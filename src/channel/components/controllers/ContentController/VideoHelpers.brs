@@ -414,7 +414,11 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
     detailScreen = getTopDetailScreenFromStack()
 
     videoContent = videoPlayer.content 'always a video, can be movie or episode
-    detailContent = detailScreen.content 'can be movie or series
+
+    detailContent = invalid
+    if detailScreen <> invalid
+      detailContent = detailScreen.content 'can be movie or series
+    end if
 
     nResumePoint = round(videoPlayer.position)
 
@@ -430,7 +434,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
     end if
 
     ' Do the appropriate action based on the cases as described in the Function definition comments
-    if videoContent.parentType = m.constants.ui.contentTypes.series
+    if detailContent <> invalid and videoContent.parentType = m.constants.ui.contentTypes.series
       ' Video player was playing a series episode
       if videoContent.parentId <> detailContent.id
         ' Case 5
@@ -474,7 +478,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
       end if
     else if videoContent.isTrailer = true
       ' Case 6, no need to do anything
-    else
+    else if detailContent <> invalid
       ' Video player was playing a movie
       if videoContent.id <> detailContent.id
         ' Case 2

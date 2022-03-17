@@ -115,7 +115,9 @@ Function removeStackTop(stack, nodeHelpers)
   size = stack.getChildCount()
   child = stack.getChild(size - 1)
   nodeHelpers.unobserveAllScoped(child)
-  child.visible = false
-  stack.removeChild(child)
+  if child <> invalid
+    child.visible = false
+    stack.removeChild(child)
+  end if
   return stack
 End Function

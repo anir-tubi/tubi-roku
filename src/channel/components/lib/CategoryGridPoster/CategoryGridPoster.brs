@@ -3,8 +3,8 @@ Function init()
 
   m.poster = m.top.findNode("Poster")
   m.LinearPoster = m.top.findNode("LinearPoster")
-  
-  
+
+
   m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
   m.top.observeField("itemContent", "onContentChange")
   m.resumeMargin = 4  'inset of resume bar
@@ -15,7 +15,7 @@ Function init()
   m.TVGuideNumberBground = m.top.findNode("TVGuideNumberBground")
   m.TVGuideNumberBground.blendColor = "0x9699A3FF"
   m.posterFadeTime = 0.5
-  
+
   '//recreate the gridItemTypes (itemIDs) and uiResolution from constants so as not to access m.global.constants for every item on the home screen as they are created
   m.gridItemTypes = {
     portrait: "portrait"
@@ -44,7 +44,7 @@ Function onContentChange()
   m.LinearTitle.visible = false
   m.LinearSubTitle.visible = false
   m.tVGuideNumberChannels.visible = false
-  
+
   gradientPoster =  m.poster.findNode("gradientPoster")
   if gradientPoster <> invalid
     m.poster.removeChild(gradientPoster)
@@ -58,7 +58,7 @@ Function onContentChange()
   ' next line shouldn't be necessary but is added in order to try and quell crashes as reported by roku crash logs
   if m.resumeProgressBar = invalid then m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
   m.resumeProgressBar.visible = false
-  
+
   ' settings utilityRowPosters Group visibility false to avoid image caching issue.
   if m.utilityRowPosters <> invalid
     m.utilityRowPosters.visible = false
@@ -69,7 +69,7 @@ Function onContentChange()
   end if
   ' settings poster visibility true to avoid image caching issue. if it is not set to true, seeing some blank posters
   m.poster.visible = true
- 
+
   if m.top.itemContent <> invalid then
     categoryContent = m.top.itemContent.getParent()
 
@@ -105,13 +105,7 @@ End Function
 
 
 Function drawHistoryProgressBar()
-  history = invalid
-  if m.top.itemContent <> invalid then
-    historyIds = m.global.historyIds
-    if historyIds <> invalid
-      history = m.global.historyIds.findNode(m.top.itemContent.id)
-    end if
-  end if
+  history = getHistory(m.top.itemContent.id)
 
   if m.top.itemContent <> invalid and history <> invalid and history.nowPos <> invalid and history.nowPos <> 0 and m.top.itemContent.length <> invalid and m.top.itemContent.length <> 0 then
     drawProgressBar(history.nowPos, m.top.itemContent.length)
@@ -163,7 +157,7 @@ Function handleLocalFocusChange(newLocalFocus)
         if m.fadeOutAnimation <> invalid
           m.fadeOutAnimation.control = "stop"
         end if
-        
+
         ' fade in the poster, but if there is already a fade in animation running, let it run
         if m.fadeInAnimation = invalid or m.fadeInAnimation.state <> "running"
           m.fadeInAnimation = fade(m.poster, "in", m.posterFadeTime)
@@ -231,7 +225,7 @@ Function setUpLinear()
   if m.top.itemContent.id <> m.itemIDs.tvGuide
     m.poster.uri = "pkg:/images/gradientBground-linearItem-vertical.png"
     m.LinearTitle.text = m.top.itemContent.title
-  else 
+  else
     if m.uiResolution <> "FHD"
       m.poster.uri = "https://cdn.adrise.tv/image/roku_support_images/gradientBground-linearItem-tvGuide_hd.png"
     else
@@ -251,7 +245,7 @@ Function setUpLinear()
     m.tVGuideNumberChannels.translation = [nTVGuideNumberChannels_X,nLinearTitlePlacement]
 
     '//Set the new Y position for the title text
-    nLinearTitlePlacement = nLinearTitlePlacement - m.TVGuideNumberBground.height - 18 
+    nLinearTitlePlacement = nLinearTitlePlacement - m.TVGuideNumberBground.height - 18
     m.LinearTitle.translation = [0, nLinearTitlePlacement]
   end if
   m.LinearPoster.translation = [381,198]
@@ -290,13 +284,13 @@ Function setUpVitg()
 
   m.title.visible = true
   m.title.text = title
-  
+
   ' It is possible when fast scrolling to the VITG row, that the item can gain focus before setUpVitg() runs.
   ' since itemHasFocus is true in this case, the callback onItemFocus won't get triggered. so manually calling handleLocalFocusChange to start trailer
   if m.top.itemHasFocus = true
     handleLocalFocusChange(m.top.itemHasFocus)
   end if
-    
+
 End Function
 
 
@@ -394,7 +388,7 @@ End Function
 Function setUpUtility()
 
    m.utilityRowPosters = m.top.createChild("Group")
-   
+
    labelFont = CreateObject("roSGNode", "Font")
    labelFont.uri = "pkg:/fonts/Vaud-Bold.ttf"
    labelFont.size = 24
@@ -405,7 +399,7 @@ Function setUpUtility()
    utilityPoster.height = 84
    utilityPoster.uri = "pkg:/images/tab_component.png"
    utilityPoster.blendColor = "0x9699A329"
-   
+
    label = CreateObject("roSGNode", "Label")
    label.id = "label"
    label.translation = [40,0]
@@ -415,14 +409,14 @@ Function setUpUtility()
    label.vertAlign = "center"
    label.text = m.top.itemContent.title
    label.font = labelFont
-   
+
    utilityPoster.appendChild(label)
    m.utilityRowPosters.appendChild(utilityPoster)
-   
+
    m.utilityPoster = utilityPoster
-   
+
    m.utilityRowPosters.visible = true
-   
+
    if m.utilityLocalFocus = invalid
      m.utilityLocalFocus = false
    end if
@@ -449,7 +443,7 @@ Function handleUtilityLocalFocusChange(newLocalFocus)
   end if
 
   m.utilityLocalFocus = newLocalFocus
-  
+
 End Function
 
 
@@ -461,22 +455,22 @@ End Function
 
 
 Function onUtilityRowListHasFocus()
-  
+
   if m.top.rowListHasFocus = false
     handleUtilityLocalFocusChange(false)
   end if
-  
+
 End Function
 
 
 Function onUtilityFocusPercentChange()
-  
+
   if m.top.focusPercent < 1.0 and m.utilityLocalFocus = true
     handleUtilityLocalFocusChange(false)
   else if m.top.focusPercent = 1.0 and m.utilityLocalFocus = false and m.top.rowListHasFocus = true
     handleUtilityLocalFocusChange(true)
-  end if  
-  
+  end if
+
 End Function
 
 

@@ -134,7 +134,9 @@ Function tubiBookmarks_addHistoryLocally(content as Object, position as Integer,
     if content.parentType = m.constants.uapiContentTypes.series
       '//if this TV content
       if content.parentId <> invalid
-        historyNode = global.historyIds.findNode(content.parentId)
+
+        historyNode = getHistory(content.parentId)
+
         if historyNode = invalid
           historyNode = global.historyIds.createChild("HistoryContentNode")
         end if
@@ -156,7 +158,9 @@ Function tubiBookmarks_addHistoryLocally(content as Object, position as Integer,
       end if
     else
       '//else if this movie content
-      historyNode = global.historyIds.findNode(content.id)
+
+      historyNode = getHistory(content.id)
+
       if historyNode = invalid
         historyNode = global.historyIds.createChild("HistoryContentNode")
       end if
@@ -240,7 +244,9 @@ End Function
 'Remove the local version copy of the resume position for a particular video.
 Function tubiBookmarks_removeHistoryLocally(content as Object, global)
   if content <> invalid
-    historyNode = global.historyIds.findNode(content.id)
+
+    historyNode = getHistory(content.id)
+
     if historyNode <> invalid
       global.historyIds.removeChild(historyNode)
     end if
@@ -461,11 +467,7 @@ Function tubiBookmarks_handleUserInfo(userInfo)
   parsed = ParseJson(userInfo)
   if parsed <> invalid
     if parsed.user_id <> invalid then         result.userId = parsed.user_id
-    if parsed.email <> invalid then           result.email = parsed.email
     if parsed.facebook_id <> invalid then     result.facebookId = parsed.facebook_id
-    if parsed.name <> invalid then            result.name = parsed.name
-    if parsed.first_name <> invalid then      result.firstName = parsed.first_name
-    if parsed.last_name <> invalid then       result.lastName = parsed.last_name
     if parsed.profile_pic <> invalid then     result.profilePic = parsed.profile_pic
     if parsed.gender <> invalid then          result.gender = parsed.gender
     if parsed.birthday <> invalid then        result.birthday = parsed.birthday
@@ -474,6 +476,27 @@ Function tubiBookmarks_handleUserInfo(userInfo)
     if parsed.enabled <> invalid then         result.enabled = parsed.enabled
     if parsed.has_password <> invalid then    result.hasPassword = parsed.has_password
     if parsed.parental_rating <> invalid then result.parentalRating = parsed.parental_rating
+
+    result.email = ""
+    if parsed.email <> invalid
+      result.email = parsed.email
+    end if
+
+    result.name = ""
+    if parsed.name <> invalid
+      result.name = parsed.name
+    end if
+
+    result.firstName = ""
+    if parsed.first_name <> invalid
+      result.firstName = parsed.first_name
+    end if
+
+    result.lastName = ""
+    if parsed.last_name <> invalid
+      result.lastName = parsed.last_name
+    end if
+
   end if
   return result
 End Function

@@ -48,23 +48,27 @@ End Function
 
 
 Function setSettingsScreenSignInInfo()
-  aaSignIn = {signedIn: false
-    name: invalid
-    email: invalid
+  aaSignIn = {
+    signedIn: false
+    name: ""
+    email: ""
   }
 
-  if isLoggedInUser() = true
-    authInfo = m.global.authInfo
-    aaSignIn.signedIn = true
-    aaSignIn.email = authInfo.email
-    sName = ""
-    if authInfo.firstName <> invalid and authInfo.lastName <> invalid
-      sName = authInfo.firstName + " " + authInfo.lastName
-    else
-      sName = authInfo.name
+  authInfo = getFieldFromGlobal("authInfo")
+
+  if isLoggedInUser(authInfo) = true
+
+    if authInfo <> invalid
+      aaSignIn.signedIn = true
+      aaSignIn.email = authInfo.email
+      if authInfo.firstName <> "" and authInfo.lastName <> ""
+        sName = authInfo.firstName + " " + authInfo.lastName
+      else
+        sName = authInfo.name
+      end if
+      aaSignIn.name = sName
     end if
 
-    aaSignIn.name = sName
   end if
 
   m.settingsScreen.signInInfo = aaSignIn
@@ -73,8 +77,8 @@ End Function
 
 Function setAuthInfoValue(attribute, value) as boolean
   bSuccess = false
-  if isLoggedInUser() = true
-    authInfo = m.global.authInfo
+  authInfo = getFieldFromGlobal("authInfo")
+  if isLoggedInUser(authInfo) = true
     authInfo[attribute] = value
     m.global.authInfo = authInfo
     bSuccess = true
@@ -155,7 +159,7 @@ Function onParentalSettingSelected()
   parentalSetting = m.settingsScreen.parentalSettingSelected
   if m.settingsScreen.signInInfo <> invalid and m.settingsScreen.signInInfo.signedIn = true
     m.settingsScreen.actionAfterActivation = ""
-    authInfo = m.global.authInfo
+    authInfo = getFieldFromGlobal("authInfo")
     if isLoggedInUser(authInfo) and parentalSetting <> authInfo.parentalrating
       ' parental settings have been updated
       nNowDate = getNowSeconds()
@@ -236,7 +240,7 @@ Function onPasswordConfirm(msg = invalid)
     confirmPasswordScreen.isLoading = true
   else
     '//if not coming from the password screen, then coming from a saved password within the last few minutes
-    authInfo = m.global.authInfo
+    authInfo = getFieldFromGlobal("authInfo")
     sPassword = authInfo.passwordText
     if authInfo.secondsOfSavedPassword = invalid or authInfo.secondsOfSavedPassword <= 0
       setAuthInfoValue("secondsOfSavedPassword", getNowSeconds())
@@ -257,7 +261,7 @@ Function refreshScreenAfterParentalChanges()
   tubiLog("SettingsScreenHelpers.refreshScreenAfterParentalChanges")
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid
-    authInfo = m.global.authInfo
+    authInfo = getFieldFromGlobal("authInfo")
     if isLoggedInUser(authInfo) and authInfo.parentalrating <> invalid
       homeScreen.parentalRating = authInfo.parentalrating
     end if
@@ -289,6 +293,9 @@ Function onParentalSettingComplete(msg)
   tubiLog("SettingsScreenHelper.onParentalSettingComplete")
   result = msg.GetData()
   m.confirmPasswordScreen.isLoading = false
+
+  authInfo = getFieldFromGlobal("authInfo")
+
   if result <> invalid
     setAuthInfoValue("parentalrating", m.settingsScreen.parentalSettingSelected)
     if isConfirmPasswordScreen() = true
@@ -358,7 +365,7 @@ Function onParentalSettingComplete(msg)
       buttons = [getTranslation("dialog_button_ok")]
 
       showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask)
-    else if m.global.authInfo.secondsOfSavedPassword <> invalid and m.global.authInfo.secondsOfSavedPassword > 0
+    else if authInfo <> invalid and authInfo.secondsOfSavedPassword <> invalid and authInfo.secondsOfSavedPassword > 0
       '//if not showing ConfirmPasswordScreen and showing parentalControls panel AND this came from a saved password,
       '//   then display the ConfirmPasswordScreen instead of error message
       setAuthInfoValue("secondsOfSavedPassword", 0)

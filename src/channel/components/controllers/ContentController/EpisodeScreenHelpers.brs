@@ -69,7 +69,8 @@ Function onEpisodeSelected(msg)
         else
           nowPos = 0
           ' find the position in global history
-          history = m.global.historyIds.findNode(content.id)
+          history = getHistory(content.id)
+
           if history <> invalid and history.nowPos > 0
             nowPos = history.nowPos
             content.nowPos = nowPos

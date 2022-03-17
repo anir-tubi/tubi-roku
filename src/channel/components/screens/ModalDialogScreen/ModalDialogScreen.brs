@@ -11,7 +11,9 @@ Function init()
   m.ScrollableBackground = m.top.findNode("ScrollableBackground")
   m.MessageGroup = m.top.findNode("MessageGroup")
 
-  m.top.screenLevel = m.global.constants.ui.screenLevels.modalDialogScreen
+  m.constants = getConstantsFromGlobal()
+
+  m.top.screenLevel = m.constants.ui.screenLevels.modalDialogScreen
 End Function
 
 

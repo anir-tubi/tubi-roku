@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  - AuthTask
  -
  - Retrieve the auth info, which may be stored and might be refreshed from the auth server.
  -
- --> 
+ -->
 <component name="AuthTask" extends="Task">
     <script type="text/brightscript" uri="AuthTask.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
@@ -16,6 +16,7 @@
     <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
     <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
     <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
+    <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
 
     <interface>
       <!-- INPUT -->
@@ -70,7 +71,7 @@
 
         <!-- number of days since the unix epoch when the device first opened Tubi -->
         <field id="firstVisit" type="integer" />
-        
+
         <!-- guestUserHasAgeInfo info as returned by Auth.getGuestUserHasAgeInfo -->
         <field id="guestUserHasAgeInfo" type="assocarray" />
 
@@ -102,7 +103,7 @@
         -        }
         -->
         <field id="result" type="assocarray" alwaysNotify="true" />
-      
+
         <!-- updateHistory:
         -        History response with structure:
         -        {

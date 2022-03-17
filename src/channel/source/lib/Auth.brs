@@ -5,7 +5,7 @@ Function TubiAuth(constants, request)
     authRegSection: "auth"
     firstVisitRegSection: "visit"
     guestUserHasAgeRegSection: "has_age"
-    
+
     constants: constants
     request: request
 
@@ -114,7 +114,7 @@ Function tubiAuth_getAuthInfo()
     else
       newAuthInfo = authInfo
     end if
-  else 
+  else
     newAuthInfo = m.fetchAndSaveAnonymousAuthInfo()
   end if
 
@@ -259,7 +259,7 @@ Function tubiAuth_fetchAnonymousAuthInfo()
     end while
   end if
 
-  if signingKeyResponse = invalid or (signingKeyResponse.id = invalid or signingKeyResponse.key = invalid) 
+  if signingKeyResponse = invalid or (signingKeyResponse.id = invalid or signingKeyResponse.key = invalid)
     return invalid
   end if
 
@@ -358,7 +358,7 @@ Function tubiAuth_getAnonymousSigningKeyRequest(verifier)
   hash = digest.Final()
 
   ' base64 encode the hash
-  ba2 = CreateObject("roByteArray") 
+  ba2 = CreateObject("roByteArray")
   ba2.FromHexString(hash)
   challenge = ba2.ToBase64String().replace("+", "-").replace("/", "_")
 
@@ -641,7 +641,7 @@ End Function
 '               body - PUT or POST body as string
 '               headers - assoc array of headers and their values
 '
-' returns a request objects as created by TubiRequest().createAsync() with an additional property(authInfo) 
+' returns a request objects as created by TubiRequest().createAsync() with an additional property(authInfo)
 '   and additional method(getAuthHeaders) - both are needed in request.handleEvent()
 ' or returns invalid if there is no authInfo in the registry
 Function tubiAuth_createAuthRequest(url as String, name = "" as String, options={} as Object) as Object
@@ -830,7 +830,7 @@ End Function
 '@authInfo: assocArray, authInfo as pulled from the registry with the old auth token and expire time
 Function tubiAuth_updateAuthInfo(newAccess, authInfo)
   updatedAuthInfo = invalid
-  
+
   if newAccess <> invalid and newAccess.expires_in <> invalid and newAccess.access_token <> invalid
     dateTime = CreateObject("roDateTime")
     newExpireTime = dateTime.asSeconds() + newAccess.expires_in
@@ -843,7 +843,7 @@ Function tubiAuth_updateAuthInfo(newAccess, authInfo)
     end if
   end if
 
-  return updatedAuthInfo  
+  return updatedAuthInfo
 End Function
 
 
@@ -852,7 +852,7 @@ End Function
 '@authInfo: assocArray, authInfo as pulled from the registry with the old auth token and expire time
 Function tubiAuth_updateAnonymousAuthInfo(newAccess, authInfo)
   updatedAuthInfo = invalid
-  
+
   if newAccess <> invalid and newAccess.expires_in <> invalid and newAccess.access_token <> invalid and newAccess.refresh_token <> invalid
     dateTime = CreateObject("roDateTime")
     newExpireTime = dateTime.asSeconds() + newAccess.expires_in
@@ -868,7 +868,7 @@ Function tubiAuth_updateAnonymousAuthInfo(newAccess, authInfo)
     end if
   end if
 
-  return updatedAuthInfo  
+  return updatedAuthInfo
 End Function
 
 
@@ -979,11 +979,23 @@ Function tubiAuth_formatAuthInfoFromServer(serverAuthInfo)
   if serverAuthInfo.access_token <> invalid then authInfo.accessToken = serverAuthInfo.access_token
   if serverAuthInfo.expires_in <> invalid then authInfo.expireTime = (serverAuthInfo.expires_in + secondsToNow).ToStr()
   if serverAuthInfo.user_id <> invalid then authInfo.userId = serverAuthInfo.user_id.toStr()
-  if serverAuthInfo.first_name <> invalid then authInfo.fn = serverAuthInfo.first_name
-  if serverAuthInfo.last_name <> invalid then authInfo.ln = serverAuthInfo.last_name
-  if serverAuthInfo.name <> invalid then authInfo.name = serverAuthInfo.name
   if serverAuthInfo.authType <> invalid then authInfo.authType = serverAuthInfo.authType
   if serverAuthInfo.has_age <> invalid then authInfo.hasAge = serverAuthInfo.has_age.toStr()
+
+  authInfo.fn = ""
+  if serverAuthInfo.first_name <> invalid
+    authInfo.fn = serverAuthInfo.first_name
+  end if
+
+  authInfo.ln = ""
+  if serverAuthInfo.last_name <> invalid
+    authInfo.ln = serverAuthInfo.last_name
+  end if
+
+  authInfo.name = ""
+  if serverAuthInfo.name <> invalid
+    authInfo.name = serverAuthInfo.name
+  end if
 
   return authInfo
 End Function
@@ -1038,7 +1050,7 @@ End Function
 ' The signature will be used when making a request fetch anonymous auth tokens for signed out users.
 '
 ' @dateTime : ISO 8601 as String
-' @tokenReqInfo : assocarray, 
+' @tokenReqInfo : assocarray,
 ' @secretKey : string, key response of signing_key
 ' @algorithm : string, from constants
 '
@@ -1061,7 +1073,7 @@ End Function
 
 ' tubiAuth_constructCanonicalRequest
 '
-' @tokenReqInfo : assocarray, 
+' @tokenReqInfo : assocarray,
 '
 ' returns canonicalRequest : string
 '
@@ -1096,7 +1108,7 @@ End Function
 
 ' tubiAuth_constructCanonicalQueryString
 '
-' @params : assocarray, 
+' @params : assocarray,
 '
 ' returns queryString : string
 '
@@ -1110,7 +1122,7 @@ End Function
 
 ' tubiAuth_constructCanonicalHeaders
 '
-' @headers : assocarray, 
+' @headers : assocarray,
 '
 ' returns canonicalHeader : string
 '
@@ -1129,7 +1141,7 @@ End Function
 
 ' tubiAuth_constructSignedHeaders
 '
-' @headers : assocarray, 
+' @headers : assocarray,
 '
 ' returns signedHeader : string
 '
@@ -1137,15 +1149,18 @@ Function tubiAuth_constructSignedHeaders(headers)
 
   signedHeader = ""
   index = 0
-  headersCount = headers.count()
 
-  for each item in headers.Items()
-    signedHeader = signedHeader + lcase(item.key).trim()
-    index = index + 1
-    if index <> headersCount
-      signedHeader = signedHeader + ";"
-    end if
-  end for 
+  if headers <> invalid
+    headersCount = headers.count()
+
+    for each item in headers.Items()
+      signedHeader = signedHeader + lcase(item.key).trim()
+      index = index + 1
+      if index <> headersCount
+        signedHeader = signedHeader + ";"
+      end if
+    end for
+  end if
 
   if signedHeader = ""
     signedHeader = chr(10)
@@ -1158,7 +1173,7 @@ End Function
 
 ' tubiAuth_constructHashedPayload
 '
-' @body : string, 
+' @body : string,
 '
 ' returns hashedPayload : string
 '
@@ -1240,7 +1255,7 @@ Function tubiAuth_calculateSignature(stringToSign, secretKey, dateTime)
     kDate = hmac.process(message)
 
     hmac = CreateObject("roHMAC")
-  
+
     if hmac.setup("sha256", kDate) = 0
       message = CreateObject("roByteArray")
       message.fromAsciiString("tubi_request")
@@ -1255,7 +1270,7 @@ Function tubiAuth_calculateSignature(stringToSign, secretKey, dateTime)
         signature = lcase(signature.ToHexString())
       end if
 
-    end if  
+    end if
   end if
 
   if signature <> invalid

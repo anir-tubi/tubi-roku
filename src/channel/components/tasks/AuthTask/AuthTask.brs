@@ -45,9 +45,9 @@ Function execInitializeUserData()
 
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
-  
+
   m.top.firstVisit = Auth.getfirstVisit()
-  m.top.authInfo = authInfo  ' set last so that it can be used as a trigger 
+  m.top.authInfo = authInfo  ' set last so that it can be used as a trigger
 End Function
 
 
@@ -180,7 +180,7 @@ Function removeFromHistory()
   NodeHelpers = TubiNodeHelpers()
   apiUtils = ApiUtils(constants)
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers, apiUtils)
-  
+
   authInfo = auth.getAuthInfo()
   if isLoggedInUser(authInfo)
     '//Remove the resume position history for signed in users
@@ -213,14 +213,14 @@ Function removeFromHistory()
 
     tubiLog("User is signed out so removeHistoryReq is returning a successful response for locally removed history")
     '//removing the history locally should mimic the return of a backend call to remove history
-    '//   this is so the calling code doesn't have to keep track if thr user is signed in or not. 
+    '//   this is so the calling code doesn't have to keep track if thr user is signed in or not.
     result = {
       response: {
         code: 204
       }
     }
     m.top.result = result
-  end if 
+  end if
   tubiLog("EXIT AuthTask.removeFromHistory")
 End Function
 

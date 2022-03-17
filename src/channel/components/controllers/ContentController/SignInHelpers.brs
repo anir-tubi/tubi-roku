@@ -41,16 +41,18 @@ Function showRFIScreen()
     ' This is the path expected to be taken in production
     currentScreen = getCurrentScreen()
 
-    dialogEvent = {
-      type: "dialog"
-      values: {
-        dialog_type: "REGISTRATION"
-        pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
-        dialog_action: "SHOW"
-        dialog_sub_type: "email-prefill"
+    if currentScreen <> invalid
+      dialogEvent = {
+        type: "dialog"
+        values: {
+          dialog_type: "REGISTRATION"
+          pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+          dialog_action: "SHOW"
+          dialog_sub_type: "email-prefill"
+        }
       }
-    }
-    m.trackingLoggingTask.trackEvent = dialogEvent
+      m.trackingLoggingTask.trackEvent = dialogEvent
+    end if
 
     ' RFI screen is showing only if the channelStore node is stored in m variable
     m.billing = CreateObject("roSGNode", "ChannelStore")

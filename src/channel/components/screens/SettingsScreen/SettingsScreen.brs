@@ -309,18 +309,19 @@ End Function
 Function CreateSignOutPanel()
   panel = CreateObject("roSGNode", "SignOutPanel")
   panel.title = getTranslation("screenSettings_menu_signOut")
+
   sName = ""
-  if m.top.signInInfo <> invalid and m.top.signInInfo.name <> invalid
+  if m.top.signInInfo <> invalid
     sName = m.top.signInInfo.name
   end if
-
   if sName <> ""
     panel.description  = getTranslation("screenSettings_signOut_description", {name: sName})
   else
     panel.description  = ""
   end if
+
   sEmail = ""
-  if m.top.signInInfo <> invalid and m.top.signInInfo.email <> invalid
+  if m.top.signInInfo <> invalid
     sEmail = m.top.signInInfo.email
   end if
   if sEmail <> ""

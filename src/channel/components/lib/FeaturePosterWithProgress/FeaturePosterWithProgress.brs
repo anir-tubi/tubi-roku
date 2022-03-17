@@ -27,10 +27,7 @@ End Function
 
 
 Function drawProgressBar()
-  history = invalid
-  if m.top.itemContent <> invalid
-    history = m.global.historyIds.findNode(m.top.itemContent.id)
-  end if
+  history = getHistory(m.top.itemContent.id)
 
   if m.top.itemContent <> invalid and history <> invalid and history.nowPos <> invalid and history.nowPos <> 0 and m.top.itemContent.length <> invalid and m.top.itemContent.length <> 0 then
     percentage = history.nowPos / m.top.itemContent.length

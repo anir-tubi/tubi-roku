@@ -8,6 +8,7 @@
 <component name="ModalDialogScreen" extends="Group" initialFocus="ButtonList">
 
   <script type="text/brightscript" uri="ModalDialogScreen.brs" />
+  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
   
   <interface>
     <!-- INPUT -->

@@ -32,16 +32,16 @@
 
       <!-- set the RowList.rowHeights and RowList.rowItemSize arrays since the category order has changed. -->
       <field id="repopulateContent" type="boolean" alwaysNotify="true"/>
-      
+
       <!-- expected to be category ids(continue_waching/queue) if new continue_waching/queue got added, helps to set focus to correct row -->
       <field id="rowAdded" type="string"/>
-      
+
       <!-- expected to be category ids(continue_waching/queue) if new continue_waching/queue got removed, helps to set focus to correct row -->
       <field id="rowRemoved" type="string"/>
 
       <!-- What kind of filter if any does this list use? For example, "tv", "movies", "latino" -->
       <field id="contentMode" value="" type="string"/>
-      
+
       <!-- Indicates if that when the server is contacted, it should indcate that the app is in kidsMode. -->
       <field id="shouldKidsModeBeSentToServer" type="boolean"/>
 
@@ -74,7 +74,7 @@
        -   Assumes there are only 2 possible widths for the CategoryGridList, full width and not full width.
        -->
       <field id="isFullWidth" type="boolean" value="true" />
-      
+
     <!-- OUTPUT -->
       <field id="itemSelected" type="node"/>
 
@@ -91,7 +91,7 @@
       <field id="oldCursorPosition" type="vector2d" value="[-1,-1]"/>
 
       <field id="selectedPosition" alias="RowList.rowItemSelected" />
-      
+
       <field id="focusedPosition" alias="RowList.rowItemFocused" />
 
       <!-- in the case that focus is not being set on the RowList, inform that content is loaded
@@ -110,7 +110,7 @@
       <field id="loadCategoriesIndex" type="integer" alwaysNotify="true" />
 
   </interface>
-  
+
   <children>
     <RowList
       id="RowList"
@@ -133,4 +133,3 @@
       duration="0.5"/>
   </children>
 </component>
-      

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  - ContentController
  -
@@ -59,9 +59,10 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiAds.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
-  
+  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
+
   <interface>
-  
+
     <!-- INPUTS -->
       <!-- the arguments that are passed into the app at startup, as an associative array -->
       <field id="startupArgs" type="assocarray"/>
@@ -70,12 +71,12 @@
       <!-- any info that is passed into the channel via roInput/ECP while the channel is running
            can be deeplinks, transport controls, voice commands, etc. -->
       <field id="roInputInfo" type="assocarray"/>
-      
+
       <!-- customSuspend will be set by scene's suspendhandler callback  -->
       <field id="customSuspend" type="assocarray" alwaysNotify="true"/>
-      
+
       <!-- customResume will be set by scene's resumehandler callback  -->
-      <field id="customResume" type="assocarray" alwaysNotify="true"/>      
+      <field id="customResume" type="assocarray" alwaysNotify="true"/>
 
       <field id="reloadUserCategoriesResponse" type="assocarray"/>
       <field id="reloadMovieUserCategoriesResponse" type="assocarray"/>
@@ -90,14 +91,14 @@
       <field id="linearTVScreenResponse" type="assocarray"/>
 
       <field id="searchResponse" type="assocarray"/>
-      
+
       <field id="transportVoiceRequest" type="assocarray"/>
-      
+
       <!-- fadeInContentController will be set true once animation logo is finished during app launch -->
       <field id="fadeInContentController" type="boolean"/>
 
-      <!-- Holds the information needed to populate a navigate_witin_page event. This info is usually set elsewhere by screens and 
-           observed by their helpers, but in rare cases, ContentController can set this associative array, which 
+      <!-- Holds the information needed to populate a navigate_witin_page event. This info is usually set elsewhere by screens and
+           observed by their helpers, but in rare cases, ContentController can set this associative array, which
            will be responsible for sending navigate_within_page events.
            See tubiTracking_getAnalyticsEvent for the format of the navigate_within_page AA
       -->
@@ -106,19 +107,19 @@
     <!-- OUTPUT -->
       <!-- Main thread listens for this and will exit the app if set to true-->
       <field id="exitApp" type="boolean" value="false"/>
-      
+
       <field id="transportVoiceResponse" type="assocarray"/>
-      
+
       <!-- removeStartUpScreens is used to remove the StartUpScreens(animationLogo) -->
-      <field id="removeStartUpScreens" type="boolean" />  
-      
+      <field id="removeStartUpScreens" type="boolean" />
+
       <!-- disableInstantResume will be set to true when guest user tries to relaunch the app after 24hours after app got suspended by pressing home or by opening channel on remote -->
       <field id="disableInstantResume" type="boolean" value="false" alwaysNotify="true"/>
 
   </interface>
-        
+
     <children>
-    
+
      <Group
       id="uiGroup"
       opacity="0.0">
@@ -150,7 +151,7 @@
 
         <ScreenStack
           id="ScreenStack"/>
-        
+
         <!--  Group that contains the linear video player when it is not in its fullscreen state, and when the player needs to be above the screen stack layer. -->
         <Group
           id="LinearPlayerGroupAboveScreenStack"/>
@@ -169,7 +170,7 @@
           height="36"
           visible="false"
           translation="[1729,72]"/>
-        <Group 
+        <Group
           id="logoGroup">
           <Poster
             id="tubiLogo"
@@ -213,12 +214,12 @@
        id="ResumeAllowedTimer"
        duration="300"
        repeat="true"/>
-     
-     <!-- DetailScreenLoadTimer is a timer used to check whether startup animation logo is finished playing -->    
+
+     <!-- DetailScreenLoadTimer is a timer used to check whether startup animation logo is finished playing -->
      <Timer
        id="DetailScreenLoadTimer"
        duration="0.5"
-       repeat="true"/>  
+       repeat="true"/>
 
       <!-- Spinner primarily for sign-in/sign-out transitions -->
       <Spinner
@@ -227,7 +228,7 @@
         modal="true"
         width="1920"
         height="1080"/>
-        
+
       <!-- Spinner to indicate loading of a linear video when it is not fullscreen -->
       <Spinner
         id="LinearVideoPlayerSpinner"
@@ -239,10 +240,9 @@
         horizAlign="right"
         vertAlign="bottom"
         visible="false"/>
-        
-   </Group>   
-   
+
+   </Group>
+
     </children>
 
 </component>
-

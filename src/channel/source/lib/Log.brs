@@ -208,7 +208,12 @@ Function tubiLog_getLoggingRequest_(logInfo as Object) as Object
   loggingReqBody.append(logInfo)
 
   loggingReqBody["user_id"] = 0
-  if m.auth.getAuthInfo() <> invalid and m.auth.getAuthInfo().userId <> invalid
+  authInfo = m.auth.getAuthInfo()
+  if authInfo <> invalid and authInfo.userId <> invalid
+    loggingReqBody["user_id"] = m.auth.getAuthInfo().userId.ToInt()
+  end if
+
+  if m.auth <> invalid and m.auth.getAuthInfo() <> invalid and m.auth.getAuthInfo().userId <> invalid
     loggingReqBody["user_id"] = m.auth.getAuthInfo().userId.ToInt()
   end if
 

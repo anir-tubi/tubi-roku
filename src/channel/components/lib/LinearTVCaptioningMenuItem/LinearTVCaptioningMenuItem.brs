@@ -4,7 +4,9 @@ Function init()
   m.MenuText = m.top.findNode("MenuText")
   m.Bground = m.top.findNode("Bground")
 
-  if m.global.constants.deviceInfo.scaledUi = true
+  m.constants = getConstantsFromGlobal()
+
+  if m.constants.deviceInfo.scaledUi = true
     m.Bground.uri = "pkg://images/menu-focus-hd.9.png"
   end if
 End Function

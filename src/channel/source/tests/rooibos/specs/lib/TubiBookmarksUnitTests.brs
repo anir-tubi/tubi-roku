@@ -1,4 +1,4 @@
-'@TestSuite [TubiBookmarks] TubiBookmarks.brs 
+'@TestSuite [TubiBookmarks] TubiBookmarks.brs
 
 '@Setup
 Function TubiBookmarksSetup()
@@ -11,7 +11,7 @@ Function TubiBookmarksSetup()
   utils = ApiUtils(constants)
 
   m.unauthorizedBM = TubiBookmarks(request, unauthorized, constants, nodeHelpers, utils)
-  
+
   authorized = tubiBookmarks_mockAuth_Authorized_testHelper(constants, request)
   m.authorizedBM = TubiBookmarks(request, authorized, constants, nodeHelpers, utils)
 
@@ -20,12 +20,12 @@ Function TubiBookmarksSetup()
 
   m.movieContent = CreateObject("roSGNode", "TubiContentNode")
   m.movieContent.type = "movie"
-  
+
   m.seriesContent = CreateObject("roSGNode", "TubiContentNode")
   m.seriesContent.type = "series"
 
   m.episodeContent = CreateObject("roSGNode", "TubiContentNode")
-  m.episodeContent.type = "episode"  
+  m.episodeContent.type = "episode"
 
   m.historyUrl = constants.urls.users.history
   m.deviceId = constants.deviceInfo.deviceId
@@ -81,7 +81,7 @@ Function tubiBookmarks_addBookmarkReqMovie_test()
   BM = m.authorizedBM
   content = m.videoContent
   content.id = "321221"
-  content.title = "We Are Young"  
+  content.title = "We Are Young"
   req = BM.addBookmarkReq(content)
   m.assertNotInvalid(req)
 End Function
@@ -92,7 +92,7 @@ Function tubiBookmarks_addBookmarkReqSeries_test()
   BM = m.authorizedBM
   content = m.seriesContent
   content.id = "01079"
-  content.title = "S02:E05 - You, I'll Be Following" 
+  content.title = "S02:E05 - You, I'll Be Following"
   req = BM.addBookmarkReq(content)
   m.assertNotInvalid(req)
 End Function
@@ -207,7 +207,7 @@ Function tubiBookmarks_addHistoryReqVideo_ParentIdAsInvalid_test()
   m.assertInvalid(body.parent_id)
 
   userId = BM.auth.getAuthInfo().userid
-  m.assertEqual(userId.toInt(), body.user_id)  
+  m.assertEqual(userId.toInt(), body.user_id)
   m.assertEqual(1478, body["position"])
 
   headers = options.headers
@@ -248,7 +248,7 @@ Function tubiBookmarks_addHistoryReqVideo_ParentIdAsEmpty_test()
   m.assertInvalid(body.parent_id)
 
   userId = BM.auth.getAuthInfo().userid
-  m.assertEqual(userId.toInt(), body.user_id)  
+  m.assertEqual(userId.toInt(), body.user_id)
   m.assertEqual(1478, body["position"])
 
   headers = options.headers
@@ -275,7 +275,7 @@ Function tubiBookmarks_addHistoryReqEpisodeParentIdAsString_test()
   content.parentId = "1079"
 
   req = BM.addHistoryReq(content, 1478)
-  
+
   m.assertNotInvalid(req)
   m.assertNotInvalid(req.url)
   m.assertEqual(m.historyUrl, req.url)
@@ -291,7 +291,7 @@ Function tubiBookmarks_addHistoryReqEpisodeParentIdAsString_test()
   m.assertEqual(1079, body.parent_id)
 
   userId = BM.auth.getAuthInfo().userid
-  m.assertEqual(userId.toInt(), body.user_id)  
+  m.assertEqual(userId.toInt(), body.user_id)
   m.assertEqual(1478, body["position"])
 
   headers = options.headers
@@ -317,7 +317,7 @@ Function tubiBookmarks_addHistoryReqEpisodeParentIdAsInteger_test()
   content.parentId = 1079
 
   req = BM.addHistoryReq(content, 1478)
-  
+
   m.assertNotInvalid(req)
   m.assertNotInvalid(req.url)
   m.assertEqual(m.historyUrl, req.url)
@@ -333,7 +333,7 @@ Function tubiBookmarks_addHistoryReqEpisodeParentIdAsInteger_test()
   m.assertEqual(1079, body.parent_id)
 
   userId = BM.auth.getAuthInfo().userid
-  m.assertEqual(userId.toInt(), body.user_id)  
+  m.assertEqual(userId.toInt(), body.user_id)
   m.assertEqual(1478, body["position"])
 
   headers = options.headers

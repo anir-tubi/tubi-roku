@@ -172,8 +172,8 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
       detailScreen.hasTrailer = true
     end if
 
-    bookmark = m.global.bookmarkIds.findNode(content.id)
-    history = m.global.historyIds.findNode(content.id)
+    bookmark = getBookmark(content.id)
+    history = getHistory(content.id)
 
     if isLoggedInUser() = false and history <> invalid
       '//if user is signed out but has history of current item, make sure it has been less than guest user resume limit,
@@ -198,7 +198,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
       if episode <> invalid
         if history <> invalid
           '//if there is no history, then there is no episode history either
-          episodeHistory = m.global.historyIds.findNode(episode.id)
+          episodeHistory = getHistory(episode.id)
         end if
         detailScreen.episodeTitle = episode.title
       end if
@@ -391,7 +391,8 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
     ' Replace the top of the detail screen content stack with the refreshed content
     oldContent = detailScreen.content
     afterFn = invalid  ' the Function to execute once we've sorted the detail screen out
-    history = m.global.historyIds.findNode(refreshedContent.id)
+
+    history = getHistory(refreshedContent.id)
 
     if m.deepLinkContent <> invalid
       if m.deepLinkContent.nowPos = 0 and history <> invalid and history.nowPos > 0
@@ -414,10 +415,9 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
         if history <> invalid
           refreshedContent.currentEpisodeId = history.currentEpisodeId
           episode = getEpisodeContent(refreshedContent)
-          episodeHistory = invalid
-          if episode <> invalid
-            episodeHistory = m.global.historyIds.findNode(episode.id)
-          end if
+
+          episodeHistory = getHistory(episode.id)
+
           if episodeHistory <> invalid and episodeHistory.nowPos > 0
             afterFn = resumeHelper
           end if
@@ -1030,7 +1030,9 @@ Function onResumeAllowedTimerFired()
       if hiddenScreen <> invalid and hiddenScreen.id = m.constants.ui.screenIds.detailScreen
         detailScreen = hiddenScreen
         bDetailScreenExistsInStack = true
-        history = m.global.historyIds.findNode(detailScreen.content.id)
+
+        history = getHistory(detailScreen.content.id)
+
         if history <> invalid
           '//if user is signed out but has history of current item, make sure it has been less than guest user resume limit,
           '//   because beyond that time we are restricted legally from showing data of signed out users.
@@ -1167,7 +1169,9 @@ End Function
 
 Function onRemoveFromHistory(detailScreen)
   if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
-    history = m.global.historyIds.findNode(detailScreen.content.id)
+
+    history = getHistory(detailScreen.content.id)
+
     if history <> invalid and history.historyId <> invalid
       content = detailScreen.content.clone(false)
       detailScreen.stringNoHistoryButton = getTranslation("screenDetails_button_removing")
@@ -1528,7 +1532,8 @@ Function processResume(episode)
       nowPos = episode.nowPos
     else
       ' find the position in global history
-      history = m.global.historyIds.findNode(episode.id)
+      history = getHistory(episode.id)
+
       if history <> invalid and history.nowPos > 0
         nowPos = history.nowPos
       end if
@@ -1553,13 +1558,15 @@ Function skipDetailScreen(refreshedContent)
   end if
 
   detailScreen = getTopDetailScreenFromStack()
-  populateDetailScreen(detailScreen, refreshedContent)
+  if detailScreen <> invalid
+    populateDetailScreen(detailScreen, refreshedContent)
 
-  episode = getEpisodeContent(detailScreen.content)
-  if episode <> invalid
-    nowPos = processResume(episode)
-    if nowPos >= 0
-      playVideoContentWhileSkippingDetailScreen(episode, nowPos, trackingPageInfo, trackingComponentInfo)
+    episode = getEpisodeContent(detailScreen.content)
+    if episode <> invalid
+      nowPos = processResume(episode)
+      if nowPos >= 0
+        playVideoContentWhileSkippingDetailScreen(episode, nowPos, trackingPageInfo, trackingComponentInfo)
+      end if
     end if
   end if
 End Function

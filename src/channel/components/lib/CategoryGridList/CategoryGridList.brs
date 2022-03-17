@@ -64,7 +64,7 @@ Function onJumpToRowItemByIDChange()
       for j=0 to container.getChildCount()-1
         item = container.getChild(j)
         if item.id = sContentID
-          'focus on the item 
+          'focus on the item
           m.RowList.jumpToRowItem = [i,j]
           return true
         end if
@@ -83,10 +83,10 @@ Function onComponentFocusChange()
 
     rowItemFocused = m.RowList.rowItemFocused
     if rowItemFocused.count() <> 2
-      '//The rowList has not gained focus yet so either use the default upperleft item or the 
+      '//The rowList has not gained focus yet so either use the default upperleft item or the
       rowItemFocused = [0,0]
-    end if 
-    
+    end if
+
     if resolveAbbreviatedContent(rowItemFocused) <> invalid or (m.itemToJumpTo <> invalid and resolveAbbreviatedContent(m.itemToJumpTo) <> invalid)
       if m.itemToJumpTo <> invalid
         m.RowList.jumpToRowItem = m.itemToJumpTo
@@ -95,7 +95,7 @@ Function onComponentFocusChange()
 
       m.justGainedFocus = true
       m.RowList.setFocus(true)
-      'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error. 
+      'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error.
       '   This is especially true when the Rowlist does not have initial focus when the content has loaded.
       m.RowList.setFocus(false)
       m.RowList.setFocus(true)
@@ -136,23 +136,23 @@ End Function
 ' it sets RowHeight and jumps the focus to a specified content.
 Function onRepopulateContent()
   setRowHeights()
-  
+
   rowItemFocused = m.RowList.rowItemFocused
   if m.itemToJumpTo <> invalid
     rowItemFocused = m.itemToJumpTo
   end if
-  
+
   if rowItemFocused = invalid
     rowItemFocused = [0,0]
   end if
-  
+
   rowAdded = m.top.rowAdded
   rowRemoved = m.top.rowRemoved
-  
+
   ' Resetting rowAdded & rowRemoved
   m.top.rowAdded = ""
   m.top.rowRemoved = ""
-  
+
   ' setting the rowItemSize and/or rowHeights moves the focus indicator back to the origin so
   ' we need to move the focus back to it's appropriate place. But we need to check that there is content
   ' at the location or else the RowList loses focus and can't get it back.
@@ -166,7 +166,7 @@ Function onRepopulateContent()
     if rowItemFocused[0] <> invalid
       rowIndex = rowItemFocused[0]
     end if
-     
+
     lastContentIndex = m.top.content.getChild(rowIndex).getChildCount() - 1
     m.itemToJumpTo = [rowIndex, lastContentIndex]
   else
@@ -178,14 +178,14 @@ Function onRepopulateContent()
     if rowItemFocused[0] <> invalid
       rowIndex = rowItemFocused[0]
     end if
-    
+
     while resolveAbbreviatedContent([rowIndex, 0]) = invalid and rowIndex >= 0
       rowIndex -= 1
     end while
 
     m.itemToJumpTo = [rowIndex, 0] ' m.itemToJumpTo might equal [-1, 0] in worst case scenario
   end if
-  
+
   ' there are 4 options here
   ' 1) new continue_watching row got inserted, so increment the focus index by 1
   ' 2) new queue row got inserted, so increment the focus index by 1
@@ -234,7 +234,7 @@ Function setRowHeights()
       rowItemSize.push([1693, posterHeight])
       rowHeight = posterHeight
       showRowLabel.push(true)
-    else if category.gridItemType = m.constants.ui.gridItemTypes.portrait    
+    else if category.gridItemType = m.constants.ui.gridItemTypes.portrait
       posterWidth = m.constants.ui.imageSizes.poster[0]
       posterHeight = m.constants.ui.imageSizes.poster[1]
       rowHeightAdjustment = 80
@@ -251,9 +251,9 @@ Function setRowHeights()
         rowItemSize.push(m.constants.ui.imageSizes.linear)
         rowHeight = m.constants.ui.imageSizes.linear[1]
         rowHeightAdjustment = 86
-      end if 
+      end if
       showRowLabel.push(true)
-    else if category.gridItemType = m.constants.ui.gridItemTypes.landscape 
+    else if category.gridItemType = m.constants.ui.gridItemTypes.landscape
       posterWidth = m.constants.ui.imageSizes.landscape[0]
       posterHeight = m.constants.ui.imageSizes.landscape[1]
       rowHeightAdjustment = 122
@@ -269,7 +269,7 @@ Function setRowHeights()
       showRowLabel.push(true)
       numRows = 3
     end if
-    
+
     if category.sponsorImages <> invalid
       '//if this is a sponsored row, then adjust the spacing so row includes the header size of the sponsored row
       rowHeightAdjustment = rowHeightAdjustment + 32
@@ -284,7 +284,7 @@ Function setRowHeights()
     "rowItemSize": rowItemSize,
     "rowHeights": rowHeights,
     "showRowLabel": showRowLabel,
-    "numRows": numRows 
+    "numRows": numRows
   })
   m.RowList.content = m.top.content
 End Function
@@ -415,8 +415,8 @@ Function onCategoryResponseInBatch(msg) As Void
     ' the number of children nodes in the parent node as the looping is happening.
     ' In order to work around this, we need to iterate backwards over a set of child node containers/categories.
     ' But we also want to iterate in the order in which the containers are displayed on the screen,
-    ' so we need to reverse the order of the nodes before iterating over them, 
-    ' such that when iterating from end to beginning, the order is the same as 
+    ' so we need to reverse the order of the nodes before iterating over them,
+    ' such that when iterating from end to beginning, the order is the same as
     ' iterating from beginning to end without pre-reversing the nodes.
     subType = response.subtype()
     reverseOrder = CreateObject("roSGNode", subtype)
@@ -537,13 +537,13 @@ Function setRowListFocus()
     m.RowList.setFocus(true)
   else
     if m.RowList.currFocusRow <> invalid and m.RowList.currFocusRow >= 0 and m.RowList.currFocusColumn <> invalid and m.RowList.currFocusColumn >= 0
-      '//If rowList is not in focus and new content is set, then one would think that rowItemFocused should be [0,0] but it isn't, 
-      '//so that is why we use currFocusRow and currFocusColumn - to ensure the proper item is announced  
+      '//If rowList is not in focus and new content is set, then one would think that rowItemFocused should be [0,0] but it isn't,
+      '//so that is why we use currFocusRow and currFocusColumn - to ensure the proper item is announced
       row = Int(m.RowList.currFocusRow)
       col = Int(m.RowList.currFocusColumn)
       reloadedItemIndex = [row, col]
     else if m.RowList.rowItemFocused <> invalid and m.RowList.rowItemFocused.count() > 1
-      '//currFocusColumn is not available in firmware lower than Roku OS 10.5, so use rowItemFocused. It's imperfect, as it 
+      '//currFocusColumn is not available in firmware lower than Roku OS 10.5, so use rowItemFocused. It's imperfect, as it
       '// may think a different item is focused insteqd of the 1st colum/1st row,
       '// but it will not display a wrong metadata when the user quickly navigates away from 1st rowItem [0,0] as the content is loading
       reloadedItemIndex = m.RowList.rowItemFocused

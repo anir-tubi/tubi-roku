@@ -7,7 +7,13 @@ Function init()
   m.top.observeField("listHasFocus", "onContainerHasFocus")
   m.top.observeField("gridHasFocus", "onContainerHasFocus")
   m.top.observeField("rowListHasFocus", "onContainerHasFocus")
-  m.categoryCountText.color = m.global.theme.focused
+
+  ' trying to access m.global can sometimes/rarely time out creating a run time error if we
+  ' try to access m.global.theme directly, so use GlobalMixin.getThemeFromGlobal() which retries if issues arise.
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.categoryCountText.color = theme.focused
+  end if
 End Function
 
 

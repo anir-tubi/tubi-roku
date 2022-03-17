@@ -22,7 +22,10 @@ Function init()
 
 
   m.buttonBG = m.top.findNode("buttonBg")
-  m.buttonBG.blendColor = m.global.theme.focused
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.buttonBG.blendColor = theme.focused
+  end if
 
   setButtonWidthAndAlignment()
 End Function

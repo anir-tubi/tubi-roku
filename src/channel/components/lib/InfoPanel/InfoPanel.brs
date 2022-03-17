@@ -22,7 +22,14 @@ Function init()
   m.Description = m.top.findNode("Description")
   m.DescriptionGroup = m.top.findNode("DescriptionGroup")
   m.DescriptionFocusButton = m.top.findNode("DescriptionFocusButton")
-  m.DescriptionFocusButton.blendColor = m.global.theme.focused
+
+  ' trying to access m.global can sometimes/rarely time out creating a run time error if we
+  ' try to access m.global.theme directly, so use GlobalMixin.getThemeFromGlobal() which retries if issues arise.
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.DescriptionFocusButton.blendColor = theme.focused
+  end if
+
   m.StarringTag = m.top.findNode("StarringTag")
   m.DirectorTag = m.top.findNode("DirectorTag")
   m.Director = m.top.findNode("Director")
