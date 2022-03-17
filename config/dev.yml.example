@@ -31,6 +31,8 @@ settings:
   charlesProxyUrl: "http://{{localHostAddress}}:8888"
   charlesProxyEnabled: false
 
+  stagingApis: false  # setting to true will use UAPI staging APIs (matrix, cms, user_device)
+
   # any settings config values under bs_consts below will overwrite
   # bs_consts values set in the various manifests in default.yml
   bs_const:

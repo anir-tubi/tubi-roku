@@ -85,6 +85,7 @@ export PKG_PASSWORD="<password from the GENKEY utility used for signing packages
 export CDN_GIT_DIRECTORY="<path to the adrise_cdn repo directory ex: ~/dev/adrise_cdn>"
 export GITHUB_PAT="<github personal access token>"
 export ROKU_DEV_TELNET="sametab" (optional)
+export AWS_PROFILE=main-roku-dev
 ```
 
 11\. Create a `dev.yml` file in your `config` directory. Use the existing `dev.yml.example` file as a template.
