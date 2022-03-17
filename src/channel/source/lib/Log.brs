@@ -63,34 +63,7 @@ Function TubiLogger(constants, request, auth)
     sendLogging: tubiLog_sendLogging_
     getLoggingRequest: tubiLog_getLoggingRequest_
     getLogPrintout: tubiLog_getLogPrintout_
-    getSentryInstance: tubiLog_getSentryInstance_
   }
-End Function
-
-
-''''''''''''''''''''
-' getSentryInstance
-'
-' Because this resolves the current user id, it probably should not
-' be cached in the Log instance
-Function tubiLog_getSentryInstance_()
-  ' sentry for remote error logging
-  sentryAttributes = {
-    "release": m.constants.deviceInfo.clientVersion
-  }
-  sentryContext = {
-    "app": {
-      "app_name": m.constants.appName
-      "device_app_hash": m.constants.deviceInfo.deviceId
-      "app_version": m.constants.deviceInfo.clientVersion
-    }
-  }
-  if m.auth.getAuthInfo() <> invalid and m.auth.getAuthInfo().userId <> invalid
-    sentryContext["user"] = {}
-    sentryContext["user"]["id"] = m.auth.getAuthInfo().userId.toStr()
-  end if
-
-  return Sentry(m.constants.thirdParty.sentry.dsn, sentryAttributes, sentryContext)
 End Function
 
 
@@ -130,12 +103,6 @@ function tubiLog_exception(level as string, message as Object) as Void
   end if
 
   print m.getLogPrintout(level, "", message.message)
-  tubiToSentry = {}
-  tubiToSentry[m.logConsts.error.name] = "error"
-  tubiToSentry[m.logConsts.warn.name] = "warning"
-  tubiToSentry[m.logConsts.info.name] = "info"
-  ' NOTE: This is a synchronous, blocking call
-  m.getSentryInstance().captureMessage(message, tubiToSentry[level])
 end function
 
 '--------------------------------------------------------------------------------

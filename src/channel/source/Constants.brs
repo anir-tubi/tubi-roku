@@ -4,10 +4,10 @@ Function getConstants()
 
   ' Compile-time generated
   constants.settings = getSettings()
-  
+
   mode = constants.settings.mode
   if mode = invalid then mode = "dev"
-  
+
   ' Device info
   constants.deviceInfo = {}
     di = CreateObject("roDeviceInfo")
@@ -30,7 +30,7 @@ Function getConstants()
       "3050X": true  ' 2 XD
       "3100X": true  ' 2 XS
       "3400X": true  ' MHL Stick
-      "3420X": true  ' MHL Stick      
+      "3420X": true  ' MHL Stick
     }
 
     'models that need some functionality reduced - like backgrounds and animations, etc.
@@ -181,7 +181,7 @@ Function getConstants()
     constants.deviceInfo.displayHeight = di.GetDisplaySize().h
     constants.deviceInfo.rokuCountryCode = di.GetUserCountryCode()
     if constants.deviceInfo.rokuCountryCode <> invalid
-      'rokuCountryCode will be used for the value of countryCode, unless it is overriden by externalConfig.info.country. 
+      'rokuCountryCode will be used for the value of countryCode, unless it is overriden by externalConfig.info.country.
       'Keep a record of the original rokuCountryCode value in case we ever need to know the non-overwritten value.
       constants.deviceInfo.rokuCountryCode = UCase(constants.deviceInfo.rokuCountryCode)
     end if
@@ -253,7 +253,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postUserHistory] = true
 
   constants.anonymous = {}
-    constants.anonymous.algorithm = "TUBI-HMAC-SHA256"  
+    constants.anonymous.algorithm = "TUBI-HMAC-SHA256"
 
   constants.thirdParty = {}
     'Nielsen ID token for integrating with Nielsen DAR via RAF
@@ -278,17 +278,14 @@ Function getConstants()
 
         constants.thirdParty.youbora.config.expectAds = true
 
-    constants.thirdParty.sentry = {}
-      constants.thirdParty.sentry.dsn = "https://f8edcfe8baf140b4b91b46dfb8af9a19:acdf43f7c38a47f1ab85583035ff1798@sentry.io/1377102"
-
     constants.thirdParty.suiteTest = {}
 
       'toggle for using suitest or not. Should only be set to true for testing situations.
-      'for production it should be false  
+      'for production it should be false
       constants.thirdParty.suiteTest.enabled = false
       if constants.settings.suitest = true
         constants.thirdParty.suiteTest.enabled = true
-  
+
         ' app_id of suitest application - can be used for any roku device within same organization. update app_id for using different account.
         constants.thirdParty.suiteTest.app_id =  "214cab71-b41b-468d-bcbb-f42732b157c4"
 
@@ -305,7 +302,7 @@ Function getConstants()
   if LCase(constants.deviceInfo.channelStore) = "telstra"
     constants.analyticsPlatform = "TELSTRA"
   end if
-  
+
   'Types of actions for modal dialogs.
   ' "restartApp" - will clear screen stack and restarts the app from beginning.
   ' "closeDialog" - user attention modal(signout modal, app exit modal etc), we are closing the modal and resume the app
@@ -351,14 +348,14 @@ Function getConstants()
   'idsToLog is expected to look like {
   '  13GSC41289Y: true
   '  YY00763924H: true
-  '}  
+  '}
   constants.idsToLog = {}
-  
+
   constants.urls = {}
     'ad server url
     ' constants.urls.adsBaseUrlRainmaker = "https://rainmaker.staging-public.tubi.io/api/v2/rev/vod/"
     constants.urls.adsBaseUrlRainmaker = "https://rainmaker.production-public.tubi.io/api/v2/rev/vod/"
-      
+
     'contents url
     constants.urls.cms = {}
       constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
@@ -384,7 +381,7 @@ Function getConstants()
 
     'tensor url
     constants.urls.tensor = {}
-      constants.urls.tensor.urlBase = "https://tensor.production-public.tubi.io/api/v1"     
+      constants.urls.tensor.urlBase = "https://tensor.production-public.tubi.io/api/v1"
       if constants.settings.mode <> "production" and constants.settings.stagingApis = true
         constants.urls.tensor.urlBase = "https://tensor.staging-public.tubi.io/api/v1"
       end if
@@ -392,7 +389,7 @@ Function getConstants()
       constants.urls.tensor.container = constants.urls.tensor.urlBase + "/containers"
       constants.urls.tensor.channel = constants.urls.tensor.urlBase + "/containers"
       constants.urls.tensor.epgChannelIds = constants.urls.tensor.urlBase + "/epg"
-  
+
     'users url
     constants.urls.users = {}
       constants.urls.users.urlBase = "https://uapi.adrise.tv/user_device"
@@ -434,7 +431,7 @@ Function getConstants()
         constants.urls.dataScience.urlBase = "https://uapi.adrise.tv/datascience"
       end if
       constants.urls.datascience.logging = constants.urls.dataScience.urlBase + "/logging"
-    
+
     'Experiments API
     constants.urls.experiments = {}
       constants.urls.experiments.baseUrl = "https://popper-engine-roku.staging-public.tubi.io/popper/"
@@ -473,7 +470,7 @@ Function getConstants()
     'channels logo image urls
     constants.urls.channelLogoBrandedPrefix = "https://cdn.adrise.tv/image/channels/"
     constants.urls.channelLogoBrandedSuffix = "/logo_center.png"
-    
+
     ' animationLogo Url which plays during app launch
     constants.urls.animationLogo = "https://cdn.adrise.tv/video/roku/animation_logo_2.mp4"
     ' The background images on the continue watching container row when the user is signed out
@@ -560,10 +557,10 @@ Function getConstants()
     constants.player.historyFrequency = 60
 
     ' time to fetch next content before credit cuepoints
-    constants.player.fetchNextDuration = 15  
+    constants.player.fetchNextDuration = 15
 
     'the max number of distinct speeds at which the player can scrub (fast forward or rewind), 0 based
-    constants.player.maxScrub = 2 
+    constants.player.maxScrub = 2
 
     'list of scrub multipliers, the number of options should match the maxScrub above
     constants.player.scrubMultipliers = [8, 64, 128]
@@ -590,7 +587,7 @@ Function getConstants()
         "pkg:/images/transport/sgplayer/icon-ffw-1.png",
         "pkg:/images/transport/sgplayer/icon-ffw-2.png",
         "pkg:/images/transport/sgplayer/icon-ffw-3.png"
-      ]      
+      ]
       constants.player.transportButtons.fastForwardLevelsFocus = [
         "pkg:/images/transport/sgplayer/icon-ffw-1-focus.png",
         "pkg:/images/transport/sgplayer/icon-ffw-2-focus.png",
@@ -656,9 +653,9 @@ Function getConstants()
     constants.cacheTimes.homescreen = 6 * 60 * 60 ' Time in seconds after which the category screen's cache is not valid
     constants.cacheTimes.epgscreen = 6 * 60 * 60 ' Time in seconds after which the epg screen's cache is not valid
 
-  'This will store the error codes that are needed to be displayed to the user. 
+  'This will store the error codes that are needed to be displayed to the user.
   'Review the following page to see the list of error codes that are used across platforms:
-  'https://tubitv.atlassian.net/wiki/spaces/EC/pages/798359880/User+Facing+Error+Codes 
+  'https://tubitv.atlassian.net/wiki/spaces/EC/pages/798359880/User+Facing+Error+Codes
   constants.errors = {}
 
   '//Where does the error happen?
@@ -706,13 +703,13 @@ Function getConstants()
       aUS = []
       aUS.push("G, TV-Y, TV-G")     '//Group 0, Little Kids
       aUS.push("PG, TV-PG, TV-Y7")  '//Group 1, Big Kids
-      aUS.push("PG-13, TV-14")      '//Group 2, Teens 
+      aUS.push("PG-13, TV-14")      '//Group 2, Teens
       aUS.push("R, TV-MA, NC-17")   '//Group 3, Adults
       constants.ui.ratings["US"] = aUS
       aMX = []
       aMX.push("A")      '//Group 0, Little Kids
       aMX.push("B")       '//Group 1, Big Kids
-      aMX.push("B15")     '//Group 2, Teens 
+      aMX.push("B15")     '//Group 2, Teens
       aMX.push("C, D")    '//Group 3, Adults
       constants.ui.ratings["MX"] = aMX
 
@@ -721,7 +718,7 @@ Function getConstants()
       aMX = []
       aMX.push("D")
       constants.ui.matureRatings["MX"] = aMX
-      
+
     constants.ui.categoryList = {}
       constants.ui.categoryList.action = "Action"
       constants.ui.categoryList.recommended_for_you = "Recommended"
@@ -919,10 +916,10 @@ Function getConstants()
       constants.ui.permanentlyCachedContentIds[constants.ui.contentIds.homegrid] = true
 
     constants.ui.imageSizes = {}
-      
+
       'Sizes of poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.poster = [186,267]
-        
+
       'Sizes of landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.landscape= [384,216]
 
@@ -932,7 +929,7 @@ Function getConstants()
       'Sizes of linear to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.linear = [384,144]
       constants.ui.imageSizes.linearExperiment = [978,660]
-     
+
       'Sizes of the linear background and minmized linear video player
       constants.ui.imageSizes.linearVideoPlayer_minimizedDimension = [1263,710]
       constants.ui.imageSizes.epgLinearVideoPlayer_minimizedDimension = [978,552]
@@ -983,7 +980,7 @@ Function getConstants()
     constants.ui.linearSideNavIds = {}
       constants.ui.linearSideNavIds.cc = "cc"
       constants.ui.linearSideNavIds.epg = "epg"
-      
+
     constants.ui.utilityIds = {}
       constants.ui.utilityIds.movies = "u_movies"
       constants.ui.utilityIds.tv = "u_tvshows"
@@ -1061,7 +1058,7 @@ Function getConstants()
       constants.ui.colors.selectedEntryText = "0x191919FF"
       constants.ui.colors.selectedEntryBox = "0xF3C4B6FF"
       constants.ui.colors.unselectedEntryBox = "0xFFFFFFFF"
-      
+
       'colors for individual elements - can be made individual or controlled by template colors
       constants.ui.colors.titleHeader = constants.ui.colors.primaryText
       constants.ui.colors.expirationWarning = "0xFF9933FF"
@@ -1070,13 +1067,13 @@ Function getConstants()
       constants.ui.colors.futureItemSelected = "0xEB9C00FF"
       constants.ui.colors.EPGProgramSelected = "0x1C1F29FF"
       constants.ui.colors.EPGProgramFocused = "0x9699A3FF"
-    
-    'The IDs of the available themes that can be used for the app 
+
+    'The IDs of the available themes that can be used for the app
     constants.ui.themeIDs = {}
     constants.ui.themeIDs.default = "default"
     constants.ui.themeIDs.kidsMode = "kidsMode"
 
-    'available themes that can be used for the app 
+    'available themes that can be used for the app
     constants.ui.themes = {}
       constants.ui.themes.default = {
         id: constants.ui.themeIDs.default
@@ -1121,7 +1118,7 @@ Function getConstants()
       constants.ui.epgscreen.focusItems = {}
         constants.ui.epgscreen.focusItems.topNav = "topNav"
         constants.ui.epgscreen.focusItems.epgTimeGridGrid = "epgTimeGrid"
-  
+
 
     ' Set some performance parementers based on device profile
     constants.performance = {}
@@ -1161,7 +1158,7 @@ Function getConstants()
         constants.performance.categoryGridList.categoryWindowSize = 10
         constants.performance.categoryGridList.eagerLoad = true
       end if
-      
+
       constants.deeplinks = {}
       constants.deeplinks["homescreen"] = "homescreen"
       constants.deeplinks["hs-search"] = "search"
@@ -1173,6 +1170,6 @@ Function getConstants()
       constants.deeplinks["auto-run-dev"] = "sideload"
       constants.deeplinks["hs-d"] = "feature-free-page"
       constants.deeplinks["dial"] = "dial"
-      
-  return constants  
+
+  return constants
 end Function
