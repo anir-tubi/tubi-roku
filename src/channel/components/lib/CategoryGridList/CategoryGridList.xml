@@ -11,6 +11,10 @@
   <!-- required by TubiMetadataTranslate.brs -->
   <script type="text/brightscript" uri="../../../source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
 
   <interface>
     <!-- INPUT -->

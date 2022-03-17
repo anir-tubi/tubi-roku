@@ -18,6 +18,9 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="../../../source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
 
   <interface>
     <!-- INPUT -->
@@ -36,7 +39,7 @@
       <!-- What is the previous page so it can be indicated on the call to action that is located on the top nav.
       -->
       <field id="callingPage" type="string"  alwaysNotify="true"/>
-      
+
       <!-- categoryId is one of the categories/channels (eg. categories(queue, action etc) or channels(fox, aetv etc))  -->
       <!-- assigning this value helps to redirect the user to specific category/channel detailscreen once user signedIn via category/channel detailscreen -->
       <field id="categoryId" type="string"/>
@@ -53,7 +56,7 @@
       <!-- tells ContentController/ChannelScreenHelpers that the category metadata
            for the channel content is out of the cache window and should be updated -->
       <field id="refreshCategoryDetailsScreen" type="boolean" alwaysNotify="true" />
-      
+
       <!-- tells the ChannelScreenHelper to display SignIn Required modal-->
       <field id="signInRequired" type="boolean" alwaysNotify="true" />
 
@@ -115,9 +118,9 @@
       id="ChannelsVideoGrid"
       translation="[192,600]"
       itemComponentName="CategoryGridPoster"
-      itemSize="[198,282]" 
+      itemSize="[198,282]"
       itemSpacing="[20,12]"
-      numRows="2"   
+      numRows="2"
       numColumns="8"
       fadeFocusFeedbackWhenAutoScrolling="true"
       vertFocusAnimationStyle="fixedFocus"

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <component name="LinearVideoPlayerScreen" extends="BaseScreen" >
   <script type="text/brightscript" uri="LinearVideoPlayerScreen.brs" />
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
@@ -9,9 +9,12 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
 
   <interface>
-  
+
     <!-- INPUT -->
       <!-- Alias fields for the video node -->
       <field id="position" alias="VideoNode.position"/>
@@ -42,7 +45,7 @@
 
       <!-- supports "play", "stop", "pause", "resume", "error" -->
       <field id="control" type="string" value="none" alwaysNotify="true"/>
-      
+
       <!-- interval in seconds for sending position data to the tracking server -->
       <field id="analyticsInterval" type="integer" value="0"/>
 
@@ -78,10 +81,10 @@
       <field id="userDisplayingChannelGuide" type="boolean"  alwaysNotify="true" />
 
       <field id="state" type="string" />
-      
+
       <!-- Used to store the loading state. It should not be used as an observed field. -->
       <field id="loading" type="boolean" value="false"/>
-      
+
       <!--When the user selects a new channel from the channel guide, this field is set-->
       <field id="channelSelected" type="node"/>
 
@@ -89,7 +92,7 @@
       <field id="errorMsg" type="string" />
 
       <!-- Error message as told by the video node  -->
-      <field id="videoErrorMsg" type="string" alias="VideoNode.errorMsg" />   
+      <field id="videoErrorMsg" type="string" alias="VideoNode.errorMsg" />
 
       <!-- Error code as told by the video node  -->
       <field id="videoErrorCode" type="integer" alias="VideoNode.errorCode" />
@@ -157,7 +160,7 @@
       id="VideoOverlay"
       opacity="0.0">
     </Group>
-    
+
     <Group
       id="Overlay1stScreen">
       <Poster
@@ -177,7 +180,7 @@
         id="HUD"
         visible="true"
         opacity="0.0" >
-        
+
         <Group
           id="Transport"
           opacity="1.0">
@@ -190,7 +193,7 @@
               layoutDirection="horiz"
               vertAlignment="center"
               horizAlignment="center"
-              translation="[960,990]"  
+              translation="[960,990]"
               itemSpacings="[20]">
               <PillIconButton
                 id="ButtonBack"

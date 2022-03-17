@@ -13,6 +13,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
 
 
   <interface>
