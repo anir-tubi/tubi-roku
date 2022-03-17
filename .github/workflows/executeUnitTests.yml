@@ -1,6 +1,7 @@
 # This file executes the unit tests when PR is raised against master branch.
 # This will be executed in Roku device available in SF office and logs will be captured in machine/server available in SF office.
 # Device details can be found here : https://tubitv.atlassian.net/wiki/spaces/IT/pages/edit-v2/2465464321
+# Roku IP address and password are taken from .env file from github action runner. If you update it, reboot the machine
 
 name: Execute Unit tests
 
@@ -29,11 +30,6 @@ jobs:
         run: |
           npm install
 
-      # reload .bashrc (using bashrc, because the server machine is linux ) to retrieve proper roku IP & password
-      - name: reload .bashrc
-        run:  |
-          source ~/.bashrc
-
       # runs gulp command to upload package to roku device and runs all unit tests 
       - name: run gulp command
         run: |
@@ -51,6 +47,7 @@ jobs:
           actual=`grep 'RESULT:' log.txt  | tail -1`
           expected="RESULT: Success"
           kill -SIGINT $PROCESS_ID
+          cat log.txt
           if [ "$actual" = "$expected" ]; then
               echo "Success"
               exit 0
