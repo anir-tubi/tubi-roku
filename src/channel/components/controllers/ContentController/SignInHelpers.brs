@@ -17,6 +17,7 @@ Function startSignIn(callbackAfterSignIn=invalid)
   if getExperimentResource("roku_email_prefill_login_age_gate", "roku_email_prefill_login_age_gate_v1").enabled = true
     showRFIScreen()
   else
+    hideNavMenu(false)
     showActivationScreen()
   end if
 
@@ -34,8 +35,10 @@ Function showRFIScreen()
   mode = m.constants.settings.mode
 
   if mode <> "production" and isNonEmptyString(settingsEmail) = true and isNonEmptyString(settingsPassword) = true
+    hideNavMenu()
     signUserIn(settingsEmail, settingsPassword)
   else if mode <> "production" and suitest = true and automaticActivation = true
+    hideNavMenu()
     signUserUpForQAAutomation()
   else
     ' This is the path expected to be taken in production
@@ -97,6 +100,8 @@ Function onUserData(msg)
     checkEmailExists(input)
 
   else
+    
+    hideNavMenu(false)
 
     dialogEvent = {
       type: "dialog"
@@ -174,6 +179,8 @@ End Function
 ' onEmailExistsResponse is the callback triggered when the emailExists API responds successfully
 ' @response : assocarray, the response of emailExists API in the form of AA
 Function onEmailExistsResponse(response)
+
+  hideNavMenu()
 
   if response <> invalid
     parsedresponse = response.parsedresponse

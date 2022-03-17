@@ -150,7 +150,7 @@ Function onSideNavItemSelected()
       if authInfo = invalid or (authInfo <> invalid and authInfo.userId = invalid)
         '//if user is not signed in, then bring up the sign on page; otherwise, don't do anything
         startSignIn(onSideNavSignInCompleted)
-        bNewScreenCalledSuccess = true
+        bNewScreenCalledSuccess = false ' setting bNewScreenCalledSuccess as false to keep the sidenav open when RFI modal is displayed. This is to avoid focus issue.
       else
         '//Bring user to the settings page and select the signout option
         showSettingsScreen("SignInOutButton")
