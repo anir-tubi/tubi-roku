@@ -100,7 +100,7 @@ Function onUserData(msg)
     checkEmailExists(input)
 
   else
-    
+
     hideNavMenu(false)
 
     dialogEvent = {
@@ -605,6 +605,15 @@ End Function
 
 Function onSignOutCompleted()
   tubiLog("SignInHelpers.onSignOutCompleted")
+
+  m.trackingLoggingTask.trackEvent = {
+    type: "account"
+    values: {
+      manip: "SIGNOUT"
+      current: "EMAIL"
+      status: "SUCCESS"
+    }
+  }
   authInfo = handleUpdatedAuth()
 
   ' set the mode before any changes are done to the UI
