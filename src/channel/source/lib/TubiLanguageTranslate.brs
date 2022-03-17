@@ -401,8 +401,8 @@ Function getTranslation_en_US()
       "message": "Welcome to Tubi Kids"
     },
     "dialog_kidsWelcomeAgeGate_description": {
-      "description": "A description informing users they are only eligible to view Tubi in kids mode",
-      "message": "You are only eligible to view Tubi Kids at this time."
+      "description": "A description informing users they cannot exit Tubi Kids for the next 24 hours",
+      "message": "You cannot exit Tubi Kids at this time. Please try again in 24 hours. Questions? Drop us a line at www.tubi.tv/support"
     },
     "dialog_cannotExitKidsMode_title": {
       "description": "Title for dialog telling the user they can not exit kids mode",
