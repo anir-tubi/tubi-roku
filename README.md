@@ -108,6 +108,7 @@ __The most commonly used Gulp commands__
 
 * `$ gulp install` - build a zip and side load it to a device (as set by your ROKU_DEV_TARGET)
 * `$ gulp stage` - build a zip using the "staging" config and upload starter components, and remote components to the staging CDN.
+* `$ gulp bumpQA` - bumps the revision number. This is used during the QA process. As changes are made and new QA builds are created, the revision number is used to distinguish between builds.
 * `$ gulp release` - bump the build number, build starter and remote components .pkgs using the "production" config. This command will also make PRs to the CDN repo and this project-total-recall repo on Github.
 
 __Gulp options__
@@ -380,7 +381,12 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 9\. Create a CH ticket with any changes that have been made and give the ticket the QA team for manual testing. Make sure the changes are written in such a way that non technical readers will be able to consume this information. The title of the changes will be used in one of the last steps when creating a release within Github.
 
-10\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build.
+10\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build. Using the following two commands, bump the revision number on the QA branch, and update the staging channel with the latest version of the QA branch.
+
+  `$ gulp bumpQA`
+  `$ gulp stage`
+
+  Note: The revision number will only display as part of the version number under the About Settings Screen when the mode is set to "qa".
 
 11\. After QA Sign Off, run `$ gulp release`. This will:
 

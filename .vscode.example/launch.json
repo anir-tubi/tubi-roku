@@ -30,7 +30,7 @@
       ]
     }, {
       "rootDir": "${workspaceFolder}/build/remote/",
-      "outFile": "tubi_remote_components_${major_version}_${minor_version}_0.zip",
+      "outFile": "tubi_remote_components_${major_version}_${minor_version}_${build_version}_${revision_version}.zip",
       "files": [
         "**/*"
       ],

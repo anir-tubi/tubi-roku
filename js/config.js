@@ -27,7 +27,7 @@ function parse(profile, templateValues={}) {
 
 /**
  * A simple function that returns the version number as defined in build.yml
- * @returns string (ex. '2_1_3')
+ * @returns string (ex. '2_1_3_0')
  */
 function getBuildTag(isMinor, isDot) {
   let build = parse(buildProfile, {});
@@ -41,7 +41,7 @@ function formatBuildTag(build, isMinor, isDot) {
     connector = '_';
   }
   if (!isMinor || isMinor === 'false') {
-    return `${build.manifest.major_version}${connector}${build.manifest.minor_version}${connector}${build.manifest.build_version}`;
+    return `${build.manifest.major_version}${connector}${build.manifest.minor_version}${connector}${build.manifest.build_version}${connector}${build.manifest.revision_version}`;
   } else {
     return `${build.manifest.major_version}${connector}${build.manifest.minor_version}`;
   }
@@ -94,10 +94,26 @@ function incrementBuildNumber() {
   build.manifest.build_version = build.manifest.build_version + 1
   build.component_library_manifest.build_version = build.manifest.build_version
   build.starter_library_manifest.build_version = build.manifest.build_version
+  build.manifest.revision_version = 0
+  build.component_library_manifest.revision_version = build.manifest.revision_version
+  build.starter_library_manifest.revision_version = build.manifest.revision_version
   const buildPath = path.join(cwd, `${buildProfile}.yml`);
   const data = yaml.dump(build);
   fs.writeFileSync(buildPath, data);
-  console.log('Incremented the build number to %d_%d_%d', build.manifest.major_version, build.manifest.minor_version, build.manifest.build_version);
+  console.log('Incremented the build number to %d_%d_%d_%d', build.manifest.major_version, build.manifest.minor_version, build.manifest.build_version, build.manifest.revision_version);
+}
+
+
+function incrementRevisionNumber() {
+  let build = parse(buildProfile, {});
+
+  build.manifest.revision_version = build.manifest.revision_version + 1
+  build.component_library_manifest.revision_version = build.manifest.revision_version
+  build.starter_library_manifest.revision_version = build.manifest.revision_version
+  const buildPath = path.join(cwd, `${buildProfile}.yml`);
+  const data = yaml.dump(build);
+  fs.writeFileSync(buildPath, data);
+  console.log('Incremented the build number to %d_%d_%d_%d', build.manifest.major_version, build.manifest.minor_version, build.manifest.build_version, build.manifest.revision_version);
 }
 
 
@@ -136,5 +152,6 @@ function removeNullsFromObject(obj){
 module.exports = {
   load,
   incrementBuildNumber,
+  incrementRevisionNumber,
   getBuildTag
 };

@@ -134,13 +134,15 @@ Function getConstants()
       scaledUi = false
     end if
 
-    ' get the client version numbers from settings rather than from appInfo, as appInfo contains
+    ' get the version numbers from settings rather than from appInfo, as appInfo contains
     ' info about the submitted release, but we want to store the version of the remote components.
-    clientVersion = constants.settings.version.Replace("_",".")
     versionNumbers = constants.settings.version.split("_")
     majorVersion = versionNumbers[0]
     minorVersion = versionNumbers[1]
     buildVersion = versionNumbers[2]
+    revisionVersion = versionNumbers[3]
+    '//ensure the client number does not include the revisionVersion so the the rest of the app does not see it.
+    clientVersion = majorVersion + "." + minorVersion + "." + buildVersion
 
     'Use newer APIs over deprecated APIs when appropriate
     deviceInfoRegSection = "deviceinfo"
@@ -196,6 +198,7 @@ Function getConstants()
     constants.deviceInfo.majorVersion = majorVersion
     constants.deviceInfo.minorVersion = minorVersion
     constants.deviceInfo.buildVersion = buildVersion
+    constants.deviceInfo.revisionVersion = revisionVersion
     constants.deviceInfo.language  = di.GetCurrentLocale().Left(2)
     constants.deviceInfo.locale  = di.GetCurrentLocale()
     constants.deviceInfo.scaledUi = scaledUi

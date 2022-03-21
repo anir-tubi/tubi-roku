@@ -16,7 +16,7 @@ function createManifest(options, filename, manifestName) {
   // reduce the array so as to not include manifest keys that don't have a value.
   // This can happen if no bs_consts are defined.
   var content = Object.keys(data).reduce((accumulatedValue, key) => {
-    if (data[key]) {
+    if (data[key] !== undefined) {
       accumulatedValue.push(`${key}=${data[key]}`);
       return accumulatedValue;
     } else {

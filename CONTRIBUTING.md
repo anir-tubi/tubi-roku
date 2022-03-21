@@ -40,7 +40,6 @@ Version numbers are semantic versioning and used as [Roku Channel Manifest](http
 * Major version increments with huge changes in the channel (such as a rewrite)
 * Minor version increments when channel is submitted to Roku channel certification process
 * Build version increments when remote components are deployed
-
-Build versions can increase by an arbitrary number, usually due to multiple release candidates delivered to QA.
+* Revision version increments when QA revisions are made
 
 

@@ -22,7 +22,7 @@ shell.config.silent = true;
 // const requestDebug = require('request-debug')(request);
 
 //Importing old build functions
-const {load, getBuildTag, incrementBuildNumber} = require('./js/config');
+const {load, getBuildTag, incrementBuildNumber, incrementRevisionNumber} = require('./js/config');
 const {createManifest, createSettings} = require('./js/build');
 const {keypress, deeplink, uploadPkg, signPkg, convertToSquashfs} = require('./js/network');
 
@@ -570,8 +570,22 @@ function bumpBuild(done) {
   if (verifyGit(done)) {
     incrementBuildNumber();
     const buildTag = getBuildTag(false, false);
-    log(`Commiting build bump to ${buildTag}`);
+    log(`Committing build bump to ${buildTag}`);
     shell.exec(`git commit -m "incrementbuild: Bump build number to ${buildTag}" config/build.yml`, {silent: true});
+    done();
+  } else {
+    // errors should be handled in verifyGit()
+  }
+}
+
+
+// increase the revision number in config/build.yml
+function bumpRevision(done) {
+  if (verifyGit(done)) {
+    incrementRevisionNumber();
+    const buildTag = getBuildTag(false, false);
+    log(`Committing build bump to ${buildTag}`);
+    shell.exec(`git commit -m "incrementbuild: Bump revision number to ${buildTag}" config/build.yml`, {silent: true});
     done();
   } else {
     // errors should be handled in verifyGit()
@@ -680,6 +694,9 @@ exports.build = series(clean, buildInstalled, buildStarter, buildRemote);
 exports.sideload = sideLoad;
 exports['build-downloads'] = series(buildStarter, buildRemote, packageStarter, packageRemote);
 exports.bump = bumpBuild;
+exports.bumpQA = bumpRevision;
+exports.bumpqa = exports.bumpQA; //Create bumpQA command alias
+exports.bumpQa = exports.bumpQA; //Create bumpQA command alias
 exports.install = series(exports.build, conditionalPackage, sideLoad);
 exports.test = series(setTest, clean, preprocessTests, buildInstalled, sideLoad);
 exports.stage = series(setStaging, exports.build, packageAll, pushStaging);
