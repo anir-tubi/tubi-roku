@@ -1470,6 +1470,14 @@ Function getTranslation_es_MX()
       "description": "Directions on the search page",
       "message": "Busca películas, series y personas"
     },
+    "screenSearch_defaultLinearSearch": {
+      "description": "Directions on the search page",
+      "message": "Busca películas, series, TV en vivo, y personas"
+    },
+    "screenSearch_trendingSearch": {
+      "description": "A header message that shows on top of default search results in search screen",
+      "message": "Búsquedas populares"
+    },
     "screenSearch_kidsWarning": {
       "description": "More directions on the search screen to suggest switching to kids mode.  Should be limited to be around 40 characters or fewer.",
       "message": "Cambiar a Niños para resultados seguros"
@@ -1481,6 +1489,14 @@ Function getTranslation_es_MX()
     "screenSearch_noResults": {
       "description": "onscreeen message when there are no search results.",
       "message": "No pudimos encontrar resultados para '{term}'\n Inténtalo de nuevo"
+    },
+    "screenSearch_results": {
+      "description": "message after loading search results.",
+      "message": "Resultados"
+    },
+    "screenSearch_matchingTitles": {
+      "description": "text after number of search results for searchedString",
+      "message": "títulos coinciden"
     },
     "screenSearch_liveText": {
       "description": "The label on the search results poster next to the live streaming icon",
@@ -2079,6 +2095,10 @@ Function getTranslation_es_MX()
     "search_hint": {
       "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
       "message": "Para habilitar el control de voz, oprime y mantén"
+    },
+    "search_voice_hint": {
+      "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed at the beginning of the sentence.",
+      "message": "Habilita el control de voz, mantén presionado el micrófono en tu control"
     },
     "dialog_button_signUp": {
       "description": "The label of the button in a dialog window that allows the user to sign up into the app.",
