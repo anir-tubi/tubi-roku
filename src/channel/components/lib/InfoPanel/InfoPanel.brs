@@ -75,6 +75,11 @@ Function init()
   'Remove LiveVideoIndicator here because otherwise the poster is visible prior to any information being passed to info panel, when we open the app
   m.offset.removeChild(m.LiveVideoIndicator)
 
+  'Remove liveIconGroup here because otherwise liveIcon and live text is visible when we select live tv
+  if m.SecondLineGroup.getChild(0) <> invalid and m.SecondLineGroup.getChild(0).id = "liveIconGroup"
+    m.SecondLineGroup.removeChild(m.liveIconGroup)
+  end if
+
   m.StarringTag.width = 0
   m.DirectorTag.width = 0
   m.DirectorTag.text = getTranslation("metadata_directed")
