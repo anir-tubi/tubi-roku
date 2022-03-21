@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  - ErrorController
  -
@@ -11,7 +11,8 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
-  
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+
   <interface>
     <!-- INPUT -->
     <!-- Display a connection error if this field is set-->

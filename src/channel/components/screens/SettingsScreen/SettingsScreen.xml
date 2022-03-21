@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <component name="SettingsScreen" extends="Group" >
   <script type="text/brightscript" uri="SettingsScreen.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
@@ -7,9 +7,10 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
-  
+
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -18,7 +19,7 @@
 
       <!-- What is the previous page so it can be indicated on the call to action that is located on the top nav.
       -->
-      <field id="callingPage" type="string"  alwaysNotify="true"/>      
+      <field id="callingPage" type="string"  alwaysNotify="true"/>
 
       <!-- If the screen is not enabled, then user should not be able to select anything -->
       <field id="enabled" type="boolean"  alwaysNotify="true"/>
@@ -29,7 +30,7 @@
       <!-- associative array that will indocate if the user is signed in and if so, the aa will contain their info.  -->
       <field id="signInInfo" type="assocarray" alwaysNotify="true" />
 
-      <!-- actionAfterActivation value will be set when user tried any action before signIn/activation  
+      <!-- actionAfterActivation value will be set when user tried any action before signIn/activation
           this helps to do callback once the activation is completed
       -->
       <field id="actionAfterActivation" type="string"/>
@@ -75,7 +76,7 @@
 
   <children>
 
-    <Label 
+    <Label
       id="Title"
       height="73"
       translation="[192,230]">

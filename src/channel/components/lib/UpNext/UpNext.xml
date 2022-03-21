@@ -11,6 +11,7 @@
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs"/>
   <script type="text/brightscript" uri="../ExperimentMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -50,7 +51,7 @@
       <field id="contentFocused" type="node"/>
       <field id="contentSelected" type="node"/>
       <field id="itemFocused" type="integer" />
-      
+
       <!-- acceptable strings are "automatic" if the timer expires or "deliberate" if the an item is selected-->
       <field id="autoplayMode" type="string" />
 
@@ -59,7 +60,7 @@
            which will be responsible for sending navigate_within_page events.
       -->
       <field id="navigateWithinPageInfo" type="assocarray"/>
-  </interface>  
+  </interface>
 
   <children>
     <Timer

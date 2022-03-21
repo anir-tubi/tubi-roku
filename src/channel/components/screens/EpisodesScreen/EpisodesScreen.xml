@@ -8,7 +8,8 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
-  
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+
   <interface>
     <!-- INPUT -->
       <!-- Full content of the item to show details for -->
@@ -36,14 +37,14 @@
       maxHeight="511"
       mode="detail"
       visible="true" />
-    
+
     <Poster
       id="leftChevron"
       uri="pkg:/images/left-chevron.png"
       width="15"
       height="27"
       translation="[90,528]"/>
-      
+
     <CommunicatingMarkupGrid
       id="EpisodeMenu"
       translation="[-425, 643]"

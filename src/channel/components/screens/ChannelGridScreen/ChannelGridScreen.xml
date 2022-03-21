@@ -19,6 +19,7 @@
 
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
 
   <interface>
     <!-- INPUT -->
@@ -40,9 +41,9 @@
       <!-- What is the previous page so it can be indicated on the call to action that is located on the top nav.
       -->
       <field id="callingPage" type="string" />
-      
+
       <field id="reloadUserCategoriesResponse" type="node" alwaysNotify="true"/>
-      
+
     <!-- OUTPUT -->
 
       <!-- An array of ContentNodes of the visible items -->
@@ -80,7 +81,7 @@
 
       <!-- stores the component info of the component that was selected when navigating to a new screen. Looks like:
         {
-          componentType: "generic_component"    ' Corresponds to one of the page types in tubiTracking_getAnalyticsComponent() 
+          componentType: "generic_component"    ' Corresponds to one of the page types in tubiTracking_getAnalyticsComponent()
                                                  ' which mirrors the protos repo.
           componentValues: {}                    ' An assoc array with key/values that match the componentType as found in
                                                  ' tubiTracking_getAnalyticsComponent().
@@ -132,9 +133,9 @@
       id="ChannelCategoryGrid"
       translation="[192,208]"
       itemComponentName="ChannelCategoryGridPoster"
-      itemSize="[384,216]" 
+      itemSize="[384,216]"
       itemSpacing="[30,30]"
-      numRows="4"   
+      numRows="4"
       numColumns="4"
       fadeFocusFeedbackWhenAutoScrolling="true"
       vertFocusAnimationStyle="fixedFocus"

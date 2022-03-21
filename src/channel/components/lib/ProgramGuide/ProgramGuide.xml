@@ -11,6 +11,7 @@
   <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -58,7 +59,7 @@
 
     <!--Since linearChannelFocused will get updated everytime minsLeftTimer is run, to protect unwanted trigging of observer, this field is used-->
     <field id="linearChannelFocusedUpdated" type="boolean" alwaysNotify="true"/>
-        
+
     <!-- present the ready node to play -->
     <field id="linearChannelToPlay" type="node" />
 

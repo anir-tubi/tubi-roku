@@ -6,9 +6,10 @@
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
-  
+
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
 
   <interface>
     <!-- INPUT -->
@@ -22,7 +23,7 @@
 
 
   </interface>
-  
+
   <children>
       <Label
         id="title"
@@ -59,7 +60,7 @@
         opacity="0"
         translation="[240,396]"
         uri="pkg:/images/initial-content-screen-menu-gradient.9.png"/>
-        
+
       <Poster
         id="InitialContentProfileMenuItemBground"
         visible="false"
@@ -68,7 +69,7 @@
         height="372"
         translation="[1032,456]"
         uri="pkg:/images/initial-content-screen-menu-item-bg.png"/>
-        
+
       <MarkupGrid
         id="InitialContentMenu"
         translation="[336,456]"
@@ -79,7 +80,7 @@
         numRows="1"
         focusBitmapUri="pkg://images/menu-focus-initial-content-screen.png"
         drawFocusFeedbackOnTop="false"
-        itemComponentName="InitialContentItem"/>  
+        itemComponentName="InitialContentItem"/>
 
       <SimpleButton
         id="skipButton"

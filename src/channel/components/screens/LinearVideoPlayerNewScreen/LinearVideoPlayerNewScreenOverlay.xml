@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <component name="LinearVideoPlayerNewScreenOverlay" extends="Group" >
   <script type="text/brightscript" uri="LinearVideoPlayerNewScreenOverlay.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
@@ -8,9 +8,10 @@
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
 
   <interface>
-  
+
     <!-- INPUT -->
       <!-- Overlay needs to know the current playing video so it can update the EPG. -->
       <field id="currentLinearVideoContent" type="node" />
@@ -35,7 +36,7 @@
 
       <!-- The items to be displayed in the the closed captioning menu -->
       <field id="closedCaptioningItems" type="node"/>
-      
+
     <!-- OUTPUT -->
       <!-- The state of the overlay being visible or not. -->
       <field id="isDisplaying" type="boolean" value="false"/>
@@ -59,7 +60,7 @@
       <field id="linearChannelToPlayUpdated" type="boolean" alwaysNotify="true" />
 
       <field id="okPressed" alias="EPG.okPressed" />
-      
+
       <field id="rowItemFocused" alias="EPG.rowItemFocused" />
 
       <field id="epgScrollingStatus" alias="EPG.scrollingStatus" />
@@ -79,7 +80,7 @@
   </interface>
 
   <children>
-    <Group 
+    <Group
       opacity="0"
       id="overlayParent">
       <Poster
@@ -101,9 +102,9 @@
           id="sideNav"
           visible="false"
           translation="[87,810]"/>
-          
+
         <!-- EPGHorizontalSlide is used to slide the EPG left and right. The EPG component can be slide up and down directly. We need to distinguish between the 2 different slides because slideFade() cannot be used when a different than the origin direction is used.  -->
-        <Group 
+        <Group
           id="EPGHorizontalSlide"
           translation="[192,0]">
 
