@@ -1050,6 +1050,7 @@ End Function
 ' sign in process (don't know if the user should be in parental control kids mode).
 Function setUiModeFromState()
   tubiLog("ContentController.setUiModeFromState")
+  modeSet = false
   if shouldShowAgeGate() = true then
     if m.guestUserHasAgeInfo = invalid then
       m.guestUserHasAgeInfo = TubiAuth(m.constants, m.Request).getGuestUserHasAgeInfo()
@@ -1058,10 +1059,14 @@ Function setUiModeFromState()
     ' Have to make sure we check expired as well as default state will always have hasAge = false
     if m.guestUserHasAgeInfo.hasAge = false AND m.guestUserHasAgeInfo.expired = false then
       setUiMode(m.constants.ui.modes.kidsAgeGate)
+      modeSet = true
     end if
   else if isKidsModeEnabledByParentalControls() = true
     setUiMode(m.constants.ui.modes.kidsParental)
-  else
+    modeSet = true
+  end if
+
+  if modeSet = false then
     setUiMode(m.constants.ui.modes.standard)
   end if
 End Function
