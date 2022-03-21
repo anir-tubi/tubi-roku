@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  - SignUpTask
  -
  - This is a short-lived task for signup & registercode using credentials
  -
- --> 
+ -->
 <component name="SignUpTask" extends="Task">
     <script type="text/brightscript" uri="SignUpTask.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
@@ -12,21 +12,23 @@
     <script type="text/brightscript" uri="../../../source/lib/RequestQueue.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
     <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
 
     <interface>
       <!-- INPUT -->
-      
+
         <!-- requestParams has the credentials used for signup -->
         <field id="requestParams" type="assocarray" />
-        
+
         <!-- this field helps to start signup/registerCode process during automation after a delay
         so that "press back from Activation Screen" test case will not fail during automation -->
         <field id="delay" type="int" value="0"/>
-        
+
       <!-- OUTPUT -->
-      
+
         <!-- Set to communicate to the screen that an error as occurred. Value should indicate what type of error occurred -->
         <field id="error" type="string" />
-        
+
     </interface>
 </component>

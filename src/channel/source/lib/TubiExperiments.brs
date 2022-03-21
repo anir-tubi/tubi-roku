@@ -60,7 +60,7 @@ Function TubiExperiments(constants) as Object
       roku_linear_search_ui_update: {
         roku_linear_search_ui_update_v1: {"enabled": false}
       }
-      
+
     }
 
     'public methods
@@ -186,7 +186,7 @@ End Function
 Function tubiExperiments_parseNamespace(namespace as Object) as Object
   'The API returns a resource JSON object that still needs to be parsed into a JSON object
   if namespace <> invalid and namespace.resource <> invalid
-    namespace.resource = ParseJson(namespace.resource)
+    namespace.resource = ParseJson(namespace.resource) 'bs:disable-line 1016 1019 1056
   end if
   return namespace    'can return invalid
 End Function

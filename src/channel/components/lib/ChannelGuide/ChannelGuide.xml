@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <component name="ChannelGuide" extends="Group" >
   <script type="text/brightscript" uri="ChannelGuide.brs" />
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
@@ -6,6 +6,8 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -26,7 +28,7 @@
     <field id="scrollingStatus" type="boolean" alias="channelsGuide.scrollingStatus" />
 
   </interface>
-  
+
   <children>
     <Poster
       width="1920"

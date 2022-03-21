@@ -16,6 +16,7 @@
     <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
     <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
     <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
     <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
 
     <interface>

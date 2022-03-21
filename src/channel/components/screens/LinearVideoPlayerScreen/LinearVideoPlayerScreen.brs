@@ -231,9 +231,9 @@ Function onControlChange()
     m.AdsSSAITask.playbackStopped = true
     stopVideo()
   else if m.top.control = "pause" then
-    pauseVideo(false, false)
+    pauseVideo()
   else if m.top.control = "resume" and m.Video.state = "paused" then
-    resumeFromPause(false)
+    resumeFromPause()
   else if m.top.control = "error"
     stopVideo()
     m.top.errorMsg = getTranslation("videoPlayer_error_playback_description")  'is used in error modal
@@ -575,6 +575,16 @@ Function stopVideo()
   if m.Video.state <> "stopped" and m.Video.state <> "finished"
     m.Video.control = "stop"
   end if
+End Function
+
+
+Function pauseVideo()
+  tubiLog("LinearVideoPlayerScreen.pauseVideo not implemented yet")
+End Function
+
+
+Function resumeFromPause()
+  tubiLog("LinearVideoPlayerScreen.resumeFromPause not implemented yet")
 End Function
 
 
