@@ -1,25 +1,25 @@
-'@TestSuite [TubiAuth] Auth.brs 
+'@TestSuite [TubiAuth] Auth.brs
 
 '@Setup
 Function TubiAuthSetup()
   m.constants = getConstants()
   m.request = TubiRequest()
   m.auth = TubiAuth(m.constants, m.request)
-  
+
   m.externalAuthInfo = {
     platform: "ios"
     externalDeviceId: "AABBCCDD"
     externalRefreshToken: "Some111Refresh999String000"
     userId: "6735"
   }
-  
+
   m.oldAuthInfo = {
     expireTime: "123456"
     accessToken: "Some555Other666String777"
     refreshToken: "Some111Refresh999String000"
     userId: "6735"
   }
-  
+
   'stub auth info from server after registration
   'some APIs return "name", others return "first_name" and "last_name"
   'we don't save facebook id or email in the registry
@@ -35,15 +35,15 @@ Function TubiAuthSetup()
     expires_in: 1209600
     authType: "EMAIL"
     has_age: true
-  }  
-    
+  }
+
   ' mocks
   m.requestTokenRefresh = Function(authInfo, authPort)
     return {} ' passes through to handleRefreshResponse so it can be anything but invalid
   End Function
-  
+
   m.requestTokenTransfer = Function(externalAuthInfo, authPort)
-    return {} 
+    return {}
   End Function
 
   m.requestObjKeys = [
@@ -65,7 +65,7 @@ Function TubiAuthSetup()
     "charlesProxyUrl"
     "passThroughCharlesProxy"
   ]
-  
+
 End function
 
 
@@ -78,7 +78,7 @@ End function
 Function tubiAuth_refreshAuthToken_test()
   auth = m.auth
   oldAuthInfo = m.oldAuthInfo
-  
+
   auth.handleRefreshResponse = Function(msg, refreshReq)
     return {
       access_token: "AABBCCDD"
@@ -98,7 +98,7 @@ End Function
 Function tubiAuth_refreshAuthToken_failed_test()
   auth = m.auth
   oldAuthInfo = m.oldAuthInfo
-  
+
   auth.handleRefreshResponse = Function(msg, refreshReq)
     return invalid
   End Function
@@ -112,7 +112,7 @@ End Function
 Function tubiAuth_refreshAuthToken_403_test()
   auth = m.auth
   oldAuthInfo = m.oldAuthInfo
-  
+
   auth.saveAuthInfo(oldAuthInfo)  ' save it to the registry to verify clearing
 
   auth.handleRefreshResponse = Function(msg, refreshReq)
@@ -145,10 +145,10 @@ Function tubiAuth_formatAuthInfoFromServer_test()
   m.assertEqual(authInfo.userId, serverAuthInfo.user_id.toStr())
   m.assertNotInvalid(authInfo.name)
   m.assertEqual(authInfo.name, serverAuthInfo.name)
-  m.assertNotInvalid(authInfo.fn)
-  m.assertEqual(authInfo.fn, serverAuthInfo.first_name)
-  m.assertNotInvalid(authInfo.ln)
-  m.assertEqual(authInfo.ln, serverAuthInfo.last_name)
+  m.assertNotInvalid(authInfo.firstName)
+  m.assertEqual(authInfo.firstName, serverAuthInfo.first_name)
+  m.assertNotInvalid(authInfo.lastName)
+  m.assertEqual(authInfo.lastName, serverAuthInfo.last_name)
   m.assertNotInvalid(authInfo.accessToken)
   m.assertEqual(authInfo.accessToken, serverAuthInfo.access_token)
   m.assertNotInvalid(authInfo.refreshToken)
@@ -198,7 +198,7 @@ End Function
 Function tubiAuth_updateAuthInfo_test()
   auth = m.auth
   authInfo = m.oldAuthInfo
-  
+
   dateTime = CreateObject("roDateTime")
   timeToNow = dateTime.AsSeconds()
   future = (timeToNow + 86400).toStr()
@@ -207,7 +207,7 @@ Function tubiAuth_updateAuthInfo_test()
     expires_in: 86400
     access_token: "Some222Crazy333String444"
   }
-  
+
   updatedAuthInfo = auth.updateAuthInfo(refreshInfo, authInfo)
   m.assertEqual(updatedAuthInfo.expireTime, future)
 End Function
@@ -259,7 +259,7 @@ Function tubiAuth_saveAuthInfo_test()
     userId: "6739"
   }
 
-  authInfo1 = auth.saveAuthInfo(authInfo1) 
+  authInfo1 = auth.saveAuthInfo(authInfo1)
   authInfo2 = auth.saveAuthInfo(authInfo2) 'invalid?
   authInfo3 = auth.saveAuthInfo(authInfo3) 'invalid?
   authInfo4 = auth.saveAuthInfo(authInfo4) 'invalid?
@@ -285,7 +285,7 @@ Function tubiAuth_deleteAuthInfo_test()
   auth = m.auth
   authInfo = m.oldAuthInfo
   auth.authRegSection = "testauth"
-  
+
   'authInfo = {
   '  expireTime: "123456"
   '  accessToken: "Some555Other666String777"
@@ -299,7 +299,7 @@ Function tubiAuth_deleteAuthInfo_test()
   auth.deleteAuthInfo()
   deletedAuthInfo = RegReadAll(auth.authRegSection)
   authInfoStillExists = false
-  if deletedAuthInfo.count() > 0 
+  if deletedAuthInfo.count() > 0
     authInfoStillExists = true
   end if
   m.assertFalse(authInfoStillExists)
@@ -407,7 +407,7 @@ Function tubiAuth_handleRefreshResponse_test()
   constants = getConstants()
   requestObj = TubiRequest()
   auth = TubiAuth(constants, requestObj)
-  
+
   url = "http://127.0.0.1:65535/"
   server = tubiAuth_createMetadataFetchTaskServer_testHelper(65535)
   msgPort = CreateObject("roMessagePort")
@@ -439,7 +439,7 @@ Function tubiAuth_handleRefreshResponse_test()
         response = response + Chr(13) + Chr(10)
         connection.sendstr(response)
         connection.close()
-      
+
       else if type(msg) = "roUrlEvent"
         newAccess = auth.handleRefreshResponse(msg, request)
         exit while
@@ -459,11 +459,11 @@ End Function
 
 '@Test handleRefreshResponse 403 unit tests
 Function tubiAuth_handleRefreshResponse_403()
-  
+
   constants = getConstants()
   requestObj = TubiRequest()
   auth = TubiAuth(constants, requestObj)
-  
+
   url = "http://127.0.0.1:65535/"
   server = tubiAuth_createMetadataFetchTaskServer_testHelper(65535)
   msgPort = CreateObject("roMessagePort")
@@ -487,7 +487,7 @@ Function tubiAuth_handleRefreshResponse_403()
         response = response + Chr(13) + Chr(10)
         connection.sendstr(response)
         connection.close()
-      
+
       else if type(msg) = "roUrlEvent"
         newAccess = auth.handleRefreshResponse(msg, request)
         exit while
@@ -551,7 +551,7 @@ End Function
 Function tubiAuth_transferRefreshToken_test()
   auth = m.auth
   externalAuthInfo = m.externalAuthInfo
-  
+
   auth.requestTokenRefresh = m.requestTokenRefresh
   auth.requestTokenTransfer = m.requestTokenTransfer
 
@@ -584,9 +584,9 @@ End Function
 Function tubiAuth_transferRefreshToken_failed_test()
   auth = m.auth
   externalAuthInfo = m.externalAuthInfo
-  
+
   auth.requestTokenRefresh = m.requestTokenRefresh
-  auth.requestTokenTransfer = m.requestTokenTransfer  
+  auth.requestTokenTransfer = m.requestTokenTransfer
 
   auth.handleRefreshResponse = Function(msg, refreshReq)
     return invalid
@@ -601,9 +601,9 @@ End Function
 Function tubiAuth_transferRefreshToken_403_test()
   auth = m.auth
   externalAuthInfo = m.externalAuthInfo
-  
+
   auth.requestTokenRefresh = m.requestTokenRefresh
-  auth.requestTokenTransfer = m.requestTokenTransfer  
+  auth.requestTokenTransfer = m.requestTokenTransfer
 
   auth.handleRefreshResponse = Function(msg, refreshReq)
     return {} ' indicates 403
@@ -634,7 +634,7 @@ End Function
 Function tubiAuth_visit_BeforeEach() as void
 
   m.tubiAuth = m.auth
-  
+
   'use a fake section so not to disturb actual first visit info
   m.tubiAuth.firstVisitRegSection = "testVisit"
 
@@ -663,7 +663,7 @@ Function tubiAuth_setFirstVisit_test()
   registryFirstVisit = m.tubiAuth.regRead("firstVisit", m.tubiAuth.firstVisitRegSection)
   m.assertNotInvalid(registryFirstVisit)
   m.assertEqual(firstVisit, registryFirstVisit.toInt())
-  
+
 End Function
 
 
@@ -831,7 +831,7 @@ Function tubiAuth_createSignature_test()
     "Content-Type": "application/json"
     "x-client-platform": "roku"
     "x-client-version": "2.16.0"
-  }  
+  }
 
   tokenReqInfo = {
     body: bodyJson
@@ -868,7 +868,7 @@ Function tubiAuth_constructCanonicalRequest_test()
     "Content-Type": "application/json"
     "x-client-platform": "roku"
     "x-client-version": "2.16.0"
-  }  
+  }
 
   tokenReqInfo = {
     body: bodyJson
@@ -949,7 +949,7 @@ End Function
 '@Test constructHashedPayload unit tests
 Function tubiAuth_constructHashedPayload_test()
 
-  auth = m.auth  
+  auth = m.auth
   body = {
     "device_id":"5d9bb3b3-dfab-50af-a65e-28d25ca4d32b",
     "id":"419f8a8e-b1aa-4763-ac4e-e451ee7358e7",

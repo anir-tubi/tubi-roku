@@ -91,6 +91,19 @@ End Function
 '}
 Function tubiAuth_getAuthInfo()
   authInfo = m.regReadAll(m.authRegSection) 'returns empty assocArray if nothing in the auth registry
+
+  firstName = authInfo.fn
+  if firstName <> invalid then
+    authInfo.firstName = firstName
+    authInfo.delete("fn")
+  end if
+
+  lastName = authInfo.ln
+  if lastName <> invalid then
+    authInfo.lastName = lastName
+    authInfo.delete("ln")
+  end if
+
   newAuthInfo = invalid
   if authInfo.expireTime <> invalid   'used as test to determine if we have any auth info in the auth registry
     authInfo.expireTime = authInfo.expireTime.toInt()
@@ -982,14 +995,14 @@ Function tubiAuth_formatAuthInfoFromServer(serverAuthInfo)
   if serverAuthInfo.authType <> invalid then authInfo.authType = serverAuthInfo.authType
   if serverAuthInfo.has_age <> invalid then authInfo.hasAge = serverAuthInfo.has_age.toStr()
 
-  authInfo.fn = ""
+  authInfo.firstName = ""
   if serverAuthInfo.first_name <> invalid
-    authInfo.fn = serverAuthInfo.first_name
+    authInfo.firstName = serverAuthInfo.first_name
   end if
 
-  authInfo.ln = ""
+  authInfo.lastName = ""
   if serverAuthInfo.last_name <> invalid
-    authInfo.ln = serverAuthInfo.last_name
+    authInfo.lastName = serverAuthInfo.last_name
   end if
 
   authInfo.name = ""

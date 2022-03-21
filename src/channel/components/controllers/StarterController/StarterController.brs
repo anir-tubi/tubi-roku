@@ -2,7 +2,7 @@ Function init()
   m.constants = getConstants()
 
   processAnimationLogo()
-  
+
   m.hasExperiments = false
   m.hasRemoteConfigs = false
   m.experimentsTask = m.top.createChild("ExperimentsTask")
@@ -19,13 +19,13 @@ Function onUrlRequest()
   if m.top.getUrl = true and m.hasExperiments = true and m.hasRemoteConfigs = true
     'Handle any remote config updates here:
     'Let youbora be enabled by the remote config
-    
+
     if m.constants.externalConfig.info.youbora_enabled = true
       m.constants.thirdParty.youbora.enabled = m.constants.externalConfig.info.youbora_enabled
     end if
 
     m.top.newBuildConstants = m.constants
-    
+
     if m.constants.remoteComponents = false
       m.top.useRemoteComponents = m.constants.remoteComponents
     else
@@ -34,7 +34,7 @@ Function onUrlRequest()
       ' if an experiment or remote config needs to update the remoteComponentsUrl, do it here.
       ' (experiment tracking should not happen here. It should happen when the user encounters the experiment!)
       '-------------------------------------------------------------------------------------'
-      ' experiment example: 
+      ' experiment example:
       ' request = TubiRequest(m.constants.settings)
       ' experiments = TubiExperiments(m.constants)
       ' sideNavEnabled = m.experiments.getExperimentResource("RokuNamespace", "roku_side_nav").enabled
@@ -43,7 +43,7 @@ Function onUrlRequest()
       ' else
       '   remoteComponentsUrl = "someOtherUrl"
       ' end if
-      ' 
+      '
       ' remote/external config example:
       ' remoteComponentsUrl = m.constants.externalConfig.sideNavRemoteComponentsUrl
 
@@ -52,7 +52,7 @@ Function onUrlRequest()
       print "remoteComponentsUrl "; remoteComponentsUrl
       m.top.remoteComponentsUrl = remoteComponentsUrl
     end if
-    
+
   end if
 End Function
 
@@ -81,44 +81,44 @@ Function processAnimationLogo()
 
   ' bufferingCompleted tells whether buffering reached 33% or more
   m.bufferingCompleted = false
-  
+
   appInfo = createObject("roAppInfo")
   initialSplashScreenDuration = Val(appInfo.getValue("splash_min_time")) / 1000
-  
+
   ' minimum seconds the custom splash poster is displayed
   m.splashScreenMin = initialSplashScreenDuration + 0
-  
+
   ' maximum seconds the custom splash poster is displayed
   m.splashScreenMax = initialSplashScreenDuration + 3
-  
+
   ' customSplashTimerCount is number of timer the timer event got fired
   m.customSplashTimerCount = 0
-  
+
   ' videoPlayed helps to set fadeInRemoteComponent=true
   m.videoPlayed = false
-  
+
   m.top.observeField("removeStartUpScreens", "onRemoveStartUpScreens")
-  
+
   m.startupScreens = m.top.findNode("startupScreens")
-  
+
   m.animationLogo = m.top.findNode("animationLogo")
-  
+
   m.customSplashTimer = m.top.findNode("customSplashTimer")
   m.customSplashTimer.ObserveField("fire","onCustomSplashTimerFired")
-  m.customSplashTimer.control = "start"  
-  
+  m.customSplashTimer.control = "start"
+
   videoContent = createObject("RoSGNode", "ContentNode")
   videoContent.url = m.constants.urls.animationLogo
   videoContent.title = "AnimationLogo"
   videoContent.streamformat = "mp4"
-  
+
   m.animationLogo = m.top.findNode("animationLogo")
   m.animationLogo.content = videoContent
   m.animationLogo.observeField("bufferingStatus", "onBufferingStatus")
   m.animationLogo.observeField("position", "onPositionChange")
   m.animationLogo.observeField("state", "onAnimationLogoChange")
   m.animationLogo.control = "prebuffer"
-  
+
 End Function
 
 
@@ -140,12 +140,12 @@ End Function
 
 Function playAnimationLogo()
 
-  if m.bufferingCompleted = true and m.customSplashTimerCount >= m.splashScreenMin 
+  if m.bufferingCompleted = true and m.customSplashTimerCount >= m.splashScreenMin
     m.top.fadeOutCustomSplash = true
     m.videoPlayed = true
     m.animationLogo.control = "play"
   end if
-  
+
 End Function
 
 
@@ -157,13 +157,13 @@ End Function
 Function onBufferingStatus(msg)
 
   buffering = msg.GetData()
-  ' we are fadingIn startupScreens(VideoNode) only when the buffering percent is >= 99% 
+  ' we are fadingIn startupScreens(VideoNode) only when the buffering percent is >= 99%
   ' this is to avoid black(videoNode) screen appearing before the video starts playing especially on slow internet connection
   if buffering <> invalid and buffering.percentage >= 99
     m.animationLogo.unobserveField("bufferingStatus")
     customFadeIn(m.startupScreens, 0.5, 0)
   ' starting the playback when the buffering percent is >= 33%
-  else if buffering <> invalid and buffering.percentage >= 33 and m.bufferingCompleted = false  
+  else if buffering <> invalid and buffering.percentage >= 33 and m.bufferingCompleted = false
     m.bufferingCompleted = true
     playAnimationLogo()
   end if
@@ -176,7 +176,7 @@ Function stopAnimationLogo()
   m.top.fadeOutCustomSplash = true
   m.videoPlayed = true
   m.animationLogo.control = "stop"
-  
+
 End Function
 
 
@@ -188,14 +188,14 @@ Function onCustomSplashTimerFired()
     ' after reaching splashScreenMax time, manually stopping animationLogo if state is stopped or buffering
     m.customSplashTimer.unobserveField("fire")
     m.customSplashTimer.control = "stop"
-    if m.animationLogo.state <> "playing"
+    if m.animationLogo <> invalid AND m.animationLogo.state <> "playing"
       stopAnimationLogo()
     end if
   else if m.videoPlayed = false
     ' will only play if video has pre buffered and m.splashScreenMin has been surpassed
     playAnimationLogo()
   end if
-  
+
 End Function
 
 
@@ -219,7 +219,7 @@ Function onRemoveStartUpScreens()
 
   m.startupScreens.visible = false
   m.top.removeChild(m.startupScreens)
-  m.startupScreens = invalid  
+  m.startupScreens = invalid
 
 End Function
 
@@ -234,7 +234,7 @@ Function customFadeIn(target, duration, delay)
     allowOnLowSpecDevices: true
   }
   return animate(target, animationOptions)
-  
+
 End Function
 
 
@@ -248,5 +248,5 @@ Function customFadeOut(target, duration, delay)
     allowOnLowSpecDevices: true
   }
   return animate(target, animationOptions)
-  
+
 End Function
