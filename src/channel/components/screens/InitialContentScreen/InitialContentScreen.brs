@@ -41,24 +41,12 @@ End Function
 Function onAnimateIntoView()
   
   rowNode = CreateObject("roSGNode", "ContentNode")
-  menuTreamentOption = getExperimentResource("roku_initial_content_type_selector_icts", "roku_initial_content_type_selector_icts_v3", false).icts_menu_option
-
-  if menuTreamentOption = "movies_tv_combined"
-    setMainContent(m.constants.ui.sideNavIds.home, rowNode)
-    setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode)
-    setMainContent(m.constants.ui.sideNavIds.espanol, rowNode)
-    setMainContent(m.constants.ui.sideNavIds.kidsMode, rowNode)
-  else if menuTreamentOption = "no_espanol"
-    setMainContent(m.constants.ui.sideNavIds.home, rowNode)
-    setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode) 
-    setMainContent(m.constants.ui.sideNavIds.kidsMode, rowNode)
-  else if menuTreamentOption = "movies_tv_separate"
-    setMainContent(m.constants.ui.sideNavIds.movies, rowNode)
-    setMainContent(m.constants.ui.sideNavIds.tv, rowNode)
-    setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode)
-    setMainContent(m.constants.ui.sideNavIds.espanol, rowNode)
-    setMainContent(m.constants.ui.sideNavIds.kidsMode, rowNode)
-  end if
+  setMainContent(m.constants.ui.sideNavIds.movies, rowNode)
+  setMainContent(m.constants.ui.sideNavIds.tv, rowNode)
+  setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode)
+  setMainContent(m.constants.ui.sideNavIds.espanol, rowNode)
+  setMainContent(m.constants.ui.sideNavIds.kidsMode, rowNode)
+    
   numOfMenuItems = rowNode.getChildCount()
   nSpacing = m.InitialContentMenu.columnSpacings[0]
   aColumnSpacings = []

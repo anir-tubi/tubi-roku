@@ -31,9 +31,6 @@ Function TubiExperiments(constants) as Object
       roku_linear_epg: {
         roku_linear_epg_v1: { "enabled": false, update_homescreen: false }
       }
-      roku_initial_content_type_selector_icts: {
-        roku_initial_content_type_selector_icts_v3: {"icts_menu_option": "movies_tv_separate"} ' valid values are : "no_icts", "movies_tv_combined", "movies_tv_separate", "no_espanol"
-      }
       roku_instant_resume: {
         roku_instant_resume_v2: {"enabled": true}
       }

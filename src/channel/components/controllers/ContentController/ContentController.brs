@@ -539,7 +539,7 @@ End Function
 ' Contain the logic to determine if the Initial Content Screen should be displayed.
 Function shouldDisplayInitialContentScreen()
   bDisplay = false
-  if m.constants.deviceInfo.countryCode = "US" and isParentalControlsAdultLevel() = true and m.uiMode <> m.constants.ui.modes.kidsAgeGate and getExperimentResource("roku_initial_content_type_selector_icts", "roku_initial_content_type_selector_icts_v3", true).icts_menu_option <> "no_icts"
+  if m.constants.deviceInfo.countryCode = "US" and isParentalControlsAdultLevel() = true and m.uiMode <> m.constants.ui.modes.kidsAgeGate
     ' Do not display this screen if they are outside of the US or are going to display kids mode or parental control is set to anything other than the adult level
     ' Also skip this screen if the user is coming from a deeplink
     bDisplay = true
