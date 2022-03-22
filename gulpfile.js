@@ -162,8 +162,8 @@ function buildInstalled() {
       sources = [...sources, ...testSources];
     }
 
-    // don't include RALE files if config is not 'dev'
-    if (options.config !== 'dev') {
+    // don't include RALE files if config is not 'dev' or it's disabled
+    if (options.config !== 'dev' || settings.raleEnabled !== true) {
       sources.push('!src/channel/components/controllers/TubiScene/TrackerTask.xml')
     }
 
@@ -320,13 +320,9 @@ function buildRemote() {
       '!src/channel/source/3rdparty/roku/NotesOnRokuTestFramework.brs',
       '!src/channel/source/3rdparty/roku/UnitTestFramework.brs',
       '!src/channel/source/tests/**',
-      '!src/channel/source/Settings.brs'
+      '!src/channel/source/Settings.brs',
+      '!src/channel/components/controllers/TubiScene/TrackerTask.xml'
     ];
-
-    // don't include RALE files if config is not 'dev'
-    if (options.config !== 'dev') {
-      sources.push('!src/channel/components/controllers/TubiScene/TrackerTask.xml')
-    }
 
     // don't include SignUp Task if config is not 'qa'
     if (options.config !== 'qa') {

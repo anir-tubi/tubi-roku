@@ -66,11 +66,13 @@ Function runChannel(constants, log, request)
   screen.show()
 
   'add RALE for dev builds - children can not be added to tubiScene until after screen.show has run
-  if constants <> invalid and constants.settings <> invalid and constants.settings.mode = "dev"
+  if constants <> invalid and constants.settings <> invalid and constants.settings.mode = "dev" and constants.settings.raleEnabled = true
     tubiScene.createChild("TrackerTask")
   end if
+  ' Used to add required node creation needed for RALE component during vscode build
+  ' vscode_rale_tracker_entry
 
-  ' Used to add required include to make RDB component in vscode
+  ' Used to add required node creation needed for RDB component during vscode build
   ' vscode_rdb_on_device_component_entry
 
   'run SceneGraph tests if in test mode

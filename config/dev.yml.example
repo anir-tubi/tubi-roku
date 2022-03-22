@@ -33,6 +33,8 @@ settings:
 
   stagingApis: false  # setting to true will use UAPI staging APIs (matrix, cms, user_device)
 
+  raleEnabled: false # setting to true will enable RALE being included in dev builds
+
   # any settings config values under bs_consts below will overwrite
   # bs_consts values set in the various manifests in default.yml
   bs_const:
