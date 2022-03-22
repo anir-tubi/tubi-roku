@@ -13,13 +13,7 @@ Function startSignIn(callbackAfterSignIn=invalid)
   end if
 
   m.callbackAfterSignIn = callbackAfterSignIn
-
-  if getExperimentResource("roku_email_prefill_login_age_gate", "roku_email_prefill_login_age_gate_v1").enabled = true
-    showRFIScreen()
-  else
-    hideNavMenu(false)
-    showActivationScreen()
-  end if
+  showRFIScreen()
 
 End Function
 
@@ -243,28 +237,12 @@ Function onEmailExistsError(errorResponse)
     }
   end if
   showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
-
-
-End Function
-
-
-' showActivationScreen is used  to display ActivationCodeScreen screen
-Function showActivationScreen()
-
-  activationCodeScreen = CreateObject("roSGNode", "ActivationCodeScreen")
-  activationCodeScreen.id = m.constants.ui.screenIds.activationCodeScreen
-  activationCodeScreen.observeFieldScoped("activationSuccess", "onActivationSuccess")
-  activationCodeScreen.observeFieldScoped("errorType", "onRegTaskError")
-  pushScreen(activationCodeScreen, true, true)
-  displayDefaultBackground()
-
 End Function
 
 
 ' showSignInScreen is used to display signIn screen
 ' @email : string,  (either taken from roku account or user entered email)
 Function showSignInScreen(email)
-
   signInScreen = CreateObject("roSGNode", "SignInScreen")
   signInScreen.id = m.constants.ui.screenIds.signInScreen
   signInScreen.username = email
@@ -273,7 +251,6 @@ Function showSignInScreen(email)
   signInScreen.observeFieldScoped("staticPageSelected", "onStaticPageSelected")
   pushScreen(signInScreen, true, true)
   displayDefaultBackground()
-
 End Function
 
 
@@ -431,93 +408,6 @@ Function onReEnterPasswordSelected()
     currentScreen.resetFocus = true
   end if
 
-End Function
-
-
-Function getActivationCodeScreen()
-  screen = invalid
-  currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and currentScreen.getSubtype() =  "ActivationCodeScreen"
-    screen = currentScreen
-  end if
-
-  return screen
-End Function
-
-
-'''''''''''''''''''''''''
-' onRegTaskError
-'
-' An error was recorded by the registrationCodeTask so let the user know
-Function onRegTaskError(evt)
-
-  sSubtypeCode = ""
-
-  sEventName = evt.getData()
-  if sEventName = "expire"
-    title = getTranslation("dialog_signIn_activationCodeExpired_title")
-    message = getTranslation("dialog_signIn_activationCodeExpired_description")
-    sSubtypeCode = m.constants.errors.subtypes.expireError
-  else if sEventName = "poll"
-    title = getTranslation("error_signIn_connectionError_title")
-    message = getTranslation("error_signIn_connectionError_description")
-    sSubtypeCode = m.constants.errors.subtypes.networkError
-  else if sEventName = "code"
-    title = getTranslation("error_signIn_connectionErrorFetch_title")
-    message = getTranslation("error_signIn_connectionErrorFetch_description")
-    sSubtypeCode = m.constants.errors.subtypes.fetchError
-  else
-    title = getTranslation("error_signIn_activationCodeGeneral_title")
-    message = getTranslation("error_signIn_activationCodeGeneral_description")
-  end if
-
-  userErrorCode = getUserFacingErrorCode(m.constants.errors.context.activateScreen, sSubtypeCode)
-
-  authPageValues = {
-    auth_action:  "REGISTER"  'Action enum
-  }
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "REGISTRATION"
-      pageOneof: m.Tracking.getAnalyticsPage("auth_page", authPageValues)
-      dialog_action: "SHOW"
-      dialog_sub_type: userErrorCode
-    }
-  }
-
-  modalInfo = {
-    title: title
-    message: getErrorMessage(message, userErrorCode)
-    openTrackEvent: dialogEvent
-    trackingTask: m.trackingLoggingTask
-  }
-  showErrorModal(modalInfo, onErrorButtonTryAgainPress, invalid, onErrorButtonCancelPress, invalid, [getTranslation("dialog_button_tryAgain"), getTranslation("dialog_button_skip")])
-End Function
-
-
-'''''''''''''''''''''''''
-' onErrorButtonCancelPress
-'
-' Respond the user selecting the cancel button on the error modal
-Function onErrorButtonCancelPress()
-  screen = getActivationCodeScreen()
-  if screen <> invalid
-    screen.getActivationCode = false
-  end if
-  popScreen(true, true)
-End Function
-
-
-'''''''''''''''''''''''''
-' onErrorButtonTryAgainPress
-'
-' Respond the user selecting the try again button on the error modal
-Function onErrorButtonTryAgainPress()
-  screen = getActivationCodeScreen()
-  if screen <> invalid
-    screen.getActivationCode = true
-  end if
 End Function
 
 
@@ -755,7 +645,6 @@ End Function
 
 Function popScreenAfterSignInProcess()
   poppableScreenSubtypes = {
-    "ActivationCodeScreen": true
     "SignInScreen": true
     "SignUpScreen": true
     "EmailInputScreen": true

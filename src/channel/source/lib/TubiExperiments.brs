@@ -42,10 +42,6 @@ Function TubiExperiments(constants) as Object
         roku_linear_countdown_timer_v1: {"countdown_timer": 10}
       }
 
-      roku_email_prefill_login_age_gate:{
-        roku_email_prefill_login_age_gate_v1: {"enabled": true}
-      }
-
       roku_instant_resume_tweak: {
         roku_instant_resume_tweak_v1: {"enabled": false}
       }
