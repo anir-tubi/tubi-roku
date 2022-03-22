@@ -918,8 +918,6 @@ Function onContentSelected(msg)
   else if content.type = m.constants.ui.contentTypes.historySignedOutUser
     '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
     startSignIn(onCWRowAfterSignIn)
-  else if content.type = m.constants.ui.contentTypes.utility
-    onUtilityItemSelected(content)
   else if content.type = m.constants.ui.contentTypes.linear
     selectLinearContent(content)
   else
@@ -946,21 +944,6 @@ Function onHomescreenContentReady(msg)
     '//Report the page_load analytics
     loadTime = Int((Uptime(0) - homeScreen.trackingLoadStartTime) * 1000) 'in ms
     screenTrackingLoad(homeScreen.trackingPageInfo, loadTime)
-  end if
-End Function
-
-
-Function onUtilityItemSelected(content)
-  itemSelectedId = content.id
-
-  if itemSelectedId = m.constants.ui.utilityIds.movies
-    showMoviesScreen()
-    m.SideNav.itemRequested = m.constants.ui.sideNavIds.movies
-  else if itemSelectedId = m.constants.ui.utilityIds.tv
-    showTVScreen()
-    m.SideNav.itemRequested = m.constants.ui.sideNavIds.tv
-  else
-    showCategoryDetailsScreen(content, "HOME")
   end if
 End Function
 

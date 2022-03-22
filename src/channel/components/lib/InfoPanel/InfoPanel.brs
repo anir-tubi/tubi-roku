@@ -199,12 +199,12 @@ Function onLineOneDataChange(msg)
   line1Label = m.TwoLineInfo.findNode("Line1")
 
   text = ""
-  if data.releasedate <> invalid and data.releasedate <> "" then
+  if data.releasedate <> invalid and data.releasedate <> ""
     text = data.releasedate + " "
   end if
-  if data.length <> invalid and data.length <> 0 then
+  if data.length <> invalid and data.length <> 0
     ' add 'dot' spacer only if we had a release date
-    if text.len() > 0 then
+    if text.len() > 0 
       text = text + Chr(&hb7) + " "
     end if
     text = text + formatLengthAsEnglish(data.length) + " "
@@ -327,7 +327,7 @@ Function onGenresChange()
   tubiLog("InfoPanel.onGenresChange")
   line2Label = m.TwoLineInfo.findNode("Line2")
   text = ""
-  if m.top.genres <> invalid and m.top.genres.count() > 0 then
+  if m.top.genres <> invalid and m.top.genres.count() > 0
     capitalGenres = []
     for each c in m.top.genres
       capitalGenres.push(capitalize(c))
@@ -353,10 +353,10 @@ End Function
 Function onDirectorsChange()
   tubiLog("InfoPanel.onDirectorChange")
   text = ""
-  if m.top.directors <> invalid and m.top.directors.count() > 0 then
+  if m.top.directors <> invalid and m.top.directors.count() > 0
     text = m.top.directors.Join(", ")
   end if
-  if text = "" then
+  if text = ""
     ' hide the whole group if no directors listed
     m.DirectorGroup.visible = false
   else if m.DirectorGroup.visible = false
@@ -369,10 +369,10 @@ End Function
 Function onStarringChange()
   tubiLog("InfoPanel.onStarringChange")
   text = ""
-  if m.top.starring <> invalid and m.top.starring.count() > 0 then
+  if m.top.starring <> invalid and m.top.starring.count() > 0
     text = m.top.starring.Join(", ")
   end if
-  if text = invalid or text = "" then
+  if text = invalid or text = ""
     ' hide the whole group if no actors/starring listed
     m.StarringGroup.visible = false
   else
@@ -385,7 +385,7 @@ End Function
 Function onSeasonEpisodeCountChange()
   tubiLog("InfoPanel.onSeasonEpisodeCountChange")
   seasonLabel = m.SeasonDetails.findNode("SeasonLine1")
-  if m.top.seasonEpisodeCount > 0 then
+  if m.top.seasonEpisodeCount > 0
     seasonLabel.text = stri(m.top.seasonEpisodeCount).trim() + " episodes"
   else
     seasonLabel.text = ""
@@ -396,7 +396,7 @@ End Function
 Function onCategoryContentCountChange()
   tubiLog("InfoPanel.onCategoryContentCountChange")
   categoryLine1 = m.CategoryDetails.findNode("CategoryLine1")
-  if m.top.categoryContentCount <> invalid and m.top.categoryContentCount > 0 then
+  if m.top.categoryContentCount <> invalid and m.top.categoryContentCount > 0
     categoryLine1.text = stri(m.top.categoryContentCount).trim() + " titles in this category"
   else
     categoryLine1.text = ""
@@ -421,9 +421,9 @@ Function onCalculateHeight()
   bottomMargin = 8
   m.DescriptionFocusButton.height = m.Description.boundingRect().height + topMargin + bottomMargin
   ' try to shorten description to fit max height
-  if m.top.maxHeight <> 0 and m.top.maxHeight < m.Offset.BoundingRect().height then
+  if m.top.maxHeight <> 0 and m.top.maxHeight < m.Offset.BoundingRect().height
     m.Description.height = m.Description.boundingRect().height - (m.offset.BoundingRect().height - m.top.maxHeight)
-    if m.Description.height <= 0 then
+    if m.Description.height <= 0
       m.Description.text = ""
     end if
     m.DescriptionFocusButton.height = m.Description.boundingRect().height + topMargin + bottomMargin
@@ -453,26 +453,26 @@ Function onModeChange()
     m.SecondLineGroup.removeChild(m.liveIconGroup)
   end if
 
-  if m.top.mode = m.constants.ui.infoPanelModes.category then
+  if m.top.mode = m.constants.ui.infoPanelModes.category
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.CategoryDetails)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [52, 15]
-  else if m.top.mode = m.constants.ui.infoPanelModes.vitg then
+  else if m.top.mode = m.constants.ui.infoPanelModes.vitg
     m.Offset.itemSpacings = [25, 15]
-  else if m.top.mode = m.constants.ui.infoPanelModes.item then
+  else if m.top.mode = m.constants.ui.infoPanelModes.item
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.TwoLineInfo)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [25, 15]
-  else if m.top.mode = m.constants.ui.infoPanelModes.movie then
+  else if m.top.mode = m.constants.ui.infoPanelModes.movie
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.TwoLineInfo)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.appendChild(m.StarringGroup)
     m.Offset.appendChild(m.DirectorGroup)
     m.Offset.itemSpacings = [25, 15, 17, 11]
-  else if m.top.mode = m.constants.ui.infoPanelModes.series then
+  else if m.top.mode = m.constants.ui.infoPanelModes.series
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.Episode)
     m.Offset.appendChild(m.TwoLineInfo)
@@ -480,16 +480,16 @@ Function onModeChange()
     m.Offset.appendChild(m.StarringGroup)
     m.Offset.appendChild(m.DirectorGroup)
     m.Offset.itemSpacings = [25, 25, 15, 17, 11]
-  else if m.top.mode = m.constants.ui.infoPanelModes.season then
+  else if m.top.mode = m.constants.ui.infoPanelModes.season
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.SeasonDetails)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [52, 15]
-  else if m.top.mode = m.constants.ui.infoPanelModes.continue_watching or m.top.mode = m.constants.ui.infoPanelModes.utility then
+  else if m.top.mode = m.constants.ui.infoPanelModes.continue_watching
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.itemSpacings = [15]
-  else if m.top.mode = m.constants.ui.infoPanelModes.episode then
+    m.Offset.itemSpacings = [15] 
+  else if m.top.mode = m.constants.ui.infoPanelModes.episode
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.Episode)
     m.Offset.appendChild(m.TwoLineInfo)

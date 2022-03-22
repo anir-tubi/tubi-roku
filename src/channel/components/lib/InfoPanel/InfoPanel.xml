@@ -10,11 +10,10 @@
  -    4) 'series' - shows full details including cast and crew
  -    5) 'season' - shows full details including cast and crew
  -    6) 'episode' - shows full details including cast and crew
- -    7) 'utility' - shows title and description
- -    8) 'continue_watching' - shows title and description
- -    9) 'linear' - shows title and description
- -   10) 'vitg' - shows nothng
- -   11) 'epg' - shows image, title, description, year aired, program timings, cc, ratings, genre and tags
+ -    7) 'continue_watching' - shows title and description
+ -    8) 'linear' - shows title and description
+ -    9) 'vitg' - shows nothng
+ -   10) 'epg' - shows image, title, description, year aired, program timings, cc, ratings, genre and tags
  -
  -
  - The InfoPanel has 6 'regions' whose text are mapped as follows:

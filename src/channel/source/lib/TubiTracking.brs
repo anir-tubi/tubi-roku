@@ -488,28 +488,20 @@ Function tubiTracking_getAnalyticsSelector(selectorType, selectorValues)
 End Function
 
 
-' Build the structure for a ContentTile/UtilityTile message
+' Build the structure for a ContentTile message
 Function tubiTracking_getAnalyticsTile(contentNode, colPos=1, rowPos=1)
   tile = invalid
   
   if contentNode <> invalid
     tile = {}
-    ' UtilityTile is used for utility row items
-    if contentNode.type = m.constants.ui.categoryTypes.utility
-    
-      tile.id = contentNode.id
-      
-    else ' ContentTile is used for non-utility row items
-    
-      contentId = contentNode.id
-      if contentNode.type = m.constants.ui.contentTypes.series
-        if Left(contentNode.id, 1) = "0"
-          contentId = Mid(contentNode.id, 2)
-        end if
-        tile.series_id = contentId.toInt()
-      else if contentNode.type = m.constants.ui.contentTypes.video or contentNode.type = m.constants.ui.contentTypes.linear 
-        tile.video_id = contentId.toInt()
+    contentId = contentNode.id
+    if contentNode.type = m.constants.ui.contentTypes.series
+      if Left(contentNode.id, 1) = "0"
+        contentId = Mid(contentNode.id, 2)
       end if
+      tile.series_id = contentId.toInt()
+    else if contentNode.type = m.constants.ui.contentTypes.video or contentNode.type = m.constants.ui.contentTypes.linear 
+      tile.video_id = contentId.toInt()
     end if
     
     tile.col = colPos
@@ -850,7 +842,6 @@ Function tubiTracking_getOneOfs()
       category_row: -1   ' 1 based index
       category_col: -1   ' 1 based index
       content_tile: {}  ' ContentTile message - optional
-      utility_tile: {}  ' UtilityTile message - optional
     }
 
     category_component: {   ' Used for category screen, channel details screen, channel/category grid screen
@@ -858,7 +849,6 @@ Function tubiTracking_getOneOfs()
       category_row: -1   ' 1 based index
       category_col: -1   ' 1 based index
       content_tile: {}  ' ContentTile message - optional
-      utility_tile: {}  ' UtilityTile message - optional
     }
 
     ' sub_category_component: {   'Does not currently exist in roku UI

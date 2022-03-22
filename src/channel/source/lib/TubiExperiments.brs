@@ -20,9 +20,6 @@ Function TubiExperiments(constants) as Object
     '
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
     defaultResources: {
-      roku_discovery_v3: {
-        roku_discovery_row_v3: {"position" : -2, "has_tvshows" : false, "has_movies" : false}
-      }
       '//When enabled = true, the "roku_linear_epg_v1" experiment should have a boolean field labeled "update_homescreen"
       '//   if update_homescreen=false, then the linear row on the homescreen looks identical to the control
       '//     roku_linear_epg_v1: { "enabled": true, "update_homescreen": false }

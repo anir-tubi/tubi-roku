@@ -74,8 +74,6 @@ Function init()
 
   ' initilize the currentColumn variable to keep track of the current focused column item. It is used in the helper to stop the linear video player, but it could be used for other things.
   m.currentColumn = -1
-
-  m.utilityMaskOffsetDiff = -100 'the diff in the amount the content area mask is offset in the up direction for utility
   
   ' Video in the grid constants
   m.vitgSlideAmt = 326 'the amount the grid slides up to fit the vitg content item
@@ -414,30 +412,16 @@ Function onCurrFocusRowChange()
     categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
   end if
 
-  ' send experiment analytics (exposure event) only when
-  ' kidsMode is not enabled and currentScreen is homescreen and parentalRating is Adult and kidsModeFeatureOn is check for countryCode = US or CA
-  if m.top.shouldKidsModeBeSentToServer = false and m.top.id = "homeScreen" and m.top.parentalRating > 2 and m.top.kidsModeFeatureOn = true
-    ' Hiding the focus rectangle when the focus is on Utility row
-    if categoryEnteringFocus <> invalid and categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.utility
-      m.CategoryGridList.getChild(0).focusBitmapUri = "pkg:/images/tab_component_alt_fhd.9.png"
-      if m.constants.deviceInfo.scaledUi = true then
-        m.CategoryGridList.getChild(0).focusBitmapUri = "pkg:/images/tab_component_alt_hd.9.png"
-      end if
-      m.CategoryGridList.getChild(0).drawFocusFeedbackOnTop = false
-    else
-      m.CategoryGridList.getChild(0).focusBitmapUri = "pkg:/images/selector-fhd.9.png"
-      m.CategoryGridList.getChild(0).drawFocusFeedbackOnTop = true
-    end if
+  if m.constants.deviceInfo.scaledUi = true
+    m.CategoryGridList.getChild(0).focusBitmapUri = "pkg:/images/selector-hd.9.png"
   else
     m.CategoryGridList.getChild(0).focusBitmapUri = "pkg:/images/selector-fhd.9.png"
-    m.CategoryGridList.getChild(0).drawFocusFeedbackOnTop = true
   end if
+  m.CategoryGridList.getChild(0).drawFocusFeedbackOnTop = true
 
   if categoryEnteringFocus <> invalid
     sSponsorBackgroundURL = ""
-    if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.utility
-      expandMaskOffsetForUtility(rowPercent)
-    else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg
+    if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg
       ' update contentArea translation, only when VITG gain focus
       expandContentAreaForVitg(rowPercent)
     else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
@@ -502,12 +486,6 @@ Function contractContentAreaToOriginal(rowPercent)
 End Function
 
 
-' @rowPercent: float, the percentage that the Utility row is focused
-Function expandMaskOffsetForUtility(rowPercent)
-  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.utilityMaskOffsetDiff * rowPercent)]
-End Function
-
-
 ' Adjust the RowList based on the difference of the normal and sponsored row title heights and relative to where the rowList already is.
 '   So if a gridType already adjusted the rowList's position, then adjust it more but relatibve to where it already had been adjusted.
 ' @rowPercent: float, the percentage that the Sponsorship row is focused
@@ -538,9 +516,7 @@ Function populateInfoPanelByContent(focusedContent)
   if focusedContent <> invalid
     sType = focusedContent.type
 
-    if sType = m.constants.ui.categoryTypes.utility
-      populateInfoPanel(m.constants.ui.infoPanelModes.utility, focusedContent)
-    else if sType = m.constants.ui.categoryTypes.linear
+    if sType = m.constants.ui.categoryTypes.linear
       populateInfoPanel(m.constants.ui.infoPanelModes.linear, focusedContent)
     else if sType = m.constants.ui.categoryTypes.historySignedOutUser
       populateInfoPanel(m.constants.ui.infoPanelModes.continue_watching, focusedContent)
@@ -607,11 +583,7 @@ Function onGridFocusChange() as void
       'row is hardcoded to 1 in the line below because the row represents the row within the category_component, not within the grid
       'and the current design only has one row per category
       tile = m.Tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, 1)
-      if oldFocusedContent.type = m.constants.ui.categoryTypes.utility
-        categoryComponentInfo["utility_tile"] = tile
-      else
-        categoryComponentInfo["content_tile"] = tile
-      end if
+      categoryComponentInfo["content_tile"] = tile
 
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
@@ -675,12 +647,7 @@ Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
     componentValues["category_slug"] = m.top.currCategoryId
     componentValues["category_row"] = itemPosition[0] + 1 'all analytics are 1 based
     tile = m.Tracking.getAnalyticsTile(gridItem, itemPosition[1] + 1)
-
-    if gridItem.type = m.constants.ui.categoryTypes.utility
-      componentValues["utility_tile"] = tile
-    else
-      componentValues["content_tile"] = tile
-    end if
+    componentValues["content_tile"] = tile
 
     ' Set the tracking component of the gridItem that was passed so it can be accessed as part of the navigateToPage event
     trackingComponentInfo = {
@@ -737,11 +704,6 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.lineOneData = lineOneData
       m.InfoPanel.titleLogoUri = contentNode.titleLogoUri
       m.InfoPanel.genres = contentNode.genres
-      m.InfoPanel.width = 960
-    else if mode = m.constants.ui.infoPanelModes.utility
-      m.InfoPanel.mode = mode
-      m.InfoPanel.title = contentNode.title
-      m.InfoPanel.description = contentNode.description
       m.InfoPanel.width = 960
     else if mode = m.constants.ui.infoPanelModes.continue_watching
       m.InfoPanel.mode = mode

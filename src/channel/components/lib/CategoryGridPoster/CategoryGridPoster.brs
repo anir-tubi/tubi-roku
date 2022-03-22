@@ -22,7 +22,6 @@ Function init()
     landscape: "landscape"
     linear: "linear"
     vitg: "vitg"
-    utility: "utility"
     historySignedOutUser: "continue_watching_signed_out_user"
   }
   m.itemIDs = {
@@ -58,11 +57,7 @@ Function onContentChange()
   ' next line shouldn't be necessary but is added in order to try and quell crashes as reported by roku crash logs
   if m.resumeProgressBar = invalid then m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
   m.resumeProgressBar.visible = false
-
-  ' settings utilityRowPosters Group visibility false to avoid image caching issue.
-  if m.utilityRowPosters <> invalid
-    m.utilityRowPosters.visible = false
-  end if
+  
   ' settings continueWatchingLayout Group visibility false to avoid image caching issue.
   if m.continueWatchingLayout <> invalid
     m.continueWatchingLayout.visible = false
@@ -83,10 +78,6 @@ Function onContentChange()
           m.title.text = m.top.itemContent.title
         else if isVitg(m.top.itemContent, m.gridItemTypes) = true
           setUpVitg()
-        else if m.top.itemContent.gridItemType = m.gridItemTypes.utility
-          m.poster.visible = false
-          setUpUtility()
-          setUpUtilityObservers()
         else if categoryContent.gridItemType = m.gridItemTypes.historySignedOutUser
           setUpSignedOutContinueWatching()
         else if categoryContent.id = "continue_watching"
@@ -381,96 +372,6 @@ Function setUpSignedOutContinueWatching()
   m.continueWatchingLayout = m.top.createChild("ContinueWatchingCategoryGridPoster")
   m.continueWatchingLayout.translation = [(m.top.width-m.continueWatchingLayout.width)/2, 57]
   m.continueWatchingLayout.visible = true
-End Function
-
-
-' creates utilityPoster & Label to show in utility row
-Function setUpUtility()
-
-   m.utilityRowPosters = m.top.createChild("Group")
-
-   labelFont = CreateObject("roSGNode", "Font")
-   labelFont.uri = "pkg:/fonts/Vaud-Bold.ttf"
-   labelFont.size = 24
-
-   utilityPoster = CreateObject("roSGNode", "Poster")
-   utilityPoster.id = "utilityPoster"
-   utilityPoster.width = 324
-   utilityPoster.height = 84
-   utilityPoster.uri = "pkg:/images/tab_component.png"
-   utilityPoster.blendColor = "0x9699A329"
-
-   label = CreateObject("roSGNode", "Label")
-   label.id = "label"
-   label.translation = [40,0]
-   label.width = 250
-   label.height = 84
-   label.horizAlign = "center"
-   label.vertAlign = "center"
-   label.text = m.top.itemContent.title
-   label.font = labelFont
-
-   utilityPoster.appendChild(label)
-   m.utilityRowPosters.appendChild(utilityPoster)
-
-   m.utilityPoster = utilityPoster
-
-   m.utilityRowPosters.visible = true
-
-   if m.utilityLocalFocus = invalid
-     m.utilityLocalFocus = false
-   end if
-
-End Function
-
-
-Function setUpUtilityObservers()
-  m.top.observeField("itemHasFocus", "onUtilityItemFocus")
-  m.top.observeField("rowListHasFocus", "onUtilityRowListHasFocus")
-  m.top.observeField("focusPercent", "onUtilityFocusPercentChange")
-End Function
-
-
-' handleUtilityLocalFocusChange is used to change the posterUri & blendColor when item gains/loses focus
-Function handleUtilityLocalFocusChange(newLocalFocus)
-
-  if m.utilityLocalFocus = false and newLocalFocus = true
-    m.utilityPoster.uri = ""
-    m.utilityPoster.blendColor = "0xFF501AFF"
-  else if m.utilityLocalFocus = true and newLocalFocus = false
-    m.utilityPoster.uri = "pkg:/images/tab_component.png"
-    m.utilityPoster.blendColor = "0x9699A329"
-  end if
-
-  m.utilityLocalFocus = newLocalFocus
-
-End Function
-
-
-Function onUtilityItemFocus()
-
-  handleUtilityLocalFocusChange(m.top.itemHasFocus)
-
-End Function
-
-
-Function onUtilityRowListHasFocus()
-
-  if m.top.rowListHasFocus = false
-    handleUtilityLocalFocusChange(false)
-  end if
-
-End Function
-
-
-Function onUtilityFocusPercentChange()
-
-  if m.top.focusPercent < 1.0 and m.utilityLocalFocus = true
-    handleUtilityLocalFocusChange(false)
-  else if m.top.focusPercent = 1.0 and m.utilityLocalFocus = false and m.top.rowListHasFocus = true
-    handleUtilityLocalFocusChange(true)
-  end if
-
 End Function
 
 

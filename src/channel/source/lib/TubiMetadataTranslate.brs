@@ -29,7 +29,6 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     buildCategoryAAWithPrepend: tubiMetadataTranslate_buildCategoryAAWithPrepend
     buildCategoryParentInfo: tubiMetadataTranslate_buildCategoryParentInfo
     buildCategoryChildrenInfo: tubiMetadataTranslate_buildCategoryChildrenInfo
-    buildUtilityCategoryAA: tubiMetadataTranslate_buildUtilityCategoryAA
     buildContinueWatchingSignedOutUserCategoryAA: tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA
     generateChannelPosterUrl: tubiMetadataTranslate_generateChannelPosterUrl
     fetchedAtTimestamp: tubiMetadataTranslate_fetchedAtTimestamp
@@ -113,9 +112,7 @@ End Function
 ' Translate the backend type into a more readable client side content type
 Function tubiMetadataTranslate_translateBackendTypeToClientSideType(sBackendType = "" as String) as String
   sReturn = ""
-  if sBackendType = "u"
-    sReturn = m.contentTypes.utility
-  else if sBackendType = "c"
+  if sBackendType = "c"
     sReturn = m.contentTypes.category
   else if sBackendType = "cwso"
     sReturn = m.contentTypes.historySignedOutUser
@@ -649,54 +646,15 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     parentalRating = 3
     if authInfo <> invalid and authInfo.parentalRating <> invalid
       parentalRating = authInfo.parentalRating
-    end if
-
-    ' utility row position experiment
-    utilityRowPosition = -2 ' setting default as negative to avoid insertion if the experiment is control group
-
-    if m.experiments <> invalid
-      m.experimentInfo = m.experiments.getExperimentResource("roku_discovery_v3", "roku_discovery_row_v3")
-      if m.experimentInfo <> invalid
-      ' decreasing the position value by 1 in order to use it as index
-        utilityRowPosition = m.experimentInfo.position - 1
-      end if
-    end if
-
-    ' include utility row only in homescreen when kidsmode feature is ON (available to users) and
-    ' parentalRating is set to Adult and isKidsMode is false
-    includeUtilityRow = false
-    if kidsModeFeatureOn = true and (contentMode = m.constants.ui.contentMode.homescreen or contentMode = "") and parentalRating > 2 and isKidsMode = false
-      includeUtilityRow = true
-    end if
+    end if 
 
     'set up AAs for all categories
     for i=0 to containers.count()-1
       container = containers[i]
       if container.id = m.constants.ui.categoryIds.history
         continueWatchingIndex = i
-        ' increasing the utilityRowPosition by 1 if the ContinueWatching has no children AND the user
-        ' is signed in (continue watching row is displayed if the user is not signed in regardless).
-        '//::TODO:: Remove this section once we have API support
-        if container.children.Count() = 0 and (isLoggedInUser = false or uiMode = m.constants.ui.modes.kidsAgeGate)
-          utilityRowPosition = utilityRowPosition + 1
-        end if
       else if container.id = m.constants.ui.categoryIds.queue
         queueIndex = i
-        ' increasing the utilityRowPosition by 1 if the MyList/Queue has no children
-        '//::TODO:: Remove this section once we have API support
-        if container.children.Count() = 0
-          utilityRowPosition = utilityRowPosition + 1
-        end if
-      end if
-
-      ' inserting utilityRow in specific position based on experiment result
-      '//::TODO:: Remove this section once we have API support
-      if includeUtilityRow = true and i = utilityRowPosition
-        categoryAA = m.buildUtilityCategoryAA(containers)
-        if categoryAA <> invalid
-          homescreenAA.children.push(categoryAA)
-        end if
-        categoryAA = invalid
       end if
 
       categoryAA = invalid
@@ -908,13 +866,12 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     return translated
   end if
 
-  ' Store the gridItemType as necessary (only for landscape, linear, vitg, and utility).
+  ' Store the gridItemType as necessary (only for landscape, linear, and vitg). 
   ' We do it here manually, after creating the child nodes, to avoid having to define
   ' a custom content node which have proven to be much slower to instantiate.
   ' Could use some testing though.
   landscape = m.constants.ui.gridItemTypes.landscape
-  vitg_large = m.constants.ui.gridItemTypes.vitg
-  utility = m.constants.ui.gridItemTypes.utility
+  vitg = m.constants.ui.gridItemTypes.vitg
   linear = m.constants.ui.gridItemTypes.linear
   gridItemType = m.getGridItemType(container, sOrientation, m.constants)
 
@@ -927,7 +884,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     nodeCount = 1 + translated.getChildCount()
   end if
 
-  if gridItemType = landscape or gridItemType = vitg_large or gridItemType = utility or gridItemType = linear
+  if gridItemType = landscape or gridItemType = vitg or gridItemType = linear
     for i = 0 to translated.getChildCount()-1
       child = translated.getChild(i)
       if child.hasField("gridItemType") <> true
@@ -1203,7 +1160,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           end if
 
           bLandscape = false
-          if parentGridItemType = m.constants.ui.gridItemTypes.portrait or parentGridItemType = m.constants.ui.gridItemTypes.utility
+          if parentGridItemType = m.constants.ui.gridItemTypes.portrait
             bLandscape = false
           else if parentGridItemType = m.constants.ui.gridItemTypes.landscape and fullChild.hero_images <> invalid
             bLandscape = true
@@ -1217,10 +1174,6 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             childAA.hdgridposterurl = fullChild.hero_images[0]
           else if fullChild.posterarts <> invalid then
             childAA.hdgridposterurl = fullChild.posterarts[0]
-            ' HDPOSTERURL is an active image which is used in utility row
-            if parentGridItemType = m.constants.ui.gridItemTypes.utility
-              childAA.HDPOSTERURL = fullChild.posterarts[1]
-            end if
           end if
           childAA.hdgridposterurl = m.getThumbnailImage(fullChild, gridType)
 
@@ -1388,102 +1341,6 @@ Function tubiMetadataTranslate_translate(contentToTranslate) As Object
 End Function
 
 
-'//::TODO:: Remove this function and references once we have API support
-Function tubiMetadataTranslate_buildUtilityCategoryAA(containers)
-
-  updateMetadata = {
-    id: "utility"
-    slug: "utility"
-    title: ""
-    description: ""
-    totalCount: 0
-    offset: m.constants.performance.categoryGridList.initialBlockSize
-    validUntil: 0
-    json: ""
-    state: "full"
-    gridItemType: m.constants.ui.gridItemTypes.utility
-    type: m.contentTypes.utility
-  }
-
-  jsonAA = {}
-  validCount = 0
-  children = []
-
-  children.append(containers)
-  children.SortBy("title")
-
-  updateMetadata.children = []
-
-  sType = "UtilityContentNode"
-
-  if m.experimentInfo <> invalid
-    if m.experimentInfo.has_tvshows = true
-      childAA = {
-        id: "u_tvshows"
-        title: "TV Shows"
-        description: "Tune in to thousands of binge worthy TV shows, docuseries and reality TV. New shows added monthly, you’ll never run out."
-        subtype: sType
-        gridItemType : "utility"
-      }
-      childAA.type = "u"
-      jsonAA[childAA.id] = childAA
-      validCount += 1
-      updateMetadata.children.push(childAA)
-    end if
-
-    if m.experimentInfo.has_movies = true
-      childAA = {
-        id: "u_movies"
-        title: "Movies"
-        description: "Movie magic starts here with thousands of nostalgic favorites and recent box office hits. New movies added monthly, no movie ticket required."
-        subtype: sType
-        gridItemType : "utility"
-      }
-      childAA.type = "u"
-      jsonAA[childAA.id] = childAA
-      validCount += 1
-      updateMetadata.children.push(childAA)
-    end if
-  end if
-
-  for each child in children
-
-    if m.constants.ui.categoryList.Lookup(child.id) <> invalid
-
-      ' TODO: FIND A BETTER WAY TO SOLVE THE u_continue_watching issue
-      ' We artificially prepend a "u_" to the category id so that when doing a .findNode(), the
-      ' continue_watching category and continue watching pill have a unique ids.
-      childId = child.id
-      if child.id = "continue_watching"
-        childId = "u_" + child.id
-      end if
-
-      childAA = {
-        id: childId
-        title: child.title
-        description: child.description
-        subtype: sType
-        gridItemType : "utility"
-      }
-      child.type = "u"
-      jsonAA[childAA.id] = child
-      validCount += 1
-      updateMetadata.children.push(childAA)
-    end if
-
-  end for
-
-  if validCount = 0
-    return invalid
-  end if
-
-  updateMetadata.totalCount = validCount
-  updateMetadata.json = FormatJSON(jsonAA)
-
-  return updateMetadata
-End Function
-
-
 Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(container, bKidsMode = false)
   updateMetadata = {}
   if container <> invalid
@@ -1590,8 +1447,6 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
     gridItemType = constants.ui.gridItemTypes.linear
   else if container.id = constants.ui.categoryIds.featured and orientation <> constants.ui.gridItemTypes.portrait
     gridItemType = constants.ui.gridItemTypes.landscape
-  else if container.type = constants.ui.categoryTypes.utility
-    gridItemType = constants.ui.gridItemTypes.utility
   end if
 
   return gridItemType

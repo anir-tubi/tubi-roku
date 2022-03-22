@@ -224,11 +224,7 @@ Function setRowHeights()
     category = m.top.content.getChild(i)
     rowHeight = 0
     rowHeightAdjustment = 0
-    if category.gridItemType = m.constants.ui.gridItemTypes.utility
-      rowItemSize.push([304,79])
-      rowHeight = 108
-      showRowLabel.push(false)
-    else if category.gridItemType = m.constants.ui.gridItemTypes.historySignedOutUser
+    if category.gridItemType = m.constants.ui.gridItemTypes.historySignedOutUser
       rowHeightAdjustment = 80
       posterHeight = m.constants.ui.imageSizes.poster[1]
       rowItemSize.push([1693, posterHeight])

@@ -769,7 +769,6 @@ Function getConstants()
       constants.ui.categoryTypes.channel = "channel"
       constants.ui.categoryTypes.linear = "linear"
       constants.ui.categoryTypes.preview = "video_preview"
-      constants.ui.categoryTypes.utility = "utility"
       constants.ui.categoryTypes.historySignedOutUser = "continue_watching_signed_out_user"
 
 
@@ -778,7 +777,6 @@ Function getConstants()
       constants.ui.infoPanelModes.vitg = "vitg"
       constants.ui.infoPanelModes.category = "category"
       constants.ui.infoPanelModes.item = "item"
-      constants.ui.infoPanelModes.utility = "utility"
       constants.ui.infoPanelModes.continue_watching = "continue_watching"
       constants.ui.infoPanelModes.linear = "linear"
       constants.ui.infoPanelModes.movie = "movie"
@@ -805,7 +803,6 @@ Function getConstants()
       constants.ui.contentTypes.season = "season"
       constants.ui.contentTypes.category = "category"
       constants.ui.contentTypes.channel = "channel"
-      constants.ui.contentTypes.utility = "utility"
       constants.ui.contentTypes.linear = "linear"
       constants.ui.contentTypes.historySignedOutUser = "continue_watching_signed_out_user"
       constants.ui.contentTypes.epg = "epg"
@@ -982,14 +979,6 @@ Function getConstants()
       constants.ui.linearSideNavIds.cc = "cc"
       constants.ui.linearSideNavIds.epg = "epg"
 
-    constants.ui.utilityIds = {}
-      constants.ui.utilityIds.movies = "u_movies"
-      constants.ui.utilityIds.tv = "u_tvshows"
-      constants.ui.utilityIds.kidsMode = "u_kids"
-      constants.ui.utilityIds.search = "u_search"
-      constants.ui.utilityIds.channels = "u_channels"
-      constants.ui.utilityIds.categories = "u_categories"
-
     'a map of screenIds to corresponding sideNavIds
     constants.ui.screenIdToSideNavId = {}
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.homeScreen] = constants.ui.sideNavIds.home
@@ -1010,7 +999,6 @@ Function getConstants()
       constants.ui.gridItemTypes.landscape = "landscape"
       constants.ui.gridItemTypes.linear = "linear"
       constants.ui.gridItemTypes.vitg = "vitg"  'video in the grid
-      constants.ui.gridItemTypes.utility = "utility"
       constants.ui.gridItemTypes.historySignedOutUser = "continue_watching_signed_out_user"
 
     constants.ui.uris = {}
