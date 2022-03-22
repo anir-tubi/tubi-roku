@@ -30,6 +30,9 @@
     <field id="trailerInfo" type="assocarray" />
     <field id="deeplinkType" type="string" />
 
+    <!-- If the content is coming from a titan endpoint, then a titan version will be supplied. This will be used by Youbora -->
+    <field id="titanVersion" type="string" />
+
     <!-- true if the content is child directed content (CDC) -->
     <field id="isCdc" type="boolean" />
     

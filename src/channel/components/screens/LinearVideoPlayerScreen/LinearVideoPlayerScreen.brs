@@ -654,6 +654,7 @@ Function setDrmOnContent(contentNode, index)
     ' set general fields related to DRM
     contentNode.httpHeaders = resource.drmHeaders
     contentNode.url = resource.url
+    contentNode.titanVersion = resource.titanVersion
     contentNode.length = resource.length
     contentNode.streamFormat = resource.streamFormat
     contentNode.drmType = resource.type

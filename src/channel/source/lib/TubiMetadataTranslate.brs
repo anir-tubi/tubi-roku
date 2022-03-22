@@ -1652,6 +1652,10 @@ Function tubiMetadataTranslate_composeVideoResources(contentFromServer)
         resource = invalid
       end if
 
+      if video.titan_version <> invalid and video.titan_version <> ""
+        resource.titanVersion = video.titan_version
+      end if
+
       if resource <> invalid
         videoResources.push(resource)
       end if
