@@ -324,38 +324,6 @@ Function getTranslation_en_US()
       "description": "title of a dialog window that shows the full description of a video item",
       "message": "Full Synopsis"
     },
-    "dialog_signIn_activationCodeExpired_title": {
-      "description": "title of the error window when the activation code has expired",
-      "message": "Activation Code Expired"
-    },
-    "dialog_signIn_activationCodeExpired_description": {
-      "description": "description of the error window when the activation code has expired",
-      "message": "We're sorry, but the activation code expired before your device was successfully linked."
-    },
-    "error_signIn_connectionError_title": {
-      "description": "title of the error window when there is a connection error",
-      "message": "Connection Error During Activation"
-    },
-    "error_signIn_connectionError_description": {
-      "description": "description of the error window when there is a connection error",
-      "message": "We're sorry, but we could not connect with the server to see if you registered your device."
-    },
-    "error_signIn_connectionErrorFetch_title": {
-      "description": "title of the error window when there is a connection error during fetching the code",
-      "message": "Connection Error During Code Fetch"
-    },
-    "error_signIn_connectionErrorFetch_description": {
-      "description": "description of the error window when there is a connection error during fetching the code",
-      "message": "We're sorry, but there was an error while receiving the code from the server."
-    },
-    "error_signIn_activationCodeGeneral_title": {
-      "description": "title of the error window when there is a general activation code error",
-      "message": "Activation Code Error"
-    },
-    "error_signIn_activationCodeGeneral_description": {
-      "description": "description of the error window when there is a general activation code error",
-      "message": "We're sorry, but an activation code error occurred."
-    },
     "dialog_parentalPassword_title": {
       "description": "title of the dialog window when guest user signs in and still needs to enter his/her password to change the parental controls",
       "message": "Enter your password"
@@ -455,22 +423,6 @@ Function getTranslation_en_US()
     "error_check_birthdate_description": {
       "description": "message letting the user know that they were not able to be signed in",
       "message": "There was an issue when trying to sign you in. Please enter the channel and sign in again."
-    },
-    "screenActivationCode_audioGuide": {
-      "description": "Display the activation code to people who cannot see.",
-      "message": "Activation Code: {code}. Refresh Code"
-    },
-    "screenActivationCode_heading": {
-      "description": "Title on the activation code screen",
-      "message": "Visit tubi.tv/activate"
-    },
-    "screenActivationCode_subheading": {
-      "description": "Subtitle on the activation code screen",
-      "message": "from a browser on another device and enter the code below"
-    },
-    "screenActivationCode_button_refresh": {
-      "description": "Label of the button that will provide a new activation code",
-      "message": "Refresh Code"
     },
     "screenSearch_defaultSearch": {
       "description": "Directions on the search page",
@@ -1342,38 +1294,6 @@ Function getTranslation_es_MX()
       "description": "title of a dialog window that shows the full desciption of a video item",
       "message": "Sinopsis completa"
     },
-    "dialog_signIn_activationCodeExpired_title": {
-      "description": "title of the error window when the activation code has expired",
-      "message": "Código de activación expirado"
-    },
-    "dialog_signIn_activationCodeExpired_description": {
-      "description": "description of the error window when the activation code has expired",
-      "message": "Lo sentimos, pero el código de activación expiró antes de que tu dispositivo se vinculará correctamente."
-    },
-    "error_signIn_connectionError_title": {
-      "description": "title of the error window when there is a connection error",
-      "message": "Error de conexión durante la activación"
-    },
-    "error_signIn_connectionError_description": {
-      "description": "description of the error window when there is a connection error",
-      "message": "Lo sentimos, pero no pudimos conectarnos con el servidor para ver si registraste tu dispositivo."
-    },
-    "error_signIn_connectionErrorFetch_title": {
-      "description": "title of the error window when there is a connection error during fetching the code",
-      "message": "Error de conexión durante la recuperación de código"
-    },
-    "error_signIn_connectionErrorFetch_description": {
-      "description": "description of the error window when there is a connection error during fetching the code",
-      "message": "Lo sentimos, pero hubo un error al recibir el código del servidor."
-    },
-    "error_signIn_activationCodeGeneral_title": {
-      "description": "title of the error window when there is a general activation code error",
-      "message": "Error de código de activación"
-    },
-    "error_signIn_activationCodeGeneral_description": {
-      "description": "description of the error window when there is a general activation code error",
-      "message": "Lo sentimos, pero ocurrió un error en el código de activación."
-    },
     "dialog_parentalPassword_title": {
       "description": "title of the dialog window when guest user signs in and still needs to enter his/her password to change the parental controls",
       "message": "Ingresa tu contraseña"
@@ -1449,22 +1369,6 @@ Function getTranslation_es_MX()
     "error_check_birthdate_description": {
       "description": "message letting the user know that they were not able to be signed in",
       "message": "Hubo un error al inciar la sesión. Por favor, ingresa al canal y inicia la sesión de nuevo."
-    },
-    "screenActivationCode_audioGuide": {
-      "description": "Display the activation code to people who cannot see.",
-      "message": "Código de activación: {code}. Actualizar código"
-    },
-    "screenActivationCode_heading": {
-      "description": "Title on the activation code screen",
-      "message": "Visita tubi.tv/activate"
-    },
-    "screenActivationCode_subheading": {
-      "description": "Subtitle on the activation code screen",
-      "message": "desde un navegador en otro dispositivo e ingresa el código a continuación"
-    },
-    "screenActivationCode_button_refresh": {
-      "description": "Label of the button that will provide a new activation code",
-      "message": "Actualizar código"
     },
     "screenSearch_defaultSearch": {
       "description": "Directions on the search page",
