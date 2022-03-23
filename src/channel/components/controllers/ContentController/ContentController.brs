@@ -1051,7 +1051,10 @@ End Function
 Function setUiModeFromState()
   tubiLog("ContentController.setUiModeFromState")
   modeSet = false
-  if shouldShowAgeGate() = true then
+  if isKidsModeEnabledByParentalControls() = true
+    setUiMode(m.constants.ui.modes.kidsParental)
+    modeSet = true
+  else if shouldShowAgeGate() = true then
     if m.guestUserHasAgeInfo = invalid then
       m.guestUserHasAgeInfo = TubiAuth(m.constants, m.Request).getGuestUserHasAgeInfo()
     end if
@@ -1061,9 +1064,6 @@ Function setUiModeFromState()
       setUiMode(m.constants.ui.modes.kidsAgeGate)
       modeSet = true
     end if
-  else if isKidsModeEnabledByParentalControls() = true
-    setUiMode(m.constants.ui.modes.kidsParental)
-    modeSet = true
   end if
 
   if modeSet = false then
