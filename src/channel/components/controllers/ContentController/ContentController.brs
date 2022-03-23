@@ -1700,74 +1700,71 @@ Function onCustomResume(msg)
 
     lastAppSuspendInSecs = m.appSuspendTimer.TotalSeconds()
     lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 24 / 60 / 60
-    if getExperimentResource("roku_instant_resume", "roku_instant_resume_v2", true).enabled = true
-      if m.Request = invalid
-        m.Request = TubiRequest(m.constants.settings)
-      end if
+    
+    if m.Request = invalid
+      m.Request = TubiRequest(m.constants.settings)
+    end if
 
-      if customResumeLaunchParams.contentId <> invalid and customResumeLaunchParams.mediaType <> invalid
-        ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates
-        ' lots of edge cases, so for consistency, restarting the app is easiest.
-        restartApp()
-      else if isLoggedInUser() = false and (lastAppSuspendInSecs > m.constants.timers.coppaFailTimeout or lastAppRestartInDays >= 4)
-        ' For guest users, if the time between last suspend and current resume is more than 24 hours,
-        ' disable Instant Resume & relaunch app from scratch.
-        ' Also every 4 days once the app restarts in order to get starter/remote components
-        restartApp()
-      else if isLoggedInUser() = true and lastAppRestartInDays >= 4
-        ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
-        restartApp()
-      else
-        if getExperimentResource("roku_instant_resume_tweak", "roku_instant_resume_tweak_v1", true).enabled = true
-          'Removes the RFIScreen
-          if m.billing <> invalid
-            m.billing.unobserveFieldScoped("userData")
-            m.billing = invalid
-          end if
-          modal = getTopModal()
-          ' Modal gets removed/hidden based on the instantResumeAction when the app was suspended.
-          ' Modals that inform a user about an action have instantResumeAction = "closeDialog" and are
-          ' removed while suspending the app. Modals that display errors have instantResumeActions of
-          ' "restartApp" for which we set visibility to false in customSuspend and then restart the app
-          ' during onCustomResume. Screens that have instantResumeAction of "startChannel" return the
-          ' user to the homescreen during onCustomResume.
-          ' Functionality that requires the app to restart is given precedence over functionality that
-          ' starts the channel or resumes the app.
+    if customResumeLaunchParams.contentId <> invalid and customResumeLaunchParams.mediaType <> invalid
+      ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates
+      ' lots of edge cases, so for consistency, restarting the app is easiest.
+      restartApp()
+    else if isLoggedInUser() = false and (lastAppSuspendInSecs > m.constants.timers.coppaFailTimeout or lastAppRestartInDays >= 4)
+      ' For guest users, if the time between last suspend and current resume is more than 24 hours,
+      ' disable Instant Resume & relaunch app from scratch.
+      ' Also every 4 days once the app restarts in order to get starter/remote components
+      restartApp()
+    else if isLoggedInUser() = true and lastAppRestartInDays >= 4
+      ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
+      restartApp()
+    else
+      if getExperimentResource("roku_instant_resume_tweak", "roku_instant_resume_tweak_v1", true).enabled = true
+        'Removes the RFIScreen
+        if m.billing <> invalid
+          m.billing.unobserveFieldScoped("userData")
+          m.billing = invalid
+        end if
+        modal = getTopModal()
+        ' Modal gets removed/hidden based on the instantResumeAction when the app was suspended.
+        ' Modals that inform a user about an action have instantResumeAction = "closeDialog" and are
+        ' removed while suspending the app. Modals that display errors have instantResumeActions of
+        ' "restartApp" for which we set visibility to false in customSuspend and then restart the app
+        ' during onCustomResume. Screens that have instantResumeAction of "startChannel" return the
+        ' user to the homescreen during onCustomResume.
+        ' Functionality that requires the app to restart is given precedence over functionality that
+        ' starts the channel or resumes the app.
 
-          if modal <> invalid
-            if modal.instantResumeAction = m.constants.instantResumeActions.restartApp
-              restartApp()
-            else if modal.instantResumeAction = m.constants.instantResumeActions.startChannel
-              sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
-              'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen
-              startChannel()
-            end if
-          else if currentScreen <> invalid
-            if currentScreen.instantResumeAction = m.constants.instantResumeActions.restartApp
-              restartApp()
-            else if (lastAppSuspendInSecs >= 1200 and currentScreen.id = m.constants.ui.screenIds.settingsScreen)
-              sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
-              'user is on the settings page and returns to the app after 20 or more minutes then retun to the homescreen
-              startChannel()
-            else if currentScreen.instantResumeAction = m.constants.instantResumeActions.startChannel
-              sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
-              'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen
-              startChannel()
-            else
-              sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
-              resumeApp()
-            end if
-          else
-            'Unknown state, backup solution to restart app.
+        if modal <> invalid
+          if modal.instantResumeAction = m.constants.instantResumeActions.restartApp
             restartApp()
+          else if modal.instantResumeAction = m.constants.instantResumeActions.startChannel
+            sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
+            'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen
+            startChannel()
+          end if
+        else if currentScreen <> invalid
+          if currentScreen.instantResumeAction = m.constants.instantResumeActions.restartApp
+            restartApp()
+          else if (lastAppSuspendInSecs >= 1200 and currentScreen.id = m.constants.ui.screenIds.settingsScreen)
+            sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
+            'user is on the settings page and returns to the app after 20 or more minutes then retun to the homescreen
+            startChannel()
+          else if currentScreen.instantResumeAction = m.constants.instantResumeActions.startChannel
+            sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
+            'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen
+            startChannel()
+          else
+            sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
+            resumeApp()
           end if
         else
-          sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
-          resumeApp()
+          'Unknown state, backup solution to restart app.
+          restartApp()
         end if
+      else
+        sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
+        resumeApp()
       end if
-    else
-      restartApp()
     end if
   else if lastSuspendOrResumeReason = "screensaver"
     ' Do nothing, but leave this as a place holder.
