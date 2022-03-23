@@ -76,11 +76,11 @@ End Function
 '  accessToken: someAccessToken(String)
 '  expireTime: numberOfSecondsUntilExpires(Integer)
 '  userId: userId(Integer as String)
-'  fn: firstName(String)
-'  ln: lastName(String)
+'  firstName: firstName(String)
+'  lastName: lastName(String)
 '  name: name(String)
 '  authType: analyticsAuthType(String)
-'  has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
+'  hasAge: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
 '
 ' For Guest user
@@ -108,7 +108,7 @@ Function tubiAuth_getAuthInfo()
   if authInfo.expireTime <> invalid   'used as test to determine if we have any auth info in the auth registry
     authInfo.expireTime = authInfo.expireTime.toInt()
 
-    if type(authInfo.hasAge) = "roString" or type(authInfo.hasAge) = "String"
+    if isString(authInfo.hasAge) = true
       if authInfo.hasAge = "true"
         authInfo.hasAge = true
       else if authInfo.hasAge = "false"
@@ -501,11 +501,11 @@ End Function
 '  accessToken: someAccessToken(String)
 '  expireTime: numberOfSecondsUntilExpires(Integer as String)
 '  userId: userId(Integer as String)
-'  fn: firstName(String)
-'  ln: lastName(String)
+'  firstName: firstName(String)
+'  lastName: lastName(String)
 '  name: name(String)
 '  authType: analyticsAuthType(String)
-'  has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
+'  hasAge: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
 '@serverAuthInfo: assocArray of auth info as received from the server
 Function tubiAuth_handleRegistration(serverAuthInfo)
@@ -525,11 +525,11 @@ End Function
 '  accessToken: someAccessToken(String)
 '  expireTime: numberOfSecondsUntilExpires(Integer as String)
 '  userId: userId(Integer as String)
-'  fn: firstName(String)
-'  ln: lastName(String)
+'  firstName: firstName(String)
+'  lastName: lastName(String)
 '  name: name(String)
 '  authType: analyticsAuthType(String)
-'  has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
+'  hasAge: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
 '@timeout: integer, the max amount of time to wait for a response from the server in seconds
 '
@@ -630,7 +630,7 @@ End Function
 
 '@authToken can be the server access_token or refresh_token depending on the call being made
 Function tubiAuth_getAuthHeaders(authToken)
-  if type(authToken) = "String" or type(authToken) = "roString"
+  if isString(authToken) = true
     headers = {
       Authorization: "Bearer " + authToken
     }
@@ -710,8 +710,9 @@ Function tubiAuth_updateAuthInfoWithAge(hasAge)
     end if
 
     ' getAuthInfo() returns an int, but saveAuthInfo() expects a string for expire time
-    if type(authInfo.expireTime) = "roInteger" or type(authInfo.expireTime) = "Integer"
-      authInfo.expireTime = authInfo.expireTime.toStr()
+    expireTime = authInfo.expireTime
+    if isInteger(expireTime) = true
+      authInfo.expireTime = expireTime.toStr()
     end if
   end if
 
@@ -748,7 +749,7 @@ End Function
 
 ' @hasAge: boolean, true indicates that the backend has determined that this user is >= 13 years old
 Function tubiAuth_setGuestUserHasAgeInfo(hasAge)
-  if type(hasAge) <> "roBoolean" and type(hasAge) <> "Boolean"
+  if isBoolean(hasAge) = false
     hasAge = false
   end if
 
@@ -782,17 +783,17 @@ End Function
 '  accessToken: someAccessToken(String)
 '  expireTime: numberOfSecondsUntilExpires(Integer as String)
 '  userId: userId(Integer as String)
-'  fn: firstName(String)
-'  ln: lastName(String)
+'  firstName: firstName(String)
+'  lastName: lastName(String)
 '  name: name(String)
 '  authType: analyticsAuthType(String)
-'  has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
+'  hasAge: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
 Function tubiAuth_saveAuthInfo(authInfo)
-  if authInfo <> invalid and authInfo.refreshToken <> invalid and authInfo.accessToken <> invalid and authInfo.expireTime <> invalid  and (type(authInfo.expireTime) = "String" or type(authInfo.expireTime) = "roString")
+  if authInfo <> invalid and authInfo.refreshToken <> invalid and authInfo.accessToken <> invalid and authInfo.expireTime <> invalid and isString(authInfo.expireTime) = true
     for each key in authInfo
       value = authInfo[key]
-      if type(value) <> "roString"
+      if isString(value) = false
         value = value.toStr()
       end if
       m.regWrite(key, value, m.authRegSection)
@@ -818,11 +819,11 @@ End Function
 '  accessToken: someAccessToken(String)
 '  expireTime: numberOfSecondsUntilExpires(Integer as String)
 '  userId: userId(Integer as String)
-'  fn: firstName(String)
-'  ln: lastName(String)
+'  firstName: firstName(String)
+'  lastName: lastName(String)
 '  name: name(String)
 '  authType: analyticsAuthType(String)
-'  has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
+'  hasAge: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
 Function tubiAuth_checkIfAuthExpired(authInfo)
   isExpired = true
@@ -830,7 +831,7 @@ Function tubiAuth_checkIfAuthExpired(authInfo)
   dateTime = CreateObject("roDateTime")
   timeInSecs = dateTime.asSeconds()
 
-  if (type(authInfo.expireTime) = "Integer" or type(authInfo.expireTime) = "roInteger") and timeInSecs < authInfo.expireTime
+  if isInteger(authInfo.expireTime) and timeInSecs < authInfo.expireTime
     isExpired = false
   end if
 

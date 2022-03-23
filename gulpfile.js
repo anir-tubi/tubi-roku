@@ -248,6 +248,7 @@ function buildStarter() {
       'src/channel/source/lib/TubiExternalConfig.brs',
       'src/channel/source/lib/TubiTracking.brs',
       'src/channel/source/lib/Auth.brs',
+      'src/channel/source/3rdparty/rta/typeUtils.brs',
     ];
     let sourceLibsSrcOptions = {
       base: 'src/channel/source'

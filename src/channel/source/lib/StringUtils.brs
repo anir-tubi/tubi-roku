@@ -20,7 +20,7 @@ End Function
 ' formatLengthAsEnglish
 '
 ' take an integer length in seconds and give it an English descriptions like "1 h 36 min"
-' ::NOTE:: when calling this function, make sure the calling file is including TubiLanguageTranslate.brs as a dependency 
+' ::NOTE:: when calling this function, make sure the calling file is including TubiLanguageTranslate.brs as a dependency
 Function formatLengthAsEnglish(length As Dynamic) As String
   if type(length) = "roFloat" or type(length) = "Float" or type(length) = "Double" then
     length = Int(length)
@@ -33,14 +33,14 @@ Function formatLengthAsEnglish(length As Dynamic) As String
     sTranslationID = invalid
     if hours = 0 and minutes = 0 then
       '//Display just seconds
-      sTranslationID = "metadata_seconds" 
+      sTranslationID = "metadata_seconds"
     else
       if hours > 0 and minutes > 0
         '//Display hours and minutes
-        sTranslationID = "metadata_hoursAndMinutes" 
-      else if hours > 0 
+        sTranslationID = "metadata_hoursAndMinutes"
+      else if hours > 0
         '//Display just hours
-        sTranslationID = "metadata_hours" 
+        sTranslationID = "metadata_hours"
       else
         '//Display just minutes
         sTranslationID = "metadata_minutes"
@@ -49,11 +49,11 @@ Function formatLengthAsEnglish(length As Dynamic) As String
 
     if sTranslationID <> invalid
       aaParams = {
-        hours: stri(hours).trim(), 
-        minutes: stri(minutes).trim(), 
+        hours: stri(hours).trim(),
+        minutes: stri(minutes).trim(),
         seconds: stri(seconds).trim()
       }
-      result = getTranslation(sTranslationID, aaParams) 
+      result = getTranslation(sTranslationID, aaParams)
     end if
 
     return result
@@ -65,10 +65,10 @@ End Function
 
 '''''''''''''''''''
 ' padString
-' 
+'
 ' simple left padding of a string with a given character
 ' input:  @s: String, used to display
-'         @width: Integer, total number of characters returned from this function 
+'         @width: Integer, total number of characters returned from this function
 '         @c: String, will be prepended based on width
 ' return: result with padstring with specified width
 ' Example: padString('12345', 8, '0') => '00012345'
@@ -86,12 +86,12 @@ End Function
 ''''''''''
 ' padStringLeft
 ' input:  @originalString: String, used to display
-'         @minLength: Integer, minimum number of characters returned from this function 
-'         @padString: String, will be prepended 
+'         @minLength: Integer, minimum number of characters returned from this function
+'         @padString: String, will be prepended
 ' return: result with paddedstring with more than minimum width
 '
 ' pad the provided string with padString(gernally spaces) to length provided.
-' PadStringLeft differes from padString only when padString + originalstring > minLenth 
+' PadStringLeft differes from padString only when padString + originalstring > minLenth
 ' padStringLeft("bbb", "0123", 8) = "01230123bbb"
 ' padString("bbb", 8, "0123") = "30123bbb"
 
@@ -117,17 +117,11 @@ Function capitalize(s As String)
 End Function
 
 
-' Helper function to determine if the value is a string
-Function isString(value)
-  return type(value) = "String" or type(value) = "roString"
-End Function
-
-
 ' Helper function that breaks down a url into its component parts
 ' @url: string, a url
 ' @paramsAA: AA, An associative array that comntaines the param names as the keys and the corresponding values as strings
 ' @paramsSeparator: string, a character used to define the start of parameters (typically "?")
-' 
+'
 ' returns an AA with the following keys:
 ' protocol: "https://"
 ' host: "www.tubi.tv"
@@ -190,7 +184,7 @@ End Function
 ' Change the param value of the provided param name with the provided value with the provided URL
 ' @url: string, The URL to change
 ' @paramToReplace: string, The query param name that its value should be changed
-' @replacementValue: string, The value that should be the new value of the provided param 
+' @replacementValue: string, The value that should be the new value of the provided param
 Function replaceURLParameter(url, paramToReplace, replacementValue)
   sReplacementURL = url
   if isString(url) = true and isString(paramToReplace) = true and isString(replacementValue) = true
@@ -203,7 +197,7 @@ Function replaceURLParameter(url, paramToReplace, replacementValue)
       sNewParamValuePair = sDelimiter + paramToReplace + "=" + replacementValue
       sReplacementURL = url.replace(match, sNewParamValuePair)
     else
-      '// The paramToReplace is not in the URL, do nothing. 
+      '// The paramToReplace is not in the URL, do nothing.
       '// In the future, we could append the param to the URL. But for right now, it is unnecessary.
     end if
   end if
@@ -219,8 +213,8 @@ Function createCacheBusterString()
   sSeconds = StrI(seconds).trim()
   nRandom = Rnd(seconds)
   sRandom = StrI(nRandom).trim()
-  
-  '//The 1st part of the string includes the number of seconds from epoch time, followed by a "-", 
+
+  '//The 1st part of the string includes the number of seconds from epoch time, followed by a "-",
   '// followed by a random number between 0 to the epoch time number
   sCacheBuster = sSeconds + "-" + sRandom
   return sCacheBuster
@@ -242,7 +236,7 @@ End Function
 
 '******************************************************
 '@param {date} dateTime - the date object that is used to get the time
-'@param {boolean} bIncludeSpaceSeparator - Should the time and the "AM" or "PM" strings be separated by a space? 
+'@param {boolean} bIncludeSpaceSeparator - Should the time and the "AM" or "PM" strings be separated by a space?
 '
 'returns AM/PM appended time format
 '******************************************************
@@ -284,7 +278,7 @@ End Function
 ' buildQueryString is used to contruct the query params in canonical form
 '
 ' @params : assocarray where key/value pairs will be turned into a query parameter string
-' 
+'
 ' returns query in String like "key1=value1&key2=value2"
 Function buildQueryString(params)
 
@@ -305,7 +299,7 @@ Function buildQueryString(params)
         queryString = queryString + "&"
       end if
 
-    end for 
+    end for
   end if
 
   return queryString

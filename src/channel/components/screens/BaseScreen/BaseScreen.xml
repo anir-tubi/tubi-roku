@@ -5,6 +5,7 @@
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
 
   <interface>
     <!-- INPUT -->
@@ -38,7 +39,7 @@
       <!-- stores the component info of the component that was selected when navigating to a new screen. Looks like:
         {
           componentType: "category_component"    Corresponds to one of the page types in
-                                                 tubiTracking_getAnalyticsComponent() 
+                                                 tubiTracking_getAnalyticsComponent()
                                                  which mirrors the protos repo.
           componentValues: {}                    An assoc array with key/values that match the
                                                  componentType as found in
@@ -73,7 +74,7 @@
            Action will be taken when instantResumeAction values are "restartApp", "startChannel" and resumeChannel. -->
       <field id="instantResumeAction" type="string" value="resumeChannel"/>
   </interface>
-  
+
   <children>
   </children>
 </component>

@@ -1,13 +1,14 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <component name="LinearVideoPlayerMinimizedInfoPanel" extends="Group" >
   <script type="text/brightscript" uri="LinearVideoPlayerMinimizedInfoPanel.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
 
   <interface>
-  
+
     <!-- INPUT -->
     <!-- The available params that can be set in this associative array are: channelURI, title1, title2, minutesLeft, time -->
     <field id="metadata" type="assocarray" alwaysNotify="true"/>

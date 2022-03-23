@@ -11,6 +11,7 @@
   <script type="text/brightscript" uri="../ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
 
   <interface>
     <!--INPUT-->
@@ -21,7 +22,7 @@
       <field id="isLinearTVAllowed" type="boolean" value="true"/>
 
       <!-- Differentiates between two modes. If set to true, it is expected that selecting an
-           item navigates the user to a new page (ex. Homescreen). 
+           item navigates the user to a new page (ex. Homescreen).
            If set to false it is expected that selecting an item updates the UI on the current screen. -->
       <field id="doesSelectionNavigate" type="boolean" />
 
@@ -86,7 +87,7 @@
       <field id="navigateWithinPageInfo" type="assocarray"/>
   </interface>
 
-  <children> 
+  <children>
     <Poster
       id="TopNavMenuBground"
       width="900"
@@ -105,6 +106,6 @@
       focusBitmapUri="pkg:/images/pill_top_nav_fhd.9.png"
       focusFootprintBitmapUri="pkg:/images/pill_top_nav_fhd.9.png"
       drawFocusFeedbackOnTop="false"
-      itemComponentName="TopNavItem"/>  
+      itemComponentName="TopNavItem"/>
   </children>
 </component>

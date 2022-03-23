@@ -6,16 +6,17 @@
   <script type="text/brightscript" uri="ProgramGuideMenuItem.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
 
     <field id="focusPercent" type="float" />
-        
+
     <field id="rowFocusPercent" type="float" />
 
     <field id="index" type="integer" />
-    
+
   </interface>
 
   <children>
@@ -66,6 +67,6 @@
         role="font"
         uri="pkg:/fonts/Vaud-Bold.ttf"
         size="30" />
-    </Label>   
-  </children>   
+    </Label>
+  </children>
 </component>

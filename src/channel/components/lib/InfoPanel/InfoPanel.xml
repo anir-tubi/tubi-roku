@@ -20,7 +20,7 @@
  -    Title - Uses content.title
  -    Episode - Uses content.episode_title
  -    CategoryDetails - uses content.getChildCount()
- -    TwoLineInfo - uses content.releasedate, content.length, content.rating, content.category/categories, 
+ -    TwoLineInfo - uses content.releasedate, content.length, content.rating, content.category/categories,
  -    Description - uses content.description
  -    DirectorGroup - uses content.director/directors
  -    StarringGroup - uses content.actor/actors
@@ -38,6 +38,7 @@
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -102,7 +103,7 @@
         visible="false"
         translation="[0,0]"
         loadDisplayMode="scaleToFit"/>
-        
+
       <LayoutGroup
         id="Offset"
         layoutDirection="vert"
@@ -115,7 +116,7 @@
           width="94"
           height="37"
           visible="true"/>
-                
+
         <LayoutGroup
           id="TitleGroup"
           layoutDirection="horiz"
@@ -139,7 +140,7 @@
               id="TitleFont"
               role="font"
               uri="pkg:/fonts/Vaud-SemiBold.ttf"
-              size="47" />  
+              size="47" />
           </Label>
         </LayoutGroup>
 
@@ -171,7 +172,7 @@
             font="dictionary:Vaud22px"/>
           -->
         </LayoutGroup>
-        
+
         <LayoutGroup
           id="SeasonDetails"
           layoutDirection="vert"
@@ -186,7 +187,7 @@
               size="27" />
           </Label>
         </LayoutGroup>
-        
+
         <LayoutGroup
           id="TwoLineInfo"
           layoutDirection="vert"
@@ -229,7 +230,7 @@
                 color="0xFFFFFFFF"
                 numLines="1"
                 wrap="false"
-                translation="[0,3]" 
+                translation="[0,3]"
                 horizAlign="center"
                 vertAlign="center">
                 <Font
@@ -244,8 +245,8 @@
               <Font
               role="font"
               uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="22" />            
-            </Label>          
+              size="22" />
+            </Label>
             <Label
               id="ExpireWarning">
               <Font
@@ -280,7 +281,7 @@
             </Label>
           </LayoutGroup>
         </LayoutGroup>
-        
+
         <Group
           id="DescriptionGroup"
           translation="[-25,0]">
@@ -306,7 +307,7 @@
               size="27" />
           </Label>
         </Group>
-          
+
         <LayoutGroup
           id="DirectorGroup"
           layoutDirection="horiz"
@@ -329,12 +330,12 @@
             <!-- this layout group pushes the separator rectangle up 2 pixels -->
             <LayoutGroup
               layoutDirection="vert">
-              <Rectangle 
+              <Rectangle
                 id="DirectorRect"
                 opacity="0.2"
                 width="43"
                 height="2"/>
-              <Rectangle 
+              <Rectangle
                 opacity="0.0"
                 height="5"/>
             </LayoutGroup>
@@ -372,12 +373,12 @@
             </Label>
             <LayoutGroup
               layoutDirection="vert">
-              <Rectangle 
+              <Rectangle
                 id="StarringRect"
                 opacity="0.2"
                 width="84"
                 height="2"/>
-              <Rectangle 
+              <Rectangle
                 opacity="0.0"
                 width="1"
                 height="5"/>

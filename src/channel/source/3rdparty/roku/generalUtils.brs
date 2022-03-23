@@ -199,18 +199,6 @@ End Function
 
 
 '******************************************************
-'isfloat
-'
-'Determine if the given object supports the ifFloat interface
-'******************************************************
-Function isfloat(obj as dynamic) As Boolean
-    if obj = invalid return false
-    if GetInterface(obj, "ifFloat") = invalid return false
-    return true
-End Function
-
-
-'******************************************************
 'strtobool
 '
 'Convert string to boolean safely. Don't crash

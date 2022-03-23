@@ -664,7 +664,13 @@ Function onAgeVerified(age)
 
   if isLoggedInUser() and age >= m.constants.ui.ages.ageGate
     ' age verified for logged in user so update auth info
+    authInfo = m.global.authInfo
     updatedAuthInfo = Auth.updateAuthInfoWithAge(true)
+    if isAA(authInfo) = true and isAA(updatedAuthInfo) = true
+      ' append updatedAuthInfo to the global authInfo to maintain the existing additional fields from global that aren't stored in registry
+      authInfo.append(updatedAuthInfo)
+      updatedAuthInfo = authInfo
+    end if
     m.global.authInfo = updatedAuthInfo
   else if age >= m.constants.ui.ages.ageGate
     ' age verified for guest user, so store age verification
@@ -724,7 +730,14 @@ Function onBirthdayCheckSuccess(hasAgeInfo)
   if hasAgeInfo <> invalid and hasAgeInfo.hasAge = true
     Request = TubiRequest(m.constants.settings)
     Auth = TubiAuth(m.constants, Request)
+
+    authInfo = m.global.authInfo
     updatedAuthInfo = Auth.updateAuthInfoWithAge(true)
+    if isAA(authInfo) = true and isAA(updatedAuthInfo) = true
+      ' append updatedAuthInfo to the global authInfo to maintain the existing additional fields from global that aren't stored in registry
+      authInfo.append(updatedAuthInfo)
+      updatedAuthInfo = authInfo
+    end if
     m.global.authInfo = updatedAuthInfo
 
     if updatedAuthInfo.hasAge = true
