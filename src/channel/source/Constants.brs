@@ -548,6 +548,9 @@ Function getConstants()
     ' number of seconds that the "up next" screen will show
     constants.player.upNextCountdown = 30
 
+    ' number of seconds that the "up next" screen will show for series
+    constants.player.upNextCountdownForSeries = 15
+
     ' default if cuepoint is missing from metadata, or minimum cuepoint
     ' duration for titles whose cuepoint is right at the end.  This will
     ' allow time for UpNext to display before the stream ends.

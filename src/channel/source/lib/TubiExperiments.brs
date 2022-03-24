@@ -28,10 +28,6 @@ Function TubiExperiments(constants) as Object
       roku_linear_epg: {
         roku_linear_epg_v1: { "enabled": false, update_homescreen: false }
       }
-      roku_postplayexp_aptimer_5sec: {
-        roku_postplayexp_aptimer_10sec: {"ap_timer": 30}
-      }
-
       roku_instant_resume_tweak: {
         roku_instant_resume_tweak_v1: {"enabled": false}
       }
