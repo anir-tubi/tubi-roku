@@ -180,6 +180,11 @@ Function confirmedBirthYearAtStartup()
 End Function
 
 
+Function confirmedBirthYearAtSignIn()
+  onAgeSubmitted(verifyAgeAtSignIn)
+End Function
+
+
 Function confirmedBirthYearAtKidsModeExit()
   onAgeSubmitted(verifyAgeAtKidsModeExit)
 End Function
