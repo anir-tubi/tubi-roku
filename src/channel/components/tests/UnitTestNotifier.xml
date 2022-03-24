@@ -6,6 +6,7 @@
   <script type="text/brightscript" uri="../../source/lib/GeneralTaskModule.brs" />
   <script type="text/brightscript" uri="../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   
   <interface>
   

@@ -32,10 +32,6 @@ Function TubiExperiments(constants) as Object
         roku_postplayexp_aptimer_10sec: {"ap_timer": 30}
       }
 
-      roku_linear_countdown_timer: {
-        roku_linear_countdown_timer_v1: {"countdown_timer": 10}
-      }
-
       roku_instant_resume_tweak: {
         roku_instant_resume_tweak_v1: {"enabled": false}
       }
