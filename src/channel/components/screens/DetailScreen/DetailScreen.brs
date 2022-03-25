@@ -276,22 +276,23 @@ End Function
 Function onIsSeries()
   tubiLog("DetailScreen.onIsSeries")
   isSeries = m.top.isSeries
-
-  signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
-  if signUpIndex > -1
-    if isLoggedInUser() = false and isReturningUser() and m.rokuRegisterSignupToSaveExperiment = true
-      if isSeries = true and signUpIndex = 1
-      ' remove sign up button from 1st index and move sign up button to 0th index if it's a series
-        addRemoveMenuItem(false, signUpIndex)
-        addRemoveMenuItem(true, -1, m.signUpMenuItem, [])
-      else if isSeries = false and signUpIndex = 0
-      ' remove sign up button from 0th index and move sign up button to 1st index if it's a movie
-        addRemoveMenuItem(false, signUpIndex)
-        addRemoveMenuItem(true, -1, m.signUpMenuItem, [m.PlayMenuItem])
+  if m.signUpMenuItem <> invalid and m.rokuRegisterSignupToSaveExperiment = true
+    signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
+    if signUpIndex > -1
+      if isLoggedInUser() = false and isReturningUser()
+        if isSeries = true and signUpIndex = 1
+        ' remove sign up button from 1st index and move sign up button to 0th index if it's a series
+          addRemoveMenuItem(false, signUpIndex)
+          addRemoveMenuItem(true, -1, m.signUpMenuItem, [])
+        else if isSeries = false and signUpIndex = 0
+        ' remove sign up button from 0th index and move sign up button to 1st index if it's a movie
+          addRemoveMenuItem(false, signUpIndex)
+          addRemoveMenuItem(true, -1, m.signUpMenuItem, [m.PlayMenuItem])
+        end if
+      else
+        ' remove the sign up button if it's not needed
+        addRemoveMenuItem(false, signUpIndex, m.signUpMenuItem, [])
       end if
-    else
-      ' remove the sign up button if it's not needed
-      addRemoveMenuItem(false, signUpIndex, m.signUpMenuItem, [])
     end if
   end if
 
@@ -310,10 +311,12 @@ End Function
 
 Function onHasTrailer()
   tubiLog("DetailScreen.onHasTrailer")
-  signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
   trailerIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.WatchTrailerMenuItem.id)
-  if m.rokuRegisterSignupToSaveExperiment = true and signUpIndex > -1
-    addRemoveMenuItem(m.top.hasTrailer, trailerIndex, m.WatchTrailerMenuItem, [m.signUpMenuItem])
+  if m.rokuRegisterSignupToSaveExperiment = true and m.signUpMenuItem <> invalid
+    signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
+    if signUpIndex > -1
+      addRemoveMenuItem(m.top.hasTrailer, trailerIndex, m.WatchTrailerMenuItem, [m.signUpMenuItem])
+    end if
   else
     addRemoveMenuItem(m.top.hasTrailer, trailerIndex, m.WatchTrailerMenuItem, [m.PlayMenuItem])
   end if
