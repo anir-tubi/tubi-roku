@@ -31,7 +31,10 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, callback = inv
     detailScreen.observeFieldScoped("refreshRelatedContent", "onRefreshRelatedContentSignal")
     detailScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     detailScreen.observeFieldScoped("relatedContentToPlay", "onContentToPlay")
-
+    if isReturningUser() = true and isLoggedInUser() = false and getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v1", true).enabled = true
+      detailScreen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelected")
+    end if
+    
     ' m.actionType variable is used for setting a callback function after successful a data fetch retry in the case where
     ' users select a menu button from the detail screen, but the origial data fetch was unsuccessful. In this way,
     ' the action will happen automatically after the successful retry.
@@ -93,6 +96,9 @@ Function setDetailStrings(screen)
   screen.stringQueueButton = getTranslation("screenDetails_button_queue")
   screen.stringNoQueueButton = getTranslation("screenDetails_button_NoQueue")
   screen.stringNoHistoryButton = getTranslation("screenDetails_button_noHistory")
+  if getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v1", false).enabled = true
+    screen.stringSignUpButton = getTranslation("registration_signup_button") + ";" + getTranslation("registration_signup_button_free")
+  end if
 End Function
 
 
@@ -208,7 +214,6 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
       detailScreen.isSeries = true
       detailScreen.mode = m.constants.ui.infoPanelModes.series
     else
-      detailScreen.isSeries = false
       detailScreen.mode = m.constants.ui.infoPanelModes.movie
     end if
 
@@ -303,7 +308,6 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
     type: m.constants.ui.backgroundTypes.fullScreen
     uriList: backgroundUriList
   }
-
   m.isScreenLoaded = true
 End Function
 
@@ -1283,6 +1287,30 @@ Function onEpisodeList(msg)
   end if
 End Function
 
+
+Function onSignUpButtonSelected(msg)
+  tubiLog("DetailScreenHelper.onSignUpButtonSelected")
+  setComponentInteractionEventForSignUp(msg.getRoSGNode())
+  startSignIn(onRegistrationProcessCompletedOnDetailsScreen)
+End function
+
+
+'@screen, screen info after selecting signUp button
+Function setComponentInteractionEventForSignUp(screen)
+  tubiLog("DetailScreenHelper.setComponentInteractionEventForSignUp")
+  componentValues = {
+    button_type: 1, '0-UNKNOWN, 1-TEXT, 2-DROPDOWN, 3-IMAGE
+    button_value: "SIGNUP_TO_SAVE_PROGRESS" 'Button value is always upper case and concatinated by "_"
+  }
+  pageInfo = screen.trackingPageInfo
+  componentInteractionInfo = {
+    pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType,pageInfo.pageValues)
+    componentOneof: m.Tracking.getAnalyticsComponent("button_component",  componentValues)
+    user_interaction: "CONFIRM"
+  }
+  sendComponentInteractionInfo(componentInteractionInfo)
+End Function
+   
 
 Function onDescriptionSelected(msg)
   tubiLog("DetailScreenHelper.onDescriptionSelected")

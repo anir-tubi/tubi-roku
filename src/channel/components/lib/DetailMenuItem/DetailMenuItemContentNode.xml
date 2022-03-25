@@ -3,5 +3,6 @@
 <component name = "DetailMenuItemContentNode" extends="ContentNode">
   <interface>
     <field id="iconUrl" type="string" value=""/>
+    <field id="badgeText" type="string" value=""/>
   </interface>
 </component>

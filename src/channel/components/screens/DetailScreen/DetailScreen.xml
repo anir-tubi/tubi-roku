@@ -11,6 +11,7 @@
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -22,6 +23,7 @@
       <field id="stringNoQueueButton" type="string"/>
       <field id="stringChannelButton" type="string"/>
       <field id="stringNoHistoryButton" type="string"/>
+      <field id="stringSignUpButton" type="string"/>
 
       <!-- Pass through signal to the info panel that the height/placement should be recalculated -->
       <field id="calculateInfoHeight" type="boolean" alias="DetailInfoPanel.calculateHeight" />
@@ -122,6 +124,9 @@
       <!-- set to true when the user wants to navigate to the channel details screen -->
       <field id="channelSelected" type="boolean" alwaysNotify="true" />
 
+      <!-- set to true when the user wants to sign-up -->
+      <field id="signUpButtonSelected" type="boolean" alwaysNotify="true" />
+
       <!-- mirrors RelatedGrid.itemSelected, but DetailScreen interjects before sending it to the ContentController -->
       <field id="relatedContentSelected" type="integer" alwaysNotify="true" />
 
@@ -133,6 +138,9 @@
       <!-- tells ContentController/DetailScreenHelpers that the content metadata
            or the related content is out of the cache window and should be updated -->
       <field id="refreshContent" type="boolean" alwaysNotify="true" />
+
+      <!-- set to true when after signup process completed -->
+      <field id="removeSignupButton" type="boolean" alwaysNotify="true" />
 
       <field id="backButtonPressed" type="boolean" alwaysNotify="true" />
 
@@ -172,6 +180,9 @@
     <DetailMenuItemContentNode
       id="WatchTrailerMenuItem"
       iconUrl="pkg:/images/icon-trailer.png" />
+    <DetailMenuItemContentNode
+      id="signUpMenuItem"
+      iconUrl="" />
 
     <Poster
       id="leftChevron"

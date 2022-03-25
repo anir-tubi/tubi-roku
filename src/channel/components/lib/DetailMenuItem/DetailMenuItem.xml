@@ -3,6 +3,10 @@
   <script type="text/brightscript" uri="DetailMenuItem.brs" />
   <script type="text/brightscript" uri="../GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs"/>
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -63,6 +67,9 @@
       height="6"
       width="0"
       translation="[4,68]"
+      visible="false" />
+    <TextIcon 
+      id="badgeLabel"
       visible="false" />
   </children>
 </component>

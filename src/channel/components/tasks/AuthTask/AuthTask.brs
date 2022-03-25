@@ -331,7 +331,6 @@ Function execGetUserInfo()
 End Function
 
 
-
 ' @authInfo: assocArray, authInfo AA as returned by Auth().getAuthInfo()
 Function isLoggedInUser(authInfo = invalid)
   if authInfo = invalid

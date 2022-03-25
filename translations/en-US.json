@@ -962,5 +962,13 @@
   "screenSettings_parentalPassword_know_my_Password": {
     "description": "Directions to the user to enter his/her password if they know their password",
     "message": "I know my password. Let's go."
+  },
+  "registration_signup_button": {
+    "description": "button text for when a non registered user focuses on details sreen",
+    "message": "Sign Up to Save Progress"
+  },
+  "registration_signup_button_free": {
+    "description": "button text on top of background image next to sign up text for when a non registered user focuses on details sreen",
+    "message": "FREE"
   }
 }

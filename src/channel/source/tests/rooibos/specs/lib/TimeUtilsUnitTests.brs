@@ -53,3 +53,22 @@ Function timeUtils_convertSecondsToMins_test()
    
   
 End Function
+
+
+'@Test getNumberOfDaysSinceEpoch unit tests
+Function timeUtils_getNumberOfDaysSinceEpoch_test()
+  dt = CreateObject("roDateTime")
+  secondsFromEpoch = dt.AsSeconds()
+  daysFromEpoch = Int(secondsFromEpoch / 60 / 60 / 24)
+  diff = getNumberOfDaysSinceEpoch() - daysFromEpoch
+
+  'Check if no of epoch days returned by getNumberOfDaysSinceEpoch is equal to the epoch Days to now
+  m.assertEqual(daysFromEpoch, getNumberOfDaysSinceEpoch())
+
+  daysFromEpoch = 19067 'March 16, 2022
+  diff = getNumberOfDaysSinceEpoch() - daysFromEpoch
+
+  'Check if no of epoch days returned by getNumberOfDaysSinceEpoch is greater than to the epoch Days to March 16, 2022
+  m.AssertTrue(diff > 0)
+
+End Function

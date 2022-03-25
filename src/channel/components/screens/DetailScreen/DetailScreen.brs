@@ -1,8 +1,8 @@
 Function init()
   m.constants = m.global.constants
   Request = TubiRequest(m.constants.settings)
-  Auth = TubiAuth(m.constants, Request)
-  m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.Auth = TubiAuth(m.constants, Request)
+  m.Tracking = TubiTracking(m.constants, Request, m.Auth)
   m.NodeHelpers = TubiNodeHelpers()
   m.Info = m.top.findNode("DetailInfoPanel")
   m.Menu = m.top.findNode("Menu")
@@ -21,6 +21,12 @@ Function init()
   m.RelatedTitle = m.top.findNode("RelatedTitle")
   m.RelatedRowLabel = m.top.findNode("RelatedRowLabel")
   m.AnimationGroup = m.top.findNode("AnimationGroup")
+  m.rokuRegisterSignupToSaveExperiment = getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v1", false).enabled
+  if m.rokuRegisterSignupToSaveExperiment = true
+    m.signUpMenuItem = m.top.findNode("signUpMenuItem")
+    m.top.observeFieldScoped("removeSignupButton", "onRemoveSignupButton")
+    m.top.observeFieldScoped("stringSignUpButton", "onStringChange")
+  end if
   m.top.observeField("length", "onLengthChange")
   m.top.observeField("isSeries", "onIsSeries")
   m.top.observeField("isBookmark", "onIsBookmark")
@@ -37,6 +43,7 @@ Function init()
   m.top.observeFieldScoped("stringNoQueueButton", "onStringChange")
   m.top.observeFieldScoped("stringChannelButton", "onStringChange")
   m.top.observeFieldScoped("stringNoHistoryButton", "onStringChange")
+ 
 
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
   m.top.observeField("relatedContent", "onRelatedContentChange")
@@ -104,15 +111,23 @@ Function onStringChange(message)
     stringNode = m.ChannelMenuItem
   else if sStringField = "stringNoHistoryButton"
     stringNode = m.RemoveHistoryMenuItem
+  else if sStringField = "stringSignUpButton"
+    stringNode = m.signUpMenuItem
   end if
 
-  if stringNode <> invalid 
-    stringNode.title = sText
+  if stringNode <> invalid
+    sTextSplitArray = sText.split(";")
+    if sTextSplitArray.count() > 1
+      stringNode.title = sText.split(";")[0]
+      stringNode.badgeText = sText.split(";")[1]
+    else
+      stringNode.title = sText
+    end if
 
     ' Adjust the width of the menu if the Channel name is too long for the default width
-    if sStringField = "stringChannelButton"
+    if sStringField = "stringChannelButton" or sStringField = "stringSignUpButton"
       tempChannelMenuItem = CreateObject("roSGNode", "DetailMenuItem")
-      tempChannelMenuItem.itemContent = m.ChannelMenuItem
+      tempChannelMenuItem.itemContent = stringNode
 
       potentialWidth = tempChannelMenuItem.calculatedTextWidth + tempChannelMenuItem.leftTextPadding + tempChannelMenuItem.rightTextPadding
       if potentialWidth > m.defaultMenuWidth
@@ -260,15 +275,48 @@ End Function
 
 Function onIsSeries()
   tubiLog("DetailScreen.onIsSeries")
+  isSeries = m.top.isSeries
+
+  signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
+  if signUpIndex > -1
+    if isLoggedInUser() = false and isReturningUser() and m.rokuRegisterSignupToSaveExperiment = true
+      if isSeries = true and signUpIndex = 1
+      ' remove sign up button from 1st index and move sign up button to 0th index if it's a series
+        addRemoveMenuItem(false, signUpIndex)
+        addRemoveMenuItem(true, -1, m.signUpMenuItem, [])
+      else if isSeries = false and signUpIndex = 0
+      ' remove sign up button from 0th index and move sign up button to 1st index if it's a movie
+        addRemoveMenuItem(false, signUpIndex)
+        addRemoveMenuItem(true, -1, m.signUpMenuItem, [m.PlayMenuItem])
+      end if
+    else
+      ' remove the sign up button if it's not needed
+      addRemoveMenuItem(false, signUpIndex, m.signUpMenuItem, [])
+    end if
+  end if
+
   episodeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
   addRemoveMenuItem(m.top.isSeries, episodeIndex, m.EpisodesMenuItem, [m.PlayMenuItem])
 End Function
 
 
+Function onRemoveSignupButton(msg)
+  signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
+  if signUpIndex <> invalid
+    addRemoveMenuItem(false, signUpIndex)
+  end if
+End Function
+
+
 Function onHasTrailer()
   tubiLog("DetailScreen.onHasTrailer")
+  signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
   trailerIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.WatchTrailerMenuItem.id)
-  addRemoveMenuItem(m.top.hasTrailer, trailerIndex, m.WatchTrailerMenuItem, [m.PlayMenuItem])
+  if m.rokuRegisterSignupToSaveExperiment = true and signUpIndex > -1
+    addRemoveMenuItem(m.top.hasTrailer, trailerIndex, m.WatchTrailerMenuItem, [m.signUpMenuItem])
+  else
+    addRemoveMenuItem(m.top.hasTrailer, trailerIndex, m.WatchTrailerMenuItem, [m.PlayMenuItem])
+  end if
 End Function
 
 
@@ -317,6 +365,10 @@ Function setInitialMenuItems() As Void
   tubiLog("DetailScreen.setInitialMenuItems")
   menuItems = CreateObject("roSGNode", "ContentNode")
   menuItems.appendChild(m.PlayMenuItem)
+  'Add SignUp button for registration experiemnt at 1st index by default
+  if isLoggedInUser() = false and isReturningUser() = true and m.rokuRegisterSignupToSaveExperiment = true
+    menuItems.appendChild(m.signUpMenuItem)
+  end if
   menuItems.appendChild(m.AddQueueMenuItem)
   m.Menu.content = menuItems
 End Function
@@ -354,6 +406,8 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
     end if
 
     if previousItemIndex > -1
+      m.Menu.content.insertChild(itemToAdd, previousItemIndex + 1)
+    else if previousItems.count() = 0
       m.Menu.content.insertChild(itemToAdd, previousItemIndex + 1)
     else
       m.Menu.content.appendChild(itemToAdd)
@@ -395,6 +449,8 @@ Function handleMenuItemSelected(itemSelected)
       'on selecting this menu, it is removing the detailScreen from screen stack, so roku negative audio sound is played, 
       'To play Roku positive audio sound, channelMenuSelected is handled in onKeyEvent.
       m.isChannelMenuSelected = true
+    else if itemSelected.id = "signUpMenuItem"
+      m.top.signUpButtonSelected = true
     end if
   end if
 End Function
@@ -601,4 +657,26 @@ Function handlePlayInput()
   else
     m.top.resumeSelected = true
   end if
+End Function
+
+
+Function isReturningUser()
+  returningUser = false
+
+  'these were converted days since year Jan 1, 1970, the unix epoch when user first-time launch the app
+  daysFromEpochForFirstVisit = m.Auth.getFirstVisit()
+  
+  'these were converted days since year Jan 1, 1970, the unix epoch 
+  daysFromEpoch = getNumberOfDaysSinceEpoch()
+  if daysFromEpochForFirstVisit <> invalid and daysFromEpoch <> invalid and daysFromEpoch > daysFromEpochForFirstVisit + 1
+    returningUser = true
+  end if
+  return returningUser
+End Function
+
+
+Function isLoggedInUser()
+  authInfo = m.global.authInfo
+
+  return (authInfo <> invalid and authInfo.userId <> invalid)
 End Function

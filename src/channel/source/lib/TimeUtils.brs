@@ -32,3 +32,15 @@ Function convertSecondsToMins(seconds As Integer) As Integer
     return fix(mins)
 End Function
 
+
+'******************************************************
+'
+'returns number of days since Unix epoch
+'******************************************************
+
+Function getNumberOfDaysSinceEpoch() as integer
+  nowDate = CreateObject("roDateTime")
+  secondsFromEpoch = nowDate.AsSeconds()
+  daysFromEpoch = Int(secondsFromEpoch / 60 / 60 / 24)
+  return daysFromEpoch
+End Function

@@ -580,6 +580,22 @@ Function onCWRowAfterSignIn()
 End Function
 
 
+Function onRegistrationProcessCompletedOnDetailsScreen()
+  tubiLog("SignInHelpers.onRegistrationProcessCompletedOnDetailsScreen")
+  setContentToRefreshAllPersonalizedScreens(false)
+
+  currentScreen = popScreenAfterSignInProcess()
+  m.spinner.visible = false
+
+  if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
+    currentScreen.removeSignupButton = true
+    currentScreen.refreshContent = true
+    if currentScreen.isInFocusChain() = true
+      currentScreen.setFocus(true)
+    end if
+  end if
+End Function
+
 ' onParentalControlAfterSignIn - occurs after activation success via Parental Control
 Function onParentalControlAfterSignIn()
   tubiLog("SignInHelpers.onParentalControlAfterSignIn")

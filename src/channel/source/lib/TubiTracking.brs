@@ -877,6 +877,11 @@ Function tubiTracking_getOneOfs()
     epg_component: {
       content_tile: {}  ' ContentTile message
     }
+
+    button_component: {
+      button_type: 0
+      button_value: ""
+    }
   }
 
   contentOneof = {

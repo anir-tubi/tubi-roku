@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="TextIcon" extends="Group">
+  <script type="text/brightscript" uri="TextIcon.brs" />
+  <interface>
+    <!-- INPUT -->
+    <field id="text" type="bool" alias="textLabel.text" />
+    <field id="fontColor" type="string" alias="textLabel.color" />
+     <field id="labelTranslation" type="array" alias="textLabel.translation" />
+    <!-- Image uri must be 9 patch image -->
+    <field id="uri" type="string" alias="textBackground.uri" />
+    <field id="blendColor" type="string" alias="textBackground.blendColor" />
+    <field id="fontUri" type="string" alias="textLabelFont.uri" />
+    <field id="fontSize" type="integer" alias="textLabelFont.size" />
+  </interface>
+  
+  <children>
+    <Poster
+      id="textBackground" />
+    <Label
+      id="textLabel"
+      height="36"
+      translation="[0,3]"
+      horizAlign="center"
+      vertAlign="center">
+      <Font
+        id="textLabelFont"
+        role="font" />
+    </Label>
+  </children>
+</component>

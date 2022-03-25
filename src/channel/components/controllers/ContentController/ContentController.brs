@@ -1860,6 +1860,22 @@ Function isLoggedInUser(authInfo = invalid)
 End Function
 
 
+Function isReturningUser()
+  returningUser = false
+  Auth = TubiAuth(m.constants, m.Request)
+
+  'these were converted days since year Jan 1, 1970, the unix epoch when user first-time launch the app
+  daysFromEpochForFirstVisit = Auth.getFirstVisit()
+  
+  'these were converted days since year Jan 1, 1970, the unix epoch 
+  daysFromEpoch = getNumberOfDaysSinceEpoch()
+  if daysFromEpochForFirstVisit <> invalid and daysFromEpoch <> invalid and daysFromEpoch > daysFromEpochForFirstVisit + 1
+    returningUser = true
+  end if
+  return returningUser
+End Function
+
+
 ' Sends a ping request to Nielsen that a session or video playback has started or ended.
 '
 ' @pingType: string, one of the following "start_session", "start_stream", "end_session", "end_stream"
