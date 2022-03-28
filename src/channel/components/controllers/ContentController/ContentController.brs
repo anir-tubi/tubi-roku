@@ -1698,7 +1698,7 @@ Function onCustomResume(msg)
 
     lastAppSuspendInSecs = m.appSuspendTimer.TotalSeconds()
     lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 24 / 60 / 60
-    
+
     if m.Request = invalid
       m.Request = TubiRequest(m.constants.settings)
     end if
@@ -1782,13 +1782,22 @@ Function resumeApp()
   m.deeplinkContent = invalid
 
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and currentScreen.id = "linearVideoPlayerScreen"
-    ' if the current screen is linearVideoPlayerScreen, then re-start the playback.
-    ' We restart to make sure that the proper video start time is included in the manifest
-    associatedScreenId = currentScreen.associatedScreenId
-    originalLinearContent = currentScreen.originalContent
-    playLinearVideoContent(originalLinearContent, false, associatedScreenId)
+  if currentScreen <> invalid
+    if currentScreen.id = "linearVideoPlayerScreen"
+      ' if the current screen is linearVideoPlayerScreen, then re-start the playback.
+      ' We restart to make sure that the proper video start time is included in the manifest
+      associatedScreenId = currentScreen.associatedScreenId
+      originalLinearContent = currentScreen.originalContent
+      playLinearVideoContent(originalLinearContent, false, associatedScreenId)
+    else if isAnEPGScreen(currentScreen)
+      ' if current Screen epg Screen,  It will start counting the remaining seconds and full videoscreen will take over when it reaches 0
+      ' without content which will be a blank screen. To avoit it,  stop the counter and refresh the EPGScreen videoplay
+      stopCountdownTimer()
+      currentScreen.refreshEPGScreenVideoPlay = false
+    end if
+
   end if
+
 
   ' when channel resumes,
   ' send page load event here only if the channel is not launched via deeplink
