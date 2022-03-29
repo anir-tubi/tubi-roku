@@ -34,7 +34,12 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
   else
     displayDefaultBackground()  ' clear background from previous screens until epgscreen loads
     showHideSpinner(true)
-    epgScreen = CreateObject("roSGNode", "EPGScreen")
+
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).side_nav = true
+      epgScreen = CreateObject("roSGNode", "EPGScreen")
+    else
+      epgScreen = CreateObject("roSGNode", "EPGHomeScreen")
+    end if
     epgScreen.observeFieldScoped("backgroundUriList", "onEPGScreenBackgroundChange")
     epgScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     epgScreen.observeFieldScoped("programGuideNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
@@ -70,6 +75,11 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
 
     pushScreen(epgScreen, true, true)
   end if
+  
+  if screenID = m.constants.ui.screenIds.epgScreen
+    epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.linearEPG
+  end if
+
   m.totalNumEPGBatches = 0 ' good practice to initialize m. scope variable in init functions
 End Function
 
@@ -551,7 +561,12 @@ End Function
 
 Function isAnEpgScreen(Screen)
   tubiLog("EPGScreenHelpers.isAnEpgScreen")
-  return screen.isSubType("EPGScreen")
+  experiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false)
+  if experiment.side_nav = true
+    return screen.isSubType("EPGScreen")
+  else 
+    return screen.isSubType("EPGHomeScreen")
+  end if
 End Function
 
 

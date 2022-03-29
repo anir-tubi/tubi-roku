@@ -942,7 +942,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
 
   categoryParent = m.buildCategoryParentInfo(container, contentMode)
   if container.type = m.contentTypes.linear
-    if m.experiments.getExperimentResource("roku_linear_epg", "roku_linear_epg_v1").update_homescreen = true
+    if m.experiments.getExperimentResource("roku_linear_epg", "roku_linear_epg_v2").update_homescreen = true
       if container.children <> invalid and container.children.count() > 0
         '//add a TV guide list item to the linear container children
 

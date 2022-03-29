@@ -36,7 +36,7 @@ Function initSideNav()
   if isTopNavHomeScreenEnabled() = true
     '//Tell the sideNav to stop displaying the Linear TV menu item
     m.SideNav.displayLinearTV = false
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).side_nav = true
       '//In this experement, top Nav will not linear TV
       if isParentalControlsAdultLevel() <> true
         m.SideNav.displayLinearEPG = false
@@ -215,19 +215,8 @@ Function onSideNavItemSelected()
       if isKidsUIOn() <> true
         setUiMode(m.constants.ui.modes.standard)
       end if
-
-      topScreen = getCurrentScreen()
-      if isTopNavHomeScreenEnabled() = false
-        ' if the topnav is not enabled, then check if the current screen is not the home screen before proceeding
-        if topScreen.id <> m.constants.ui.screenIds.homeScreen
-          '//if this is the homescreen, then just close the sidenav. no need to call showHomeScreen()
-          showHomeScreen(m.constants, authInfo)
-        end if
-      else if isCurrentScreenHomeScreen() = false or topScreen.id = m.constants.ui.screenIds.espanolScreen
-        '//Don't open the homescreen if the current screen is already a homescreen type (except the espanol screen since that displays in the side nav). Just need to close the side nav.
-        showHomeScreen(m.constants, authInfo)
-      end if
-
+      
+      showHomeScreen(m.constants, authInfo)
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.channels
       if isKidsUIOn() = true
@@ -292,12 +281,8 @@ Function onSideNavItemSelected()
         bNewScreenCalledSuccess = false
         displayMenuItemDisabled(m.constants.ui.sideNavIds.linearEPG, "teens")
       else
-        topScreen = getCurrentScreen()
-        '//Don't open the EPGScreen if the current screen is already a EPGScreen type (news or sports). Just need to close the side nav.
-        if isAnEPGScreen(topScreen) = false
-          setUiMode(m.constants.ui.modes.standard)
-          showDefaultEPGScreen()
-        end if
+        setUiMode(m.constants.ui.modes.standard)
+        showDefaultEPGScreen()
         bNewScreenCalledSuccess = true
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.mylist
@@ -546,9 +531,17 @@ Function getSideNavIdAssociatedWithScreen(screen)
   idsAssociatedWithHome[m.constants.ui.screenIds.tvScreen] = true
 
   idsAssociatedWithEpg = {}
-  idsAssociatedWithEpg[m.constants.ui.screenIds.epgScreen] = true
-  idsAssociatedWithEpg[m.constants.ui.screenIds.sportsEPGScreen] = true
-  idsAssociatedWithEpg[m.constants.ui.screenIds.newsEPGScreen] = true
+
+  experiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false)
+  if experiment.side_nav = false
+    '//if the new EPG live TV option is in the homescreen top nav, not side nav
+    idsAssociatedWithHome[m.constants.ui.screenIds.epgScreen] = true
+  else
+    '//if the new EPG live TV option is in the side nav
+    idsAssociatedWithEpg[m.constants.ui.screenIds.epgScreen] = true
+    idsAssociatedWithEpg[m.constants.ui.screenIds.sportsEPGScreen] = true
+    idsAssociatedWithEpg[m.constants.ui.screenIds.newsEPGScreen] = true    
+  end if
 
   if screen.id <> invalid
     if idsAssociatedWithHome[screen.id] <> invalid

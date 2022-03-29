@@ -37,7 +37,7 @@ Function init()
   m.top.observeField("closeTransport", "hideOverlay")
   m.top.observeField("channelTimeGridContent", "onChannelTimeGridContentChanged")
 
-  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", true).enabled = true
+  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).enabled = true
     m.top.observeField("width", "onWidthChange")
     m.top.observeField("height", "onHeightChange")
   end if
@@ -341,7 +341,7 @@ End Function
 
 Function onFullScreenChange()
   if m.top.fullscreen = true
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", true).enabled = true
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).enabled = true
       m.gradiantOnMinimizedState.visible = false
       hideProgrammingData()
     end if
@@ -354,7 +354,7 @@ Function onFullScreenChange()
         end if
       end if
     end if
-  else if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", true).enabled = true
+  else if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).enabled = true
     m.gradiantOnMinimizedState.visible = true
     '//Display program data when minimized (if it is available)
     setMinimizedInfoPanelProgrammingDataWithChannelTimeGridContent()

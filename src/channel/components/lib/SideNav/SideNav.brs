@@ -105,7 +105,7 @@ Function onCreateMenuItems()
   m.mainItems = m.top.findNode("mainItems")
   m.mainItemsSelected = m.top.findNode("mainItemsSelected")
 
-  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true
+  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).enabled = true
     menuItems = [
       m.constants.ui.sideNavIds.profile
       m.constants.ui.sideNavIds.kidsMode

@@ -82,9 +82,14 @@ Function displayFirstContentScreen(sPageID)
   tubiLog("InitialContentScreenHelpers.displayFirstContentScreen")
   sideNavFocus = m.constants.ui.sideNavIds.home
   if sPageID = m.constants.ui.sideNavIds.linearTV
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v1", false).enabled = true 
+    epgExperiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false)
+    if epgExperiment.enabled = true 
       showDefaultEPGScreen()
-      sideNavFocus = m.constants.ui.sideNavIds.linearEPG
+      if epgExperiment.side_nav = true
+        sideNavFocus = m.constants.ui.sideNavIds.linearEPG
+      else
+        sideNavFocus = m.constants.ui.sideNavIds.home
+      end if
     else
       showLinearTVScreen()
       sideNavFocus = m.constants.ui.sideNavIds.home

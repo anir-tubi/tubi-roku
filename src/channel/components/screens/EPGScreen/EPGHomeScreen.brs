@@ -1,9 +1,12 @@
 Function init()
-  tubiLog("EPGScreen.init")
+  tubiLog("EPGHomeScreen.init")
   m.constants = m.global.constants
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
+
+  '//Send the experiment exposure event when the EPG homescreen is created
+  getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", true)
 
   'infoPanel
   m.infoPanelParent = m.top.findNode("InfoPanelParent")
@@ -14,6 +17,7 @@ Function init()
 
   'topNav
   m.topNav = m.top.FindNode("topNav")
+  m.topNav.selectedId = m.constants.ui.sideNavIds.linearEPG
   m.topNavBG = m.top.FindNode("topNavBG")
   m.topNav.observeField("selected", "onTopNavSelection")
   m.topNav.observeField("backItemSelected", "onTopNavBackItemSelected")
@@ -36,11 +40,10 @@ Function init()
 
   'm.top
   m.defaultBackgroundUri = "pkg:/images/art-blur-background.png"
-  m.top.screenLevel = m.constants.ui.screenLevels.EPGScreen
+  m.top.screenLevel = m.constants.ui.screenLevels.epgScreen
   m.top.observeField("updateTimeGridContent", "onTimeContentChange")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
-  m.top.observeField("id", "onIDChange")
   m.top.observeField("refreshTopNav", "onRefreshTopNav")
   m.top.observeField("visible", "onVisibleChange")
   m.top.backgroundUriList = [m.defaultBackgroundUri]
@@ -49,7 +52,6 @@ Function init()
     pageType : "linear_browse_page"
     pageValues : {}
   }
-
   m.epgTimeGrid.trackingPageInfo = m.top.trackingPageInfo
   'ChannelRefreshTimer
   m.channelRefreshTimer = m.top.findNode("channelRefreshTimer")
@@ -68,7 +70,7 @@ Function onVisibleChange()
 End Function
 
 Function onScreenFocusChange()
-  tubiLog("EPGScreen.onScreenFocusChange")
+  tubiLog("EPGHomeScreen.onScreenFocusChange")
   if m.top.hasFocus() = true
     ' since epg main content node does not have valid Until, just findout the validUntil from first child
     ' This check might be necessary if user stay on topnav/sidenav for very long time.
@@ -98,7 +100,7 @@ End Function
 
 
 Function onLinearChannelFocused()
-  tubiLog("EPGScreen.onLinearChannelFocused")
+  tubiLog("EPGHomeScreen.onLinearChannelFocused")
   if m.epgTimeGrid <> invalid
     content = m.epgTimeGrid.linearChannelFocused
     if content <> invalid and content.title <> invalid
@@ -142,7 +144,7 @@ End Function
 
 
 Function onTimeContentChange()
-  tubiLog("EPGScreen.onTimeContentChange")
+  tubiLog("EPGHomeScreen.onTimeContentChange")
   if m.top.timeGridContent <> invalid
     m.epgTimeGrid.content = m.top.timeGridContent
     m.epgTimeGrid.contentUpdated = true
@@ -152,7 +154,7 @@ End Function
 
 
 Function onLinearChannelToPlay(msg)
-  tubiLog("EPGScreen.onLinearChannelToPlay")
+  tubiLog("EPGHomeScreen.onLinearChannelToPlay")
   linearChannelupdated = msg.getData()
   if linearChannelupdated = true
     linearChannelToPlay = m.epgTimeGrid.linearChannelToPlay
@@ -208,7 +210,7 @@ Function onTransportVoiceRequest(msg)
   if inputInfo <> invalid and inputInfo.command <> invalid
     command = inputInfo.command
   end if
-  tubiLog("EPGScreen.onTransportVoiceRequest " + command)
+  tubiLog("EPGHomeScreen.onTransportVoiceRequest " + command)
 
   if m.epgTimeGrid.isInFocusChain() = true
     if command = "play"
@@ -239,7 +241,7 @@ End Function
 
 
 Function onKeyEvent(key As string, press As boolean) As boolean
-  tubiLog("EPGScreen.onKeyEvent")
+  tubiLog("EPGHomeScreen.onKeyEvent")
   if press
     if m.top.enableTopNav = true
       if key = "back"
@@ -274,8 +276,6 @@ Function onKeyEvent(key As string, press As boolean) As boolean
         return true
       else if key = "left"
         ' navigating to the side nav
-      '  m.top.stopH = true
-
         if m.TopNav.isInFocusChain() = true
           ' navigating to the side nav from the top nav specifically
           m.top.topNavToggled = false
@@ -299,7 +299,7 @@ End Function
 
 
 Function setFocusOntoTopNav(isToggle)
-  tubiLog("EPGScreen.setFocusOntoTopNav")
+  tubiLog("EPGHomeScreen.setFocusOntoTopNav")
   if isToggle = true
     m.top.topNavToggled = true
   else
@@ -314,7 +314,7 @@ End Function
 
 
 Function setFocusOnepgTimeGrid()
-  tubiLog("epgScreen.setFocusOnepgTimeGrid ")
+  tubiLog("EPGHomeScreen.setFocusOnepgTimeGrid ")
   'setting this field to false will trigger the focused channel to play in minimized window
   if m.topNav.isInFocusChain()
     ' only send top nav toggle event if the top nav is losing focus
@@ -334,7 +334,7 @@ End Function
 
 ' The top nav has changed selection, so change the contentSelected so the helper can change things accordingly
 Function onTopNavSelection()
-  tubiLog("EPGScreen.onTopNavSelection")
+  tubiLog("EPGHomeScreen.onTopNavSelection")
   m.top.trackingComponentInfo = m.TopNav.trackingComponentInfo
   m.top.topNavItemSelected = m.TopNav.selected
 End Function
@@ -342,7 +342,7 @@ End Function
 
 
 Function onRefreshTopNav()
-  tubiLog("EPGscreen.onRefreshTopNav")
+  tubiLog("EPGHomeScreen.onRefreshTopNav")
   m.topNav.content = generateTopNavContentItems()
   m.topNav.contentUpdated = true
   m.TopNav.uiState = "unfocusedNear"
@@ -354,7 +354,7 @@ End Function
 '
 ' @focusRowIndex: integer, the 0 based index of the row that is focused
 Function setTopNavUi(focusRowIndex)
-  tubilog("EPGScreen.setTopNavUi")
+  tubilog("EPGHomeScreen.setTopNavUi")
   if focusRowIndex = 0
     m.topNav.uiState = "unfocusedNear"
   else
@@ -365,7 +365,7 @@ End Function
 
 ' The top nav has changed selection, so change the contentSelected so the helper can change things accordingly
 Function onTopNavBackItemSelected()
-  tubiLog("EPGScreen.onTopNavBackItemSelected")
+  tubiLog("EPGHomeScreen.onTopNavBackItemSelected")
 
   '//Set trackingComponentInfo before setting contentSelected so the proper selected analytics is tracked within the screenStack
   if m.TopNav.backItemSelected <> invalid
@@ -379,11 +379,12 @@ End Function
 
 
 ' @includeLinearTV: boolean, true if a linear TV item should be included
-Function generateTopNavContentItems()
+Function generateTopNavContentItems(includeLinearTV = false)
   menuItemIds = [
-    m.constants.ui.sideNavIds.linearepg
-    m.constants.ui.sideNavIds.news
-    m.constants.ui.sideNavIds.sports
+    m.constants.ui.sideNavIds.home
+    m.constants.ui.sideNavIds.movies
+    m.constants.ui.sideNavIds.tv
+    m.constants.ui.sideNavIds.linearEPG
   ]
 
   parent = CreateObject("roSGNode", "ContentNode")
@@ -391,12 +392,14 @@ Function generateTopNavContentItems()
     item = parent.createChild("TopNavContentNode")
     item.id = id
 
-    if id = m.constants.ui.sideNavIds.linearEPG
-      item.title = getTranslation("menu_epg_all")
-    else if id = m.constants.ui.sideNavIds.news
-      item.title = getTranslation("menu_epg_news")
-    else if id = m.constants.ui.sideNavIds.sports
-      item.title = getTranslation("menu_epg_sports")
+    if id = m.constants.ui.sideNavIds.home
+      item.title = getTranslation("menu_foryou")
+    else if id = m.constants.ui.sideNavIds.movies
+      item.title = getTranslation("menu_movies")
+    else if id = m.constants.ui.sideNavIds.tv
+      item.title = getTranslation("menu_tv")
+    else if id = m.constants.ui.sideNavIds.linearEPG
+      item.title = getTranslation("menu_livetv")
     end if
   end for
 
@@ -420,30 +423,9 @@ End Function
 
 
 Function onTimeGridRefreshTimer()
-  tubiLog("epgScreen.onTimeGridRefreshTimer")
+  tubiLog("EPGHomeScreen.onTimeGridRefreshTimer")
   m.top.loadAllChannels = true
 End Function
-
-
-Function onIDChange()
-  tubiLog("EPGSCreen.onIDChange")
-  newTrackingPageInfo = m.top.trackingPageInfo
-  if m.top.id = m.constants.ui.screenIds.sportsEPGScreen
-    newTrackingPageInfo.pageType = "sports_browse_page"
-    m.top.screenLevel = m.constants.ui.screenLevels.sportsEPGScreen
-  else if m.top.id = m.constants.ui.screenIds.newsEPGScreen
-    newTrackingPageInfo.pageType = "news_browse_page"
-    m.top.screenLevel = m.constants.ui.screenLevels.newsEPGScreen
-  else
-    m.top.trackingPageInfo.pageType = "linear_browse_page"
-    m.top.screenLevel = m.constants.ui.screenLevels.epgScreen
-  end if
-  m.top.trackingPageInfo = newTrackingPageInfo
-  m.topNav.trackingPageInfo = newTrackingPageInfo
-  m.epgTimeGrid.trackingPageInfo = newTrackingPageInfo
-End Function
-
-
 
 
 ' The top nav will dispatch a navigateWithinPageInfo event which needs to be re-dispatched to the epgscreenHelpers
