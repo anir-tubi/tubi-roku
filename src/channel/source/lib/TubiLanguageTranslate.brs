@@ -1672,7 +1672,7 @@ Function getTranslation_es_MX()
     },
     "screenDetails_button_episodes": {
       "description": "Label of button to allow users to display the list of episodes/seasons of the current video title",
-      "message": "Lista de capítulos"
+      "message": "Lista de Capítulos"
     },
     "screenDetails_relatedTitles": {
       "description": "Label of button to allow users to view other video titles related to the current video title",
@@ -2039,6 +2039,14 @@ Function getTranslation_es_MX()
     "screenSettings_parentalPassword_know_my_Password": {
       "description": "Directions to the user to enter his/her password if they know their password",
       "message": "Yo se mi contraseña. Vamos."
+    },
+    "registration_signup_button": {
+      "description": "button text for when a non registered user focuses on details sreen",
+      "message": "Regístrate para Guardar Tu Progreso"
+    },
+    "registration_signup_button_free": {
+      "description": "button text on top of background image next to sign up text for when a non registered user focuses on details sreen",
+      "message": "GRATIS"
     }
   }
 End Function
