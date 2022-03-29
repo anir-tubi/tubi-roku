@@ -38,9 +38,10 @@ Function onItemContentChange()
     else
       m.Progress.visible = false
     end if
+    m.top.calculatedWidth = m.top.calculatedTextWidth + m.DetailsMenuText.translation[0]
     if m.rokuRegisterSignupToSaveExperiment = true
       'Move the translation of Button text to left when there is no image
-      if m.top.itemContent.iconUrl = ""
+      if m.top.itemContent.id = "signUpMenuItem" and m.top.itemContent.iconUrl = ""
         m.DetailsMenuText.translation = [22, 0]
       else
         m.DetailsMenuText.translation = [72, 0]
