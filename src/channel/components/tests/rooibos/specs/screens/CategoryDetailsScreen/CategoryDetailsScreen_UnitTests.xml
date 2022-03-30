@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <component name="CategoryDetailsScreenTest" extends="CategoryDetailsScreen">
   <interface>
     <function name="Rooibos_RunNodeTests" />
   </interface>
 
   <script type="text/brightscript" uri="CategoryDetailsScreen_UnitTests.brs" />
+  <!-- bs:disable-next-line: 1004 -->
   <script type="text/brightscript" uri="../../../../../../source/rooibosFunctionMap.brs" />
   <script type="text/brightscript" uri="../../../../../../source/tests/rooibos/rooibosDist.brs" />
 </component>

@@ -247,7 +247,6 @@ function buildStarter() {
       'src/channel/source/lib/TubiExperiments.brs',
       'src/channel/source/lib/TubiExternalConfig.brs',
       'src/channel/source/lib/TubiTracking.brs',
-      'src/channel/source/lib/Auth.brs',
       'src/channel/source/3rdparty/rta/typeUtils.brs',
     ];
     let sourceLibsSrcOptions = {
@@ -317,7 +316,6 @@ function buildRemote() {
       '!src/channel/components/controllers/BackgroundScene/**',
       '!src/channel/components/tasks/ExperimentsTask/**',
       '!src/channel/components/tasks/AnalyticsTask/**',
-      '!src/channel/source/3rdparty/ComponentTestFramework.brs',
       '!src/channel/source/3rdparty/roku/NotesOnRokuTestFramework.brs',
       '!src/channel/source/3rdparty/roku/UnitTestFramework.brs',
       '!src/channel/source/tests/**',

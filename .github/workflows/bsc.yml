@@ -1,0 +1,48 @@
+name: BSC
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  bsc:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Setup ReviewDog
+      uses: "reviewdog/action-setup@v1"
+      with:
+        reviewdog_version: latest #Optional. [latest,nightly,v.X.Y.Z]
+
+    # npm command install all required packages
+    - name: npm command
+      run: |
+        npm install
+
+    - name: Check source code for issues with bsc
+      env:
+        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        set -o pipefail
+        npx bsc --project bsconfig.json --create-package false --copy-to-staging false | reviewdog -efm="%f:%l:%c - %m" -reporter=github-pr-review -tee
+
+    - name: Build local, starter and remote output folders
+      run: npx gulp build
+
+    - name: Check local output folder with bsc
+      run: npx bsc --project ./build-config/local-bsconfig.json --create-package false --copy-to-staging false
+
+    - name: Check starter output folder with bsc
+      run: npx bsc --project ./build-config/starter-bsconfig.json --create-package false --copy-to-staging false
+
+    - name: Check remote output folder with bsc
+      run: npx bsc --project ./build-config/remote-bsconfig.json --create-package false --copy-to-staging false

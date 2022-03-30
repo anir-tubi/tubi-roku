@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <component name="Test_VideoPlayer" extends="VideoPlayerScreen">
   <interface>
     <function name="Rooibos_RunNodeTests" />
@@ -6,6 +6,7 @@
   <script type="text/brightscript" uri="VideoPlayer_VideoErrorHelpersUnitTests.brs" />
   <script type="text/brightscript" uri="VideoPlayer_VideoPlayerCuepointsUnitTests.brs" />
   <script type="text/brightscript" uri="VideoPlayer_VideoPlayerHelpersUnitTests.brs" />
+  <!-- bs:disable-next-line: 1004 -->
   <script type="text/brightscript" uri="../../../../../../source/rooibosFunctionMap.brs" />
   <script type="text/brightscript" uri="../../../../../../source/tests/rooibos/rooibosDist.brs" />
 </component>

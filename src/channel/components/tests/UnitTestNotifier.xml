@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <component name="UnitTestNotifier" extends="Group">
 
   <script type="text/brightscript" uri="UnitTestNotifier.brs" />
@@ -7,15 +7,16 @@
   <script type="text/brightscript" uri="../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
-  
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+
   <interface>
-  
+
     <!-- INPUTS -->
 
       <!-- customSuspendUnitTest will be set by scene's suspendhandler callback  -->
       <field id="customSuspendUnitTest" type="assocarray" alwaysNotify="true"/>
-      
+
   </interface>
 
 </component>
-

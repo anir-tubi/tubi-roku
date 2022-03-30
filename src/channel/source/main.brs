@@ -11,11 +11,6 @@ Function Main(startupArgs)
   auth = TubiAuth(constants, request)
   log = TubiLogger(constants, request, auth)
 
-  if m.startupArgs.ComponentTest <> invalid and m.startupArgs.ComponentTest <> ""
-    ' This will block indefinitely
-    ComponentTest(m.startupArgs.ComponentTest) 'bs:disable-line 1001
-  end if
-
   logCrashesOnStartup(m.startupArgs, log, constants)
 
   ' permaScreen is a permanent screen that exists even when the screen created by runChannel()

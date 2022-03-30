@@ -135,7 +135,7 @@ Function tubiBookmarks_addHistoryLocally(content as Object, position as Integer,
       '//if this TV content
       if content.parentId <> invalid
 
-        historyNode = getHistory(content.parentId)
+        historyNode = getHistory(content.parentId) 'bs:disable-line 1001
 
         if historyNode = invalid
           historyNode = global.historyIds.createChild("HistoryContentNode")
@@ -159,7 +159,7 @@ Function tubiBookmarks_addHistoryLocally(content as Object, position as Integer,
     else
       '//else if this movie content
 
-      historyNode = getHistory(content.id)
+      historyNode = getHistory(content.id) 'bs:disable-line 1001
 
       if historyNode = invalid
         historyNode = global.historyIds.createChild("HistoryContentNode")
@@ -245,7 +245,7 @@ End Function
 Function tubiBookmarks_removeHistoryLocally(content as Object, global)
   if content <> invalid
 
-    historyNode = getHistory(content.id)
+    historyNode = getHistory(content.id) 'bs:disable-line 1001
 
     if historyNode <> invalid
       global.historyIds.removeChild(historyNode)

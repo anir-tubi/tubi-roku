@@ -145,7 +145,7 @@ function tubiLog_sendLogging_(logInfo as Object, queue as Object)
     if logInfo.message <> "" and m.constants <> invalid
 
       ' user has set consoleLoggingEnabled to true in their dev.yml/qa.yml
-#if consoleLoggingEnabled 'bs:disable-line 1090
+#if consoleLoggingEnabled
         print m.getLogPrintout(logInfo.level, logInfo.subtype, logInfo.message)
 #end if
 
@@ -252,7 +252,7 @@ End Function
 Function tubiLog_helper(logType, message="" as Dynamic, level="debug" as String, serverTypeName="" as String, subtype="" as String) as Void
   if message <> invalid and message <> ""
 
-#if consoleLoggingEnabled 'bs:disable-line 1090
+#if consoleLoggingEnabled
       print tubiLog_getLogPrintout_(level, subtype, message)
 #end if
 

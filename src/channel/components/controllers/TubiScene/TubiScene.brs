@@ -9,11 +9,11 @@ Function init()
     m.customSplashPoster.uri = "pkg:/images/splash-hd.jpg"
   else
     m.customSplashPoster.uri = "pkg:/images/splash-fhd.jpg"
-  end if  
+  end if
 
   m.top.observeField("fadeOutCustomSplash", "onFadeOutCustomSplash")
   m.top.observeField("fadeOutSpinner", "onFadeOutSpinner")
-  
+
   m.top.observeField("change", "onChildrenChange")
 End Function
 
@@ -24,20 +24,20 @@ Function onChildrenChange()
 End Function
 
 
-' customSuspend is the callback for suspendhandler customization tag, 
+' customSuspend is the callback for suspendhandler customization tag,
 ' will be triggered when user presses Home/Labeled channel key
 Function customSuspend(args)
 
-  m.contentController = m.top.findNode("ContentController") 
+  m.contentController = m.top.findNode("ContentController")
   if m.contentController <> invalid
     m.contentController.customSuspend = args
   end if
-    
+
 End Function
 
 
-' customResume is the callback for resumehandler customization tag, 
-' every app launch, roku firmware checks whether the customSuspend.lastSuspendOrResumeReason has value as "Home", 
+' customResume is the callback for resumehandler customization tag,
+' every app launch, roku firmware checks whether the customSuspend.lastSuspendOrResumeReason has value as "Home",
 ' if exists, then triggers customResume callback to make necessary action
 Function customResume(args)
 
@@ -46,7 +46,7 @@ Function customResume(args)
       m.contentController.customResume = args
     end if
   end if
-  
+
 End Function
 
 
@@ -65,10 +65,10 @@ Function onCustomSplashFadeStateChange(msg)
   if animationState = "stopped"
     if m.spinner <> invalid and m.spinner.opacity = 0
       m.spinnerFade = customFadeIn(m.spinner, 1, 0)
-    end if    
+    end if
     customSplashFade.unobserveField("state")
   end if
-  
+
 End Function
 
 
@@ -77,7 +77,7 @@ Function onFadeOutSpinner()
   if m.spinnerFade <> invalid and m.spinnerFade.state = "running"
     m.spinnerFade.control = "stop"
   end if
-  
+
   if m.spinner <> invalid and m.spinner.opacity > 0
     customFadeOut(m.spinner, 1, 0)
   end if
@@ -95,7 +95,7 @@ Function customFadeIn(target, duration, delay)
     allowOnLowSpecDevices: true
   }
   return animate(target, animationOptions)
-  
+
 End Function
 
 
@@ -109,5 +109,5 @@ Function customFadeOut(target, duration, delay)
     allowOnLowSpecDevices: true
   }
   return animate(target, animationOptions)
-  
+
 End Function
