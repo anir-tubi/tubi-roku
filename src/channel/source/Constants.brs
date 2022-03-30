@@ -182,6 +182,7 @@ Function getConstants()
     constants.deviceInfo.displayWidth = di.GetDisplaySize().w
     constants.deviceInfo.displayHeight = di.GetDisplaySize().h
     constants.deviceInfo.rokuCountryCode = di.GetUserCountryCode()
+    constants.deviceInfo.hasHandsFreeVoiceFeature = di.HasFeature("handsfree_voice")
     if constants.deviceInfo.rokuCountryCode <> invalid
       'rokuCountryCode will be used for the value of countryCode, unless it is overriden by externalConfig.info.country.
       'Keep a record of the original rokuCountryCode value in case we ever need to know the non-overwritten value.

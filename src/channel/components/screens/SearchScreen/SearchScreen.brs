@@ -29,10 +29,11 @@ Function init()
     m.searchGroup.translation = [192, 414]
     m.KidsModeMessage.opacity = 0.6
 
-    ' 'Creating hint
-    setTextForVoiceHint()
+    'show voice hint message if user has voice remote
+    if m.constants.deviceInfo.hasHandsFreeVoiceFeature = true
+      setTextForVoiceHint()
+    end if
 
-    'Creating Keyboard
     m.keyboard = m.searchGroup.createChild("DynamicCustomKeyboard")
     m.keyboard.translation = [0, -20]
   else
@@ -44,17 +45,18 @@ Function init()
 
     m.KidsModeMessage.opacity = 1
 
-    'Creating Keyboard
     m.keyboard = m.searchGroup.createChild("DynamicCustomKeyboard")
     m.keyboard.translation = [0, 0]
 
-    'Creating hint
-    createSearchHintLayoutGroup()
-    m.searchHintGroup.translation = [0, 643]
-    m.voiceHint = m.searchHintGroup.createChild("Label")
-    m.voiceHintfont.size = 27
+    'show voice hint message if user has voice remote
+    if m.constants.deviceInfo.hasHandsFreeVoiceFeature = true
+      createSearchHintLayoutGroup()
+      m.searchHintGroup.translation = [0, 643]
+      m.voiceHint = m.searchHintGroup.createChild("Label")
+      m.voiceHintfont.size = 27
 
-    m.voiceHint.font = m.voiceHintfont
+      m.voiceHint.font = m.voiceHintfont
+    end if
   end if
   m.keyboard.setFocus(true)
   m.Keyboard.textEditBox.maxTextLength = 100
@@ -149,9 +151,11 @@ Function setSearchStrings()
     m.searchHintToSearch = getTranslation("screenSearch_defaultLinearSearch")
     setDefaultText()
   else
-    setVoiceHint()
+    if m.searchHintGroup <> invalid
+      setVoiceHint()
+      m.searchHintGroup.visible = true
+    end if
     m.sDefaultSearchText = getTranslation("screenSearch_defaultSearch")
-    m.searchHintGroup.visible = true
   end if
   m.searchText.text = m.sDefaultSearchText
   m.sDefaultKidsWarning = getTranslation("screenSearch_kidsWarning")
@@ -284,7 +288,9 @@ Function onSearchContentChange()
       '//display special text when the default search is displaying 
       if getExperimentResource("roku_linear_search_ui_update", "roku_linear_search_ui_update_v1", false).enabled = true
         setDefaultText()
-        m.microphone.visible = true
+        if m.microphone <> invalid
+          m.microphone.visible = true
+        end if
       else
         m.SearchText.text = m.sDefaultSearchText
       end if
@@ -354,7 +360,9 @@ Function onItemFocused()
     if getExperimentResource("roku_linear_search_ui_update", "roku_linear_search_ui_update_v1", false).enabled = true
       m.top.backgroundUriList = focusedContent.backgrounds
       m.searchScreenInfoPanel.visible = true
-      m.microphone.visible = false
+      if m.microphone <> invalid
+        m.microphone.visible = false
+      end if
       setVisibilityForDefaultText(false)
       m.searchScreenInfoPanel.title = focusedContent.title
       m.searchScreenInfoPanel.description = focusedContent.DESCRIPTION
@@ -660,6 +668,8 @@ Function handleInfoPanelVisibilityForLeftPress()
       setDefaultText()
     end if
     setVisibilityForDefaultText(true)
-    m.microphone.visible = true
+    if m.microphone <> invalid
+      m.microphone.visible = true
+    end if
   end if
 End Function
