@@ -147,15 +147,17 @@ Function onDescriptionSelected()
 End Function
 
 
-Function jumpToSelectedItem()
-  jumpToItem = 0
+Function refocusMenuItem()
   if m.Menu.content <> invalid
-    jumpToItem = m.Menu.itemSelected
-    if m.Menu.itemSelected >= m.Menu.content.getChildCount()
-      jumpToItem = m.Menu.content.getChildCount()-1
-    end if  
+    if m.Menu.itemFocused >= m.Menu.content.getChildCount()
+      jumpToItem = m.Menu.content.getChildCount() - 1
+
+      if jumpToItem >= 0
+        m.Menu.jumpToItem = jumpToItem
+      end if
+    end if
   end if
-  m.Menu.jumpToItem = jumpToItem
+
   focusMenu(true)
 End Function
 
@@ -396,7 +398,7 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
   if add = false and itemIndex > -1
     'menu item exists, so we need to remove it
     m.Menu.content.removeChildIndex(itemIndex)
-    jumpToSelectedItem()
+    refocusMenuItem()
   else if add = true and itemIndex = -1
     'we don't have menu item, and need to add one
     'find the previous item index, and insert the Watch Trailer item one index after
@@ -417,8 +419,7 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
     else
       m.Menu.content.appendChild(itemToAdd)
     end if
-    jumpToSelectedItem()
-
+    refocusMenuItem()
   end if
 End Function
 

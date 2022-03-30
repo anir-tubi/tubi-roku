@@ -590,11 +590,11 @@ Function onRegistrationProcessCompletedOnDetailsScreen()
   if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
     currentScreen.removeSignupButton = true
     currentScreen.refreshContent = true
-    if currentScreen.isInFocusChain() = true
-      currentScreen.setFocus(true)
-    end if
+    currentScreen.setFocus(true)
+    currentScreen.jumpToItem = 0
   end if
 End Function
+
 
 ' onParentalControlAfterSignIn - occurs after activation success via Parental Control
 Function onParentalControlAfterSignIn()
@@ -664,7 +664,6 @@ Function popScreenAfterSignInProcess()
     "SignInScreen": true
     "SignUpScreen": true
     "EmailInputScreen": true
-    "AgeVerificationScreen": true
   }
 
   count = m.screenStack.getChildCount()-1
