@@ -160,6 +160,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
   if type(detailScreen) = "roSGNode" and detailScreen.isSubType("DetailScreen") and type(content) = "roSGNode"
     'hide the spinner
     detailScreen.isLoading = false
+
     lineOneData = {}
 
     ' don't show related content if the user is in any of the kids modes
@@ -216,6 +217,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
     else
       detailScreen.mode = m.constants.ui.infoPanelModes.movie
     end if
+    detailScreen.isInKidsModeUI = isKidsUIOn()
 
     if episode <> invalid
       stateSource = episode
