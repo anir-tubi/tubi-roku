@@ -58,6 +58,7 @@ Function init()
       m.voiceHint.font = m.voiceHintfont
     end if
   end if
+  m.keyboard.id = "SearchKeyboard"
   m.keyboard.setFocus(true)
   m.Keyboard.textEditBox.maxTextLength = 100
 
