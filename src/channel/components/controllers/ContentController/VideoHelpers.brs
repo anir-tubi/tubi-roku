@@ -550,8 +550,7 @@ Function stopVideoContent(videoPlayer)
     videoPlayer.unobserveFieldScoped("segInfo")
 
     ' reset the deep link state since we've handled it already at this point
-    m.deepLinkContent = invalid
-    m.enteredFromDeepLink = false
+    resetDeeplinkValues()
     m.currentScreenAtDeeplinkInputEvent = invalid
     m.handlingDeeplinkInputEvent = false
 

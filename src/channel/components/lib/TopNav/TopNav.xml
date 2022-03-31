@@ -48,7 +48,7 @@
            "unfocusedClose" indicates that the focus is near the top nav component (ie. 1st row of
            the home grid) and "unfocusedFar" indicates that the focus is far from the top nav
            component (ie. 2nd or greater row of the homegrid) -->
-      <field id="uiState" type="string" value="unfocusedNear" />
+      <field id="uiState" type="string" />
 
       <!-- If the top nav has focus, and a back button press navigates to the default top nav item,
            then there should be no NavigateWithinPageEvent. This field indicates if we are currently

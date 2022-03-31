@@ -433,7 +433,7 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
 
         if m.enteredFromDeepLink = true
           ' m.enteredFromDeepLink will be set to false when the video is played
-          sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
+          sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
         end if
       else if (m.deepLinkContent.deeplinkType = "season" or m.deepLinkContent.deeplinkType = "episode" or m.deepLinkContent.deeplinkType = "series") and refreshedContent.type = m.constants.ui.contentTypes.video
         '  refreshedContent.id =       episode id
@@ -471,7 +471,7 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
         afterFn = episodesHelper
 
         if m.enteredFromDeepLink = true
-          sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "episodeList", m.Tracking, m.trackingLoggingTask, m.constants)
+          sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, m.constants.deeplinks.entryPoints.episodeList, m.Tracking, m.trackingLoggingTask, m.constants)
           m.enteredFromDeepLink = false
         end if
       else if m.deepLinkContent.deeplinkType = "episode" and refreshedContent.type = m.constants.ui.contentTypes.series
@@ -493,7 +493,7 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
 
         if m.enteredFromDeepLink = true
           ' m.enteredFromDeepLink will be set to false when the video is played
-          sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
+          sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
         end if
       else if m.deepLinkContent.deeplinkType = "movie"
         'determine if we need to resume or play from start the deeplinked movie
@@ -506,13 +506,13 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
 
         if m.enteredFromDeepLink = true
           ' m.enteredFromDeepLink will be set to false when the video is played
-          sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "video", m.Tracking, m.trackingLoggingTask, m.constants)
+          sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
         end if
       else
         'start the channel normally in case of issues
         'handle deeplinking tracking when landing on category/home screen
         if m.enteredFromDeepLink = true
-          sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, "home", m.Tracking, m.trackingLoggingTask, m.constants)
+          sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, m.constants.deeplinks.entryPoints.home, m.Tracking, m.trackingLoggingTask, m.constants)
           m.enteredFromDeepLink = false
         end if
         m.deepLinkContent = invalid
@@ -608,7 +608,7 @@ Function handleSingleContentError(error, onRetrySuccessCallback, onRetryErrorCal
   if m.enteredFromDeepLink = true
     m.enteredFromDeepLink = false
     content = getDetailScreenContent(detailScreen)
-    sendDeeplinkAnalytics(m.deepLinkContent, content, "home", m.Tracking, m.trackingLoggingTask, m.constants)
+    sendDeeplinkAnalytics(m.deepLinkContent, content, m.constants.deeplinks.entryPoints.home, m.Tracking, m.trackingLoggingTask, m.constants)
     m.deepLinkContent = invalid
     startChannel() 'adds a homescreen which will remove all other screens underneath
 
@@ -1602,44 +1602,6 @@ Function skipDetailScreen(refreshedContent)
 End Function
 
 
-' Organizes the information needed to create a "referred" tracking event and sends the information to the trackingTask which will
-' actually send the event.
-'
-' @deepLinkContent: roSGNode, a content node created by deeplink logic and passed to the content controller via m.deeplinkContent
-' @refreshedContent: roSGNode, a content node containing full information from the /content API
-' @entryPoint: string, indicates where the user will land after the deeplink, can be one of: "detail", "home", "episodeList", "video"
-' @trackingLib: associativeArray, an instance of TubiTracking()
-' @trackingTask: roSGNode, an instance of the TrackingLoggingTask
-' @constants: associativeArray, m.constants
-Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, trackingLib, trackingTask, constants)
-  referredAnalyticsEvent = {
-    referred_type: "DEEP_LINK"
-    campaign: deepLinkContent.campaign
-    source: deepLinkContent.source
-    medium: deepLinkContent.medium
-    source_device_id: deeplinkContent.sourceDeviceId
-  }
-
-  pageInfo = getDetailScreenAnalyticsPageInfo(refreshedContent, constants)
-
-  if entryPoint = "detail"
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-  else if entryPoint = "home"
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {})
-  else if entryPoint = "episodeList"
-    if deepLinkContent <> invalid and type(deepLinkContent.id) = "roString"
-      seriesId = deeplinkContent.id.toInt()
-      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("episode_video_list_page", {series_id: seriesId})
-    end if
-  else if entryPoint = "video"
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-  end if
-
-  trackingTask.trackEvent = {
-    type: "referred"
-    values: referredAnalyticsEvent
-  }
-End Function
 
 
 ' Organizes the information needed to create a "bookmark" tracking event and sends the information to the trackingTask which will

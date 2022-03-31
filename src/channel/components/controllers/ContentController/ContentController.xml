@@ -36,6 +36,7 @@
   <script type="text/brightscript" uri="AgeVerificationScreenHelpers.brs" />
   <script type="text/brightscript" uri="EPGScreenHelpers.brs" />
   <script type="text/brightscript" uri="TopNavHelpers.brs" />
+  <script type="text/brightscript" uri="DeeplinkHelpers.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />

@@ -548,7 +548,7 @@ Function displayLinearPlayerProgrammingDataOnHomescreen()
     if videoPlayer <> invalid and videoPlayer.state = "playing"
       if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).update_homescreen = true
         '//get the info to display in the minmized player info panel
-        fetchEPGChannel(videoPlayer, videoPlayer.content.ID)
+        fetchEPGChannel(videoPlayer.id, videoPlayer.content.ID , onEPGChannelProgramSuccess , onEPGChannelProgramError)
       end if
     end if
   end if
@@ -669,6 +669,9 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
         popScreen(true, true)
         stopAndHideLinearVideoPlayer()
       else
+        if m.enteredFromDeeplink = true
+          jumpToParentScreenContentByID(videoPlayer.content.id, "", currentScreen.associatedScreenID)
+        end if
         popScreen(true, true)
 
         '//animate the video player into the corner

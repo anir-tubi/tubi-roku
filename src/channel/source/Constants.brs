@@ -872,7 +872,6 @@ Function getConstants()
       constants.ui.screenIds.newsScreen = "newsScreen"
       constants.ui.screenIds.emailInputScreen = "emailInputScreen"
       constants.ui.screenIds.linearTVScreen = "linearTVScreen"
-      constants.ui.screenIds.linearEPGScreen = "linearEPGScreen"
       constants.ui.screenIds.signUpScreen = "signUpScreen"
       constants.ui.screenIds.signInScreen = "signInScreen"
       constants.ui.screenIds.upNextScreen = "upNextScreen"
@@ -891,7 +890,6 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryListScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.espanolScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.linearTVScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.linearEPGScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.movieScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.tvScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.searchScreen] = true
@@ -1163,6 +1161,20 @@ Function getConstants()
       constants.deeplinks["auto-run-dev"] = "sideload"
       constants.deeplinks["hs-d"] = "feature-free-page"
       constants.deeplinks["dial"] = "dial"
+
+      constants.deeplinks.entrypoints = {}
+      constants.deeplinks.entrypoints.detail = "detail"
+      constants.deeplinks.entrypoints.home = "home"
+      constants.deeplinks.entrypoints.epg = "epg"
+      constants.deeplinks.entrypoints.category = "category"
+      constants.deeplinks.entrypoints.channel = "channel"
+      constants.deeplinks.entrypoints.espanol = "espanol"
+      constants.deeplinks.entrypoints.movies = "movies"
+      constants.deeplinks.entrypoints.tv = "tv"
+      constants.deeplinks.entrypoints.categoryDetail = "categoryDetail"
+      constants.deeplinks.entrypoints.news = "news"
+      constants.deeplinks.entrypoints.episodeList =  "episodeList"
+      constants.deeplinks.entrypoints.video = "video"
 
   return constants
 end Function

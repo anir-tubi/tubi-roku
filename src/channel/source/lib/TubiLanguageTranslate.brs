@@ -304,6 +304,10 @@ Function getTranslation_en_US()
       "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled due to parental set to Teens",
       "message": "Please turn off parental controls to use this feature."
     },
+    "dialog_contentNotAvailable_Parental_description": {
+      "description": "Message of a Dialog Window that is shown when a deeplink content can not played because of user's parental control setting",
+      "message": "Please turn off parental controls to watch this content."
+    },
     "error_connection_title": {
       "description": "title of error window when there is a connection error",
       "message": "Connection Error"
@@ -503,6 +507,10 @@ Function getTranslation_en_US()
     "error_deeplink_content": {
       "description": "Error message when the app can not retrieve the deeplink content.",
       "message": "The title you're trying to watch is not currently available"
+    },
+    "error_deeplink_page": {
+      "description": "Error message when the app can not retrieve the page requested through deeplink",
+      "message": "The page you're looking for is not currently available"
     },
     "error_tryAgain_title": {
       "description": "Error message when the user has the option to try the operation again.",

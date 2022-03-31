@@ -70,6 +70,9 @@ Function runChannel(constants, log, request)
   ' Used to add required node creation needed for RDB component during vscode build
   ' vscode_rdb_on_device_component_entry
 
+  ' Used to add required include to make RDB component in vscode
+  ' vscode_rdb_on_device_component_entry
+
   'run SceneGraph tests if in test mode
   if constants.settings.mode = "test"
     sgGlobal.setField("theme", constants.ui.themes.default) 'set theme for testing purposes

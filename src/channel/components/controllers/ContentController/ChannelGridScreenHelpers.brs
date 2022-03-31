@@ -2,12 +2,17 @@
 ' @constants: assocArray, constants as set in Constants.brs and updated in the hotpatch
 ' @sPageSource: string, What page is calling this function? This string is what is displayed on the top of the page
 '                       to let the user know what page they will go to when they click the back button
-Function showChannelListScreen(constants, sPageSource)
+' @sendNavigationLoadEvents: boolean, when the page is loaded, do the navigation to page, pageload events needs to be sent
+Function showChannelListScreen(constants, sPageSource, sendNavigationLoadEvents = true)
   channelListScreen = getFromScreenCache(m.constants.ui.screenIds.channelListScreen)
   if channelListScreen <> invalid
-    pushScreen(channelListScreen, true, true)
+    if sendNavigationLoadEvents = false
+      pushScreen(channelListScreen, false, false)
+    else
+      pushScreen(channelListScreen, true, true)
+    end if
   else
-    showChannelGridScreen(constants, sPageSource, true, m.constants.ui.screenLevels.channelCategoryGridScreen)
+    showChannelGridScreen(constants, sPageSource, true, m.constants.ui.screenLevels.channelCategoryGridScreen , sendNavigationLoadEvents)
   end if
 End Function
 
@@ -16,12 +21,16 @@ End Function
 ' @constants: assocArray, constants as set in Constants.brs and updated in the hotpatch
 ' @sPageSource: string, What page is calling this function? This string is what is displayed on the top of the page
 '                       to let the user know what page they will go to when they click the back button
-Function showCategoryListScreen(constants, sPageSource)
+Function showCategoryListScreen(constants, sPageSource, sendNavigationLoadEvents = true)
   categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
   if categoryListScreen <> invalid
-    pushScreen(categoryListScreen, true, true)
+    if sendNavigationLoadEvents = false
+      pushScreen(categoryListScreen, false, false)
+    else
+      pushScreen(categoryListScreen, true, true)
+    end if
   else
-    showChannelGridScreen(constants, sPageSource, false, m.constants.ui.screenLevels.channelCategoryGridScreen)
+    showChannelGridScreen(constants, sPageSource, false, m.constants.ui.screenLevels.channelCategoryGridScreen, sendNavigationLoadEvents)
   end if
 End Function
 
@@ -33,7 +42,7 @@ End Function
 ' @sPageSource: string, What page is calling this function? This string is what is displayed on the top of the page to let the user know what page they will go to when they click the back button
 ' @bChannel: boolean, Is this a grid page displaying channels? If not, it will be a grid page displaying categories
 ' @screenLevel: integer, Should this screen have a different screenlevel other than its default one?
-Function showChannelGridScreen(constants, sPageSource, bChannel = true, screenLevel = -1)
+Function showChannelGridScreen(constants, sPageSource, bChannel = true, screenLevel = -1, sendNavigationLoadEvents = true)
   gridScreen = CreateObject("roSGNode", "ChannelGridScreen")
 
   gridScreenId = constants.ui.screenIds.channelListScreen
@@ -63,7 +72,11 @@ Function showChannelGridScreen(constants, sPageSource, bChannel = true, screenLe
   }
 
   setInScreenCache(gridScreen)
-  pushScreen(gridScreen, true, false)  ' don't send page load tracking until we resolve channel content
+  if sendNavigationLoadEvents = false
+    pushScreen(gridScreen, false, false)
+  else
+    pushScreen(gridScreen, true, false)  ' don't send page load tracking until we resolve channel content
+  end if
   getGridDataFromServer(gridScreen)
 End Function
 
@@ -74,7 +87,7 @@ Function onGridContentSelected(msg)
   sType = ""
   if gridScreen.displayChannels = true
     sType = m.constants.ui.terms.channels
-  else 
+  else
     sType = m.constants.ui.terms.categories
   end if
   sType = UCase(sType)
@@ -166,7 +179,7 @@ Function onCategoriesListError(errorInfo)
   tubiLog("ChannelGridScreenHelpers.onCategoriesListError")
 
   screen = getFromScreenCache(errorInfo.screenId)
-  
+
   if screen <> invalid and (screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.categoryListScreen)
     'the channelListScreen will be popped from the stack after the user closes the error modal
 

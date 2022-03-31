@@ -518,11 +518,11 @@ Function startUserExperience()
 
     setUiModeFromState()
 
-    if m.enteredFromDeepLink = true then
+    if m.enteredFromDeepLink = true
       tubiLog("ContentController detected deep link request")
       ' we were asked to deep link into a content item. Go to it
       ' whether we were logged in or not.
-      showDetailScreen(m.deeplinkContent, false)
+      handleDeeplink()
     else if shouldDisplayInitialContentScreen() = true
       ' Display the intitial content screen to the user so they can choose the proper experience.
       displayInitialContentScreen()
@@ -569,7 +569,7 @@ End Function
 ' this is one of the pre-requisites to starting the SG user experience.
 Function onStartupArgs()
   m.deeplinkContent = invalid
-  if m.top.startUpArgs <> invalid and m.top.startUpArgs.contentID <> invalid
+  if m.top.startUpArgs <> invalid and (m.top.startUpArgs.contentID <> invalid or m.top.startUpArgs.page <> invalid)
     m.deeplinkContent = createDeeplinkContentFromStartupArgs(m.top.startUpArgs)
   end if
 
@@ -611,162 +611,12 @@ Function onInputInfoReceived()
   end if
 End Function
 
-Function handleInputDeeplink(inputInfo) as Void
-  resetSideNav(false)
-  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
-  stopVideoContent(videoPlayer) 'sets m.handlingDeeplinkInputEvent = false and m.deeplinkContent = invalid
-  returnToPreviousScreenFromLinearVideo(false)
-
-  if m.uiMode = m.constants.ui.modes.kids
-    if needsToShowAgeVerificationScreen() = true then
-      showAgeVerificationScreenAtInputDeeplink(m.uiMode)
-      return
-    else
-      ' turn off kids mode for input deeplinks (ie. voice commands)
-      ' Normal kids mode allows users to exit kids mode, so treat voice command deeplink as if
-      ' user is exiting kids mode.
-      ' Keeping the "kidsAgeGate" and "kidsParental" uiModes will prevent voice command deeplinks
-      ' from being successful unless the content is kids content.
-      setUiMode(m.constants.ui.modes.standard)
-
-      ' remove all screens if in kids mode so that when backing out of the details screen,
-      ' the home screen will be re-populated as expected to the standard UI.
-      shrinkScreenStack(0)
-      emptyScreenCache()
-    end if
-  end if
-
-  ' the following values will be used to save state and will be used in the process that
-  ' is kicked off by showDetailScreen to load the detail screen and video player screen
-  m.deeplinkContent = createDeeplinkContentFromStartupArgs(inputInfo)
-  m.handlingDeeplinkInputEvent = true
-
-  ' close any opened modal/pop-up when deeplinking via roInput
-  for i=0 to m.top.getChildCount()-1
-    screen = m.top.getChild(i)
-    if screen.subType() = "ModalDialogScreen"
-      closeModal(screen, "back")
-    end if
-  end for
-
-  showDetailScreen(m.deeplinkContent, false, skipDetailScreen)
-End Function
 
 Function onTransportVoiceResponse(msg)
   transportVoiceResponse = msg.getData()
   m.top.transportVoiceResponse = transportVoiceResponse
 End Function
 
-
-' Parse launch arguments for any deep linking.
-' Returns a DeeplinkContentNode or invalid
-' @args: assocArray, the args passed to main() at startup
-'
-' Feed: http://cms.adrise.com/roku/partnerSearch/xml
-'
-' ARGUMENTS TO ROKU MAIN():
-'
-' Non-deep link args and example values:
-'   splashTime                      - "1600"
-'   instant_on_run_mode             - "foreground"
-'   lastExitOrTerminationReason     - "EXIT_UNKNOWN"
-'   source                          - 'meta-search', 'external-control'
-'
-' Deep link args:
-'   contentId    - string identifier
-'   entry        - 'banner' or omitted for search source
-'   mediaType    - "season", "series", "episode", "movie", "shortform", and "live"
-'   entry        - string, custom parameter, used for tracking the source of deeplinks, passed to referred analytics events
-'   deviceId     - string, custome paramater, the device id of the device sending the deeplink (used when mobile "casts" to roku)
-'   resumeTime   - integer, custome paramater, the position from which a deeplink should resume (used when mobile "casts" to roku)
-'   refreshToken - string, custome paramater, a token that can be used to refresh the auth token.
-'                  Is used to transfer login info from a "casting" device to roku (used when mobile "casts" to roku)
-'   userId       - integer, custome paramater, the user id of the user sending the deeplink (used when mobile "casts" to roku)
-'
-' deeplinks from iOS look like:
-' http://192.168.20.31:8060/launch/41468?deviceId=E7E674A4%2D25DD%2D4B7A%2DBC67%2DB9AD1BAC7CC5&mediaType=movie&contentID=342067&resumeTime=0&userId=0&entry=iphone
-' http://192.168.20.31:8060/launch/41468?mediaType=episode&entry=iphone&deviceId=E7E674A4%2D25DD%2D4B7A%2DBC67%2DB9AD1BAC7CC5&contentID=456881&userId=0&resumeTime=0
-Function createDeeplinkContentFromStartupArgs(args)
-  'handle/set up any deep linking that may have occurred
-  if (args.contentId <> invalid)
-    tubiLog("Deep Link detected for content id " + args.contentId)
-
-    content = CreateObject("roSGNode", "DeeplinkContentNode")
-    content.id = args.contentId
-
-    ' default deep link source is no-source
-    if args.source = invalid or m.constants.deeplinks[args.source] = invalid
-      content.source = "no-source"
-    else
-      content.source = m.constants.deeplinks[args.source]
-    end if
-
-    ' if there is a parameter called entry with a value, that is the source of the deep link
-    ' typically entry = banner from the Roku banner ads ('entry' is a custom parameter)
-    ' deep link urls with entry source should look like:
-    ' contentID=18267&entry=banner
-    if args.entry <> invalid
-      content.source = args.entry
-    end if
-
-    ' the device id of the device deeplinking to roku. Might be an iOS or android device that is "casting" to roku.
-    if args.deviceId <> invalid and args.deviceId.unescape() <> ""
-      content.sourceDeviceId = args.deviceId.unescape()
-    end if
-
-    ' set up the resume time if we are deeplinking to a specific point in the video
-    if args.resumeTime <> invalid
-      content.nowPos = args.resumeTime.ToInt()
-    end if
-
-    ' if deep linked from Roku search it's possible that we are deep linking to a series, instead of actual video content
-    ' deep links from search for series should like:
-    ' contentID=335&mediaType=series
-    '
-    ' See full list of mediaType at https://sdkdocs.roku.com/display/sdkdoc/External+Control+Guide
-    if args.mediaType = "series"
-      content.type = "series"
-      content.deeplinkType = "series"
-    else if args.mediaType = "season"
-      content.type = "series"
-      content.deeplinkType = "season"
-    else if args.mediaType = "movie"
-      content.type = "video"
-      content.deeplinkType = "movie"
-    else if args.mediaType = "episode"
-      content.type = "video"
-      content.deeplinkType = "episode"
-    end if
-
-    ' remove any 0s that might be prepended to the content id
-    if content.source = "search"
-      prepend = "0"
-      while prepend = "0"
-        prepend = content.id
-        if prepend = "0"
-          length = content.id.len()
-          content.id = content.id.right(length - 1)
-        end if
-      end while
-    end if
-
-    'see tubitv.atlassian.net/wiki/display/EC/Referrals
-    content.medium = "partnership"
-    if args.medium <> invalid
-      content.medium = args.medium
-    end if
-
-    'see tubitv.atlassian.net/wiki/display/EC/Referrals
-    content.campaign = "default-campaign"
-    if args.campaign <> invalid
-      content.campaign = args.campaign
-    end if
-
-    return content
-  else
-    return invalid
-  end if
-End Function
 
 
 '@args: assocArray, the startupArgs passed into main when the channel starts
@@ -1188,6 +1038,24 @@ Function isParentalControlsAdultLevel() as Boolean
 
     if authInfo.parentalrating = invalid or authInfo.parentalrating <> 3
       bEnabled = false
+    end if
+
+  end if
+
+  return bEnabled
+End Function
+
+
+Function isParentalControlsTeensLevel() as Boolean
+  tubiLog("ContentController.isParentalControlsTeensLevel")
+  bEnabled = false
+
+  if isLoggedInUser() = true
+
+    authInfo = m.global.authInfo
+
+    if authInfo.parentalrating = invalid or authInfo.parentalrating = 2
+      bEnabled = true
     end if
 
   end if
@@ -1703,7 +1571,7 @@ Function onCustomResume(msg)
       m.Request = TubiRequest(m.constants.settings)
     end if
 
-    if customResumeLaunchParams.contentId <> invalid and customResumeLaunchParams.mediaType <> invalid
+    if (customResumeLaunchParams.contentId <> invalid and customResumeLaunchParams.mediaType <> invalid) or customResumeLaunchParams.page <> invalid
       ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates
       ' lots of edge cases, so for consistency, restarting the app is easiest.
       restartApp()
@@ -1868,8 +1736,8 @@ Function isReturningUser()
 
   'these were converted days since year Jan 1, 1970, the unix epoch when user first-time launch the app
   daysFromEpochForFirstVisit = Auth.getFirstVisit()
-  
-  'these were converted days since year Jan 1, 1970, the unix epoch 
+
+  'these were converted days since year Jan 1, 1970, the unix epoch
   daysFromEpoch = getNumberOfDaysSinceEpoch()
   if daysFromEpochForFirstVisit <> invalid and daysFromEpoch <> invalid and daysFromEpoch > daysFromEpochForFirstVisit + 1
     returningUser = true

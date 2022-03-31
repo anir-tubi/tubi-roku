@@ -33,10 +33,10 @@ Function init()
 
   BackLabel = m.top.findNode("callToAction")
   if m.constants.deviceInfo.uiResolution <> "FHD"
-    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment 
+    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
-  
+
 End Function
 
 
@@ -64,9 +64,9 @@ End Function
 ' checkForContentAndRefresh()
 ' @param bContentEmpty - Does the passed category have NO content?
 ' @param sCategoryID - The ID of the channel/category that is changing,
-' 
+'
 ' When the content of a channel/category is known to have changed outside of this file, then this function should be called
-' to see if the content should be refreshed. If it should, then validUntil will be set to 0 so the next time this screen 
+' to see if the content should be refreshed. If it should, then validUntil will be set to 0 so the next time this screen
 ' is on screen, then the content will be reloaded.
 Function checkForContentAndRefresh(bContentEmpty, sCategoryID)
   '//Go thru the content and see if category associated with sCategoryID should be hidden or not
@@ -86,7 +86,7 @@ Function checkForContentAndRefresh(bContentEmpty, sCategoryID)
     if bCategoryDisplayingOnScreen = true and bContentEmpty = false
       '//no need to refresh the screen if the category is already displaying AND the category isn't empty
       bRefresh = false
-    else if bCategoryDisplayingOnScreen = false and bContentEmpty = true 
+    else if bCategoryDisplayingOnScreen = false and bContentEmpty = true
       '//no need to refresh the screen if the empty category is already not displaying
       bRefresh = false
     end if
@@ -94,7 +94,7 @@ Function checkForContentAndRefresh(bContentEmpty, sCategoryID)
     if bRefresh = true
       m.top.content.validUntil = 0
     end if
-  end if 
+  end if
 End Function
 
 
@@ -112,7 +112,7 @@ Function onSetCallOfAction()
   end if
   if sCallToAction = ""
     sCallToAction = getTranslation("goBack_default")
-  end if 
+  end if
 
   callToAction = m.top.findNode("callToAction")
   callToAction.text = sCallToAction
@@ -148,6 +148,7 @@ Function onLoadContent()
     items = m.top.content
     m.contentLoadedAndFocused = false
     m.ChannelCategoryGrid.content = items
+    jumpToItemById()
   end if
 End Function
 
@@ -219,7 +220,7 @@ Function reportVisibleItems()
     aVisibleItems = []
     '//Using "visibleItems", indicate what items are visible.
     '//This assumes that the focused item is in the top most visible row
-    for i=lowestVisibleItem to highestVisibleItem 
+    for i=lowestVisibleItem to highestVisibleItem
       '//for loop to go thru the visible items
       item = m.top.content.getChild(i)
       aVisibleItems.push(item)
@@ -259,4 +260,21 @@ Function getTrackingCategoryComponent(item, numColumns, category)
     category_col: col
     category_slug: slug
   }
+End Function
+
+
+Function jumpToItemById()
+  tubilog("ChannelGridScreen.onJumpToItem")
+  sCategoryID = m.top.jumpToItemByID
+  nodeHelpers = TubiNodeHelpers()
+  content = m.top.content
+
+  if content <> invalid and sCategoryID <> ""
+    index = nodeHelpers.getChildIndexById(content, sCategoryID)
+    if index <> -1
+      m.ChannelCategoryGrid.jumpToItem = index
+    end if
+    m.top.jumpToItemByID = ""
+  end if
+
 End Function

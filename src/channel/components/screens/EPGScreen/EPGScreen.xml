@@ -17,12 +17,15 @@
     <!--Timegrid content updated in batches-->
     <field id="timeGridContent" type="node" />
 
+    <!--This field will hold deeplink to linear Content-->
+    <field id="contentIdToFocusOnLoadComplete" type="string" value="" />
+
     <!-- Content might be loading in batch. So render only when timeGridContent is set -->
     <field id="updateTimeGridContent" type="boolean" alwaysNotify="true" />
 
     <!-- Is the content of the EPG Screen loading? -->
     <!-- This field is not currently being used by the screen (as the screen uses the loading indicator in ContentController) but is needed to ensure screens that load EPG content use the same interface and this field is part of that interface.-->
-    <field id="timeGridContentLoading" type="boolean" alwaysNotify="true" />
+    <field id="timeGridContentLoading" type="boolean" alwaysNotify="true" value="false"/>
 
     <!-- Not Used in EPGScreen. But this field is set in SideNav functions and without interface brightScript will throw error  -->
     <field id="enabled" type="boolean" alwaysNotify="true"/>

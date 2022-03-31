@@ -95,7 +95,7 @@ Function refreshEPGScreen(epgscreen)
   else if epgscreen.id = m.constants.ui.screenIds.newsEPGScreen
     mode = m.constants.ui.contentMode.newsEPGScreen
     epgscreen.topNavSelectedId = m.constants.ui.sideNavIds.news
-  else if epgscreen.id = m.constants.ui.screenIds.linearEPG
+  else if epgscreen.id = m.constants.ui.screenIds.epgScreen
     mode = m.constants.ui.contentMode.epgScreen
     epgscreen.topNavSelectedId = m.constants.ui.sideNavIds.linearEPG
     epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
@@ -145,13 +145,13 @@ Function fetchEPGChannels(screen, mode = "tubitv_us_linear")
 End Function
 
 
-Function fetchEPGChannel(screen, channelID)
+Function fetchEPGChannel(screenId, channelID, successCallback, errorCallback)
   cachedChannel = invalid
   cachedAllChannels = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
 
   if cachedAllChannels <> invalid and cachedAllChannels.getChildCount() > 0 and shouldRefresh(cachedAllChannels.getChild(0)) = false
     '//go thru the channels and find the desired channel
-    for i = 0 to cachedAllChannels.getChildCount()
+    for i = 0 to cachedAllChannels.getChildCount() - 1
       cachedChannelTemp = cachedAllChannels.getChild(i)
       if cachedChannelTemp.id = channelID
         if shouldRefresh(cachedChannelTemp) = false
@@ -178,13 +178,13 @@ Function fetchEPGChannel(screen, channelID)
     '//The channel data has been cached, so call the success callback immediately.
     instantResponse = CreateObject("roSGNode", "ContentNode")
     instantResponse.addField("requestorID", "string", false)
-    instantResponse.requestorID = screen.id
+    instantResponse.requestorID = screenId
     '//TODO: Think about better logic of just getting data from Cached Channel. But for now, if we are using contentNode,
     ' we need to clone the original channel which is present in Cache. Otherwise, just appending/replacing the node will reparent the node and next time
     'when Cache has been used, it will be missing the channel which was already reparented.
     clonedCachedChannel = cachedChannel.clone(true)
     instantResponse.appendChild(clonedCachedChannel)
-    onEPGChannelProgramSuccess(instantResponse, false)
+    successCallback(instantResponse, false)
   else
       '//call the API to get new channel data
       channelListIDs = [channelID]
@@ -193,11 +193,11 @@ Function fetchEPGChannel(screen, channelID)
         url : epgProgramInfo.url
         requestType : m.constants.reqNames.getEPGPrograms
         options : epgProgramInfo.options
-        successCallback : onEPGChannelProgramSuccess
-        errorCallback : onEPGChannelProgramError
+        successCallback : successCallback
+        errorCallback : errorCallback
         responseType : "node"
         storeInCacheUponSuccess: true
-        requestorID : screen.id
+        requestorID : screenId
       })
   end if
 
@@ -465,16 +465,24 @@ Function onRefreshEPGScreenVideoPlay(msg)
 
     changeEPGScreenBackground(epgscreen)
     if linearVideoPlayer <> invalid and linearVideoPlayer.state = "playing"
-      m.backgroundGroup.posterVisible = false
+      if epgScreen.timeGridContent = invalid or epgScreen.timeGridContentLoading = true
+        'Anytime Video is playing and epgScreen is empty, then refresh the epgScreen.  This situation might happen when
+        'when we play content directly from deeplink and epgScreen still does not have content if user presses backbutton.
+        refreshEPGScreen(epgScreen)
+        m.backgroundGroup.posterVisible = false
+        startCountdownTimer()
+      else
+        m.backgroundGroup.posterVisible = false
 
-      '//if the linear player is playing a video and it does not match with the current focus, then change focus to that of the playing video
-      focusedChannel = epgScreen.linearChannelFocused
-      if focusedChannel <> invalid and focusedChannel.id <> invalid and isLinearPlayerPlayingThisContent(focusedChannel) = false
-        channelId = linearVideoPlayer.content.id
-        epgScreen.jumpToRowItemByID = [channelId, ""]
+        '//if the linear player is playing a video and it does not match with the current focus, then change focus to that of the playing video
+        focusedChannel = epgScreen.linearChannelFocused
+        if focusedChannel <> invalid and focusedChannel.id <> invalid and isLinearPlayerPlayingThisContent(focusedChannel) = false
+          channelId = linearVideoPlayer.content.id
+          epgScreen.jumpToRowItemByID = [channelId, ""]
+        end if
+
+        startCountdownTimer()
       end if
-
-      startCountdownTimer()
     else ' from top/side Nav
       m.backgroundGroup.posterVisible = true
 
@@ -595,16 +603,24 @@ Function resetEPGScreenContent()
     epgscreen.fullScreenCountdown = -1
   end if
   stopAndHideLinearVideoPlayer()
+  if epgScreen.timeGridContent = invalid or epgScreen.timeGridContentLoading = true
+    ' Any time, due to player error EPGscreen has been presented (for example deeplink content is failed to play)
+    ' and epgScreen.timeGridContent is still empty, in that case fetch/use cache
+    refreshEPGScreen(epgScreen)
+    m.backgroundGroup.posterVisible = false
+  end if
 End Function
 
 
 Function setTimeGridContentLoadingToComplete(screen)
   tubiLog("EPGSCreenHelpers.setTimeGridContentLoading")
   checkAndFixDuplicates(screen)
+  if screen.contentIdToFocusOnLoadComplete <> ""
+    setLinearChannelDeeplink(screen)
+  end if
   screen.updateTimeGridContent = true
-
-  showHideSpinner(false)
   screen.timeGridContentLoading = false
+  showHideSpinner(false)
 End Function
 
 
@@ -646,4 +662,12 @@ Function checkAndFixDuplicates(screen)
     end for
   end if
 
+End Function
+
+
+Function  setLinearChannelDeeplink(screen)
+  tubilog("EPGSCreenHelpers.setLinearChannelDeeplink")
+  contentIdToFocusOnLoadComplete = screen.contentIdToFocusOnLoadComplete
+  screen.contentIdToFocusOnLoadComplete = ""
+  jumpToParentScreenContentByID(contentIdToFocusOnLoadComplete, "", m.constants.ui.screenIds.EPGScreen)
 End Function

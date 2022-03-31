@@ -1,4 +1,4 @@
-Function showCategoryDetailsScreen(content, sPageSource = "")
+Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoadEvents = true)
   categoryDetailsScreen = CreateObject("roSGNode", "CategoryDetailsScreen")
   categoryDetailsScreen.callingPage = sPageSource
   categoryDetailsScreen.trackingLoadStartTime = UpTime(0)
@@ -25,8 +25,12 @@ Function showCategoryDetailsScreen(content, sPageSource = "")
 
   displayDefaultBackground()
 
-  ' don't send page load tracking until category details content is returned from the API
-  pushScreen(categoryDetailsScreen, true, false)
+  if sendNavigationLoadEvents = true
+    ' don't send page load tracking until category details content is returned from the API
+    pushScreen(categoryDetailsScreen, true, false)
+  else
+    pushScreen(categoryDetailsScreen, false, false)
+  end if
 
   ' make queue API request only if the user loggedIn
   if content.id = m.constants.ui.categoryIds.queue and isLoggedInUser() = false

@@ -16,6 +16,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
 
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
@@ -44,6 +45,9 @@
       <field id="callingPage" type="string" />
 
       <field id="reloadUserCategoriesResponse" type="node" alwaysNotify="true"/>
+
+      <!--jumpToItemByID is used to jump to an item on channel/categoryScreen when content is played through deeplink after content has been loaded.-->
+       <field id="jumpToItemByID" type="string" />
 
     <!-- OUTPUT -->
 
