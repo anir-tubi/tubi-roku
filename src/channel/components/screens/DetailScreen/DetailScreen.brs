@@ -44,7 +44,7 @@ Function init()
   m.top.observeFieldScoped("stringNoQueueButton", "onStringChange")
   m.top.observeFieldScoped("stringChannelButton", "onStringChange")
   m.top.observeFieldScoped("stringNoHistoryButton", "onStringChange")
- 
+
 
   m.Menu.observeField("itemSelected", "onMenuItemSelected")
   m.top.observeField("relatedContent", "onRelatedContentChange")
@@ -78,7 +78,7 @@ Function init()
   ' Used to determine if navigate_within_page events should be sent. Only send when the related content already
   ' has focus, not when it gains focus.
   m.relatedHasFocus = false
-  
+
   ' isChannelMenuSelected variable is used for handling the channel selection from detail menu
   m.isChannelMenuSelected = false
 
@@ -101,7 +101,7 @@ End Function
 Function onStringChange(message)
   sStringField = message.GetField()
   sText = message.GetData()
-  
+
   stringNode = invalid
 
   if sStringField = "stringQueueButton"
@@ -166,13 +166,13 @@ End Function
 Function onScreenFocusChange()
   tubiLog("DetailScreen.onScreenFocusChange")
   if m.top.hasFocus() then
-   
-    'After Instant Resume, when pressing back from one detail screen to another detail screen via YMAL 
+
+    'After Instant Resume, when pressing back from one detail screen to another detail screen via YMAL
     'related content(YMAL) thunbnails are not loading. Resetting relatedContent node fixes the issue.
     relatedContent = m.top.relatedContent
     m.top.relatedContent = invalid
     m.top.relatedContent = relatedContent
-   
+
     m.focusTarget.setFocus(true)
     ' force a background update
     m.top.backgroundUriList = m.top.backgroundUriList
@@ -185,7 +185,7 @@ Function onScreenFocusChange()
     if shouldRefresh(m.top.relatedContent) = true
       m.RelatedContentGroup.visible = false
       m.top.refreshRelatedContent = true
-    end if  
+    end if
   end if
 End Function
 
@@ -346,7 +346,7 @@ End Function
 
 Function onIsLoading()
   tubiLog("DetailScreen.onIsLoading")
-  
+
   ' we only want to remove the menu on the initial loading of series screens.
   ' In the case of an error, we populate the screen with series metadata (as opposed to episode metadata)
   ' and we don't want to remove the menu once the screen already has metadata.
@@ -406,7 +406,7 @@ End Function
 ' @itemIndex: int, index location of the item in the menuItems. -1 indicates the item does not exist in the menuItems.
 ' @itemToAdd: one of the DetailMenuItemContentNode children of the DetailScreen (ie m.EpisodesMenuItem). This is optional for remove.
 ' @previousItem: array, indicates which existing item the added item will follow. If the array contains multiple items,
-'                       the first item in the array that is found will dictate the placement of the new item, 
+'                       the first item in the array that is found will dictate the placement of the new item,
 '                       and all other items will be disregarded.
 ' Set basic buttons first, additional buttons will be added based on the input fields of the details screen
 Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = []) As Void
@@ -469,7 +469,7 @@ Function handleMenuItemSelected(itemSelected)
     else if itemSelected.id = "RemoveHistoryMenuItem"
       m.top.removeFromHistorySelected = true
     else if itemSelected.id = "ChannelMenuItem"
-      'on selecting this menu, it is removing the detailScreen from screen stack, so roku negative audio sound is played, 
+      'on selecting this menu, it is removing the detailScreen from screen stack, so roku negative audio sound is played,
       'To play Roku positive audio sound, channelMenuSelected is handled in onKeyEvent.
       m.isChannelMenuSelected = true
     else if itemSelected.id = "signUpMenuItem"
@@ -485,6 +485,7 @@ Function onRelatedContentChange()
     m.RelatedContentGroup.visible = true
     ' To force a single row in postergrid, set the columns
     m.RelatedGrid.numColumns = m.top.relatedContent.getChildCount()
+    m.RelatedGrid.jumpToItem = m.RelatedGrid.itemFocused
   else
     m.RelatedContentGroup.visible = false
     if m.RelatedContentGroup.isInFocusChain()
@@ -688,8 +689,8 @@ Function isReturningUser()
 
   'these were converted days since year Jan 1, 1970, the unix epoch when user first-time launch the app
   daysFromEpochForFirstVisit = m.Auth.getFirstVisit()
-  
-  'these were converted days since year Jan 1, 1970, the unix epoch 
+
+  'these were converted days since year Jan 1, 1970, the unix epoch
   daysFromEpoch = getNumberOfDaysSinceEpoch()
   if daysFromEpochForFirstVisit <> invalid and daysFromEpoch <> invalid and daysFromEpoch > daysFromEpochForFirstVisit + 1
     returningUser = true
