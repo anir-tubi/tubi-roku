@@ -1147,12 +1147,16 @@ Function getTranslation_es_MX()
       "message": "Todo"
     },
     "menu_epg_sports": {
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the all EPG screen.",
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Sports EPG screen.",
       "message": "Deportes"
     },
     "menu_epg_news": {
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the all EPG screen.",
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the News EPG screen.",
       "message": "Noticias"
+    },
+    "menu_epg_entertainment": {
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Entertainment EPG screen.",
+      "message": "Entretenimiento"
     },
     "epg_starts_at": {
       "description": "Program time Title when user selects a future program on EPG.",
@@ -1294,6 +1298,10 @@ Function getTranslation_es_MX()
       "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled due to parental set to Teens",
       "message": "Por favor, desactiva el control parental para utilizar esta función."
     },
+    "dialog_contentNotAvailable_Parental_description": {
+      "description": "Message of a Dialog Window that is shown when a deeplink content can not played because of user's parental control setting",
+      "message": "Por favor, desactiva el control parental para utilizar esta función."
+    },
     "error_connection_title": {
       "description": "title of error window when there is a connection error",
       "message": "Error de conexión"
@@ -1311,7 +1319,7 @@ Function getTranslation_es_MX()
       "message": "Esta versión de Tubi ya no es compatible. Para actualizar, sal de la aplicación Tubi y ve a:\n\nConfiguración> Sistema> Actualización del sistema> Verificar ahora"
     },
     "dialog_fullSynopsis_title": {
-      "description": "title of a dialog window that shows the full desciption of a video item",
+      "description": "title of a dialog window that shows the full description of a video item",
       "message": "Sinopsis completa"
     },
     "dialog_parentalPassword_title": {
@@ -1325,6 +1333,22 @@ Function getTranslation_es_MX()
     "dialog_signIn_title": {
       "description": "title of a dialog window when it asks the user to sign in",
       "message": "Por favor, Iniciar Sesión"
+    },
+    "dialog_confirmCorrectAge_title": {
+      "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
+      "message": "Naciste en {birthYear}"
+    },
+    "dialog_confirmCorrectAge_description": {
+      "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
+      "message": "Por favor confirma para continuar"
+    },
+    "dialog_confirmCorrectAge_confirm": {
+      "description": "label of a dialog window button that will confirm app user's age is correct",
+      "message": "Sí"
+    },
+    "dialog_confirmCorrectAge_edit": {
+      "description": "label of a dialog window button that will let user edit their age again",
+      "message": "Editar"
     },
     "dialog_kidsExit_title": {
       "description": "title of a dialog window when the user is attempting to exit kids Mode",
@@ -1343,15 +1367,23 @@ Function getTranslation_es_MX()
       "message": "Bienvenido a Tubi Niños"
     },
     "dialog_kidsWelcomeAgeGate_description": {
-      "description": "A description informing users they are only eligible to view Tubi in kids mode",
-      "message": "Solo estas elegible para ver Tubi Niños en este momento."
+      "description": "A description informing users they cannot exit Tubi Kids for the next 24 hours",
+      "message": "No puedes salir de Tubi Kids en este momento. Inténtelo de nuevo en 24 horas. Preguntas? Envíanos una línea a www.tubi.tv/support"
+    },
+    "dialog_cannotExitKidsMode_title": {
+      "description": "Title for dialog telling the user they can not exit kids mode",
+      "message": "No se pudo Salir del Modo Niños"
+    },
+    "dialog_cannotExitKidsMode_description": {
+      "description": "Description for dialog telling the user they can not exit kids mode",
+      "message": "Por favor, inténtelo de nuevo en 24 horas.\nPreguntas? Háganos saber en support@tubi.tv"
     },
     "dialog_exitApp_title": {
-      "description": "Title of ther dialog window that asks the user if they want to exit the app",
+      "description": "Title of the dialog window that asks the user if they want to exit the app",
       "message": "¿Estás seguro?"
     },
     "dialog_exitApp_description": {
-      "description": "description of ther dialog window that asks the user if they want to exit the app",
+      "description": "description of the dialog window that asks the user if they want to exit the app",
       "message": "¿Seguro que quieres salir de Tubi?"
     },
     "error_noGetChannels_description": {
@@ -1371,7 +1403,7 @@ Function getTranslation_es_MX()
       "message": "Para ver este video gratis, por favor, regístrate o inicia sesión."
     },
     "error_matureContent_title": {
-      "description": "Title of the dialog window when user attempts to play mature content but they need to be sigfned in first",
+      "description": "Title of the dialog window when user attempts to play mature content but they need to be signed in first",
       "message": "Contenido adulto"
     },
     "dialog_signOut_title": {
@@ -1468,6 +1500,10 @@ Function getTranslation_es_MX()
     },
     "error_deeplink_content": {
       "description": "Error message when the app can not retrieve the deeplink content.",
+      "message": "El título que has elegido no está disponible en este momento"
+    },
+    "error_deeplink_page": {
+      "description": "Error message when the app can not retrieve the page requested through deeplink",
       "message": "El título que has elegido no está disponible en este momento"
     },
     "error_tryAgain_title": {
@@ -1703,8 +1739,8 @@ Function getTranslation_es_MX()
       "message": "No pudimos mandar tu fecha de nacimiento a nuestros servidores con éxito."
     },
     "screenAgeVerification_header": {
-      "description": "A header message welcoming users to Tubi on Age required screen",
-      "message": "Bienvenido a Tubi, {firstname}"
+      "description": "A header message on the Age required screen asking them to confirm their age",
+      "message": "Confirma tu edad*"
     },
     "screenAgeVerification_sub_header": {
       "description": "A sub header message to direct users to enter their birth date",
@@ -1914,7 +1950,7 @@ Function getTranslation_es_MX()
     },
     "why_ask_age_description": {
       "description": "The main message which explains why Tubi is asking for the users year of birth",
-      "message": "Usamos esta información para confirmar si satisfaces los requerimientos de edad presentados en nuestros Términos de uso y para personalizar tu experiencia. Lee los Términos de uso en: www.tubitv.com/terms ¿Preguntas? Haznos saber a: support@tubi.tv"
+      "message": "*Usamos esta información para confirmar si satisfaces los requerimientos de edad presentados en nuestros Términos de uso y para personalizar tu experiencia. Lee los Términos de uso en: www.tubitv.com/terms ¿Preguntas? Haznos saber a: support@tubi.tv"
     },
     "signIn_screen_heading": {
       "description": "Title on the signIn screen",
@@ -2022,7 +2058,7 @@ Function getTranslation_es_MX()
     },
     "search_voice_hint": {
       "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed at the beginning of the sentence.",
-      "message": "Habilita el control de voz, mantén presionado el micrófono en tu control"
+      "message": "Para habilitar el control de voz, oprime y mantén presionado el botón del micrófono en tu control"
     },
     "dialog_button_signUp": {
       "description": "The label of the button in a dialog window that allows the user to sign up into the app.",
