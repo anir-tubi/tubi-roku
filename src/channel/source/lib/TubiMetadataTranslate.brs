@@ -636,18 +636,6 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     continueWatchingIndex = 4
     queueIndex = 5
 
-    '//::TODO:: Remove the kidsModeFeatureOn check once we have API support
-    kidsModeFeatureOn = false   'Should the kids Mode feature be made available for the user to interact with
-    if m.constants.deviceInfo.countryCode <> invalid and (UCase(m.constants.deviceInfo.countryCode) = "US" or UCase(m.constants.deviceInfo.countryCode) = "CA")
-      kidsModeFeatureOn = true
-    end if
-
-    '//::TODO:: Remove the parentalRating check once we have API support
-    parentalRating = 3
-    if authInfo <> invalid and authInfo.parentalRating <> invalid
-      parentalRating = authInfo.parentalRating
-    end if 
-
     'set up AAs for all categories
     for i=0 to containers.count()-1
       container = containers[i]
@@ -673,7 +661,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
       end if
     end for
 
-    translated.update(homescreenAA)
+    translated.update(homescreenAA, true)
     translated.addField("continueWatchingIndex", "integer", false)
     translated.addField("queueIndex", "integer", false)
     translated.continueWatchingIndex = continueWatchingIndex
@@ -866,33 +854,15 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     return translated
   end if
 
-  ' Store the gridItemType as necessary (only for landscape, linear, and vitg). 
-  ' We do it here manually, after creating the child nodes, to avoid having to define
-  ' a custom content node which have proven to be much slower to instantiate.
-  ' Could use some testing though.
-  landscape = m.constants.ui.gridItemTypes.landscape
-  vitg = m.constants.ui.gridItemTypes.vitg
-  linear = m.constants.ui.gridItemTypes.linear
-  gridItemType = m.getGridItemType(container, sOrientation, m.constants)
-
 
   if type(categoryMetadata) = "roAssociativeArray"
     ' buildCategoryAA always returns AA.state = "partial",
     ' but any single category request should be considered fully loaded
     categoryMetadata.state = "loaded"
-    translated.update(categoryMetadata)
+    translated.update(categoryMetadata, true)
     nodeCount = 1 + translated.getChildCount()
   end if
 
-  if gridItemType = landscape or gridItemType = vitg or gridItemType = linear
-    for i = 0 to translated.getChildCount()-1
-      child = translated.getChild(i)
-      if child.hasField("gridItemType") <> true
-        child.addField("gridItemType", "string", false)
-      end if
-      child.gridItemType = gridItemType
-    end for
-  end if
 
   tubiLog("TranslateMetadata converted " + stri(nodeCount) + " nodes")
   return translated
@@ -940,7 +910,7 @@ End Function
 ' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
 Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = invalid, sOrientation = "", bFullData = false, contentMode = "homeScreen")
 
-  categoryParent = m.buildCategoryParentInfo(container, contentMode)
+  categoryParent = m.buildCategoryParentInfo(container, contentMode, sOrientation)
   if container.type = m.contentTypes.linear
     if m.experiments.getExperimentResource("roku_linear_epg", "roku_linear_epg_v2").update_homescreen = true
       if container.children <> invalid and container.children.count() > 0
@@ -1028,9 +998,10 @@ End Function
 ' @container: assocArray, the container/category metadata as returned by the API, not including metadata
 '                         for each child of the container/category
 ' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
+' @sOrientation: string, should the thumbnail be a "portrait" or "landscape" (match against m.constants.ui.gridItemTypes values)
 '
 ' @returns: assocArray, an AA that can be used with node.update() to create a TubiCategoryNode
-Function tubiMetadataTranslate_buildCategoryParentInfo(container, contentMode = "homeScreen")
+Function tubiMetadataTranslate_buildCategoryParentInfo(container, contentMode = "homeScreen", sOrientation = "")
   updateMetadata = {}
 
   if type(container) = "roAssociativeArray"
@@ -1055,6 +1026,10 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, contentMode = 
       state: "partial"
       gridItemType: ""
     }
+
+    if sOrientation <> "" then
+      updateMetadata.gridItemType = m.getGridItemType(container, sOrientation, m.constants)
+    end if
 
     updateMetadata = m.setSponsorshipInfo(updateMetadata, container.sponsorship)
 
