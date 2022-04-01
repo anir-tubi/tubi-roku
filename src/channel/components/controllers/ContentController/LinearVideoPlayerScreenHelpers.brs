@@ -653,8 +653,8 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
   currentScreen = getCurrentScreen()
   if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen
     if bContinueToPlay = true
-      ' sports epg screen or news epg screen might not have the contentID. So search for content ID and handle the back logic
-      if currentScreen.associatedScreenID = m.constants.ui.screenIds.newsEPGScreen or currentScreen.associatedScreenID = m.constants.ui.screenIds.sportsEPGScreen
+      ' sports epg screen, news epg screen, or entertainment epg screen might not have the contentID. So search for content ID and handle the back logic
+      if isIDofAnEpgScreen(currentScreen.associatedScreenID) = true
         handleBackToEPGScreen(videoPlayer.originalContent, currentScreen.associatedScreenID)
 
         '//animate the video player into the corner
@@ -757,8 +757,7 @@ Function showLinearPlayerError(error_message = "", errorCode = invalid)
       trackingTask: m.trackingLoggingTask
     }
     'in case of error retrieving the player content, then stop the countdown timer and stop the video player. That way, focus on stay on the current content but not automatically try to play the error content.
-    screenID = videoPlayer.associatedScreenID
-    if screenID = m.constants.ui.screenIds.epgScreen or screenID = m.constants.ui.screenIds.sportsEPGScreen or screenID = m.constants.ui.screenIds.newsEPGScreen
+    if isIDofAnEpgScreen(videoPlayer.associatedScreenID) = true
       showErrorModal(modalInfo, onRetryLinearPlayerError, invalid, resetEPGScreenContent, invalid)
     else
       showErrorModal(modalInfo, onRetryLinearPlayerError, invalid)
@@ -961,12 +960,12 @@ Function handleBackToEPGScreen(content, screenId)
   if content <> invalid
     contentId = content.id
     isContentPresent = doesEpgScreenHaveContent(contentId,screenId)
-    'if Content is not present in sports or news screen, then go back to 'all epg' screen.
+    'if Content is not present in sports, news, or entertainment screen, then go back to 'all epg' screen.
     if isContentPresent = false
       jumpToParentScreenContentByID(contentId, "", m.constants.ui.screenIds.EPGScreen)
       showDefaultEPGScreen()
     else
-      ' if content is present, then go back to sports/news screen
+      ' if content is present, then go back to sports/news/entertainment screen
       jumpToParentScreenContentByID(contentId, "", screenId)
       popScreen(true, true)
     end if

@@ -382,9 +382,10 @@ End Function
 ' @includeLinearTV: boolean, true if a linear TV item should be included
 Function generateTopNavContentItems()
   menuItemIds = [
-    m.constants.ui.sideNavIds.linearepg
+    m.constants.ui.sideNavIds.linearEPG
     m.constants.ui.sideNavIds.news
     m.constants.ui.sideNavIds.sports
+    m.constants.ui.sideNavIds.entertainment
   ]
 
   parent = CreateObject("roSGNode", "ContentNode")
@@ -398,6 +399,8 @@ Function generateTopNavContentItems()
       item.title = getTranslation("menu_epg_news")
     else if id = m.constants.ui.sideNavIds.sports
       item.title = getTranslation("menu_epg_sports")
+    else if id = m.constants.ui.sideNavIds.entertainment
+      item.title = getTranslation("menu_epg_entertainment")
     end if
   end for
 
@@ -435,6 +438,9 @@ Function onIDChange()
   else if m.top.id = m.constants.ui.screenIds.newsEPGScreen
     newTrackingPageInfo.pageType = "news_browse_page"
     m.top.screenLevel = m.constants.ui.screenLevels.newsEPGScreen
+  else if m.top.id = m.constants.ui.screenIds.entertainmentEPGScreen
+    newTrackingPageInfo.pageType = "entertainment_browse_page"
+    m.top.screenLevel = m.constants.ui.screenLevels.entertainmentEPGScreen
   else
     m.top.trackingPageInfo.pageType = "linear_browse_page"
     m.top.screenLevel = m.constants.ui.screenLevels.epgScreen

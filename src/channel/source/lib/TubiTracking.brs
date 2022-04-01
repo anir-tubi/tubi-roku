@@ -669,6 +669,10 @@ Function tubiTracking_getOneOfs()
     i: "i"  'filler because empty fields are removed
   }
 
+  entertainment_browse_page = {
+    i: "i"  'filler because empty fields are removed
+  }
+
   latino_browse_page = {
     i: "i"  'filler because empty fields are removed
   }
@@ -773,6 +777,7 @@ Function tubiTracking_getOneOfs()
     series_browse_page: series_browse_page
     news_browse_page: news_browse_page
     sports_browse_page: sports_browse_page
+    entertainment_browse_page: entertainment_browse_page
     latino_browse_page: latino_browse_page
     onboarding_page: onboarding_page
     landing_page: landing_page
@@ -804,6 +809,7 @@ Function tubiTracking_getOneOfs()
     dest_series_browse_page: series_browse_page
     dest_news_browse_page: news_browse_page
     dest_sports_browse_page: sports_browse_page
+    dest_entertainment_browse_page: entertainment_browse_page
     dest_latino_browse_page: latino_browse_page
     dest_linear_browse_page: linear_browse_page
     dest_onboarding_page: onboarding_page
@@ -934,6 +940,7 @@ Function tubiTracking_getSideNavPageMap(constants)
     if sideNavIds.linearEPG <> invalid then map[sideNavIds.linearEPG] = "LINEAR"
     if sideNavIds.sports <> invalid then map[sideNavIds.sports] = "SPORTS"
     if sideNavIds.news <> invalid then map[sideNavIds.news] = "NEWS"
+    if sideNavIds.entertainment <> invalid then map[sideNavIds.entertainment] = "ENTERTAINMENT"
     if sideNavIds.subtitles <> invalid then map[sideNavIds.subtitles] = "SUBTITLES"
     if sideNavIds.back <> invalid then map[sideNavIds.back] = "BACK"
   end if

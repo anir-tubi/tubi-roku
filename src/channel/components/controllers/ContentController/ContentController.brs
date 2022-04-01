@@ -1252,6 +1252,7 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
   setContentToRefresh(m.constants.ui.screenIds.sportsEPGScreen)
   setContentToRefresh(m.constants.ui.screenIds.newsEPGScreen)
+  setContentToRefresh(m.constants.ui.screenIds.entertainmentEPGScreen)
 End Function
 
 

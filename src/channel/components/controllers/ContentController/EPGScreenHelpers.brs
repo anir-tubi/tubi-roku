@@ -95,12 +95,12 @@ Function refreshEPGScreen(epgscreen)
   else if epgscreen.id = m.constants.ui.screenIds.newsEPGScreen
     mode = m.constants.ui.contentMode.newsEPGScreen
     epgscreen.topNavSelectedId = m.constants.ui.sideNavIds.news
-  else if epgscreen.id = m.constants.ui.screenIds.epgScreen
-    mode = m.constants.ui.contentMode.epgScreen
-    epgscreen.topNavSelectedId = m.constants.ui.sideNavIds.linearEPG
-    epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
+  else if epgscreen.id = m.constants.ui.screenIds.entertainmentEPGScreen
+    mode = m.constants.ui.contentMode.entertainmentEPGScreen
+    epgscreen.topNavSelectedId = m.constants.ui.sideNavIds.entertainment
   else
     mode = m.constants.ui.contentMode.epgScreen
+    epgscreen.topNavSelectedId = m.constants.ui.sideNavIds.linearEPG
     epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
   end if
 
@@ -127,7 +127,7 @@ End Function
 
 
 ' @param screen: roSGNode, Screen that is fetching and is hosting the EPG Channels: i.e. epgScreen, Linear Video Player Screen
-' @param mode: String, The mode that will dictate that what kind of channels will be gathered for the EPG: i.e. all, sports, news
+' @param mode: String, The mode that will dictate that what kind of channels will be gathered for the EPG: i.e. all, sports, news, entertainment
 Function fetchEPGChannels(screen, mode = "tubitv_us_linear")
   epgContainerInfo = m.tensorapi.getEPGChannelidsReqInfo(mode)
 
@@ -517,6 +517,13 @@ Function showNewsEPGScreen(componentToFocus = "")
 End Function
 
 
+' @componentToFocus: string, one of the values in constants.ui.epgScreen.focusItems
+Function showEntertainmentEPGScreen(componentToFocus = "")
+  tubiLog("EPGScreenHelpers.showEntertainmentEPGScreen")
+  showEPGScreen(m.constants, m.constants.ui.screenIds.entertainmentEPGScreen, componentToFocus)
+End Function
+
+
 Function onLoadAllEPGChannels(msg)
   tubiLog("EPGScreenHelpers.onLoadAllEPGChannels")
   epgScreen = msg.getRoSGNode()
@@ -575,6 +582,18 @@ Function isAnEpgScreen(Screen)
   else 
     return screen.isSubType("EPGHomeScreen")
   end if
+End Function
+
+
+' Is the passed ID belong to an EPG Screen?
+Function isAnEPGScreenID(sID)
+  tubiLog("EPGScreenHelpers.isAnEPGScreenID")
+  bReturn = false
+  if sID = m.constants.ui.screenIds.epgScreen or sID = m.constants.ui.screenIds.sportsEPGScreen or sID = m.constants.ui.screenIds.newsEPGScreen or sID = m.constants.ui.screenIds.entertainmentEPGScreen
+    bReturn = true
+  end if
+  
+  return bReturn
 End Function
 
 

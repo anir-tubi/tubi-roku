@@ -83,6 +83,8 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
         showNewsEPGScreen(componentToFocus)
       else if topNavItem.id = m.constants.ui.sideNavIds.sports
         showSportsEPGScreen(componentToFocus)
+      else if topNavItem.id = m.constants.ui.sideNavIds.entertainment
+        showEntertainmentEPGScreen(componentToFocus)
       end if
     else
       ' If the user selected a top nav item that is associated with the current screen,

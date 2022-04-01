@@ -157,12 +157,16 @@ Function getTranslation_en_US()
       "message": "All"
     },
     "menu_epg_sports":{
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the all EPG screen.",
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Sports EPG screen.",
       "message": "Sports"
     },
     "menu_epg_news":{
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the all EPG screen.",
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the News EPG screen.",
       "message": "News"
+    },
+    "menu_epg_entertainment":{
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Entertainment EPG screen.",
+      "message": "Entertainment"
     },
     "epg_starts_at": {
       "description": "Program time Title when user selects a future program on EPG.",

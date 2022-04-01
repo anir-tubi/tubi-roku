@@ -541,6 +541,7 @@ Function getSideNavIdAssociatedWithScreen(screen)
     idsAssociatedWithEpg[m.constants.ui.screenIds.epgScreen] = true
     idsAssociatedWithEpg[m.constants.ui.screenIds.sportsEPGScreen] = true
     idsAssociatedWithEpg[m.constants.ui.screenIds.newsEPGScreen] = true    
+    idsAssociatedWithEpg[m.constants.ui.screenIds.entertainmentEPGScreen] = true    
   end if
 
   if screen.id <> invalid

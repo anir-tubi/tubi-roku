@@ -1575,8 +1575,10 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
       translated.id = m.constants.ui.contentIds.timeGridContent
     else if contentToTranslate.mode.id = m.constants.ui.contentMode.sportsEPGScreen
       translated.id = m.constants.ui.contentIds.sportsTimeGridContent
-    else if contentToTranslate.mode.id = m.constants.ui.contentMode.newsepgScreen
+    else if contentToTranslate.mode.id = m.constants.ui.contentMode.newsEPGScreen
       translated.id = m.constants.ui.contentIds.newsTimeGridContent
+    else if contentToTranslate.mode.id = m.constants.ui.contentMode.entertainmentEPGScreen
+      translated.id = m.constants.ui.contentIds.entertainmentTimeGridContent
     end if
   end if
 

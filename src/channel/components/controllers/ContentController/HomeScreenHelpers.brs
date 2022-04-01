@@ -846,12 +846,17 @@ Function stopCountdownTimer()
     epgScreen.fullscreenCountdown = -1
   end if
 
-  epgScreen = getFromScreenCache(m.constants.ui.screenIds.SportsEPGScreen)
+  epgScreen = getFromScreenCache(m.constants.ui.screenIds.sportsEPGScreen)
   if epgScreen <> invalid
     epgScreen.fullscreenCountdown = -1
   end if
 
-  epgScreen = getFromScreenCache(m.constants.ui.screenIds.NewsEPGScreen)
+  epgScreen = getFromScreenCache(m.constants.ui.screenIds.newsEPGScreen)
+  if epgScreen <> invalid
+    epgScreen.fullscreenCountdown = -1
+  end if
+
+  epgScreen = getFromScreenCache(m.constants.ui.screenIds.entertainmentEPGScreen)
   if epgScreen <> invalid
     epgScreen.fullscreenCountdown = -1
   end if
