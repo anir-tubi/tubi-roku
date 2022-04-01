@@ -654,7 +654,7 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
   if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen
     if bContinueToPlay = true
       ' sports epg screen, news epg screen, or entertainment epg screen might not have the contentID. So search for content ID and handle the back logic
-      if isIDofAnEpgScreen(currentScreen.associatedScreenID) = true
+      if isAnEPGScreenID(currentScreen.associatedScreenID) = true
         handleBackToEPGScreen(videoPlayer.originalContent, currentScreen.associatedScreenID)
 
         '//animate the video player into the corner
@@ -757,7 +757,7 @@ Function showLinearPlayerError(error_message = "", errorCode = invalid)
       trackingTask: m.trackingLoggingTask
     }
     'in case of error retrieving the player content, then stop the countdown timer and stop the video player. That way, focus on stay on the current content but not automatically try to play the error content.
-    if isIDofAnEpgScreen(videoPlayer.associatedScreenID) = true
+    if isAnEPGScreenID(videoPlayer.associatedScreenID) = true
       showErrorModal(modalInfo, onRetryLinearPlayerError, invalid, resetEPGScreenContent, invalid)
     else
       showErrorModal(modalInfo, onRetryLinearPlayerError, invalid)

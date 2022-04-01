@@ -585,7 +585,8 @@ Function isAnEpgScreen(Screen)
 End Function
 
 
-' Is the passed ID belong to an EPG Screen?
+' Is the passed ID associated with an EPG Screen?
+' @sID: string, the id of a screen component
 Function isAnEPGScreenID(sID)
   tubiLog("EPGScreenHelpers.isAnEPGScreenID")
   bReturn = false

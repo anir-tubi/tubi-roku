@@ -591,15 +591,11 @@ Function tubiAds_updateYouboraOptions(youboraTask, ctx, impressionCount)
 
     if ctx.ad <> invalid
       if ctx.ad.creativeAdId <> invalid and ctx.ad.creativeAdId <> ""
-        'rainmaker
         youboraOptions["ad.extraparam.1"] = ctx.ad.creativeAdId
-      else if ctx.ad.adId <> invalid
-        'adrise
-        youboraOptions["ad.extraparam.1"] = ctx.ad.adId
       end if
 
-      if ctx.ad.adVideoId <> invalid
-        youboraOptions["ad.extraparam.2"] = ctx.ad.adVideoId
+      if ctx.ad.streams <> invalid and ctx.ad.streams[0] <> invalid and ctx.ad.streams[0].id <> invalid
+        youboraOptions["ad.extraparam.2"] = ctx.ad.streams[0].id
       end if
 
       if youboraOptions["ad.extraparam.1"] <> invalid and youboraOptions["ad.extraparam.2"] <> invalid
