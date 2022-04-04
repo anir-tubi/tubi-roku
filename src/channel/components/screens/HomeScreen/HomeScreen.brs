@@ -1,7 +1,5 @@
 Function init()
-  tubiLog("HomeScreen.init")  
-  '//Send the experiment exposure event when the homescreen is created
-  experiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", true)
+  tubiLog("HomeScreen.init")
 
   m._ = rodash()
   m.constants = m.global.constants
@@ -84,7 +82,7 @@ Function init()
   m.sponsorSlideAmt = 29 'the amount the grid slides up to fit the sponsored header. This is the difference of the heights of the sponsored and normal row titles
   m.sponsorMaskOffsetDiff = 29 'the diff in the amount the content area mask is offset in the up direction for sponsored rows. This is the difference of the heights of the sponsored and normal row titles
 
-  if experiment.update_homescreen = true
+  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).update_homescreen = true
     m.linearSlideAmt = 385 'the amount the grid slides up to fit the linear content item
     m.linearMaskOffsetDiff = 280 'the diff in the amount the content area mask is offset in the up direction for the linear news container
   else
@@ -163,7 +161,9 @@ Function generateTopNavContentItems(includeLinearTV = false)
     m.constants.ui.sideNavIds.tv
   ]
   if includeLinearTV = true
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).enabled = false
+    '//Note: The EPG experiment exposure event is sent now when the homescreen is displayed - 
+    '//   this ensures it fires during control or variants when displaying homescreen BUT not during kids mode or when displaying any homescreen that does not have a top nav
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", true).enabled = false
       menuItemIds.push(m.constants.ui.sideNavIds.linearTV)
     else
       menuItemIds.push(m.constants.ui.sideNavIds.linearEPG)
