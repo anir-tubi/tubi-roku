@@ -16,6 +16,7 @@ Function init()
   m.leftSide = m.top.findNode("leftSide")
   m.SearchText = m.top.findNode("SearchText")
   m.searchScreenInfoPanel = m.top.findNode("SearchSCreenInfoPanel")
+  hasVoiceRemoteFeature = m.constants.deviceInfo.hasVoiceRemoteFeature
 
   m.voiceHintfont = CreateObject("roSGNode", "Font")
   m.voiceHintfont.uri = "pkg:/fonts/Vaud-SemiBold.ttf"
@@ -30,7 +31,7 @@ Function init()
     m.KidsModeMessage.opacity = 0.6
 
     'show voice hint message if user has voice remote
-    if m.constants.deviceInfo.hasHandsFreeVoiceFeature = true
+    if hasVoiceRemoteFeature = true
       setTextForVoiceHint()
     end if
 
@@ -49,7 +50,7 @@ Function init()
     m.keyboard.translation = [0, 0]
 
     'show voice hint message if user has voice remote
-    if m.constants.deviceInfo.hasHandsFreeVoiceFeature = true
+    if hasVoiceRemoteFeature = true
       createSearchHintLayoutGroup()
       m.searchHintGroup.translation = [0, 643]
       m.voiceHint = m.searchHintGroup.createChild("Label")
