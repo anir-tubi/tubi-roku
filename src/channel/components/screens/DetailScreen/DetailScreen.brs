@@ -682,25 +682,3 @@ Function handlePlayInput()
     m.top.resumeSelected = true
   end if
 End Function
-
-
-Function isReturningUser()
-  returningUser = false
-
-  'these were converted days since year Jan 1, 1970, the unix epoch when user first-time launch the app
-  daysFromEpochForFirstVisit = m.Auth.getFirstVisit()
-
-  'these were converted days since year Jan 1, 1970, the unix epoch
-  daysFromEpoch = getNumberOfDaysSinceEpoch()
-  if daysFromEpochForFirstVisit <> invalid and daysFromEpoch <> invalid and daysFromEpoch > daysFromEpochForFirstVisit + 1
-    returningUser = true
-  end if
-  return returningUser
-End Function
-
-
-Function isLoggedInUser()
-  authInfo = m.global.authInfo
-
-  return (authInfo <> invalid and authInfo.userId <> invalid)
-End Function

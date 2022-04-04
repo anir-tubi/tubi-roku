@@ -329,13 +329,3 @@ Function execGetUserInfo()
     m.top.userInfo = invalid
   end if
 End Function
-
-
-' @authInfo: assocArray, authInfo AA as returned by Auth().getAuthInfo()
-Function isLoggedInUser(authInfo = invalid)
-  if authInfo = invalid
-    authInfo = m.global.authInfo
-  end if
-
-  return (authInfo <> invalid and authInfo.userId <> invalid)
-End Function

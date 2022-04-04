@@ -9,6 +9,7 @@
   <script type="text/brightscript" uri="SideNav.brs" />
   <script type="text/brightscript" uri="../ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
@@ -17,6 +18,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
 
   <interface>
     <!-- INPUTS -->
