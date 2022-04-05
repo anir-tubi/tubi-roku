@@ -427,7 +427,7 @@ Function handleLinearDeeplinkContent()
         sCatSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.EPGScreen]
       else
         if m.enteredFromDeepLink = true
-          sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoint.news, m.Tracking, m.trackingLoggingTask, m.constants)
+          sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.news, m.Tracking, m.trackingLoggingTask, m.constants)
         end if
         showLinearTVScreen()
         sCatSideNavID = m.constants.ui.sideNavIds.home
