@@ -668,6 +668,7 @@ Function popScreenAfterSignInProcess()
     "SignInScreen": true
     "SignUpScreen": true
     "EmailInputScreen": true
+    "AgeVerificationScreen": true
   }
 
   count = m.screenStack.getChildCount()-1
