@@ -3,7 +3,7 @@
 
 <component name="YBPluginRokuVideo" extends="YBPluginGeneric">
     <interface>
-		  <field id = "taskState" type = "string" />
+		  <field id = "taskState" type = "string" alwaysNotify = "true"/>
     </interface>
 
     <script type="text/brightscript" uri="./YBPluginRokuVideo.brs"/>

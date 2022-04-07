@@ -25,6 +25,7 @@ sub init()
     m.getMediaDuration = getMediaDuration
     m.getTitle = getTitle
     m.getIsLive = getIsLive
+    m.getPlayrate = getPlayrate
     m.getRendition = getRendition
     m.getThroughput = getThroughput
     m.getTotalBytes = getTotalBytes
@@ -72,7 +73,7 @@ sub _run()
     YouboraLog("YBPluginGeneric.brs - run")
 
     m.pluginName = "Generic"
-    m.pluginVersion = "6.5.22-" + m.pluginName
+    m.pluginVersion = "6.5.25-" + m.pluginName
 
     m.infoManager = InfoManager(m)
     setOptions(m.top.options)
@@ -210,6 +211,10 @@ function getBitrate()
     return -1
 end function
 
+function getPlayrate()
+    return invalid
+end function
+
 function getTotalBytes()
     return 0
 end function
@@ -279,8 +284,6 @@ sub eventHandler(event as string, params = invalid)
     if event = "init"
         m.viewManager.sendRequest("init", params)
     else if event = "play"
-        'Remove when finished with delayed start
-        if m.isStarted = false and m.viewManager.isInitiated = false then ?"Play event// TITLE: "; m.infoManager.getTitle(); " RESOURCE: "; m.infoManager.getResource(); " GETISLIVE: "; m.infoManager.getIsLive(); " DURATION: "; m.infoManager.getMediaDuration()
         if (m.infoManager.getTitle() <> invalid and m.infoManager.getTitle() <> "") and (m.infoManager.getResource() <> invalid and m.infoManager.getResource() <> "Unknown") and (m.infoManager.getIsLive() = true or m.infoManager.getMediaDuration() <> 0) and m.isStarted = false and m.isExtraMetadataReady() = true or (m.isExtraMetadataReady() = true and m.viewManager.isJoinSent = true)
             m.viewManager.sendRequest("start", params)
             m.isStarted = true

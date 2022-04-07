@@ -6,41 +6,41 @@ function ViewManager(_infoManager as Object, plugin) As Object
     'Methods
     this.pingCallback = ViewManager_pingCallback
     this.beatCallback = ViewManager_beatCallback
-	this.sendRequest = ViewManager_sendRequest
+		this.sendRequest = ViewManager_sendRequest
+		this.getDiff = ViewManager_getDiff
 
     'Fields
-	this.isInitiated = false
+		this.isInitiated = false
     this.isStartSent = false
-	this.isJoinSent = false
-	this.isPaused = false
-	this.isSeeking = false
-	this.isBuffering = false
-	this.isShowingAds = false
-	this.isErrorSent = false
-	this.isAdPaused = false
-	this.isAdJoinSent = false
-	this.isAdInitiated = false
-	this.isAdBreakStarted = false
-	this.isAdManifestSent = false
+		this.isJoinSent = false
+		this.isPaused = false
+		this.isSeeking = false
+		this.isBuffering = false
+		this.isShowingAds = false
+		this.isErrorSent = false
+		this.isAdPaused = false
+		this.isAdJoinSent = false
+		this.isAdInitiated = false
+		this.isAdBreakStarted = false
+		this.isAdManifestSent = false
 
-	this.isFinished = false
+		this.isFinished = false
 
     this.chronoSeek = Chrono()
     this.chronoPause = Chrono()
     this.chronoJoinTime = Chrono()
     this.chronoBuffer = Chrono()
-	this.chronoPing = Chrono()
-	this.chronoBeat = Chrono()
+		this.chronoPing = Chrono()
+		this.chronoBeat = Chrono()
 
-	'Ad chronos
-	this.chronoGenericAd = Chrono()
-	this.chronoAdJoin = Chrono()
-	this.chronoAdPause = Chrono()
-	this.chronoTotalAds = Chrono()
+		'Ad chronos
+		this.chronoGenericAd = Chrono()
+		this.chronoAdJoin = Chrono()
+		this.chronoAdPause = Chrono()
+		this.chronoTotalAds = Chrono()
 
-	'Ping time, even though we could get it from the communication class for performance sake we save a copy here
-	this.pingTime = 5
-
+		'Ping time, even though we could get it from the communication class for performance sake we save a copy here
+		this.pingTime = 5
 
     if _infoManager <> Invalid
 
@@ -63,7 +63,11 @@ end Function
 
 'This method is called from the plugin periodically
 sub ViewManager_pingCallback()
-	m.sendRequest("ping")
+	diffvalue = 0
+	if m.chronoPing.startTime <> invalid
+		diffvalue = m.chronoPing.currentMillis() - m.chronoPing.startTime 
+	end if
+	m.sendRequest("ping", {"diffTime": diffvalue})
 	m.chronoPing.start()
 	'We "use" the ping time to check if any metadata was missing too
 	if m.infoManager.options["waitForMetadata"] = "true" then m.infoManager.plugin.eventHandler("play")
@@ -74,6 +78,18 @@ sub ViewManager_beatCallback()
 	m.chronoBeat.start()
 end sub
 
+function ViewManager_getDiff(current as object, previous as object) as object
+	ret = {}
+	if previous = invalid
+		previous = {}
+	end if
+	for each prop in current
+		if current[prop] <> invalid and current[prop] <> previous[prop]
+			ret[prop] = current[prop]
+		end if
+	end for
+	return ret
+end function
 
 sub ViewManager_sendRequest(req as String, params = Invalid)
 
@@ -96,7 +112,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 			'Start chronos
 			m.infoManager.plugin._startPingTimer()
 			m.chronoPing.start()
-	        m.chronoJoinTime.start() 'Start timing join time
+	    m.chronoJoinTime.start() 'Start timing join time
 
 			m.com.nextView = {live:"U"} 'Live = true
 			m.com.request = {service: "/init", args:params}
@@ -106,6 +122,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
 		if m.isStartSent = false
 			params = m.infoManager.getRequestParams("start", params)
+			m.lastEntities = m.infoManager.getEntities()
 
 			m.isStartSent = true
 
@@ -231,26 +248,11 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 	else if req = "ping"
 
 		params = m.infoManager.getRequestParams("ping", params)
-
-		rendition = m.infoManager.getRendition()
-		metrics = m.infoManager.getVideoMetrics()
-		subtitles = m.infoManager.getSubtitles()
-
-		changedEntities = {}
-
-		if rendition <> Invalid and rendition <> m.lastRendition
-			m.lastRendition = rendition
-			changedEntities["rendition"] = m.lastRendition
-		endif
-
-		if subtitles <> Invalid and subtitles <> m.lastSubtitles
-			m.lastSubtitles = subtitles
-			changedEntities["subtitles"] = m.lastSubtitles
-		endif
-
-		if metrics <> Invalid and CompareAA(metrics, m.lastMetrics) = false
-			m.lastMetrics = metrics
-			changedEntities["metrics"] = m.lastMetrics
+		entities = m.infoManager.getEntities()
+		diffEntities = m.getDiff(entities, m.lastEntities)
+		m.lastEntities = entities
+		if diffEntities.Count() > 0
+			params["entities"] = diffEntities
 		end if
 
 		if params.DoesExist("pingTime") = false then params["pingTime"] = m.pingTime
@@ -264,17 +266,6 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 		if m.isPaused
 			if params.DoesExist("pauseDuration") = false then params["pauseDuration"] = m.chronoPause.getDeltaTime(false)
 		end if
-
-		if changedEntities.Count() = 1
-			key = changedEntities.Keys()[0]
-			value = changedEntities[key]
-			params["entityType"] = key
-			params["entityValue"] = value
-		else if changedEntities.Count() > 1
-			if params.DoesExist("entityValue") = false
-				params["entityValue"] = changedEntities
-			endif
-		endif
 
 		if m.isShowingAds = true
 		  params["adPlayhead"] = m.infoManager.getAdPlayhead()

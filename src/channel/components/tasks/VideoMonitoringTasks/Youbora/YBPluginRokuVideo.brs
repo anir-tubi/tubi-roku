@@ -9,7 +9,7 @@ end sub
 sub startMonitoring()
 
     m.pluginName = "RokuVideo"
-    m.pluginVersion = "6.5.22-" + m.pluginName
+    m.pluginVersion = "6.5.25-" + m.pluginName
 
     ' Let's cache the segment used on the bitrate to access less to it
     m.bitrateSegment = invalid
@@ -298,12 +298,20 @@ function getTotalBytes()
     return m.totalBytes
 end function
 
+function getPlayrate()
+    ret = m.top.videoplayer.playbackSpeed
+    if m.viewManager.isPaused
+        ret = 0
+    end if
+    return ret
+end function
+
 function getPlayerVersion()
     return "Roku-Video"
 end function
 
-sub _taskListener(state)
-    if state = "stop"
+sub _taskListener(taskState)
+    if taskState = "stop"
         m.top.videoplayer.unobserveFieldScoped("state")
         m.top.videoplayer.unobserveFieldScoped("bufferingStatus")
         m.top.videoplayer.unobserveFieldScoped("downloadedSegment")

@@ -749,7 +749,6 @@ Function onVideoTrackingStart(msg)
       youboraconfig["content.customDimension.2"] = videoplayer.content.titanVersion
     end if
     youboraconfig["content.resource"] = videoplayer.content.URL
-    youboraConfig["content.transactionCode"] = m.constants.deviceInfo.deviceId
     youboraConfig["device.model"] = m.constants.deviceInfo.model
     youboraConfig["app.releaseVersion"] = m.constants.deviceInfo.clientVersion
 

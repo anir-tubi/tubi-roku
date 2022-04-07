@@ -4,6 +4,7 @@ function InfoManager(plugin, options = invalid)
 
     'Methods
     this.getRequestParams = InfoManager_getRequestParams
+    this.getEntities = InfoManager_getEntities
 
     this.getResource = function()
         resource = m.options["content.resource"]
@@ -95,6 +96,10 @@ function InfoManager(plugin, options = invalid)
         end if
 
         return title
+    end function
+
+    this.getPlayrate = function()
+        return m.plugin.getPlayrate()
     end function
 
     this.getIsLive = function()
@@ -375,6 +380,17 @@ function InfoManager(plugin, options = invalid)
 
 end function
 
+function InfoManager_getEntities() as object
+    return {
+        "rendition": m.getRendition(),
+        "title": m.getTitle(),
+        "program": m.options["content.program"],
+        "cdn": m.options["content.cdn"],
+        "subtitles": m.getSubtitles(),
+        "contentLanguage": m.options["content.language"]
+    }
+end function
+
 function InfoManager_getRequestParams(requestName = "" as string, params = invalid)
 
     if params = invalid
@@ -427,7 +443,6 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("system") = false then outParams["system"] = m.options["accountCode"]
         if outParams.DoesExist("pluginName") = false then outParams["pluginName"] = m.plugin.getPluginName()
         if outParams.DoesExist("pluginVersion") = false then outParams["pluginVersion"] = m.plugin.getPluginVersion()
-        if outParams.DoesExist("npawFingerprint") = false then outParams["npawFingerprint"] = CreateObject("roDeviceInfo").GetChannelClientId()
     else if requestName = "start" or requestName = "error"
         'Start and Error share most of the params, but error also has error code and error message
         ' Params
@@ -435,7 +450,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("player") = false then outParams["player"] = m.plugin.getPluginName()
 
         if outParams.DoesExist("transactionCode") = false then outParams["transactionCode"] = m.options["content.transactionCode"]
-
+        if outParams.DoesExist("deviceUUID") = false then outParams["deviceUUID"] = CreateObject("roDeviceInfo").GetChannelClientId()
         'Plugin versioning
         if outParams.DoesExist("pluginVersion") = false then outParams["pluginVersion"] = m.plugin.getPluginVersion()
         if outParams.DoesExist("playerVersion") = false then outParams["playerVersion"] = m.plugin.getPlayerVersion()
@@ -509,6 +524,8 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("bitrate") = false then outParams["bitrate"] = m.getBitrate()
         if outParams.DoesExist("throughput") = false then outParams["throughput"] = m.getThroughput()
         if outParams.DoesExist("totalBytes") = false then outParams["totalBytes"] = m.getTotalBytes()
+        if outParams.DoesExist("playrate") = false then outParams["playrate"] = m.getPlayrate()
+        if outParams.DoesExist("metrics") = false then outParams["metrics"] = m.getVideoMetrics()   
     else if requestName = "bufferEnd"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
         'Avoid sending a playhead of 0
@@ -530,7 +547,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
         if outParams.DoesExist("adNumberInBreak") = false then outParams["adNumberInBreak"] = m.getAdNumberInBreak()
-        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.22 Roku Adnalyzer"
+        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.25 Roku Adnalyzer"
         'Extra params
         nextraparams = 10
         index = 1
@@ -651,6 +668,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("pluginName") = false then outParams["pluginName"] = m.plugin.getPluginName()
         if outParams.DoesExist("pluginVersion") = false then outParams["pluginVersion"] = m.plugin.getPluginVersion()
         if outParams.DoesExist("obfuscateIp") = false then outParams["obfuscateIp"] = m.options["user.obfuscateIp"]
+        if outParams.DoesExist("deviceUUID") = false then outParams["deviceUUID"] = CreateObject("roDeviceInfo").GetChannelClientId()
         nextraparams = 20
         index = 1
         while (index <= nextraparams)
