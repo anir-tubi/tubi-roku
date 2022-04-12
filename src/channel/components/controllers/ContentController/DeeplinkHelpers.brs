@@ -223,7 +223,7 @@ End Function
 
 Function fetchSingleLinearChannel()
   tubilog("deeplinkHelpers.deeplinkPlayLinearChannel")
-  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).enabled = true
+  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).enabled = true
     screenId = m.constants.ui.screenIds.epgScreen
   else
     screenId = m.constants.ui.screenIds.linearTVScreen
@@ -258,7 +258,7 @@ Function onSingleChannelFetchForDeeplinkSuccess(successResponse, storeInCache=fa
 
       'if linear EPG experiment is on, then show epg Screen for linear content
       ' if not, then display the linear Home Screen.
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).enabled = true
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).enabled = true
         showDefaultEPGScreen()
         epgScreen = getFromScreenCache(m.constants.ui.screenIds.epgScreen)
         if epgScreen.timeGridContent = invalid or epgScreen.timeGridContentLoading = true
@@ -419,7 +419,7 @@ Function handleLinearDeeplinkContent()
       sCatSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.EPGScreen]
     else
       ' without contentId(deeplinkContentId),  just display the default epg Screen or linear TV screen.
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).enabled = true
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).enabled = true
         if m.enteredFromDeepLink = true
           sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.epg, m.Tracking, m.trackingLoggingTask, m.constants)
         end if

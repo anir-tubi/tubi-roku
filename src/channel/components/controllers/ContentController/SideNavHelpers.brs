@@ -36,7 +36,7 @@ Function initSideNav()
   if isTopNavHomeScreenEnabled() = true
     '//Tell the sideNav to stop displaying the Linear TV menu item
     m.SideNav.displayLinearTV = false
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).side_nav = true
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).side_nav = true
       '//In this experement, top Nav will not linear TV
       if isParentalControlsAdultLevel() <> true
         m.SideNav.displayLinearEPG = false
@@ -65,6 +65,12 @@ End Function
 
 ' @sID: string: one of the menu item ids. A list of ids can be found in constants.ui.sideNavIds
 Function focusSideNavOption(sID)
+  if isParentalControlsAdultLevel() = true and isKidsUIOn() = false
+    '//Fire the epg exposure event when the side nav is viewable (which happens when this function is called)
+    '// but not when kids mode is on, or parental settings is set to teens or less
+    getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", true)
+  end if
+
   if isNonEmptyString(sID) and m.constants.ui.sideNavIds[sID] <> invalid
     m.SideNav.itemRequested = sID '//set itemRequested so the focus is on the proper button in the sideNav
   end if
@@ -532,7 +538,7 @@ Function getSideNavIdAssociatedWithScreen(screen)
 
   idsAssociatedWithEpg = {}
 
-  experiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false)
+  experiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false)
   if experiment.side_nav = false
     '//if the new EPG live TV option is in the homescreen top nav, not side nav
     idsAssociatedWithHome[m.constants.ui.screenIds.epgScreen] = true

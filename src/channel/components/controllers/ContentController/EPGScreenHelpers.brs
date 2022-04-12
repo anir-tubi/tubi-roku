@@ -35,7 +35,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     displayDefaultBackground()  ' clear background from previous screens until epgscreen loads
     showHideSpinner(true)
 
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).side_nav = true
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).side_nav = true
       epgScreen = CreateObject("roSGNode", "EPGScreen")
     else
       epgScreen = CreateObject("roSGNode", "EPGHomeScreen")
@@ -576,7 +576,7 @@ End Function
 
 Function isAnEpgScreen(Screen)
   tubiLog("EPGScreenHelpers.isAnEpgScreen")
-  experiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false)
+  experiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false)
   if experiment.side_nav = true
     return screen.isSubType("EPGScreen")
   else 

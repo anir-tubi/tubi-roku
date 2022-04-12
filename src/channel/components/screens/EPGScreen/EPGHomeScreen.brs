@@ -6,7 +6,7 @@ Function init()
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 
   '//Send the experiment exposure event when the EPG homescreen is created
-  getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", true)
+  getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", true)
 
   'infoPanel
   m.infoPanelParent = m.top.findNode("InfoPanelParent")

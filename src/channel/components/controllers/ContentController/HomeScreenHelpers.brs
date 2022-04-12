@@ -367,7 +367,7 @@ Function setEnableTopNavOnHomescreen(homescreen)
 
   if homescreen <> invalid
     if homescreen.isLinearTVAllowedInTopNav <> isParentalControlsAdultLevel()
-      homeScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel() and getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).side_nav = false
+      homeScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel() and getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).side_nav = false
       refreshNeeded = true
     end if
 
@@ -734,7 +734,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
     '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
     '//we should stop the countdown timer
     bStopCountdownTimer = true
-    epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false)
+    epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false)
 
     if focusedContent.type = m.constants.ui.categoryTypes.linear and focusedContent.id <> m.constants.ui.contentIds.tvGuide and m.SideNav.opened <> true
       bPlayVideo = true
@@ -818,7 +818,7 @@ Function selectLinearContent(content)
         playLinearVideoContent(content, false, homeScreen.id)
       end if
     else
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).enabled = true
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).enabled = true
         showDefaultEPGScreen()
       end if
     end if
@@ -828,7 +828,7 @@ End Function
 
 Function stopCountdownTimer()
   tubiLog("HomeScreenHelpers.stopCountdownTimer")
-  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).update_homescreen = true
+  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).update_homescreen = true
     '//hide the countdown timer
     setPlayerCountDownChange(-1)
   else
@@ -870,7 +870,7 @@ Function startCountdownTimer()
   if Screen <> invalid and (Screen.id = m.constants.ui.screenIds.homeScreen or Screen.id = m.constants.ui.screenIds.linearTVScreen )
     stopCountdownTimer()
     '//Start/reset timer to play video in fullscreen after a few seconds
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).update_homescreen = true
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).update_homescreen = true
       setPlayerCountDownChange(m.constants.timers.linearFullscreenTimeout)
     else
       Screen.fullscreenCountdown =  m.constants.timers.linearFullscreenTimeout

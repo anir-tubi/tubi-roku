@@ -495,7 +495,7 @@ Function onModeChange()
     m.Offset.appendChild(m.TwoLineInfo)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [25, 18]
-  else if m.top.mode = m.constants.ui.infoPanelModes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).update_homescreen = true
+  else if m.top.mode = m.constants.ui.infoPanelModes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).update_homescreen = true
     m.Offset.itemSpacings = [25, 15]
   else if m.top.mode = m.constants.ui.infoPanelModes.linear
     m.Offset.appendChild(m.LiveVideoIndicator)

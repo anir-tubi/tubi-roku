@@ -151,7 +151,7 @@ Function init()
     trackType: "startApp"
   }
 
-  epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false)
+  epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false)
   if epgExperimentResource.enabled = true
     if epgExperimentResource.update_homescreen = true
       m.LinearVideoPlayerSpinner.translation = [447, 660]
@@ -1695,7 +1695,7 @@ Function onFullscreenCountdown()
   screen = getCurrentScreen()
   if screen <> invalid
     if screen.id = m.constants.ui.screenIds.homeScreen or screen.id = m.constants.ui.screenIds.linearTVScreen
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v2", false).update_homescreen = true
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).update_homescreen = true
         nCurrentCount = m.fullscreenCountdown
         nNewCount = nCurrentCount - 1
         setPlayerCountDownChange(nNewCount)
