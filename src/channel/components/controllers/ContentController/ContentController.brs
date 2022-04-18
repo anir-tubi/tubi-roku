@@ -137,9 +137,6 @@ Function init()
   ' (for example the video has been backed out of, or there was an error fetching deeplink metadata)
   m.enteredFromDeepLink = false
 
-  ' indicates if we are in the process of handling an input event deeplink.
-  m.handlingDeeplinkInputEvent = false
-
   ' Set to the category id when content is launched from category screen,
   ' or set to invalid elsewhere
   m.autoplayContext = invalid

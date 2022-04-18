@@ -551,8 +551,6 @@ Function stopVideoContent(videoPlayer)
 
     ' reset the deep link state since we've handled it already at this point
     resetDeeplinkValues()
-    m.currentScreenAtDeeplinkInputEvent = invalid
-    m.handlingDeeplinkInputEvent = false
 
     videoPlayer.control = "stop"
 

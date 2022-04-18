@@ -150,9 +150,9 @@ Function handleInputDeeplink(inputInfo) as Void
   tubilog("DeeplinkHelpers.handleInputDeeplink")
   resetSideNav(false)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
-  stopVideoContent(videoPlayer) 'sets m.handlingDeeplinkInputEvent = false and m.deeplinkContent = invalid
+  stopVideoContent(videoPlayer) 'sets m.enteredFromDeeplink = false and m.deeplinkContent = invalid
   stopCountdownTimer() 'stop previous counter
-  returnToPreviousScreenFromLinearVideo(false)
+  stopAndHideLinearVideoPlayer()
 
   if m.uiMode = m.constants.ui.modes.kids
     if needsToShowAgeVerificationScreen() = true then
@@ -176,7 +176,6 @@ Function handleInputDeeplink(inputInfo) as Void
   ' the following values will be used to save state and will be used in the process that
   ' is kicked off by showDetailScreen to load the detail screen and video player screen
   m.deeplinkContent = createDeeplinkContentFromStartupArgs(inputInfo)
-  m.handlingDeeplinkInputEvent = true
 
   ' close any opened modal/pop-up when deeplinking via roInput
   for i=0 to m.top.getChildCount()-1
@@ -186,14 +185,13 @@ Function handleInputDeeplink(inputInfo) as Void
     end if
   end for
 
-  handleDeeplinkContentByType(skipDetailScreen)
+  handleDeeplinkContentByType()
 
 End Function
 
 
 ' this function calls appropriate functions to andle the deeplinks based on deeplink type
-' @callbackFun: callback function that needs to be passed for any of the handler.
-Function handleDeeplinkContentByType(callbackFun = invalid)
+Function handleDeeplinkContentByType()
   tubilog("deeplinkHelpers.handleDeeplinkContentByType")
   if m.deepLinkContent <> invalid
     if m.deepLinkContent.deeplinkType = "linear" or m.deepLinkContent.deeplinkType = "liveTV"
@@ -210,8 +208,14 @@ Function handleDeeplinkContentByType(callbackFun = invalid)
       handleEspanolPageDeeplinkContent()
     else if m.deepLinkContent.deeplinktype = "tvPage"
       handleTVPageDeeplinkContent()
-    else if m.deepLinkContent.deeplinktype = "series" or m.deepLinkContent.deeplinktype = "episode"  or m.deepLinkContent.deeplinktype = "movie" or m.deepLinkContent.deeplinktype = "season"
-      showDetailScreen(m.deeplinkContent, false, callbackFun)
+    else if m.deepLinkContent.deeplinktype = "series"
+      getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeriesContentSuccess, handleSingleContentDeeplinkError)
+    else if m.deepLinkContent.deeplinktype = "episode"
+      getSingleContentFromServer(m.deeplinkContent, onDeeplinkEpisodeContentSuccess, handleSingleContentDeeplinkError)
+    else if m.deepLinkContent.deeplinktype = "season"
+      getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeasonContentSuccess, handleSingleContentDeeplinkError)
+    else if m.deepLinkContent.deeplinktype = "movie"
+      showDetailScreen(m.deeplinkContent, false, skipDetailScreen, handleSingleContentDeeplinkError )
     else
       message = getTranslation("error_deeplink_page")
       showDeeplinkErrorModal(invalid, message)
@@ -284,8 +288,8 @@ End Function
 
 ' error callback and error handler for deeplinks.
 ' @response: roSGNode, error response content
-' @message : string, message to show on the deeplink error modal if not using the default
-Function showDeeplinkErrorModal(response = invalid,  message = "")
+' @message: string, message to show on the deeplink error modal if not using the default
+Function showDeeplinkErrorModal(response=invalid,  message = "")
   tubilog("deeplinkHelpers.showDeeplinkErrorModal")
   if message = ""
     message = getTranslation("error_deeplink_content")
@@ -297,43 +301,48 @@ Function showDeeplinkErrorModal(response = invalid,  message = "")
       dialogType = "CONTENT_NOT_FOUND" 'DialogType enum
     else if response.code = 403 or response.code = 451 or response.code = 401 or response.code = 422
       dialogType = "RESTRICTED_CONTENT"
+      message = getTranslation("dialog_contentNotAvailable_Parental_description")
     end if
   else if isKidsModeEnabledByParentalControls() = true or m.uiMode = m.constants.ui.modes.kidsAgeGate
     dialogType = "RESTRICTED_CONTENT"
+    message = getTranslation("dialog_contentNotAvailable_Parental_description")
   end if
 
   title = getTranslation("dialog_errorOops_title")
+
   if m.enteredFromDeepLink = true
+
     sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.home, m.Tracking, m.trackingLoggingTask, m.constants)
     resetDeeplinkValues()
-    startChannel()
+    startChannel() 'adds a homescreen which will remove all other screens underneath
+
     dialogEvent = {
-      type : "dialog"
-      values : {
-        dialog_type : dialogType
-        pageOneof : m.Tracking.getAnalyticsPage("home_page", {})
-        dialog_action : "SHOW"
-        dialog_sub_type : "launch-deeplink"
+      type: "dialog"
+      values: {
+        dialog_type: dialogType
+        pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
+        dialog_action: "SHOW"
+        dialog_sub_type: "launch-deeplink"
       }
     }
 
     showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
 
   else if m.deepLinkContent <> invalid
+    m.deepLinkContent = invalid
+    ' we are in this block if there is a roInputEvent causing a deeplink (ie. voice control while the channel is open)
     currentScreen = getCurrentScreen()
     if currentScreen <> invalid
       dialogEvent = {
-        type : "dialog"
-        values : {
-          dialog_type : dialogType
-          pageOneof : m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
-          dialog_action : "SHOW"
-          dialog_sub_type : "input-deeplink"
+        type: "dialog"
+        values: {
+          dialog_type: dialogType
+          pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+          dialog_action: "SHOW"
+          dialog_sub_type: "input-deeplink"
         }
       }
       showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
-      resetDeeplinkValues()
-      startChannel()
     end if
   end if
 
@@ -351,14 +360,14 @@ End Function
 ' @constants: associativeArray, m.constants
 Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, trackingLib, trackingTask, constants)
   referredAnalyticsEvent = {
-    referred_type : "DEEP_LINK"
-    campaign : deepLinkContent.campaign
-    source : deepLinkContent.source
-    medium : deepLinkContent.medium
-    source_device_id : deeplinkContent.sourceDeviceId
+    referred_type: "DEEP_LINK"
+    campaign: deepLinkContent.campaign
+    source: deepLinkContent.source
+    medium: deepLinkContent.medium
+    source_device_id: deeplinkContent.sourceDeviceId
   }
 
-  if deeplinkContent.type = "linear" and deepLinkContent.id <> invalid and deeplinkContent.id <> ""
+  if (deeplinkContent.type = m.constants.ui.contentTypes.linear or deepLinkContent.type = m.constants.ui.contentTypes.video or (deepLinkContent.type = "series" and deeplinkContent.deeplinkType = "series")) and deepLinkContent.id <> invalid and deeplinkContent.id <> ""
     pageInfo = {
       pageType: "video_player_page"
       pageValues: {
@@ -392,15 +401,15 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
   else if entryPoint =  m.constants.deeplinks.entryPoints.episodeList
     if deepLinkContent <> invalid
       seriesId = deeplinkContent.id.toInt()
-      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("episode_video_list_page", { series_id : seriesId })
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("episode_video_list_page", { series_id: seriesId })
     end if
   else if entryPoint =  m.constants.deeplinks.entryPoints.video and pageInfo <> invalid
     referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
   end if
 
   trackingTask.trackEvent = {
-    type : "referred"
-    values : referredAnalyticsEvent
+    type: "referred"
+    values: referredAnalyticsEvent
   }
 End Function
 
@@ -609,4 +618,186 @@ End Function
 Function resetDeeplinkValues()
   m.deepLinkContent = invalid
   m.enteredFromDeepLink = false
+End Function
+
+
+' success handler for Series deeplinks.
+' @detailScreen: roSGNode, series detail page
+' @refreshedContent: roSGNode, success response content
+' @sendTracking: boolean , this paramter is used to control whether NavigateToPage events needs to send or not. In case of deeplinks, no need to send NavigateToPage Event
+Function handleDeeplinkSeriesSuccessResponse(refreshedContent)
+  history = getHistory(refreshedContent.id)
+
+  '  refreshedContent.id:       series id
+  '  refreshedContent.seriesId: invalid
+  '  refreshedContent.type:     series
+  '  m.deepLinkContent.deepLinkType: series
+
+  ' As of spring 2018 (firmware 8.1), "series" media types are valid and
+  ' will have a content id of an episode, not the series.  Roku states that
+  ' the episode id is NOT what should be played, rather we are allowed
+  ' to choose the most appropriate episode and automatically start playback.
+  ' Here we use the history to choose an episode or just default to the first one.
+  afterFn = playHelper
+  if history <> invalid
+    refreshedContent.currentEpisodeId = history.currentEpisodeId
+    episode = getEpisodeContent(refreshedContent)
+
+    episodeHistory = getHistory(episode.id)
+
+    if episodeHistory <> invalid and episodeHistory.nowPos > 0
+      episode.nowPos = episodeHistory.nowPos
+      afterFn = resumeHelper
+    end if
+  else
+    refreshedContent.currentEpisodeId = ""
+  end if
+
+  if m.enteredFromDeepLink = true
+    ' m.enteredFromDeepLink will be set to false when the video is played
+    sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
+  end if
+
+  detailScreen = getTopDetailScreenFromStack()
+
+  if detailScreen <> invalid
+    detailScreen.contentFetchError = false
+    populateDetailScreen(detailScreen, refreshedContent)
+    handleDetailScreenAfterFn(detailScreen, afterFn)
+  end if
+End Function
+
+' success handler for video fetch in case of series/season/episode deeplinks.
+' @refreshedContent: roSGNode, success video response content
+' @successcb: successcallback which will handle success response after fetching video for provided contentId
+' @errorcb: errorCallback which will handle error while fetching video for provided contentId
+Function handleDeeplinkVideoSuccessResponse(refreshedContent, successCb = invalid, errorCb = invalid) as Void
+  '  refreshedContent.id =       episode id
+  '  refreshedContent.seriesId = series id
+  '  refreshedContent.type =     video
+  '  m.deepLinkContent.deepLinkType = season | episode | series
+
+  ' deeplink sent us an episode id, so here, we have full info for an episode, but we need full info for a series
+  ' don't send deeplink analytics here, we will send it once we get the refreshedContent (response from getSingleContentFromServer())
+  emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
+  emptySeriesNode.type = m.constants.ui.contentTypes.series
+  emptySeriesNode.id = refreshedContent.seriesId
+  showDetailScreen(emptySeriesNode, false, successCb, errorCb)
+End Function
+
+
+Function handleDeeplinkSeasonSuccessResponse(refreshedContent)
+  '  refreshedContent.id =       series id
+  '  refreshedContent.seriesId = invalid
+  '  refreshedContent.type =     series
+  '  m.deepLinkContent.deepLinkType = season
+
+  ' we've now received the full series info, so we can build the relevant screens
+  refreshedContent.currentEpisodeId = m.deepLinkContent.id
+  ' when deeplinkType = "season", deeplinkContent.id should be an episode id. We want to send tracking with the series id.
+  m.deepLinkContent.id = refreshedContent.id
+  afterFn = episodesHelper
+
+  if m.enteredFromDeepLink = true
+    sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, m.constants.deeplinks.entryPoints.episodeList, m.Tracking, m.trackingLoggingTask, m.constants)
+    m.enteredFromDeepLink = false
+  end if
+  detailScreen = getTopDetailScreenFromStack()
+  if detailScreen <> invalid
+    detailScreen.contentFetchError = false
+    populateDetailScreen(detailScreen, refreshedContent)
+    handleDetailScreenAfterFn(detailScreen, afterFn)
+  end if
+End Function
+
+
+Function handleDeeplinkEpisodeSuccessResponse(refreshedContent)
+  history = getHistory(refreshedContent.id)
+  '  refreshedContent.id =       series id
+  '  refreshedContent.seriesId = invalid
+  '  refreshedContent.type =     series
+  '  m.deepLinkContent.deepLinkType = episode
+
+  ' we now have the full series info for episode deeplinks
+  refreshedContent.currentEpisodeId = m.deepLinkContent.id
+  'determine if we need to resume or play from start the deeplinked episode
+  if history <> invalid
+    episode = getEpisodeContent(refreshedContent)
+    episodeHistory = getHistory(episode.id)
+    if episodeHistory <> invalid and episodeHistory.nowPos > 0
+      episode.nowPos = episodeHistory.nowPos
+    end if
+    afterFn = resumeHelper
+  else
+    afterFn = playHelper
+  end if
+
+  if m.enteredFromDeepLink = true
+    ' m.enteredFromDeepLink will be set to false when the video is played
+    sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
+  end if
+  detailScreen = getTopDetailScreenFromStack()
+
+  if detailScreen <> invalid
+    detailScreen.contentFetchError = false
+    populateDetailScreen(detailScreen, refreshedContent)
+    handleDetailScreenAfterFn(detailScreen, afterFn)
+  end if
+End Function
+
+
+'this function will be called to get series details and then to fetch video to be played by deeplinkContent.id
+Function onDeeplinkSeriesContentSuccess(singleContent)
+  tubilog("deeplinkHelpers.onDeeplinkSeriesContentSuccess")
+  if singleContent.type = m.constants.ui.contentTypes.video
+    handleDeeplinkVideoSuccessResponse(singleContent, handleDeeplinkSeriesSuccessResponse, handleSingleContentDeeplinkError)
+  end if
+End Function
+
+
+'this function will be called to get series details and then to fetch video to be played by deeplinkContent.id
+Function onDeeplinkEpisodeContentSuccess(singleContent)
+  tubilog("deeplinkHelpers.onDeeplinkEpisodeContentSuccess")
+
+  if singleContent.type = m.constants.ui.contentTypes.video
+    handleDeeplinkVideoSuccessResponse(singleContent,  handleDeeplinkEpisodeSuccessResponse, handleSingleContentDeeplinkError)
+  end if
+
+End Function
+
+
+Function onDeeplinkSeasonContentSuccess(singleContent)
+  tubilog("deeplinkHelpers.onDeeplinkSeasonContentSuccess")
+  if singleContent.type = m.constants.ui.contentTypes.video
+    handleDeeplinkVideoSuccessResponse( singleContent, handleDeeplinkSeasonSuccessResponse, handleSingleContentDeeplinkError)
+  end if
+End Function
+
+
+Function handleSingleContentDeeplinkError(error)
+  tubilog("DeeplinkHelpers.handleSingleContentDeeplinkError")
+
+  message = getTranslation("screenDetails_error_getContent_description")
+  if m.enteredFromDeepLink = false and m.deepLinkContent <> invalid
+    'only in case of the movie, we have already sneaked the showdetail screen, so we need to
+    'bring the user to previous screen.
+    if m.deepLinkContent.deeplinktype = "movie"
+      detailScreen = getTopDetailScreenFromStack()
+      if detailScreen <> invalid and detailScreen.content.id = m.deepLinkContent.id
+        'Simply popping the screen is resulting in issues, so calling onDetailBackPressed function.
+        onDetailBackPressed()
+      end if
+    end if
+
+    'If user issues input deeplink on linearvideoplayer/videoplayer, video will stop and tries to play deeplink content.
+    'In case of deeplink error, bring the user back to detail screen.
+    currentScreen = getCurrentScreen()
+    if currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen
+      returnToPreviousScreenFromLinearVideo(false)
+    else if currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
+      returnToDetailScreenFromVideo(true)
+    end if
+  end if
+  showDeeplinkErrorModal(error, message)
+
 End Function
