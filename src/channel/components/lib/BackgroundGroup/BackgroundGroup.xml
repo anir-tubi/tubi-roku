@@ -11,8 +11,8 @@
   <script type="text/brightscript" uri="BackgroundGroup.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
-  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />  
-  
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+
   <interface>
     <!-- INPUT -->
     <!-- backgrondInfo has the keys "type (string)" and "uriList (array)".
@@ -45,9 +45,11 @@
         id="FullScreenGradient"
         uri="pkg:/images/detail-gradient-25.png"
         gradientOpacity="1.0"/>
+      <MultipleGradientGroup
+        id="LeftBottomGradient"/>
       <BackgroundGradientGroup
         id="TopRightGradient"
-        uri="pkg:/images/home-gradient-25.png"
+        uri="pkg:/images/home-gradient_kids.png"
         gradientOpacity="0.0"/>
       <BackgroundGradientGroup
         id="LinearGradient1"

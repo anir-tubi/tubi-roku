@@ -568,12 +568,11 @@ Function showAgeVerificationScreen(ageSubmittedCallback, signInInfo = invalid, p
   callbackString = convertFunctionToString(ageSubmittedCallback)
   ageVerificationScreen = CreateObject("roSGNode", "AgeVerificationScreen")
   ageVerificationScreen.id = m.constants.ui.screenIds.ageVerificationScreen
-  ageVerificationScreen.backgroundUriList = [m.defaultBackgroundUri]
   ageVerificationScreen.signInInfo = signInInfo
   ageVerificationScreen.previousUiMode = previousUiMode
   ageVerificationScreen.observeFieldScoped("ageSubmitted", callbackString)
   ageVerificationScreen.observeFieldScoped("backButtonPressed", "onBackButtonPressed")
-  displayDefaultBackground()
+  ageVerificationScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
   pushScreen(ageVerificationScreen, true, true)
 End Function
 

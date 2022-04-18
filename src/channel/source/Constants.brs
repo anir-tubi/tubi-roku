@@ -819,6 +819,7 @@ Function getConstants()
       constants.ui.backgroundTypes.linear = "linear"
       constants.ui.backgroundTypes.feature = "feature"
       constants.ui.backgroundTypes.epg = "epg"
+      constants.ui.backgroundTypes.marketingScreen = "marketingScreen"
 
     constants.ui.modes = {}
       constants.ui.modes.standard = "standard"
@@ -1014,7 +1015,6 @@ Function getConstants()
 
     constants.ui.uris = {}
       'background gradient urls
-      constants.ui.uris.homeBackgroundGradient = "pkg:/images/home-gradient-25.png"
       constants.ui.uris.detailBackgroundGradient = "pkg:/images/detail-gradient-25.png"
 
       'category background thumbnails
@@ -1030,10 +1030,11 @@ Function getConstants()
       'kidsMode background image uri
       constants.ui.uris.kidsModeBackground = "pkg:/images/art-blur-background_kids.png"
       constants.ui.uris.backgroundFullScreenGradient = "pkg:/images/detail-gradient-25.png"
-      constants.ui.uris.backgroundTopRightGradient = "pkg:/images/home-gradient-25.png"
       constants.ui.uris.backgroundFullScreenGradient_kidsMode = "pkg:/images/detail-gradient_kids.png"
       constants.ui.uris.backgroundTopRightGradient_kidsMode = "pkg:/images/home-gradient_kids.png"
       constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_kidsmode.png"
+
+      constants.ui.uris.marketingBackground = "pkg:/images/marketing-background.jpg"
 
     constants.ui.colors = {}
       'template colors

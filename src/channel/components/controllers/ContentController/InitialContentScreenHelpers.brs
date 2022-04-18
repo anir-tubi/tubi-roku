@@ -3,22 +3,20 @@ Function displayInitialContentScreen()
   showHideSpinner(false)
   screen = CreateObject("roSGNode", "InitialContentScreen")
   screen.id = m.constants.ui.screenIds.initialContentScreen
-  screen.backgroundUriList = [m.defaultBackgroundUri]
-  displayDefaultBackground()
 
   screen.screenLevel = m.constants.ui.screenLevels.initialContentScreen
   screen.observeFieldScoped("actionableItemSelected", "onActionableItemSelected")
   screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-
+  screen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
   pushScreen(screen, true, true)
-  
+
   '//if the startup logo animation is done, then animate the screen into view. Otherwise, wait for the animation to be done.
   if m.top.removeStartUpScreens = true
     onStartupAnimationDone()
-  else 
+  else
     m.top.observeFieldScoped("removeStartUpScreens", "onStartupAnimationDone")
   end if
-  
+
 End Function
 
 
@@ -54,20 +52,20 @@ Function sendInitialContentComponentInteractionEvent(sSelectedID, screen)
   else if sSelectedID = m.constants.ui.keyIds.back
     sUserInteraction = "BACK"
   else
-    '//skip and back do not have a navComponent/componentOneof. Just the buttons that link directly to pages do. 
+    '//skip and back do not have a navComponent/componentOneof. Just the buttons that link directly to pages do.
     navComponent = {
       top_nav_section: m.Tracking.sideNavPageMap[sSelectedID]
     }
   end if
 
   pageOneof = m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pagetype, screen.trackingPageInfo.pageValues)
-  event = { 
+  event = {
     type: "component_interaction"
     values: {
       pageOneof: pageOneof
       user_interaction: sUserInteraction
     }
-  } 
+  }
 
   if navComponent <> invalid
     '//::NOTE:: The intitial content screen repurposes the top_nav_component for the component_interaction event
@@ -121,5 +119,3 @@ Function displayFirstContentScreen(sPageID)
 
   focusSideNavOption(sideNavFocus)
 End Function
-
-

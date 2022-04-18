@@ -42,6 +42,8 @@ Function init()
 
   m.top.screenLevel = m.constants.ui.screenLevels.ageGateScreen
 
+  m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
+
   m.top.observeField("focusedChild", "onComponentFocusChanged")
   m.NumberPad.observeField("buttonSelected", "onNumberPadButtonSelected")
   m.top.observeFieldScoped("ageSubmitted", "onAgeSubmittedChanged")
@@ -50,6 +52,8 @@ End Function
 
 Function onComponentFocusChanged()
   if m.top.hasFocus()
+    ' force a background update
+    m.top.backgroundUriList = m.backgroundUriList
     m.NumberPad.setFocus(true)
   end if
 End Function

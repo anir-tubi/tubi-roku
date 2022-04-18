@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!--
+ - MultipleGradientGroup is group of two or more background gradients
+ -
+ -->
+<component name="MultipleGradientGroup" extends="Group">
+
+  <script type="text/brightscript" uri="MultipleGradientGroup.brs" />
+
+  <interface>
+    <!-- Store the last animation that was triggered in case we need to stop it later-->
+    <field id="lastAnimationName" type="string" alwaysNotify="true"/>
+    <!-- uriList field accepts array of backgroundUris for a content. BackgroundgradientGroup will be created based on this.
+      eg. ["pkg:/images/leftGradient.png", "pkg:/images/bottomGradient.png"]  -->
+    <field id="uriList" type="array"/>
+    <!-- allowed values are none, start, stop, pause, resume, finish -->
+    <field id="fadeInControl" type="string" alwaysNotify="true"/>
+    <!-- allowed values are none, start, stop, pause, resume, finish -->
+    <field id="fadeOutControl" type="string" alwaysNotify="true"/>
+    <field id="gradientOpacity" type="float" alwaysNotify="true"/>
+  </interface>
+
+  <children>
+
+    <Group
+      id="gradientGroup">
+    </Group>
+
+  </children>
+</component>

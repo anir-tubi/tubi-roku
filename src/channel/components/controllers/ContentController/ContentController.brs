@@ -108,6 +108,8 @@ Function init()
   end if
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
+  m.marketingBackgroundUri = m.constants.ui.uris.marketingBackground
+
   ' Global state
   m.global.addField("bookmarkIds", "node", false)
   m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
@@ -1374,6 +1376,18 @@ Function displayDefaultBackground()
 End Function
 
 
+Function onScreenBackgroundUpdated(msg)
+  TubiLog("ContentController.onScreenBackgroundUpdated")
+  screen = msg.getRoSGNode()
+  if screen <> invalid
+    m.backgroundGroup.backgroundInfo = {
+      type: getBackgroundtype(screen.backgroundUriList)
+      uriList: screen.backgroundUriList
+    }
+  end if
+End Function
+
+
 ' fireAppLoadTimeEvent
 '
 ' Fire off a log to a server so we can track how long it took since the app was started
@@ -1396,11 +1410,12 @@ Function getBackgroundtype(backgroundUriList, contentType = "")
   if backgroundUriList <> invalid
     if backgroundUriList[0] = m.defaultBackgroundUri
       backgroundType = m.constants.ui.backgroundTypes.fullScreen
+    else if backgroundUriList[0] = m.marketingBackgroundUri
+      backgroundType = m.constants.ui.backgroundTypes.marketingScreen
     else if contentType = m.constants.ui.contentTypes.linear
       backgroundType = m.constants.ui.backgroundTypes.linear
     else if contentType = m.constants.ui.contentTypes.epg
       backgroundType = m.constants.ui.backgroundTypes.epg
-
     else
       backgroundType = m.constants.ui.backgroundTypes.topRight
     end if

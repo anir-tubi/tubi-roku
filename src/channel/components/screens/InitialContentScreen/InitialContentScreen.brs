@@ -1,7 +1,7 @@
 Function init()
   m.constants  = getConstantsFromGlobal()
   theme = getThemeFromGlobal()
-  
+
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
@@ -37,16 +37,16 @@ Function init()
 End Function
 
 
-' animate the screen when the page 1st loads 
+' animate the screen when the page 1st loads
 Function onAnimateIntoView()
-  
+
   rowNode = CreateObject("roSGNode", "ContentNode")
   setMainContent(m.constants.ui.sideNavIds.movies, rowNode)
   setMainContent(m.constants.ui.sideNavIds.tv, rowNode)
   setMainContent(m.constants.ui.sideNavIds.linearTV, rowNode)
   setMainContent(m.constants.ui.sideNavIds.espanol, rowNode)
   setMainContent(m.constants.ui.sideNavIds.kidsMode, rowNode)
-    
+
   numOfMenuItems = rowNode.getChildCount()
   nSpacing = m.InitialContentMenu.columnSpacings[0]
   aColumnSpacings = []
@@ -79,8 +79,8 @@ Function onAnimateIntoView()
   m.InitialContentMenuBground.width = nMenuWidth + (nInitialContentMenuBgroundPadding*2)
   m.InitialContentMenuBground.translation = [(1920 - m.InitialContentMenuBground.width)/2 , m.InitialContentMenuBground.translation[1]]
 
+  m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
 
-  
   if m.constants.deviceInfo.limitedUi = false
     fade(m.InitialContentMenuBground, "in", .5, .5)
     slideFade(m.Title, "above", "in", .5, 0, 50)
@@ -110,7 +110,7 @@ End Function
 
 
 ' Set the ContentNode of one menu button of this screen and add it to the passed parentNode
-' @itemID - string, The ID of the propsed menu button 
+' @itemID - string, The ID of the propsed menu button
 ' @parentNode - The node to which the new button info will be added
 Function setMainContent(itemID, parentNode)
   contentNode = CreateObject("roSGNode", "ContentNode")
@@ -147,7 +147,7 @@ Function setMainContent(itemID, parentNode)
     bSuccess = true
   end if
 
-  if bSuccess = true 
+  if bSuccess = true
     parentNode.appendChild(contentNode)
   end if
 
@@ -157,12 +157,16 @@ End Function
 Function onItemSelected()
   item = m.InitialContentMenu.itemSelected
   contentItem = m.InitialContentMenu.content.getChild(item)
-  
+
   setActionableItemSelected(contentItem.id)
 End Function
 
 
 Function onItemFocused()
+
+  ' force a background update
+  m.top.backgroundUriList = m.backgroundUriList
+
   row = 1
   col = 1
   sButtonID = invalid
@@ -178,17 +182,17 @@ Function onItemFocused()
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
         componentOneof: m.Tracking.getAnalyticsComponent("top_nav_component", m.previousFocusedButton)
-        means_of_navigation: "SCROLL"  'MeansOfNavigation enum 
-      
+        means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+
         vertical_location: row  '//The row location of the side nav
         vertical_location_mode: "INDEX"  'LocationMode enum
         horizontal_location: col  '//The column location of the side nav
         horizontal_location_mode: "INDEX"  'LocationMode enum
       }
     end if
-  else 
+  else
     '// if m.SkipButton.hasFocus() = true
-    '//this else statement does nothing but to inform the developer that 
+    '//this else statement does nothing but to inform the developer that
     '//analytics is purposely not being sent for the focus of or from the skip button
   end if
 

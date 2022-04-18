@@ -41,7 +41,7 @@
       layoutDirection="vert"
       vertAlignment="custom"
       horizAlignment="custom"
-      itemSpacings="[20, 45, 17, 17, 20, 90, 130]">
+      itemSpacings="[20, 45, 17, 17, 20]">
       <Label
         id="pageHeading"
         color="0xFFFFFF"
@@ -88,70 +88,80 @@
           size="27" />
       </Label>
 
-      <SimpleButton
-        translation="[756,0]"
-        id="continueBtn"
-        color="0x9699A3"
-        width="408"/>
 
       <LayoutGroup
-        id="existingAccLayout"
-        layoutDirection="horiz"
-        horizAlignment="center"
-        vertAlignment="center"
-        translation="[960,0]"
-        itemSpacings="[12]">
+        id="buttonsGroup"
+        layoutDirection="vert"
+        vertAlignment="custom"
+        horizAlignment="custom"
+        itemSpacings="[90, 130]">
 
-        <Label
-          id="newPasswordLabel"
-          color="#FFFFFF">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="27" />
-        </Label>
+        <SimpleButton
+          translation="[756,0]"
+          id="continueBtn"
+          color="0x9699A3"
+          width="408"/>
 
-        <Label
-          id="newPasswordLink"
-          color="#FFFFFF">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="27" />
-        </Label>
+        <LayoutGroup
+          id="existingAccLayout"
+          layoutDirection="horiz"
+          horizAlignment="center"
+          vertAlignment="center"
+          translation="[960,0]"
+          itemSpacings="[12]">
+
+          <Label
+            id="newPasswordLabel"
+            color="#FFFFFF">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="27" />
+          </Label>
+
+          <Label
+            id="newPasswordLink"
+            color="#FFFFFF">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="27" />
+          </Label>
+
+        </LayoutGroup>
+
+        <ButtonGroup
+          id="staticPageLinkGroup"
+          layoutDirection="horiz"
+          horizAlignment="center"
+          translation="[960,0]"
+          vertAlignment="custom"
+          itemSpacings="[96]">
+
+          <SimpleButton
+            id="termsBtn"
+            color="0x10141F"
+            unfocusedBackgroundOpacity="0"/>
+
+          <SimpleButton
+            id="ppBtn"
+            color="0x10141F"
+            unfocusedBackgroundOpacity="0"/>
+
+          <SimpleButton
+            id="donotsellMyInfoBtn"
+            color="0x10141F"
+            unfocusedBackgroundOpacity="0"/>
+
+        </ButtonGroup>
 
       </LayoutGroup>
 
-      <ButtonGroup
-        id="staticPageLinkGroup"
-        layoutDirection="horiz"
-        horizAlignment="center"
-        translation="[960,0]"
-        vertAlignment="custom"
-        itemSpacings="[96]">
-
-        <SimpleButton
-          id="termsBtn"
-          color="0x10141F"
-          unfocusedBackgroundOpacity="0"/>
-
-        <SimpleButton
-          id="ppBtn"
-          color="0x10141F"
-          unfocusedBackgroundOpacity="0"/>
-
-        <SimpleButton
-          id="donotsellMyInfoBtn"
-          color="0x10141F"
-          unfocusedBackgroundOpacity="0"/>
-
-      </ButtonGroup>
-
     </LayoutGroup>
 
-        <PasswordEntryKeyboard
-          id="passwordEntryKeyboard"
-          translation="[0,1080]"/>
+    <PasswordEntryKeyboard
+      id="passwordEntryKeyboard"
+      translation="[0,1080]"/>
 
   </children>
 </component>

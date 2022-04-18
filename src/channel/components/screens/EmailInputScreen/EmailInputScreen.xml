@@ -87,12 +87,6 @@
       id="keyboardGrp"
       translation="[0,550]">
 
-      <Rectangle
-        id="keyboardBackground"
-        color="0x10141F"
-        width="1920"
-        height="600"/>
-
       <LayoutGroup
         layoutDirection="vert"
         horizAlignment="custom"

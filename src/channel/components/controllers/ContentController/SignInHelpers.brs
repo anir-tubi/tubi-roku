@@ -249,8 +249,8 @@ Function showSignInScreen(email)
   signInScreen.observeFieldScoped("signInSelected", "onSignInSelected")
   signInScreen.observeFieldScoped("emailSelected", "onSignInScreenEmailSelected")
   signInScreen.observeFieldScoped("staticPageSelected", "onStaticPageSelected")
+  signInScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
   pushScreen(signInScreen, true, true)
-  displayDefaultBackground()
 End Function
 
 
@@ -269,8 +269,8 @@ Function showEmailScreen()
   emailScreen.id = m.constants.ui.screenIds.emailScreen
   emailScreen.observeFieldScoped("continueSelected", "onEmailInputContinueSelected")
   emailScreen.observeFieldScoped("backButtonSelected", "onEmailInputBackButtonSelected")
+  emailScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
   pushScreen(emailScreen, true, true)
-  displayDefaultBackground()
 
 End Function
 
