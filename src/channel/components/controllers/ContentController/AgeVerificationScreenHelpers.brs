@@ -577,6 +577,18 @@ Function showAgeVerificationScreen(ageSubmittedCallback, signInInfo = invalid, p
 End Function
 
 
+Function onAgeVerificationScreenBackgroundUpdated(msg)
+  TubiLog("AgeVerificationScreenHelpers.onAgeVerificationScreenBackgroundUpdated")
+  ageVerificationScreen = msg.getRoSGNode()
+  if ageVerificationScreen <> invalid
+    m.backgroundGroup.backgroundInfo = {
+      type: getBackgroundtype(ageVerificationScreen.backgroundUriList)
+      uriList: ageVerificationScreen.backgroundUriList
+    }
+  end if
+End Function
+
+
 ' @verifyAgeCallback: function, a wrapper function around verifyAge (ie. verifyAgeAtStartup)
 Function onAgeSubmitted(verifyAgeCallback) as Void
   tubiLog("AgeVerificationScreenHelpers.onAgeSubmitted")

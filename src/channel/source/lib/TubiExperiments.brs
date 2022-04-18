@@ -31,13 +31,17 @@ Function TubiExperiments(constants) as Object
       roku_linear_epg: {
         roku_linear_epg_v3: { "enabled": false, "side_nav": false, "update_homescreen": false}
       }
-      
+
       roku_linear_search_ui_update: {
         roku_linear_search_ui_update_v1: {"enabled": false}
       }
-      
+
       roku_register_signup_to_save: {
         roku_register_signup_to_save_v1: {"enabled": false}
+      }
+
+      roku_detail_screen_background_image: {
+        roku_detail_screen_background_image_v1: {"enabled": false}
       }
     }
 

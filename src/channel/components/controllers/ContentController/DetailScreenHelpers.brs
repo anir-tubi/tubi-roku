@@ -34,7 +34,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, callback = inv
     if isReturningUser() = true and isLoggedInUser() = false and getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v1", true).enabled = true
       detailScreen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelected")
     end if
-    
+
     ' m.actionType variable is used for setting a callback function after successful a data fetch retry in the case where
     ' users select a menu button from the detail screen, but the origial data fetch was unsuccessful. In this way,
     ' the action will happen automatically after the successful retry.
@@ -106,10 +106,17 @@ Function onDetailBackgroundChange(msg)
   tubiLog("DetailScreenHelpers.onDetailBackgroundChange")
   detailScreen = msg.getRoSGNode()
   if detailScreen.isInFocusChain()
-    m.backgroundGroup.backgroundInfo = {
-      type: m.constants.ui.backgroundTypes.fullScreen
-      uriList: detailScreen.backgroundUriList
-    }
+    if getExperimentResource("roku_detail_screen_background_image", "roku_detail_screen_background_image_v1", true).enabled = true
+      m.backgroundGroup.backgroundInfo = {
+        type: m.constants.ui.backgroundTypes.topright
+        uriList: detailScreen.backgroundUriList
+      }
+    else
+      m.backgroundGroup.backgroundInfo = {
+        type: m.constants.ui.backgroundTypes.fullscreen
+        uriList: detailScreen.backgroundUriList
+      }
+    end if
   end if
 End Function
 
@@ -306,10 +313,6 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex=fals
     end if
   end if
 
-  m.backgroundGroup.backgroundInfo = {
-    type: m.constants.ui.backgroundTypes.fullScreen
-    uriList: backgroundUriList
-  }
   m.isScreenLoaded = true
 End Function
 
@@ -1312,7 +1315,7 @@ Function setComponentInteractionEventForSignUp(screen)
   }
   sendComponentInteractionInfo(componentInteractionInfo)
 End Function
-   
+
 
 Function onDescriptionSelected(msg)
   tubiLog("DetailScreenHelper.onDescriptionSelected")

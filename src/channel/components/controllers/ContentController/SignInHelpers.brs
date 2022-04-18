@@ -275,6 +275,18 @@ Function showEmailScreen()
 End Function
 
 
+Function onBackgroundScreenUpdated(msg)
+  TubiLog("SignInHelpers.onBackgroundScreenUpdated")
+  screen = msg.getRoSGNode()
+  if screen <> invalid
+    m.backgroundGroup.backgroundInfo = {
+      type: getBackgroundtype(screen.backgroundUriList)
+      uriList: screen.backgroundUriList
+    }
+  end if
+End Function
+
+
 ' onStaticPageSelected callback is triggered when user selects static links on signUp/signIn screens
 Function onStaticPageSelected(evt)
 
