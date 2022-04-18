@@ -416,7 +416,11 @@ Function handleLinearDeeplinkContent()
     ' linear deeplink request has been recieved with content ID to play, so fetch and start playing the content
     if m.deeplinkContent.id <> ""
       fetchSingleLinearChannel()
-      sCatSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.EPGScreen]
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).side_nav = true
+        sCatSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.EPGScreen]
+      else
+        sCatSideNavID = m.constants.ui.sideNavIds.home
+      end if
     else
       ' without contentId(deeplinkContentId),  just display the default epg Screen or linear TV screen.
       if getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).enabled = true

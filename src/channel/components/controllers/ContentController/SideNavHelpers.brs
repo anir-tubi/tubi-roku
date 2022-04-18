@@ -65,7 +65,9 @@ End Function
 
 ' @sID: string: one of the menu item ids. A list of ids can be found in constants.ui.sideNavIds
 Function focusSideNavOption(sID)
-  if isParentalControlsAdultLevel() = true and isKidsUIOn() = false
+
+  screen = getCurrentScreen()
+  if isParentalControlsAdultLevel() = true and isKidsUIOn() = false and screen <> invalid and screen.id <> m.constants.ui.screenIds.linearVideoPlayerScreen
     '//Fire the epg exposure event when the side nav is viewable (which happens when this function is called)
     '// but not when kids mode is on, or parental settings is set to teens or less
     getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", true)

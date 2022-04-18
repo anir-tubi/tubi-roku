@@ -5,9 +5,6 @@ Function init()
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 
-  '//Send the experiment exposure event when the EPG Screen is created
-  getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", true)
-
   'infoPanel
   m.infoPanelParent = m.top.findNode("InfoPanelParent")
   m.infoPanel = m.top.findNode("InfoPanel")
@@ -73,6 +70,9 @@ End Function
 Function onScreenFocusChange()
   tubiLog("EPGScreen.onScreenFocusChange")
   if m.top.hasFocus() = true
+    '//Fire experiment exposure event when the EPG Screen is focused - just in case there is a deep link to linear content
+    getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", true)
+    
     ' since epg main content node does not have valid Until, just findout the validUntil from first child
     ' This check might be necessary if user stay on topnav/sidenav for very long time.
     if m.epgTimeGrid.content <> invalid and shouldRefresh(m.epgTimeGrid.content.getChild(0)) = true
