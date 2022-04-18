@@ -1,11 +1,12 @@
 ' TubiRequest is used for tubi specific http requests
 ' the functions inside this module will be more specific to tubi
 ' TubiRequest is deprecated and any new logic should use Request with the goal of eventually removing TubiRequest.
-Function TubiRequest(settings = {mode: "production",CharlesProxyEnabled: false })
+Function TubiRequest(settings = {mode: "production",CharlesProxyEnabled: false, printReqAndResInfo: false })
   return {
     configMode: settings.mode
     charlesProxyEnabled: settings.charlesProxyEnabled
     charlesProxyUrl:settings.charlesProxyUrl
+    printReqAndResInfo: settings.printReqAndResInfo
     createAsync: createAsyncHTTPRequest
     start: tubihttp_start
     handleEvent: tubi_handleHttpEvent
@@ -14,8 +15,8 @@ Function TubiRequest(settings = {mode: "production",CharlesProxyEnabled: false }
     cancel: tubihttp_cancel
     isHttps: tubihttp_isHttps_
     addParamsToUrl: tubihttp_addParamsToUrl_
-    getLocale: tubihttp_getLocale_ 
-    passThroughCharlesProxy: tubihttp_passThroughCharlesProxy 
+    getLocale: tubihttp_getLocale_
+    passThroughCharlesProxy: tubihttp_passThroughCharlesProxy
     removeCharlesProxy: tubihttp_removeCharlesProxy
   }
 End Function
@@ -82,7 +83,7 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
         mergedOptions[o].Append({"Accept-Language": m.getLocale()})
       end if
     end if
-    
+
   end for
 
   o = {
@@ -105,6 +106,7 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
     urltransfer: invalid
     klass: "TubiAsyncHTTPRequest"   ' Just a sentinel for verification by Request Queue
     configMode: m.configMode
+    printReqAndResInfo: m.printReqAndResInfo
     charlesProxyEnabled: m.charlesProxyEnabled
     charlesProxyUrl: m.charlesProxyUrl
     passThroughCharlesProxy: m.passThroughCharlesProxy
@@ -117,12 +119,12 @@ End Function
 '''''''''''''''''''''''
 ' start - Prep the roUrlTransfer object and initiate the request
 '
-' urltransfer_or_messageport - a roUrlTransfer or roMessagePort object; 
+' urltransfer_or_messageport - a roUrlTransfer or roMessagePort object;
 '
 '     If roUrlTransfer is passed, the object is used to execute the request and events
 '     send to the roMessagePort already associated with the roUrlTransfer object.
 '
-'     If roMessagePort is passed, a roUrlTransfer object is allocated and 
+'     If roMessagePort is passed, a roUrlTransfer object is allocated and
 '     events will be sent to the roMessagePort provided.
 '
 Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
@@ -146,9 +148,9 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
   end if
 
   if m.params.Count() > 0  and isRetry = false then
-    fullUrl = m.addParamsToUrl_(m.url, m.params) 
+    fullUrl = m.addParamsToUrl_(m.url, m.params)
     fulProxyUrl = m.passThroughCharlesProxy(fullUrl)
-    m.urltransfer.SetUrl(fulProxyUrl)  
+    m.urltransfer.SetUrl(fulProxyUrl)
     m.url = fulProxyUrl
   else
     m.urltransfer.SetUrl(m.url)
@@ -163,10 +165,14 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
   m.urltransfer.setHeaders(m.headers)
   m.urltransfer.setRequest(m.method)
 
-  ' print output for qa to test
-  if m.configMode = "qa" or m.configMode = "staging"
-    tubiLog("sending a " + m.method + " request to " + m.url)  
-    print m.body
+  ' print req info for debugging
+  if m.printReqAndResInfo = true
+    print ""
+    print "Request Information"
+    print "sending a " ; m.method ; " request to " ; m.url
+    print "headers==> "; m.headers
+    print "body===> " ; m.body
+    print ""
   end if
 
   if (m.configMode <> "production") and m.charlesProxyEnabled
@@ -246,11 +252,11 @@ Function tubi_handleHttpEvent(message As Object) As Object
   if m.urltransfer = invalid
     return invalid
   end if
-    
+
   ' handle retries
   if type(message) = "roUrlEvent" then
     if message.GetSourceIdentity() = m.urltransfer.GetIdentity() then
-      if message.GetInt() = 1 then 
+      if message.GetInt() = 1 then
         ' 1. Check success or failure?
         code = message.GetResponseCode()
 
@@ -260,12 +266,12 @@ Function tubi_handleHttpEvent(message As Object) As Object
           if newAuthInfo <> invalid
             'replace any necessary new auth info in the headers and try again
             authHeaders = m.getAuthHeaders(newAuthInfo.accessToken)
-            
+
             if authHeaders <> invalid
               for each header in authHeaders
                 m.headers[header] = authHeaders[header]
               end for
-              
+
               m.retries = m.retries - 1
               m.start(m.urltransfer)
             end if
@@ -282,7 +288,7 @@ Function tubi_handleHttpEvent(message As Object) As Object
           end if
 
         else if code < 0 and m.retries > 0 then
-          m.retries = m.retries - 1    
+          m.retries = m.retries - 1
           m.start(m.urltransfer) ' fire off the request again
         else
           ' Here on success or on retry limit
@@ -294,11 +300,13 @@ Function tubi_handleHttpEvent(message As Object) As Object
             name: m.name
           }
 
-          ' print response info for qa team
-          if (m.configMode = "qa" or m.configMode = "staging")
+          ' print response info for debugging
+          if m.printReqAndResInfo = true
             if Left(m.name, 5) = "track"
+              print ""
               print "received "; code; " for "; m.name
               print m.response.data
+              print ""
             end if
           end if
 
@@ -361,7 +369,7 @@ End Function
 Function tubihttp_getLocale_() as String
   di = CreateObject("roDeviceInfo")
   locale = di.GetCurrentLocale()
-  if locale <> invalid 
+  if locale <> invalid
     locale = locale.replace("_", "-")
   else
     locale = "en-US"
@@ -406,7 +414,7 @@ Function tubihttp_addParamsToUrl_(url As String, params As Object) As String
     end if
 
     for each value in values
-      if value = invalid then 
+      if value = invalid then
         value = ""  ' don't send any string literal "invalid"
       end if
       value = value.toStr().trim()
@@ -458,10 +466,10 @@ Function tubi_handleHttpEventv2(message As Object) As Object
   if m.urltransfer = invalid
     return invalid
   end if
-    
+
   if type(message) = "roUrlEvent" then
     if message.GetSourceIdentity() = m.urltransfer.GetIdentity() then
-      if message.GetInt() = 1 then 
+      if message.GetInt() = 1 then
         ' 1. Check success or failure?
         code = message.GetResponseCode()
 
@@ -473,11 +481,13 @@ Function tubi_handleHttpEventv2(message As Object) As Object
           name: m.name
         }
 
-        ' print response info for qa team
-        if (m.configMode = "qa" or m.configMode = "staging")
+        ' print response info for debugging
+        if m.printReqAndResInfo = true
           if Left(m.name, 5) = "track"
+            print ""
             print "received "; code; " for "; m.name
             print m.response.data
+            print ""
           end if
         end if
 

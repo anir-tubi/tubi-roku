@@ -26,7 +26,10 @@ settings:
   email: ""
   password: ""
 
-  #To enable the Charles Proxy, set CharlesProxyEnabled true 
+  # setting printReqAndResInfo as true will print log for all api request information
+  printReqAndResInfo: true
+
+  #To enable the Charles Proxy, set CharlesProxyEnabled true
   charlesProxyUrl: "http://{{localHostAddress}}:8888"
   charlesProxyEnabled: false
 
