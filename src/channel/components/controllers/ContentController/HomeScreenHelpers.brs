@@ -59,6 +59,9 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     homeScreen.observeFieldScoped("sponsoredRowFocused", "onHomescreenSponsoredRowFocused")
     homeScreen.observeFieldScoped("columnFocused", "onColumnFocusChanged")
 
+    '//::TODO:: epg - remove this observer once the roku_linear_epg_v3 experiment is done
+    homeScreen.observeField("focusedChild", "onHomeScreenFocusChange")
+
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop lsitenting to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
 
@@ -100,6 +103,19 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     pushScreen(homeScreen, true, false)
   end if
 End Function
+
+
+
+Function onHomeScreenFocusChange(msg)
+  tubiLog("HomeScreenHelpers.onHomeScreenFocusChange")
+  screen = msg.getRoSGNode()
+  if screen <> invalid and screen.isInFocusChain() = true and m.deeplinkContent = invalid
+    '//Fire experiment exposure event when the Home Screen is focused - just in case there is a deep link to linear content
+    '//::NOTE:: delete this function once the experiment is over
+    bEnabled = getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", true).enabled
+  end if
+End Function
+
 
 
 Function homeBatchResponse(response)
