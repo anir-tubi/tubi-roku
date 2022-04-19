@@ -29,7 +29,7 @@ Function init()
   end if
   m.top.observeField("length", "onLengthChange")
   m.top.observeField("isSeries", "onIsSeries")
-  m.top.observeField("isInKidsModeUI", "onIsKidsModeUIChange")
+  m.top.observeField("isInKidsAgeGateMode", "onIsInKidsAgeGateMode")
   m.top.observeField("isBookmark", "onIsBookmark")
   m.top.observeField("isHistory", "onIsHistory")
   m.top.observeField("isChannelItem", "onIsChannel")
@@ -312,12 +312,12 @@ Function onRemoveSignupButton(msg)
 End Function
 
 
-Function onIsKidsModeUIChange()
+Function onIsInKidsAgeGateMode()
   if m.rokuRegisterSignupToSaveExperiment = true and isLoggedInUser() = false and isReturningUser() = true
     signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
-    if m.top.isInKidsModeUI = true and signUpIndex > -1
+    if m.top.isInKidsAgeGateMode = true and signUpIndex > -1
       addRemoveMenuItem(false, signUpIndex)
-    else if m.top.isInKidsModeUI = false and signUpIndex = -1
+    else if m.top.isInKidsAgeGateMode = false and signUpIndex = -1
       if m.top.isSeries = true
         addRemoveMenuItem(true, signUpIndex, m.signUpMenuItem, [])
       else if m.top.isSeries = false

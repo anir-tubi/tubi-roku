@@ -22,3 +22,17 @@ Function isReturningUser()
   end if
   return returningUser
 End Function
+
+
+Function needsToShowAgeVerificationScreen()
+  if isLoggedInUser() = true AND m.global.authInfo.hasAge = true then
+    return false
+  else
+    guestUserHasAgeInfo = TubiAuth(m.constants, m.Request).getGuestUserHasAgeInfo()
+    ' In the case that the user is logged in but there is no age information associated with the account, hasAge defaults to false.
+    if guestUserHasAgeInfo.hasAge = true and guestUserHasAgeInfo.expired <> true
+      return false
+    end if
+  end if
+  return true
+End Function

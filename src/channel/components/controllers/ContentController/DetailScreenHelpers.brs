@@ -232,8 +232,11 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     else
       detailScreen.mode = m.constants.ui.infoPanelModes.movie
     end if
-    detailScreen.isInKidsModeUI = isKidsUIOn()
-
+    if m.uiMode = m.constants.ui.modes.kidsAgeGate
+      detailScreen.isInKidsAgeGateMode = true
+    else
+      detailScreen.isInKidsAgeGateMode = false
+    end if
     if episode <> invalid
       stateSource = episode
     else
