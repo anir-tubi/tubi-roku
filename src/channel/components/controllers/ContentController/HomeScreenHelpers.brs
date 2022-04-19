@@ -109,7 +109,7 @@ End Function
 Function onHomeScreenFocusChange(msg)
   tubiLog("HomeScreenHelpers.onHomeScreenFocusChange")
   screen = msg.getRoSGNode()
-  if screen <> invalid and screen.isInFocusChain() = true and m.deeplinkContent = invalid
+  if screen <> invalid and screen.isInFocusChain() = true and m.deeplinkContent = invalid and isParentalControlsAdultLevel() = true and isKidsUIOn() = false
     '//Fire experiment exposure event when the Home Screen is focused - just in case there is a deep link to linear content
     '//::NOTE:: delete this function once the experiment is over
     bEnabled = getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", true).enabled
