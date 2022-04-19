@@ -320,7 +320,7 @@ Function onErrorReloadUserCategories(response, screenID = "")
 
   if homeScreen <> invalid and response <> invalid
     ' if we were loading in the background, don't show an error modal
-    if homeScreen.isInFocusChain()
+    if homeScreen.isInFocusChain() = true
       errorMessage = getTranslation("screenHome_error_fetchCategories_description")
       errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
       dialogEvent =  {

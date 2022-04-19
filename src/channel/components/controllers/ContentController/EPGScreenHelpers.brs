@@ -52,6 +52,10 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     epgScreen.observeFieldScoped("topNavToggled", "onScreenTopNavToggled")
     epgScreen.observeFieldScoped("refreshEPGScreenVideoPlay", "onRefreshEPGScreenVideoPlay")
     epgScreen.observeFieldScoped("epgScreenOkPressed", "onEPGScreenOKPressed")
+
+    '//::TODO:: epg - remove this observer once the roku_linear_epg_v3 experiment is done
+    epgScreen.observeField("focusedChild", "onEPGScreenFocusChange")
+
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop lsitenting to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
 
@@ -81,6 +85,17 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
   end if
 
   m.totalNumEPGBatches = 0 ' good practice to initialize m. scope variable in init functions
+End Function
+
+
+Function onEPGScreenFocusChange(msg)
+  tubiLog("EPGScreenHelpers.onEPGScreenFocusChange")
+  epgScreen = msg.getRoSGNode()
+  if epgScreen <> invalid and epgScreen.isInFocusChain() = true and m.deeplinkContent = invalid
+    '//Fire experiment exposure event when the EPG Screen is focused - just in case there is a deep link to linear content
+    '//::NOTE:: delete this function once the experiment is over
+    getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", true)
+  end if
 End Function
 
 
