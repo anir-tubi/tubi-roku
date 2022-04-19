@@ -91,6 +91,10 @@ Function init()
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
 
+  'initialize linearScreenAfterFn. This function is executed after fadeInController
+  'in case fadeInContentController is still playing when we tried to play linear content which will result in playback error.
+  m.linearScreenAfterFn = invalid
+
   m.deeplinkContent = invalid
   m.startupArgsReceived = false
   m.top.observeFieldScoped("startupArgs", "onStartupArgs")
@@ -171,7 +175,11 @@ Function onFadeInContentController()
   fadeInUiGroup.observeField("state", "onUiGroupFadeStateChange")
 
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and currentScreen.isInFocusChain() = false
+  'if m.linearScreenAfterFn is set in that case execute linearScreenAfterFn
+  if m.linearScreenAfterFn <> invalid
+    m.linearScreenAfterFn()
+    m.linearScreenAfterFn = invalid
+  else if currentScreen <> invalid and currentScreen.isInFocusChain() = false
 
     ' isUpgradeModalOpened will be true if constants.showUpgradeAlert is true
     ' focus currentScreen only if the upgradeModal is closed or disabled

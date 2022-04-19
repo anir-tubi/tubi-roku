@@ -195,7 +195,13 @@ Function handleDeeplinkContentByType()
   tubilog("deeplinkHelpers.handleDeeplinkContentByType")
   if m.deepLinkContent <> invalid
     if m.deepLinkContent.deeplinkType = "linear" or m.deepLinkContent.deeplinkType = "liveTV"
-      handleLinearDeeplinkContent()
+      'if fadeInContentController is still playing, then linear content can not play.
+      'in that case, consider handling the linear deeplink content after fade in animation is over in onFadeInContentController
+      if m.top.fadeInContentController = true
+        handleLinearDeeplinkContent()
+      else
+        m.linearScreenAfterFn = handleLinearDeeplinkContent
+      end if
     else if m.deepLinkContent.deeplinkType = "category"
       handleCategoryDeeplinkContent()
     else if m.deepLinkContent.deeplinkType = "channel"
