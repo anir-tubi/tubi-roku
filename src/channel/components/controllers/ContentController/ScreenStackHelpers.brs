@@ -3,13 +3,22 @@
 Function pushScreen(screen As Object, sendNavigateEvents = true, sendLoadingEvents = true)
   tubiLog("ScreenStackHelpers.pushScreen " + screen.id)
   m.sentSponsorPixels = {} '//refresh this associative array that keeps track of the viewing of the sponsor images. Only send out the sponsor pixels once per page load so refresh upon a loading of a new screen.
-  setSponsorshipBackground("") '//reset the sponsorship background whenever a screen is pushed 
-  
-  current = m.screenStack.current
+  setSponsorshipBackground("") '//reset the sponsorship background whenever a screen is pushed
 
-  'handle user tracking for navigating to screen
-  if sendNavigateEvents = true and current <> invalid
-    screenTrackingNavigate(current.trackingPageInfo, screen.trackingPageInfo, current.trackingComponentInfo)
+  if isKidsUIOn() = false and screen.subtype() = "HomeScreen"
+    showExperienceLogo(m.contentExperienceMode)
+  end if
+
+  current = m.screenStack.current
+  if current <> invalid
+    if isKidsUIOn() = false and current.subtype() = "HomeScreen"
+      hideExperienceLogo()
+    end if
+
+    'handle user tracking for navigating to screen
+    if sendNavigateEvents = true
+      screenTrackingNavigate(current.trackingPageInfo, screen.trackingPageInfo, current.trackingComponentInfo)
+    end if
   end if
 
   'handle user tracking for loading screen
@@ -36,7 +45,7 @@ End Function
 ' Wrapper around the m.screenStack push interface to handle analytics events
 ' Remove the top-most screen of the stack, making the previous screen visible
 '
-' @sendNavigateEvents: boolean, don't send NavigateToPage analytics events. This might be useful in the 
+' @sendNavigateEvents: boolean, don't send NavigateToPage analytics events. This might be useful in the
 '                               case where a page fails to load but the page was already added to the screen
 '                               stack, and now the screen must be removed from screen stack, but the user did
 '                               not purposefully navigate back
@@ -47,10 +56,13 @@ End Function
 Function popScreen(sendNavigateEvents = true, sendLoadingEvents = true)
   tubiLog("ScreenStackHelpers.popScreen")
   m.sentSponsorPixels = {} '//refresh this associative array that keeps track of the viewing of the sponsor images. Only send out the sponsor pixels once per page load so refresh upon an unloading of a screen.
-  setSponsorshipBackground("") '//reset the sponsorship background whenever a screen is popped 
+  setSponsorshipBackground("") '//reset the sponsorship background whenever a screen is popped
 
   toBePopped = getCurrentScreen()
   topHidden = getHiddenScreen(1)
+  if topHidden <> invalid and isKidsUIOn() = false and topHidden.subtype() = "HomeScreen"
+    showExperienceLogo(m.contentExperienceMode)
+  end if
 
   ' If the screen to be popped is the only screen, it will leave an empty screen stack.
   ' In the case of an empty screen stack, we will build a home page. From an analytics standpoint
@@ -87,7 +99,7 @@ End Function
 
 ' iterates over screen stack from top to bottom and returns the first screen found with an id that
 ' matches the id of the screen passed in
-' 
+'
 ' @screenId: string, the id of the screen that is being searched for
 Function getScreenFromStackById(screenId)
   for i = m.screenStack.getChildCount() - 1 to 0 step -1
@@ -212,6 +224,6 @@ End Function
 Function onScreenChange()
   if getCurrentScreen() <> invalid and getCurrentScreen().id <> invalid
     bSideNavVisible = (m.constants.ui.sideNavOpenIds[getCurrentScreen().id] = true)
-    m.sideNav.visible = bSideNavVisible   
+    m.sideNav.visible = bSideNavVisible
   end if
 End Function

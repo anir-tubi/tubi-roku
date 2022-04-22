@@ -5,13 +5,15 @@ Function init()
 
   m.constants = m.global.constants
 
+  m.contentExperienceMode = m.constants.ui.contentExperienceModes.standard
+
   ' Timer to find last time the app restarted
   m.lastAppRestartTimer = CreateObject("roTimespan")
 
   ' Timer to find last time the app suspended
   m.appSuspendTimer = CreateObject("roTimespan")
 
-  generalTask = CreateObject("roSGNode", "GeneralTask")  ' initiate GeneralTask
+  generalTask = CreateObject("roSGNode", "GeneralTask") ' initiate GeneralTask
   ' Initiate GeneralTaskModule by passing caller context.
   ' Calling GeneralTaskModule() will append methods to the local m.
   ' DO NOT overwrite m variable methods/properties which belongs to GeneralTaskModule.
@@ -46,6 +48,7 @@ Function init()
   m.logo = m.logoGroup.findNode("tubiLogo")
   m.logoKids = m.logoGroup.findNode("tubiKidsLogo")
   m.logoEspanol = m.logoGroup.findNode("tubiEspanolLogo")
+  m.experienceLogo = m.logoGroup.findNode("experienceLogo")
   m.clock = m.top.findNode("clock")
   m.spinner = m.top.findNode("ContentControllerSpinner")
   m.LinearVideoPlayerSpinner = m.top.findNode("LinearVideoPlayerSpinner")
@@ -75,15 +78,10 @@ Function init()
   m.global.trackingLoggingTask = m.trackingLoggingTask
 
   ' initialize states needed for various parts of kids mode
-  m.kidsModeFeatureOn = false   'Should the kids Mode feature be made available for the user to interact with
+  m.kidsModeFeatureOn = false 'Should the kids Mode feature be made available for the user to interact with
   if m.constants.deviceInfo.countryCode <> invalid and (UCase(m.constants.deviceInfo.countryCode) = "US" or UCase(m.constants.deviceInfo.countryCode) = "CA")
     m.kidsModeFeatureOn = true
   end if
-
-  ' initSideNav must run after m.global.trackingLoggingTask is set in case there are any experiments
-  ' within the side nav component that rely on trackingLoggingTask to send exposure events.
-  ' initSideNav relies on m.kidsModeFeatureOn being set, so run after m.kidsModeFeatureOn is set.
-  initSideNav()
 
   ' TODO: Once MetadataFetchTask functionality is refactored to use the GeneralTask remove uiMode from m.global
   m.global.addField("uiMode", "string", false)
@@ -121,11 +119,11 @@ Function init()
   m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
 
   m.global.addField("authInfo", "assocarray", false)
-  m.global.authInfo = invalid  ' indicates not logged in
+  m.global.authInfo = invalid ' indicates not logged in
 
-  m.authInfoReceived = false    'is the auth info returned from the registry
-  m.authInfoRefreshed = true    'is the auth info refreshed after receiving a deeplink with a refresh token
-  m.ageVerificationComplete = false   'has the user verified their age?
+  m.authInfoReceived = false 'is the auth info returned from the registry
+  m.authInfoRefreshed = true 'is the auth info refreshed after receiving a deeplink with a refresh token
+  m.ageVerificationComplete = false 'has the user verified their age?
   m.authTask = CreateObject("roSGNode", "AuthTask")
   m.authTask.observeFieldScoped("authInfo", "onStartupAuthInfoReceived")
   m.authTask.functionName = "execInitializeUserData"
@@ -145,7 +143,7 @@ Function init()
   ' or set to invalid elsewhere
   m.autoplayContext = invalid
 
-  m.lastUserActivity = Uptime(0)  ' arbitrary marker when user last pressed a remote key
+  m.lastUserActivity = Uptime(0) ' arbitrary marker when user last pressed a remote key
 
   ' holds state so we don't fire the app load beacon more than once
   m.appLoadedBeaconFired = false
@@ -185,7 +183,7 @@ Function onFadeInContentController()
     ' focus currentScreen only if the upgradeModal is closed or disabled
 
     isUpgradeModalOpened = false
-    for i=0 to m.top.getChildCount()-1
+    for i = 0 to m.top.getChildCount() - 1
       screen = m.top.getChild(i)
       if screen.subType() = "ModalDialogScreen"
         isUpgradeModalOpened = true
@@ -209,7 +207,7 @@ Function displayExitModal(trackingPageInfo)
   dialogEvent = {
     type: "dialog"
     values: {
-      dialog_type: "EXIT"   'DialogType enum
+      dialog_type: "EXIT" 'DialogType enum
       pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
       dialog_action: "SHOW"
       dialog_sub_type: ""
@@ -226,7 +224,7 @@ End Function
 Function displayMaturePlayWarning(dialogSubtype, pageInfo)
   dialogEvent = getDialogAnalyticEvent("SIGNIN_REQUIRED", dialogSubtype, pageInfo)
 
-  title =  getTranslation("error_matureContent_title")
+  title = getTranslation("error_matureContent_title")
   message = getTranslation("error_mustBeSignedIn_description")
   buttons = [getTranslation("dialog_button_continue"), getTranslation("dialog_button_cancel")]
   showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected)
@@ -286,7 +284,7 @@ End Function
 ' onKeyEvent
 '
 ' Back pressed on detail screen should close it
-Function onKeyEvent(key As String, press As Boolean) as Boolean
+Function onKeyEvent(key as String, press as Boolean) as Boolean
   tubiLog("ContentController.onKeyEvent key = " + key)
   if m.lastUserActivity <> invalid
     m.lastUserActivity = Uptime(0)
@@ -342,6 +340,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           end if
           popScreen(true, true)
           newTopScreen = getCurrentScreen()
+
           sideNavId = m.constants.ui.screenIdToSideNavId[newTopScreen.id]
           if sideNavId <> invalid
             focusSideNavOption(sideNavId)
@@ -502,12 +501,19 @@ Function startUserExperience()
     else
       ' the user is a guest user, and we are not age gating guest users at app launch,
       ' so set m.ageVerificationComplete = true and recursively call this
-      ' function so we can move past the m.ageVerificationComplete check.
+      ' Function so we can move past the m.ageVerificationComplete check.
       m.ageVerificationComplete = true
       startUserExperience()
     end if
   else
     ' All of the above checked values are true, so we are ready to start the channel UI
+
+    ' initSideNav must run after m.global.trackingLoggingTask is set in case there are any experiments
+    ' within the side nav component that rely on trackingLoggingTask to send exposure events.
+    ' initSideNav relies on m.kidsModeFeatureOn being set, so run after m.kidsModeFeatureOn is set.
+    ' initSideNav also relies on m.global.authInfo being set in order to run isParentalControlsAdultLevel
+    initSideNav()
+
     showContentGroup()
 
     ' Since we're ready to start the channel, make sure the loading spinner is hidden
@@ -566,7 +572,7 @@ Function sendHdcpLog()
     if isActive = false
       hdcpVersion = "none"
     end if
-    tubiLog(hdcpVersion, "info", "clientInfo", "hdcp-version")   'send info to server
+    tubiLog(hdcpVersion, "info", "clientInfo", "hdcp-version") 'send info to server
   end if
 
 End Function
@@ -698,6 +704,8 @@ Function setDirtyUserCategories(categoryId)
     movieScreen = getFromScreenCache(m.constants.ui.screenIds.movieScreen)
     tvScreen = getFromScreenCache(m.constants.ui.screenIds.tvScreen)
     espanolScreen = getFromScreenCache(m.constants.ui.screenIds.espanolScreen)
+    bestKnownScreen = getFromScreenCache(m.constants.ui.screenIds.bestKnownScreen)
+    nostalgiaScreen = getFromScreenCache(m.constants.ui.screenIds.nostalgiaScreen)
 
     isKidsMode = shouldKidsModeBeSentToServer()
     reqName = m.constants.reqNames.getCategory
@@ -777,6 +785,46 @@ Function setDirtyUserCategories(categoryId)
         id: categoryId
       })
     end if
+
+    if bestKnownScreen <> invalid
+      option = {}
+      params = {}
+
+      params["content_mode"] = m.constants.ui.contentMode.bestKnown
+      option.params = params
+
+      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, option)
+
+      m.makeRequest({
+        url: categoryReqInfo.url
+        requestType: reqName
+        options: categoryReqInfo.options
+        successCallback: onReloadUserCategoriesResponseInBestKnownScreenScreen
+        errorCallback: onErrorReloadUserCategoriesInBestKnownScreen
+        responseType: "node"
+        id: categoryId
+      })
+    end if
+
+    if nostalgiaScreen <> invalid
+      option = {}
+      params = {}
+
+      params["content_mode"] = m.constants.ui.contentMode.nostalgia
+      option.params = params
+
+      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, option)
+
+      m.makeRequest({
+        url: categoryReqInfo.url
+        requestType: reqName
+        options: categoryReqInfo.options
+        successCallback: onReloadUserCategoriesResponseInNostalgiaScreenScreen
+        errorCallback: onErrorReloadUserCategoriesInNostalgiaScreen
+        responseType: "node"
+        id: categoryId
+      })
+    end if
   end if
 End Function
 
@@ -817,7 +865,7 @@ Function setUiMode(mode)
     'standard
     m.uiMode = mode
 
-    ' must set global thme prior to setting m.sideNav.uiMode, since the sideNav update
+    ' must set global theme prior to setting m.sideNav.uiMode, since the sideNav update
     ' depends on the global theme.
     if m.global.theme = invalid or m.global.theme.id <> m.constants.ui.themeIDs.default
       m.global.theme = m.constants.ui.themes.default
@@ -917,7 +965,7 @@ Function setUiModeFromState()
     end if
 
     ' Have to make sure we check expired as well as default state will always have hasAge = false
-    if m.guestUserHasAgeInfo.hasAge = false AND m.guestUserHasAgeInfo.expired = false then
+    if m.guestUserHasAgeInfo.hasAge = false and m.guestUserHasAgeInfo.expired = false then
       setUiMode(m.constants.ui.modes.kidsAgeGate)
       modeSet = true
     end if
@@ -943,6 +991,12 @@ Function setCommonKidsModeElements()
     m.backgroundGroup.kidsMode = true
     m.trackingLoggingTask.analyticsAppMode = "KIDS_MODE"
     tellScreensIfKidsModeBeSentToServer()
+
+    if isICTSExperimentEnabled(true) = true
+      '//change the side nav options if the experiment variant is enabled
+      m.SideNav.displayKids = true
+      m.SideNav.displayContentExperience = false
+    end if
   end if
 End Function
 
@@ -994,30 +1048,55 @@ End Function
 
 
 Function showKidsLogo()
-
-  m.logoKids.visible = true
-
+  if isICTSExperimentEnabled(true) = true
+    showExperienceLogo(m.constants.ui.modes.kids)
+  else
+    m.logoKids.visible = true
+  end if
 End Function
 
 
 Function hideKidsLogo()
-
-  m.logoKids.visible = false
-
+  if isICTSExperimentEnabled() = true
+    hideExperienceLogo()
+  else
+    m.logoKids.visible = false
+  end if
 End Function
 
 
 Function showEspanolLogo()
-
-  m.logoEspanol.visible = true
-
+  if isICTSExperimentEnabled(true) = true
+    showExperienceLogo(m.constants.ui.contentExperienceModes.espanol)
+  else
+    m.logoEspanol.visible = true
+  end if
 End Function
 
 
 Function hideEspanolLogo()
+  if isICTSExperimentEnabled() = true
+    hideExperienceLogo()
+  else
+    m.logoEspanol.visible = false
+  end if
+End Function
 
-  m.logoEspanol.visible = false
 
+'@experienceId: string - identifier of which experience logo to show. one of constants.ui.contentExperienceModes
+Function showExperienceLogo(experienceId)
+  modes = m.constants.ui.contentExperienceModes
+  if isICTSExperimentEnabled(true) = true and experienceId <> modes.standard and experienceId <> modes.liveTV
+    m.experienceLogo.experienceId = experienceId
+    m.experienceLogo.visible = true
+  else
+    m.experienceLogo.visible = false
+  end if
+End Function
+
+
+Function hideExperienceLogo()
+  m.experienceLogo.visible = false
 End Function
 
 
@@ -1073,7 +1152,7 @@ End Function
 
 Function refreshAllDetailScreens()
   ' Refresh all detail screens so they have proper history that's been loaded or unloaded
-  for i=0 to m.screenStack.getChildCount()-1
+  for i = 0 to m.screenStack.getChildCount() - 1
     screen = m.screenStack.getChild(i)
     if screen.subType() = "DetailScreen"
       populateDetailScreen(screen, screen.content)
@@ -1087,7 +1166,7 @@ End Function
 ' @sCategoryID: string, the category id we are searching for in the stack
 Function refreshStackedUserScreenWithChangedCategory(sCategoryID)
   ' Tell the screen that contains the categroy associated with the passed ID to refresh the next time is is on screen by setting the validUntil variable to 0
-  for i=0 to m.screenStack.getChildCount()-1
+  for i = 0 to m.screenStack.getChildCount() - 1
     screen = m.screenStack.getChild(i)
     if screen <> invalid and screen.isSubType("CategoryDetailsScreen")
       content = screen.content
@@ -1254,6 +1333,8 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   setContentToRefresh(m.constants.ui.screenIds.tvScreen)
   setContentToRefresh(m.constants.ui.screenIds.movieScreen)
   setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
+  setContentToRefresh(m.constants.ui.screenIds.bestKnownScreen)
+  setContentToRefresh(m.constants.ui.screenIds.nostalgiaScreen)
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
@@ -1401,7 +1482,7 @@ Function fireAppLoadTimeEvent(loadTime)
     loadtime: loadTime
     model: m.constants.deviceInfo.model
   }
-  tubiLog(FormatJSON(messageInfo), "info", "clientInfo", "time-to-load")   'send info to server
+  tubiLog(FormatJSON(messageInfo), "info", "clientInfo", "time-to-load") 'send info to server
 End Function
 
 
@@ -1432,16 +1513,16 @@ End Function
 ' show an upgrade modal if constants says that we should
 Function showUpgradeModal(shouldAlert, trackingLib, trackingTask)
   if shouldAlert = true
-    title  = getTranslation("dialog_updateVersion_title")
-    message  = getTranslation("dialog_updateVersion_description")
+    title = getTranslation("dialog_updateVersion_title")
+    message = getTranslation("dialog_updateVersion_description")
 
     buttons = [getTranslation("dialog_button_close")]
 
     dialogEvent = {
       type: "dialog"
       values: {
-        dialog_type: "UPGRADE"   'DialogType enum
-        pageOneof: trackingLib.getAnalyticsPage("home_page", {})
+        dialog_type: "UPGRADE" 'DialogType enum
+        pageOneof: trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
         dialog_action: "SHOW"
         dialog_sub_type: ""
       }

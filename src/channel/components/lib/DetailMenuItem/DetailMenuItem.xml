@@ -73,6 +73,7 @@
       visible="false" />
     <TextIcon
       id="badgeLabel"
+      uri="pkg:/images/tag-rounded-rectangle-background-pull-{size}.9.png"
       visible="false" />
   </children>
 </component>

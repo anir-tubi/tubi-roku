@@ -74,43 +74,43 @@ End Function
 'however, anything worthy of warn or error severity should be sent to the server (ie. fill all the parameters for warn and error)
 
 'debug will only send logging to the server if the device id is in m.idsToLog
-function tubiLog_debug(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object)
+Function tubiLog_debug(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object)
   logInfo = m.buildLogInfo(message, m.logConsts.debug.serverType[serverTypeName], subtype, m.logConsts.debug.name)
   m.sendLogging(logInfo, queue)
-end function
+End Function
 
 
-function tubiLog_info(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object)
+Function tubiLog_info(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object)
   logInfo = m.buildLogInfo(message, m.logConsts.info.serverType[serverTypeName], subtype, m.logConsts.info.name)
   m.sendLogging(logInfo, queue)
-end function
+End Function
 
 
-function tubiLog_error(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object)
+Function tubiLog_error(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object)
   logInfo = m.buildLogInfo(message, m.logConsts.error.serverType[serverTypeName], subtype, m.logConsts.error.name)
   m.sendLogging(logInfo, queue)
-end function
+End Function
 
 
-function tubiLog_warn(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object)
+Function tubiLog_warn(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object)
   logInfo = m.buildLogInfo(message, m.logConsts.warn.serverType[serverTypeName], subtype, m.logConsts.warn.name)
   m.sendLogging(logInfo, queue)
-end function
+End Function
 
-function tubiLog_exception(level as string, message as Object) as Void
+Function tubiLog_exception(level as string, message as Object) as Void
   if type(message) <> "roAssociativeArray"
     return
   end if
 
   print m.getLogPrintout(level, "", message.message)
-end function
+End Function
 
 '--------------------------------------------------------------------------------
 '--------------------------------------------------------------------------------
 
 
 
-function tubiLog_buildLogInfo_(message as String, serverType as Dynamic, subtype as String, level as String)
+Function tubiLog_buildLogInfo_(message as String, serverType as Dynamic, subtype as String, level as String)
   if subtype = ""
     subtype = "client_generic"
   end if
@@ -125,7 +125,7 @@ function tubiLog_buildLogInfo_(message as String, serverType as Dynamic, subtype
   logInfo["type"] = serverType
 
   return logInfo
-end function
+End Function
 
 
 'sends the logging info to the server by creating a logging request and adding the loggging request to the passed in request queue
@@ -140,7 +140,7 @@ end function
 '@queue: roAssociativeArray, object as created by RequestQueue()
 '
 'returns invalid if the log was only printed to the console
-function tubiLog_sendLogging_(logInfo as Object, queue as Object)
+Function tubiLog_sendLogging_(logInfo as Object, queue as Object)
   if logInfo <> invalid and logInfo.count() > 0
     if logInfo.message <> "" and m.constants <> invalid
 
@@ -159,7 +159,7 @@ function tubiLog_sendLogging_(logInfo as Object, queue as Object)
     end if
   end if
   return invalid
-end function
+End Function
 
 
 'uses Request().createAsync() to build a request that is ready to be sent to the logging API

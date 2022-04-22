@@ -22,7 +22,7 @@ Function onItemContentChange()
 
     if m.top.itemContent.id = "signUpMenuItem" and m.rokuRegisterSignupToSaveExperiment = true
       'If the button has title and BadgeText, calculated width will be width of both title and badgeText to avoid button crop. To get the
-      'calculated width we are assigning the title and badgeText to the m.DetailsMenuText and get the calculated value 
+      'calculated width we are assigning the title and badgeText to the m.DetailsMenuText and get the calculated value
       'and after setting the calculatedWidth resetting m.DetailsMenuText.text to title.
       m.DetailsMenuText.text = m.top.itemContent.title + m.top.itemContent.badgeText
       m.top.calculatedTextWidth = m.DetailsMenuText.boundingRect().width
@@ -52,12 +52,6 @@ Function onItemContentChange()
         m.badgeLabel.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
         m.badgeLabel.fontSize = 21
         m.badgeLabel.text = m.top.itemContent.badgeText
-        if m.global.constants.deviceInfo.scaledUi = true
-          m.badgeLabel.labelTranslation = [0, 4]
-          m.badgeLabel.uri = "pkg:/images/tag-rounded-rectangle-background-pull-hd.9.png"
-        else
-          m.badgeLabel.uri ="pkg:/images/tag-rounded-rectangle-background-pull-fhd.9.png"
-        end if
         m.badgeLabel.visible = true
         m.badgeLabel.translation = [calculatedWidth + 20, 20]
       else

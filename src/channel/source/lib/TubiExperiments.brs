@@ -25,11 +25,20 @@ Function TubiExperiments(constants) as Object
       '//     roku_linear_epg_v3: { "enabled": true, "side_nav": false, "update_homescreen": false}
       '//   if side_nav=true, then the "Live TV" option will be found on the side nav and not on the homescreen's top nav
       '//     roku_linear_epg_v3: { "enabled": true, "side_nav": true, "update_homescreen": false }
-      '// ::NOTE:: For v2 of this experiment, "update_homescreen" is ALWAYS set to false - for control and all variants. 
-      '//           In the future, is has been discussed that a future experiment (v3?) will test having the liveTV row 
+      '// ::NOTE:: For v2 of this experiment, "update_homescreen" is ALWAYS set to false - for control and all variants.
+      '//           In the future, is has been discussed that a future experiment (v3?) will test having the liveTV row
       '//           on the homescreen with a different EPG UI, in which case "update_homescreen" will then be set to true in an experiment variant.
       roku_linear_epg: {
         roku_linear_epg_v3: { "enabled": false, "side_nav": false, "update_homescreen": false}
+      }
+
+      '//When enabled = true, the "roku_icts_content_modes_v1" experiment should have a boolean field labeled "show_background_images" and a boolean field labeled "live_tv_first"
+      '//   if enabled=true and show_background_images=true and live_tv_first=false, then we will show background images and a-list will be first
+      '//     roku_icts_content_modes_v1: {"enabled": true, "show_background_images": true, "live_tv_first": false}
+      '//   if enabled=true and show_background_images=false and live_tv_first=true, then we will not show background images and live tv will be first and show me everything will be focused first
+      '//     roku_icts_content_modes_v1: {"enabled": true, "show_background_images": false, "live_tv_first": false}
+      roku_icts_content_modes: {
+        roku_icts_content_modes_v1: {"enabled": false, "show_background_images": false, "live_tv_first": false}
       }
 
       roku_linear_search_ui_update: {

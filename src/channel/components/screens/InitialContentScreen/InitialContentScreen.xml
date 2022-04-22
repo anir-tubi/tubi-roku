@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="InitialContentScreen" extends="BaseScreen">
-
   <script type="text/brightscript" uri="InitialContentScreen.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
@@ -14,17 +13,16 @@
   <interface>
     <!-- INPUT -->
       <!-- Tell screen to display into view -->
-      <field id="animateIntoView" type="boolean"/>
+      <field id="animateIntoView" type="boolean" alwaysNotify="true"/>
 
 
     <!-- OUTPUT -->
       <!-- The item that the user selects. Action should be done immediately after hearing a change of this field. -->
-      <field id="actionableItemSelected" type="string"/>
-
-
+      <field id="actionableItemSelected" type="string" alwaysNotify="true"/>
   </interface>
 
   <children>
+    <Group id="controlGroup">
       <Label
         id="title"
         vertAlign="center"
@@ -52,7 +50,6 @@
           size="27" />
       </Label>
 
-
       <Poster
         id="InitialContentMenuBground"
         width="1069"
@@ -61,17 +58,8 @@
         translation="[240,396]"
         uri="pkg:/images/initial-content-screen-menu-gradient.9.png"/>
 
-      <Poster
-        id="InitialContentProfileMenuItemBground"
-        visible="false"
-        opacity="0"
-        width="312"
-        height="372"
-        translation="[1032,456]"
-        uri="pkg:/images/initial-content-screen-menu-item-bg.png"/>
-
       <MarkupGrid
-        id="InitialContentMenu"
+        id="controlInitialContentMenu"
         translation="[336,456]"
         rowHeights="[252]"
         itemSize="[192, 410]"
@@ -80,10 +68,10 @@
         numRows="1"
         focusBitmapUri="pkg://images/menu-focus-initial-content-screen.png"
         drawFocusFeedbackOnTop="false"
-        itemComponentName="InitialContentItem"/>
+        itemComponentName="ControlInitialContentItem"/>
 
       <SimpleButton
-        id="skipButton"
+        id="controlSkipButton"
         visible="true"
         opacity="0"
         translation="[714,888]"
@@ -91,9 +79,76 @@
         height="96"
         color="0x9699a3FF"
         unfocusedBackgroundOpacity=".16"/>
+    </Group>
 
-      <Timer
-       id="FocusDelayTimer"
-       repeat="false"/>
-    </children>
+    <Group id="variantGroup">
+      <CrossFadePoster
+        id="headerPoster"
+        width="1704"
+        height="420"
+        animationDuration="0.5"
+        opacity="0"
+        translation="[120, 0]" />
+      <Label
+        id="titleLabel"
+        width="1920"
+        horizAlign="center"
+        color="#FF501A"
+        opacity="0"
+        translation="[0, 198]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="32" />
+      </Label>
+
+      <CrossFadeLabel
+        id="experienceTitleFadeLabel"
+        width="1920"
+        horizAlign="center"
+        color="#FFFFFF"
+        animationDuration="0.5"
+        opacity="0"
+        translation="[0, 246]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="54" />
+      </CrossFadeLabel>
+      <CrossFadeLabel
+        id="experienceDescriptionFadeLabel"
+        width="1920"
+        horizAlign="center"
+        color="#D7DAE0"
+        animationDuration="0.5"
+        wrap="true"
+        opacity="0"
+        translation="[0, 312]">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="28" />
+      </CrossFadeLabel>
+      <MarkupGrid
+        id="InitialContentMenu"
+        translation="[0, 432]"
+        itemSize="[216, 216]"
+        columnSpacings="[24]"
+        numRows="1"
+        itemComponentName="InitialContentItem" />
+      <SimpleButton
+        id="SkipButton"
+        width="303"
+        height="84"
+        color="#9699A3"
+        fontSize="24"
+        unfocusedBackgroundOpacity=".16"
+        opacity="0"
+        translation="[808.5, 708]" />
+    </Group>
+
+    <Timer
+        id="FocusDelayTimer"
+        repeat="false"/>
+  </children>
 </component>

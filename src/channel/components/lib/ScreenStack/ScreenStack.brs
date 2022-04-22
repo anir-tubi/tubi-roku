@@ -11,10 +11,12 @@ End Function
 ' Indicates that the the current screen should gain focus
 Function onSetCurrentFocusCommand()
   screen = m.top.current
-  if screen.isInFocusChain() <> true
-    screen.setFocus(true)
+  if screen <> invalid
+    if screen.isInFocusChain() <> true
+      screen.setFocus(true)
+    end if
+    screen.visible = true
   end if
-  screen.visible = true
 End Function
 
 
@@ -48,7 +50,7 @@ Function onPush(msg)
     ' the search screen can be pushed on top of the home screen,
     ' but the home screen can not be pushed on top of the search screen.
     ' This is done to prevent screen looping where screen A calls screen B, which in turn calls screen A, etc.
-    ' Screens can be flagged as isStackable = true, so that screens with the same screenLevel can stack on top of 
+    ' Screens can be flagged as isStackable = true, so that screens with the same screenLevel can stack on top of
     ' each other (for example, details screens when using You May Also Like).
     stackTop = getCurrent()
     if stackTop <> invalid
@@ -73,9 +75,9 @@ Function onPush(msg)
     m.top.current = newChild
     if newChild.shouldFocusWhenPushed <> false
       newChild.setFocus(true)
-    end if    
+    end if
     newChild.visible = true
-    
+
     if oldCurrent <> invalid and oldCurrent.isSameNode(newChild) = false
       oldCurrent.visible = false
     end if

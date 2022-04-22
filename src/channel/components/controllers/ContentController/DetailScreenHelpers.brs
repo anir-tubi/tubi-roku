@@ -1172,7 +1172,7 @@ Function setComponentInteractionEventForSignUp(screen)
   }
   pageInfo = screen.trackingPageInfo
   componentInteractionInfo = {
-    pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType,pageInfo.pageValues)
+    pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
     componentOneof: m.Tracking.getAnalyticsComponent("button_component",  componentValues)
     user_interaction: "CONFIRM"
   }

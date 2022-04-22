@@ -518,8 +518,8 @@ End Function
 
 
 'requests and receives a new auth token from the server
-'this is a helper Function that wraps tubiAuth_requestTokenRefresh_ and tubiAuth_handleRefreshResponse_
-'this Function behaves synchronously and blocks until a response is received or the timeout is reached
+'this is a helper function that wraps tubiAuth_requestTokenRefresh_ and tubiAuth_handleRefreshResponse_
+'this function behaves synchronously and blocks until a response is received or the timeout is reached
 '@authInfo = {
 '  refreshToken: someRefreshToken(String)
 '  accessToken: someAccessToken(String)

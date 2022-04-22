@@ -1,10 +1,10 @@
 ' Placeholder file to make bsc happy while developing since this file is created at build time
-function getSettings()
+Function getSettings()
 	print "this should never get called"
 	stop
-end function
+End Function
 
-function getManifest()
+Function getManifest()
 	print "this should never get called"
 	stop
-end function
+End Function

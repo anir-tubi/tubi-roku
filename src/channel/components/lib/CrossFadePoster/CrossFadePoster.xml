@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - CrossFadePoster
+ -
+ - This is a "Poster"-like component that will crossfade when provided a new uri.
+ -
+ -->
+<component name="CrossFadePoster" extends="Group" >
+  <script type="text/brightscript" uri="CrossFadePoster.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ImageMixin.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="uri" type="string" />
+    <field id="animationDuration" alias="animation.duration" value="1.0" />
+
+    <!-- forwarded to children -->
+    <field id="width" alias="posterA.width, posterB.width" />
+    <field id="height" alias="posterA.height, posterB.height" />
+    <field id="loadDisplayMode" alias="posterA.loadDisplayMode, posterB.loadDisplayMode" />
+
+    <!-- OUTPUTS -->
+    <field id="loadStatus" type="string" />
+  </interface>
+
+  <children>
+    <Poster
+      id="posterA"
+      opacity="0" />
+    <Poster
+      id="posterB"
+      opacity="0" />
+
+    <Animation
+      id="animation"
+      easeFunction="linear">
+      <FloatFieldInterpolator
+        id="fadeOutInterpolator"
+        key="[0.0, 1.0]"
+        keyValue="[1.0, 0.0]" />
+      <FloatFieldInterpolator
+        id="fadeInInterpolator"
+        key="[0.0, 1.0]"
+        keyValue="[0.0, 1.0]" />
+    </Animation>
+  </children>
+</component>

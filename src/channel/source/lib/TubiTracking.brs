@@ -20,16 +20,18 @@ Function TubiTracking (constants, request, auth)
     getAnalyticsSelector: tubiTracking_getAnalyticsSelector
     getAnalyticsTile: tubiTracking_getAnalyticsTile
     getAnalyticsAd: tubiTracking_getAnalyticsAd
+    getAnalyticsHomePageContentMode: tubiTracking_getAnalyticsHomePageContentMode
     
     populateMessage: tubiTracking_populateMessage
     isEmptyValue: tubiTracking_isEmptyValue
     isNumeric: tubiTracking_isNumeric
     isString: tubiTracking_isString
+    getHomePageContentModeMap: tubiTracking_getHomePageContentModeMap
 
     ' an AA structure of the valid "Oneofs" that are needed in various protos messages
     allOneofs: tubiTracking_getOneOfs()
 
-    'an AA map of page ids to their corresponding enum values for the LeftSideNavComponent Section
+    ' an AA map of page ids to their corresponding enum values for the LeftSideNavComponent Section
     sideNavPageMap: tubiTracking_getSideNavPageMap(constants)
   }
 End Function
@@ -558,6 +560,20 @@ Function tubiTracking_getAnalyticsAd(ctx)
 End Function
 
 
+' @screenId: string, an id of an instance of the home screen
+' @returns: string, the analytics content mode corresponding to the passed in screen id
+Function tubiTracking_getAnalyticsHomePageContentMode(screenId)
+  homePageContentModeMap = m.getHomePageContentModeMap(m.constants)
+  analyticsContentMode = "CONTENT_MODE_UNKNOWN"
+
+  if homePageContentModeMap[screenId] <> invalid
+    analyticsContentMode = homePageContentModeMap[screenId]
+  end if
+
+  return analyticsContentMode
+End Function
+
+
 ' tubiTracking_populateMessage populates a "protobuf message" structure with passed in content based on the defined structure.
 ' The defined structure may have more fields than the passed in content has to populate it with, so this function returns a structure only
 ' with fields that have been populated. tubiTracking_populateMessage also overwrites any "Oneof" fields if the values for the "Oneof"
@@ -650,17 +666,9 @@ Function tubiTracking_getOneOfs()
   }
 
   home_page = {
-    i: "i"  'filler because empty fields are removed
+    content_mode: "CONTENT_MODE_UNKNOWN"  'filler because empty fields are removed
   }
 
-  movie_browse_page = {
-    i: "i"  'filler because empty fields are removed
-  }
- 
-  series_browse_page = {
-    i: "i"  'filler because empty fields are removed
-  }
-  
   news_browse_page = {
     i: "i"  'filler because empty fields are removed
   }
@@ -670,10 +678,6 @@ Function tubiTracking_getOneOfs()
   }
 
   entertainment_browse_page = {
-    i: "i"  'filler because empty fields are removed
-  }
-
-  latino_browse_page = {
     i: "i"  'filler because empty fields are removed
   }
 
@@ -773,12 +777,9 @@ Function tubiTracking_getOneOfs()
     register_page: register_page
     account_page: account_page
     access_menu_page: access_menu_page
-    movie_browse_page: movie_browse_page 
-    series_browse_page: series_browse_page
     news_browse_page: news_browse_page
     sports_browse_page: sports_browse_page
     entertainment_browse_page: entertainment_browse_page
-    latino_browse_page: latino_browse_page
     onboarding_page: onboarding_page
     landing_page: landing_page
     age_gate_page: age_gate_page
@@ -805,12 +806,9 @@ Function tubiTracking_getOneOfs()
     dest_register_page: register_page
     dest_account_page: account_page
     dest_access_menu_page: access_menu_page
-    dest_movie_browse_page: movie_browse_page
-    dest_series_browse_page: series_browse_page
     dest_news_browse_page: news_browse_page
     dest_sports_browse_page: sports_browse_page
     dest_entertainment_browse_page: entertainment_browse_page
-    dest_latino_browse_page: latino_browse_page
     dest_linear_browse_page: linear_browse_page
     dest_onboarding_page: onboarding_page
     dest_landing_page: landing_page
@@ -938,11 +936,31 @@ Function tubiTracking_getSideNavPageMap(constants)
     if sideNavIds.kidsMode <> invalid then map[sideNavIds.kidsMode] = "KIDS"
     if sideNavIds.profile <> invalid then map[sideNavIds.profile] = "ACCOUNT"
     if sideNavIds.linearEPG <> invalid then map[sideNavIds.linearEPG] = "LINEAR"
+    if sideNavIds.contentExperience <> invalid then map[sideNavIds.contentExperience] = "SWITCH_EXPERIENCE"
+    if sideNavIds.nostalgia <> invalid then map[sideNavIds.nostalgia] = "NOSTALGIA"
+    if sideNavIds.bestKnown <> invalid then map[sideNavIds.bestKnown] = "A_LIST"
     if sideNavIds.sports <> invalid then map[sideNavIds.sports] = "SPORTS"
     if sideNavIds.news <> invalid then map[sideNavIds.news] = "NEWS"
     if sideNavIds.entertainment <> invalid then map[sideNavIds.entertainment] = "ENTERTAINMENT"
     if sideNavIds.subtitles <> invalid then map[sideNavIds.subtitles] = "SUBTITLES"
     if sideNavIds.back <> invalid then map[sideNavIds.back] = "BACK"
+  end if
+  return map
+End Function
+
+
+' returns an AA that maps screen ids of homescreen instances to the appropriate analytics content mode
+Function tubiTracking_getHomePageContentModeMap(constants)
+  map = {}
+  if constants <> invalid and constants.ui <> invalid and constants.ui.screenIds <> invalid
+    screenIds = constants.ui.screenIds
+    if screenIds.homeScreen <> invalid then map[screenIds.homeScreen] = "CONTENT_MODE_UNKNOWN"
+    if screenIds.movieScreen <> invalid then map[screenIds.movieScreen] = "CONTENT_MODE_MOVIE"
+    if screenIds.tvScreen <> invalid then map[screenIds.tvScreen] = "CONTENT_MODE_TV"
+    if screenIds.linearTVScreen <> invalid then map[screenIds.linearTVScreen] = "CONTENT_MODE_NEWS"
+    if screenIds.espanolScreen <> invalid then map[screenIds.espanolScreen] = "CONTENT_MODE_LATINO"
+    if screenIds.nostalgiaScreen <> invalid then map[screenIds.nostalgiaScreen] = "NOSTALGIA"
+    if screenIds.bestKnownScreen <> invalid then map[screenIds.bestKnownScreen] = "A_LIST"
   end if
   return map
 End Function

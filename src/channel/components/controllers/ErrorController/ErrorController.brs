@@ -35,7 +35,7 @@ Function showModalDialog(error)
     type: "dialog"
     values: {
       dialog_type: "NETWORK_ERROR" 'DialogType enum
-      pageOneof: m.Tracking.getAnalyticsPage("home_page", {})  'a valid page type (see DialogEvent in events.protos)
+      pageOneOf: m.Tracking.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})  'a valid page type (see DialogEvent in events.protos)
       dialog_action: "SHOW"
       dialog_sub_type: errorCode
     }

@@ -199,6 +199,13 @@
             translation="[1503,60]"
             opacity="1.0"
             visible="false"/>
+          <ExperienceLogo
+            id="experienceLogo"
+            tubiLogoWidth="103"
+            tubiLogoHeight="45"
+            fontSize="32"
+            visible="false"
+            translation="[1770, 60]" />
         </Group>
       </Group>
 

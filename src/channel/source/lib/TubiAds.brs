@@ -1,4 +1,4 @@
-function TubiAds (constants, log, request, requestQueue, auth, tracking, adContentType)
+Function TubiAds (constants, log, request, requestQueue, auth, tracking, adContentType)
   'Add Support for Roku Advertising Framework
   roAdFramework = Roku_Ads()
 
@@ -65,7 +65,7 @@ function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
     getMd5Hash: tubiAds_getMd5Hash
     appMode: "DEFAULT_MODE"
   }
-end function
+End Function
 
 
 ' returns a set of ad helper functions that can be used outside of TubiAds without invoking RAF
@@ -108,7 +108,7 @@ End Function
 '                   ]
 '
 ' ----------------------------------------------
-function tubiAds_hasAds(allAdUnitsList)
+Function tubiAds_hasAds(allAdUnitsList)
   hasAds = false
   if allAdUnitsList <> invalid and allAdUnitsList.count() > 0
     firstAdUnitsListContainer = m.allAdUnitsList[0]
@@ -121,7 +121,7 @@ function tubiAds_hasAds(allAdUnitsList)
   end if
 
   return hasAds
-end function
+End Function
 
 ' ----------------------------------------------
 '  m.reset()
@@ -129,13 +129,13 @@ end function
 '  call when starting a content video to
 '  clear everything out
 ' ----------------------------------------------
-function tubiAds_reset()
+Function tubiAds_reset()
   m.allAdUnitsList = []
   m.commercialDuration = 0
   m.containerNode = invalid
   m.adPlaybackPos = 0
   m.isInteracting = false
-end function
+End Function
 
 
 ' ----------------------------------------------
@@ -144,7 +144,7 @@ end function
 ' cache an ads list for an ad break - typically occurs 4-7 seconds before an ad break actually runs
 ' we keep the most recently cached ad break at m.lastAdsList
 ' ----------------------------------------------
-function tubiAds_cacheAdsList(episode, breakPos)
+Function tubiAds_cacheAdsList(episode, breakPos)
   if(m.lastAdsList = invalid or m.lastAdsList.breakPos <> breakPos or m.lastAdsList.cid <> episode.adrise_contentId)
     m.getAdsListViaRoku(episode, breakPos)
 
@@ -159,17 +159,17 @@ function tubiAds_cacheAdsList(episode, breakPos)
       list: list
     }
   end if
-end function
+End Function
 
 ' ----------------------------------------------
 ' getCachedAdsList
 ' ----------------------------------------------
-function tubiAds_getCachedAdsList(episode, breakPos)
+Function tubiAds_getCachedAdsList(episode, breakPos)
   if m.lastAdsList <> invalid and episode.id = m.lastAdsList.cid and breakPos = m.lastAdsList.breakPos
     return m.lastAdsList.list
   end if
   return invalid
-end function
+End Function
 
 
 ' ----------------------------------------------
@@ -257,7 +257,7 @@ End Function
 ' ----------------------------------------------
 ' @episode: node, TubiContentNode for a video (movie or episode)
 ' @breakPos: integer, the preroll or midroll playback position at which the break occurs
-function tubiAds_getAdsListViaRoku(episode, breakPos)
+Function tubiAds_getAdsListViaRoku(episode, breakPos)
   m.allAdUnitsList = []
 
   nielsenGenres = "" 'nielsenGenres may be set as an array of strigs later
@@ -375,7 +375,7 @@ function tubiAds_getAdsListViaRoku(episode, breakPos)
   else
     return invalid
   end if
-end function
+End Function
 
 
 ' ----------------------------------------------
@@ -384,7 +384,7 @@ end function
 ' containerNode is any empty Group node under which RAF will create a child video node of its own, and
 ' remove it on completion of showAds()
 ' ----------------------------------------------
-function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
+Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
   ' ShowVariable(m.allAdUnitsList, "ALL AD UNITS LIST", 4)
   scene = containerNode.getScene()
   m.youboraTask = scene.findNode("Youbora")  'created in ContentController.initVideoTracking
@@ -441,7 +441,7 @@ function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
   end if
 
   return m.constants.player.playerResults.completed
-end function
+End Function
 
 
 ' ----------------------------------------------
@@ -454,30 +454,30 @@ end function
 ' SIDE EFFECT: updates the resumePlayAdsList property on the player object that is passed in
 ' (expect that the player object will be the main video player for the channel)
 ' ----------------------------------------------
-function tubiAds_getResumingPlayAds(episode, position)
+Function tubiAds_getResumingPlayAds(episode, position)
 
   m.getAdsListViaRoku(episode, position)
   return m.hasAds(m.allAdUnitsList)
-end function
+End Function
 
 ' ----------------------------------------------
 ' adBufferingCallback
 '
 ' callback during RAF buffering
-function tubiAds_adBufferingCallback(_eventType, ctx)
+Function tubiAds_adBufferingCallback(_eventType, ctx)
   if ctx.progress <> invalid
     m.controlNode.adProgress = ctx.progress
   else
     m.containerNode.visible = false
   end if
-end function
+End Function
 
 
 ' ------------------------------------
 ' adTrackingCallback
 '
 ' callback during RAF ad display
-function tubiAds_adTrackingCallback(eventType, ctx)
+Function tubiAds_adTrackingCallback(eventType, ctx)
   impressionCount = invalid
   youboraOptions = invalid
 
@@ -580,7 +580,7 @@ function tubiAds_adTrackingCallback(eventType, ctx)
     end if
     m.youboraTask.adevent = ctx
   end if
-end function
+End Function
 
 
 Function tubiAds_updateYouboraOptions(youboraTask, ctx, impressionCount)

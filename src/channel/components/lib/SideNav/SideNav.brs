@@ -10,6 +10,7 @@ Function init()
   m.top.observeFieldScoped("displayLinearTV", "onLinearTVDisplayChanged")
   m.top.observeFieldScoped("displayLinearEPG","onLinearEPGDisplayChanged")
   m.top.observeFieldScoped("displayMoviesTV", "onMovieTVDisplayChanged")
+  m.top.observeFieldScoped("displayContentExperience", "onContentExperienceDisplayChanged")
   m.top.observeFieldScoped("displayChannels", "onChannelsDisplayChanged")
   m.top.observeFieldScoped("displaySignIn", "onSignInDisplayChanged")
   m.top.observeFieldScoped("displayKids", "onKidsDisplayChanged")
@@ -28,28 +29,29 @@ Function init()
 End Function
 
 
+'@menuItems: stringarray array of the menu item ids we want to add
 Function setMenuItems(menuItems)
-
   menuItemCount = menuItems.Count()
+
   for i = 0 to menuItemCount-1
-    setMainContentSelect(menuItems[i])
-    setMainContent(menuItems[i])
+    m.MainContent.appendChild(createMainContent(menuItems[i]))
+    m.MainContentSelect.appendChild(createMainContentSelect(menuItems[i]))
   end for
 
 End Function
 
-
-Function setMainContentSelect(item)
+'@item: string id of the menu item
+Function createMainContentSelect(item)
 
   contentNode = CreateObject("roSGNode", "SideNavContentNode")
   contentNode.id = item + "-select"
   m[item + "ContentSelect"] = contentNode
-  m.MainContentSelect.appendChild(contentNode)
 
-End function
+  return contentNode
+End Function
 
 
-Function setMainContent(item)
+Function createMainContent(item)
 
   contentNode = CreateObject("roSGNode", "SideNavContentNode")
   contentNode.id = item
@@ -68,6 +70,9 @@ Function setMainContent(item)
   else if item = m.constants.ui.sideNavIds.tv
     contentNode.title = getTranslation("menu_tv")
     contentNode.iconUrl = "pkg:/images/sideNavTV.png"
+  else if item = m.constants.ui.sideNavIds.contentExperience
+    contentNode.title = getTranslation("menu_contentExperience")
+    contentNode.iconUrl = "pkg:/images/sideNavContentExperience.png"
   else if item = m.constants.ui.sideNavIds.espanol
     contentNode.title = "Español"
     contentNode.iconUrl = "pkg:/images/sideNavEspanol.png"
@@ -84,7 +89,13 @@ Function setMainContent(item)
     contentNode.title = getTranslation("menu_channels")
     contentNode.iconUrl = "pkg:/images/sideNavChannels.png"
   else if item = m.constants.ui.sideNavIds.profile
-    contentNode.title = getTranslation("menu_signIn")
+    ' m.top.stringSignIn may have been set before SideNav.createMainContent() was called
+    ' so use it if it exists
+    if m.top.stringSignIn <> ""
+      contentNode.title = m.top.stringSignIn
+    else
+      contentNode.title = getTranslation("menu_signIn")
+    end if
     contentNode.iconUrl = "pkg:/images/sideNavProfile.png"
   else if item = m.constants.ui.sideNavIds.settings
     contentNode.title = getTranslation("menu_settings")
@@ -95,7 +106,7 @@ Function setMainContent(item)
   end if
   m[item + "Content"] = contentNode
 
-  m.MainContent.appendChild(contentNode)
+  return contentNode
 
 End Function
 
@@ -111,6 +122,7 @@ Function onCreateMenuItems()
       m.constants.ui.sideNavIds.kidsMode
       m.constants.ui.sideNavIds.search
       m.constants.ui.sideNavIds.linearEPG
+      m.constants.ui.sideNavIds.contentExperience
       m.constants.ui.sideNavIds.home
       m.constants.ui.sideNavIds.movies
       m.constants.ui.sideNavIds.tv
@@ -123,23 +135,25 @@ Function onCreateMenuItems()
     ]
   else
     menuItems = [
-    m.constants.ui.sideNavIds.profile
-    m.constants.ui.sideNavIds.kidsMode
-    m.constants.ui.sideNavIds.search
-    m.constants.ui.sideNavIds.home
-    m.constants.ui.sideNavIds.movies
-    m.constants.ui.sideNavIds.tv
-    m.constants.ui.sideNavIds.myList
-    m.constants.ui.sideNavIds.categories
-    m.constants.ui.sideNavIds.channels
-    m.constants.ui.sideNavIds.espanol
-    m.constants.ui.sideNavIds.settings
-    m.constants.ui.sideNavIds.exit
+      m.constants.ui.sideNavIds.profile
+      m.constants.ui.sideNavIds.kidsMode
+      m.constants.ui.sideNavIds.search
+      m.constants.ui.sideNavIds.contentExperience
+      m.constants.ui.sideNavIds.home
+      m.constants.ui.sideNavIds.movies
+      m.constants.ui.sideNavIds.tv
+      m.constants.ui.sideNavIds.myList
+      m.constants.ui.sideNavIds.categories
+      m.constants.ui.sideNavIds.channels
+      m.constants.ui.sideNavIds.espanol
+      m.constants.ui.sideNavIds.settings
+      m.constants.ui.sideNavIds.exit
   ]
   end if
 
   ' Creates roSGNode dynamically
-  setMenuItems(menuItems)
+  m.MenuItemIDs = menuItems
+  setMenuItems(m.MenuItemIDs)
 
   '// This is the item to focus on when the sidenav opens. This implies that this was the last item (that has an associated screen) selected
   m.itemSelectedRemembered = invalid
@@ -213,9 +227,12 @@ End Function
 ' Hide the espanol item if this is called
 Function onEspanolDisplayChanged()
   if m.top.displayEspanol = false
-    '//Remove espanol if those items should be hidden. For right now, don't worry about turning it back on
+    '//Remove espanol if those items should be hidden.
     removeEspanol()
     verticallyCenterSideNav()
+  else
+    ' Display the menu item if it should be displayed
+    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.espanol)
   end if
 End Function
 
@@ -223,9 +240,12 @@ End Function
 ' Hide the live TV item if this is called
 Function onLinearTVDisplayChanged()
   if m.top.displayLinearTV = false
-    '//Remove line TV if those items should be hidden. For right now, don't worry about turning it back on
+    '//Remove line TV if those items should be hidden.
     removeLinearTV()
     verticallyCenterSideNav()
+  else
+    ' Display the menu item if it should be displayed
+    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.linearTV)
   end if
 End Function
 
@@ -233,9 +253,12 @@ End Function
 'Hide the linear EPG
 Function onLinearEPGDisplayChanged()
   if m.top.displayLinearEPG = false
-    '//Remove line TV if those items should be hidden. For right now, don't worry about turning it back on
+    '//Remove line TV if those items should be hidden.
     removeLinearEPG()
     verticallyCenterSideNav()
+  else
+    ' Display the menu item if it should be displayed
+    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.linearEPG)
   end if
 End Function
 
@@ -244,10 +267,26 @@ End Function
 Function onMovieTVDisplayChanged()
   if m.top.displayMoviesTV = false
     ' Remove movies/tv if those items should be hidden.
-    ' For right now, don't worry about turning it back on.
     removeMovies()
     removeTv()
     verticallyCenterSideNav()
+  else
+    ' Display the menu items if they should be displayed
+    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.movies)
+    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.tv)
+  end if
+End Function
+
+
+' Hide the ContentExperience item if this is called
+Function onContentExperienceDisplayChanged()
+  if m.top.displayContentExperience = false
+    ' Remove the ContentExperience icon if that item should be hidden.
+    removeContentExperience()
+    verticallyCenterSideNav()
+  else
+    ' Display the Content Experience Menu item if the item should be displayed
+    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.contentExperience)
   end if
 End Function
 
@@ -255,9 +294,12 @@ End Function
 ' Hide the Channels item if this is called
 Function onChannelsDisplayChanged()
   if m.top.displayChannels = false
-    '//Remove Channels if that item should be hidden. For right now, don't worry about turning it back on
+    '//Remove Channels if that item should be hidden.
     removeChannels()
     verticallyCenterSideNav()
+  else
+    ' Display the menu item if it should be displayed
+    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.channels)
   end if
 End Function
 
@@ -266,9 +308,11 @@ End Function
 Function onSignInDisplayChanged()
   if m.top.displaySignIn = false
     ' Remove Sign In if that item should be hidden.
-    ' For right now, don't worry about turning it back on.
     removeProfile()
     verticallyCenterSideNav()
+  else
+    ' Display the menu item if it should be displayed
+    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.profile)
   end if
 End Function
 
@@ -276,8 +320,62 @@ End Function
 Function onKidsDisplayChanged()
   if m.top.displayKids = false
     ' Remove Kids if that item should be hidden.
-    ' For right now, don't worry about turning it back on.
     removeKids()
+    verticallyCenterSideNav()
+  else
+    ' Display the KidsMode menuy item if the item should be displayed
+    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.kidsMode)
+  end if
+End Function
+
+
+' Insert the menu item associated with sMenuID into the m.MainContent and m.MainContentSelect menu lists in the order that the menu item belongs
+' @sMenuID string one of constants.ui.sideNavIds for which we want to add if it does not already exist
+Function insertMenuItemInMenuLists(sMenuID)
+  nMenuItemOriginalIndex = getIndexOfMenuID(sMenuID)
+  if nMenuItemOriginalIndex >= 0
+    '//menuItem belongs in the menu list, so allowed to proceed to determine where the menu item actually belongs in the list in its current state
+    nIndex = 0
+    nMenuListCountUntil = m.MainContent.getChildCount()-1
+    for i = 0 to nMenuListCountUntil
+      menuContentItem = m.MainContent.getChild(i)
+      sMenuContentItemID = menuContentItem.Id
+      if sMenuID = sMenuContentItemID
+        '// The menu to be inserted to the menu is already in the menu. No need to do anything
+        exit for
+      else
+        nTempMenuItemOriginalIndex = getIndexOfMenuID(sMenuContentItemID)
+        '//Does the temporary, current menu item come before the main menu item that was passed to this function?
+        bTempMenuItemComeBeforePassedMenuItem = (nTempMenuItemOriginalIndex < nMenuItemOriginalIndex)
+
+        if bTempMenuItemComeBeforePassedMenuItem = false
+          '// this is the index to insert the menuItem into the menu list
+          nIndex = i
+          exit for
+        else if i = nMenuListCountUntil
+          '//This is the last item
+          nIndex = i
+        end if
+      end if
+    end for
+
+    menuItem = m[sMenuID + "Content"]
+    if menuItem = invalid
+      menuItem = createMainContent(sMenuID)
+    end if
+
+    menuItemSelect = m[sMenuID + "ContentSelect"]
+    if menuItemSelect = invalid
+      menuItemSelect = createMainContentSelect(sMenuID)
+    end if
+
+    '//Ensure the menu items match the active state of the other menu items
+    menuItem.active = m.top.opened
+    menuItemSelect.active = m.top.opened
+
+    '//add the menu items at their proper locations
+    m.MainContent.insertChild(menuItem, nIndex)
+    m.MainContentSelect.insertChild(menuItemSelect, nIndex)
     verticallyCenterSideNav()
   end if
 End Function
@@ -295,7 +393,6 @@ Function onLinearEPGTurnedOnChanged()
     m.linearEPGContent.turnedOn = m.top.linearEPGTurnedOn
   end if
 End Function
-
 
 
 Function onKidsItemTurnedOnChanged()
@@ -321,6 +418,7 @@ Function onUiModeChanged()
     removeKids()
     removeMovies()
     removeTv()
+    removeContentExperience()
     removeChannels()
     removeEspanol()
     removeLinearTV()
@@ -373,9 +471,11 @@ End Function
 Function removeProfile()
   if m.profileContent <> invalid
     m.MainContent.removeChild(m.profileContent)
+    m.profileContent = invalid
   end if
   if m.profileContentSelect <> invalid
     m.MainContentSelect.removeChild(m.profileContentSelect)
+    m.profileContentSelect = invalid
   end if
 End Function
 
@@ -383,9 +483,11 @@ End Function
 Function removeKids()
   if m.kidsModeContent <> invalid
     m.MainContent.removeChild(m.kidsModeContent)
+    m.kidsModeContent = invalid
   end if
   if m.kidsModeContentSelect <> invalid
     m.MainContentSelect.removeChild(m.kidsModeContentSelect)
+    m.kidsModeContentSelect = invalid
   end if
 End Function
 
@@ -393,9 +495,11 @@ End Function
 Function removeMovies()
   if m.moviesContent <> invalid
     m.MainContent.removeChild(m.moviesContent)
+    m.moviesContent = invalid
   end if
   if m.moviesContentSelect <> invalid
     m.MainContentSelect.removeChild(m.moviesContentSelect)
+    m.moviesContentSelect = invalid
   end if
 End Function
 
@@ -403,9 +507,23 @@ End Function
 Function removeTv()
   if m.tvContent <> invalid
     m.MainContent.removeChild(m.tvContent)
+    m.tvContent = invalid
   end if
   if m.tvContentSelect <> invalid
     m.MainContentSelect.removeChild(m.tvContentSelect)
+    m.tvContentSelect = invalid
+  end if
+End Function
+
+
+Function removeContentExperience()
+  if m.contentExperienceContent <> invalid
+    m.MainContent.removeChild(m.contentExperienceContent)
+    m.contentExperienceContent = invalid
+  end if
+  if m.contentExperienceContentSelect <> invalid
+    m.MainContentSelect.removeChild(m.contentExperienceContentSelect)
+    m.contentExperienceContentSelect = invalid
   end if
 End Function
 
@@ -413,9 +531,11 @@ End Function
 Function removeChannels()
   if m.channelsContent <> invalid
     m.MainContent.removeChild(m.channelsContent)
+    m.channelsContent = invalid
   end if
   if m.channelsContentSelect <> invalid
     m.MainContentSelect.removeChild(m.channelsContentSelect)
+    m.channelsContentSelect = invalid
   end if
 End Function
 
@@ -423,9 +543,11 @@ End Function
 Function removeEspanol()
   if m.espanolContent <> invalid
     m.MainContent.removeChild(m.espanolContent)
+    m.espanolContent = invalid
   end if
   if m.espanolContentSelect <> invalid
     m.MainContentSelect.removeChild(m.espanolContentSelect)
+    m.espanolContentSelect = invalid
   end if
 End Function
 
@@ -433,9 +555,11 @@ End Function
 Function removeLinearTV()
   if m.linearTVContent <> invalid
     m.MainContent.removeChild(m.linearTVContent)
+    m.linearTVContent = invalid
   end if
   if m.linearTVContentSelect <> invalid
     m.MainContentSelect.removeChild(m.linearTVContentSelect)
+    m.linearTVContentSelect = invalid
   end if
 End Function
 
@@ -443,9 +567,11 @@ End Function
 Function removeLinearEPG()
   if m.linearEPGContent <> invalid
     m.MainContent.removeChild(m.linearEPGContent)
+    m.linearEPGContent = invalid
   end if
   if m.linearEPGContentSelect <> invalid
     m.MainContentSelect.removeChild(m.linearEPGContentSelect)
+    m.linearEPGContentSelect = invalid
   end if
 End Function
 
@@ -453,9 +579,11 @@ End Function
 Function removeMyList()
   if m.myListContent <> invalid
     m.MainContent.removeChild(m.myListContent)
+    m.myListContent = invalid
   end if
   if m.myListContentSelect <> invalid
     m.MainContentSelect.removeChild(m.myListContentSelect)
+    m.myListContentSelect = invalid
   end if
 End Function
 
@@ -546,6 +674,22 @@ End Function
 Function onSelectedItemRequested()
   index = getIndexByID(m.mainItems, m.top.selectedItemRequested)
   m.mainItemsSelected.jumpToItem = index
+End Function
+
+
+' Find the index of the passed menu ID within the array of menu IDs
+Function getIndexOfMenuID(sID)
+  nIndex = -1
+  if m.MenuItemIDs <> invalid
+    for i = 0 to m.MenuItemIDs.Count()-1
+      if sID = m.MenuItemIDs[i]
+        nIndex = i
+        exit for
+      end if
+    end for
+  end if
+
+  return nIndex
 End Function
 
 

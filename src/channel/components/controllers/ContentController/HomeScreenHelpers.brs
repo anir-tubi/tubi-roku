@@ -18,7 +18,7 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     '//when calling pushScreen() for a cached home screen, then report navigate_to_page and
     ' page_load events immediately, since there is no content fetching occuring.
     shouldSendPageLoadEvent = true
-    if homescreen.isLoading = true
+    if homeScreen.isLoading = true
       ' when a user signs in/out, the homescreen may be in the screen cache, however the page may be
       ' going through the loading process, in which case we will send the PageLoadEvent when the
       ' homescreen concludes loading, in onHomescreenContentReady().
@@ -31,9 +31,17 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     refreshHomescreenTopNav(homescreen)
     ' set which component to focus on once the screen gains focus
     if componentToFocus = m.constants.ui.homescreen.focusItems.topNav
-      homescreen.componentToFocus = m.constants.ui.homescreen.focusItems.topNav
+      homeScreen.componentToFocus = m.constants.ui.homescreen.focusItems.topNav
     else
-      homescreen.componentToFocus = m.constants.ui.homescreen.focusItems.contentGrid
+      homeScreen.componentToFocus = m.constants.ui.homescreen.focusItems.contentGrid
+    end if
+
+    ' Reset user back to the top of the content when they return to content experience homepage
+    if isICTSExperimentEnabled() = true
+      screenIds = constants.ui.screenIds
+      if screenID = screenIds.nostalgiaScreen or screenID = screenIds.bestKnownScreen or screenID = screenIds.linearTVScreen or screenID = screenIds.espanolScreen
+        homeScreen.jumpToRowItem = [0, 0]
+      end if
     end if
 
     pushScreen(homeScreen, true, shouldSendPageLoadEvent)
@@ -79,6 +87,10 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     else if screenID = constants.ui.screenIds.linearTVScreen
       sContentMode = constants.ui.contentMode.linear
       homescreen.topNavSelectedId = constants.ui.sideNavIds.linearTV
+    else if screenID = constants.ui.screenIds.bestKnownScreen
+      sContentMode = constants.ui.contentMode.bestKnown
+    else if screenID = constants.ui.screenIds.nostalgiaScreen
+      sContentMode = constants.ui.contentMode.nostalgia
     end if
 
     homeScreen.contentMode = sContentMode
@@ -162,6 +174,28 @@ Function espanolBatchResponse(response)
 End Function
 
 
+Function nostalgiaBatchResponse(response)
+
+  screenID = m.constants.ui.screenIds.nostalgiaScreen
+  homeScreen = getFromScreenCache(screenID)
+  if homeScreen <> invalid
+    homeScreen.batchResponse = response
+  end if
+
+End Function
+
+
+Function bestKnownBatchResponse(response)
+
+  screenID = m.constants.ui.screenIds.bestKnownScreen
+  homeScreen = getFromScreenCache(screenID)
+  if homeScreen <> invalid
+    homeScreen.batchResponse = response
+  end if
+
+End Function
+
+
 Function LinearTVBatchResponse(response)
 
   screenID = m.constants.ui.screenIds.linearTVScreen
@@ -170,6 +204,18 @@ Function LinearTVBatchResponse(response)
     homeScreen.batchResponse = response
   end if
 
+End Function
+
+
+' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
+Function showNostalgiaScreen(componentToFocus = "")
+  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.nostalgiaScreen, componentToFocus)
+End Function
+
+
+' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
+Function showBestKnownScreen(componentToFocus = "")
+  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.bestKnownScreen, componentToFocus)
 End Function
 
 
@@ -199,7 +245,8 @@ End Function
 
 ' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
 Function showDefaultHomeScreen(componentToFocus = "")
-  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.homeScreen, componentToFocus )
+  m.contentExperienceMode = m.constants.ui.contentExperienceModes.standard
+  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.homeScreen, componentToFocus)
 End Function
 
 
@@ -214,6 +261,16 @@ End Function
 
 Function onReloadUserCategoriesResponseInEspanolScreen(response)
   onReloadUserCategoriesInHomeScreen(response, m.constants.ui.screenIds.espanolScreen)
+End Function
+
+
+Function onReloadUserCategoriesResponseInNostalgiaScreenScreen(response)
+  onReloadUserCategoriesInHomeScreen(response, m.constants.ui.screenIds.nostalgiaScreen)
+End Function
+
+
+Function onReloadUserCategoriesResponseInBestKnownScreenScreen(response)
+  onReloadUserCategoriesInHomeScreen(response, m.constants.ui.screenIds.bestKnownScreen)
 End Function
 
 
@@ -305,6 +362,15 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
   end if
 End Function
 
+Function onErrorReloadUserCategoriesInNostalgiaScreen(response)
+  onErrorReloadUserCategories(response, m.constants.ui.screenIds.nostalgiaScreen)
+End Function
+
+
+Function onErrorReloadUserCategoriesInBestKnownScreen(response)
+  onErrorReloadUserCategories(response, m.constants.ui.screenIds.bestKnownScreen)
+End Function
+
 
 Function onErrorReloadUserCategoriesInEspanolScreen(response)
   onErrorReloadUserCategories(response, m.constants.ui.screenIds.espanolScreen)
@@ -335,15 +401,17 @@ Function onErrorReloadUserCategories(response, screenID = "")
   homeScreen = getFromScreenCache(screenID)
 
   if homeScreen <> invalid and response <> invalid
+    analyticsContentMode = m.Tracking.getAnalyticsHomePageContentMode(screenID)
+
     ' if we were loading in the background, don't show an error modal
     if homeScreen.isInFocusChain() = true
       errorMessage = getTranslation("screenHome_error_fetchCategories_description")
       errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
-      dialogEvent =  {
+      dialogEvent = {
         type: "dialog"
         values: {
           dialog_type: "PLAYER_ERROR"
-          pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
+          pageOneof: m.Tracking.getAnalyticsPage("home_page", {content_mode: analyticsContentMode})
           dialog_action: "SHOW"
           dialog_sub_type: errorCode
         }
@@ -391,6 +459,15 @@ Function setEnableTopNavOnHomescreen(homescreen)
     bTopNavAllowed = isTopNavHomeScreenEnabled()
     if homeScreen.id = m.constants.ui.screenIds.espanolScreen
       '//espanol is not in the topNav
+      bTopNavAllowed = false
+    else if homeScreen.id = m.constants.ui.screenIds.nostalgiaScreen
+      '//this screen is not in the topNav
+      bTopNavAllowed = false
+    else if homeScreen.id = m.constants.ui.screenIds.bestKnownScreen
+      '//this screen is not in the topNav
+      bTopNavAllowed = false
+    else if (homeScreen.id = m.constants.ui.screenIds.linearTVScreen or homeScreen.id = m.constants.ui.screenIds.epgScreen) and isICTSExperimentEnabled() = true
+      '//this screen is not in the topNav
       bTopNavAllowed = false
     end if
 
@@ -447,6 +524,12 @@ Function fetchHomeScreen(homeScreen)
     else if homeScreen.id = m.constants.ui.screenIds.espanolScreen
       sucessHandler = onEspanolScreenSuccessResponse
       errorHandler = onEspanolScreenErrorResponse
+    else if homeScreen.id = m.constants.ui.screenIds.bestKnownScreen
+      sucessHandler = onBestKnownScreenSuccessResponse
+      errorHandler = onBestKnownScreenErrorResponse
+    else if homeScreen.id = m.constants.ui.screenIds.nostalgiaScreen
+      sucessHandler = onNostalgiaScreenSuccessResponse
+      errorHandler = onNostalgiaScreenErrorResponse
     else if homeScreen.id = m.constants.ui.screenIds.linearTVScreen
       sucessHandler = onLinearTVScreenSuccessResponse
       errorHandler = onLinearTVScreenErrorResponse
@@ -517,6 +600,22 @@ End Function
 
 
 ''''''''''''''''''''''''''''''
+' onNostalgiaScreenSuccessResponse
+'
+Function onNostalgiaScreenSuccessResponse(response)
+  respondToHomeScreenSuccessResponse(m.constants.ui.screenIds.nostalgiaScreen, response)
+End Function
+
+
+''''''''''''''''''''''''''''''
+' onBestKnownScreenSuccessResponse
+'
+Function onBestKnownScreenSuccessResponse(response)
+  respondToHomeScreenSuccessResponse(m.constants.ui.screenIds.bestKnownScreen, response)
+End Function
+
+
+''''''''''''''''''''''''''''''
 ' onMovieScreenSuccessResponse
 '
 Function onMovieScreenSuccessResponse(response)
@@ -580,10 +679,26 @@ End Function
 
 
 ''''''''''''''''''''''''''''''
-' onEspanolscreenErrorResponse
+' onEspanolScreenErrorResponse
 '
 Function onEspanolScreenErrorResponse(response)
   handleHomeScreenErrorResponse(m.constants.ui.screenIds.espanolScreen, response)
+End Function
+
+
+''''''''''''''''''''''''''''''
+' onNostalgiaScreenErrorResponse
+'
+Function onNostalgiaScreenErrorResponse(response)
+  handleHomeScreenErrorResponse(m.constants.ui.screenIds.nostalgiaScreen, response)
+End Function
+
+
+''''''''''''''''''''''''''''''
+' onBestKnownScreenErrorResponse
+'
+Function onBestKnownScreenErrorResponse(response)
+  handleHomeScreenErrorResponse(m.constants.ui.screenIds.bestKnownScreen, response)
 End Function
 
 
@@ -625,11 +740,13 @@ Function handleHomeScreenErrorResponse(screenID, response)
       errorMessage = getTranslation("screenHome_error_fetchScreenContent_description")
       errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
 
+      trackingPageInfo = homeScreen.trackingPageInfo
+
       dialogEvent = {
         type: "dialog"
         values: {
           dialog_type: "NETWORK_ERROR"
-          pageOneof: m.Tracking.getAnalyticsPage(homeScreen.trackingPageInfo.pageType, {})
+          pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
           dialog_action: "SHOW"
           dialog_sub_type: errorCode
         }
@@ -883,18 +1000,18 @@ End Function
 Function startCountdownTimer()
   tubiLog("HomeScreenHelpers.stopCountdownTimer")
   Screen = getCurrentScreen()
-  if Screen <> invalid and (Screen.id = m.constants.ui.screenIds.homeScreen or Screen.id = m.constants.ui.screenIds.linearTVScreen )
+  if Screen <> invalid and (Screen.id = m.constants.ui.screenIds.homeScreen or Screen.id = m.constants.ui.screenIds.linearTVScreen)
     stopCountdownTimer()
     '//Start/reset timer to play video in fullscreen after a few seconds
     if getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).update_homescreen = true
       setPlayerCountDownChange(m.constants.timers.linearFullscreenTimeout)
     else
-      Screen.fullscreenCountdown =  m.constants.timers.linearFullscreenTimeout
+      Screen.fullscreenCountdown = m.constants.timers.linearFullscreenTimeout
     end if
     m.playerFullscreenCountdownTimer.control = "start"
   else if Screen <> invalid and isAnEpgScreen(Screen) = true
     stopCountdownTimer()
-    Screen.fullscreenCountdown =  m.constants.timers.linearFullscreenTimeout
+    Screen.fullscreenCountdown = m.constants.timers.linearFullscreenTimeout
     m.playerFullscreenCountdownTimer.control = "start"
   end if
 End Function
@@ -990,6 +1107,10 @@ Function onLoadCategoriesIndex(msg)
     batchResponseHandler = tvBatchResponse
   else if homeScreen.id = m.constants.ui.screenIds.espanolScreen
     batchResponseHandler = espanolBatchResponse
+  else if homeScreen.id = m.constants.ui.screenIds.bestKnownScreen
+    batchResponseHandler = bestKnownBatchResponse
+  else if homeScreen.id = m.constants.ui.screenIds.nostalgiaScreen
+    batchResponseHandler = nostalgiaBatchResponse
   else if homeScreen.id = m.constants.ui.screenIds.linearTVScreen
     batchResponseHandler = linearTVBatchResponse
   end if

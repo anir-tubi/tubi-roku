@@ -136,7 +136,7 @@ End Function
 '''''''''''''''''''''
 ' translateRecursive
 '
-' This is a recursive Function that does the heavy lifting for translateContentFromServer
+' This is a recursive function that does the heavy lifting for translateContentFromServer
 ' This function has the side effect of updating the translatedContent object that is passed in.
 ' Pass in an AA as the translatedContent argument if using the .update() function later.
 '
@@ -1222,7 +1222,7 @@ End Function
 ''''''''''''''''''''''
 ' getContentsJson
 '
-'helper Function to encapsulate getting the contents JSON from a matrix single container response
+'helper function to encapsulate getting the contents JSON from a matrix single container response
 '@parsedJson: assocArray, the container response that has already been run through ParseJSON()
 '@fullJson: string, the full json formatted response
 Function tubiMetadataTranslate_getContentsJson(parsedJson, fullJson)

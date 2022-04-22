@@ -433,7 +433,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
       nResumePoint = 0
     end if
 
-    ' Do the appropriate action based on the cases as described in the Function definition comments
+    ' Do the appropriate action based on the cases as described in the function definition comments
     if detailContent <> invalid and videoContent.parentType = m.constants.ui.contentTypes.series
       ' Video player was playing a series episode
       if videoContent.parentId <> detailContent.id

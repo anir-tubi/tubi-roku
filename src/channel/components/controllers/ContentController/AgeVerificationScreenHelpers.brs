@@ -166,7 +166,7 @@ Function conditionallyConfirmBirthYear(ageVerificationScreen, verifyAgeCallback,
       type: "dialog"
       values: {
         dialog_type: "BIRTHDAY"   'DialogType enum
-        pageOneof: m.Tracking.getAnalyticsPage("home_page", {})
+        pageOneof: m.Tracking.getAnalyticsPage("age_gate_page", {})
         dialog_action: "SHOW"
         dialog_sub_type: "age_confirmation"
       }

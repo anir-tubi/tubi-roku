@@ -191,20 +191,24 @@ Function onIDChange()
   '//Set the tracking based on the id of the homescreen
   '//::NOTE:: id should only be set after the instantiation of the HomeScreen, but before the screen is added to the stack
   newTrackingPageInfo = m.top.trackingPageInfo
+  analyticsContentMode = m.Tracking.getAnalyticsHomePageContentMode(m.top.id)
+
+  newTrackingPageInfo.pageType = "home_page"
+  newTrackingPageInfo.pageValues = {content_mode: analyticsContentMode}
+
   if m.top.id = m.constants.ui.screenIds.movieScreen
-    newTrackingPageInfo.pageType = "movie_browse_page"
     m.top.screenLevel = m.constants.ui.screenLevels.movieScreen
   else if m.top.id = m.constants.ui.screenIds.tvScreen
-    newTrackingPageInfo.pageType = "series_browse_page"
     m.top.screenLevel = m.constants.ui.screenLevels.tvScreen
   else if m.top.id = m.constants.ui.screenIds.espanolScreen
-    newTrackingPageInfo.pageType = "latino_browse_page"
     m.top.screenLevel = m.constants.ui.screenLevels.espanolScreen
   else if m.top.id = m.constants.ui.screenIds.linearTVScreen
-    newTrackingPageInfo.pageType = "news_browse_page"
     m.top.screenLevel = m.constants.ui.screenLevels.linearTVScreen
+  else if m.top.id = m.constants.ui.screenIds.nostalgiaScreen
+    m.top.screenLevel = m.constants.ui.screenLevels.nostalgiaScreen
+  else if m.top.id = m.constants.ui.screenIds.bestKnownScreen
+    m.top.screenLevel = m.constants.ui.screenLevels.bestKnownScreen
   else
-    newTrackingPageInfo.pageType = "home_page"
     m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
   end if
 
@@ -903,6 +907,11 @@ Function onKeyEvent(key, press) as boolean
 
           return false
         end if
+      end if
+    else
+      if key = "left" or key = "back"
+        ' navigating to the side nav
+        m.top.stopLinearVideoPlayer = true
       end if
     end if
 

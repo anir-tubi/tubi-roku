@@ -1,14 +1,28 @@
 Function displayInitialContentScreen()
   tubiLog("InitialContentScreenHelpers.displayInitialContentScreen")
-  showHideSpinner(false)
-  screen = CreateObject("roSGNode", "InitialContentScreen")
-  screen.id = m.constants.ui.screenIds.initialContentScreen
 
-  screen.screenLevel = m.constants.ui.screenLevels.initialContentScreen
-  screen.observeFieldScoped("actionableItemSelected", "onActionableItemSelected")
-  screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-  screen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
-  screen.backgroundUriList = [m.marketingBackgroundUri]
+  if isICTSExperimentEnabled(true) = true
+    m.logoGroup.visible = false
+  end if
+
+  showHideSpinner(false)
+
+  screenId = m.constants.ui.screenIds.initialContentScreen
+  screen = getFromScreenCache(screenId)
+  if screen = invalid
+    screen = CreateObject("roSGNode", "InitialContentScreen")
+    screen.id = screenId
+    screen.backgroundUriList = [m.defaultBackgroundUri]
+    screen.screenLevel = m.constants.ui.screenLevels.initialContentScreen
+    screen.observeFieldScoped("actionableItemSelected", "onActionableItemSelected")
+    screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+    screen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
+
+    screen.backgroundUriList = [m.marketingBackgroundUri]
+
+    setInScreenCache(screen)
+  end if
+
   pushScreen(screen, true, true)
 
   '//if the startup logo animation is done, then animate the screen into view. Otherwise, wait for the animation to be done.
@@ -76,47 +90,81 @@ Function sendInitialContentComponentInteractionEvent(sSelectedID, screen)
   m.trackingLoggingTask.trackEvent = event
 End Function
 
-
-Function displayFirstContentScreen(sPageID)
+' @sSelectedID, id of the item that was selected on the ICTS. May be one of constants.ui.sideNavIds or constants.ui.contentExperienceModes
+Function displayFirstContentScreen(sSelectedID)
   tubiLog("InitialContentScreenHelpers.displayFirstContentScreen")
-  sideNavFocus = m.constants.ui.sideNavIds.home
-  if sPageID = m.constants.ui.sideNavIds.linearTV
+
+  contentExperienceModes = m.constants.ui.contentExperienceModes
+  sideNavIds = m.constants.ui.sideNavIds
+  sideNavFocus = sideNavIds.home
+  if isICTSExperimentEnabled() = true
+    sideNavFocus = sideNavIds.contentExperience
+    ' Have to unhide the logo when we leave ICTS
+    m.logoGroup.visible = true
+  end if
+
+  if sSelectedID = sideNavIds.linearTV
+    m.contentExperienceMode = contentExperienceModes.liveTV
     epgExperiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false)
     if epgExperiment.enabled = true
       showDefaultEPGScreen()
       if epgExperiment.side_nav = true
-        sideNavFocus = m.constants.ui.sideNavIds.linearEPG
-      else
-        sideNavFocus = m.constants.ui.sideNavIds.home
+        sideNavFocus = sideNavIds.linearEPG
       end if
     else
       showLinearTVScreen()
-      sideNavFocus = m.constants.ui.sideNavIds.home
     end if
-  else if sPageID = m.constants.ui.sideNavIds.kidsMode
-    sideNavFocus = m.constants.ui.sideNavIds.home
+  else if sSelectedID = sideNavIds.kidsMode
+    sideNavFocus = sideNavIds.home
+    m.contentExperienceMode = contentExperienceModes.kids
     setUiMode(m.constants.ui.modes.kids)
-    reloadDefaultHomeScreenContent()
+    refreshScreenAfterParentalChanges()
     showDefaultHomeScreen()
-  else if sPageID = m.constants.ui.sideNavIds.espanol
+  else if sSelectedID = sideNavIds.espanol
+    m.contentExperienceMode = contentExperienceModes.espanol
     setUiMode(m.constants.ui.modes.latino)
-    sideNavFocus = m.constants.ui.sideNavIds.espanol
+    if isICTSExperimentEnabled() = false
+      sideNavFocus = sideNavIds.espanol
+    end if
     showEspanolScreen()
-  else if sPageID = m.constants.ui.sideNavIds.profile
+  else if sSelectedID = sideNavIds.profile
     setUiMode(m.constants.ui.modes.standard)
     startSignIn(onSignInAfterInitialContentScreen)
-  else if sPageID = m.constants.ui.sideNavIds.movies
+  else if sSelectedID = sideNavIds.movies
     setUiMode(m.constants.ui.modes.standard)
     showMoviesScreen()
-  else if sPageID = m.constants.ui.sideNavIds.tv
+  else if sSelectedID = sideNavIds.tv
     setUiMode(m.constants.ui.modes.standard)
     showTVScreen()
-  else
-    ' send the user to the default home page
+  else if sSelectedID = sideNavIds.bestKnown
+    m.contentExperienceMode = contentExperienceModes.bestKnown
     setUiMode(m.constants.ui.modes.standard)
-    reloadDefaultHomeScreenContent()
-    showDefaultHomeScreen()
+    showBestKnownScreen()
+  else if sSelectedID = sideNavIds.nostalgia
+    m.contentExperienceMode = contentExperienceModes.nostalgia
+    setUiMode(m.constants.ui.modes.standard)
+    showNostalgiaScreen()
+  else
+    screenStackCount = m.screenStack.getChildCount()
+    if sSelectedID = m.constants.ui.keyIds.back and screenStackCount > 1 and getHiddenScreen().id <> m.constants.ui.screenIds.signInScreen
+      ' ICTS can now be shown again from sidenav so if we have another page underneath this then pop to that instead,
+      ' unless this it is the sign in screen because we're coming from kids mode login
+      popScreen(false, false)
+    else
+      sideNavFocus = sideNavIds.home
+      m.contentExperienceMode = contentExperienceModes.standard
+      ' send the user to the default home page
+      setUiMode(m.constants.ui.modes.standard)
+      reloadDefaultHomeScreenContent()
+      showDefaultHomeScreen()
+    end if
   end if
 
   focusSideNavOption(sideNavFocus)
+End Function
+
+
+Function isICTSExperimentEnabled(sendEvent = false)
+  ictsExperiment = getExperimentResource("roku_icts_content_modes", "roku_icts_content_modes_v1", sendEvent)
+  return ictsExperiment.enabled = true and m.constants.deviceInfo.countryCode = "US"
 End Function

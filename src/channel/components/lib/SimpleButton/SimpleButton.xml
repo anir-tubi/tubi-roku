@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  - SimpleButton
  - A simple, stand alone button that changes width based on the length of the text, and
@@ -11,18 +11,19 @@
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
   <interface>
-  
+
     <!-- INPUTS -->
       <field id="color" type="String" value="0x9699A3"/>
-      <field id="width" type="Integer" />
-      <field id="height" type="Integer" alias="buttonBG.height"/>
-      <field id="uri" type="Integer" alias="buttonBG.uri"/>
+      <field id="width" alias="label.width, buttonBG.width" />
+      <field id="height" alias="buttonBG.height"/>
+      <field id="uri" alias="buttonBG.uri"/>
+      <field id="fontSize" alias="labelFont.size"/>
       <field id="text" type="String" />
       <field id="unfocusedBackgroundOpacity" type="float" value="0.17"/>
-    
+
     <!-- OUTPUTS -->
       <field id="selected" type="boolean" alwaysNotify="true" />
-    
+
   </interface>
 
   <children>
@@ -30,7 +31,7 @@
       id="buttonBG"
       height="80"
       uri="pkg:/images/menu-focus-fhd.9.png"
-      translation="[0,0]"/>    
+      translation="[0,0]"/>
     <Label
       id="label"
       color="0xFFFFFF"
@@ -40,6 +41,7 @@
       vertAlign="center"
       translation="[0,6]">
       <Font
+        id="labelFont"
         role="font"
         uri="pkg:/fonts/Vaud-SemiBold.ttf"
         size="33" />

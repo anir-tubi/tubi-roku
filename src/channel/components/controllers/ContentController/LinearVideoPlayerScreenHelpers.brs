@@ -1,7 +1,7 @@
 '''''''''''''''''''''
 ' playLinearVideoContent
 '
-' Helper Function for onResume and onPlay to launch content
+' Helper function for onResume and onPlay to launch content
 ' @content: TubiContentNode, the content to be played
 ' @bMinimized: boolean, Should the player be playing in its minmized state on the homescreen? If false, then it will be at fullscreen.
 ' @sAssociatedScreenID: String, Often times the screen right before the linear video player screen is displayed has a close association. Keep a record of the ID associated with the associated screen.

@@ -309,7 +309,7 @@ Function setComponentInteractionEventForLiveAndFuturePrograms(content, rowNum, c
     pageValues = m.top.trackingPageInfo.pageValues
   end if
   componentInteractionInfo = {
-    pageOneof: m.Tracking.getAnalyticsPage(pageType,pageValues)
+    pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
     componentOneof: m.Tracking.getAnalyticsComponent("epg_component",  componentValues)
     user_interaction: "CONFIRM"
   }

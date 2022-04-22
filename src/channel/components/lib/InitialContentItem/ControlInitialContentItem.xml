@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ControlInitialContentItem" extends="Group" >
+  <script type="text/brightscript" uri="ControlInitialContentItem.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../GlobalMixin.brs" />
+  <interface>
+    <!-- INPUTS -->
+    <field id="itemContent" type="node" />
+    <field id="gridHasFocus" type="boolean" />
+    <field id="focusPercent" type="float" />
+    <field id="index" type="integer" />
+  </interface>
+
+
+  <children>
+    <Group id="parentGroup"
+      opacity="0"
+      >
+      <Poster
+        id="focusBG"
+        translation="[0, 0]"
+        uri="pkg://images/menu-focus-initial-content-screen.png"
+        opacity=".16"
+        loadSync="true"
+        width="192"
+        height="252"/>
+      <Group
+        id="IconGroup"
+        translation="[60, 120]">
+        <Poster
+          id="Icon"
+          loadSync="true"
+          width="72"
+          height="72"/>
+        <Poster
+          id="IconFocused"
+          opacity="0"
+          loadSync="true"
+          width="72"
+          height="72"/>
+      </Group>
+
+
+      <Group
+        id="TitleGroup"
+        translation="[0,285]">
+        <Label
+          id="Title"
+          wrap="true"
+          maxLines="2"
+          vertAlign="top"
+          horizAlign="center"
+          ellipsizeOnBoundary="false"
+          width="192"
+          height="120">
+          <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="30" />
+        </Label>
+        <Label
+          id="TitleFocused"
+          wrap="true"
+          maxLines="2"
+          opacity="0"
+          vertAlign="top"
+          horizAlign="center"
+          ellipsizeOnBoundary="false"
+          width="192"
+          height="120">
+          <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="30" />
+        </Label>
+      </Group>
+    </Group>
+  </children>
+</component>

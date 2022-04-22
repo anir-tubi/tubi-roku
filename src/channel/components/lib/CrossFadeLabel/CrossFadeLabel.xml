@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - CrossFadeLabel
+ -
+ - This is a "Label"-like component that will crossfade when provided new text.
+ - Unlike RotatingLabel, this only takes one text and will not auto switch between text as a result
+ -
+ -->
+<component name="CrossFadeLabel" extends="Group" >
+  <script type="text/brightscript" uri="CrossFadeLabel.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="text" type="string" />
+    <field id="animationDuration" alias="animation.duration" value="1.0" />
+
+    <!-- forwarded to children -->
+    <field id="color" alias="labelA.color, labelB.color" />
+    <field id="width" alias="labelA.width, labelB.width" />
+    <field id="font" alias="labelA.font, labelB.font" />
+    <field id="horizAlign" alias="labelA.horizAlign, labelB.horizAlign" />
+    <field id="vertAlign" alias="labelA.vertAlign, labelB.vertAlign" />
+    <field id="numLines" alias="labelA.numLines, labelB.numLines" />
+    <field id="maxLines" alias="labelA.maxLines, labelB.maxLines"/>
+    <field id="wrap" alias="labelA.wrap, labelB.wrap"/>
+    <field id="lineSpacing" alias="labelA.lineSpacing, labelB.lineSpacing"/>
+    <field id="displayPartialLines" alias="labelA.displayPartialLines, labelB.displayPartialLines"/>
+    <field id="ellipsizeOnBoundary" alias="labelA.ellipsizeOnBoundary, labelB.ellipsizeOnBoundary"/>
+    <field id="truncateOnDelimiter" alias="labelA.truncateOnDelimiter, labelB.truncateOnDelimiter"/>
+    <field id="wordBreakChars" alias="labelA.wordBreakChars, labelB.wordBreakChars"/>
+    <field id="ellipsisText" alias="labelA.ellipsisText, labelB.ellipsisText"/>
+  </interface>
+
+  <children>
+    <Label
+      id="labelA"
+      opacity="0" />
+    <Label
+      id="labelB"
+      opacity="0" />
+
+    <Animation
+      id="animation"
+      easeFunction="linear">
+      <FloatFieldInterpolator
+        id="fadeOutInterpolator"
+        key="[0.0, 1.0]"
+        keyValue="[1.0, 0.0]" />
+      <FloatFieldInterpolator
+        id="fadeInInterpolator"
+        key="[0.0, 1.0]"
+        keyValue="[0.0, 1.0]" />
+    </Animation>
+  </children>
+</component>

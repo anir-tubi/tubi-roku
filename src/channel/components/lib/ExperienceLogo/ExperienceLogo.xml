@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - ExperienceLogo
+ - Provides a common component for displaying one of the experience logos in the app
+ -->
+<component name="ExperienceLogo" extends="Group">
+  <script type="text/brightscript" uri="ExperienceLogo.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <interface>
+
+    <!-- INPUTS -->
+    <!-- identifier of which experience logo to show. one of constants.ui.contentExperienceModes -->
+    <field id="experienceId" type="string" />
+    <!-- Since the logo is centered we need to know how wide the space to know how to center it -->
+    <field id="width" type="float" />
+    <field id="tubiLogoWidth" alias="tubiLogo.width" />
+    <field id="tubiLogoHeight" alias="tubiLogo.height" />
+    <field id="fontSize" alias="textIcon.fontSize" />
+  </interface>
+
+  <children>
+    <LayoutGroup
+      id="layoutGroup"
+      horizAlignment="center"
+      itemSpacings="[12]">
+      <Poster
+        id="tubiLogo"
+        uri="pkg:/images/logo-white-large.png" />
+      <TextIcon
+        id="textIcon"
+        uri="pkg:/images/{size}/menu-button.9.png"
+        padding="[15, 9]"
+        fontColor="#FFFFFF"
+        fontUri="pkg:/fonts/Vaud-Bold.ttf"
+        fontSize="27" />
+    </LayoutGroup>
+  </children>
+</component>

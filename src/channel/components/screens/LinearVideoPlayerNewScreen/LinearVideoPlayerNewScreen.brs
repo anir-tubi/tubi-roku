@@ -540,7 +540,7 @@ Function backButtonExit()
 End Function
 
 
-' Helper Function that aggregates any tasks that need to be done before playing a new video
+' Helper function that aggregates any tasks that need to be done before playing a new video
 Function prepareToStartVideo(content, drmIndex)
   resetVideoPlayerState(content)
   setDrmOnContent(content, drmIndex)
@@ -713,7 +713,7 @@ Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, str
 End Function
 
 
-'Helper Function that removes all characters after the ? in the url
+'Helper function that removes all characters after the ? in the url
 Function removeExcessUrl(url)
   cutUrl = ""
   if type(url) = "roString" or type(url) = "String"

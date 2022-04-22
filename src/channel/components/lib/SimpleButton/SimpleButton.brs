@@ -1,22 +1,14 @@
 Function init()
-
   m.buttonBG = m.top.findNode("buttonBG")
   m.label = m.top.findNode("label")
   m.buttonBG.opacity = m.top.unfocusedBackgroundOpacity
-  
+
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("unfocusedBackgroundOpacity", "onOpacityChanged")
 
   m.top.observeField("text", "onTextChanged")
-  m.top.observeField("width", "onWidthChanged")
-  
 End Function
 
-
-Function onWidthChanged()
-  m.label.width = m.top.width
-  m.buttonBG.width = m.top.width
-End Function
 
 
 Function onTextChanged()
@@ -47,7 +39,7 @@ End Function
 
 Function onScreenFocusChange()
   tubiLog("SimpleButton.onScreenFocusChange")
-  
+
   if m.top.hasFocus() then
     m.buttonBG.blendColor = m.global.theme.focused
     m.buttonBG.opacity = 1.0
@@ -55,16 +47,16 @@ Function onScreenFocusChange()
     m.buttonBG.blendColor = m.top.color
     m.buttonBG.opacity = m.top.unfocusedBackgroundOpacity
   end if
-  
+
 End Function
 
 
 Function onOpacityChanged()
- 
+
   if m.top.hasFocus() = false
     m.buttonBG.opacity = m.top.unfocusedBackgroundOpacity
   end if
-  
+
 End Function
 
 

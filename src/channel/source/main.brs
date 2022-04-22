@@ -125,11 +125,14 @@ Function runChannel(constants, log, request)
     if msgType = "roInputEvent"
       if controller <> invalid and msg.GetInfo() <> invalid
         inputInfo = msg.GetInfo()
-        if inputInfo.type = invalid
-          'deeplink info doesn't have a "type" field, so we add one in order to easily differentiate input behavior later
-          inputInfo.type = "deeplink"
+        if inputInfo.rale = invalid
+          ' We don't want to handle rale events in our deeplinking code
+          if inputInfo.type = invalid
+            'deeplink info doesn't have a "type" field, so we add one in order to easily differentiate input behavior later
+            inputInfo.type = "deeplink"
+          end if
+          controller.roInputInfo = inputInfo
         end if
-        controller.roInputInfo = inputInfo
       end if
     else if msgType = "roSGScreenEvent"
       ' documentation indicates a roSGSCreenEvent occurs when screen.close() is called, but trial

@@ -1,4 +1,8 @@
 Function initSideNav()
+  tubiLog("SideNavHelpers.initSideNav")
+  '//::NOTE:: this assumes a couple of things:
+  '//         1) this is only called once at the launch of the app, and
+  '//         2) all of the menu items start out being visible and this function informs the sideNav component which menu items should be hidden
   m.SideNav.observeFieldScoped("itemSelectedId", "onSideNavItemSelected")
   m.SideNav.observeFieldScoped("navigateWithinPageInfo", "onSideNavNavigateWithinPageInfoChanged")
 
@@ -47,6 +51,19 @@ Function initSideNav()
       m.SideNav.displayLinearEPG = false
     end if
     m.SideNav.displayMoviesTV = false
+  end if
+
+  if isICTSExperimentEnabled() = true
+    m.SideNav.displayEspanol = false
+    if isKidsUIOn() <> true
+      m.SideNav.displayKids = false
+    end if
+
+    if isParentalControlsAdultLevel() <> true
+      m.SideNav.displayContentExperience = false
+    end if
+  else
+    m.SideNav.displayContentExperience = false
   end if
 
   'set the initial value for the sign in item string
@@ -164,6 +181,9 @@ Function onSideNavItemSelected()
         showSettingsScreen("SignInOutButton")
         bNewScreenCalledSuccess = true
       end if
+    else if itemSelectedId = m.constants.ui.sideNavIds.contentExperience
+      displayInitialContentScreen()
+      bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.kidsMode
       if itemSelected.turnedOn = true
         '//If the parental control settings are not set to kids, then this action is not limited
@@ -223,7 +243,7 @@ Function onSideNavItemSelected()
       if isKidsUIOn() <> true
         setUiMode(m.constants.ui.modes.standard)
       end if
-      
+
       showHomeScreen(m.constants, authInfo)
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.channels
@@ -260,6 +280,14 @@ Function onSideNavItemSelected()
         showTVScreen()
         bNewScreenCalledSuccess = true
       end if
+    else if itemSelectedId = m.constants.ui.sideNavIds.nostalgia
+      setUiMode(m.constants.ui.modes.standard)
+      showNostalgiaScreen()
+      bNewScreenCalledSuccess = true
+    else if itemSelectedId = m.constants.ui.sideNavIds.bestKnown
+      setUiMode(m.constants.ui.modes.standard)
+      showBestKnownScreen()
+      bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.espanol
       if isKidsUIOn() = true
         bNewScreenCalledSuccess = false
@@ -339,15 +367,15 @@ Function onSideNavItemSelected()
 End Function
 
 
-Function displayMenuItemDisabled(sMenuItemID, parental="")
+Function displayMenuItemDisabled(sMenuItemID, parental = "")
   currentScreenNow = getCurrentScreen()
   sTitle = getTranslation("dialog_errorOops_title")
   sDialogSubTypeValue = ""
   if sMenuItemID = m.constants.ui.sideNavIds.channels
     sTitle = getTranslation("dialog_channelsDisabled_title")
     sDialogSubTypeValue = "kids-mode-channels"
-'//::TODO:: Because movies, tv shows, espanol, and live TV are displayed in the top nav, then no need to have code to show a dialog window for these options
-'//         Get rid of this code and any supporting code in this file once it has been determined that top nav is here to stay. Once it has been decided to have the topNav on FireTV
+    '//::TODO:: Because movies, tv shows, espanol, and live TV are displayed in the top nav, then no need to have code to show a dialog window for these options
+    '//         Get rid of this code and any supporting code in this file once it has been determined that top nav is here to stay. Once it has been decided to have the topNav on FireTV
   else if sMenuItemID = m.constants.ui.sideNavIds.movies
     sTitle = getTranslation("dialog_moviesDisabled_title")
     sDialogSubTypeValue = "kids-mode-movies"
@@ -401,9 +429,18 @@ End Function
 Function disableKidsModeFromSideNav()
   setUiMode(m.constants.ui.modes.standard)
   refreshScreenAfterParentalChanges()
-  showDefaultHomeScreen()
-  homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
-  focusSideNavOption(homeSideNavID)
+
+  if isICTSExperimentEnabled() = true
+    '//change the side nav options if the experiment variant is enabled
+    m.SideNav.displayKids = false
+    m.SideNav.displayContentExperience = true
+    hideNavMenu(false)
+    displayInitialContentScreen()
+  else
+    showDefaultHomeScreen()
+    homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
+    focusSideNavOption(homeSideNavID)
+  end if
 End Function
 
 
@@ -534,22 +571,24 @@ Function getSideNavIdAssociatedWithScreen(screen)
 
   idsAssociatedWithHome = {}
   idsAssociatedWithHome[m.constants.ui.screenIds.homeScreen] = true
-  idsAssociatedWithHome[m.constants.ui.screenIds.linearTVScreen] = true
+  if isICTSExperimentEnabled() = false
+    idsAssociatedWithHome[m.constants.ui.screenIds.linearTVScreen] = true
+  end if
   idsAssociatedWithHome[m.constants.ui.screenIds.movieScreen] = true
   idsAssociatedWithHome[m.constants.ui.screenIds.tvScreen] = true
 
   idsAssociatedWithEpg = {}
 
   experiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false)
-  if experiment.side_nav = false
+  if experiment.side_nav = false and isICTSExperimentEnabled() = false
     '//if the new EPG live TV option is in the homescreen top nav, not side nav
     idsAssociatedWithHome[m.constants.ui.screenIds.epgScreen] = true
   else
     '//if the new EPG live TV option is in the side nav
     idsAssociatedWithEpg[m.constants.ui.screenIds.epgScreen] = true
     idsAssociatedWithEpg[m.constants.ui.screenIds.sportsEPGScreen] = true
-    idsAssociatedWithEpg[m.constants.ui.screenIds.newsEPGScreen] = true    
-    idsAssociatedWithEpg[m.constants.ui.screenIds.entertainmentEPGScreen] = true    
+    idsAssociatedWithEpg[m.constants.ui.screenIds.newsEPGScreen] = true
+    idsAssociatedWithEpg[m.constants.ui.screenIds.entertainmentEPGScreen] = true
   end if
 
   if screen.id <> invalid

@@ -79,7 +79,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
 
     pushScreen(epgScreen, true, true)
   end if
-  
+
   if screenID = m.constants.ui.screenIds.epgScreen
     epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.linearEPG
   end if
@@ -594,7 +594,7 @@ Function isAnEpgScreen(Screen)
   experiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false)
   if experiment.side_nav = true
     return screen.isSubType("EPGScreen")
-  else 
+  else
     return screen.isSubType("EPGHomeScreen")
   end if
 End Function
@@ -608,7 +608,7 @@ Function isAnEPGScreenID(sID)
   if sID = m.constants.ui.screenIds.epgScreen or sID = m.constants.ui.screenIds.sportsEPGScreen or sID = m.constants.ui.screenIds.newsEPGScreen or sID = m.constants.ui.screenIds.entertainmentEPGScreen
     bReturn = true
   end if
-  
+
   return bReturn
 End Function
 
@@ -650,7 +650,7 @@ End Function
 Function setTimeGridContentLoadingToComplete(screen)
   tubiLog("EPGSCreenHelpers.setTimeGridContentLoading")
   checkAndFixDuplicates(screen)
-  if screen.contentIdToFocusOnLoadComplete <> ""
+  if isNonEmptyString(screen.contentIdToFocusOnLoadComplete)
     setLinearChannelDeeplink(screen)
   end if
   screen.updateTimeGridContent = true
