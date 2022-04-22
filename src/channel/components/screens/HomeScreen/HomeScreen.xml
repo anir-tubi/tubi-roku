@@ -166,13 +166,6 @@
   </interface>
 
   <children>
-    <!-- Temporary Background gradient for TopNav. A better solution will be made after the experiment. -->
-    <Poster
-        id="topNavBG"
-        height="250"
-        width="1920"
-        uri="pkg:/images/gradient-topNav.png"
-        visible="false"/>
     <Group id="nav">
       <LayoutGroup
         id="ScreenNavigationHint"

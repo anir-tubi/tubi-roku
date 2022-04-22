@@ -15,7 +15,6 @@ Function init()
   'topNav
   m.topNav = m.top.FindNode("topNav")
   m.topNav.selectedId = m.constants.ui.sideNavIds.linearEPG
-  m.topNavBG = m.top.FindNode("topNavBG")
   m.topNav.observeField("selected", "onTopNavSelection")
   m.topNav.observeField("backItemSelected", "onTopNavBackItemSelected")
   m.topNav.observeField("navigateWithinPageInfo", "onTopNavNavigateWithinPageInfoChange")

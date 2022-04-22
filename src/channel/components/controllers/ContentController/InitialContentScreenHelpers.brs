@@ -8,6 +8,7 @@ Function displayInitialContentScreen()
   screen.observeFieldScoped("actionableItemSelected", "onActionableItemSelected")
   screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   screen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
+  screen.backgroundUriList = [m.marketingBackgroundUri]
   pushScreen(screen, true, true)
 
   '//if the startup logo animation is done, then animate the screen into view. Otherwise, wait for the animation to be done.
@@ -81,7 +82,7 @@ Function displayFirstContentScreen(sPageID)
   sideNavFocus = m.constants.ui.sideNavIds.home
   if sPageID = m.constants.ui.sideNavIds.linearTV
     epgExperiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false)
-    if epgExperiment.enabled = true 
+    if epgExperiment.enabled = true
       showDefaultEPGScreen()
       if epgExperiment.side_nav = true
         sideNavFocus = m.constants.ui.sideNavIds.linearEPG

@@ -9,7 +9,6 @@ Function init()
   m.ContentArea = m.top.findNode("ContentArea")
   m.NavSection = m.top.findNode("nav")
   m.TopNav = m.top.findNode("TopNav")
-  m.topNavBG = m.top.findNode("topNavBG")
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.InfoPanelParent = m.top.findNode("InfoPanelParent")
   m.HintGroup = m.top.findNode("UpHintGroup")
@@ -75,7 +74,7 @@ Function init()
 
   ' initilize the currentColumn variable to keep track of the current focused column item. It is used in the helper to stop the linear video player, but it could be used for other things.
   m.currentColumn = -1
-  
+
   ' Video in the grid constants
   m.vitgSlideAmt = 326 'the amount the grid slides up to fit the vitg content item
   m.vitgMaskOffsetDiff = 352 'the diff in the amount the content area mask is offset in the up direction for vitg
@@ -92,7 +91,7 @@ Function init()
 
   m.originalContentAreaTranslation = m.ContentArea.translation
   m.vitgContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.vitgSlideAmt]
-  m.linearContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.linearSlideAmt] 
+  m.linearContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.linearSlideAmt]
   m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
 
   authInfo = m.global.authInfo
@@ -106,16 +105,14 @@ End Function
 
 Function onEnableTopNavChange()
   tubiLog("HomeScreen.onEnableTopNavChange")
-  if m.top.enableTopNav = true    
+  if m.top.enableTopNav = true
     m.InfoPanel.translation = [m.InfoPanel.translation[0], 180]
     m.NavSection.visible = false
     m.TopNav.visible = true
-    m.topNavBG.visible = true
   else
     m.InfoPanel.translation = [m.InfoPanel.translation[0], 133]
     m.NavSection.visible = true
     m.TopNav.visible = false
-    m.topNavBG.visible = false
   end if
 End Function
 
@@ -322,7 +319,7 @@ Function onCurrFocusColumnChange(msg)
   column = msg.getData()
   newColumn = Int(column)
   if newColumn <> invalid and newColumn <> m.currentColumn
-    '//make sure we only report the new column for a whole integer 
+    '//make sure we only report the new column for a whole integer
     m.currentColumn = newColumn
 
     m.top.columnFocused = m.currentColumn
@@ -450,13 +447,13 @@ Function onCurrFocusRowChange()
         sSponsorBackgroundURL = categoryEnteringFocus.sponsorImages.brandColor
       end if
     end if
-    
+
     m.top.sponsorshipBackground = sSponsorBackgroundURL
 
   else if categoryLosingFocus <> invalid
     tubiLog("HomeScreen.onCurrFocusRowChange, elseIf categoryLosingFocus <> invalid ")
     '//::QUESTION:: When does this elseIF block ever get triggered. If never, then consider getting rid of this block
-    
+
     contractContentAreaToOriginal(rowPercent)
 
   end if
@@ -477,7 +474,7 @@ Function contractContentAreaToOriginal(rowPercent)
       '//while the rowPercent is less than .75, then gradually shift the visual elements back to default state
       nDiffContentAreaTranslation_y = m.originalContentAreaTranslation[1] - m.ContentArea.translation[1]
       nDiffContentAreaMaskOffset_y = m.originalContentAreaMaskOffset[1] - m.ContentArea.maskOffset[1]
-      
+
       m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.ContentArea.translation[1] + nDiffContentAreaTranslation_y * rowPercent]
       m.ContentArea.maskOffset = [m.originalContentAreaMaskOffset[0], m.ContentArea.maskOffset[1] + nDiffContentAreaMaskOffset_y * rowPercent]
       if m.InfoPanel.opacity < 1 and m.InfoPanel.opacity < rowPercent
@@ -498,7 +495,7 @@ End Function
 ' @rowPercent: float, the percentage that the Sponsorship row is focused
 Function expandContentAreaForSponsorship(rowPercent)
   m.ContentArea.translation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - (m.sponsorSlideAmt  * rowPercent)]
-  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.ContentArea.maskOffset[1] + (m.sponsorMaskOffsetDiff * rowPercent)]   
+  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.ContentArea.maskOffset[1] + (m.sponsorMaskOffsetDiff * rowPercent)]
 End Function
 
 
@@ -560,7 +557,7 @@ Function onGridFocusChange() as void
   focusedContent = m.CategoryGridList.itemFocused
 
   if m.CategoryGridList.isInFocusChain() = true
-    '//if the CategoryGridList is in focus, then alter the UI. No need to do this for topnav as it may cause the linear video player 
+    '//if the CategoryGridList is in focus, then alter the UI. No need to do this for topnav as it may cause the linear video player
     '// to start to play when the top nav is in focus because there is a delay of reporting of the focused item by the CategoryGridList
     if focusedContent <> invalid
       if focusedContent.type <> m.constants.ui.gridItemTypes.linear
@@ -570,12 +567,12 @@ Function onGridFocusChange() as void
       m.top.contentFocused = focusedContent
     end if
 
-    populateInfoPanelByContent(focusedContent) 
+    populateInfoPanelByContent(focusedContent)
   end if
 
 
 
-  'Set up the navigateWithinPageInfo to send to ContentController via Homescreen. Need for when CategoryGridList or topNav are in focus 
+  'Set up the navigateWithinPageInfo to send to ContentController via Homescreen. Need for when CategoryGridList or topNav are in focus
   oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + 1
   oldAnalyticsCol = m.CategoryGridList.oldCursorPosition[1] + 1
   newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + 1
@@ -612,14 +609,14 @@ Function onTopNavNavigateWithinPageInfoChange()
   tubiLog("Homescreen.onTopNavNavigateWithinPageInfoChange")
   navigateWithinPageInfo = m.TopNav.navigateWithinPageInfo
   if navigateWithinPageInfo <> invalid and navigateWithinPageInfo.means_of_navigation = "BUTTON"
-    '//The navigateWithinPageInfo is caused by the user going from the video CategoryGridList to the Top Nav. 
-    '//Before navigateWithinPageInfo is communicated to the outside helper, add info about the CategoryGridList    
+    '//The navigateWithinPageInfo is caused by the user going from the video CategoryGridList to the Top Nav.
+    '//Before navigateWithinPageInfo is communicated to the outside helper, add info about the CategoryGridList
     categoryComponentInfo = getTrackingComponentInfoOfCategoryGridList(m.CategoryGridList.itemFocused, m.CategoryGridList.focusedPosition)
 
     if categoryComponentInfo <> invalid and categoryComponentInfo.componentValues <> invalid
       navigateWithinPageInfo.componentOneof = m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo.componentValues)
     end if
-  end if 
+  end if
   m.top.navigateWithinPageInfo = navigateWithinPageInfo
 End Function
 
@@ -717,7 +714,7 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.width = 960
-    else if mode = m.constants.ui.infoPanelModes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).update_homescreen = true 
+    else if mode = m.constants.ui.infoPanelModes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).update_homescreen = true
       m.InfoPanel.mode = mode
     else if mode = m.constants.ui.infoPanelModes.linear
       m.InfoPanel.mode = mode

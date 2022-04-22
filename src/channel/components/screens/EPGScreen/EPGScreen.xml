@@ -101,11 +101,6 @@
   </interface>
 
   <children>
-    <Poster
-      id="topNavBG"
-      height="250"
-      width="1920"
-      uri="pkg:/images/gradient-topNav.png" />
 
     <TopNav
       id="topNav"
