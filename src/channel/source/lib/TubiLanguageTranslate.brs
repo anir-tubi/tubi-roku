@@ -550,7 +550,7 @@ Function getTranslation_en_US()
     },
     "screenInitialContent_nostalgia_menu_item_description": {
       "description": "description of the nostalgia experience menu item",
-      "message": "Revisit your favorite movies + tv shows from the past,\nyou won’t even need to adjust your antenna"
+      "message": "Revisit your favorite movies + tv shows\nfrom the past"
     },
     "screenInitialContent_live_tv_menu_item_description": {
       "description": "description of the live tv experience menu item",
