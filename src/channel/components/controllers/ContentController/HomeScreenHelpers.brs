@@ -451,7 +451,8 @@ Function setEnableTopNavOnHomescreen(homescreen)
 
   if homescreen <> invalid
     if homescreen.isLinearTVAllowedInTopNav <> isParentalControlsAdultLevel()
-      homeScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel() and getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).side_nav = false
+      allowedByExperiments = getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).side_nav = false and isICTSExperimentEnabled() = false
+      homeScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel() and allowedByExperiments
       refreshNeeded = true
     end if
 

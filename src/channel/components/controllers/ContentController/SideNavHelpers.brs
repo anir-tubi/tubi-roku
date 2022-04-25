@@ -241,6 +241,7 @@ Function onSideNavItemSelected()
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.home
       if isKidsUIOn() <> true
+        m.contentExperienceMode = m.constants.ui.contentExperienceModes.standard
         setUiMode(m.constants.ui.modes.standard)
       end if
 

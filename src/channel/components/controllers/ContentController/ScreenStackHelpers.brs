@@ -61,6 +61,9 @@ Function popScreen(sendNavigateEvents = true, sendLoadingEvents = true)
   toBePopped = getCurrentScreen()
   topHidden = getHiddenScreen(1)
   if topHidden <> invalid and isKidsUIOn() = false and topHidden.subtype() = "HomeScreen"
+    if topHidden.id = m.constants.ui.screenIds.homeScreen
+      m.contentExperienceMode = m.constants.ui.contentExperienceModes.standard
+    end if
     showExperienceLogo(m.contentExperienceMode)
   end if
 
