@@ -465,9 +465,6 @@ Function setEnableTopNavOnHomescreen(homescreen)
     else if homeScreen.id = m.constants.ui.screenIds.bestKnownScreen
       '//this screen is not in the topNav
       bTopNavAllowed = false
-    else if (homeScreen.id = m.constants.ui.screenIds.linearTVScreen or homeScreen.id = m.constants.ui.screenIds.epgScreen) and isICTSExperimentEnabled() = true
-      '//this screen is not in the topNav
-      bTopNavAllowed = false
     end if
 
     if homescreen.enableTopNav <> bTopNavAllowed
