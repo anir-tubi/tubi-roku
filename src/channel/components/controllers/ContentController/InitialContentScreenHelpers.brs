@@ -146,19 +146,12 @@ Function displayFirstContentScreen(sSelectedID)
     setUiMode(m.constants.ui.modes.standard)
     showNostalgiaScreen()
   else
-    screenStackCount = m.screenStack.getChildCount()
-    if sSelectedID = m.constants.ui.keyIds.back and screenStackCount > 1 and getHiddenScreen().id <> m.constants.ui.screenIds.signInScreen
-      ' ICTS can now be shown again from sidenav so if we have another page underneath this then pop to that instead,
-      ' unless this it is the sign in screen because we're coming from kids mode login
-      popScreen(false, false)
-    else
-      sideNavFocus = sideNavIds.home
-      m.contentExperienceMode = contentExperienceModes.standard
-      ' send the user to the default home page
-      setUiMode(m.constants.ui.modes.standard)
-      reloadDefaultHomeScreenContent()
-      showDefaultHomeScreen()
-    end if
+    sideNavFocus = sideNavIds.home
+    m.contentExperienceMode = contentExperienceModes.standard
+    ' send the user to the default home page
+    setUiMode(m.constants.ui.modes.standard)
+    reloadDefaultHomeScreenContent()
+    showDefaultHomeScreen()
   end if
 
   focusSideNavOption(sideNavFocus)

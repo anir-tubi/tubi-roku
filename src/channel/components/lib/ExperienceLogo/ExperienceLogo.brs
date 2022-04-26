@@ -31,7 +31,7 @@ Function onExperienceIdChange(msg)
   else if id = m.constants.ui.contentExperienceModes.espanol
     text = "Español"
     blendColor = "#00964E"
-  else if id = m.constants.ui.modes.kids
+  else if id = m.constants.ui.contentExperienceModes.kids
     text = getTranslation("menu_kids")
     blendColor = "#EB9C00"
   end if

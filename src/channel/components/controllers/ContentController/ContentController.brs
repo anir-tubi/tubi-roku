@@ -1049,7 +1049,7 @@ End Function
 
 Function showKidsLogo()
   if isICTSExperimentEnabled(true) = true
-    showExperienceLogo(m.constants.ui.modes.kids)
+    showExperienceLogo(m.constants.ui.contentExperienceModes.kids)
   else
     m.logoKids.visible = true
   end if

@@ -871,7 +871,7 @@ Function getConstants()
       constants.ui.screenLevels.signUpScreen = 90
       constants.ui.screenLevels.signInScreen = 90
       constants.ui.screenLevels.ageGateScreen = 90
-      constants.ui.screenLevels.initialContentScreen = 300
+      constants.ui.screenLevels.initialContentScreen = 20
       constants.ui.screenLevels.modalDialogScreen = 1000
 
     constants.ui.screenIds = {}
