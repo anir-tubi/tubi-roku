@@ -442,5 +442,6 @@ Function showConfirmPasswordScreen()
   m.confirmPasswordScreen.observeField("visible", "onConfirmPasswordScreenVisible")
   m.confirmPasswordScreen.observeField("submitSelected", "onPasswordConfirm")
   m.confirmPasswordScreen.observeField("backPressed", "onSettingsBackPressed")
+  m.confirmPasswordScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
   pushScreen(m.confirmPasswordScreen)
 End Function

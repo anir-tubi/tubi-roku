@@ -1,6 +1,6 @@
 Function init()
   m.constants = getConstantsFromGlobal()
-  
+
   m.password = m.top.findNode("password")
   m.password.hint = getTranslation("signIn_password_hint")
 
@@ -17,6 +17,8 @@ Function init()
   }
 
   m.top.screenLevel = m.constants.ui.screenLevels.confirmPasswordScreen
+
+  m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
 End Function
 
 
@@ -26,6 +28,8 @@ End Function
 Function onScreenFocusChange()
   tubiLog("ConfirmPasswordScreen.onScreenFocusChange")
   if m.top.hasFocus()
+    ' force a background update
+    m.top.backgroundUriList = m.backgroundUriList
     m.Keyboard.setFocus(true)
     if m.constants.settings.mode <> "production" and m.constants.settings.password <> invalid
       m.keyboard.text = m.constants.settings.password
@@ -50,7 +54,7 @@ Function onButtonSelected(evt)
     m.top.backPressed = true
   else if buttonSelected = "up"
     'DO nothing
-  end if 
+  end if
 End Function
 
 
