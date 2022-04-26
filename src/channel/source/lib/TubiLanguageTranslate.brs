@@ -1222,6 +1222,10 @@ Function getTranslation_es_MX()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the tv shows screen.",
       "message": "Series"
     },
+    "menu_contentExperience": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the Content Experience screen.",
+      "message": "Cambiar Modos"
+    },
     "menu_livetv": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the live TV screen.",
       "message": "TV En Vivo"
@@ -1483,7 +1487,7 @@ Function getTranslation_es_MX()
       "message": "Actualizando tus resultados..."
     },
     "screenSearch_noResults": {
-      "description": "onscreeen message when there are no search results.",
+      "description": "onscreen message when there are no search results.",
       "message": "No pudimos encontrar resultados para '{term}'\n Inténtalo de nuevo"
     },
     "screenSearch_results": {
@@ -1561,6 +1565,42 @@ Function getTranslation_es_MX()
     "screenInitialContent_subtitle_signedIn": {
       "description": "subTitle of the initial content screen when user is signed in",
       "message": "Elige algo para ver"
+    },
+    "screenInitialContent_bestKnown_menu_item_title": {
+      "description": "title of the A-List experience menu item",
+      "message": "Cine VIP"
+    },
+    "screenInitialContent_bestKnown_menu_item_description": {
+      "description": "description of the A-List experience menu item",
+      "message": "Ponte al día con películas y series populares, recientes y aclamados por críticos"
+    },
+    "screenInitialContent_nostalgia_menu_item_title": {
+      "description": "title of the nostalgia experience menu item",
+      "message": "Nostalgia"
+    },
+    "screenInitialContent_nostalgia_menu_item_description": {
+      "description": "description of the nostalgia experience menu item",
+      "message": "Vuelve a ver tus películas y series favoritas\ndel pasado"
+    },
+    "screenInitialContent_live_tv_menu_item_description": {
+      "description": "description of the live tv experience menu item",
+      "message": "Desde noticias locales y nacionales de última hora, hasta deportes en vivo +\nentretenimiento, ver lo que más te importa"
+    },
+    "screenInitialContent_espanol_menu_item_description": {
+      "description": "description of the espanol experience menu item",
+      "message": "Desde series de televisión hasta Documentales y Películas,\nTubi lo tiene todo en español"
+    },
+    "screenInitialContent_kids_menu_item_description": {
+      "description": "description of the kids experience menu item",
+      "message": "Aventuras animadas y clásicos conmovedores que\ntoda la familia puede disfrutar."
+    },
+    "screenInitialContent_show_everything_title": {
+      "description": "title for button a user clicks to skip selecting a content experience",
+      "message": "Muestrame Todo"
+    },
+    "screenInitialContent_show_everything_description": {
+      "description": "description for button a user clicks to skip selecting a content experience",
+      "message": "Saltar la selección por ahora. Muéstrame el catálogo completo de Tubi."
     },
     "screenDetails_error_queueMovie_description": {
       "description": "Error message when a movie is not added to the user's list.",
@@ -1964,7 +2004,7 @@ Function getTranslation_es_MX()
       "note": "This translation is used for channelStore, please double check that it is not needed before deleting"
     },
     "channel_webDescription": {
-      "description": "This is the desacription of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
+      "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
       "message": "Ve miles de películas y series totalmente Gratis. En Tubi puedes ver contenido 100% legal y de forma ilimitada. No se requiere tarjeta de crédito o suscripción. Solo tienes que descargar la aplicación, elige lo que quieras ver en dónde tú quieras y disfruta del contenido con menos anuncios que el cable. Tubi es el servicio más grande de streaming Gratis que ofrece películas y series de televisión premiadas. Tenemos algo para todos: Comedias, dramas, familiares, clásicas, dramas coreanos, anime y más. ¡Descarga hoy y empieza el streaming de entretenimiento Gratis!",
       "note": "This translation is used for channelStore, please double check that it is not needed before deleting"
     },
@@ -2129,11 +2169,11 @@ Function getTranslation_es_MX()
       "message": "Yo se mi contraseña. Vamos."
     },
     "registration_signup_button": {
-      "description": "button text for when a non registered user focuses on details sreen",
+      "description": "button text for when a non registered user focuses on details screen",
       "message": "Regístrate para Guardar Tu Progreso"
     },
     "registration_signup_button_free": {
-      "description": "button text on top of background image next to sign up text for when a non registered user focuses on details sreen",
+      "description": "button text on top of background image next to sign up text for when a non registered user focuses on details screen",
       "message": "GRATIS"
     }
   }
