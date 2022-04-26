@@ -7,21 +7,15 @@ Function displayInitialContentScreen()
 
   showHideSpinner(false)
 
-  screenId = m.constants.ui.screenIds.initialContentScreen
-  screen = getFromScreenCache(screenId)
-  if screen = invalid
-    screen = CreateObject("roSGNode", "InitialContentScreen")
-    screen.id = screenId
-    screen.backgroundUriList = [m.defaultBackgroundUri]
-    screen.screenLevel = m.constants.ui.screenLevels.initialContentScreen
-    screen.observeFieldScoped("actionableItemSelected", "onActionableItemSelected")
-    screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-    screen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
+  screen = CreateObject("roSGNode", "InitialContentScreen")
+  screen.id = m.constants.ui.screenIds.initialContentScreen
+  screen.backgroundUriList = [m.defaultBackgroundUri]
+  screen.screenLevel = m.constants.ui.screenLevels.initialContentScreen
+  screen.observeFieldScoped("actionableItemSelected", "onActionableItemSelected")
+  screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+  screen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
 
-    screen.backgroundUriList = [m.marketingBackgroundUri]
-
-    setInScreenCache(screen)
-  end if
+  screen.backgroundUriList = [m.marketingBackgroundUri]
 
   pushScreen(screen, true, true)
 
@@ -83,7 +77,7 @@ Function sendInitialContentComponentInteractionEvent(sSelectedID, screen)
   }
 
   if navComponent <> invalid
-    '//::NOTE:: The intitial content screen repurposes the top_nav_component for the component_interaction event
+    '//::NOTE:: The initial content screen repurposes the top_nav_component for the component_interaction event
     event.values.componentOneof = m.Tracking.getAnalyticsComponent("top_nav_component", navComponent)
   end if
 

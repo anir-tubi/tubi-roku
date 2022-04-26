@@ -921,7 +921,9 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.sportsEPGScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.newsEPGScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.entertainmentEPGScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.initialContentScreen] = true
+      ' Note when returning to the page there were issues with MarkupGrid being in a bad state either
+      ' due to the ArrayGrid items being recycled or some state of the MarkupGrid itself.
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.initialContentScreen] = false
       constants.ui.cacheableScreenIds[constants.ui.screenIds.bestKnownScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.nostalgiaScreen] = true
 

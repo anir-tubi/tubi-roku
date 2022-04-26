@@ -537,7 +537,7 @@ Function startUserExperience()
       ' whether we were logged in or not.
       handleDeeplink()
     else if shouldDisplayInitialContentScreen() = true
-      ' Display the intitial content screen to the user so they can choose the proper experience.
+      ' Display the initial content screen to the user so they can choose the proper experience.
       displayInitialContentScreen()
       showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary
     else
