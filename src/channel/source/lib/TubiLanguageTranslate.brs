@@ -194,7 +194,7 @@ Function getTranslation_en_US()
     },
     "menu_contentExperience": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the Content Experience screen.",
-      "message": "Switch Modes"
+      "message": "Switch Mode"
     },
     "menu_livetv": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the live TV screen.",
