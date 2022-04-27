@@ -20,16 +20,16 @@ Function TubiExperiments(constants) as Object
     '
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
     defaultResources: {
-      '//When enabled = true, the "roku_linear_epg_v3" experiment should have a boolean field labeled "side_nav"
+      '//When enabled = true, the "roku_linear_epg_v4" experiment should have a boolean field labeled "side_nav"
       '//   if side_nav=false, then the "Live TV" option will not be found on the side nav but on the homescreen's top nav
-      '//     roku_linear_epg_v3: { "enabled": true, "side_nav": false, "update_homescreen": false}
+      '//     roku_linear_epg_v4: { "enabled": true, "side_nav": false, "update_homescreen": false}
       '//   if side_nav=true, then the "Live TV" option will be found on the side nav and not on the homescreen's top nav
-      '//     roku_linear_epg_v3: { "enabled": true, "side_nav": true, "update_homescreen": false }
+      '//     roku_linear_epg_v4: { "enabled": true, "side_nav": true, "update_homescreen": false }
       '// ::NOTE:: For v2 of this experiment, "update_homescreen" is ALWAYS set to false - for control and all variants.
       '//           In the future, is has been discussed that a future experiment (v3?) will test having the liveTV row
       '//           on the homescreen with a different EPG UI, in which case "update_homescreen" will then be set to true in an experiment variant.
       roku_linear_epg: {
-        roku_linear_epg_v3: { "enabled": false, "side_nav": false, "update_homescreen": false}
+        roku_linear_epg_v4: { "enabled": false, "side_nav": false, "update_homescreen": false}
       }
 
       '//When enabled = true, the "roku_icts_content_modes_v1" experiment should have a boolean field labeled "show_background_images" and a boolean field labeled "live_tv_first"

@@ -67,7 +67,7 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     homeScreen.observeFieldScoped("sponsoredRowFocused", "onHomescreenSponsoredRowFocused")
     homeScreen.observeFieldScoped("columnFocused", "onColumnFocusChanged")
 
-    '//::TODO:: epg - remove this observer once the roku_linear_epg_v3 experiment is done
+    '//::TODO:: epg - remove this observer once the roku_linear_epg_v4 experiment is done
     homeScreen.observeField("focusedChild", "onHomeScreenFocusChange")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop lsitenting to timer before listing to it in case a previous screen started the timer
@@ -124,7 +124,7 @@ Function onHomeScreenFocusChange(msg)
   if screen <> invalid and screen.isInFocusChain() = true and m.deeplinkContent = invalid and isParentalControlsAdultLevel() = true and isKidsUIOn() = false
     '//Fire experiment exposure event when the Home Screen is focused - just in case there is a deep link to linear content
     '//::NOTE:: delete this function once the experiment is over
-    bEnabled = getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", true).enabled
+    bEnabled = getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", true).enabled
   end if
 End Function
 
@@ -451,7 +451,7 @@ Function setEnableTopNavOnHomescreen(homescreen)
 
   if homescreen <> invalid
     if homescreen.isLinearTVAllowedInTopNav <> isParentalControlsAdultLevel()
-      homeScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel() and getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).side_nav = false
+      homeScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel() and getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).side_nav = false
     end if
 
     '//When the screen loads new content, make sure the topNav is displayed if it is supposed to. For example, if the user changes the parental settings from adults to older kids, then the app is in kidsMode and should not display the top nav. Changing the topNav status when reloading the content will ensure the top nav is diosplayed when it should be.
@@ -863,7 +863,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
     '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
     '//we should stop the countdown timer
     bStopCountdownTimer = true
-    epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false)
+    epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false)
 
     if focusedContent.type = m.constants.ui.categoryTypes.linear and focusedContent.id <> m.constants.ui.contentIds.tvGuide and m.SideNav.opened <> true
       bPlayVideo = true
@@ -947,7 +947,7 @@ Function selectLinearContent(content)
         playLinearVideoContent(content, false, homeScreen.id)
       end if
     else
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).enabled = true
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).enabled = true
         showDefaultEPGScreen()
       end if
     end if
@@ -957,7 +957,7 @@ End Function
 
 Function stopCountdownTimer()
   tubiLog("HomeScreenHelpers.stopCountdownTimer")
-  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).update_homescreen = true
+  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).update_homescreen = true
     '//hide the countdown timer
     setPlayerCountDownChange(-1)
   else
@@ -999,7 +999,7 @@ Function startCountdownTimer()
   if Screen <> invalid and (Screen.id = m.constants.ui.screenIds.homeScreen or Screen.id = m.constants.ui.screenIds.linearTVScreen)
     stopCountdownTimer()
     '//Start/reset timer to play video in fullscreen after a few seconds
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).update_homescreen = true
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).update_homescreen = true
       setPlayerCountDownChange(m.constants.timers.linearFullscreenTimeout)
     else
       Screen.fullscreenCountdown = m.constants.timers.linearFullscreenTimeout

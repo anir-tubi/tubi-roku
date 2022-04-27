@@ -309,7 +309,7 @@ Function transitionGradients()
         m.leftBottomGradient.gradientOpacity = 1.0
       end if
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.linear
-      'This comment will remind us to remove this section when we graduate EPG when we search for experiment name :roku_linear_epg->roku_linear_epg_v3
+      'This comment will remind us to remove this section when we graduate EPG when we search for experiment name :roku_linear_epg->roku_linear_epg_v4
       m.fullScreenGradient.gradientOpacity = 0.0
       m.leftBottomGradient.gradientOpacity = 0.0
       m.topRightGradient.gradientOpacity = 0.0
@@ -417,7 +417,7 @@ Function transitionGradients()
         m.linearGradient2.lastAnimationName = "GradientFadeOut"
       end if
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.linear
-      'This comment will remind us to remove this section when we graduate EPG when we search for experiment name :roku_linear_epg->roku_linear_epg_v3
+      'This comment will remind us to remove this section when we graduate EPG when we search for experiment name :roku_linear_epg->roku_linear_epg_v4
       'don't fade in the linearGradient due to 2 reasons
       '1) if the old background poster was the default background, there is no gradient, so fading in the
       '   gradient while the linear background poster fades in shows the edges of the linear background
@@ -529,7 +529,7 @@ Function startTransitionIn()
       m.newPoster.lastAnimationName = "TopRightTransitionIn"
     end if
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.linear
-    'This comment will remind us to remove this section when we graduate EPG when we search for experiment name :roku_linear_epg->roku_linear_epg_v3
+    'This comment will remind us to remove this section when we graduate EPG when we search for experiment name :roku_linear_epg->roku_linear_epg_v4
     m.newPoster.linearTransitionInControl = "start"
     m.newPoster.lastAnimationName = "linearTransitionIn"
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.epg

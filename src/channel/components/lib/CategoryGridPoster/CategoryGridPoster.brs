@@ -69,7 +69,7 @@ Function onContentChange()
     categoryContent = m.top.itemContent.getParent()
 
     if categoryContent <> invalid and m.top.itemContent.gridItemType <> invalid then
-      if m.top.itemContent.gridItemType = m.gridItemTypes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).update_homescreen = true
+      if m.top.itemContent.gridItemType = m.gridItemTypes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).update_homescreen = true
         setUpLinear()
       else
         m.poster.uri = m.top.itemContent.hdgridposterurl
@@ -360,7 +360,7 @@ End Function
 
 Function isLinear(itemContent, gridItemTypes)
   bIsLinear = false
-  if itemContent.gridItemType = gridItemTypes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v3", false).update_homescreen = true
+  if itemContent.gridItemType = gridItemTypes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).update_homescreen = true
     bIsLinear = true
   end if
 
