@@ -29,7 +29,7 @@ Function TubiExperiments(constants) as Object
       '//           In the future, is has been discussed that a future experiment (v3?) will test having the liveTV row
       '//           on the homescreen with a different EPG UI, in which case "update_homescreen" will then be set to true in an experiment variant.
       roku_linear_epg: {
-        roku_linear_epg_v4: { "enabled": false, "side_nav": false, "update_homescreen": false}
+        roku_linear_epg_v4: { "enabled": true, "side_nav": false, "update_homescreen": false}
       }
 
       '//When enabled = true, the "roku_icts_content_modes_v1" experiment should have a boolean field labeled "show_background_images" and a boolean field labeled "live_tv_first"
