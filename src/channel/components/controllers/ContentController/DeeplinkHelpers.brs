@@ -415,7 +415,7 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
   else if entryPoint = m.constants.deeplinks.entryPoints.categoryDetail
     referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("category_page",  {"category_slug": deepLinkContent.id})
   else if entryPoint = m.constants.deeplinks.entryPoints.news
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_NEWS"})
+    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_LINEAR"})
   else if entryPoint = m.constants.deeplinks.entryPoints.episodeList
     if deepLinkContent <> invalid
       seriesId = deeplinkContent.id.toInt()

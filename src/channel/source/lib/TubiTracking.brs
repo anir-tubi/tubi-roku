@@ -957,7 +957,7 @@ Function tubiTracking_getHomePageContentModeMap(constants)
     if screenIds.homeScreen <> invalid then map[screenIds.homeScreen] = "CONTENT_MODE_UNKNOWN"
     if screenIds.movieScreen <> invalid then map[screenIds.movieScreen] = "CONTENT_MODE_MOVIE"
     if screenIds.tvScreen <> invalid then map[screenIds.tvScreen] = "CONTENT_MODE_TV"
-    if screenIds.linearTVScreen <> invalid then map[screenIds.linearTVScreen] = "CONTENT_MODE_NEWS"
+    if screenIds.linearTVScreen <> invalid then map[screenIds.linearTVScreen] = "CONTENT_MODE_LINEAR"
     if screenIds.espanolScreen <> invalid then map[screenIds.espanolScreen] = "CONTENT_MODE_LATINO"
     if screenIds.nostalgiaScreen <> invalid then map[screenIds.nostalgiaScreen] = "CONTENT_MODE_NOSTALGIA"
     if screenIds.bestKnownScreen <> invalid then map[screenIds.bestKnownScreen] = "CONTENT_MODE_ALIST"
