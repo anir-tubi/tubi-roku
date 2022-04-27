@@ -282,6 +282,7 @@ Function playUpNextContent(nextContent, autoplayType)
   m.videoSponsorExposureId = ""
 
   if videoPlayer <> invalid
+
     videoContent = videoPlayer.content
     if videoContent <> invalid and videoContent.parentType = m.constants.ui.contentTypes.series
       detailScreen = getTopDetailScreenFromStack()
@@ -294,7 +295,20 @@ Function playUpNextContent(nextContent, autoplayType)
     end if
 
     oldContent = videoPlayer.content
-    content = addSeriesTitle(nextContent, oldContent)
+    analyticId = 0
+    content = invalid
+    'A series can be included into the autoplaylist of a Movie.
+    'In that case, exctract the episode info to play from nextContent
+    if nextContent.type = m.constants.ui.contentTypes.series
+      if nextContent.getChild(0) <> invalid and nextContent.getChild(0).getchild(0) <> invalid
+        content = nextContent.getChild(0).getchild(0)
+        analyticId = content.id.toInt()
+      end if
+    else
+      analyticId = nextContent.id.toInt()
+      content = addSeriesTitle(nextContent, oldContent)
+    end if
+
     stopVideoContent(videoPlayer)
 
     ' for analytics purposes, simulate navigating to a new video player page
@@ -303,7 +317,7 @@ Function playUpNextContent(nextContent, autoplayType)
     oldTrackingPageInfo = videoPlayer.trackingPageInfo
     newTrackingPageInfo = videoPlayer.trackingPageInfo
     newTrackingPageInfo.pageValues = {
-      video_id: nextContent.id.toInt()
+      video_id: analyticId
     }
     screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, videoPlayer.trackingComponentInfo)
     screenTrackingLoad(newTrackingPageInfo)
@@ -312,10 +326,15 @@ Function playUpNextContent(nextContent, autoplayType)
     ' exits, it's already populated and there is no visible screen re-render. Assume this is only necessary
     ' for movies, as series only autoplay into the same series for now.
     if oldContent.parentType <> m.constants.ui.contentTypes.series
-      emptyMovieNode = CreateObject("roSGNode", "TubiContentNode")
-      emptyMovieNode.type = m.constants.ui.contentTypes.video
-      emptyMovieNode.id = nextContent.id
-      getSingleContentFromServer(emptyMovieNode, onAutoplaySingleContentResponse, onSingleContentErrorWithoutTracking)
+      if nextContent.type = m.constants.ui.contentTypes.series
+        'this is not ideal but since we already have series content, we can do not want to refetch the series content.
+        onAutoplaySingleContentResponse(nextContent)
+      else
+        emptyMovieNode = CreateObject("roSGNode", "TubiContentNode")
+        emptyMovieNode.type = m.constants.ui.contentTypes.video
+        emptyMovieNode.id = nextContent.id
+        getSingleContentFromServer(emptyMovieNode, onAutoplaySingleContentResponse, onSingleContentErrorWithoutTracking)
+      end if
     end if
 
     playVideoContent(content, autoplayType)
@@ -829,10 +848,11 @@ Function onUpNextResponse(upNextContent)
   if videoPlayer <> invalid
     if upNextContent <> invalid
       ' updates descriptorCode and descriptorDescription for upNextContent
-      for i = 0 to upNextContent.getChildCount()-1
+      for i = upNextContent.getChildCount()-1 to 0 step -1
         content = upNextContent.getChild(i)
         setDescriptorCodeAndDescription(content)
       end for
+
       if m.receivedGoToNextPressed = true
         firstUpNextItem = upNextContent.getChild(0)
         if firstUpNextItem <> invalid
@@ -843,6 +863,8 @@ Function onUpNextResponse(upNextContent)
       else if upNextContent.getChildCount() > 0
         videoPlayer.upNextContent = upNextContent
         videoPlayer.upNextUpdateContent = true
+      else 'worst case there are no contents under upNextContent
+        returnToDetailScreenFromVideo()
       end if
     end if
   else

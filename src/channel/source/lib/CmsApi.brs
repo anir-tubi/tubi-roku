@@ -59,6 +59,8 @@ Function cmsApi_getUpNextContentRequestInfo(contentId, passedOptions)
   options = m.getCommonOptions()
   params = options.params
   headers = options.headers
+  'adding accept-version=6.0.0 in header will include series recommendations at the end of a movie
+  headers["accept-version"] = "6.0.0"
 
   params["video_resources"] = m.constants.player.drmOrder
 

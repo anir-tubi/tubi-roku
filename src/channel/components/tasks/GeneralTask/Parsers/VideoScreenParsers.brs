@@ -31,7 +31,7 @@ Function parseVideoScreenUpNextSuccess(fullResponse, _requestNode)
   upNextContent = CreateObject("roSGNode", "ContentNode")
   for each content in parsedResponse
     upNextItem = upNextContent.createChild("TubiContentNode")
-    translate.translateRecursive(content, upNextItem)
+    translate.upNextTranslateRecursiveWrapper(content, upNextItem)
   end for
   return upNextContent
 End Function

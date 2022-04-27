@@ -13,6 +13,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     translateLinearChannelGuide: tubiMetadataTranslate_translateLinearChannelGuide
     translateEPGChannelIds: tubiMetadataTranslate_translateEPGChannelIds
     translateEPGPrograms: tubiMetadataTranslate_translateEPGPrograms
+    upNextTranslateRecursiveWrapper: tubiMetadataTranslate_upNextTranslateRecursiveWrapper
 
     ' private
     constants: constants
@@ -1759,4 +1760,43 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
   end for
 
 return contentNode
+End Function
+
+' @content: roAssocArray, series/movie content directly from the server
+' @upnextContentItem: Node, Empty tubicontentNode to be passed over to translateRecursive Function.
+'
+' This function will wrap the TranslateRecursive function and removes any series without seasons and any seasons without episode
+
+Function tubiMetadataTranslate_upNextTranslateRecursiveWrapper(content, upnextContentItem)
+  bInclude = true
+
+  if content.type <> invalid
+    sType = m.translateBackendTypeToClientSideType(content.type)
+    if sType = m.contentTypes.series
+      if content.children <> invalid
+        if content.children.count() <= 0 'no seasons
+          bInclude = false
+        else if content.children.count() > 0 'there are seasons so check each season for emptiness
+          for i = content.children.count() -1 to 0 step -1
+            season = content.children[i]
+            if season.children = invalid or (season.children <> invalid and season.children.count() <= 0) 'empt season
+              content.children.delete(i) 'remove season
+            end if
+          end for
+          if content.children.count() <= 0
+            bInclude = false
+          end if
+        end if
+      else
+        bInclude = false
+      end if
+    end if
+  end if
+
+  if bInclude = true
+    m.translateRecursive(content, upnextContentItem)
+  else
+    parent = upnextContentItem.getParent()
+    parent.removeChild(upnextContentItem)
+  end if
 End Function
