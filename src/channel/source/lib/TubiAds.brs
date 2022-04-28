@@ -661,6 +661,7 @@ Function tubiAds_getNielsenPingRequestInfo(constants, pingType, content = invali
       createtm: nowTime
       devid: constants.deviceInfo.deviceAdId
       uoo: optOut
+      intid: constants.thirdParty.nielsen.intId
     }
     headers: {
       "Content-Type": "text/plain"

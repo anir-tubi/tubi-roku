@@ -265,6 +265,7 @@ Function getConstants()
     constants.thirdParty.nielsen = {}
       constants.thirdParty.nielsen.rafToken = "PB8C78BDD-9B1B-4020-B4DD-AE7917C0F396"
       constants.thirdParty.nielsen.pingToken = "PB8C78BDD-9B1B-4020-B4DD-AE7917C0F396"
+      constants.thirdParty.nielsen.intId = "v1pi01kzclhgle4jmjek1ihmoe" 'a hard coded integration ID to be used in nielsen pings
 
       constants.thirdParty.nielsen.pingTypes = {}
         constants.thirdParty.nielsen.pingTypes.sessionStart = "session_start"

@@ -212,6 +212,8 @@ Function tubiAds_getNielsenPingRequestInfo_test()
   m.assertInvalid(reqInfo.options.params.streamId)
   m.assertEqual(reqInfo.options.params.devid, m.ads.constants.deviceInfo.deviceAdId)
   m.assertEqual(reqInfo.options.params.uoo, "1")
+  m.assertEqual(reqInfo.options.params.intid, m.ads.constants.thirdParty.nielsen.intId)
+
 
   ' test with some non default values
   m.ads.constants.deviceInfo.isAdIdTrackingDisabled = false
@@ -229,6 +231,7 @@ Function tubiAds_getNielsenPingRequestInfo_test()
   m.assertEqual(reqInfo.options.params.streamid.len(), 16)
   m.assertEqual(reqInfo.options.params.devid, m.ads.constants.deviceInfo.deviceAdId)
   m.assertEqual(reqInfo.options.params.uoo, "0")
+  m.assertEqual(reqInfo.options.params.intid, m.ads.constants.thirdParty.nielsen.intId)
 
   sessionEnd = m.constants.thirdParty.nielsen.pingTypes.sessionEnd
   reqInfo = m.adsLimited.getNielsenPingRequestInfo(m.ads.constants, sessionEnd)
@@ -243,6 +246,7 @@ Function tubiAds_getNielsenPingRequestInfo_test()
   m.assertInvalid(reqInfo.options.params.streamId)
   m.assertEqual(reqInfo.options.params.devid, m.ads.constants.deviceInfo.deviceAdId)
   m.assertEqual(reqInfo.options.params.uoo, "0")
+  m.assertEqual(reqInfo.options.params.intid, m.ads.constants.thirdParty.nielsen.intId)
 
   streamEnd = m.constants.thirdParty.nielsen.pingTypes.streamEnd
   reqInfo = m.adsLimited.getNielsenPingRequestInfo(m.ads.constants, streamEnd, content)
@@ -258,6 +262,7 @@ Function tubiAds_getNielsenPingRequestInfo_test()
   m.assertEqual(reqInfo.options.params.streamid.len(), 16)
   m.assertEqual(reqInfo.options.params.devid, m.ads.constants.deviceInfo.deviceAdId)
   m.assertEqual(reqInfo.options.params.uoo, "0")
+  m.assertEqual(reqInfo.options.params.intid, m.ads.constants.thirdParty.nielsen.intId)
 End Function
 
 
