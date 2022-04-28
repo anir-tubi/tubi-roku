@@ -1,0 +1,9 @@
+<component name="TesterNode" extends="Node" >
+  <script type="text/brightscript" uri="../../../source/lib/TestFunction.brs" />
+
+  <interface>
+    <function name="tubi_testFunction1"/>
+    <function name="tubi_testFunction2"/>
+    <function name="tubi_testFunction3"/>
+  </interface>
+</component>
