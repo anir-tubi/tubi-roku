@@ -263,7 +263,12 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
   nielsenGenres = "" 'nielsenGenres may be set as an array of strigs later
   nielsenProgramId = ""
 
-  if episode.isCdc = false or m.auth.getAuthInfo() <> invalid
+  authInfo = m.auth.getAuthInfo()
+
+  ' don't pass content information for child directed content if the user is not logged in
+  if episode.isCdc = false or (authInfo <> invalid and authInfo.userId <> invalid)
+    nielsenGenres = ["GV"] 'default Nielsen genre in case backend didn't associate any with this content
+
     'set the content genre (as stated in RAF documentation for Nielsen functionality)
     if episode.rokuGenres <> invalid and episode.rokuGenres.count() > 0
       nielsenGenres = episode.rokuGenres
