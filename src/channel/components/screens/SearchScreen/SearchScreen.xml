@@ -103,6 +103,7 @@
         <Label
           id="KidsModeMessage"
           vertAlign="top"
+          opacity="0.6"
           width="550"
           height="50">
             <Font
@@ -117,6 +118,7 @@
     <Label  
       id="SearchText"
       vertAlign="center"
+      translation="[786, 436]"
       width="1114"
       height="64">
       <Font
@@ -131,13 +133,17 @@
       visible="false"
       translation="[167,120]"/>
     <Group
-      id="searchGroup">
+      id="searchGroup"
+      translation="[192, 414]">
+      <DynamicCustomKeyboard
+        id="Keyboard"
+        translation="[0,-20]"/>
    </Group>
     
     <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus, 
     the resultGrid is slightly too low and too far to the right. It has to do something to do with the custom focusBitmapUri.  -->
     <Group
-      translation="[843, 240]"
+      translation="[786, 496]"
       id="ResultArea">
       <MarkupGrid
         id="ResultGrid"

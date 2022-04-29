@@ -21,44 +21,17 @@ Function init()
   m.voiceHintfont = CreateObject("roSGNode", "Font")
   m.voiceHintfont.uri = "pkg:/fonts/Vaud-SemiBold.ttf"
 
-  if getExperimentResource("roku_linear_search_ui_update", "roku_linear_search_ui_update_v1", true).enabled = true
-    m.ResultArea.translation = [786, 496]
-    m.searchText.translation = [786, 436]
-    m.searchMenuText = m.top.findNode("searchMenuText")
-    m.searchHintText = m.top.findNode("searchHintText")
+  m.searchMenuText = m.top.findNode("searchMenuText")
+  m.searchHintText = m.top.findNode("searchHintText")
 
-    m.searchGroup.translation = [192, 414]
-    m.KidsModeMessage.opacity = 0.6
 
-    'show voice hint message if user has voice remote
-    if hasVoiceRemoteFeature = true
-      setTextForVoiceHint()
-    end if
-
-    m.keyboard = m.searchGroup.createChild("DynamicCustomKeyboard")
-    m.keyboard.translation = [0, -20]
-  else
-    m.leftSide.translation = [192, 75]
-    m.ResultArea.translation = [843, 230]
-    m.searchText.translation = [843, 180]
-    m.searchGroup.translation = [192, 139]
-    m.searchText.vertAlign = "top"
-
-    m.KidsModeMessage.opacity = 1
-
-    m.keyboard = m.searchGroup.createChild("DynamicCustomKeyboard")
-    m.keyboard.translation = [0, 0]
-
-    'show voice hint message if user has voice remote
-    if hasVoiceRemoteFeature = true
-      createSearchHintLayoutGroup()
-      m.searchHintGroup.translation = [0, 643]
-      m.voiceHint = m.searchHintGroup.createChild("Label")
-      m.voiceHintfont.size = 27
-
-      m.voiceHint.font = m.voiceHintfont
-    end if
+  'show voice hint message if user has voice remote
+  if hasVoiceRemoteFeature = true
+    setTextForVoiceHint()
   end if
+
+  m.keyboard = m.top.findNode("Keyboard")
+  
   m.keyboard.id = "SearchKeyboard"
   m.keyboard.setFocus(true)
   m.Keyboard.textEditBox.maxTextLength = 100
@@ -147,18 +120,10 @@ Function setSearchStrings()
   BackLabel = m.top.findNode("callToAction")
   BackLabel.text = getTranslation("goBack_menu")
 
-  if getExperimentResource("roku_linear_search_ui_update", "roku_linear_search_ui_update_v1", false).enabled = true
-    m.sDefaultSearchText = getTranslation("screenSearch_trendingSearch")
-    m.searchTitleText = getTranslation("menu_search")
-    m.searchHintToSearch = getTranslation("screenSearch_defaultLinearSearch")
-    setDefaultText()
-  else
-    if m.searchHintGroup <> invalid
-      setVoiceHint()
-      m.searchHintGroup.visible = true
-    end if
-    m.sDefaultSearchText = getTranslation("screenSearch_defaultSearch")
-  end if
+  m.sDefaultSearchText = getTranslation("screenSearch_trendingSearch")
+  m.searchTitleText = getTranslation("menu_search")
+  m.searchHintToSearch = getTranslation("screenSearch_defaultLinearSearch")
+  setDefaultText()
   m.searchText.text = m.sDefaultSearchText
   m.sDefaultKidsWarning = getTranslation("screenSearch_kidsWarning")
   m.KidsModeMessage.text = m.sDefaultKidsWarning
@@ -288,20 +253,14 @@ Function onSearchContentChange()
   if m.top.content <> invalid and m.top.content.getChildCount() > 0 then
     if m.top.content.isDefaultSearchResults = true
       '//display special text when the default search is displaying 
-      if getExperimentResource("roku_linear_search_ui_update", "roku_linear_search_ui_update_v1", false).enabled = true
-        setDefaultText()
-        if m.microphone <> invalid
-          m.microphone.visible = true
-        end if
-      else
-        m.SearchText.text = m.sDefaultSearchText
+      setDefaultText()
+      if m.microphone <> invalid
+        m.microphone.visible = true
       end if
     else
-      if getExperimentResource("roku_linear_search_ui_update", "roku_linear_search_ui_update_v1", false).enabled = true
-        matchingText = getTranslation("screenSearch_matchingTitles")
-        m.searchHintText.text = m.ResultGrid.content.getChildCount().toStr() + " " + matchingText + " " + Chr(34) + m.searchMenuText.text + Chr(34)
-        m.SearchText.text = getTranslation("screenSearch_results")
-      end if
+      matchingText = getTranslation("screenSearch_matchingTitles")
+      m.searchHintText.text = m.ResultGrid.content.getChildCount().toStr() + " " + matchingText + " " + Chr(34) + m.searchMenuText.text + Chr(34)
+      m.SearchText.text = getTranslation("screenSearch_results")
     end if
 
     m.ResultGrid.visible = true
@@ -325,15 +284,10 @@ Function onKeyboardTextChanged()
   m.NoResultsMessage.visible = false
 
   sKeyboardText = m.Keyboard.text
-  if getExperimentResource("roku_linear_search_ui_update", "roku_linear_search_ui_update_v1", false).enabled = true
-    m.searchScreenInfoPanel.visible = false
-    m.SearchText.text =  ""
-    m.searchHintText.text = ""
-    m.KidsModeMessage.text = ""
-    m.searchMenuText.text = LCase(sKeyboardText)
-  else
-    m.SearchText.text = LCase(sKeyboardText)
-  end if
+  m.SearchText.text =  ""
+  m.searchHintText.text = ""
+  m.KidsModeMessage.text = ""
+  m.searchMenuText.text = LCase(sKeyboardText)
 
   if sKeyboardText <> invalid and sKeyboardText.trim().len() > 0 then
     loadSearchResults()
@@ -359,33 +313,31 @@ Function onItemFocused()
   tubiLog("SearchScreen.onItemFocused")
   if m.ResultGrid.content <> invalid
     focusedContent = m.ResultGrid.content.getChild(m.ResultGrid.itemFocused)
-    if getExperimentResource("roku_linear_search_ui_update", "roku_linear_search_ui_update_v1", false).enabled = true
-      m.top.backgroundUriList = focusedContent.backgrounds
-      m.searchScreenInfoPanel.visible = true
-      if m.microphone <> invalid
-        m.microphone.visible = false
-      end if
-      setVisibilityForDefaultText(false)
-      m.searchScreenInfoPanel.title = focusedContent.title
-      m.searchScreenInfoPanel.description = focusedContent.DESCRIPTION
-      if focusedContent.type = "linear" 
-        m.searchScreenInfoPanel.genres = focusedContent.genres
-        m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.linearsearch
-      else
-        lineOneData = {}
-        lineOneData.releasedate = focusedContent.releaseDate
-        lineOneData.descriptorCode = UCase(focusedContent.descriptorCode)
-        lineOneData.length = focusedContent.length
-        lineOneData.hasCC = (focusedContent.hasSubtitles or not m._.empty(focusedContent.subtitleTracks))
-        lineOneData.rating = focusedContent.rating
-        m.searchScreenInfoPanel.lineOneData = lineOneData
-        m.searchScreenInfoPanel.genres = focusedContent.genres
-        m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.item
-      end if
-      description = m.searchScreenInfoPanel.findNode("Description")
-      description.maxLines = 2
-      description.width = 960
+    m.top.backgroundUriList = focusedContent.backgrounds
+    m.searchScreenInfoPanel.visible = true
+    if m.microphone <> invalid
+      m.microphone.visible = false
     end if
+    setVisibilityForDefaultText(false)
+    m.searchScreenInfoPanel.title = focusedContent.title
+    m.searchScreenInfoPanel.description = focusedContent.DESCRIPTION
+    if focusedContent.type = "linear" 
+      m.searchScreenInfoPanel.genres = focusedContent.genres
+      m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.linearsearch
+    else
+      lineOneData = {}
+      lineOneData.releasedate = focusedContent.releaseDate
+      lineOneData.descriptorCode = UCase(focusedContent.descriptorCode)
+      lineOneData.length = focusedContent.length
+      lineOneData.hasCC = (focusedContent.hasSubtitles or not m._.empty(focusedContent.subtitleTracks))
+      lineOneData.rating = focusedContent.rating
+      m.searchScreenInfoPanel.lineOneData = lineOneData
+      m.searchScreenInfoPanel.genres = focusedContent.genres
+      m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.item
+    end if
+    description = m.searchScreenInfoPanel.findNode("Description")
+    description.maxLines = 2
+    description.width = 960
     ' Set up the info that the ContentController uses to send navigate_within_page events.
     ' Don't change m.top.navigateWithinPageInfo if the focused content hasn't changed
     ' (protects against re-setting when the focus is set upon returning to search page from details page)
@@ -636,16 +588,6 @@ Function setVoiceHint()
 End Function
 
 
-Function createSearchHintLayoutGroup()
-  m.searchHintGroup = m.searchGroup.createChild("LayoutGroup")
-  m.searchHintGroup.layoutDirection = "vert"
-  m.searchHintGroup.vertAlignment = "top"
-  m.searchHintGroup.horizAlignment = "left"
-  m.searchHintGroup.itemSpacings = [5]
-  m.searchHintGroup.visible = false
-End Function
-
-
 Function setDefaultText()
   m.searchMenuText.text = m.searchTitleText
   m.searchHintText.text = m.searchHintToSearch
@@ -661,17 +603,15 @@ End Function
 
 
 Function handleInfoPanelVisibilityForLeftPress()
-  if getExperimentResource("roku_linear_search_ui_update", "roku_linear_search_ui_update_v1", false).enabled = true
-    m.top.backgroundUriList = [m.defaultHeroUri]
-    if m.searchMenuText.text <> "" and m.searchMenuText.text <>  m.searchTitleText
-      m.searchScreenInfoPanel.visible = false
-    else
-      m.searchScreenInfoPanel.visible = false
-      setDefaultText()
-    end if
-    setVisibilityForDefaultText(true)
-    if m.microphone <> invalid
-      m.microphone.visible = true
-    end if
+  m.top.backgroundUriList = [m.defaultHeroUri]
+  if m.searchMenuText.text <> "" and m.searchMenuText.text <>  m.searchTitleText
+    m.searchScreenInfoPanel.visible = false
+  else
+    m.searchScreenInfoPanel.visible = false
+    setDefaultText()
+  end if
+  setVisibilityForDefaultText(true)
+  if m.microphone <> invalid
+    m.microphone.visible = true
   end if
 End Function
