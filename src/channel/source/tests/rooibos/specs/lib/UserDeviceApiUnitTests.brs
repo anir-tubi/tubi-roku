@@ -240,3 +240,60 @@ Function userDeviceApi_patchSettingsInfo_test()
 
   m.assertEqual(patchSettingsInfo.options.method, "PATCH")
 End Function
+
+
+'@Test magicLink unit tests
+Function userDeviceApi_magicLink_test()
+  magicLinkUrl = m.constants.urls.account.magicLink
+  email = m.testEmail
+  options = {}
+  options.params = {
+    device_id: m.device_id
+    platform: m.platform
+  }
+
+  requestInfo = m.userDeviceApi.magicLink(email)
+  m.assertNotInvalid(requestInfo)
+  m.assertNotInvalid(requestInfo.url)
+  m.assertEqual(requestInfo.url, magicLinkUrl)
+
+  m.assertNotInvalid(requestInfo.options)
+  params = requestInfo.options.params
+  m.assertNotInvalid(params)
+
+  m.assertNotInvalid(params.email)
+  m.assertEqual(params.email, m.testEmail)
+
+  m.assertNotInvalid(params.device_id)
+  m.assertEqual(params.device_id, m.device_id)
+
+  m.assertNotInvalid(params.platform)
+  m.assertEqual(params.platform, m.platform)
+End Function
+
+
+'@Test queryStatusOfMagicLink unit tests
+Function userDeviceApi_queryStatusOfMagicLink_test()
+  uid = "07ff5657-07f1-40d0-b3e0-27f60bbd90fa"
+  options = {}
+  options.params = {
+    device_id: m.device_id
+    platform: m.platform
+  }
+  queryUrlForMagicLink = m.constants.urls.account.magicLink + "/" + uid
+  requestInfo = m.userDeviceApi.queryStatusOfMagicLink(uid)
+
+  m.assertNotInvalid(requestInfo)
+  m.assertNotInvalid(requestInfo.url)
+  m.assertEqual(requestInfo.url, queryUrlForMagicLink)
+
+  m.assertNotInvalid(requestInfo.options)
+  params = requestInfo.options.params
+  m.assertNotInvalid(params)
+
+  m.assertNotInvalid(params.device_id)
+  m.assertEqual(params.device_id, m.device_id)
+
+  m.assertNotInvalid(params.platform)
+  m.assertEqual(params.platform, m.platform)
+End Function

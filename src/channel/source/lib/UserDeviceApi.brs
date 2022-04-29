@@ -12,6 +12,8 @@ Function UserDeviceApi(constants, apiUtils)
     deviceRegisterInfo: userDeviceApi_deviceRegisterInfo
     checkBirthdayInfo: userDeviceApi_checkBirthdayInfo
     patchSettingsInfo: userDeviceApi_patchSettingsInfo
+    magicLink: userDeviceApi_magicLink
+    queryStatusOfMagicLink: userDeviceApi_queryStatusOfMagicLink
   }
 
   userDeviceApi = {}
@@ -135,6 +137,33 @@ Function userDeviceApi_patchSettingsInfo(userId, passedOptions)
   headers.append(m.constants.headers.commonUapi)
   options["method"] = m.constants.reqTypes.patch
   options["headers"] = headers
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
+' @email : string,  (either taken from roku account or user entered email)
+Function userDeviceApi_magicLink(email)
+  url = m.constants.urls.account.magicLink
+  headers = {}
+  options = m.getCommonOptions()
+  options.params["email"] = email
+  options["method"] = m.constants.reqTypes.post
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
+'@uid: string, unique identifier generated through magicLink for each user 
+Function userDeviceApi_queryStatusOfMagicLink(uid)
+  url = m.constants.urls.account.magicLink + "/" + uid
+  headers = {}
+  options = m.getCommonOptions()
+  options["method"] = m.constants.reqTypes.get
   return {
     url: url
     options: options

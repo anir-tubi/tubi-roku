@@ -28,6 +28,12 @@
 
   <children>
 
+    <Poster
+      id="backButtonPoster"
+      uri="pkg:/images/back_button.png"
+      translation="[126,60]"
+      width="170"
+      height="72"/>
     <LayoutGroup
       id="emailLayout"
       translation="[0, 290]"

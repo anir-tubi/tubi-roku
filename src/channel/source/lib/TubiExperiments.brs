@@ -49,6 +49,10 @@ Function TubiExperiments(constants) as Object
         roku_register_signup_to_save_v1: {"enabled": false}
       }
 
+      roku_registration_with_magic_link: {
+        roku_registration_with_magic_link_v1: {"enabled": false}
+      }
+      
       roku_detail_screen_background_image: {
         roku_detail_screen_background_image_v1: {"enabled": false}
       }

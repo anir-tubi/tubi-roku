@@ -139,7 +139,7 @@ Function onEmailInputBackButtonSelected()
     }
   }
   popScreen(true, true)
-
+  onStopAndClearEmailVerificationTimer()
 End Function
 
 
@@ -182,7 +182,13 @@ Function onEmailExistsResponse(response)
 
     if parsedresponse <> invalid and requestInput <> invalid
       if parsedresponse.taken = true
-        showSignInScreen(requestInput.email)
+        if getExperimentResource("roku_registration_with_magic_link", "roku_registration_with_magic_link_v1", true).enabled = true
+          showEmailVerificationScreen(requestInput.email)
+          m.email = requestInput.email
+          createMagicLinkRequest(requestInput.email)
+        else
+          showSignInScreen(requestInput.email)
+        end if
       else
         m.authInfoReceived = false
         signUpCredentials = {}
@@ -265,13 +271,13 @@ End Function
 ' showEmailScreen is used to display Email screen for entering new email for signup
 Function showEmailScreen()
 
+  onStopAndClearEmailVerificationTimer()
   emailScreen = CreateObject("roSGNode", "EmailInputScreen")
   emailScreen.id = m.constants.ui.screenIds.emailScreen
   emailScreen.observeFieldScoped("continueSelected", "onEmailInputContinueSelected")
   emailScreen.observeFieldScoped("backButtonSelected", "onEmailInputBackButtonSelected")
   emailScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
   pushScreen(emailScreen, true, true)
-
 End Function
 
 
@@ -681,6 +687,7 @@ Function popScreenAfterSignInProcess()
     "SignUpScreen": true
     "EmailInputScreen": true
     "AgeVerificationScreen": true
+    "EmailVerificationScreen": true
   }
 
   count = m.screenStack.getChildCount()-1
@@ -693,7 +700,6 @@ Function popScreenAfterSignInProcess()
     end if
   end for
   currentScreen = getCurrentScreen()
-
   return currentScreen
 End Function
 
@@ -711,4 +717,190 @@ Function signUserUpForQAAutomation()
   }
   birthdate = "2000-01-01"
   verifyAgeAtSignup(signInInfo, birthdate)
+End Function
+
+
+Function onMagicLinkResponse(response)
+  tubiLog("SignInHelpers.onMagicLinkResponse")
+  currentScreen = getCurrentScreen()
+  if response <> invalid
+    if currentScreen.id = m.constants.ui.screenIds.EmailVerificationScreen
+      currentScreen.uid = response.uid
+      m.emailVerificationTimer = m.top.createChild("Timer")
+      m.emailVerificationTimer.repeat = false
+      m.emailVerificationTimer.duration = 2
+      m.emailVerificationTimer.observeFieldScoped("fire", "onEmailVerificationTimerFired")
+      m.emailVerificationTimer.control = "start"
+    end if
+  end if
+End Function
+
+
+Function onMagicLinkError(errorResponse)
+  tubiLog("SignInHelpers.onMagicLinkError")
+
+  errorCode = getUserFacingErrorCode(m.constants.errors.context.emailVerificationScreen, m.constants.errors.subtypes.networkError, errorResponse)
+  errorMessage = getTranslation("dialog_error_description")
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "LOGIN_REQUEST" 'DialogType enum
+      pageOneof: m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
+      dialog_action: "SHOW"
+      dialog_sub_type: "server_error"
+    }
+  }
+
+  modalInfo = {
+    title: getTranslation("dialog_defaultError_title")
+    message:getErrorMessage(errorMessage, errorCode)
+    openTrackEvent: dialogEvent
+    trackingTask: m.trackingLoggingTask
+  }
+  
+  showErrorModal(modalInfo, invalid, invalid, onOkButtonClickedOnMagicLinkError, invalid, [getTranslation("dialog_button_ok")])
+End Function
+
+
+' showEmailVerificationScreen will send verification email to the roku account or
+' user entered email if user choose different email.
+' once user verified their email, it will redirect to the appropriae screen.
+' If the user doesn't receive verificaion link, they can select resend verification.
+
+' @email : string,  (either taken from roku account or user entered email)
+Function showEmailVerificationScreen(email)
+  tubiLog("SignInHelpers.showEmailVerificationScreen")
+  emailVerificationScreen = CreateObject("roSGNode", "EmailVerificationScreen")
+  emailVerificationScreen.id = m.constants.ui.screenIds.EmailVerificationScreen
+  emailVerificationScreen.username = email
+  emailVerificationScreen.observeFieldScoped("selectedDifferentEmail", "showEmailScreen")
+  emailVerificationScreen.observeFieldScoped("backButtonSelected", "onStopAndClearEmailVerificationTimer")
+  emailVerificationScreen.observeFieldScoped("resendVerificationLink", "onResendVeficationLink")
+  pushScreen(emailVerificationScreen, true, true)
+  displayDefaultBackground()
+End Function
+
+
+Function onEmailVerificationTimerFired()
+  tubiLog("SignInHelpers.onEmailVerificationTimerFired")
+  'Make Request
+  uid = ""
+  currentScreen = getCurrentScreen()
+  if currentScreen.id = m.constants.ui.screenIds.EmailVerificationScreen
+    uid = currentScreen.uid
+    requestInfo = m.userDeviceApi.queryStatusOfMagicLink(uid)
+    m.makeRequest({
+      url: requestInfo.url
+      requestType: m.constants.reqNames.queryStatusOfMagicLink
+      options: requestInfo.options
+      successCallback: onQueryStatusOfMagicLinkError
+      errorCallback: onQueryStatusOfMagicLinkError
+      responseType: "assocarray"
+    })
+  end if
+End Function
+
+
+Function onQueryStatusOfMagicLinkResponse(response)
+  tubiLog("SignInHelpers.onqueryStatusOfMagicLinkResponse")
+  if response <> invalid and response.status = "PENDING"
+    m.emailVerificationTimer.control = "start"
+  else if response <> invalid and response.access_token <> invalid
+    onStopAndClearEmailVerificationTimer()
+    Auth = TubiAuth(m.constants, m.Request)
+    Auth.handleRegistration(response)
+    onSignUpResponse(invalid)
+  end if
+   
+End Function
+
+
+Function onStopAndClearEmailVerificationTimer()
+  tubiLog("SignInHelpers.onStopAndClearEmailVerificationTimer")
+  if m.emailVerificationTimer <> invalid
+    m.emailVerificationTimer.control = "stop"
+    m.emailVerificationTimer.unobserveFieldScoped("fire")
+    m.top.removeChild(m.emailVerificationTimer)
+  end if
+End Function
+
+
+Function onQueryStatusOfMagicLinkError(errorResponse)
+  tubiLog("SignInHelpers.onqueryStatusOfMagicLinkError")
+  currentScreen = getCurrentScreen()
+  if currentScreen.id = m.constants.ui.screenIds.EmailVerificationScreen
+    currentScreen.queryResponseError = currentScreen.queryResponseError + 1
+    if currentScreen.queryResponseError > 3
+      currentScreen.queryResponseError = 0
+      errorCode = getUserFacingErrorCode(m.constants.errors.context.emailVerificationScreen, m.constants.errors.subtypes.expireError, errorResponse)
+      errorMessage = getTranslation("dialog_uidExpiraionError_description")
+
+      dialogEvent = {
+        type: "dialog"
+        values: {
+          dialog_type: "LOGIN_REQUEST" 'DialogType enum
+          pageOneof: m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
+          dialog_action: "SHOW"
+          dialog_sub_type: "link_expired"
+        }
+      }
+
+      modalInfo = {
+        title: getTranslation("dialog_uidExpiraionError_title")
+        message:getErrorMessage(errorMessage, errorCode)
+        openTrackEvent: dialogEvent
+        trackingTask: m.trackingLoggingTask
+      }
+      showErrorModal(modalInfo, invalid, invalid, onOkButtonClickedOnLinkExpired, invalid, [getTranslation("dialog_button_ok")])
+    end if
+  end if
+End Function
+
+
+Function onResendVeficationLink()
+  tubiLog("SignInHelpers.onResendVeficationLink")
+  createMagicLinkRequest(m.email)
+End Function
+
+
+' @email : string,  (either taken from roku account or user entered email)
+Function createMagicLinkRequest(email)
+  requestInfo = m.userDeviceApi.magicLink(email)
+  m.makeRequest({
+    url: requestInfo.url
+    requestType: m.constants.reqNames.magicLink
+    options: requestInfo.options
+    successCallback: onMagicLinkResponse
+    errorCallback: onMagicLinkError
+    responseType: "assocarray"
+    email: email
+  })
+End Function
+
+
+Function onOkButtonClickedOnMagicLinkError()
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "LOGIN_REQUEST"
+      pageOneof: m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
+      dialog_action: "ACCEPT_DELIBERATE"
+      dialog_sub_type: "server_error"
+    }
+  }
+  m.trackingLoggingTask.trackEvent = dialogEvent
+End Function
+
+
+Function onOkButtonClickedOnLinkExpired()
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "LOGIN_REQUEST"
+      pageOneof: m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
+      dialog_action: "ACCEPT_DELIBERATE"
+      dialog_sub_type: "link_expired"
+    }
+  }
+  m.trackingLoggingTask.trackEvent = dialogEvent
 End Function

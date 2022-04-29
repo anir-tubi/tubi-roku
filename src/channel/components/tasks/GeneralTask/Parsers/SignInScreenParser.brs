@@ -68,3 +68,37 @@ Function parseSignInError(fullResponse, requestNode)
     code: fullResponse.code
   }
 End Function
+
+
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
+'side effects... overwrites the old authInfo in the registry with the new authInfo
+Function parseMagicLinkSuccess(fullResponse, requestNode)
+  return fullResponse.data
+End Function
+
+
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
+Function parseMagicLinkError(fullResponse, requestNode)
+  return fullResponse.code
+End Function
+
+
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
+'side effects... overwrites the old authInfo in the registry with the new authInfo
+Function parsequeryStatusOfMagicLinkSuccess(fullResponse, requestNode)
+  return fullResponse.data
+End Function
+
+
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
+Function parsequeryStatusOfMagicLinkError(fullResponse, requestNode)
+  return fullResponse.code
+End Function

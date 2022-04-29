@@ -235,6 +235,8 @@ Function getConstants()
     constants.reqNames.refreshToken = "refreshToken"
     constants.reqNames.transferToken = "transferToken"
     constants.reqNames.generic = "generic"
+    constants.reqNames.magicLink = "magicLink"
+    constants.reqNames.queryStatusOfMagicLink = "queryStatusOfMagicLink"
 
     ' a list of reqnames that the general task should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
@@ -424,6 +426,7 @@ Function getConstants()
       constants.urls.account.login = constants.urls.account.urlBase + "/user/login"
       constants.urls.account.checkBirthday = constants.urls.account.urlBase + "/user/check_birthday_info"
       constants.urls.account.deviceRegister = constants.urls.account.urlBase + "/device/register"
+      constants.urls.account.magicLink = constants.urls.account.urlBase + "/device/magic_link"
 
       constants.urls.account.anonymous = {}
       constants.urls.account.anonymous.signingKey = constants.urls.account.urlBase + "/device/anonymous/signing_key"
@@ -681,6 +684,7 @@ Function getConstants()
   constants.errors.context.categoriesScreen = "10"
   constants.errors.context.linearPlayerScreen = "11"
   constants.errors.context.epgScreen = "12"
+  constants.errors.context.emailVerificationScreen = "13"
 
   '//What is the actual error?
   constants.errors.subtypes = {}
@@ -872,6 +876,7 @@ Function getConstants()
       constants.ui.screenLevels.signUpScreen = 90
       constants.ui.screenLevels.signInScreen = 90
       constants.ui.screenLevels.ageGateScreen = 90
+      constants.ui.screenLevels.emailVerificationScreen = 90
       constants.ui.screenLevels.initialContentScreen = 20
       constants.ui.screenLevels.modalDialogScreen = 1000
 
@@ -902,6 +907,7 @@ Function getConstants()
       constants.ui.screenIds.sportsEPGScreen = "sportsEPGScreen"
       constants.ui.screenIds.newsEPGScreen = "newsEPGScreen"
       constants.ui.screenIds.entertainmentEPGScreen = "entertainmentEPGScreen"
+      constants.ui.screenIds.EmailVerificationScreen = "emailVerificationScreen"
       constants.ui.screenIds.bestKnownScreen = "bestKnownScreen"  '//Note: BestKnown Screen refers to the A-List Screen
       constants.ui.screenIds.nostalgiaScreen = "nostalgiaScreen"
 

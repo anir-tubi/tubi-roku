@@ -53,6 +53,19 @@ Function createParsingCallbacks()
     parseError: parseAgeVerificationScreenDeviceRegistrationError
   }
 
+  'magicLink 
+  m.requestTypes[m.constants.reqNames.magicLink] = {
+    parseSuccess: parseMagicLinkSuccess
+    parseError: parseMagicLinkError
+  }
+
+
+  'magic link polling
+  m.requestTypes[m.constants.reqNames.queryStatusOfMagicLink] = {
+    parseSuccess: parsequeryStatusOfMagicLinkSuccess
+    parseError: parsequeryStatusOfMagicLinkError
+  }
+
   ' check birthday (check if birthday exists for logged in user)
   m.requestTypes[m.constants.reqNames.checkBirthdayInfo] = {
     parseSuccess: parseAgeVerificationScreenCheckBirthdaySuccess

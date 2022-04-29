@@ -104,9 +104,21 @@
     "description": "The default title of a popup error dialog",
     "message": "Something went wrong"
   },
+  "dialog_uidExpiraionError_title": {
+    "description": "The title of a popup error dialog when link has been expired during signup process",
+    "message": "This verification link has expired"
+  },
   "dialog_defaultError_description": {
     "description": "The default message of a popup error dialog",
     "message": "We're sorry for the inconvenience. For assistance, please contact support@tubi.tv \n"
+  },
+  "dialog_error_description": {
+    "description": "The message of a popup error dialog when user magicLink API fails and user doesn't get verification link to their emial",
+    "message": "We are having trouble processing this request. Please check your internet connection or retry clicking Resend Verification Link"
+  },
+  "dialog_uidExpiraionError_description": {
+    "description": "The description of a popup error dialog when link has been expired during signup process",
+    "message": "For a new verification link, please click again on Resend Verification link"
   },
   "dialog_errorMessageContact": {
     "description": "The contact info displayed in an error dialog",
@@ -155,6 +167,26 @@
   "dialog_button_settings": {
     "description": "Label of the dialog button to cause the app to go to the settings screen.",
     "message": "Go To Settings"
+  },
+  "dialog_email_verification_email_already_sent": {
+    "description": "The first line of the email verification description dialog",
+    "message": "A verification email has already been sent to"
+  },
+  "dialog_email_verification_check_spam": {
+    "description": "The second line of the email verification description dialog",
+    "message": "Please remember to check your spam folder"
+  },
+  "dialog_button_resend_verification_link": {
+    "description": "Label of the dialog button to resend the email verificaion link",
+    "message": "Yes, Resend Verification Email"
+  },
+  "dialog_button_attempts_title": {
+    "description": "Title of the dialog after user selcts resend verification link more than 3 times",
+    "message": "Too Many Attempts"
+  },
+  "dialog_button_multiple_emails_sent": {
+    "description": "The first line of the too many attempts dialog",
+    "message": "Multiple verification emails have already been sent to"
   },
   "dialog_errorOops_title": {
     "description": "A general error title for an error dialog window",
@@ -935,6 +967,18 @@
     "description": "could not verify your email modal description",
     "message": "Could not verify your email"
   },
+  "check_email_inbox": {
+    "description": "Title on the email verification screen",
+    "message": "Check Your Email Inbox"
+  },
+  "click_on_verification_link": {
+    "description": "Message shown on the email verification screen about the verification link sent to email",
+    "message": "Please click the verification link sent to your email:"
+  },
+  "screen_refresh_after_email_verification": {
+    "description": "Message shown on the email verification to let the user know screen will refresh after the email verification",
+    "message": "This screen will refresh once you have verified your email."
+  },
   "goBack_signIn": {
     "description": "Navigational instructions to users on what the back button does on the current page",
     "message": "PRESS BACK FOR SIGNIN"
@@ -1022,5 +1066,13 @@
   "registration_signup_button_free": {
     "description": "button text on top of background image next to sign up text for when a non registered user focuses on details screen",
     "message": "FREE"
+  },
+  "screenEmailVerification_resend_verification_link": {
+    "description": "Label of button to allow users to resend the email verificaion link for sign in",
+    "message": "Resend Verification Link"
+  },
+  "screenEmailVerification_use_different_email": {
+    "description": "Label of button to allow users to use different email address for sign in",
+    "message": "Use Different Email"
   }
 }
