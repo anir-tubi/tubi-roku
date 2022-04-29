@@ -704,8 +704,6 @@ Function setDirtyUserCategories(categoryId)
     movieScreen = getFromScreenCache(m.constants.ui.screenIds.movieScreen)
     tvScreen = getFromScreenCache(m.constants.ui.screenIds.tvScreen)
     espanolScreen = getFromScreenCache(m.constants.ui.screenIds.espanolScreen)
-    bestKnownScreen = getFromScreenCache(m.constants.ui.screenIds.bestKnownScreen)
-    nostalgiaScreen = getFromScreenCache(m.constants.ui.screenIds.nostalgiaScreen)
 
     isKidsMode = shouldKidsModeBeSentToServer()
     reqName = m.constants.reqNames.getCategory
@@ -781,46 +779,6 @@ Function setDirtyUserCategories(categoryId)
         options: categoryReqInfo.options
         successCallback: onReloadUserCategoriesResponseInEspanolScreen
         errorCallback: onErrorReloadUserCategoriesInEspanolScreen
-        responseType: "node"
-        id: categoryId
-      })
-    end if
-
-    if bestKnownScreen <> invalid
-      option = {}
-      params = {}
-
-      params["content_mode"] = m.constants.ui.contentMode.bestKnown
-      option.params = params
-
-      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, option)
-
-      m.makeRequest({
-        url: categoryReqInfo.url
-        requestType: reqName
-        options: categoryReqInfo.options
-        successCallback: onReloadUserCategoriesResponseInBestKnownScreenScreen
-        errorCallback: onErrorReloadUserCategoriesInBestKnownScreen
-        responseType: "node"
-        id: categoryId
-      })
-    end if
-
-    if nostalgiaScreen <> invalid
-      option = {}
-      params = {}
-
-      params["content_mode"] = m.constants.ui.contentMode.nostalgia
-      option.params = params
-
-      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, option)
-
-      m.makeRequest({
-        url: categoryReqInfo.url
-        requestType: reqName
-        options: categoryReqInfo.options
-        successCallback: onReloadUserCategoriesResponseInNostalgiaScreenScreen
-        errorCallback: onErrorReloadUserCategoriesInNostalgiaScreen
         responseType: "node"
         id: categoryId
       })
