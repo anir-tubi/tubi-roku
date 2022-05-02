@@ -34,11 +34,9 @@
 
   <children>
     <Label
-      id="labelA"
-      opacity="0" />
+      id="labelA" />
     <Label
-      id="labelB"
-      opacity="0" />
+      id="labelB" />
 
     <Animation
       id="animation"
