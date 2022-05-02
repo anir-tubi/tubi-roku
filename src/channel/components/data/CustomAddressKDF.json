@@ -1,9 +1,6 @@
 {
   "keyboardWidthFHD": 447,
   "keyboardHeightFHD": 522,
-
-  "keyboardWidthHD": 447,
-  "keyboardHeightHD": 522,
   "sections": [
     {
       "grids": [
@@ -77,22 +74,19 @@
                   "icon": "theme:KeyboardClearOnBitmap",
                   "focusIcon": "theme:KeyboardClearOffBitmap",
                   "strOut": "Clear",
-                  "keyWidthFHD": 148,
-                  "keyWidthHD": 148
+                  "keyWidthFHD": 148
                 },
                 {
                   "icon": "theme:KeyboardSpaceOnBitmap",
                   "focusIcon": "theme:KeyboardSpaceOffBitmap",
                   "strOut": "Space",
-                  "keyWidthFHD": 148,
-                  "keyWidthHD": 148
+                  "keyWidthFHD": 148
                 },
                 {
                   "icon": "theme:KeyboardDeleteOnBitmap",
                   "focusIcon": "theme:KeyboardDeleteOffBitmap",
                   "strOut": "backspace",
-                  "keyWidthFHD": 148,
-                  "keyWidthHD": 148
+                  "keyWidthFHD": 148
                 }
               ]
             }

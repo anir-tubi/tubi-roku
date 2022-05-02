@@ -1,0 +1,48 @@
+{
+  "keyboardWidthFHD": 483,
+  "keyboardHeightFHD": 390,
+  "sections": [
+    {
+    "grids": [
+      {
+      "rows": [
+        {
+        "keys": [
+          { "label": "1" },
+          { "label": "2" },
+          { "label": "3" }
+        ]
+        },
+        {
+        "keys": [
+          { "label": "4" },
+          { "label": "5" },
+          { "label": "6" }
+        ]
+        },
+        {
+        "keys": [
+          { "label": "7" },
+          { "label": "8" },
+          { "label": "9" }
+        ]
+        },
+        {
+        "keys": [
+          {
+            "label": "0"
+          },
+          {
+            "icon": "pkg:/images/icon-delete.png",
+            "focusIcon": "pkg:/images/icon-delete.png",
+            "autoRepeat": 1,
+            "strOut": "backspace"
+          }
+        ]
+        }
+      ]
+      }
+    ]
+    }
+  ]
+  }

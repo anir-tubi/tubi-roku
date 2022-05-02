@@ -6,7 +6,8 @@
 <component name="NumberPad" extends="Group">
 
   <script type="text/brightscript" uri="NumberPad.brs" />
-  
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+
   <interface>
 
     <!-- INPUT -->
@@ -14,14 +15,12 @@
       <field id="moveFocusToDelete" type="boolean" alwaysNotify="true"/>
 
     <!-- OUTPUT -->
-      <!-- the number on the number pad that was selected, as a string (ie. "1"), or "back" -->
-      <field id="buttonSelected" type="string" alwaysNotify="true"/>
+      <field id="text" type="string" alias="keyboard.text" />
   </interface>
 
   <children>
-    <Rowlist
-      id="NumberPadBackgroundRowlist" />
-    <Rowlist
-      id="NumberPadForegroundRowlist" />
+    <DynamicCustomKeyboard
+      id="keyboard"
+      translation="[0, -90]" />
   </children>
 </component>

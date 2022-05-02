@@ -25,9 +25,6 @@ Function init()
 
   m.yearLetter = m.YearEntryFront.text.Left(1)
 
-  ' m.date will have the format "12-09-2021"
-  m.date = ""
-
   ' m.warningDisplayedCount helps to track how many time warning message is displayed when user enters year of birth
   m.warningDisplayedCount = 0
 
@@ -45,7 +42,7 @@ Function init()
   m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
 
   m.top.observeField("focusedChild", "onComponentFocusChanged")
-  m.NumberPad.observeField("buttonSelected", "onNumberPadButtonSelected")
+  m.NumberPad.observeField("text", "onNumberPadTextChanged")
   m.top.observeFieldScoped("ageSubmitted", "onAgeSubmittedChanged")
 End Function
 
@@ -69,66 +66,55 @@ Function centerTips()
 End Function
 
 
-Function onNumberPadButtonSelected(msg)
-  selected = msg.getData()
-  if selected = "back"
-    ' remove the last character
-    if m.date.len() > 0
-      amountToRemove = 1
-      newDateLen = m.date.len() - amountToRemove
-      m.date = m.date.Left(newDateLen)
-      m.Prompt.visible = false
-    end if
+Function onNumberPadTextChanged(msg)
+  date = msg.getData()
+  millenium = date.left(1).toInt()
+  century = date.mid(1, 1).toInt()
+  decade = date.mid(2, 1).toInt()
+  dateLength = date.len()
+
+  if dateLength = 1 and millenium <> 1 and millenium <> 2
+    m.Prompt.visible = true
+    m.NumberPad.text = ""
+  else if dateLength = 2 and millenium = 1 and century <> 9
+    ' don't allow centuries that are not 19xx if millenium is 1xxx
+    m.Prompt.visible = true
+    m.NumberPad.text = date.left(1)
+  else if dateLength = 2 and millenium = 2 and checkValidCentury(millenium, century) = false
+    ' don't allow centuries greater than the current century if millenium is 2xxx
+    m.Prompt.visible = true
+    m.NumberPad.text = date.left(1)
+  else if dateLength = 3 and millenium = 2 and checkValidDecade(century, decade) = false
+    ' don't allow decades greater than the current decade if millenium is 2xxx
+    m.Prompt.visible = true
+    m.NumberPad.text = date.left(2)
+  else if dateLength = 4 and checkValidYear(date) = false
+    ' don't allow future years/month/dates
+    m.Prompt.visible = true
+    m.NumberPad.text = date.left(3)
   else
-    selectedInt = selected.toInt()
+    m.Prompt.visible = false
+    if dateLength = 4
+      m.NumberPad.moveFocusToDelete = true
+      m.top.birthdate = date + "-12-31"  ' since backend expects birthday in date format(YYYY-MM-DD), we are appending dummy month & day
 
-    if m.date.len() = 0 and selectedInt <> 1 and selectedInt <> 2
-      m.Prompt.visible = true
-    else if m.date.len() = 1 and m.date.Right(1).toInt() = 1 and selectedInt <> 9
-      ' do nothing, don't allow centuries that are not 19xx if millenium is 1xxx
-      m.Prompt.visible = true
-    else if m.date.len() = 1 and m.date.Right(1).toInt() = 2 and checkValidCentury(m.date.Right(1).toInt(), selectedInt) = false
-      ' do nothing, don't allow centuries greater than the current century if millenium is 2xxx
-      m.Prompt.visible = true
-    else if m.date.len() = 2 and m.date.Mid(6, 1).toInt() = 2 and checkValidDecade(m.date.Right(1).toInt(), selectedInt) = false
-      ' do nothing, don't allow decades greater than the current decade if millenium is 2xxx
-      m.Prompt.visible = true
-    else if m.date.len() = 3 and checkValidYear(m.date + selected) = false
-      m.Prompt.visible = true
-    else if m.date.len() < 4
-      ' only add more characters to the date if we don't have the whole date already
-      m.date += selected
-      m.Prompt.visible = false
-
-      if m.date.len() = 4
-        m.top.birthdate = m.date + "-12-31"  ' since backend expects birthday in date format(YYYY-MM-DD), we are appending dummy month & day
-
-        dateTime = createObject("roDateTime")
-        currentYear = dateTime.getYear()
-
-        if isUserToddler(m.date, currentYear) = true and m.warningDisplayedCount = 0
-          m.Prompt.text = getTranslation("screenAgeVerification_warning_prompt")
-          m.Prompt.visible = true
-          m.warningDisplayedCount += 1
-          m.NumberPad.moveFocusToDelete = true
-        else if isUserNewBorn(m.date, currentYear) = true or isUserTooOld(m.date, currentYear) = true
-          m.Prompt.text = getTranslation("screenAgeVerification_error_prompt")
-          m.Prompt.visible = true
-          m.NumberPad.moveFocusToDelete = true
-        else
-          m.StartButton.setFocus(true)
-        end if
-
+      currentYear = createObject("roDateTime").getYear()
+      if isUserToddler(date, currentYear) = true and m.warningDisplayedCount = 0
+        m.Prompt.text = getTranslation("screenAgeVerification_warning_prompt")
+        m.Prompt.visible = true
+        m.warningDisplayedCount += 1
+      else if isUserNewBorn(date, currentYear) = true or isUserTooOld(date, currentYear) = true
+        m.Prompt.text = getTranslation("screenAgeVerification_error_prompt")
+        m.Prompt.visible = true
+      else
+        m.StartButton.setFocus(true)
       end if
 
-    else if m.date.len() = 4
-      m.NumberPad.moveFocusToDelete = true
     end if
 
+    refreshDateOnScreen(date)
+    updateDateDecorations()
   end if
-
-  refreshDateOnScreen(m.date)
-  updateDateDecorations()
 End Function
 
 Function onAgeSubmittedChanged()
@@ -231,7 +217,7 @@ Function onKeyEvent(key, press) as Boolean
       m.top.backButtonPressed = true
     else
       if key = "down"
-        if m.date.len() = 4 and m.NumberPad.isInFocusChain() = true and m.Prompt.visible = false
+        if m.NumberPad.text.len() = 4 and m.NumberPad.isInFocusChain() = true and m.Prompt.visible = false
           m.StartButton.setFocus(true)
         end if
       else if key = "up"
