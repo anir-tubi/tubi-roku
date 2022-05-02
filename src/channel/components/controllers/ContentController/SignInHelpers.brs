@@ -793,7 +793,7 @@ Function onEmailVerificationTimerFired()
       url: requestInfo.url
       requestType: m.constants.reqNames.queryStatusOfMagicLink
       options: requestInfo.options
-      successCallback: onQueryStatusOfMagicLinkError
+      successCallback: onQueryStatusOfMagicLinkResponse
       errorCallback: onQueryStatusOfMagicLinkError
       responseType: "assocarray"
     })
