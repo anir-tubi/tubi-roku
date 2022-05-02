@@ -747,7 +747,7 @@ Function onMagicLinkError(errorResponse)
       dialog_type: "LOGIN_REQUEST" 'DialogType enum
       pageOneof: m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
       dialog_action: "SHOW"
-      dialog_sub_type: "server_error"
+      dialog_sub_type: "magiclink_server_err"
     }
   }
 
@@ -885,7 +885,7 @@ Function onOkButtonClickedOnMagicLinkError()
       dialog_type: "LOGIN_REQUEST"
       pageOneof: m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
       dialog_action: "ACCEPT_DELIBERATE"
-      dialog_sub_type: "server_error"
+      dialog_sub_type: "magiclink_server_err"
     }
   }
   m.trackingLoggingTask.trackEvent = dialogEvent
