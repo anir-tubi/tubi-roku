@@ -1016,7 +1016,7 @@ Function getTranslation_en_US()
     },
     "dialog_mylist_signIn_description": {
       "description": "Dialog description to say the user to signIn to view the My List",
-      "message": "You must be logged in in order to view your list"
+      "message": "You must be logged in to view your list"
     },
     "dialog_mylist_empty_title": {
       "description": "A general empty My list title for an dialog window",
