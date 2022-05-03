@@ -109,8 +109,9 @@
         itemSpacings="[1]">
 
       <Group>
-        <MarkupList
+        <MarkupGrid
           numRows="8"
+          numColumns="1"
           id="mainItemsSelected"
           itemSize="[397,70]"
           itemSpacing="[0,17]"
@@ -121,9 +122,10 @@
           itemComponentName="SideNavIconComponent">
           <ContentNode id="MainContent-select" role="content" >
           </ContentNode>
-        </MarkupList>
-        <MarkupList
+        </MarkupGrid>
+        <MarkupGrid
           numRows="8"
+          numColumns="1"
           id="mainItems"
           itemSize="[397,70]"
           itemSpacing="[0,17]"
@@ -134,7 +136,7 @@
           itemComponentName="SideNavIconComponent">
           <ContentNode id="MainContent" role="content" >
           </ContentNode>
-        </MarkupList>
+        </MarkupGrid>
       </Group>
 
     </LayoutGroup>

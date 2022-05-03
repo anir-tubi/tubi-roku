@@ -21,11 +21,13 @@
   <children>
     <Group
       id="SettingsMenuGroup">
-      <MarkupList
+      <MarkupGrid
         id="SettingsMenu"
+        drawFocusFeedbackOnTop="false"
         numRows="12"
         itemSize="[470,80]"
         itemSpacing="[0,8]"
+        numColumns="1"
         itemComponentName="DetailMenuItem"
         vertFocusAnimationStyle="floatingFocus">
         <ContentNode
@@ -50,7 +52,7 @@
             id="SignInOutButton"
             iconUrl="pkg:/images/icon-sign-in.png" />
         </ContentNode>
-      </MarkupList>
+      </MarkupGrid>
     </Group>
   </children>
 </component>
