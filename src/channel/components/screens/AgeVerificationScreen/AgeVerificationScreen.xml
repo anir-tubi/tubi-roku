@@ -175,10 +175,10 @@
     </Group>
     <Label
       id="AgeVericationErrorPrompt"
-      translation="[0,804]"
+      translation="[626,804]"
       color="0xEB9C00"
       width="1000"
-      horizAlign="center"
+      horizAlign="right"
       visible="false">
       <Font
         role="font"

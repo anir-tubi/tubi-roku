@@ -28,10 +28,6 @@ Function init()
   ' m.warningDisplayedCount helps to track how many time warning message is displayed when user enters year of birth
   m.warningDisplayedCount = 0
 
-  ' Center the tip text and error prompt text on the date info display
-  ' need to know the language translation before we can center properly
-  centerTips()
-
   m.top.trackingPageInfo = {
     pageType: "age_gate_page"
     pageValues: {}
@@ -53,16 +49,6 @@ Function onComponentFocusChanged()
     m.top.backgroundUriList = m.backgroundUriList
     m.NumberPad.setFocus(true)
   end if
-End Function
-
-
-Function centerTips()
-  dateBoundingRect = m.DateInfo.boundingRect()
-  dateCenter = (dateBoundingRect.width / 2) + dateBoundingRect.x
-
-  promptWidth = m.Prompt.boundingRect().width
-  promptX = dateCenter - (promptWidth / 2)
-  m.Prompt.translation = [promptX, m.Prompt.translation[1]]
 End Function
 
 
