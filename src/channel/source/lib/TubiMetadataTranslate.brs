@@ -14,6 +14,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     translateEPGChannelIds: tubiMetadataTranslate_translateEPGChannelIds
     translateEPGPrograms: tubiMetadataTranslate_translateEPGPrograms
     upNextTranslateRecursiveWrapper: tubiMetadataTranslate_upNextTranslateRecursiveWrapper
+    setDescriptorCodeAndDescription: tubiMetadataTranslate_setDescriptorCodeAndDescription
 
     ' private
     constants: constants
@@ -357,7 +358,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.ratings <> invalid and contentFromServer.ratings[0] <> invalid and contentFromServer.ratings[0].value <> invalid
     translatedContent.rating = contentFromServer.ratings[0].value
     if contentFromServer.ratings[0].descriptors <> invalid and contentFromServer.ratings[0].descriptors.Count() > 0
-      translatedContent.descriptors = contentFromServer.ratings[0].descriptors
+      m.setDescriptorCodeAndDescription(translatedContent, contentFromServer.ratings[0].descriptors)
     end if
   end if
 
@@ -1799,4 +1800,48 @@ Function tubiMetadataTranslate_upNextTranslateRecursiveWrapper(content, upnextCo
     parent = upnextContentItem.getParent()
     parent.removeChild(upnextContentItem)
   end if
+End Function
+
+
+' read the descriptors and set value for descriptorCode and descriptorDescription fields in contentNode
+'
+' @content: TubiContentNode, which has descriptorCode & descriptorDescription fields also on it. Value will be set based on descriptors param.
+' @descriptors: roArray, array of roAssociativeArray.
+'   eg.
+'     [
+'        {
+'           code: "L"
+'           description: "Coarse or crude language"
+'        }
+'        {
+'           code: "V"
+'           description: "Violence"
+'        }
+'     ]
+Function tubiMetadataTranslate_setDescriptorCodeAndDescription(content, descriptors)
+
+  if content <> invalid and descriptors <> invalid and descriptors.Count() > 1
+
+    descriptor_code = ""
+    descriptor_desc = ""
+
+    descriptorsCount = descriptors.Count()
+
+    for i = 0 to descriptorsCount - 1
+      if descriptors[i].code <> invalid
+        descriptor_code += descriptors[i].code.Trim() + " "
+      end if
+      if descriptors[i].description <> invalid
+        if Len(descriptor_desc) > 0
+          descriptor_desc += ", " + descriptors[i].description.Trim()
+        else
+          descriptor_desc += descriptors[i].description.Trim()
+        end if
+      end if
+    end for
+    content.descriptorCode = UCase(descriptor_code)
+    content.descriptorDescription = descriptor_desc
+
+  end if
+
 End Function

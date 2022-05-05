@@ -848,12 +848,6 @@ Function onUpNextResponse(upNextContent)
 
   if videoPlayer <> invalid
     if upNextContent <> invalid
-      ' updates descriptorCode and descriptorDescription for upNextContent
-      for i = upNextContent.getChildCount()-1 to 0 step -1
-        content = upNextContent.getChild(i)
-        setDescriptorCodeAndDescription(content)
-      end for
-
       if m.receivedGoToNextPressed = true
         firstUpNextItem = upNextContent.getChild(0)
         if firstUpNextItem <> invalid

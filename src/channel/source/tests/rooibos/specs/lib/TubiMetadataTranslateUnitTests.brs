@@ -1,4 +1,4 @@
-'@TestSuite [TubiMetadataTranslate] TubiMetadataTranslate.brs 
+'@TestSuite [TubiMetadataTranslate] TubiMetadataTranslate.brs
 
 '@Setup
 Function TubiMetadataTranslateSetup()
@@ -27,7 +27,7 @@ Function tubiMetadataTranslate_translateRecursive_testTranslateTypes_test()
   source = {
     id: "12345"
     type: ""
-  } 
+  }
 
   for each contentType in serverContentTypes
     dest = CreateObject("roSGNode", "TubiContentNode")
@@ -63,7 +63,7 @@ Function tubiMetadataTranslate_translateRecursive_testParentTypes_test()
   source = {
     id: "12345"
     type: "v"
-  } 
+  }
 
   for each contentType in parentContentTypes
     parent = CreateObject("roSGNode", "TubiContentNode")
@@ -360,7 +360,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds_test()
   m.assertTrue(translated.getChildCount() = 88)
   m.assertTrue(translated.getChild(0).id = "613683")
   m.assertTrue(translated.getChild(0).containerName = "Sports on Tubi")
- 
+
 End Function
 
 
@@ -427,5 +427,42 @@ Function tubiMetadataTranslate_translateEPGPrograms_test()
   m.assertEqual(program.Rating, "")
   'm.assertTrue(program.descriptors.count() = 0) '- commenting this as epgProgram.json tags is empty. If you want to use this assert, add value to tags in epgProgram.json
   m.assertEqual(program.ReleaseDate, "")
+
+End Function
+
+
+'@Test setDescriptorCodeAndDescription unit tests
+Function tubiMetadataTranslate_setDescriptorCodeAndDescription_test()
+
+  descriptors = [
+    {
+        "code": "L",
+        "description": "Coarse or crude language"
+    },
+    {
+        "code": "V",
+        "description": "Violence"
+    }
+  ]
+  content = CreateObject("roSGNode", "TubiContentNode")
+  m.translate.setDescriptorCodeAndDescription(content, descriptors)
+
+  m.assertNotInvalid(content.descriptorCode)
+  m.assertEqual(content.descriptorCode, "L V ")
+
+  m.assertNotInvalid(content.descriptorDescription)
+  m.assertEqual(content.descriptorDescription, "Coarse or crude language, Violence")
+
+
+  descriptors = []
+  content = CreateObject("roSGNode", "TubiContentNode")
+  m.translate.setDescriptorCodeAndDescription(content, descriptors)
+
+  m.assertNotInvalid(content.descriptorCode)
+  m.assertEqual(content.descriptorCode, "")
+
+  m.assertNotInvalid(content.descriptorDescription)
+  m.assertEqual(content.descriptorDescription, "")
+
 
 End Function
