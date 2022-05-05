@@ -736,7 +736,7 @@ Function exitAgeVerificationScreenUnverified()
     end if
   end if
 
-  popScreen(false, false)
+  popScreen(true, true)
 End Function
 
 

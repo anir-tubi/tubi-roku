@@ -1072,7 +1072,10 @@ Function onHomescreenContentReady(msg)
 
     '//Report the page_load analytics
     loadTime = Int((Uptime(0) - homeScreen.trackingLoadStartTime) * 1000) 'in ms
-    screenTrackingLoad(homeScreen.trackingPageInfo, loadTime)
+    currentScreen = getCurrentScreen()
+    if currentScreen.id = m.constants.ui.screenIds.homeScreen
+      screenTrackingLoad(homeScreen.trackingPageInfo, loadTime)
+    end if
   end if
 End Function
 
