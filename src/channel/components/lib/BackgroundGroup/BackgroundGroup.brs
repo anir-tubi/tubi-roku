@@ -272,7 +272,12 @@ Function transitionPosters()
         startTransitionIn()
 
         'once the transition is complete we will want to start the timer for rotating background images
-        m.newPoster.findNode(m.newPoster.lastAnimationName).observeField("state", "onTransitionComplete")
+        node = m.newPoster.findNode(m.newPoster.lastAnimationName)
+        if node = invalid
+          tubiLog("Node could not be found for lastAnimationName: " + m.newPoster.lastAnimationName, "warn")
+        else
+          node.observeField("state", "onTransitionComplete")
+        end if
       else
         'set observer/callback to select and start the transition animation if the poster is not yet ready
         m.newPoster.observeField("loadStatus", "onBackgroundPosterReady")
