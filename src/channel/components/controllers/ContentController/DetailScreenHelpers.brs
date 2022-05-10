@@ -1427,9 +1427,18 @@ Function skipDetailScreen(refreshedContent)
     episode = getEpisodeContent(detailScreen.content)
     if episode <> invalid
       nowPos = processResume(episode)
-      if nowPos >= 0
-        playVideoContentWhileSkippingDetailScreen(episode, nowPos, trackingPageInfo, trackingComponentInfo)
+      if m.top.fadeInContentController = true
+        if nowPos >= 0
+          playVideoContentWhileSkippingDetailScreen(episode, nowPos, trackingPageInfo, trackingComponentInfo)
+        end if
+      else
+        if nowPos > 0
+          m.detailScreenAfterFn = resumeHelper
+        else
+          m.detailScreenAfterFn = playHelper
+        end if
       end if
+
     end if
   end if
 End Function

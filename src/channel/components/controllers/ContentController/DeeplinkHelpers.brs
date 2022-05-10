@@ -223,11 +223,19 @@ Function handleDeeplinkContentByType()
     else if m.deepLinkContent.deeplinktype = "tvPage"
       handleTVPageDeeplinkContent()
     else if m.deepLinkContent.deeplinktype = "series"
-      getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeriesContentSuccess, handleSingleContentDeeplinkError)
+      if Left(m.deepLinkContent.id, 1) = "0"
+        showDetailScreen(m.deepLinkContent, false, skipDetailScreen, handleSingleContentDeeplinkError)
+      else
+        getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeriesContentSuccess, handleSingleContentDeeplinkError)
+      end if
     else if m.deepLinkContent.deeplinktype = "episode"
       getSingleContentFromServer(m.deeplinkContent, onDeeplinkEpisodeContentSuccess, handleSingleContentDeeplinkError)
     else if m.deepLinkContent.deeplinktype = "season"
-      getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeasonContentSuccess, handleSingleContentDeeplinkError)
+      if Left(m.deepLinkContent.id, 1) = "0"
+        showDetailScreen(m.deepLinkContent, false, skipDetailScreen, handleSingleContentDeeplinkError)
+      else
+        getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeasonContentSuccess, handleSingleContentDeeplinkError)
+      end if
     else if m.deepLinkContent.deeplinktype = "movie"
       showDetailScreen(m.deeplinkContent, false, skipDetailScreen, handleSingleContentDeeplinkError )
     else
