@@ -258,6 +258,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.emailExists] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getChannelGuide] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postUserHistory] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.signIn] = true
 
   constants.anonymous = {}
     constants.anonymous.algorithm = "TUBI-HMAC-SHA256"
@@ -404,12 +405,10 @@ Function getConstants()
       if constants.settings.mode <> "production" and constants.settings.stagingApis = true
         constants.urls.users.urlBase = "https://uapi.staging-public.tubi.io/user_device"
       end if
-      constants.urls.users.login = constants.urls.users.urlBase + "/login"
       constants.urls.users.signup = constants.urls.users.urlBase + "/signup"
       constants.urls.users.registerCode = constants.urls.users.urlBase + "/code/register"
       constants.urls.users.refreshToken = constants.urls.users.urlBase + "/login/refresh"
       constants.urls.users.transferToken = constants.urls.users.urlBase + "/login/transfer"
-      constants.urls.users.migrateLogin = constants.urls.users.urlBase + "/login/migrate"
       constants.urls.users.queues = constants.urls.users.urlBase + "/queues"
       constants.urls.users.history = constants.urls.users.urlBase + "/histories"
       constants.urls.users.config = constants.urls.users.urlBase + "/config/" + constants.platform

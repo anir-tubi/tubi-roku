@@ -456,7 +456,7 @@ End Function
 Function onPostSignInAuthInfoUpdated()
   tubiLog("SignInHelpers.onPostSignInAuthInfoUpdated")
   authInfo = handleUpdatedAuth()
-  if (shouldShowAgeGate() and authInfo.hasAge <> true)
+  if (shouldShowAgeGate() and authInfo <> invalid and authInfo.hasAge <> true)
     m.spinner.visible = false
     signInInfo = invalid
     if authInfo <> invalid
@@ -757,7 +757,7 @@ Function onMagicLinkError(errorResponse)
     openTrackEvent: dialogEvent
     trackingTask: m.trackingLoggingTask
   }
-  
+
   showErrorModal(modalInfo, invalid, invalid, onOkButtonClickedOnMagicLinkError, invalid, [getTranslation("dialog_button_ok")])
 End Function
 
@@ -811,7 +811,7 @@ Function onQueryStatusOfMagicLinkResponse(response)
     Auth.handleRegistration(response)
     onSignUpResponse(invalid)
   end if
-   
+
 End Function
 
 
