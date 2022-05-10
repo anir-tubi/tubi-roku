@@ -530,8 +530,7 @@ Function onSignOutCompleted()
   setContentToRefreshAllPersonalizedScreens()
   setSideNavSignedInItem(authInfo)
 
-  ' this happens when a user signs out or user signs in from the side nav or from settings side nav
-  restartChannel()
+  startChannel()
 End Function
 
 
