@@ -592,6 +592,15 @@ If you need to get the latest translations from the Crowdin servers, then create
 
 NOTE: Instead of passing the crowdin key, you can set the crowdin key as system environment variable labeled as"ROKU_CROWDIN_KEY". This is actually the preferred way of doing things. Check your system on how to create an environment variable. Also note, that the Crowdin key can be gotten either from the company's LastPass Account or through the [Crowdin website](https://crowdin.com/project/tubiapps/settings#api).
 
+# Restart Github Action Runner
+
+A linux machine has been dedicated in the San Francisco office to be used for GitHub PR unit testing. A Github Actions runner is running on this linux machine.  A roku device is connected to the linux machine. 
+
+When any PR is raised against master, the Github Actions runner triggers all of the project's unit tests. The PR will be allowed to merge based on the runner's test results.
+
+If the Github Actions runner is not working, the linux machine may need to be restarted. The below document explains how to do that. 
+https://tubitv.atlassian.net/wiki/spaces/IT/pages/2465464321/Accessing+Roku+Github+Action+Server
+
 # Charles Proxy
 
 Roku app integration with Charles proxy.
