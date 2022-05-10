@@ -258,6 +258,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.emailExists] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getChannelGuide] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postUserHistory] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.signup] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.signIn] = true
 
   constants.anonymous = {}

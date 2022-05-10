@@ -257,7 +257,7 @@ Function verifyAgeAtSignup(signInInfo, birthdate)
         last_name: ""
         birthday: birthdate
         email_type: signInInfo.emailType
-        used_email_as_first_name: usedEmailAsFirstName
+        temporary_name: usedEmailAsFirstName
       }
     }
 
