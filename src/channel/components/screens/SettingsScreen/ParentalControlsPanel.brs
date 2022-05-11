@@ -38,7 +38,7 @@ Function getRatingStrings(nRatingIndex)
   if aRatings <> invalid and aRatings[nRatingIndex] <> invalid
     sRatingsReturn = aRatings[nRatingIndex]
   end if
-  return sRatingsReturn 
+  return sRatingsReturn
 End Function
 
 
@@ -56,18 +56,17 @@ Function setParentalControlStrings()
     sText = getTranslation("screenSettings_parentalControls_group" + i.toStr(), {ratings: sRatings})
     child.title = sText
 
-    '//Temporarily create checkbuttons for each button text to find the largest width necessary for the set of buttons, 
+    '//Temporarily create checkbuttons for each button text to find the largest width necessary for the set of buttons,
     '//   in order to determine how wide m.Menu should be.
     '//   Different languages may make the text wider than usual so we need to ensure the button displays the full text
     checkBtn = CreateObject("roSGNode", "CheckButton")
-    btnContent =  CreateObject("roSGNode", "CheckButtonContentNode") 
-    btnContent.title = sText 
-    checkBtn.itemContent = btnContent 
-    if checkBtn.calculatedWidth > nWidestWidth 
+    btnContent =  CreateObject("roSGNode", "CheckButtonContentNode")
+    btnContent.title = sText
+    checkBtn.itemContent = btnContent
+    if checkBtn.calculatedWidth > nWidestWidth
       nWidestWidth = checkBtn.calculatedWidth
     end if
-    checkBtn = invalid
-  end for 
+  end for
   m.Menu.itemSize = [nWidestWidth, m.Menu.itemSize[1]]
 
   m.Menu.content = newContent

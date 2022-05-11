@@ -738,9 +738,9 @@ Function onVideoTrackingStart(msg)
 
     if videoPlayer <> invalid and videoPlayer.content <> invalid
       youboraConfig["extraparam.1"] = videoPlayer.content.id
-      youboraConfig["content.id"] = videoplayer.content.id
+      youboraConfig["content.id"] = videoPlayer.content.id
 
-      playbackType = videoplayer.content.drmType
+      playbackType = videoPlayer.content.drmType
       youboraConfig["content.playbackType"] = playbackType
 
       if isString(playbackType)
@@ -750,22 +750,22 @@ Function onVideoTrackingStart(msg)
         end if
       end if
 
-      youboraConfig.tvShow = Mid(videoplayer.content.parentId, 2)
+      youboraConfig.tvShow = Mid(videoPlayer.content.parentId, 2)
     end if
 
     if isLoggedInUser() = true
       youboraConfig.username = m.global.authInfo.userId
     end if
 
-    if videoplayer.content.type = m.constants.ui.contentTypes.linear
+    if videoPlayer.content.type = m.constants.ui.contentTypes.linear
       youboraConfig["content.isLive"] = true
     else
       youboraConfig["content.isLive"] = false
     end if
-    if isNonEmptyString(videoplayer.content.titanVersion) = true
-      youboraconfig["content.customDimension.2"] = videoplayer.content.titanVersion
+    if isNonEmptyString(videoPlayer.content.titanVersion) = true
+      youboraConfig["content.customDimension.2"] = videoPlayer.content.titanVersion
     end if
-    youboraconfig["content.resource"] = videoplayer.content.URL
+    youboraConfig["content.resource"] = videoPlayer.content.URL
     youboraConfig["device.model"] = m.constants.deviceInfo.model
     youboraConfig["device.code"] = m.constants.deviceInfo.deviceId
     youboraConfig["app.releaseVersion"] = m.constants.deviceInfo.clientVersion
@@ -793,8 +793,8 @@ Function onSendYouboraError(msg)
     m.youboraTask.event = {
       handler: "error"
       params: {
-        "msg": videoplayer.videoErrorMsg,
-        "errorCode": videoplayer.videoErrorCode.ToStr()
+        "msg": videoPlayer.videoErrorMsg
+        "errorCode": videoPlayer.videoErrorCode.ToStr()
       }
     }
   end if

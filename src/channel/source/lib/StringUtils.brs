@@ -243,9 +243,9 @@ End Function
 
 Function GetAMPMTimeString(dateTime, bIncludeSpaceSeparator = true) as string
   if dateTime.GetHours() - 12 >= 0
-    amPM = "PM"
+    amPm = "PM"
   else
-    amPM = "AM"
+    amPm = "AM"
   end if
   hourValue = dateTime.getHours() mod 12
   if hourValue = 0

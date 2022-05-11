@@ -1,5 +1,6 @@
 {
   "rootDir": "./src/channel",
+  "plugins": [ "@rokucommunity/bslint" ],
   "files": [
     "manifest",
     "source/**/*.*",
@@ -13,6 +14,7 @@
     "codes": [1104, 1090]
   },
   "source/tests/rooibos/rooibosDist.brs",
+  "source/rooibosFunctionMap.brs",
   {
     "codes": [1013],
     "src": "components/lib/DevGridOverlay.brs"

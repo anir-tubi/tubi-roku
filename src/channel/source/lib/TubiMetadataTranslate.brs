@@ -278,17 +278,17 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   'add default credit cuepoints if missing, or skip it if content is very short
   if postlude = 0 and translatedContent.length > m.creditsDuration
-    cuepoint = translatedContent.length - m.creditsDuration
-    if cuepoint >= 0
-      postlude = cuepoint
+    cuePoint = translatedContent.length - m.creditsDuration
+    if cuePoint >= 0
+      postlude = cuePoint
     end if
   end if
 
   ' if credits duration is less than m.creditsDuration, force it to be at least that long
   if postlude > 0 and (translatedContent.length - postlude) < m.creditsDuration
-    cuepoint = translatedContent.length - m.creditsDuration
+    cuePoint = translatedContent.length - m.creditsDuration
     if cuePoint >= 0
-      postlude = cuepoint
+      postlude = cuePoint
     else
       ' if the cuepoint was adjusted, but it ended up being negative
       postlude = 0

@@ -100,22 +100,22 @@ End Function
 
 
 '//Refresh the content and the enabling of the top nav of the epg screen
-Function refreshEPGScreen(epgscreen)
+Function refreshEPGScreen(epgScreen)
   tubiLog("EPGScreenHelpers.refreshEPGscreen")
   mode = ""
   epgChannelList = invalid
-  if epgscreen.id = m.constants.ui.screenIds.sportsEPGScreen
+  if epgScreen.id = m.constants.ui.screenIds.sportsEPGScreen
     mode = m.constants.ui.contentMode.sportsEPGScreen
-    epgscreen.topNavSelectedId = m.constants.ui.sideNavIds.sports
-  else if epgscreen.id = m.constants.ui.screenIds.newsEPGScreen
+    epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.sports
+  else if epgScreen.id = m.constants.ui.screenIds.newsEPGScreen
     mode = m.constants.ui.contentMode.newsEPGScreen
-    epgscreen.topNavSelectedId = m.constants.ui.sideNavIds.news
-  else if epgscreen.id = m.constants.ui.screenIds.entertainmentEPGScreen
+    epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.news
+  else if epgScreen.id = m.constants.ui.screenIds.entertainmentEPGScreen
     mode = m.constants.ui.contentMode.entertainmentEPGScreen
-    epgscreen.topNavSelectedId = m.constants.ui.sideNavIds.entertainment
+    epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.entertainment
   else
     mode = m.constants.ui.contentMode.epgScreen
-    epgscreen.topNavSelectedId = m.constants.ui.sideNavIds.linearEPG
+    epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.linearEPG
     epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
   end if
 
@@ -123,7 +123,7 @@ Function refreshEPGScreen(epgscreen)
     setEPGScreenLoading(epgScreen)
     fetchEPGScreenChannels(epgScreen, mode)
   else if epgChannelList <> invalid
-    epgscreen.timeGridContent = epgChannelList
+    epgScreen.timeGridContent = epgChannelList
     setTimeGridContentLoadingToComplete(epgScreen)
   end if
 End Function
@@ -403,20 +403,20 @@ End Function
 Function appendOrAddTimeGridNewContents(response, epgScreen)
   tubiLog("EPGScreenHelpers.appendOrAddTimeGridNewContents")
 
-  if response <> invalid and epgscreen.timeGridContent <> invalid
+  if response <> invalid and epgScreen.timeGridContent <> invalid
     for i = 0 to response.getChildCount() - 1
       if response.getChild(i) <> invalid
         newNode = response.getChild(i).clone(true)
-        oldNodeIndex = m.NodeHelpers.getChildIndexById(epgscreen.timeGridContent, newNode.id)
+        oldNodeIndex = m.NodeHelpers.getChildIndexById(epgScreen.timeGridContent, newNode.id)
 
         if oldNodeIndex = -1
-          epgscreen.timeGridContent.appendChild(newNode)
+          epgScreen.timeGridContent.appendChild(newNode)
         else
-          if epgscreen.timeGridContent.getChild(oldNodeIndex) <> invalid
-            containerName = epgscreen.timeGridContent.getChild(oldNodeIndex).containerName
+          if epgScreen.timeGridContent.getChild(oldNodeIndex) <> invalid
+            containerName = epgScreen.timeGridContent.getChild(oldNodeIndex).containerName
             newNode.parentTitle = containerName
           end if
-          epgscreen.timeGridContent.replaceChild(newNode, oldNodeIndex)
+          epgScreen.timeGridContent.replaceChild(newNode, oldNodeIndex)
         end if
       end if
     end for
@@ -473,12 +473,12 @@ Function onRefreshEPGScreenVideoPlay(msg)
   else if refreshEPGScreenVideoPlay = true
     m.backgroundGroup.posterVisible = true
     stopCountdownTimer()
-    epgscreen.fullScreenCountdown = -1
+    epgScreen.fullScreenCountdown = -1
     stopAndHideLinearVideoPlayer()
   else 'from FullScreen video
     linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
 
-    changeEPGScreenBackground(epgscreen)
+    changeEPGScreenBackground(epgScreen)
     if linearVideoPlayer <> invalid and linearVideoPlayer.state = "playing"
       if epgScreen.timeGridContent = invalid or epgScreen.timeGridContentLoading = true
         'Anytime Video is playing and epgScreen is empty, then refresh the epgScreen.  This situation might happen when
@@ -502,7 +502,7 @@ Function onRefreshEPGScreenVideoPlay(msg)
       m.backgroundGroup.posterVisible = true
 
       if currentScreen <> invalid and isAnEpgScreen(currentScreen) and currentScreen.linearChannelToPlay <> invalid
-        playLinearVideoContent(currentScreen.linearChannelToPlay, true, CurrentScreen.id)
+        playLinearVideoContent(currentScreen.linearChannelToPlay, true, currentScreen.id)
       end if
     end if
   end if
@@ -579,7 +579,7 @@ Function onEPGscreenContentReady(msg)
   tubiLog("EPGscreenHelpers.onEPGscreenContentReady ")
   'when user selects LiveTV on ICTS, we need to fire app start
   fireAppLoadBeacon()
-  epgscreen = msg.getRoSGNode()
+  epgScreen = msg.getRoSGNode()
   epgScreen.unobserveFieldScoped("contentReady")
   showHideSpinner(false)
 
@@ -589,7 +589,7 @@ Function onEPGscreenContentReady(msg)
 End Function
 
 
-Function isAnEpgScreen(Screen)
+Function isAnEpgScreen(screen)
   tubiLog("EPGScreenHelpers.isAnEpgScreen")
   experiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false)
   if experiment.side_nav = true
@@ -635,7 +635,7 @@ Function resetEPGScreenContent()
   stopCountdownTimer()
   epgScreen = getCurrentScreen()
   if epgScreen <> invalid and isAnEpgScreen(epgScreen) = true
-    epgscreen.fullScreenCountdown = -1
+    epgScreen.fullScreenCountdown = -1
   end if
   stopAndHideLinearVideoPlayer()
   if epgScreen.timeGridContent = invalid or epgScreen.timeGridContentLoading = true

@@ -28,7 +28,7 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
       showHideSpinner(false)
     end if
 
-    refreshHomescreenTopNav(homescreen)
+    refreshHomescreenTopNav(homeScreen)
     ' set which component to focus on once the screen gains focus
     if componentToFocus = m.constants.ui.homescreen.focusItems.topNav
       homeScreen.componentToFocus = m.constants.ui.homescreen.focusItems.topNav
@@ -75,18 +75,18 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
 
     sContentMode = constants.ui.contentMode.homescreen
     if screenID = constants.ui.screenIds.homeScreen
-      homescreen.topNavSelectedId = constants.ui.sideNavIds.home
+      homeScreen.topNavSelectedId = constants.ui.sideNavIds.home
     else if screenID = constants.ui.screenIds.movieScreen
       sContentMode = constants.ui.contentMode.movie
-      homescreen.topNavSelectedId = constants.ui.sideNavIds.movies
+      homeScreen.topNavSelectedId = constants.ui.sideNavIds.movies
     else if screenID = constants.ui.screenIds.tvScreen
       sContentMode = constants.ui.contentMode.tv
-      homescreen.topNavSelectedId = constants.ui.sideNavIds.tv
+      homeScreen.topNavSelectedId = constants.ui.sideNavIds.tv
     else if screenID = constants.ui.screenIds.espanolScreen
       sContentMode = constants.ui.contentMode.latino
     else if screenID = constants.ui.screenIds.linearTVScreen
       sContentMode = constants.ui.contentMode.linear
-      homescreen.topNavSelectedId = constants.ui.sideNavIds.linearTV
+      homeScreen.topNavSelectedId = constants.ui.sideNavIds.linearTV
     else if screenID = constants.ui.screenIds.bestKnownScreen
       sContentMode = constants.ui.contentMode.bestKnown
     else if screenID = constants.ui.screenIds.nostalgiaScreen
@@ -100,15 +100,15 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     homeScreen.canLoadCategories = true
     homeScreen.id = screenID
 
-    refreshHomescreenTopNav(homescreen)
+    refreshHomescreenTopNav(homeScreen)
     fetchHomescreen(homeScreen)
     setInScreenCache(homeScreen)
 
     ' set which component to focus on once the screen gains focus
     if componentToFocus = m.constants.ui.homescreen.focusItems.topNav
-      homescreen.componentToFocus = m.constants.ui.homescreen.focusItems.topNav
+      homeScreen.componentToFocus = m.constants.ui.homescreen.focusItems.topNav
     else
-      homescreen.componentToFocus = m.constants.ui.homescreen.focusItems.contentGrid
+      homeScreen.componentToFocus = m.constants.ui.homescreen.focusItems.contentGrid
     end if
 
     'page_load tracking will happen when content is received and displayed when onHomescreenContentReady() is called.
@@ -340,7 +340,6 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
           homeScreen.content = clonedContent
         end if
 
-        clonedContent = invalid
         homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
       else if newCategory = invalid and oldCategory <> invalid
         if oldCategory.id = m.constants.ui.categoryIds.history
@@ -429,12 +428,12 @@ Function onErrorReloadUserCategories(response, screenID = "")
 End Function
 
 
-' @homescreen: roSGNode, a Homescreen component
-Function refreshHomescreenTopNav(homescreen)
+' @homescreen: roSGNode, a HomeScreen component
+Function refreshHomescreenTopNav(homeScreen)
   refreshNeeded = setEnableTopNavOnHomescreen(homeScreen)
 
   if refreshNeeded = true
-    homescreen.refreshTopNav = true
+    homeScreen.refreshTopNav = true
   end if
 End Function
 
@@ -445,12 +444,12 @@ End Function
 '
 ' @returns: boolean, true if the value on either the isLinearTVAllowedInTopNav or enableTopNav is
 '           changing, indicating that the top nav items should be regenerated/refreshed
-Function setEnableTopNavOnHomescreen(homescreen)
+Function setEnableTopNavOnHomescreen(homeScreen)
   tubiLog("HomeScreenControllers.setEnableTopNavOnHomescreen")
   refreshNeeded = false
 
-  if homescreen <> invalid
-    if homescreen.isLinearTVAllowedInTopNav <> isParentalControlsAdultLevel()
+  if homeScreen <> invalid
+    if homeScreen.isLinearTVAllowedInTopNav <> isParentalControlsAdultLevel()
       homeScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel() and getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).side_nav = false
     end if
 
@@ -467,7 +466,7 @@ Function setEnableTopNavOnHomescreen(homescreen)
       bTopNavAllowed = false
     end if
 
-    if homescreen.enableTopNav <> bTopNavAllowed
+    if homeScreen.enableTopNav <> bTopNavAllowed
       homeScreen.enableTopNav = bTopNavAllowed
       refreshNeeded = true
     end if
@@ -778,7 +777,7 @@ Function retryCategoryList(screenID)
   homeScreen = getFromScreenCache(screenID)
   if homeScreen <> invalid
     homeScreen.canLoadCategories = true
-    fetchHomescreen(homescreen)
+    fetchHomescreen(homeScreen)
     homeScreen.setFocus(true)
   end if
 End Function
@@ -804,11 +803,11 @@ Function onHomescreenSponsoredRowFocused(msg)
   isSponsoredRowFocused = msg.getData()
   if isSponsoredRowFocused = true
     homeScreen = msg.getRoSGNode()
-    if homescreen <> invalid
-      row = homescreen.rowFocused
+    if homeScreen <> invalid
+      row = homeScreen.rowFocused
       if row <> invalid
         manageHomescreenSponsorPixels(row)
-        setSponsorshipBackground(homescreen.sponsorshipBackground)
+        setSponsorshipBackground(homeScreen.sponsorshipBackground)
       end if
     end if
   end if
@@ -1063,8 +1062,8 @@ End Function
 
 Function onHomescreenContentReady(msg)
   tubiLog("HomescreenHelpers.onHomescreenContentReady")
-  homescreen = msg.getRoSGNode()
-  if homescreen.contentReady = true
+  homeScreen = msg.getRoSGNode()
+  if homeScreen.contentReady = true
     fireAppLoadBeacon()
     homeScreen.unobserveFieldScoped("contentReady")
     homeScreen.isLoading = false

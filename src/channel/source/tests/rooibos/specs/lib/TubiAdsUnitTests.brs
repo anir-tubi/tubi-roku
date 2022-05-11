@@ -1,4 +1,4 @@
-'@TestSuite [TubiAds] TubiAds.brs 
+'@TestSuite [TubiAds] TubiAds.brs
 Library "Roku_Ads.brs"
 
 
@@ -8,7 +8,6 @@ Function TubiAds_testSetup()
   request = TubiRequest()
   requestQueue = TubiRequestQueue()
   auth = TubiAuth(m.constants, request)
-  translate = TubiMetadataTranslate(m.constants)
   tracking = TubiTracking(m.constants, request, auth)
   log = TubiLogger(m.constants, request, auth)
   m.ads = TubiAds(m.constants, log, request, requestQueue, auth, tracking, "mp4")

@@ -180,14 +180,12 @@ End Function
 '@Test translateRecursive series unit tests
 Function tubiMetadataTranslate_translateRecursive_series_test()
   seriesJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/series.json")
-  fetchTime = CreateObject("roDateTime").AsSeconds()
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(ParseJson(seriesJson), dest)
   m.assertNotInvalid(dest)
   m.assertTrue(dest.getChildCount() = 2)
   season = dest.getChild(0)
   m.assertTrue(season.getChildCount() = 52)
-  episode = season.getChild(0)
 End Function
 
 
@@ -301,7 +299,6 @@ End Function
 
 '@Test generateChannelPosterUrl unbranded unit tests
 Function tubiMetadataTranslate_generateChannelPosterUrl_unbranded_test()
-  channel = ParseJson(ReadAsciiFile("pkg:/source/tests/rooibos/units/channel.json"))
   posterUrl = m.translate.generateChannelPosterUrl("")
   m.assertEqual(posterUrl, m.constants.urls.channelPosterUnbranded)
   posterUrl = m.translate.generateChannelPosterUrl(invalid)

@@ -15,7 +15,7 @@ Function init()
   ' Non-OpenGL slow devices look really poor with clunky spinner
   ' https://developer.roku.com/en-gb/docs/specs/hardware.md
   loadingMessage = m.top.findNode("LoadingMessage")
-  LoadingMessage.text = getTranslation("loadingIndicator")
+  loadingMessage.text = getTranslation("loadingIndicator")
   if m.limitedUi <> true
     m.Animation = m.top.findNode("SpinnerAnimation")
     m.top.observeField("visible", "onVisibilityChange")

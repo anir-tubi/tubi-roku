@@ -1,4 +1,4 @@
-'@TestSuite [TubiCache] TubiCache.brs 
+'@TestSuite [TubiCache] TubiCache.brs
 
 '@Setup
 Function TubiCacheSetup()
@@ -291,7 +291,7 @@ Function tubiCache_deleteFromContentCacheOrder_test()
   m.assertTrue(m.cache.contentCacheOrder.count() = 2)
   m.assertTrue(m.cache.contentCacheOrder[0].id <> "test_content1" )
   m.assertTrue(m.cache.contentCacheOrder[1].id <> "test_content1" )
-  
+
   ' check deleting the middle of the order
   m.cache.emptyContentCache()
   content1 = m.generateNodeTree(2, 1) 'creates 2 nodes
@@ -383,7 +383,7 @@ Function tubiCache_getLruContentFromCache_test()
 
   ' getting content from cache moves the content to the most recently used position in the cache
   ' as long as it is not "permanent" (content2 is "permanent")
-  cc = m.cache.getFromContentCache("content1")
+  m.cache.getFromContentCache("content1")
   lruCachedContent = m.cache.getLruContentFromCache()
   m.assertTrue(lruCachedContent.isSameNode(content3))
 End Function
@@ -420,7 +420,7 @@ Function tubiCache_isOnlyPermanentCacheRemaining_test()
 
   ' test with one cached content as "permanent"
   m.cache.permanentContentIds["content1"] = true
-  
+
   content1 = m.generateNodeTree(2, 1)
   content1.id = "content1"
   content2 = m.generateNodeTree(2, 1)
@@ -437,7 +437,7 @@ Function tubiCache_isOnlyPermanentCacheRemaining_test()
   m.cache.permanentContentIds["content1"] = true
   m.cache.permanentContentIds["content2"] = true
   m.cache.permanentContentIds["content3"] = true
-  
+
   content1 = m.generateNodeTree(2, 1)
   content1.id = "content1"
   content2 = m.generateNodeTree(2, 1)
@@ -448,7 +448,7 @@ Function tubiCache_isOnlyPermanentCacheRemaining_test()
   m.cache.setInContentCache(content1)
   m.cache.setInContentCache(content2)
   m.cache.setInContentCache(content3)
-  
+
   m.assertTrue(m.cache.isOnlyPermanentCacheRemaining())
   m.cache.emptyContentCache()
 End Function

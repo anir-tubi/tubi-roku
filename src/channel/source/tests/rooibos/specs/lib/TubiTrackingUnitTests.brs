@@ -1,4 +1,4 @@
-'@TestSuite [TubiTracking] TubiTracking.brs 
+'@TestSuite [TubiTracking] TubiTracking.brs
 
 '@Setup
 Function TubiTrackingSetup()
@@ -11,7 +11,7 @@ Function tubiTracking_createTubiTracking_testHelper()
   request = TubiRequest()
   auth = TubiAuth(constants, request)
   tracking = TubiTracking(constants, request, auth)
-  return Tracking
+  return tracking
 End Function
 
 
@@ -24,7 +24,7 @@ End Function
 Function tubiTracking_getAnalyticsRequestIdempotency_test()
   Tracking = m.Tracking
   idempotency = Tracking.getAnalyticsRequestIdempotency()
-  
+
   'test that the key named "key" exists and the value is a string
   m.assertNotInvalid(idempotency.key)
   m.assertTrue(type(idempotency.key) = "roString" or type(idempotency.key) = "String")
@@ -53,7 +53,6 @@ End Function
 
 '@Test getAnalyticsUser unit tests
 Function tubiTracking_getAnalyticsUser_test()
-  deviceInfo = CreateObject("roDeviceInfo")
   Tracking = m.Tracking
   user = Tracking.getAnalyticsUser()
 
@@ -251,7 +250,7 @@ End Function
 Function tubiTracking_getAnalyticsTile_test()
   Tracking = m.Tracking
   content = CreateObject("roSGNode", "TubiContentNode")
-  
+
   'test series with correct id format
   content.type = "series"
   content.id = "0123"
@@ -498,7 +497,7 @@ Function tubiTracking_populateMessage_test()
 End Function
 
 
-'@Test isEmptyValue unit tests 
+'@Test isEmptyValue unit tests
 Function tubiTracking_isEmptyValue_test()
   Tracking = m.Tracking
 
@@ -533,7 +532,7 @@ Function tubiTracking_isEmptyValue_test()
 End Function
 
 
-'@Test isNumeric unit tests 
+'@Test isNumeric unit tests
 Function tubiTracking_isNumeric_test()
   Tracking = m.Tracking
 

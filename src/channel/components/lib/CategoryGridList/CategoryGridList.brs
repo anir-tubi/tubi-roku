@@ -256,7 +256,7 @@ Function setRowHeights()
       rowItemSize.push([posterWidth,posterHeight])
       rowHeight = posterHeight
       showRowLabel.push(true)
-    else if category.gridItemType = m.constants.ui.gridItemTypes.vitg   
+    else if category.gridItemType = m.constants.ui.gridItemTypes.vitg
       rowHeightAdjustment = 122
       posterWidth = m.constants.ui.imageSizes.vitg[0]
       posterHeight = m.constants.ui.imageSizes.vitg[1]
@@ -414,7 +414,7 @@ Function onCategoryResponseInBatch(msg) As Void
     ' so we need to reverse the order of the nodes before iterating over them,
     ' such that when iterating from end to beginning, the order is the same as
     ' iterating from beginning to end without pre-reversing the nodes.
-    subType = response.subtype()
+    subtype = response.subtype()
     reverseOrder = CreateObject("roSGNode", subtype)
 
     for i = response.getChildCount() - 1 to 0 step -1

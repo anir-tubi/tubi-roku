@@ -1,4 +1,4 @@
-'@TestSuite [TubiRequestQueue] RequestQueue.brs 
+'@TestSuite [TubiRequestQueue] RequestQueue.brs
 
 '@Setup
 Function TubiRequestQueueSetup()
@@ -19,7 +19,7 @@ End Function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-'@Test create unit tests 
+'@Test create unit tests
 Function tubiRequestQueue_create_test()
   m.AssertNotInvalid(TubiRequestQueue().create(m.port))
 End Function
@@ -28,7 +28,7 @@ End Function
 '@Test pushRequest unit tests
 Function tubiRequestQueue_pushRequest_test()
   q = TubiRequestQueue().create(m.port)
-  id = q.pushRequest(m.request)
+  q.pushRequest(m.request)
   m.AssertEqual(q.Count(), 1)
 End Function
 
@@ -36,7 +36,7 @@ End Function
 '@Test cancelRequest unit tests
 Function tubiRequestQueue_cancelRequest_test()
   q = TubiRequestQueue().create(m.port)
-  id = q.pushRequest(m.request)
+  q.pushRequest(m.request)
   m.AssertEqual(q.Count(), 1)
 
   q.cancelRequest(m.request)
@@ -58,7 +58,7 @@ Function tubiRequestQueue_maxSize_test()
   q = TubiRequestQueue().create(m.port, 1)
   r1 = m.request
 
-  confirm1 = q.pushRequest(r1)
+  q.pushRequest(r1)
   m.AssertEqual(q.Count(), 1)
 
   r2 = TubiRequest().createAsync(m.sLocalHostURL)

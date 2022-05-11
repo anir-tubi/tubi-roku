@@ -1,4 +1,4 @@
-'@TestSuite [CmsApi] CmsApi.brs 
+'@TestSuite [CmsApi] CmsApi.brs
 
 '@Setup
 Function CmsApiSetup()
@@ -295,7 +295,7 @@ Function cmsApi_homeScreenReqInfo_test()
     headers: {
       "x-tubi-inject-live-news": "true"
       "x-custom-header": "custom_header_value"
-      "x-client-platform": m.cmsApi.constants.headers.commonUapi["x-client-platform"] 
+      "x-client-platform": m.cmsApi.constants.headers.commonUapi["x-client-platform"]
       "x-client-version": m.cmsApi.constants.headers.commonUapi["x-client-version"]
     }
   }
@@ -477,7 +477,7 @@ Function cmsApi_categoryReqInfo_test()
     headers: {
       "x-tubi-inject-live-news": "false"
       "x-custom-header": "custom_header_value"
-      "x-client-platform": m.cmsApi.constants.headers.commonUapi["x-client-platform"] 
+      "x-client-platform": m.cmsApi.constants.headers.commonUapi["x-client-platform"]
       "x-client-version": m.cmsApi.constants.headers.commonUapi["x-client-version"]
     }
   }
@@ -831,9 +831,6 @@ Function cmsApi_setTupianPosterParam_test()
     is_existing: true
   }
 
-  imageTypes = [
-    "poster"
-  ]
   updatedParams = m.cmsApi.setTupianPosterParam(existingParams)
 
   m.assertNotInvalid(updatedParams.userid)

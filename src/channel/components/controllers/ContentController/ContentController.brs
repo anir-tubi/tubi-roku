@@ -1764,14 +1764,14 @@ Function onFullscreenCountdown()
         screen.fullscreenCountdown = nNewCount
       end if
       if nNewCount <= 0
-        selectLinearContent(Screen.contentFocused)
+        selectLinearContent(screen.contentFocused)
       end if
     else if isAnEpgScreen(screen) = true
-      nCurrentCount = Screen.fullscreenCountdown
+      nCurrentCount = screen.fullscreenCountdown
       nNewCount = nCurrentCount - 1
       screen.fullscreenCountdown = nNewCount
       if nNewCount <= 0
-        selectLinearContent(Screen.linearChannelToPlay)
+        selectLinearContent(screen.linearChannelToPlay)
       end if
     end if
   end if

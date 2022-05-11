@@ -67,7 +67,7 @@ Function onPush(msg)
           end if
         end if
 
-        stackTop = getCurrent()
+        stackTop = getCurrent() 'bs:disable-line LINT1005
       end while
     end if
 

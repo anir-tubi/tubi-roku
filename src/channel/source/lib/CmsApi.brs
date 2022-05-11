@@ -409,7 +409,7 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
               params: {}
             }
 
-            if homescreen.contentMode = m.constants.ui.contentMode.homescreen
+            if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
               contentModeValue = ""
             else
               contentModeValue = homeScreen.contentMode

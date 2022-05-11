@@ -1,4 +1,4 @@
-'@TestSuite [StringUtils] StringUtils.brs 
+'@TestSuite [StringUtils] StringUtils.brs
 
 '@Setup
 Function StringUtilsSetup()
@@ -13,7 +13,7 @@ End Function
 '@Test padString unit tests
 Function stringUtils_padString_test()
   ' since we use this for transport time, test with time values
-  for i=0 to 60 
+  for i=0 to 60
     padded = padString(stri(i), 2, "0")
     m.AssertEqual(padded.len(), 2)
   end for
@@ -66,7 +66,7 @@ Function stringUtils_formatLengthAsTimestamp_test()
     m.AssertNotEqual(formatted, "")
     m.AssertTrue(formatted.len() > 6)
   end for
-End Function 
+End Function
 
 
 '@Test formatLengthAsEnglish unit tests
@@ -130,7 +130,7 @@ Function stringUtils_getUrlParts_test()
   m.assertEqual(paramsAA["opt_out"], "1")
   m.assertEqual(paramsAA["pub_id"], "0a2ada522f8db273c200b95eee98d316")
   m.assertEqual(paramsAA["adv_id"], "e85365f8-e632-510f-bd8a-6352696879ca")
-  
+
 End Function
 
 
@@ -158,8 +158,8 @@ Function stringUtils_replaceURLParameter_test()
   m.assertTrue(convertedURL_good2.Instr("cb=XYZ") >= 0)
 
 
-  '//the following URLs do not have the "cb" param so it is expected to return the same "URL" as what was put in 
-  m.assertEqual(goodUrl3, goodUrl3)
+  '//the following URLs do not have the "cb" param so it is expected to return the same "URL" as what was put in
+  m.assertEqual(goodUrl3, convertedURL_good3)
   m.assertEqual(badUrl1, convertedURL_bad1)
   m.assertEqual(badUrl2, convertedURL_bad2)
   m.assertEqual(badUrl3, convertedURL_bad3)
@@ -188,14 +188,14 @@ End Function
 '@Test convertFunctionToString unit tests
 Function stringUtils_convertFunctionToString_test()
 
-  functionStr = convertFunctionToString(onBookmarkedAfterSignIn)
+  functionStr = convertFunctionToString(loadPackagedComponents)
   m.assertNotInvalid(functionStr)
-  m.assertEqual(LCASE(functionStr), LCASE("onBookmarkedAfterSignIn"))
+  m.assertEqual(LCASE(functionStr), LCASE("loadPackagedComponents"))
 
-  functionStr = convertFunctionToString("onBookmarkedAfterSignIn")
+  functionStr = convertFunctionToString("loadPackagedComponents")
   m.assertNotInvalid(functionStr)
-  m.assertEqual(functionStr, "")  
-  
+  m.assertEqual(functionStr, "")
+
 End Function
 
 
@@ -208,7 +208,7 @@ Function stringUtils_GetAMPMTimeString_test()
 
   dt.fromSeconds(1636171870)
   m.AssertEqual(GetAMPMTimeString(dt), "4:11 AM")
-  
+
   dt.fromSeconds(1636891870)
   m.AssertEqual(GetAMPMTimeString(dt), "12:11 PM")
 

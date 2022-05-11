@@ -1,9 +1,9 @@
 '@SGNode Test_VideoPlayer
-'@TestSuite [VideoPlayerHelpers] VideoPlayerHelpers in VideoPlayer.brs 
+'@TestSuite [VideoPlayerHelpers] VideoPlayerHelpers in VideoPlayer.brs
 
 '@Setup
 Function VideoPlayerSetup()
-  m.mockVideo = createObject("roSGNode", "Group") 
+  m.mockVideo = createObject("roSGNode", "Group")
   m.mockVideo.addField("state", "string", false)
 End Function
 
@@ -21,7 +21,7 @@ Function isActiveVideoState_test()
 
     videoState = "pause"
     m.AssertTrue(isActiveVideoState(videoState, video))
-    
+
     videoState = "rew"
     m.AssertTrue(isActiveVideoState(videoState, video))
 
@@ -43,7 +43,7 @@ Function isActiveVideoState_test()
 
     videoState = "pause"
     m.AssertFalse(isActiveVideoState(videoState, video))
-    
+
     videoState = "rew"
     m.AssertFalse(isActiveVideoState(videoState, video))
 
@@ -58,14 +58,14 @@ Function isActiveVideoState_test()
 
     videoState = "skip"
     m.AssertFalse(isActiveVideoState(videoState, video))
-  
+
   video.state = "playing"
     videoState = "play"
     m.AssertTrue(isActiveVideoState(videoState, video))
 
     videoState = "pause"
     m.AssertTrue(isActiveVideoState(videoState, video))
-    
+
     videoState = "rew"
     m.AssertTrue(isActiveVideoState(videoState, video))
 
@@ -80,14 +80,14 @@ Function isActiveVideoState_test()
 
     videoState = "skip"
     m.AssertTrue(isActiveVideoState(videoState, video))
-  
+
   video.state = "paused"
     videoState = "play"
     m.AssertTrue(isActiveVideoState(videoState, video))
 
     videoState = "pause"
     m.AssertTrue(isActiveVideoState(videoState, video))
-    
+
     videoState = "rew"
     m.AssertTrue(isActiveVideoState(videoState, video))
 
@@ -102,14 +102,14 @@ Function isActiveVideoState_test()
 
     videoState = "skip"
     m.AssertTrue(isActiveVideoState(videoState, video))
-  
+
   video.state = "stopped"
     videoState = "play"
     m.AssertFalse(isActiveVideoState(videoState, video))
 
     videoState = "pause"
     m.AssertFalse(isActiveVideoState(videoState, video))
-    
+
     videoState = "rew"
     m.AssertFalse(isActiveVideoState(videoState, video))
 
@@ -124,14 +124,14 @@ Function isActiveVideoState_test()
 
     videoState = "skip"
     m.AssertFalse(isActiveVideoState(videoState, video))
-  
+
   video.state = "finished"
     videoState = "play"
     m.AssertTrue(isActiveVideoState(videoState, video))
 
     videoState = "pause"
     m.AssertTrue(isActiveVideoState(videoState, video))
-    
+
     videoState = "rew"
     m.AssertTrue(isActiveVideoState(videoState, video))
 
@@ -146,14 +146,14 @@ Function isActiveVideoState_test()
 
     videoState = "skip"
     m.AssertTrue(isActiveVideoState(videoState, video))
-  
+
   video.state = "error"
     videoState = "play"
     m.AssertTrue(isActiveVideoState(videoState, video))
 
     videoState = "pause"
     m.AssertTrue(isActiveVideoState(videoState, video))
-    
+
     videoState = "rew"
     m.AssertTrue(isActiveVideoState(videoState, video))
 
@@ -168,8 +168,6 @@ Function isActiveVideoState_test()
 
     videoState = "skip"
     m.AssertTrue(isActiveVideoState(videoState, video))
-
-  return test
 End Function
 
 
@@ -185,6 +183,4 @@ Function isButtonPressAllowed_test()
   video.state = "stopped"
   videoState = "play"
   m.AssertFalse(isButtonPressAllowed("OK", videoState, video))
-  
-  return test
 End Function

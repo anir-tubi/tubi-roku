@@ -238,7 +238,7 @@ Function onEmailExistsError(errorResponse)
 
   if simpleModalInfo <> invalid and simpleModalInfo.buttonInfo <> invalid and simpleModalInfo.buttonInfo[0] <> invalid
     simpleModalInfo.buttonInfo[0].callbackParams = {
-      email : requestInput.email,
+      email : requestInput.email
       emailType : requestInput.emailType
     }
   end if

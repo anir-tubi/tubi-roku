@@ -830,7 +830,7 @@ Function onBookmarkedAfterSignIn(msg) As Void
     ' re-fetch homescreen content when user signedIn
     homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
     if homeScreen <> invalid
-      fetchHomescreen(homescreen)
+      fetchHomescreen(homeScreen)
     end if
 
     tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
@@ -1136,7 +1136,7 @@ End function
 Function setComponentInteractionEventForSignUp(screen)
   tubiLog("DetailScreenHelper.setComponentInteractionEventForSignUp")
   componentValues = {
-    button_type: 1, '0-UNKNOWN, 1-TEXT, 2-DROPDOWN, 3-IMAGE
+    button_type: 1 '0-UNKNOWN, 1-TEXT, 2-DROPDOWN, 3-IMAGE
     button_value: "SIGNUP_TO_SAVE_PROGRESS" 'Button value is always upper case and concatinated by "_"
   }
   pageInfo = screen.trackingPageInfo

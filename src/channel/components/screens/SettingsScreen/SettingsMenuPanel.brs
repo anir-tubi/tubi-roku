@@ -89,13 +89,13 @@ End Function
 
 Function removeSignInButton()
   signInOutButton = m.top.findNode("SignInOutButton")
-  removeButton(SignInOutButton)
+  removeButton(signInOutButton)
 End Function
 
 
 Function removeDoNotSellButton()
   doNotSellPolicyButton = m.top.findNode("DoNotSellPolicyButton")
-  removeButton(DoNotSellPolicyButton)
+  removeButton(doNotSellPolicyButton)
 End Function
 
 

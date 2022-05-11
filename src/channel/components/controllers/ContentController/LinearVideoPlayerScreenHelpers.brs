@@ -911,8 +911,9 @@ End Function
 
 Function onChannelGuideFetchError(response)
   tubiLog("LinearVideoPlayerScreenHelpers.onChannelGuideFetchError")
+  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   '//Only show an error modal if the channel guide is still visible
-  if videoPlayer.displayingChannelGuide = true
+  if videoPlayer <> invalid and videoPlayer.displayingChannelGuide = true
     errorMessage = getTranslation("channelGuide_error_fetchContent_description")
     errorCode = getUserFacingErrorCode(m.constants.errors.context.linearPlayerScreen, m.constants.errors.subtypes.fetchError, response.code)
 

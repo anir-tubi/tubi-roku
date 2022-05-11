@@ -279,7 +279,7 @@ Function onSingleChannelFetchForDeeplinkSuccess(successResponse, storeInCache=fa
     else
       ' once the channel has been fetched and then set it in the cache to be used by EPG/homeScreen
       if storeInCache = true
-        bSet = setInContentCache(linearContent)
+        setInContentCache(linearContent)
       end if
 
       'if linear EPG experiment is on, then show epg Screen for linear content
@@ -386,10 +386,10 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
     campaign: deepLinkContent.campaign
     source: deepLinkContent.source
     medium: deepLinkContent.medium
-    source_device_id: deeplinkContent.sourceDeviceId
+    source_device_id: deepLinkContent.sourceDeviceId
   }
 
-  if (deeplinkContent.type = m.constants.ui.contentTypes.linear or deepLinkContent.type = m.constants.ui.contentTypes.video or (deepLinkContent.type = "series" and deeplinkContent.deeplinkType = "series")) and deepLinkContent.id <> invalid and deeplinkContent.id <> ""
+  if (deepLinkContent.type = m.constants.ui.contentTypes.linear or deepLinkContent.type = m.constants.ui.contentTypes.video or (deepLinkContent.type = "series" and deepLinkContent.deeplinkType = "series")) and deepLinkContent.id <> invalid and deepLinkContent.id <> ""
     pageInfo = {
       pageType: "video_player_page"
       pageValues: {
@@ -426,7 +426,7 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
     referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_LINEAR"})
   else if entryPoint = m.constants.deeplinks.entryPoints.episodeList
     if deepLinkContent <> invalid
-      seriesId = deeplinkContent.id.toInt()
+      seriesId = deepLinkContent.id.toInt()
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("episode_video_list_page", { series_id: seriesId })
     end if
   else if entryPoint =  m.constants.deeplinks.entryPoints.video and pageInfo <> invalid

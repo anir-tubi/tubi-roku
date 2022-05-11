@@ -269,7 +269,7 @@ Function refreshScreenAfterParentalChanges()
     if isLoggedInUser(authInfo) and authInfo.parentalrating <> invalid
       homeScreen.parentalRating = authInfo.parentalrating
     end if
-    fetchHomescreen(homescreen)
+    fetchHomescreen(homeScreen)
   end if
 
   setContentToRefresh(m.constants.ui.screenIds.tvScreen)

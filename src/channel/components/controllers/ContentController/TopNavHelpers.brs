@@ -161,7 +161,7 @@ Function onNavigatedFromTopNavToSideNav(msg)
 End Function
 
 
-Function sendTopNavToSideNavNavigationEvent(screen, sidenav)
+Function sendTopNavToSideNavNavigationEvent(screen, sideNav)
   if screen <> invalid and sideNav <> invalid
     focusedNavId = m.constants.ui.screenIdToSideNavId[screen.id]
     buttonID = m.Tracking.sideNavPageMap[focusedNavId]

@@ -429,7 +429,7 @@ Function tubiAuth_handleRefreshResponse_test()
       if type(msg) = "roSocketEvent"
 
         connection = server.accept()
-        buffer = connection.receiveStr(1024)
+        connection.receiveStr(1024)
 
         response =            "HTTP/1.1 200 OK" + Chr(13) + Chr(10)
         response = response + "Content-length: " + stri(json.len()) + Chr(13) + Chr(10)
@@ -479,7 +479,7 @@ Function tubiAuth_handleRefreshResponse_403()
       if type(msg) = "roSocketEvent"
 
         connection = server.accept()
-        buffer = connection.receiveStr(1024)
+        connection.receiveStr(1024)
 
         response =            "HTTP/1.1 403 Forbidden" + Chr(13) + Chr(10)
         response = response + "Content-length: 0" + Chr(13) + Chr(10)

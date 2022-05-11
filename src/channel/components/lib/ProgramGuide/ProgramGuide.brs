@@ -16,7 +16,7 @@ Function init()
   end if
   m.playOnFocusMode = true
   m.lastFocused = -1
-  
+
   m.programGrid.observeFieldScoped("currFocusRow", "onRowFocused")
   m.top.observeFieldScoped("jumpToLinearChannelID", "onJumpToLinearChannelID")
   m.top.observeFieldScoped("EPGFullMode", "onDisplayModeChange")
@@ -61,7 +61,7 @@ Function onProgramGridContentFocused(msg)
     row = rowItemFocused[0] + 1
     col = rowItemFocused[1] + 1
     m.lastItemFocused = rowItemFocused
-    
+
     pageType = ""
     if m.top.trackingPageInfo <> invalid and m.top.trackingPageInfo.pagetype <> invalid
       pageType = m.top.trackingPageInfo.pagetype
@@ -79,13 +79,13 @@ Function onProgramGridContentFocused(msg)
       horizontal_location: col
     }
     m.top.navigateWithinPageInfo = navigateWithinPageInfo
-   
+
   end if
 
   if itemPosition <> invalid and itemPosition.count() = 2
-    channel = ChannelItem.content.getChild(itemPosition[0])
+    channel = channelItem.content.getChild(itemPosition[0])
     if m.playOnFocusMode = true or m.top.linearChannelToPlay = invalid 'anytime linearChannelToPlay is invalid, assign focused channel to play?
-      if channel <> invalid and channel.videoResources <> invalid 
+      if channel <> invalid and channel.videoResources <> invalid
         m.top.linearChannelToPlay = channel
         m.top.linearChannelToPlayUpdated = true
       end if
@@ -138,7 +138,7 @@ End Function
 
 Function onContentChanged()
   tubiLog("ProgramGuide.onContentChanged")
-  
+
   if m.top.content <> invalid
     m.programGrid.content = m.top.content
     m.channelsGrid.content = m.top.content
@@ -153,7 +153,7 @@ Function onTimeGridFocusChange()
     if m.updateMinsLeftTimer.control <> "start"
       m.updateMinsLeftTimer.control = "start"
       if m.programGrid.content <> invalid
-        'UpdateMinsLeftTimer might take a whole min to update after content has been rendered. 
+        'UpdateMinsLeftTimer might take a whole min to update after content has been rendered.
         'Call this function to ensure current program shows how much time left on the program on every time timeGrid first gets focus.
         onUpdateMinsLeftTimer()
       end if
@@ -168,8 +168,8 @@ Function onRowFocused(msg)
   tubiLog("ProgramGrid.onRowFocused")
   focusPos = msg.getData()
   newFocus = Int(focusPos)
-  if focusPos > m.programGrid.itemUnfocused 
-    if newFocus < focusPos 
+  if focusPos > m.programGrid.itemUnfocused
+    if newFocus < focusPos
       newFocus += 1
     end if
   end if
@@ -181,7 +181,7 @@ Function onRowFocused(msg)
 End Function
 
 
-'based on m.top.jumpToLinearChannelID, this function will jump to channel 
+'based on m.top.jumpToLinearChannelID, this function will jump to channel
 Function onJumpToLinearChannelID()
   tubiLog("ProgramGuide.onJumpToLinearChannelID")
   if m.programGrid.content <> invalid and m.top.jumpToLinearChannelID <> invalid and m.top.jumpToLinearChannelID.count() = 2
@@ -194,7 +194,7 @@ Function onJumpToLinearChannelID()
           m.top.linearChannelFocused = program
           '//::TODO:: EPG - why doesn't setting of linearChannelFocusedUpdated trigger EPGScreen.onLinearChannelFocused from calling?
           m.top.linearChannelFocusedUpdated = true
-          
+
           if m.top.shouldSendComponentInteractionEventOnJumpToLinearChannelId = true
             m.top.shouldSendComponentInteractionEventOnJumpToLinearChannelId = false
             rowNum = i + 1
@@ -274,7 +274,7 @@ Function onOkPressed()
 End Function
 
 
-'TODO : We would like to refactor this functionality in future.  
+'TODO : We would like to refactor this functionality in future.
 'Currently this function is taking the request from outside(EPGScreen) and setting the focused item as  'LinearchannelToPlay'
 'this functionality is required to handle situations where EPG is asked to behave differently in 'PlayOnSelect' Mode.
 'for example when EPG starts, without user selecting a channel, EPGScreen needs to play first channel in minimized window.
@@ -283,7 +283,7 @@ End Function
 
 Function onSetFocusedToPlay()
   tubilog("ProgramGrid.onSetFocusedToPlay")
-  if m.top.linearChannelFocused <> invalid 
+  if m.top.linearChannelFocused <> invalid
     m.top.linearChannelToPlay = m.top.linearChannelFocused.getParent()
     m.top.linearChannelToPlayUpdated = true
   end if
@@ -327,7 +327,7 @@ Function doesSendEvent(lastItemFocused, rowItemFocused)
     'to avoid duplicates, when onProgramGridContentFocused() gets invoked twice.
     if rowItemFocused[1] = lastItemFocused[1] and rowItemFocused[0] = lastItemFocused[0]
       isEqual = false
-    'this will avoid the duplicate events when up/down navigation, as the item 
+    'this will avoid the duplicate events when up/down navigation, as the item
     'jumped to [currentRowFocused, 0] and then jump to the correct item.
     else if rowItemFocused[1] = 0 and rowItemFocused[0] = lastItemFocused[0] and (m.programGrid.kepPressed = "up" or m.programGrid.kepPressed = "down")
       isEqual = false
