@@ -25,7 +25,12 @@ Function onItemContentChange()
       'calculated width we are assigning the title and badgeText to the m.DetailsMenuText and get the calculated value
       'and after setting the calculatedWidth resetting m.DetailsMenuText.text to title.
       m.DetailsMenuText.text = m.top.itemContent.title + m.top.itemContent.badgeText
-      m.top.calculatedTextWidth = m.DetailsMenuText.boundingRect().width
+      iconWidth = 0
+      'adding extra width for focus if icon is present
+      if m.top.itemContent.iconUrl <> invalid and m.top.itemContent.iconUrl <> ""
+        iconWidth = 36
+      end if
+      m.top.calculatedTextWidth = m.DetailsMenuText.boundingRect().width + iconWidth
       m.DetailsMenuText.text = m.top.itemContent.title
     else
       m.DetailsMenuText.text = m.top.itemContent.title

@@ -36,7 +36,7 @@ Function onIconChange()
     else if sIconID = "checkmark"
       m.Icon.uri = "pkg:/images/icon-checkmark.png"
     else if sIconID = "about"
-      m.Icon.uri = "pkg:/images/icon-about.png"
+      m.Icon.uri = "pkg:/images/icon-about.webp"
     end if
   end if
 End Function

@@ -162,31 +162,31 @@
     <!-- All the potential menu items, will be dynamically added or removed based on 'content' -->
     <DetailMenuItemContentNode
       id="ResumeMenuItem"
-      iconUrl="pkg:/images/icon-resume.png"/>
+      iconUrl="pkg:/images/icon-resume.webp"/>
     <DetailMenuItemContentNode
       id="PlayMenuItem"
-      iconUrl="pkg:/images/icon-play.png" />
+      iconUrl="pkg:/images/icon-play.webp" />
     <DetailMenuItemContentNode
       id="EpisodesMenuItem"
-      iconUrl="pkg:/images/icon-all-episodes.png" />
+      iconUrl="pkg:/images/icon-all-episodes.webp" />
     <DetailMenuItemContentNode
       id="AddQueueMenuItem"
-      iconUrl="pkg:/images/icon-add-to-queue.png" />
+      iconUrl="pkg:/images/icon-add-to-queue.webp" />
     <DetailMenuItemContentNode
       id="RemoveQueueMenuItem"
-      iconUrl="pkg:/images/icon-remove-from-queue.png" />
+      iconUrl="pkg:/images/icon-remove-from-queue.webp" />
     <DetailMenuItemContentNode
       id="RemoveHistoryMenuItem"
-      iconUrl="pkg:/images/icon-remove-from-history.png" />
+      iconUrl="pkg:/images/icon-remove-from-history.webp" />
     <DetailMenuItemContentNode
       id="ChannelMenuItem"
       iconUrl="pkg:/images/icon-channel.png" />
     <DetailMenuItemContentNode
       id="WatchTrailerMenuItem"
-      iconUrl="pkg:/images/icon-trailer.png" />
+      iconUrl="pkg:/images/icon-trailer.webp" />
     <DetailMenuItemContentNode
       id="signUpMenuItem"
-      iconUrl="" />
+      iconUrl="pkg:/images/icon-sign-in.webp" />
 
     <Poster
       id="leftChevron"

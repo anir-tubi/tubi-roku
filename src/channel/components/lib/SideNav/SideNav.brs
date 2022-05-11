@@ -63,7 +63,7 @@ Function createMainContent(item)
     contentNode.iconUrl = "pkg:/images/sideNavSearch.png"
   else if item = m.constants.ui.sideNavIds.home
     contentNode.title = getTranslation("menu_home")
-    contentNode.iconUrl = "pkg:/images/sideNavHome.png"
+    contentNode.iconUrl = "pkg:/images/sideNavHome.webp"
   else if item = m.constants.ui.sideNavIds.movies
     contentNode.title = getTranslation("menu_movies")
     contentNode.iconUrl = "pkg:/images/sideNavMovies.png"
@@ -81,13 +81,13 @@ Function createMainContent(item)
     contentNode.iconUrl = "pkg:/images/sideNavLinearTV.png"
   else if item = m.constants.ui.sideNavIds.myList
     contentNode.title = getTranslation("menu_mylist")
-    contentNode.iconUrl = "pkg:/images/sideNavMyList.png"
+    contentNode.iconUrl = "pkg:/images/icon-add-to-queue.webp"
   else if item = m.constants.ui.sideNavIds.categories
     contentNode.title = getTranslation("menu_categories")
-    contentNode.iconUrl = "pkg:/images/sideNavCategories.png"
+    contentNode.iconUrl = "pkg:/images/sideNavCategories.webp"
   else if item = m.constants.ui.sideNavIds.channels
     contentNode.title = getTranslation("menu_channels")
-    contentNode.iconUrl = "pkg:/images/sideNavChannels.png"
+    contentNode.iconUrl = "pkg:/images/sideNavChannels.webp"
   else if item = m.constants.ui.sideNavIds.profile
     ' m.top.stringSignIn may have been set before SideNav.createMainContent() was called
     ' so use it if it exists
@@ -96,10 +96,10 @@ Function createMainContent(item)
     else
       contentNode.title = getTranslation("menu_signIn")
     end if
-    contentNode.iconUrl = "pkg:/images/sideNavProfile.png"
+    contentNode.iconUrl = "pkg:/images/icon-sign-in.webp"
   else if item = m.constants.ui.sideNavIds.settings
     contentNode.title = getTranslation("menu_settings")
-    contentNode.iconUrl = "pkg:/images/sideNavSettings.png"
+    contentNode.iconUrl = "pkg:/images/sideNavSettings.webp"
   else if item = m.constants.ui.sideNavIds.exit
     contentNode.title = getTranslation("menu_exit")
     contentNode.iconUrl = "pkg:/images/sideNavExit.png"

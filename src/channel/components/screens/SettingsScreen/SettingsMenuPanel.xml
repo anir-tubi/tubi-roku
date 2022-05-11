@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <component name="SettingsMenuPanel" extends="ListPanel" >
   <script type="text/brightscript" uri="SettingsMenuPanel.brs"/>
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
@@ -35,22 +35,22 @@
           role="content">
           <DetailMenuItemContentNode
             id="ParentalControlsButton"
-            iconUrl="pkg:/images/icon-parental.png" />
+            iconUrl="pkg:/images/icon-parental.webp" />
           <DetailMenuItemContentNode
             id="AboutButton"
-            iconUrl="pkg:/images/icon-about.png" />
+            iconUrl="pkg:/images/icon-about.webp" />
           <DetailMenuItemContentNode
             id="PrivacyPolicyButton"
-            iconUrl="pkg:/images/icon-privacy.png" />
+            iconUrl="pkg:/images/icon-privacy.webp" />
           <DetailMenuItemContentNode
             id="TermsOfServiceButton"
-            iconUrl="pkg:/images/icon-terms.png" />
+            iconUrl="pkg:/images/icon-terms.webp" />
           <DetailMenuItemContentNode
             id="DoNotSellPolicyButton"
-            iconUrl="pkg:/images/icon-dns.png" />
+            iconUrl="pkg:/images/icon-dns.webp" />
           <DetailMenuItemContentNode
             id="SignInOutButton"
-            iconUrl="pkg:/images/icon-sign-in.png" />
+            iconUrl="pkg:/images/icon-sign-in.webp" />
         </ContentNode>
       </MarkupGrid>
     </Group>
