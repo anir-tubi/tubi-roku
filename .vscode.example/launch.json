@@ -18,6 +18,7 @@
     "files": [
       "**/*"
     ],
+    "injectRdbOnDeviceComponent": true,
     "componentLibrariesPort": 8090,
     "componentLibraries": [{
       "rootDir": "${workspaceFolder}/build/starter/",
@@ -38,5 +39,26 @@
         "${workspaceFolder}/src/channel/"
       ]
     }]
+  }, {
+    "name": "Debug Gulp Command",
+    "type": "node",
+    "request": "launch",
+    "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
+    "args": ["${input:gulpCommands}"],
+    "cwd": "${workspaceRoot}",
+    "runtimeArgs": [
+      "--nolazy"
+    ],
+    "console": "integratedTerminal"
+  }],
+  "inputs": [{
+    "id": "gulpCommands",
+    "description": "Name of Gulp command",
+    "default": "addMissingImages",
+    "type": "pickString",
+    "options": [
+      "build",
+      "addMissingImages"
+    ]
   }]
 }

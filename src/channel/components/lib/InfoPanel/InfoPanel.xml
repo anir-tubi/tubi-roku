@@ -407,7 +407,7 @@
       visible="false" >
       <Poster
         id="FullscreenIcon"
-        uri="pkg:/images/icon-fullscreen.png"
+        uri="pkg:/images/icon-fullScreen.png"
         width="30"
         height="26"
         loadDisplayMode="scaleToFit"

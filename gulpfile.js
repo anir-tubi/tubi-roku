@@ -4,7 +4,6 @@ const del = require('del');
 const fs = require('fs');
 const debug = require('gulp-debug-streams');
 const dedupe = require('gulp-dedupe');
-const gulpif = require('gulp-if');
 const replace = require('gulp-replace');
 const { server, serverClose } = require('gulp-connect');
 const filter = require('gulp-filter');
@@ -34,7 +33,7 @@ const {listUnusedImages,listUnusedTranslations} = require('./js/codeclean.js');
 const {NoStackError} = require('./js/utilities')
 
 // Importing functions with Git functionality
-const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotInProduction} = require('./js/git');
+const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotInProduction, addMissingImagesToRemoteLibrary} = require('./js/git');
 
 /* Allow some environment variables to drive which config we're building.
    Environment variables are set on options, along with any parameters passed in
@@ -698,6 +697,7 @@ exports.stage = series(setStaging, exports.build, packageAll, pushStaging);
 exports.releaseOnGithub = series(tagBuild, pushTag, createGithubRelease);
 exports.release = series(confirmRelease, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub);
 exports.compare = findCommitsNotInProduction;
+exports.addMissingImages = addMissingImagesToRemoteLibrary
 
 //command lines related to the crowdin language translations
 exports.update_local_translations = updateLocalTranslations;

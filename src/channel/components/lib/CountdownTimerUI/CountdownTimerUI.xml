@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- 
+<!--
   CountdownTimerUI
   The CountdownTimer is the UI representation of the countdown timer. It will display how many seconds are left.
   ::TODO:: EPG - when the EPG experiment gets graduated, consider placing the code/logic of the m.LinearCountdownTimer within this component so the ControlController has less code.
@@ -11,7 +11,7 @@
   <script type="text/brightscript" uri="CountdownTimerUI.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
-  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />  
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
   <interface>
@@ -27,7 +27,7 @@
       <field id="width" type="float"/>
 
   </interface>
-  <children> 
+  <children>
     <Group
       id="CountdownTimerParent"
       opacity="0">
@@ -44,7 +44,7 @@
         itemSpacings="[8]">
           <Poster
             id="FullscreenIcon"
-            uri="pkg:/images/icon-fullscreen.png"
+            uri="pkg:/images/icon-fullScreen.png"
             width="20"
             height="22"
             loadDisplayMode="scaleToFit"

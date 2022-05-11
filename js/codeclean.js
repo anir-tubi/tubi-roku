@@ -20,7 +20,11 @@ function listUnusedImages(done) {
     const imageSet = new Set(images)
     imageSet.forEach(image => {
         if (!searchforStringInFiles(image, files)){
-            log(image);
+            // We now have to look for references to images that have size replacement in them as well like pkg:/images/{size}/menu-button.9.png
+            const imageSizePath = image.replace(/([\/\-_])(fhd|hd)/, '$1{size}');
+            if (!searchforStringInFiles(imageSizePath, files)){
+                log(image);
+            }
         }
     });
     log('====================================================')
@@ -45,11 +49,11 @@ function listUnusedTranslations(done) {
     const _sLocalTranslationFilePath = `${process.cwd()}/${_sLocalTranslationFilename}`
     const translations = JSON.parse(fs.readFileSync(_sLocalTranslationFilePath))
     const files = glob.sync('src/channel/{components,source}/**/*.*', {ignore: ['src/channel/source/lib/TubiLanguageTranslate.brs','src/channel/source/tests/**/*.*'] } );
-   
+
     log('====================================================')
     log('LIST OF UNUSED TRANSLATIONS :')
     log('These are the potential list of unused translations. Please make sure they are indeed not used and then delete the scripts from all languages that are not being used.');
-    log('====================================================') 
+    log('====================================================')
     Object.keys(translations).forEach(tr => {
         if (!searchforStringInFiles(tr, files)){
             log(tr);

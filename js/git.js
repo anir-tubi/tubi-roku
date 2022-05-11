@@ -1,6 +1,7 @@
 const log = require('fancy-log');
 const clipboardy = require('clipboardy');
 const prompts = require('prompts');
+const fs = require('fs');
 const shell = require('shelljs');
 shell.config.silent = true;
 
@@ -13,6 +14,9 @@ const ghInfo = {
   rokuRepo: 'project-total-recall',
   cdnRepo: 'adrise_cdn',
 };
+
+const remoteRelease = 'Remote Release';
+const submissionRelease = 'Submission Release';
 
 // Github API wrapper
 const { Octokit } = require('@octokit/rest');
@@ -114,10 +118,10 @@ async function makeReleasePrs(done) {
 
   const cdnStarterComponentsPath = `${cdnPath}/hotpatches/roku/starter-components/${starterComponentsFileName}`;
   const cdnRemoteComponentsPath = `${cdnPath}/hotpatches/roku/components/${remoteComponentsFileName}`;
-  
+
   const localStarterComponentsPath = `build/tubi_starter_components_${minorBuildTag}.pkg`;
   const localRemoteComponentsPath = `build/tubi_remote_components_${fullBuildTag}.pkg`;
-  
+
   // copy the starter components from the /build directory to the CDN repo directory
   log(`...Copying the starter components to the local ${ghInfo.cdnRepo} repo`);
   const moveStarterComponentsResult = shell.cp(localStarterComponentsPath, cdnStarterComponentsPath);
@@ -179,7 +183,7 @@ async function makeReleasePrs(done) {
 
   // make a PR against the production branch on the project-total-recall repo at Github
   const prodRokuBranchName = `${minorBuildTag}_branch`;
-  log(`...Making a PR from the remote ${releaseBranchName} on ${ghInfo.rokuRepo} against the ${prodRokuBranchName} branch`);  
+  log(`...Making a PR from the remote ${releaseBranchName} on ${ghInfo.rokuRepo} against the ${prodRokuBranchName} branch`);
   let releasePrUrl = '';
   try {
     const releasePrRes = await octokit.pulls.create({
@@ -198,7 +202,7 @@ async function makeReleasePrs(done) {
 
   // copy the PR urls to the clipboard
   if (releasePrUrl && cdnPrUrl) {
-    
+
     // multi line string
     const prUrlsForPasting = `${releasePrUrl}
 ${cdnPrUrl}`;
@@ -283,8 +287,6 @@ async function createGithubRelease(done) {
     done(new NoStackError(err));
   }
 
-  const remote = 'Remote Release';
-  const submission = 'Submission Release';
   const {releaseType, isPreRelease, preReleaseDate} = await prompts([
     // prompt the dev for the release type to be used as the Release title
     {
@@ -292,11 +294,11 @@ async function createGithubRelease(done) {
       name: 'releaseType',
       message: 'Choose a release type (use arrow or tab keys to select)',
       initial: false,
-      inactive: remote,
-      active: submission,
+      inactive: remoteRelease,
+      active: submissionRelease,
       format: (val) => {
         // format the releaseType value as a remote/submission string instead of boolean
-        return val ? submission : remote;
+        return val ? submissionRelease : remoteRelease;
       }
     },
     // if it's a "Remote Release", prompt if it should be marked as a pre-release
@@ -304,7 +306,7 @@ async function createGithubRelease(done) {
       type: (prev) => {
         // only show this prompt if it's a remote release, as submission releases are assumed
         // to be pre releases by default.
-        return (prev === remote) ? 'confirm' : null;
+        return (prev === remoteRelease) ? 'confirm' : null;
       },
       name: 'isPreRelease',
       message: 'Should this release be marked as a pre release? Select no if the release will be deployed today. (y/n)',
@@ -312,7 +314,7 @@ async function createGithubRelease(done) {
     // if it's a pre-release, prompt what the release date should be
     {
       type: (prev, values) => {
-        return (values.isPreRelease || values.releaseType === submission) ? 'date' : null;
+        return (values.isPreRelease || values.releaseType === submissionRelease) ? 'date' : null;
       },
       name: 'preReleaseDate',
       message: 'What date will this release be deployed? (use tab/arrow/number keys to modify date)',
@@ -480,14 +482,83 @@ function extractPrIdFromCommitInfo(commitInfo) {
 }
 
 
-// get the character position of '(#1234)' string in the commit message
-// @commitInfo: string, has format `abcdefgh some commit message (#1234)`
-//                      where "abcdefg" is the abbreviated commit sha
-//                      and where "(#1234)" is the Github PR ID for the commit within the repo.
-function getPrIdPosition(commitInfo){
-  prIdPosition = commitInfoinStr('(#');
+async function addMissingImagesToRemoteLibrary(done) {
+  // First we need to find our last submission release
+  const releases = await octokit.repos.listReleases({
+    owner: ghInfo.owner,
+    repo: ghInfo.rokuRepo
+  });
 
-  return prIdPosition
+  let lastSubmissionReleaseTag;
+  for (const release of releases.data) {
+    if (release.name === submissionRelease) {
+      lastSubmissionReleaseTag = release.tag_name;
+      break;
+    }
+  }
+
+  if (!lastSubmissionReleaseTag) {
+    log('Could not find last submission release. Exiting.');
+    done();
+    return;
+  }
+
+  log(`Found last submission release: '${lastSubmissionReleaseTag}' continuing`);
+
+  // Do sanity check that we're on the same major/minor version
+  const [currentBranchMajorVersion, currentBranchMinorVersion] = getBuildTag().split('_').slice(0, 2);
+  const [lastSubmissionMajorVersion, lastSubmissionMinorVersion] = lastSubmissionReleaseTag.split('_').slice(0, 2);
+  if (currentBranchMajorVersion !== lastSubmissionMajorVersion) {
+    log('Major version did not match last submission release. Exiting.');
+    done();
+    return;
+  }
+
+  if (currentBranchMinorVersion !== lastSubmissionMinorVersion) {
+    log('Minor version did not match last submission release. Exiting.');
+    done();
+    return;
+  }
+
+  // Now we need to find what images changed
+  const baseChannelPath = 'src/channel/';
+  const errorMsg = `Could not get git diff for ${lastSubmissionReleaseTag}`;
+  const output = execGitCommand(`git diff --name-only ${lastSubmissionReleaseTag} ${baseChannelPath}`, errorMsg, done);
+  const changedImageFilePaths = output.match(/^.*\.png|^.*\.jpg|^.*\.webp/gm)
+
+  // And whether they're already included in our file
+  const newImagesSinceFilePath = `new_images_since/new_images_since_${lastSubmissionMajorVersion}_${lastSubmissionMinorVersion}`;
+  let newImagesSinceFileContents = fs.readFileSync(newImagesSinceFilePath, 'utf8');
+  const imagesToAdd = [];
+  for (const changedImageFilePath of changedImageFilePaths) {
+    // First check the file exists as files that were deleted are also included in the diff
+    if (!fs.existsSync(changedImageFilePath)) {
+      continue;
+    }
+
+    const relativeChangedImageFilePath = changedImageFilePath.replace(baseChannelPath, '');
+    if (newImagesSinceFileContents.search(relativeChangedImageFilePath) === -1) {
+      imagesToAdd.push(relativeChangedImageFilePath);
+    }
+  }
+
+  if (imagesToAdd.length > 0) {
+    const formattedNewImageContents = imagesToAdd.join('\n');
+    log(`The following images were found that are not included in ${newImagesSinceFilePath} already:\n${formattedNewImageContents}`);
+    // Prompt if the dev wants to add these images to new images since file
+    const {addToFile} = await prompts({
+      type: 'confirm',
+      name: 'addToFile',
+      message: `Do you want add these to ${newImagesSinceFilePath}?`,
+    });
+    if (addToFile) {
+      newImagesSinceFileContents += '\n' + formattedNewImageContents;
+      fs.writeFileSync(newImagesSinceFilePath, newImagesSinceFileContents);
+    }
+  } else {
+    log(`No images were found that are not already included in ${newImagesSinceFilePath}`);
+  }
+  done();
 }
 
 module.exports = {
@@ -495,5 +566,6 @@ module.exports = {
   makeReleasePrs,
   pushTag,
   createGithubRelease,
-  findCommitsNotInProduction
+  findCommitsNotInProduction,
+  addMissingImagesToRemoteLibrary
 };

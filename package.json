@@ -28,7 +28,6 @@
     "gulp-debug-streams": "^3.0.0",
     "gulp-dedupe": "^0.0.2",
     "gulp-filter": "^6.0.0",
-    "gulp-if": "^2.0.2",
     "gulp-replace": "1.0.0",
     "gulp-zip": "^4.1.0",
     "handlebars": "^4.0.11",

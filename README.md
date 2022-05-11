@@ -108,6 +108,7 @@ __The most commonly used Gulp commands__
 
 * `$ gulp install` - build a zip and side load it to a device (as set by your ROKU_DEV_TARGET)
 * `$ gulp stage` - build a zip using the "staging" config and upload starter components, and remote components to the staging CDN.
+* `$ gulp addMissingImages` - updates new_images_since file with images that need to be included in the remote component library.
 * `$ gulp bumpQA` - bumps the revision number. This is used during the QA process. As changes are made and new QA builds are created, the revision number is used to distinguish between builds.
 * `$ gulp release` - bump the build number, build starter and remote components .pkgs using the "production" config. This command will also make PRs to the CDN repo and this project-total-recall repo on Github.
 
@@ -347,7 +348,7 @@ Remote releases are releases that are not sent to Roku, and updates are made whe
 
 Ensure the cherry pick commit names include the name of PR number. This usually is done automatically but be aware that we need to have the PR numbers to make it easier later on so we know which PRs have been pushed and which ones have not.
 
-5\. Check each of the cherry picked commits for images that have been added or updated as part of any UI updates. Update the `new_images_since/new_images_since_x_y` file with the image locations of any new or updated images.
+5\. Check each of the cherry picked commits for images that have been added or updated as part of any UI updates. Update the `new_images_since/new_images_since_x_y` file with the image locations of any new or updated images. This can now be automated by running `gulp addMissingImages`.
 
 6\. Make a new commit on the `qa_x_y_z` branch with the hotpatch and new images updates. Push `qa_x_y_z` branch to github.
 
