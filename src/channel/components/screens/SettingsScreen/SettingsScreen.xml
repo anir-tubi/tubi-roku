@@ -8,7 +8,7 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
-
+  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
@@ -19,6 +19,8 @@
     <!-- INPUTS -->
 
       <field id="parentalSettingUpdated" type="boolean" alwaysNotify="true"/>
+
+      <field id="autoPreviewItemUpdated" type="integer" alwaysNotify="true"/>
 
       <!-- What is the previous page so it can be indicated on the call to action that is located on the top nav.
       -->
@@ -51,6 +53,7 @@
       <field id="signOutSelected" type="boolean" alwaysNotify="true"/>
       <field id="signInSelected" type="boolean" alwaysNotify="true"/>
       <field id="parentalSettingSelected" type="integer" alwaysNotify="true"/>
+      <field id="autoPreviewSettingSelected" type="integer" alwaysNotify="true" />
 
       <!-- Keeps the information used for user tracking - structure looks like:
         {
@@ -65,6 +68,12 @@
            See tubiTracking_getAnalyticsEvent for the format of the navigate_within_page AA
       -->
       <field id="navigateWithinPageInfo" type="assocarray" />
+
+       <!-- Holds the information needed to populate a component_interaction event. This will
+           be observed by the contentController via epgScreenHelper
+           which will be responsible for sending component_interaction events.
+      -->
+      <field id="componentInteractionInfo" type="assocarray"/>
 
       <!-- Holds the "level" of the screen relative to other screens.
            Screens with smaller screenLevel values cannot be stacked on top of screens with higher screenLevel values.
@@ -82,7 +91,7 @@
     <Label
       id="Title"
       height="73"
-      translation="[192,230]">
+      translation="[192,200]">
       <Font
        role="font"
        uri="pkg:/fonts/Vaud-SemiBold.ttf"

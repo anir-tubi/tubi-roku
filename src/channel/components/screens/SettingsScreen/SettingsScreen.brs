@@ -17,7 +17,7 @@ Function init()
   end if
 
   ' Create the menu
-  m.SettingsMenuPanel = CreateSettingsMenuPanel()
+  m.SettingsMenuPanel = createSettingsMenuPanel()
   m.SettingsMenuPanel.observeField("createNextPanelIndex", "onCreateNextPanelIndex")
   m.SettingsMenuPanel.observeField("itemSelected", "onMenuItemSelected")
   m.SettingsMenuPanel.observeField("itemFocused", "onMenuItemFocused")
@@ -33,6 +33,8 @@ Function init()
 
   m.top.observeFieldScoped("signInInfo", "onSignInInfoChange")
   m.top.observeFieldScoped("uiMode", "onUiModeChange")
+
+  m.top.observeField("autoPreviewItemUpdated", "onSignInInfoChange")
 
   'set initial tracking values
   m.top.trackingPageInfo = {
@@ -66,11 +68,13 @@ End Function
 
 Function onSignInInfoChange()
   m.SettingsMenuPanel.signInInfo = m.top.signInInfo
-  ' renew the parental controls panel if it is showing
+  ' renew the parental controls/autoplay preview panel if it is showing
   for i = 0 to m.PanelSet.getChildCount() - 1
     child = m.PanelSet.getChild(i)
     if child.subtype() = "ParentalControlsPanel"
-      CreateParentalControlsPanel(child)
+      createParentalControlsPanel(child)
+    else if child.subtype() = "AutoplayPreviewPanel"
+      createOrUpdateAutoPlayPreviewPanel(child)
     end if
   end for
 End Function
@@ -146,20 +150,22 @@ Function createNextPanel(buttonContent)
 
   if buttonContent <> invalid
     if buttonContent.id = "ParentalControlsButton"
-      nextPanel = CreateParentalControlsPanel()
+      nextPanel = createParentalControlsPanel()
+    else if buttonContent.id = "AutoplayPreviewButton"
+      nextPanel = createOrUpdateAutoPlayPreviewPanel()
     else if buttonContent.id = "AboutButton"
-      nextPanel = CreateAboutPanel()
+      nextPanel = createAboutPanel()
     else if buttonContent.id = "PrivacyPolicyButton"
-      nextPanel = CreateLegalPanel(buttonContent.title, m.constants.urls.privacyUrl)
+      nextPanel = createLegalPanel(buttonContent.title, m.constants.urls.privacyUrl)
     else if buttonContent.id = "TermsOfServiceButton"
-      nextPanel = CreateLegalPanel(buttonContent.title, m.constants.urls.termsOfUseUrl)
+      nextPanel = createLegalPanel(buttonContent.title, m.constants.urls.termsOfUseUrl)
     else if buttonContent.id = "DoNotSellPolicyButton"
-      nextPanel = CreateLegalPanel(buttonContent.title, m.constants.urls.doNotSellUrl)
+      nextPanel = createLegalPanel(buttonContent.title, m.constants.urls.doNotSellUrl)
     else if buttonContent.id = "SignInOutButton"
       if isSignedIn() = true
-        nextPanel = CreateSignOutPanel()
+        nextPanel = createSignOutPanel()
       else
-        nextPanel = CreateSignInPanel()
+        nextPanel = createSignInPanel()
       end if
     end if
   end if
@@ -177,7 +183,7 @@ Function isSignedIn()
 End Function
 
 
-Function CreateParentalControlsPanel(existingPanel = invalid)
+Function createParentalControlsPanel(existingPanel = invalid)
   if existingPanel = invalid
     pcPanel = CreateObject("roSGNode", "ParentalControlsPanel")
     pcPanel.observeField("itemSelected", "onParentalControlsItemSelected")
@@ -206,6 +212,56 @@ Function CreateParentalControlsPanel(existingPanel = invalid)
 End Function
 
 
+' @existingPanel: roSGnode, videoPreview panel if already been created.
+' UI for panel consisting of autoplayPreview choices.
+Function createOrUpdateAutoPlayPreviewPanel(existingPanel = invalid)
+  if existingPanel = invalid
+    videoPreviewPanel = createAutoPreviewPanel()
+  else 'update the existing autoplayPreview Panel
+    videoPreviewPanel = existingPanel
+    if isSignedIn() = true
+      videoPreviewPanel.selectItem = m.top.autoPreviewItemUpdated
+    else
+      videoPreviewPanel.selectItem = 0 ' default if not signed in
+    end if
+  end if
+
+  return videoPreviewPanel
+End Function
+
+
+Function createAutoPreviewPanel()
+  videoPreviewPanel = CreateObject("roSGNode", "AutoplayPreviewPanel")
+  videoPreviewPanel.observeField("itemSelected", "onAutoplayPreviewPanelItemSelected")
+  videoPreviewPanel.observeField("componentInteractionInfo", "onAutoPlayPreviewComponentInteractionInfo")
+  videoPreviewPanel.width = m.rightPanelWidth
+  videoPreviewPanel.focusable = true
+  videoPreviewPanel.hasNextPanel = false
+  videoPreviewPanel.leftOnly = false
+  videoPreviewPanel.selectButtonMovesPanelForward = false
+  videoPreviewPanel.offset = m.rightPanelOffset
+  if isSignedIn() = true
+    authInfo = getFieldFromGlobal("authInfo")
+      if authInfo <> invalid
+        if authInfo.enableVideoPreview = true
+          videoPreviewPanel.selectItem = 0
+        else
+          videoPreviewPanel.selectItem = 1
+        end if
+      end if
+  else
+    videoPreviewPanel.selectItem = 0 ' default if not signed in
+  end if
+  return videoPreviewPanel
+End Function
+
+
+Function onAutoPlayPreviewComponentInteractionInfo(msg)
+  videoPreviewPanel = msg.getRoSGNode()
+  m.top.componentInteractionInfo = videoPreviewPanel.componentInteractionInfo
+End Function
+
+
 Function onParentalSettingsReceived(msg)
   task = msg.getRoSGNode()
   if task <> invalid
@@ -221,7 +277,7 @@ Function onParentalSettingsReceived(msg)
 End Function
 
 
-Function CreateAboutPanel()
+Function createAboutPanel()
   aboutPanel = CreateObject("roSGNode", "AboutPanel")
   aboutPanel.titleOne = getTranslation("screenSettings_about_title")
   aboutPanel.textOne = getTranslation("screenSettings_about_description")
@@ -230,7 +286,7 @@ Function CreateAboutPanel()
   sVersion = m.constants.deviceInfo.clientVersion
   if m.constants.settings.mode <> "production"
     '//show the revision number when not in production
-    sVersion = sVersion + "." + m.constants.deviceInfo.revisionVersion 
+    sVersion = sVersion + "." + m.constants.deviceInfo.revisionVersion
   end if
   sShortDeviceID = Right(m.constants.deviceInfo.deviceId, 7)
   sYear = CreateObject("roDateTime").GetYear().toStr()
@@ -250,7 +306,7 @@ Function CreateAboutPanel()
 End Function
 
 
-Function CreateSettingsMenuPanel()
+Function createSettingsMenuPanel()
   settingsMenuPanel = CreateObject("roSGNode", "SettingsMenuPanel")
   settingsMenuPanel.width = m.leftPanelWidth
   settingsMenuPanel.leftPosition = 0
@@ -264,7 +320,7 @@ Function CreateSettingsMenuPanel()
 End Function
 
 
-Function CreateLegalPanel(title, uri)
+Function createLegalPanel(title, uri)
   textPanel = CreateObject("roSGNode", "ScrollingTextPanel")
   textPanel.title = title
   textPanel.width = m.rightPanelWidth
@@ -299,7 +355,7 @@ Function onLegalState(msg)
 End Function
 
 
-Function CreateSignInPanel()
+Function createSignInPanel()
   panel = CreateObject("roSGNode", "ScrollingTextPanel")
   panel.title = getTranslation("screenSettings_signInPanel_title")
   panel.text = getTranslation("screenSettings_signIn_description")
@@ -310,7 +366,7 @@ Function CreateSignInPanel()
 End Function
 
 
-Function CreateSignOutPanel()
+Function createSignOutPanel()
   panel = CreateObject("roSGNode", "SignOutPanel")
   panel.title = getTranslation("screenSettings_menu_signOut")
 
@@ -379,6 +435,14 @@ End Function
 Function onParentalControlsItemSelected(msg)
   tubiLog("SettingsScreen.onParentalControlsItemSelected")
   m.top.parentalSettingSelected = msg.GetData()
+End Function
+
+
+Function onAutoplayPreviewPanelItemSelected(msg)
+  tubiLog("SettingsScreen.onAutoplayPreviewItemSelected")
+  itemSelected = msg.GetData()
+  m.top.autoPreviewSettingSelected = itemSelected
+
 End Function
 
 

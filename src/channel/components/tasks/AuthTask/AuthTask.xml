@@ -55,6 +55,8 @@
 
         <field id="parentalSetting" type="integer"/>
 
+        <field id="autoplayPreviewSetting" type="boolean" />
+
         <field id="externalAuthInfo" type="assocarray"/>
 
         <field id="isKidsMode" type="boolean" />

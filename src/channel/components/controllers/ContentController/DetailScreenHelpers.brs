@@ -32,8 +32,25 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.observeFieldScoped("refreshRelatedContent", "onRefreshRelatedContentSignal")
     detailScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     detailScreen.observeFieldScoped("relatedContentToPlay", "onContentToPlay")
+    detailScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     if isReturningUser() = true and isLoggedInUser() = false and getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v1", true).enabled = true
       detailScreen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelected")
+    end if
+
+    if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true
+      previewState = getVideoPreviewStateForThisContent(content)
+      if previewState = "buffering" or previewState = "playing"
+        pageType = "video_page"
+        if content.type = m.constants.ui.contentTypes.series
+          pageType = "series_detail_page"
+        end if
+        setPageTypeForVideoPreview(pageType) ' this will help to trigger analytics
+      else
+        previewState = getVideoPreviewState()
+        if previewState <> "stopped" and previewState <> "finished" ' this means video not stopped/finished for previous content, so we need to stop it
+          stopVideoPreview()
+        end if
+      end if
     end if
 
     ' m.actionType variable is used for setting a callback function after successful a data fetch retry in the case where
@@ -112,17 +129,41 @@ Function onDetailBackgroundChange(msg)
   tubiLog("DetailScreenHelpers.onDetailBackgroundChange")
   detailScreen = msg.getRoSGNode()
   if detailScreen.isInFocusChain()
-    if getExperimentResource("roku_detail_screen_background_image", "roku_detail_screen_background_image_v1", true).enabled = true
-      m.backgroundGroup.backgroundInfo = {
-        type: m.constants.ui.backgroundTypes.topright
-        uriList: detailScreen.backgroundUriList
-      }
+
+    if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true
+      previewState = getVideoPreviewState()
+      if previewState = "playing"
+        m.backgroundGroup.backgroundInfo = {
+          type: m.constants.ui.backgroundTypes.epg
+          uriList: [] ' setting uriList as empty, because don't rotate background poster when video preview is playing
+        }
+      else
+        if getExperimentResource("roku_detail_screen_background_image", "roku_detail_screen_background_image_v1", true).enabled = true
+          m.backgroundGroup.backgroundInfo = {
+            type: m.constants.ui.backgroundTypes.topright
+            uriList: detailScreen.backgroundUriList
+          }
+        else
+          m.backgroundGroup.backgroundInfo = {
+            type: m.constants.ui.backgroundTypes.fullscreen
+            uriList: detailScreen.backgroundUriList
+          }
+        end if
+      end if
     else
-      m.backgroundGroup.backgroundInfo = {
-        type: m.constants.ui.backgroundTypes.fullscreen
-        uriList: detailScreen.backgroundUriList
-      }
+      if getExperimentResource("roku_detail_screen_background_image", "roku_detail_screen_background_image_v1", true).enabled = true
+        m.backgroundGroup.backgroundInfo = {
+          type: m.constants.ui.backgroundTypes.topright
+          uriList: detailScreen.backgroundUriList
+        }
+      else
+        m.backgroundGroup.backgroundInfo = {
+          type: m.constants.ui.backgroundTypes.fullscreen
+          uriList: detailScreen.backgroundUriList
+        }
+      end if
     end if
+
   end if
 End Function
 
@@ -1277,19 +1318,25 @@ End Function
 ' if data not present, it invokes content api
 Function onResume(msg)
   tubiLog("ContentController.onResume")
-  detailScreen = msg.getRoSGNode()
+    detailScreen = msg.getRoSGNode()
+    resumeVideoDetailScreen(detailScreen)
 
-  if isFetchingInProgress(detailScreen) <> true
+End Function
+
+
+Function resumeVideoDetailScreen(detailScreen)
+  tubiLog("DetailScreenHelpers.resumeVideoDetailScreen")
+  if detailScreen <> invalid and isFetchingInProgress(detailScreen) <> true
     if isPlayable(detailScreen) = true
       resumeHelper(detailScreen)
     else
       m.actionType = resumeHelper
       detailScreen.isLoading = true
       getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
-    end if
+      end if
   end if
-End Function
 
+End Function
 
 '''''''''''
 ' onPlay
@@ -1299,8 +1346,14 @@ End Function
 Function onPlay(msg)
   tubiLog("DetailScreenHelpers.onPlay")
   detailScreen = msg.getRoSGNode()
+  playVideoDetailScreen(detailScreen)
 
-  if isFetchingInProgress(detailScreen) <> true
+End Function
+
+
+Function playVideoDetailScreen(detailScreen)
+  tubiLog("DetailScreenHelpers.playVideoDetailScreen")
+  if detailScreen <> invalid and isFetchingInProgress(detailScreen) <> true
     if isPlayable(detailScreen) = true
       playHelper(detailScreen)
     else

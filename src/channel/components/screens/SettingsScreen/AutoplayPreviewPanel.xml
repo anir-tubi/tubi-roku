@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="AutoplayPreviewPanel" extends="Panel" >
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="AutoplayPreviewPanel.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+      <!-- make a particular setting "checked" and focused -->
+      <field id="selectItem" type="integer" alwaysNotify="true"/>
+      <field id="offset" alias="Offset.translation"/>
+      <field id="isLoading" type="boolean"/>
+
+
+    <!-- OUTPUTS -->
+      <field id="itemSelected" alias="AutoplayPreviewMenu.itemSelected"/>
+
+       <!-- Holds the information needed to populate a component_interaction event. This will
+           be observed by the contentController via epgScreenHelper
+           which will be responsible for sending component_interaction events.
+      -->
+      <field id="componentInteractionInfo" type="assocarray"/>
+  </interface>
+
+  <children>
+    <Group
+      id="Offset">
+
+    <Group
+      id="ContentGroup">
+      <Label
+        id="Title"
+        height="73"
+        vertAlign="bottom"
+        translation="[25,0]">
+        <Font
+         role="font"
+         uri="pkg:/fonts/Vaud-SemiBold.ttf"
+         size="43" />
+      </Label>
+
+      <Label
+        id="Instructions"
+        width="890"
+        wrap="true"
+        vertAlign="bottom"
+        translation="[25,143]">
+        <Font
+         role="font"
+         uri="pkg:/fonts/Vaud-SemiBold.ttf"
+         size="27" />
+      </Label>
+
+      <MarkupList
+        id="AutoplayPreviewMenu"
+        numRows="2"
+        itemSize="[585,72]"
+        itemSpacing="[0,8]"
+        itemComponentName="CheckButton"
+        vertFocusAnimationStyle="floatingFocus"
+        translation="[25,246]">
+        <ContentNode
+          id="SettingsMenuContent"
+          role="content">
+          <CheckButtonContentNode
+            id="On"/>
+          <CheckButtonContentNode
+            id="Off"/>
+        </ContentNode>
+      </MarkupList>
+    </Group>
+
+    <Spinner
+      id="Spinner"
+      visible="false"
+      height="717"
+      width="1034"
+      translation="[0,0]"/>
+    </Group>
+  </children>
+</component>

@@ -1,4 +1,4 @@
-'@TestSuite [UserDeviceApi] UserDeviceApi.brs 
+'@TestSuite [UserDeviceApi] UserDeviceApi.brs
 
 '@Setup
 Function UserDeviceApiSetup()
@@ -13,7 +13,7 @@ Function UserDeviceApiSetup()
   m.patchSettingsUrl = m.constants.urls.users.settings
   m.app_id = m.constants.settings.shortAppName
   m.platform = m.constants.platform
-  m.device_id = m.constants.deviceInfo.deviceId  
+  m.device_id = m.constants.deviceInfo.deviceId
   m.testEmail = "test@tubi.tv"
   m.testPassword = "111111"
   m.app_id = "tubitv"
@@ -62,7 +62,7 @@ Function userDeviceApi_signUpReqInfo_test()
 
   options = {}
   options.body = {
-    platform: m.constants.platform  
+    platform: m.constants.platform
     device_id: m.constants.deviceInfo.deviceId
     credentials: {
       email: m.testEmail
@@ -123,7 +123,7 @@ Function userDeviceApi_signInReqInfo_test()
 
   options = {}
   options.body = {
-    platform: m.constants.platform  
+    platform: m.constants.platform
     device_id: m.constants.deviceInfo.deviceId
     type: "email"
     credentials: {
@@ -134,7 +134,7 @@ Function userDeviceApi_signInReqInfo_test()
   requestInfo = m.userDeviceApi.signInReqInfo(options)
   m.assertNotInvalid(requestInfo)
   m.assertNotInvalid(requestInfo.url)
-  m.assertEqual(requestInfo.url, loginUrl)  
+  m.assertEqual(requestInfo.url, loginUrl)
 
   options = requestInfo.options
   m.assertNotInvalid(options)
@@ -238,6 +238,27 @@ Function userDeviceApi_patchSettingsInfo_test()
   m.assertNotInvalid(body.random_setting)
   m.assertEqual(body.random_setting, true)
 
+  m.assertEqual(patchSettingsInfo.options.method, "PATCH")
+End Function
+
+
+'@Test patchAutoplayPreviewSettingInfo unit tests
+Function userDeviceApi_patchAutoplayPreviewSettingInfo_test()
+
+  patchSettingsInfo = m.userDeviceApi.patchAutoplayPreviewSettingInfo(false)
+
+  m.assertNotInvalid(patchSettingsInfo)
+
+  m.assertNotInvalid(patchSettingsInfo.url)
+  m.assertEqual(patchSettingsInfo.url, m.constants.urls.account.patchAutoplayPreview)
+
+  m.assertNotInvalid(patchSettingsInfo.options)
+  m.assertNotInvalid(patchSettingsInfo.options.body)
+  body = ParseJson(patchSettingsInfo.options.body)
+  m.assertNotInvalid(body.enable_video_preview)
+  m.assertFalse(body.enable_video_preview)
+
+  m.assertNotInvalid(patchSettingsInfo.options.headers)
   m.assertEqual(patchSettingsInfo.options.method, "PATCH")
 End Function
 

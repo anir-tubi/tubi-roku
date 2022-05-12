@@ -39,6 +39,9 @@ Function init()
   m.uiGroup = m.top.findNode("uiGroup")
   m.contentGroup = m.top.findNode("ContentGroup")
   m.SideNav = m.top.findNode("SideNav")
+
+  m.VideoPreviewGroup = m.top.findNode("VideoPreviewGroup")
+
   m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")
   m.LinearPlayerGroupAboveScreenStack = m.top.findNode("LinearPlayerGroupAboveScreenStack")
   m.LinearCountdownTimer = m.top.findNode("LinearCountdownTimer")
@@ -112,6 +115,9 @@ Function init()
 
   m.marketingBackgroundUri = m.constants.ui.uris.marketingBackground
 
+  'This variable has been used to keep track of user's choice on autoplay. Without maintaining this variable, we might have to access m.global everytime
+  m.isAutoplayVideoPreviewOn = true 'True by default
+
   ' Global state
   m.global.addField("bookmarkIds", "node", false)
   m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
@@ -163,6 +169,7 @@ Function init()
     'Once the LinearVideoplayer integrates with EPGScreen, then we need to revisit the logic of when to let the user interact with EPG TimeGrid due to jumpTO channel requirement and Channel might be fetched to focus on.
     m.updateEPGTimeGrid = true
   end if
+
 End Function
 
 
@@ -269,6 +276,12 @@ End Function
 ' triggered when signIn button is selected while updating Parental Control
 Function onSignInModalSelectedViaParentalControl()
   startSignIn(onParentalControlAfterSignIn)
+End Function
+
+
+'triggered when signIn button is selected while updating video preview options
+Function onSignInModalSelectedViaAutoplayPreview()
+  startSignIn(onAutoplayPreviewAfterSignIn)
 End Function
 
 
@@ -1363,10 +1376,18 @@ Function setHomeScreenBackground(homeScreen)
     if homeScreen.contentFocused <> invalid
       contentType = homeScreen.contentFocused.type
     end if
-    m.backgroundGroup.backgroundInfo = {
-      type: getBackgroundtype(homeScreen.backgroundUriList, contentType)
-      uriList: homeScreen.backgroundUriList
-    }
+    videoPreviewState = getVideoPreviewState()
+    if videoPreviewState = "playing" or videoPreviewState = "paused"
+      m.backgroundGroup.backgroundInfo = {
+        type: m.constants.ui.backgroundTypes.epg
+        uriList: [] ' setting uriList as empty, because don't need to rotate the background poster when video preview is playing
+      }
+    else
+      m.backgroundGroup.backgroundInfo = {
+        type: getBackgroundtype(homeScreen.backgroundUriList, contentType)
+        uriList: homeScreen.backgroundUriList
+      }
+    end if
   end if
 End Function
 

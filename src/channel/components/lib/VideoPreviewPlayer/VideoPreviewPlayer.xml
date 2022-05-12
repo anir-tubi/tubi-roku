@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="VideoPreviewPlayer" extends="Group" >
+  <script type="text/brightscript" uri="VideoPreviewPlayer.brs" />
+  <script type="text/brightscript" uri="../GlobalMixin.brs" />
+  <script type="text/brightscript" uri="../CacheValidationMixin.brs" />
+  <script type="text/brightscript" uri="../AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+
+  <interface>
+
+    <!-- INPUT -->
+      <!-- Alias fields for the video node -->
+      <field id="width" alias="VideoNode.width"/>
+      <field id="height" alias="VideoNode.height"/>
+
+      <field id="content" type="node"/>
+      <field id="updateContent" type="boolean" alwaysNotify="true"/>
+
+      <!-- pageTypeForAnalytics is the pageType of VideoPreview's parent screen -->
+      <field id="pageTypeForAnalytics" type="string" value="" />
+
+      <!-- supports "play", "stop", "pause" -->
+      <field id="control" type="string" value="none"/>
+
+    <!-- OUTPUT -->
+
+      <!-- Observing state interface helps to show/hide static poster background -->
+      <field id="state" type="string" />
+
+  </interface>
+
+  <children>
+    <Video
+      id="VideoNode"
+      width="1120"
+      height="630"
+      translation="[799,0]"
+      enableUI="false"
+      cgms="3"
+      enableTrickPlay="false"
+      notificationInterval="1.0"
+      visible="true" />
+
+  </children>
+</component>

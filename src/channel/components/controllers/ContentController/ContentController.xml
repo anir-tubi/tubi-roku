@@ -37,6 +37,7 @@
   <script type="text/brightscript" uri="EPGScreenHelpers.brs" />
   <script type="text/brightscript" uri="TopNavHelpers.brs" />
   <script type="text/brightscript" uri="DeeplinkHelpers.brs" />
+  <script type="text/brightscript" uri="VideoPreviewHelpers.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
@@ -142,6 +143,9 @@
       <Group
         id="ContentGroup"
         visible="false">
+        <!--  Group that contains the video preview -->
+        <Group
+          id="VideoPreviewGroup"/>
         <!--  Group that contains the linear video player when it is not in its fullscreen state -->
         <Group
           id="LinearPlayerGroup"/>

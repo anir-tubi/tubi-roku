@@ -561,6 +561,9 @@ Function handleUpdatedAuth()
 
   setSideNavSignedInItem(authInfo)
 
+  'set the autoplayVideoPreview on/off based on user global settings.
+  setAutoplayVideoPreviewFromGlobal(authInfo)
+
   return authInfo
 End Function
 
@@ -670,6 +673,23 @@ Function onSideNavMyListAfterSignIn()
     ' don't expect this to happen, keeping here as a fallback mechanism
     restartChannel()
   end if
+End Function
+
+
+' onAutoplayPreviewAfterSignIn - occurs after signin success via autoplay preview
+Function onAutoplayPreviewAfterSignIn()
+  tubiLog("SignInHelpers.onAutoplayPreviewAfterSignIn")
+
+  currentScreen = popScreenAfterSignInProcess()
+  m.spinner.visible = false
+
+  if currentScreen <> invalid and currentScreen.getSubtype() = "SettingsScreen"
+    setSettingsScreenSignInInfo()
+    currentScreen.setFocus(true)
+  end if
+
+  onAutoPreviewSettingSelected()
+
 End Function
 
 

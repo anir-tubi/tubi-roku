@@ -426,6 +426,7 @@ Function getConstants()
       constants.urls.account.login = constants.urls.account.urlBase + "/user/login"
       constants.urls.account.checkBirthday = constants.urls.account.urlBase + "/user/check_birthday_info"
       constants.urls.account.deviceRegister = constants.urls.account.urlBase + "/device/register"
+      constants.urls.account.patchAutoplayPreview = constants.urls.account.urlBase + "/user/settings"
       constants.urls.account.magicLink = constants.urls.account.urlBase + "/device/magic_link"
 
       constants.urls.account.anonymous = {}
@@ -907,7 +908,6 @@ Function getConstants()
       constants.ui.screenIds.sportsEPGScreen = "sportsEPGScreen"
       constants.ui.screenIds.newsEPGScreen = "newsEPGScreen"
       constants.ui.screenIds.entertainmentEPGScreen = "entertainmentEPGScreen"
-      constants.ui.screenIds.EmailVerificationScreen = "emailVerificationScreen"
       constants.ui.screenIds.bestKnownScreen = "bestKnownScreen"  '//Note: BestKnown Screen refers to the A-List Screen
       constants.ui.screenIds.nostalgiaScreen = "nostalgiaScreen"
 
@@ -933,6 +933,9 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.initialContentScreen] = false
       constants.ui.cacheableScreenIds[constants.ui.screenIds.bestKnownScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.nostalgiaScreen] = true
+
+    constants.ui.componentIds = {}
+    constants.ui.componentIds.videoPreviewPlayer = "VideoPreviewPlayer"
 
     ' top level content ids for parent content nodes that don't have a content id from the backend
     constants.ui.contentIds = {}

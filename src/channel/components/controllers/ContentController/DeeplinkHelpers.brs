@@ -157,6 +157,9 @@ Function handleInputDeeplink(inputInfo) as Void
   stopVideoContent(videoPlayer) 'sets m.enteredFromDeeplink = false and m.deeplinkContent = invalid
   stopCountdownTimer() 'stop previous counter
   stopAndHideLinearVideoPlayer()
+  if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true
+    stopVideoPreview()
+  end if
 
   if m.uiMode = m.constants.ui.modes.kids
     if needsToShowAgeVerificationScreen() = true then

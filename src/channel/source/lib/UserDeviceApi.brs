@@ -1,6 +1,6 @@
 ' Thin wrapper for the old UAPI user_device requests and the new account API requests
 Function UserDeviceApi(constants, apiUtils)
-  
+
   defaultValues = {
     ' dependencies
     constants: constants
@@ -12,6 +12,7 @@ Function UserDeviceApi(constants, apiUtils)
     deviceRegisterInfo: userDeviceApi_deviceRegisterInfo
     checkBirthdayInfo: userDeviceApi_checkBirthdayInfo
     patchSettingsInfo: userDeviceApi_patchSettingsInfo
+    patchAutoplayPreviewSettingInfo: userDeviceApi_patchAutoplayPreviewSettingInfo
     magicLink: userDeviceApi_magicLink
     queryStatusOfMagicLink: userDeviceApi_queryStatusOfMagicLink
   }
@@ -158,7 +159,7 @@ Function userDeviceApi_magicLink(email)
 End Function
 
 
-'@uid: string, unique identifier generated through magicLink for each user 
+'@uid: string, unique identifier generated through magicLink for each user
 Function userDeviceApi_queryStatusOfMagicLink(uid)
   url = m.constants.urls.account.magicLink + "/" + uid
   headers = {}
@@ -168,4 +169,25 @@ Function userDeviceApi_queryStatusOfMagicLink(uid)
     url: url
     options: options
   }
+End Function
+
+
+' @choice: boolean, user selection of Video preview on/off
+'         true - video Preview on
+'         flase - video preview off
+Function userDeviceApi_patchAutoplayPreviewSettingInfo(choice)
+  url = m.constants.urls.account.patchAutoplayPreview
+  options = {}
+  body = {enable_video_preview: choice}
+
+  options["body"] = FormatJson(body)
+  headers = {}
+  headers.append(m.constants.headers.commonUapi)
+  options["method"] = m.constants.reqTypes.patch
+  options["headers"] = headers
+  return {
+    url: url
+    options: options
+  }
+
 End Function

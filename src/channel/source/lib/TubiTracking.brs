@@ -21,7 +21,7 @@ Function TubiTracking (constants, request, auth)
     getAnalyticsTile: tubiTracking_getAnalyticsTile
     getAnalyticsAd: tubiTracking_getAnalyticsAd
     getAnalyticsHomePageContentMode: tubiTracking_getAnalyticsHomePageContentMode
-    
+
     populateMessage: tubiTracking_populateMessage
     isEmptyValue: tubiTracking_isEmptyValue
     isNumeric: tubiTracking_isNumeric
@@ -40,7 +40,7 @@ End Function
 ' Please see https://github.com/adRise/protos/analytics for details and event structures
 ' ClientEvent is the main event that we will be building, with different AppEvents added for each type of trackable even
 '
-' tubiTracking_trackUserEvent() is a wrapper around getClientEvent() that will take the generated client event and 
+' tubiTracking_trackUserEvent() is a wrapper around getClientEvent() that will take the generated client event and
 ' send it to the analytics server.
 '
 ' @eventType: string: one of the fields defined in the "oneof" definition within AppEvent. For example: "active" or "page_load"
@@ -216,7 +216,7 @@ End Function
 ' @eventValues: assocArray, the information that will fill in the values for the keys of each event type as defined within the function.
 '                           For example: if the eventType = "search", then eventValues = {query: "abc", search_type: "PAGE"}
 '
-' Note: eventTypes with keys that end in "Oneof" (ie. "pageOneof") will be overwritten with one of the allowed page types as 
+' Note: eventTypes with keys that end in "Oneof" (ie. "pageOneof") will be overwritten with one of the allowed page types as
 '       defined in events.protos. For example: with respect to the "page_load" event type, the eventValues should look like:
 '
 '       {
@@ -432,6 +432,28 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       prompt: "" 'optional, describes the question being asked
       selectorOneOf: {} 'a valid selector component
     }
+
+    start_preview: {
+      video_id: -1
+      is_fullscreen: false
+      video_player: "BANNER"
+      page_type: "" 'current screen
+    }
+
+    finish_preview: {
+      video_id: -1
+      end_position: -1
+      page_type: "" 'current screen
+    }
+
+    preview_play_progress: {
+      video_id: -1
+      position: -1
+      view_time: -1
+      video_player: "BANNER"
+      page_type: "" 'current screen
+    }
+
   }
 
   eventBase = eventTypes[eventType]
@@ -493,7 +515,7 @@ End Function
 ' Build the structure for a ContentTile message
 Function tubiTracking_getAnalyticsTile(contentNode, colPos=1, rowPos=1)
   tile = invalid
-  
+
   if contentNode <> invalid
     tile = {}
     contentId = contentNode.id
@@ -502,12 +524,12 @@ Function tubiTracking_getAnalyticsTile(contentNode, colPos=1, rowPos=1)
         contentId = Mid(contentNode.id, 2)
       end if
       tile.series_id = contentId.toInt()
-    else if contentNode.type = m.constants.ui.contentTypes.video or contentNode.type = m.constants.ui.contentTypes.linear 
+    else if contentNode.type = m.constants.ui.contentTypes.video or contentNode.type = m.constants.ui.contentTypes.linear
       tile.video_id = contentId.toInt()
     end if
-    
+
     tile.col = colPos
-    tile.row = rowPos    
+    tile.row = rowPos
 
   end if
 
@@ -701,7 +723,7 @@ Function tubiTracking_getOneOfs()
   video_player_page = {
     video_id: -1
   }
-  
+
   series_detail_page = {
     series_id: -1
   }
@@ -744,16 +766,16 @@ Function tubiTracking_getOneOfs()
 
   section_topNav = {
     top_nav_section: ""  ' Section enum
-  } 
+  }
 
   linear_browse_page = {
     i: "i"
   }
-  
+
   landing_page = {}
 
   age_gate_page = {}
-  
+
   ' splash_page = {}   'not currently used
   ' forget_page = {}   'not currently used
 
@@ -840,7 +862,7 @@ Function tubiTracking_getOneOfs()
     left_side_nav_component: section_leftNav
 
     top_nav_component: section_topNav
-    
+
     channel_guide_component: {
       category_slug: ""
       category_row: -1   ' 1 based index
@@ -968,7 +990,7 @@ End Function
 
 'helper function to determine if the value can be compared to a number
 Function tubiTracking_isNumeric(value)
-  if type(value) = "roInteger" or type(value) = "roInt" or type(value) = "Integer" or type(value) = "roFloat" or type(value) = "Float" or type(value) = "roDouble" or type(value) = "Double" 
+  if type(value) = "roInteger" or type(value) = "roInt" or type(value) = "Integer" or type(value) = "roFloat" or type(value) = "Float" or type(value) = "roDouble" or type(value) = "Double"
     return true
   end if
 

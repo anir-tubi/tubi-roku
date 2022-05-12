@@ -11,6 +11,7 @@ Function TubiAuth(constants, request)
 
     'public methods
     getAuthInfo: tubiAuth_getAuthInfo
+    setAuthInfo: tubiAuth_setAuthInfo
     getFirstVisit: tubiAuth_getFirstVisit
     setFirstVisit: tubiAuth_setFirstVisit
     handleRegistration: tubiAuth_handleRegistration
@@ -23,6 +24,7 @@ Function TubiAuth(constants, request)
     getGuestUserHasAgeInfo: tubiAuth_getGuestUserHasAgeInfo
     setGuestUserHasAgeInfo: tubiAuth_setGuestUserHasAgeInfo
     deleteGuestUserHasAgeInfo: tubiAuth_deleteGuestUserHasAgeInfo
+    setEnableVideoPreview: tubiAuth_setEnableVideoPreview
 
 
     'private methods
@@ -104,6 +106,14 @@ Function tubiAuth_getAuthInfo()
     authInfo.delete("ln")
   end if
 
+  if authInfo.enablevideopreview <> invalid 'convert string to boolean since authGlobal will have boolean.
+    if authInfo.enablevideopreview = "false"
+      authInfo.enablevideopreview = false
+    else
+      authInfo.enablevideopreview = true
+    end if
+  end if
+
   newAuthInfo = invalid
   if authInfo.expireTime <> invalid   'used as test to determine if we have any auth info in the auth registry
     authInfo.expireTime = authInfo.expireTime.toInt()
@@ -132,6 +142,20 @@ Function tubiAuth_getAuthInfo()
   end if
 
   return newAuthInfo  'can return invalid
+End Function
+
+
+'Saves the key value pair in registry
+'@key : String, authInfo key
+'@value: String, Value for the provided key
+Function tubiAuth_setAuthInfo(key, value)
+
+  if isString(key) = true and isString(value) = true
+    m.regWrite(key, value, m.authRegSection)
+  else
+    tubiLog("Key/Value provided for SetAuthInfo Function are not Strings.", "warn")
+  end if
+
 End Function
 
 
@@ -494,6 +518,26 @@ Function tubiAuth_setFirstVisit()
 End Function
 
 
+'@choice - user choice of Video preview
+'         true - show video preview
+'         false - do not show video preview
+Function tubiAuth_setEnableVideoPreview(choice)
+  if isString(choice) = true
+    if choice = "true"
+      m.setAuthInfo("enablevideopreview", "true")
+    else if choice = "false"
+      m.setAuthInfo("enablevideopreview", "false")
+    end if
+  else
+    if choice = true
+      m.setAuthInfo("enablevideopreview", "true")
+    else
+      m.setAuthInfo("enablevideopreview", "false")
+    end if
+  end if
+End Function
+
+
 'parses auth info from the server and saves it into the registry for further access
 'returns invalid or the authInfo assocArray that was successfully saved into the registry:
 'authInfo = {
@@ -691,6 +735,7 @@ Function tubiAuth_createAuthRequest(url as String, name = "" as String, options=
     authReq.authInfo = authInfo
     authReq.regWrite = m.regWrite
     authReq.authRegSection = m.authRegSection
+    authReq.setAuthInfo = m.setAuthInfo
   end if
 
   return authReq
@@ -995,6 +1040,7 @@ Function tubiAuth_formatAuthInfoFromServer(serverAuthInfo)
   if serverAuthInfo.user_id <> invalid then authInfo.userId = serverAuthInfo.user_id.toStr()
   if serverAuthInfo.authType <> invalid then authInfo.authType = serverAuthInfo.authType
   if serverAuthInfo.has_age <> invalid then authInfo.hasAge = serverAuthInfo.has_age.toStr()
+  if serverAuthInfo.enable_video_preview <> invalid then authInfo.enableVideoPreview = serverAuthInfo.enable_video_preview
 
   authInfo.firstName = ""
   if serverAuthInfo.first_name <> invalid

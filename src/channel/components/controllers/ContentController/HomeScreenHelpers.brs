@@ -66,6 +66,8 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     homeScreen.observeFieldScoped("stopLinearVideoPlayer", "onStopLinearVideoPlayer")
     homeScreen.observeFieldScoped("sponsoredRowFocused", "onHomescreenSponsoredRowFocused")
     homeScreen.observeFieldScoped("columnFocused", "onColumnFocusChanged")
+    homeScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
+    homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
 
     '//::TODO:: epg - remove this observer once the roku_linear_epg_v4 experiment is done
     homeScreen.observeField("focusedChild", "onHomeScreenFocusChange")
@@ -858,6 +860,7 @@ End Function
 ' @param focusedContent, roSGNode - The TubiContentNode of the focused content
 ' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content
 Function setHomeScreenAfterFocus(focusedContent, homeScreen)
+
   if focusedContent <> invalid and getCurrentScreen() <> invalid and getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
     '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
     '//we should stop the countdown timer
@@ -889,6 +892,28 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
       stopAndHideLinearVideoPlayer()
     end if
 
+    if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true and focusedContent.type <> invalid and m.SideNav.opened <> true
+      previewState = getVideoPreviewStateForThisContent(focusedContent)
+      if previewState = "buffering" or previewState = "playing"
+        videoPreview = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
+        if videoPreview <> invalid
+          setPageTypeForVideoPreview("home_page")
+        end if
+        m.backgroundGroup.posterVisible = false
+      else if previewState = "paused"
+        resumeVideoPreview()
+      else ' this block is needed if user focuses to different content, it stops the preview of current content & starts the preview of new content
+        m.backgroundGroup.posterVisible = true
+        stopVideoPreview()
+        if focusedContent <> invalid and focusedContent.videoPreviewUrl <> ""
+          ' fire exposure event for video preview
+          if getExperimentResource("roku_video_preview", "roku_video_preview_v1", true).enabled = true
+            startVideoPreview(focusedContent, "home_page")
+          end if
+        end if
+      end if
+    end if
+
     if focusedContent.type <> invalid and epgExperimentResource.update_homescreen = true
       if focusedContent.type = m.constants.ui.categoryTypes.linear
         m.clock.visible = true
@@ -904,6 +929,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
     end if
 
   end if
+
 End Function
 
 

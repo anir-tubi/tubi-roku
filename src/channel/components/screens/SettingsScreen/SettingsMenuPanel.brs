@@ -44,6 +44,14 @@ Function setSettingsMenuStrings()
     TermsOfServiceButton.title = getTranslation("screenSettings_menu_tos")
     DoNotSellPolicyButton = m.top.findNode("DoNotSellPolicyButton")
     DoNotSellPolicyButton.title = getTranslation("screenSettings_menu_doNotSellPolicy")
+    if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true
+      AutoplayPreviewButton = CreateObject("roSGNode", "DetailMenuItemContentNode")
+      AutoplayPreviewButton.title = getTranslation("screenSettings_menu_autoplayPreview")
+      AutoplayPreviewButton.id="AutoplayPreviewButton"
+      AutoplayPreviewButton.iconUrl="pkg:/images/icon-trailer.webp"
+      settingContentNode = m.top.findNode("SettingsMenuContent")
+      settingContentNode.insertChild(AutoplayPreviewButton, 1)
+    end if
 End Function
 
 

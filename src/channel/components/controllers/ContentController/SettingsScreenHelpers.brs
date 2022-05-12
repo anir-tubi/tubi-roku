@@ -13,9 +13,11 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.observeFieldScoped("signInSelected", "onSettingsSignInSelected")
   m.settingsScreen.observeFieldScoped("parentalSettingSelected", "onParentalSettingSelected")
   m.settingsScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+  m.settingsScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
   m.settingsScreen.observeFieldScoped("backgroundUriList", "onSettingsBackgroundChange")
   m.settingsScreen.observeFieldScoped("showDeviceModal", "onShowDeviceModal")
   m.settingsScreen.observeFieldScoped("backButtonPressed", "onSettingsBackPressed")
+  m.settingsScreen.observeFieldScoped("autoPreviewSettingSelected", "onAutoPreviewSettingSelected")
 
   if isICTSExperimentEnabled() = true
     m.displayICTSUponBackFromSettings = false
@@ -139,13 +141,6 @@ Function onSignOutModalSelected()
 End Function
 
 
-Function onSettingsSignInSelected()
-  tubiLog("SettingsScreenHelpers.onSettingsSignInSelected")
-  m.settingsScreen.actionAfterActivation = ""
-  startSignIn(onSideNavSignInCompleted)
-End Function
-
-
 '//When exiting the ConfirmPasswordScreen, make sure some event handlers are no longer listened to
 Function onConfirmPasswordScreenVisible(msg)
   tubiLog("SettingsScreenHelper.onConfirmPasswordScreenVisible")
@@ -155,6 +150,63 @@ Function onConfirmPasswordScreenVisible(msg)
   if confirmPasswordScreen <> invalid and confirmPasswordScreen.visible = false and m.parentalSettingUpdateTask <> invalid
     m.parentalSettingUpdateTask.unobserveField("result")
   end if
+End Function
+
+'this function will handle things when user selects a autoplayvideoPreview choice
+Function onAutoPreviewSettingSelected()
+  tubiLog("SettingsScreenHelpers.onAutoPreviewSettingSelected")
+  userInteraction = ""
+  if m.settingsScreen.signInInfo <> invalid and m.settingsScreen.signInInfo.signedIn = true
+    if m.settingsScreen.autoPreviewSettingSelected = 0
+      choice = true
+      userInteraction = "TOGGLE_ON"
+    else
+      choice = false
+      userInteraction = "TOGGLE_OFF"
+    end if
+
+    patchAutoplayPreviewChoice(choice)
+    setAuthInfoValue("enableVideoPreview", choice)
+    auth = TubiAuth(m.constants, m.Request)
+    auth.setEnableVideoPreview(choice) ' update the registry to mimic authGlobal.
+    m.settingsScreen.autoPreviewItemUpdated = m.settingsScreen.autoPreviewSettingSelected
+    setAutoplayVideoPreviewFromGlobal()
+
+    'Send ComponentInteractionEvent
+
+    leftSideNavComponent = {
+      left_nav_section: "ACCOUNT"
+    }
+    pageInfo = {
+      pageType: "account_page"
+      pageValues: {
+        account_page_type: "VIDEO_PREVIEW"
+      }
+    }
+    componentInteractionInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+      componentOneof: m.Tracking.getAnalyticsComponent("left_side_nav_component", leftSideNavComponent)
+      user_interaction: userInteraction
+    }
+    sendComponentInteractionInfo(componentInteractionInfo)
+  else
+    pageInfo = m.settingsScreen.trackingPageInfo
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "SIGNIN_REQUIRED"
+        pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+        dialog_action: "SHOW"
+        dialog_sub_type: "sign-in-videopreview"
+      }
+    }
+
+    title = getTranslation("dialog_signIn_title")
+    message = getTranslation("screenSettings_error_signInAutoplayPreview_description")
+    buttons = [getTranslation("dialog_button_signIn"), getTranslation("dialog_button_cancel")]
+    showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalSelectedViaAutoplayPreview)
+  end if
+
 End Function
 
 
@@ -444,4 +496,53 @@ Function showConfirmPasswordScreen()
   m.confirmPasswordScreen.observeField("backPressed", "onSettingsBackPressed")
   m.confirmPasswordScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
   pushScreen(m.confirmPasswordScreen)
+End Function
+
+
+'@choice : boolean, user's selection of autoplay preview preference.
+'          true - show video previews
+'          false - no video previews
+' PATCH user account info with their autoplay preview preference.
+Function patchAutoplayPreviewChoice(choice)
+  tubiLog("SettingScreenHelpers.patchAutoplayPreviewChoice")
+    authInfo = getFieldFromGlobal("authInfo")
+
+    if isLoggedInUser(authInfo)
+      patchSettingsInfo = m.userDeviceApi.patchAutoplayPreviewSettingInfo(choice)
+
+      m.makeRequest({
+        url: patchSettingsInfo.url
+        requestType: m.constants.reqNames.patchUserSettings
+        options: patchSettingsInfo.options
+        responseType: "assocarray"
+        silenceCallbackWarnings: true
+      })
+    end if
+End Function
+
+
+' @authInfo : AA, authInfo as stored on m.global.authInfo, optional parameter if calling function already has authInfo AA.
+' this function will set m.isAutoplayVideoPreviewOn based on user autoplay choice or auth global
+' m.isAutoplayVideoPreviewOn variable is used to avoid accessing global everytime to check user autoplay choice, everytime an item gets focus on homeScreen.
+Function setAutoplayVideoPreviewFromGlobal(authInfo = invalid)
+  tubiLog("SettingScreenHelpers.setAutoplayVideoPreviewFromGlobal")
+  bEnabled = true
+
+  if authInfo = invalid
+    authInfo = getFieldFromGlobal("authInfo")
+  end if
+
+  if isLoggedInUser(authInfo) = true and getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true
+    if authInfo.enableVideoPreview <> invalid
+      bEnabled = authInfo.enableVideoPreview
+    end if
+  end if
+  m.isAutoplayVideoPreviewOn = bEnabled
+End Function
+
+
+Function onSettingsSignInSelected()
+  tubiLog("SettingsScreenHelpers.onSettingsSignInSelected")
+  m.settingsScreen.actionAfterActivation = ""
+  startSignIn(onSideNavSignInCompleted)
 End Function

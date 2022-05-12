@@ -288,6 +288,10 @@ Function getTranslation_en_US()
       "description": "Label of the dialog button to turn something off: i.e. turn off closed captions",
       "message": "Off"
     },
+    "dialog_button_on": {
+      "description": "Label of the dialog button to turn something on: i.e. turn on autoplay preview",
+      "message": "On"
+    },
     "dialog_button_settings": {
       "description": "Label of the dialog button to cause the app to go to the settings screen.",
       "message": "Go To Settings"
@@ -660,6 +664,10 @@ Function getTranslation_en_US()
       "description": "The label for the parental controls",
       "message": "Parental Controls"
     },
+    "screenSettings_menu_autoplayPreview": {
+      "description": "The label for the autoplay preview",
+      "message": "Autoplay Previews"
+    },
     "screenSettings_parentalControls_group0": {
       "description": "Group 0 of the parental controls",
       "message": "Little Kids ({ratings})",
@@ -683,6 +691,10 @@ Function getTranslation_en_US()
     "screenSettings_parentalControls_instructions": {
       "description": "Description of the parental controls screen",
       "message": "Please select the appropriate viewing age for Tubi TV. Your selection will determine which movie and show ratings you can view in the app. If this selection is changed, you will be required to enter your account password."
+    },
+    "screenSettings_autoplayPreview_instructions": {
+      "description": "Description of the autoplay preview user choice screen",
+      "message": "You can turn the autoplay functionality on or off, which allows you to preview the video while browsing."
     },
     "screenSettings_menu_about": {
       "description": "A menu Item for the Settings screen",
@@ -763,6 +775,10 @@ Function getTranslation_en_US()
     "screenSettings_error_signInParental_description": {
       "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
       "message": "You must be signed in to adjust parental controls"
+    },
+    "screenSettings_error_signInAutoplayPreview_description": {
+      "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
+      "message": "You must be signed in to change Autoplay Preview preferences."
     },
     "screenChannels_error_retrieve_message": {
       "description": "Onscreen message to indicate channel content could not be gathered",

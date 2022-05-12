@@ -165,6 +165,7 @@ End Function
 
 Function onScreenFocusChange()
   tubiLog("DetailScreen.onScreenFocusChange")
+
   if m.top.hasFocus() then
 
     'After Instant Resume, when pressing back from one detail screen to another detail screen via YMAL
@@ -174,8 +175,6 @@ Function onScreenFocusChange()
     m.top.relatedContent = relatedContent
 
     m.focusTarget.setFocus(true)
-    ' force a background update
-    m.top.backgroundUriList = m.top.backgroundUriList
 
     'determine if the content should be refreshed
     if shouldRefresh(m.top.content) = true
@@ -187,6 +186,8 @@ Function onScreenFocusChange()
       m.top.refreshRelatedContent = true
     end if
   end if
+  ' force a background update
+  m.top.backgroundUriList = m.top.backgroundUriList
 End Function
 
 
@@ -291,7 +292,7 @@ Function onIsSeries()
       addRemoveMenuItem(false, signUpIndex, m.signUpMenuItem, [])
     end if
   else
-    'Add menu item to anytype(firstTime/returned) of user if the user is not in signUpExperiement 
+    'Add menu item to anytype(firstTime/returned) of user if the user is not in signUpExperiement
     'EpisodeMenuItem will add after playMenuItem
     addRemoveMenuItem(m.top.isSeries, episodeIndex, m.EpisodesMenuItem, [m.PlayMenuItem])
   end if
@@ -444,6 +445,9 @@ End Function
 Function handleMenuItemSelected(itemSelected)
   if itemSelected <> invalid then
     tubiLog("DetailScreen.handleMenuItemSelected" + itemSelected.title)
+    if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true
+      m.top.stopVideoPreview = true
+    end if
     if itemSelected.id = "ResumeMenuItem"
       m.top.resumeSelected = true
     else if itemSelected.id = "PlayMenuItem"
@@ -513,6 +517,13 @@ End Function
 Function onRelatedItemFocused()
   tubiLog("DetailScreen.onRelatedItemFocused")
   if m.RelatedGrid.content <> invalid
+
+    if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true
+      m.top.stopVideoPreview = true
+      ' force a background update
+      m.top.backgroundUriList = m.top.backgroundUriList
+    end if
+
     focusedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemFocused)
     if focusedContent <> invalid
       m.RelatedTitle.text = focusedContent.title
