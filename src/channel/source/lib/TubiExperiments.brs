@@ -32,6 +32,14 @@ Function TubiExperiments(constants) as Object
         roku_linear_epg_v4: { "enabled": true, "side_nav": false, "update_homescreen": false}
       }
 
+      '//When enabled = true, the "roku_icts_skip_new_v1" experiment should have a boolean field labeled "initially_focus_skip", a boolean field labeled "live_tv_first" and a boolean field labeled "show_me_everything"
+      '//   if enabled=true and initially_focus_skip=true, live_tv_first=false and show_me_everything=false, then we will focus on the skip button
+      '//   if enabled=true and initially_focus_skip=false, live_tv_first=true and show_me_everything=false, then live tv will be first and we will focus on it
+      '//   if enabled=true and initially_focus_skip=true, live_tv_first=true and show_me_everything=true, then we will focus on the skip button and it will have the show me everything text
+      roku_icts_skip_new: {
+        roku_icts_skip_new_v1: {"enabled": false, "initially_focus_skip": false, "live_tv_first": false, "show_me_everything": false}
+      }
+
       '//When enabled = true, the "roku_icts_content_modes_v1" experiment should have a boolean field labeled "show_background_images" and a boolean field labeled "live_tv_first"
       '//   if enabled=true and show_background_images=true and live_tv_first=false, then we will show background images and a-list will be first
       '//     roku_icts_content_modes_v1: {"enabled": true, "show_background_images": true, "live_tv_first": false}
@@ -48,7 +56,7 @@ Function TubiExperiments(constants) as Object
       roku_registration_with_magic_link: {
         roku_registration_with_magic_link_v1: {"enabled": false}
       }
-      
+
       roku_detail_screen_background_image: {
         roku_detail_screen_background_image_v1: {"enabled": false}
       }

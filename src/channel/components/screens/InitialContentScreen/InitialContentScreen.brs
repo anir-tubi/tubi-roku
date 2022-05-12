@@ -79,7 +79,7 @@ Function init()
     m.InitialContentMenu = m.top.findNode("controlInitialContentMenu")
 
     m.Title.text = getTranslation("screenInitialContent_title")
-    m.SkipButton.text = getTranslation("dialog_button_skip")
+    m.SkipButton.text = getSkipButtonText()
 
     authInfo = m.global.authInfo
     if (authInfo <> invalid and authInfo.userId <> invalid)
@@ -91,9 +91,19 @@ Function init()
     m.InitialContentMenu.focusBitmapBlendColor = theme.focused
 
     m.rowNode = CreateObject("roSGNode", "ContentNode")
+
+    setLiveTvFirst = isICTSSkipExperimentEnabled() AND getICTSSkipExperiment().live_tv_first = true
+    if setLiveTvFirst = true then
+        setMainContent(m.constants.ui.sideNavIds.linearTV, m.rowNode)
+    end if
+
     setMainContent(m.constants.ui.sideNavIds.movies, m.rowNode)
     setMainContent(m.constants.ui.sideNavIds.tv, m.rowNode)
-    setMainContent(m.constants.ui.sideNavIds.linearTV, m.rowNode)
+
+    if setLiveTvFirst = false then
+      setMainContent(m.constants.ui.sideNavIds.linearTV, m.rowNode)
+    end if
+
     setMainContent(m.constants.ui.sideNavIds.espanol, m.rowNode)
     setMainContent(m.constants.ui.sideNavIds.kidsMode, m.rowNode)
 
@@ -183,6 +193,8 @@ End Function
 Function onFocusDelayTimer()
   m.FocusDelayTimer.unobserveFieldScoped("fire")
   if isLiveTVFirst() = true
+    m.SkipButton.setFocus(true)
+  else if shouldInitiallyFocusSkip() = true
     m.SkipButton.setFocus(true)
   else
     m.InitialContentMenu.setFocus(true)
@@ -408,6 +420,39 @@ End Function
 Function isLiveTVFirst()
   ictsExperiment = getExperimentResource("roku_icts_content_modes", "roku_icts_content_modes_v1", false)
   return ictsExperiment.live_tv_first = true and m.constants.deviceInfo.countryCode = "US"
+End Function
+
+
+Function getICTSSkipExperiment(sendEvent = false)
+  return getExperimentResource("roku_icts_skip_new", "roku_icts_skip_new_v1", sendEvent)
+End Function
+
+
+Function isICTSSkipExperimentEnabled()
+  if m.constants.deviceInfo.countryCode <> "US" then
+    return false
+  end if
+
+  return getICTSSkipExperiment(true).enabled = true
+End Function
+
+
+Function shouldInitiallyFocusSkip()
+  shouldFocusSkip = false
+  if isICTSSkipExperimentEnabled() = true then
+    shouldFocusSkip = getICTSSkipExperiment().initially_focus_skip = true
+  end if
+  return shouldFocusSkip
+End Function
+
+
+Function getSkipButtonText()
+  text = getTranslation("dialog_button_skip")
+  if isICTSSkipExperimentEnabled() = true AND getICTSSkipExperiment().show_me_everything = true then
+    text = getTranslation("screenInitialContent_show_everything_title")
+  end if
+
+  return text
 End Function
 
 
