@@ -1426,7 +1426,7 @@ Function skipDetailScreen(refreshedContent)
 
     episode = getEpisodeContent(detailScreen.content)
     if m.enteredFromDeepLink = true
-      sendDeeplinkAnalytics(episode, episode, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
+      sendDeeplinkAnalytics(m.deeplinkContent, episode, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
     end if
     if episode <> invalid
       nowPos = processResume(episode)
