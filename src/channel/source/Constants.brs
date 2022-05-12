@@ -908,6 +908,7 @@ Function getConstants()
       constants.ui.screenIds.sportsEPGScreen = "sportsEPGScreen"
       constants.ui.screenIds.newsEPGScreen = "newsEPGScreen"
       constants.ui.screenIds.entertainmentEPGScreen = "entertainmentEPGScreen"
+      constants.ui.screenIds.emailVerificationScreen = "emailVerificationScreen"
       constants.ui.screenIds.bestKnownScreen = "bestKnownScreen"  '//Note: BestKnown Screen refers to the A-List Screen
       constants.ui.screenIds.nostalgiaScreen = "nostalgiaScreen"
 
@@ -937,7 +938,7 @@ Function getConstants()
     constants.ui.componentIds = {}
     constants.ui.componentIds.videoPreviewPlayer = "VideoPreviewPlayer"
 
-    ' top level content ids for parent content nodes that don't have a content id from the backend
+      ' top level content ids for parent content nodes that don't have a content id from the backend
     constants.ui.contentIds = {}
       constants.ui.contentIds.homegrid = "homegrid"
       constants.ui.contentIds.categoryList = "categoriesList"
