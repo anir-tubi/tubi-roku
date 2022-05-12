@@ -1425,6 +1425,9 @@ Function skipDetailScreen(refreshedContent)
     populateDetailScreen(detailScreen, refreshedContent)
 
     episode = getEpisodeContent(detailScreen.content)
+    if m.enteredFromDeepLink = true
+      sendDeeplinkAnalytics(episode, episode, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
+    end if
     if episode <> invalid
       nowPos = processResume(episode)
       if m.top.fadeInContentController = true
