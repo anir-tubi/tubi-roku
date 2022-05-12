@@ -328,6 +328,7 @@ Function playContent()
       seekToPosition(m.Video.content.nowPos)
     else
       m.lastButtonPressPos = 0
+      m.lastPingTime = 0
     end if
 
     'start_video user event analytics
