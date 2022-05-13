@@ -1334,9 +1334,9 @@ Function getTranslation_es_MX()
       "description": "The default message of a popup error dialog",
       "message": "Disculpa la molestia. Para obtener ayuda, ponte en contacto con support@tubi.tv"
     },
-    "dialog_error_description": {
+    "dialog_magicLink_error_description": {
       "description": "The message of a popup error dialog when user magicLink API fails and user doesn't get verification link to their emial",
-      "message": "Estamos teniendo problemas para procesar esta solicitud. Verifica tu conexión a internet o vuelve a intentarlo haciendo clic en Reenviar enlace de Verificación"
+      "message": "Estamos teniendo problemas para procesar esta solicitud. Verifica tu conexión o vuelve a intentarlo haciendo clic en Reenviar enlace de Verificación"
     },
     "dialog_uidExpiraionError_description": {
       "description": "The description of a popup error dialog when link has been expired during signup process",
