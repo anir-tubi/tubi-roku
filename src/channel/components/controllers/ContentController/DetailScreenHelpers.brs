@@ -138,30 +138,16 @@ Function onDetailBackgroundChange(msg)
           uriList: [] ' setting uriList as empty, because don't rotate background poster when video preview is playing
         }
       else
-        if getExperimentResource("roku_detail_screen_background_image", "roku_detail_screen_background_image_v1", true).enabled = true
-          m.backgroundGroup.backgroundInfo = {
-            type: m.constants.ui.backgroundTypes.topright
-            uriList: detailScreen.backgroundUriList
-          }
-        else
-          m.backgroundGroup.backgroundInfo = {
-            type: m.constants.ui.backgroundTypes.fullscreen
-            uriList: detailScreen.backgroundUriList
-          }
-        end if
-      end if
-    else
-      if getExperimentResource("roku_detail_screen_background_image", "roku_detail_screen_background_image_v1", true).enabled = true
         m.backgroundGroup.backgroundInfo = {
           type: m.constants.ui.backgroundTypes.topright
           uriList: detailScreen.backgroundUriList
         }
-      else
-        m.backgroundGroup.backgroundInfo = {
-          type: m.constants.ui.backgroundTypes.fullscreen
-          uriList: detailScreen.backgroundUriList
-        }
       end if
+    else
+      m.backgroundGroup.backgroundInfo = {
+        type: m.constants.ui.backgroundTypes.topright
+        uriList: detailScreen.backgroundUriList
+      }
     end if
 
   end if
