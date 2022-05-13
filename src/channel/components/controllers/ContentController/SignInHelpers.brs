@@ -759,7 +759,7 @@ Function onMagicLinkError(errorResponse)
   tubiLog("SignInHelpers.onMagicLinkError")
 
   errorCode = getUserFacingErrorCode(m.constants.errors.context.emailVerificationScreen, m.constants.errors.subtypes.networkError, errorResponse)
-  errorMessage = getTranslation("dialog_error_description")
+  errorMessage = getTranslation("dialog_magicLink_error_description")
   dialogEvent = {
     type: "dialog"
     values: {

@@ -112,7 +112,7 @@
     "description": "The default message of a popup error dialog",
     "message": "We're sorry for the inconvenience. For assistance, please contact support@tubi.tv \n"
   },
-  "dialog_error_description": {
+  "dialog_magicLink_error_description": {
     "description": "The message of a popup error dialog when user magicLink API fails and user doesn't get verification link to their emial",
     "message": "We are having trouble processing this request. Please check your internet connection or retry clicking Resend Verification Link"
   },
