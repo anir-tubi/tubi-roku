@@ -1326,9 +1326,21 @@ Function getTranslation_es_MX()
       "description": "The default title of a popup error dialog",
       "message": "Algo salió mal"
     },
+    "dialog_uidExpiraionError_title": {
+      "description": "The title of a popup error dialog when link has been expired during signup process",
+      "message": "Este enlace de verificación ha expirado"
+    },
     "dialog_defaultError_description": {
       "description": "The default message of a popup error dialog",
       "message": "Disculpa la molestia. Para obtener ayuda, ponte en contacto con support@tubi.tv"
+    },
+    "dialog_error_description": {
+      "description": "The message of a popup error dialog when user magicLink API fails and user doesn't get verification link to their emial",
+      "message": "Estamos teniendo problemas para procesar esta solicitud. Verifica tu conexión a internet o vuelve a intentarlo haciendo clic en Reenviar enlace de Verificación"
+    },
+    "dialog_uidExpiraionError_description": {
+      "description": "The description of a popup error dialog when link has been expired during signup process",
+      "message": "Para obtener un nuevo enlace de verificación, haz clic nuevamente en el enlace Reenviar Verificación"
     },
     "dialog_errorMessageContact": {
       "description": "The contact info displayed in an error dialog",
@@ -1374,9 +1386,33 @@ Function getTranslation_es_MX()
       "description": "Label of the dialog button to turn something off: i.e. turn off closed captions",
       "message": "Apagar"
     },
+    "dialog_button_on": {
+      "description": "Label of the dialog button to turn something on: i.e. turn on autoplay preview",
+      "message": "Encender"
+    },
     "dialog_button_settings": {
       "description": "Label of the dialog button to cause the app to go to the settings screen.",
       "message": "Ir a configuración"
+    },
+    "dialog_email_verification_email_already_sent": {
+      "description": "The first line of the email verification description dialog",
+      "message": "Ya se ha enviado un correo electrónico de verificación a"
+    },
+    "dialog_email_verification_check_spam": {
+      "description": "The second line of the email verification description dialog",
+      "message": "Por favor, recuerda revisar tu sección de spam"
+    },
+    "dialog_button_resend_verification_link": {
+      "description": "Label of the dialog button to resend the email verificaion link",
+      "message": "Sí, Reenviar correo clectrónico de verificación"
+    },
+    "dialog_button_attempts_title": {
+      "description": "Title of the dialog after user selcts resend verification link more than 3 times",
+      "message": "Demasiados Intentos"
+    },
+    "dialog_button_multiple_emails_sent": {
+      "description": "The first line of the too many attempts dialog",
+      "message": "Ya se han enviado varios correos electrónicos de verificación a"
     },
     "dialog_errorOops_title": {
       "description": "A general error title for an error dialog window",
@@ -1726,6 +1762,10 @@ Function getTranslation_es_MX()
       "description": "The label for the parental controls",
       "message": "Controles parentales"
     },
+    "screenSettings_menu_autoplayPreview": {
+      "description": "The label for the autoplay preview",
+      "message": "Avance de Video"
+    },
     "screenSettings_parentalControls_group0": {
       "description": "Group 0 of the parental controls",
       "message": "Niños pequeños ({ratings})",
@@ -1749,6 +1789,10 @@ Function getTranslation_es_MX()
     "screenSettings_parentalControls_instructions": {
       "description": "Description of the parental controls screen",
       "message": "Elige la edad de visualización adecuada para Tubi. Tu selección determinará qué clasificaciones de películas y programas puedes ver en la aplicación. Si se modifica esta selección, pediremos que ingreses la contraseña de tu cuenta."
+    },
+    "screenSettings_autoplayPreview_instructions": {
+      "description": "Description of the autoplay preview user choice screen",
+      "message": "Puedes activar o desactivar la función de reproducción automática, que te permite ver el vídeo mientras navegas."
     },
     "screenSettings_menu_about": {
       "description": "A menu Item for the Settings screen",
@@ -1829,6 +1873,10 @@ Function getTranslation_es_MX()
     "screenSettings_error_signInParental_description": {
       "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
       "message": "Debes iniciar sesión para ajustar los controles parentales"
+    },
+    "screenSettings_error_signInAutoplayPreview_description": {
+      "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
+      "message": "Debes iniciar sesión para cambiar las preferencias de reproducción automática."
     },
     "screenChannels_error_retrieve_message": {
       "description": "Onscreen message to indicate channel content could not be gathered",
@@ -2156,6 +2204,18 @@ Function getTranslation_es_MX()
       "description": "could not verify your email modal description",
       "message": "No pudimos verificar tu correo electrónico"
     },
+    "check_email_inbox": {
+      "description": "Title on the email verification screen",
+      "message": "Revisa tu correo electrónico"
+    },
+    "click_on_verification_link": {
+      "description": "Message shown on the email verification screen about the verification link sent to email",
+      "message": "Haz clic en el enlace de verificación enviado a tu correo electrónico:"
+    },
+    "screen_refresh_after_email_verification": {
+      "description": "Message shown on the email verification to let the user know screen will refresh after the email verification",
+      "message": "Esta pantalla se actualizará una vez que hayas verificado tu correo electrónico."
+    },
     "goBack_signIn": {
       "description": "Navigational instructions to users on what the back button does on the current page",
       "message": "PRESIONA ATRÁS PARA VOLVER A INICIAR SESIÓN"
@@ -2243,6 +2303,14 @@ Function getTranslation_es_MX()
     "registration_signup_button_free": {
       "description": "button text on top of background image next to sign up text for when a non registered user focuses on details screen",
       "message": "GRATIS"
+    },
+    "screenEmailVerification_resend_verification_link": {
+      "description": "Label of button to allow users to resend the email verificaion link for sign in",
+      "message": "Reenviar Enlace de Verificación"
+    },
+    "screenEmailVerification_use_different_email": {
+      "description": "Label of button to allow users to use different email address for sign in",
+      "message": "Usar un correo electrónico diferente"
     }
   }
 End Function
