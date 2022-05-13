@@ -58,7 +58,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_detail_screen_background_image: {
-        roku_detail_screen_background_image_v1: {"enabled": false}
+        roku_detail_screen_background_image_v1: {"enabled": true}
       }
       ' enabled = true : after the video preview of the selected title ends, the user sees the hero image again.
       ' autostart = true : after the video preview of the selected title ends, the user sees the title start autoplaying in full screen mode.
