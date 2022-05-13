@@ -1191,7 +1191,7 @@ Function tubiAuth_getSignedHeaders_test()
   m.assertEqual(signedHeaders, expectedSignedHeaders)
 End Function
 
-'@Only
+
 '@Test setAuthInfo unit tests
 Function tubiAuth_setAuthInfo_test()
   auth = m.auth
