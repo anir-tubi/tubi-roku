@@ -48,7 +48,7 @@ Function setSettingsMenuStrings()
       AutoplayPreviewButton = CreateObject("roSGNode", "DetailMenuItemContentNode")
       AutoplayPreviewButton.title = getTranslation("screenSettings_menu_autoplayPreview")
       AutoplayPreviewButton.id="AutoplayPreviewButton"
-      AutoplayPreviewButton.iconUrl="pkg:/images/icon-trailer.webp"
+      AutoplayPreviewButton.iconUrl="pkg:/images/icon-trailer.png"
       settingContentNode = m.top.findNode("SettingsMenuContent")
       settingContentNode.insertChild(AutoplayPreviewButton, 1)
     end if
