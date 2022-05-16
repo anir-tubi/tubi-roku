@@ -743,7 +743,7 @@ Function onMagicLinkResponse(response)
   tubiLog("SignInHelpers.onMagicLinkResponse")
   currentScreen = getCurrentScreen()
   if response <> invalid
-    if currentScreen.id = m.constants.ui.screenIds.EmailVerificationScreen
+    if currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen
       currentScreen.uid = response.uid
       m.emailVerificationTimer = m.top.createChild("Timer")
       m.emailVerificationTimer.repeat = false
@@ -790,7 +790,7 @@ End Function
 Function showEmailVerificationScreen(email)
   tubiLog("SignInHelpers.showEmailVerificationScreen")
   emailVerificationScreen = CreateObject("roSGNode", "EmailVerificationScreen")
-  emailVerificationScreen.id = m.constants.ui.screenIds.EmailVerificationScreen
+  emailVerificationScreen.id = m.constants.ui.screenIds.emailVerificationScreen
   emailVerificationScreen.username = email
   emailVerificationScreen.observeFieldScoped("selectedDifferentEmail", "showEmailScreen")
   emailVerificationScreen.observeFieldScoped("backButtonSelected", "onStopAndClearEmailVerificationTimer")
@@ -805,7 +805,7 @@ Function onEmailVerificationTimerFired()
   'Make Request
   uid = ""
   currentScreen = getCurrentScreen()
-  if currentScreen.id = m.constants.ui.screenIds.EmailVerificationScreen
+  if currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen
     uid = currentScreen.uid
     requestInfo = m.userDeviceApi.queryStatusOfMagicLink(uid)
     m.makeRequest({
@@ -847,7 +847,7 @@ End Function
 Function onQueryStatusOfMagicLinkError(errorResponse)
   tubiLog("SignInHelpers.onqueryStatusOfMagicLinkError")
   currentScreen = getCurrentScreen()
-  if currentScreen.id = m.constants.ui.screenIds.EmailVerificationScreen
+  if currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen
     currentScreen.queryResponseError = currentScreen.queryResponseError + 1
     if currentScreen.queryResponseError > 3
       currentScreen.queryResponseError = 0
