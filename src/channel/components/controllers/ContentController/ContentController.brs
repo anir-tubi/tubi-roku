@@ -1378,6 +1378,7 @@ Function setHomeScreenBackground(homeScreen)
     end if
     videoPreviewState = getVideoPreviewState()
     if videoPreviewState = "playing" or videoPreviewState = "paused"
+
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.epg
         uriList: [] ' setting uriList as empty, because don't need to rotate the background poster when video preview is playing

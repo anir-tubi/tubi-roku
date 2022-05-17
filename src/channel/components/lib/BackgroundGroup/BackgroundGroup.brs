@@ -324,6 +324,13 @@ Function transitionGradients()
       m.fullScreenGradient.gradientOpacity = 0.0
       m.leftBottomGradient.gradientOpacity = 0.0
       m.topRightGradient.gradientOpacity = 0.0
+      if m.top.kidsMode = true
+        m.linearGradient1.uri = "pkg:/images/gradient-left-kids.png"
+        m.linearGradient2.uri = "pkg:/images/gradient-bottom-kids.png"
+      else
+        m.linearGradient1.uri = "pkg:/images/horizGradientEPG.png"
+        m.linearGradient2.uri = "pkg:/images/vertGradientEPG.png"
+      end if
       m.linearGradient1.gradientOpacity = 1.0
       m.linearGradient2.gradientOpacity = 1.0
     end if
@@ -452,8 +459,14 @@ Function transitionGradients()
       '   poster since it is not full screen
       '2) when returning to the category screen from the details screen, the animation is clunky. Setting
       '   the value without animating it is an attempt to reduce the processing needed to run the animations.
-      m.linearGradient1.uri = "pkg:/images/horizGradientEPG.png"
-      m.linearGradient2.uri = "pkg:/images/vertGradientEPG.png"
+
+      if m.top.kidsMode = true
+        m.linearGradient1.uri = "pkg:/images/gradient-left-kids.png"
+        m.linearGradient2.uri = "pkg:/images/gradient-bottom-kids.png"
+      else
+        m.linearGradient1.uri = "pkg:/images/horizGradientEPG.png"
+        m.linearGradient2.uri = "pkg:/images/vertGradientEPG.png"
+      end if
       m.linearGradient1.gradientOpacity = 1.0
       m.linearGradient2.gradientOpacity = 1.0
       if m.fullScreenGradient.gradientOpacity > 0.0
