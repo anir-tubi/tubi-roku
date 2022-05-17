@@ -188,7 +188,7 @@ Function getPreviewProgressEvent(pageType)
       type: "preview_play_progress"
       values: {
         video_id: m.Video.content.id.toInt()
-        position: m.playerPosition
+        position: Int(m.playerPosition * 1000) 'ms
         view_time: viewTime
         video_player: "BANNER"
         page_type: pageType
@@ -208,7 +208,7 @@ Function getFinishPreviewEvent()
     type: "finish_preview"
     values: {
       video_id: m.Video.content.id.toInt()
-      end_position: m.playerPosition
+      end_position: Int(m.playerPosition * 1000) 'ms
       page_type: m.currentPageType
     }
   }
