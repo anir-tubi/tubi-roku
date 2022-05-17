@@ -1462,8 +1462,15 @@ Function skipDetailScreen(refreshedContent)
   detailScreen = getTopDetailScreenFromStack()
   if detailScreen <> invalid
     populateDetailScreen(detailScreen, refreshedContent)
+    if refreshedContent.type = m.constants.ui.contentTypes.series and refreshedContent.currentEpisodeId = "" and refreshedContent.isRecurring = false
+      ' first see if there was a specific episode id we wanted
+      history = getHistory(refreshedContent.id)
+      if history <> invalid
+        refreshedContent.currentEpisodeId = history.currentEpisodeId
+      end if
+    end if
 
-    episode = getEpisodeContent(detailScreen.content)
+    episode = getEpisodeContent(refreshedContent)
     if m.enteredFromDeepLink = true
       sendDeeplinkAnalytics(m.deeplinkContent, episode, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
     end if
