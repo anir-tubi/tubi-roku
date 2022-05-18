@@ -40,6 +40,7 @@ Function init()
   m.top.observeField("updateTimeGridContent", "onTimeContentChange")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
+  m.top.observeField("id", "onIDChange")
   m.top.observeField("refreshTopNav", "onRefreshTopNav")
   m.top.observeField("visible", "onVisibleChange")
   m.top.backgroundUriList = [m.defaultBackgroundUri]
@@ -421,6 +422,18 @@ End Function
 Function onTimeGridRefreshTimer()
   tubiLog("EPGHomeScreen.onTimeGridRefreshTimer")
   m.top.loadAllChannels = true
+End Function
+
+
+Function onIDChange()
+  '//Set the tracking based on the id of the homescreen
+  '//::NOTE:: id should only be set after the instantiation of the HomeScreen, but before the screen is added to the stack
+  newTrackingPageInfo = m.top.trackingPageInfo
+  analyticsContentMode = m.Tracking.getAnalyticsHomePageContentMode(m.top.id)
+  newTrackingPageInfo.pageValues = {content_mode: analyticsContentMode}
+
+  m.top.trackingPageInfo = newTrackingPageInfo
+  m.topNav.trackingPageInfo = newTrackingPageInfo
 End Function
 
 
