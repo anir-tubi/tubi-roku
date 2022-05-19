@@ -81,6 +81,9 @@ Function onVideoPreviewStateChanged(msg)
       currentScreen.backgroundUriList = currentScreen.backgroundUriList
     end if
     m.backgroundGroup.posterVisible = false
+  else if videoPreviewState = "error"
+    ' unobserve the state if we have any error while playing mp4 video previews to avoid autostarting the focused content on autostart varient of experiment.
+    videoPreview.unobserveFieldScoped("state")
   else
     if videoPreview <> invalid
       videoPreview.visible = false
@@ -121,8 +124,10 @@ Function startVideoPreview(content, pageType="home_page")
       videoPreview = CreateObject("roSGNode", "VideoPreviewPlayer")
       videoPreview.visible = false
       videoPreview.id = m.constants.ui.componentIds.videoPreviewPlayer
-      videoPreview.observeField("state", "onVideoPreviewStateChanged")
     end if
+    ' unobserve field just in case previous state was error and start observing a fresh status.
+    videoPreview.unobserveFieldScoped("state")
+    videoPreview.observeFieldScoped("state", "onVideoPreviewStateChanged")
     videoPreview.pageTypeForAnalytics = pageType
 
     videoContent = createObject("RoSGNode", "ContentNode")
