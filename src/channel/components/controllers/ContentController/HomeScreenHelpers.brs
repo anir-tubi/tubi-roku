@@ -905,13 +905,15 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
       else ' this block is needed if user focuses to different content, it stops the preview of current content & starts the preview of new content
         m.backgroundGroup.posterVisible = true
         stopVideoPreview()
-        if focusedContent <> invalid and focusedContent.videoPreviewUrl <> ""
-          ' fire exposure event for video preview
-          if getExperimentResource("roku_video_preview", "roku_video_preview_v1", true).enabled = true
-            startVideoPreview(focusedContent, "home_page")
-          end if
+        if focusedContent.videoPreviewUrl <> ""
+          ' fire exposure event for video preview non-control group
+          getExperimentResource("roku_video_preview", "roku_video_preview_v1", true)
+          startVideoPreview(focusedContent, "home_page")
         end if
       end if
+    else if focusedContent.type <> invalid and m.SideNav.opened <> true and focusedContent.videoPreviewUrl <> ""
+      ' fire exposure event for video preview control group
+      getExperimentResource("roku_video_preview", "roku_video_preview_v1", true)
     end if
 
     if focusedContent.type <> invalid and epgExperimentResource.update_homescreen = true
