@@ -1120,6 +1120,7 @@ Function getConstants()
         keyboard_focused_key: "pkg:/images/keyboard_search_focused_key.9.png"
         scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground.9.png"
         scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground.9.png"
+        gradientBlendColor: "0x10141FFF"
       }
       constants.ui.themes.kidsMode = {
         id: constants.ui.themeIDs.kidsMode
@@ -1128,6 +1129,7 @@ Function getConstants()
         keyboard_focused_key: "pkg:/images/keyboard_search_focused_key_kidsMode.9.png"
         scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground_kidsMode.9.png"
         scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground_kidsMode.9.png"
+        gradientBlendColor: "0x2865B7FF"
       }
 
     constants.ui.homescreen = {}

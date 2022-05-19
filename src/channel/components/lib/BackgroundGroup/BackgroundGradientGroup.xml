@@ -12,6 +12,7 @@
     <field id="gradientOpacity" alias="BackgroundGradient.opacity" />
     <field id="fadeInControl" alias="GradientFadeIn.control" />
     <field id="fadeOutControl" alias="GradientFadeOut.control" />
+    <field id="gradientBlendColor" alias="BackgroundGradient.blendColor" />
   </interface>
 
   <children>
