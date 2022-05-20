@@ -54,7 +54,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_registration_with_magic_link: {
-        roku_registration_with_magic_link_v1: {"enabled": false}
+        roku_registration_with_magic_link_v1: {"enabled": true}
       }
 
       ' enabled = true : after the video preview of the selected title ends, the user sees the hero image again.
