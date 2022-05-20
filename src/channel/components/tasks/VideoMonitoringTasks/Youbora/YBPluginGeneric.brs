@@ -73,7 +73,7 @@ sub _run()
     YouboraLog("YBPluginGeneric.brs - run")
 
     m.pluginName = "Generic"
-    m.pluginVersion = "6.5.25-" + m.pluginName
+    m.pluginVersion = "6.5.27-" + m.pluginName
 
     m.infoManager = InfoManager(m)
     setOptions(m.top.options)

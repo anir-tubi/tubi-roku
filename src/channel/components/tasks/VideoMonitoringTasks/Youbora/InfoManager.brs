@@ -166,10 +166,19 @@ function InfoManager(plugin, options = invalid)
         return totalBytes
     end function
 
+    this.getDeviceUUID = function ()
+        if m.options["device.id"] = invalid
+            return CreateObject("roDeviceInfo").GetChannelClientId()
+        else
+            return m.options["device.id"]
+        end if
+    end function
+
     this.getDeviceInfo = function()
         deviceInfo = {}
         if m.options["device.model"] = invalid
-            hardwareModel = CreateObject("roDeviceInfo").GetModel()
+            devInfo = CreateObject("roDeviceInfo")
+            hardwareModel = devInfo.GetModel()
             'Mapping
             models = {
                 'Roku Smart Soundbar
@@ -249,9 +258,11 @@ function InfoManager(plugin, options = invalid)
                 "2500X" : "Roku HD"
             }
 
+            deviceInfo["model"] = hardwareModel
             if models.DoesExist(hardwareModel)
                 deviceInfo["deviceName"] = models[hardwareModel]
-                deviceInfo["model"] = hardwareModel
+            else
+                deviceInfo["deviceName"] = devInfo.GetModelDisplayName()
             end if
         else
             deviceInfo["model"] = m.options["device.model"]
@@ -450,7 +461,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("player") = false then outParams["player"] = m.plugin.getPluginName()
 
         if outParams.DoesExist("transactionCode") = false then outParams["transactionCode"] = m.options["content.transactionCode"]
-        if outParams.DoesExist("deviceUUID") = false then outParams["deviceUUID"] = CreateObject("roDeviceInfo").GetChannelClientId()
+        if outParams.DoesExist("deviceUUID") = false then outParams["deviceUUID"] = m.getDeviceUUID()
         'Plugin versioning
         if outParams.DoesExist("pluginVersion") = false then outParams["pluginVersion"] = m.plugin.getPluginVersion()
         if outParams.DoesExist("playerVersion") = false then outParams["playerVersion"] = m.plugin.getPlayerVersion()
@@ -547,7 +558,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
         if outParams.DoesExist("adNumberInBreak") = false then outParams["adNumberInBreak"] = m.getAdNumberInBreak()
-        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.25 Roku Adnalyzer"
+        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.27 Roku Adnalyzer"
         'Extra params
         nextraparams = 10
         index = 1
