@@ -374,12 +374,8 @@ async function createGithubRelease(done) {
     done(new NoStackError(err));
   }
 }
-
-
-async function findCommitsNotInProduction(done) {
-  const minorVersionNumber = getBuildTag(true, false);
-  const prodBranch = `${minorVersionNumber}_branch`;
-
+// @compareBranch: string, the branch name we are comparing to master"
+async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
   // verify clean working directory
   verifyGit(done);
 
@@ -387,7 +383,7 @@ async function findCommitsNotInProduction(done) {
   const {prepareConfirmation} = await prompts({
     type: 'confirm',
     name: 'prepareConfirmation',
-    message: `Running this script will apply updates from origin master and origin ${prodBranch} to your local master and ${prodBranch} branches. Do you wish to proceed? (y/n)`,
+    message: `Running this script will apply updates from origin master and origin ${compareBranch} to your local master and ${compareBranch} branches. Do you wish to proceed? (y/n)`,
   });
 
   if (!prepareConfirmation) {
@@ -396,20 +392,24 @@ async function findCommitsNotInProduction(done) {
     return done();
   }
 
-  // pull origin production branch
-  execGitCommand(`git fetch origin ${prodBranch}:${prodBranch}`, 'Could not fetch the current production branch', done);
+  // pull origin of compareBranch
+  if (getCurrentBranch(done) === compareBranch) {
+    // Have to pull if on the current branch as fetch will fail https://stackoverflow.com/questions/2236743/git-refusing-to-fetch-into-current-branch
+    execGitCommand(`git pull`, `Could not pull ${compareBranch} branch`, done);
+  } else {
+    execGitCommand(`git fetch origin ${compareBranch}:${compareBranch}`, `Could not fetch ${compareBranch} branch`, done);
+  }
 
-  // get commits on production branch
-  const gitLogProd = execGitCommand(`git log ${prodBranch} -200`, 'Could not get git logs from prod branch.', done);
+  // get commits on compareBranch
+  const gitLogs = execGitCommand(`git log ${compareBranch} -200`, `Could not get git logs from ${compareBranch} branch.`, done);
 
-  // process/store commits on production branch
-  // const prodLogs = mapGitLogs(gitLogProd);
-  const prodLogs = {}
-  gitLogProd.split('\n')
+  // process/store commits on compareBranch branch
+  const foundPullRequests = {}
+  gitLogs.split('\n')
     .forEach((item) => {
-      prId = extractPrIdFromCommitInfo(item);
+      const prId = extractPrIdFromCommitInfo(item);
       if (prId) {
-        prodLogs[prId] = true;
+        foundPullRequests[prId] = true;
       }
     });
 
@@ -419,23 +419,44 @@ async function findCommitsNotInProduction(done) {
   // get commits on master
   const gitLogMaster = execGitCommand('git log master --oneline -200', 'Could not get git logs from master branch.', done);
 
-  // filter logs from master that aren't on production
-  const commitsFromMasterNotOnProd = gitLogMaster
+  // filter logs from master that aren't on compareBranch
+  const commitsFromMasterNotOnCompareBranch = gitLogMaster
     .split('\n')
     .filter((item) => {
       const prId = extractPrIdFromCommitInfo(item);
-      return prId && !prodLogs[prId];
+      return prId && !foundPullRequests[prId];
     });
 
   console.log('');
-  console.log(`COMMITS THAT HAVE NOT BEEN CHERRY PICKED FROM master TO ${prodBranch}`);
+  console.log(`COMMITS THAT HAVE NOT BEEN CHERRY PICKED FROM master TO ${compareBranch}`);
   console.log('-----------------------------------------------------------------------');
-  commitsFromMasterNotOnProd.forEach((item) => {
+  commitsFromMasterNotOnCompareBranch.forEach((item) => {
     console.log(item);
   });
   console.log('-----------------------------------------------------------------------');
   return done();
 }
+
+
+function findCommitsNotOnProductionBranch(done) {
+  const minorVersionNumber = getBuildTag(true, false);
+  const prodBranch = `${minorVersionNumber}_branch`;
+  return findCommitsOnMasterNotOnBranch(done, prodBranch);
+}
+
+
+function getCurrentBranch(done) {
+  const errorMsg = 'Could not get current branch';
+  const currentBranch = execGitCommand('git branch --show-current', errorMsg, done).trim();
+  return currentBranch;
+}
+
+
+function findCommitsNotOnCurrentBranch(done) {
+  const currentBranch = getCurrentBranch(done)
+  return findCommitsOnMasterNotOnBranch(done, currentBranch);
+}
+
 
 // @gitCommand: string, a git command to be executed, for example "git pull origin master"
 // @defaultErrorMessage: string, an error message explaining which command was not able to be completed
@@ -463,12 +484,12 @@ function execGitCommand(gitCommand, defaultErrorMsg, done) {
 //
 // @returns: string, the PR ID like '(#1234)'
 function extractPrIdFromCommitInfo(commitInfo) {
-  rev = commitInfo
+  const rev = commitInfo
     .split('')
     .reverse()
     .join('')
 
-  prIdPosition = rev.indexOf('#( ')
+  const prIdPosition = rev.indexOf('#( ')
 
   if (prIdPosition > 0){
     return rev
@@ -566,6 +587,7 @@ module.exports = {
   makeReleasePrs,
   pushTag,
   createGithubRelease,
-  findCommitsNotInProduction,
+  findCommitsNotOnProductionBranch,
+  findCommitsNotOnCurrentBranch,
   addMissingImagesToRemoteLibrary
 };

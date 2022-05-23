@@ -337,11 +337,13 @@ Remote releases are releases that are not sent to Roku, and updates are made whe
 
 2\. Checkout the most recent `x_y_branch` branch. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number.
 
-3\. Run `$ gulp compare`. This will do the following:
+3\. Run `$ gulp compareProd`. This will do the following:
 
   - fetch any commits from remote `master` to local `master`
   - fetch any commits from the most recent remote `x_y_branch` to the local `x_y_branch`.
   - Compare the last 200 commits on local `master` with the last 200 commits on the local `x_y_branch`, and print out a list of commits that exist on local `master` but have not yet been cherry picked to the local `x_y_branch`.
+
+__NOTE__ you can also use the new `gulp compareCheckedOut` after the initial qa branch for a release has been made to see a list of PRs that have not been cherry picked into the current qa branch.
 
 4\. Cherry pick any commits from local `master` that are to be included in the next release onto the qa branch `qa_x_y_z`.
 (See [this page](https://www.previousnext.com.au/blog/intro-cherry-picking-git) for more info info on the cherry pick git command.)

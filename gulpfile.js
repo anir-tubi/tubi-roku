@@ -33,7 +33,7 @@ const {listUnusedImages,listUnusedTranslations} = require('./js/codeclean.js');
 const {NoStackError} = require('./js/utilities')
 
 // Importing functions with Git functionality
-const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotInProduction, addMissingImagesToRemoteLibrary} = require('./js/git');
+const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch} = require('./js/git');
 
 /* Allow some environment variables to drive which config we're building.
    Environment variables are set on options, along with any parameters passed in
@@ -81,8 +81,8 @@ passedArgs.forEach(arg => {
       //check if the arg is an IP address
       let ipBlocks = strippedArg.split('.');
       let isIp = ipBlocks.reduce((acc, block) => {
-        block = parseInt(block);
-        return (block >= 0 && block < 256) ? true : false;
+        const blockInteger = parseInt(block);
+        return (blockInteger >= 0 && blockInteger < 256) ? true : false;
       }, true);
 
       if (isIp) {
@@ -696,8 +696,9 @@ exports.test = series(setTest, clean, preprocessTests, buildInstalled, sideLoad)
 exports.stage = series(setStaging, exports.build, packageAll, pushStaging);
 exports.releaseOnGithub = series(tagBuild, pushTag, createGithubRelease);
 exports.release = series(confirmRelease, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub);
-exports.compare = findCommitsNotInProduction;
-exports.addMissingImages = addMissingImagesToRemoteLibrary
+exports.compareProd = findCommitsNotOnProductionBranch;
+exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
+exports.addMissingImages = addMissingImagesToRemoteLibrary;
 
 //command lines related to the crowdin language translations
 exports.update_local_translations = updateLocalTranslations;
