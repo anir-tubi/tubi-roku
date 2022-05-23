@@ -1,5 +1,10 @@
 'General long running task which handles the api request & response, success and error callbacks
 Function init()
+  m.port = createObject("roMessagePort")
+  m.top.observeField("request", m.port)
+  m.top.observeField("batchRequest", m.port)
+  m.top.observeField("cancel", m.port)
+  m.constants = getConstantsFromGlobal()
   m.top.functionName = "listen"
   m.top.control = "run"
 End Function
@@ -10,18 +15,8 @@ End Function
 ' this task listens for new request in port and makes api request & response calls
 Function listen()
 
-  tubiLog("GeneralTask.listenloop started")
-  m.port = createObject("roMessagePort")
-  m.top.observeField("request", m.port)
-  m.top.observeField("batchRequest", m.port)
-  m.top.observeField("cancel", m.port)
-  m.constants = getConstantsFromGlobal()
+  tubiLog("GeneralTask.listen loop started")
   m.nodeHelpers = TubiNodeHelpers()
-
-  m.timespan = CreateObject("roTimeSpan")
-  m.timespan.mark()
-  m.epoch = m.timespan.TotalMilliseconds()
-  m.totalConversionTime = 0
 
   ' Ready the translator
   experiments = TubiExperiments(m.constants)
@@ -48,6 +43,7 @@ Function listen()
 
   m.jobStore = {}
   m.requestTypes = {}
+  m.backedOffJobs = {}
   createParsingCallbacks()
 
   m.requestModule = Request(m.constants.settings)
@@ -55,7 +51,7 @@ Function listen()
   m.authInfo = invalid
 
   while (true)
-    msg = wait(0, m.port)
+    msg = wait(200, m.port)
     if type(msg) = "roSGNodeEvent"
       if msg.getField() = "request"
 
@@ -89,6 +85,15 @@ Function listen()
     else if type(msg) = "roUrlEvent"
       processResponse(msg)
     end if
+
+    for each requestId in m.backedOffJobs
+      obj = m.backedOffJobs[requestId]
+      if obj.timespan.totalMilliseconds() > obj.backoffDuration then
+        job = obj.job
+        makeApiRequest(job.requestNode, job.batchNode)
+        m.backedOffJobs.delete(requestId)
+      end if
+    end for
   end while
 
 End Function
@@ -130,7 +135,7 @@ Function makeApiRequest(requestNode, batchNode = invalid) as Boolean
     urlTransfer = tubiReq.urlTransfer
 
     if urlTransfer <> invalid and reqSent = true
-      id = stri(urlTransfer.getIdentity()).trim()
+      id = urlTransfer.getIdentity().toStr()
 
       m.jobStore[id] = {
         requestNode: requestNode
@@ -181,7 +186,7 @@ End Function
 ' it does basic parsing the api response and send to appropriate parsing callbacks for further parsing, and send back the parsed data to the response field.
 ' @msg : roUrlEvent, response object from api
 Function processResponse(msg)
-  id = stri(msg.GetSourceIdentity()).trim()
+  id = msg.GetSourceIdentity().toStr()
   job = m.jobStore[id]
 
   if job <> invalid
@@ -222,8 +227,7 @@ Function processResponse(msg)
             end if
 
             if newAuthInfo <> invalid
-              handleBackoff(requestNode, retries) 'pause before retry to relieve pressure on the backend
-              makeApiRequest(job.requestNode, job.batchNode)
+              handleBackoff(job, retries) 'pause before retry to relieve pressure on the backend
             else
               processErrorReponse(result, callbackTypes, job)
             end if
@@ -232,8 +236,7 @@ Function processResponse(msg)
           end if
         else
           if retries > 0
-            handleBackoff(requestNode, retries) 'pause before retry to relieve pressure on the backend
-            makeApiRequest(job.requestNode, job.batchNode)
+            handleBackoff(job, retries) 'pause before retry to relieve pressure on the backend
           else
             processErrorReponse(result, callbackTypes, job)
           end if
@@ -458,38 +461,39 @@ End function
 ' this method cancels the outstanding requests on the same screen
 ' @requestNode : roSGNode, requestNode is ContentNode created at GeneralTaskModule
 Function cancelRequests(requestNode) As Void
-
   tubiLog("GeneralTask.cancelRequests")
 
   requestId = requestNode.id
-  for each job in m.jobStore
-    child = m.jobStore[job]
-    if child <> invalid and child.requestnode <> invalid and child.tubiReq <> invalid
-      if child.requestnode.id = requestId
-        child.tubiReq.cancel()
+  for each key in m.jobStore
+    job = m.jobStore[key]
+    if job <> invalid and job.requestNode <> invalid and job.tubiReq <> invalid
+      if job.requestNode.id = requestId
+        job.tubiReq.cancel()
         exit for
       end if
     end if
   end for
-
+  m.backedOffJobs.delete(requestId)
 End Function
 
 
-' Helper function to handle the sleep before retrying a request
+' Helper function to setup logic to store the job before retrying after the requested amount of time has passed
 '
-' @requestNode: roSGNode, a request node as created by GeneralTaskModule().constructRequestNode()
+' @job: AssocArray, the job for this request as created in makeApiRequest
 ' @retries: integer, the number of remaining retries for a request/request node
 '
 ' side effects: updates the retries and pause fields of the passed in requestNode
-Function handleBackoff(requestNode, retries)
+Function handleBackoff(job, retries)
+  requestNode = job.requestNode
   backoffFactor = requestNode.backoffFactor
-  pause = requestNode.pause
-
-  sleep(pause) ' making some delay for retry request
-
-  pause = pause * backoffFactor
-  requestNode.pause = pause
+  backoffDuration = requestNode.pause * backoffFactor
+  requestNode.pause = backoffDuration
   requestNode.retries = retries - 1
+  m.backedOffJobs[requestNode.id] = {
+    "timespan": createObject("roTimespan")
+    "job": job
+    "backoffDuration": backoffDuration
+  }
 End Function
 
 
