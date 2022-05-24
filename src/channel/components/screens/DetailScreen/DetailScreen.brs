@@ -280,22 +280,15 @@ End Function
 Function onIsSeries()
   tubiLog("DetailScreen.onIsSeries")
   isSeries = m.top.isSeries
-  episodeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
+  episodeListIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
   if m.signUpMenuItem <> invalid and m.rokuRegisterSignupToSaveExperiment = true
     signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
-    if isLoggedInUser() = false and isReturningUser()
-      'Add menu item if the returning user is in experiment and not loggedin
-      'EpisodeMenuItem will add after signUpMeuItem if it's present otherwise it will place after the playMenuitem
-      addRemoveMenuItem(m.top.isSeries, episodeIndex, m.EpisodesMenuItem, [m.signUpMenuItem, m.PlayMenuItem])
-    else
+    if isLoggedInUser() = true or isReturningUser() = false
       ' remove the sign up button if it's not needed
       addRemoveMenuItem(false, signUpIndex, m.signUpMenuItem, [])
     end if
-  else
-    'Add menu item to anytype(firstTime/returned) of user if the user is not in signUpExperiement
-    'EpisodeMenuItem will add after playMenuItem
-    addRemoveMenuItem(m.top.isSeries, episodeIndex, m.EpisodesMenuItem, [m.PlayMenuItem])
   end if
+  addRemoveMenuItem(m.top.isSeries, episodeListIndex, m.EpisodesMenuItem, [m.signUpMenuItem, m.PlayMenuItem])
 End Function
 
 
