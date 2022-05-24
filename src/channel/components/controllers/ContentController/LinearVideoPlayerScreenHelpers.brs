@@ -17,7 +17,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
     videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
 
     if videoPlayer = invalid
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).enabled = true
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = true
         videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerNewScreen")
         videoPlayer.observeFieldScoped("navigateToEPGScreen", "onLinearVideoPlayerRequestingTVGuide")
         '//::TODO:: EPG - when the EPG experiment is graduated, then replace LinearVideoPlayerScreen with LinearVideoPlayerNewScreen: 1) get rid of LinearVideoPlayerScreen, and 2) rename LinearVideoPlayerNewScreen to LinearVideoPlayerScreen
@@ -31,7 +31,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
       videoPlayer.observeFieldScoped("refreshChannels", "onChannelsRequested")
       videoPlayer.observeFieldScoped("fullscreen", "onLinearVideoPlayerVisibleFullscreenChange")
       videoPlayer.observeFieldScoped("userDisplayingChannelGuide", "onChannelGuideVisibleStateChangedByUser")
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).enabled = true
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = true
         videoPlayer.observeFieldScoped("channelSelectedUpdated", "onLinearChannelSelectedFromGuide")
         videoPlayer.observeFieldScoped("linearOverlayNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
         videoPlayer.observeFieldScoped("linearOverlayComponentInteractionInfo", "onComponentInteractionInfoChange")
@@ -204,7 +204,7 @@ Function maximizeLinearPlayer(content)
       m.backgroundGroup.posterVisible = true
       showHideLinearVideoPlayerSpinner(false)
       videoPlayer.loading = false
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).enabled = true
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = true
         getDataForTimeGrid()
       end if
       repositionLinearVideoPlayerToMaxState(bAnimate)
@@ -216,7 +216,7 @@ End Function
 
 Function getDataForTimeGrid()
   tubilog("LinearVideoPlayerScreenHelpers.getDataForTimeGrid")
-  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).enabled = true
+  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = true
     videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
     epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
     if videoPlayer <> invalid
@@ -456,7 +456,7 @@ Function repositionLinearVideoPlayerToMaxState(bAnimate)
       nDuration = .5
     end if
 
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).enabled = true
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = true
       clearMinimizedLinearPlayerAnimation()
     end if
     resizeToLocation(videoPlayer, 1920, 1080, [0,0], nDuration)
@@ -475,7 +475,7 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
     videoPlayer.observeFieldScoped("state", "onLinearVideoPlayerStateWhileInMinState")
 
     linearPlayerParentGroup = m.LinearPlayerGroup
-    epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false)
+    epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false)
     if epgExperimentResource.enabled = true
       currentScreen = getCurrentScreen()
       if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.homeScreen
@@ -546,7 +546,7 @@ Function displayLinearPlayerProgrammingDataOnHomescreen()
     clearMinimizedLinearPlayerAnimation()
     videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
     if videoPlayer <> invalid and videoPlayer.state = "playing"
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).update_homescreen = true
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
         '//get the info to display in the minmized player info panel
         fetchEPGChannel(videoPlayer.id, videoPlayer.content.ID , onEPGChannelProgramSuccess , onEPGChannelProgramError)
       end if
@@ -573,10 +573,10 @@ Function onLinearVideoPlayerStateWhileInMinState(msg)
       videoPlayer.visible = true
 
       currentScreen = getCurrentScreen()
-      epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false)
+      epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false)
       if (currentScreen <> invalid and isAnEpgScreen(currentScreen) = true) or epgExperimentResource.enabled = false or epgExperimentResource.update_homescreen = false
         '//if this is the homescreen, then no need to hide the background group. If this is the EPG screen, then we need to hide the poster while the video is playing
-        '//If we are not in the roku_linear_epg_v4 experiment, then we also need to hide the poster.
+        '//If we are not in the roku_linear_epg_v5 experiment, then we also need to hide the poster.
         m.backgroundGroup.posterVisible = false
       end if
     end if
@@ -593,7 +593,7 @@ Function onLinearVideoPlayerVisibleFullscreenChange(msg)
   if bVisible = true and bFullScreen = false
     '//Is the video player not in fullscreen but still visible?
     m.SideNav.visible = true
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).enabled = false
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = false
       m.logoGroup.visible = false
     end if
   else if bVisible = false and bFullScreen = false
@@ -820,7 +820,7 @@ End Function
 Function onLinearChannelSelectedFromGuide(msg)
   tubiLog("LinearVideoPlayerScreenHelpers.onLinearChannelSelectedFromGuide")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).enabled = true
+  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = true
     channel = videoPlayer.channelSelected
   else
     channel = msg.getData()
@@ -830,7 +830,7 @@ Function onLinearChannelSelectedFromGuide(msg)
   playProvidedChannel = true
   if videoPlayer <> invalid
     if channel <> invalid and channel.videoResources <> invalid
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).enabled = true
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = true
         if isLinearPlayerPlayingThisContent(channel) = true
           playProvidedChannel = false
         end if

@@ -35,7 +35,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     displayDefaultBackground()  ' clear background from previous screens until epgscreen loads
     showHideSpinner(true)
 
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).side_nav = true
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).side_nav = true
       epgScreen = CreateObject("roSGNode", "EPGScreen")
     else
       epgScreen = CreateObject("roSGNode", "EPGHomeScreen")
@@ -53,7 +53,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     epgScreen.observeFieldScoped("refreshEPGScreenVideoPlay", "onRefreshEPGScreenVideoPlay")
     epgScreen.observeFieldScoped("epgScreenOkPressed", "onEPGScreenOKPressed")
 
-    '//::TODO:: epg - remove this observer once the roku_linear_epg_v4 experiment is done
+    '//::TODO:: epg - remove this observer once the roku_linear_epg_v5 experiment is done
     epgScreen.observeField("focusedChild", "onEPGScreenFocusChange")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop lsitenting to timer before listing to it in case a previous screen started the timer
@@ -94,7 +94,7 @@ Function onEPGScreenFocusChange(msg)
   if epgScreen <> invalid and epgScreen.isInFocusChain() = true and m.deeplinkContent = invalid
     '//Fire experiment exposure event when the EPG Screen is focused - just in case there is a deep link to linear content
     '//::NOTE:: delete this function once the experiment is over
-    getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", true)
+    getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", true)
   end if
 End Function
 
@@ -591,7 +591,7 @@ End Function
 
 Function isAnEpgScreen(screen)
   tubiLog("EPGScreenHelpers.isAnEpgScreen")
-  experiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false)
+  experiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false)
   if experiment.side_nav = true
     return screen.isSubType("EPGScreen")
   else

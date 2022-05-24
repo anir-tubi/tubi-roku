@@ -99,7 +99,7 @@ Function displayFirstContentScreen(sSelectedID)
 
   if sSelectedID = sideNavIds.linearTV
     m.contentExperienceMode = contentExperienceModes.liveTV
-    epgExperiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false)
+    epgExperiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false)
     sideNavFocus = sideNavIds.home
     if epgExperiment.enabled = true
       showDefaultEPGScreen()

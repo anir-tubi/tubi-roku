@@ -238,7 +238,7 @@ Function setRowHeights()
       rowHeight = posterHeight
       showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.linear
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).update_homescreen = true
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
         rowItemSize.push(m.constants.ui.imageSizes.linearExperiment)
         rowHeightAdjustment = 70
         rowHeight = m.constants.ui.imageSizes.linearExperiment[1]

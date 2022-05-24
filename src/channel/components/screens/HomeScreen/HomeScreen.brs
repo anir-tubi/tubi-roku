@@ -81,7 +81,7 @@ Function init()
   m.sponsorSlideAmt = 29 'the amount the grid slides up to fit the sponsored header. This is the difference of the heights of the sponsored and normal row titles
   m.sponsorMaskOffsetDiff = 29 'the diff in the amount the content area mask is offset in the up direction for sponsored rows. This is the difference of the heights of the sponsored and normal row titles
 
-  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).update_homescreen = true
+  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
     m.linearSlideAmt = 385 'the amount the grid slides up to fit the linear content item
     m.linearMaskOffsetDiff = 280 'the diff in the amount the content area mask is offset in the up direction for the linear news container
   else
@@ -164,7 +164,7 @@ Function generateTopNavContentItems(includeLinearTV = false)
     m.constants.ui.sideNavIds.tv
   ]
   if includeLinearTV = true
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).enabled = false
+    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = false
       menuItemIds.push(m.constants.ui.sideNavIds.linearTV)
     else
       menuItemIds.push(m.constants.ui.sideNavIds.linearEPG)
@@ -520,7 +520,7 @@ End Function
 Function expandContentAreaForLinear(rowPercent)
   m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.linearSlideAmt * rowPercent)]
   m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.linearMaskOffsetDiff * rowPercent)]
-  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).update_homescreen = true
+  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
     m.InfoPanel.opacity = 1 - rowPercent
   end if
 End Function
@@ -726,7 +726,7 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.width = 960
-    else if mode = m.constants.ui.infoPanelModes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).update_homescreen = true
+    else if mode = m.constants.ui.infoPanelModes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
       m.InfoPanel.mode = mode
     else if mode = m.constants.ui.infoPanelModes.linear
       m.InfoPanel.mode = mode
@@ -753,7 +753,7 @@ End Function
 
 Function determineBackgroundImage(focusedContent)
   if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0
-    if focusedContent.type = m.constants.ui.categoryTypes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v4", false).update_homescreen = true
+    if focusedContent.type = m.constants.ui.categoryTypes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
       return [m.defaultBackgroundUri]
     else
       return focusedContent.backgrounds
