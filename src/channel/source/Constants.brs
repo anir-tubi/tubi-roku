@@ -363,8 +363,10 @@ Function getConstants()
 
   constants.urls = {}
     'ad server url
-    ' constants.urls.adsBaseUrlRainmaker = "https://rainmaker.staging-public.tubi.io/api/v2/rev/vod/"
-    constants.urls.adsBaseUrlRainmaker = "https://rainmaker.production-public.tubi.io/api/v2/rev/vod/"
+    constants.urls.adsBaseUrlRainmaker = "https://rainmaker.staging-public.tubi.io/api/v2/rev/vod/"
+    if constants.settings.mode = "production"
+      constants.urls.adsBaseUrlRainmaker = "https://rainmaker.production-public.tubi.io/api/v2/rev/vod/"
+    end if
 
     'contents url
     constants.urls.cms = {}
