@@ -287,8 +287,15 @@ Function onIsSeries()
       ' remove the sign up button if it's not needed
       addRemoveMenuItem(false, signUpIndex, m.signUpMenuItem, [])
     end if
+
+    ' if in the sign up CTA experiment, add the episodes list menu item after the sign up menu item,
+    ' otherwise add the episodes list menu item after the play menu item.
+    menuItems = [m.signUpMenuItem, m.PlayMenuItem]
+  else
+    menuItems = [m.PlayMenuItem]
   end if
-  addRemoveMenuItem(m.top.isSeries, episodeListIndex, m.EpisodesMenuItem, [m.signUpMenuItem, m.PlayMenuItem])
+
+  addRemoveMenuItem(m.top.isSeries, episodeListIndex, m.EpisodesMenuItem, menuItems)
 End Function
 
 
@@ -406,9 +413,12 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
     previousItemIndex = -1
     if itemToAdd <> invalid and previousItems <> invalid and previousItems.count() > 0
       for i=0 to previousItems.count()-1
-        previousItemIndex = m.NodeHelpers.getChildIndexById(menuItems, previousItems[i].id)
-        if previousItemIndex > -1
-          exit for
+        previousItem = previousItems[i]
+        if previousItem <> invalid
+          previousItemIndex = m.NodeHelpers.getChildIndexById(menuItems, previousItem.id)
+          if previousItemIndex > -1
+            exit for
+          end if
         end if
       end for
     end if
