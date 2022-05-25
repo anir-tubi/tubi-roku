@@ -33,7 +33,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     detailScreen.observeFieldScoped("relatedContentToPlay", "onContentToPlay")
     detailScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
-    if isReturningUser() = true and isLoggedInUser() = false and getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v1", true).enabled = true
+    if isReturningUser() = true and isLoggedInUser() = false and getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v2", true).enabled = true
       detailScreen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelected")
     end if
 
@@ -119,7 +119,7 @@ Function setDetailStrings(screen)
   screen.stringQueueButton = getTranslation("screenDetails_button_queue")
   screen.stringNoQueueButton = getTranslation("screenDetails_button_NoQueue")
   screen.stringNoHistoryButton = getTranslation("screenDetails_button_noHistory")
-  if getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v1", false).enabled = true
+  if getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v2", false).enabled = true
     screen.stringSignUpButton = getTranslation("registration_signup_button") + ";" + getTranslation("registration_signup_button_free")
   end if
 End Function

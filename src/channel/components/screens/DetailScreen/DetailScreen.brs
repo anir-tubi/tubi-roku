@@ -21,7 +21,7 @@ Function init()
   m.RelatedTitle = m.top.findNode("RelatedTitle")
   m.RelatedRowLabel = m.top.findNode("RelatedRowLabel")
   m.AnimationGroup = m.top.findNode("AnimationGroup")
-  m.rokuRegisterSignupToSaveExperiment = getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v1", false).enabled
+  m.rokuRegisterSignupToSaveExperiment = getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v2", false).enabled
   if m.rokuRegisterSignupToSaveExperiment = true
     m.signUpMenuItem = m.top.findNode("signUpMenuItem")
     m.top.observeFieldScoped("removeSignupButton", "onRemoveSignupButton")

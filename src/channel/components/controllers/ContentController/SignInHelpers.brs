@@ -582,7 +582,7 @@ Function onQueueAfterSignIn()
   m.spinner.visible = false
 
   if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
-    if getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v1", false).enabled = true
+    if getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v2", false).enabled = true
       currentScreen.removeSignupButton = true
     end if
     currentScreen.jumpToItem = 0

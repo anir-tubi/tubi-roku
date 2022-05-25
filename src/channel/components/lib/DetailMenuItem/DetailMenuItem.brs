@@ -4,7 +4,7 @@ Function init()
   m.DetailsMenuText = m.top.findNode("DetailsMenuText")
   m.top.leftTextPadding = m.DetailsMenuText.translation[0]
   m.Progress = m.top.findNode("ResumeProgressBar")
-  m.rokuRegisterSignupToSaveExperiment = getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v1", false).enabled
+  m.rokuRegisterSignupToSaveExperiment = getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v2", false).enabled
   if m.rokuRegisterSignupToSaveExperiment = true
     m.badgeLabel = m.top.findNode("badgeLabel")
   end if

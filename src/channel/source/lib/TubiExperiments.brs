@@ -50,7 +50,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_register_signup_to_save: {
-        roku_register_signup_to_save_v1: {"enabled": false}
+        roku_register_signup_to_save_v2: {"enabled": false}
       }
 
       roku_registration_with_magic_link: {
