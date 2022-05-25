@@ -19,6 +19,6 @@
 
       <!-- OUTPUT -->
         <field id="experimentsInfo" type="assocArray" />
-        <field id="externalConfigInfo" type="assocArray" />
+        <field id="externalConfigInfo" type="assocArray" alwaysNotify="true" />
     </interface>
 </component>
