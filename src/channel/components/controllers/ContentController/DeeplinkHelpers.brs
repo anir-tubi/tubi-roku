@@ -486,39 +486,32 @@ End Function
 
 Function handleCategoryDeeplinkContent()
   tubilog("DeeplinkHelpers.handleCategoryDeeplinkContent")
-  if isParentalControlsAdultLevel() = false or m.uiMode = m.constants.ui.modes.kidsAgeGate
-    'ignore the contentId and just show home screen.  We will not be able to show detail screen on kids mode
-    'because there is no way to differentiate the kids category tiles from adult category tiles.
-    'currently backend has an issue that it is sending the contents for adult categoryId if app is parental blocked.
-    'do not change the Uimode to standard.
-    showDefaultHomeScreen()
-    sCatSideNavID = m.constants.ui.sideNavIds.home
+
+
+  if m.deeplinkContent.id <> ""
+    if m.enteredFromDeepLink = true
+      sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.categoryDetail, m.Tracking, m.trackingLoggingTask, m.constants)
+    end if
+    showCategoryListScreen(m.constants, m.constants.ui.terms.menu,false)
+    contentNode = CreateObject("roSGNode", "CategoryContentNode")
+    contentNode.id = m.deeplinkContent.id
+    showCategoryDetailsScreen(contentNode, m.constants.ui.terms.categories, false)
+    categorylListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
+    if categorylListScreen <> invalid
+      categorylListScreen.jumpToItemById = m.deeplinkContent.id
+    end if
+  else
     if m.enteredFromDeepLink = true
       sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.category, m.Tracking, m.trackingLoggingTask, m.constants)
     end if
-  else
+    showCategoryListScreen(m.constants, m.constants.ui.terms.menu, true)
+  end if
+  sCatSideNavID = m.constants.ui.sideNavIds.categories
 
-    if m.deeplinkContent.id <> ""
-      if m.enteredFromDeepLink = true
-        sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.categoryDetail, m.Tracking, m.trackingLoggingTask, m.constants)
-      end if
-      showCategoryListScreen(m.constants, m.constants.ui.terms.menu,false)
-      contentNode = CreateObject("roSGNode", "CategoryContentNode")
-      contentNode.id = m.deeplinkContent.id
-      showCategoryDetailsScreen(contentNode, m.constants.ui.terms.categories, false)
-      categorylListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
-      if categorylListScreen <> invalid
-        categorylListScreen.jumpToItemById = m.deeplinkContent.id
-      end if
-    else
-      if m.enteredFromDeepLink = true
-        sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.category, m.Tracking, m.trackingLoggingTask, m.constants)
-      end if
-      showCategoryListScreen(m.constants, m.constants.ui.terms.menu, true)
-    end if
-    sCatSideNavID = m.constants.ui.sideNavIds.categories
+  if (isParentalControlsAdultLevel() = true or isParentalControlsTeensLevel() = true) and m.uiMode <> m.constants.ui.modes.kidsAgeGate
     setUiMode(m.constants.ui.modes.standard)
   end if
+
   focusSideNavOption(sCatSideNavID)
   resetDeeplinkValues()
 
