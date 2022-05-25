@@ -767,7 +767,7 @@ Function onVideoTrackingStart(msg)
     end if
     youboraConfig["content.resource"] = videoPlayer.content.URL
     youboraConfig["device.model"] = m.constants.deviceInfo.model
-    youboraConfig["device.code"] = m.constants.deviceInfo.deviceId
+    youboraConfig["device.id"] = m.constants.deviceInfo.deviceId
     youboraConfig["app.releaseVersion"] = m.constants.deviceInfo.clientVersion
 
     m.youboraTask.options = youboraConfig
