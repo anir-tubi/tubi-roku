@@ -255,6 +255,7 @@ End Function
 ' being shown.
 Function onScreenFocusChange()
   tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
+
   if m.top.hasFocus() = true
     if m.CategoryGridList.content <> invalid and shouldRefresh(m.CategoryGridList.content) = true
       m.top.loadAllCategories = true

@@ -18,7 +18,7 @@ Function init()
   m.top.observeFieldScoped("uiMode", "onUiModeChange")
   m.global.observeField("theme", "onThemeChange")
 
-  setSettingsMenuStrings()
+  setSettingsMenuStringsAndIcons()
 
   if UCase(m.constants.deviceInfo.countryCode) <> "US"
     removeDoNotSellButton()
@@ -33,7 +33,7 @@ Function onThemeChange()
 End Function
 
 
-Function setSettingsMenuStrings()
+Function setSettingsMenuStringsAndIcons()
     ParentalControlsButton =  m.top.findNode("ParentalControlsButton")
     ParentalControlsButton.title = getTranslation("screenSettings_menu_parentalControls")
     AboutButton =  m.top.findNode("AboutButton")
@@ -44,11 +44,28 @@ Function setSettingsMenuStrings()
     TermsOfServiceButton.title = getTranslation("screenSettings_menu_tos")
     DoNotSellPolicyButton = m.top.findNode("DoNotSellPolicyButton")
     DoNotSellPolicyButton.title = getTranslation("screenSettings_menu_doNotSellPolicy")
+    signInOutButton = m.top.findNode("SignInOutButton")
+
+    updateIconsEnabled = getExperimentResource("roku_update_icons", "roku_update_icons_v1", false).enabled
+
+    if updateIconsEnabled = false
+      ParentalControlsButton.iconUrl = "pkg:/images/icon-parental.png"
+      AboutButton.iconUrl = "pkg:/images/icon-about.png"
+      PrivacyPolicyButton.iconUrl = "pkg:/images/icon-privacy.png"
+      TermsOfServiceButton.iconUrl = "pkg:/images/icon-terms.png"
+      DoNotSellPolicyButton.iconUrl = "pkg:/images/icon-dns.png"
+      signInOutButton.iconUrl = "pkg:/images/icon-sign-in.webp"
+    end if
+
     if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true
       AutoplayPreviewButton = CreateObject("roSGNode", "DetailMenuItemContentNode")
       AutoplayPreviewButton.title = getTranslation("screenSettings_menu_autoplayPreview")
       AutoplayPreviewButton.id="AutoplayPreviewButton"
-      AutoplayPreviewButton.iconUrl="pkg:/images/icon-trailer.png"
+      if updateIconsEnabled = true
+        AutoplayPreviewButton.iconUrl="pkg:/images/icon-trailer.webp"
+      else
+        AutoplayPreviewButton.iconUrl="pkg:/images/icon-trailer.png"
+      end if
       settingContentNode = m.top.findNode("SettingsMenuContent")
       settingContentNode.insertChild(AutoplayPreviewButton, 1)
     end if
@@ -56,14 +73,14 @@ End Function
 
 
 Function onSignInInfoChange()
-  signInButton = m.top.findNode("SignInOutButton")
+  signInOutButton = m.top.findNode("SignInOutButton")
   sText = getTranslation("menu_signIn")
   if m.top.signInInfo <> invalid
     if m.top.signInInfo.signedIn = true
       sText = getTranslation("screenSettings_menu_signOut")
     end if
   end if
-  signInButton.title = sText
+  signInOutButton.title = sText
 End Function
 
 

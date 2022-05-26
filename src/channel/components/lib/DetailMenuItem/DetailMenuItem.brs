@@ -1,6 +1,11 @@
 Function init()
   m.top.observeField("itemContent", "onItemContentChange")
   m.Icon = m.top.findNode("Icon")
+  if getExperimentResource("roku_update_icons", "roku_update_icons_v1", false).enabled = false
+    m.Icon.width = 40
+    m.Icon.height = 40
+    m.Icon.translation = [22,17]
+  end if
   m.DetailsMenuText = m.top.findNode("DetailsMenuText")
   m.top.leftTextPadding = m.DetailsMenuText.translation[0]
   m.Progress = m.top.findNode("ResumeProgressBar")

@@ -62,6 +62,10 @@ Function TubiExperiments(constants) as Object
       roku_video_preview: {
         roku_video_preview_v1: {"enabled": false, "autostart": false}
       }
+
+      roku_update_icons: {
+        roku_update_icons_v1: {"enabled": false}
+      }
     }
 
     'public methods

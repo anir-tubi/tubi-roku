@@ -15,6 +15,17 @@ Function init()
   m.RemoveHistoryMenuItem = m.top.findNode("RemoveHistoryMenuItem")
   m.ChannelMenuItem = m.top.findNode("ChannelMenuItem")
   m.WatchTrailerMenuItem = m.top.findNode("WatchTrailerMenuItem")
+  ' fire exposure event when detail screen is
+  updateIconsEnabled = getExperimentResource("roku_update_icons", "roku_update_icons_v1", false).enabled
+  if updateIconsEnabled = false
+    m.ResumeMenuItem.iconUrl = "pkg:/images/icon-resume.png"
+    m.PlayMenuItem.iconUrl = "pkg:/images/icon-play.png"
+    m.EpisodesMenuItem.iconUrl = "pkg:/images/icon-all-episodes.png"
+    m.AddQueueMenuItem.iconUrl = "pkg:/images/icon-add-to-queue.png"
+    m.RemoveQueueMenuItem.iconUrl = "pkg:/images/icon-remove-from-queue.png"
+    m.RemoveHistoryMenuItem.iconUrl = "pkg:/images/icon-remove-from-history.png"
+    m.WatchTrailerMenuItem.iconUrl = "pkg:/images/icon-trailer.png"
+  end if
   m.RelatedContentParentGroup = m.top.findNode("RelatedContentParentGroup")
   m.RelatedContentGroup = m.RelatedContentParentGroup.findNode("RelatedContentGroup")
   m.RelatedGrid = m.top.findNode("RelatedGrid")
@@ -24,6 +35,9 @@ Function init()
   m.rokuRegisterSignupToSaveExperiment = getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v2", false).enabled
   if m.rokuRegisterSignupToSaveExperiment = true
     m.signUpMenuItem = m.top.findNode("signUpMenuItem")
+    if updateIconsEnabled = true
+      m.signUpMenuItem.iconUrl = "pkg:/images/icon-sign-in.webp"
+    end if
     m.top.observeFieldScoped("removeSignupButton", "onRemoveSignupButton")
     m.top.observeFieldScoped("stringSignUpButton", "onStringChange")
   end if
@@ -165,7 +179,6 @@ End Function
 
 Function onScreenFocusChange()
   tubiLog("DetailScreen.onScreenFocusChange")
-
   if m.top.hasFocus() then
 
     'After Instant Resume, when pressing back from one detail screen to another detail screen via YMAL

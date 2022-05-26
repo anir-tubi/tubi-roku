@@ -46,9 +46,9 @@
   <children>
     <Poster
      id="Icon"
-     translation="[22,16]"
      width="36"
      height="36"
+     translation="[24,19]"
      loadSync="true"/>
 
     <Label

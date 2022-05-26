@@ -83,6 +83,9 @@ End Function
 ' @sID: string: one of the menu item ids. A list of ids can be found in constants.ui.sideNavIds
 Function focusSideNavOption(sID)
 
+  '//Fire the update Icons exposure event when the side nav is viewable (which happens when this function is called)
+  getExperimentResource("roku_update_icons", "roku_update_icons_v1", true)
+
   screen = getCurrentScreen()
   if isParentalControlsAdultLevel() = true and screen <> invalid and screen.id <> m.constants.ui.screenIds.linearVideoPlayerScreen
     '//Fire the epg exposure event when the side nav is viewable (which happens when this function is called)

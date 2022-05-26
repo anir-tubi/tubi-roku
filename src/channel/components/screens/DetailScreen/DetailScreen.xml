@@ -169,28 +169,27 @@
       iconUrl="pkg:/images/icon-resume.webp"/>
     <DetailMenuItemContentNode
       id="PlayMenuItem"
-      iconUrl="pkg:/images/icon-play.webp" />
+      iconUrl="pkg:/images/icon-play.webp"/>
     <DetailMenuItemContentNode
       id="EpisodesMenuItem"
-      iconUrl="pkg:/images/icon-all-episodes.webp" />
+      iconUrl="pkg:/images/icon-all-episodes.webp"/>
     <DetailMenuItemContentNode
       id="AddQueueMenuItem"
-      iconUrl="pkg:/images/icon-add-to-queue.webp" />
+      iconUrl="pkg:/images/icon-add-to-queue.webp"/>
     <DetailMenuItemContentNode
       id="RemoveQueueMenuItem"
-      iconUrl="pkg:/images/icon-remove-from-queue.webp" />
+      iconUrl="pkg:/images/icon-remove-from-queue.webp"/>
     <DetailMenuItemContentNode
       id="RemoveHistoryMenuItem"
-      iconUrl="pkg:/images/icon-remove-from-history.webp" />
+      iconUrl="pkg:/images/icon-remove-from-history.webp"/>
     <DetailMenuItemContentNode
       id="ChannelMenuItem"
-      iconUrl="pkg:/images/icon-channel.png" />
+      iconUrl="pkg:/images/icon-channel.png"/>
     <DetailMenuItemContentNode
       id="WatchTrailerMenuItem"
-      iconUrl="pkg:/images/icon-trailer.webp" />
+      iconUrl="pkg:/images/icon-trailer.webp"/>
     <DetailMenuItemContentNode
-      id="signUpMenuItem"
-      iconUrl="pkg:/images/icon-sign-in.webp" />
+      id="signUpMenuItem"/>
 
     <Poster
       id="leftChevron"
