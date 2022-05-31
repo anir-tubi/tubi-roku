@@ -182,13 +182,9 @@ Function onEmailExistsResponse(response)
 
     if parsedresponse <> invalid and requestInput <> invalid
       if parsedresponse.taken = true
-        if getExperimentResource("roku_registration_with_magic_link", "roku_registration_with_magic_link_v1", true).enabled = true
-          showEmailVerificationScreen(requestInput.email)
-          m.email = requestInput.email
-          createMagicLinkRequest(requestInput.email)
-        else
-          showSignInScreen(requestInput.email)
-        end if
+        showEmailVerificationScreen(requestInput.email)
+        m.email = requestInput.email
+        createMagicLinkRequest(requestInput.email)
       else
         m.authInfoReceived = false
         signUpCredentials = {}
