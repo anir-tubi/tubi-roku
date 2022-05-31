@@ -1,0 +1,25 @@
+name: Draft Pull Request Actions
+
+on:
+  pull_request:
+    types:
+      - opened
+      - converted_to_draft
+      - ready_for_review
+env:
+  TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  add-remove-not-ready-label:
+    runs-on: ubuntu-latest
+    name: Add Remove Not Ready For Review Label
+    steps:
+    - uses: actions/checkout@v2
+
+    # npm command install only production packages
+    - name: npm install
+      run: |
+        npm install --only=prod
+
+    - name: Run Workflow Code
+      run: node ./js/workflows/draftPullRequest.js
