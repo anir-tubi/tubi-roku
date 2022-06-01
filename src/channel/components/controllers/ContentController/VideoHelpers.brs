@@ -3,11 +3,11 @@
 '
 ' Helper function for onResume and onPlay to launch content
 ' @content: TubiContentNode, the content to be played, can be a movie, episode, or trailer
-' @autoplayType: string, valid values are "automatic", "deliberate", or "none"
+' @playbackSource: string, valid values are "automatic", "deliberate", "previews" or "unknown"
 ' @position: integer, the position from which to start video playback
-Function playVideoContent(content, autoplayType = "none", position = 0)
+Function playVideoContent(content, playbackSource = "unknown", position = 0)
   tubiLog("VideoHelpers.playVideoContent")
-  videoPlayer = setupVideoPlayer(content, autoplayType, position)
+  videoPlayer = setupVideoPlayer(content, playbackSource, position)
 
   currentScreen = getCurrentScreen()
 
@@ -39,8 +39,8 @@ End Function
 ' @nowPos: integer, the position from which the video playback should be resumed
 ' @currentTrackingPageInfo: assocArray, trackingPageInfo of the screen being navigated from
 ' @trackingComponentInfo: assocArray, trackingPageInfo of the screen being navigated from
-Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrackingPageInfo, trackingComponentInfo = invalid)
-  videoPlayer = setupVideoPlayer(content, "none", nowPos)
+Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrackingPageInfo, trackingComponentInfo = invalid, playbackSource="unknown")
+  videoPlayer = setupVideoPlayer(content, playbackSource, nowPos)
 
   ' send custom navigateToPage event, since a details screen was added to the screen stack but the user
   ' never saw it, we want to navigate from the screen under the most recently added details screen.
@@ -61,9 +61,9 @@ End Function
 
 ' Helper function for onResume and onPlay to launch content
 ' @content: TubiContentNode, the content to be played, can be a movie, episode, or trailer
-' @autoplayType: string, valid values are "automatic", "deliberate", or "none"
+' @playbackSource: string, valid values are "automatic", "deliberate", "previews" or "unknown"
 ' @position: integer, the position from which to start video playback
-Function setupVideoPlayer(content, autoplayType = "none", position = 0)
+Function setupVideoPlayer(content, playbackSource = "unknown", position = 0)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
   if videoPlayer = invalid
@@ -97,18 +97,23 @@ Function setupVideoPlayer(content, autoplayType = "none", position = 0)
     videoPlayer.appMode = "DEFAULT_MODE"
   end if
 
+  ' resetting to default value
+  videoPlayer.isTrailer = false
+
   if content <> invalid
     if content.isTrailer
-      videoPlayer.analyticsMode = "trailer"
+      videoPlayer.isTrailer = true
       videoPlayer.observeFieldScoped("skipTrailer", "onSkipTrailer")
       videoPlayer.observeFieldScoped("goToNext", "onSkipTrailer")
       videoPlayer.enableAds = false
     else
-      videoPlayer.analyticsMode = "normal"
-      if autoplayType = "automatic"
-        videoPlayer.analyticsMode = "autoplay-automatic"
-      else if autoplayType = "deliberate"
-        videoPlayer.analyticsMode = "autoplay-deliberate"
+      videoPlayer.playbackSource = m.constants.player.playbackSource.unknown
+      if playbackSource = "automatic"
+        videoPlayer.playbackSource = m.constants.player.playbackSource.autoplayAutomatic
+      else if playbackSource = "deliberate"
+        videoPlayer.playbackSource = m.constants.player.playbackSource.autoplayDeliberate
+      else if playbackSource = "previews"
+        videoPlayer.playbackSource = m.constants.player.playbackSource.videoPreviews
       end if
 
       ' set observers for non trailer content
@@ -257,7 +262,7 @@ Function onGoToNext(msg)
             m.upNextRequest = fetchUpNextContent(videoPlayer)
           else
             ' the up next content is good to go, so play it
-            playUpNextContent(nextContent, "none")
+            playUpNextContent(nextContent, "unknown")
           end if
         else
           returnToDetailScreenFromVideo()
@@ -273,8 +278,8 @@ End Function
 
 
 ' @nextContent: roSGNode, the content node representing the content that will be played next
-' @ autoplayType: string, "deliberate", "automatic" or "none", refers to if the up next content was selected or is auto playing
-Function playUpNextContent(nextContent, autoplayType)
+' @playbackSource: string, valid values are "automatic", "deliberate", "unknown" or "previews", refers to if the up next content was selected or is auto playing
+Function playUpNextContent(nextContent, playbackSource)
   tubiLog("VideoHelpers.playUpNextContent")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
@@ -337,7 +342,7 @@ Function playUpNextContent(nextContent, autoplayType)
       end if
     end if
 
-    playVideoContent(content, autoplayType)
+    playVideoContent(content, playbackSource)
   end if
 End Function
 
@@ -819,7 +824,7 @@ Function fetchUpNextContent(videoPlayer)
       }
     }
 
-    if videoPlayer.analyticsMode = "autoplay-automatic"
+    if videoPlayer.playbackSource = "automatic"
       options.params.mode = "ap"
     end if
 
@@ -851,7 +856,7 @@ Function onUpNextResponse(upNextContent)
       if m.receivedGoToNextPressed = true
         firstUpNextItem = upNextContent.getChild(0)
         if firstUpNextItem <> invalid
-          playUpNextContent(firstUpNextItem, "none")
+          playUpNextContent(firstUpNextItem, "unknown")
         else
           returnToDetailScreenFromVideo()
         end if

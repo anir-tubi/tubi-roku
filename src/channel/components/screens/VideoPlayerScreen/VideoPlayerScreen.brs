@@ -74,7 +74,7 @@ Function init()
   if m.constants.deviceInfo.language = "es"
     m.logoKids.uri = "pkg:/images/locale/es_ES/logo-kids-white-xlarge.png"
   end if
-  
+
   m.ratingOverlay = m.top.findNode("ratingOverlay")
   m.ratingGradient = m.top.findNode("ratingGradient")
   m.ratingBar = m.top.findNode("ratingBar")
@@ -83,7 +83,7 @@ Function init()
   m.ratingBackground = m.top.findNode("ratingBackground")
   m.ratingLabel = m.top.findNode("ratingLabel")
   m.descriptorCode = m.top.findNode("descriptorCode")
-  m.descriptorDesc = m.top.findNode("descriptorDesc")  
+  m.descriptorDesc = m.top.findNode("descriptorDesc")
   m.ratingOverlayTimer = m.top.findNode("ratingOverlayTimer")
   m.ratingOverlayTimer.observeField("fire", "hideRatingOverlay")
 
@@ -108,11 +108,11 @@ Function init()
   else
     m.SkipIntro.uri = "pkg:/images/selector-fhd.9.png"
   end if
-  
+
   BackLabel = m.top.findNode("BackLabel")
   BackLabel.text = getTranslation("goBack_videoPlayer_controls")
   if m.constants.deviceInfo.uiResolution <> "FHD"
-    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment 
+    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
 
@@ -134,9 +134,9 @@ Function init()
   m.positionAtJumpStart = -1
   m.playerPosition = 0
 
-  ' ratingInterval is time in seconds which helps to show tv ratings/descriptors on player 
+  ' ratingInterval is time in seconds which helps to show tv ratings/descriptors on player
   m.ratingInterval = 0
-  ' m.showRatings boolean variable is to avoid showing ratingoverlay every time when player state changes from buffering to playing. 
+  ' m.showRatings boolean variable is to avoid showing ratingoverlay every time when player state changes from buffering to playing.
   ' we want to show only first time when playing state happens & after every ad break & timer. Also we are setting m.showRatings = true after every ad break.
   m.showRatings = true
 
@@ -175,10 +175,10 @@ Function init()
   ' m.seekReferenceQueue is used to record the playback positions to which m.Video.seek is set.
   ' Context: setting a value on m.Video.seek will cause the onVideoPositionChange() callback to fire.
   ' We do not want playProgressEvents to fire from onVideoPositionChange() if the callback occurs due to a seek,
-  ' so we check if the position associated with the onVideoPositionChange() callback is at the 0 index of 
+  ' so we check if the position associated with the onVideoPositionChange() callback is at the 0 index of
   ' m.seekReferenceQueue, and if it is, we know that the callback is firing due to seek. We use a "queue" to protect
   ' against the edge case / race condition that multiple seek events may occur prior to the onVideoPositionChange()
-  ' callback being run for the first seek event. If we used a single value instead of the queue, in the event of the 
+  ' callback being run for the first seek event. If we used a single value instead of the queue, in the event of the
   ' previously described edge case, the value would be changed by the 2nd seek event prior to the onVideoPositionChange()
   ' callback referencing the value, which would lead to badly formed playProgressEvents.
   m.seekReferenceQueue = []
@@ -225,7 +225,7 @@ Function init()
   m.didAdvanceDrm = false
 
   ' m.shouldShowUpNext holds the state of whether the up next / autoplay UI should be shown when the
-  ' user reaches the credits cuepoint. Decisions to show the up next / autoplay UI will be made in each 
+  ' user reaches the credits cuepoint. Decisions to show the up next / autoplay UI will be made in each
   ' update to m.Video.position. If the position is prior to the credits cuepoint, then shouldShowUpNext
   ' should be set to true. If the position is after the credits cuepoint, then shouldShowUpNext should be
   ' set to false, and shouldShowUpNext should be reset to true at the beginning of each video playback
@@ -248,7 +248,7 @@ Function setSkipIntroButtonAndTimer(skipIntroTitle as string, skipIntroId as str
   m.skipIntroButtonTimer.control = "start"
   m.SkipIntro.id = skipIntroId
   m.SkipIntro.text = skipIntroTitle
-  
+
   showSkipIntroButton()
 End Function
 
@@ -332,7 +332,7 @@ Function playContent()
     end if
 
     'start_video user event analytics
-    if m.top.analyticsMode = "trailer"
+    if m.top.isTrailer = true
       'set up tracking for trailer
       trackEvent({
         type: "start_trailer"
@@ -343,22 +343,16 @@ Function playContent()
       })
     else
       'set up tracking for normal playback
-      autoPlayAutomatic = false
-      autoPlayDeliberate = false
+      playbackSource = m.top.playbackSource
       isLiveTv = false
       isFullScreen = true
       isEmbedded = false
-      if m.top.analyticsMode = "autoplay-automatic"
-        autoPlayAutomatic = true
-      else if m.top.analyticsMode = "autoplay-deliberate"
-        autoPlayDeliberate = true
-      end if
 
       hasSubtitles = false
       if m.Video.globalCaptionMode = "On" and m.Video.content.hasSubtitles = true
         hasSubtitles = true
       end if
-      
+
       resourceType = "VIDEO_RESOURCE_TYPE_UNKNOWN"
       if m.Video.content.drmType = m.constants.player.drmTypes.dashWidevine
         resourceType = "VIDEO_RESOURCE_TYPE_DASH_WIDEVINE"
@@ -378,8 +372,7 @@ Function playContent()
           is_livetv: isLiveTv
           is_embedded: isEmbedded
           is_fullscreen: isFullScreen
-          from_autoplay_deliberate: autoPlayDeliberate
-          from_autoplay_automatic: autoPlayAutomatic
+          playback_source: playbackSource
           video_player: "DEFAULT"
           video_resource_type: resourceType
           video_resource_url: m.Video.content.URL
@@ -397,7 +390,7 @@ Function playContent()
           tubilog("VideoPlayer: MIDROLL: " + strI(cuepoint))
           m.midrolls[strI(cuepoint)] = true
         end for
-      end if    
+      end if
       ' Start pre-roll fetch
       m.top.adControl = "preroll"
     else
@@ -478,7 +471,7 @@ Function onVideoStateChange(msg)
       ' so we wait until the "finished" state is reached to play the next available stream for the video
       ' in order to prevent race conditions due to video player state changing.
       m.didAdvanceDrm = false
-      ' ensure that when the new DRM resource plays, it starts where the previous resource had been playing - if it had been playing 
+      ' ensure that when the new DRM resource plays, it starts where the previous resource had been playing - if it had been playing
       if m.Video.content <> invalid and m.playerPosition >= 0
         m.Video.content.nowPos = m.playerPosition
       end if
@@ -492,7 +485,7 @@ Function onVideoStateChange(msg)
           trackEvent(playProgressEvent)
         end if
 
-        if m.top.analyticsMode = "trailer"
+        if m.top.isTrailer = true
           trackEvent({
             type: "finish_trailer"
             values: {
@@ -535,7 +528,7 @@ Function onVideoStateChange(msg)
           trackEvent(playProgressEvent)
         end if
 
-        if m.top.analyticsMode = "trailer"
+        if m.top.isTrailer = true
           trackEvent({
             type: "finish_trailer"
             values: {
@@ -640,7 +633,7 @@ Function onVideoPositionChange()
       ' watched beyond the cuepoint but the title doesn't get removed due
       ' to no history events triggering after the cuepoint
       historyPosition(m.playerPosition + 5)
-       
+
       if m.UpNext.content <> invalid
         animateTransport("out")
         clearSkipIntroButtonAndTimer()
@@ -660,12 +653,12 @@ Function onVideoPositionChange()
     else if m.playerPosition < content.creditsCuePoints.postlude
       m.shouldShowUpNext = true
     end if
-    
+
     if m.playerPosition + m.constants.player.fetchNextDuration >= content.creditsCuePoints.postlude
       m.top.upNextCuepointReached = true
     end if
   end if
-  
+
   'set the content, focus to SkipIntro and send exposure event when Skip Intro/recap/early credit cue points available
     if content <> invalid and content.creditsCuePoints <> invalid
       if isSkipIntroCuePointsReached(content.creditsCuePoints)
@@ -698,7 +691,7 @@ Function onVideoPositionChange()
     if m.top.enableAds = true and m.midrolls.count() > 0 then
 
       m.AdHeadsUp.visible = false  ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown
- 
+
       ' attempt to fetch midroll ads before actual cuepoint
       potentialCuepoint = m.playerPosition + m.adPrefetchTime
       isCuepointPrefetchTimeReached = m.midrolls[strI(potentialCuepoint)]
@@ -726,22 +719,22 @@ Function onVideoPositionChange()
           playProgressEvent = getPlayProgressEvent()
           if playProgressEvent <> invalid
             trackEvent(playProgressEvent)
-    
+
             ' set m.lastPingTime here to prevent an extra playProgressEvent if a user backs out of the ads
             ' thereby triggering backButtonExit() which also sends a playProgressEvent.
             m.lastPingTime = m.playerPosition
           end if
-          
+
           ' update history when showing adBreak
           historyPosition(m.playerPosition)
-    
+
           ' We must stop the video here, not just pause it, in order to release
           ' system resources to the RAF video player
           showAdBreak()
-          m.showRatings = true 
+          m.showRatings = true
         else if m.top.adState = "noads"
           ' when we reach the cuepoint, we find that the last ad call returned no ads
- 
+
           if m.mostRecentCompletedCuepoint <> m.playerPosition
             ' If ad playback concluded, a resume_after_break event will be fired in onAdStateChange().
             ' Restarting playback after ads could also trigger this resume_after_break event to fire
@@ -763,7 +756,7 @@ Function onVideoPositionChange()
       end if
 
     end if
-    
+
 End Function
 
 
@@ -807,7 +800,7 @@ Function onAdStateChange()
     ' video playback stopped and should play right away when we get adspending.
     ' pre-roll or resume-roll. Play ads right away
     showAdBreak()
-    m.showRatings = true 
+    m.showRatings = true
   else if m.top.adState = "noads" and (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip" or m.VideoState = "hop") and m.Video.state <> "playing" then
     ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
     ' TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
@@ -895,14 +888,14 @@ End Function
 
 Function onSpritesReceived(msg)
   thumbnailsInfo = msg.getData()  'expect a TubiContentNode with thumbnail fields populated
-  
+
   m.Thumbnail.visible = false   ' always start with thumbnail invisible, then show it when scrubbing
 
   if thumbnailsInfo <> invalid
     ' sprites are reset to invalid when video playback stops. Don't log when that happens because
     ' it's confusing when reading the logs.
     tubiLog("VideoPlayer.onSpritesReceived")
- 
+
     if thumbnailsInfo.thumbnailUrls <> invalid and thumbnailsInfo.thumbnailUrls.count() > 0
       m.Thumbnail.numSprites = thumbnailsInfo.thumbnailSpan
       m.Thumbnail.rows = thumbnailsInfo.thumbnailRows
@@ -1014,15 +1007,15 @@ Function trackEvent(event As Object)
     "finish_trailer": true
   }
 
-  if m.top.analyticsMode <> "trailer" or allowedTrailerEvents[event.type] = true
+  if m.top.isTrailer = false or allowedTrailerEvents[event.type] = true
     m.global.trackingLoggingTask.trackEvent = event
   end if
 End Function
 
 
-' Helper function to prevent historyPosition being sent during  trailers
+' Helper function to prevent historyPosition being sent during trailers
 Function historyPosition(position)
-  if m.top.analyticsMode = "normal" or m.top.analyticsMode = "autoplay-automatic" or m.top.analyticsMode = "autoplay-deliberate"
+  if m.top.isTrailer = false
     ' round the position up/down based on 0.5 rule.
     ' this is necessary since isAtPosition() is returning true if the decimal is greater than 0.5.
     ' If we do not round here, and a user exits the video player during ad playback, the history would be
@@ -1096,10 +1089,10 @@ Function resetVideoPlayerState(content = invalid)
   cancelReplayCaptions()
   m.AdHeadsUp.visible = false
   m.top.adPosition = 0
-  
+
   m.showRatings = true
   m.ratingInterval = 0
-  
+
   if content <> invalid
     m.top.adPosition = content.nowPos
     updateVideoPlayerState(content)
@@ -1143,7 +1136,7 @@ Function updateVideoPlayerState(content) as Void
   ' make the content available to the video node
   m.Video.content = content
   if content.rating <> invalid and content.rating <> ""
-    
+
     m.ratingLabel.width = 0
     m.ratingLabel.text = Ucase(content.rating)
     nRatingBoundingBoxIncrease = m.ratingLabel.boundingRect().width + 24
@@ -1151,11 +1144,11 @@ Function updateVideoPlayerState(content) as Void
     m.ratingLabel.width = nRatingBoundingBoxIncrease
 
   end if
-  
+
   descriptorCode = content.descriptorCode
   sDescriptorCodeText = ""
   if descriptorCode <> invalid and descriptorCode <> ""
-    sDescriptorCodeText = UCase(descriptorCode) 
+    sDescriptorCodeText = UCase(descriptorCode)
   end if
   m.descriptorCode.text = sDescriptorCodeText
 
@@ -1366,11 +1359,10 @@ Function getPlayProgressEvent()
       }
     }
 
-    if m.top.analyticsMode = "trailer"
+    if m.top.isTrailer = true
       playProgressEvent.type = "trailer_play_progress"
     else
-      playProgressEvent.values.from_autoplay_deliberate = m.top.analyticsMode = "autoplay-deliberate"
-      playProgressEvent.values.from_autoplay_automatic = m.top.analyticsMode = "autoplay-automatic"
+      playProgressEvent.values.playback_source = m.top.playbackSource
     end if
 
     'nominal_speed will be added to the Connection message, rather than the PlayProgressEvent message,
@@ -1415,11 +1407,11 @@ Function setAutoplayMode(mode)
   autoplayModes = {
     automatic: true
     deliberate: true
-    none: true
+    unknown: true
   }
-  
+
   if autoplayModes[mode] <> true
-    mode = "none"
+    mode = "unknown"
   end if
 
   m.top.autoplayMode = mode
@@ -1446,24 +1438,24 @@ End Function
 ' showratingOverlay helps to show the rating overlay and start the timer to hide it after certain amount of time.
 Function showRatingOverlay()
 
-  fade(m.ratingOverlay, "in", 0.6)   
+  fade(m.ratingOverlay, "in", 0.6)
   if m.Overlay.opacity > 0.0
     m.ratingOverlay.translation = [0,250]
   else
-    m.ratingOverlay.translation = [0,0]  
-  end if  
-  m.ratingOverlayTimer.control = "start" 
+    m.ratingOverlay.translation = [0,0]
+  end if
+  m.ratingOverlayTimer.control = "start"
 
 End Function
 
 
 ' hideRatingOverlay helps to hide the rating overlay and reset the rating Interval.
 Function hideRatingOverlay()
-  
+
   if m.ratingOverlay.opacity  > 0
     ' resetting ratingInterval to zero, because we don't want to show the ratingOverlay immediately after hiding
-    m.ratingInterval = 0 
-    fade(m.ratingOverlay, "out", 0.6)  
+    m.ratingInterval = 0
+    fade(m.ratingOverlay, "out", 0.6)
   end if
 
 End Function

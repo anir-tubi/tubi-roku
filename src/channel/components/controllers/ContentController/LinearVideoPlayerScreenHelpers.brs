@@ -47,8 +47,6 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
     unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
     videoPlayer.associatedScreenID = sAssociatedScreenID
 
-    videoPlayer.analyticsMode = "normal"
-
     ' set general observers for all content
     videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
     if videoPlayer.visible = false

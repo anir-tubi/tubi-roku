@@ -240,7 +240,7 @@ Function handleDeeplinkContentByType()
         getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeasonContentSuccess, handleSingleContentDeeplinkError)
       end if
     else if m.deepLinkContent.deeplinktype = "movie"
-      showDetailScreen(m.deeplinkContent, false, skipDetailScreen, handleSingleContentDeeplinkError )
+      showDetailScreen(m.deeplinkContent, false, skipDetailScreen, handleSingleContentDeeplinkError)
     else
       message = getTranslation("error_deeplink_page")
       showDeeplinkErrorModal(invalid, message)

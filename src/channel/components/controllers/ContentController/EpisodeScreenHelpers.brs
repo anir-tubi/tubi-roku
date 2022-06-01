@@ -69,7 +69,7 @@ Function onEpisodeSelected(msg)
             }
           }
 
-          playVideoContent(content, "none", nowPos)
+          playVideoContent(content, "unknown", nowPos)
         end if
       end if
     end if

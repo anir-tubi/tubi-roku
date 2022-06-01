@@ -584,6 +584,12 @@ Function getConstants()
     constants.player.transportAutoHideTime = 5
     constants.player.thumbnailFrequency = 5
 
+    constants.player.playbackSource = {}
+    constants.player.playbackSource.autoplayDeliberate = "AUTOPLAY_DELIBERATE"
+    constants.player.playbackSource.autoplayAutomatic = "AUTOPLAY_AUTOMATIC"
+    constants.player.playbackSource.videoPreviews = "VIDEO_PREVIEWS"
+    constants.player.playbackSource.unknown = "UNKNOWN_PLAYBACK_SOURCE"
+
     'video player returns one of the following
     constants.player.playerResults = {}
       constants.player.playerResults.completed = "COMPLETED"

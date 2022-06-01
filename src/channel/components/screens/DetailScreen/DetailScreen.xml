@@ -99,6 +99,16 @@
 
       <field id="content" type="node" />
 
+      <!-- State that lets the player know how it is being used, so it can determine
+        -  how it should do tracking.
+        -  Allowed sources are:
+        -  'unknown'
+        -  'previews'
+        -  'automatic'
+        -  'deliberate'
+        -->
+    <field id="playbackSource" type="string"/>
+
     <!-- OUTPUTS -->
 
       <!-- Should the full description be displayed -->

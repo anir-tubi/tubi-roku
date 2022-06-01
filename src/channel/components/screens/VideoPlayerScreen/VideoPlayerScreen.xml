@@ -49,12 +49,13 @@
 
       <!-- State that lets the player know how it is being used, so it can determine
         -  how it should do tracking.
-        -  Allowed modes are:
-        -  'normal'
-        -  'trailer'
-        -  'autoplay'
+        -  Allowed sources are:
+        -  'unknown'
+        -  'previews'
+        -  'automatic'
+        -  'deliberate'
         -->
-      <field id="analyticsMode" type="string" value="normal" />
+      <field id="playbackSource" type="string" value="unknown" />
 
       <!--
         -
@@ -89,6 +90,8 @@
       <!-- When this is set to true, then change LoadingMessage.text to reflect the propper message -->
       <field id="displayAdLoadingMessage" type="boolean" value="false" alwaysNotify="true"/>
 
+       <!-- isTrailer will be set true for trailers, otherwise false -->
+      <field id="isTrailer" type="boolean" value="false"/>
 
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
@@ -125,7 +128,7 @@
       <field id="upNextNavigateWithinPageInfo" alias="UpNext.navigateWithinPageInfo" />
 
       <!-- Used to set the autoplay_deliberate and autoplay_automatic analytics values
-           for PlayProgressEvents and StartVideoEvents. Allowed values are "automatic", "deliberate" and "none"
+           for PlayProgressEvents and StartVideoEvents. Allowed values are "automatic", "deliberate" and "unknown"
            -->
       <field id="autoplayMode" type="string" />
 

@@ -292,8 +292,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       is_livetv: false
       is_embedded: false
       is_fullscreen: true
-      from_autoplay_deliberate: false 'TODO: Verify that these didn't get turned into an Enum
-      from_autoplay_automatic: false
+      playback_source: ""
       video_resource_type: "" ' The type of video resource
       video_resource_url: "" 'The playable url in video resource
       video_player: ""  'VideoPlayer enum
@@ -303,8 +302,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       video_id: -1
       position: -1   'ms
       view_time: -1  'ms
-      from_autoplay_deliberate: false
-      from_autoplay_automatic: false
+      playback_source: ""
       video_player: ""  'VideoPlayer enum
     }
 

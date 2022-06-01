@@ -122,7 +122,7 @@ Function onResetContent()
   m.top.content = invalid
   m.top.contentFocused = invalid
   m.top.contentSelected = invalid
-  m.top.autoplayMode = "none"
+  m.top.autoplayMode = "unknown"
 End Function
 
 

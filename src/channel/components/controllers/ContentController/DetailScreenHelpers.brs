@@ -7,7 +7,8 @@
 '                                   PlayProgressEvent analytics should be sent after fetching info from the backend.
 ' @successCb: roFunction, a callback to run upon successful fetching of single content metadata
 ' @errorCb: roFunction, a callback to run upon error while fetching of single content metadata
-Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = invalid, errorCb = invalid)
+' @playbackSource: string, valid values are "automatic", "deliberate", "unknown" or "previews"
+Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = invalid, errorCb = invalid, playbackSource = "unknown")
   tubiLog("DetailScreenHelpers.showDetailScreen")
 
   if content <> invalid
@@ -15,6 +16,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.id = m.constants.ui.screenIds.detailScreen
     detailScreen.trackingLoadStartTime = Uptime(0)
     detailScreen.shouldFocusWhenPushed = m.top.fadeInContentController
+    detailScreen.playbackSource = playbackSource
     detailScreen.observeFieldScoped("playSelected", "onPlay")
     detailScreen.observeFieldScoped("resumeSelected", "onResume")
     detailScreen.observeFieldScoped("watchTrailerSelected", "onWatchTrailer")
@@ -1316,9 +1318,12 @@ Function onResume(msg)
 End Function
 
 
-Function resumeVideoDetailScreen(detailScreen)
+' @detailScreen: roSGNode, detail screen node
+' @playbackSource: string, valid values are "automatic", "deliberate", "previews" or "unknown"
+Function resumeVideoDetailScreen(detailScreen, playbackSource="unknown")
   tubiLog("DetailScreenHelpers.resumeVideoDetailScreen")
   if detailScreen <> invalid and isFetchingInProgress(detailScreen) <> true
+    detailScreen.playbackSource = playbackSource
     if isPlayable(detailScreen) = true
       resumeHelper(detailScreen)
     else
@@ -1343,9 +1348,12 @@ Function onPlay(msg)
 End Function
 
 
-Function playVideoDetailScreen(detailScreen)
+' @detailScreen: roSGNode, detail screen node
+' @playbackSource: string, valid values are "automatic", "deliberate", "previews" or "unknown"
+Function playVideoDetailScreen(detailScreen, playbackSource="unknown")
   tubiLog("DetailScreenHelpers.playVideoDetailScreen")
   if detailScreen <> invalid and isFetchingInProgress(detailScreen) <> true
+    detailScreen.playbackSource = playbackSource
     if isPlayable(detailScreen) = true
       playHelper(detailScreen)
     else
@@ -1397,7 +1405,7 @@ Function playHelper(screen)
       end if
       displayDetailScreenMaturePlayWarning(episode, dialogSubtype)
     else
-      playVideoContent(episode)
+      playVideoContent(episode, screen.playbackSource)
     end if
   else
     tubiLog("ERROR: Play selected but content is invalid")
@@ -1410,7 +1418,7 @@ Function resumeHelper(detailScreen)
   if episode <> invalid then
     nowPos = processResume(episode)
     if nowPos >= 0
-      playVideoContent(episode, "none", nowPos)
+      playVideoContent(episode, detailScreen.playbackSource, nowPos)
     end if
   else
     tubiLog("ERROR: Resume selected but content is invalid")
@@ -1484,7 +1492,7 @@ Function skipDetailScreen(refreshedContent)
       nowPos = processResume(episode)
       if m.top.fadeInContentController = true
         if nowPos >= 0
-          playVideoContentWhileSkippingDetailScreen(episode, nowPos, trackingPageInfo, trackingComponentInfo)
+          playVideoContentWhileSkippingDetailScreen(episode, nowPos, trackingPageInfo, trackingComponentInfo, detailScreen.playbackSource)
         end if
       else
         if nowPos > 0

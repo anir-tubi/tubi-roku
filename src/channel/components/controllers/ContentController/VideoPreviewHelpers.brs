@@ -95,12 +95,12 @@ Function onVideoPreviewStateChanged(msg)
     if currentScreen <> invalid
       if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).autostart = true
         if currentScreen.subType() = "HomeScreen"
-          showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen)
+          showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen, invalid, "previews")
         else if currentScreen.subType() = "DetailScreen"
           if currentScreen.isHistory = true
-            resumeVideoDetailScreen(currentScreen)
+            resumeVideoDetailScreen(currentScreen, "previews")
           else
-            playVideoDetailScreen(currentScreen)
+            playVideoDetailScreen(currentScreen, "previews")
           end if
         end if
       else if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true

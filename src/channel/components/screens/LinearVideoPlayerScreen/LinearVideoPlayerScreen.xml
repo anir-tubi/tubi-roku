@@ -49,15 +49,6 @@
       <!-- interval in seconds for sending position data to the tracking server -->
       <field id="analyticsInterval" type="integer" value="0"/>
 
-      <!-- State that lets the player know how it is being used, so it can determine
-        -  how it should do tracking.
-        -  Allowed modes are:
-        -  'normal'
-        -  'trailer'
-        -  'autoplay'
-        -->
-      <field id="analyticsMode" type="string" value="normal" />
-
       <!-- Message shown during ad loading and video loading -->
       <field id="loadingMessage" alias="LoadingMessage.text" />
 
