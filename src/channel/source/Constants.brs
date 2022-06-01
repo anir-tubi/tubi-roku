@@ -402,21 +402,20 @@ Function getConstants()
       constants.urls.tensor.channel = constants.urls.tensor.urlBase + "/containers"
       constants.urls.tensor.epgChannelIds = constants.urls.tensor.urlBase + "/epg"
 
-    'users url
-    constants.urls.users = {}
-      constants.urls.users.urlBase = "https://uapi.adrise.tv/user_device"
+    'user devices url
+    constants.urls.userDevice = {}
+      constants.urls.userDevice.urlBase = "https://uapi.adrise.tv/user_device"
       if constants.settings.mode <> "production" and constants.settings.stagingApis = true
-        constants.urls.users.urlBase = "https://uapi.staging-public.tubi.io/user_device"
+        constants.urls.userDevice.urlBase = "https://uapi.staging-public.tubi.io/user_device"
       end if
-      constants.urls.users.signup = constants.urls.users.urlBase + "/signup"
-      constants.urls.users.registerCode = constants.urls.users.urlBase + "/code/register"
-      constants.urls.users.refreshToken = constants.urls.users.urlBase + "/login/refresh"
-      constants.urls.users.transferToken = constants.urls.users.urlBase + "/login/transfer"
-      constants.urls.users.queues = constants.urls.users.urlBase + "/queues"
-      constants.urls.users.history = constants.urls.users.urlBase + "/histories"
-      constants.urls.users.config = constants.urls.users.urlBase + "/config/" + constants.platform
-      constants.urls.users.settings = constants.urls.users.urlBase + "/users" ' + "/:id/settings"
-      constants.urls.users.codeStatus = constants.urls.users.urlBase + "/code/status"
+      constants.urls.userDevice.signup = constants.urls.userDevice.urlBase + "/signup"
+      constants.urls.userDevice.registerCode = constants.urls.userDevice.urlBase + "/code/register"
+      constants.urls.userDevice.refreshToken = constants.urls.userDevice.urlBase + "/login/refresh"
+      constants.urls.userDevice.transferToken = constants.urls.userDevice.urlBase + "/login/transfer"
+      constants.urls.userDevice.queues = constants.urls.userDevice.urlBase + "/queues"
+      constants.urls.userDevice.history = constants.urls.userDevice.urlBase + "/histories"
+      constants.urls.userDevice.config = constants.urls.userDevice.urlBase + "/config/" + constants.platform
+      constants.urls.userDevice.codeStatus = constants.urls.userDevice.urlBase + "/code/status"
 
     ' account urls
     constants.urls.account = {}
@@ -428,7 +427,8 @@ Function getConstants()
       constants.urls.account.login = constants.urls.account.urlBase + "/user/login"
       constants.urls.account.checkBirthday = constants.urls.account.urlBase + "/user/check_birthday_info"
       constants.urls.account.deviceRegister = constants.urls.account.urlBase + "/device/register"
-      constants.urls.account.patchAutoplayPreview = constants.urls.account.urlBase + "/user/settings"
+      constants.urls.account.settings = constants.urls.account.urlBase + "/user/settings"
+      constants.urls.account.parentalRating = constants.urls.account.settings + "/parental_rating"
       constants.urls.account.magicLink = constants.urls.account.urlBase + "/device/magic_link"
 
       constants.urls.account.anonymous = {}

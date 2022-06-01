@@ -718,7 +718,7 @@ Function tubiAuth_createAuthRequest(url as String, name = "" as String, options=
     if options.params = invalid
       options.params = {}
     end if
-    if options.params["user_id"] = invalid
+    if options.params["user_id"] = invalid and (url <> m.constants.urls.account.settings and url <> m.constants.urls.account.parentalRating)
       options.params["user_id"] = authInfo.userId
     end if
 
@@ -935,23 +935,16 @@ End Function
 '@authInfo: assocArray, expired authToken
 '@port: roMessagePort
 Function tubiAuth_requestTokenRefresh(authInfo, port)
-  body = {
-    user_id: authInfo.userId
-    device_id: m.constants.deviceInfo.deviceId
-    platform: m.constants.platform
-  }
-  bodyJson = FormatJson(body)
 
   headers = m.getAuthHeaders(authInfo.refreshToken)
 
   reqOptions = {
     method: "POST"
-    body: bodyJson
     headers: headers
     retries: 0
   }
 
-  newTokenReq = m.request.createAsync(m.constants.urls.users.refreshToken, "getNewAccessToken", reqOptions)
+  newTokenReq = m.request.createAsync(m.constants.urls.userDevice.refreshToken, "getNewAccessToken", reqOptions)
   reqSent = newTokenReq.start(port)
 
   if reqSent = true
@@ -970,7 +963,6 @@ End Function
 '   userId: string of integers, the user id sent by the originating device
 Function tubiAuth_requestTokenTransfer(externalAuthInfo, port)
   body = {
-    user_id: externalAuthInfo.userId
     device_id: m.constants.deviceInfo.deviceId
     platform: m.constants.platform
     from_device_id: externalAuthInfo.externalDeviceId
@@ -986,7 +978,7 @@ Function tubiAuth_requestTokenTransfer(externalAuthInfo, port)
     retries: 0
   }
 
-  newTokenReq = m.request.createAsync(m.constants.urls.users.transferToken, "getRefreshTokenFromTransfer", reqOptions)
+  newTokenReq = m.request.createAsync(m.constants.urls.userDevice.transferToken, "getRefreshTokenFromTransfer", reqOptions)
   reqSent = newTokenReq.start(port)
 
   if reqSent = true

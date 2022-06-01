@@ -27,7 +27,7 @@ Function TubiBookmarksSetup()
   m.episodeContent = CreateObject("roSGNode", "TubiContentNode")
   m.episodeContent.type = "episode"
 
-  m.historyUrl = constants.urls.users.history
+  m.historyUrl = constants.urls.userDevice.history
   m.deviceId = constants.deviceInfo.deviceId
   m.appName = constants.appName
   m.platform = constants.platform

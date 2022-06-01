@@ -361,7 +361,7 @@ End Function
 '@Test requestTokenRefresh unit tests
 Function tubiAuth_requestTokenRefresh_test()
   auth = m.auth
-  auth.constants.urls.users.refreshToken = "http://127.0.0.1:65535/"
+  auth.constants.urls.userDevice.refreshToken = "http://127.0.0.1:65535/"
   savedAuthInfo = m.oldAuthInfo
 
   server = tubiAuth_createMetadataFetchTaskServer_testHelper(65535)
@@ -371,7 +371,7 @@ Function tubiAuth_requestTokenRefresh_test()
   m.assertNotInvalid(authRequest)
   m.assertNotInvalid(authRequest.isHttps)
   m.assertNotInvalid(authRequest.url)
-  m.assertEqual(authRequest.url, auth.constants.urls.users.refreshToken)
+  m.assertEqual(authRequest.url, auth.constants.urls.userDevice.refreshToken)
   m.assertNotInvalid(authRequest.method)
   m.assertEqual(authRequest.method, "POST")
 End Function
@@ -380,12 +380,11 @@ End Function
 '@Test requestTokenTransfer unit tests
 Function tubiAuth_requestTokenTransfer_test()
   auth = m.auth
-  auth.constants.urls.users.transferToken = "http://127.0.0.1:65535/"
+  auth.constants.urls.userDevice.transferToken = "http://127.0.0.1:65535/"
   externalAuthInfo = {
     platform: "iphone"
     externalDeviceId: "Some555Other666String777"
     externalRefreshToken: "Some111Refresh999String000"
-    userId: "6735"
   }
 
   server = tubiAuth_createMetadataFetchTaskServer_testHelper(65535)
@@ -395,7 +394,7 @@ Function tubiAuth_requestTokenTransfer_test()
   m.assertNotInvalid(authRequest)
   m.assertNotInvalid(authRequest.isHttps)
   m.assertNotInvalid(authRequest.url)
-  m.assertEqual(authRequest.url, auth.constants.urls.users.transferToken)
+  m.assertEqual(authRequest.url, auth.constants.urls.userDevice.transferToken)
   m.assertNotInvalid(authRequest.method)
   m.assertEqual(authRequest.method, "POST")
 End Function

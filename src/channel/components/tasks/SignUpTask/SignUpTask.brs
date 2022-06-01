@@ -14,7 +14,7 @@ Function execSignUp() As Void
   requestParams = m.top.requestParams
 
   ' SignUp using platform, deviceId & credentials(email,password,gender,firstName,lastName,birthday)
-  url = constants.urls.users.signup
+  url = constants.urls.userDevice.signup
   params = {
     platform: constants.platform  
     device_id: constants.deviceInfo.deviceId
@@ -69,11 +69,10 @@ Function execSignUp() As Void
   end while
 
  ' Register Code using activationCode, userId & accessToken
-  url = constants.urls.users.registerCode
+  url = constants.urls.userDevice.registerCode
   headers = Auth.getAuthHeaders(access_token)
   params = {
     activation_code: requestParams.activationCode
-    user_id: user_id 
   }
   body = FormatJSON(params)
   

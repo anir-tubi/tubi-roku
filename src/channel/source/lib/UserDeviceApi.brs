@@ -45,7 +45,7 @@ End Function
 'signUpReqInfo()
 '
 Function userDeviceApi_signUpReqInfo(passedOptions = {})
-  url = m.constants.urls.users.signup
+  url = m.constants.urls.userDevice.signup
   options = {}
   headers = {}
   headers.append(m.constants.headers.commonUapi)
@@ -106,14 +106,13 @@ Function userDeviceApi_deviceRegisterInfo(birthdate)
 End Function
 
 
-Function userDeviceApi_checkBirthdayInfo(userId)
+Function userDeviceApi_checkBirthdayInfo()
   url = m.constants.urls.account.checkBirthday
 
   options = {
     params: {}
     headers: {}
   }
-  options.params["user_id"] = userId
   options.headers.append(m.constants.headers.commonUapi)
 
   return {
@@ -123,11 +122,10 @@ Function userDeviceApi_checkBirthdayInfo(userId)
 End Function
 
 
-' @userId: string, the user id as told by the backend
 ' @passedOptions: AA, options to be passed to TubiRequest().createAsync. The value for the "body"
 '                     key must be an AA (which will be turned into a JSON string)
-Function userDeviceApi_patchSettingsInfo(userId, passedOptions)
-  url = m.constants.urls.users.settings + "/" + userId + "/settings"
+Function userDeviceApi_patchSettingsInfo(passedOptions)
+  url = m.constants.urls.account.settings
 
   options = passedOptions
 
@@ -176,7 +174,7 @@ End Function
 '         true - video Preview on
 '         flase - video preview off
 Function userDeviceApi_patchAutoplayPreviewSettingInfo(choice)
-  url = m.constants.urls.account.patchAutoplayPreview
+  url = m.constants.urls.account.settings
   options = {}
   body = {enable_video_preview: choice}
 

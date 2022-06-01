@@ -496,7 +496,7 @@ Function startUserExperience()
         ' 1) check if the backend has an age for the user
         ' 2) if not, show the age verification screen
         ' 3) upon getting a valid birthdate for the user, PATCH the user record on the backend
-        checkBirthdayInfo = m.userDeviceApi.checkBirthdayInfo(authInfo.userId)
+        checkBirthdayInfo = m.userDeviceApi.checkBirthdayInfo()
         m.makeRequest({
           url: checkBirthdayInfo.url
           requestType: m.constants.reqNames.checkBirthdayInfo

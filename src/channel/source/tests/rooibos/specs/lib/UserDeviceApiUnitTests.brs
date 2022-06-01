@@ -7,10 +7,10 @@ Function UserDeviceApiSetup()
   utils = ApiUtils(m.constants)
   m.userDeviceApi = UserDeviceApi(m.constants, utils)
   m.emailExistsUrl = m.constants.urls.account.emailExists
-  m.signupUrl = m.constants.urls.users.signup
+  m.signupUrl = m.constants.urls.userDevice.signup
   m.deviceRegisterUrl = m.constants.urls.account.deviceRegister
   m.checkBirthdayUrl = m.constants.urls.account.checkBirthday
-  m.patchSettingsUrl = m.constants.urls.users.settings
+  m.patchSettingsUrl = m.constants.urls.account.settings
   m.app_id = m.constants.settings.shortAppName
   m.platform = m.constants.platform
   m.device_id = m.constants.deviceInfo.deviceId
@@ -195,8 +195,7 @@ End Function
 
 '@Test checkBirthdayInfo unit tests
 Function userDeviceApi_checkBirthdayInfo_test()
-  userId = "1234"
-  checkBirthdayInfo = m.userDeviceApi.checkBirthdayInfo(userId)
+  checkBirthdayInfo = m.userDeviceApi.checkBirthdayInfo()
 
   m.assertNotInvalid(checkBirthdayInfo)
 
@@ -206,13 +205,11 @@ Function userDeviceApi_checkBirthdayInfo_test()
   m.assertNotInvalid(checkBirthdayInfo.options)
 
   m.assertNotInvalid(checkBirthdayInfo.options.params)
-  m.assertNotInvalid(checkBirthdayInfo.options.params.user_id)
 End Function
 
 
 '@Test patchSettingsInfo unit tests
 Function userDeviceApi_patchSettingsInfo_test()
-  userId = "1234"
   birthdate = "04-01-1984"
   passedOptions = {
     body: {
@@ -220,12 +217,12 @@ Function userDeviceApi_patchSettingsInfo_test()
       random_setting: true
     }
   }
-  patchSettingsInfo = m.userDeviceApi.patchSettingsInfo(userId, passedOptions)
+  patchSettingsInfo = m.userDeviceApi.patchSettingsInfo(passedOptions)
 
   m.assertNotInvalid(patchSettingsInfo)
 
   m.assertNotInvalid(patchSettingsInfo.url)
-  m.assertEqual(patchSettingsInfo.url, m.patchSettingsUrl + "/" + userId + "/settings")
+  m.assertEqual(patchSettingsInfo.url, m.patchSettingsUrl)
 
   m.assertNotInvalid(patchSettingsInfo.options)
 
@@ -250,7 +247,7 @@ Function userDeviceApi_patchAutoplayPreviewSettingInfo_test()
   m.assertNotInvalid(patchSettingsInfo)
 
   m.assertNotInvalid(patchSettingsInfo.url)
-  m.assertEqual(patchSettingsInfo.url, m.constants.urls.account.patchAutoplayPreview)
+  m.assertEqual(patchSettingsInfo.url, m.constants.urls.account.settings)
 
   m.assertNotInvalid(patchSettingsInfo.options)
   m.assertNotInvalid(patchSettingsInfo.options.body)

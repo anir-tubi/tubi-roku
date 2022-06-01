@@ -86,7 +86,7 @@ Function tubiBookmarks_createBookmarksRequest_(id as String, action as String, c
   end if
 
   bodyJson = invalid
-  url = m.constants.urls.users.queues
+  url = m.constants.urls.userDevice.queues
 
   if action = "add"
     verb = m.constants.reqTypes.post
@@ -187,7 +187,7 @@ Function tubiBookmarks_getAddHistoryRequestInfo(content as Object, nowPos as Int
     return invalid
   end if
 
-  url = m.constants.urls.users.history
+  url = m.constants.urls.userDevice.history
 
   body = {
     content_id: content.id
@@ -284,7 +284,7 @@ Function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, 
   end if
   bodyJson = FormatJson(body)
 
-  url = m.constants.urls.users.history
+  url = m.constants.urls.userDevice.history
 
   if action = "add"
     verb = m.constants.reqTypes.post
@@ -328,7 +328,7 @@ Function tubiBookmarks_getInitialBookmarksReq(localId) as Object
     return invalid
   end if
 
-  url = m.constants.urls.users.queues
+  url = m.constants.urls.userDevice.queues
 
   options = {
     method: m.constants.reqTypes.get
@@ -357,7 +357,7 @@ Function tubiBookmarks_getInitialHistoryReq(localId) as Object
     return invalid
   end if
 
-  url = m.constants.urls.users.history
+  url = m.constants.urls.userDevice.history
 
   options = {
     method: m.constants.reqTypes.get
@@ -452,8 +452,7 @@ Function tubiBookmarks_getUserInfoReq()
   if m.isLoggedInUser(authInfo) = false
     return invalid
   end if
-
-  url = m.constants.urls.users.settings + "/" + authInfo.userId.toStr() + "/settings"
+  url = m.constants.urls.account.settings
   options = {
     params: {
       platform: m.constants.platform
@@ -509,7 +508,7 @@ Function tubiBookmarks_updateParentalRatingReq(newRating, password)
     return invalid
   end if
 
-  url = m.constants.urls.users.settings + "/" + authInfo.userId.toStr() + "/settings/parental_rating"
+  url = m.constants.urls.account.parentalRating
   body = {
     parental_rating: newRating
     password: password

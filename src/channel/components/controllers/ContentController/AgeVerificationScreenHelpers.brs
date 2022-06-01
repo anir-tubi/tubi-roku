@@ -841,7 +841,7 @@ Function patchSignedInUserAge()
 
     authInfo = m.global.authInfo
     if isLoggedInUser(authInfo)
-      patchSettingsInfo = m.userDeviceApi.patchSettingsInfo(authInfo.userId, options)
+      patchSettingsInfo = m.userDeviceApi.patchSettingsInfo(options)
 
       m.makeRequest({
         url: patchSettingsInfo.url

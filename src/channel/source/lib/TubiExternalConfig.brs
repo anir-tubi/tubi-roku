@@ -62,7 +62,7 @@ End Function
 
 
 Function tubiExternalConfig_getConfigsRequest(request, constants)
-  url = constants.urls.users.config
+  url = constants.urls.userDevice.config
   options = {
     params: {
       "device_id": constants.deviceInfo.deviceId
