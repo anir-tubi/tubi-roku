@@ -451,8 +451,19 @@ Function setEnableTopNavOnHomescreen(homeScreen)
   refreshNeeded = false
 
   if homeScreen <> invalid
-    if homeScreen.isLinearTVAllowedInTopNav <> isParentalControlsAdultLevel()
-      homeScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel() and getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).side_nav = false
+    isPCAdult = isParentalControlsAdultLevel()
+
+    if homeScreen.isLinearTVAllowedInTopNav <> isPCAdult
+      preState = homeScreen.isLinearTVAllowedInTopNav
+      if isPCAdult = true and getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).side_nav = false
+        homeScreen.isLinearTVAllowedInTopNav = true
+      else
+        homeScreen.isLinearTVAllowedInTopNav =  false
+      end if
+      if preState <> homeScreen.isLinearTVAllowedInTopNav
+        refreshNeeded = true
+      end if
+
     end if
 
     '//When the screen loads new content, make sure the topNav is displayed if it is supposed to. For example, if the user changes the parental settings from adults to older kids, then the app is in kidsMode and should not display the top nav. Changing the topNav status when reloading the content will ensure the top nav is diosplayed when it should be.
