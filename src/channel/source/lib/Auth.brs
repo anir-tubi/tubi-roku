@@ -131,8 +131,11 @@ Function tubiAuth_getAuthInfo()
     if isExpired = true
       if authInfo.userId <> invalid
         newAuthInfo = m.refreshAuthToken(authInfo, 3) 'can return invalid
-      else
+      else if isString(authInfo.secretKey) = true
         newAuthInfo = m.refreshAnonymousToken(authInfo, 3) 'can return invalid
+      else
+        tubiLog("AuthInfo did not have secretKey! This should not have happened: " + FormatJson(authInfo), "warn", "clientWarn", "no-secret-key")
+        newAuthInfo = m.fetchAndSaveAnonymousAuthInfo() 'can return invalid
       end if
     else
       newAuthInfo = authInfo
