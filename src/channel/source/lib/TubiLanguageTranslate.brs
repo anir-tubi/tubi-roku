@@ -1824,7 +1824,7 @@ Function getTranslation_es_MX()
     },
     "screenSettings_parentalPassword_subtitle": {
       "description": "Directions 2nd line for signed out users who attempt to change the parental controls",
-      "message": "para actualizar los controles parentales"
+      "message": "controles parentales"
     },
     "screenSettings_parentalPassword_button_hide": {
       "description": "Label of button on the password entry screen to hide the password",
@@ -1852,22 +1852,22 @@ Function getTranslation_es_MX()
     },
     "screenSettings_error_parentalChanges_description_group0": {
       "description": "Success message when parental controls has changed to group 0",
-      "message": "La configuración del Control Parental ha cambiado a Niños pequeños. Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
+      "message": "La configuración de los controles parentales ha cambiado a Niños pequeños. Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
       "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_error_parentalChanges_description_group1": {
       "description": "Success message when parental controls has changed to group 1",
-      "message": "La configuración del Control Parental ha cambiado a Niños mayores. Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
+      "message": "La configuración de los controles parentales ha cambiado a Niños mayores. Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
       "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_error_parentalChanges_description_group2": {
       "description": "Success message when parental controls has changed to group 2",
-      "message": "La configuración del Control Parental ha cambiado a Adolescentes. Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
+      "message": "La configuración de los controles parentales ha cambiado a Adolescentes. Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
       "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_error_parentalChanges_description_group3": {
       "description": "Success message when parental controls has changed to group 3",
-      "message": "La configuración del Control Parental ha cambiado a Adultos. Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
+      "message": "La configuración de los controles parentales ha cambiado a Adultos. Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
       "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_error_signInParental_description": {
