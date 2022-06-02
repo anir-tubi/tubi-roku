@@ -670,22 +670,22 @@ Function getTranslation_en_US()
     },
     "screenSettings_parentalControls_group0": {
       "description": "Group 0 of the parental controls",
-      "message": "Little Kids ({ratings})",
+      "message": "Little Kids",
       "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_parentalControls_group1": {
       "description": "Group 1 of the parental controls",
-      "message": "Older Kids ({ratings})",
+      "message": "Older Kids",
       "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_parentalControls_group2": {
       "description": "Group 2 of the parental controls",
-      "message": "Teens ({ratings})",
+      "message": "Teens",
       "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_parentalControls_group3": {
       "description": "Group 3 of the parental controls",
-      "message": "Adults ({ratings})",
+      "message": "Adults",
       "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_parentalControls_instructions": {
@@ -754,22 +754,22 @@ Function getTranslation_en_US()
     },
     "screenSettings_error_parentalChanges_description_group0": {
       "description": "Success message when parental controls has changed to group 0",
-      "message": "Parental controls setting has changed to Little Kids ({ratings}}). Parental controls will be password protected after 5 minutes.",
+      "message": "Parental controls setting has changed to Little Kids. Parental controls will be password protected after 5 minutes.",
       "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_error_parentalChanges_description_group1": {
       "description": "Success message when parental controls has changed to group 1",
-      "message": "Parental controls setting has changed to Older Kids ({ratings}). Parental controls will be password protected after 5 minutes.",
+      "message": "Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.",
       "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_error_parentalChanges_description_group2": {
       "description": "Success message when parental controls has changed to group 2",
-      "message": "Parental controls setting has changed to Teens ({ratings}). Parental controls will be password protected after 5 minutes.",
+      "message": "Parental controls setting has changed to Teens. Parental controls will be password protected after 5 minutes.",
       "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_error_parentalChanges_description_group3": {
       "description": "Success message when parental controls has changed to group 3",
-      "message": "Parental controls setting has changed to Adults ({ratings}). Parental controls will be password protected after 5 minutes.",
+      "message": "Parental controls setting has changed to Adults. Parental controls will be password protected after 5 minutes.",
       "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_error_signInParental_description": {
@@ -1768,22 +1768,22 @@ Function getTranslation_es_MX()
     },
     "screenSettings_parentalControls_group0": {
       "description": "Group 0 of the parental controls",
-      "message": "Niños pequeños ({ratings})",
+      "message": "Niños pequeños",
       "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_parentalControls_group1": {
       "description": "Group 1 of the parental controls",
-      "message": "Niños mayores ({ratings})",
+      "message": "Niños mayores",
       "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_parentalControls_group2": {
       "description": "Group 2 of the parental controls",
-      "message": "Adolescentes ({ratings})",
+      "message": "Adolescentes",
       "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_parentalControls_group3": {
       "description": "Group 3 of the parental controls",
-      "message": "Adultos ({ratings})",
+      "message": "Adultos",
       "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_parentalControls_instructions": {
@@ -1852,22 +1852,22 @@ Function getTranslation_es_MX()
     },
     "screenSettings_error_parentalChanges_description_group0": {
       "description": "Success message when parental controls has changed to group 0",
-      "message": "La configuración del Control Parental ha cambiado a Niños pequeños ({ratings}}). Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
+      "message": "La configuración del Control Parental ha cambiado a Niños pequeños. Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
       "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_error_parentalChanges_description_group1": {
       "description": "Success message when parental controls has changed to group 1",
-      "message": "La configuración del Control Parental ha cambiado a Niños mayores ({ratings}). Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
+      "message": "La configuración del Control Parental ha cambiado a Niños mayores. Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
       "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_error_parentalChanges_description_group2": {
       "description": "Success message when parental controls has changed to group 2",
-      "message": "La configuración del Control Parental ha cambiado a Adolescentes ({ratings}). Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
+      "message": "La configuración del Control Parental ha cambiado a Adolescentes. Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
       "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_error_parentalChanges_description_group3": {
       "description": "Success message when parental controls has changed to group 3",
-      "message": "La configuración del Control Parental ha cambiado a Adultos ({ratings}). Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
+      "message": "La configuración del Control Parental ha cambiado a Adultos. Los controles parentales estarán protegidos con contraseña después de 5 minutos.",
       "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
     },
     "screenSettings_error_signInParental_description": {

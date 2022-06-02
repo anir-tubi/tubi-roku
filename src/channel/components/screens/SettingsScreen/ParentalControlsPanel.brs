@@ -24,24 +24,6 @@ Function init()
 End Function
 
 
-
-Function getRatingStrings(nRatingIndex)
-  sRatingsReturn = ""
-  countryCode = m.constants.deviceInfo.countryCode
-
-  aRatings = m.constants.ui.ratings[countryCode]
-
-  if aRatings = invalid
-    aRatings = m.constants.ui.ratings["US"]
-  end if
-
-  if aRatings <> invalid and aRatings[nRatingIndex] <> invalid
-    sRatingsReturn = aRatings[nRatingIndex]
-  end if
-  return sRatingsReturn
-End Function
-
-
 Function setParentalControlStrings()
   Title = m.top.findNode("Title")
   Title.text = getTranslation("screenSettings_menu_parentalControls")
@@ -52,8 +34,7 @@ Function setParentalControlStrings()
   newContent = m.Menu.content.clone(true)
   for i=0 to newContent.getChildCount()-1
     child = newContent.getChild(i)
-    sRatings = getRatingStrings(i)
-    sText = getTranslation("screenSettings_parentalControls_group" + i.toStr(), {ratings: sRatings})
+    sText = getTranslation("screenSettings_parentalControls_group" + i.toStr())
     child.title = sText
 
     '//Temporarily create checkbuttons for each button text to find the largest width necessary for the set of buttons,
