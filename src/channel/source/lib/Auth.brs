@@ -1,8 +1,13 @@
 '@constants: assocArray, the constants object returned from getContstants()
 '@request: assocArray, the object returned from TubiRequest()
 Function TubiAuth(constants, request)
+  authRegSection = "auth"
+  if constants.settings.stagingApis = true then
+    authRegSection = "auth_staging"
+  end if
+
   return {
-    authRegSection: "auth"
+    authRegSection: authRegSection
     firstVisitRegSection: "visit"
     guestUserHasAgeRegSection: "has_age"
 
