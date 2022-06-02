@@ -688,6 +688,7 @@ End Function
 
 Function handlePlayInput()
   itemFocused = m.Menu.content.getChild(m.Menu.itemFocused)
+  m.top.stopVideoPreview = true
   if itemFocused.id = "PlayMenuItem" and m.Menu.isInFocusChain() = true
     m.top.playSelected = true
   else if itemFocused.id = "WatchTrailerMenuItem" and m.Menu.isInFocusChain() = true
