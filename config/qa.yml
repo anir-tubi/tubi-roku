@@ -7,12 +7,6 @@ settings:
   remoteComponentsExtension: "zip" #prevents packages being built for qa builds, as they are not used - makes for faster builds
   skipAgeGate: false #setting to true will prevent the COPPA age gate screen from appearing
 
-  #setting to true will result in suitest being loaded
-  suitest: true
-
-  #setting to true will use analytics proxy server and display category slugs and content id in UI
-  suitestjs: false
-
   # setting to true will activate/signup the app automatically with a generated email and username
   # (if the values of suitest & stagingApis are also true)
   automaticActivation: true
@@ -37,3 +31,14 @@ settings:
     #By default nothing will be printed to debug console.(port : 8085 )
     #To enable console debuglogs, set consoleLoggingEnabled to true
     consoleLoggingEnabled: true
+
+  #setting to true will result in suitest being loaded
+  suitest: false
+
+  #setting to true will use analytics proxy server and display category slugs and content id in UI
+  suitestjs: false
+
+manifest:
+  # Set to 0 to prevent instant resume functionality.
+  # Setting to 0 is required to run analytics automated tests via Suitest's v3 js library
+  run_as_process: 1
