@@ -913,9 +913,15 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
         m.backgroundGroup.posterVisible = false
       else if previewState = "paused"
         resumeVideoPreview()
-      else ' this block is needed if user focuses to different content, it stops the preview of current content & starts the preview of new content
-        m.backgroundGroup.posterVisible = true
+      else
+        ' this block is needed if user focuses to different content,
+        ' it stops the preview of current content & starts the preview of new content
         stopVideoPreview()
+
+        if isLinearPlayerPlayingThisContent(focusedContent) = false
+          m.backgroundGroup.posterVisible = true
+        end if
+
         if focusedContent.videoPreviewUrl <> ""
           ' fire exposure event for video preview non-control group
           getExperimentResource("roku_video_preview", "roku_video_preview_v1", true)
