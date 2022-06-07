@@ -794,7 +794,23 @@ Function getTranslation_en_US()
     },
     "screenHome_error_fetchScreenContent_description": {
       "description": "Onscreen message to indicate home content could not be loaded",
-      "message": "Unable to load Tubi home screen."
+      "message": "Unable to load the Tubi Home screen."
+    },
+    "screenEspanol_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate espanol content could not be loaded",
+      "message": "Unable to load the Tubi Espanol screen."
+    },
+    "screenMovies_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate movies content could not be loaded",
+      "message": "Unable to load the Tubi Movies screen."
+    },
+    "screenKids_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate kids home content could not be loaded",
+      "message": "Unable to load the Tubi Kids screen."
+    },
+    "screenTv_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate TV content could not be loaded",
+      "message": "Unable to load the Tubi TV Shows screen."
     },
     "screenHome_item_tvguide_title": {
       "description": "The title of the rowList item for the TV Guide. It should be in title case.",

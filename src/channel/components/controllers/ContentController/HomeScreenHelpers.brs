@@ -745,7 +745,20 @@ Function handleHomeScreenErrorResponse(screenID, response)
     homeScreen.unobserveFieldScoped("contentReady")
     ' if we were loading in the background, don't show an error modal
     if homeScreen.isInFocusChain()
-      errorMessage = getTranslation("screenHome_error_fetchScreenContent_description")
+      errorMessage = ""
+      if screenID = m.constants.ui.screenIds.espanolScreen
+        errorMessage = getTranslation("screenEspanol_error_fetchScreenContent_description")
+      else if screenID = m.constants.ui.screenIds.movieScreen
+        errorMessage = getTranslation("screenMovies_error_fetchScreenContent_description")
+      else if screenID = m.constants.ui.screenIds.tvScreen
+        errorMessage = getTranslation("screenTv_error_fetchScreenContent_description")
+      else
+        if homeScreen.kidsModeFeatureOn = true
+          errorMessage = getTranslation("screenKids_error_fetchScreenContent_description")
+        else
+          errorMessage = getTranslation("screenHome_error_fetchScreenContent_description")
+        end if
+      end if
       errorCode = getUserFacingErrorCode(m.constants.errors.context.homeScreen, m.constants.errors.subtypes.fetchError, response.code)
 
       trackingPageInfo = homeScreen.trackingPageInfo
