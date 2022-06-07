@@ -344,7 +344,7 @@ function buildRemote() {
     const newImagesFile = `new_images_since/new_images_since_${minorBuildTag}`;
     const newImages = fs.readFileSync(newImagesFile, "utf8").split('\n').filter(function(e) {
       e = e.trim();
-      return (!e.startsWith("#") && (e.endsWith("png") || e.endsWith('jpg')));
+      return (!e.startsWith("#") && (e.endsWith("png") || e.endsWith('jpg') || e.endsWith('webp')));
     });
     log(`Found ${newImages.length} lines in ${newImagesFile}`);
     const imagePathRegex = /pkg:\/[0-9a-zA-Z\.\/\-_]*/g;
