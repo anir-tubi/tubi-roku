@@ -33,7 +33,7 @@ const {listUnusedImages,listUnusedTranslations} = require('./js/codeclean.js');
 const {NoStackError} = require('./js/utilities')
 
 // Importing functions with Git functionality
-const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch} = require('./js/git');
+const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch} = require('./js/git');
 
 /* Allow some environment variables to drive which config we're building.
    Environment variables are set on options, along with any parameters passed in
@@ -694,7 +694,7 @@ exports.bumpqa = exports.bumpQA; //Create bumpQA command alias
 exports.bumpQa = exports.bumpQA; //Create bumpQA command alias
 exports.install = series(exports.build, conditionalPackage, sideLoad);
 exports.test = series(setTest, clean, preprocessTests, buildInstalled, sideLoad);
-exports.stage = series(setStaging, bumpRevision, exports.build, packageAll, pushStaging);
+exports.stage = series(setStaging, bumpRevision, exports.build, packageAll, pushStaging, pushBranch);
 exports.releaseOnGithub = series(tagBuild, pushTag, createGithubRelease);
 exports.release = series(confirmRelease, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub);
 exports.compareProd = findCommitsNotOnProductionBranch;

@@ -231,6 +231,17 @@ async function pushTag(done) {
 }
 
 
+async function pushBranch(done){
+  log(`...Pushing QA branch to origin (Github)`);
+  const currentBranch = getCurrentBranch(done);
+  const gitPushCurrentBranch = `git push origin ${currentBranch}`;
+  const gitPushCurrentBranchErrorMsg = `Could not push ${currentBranch} to origin (Github). Please push it manually`;
+
+  execGitCommand(gitPushCurrentBranch, gitPushCurrentBranchErrorMsg, done);
+}
+
+
+
 async function createGithubRelease(done) {
   // Prompt if the dev wants to make a release via the CLI (as opposed to Github UI)
   const {releaseConfirmation} = await prompts({
@@ -589,5 +600,6 @@ module.exports = {
   createGithubRelease,
   findCommitsNotOnProductionBranch,
   findCommitsNotOnCurrentBranch,
-  addMissingImagesToRemoteLibrary
+  addMissingImagesToRemoteLibrary,
+  pushBranch
 };

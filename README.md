@@ -75,7 +75,7 @@ When asked to set up a dev password, use "1234" so it's easier for any developer
 
 - .zprofile for ZSH (ZSH is the default shell for new Macs.)
 - .bash_profile for BASH on Macs
-- .bashrc for BASH on Linux  
+- .bashrc for BASH on Linux
 (It might need a restart to take effect.)
 
 ```shell
@@ -107,7 +107,7 @@ To see a list of gulp commands `$ gulp --tasks`
 __The most commonly used Gulp commands__
 
 * `$ gulp install` - build a zip and side load it to a device (as set by your ROKU_DEV_TARGET)
-* `$ gulp stage` - build a zip using the "staging" config and upload starter components, and remote components to the staging CDN.
+* `$ gulp stage` - bumps the revision number, build a zip using the "staging" config and upload starter components, and remote components to the staging CDN.
 * `$ gulp addMissingImages` - updates new_images_since file with images that need to be included in the remote component library.
 * `$ gulp bumpQA` - bumps the revision number. This is used during the QA process. As changes are made and new QA builds are created, the revision number is used to distinguish between builds.
 * `$ gulp release` - bump the build number, build starter and remote components .pkgs using the "production" config. This command will also make PRs to the CDN repo and this project-total-recall repo on Github.
@@ -382,11 +382,12 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   `$ gulp stage`
 
+  Note: This will also push the current qa branch to github.
+
 9\. Create a CH ticket with any changes that have been made and give the ticket the QA team for manual testing. Make sure the changes are written in such a way that non technical readers will be able to consume this information. The title of the changes will be used in one of the last steps when creating a release within Github.
 
-10\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build. Using the following two commands, bump the revision number on the QA branch, and update the staging channel with the latest version of the QA branch.
+10\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build. Use the following command to update the staging channel with the latest version of the QA branch.
 
-  `$ gulp bumpQA`
   `$ gulp stage`
 
   Note: The revision number will only display as part of the version number under the About Settings Screen when the mode is set to "qa".
@@ -482,7 +483,7 @@ Then run:
 
 # Experiments
 
-We may want to see how a new feature will affect the app's metrics from a small group of our users before rolling out the feature to everyone on a given  platform. To do this, we will need to use the popper experiment system to let the app know when an experimental feature should be seen. Below are the details of this process.  
+We may want to see how a new feature will affect the app's metrics from a small group of our users before rolling out the feature to everyone on a given  platform. To do this, we will need to use the popper experiment system to let the app know when an experimental feature should be seen. Below are the details of this process.
 
 ## Setting up the experiment within the Popper Experiment System:
 
@@ -521,7 +522,7 @@ We may want to see how a new feature will affect the app's metrics from a small 
 
 ## Setting up the experiment within the Roku Code:
 
-- Within TubiExperiments.brs, set up a default experiment resource. Although the Popper experiment system can set a default value, we should still set a default resource client-side in case the app cannot communicate to the backend. Additionally, when the experiment ends, Popper will cease to provide a resource for the experiment, so the default resource will be used as a fallback. As previously stated, the resource values provide the code a way to externalize the properties of a given experiment. Locate the defaultResources associative array within the TubiExperiments.brs file and add the default resource associative array within the appropriate namespace.  
+- Within TubiExperiments.brs, set up a default experiment resource. Although the Popper experiment system can set a default value, we should still set a default resource client-side in case the app cannot communicate to the backend. Additionally, when the experiment ends, Popper will cease to provide a resource for the experiment, so the default resource will be used as a fallback. As previously stated, the resource values provide the code a way to externalize the properties of a given experiment. Locate the defaultResources associative array within the TubiExperiments.brs file and add the default resource associative array within the appropriate namespace.
 For example:
 
   ```vbnet
@@ -536,7 +537,7 @@ For example:
   }
   ```
 
-- After you have set everything up, then you can have your code check which experiment is turned on and display to the user that experiment. To do this, you simply have to add somewhere in your code (where it makes sense) a call to the getExperimentResource() method to check if an experiment has been turned on.  
+- After you have set everything up, then you can have your code check which experiment is turned on and display to the user that experiment. To do this, you simply have to add somewhere in your code (where it makes sense) a call to the getExperimentResource() method to check if an experiment has been turned on.
 For example:
 
   ```vbnet
@@ -545,7 +546,7 @@ For example:
   end if
   ```
 
-- Alternately, you can call the getExperimentResource() method to get the associative array associated with the experiment and do the appropriate things that are particular to your experiment.  
+- Alternately, you can call the getExperimentResource() method to get the associative array associated with the experiment and do the appropriate things that are particular to your experiment.
 For example:
 
   ```vbnet
@@ -597,11 +598,11 @@ NOTE: Instead of passing the crowdin key, you can set the crowdin key as system 
 
 # Restart Github Action Runner
 
-A linux machine has been dedicated in the San Francisco office to be used for GitHub PR unit testing. A Github Actions runner is running on this linux machine.  A roku device is connected to the linux machine. 
+A linux machine has been dedicated in the San Francisco office to be used for GitHub PR unit testing. A Github Actions runner is running on this linux machine.  A roku device is connected to the linux machine.
 
 When any PR is raised against master, the Github Actions runner triggers all of the project's unit tests. The PR will be allowed to merge based on the runner's test results.
 
-If the Github Actions runner is not working, the linux machine may need to be restarted. The below document explains how to do that. 
+If the Github Actions runner is not working, the linux machine may need to be restarted. The below document explains how to do that.
 https://tubitv.atlassian.net/wiki/spaces/IT/pages/2465464321/Accessing+Roku+Github+Action+Server
 
 # Charles Proxy
