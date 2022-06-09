@@ -603,6 +603,76 @@ Function findEpisode2dIndex(episodeId, contentNode)
 End Function
 
 
+
+' @currentItemFocused: array, current episode index
+' @contentNode: Node, a TubiContentNode, expected to be used only on series content nodes
+'
+' @returns: 2D array, [season, episode] which comes after current episode.
+'   for example, if currentItemFocused = [3,2], this function will return [3,3] if second episode is not the last episode in season 3
+'   or [4,0] if there is a season 4 and second episode is last episode in season 3.
+Function findNextEpisode2dIndex(currentItemFocused, contentNode)
+  if contentNode <> invalid and currentItemFocused <> invalid and currentItemFocused.count() = 2
+    seasonIndex = currentItemFocused[0]
+    episodeIndex = currentItemFocused[1]
+
+    if (episodeIndex + 1) < contentNode.getChild(seasonIndex).getChildCount()
+      return [seasonIndex, episodeIndex + 1]
+    else if (seasonIndex + 1) < contentNode.getChildCount()
+      return [seasonIndex + 1, 0]
+    end if
+  end if
+  return [0,0]
+End Function
+
+
+' @currentItemFocused: array, current episode 2D index
+' @seriesContent: Node, a TubiContentNode filled with content meta data for a series.
+'
+' @returns: 2D array, [season, episode] representing the first episode that is not watched to completion
+' which is after the episode represented by the currentItemFocused array
+Function findNextEpisode(currentItemFocused, seriesContent)
+  nextEpisode = [0,0] ' initialize next episode to be first episode
+
+  if seriesContent <> invalid and currentItemFocused <> invalid and currentItemFocused.count() = 2
+
+    nextEpisode = findNextEpisode2dIndex(currentItemFocused, seriesContent)
+    seasonIndex = nextEpisode[0]
+    episodeIndex = nextEpisode[1]
+    historyIds = getFieldFromGlobal("historyIds") ' get the history to avoid accessing m.global every time
+    if historyIds <> invalid
+      for i = seasonIndex to seriesContent.getChildCount() - 1
+        season = seriesContent.getChild(i)
+        for j = episodeIndex to season.getChildCount() - 1
+
+          item = seriesContent.getchild(i).getChild(j)
+          history = historyIds.findNode(item.id)
+
+          if history <> invalid and history.nowPos <> invalid and history.nowPos <> 0
+            nowPos = history.nowPos
+          else
+            nowPos = 0
+          end if
+
+          if item.creditsCuePoints <> invalid and item.creditsCuePoints.postlude <> invalid and nowPos < item.creditsCuePoints.postlude  then
+              return [i,j] ' first unwatched episode next to currently watched episode
+          end if
+        end for
+        episodeIndex = 0  'next season, so start from beginning
+      end for
+
+
+      'if we ran out of all the episodes, return first episode as next episode
+      if i = seriesContent.getChildCount() - 1 and j = seriesContent.getChild(i).getChildCount() - 1
+        nextEpisode = [0,0]
+      end if
+    end if
+  end if
+return nextEpisode
+
+End Function
+
+
+
 ' returns episode detail as node, if episode detail not present it returns invalid
 Function getEpisodeDetail(content)
   if content <> invalid

@@ -452,8 +452,10 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
     ' number then there is still a screen redraw issue: i.e. user watches only 2 seconds of a video.
     ' The local number is 2 seconds and displays the resume button, but the backend determines that 2
     ' seconds is not enough to warrant a resume button and returns 0 as the resume point.
-    if nResumePoint < m.constants.player.historyFrequency or isEndReached = true
-      '//If the video is either at the very beginning or at the very end, then it should pass the local resume point as 0
+    if nResumePoint < m.constants.player.historyFrequency or (isEndReached = true and detailContent <> invalid and detailContent.type <> m.constants.ui.contentTypes.series)
+      '//If the video is either at the very beginning or at the very end, then it should pass the local resume point as 0.
+      ' if content type is series, we do not need to reset the resumepoint to 0 because it will lose the watch history. But in case of movies,
+      ' if user watches till the end, we need to reset the resumepoint to 0.
       nResumePoint = 0
     end if
 
@@ -497,7 +499,13 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
 
           episodesScreen.content = detailContent
           episodesScreen.updateContent = true
-          episodesScreen.episodeToFocus = itemFocused
+          'if end reached for an episode, then place focus on next episode.
+          'if upnextContent is not present, then videoplayer will backout to previous screen.
+          if isEndReached = true
+            episodesScreen.episodeToFocus = findNextEpisode(itemFocused, detailContent)
+          else
+            episodesScreen.episodeToFocus = itemFocused
+          end if
         end if
       end if
     else if videoContent.isTrailer = true

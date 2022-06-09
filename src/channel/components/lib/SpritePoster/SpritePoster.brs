@@ -34,7 +34,7 @@ Function showSprite()
   nColumnIndex = 0
   '//nRowIndex = the number of row that the image is found within, Zero based
   nRowIndex = 0
-  nColumns = m.top.columns 
+  nColumns = m.top.columns
   nRows = m.top.rows
   if nRows <= 0
     '//Assume at least 1 row
@@ -42,7 +42,7 @@ Function showSprite()
   end if
 
   if m.top.numSprites <> 0
-    if nColumns <= 0 
+    if nColumns <= 0
       nColumns = m.top.numSprites
     end if
     page = m.top.jumpToSprite \ m.top.numSprites
@@ -97,8 +97,12 @@ Function showSprite()
   m.preload2.loadHeight = loadHeight
   if m.top.spriteUrls[page] <> invalid
     m.poster.uri = m.top.spriteUrls[page]
-    m.preload.uri = m.top.spriteUrls[page+1]
-    m.preload2.uri = m.top.spriteUrls[page+2]
+    if m.top.spriteUrls[page+1] <> invalid
+      m.preload.uri = m.top.spriteUrls[page+1]
+    end if
+    if m.top.spriteUrls[page+2] <> invalid
+      m.preload2.uri = m.top.spriteUrls[page+2]
+    end if
 
     offsetX = m.top.width * nColumnIndex
     offsetY = m.top.height * nRowIndex
