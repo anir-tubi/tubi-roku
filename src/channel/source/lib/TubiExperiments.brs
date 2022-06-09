@@ -50,7 +50,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_register_signup_to_save: {
-        roku_register_signup_to_save_v2: {"enabled": true}
+        roku_register_signup_to_save_v3: {"enabled": false}
       }
 
       ' enabled = true : after the video preview of the selected title ends, the user sees the hero image again.

@@ -9,10 +9,7 @@ Function init()
   m.DetailsMenuText = m.top.findNode("DetailsMenuText")
   m.top.leftTextPadding = m.DetailsMenuText.translation[0]
   m.Progress = m.top.findNode("ResumeProgressBar")
-  m.rokuRegisterSignupToSaveExperiment = getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v2", false).enabled
-  if m.rokuRegisterSignupToSaveExperiment = true
-    m.badgeLabel = m.top.findNode("badgeLabel")
-  end if
+  m.badgeLabel = m.top.findNode("badgeLabel")
 
   constants = getConstantsFromGlobal()
   if constants <> invalid
@@ -25,7 +22,7 @@ Function onItemContentChange()
   tubiLog("DetailMenuItem.onItemContentChange")
   if m.top.itemContent <> invalid then
 
-    if m.top.itemContent.id = "signUpMenuItem" and m.rokuRegisterSignupToSaveExperiment = true
+    if m.top.itemContent.id = "signUpMenuItem"
       'If the button has title and BadgeText, calculated width will be width of both title and badgeText to avoid button crop. To get the
       'calculated width we are assigning the title and badgeText to the m.DetailsMenuText and get the calculated value
       'and after setting the calculatedWidth resetting m.DetailsMenuText.text to title.
@@ -49,24 +46,23 @@ Function onItemContentChange()
       m.Progress.visible = false
     end if
     m.top.calculatedWidth = m.top.calculatedTextWidth + m.DetailsMenuText.translation[0]
-    if m.rokuRegisterSignupToSaveExperiment = true
-      'Move the translation of Button text to left when there is no image
-      if m.top.itemContent.id = "signUpMenuItem" and m.top.itemContent.iconUrl = ""
-        m.DetailsMenuText.translation = [22, 0]
-      else
-        m.DetailsMenuText.translation = [72, 0]
-      end if
-      calculatedWidth = m.DetailsMenuText.boundingRect().width + m.DetailsMenuText.translation[0]
-      if m.top.itemContent.badgeText <> ""
-        m.badgeLabel.fontColor = "0x10141F"
-        m.badgeLabel.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
-        m.badgeLabel.fontSize = 21
-        m.badgeLabel.text = m.top.itemContent.badgeText
-        m.badgeLabel.visible = true
-        m.badgeLabel.translation = [calculatedWidth + 20, 20]
-      else
-        m.badgeLabel.visible = false
-      end if
+
+    'Move the translation of Button text to left when there is no image
+    if m.top.itemContent.id = "signUpMenuItem" and m.top.itemContent.iconUrl = ""
+      m.DetailsMenuText.translation = [22, 0]
+    else
+      m.DetailsMenuText.translation = [72, 0]
+    end if
+    calculatedWidth = m.DetailsMenuText.boundingRect().width + m.DetailsMenuText.translation[0]
+    if m.top.itemContent.badgeText <> ""
+      m.badgeLabel.fontColor = "0x10141F"
+      m.badgeLabel.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
+      m.badgeLabel.fontSize = 21
+      m.badgeLabel.text = m.top.itemContent.badgeText
+      m.badgeLabel.visible = true
+      m.badgeLabel.translation = [calculatedWidth + 20, 20]
+    else
+      m.badgeLabel.visible = false
     end if
   end if
 End Function

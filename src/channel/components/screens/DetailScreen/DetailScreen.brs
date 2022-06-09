@@ -32,15 +32,12 @@ Function init()
   m.RelatedTitle = m.top.findNode("RelatedTitle")
   m.RelatedRowLabel = m.top.findNode("RelatedRowLabel")
   m.AnimationGroup = m.top.findNode("AnimationGroup")
-  m.rokuRegisterSignupToSaveExperiment = getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v2", false).enabled
-  if m.rokuRegisterSignupToSaveExperiment = true
-    m.signUpMenuItem = m.top.findNode("signUpMenuItem")
-    if updateIconsEnabled = true
-      m.signUpMenuItem.iconUrl = "pkg:/images/icon-sign-in.webp"
-    end if
-    m.top.observeFieldScoped("removeSignupButton", "onRemoveSignupButton")
-    m.top.observeFieldScoped("stringSignUpButton", "onStringChange")
+  m.signUpMenuItem = m.top.findNode("signUpMenuItem")
+  if updateIconsEnabled = true
+    m.signUpMenuItem.iconUrl = "pkg:/images/icon-sign-in.webp"
   end if
+  m.top.observeFieldScoped("removeSignupButton", "onRemoveSignupButton")
+  m.top.observeFieldScoped("stringSignUpButton", "onStringChange")
   m.top.observeField("length", "onLengthChange")
   m.top.observeField("isSeries", "onIsSeries")
   m.top.observeField("isInKidsAgeGateMode", "onIsInKidsAgeGateMode")
@@ -294,20 +291,30 @@ Function onIsSeries()
   tubiLog("DetailScreen.onIsSeries")
   isSeries = m.top.isSeries
   episodeListIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
-  if m.signUpMenuItem <> invalid and m.rokuRegisterSignupToSaveExperiment = true
-    signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
-    if isLoggedInUser() = true or isReturningUser() = false
-      ' remove the sign up button if it's not needed
-      addRemoveMenuItem(false, signUpIndex, m.signUpMenuItem, [])
+  signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
+  menuItems = [m.signUpMenuItem, m.PlayMenuItem]
+  if isLoggedInUser() = false and isReturningUser()
+    if getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v3", true).enabled = true
+      if isSeries = true and signUpIndex = 1
+        'Remove the signup button at 1st index and make signup button as default for series.
+        addRemoveMenuItem(false, signUpIndex)
+        addRemoveMenuItem(true, -1, m.signUpMenuItem, [])
+        menuItems = [m.PlayMenuItem, m.signUpMenuItem]
+      else if isSeries = false and signUpIndex = 0
+        'Move sign up button to 1st index for movies
+        addRemoveMenuItem(false, signUpIndex)
+        addRemoveMenuItem(true, -1, m.signUpMenuItem, [m.PlayMenuItem])
+      end if 
+    else
+      if signUpIndex = -1
+        menuItems = [m.PlayMenuItem]
+      end if
     end if
-
-    ' if in the sign up CTA experiment, add the episodes list menu item after the sign up menu item,
-    ' otherwise add the episodes list menu item after the play menu item.
-    menuItems = [m.signUpMenuItem, m.PlayMenuItem]
   else
+    'remove the sign up button if it's not needed
+    addRemoveMenuItem(false, signUpIndex, m.signUpMenuItem, [])
     menuItems = [m.PlayMenuItem]
   end if
-
   addRemoveMenuItem(m.top.isSeries, episodeListIndex, m.EpisodesMenuItem, menuItems)
 End Function
 
@@ -321,7 +328,7 @@ End Function
 
 
 Function onIsInKidsAgeGateMode()
-  if m.rokuRegisterSignupToSaveExperiment = true and isLoggedInUser() = false and isReturningUser() = true
+  if isLoggedInUser() = false and isReturningUser() = true
     signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
     if m.top.isInKidsAgeGateMode = true and signUpIndex > -1
       addRemoveMenuItem(false, signUpIndex)
@@ -335,8 +342,8 @@ End Function
 Function onHasTrailer()
   tubiLog("DetailScreen.onHasTrailer")
   trailerIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.WatchTrailerMenuItem.id)
-  if m.rokuRegisterSignupToSaveExperiment = true and m.signUpMenuItem <> invalid
-    signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
+  signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
+  if m.signUpMenuItem <> invalid
     if signUpIndex > -1
       addRemoveMenuItem(m.top.hasTrailer, trailerIndex, m.WatchTrailerMenuItem, [m.signUpMenuItem])
     else
@@ -394,7 +401,7 @@ Function setInitialMenuItems() As Void
   menuItems = CreateObject("roSGNode", "ContentNode")
   menuItems.appendChild(m.PlayMenuItem)
   'Add SignUp button for registration experiemnt at 1st index by default
-  if isLoggedInUser() = false and isReturningUser() = true and m.rokuRegisterSignupToSaveExperiment = true
+  if isLoggedInUser() = false and isReturningUser() = true
     menuItems.appendChild(m.signUpMenuItem)
   end if
   menuItems.appendChild(m.AddQueueMenuItem)
