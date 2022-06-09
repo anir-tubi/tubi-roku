@@ -1910,6 +1910,22 @@ Function getTranslation_es_MX()
       "description": "Onscreen message to indicate home content could not be loaded",
       "message": "No se pudo cargar la pantalla de inicio de Tubi."
     },
+    "screenEspanol_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate espanol content could not be loaded",
+      "message": "No se pudo cargar la pantalla de Tubi en Espanol."
+    },
+    "screenMovies_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate movies content could not be loaded",
+      "message": "No se pudo cargar la pantalla de películas de Tubi."
+    },
+    "screenKids_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate kids home content could not be loaded",
+      "message": "No se pudo cargar la pantalla de Tubi Niños."
+    },
+    "screenTv_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate TV content could not be loaded",
+      "message": "No se pudo cargar la pantalla de series de Tubi."
+    },
     "screenHome_item_tvguide_title": {
       "description": "The title of the rowList item for the TV Guide. It should be in title case.",
       "message": "Guía de TV"
