@@ -91,23 +91,9 @@ Function onVideoPreviewStateChanged(msg)
     m.backgroundGroup.posterVisible = true
   end if
 
-  if videoPreviewState = "finished"
-    if currentScreen <> invalid
-      if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).autostart = true
-        if currentScreen.subType() = "HomeScreen"
-          showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen, invalid, "previews")
-        else if currentScreen.subType() = "DetailScreen"
-          if currentScreen.isHistory = true
-            resumeVideoDetailScreen(currentScreen, "previews")
-          else
-            playVideoDetailScreen(currentScreen, "previews")
-          end if
-        end if
-      else if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true
-        ' updating backgroundUriList in order to change the backgroundType/gradient to topright when video preview is finished
-        currentScreen.backgroundUriList = currentScreen.backgroundUriList
-      end if
-    end if
+  if videoPreviewState = "finished" and currentScreen <> invalid
+    ' updating backgroundUriList in order to change the backgroundType/gradient to topright when video preview is finished
+    currentScreen.backgroundUriList = currentScreen.backgroundUriList
   end if
 
 End Function

@@ -916,7 +916,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
       stopAndHideLinearVideoPlayer()
     end if
 
-    if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true and focusedContent.type <> invalid and m.SideNav.opened <> true
+    if focusedContent.type <> invalid and m.SideNav.opened <> true
       previewState = getVideoPreviewStateForThisContent(focusedContent)
       if previewState = "buffering" or previewState = "playing"
         videoPreview = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
@@ -936,14 +936,9 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
         end if
 
         if focusedContent.videoPreviewUrl <> ""
-          ' fire exposure event for video preview non-control group
-          getExperimentResource("roku_video_preview", "roku_video_preview_v1", true)
           startVideoPreview(focusedContent, "home_page")
         end if
       end if
-    else if focusedContent.type <> invalid and m.SideNav.opened <> true and focusedContent.videoPreviewUrl <> ""
-      ' fire exposure event for video preview control group
-      getExperimentResource("roku_video_preview", "roku_video_preview_v1", true)
     end if
 
     if focusedContent.type <> invalid and epgExperimentResource.update_homescreen = true

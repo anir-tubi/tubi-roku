@@ -513,7 +513,7 @@ Function setAutoplayVideoPreviewFromGlobal(authInfo = invalid)
     authInfo = getFieldFromGlobal("authInfo")
   end if
 
-  if isLoggedInUser(authInfo) = true and getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true
+  if isLoggedInUser(authInfo) = true
     if authInfo.enableVideoPreview <> invalid
       bEnabled = authInfo.enableVideoPreview
     end if

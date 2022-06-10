@@ -37,21 +37,20 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     detailScreen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelected")
 
-    if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true
-      previewState = getVideoPreviewStateForThisContent(content)
-      if previewState = "buffering" or previewState = "playing"
-        pageType = "video_page"
-        if content.type = m.constants.ui.contentTypes.series
-          pageType = "series_detail_page"
-        end if
-        setPageTypeForVideoPreview(pageType) ' this will help to trigger analytics
-      else
-        previewState = getVideoPreviewState()
-        if previewState <> "stopped" and previewState <> "finished" ' this means video not stopped/finished for previous content, so we need to stop it
-          stopVideoPreview()
-        end if
+    previewState = getVideoPreviewStateForThisContent(content)
+    if previewState = "buffering" or previewState = "playing"
+      pageType = "video_page"
+      if content.type = m.constants.ui.contentTypes.series
+        pageType = "series_detail_page"
+      end if
+      setPageTypeForVideoPreview(pageType) ' this will help to trigger analytics
+    else
+      previewState = getVideoPreviewState()
+      if previewState <> "stopped" and previewState <> "finished" ' this means video not stopped/finished for previous content, so we need to stop it
+        stopVideoPreview()
       end if
     end if
+
 
     ' m.actionType variable is used for setting a callback function after successful a data fetch retry in the case where
     ' users select a menu button from the detail screen, but the origial data fetch was unsuccessful. In this way,
@@ -128,26 +127,18 @@ Function onDetailBackgroundChange(msg)
   detailScreen = msg.getRoSGNode()
   if detailScreen.isInFocusChain()
 
-    if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true
-      previewState = getVideoPreviewState()
-      if previewState = "playing"
-        m.backgroundGroup.backgroundInfo = {
-          type: m.constants.ui.backgroundTypes.epg
-          uriList: [] ' setting uriList as empty, because don't rotate background poster when video preview is playing
-        }
-      else
-        m.backgroundGroup.backgroundInfo = {
-          type: m.constants.ui.backgroundTypes.topright
-          uriList: detailScreen.backgroundUriList
-        }
-      end if
+    previewState = getVideoPreviewState()
+    if previewState = "playing"
+      m.backgroundGroup.backgroundInfo = {
+        type: m.constants.ui.backgroundTypes.epg
+        uriList: [] ' setting uriList as empty, because don't rotate background poster when video preview is playing
+      }
     else
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.topright
         uriList: detailScreen.backgroundUriList
       }
     end if
-
   end if
 End Function
 

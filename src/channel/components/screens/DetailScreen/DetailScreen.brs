@@ -468,9 +468,7 @@ End Function
 Function handleMenuItemSelected(itemSelected)
   if itemSelected <> invalid then
     tubiLog("DetailScreen.handleMenuItemSelected" + itemSelected.title)
-    if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true
-      m.top.stopVideoPreview = true
-    end if
+    m.top.stopVideoPreview = true
     if itemSelected.id = "ResumeMenuItem"
       m.top.resumeSelected = true
     else if itemSelected.id = "PlayMenuItem"
@@ -540,12 +538,9 @@ End Function
 Function onRelatedItemFocused()
   tubiLog("DetailScreen.onRelatedItemFocused")
   if m.RelatedGrid.content <> invalid
-
-    if getExperimentResource("roku_video_preview", "roku_video_preview_v1", false).enabled = true
-      m.top.stopVideoPreview = true
-      ' force a background update
-      m.top.backgroundUriList = m.top.backgroundUriList
-    end if
+    m.top.stopVideoPreview = true
+    ' force a background update
+    m.top.backgroundUriList = m.top.backgroundUriList
 
     focusedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemFocused)
     if focusedContent <> invalid
