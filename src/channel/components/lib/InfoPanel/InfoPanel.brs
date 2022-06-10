@@ -42,7 +42,6 @@ Function init()
   m.PartnerLogo = m.top.findNode("PartnerLogo")
   m.ExpireWarning = m.top.findNode("ExpireWarning")
   m.ExpireWarning.color = m.constants.ui.colors.expirationWarning
-  m.liveIconGroup = m.top.findNode("liveIconGroup")
   m.SecondLineGroup = m.top.findNode("SecondLineGroup")
   m.top.observeField("mode", "onModeChange")
   m.top.observeField("width", "onWidthChange")
@@ -74,11 +73,6 @@ Function init()
 
   'Remove LiveVideoIndicator here because otherwise the poster is visible prior to any information being passed to info panel, when we open the app
   m.offset.removeChild(m.LiveVideoIndicator)
-
-  'Remove liveIconGroup here because otherwise liveIcon and live text is visible when we select live tv
-  if m.SecondLineGroup.getChild(0) <> invalid and m.SecondLineGroup.getChild(0).id = "liveIconGroup"
-    m.SecondLineGroup.removeChild(m.liveIconGroup)
-  end if
 
   m.StarringTag.width = 0
   m.DirectorTag.width = 0
@@ -204,7 +198,7 @@ Function onLineOneDataChange(msg)
   end if
   if data.length <> invalid and data.length <> 0
     ' add 'dot' spacer only if we had a release date
-    if text.len() > 0 
+    if text.len() > 0
       text = text + Chr(&hb7) + " "
     end if
     text = text + formatLengthAsEnglish(data.length) + " "
@@ -449,8 +443,10 @@ Function onModeChange()
     m.top.removeChild(m.PlayerCountdownGroup)
   end if
 
-  if m.SecondLineGroup.getChild(0) <> invalid and m.SecondLineGroup.getChild(0).id = "liveIconGroup"
+
+  if m.liveIconGroup <> invalid AND m.liveIconGroup.isSameNode(m.SecondLineGroup.getChild(0)) then
     m.SecondLineGroup.removeChild(m.liveIconGroup)
+    m.liveIconGroup.shouldAnimate = false
   end if
 
   if m.top.mode = m.constants.ui.infoPanelModes.category
@@ -488,7 +484,7 @@ Function onModeChange()
   else if m.top.mode = m.constants.ui.infoPanelModes.continue_watching
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.itemSpacings = [15] 
+    m.Offset.itemSpacings = [15]
   else if m.top.mode = m.constants.ui.infoPanelModes.episode
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.Episode)
@@ -519,6 +515,11 @@ Function onModeChange()
     if m.firstLineGroup <> invalid
       m.twoLineInfo.removeChild(m.firstLineGroup)
     end if
+
+    if m.liveIconGroup = invalid then
+      m.liveIconGroup = createObject("roSGNode", "LiveIconGroup")
+    end if
+    m.liveIconGroup.shouldAnimate = true
     m.SecondLineGroup.insertChild(m.liveIconGroup, 0)
   end if
 

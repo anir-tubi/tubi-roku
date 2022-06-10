@@ -266,9 +266,6 @@
             vertAlignment="center"
             itemSpacings="[10]"
             addItemSpacingAfterChild="true">
-            <LiveIconGroup
-              id="liveIconGroup"
-              shouldAnimate="true" />
             <Label
               id="Line2"
               opacity="0.5"

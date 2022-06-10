@@ -10,27 +10,49 @@ Function init()
     "pkg:/images/icon_live_2.png",
     "pkg:/images/icon_live_3.png"
   ]
+  m.nonAnimatingUri = "pkg:/images/icon_live_4.png"
+  m.liveAnimateImage.uri = m.nonAnimatingUri
   m.animateIndex = 0
 End Function
 
 
 Function onAnimate()
   if m.top.shouldAnimate = false
-    m.liveAnimateImage.uri = "pkg:/images/icon_live_4.png"
+    m.liveAnimateImage.uri = m.nonAnimatingUri
+    if m.animateTimer <> invalid then
+      m.animateTimer.control = "stop"
+    end if
   else
-    animateTimer = m.top.createChild("Timer")
-    animateTimer.repeat = true
-    animateTimer.duration = 0.6
-    animateTimer.observeField("fire", "onAnimateTimerFired")
-    animateTimer.control = "start"
+    m.top.enableRenderTracking = true
+    m.top.observeFieldScoped("renderTracking", "onRenderTrackingChange")
+    if m.animateTimer = invalid then
+      timer = m.top.createChild("Timer")
+      timer.repeat = true
+      timer.duration = 0.6
+      timer.observeFieldScoped("fire", "onAnimateTimerFired")
+      m.animateTimer = timer
+    end if
+    m.animateTimer.control = "start"
+    onAnimateTimerFired()
   end if
 end Function
 
 
 Function onAnimateTimerFired()
-  if m.animateIndex >= m.posterArray.count() 
-    m.animateIndex = 0
-  end if
+  ' We want to keep the previous image showing until the new image loads to avoid flashing
+  m.liveAnimateImage.loadingBitmapUri = m.liveAnimateImage.uri
   m.liveAnimateImage.uri = m.posterArray[m.animateIndex]
   m.animateIndex++
+  if m.animateIndex >= m.posterArray.count()
+    m.animateIndex = 0
+  end if
+End Function
+
+
+Function onRenderTrackingChange(msg)
+  if msg.getData() = "none" then
+    m.animateTimer.control = "stop"
+  else if m.top.shouldAnimate = true then
+    m.animateTimer.control = "start"
+  end if
 End Function
