@@ -19,6 +19,7 @@ Function TubiAuth(constants, request)
     setAuthInfo: tubiAuth_setAuthInfo
     getFirstVisit: tubiAuth_getFirstVisit
     setFirstVisit: tubiAuth_setFirstVisit
+    clearFirstVisit: tubiAuth_clearFirstVisit
     handleRegistration: tubiAuth_handleRegistration
     logout: tubiAuth_deleteAuthInfo
     refreshAuthToken: tubiAuth_refreshAuthToken
@@ -502,14 +503,20 @@ Function tubiAuth_handleAnonymousRefreshTokenResponse(msg, anonymousTokenReq)
 End Function
 
 
-'checks device registry for first visit value, if none exists, set today's value as the first visit value.
-'returns stored first visit value (number of days since Unix epoch) or today's value
+Function tubiAuth_clearFirstVisit()
+  firstVisit = m.regDelete("firstVisit", m.firstVisitRegSection)
+  return firstVisit
+End Function
+
+
+'reads device registry for firstVisit value
+'returns firstVisit value if value is present, otherwise return -1
 Function tubiAuth_getFirstVisit()
   firstVisit = m.regRead("firstVisit", m.firstVisitRegSection)
   if firstVisit <> invalid
     firstVisit = firstVisit.toInt()
   else
-    firstVisit = m.setFirstVisit()
+    firstVisit = -1
   end if
   return firstVisit
 End Function

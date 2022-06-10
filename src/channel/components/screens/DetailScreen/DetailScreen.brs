@@ -293,7 +293,7 @@ Function onIsSeries()
   episodeListIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
   signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
   menuItems = [m.signUpMenuItem, m.PlayMenuItem]
-  if isLoggedInUser() = false and isReturningUser()
+  if isLoggedInUser() = false and isNewUser() = false
     if getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v3", true).enabled = true
       if isSeries = true and signUpIndex = 1
         'Remove the signup button at 1st index and make signup button as default for series.
@@ -304,7 +304,7 @@ Function onIsSeries()
         'Move sign up button to 1st index for movies
         addRemoveMenuItem(false, signUpIndex)
         addRemoveMenuItem(true, -1, m.signUpMenuItem, [m.PlayMenuItem])
-      end if 
+      end if
     else
       if signUpIndex = -1
         menuItems = [m.PlayMenuItem]
@@ -328,7 +328,7 @@ End Function
 
 
 Function onIsInKidsAgeGateMode()
-  if isLoggedInUser() = false and isReturningUser() = true
+  if isLoggedInUser() = false and isNewUser() = false
     signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
     if m.top.isInKidsAgeGateMode = true and signUpIndex > -1
       addRemoveMenuItem(false, signUpIndex)
@@ -401,7 +401,7 @@ Function setInitialMenuItems() As Void
   menuItems = CreateObject("roSGNode", "ContentNode")
   menuItems.appendChild(m.PlayMenuItem)
   'Add SignUp button for registration experiemnt at 1st index by default
-  if isLoggedInUser() = false and isReturningUser() = true
+  if isLoggedInUser() = false and isNewUser() = false
     menuItems.appendChild(m.signUpMenuItem)
   end if
   menuItems.appendChild(m.AddQueueMenuItem)

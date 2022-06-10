@@ -489,6 +489,18 @@ Function getConstants()
     constants.urls.continueWatchingItemBackground = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingNonRegisteredItemBground.png"
     constants.urls.continueWatchingItemBackground_kidsMode = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingNonRegisteredItemBground_kidsMode.png"
 
+    constants.urls.onBoardingBackground = "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-welcome-fhd.webp"
+    constants.urls.landingBackgroundUriList = [
+      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-1.webp"
+      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-2.webp"
+      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-3.webp"
+      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-4.webp"
+      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-5.webp"
+      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-6.webp"
+      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-7.webp"
+      "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-8.webp"
+     ]
+
     ' url for pinging Nielsen
     constants.urls.nielsenPing = "https://audit.imrworldwide.com/cgi-bin/gn"
 
@@ -846,6 +858,7 @@ Function getConstants()
       constants.ui.backgroundTypes.feature = "feature"
       constants.ui.backgroundTypes.epg = "epg"
       constants.ui.backgroundTypes.marketingScreen = "marketingScreen"
+      constants.ui.backgroundTypes.rightScreen = "rightScreen"
 
     constants.ui.modes = {}
       constants.ui.modes.standard = "standard"
@@ -862,6 +875,7 @@ Function getConstants()
     constants.ui.screenLevels = {}
       ' NOTE : screen level 150 is RESERVED for settings screen when going via signup/signin screen
       constants.ui.screenLevels.homeScreen = 10
+      constants.ui.screenLevels.initialContentScreen = 20
       constants.ui.screenLevels.espanolScreen = 20
       constants.ui.screenLevels.bestKnownScreen = 20
       constants.ui.screenLevels.nostalgiaScreen = 20
@@ -886,7 +900,10 @@ Function getConstants()
       constants.ui.screenLevels.signInScreen = 90
       constants.ui.screenLevels.ageGateScreen = 90
       constants.ui.screenLevels.emailVerificationScreen = 90
-      constants.ui.screenLevels.initialContentScreen = 20
+      constants.ui.screenLevels.welcomeScreen = 99
+      constants.ui.screenLevels.freeForeverScreen = 110
+      constants.ui.screenLevels.availableDeviceScreen = 111
+      constants.ui.screenLevels.landingScreen = 112
       constants.ui.screenLevels.modalDialogScreen = 1000
 
     constants.ui.screenIds = {}
@@ -919,6 +936,10 @@ Function getConstants()
       constants.ui.screenIds.emailVerificationScreen = "emailVerificationScreen"
       constants.ui.screenIds.bestKnownScreen = "bestKnownScreen"  '//Note: BestKnown Screen refers to the A-List Screen
       constants.ui.screenIds.nostalgiaScreen = "nostalgiaScreen"
+      constants.ui.screenIds.welcomeScreen = "welcomeScreen"
+      constants.ui.screenIds.freeForeverScreen = "freeForeverScreen"
+      constants.ui.screenIds.availableDeviceScreen = "availableDeviceScreen"
+      constants.ui.screenIds.landingScreen = "landingScreen"
 
     constants.ui.cacheableScreenIds = {}
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
@@ -1002,6 +1023,13 @@ Function getConstants()
       constants.ui.sideNavOpenIds[constants.ui.screenIds.sportsEPGScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.newsEPGScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.entertainmentEPGScreen] = true
+
+    constants.ui.onBoarding = {}
+      constants.ui.onBoarding.pageSequence = {}
+        constants.ui.onBoarding.pageSequence.welcomeScreen = 0
+        constants.ui.onBoarding.pageSequence.freeForeverScreen = 1
+        constants.ui.onBoarding.pageSequence.availableDeviceScreen = 2
+        constants.ui.onBoarding.pageSequence.landingScreen = 3
 
     constants.ui.keyIds = {}
       constants.ui.keyIds.back = "back"

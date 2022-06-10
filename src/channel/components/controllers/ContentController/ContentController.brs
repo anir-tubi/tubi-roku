@@ -127,6 +127,24 @@ Function init()
   m.global.addField("authInfo", "assocarray", false)
   m.global.authInfo = invalid ' indicates not logged in
 
+  ' isNewUser global variable is needed to show/hide onboarding, signup button on detail screen
+  ' isNewUser will be set to true, if there is entry on firstVisit registry. Otherwise false
+  m.global.addField("isNewUser", "boolean", false)
+  m.global.isNewUser = false
+
+  ' checking the firstVisit in registry and setting the isNewUser global based on it
+  if Auth.getFirstVisit() = -1
+    m.global.isNewUser = true
+    Auth.setFirstVisit()
+  end if
+
+  ' QA TESTING PURPOSE: below block can be removed during onboarding graduation.
+  ' By clearing registry, QA can turn 'showOnboardingAlways' back to false in .yml and make sure onboarding screen is shown for next launch.
+  if m.constants.settings.showOnboardingAlways = true
+    m.global.isNewUser = true
+    Auth.clearFirstVisit()
+  end if
+
   m.authInfoReceived = false 'is the auth info returned from the registry
   m.authInfoRefreshed = true 'is the auth info refreshed after receiving a deeplink with a refresh token
   m.ageVerificationComplete = false 'has the user verified their age?
@@ -549,6 +567,9 @@ Function startUserExperience()
       ' we were asked to deep link into a content item. Go to it
       ' whether we were logged in or not.
       handleDeeplink()
+    else if isNewUser() = true and getExperimentResource("roku_regist_enhanced_onboarding", "roku_enhanced_onboarding_v1", true).enabled = true then
+      ' show on-boarding screens only for new users (guest)
+      showOnBoardingWelcomeScreen()
     else if shouldDisplayInitialContentScreen() = true
       ' Display the initial content screen to the user so they can choose the proper experience.
       displayInitialContentScreen()
@@ -1454,6 +1475,18 @@ Function onScreenBackgroundUpdated(msg)
 End Function
 
 
+Function onLandingScreenBackgroundChange(msg)
+  TubiLog("ContentController.onLandingScreenBackgroundChange")
+  landingScreen = msg.getRoSGNode()
+  if landingScreen <> invalid
+    m.backgroundGroup.backgroundInfo = {
+      type: m.constants.ui.backgroundTypes.rightScreen
+      uriList: landingScreen.backgroundUriList
+    }
+  end if
+End Function
+
+
 ' fireAppLoadTimeEvent
 '
 ' Fire off a log to a server so we can track how long it took since the app was started
@@ -1645,6 +1678,9 @@ Function onCustomResume(msg)
 
   if lastSuspendOrResumeReason = "home" and customResumeLaunchParams <> invalid
     currentScreen = getCurrentScreen()
+
+    ' User coming back to app via instant resume is considered as returning user
+    m.global.isNewUser = false
 
     lastAppSuspendInSecs = m.appSuspendTimer.TotalSeconds()
     lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 24 / 60 / 60

@@ -8,19 +8,11 @@ Function isLoggedInUser(authInfo = invalid)
 End Function
 
 
-Function isReturningUser()
-  returningUser = false
-  Auth = TubiAuth(m.constants, m.Request)
+Function isNewUser()
 
-  'these were converted days since year Jan 1, 1970, the unix epoch when user first-time launch the app
-  daysFromEpochForFirstVisit = Auth.getFirstVisit()
-  
-  'these were converted days since year Jan 1, 1970, the unix epoch 
-  daysFromEpoch = getNumberOfDaysSinceEpoch()
-  if daysFromEpochForFirstVisit <> invalid and daysFromEpoch <> invalid and daysFromEpoch > daysFromEpochForFirstVisit + 1
-    returningUser = true
-  end if
-  return returningUser
+  bNewUser = m.global.isNewUser
+  return (bNewUser <> invalid and bNewUser = true and isLoggedInUser() = false)
+
 End Function
 
 

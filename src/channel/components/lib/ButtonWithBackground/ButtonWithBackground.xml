@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - ButtonWithBackground
+ - Items used in a MarkupGrid (like FilledButtonMarkupGrid) or RowList for drawing buttons with background.
+ -->
+<component name="ButtonWithBackground" extends="Group" >
+  <script type="text/brightscript" uri="ButtonWithBackground.brs" />
+  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+
+  <interface>
+    <field id="itemHasFocus" type="boolean" />
+    <field id="itemContent" type="node" />
+  </interface>
+
+  <children>
+    <Poster
+      id="buttonBG"
+      width="450"
+      height="96"
+      uri="pkg:/images/menu-focus-fhd.9.png"
+      blendColor="0x9699A3"
+      opacity="0.16"
+      translation="[0,0]"/>
+    <Label
+      id="label"
+      color="0xFFFFFF"
+      height="80"
+      width="450"
+      horizAlign="center"
+      vertAlign="center"
+      translation="[0,6]">
+      <Font
+        id="labelFont"
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="33" />
+    </Label>
+  </children>
+</component>

@@ -59,6 +59,10 @@
         id="LinearGradient2"
         uri="pkg:/images/vertGradientEPG.png"
         gradientOpacity="0.0"/>
+      <BackgroundGradientGroup
+        id="LeftGradient"
+        uri="pkg:/images/leftGradient.png"
+        gradientOpacity="0.0"/>
     </Group>
   </children>
 </component>

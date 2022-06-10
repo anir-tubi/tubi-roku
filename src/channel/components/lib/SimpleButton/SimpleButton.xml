@@ -38,8 +38,7 @@
       opacity="1.0"
       height="80"
       horizAlign="center"
-      vertAlign="center"
-      translation="[0,6]">
+      vertAlign="center">
       <Font
         id="labelFont"
         role="font"

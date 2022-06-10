@@ -46,7 +46,6 @@ Function execInitializeUserData()
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
 
-  m.top.firstVisit = Auth.getfirstVisit()
   m.top.authInfo = authInfo  ' set last so that it can be used as a trigger
 End Function
 

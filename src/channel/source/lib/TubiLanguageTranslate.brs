@@ -1229,6 +1229,82 @@ Function getTranslation_en_US()
     "screenEmailVerification_use_different_email": {
       "description": "Label of button to allow users to use different email address for sign in",
       "message": "Use Different Email"
+    },
+    "next_button": {
+      "description": "Button text displayed on onBoarding screens to proceed to next screens",
+      "message": "Next"
+    },
+    "skip_button": {
+      "description": "Button text displayed on onBoarding screens to skip the onbarding flow",
+      "message": "Skip"
+    },
+    "getStarted_button": {
+      "description": "Button text displayed on onBoarding screens, takes to landing screen",
+      "message": "Get Started"
+    },
+    "registerOrSignIn_button": {
+      "description": "Button text displayed on onBoarding screens takes to Roku Request for Information modal",
+      "message": "Register or Sign In"
+    },
+    "continueAsGuest_button": {
+      "description": "Button text displayed on onBoarding screens takes to Initial Content Type Selector Screen or Home Screen",
+      "message": "Continue as Guest"
+    },
+    "onBoarding_welcomeScreen_heading": {
+      "description": "Label displayed on onBoarding welcome screen",
+      "message": "Welcome to unlimited movies,\nTV shows and Live TV"
+    },
+    "onBoarding_welcomeScreen_description": {
+      "description": "Description displayed on onBoarding welcome screen",
+      "message": "For all your Entertainment, News, and Sports needs.\nAlways free. No subscription. 100% legal."
+    },
+    "onBoarding_freeForeverScreen_heading": {
+      "description": "Label displayed on onBoarding Free Forever screen",
+      "message": "FREE Forever with Fewer\nAds than Cable"
+    },
+    "onBoarding_freeForeverScreen_description": {
+      "description": "Description displayed on onBoarding Free Forever screen",
+      "message": "3x more content and 3x less ads. None of the costs. $0/month.\nNo paywalls, no bundles."
+    },
+    "onBoarding_availableDeviceScreen_heading": {
+      "description": "Label displayed on onBoarding Available Device screen",
+      "message": "Available on all\nyour devices"
+    },
+    "onBoarding_availableDeviceScreen_description": {
+      "description": "Description displayed on onBoarding Available Device screen",
+      "message": "Watch on your phone, television, tablet\nor computer."
+    },
+    "onBoarding_landingScreen_heading": {
+      "description": "Label displayed on onBoarding Landing screen",
+      "message": "Tubi is better when\nyou sign up"
+    },
+    "onBoarding_landingScreen_description": {
+      "description": "Description displayed on onBoarding Landing screen",
+      "message": "No credit card required • Free Forever"
+    },
+    "onBoarding_landingScreen_addListLabel": {
+      "description": "Label displayed on onBoarding Landing screen informing add to your list",
+      "message": "Add to Your List"
+    },
+    "onBoarding_landingScreen_addListBody": {
+      "description": "Body displayed on onBoarding Landing screen informing save now and watch later",
+      "message": "Save Now, Watch Later"
+    },
+    "onBoarding_landingScreen_saveProgressLabel": {
+      "description": "Label displayed on onBoarding Landing screen informing save your progress",
+      "message": "Save Your Progress"
+    },
+    "onBoarding_landingScreen_saveProgressBody": {
+      "description": "Body displayed on onBoarding Landing screen informing pickup where you left off",
+      "message": "Pickup where you left off"
+    },
+    "onBoarding_landingScreen_madeForYouLabel": {
+      "description": "Label displayed on onBoarding Landing screen informing made for you",
+      "message": "Made For You"
+    },
+    "onBoarding_landingScreen_madeForYouBody": {
+      "description": "Body displayed on onBoarding Landing screen informing better recommendations",
+      "message": "Unlock better recommendations"
     }
   }
 End Function
@@ -2343,6 +2419,82 @@ Function getTranslation_es_MX()
     "screenEmailVerification_use_different_email": {
       "description": "Label of button to allow users to use different email address for sign in",
       "message": "Usar un correo electrónico diferente"
+    },
+    "next_button": {
+      "description": "Button text displayed on onBoarding screens to proceed to next screens",
+      "message": "Siguiente"
+    },
+    "skip_button": {
+      "description": "Button text displayed on onBoarding screens to skip the onbarding flow",
+      "message": "Saltar"
+    },
+    "getStarted_button": {
+      "description": "Button text displayed on onBoarding screens, takes to landing screen",
+      "message": "Comenzar"
+    },
+    "registerOrSignIn_button": {
+      "description": "Button text displayed on onBoarding screens takes to Roku Request for Information modal",
+      "message": "Regístrate o Iniciar Sesión"
+    },
+    "continueAsGuest_button": {
+      "description": "Button text displayed on onBoarding screens takes to Initial Content Type Selector Screen or Home Screen",
+      "message": "Continuar como invitado"
+    },
+    "onBoarding_welcomeScreen_heading": {
+      "description": "Label displayed on onBoarding welcome screen",
+      "message": "Bienvenido a películas ilimitadas,\nSeries y TV en Vivo"
+    },
+    "onBoarding_welcomeScreen_description": {
+      "description": "Description displayed on onBoarding welcome screen",
+      "message": "Para todas tus necesidades de entretenimiento, Noticias y Deportes.\nSiempre gratis. Sin suscripción. 100% legal."
+    },
+    "onBoarding_freeForeverScreen_heading": {
+      "description": "Label displayed on onBoarding Free Forever screen",
+      "message": "Gratis Siempre con Menos\nAnuncios que el Cable"
+    },
+    "onBoarding_freeForeverScreen_description": {
+      "description": "Description displayed on onBoarding Free Forever screen",
+      "message": "3 veces más contenido y 3 veces menos anuncios. Sin costos. $0/mes.\nSin muros de pago, sin paquetes."
+    },
+    "onBoarding_availableDeviceScreen_heading": {
+      "description": "Label displayed on onBoarding Available Device screen",
+      "message": "Disponible en todos\ntus dispositivos"
+    },
+    "onBoarding_availableDeviceScreen_description": {
+      "description": "Description displayed on onBoarding Available Device screen",
+      "message": "Ver en tu teléfono, televisión, tableta\no computadora."
+    },
+    "onBoarding_landingScreen_heading": {
+      "description": "Label displayed on onBoarding Landing screen",
+      "message": "Tubi es mejor cuando\nte inscribes"
+    },
+    "onBoarding_landingScreen_description": {
+      "description": "Description displayed on onBoarding Landing screen",
+      "message": "No se requiere tarjeta de crédito * Gratis siempre"
+    },
+    "onBoarding_landingScreen_addListLabel": {
+      "description": "Label displayed on onBoarding Landing screen informing add to your list",
+      "message": "Agregar a Mi Lista"
+    },
+    "onBoarding_landingScreen_addListBody": {
+      "description": "Body displayed on onBoarding Landing screen informing save now and watch later",
+      "message": "Guardar Ahora, Ver Más Tarde"
+    },
+    "onBoarding_landingScreen_saveProgressLabel": {
+      "description": "Label displayed on onBoarding Landing screen informing save your progress",
+      "message": "Guarda tu progreso"
+    },
+    "onBoarding_landingScreen_saveProgressBody": {
+      "description": "Body displayed on onBoarding Landing screen informing pickup where you left off",
+      "message": "Continúa donde dejaste de ver"
+    },
+    "onBoarding_landingScreen_madeForYouLabel": {
+      "description": "Label displayed on onBoarding Landing screen informing made for you",
+      "message": "Hecho para ti"
+    },
+    "onBoarding_landingScreen_madeForYouBody": {
+      "description": "Body displayed on onBoarding Landing screen informing better recommendations",
+      "message": "Desbloquea mejores recomendaciones"
     }
   }
 End Function

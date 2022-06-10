@@ -53,8 +53,13 @@ Function TubiExperiments(constants) as Object
         roku_register_signup_to_save_v3: {"enabled": false}
       }
 
+      roku_regist_enhanced_onboarding: {
+        roku_enhanced_onboarding_v1: {"enabled": false}
+      }
+
       roku_update_icons: {
         roku_update_icons_v1: {"enabled": false}
+
       }
     }
 

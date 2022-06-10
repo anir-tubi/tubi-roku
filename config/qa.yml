@@ -16,6 +16,10 @@ settings:
   #Also controls instant resume timeout for signed out users
   coppaHasAgeDuration: 60
 
+  # enabling showOnBoardingAlways will show OnBoarding Screen every time the app is launched as non-production mode for guest users.
+  # This field is added for testing purpose
+  showOnBoardingAlways: false
+
   # email/password values will be used to automatically sign a user in when "sign in" is selected
   email: ""
   password: ""

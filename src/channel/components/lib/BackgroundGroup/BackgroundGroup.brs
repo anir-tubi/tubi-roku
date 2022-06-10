@@ -29,6 +29,7 @@ Function init()
   m.topRightGradient = m.top.findNode("TopRightGradient")
   m.linearGradient1 = m.top.findNode("LinearGradient1")
   m.linearGradient2 = m.top.findNode("LinearGradient2")
+  m.leftGradient = m.top.findNode("LeftGradient")
 
   m.leftBottomGradient = m.top.findNode("LeftBottomGradient")
   m.leftBottomGradient.uriList = ["pkg:/images/leftGradient.png", "pkg:/images/bottomGradient.png"]
@@ -151,6 +152,7 @@ Function completePosterAnimations()
     m.topRightGradient
     m.fullScreenGradient
     m.leftBottomGradient
+    m.leftGradient
   ]
 
   for each poster in posterGroups
@@ -187,6 +189,19 @@ Function setPosterValues(posterUri)
       m.oldPoster.loadDisplayMode = "scaleToZoom"
     end if
   else if m.aCurrentBackgroundInfo.type = m.constants.ui.backgroundTypes.marketingScreen
+    m.oldPoster.width = 1920
+    m.oldPoster.height = 1080
+    m.oldPoster.posterTranslation = [0,0]
+    if m.constants.deviceInfo.limitedUi = true
+      m.oldPoster.loadWidth = "640"
+      m.oldPoster.loadHeight = "360"
+      m.oldPoster.loadDisplayMode = "scaleToZoom"
+    else if m.constants.deviceInfo.lowVram = true
+      m.oldPoster.loadWidth = "1280"
+      m.oldPoster.loadHeight = "720"
+      m.oldPoster.loadDisplayMode = "scaleToZoom"
+    end if
+  else if m.aCurrentBackgroundInfo.type = m.constants.ui.backgroundTypes.rightScreen
     m.oldPoster.width = 1920
     m.oldPoster.height = 1080
     m.oldPoster.posterTranslation = [0,0]
@@ -296,16 +311,19 @@ Function transitionGradients()
       m.linearGradient1.gradientOpacity = 0.0
       m.linearGradient2.gradientOpacity = 0.0
       m.topRightGradient.gradientOpacity = 0.0
+      m.leftGradient.gradientOpacity = 0.0
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen
       m.fullScreenGradient.gradientOpacity = 1.0
       m.leftBottomGradient.gradientOpacity = 0.0
       m.linearGradient1.gradientOpacity = 0.0
       m.linearGradient2.gradientOpacity = 0.0
       m.topRightGradient.gradientOpacity = 0.0
+      m.leftGradient.gradientOpacity = 0.0
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.topRight
       m.linearGradient1.gradientOpacity = 0.0
       m.linearGradient2.gradientOpacity = 0.0
       m.fullScreenGradient.gradientOpacity = 0.0
+      m.leftGradient.gradientOpacity = 0.0
       if m.top.kidsMode = true
         m.leftBottomGradient.gradientOpacity = 0.0
         m.topRightGradient.gradientOpacity = 1.0
@@ -313,17 +331,25 @@ Function transitionGradients()
         m.topRightGradient.gradientOpacity = 0.0
         m.leftBottomGradient.gradientOpacity = 1.0
       end if
+    else if m.newBackgroundType = m.constants.ui.backgroundTypes.rightScreen
+      m.linearGradient1.gradientOpacity = 0.0
+      m.linearGradient2.gradientOpacity = 0.0
+      m.fullScreenGradient.gradientOpacity = 0.0
+      m.topRightGradient.gradientOpacity = 0.0
+      m.leftGradient.gradientOpacity = 1.0
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.linear
       'This comment will remind us to remove this section when we graduate EPG when we search for experiment name :roku_linear_epg->roku_linear_epg_v5
       m.fullScreenGradient.gradientOpacity = 0.0
       m.leftBottomGradient.gradientOpacity = 0.0
       m.topRightGradient.gradientOpacity = 0.0
+      m.leftGradient.gradientOpacity = 0.0
       m.linearGradient1.gradientOpacity = 1.0
       m.linearGradient2.gradientOpacity = 1.0
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.epg
       m.fullScreenGradient.gradientOpacity = 0.0
       m.leftBottomGradient.gradientOpacity = 0.0
       m.topRightGradient.gradientOpacity = 0.0
+      m.leftGradient.gradientOpacity = 0.0
       m.linearGradient1.uri = "pkg:/images/horizGradientEPG.png"
       m.linearGradient2.uri = "pkg:/images/vertGradientEPG.png"
       if m.top.kidsMode = true
@@ -344,6 +370,7 @@ Function transitionGradients()
     m.linearGradient2.fadeOutControl = "stop"
     m.leftBottomGradient.fadeOutControl = "stop"
     m.topRightGradient.fadeOutControl = "stop"
+    m.leftGradient.fadeOutControl = "stop"
     if m.newPoster.uri = m.blurredDefaultBackground_current
       if m.fullScreenGradient.gradientOpacity > 0.0
         m.fullScreenGradient.fadeOutControl = "start"
@@ -364,6 +391,10 @@ Function transitionGradients()
       if m.topRightGradient.gradientOpacity > 0.0
         m.topRightGradient.fadeOutControl = "start"
         m.topRightGradient.lastAnimationName = "GradientFadeOut"
+      end if
+      if m.leftGradient.gradientOpacity > 0.0
+        m.leftGradient.fadeOutControl = "start"
+        m.leftGradient.lastAnimationName = "GradientFadeOut"
       end if
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.fullScreen
       if m.fullScreenGradient.gradientOpacity < 1.0
@@ -386,6 +417,10 @@ Function transitionGradients()
         m.topRightGradient.fadeOutControl = "start"
         m.topRightGradient.lastAnimationName = "GradientFadeOut"
       end if
+      if m.leftGradient.gradientOpacity > 0.0
+        m.leftGradient.fadeOutControl = "start"
+        m.leftGradient.lastAnimationName = "GradientFadeOut"
+      end if
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.marketingScreen
       if m.leftBottomGradient.gradientOpacity > 0.0
         m.leftBottomGradient.fadeOutControl = "start"
@@ -406,6 +441,10 @@ Function transitionGradients()
       if m.topRightGradient.gradientOpacity > 0.0
         m.topRightGradient.fadeOutControl = "start"
         m.topRightGradient.lastAnimationName = "GradientFadeOut"
+      end if
+      if m.leftGradient.gradientOpacity > 0.0
+        m.leftGradient.fadeOutControl = "start"
+        m.leftGradient.lastAnimationName = "GradientFadeOut"
       end if
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.topRight
       'don't fade in the topRightGradient due to 2 reasons
@@ -430,6 +469,28 @@ Function transitionGradients()
       if m.linearGradient2.gradientOpacity > 0.0
         m.linearGradient2.fadeOutControl = "start"
         m.linearGradient2.lastAnimationName = "GradientFadeOut"
+      end if
+      if m.leftGradient.gradientOpacity > 0.0
+        m.leftGradient.fadeOutControl = "start"
+        m.leftGradient.lastAnimationName = "GradientFadeOut"
+      end if
+    else if m.newBackgroundType = m.constants.ui.backgroundTypes.rightScreen
+      m.leftGradient.gradientOpacity = 1.0
+      if m.fullScreenGradient.gradientOpacity > 0.0
+        m.fullScreenGradient.fadeOutControl = "start"
+        m.fullScreenGradient.lastAnimationName = "GradientFadeOut"
+      end if
+      if m.linearGradient1.gradientOpacity > 0.0
+        m.linearGradient1.fadeOutControl = "start"
+        m.linearGradient1.lastAnimationName = "GradientFadeOut"
+      end if
+      if m.linearGradient2.gradientOpacity > 0.0
+        m.linearGradient2.fadeOutControl = "start"
+        m.linearGradient2.lastAnimationName = "GradientFadeOut"
+      end if
+      if m.topRightGradient.gradientOpacity > 0.0
+        m.topRightGradient.fadeOutControl = "start"
+        m.topRightGradient.lastAnimationName = "GradientFadeOut"
       end if
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.linear
       'This comment will remind us to remove this section when we graduate EPG when we search for experiment name :roku_linear_epg->roku_linear_epg_v5
@@ -457,6 +518,10 @@ Function transitionGradients()
         m.topRightGradient.fadeOutControl = "start"
         m.topRightGradient.lastAnimationName = "GradientFadeOut"
       end if
+      if m.leftGradient.gradientOpacity > 0.0
+        m.leftGradient.fadeOutControl = "start"
+        m.leftGradient.lastAnimationName = "GradientFadeOut"
+      end if
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.epg
       'don't fade in the linearGradient due to 2 reasons
       '1) if the old background poster was the default background, there is no gradient, so fading in the
@@ -486,6 +551,10 @@ Function transitionGradients()
       if m.topRightGradient.gradientOpacity > 0.0
         m.topRightGradient.fadeOutControl = "start"
         m.topRightGradient.lastAnimationName = "GradientFadeOut"
+      end if
+      if m.leftGradient.gradientOpacity > 0.0
+        m.leftGradient.fadeOutControl = "start"
+        m.leftGradient.lastAnimationName = "GradientFadeOut"
       end if
     end if
   end if
@@ -563,6 +632,9 @@ Function startTransitionIn()
     m.newPoster.fullScreenTransitionInControl = "start"
     m.newPoster.lastAnimationName = "FullScreenTransitionIn"
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.marketingScreen
+    m.newPoster.fullScreenTransitionInControl = "start"
+    m.newPoster.lastAnimationName = "FullScreenTransitionIn"
+  else if m.newBackgroundType = m.constants.ui.backgroundTypes.rightScreen
     m.newPoster.fullScreenTransitionInControl = "start"
     m.newPoster.lastAnimationName = "FullScreenTransitionIn"
   end if
