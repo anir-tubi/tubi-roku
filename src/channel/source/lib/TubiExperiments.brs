@@ -40,6 +40,10 @@ Function TubiExperiments(constants) as Object
         roku_icts_skip_new_v1: {"enabled": false, "initially_focus_skip": false, "live_tv_first": false, "show_me_everything": false}
       }
 
+      roku_in_pod_stitching: {
+        roku_in_pod_stitching_v1: {"enabled": false}
+      }
+
       '//When enabled = true, the "roku_icts_content_modes_v1" experiment should have a boolean field labeled "show_background_images" and a boolean field labeled "live_tv_first"
       '//   if enabled=true and show_background_images=true and live_tv_first=false, then we will show background images and a-list will be first
       '//     roku_icts_content_modes_v1: {"enabled": true, "show_background_images": true, "live_tv_first": false}

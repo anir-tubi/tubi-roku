@@ -5,6 +5,9 @@ Function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
   'set the preferences for the Roku Advertising Framework so we never use their ad server if our server returns no ads
   'set to 0 retries - 1 max request, even if there are no ads returned from our server
   roAdFramework.setAdPrefs(false, 1)
+  if m.enableInPodStitching = true then
+    roAdFramework.enableInPodStitching(true)
+  end if
 
   'turn on Nielsen DAR API for the Roku Advertising Framework
   'this is mutually exclusive with Roku's own Global Audience Measurement API,
@@ -541,7 +544,22 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       else
         endPosition = invalid
         if eventType = "Complete"
+          ' When enableInPodStitching(true) is set the final ad event does not include duration or ad in ctx. We can pull these from the last position update for now until Roku fixes RAF to correctly return this. This was last tested in RAF version 3.0026. We can retest in the future once the next version comes out
+          if ctx.duration = invalid OR ctx.ad = invalid then
+            replacementCtx = m._lastContextWithValidDurationAndAdInfo
+            m.delete("_lastContextWithValidDurationAndAdInfo")
+            ' Do some basic verification to make sure this is for the same ad and pod
+            if ctx.adServer = replacementCtx.adServer AND ctx.adCount = replacementCtx.adCount AND ctx.adIndex = replacementCtx.adIndex then
+              ctx = replacementCtx
+            end if
+          end if
           endPosition = ctx.duration
+          ' Send exposure after first ad finishes in a multi ad break
+          ' NOTE the complete event for the first ad actually has adIndex as 2 #roku :|
+          if isFunction(getExperimentResource) AND ctx.adCount > 1 AND ctx.adIndex = 2 then 'bs:disable-line LINT1001
+            'bs:disable-next-line 1001 LINT1001
+            getExperimentResource("roku_in_pod_stitching", "roku_in_pod_stitching_v1", true)
+          end if
         else if eventType = "Close"
           endPosition = m.adPlaybackPos
         end if
@@ -573,9 +591,15 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       m.isInteracting = true
     end if
   else
-    ' eventType is invalid when an event fires signaling that one second of ad playback has ocurred
-    if ctx.time <> invalid
-      m.adPlaybackPos = ctx.time
+    if ctx <> invalid then
+      ' eventType is invalid when an event fires signaling that one second of ad playback has ocurred
+      if ctx.time <> invalid then
+        m.adPlaybackPos = ctx.time
+      end if
+
+      if ctx.duration <> invalid AND ctx.ad <> invalid then
+        m._lastContextWithValidDurationAndAdInfo = ctx
+      end if
     end if
   end if
 
