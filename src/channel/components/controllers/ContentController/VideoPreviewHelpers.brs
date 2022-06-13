@@ -50,6 +50,22 @@ Function stopVideoPreview(node=invalid)
 End Function
 
 
+' stopVideoPreviewIfPlaying stops the video preview only if videopreview is playing or buffering.
+' @node : roSGNode, a VideoPreviewPlayer node
+Function stopVideoPreviewIfPlaying(node = invalid)
+  tubiLog("VideoPreviewHelpers.stopVideoPreviewIfPlaying")
+  if node = invalid
+    node = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
+  end if
+
+  if node <> invalid and node.subType() = "VideoPreviewPlayer" and (node.state = "buffering" or node.state = "playing" ) 'this means video preview not stopped/finished for previous content, so we need to stop it
+    node.control = "stop"
+    node.visible = false
+  end if
+
+End Function
+
+
 Function onPauseVideoPreview()
   tubiLog("VideoPreviewHelpers.onPauseVideoPreview")
   pauseVideoPreview()

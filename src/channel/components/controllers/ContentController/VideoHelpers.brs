@@ -76,6 +76,8 @@ Function setupVideoPlayer(content, playbackSource = "unknown", position = 0)
     setInScreenCache(videoPlayer)
   end if
 
+  stopVideoPreviewIfPlaying() 'stop videopreview just in case it is playing
+
   ' m.upNextRequest can be checked to determine if a request to fetch up next / autoplay content has
   ' already been made for the currently playing content. This is important in the case where a user
   ' might select the go to next button while the request is in flight from the player reaching the
