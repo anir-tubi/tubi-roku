@@ -181,7 +181,7 @@
 
       <CommunicatingMarkupGrid
         id="buttonList"
-        itemSize="[450,93]"
+        itemSize="[450,96]"
         itemComponentName="ButtonWithBackground"
         itemSpacing="[0,9]"
         numRows="3"
