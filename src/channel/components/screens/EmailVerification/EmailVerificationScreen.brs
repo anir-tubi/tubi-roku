@@ -16,6 +16,9 @@ Function init()
   m.verificationHintText = m.top.findNode("verificationHintText")
   m.resendVerificationLinkButton = m.top.findNode("resendVerificationLinkButton")
   m.useDifferentEmailButton = m.top.findNode("useDifferentEmailButton")
+  'setting the alignement of the item in the list to make the text center when no iconUrl and badge text.
+  m.resendVerificationLinkButton.align = "center"
+  m.useDifferentEmailButton.align = "center"
 
   m.EmailVerificationMenu.observeField("itemSelected", "onEmailVerificationMenuItemSelected")
   m.top.observeField("focusedChild", "onScreenFocusChange")

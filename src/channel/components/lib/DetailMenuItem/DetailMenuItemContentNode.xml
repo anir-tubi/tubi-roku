@@ -2,7 +2,11 @@
 <!-- Extend the ContentNode so we can add some custom fields -->
 <component name = "DetailMenuItemContentNode" extends="ContentNode">
   <interface>
+    <!-- INPUTS -->
     <field id="iconUrl" type="string" value=""/>
     <field id="badgeText" type="string" value=""/>
+
+    <!-- alignment of the item in the list. Accepted values are left and center -->
+    <field id="align" type="string" value="left" />
   </interface>
 </component>

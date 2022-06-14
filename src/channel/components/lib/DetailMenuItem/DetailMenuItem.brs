@@ -65,6 +65,13 @@ Function onItemContentChange()
       m.badgeLabel.visible = false
     end if
   end if
+  
+  'Adjusting the DetailsMenuText text to center when there is no icoUrl and badge label text.
+  if m.top.itemContent.align = "center"
+    xTranslation = (m.top.width - m.top.calculatedTextWidth) / 2
+    m.DetailsMenuText.translation = [xTranslation, 0]
+  end if
+
 End Function
 
 Function showProgressBar(percentage As Double)
