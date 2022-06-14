@@ -52,3 +52,17 @@ Function onButtonSelected()
     m.top.getStartedButtonPressed = true
   end if
 End Function
+
+
+Function onKeyEvent(key, press) as boolean
+  if press
+    if key = "back"
+     if m.top.id = m.constants.ui.screenIds.welcomeScreen
+       m.top.backKeyPressed = true
+       return true
+     end if
+    end if
+  end if
+
+  return false
+End Function

@@ -30,6 +30,9 @@
       <!-- Set to true if the user presses Get Started button and corresponding callback gets invoked -->
       <field id="getStartedButtonPressed" type="boolean" value="false" alwaysNotify="true"/>
 
+      <!-- Set to true if the user presses back key from remote and corresponding callback gets invoked -->
+      <field id="backKeyPressed" type="boolean" value="false" alwaysNotify="true"/>
+
   </interface>
 
   <children>
@@ -75,17 +78,17 @@
           uri="pkg:/fonts/Vaud-Medium.ttf"
           size="27" />
       </Label>
-
-      <CommunicatingMarkupGrid
-        id="buttonList"
-        itemSize="[450,93]"
-        itemComponentName="ButtonWithBackground"
-        itemSpacing="[0,9]"
-        numRows="3"
-        numColumns="1"
-        vertFocusAnimationStyle="floatingFocus"/>
-
     </LayoutGroup>
+
+    <CommunicatingMarkupGrid
+      id="buttonList"
+      itemSize="[450,93]"
+      itemComponentName="ButtonWithBackground"
+      itemSpacing="[0,9]"
+      numRows="3"
+      numColumns="1"
+      vertFocusAnimationStyle="floatingFocus"
+      translation="[126,750]"/>
 
   </children>
 </component>

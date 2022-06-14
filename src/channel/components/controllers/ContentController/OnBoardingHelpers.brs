@@ -20,6 +20,7 @@ Function showOnBoardingWelcomeScreen()
   }
   welcomeScreen.observeFieldScoped("nextButtonPressed", "onWelcomeScreenNextButtonPressed")
   welcomeScreen.observeFieldScoped("skipButtonPressed", "onWelcomeScreenSkipButtonPressed")
+  welcomeScreen.observeFieldScoped("backKeyPressed", "onWelcomeScreenBackKeyPressed")
   pushScreen(welcomeScreen, true, true)
 
 End Function
@@ -32,6 +33,12 @@ End Function
 
 Function onWelcomeScreenSkipButtonPressed()
   showOnBoardingLandingScreen()
+End Function
+
+
+Function onWelcomeScreenBackKeyPressed(msg)
+  screen = msg.getRoSGNode()
+  displayExitModal(screen.trackingPageInfo)
 End Function
 
 
