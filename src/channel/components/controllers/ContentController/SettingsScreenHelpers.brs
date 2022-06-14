@@ -124,17 +124,6 @@ Function onSignOutModalSelected()
 End Function
 
 
-'//When exiting the ConfirmPasswordScreen, make sure some event handlers are no longer listened to
-Function onConfirmPasswordScreenVisible(msg)
-  tubiLog("SettingsScreenHelper.onConfirmPasswordScreenVisible")
-  confirmPasswordScreen = msg.getRoSGNode()
-  '//if we don't stop listening to this "result" field, then it may cause an error window to appear if/when
-  '//   the request returns a negative response.
-  if confirmPasswordScreen <> invalid and confirmPasswordScreen.visible = false and m.parentalSettingUpdateTask <> invalid
-    m.parentalSettingUpdateTask.unobserveField("result")
-  end if
-End Function
-
 'this function will handle things when user selects a autoplayvideoPreview choice
 Function onAutoPreviewSettingSelected()
   tubiLog("SettingsScreenHelpers.onAutoPreviewSettingSelected")
@@ -272,25 +261,35 @@ End Function
 
 Function onPasswordConfirm(msg = invalid)
   tubiLog("SettingsScreenHelper.onPasswordConfirm")
+  authInfo = getFieldFromGlobal("authInfo")
+  sPassword = ""
   if msg <> invalid
     confirmPasswordScreen = msg.getRoSGNode()
     sPassword = confirmPasswordScreen.passwordText
-    confirmPasswordScreen.addFields({task: m.parentalSettingUpdateTask})
     confirmPasswordScreen.isLoading = true
   else
     '//if not coming from the password screen, then coming from a saved password within the last few minutes
-    authInfo = getFieldFromGlobal("authInfo")
     sPassword = authInfo.passwordText
     if authInfo.secondsOfSavedPassword = invalid or authInfo.secondsOfSavedPassword <= 0
       setAuthInfoValue("secondsOfSavedPassword", getNowSeconds())
     end if
   end if
-  m.parentalSettingUpdateTask = CreateObject("roSGNode", "AuthTask")
-  m.parentalSettingUpdateTask.functionName = "updateParentalSetting"
-  m.parentalSettingUpdateTask.password = sPassword
-  m.parentalSettingUpdateTask.parentalSetting = m.settingsScreen.parentalSettingSelected
-  m.parentalSettingUpdateTask.observeField("result", "onParentalSettingComplete")
-  m.parentalSettingUpdateTask.control = "RUN"
+
+  if isLoggedInUser(authInfo)
+    parentalRatingReq = m.userDeviceApi.updateParentalRatingReqInfo(m.settingsScreen.parentalSettingSelected, sPassword)
+
+    m.makeRequest({
+      url: parentalRatingReq.url
+      requestType: m.constants.reqNames.updateParentalRating
+      options: parentalRatingReq.options
+      successCallback: updateParentalSettingsSuccessResponse
+      errorCallback: updateParentalSettingsErrorResponse
+      responseType: "assocarray"
+      password: sPassword
+    })
+  end if
+
+
 End Function
 
 
@@ -330,20 +329,19 @@ Function refreshScreenAfterParentalChanges()
 End Function
 
 
-Function onParentalSettingComplete(msg)
-  tubiLog("SettingsScreenHelper.onParentalSettingComplete")
-  result = msg.GetData()
+Function updateParentalSettingsSuccessResponse(response)
+  tubiLog("SettingsScreenHelper.updateParentalSettingsSuccessResponse")
   m.confirmPasswordScreen.isLoading = false
 
   authInfo = getFieldFromGlobal("authInfo")
 
-  if result <> invalid
+  if response <> invalid
     setAuthInfoValue("parentalrating", m.settingsScreen.parentalSettingSelected)
     if isConfirmPasswordScreen() = true
       '//If ConfirmPasswordScreen visible, then pop the Screen and save the password
       popScreen(true, true) ' remove the ConfirmPasswordScreen
 
-      setAuthInfoValue("passwordText", m.parentalSettingUpdateTask.password)
+      setAuthInfoValue("passwordText", response.requestInput.password)
       setAuthInfoValue("secondsOfSavedPassword", getNowSeconds())
     else
       '//Update menu so it appears updated. This is only needed if the password has been saved locally and was not entered immediately from the password screeen
@@ -404,32 +402,38 @@ Function onParentalSettingComplete(msg)
     title = getTranslation("screenSettings_error_parentalChanges")
     message = getTranslation(sMessageID)
     showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
-  else
-    if isConfirmPasswordScreen() = true
-      setAuthInfoValue("secondsOfSavedPassword", 0)
+  end if
+End Function
 
-      pageInfo = m.settingsScreen.trackingPageInfo
-      dialogEvent = {
-        type: "dialog"
-        values: {
-          dialog_type: "SIGNIN_REQUIRED"
-          pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-          dialog_action: "SHOW"
-          dialog_sub_type: "parental-controls-failure"
-        }
+
+Function updateParentalSettingsErrorResponse(_error)
+  tubiLog("SettingsScreenHelper.updateParentalSettingsErrorResponse")
+  authInfo = getFieldFromGlobal("authInfo")
+
+  if isConfirmPasswordScreen() = true
+    setAuthInfoValue("secondsOfSavedPassword", 0)
+
+    pageInfo = m.settingsScreen.trackingPageInfo
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "SIGNIN_REQUIRED"
+        pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+        dialog_action: "SHOW"
+        dialog_sub_type: "parental-controls-failure"
       }
+    }
 
-      title = getTranslation("screenSettings_error_parentalFailedChange_title")
-      message = getTranslation("screenSettings_error_parentalFailedChange_description")
-      buttons = [getTranslation("dialog_button_ok")]
+    title = getTranslation("screenSettings_error_parentalFailedChange_title")
+    message = getTranslation("screenSettings_error_parentalFailedChange_description")
+    buttons = [getTranslation("dialog_button_ok")]
 
-      showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask)
-    else if authInfo <> invalid and authInfo.secondsOfSavedPassword <> invalid and authInfo.secondsOfSavedPassword > 0
-      '//if not showing ConfirmPasswordScreen and showing parentalControls panel AND this came from a saved password,
-      '//   then display the ConfirmPasswordScreen instead of error message
-      setAuthInfoValue("secondsOfSavedPassword", 0)
-      onParentalSettingSelected()
-    end if
+    showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask)
+  else if authInfo <> invalid and authInfo.secondsOfSavedPassword <> invalid and authInfo.secondsOfSavedPassword > 0
+    '//if not showing ConfirmPasswordScreen and showing parentalControls panel AND this came from a saved password,
+    '//   then display the ConfirmPasswordScreen instead of error message
+    setAuthInfoValue("secondsOfSavedPassword", 0)
+    onParentalSettingSelected()
   end if
 End Function
 
@@ -472,7 +476,6 @@ Function showConfirmPasswordScreen()
   m.confirmPasswordScreen.setUp = getTranslation("screenSettings_parentalPassword_setup_new_password") + ","
   m.confirmPasswordScreen.visit = getTranslation("screenSettings_parentalPassword_visit_link")
   m.confirmPasswordScreen.isLoading = false
-  m.confirmPasswordScreen.observeField("visible", "onConfirmPasswordScreenVisible")
   m.confirmPasswordScreen.observeField("submitSelected", "onPasswordConfirm")
   m.confirmPasswordScreen.observeField("backPressed", "onSettingsBackPressed")
   m.confirmPasswordScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")

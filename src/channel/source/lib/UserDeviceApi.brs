@@ -15,6 +15,7 @@ Function UserDeviceApi(constants, apiUtils)
     patchAutoplayPreviewSettingInfo: userDeviceApi_patchAutoplayPreviewSettingInfo
     magicLink: userDeviceApi_magicLink
     queryStatusOfMagicLink: userDeviceApi_queryStatusOfMagicLink
+    updateParentalRatingReqInfo: userDeviceApi_updateParentalRatingReqInfo
   }
 
   userDeviceApi = {}
@@ -188,4 +189,25 @@ Function userDeviceApi_patchAutoplayPreviewSettingInfo(choice)
     options: options
   }
 
+End Function
+
+'@parentalRating: integer, selected parentalRating from the settings screen
+'password: string, user entered password
+Function userDeviceApi_updateParentalRatingReqInfo(parentalRating, password)
+
+  url = m.constants.urls.account.parentalRating
+  options = {}
+  headers = m.getCommonOptions().headers
+  body = {
+    parental_rating: parentalRating,
+    password: password
+  }
+  options["method"] = m.constants.reqTypes.put
+  options["body"] = FormatJson(body)
+  options["headers"] = headers
+
+  return {
+    url: url
+    options: options
+  }
 End Function

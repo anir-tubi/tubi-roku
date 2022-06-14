@@ -237,6 +237,7 @@ Function getConstants()
     constants.reqNames.generic = "generic"
     constants.reqNames.magicLink = "magicLink"
     constants.reqNames.queryStatusOfMagicLink = "queryStatusOfMagicLink"
+    constants.reqNames.updateParentalRating = "updateParentalRating"
 
     ' a list of reqnames that the general task should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
@@ -260,6 +261,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postUserHistory] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.signup] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.signIn] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.updateParentalRating] = true
 
   constants.anonymous = {}
     constants.anonymous.algorithm = "TUBI-HMAC-SHA256"

@@ -21,7 +21,6 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
     handleInitialHistory: tubiBookmarks_handleInitialHistory
     getUserInfoReq: tubiBookmarks_getUserInfoReq
     handleUserInfo: tubiBookmarks_handleUserInfo
-    updateParentalRatingReq: tubiBookmarks_updateParentalRatingReq
 
     'private methods
     createBookmarksRequest: tubiBookmarks_createBookmarksRequest_
@@ -499,28 +498,6 @@ Function tubiBookmarks_handleUserInfo(userInfo)
 
   end if
   return result
-End Function
-
-
-Function tubiBookmarks_updateParentalRatingReq(newRating, password)
-  authInfo = m.auth.getAuthInfo()
-  if m.isLoggedInUser(authInfo) = false
-    return invalid
-  end if
-
-  url = m.constants.urls.account.parentalRating
-  body = {
-    parental_rating: newRating
-    password: password
-  }
-  options = {
-    method: m.constants.reqTypes.put
-    params: {
-      platform: m.constants.platform
-    }
-    body: FormatJson(body)
-  }
-  return m.auth.createAuthRequest(url, "updateParentalRating", options)
 End Function
 
 

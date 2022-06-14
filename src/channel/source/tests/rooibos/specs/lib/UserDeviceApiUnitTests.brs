@@ -315,3 +315,27 @@ Function userDeviceApi_queryStatusOfMagicLink_test()
   m.assertNotInvalid(params.platform)
   m.assertEqual(params.platform, m.platform)
 End Function
+
+
+'@Test updateParentalRatingReqInfo unit tests
+Function userDeviceApi_updateParentalRatingReqInfo_test()
+  parentalRating = 3
+  userEnteredPassword = "password@tubi"
+  parentalRatingReq = m.userDeviceApi.updateParentalRatingReqInfo(parentalRating, userEnteredPassword)
+
+  m.assertNotInvalid(parentalRatingReq)
+
+  m.assertNotInvalid(parentalRatingReq.url)
+  m.assertEqual(parentalRatingReq.url, m.constants.urls.account.parentalRating)
+
+  m.assertNotInvalid(parentalRatingReq.options)
+  m.assertNotInvalid(parentalRatingReq.options.body)
+  body = ParseJson(parentalRatingReq.options.body)
+  m.assertNotInvalid(body.parental_rating)
+  m.assertNotInvalid(body.password)
+  m.assertEqual(body.parental_rating, 3)
+  m.assertEqual(body.password, "password@tubi")
+
+  m.assertNotInvalid(parentalRatingReq.options.headers)
+  m.assertEqual(parentalRatingReq.options.method, "PUT")
+End Function

@@ -66,6 +66,12 @@ Function createParsingCallbacks()
     parseError: parsequeryStatusOfMagicLinkError
   }
 
+  'updateParentalRating 
+  m.requestTypes[m.constants.reqNames.updateParentalRating] = {
+    parseSuccess: parseUpdateParentalRatingSuccess
+    parseError: parseUpdateParentalRatingError
+  }
+
   ' check birthday (check if birthday exists for logged in user)
   m.requestTypes[m.constants.reqNames.checkBirthdayInfo] = {
     parseSuccess: parseAgeVerificationScreenCheckBirthdaySuccess

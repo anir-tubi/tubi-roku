@@ -280,35 +280,6 @@ Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false
 End Function
 
 
-Function updateParentalSetting()
-  tubiLog("AuthTask.updateParentalSetting")
-  constants = m.global.constants
-  Request = TubiRequest(constants.settings)
-  Auth = TubiAuth(constants, Request)
-  NodeHelpers = TubiNodeHelpers()
-  apiUtils = ApiUtils(constants)
-  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers, apiUtils)
-  authInfo = Auth.getAuthInfo()
-
-  'only do the following if the user is logged in
-  updateParentalReq = Bookmarks.updateParentalRatingReq(m.top.parentalSetting, m.top.password)
-
-  if updateParentalReq <> invalid
-    result = updateParentalReq.runSynchronous()
-    if result <> invalid
-      ' Force a refresh since the user token contains the parental control setting
-      m.top.authInfo = Auth.refreshAuthToken(authInfo, 5)
-      m.top.result = updateParentalReq.response
-    else
-      m.top.result = invalid
-    end if
-  else
-    m.top.result = invalid
-  end if
-  tubiLog("EXIT AuthTask.updateParentalSetting")
-End Function
-
-
 Function execGetUserInfo()
   tubiLog("AuthTask.getUserInfo")
   constants = m.global.constants
