@@ -92,7 +92,7 @@ End Function
 Function onVideoStateChange(msg)
   state = msg.GetData()
   if state = "finished"
-    finishPreviewEvent = getFinishPreviewEvent()
+    finishPreviewEvent = getFinishPreviewEvent(true)
     trackEvent(finishPreviewEvent)
     m.top.content = invalid
   else if state = "error"
@@ -202,7 +202,8 @@ Function getPreviewProgressEvent(pageType)
 End Function
 
 
-Function getFinishPreviewEvent()
+'set hasCompleted to true when user watches the entire video preview, otherwise set it to false.
+Function getFinishPreviewEvent(hasCompleted = false)
 
   finishPreviewEvent = {
     type: "finish_preview"
@@ -210,6 +211,7 @@ Function getFinishPreviewEvent()
       video_id: m.Video.content.id.toInt()
       end_position: Int(m.playerPosition * 1000) 'ms
       page_type: m.currentPageType
+      has_completed: hasCompleted
     }
   }
   return finishPreviewEvent
