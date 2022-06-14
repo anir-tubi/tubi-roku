@@ -37,7 +37,7 @@ Function TubiExperiments(constants) as Object
       '//   if enabled=true and initially_focus_skip=false, live_tv_first=true and show_me_everything=false, then live tv will be first and we will focus on it
       '//   if enabled=true and initially_focus_skip=true, live_tv_first=true and show_me_everything=true, then we will focus on the skip button and it will have the show me everything text
       roku_icts_skip_new: {
-        roku_icts_skip_new_v1: {"enabled": false, "initially_focus_skip": false, "live_tv_first": false, "show_me_everything": false}
+        roku_icts_skip_new_v1: {"enabled": true, "initially_focus_skip": true, "live_tv_first": false, "show_me_everything": true}
       }
 
       roku_in_pod_stitching: {
