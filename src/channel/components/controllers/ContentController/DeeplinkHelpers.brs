@@ -382,62 +382,69 @@ End Function
 ' @trackingTask: roSGNode, an instance of the TrackingLoggingTask
 ' @constants: associativeArray, m.constants
 Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, trackingLib, trackingTask, constants)
-  referredAnalyticsEvent = {
-    referred_type: "DEEP_LINK"
-    campaign: deepLinkContent.campaign
-    source: deepLinkContent.source
-    medium: deepLinkContent.medium
-    source_device_id: deepLinkContent.sourceDeviceId
-  }
-
-  if (deepLinkContent.type = m.constants.ui.contentTypes.linear or deepLinkContent.type = m.constants.ui.contentTypes.video or (deepLinkContent.type = "series" and deepLinkContent.deeplinkType = "series")) and deepLinkContent.id <> invalid and deepLinkContent.id <> ""
-    pageInfo = {
-      pageType: "video_player_page"
-      pageValues: {
-        video_id: deepLinkContent.Id.toInt()
-      }
+  if deepLinkContent <> invalid  'if deeplinkContent is invalid then, there is no point in sending refferedanalyticsEvent
+    referredAnalyticsEvent = {
+      referred_type: "DEEP_LINK"
+      campaign: deepLinkContent.campaign
+      source: deepLinkContent.source
+      medium: deepLinkContent.medium
+      source_device_id: deepLinkContent.sourceDeviceId
     }
-  else
-    pageInfo = getDetailScreenAnalyticsPageInfo(refreshedContent, constants)
-  end if
 
-  if entryPoint =  m.constants.deeplinks.entryPoints.detail
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-  else if entryPoint = m.constants.deeplinks.entryPoints.home
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
-  else if entryPoint = m.constants.deeplinks.entryPoints.epg
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("linear_browse_page", {})
-  else if entryPoint = m.constants.deeplinks.entryPoints.category
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("category_list_page", {})
-  else if entryPoint = m.constants.deeplinks.entryPoints.channel
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("channel_list_page", {})
-  else if entryPoint = m.constants.deeplinks.entryPoints.espanol
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_LATINO"})
-  else if entryPoint = m.constants.deeplinks.entryPoints.nostalgia
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_NOSTALGIA"})
-  else if entryPoint = m.constants.deeplinks.entryPoints.bestKnown
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_ALIST"})
-  else if entryPoint = m.constants.deeplinks.entryPoints.movies
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_MOVIE"})
-  else if entryPoint = m.constants.deeplinks.entryPoints.tv
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_TV"})
-  else if entryPoint = m.constants.deeplinks.entryPoints.categoryDetail
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("category_page",  {"category_slug": deepLinkContent.id})
-  else if entryPoint = m.constants.deeplinks.entryPoints.news
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_LINEAR"})
-  else if entryPoint = m.constants.deeplinks.entryPoints.episodeList
-    if deepLinkContent <> invalid
-      seriesId = deepLinkContent.id.toInt()
-      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("episode_video_list_page", { series_id: seriesId })
+    if (deepLinkContent.type = m.constants.ui.contentTypes.linear or deepLinkContent.type = m.constants.ui.contentTypes.video or (deepLinkContent.type = "series" and deepLinkContent.deeplinkType = "series")) and deepLinkContent.id <> invalid and deepLinkContent.id <> ""
+      pageInfo = {
+        pageType: "video_player_page"
+        pageValues: {
+          video_id: deepLinkContent.Id.toInt()
+        }
+      }
+    else if refreshedContent <> invalid
+      pageInfo = getDetailScreenAnalyticsPageInfo(refreshedContent, constants)
+    else 'default
+      pageInfo = {
+        pageType: "home_page"
+        pageValues: {content_mode: "CONTENT_MODE_UNKNOWN"}
+      }
     end if
-  else if entryPoint =  m.constants.deeplinks.entryPoints.video and pageInfo <> invalid
-    referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-  end if
 
-  trackingTask.trackEvent = {
-    type: "referred"
-    values: referredAnalyticsEvent
-  }
+    if entryPoint =  m.constants.deeplinks.entryPoints.detail
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+    else if entryPoint = m.constants.deeplinks.entryPoints.home
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
+    else if entryPoint = m.constants.deeplinks.entryPoints.epg
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("linear_browse_page", {})
+    else if entryPoint = m.constants.deeplinks.entryPoints.category
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("category_list_page", {})
+    else if entryPoint = m.constants.deeplinks.entryPoints.channel
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("channel_list_page", {})
+    else if entryPoint = m.constants.deeplinks.entryPoints.espanol
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_LATINO"})
+    else if entryPoint = m.constants.deeplinks.entryPoints.nostalgia
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_NOSTALGIA"})
+    else if entryPoint = m.constants.deeplinks.entryPoints.bestKnown
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_ALIST"})
+    else if entryPoint = m.constants.deeplinks.entryPoints.movies
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_MOVIE"})
+    else if entryPoint = m.constants.deeplinks.entryPoints.tv
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_TV"})
+    else if entryPoint = m.constants.deeplinks.entryPoints.categoryDetail
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("category_page",  {"category_slug": deepLinkContent.id})
+    else if entryPoint = m.constants.deeplinks.entryPoints.news
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_LINEAR"})
+    else if entryPoint = m.constants.deeplinks.entryPoints.episodeList
+      if deepLinkContent <> invalid
+        seriesId = deepLinkContent.id.toInt()
+        referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("episode_video_list_page", { series_id: seriesId })
+      end if
+    else if entryPoint =  m.constants.deeplinks.entryPoints.video and pageInfo <> invalid
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+    end if
+
+    trackingTask.trackEvent = {
+      type: "referred"
+      values: referredAnalyticsEvent
+    }
+  end if
 End Function
 
 
