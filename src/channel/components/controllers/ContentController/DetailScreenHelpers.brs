@@ -37,17 +37,19 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     detailScreen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelected")
 
-    previewState = getVideoPreviewStateForThisContent(content)
-    if previewState = "buffering" or previewState = "playing"
-      pageType = "video_page"
-      if content.type = m.constants.ui.contentTypes.series
-        pageType = "series_detail_page"
-      end if
-      setPageTypeForVideoPreview(pageType) ' this will help to trigger analytics
-    else
-      previewState = getVideoPreviewState()
-      if previewState <> "stopped" and previewState <> "finished" ' this means video not stopped/finished for previous content, so we need to stop it
-        stopVideoPreview()
+    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+      previewState = getVideoPreviewStateForThisContent(content)
+      if previewState = "buffering" or previewState = "playing"
+        pageType = "video_page"
+        if content.type = m.constants.ui.contentTypes.series
+          pageType = "series_detail_page"
+        end if
+        setPageTypeForVideoPreview(pageType) ' this will help to trigger analytics
+      else
+        previewState = getVideoPreviewState()
+        if previewState <> "stopped" and previewState <> "finished" ' this means video not stopped/finished for previous content, so we need to stop it
+          stopVideoPreview()
+        end if
       end if
     end if
 
@@ -127,18 +129,26 @@ Function onDetailBackgroundChange(msg)
   detailScreen = msg.getRoSGNode()
   if detailScreen.isInFocusChain()
 
-    previewState = getVideoPreviewState()
-    if previewState = "playing"
-      m.backgroundGroup.backgroundInfo = {
-        type: m.constants.ui.backgroundTypes.epg
-        uriList: [] ' setting uriList as empty, because don't rotate background poster when video preview is playing
-      }
+    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+      previewState = getVideoPreviewState()
+      if previewState = "playing"
+        m.backgroundGroup.backgroundInfo = {
+          type: m.constants.ui.backgroundTypes.epg
+          uriList: [] ' setting uriList as empty, because don't rotate background poster when video preview is playing
+        }
+      else
+        m.backgroundGroup.backgroundInfo = {
+          type: m.constants.ui.backgroundTypes.topright
+          uriList: detailScreen.backgroundUriList
+        }
+      end if
     else
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.topright
         uriList: detailScreen.backgroundUriList
       }
     end if
+
   end if
 End Function
 

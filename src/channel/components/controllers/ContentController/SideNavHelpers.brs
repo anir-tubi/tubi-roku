@@ -159,8 +159,10 @@ Function onSideNavItemSelected()
     '// If a new screen is to be called, then collapse the side nav and remember which side nav button was last clicked
     bNewScreenCalledSuccess = false
 
-    ' stop the video preview when user selects any item from sidenav
-    stopVideoPreview()
+    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+      ' stop the video preview when user selects any item from sidenav
+      stopVideoPreview()
+    end if
 
     ' set appropriate analytics component on the page being navigated from so NavigateToPageEvent
     ' contains all the requisite information -  NOTE: this analytic does not get reported when the user presses the sideNav button associated with the current screen

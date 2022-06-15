@@ -468,7 +468,9 @@ End Function
 Function handleMenuItemSelected(itemSelected)
   if itemSelected <> invalid then
     tubiLog("DetailScreen.handleMenuItemSelected" + itemSelected.title)
-    m.top.stopVideoPreview = true
+    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+      m.top.stopVideoPreview = true
+    end if
     if itemSelected.id = "ResumeMenuItem"
       m.top.resumeSelected = true
     else if itemSelected.id = "PlayMenuItem"
@@ -538,9 +540,11 @@ End Function
 Function onRelatedItemFocused()
   tubiLog("DetailScreen.onRelatedItemFocused")
   if m.RelatedGrid.content <> invalid
-    m.top.stopVideoPreview = true
-    ' force a background update
-    m.top.backgroundUriList = m.top.backgroundUriList
+    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+      m.top.stopVideoPreview = true
+      ' force a background update
+      m.top.backgroundUriList = m.top.backgroundUriList
+    end if
 
     focusedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemFocused)
     if focusedContent <> invalid
@@ -690,7 +694,10 @@ End Function
 
 Function handlePlayInput()
   itemFocused = m.Menu.content.getChild(m.Menu.itemFocused)
-  m.top.stopVideoPreview = true
+  if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+    m.top.stopVideoPreview = true
+  end if
+
   if itemFocused.id = "PlayMenuItem" and m.Menu.isInFocusChain() = true
     m.top.playSelected = true
   else if itemFocused.id = "WatchTrailerMenuItem" and m.Menu.isInFocusChain() = true

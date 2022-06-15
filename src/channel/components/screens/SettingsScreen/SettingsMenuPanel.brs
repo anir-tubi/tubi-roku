@@ -57,16 +57,18 @@ Function setSettingsMenuStringsAndIcons()
       signInOutButton.iconUrl = "pkg:/images/icon-sign-in.webp"
     end if
 
-    AutoplayPreviewButton = CreateObject("roSGNode", "DetailMenuItemContentNode")
-    AutoplayPreviewButton.title = getTranslation("screenSettings_menu_autoplayPreview")
-    AutoplayPreviewButton.id="AutoplayPreviewButton"
-    if updateIconsEnabled = true
-      AutoplayPreviewButton.iconUrl="pkg:/images/icon-trailer.webp"
-    else
-      AutoplayPreviewButton.iconUrl="pkg:/images/icon-trailer.png"
+    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+      AutoplayPreviewButton = CreateObject("roSGNode", "DetailMenuItemContentNode")
+      AutoplayPreviewButton.title = getTranslation("screenSettings_menu_autoplayPreview")
+      AutoplayPreviewButton.id="AutoplayPreviewButton"
+      if updateIconsEnabled = true
+        AutoplayPreviewButton.iconUrl="pkg:/images/icon-trailer.webp"
+      else
+        AutoplayPreviewButton.iconUrl="pkg:/images/icon-trailer.png"
+      end if
+      settingContentNode = m.top.findNode("SettingsMenuContent")
+      settingContentNode.insertChild(AutoplayPreviewButton, 1)
     end if
-    settingContentNode = m.top.findNode("SettingsMenuContent")
-    settingContentNode.insertChild(AutoplayPreviewButton, 1)
 
 End Function
 

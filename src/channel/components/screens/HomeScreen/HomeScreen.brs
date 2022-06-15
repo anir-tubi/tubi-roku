@@ -122,7 +122,9 @@ Function onTopNavSelection()
   tubiLog("HomeScreen.onTopNavSelection")
 
   ' stop the video preview when user selects any item from topnav
-  m.top.stopVideoPreview = true
+  if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+    m.top.stopVideoPreview = true
+  end if
 
   '//Set trackingComponentInfo before setting contentSelected so the proper selected analytics is tracked within the screenStack
   m.top.trackingComponentInfo = m.TopNav.trackingComponentInfo
@@ -782,7 +784,9 @@ Function setFocusOntoTopNav(isToggle)
   end if
 
   m.top.stopLinearVideoPlayer = true
-  m.top.pauseVideoPreview = true
+  if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+    m.top.pauseVideoPreview = true
+  end if
 
   ' is necessary to set the uiState before the focus, so the topNav itemContents
   ' can have the appropriate color values set once they react to the focus change
@@ -904,7 +908,9 @@ Function onKeyEvent(key, press) as boolean
       else if key = "left"
         ' navigating to the side nav
         m.top.stopLinearVideoPlayer = true
-        m.top.pauseVideoPreview = true
+        if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+          m.top.pauseVideoPreview = true
+        end if
 
         if m.TopNav.isInFocusChain() = true
           ' navigating to the side nav from the top nav specifically
@@ -921,7 +927,9 @@ Function onKeyEvent(key, press) as boolean
       if key = "left" or key = "back"
         ' This is required because the homescreens without topNav will keep playing video Preview when focus is out of
         ' screen
-        m.top.pauseVideoPreview = true
+        if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+          m.top.pauseVideoPreview = true
+        end if
 
         ' navigating to the side nav
         m.top.stopLinearVideoPlayer = true
@@ -969,7 +977,9 @@ Function handlePlayInput()
     positionFocused = m.top.cursorPosition
     m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(itemFocused, positionFocused)
 
-    m.top.stopVideoPreview = true
+    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+      m.top.stopVideoPreview = true
+    end if
 
     ' Content controller observes contentSelected to populate/push the detail screen
     if itemFocused <> invalid and itemFocused.type <> m.constants.ui.contentTypes.linear
