@@ -49,5 +49,7 @@
     <!-- Sponsor Exposure ID to send to rainmaker when playing the video. -->
     <field id="sponsorExp" type="string"/>
 
+    <field id="subtext" type="string" />
+
   </interface>
 </component>

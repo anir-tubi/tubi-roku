@@ -13,13 +13,13 @@
     <!-- INPUTS -->
       <!-- Incoming interface: populate children nodes with content values -->
       <field id="content" type="node"/>
-      
-      <!-- The number of the focus/current index. 
-        ::NOTE::If the component is set as the rowTitleComponentName of a RowList, 
+
+      <!-- The number of the focus/current index.
+        ::NOTE::If the component is set as the rowTitleComponentName of a RowList,
         then the focusIndex is set automatically and the currentindex field does not need to be set. -->
       <field id="currentindex" type="integer"/>
   </interface>
-  
+
   <children>
     <Poster
       id="SponsorPoster"
@@ -40,6 +40,21 @@
         id="CategoryNameFont"
         uri="pkg:/fonts/Vaud-Bold.ttf"
         size="36" />
+    </Label>
+    <!--subText will be appended to the row label-->
+    <Label
+      id="subText"
+      height="36"
+      width="800"
+      vertAlign="center"
+      color="0xD7DAE0FF"
+      visible="false"
+      opacity="0.64">
+      <Font
+        role="font"
+        id="subTextFont"
+        uri="pkg:/fonts/Vaud-Medium.ttf"
+        size="24" />
     </Label>
 
     <LayoutGroup

@@ -11,6 +11,8 @@ Function init()
   m.top.observeField("content", "onContentChange")
   m.top.observeField("currentIndex", "onIndexChange")
 
+  m.subText = m.top.findNode("subText")
+
   ' trying to access m.global can sometimes/rarely time out creating a run time error if we
   ' try to access m.global.theme directly, so use GlobalMixin.getThemeFromGlobal() which retries if issues arise.
   theme = getThemeFromGlobal()
@@ -50,22 +52,43 @@ End Function
 
 Function onContentChange()
   tubiLog("CategoryGridRowLabel.onContentChange")
-  if m.top.content <> invalid then
-    m.CategoryName.text = m.top.content.title
+  item = m.top.content
+  if item <> invalid
+    m.CategoryName.text = item.title
 
     '//reset translations back to the original locations
     m.CategoryName.translation = m.originalTranslation_CategoryName
     m.CategoryCount.translation = m.originalTranslation_CategoryCount
 
-    if m.top.content.type = "channel"
+    m.CategoryName.width = 1000
+    m.subText.visible = false
+    'to clean roku_registration_subtext_homegrid, remove entire if/else
+    'to graaduate roku_registration_subtext_homegrid, just remove line if getExperimentResource("roku_r...
+    if item.subtext <> invalid and item.subtext <> ""
+      authInfo = getFieldFromGlobal("authInfo")
+      if (authInfo = invalid or (authInfo <> invalid and authInfo.userId = invalid))  'signedOut user or new user
+        if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_recommended", true).subtext_recommended = true
+          'recalculate the width of the rowlabel. This is required because Spanish titles might be different width than english.
+          m.CategoryName.width = 0
+          m.CategoryName.text = item.title
+          width = m.CategoryName.boundingRect().width + 25
+          m.CategoryName.width = width
+          m.subText.text = item.subtext
+          m.subText.translation = [width, 5]
+          m.subText.visible = true
+        end if
+      end if
+    end if
+
+    if item.type = "channel"
       m.CategoryCount.translation = [1630,12]
     end if
 
     '//Display Sponsor if there is a sponsor
-    if m.top.content.sponsorImages <> invalid
+    if item.sponsorImages <> invalid
       '//Move/resize/display elements when there is a sponsor. If no sponsor, then hidden elements will ensure the height of the row label is varied when this component is used as the "rowTitleComponentName" in a rowlist
       '//Set the Sponsor heights here rather than the XML so it does not affect the height of a non-sponsored row label
-      images = m.top.content.sponsorImages
+      images = item.sponsorImages
       m.SponsoredByText.text = getTranslation("sponsor_brought_by")
       SponsoredByTextFont = m.top.findNode("SponsoredByTextFont")
       m.SponsoredByText.height = SponsoredByTextFont.size
@@ -80,7 +103,7 @@ Function onContentChange()
       m.CategoryName.translation = [m.SponsoredBy.translation[0], 7]
       m.CategoryCount.translation = [m.CategoryCount.translation[0], 72]
       m.SponsoredBy.translation = [m.SponsoredBy.translation[0], 74]
-    else 
+    else
       '//reset the assets in case the label is reused for other container rows that do not have sponsorships
       m.SponsoredByPoster.unobserveField("loadStatus")
       m.SponsoredByText.height = 0
@@ -95,9 +118,9 @@ Function onContentChange()
     end if
 
     drawItemCount()
-    if m.top.content.gridItemType = "linear" or m.top.content.gridItemType = "continue_watching_signed_out_user"
+    if item.gridItemType = "linear" or item.gridItemType = "continue_watching_signed_out_user"
       m.CategoryCount.visible = false
-    else 
+    else
       m.CategoryCount.visible = true
     end if
   end if
@@ -112,7 +135,7 @@ Function drawItemCount()
   if m.top.content.getChildCount() > 0
     m.ItemCount.text = " " + Chr(&hb7) + " " + stri(m.top.content.getChildCount()).trim()
     m.FocusIndex.text = stri(cursorIndex + 1).trim()
-  else 
+  else
     ' It's odd to see '0 of 0' so we hide the counter
     m.ItemCount.text = ""
     m.FocusIndex.text = ""

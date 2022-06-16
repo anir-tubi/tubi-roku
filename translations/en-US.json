@@ -824,6 +824,10 @@
     "description": "When content is sponsored by an advertizer, then this text proceeds the image of the sponsor. The text and the image should make a complete sentence.",
     "message": "Brought to you by"
   },
+  "registration_signIn_recommended":{
+    "description": "text appended to recommended row label to subtly remind users that they are signed out so that they understand that they need to sign-in to use Tubi at its fullest",
+    "message":"Sign In for a more personalized experience"
+  },
   "screenEndCard_startingIn": {
     "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
     "message": "Starting in {seconds} s"
