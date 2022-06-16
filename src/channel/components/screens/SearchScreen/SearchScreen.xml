@@ -116,7 +116,7 @@
     </LayoutGroup>
 
     <!-- Live text entry box with a non-blinking "cursor" -->
-    <Label  
+    <Label
       id="SearchText"
       vertAlign="center"
       translation="[786, 436]"
@@ -128,7 +128,7 @@
         uri="pkg:/fonts/Vaud-SemiBold.ttf"
         size="36"/>
     </Label>
-      
+
     <InfoPanel
       id="SearchScreenInfoPanel"
       visible="false"
@@ -140,8 +140,8 @@
         id="Keyboard"
         translation="[0,-20]"/>
    </Group>
-    
-    <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus, 
+
+    <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus,
     the resultGrid is slightly too low and too far to the right. It has to do something to do with the custom focusBitmapUri.  -->
     <Group
       translation="[786, 496]"
@@ -181,5 +181,8 @@
           size="27" />
       </Label>
     </Group>
+    <Timer
+      id="searchDebounce"
+      duration="0.5"/>
   </children>
 </component>

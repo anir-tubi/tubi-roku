@@ -6,7 +6,7 @@ Function init()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
-  
+
   m.ResultArea = m.top.findNode("ResultArea")
   m.searchGroup = m.top.findNode("searchGroup")
 
@@ -31,7 +31,7 @@ Function init()
   end if
 
   m.keyboard = m.top.findNode("Keyboard")
-  
+
   m.keyboard.id = "SearchKeyboard"
   m.keyboard.setFocus(true)
   m.Keyboard.textEditBox.maxTextLength = 100
@@ -39,8 +39,12 @@ Function init()
   m.Keyboard.keyGrid.keyDefinitionUri = "pkg:/components/data/CustomAddressKDF.json"
   m.keyboard.textEditBox.visible = false
 
+  ' searchDebounce timer helps to reduce number of search api requests
+  m.searchDebounce = m.top.findNode("searchDebounce")
+  m.searchDebounce.observeField("fire", "onSearchDebounce")
+
   setSearchStrings()
-  
+
   m.KidsModeMessageSpacer = m.top.findNode("KidsModeMessageSpacer")
 
   m.ResultGrid = m.top.findNode("ResultGrid")
@@ -253,7 +257,7 @@ Function onSearchContentChange()
 
   if m.top.content <> invalid and m.top.content.getChildCount() > 0 then
     if m.top.content.isDefaultSearchResults = true
-      '//display special text when the default search is displaying 
+      '//display special text when the default search is displaying
       setDefaultText()
       if m.microphone <> invalid
         m.microphone.visible = true
@@ -271,26 +275,10 @@ Function onSearchContentChange()
   end if
 End Function
 
-''''''''''''''''''''''''''
-' onKeyboardTextChanged
-'
-' Launch a search when the keyboard text has changed
-Function onKeyboardTextChanged()
-  tubiLog("SearchScreen.onSearchTextChanged " + m.Keyboard.text)
 
-  '//display spinner
-  displayLoading()
-  '//hide previous content
-  m.ResultGrid.visible = false
-  m.NoResultsMessage.visible = false
+Function onSearchDebounce()
 
-  sKeyboardText = m.Keyboard.text
-  m.SearchText.text =  ""
-  m.searchHintText.text = ""
-  m.KidsModeMessage.text = ""
-  m.searchMenuText.text = LCase(sKeyboardText)
-
-  if sKeyboardText <> invalid and sKeyboardText.trim().len() > 0 then
+  if m.Keyboard.text <> invalid and m.Keyboard.text.trim().len() > 0 then
     loadSearchResults()
   else
     '//if the search text was empty, clear out any existing results and display the default search results
@@ -303,6 +291,31 @@ Function onKeyboardTextChanged()
       query: Left(m.Keyboard.text, 256)
     }
   }
+
+End function
+
+
+''''''''''''''''''''''''''
+' onKeyboardTextChanged
+'
+' Launch a search when the keyboard text has changed
+Function onKeyboardTextChanged()
+  tubiLog("SearchScreen.onKeyboardTextChanged " + m.Keyboard.text)
+
+  '//display spinner
+  displayLoading()
+  '//hide previous content
+  m.ResultGrid.visible = false
+  m.NoResultsMessage.visible = false
+
+  m.SearchText.text =  ""
+  m.searchHintText.text = ""
+  m.KidsModeMessage.text = ""
+  m.searchMenuText.text = LCase(m.Keyboard.text)
+
+  ' making backend request only after 0.5s
+  m.searchDebounce.control = "start"
+
 End Function
 
 
@@ -322,7 +335,7 @@ Function onItemFocused()
     setVisibilityForDefaultText(false)
     m.searchScreenInfoPanel.title = focusedContent.title
     m.searchScreenInfoPanel.description = focusedContent.DESCRIPTION
-    if focusedContent.type = "linear" 
+    if focusedContent.type = "linear"
       m.searchScreenInfoPanel.genres = focusedContent.genres
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.linearsearch
     else
