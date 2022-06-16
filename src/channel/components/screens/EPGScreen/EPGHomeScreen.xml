@@ -53,6 +53,9 @@
     <!-- the id that top nav should treat as selected from a UI perspective -->
     <field id="topNavSelectedId" type="string" alias="topNav.selectedId" />
 
+    <!-- set to true if the user is signed in and we want to change the experience based on that -->
+    <field id="signedIn" type="boolean" value="false" />
+
     <!-- OUTPUTS -->
 
     <field id="epgScreenOkPressed" type="boolean" alwaysNotify="true"/>

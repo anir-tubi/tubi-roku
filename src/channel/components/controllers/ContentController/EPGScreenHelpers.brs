@@ -15,6 +15,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     epgScreen.shouldFocusWhenPushed = m.top.fadeInContentController
     changeEPGScreenBackground(epgScreen) ' ensure background of the epg screen is used immediatly instead of previous screen's background
     shouldSendPageLoadEvent = true
+    epgScreen.signedIn = isLoggedInUser()
     if epgScreen.contentReady = false
       'First batch of Contents are not ready. So send the pageloadEvent after onContentReady()
       shouldSendPageLoadEvent = false
@@ -40,6 +41,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     else
       epgScreen = CreateObject("roSGNode", "EPGHomeScreen")
     end if
+
     epgScreen.observeFieldScoped("backgroundUriList", "onEPGScreenBackgroundChange")
     epgScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     epgScreen.observeFieldScoped("programGuideNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
@@ -52,6 +54,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     epgScreen.observeFieldScoped("topNavToggled", "onScreenTopNavToggled")
     epgScreen.observeFieldScoped("refreshEPGScreenVideoPlay", "onRefreshEPGScreenVideoPlay")
     epgScreen.observeFieldScoped("epgScreenOkPressed", "onEPGScreenOKPressed")
+    epgScreen.signedIn = isLoggedInUser()
 
     '//::TODO:: epg - remove this observer once the roku_linear_epg_v5 experiment is done
     epgScreen.observeField("focusedChild", "onEPGScreenFocusChange")

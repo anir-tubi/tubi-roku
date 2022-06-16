@@ -45,6 +45,7 @@ Function init()
   m.top.observeField("visible", "onVisibleChange")
   m.top.backgroundUriList = [m.defaultBackgroundUri]
   m.top.handlesTransportVoiceRequests = true
+  m.top.observeFieldScoped("signedIn", "onSignedInChange")
   m.top.trackingPageInfo = {
     pageType : "linear_browse_page"
     pageValues : {}
@@ -391,6 +392,9 @@ Function generateTopNavContentItems(includeLinearTV = false)
 
     if id = m.constants.ui.sideNavIds.home
       item.title = getTranslation("menu_foryou")
+      if m.top.signedIn = false and getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", true).subtext_topnav = true
+        item.title = getTranslation("menu_epg_all")
+      end if
     else if id = m.constants.ui.sideNavIds.movies
       item.title = getTranslation("menu_movies")
     else if id = m.constants.ui.sideNavIds.tv
@@ -498,4 +502,10 @@ Function fadeInContentArea()
   if m.InfoPanelParent.opacity < 1
     m.infoPanelFade = fade(m.InfoPanelParent, "in", .4, 0.0, 1)
   end if
+End Function
+
+
+Function onSignedInChange()
+  tubiLog("EPGScreen.onSignedInChange")
+  onRefreshTopNav()
 End Function

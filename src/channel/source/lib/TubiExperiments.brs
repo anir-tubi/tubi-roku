@@ -66,6 +66,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_registration_subtext_homegrid: {
+        roku_registration_subtext_homegrid_topnav: {"subtext_topnav": false}
         roku_registration_subtext_homegrid_sidenav: {"subtext_sidenav": false}
       }
       ' enabled = true : after the video preview of the selected title ends, the user sees the hero image again.

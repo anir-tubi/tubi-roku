@@ -28,6 +28,8 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
       showHideSpinner(false)
     end if
 
+    homeScreen.signedIn = isLoggedInUser(authInfo)
+
     refreshHomescreenTopNav(homeScreen)
     ' set which component to focus on once the screen gains focus
     if componentToFocus = m.constants.ui.homescreen.focusItems.topNav
@@ -97,7 +99,8 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
 
     homeScreen.contentMode = sContentMode
     homeScreen.shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
-    homeScreen.signedIn = (authInfo <> invalid)
+
+    homeScreen.signedIn = isLoggedInUser(authInfo)
     homeScreen.kidsModeFeatureOn = m.kidsModeFeatureOn
     homeScreen.canLoadCategories = true
     homeScreen.id = screenID
@@ -438,6 +441,7 @@ End Function
 
 ' @homescreen: roSGNode, a HomeScreen component
 Function refreshHomescreenTopNav(homeScreen)
+
   refreshNeeded = setEnableTopNavOnHomescreen(homeScreen)
 
   if refreshNeeded = true
@@ -487,6 +491,10 @@ Function setEnableTopNavOnHomescreen(homeScreen)
 
     if homeScreen.enableTopNav <> bTopNavAllowed
       homeScreen.enableTopNav = bTopNavAllowed
+      refreshNeeded = true
+    end if
+
+    if homeScreen.signedIn <> isLoggedInUser() and getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true
       refreshNeeded = true
     end if
   end if

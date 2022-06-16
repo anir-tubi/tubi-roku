@@ -42,6 +42,7 @@ Function init()
   m.top.observeField("id", "onIDChange")
   m.top.observeField("refreshTopNav", "onRefreshTopNav")
   m.top.observeField("visible", "onVisibleChange")
+  m.top.observeFieldScoped("signedIn", "onSignedInChange")
   m.top.backgroundUriList = [m.defaultBackgroundUri]
   m.top.handlesTransportVoiceRequests = true
   m.top.trackingPageInfo = {
@@ -390,7 +391,7 @@ Function generateTopNavContentItems()
     item.id = id
 
     if id = m.constants.ui.sideNavIds.linearEPG
-      item.title = getTranslation("menu_epg_all")
+      item.title = getTranslation("menu_foryou")
     else if id = m.constants.ui.sideNavIds.news
       item.title = getTranslation("menu_epg_news")
     else if id = m.constants.ui.sideNavIds.sports
@@ -510,4 +511,10 @@ Function fadeInContentArea()
   if m.InfoPanelParent.opacity < 1
     m.infoPanelFade = fade(m.InfoPanelParent, "in", .4, 0.0, 1)
   end if
+End Function
+
+
+Function onSignedInChange()
+  tubiLog("EPGScreen.onSignedInChange")
+  onRefreshTopNav()
 End Function
