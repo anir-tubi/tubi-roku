@@ -95,6 +95,9 @@ Function onEPGScreenFocusChange(msg)
     '//Fire experiment exposure event when the EPG Screen is focused - just in case there is a deep link to linear content
     '//::NOTE:: delete this function once the experiment is over
     getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", true)
+    if isLoggedInUser() = false
+      getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", true)
+    end if
   end if
 End Function
 

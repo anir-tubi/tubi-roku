@@ -109,11 +109,22 @@ Function createMainContent(item)
   else if item = m.constants.ui.sideNavIds.profile
     ' m.top.stringSignIn may have been set before SideNav.createMainContent() was called
     ' so use it if it exists
-    if m.top.stringSignIn <> ""
-      contentNode.title = m.top.stringSignIn
-    else
-      contentNode.title = getTranslation("menu_signIn")
+    contentNode.title = m.top.stringSignIn
+
+    signTxt = getTranslation("menu_signIn")
+
+    if contentNode.title = ""
+      contentNode.title = signTxt
     end if
+
+    if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", false).subtext_sidenav = true
+      if contentNode.title = signTxt  'if title is 'SignIn', that means, user has signed out=>set subtext also 'SignIn'
+        contentNode.shortDescriptionLine1 = signTxt
+      else
+        contentNode.shortDescriptionLine1 = "" 'If title is not "SignIn" but something like 'hi user' then user has signedIn and no need to show subtext
+      end if
+    end if
+
     if m.updateIconsEnabled = true
       contentNode.iconUrl = "pkg:/images/icon-sign-in.webp"
     else
@@ -215,6 +226,15 @@ End Function
 Function onSignInChange()
   if m.profileContent <> invalid
     m.profileContent.title = m.top.stringSignIn
+    if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", false).subtext_sidenav = true
+
+      signTxt = getTranslation("menu_signIn")
+      if m.profileContent.title = signTxt
+        m.profileContent.shortDescriptionLine1 = signTxt
+      else
+        m.profileContent.shortDescriptionLine1 = ""
+      end if
+    end if
   end if
 End Function
 
