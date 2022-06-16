@@ -5,3 +5,17 @@ Function focusState(node As Object) As String
     return ""
   end if
 End Function
+
+
+'setting the keyboard key focus colors
+Function handleKeyboardColors()
+  theme = getThemeFromGlobal()
+  keyboardPalette = createObject("roSGNode", "RSGPalette")
+  if theme <> invalid
+    keyboardPalette.colors = {
+      "FocusColor": theme.focused,
+      "FocusItemColor": m.constants.ui.colors.keyboardFocusedText
+    }
+  end if
+  return keyboardPalette
+End Function

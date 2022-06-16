@@ -15,9 +15,11 @@ Function init()
     m.continue.observeFieldScoped("selected", "onButtonSelected")
 
     m.keyboard = m.top.findNode("Keyboard")
-    m.top.observeField("focusedChild", "onComponentFocus")
-    m.keyboard.focusedKeyColor = m.constants.ui.colors.keyboardFocusedText
-    m.keyboard.focusBitmapUri = m.theme.keyboard_focused_key
+    m.keyboard.domain = "password"
+    m.keyboard.textEditBox.visible = false
+    m.keyboard.palette = handleKeyboardColors()
+
+    m.keyboard.textEditBox.observeFieldScoped("focusedChild", "onTextEditBoxFocusedChildChange")
 End Function
 
 
@@ -83,11 +85,9 @@ Function onButtonSelected(evt)
 End Function
 
 
-Function onComponentFocus()
-'To bring the focus to Keyboard whenever this screen is set focus
-  if m.top.isInFocusChain()
-      if m.keyboard.isInFocusChain() = false and m.top.focusedChild.id = "passwordEntryKeyboard"
-          m.keyboard.setFocus(true)
-      end if
-  end if 
+Function onTextEditBoxFocusedChildChange()
+  ' Don't allow textEditBox to take focus since we're not showing it
+  if m.keyboard.textEditBox.hasFocus() = true
+    m.keyboard.keyGrid.setFocus(true)
+  end if
 End Function

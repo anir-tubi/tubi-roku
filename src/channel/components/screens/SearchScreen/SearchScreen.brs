@@ -45,14 +45,14 @@ Function init()
 
   m.ResultGrid = m.top.findNode("ResultGrid")
 
-  m.keyboardPalette = createObject("roSGNode", "RSGPalette")
   m.keyboard.observeField("text", "onKeyboardTextChanged")
   m.keyboard.textEditBox.observeField("focusedChild", "onTextEditBoxFocused")
 
   m.ResultGrid.observeField("itemSelected", "onResultSelected")
   m.ResultGrid.observeField("itemFocused", "onItemFocused")
 
-  handleKeyboardColors()
+  m.keyboard.palette = handleKeyboardColors()
+  m.ResultGrid.focusBitmapBlendColor = m.theme.focused
 
   m.NoResultsMessage = m.top.findNode("NoResultsMessage")
   m.NoResultsMessage.color = m.constants.ui.colors.primaryText
@@ -175,7 +175,8 @@ Function onEnableChange()
 End Function
 
 Function onKidsModeEnableChange()
-  handleKeyboardColors()
+  m.keyboard.palette = handleKeyboardColors()
+  m.ResultGrid.focusBitmapBlendColor = m.theme.focused
   if m.top.kidsModeEnabled = true
     m.KidsModeMessage.visible = false
   else
@@ -490,16 +491,6 @@ Function handleKeyboardVoiceInput(resultFocus)
     m.keyboard.textEditBox.voiceEnabled = false
   else
     m.keyboard.textEditBox.voiceEnabled = true
-  end if
-End Function
-
-'setting the keyboard colors when swicth from default keyboard to kids mode keyboard
-Function handleKeyboardColors()
-  theme = getThemeFromGlobal()
-  if theme <> invalid
-    m.keyboardPalette.colors = { "FocusColor": theme.focused, "FocusItemColor": m.constants.ui.colors.keyboardFocusedText }
-    m.keyboard.palette = m.keyboardPalette
-    m.ResultGrid.focusBitmapBlendColor = theme.focused
   end if
 End Function
 

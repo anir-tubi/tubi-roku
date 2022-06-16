@@ -6,6 +6,7 @@ Function init()
 
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
+  m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
   m.keyboard.observeFieldScoped("buttonSelected", "onButtonSelected")
 
   'set initial tracking values
@@ -36,6 +37,10 @@ Function onScreenFocusChange()
       m.password.text = m.constants.settings.password
     end if
   end if
+  
+  if m.top.isInFocusChain() = false
+    m.keyboard.unobserveFieldScoped("text")
+  end if
 End Function
 
 
@@ -59,11 +64,17 @@ End Function
 
 
 Function onKeyEvent(key As String, press As Boolean) As Boolean
-tubiLog("ConfirmPasswordScreen.onKeyEvent")
+  tubiLog("ConfirmPasswordScreen.onKeyEvent")
   if key = "OK"
     m.password.text = m.keyboard.text
   else if key = "back"
     m.top.backPressed = true
   end if
   return press
+ End Function
+
+
+ Function onKeyboardTextChanged()
+  tubiLog("ConfirmPasswordScreen.onKeyboardTextChanged")
+  m.password.text = m.keyboard.text
  End Function

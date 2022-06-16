@@ -13,9 +13,15 @@ Function init()
   m.email = m.top.findNode("email")
 
   m.keyboard = m.top.findNode("Keyboard")
-  m.keyboard.showTextEditBox = false
-  m.keyboard.focusedKeyColor = m.constants.ui.colors.keyboardFocusedText
-  m.keyboard.focusBitmapUri = m.theme.keyboard_focused_key
+
+  m.Keyboard.textEditBox.voiceEnabled = true
+  m.keyboard.domain = "email"
+  m.keyboard.textEditBox.visible = false
+  m.Keyboard.textEditBox.maxTextLength = 100
+  
+  m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
+
+  m.keyboard.palette = handleKeyboardColors()
 
   m.back = m.top.findNode("back")
   m.back.text = getTranslation("linearVideoPlayer_buttonBack")
@@ -44,13 +50,29 @@ End Function
 
 Function onScreenFocusChange()
 
-  tubiLog("SignUpScreen.onScreenFocusChange")
+  tubiLog("EmailInputScreen.onScreenFocusChange")
   if m.top.hasFocus() then
     ' force a background update
+    m.Keyboard.textEditBox.voiceEnabled = true
     m.top.backgroundUriList = m.backgroundUriList
-    m.keyboard.setFocus(true)
+    m.keyboard.keyGrid.setFocus(true)
+  end if
+  if m.top.isInFocusChain() = false
+    m.keyboard.unobserveFieldScoped("text")
+    m.Keyboard.textEditBox.voiceEnabled = false
   end if
 
+End Function
+
+
+Function onKeyboardTextChanged()
+  m.email.text = m.keyboard.text
+End Function
+
+
+'Handling when app is focusing on an invisible textbox that is built into the keyboard
+Function onTextEditBoxFocused()
+  m.Keyboard.setFocus(true)
 End Function
 
 
@@ -94,7 +116,6 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   if press
 
     if key = "back"
-
       m.top.backButtonSelected = true
 
     else if key = "down"

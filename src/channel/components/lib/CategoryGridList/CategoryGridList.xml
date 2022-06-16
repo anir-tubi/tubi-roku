@@ -4,6 +4,7 @@
   <script type="text/brightscript" uri="CategoryGridList.brs" />
   <script type="text/brightscript" uri="../FocusMixin.brs" />
   <script type="text/brightscript" uri="../ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />

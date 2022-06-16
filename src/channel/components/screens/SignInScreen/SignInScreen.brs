@@ -38,6 +38,7 @@ Function init()
   m.donotsellMyInfoBtn.observeFieldScoped("selected", "onDoNotSellMyInfoButtonSelected")
 
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
+  m.voiceKeyboard = m.keyboard.findNode("Keyboard")
   m.keyboard.observeFieldScoped("buttonSelected", "onButtonSelected")
 
   m.buttonsGroup = m.top.findNode("buttonsGroup")
@@ -48,6 +49,11 @@ Function init()
 
   m.email = m.top.findNode("email")
   m.email.hint = getTranslation("signIn_email_hint")
+
+  'emailHasFocus is used to store the state of whether or not the email text entry field has been focused.
+  'We need to store this state, and can't simply rely on m.email.isInFocusChain() because when user starts using microphone,
+  'the email entry text field loses focus and keyboard gains the focus.
+  m.emailHasFocus = false
 
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
 
@@ -72,11 +78,26 @@ Function onScreenFocusChange()
   ' force a background update
   m.top.backgroundUriList = m.backgroundUriList
   if m.top.hasFocus() then
+    m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
+    m.voiceKeyboard.textEditBox.voiceEnabled = true
     if m.email.text = "" 'if email field is empty when screen gains focus, then setting focus to email field
       m.email.setFocus(true)
+      m.emailHasFocus = true
     else
       m.password.setFocus(true)
     end if
+  end if
+
+  if m.top.isInFocusChain() = false 
+    m.voiceKeyboard.textEditBox.voiceEnabled = false
+    m.keyboard.unobserveFieldScoped("text")
+  end if
+
+  'When user start using microphone, even though email has focus and setting m.emailHasFocus to true, it  changes 
+  'to m.emailHasFocus to false and email loses the focus and focus goes to keyboard. So, setting m.emailHasFocus to false only when 
+  'email is not in focusChain and focusedChild is not passwordEntryKeyboard.
+  if m.email.isInFocusChain() = false and m.top.focusedChild <> invalid and m.top.focusedChild.id <> "passwordEntryKeyboard"
+    m.emailHasFocus = false
   end if
 
 End Function
@@ -190,7 +211,6 @@ End Function
 
 
 Function showKeyboard()
-
   slideTo(m.keyboard, [0,550], 1.0)
 
 End Function
@@ -204,7 +224,6 @@ End Function
 
 
 Function hideKeyboard()
-
   slideTo(m.keyboard, [0,1080], 1.0)
   m.continueBtn.visible = true
 
@@ -226,7 +245,6 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
   handled = true
   if press
-
     if key = "back"
 
       if m.keyboard.isInFocusChain() = true
@@ -261,6 +279,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
       if m.password.hasFocus() = true
         m.email.setFocus(true)
+        m.emailHasFocus = true
       else if m.continueBtn.hasFocus() = true
         m.password.setFocus(true)
       else if m.termsBtn.hasFocus() = true
@@ -331,3 +350,15 @@ Function proceedPasswordValidation()
       }
     end if
 End Function
+
+
+Function onKeyboardTextChanged()
+  tubiLog("SignInScreen.onKeyboardTextChanged")
+  if m.keyboard.isInFocusChain() = true and m.emailHasFocus = false
+    m.password.selected = true
+    m.password.text = m.keyboard.text
+  else if m.emailHasFocus = true
+    m.voiceKeyboard.textEditBox.voiceEnabled = false
+    m.top.emailSelected = true
+  end if
+ End Function

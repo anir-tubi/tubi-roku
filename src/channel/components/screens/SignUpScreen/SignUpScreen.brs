@@ -41,9 +41,10 @@ Function init()
   m.keyboardGrp = m.top.findNode("keyboardGrp")
 
   m.keyboard = m.top.findNode("Keyboard")
-  m.keyboard.showTextEditBox = false
-  m.keyboard.focusedKeyColor = m.constants.ui.colors.keyboardFocusedText
-  m.keyboard.focusBitmapUri = m.theme.keyboard_focused_key
+  m.keyboard.domain = "password"
+  m.keyboard.textEditBox.visible = false
+
+  m.keyboard.palette = handleKeyboardColors()
 
   m.back = m.top.findNode("back")
   m.back.text = getTranslation("linearVideoPlayer_buttonBack")
