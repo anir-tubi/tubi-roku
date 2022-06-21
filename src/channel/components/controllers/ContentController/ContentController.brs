@@ -252,7 +252,7 @@ Function displayMaturePlayWarning(dialogSubtype, pageInfo)
   title = getTranslation("error_matureContent_title")
   message = getTranslation("error_mustBeSignedIn_description")
   buttons = [getTranslation("dialog_button_continue"), getTranslation("dialog_button_cancel")]
-  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onSignInModalButtonSelected)
+  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onMaturePlayWarningSignInModalButtonSelected)
 End Function
 
 
@@ -286,8 +286,8 @@ End Function
 
 
 ' handles the response of a user who has been presented a sign in modal
-Function onSignInModalButtonSelected()
-  startSignIn(onSideNavSignInCompleted)
+Function onMaturePlayWarningSignInModalButtonSelected()
+  startSignIn(onMatureContentWarningSignInCompleted)
 End Function
 
 

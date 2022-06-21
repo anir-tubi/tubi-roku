@@ -510,6 +510,22 @@ Function onSideNavSignInCompleted()
 End Function
 
 
+Function onMatureContentWarningSignInCompleted()
+  tubiLog("SignInHelpers.onMatureContentWarningSignInCompleted")
+
+  setContentToRefreshAllPersonalizedScreens(false)
+
+  currentScreen = popScreenAfterSignInProcess()
+  m.spinner.visible = false
+
+  if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
+    refreshAllDetailScreens()
+    currentScreen.removeSignupButton = true
+    currentScreen.jumpToItem = 0
+  end if
+End Function
+
+
 Function onSignOutCompleted()
   tubiLog("SignInHelpers.onSignOutCompleted")
 
