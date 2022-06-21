@@ -6,6 +6,7 @@ Function init()
 
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
+  m.voiceKeyboard = m.keyboard.findNode("Keyboard")
   m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
   m.keyboard.observeFieldScoped("buttonSelected", "onButtonSelected")
 
@@ -32,6 +33,7 @@ Function onScreenFocusChange()
     ' force a background update
     m.top.backgroundUriList = m.backgroundUriList
     m.Keyboard.setFocus(true)
+    m.voiceKeyboard.textEditBox.voiceEnabled = true
     if m.constants.settings.mode <> "production" and m.constants.settings.password <> invalid
       m.keyboard.text = m.constants.settings.password
       m.password.text = m.constants.settings.password
@@ -39,6 +41,7 @@ Function onScreenFocusChange()
   end if
   
   if m.top.isInFocusChain() = false
+    m.voiceKeyboard.textEditBox.voiceEnabled = false
     m.keyboard.unobserveFieldScoped("text")
   end if
 End Function

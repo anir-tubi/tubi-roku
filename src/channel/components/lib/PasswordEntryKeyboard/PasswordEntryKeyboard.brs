@@ -19,6 +19,7 @@ Function init()
     m.keyboard.textEditBox.visible = false
     m.keyboard.palette = handleKeyboardColors()
 
+    m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
     m.keyboard.textEditBox.observeFieldScoped("focusedChild", "onTextEditBoxFocusedChildChange")
 End Function
 
@@ -89,5 +90,15 @@ Function onTextEditBoxFocusedChildChange()
   ' Don't allow textEditBox to take focus since we're not showing it
   if m.keyboard.textEditBox.hasFocus() = true
     m.keyboard.keyGrid.setFocus(true)
+  end if
+End Function
+
+
+Function onScreenFocusChange()
+  if m.top.hasFocus()
+    m.keyboard.textEditBox.voiceEnabled = true
+    m.keyboard.keyGrid.setFocus(true)
+  else if m.top.isInFocusChain() = false
+    m.keyboard.textEditBox.voiceEnabled = false
   end if
 End Function
