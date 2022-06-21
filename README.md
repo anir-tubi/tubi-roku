@@ -501,24 +501,41 @@ We may want to see how a new feature will affect the app's metrics from a small 
 
 ## Deploying an experiment on Popper Staging:
 
-- Run the `$ vauth` command
+Staging experiments are stored on the `roku_popper_staging` branch. Before adding new experiments to the roku popper staging environment, do the following:
+1. Pull the remote `roku_popper_staging` branch to your local `roku_popper_staging` branch
+2. Pull the remote `master` branch to your local `master` branch
+3. Merge your local `master` branch into your local `roku_popper_staging` branch.
 
-- Before you can deploy to staging, you need to ensure your ssh config file has been updated with the IP addresses and hostname info of the popper staging location. This info can be found under "[popper-engine-roku]" in the [staging inventory](https://github.com/adRise/adrise_infrastructure/blob/master/inventory/staging/staging#L317).
+For each experiment that needs to be added to the roku popper staging environment, do the following:
+1. Create a separate local branch off of master.
+2. Merge your experiment branch into the `roku_popper_staging` branch
+3. Make a PR to `master` from your local experiment branch when appropriate.
 
-- Please follow the [SSH Access Instructions](https://github.com/adRise/adrise_infrastructure#ssh-access) while using the popper info from the previous step to set up your SSH Config file. Below is an example of what is added to the .ssh/config file. (Note: on the Mac, the ssh config file is located in [user]/.ssh/config, where "user" is the username on your mac.)
+Once all experiment branches for the release have been merged into the `roku_popper_staging` branch, then:
 
-  ```text
-  Host popper-engine-roku-01 172.30.27.29
-   User ubuntu
-   Hostname 172.30.27.29
-   IdentityFile ~/.ssh/adrise_aws_ohio_staging.pem
-   ProxyCommand ssh -A -q -W %h:%p bastion-staging-1
-  ```
+1. Go to https://github.com/adRise/popper-config/actions/workflows/deploy.yml. Click the `Run workflow` dropdown on the right and make sure the branch is `roku_popper_staging` and Target Popper Environment is `staging`. Once confirmed, click the `Run workflow` button.
 
-  - where the "IdentityFile" is the PEM file you set up for the staging server as described in the SSH Access Instructions,
-  - where the "host" and "hostname" (the IP address) are the popper staging info gathered from the previous step
+2. This should make a new Deploy workflow. Click into it. It will take some to complete but once it gets to the Create Git Tag step look at that steps output. It should look somethign like:  
+`* [new tag]           20220525.205906Z_ea68a278 -> 20220525.205906Z_ea68a278`  
+In this case `20220525.205906Z_ea68a278` is our build id.
 
-- Once you have set up your ssh config file, you can now follow the directions on how to deploy your JSON popper configuration changes, see [[How to deploy to staging instructions](https://github.com/adRise/popper-config/blob/master/doc/Deployment.md#how-to-deploy-to-staging)]
+3. Connect to the VPN
+
+4. Run multifactor authentication for AWS. Typically this means running `vauth`. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
+
+5. Activate conda `conda activate infra`
+
+6. Run the following conda command replacing `<BUILD-ID>` with your actual build id from step 2
+
+```shell
+infra -y deploy -e staging kustomization \
+    -x app=popper-engine \
+    -x image=370025973162.dkr.ecr.us-east-2.amazonaws.com/popper-config  \
+    -x tag=<BUILD-ID> \
+    -x base=apps/staging/base/namespaces/staging-popper-roku
+```
+
+If all was successful you should be able to login to https://popper.tubi.io/ and see the experiment show up under the `roku-staging` environment.
 
 ## Setting up the experiment within the Roku Code:
 

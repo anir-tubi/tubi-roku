@@ -35,7 +35,7 @@ Function TubiExperiments(constants) as Object
       '//When enabled = true, the "roku_icts_skip_new_v1" experiment should have a boolean field labeled "initially_focus_skip", a boolean field labeled "live_tv_first" and a boolean field labeled "show_me_everything"
       '//   if enabled=true and initially_focus_skip=true, live_tv_first=false and show_me_everything=false, then we will focus on the skip button
       '//   if enabled=true and initially_focus_skip=false, live_tv_first=true and show_me_everything=false, then live tv will be first and we will focus on it
-      '//   if enabled=true and initially_focus_skip=true, live_tv_first=true and show_me_everything=true, then we will focus on the skip button and it will have the show me everything text
+      '//   if enabled=true and initially_focus_skip=true, live_tv_first=false and show_me_everything=true, then we will focus on the skip button and it will have the show me everything text
       roku_icts_skip_new: {
         roku_icts_skip_new_v1: {"enabled": true, "initially_focus_skip": true, "live_tv_first": false, "show_me_everything": true}
       }
