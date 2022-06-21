@@ -7,7 +7,7 @@ Function init()
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("height", "onHeightChange")
   m.top.observeField("active", "onActiveChange")
-  m.sidenavSubtxtExp =  getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", false).subtext_sidenav = true
+  m.sidenavSubtxtExp = getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", false).subtext_sidenav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_sidenav = true
 End Function
 
 ''''''''''''''''''

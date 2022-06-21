@@ -499,7 +499,7 @@ Function onSideNavSignInCompleted()
   setContentToRefreshAllPersonalizedScreens()
 
   refreshAllDetailScreens()
-  if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true
+  if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_topnav = true
     refreshAllHomeScreenTopNav()
   end if
   setSideNavSignedInItem(m.global.authInfo)
@@ -579,7 +579,7 @@ Function onQueueAfterSignIn()
 
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
-  if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true
+  if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_topnav = true
     refreshAllHomeScreenTopNav()
   end if
 
@@ -616,7 +616,7 @@ Function onRegistrationProcessCompletedOnDetailsScreen()
     currentScreen.refreshContent = true
     currentScreen.setFocus(true)
     currentScreen.jumpToItem = 0
-    if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true
+    if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_topnav = true
       refreshAllHomeScreenTopNav()
     end if
   end if
@@ -670,7 +670,7 @@ Function onSideNavMyListAfterSignIn()
     ' this happens when user logs in via categoryDetailsScreen (queue/mylist)
     content = CreateObject("roSGNode", "CategoryContentNode")
     content.id = m.constants.ui.categoryIds.queue
-    if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true
+    if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_topnav = true
       refreshAllHomeScreenTopNav()
     end if
     fetchCategoryDetails(content)
@@ -688,7 +688,7 @@ Function onAutoplayPreviewAfterSignIn()
 
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
-  if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true
+  if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_topnav = true
     refreshAllHomeScreenTopNav()
   end if
 

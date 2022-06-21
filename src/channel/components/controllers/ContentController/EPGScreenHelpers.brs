@@ -94,12 +94,16 @@ End Function
 Function onEPGScreenFocusChange(msg)
   tubiLog("EPGScreenHelpers.onEPGScreenFocusChange")
   epgScreen = msg.getRoSGNode()
-  if epgScreen <> invalid and epgScreen.isInFocusChain() = true and m.deeplinkContent = invalid
+  if epgScreen <> invalid and epgScreen.isInFocusChain() = true
     '//Fire experiment exposure event when the EPG Screen is focused - just in case there is a deep link to linear content
-    '//::NOTE:: delete this function once the experiment is over
-    getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", true)
+    '//::TODO NOTE:: delete this function once the experiment is over
+    if m.deeplinkContent = invalid
+      getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", true)
+    end if
+
     if isLoggedInUser() = false
       getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", true)
+      getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", true)
     end if
   end if
 End Function

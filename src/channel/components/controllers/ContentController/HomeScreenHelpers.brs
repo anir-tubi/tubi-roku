@@ -126,14 +126,16 @@ End Function
 Function onHomeScreenFocusChange(msg)
   tubiLog("HomeScreenHelpers.onHomeScreenFocusChange")
   screen = msg.getRoSGNode()
-  if screen <> invalid and screen.isInFocusChain() = true and m.deeplinkContent = invalid
-    if isParentalControlsAdultLevel() = true and isKidsUIOn() = false
+  if screen <> invalid and screen.isInFocusChain() = true
+    if isParentalControlsAdultLevel() = true and isKidsUIOn() = false and m.deeplinkContent = invalid
       '//Fire experiment exposure event when the Home Screen is focused - just in case there is a deep link to linear content
       '//::NOTE:: delete this function once the experiment is over
       getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", true)
     end if
+
     if isLoggedInUser() = false
       getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", true)
+      getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", true)
     end if
   end if
 
@@ -494,7 +496,7 @@ Function setEnableTopNavOnHomescreen(homeScreen)
       refreshNeeded = true
     end if
 
-    if homeScreen.signedIn <> isLoggedInUser() and getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true
+    if homeScreen.signedIn <> isLoggedInUser() and (getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_topnav = true)
       refreshNeeded = true
     end if
   end if

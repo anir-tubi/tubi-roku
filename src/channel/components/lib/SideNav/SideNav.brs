@@ -117,7 +117,7 @@ Function createMainContent(item)
       contentNode.title = signTxt
     end if
 
-    if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", false).subtext_sidenav = true
+    if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", false).subtext_sidenav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_sidenav = true
       if contentNode.title = signTxt  'if title is 'SignIn', that means, user has signed out=>set subtext also 'SignIn'
         contentNode.shortDescriptionLine1 = signTxt
       else
@@ -226,7 +226,7 @@ End Function
 Function onSignInChange()
   if m.profileContent <> invalid
     m.profileContent.title = m.top.stringSignIn
-    if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", false).subtext_sidenav = true
+    if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", false).subtext_sidenav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_sidenav = true
 
       signTxt = getTranslation("menu_signIn")
       if m.profileContent.title = signTxt
