@@ -442,6 +442,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       video_id: -1
       end_position: -1 'ms
       page_type: "" 'current screen
+      has_completed: false
     }
 
     preview_play_progress: {
