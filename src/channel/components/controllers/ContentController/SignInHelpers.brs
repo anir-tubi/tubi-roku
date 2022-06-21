@@ -466,8 +466,8 @@ Function onPostSignInAuthInfoUpdated()
     m.callbackAfterSignIn = invalid ' setting to invalid to avoid future callbacks
     callbackAfterSignIn()
   else
-    ' this should not happen but restart the channel in case it somehow does
-    restartChannel()
+    ' this should not happen but start the channel in case it somehow does
+    startChannel()
   end if
 End Function
 
@@ -505,7 +505,7 @@ Function onSideNavSignInCompleted()
   setSideNavSignedInItem(m.global.authInfo)
 
   ' this happens when a user signs out or user signs in from the side nav or from settings side nav
-  restartChannel()
+  startChannel()
 
 End Function
 
@@ -616,7 +616,7 @@ Function onCWRowAfterSignIn()
 
   setContentToRefreshAllPersonalizedScreens()
 
-  restartChannel()
+  startChannel()
 End Function
 
 
@@ -693,7 +693,7 @@ Function onSideNavMyListAfterSignIn()
     setContentToRefreshAllPersonalizedScreens()
   else
     ' don't expect this to happen, keeping here as a fallback mechanism
-    restartChannel()
+    startChannel()
   end if
 End Function
 
