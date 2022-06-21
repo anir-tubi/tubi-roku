@@ -2142,6 +2142,10 @@ Function getTranslation_es_MX()
       "description": "When content is sponsored by an advertizer, then this text proceeds the image of the sponsor. The text and the image should make a complete sentence.",
       "message": "Traído a ti por"
     },
+    "registration_signIn_recommended": {
+      "description": "text appended to recommended row label to subtly remind users that they are signed out so that they understand that they need to sign-in to use Tubi at its fullest",
+      "message": "Inicia Sesión para una experiencia personalizada"
+    },
     "screenEndCard_startingIn": {
       "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
       "message": "Comenzando en {seconds} s"
@@ -2474,7 +2478,7 @@ Function getTranslation_es_MX()
     },
     "onBoarding_landingScreen_description": {
       "description": "Description displayed on onBoarding Landing screen",
-      "message": "No se requiere tarjeta de crédito * Gratis siempre"
+      "message": "Tarjeta de Crédito No Requerida • Gratis Siempre"
     },
     "onBoarding_landingScreen_addListLabel": {
       "description": "Label displayed on onBoarding Landing screen informing add to your list",
