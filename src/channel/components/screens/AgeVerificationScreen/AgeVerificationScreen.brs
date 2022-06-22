@@ -104,8 +104,8 @@ Function onNumberPadTextChanged(msg)
 End Function
 
 Function onAgeSubmittedChanged()
-  ' Want to reset the date on submit as the only time they will be coming back is if they were confirming their age and likely need to change it
-  refreshDateOnScreen(invalid)
+  ' Want to reset the numberpad text on submit as the only time they will be coming back is if they were confirming their age and likely need to change it
+    m.NumberPad.text = ""
 End Function
 
 
