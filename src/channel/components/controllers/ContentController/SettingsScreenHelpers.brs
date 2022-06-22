@@ -19,10 +19,6 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.observeFieldScoped("backButtonPressed", "onSettingsBackPressed")
   m.settingsScreen.observeFieldScoped("autoPreviewSettingSelected", "onAutoPreviewSettingSelected")
 
-  if isICTSExperimentEnabled() = true
-    m.displayICTSUponBackFromSettings = false
-  end if
-
   if screenLevel <> 0
     m.settingsScreen.screenLevel = screenLevel
   end if
@@ -309,8 +305,6 @@ Function refreshScreenAfterParentalChanges()
   setContentToRefresh(m.constants.ui.screenIds.tvScreen)
   setContentToRefresh(m.constants.ui.screenIds.movieScreen)
   setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
-  setContentToRefresh(m.constants.ui.screenIds.bestKnownScreen)
-  setContentToRefresh(m.constants.ui.screenIds.nostalgiaScreen)
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
@@ -349,32 +343,12 @@ Function updateParentalSettingsSuccessResponse(response)
     end if
 
     if m.settingsScreen.parentalSettingSelected < 2
-      if isICTSExperimentEnabled() = true
-        '//change the side nav options if the experiment variant is enabled
-        m.SideNav.displayKids = true
-        m.SideNav.displayContentExperience = false
-        m.displayICTSUponBackFromSettings = false
-      end if
       setUiMode(m.constants.ui.modes.kidsParental)
     else
       '//turn off kids mode (if it is on) when switching to teens and greater
       '// Also, disable the manual version of kids mode if the user had previously enabled kids mode manually
       if isKidsUIOn() = true
         setUiMode(m.constants.ui.modes.standard)
-      end if
-
-      if isICTSExperimentEnabled() = true
-        '//change the side nav options if the experiment variant is enabled
-        m.SideNav.displayKids = false
-
-        if isParentalControlsAdultLevel() = true
-          m.SideNav.displayContentExperience = true
-          m.displayICTSUponBackFromSettings = true
-        else
-          ' don't show content experiences for teens parental controls
-          m.SideNav.displayContentExperience = false
-          m.displayICTSUponBackFromSettings = false
-        end if
       end if
     end if
 
@@ -459,13 +433,8 @@ End Function
 
 
 Function onSettingsBackPressed()
-  if isICTSExperimentEnabled() = true and m.displayICTSUponBackFromSettings = true
-    m.displayICTSUponBackFromSettings = false
-    displayInitialContentScreen()
-  else
-    onKeyEvent("back", true)
-    onKeyEvent("back", false)
-  end if
+  onKeyEvent("back", true)
+  onKeyEvent("back", false)
 End Function
 
 

@@ -22,130 +22,62 @@
   </interface>
 
   <children>
-    <Group id="controlGroup">
-      <Label
-        id="title"
-        vertAlign="center"
-        horizAlign="center"
-        width="1920"
-        height="84"
-        opacity="0"
-        translation="[0,184]">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="70" />
-      </Label>
-      <Label
-        id="subtitle"
-        vertAlign="center"
-        horizAlign="center"
-        width="1920"
-        height="42"
-        opacity="0"
-        translation="[0,283]">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="27" />
-      </Label>
+    <Label
+      id="title"
+      vertAlign="center"
+      horizAlign="center"
+      width="1920"
+      height="84"
+      opacity="0"
+      translation="[0,184]">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Bold.ttf"
+        size="70" />
+    </Label>
+    <Label
+      id="subtitle"
+      vertAlign="center"
+      horizAlign="center"
+      width="1920"
+      height="42"
+      opacity="0"
+      translation="[0,283]">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Medium.ttf"
+        size="27" />
+    </Label>
 
-      <Poster
-        id="InitialContentMenuBground"
-        width="1069"
-        height="491"
-        opacity="0"
-        translation="[240,396]"
-        uri="pkg:/images/initial-content-screen-menu-gradient.9.png"/>
+    <Poster
+      id="InitialContentMenuBground"
+      width="1069"
+      height="491"
+      opacity="0"
+      translation="[240,396]"
+      uri="pkg:/images/initial-content-screen-menu-gradient.9.png"/>
 
-      <MarkupGrid
-        id="controlInitialContentMenu"
-        translation="[336,456]"
-        rowHeights="[252]"
-        itemSize="[192, 410]"
-        columnSpacings="[36]"
-        numColumns="5"
-        numRows="1"
-        focusBitmapUri="pkg://images/menu-focus-initial-content-screen.png"
-        drawFocusFeedbackOnTop="false"
-        itemComponentName="ControlInitialContentItem"/>
+    <MarkupGrid
+      id="controlInitialContentMenu"
+      translation="[336,456]"
+      rowHeights="[252]"
+      itemSize="[192, 410]"
+      columnSpacings="[36]"
+      numColumns="5"
+      numRows="1"
+      focusBitmapUri="pkg://images/menu-focus-initial-content-screen.png"
+      drawFocusFeedbackOnTop="false"
+      itemComponentName="ControlInitialContentItem"/>
 
-      <SimpleButton
-        id="controlSkipButton"
-        visible="true"
-        opacity="0"
-        translation="[714,888]"
-        width="490"
-        height="96"
-        color="0x9699a3FF"
-        unfocusedBackgroundOpacity=".16"/>
-    </Group>
-
-    <Group id="variantGroup">
-      <CrossFadePoster
-        id="headerPoster"
-        width="1704"
-        height="420"
-        animationDuration="0.5"
-        opacity="0"
-        translation="[120, 0]" />
-      <Label
-        id="titleLabel"
-        width="1920"
-        horizAlign="center"
-        color="#FF501A"
-        opacity="0"
-        translation="[0, 198]">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="32" />
-      </Label>
-
-      <CrossFadeLabel
-        id="experienceTitleFadeLabel"
-        width="1920"
-        horizAlign="center"
-        color="#FFFFFF"
-        animationDuration="0.5"
-        opacity="0"
-        translation="[0, 246]">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="54" />
-      </CrossFadeLabel>
-      <CrossFadeLabel
-        id="experienceDescriptionFadeLabel"
-        width="1920"
-        horizAlign="center"
-        color="#D7DAE0"
-        animationDuration="0.5"
-        wrap="true"
-        opacity="0"
-        translation="[0, 312]">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="28" />
-      </CrossFadeLabel>
-      <MarkupGrid
-        id="InitialContentMenu"
-        translation="[0, 432]"
-        itemSize="[216, 216]"
-        columnSpacings="[24]"
-        numRows="1"
-        itemComponentName="InitialContentItem" />
-      <SimpleButton
-        id="SkipButton"
-        width="303"
-        height="84"
-        color="#9699A3"
-        fontSize="24"
-        unfocusedBackgroundOpacity=".16"
-        opacity="0"
-        translation="[808.5, 708]" />
-    </Group>
+    <SimpleButton
+      id="skipButton"
+      visible="true"
+      opacity="0"
+      translation="[714,888]"
+      width="490"
+      height="96"
+      color="0x9699a3FF"
+      unfocusedBackgroundOpacity=".16"/>
 
     <Timer
         id="FocusDelayTimer"

@@ -963,9 +963,6 @@ Function tubiTracking_getSideNavPageMap(constants)
     if sideNavIds.kidsMode <> invalid then map[sideNavIds.kidsMode] = "KIDS"
     if sideNavIds.profile <> invalid then map[sideNavIds.profile] = "ACCOUNT"
     if sideNavIds.linearEPG <> invalid then map[sideNavIds.linearEPG] = "LINEAR"
-    if sideNavIds.contentExperience <> invalid then map[sideNavIds.contentExperience] = "SWITCH_EXPERIENCE"
-    if sideNavIds.nostalgia <> invalid then map[sideNavIds.nostalgia] = "NOSTALGIA"
-    if sideNavIds.bestKnown <> invalid then map[sideNavIds.bestKnown] = "A_LIST"
     if sideNavIds.sports <> invalid then map[sideNavIds.sports] = "SPORTS"
     if sideNavIds.news <> invalid then map[sideNavIds.news] = "NEWS"
     if sideNavIds.entertainment <> invalid then map[sideNavIds.entertainment] = "ENTERTAINMENT"
@@ -987,8 +984,6 @@ Function tubiTracking_getHomePageContentModeMap(constants)
     if screenIds.linearTVScreen <> invalid then map[screenIds.linearTVScreen] = "CONTENT_MODE_LINEAR"
     if screenIds.epgScreen <> invalid then map[screenIds.epgScreen] = "CONTENT_MODE_LINEAR"
     if screenIds.espanolScreen <> invalid then map[screenIds.espanolScreen] = "CONTENT_MODE_LATINO"
-    if screenIds.nostalgiaScreen <> invalid then map[screenIds.nostalgiaScreen] = "CONTENT_MODE_NOSTALGIA"
-    if screenIds.bestKnownScreen <> invalid then map[screenIds.bestKnownScreen] = "CONTENT_MODE_ALIST"
   end if
   return map
 End Function

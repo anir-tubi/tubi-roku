@@ -53,19 +53,6 @@ Function initSideNav()
     m.SideNav.displayMoviesTV = false
   end if
 
-  if isICTSExperimentEnabled() = true
-    m.SideNav.displayEspanol = false
-    if isKidsUIOn() <> true
-      m.SideNav.displayKids = false
-    end if
-
-    if isParentalControlsAdultLevel() <> true
-      m.SideNav.displayContentExperience = false
-    end if
-  else
-    m.SideNav.displayContentExperience = false
-  end if
-
   'set the initial value for the sign in item string
   setSideNavSignedInItem(m.global.authInfo)
 End Function
@@ -189,9 +176,6 @@ Function onSideNavItemSelected()
         showSettingsScreen("SignInOutButton")
         bNewScreenCalledSuccess = true
       end if
-    else if itemSelectedId = m.constants.ui.sideNavIds.contentExperience
-      displayInitialContentScreen()
-      bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.kidsMode
       if itemSelected.turnedOn = true
         '//If the parental control settings are not set to kids, then this action is not limited
@@ -249,7 +233,6 @@ Function onSideNavItemSelected()
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.home
       if isKidsUIOn() <> true
-        m.contentExperienceMode = m.constants.ui.contentExperienceModes.standard
         setUiMode(m.constants.ui.modes.standard)
       end if
 
@@ -289,14 +272,6 @@ Function onSideNavItemSelected()
         showTVScreen()
         bNewScreenCalledSuccess = true
       end if
-    else if itemSelectedId = m.constants.ui.sideNavIds.nostalgia
-      setUiMode(m.constants.ui.modes.standard)
-      showNostalgiaScreen()
-      bNewScreenCalledSuccess = true
-    else if itemSelectedId = m.constants.ui.sideNavIds.bestKnown
-      setUiMode(m.constants.ui.modes.standard)
-      showBestKnownScreen()
-      bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.espanol
       if isKidsUIOn() = true
         bNewScreenCalledSuccess = false
@@ -439,17 +414,9 @@ Function disableKidsModeFromSideNav()
   setUiMode(m.constants.ui.modes.standard)
   refreshScreenAfterParentalChanges()
 
-  if isICTSExperimentEnabled() = true
-    '//change the side nav options if the experiment variant is enabled
-    m.SideNav.displayKids = false
-    m.SideNav.displayContentExperience = true
-    hideNavMenu(false)
-    displayInitialContentScreen()
-  else
-    showDefaultHomeScreen()
-    homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
-    focusSideNavOption(homeSideNavID)
-  end if
+  showDefaultHomeScreen()
+  homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
+  focusSideNavOption(homeSideNavID)
 End Function
 
 
@@ -580,16 +547,14 @@ Function getSideNavIdAssociatedWithScreen(screen)
 
   idsAssociatedWithHome = {}
   idsAssociatedWithHome[m.constants.ui.screenIds.homeScreen] = true
-  if isICTSExperimentEnabled() = false
-    idsAssociatedWithHome[m.constants.ui.screenIds.linearTVScreen] = true
-  end if
+  idsAssociatedWithHome[m.constants.ui.screenIds.linearTVScreen] = true
   idsAssociatedWithHome[m.constants.ui.screenIds.movieScreen] = true
   idsAssociatedWithHome[m.constants.ui.screenIds.tvScreen] = true
 
   idsAssociatedWithEpg = {}
 
   experiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false)
-  if experiment.side_nav = false and isICTSExperimentEnabled() = false
+  if experiment.side_nav = false
     '//if the new EPG live TV option is in the homescreen top nav, not side nav
     idsAssociatedWithHome[m.constants.ui.screenIds.epgScreen] = true
   else

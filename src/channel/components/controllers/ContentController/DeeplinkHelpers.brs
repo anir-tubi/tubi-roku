@@ -104,10 +104,6 @@ Function createDeeplinkContentFromStartupArgs(args)
         content.deeplinkType = "tvPage"
       else if args.page = "espanol"
         content.deeplinkType = "espanolPage"
-      else if args.page = "alist"
-        content.deeplinkType = "alistPage"
-      else if args.page = "nostalgia"
-        content.deeplinkType = "nostalgiaPage"
       else if args.page = "kids"
         content.deeplinkType = "kids"
       end if
@@ -217,10 +213,6 @@ Function handleDeeplinkContentByType()
       handleMoviesPageDeeplinkContent()
     else if m.deepLinkContent.deeplinkType = "kids"
       handleKidsPageDeeplinkContent()
-    else if m.deepLinkContent.deeplinkType = "nostalgiaPage"
-      handleNostalgiaPageDeeplinkContent()
-    else if m.deepLinkContent.deeplinkType = "alistPage"
-      handleBestKnownPageDeeplinkContent()
     else if m.deepLinkContent.deeplinktype = "espanolPage"
       handleEspanolPageDeeplinkContent()
     else if m.deepLinkContent.deeplinktype = "tvPage"
@@ -421,10 +413,6 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("channel_list_page", {})
     else if entryPoint = m.constants.deeplinks.entryPoints.espanol
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_LATINO"})
-    else if entryPoint = m.constants.deeplinks.entryPoints.nostalgia
-      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_NOSTALGIA"})
-    else if entryPoint = m.constants.deeplinks.entryPoints.bestKnown
-      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_ALIST"})
     else if entryPoint = m.constants.deeplinks.entryPoints.movies
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_MOVIE"})
     else if entryPoint = m.constants.deeplinks.entryPoints.tv
@@ -467,10 +455,6 @@ Function handleLinearDeeplinkContent()
         sCatSideNavID = m.constants.ui.sideNavIds.home
       end if
     else
-      if isICTSExperimentEnabled() = true
-        m.contentExperienceMode = m.constants.ui.contentExperienceModes.liveTV
-      end if
-
       ' without contentId(deeplinkContentId),  just display the default epg Screen or linear TV screen.
       if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = true
         if m.enteredFromDeepLink = true
@@ -585,53 +569,9 @@ Function handleEspanolPageDeeplinkContent()
     message = getTranslation("dialog_sideNavItemDisabled_Parental_description")
     showDeeplinkErrorModal(invalid, message)
   else
-    m.contentExperienceMode = m.constants.ui.contentExperienceModes.espanol
     setUiMode(m.constants.ui.modes.latino)
     showEspanolScreen()
-    if isICTSExperimentEnabled() = true
-      focusSideNavOption(m.constants.ui.sideNavIds.home)
-    else
-      focusSideNavOption(m.constants.ui.sideNavIds.espanol)
-    end if
-
-  end if
-  resetDeeplinkValues()
-End Function
-
-
-Function handleNostalgiaPageDeeplinkContent()
-  tubilog("DeeplinkHelpers.handleNostalgiaPageDeeplinkContent")
-  if m.enteredFromDeepLink = true
-    sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.nostalgia, m.Tracking, m.trackingLoggingTask, m.constants)
-  end if
-  if isParentalControlsAdultLevel() = false or m.uiMode = m.constants.ui.modes.kidsAgeGate
-    ' Display error message indicating to turn off the parental controls
-    message = getTranslation("dialog_sideNavItemDisabled_Parental_description")
-    showDeeplinkErrorModal(invalid, message)
-  else
-    m.contentExperienceMode = m.constants.ui.contentExperienceModes.nostalgia
-    setUiMode(m.constants.ui.modes.standard)
-    showNostalgiaScreen()
-    focusSideNavOption(m.constants.ui.sideNavIds.home)
-  end if
-  resetDeeplinkValues()
-End Function
-
-
-Function handleBestKnownPageDeeplinkContent()
-  tubilog("DeeplinkHelpers.handleBestKnownPageDeeplinkContent")
-  if m.enteredFromDeepLink = true
-    sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.bestKnown, m.Tracking, m.trackingLoggingTask, m.constants)
-  end if
-  if isParentalControlsAdultLevel() = false or m.uiMode = m.constants.ui.modes.kidsAgeGate
-    ' Display error message indicating to turn off the parental controls
-    message = getTranslation("dialog_sideNavItemDisabled_Parental_description")
-    showDeeplinkErrorModal(invalid, message)
-  else
-    m.contentExperienceMode = m.constants.ui.contentExperienceModes.bestKnown
-    setUiMode(m.constants.ui.modes.standard)
-    showBestKnownScreen()
-    focusSideNavOption(m.constants.ui.sideNavIds.home)
+    focusSideNavOption(m.constants.ui.sideNavIds.espanol)
   end if
   resetDeeplinkValues()
 End Function

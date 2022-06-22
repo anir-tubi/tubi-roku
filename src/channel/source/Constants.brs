@@ -819,21 +819,10 @@ Function getConstants()
       constants.ui.infoPanelModes.epg = "epg"
       constants.ui.infoPanelModes.linearsearch = "linear-search"
 
-      constants.ui.contentExperienceModes = {}
-      ' these are used as id for the content experience choices presented on the ICTS. Their primary use is for how the UI will look.
-      constants.ui.contentExperienceModes.standard = "standard"
-      constants.ui.contentExperienceModes.nostalgia = "nostalgia"
-      constants.ui.contentExperienceModes.bestKnown = "bestKnown"  ' refers to the A-List content experience
-      constants.ui.contentExperienceModes.liveTV = "liveTV"
-      constants.ui.contentExperienceModes.espanol = "espanol"
-      constants.ui.contentExperienceModes.kids = "kids"
-
     constants.ui.contentMode = {}
       ' these are also used for the content experience choices but are the value that is sent to the back end in our api requests
       constants.ui.contentMode.homescreen = "homescreen"
       constants.ui.contentMode.latino = "latino"
-      constants.ui.contentMode.bestKnown = "alist"
-      constants.ui.contentMode.nostalgia = "nostalgia"
       constants.ui.contentMode.movie = "movie"
       constants.ui.contentMode.tv = "tv"
       constants.ui.contentMode.linear = "linear"
@@ -879,8 +868,6 @@ Function getConstants()
       constants.ui.screenLevels.homeScreen = 10
       constants.ui.screenLevels.initialContentScreen = 20
       constants.ui.screenLevels.espanolScreen = 20
-      constants.ui.screenLevels.bestKnownScreen = 20
-      constants.ui.screenLevels.nostalgiaScreen = 20
       constants.ui.screenLevels.linearTVScreen = 20
       constants.ui.screenLevels.epgScreen = 20
       constants.ui.screenLevels.newsepgScreen = 20
@@ -936,8 +923,6 @@ Function getConstants()
       constants.ui.screenIds.newsEPGScreen = "newsEPGScreen"
       constants.ui.screenIds.entertainmentEPGScreen = "entertainmentEPGScreen"
       constants.ui.screenIds.emailVerificationScreen = "emailVerificationScreen"
-      constants.ui.screenIds.bestKnownScreen = "bestKnownScreen"  '//Note: BestKnown Screen refers to the A-List Screen
-      constants.ui.screenIds.nostalgiaScreen = "nostalgiaScreen"
       constants.ui.screenIds.welcomeScreen = "welcomeScreen"
       constants.ui.screenIds.freeForeverScreen = "freeForeverScreen"
       constants.ui.screenIds.availableDeviceScreen = "availableDeviceScreen"
@@ -963,8 +948,6 @@ Function getConstants()
       ' Note when returning to the page there were issues with MarkupGrid being in a bad state either
       ' due to the ArrayGrid items being recycled or some state of the MarkupGrid itself.
       constants.ui.cacheableScreenIds[constants.ui.screenIds.initialContentScreen] = false
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.bestKnownScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.nostalgiaScreen] = true
 
     constants.ui.componentIds = {}
     constants.ui.componentIds.videoPreviewPlayer = "VideoPreviewPlayer"
@@ -1015,8 +998,6 @@ Function getConstants()
       constants.ui.sideNavOpenIds[constants.ui.screenIds.channelListScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.categoryListScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.espanolScreen] = true
-      constants.ui.sideNavOpenIds[constants.ui.screenIds.bestKnownScreen] = true
-      constants.ui.sideNavOpenIds[constants.ui.screenIds.nostalgiaScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.linearTVScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.epgScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.movieScreen] = true
@@ -1038,13 +1019,10 @@ Function getConstants()
 
     constants.ui.sideNavIds = {}
       constants.ui.sideNavIds.home = "home"
-      constants.ui.sideNavIds.contentExperience = "contentExperience"
       constants.ui.sideNavIds.search = "search"
       constants.ui.sideNavIds.channels = "channels"
       constants.ui.sideNavIds.categories = "categories"
       constants.ui.sideNavIds.espanol = "espanol"
-      constants.ui.sideNavIds.nostalgia = "nostalgia"
-      constants.ui.sideNavIds.bestKnown = "bestKnown"
       constants.ui.sideNavIds.movies = "movies"
       constants.ui.sideNavIds.tv = "tv"
       constants.ui.sideNavIds.settings = "settings"
@@ -1067,7 +1045,6 @@ Function getConstants()
     'a map of screenIds to corresponding sideNavIds
     constants.ui.screenIdToSideNavId = {}
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.homeScreen] = constants.ui.sideNavIds.home
-      constants.ui.screenIdToSideNavId[constants.ui.screenIds.initialContentScreen] = constants.ui.sideNavIds.contentExperience
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.searchScreen] = constants.ui.sideNavIds.search
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.channelListScreen] = constants.ui.sideNavIds.channels
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.categoryListScreen] = constants.ui.sideNavIds.categories
@@ -1239,8 +1216,6 @@ Function getConstants()
       constants.deeplinks.entrypoints.category = "category"
       constants.deeplinks.entrypoints.channel = "channel"
       constants.deeplinks.entrypoints.espanol = "espanol"
-      constants.deeplinks.entrypoints.nostalgia = "nostalgia"
-      constants.deeplinks.entrypoints.bestKnown = "bestKnown"
       constants.deeplinks.entrypoints.movies = "movies"
       constants.deeplinks.entrypoints.tv = "tv"
       constants.deeplinks.entrypoints.categoryDetail = "categoryDetail"

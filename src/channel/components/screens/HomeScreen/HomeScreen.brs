@@ -213,10 +213,6 @@ Function onIDChange()
     m.top.screenLevel = m.constants.ui.screenLevels.espanolScreen
   else if m.top.id = m.constants.ui.screenIds.linearTVScreen
     m.top.screenLevel = m.constants.ui.screenLevels.linearTVScreen
-  else if m.top.id = m.constants.ui.screenIds.nostalgiaScreen
-    m.top.screenLevel = m.constants.ui.screenLevels.nostalgiaScreen
-  else if m.top.id = m.constants.ui.screenIds.bestKnownScreen
-    m.top.screenLevel = m.constants.ui.screenLevels.bestKnownScreen
   else
     m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
   end if

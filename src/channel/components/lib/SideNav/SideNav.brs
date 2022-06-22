@@ -12,7 +12,6 @@ Function init()
   m.top.observeFieldScoped("displayLinearTV", "onLinearTVDisplayChanged")
   m.top.observeFieldScoped("displayLinearEPG","onLinearEPGDisplayChanged")
   m.top.observeFieldScoped("displayMoviesTV", "onMovieTVDisplayChanged")
-  m.top.observeFieldScoped("displayContentExperience", "onContentExperienceDisplayChanged")
   m.top.observeFieldScoped("displayChannels", "onChannelsDisplayChanged")
   m.top.observeFieldScoped("displaySignIn", "onSignInDisplayChanged")
   m.top.observeFieldScoped("displayKids", "onKidsDisplayChanged")
@@ -76,9 +75,6 @@ Function createMainContent(item)
   else if item = m.constants.ui.sideNavIds.tv
     contentNode.title = getTranslation("menu_tv")
     contentNode.iconUrl = "pkg:/images/sideNavTV.png"
-  else if item = m.constants.ui.sideNavIds.contentExperience
-    contentNode.title = getTranslation("menu_contentExperience")
-    contentNode.iconUrl = "pkg:/images/sideNavContentExperience.png"
   else if item = m.constants.ui.sideNavIds.espanol
     contentNode.title = "Español"
     contentNode.iconUrl = "pkg:/images/sideNavEspanol.png"
@@ -159,7 +155,6 @@ Function onCreateMenuItems()
       m.constants.ui.sideNavIds.kidsMode
       m.constants.ui.sideNavIds.search
       m.constants.ui.sideNavIds.linearEPG
-      m.constants.ui.sideNavIds.contentExperience
       m.constants.ui.sideNavIds.home
       m.constants.ui.sideNavIds.movies
       m.constants.ui.sideNavIds.tv
@@ -175,7 +170,6 @@ Function onCreateMenuItems()
       m.constants.ui.sideNavIds.profile
       m.constants.ui.sideNavIds.kidsMode
       m.constants.ui.sideNavIds.search
-      m.constants.ui.sideNavIds.contentExperience
       m.constants.ui.sideNavIds.home
       m.constants.ui.sideNavIds.movies
       m.constants.ui.sideNavIds.tv
@@ -324,19 +318,6 @@ Function onMovieTVDisplayChanged()
 End Function
 
 
-' Hide the ContentExperience item if this is called
-Function onContentExperienceDisplayChanged()
-  if m.top.displayContentExperience = false
-    ' Remove the ContentExperience icon if that item should be hidden.
-    removeContentExperience()
-    verticallyCenterSideNav()
-  else
-    ' Display the Content Experience Menu item if the item should be displayed
-    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.contentExperience)
-  end if
-End Function
-
-
 ' Hide the Channels item if this is called
 Function onChannelsDisplayChanged()
   if m.top.displayChannels = false
@@ -464,7 +445,6 @@ Function onUiModeChanged()
     removeKids()
     removeMovies()
     removeTv()
-    removeContentExperience()
     removeChannels()
     removeEspanol()
     removeLinearTV()
@@ -558,18 +538,6 @@ Function removeTv()
   if m.tvContentSelect <> invalid
     m.MainContentSelect.removeChild(m.tvContentSelect)
     m.tvContentSelect = invalid
-  end if
-End Function
-
-
-Function removeContentExperience()
-  if m.contentExperienceContent <> invalid
-    m.MainContent.removeChild(m.contentExperienceContent)
-    m.contentExperienceContent = invalid
-  end if
-  if m.contentExperienceContentSelect <> invalid
-    m.MainContentSelect.removeChild(m.contentExperienceContentSelect)
-    m.contentExperienceContentSelect = invalid
   end if
 End Function
 

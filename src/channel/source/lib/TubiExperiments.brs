@@ -32,25 +32,9 @@ Function TubiExperiments(constants) as Object
         roku_linear_epg_v5: { "enabled": true, "side_nav": false, "update_homescreen": false}
       }
 
-      '//When enabled = true, the "roku_icts_skip_new_v1" experiment should have a boolean field labeled "initially_focus_skip", a boolean field labeled "live_tv_first" and a boolean field labeled "show_me_everything"
-      '//   if enabled=true and initially_focus_skip=true, live_tv_first=false and show_me_everything=false, then we will focus on the skip button
-      '//   if enabled=true and initially_focus_skip=false, live_tv_first=true and show_me_everything=false, then live tv will be first and we will focus on it
-      '//   if enabled=true and initially_focus_skip=true, live_tv_first=false and show_me_everything=true, then we will focus on the skip button and it will have the show me everything text
-      roku_icts_skip_new: {
-        roku_icts_skip_new_v1: {"enabled": true, "initially_focus_skip": true, "live_tv_first": false, "show_me_everything": true}
-      }
 
       roku_in_pod_stitching: {
         roku_in_pod_stitching_v1: {"enabled": false}
-      }
-
-      '//When enabled = true, the "roku_icts_content_modes_v1" experiment should have a boolean field labeled "show_background_images" and a boolean field labeled "live_tv_first"
-      '//   if enabled=true and show_background_images=true and live_tv_first=false, then we will show background images and a-list will be first
-      '//     roku_icts_content_modes_v1: {"enabled": true, "show_background_images": true, "live_tv_first": false}
-      '//   if enabled=true and show_background_images=false and live_tv_first=true, then we will not show background images and live tv will be first and show me everything will be focused first
-      '//     roku_icts_content_modes_v1: {"enabled": true, "show_background_images": false, "live_tv_first": false}
-      roku_icts_content_modes: {
-        roku_icts_content_modes_v1: {"enabled": false, "show_background_images": false, "live_tv_first": false}
       }
 
       roku_register_signup_to_save: {

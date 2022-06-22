@@ -5,16 +5,8 @@ Function pushScreen(screen As Object, sendNavigateEvents = true, sendLoadingEven
   m.sentSponsorPixels = {} '//refresh this associative array that keeps track of the viewing of the sponsor images. Only send out the sponsor pixels once per page load so refresh upon a loading of a new screen.
   setSponsorshipBackground("") '//reset the sponsorship background whenever a screen is pushed
 
-  if isKidsUIOn() = false and screen.subtype() = "HomeScreen"
-    showExperienceLogo(m.contentExperienceMode)
-  end if
-
   current = m.screenStack.current
   if current <> invalid
-    if isKidsUIOn() = false and current.subtype() = "HomeScreen"
-      hideExperienceLogo()
-    end if
-
     'handle user tracking for navigating to screen
     if sendNavigateEvents = true
       screenTrackingNavigate(current.trackingPageInfo, screen.trackingPageInfo, current.trackingComponentInfo)
@@ -60,12 +52,6 @@ Function popScreen(sendNavigateEvents = true, sendLoadingEvents = true)
 
   toBePopped = getCurrentScreen()
   topHidden = getHiddenScreen(1)
-  if topHidden <> invalid and isKidsUIOn() = false and topHidden.subtype() = "HomeScreen"
-    if topHidden.id = m.constants.ui.screenIds.homeScreen
-      m.contentExperienceMode = m.constants.ui.contentExperienceModes.standard
-    end if
-    showExperienceLogo(m.contentExperienceMode)
-  end if
 
   ' If the screen to be popped is the only screen, it will leave an empty screen stack.
   ' In the case of an empty screen stack, we will build a home page. From an analytics standpoint

@@ -38,14 +38,6 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
       homeScreen.componentToFocus = m.constants.ui.homescreen.focusItems.contentGrid
     end if
 
-    ' Reset user back to the top of the content when they return to content experience homepage
-    if isICTSExperimentEnabled() = true
-      screenIds = constants.ui.screenIds
-      if screenID = screenIds.nostalgiaScreen or screenID = screenIds.bestKnownScreen or screenID = screenIds.linearTVScreen or screenID = screenIds.espanolScreen
-        homeScreen.jumpToRowItem = [0, 0]
-      end if
-    end if
-
     pushScreen(homeScreen, true, shouldSendPageLoadEvent)
   else
     showHideSpinner(true)
@@ -91,10 +83,6 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     else if screenID = constants.ui.screenIds.linearTVScreen
       sContentMode = constants.ui.contentMode.linear
       homeScreen.topNavSelectedId = constants.ui.sideNavIds.linearTV
-    else if screenID = constants.ui.screenIds.bestKnownScreen
-      sContentMode = constants.ui.contentMode.bestKnown
-    else if screenID = constants.ui.screenIds.nostalgiaScreen
-      sContentMode = constants.ui.contentMode.nostalgia
     end if
 
     homeScreen.contentMode = sContentMode
@@ -187,28 +175,6 @@ Function espanolBatchResponse(response)
 End Function
 
 
-Function nostalgiaBatchResponse(response)
-
-  screenID = m.constants.ui.screenIds.nostalgiaScreen
-  homeScreen = getFromScreenCache(screenID)
-  if homeScreen <> invalid
-    homeScreen.batchResponse = response
-  end if
-
-End Function
-
-
-Function bestKnownBatchResponse(response)
-
-  screenID = m.constants.ui.screenIds.bestKnownScreen
-  homeScreen = getFromScreenCache(screenID)
-  if homeScreen <> invalid
-    homeScreen.batchResponse = response
-  end if
-
-End Function
-
-
 Function LinearTVBatchResponse(response)
 
   screenID = m.constants.ui.screenIds.linearTVScreen
@@ -217,18 +183,6 @@ Function LinearTVBatchResponse(response)
     homeScreen.batchResponse = response
   end if
 
-End Function
-
-
-' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
-Function showNostalgiaScreen(componentToFocus = "")
-  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.nostalgiaScreen, componentToFocus)
-End Function
-
-
-' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
-Function showBestKnownScreen(componentToFocus = "")
-  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.bestKnownScreen, componentToFocus)
 End Function
 
 
@@ -258,7 +212,6 @@ End Function
 
 ' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
 Function showDefaultHomeScreen(componentToFocus = "")
-  m.contentExperienceMode = m.constants.ui.contentExperienceModes.standard
   showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.homeScreen, componentToFocus)
 End Function
 
@@ -274,16 +227,6 @@ End Function
 
 Function onReloadUserCategoriesResponseInEspanolScreen(response)
   onReloadUserCategoriesInHomeScreen(response, m.constants.ui.screenIds.espanolScreen)
-End Function
-
-
-Function onReloadUserCategoriesResponseInNostalgiaScreenScreen(response)
-  onReloadUserCategoriesInHomeScreen(response, m.constants.ui.screenIds.nostalgiaScreen)
-End Function
-
-
-Function onReloadUserCategoriesResponseInBestKnownScreenScreen(response)
-  onReloadUserCategoriesInHomeScreen(response, m.constants.ui.screenIds.bestKnownScreen)
 End Function
 
 
@@ -372,15 +315,6 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
     '//Stop loading of homescreen which will refresh the screen's content
     homeScreen.isLoading = false
   end if
-End Function
-
-Function onErrorReloadUserCategoriesInNostalgiaScreen(response)
-  onErrorReloadUserCategories(response, m.constants.ui.screenIds.nostalgiaScreen)
-End Function
-
-
-Function onErrorReloadUserCategoriesInBestKnownScreen(response)
-  onErrorReloadUserCategories(response, m.constants.ui.screenIds.bestKnownScreen)
 End Function
 
 
@@ -483,12 +417,6 @@ Function setEnableTopNavOnHomescreen(homeScreen)
     if homeScreen.id = m.constants.ui.screenIds.espanolScreen
       '//espanol is not in the topNav
       bTopNavAllowed = false
-    else if homeScreen.id = m.constants.ui.screenIds.nostalgiaScreen
-      '//this screen is not in the topNav
-      bTopNavAllowed = false
-    else if homeScreen.id = m.constants.ui.screenIds.bestKnownScreen
-      '//this screen is not in the topNav
-      bTopNavAllowed = false
     end if
 
     if homeScreen.enableTopNav <> bTopNavAllowed
@@ -548,12 +476,6 @@ Function fetchHomeScreen(homeScreen)
     else if homeScreen.id = m.constants.ui.screenIds.espanolScreen
       sucessHandler = onEspanolScreenSuccessResponse
       errorHandler = onEspanolScreenErrorResponse
-    else if homeScreen.id = m.constants.ui.screenIds.bestKnownScreen
-      sucessHandler = onBestKnownScreenSuccessResponse
-      errorHandler = onBestKnownScreenErrorResponse
-    else if homeScreen.id = m.constants.ui.screenIds.nostalgiaScreen
-      sucessHandler = onNostalgiaScreenSuccessResponse
-      errorHandler = onNostalgiaScreenErrorResponse
     else if homeScreen.id = m.constants.ui.screenIds.linearTVScreen
       sucessHandler = onLinearTVScreenSuccessResponse
       errorHandler = onLinearTVScreenErrorResponse
@@ -620,22 +542,6 @@ End Function
 '
 Function onEspanolScreenSuccessResponse(response)
   respondToHomeScreenSuccessResponse(m.constants.ui.screenIds.espanolScreen, response)
-End Function
-
-
-''''''''''''''''''''''''''''''
-' onNostalgiaScreenSuccessResponse
-'
-Function onNostalgiaScreenSuccessResponse(response)
-  respondToHomeScreenSuccessResponse(m.constants.ui.screenIds.nostalgiaScreen, response)
-End Function
-
-
-''''''''''''''''''''''''''''''
-' onBestKnownScreenSuccessResponse
-'
-Function onBestKnownScreenSuccessResponse(response)
-  respondToHomeScreenSuccessResponse(m.constants.ui.screenIds.bestKnownScreen, response)
 End Function
 
 
@@ -707,22 +613,6 @@ End Function
 '
 Function onEspanolScreenErrorResponse(response)
   handleHomeScreenErrorResponse(m.constants.ui.screenIds.espanolScreen, response)
-End Function
-
-
-''''''''''''''''''''''''''''''
-' onNostalgiaScreenErrorResponse
-'
-Function onNostalgiaScreenErrorResponse(response)
-  handleHomeScreenErrorResponse(m.constants.ui.screenIds.nostalgiaScreen, response)
-End Function
-
-
-''''''''''''''''''''''''''''''
-' onBestKnownScreenErrorResponse
-'
-Function onBestKnownScreenErrorResponse(response)
-  handleHomeScreenErrorResponse(m.constants.ui.screenIds.bestKnownScreen, response)
 End Function
 
 
@@ -1181,10 +1071,6 @@ Function onLoadCategoriesIndex(msg)
     batchResponseHandler = tvBatchResponse
   else if homeScreen.id = m.constants.ui.screenIds.espanolScreen
     batchResponseHandler = espanolBatchResponse
-  else if homeScreen.id = m.constants.ui.screenIds.bestKnownScreen
-    batchResponseHandler = bestKnownBatchResponse
-  else if homeScreen.id = m.constants.ui.screenIds.nostalgiaScreen
-    batchResponseHandler = nostalgiaBatchResponse
   else if homeScreen.id = m.constants.ui.screenIds.linearTVScreen
     batchResponseHandler = linearTVBatchResponse
   end if

@@ -44,9 +44,6 @@
       <!-- Should the sideNav display the movies/TV menu items? -->
       <field id="displayMoviesTV" value="true" type="boolean"/>
 
-      <!-- Should the sideNav display the ContentExperience menu item? -->
-      <field id="displayContentExperience" value="true" type="boolean"/>
-
       <!-- Should the sideNav display the channels menu item? -->
       <field id="displayChannels" value="true" type="boolean"/>
 

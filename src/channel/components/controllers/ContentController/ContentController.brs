@@ -5,8 +5,6 @@ Function init()
 
   m.constants = m.global.constants
 
-  m.contentExperienceMode = m.constants.ui.contentExperienceModes.standard
-
   ' Timer to find last time the app restarted
   m.lastAppRestartTimer = CreateObject("roTimespan")
 
@@ -51,7 +49,6 @@ Function init()
   m.logo = m.logoGroup.findNode("tubiLogo")
   m.logoKids = m.logoGroup.findNode("tubiKidsLogo")
   m.logoEspanol = m.logoGroup.findNode("tubiEspanolLogo")
-  m.experienceLogo = m.logoGroup.findNode("experienceLogo")
   m.clock = m.top.findNode("clock")
   m.spinner = m.top.findNode("ContentControllerSpinner")
   m.LinearVideoPlayerSpinner = m.top.findNode("LinearVideoPlayerSpinner")
@@ -987,12 +984,6 @@ Function setCommonKidsModeElements()
     m.backgroundGroup.kidsMode = true
     m.trackingLoggingTask.analyticsAppMode = "KIDS_MODE"
     tellScreensIfKidsModeBeSentToServer()
-
-    if isICTSExperimentEnabled(true) = true
-      '//change the side nav options if the experiment variant is enabled
-      m.SideNav.displayKids = true
-      m.SideNav.displayContentExperience = false
-    end if
   end if
 End Function
 
@@ -1044,55 +1035,22 @@ End Function
 
 
 Function showKidsLogo()
-  if isICTSExperimentEnabled(true) = true
-    showExperienceLogo(m.constants.ui.contentExperienceModes.kids)
-  else
-    m.logoKids.visible = true
-  end if
+ m.logoKids.visible = true
 End Function
 
 
 Function hideKidsLogo()
-  if isICTSExperimentEnabled() = true
-    hideExperienceLogo()
-  else
-    m.logoKids.visible = false
-  end if
+  m.logoKids.visible = false
 End Function
 
 
 Function showEspanolLogo()
-  if isICTSExperimentEnabled(true) = true
-    showExperienceLogo(m.constants.ui.contentExperienceModes.espanol)
-  else
-    m.logoEspanol.visible = true
-  end if
+  m.logoEspanol.visible = true
 End Function
 
 
 Function hideEspanolLogo()
-  if isICTSExperimentEnabled() = true
-    hideExperienceLogo()
-  else
-    m.logoEspanol.visible = false
-  end if
-End Function
-
-
-'@experienceId: string - identifier of which experience logo to show. one of constants.ui.contentExperienceModes
-Function showExperienceLogo(experienceId)
-  modes = m.constants.ui.contentExperienceModes
-  if isICTSExperimentEnabled(true) = true and experienceId <> modes.standard and experienceId <> modes.liveTV
-    m.experienceLogo.experienceId = experienceId
-    m.experienceLogo.visible = true
-  else
-    m.experienceLogo.visible = false
-  end if
-End Function
-
-
-Function hideExperienceLogo()
-  m.experienceLogo.visible = false
+  m.logoEspanol.visible = false
 End Function
 
 
@@ -1329,8 +1287,6 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   setContentToRefresh(m.constants.ui.screenIds.tvScreen)
   setContentToRefresh(m.constants.ui.screenIds.movieScreen)
   setContentToRefresh(m.constants.ui.screenIds.espanolScreen)
-  setContentToRefresh(m.constants.ui.screenIds.bestKnownScreen)
-  setContentToRefresh(m.constants.ui.screenIds.nostalgiaScreen)
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)

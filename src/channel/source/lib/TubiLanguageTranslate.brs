@@ -192,10 +192,6 @@ Function getTranslation_en_US()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the tv shows screen.",
       "message": "TV Shows"
     },
-    "menu_contentExperience": {
-      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the Content Experience screen.",
-      "message": "Switch Mode"
-    },
     "menu_livetv": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the live TV screen.",
       "message": "Live TV"
@@ -572,41 +568,9 @@ Function getTranslation_en_US()
       "description": "subTitle of the initial content screen when user is signed in",
       "message": "Pick something to watch"
     },
-    "screenInitialContent_bestKnown_menu_item_title": {
-      "description": "title of the A-List experience menu item",
-      "message": "A-List"
-    },
-    "screenInitialContent_bestKnown_menu_item_description": {
-      "description": "description of the A-List experience menu item",
-      "message": "Catch up on popular, critically acclaimed and recent movies and TV"
-    },
-    "screenInitialContent_nostalgia_menu_item_title": {
-      "description": "title of the nostalgia experience menu item",
-      "message": "Nostalgia"
-    },
-    "screenInitialContent_nostalgia_menu_item_description": {
-      "description": "description of the nostalgia experience menu item",
-      "message": "Revisit your favorite movies + tv shows\nfrom the past"
-    },
-    "screenInitialContent_live_tv_menu_item_description": {
-      "description": "description of the live tv experience menu item",
-      "message": "From breaking local and national news, to live sports +\nentertainment, watch what matters to you most"
-    },
-    "screenInitialContent_espanol_menu_item_description": {
-      "description": "description of the espanol experience menu item",
-      "message": "From TV shows to Documentaries and Movies,\nTubi has it all in Spanish"
-    },
-    "screenInitialContent_kids_menu_item_description": {
-      "description": "description of the kids experience menu item",
-      "message": "Animated adventures and heartwarming classics that\nthe whole family can enjoy."
-    },
     "screenInitialContent_show_everything_title": {
       "description": "title for button a user clicks to skip selecting a content experience",
       "message": "Show Me Everything"
-    },
-    "screenInitialContent_show_everything_description": {
-      "description": "description for button a user clicks to skip selecting a content experience",
-      "message": "Skip the selection for now. Show me the complete Tubi library."
     },
     "screenDetails_error_queueMovie_description": {
       "description": "Error message when a movie is not added to the user's list.",
@@ -1386,10 +1350,6 @@ Function getTranslation_es_MX()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the tv shows screen.",
       "message": "Series"
     },
-    "menu_contentExperience": {
-      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the Content Experience screen.",
-      "message": "Cambiar Modo"
-    },
     "menu_livetv": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the live TV screen.",
       "message": "TV En Vivo"
@@ -1766,41 +1726,9 @@ Function getTranslation_es_MX()
       "description": "subTitle of the initial content screen when user is signed in",
       "message": "Elige algo para ver"
     },
-    "screenInitialContent_bestKnown_menu_item_title": {
-      "description": "title of the A-List experience menu item",
-      "message": "Cine VIP"
-    },
-    "screenInitialContent_bestKnown_menu_item_description": {
-      "description": "description of the A-List experience menu item",
-      "message": "Ponte al día con películas y series populares, recientes y aclamados por críticos"
-    },
-    "screenInitialContent_nostalgia_menu_item_title": {
-      "description": "title of the nostalgia experience menu item",
-      "message": "Nostalgia"
-    },
-    "screenInitialContent_nostalgia_menu_item_description": {
-      "description": "description of the nostalgia experience menu item",
-      "message": "Vuelve a ver tus películas y series favoritas\ndel pasado"
-    },
-    "screenInitialContent_live_tv_menu_item_description": {
-      "description": "description of the live tv experience menu item",
-      "message": "Desde noticias locales y nacionales de última hora, hasta deportes en vivo +\nentretenimiento, ver lo que más te importa"
-    },
-    "screenInitialContent_espanol_menu_item_description": {
-      "description": "description of the espanol experience menu item",
-      "message": "Desde series de televisión hasta Documentales y Películas,\nTubi lo tiene todo en español"
-    },
-    "screenInitialContent_kids_menu_item_description": {
-      "description": "description of the kids experience menu item",
-      "message": "Aventuras animadas y clásicos conmovedores que\ntoda la familia puede disfrutar."
-    },
     "screenInitialContent_show_everything_title": {
       "description": "title for button a user clicks to skip selecting a content experience",
       "message": "Muestrame Todo"
-    },
-    "screenInitialContent_show_everything_description": {
-      "description": "description for button a user clicks to skip selecting a content experience",
-      "message": "Saltar la selección por ahora. Muéstrame el catálogo completo de Tubi."
     },
     "screenDetails_error_queueMovie_description": {
       "description": "Error message when a movie is not added to the user's list.",
