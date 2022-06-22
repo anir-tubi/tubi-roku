@@ -456,6 +456,10 @@ End Function
 ' handles the response of a user who has been presented an exit app modal
 Function onExitAppModalButtonSelected()
   sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionEnd, invalid, setExitAppWrapper, setExitAppWrapper)
+  m.trackingLoggingTask.trackEvent = {
+    type: "exit"
+    values: {}
+  }
 End Function
 
 
@@ -1623,6 +1627,10 @@ Function onCustomSuspend(msg)
 
   if customSuspendArgs.lastSuspendOrResumeReason = "home"
     sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionEnd)
+    m.trackingLoggingTask.trackEvent = {
+      type: "inactive"
+      values: {}
+    }
     m.appSuspendTimer.Mark()
     currentScreen = getCurrentScreen()
     ' if the current screen is videoplayer, return to detail screen so that it will update historyPosition and remove video screen from stack and show previous screen from stack

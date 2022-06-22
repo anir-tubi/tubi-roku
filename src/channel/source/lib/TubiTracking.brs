@@ -237,6 +237,12 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       resume: false 'optional
     }
 
+    inactive: {
+    }
+
+    exit: {
+    }
+
     referred: {
       referred_type: "" 'ReferredType enum
       campaign: ""
