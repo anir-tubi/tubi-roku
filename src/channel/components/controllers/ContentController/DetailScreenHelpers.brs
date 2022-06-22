@@ -258,10 +258,10 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     else
       detailScreen.mode = m.constants.ui.infoPanelModes.movie
     end if
-    if m.uiMode = m.constants.ui.modes.kidsAgeGate
-      detailScreen.isInKidsAgeGateMode = true
+    if isKidsUIOn() = true
+      detailScreen.isInKidsMode = true
     else
-      detailScreen.isInKidsAgeGateMode = false
+      detailScreen.isInKidsMode = false
     end if
     if episode <> invalid
       stateSource = episode
@@ -301,7 +301,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
 
     '//right now in kids mode, there are no channels showing up, so hardcode it so the channel's button doesn't show
     detailScreen.isChannelItem = (content.channelId <> invalid and content.channelId <> "" and isKidsUIOn() = false)
-    detailScreen.stringChannelButton = getTranslation("screenDetails_button_gotoChannel", { channel: content.channelName })
+    detailScreen.stringChannelButton = getTranslation("screenDetails_button_gotoChannel", {channel: content.channelName})
     detailScreen.length = stateSource.length 'needed to compute the resume bar on the resume button
 
     nResumePoint = 0
@@ -622,7 +622,7 @@ Function findNextEpisode2dIndex(currentItemFocused, contentNode)
       return [seasonIndex + 1, 0]
     end if
   end if
-  return [0,0]
+  return [0, 0]
 End Function
 
 
@@ -632,7 +632,7 @@ End Function
 ' @returns: 2D array, [season, episode] representing the first episode that is not watched to completion
 ' which is after the episode represented by the currentItemFocused array
 Function findNextEpisode(currentItemFocused, seriesContent)
-  nextEpisode = [0,0] ' initialize next episode to be first episode
+  nextEpisode = [0, 0] ' initialize next episode to be first episode
 
   if seriesContent <> invalid and currentItemFocused <> invalid and currentItemFocused.count() = 2
 
@@ -654,22 +654,22 @@ Function findNextEpisode(currentItemFocused, seriesContent)
             nowPos = 0
           end if
 
-          if item.creditsCuePoints <> invalid and item.creditsCuePoints.postlude <> invalid and nowPos < item.creditsCuePoints.postlude  then
-              return [i,j] ' first unwatched episode next to currently watched episode
+          if item.creditsCuePoints <> invalid and item.creditsCuePoints.postlude <> invalid and nowPos < item.creditsCuePoints.postlude then
+            return [i, j] ' first unwatched episode next to currently watched episode
           end if
         end for
-        episodeIndex = 0  'next season, so start from beginning
+        'bs:disable-next-line LINT1005
+        episodeIndex = 0 'next season, so start from beginning
       end for
 
 
       'if we ran out of all the episodes, return first episode as next episode
       if i = seriesContent.getChildCount() - 1 and j = seriesContent.getChild(i).getChildCount() - 1
-        nextEpisode = [0,0]
+        nextEpisode = [0, 0]
       end if
     end if
   end if
-return nextEpisode
-
+  return nextEpisode
 End Function
 
 
@@ -1244,7 +1244,7 @@ Function setComponentInteractionEventForSignUp(screen)
   pageInfo = screen.trackingPageInfo
   componentInteractionInfo = {
     pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-    componentOneof: m.Tracking.getAnalyticsComponent("button_component",  componentValues)
+    componentOneof: m.Tracking.getAnalyticsComponent("button_component", componentValues)
     user_interaction: "CONFIRM"
   }
   sendComponentInteractionInfo(componentInteractionInfo)
@@ -1258,7 +1258,7 @@ Function onDescriptionSelected(msg)
     type: "dialog"
     values: {
       dialog_type: "FULL_VIDEO_DESCRIPTION"
-      pageOneof: m.Tracking.getAnalyticsPage("video_page", { video_id: detailScreen.content.id.toInt() })
+      pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: detailScreen.content.id.toInt()})
       dialog_action: "SHOW" 'Action enum
       dialog_sub_type: "video-description" 'max 20 character string
     }
@@ -1288,7 +1288,7 @@ Function trailerHelper(screen)
       end if
 
       if content.title <> invalid
-        trailerContent.title = getTranslation("videoPlayer_trailerTitle", { title: content.title })
+        trailerContent.title = getTranslation("videoPlayer_trailerTitle", {title: content.title})
       end if
 
       trailerContent.streamformat = "hls"
@@ -1379,15 +1379,15 @@ End Function
 ' if data not present, it invokes content api
 Function onResume(msg)
   tubiLog("ContentController.onResume")
-    detailScreen = msg.getRoSGNode()
-    resumeVideoDetailScreen(detailScreen)
+  detailScreen = msg.getRoSGNode()
+  resumeVideoDetailScreen(detailScreen)
 
 End Function
 
 
 ' @detailScreen: roSGNode, detail screen node
 ' @playbackSource: string, valid values are "automatic", "deliberate", "previews" or "unknown"
-Function resumeVideoDetailScreen(detailScreen, playbackSource="unknown")
+Function resumeVideoDetailScreen(detailScreen, playbackSource = "unknown")
   tubiLog("DetailScreenHelpers.resumeVideoDetailScreen")
   if detailScreen <> invalid and isFetchingInProgress(detailScreen) <> true
     detailScreen.playbackSource = playbackSource
@@ -1397,7 +1397,7 @@ Function resumeVideoDetailScreen(detailScreen, playbackSource="unknown")
       m.actionType = resumeHelper
       detailScreen.isLoading = true
       getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
-      end if
+    end if
   end if
 
 End Function
@@ -1417,7 +1417,7 @@ End Function
 
 ' @detailScreen: roSGNode, detail screen node
 ' @playbackSource: string, valid values are "automatic", "deliberate", "previews" or "unknown"
-Function playVideoDetailScreen(detailScreen, playbackSource="unknown")
+Function playVideoDetailScreen(detailScreen, playbackSource = "unknown")
   tubiLog("DetailScreenHelpers.playVideoDetailScreen")
   if detailScreen <> invalid and isFetchingInProgress(detailScreen) <> true
     detailScreen.playbackSource = playbackSource

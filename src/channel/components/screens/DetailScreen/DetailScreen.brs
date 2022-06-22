@@ -40,7 +40,7 @@ Function init()
   m.top.observeFieldScoped("stringSignUpButton", "onStringChange")
   m.top.observeField("length", "onLengthChange")
   m.top.observeField("isSeries", "onIsSeries")
-  m.top.observeField("isInKidsAgeGateMode", "onIsInKidsAgeGateMode")
+  m.top.observeField("isInKidsMode", "onIsInKidsMode")
   m.top.observeField("isBookmark", "onIsBookmark")
   m.top.observeField("isHistory", "onIsHistory")
   m.top.observeField("isChannelItem", "onIsChannel")
@@ -327,12 +327,12 @@ Function onRemoveSignupButton(msg)
 End Function
 
 
-Function onIsInKidsAgeGateMode()
+Function onIsInKidsMode()
   if isLoggedInUser() = false and isNewUser() = false
     signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
-    if m.top.isInKidsAgeGateMode = true and signUpIndex > -1
+    if m.top.isInKidsMode = true and signUpIndex > -1
       addRemoveMenuItem(false, signUpIndex)
-    else if m.top.isInKidsAgeGateMode = false and signUpIndex = -1
+    else if m.top.isInKidsMode = false and signUpIndex = -1
       addRemoveMenuItem(true, signUpIndex, m.signUpMenuItem, [m.PlayMenuItem])
     end if
   end if
