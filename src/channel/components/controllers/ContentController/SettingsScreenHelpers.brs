@@ -383,10 +383,11 @@ End Function
 Function updateParentalSettingsErrorResponse(_error)
   tubiLog("SettingsScreenHelper.updateParentalSettingsErrorResponse")
   authInfo = getFieldFromGlobal("authInfo")
-
+  
   if isConfirmPasswordScreen() = true
+    m.confirmPasswordScreen.isLoading = false
     setAuthInfoValue("secondsOfSavedPassword", 0)
-
+    
     pageInfo = m.settingsScreen.trackingPageInfo
     dialogEvent = {
       type: "dialog"
