@@ -23,6 +23,11 @@ Function onContentChange(data)
     if m.sidenavSubtxtExp = true
       if item.shortDescriptionLine1 <> invalid
         m.subTxt.text = item.shortDescriptionLine1
+        if m.subTxt.text <> ""
+          'subTxt needs to be centered on the sideNav. Center position of the subtext calculated using safezone start point(114) + center point of the profile icon.
+          subTxtCenterPt = (114 + (m.Icon.boundingRect().width / 2)) - ( m.subTxt.boundingRect().width / 2 )
+          m.subTxt.translation = [subTxtCenterPt, 52]
+        end if
       else
         m.subTxt.text = ""
       end if

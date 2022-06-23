@@ -23,9 +23,9 @@
       height="36"/>
 
     <Label
-      translation="[100, 52]"
       id="subTxt"
       vertAlign="center"
+      horizAlign="left"
       color="0x8C8F98FF"
       opacity="0.8">
       <Font
