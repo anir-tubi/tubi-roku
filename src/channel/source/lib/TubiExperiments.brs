@@ -46,7 +46,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_update_icons: {
-        roku_update_icons_v1: {"enabled": false}
+        roku_update_icons_v1: {"enabled": true}
       }
 
       roku_registration_subtext_homegrid: {
