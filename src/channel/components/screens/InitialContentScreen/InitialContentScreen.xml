@@ -67,7 +67,7 @@
       numRows="1"
       focusBitmapUri="pkg://images/menu-focus-initial-content-screen.png"
       drawFocusFeedbackOnTop="false"
-      itemComponentName="ControlInitialContentItem"/>
+      itemComponentName="InitialContentItem"/>
 
     <SimpleButton
       id="skipButton"
