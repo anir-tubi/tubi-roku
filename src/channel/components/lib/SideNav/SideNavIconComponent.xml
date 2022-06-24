@@ -34,18 +34,23 @@
         uri="pkg:/fonts/Vaud-Bold.ttf"
         size="20" />
     </Label>
-
-    <Label
+    <LayoutGroup
+      id="LabelParent"
       translation="[162, 3]"
-      id="Label"
-      vertAlign="center"
-      color="0xFFFFFFFF"
-      opacity="0">
-      <Font
-          id="Font"
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="34" />
-    </Label>
+      layoutDirection="horiz"
+      itemSpacings="[12]"
+      vertAlignment="custom">
+      <Label
+        id="Label"
+        vertAlign="center"
+        color="0xFFFFFFFF"
+        opacity="0">
+        <Font
+            id="Font"
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="34" />
+      </Label>
+   </LayoutGroup>
   </children>
 </component>

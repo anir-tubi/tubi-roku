@@ -4,10 +4,12 @@ Function init()
   m.Label = m.top.findNode("Label")
   m.Icon = m.top.findNode("Icon")
   m.subTxt = m.top.findNode("subTxt")
+  m.labelParent = m.top.findNode("LabelParent")
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("height", "onHeightChange")
   m.top.observeField("active", "onActiveChange")
   m.sidenavSubtxtExp = getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", false).subtext_sidenav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_sidenav = true
+  m.sideIconLabel = invalid
 End Function
 
 ''''''''''''''''''
@@ -31,6 +33,30 @@ Function onContentChange(data)
       else
         m.subTxt.text = ""
       end if
+
+      'add free icon next to Label when sideNav is open
+      if item.shortDescriptionLine2 <> invalid
+        if item.shortDescriptionLine2 <> ""
+          if m.sideIconLabel = invalid
+            m.sideIconLabel = m.labelParent.createChild("TextIcon")
+            m.sideIconLabel.id = "SideIconLabel"
+            m.sideIconLabel.fontSize = 18
+            m.sideIconLabel.fontColor = "0x000000"
+            m.sideIconLabel.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
+            m.sideIconLabel.padding = [12, 9]
+            m.sideIconLabel.text = item.shortDescriptionLine2
+            m.sideIconLabel.uri = "pkg:/images/tag-rounded-rectangle-background-pull-{size}.9.png"
+            m.sideIconLabel.opacity = 0
+            m.sideIconLabel.translation = [0, 10]
+          end if
+        else if item.shortDescriptionLine2 = "" and m.sideIconLabel <> invalid
+          m.labelParent.removeChild(m.sideIconLabel)
+          m.sideIconLabel = invalid
+        end if
+      else if m.sideIconLabel <> invalid
+        m.labelParent.removeChild(m.sideIconLabel)
+        m.sideIconLabel = invalid
+      end if
     end if
 
     m.font.size = item.fontSize
@@ -52,6 +78,9 @@ Function onActiveChange()
       m.Icon.opacity = 1
       if m.sidenavSubtxtExp = true
         m.subTxt.opacity = 0
+        if m.sideIconLabel <> invalid
+          m.sideIconLabel.opacity = 1
+        end if
       end if
       fade(m.Label, "in", .1)
     else
@@ -59,6 +88,9 @@ Function onActiveChange()
       m.Icon.opacity = .31
       if m.sidenavSubtxtExp = true
         m.subTxt.opacity = 0.8
+        if m.sideIconLabel <> invalid
+          m.sideIconLabel.opacity = 1
+        end if
       end if
       fade(m.Label, "in", .1, 0, .31)
     end if
@@ -70,11 +102,17 @@ Function onActiveChange()
       m.Icon.opacity = 1
       if m.sidenavSubtxtExp = true
         m.subTxt.opacity = 0
+        if m.sideIconLabel <> invalid
+          m.sideIconLabel.opacity = 0
+        end if
       end if
     else
       m.Icon.opacity = .31
       if m.sidenavSubtxtExp = true
         m.subTxt.opacity = 0.8
+        if m.sideIconLabel <> invalid
+          m.sideIconLabel.opacity = 0
+        end if
       end if
     end if
   end if
