@@ -64,7 +64,7 @@
         -->
 
       <!--
-        - Written to by the main brightscript thread.
+        - Written to by AdsTask.
         - Possible values:  init, fetching, noads, adspending, adsplaying, adsclosed
         -->
       <field id="adState" type="string" value=""/>

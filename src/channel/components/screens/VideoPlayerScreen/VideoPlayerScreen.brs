@@ -116,6 +116,9 @@ Function init()
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
 
+  m.RAFAdContainer = m.top.findNode("RAFAdContainer")
+  m.RAFAdContainer.observeFieldScoped("change", "onRAFAdContainerChangeChange")
+
   m.AdsTask = m.top.findNode("AdsTask")
   m.AdsTask.videoPlayerNode = m.top
   m.AdsTask.control = "RUN"
@@ -833,6 +836,25 @@ Function onAdStateChange()
   else if m.top.adState = "adsclosed"
     m.top.setFocus(true)
     backButtonExit()
+  end if
+End Function
+
+
+' While we have an adsplaying state for adState that doesn't actually mean that ads are playing yet or that RAF has been setup yet.
+' For this reason we are observering the container we give to RAF to see when it adds its components and we can modify as needed
+Function onRAFAdContainerChangeChange(msg)
+  change = msg.getData()
+  if change.Operation = "add" then
+    ' When enableInPodStitching(true) the video player controls for the ad show when they shouldn't. This fixes that
+    ' TODO be sure to verify every RAF release to check if getchild(0) works as intended. Or better yet push Roku to fix it correctly :)
+    renderer = m.RAFAdContainer.getChild(0)
+    ' stitched ads uses RAFContentRenderer and regular uses RAFRenderer
+    if renderer <> invalid AND renderer.subtype() = "RAFContentRenderer" then
+      rafVideoNode = renderer.getChild(0)
+      if rafVideoNode <> invalid AND rafVideoNode.hasField("enableUI") then
+        rafVideoNode.enableUI = false
+      end if
+    end if
   end if
 End Function
 

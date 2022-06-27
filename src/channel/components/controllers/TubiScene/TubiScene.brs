@@ -13,14 +13,6 @@ Function init()
 
   m.top.observeField("fadeOutCustomSplash", "onFadeOutCustomSplash")
   m.top.observeField("fadeOutSpinner", "onFadeOutSpinner")
-
-  m.top.observeField("change", "onChildrenChange")
-End Function
-
-
-Function onChildrenChange()
-  m.top.unobserveField("change")
-  ' can consider putting an animated logo video here
 End Function
 
 
