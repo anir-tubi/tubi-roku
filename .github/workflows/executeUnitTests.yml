@@ -18,7 +18,7 @@ jobs:
     # name helps to check the status of github action
     name: Execute Unit Tests
     # The type of runner that the job will run. self hosted machine is our own machine setup in SF office and it has dedicated connected roku device.
-    runs-on: self-hosted
+    runs-on: [self-hosted, roku-build-server]
     # timeouts after 10 minutes, if the execution/unit test got stuck/crash
     timeout-minutes: 10
 
