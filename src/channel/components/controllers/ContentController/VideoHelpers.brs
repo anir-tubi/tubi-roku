@@ -194,44 +194,59 @@ End Function
 ' updateHistory
 '
 ' triggers backend API to bookmark video position
-Function updateHistory(content, nowPos)
-
+' @content: roSGNode, TubiContentNode
+' @nowPos: integer, a playback position which will be passed to the history API
+' @isFireAndForget: boolean, true to not handle the history response
+'                            false to handle the history response (only needed when exiting playback)
+Function updateHistory(content, nowPos, isFireAndForget = true)
   if isLoggedInUser() and content["type"] = m.constants.ui.contentTypes.video
 
     bKidsMode = shouldKidsModeBeSentToServer()
     postUserHistory = m.Bookmarks.addHistoryReq(content, nowPos, bKidsMode)
 
     if postUserHistory <> invalid
+
+      successCallback = invalid
+      inputContent = invalid
+      inputNowPos = invalid
+      if isFireAndForget = false
+        successCallback = onHistorySuccess
+        inputContent = content
+        inputNowPos = nowPos
+      end if
+
       m.makeRequest({
         url: postUserHistory.url
         requestType: m.constants.reqNames.postUserHistory
         options: postUserHistory.options
-        successCallback: onHistorySuccess
-        responseType: "assocarray"
+        successCallback: successCallback
         silenceCallbackWarnings: true
+        responseType: "node"
+        content: inputContent
+        nowPos: inputNowPos
       })
     end if
-
   end if
+End Function
 
+
+' Wrapper around updateHistory which will ensure the response to the history POST request is handled
+'
+' @content: roSGNode, TubiContentNode
+' @nowPos: integer, a playback position which will be passed to the history API
+Function updateHistoryAndHandleResponse(content, nowPos)
+  updateHistory(content, nowPos, false)
 End Function
 
 
 ' onHistorySuccess
 '
-' triggers once the API responds for bookmark API
-Function onHistorySuccess(parsedResponse)
-
-  historyResult = {}
-  if parsedResponse <> invalid and parsedResponse.id <> invalid
-    if parsedResponse.episodes <> invalid and type(parsedResponse.episodes) = "roArray" and parsedResponse.episodes.count() > 0
-      historyResult.historyId = parsedResponse.episodes[0].id
-      historyResult.parentHistoryId = parsedResponse.id
-    else
-      historyResult.historyId = parsedResponse.id
-    end if
+' triggers once the API responds for history API
+Function onHistorySuccess(content)
+  tubiLog("VideoHelpers.onHistorySuccess")
+  if content <> invalid
+    m.Bookmarks.addHistoryLocally(content, content.nowPos, m.global)
   end if
-
 End Function
 
 
@@ -239,9 +254,7 @@ End Function
 '
 ' updates the history locally for signedIn user & guest user
 Function updateHistoryLocally(content as Object, position as Integer)
-
   m.Bookmarks.addHistoryLocally(content, position, m.global)
-
 End Function
 
 
@@ -446,19 +459,20 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
       detailContent = detailScreen.content 'can be movie or series
     end if
 
-    nResumePoint = round(videoPlayer.position)
+    historyPosition = round(videoPlayer.position)
+    detailScreenResumePosition = historyPosition
 
-    isEndReached = (videoContent.creditsCuePoints <> invalid and videoContent.creditsCuePoints.postlude <> invalid and videoContent.creditsCuePoints.postlude > 0 and nResumePoint > videoContent.creditsCuePoints.postlude)
+    isEndReached = (videoContent.creditsCuePoints <> invalid and videoContent.creditsCuePoints.postlude <> invalid and videoContent.creditsCuePoints.postlude > 0 and detailScreenResumePosition > videoContent.creditsCuePoints.postlude)
     ' So the detailed page does not have a refresh issue, pass the local resume number before the backend communicates.
     ' The problem with this is that if the backend comes back with a different number than the local
     ' number then there is still a screen redraw issue: i.e. user watches only 2 seconds of a video.
     ' The local number is 2 seconds and displays the resume button, but the backend determines that 2
     ' seconds is not enough to warrant a resume button and returns 0 as the resume point.
-    if nResumePoint < m.constants.player.historyFrequency or (isEndReached = true and detailContent <> invalid and detailContent.type <> m.constants.ui.contentTypes.series)
+    if detailScreenResumePosition < m.constants.player.historyFrequency or (isEndReached = true and detailContent <> invalid and detailContent.type <> m.constants.ui.contentTypes.series)
       '//If the video is either at the very beginning or at the very end, then it should pass the local resume point as 0.
       ' if content type is series, we do not need to reset the resumepoint to 0 because it will lose the watch history. But in case of movies,
       ' if user watches till the end, we need to reset the resumepoint to 0.
-      nResumePoint = 0
+      detailScreenResumePosition = 0
     end if
 
     ' Do the appropriate action based on the cases as described in the function definition comments
@@ -480,14 +494,20 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
         ' Still in the same series - possibly autoplayed, or possibly same episode
         ' update some info in the detail screen content and repopulate with that content
         detailContent.currentEpisodeId = videoContent.id
-        populateDetailScreen(detailScreen, detailContent, false, nResumePoint)
+        populateDetailScreen(detailScreen, detailContent, false, detailScreenResumePosition)
 
         'updating the history if user has watched more than historyFrequency or postlude reached
-        if nResumePoint > 0 or isEndReached = true
+        if historyPosition > 0 or isEndReached = true
           ' For SignedIn/guest user, update resume point to global variable
-          updateHistoryLocally(videoContent, nResumePoint)
-          ' For SignedIn user, update resume point to backend
-          updateHistory(videoContent, nResumePoint)
+          updateHistoryLocally(videoContent, historyPosition)
+
+          ' For SignedIn user, update resume point to backend.
+          ' When the update history response's succcess callback  is triggered, it will overwrite
+          ' whatever was set in the global history object by the previous call to updateHistoryLocally.
+          ' We keep both calls in case there is an error when sending to the server, and also to
+          ' avoid race conditions where the user could see the details screen before the history
+          ' request resolves.
+          updateHistoryAndHandleResponse(videoContent, historyPosition)
         end if
 
         ' Repopulate the episodes screen if it is the screen under the video player screen in the call stack
@@ -497,7 +517,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
           episodesScreen = hiddenScreen
 
           itemFocused = findEpisode2dIndex(detailContent.currentEpisodeId, detailContent)
-          updateNowPosForEpisode(detailContent, itemFocused, nResumePoint)
+          updateNowPosForEpisode(detailContent, itemFocused, historyPosition)
 
           episodesScreen.content = detailContent
           episodesScreen.updateContent = true
@@ -535,14 +555,20 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
         ' Returning to the detail screen for the same movie as was started, no autoplay
         ' Just repopulate the detail screen with the same content
         'updating the history if user has watched more than historyFrequency or postlude reached
-        if nResumePoint > 0 or isEndReached = true
-          ' For SignedIn/guest user, update resume point to global variable
-          updateHistoryLocally(videoContent, nResumePoint)
+        if historyPosition > 0 or isEndReached = true
+          ' For SignedIn/guest user, update resume point to global variable.
+          updateHistoryLocally(videoContent, historyPosition)
+
           ' For SignedIn user, update resume point to backend
-          updateHistory(videoContent, nResumePoint)
+          ' When the update history response's succcess callback  is triggered, it will overwrite
+          ' whatever was set in the global history object by the previous call to updateHistoryLocally.
+          ' We keep both calls in case there is an error when sending to the server, and also to
+          ' avoid race conditions where the user could see the details screen before the history
+          ' request resolves.
+          updateHistoryAndHandleResponse(videoContent, historyPosition)
         end if
 
-        populateDetailScreen(detailScreen, detailContent, false, nResumePoint)
+        populateDetailScreen(detailScreen, detailContent, false, detailScreenResumePosition)
       end if
     end if
   end if

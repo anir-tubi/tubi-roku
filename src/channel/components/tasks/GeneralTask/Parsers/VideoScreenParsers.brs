@@ -51,8 +51,80 @@ End Function
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
 ' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseHistorySuccess(fullResponse, _requestNode)
-  return {
-    parsedResponse: fullResponse.data
-  }
+'
+' @returns: a clone of the content that was used to make the request with updated history id
+' and parentHistoryId (if original content was an episode), or invalid if response JSON does not
+' contain the expected keys.
+Function parseHistorySuccess(fullResponse, requestNode)
+  response = fullResponse.data
+
+  if response.content_id = invalid or response.id = invalid or response.content_type = invalid then
+    return invalid
+  end if
+
+  if requestNode.input.content = invalid
+    return invalid
+  end if
+
+  content = requestNode.input.content.clone(true)
+  nowPos = requestNode.input.nowPos
+
+  isResponseSeries = (response.content_type = m.constants.uapiContentTypes.series and response.episodes <> invalid and type(response.episodes) = "roArray" and response.episodes.count() > 0)
+  episode = invalid
+
+  if isResponseSeries = true
+    episodeIndex = 0
+    if response.position <> invalid
+      episodeIndex = response.position
+    end if
+
+    episode = response.episodes[episodeIndex]
+
+    if episode = invalid or episode.content_id = invalid
+      return invalid
+    end if
+  else if response.content_type <> m.constants.uapiContentTypes.movie
+    ' the response is a series type, but missing some necessary information
+    return invalid
+  end if
+
+  ' create a default content node in case one wasn't passed as part of the request input as expected
+  mustCreateNewContent = false
+  if type(content) <> "roSGNode"
+    mustCreateNewContent = true
+  else if isResponseSeries = true and episode.content_id.toStr() <> content.id
+    mustCreateNewContent = true
+  else if isResponseSeries = false and response.content_id.toStr() <> content.id
+    mustCreateNewContent = true
+  end if
+
+  if mustCreateNewContent = true
+    content = createObject("roSGNode", "TubiContentNode")
+
+    if isResponseSeries = true
+      content.id = episode.content_id.toStr()
+      content.type = m.constants.uapiContentTypes.episode
+    else
+      content.id = response.content_id.toStr()
+      content.type = m.constants.uapiContentTypes.movie
+    end if
+  end if
+
+  position = -1
+  if isResponseSeries = true
+    content.historyId = episode.id.toStr()
+    content.parentHistoryId = response.id.toStr()
+    position = episode.position
+  else
+    content.historyId = response.id.toStr()
+    position = response.position
+  end if
+
+  if position >= 0
+    content.nowPos = position
+  else
+    content.nowPos = nowPos
+  end if
+
+  return content
 End Function

@@ -153,21 +153,27 @@ Function tubiBookmarks_addHistoryLocally(content as Object, position as Integer,
         childNode.lastSaved = nLastSaved
         childNode.nowPos = position
         childNode.type = content.type
-        childNode.historyId = content.id
+
+        if isNonEmptyString(content.historyId) = true
+          childNode.historyId = content.historyId
+        end if
       end if
     else
       '//else if this movie content
 
       historyNode = getHistory(content.id) 'bs:disable-line 1001 LINT1001
-
       if historyNode = invalid
         historyNode = global.historyIds.createChild("HistoryContentNode")
       end if
+
       historyNode.id = content.id
       historyNode.lastSaved = nLastSaved
       historyNode.nowPos = position
       historyNode.type = content.type
-      historyNode.historyId = content.id
+
+      if isNonEmptyString(content.historyId) = true
+        historyNode.historyId = content.historyId
+      end if
     end if
   end if
 End Function
@@ -233,7 +239,7 @@ End Function
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 Function tubiBookmarks_removeHistoryReq(content as Object, bKidsMode = false as Boolean) as Object
   historyReq = invalid
-  if content <> invalid and content.historyId <> invalid then
+  if content <> invalid and isNonEmptyString(content.historyId) = true
     historyReq = m.createHistoryRequest(content.historyId, invalid, 0, "delete", "", bKidsMode)
   end if
   return historyReq

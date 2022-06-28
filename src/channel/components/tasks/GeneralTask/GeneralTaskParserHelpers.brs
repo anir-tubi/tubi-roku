@@ -59,7 +59,6 @@ Function createParsingCallbacks()
     parseError: parseMagicLinkError
   }
 
-
   'magic link polling
   m.requestTypes[m.constants.reqNames.queryStatusOfMagicLink] = {
     parseSuccess: parsequeryStatusOfMagicLinkSuccess
