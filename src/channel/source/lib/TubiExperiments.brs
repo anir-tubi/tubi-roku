@@ -68,6 +68,10 @@ Function TubiExperiments(constants) as Object
         roku_video_preview_v2: {"enabled": false, "autostart": false}
       }
 
+      roku_featured_landscape: {
+        roku_featured_landscape_v1: {"enabled": false}
+      }
+
     }
 
     'public methods
