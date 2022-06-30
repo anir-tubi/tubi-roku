@@ -49,6 +49,9 @@ Function tubiBookmarks_setupGlobalFields_testHelper()
   m.global.addField("historyIds", "node", false)
   m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
 
+  m.global.addField("likeIds", "node", false)
+  m.global.likeIds = CreateObject("roSGNode", "LikeContentNode")
+
 End Function
 
 
@@ -155,6 +158,7 @@ Function tubiBookmarks_removeBookmarkLocallySuccessful_test()
   historyNode = m.global.historyIds.findNode(content.id)
   '//2) The content should have been successfully been removed, so history should be invalid
   m.assertInvalid(historyNode)
+  '//::TODO::like - add like test to this and other unit test functions if like/dislike experiment gets approved - (or immediately after like/dislike experiment launches)
 End Function
 
 

@@ -237,6 +237,7 @@ Function getConstants()
     constants.reqNames.generic = "generic"
     constants.reqNames.magicLink = "magicLink"
     constants.reqNames.queryStatusOfMagicLink = "queryStatusOfMagicLink"
+    constants.reqNames.setContentRating = "setContentRating"
     constants.reqNames.updateParentalRating = "updateParentalRating"
 
     ' a list of reqnames that the general task should expect to handle 403 errors for
@@ -261,6 +262,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postUserHistory] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.signup] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.signIn] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.setContentRating] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.updateParentalRating] = true
 
   constants.anonymous = {}
@@ -430,6 +432,7 @@ Function getConstants()
       constants.urls.account.checkBirthday = constants.urls.account.urlBase + "/user/check_birthday_info"
       constants.urls.account.deviceRegister = constants.urls.account.urlBase + "/device/register"
       constants.urls.account.settings = constants.urls.account.urlBase + "/user/settings"
+      constants.urls.account.contentRating = constants.urls.account.urlBase + "/user/preferences/rate"
       constants.urls.account.parentalRating = constants.urls.account.settings + "/parental_rating"
       constants.urls.account.magicLink = constants.urls.account.urlBase + "/device/magic_link"
 
@@ -717,6 +720,10 @@ Function getConstants()
   constants.errors.subtypes.addBookmarkError = "102"
   constants.errors.subtypes.removeBookmarkError = "103"
   constants.errors.subtypes.removeHistoryError = "104"
+  constants.errors.subtypes.ratingAddLikeError = "105"
+  constants.errors.subtypes.ratingAddDislikeError = "106"
+  constants.errors.subtypes.ratingRemoveLikeError = "107"
+  constants.errors.subtypes.ratingRemoveDislikeError = "108"
   'Could not setup player
   constants.errors.subtypes.playerSetupError = "200"
   constants.errors.subtypes.playerPlaybackError = "201"
@@ -803,6 +810,20 @@ Function getConstants()
       constants.ui.categoryTypes.linear = "linear"
       constants.ui.categoryTypes.preview = "video_preview"
       constants.ui.categoryTypes.historySignedOutUser = "continue_watching_signed_out_user"
+
+
+    constants.ui.likeDislikeActions = {}
+      'these map to matrix api like/dislike rating actions
+      constants.ui.likeDislikeActions.like = "like"
+      constants.ui.likeDislikeActions.dislike = "dislike"
+      constants.ui.likeDislikeActions.removeLike = "remove-like"
+      constants.ui.likeDislikeActions.removeDislike = "remove-dislike"
+
+    constants.ui.likeDislikeStates = {}
+      'these map to like/dislike rating states
+      constants.ui.likeDislikeStates.liked = "liked"
+      constants.ui.likeDislikeStates.disliked = "disliked"
+      constants.ui.likeDislikeStates.changing = "changing"
 
 
     constants.ui.infoPanelModes = {}

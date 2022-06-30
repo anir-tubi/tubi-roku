@@ -570,6 +570,7 @@ Function handleUpdatedAuth()
   ' These will be empty parent nodes (no children) if user is not authenticated
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
+  m.global.likeIds = m.authTask.likes
   m.authInfoReceived = true
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid

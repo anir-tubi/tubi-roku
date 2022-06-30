@@ -1,22 +1,42 @@
 Function init()
   m.top.observeField("itemContent", "onItemContentChange")
+  m.top.observeFieldScoped("width", "onWidthChange")
+  m.top.observeFieldScoped("height", "onHeightChange")
+  m.top.observeFieldScoped("itemHasFocus", "onItemHasFocus")
+  m.buttonBG = m.top.findNode("buttonBG")
+
   m.Icon = m.top.findNode("Icon")
   if getExperimentResource("roku_update_icons", "roku_update_icons_v1", false).enabled = false
     m.Icon.width = 40
     m.Icon.height = 40
-    m.Icon.translation = [22,17]
+    m.Icon.translation = [22, 17]
   end if
   m.DetailsMenuText = m.top.findNode("DetailsMenuText")
   m.top.leftTextPadding = m.DetailsMenuText.translation[0]
   m.Progress = m.top.findNode("ResumeProgressBar")
   m.badgeLabel = m.top.findNode("badgeLabel")
 
-  constants = getConstantsFromGlobal()
-  if constants <> invalid
-    m.top.color = constants.ui.colors.transparent
-    m.Progress.color = constants.ui.colors.focusedText
+  m.constants = getConstantsFromGlobal()
+  if m.constants <> invalid
+    m.top.color = m.constants.ui.colors.transparent
+    m.Progress.color = m.constants.ui.colors.focusedText
+
+    if m.constants.deviceInfo.scaledUi = true
+      m.buttonBG.uri = "pkg:/images/menu-focus-hd.9.png"
+    end if
   end if
 End Function
+
+
+Function onWidthChange()
+  m.buttonBG.width = m.top.width
+End Function
+
+
+Function onHeightChange()
+  m.buttonBG.height = m.top.height
+End Function
+
 
 Function onItemContentChange()
   tubiLog("DetailMenuItem.onItemContentChange")
@@ -40,6 +60,9 @@ Function onItemContentChange()
     end if
 
     m.Icon.uri = m.top.itemContent.iconUrl
+
+    m.buttonBG.visible = m.top.itemContent.isUnfocusedFootprintEnabled
+
     if m.top.itemContent.playstart <> invalid and m.top.itemContent.playstart <> 0.0 and m.top.itemContent.length <> invalid and m.top.itemContent.length <> 0.0 then
       showProgressBar(m.top.itemContent.playstart / m.top.itemContent.length)
     else
@@ -64,12 +87,12 @@ Function onItemContentChange()
     else
       m.badgeLabel.visible = false
     end if
-  end if
-  
-  'Adjusting the DetailsMenuText text to center when there is no icoUrl and badge label text.
-  if m.top.itemContent.align = "center"
-    xTranslation = (m.top.width - m.top.calculatedTextWidth) / 2
-    m.DetailsMenuText.translation = [xTranslation, 0]
+
+    'Adjusting the DetailsMenuText text to center when there is no icoUrl and badge label text.
+    if m.top.itemContent.align = "center"
+      xTranslation = (m.top.width - m.top.calculatedTextWidth) / 2
+      m.DetailsMenuText.translation = [xTranslation, 0]
+    end if
   end if
 
 End Function
@@ -81,4 +104,15 @@ Function showProgressBar(percentage As Double)
   ' width of menu item is 440, 4 pixel margin for progress bar
   m.Progress.width = (m.top.width - 8.0) * percentage
   m.Progress.visible = true
+End Function
+
+
+Function onItemHasFocus()
+  if m.top.itemHasFocus = true
+    m.buttonBG.opacity = 1.0
+    m.buttonBG.blendcolor = m.constants.ui.colors.focused
+  else
+    m.buttonBG.opacity = 0.16
+    m.buttonBG.blendcolor = "0x9699A3"
+  end if
 End Function

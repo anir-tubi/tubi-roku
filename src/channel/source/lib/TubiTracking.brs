@@ -285,6 +285,11 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       op: ""  'Operation enum
     }
 
+    explicit_feedback: {
+      targetOneOf: {} 'a valid target, see ExplicitFeedbackEvent in events.protos.
+      pageOneof: {}  'a valid page type (see ExplicitFeedbackEvent in events.protos)
+    }
+
     search: {
       query: ""
       search_type: "" 'SearchType enum
@@ -784,6 +789,19 @@ Function tubiTracking_getOneOfs()
   ' splash_page = {}   'not currently used
   ' forget_page = {}   'not currently used
 
+  contentOneof = {
+    series_id: -1
+    video_id: -1
+  }
+
+  targetOneof = {
+    content: {
+      series_id: -1
+      video_id: -1
+      user_interaction: ""
+    }
+  }
+
   'set up the page "Oneofs" with the available page types
   pageOneof = {
     current_page: current_page
@@ -913,11 +931,11 @@ Function tubiTracking_getOneOfs()
       button_type: 0
       button_value: ""
     }
-  }
 
-  contentOneof = {
-    series_id: -1
-    video_id: -1
+    content: {
+      series_id: -1
+      video_id: -1
+    }
   }
 
   selectorOneOf = {
@@ -935,6 +953,7 @@ Function tubiTracking_getOneOfs()
   }
 
   return {
+    targetOneof: targetOneof
     pageOneof: pageOneof
     dest_pageOneof: dest_pageOneof
     dest_componentOneof: dest_componentOneof

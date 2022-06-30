@@ -86,6 +86,11 @@
         -->
         <field id="history" type="node" />
 
+        <!-- execInitializeUserData, execSignOut:
+        -        LikeContentNode tree of likes and dislikes
+        -->
+        <field id="likes" type="node" />
+
         <!-- addBookmarkResult:
         -        Result of request as:
         -        {

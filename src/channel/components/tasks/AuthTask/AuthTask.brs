@@ -20,7 +20,7 @@ Function execInitializeUserData()
     getUserInfo = true
   end if
 
-  userCats = getInitialUserCategories(Bookmarks, true, true, getUserInfo)
+  userCats = getInitialUserCategories(Bookmarks, true, true, getUserInfo, true)
   ' enhance the auth tokens with the user profile information
   if authInfo <> invalid and userCats.userInfo <> invalid
     tempAuthInfo = userCats.userInfo
@@ -45,6 +45,7 @@ Function execInitializeUserData()
 
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
+  m.top.likes = userCats.newLikes
 
   m.top.authInfo = authInfo  ' set last so that it can be used as a trigger
 End Function
@@ -81,10 +82,11 @@ Function execSignOut()
   apiUtils = ApiUtils(constants)
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers, apiUtils)
 
-  userCats = getInitialUserCategories(Bookmarks, true, false, false)
+  userCats = getInitialUserCategories(Bookmarks, true, false, false, true)
 
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
+  m.top.likes = userCats.newLikes
   m.top.guestUserHasAgeInfo = invalid
   m.top.authInfo = Auth.getAuthInfo()
 End Function
@@ -224,17 +226,21 @@ Function removeFromHistory()
 End Function
 
 
-Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false, getUserInfo=false)
+Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false, getUserInfo=false, getLikes=false)
   queuePort = CreateObject("roMessagePort")
   queue = TubiRequestQueue().create(queuePort)
   localBookmarkReqId = "bookmark"
   localHistoryReqId = "history"
+  localLikeReqId = "like"
+  localDislikeReqId = "dislike"
   ' return empty containers if user is not authenticated or requests fail
   newBookmarks = CreateObject("roSGNode", "BookmarkContentNode")
   newHistory = CreateObject("roSGNode", "HistoryContentNode")
+  newLikes = CreateObject("roSGNode", "LikeContentNode")
   userCategories = {
     newBookmarks: newBookmarks
     newHistory: newHistory
+    newLikes: newLikes
   }
 
   if getUserInfo = true
@@ -259,6 +265,17 @@ Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false
     end if
   end if
 
+  if getLikes = true
+    initialLikeReq = Bookmarks.getInitialLikeReq(localLikeReqId, true)
+    if initialLikeReq <> invalid then
+      queue.pushRequest(initialLikeReq)
+    end if
+    initialDislikeReq = Bookmarks.getInitialLikeReq(localDislikeReqId, false)
+    if initialDislikeReq <> invalid then
+      queue.pushRequest(initialDislikeReq)
+    end if
+  end if
+
   while queue.count() > 0
     msg = wait(0, queuePort)
     handledReq = queue.handleEvent(msg)
@@ -271,6 +288,27 @@ Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false
           userCategories.newHistory = Bookmarks.handleInitialHistory(handledReq.response.data)
         else if handledReq.localId = "userInfo"
           userCategories.userInfo = Bookmarks.handleUserInfo(handledReq.response.data)
+        else if handledReq.localId = "like" or handledReq.localId = "dislike"
+          bLiked = (handledReq.localId = "like")
+          userLikes = Bookmarks.handleInitialLikes(handledReq.response.data, bLiked)
+
+          if type(userCategories.newLikes) = "roSGNode" and userCategories.newLikes.getChildCount() > 0
+            '//If newLikes already exists, then combine the other (like or disliked) array into one
+            if type(userLikes.content) = "roSGNode" and userLikes.content.getChildCount() > 0
+              userCategories.newLikes.appendChildren(userLikes.content.getChildren(-1,0))
+            end if
+          else
+            userCategories.newLikes = userLikes.content
+          end if
+          
+          '//Handle pagination
+          if isNonEmptyString(userLikes.nextPageId) = true
+            paginationLikeReq = Bookmarks.getInitialLikeReq(handledReq.localId, bLiked, userLikes.nextPageId)
+            if paginationLikeReq <> invalid
+              queue.pushRequest(paginationLikeReq)
+            end if
+          end if
+
         end if
       end if
     end if
@@ -290,7 +328,7 @@ Function execGetUserInfo()
   Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers, apiUtils)
   authInfo = Auth.getAuthInfo()
 
-  result = getInitialUserCategories(Bookmarks, false, false, true)
+  result = getInitialUserCategories(Bookmarks, false, false, true, false)
   if result <> invalid and result.userInfo <> invalid
     ' Just in case settings have changed, refresh the auth token
     Auth.refreshAuthToken(authInfo, 5)

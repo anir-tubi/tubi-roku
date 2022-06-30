@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<component name="DetailScreen" extends="BaseScreen" initialFocus="Menu" >
+<component name="DetailScreen" extends="BaseScreen">
 
   <script type="text/brightscript" uri="DetailScreen.brs" />
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
@@ -25,6 +25,7 @@
       <field id="stringChannelButton" type="string"/>
       <field id="stringNoHistoryButton" type="string"/>
       <field id="stringSignUpButton" type="string"/>
+      <field id="stringLikeDislikeButton" type="string"/>
 
       <!-- Pass through signal to the info panel that the height/placement should be recalculated -->
       <field id="calculateInfoHeight" type="boolean" alias="DetailInfoPanel.calculateHeight" />
@@ -61,6 +62,9 @@
 
       <!-- Indicates if the video is in the user's history -->
       <field id="isHistory" type="boolean" />
+
+      <!-- Set the like/dislike state: valid strings are constants.ui.likeDislikeStates.liked or constants.ui.likeDislikeStates.disliked or constants.ui.likeDislikeStates.changing - or it can be an empty string "" to signify none.   -->
+      <field id="likeDislikeState" type="string"/>
 
       <!-- Indicates if the video is in a channel -->
       <field id="isChannelItem" type="boolean" value="false" />
@@ -117,8 +121,20 @@
       <!-- set to true when the suer selects the 'Resume' menu button -->
       <field id="resumeSelected" type="boolean" alwaysNotify="true" />
 
-      <!-- set to true when the suer selects the 'Play' menu button -->
+      <!-- set to true when the user selects the 'Play' menu button -->
       <field id="playSelected" type="boolean" alwaysNotify="true" />
+
+      <!-- set to true when the user selects the 'Like' menu button -->
+      <field id="likeSelected" type="boolean" alwaysNotify="true" />
+
+      <!-- set to true when the user selects the 'Dislike' menu button -->
+      <field id="dislikeSelected" type="boolean" alwaysNotify="true" />
+
+      <!-- set to true when the user selects the 'Remove Like' menu button -->
+      <field id="removeLikeSelected" type="boolean" alwaysNotify="true" />
+
+      <!-- set to true when the user selects the 'Remove Dislike' menu button -->
+      <field id="removeDislikeSelected" type="boolean" alwaysNotify="true" />
 
       <!-- set to true when the user selects the 'Episode List' menu button -->
       <field id="episodeListSelected" type="boolean" alwaysNotify="true" />
@@ -170,6 +186,12 @@
       <!-- Communicates to the parent that the video preview should be stopped -->
       <field id="stopVideoPreview" type="boolean" alwaysNotify="true"/>
 
+      <!-- The analytics IDs of the focused item and the previously focused item -->
+      <field id="focusedMenuItemAnalyticsIds" type="array" value="[]"/>
+
+      <!-- Called to report that the Like/Dislike Menu has gained focus or lost focus -->
+      <field id="focusOnLikeMenu" type="boolean" value="false"/>
+
   </interface>
 
   <children>
@@ -180,6 +202,20 @@
     <DetailMenuItemContentNode
       id="PlayMenuItem"
       iconUrl="pkg:/images/icon-play.webp"/>
+    <DetailMenuItemContentNode
+      id="LikeMenuItem"
+      analyticsId="LIKE"
+      isUnfocusedFootprintEnabled="true"
+      iconUrl="pkg:/images/icon-like.webp" />
+    <DetailMenuItemContentNode
+      id="DislikeMenuItem"
+      analyticsId="DISLIKE"
+      isUnfocusedFootprintEnabled="true"
+      iconUrl="pkg:/images/icon-dislike.webp" />
+    <DetailMenuItemContentNode
+      id="LikeDislikeMenuItem"
+      analyticsId="LIKE_OR_DISLIKE"
+      iconUrl="pkg:/images/icon-like.webp" />
     <DetailMenuItemContentNode
       id="EpisodesMenuItem"
       iconUrl="pkg:/images/icon-all-episodes.webp"/>
@@ -234,6 +270,17 @@
         itemSpacing="[0,8]"
         numRows="3"
         numColumns="1"
+        vertFocusAnimationStyle="floatingFocus"/>
+
+      <FilledButtonMarkupGrid
+        id="SecondaryMenu"
+        translation="[667,730]"
+        itemSize="[465,80]"
+        itemComponentName="DetailMenuItem"
+        itemSpacing="[0,8]"
+        numRows="3"
+        numColumns="1"
+        visible="false"
         vertFocusAnimationStyle="floatingFocus"/>
 
       <Group

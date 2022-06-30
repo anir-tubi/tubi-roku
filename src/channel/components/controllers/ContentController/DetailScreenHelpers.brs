@@ -10,15 +10,20 @@
 ' @playbackSource: string, valid values are "automatic", "deliberate", "unknown" or "previews"
 Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = invalid, errorCb = invalid, playbackSource = "unknown")
   tubiLog("DetailScreenHelpers.showDetailScreen")
-
   if content <> invalid
     detailScreen = CreateObject("roSGNode", "DetailScreen")
     detailScreen.id = m.constants.ui.screenIds.detailScreen
     detailScreen.trackingLoadStartTime = Uptime(0)
     detailScreen.shouldFocusWhenPushed = m.top.fadeInContentController
     detailScreen.playbackSource = playbackSource
+    detailScreen.observeFieldScoped("focusedMenuItemAnalyticsIds", "onDetailScreenMenuItemFocused")
+    detailScreen.observeFieldScoped("focusOnLikeMenu", "onDetailScreenLikeMenuFocused")
     detailScreen.observeFieldScoped("playSelected", "onPlay")
     detailScreen.observeFieldScoped("resumeSelected", "onResume")
+    detailScreen.observeFieldScoped("likeSelected", "onLike")
+    detailScreen.observeFieldScoped("dislikeSelected", "onDislike")
+    detailScreen.observeFieldScoped("removeLikeSelected", "onRemoveLike")
+    detailScreen.observeFieldScoped("removeDislikeSelected", "onRemoveDislike")
     detailScreen.observeFieldScoped("watchTrailerSelected", "onWatchTrailer")
     detailScreen.observeFieldScoped("episodeListSelected", "onEpisodeList")
     detailScreen.observeFieldScoped("fullDescriptionSelected", "onDescriptionSelected")
@@ -82,6 +87,8 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
       detailScreen.isLoading = true
     else
       populateDetailScreen(detailScreen, content, true)
+      detailScreen.isLoading = true '//1st set to true before settng to false. For some reason setting it to false by itself does not get registered, even if he isLoading field's alwaysNotify property is set to true
+      detailScreen.isLoading = false
     end if
 
     pushScreen(detailScreen, false, false) ' don't send tracking until we resolve series episode
@@ -222,6 +229,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
 
     bookmark = getBookmark(content.id)
     history = getHistory(content.id)
+    like = getLike(content.id)
 
     if isLoggedInUser() = false and history <> invalid
       '//if user is signed out but has history of current item, make sure it has been less than guest user resume limit,
@@ -298,6 +306,11 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
 
     setIsBookmark(detailScreen, (bookmark <> invalid))
     setIsHistory(detailScreen, (history <> invalid))
+    sLikedState = ""
+    if like <> invalid
+      sLikedState = like.state
+    end if
+    detailScreen.likeDislikeState = sLikedState
 
     '//right now in kids mode, there are no channels showing up, so hardcode it so the channel's button doesn't show
     detailScreen.isChannelItem = (content.channelId <> invalid and content.channelId <> "" and isKidsUIOn() = false)
@@ -559,7 +572,6 @@ Function getRelatedContent(content)
   ' (but not if in any of the kids modes, since it won't be displayed)
   if content <> invalid and isKidsUIOn() = false
     relatedRequestInfo = m.cmsApi.relatedContentReqInfo(content.id, shouldKidsModeBeSentToServer())
-
     m.makeRequest({
       url: relatedRequestInfo.url
       requestType: m.constants.reqNames.getRelatedContent
@@ -584,6 +596,7 @@ Function handleRelatedResponse(relatedContent)
     end if
   end if
 End Function
+
 
 '@episodeId: String, episode content Id
 '@contentNode: Node, a TubiContentNode, expected to be used only on series content nodes
@@ -1058,6 +1071,189 @@ Function onRemoveFromQueueRetry(params)
 End Function
 
 
+'''''''''''
+' onLike
+'
+' Observer that is called when the like button is selected
+Function onLike(msg)
+  tubiLog("DetailScreenHelpers.onLike")
+  detailScreen = msg.getRoSGNode()
+  updateLikeDislike(detailScreen, m.constants.ui.likeDislikeActions.like)
+End Function
+
+
+Function onDislike(msg)
+  tubiLog("DetailScreenHelpers.onDislike")
+  detailScreen = msg.getRoSGNode()
+  updateLikeDislike(detailScreen, m.constants.ui.likeDislikeActions.dislike)
+End Function
+
+
+Function onRemoveLike(msg)
+  tubiLog("DetailScreenHelpers.onRemoveLike")
+  detailScreen = msg.getRoSGNode()
+  updateLikeDislike(detailScreen, m.constants.ui.likeDislikeActions.removeLike)
+End Function
+
+
+Function onRemoveDislike(msg)
+  tubiLog("DetailScreenHelpers.onRemoveDislike")
+  detailScreen = msg.getRoSGNode()
+  updateLikeDislike(detailScreen, m.constants.ui.likeDislikeActions.removeDislike)
+End Function
+
+
+'When there is an error, this function used by the user to try the operation again
+' @param params, Array: The 1st element is the detailscreen and the 2nd element should be the returnedAction of the failed likeDislike rating action: @see the parameters match updateLikeDislike()
+Function onLikeDislikeRetry(params)
+  tubiLog("DetailScreenHelpers.onLikeDislikeRetry")
+  if type(params) = "roArray" and params.count() = 2
+    updateLikeDislike(params[0], params[1])
+  end if
+End Function
+
+
+' @param sRating, String: The like/dislike rating that the content like state should be changed. Or is the remove enum that will indicate the removal of the like/dislike state. The possible values are all under m.constants.ui.likeDislikeActions
+Function updateLikeDislike(detailScreen, sRatingChange)
+  if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
+    detailScreen.isWaitingForServerResponse = true
+
+    '//While the backend is setting the rating, change the like state to changing
+    detailScreen.likeDislikeState = m.constants.ui.likeDislikeStates.changing
+    updateLikeDislikeRequestInfo = m.userDeviceApi.setContentRating(detailScreen.content.id, sRatingChange)
+
+
+    '//Send Analytics of user interaction with the like/dislike button
+    sAnalyticsEventType = ""
+    if sRatingChange = m.constants.ui.likeDislikeActions.like
+      sAnalyticsEventType = "LIKE"
+    else if sRatingChange = m.constants.ui.likeDislikeActions.dislike
+      sAnalyticsEventType = "DISLIKE"
+    else if sRatingChange = m.constants.ui.likeDislikeActions.removeLike
+      sAnalyticsEventType = "UNDO_LIKE"
+    else if sRatingChange = m.constants.ui.likeDislikeActions.removeDislike
+      sAnalyticsEventType = "UNDO_DISLIKE"
+    end if
+    sendLikeSelectAnalytics(detailScreen, sAnalyticsEventType)
+
+   
+    m.makeRequest({
+      url: updateLikeDislikeRequestInfo.url
+      requestType: m.constants.reqNames.setContentRating
+      options: updateLikeDislikeRequestInfo.options
+      successCallback: onLikeChangedSuccess
+      errorCallback: onLIkeChangedError
+      responseType: "assocarray"
+    })
+  end if
+End Function
+
+
+Function onLikeChangedSuccess(requestBody)
+  tubiLog("DetailScreenHelpers.onLikeChangedSuccess")
+  detailScreen = getTopDetailScreenFromStack()
+  if requestBody <> invalid and type(requestBody.data) = "roArray"
+    returnedContentId = requestBody.data[0]
+    sReturnedAction = requestBody.action
+    m.Bookmarks.updateLikesLocally(returnedContentId, sReturnedAction, m.global) 
+
+    '//Tell Detail Screen how to react to user interacting with the like/dislike button
+    if detailScreen <> invalid and detailScreen.content <> invalid 
+      if detailScreen.content.id <> invalid and returnedContentId <> invalid and returnedContentId = detailScreen.content.id
+        '//if the returned server call is associated with the the current video title, then proceed
+        '//Proceed to take the proper action based on the action requested
+        detailScreen.isWaitingForServerResponse = false
+        setDetailScreenLikeDislikeStateFromLikeAction(detailScreen, sReturnedAction)
+      end if
+    end if
+  end if
+End Function
+
+
+' Translate the like/dislike action into a like/dislike state. 
+' @param sLikeAction, String: The like action. The possible options are available in constants.ui.likeDislikeActions
+' @return The Liked state. The possible options are available in constants.ui.likeDislikeStates
+Function translateLikeActionToLikeState(sLikeAction)
+  sState = "" 
+  if sLikeAction = m.constants.ui.likeDislikeActions.like
+    sState = m.constants.ui.likeDislikeStates.liked
+  else if sLikeAction = m.constants.ui.likeDislikeActions.dislike
+    sState = m.constants.ui.likeDislikeStates.disliked
+  end if
+  
+  return sState
+End Function 
+
+
+' @param sLikeAction: String, the like action constant for the user of the current title: like, dislike, or "". The like/dislike states are defined in constants.ui.likeDislikeActions 
+Function setDetailScreenLikeDislikeStateFromLikeAction(detailScreen, sLikeAction)
+  sLikedState = translateLikeActionToLikeState(sLikeAction)
+  detailScreen.likeDislikeState = sLikedState
+End Function
+
+
+Function onLikeChangedError(parsedReturn)
+  tubiLog("DetailScreenHelpers.onLikeChangedError")
+  code = parsedReturn.code
+  returnedContentId = invalid
+  returnedAction = invalid
+  if parsedReturn.action <> invalid and parsedReturn.data <> invalid and parsedReturn.data.Count() > 0
+    returnedContentId = parsedReturn.data[0]
+    returnedAction = parsedReturn.action
+  end if
+
+  detailScreen = getTopDetailScreenFromStack()  
+  
+  if detailScreen <> invalid and detailScreen.content <> invalid
+    '//return the likeDislike button to the way it was before trying to unsuccessfully set the like/dislike
+    currentScreen = getCurrentScreen()
+    if currentScreen <> invalid and currentScreen().id = detailScreen.id
+      detailScreen.isWaitingForServerResponse = false
+
+      '//set back to the previous like state before the failed attempt
+      sPreviousLikeState = getLike(detailScreen.id)
+      setDetailScreenLikeDislikeStateFromLikeAction(detailScreen, sPreviousLikeState)
+
+      '//Make sure the current screen is associated with the detail screen that caused the error
+      if code <> invalid and detailScreen.content.id <> invalid and returnedContentId <> invalid and returnedContentId = detailScreen.content.id
+        sErrorSubtype = ""
+        dialogEvent = ""
+        sAnalyticsDialogType = "SERVER_ERROR"
+        if returnedAction = m.constants.ui.likeDislikeActions.like
+          sErrorSubtype = m.constants.errors.subtypes.ratingAddLikeError
+          ' sAnalyticsDialogType = "LIKE" '//::TODO:: have backend provide a DialogType in protos that corresponds to failing to change a specific like action
+        else if returnedAction = m.constants.ui.likeDislikeActions.dislike
+          sErrorSubtype = m.constants.errors.subtypes.ratingAddDislikeError
+          ' sAnalyticsDialogType = "DISLIKE" '//::TODO:: have backend provide a DialogType in protos that corresponds to failing to change a specific like action
+        else if returnedAction = m.constants.ui.likeDislikeActions.removeLike
+          sErrorSubtype = m.constants.errors.subtypes.ratingRemoveLikeError
+          ' sAnalyticsDialogType = "UNDO_LIKE" '//::TODO:: have backend provide a DialogType in protos that corresponds to failing to change a specific like action
+        else if returnedAction = m.constants.ui.likeDislikeActions.removeDislike
+          sErrorSubtype = m.constants.errors.subtypes.ratingRemoveDislikeError
+          ' sAnalyticsDialogType = "UNDO_DISLIKE" '//::TODO:: have backend provide a DialogType in protos that corresponds to failing to change a specific like action
+        end if
+    
+        ' set up the error modal dialog
+        errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, sErrorSubtype, code)
+        content = getDetailScreenContent(detailScreen)
+        dialogEvent = getDetailScreenDialogAnalyticEvent(content, sAnalyticsDialogType, errorCode, m.constants)
+        title = getTranslation("error_tryAgain_title")
+        message = getTranslation("screenDetails_error_likeDislike_description")
+    
+        modalInfo = {
+          title: title
+          message: getErrorMessage(message, errorCode)
+          openTrackEvent: dialogEvent
+          trackingTask: m.trackingLoggingTask
+        }
+        showErrorModal(modalInfo, onLikeDislikeRetry, [detailScreen, returnedAction])
+      end if
+    end if
+  end if
+End Function
+
+
+
 Function onBookmarkRemoved(msg) As Void
   tubiLog("DetailScreenHelpers.onBookmarkRemoved")
   task = msg.getRoSGNode()
@@ -1381,7 +1577,6 @@ Function onResume(msg)
   tubiLog("ContentController.onResume")
   detailScreen = msg.getRoSGNode()
   resumeVideoDetailScreen(detailScreen)
-
 End Function
 
 
@@ -1609,6 +1804,103 @@ Function sendBookmarkAnalytics(content, operation, trackingLib, trackingTask, co
     type: "bookmark"
     values: bookmarkAnalyticsEvent
   }
+End Function
+
+
+' Organizes the information needed to create a "like/dislike" event when the user changes the like state of a content. The function 
+' sends the information to the trackingTask which will actually send the event.
+'
+' @screen: the detail screen
+' @sLikeEventEnum: string, one of the valid event strngs as defined in events.protos -> enum ExplicitInteraction
+Function sendLikeSelectAnalytics(screen, sLikeEventEnum)
+  tubiLog("DetailScreenHelper.sendLikeSelectAnalytics")
+
+  explicitFeedbackEvent = {
+    targetOneof: {}
+    pageOneof: {}
+  }
+  
+  pageInfo = screen.trackingPageInfo
+  pageOneof = m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+  
+  componentValues = {}
+
+  content = screen.content
+  if content.type = m.constants.ui.contentTypes.series
+    seriesId = content.id
+    '//if series, remove the "0" that was added in TubiMetadataTranslate
+    if Left(content.id, 1) = "0"
+      seriesId = Mid(content.id, 2)
+    end if
+    componentValues.series_id = seriesId.toInt()
+  else if content.type = m.constants.ui.contentTypes.video
+    componentValues.video_id = content.id.toInt()
+  end if
+
+  targetOneof = m.Tracking.getAnalyticsComponent("content", componentValues)
+  targetOneof.content.user_interaction = sLikeEventEnum
+
+  explicitFeedbackEvent.targetOneof = targetOneof
+  explicitFeedbackEvent.pageOneof = pageOneof
+
+  m.trackingLoggingTask.trackEvent = {
+    type: "explicit_feedback"
+    values: explicitFeedbackEvent
+  }
+End Function
+
+
+'When the menu item changes focus, then analytics should be sent out regarding which menu items  have gained or lost focus 
+Function onDetailScreenMenuItemFocused(msg)
+  tubiLog("DetailScreenHelpers.onDetailScreenMenuItemFocused")
+  detailScreen = msg.getRoSGNode()
+  focusedMenuItemAnalyticsValues = msg.getData()
+  
+  sCurrentFocusedValue = focusedMenuItemAnalyticsValues[0]
+  sPreviousFocusedValue = focusedMenuItemAnalyticsValues[1]
+
+  sendDetailMenuFocusAnalytics(detailScreen, sCurrentFocusedValue, "TOGGLE_ON")
+  sendDetailMenuFocusAnalytics(detailScreen, sPreviousFocusedValue, "TOGGLE_OFF")
+End Function
+
+
+'When the Like/Dislike Menu gains focus, then send out an analytic call
+Function onDetailScreenLikeMenuFocused(msg)
+  tubiLog("DetailScreenHelpers.onDetailScreenLikeMenuFocused")
+  detailScreen = msg.getRoSGNode()
+  if detailScreen.focusOnLikeMenu = true
+    sendDetailMenuFocusAnalytics(detailScreen, "LIKE_OR_DISLIKE", "CONFIRM")
+  end if
+end Function
+
+
+' send out a call to analytics that a menu item has been focused or unfocused, or when the like/dislike menu has gained focus
+' @param screen, the detail screen that is causing this analytics event
+' @param sAnalyticsValue:String, The analytics string value that represent a menu item or menu being focused or unfocused
+' @param sUserInteraction: The protos enum related to the user interaction
+Function sendDetailMenuFocusAnalytics(screen, sAnalyticsValue, sUserInteraction)
+  if sAnalyticsValue <> invalid and sAnalyticsValue <> ""
+    componentInteractionEvent =  {
+      pageOneof: {}
+      componentOneof: {}
+      user_interaction: sUserInteraction
+    }
+
+    pageInfo = screen.trackingPageInfo
+    componentInteractionEvent.pageOneof = m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+
+    componentValues = {
+      button_type: 1 '0-UNKNOWN, 1-TEXT, 2-DROPDOWN, 3-IMAGE
+      button_value: sAnalyticsValue
+    }
+    componentInteractionEvent.componentOneof = m.Tracking.getAnalyticsComponent("button_component", componentValues)
+
+
+    m.trackingLoggingTask.trackEvent = {
+      type: "component_interaction"
+      values: componentInteractionEvent
+    }
+  end if
 End Function
 
 

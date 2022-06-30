@@ -120,6 +120,8 @@ Function init()
   m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
   m.global.addField("historyIds", "node", false)
   m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
+  m.global.addField("likeIds", "node", false)
+  m.global.likeIds = CreateObject("roSGNode", "LikeContentNode")
 
   m.global.addField("authInfo", "assocarray", false)
   m.global.authInfo = invalid ' indicates not logged in
@@ -847,6 +849,7 @@ Function onHistoryQueueRefresh()
   ' These will be empty parent nodes (no children) if user is not authenticated
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
+  m.global.likeIds = m.authTask.likes
   refreshAllDetailScreens()
 End Function
 

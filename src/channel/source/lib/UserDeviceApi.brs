@@ -13,6 +13,7 @@ Function UserDeviceApi(constants, apiUtils)
     checkBirthdayInfo: userDeviceApi_checkBirthdayInfo
     patchSettingsInfo: userDeviceApi_patchSettingsInfo
     patchAutoplayPreviewSettingInfo: userDeviceApi_patchAutoplayPreviewSettingInfo
+    setContentRating: userDeviceApi_setContentRating
     magicLink: userDeviceApi_magicLink
     queryStatusOfMagicLink: userDeviceApi_queryStatusOfMagicLink
     updateParentalRatingReqInfo: userDeviceApi_updateParentalRatingReqInfo
@@ -49,7 +50,7 @@ Function userDeviceApi_signUpReqInfo(passedOptions = {})
   url = m.constants.urls.userDevice.signup
   options = {}
   headers = {}
-  headers.append(m.constants.headers.commonUapi)
+  headers.append(m.getCommonOptions().headers)
   body = FormatJSON(passedOptions.body)
   options["method"] = m.constants.reqTypes.post
   options["body"] = body
@@ -69,7 +70,7 @@ Function userDeviceApi_signInReqInfo(passedOptions = {})
   options = {}
   body = FormatJSON(passedOptions.body)
   headers = {}
-  headers.append(m.constants.headers.commonUapi)
+  headers.append(m.getCommonOptions().headers)
   options["method"] = m.constants.reqTypes.post
   options["body"] = body
   options["headers"] = headers
@@ -94,7 +95,7 @@ Function userDeviceApi_deviceRegisterInfo(birthdate)
     birthday: birthdate
   }
   headers = {}
-  headers.append(m.constants.headers.commonUapi)
+  headers.append(m.getCommonOptions().headers)
   body = FormatJSON(body)
   options["method"] = m.constants.reqTypes.post
   options["body"] = body
@@ -114,7 +115,7 @@ Function userDeviceApi_checkBirthdayInfo()
     params: {}
     headers: {}
   }
-  options.headers.append(m.constants.headers.commonUapi)
+  options.headers.append(m.getCommonOptions().headers)
 
   return {
     url: url
@@ -134,7 +135,7 @@ Function userDeviceApi_patchSettingsInfo(passedOptions)
     options["body"] = FormatJSON(passedOptions.body)
   end if
   headers = {}
-  headers.append(m.constants.headers.commonUapi)
+  headers.append(m.getCommonOptions().headers)
   options["method"] = m.constants.reqTypes.patch
   options["headers"] = headers
   return {
@@ -181,14 +182,41 @@ Function userDeviceApi_patchAutoplayPreviewSettingInfo(choice)
 
   options["body"] = FormatJson(body)
   headers = {}
-  headers.append(m.constants.headers.commonUapi)
+  headers.append(m.getCommonOptions().headers)
   options["method"] = m.constants.reqTypes.patch
   options["headers"] = headers
   return {
     url: url
     options: options
   }
+End Function
 
+
+' Set a rating for a given video ID
+' @param sContentID: the ID of the video/series
+' @param sRatingAction: string, user selection of like/dislike
+'         like - associate title with a like (constants.ui.likeDislikeActions.like)
+'         dislike - associate title with a dislike (constants.ui.likeDislikeActions.dislike)
+'         remove-like - disassociate title with a like (constants.ui.likeDislikeActions.removeLike)
+'         remove-dislike - disassociate title with a dislike (constants.ui.likeDislikeActions.removeDislike)
+Function userDeviceApi_setContentRating(sContentID, sRatingAction)
+  url = m.constants.urls.account.contentRating
+  options = {}
+  body = {
+    action: sRatingAction,
+    target: "title",
+    data: [sContentID]
+  }
+
+  options["body"] = FormatJson(body)
+  headers = {}
+  headers.append(m.getCommonOptions().headers)
+  options["method"] = m.constants.reqTypes.patch
+  options["headers"] = headers
+  return {
+    url: url
+    options: options
+  }
 End Function
 
 '@parentalRating: integer, selected parentalRating from the settings screen

@@ -13,12 +13,15 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
     removeBookmarkReq: tubiBookmarks_removeBookmarkReq
     addHistoryReq: tubiBookmarks_getAddHistoryRequestInfo
     addHistoryLocally: tubiBookmarks_addHistoryLocally
+    updateLikesLocally: tubiBookmarks_updateLikesLocally
     removeHistoryReq: tubiBookmarks_removeHistoryReq
     removeHistoryLocally: tubiBookmarks_removeHistoryLocally
     getInitialBookmarksReq: tubiBookmarks_getInitialBookmarksReq
     getInitialHistoryReq: tubiBookmarks_getInitialHistoryReq
+    getInitialLikeReq: tubiBookmarks_getInitialLikeReq
     handleInitialBookmarks: tubiBookmarks_handleInitialBookmarks
     handleInitialHistory: tubiBookmarks_handleInitialHistory
+    handleInitialLikes: tubiBookmarks_handleInitialLikes
     getUserInfoReq: tubiBookmarks_getUserInfoReq
     handleUserInfo: tubiBookmarks_handleUserInfo
 
@@ -174,6 +177,36 @@ Function tubiBookmarks_addHistoryLocally(content as Object, position as Integer,
       if isNonEmptyString(content.historyId) = true
         historyNode.historyId = content.historyId
       end if
+    end if
+  end if
+End Function
+
+
+' @param contentId, String: the ID of the title to change it's liking
+' @param sRatingAction, String: The Action enum to alter the like state of the provided content ID. The possible values are all under m.constants.ui.likeDislikeActions
+Function tubiBookmarks_updateLikesLocally(contentId as String, sRatingAction as String, global = invalid)
+  if contentId <> invalid and global <> invalid and global.likeIds <> invalid
+    likeNode = getLike(contentId) 'bs:disable-line 1001 LINT1001
+
+    sState = ""
+    if sRatingAction = m.constants.ui.likeDislikeActions.like
+      sState = m.constants.ui.likeDislikeStates.liked
+    else if sRatingAction = m.constants.ui.likeDislikeActions.dislike
+      sState = m.constants.ui.likeDislikeStates.disliked
+    end if
+
+    if sState = ""
+        '//remove the like
+        if likeNode <> invalid
+          global.likeIds.removeChild(likeNode)
+        end if
+    else
+      '//update or add the like
+      if likeNode = invalid
+        likeNode = global.likeIds.createChild("LikeContentNode")
+        likeNode.id = contentId
+      end if
+      likeNode.state = sState
     end if
   end if
 End Function
@@ -387,6 +420,53 @@ Function tubiBookmarks_getInitialHistoryReq(localId) as Object
 End Function
 
 
+'@param localId: string, a string used to identify req when a response is received
+'@param bLiked: Boolean, Is this a "like" request? If not, it is a "dislike" request
+'@param nextPageId: string, the paginated ID of the next page of likes/dislikes
+Function tubiBookmarks_getInitialLikeReq(localId, bLiked = true, nextPageId = "") as Object
+  authInfo = m.auth.getAuthInfo()  'from registry
+
+  'if the user is not logged in (aka doesn't have an accessToken in local memory),
+  'then don't get likes
+  if m.isLoggedInUser(authInfo) = false
+    return invalid
+  end if
+
+  url = m.constants.urls.account.contentRating 
+  sLikeType = "liked"
+  if bLiked = false
+    sLikeType = "disliked"
+  end if
+
+  options = {
+    method: m.constants.reqTypes.get
+    params: {
+      "page_enabled": false
+      target: "title"
+      limit: 100
+      type: sLikeType
+      platform: m.constants.platform
+      "deviceId": m.constants.deviceInfo.deviceId
+    }
+  }
+  if nextPageId <> ""
+    options.params.start = nextPageId
+  end if
+
+  initialReq = m.auth.createAuthRequest(url, "getInitialLikes", options)
+  'auth.createAuthRequest() returns invalid if user is not logged in
+  if initialReq = invalid
+    initialReq = m.request.createAsync(url, "getInitialLikes", options)
+  end if
+
+  if initialReq <> invalid then
+    initialReq.localId = localId
+  end if
+
+  return initialReq
+End Function
+
+
 '@initialBookmarks: string, JSON server response when making the first call to UAPI to get a user's basic bookmark info
 'returns bookmarkIds ordered node tree with series having episode children
 Function tubiBookmarks_handleInitialBookmarks(initialBookmarks)
@@ -451,6 +531,30 @@ Function tubiBookmarks_handleInitialHistory(initialHistory)
 
   return historyIds
 End Function
+
+
+'@initialLikes: string, JSON server response when making the first call to UAPI to get a user's like history info
+'returns likeIds ordered node tree
+Function tubiBookmarks_handleInitialLikes(initialLikes, bLiked = true)
+  returnParsed = {}
+  itemIds = CreateObject("roSGNode", "LikeContentNode")
+  parsedInitialData = ParseJson(initialLikes)
+  if parsedInitialData <> invalid and parsedInitialData.data <> invalid and parsedInitialData.data.count() > 0 
+    for i = 0 to parsedInitialData.data.count() - 1
+      child = itemIds.createChild("LikeContentNode")
+      child.id = parsedInitialData.data[i]
+      if bLiked = true
+        child.state = m.constants.ui.likeDislikeStates.liked
+      else
+        child.state = m.constants.ui.likeDislikeStates.disliked
+      end if
+    end for
+  end if
+  returnParsed.content = itemIds
+  returnParsed.nextPageId = parsedInitialData.next
+  return returnParsed
+End Function
+
 
 Function tubiBookmarks_getUserInfoReq()
   authInfo = m.auth.getAuthInfo()

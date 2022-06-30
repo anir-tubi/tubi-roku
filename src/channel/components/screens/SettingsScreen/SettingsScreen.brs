@@ -20,7 +20,7 @@ Function init()
   m.SettingsMenuPanel = createSettingsMenuPanel()
   m.SettingsMenuPanel.observeField("createNextPanelIndex", "onCreateNextPanelIndex")
   m.SettingsMenuPanel.observeField("itemSelected", "onMenuItemSelected")
-  m.SettingsMenuPanel.observeField("itemFocused", "onMenuItemFocused")
+  m.SettingsMenuPanel.observeField("itemFocused", "onDetailScreenMenuItemFocused")
 
   ' This must happen after the pane is all set up so that the createNextPanelIndex
   ' event fires for the default menu selection
@@ -102,8 +102,8 @@ End Function
 '       onComponentFocusChange, are the only way I have been able to
 '       acheive the desired opacity as focus moves left/right across panels
 '       and in/out of the screen, such as when a sign in dialog shows.
-Function onMenuItemFocused()
-  tubiLog("SettingsScreen.onMenuItemFocused")
+Function onDetailScreenMenuItemFocused()
+  tubiLog("SettingsScreen.onDetailScreenMenuItemFocused")
   m.Title.opacity = 1.0
   m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
 End Function

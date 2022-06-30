@@ -65,6 +65,12 @@ Function createParsingCallbacks()
     parseError: parsequeryStatusOfMagicLinkError
   }
 
+  'set Content Like/Dislike Rating
+  m.requestTypes[m.constants.reqNames.setContentRating] = {
+    parseSuccess: parseContentRateSuccess
+    parseError: parseContentRateError
+  }
+  
   'updateParentalRating 
   m.requestTypes[m.constants.reqNames.updateParentalRating] = {
     parseSuccess: parseUpdateParentalRatingSuccess

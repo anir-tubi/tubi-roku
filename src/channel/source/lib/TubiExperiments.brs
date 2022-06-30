@@ -32,6 +32,10 @@ Function TubiExperiments(constants) as Object
         roku_linear_epg_v5: { "enabled": true, "side_nav": false, "update_homescreen": false}
       }
 
+      '// When enabled=true, the roku_title_reactions_v1 experiment will display a Like/dislike button on the title details screen if the user is logged in
+      roku_title_reactions: {
+        roku_title_reactions_v1: {"enabled": false}
+      }
 
       roku_in_pod_stitching: {
         roku_in_pod_stitching_v1: {"enabled": false}

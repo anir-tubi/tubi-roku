@@ -17,7 +17,7 @@
       <!-- The number of the focus/current index.
         ::NOTE::If the component is set as the rowTitleComponentName of a RowList,
         then the focusIndex is set automatically and the currentindex field does not need to be set. -->
-      <field id="currentindex" type="integer"/>
+      <field id="currentIndex" type="integer"/>
   </interface>
 
   <children>

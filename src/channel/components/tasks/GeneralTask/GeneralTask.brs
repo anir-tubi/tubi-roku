@@ -269,7 +269,10 @@ Function processSuccessResponse(result, callbackTypes, job)
       ' fallback, try parsing JSON in case no responseHeaders were set (most likely an
       ' ovesight by the backend service)
       fullJson = responseFromServer.data
-      parsedJson = parseJson(responseFromServer.data)
+      parsedJson = invalid
+      if fullJson <> invalid and fullJson <> ""
+        parsedJson = parseJson(responseFromServer.data)
+      end if
 
       if parsedJson <> invalid
         ' only update result in the case of not an error, so we can pass the original result
@@ -281,7 +284,10 @@ Function processSuccessResponse(result, callbackTypes, job)
       ' knows how to handle the original non json response.
     else if Instr(1, responseHeaders["Content-Type"], "application/json") > 0
       fullJson = responseFromServer.data
-      parsedJson = parseJson(responseFromServer.data)
+      parsedJson = invalid
+      if fullJson <> invalid and fullJson <> ""
+        parsedJson = parseJson(responseFromServer.data)
+      end if
 
       if parsedJson <> invalid
         ' only update result in the case of not an error, so we can pass the original result

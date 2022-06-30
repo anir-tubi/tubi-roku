@@ -6,9 +6,14 @@ Function init()
   m.NodeHelpers = TubiNodeHelpers()
   m.Info = m.top.findNode("DetailInfoPanel")
   m.Menu = m.top.findNode("Menu")
+  m.SecondaryMenu = m.top.findNode("SecondaryMenu")
   m.defaultMenuWidth = m.Menu.itemSize[0]
+  m.defaultSecondaryMenuY = m.SecondaryMenu.translation[1]
   m.ResumeMenuItem = m.top.findNode("ResumeMenuItem")
   m.PlayMenuItem = m.top.findNode("PlayMenuItem")
+  m.LikeMenuItem = m.top.findNode("LikeMenuItem")
+  m.DislikeMenuItem = m.top.findNode("DislikeMenuItem")
+  m.LikeDislikeMenuItem = m.top.findNode("LikeDislikeMenuItem")
   m.EpisodesMenuItem = m.top.findNode("EpisodesMenuItem")
   m.AddQueueMenuItem = m.top.findNode("AddQueueMenuItem")
   m.RemoveQueueMenuItem = m.top.findNode("RemoveQueueMenuItem")
@@ -38,34 +43,44 @@ Function init()
   end if
   m.top.observeFieldScoped("removeSignupButton", "onRemoveSignupButton")
   m.top.observeFieldScoped("stringSignUpButton", "onStringChange")
-  m.top.observeField("length", "onLengthChange")
-  m.top.observeField("isSeries", "onIsSeries")
-  m.top.observeField("isInKidsMode", "onIsInKidsMode")
-  m.top.observeField("isBookmark", "onIsBookmark")
-  m.top.observeField("isHistory", "onIsHistory")
-  m.top.observeField("isChannelItem", "onIsChannel")
-  m.top.observeField("resumePoint", "onResumePointChange")
-  m.top.observeField("hasTrailer", "onHasTrailer")
-  m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.top.observeField("isLoading", "onIsLoading")
-  m.top.observeField("disableBookmarks", "onDisableBookmarksChange")
-  m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
+  m.top.observeFieldScoped("length", "onLengthChange")
+  m.top.observeFieldScoped("isSeries", "onIsSeries")
+  m.top.observeFieldScoped("isInKidsMode", "onIsInKidsMode")
+  m.top.observeFieldScoped("isBookmark", "onIsBookmark")
+  m.top.observeFieldScoped("likeDislikeState", "onLikeDislikeStateChanged")
+  m.top.observeFieldScoped("isHistory", "onIsHistory")
+  m.top.observeFieldScoped("isChannelItem", "onIsChannel")
+  m.top.observeFieldScoped("resumePoint", "onResumePointChange")
+  m.top.observeFieldScoped("hasTrailer", "onHasTrailer")
+  m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
+  m.top.observeFieldScoped("isLoading", "onIsLoading")
+  m.top.observeFieldScoped("disableBookmarks", "onDisableBookmarksChange")
+  m.top.observeFieldScoped("transportVoiceRequest", "onTransportVoiceRequest")
 
   m.top.observeFieldScoped("stringQueueButton", "onStringChange")
   m.top.observeFieldScoped("stringNoQueueButton", "onStringChange")
   m.top.observeFieldScoped("stringChannelButton", "onStringChange")
   m.top.observeFieldScoped("stringNoHistoryButton", "onStringChange")
+  m.top.observeFieldScoped("stringLikeDislikeButton", "onStringChange")
 
 
-  m.Menu.observeField("itemSelected", "onMenuItemSelected")
-  m.top.observeField("relatedContent", "onRelatedContentChange")
-  m.RelatedGrid.observeField("itemSelected", "onRelatedContentSelected")
-  m.RelatedGrid.observeField("itemFocused", "onRelatedItemFocused")
-  m.Info.observeField("descriptionSelected", "onDescriptionSelected")
+  m.Menu.observeFieldScoped("itemSelected", "onMenuItemSelected")
+  m.Menu.observeFieldScoped("itemFocused", "onDetailScreenMenuItemFocused")
+  m.SecondaryMenu.observeFieldScoped("itemSelected", "onSecondaryMenuItemSelected")
+  m.SecondaryMenu.observeFieldScoped("itemFocused", "onSecondaryMenuItemFocused")
+  m.top.observeFieldScoped("relatedContent", "onRelatedContentChange")
+  m.RelatedGrid.observeFieldScoped("itemSelected", "onRelatedContentSelected")
+  m.RelatedGrid.observeFieldScoped("itemFocused", "onRelatedItemFocused")
+  m.Info.observeFieldScoped("descriptionSelected", "onDescriptionSelected")
 
   m.defaultHeroUri = "pkg:/images/art-blur-background.png"
   setInitialMenuItems()
-  m.focusTarget = m.Menu
+
+  m.isLikeDislikeExperimentEnabled = getExperimentResource("roku_title_reactions", "roku_title_reactions_v1", false).enabled
+  if m.isLikeDislikeExperimentEnabled = true
+    setInitialSecondaryMenuItems()
+  end if
+
   setDetailStrings()
   m.focusAnimationDuration = 0.4
 
@@ -101,6 +116,8 @@ End Function
 
 Function setDetailStrings()
   m.PlayMenuItem.title = getTranslation("screenDetails_button_play")
+  m.LikeMenuItem.title = getTranslation("screenDetails_button_like")
+  m.DislikeMenuItem.title = getTranslation("screenDetails_button_dislike")
   m.ResumeMenuItem.title = getTranslation("screenDetails_button_resume")
   m.EpisodesMenuItem.title = getTranslation("screenDetails_button_episodes")
   m.WatchTrailerMenuItem.title = getTranslation("screenDetails_button_trailer")
@@ -110,40 +127,54 @@ End Function
 
 
 Function onStringChange(message)
-  sStringField = message.GetField()
-  sText = message.GetData()
+  sButtonStringId = message.GetField()
+  sButtonText = message.GetData()
+  changeButtonText(sButtonStringId, sButtonText)
+End function
 
+
+Function changeButtonText(sButtonStringId, sButtonText)
   stringNode = invalid
 
-  if sStringField = "stringQueueButton"
+  if sButtonStringId = "stringQueueButton"
     stringNode = m.AddQueueMenuItem
-  else if sStringField = "stringNoQueueButton"
+  else if sButtonStringId = "stringNoQueueButton"
     stringNode = m.RemoveQueueMenuItem
-  else if sStringField = "stringChannelButton"
+  else if sButtonStringId = "stringChannelButton"
     stringNode = m.ChannelMenuItem
-  else if sStringField = "stringNoHistoryButton"
+  else if sButtonStringId = "stringNoHistoryButton"
     stringNode = m.RemoveHistoryMenuItem
-  else if sStringField = "stringSignUpButton"
+  else if sButtonStringId = "stringSignUpButton"
     stringNode = m.signUpMenuItem
+  else if sButtonStringId = "stringLikeDislikeButton"
+    stringNode = m.LikeDislikeMenuItem
+    setVisibilityOfSecondaryMenu()
+    if sButtonText = getTranslation("screenDetails_button_changingRating")
+      '//if the rating is changing, then change icon to default like button
+      stringNode.iconUrl = "pkg:/images/icon-like.webp"
+    end if
   end if
 
   if stringNode <> invalid
-    sTextSplitArray = sText.split(";")
+    sTextSplitArray = sButtonText.split(";")
     if sTextSplitArray.count() > 1
-      stringNode.title = sText.split(";")[0]
-      stringNode.badgeText = sText.split(";")[1]
+      stringNode.title = sButtonText.split(";")[0]
+      stringNode.badgeText = sButtonText.split(";")[1]
     else
-      stringNode.title = sText
+      stringNode.title = sButtonText
     end if
 
-    ' Adjust the width of the menu if the Channel name is too long for the default width
-    if sStringField = "stringChannelButton" or sStringField = "stringSignUpButton"
+    ' Adjust the width of the menu if the Channel name or the signin button (if signin conditions) is too long for the default width
+    if sButtonStringId = "stringChannelButton" or (sButtonStringId = "stringSignUpButton" and isLoggedInUser() = false and isNewUser() = false)
       tempChannelMenuItem = CreateObject("roSGNode", "DetailMenuItem")
       tempChannelMenuItem.itemContent = stringNode
 
       potentialWidth = tempChannelMenuItem.calculatedTextWidth + tempChannelMenuItem.leftTextPadding + tempChannelMenuItem.rightTextPadding
       if potentialWidth > m.defaultMenuWidth
         m.Menu.itemSize = [potentialWidth, m.Menu.itemSize[1]]
+
+        '//move SecondaryMenu to ensure it is not overlapping the Menu
+        m.SecondaryMenu.translation = [potentialWidth + 200, m.SecondaryMenu.translation[1]]
       end if
 
       tempChannelMenuItem = invalid
@@ -169,14 +200,14 @@ Function refocusMenuItem()
       end if
     end if
   end if
-
   focusMenu(true)
 End Function
 
 
 Function onScreenFocusChange()
   tubiLog("DetailScreen.onScreenFocusChange")
-  if m.top.hasFocus() then
+
+  if m.top.hasFocus() = true
 
     'After Instant Resume, when pressing back from one detail screen to another detail screen via YMAL
     'related content(YMAL) thunbnails are not loading. Resetting relatedContent node fixes the issue.
@@ -184,7 +215,9 @@ Function onScreenFocusChange()
     m.top.relatedContent = invalid
     m.top.relatedContent = relatedContent
 
-    m.focusTarget.setFocus(true)
+    if m.focusTarget <> invalid
+      m.focusTarget.setFocus(true)
+    end if
 
     'determine if the content should be refreshed
     if shouldRefresh(m.top.content) = true
@@ -230,7 +263,7 @@ Function onIsBookmark()
   if m.top.disableBookmarks = false
     if m.top.isBookmark = false
       if addQueueIndex = -1
-      'add queue item doesn't exist
+        'add queue item doesn't exist
         if removeQueueIndex > -1
           'remove queue item does exist so replace remove queue item with add queue item
           m.Menu.content.removeChildIndex(removeQueueIndex)
@@ -257,6 +290,48 @@ Function onIsBookmark()
         m.Menu.content.removeChildIndex(m.AddQueueMenuItem)
       end if
     end if
+  end if
+End Function
+
+
+Function onLikeDislikeStateChanged()
+  changeLikeDislikeButtonText() 
+End Function
+
+
+Function changeLikeDislikeButtonText()
+  if m.isLikeDislikeExperimentEnabled = true
+    sButtonText = ""
+    sIconUrl = ""
+    if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked or m.top.likeDislikeState = m.constants.ui.likeDislikeStates.disliked
+      if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked
+        '//The Like State is "liked", so display liked state
+        sButtonText = getTranslation("screenDetails_button_liked")
+        sIconUrl = "pkg:/images/icon-liked.webp"
+      else
+        '//The Like State is "disliked", so display disliked state
+        sButtonText = getTranslation("screenDetails_button_disliked")
+        sIconUrl = "pkg:/images/icon-disliked.webp"
+      end if
+
+      if m.Menu.content <> invalid and m.Menu.itemFocused >= 0
+        focusedMenuItem = m.Menu.content.getChild(m.Menu.itemFocused)
+        if m.Menu.isInFocusChain() = true and focusedMenuItem <> invalid and focusedMenuItem.id = "LikeDislikeMenuItem"
+          sButtonText = sButtonText + getTranslation("screenDetails_button_like_instructions")
+        end if
+      end if
+    else if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.changing
+      sButtonText = getTranslation("screenDetails_button_changingRating")
+      sIconUrl = m.LikeDislikeMenuItem.iconUrl '//Keep the icon as it is while the like state is set to changing
+    else
+      '//The Like State is nothing so display default state
+      sButtonText = getTranslation("screenDetails_button_likeDislike")
+      sIconUrl = "pkg:/images/icon-like.webp"
+    end if
+    
+    changeButtonText("stringLikeDislikeButton", sButtonText)
+    m.LikeDislikeMenuItem.iconUrl = sIconUrl
+    setVisibilityOfSecondaryMenu()
   end if
 End Function
 
@@ -292,7 +367,9 @@ Function onIsSeries()
   isSeries = m.top.isSeries
   episodeListIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
   signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
-  menuItems = [m.signUpMenuItem, m.PlayMenuItem]
+  menuItems = [m.LikeDislikeMenuItem, m.signUpMenuItem, m.PlayMenuItem]
+
+  '//Change the button order of the signup button depending on isSeries state
   if isLoggedInUser() = false and isNewUser() = false
     if getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v3", true).enabled = true
       if isSeries = true and signUpIndex = 1
@@ -301,20 +378,13 @@ Function onIsSeries()
         addRemoveMenuItem(true, -1, m.signUpMenuItem, [])
         menuItems = [m.PlayMenuItem, m.signUpMenuItem]
       else if isSeries = false and signUpIndex = 0
-        'Move sign up button to 1st index for movies
+        'Add sign up button after the Play button for movies
         addRemoveMenuItem(false, signUpIndex)
-        addRemoveMenuItem(true, -1, m.signUpMenuItem, [m.PlayMenuItem])
-      end if
-    else
-      if signUpIndex = -1
-        menuItems = [m.PlayMenuItem]
+        addRemoveMenuItem(true, -1, m.signUpMenuItem, menuItems)
       end if
     end if
-  else
-    'remove the sign up button if it's not needed
-    addRemoveMenuItem(false, signUpIndex, m.signUpMenuItem, [])
-    menuItems = [m.PlayMenuItem]
   end if
+
   addRemoveMenuItem(m.top.isSeries, episodeListIndex, m.EpisodesMenuItem, menuItems)
 End Function
 
@@ -323,6 +393,13 @@ Function onRemoveSignupButton(msg)
   signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
   if signUpIndex <> invalid
     addRemoveMenuItem(false, signUpIndex)
+
+    if m.top.isInKidsMode = false and isLoggedInUser() = true
+      if getExperimentResource("roku_title_reactions", "roku_title_reactions_v1", true).enabled = true
+        '//add like/dislike button
+        addRemoveMenuItem(true, -1, m.LikeDislikeMenuItem, [m.PlayMenuItem])
+      end if
+    end if
   end if
 End Function
 
@@ -336,22 +413,31 @@ Function onIsInKidsMode()
       addRemoveMenuItem(true, signUpIndex, m.signUpMenuItem, [m.PlayMenuItem])
     end if
   end if
+
+  if m.top.isInKidsMode = true
+    '//remove like/dislike button
+    likeDislikeButtonIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
+    addRemoveMenuItem(false, likeDislikeButtonIndex)
+  else if isLoggedInUser() = true
+    if getExperimentResource("roku_title_reactions", "roku_title_reactions_v1", true).enabled = true
+      '//add like/dislike button
+      addRemoveMenuItem(true, -1, m.LikeDislikeMenuItem, [m.PlayMenuItem])
+    end if
+  end if
 End Function
 
 
 Function onHasTrailer()
   tubiLog("DetailScreen.onHasTrailer")
   trailerIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.WatchTrailerMenuItem.id)
-  signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
-  if m.signUpMenuItem <> invalid
-    if signUpIndex > -1
-      addRemoveMenuItem(m.top.hasTrailer, trailerIndex, m.WatchTrailerMenuItem, [m.signUpMenuItem])
-    else
-      addRemoveMenuItem(m.top.hasTrailer, trailerIndex, m.WatchTrailerMenuItem, [m.PlayMenuItem])
-    end if
-  else
-    addRemoveMenuItem(m.top.hasTrailer, trailerIndex, m.WatchTrailerMenuItem, [m.PlayMenuItem])
-  end if
+  
+  previousItems = [
+    m.signUpMenuItem
+    m.LikeDislikeMenuItem
+    m.PlayMenuItem
+  ]
+
+  addRemoveMenuItem(m.top.hasTrailer, trailerIndex, m.WatchTrailerMenuItem, previousItems)
 End Function
 
 
@@ -369,6 +455,9 @@ Function onIsLoading()
     m.RelatedContentGroup.visible = not m.top.isLoading
   else
     m.RelatedContentGroup.visible = false
+  end if
+  if m.top.isLoading = false 
+    focusMenu()
   end if
 End Function
 
@@ -400,12 +489,36 @@ Function setInitialMenuItems() As Void
   tubiLog("DetailScreen.setInitialMenuItems")
   menuItems = CreateObject("roSGNode", "ContentNode")
   menuItems.appendChild(m.PlayMenuItem)
+
   'Add SignUp button for registration experiemnt at 1st index by default
   if isLoggedInUser() = false and isNewUser() = false
     menuItems.appendChild(m.signUpMenuItem)
   end if
+  if isLoggedInUser() = true
+    '//as long as the user is loggd in, send the like/dislike experiment exposure event here
+    if getExperimentResource("roku_title_reactions", "roku_title_reactions_v1", true).enabled = true
+      '//if the experiment is enabled then add the add like button
+      menuItems.appendChild(m.LikeDislikeMenuItem)
+    end if
+  end if
   menuItems.appendChild(m.AddQueueMenuItem)
   m.Menu.content = menuItems
+End Function
+
+
+
+''''''''''''''''''''''
+' setInitialSecondaryMenuItems
+'
+' The secondary menu currently only displays the like/dislike options when 
+'   the "like or dislike" button of the main menu is focused. However, since it is possible other menu items
+'   will need a secondary menu, let's set up the secondary menu like how we set up the main menu.
+Function setInitialSecondaryMenuItems() As Void
+  tubiLog("DetailScreen.setInitialSecondaryMenuItems")
+  menuItems = CreateObject("roSGNode", "ContentNode")
+  menuItems.appendChild(m.LikeMenuItem)
+  menuItems.appendChild(m.DislikeMenuItem)
+  m.SecondaryMenu.content = menuItems
 End Function
 
 
@@ -426,13 +539,14 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
   if add = false and itemIndex > -1
     'menu item exists, so we need to remove it
     m.Menu.content.removeChildIndex(itemIndex)
+
     refocusMenuItem()
   else if add = true and itemIndex = -1
     'we don't have menu item, and need to add one
     'find the previous item index, and insert the Watch Trailer item one index after
     previousItemIndex = -1
     if itemToAdd <> invalid and previousItems <> invalid and previousItems.count() > 0
-      for i=0 to previousItems.count()-1
+      for i = 0 to previousItems.count() - 1
         previousItem = previousItems[i]
         if previousItem <> invalid
           previousItemIndex = m.NodeHelpers.getChildIndexById(menuItems, previousItem.id)
@@ -455,6 +569,16 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
 End Function
 
 
+' assign the focusedMenuItemAnalyticsIds field with the passed ID and the previous focused ID
+Function setNewFocusedId(sCurrentFocusedId)
+  sPreviousFocusedId = ""
+  if m.top.focusedMenuItemAnalyticsIds.Count() = 2
+    sPreviousFocusedId = m.top.focusedMenuItemAnalyticsIds[0]
+  end if
+  m.top.focusedMenuItemAnalyticsIds = [sCurrentFocusedId, sPreviousFocusedId]
+End Function
+
+
 ''''''''''''''''''''''''
 ' onMenuItemSelected
 '
@@ -462,6 +586,71 @@ Function onMenuItemSelected()
   selection = m.Menu.content.getChild(m.Menu.itemSelected)
   handleMenuItemSelected(selection)
 End Function
+
+
+Function onDetailScreenMenuItemFocused()
+  setVisibilityOfSecondaryMenu()
+  focused = m.Menu.content.getChild(m.Menu.itemFocused)
+  setNewFocusedId(focused.analyticsId)
+
+  if m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing
+    '//When the user has liked or disliked content and then moves to or away from the like/dislike button, then change the text to be the focused or unfocused versions
+    changeLikeDislikeButtonText()
+  end if
+End Function
+
+
+Function onSecondaryMenuItemSelected()
+  selection = m.SecondaryMenu.content.getChild(m.SecondaryMenu.itemSelected)
+  handleMenuItemSelected(selection)
+End Function
+
+
+Function onSecondaryMenuItemFocused()
+  focused = m.SecondaryMenu.content.getChild(m.SecondaryMenu.itemFocused)
+  setNewFocusedId(focused.analyticsId)
+End Function
+
+
+' checks if the secondary menu should be seen and then perform the proper actions if the menu should be seen or not.
+' @return boolean, Should the menu be seen? (The function will ensure the menu is made visible if it should and not if it should not.)
+Function setVisibilityOfSecondaryMenu()
+  result = false
+  
+  if m.isLikeDislikeExperimentEnabled = true 
+    itemFocused = m.Menu.content.getChild(m.Menu.itemFocused)
+    if m.SecondaryMenu.isInFocusChain() = true or (m.Menu.isInFocusChain() = true and itemFocused <> invalid and itemFocused.id = "LikeDislikeMenuItem" and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing)
+      alignSecondaryMenuWithMenu()
+      
+      m.SecondaryMenu.visible = true
+      m.Menu.focusFootprintBlendColor = m.constants.ui.colors.selectedListItem
+      m.Menu.focusFootprintBitmapUri = "pkg://images/menu-focus-fhd.9.png"
+      if m.constants.deviceInfo.scaledUi = true
+        m.Menu.focusFootprintBitmapUri = "pkg://images/menu-focus-hd.9.png"
+      end if
+      result = true
+    else
+      m.SecondaryMenu.visible = false
+      m.Menu.focusFootprintBitmapUri = ""
+    end if
+  end if
+
+  return result
+End Function
+
+
+' Properly Align SecondaryMenu with the like/dislike button in the Menu
+Function alignSecondaryMenuWithMenu()
+  likeDislikeButtonIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
+  boundingBoxLikeDislike = m.Menu.ancestorSubBoundingRect("item" + likeDislikeButtonIndex.toStr() + "_0", m.Menu)
+  nMenuHeight = m.Menu.itemSize[1] + m.Menu.itemSpacing[1]
+  nSubMenuLocation = boundingBoxLikeDislike.y/nMenuHeight
+  if nSubMenuLocation = 0
+    m.SecondaryMenu.translation = [m.SecondaryMenu.translation[0], m.Menu.translation[1]]
+  else
+    m.SecondaryMenu.translation = [m.SecondaryMenu.translation[0], m.defaultSecondaryMenuY]
+  end if
+End Function 
 
 
 ' @itemSelected: roSGNode: ContentNode representing the content that was selected by the user
@@ -475,6 +664,27 @@ Function handleMenuItemSelected(itemSelected)
       m.top.resumeSelected = true
     else if itemSelected.id = "PlayMenuItem"
       m.top.playSelected = true
+    else if itemSelected.id = "LikeDislikeMenuItem"
+      if m.LikeDislikeMenuItem.title = getTranslation("screenDetails_button_changingRating") 
+        '//If it is still trying to change the rating then do nothing if this btton is clicked again
+      else if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked
+        '//when the current item is liked, then remove the like state
+        m.top.removeLikeSelected = true
+      else if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.disliked
+        '//when the current item is disliked, then remove the dislike state
+        m.top.removeDislikeSelected = true
+      else
+        '//if displaying the like or dislike button, then clicking this should not cause a change of like status, 
+        '//   but it may be confusing to the useer if nothing happens, so
+        '//   the focus should move to the 2nd menu
+        focusSecondaryMenu()
+      end if
+    else if itemSelected.id = "LikeMenuItem"
+      m.top.likeSelected = true
+      focusMenu()
+    else if itemSelected.id = "DislikeMenuItem"
+      m.top.dislikeSelected = true
+      focusMenu()
     else if itemSelected.id = "WatchTrailerMenuItem"
       m.top.watchTrailerSelected = true
     else if itemSelected.id = "EpisodesMenuItem"
@@ -505,7 +715,7 @@ Function onRelatedContentChange()
     m.RelatedGrid.jumpToItem = m.RelatedGrid.itemFocused
   else
     m.RelatedContentGroup.visible = false
-    if m.RelatedContentGroup.isInFocusChain()
+    if m.RelatedContentGroup.isInFocusChain() = true
       focusMenu()
     end if
   end if
@@ -528,9 +738,9 @@ Function handleRelatedContentSelected(selectedContent, position)
   row = 1
   m.top.trackingComponentInfo = {
     componentType: "related_component"
-      componentValues: {
-        content_tile: m.Tracking.getAnalyticsTile(selectedContent, col, row)
-      }
+    componentValues: {
+      content_tile: m.Tracking.getAnalyticsTile(selectedContent, col, row)
+    }
   }
 
   m.top.relatedContentSelected = position
@@ -558,13 +768,13 @@ Function onRelatedItemFocused()
     ' trigger navigate_within_page events in ContentController
     if m.relatedHasFocus = true
       m.top.navigateWithinPageInfo = {
-        pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: videoId} )
+        pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: videoId})
         componentOneof: m.Tracking.getAnalyticsComponent("related_component", m.oldYmalComponent) 'category_list_component doesn't exist in protos
-        means_of_navigation: "BUTTON"  'MeansOfNavigation enum
+        means_of_navigation: "BUTTON" 'MeansOfNavigation enum
         vertical_location: row '1 based index
-        vertical_location_mode: "INDEX"  'LocationMode enum
+        vertical_location_mode: "INDEX" 'LocationMode enum
         horizontal_location: col
-        horizontal_location_mode: "INDEX"  'LocationMode enum
+        horizontal_location_mode: "INDEX" 'LocationMode enum
       }
       m.oldYmalComponent = {
         content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
@@ -579,87 +789,56 @@ Function onRelatedItemFocused()
 End Function
 
 
-'''''''''''''''''''''''
-' onKeyEvent
-'
-' Hijack any back button presses before they make it to the screen stack if we are waiting for a server
-' response from any of add/remove queue/history so that we make sure the category screen can update with new user category content
-Function onKeyEvent(key As String, press As Boolean) as Boolean
-  tubiLog("DetailScreen.onKeyEvent key = " + key)
-  if press then
-    if key = "back" or key = "left"
-      if not m.top.isWaitingForServerResponse
-        m.top.backButtonPressed = true
-      end if
-      return true
-    ' Down presses arrive here if not consumed by the menu, meaning it's already at the bottom button
-    else if key = "down"
-      if m.Menu.isInFocusChain() = true and m.RelatedContentParentGroup.visible = true and m.RelatedContentGroup.visible = true then
-        focusRelated()
-        return true
-      else if m.Info.isInFocusChain()
-        focusMenu()
-        return true
-      end if
-    else if key = "up"
-      if m.RelatedGrid.isInFocusChain()
-        focusMenu()
-        return true
-      else if m.Menu.isInFocusChain() and m.Info.isDescriptionEllipsized
-        focusInfo()
-        return true
-      end if
-    else if key = "OK"
-      if m.isChannelMenuSelected = true
-        m.isChannelMenuSelected = false
-        m.top.channelSelected = true
-      end if
-      '//ensure this keypress is captured so the default Roku positive audio sound is played.
-      return true
-    else if key = "play"
-      handlePlayInput()
-      return true
-    end if
-  end if
-
-  return false
-End Function
-
-
-Function focusMenu(immediately=false)
+Function focusMenu(immediately = false)
   m.focusTarget = m.Menu
   if immediately
-    m.AnimationGroup.translation = [0,0]
+    m.AnimationGroup.translation = [0, 0]
     m.RelatedContentGroup.opacity = 0.2
     m.Info.opacity = 1.0
   else
-    slideTo(m.AnimationGroup, [0,0], m.focusAnimationDuration)
-    animate(m.RelatedContentGroup, { opacity: 0.2, duration: m.focusAnimationDuration})
-    animate(m.Info, { opacity: 1.0, duration: m.focusAnimationDuration})
+    slideTo(m.AnimationGroup, [0, 0], m.focusAnimationDuration)
+    animate(m.RelatedContentGroup, {opacity: 0.2, duration: m.focusAnimationDuration})
+    animate(m.Info, {opacity: 1.0, duration: m.focusAnimationDuration})
   end if
-  if m.top.isInFocusChain()
+  if m.top.isInFocusChain() = true
+    m.top.focusOnLikeMenu = false '//make sure this is set to false in case cominng from secondary menus
     m.Menu.setFocus(true)
     m.relatedHasFocus = false
   end if
 End Function
 
 
+Function focusSecondaryMenu()
+  m.focusTarget = m.SecondaryMenu
+  if m.top.isInFocusChain() = true
+    m.top.focusOnLikeMenu = true
+    m.SecondaryMenu.jumpToItem = 0  'reset focus to the 1st menu item
+    m.SecondaryMenu.setFocus(true)
+  end if
+End Function
+
+
 Function focusRelated()
   m.focusTarget = m.RelatedGrid
-  if m.top.isInFocusChain()
+  if m.top.isInFocusChain() = true
+    setNewFocusedId("") '//ensure new focus is set when the YMAL is focused.
     m.RelatedGrid.setFocus(true)
   end if
-  slideTo(m.AnimationGroup, [0,-392], m.focusAnimationDuration)
-  animate(m.RelatedContentGroup, { opacity: 1.0, duration: m.focusAnimationDuration })
-  animate(m.Info, { opacity: 0.2, duration: m.focusAnimationDuration })
+  slideTo(m.AnimationGroup, [0, -392], m.focusAnimationDuration)
+  animate(m.RelatedContentGroup, {opacity: 1.0, duration: m.focusAnimationDuration})
+  animate(m.Info, {opacity: 0.2, duration: m.focusAnimationDuration})
+
+  setVisibilityOfSecondaryMenu()
 End Function
 
 
 Function focusInfo()
   m.focusTarget = m.Info
-  if m.top.isInFocusChain()
+  if m.top.isInFocusChain() = true
+    setNewFocusedId("") '//ensure new focus is set when the info panel is focused.
     m.Info.setFocus(true)
   end if
+  setVisibilityOfSecondaryMenu()
 End Function
 
 
@@ -698,9 +877,9 @@ Function handlePlayInput()
     m.top.stopVideoPreview = true
   end if
 
-  if itemFocused.id = "PlayMenuItem" and m.Menu.isInFocusChain() = true
+  if m.Menu.isInFocusChain() = true and itemFocused.id = "PlayMenuItem"
     m.top.playSelected = true
-  else if itemFocused.id = "WatchTrailerMenuItem" and m.Menu.isInFocusChain() = true
+  else if m.Menu.isInFocusChain() = true and itemFocused.id = "WatchTrailerMenuItem"
     m.top.watchTrailerSelected = true
   else if m.RelatedGrid.isInFocusChain() = true
     selectedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemFocused)
@@ -708,4 +887,57 @@ Function handlePlayInput()
   else
     m.top.resumeSelected = true
   end if
+End Function
+
+
+'''''''''''''''''''''''
+' onKeyEvent
+'
+' Hijack any back button presses before they make it to the screen stack if we are waiting for a server
+' response from any of add/remove queue/history so that we make sure the category screen can update with new user category content
+Function onKeyEvent(key As String, press As Boolean) as Boolean
+  tubiLog("DetailScreen.onKeyEvent key = " + key)
+  if press then
+    if key = "back" or (key = "left" and m.SecondaryMenu.isInFocusChain() = false)
+      if not m.top.isWaitingForServerResponse
+        m.top.backButtonPressed = true
+      end if
+      return true
+      ' Down presses arrive here if not consumed by the menu, meaning it's already at the bottom button
+    else if key = "down"
+      if m.Menu.isInFocusChain() = true and m.RelatedContentParentGroup.visible = true and m.RelatedContentGroup.visible = true then
+        focusRelated()
+        return true
+      else if m.Info.isInFocusChain() = true
+        focusMenu()
+        return true
+      end if
+    else if key = "up"
+      if m.RelatedGrid.isInFocusChain() = true
+        focusMenu()
+        return true
+      else if m.Menu.isInFocusChain() = true and m.Info.isDescriptionEllipsized = true
+        focusInfo()
+        return true
+      end if
+    else if key = "OK"
+      if m.isChannelMenuSelected = true
+        m.isChannelMenuSelected = false
+        m.top.channelSelected = true
+      end if
+      '//ensure this keypress is captured so the default Roku positive audio sound is played.
+      return true
+    else if key = "play"
+      handlePlayInput()
+      return true
+    else if key = "right" and m.Menu.isInFocusChain() = true and m.Menu.content.getChild(m.Menu.itemFocused).id = "LikeDislikeMenuItem" and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked 
+      focusSecondaryMenu()
+      return true
+    else if key = "left" and m.SecondaryMenu.isInFocusChain() = true
+      focusMenu()
+      return true
+    end if
+  end if
+
+  return false
 End Function

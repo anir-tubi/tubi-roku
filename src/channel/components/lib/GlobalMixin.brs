@@ -50,6 +50,24 @@ Function getHistory(contentId)
 End Function
 
 
+' getLike finds the like/dislike node based on contentId provided
+'
+' @contentId: string, the id of any content
+' returns a LikeContentNode of the given content
+Function getLike(contentId)
+
+  likeNode = invalid
+  if contentId <> invalid
+    likeIds = getFieldFromGlobal("likeIds")
+    if likeIds <> invalid
+      likeNode = likeIds.findNode(contentId)
+    end if
+  end if
+  return likeNode
+
+End Function
+
+
 ' getBookmarks finds the bookmarks based on contentId provided
 '
 ' @contentId: string, the id of any content

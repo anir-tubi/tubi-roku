@@ -516,6 +516,10 @@ Function getTranslation_en_US()
       "description": "label of the button that will remove the video title from the user's viewing history",
       "message": "Remove from history"
     },
+    "screenDetails_button_changingRating": {
+      "description": "label of the button when the user has clicked the button and the like/dislike state of the video title is changing",
+      "message": "Changing Rating..."
+    },
     "screenDetails_button_queueNow": {
       "description": "label of the button when the user has clicked the button and the video title is being added to the user's list",
       "message": "Adding..."
@@ -807,6 +811,30 @@ Function getTranslation_en_US()
     "screenDetails_button_play": {
       "description": "Label of button to allow users to play the current video title",
       "message": "Play"
+    },
+    "screenDetails_button_like_instructions": {
+      "description": "text to be place AFTER the text that indicates that the user 'liked' or 'disliked' the current video title. This appears once the button gains focus",
+      "message": " - Remove Rating"
+    },
+    "screenDetails_button_like": {
+      "description": "Label of button to allow users to like the current video title",
+      "message": "Like"
+    },
+    "screenDetails_button_liked": {
+      "description": "Label of button to indicate to users that the current video title has been liked",
+      "message": "Liked"
+    },
+    "screenDetails_button_dislike": {
+      "description": "Label of button to allow users to dislike the current video title",
+      "message": "Dislike"
+    },
+    "screenDetails_button_disliked": {
+      "description": "Label of button to indicate to users that the current video title has been disliked",
+      "message": "Disliked"
+    },
+    "screenDetails_button_likeDislike": {
+      "description": "Label of unfocused button to allow users to like or dislike the current video title",
+      "message": "Like or Dislike"
     },
     "screenDetails_button_resume": {
       "description": "Label of button to allow users to resume the current video title",
