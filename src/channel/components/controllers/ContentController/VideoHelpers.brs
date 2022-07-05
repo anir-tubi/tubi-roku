@@ -140,10 +140,7 @@ Function setupVideoPlayer(content, playbackSource = "unknown", position = 0)
     getSprites(content)
 
     '//Stop the background artwork from transitioning
-    m.backgroundGroup.backgroundInfo = {
-      type: m.constants.ui.backgroundTypes.fullScreen
-      uriList: []
-    }
+    m.backgroundGroup.shouldRotateBackgrounds = false
 
     ' set general observers for all content (including trailers)
     videoPlayer.observeFieldScoped("state", "onVideoPlayerState")

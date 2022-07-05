@@ -1366,7 +1366,7 @@ Function setHomeScreenBackground(homeScreen)
 
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.epg
-        uriList: [] ' setting uriList as empty, because don't need to rotate the background poster when video preview is playing
+        uriList: [] ' setting uriList as empty, because don't need to rotate the background poster when video preview is playing. We can't use shouldRotateBackgrounds because we still need the gradients from backgroundGroup
       }
     else
       m.backgroundGroup.backgroundInfo = {

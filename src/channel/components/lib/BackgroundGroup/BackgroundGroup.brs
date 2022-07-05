@@ -22,6 +22,7 @@ Function init()
   m.top.observeField("backgroundInfo", "newBackgroundSet")
   m.top.observeField("kidsMode", "onKidsModeChange")
   m.top.observeField("posterVisible", "onPosterVisibleChange")
+  m.top.observeFieldScoped("shouldRotateBackgrounds", "onShouldRotateBackgroundsChange")
 
   m.PosterGroup = m.top.findNode("PosterGroup")
   m.GradientGroup = m.top.findNode("GradientGroup")
@@ -50,6 +51,7 @@ Function init()
   m.top.inheritParentOpacity = false
 End Function
 
+
 Function onKidsModeChange()
   if m.top.kidsMode = true
     m.fullScreenGradient.uri = m.constants.ui.uris.backgroundFullScreenGradient_kidsMode
@@ -75,9 +77,22 @@ Function onPosterVisibleChange()
 End Function
 
 
+Function onShouldRotateBackgroundsChange(msg)
+  if msg.getData() = true then
+    startTimer()
+  else
+    stopTimer()
+  end if
+End Function
+
+
 'Runs when the backgroundType has been set.
 Function newBackgroundSet()
   TubiLog("BackgroundGroup.newBackgroundSet")
+
+  ' reenable shouldRotateBackgrounds for simplicity
+  m.top.shouldRotateBackgrounds = true
+
   m.aCurrentBackgroundInfo = m.top.backgroundInfo
 
   for i=0 to m.aCurrentBackgroundInfo.uriList.count()-1
@@ -105,7 +120,7 @@ Function newBackgroundSet()
     end for
   end if
   if isSame = false
-    m.timer.control = "stop"
+    stopTimer()
     m.isRotation = false
     updateBackground(0)
     m.lastBackgroundInfo = m.aCurrentBackgroundInfo
@@ -287,11 +302,11 @@ Function transitionPosters()
         startTransitionIn()
 
         'once the transition is complete we will want to start the timer for rotating background images
-        node = m.newPoster.findNode(m.newPoster.lastAnimationName)
-        if node = invalid
+        lastAnimationNode = m.newPoster.findNode(m.newPoster.lastAnimationName)
+        if lastAnimationNode = invalid
           tubiLog("Node could not be found for lastAnimationName: " + m.newPoster.lastAnimationName, "warn")
         else
-          node.observeField("state", "onTransitionComplete")
+          lastAnimationNode.observeField("state", "onTransitionComplete")
         end if
       else
         'set observer/callback to select and start the transition animation if the poster is not yet ready
@@ -568,8 +583,9 @@ Function onBackgroundPosterReady()
     startTransitionIn()
 
     'once the transition is complete we will want to start the timer for rotating background images
-    if m.newPoster.findNode(m.newPoster.lastAnimationName) <> invalid
-      m.newPoster.findNode(m.newPoster.lastAnimationName).observeField("state", "onTransitionComplete")
+    node = m.newPoster.findNode(m.newPoster.lastAnimationName)
+    if node <> invalid
+      node.observeField("state", "onTransitionComplete")
     end if
   end if
 End Function
@@ -579,18 +595,29 @@ End Function
 Function onTransitionComplete()
   m.newPoster.findNode(m.newPoster.lastAnimationName).unobserveField("state")
 
-  if m.aCurrentBackgroundInfo.uriList.count() > 1
-    m.timer.observeField("fire", "rotateBackgrounds")
-    m.timer.control = "start"
+  if m.aCurrentBackgroundInfo.uriList.count() > 1 AND m.top.shouldRotateBackgrounds = true then
+    startTimer()
   end if
 End Function
 
 
-'Determines the next background image uri and makes call to update the background
-Function rotateBackgrounds()
-  m.timer.unobserveField("fire")
+Function startTimer()
+  stopTimer()
+  m.timer.observeFieldScoped("fire", "onTimerFired")
+  m.timer.control = "start"
+End Function
 
-  currentIndex = 0
+
+Function stopTimer()
+  m.timer.unobserveFieldScoped("fire")
+  m.timer.control = "stop"
+End Function
+
+
+'Determines the next background image uri and makes call to update the background
+Function onTimerFired()
+  stopTimer()
+
   currentIndex = m._.indexOf(m.aCurrentBackgroundInfo.uriList, m.newPoster.uri)
 
   nextIndex = 0

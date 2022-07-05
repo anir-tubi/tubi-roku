@@ -194,7 +194,7 @@ Function maximizeLinearPlayer(content)
     videoPlayer.observeFieldScoped("backButtonPressed", "onLinearVideoPlayerBackPressed")
 
     if videoPlayer.fullscreen = false
-      '//stop the background artwork from transitioning and from displaying while player is in fullscreen
+      '//stop the background artwork from transitioning and from displaying while player is in fullscreen. We can't use shouldRotateBackgrounds because we still need the gradients from backgroundGroup
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.linear
         uriList: []

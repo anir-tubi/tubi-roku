@@ -66,7 +66,7 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     '//::TODO:: epg - remove this observer once the roku_linear_epg_v5 experiment is done
     homeScreen.observeField("focusedChild", "onHomeScreenFocusChange")
 
-    m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop lsitenting to timer before listing to it in case a previous screen started the timer
+    m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
 
     sContentMode = constants.ui.contentMode.homescreen

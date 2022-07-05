@@ -15,12 +15,15 @@
 
   <interface>
     <!-- INPUT -->
-    <!-- backgrondInfo has the keys "type (string)" and "uriList (array)".
+    <!-- backgroundInfo has the keys "type (string)" and "uriList (array)".
          type can be "topright", "fullscreen", "linear"
          uriList is an array of background image uris
+         For simplicity shouldRotateBackgrounds is set back to true when backgroundInfo is set
     -->
     <field id="backgroundInfo" type="assocarray" />
     <field id="kidsMode" type="boolean" />
+    <!-- Controls whether the background will switch between background uris on a timed basis -->
+    <field id="shouldRotateBackgrounds" type="bool" value="true" />
     <!--Tell the Background Group to hide or display the poster artwork-->
     <field id="posterVisible" type="boolean" value="true" />
   </interface>

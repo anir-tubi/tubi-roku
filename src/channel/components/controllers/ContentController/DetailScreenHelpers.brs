@@ -138,12 +138,7 @@ Function onDetailBackgroundChange(msg)
 
     if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
       previewState = getVideoPreviewState()
-      if previewState = "playing"
-        m.backgroundGroup.backgroundInfo = {
-          type: m.constants.ui.backgroundTypes.epg
-          uriList: [] ' setting uriList as empty, because don't rotate background poster when video preview is playing
-        }
-      else
+      if previewState <> "playing"
         m.backgroundGroup.backgroundInfo = {
           type: m.constants.ui.backgroundTypes.topright
           uriList: detailScreen.backgroundUriList
