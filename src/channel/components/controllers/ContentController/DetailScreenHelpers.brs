@@ -1197,7 +1197,7 @@ Function onLikeChangedError(parsedReturn)
   if detailScreen <> invalid and detailScreen.content <> invalid
     '//return the likeDislike button to the way it was before trying to unsuccessfully set the like/dislike
     currentScreen = getCurrentScreen()
-    if currentScreen <> invalid and currentScreen().id = detailScreen.id
+    if currentScreen <> invalid and currentScreen.id = detailScreen.id
       detailScreen.isWaitingForServerResponse = false
 
       '//set back to the previous like state before the failed attempt
