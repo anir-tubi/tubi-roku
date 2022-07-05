@@ -356,11 +356,6 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       detailScreen.jumpToItem = 0
     end if
 
-    if m.deepLinkContent = invalid
-      '//Fire the update Icons exposure event when the detail screen is shown to user
-      getExperimentResource("roku_update_icons", "roku_update_icons_v1", true)
-    end if
-
   end if
 
   m.isScreenLoaded = true

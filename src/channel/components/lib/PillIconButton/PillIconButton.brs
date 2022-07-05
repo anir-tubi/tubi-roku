@@ -36,11 +36,7 @@ Function onIconChange()
     else if sIconID = "checkmark"
       m.Icon.uri = "pkg:/images/icon-checkmark.png"
     else if sIconID = "about"
-      if getExperimentResource("roku_update_icons", "roku_update_icons_v1", false).enabled = true
-        m.Icon.uri = "pkg:/images/icon-about.webp"
-      else
-        m.Icon.uri = "pkg:/images/icon-about.png"
-      end if
+      m.Icon.uri = "pkg:/images/icon-about.webp"
     end if
   end if
 End Function

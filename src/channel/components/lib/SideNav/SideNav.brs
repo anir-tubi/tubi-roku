@@ -4,8 +4,6 @@ Function init()
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 
-  m.updateIconsEnabled = getExperimentResource("roku_update_icons", "roku_update_icons_v1", false).enabled
-
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("stringSignIn", "onSignInChange")
   m.top.observeFieldScoped("displayEspanol", "onEspanolDisplayChanged")
@@ -64,11 +62,7 @@ Function createMainContent(item)
     contentNode.iconUrl = "pkg:/images/sideNavSearch.png"
   else if item = m.constants.ui.sideNavIds.home
     contentNode.title = getTranslation("menu_home")
-    if m.updateIconsEnabled = true
-      contentNode.iconUrl = "pkg:/images/sideNavHome.webp"
-    else
-      contentNode.iconUrl = "pkg:/images/sideNavHome.png"
-    end if
+    contentNode.iconUrl = "pkg:/images/sideNavHome.webp"
   else if item = m.constants.ui.sideNavIds.movies
     contentNode.title = getTranslation("menu_movies")
     contentNode.iconUrl = "pkg:/images/sideNavMovies.png"
@@ -83,25 +77,13 @@ Function createMainContent(item)
     contentNode.iconUrl = "pkg:/images/sideNavLinearTV.png"
   else if item = m.constants.ui.sideNavIds.myList
     contentNode.title = getTranslation("menu_mylist")
-    if m.updateIconsEnabled = true
-      contentNode.iconUrl = "pkg:/images/icon-add-to-queue.webp"
-    else
-      contentNode.iconUrl = "pkg:/images/sideNavMyList.png"
-    end if
+    contentNode.iconUrl = "pkg:/images/icon-add-to-queue.webp"
   else if item = m.constants.ui.sideNavIds.categories
     contentNode.title = getTranslation("menu_categories")
-    if m.updateIconsEnabled = true
-      contentNode.iconUrl = "pkg:/images/sideNavCategories.webp"
-    else
-      contentNode.iconUrl = "pkg:/images/sideNavCategories.png"
-    end if
+    contentNode.iconUrl = "pkg:/images/sideNavCategories.webp"
   else if item = m.constants.ui.sideNavIds.channels
     contentNode.title = getTranslation("menu_channels")
-    if m.updateIconsEnabled = true
-      contentNode.iconUrl = "pkg:/images/sideNavChannels.webp"
-    else
-      contentNode.iconUrl = "pkg:/images/sideNavChannels.png"
-    end if
+    contentNode.iconUrl = "pkg:/images/sideNavChannels.webp"
   else if item = m.constants.ui.sideNavIds.profile
     ' m.top.stringSignIn may have been set before SideNav.createMainContent() was called
     ' so use it if it exists
@@ -123,18 +105,10 @@ Function createMainContent(item)
       end if
     end if
 
-    if m.updateIconsEnabled = true
-      contentNode.iconUrl = "pkg:/images/icon-sign-in.webp"
-    else
-      contentNode.iconUrl = "pkg:/images/sideNavProfile.png"
-    end if
+    contentNode.iconUrl = "pkg:/images/icon-sign-in.webp"
   else if item = m.constants.ui.sideNavIds.settings
     contentNode.title = getTranslation("menu_settings")
-    if m.updateIconsEnabled = true
-      contentNode.iconUrl = "pkg:/images/sideNavSettings.webp"
-    else
-      contentNode.iconUrl = "pkg:/images/sideNavSettings.png"
-    endif
+    contentNode.iconUrl = "pkg:/images/sideNavSettings.webp"
   else if item = m.constants.ui.sideNavIds.exit
     contentNode.title = getTranslation("menu_exit")
     contentNode.iconUrl = "pkg:/images/sideNavExit.png"

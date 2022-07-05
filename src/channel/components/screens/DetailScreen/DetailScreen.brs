@@ -21,16 +21,6 @@ Function init()
   m.ChannelMenuItem = m.top.findNode("ChannelMenuItem")
   m.WatchTrailerMenuItem = m.top.findNode("WatchTrailerMenuItem")
   ' fire exposure event when detail screen is
-  updateIconsEnabled = getExperimentResource("roku_update_icons", "roku_update_icons_v1", false).enabled
-  if updateIconsEnabled = false
-    m.ResumeMenuItem.iconUrl = "pkg:/images/icon-resume.png"
-    m.PlayMenuItem.iconUrl = "pkg:/images/icon-play.png"
-    m.EpisodesMenuItem.iconUrl = "pkg:/images/icon-all-episodes.png"
-    m.AddQueueMenuItem.iconUrl = "pkg:/images/icon-add-to-queue.png"
-    m.RemoveQueueMenuItem.iconUrl = "pkg:/images/icon-remove-from-queue.png"
-    m.RemoveHistoryMenuItem.iconUrl = "pkg:/images/icon-remove-from-history.png"
-    m.WatchTrailerMenuItem.iconUrl = "pkg:/images/icon-trailer.png"
-  end if
   m.RelatedContentParentGroup = m.top.findNode("RelatedContentParentGroup")
   m.RelatedContentGroup = m.RelatedContentParentGroup.findNode("RelatedContentGroup")
   m.RelatedGrid = m.top.findNode("RelatedGrid")
@@ -38,9 +28,7 @@ Function init()
   m.RelatedRowLabel = m.top.findNode("RelatedRowLabel")
   m.AnimationGroup = m.top.findNode("AnimationGroup")
   m.signUpMenuItem = m.top.findNode("signUpMenuItem")
-  if updateIconsEnabled = true
-    m.signUpMenuItem.iconUrl = "pkg:/images/icon-sign-in.webp"
-  end if
+  m.signUpMenuItem.iconUrl = "pkg:/images/icon-sign-in.webp"
   m.top.observeFieldScoped("removeSignupButton", "onRemoveSignupButton")
   m.top.observeFieldScoped("stringSignUpButton", "onStringChange")
   m.top.observeFieldScoped("length", "onLengthChange")

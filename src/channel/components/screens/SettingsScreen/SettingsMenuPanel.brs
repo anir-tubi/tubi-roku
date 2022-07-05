@@ -44,28 +44,12 @@ Function setSettingsMenuStringsAndIcons()
     TermsOfServiceButton.title = getTranslation("screenSettings_menu_tos")
     DoNotSellPolicyButton = m.top.findNode("DoNotSellPolicyButton")
     DoNotSellPolicyButton.title = getTranslation("screenSettings_menu_doNotSellPolicy")
-    signInOutButton = m.top.findNode("SignInOutButton")
-
-    updateIconsEnabled = getExperimentResource("roku_update_icons", "roku_update_icons_v1", false).enabled
-
-    if updateIconsEnabled = false
-      ParentalControlsButton.iconUrl = "pkg:/images/icon-parental.png"
-      AboutButton.iconUrl = "pkg:/images/icon-about.png"
-      PrivacyPolicyButton.iconUrl = "pkg:/images/icon-privacy.png"
-      TermsOfServiceButton.iconUrl = "pkg:/images/icon-terms.png"
-      DoNotSellPolicyButton.iconUrl = "pkg:/images/icon-dns.png"
-      signInOutButton.iconUrl = "pkg:/images/icon-sign-in.webp"
-    end if
 
     if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
       AutoplayPreviewButton = CreateObject("roSGNode", "DetailMenuItemContentNode")
       AutoplayPreviewButton.title = getTranslation("screenSettings_menu_autoplayPreview")
       AutoplayPreviewButton.id="AutoplayPreviewButton"
-      if updateIconsEnabled = true
-        AutoplayPreviewButton.iconUrl="pkg:/images/icon-trailer.webp"
-      else
-        AutoplayPreviewButton.iconUrl="pkg:/images/icon-trailer.png"
-      end if
+      AutoplayPreviewButton.iconUrl="pkg:/images/icon-trailer.webp"
       settingContentNode = m.top.findNode("SettingsMenuContent")
       settingContentNode.insertChild(AutoplayPreviewButton, 1)
     end if
