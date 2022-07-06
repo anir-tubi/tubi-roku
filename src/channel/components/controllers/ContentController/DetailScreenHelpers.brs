@@ -16,8 +16,9 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.trackingLoadStartTime = Uptime(0)
     detailScreen.shouldFocusWhenPushed = m.top.fadeInContentController
     detailScreen.playbackSource = playbackSource
-    detailScreen.observeFieldScoped("focusedMenuItemAnalyticsIds", "onDetailScreenMenuItemFocused")
-    detailScreen.observeFieldScoped("focusOnLikeMenu", "onDetailScreenLikeMenuFocused")
+    detailScreen.observeFieldScoped("toggleOnButtonValue", "onDetailScreenButtonToggleOn")
+    detailScreen.observeFieldScoped("toggleOffButtonValue", "onDetailScreenButtonToggleOff")
+    detailScreen.observeFieldScoped("confirmButtonValue", "onDetailScreenButtonConfirm")
     detailScreen.observeFieldScoped("playSelected", "onPlay")
     detailScreen.observeFieldScoped("resumeSelected", "onResume")
     detailScreen.observeFieldScoped("likeSelected", "onLike")
@@ -134,6 +135,13 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
 End Function
 
 
+' @screen: roSGNode, a node with subtype BaseScreen
+' @returns: boolean, true if the passed in parameter is a detail screen, false otherwise
+Function isDetailScreen(screen)
+  return (type(screen) = "roSGNode" and screen.isSubType("DetailScreen") = true)
+End Function
+
+
 Function setDetailStrings(screen)
   screen.stringQueueButton = getTranslation("screenDetails_button_queue")
   screen.stringNoQueueButton = getTranslation("screenDetails_button_NoQueue")
@@ -211,7 +219,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
   tubiLog("DetailScreenHelpers.populateDetailScreen")
   'initialize default background - will be overwritten later in most cases
   backgroundUriList = [m.defaultBackgroundUri]
-  if type(detailScreen) = "roSGNode" and detailScreen.isSubType("DetailScreen") and type(content) = "roSGNode"
+  if isDetailScreen(detailScreen) = true and type(content) = "roSGNode"
     'hide the spinner
     detailScreen.isLoading = false
 
@@ -1853,28 +1861,37 @@ Function sendLikeSelectAnalytics(screen, sLikeEventEnum)
 End Function
 
 
-'When the menu item changes focus, then analytics should be sent out regarding which menu items  have gained or lost focus
-Function onDetailScreenMenuItemFocused(msg)
-  tubiLog("DetailScreenHelpers.onDetailScreenMenuItemFocused")
+Function onDetailScreenButtonToggleOn(msg)
+  tubilog("DetailScreenHelpers.onDetailScreenButtonToggleOn")
+  analyticsButtonValue = msg.getData()
   detailScreen = msg.getRoSGNode()
-  focusedMenuItemAnalyticsValues = msg.getData()
 
-  sCurrentFocusedValue = focusedMenuItemAnalyticsValues[0]
-  sPreviousFocusedValue = focusedMenuItemAnalyticsValues[1]
-
-  sendDetailMenuFocusAnalytics(detailScreen, sCurrentFocusedValue, "TOGGLE_ON")
-  sendDetailMenuFocusAnalytics(detailScreen, sPreviousFocusedValue, "TOGGLE_OFF")
+  if analyticsButtonValue <> "" and isDetailScreen(detailScreen) = true
+    sendDetailMenuFocusAnalytics(detailScreen, analyticsButtonValue, "TOGGLE_ON")
+  end if
 End Function
 
 
-'When the Like/Dislike Menu gains focus, then send out an analytic call
-Function onDetailScreenLikeMenuFocused(msg)
-  tubiLog("DetailScreenHelpers.onDetailScreenLikeMenuFocused")
+Function onDetailScreenButtonToggleOff(msg)
+  tubilog("DetailScreenHelpers.onDetailScreenButtonToggleOff")
+  analyticsButtonValue = msg.getData()
   detailScreen = msg.getRoSGNode()
-  if detailScreen.focusOnLikeMenu = true
-    sendDetailMenuFocusAnalytics(detailScreen, "LIKE_OR_DISLIKE", "CONFIRM")
+
+  if analyticsButtonValue <> "" and isDetailScreen(detailScreen) = true
+    sendDetailMenuFocusAnalytics(detailScreen, analyticsButtonValue, "TOGGLE_OFF")
   end if
-end Function
+End Function
+
+
+Function onDetailScreenButtonConfirm(msg)
+  tubilog("DetailScreenHelpers.onDetailScreenButtonConfirm")
+  analyticsButtonValue = msg.getData()
+  detailScreen = msg.getRoSGNode()
+
+  if analyticsButtonValue <> "" and isDetailScreen(detailScreen) = true
+    sendDetailMenuFocusAnalytics(detailScreen, analyticsButtonValue, "CONFIRM")
+  end if
+End Function
 
 
 ' send out a call to analytics that a menu item has been focused or unfocused, or when the like/dislike menu has gained focus
@@ -1893,7 +1910,7 @@ Function sendDetailMenuFocusAnalytics(screen, sAnalyticsValue, sUserInteraction)
     componentInteractionEvent.pageOneof = m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
 
     componentValues = {
-      button_type: 1 '0-UNKNOWN, 1-TEXT, 2-DROPDOWN, 3-IMAGE
+      button_type: "TEXT"
       button_value: sAnalyticsValue
     }
     componentInteractionEvent.componentOneof = m.Tracking.getAnalyticsComponent("button_component", componentValues)

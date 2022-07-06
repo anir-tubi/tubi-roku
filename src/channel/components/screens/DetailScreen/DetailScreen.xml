@@ -186,8 +186,10 @@
       <!-- Communicates to the parent that the video preview should be stopped -->
       <field id="stopVideoPreview" type="boolean" alwaysNotify="true"/>
 
-      <!-- The analytics IDs of the focused item and the previously focused item -->
-      <field id="focusedMenuItemAnalyticsIds" type="array" value="[]"/>
+      <!-- The "button_value" for an analytics ButtonComponent -->
+      <field id="toggleOnButtonValue" type="string" alwaysNotify="true" />
+      <field id="toggleOffButtonValue" type="string" alwaysNotify="true" />
+      <field id="confirmButtonValue" type="string" alwaysNotify="true" />
 
       <!-- Called to report that the Like/Dislike Menu has gained focus or lost focus -->
       <field id="focusOnLikeMenu" type="boolean" value="false"/>
@@ -204,17 +206,17 @@
       iconUrl="pkg:/images/icon-play.webp"/>
     <DetailMenuItemContentNode
       id="LikeMenuItem"
-      analyticsId="LIKE"
+      analyticsButtonValue="LIKE"
       isUnfocusedFootprintEnabled="true"
       iconUrl="pkg:/images/icon-like.webp" />
     <DetailMenuItemContentNode
       id="DislikeMenuItem"
-      analyticsId="DISLIKE"
+      analyticsButtonValue="DISLIKE"
       isUnfocusedFootprintEnabled="true"
       iconUrl="pkg:/images/icon-dislike.webp" />
     <DetailMenuItemContentNode
       id="LikeDislikeMenuItem"
-      analyticsId="LIKE_OR_DISLIKE"
+      analyticsButtonValue="LIKE_OR_DISLIKE"
       iconUrl="pkg:/images/icon-like.webp" />
     <DetailMenuItemContentNode
       id="EpisodesMenuItem"

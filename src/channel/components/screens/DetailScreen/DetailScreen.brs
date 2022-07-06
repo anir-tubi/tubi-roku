@@ -53,9 +53,11 @@ Function init()
 
 
   m.Menu.observeFieldScoped("itemSelected", "onMenuItemSelected")
-  m.Menu.observeFieldScoped("itemFocused", "onDetailScreenMenuItemFocused")
+  m.Menu.observeFieldScoped("itemFocused", "onMenuItemFocused")
+  m.Menu.observeFieldScoped("itemUnfocused", "onMenuItemUnfocused")
   m.SecondaryMenu.observeFieldScoped("itemSelected", "onSecondaryMenuItemSelected")
   m.SecondaryMenu.observeFieldScoped("itemFocused", "onSecondaryMenuItemFocused")
+  m.SecondaryMenu.observeFieldScoped("itemUnfocused", "onSecondaryMenuItemUnfocused")
   m.top.observeFieldScoped("relatedContent", "onRelatedContentChange")
   m.RelatedGrid.observeFieldScoped("itemSelected", "onRelatedContentSelected")
   m.RelatedGrid.observeFieldScoped("itemFocused", "onRelatedItemFocused")
@@ -557,29 +559,20 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
 End Function
 
 
-' assign the focusedMenuItemAnalyticsIds field with the passed ID and the previous focused ID
-Function setNewFocusedId(sCurrentFocusedId)
-  sPreviousFocusedId = ""
-  if m.top.focusedMenuItemAnalyticsIds.Count() = 2
-    sPreviousFocusedId = m.top.focusedMenuItemAnalyticsIds[0]
-  end if
-  m.top.focusedMenuItemAnalyticsIds = [sCurrentFocusedId, sPreviousFocusedId]
-End Function
-
-
 ''''''''''''''''''''''''
 ' onMenuItemSelected
 '
 Function onMenuItemSelected()
   selection = m.Menu.content.getChild(m.Menu.itemSelected)
+  m.top.confirmButtonValue = selection.analyticsButtonValue
   handleMenuItemSelected(selection)
 End Function
 
 
-Function onDetailScreenMenuItemFocused()
+Function onMenuItemFocused()
   setVisibilityOfSecondaryMenu()
   focused = m.Menu.content.getChild(m.Menu.itemFocused)
-  setNewFocusedId(focused.analyticsId)
+  m.top.toggleOnButtonValue = focused.analyticsButtonValue
 
   if m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing
     '//When the user has liked or disliked content and then moves to or away from the like/dislike button, then change the text to be the focused or unfocused versions
@@ -588,15 +581,36 @@ Function onDetailScreenMenuItemFocused()
 End Function
 
 
+Function onMenuItemUnfocused(msg)
+  itemUnfocusedIndex = msg.getData()
+  itemUnfocused = m.Menu.content.getChild(itemUnfocusedIndex)
+
+  if itemUnfocused <> invalid
+    m.top.toggleOffButtonValue = itemUnfocused.analyticsButtonValue
+  end if
+End Function
+
+
 Function onSecondaryMenuItemSelected()
   selection = m.SecondaryMenu.content.getChild(m.SecondaryMenu.itemSelected)
+  m.top.confirmButtonValue = selection.analyticsButtonValue
   handleMenuItemSelected(selection)
 End Function
 
 
 Function onSecondaryMenuItemFocused()
   focused = m.SecondaryMenu.content.getChild(m.SecondaryMenu.itemFocused)
-  setNewFocusedId(focused.analyticsId)
+  m.top.toggleOnButtonValue = focused.analyticsButtonValue
+End Function
+
+
+Function onSecondaryMenuItemUnfocused(msg)
+  itemUnfocusedIndex = msg.getData()
+  itemUnfocused = m.SecondaryMenu.content.getChild(itemUnfocusedIndex)
+
+  if itemUnfocused <> invalid
+    m.top.toggleOffButtonValue = itemUnfocused.analyticsButtonValue
+  end if
 End Function
 
 
@@ -809,7 +823,8 @@ End Function
 Function focusRelated()
   m.focusTarget = m.RelatedGrid
   if m.top.isInFocusChain() = true
-    setNewFocusedId("") '//ensure new focus is set when the YMAL is focused.
+    focusedMenuItem = m.Menu.content.getChild(m.Menu.itemFocused)
+    m.top.toggleOffButtonValue = focusedMenuItem.analyticsButtonValue
     m.RelatedGrid.setFocus(true)
   end if
   slideTo(m.AnimationGroup, [0, -392], m.focusAnimationDuration)
@@ -823,7 +838,8 @@ End Function
 Function focusInfo()
   m.focusTarget = m.Info
   if m.top.isInFocusChain() = true
-    setNewFocusedId("") '//ensure new focus is set when the info panel is focused.
+    focusedMenuItem = m.Menu.content.getChild(m.Menu.itemFocused)
+    m.top.toggleOffButtonValue = focusedMenuItem.analyticsButtonValue
     m.Info.setFocus(true)
   end if
   setVisibilityOfSecondaryMenu()
@@ -919,9 +935,13 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       handlePlayInput()
       return true
     else if key = "right" and m.Menu.isInFocusChain() = true and m.Menu.content.getChild(m.Menu.itemFocused).id = "LikeDislikeMenuItem" and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked 
+      focusedItem = m.Menu.content.getChild(m.Menu.itemFocused)
+      m.top.toggleOffButtonValue = focusedItem.analyticsButtonValue
       focusSecondaryMenu()
       return true
     else if key = "left" and m.SecondaryMenu.isInFocusChain() = true
+      focusedItem = m.SecondaryMenu.content.getChild(m.SecondaryMenu.itemFocused)
+      m.top.toggleOffButtonValue = focusedItem.analyticsButtonValue
       focusMenu()
       return true
     end if

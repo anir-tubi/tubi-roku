@@ -10,7 +10,8 @@
 
     <!-- alignment of the item in the list. Accepted values are left and center -->
     <field id="align" type="string" value="left" />
-    <!-- The ID of the menu item that should be sent to the analytics -->
-    <field id="analyticsId" type="string" value="" />
+
+    <!-- The button_value of the menu item that should be sent to analytics as part of a ButtonComponent -->
+    <field id="analyticsButtonValue" type="string" value="" />
   </interface>
 </component>
