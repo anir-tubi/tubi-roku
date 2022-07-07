@@ -264,6 +264,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.signIn] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.setContentRating] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.updateParentalRating] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.deviceRegister] = true
 
   constants.anonymous = {}
     constants.anonymous.algorithm = "TUBI-HMAC-SHA256"
