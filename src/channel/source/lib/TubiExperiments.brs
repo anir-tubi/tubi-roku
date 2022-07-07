@@ -64,6 +64,10 @@ Function TubiExperiments(constants) as Object
         roku_video_preview_v2: {"enabled": false, "autostart": false}
       }
 
+      roku_coppa_registration_age_vs_yob: {
+        roku_coppa_registration_age_vs_yob_v1: {"enabled": false}
+      }
+
       roku_skip_icts: {
         roku_skip_icts_v1 : {"enabled": false}
       }
@@ -71,7 +75,6 @@ Function TubiExperiments(constants) as Object
       roku_featured_landscape: {
         roku_featured_landscape_v1: {"enabled": false}
       }
-
     }
 
     'public methods

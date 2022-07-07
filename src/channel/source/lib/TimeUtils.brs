@@ -5,8 +5,8 @@
 '******************************************************
 
 Function getCurrentUTCTime() as integer
-    now = CreateObject("roDateTime")
-    return now.AsSeconds()
+  now = CreateObject("roDateTime")
+  return now.AsSeconds()
 End Function
 
 '******************************************************
@@ -15,9 +15,9 @@ End Function
 '******************************************************
 
 Function getCurrentLocalTime() as integer
-    now = CreateObject("roDateTime")
-    now.ToLocalTime()
-    return now.AsSeconds()
+  now = CreateObject("roDateTime")
+  now.ToLocalTime()
+  return now.AsSeconds()
 End Function
 
 
@@ -27,9 +27,9 @@ End Function
 ' For example, passing in 12 would return 1. Passing in 119 would return 2.
 ' @param seconds : integer
 '******************************************************
-Function convertSecondsToMins(seconds As Integer) As Integer 
-    mins = (seconds / 60) + 1
-    return fix(mins)
+Function convertSecondsToMins(seconds As Integer) As Integer
+  mins = (seconds / 60) + 1
+  return fix(mins)
 End Function
 
 
@@ -43,4 +43,14 @@ Function getNumberOfDaysSinceEpoch() as integer
   secondsFromEpoch = nowDate.AsSeconds()
   daysFromEpoch = Int(secondsFromEpoch / 60 / 60 / 24)
   return daysFromEpoch
+End Function
+
+
+'******************************************************
+'returns year for current roDateTime
+'******************************************************
+Function getCurrentYear()
+  dateTime = createObject("roDateTime")
+  currentYear = dateTime.getYear()
+  return currentYear
 End Function

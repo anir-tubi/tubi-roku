@@ -1,4 +1,4 @@
-'@TestSuite [TimeUtils] TimeUtils.brs 
+'@TestSuite [TimeUtils] TimeUtils.brs
 
 '@Setup
 Function TimeUtilsSetup()
@@ -15,7 +15,7 @@ Function timeUtils_getCurrentUTCTime_test()
   now = dt.AsSeconds()
   diff = getCurrentUTCTime() - now
   ' check if current time retured by getCurrentUTCTime is very close to current time
-  m.AssertTrue(diff < 2) 
+  m.AssertTrue(diff < 2)
 End Function
 
 
@@ -46,12 +46,12 @@ Function timeUtils_convertSecondsToMins_test()
   totalmins = convertSecondsToMins(123456789)
   m.AssertEqual(mins+1, totalmins)
 
-  
+
   mins.SetInt(-90/60)
   totalmins = convertSecondsToMins(-90)
   m.AssertEqual(mins+1, totalmins)
-   
-  
+
+
 End Function
 
 
@@ -71,4 +71,10 @@ Function timeUtils_getNumberOfDaysSinceEpoch_test()
   'Check if no of epoch days returned by getNumberOfDaysSinceEpoch is greater than to the epoch Days to March 16, 2022
   m.AssertTrue(diff > 0)
 
+End Function
+
+
+'@Test getCurrentYear unit tests
+Function timeUtils_getCurrentYear_test()
+  m.assertEqual(createObject("roDateTime").getYear(), getCurrentYear())
 End Function

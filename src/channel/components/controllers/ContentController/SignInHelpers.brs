@@ -810,7 +810,7 @@ End Function
 ' showEmailVerificationScreen will send verification email to the roku account or
 ' user entered email if user choose different email.
 ' once user verified their email, it will redirect to the appropriae screen.
-' If the user doesn't receive verificaion link, they can select resend verification.
+' If the user doesn't receive verification link, they can select resend verification.
 
 ' @email : string,  (either taken from roku account or user entered email)
 Function showEmailVerificationScreen(email)

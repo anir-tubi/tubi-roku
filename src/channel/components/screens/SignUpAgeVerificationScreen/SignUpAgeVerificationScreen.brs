@@ -1,29 +1,48 @@
 Function init()
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
   m.Header = m.top.findNode("AgeVerificationPageHeader")
   m.SubHeader = m.top.findNode("AgeVerificationPageSubHeader")
   m.NumberPad = m.top.findNode("AgeVerificationNumberpad")
   m.StartButton = m.top.findNode("AgeVerificationStartButton")
+  m.AgeInfo = m.top.findNode("AgeVerificationAgeInfo")
   m.DateInfo = m.top.findNode("AgeVerificationDateInfo")
-  m.YearEntryFront = m.top.findNode("AgeVerificationYearEntryFront")
-  m.YearEntryBack = m.top.findNode("AgeVerificationYearEntryBack")
+  m.YearEntry = m.top.findNode("AgeVerificationYearEntry")
   m.YearBackground = m.top.findNode("AgeVerificationYearBg")
+  m.AgePrefixLabel = m.top.findNode("AgeVerificationAgePrefixLabel")
+  m.AgePostfixLabel = m.top.findNode("AgeVerificationAgePostfixLabel")
+  m.AgeEntry = m.top.findNode("AgeVerificationAgeEntry")
+  m.AgeBackground = m.top.findNode("AgeVerificationAgeBg")
   m.YearLabel = m.top.findNode("AgeVerificationYear")
-  m.Prompt = m.top.findNode("AgeVerificationErrorPrompt")
+  m.ErrorPrompt = m.top.findNode("AgeVerificationErrorPrompt")
+  m.AgeWarningPrompt = m.top.findNode("AgeWarningPrompt")
+  m.AgeErrorPrompt = m.top.findNode("AgeErrorPrompt")
   m.bornYear = m.top.findNode("AgeVerificationYearText")
   m.infoLabel = m.top.findNode("AgeVerificationInfoLabel")
 
   m.Header.text = getTranslation("screenAgeVerification_header")
-  m.SubHeader.text = getTranslation("screenAgeVerification_sub_header")
   m.StartButton.text = getTranslation("screenAgeVerification_keypad_button")
-  m.YearEntryFront.text = getTranslation("screenAgeVerification_yyyy")
-  m.YearEntryBack.text = getTranslation("screenAgeVerification_yyyy")
+  m.YearEntry.text = getTranslation("screenAgeVerification_yyyy")
   m.YearLabel.text = getTranslation("screenAgeVerification_year")
-  m.Prompt.text = getTranslation("screenAgeVerification_error_prompt")
+  m.ErrorPrompt.text = getTranslation("screenAgeVerification_error_prompt")
+  m.AgeWarningPrompt.text = getTranslation("screenAgeVerification_warning_prompt")
+  m.AgeErrorPrompt.text = getTranslation("screenSignUpAgeVerification_error_prompt_age")
   m.bornYear.text = getTranslation("screenAgeVerification_born_year")
+  m.AgePrefixLabel.text = getTranslation("screenSignUpAgeVerification_request_age_prefix")
+  m.AgePostfixLabel.text = getTranslation("screenSignUpAgeVerification_request_age_postfix")
   m.infoLabel.text = getTranslation("why_ask_age_description")
 
-  m.yearLetter = m.YearEntryFront.text.Left(1)
+  m.isAgeExperimentEnabled = getExperimentResource("roku_coppa_registration_age_vs_yob", "roku_coppa_registration_age_vs_yob_v1", true).enabled
+  if m.isAgeExperimentEnabled = true then
+    m.DateInfo.visible = false
+    m.AgeInfo.visible = true
+    m.SubHeader.text = getTranslation("screenSignUpAgeVerification_sub_header_age")
+  else
+    m.DateInfo.visible = true
+    m.AgeInfo.visible = false
+    m.SubHeader.text = getTranslation("screenAgeVerification_sub_header")
+  end if
+
+  m.yearLetter = m.YearEntry.text.Left(1)
 
   ' m.warningDisplayedCount helps to track how many time warning message is displayed when user enters year of birth
   m.warningDisplayedCount = 0
@@ -37,9 +56,9 @@ Function init()
 
   m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
 
-  m.top.observeField("focusedChild", "onComponentFocusChanged")
-  m.NumberPad.observeField("text", "onNumberPadTextChanged")
-  m.top.observeFieldScoped("ageSubmitted", "onAgeSubmittedChanged")
+  m.top.observeFieldScoped("focusedChild", "onComponentFocusChanged")
+  m.NumberPad.observeFieldScoped("text", "onNumberPadTextChanged")
+  m.StartButton.observeFieldScoped("selected", "onStartButtonSelected")
 End Function
 
 
@@ -53,59 +72,114 @@ End Function
 
 
 Function onNumberPadTextChanged(msg)
-  date = msg.getData()
-  millenium = date.left(1).toInt()
-  century = date.mid(1, 1).toInt()
-  decade = date.mid(2, 1).toInt()
-  dateLength = date.len()
-
-  if dateLength = 1 and millenium <> 1 and millenium <> 2
-    m.Prompt.visible = true
-    m.NumberPad.text = ""
-  else if dateLength = 2 and millenium = 1 and century <> 9
-    ' don't allow centuries that are not 19xx if millenium is 1xxx
-    m.Prompt.visible = true
-    m.NumberPad.text = date.left(1)
-  else if dateLength = 2 and millenium = 2 and checkValidCentury(millenium, century) = false
-    ' don't allow centuries greater than the current century if millenium is 2xxx
-    m.Prompt.visible = true
-    m.NumberPad.text = date.left(1)
-  else if dateLength = 3 and millenium = 2 and checkValidDecade(century, decade) = false
-    ' don't allow decades greater than the current decade if millenium is 2xxx
-    m.Prompt.visible = true
-    m.NumberPad.text = date.left(2)
-  else if dateLength = 4 and checkValidYear(date) = false
-    ' don't allow future years/month/dates
-    m.Prompt.visible = true
-    m.NumberPad.text = date.left(3)
-  else
-    m.Prompt.visible = false
-    if dateLength = 4
-      m.NumberPad.moveFocusToDelete = true
-      m.top.birthdate = date + "-12-31"  ' since backend expects birthday in date format(YYYY-MM-DD), we are appending dummy month & day
-
-      currentYear = createObject("roDateTime").getYear()
-      if isUserToddler(date, currentYear) = true and m.warningDisplayedCount = 0
-        m.Prompt.text = getTranslation("screenAgeVerification_warning_prompt")
-        m.Prompt.visible = true
-        m.warningDisplayedCount += 1
-      else if isUserNewBorn(date, currentYear) = true or isUserTooOld(date, currentYear) = true
-        m.Prompt.text = getTranslation("screenAgeVerification_error_prompt")
-        m.Prompt.visible = true
-      else
-        m.StartButton.setFocus(true)
-      end if
-
+  text = msg.getData()
+  if m.isAgeExperimentEnabled = true then
+    ' We don't handle our checks until a user actually clicks start watching just update the onscreen text
+    ' Only allow a max of 3 digits
+    if text.len() > 3 then
+      text = text.left(3)
+      ' Have to also set the numberpad to prevent getting out of sync
+      m.NumberPad.text = text
     end if
 
-    refreshDateOnScreen(date)
-    updateDateDecorations()
+    m.AgeEntry.text = text
+  else
+    date = text
+    millenium = date.left(1).toInt()
+    century = date.mid(1, 1).toInt()
+    decade = date.mid(2, 1).toInt()
+    dateLength = date.len()
+
+    if dateLength = 1 and millenium <> 1 and millenium <> 2
+      m.ErrorPrompt.visible = true
+      m.NumberPad.text = ""
+    else if dateLength = 2 and millenium = 1 and century <> 9
+      ' don't allow centuries that are not 19xx if millenium is 1xxx
+      m.ErrorPrompt.visible = true
+      m.NumberPad.text = date.left(1)
+    else if dateLength = 2 and millenium = 2 and checkValidCentury(millenium, century) = false
+      ' don't allow centuries greater than the current century if millenium is 2xxx
+      m.ErrorPrompt.visible = true
+      m.NumberPad.text = date.left(1)
+    else if dateLength = 3 and millenium = 2 and checkValidDecade(century, decade) = false
+      ' don't allow decades greater than the current decade if millenium is 2xxx
+      m.ErrorPrompt.visible = true
+      m.NumberPad.text = date.left(2)
+    else if dateLength = 4 and checkValidYear(date) = false
+      ' don't allow future years/month/dates
+      m.ErrorPrompt.visible = true
+      m.NumberPad.text = date.left(3)
+    else
+      m.ErrorPrompt.visible = false
+      if dateLength = 4
+        m.NumberPad.moveFocusToDelete = true
+        updateBirthdate(date)
+
+        currentYear = createObject("roDateTime").getYear()
+        if isUserToddler(date, currentYear) = true and m.warningDisplayedCount = 0
+          m.ErrorPrompt.text = getTranslation("screenAgeVerification_warning_prompt")
+          m.ErrorPrompt.visible = true
+          m.warningDisplayedCount += 1
+        else if isUserNewBorn(date, currentYear) = true or isUserTooOld(date, currentYear) = true
+          m.ErrorPrompt.text = getTranslation("screenAgeVerification_error_prompt")
+          m.ErrorPrompt.visible = true
+        else
+          m.StartButton.setFocus(true)
+        end if
+
+      end if
+
+      refreshDateOnScreen(date)
+      updateDateDecorations()
+    end if
   end if
 End Function
 
-Function onAgeSubmittedChanged()
-  ' Want to reset the numberpad text on submit as the only time they will be coming back is if they were confirming their age and likely need to change it
+' @year: String - year we are saying the user was born in
+Function updateBirthdate(year)
+  m.top.birthdate = year + "-12-31"  ' since backend expects birthday in date format(YYYY-MM-DD), we are appending dummy month & day
+End Function
+
+
+Function onStartButtonSelected()
+  shouldSubmitAge = false
+  if m.isAgeExperimentEnabled = true then
+    age = m.NumberPad.text.toInt()
+    ageLength = m.NumberPad.text.len()
+    m.AgeEntry.text = m.NumberPad.text
+
+    m.AgeErrorPrompt.visible = false
+    m.AgeWarningPrompt.visible = false
+    if age <= 1 then
+      if ageLength > 0 then
+        m.AgeErrorPrompt.visible = true
+        m.NumberPad.setFocus(true)
+        m.NumberPad.moveFocusToDelete = true
+      end if
+    else if age <= 4 AND m.warningDisplayedCount = 0 then
+      m.AgeWarningPrompt.visible = true
+      m.warningDisplayedCount += 1
+      m.NumberPad.setFocus(true)
+      m.NumberPad.moveFocusToDelete = true
+    else if age > 125 then
+      m.AgeErrorPrompt.visible = true
+      m.NumberPad.setFocus(true)
+      m.NumberPad.moveFocusToDelete = true
+    else
+      ' We have to remove one or someone who is 13 would be considered 12 other than the last day of the year
+      year = getCurrentYear() - age - 1
+      updateBirthdate(year.toStr())
+      shouldSubmitAge = true
+    end if
+  else
+    shouldSubmitAge = true
+  end if
+
+  if shouldSubmitAge = true then
+    ' Want to reset the numberpad text on submit as the only time they will be coming back is if they were confirming their age and likely need to change it
     m.NumberPad.text = ""
+    m.top.ageSubmitted = true
+  end if
 End Function
 
 
@@ -156,20 +230,15 @@ Function refreshDateOnScreen(date)
 
   ' update the year values
   if year = invalid or year.len() = 0
-    m.YearEntryFront.text = m.yearLetter + m.yearLetter + m.yearLetter + m.yearLetter
-    m.YearEntryBack.text = m.yearLetter + m.yearLetter + m.yearLetter + m.yearLetter
+    m.YearEntry.text = m.yearLetter + m.yearLetter + m.yearLetter + m.yearLetter
   else if year.len() = 1
-    m.YearEntryFront.text = year + m.yearLetter + m.yearLetter + m.yearLetter
-    m.YearEntryBack.text = year + m.yearLetter + m.yearLetter + m.yearLetter
+    m.YearEntry.text = year + m.yearLetter + m.yearLetter + m.yearLetter
   else if year.len() = 2
-    m.YearEntryFront.text = year + m.yearLetter + m.yearLetter
-    m.YearEntryBack.text = year + m.yearLetter + m.yearLetter
+    m.YearEntry.text = year + m.yearLetter + m.yearLetter
   else if year.len() = 3
-    m.YearEntryFront.text = year + m.yearLetter
-    m.YearEntryBack.text = year + m.yearLetter
+    m.YearEntry.text = year + m.yearLetter
   else if year.len() = 4
-    m.YearEntryFront.text = year
-    m.YearEntryBack.text = year
+    m.YearEntry.text = year
   end if
 End Function
 
@@ -183,8 +252,7 @@ Function decorateYear()
   stopAllAnimations()
 
   ' fade in the year if necessary
-  if m.YearEntryFront.opacity < 1 then m.yearEntryFade = fade(m.YearEntryFront, "in", 0.3)
-  if m.YearBackground.opacity < 1 then m.yearBgFade = fade(m.YearBackground, "in", 0.3)
+  if m.YearEntry.opacity < 1 then m.yearEntryFade = fade(m.YearEntry, "in", 0.3)
 
 End Function
 
@@ -203,7 +271,11 @@ Function onKeyEvent(key, press) as Boolean
       m.top.backButtonPressed = true
     else
       if key = "down"
-        if m.NumberPad.text.len() = 4 and m.NumberPad.isInFocusChain() = true and m.Prompt.visible = false
+        if m.isAgeExperimentEnabled = true then
+          if m.NumberPad.text.isEmpty() = false then
+            m.StartButton.setFocus(true)
+          end if
+        else if m.NumberPad.text.len() = 4 AND m.NumberPad.isInFocusChain() = true AND m.ErrorPrompt.visible = false then
           m.StartButton.setFocus(true)
         end if
       else if key = "up"

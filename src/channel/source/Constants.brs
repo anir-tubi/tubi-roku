@@ -938,7 +938,6 @@ Function getConstants()
       constants.ui.screenIds.modalDialogScreen = "modalDialogScreen"
       constants.ui.screenIds.videoPlayerScreen = "videoPlayerScreen"
       constants.ui.screenIds.linearVideoPlayerScreen = "linearVideoPlayerScreen"
-      constants.ui.screenIds.ageVerificationScreen = "ageVerificationScreen"
       constants.ui.screenIds.initialContentScreen = "initialContentScreen"
       constants.ui.screenIds.epgScreen = "epgScreen"
       constants.ui.screenIds.sportsEPGScreen = "sportsEPGScreen"

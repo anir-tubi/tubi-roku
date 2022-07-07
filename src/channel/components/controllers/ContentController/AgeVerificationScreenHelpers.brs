@@ -74,7 +74,7 @@ End Function
 ' @signInInfo: assocarray(email,firstName,emailType) default set to invalid. eg - (test@tubi.tv, test, 'manual/pre_fill')
 Function showAgeVerificationScreenAtSignUp(signInInfo = invalid as object)
   tubiLog("AgeVerificationScreenHelpers.showAgeVerificationScreenAtSignUp")
-  showAgeVerificationScreen(onAgeSubmittedAtSignUp, signInInfo)
+  showSignUpAgeVerificationScreen(signInInfo)
 End Function
 
 
@@ -154,8 +154,6 @@ Function conditionallyConfirmBirthYear(ageVerificationScreen, verifyAgeCallback,
     onAgeSubmitted(verifyAgeCallback)
   else
     'Show confirmation
-    title  = getTranslation("dialog_confirmCorrectAge_title", {"birthYear": birthYear})
-    message  = getTranslation("dialog_confirmCorrectAge_description")
 
     buttons = [
       getTranslation("dialog_confirmCorrectAge_confirm")
@@ -171,6 +169,15 @@ Function conditionallyConfirmBirthYear(ageVerificationScreen, verifyAgeCallback,
         dialog_sub_type: "age_confirmation"
       }
     }
+
+    title = getTranslation("dialog_confirmCorrectAge_title", {"birthYear": birthYear})
+    if getExperimentResource("roku_coppa_registration_age_vs_yob", "roku_coppa_registration_age_vs_yob_v1", true).enabled = true then
+      age = currentYear - birthYear.toInt() - 1
+      title = getTranslation("dialog_confirmCorrectAge_title_age", {"age": age.toStr()})
+    end if
+
+    message = getTranslation("dialog_confirmCorrectAge_description")
+
     showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, confirmedBirthYearCallback)
   end if
 End Function
@@ -562,15 +569,25 @@ End Function
 
 ' showAgeVerificationScreen is used to display create AgeVerificationScreen and display
 ' @ageSubmittedCallback: roFunction that will run after user submits their birth year
-' @ageSubmittedCallback: assocarray used for tracking info later
+' @signInInfo: assocarray used for tracking info later
 ' @previousUiMode: string of what uiMode we were in before showing showing the age verification screen so we can put them back in it if they back out, one of the values in constants.ui.modes
 Function showAgeVerificationScreen(ageSubmittedCallback, signInInfo = invalid, previousUiMode = "")
   callbackString = convertFunctionToString(ageSubmittedCallback)
   ageVerificationScreen = CreateObject("roSGNode", "AgeVerificationScreen")
-  ageVerificationScreen.id = m.constants.ui.screenIds.ageVerificationScreen
   ageVerificationScreen.signInInfo = signInInfo
   ageVerificationScreen.previousUiMode = previousUiMode
   ageVerificationScreen.observeFieldScoped("ageSubmitted", callbackString)
+  ageVerificationScreen.observeFieldScoped("backButtonPressed", "onBackButtonPressed")
+  ageVerificationScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
+  pushScreen(ageVerificationScreen, true, true)
+End Function
+
+' SignUpAgeVerificationScreen is used to display create AgeVerificationScreen and display
+' @signInInfo: assocarray used for tracking info later
+Function showSignUpAgeVerificationScreen(signInInfo)
+  ageVerificationScreen = createObject("roSGNode", "SignUpAgeVerificationScreen")
+  ageVerificationScreen.signInInfo = signInInfo
+  ageVerificationScreen.observeFieldScoped("ageSubmitted", "onAgeSubmittedAtSignUp")
   ageVerificationScreen.observeFieldScoped("backButtonPressed", "onBackButtonPressed")
   ageVerificationScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
   pushScreen(ageVerificationScreen, true, true)
@@ -594,7 +611,8 @@ Function onAgeSubmitted(verifyAgeCallback) as Void
   tubiLog("AgeVerificationScreenHelpers.onAgeSubmitted")
 
   ageVerificationScreen = getCurrentScreen()
-  if ageVerificationScreen = invalid OR ageVerificationScreen.id <> "ageVerificationScreen" then
+  nodeSubtype = getNodeSubtype(ageVerificationScreen)
+  if nodeSubtype <> "AgeVerificationScreen" AND nodeSubtype <> "SignUpAgeVerificationScreen" then
     tubiLog("AgeVerificationScreen could not be found")
     return
   end if
@@ -828,7 +846,8 @@ End Function
 Function patchSignedInUserAge()
   birthdate = ""
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and currentScreen.id = "ageVerificationScreen"
+  nodeSubtype = getNodeSubtype(currentScreen)
+  if nodeSubtype = "AgeVerificationScreen" OR nodeSubtype = "SignUpAgeVerificationScreen" then
     birthdate = currentScreen.birthdate
   end if
 

@@ -301,11 +301,11 @@ Function getTranslation_en_US()
       "message": "Please remember to check your spam folder"
     },
     "dialog_button_resend_verification_link": {
-      "description": "Label of the dialog button to resend the email verificaion link",
+      "description": "Label of the dialog button to resend the email verification link",
       "message": "Yes, Resend Verification Email"
     },
     "dialog_button_attempts_title": {
-      "description": "Title of the dialog after user selcts resend verification link more than 3 times",
+      "description": "Title of the dialog after user selects resend verification link more than 3 times",
       "message": "Too Many Attempts"
     },
     "dialog_button_multiple_emails_sent": {
@@ -383,6 +383,10 @@ Function getTranslation_en_US()
     "dialog_confirmCorrectAge_title": {
       "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
       "message": "Were you born in {birthYear}"
+    },
+    "dialog_confirmCorrectAge_title_age": {
+      "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct age",
+      "message": "Are you {age} years old"
     },
     "dialog_confirmCorrectAge_description": {
       "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
@@ -591,6 +595,10 @@ Function getTranslation_en_US()
     "screenDetails_error_noQueueSeries_description": {
       "description": "Error message when a tv show/series is not removed from the user's list.",
       "message": "We’re not sure what happened but something went wrong when trying to remove this TV show from your list."
+    },
+    "screenDetails_error_likeDislike_description": {
+      "description": "Error message when a video title's like/dislike rating is not changed.",
+      "message": "We’re not sure what happened but something went wrong when trying to change the rating."
     },
     "screenDetails_error_noHistory_description": {
       "description": "Error message when video is not removed from the user's viewing history.",
@@ -843,6 +851,22 @@ Function getTranslation_en_US()
     "screenAgeVerification_network_issue": {
       "description": "An error message shown to users when they submit their birthdate, but there is an unexpected server or network error",
       "message": "Could not successfully send your birthdate to our servers."
+    },
+    "screenSignUpAgeVerification_sub_header_age": {
+      "description": "A sub header message to direct users to enter their age",
+      "message": "To continue, please verify your age"
+    },
+    "screenSignUpAgeVerification_request_age_prefix": {
+      "description": "Label to ask user to enter their age. This part precedes the age provided",
+      "message": "I'm"
+    },
+    "screenSignUpAgeVerification_request_age_postfix": {
+      "description": "Label to ask user to enter their age. This part comes after the age provided",
+      "message": "Years Old"
+    },
+    "screenSignUpAgeVerification_error_prompt_age": {
+      "description": "A message informing the user that they entered an age that is not acceptable",
+      "message": "Please enter a valid age"
     },
     "screenAgeVerification_header": {
       "description": "A header message on the Age required screen asking them to confirm their age",
@@ -1219,7 +1243,7 @@ Function getTranslation_en_US()
       "message": "FREE"
     },
     "screenEmailVerification_resend_verification_link": {
-      "description": "Label of button to allow users to resend the email verificaion link for sign in",
+      "description": "Label of button to allow users to resend the email verification link for sign in",
       "message": "Resend Verification Link"
     },
     "screenEmailVerification_use_different_email": {
@@ -1231,7 +1255,7 @@ Function getTranslation_en_US()
       "message": "Next"
     },
     "skip_button": {
-      "description": "Button text displayed on onBoarding screens to skip the onbarding flow",
+      "description": "Button text displayed on onBoarding screens to skip the onboarding flow",
       "message": "Skip"
     },
     "getStarted_button": {
@@ -1487,7 +1511,7 @@ Function getTranslation_es_MX()
       "message": "Por favor, recuerda revisar tu sección de spam"
     },
     "dialog_button_resend_verification_link": {
-      "description": "Label of the dialog button to resend the email verificaion link",
+      "description": "Label of the dialog button to resend the email verification link",
       "message": "Sí, Reenviar correo clectrónico de verificación"
     },
     "dialog_button_attempts_title": {
@@ -2377,7 +2401,7 @@ Function getTranslation_es_MX()
       "message": "GRATIS"
     },
     "screenEmailVerification_resend_verification_link": {
-      "description": "Label of button to allow users to resend the email verificaion link for sign in",
+      "description": "Label of button to allow users to resend the email verification link for sign in",
       "message": "Reenviar Enlace de Verificación"
     },
     "screenEmailVerification_use_different_email": {

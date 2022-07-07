@@ -81,3 +81,24 @@ function isFunction(value as Dynamic) as Boolean
 	valueType = type(value)
 	return (valueType = "roFunction") OR (valueType = "Function")
 end function
+
+' /**
+' * @description Checks if the supplied value is a valid Node type
+' * @param {Dynamic} value The variable to be checked
+' * @return {Boolean} Results of the check
+' */
+function isNode(value as Dynamic) as Boolean
+	return type(value) = "roSGNode"
+end function
+
+' /**
+' * @description Gets node subtype in a safe manor that will return an empty string if not a node
+' * @param {Dynamic} value The variable to get subtype for
+' * @return {String} Subtype if node or empty string if not
+' */
+function getNodeSubtype(value as Dynamic) as String
+	if isNode(value) = true then
+		return value.subtype()
+	end if
+	return ""
+end function
