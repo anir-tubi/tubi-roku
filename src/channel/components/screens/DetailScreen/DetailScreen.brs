@@ -154,8 +154,10 @@ Function changeButtonText(sButtonStringId, sButtonText)
       stringNode.title = sButtonText
     end if
 
-    ' Adjust the width of the menu if the Channel name or the signin button (if signin conditions) is too long for the default width
-    if sButtonStringId = "stringChannelButton" or (sButtonStringId = "stringSignUpButton" and isLoggedInUser() = false and isNewUser() = false)
+    ' Adjust the width of the menu if the Channel name, the signin button (if signin conditions), or the like/dislike button (if signin conditions) is too long for the default width
+    isSignUpButton = (sButtonStringId = "stringSignUpButton" and isLoggedInUser() = false and isNewUser() = false)
+    isLikeButton = (sButtonStringId = "stringLikeDislikeButton" and isLoggedInUser() = true and getExperimentResource("roku_title_reactions", "roku_title_reactions_v1", false).enabled = true)
+    if sButtonStringId = "stringChannelButton" or isSignUpButton = true or isLikeButton = true
       tempChannelMenuItem = CreateObject("roSGNode", "DetailMenuItem")
       tempChannelMenuItem.itemContent = stringNode
 
