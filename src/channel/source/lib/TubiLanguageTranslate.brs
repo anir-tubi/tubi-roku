@@ -1515,7 +1515,7 @@ Function getTranslation_es_MX()
       "message": "Sí, Reenviar correo clectrónico de verificación"
     },
     "dialog_button_attempts_title": {
-      "description": "Title of the dialog after user selcts resend verification link more than 3 times",
+      "description": "Title of the dialog after user selects resend verification link more than 3 times",
       "message": "Demasiados Intentos"
     },
     "dialog_button_multiple_emails_sent": {
@@ -1593,6 +1593,10 @@ Function getTranslation_es_MX()
     "dialog_confirmCorrectAge_title": {
       "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
       "message": "Naciste en {birthYear}"
+    },
+    "dialog_confirmCorrectAge_title_age": {
+      "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct age",
+      "message": "Tienes {age} años"
     },
     "dialog_confirmCorrectAge_description": {
       "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
@@ -1726,6 +1730,10 @@ Function getTranslation_es_MX()
       "description": "label of the button that will remove the video title from the user's viewing history",
       "message": "Eliminar del historial"
     },
+    "screenDetails_button_changingRating": {
+      "description": "label of the button when the user has clicked the button and the like/dislike state of the video title is changing",
+      "message": "Cambiando Calificaciones..."
+    },
     "screenDetails_button_queueNow": {
       "description": "label of the button when the user has clicked the button and the video title is being added to the user's list",
       "message": "Agregando..."
@@ -1798,6 +1806,10 @@ Function getTranslation_es_MX()
       "description": "Error message when a tv show/series is not removed from the user's list.",
       "message": "No estamos seguros de lo que pasó, pero algo salió mal al tratar de eliminar esta serie de tu lista."
     },
+    "screenDetails_error_likeDislike_description": {
+      "description": "Error message when a video title's like/dislike rating is not changed.",
+      "message": "No estamos seguros de lo que sucedió, pero algo salió mal al intentar cambiar la calificación."
+    },
     "screenDetails_error_noHistory_description": {
       "description": "Error message when video is not removed from the user's viewing history.",
       "message": "Algo salió mal al eliminar el contenido de tu historial."
@@ -1824,7 +1836,7 @@ Function getTranslation_es_MX()
     },
     "screenSettings_about_description": {
       "description": "The description on the about screen",
-      "message": "Tubi es la aplicación más grande de series y películas gratuitas. Tenemos un catálogo de contenido con más de 15,000 películas y series con muchos menos anuncios que la televisión por cable."
+      "message": "Tubi es la aplicación más grande de series y películas gratuitas. Tenemos un catálogo de contenido con miles de películas y series con muchos menos anuncios que la televisión por cable."
     },
     "screenSettings_about_title2": {
       "description": "The subtitle on the about screen",
@@ -2018,6 +2030,30 @@ Function getTranslation_es_MX()
       "description": "Label of button to allow users to play the current video title",
       "message": "Ver"
     },
+    "screenDetails_button_like_instructions": {
+      "description": "text to be place AFTER the text that indicates that the user 'liked' or 'disliked' the current video title. This appears once the button gains focus",
+      "message": " - Borrar Calificación"
+    },
+    "screenDetails_button_like": {
+      "description": "Label of button to allow users to like the current video title",
+      "message": "Me Gusta"
+    },
+    "screenDetails_button_liked": {
+      "description": "Label of button to indicate to users that the current video title has been liked",
+      "message": "Te Gustó"
+    },
+    "screenDetails_button_dislike": {
+      "description": "Label of button to allow users to dislike the current video title",
+      "message": "No Me Gusta"
+    },
+    "screenDetails_button_disliked": {
+      "description": "Label of button to indicate to users that the current video title has been disliked",
+      "message": "No Te Gustó"
+    },
+    "screenDetails_button_likeDislike": {
+      "description": "Label of unfocused button to allow users to like or dislike the current video title",
+      "message": "Me Gusta o No Me Gusta"
+    },
     "screenDetails_button_resume": {
       "description": "Label of button to allow users to resume the current video title",
       "message": "Reanudar"
@@ -2025,6 +2061,22 @@ Function getTranslation_es_MX()
     "screenAgeVerification_network_issue": {
       "description": "An error message shown to users when they submit their birthdate, but there is an unexpected server or network error",
       "message": "No pudimos mandar tu fecha de nacimiento a nuestros servidores con éxito."
+    },
+    "screenSignUpAgeVerification_sub_header_age": {
+      "description": "A sub header message to direct users to enter their age",
+      "message": "Para continuar, por favor verifica tu edad"
+    },
+    "screenSignUpAgeVerification_request_age_prefix": {
+      "description": "Label to ask user to enter their age. This part precedes the age provided",
+      "message": "Tengo"
+    },
+    "screenSignUpAgeVerification_request_age_postfix": {
+      "description": "Label to ask user to enter their age. This part comes after the age provided",
+      "message": "años de edad"
+    },
+    "screenSignUpAgeVerification_error_prompt_age": {
+      "description": "A message informing the user that they entered an age that is not acceptable",
+      "message": "Por favor, ingresa una edad válida"
     },
     "screenAgeVerification_header": {
       "description": "A header message on the Age required screen asking them to confirm their age",
@@ -2413,7 +2465,7 @@ Function getTranslation_es_MX()
       "message": "Siguiente"
     },
     "skip_button": {
-      "description": "Button text displayed on onBoarding screens to skip the onbarding flow",
+      "description": "Button text displayed on onBoarding screens to skip the onboarding flow",
       "message": "Saltar"
     },
     "getStarted_button": {
