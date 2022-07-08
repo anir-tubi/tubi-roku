@@ -57,8 +57,10 @@ End Function
 Function getTranslationBasedOnLocale(sStringID as String, sLocaleID as String) as String
   sTranslatedString = ""
   translations = invalid
-  if m.global.translationAA <> invalid
-    translations = m.global.translationAA[sLocaleID]
+
+  translationAA = m.global.translationAA
+  if translationAA <> invalid then
+    translations = translationAA[sLocaleID]
   end if
   if translations = invalid
     '//The associative array for the passed locale does not exist, so get the associative arra associated with that locale
