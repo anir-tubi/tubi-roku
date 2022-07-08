@@ -626,7 +626,7 @@ Function getTranslation_en_US()
     },
     "screenSettings_about_description": {
       "description": "The description on the about screen",
-      "message": "Tubi is the leading free, premium, video streaming app. We have the largest library of content with over 15,000 movies and television shows with far fewer ads than cable TV."
+      "message": "Tubi is the leading free, premium, video streaming app. We have a large and diverse library of content with many thousands of titles and 3x fewer ads than cable TV."
     },
     "screenSettings_about_title2": {
       "description": "The subtitle on the about screen",
