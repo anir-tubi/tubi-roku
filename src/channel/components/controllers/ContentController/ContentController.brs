@@ -1564,7 +1564,12 @@ End Function
 
 
 Function isDeviceInUSorCA()
-  return (m.constants.deviceInfo.countryCode = "US" or m.constants.deviceInfo.countryCode = "CA")
+  return (UCase(m.constants.deviceInfo.countryCode) = "US" or UCase(m.constants.deviceInfo.countryCode) = "CA")
+End Function
+
+
+Function isDeviceInUS()
+  return UCase(m.constants.deviceInfo.countryCode) = "US"
 End Function
 
 

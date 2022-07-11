@@ -791,8 +791,10 @@ End Function
 ' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content
 Function setHomeScreenAfterFocus(focusedContent, homeScreen)
 
-  ' fire exposure event for roku_featured_landscape_v1 experiment
-  getExperimentResource("roku_featured_landscape", "roku_featured_landscape_v1", true)
+  ' fire exposure event for roku_featured_landscape_v1 experiment only in US
+  if isDeviceInUS() = true
+    getExperimentResource("roku_featured_landscape", "roku_featured_landscape_v1", true)
+  end if
 
   if focusedContent <> invalid and getCurrentScreen() <> invalid and getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
     '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
