@@ -1,11 +1,11 @@
-'@TestSuite [GeneralTaskModule] GeneralTaskModule.brs 
+'@TestSuite [GeneralTaskModule] GeneralTaskModule.brs
 
 '@Setup
 Function GeneralTaskModuleSetup()
 
   generalTask = CreateObject("roSGNode", "GeneralTask")
   GeneralTaskModule(m, generalTask)
-   
+
 End function
 
 
@@ -18,7 +18,7 @@ Function generalTaskModule_makeRequest_test()
 
   requestType = "getThumbnails"
   requestUrl = "https://uapi.adrise.tv/cms/content/458275/thumbnail_sprites"
-  
+
   options = {}
   options.params = {
     app_id: "tubitv"
@@ -26,12 +26,12 @@ Function generalTaskModule_makeRequest_test()
     platform: "roku"
     type: "5x"
   }
-  
+
   successCallback = onSuccessCallbackTest
   errorCallback = onErrorCallbackTest
   responseType = "node"
-  
-  requestNode = m.makeRequest({
+
+  reqInfo = m.makeRequest({
     requestType: requestType
     url: requestUrl
     options: options
@@ -39,33 +39,33 @@ Function generalTaskModule_makeRequest_test()
     errorCallback: errorCallback
     responseType: responseType
   })
-  
-  m.assertNotInvalid(requestNode)
-  
-  ' checks requestNode[:id]
-  m.assertNotEmpty(requestNode.id)
+
+  m.assertNotInvalid(reqInfo)
+
+  ' checks reqInfo[:id]
+  m.assertNotEmpty(reqInfo.id)
   expectedUUIDCount = 36
-  requestNodeUUIDCount = Len(requestNode.id)
-  m.assertEqual(expectedUUIDCount, requestNodeUUIDCount)
-  
+  reqInfoUUIDCount = Len(reqInfo.id)
+  m.assertEqual(expectedUUIDCount, reqInfoUUIDCount)
+
   ' checks response field
-  hasResponseField = requestNode.hasField("response")
+  callbackNode = reqInfo.callbackNode
+  hasResponseField = callbackNode.hasField("response")
   m.assertTrue(hasResponseField)
-  responseType = requestNode.getFieldType("response")
+  responseType = callbackNode.getFieldType("response")
   m.assertEqual(responseType, "node")
-  
+
   ' checks error field
-  hasErrorField = requestNode.hasField("error")
-  m.assertTrue(hasErrorField) 
-  
+  hasErrorField = callbackNode.hasField("error")
+  m.assertTrue(hasErrorField)
+
   ' checks input field
-  input = requestNode.input
-  m.assertEqual(requestType, input.requestType)
-  m.assertEqual(requestUrl, input.url)
-  m.assertEqual(options.params.app_id, input.options.params.app_id)
-  m.assertEqual(options.params.device_id, input.options.params.device_id)
-  m.assertEqual(options.params.platform, input.options.params.platform)
-  m.assertEqual(options.params.type, input.options.params.type)
+  m.assertEqual(requestType, reqInfo.requestType)
+  m.assertEqual(requestUrl, reqInfo.url)
+  m.assertEqual(options.params.app_id, reqInfo.options.params.app_id)
+  m.assertEqual(options.params.device_id, reqInfo.options.params.device_id)
+  m.assertEqual(options.params.platform, reqInfo.options.params.platform)
+  m.assertEqual(options.params.type, reqInfo.options.params.type)
 
 End Function
 
@@ -73,22 +73,22 @@ End Function
 '@Test getGeneralTaskSuccessCallback unit tests
 Function generalTaskModule_getGeneralTaskSuccessCallback_test()
 
-  requestNode = CreateObject("roSGNode", "RequestNode")
-  requestNode.id = "12345"  
-  
-  successCallback = onSuccessCallbackTest
-  errorCallback = onErrorCallbackTest
-  m.storeGeneralTaskCallbacks(requestNode, successCallback, errorCallback)
+  reqInfo = {}
+  reqInfo.id = "12345"
 
-  requestNode = CreateObject("roSGNode", "RequestNode")
-  requestNode.id = "12345"
-  callback = m.getGeneralTaskSuccessCallback(requestNode)
+  reqInfo.successCallback = onSuccessCallbackTest
+  reqInfo.errorCallback = onErrorCallbackTest
+  m.storeGeneralTaskCallbacks(reqInfo)
+
+  reqInfo = {}
+  reqInfo.id = "12345"
+  callback = m.getGeneralTaskSuccessCallback(reqInfo)
   m.assertNotInvalid(callback)
   m.assertEqual(callback, onSuccessCallbackTest)
-  
-  requestNode = CreateObject("roSGNode", "RequestNode")
-  requestNode.id = "56789"
-  callback = m.getGeneralTaskSuccessCallback(requestNode)  
+
+  reqInfo = {}
+  reqInfo.id = "56789"
+  callback = m.getGeneralTaskSuccessCallback(reqInfo)
   m.assertInvalid(callback)
 
 End Function
@@ -97,21 +97,21 @@ End Function
 '@Test getGeneralTaskErrorCallback unit tests
 Function generalTaskModule_getGeneralTaskErrorCallback_test()
 
-  requestNode = CreateObject("roSGNode", "RequestNode")
-  requestNode.id = "12345" 
-  successCallback = onSuccessCallbackTest
-  errorCallback = onErrorCallbackTest
-  m.storeGeneralTaskCallbacks(requestNode, successCallback, errorCallback)
+  reqInfo = {}
+  reqInfo.id = "12345"
+  reqInfo.successCallback = onSuccessCallbackTest
+  reqInfo.errorCallback = onErrorCallbackTest
+  m.storeGeneralTaskCallbacks(reqInfo)
 
-  requestNode = CreateObject("roSGNode", "RequestNode")
-  requestNode.id = "12345" 
-  callback = m.getGeneralTaskErrorCallback(requestNode)
+  reqInfo = {}
+  reqInfo.id = "12345"
+  callback = m.getGeneralTaskErrorCallback(reqInfo)
   m.assertNotInvalid(callback)
   m.assertEqual(callback, onErrorCallbackTest)
-  
-  requestNode = CreateObject("roSGNode", "RequestNode")
-  requestNode.id = "56789" 
-  callback = m.getGeneralTaskErrorCallback(requestNode)  
+
+  reqInfo = {}
+  reqInfo.id = "56789"
+  callback = m.getGeneralTaskErrorCallback(reqInfo)
   m.assertInvalid(callback)
 
 End Function
@@ -120,12 +120,12 @@ End Function
 '@Test storeGeneralTaskCallbacks unit tests
 Function generalTaskModule_storeGeneralTaskCallbacks_test()
 
-  requestNode = CreateObject("roSGNode", "RequestNode")
-  requestNode.id = "12345" 
-  successCallback = onSuccessCallbackTest
-  errorCallback = onErrorCallbackTest
-  callbacks = m.storeGeneralTaskCallbacks(requestNode, successCallback, errorCallback)
-  
+  reqInfo = {}
+  reqInfo.id = "12345"
+  reqInfo.successCallback = onSuccessCallbackTest
+  reqInfo.errorCallback = onErrorCallbackTest
+  callbacks = m.storeGeneralTaskCallbacks(reqInfo)
+
   m.assertNotInvalid(callbacks)
   m.assertEqual(callbacks.successCallback, onSuccessCallbackTest)
   m.assertEqual(callbacks.errorCallback, onErrorCallbackTest)

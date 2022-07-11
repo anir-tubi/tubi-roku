@@ -1,7 +1,7 @@
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseDetailScreenSingleContentSuccess(fullResponse, _requestNode)
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseDetailScreenSingleContentSuccess(fullResponse, _reqInfo)
   translate = TubiMetadataTranslate(m.constants)
   parsedResponse = fullResponse.data
   updatedContent = CreateObject("roSGNode", "TubiContentNode")
@@ -12,36 +12,36 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseDetailScreenRelatedContentSuccess(fullResponse, requestNode)
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseDetailScreenRelatedContentSuccess(fullResponse, reqInfo)
   translate = TubiMetadataTranslate(m.constants)
   parsedResponse = fullResponse.data
   relatedContent = translate.translateRelatedContent(parsedResponse)
-  relatedContent.id = requestNode.input.contentId
+  relatedContent.id = reqInfo.contentId
   return relatedContent
 End Function
 
 
 ' Success making changes to the like/dislike settings
-Function parseContentRateSuccess(fullResponse, requestNode)
+Function parseContentRateSuccess(_fullResponse, reqInfo)
   returnResponse = {}
-  if requestNode <> invalid and requestNode.input <> invalid and requestNode.input.options <> invalid and requestNode.input.options.body <> invalid
-    returnResponse = requestNode.input.options.body
+  if reqInfo <> invalid and reqInfo.options <> invalid and reqInfo.options.body <> invalid
+    returnResponse = reqInfo.options.body
   end if
-  
+
   return returnResponse
 End Function
 
 
 ' Error making changes to the like/dislike settings
-Function parseContentRateError(fullResponse, requestNode)
+Function parseContentRateError(fullResponse, reqInfo)
   returnParsed = {}
-  if requestNode <> invalid and requestNode.input <> invalid and requestNode.input.options <> invalid and requestNode.input.options.body <> invalid
-    returnParsed = parseJSON(requestNode.input.options.body)
+  if reqInfo <> invalid and reqInfo.options <> invalid and reqInfo.options.body <> invalid
+    returnParsed = parseJSON(reqInfo.options.body)
   end if
   if fullResponse <> invalid and fullResponse.code <> invalid
     returnParsed.code = fullResponse.code
   end if
-  
+
   return returnParsed
 End Function

@@ -5,6 +5,8 @@ Function init()
   m.top.observeField("batchRequest", m.port)
   m.top.observeField("cancel", m.port)
   m.constants = getConstantsFromGlobal()
+  ' We store a local copy of the translations so we don't have to do a rendezvous each time we request a translation during parsing
+  m.translationAA = getFieldFromGlobal("translationAA")
   m.top.functionName = "listen"
   m.top.control = "run"
 End Function
@@ -14,7 +16,6 @@ End Function
 '
 ' this task listens for new request in port and makes api request & response calls
 Function listen()
-
   tubiLog("GeneralTask.listen loop started")
   m.nodeHelpers = TubiNodeHelpers()
 
@@ -52,37 +53,22 @@ Function listen()
 
   while (true)
     msg = wait(200, m.port)
-    if type(msg) = "roSGNodeEvent"
-      if msg.getField() = "request"
-
-        requestNode = msg.getData()
-
-        if requestNode <> invalid and isEmptyField(requestNode.response) and isEmptyField(requestNode.error)
-          m.top.request = invalid 'reset the request field so no changes to the requestNode cause the following logic to run again
-          makeApiRequest(requestNode, invalid)
-        end if
-
+    if type(msg) = "roSGNodeEvent" then
+      if msg.getField() = "request" then
+        reqInfo = msg.getData()
+        makeApiRequest(reqInfo, invalid)
       else if msg.getField() = "batchRequest"
-
-        requestNode = msg.getData()
-
-        if requestNode <> invalid
-          m.top.batchRequest = invalid 'reset the request field so no changes to the requestNode cause the following logic to run again
-          makeBatchApiRequests(requestNode)
+        batchInfo = msg.getData()
+        if batchInfo <> invalid then
+          makeBatchApiRequests(batchInfo)
         end if
-
-      else if msg.getField() = "cancel"
-
-        requestNode = msg.getData()
-
-        if requestNode <> invalid
-          m.top.cancel = invalid 'reset the request field so no changes to the requestNode cause the following logic to run again
-          cancelRequests(requestNode)
+      else if msg.getField() = "cancel" then
+        reqInfo = msg.getData()
+        if reqInfo <> invalid then
+          cancelRequests(reqInfo)
         end if
-
       end if
-
-    else if type(msg) = "roUrlEvent"
+    else if type(msg) = "roUrlEvent" then
       processResponse(msg)
     end if
 
@@ -90,28 +76,25 @@ Function listen()
       obj = m.backedOffJobs[requestId]
       if obj.timespan.totalMilliseconds() > obj.backoffDuration then
         job = obj.job
-        makeApiRequest(job.requestNode, job.batchNode)
+        makeApiRequest(job.reqInfo, job.batchInfo)
         m.backedOffJobs.delete(requestId)
       end if
     end for
   end while
-
 End Function
 
 
 ' makeApiRequest
 '
 ' this method creates TubiRequest Object and start the api request
-' @requestNode : roSGNode, requestNode is ContentNode
-' @batchNode : roSGNode, batchNode is TubiRequest() Object for batchRequest. it will be invalid for single request
-Function makeApiRequest(requestNode, batchNode = invalid) as Boolean
-  input = requestNode.input 'grab a local copy of inputs to prevent subsequent rendezvous's
+' @reqInfo: AA that was created by generalTask_makeRequest
+' @batchInfo: AA, contains information needed to make the request. See generalTask_makeBatchRequest for more info.
+Function makeApiRequest(reqInfo, batchInfo = invalid) as Boolean
+  if reqInfo <> invalid
+    requestType = reqInfo.requestType
+    url = reqInfo.url
 
-  if input <> invalid
-    requestType = input.requestType
-    url = input.url
-
-    options = input.options
+    options = reqInfo.options
     if options = invalid
       options = {}
     end if
@@ -138,9 +121,9 @@ Function makeApiRequest(requestNode, batchNode = invalid) as Boolean
       id = urlTransfer.getIdentity().toStr()
 
       m.jobStore[id] = {
-        requestNode: requestNode
+        reqInfo: reqInfo
         tubiReq: tubiReq
-        batchNode: batchNode
+        batchInfo: batchInfo
       }
       return true
     else
@@ -149,26 +132,23 @@ Function makeApiRequest(requestNode, batchNode = invalid) as Boolean
   else
     return false
   end if
-
 End Function
 
 
-' @batchNode : roSGNode, batchNode is ContentNode and requests are children
-Function makeBatchApiRequests(batchNode) As Void
-  batchCount = batchNode.getChildCount()
-
+' @batchInfo: AA, contains information needed to make the request. See generalTask_makeBatchRequest for more info.
+Function makeBatchApiRequests(batchInfo)
   batchResponseAccumulator = {}
   batchResponseOrder = []
-  batchId = batchNode.id
+  batchId = batchInfo.id
 
-  for i=0 to batchCount-1
-    singleRequestNode = batchNode.getChild(i)
-    reqSent = makeApiRequest(singleRequestNode, batchNode)
+  requests = batchInfo.requests
+  for each reqInfo in requests
+    reqSent = makeApiRequest(reqInfo, batchInfo)
 
     if reqSent = true
       ' Create a list of expected responses for the batch that will be
       ' used to verify if all the responses for the batch have been returned.
-      requestId = singleRequestNode.id
+      requestId = reqInfo.id
       batchResponseOrder.push(requestId)
       batchResponseAccumulator[requestId] = invalid
     end if
@@ -191,14 +171,12 @@ Function processResponse(msg)
 
   if job <> invalid
 
-    requestNode = job.requestNode
-
-    requestInput = requestNode.input
-    requestType = requestInput.requestType
+    reqInfo = job.reqInfo
+    requestType = reqInfo.requestType
     callbackTypes = m.requestTypes[requestType]
 
     result = job.tubiReq.handleEvent(msg)
-    retries = requestNode.retries
+    retries = reqInfo.retries
 
     if result <> invalid and result.response <> invalid
 
@@ -254,9 +232,9 @@ End Function
 ' @result : assocarray, this is the request handleEvent AA with response
 ' @callbackTypes : assocarray, it holds parseError & parseSuccess callbacks
 ' @job : assocarray, job as held in m.jobStore. Keys include:
-'                    requestNode: roSGNode, RequestNode for the specific request
+'                    reqInfo: AA, info as passed in from generalTask_makeRequest for the specific request
 '                    tubiReq: AA, as returned from Request().createAsync()
-'                    batchnode: roSGNode, parent RequestNode for the batch of individual Request Nodes
+'                    batchInfo: AA, contains information needed to make the request. See generalTask_makeBatchRequest for more info.
 '                               (invalid for single request, valid for batch request)
 Function processSuccessResponse(result, callbackTypes, job)
 
@@ -312,22 +290,17 @@ Function processSuccessResponse(result, callbackTypes, job)
     ' some requests may not require handling of the response and and therefore may not
     ' have a parseSuccess callback.
     if parserCallback <> invalid
-
-      output = parserCallback(result.response, job.requestNode)
+      output = parserCallback(result.response, job.reqInfo)
 
       ' this block will execute only for batch responses
-      if job.batchNode <> invalid and job.batchNode.id <> invalid
-
+      if job.batchInfo <> invalid and job.batchInfo.id <> invalid
         accumulateBatchResponse(job, output)
-
       else
-
-        job.requestNode.response = output
-
+        job.reqInfo.callbackNode.response = output
       end if
-
     else
-      job.requestNode.response = invalid
+      ' Default responseType is string so we send back an empty string to at least let someone know the request succeeded
+      job.reqInfo.callbackNode.response = ""
     end if
   end if
 
@@ -337,20 +310,20 @@ End Function
 'accumulateBatchResponse, invokes callbacks for batch response and sets responses
 '
 ' @job : assocarray, job as held in m.jobStore. Keys include:
-'                    requestNode: roSGNode, RequestNode for the specific request
+'                    reqInfo: AA, info passed in for request as part of either generalTask_makeRequest or generalTask_makeBatchRequest containing info needed to make the request
 '                    tubiReq: AA, as returned from Request().createAsync()
-'                    batchnode: roSGNode, parent RequestNode for the batch of individual Request Nodes
+'                    batchInfo: AA, contains information needed to make the request. See generalTask_makeBatchRequest for more info.
 ' @parsedResponse: any, the response value after it has been run through the appropriate
 '                       success or error parser
 '
 ' Side effect sends the batch with responses back to the render thread if all responses have been returned
-Function accumulateBatchResponse(job, parsedResponse)
-  if job = invalid or job.batchNode = invalid or job.requestNode = invalid
-    return invalid
+Function accumulateBatchResponse(job, parsedResponse) as Void
+  if job = invalid or job.reqInfo = invalid or job.batchInfo = invalid
+    return
   end if
 
-  requestId = job.requestNode.id
-  batchId = job.batchNode.id
+  requestId = job.reqInfo.id
+  batchId = job.batchInfo.id
   batch = m.batchStore[batchId]
 
   if batch <> invalid and batch.responseAccumulator <> invalid and batch.responseOrder <> invalid
@@ -385,7 +358,7 @@ Function accumulateBatchResponse(job, parsedResponse)
       ' individual request types, but at the batch level. This would allow us to include
       ' input information from the original batch node into the batch response.
 
-      batchResponseType = job.batchNode.input.responseType
+      batchResponseType = job.batchInfo.responseType
 
       if batchResponseType = "node"
         batchResponse = CreateObject("roSGNode", "ContentNode")
@@ -420,7 +393,7 @@ Function accumulateBatchResponse(job, parsedResponse)
         batchResponse = ""
       end if
 
-      job.batchNode.response = batchResponse
+      job.batchInfo.callbackNode.response = batchResponse
       m.batchStore.delete(batchId)
     end if
   end if
@@ -431,7 +404,7 @@ End Function
 '
 ' @result : assocarray, this is the request handleEvent AA with response
 ' @callbackTypes : assocarray, it holds parseerror & parsesuccess callbacks
-' @job : assocarray, it has requestNode, tubiReq, batchnode(invalid for single request, valid for batch request)
+' @job : assocarray, it has reqInfo, tubiReq, batchInfo(invalid for single request, valid for batch request)
 '
 Function processErrorReponse(result, callbackTypes, job)
   ' end result of parsedResponse type may vary depending on API response format
@@ -446,16 +419,16 @@ Function processErrorReponse(result, callbackTypes, job)
 
   ' some requests might not require error handling, and therefore may not have a parseError callback
   if parserCallback <> invalid
-    output = parserCallback(result.response, job.requestNode)
+    output = parserCallback(result.response, job.reqInfo)
 
     ' this block will execute only for batch responses
-    if job.batchNode <> invalid and job.batchNode.id <> invalid
+    if job.batchInfo <> invalid and job.batchInfo.id <> invalid
       accumulateBatchResponse(job, output)
     else
-      job.requestNode.error = output
+      job.reqInfo.callbackNode.error = output
     end if
   else
-    job.requestNode.response = invalid
+    job.reqInfo.callbackNode.response = invalid
   end if
 
 End function
@@ -465,15 +438,15 @@ End function
 ' cancelRequests
 '
 ' this method cancels the outstanding requests on the same screen
-' @requestNode : roSGNode, requestNode is ContentNode created at GeneralTaskModule
-Function cancelRequests(requestNode) As Void
+' @reqInfo: AA that was created by generalTask_makeRequest
+Function cancelRequests(reqInfo) As Void
   tubiLog("GeneralTask.cancelRequests")
 
-  requestId = requestNode.id
+  requestId = reqInfo.id
   for each key in m.jobStore
     job = m.jobStore[key]
-    if job <> invalid and job.requestNode <> invalid and job.tubiReq <> invalid
-      if job.requestNode.id = requestId
+    if job <> invalid and job.reqInfo <> invalid and job.tubiReq <> invalid
+      if job.reqInfo.id = requestId
         job.tubiReq.cancel()
         exit for
       end if
@@ -488,14 +461,14 @@ End Function
 ' @job: AssocArray, the job for this request as created in makeApiRequest
 ' @retries: integer, the number of remaining retries for a request/request node
 '
-' side effects: updates the retries and pause fields of the passed in requestNode
+' side effects: updates the retries and pause fields of the passed in reqInfo
 Function handleBackoff(job, retries)
-  requestNode = job.requestNode
-  backoffFactor = requestNode.backoffFactor
-  backoffDuration = requestNode.pause * backoffFactor
-  requestNode.pause = backoffDuration
-  requestNode.retries = retries - 1
-  m.backedOffJobs[requestNode.id] = {
+  reqInfo = job.reqInfo
+  backoffFactor = reqInfo.backoffFactor
+  backoffDuration = reqInfo.pause * backoffFactor
+  reqInfo.pause = backoffDuration
+  reqInfo.retries = retries - 1
+  m.backedOffJobs[reqInfo.id] = {
     "timespan": createObject("roTimespan")
     "job": job
     "backoffDuration": backoffDuration

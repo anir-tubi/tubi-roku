@@ -7,6 +7,9 @@ Function init()
   m.top.observeField("logMsg", m.port)
   m.top.observeField("logException", m.port)
   m.top.observeField("analyticsAppMode", m.port)
+
+  m.constants = m.global.constants   ' this should grab a thread-local copy
+
   m.top.control = "RUN"
 End Function
 
@@ -20,7 +23,6 @@ End Function
 Function watchLoop()
   tubiLog("TrackingLoggingTask.watchLoop started")
   m.queue = TubiRequestQueue().create(m.port)
-  m.constants = m.global.constants   ' this should grab a thread-local copy
   m.request = TubiRequest(m.constants.settings)
   m.auth = TubiAuth(m.constants, m.request)
   m.logger = TubiLogger(m.constants, m.request, m.auth)

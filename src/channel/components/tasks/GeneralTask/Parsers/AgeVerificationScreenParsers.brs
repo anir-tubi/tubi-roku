@@ -1,8 +1,7 @@
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseAgeVerificationScreenDeviceRegistrationSuccess(fullResponse, _requestNode)
-
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseAgeVerificationScreenDeviceRegistrationSuccess(fullResponse, _reqInfo)
   age = -1
   parsedResponse = fullResponse.data
   if parsedResponse <> invalid and parsedResponse.age <> invalid
@@ -14,9 +13,8 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseAgeVerificationScreenDeviceRegistrationError(fullResponse, requestNode)
-
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseAgeVerificationScreenDeviceRegistrationError(fullResponse, reqInfo)
   ' default code
   errCode = -1234
 
@@ -27,15 +25,15 @@ Function parseAgeVerificationScreenDeviceRegistrationError(fullResponse, request
 
   return {
     code: errCode
-    requestNode: requestNode
+    reqInfo: reqInfo
   }
 End Function
 
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseAgeVerificationScreenCheckBirthdaySuccess(fullResponse, _requestNode)
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseAgeVerificationScreenCheckBirthdaySuccess(fullResponse, _reqInfo)
   parsedResponse = fullResponse.data
 
   res = {}
@@ -49,8 +47,8 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseAgeVerificationScreenCheckBirthdayError(fullResponse, _requestNode)
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseAgeVerificationScreenCheckBirthdayError(fullResponse, _reqInfo)
   errCode = -1234
   if fullResponse <> invalid and fullResponse.code <> invalid
     ' HTTP or Curl code

@@ -1,22 +1,20 @@
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseHomeScreenContentSuccess(fullResponse, requestNode)
-
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
   experiments = TubiExperiments(m.constants)
   translate = TubiMetadataTranslate(m.constants, experiments)
   parsedResponse = fullResponse.data
 
   contentMode = invalid
   isKidsMode = invalid
-  input = requestNode.input
 
   authInfo = invalid
   uiMode = "standard"
 
-  if input <> invalid and input.options <> invalid
+  if reqInfo <> invalid and reqInfo.options <> invalid
 
-    options = input.options
+    options = reqInfo.options
     if options <> invalid and options.params <> invalid
       contentMode = options.params.contentMode
 
@@ -27,10 +25,10 @@ Function parseHomeScreenContentSuccess(fullResponse, requestNode)
       isKidsMode = options.params.isKidsMode
     end if
 
-    authInfo = input.authInfo
-    uiMode = input.uiMode
+    authInfo = reqInfo.authInfo
+    uiMode = reqInfo.uiMode
 
-  end if 
+  end if
 
   convertedMetadata = translate.translateHomescreen(parsedResponse, contentMode, authInfo, isKidsMode, uiMode)
 
@@ -40,9 +38,8 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseCategoryContentSuccess(fullResponse, requestNode)
-
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseCategoryContentSuccess(fullResponse, reqInfo)
   experiments = TubiExperiments(m.constants)
   translate = TubiMetadataTranslate(m.constants, experiments)
 
@@ -53,17 +50,13 @@ Function parseCategoryContentSuccess(fullResponse, requestNode)
   bFullData = false
   contentMode = "homeScreen"
 
-  requestInput = requestNode.input
-  if requestInput <> invalid and requestInput.options <> invalid
-
-    options = requestInput.options
+  if reqInfo <> invalid
+    options = reqInfo.options
     if options <> invalid and options.params <> invalid
       contentMode = options.params.contentMode
     end if
-
   end if
 
   convertedMetadata = translate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode)
   return convertedMetadata  'may return an empty container
-
 End Function

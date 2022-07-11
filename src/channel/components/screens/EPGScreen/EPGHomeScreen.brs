@@ -376,8 +376,7 @@ Function onTopNavBackItemSelected()
 End Function
 
 
-' @includeLinearTV: boolean, true if a linear TV item should be included
-Function generateTopNavContentItems(includeLinearTV = false)
+Function generateTopNavContentItems()
   menuItemIds = [
     m.constants.ui.sideNavIds.home
     m.constants.ui.sideNavIds.movies

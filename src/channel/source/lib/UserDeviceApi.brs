@@ -148,7 +148,6 @@ End Function
 ' @email : string,  (either taken from roku account or user entered email)
 Function userDeviceApi_magicLink(email)
   url = m.constants.urls.account.magicLink
-  headers = {}
   options = m.getCommonOptions()
   options.params["email"] = email
   options["method"] = m.constants.reqTypes.post
@@ -162,7 +161,6 @@ End Function
 '@uid: string, unique identifier generated through magicLink for each user
 Function userDeviceApi_queryStatusOfMagicLink(uid)
   url = m.constants.urls.account.magicLink + "/" + uid
-  headers = {}
   options = m.getCommonOptions()
   options["method"] = m.constants.reqTypes.get
   return {

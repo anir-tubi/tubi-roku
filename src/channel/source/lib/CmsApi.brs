@@ -428,8 +428,6 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
             categoryReqInfo = m.categoryReqInfo(categoryId, bKidsMode, options)
             categoryReqInfo.requestType = reqName
             categoryReqInfo.responseType = "node"
-            categoryReqInfo.silenceCallbackWarnings = true
-
           end if
 
         end if

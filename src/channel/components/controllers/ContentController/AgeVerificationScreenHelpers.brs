@@ -409,8 +409,8 @@ End Function
 Function handleNetworkError(err, tryAgainCallback, cancelCallback)
 
   birthdate = ""
-  if err.requestNode <> invalid and err.requestNode.input <> invalid
-    inputData = err.requestNode.input
+  if err.reqInfo <> invalid
+    inputData = err.reqInfo
     if inputData.birthdate <> invalid
       birthdate = inputData.birthdate
     end if
@@ -446,8 +446,8 @@ Function handleNetworkErrorOnSignUp(err)
   signInInfo = {}
   birthdate = ""
 
-  if err.requestNode <> invalid and err.requestNode.input <> invalid
-    inputData = err.requestNode.input
+  if err.reqInfo <> invalid
+    inputData = err.reqInfo
     if inputData.signInInfo <> invalid
       signInInfo = inputData.signInInfo
     end if

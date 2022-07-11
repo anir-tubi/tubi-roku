@@ -1,22 +1,20 @@
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseCategoryListSuccess(fullResponse, requestNode)
-
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseCategoryListSuccess(fullResponse, reqInfo)
   experiments = TubiExperiments(m.constants)
   translate = TubiMetadataTranslate(m.constants, experiments)
   parsedResponse = fullResponse.data
 
   isChannels = false
-  input = requestNode.input
 
-  if input <> invalid and input.screenId <> invalid
-    screenId = input.screenId
+  if reqInfo <> invalid and reqInfo.screenId <> invalid
+    screenId = reqInfo.screenId
 
     if screenId = m.constants.ui.screenIds.channelListScreen
       isChannels = true
     end if
-  end if 
+  end if
 
   categoriesListContent = translate.translateCategoriesListScreen(parsedResponse, isChannels)
 
@@ -26,13 +24,12 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseCategoryListError(fullResponse, requestNode)
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseCategoryListError(fullResponse, reqInfo)
   screenId = ""
-  input = requestNode.input
 
-  if input.screenId <> invalid
-    screenId = input.screenId
+  if reqInfo.screenId <> invalid
+    screenId = reqInfo.screenId
   end if
 
   return {

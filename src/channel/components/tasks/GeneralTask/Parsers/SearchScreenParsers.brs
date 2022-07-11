@@ -1,8 +1,7 @@
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseDefaultSearchSuccess(fullResponse, requestNode)
-
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseDefaultSearchSuccess(fullResponse, reqInfo)
   metadataTranslate = TubiMetadataTranslate(m.constants)
 
   parsedResponse = fullResponse.data
@@ -12,10 +11,9 @@ Function parseDefaultSearchSuccess(fullResponse, requestNode)
   bFullData = true
   contentMode = invalid
 
-  requestInput = requestNode.input
-  if requestInput <> invalid and requestInput.options <> invalid
+  if reqInfo <> invalid and reqInfo.options <> invalid
 
-    options = requestInput.options
+    options = reqInfo.options
     if options <> invalid and options.params <> invalid
       contentMode = options.params.contentMode
     end if
@@ -25,18 +23,15 @@ Function parseDefaultSearchSuccess(fullResponse, requestNode)
   convertedMetadata = metadataTranslate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode)
 
   return convertedMetadata
-
 End Function
 
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseSearchAPISuccess(fullResponse, _requestNode)
-
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseSearchAPISuccess(fullResponse, _reqInfo)
   metadataTranslate = TubiMetadataTranslate(m.constants)
   parsedResponse = fullResponse.data
   convertedMetadata = metadataTranslate.translate(parsedResponse)
   return convertedMetadata
-
 End Function

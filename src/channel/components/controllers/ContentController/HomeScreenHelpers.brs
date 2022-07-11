@@ -1091,5 +1091,5 @@ Function onLoadCategoriesIndex(msg)
       successCallback: batchResponseHandler
     })
   end if
-
+  return true
 End Function

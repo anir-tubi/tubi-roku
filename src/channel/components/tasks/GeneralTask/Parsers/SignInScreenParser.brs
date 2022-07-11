@@ -1,9 +1,9 @@
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseEmailExistsSuccess(fullResponse, requestNode)
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseEmailExistsSuccess(fullResponse, reqInfo)
   return {
-    requestInput: requestNode.input
+    requestInput: reqInfo
     parsedResponse: fullResponse.data
   }
 End Function
@@ -11,10 +11,10 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseEmailExistsError(fullResponse, requestNode)
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseEmailExistsError(fullResponse, reqInfo)
   return {
-    requestInput: requestNode.input
+    requestInput: reqInfo
     code: fullResponse.code
   }
 End Function
@@ -22,9 +22,9 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 'side effects... overwrites the old authInfo in the registry with the new authInfo
-Function parseSignUpSuccess(fullResponse, _requestNode)
+Function parseSignUpSuccess(fullResponse, _reqInfo)
   parsedResponse = fullResponse.data
   parsedResponse.authType = "EMAIL"  'used for subsequent analytics requests
   requestModule = TubiRequest(m.constants.settings)
@@ -36,10 +36,10 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseSignUpError(fullResponse, requestNode)
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseSignUpError(fullResponse, reqInfo)
   return {
-    requestNode: requestNode
+    reqInfo: reqInfo
     code: fullResponse.code
   }
 End Function
@@ -47,9 +47,9 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 'side effects... overwrites the old authInfo in the registry with the new authInfo
-Function parseSignInSuccess(fullResponse, _requestNode)
+Function parseSignInSuccess(fullResponse, _reqInfo)
   parsedResponse = fullResponse.data
   parsedResponse.authType = "EMAIL"  'used for subsequent analytics requests
   requestModule = TubiRequest(m.constants.settings)
@@ -61,10 +61,10 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseSignInError(fullResponse, requestNode)
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseSignInError(fullResponse, reqInfo)
   return {
-    requestInput: requestNode.input
+    requestInput: reqInfo
     code: fullResponse.code
   }
 End Function
@@ -72,33 +72,33 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 'side effects... overwrites the old authInfo in the registry with the new authInfo
-Function parseMagicLinkSuccess(fullResponse, requestNode)
+Function parseMagicLinkSuccess(fullResponse, _reqInfo)
   return fullResponse.data
 End Function
 
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseMagicLinkError(fullResponse, requestNode)
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseMagicLinkError(fullResponse, _reqInfo)
   return fullResponse.code
 End Function
 
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 'side effects... overwrites the old authInfo in the registry with the new authInfo
-Function parsequeryStatusOfMagicLinkSuccess(fullResponse, requestNode)
+Function parsequeryStatusOfMagicLinkSuccess(fullResponse, _reqInfo)
   return fullResponse.data
 End Function
 
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parsequeryStatusOfMagicLinkError(fullResponse, requestNode)
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parsequeryStatusOfMagicLinkError(fullResponse, _reqInfo)
   return fullResponse.code
 End Function

@@ -1,7 +1,7 @@
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseVideoScreenSpritesSuccess(fullResponse, _requestNode)
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseVideoScreenSpritesSuccess(fullResponse, _reqInfo)
   parsedResponse = fullResponse.data
   spritesContentNode = invalid
   if parsedResponse <> invalid then
@@ -24,8 +24,8 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseVideoScreenUpNextSuccess(fullResponse, _requestNode)
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseVideoScreenUpNextSuccess(fullResponse, _reqInfo)
   parsedResponse = fullResponse.data
   translate = TubiMetadataTranslate(m.constants)
   upNextContent = CreateObject("roSGNode", "ContentNode")
@@ -39,8 +39,8 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseLiveVideoManifestSuccess(fullResponse, _requestNode)
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseLiveVideoManifestSuccess(fullResponse, _reqInfo)
   return {
     res: fullResponse.data
     headers: fullResponse.headers
@@ -50,24 +50,24 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_requestedNode: roSGNode, a RequestNode instance containing info needed to make the request
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 '
 ' @returns: a clone of the content that was used to make the request with updated history id
 ' and parentHistoryId (if original content was an episode), or invalid if response JSON does not
 ' contain the expected keys.
-Function parseHistorySuccess(fullResponse, requestNode)
+Function parseHistorySuccess(fullResponse, reqInfo)
   response = fullResponse.data
 
   if response.content_id = invalid or response.id = invalid or response.content_type = invalid then
     return invalid
   end if
 
-  if requestNode.input.content = invalid
+  if reqInfo.content = invalid
     return invalid
   end if
 
-  content = requestNode.input.content.clone(true)
-  nowPos = requestNode.input.nowPos
+  content = reqInfo.content.clone(true)
+  nowPos = reqInfo.nowPos
 
   isResponseSeries = (response.content_type = m.constants.uapiContentTypes.series and response.episodes <> invalid and type(response.episodes) = "roArray" and response.episodes.count() > 0)
   episode = invalid

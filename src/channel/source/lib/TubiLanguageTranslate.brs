@@ -58,7 +58,12 @@ Function getTranslationBasedOnLocale(sStringID as String, sLocaleID as String) a
   sTranslatedString = ""
   translations = invalid
 
-  translationAA = m.global.translationAA
+  ' We only store m.translationAA in GeneralTask currently to allow accessing translations without rendezvous
+  translationAA = m.translationAA
+  if translationAA = invalid then
+    translationAA = m.global.translationAA
+  end if
+
   if translationAA <> invalid then
     translations = translationAA[sLocaleID]
   end if

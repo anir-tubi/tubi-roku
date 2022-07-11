@@ -287,7 +287,7 @@ End Function
 
 
 Function onLikeDislikeStateChanged()
-  changeLikeDislikeButtonText() 
+  changeLikeDislikeButtonText()
 End Function
 
 
@@ -320,7 +320,7 @@ Function changeLikeDislikeButtonText()
       sButtonText = getTranslation("screenDetails_button_likeDislike")
       sIconUrl = "pkg:/images/icon-like.webp"
     end if
-    
+
     changeButtonText("stringLikeDislikeButton", sButtonText)
     m.LikeDislikeMenuItem.iconUrl = sIconUrl
     setVisibilityOfSecondaryMenu()
@@ -381,7 +381,7 @@ Function onIsSeries()
 End Function
 
 
-Function onRemoveSignupButton(msg)
+Function onRemoveSignupButton()
   signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
   if signUpIndex <> invalid
     addRemoveMenuItem(false, signUpIndex)
@@ -422,7 +422,7 @@ End Function
 Function onHasTrailer()
   tubiLog("DetailScreen.onHasTrailer")
   trailerIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.WatchTrailerMenuItem.id)
-  
+
   previousItems = [
     m.signUpMenuItem
     m.LikeDislikeMenuItem
@@ -448,7 +448,7 @@ Function onIsLoading()
   else
     m.RelatedContentGroup.visible = false
   end if
-  if m.top.isLoading = false 
+  if m.top.isLoading = false
     focusMenu()
   end if
 End Function
@@ -502,7 +502,7 @@ End Function
 ''''''''''''''''''''''
 ' setInitialSecondaryMenuItems
 '
-' The secondary menu currently only displays the like/dislike options when 
+' The secondary menu currently only displays the like/dislike options when
 '   the "like or dislike" button of the main menu is focused. However, since it is possible other menu items
 '   will need a secondary menu, let's set up the secondary menu like how we set up the main menu.
 Function setInitialSecondaryMenuItems() As Void
@@ -620,12 +620,12 @@ End Function
 ' @return boolean, Should the menu be seen? (The function will ensure the menu is made visible if it should and not if it should not.)
 Function setVisibilityOfSecondaryMenu()
   result = false
-  
-  if m.isLikeDislikeExperimentEnabled = true 
+
+  if m.isLikeDislikeExperimentEnabled = true
     itemFocused = m.Menu.content.getChild(m.Menu.itemFocused)
     if m.SecondaryMenu.isInFocusChain() = true or (m.Menu.isInFocusChain() = true and itemFocused <> invalid and itemFocused.id = "LikeDislikeMenuItem" and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing)
       alignSecondaryMenuWithMenu()
-      
+
       m.SecondaryMenu.visible = true
       m.Menu.focusFootprintBlendColor = m.constants.ui.colors.selectedListItem
       m.Menu.focusFootprintBitmapUri = "pkg://images/menu-focus-fhd.9.png"
@@ -654,7 +654,7 @@ Function alignSecondaryMenuWithMenu()
   else
     m.SecondaryMenu.translation = [m.SecondaryMenu.translation[0], m.defaultSecondaryMenuY]
   end if
-End Function 
+End Function
 
 
 ' @itemSelected: roSGNode: ContentNode representing the content that was selected by the user
@@ -669,7 +669,7 @@ Function handleMenuItemSelected(itemSelected)
     else if itemSelected.id = "PlayMenuItem"
       m.top.playSelected = true
     else if itemSelected.id = "LikeDislikeMenuItem"
-      if m.LikeDislikeMenuItem.title = getTranslation("screenDetails_button_changingRating") 
+      if m.LikeDislikeMenuItem.title = getTranslation("screenDetails_button_changingRating")
         '//If it is still trying to change the rating then do nothing if this btton is clicked again
       else if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked
         '//when the current item is liked, then remove the like state
@@ -678,7 +678,7 @@ Function handleMenuItemSelected(itemSelected)
         '//when the current item is disliked, then remove the dislike state
         m.top.removeDislikeSelected = true
       else
-        '//if displaying the like or dislike button, then clicking this should not cause a change of like status, 
+        '//if displaying the like or dislike button, then clicking this should not cause a change of like status,
         '//   but it may be confusing to the useer if nothing happens, so
         '//   the focus should move to the 2nd menu
         focusSecondaryMenu()
@@ -936,7 +936,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
     else if key = "play"
       handlePlayInput()
       return true
-    else if key = "right" and m.Menu.isInFocusChain() = true and m.Menu.content.getChild(m.Menu.itemFocused).id = "LikeDislikeMenuItem" and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked 
+    else if key = "right" and m.Menu.isInFocusChain() = true and m.Menu.content.getChild(m.Menu.itemFocused).id = "LikeDislikeMenuItem" and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked
       focusedItem = m.Menu.content.getChild(m.Menu.itemFocused)
       m.top.toggleOffButtonValue = focusedItem.analyticsButtonValue
       focusSecondaryMenu()

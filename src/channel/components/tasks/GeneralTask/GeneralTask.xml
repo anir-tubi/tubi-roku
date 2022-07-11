@@ -42,8 +42,8 @@
     <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
 
     <interface>
-      <field id="request" type="node" />
-      <field id="batchRequest" type="node" />
-      <field id="cancel" type="node" />
+      <field id="request" type="assocarray" />
+      <field id="batchRequest" type="assocarray" />
+      <field id="cancel" type="assocarray" />
     </interface>
 </component>

@@ -1,7 +1,7 @@
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_requestNode: roSGNode, a RequestNode instance containing info needed to make the request
-Function parseCategoryDetailsSuccess(fullResponse, _requestNode)
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseCategoryDetailsSuccess(fullResponse, _reqInfo)
   translate = TubiMetadataTranslate(m.constants)
 
   parsedResponse = fullResponse.data

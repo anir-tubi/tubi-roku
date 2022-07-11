@@ -83,6 +83,23 @@ function isFunction(value as Dynamic) as Boolean
 end function
 
 ' /**
+' * @description Checks if the supplied value is a valid Array type
+' * @param {Dynamic} value The variable to be checked
+' * @return {Boolean} Results of the check
+' */
+function isArray(value as Dynamic) as Boolean
+	return type(value) = "roArray"
+end function
+
+' /**
+' * @description Checks if the supplied value is a valid Array type and not empty
+' * @param {Dynamic} value The variable to be checked
+' * @return {Boolean} Results of the check
+' */
+function isNonEmptyArray(value as Dynamic) as Boolean
+	return (isArray(value) AND NOT value.isEmpty())
+end function
+
 ' * @description Checks if the supplied value is a valid Node type
 ' * @param {Dynamic} value The variable to be checked
 ' * @return {Boolean} Results of the check
