@@ -561,6 +561,16 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
 End Function
 
 
+' assign the focusedMenuItemAnalyticsIds field with the passed ID and the previous focused ID
+Function setNewFocusedId(sCurrentFocusedId)
+  sPreviousFocusedId = ""
+  if m.top.focusedMenuItemAnalyticsIds.Count() = 2
+    sPreviousFocusedId = m.top.focusedMenuItemAnalyticsIds[0]
+  end if
+  m.top.focusedMenuItemAnalyticsIds = [sCurrentFocusedId, sPreviousFocusedId]
+End Function
+
+
 ''''''''''''''''''''''''
 ' onMenuItemSelected
 '

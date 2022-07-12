@@ -260,6 +260,31 @@ Function userDeviceApi_patchAutoplayPreviewSettingInfo_test()
 End Function
 
 
+'@Test setContentRating unit tests
+Function userDeviceApi_setContentRating_test()
+  likeDislikeUrl = m.constants.urls.account.contentRating
+  testTitleId = "321251"
+
+  requestInfo = m.userDeviceApi.setContentRating(testTitleId, m.constants.ui.likeDislikeActions.like)
+  m.assertNotInvalid(requestInfo)
+  m.assertNotInvalid(requestInfo.url)
+  m.assertEqual(requestInfo.url, likeDislikeUrl)
+
+  m.assertNotInvalid(requestInfo.options)
+  m.assertNotInvalid(requestInfo.options.body)
+  params = parseJSON(requestInfo.options.body)
+
+  m.assertNotInvalid(params)
+  m.assertNotInvalid(params.action)
+  m.assertEqual(params.action,  m.constants.ui.likeDislikeActions.like)
+
+  m.assertNotInvalid(params.data)
+  m.assertEqual(type(params.data), "roArray")
+  m.assertEqual(params.data[0], testTitleId)
+
+End Function
+
+
 '@Test magicLink unit tests
 Function userDeviceApi_magicLink_test()
   magicLinkUrl = m.constants.urls.account.magicLink

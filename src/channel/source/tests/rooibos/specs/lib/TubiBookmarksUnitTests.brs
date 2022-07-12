@@ -203,6 +203,25 @@ Function tubiBookmarks_addBookmarkLocallySuccessfulForEpisode_test()
 End Function
 
 
+'@Test updateLikesLocally unit tests
+Function tubiBookmarks_updateLikesLocallySuccessful_test()
+
+  tubiBookmarks_setupGlobalFields_testHelper()
+
+  BM = m.authorizedBM
+  content = m.seriesContent
+  content.id = "0302800"
+  BM.updateLikesLocally(content.id, BM.constants.ui.likeDislikeActions.like, m.global)
+
+  likeNode = m.global.likeIds.findNode(content.id)
+  '//The content should have been successfully been added, so like node should be valid
+  m.assertNotInvalid(likeNode)
+  m.assertEqual(likeNode.subType(), "LikeContentNode")
+  m.assertEqual(likeNode.id, "0302800")
+  m.assertEqual(likeNode.state, BM.constants.ui.likeDislikeStates.liked)
+End Function
+
+
 '@Test addHistoryReqVideo_ParentIdAsInvalid unit tests
 Function tubiBookmarks_addHistoryReqVideo_ParentIdAsInvalid_test()
   BM = m.authorizedBM
@@ -398,12 +417,37 @@ Function tubiBookmarks_getInitialHistoryReqSignedOut_test()
 End Function
 
 
+'@Test getInitialLikeReqSignedOut unit tests
+Function tubiBookmarks_getInitialLikeReqSignedOut_test()
+  constants = getConstants()
+  REQUEST = TubiRequest()
+  AUTH = tubiBookmarks_mockAuth_Unauthorized_testHelper(constants, REQUEST)
+  NODEHELPERS = TubiNodeHelpers()
+  utils = ApiUtils(constants)
+  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS, utils)
+  req = BM.getInitialLikeReq("1234")
+  m.assertInvalid(req)
+End Function
+
+
 
 '@Test getInitialHistoryReqSignedIn unit tests
 Function tubiBookmarks_getInitialHistoryReqSignedIn_test()
   BM = m.authorizedBM
-  req = BM.getInitialHistoryReq("1234")
+  req = BM.getInitialHistoryReq("1234") 
   m.assertNotInvalid(req)
+End Function
+
+
+'@Test getInitialLikeReqSignedIn unit tests
+Function tubiBookmarks_getInitialLikeReqSignedIn_test()
+  constants = getConstants()
+  BM = m.authorizedBM
+  req = BM.getInitialLikeReq("1234")
+  m.assertNotInvalid(req)
+  m.assertEqual(req.url, constants.urls.account.contentRating)
+  m.assertEqual(req.params.type, "liked")
+  m.assertEqual(req.localid, "1234")
 End Function
 
 
@@ -526,3 +570,22 @@ Function tubiBookmarks_handleInitialHistory_test()
   m.assertEqual(history.getChild(1).getChild(0).nowPos, 2720)
   m.assertEqual(history.getChild(1).getChild(0).type, "video")
 End Function
+
+
+'@Test handleInitialLikes unit tests
+Function tubiBookmarks_handleInitialLikes_test()
+  BM = m.authorizedBM
+  serverData = {
+    "data": [321251, 2071]
+    "next": "next_page_id"
+  }
+  serverJson = FormatJson(serverData)
+  likes = BM.handleInitialLikes(serverJson, true)
+  m.assertNotInvalid(likes)
+  m.assertEqual(likes.content.getChildCount(), 2)
+  m.assertEqual(likes.content.getChild(0).subType(), "LikeContentNode")
+  m.assertEqual(likes.content.getChild(0).id, "321251")
+  m.assertEqual(likes.content.getChild(1).id, "2071")
+  m.assertEqual(likes.content.getChild(1).state, BM.constants.ui.likeDislikeStates.liked)
+  m.assertEqual(likes.nextPageId, "next_page_id")
+  End Function

@@ -1133,7 +1133,6 @@ Function updateLikeDislike(detailScreen, sRatingChange)
     detailScreen.likeDislikeState = m.constants.ui.likeDislikeStates.changing
     updateLikeDislikeRequestInfo = m.userDeviceApi.setContentRating(detailScreen.content.id, sRatingChange)
 
-
     '//Send Analytics of user interaction with the like/dislike button
     sAnalyticsEventType = ""
     if sRatingChange = m.constants.ui.likeDislikeActions.like
@@ -1146,7 +1145,6 @@ Function updateLikeDislike(detailScreen, sRatingChange)
       sAnalyticsEventType = "UNDO_DISLIKE"
     end if
     sendLikeSelectAnalytics(detailScreen, sAnalyticsEventType)
-
 
     m.makeRequest({
       url: updateLikeDislikeRequestInfo.url
@@ -1243,14 +1241,12 @@ Function onLikeChangedError(parsedReturn)
           sErrorSubtype = m.constants.errors.subtypes.ratingRemoveDislikeError
           ' sAnalyticsDialogType = "UNDO_DISLIKE" '//::TODO:: have backend provide a DialogType in protos that corresponds to failing to change a specific like action
         end if
-
         ' set up the error modal dialog
         errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, sErrorSubtype, code)
         content = getDetailScreenContent(detailScreen)
         dialogEvent = getDetailScreenDialogAnalyticEvent(content, sAnalyticsDialogType, errorCode, m.constants)
         title = getTranslation("error_tryAgain_title")
         message = getTranslation("screenDetails_error_likeDislike_description")
-
         modalInfo = {
           title: title
           message: getErrorMessage(message, errorCode)

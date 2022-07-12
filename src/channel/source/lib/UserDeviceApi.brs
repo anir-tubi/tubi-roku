@@ -217,6 +217,7 @@ Function userDeviceApi_setContentRating(sContentID, sRatingAction)
   }
 End Function
 
+
 '@parentalRating: integer, selected parentalRating from the settings screen
 'password: string, user entered password
 Function userDeviceApi_updateParentalRatingReqInfo(parentalRating, password)
