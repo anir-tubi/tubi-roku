@@ -928,7 +928,7 @@ Function tubiTracking_getOneOfs()
     }
 
     button_component: {
-      button_type: 0
+      button_type: ""  'ButtonType enum
       button_value: ""
     }
 

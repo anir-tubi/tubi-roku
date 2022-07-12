@@ -1445,7 +1445,7 @@ End function
 Function setComponentInteractionEventForSignUp(screen)
   tubiLog("DetailScreenHelper.setComponentInteractionEventForSignUp")
   componentValues = {
-    button_type: 1 '0-UNKNOWN, 1-TEXT, 2-DROPDOWN, 3-IMAGE
+    button_type: "TEXT"
     button_value: "SIGNUP_TO_SAVE_PROGRESS" 'Button value is always upper case and concatinated by "_"
   }
   pageInfo = screen.trackingPageInfo
