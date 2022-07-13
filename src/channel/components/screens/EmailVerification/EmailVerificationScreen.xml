@@ -68,14 +68,14 @@
       </Label>
       <Label
         id="email"
-        color="0xFF0000"
+        color="0xFFFFFF"
         width="1248"
         horizAlign="center"
         vertAlign="bottom">
         <Font
           role="font"
           uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="24"/>
+          size="36"/>
       </Label>
       <Label
         id="verificationHintText"
