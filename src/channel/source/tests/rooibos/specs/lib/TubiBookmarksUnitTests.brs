@@ -80,18 +80,6 @@ Function tubiBookmarks_mockAuth_Authorized_testHelper(constants, request)
 End Function
 
 
-'@Test removeBookmarkReq unit tests
-Function tubiBookmarks_removeBookmarkReq_test()
-  BM = m.authorizedBM
-  content = m.seriesContent
-  content.id = "01079"
-  content.title = "S02:E05 - You, I'll Be Following"
-  content.bookmarkId = "AABBCCDD"
-  req = BM.removeBookmarkReq(content)
-  m.assertNotInvalid(req)
-End Function
-
-
 '@Test addHistoryLocally unit tests
 Function tubiBookmarks_addBookmarkLocallySuccessful_test()
 

@@ -1025,18 +1025,21 @@ Function onRemoveFromQueue(detailScreen)
     bookmark = m.global.bookmarkIds.findNode(content.id)
     if bookmark <> invalid
       detailScreen.stringQueueButton = getTranslation("screenDetails_button_removing")
-      userTask = CreateObject("roSGNode", "AuthTask")
-      userTask.functionName = "removeFromQueue"
-      content.bookmarkId = bookmark.bookmarkId
-      userTask.content = content
-      userTask.isKidsMode = shouldKidsModeBeSentToServer()
-      userTask.addField("target", "node", false)
-      userTask.target = detailScreen
-      detailScreen.addField("task", "node", false)
-      detailScreen.task = userTask
-      userTask.observeFieldScoped("result", "onBookmarkRemoved")
-      userTask.control = "RUN"
+
+      removeFromQueueReq = m.userDeviceApi.removeFromQueueReqInfo(bookmark.bookmarkId)
+
+      m.makeRequest({
+        url: removeFromQueueReq.url
+        requestType: m.constants.reqNames.deleteFromQueue
+        options: removeFromQueueReq.options
+        successCallback: removeFromQueueSuccessResponse
+        errorCallback: removeFromQueueErrorResponse
+        responseType: "string"
+      })
+
       detailScreen.isWaitingForServerResponse = true
+    else
+      tubiLog("bookmark id not found")
     end if
   end if
 End Function
@@ -1225,52 +1228,6 @@ Function onLikeChangedError(parsedReturn)
       end if
     end if
   end if
-End Function
-
-
-
-Function onBookmarkRemoved(msg) As Void
-  tubiLog("DetailScreenHelpers.onBookmarkRemoved")
-  task = msg.getRoSGNode()
-  detailScreen = task.target
-  result = task.result
-  task.unobserveField("result")
-  detailScreen.task = invalid
-  detailScreen.isWaitingForServerResponse = false
-
-  if result = invalid or result.response.code <> 204 then
-    code = ""
-    content = getDetailScreenContent(detailScreen)
-
-    if content.type = m.constants.ui.contentTypes.series
-      message = getTranslation("screenDetails_error_noQueueSeries_description")
-    else
-      message = getTranslation("screenDetails_error_noQueueMovie_description")
-    end if
-
-    if result <> invalid
-      code = result.response.code
-    end if
-    detailScreen.stringQueueButton = getTranslation("screenDetails_button_noQueue")
-
-    ' set up the error modal dialog
-    errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.removeBookmarkError, code)
-    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "REMOVE_FROM_QUEUE", errorCode, m.constants)
-    title = getTranslation("error_tryAgain_title")
-
-    modalInfo = {
-      title: title
-      message: getErrorMessage(message, errorCode)
-      openTrackEvent: dialogEvent
-      trackingTask: m.trackingLoggingTask
-    }
-
-    showErrorModal(modalInfo, onRemoveFromQueueRetry, [detailScreen])
-    return
-  end if
-
-  sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
-  onHistoryQueueChange(m.constants.ui.categoryIds.queue)
 End Function
 
 
@@ -1963,6 +1920,55 @@ Function onAutoplaySingleContentResponse(refreshedContent)
     populateDetailScreen(detailScreen, refreshedContent)
     getRelatedContent(refreshedContent)
   end if
+End Function
+
+
+Function removeFromQueueSuccessResponse(_response)
+  tubiLog("DetailScreenHelpers.removeFromQueueSuccessResponse")
+  detailScreen = getTopDetailScreenFromStack()
+  if detailScreen <> invalid
+    detailScreen.isWaitingForServerResponse = false
+    sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
+  end if
+  onHistoryQueueChange(m.constants.ui.categoryIds.queue)
+End Function
+
+
+Function removeFromQueueErrorResponse(error)
+  tubiLog("DetailScreenHelpers.removeFromQueueErrorResponse")
+  detailScreen = getTopDetailScreenFromStack()
+  if detailScreen <> invalid
+    detailScreen.isWaitingForServerResponse = false
+
+    code = ""
+    content = getDetailScreenContent(detailScreen)
+
+    if content <> invalid and content.type = m.constants.ui.contentTypes.series
+      message = getTranslation("screenDetails_error_noQueueSeries_description")
+    else
+      message = getTranslation("screenDetails_error_noQueueMovie_description")
+    end if
+
+    if error <> invalid
+      code = error.code
+    end if
+    detailScreen.stringQueueButton = getTranslation("screenDetails_button_noQueue")
+
+    ' set up the error modal dialog
+    errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.removeBookmarkError, code)
+    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "REMOVE_FROM_QUEUE", errorCode, m.constants)
+    title = getTranslation("error_tryAgain_title")
+
+    modalInfo = {
+      title: title
+      message: getErrorMessage(message, errorCode)
+      openTrackEvent: dialogEvent
+      trackingTask: m.trackingLoggingTask
+    }
+
+    showErrorModal(modalInfo, onRemoveFromQueueRetry, [detailScreen])
+  end if
+
 End Function
 
 

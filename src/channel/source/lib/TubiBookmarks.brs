@@ -9,7 +9,6 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
     nodeHelpers: nodeHelpers
 
     'public methods
-    removeBookmarkReq: tubiBookmarks_removeBookmarkReq
     addHistoryReq: tubiBookmarks_getAddHistoryRequestInfo
     addHistoryLocally: tubiBookmarks_addHistoryLocally
     updateLikesLocally: tubiBookmarks_updateLikesLocally
@@ -23,7 +22,6 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
     handleUserInfo: tubiBookmarks_handleUserInfo
 
     'private methods
-    createBookmarksRequest: tubiBookmarks_createBookmarksRequest_
     createHistoryRequest: tubiBookmarks_createHistoryRequest_
     isLoggedInUser: tubiBookmarks_isLoggedInUser
   }
@@ -33,71 +31,6 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
   tubiBookmarks.append(defaultValues)
   return tubiBookmarks
 
-End Function
-
-
-'returns a request object that can be used to remove a bookmark from the server
-'@content: can be a content node from scene graph or a content object from the main thread - expect videos/movies or episodes, no series
-' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-Function tubiBookmarks_removeBookmarkReq(content as Object, bKidsMode = false as Boolean) as Object
-  bookmarkReq = invalid
-  if content <> invalid and content.id <> invalid and content.bookmarkId <> invalid
-    bookmarkReq = m.createBookmarksRequest(content.bookmarkId, "delete", "", bKidsMode)
-  else
-    tubiLog("bookmark id not found")
-  end if
-  return bookmarkReq
-End Function
-
-
-'returns a request object that can be used to add or delete the bookmark from the server, or invalid
-'@id: stringified content id of series or video that we are adding/deleting
-  'if add, @id should be the contentId
-  'if delete @id should be the 'bookmark server id'
-'@action: string (should be "add" or "delete")
-'@contentType: string (should be "series" or "movie") - not necessary for deletes
-'@bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-'@port: roMessagePort that will be used to listen for the async response - probably the port defined in detailsPage.show()
-Function tubiBookmarks_createBookmarksRequest_(id as String, action as String, contentType = "" as String, bKidsMode = false as Boolean) as Object
-  authInfo = m.auth.getAuthInfo()  'from registry
-  if m.isLoggedInUser(authInfo) = false
-    return invalid
-  end if
-
-  bodyJson = invalid
-  url = m.constants.urls.userDevice.queues
-
-  if action = "add"
-    verb = m.constants.reqTypes.post
-    body = {
-      user_id: authInfo.userId
-      content_id: id
-      content_type: contentType
-    }
-    bodyJson = FormatJson(body)
-
-  else if action = "delete"
-    verb = m.constants.reqTypes.del
-    url = url + "/" + id
-  else
-    return invalid
-  end if
-
-  options = {
-    method: verb
-    params: {
-      platform: m.constants.platform
-    }
-  }
-  options.params["isKidsMode"] = bKidsMode
-
-  if bodyJson <> invalid
-    options.body = bodyJson
-  end if
-
-  bookmarkReq = m.auth.createAuthRequest(url, action+"Bookmark", options)
-
-  return bookmarkReq
 End Function
 
 

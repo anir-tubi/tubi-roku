@@ -366,6 +366,24 @@ Function userDeviceApi_updateParentalRatingReqInfo_test()
 End Function
 
 
+'@Test removeFromQueueReqInfo unit tests
+Function userDeviceApi_removeFromQueueReqInfo_test()
+  bookmarkId = "AABBCCDD"
+  url = m.constants.urls.userDevice.queues + "/" + bookmarkId
+  removeFromQueueReq = m.userDeviceApi.removeFromQueueReqInfo(bookmarkId)
+
+  m.assertNotInvalid(removeFromQueueReq)
+
+  m.assertNotInvalid(removeFromQueueReq.url)
+  m.assertEqual(removeFromQueueReq.url, url)
+
+  m.assertNotInvalid(removeFromQueueReq.options)
+
+  m.assertNotInvalid(removeFromQueueReq.options.headers)
+  m.assertEqual(removeFromQueueReq.options.method, "DELETE")
+End Function
+
+
 '@Test addToQueueReqMovie unit tests
 Function userDeviceApi_addToQueueReqMovie_test()
   userId = 1234

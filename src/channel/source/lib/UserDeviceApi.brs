@@ -18,6 +18,7 @@ Function UserDeviceApi(constants, apiUtils)
     deleteHistory: userDeviceApi_deleteHistory
     queryStatusOfMagicLink: userDeviceApi_queryStatusOfMagicLink
     updateParentalRatingReqInfo: userDeviceApi_updateParentalRatingReqInfo
+    removeFromQueueReqInfo: userDeviceApi_removeFromQueueReqInfo
     addToQueueReqInfo: userDeviceApi_addToQueueReqInfo
   }
 
@@ -274,6 +275,19 @@ Function userDeviceApi_addToQueueReqInfo(userId, contentId, contentType)
   options["method"] = m.constants.reqTypes.post
   options["body"] = FormatJson(body)
   options["headers"] = headers
+
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
+Function userDeviceApi_removeFromQueueReqInfo(bookmarkId)
+
+  url = m.constants.urls.userDevice.queues + "/" + bookmarkId
+  options = m.getCommonOptions()
+  options["method"] = m.constants.reqTypes.del
 
   return {
     url: url

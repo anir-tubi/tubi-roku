@@ -164,6 +164,12 @@ Function createParsingCallbacks()
     parseSuccess: parseAddToQueueSuccess
     parseError: parseAddToQueueError
   }
+  
+  'delete queue bookmarks 
+  m.requestTypes[m.constants.reqNames.deleteFromQueue] = {
+    parseSuccess: parseRemoveFromQueueSuccess
+    parseError: parseRemoveFromQueueError
+  }
 
 End Function
 

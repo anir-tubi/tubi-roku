@@ -92,41 +92,6 @@ Function execSignOut()
 End Function
 
 
-Function removeFromQueue()
-  tubiLog("AuthTask.removeFromQueue")
-  constants = m.global.constants
-  Request = TubiRequest(constants.settings)
-  Auth = TubiAuth(constants, Request)
-  NodeHelpers = TubiNodeHelpers()
-  apiUtils = ApiUtils(constants)
-  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers, apiUtils)
-
-  tubiLog("Removing bookmark id " + m.top.content.bookmarkId + " for content " + m.top.content.id)
-  request = Bookmarks.removeBookmarkReq(m.top.content, m.top.isKidsMode)
-  port = CreateObject("roMessagePort")
-  if request <> invalid then
-    request.start(port)
-    while true
-      msg = wait(0, port)
-      result = request.handleEvent(msg)
-      if result <> invalid then
-        if result.response.code >= 200 and result.response.code < 300
-          tubiLog("removeBookmarkReq received " + result.response.code.toStr())
-        else
-          tubiLog("removeBookmark failed")
-        end if
-        m.top.result = result
-        exit while
-      end if
-    end while
-  else
-    tubiLog("removeBookmarkReq returned invalid")
-    m.top.result = invalid
-  end if
-  tubiLog("EXIT AuthTask.removeFromQueue")
-End Function
-
-
 Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false, getUserInfo=false, getLikes=false)
   queuePort = CreateObject("roMessagePort")
   queue = TubiRequestQueue().create(queuePort)
