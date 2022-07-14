@@ -80,51 +80,6 @@ Function tubiBookmarks_mockAuth_Authorized_testHelper(constants, request)
 End Function
 
 
-'@Test addBookmarkReqUnauthorized unit tests
-Function tubiBookmarks_addBookmarkReqUnauthorized_test()
-  BM = m.unauthorizedBM
-  content = m.videoContent
-  content.id = "321221"
-  content.title = "We Are Young"
-  req = BM.addBookmarkReq(content)
-  m.assertInvalid(req)
-End Function
-
-
-'@Test addBookmarkReqMovie unit tests
-Function tubiBookmarks_addBookmarkReqMovie_test()
-  BM = m.authorizedBM
-  content = m.videoContent
-  content.id = "321221"
-  content.title = "We Are Young"
-  req = BM.addBookmarkReq(content)
-  m.assertNotInvalid(req)
-End Function
-
-
-'@Test addBookmarkReqSeries unit tests
-Function tubiBookmarks_addBookmarkReqSeries_test()
-  BM = m.authorizedBM
-  content = m.seriesContent
-  content.id = "01079"
-  content.title = "S02:E05 - You, I'll Be Following"
-  req = BM.addBookmarkReq(content)
-  m.assertNotInvalid(req)
-End Function
-
-
-'@Test addBookmarkReqEpisodeWithParent unit tests
-Function tubiBookmarks_addBookmarkReqEpisodeWithParent_test()
-  BM = m.authorizedBM
-  content = m.videoContent
-  content.id = "302800"
-  content.title = "S02:E05 - You, I'll Be Following"
-  content.parentId = "01079"
-  req = BM.addBookmarkReq(content)
-  m.assertNotInvalid(req)
-End Function
-
-
 '@Test removeBookmarkReq unit tests
 Function tubiBookmarks_removeBookmarkReq_test()
   BM = m.authorizedBM

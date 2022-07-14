@@ -9,7 +9,6 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
     nodeHelpers: nodeHelpers
 
     'public methods
-    addBookmarkReq: tubiBookmarks_addBookmarkReq
     removeBookmarkReq: tubiBookmarks_removeBookmarkReq
     addHistoryReq: tubiBookmarks_getAddHistoryRequestInfo
     addHistoryLocally: tubiBookmarks_addHistoryLocally
@@ -34,26 +33,6 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
   tubiBookmarks.append(defaultValues)
   return tubiBookmarks
 
-End Function
-
-
-'returns a request object that can be used to add a bookmark to the server
-'@content: can be a content node from scene graph or a content object from the main thread - expect either a video/movie or episode, no series
-'     send either the video or the episode as the content, not the parent series
-' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-Function tubiBookmarks_addBookmarkReq(content as Object, bKidsMode = false as Boolean) as Object
-  bookmarkReq = invalid
-  if content <> invalid
-    'translate internal content type to UAPI content type
-    if content["type"] = m.constants.ui.contentTypes.video
-      bookmarkReq = m.createBookmarksRequest(content.id, "add", m.constants.uapiContentTypes.movie, bKidsMode)
-    else if content["type"] = m.constants.ui.contentTypes.series
-      bookmarkReq = m.createBookmarksRequest(content.id, "add", m.constants.uapiContentTypes.series, bKidsMode)
-    else
-      tubiLog("ERROR: Can't bookmark content that isn't a video or series")
-    end if
-  end if
-  return bookmarkReq
 End Function
 
 

@@ -812,23 +812,38 @@ Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
       showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, addToQueueSignInSelected)
     else if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
       detailScreen.stringQueueButton = getTranslation("screenDetails_button_queueNow")
-      userTask = CreateObject("roSGNode", "AuthTask")
-      userTask.functionName = "addToQueue"
-      userTask.content = detailScreen.content
-      userTask.isKidsMode = shouldKidsModeBeSentToServer()
-      userTask.addField("target", "node", false)
-      userTask.target = detailScreen
-      detailScreen.addField("task", "node", false)
-      detailScreen.task = userTask
-      callBackAfterSignInStr = convertFunctionToString(callBackAfterSignIn)
-      if callBackAfterSignInStr <> ""
-        userTask.observeField("addBookmarkResult", callBackAfterSignInStr)
-      else
-        userTask.observeField("addBookmarkResult", "onBookmarked")
+
+      authInfo = getFieldFromGlobal("authInfo")
+      userId = 0
+      if authInfo <> invalid and authInfo.userId <> invalid
+        userId = authInfo.userId.toInt()
       end if
-      userTask.control = "RUN"
+      contentType = ""
+      if detailScreen.content <> invalid and detailScreen.content["type"] = m.constants.ui.contentTypes.video
+        contentType = m.constants.uapiContentTypes.movie
+      else if detailScreen.content <> invalid and detailScreen.content["type"] = m.constants.ui.contentTypes.series
+        contentType = m.constants.uapiContentTypes.series
+      end if
+
+      addToQueueReq = m.userDeviceApi.addToQueueReqInfo(userId, detailScreen.content.id, contentType)
+      
+      callBackSuccessFunction = callBackAfterSignIn
+      if callBackSuccessFunction = invalid
+        callBackSuccessFunction = addToQueueSuccessResponse
+      end if
+
+      m.makeRequest({
+        url: addToQueueReq.url
+        requestType: m.constants.reqNames.postToQueue
+        options: addToQueueReq.options
+        successCallback: callBackSuccessFunction
+        errorCallback: addToQueueErrorResponse
+        responseType: "assocarray"
+      })
       detailScreen.isWaitingForServerResponse = true
+
     end if
+    
   end if
 End Function
 
@@ -843,39 +858,6 @@ Function onAddToQueueRetry(params)
   if type(params) = "roArray" and params.count() = 1
     onAddToQueue(params[0])
   end if
-End Function
-
-
-''''''''''''''''''
-' onBookmarked callback gets triggered when signedIn user adds a content to queue via detail screen
-Function onBookmarked(msg) As Void
-  tubiLog("DetailScreenHelpers.onBookmarked")
-  task = msg.getRoSGNode()
-  detailScreen = task.target
-  addBookmarkResult = task.addBookmarkResult
-
-  bookmarkId = ""
-  if addBookmarkResult <> invalid
-    bookmarkId = addBookmarkResult.bookmarkId
-  end if
-
-  task.unobserveFieldScoped("addBookmarkResult")
-  detailScreen.task = invalid
-  detailScreen.isWaitingForServerResponse = false
-
-  if bookmarkId = invalid or bookmarkId = ""
-    bookmarkFailed(detailScreen, addBookmarkResult)
-    return
-  else
-
-    tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
-    setIsBookmark(detailScreen, true)
-
-    sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
-    onHistoryQueueChange(m.constants.ui.categoryIds.queue)
-
-  end if
-
 End Function
 
 
@@ -921,32 +903,19 @@ End Function
 ''''''''''''''''''
 ' onBookmarkedAfterSignIn callback gets triggered when guest user completing signIn process
 ' while adding queue via detail screen
-'
-Function onBookmarkedAfterSignIn(msg) As Void
-  tubiLog("DetailScreenHelpers.onBookmarkedAfterSignIn")
-  task = msg.getRoSGNode()
-  detailScreen = task.target
-  addBookmarkResult = task.addBookmarkResult
-
-  bookmarkId = ""
-  if addBookmarkResult <> invalid
-    bookmarkId = addBookmarkResult.bookmarkId
+Function onBookmarkedAfterSignIn(response)
+  detailScreen = getTopDetailScreenFromStack()
+  detailScreen.isWaitingForServerResponse = false
+  if response <> invalid and response.parsedresponse <> invalid
+    bookmarkId = response.parsedresponse.id
   end if
 
-  task.unobserveFieldScoped("addBookmarkResult")
-  detailScreen.task = invalid
-  detailScreen.isWaitingForServerResponse = false
-
-  if bookmarkId = invalid or bookmarkId = ""
-    bookmarkFailed(detailScreen, addBookmarkResult)
-    return
-  else
-
+  if bookmarkId <> invalid
     content = getDetailScreenContent(detailScreen)
     dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", "add-queue-success", m.constants)
 
     title = "Content"
-    if detailScreen.title <> invalid and detailScreen.title <> ""
+    if isNonEmptyString(detailScreen.title) = true
       title = detailScreen.title
     end if
     description = title + " has been added to the List"
@@ -960,14 +929,13 @@ Function onBookmarkedAfterSignIn(msg) As Void
     end if
 
     tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
-    setIsBookmark(detailScreen, true)
+    if response <> invalid and response.parsedresponse <> invalid and detailScreen.content.id.toInt() = response.parsedresponse.content_id
+      setIsBookmark(detailScreen, true)
+    end if
 
     sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
     onHistoryQueueChange(m.constants.ui.categoryIds.queue)
-    setDirtyUserCategories(m.constants.ui.categoryIds.history)
-
   end if
-
 End Function
 
 
@@ -1994,5 +1962,38 @@ Function onAutoplaySingleContentResponse(refreshedContent)
   if refreshedContent <> invalid
     populateDetailScreen(detailScreen, refreshedContent)
     getRelatedContent(refreshedContent)
+  end if
+End Function
+
+
+Function addToQueueSuccessResponse(response)
+  tubiLog("DetailScreenHelpers.addToQueueSuccessResponse")
+  if response <> invalid
+    bookmarkId = response.id
+  end if
+  detailScreen = getTopDetailScreenFromStack()
+  
+  if detailScreen <> invalid
+    detailScreen.isWaitingForServerResponse = false
+    
+    if bookmarkId <> invalid
+      tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
+      if response <> invalid and detailScreen.content.id.toInt() = response.content_id
+        setIsBookmark(detailScreen, true)
+      end if
+      sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
+      onHistoryQueueChange(m.constants.ui.categoryIds.queue)
+    end if
+  end if
+
+End Function
+
+
+Function addToQueueErrorResponse(error)
+  tubiLog("DetailScreenHelpers.addToQueueErrorResponse")
+  detailScreen = getTopDetailScreenFromStack()
+  if detailScreen <> invalid
+    detailScreen.isWaitingForServerResponse = false
+    bookmarkFailed(detailScreen, error)
   end if
 End Function

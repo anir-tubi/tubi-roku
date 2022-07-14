@@ -366,6 +366,60 @@ Function userDeviceApi_updateParentalRatingReqInfo_test()
 End Function
 
 
+'@Test addToQueueReqMovie unit tests
+Function userDeviceApi_addToQueueReqMovie_test()
+  userId = 1234
+  contentId = "321221"
+  contentType = "movie"
+  movieAddToQueueReq = m.userDeviceApi.addToQueueReqInfo(userId, contentId, contentType)
+
+  m.assertNotInvalid(movieAddToQueueReq)
+
+  m.assertNotInvalid(movieAddToQueueReq.url)
+  m.assertEqual(movieAddToQueueReq.url, m.constants.urls.userDevice.queues)
+
+  m.assertNotInvalid(movieAddToQueueReq.options)
+  m.assertNotInvalid(movieAddToQueueReq.options.body)
+  body = ParseJson(movieAddToQueueReq.options.body)
+  m.assertNotInvalid(body.user_id)
+  m.assertNotInvalid(body.content_id)
+  m.assertNotInvalid(body.content_type)
+  m.assertEqual(body.user_id, 1234)
+  m.assertEqual(body.content_id, "321221")
+  m.assertEqual(body.content_type, "movie")
+
+  m.assertNotInvalid(movieAddToQueueReq.options.headers)
+  m.assertEqual(movieAddToQueueReq.options.method, "POST")
+End Function
+
+
+'@Test addToQueueReqSeries unit tests
+Function userDeviceApi_addToQueueReqSeries_test()
+  userId = 1234
+  contentId = "01079"
+  contentType = "series"
+  seriesAddToQueueReqInfo = m.userDeviceApi.addToQueueReqInfo(userId, contentId, contentType)
+
+  m.assertNotInvalid(seriesAddToQueueReqInfo)
+
+  m.assertNotInvalid(seriesAddToQueueReqInfo.url)
+  m.assertEqual(seriesAddToQueueReqInfo.url, m.constants.urls.userDevice.queues)
+
+  m.assertNotInvalid(seriesAddToQueueReqInfo.options)
+  m.assertNotInvalid(seriesAddToQueueReqInfo.options.body)
+  body = ParseJson(seriesAddToQueueReqInfo.options.body)
+  m.assertNotInvalid(body.user_id)
+  m.assertNotInvalid(body.content_id)
+  m.assertNotInvalid(body.content_type)
+  m.assertEqual(body.user_id, 1234)
+  m.assertEqual(body.content_id, "01079")
+  m.assertEqual(body.content_type, "series")
+
+  m.assertNotInvalid(seriesAddToQueueReqInfo.options.headers)
+  m.assertEqual(seriesAddToQueueReqInfo.options.method, "POST")
+End Function
+
+
 '@Test deleteHistory unit tests
 Function userDeviceApi_deleteHistory_test()
 

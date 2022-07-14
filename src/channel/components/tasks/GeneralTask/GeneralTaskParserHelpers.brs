@@ -159,6 +159,12 @@ Function createParsingCallbacks()
     parseError: parseGenericError
   }
 
+  'queue bookmarks 
+  m.requestTypes[m.constants.reqNames.postToQueue] = {
+    parseSuccess: parseAddToQueueSuccess
+    parseError: parseAddToQueueError
+  }
+
 End Function
 
 

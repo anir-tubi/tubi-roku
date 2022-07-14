@@ -92,52 +92,6 @@ Function execSignOut()
 End Function
 
 
-Function addToQueue()
-  tubiLog("AuthTask.addToQueue")
-  constants = m.global.constants
-  Request = TubiRequest(constants.settings)
-  Auth = TubiAuth(constants, Request)
-  NodeHelpers = TubiNodeHelpers()
-  apiUtils = ApiUtils(constants)
-  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers, apiUtils)
-  request = Bookmarks.addBookmarkReq(m.top.content, m.top.isKidsMode)
-  port = CreateObject("roMessagePort")
-  if request <> invalid then
-    request.start(port)
-
-    while true
-      msg = wait(0, port)
-      result = request.handleEvent(msg)
-      if result <> invalid and result.response <> invalid
-        parsed = ParseJSON(result.response.data)
-        if parsed <> invalid then
-          m.top.addBookmarkResult = {
-            bookmarkId: parsed.id
-            code: result.response.code
-          }
-          tubiLog("addBookmark received bookmarkId " + parsed.id.toStr())
-        else
-          tubiLog("addBookmark failed to parse response")
-          m.top.addBookmarkResult = {
-            bookmarkId: ""
-            code: result.response.code
-          }
-        end if
-        exit while
-      end if
-    end while
-  else
-    tubiLog("addBookmarkReq returned invalid")
-    ' this should never happen
-    m.top.addBookmarkResult = {
-      bookmarkId: ""
-      code: -1
-    }
-  end if
-  tubiLog("EXIT AuthTask.addToQueue")
-End Function
-
-
 Function removeFromQueue()
   tubiLog("AuthTask.removeFromQueue")
   constants = m.global.constants
