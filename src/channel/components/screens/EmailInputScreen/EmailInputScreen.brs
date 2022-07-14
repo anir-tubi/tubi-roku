@@ -15,7 +15,6 @@ Function init()
   m.keyboard = m.top.findNode("Keyboard")
 
   m.Keyboard.textEditBox.voiceEnabled = true
-  m.keyboard.domain = "email"
   m.keyboard.textEditBox.visible = false
   m.Keyboard.textEditBox.maxTextLength = 100
   
