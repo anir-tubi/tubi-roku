@@ -1157,6 +1157,7 @@ Function updateVideoPlayerState(content) as Void
   if type(content) <> "roSGNode" then return
   ' make the content available to the video node
   m.Video.content = content
+  m.ratingLabel.text = ""
   if content.rating <> invalid and content.rating <> ""
 
     m.ratingLabel.width = 0
@@ -1166,7 +1167,7 @@ Function updateVideoPlayerState(content) as Void
     m.ratingLabel.width = nRatingBoundingBoxIncrease
 
   end if
-
+  m.descriptorCode.text = ""
   descriptorCode = content.descriptorCode
   sDescriptorCodeText = ""
   if descriptorCode <> invalid and descriptorCode <> ""

@@ -1436,6 +1436,10 @@ Function trailerHelper(screen)
         trailerContent.id = content.trailerInfo.id
         trailerContent.subtitleTracks = []
         trailerContent.subtitleConfig = invalid
+        trailerContent.rating = content.rating
+        trailerContent.descriptorCode = content.descriptorCode
+        trailerContent.descriptors = content.descriptors
+        trailerContent.descriptorDescription = content.descriptorDescription
       end if
 
       playVideoContent(trailerContent)
