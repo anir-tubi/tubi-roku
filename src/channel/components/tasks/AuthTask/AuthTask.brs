@@ -173,59 +173,6 @@ Function removeFromQueue()
 End Function
 
 
-Function removeFromHistory()
-  tubiLog("AuthTask.removeFromHistory")
-  constants = m.global.constants
-  Request = TubiRequest(constants.settings)
-  Auth = TubiAuth(constants, Request)
-  NodeHelpers = TubiNodeHelpers()
-  apiUtils = ApiUtils(constants)
-  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers, apiUtils)
-
-  authInfo = auth.getAuthInfo()
-  if isLoggedInUser(authInfo)
-    '//Remove the resume position history for signed in users
-
-    tubiLog("Removing content " + m.top.content.id + " from history")
-    request = Bookmarks.removeHistoryReq(m.top.content, m.top.isKidsMode)
-    port = CreateObject("roMessagePort")
-    if request <> invalid then
-      request.start(port)
-      while true
-        msg = wait(0, port)
-        result = request.handleEvent(msg)
-        if result <> invalid then
-          if result.response.code >= 200 and result.response.code < 300
-            tubiLog("removeHistoryReq received " + result.response.code.toStr())
-          else
-            tubiLog("removeBookmark failed")
-          end if
-          m.top.result = result
-          exit while
-        end if
-      end while
-    else
-      tubiLog("removeHistoryReq returned invalid")
-      m.top.result = invalid
-    end if
-  else
-    '//Remove the resume position history for signed out users
-    Bookmarks.removeHistoryLocally(m.top.content, m.global)
-
-    tubiLog("User is signed out so removeHistoryReq is returning a successful response for locally removed history")
-    '//removing the history locally should mimic the return of a backend call to remove history
-    '//   this is so the calling code doesn't have to keep track if thr user is signed in or not.
-    result = {
-      response: {
-        code: 204
-      }
-    }
-    m.top.result = result
-  end if
-  tubiLog("EXIT AuthTask.removeFromHistory")
-End Function
-
-
 Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false, getUserInfo=false, getLikes=false)
   queuePort = CreateObject("roMessagePort")
   queue = TubiRequestQueue().create(queuePort)
@@ -300,7 +247,7 @@ Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false
           else
             userCategories.newLikes = userLikes.content
           end if
-          
+
           '//Handle pagination
           if isNonEmptyString(userLikes.nextPageId) = true
             paginationLikeReq = Bookmarks.getInitialLikeReq(handledReq.localId, bLiked, userLikes.nextPageId)

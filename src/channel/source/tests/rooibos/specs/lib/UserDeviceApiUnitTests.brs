@@ -364,3 +364,25 @@ Function userDeviceApi_updateParentalRatingReqInfo_test()
   m.assertNotInvalid(parentalRatingReq.options.headers)
   m.assertEqual(parentalRatingReq.options.method, "PUT")
 End Function
+
+
+'@Test deleteHistory unit tests
+Function userDeviceApi_deleteHistory_test()
+
+  historyId="56788"
+  url = m.constants.urls.userDevice.urlBase + "/histories/" + historyId
+
+  deleteHistory = m.userDeviceApi.deleteHistory(historyId)
+
+  m.assertNotInvalid(deleteHistory)
+
+  m.assertNotInvalid(deleteHistory.url)
+  m.assertEqual(deleteHistory.url, url)
+
+  m.assertNotInvalid(deleteHistory.options)
+  m.assertEqual(deleteHistory.options.method, "DELETE")
+
+  params = deleteHistory.options.params
+  m.assertNotInvalid(params)
+
+End Function

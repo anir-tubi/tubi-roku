@@ -1,5 +1,5 @@
 ' createParsingCallbacks
-' 
+'
 ' sets requestTypes with various success and error callbacks
 ' add new assocarray (api requestType key & value) into m.requestTypes to handle new api parsing
 Function createParsingCallbacks()
@@ -39,7 +39,7 @@ Function createParsingCallbacks()
   m.requestTypes[m.constants.reqNames.signUp] = {
     parseSuccess: parseSignUpSuccess
     parseError: parseSignUpError
-  }  
+  }
 
   ' signin
   m.requestTypes[m.constants.reqNames.signIn] = {
@@ -53,7 +53,7 @@ Function createParsingCallbacks()
     parseError: parseAgeVerificationScreenDeviceRegistrationError
   }
 
-  'magicLink 
+  'magicLink
   m.requestTypes[m.constants.reqNames.magicLink] = {
     parseSuccess: parseMagicLinkSuccess
     parseError: parseMagicLinkError
@@ -70,8 +70,8 @@ Function createParsingCallbacks()
     parseSuccess: parseContentRateSuccess
     parseError: parseContentRateError
   }
-  
-  'updateParentalRating 
+
+  'updateParentalRating
   m.requestTypes[m.constants.reqNames.updateParentalRating] = {
     parseSuccess: parseUpdateParentalRatingSuccess
     parseError: parseUpdateParentalRatingError
@@ -117,6 +117,12 @@ Function createParsingCallbacks()
     parseSuccess: parseHistorySuccess
   }
 
+  'history delete
+  m.requestTypes[m.constants.reqNames.deleteHistory] = {
+    parseSuccess: parseDeleteFromHistorySuccess
+    parseError: parseDeleteFromHistoryError
+  }
+
   ' homescreen
   m.requestTypes[m.constants.reqNames.getHomescreen] = {
     parseSuccess: parseHomeScreenContentSuccess
@@ -159,7 +165,7 @@ End Function
 Function getErrorCodeFromResponse(fullResponse)
   ' default code
   errCode = -1235
-  
+
   if fullResponse <> invalid and fullResponse.code <> invalid
     if fullResponse.code >= 200 and fullResponse.code < 400
       ' got a valid response code from the server, but there was some other issue with the response

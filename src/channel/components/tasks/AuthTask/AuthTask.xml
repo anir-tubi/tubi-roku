@@ -34,10 +34,6 @@
         -        content.id
         -        content.bookmarkId
         -
-        -    removeFromHistory:
-        -        content.id
-        -        content.historyId
-        -
         -    updateHistory:
         -        content.id
         -        content.type
@@ -101,7 +97,7 @@
         -->
         <field id="addBookmarkResult" type="assocarray" alwaysNotify="true" />
 
-        <!-- removeFromQueue, removeFromHistory:
+        <!-- removeFromQueue:
         -        Result of request as:
         -        {
         -          code: <integer http response code>

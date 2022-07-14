@@ -14,8 +14,6 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
     addHistoryReq: tubiBookmarks_getAddHistoryRequestInfo
     addHistoryLocally: tubiBookmarks_addHistoryLocally
     updateLikesLocally: tubiBookmarks_updateLikesLocally
-    removeHistoryReq: tubiBookmarks_removeHistoryReq
-    removeHistoryLocally: tubiBookmarks_removeHistoryLocally
     getInitialBookmarksReq: tubiBookmarks_getInitialBookmarksReq
     getInitialHistoryReq: tubiBookmarks_getInitialHistoryReq
     getInitialLikeReq: tubiBookmarks_getInitialLikeReq
@@ -267,31 +265,6 @@ Function tubiBookmarks_getAddHistoryRequestInfo(content as Object, nowPos as Int
 End Function
 
 
-'returns a request object that can be used to remove a history from the server
-' @content: can be a content node from scene graph or a content object from the main thread - expect either a video/movie or episode, no series
-' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-Function tubiBookmarks_removeHistoryReq(content as Object, bKidsMode = false as Boolean) as Object
-  historyReq = invalid
-  if content <> invalid and isNonEmptyString(content.historyId) = true
-    historyReq = m.createHistoryRequest(content.historyId, invalid, 0, "delete", "", bKidsMode)
-  end if
-  return historyReq
-End Function
-
-
-'Remove the local version copy of the resume position for a particular video.
-Function tubiBookmarks_removeHistoryLocally(content as Object, global)
-  if content <> invalid
-
-    historyNode = getHistory(content.id) 'bs:disable-line 1001 LINT1001
-
-    if historyNode <> invalid
-      global.historyIds.removeChild(historyNode)
-    end if
-  end if
-End Function
-
-
 'returns a request object that can be used to add or delete the history from the server, or invalid
 '@id: stringified content id of series or video that we are adding/deleting
   'if add, @id should be the contentId
@@ -432,7 +405,7 @@ Function tubiBookmarks_getInitialLikeReq(localId, bLiked = true, nextPageId = ""
     return invalid
   end if
 
-  url = m.constants.urls.account.contentRating 
+  url = m.constants.urls.account.contentRating
   sLikeType = "liked"
   if bLiked = false
     sLikeType = "disliked"
@@ -539,7 +512,7 @@ Function tubiBookmarks_handleInitialLikes(initialLikes, bLiked = true)
   returnParsed = {}
   itemIds = CreateObject("roSGNode", "LikeContentNode")
   parsedInitialData = ParseJson(initialLikes)
-  if parsedInitialData <> invalid and parsedInitialData.data <> invalid and parsedInitialData.data.count() > 0 
+  if parsedInitialData <> invalid and parsedInitialData.data <> invalid and parsedInitialData.data.count() > 0
     for i = 0 to parsedInitialData.data.count() - 1
       child = itemIds.createChild("LikeContentNode")
       child.id = parsedInitialData.data[i]

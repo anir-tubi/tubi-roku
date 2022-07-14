@@ -15,6 +15,7 @@ Function UserDeviceApi(constants, apiUtils)
     patchAutoplayPreviewSettingInfo: userDeviceApi_patchAutoplayPreviewSettingInfo
     setContentRating: userDeviceApi_setContentRating
     magicLink: userDeviceApi_magicLink
+    deleteHistory: userDeviceApi_deleteHistory
     queryStatusOfMagicLink: userDeviceApi_queryStatusOfMagicLink
     updateParentalRatingReqInfo: userDeviceApi_updateParentalRatingReqInfo
   }
@@ -36,6 +37,24 @@ Function userDeviceApi_emailExistsReqInfo(passedOptions = {})
   if passedOptions.params <> invalid
     options.params["email"] = passedOptions.params.email
   end if
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
+''''''''''''''''''''''
+'deleteHistory()
+'
+Function userDeviceApi_deleteHistory(historyId)
+  url = m.constants.urls.userDevice.history
+
+  url = url + "/" + historyId
+
+  options = m.getCommonOptions()
+  options["method"] = m.constants.reqTypes.del
+
   return {
     url: url
     options: options

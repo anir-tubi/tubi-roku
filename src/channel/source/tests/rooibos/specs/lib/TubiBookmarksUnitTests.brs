@@ -137,31 +137,6 @@ Function tubiBookmarks_removeBookmarkReq_test()
 End Function
 
 
-'@Test a successful attempt at calling removeHistoryLocally unit test
-Function tubiBookmarks_removeBookmarkLocallySuccessful_test()
-
-  tubiBookmarks_setupGlobalFields_testHelper()
-
-  BM = m.authorizedBM
-  content = m.videoContent
-  content.id = "321221"
-  content.title = "We Are Young"
-
-  nPositionToSave = 300
-  BM.addHistoryLocally(content, nPositionToSave, m.global)
-  historyNode = m.global.historyIds.findNode(content.id)
-  '//1) Test that the content has been successfully been added
-  m.assertEqual(historyNode.nowPos, nPositionToSave)
-
-
-  BM.removeHistoryLocally(content, m.global)
-  historyNode = m.global.historyIds.findNode(content.id)
-  '//2) The content should have been successfully been removed, so history should be invalid
-  m.assertInvalid(historyNode)
-  '//::TODO::like - add like test to this and other unit test functions if like/dislike experiment gets approved - (or immediately after like/dislike experiment launches)
-End Function
-
-
 '@Test addHistoryLocally unit tests
 Function tubiBookmarks_addBookmarkLocallySuccessful_test()
 

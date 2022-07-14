@@ -1314,28 +1314,34 @@ End Function
 
 
 Function onRemoveFromHistory(detailScreen)
-  if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
+  if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true and detailScreen.content <> invalid
+    contentId = detailScreen.content.id
+    history = getHistory(contentId)
 
-    history = getHistory(detailScreen.content.id)
+    authInfo = getFieldFromGlobal("authInfo")
 
-    if history <> invalid and history.historyId <> invalid
+    isLoggedInUser = isLoggedInUser(authInfo)
+
+    if isLoggedInUser = true and  history <> invalid and isNonEmptyString(history.historyId) = true
       content = detailScreen.content.clone(false)
       detailScreen.stringNoHistoryButton = getTranslation("screenDetails_button_removing")
       content.historyId = history.historyId
-      if m.userTask <> invalid
-        m.NodeHelpers.unobserveAllScoped(m.userTask)
-      end if
-      userTask = CreateObject("roSGNode", "AuthTask")
-      userTask.functionName = "removeFromHistory"
-      userTask.content = content
-      userTask.isKidsMode = shouldKidsModeBeSentToServer()
-      userTask.addField("target", "node", false)
-      userTask.target = detailScreen
-      detailScreen.addField("task", "node", false)
-      detailScreen.task = userTask
-      userTask.observeField("result", "onHistoryRemoved")
-      userTask.control = "RUN"
+
       detailScreen.isWaitingForServerResponse = true
+
+      requestInfo = m.userDeviceApi.deleteHistory(history.historyId)
+      m.makeRequest({
+        url: requestInfo.url
+        requestType: m.constants.reqNames.deleteHistory
+        options: requestInfo.options
+        successCallback: onHistoryRemovedSuccess
+        errorCallback: onHistoryRemovedError
+        responseType: "boolean"
+      })
+    else if isLoggedInUser = false
+      removeHistoryLocally(contentId)
+      detailScreen.isWaitingForServerResponse = false
+      setIsHistory(detailScreen, false)
     end if
   end if
 End Function
@@ -1349,40 +1355,42 @@ Function onRemoveFromHistoryRetry(params)
 End Function
 
 
-Function onHistoryRemoved(msg) As Void
+Function onHistoryRemovedSuccess(_response) As Void
   tubiLog("DetailScreenHelpers.onHistoryRemoved")
-  task = msg.getRoSGNode()
-  detailScreen = task.target
-  result = task.result
-  task.unobserveField("result")
-  detailScreen.task = invalid
+  detailScreen = getTopDetailScreenFromStack()
   detailScreen.isWaitingForServerResponse = false
-
-  if result = invalid or result.response.code <> 204 then
-    code = ""
-    message = getTranslation("screenDetails_error_noHistory_description")
-    if result <> invalid
-      code = result.response.code
-    end if
-    content = getDetailScreenContent(detailScreen)
-
-    ' set up the error modal dialog
-    errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.removeHistoryError, code)
-    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "REMOVE_FROM_HISTORY", errorCode, m.constants)
-
-    modalInfo = {
-      message: getErrorMessage(message, errorCode)
-      openTrackEvent: dialogEvent
-      trackingTask: m.trackingLoggingTask
-    }
-
-    showErrorModal(modalInfo, onRemoveFromHistoryRetry, [detailScreen])
-    return
-  end if
-
   setIsHistory(detailScreen, false)
   sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_CONTINUE_WATCHING", m.Tracking, m.trackingLoggingTask, m.constants)
   onHistoryQueueChange(m.constants.ui.categoryIds.history)
+
+End Function
+
+
+Function onHistoryRemovedError(response)
+  tubiLog("DetailScreenHelpers.onHistoryRemoved")
+  detailScreen = getTopDetailScreenFromStack()
+  detailScreen.isWaitingForServerResponse = false
+
+  code = ""
+  if response <> invalid
+    code = response.code
+  end if
+  message = getTranslation("screenDetails_error_noHistory_description")
+  content = getDetailScreenContent(detailScreen)
+
+  ' set up the error modal dialog
+  errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.removeHistoryError, code)
+  dialogEvent = getDetailScreenDialogAnalyticEvent(content, "REMOVE_FROM_HISTORY", errorCode, m.constants)
+
+  modalInfo = {
+    message: getErrorMessage(message, errorCode)
+    openTrackEvent: dialogEvent
+    trackingTask: m.trackingLoggingTask
+  }
+
+  showErrorModal(modalInfo, onRemoveFromHistoryRetry, [detailScreen])
+  setIsHistory(detailScreen, true)
+
 End Function
 
 

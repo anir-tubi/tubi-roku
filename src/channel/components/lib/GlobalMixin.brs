@@ -50,6 +50,20 @@ Function getHistory(contentId)
 End Function
 
 
+
+' Remove the local version copy of the resume position for a particular video.
+' @contentId: String, ContentNode to be removed from local history
+Function removeHistoryLocally(contentId)
+  if contentId <> invalid
+    historyNode = getHistory(contentId)
+    historyIds = getFieldFromGlobal("historyIds")
+    if historyIds <> invalid and historyNode <> invalid
+      historyIds.removeChild(historyNode)
+    end if
+  end if
+End Function
+
+
 ' getLike finds the like/dislike node based on contentId provided
 '
 ' @contentId: string, the id of any content
