@@ -175,8 +175,8 @@ Function sendTopNavToSideNavNavigationEvent(screen, sideNav)
     }
 
     pageOneof = {}
-    if screen.navigateWithinPageInfo <> invalid
-      pageOneof = screen.navigateWithinPageInfo.pageOneof
+    if screen.trackingPageInfo <> invalid
+      pageOneof = m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
     end if
 
     row = sideNav.focusedPosition + 1
