@@ -100,7 +100,8 @@ Function getTranslationAA(sLocaleID as String) as Boolean
   sLocaleID = LCase(sLocaleID)
   if sLocaleID = "en_us"
     parsed = getTranslation_en_US()
-  else if sLocaleID = "es_es"
+  else if Left(sLocaleID, 2) = "es"
+    'es_MX and es_ES
     parsed = getTranslation_es_MX()
   else if sLocaleID = "en_gb"
   else if sLocaleID = "fr_ca"
