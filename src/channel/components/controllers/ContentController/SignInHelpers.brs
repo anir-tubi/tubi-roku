@@ -732,6 +732,7 @@ Function popScreenAfterSignInProcess()
     "SignUpScreen": true
     "EmailInputScreen": true
     "AgeVerificationScreen": true
+    "SignUpAgeVerificationScreen": true
     "EmailVerificationScreen": true
   }
 
