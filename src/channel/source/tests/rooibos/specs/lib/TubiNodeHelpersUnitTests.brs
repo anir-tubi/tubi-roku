@@ -1,4 +1,4 @@
-'@TestSuite [TubiNodeHelpers] TubiNodeHelpers.brs 
+'@TestSuite [TubiNodeHelpers] TubiNodeHelpers.brs
 
 '@Setup
 Function TubiNodeHelpersSetup()
@@ -54,10 +54,41 @@ Function tubiNodeHelpers_getChildIndexById_test()
 End Function
 
 
+'@Test getChildIndicesById unit tests
+Function tubiNodeHelpers_getChildIndicesById_test()
+  idToRemove = "0"
+  dupItems = "0"
+
+  for i=0 to 5
+    child = m.parent.createChild("ContentNode")
+    child.id = Mid(Str(i), 2)
+    if i = 3
+      idToRemove = child.id
+    end if
+    if i=4
+      dupItems = child.id
+      child = m.parent.createChild("ContentNode") 'duplicate CHild
+      child.id = Mid(Str(i), 2)
+    end if
+
+  end for
+  fakeChild = CreateObject("roSGNode", "ContentNode")
+  fakeChild.id = "fake"
+  'single index
+  childIndex = m.NODEHELPERS.getChildIndicesById(m.parent, idToRemove)
+  m.AssertEqual(childIndex, [3])
+  'No index
+  fakeChildIndex = m.NODEHELPERS.getChildIndicesById(m.parent, "fake")
+  m.AssertEqual(fakeChildIndex, [])
+  'duplicate items
+  childIndices = m.NODEHELPERS.getChildIndicesById(m.parent, dupItems)
+  m.AssertEqual(childIndices, [4,5])
+End Function
+
 '@Test getLastChild unit tests
 Function tubiNodeHelpers_getLastChild_test()
   parent = CreateObject("roSGNode", "Group")
-  
+
   ' test if there are no children in the parent
   invalidLastChild = m.nodeHelpers.getLastChild(parent)
   m.AssertInvalid(invalidLastChild)
@@ -259,7 +290,7 @@ Function tubiNodeHelpers_countNodes_test()
 End Function
 
 
-' helper function to recursively generate a node tree containing x amount of layers of 
+' helper function to recursively generate a node tree containing x amount of layers of
 ' ContentNodes with each non leaf/external node containing y children
 ' (if x = 1, the root node is also a leaf node, and no children will be added).
 ' Total nodes on the tree = Σ (n=0...x-1) (y^(i))

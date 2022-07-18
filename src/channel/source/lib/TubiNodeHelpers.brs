@@ -2,6 +2,7 @@ Function TubiNodeHelpers()
   return {
     getChildIndex: tubiNodeHelpers_getChildIndex
     getChildIndexById: tubiNodeHelpers_getChildIndexById
+    getChildIndicesById: tubiNodeHelpers_getChildIndicesById
     getLastChild: tubiNodeHelpers_getLastChild
     unobserveAllScoped: tubiNodeHelpers_unobserveAllScoped
     unobserveAll: tubiNodeHelpers_unobserveAll
@@ -45,6 +46,22 @@ Function tubiNodeHelpers_getChildIndexById(parent, childId)
   else
     return -1
   end if
+End Function
+
+
+' used to determine all the Indices(array) of the child having childId with respect to the parent
+' can be used if the parent along with children have been cloned and getChildIndex won't work
+' returns the indices or [] if the passed in child does not belong to the parent
+Function tubiNodeHelpers_getChildIndicesById(parent, childId)
+  indices = []
+  if parent <> invalid and parent.getChildCount() > 0
+    for i=0 to parent.getChildCount()-1
+      if parent.getChild(i).id <> invalid and parent.getChild(i).id = childId
+        indices.push(i)
+      end if
+    end for
+  end if
+  return indices
 End Function
 
 
@@ -202,7 +219,7 @@ End Function
 '         overflow seems to happen around 75 nodes deep, so leave max depth at 30 so there is plenty
 '         of room to spare.
 ' returns the number of children that the passed node has, including the passed node itself.
-' 
+'
 Function tubiNodeHelpers_countNodes(node, depth = 0)
   nodeCount = 0
 

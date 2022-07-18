@@ -346,8 +346,8 @@ Function onEpgProgramError(response)
     'remove each of the channel Ids from TimeGrid which does not have any channel/program information. Please note that at this point, this node is an empty row on TimeGrid.
     contentIDList = response.contentId.Tokenize(",")
     for each content in contentIDList
-        i = m.NodeHelpers.getChildIndexById(screen.timeGridContent, content)
-        screen.timeGridContent.removeChildIndex(i)
+      i = m.NodeHelpers.getChildIndexById(screen.timeGridContent, content)
+      screen.timeGridContent.removeChildIndex(i)
     end for
 
     if screen.timeGridContent <> invalid and screen.timeGridContent.getChildCount() > 0
@@ -416,17 +416,24 @@ Function appendOrAddTimeGridNewContents(response, epgScreen)
   if response <> invalid and epgScreen.timeGridContent <> invalid
     for i = 0 to response.getChildCount() - 1
       if response.getChild(i) <> invalid
-        newNode = response.getChild(i).clone(true)
-        oldNodeIndex = m.NodeHelpers.getChildIndexById(epgScreen.timeGridContent, newNode.id)
+        newId = response.getChild(i).id
+        indices = m.NodeHelpers.getChildIndicesById(epgScreen.timeGridContent, newId)
 
-        if oldNodeIndex = -1
+        if indices.Count() <= 0
+          newNode = response.getChild(i).clone(true)
           epgScreen.timeGridContent.appendChild(newNode)
         else
-          if epgScreen.timeGridContent.getChild(oldNodeIndex) <> invalid
-            containerName = epgScreen.timeGridContent.getChild(oldNodeIndex).containerName
-            newNode.parentTitle = containerName
-          end if
-          epgScreen.timeGridContent.replaceChild(newNode, oldNodeIndex)
+          for each oldNodeIndex in indices
+            if epgScreen.timeGridContent.getChild(oldNodeIndex) <> invalid
+              containerName = epgScreen.timeGridContent.getChild(oldNodeIndex).containerName 'containerName is present only in getChannelList api call.
+
+              if containerName <> invalid and containerName <> ""
+                newNode = response.getChild(i).clone(true)
+                newNode.parentTitle = containerName
+                epgScreen.timeGridContent.replaceChild(newNode, oldNodeIndex)
+              end if
+            end if
+          end for
         end if
       end if
     end for
@@ -659,7 +666,7 @@ End Function
 
 Function setTimeGridContentLoadingToComplete(screen)
   tubiLog("EPGSCreenHelpers.setTimeGridContentLoading")
-  checkAndFixDuplicates(screen)
+  cleanUpInvalidsInEPG(screen)
   if isNonEmptyString(screen.contentIdToFocusOnLoadComplete)
     setLinearChannelDeeplink(screen)
   end if
@@ -672,37 +679,17 @@ End Function
 
 'This function is cleanup after epgData all been fetched.
 'There might be 3 conditions that we need to handle before rendering.
-'Duplicates - because getChildIndexById() function will return the first place where the channelId appears in parent, the duplicate ChannelId Nodes are left empty.  We need to copy the first channelInfo for duplicate channels Too.
 'Invalids - just for some reason, if there is a invalid node on timeGridConent, we need to remove those(might never happen)
 'EmptyContentNode - emptyContentNode will have channelID and ContainerName but without any information like ChannelName, video resources to play etc.  We need to remove empty nodes too.
 
-Function checkAndFixDuplicates(screen)
-  tubiLog("EPGSCreenHelpers.checkAndFixDuplicates")
+Function cleanUpInvalidsInEPG(screen)
+  tubiLog("EPGSCreenHelpers.cleanUpInvalidsInEPG")
   if screen.timeGridContent <> invalid and screen.timeGridContent.getchildCount() > 0 'just in case of error and no programs has been retrived
     for i = 0 to screen.timeGridContent.getchildCount() - 1
-      itemTobeReplaced = screen.timeGridContent.getChild(i)
+      item = screen.timeGridContent.getChild(i)
 
-      if itemTobeReplaced = invalid
+      if item = invalid or (item <> invalid and (item.channelName = invalid or item.channelName = ""))
         screen.timeGridContent.removeChildindex(i)
-      else if itemTobeReplaced.channelName = invalid or itemTobeReplaced.channelName = ""
-        'either channel is duplicate or no channel info available
-        dupFound = false
-
-        for j = 0 to screen.timeGridContent.getchildCount() - 1
-          itemReplace = screen.timeGridContent.getChild(j)
-          if itemTobeReplaced.id = itemReplace.id and itemReplace.channelName <> invalid and itemReplace.channelName <> ""
-            containerName = itemTobeReplaced.containerName 'copy the container name because it will be different than its duplicate.
-            dup = itemReplace.clone(true)
-            dup.parentTitle = containerName
-            screen.timeGridContent.replaceChild(dup, i)
-            dupFound = true
-            exit for
-          end if
-        end for
-        ' //if no duplicates are found, then this is an empty node and should be removed.
-        if dupFound = false
-          screen.timeGridContent.removeChildindex(i)
-        end if
       end if
     end for
   end if
