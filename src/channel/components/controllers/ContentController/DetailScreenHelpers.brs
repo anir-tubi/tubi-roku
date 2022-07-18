@@ -906,36 +906,38 @@ End Function
 Function onBookmarkedAfterSignIn(response)
   detailScreen = getTopDetailScreenFromStack()
   detailScreen.isWaitingForServerResponse = false
+  
   if response <> invalid and response.parsedresponse <> invalid
     bookmarkId = response.parsedresponse.id
+
+    if bookmarkId <> invalid
+      content = getDetailScreenContent(detailScreen)
+      dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", "add-queue-success", m.constants)
+
+      title = "Content"
+      if isNonEmptyString(detailScreen.title) = true
+        title = detailScreen.title
+      end if
+      description = title + " has been added to the List"
+
+      showSimpleInstantResumableModal("Success", description, [], dialogEvent, m.trackingLoggingTask)
+
+      ' re-fetch homescreen content when user signedIn
+      homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+      if homeScreen <> invalid
+        fetchHomescreen(homeScreen)
+      end if
+
+      tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
+      if response <> invalid and response.parsedresponse <> invalid and detailScreen.content.id.toInt() = response.parsedresponse.content_id
+        setIsBookmark(detailScreen, true)
+      end if
+
+      sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
+      onHistoryQueueChange(m.constants.ui.categoryIds.queue)
+    end if
   end if
 
-  if bookmarkId <> invalid
-    content = getDetailScreenContent(detailScreen)
-    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", "add-queue-success", m.constants)
-
-    title = "Content"
-    if isNonEmptyString(detailScreen.title) = true
-      title = detailScreen.title
-    end if
-    description = title + " has been added to the List"
-
-    showSimpleInstantResumableModal("Success", description, [], dialogEvent, m.trackingLoggingTask)
-
-    ' re-fetch homescreen content when user signedIn
-    homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-    if homeScreen <> invalid
-      fetchHomescreen(homeScreen)
-    end if
-
-    tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
-    if response <> invalid and response.parsedresponse <> invalid and detailScreen.content.id.toInt() = response.parsedresponse.content_id
-      setIsBookmark(detailScreen, true)
-    end if
-
-    sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
-    onHistoryQueueChange(m.constants.ui.categoryIds.queue)
-  end if
 End Function
 
 
@@ -1978,21 +1980,22 @@ End Function
 
 Function addToQueueSuccessResponse(response)
   tubiLog("DetailScreenHelpers.addToQueueSuccessResponse")
-  if response <> invalid
-    bookmarkId = response.id
-  end if
   detailScreen = getTopDetailScreenFromStack()
   
   if detailScreen <> invalid
     detailScreen.isWaitingForServerResponse = false
-    
-    if bookmarkId <> invalid
-      tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
-      if response <> invalid and detailScreen.content.id.toInt() = response.content_id
-        setIsBookmark(detailScreen, true)
+
+    if response <> invalid
+      bookmarkId = response.id
+
+      if bookmarkId <> invalid
+        tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
+        if response <> invalid and detailScreen.content.id.toInt() = response.content_id
+          setIsBookmark(detailScreen, true)
+        end if
+        sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
+        onHistoryQueueChange(m.constants.ui.categoryIds.queue)
       end if
-      sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
-      onHistoryQueueChange(m.constants.ui.categoryIds.queue)
     end if
   end if
 
