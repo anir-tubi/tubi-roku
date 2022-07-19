@@ -907,8 +907,8 @@ Function onBookmarkedAfterSignIn(response)
   detailScreen = getTopDetailScreenFromStack()
   detailScreen.isWaitingForServerResponse = false
   
-  if response <> invalid and response.parsedresponse <> invalid
-    bookmarkId = response.parsedresponse.id
+  if response <> invalid
+    bookmarkId = response.id
 
     if bookmarkId <> invalid
       content = getDetailScreenContent(detailScreen)
