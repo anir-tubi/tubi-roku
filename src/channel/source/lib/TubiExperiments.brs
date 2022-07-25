@@ -50,9 +50,9 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_registration_subtext_homegrid: {
-        roku_registration_subtext_homegrid_recommended: {"subtext_recommended": false}
+        roku_registration_subtext_homegrid_recommended: {"subtext_recommended": true}
         roku_registration_subtext_homegrid_topnav: {"subtext_topnav": false}
-        roku_registration_subtext_homegrid_sidenav: {"subtext_sidenav": false}
+        roku_registration_subtext_homegrid_sidenav: {"subtext_sidenav": true}
         ' roku_registration_subtext_homegrid_sidenav, roku_registration_subtext_homegrid_topnav, roku_registration_subtext_homegrid_recommended, experiments are present at a time.
         roku_registration_subtext_homegrid_all: {"subtext_sidenav": false, "subtext_topnav": false, "subtext_recommended": false}
       }
