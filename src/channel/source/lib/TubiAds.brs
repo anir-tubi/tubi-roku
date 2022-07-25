@@ -562,9 +562,11 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
           endPosition = ctx.duration
           ' Send exposure after first ad finishes in a multi ad break
           ' NOTE the complete event for the first ad actually has adIndex as 2 #roku :|
-          if isFunction(getExperimentResource) AND ctx.adCount > 1 AND ctx.adIndex = 2 then 'bs:disable-line LINT1001
-            'bs:disable-next-line 1001 LINT1001
-            getExperimentResource("roku_in_pod_stitching", "roku_in_pod_stitching_v1", true)
+          if isFunction(getExperimentResource)  'bs:disable-line LINT1001
+            if ctx.adCount <> invalid AND ctx.adCount > 1 AND ctx.adIndex <> invalid and ctx.adIndex = 2 then
+              'bs:disable-next-line 1001 LINT1001
+              getExperimentResource("roku_in_pod_stitching", "roku_in_pod_stitching_v1", true)
+            end if
           end if
         else if eventType = "Close"
           endPosition = m.adPlaybackPos
