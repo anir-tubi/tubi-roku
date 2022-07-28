@@ -61,7 +61,7 @@ Function TubiExperiments(constants) as Object
       ' enabled = true : after the video preview of the selected title ends, the user sees the hero image again.
       ' autostart = true : after the video preview of the selected title ends, the user sees the title start autoplaying in full screen mode.
       roku_video_preview: {
-        roku_video_preview_v2: {"enabled": false, "autostart": false}
+        roku_video_preview_v2: {"enabled": true, "autostart": true}
       }
 
       roku_coppa_registration_age_vs_yob: {
