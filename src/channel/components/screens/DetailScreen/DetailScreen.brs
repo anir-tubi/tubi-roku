@@ -676,8 +676,10 @@ Function handleMenuItemSelected(itemSelected)
     end if
     if itemSelected.id = "ResumeMenuItem"
       m.top.resumeSelected = true
+      m.Menu.jumpToItem = 0 '//reset menu back to the top after a video is requested to play
     else if itemSelected.id = "PlayMenuItem"
       m.top.playSelected = true
+      m.Menu.jumpToItem = 0 '//reset menu back to the top after a video is requested to play
     else if itemSelected.id = "LikeDislikeMenuItem"
       if m.LikeDislikeMenuItem.title = getTranslation("screenDetails_button_changingRating")
         '//If it is still trying to change the rating then do nothing if this btton is clicked again
@@ -895,6 +897,7 @@ Function handlePlayInput()
 
   if m.Menu.isInFocusChain() = true and itemFocused.id = "PlayMenuItem"
     m.top.playSelected = true
+    m.Menu.jumpToItem = 0 '//reset menu back to the top after a video is requested to play
   else if m.Menu.isInFocusChain() = true and itemFocused.id = "WatchTrailerMenuItem"
     m.top.watchTrailerSelected = true
   else if m.RelatedGrid.isInFocusChain() = true
@@ -902,6 +905,7 @@ Function handlePlayInput()
     m.top.relatedContentToPlay = selectedContent
   else
     m.top.resumeSelected = true
+    m.Menu.jumpToItem = 0 '//reset menu back to the top after a video is requested to play
   end if
 End Function
 
