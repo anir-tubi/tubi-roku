@@ -115,7 +115,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     if content.type = m.constants.ui.contentTypes.series
       seriesContent  = getFromContentCache(content.id)
       if seriesContent <> invalid
-        handleSingleContentResponse(seriesContent, sendTrackingOnResponse)
+        successCallback(seriesContent)
       else
         getSingleContentFromServer(content, successCallback, errorCallback)
       end if
@@ -826,7 +826,7 @@ Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
       end if
 
       addToQueueReq = m.userDeviceApi.addToQueueReqInfo(userId, detailScreen.content.id, contentType)
-      
+
       callBackSuccessFunction = callBackAfterSignIn
       if callBackSuccessFunction = invalid
         callBackSuccessFunction = addToQueueSuccessResponse
@@ -843,7 +843,7 @@ Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
       detailScreen.isWaitingForServerResponse = true
 
     end if
-    
+
   end if
 End Function
 
@@ -906,7 +906,7 @@ End Function
 Function onBookmarkedAfterSignIn(response)
   detailScreen = getTopDetailScreenFromStack()
   detailScreen.isWaitingForServerResponse = false
-  
+
   if response <> invalid
     bookmarkId = response.id
 
@@ -1981,7 +1981,7 @@ End Function
 Function addToQueueSuccessResponse(response)
   tubiLog("DetailScreenHelpers.addToQueueSuccessResponse")
   detailScreen = getTopDetailScreenFromStack()
-  
+
   if detailScreen <> invalid
     detailScreen.isWaitingForServerResponse = false
 
