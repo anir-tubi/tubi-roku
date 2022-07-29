@@ -53,16 +53,17 @@ Function showRFIScreen()
 
     ' RFI screen is showing only if the channelStore node is stored in m variable
     m.billing = CreateObject("roSGNode", "ChannelStore")
-    m.billing.observeFieldScoped("userData", "onUserData")
+    m.billing.observeFieldScoped("userData", "onRfiUserData")
     m.billing.requestedUserData = "email, firstName, lastName"
     m.billing.command = "getUserData"
   end if
 End Function
 
 
-' onUserData is the callback triggered when ChannelStore returns userData
-Function onUserData(msg)
-  tubiLog("SignInHelpers.onUserData")
+' onRfiUserData is the callback triggered when ChannelStore returns userData via
+' the firmware RFI (request for information) modal
+Function onRfiUserData(msg)
+  tubiLog("SignInHelpers.onRfiUserData")
 
   m.billing = invalid ' making m.billing as invalid to avoid using it another places
 
@@ -182,9 +183,7 @@ Function onEmailExistsResponse(response)
 
     if parsedresponse <> invalid and requestInput <> invalid
       if parsedresponse.taken = true
-        showEmailVerificationScreen(requestInput.email)
-        m.email = requestInput.email
-        createMagicLinkRequest(requestInput.email)
+        showSignInScreen(requestInput.email)
       else
         m.authInfoReceived = false
         signUpCredentials = {}
