@@ -212,13 +212,20 @@ Function onScreenFocusChange()
     end if
 
     'determine if the content should be refreshed
-    if shouldRefresh(m.top.content) = true
-      m.top.refreshContent = true
-    end if
+    content = m.top.content
+    if content <> invalid and content.isSubtype("DeeplinkContentNode") = false
+      ' only refresh if we are not in the process of handling a deeplink (input or regular).
+      ' DeeplinkContentNodes are just temporary content nodes and will always seem like
+      ' they should be refreshed, but there is no need to refresh them since we will fetch the
+      ' content for them always.
+      if shouldRefresh(m.top.content) = true
+        m.top.refreshContent = true
+      end if
 
-    if shouldRefresh(m.top.relatedContent) = true
-      m.RelatedContentGroup.visible = false
-      m.top.refreshRelatedContent = true
+      if shouldRefresh(m.top.relatedContent) = true
+        m.RelatedContentGroup.visible = false
+        m.top.refreshRelatedContent = true
+      end if
     end if
   end if
   ' force a background update

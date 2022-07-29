@@ -815,6 +815,6 @@ Function handleSingleContentDeeplinkError(error)
       returnToDetailScreenFromVideo(true)
     end if
   end if
-  showDeeplinkErrorModal(error, message)
 
+  showDeeplinkErrorModal(error, message)
 End Function
