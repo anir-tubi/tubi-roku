@@ -5,6 +5,17 @@ Function getConstants()
   ' Compile-time generated
   constants.settings = getSettings()
 
+  'content IDs used to store things in the registry
+  constants.registryIDs = {}
+    constants.registryIDs.deviceId = "deviceId"
+    constants.registryIDs.lastPlayedLinearId = "lastPlayedLinearId"
+    constants.registryIDs.hasLinearVideoPlayed = "hasLinearVideoPlayed"
+
+  'Registry Section IDs used to store things in a particular section of the registry
+  constants.registrySectionIDs = {}
+    constants.registrySectionIDs.deviceInfoSectionId = "deviceinfo"
+    constants.registrySectionIDs.lastPlayedLinearSectionId = "lastPlayedLinearSection"
+
   mode = constants.settings.mode
   if mode = invalid then mode = "dev"
 
@@ -145,14 +156,13 @@ Function getConstants()
     clientVersion = majorVersion + "." + minorVersion + "." + buildVersion
 
     'Use newer APIs over deprecated APIs when appropriate
-    deviceInfoRegSection = "deviceinfo"
     if FindMemberFunction(di, "GetChannelClientId") <> invalid
-      storedDeviceId = RegRead("deviceId", deviceInfoRegSection)
+      storedDeviceId = RegRead(constants.registryIDs.deviceId, constants.registrySectionIDs.deviceInfoSectionId)
       if storedDeviceId <> invalid and storedDeviceId <> "000000000000"
         constants.deviceInfo.deviceId = storedDeviceId
       else
         constants.deviceInfo.deviceId = di.GetChannelClientId()
-        RegWrite("deviceId", constants.deviceInfo.deviceId, deviceInfoRegSection)
+        RegWrite(constants.registryIDs.deviceId, constants.deviceInfo.deviceId, constants.registrySectionIDs.deviceInfoSectionId)
       end if
     else
       constants.deviceInfo.deviceId = "noid"

@@ -17,11 +17,11 @@
 '   entry        - 'banner' or omitted for search source
 '   mediaType    - "season", "series", "episode", "movie", "shortform", and "live"
 '   entry        - string, custom parameter, used for tracking the source of deeplinks, passed to referred analytics events
-'   deviceId     - string, custome paramater, the device id of the device sending the deeplink (used when mobile "casts" to roku)
-'   resumeTime   - integer, custome paramater, the position from which a deeplink should resume (used when mobile "casts" to roku)
-'   refreshToken - string, custome paramater, a token that can be used to refresh the auth token.
+'   deviceId     - string, custom paramater, the device id of the device sending the deeplink (used when mobile "casts" to roku)
+'   resumeTime   - integer, custom paramater, the position from which a deeplink should resume (used when mobile "casts" to roku)
+'   refreshToken - string, custom paramater, a token that can be used to refresh the auth token.
 '                  Is used to transfer login info from a "casting" device to roku (used when mobile "casts" to roku)
-'   userId       - integer, custome paramater, the user id of the user sending the deeplink (used when mobile "casts" to roku)
+'   userId       - integer, custom paramater, the user id of the user sending the deeplink (used when mobile "casts" to roku)
 '
 ' deeplinks from iOS look like:
 ' http://192.168.20.31:8060/launch/41468?deviceId=E7E674A4%2D25DD%2D4B7A%2DBC67%2DB9AD1BAC7CC5&mediaType=movie&contentID=342067&resumeTime=0&userId=0&entry=iphone
@@ -141,7 +141,7 @@ End Function
 
 
 Function handleDeeplink()
-  tubiLog("ContentController.startUserExperience")
+  tubiLog("ContentController.handleDeeplink")
   handleDeeplinkContentByType()
 End Function
 

@@ -188,6 +188,11 @@ Function maximizeLinearPlayer(content)
       bAnimate = true
     end if
 
+    'save the ID of the Linear Channel that is being played so it can posssibly be used later to resume playng when the app is relaunched
+    RegWrite(m.constants.registryIDs.lastPlayedLinearId, content.id, m.constants.registrySectionIDs.lastPlayedLinearSectionId)
+    '//Indicate that a linear video has played
+    RegWrite(m.constants.registryIDs.hasLinearVideoPlayed, "true", m.constants.registrySectionIDs.lastPlayedLinearSectionId)
+
     videoPlayer.unobserveFieldScoped("state")
     videoPlayer.unobserveFieldScoped("backButtonPressed")
     videoPlayer.observeFieldScoped("state", "onLinearVideoPlayerState")
@@ -588,17 +593,24 @@ Function onLinearVideoPlayerVisibleFullscreenChange(msg)
   videoPlayer = msg.getRoSGNode()
   bVisible = videoPlayer.visible
   bFullScreen = videoPlayer.fullscreen
-  if bVisible = true and bFullScreen = false
-    '//Is the video player not in fullscreen but still visible?
-    m.SideNav.visible = true
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = false
-      m.logoGroup.visible = false
+  if bFullScreen = false
+    experimentLinearRelaunch = getExperimentResource("roku_relaunch_linear", "roku_relaunch_linear_v1", false)
+    if experimentLinearRelaunch <> invalid and experimentLinearRelaunch.enabled = true and experimentLinearRelaunch.resetTiming = "linearstop"
+      '//Delete linear video ID, if the experiment variant is set to reset after stopping of linear video in full screen
+      RegDelete(m.constants.registryIDs.lastPlayedLinearId, m.constants.registrySectionIDs.lastPlayedLinearSectionId)
     end if
-  else if bVisible = false and bFullScreen = false
-    '//Is the video player no longer visible and not in fullscreen? i.e. the news container is no longer in focus
+
     m.SideNav.visible = true
-    m.logoGroup.visible = true
-    m.clock.visible = false
+    if bVisible = true
+      '//Is the video player not in fullscreen but still visible?
+      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = false
+        m.logoGroup.visible = false
+      end if
+    else
+      '//Is the video player no longer visible and not in fullscreen? i.e. the news container is no longer in focus
+      m.logoGroup.visible = true
+      m.clock.visible = false
+    end if
   else
     '//Is the video player in fullscreen?
     m.SideNav.visible = false

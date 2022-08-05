@@ -625,6 +625,11 @@ Function onOpenedChanged()
       list = m.top.findNode(m.itemSelectedRemembered.list)
       index = getIndexByID(list, m.itemSelectedRemembered.id)
       list.jumpToItem = index
+      
+      if list.id = m.mainItems.id
+        '//make sure the other mainItemsSelected matches with  mainItems
+        m.mainItemsSelected.jumpToItem = index
+      end if
       list.setFocus(true)
     end if
 
