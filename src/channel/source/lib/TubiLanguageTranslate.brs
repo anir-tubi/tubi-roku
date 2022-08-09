@@ -809,35 +809,35 @@ Function getTranslation_en_US()
       "message": "{minutes}m left"
     },
     "tomorrow":{
-      "description": "Day Tomorrow",
+      "description": "Tomorrow",
       "message": "Tomorrow"
     },
     "day_1":{
-      "description": "Monday",
+      "description": "shortened version Monday, formatted with , and a space",
       "message": "Mon, "
     },
     "day_2":{
-      "description": "Tuesday",
+      "description": "shortened version Tuesday, formatted with , and a space",
       "message": "Tue, "
     },
     "day_3":{
-      "description": "Wednessday",
+      "description": "shortened version Wednessday, formatted with , and a space",
       "message": "Wed, "
     },
     "day_4":{
-      "description": "Thursday",
+      "description": "shortened version Thursday, formatted with , and a space",
       "message": "Thur, "
     },
     "day_5":{
-      "description": "Friday",
+      "description": "shortened version Friday, formatted with , and a space",
       "message": "Fri, "
     },
     "day_6":{
-      "description": "Saturday",
+      "description": "shortened version Saturday, formatted with , and a space",
       "message": "Sat, "
     },
     "day_7":{
-      "description": "Sunday",
+      "description": "shortened version Sunday, formatted with , and a space",
       "message": "Sun, "
     },
     "channelGuide_error_fetchContent_description": {
@@ -2049,6 +2049,38 @@ Function getTranslation_es_MX()
     "epg_minutes_left": {
       "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
       "message": "quedan {minutes} m"
+    },
+    "tomorrow": {
+      "description": "Tomorrow",
+      "message": "Mañana"
+    },
+    "day_1": {
+      "description": "shortened version Monday, formatted with , and a space",
+      "message": "Lun, "
+    },
+    "day_2": {
+      "description": "shortened version Tuesday, formatted with , and a space",
+      "message": "Mar, "
+    },
+    "day_3": {
+      "description": "shortened version Wednessday, formatted with , and a space",
+      "message": "Mié, "
+    },
+    "day_4": {
+      "description": "shortened version Thursday, formatted with , and a space",
+      "message": "Jue, "
+    },
+    "day_5": {
+      "description": "shortened version Friday, formatted with , and a space",
+      "message": "Vie, "
+    },
+    "day_6": {
+      "description": "shortened version Saturday, formatted with , and a space",
+      "message": "Sáb, "
+    },
+    "day_7": {
+      "description": "shortened version Sunday, formatted with , and a space",
+      "message": "Dom, "
     },
     "channelGuide_error_fetchContent_description": {
       "description": "Onscreen message to indicate channel Guide content could not be loaded",

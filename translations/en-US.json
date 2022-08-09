@@ -677,35 +677,35 @@
     "message": "{minutes}m left"
   },
   "tomorrow":{
-    "description": "Day Tomorrow",
+    "description": "Tomorrow",
     "message": "Tomorrow"
   },
   "day_1":{
-    "description": "Monday",
+    "description": "shortened version Monday, formatted with , and a space",
     "message": "Mon, "
   },
   "day_2":{
-    "description": "Tuesday",
+    "description": "shortened version Tuesday, formatted with , and a space",
     "message": "Tue, "
   },
   "day_3":{
-    "description": "Wednessday",
+    "description": "shortened version Wednessday, formatted with , and a space",
     "message": "Wed, "
   },
   "day_4":{
-    "description": "Thursday",
+    "description": "shortened version Thursday, formatted with , and a space",
     "message": "Thur, "
   },
   "day_5":{
-    "description": "Friday",
+    "description": "shortened version Friday, formatted with , and a space",
     "message": "Fri, "
   },
   "day_6":{
-    "description": "Saturday",
+    "description": "shortened version Saturday, formatted with , and a space",
     "message": "Sat, "
   },
   "day_7":{
-    "description": "Sunday",
+    "description": "shortened version Sunday, formatted with , and a space",
     "message": "Sun, "
   },
 
