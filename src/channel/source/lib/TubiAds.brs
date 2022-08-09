@@ -366,6 +366,13 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
             end if
           end for
 
+          ' allow sending pixels via charles
+          if m.constants.settings.mode <> "production"
+            for each pixel in adUnit.tracking
+              pixel.url = m.request.passThroughCharlesProxy(pixel.url)
+            end for
+          end if
+
           'add the roku ad unit to the adUnitsList in the current adUnitsListContainer
           adUnitsListContainer.adUnitsList[0].ads.push(adUnit)
 
@@ -373,7 +380,6 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
           if currentAdUnitsList[0].duration = invalid or currentAdUnitsList[0].duration <= 0
             m.commercialDuration = m.commercialDuration + adUnit.duration
           end if
-
         end if
       end if
     end for

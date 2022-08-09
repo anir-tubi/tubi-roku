@@ -7,7 +7,7 @@ End Function
 
 
 Function execAdsSSAITask()
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
 
   'a port used for sending requests
   m.ssaiPort = CreateObject("roMessagePort")
@@ -146,6 +146,13 @@ Function pollForAds(url)
           if adIdSplit.count() > 1
             ad.adId = adIdSplit[0]
             ad.yospaceId = adIdSplit[1]
+          end if
+
+          ' update ad tracking pixels to be sent via charles
+          if m.constants.settings.mode <> "production" and isArray(ad.tracking)
+            for each pixel in ad.tracking
+              pixel.url = m.request.passThroughCharlesProxy(pixel.url)
+            end for
           end if
 
           ' add the sequence of the ad within the pod for future reference
