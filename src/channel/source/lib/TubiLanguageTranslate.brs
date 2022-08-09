@@ -808,6 +808,38 @@ Function getTranslation_en_US()
       "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
       "message": "{minutes}m left"
     },
+    "tomorrow":{
+      "description": "Day Tomorrow",
+      "message": "Tomorrow"
+    },
+    "day_1":{
+      "description": "Monday",
+      "message": "Mon, "
+    },
+    "day_2":{
+      "description": "Tuesday",
+      "message": "Tue, "
+    },
+    "day_3":{
+      "description": "Wednessday",
+      "message": "Wed, "
+    },
+    "day_4":{
+      "description": "Thursday",
+      "message": "Thur, "
+    },
+    "day_5":{
+      "description": "Friday",
+      "message": "Fri, "
+    },
+    "day_6":{
+      "description": "Saturday",
+      "message": "Sat, "
+    },
+    "day_7":{
+      "description": "Sunday",
+      "message": "Sun, "
+    },
     "channelGuide_error_fetchContent_description": {
       "description": "Onscreen message to indicate channel Guide content could not be loaded",
       "message": "Unable to load the Channel Guide."

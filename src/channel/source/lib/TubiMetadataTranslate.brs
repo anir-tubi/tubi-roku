@@ -1685,12 +1685,18 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
           program.title = programFromServer.title
 
           startTime = ""
+          dayOfMonth = ""
+          dayOfWeek = ""
+          dateString = ""
           startTimeFromServer = programFromServer.start_time
           if startTimeFromServer <> invalid and (type(startTimeFromServer) = "String" or type(startTimeFromServer) = "roString") and startTimeFromServer <> ""
             datetimeObj = CreateObject("roDateTime")
             datetimeObj.FromISO8601String(startTimeFromServer)
             datetimeObj.ToLocalTime()
             program.startTime = datetimeObj.asSeconds()
+            dateString = datetimeObj.AsDateString("short-date")
+            dayOfWeek = "day_" + StrI(datetimeObj.GetDayOfWeek()).trim()
+            dayOfMonth = StrI(datetimeObj.GetDayOfMonth()).trim()
             startTime = GetAMPMTimeString(datetimeObj)
           end if
 
@@ -1739,14 +1745,27 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
           now  = CreateObject("roDateTime")
           now.ToLocalTime()
           nowTime = now.asSeconds()
+          tomorrowSecs = nowTime + 86400 'seconds per day
+          tomorrow = CreateObject("roDateTime")
+          tomorrow.FromSeconds(tomorrowSecs)
 
-          if program.startTime <= nowTime and program.endTime > nowTime
-            timeLeft = (program.endTime -  nowTime) / 60
-            program.ShortDescriptionLine1 = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(program.endTime - nowTime))})
-          else
+          'Today
+          if dateString = now.AsDateString("short-date")
+            if program.startTime <= nowTime and program.endTime > nowTime  ' current program eg:20M left
+              timeLeft = (program.endTime -  nowTime) / 60
+              program.ShortDescriptionLine1 = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(program.endTime - nowTime))})
+            else   'Today future program eg: 10:00 AM
+              timeLeft = (program.endTime - program.startTime) / 60
+              program.ShortDescriptionLine1 = startTime
+            end if
+          else if dateString = tomorrow.AsDateString("short-date") ' tomorrow programs eg: 10 AM Tomorrow
             timeLeft = (program.endTime - program.startTime) / 60
-            program.ShortDescriptionLine1 = startTime
+            program.ShortDescriptionLine1 =  startTime + " " + getTranslation("tomorrow")
+          else 'future day programs eg: Jan, 8 10:00 AM
+            timeLeft = (program.endTime - program.startTime) / 60
+            program.ShortDescriptionLine1 = startTime + " " + getTranslation(dayOfWeek) + dayOfMonth
           end if
+
           'the value 19.2 is the width for every minute of the program as per the EPG Design. This value will change if EPG design changes in future.
           '186 is min width
           width = timeLeft * 19.2
