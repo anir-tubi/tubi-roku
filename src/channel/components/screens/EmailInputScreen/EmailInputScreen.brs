@@ -17,7 +17,7 @@ Function init()
   m.Keyboard.textEditBox.voiceEnabled = true
   m.keyboard.textEditBox.visible = false
   m.Keyboard.textEditBox.maxTextLength = 100
-  
+
   m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
 
   m.keyboard.palette = handleKeyboardColors()
@@ -28,6 +28,8 @@ Function init()
   m.continue = m.top.findNode("continue")
   m.continue.text = getTranslation("dialog_button_continue")
   m.continue.observeFieldScoped("selected", "onContinueButtonSelected")
+
+  m.keyboard.textEditBox.observeFieldScoped("focusedChild", "onKeyboardTextEditBoxFocusedChildChange")
 
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
 
@@ -61,6 +63,13 @@ Function onScreenFocusChange()
     m.Keyboard.textEditBox.voiceEnabled = false
   end if
 
+End Function
+
+Function onKeyboardTextEditBoxFocusedChildChange()
+  ' Don't allow textEditBox to take focus since we're not showing it
+  if m.keyboard.textEditBox.hasFocus()
+    m.keyboard.keyGrid.setFocus(true)
+  end if
 End Function
 
 
@@ -112,8 +121,9 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   end if
 
   handled = true
-  if press
-
+  if press = false then
+    return false
+  else
     if key = "back"
       m.top.backButtonSelected = true
 
