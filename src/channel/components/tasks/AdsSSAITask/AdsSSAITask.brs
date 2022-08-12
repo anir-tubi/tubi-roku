@@ -268,7 +268,7 @@ Function onTags(msg)
       ' at the start of the next segment, if it is a filler video segment.
       m.top.isPlayingAdFiller = false
     end if
-  else
+  else if id3s.getType() = "middle"
     ' At a middle point of a segment (there can be multiple middle points per segment).
     ' fire any quartile or midpoint pixels as necessary
     if m.currentAdInPod <> invalid
