@@ -125,7 +125,7 @@ Function init()
 
   'm.VideoState is source of truth for the state of the video player for the UI
   'possible values are "play", "pause", "rew", "ffw", "stop", "refresh", "skip", "hop"
-  m.VideoState = "stop"
+  updateVideoState("stop")
 
   'm.scrubAmt is the 0-based level of scrub speed - current design allows for 0, 1, 2
   m.scrubAmt = -1
@@ -325,13 +325,13 @@ Function playContent()
     if m.Video.content.nowPos <> invalid and m.Video.content.nowPos >= 0
       m.playerPosition = m.Video.content.nowPos
       m.lastSavedPosition = m.Video.content.nowPos
-      m.lastPingTime = m.Video.content.nowPos
+      updateLastPingTime(m.Video.content.nowPos)
       m.lastButtonPressPos = m.Video.content.nowPos
       m.seekReferenceQueue.push(m.Video.content.nowPos)
       seekToPosition(m.Video.content.nowPos)
     else
       m.lastButtonPressPos = 0
-      m.lastPingTime = 0
+      updateLastPingTime(0)
     end if
 
     'start_video user event analytics
@@ -383,7 +383,7 @@ Function playContent()
       })
     end if
 
-    m.VideoState = "play"
+    updateVideoState("play")
     if m.top.enableAds = true then
       '//Set the midrolls of the videoplayer now and set the adControl state to preroll
       cuepoints = m.Video.content.cuepoints
@@ -499,7 +499,7 @@ Function onVideoStateChange(msg)
         end if
       end if
 
-      m.VideoState = "stop"
+      updateVideoState("stop")
 
       ' setting the m.top.state field to finished triggers autoplay content to start
       ' we don't want that trigger to fire if the up next component is still visible
@@ -542,11 +542,6 @@ Function onVideoStateChange(msg)
         end if
       end if
     end if
-  else if state = "playing" and m.VideoState <> "pause"
-    ' reset the last ping time to the position at which video playback is starting or re-starting (after a seek)
-    ' in order to avoid race conditions in which the video position might update while the handle logic is being completed.
-    m.lastPingTime = m.Video.position
-    m.lastSavedPosition = m.lastSavedPosition
   end if
 
   ' Loading page visibility
@@ -565,6 +560,13 @@ Function onVideoStateChange(msg)
     end if
   end if
 
+End Function
+
+
+' updates the lastPingTime
+' @position: int, this is video position
+Function updateLastPingTime(position)
+  m.lastPingTime = position
 End Function
 
 
@@ -614,7 +616,7 @@ Function onVideoPositionChange()
     if m.playerPosition >= m.lastPingTime + m.analyticsInterval and playProgressOk = true
       playProgressEvent = getPlayProgressEvent()
       if playProgressEvent <> invalid
-        m.lastPingTime = m.playerPosition
+        updateLastPingTime(m.playerPosition)
         trackEvent(playProgressEvent)
       end if
     end if
@@ -725,7 +727,7 @@ Function onVideoPositionChange()
 
             ' set m.lastPingTime here to prevent an extra playProgressEvent if a user backs out of the ads
             ' thereby triggering backButtonExit() which also sends a playProgressEvent.
-            m.lastPingTime = m.playerPosition
+            updateLastPingTime(m.playerPosition)
           end if
 
           ' update history when showing adBreak
@@ -811,7 +813,8 @@ Function onAdStateChange()
       m.top.setFocus(true)
       m.seekReferenceQueue.push(m.playerPosition)
       seekToPosition(m.playerPosition)
-      m.VideoState = "play"
+      updateVideoState("play")
+      updateLastPingTime(m.playerPosition) ' updating lastPingtime for extra safety
       m.Video.control = "play"
       m.mostRecentCompletedCuepoint = m.playerPosition
       trackEvent({
@@ -1128,7 +1131,7 @@ End Function
 
 Function stopVideo()
   tubilog("VideoPlayer.stopVideo")
-  m.VideoState = "stop"
+  updateVideoState("stop")
 
   ' add check so that onVideoStateChange doesn't get called
   ' if the video is already in a non playing state.
@@ -1372,15 +1375,29 @@ End Function
 Function getPlayProgressEvent()
   playProgressEvent = invalid
   if m.playerPosition > m.lastPingTime
+
+    viewTime = Int((m.playerPosition - m.lastPingTime) * 1000)   'ms
+
     playProgressEvent = {
       type: "play_progress"
       values: {
         video_id: m.Video.content.id.toInt()
         position: Int(m.playerPosition * 1000)   'ms - without Int(), can return scientific notation, causing API error
-        view_time: Int((m.playerPosition - m.lastPingTime) * 1000)   'ms
+        view_time: viewTime
         video_player: "DEFAULT"
       }
     }
+
+    ''//::TODO:: Remove this block once the play_progress viewtime value exceeds 15000 issue fixed - added this for debugging purpose
+    if viewTime >= 15000
+      adState = m.top.adState
+      videoInfo = {}
+      videoInfo.adState = adState
+      videoInfo.viewTime = viewTime.tostr()
+      videoInfo.videoState = m.VideoState
+      videoInfo.playerPosition = m.playerPosition
+      tubiLog(FormatJSON(videoInfo), "info", "videoInfo", "view-time-exceeds")
+    end if
 
     if m.top.isTrailer = true
       playProgressEvent.type = "trailer_play_progress"

@@ -2,7 +2,6 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   tubiLog("VideoTransportHandling.onKeyEvent key = " + key + " press: " + press.toStr())
   if press
     m.lastButtonPressPos = m.playerPosition
-
     if isButtonPressAllowed(key,  m.VideoState, m.Video)
       if key = "OK"
         handleOk()
@@ -77,7 +76,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
                 exit for
               end if
             end for
-          end if  
+          end if
         end if
 
       else if key = "up"
@@ -101,7 +100,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         else if m.skipIntro.hasFocus() = true
           setFocusedButton(m.ProgressBar)
         else
-          return false  
+          return false
         end if
 
       else if key = "back"
@@ -182,7 +181,7 @@ Function handleTransportVoiceEvent()
     command = inputInfo.command
   end if
   tubiLog("VideoTransportHandling.handleTransportVoiceEvent " + command)
-  
+
   response = "unhandled"
 
   if m.top.visible = true and m.UpNext.opacity = 0
@@ -192,16 +191,20 @@ Function handleTransportVoiceEvent()
     else if command = "ok"
       handleOk()
     else if command = "pause" or command = "stop"
-      pauseVideo(true, true)
+      if m.VideoState = "play"
+        pauseVideo(true, true)
+      else
+        stopScrubTimer()
+      end if
     else if command = "replay"
       handleHopBack(false, 20)
     else if command = "startover"
       goToStart()
-    else if command = "rewind" 
+    else if command = "rewind"
       handleRewind()
     else if command = "forward"
       handleFastForward()
-    else if command = "seek"  
+    else if command = "seek"
       direction = ""
       if inputInfo <> invalid and inputInfo.duration <> invalid and inputInfo.direction <> invalid
         duration = inputInfo.duration.toInt()
@@ -220,9 +223,9 @@ Function handleTransportVoiceEvent()
         end if
         handleHopBack(false, duration)
       else
-        response = "unhandled"  
+        response = "unhandled"
       end if
-    else if command = "next" 
+    else if command = "next"
       goToNext()
     else if command = "skip"
       'If the content has an intro/recap/early credits, handle the "skip" command.
@@ -233,7 +236,7 @@ Function handleTransportVoiceEvent()
         goToNext()
       end if
     else
-      response = "unhandled"     
+      response = "unhandled"
     end if
   else if m.UpNext.isInFocusChain()
     if command = "play" or command = "ok"
@@ -243,7 +246,7 @@ Function handleTransportVoiceEvent()
       response = "unhandled"
     end if
   end if
-  
+
   inputInfo.response = response
   m.top.transportVoiceResponse = inputInfo
 End Function
@@ -252,7 +255,7 @@ End Function
 'pause the video player
 Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
   m.Video.control = "pause"
-  m.VideoState = "pause"
+  updateVideoState("pause")
 
   if shouldShowTransport
     if m.HUD.opacity < 1.0
@@ -262,7 +265,7 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
 
   m.PlayPauseButton.uri = m.buttonUris.play
   setFocusedButton(m.PlayPauseButton)
-  
+
   if shouldSendAnalytics = true
     trackEvent({
       type: "pause_toggle"
@@ -286,13 +289,13 @@ Function resumeFromPause(shouldSendAnalytics)
 
   ' when pausing the video, due to a firmware regression the Video.position can update
   ' an additional time after pausing, but m.playerPosition will not update after pausing leading the
-  ' two values to be out of sync. If the difference is less than 1 second, treat it as if the 
+  ' two values to be out of sync. If the difference is less than 1 second, treat it as if the
   ' m.playerPosition and m.Video.positions are equal.
   if m.playerPosition <> m.Video.position and Abs(m.playerPosition - m.Video.position) > 1
     jumpToPosition(m.playerPosition)
   else
     m.Video.control = "resume"
-    m.VideoState = "play"
+    updateVideoState("play")
 
     if shouldSendAnalytics = true
       trackEvent({
@@ -327,12 +330,18 @@ Function resumeFromSkip()
     jumpToPosition(m.playerPosition)
   else
     m.Video.control = "resume"
-    m.VideoState = "play"
+    updateVideoState("play")
   end if
   m.PlayPauseButton.uri = m.buttonUris.pause
   setFocusedButton(m.PlayPauseButton)
 End Function
 
+
+' updates the VideoState
+' @videoState: string, possible values are play/pause/stop/rew/ffw/hop/skip
+Function updateVideoState(videoState)
+  m.VideoState = videoState
+End Function
 
 
 'handles the Skip Trailer selection
@@ -340,7 +349,7 @@ End Function
 Function handleSkipTrailer()
   m.top.skipTrailer = true
   animateTransport("out")
-  resetTransportButtons()  
+  resetTransportButtons()
   setFocusedButton(m.PlayPauseButton)
 End Function
 
@@ -356,7 +365,7 @@ Function goToStart()
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(false)
     setFocusedButton(m.StartButton)
-  else
+  else if m.VideoState <> "skip"
     playProgressEvent = getPlayProgressEvent()
     if playProgressEvent <> invalid
       trackEvent(playProgressEvent)
@@ -446,7 +455,7 @@ Function handleFastForward()
 
   'begin fast forwarding, but don't need everything in beginScrub()
   if m.VideoState = "rew"
-    m.VideoState = "ffw"
+    updateVideoState("ffw")
     m.scrubAmt = 0
     m.RewindButton.uri = m.buttonUris.rewind
     m.FastForwardButton.uri = m.buttonUris.fastForwardLevels[0]
@@ -464,7 +473,7 @@ Function handleFastForward()
   else
     m.positionAtJumpStart = m.playerPosition
     beginScrub()
-    m.VideoState = "ffw"
+    updateVideoState("ffw")
     m.FastForwardButton.uri = m.buttonUris.fastForwardLevels[0]
     m.PlayPauseButton.uri = m.buttonUris.play
   end if
@@ -482,7 +491,7 @@ Function handleRewind()
 
   'begin rewinding, but don't need everything in beginScrub()
   if m.VideoState = "ffw"
-    m.VideoState = "rew"
+    updateVideoState("rew")
     m.scrubAmt = 0
     m.FastForwardButton.uri = m.buttonUris.fastforward
     m.RewindButton.uri = m.buttonUris.rewindLevels[0]
@@ -500,7 +509,7 @@ Function handleRewind()
   else
     m.positionAtJumpStart = m.playerPosition
     beginScrub()
-    m.VideoState = "rew"
+    updateVideoState("rew")
     m.RewindButton.uri = m.buttonUris.rewindLevels[0]
     m.PlayPauseButton.uri = m.buttonUris.play
   end if
@@ -530,7 +539,7 @@ Function handleHopForward(duration)
   'if the transport is shown during playback between the intro or other skippable cuepoints'
   hideSkipIntroButton(m.top)
   clearSkipIntroTimer()
-  m.VideoState = "hop"
+  updateVideoState("hop")
   hopPosition = m.playerPosition + duration
   jumpToPosition(hopPosition)
 End Function
@@ -574,7 +583,7 @@ Function handleHopBack(remoteReplayButton, duration)
     end if
   end if
 
-  m.VideoState = "hop"
+  updateVideoState("hop")
   jumpToPosition(hopPosition)
 End Function
 
@@ -585,6 +594,7 @@ Function handleSkipVideo(amt, isProgressBarFocused)
   'handle the first skip press
   if m.VideoState <> "skip"
     m.Video.control = "pause"
+
     m.PlayPauseButton.uri = m.buttonUris.play
     'Only hide the button, don't clear the button so that the button will be shown again
     'if the transport is shown during playback between the intro or other skippable cuepoints'
@@ -599,9 +609,11 @@ Function handleSkipVideo(amt, isProgressBarFocused)
 
       'only update m.positionAtJumpStart if we are not concluding another seek interaction
       m.positionAtJumpStart = m.playerPosition
+    else
+      stopScrubTimer()
     end if
 
-    m.VideoState = "skip"
+    updateVideoState("skip")
   end if
 
   if isProgressBarFocused <> true
@@ -725,7 +737,7 @@ Function onSkipIntroSelected()
 
   if hopPosition > 0
     m.positionAtJumpStart = m.playerPosition
-    m.VideoState = "hop"
+    updateVideoState("hop")
     jumpToPosition(hopPosition)
   end if
 
@@ -756,12 +768,19 @@ Function beginScrub()
 End Function
 
 
-'Perform at end of FF or RW
-' @shouldJump: boolean, indicates if we should use jumpToPosition - don't use if will use later on in the calling function
-Function endScrub(shouldJump = false)
+Function stopScrubTimer()
+
   m.scrubAmt = -1 'reset just in case it somehow got to less than -1
   m.ScrubTimer.control = "stop"
   m.ScrubTimer.unobserveField("fire")
+
+End Function
+
+
+'Perform at end of FF or RW
+' @shouldJump: boolean, indicates if we should use jumpToPosition - don't use if will use later on in the calling function
+Function endScrub(shouldJump = false)
+  stopScrubTimer()
   ' Reset periodic event trackers
 
   animateTransport("out")
@@ -839,10 +858,12 @@ Function jumpToPosition(position)
 
   m.PlayPauseButton.uri = m.buttonUris.pause
   m.lastButtonPressPos = position
-  
+
   ' update history when seeking
   historyPosition(m.positionAtJumpStart)
-  
+
+  updateLastPingTime(m.playerPosition)
+
   m.Thumbnail.visible = false
   ' seek analytics
   trackEvent({
@@ -863,7 +884,7 @@ Function jumpToPosition(position)
   else
     m.seekReferenceQueue.push(position)
     seekToPosition(position) 'will load and play the video at the seeked to point
-    m.VideoState = "play"
+    updateVideoState("play")
   end if
 
   return position
@@ -965,18 +986,18 @@ Function animateTransport(direction)
 
   if direction = "in" and m.ratingOverlay.opacity = 1.0
     slideTo(m.ratingOverlay, [0,250], 0.6)
-    fade(m.ratingGradient, "out", 0.2)  
+    fade(m.ratingGradient, "out", 0.2)
     fade(m.Overlay, direction, 0.6, 0.2)
-  else if direction = "out" and m.ratingOverlay.opacity = 1.0  
+  else if direction = "out" and m.ratingOverlay.opacity = 1.0
     fade(m.Overlay, direction, 0.6)
     slideTo(m.ratingOverlay, [0,0], 0.6, 0.2)
     fade(m.ratingGradient, "in", 0.6, 0.6)
   else
-    fade(m.Overlay, direction, 0.6)  
+    fade(m.Overlay, direction, 0.6)
   end if
 
   slideFade(m.HUD, "below", direction, 0.6)
-  
+
 End Function
 
 
