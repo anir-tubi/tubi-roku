@@ -69,24 +69,20 @@ Function onContentChange()
     categoryContent = m.top.itemContent.getParent()
 
     if categoryContent <> invalid and m.top.itemContent.gridItemType <> invalid then
-      if m.top.itemContent.gridItemType = m.gridItemTypes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
-        setUpLinear()
-      else
-        m.poster.uri = m.top.itemContent.hdgridposterurl
-        if m.top.itemContent.gridItemType = m.gridItemTypes.landscape
-          m.title.visible = true
-          m.title.text = m.top.itemContent.title
-        else if isVitg(m.top.itemContent, m.gridItemTypes) = true
-          setUpVitg()
-        else if categoryContent.gridItemType = m.gridItemTypes.historySignedOutUser
-          setUpSignedOutContinueWatching()
-        else if categoryContent.id = "continue_watching"
-          drawHistoryProgressBar()
-        'm.top.itemContent.gridItemType is not an empty string on the home screen,
-        'and we want this to set Live logo and text just on the search screen.
-        else  if (m.top.itemContent.gridItemType = "" and m.top.itemContent.type = "linear")
-          setLiveIconAndText()
-        end if
+      m.poster.uri = m.top.itemContent.hdgridposterurl
+      if m.top.itemContent.gridItemType = m.gridItemTypes.landscape
+        m.title.visible = true
+        m.title.text = m.top.itemContent.title
+      else if isVitg(m.top.itemContent, m.gridItemTypes) = true
+        setUpVitg()
+      else if categoryContent.gridItemType = m.gridItemTypes.historySignedOutUser
+        setUpSignedOutContinueWatching()
+      else if categoryContent.id = "continue_watching"
+        drawHistoryProgressBar()
+      'm.top.itemContent.gridItemType is not an empty string on the home screen,
+      'and we want this to set Live logo and text just on the search screen.
+      else  if (m.top.itemContent.gridItemType = "" and m.top.itemContent.type = "linear")
+        setLiveIconAndText()
       end if
     else
       m.poster.uri = m.top.itemContent.hdgridposterurl
@@ -137,9 +133,6 @@ Function handleLocalFocusChange(newLocalFocus)
             m.vitg.hasFocus = newLocalFocus
           end if
         end if
-      else if isLinear(m.top.itemContent, m.gridItemTypes) = true
-        '//if the linear item gains focus, then fade out the poster/background
-        m.fadeOutAnimation = fade(m.poster, "out", m.posterFadeTime)
       end if
     else if m.localFocus = true and newLocalFocus = false
       ' item is losing focus - so fade the poster in (as necessary) and destroy the video player
@@ -356,15 +349,6 @@ Function isVitg(itemContent, gridItemTypes)
     isVitg = true
   end if
   return isVitg
-End Function
-
-Function isLinear(itemContent, gridItemTypes)
-  bIsLinear = false
-  if itemContent.gridItemType = gridItemTypes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
-    bIsLinear = true
-  end if
-
-  return bIsLinear
 End Function
 
 

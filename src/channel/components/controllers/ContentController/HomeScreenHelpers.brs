@@ -63,7 +63,7 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     homeScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
 
-    '//::TODO:: epg - remove this observer once the roku_linear_epg_v5 experiment is done
+    '//::TODO:: remove this observer once the roku_registration_subtext_homegrid experiments are done
     homeScreen.observeField("focusedChild", "onHomeScreenFocusChange")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
@@ -80,9 +80,6 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
       homeScreen.topNavSelectedId = constants.ui.sideNavIds.tv
     else if screenID = constants.ui.screenIds.espanolScreen
       sContentMode = constants.ui.contentMode.latino
-    else if screenID = constants.ui.screenIds.linearTVScreen
-      sContentMode = constants.ui.contentMode.linear
-      homeScreen.topNavSelectedId = constants.ui.sideNavIds.linearTV
     end if
 
     homeScreen.contentMode = sContentMode
@@ -115,12 +112,6 @@ Function onHomeScreenFocusChange(msg)
   tubiLog("HomeScreenHelpers.onHomeScreenFocusChange")
   screen = msg.getRoSGNode()
   if screen <> invalid and screen.isInFocusChain() = true
-    if isParentalControlsAdultLevel() = true and isKidsUIOn() = false and m.deeplinkContent = invalid
-      '//Fire experiment exposure event when the Home Screen is focused - just in case there is a deep link to linear content
-      '//::NOTE:: delete this function once the experiment is over
-      getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", true)
-    end if
-
     if isLoggedInUser() = false
       getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", true)
       getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", true)
@@ -175,17 +166,6 @@ Function espanolBatchResponse(response)
 End Function
 
 
-Function LinearTVBatchResponse(response)
-
-  screenID = m.constants.ui.screenIds.linearTVScreen
-  homeScreen = getFromScreenCache(screenID)
-  if homeScreen <> invalid
-    homeScreen.batchResponse = response
-  end if
-
-End Function
-
-
 ' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
 Function showEspanolScreen(componentToFocus = "")
   showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.espanolScreen, componentToFocus)
@@ -201,12 +181,6 @@ End Function
 ' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
 Function showTVScreen(componentToFocus = "")
   showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.tvScreen, componentToFocus)
-End Function
-
-
-' @componentToFocus: string, one of the values in constants.ui.homescreen.focusItems
-Function showLinearTVScreen(componentToFocus = "")
-  showHomeScreen(m.constants, m.global.authInfo, m.constants.ui.screenIds.linearTVScreen, componentToFocus)
 End Function
 
 
@@ -227,11 +201,6 @@ End Function
 
 Function onReloadUserCategoriesResponseInEspanolScreen(response)
   onReloadUserCategoriesInHomeScreen(response, m.constants.ui.screenIds.espanolScreen)
-End Function
-
-
-Function onReloadUserCategoriesResponseInLinearTVScreen(response)
-  onReloadUserCategoriesInHomeScreen(response, m.constants.ui.screenIds.linearTVScreen)
 End Function
 
 
@@ -323,11 +292,6 @@ Function onErrorReloadUserCategoriesInEspanolScreen(response)
 End Function
 
 
-Function onErrorReloadUserCategoriesInLinearTVScreen(response)
-  onErrorReloadUserCategories(response, m.constants.ui.screenIds.linearTVScreen)
-End Function
-
-
 Function onErrorReloadUserCategoriesInMovieScreen(response)
   onErrorReloadUserCategories(response, m.constants.ui.screenIds.movieScreen)
 End Function
@@ -399,17 +363,13 @@ Function setEnableTopNavOnHomescreen(homeScreen)
   if homeScreen <> invalid
     isPCAdult = isParentalControlsAdultLevel()
 
-    if homeScreen.isLinearTVAllowedInTopNav <> isPCAdult
+    if homeScreen.isLinearTVAllowedInTopNav <> isPCAdult 
       preState = homeScreen.isLinearTVAllowedInTopNav
-      if isPCAdult = true and getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).side_nav = false
-        homeScreen.isLinearTVAllowedInTopNav = true
-      else
-        homeScreen.isLinearTVAllowedInTopNav =  false
-      end if
+      
+      homeScreen.isLinearTVAllowedInTopNav = (isPCAdult = true)
       if preState <> homeScreen.isLinearTVAllowedInTopNav
         refreshNeeded = true
       end if
-
     end if
 
     '//When the screen loads new content, make sure the topNav is displayed if it is supposed to. For example, if the user changes the parental settings from adults to older kids, then the app is in kidsMode and should not display the top nav. Changing the topNav status when reloading the content will ensure the top nav is diosplayed when it should be.
@@ -476,9 +436,6 @@ Function fetchHomeScreen(homeScreen)
     else if homeScreen.id = m.constants.ui.screenIds.espanolScreen
       sucessHandler = onEspanolScreenSuccessResponse
       errorHandler = onEspanolScreenErrorResponse
-    else if homeScreen.id = m.constants.ui.screenIds.linearTVScreen
-      sucessHandler = onLinearTVScreenSuccessResponse
-      errorHandler = onLinearTVScreenErrorResponse
     end if
 
     options = {}
@@ -526,14 +483,6 @@ Function fetchHomeScreen(homeScreen)
     homeScreen.resetContentAreaValues = true
     setHomeScreenLoading(homeScreen)
   end if
-End Function
-
-
-''''''''''''''''''''''''''''''
-' onLinearTVScreenSuccessResponse
-'
-Function onLinearTVScreenSuccessResponse(response)
-  respondToHomeScreenSuccessResponse(m.constants.ui.screenIds.linearTVScreen, response)
 End Function
 
 
@@ -597,14 +546,6 @@ Function respondToHomeScreenSuccessResponse(screenID, rawResponse)
       homeScreen.setFocus(true)
     end if
   end if
-End Function
-
-
-''''''''''''''''''''''''''''''
-' onLinearTVScreenErrorResponse
-'
-Function onLinearTVScreenErrorResponse(response)
-  handleHomeScreenErrorResponse(m.constants.ui.screenIds.linearTVScreen, response)
 End Function
 
 
@@ -800,8 +741,6 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
     '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
     '//we should stop the countdown timer
     bStopCountdownTimer = true
-    epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false)
-
     if focusedContent.type = m.constants.ui.categoryTypes.linear and focusedContent.id <> m.constants.ui.contentIds.tvGuide and m.SideNav.opened <> true
       bPlayVideo = true
       if isLinearPlayerPlayingThisContent(focusedContent) = true
@@ -819,9 +758,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
         bStopCountdownTimer = false
         startCountdownTimer()
 
-        if epgExperimentResource.enabled = false or epgExperimentResource.update_homescreen = false
-          m.backgroundGroup.posterVisible = false
-        end if
+        m.backgroundGroup.posterVisible = false
       end if
     else
       stopAndHideLinearVideoPlayer()
@@ -855,16 +792,6 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
     else if focusedContent.type <> invalid and m.SideNav.opened <> true and focusedContent.videoPreviewUrl <> ""
       ' fire exposure event for video preview control group
       getExperimentResource("roku_video_preview", "roku_video_preview_v2", true)
-    end if
-
-    if focusedContent.type <> invalid and epgExperimentResource.update_homescreen = true
-      if focusedContent.type = m.constants.ui.categoryTypes.linear
-        m.clock.visible = true
-        m.logoGroup.visible = false
-      else
-        m.clock.visible = false
-        m.logoGroup.visible = true
-      end if
     end if
 
     if bStopCountdownTimer = true
@@ -917,9 +844,7 @@ Function selectLinearContent(content)
         playLinearVideoContent(content, false, homeScreen.id)
       end if
     else
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = true
-        showDefaultEPGScreen()
-      end if
+      showDefaultEPGScreen()
     end if
   end if
 End Function
@@ -927,38 +852,17 @@ End Function
 
 Function stopCountdownTimer()
   tubiLog("HomeScreenHelpers.stopCountdownTimer")
-  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
-    '//hide the countdown timer
-    setPlayerCountDownChange(-1)
-  else
-    homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-    if homeScreen <> invalid
-      homeScreen.fullscreenCountdown = -1
-    end if
-    linearTVScreen = getFromScreenCache(m.constants.ui.screenIds.linearTVScreen)
-    if linearTVScreen <> invalid
-      linearTVScreen.fullscreenCountdown = -1
-    end if
+
+  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
+  if homeScreen <> invalid
+    homeScreen.fullscreenCountdown = -1
   end if
+    
   epgScreen = getFromScreenCache(m.constants.ui.screenIds.epgScreen)
   if epgScreen <> invalid
     epgScreen.fullscreenCountdown = -1
   end if
 
-  epgScreen = getFromScreenCache(m.constants.ui.screenIds.sportsEPGScreen)
-  if epgScreen <> invalid
-    epgScreen.fullscreenCountdown = -1
-  end if
-
-  epgScreen = getFromScreenCache(m.constants.ui.screenIds.newsEPGScreen)
-  if epgScreen <> invalid
-    epgScreen.fullscreenCountdown = -1
-  end if
-
-  epgScreen = getFromScreenCache(m.constants.ui.screenIds.entertainmentEPGScreen)
-  if epgScreen <> invalid
-    epgScreen.fullscreenCountdown = -1
-  end if
   m.playerFullscreenCountdownTimer.control = "stop"
 End Function
 
@@ -966,14 +870,9 @@ End Function
 Function startCountdownTimer()
   tubiLog("HomeScreenHelpers.stopCountdownTimer")
   Screen = getCurrentScreen()
-  if Screen <> invalid and (Screen.id = m.constants.ui.screenIds.homeScreen or Screen.id = m.constants.ui.screenIds.linearTVScreen)
+  if Screen <> invalid and Screen.id = m.constants.ui.screenIds.homeScreen
     stopCountdownTimer()
-    '//Start/reset timer to play video in fullscreen after a few seconds
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
-      setPlayerCountDownChange(m.constants.timers.linearFullscreenTimeout)
-    else
-      Screen.fullscreenCountdown = m.constants.timers.linearFullscreenTimeout
-    end if
+    Screen.fullscreenCountdown = m.constants.timers.linearFullscreenTimeout
     m.playerFullscreenCountdownTimer.control = "start"
   else if Screen <> invalid and isAnEpgScreen(Screen) = true
     stopCountdownTimer()
@@ -1077,8 +976,6 @@ Function onLoadCategoriesIndex(msg)
     batchResponseHandler = tvBatchResponse
   else if homeScreen.id = m.constants.ui.screenIds.espanolScreen
     batchResponseHandler = espanolBatchResponse
-  else if homeScreen.id = m.constants.ui.screenIds.linearTVScreen
-    batchResponseHandler = linearTVBatchResponse
   end if
 
   isKidsMode = shouldKidsModeBeSentToServer()

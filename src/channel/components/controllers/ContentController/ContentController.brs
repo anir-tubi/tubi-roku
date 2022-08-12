@@ -175,19 +175,6 @@ Function init()
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"
   }
-
-  epgExperimentResource = getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false)
-  if epgExperimentResource.enabled = true
-    if epgExperimentResource.update_homescreen = true
-      m.LinearVideoPlayerSpinner.translation = [447, 660]
-    end if
-
-    'this variable is used to decide when to let the user interact with EPG TimeGrid after content has been either assinged first time or refreshed after validUntil/refetch due to errors.
-    'currently, user is allowed to interact with EPG as soon as first batch is retrived and EPG content has been updated.
-    'Once the LinearVideoplayer integrates with EPGScreen, then we need to revisit the logic of when to let the user interact with EPG TimeGrid due to jumpTO channel requirement and Channel might be fetched to focus on.
-    m.updateEPGTimeGrid = true
-  end if
-
 End Function
 
 
@@ -1300,9 +1287,6 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
-  setContentToRefresh(m.constants.ui.screenIds.sportsEPGScreen)
-  setContentToRefresh(m.constants.ui.screenIds.newsEPGScreen)
-  setContentToRefresh(m.constants.ui.screenIds.entertainmentEPGScreen)
 End Function
 
 
@@ -1482,7 +1466,7 @@ Function getBackgroundtype(backgroundUriList, contentType = "")
     else if backgroundUriList[0] = m.marketingBackgroundUri
       backgroundType = m.constants.ui.backgroundTypes.marketingScreen
     else if contentType = m.constants.ui.contentTypes.linear
-      backgroundType = m.constants.ui.backgroundTypes.linear
+      backgroundType = m.constants.ui.backgroundTypes.linearHomeScreen
     else if contentType = m.constants.ui.contentTypes.epg
       backgroundType = m.constants.ui.backgroundTypes.epg
     else
@@ -1833,7 +1817,7 @@ Function onSingleChannelFetchForLinearRelaunchSuccess(successResponse, _storeInC
     '//deeplink to the EPG SCreen, then launch the linear video player, and ensure the side nav displays the proper focus
     showDefaultEPGScreen()
     hideNavMenu(false) '//ensure the side nav is closed.
-    playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.linearTVScreen)
+    playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.epgScreen)
     focusSideNavOption(m.constants.ui.sideNavIds.home)
   else
     restartApp()
@@ -1900,25 +1884,18 @@ Function onFullscreenCountdown()
   tubiLog("ContentController.onFullscreenCountdown")
   screen = getCurrentScreen()
   if screen <> invalid
-    if screen.id = m.constants.ui.screenIds.homeScreen or screen.id = m.constants.ui.screenIds.linearTVScreen
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
-        nCurrentCount = m.fullscreenCountdown
-        nNewCount = nCurrentCount - 1
-        setPlayerCountDownChange(nNewCount)
-      else
-        nCurrentCount = screen.fullscreenCountdown
-        nNewCount = nCurrentCount - 1
-        screen.fullscreenCountdown = nNewCount
-      end if
-      if nNewCount <= 0
-        selectLinearContent(screen.contentFocused)
-      end if
-    else if isAnEpgScreen(screen) = true
+    if screen.id = m.constants.ui.screenIds.homeScreen or isAnEpgScreen(screen) = true
+      bLinearOnHomeScreen = (screen.id = m.constants.ui.screenIds.homeScreen)
+
       nCurrentCount = screen.fullscreenCountdown
       nNewCount = nCurrentCount - 1
       screen.fullscreenCountdown = nNewCount
       if nNewCount <= 0
-        selectLinearContent(screen.linearChannelToPlay)
+        if bLinearOnHomeScreen = true
+          selectLinearContent(screen.contentFocused)
+        else
+          selectLinearContent(screen.linearChannelToPlay)
+        end if
       end if
     end if
   end if

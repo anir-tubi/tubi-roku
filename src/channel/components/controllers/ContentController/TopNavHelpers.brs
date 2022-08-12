@@ -75,8 +75,6 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
         showDefaultHomeScreen(componentToFocus)
       else if topNavItem.id = m.constants.ui.sideNavIds.espanol
         showEspanolScreen(componentToFocus)
-      else if topNavItem.id = m.constants.ui.sideNavIds.linearTV
-        showLinearTVScreen(componentToFocus)
       else if topNavItem.id = m.constants.ui.sideNavIds.channels
         showChannelListScreen(m.constants, m.constants.ui.terms.menu)
       else if topNavItem.id = m.constants.ui.sideNavIds.Categories
@@ -85,12 +83,6 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
         showSearchScreen()
       else if topNavItem.id = m.constants.ui.sideNavIds.linearEPG
         showDefaultEPGScreen(componentToFocus)
-      else if topNavItem.id = m.constants.ui.sideNavIds.news
-        showNewsEPGScreen(componentToFocus)
-      else if topNavItem.id = m.constants.ui.sideNavIds.sports
-        showSportsEPGScreen(componentToFocus)
-      else if topNavItem.id = m.constants.ui.sideNavIds.entertainment
-        showEntertainmentEPGScreen(componentToFocus)
       end if
     else
       ' If the user selected a top nav item that is associated with the current screen,

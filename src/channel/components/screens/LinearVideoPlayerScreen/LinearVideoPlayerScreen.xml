@@ -3,15 +3,18 @@
   <script type="text/brightscript" uri="LinearVideoPlayerScreen.brs" />
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/EPGMixin.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
-  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+
 
   <interface>
 
@@ -21,15 +24,27 @@
       <field id="width" alias="VideoNode.width"/>
       <field id="height" alias="VideoNode.height"/>
 
+      <!-- New content has been added to the video player -->
+      <field id="content" type="node"/>
+
+      <field id="updateContent" type="boolean" alwaysNotify="true"/>
+
       <!-- originalContent stores the content as it is returned from CCS services. It used
            as a store, in case the linear video player needs to be restarted. -->
       <field id="originalContent" type="node"/>
 
-      <!-- content stores a clone of originalContent that has had the stream manifest url updated
-           with yospace parameters. This is the content node that will be used to play the video
-           in the UI. -->
-      <field id="content" type="node"/>
-      <field id="updateContent" type="boolean" alwaysNotify="true"/>
+      <!--Timegrid content updated in batches-->
+      <field id="timeGridContent" type="node" alias="VideoOverlay.timeGridContent"/>
+
+      <!-- Content might be loading in batch. So render only when timeGridContent is set -->
+      <field id="updateTimeGridContent" type="boolean" alwaysNotify="true" alias="VideoOverlay.updateTimeGridContent"/>
+
+      <!-- Is the content of the EPG component loading? -->
+      <field id="timeGridContentLoading" type="boolean" alwaysNotify="true" alias="VideoOverlay.timeGridContentLoading"/>
+
+      <!-- When the screen asks for timegrid content for a particular channel, then the response will be set to this field. -->
+      <field id="channelTimeGridContent" type="node" alwaysNotify="true"/>
+
 
       <!-- content that is used to display a channel guide overliad the video player -->
       <field id="channelsContent" type="node"/>
@@ -37,11 +52,14 @@
       <!-- Fields to pass through to AdsSSAITask -->
       <field id="pollUrl" alias="PlayerAdsSSAITask.pollUrl" />
 
-      <!-- Indicator that the outside would like the overlay transports to be closed -->
+      <!-- Indicator that the outside would like the overlay to be closed -->
       <field id="closeTransport" type="boolean" alwaysNotify="true"/>
 
+      <!-- Should the video player show the programming data. This assumes the player is in minimized state. -->
+      <field id="displayProgrammingData" type="boolean" alwaysNotify="true"/>
+
       <!-- Is video player currently in fullscreen? -->
-      <field id="fullscreen" type="boolean" value="false"/>
+      <field id="fullscreen" type="boolean" value="false" alwaysNotify="true"/>
 
       <!-- supports "play", "stop", "pause", "resume", "error" -->
       <field id="control" type="string" value="none" alwaysNotify="true"/>
@@ -62,6 +80,9 @@
       <!-- Set to true if the back button was pressed while the video player has focus -->
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
 
+      <!-- When this is called, then the helper should display the EPGScreen-->
+      <field id="navigateToEPGScreen" alias="VideoOverlay.navigateToEPGScreen"/>
+
       <!-- Set when the video player needs to display the channel guide -->
       <field id="refreshChannels" type="boolean" alwaysNotify="true" />
 
@@ -79,6 +100,9 @@
       <!--When the user selects a new channel from the channel guide, this field is set-->
       <field id="channelSelected" type="node"/>
 
+      <!--Since channelSelected will get updated everytime minsLeftTimer is run, to protect unwanted trigging of observer, this field is used-->
+      <field id="ChannelSelectedUpdated" type="boolean" alwaysNotify="true" />
+
       <!-- Error message to be displayed to the user -->
       <field id="errorMsg" type="string" />
 
@@ -94,10 +118,21 @@
            the Youbora plugin with the error info. The content controller observes this field and sends error info to Youbora.
       -->
       <field id="sendYouboraError" type="boolean" alwaysNotify="true" />
+
       <field id="sendVideoTrackingStart" type="boolean" alwaysNotify="true" />
+
+       <!-- Pass through LinearVideoPlayerOverlay component events to LinearVideoPlayerScreen helper -->
+      <field id="linearOverlayNavigateWithinPageInfo" alias="VideoOverlay.programGuideNavigateWithinPageInfo" />
+
+      <!-- Pass through LinearVideoPlayerOverlay component events to LinearVideoPlayerScreen helper -->
+      <field id="linearOverlayComponentInteractionInfo" alias="VideoOverlay.programGuidecomponentInteractionInfo" />
   </interface>
 
   <children>
+    <LinearVideoPlayerMinimizedInfoPanel
+      id="ProgrammingData"
+      opacity="0"
+      translation="[552,0]"/>
     <Video
       id="VideoNode"
       width="1920"
@@ -108,6 +143,12 @@
       enableTrickPlay="false"
       notificationInterval="0.5"
       visible="true" />
+    <Poster
+      id="GradiantOnMinimizedState"
+      width="1920"
+      height="1080"
+      uri="pkg:/images/gradient_linear_minimized_player.png"
+      visible="false"/>
 
     <Group
       id="Loading"
@@ -117,16 +158,7 @@
         color="0x000000FF"
         width="1920"
         height="1080"/>
-      <Group
-        id="logoGroup">
-        <Poster
-          id="tubiLogo"
-          width="309"
-          height="135"
-          uri="pkg:/images/logo-white-xlarge.png"
-          loadSync="true"
-          translation="[810,382]"/>
-        </Group>
+
       <Label
         id="LoadingMessage"
         height="64"
@@ -147,108 +179,9 @@
         translation="[584,696]"/>
     </Group>
 
-    <Group
-      id="VideoOverlay"
-      opacity="0.0">
-    </Group>
+    <LinearVideoPlayerScreenOverlay
+      id="VideoOverlay"/>
 
-    <Group
-      id="Overlay1stScreen">
-      <Poster
-        id="TransportGradient"
-        width="1920"
-        height="1080"
-        translation="[0,0]"
-        opacity="0.0"
-        uri="pkg:/images/playback-gradient-fhd.9.png"/>
-      <Poster
-        id="HUDIcon"
-        opacity="0"
-        width="120"
-        height="120"
-        translation="[900,60]"/>
-      <Group
-        id="HUD"
-        visible="true"
-        opacity="0.0" >
-
-        <Group
-          id="Transport"
-          opacity="1.0">
-
-          <!-- Transport buttons - Transport buttons must be in the order they appear on the screen (from left to right) -->
-          <Group
-            id="TransportButtons" >
-            <LayoutGroup
-              id="ButtonsGroup"
-              layoutDirection="horiz"
-              vertAlignment="center"
-              horizAlignment="center"
-              translation="[960,990]"
-              itemSpacings="[20]">
-              <PillIconButton
-                id="ButtonBack"
-                icon="left"/>
-              <PillIconButton
-                id="ButtonCaptions"
-                icon="up"/>
-              <PillIconButton
-                id="ButtonChannels"
-                icon="right"/>
-            </LayoutGroup>
-          </Group>
-        </Group>  <!-- Transport -->
-      </Group>  <!-- HUD -->
-    </Group>
-
-    <!-- The following are pages that display upon a selection of a button-->
-    <Group
-      id="Overlay2ndScreen">
-        <ChannelGuide
-          id="channelsGuideGroup"
-          opacity="0"/>
-
-        <!--::TODO::LiveNews - the closed captioning group should be its own component. Do this for v1. -->
-        <Group
-          id="closedCaptioningGroup"
-          opacity="0">
-          <Poster
-            width="1920"
-            height="1080"
-            uri="pkg:/images/gradientBground-closedCaptioning.png"/>
-          <PillIconButton
-            id="cc_close_btn"
-            translation="[891,865]"
-            icon="down"/>
-          <RowList
-            id="closedCaptioningButtonListBackground"
-            translation="[960,947]"
-            numRows="1"
-            showRowLabel="[false]"
-            itemSize="[1835,72]"
-            showRowCounter="[false]"
-            rowItemSize="[[225,72]]"
-            rowItemSpacing="[[18,0]]"
-            fadeFocusFeedbackWhenAutoScrolling="true"
-            drawFocusFeedbackOnTop="true"
-            focusBitmapUri="pkg://images/menu-focus-fhd.9.png"
-            itemComponentName="LinearTVCaptioningMenuItem"
-            rowFocusAnimationStyle="floatingFocus"/>
-          <RowList
-            visible="true"
-            id="closedCaptioningButtonList"
-            translation="[960,947]"
-            numRows="1"
-            showRowLabel="[false]"
-            itemSize="[1835,72]"
-            showRowCounter="[false]"
-            rowItemSize="[[225,72]]"
-            rowItemSpacing="[[18,0]]"
-            drawFocusFeedback="false"
-            itemComponentName="LinearTVCaptioningMenuItem"
-            rowFocusAnimationStyle="floatingFocus"/>
-        </Group>
-    </Group>
 
     <AdsSSAITask
       id="PlayerAdsSSAITask" />

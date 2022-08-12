@@ -87,15 +87,12 @@
       <field id="reloadUserCategoriesResponse" type="assocarray"/>
       <field id="reloadMovieUserCategoriesResponse" type="assocarray"/>
       <field id="reloadTVUserCategoriesResponse" type="assocarray"/>
-      <field id="reloadLinearTVUserCategoriesResponse" type="assocarray"/>
       <field id="reloadEspanolUserCategoriesResponse" type="assocarray"/>
 
       <field id="homescreenResponse" type="assocarray"/>
       <field id="moviescreenResponse" type="assocarray"/>
       <field id="tvscreenResponse" type="assocarray"/>
       <field id="espanolscreenResponse" type="assocarray"/>
-      <field id="linearTVScreenResponse" type="assocarray"/>
-
       <field id="searchResponse" type="assocarray"/>
 
       <field id="transportVoiceRequest" type="assocarray"/>

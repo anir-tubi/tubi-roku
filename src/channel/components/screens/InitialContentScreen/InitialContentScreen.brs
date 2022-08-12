@@ -44,7 +44,7 @@ Function init()
 
   setMainContent(m.constants.ui.sideNavIds.movies, m.rowNode)
   setMainContent(m.constants.ui.sideNavIds.tv, m.rowNode)
-  setMainContent(m.constants.ui.sideNavIds.linearTV, m.rowNode)
+  setMainContent(m.constants.ui.sideNavIds.linearEPG, m.rowNode)
   setMainContent(m.constants.ui.sideNavIds.espanol, m.rowNode)
   setMainContent(m.constants.ui.sideNavIds.kidsMode, m.rowNode)
 
@@ -116,7 +116,7 @@ Function setMainContent(itemID, parentNode)
     contentNode.title = getTranslation("menu_movies_and_tv")
     contentNode.hdgridposterurl = "pkg:/images/icon-movies-large.png"
     bSuccess = true
-  else if itemID = m.constants.ui.sideNavIds.linearTV
+  else if itemID = m.constants.ui.sideNavIds.linearEPG
     contentNode.title = getTranslation("menu_livetv")
     contentNode.hdgridposterurl = "pkg:/images/icon-linearTV-large.png"
     bSuccess = true

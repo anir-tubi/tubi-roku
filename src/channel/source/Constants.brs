@@ -849,11 +849,11 @@ Function getConstants()
       constants.ui.infoPanelModes.category = "category"
       constants.ui.infoPanelModes.item = "item"
       constants.ui.infoPanelModes.continue_watching = "continue_watching"
-      constants.ui.infoPanelModes.linear = "linear"
       constants.ui.infoPanelModes.movie = "movie"
       constants.ui.infoPanelModes.series = "series"
       constants.ui.infoPanelModes.season = "season"
       constants.ui.infoPanelModes.episode = "episode"
+      constants.ui.infoPanelModes.linearHomeScreen = "linearHomeScreen"
       constants.ui.infoPanelModes.epg = "epg"
       constants.ui.infoPanelModes.linearsearch = "linear-search"
 
@@ -865,9 +865,6 @@ Function getConstants()
       constants.ui.contentMode.tv = "tv"
       constants.ui.contentMode.linear = "linear"
       constants.ui.contentMode.epgScreen = "tubitv_us_linear" 'this value is used as input query param, and the value of the param expected is tubitv_us_linear .
-      constants.ui.contentMode.sportsEPGScreen = "tubitv_epg_sports" 'this value is used as input query param, and the value of the param expected is  tubitv_epg_sports .
-      constants.ui.contentMode.newsEPGScreen = "tubitv_epg_news" 'this value is used as input query param, and the value of the param expected is tubitv_epg_news .
-      constants.ui.contentMode.entertainmentEPGScreen = "tubitv_epg_entertainment" 'this value is used as input query param, and the value of the param expected is tubitv_epg_entertainment .
 
     constants.ui.contentTypes = {}
       constants.ui.contentTypes.series = "series"
@@ -883,8 +880,8 @@ Function getConstants()
     constants.ui.backgroundTypes = {}
       constants.ui.backgroundTypes.fullScreen = "fullscreen"
       constants.ui.backgroundTypes.topRight = "topright"
-      constants.ui.backgroundTypes.linear = "linear"
       constants.ui.backgroundTypes.feature = "feature"
+      constants.ui.backgroundTypes.linearHomeScreen = "linearHomeScreen"
       constants.ui.backgroundTypes.epg = "epg"
       constants.ui.backgroundTypes.marketingScreen = "marketingScreen"
       constants.ui.backgroundTypes.rightScreen = "rightScreen"
@@ -906,11 +903,7 @@ Function getConstants()
       constants.ui.screenLevels.homeScreen = 10
       constants.ui.screenLevels.initialContentScreen = 20
       constants.ui.screenLevels.espanolScreen = 20
-      constants.ui.screenLevels.linearTVScreen = 20
       constants.ui.screenLevels.epgScreen = 20
-      constants.ui.screenLevels.newsepgScreen = 20
-      constants.ui.screenLevels.sportsepgScreen = 20
-      constants.ui.screenLevels.entertainmentepgScreen = 20
       constants.ui.screenLevels.movieScreen = 20
       constants.ui.screenLevels.tvScreen = 20
       constants.ui.screenLevels.channelCategoryGridScreen = 20
@@ -947,7 +940,6 @@ Function getConstants()
       constants.ui.screenIds.detailScreen = "detailScreen"
       constants.ui.screenIds.episodeScreen = "episodeScreen"
       constants.ui.screenIds.emailInputScreen = "emailInputScreen"
-      constants.ui.screenIds.linearTVScreen = "linearTVScreen"
       constants.ui.screenIds.signUpScreen = "signUpScreen"
       constants.ui.screenIds.signInScreen = "signInScreen"
       constants.ui.screenIds.upNextScreen = "upNextScreen"
@@ -956,9 +948,6 @@ Function getConstants()
       constants.ui.screenIds.linearVideoPlayerScreen = "linearVideoPlayerScreen"
       constants.ui.screenIds.initialContentScreen = "initialContentScreen"
       constants.ui.screenIds.epgScreen = "epgScreen"
-      constants.ui.screenIds.sportsEPGScreen = "sportsEPGScreen"
-      constants.ui.screenIds.newsEPGScreen = "newsEPGScreen"
-      constants.ui.screenIds.entertainmentEPGScreen = "entertainmentEPGScreen"
       constants.ui.screenIds.emailVerificationScreen = "emailVerificationScreen"
       constants.ui.screenIds.welcomeScreen = "welcomeScreen"
       constants.ui.screenIds.freeForeverScreen = "freeForeverScreen"
@@ -970,7 +959,6 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.channelListScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryListScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.espanolScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.linearTVScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.movieScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.tvScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.searchScreen] = true
@@ -979,9 +967,6 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.emailInputScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.signInScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.epgScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.sportsEPGScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.newsEPGScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.entertainmentEPGScreen] = true
       ' Note when returning to the page there were issues with MarkupGrid being in a bad state either
       ' due to the ArrayGrid items being recycled or some state of the MarkupGrid itself.
       constants.ui.cacheableScreenIds[constants.ui.screenIds.initialContentScreen] = false
@@ -1035,14 +1020,10 @@ Function getConstants()
       constants.ui.sideNavOpenIds[constants.ui.screenIds.channelListScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.categoryListScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.espanolScreen] = true
-      constants.ui.sideNavOpenIds[constants.ui.screenIds.linearTVScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.epgScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.movieScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.tvScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.searchScreen] = true
-      constants.ui.sideNavOpenIds[constants.ui.screenIds.sportsEPGScreen] = true
-      constants.ui.sideNavOpenIds[constants.ui.screenIds.newsEPGScreen] = true
-      constants.ui.sideNavOpenIds[constants.ui.screenIds.entertainmentEPGScreen] = true
 
     constants.ui.onBoarding = {}
       constants.ui.onBoarding.pageSequence = {}
@@ -1064,14 +1045,10 @@ Function getConstants()
       constants.ui.sideNavIds.tv = "tv"
       constants.ui.sideNavIds.settings = "settings"
       constants.ui.sideNavIds.exit = "exit"
-      constants.ui.sideNavIds.linearTV = "linearTV"
       constants.ui.sideNavIds.linearEPG = "linearEPG"
       constants.ui.sideNavIds.profile = "profile"
       constants.ui.sideNavIds.kidsMode = "kidsMode"
       constants.ui.sideNavIds.myList = "myList"
-      constants.ui.sideNavIds.sports = "sports"
-      constants.ui.sideNavIds.news = "news"
-      constants.ui.sideNavIds.entertainment = "entertainment"
       constants.ui.sideNavIds.subtitles = "subtitles"
       constants.ui.sideNavIds.back = "back"
 
@@ -1086,14 +1063,10 @@ Function getConstants()
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.channelListScreen] = constants.ui.sideNavIds.channels
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.categoryListScreen] = constants.ui.sideNavIds.categories
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.espanolScreen] = constants.ui.sideNavIds.espanol
-      constants.ui.screenIdToSideNavId[constants.ui.screenIds.linearTVScreen] = constants.ui.sideNavIds.linearTV
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.epgscreen] = constants.ui.sideNavIds.linearEPG
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.movieScreen] = constants.ui.sideNavIds.movies
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.tvScreen] = constants.ui.sideNavIds.tv
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.settingsScreen] = constants.ui.sideNavIds.settings
-      constants.ui.screenIdToSideNavId[constants.ui.screenIds.sportsEPGScreen] = constants.ui.sideNavIds.sports
-      constants.ui.screenIdToSideNavId[constants.ui.screenIds.newsEPGScreen] = constants.ui.sideNavIds.news
-      constants.ui.screenIdToSideNavId[constants.ui.screenIds.entertainmentEPGScreen] = constants.ui.sideNavIds.entertainment
 
     constants.ui.gridItemTypes = {}
       constants.ui.gridItemTypes.portrait = "portrait"

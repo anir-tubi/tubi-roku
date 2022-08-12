@@ -80,14 +80,8 @@ Function init()
   m.vitgMaskOffsetDiff = 352 'the diff in the amount the content area mask is offset in the up direction for vitg
   m.sponsorSlideAmt = 29 'the amount the grid slides up to fit the sponsored header. This is the difference of the heights of the sponsored and normal row titles
   m.sponsorMaskOffsetDiff = 29 'the diff in the amount the content area mask is offset in the up direction for sponsored rows. This is the difference of the heights of the sponsored and normal row titles
-
-  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
-    m.linearSlideAmt = 385 'the amount the grid slides up to fit the linear content item
-    m.linearMaskOffsetDiff = 280 'the diff in the amount the content area mask is offset in the up direction for the linear news container
-  else
-    m.linearSlideAmt = -115 'the amount the grid slides up to fit the linear content item
-    m.linearMaskOffsetDiff = -99 'the diff in the amount the content area mask is offset in the up direction for the linear news container
-  end if
+  m.linearSlideAmt = -115 'the amount the grid slides up to fit the linear content item
+  m.linearMaskOffsetDiff = -99 'the diff in the amount the content area mask is offset in the up direction for the linear news container
 
   m.originalContentAreaTranslation = m.ContentArea.translation
   m.vitgContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.vitgSlideAmt]
@@ -164,11 +158,7 @@ Function generateTopNavContentItems(includeLinearTV = false)
     m.constants.ui.sideNavIds.tv
   ]
   if includeLinearTV = true
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = false
-      menuItemIds.push(m.constants.ui.sideNavIds.linearTV)
-    else
-      menuItemIds.push(m.constants.ui.sideNavIds.linearEPG)
-    end if
+    menuItemIds.push(m.constants.ui.sideNavIds.linearEPG)
   end if
 
   parent = CreateObject("roSGNode", "ContentNode")
@@ -185,8 +175,6 @@ Function generateTopNavContentItems(includeLinearTV = false)
       item.title = getTranslation("menu_movies")
     else if id = m.constants.ui.sideNavIds.tv
       item.title = getTranslation("menu_tv")
-    else if id = m.constants.ui.sideNavIds.linearTV
-      item.title = getTranslation("menu_livetv")
     else if id = m.constants.ui.sideNavIds.linearEPG
       item.title = getTranslation("menu_livetv")
     end if
@@ -211,8 +199,6 @@ Function onIDChange()
     m.top.screenLevel = m.constants.ui.screenLevels.tvScreen
   else if m.top.id = m.constants.ui.screenIds.espanolScreen
     m.top.screenLevel = m.constants.ui.screenLevels.espanolScreen
-  else if m.top.id = m.constants.ui.screenIds.linearTVScreen
-    m.top.screenLevel = m.constants.ui.screenLevels.linearTVScreen
   else
     m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
   end if
@@ -520,9 +506,6 @@ End Function
 Function expandContentAreaForLinear(rowPercent)
   m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.linearSlideAmt * rowPercent)]
   m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.linearMaskOffsetDiff * rowPercent)]
-  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
-    m.InfoPanel.opacity = 1 - rowPercent
-  end if
 End Function
 
 
@@ -531,7 +514,7 @@ Function populateInfoPanelByContent(focusedContent)
     sType = focusedContent.type
 
     if sType = m.constants.ui.categoryTypes.linear
-      populateInfoPanel(m.constants.ui.infoPanelModes.linear, focusedContent)
+      populateInfoPanel(m.constants.ui.infoPanelModes.linearHomeScreen, focusedContent)
     else if sType = m.constants.ui.categoryTypes.historySignedOutUser
       populateInfoPanel(m.constants.ui.infoPanelModes.continue_watching, focusedContent)
     else if sType = m.constants.ui.categoryTypes.preview
@@ -721,18 +704,16 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.titleLogoUri = contentNode.titleLogoUri
       m.InfoPanel.genres = contentNode.genres
       m.InfoPanel.width = 960
+    else if mode = m.constants.ui.infoPanelModes.linearHomeScreen
+      m.InfoPanel.mode = mode
+      m.InfoPanel.title = contentNode.title
+      m.InfoPanel.description = contentNode.description
+      m.InfoPanel.width = 650
     else if mode = m.constants.ui.infoPanelModes.continue_watching
       m.InfoPanel.mode = mode
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.width = 960
-    else if mode = m.constants.ui.infoPanelModes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
-      m.InfoPanel.mode = mode
-    else if mode = m.constants.ui.infoPanelModes.linear
-      m.InfoPanel.mode = mode
-      m.InfoPanel.title = contentNode.title
-      m.InfoPanel.description = contentNode.description
-      m.InfoPanel.width = 650
     end if
 
     m.InfoPanel.calculateHeight = true
@@ -753,11 +734,7 @@ End Function
 
 Function determineBackgroundImage(focusedContent)
   if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0
-    if focusedContent.type = m.constants.ui.categoryTypes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
-      return [m.defaultBackgroundUri]
-    else
-      return focusedContent.backgrounds
-    end if
+    return focusedContent.backgrounds
   else
     return [m.defaultBackgroundUri]
   end if

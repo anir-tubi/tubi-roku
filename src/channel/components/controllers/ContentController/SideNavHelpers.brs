@@ -12,10 +12,6 @@ Function initSideNav()
   if m.constants.deviceInfo.countryCode <> "US"
     '//Tell the sideNav to stop displaying the Espanol menu item
     m.SideNav.displayEspanol = false
-    '//Tell the sideNav to stop displaying the Linear TV menu item
-    m.SideNav.displayLinearTV = false
-    '//Tell the sideNav to stop displaying the LinearEPG item
-    m.SideNav.displayLinearEPG = false
     '//Tell the sideNav to stop displaying the movies/TV menu items
     m.SideNav.displayMoviesTV = false
     '//Tell the sideNav to stop displaying the channel menu item
@@ -38,18 +34,6 @@ Function initSideNav()
 
   ' stop displaying some side nav items if the top nav is being displayed
   if isTopNavHomeScreenEnabled() = true
-    '//Tell the sideNav to stop displaying the Linear TV menu item
-    m.SideNav.displayLinearTV = false
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).side_nav = true
-      '//In this experement, top Nav will not linear TV
-      if isParentalControlsAdultLevel() <> true
-        m.SideNav.displayLinearEPG = false
-      else
-        m.SideNav.displayLinearEPG = true
-      end if
-    else
-      m.SideNav.displayLinearEPG = false
-    end if
     m.SideNav.displayMoviesTV = false
   end if
 
@@ -71,12 +55,6 @@ End Function
 Function focusSideNavOption(sID)
 
   screen = getCurrentScreen()
-  if isParentalControlsAdultLevel() = true and screen <> invalid and screen.id <> m.constants.ui.screenIds.linearVideoPlayerScreen
-    '//Fire the epg exposure event when the side nav is viewable (which happens when this function is called)
-    '// but not when kids mode is on, or parental settings is set to teens or less
-    getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", true)
-  end if
-
   if isNonEmptyString(sID) and m.constants.ui.sideNavIds[sID] <> invalid
     m.SideNav.itemRequested = sID '//set itemRequested so the focus is on the proper button in the sideNav
   end if
@@ -281,27 +259,6 @@ Function onSideNavItemSelected()
         showEspanolScreen()
         bNewScreenCalledSuccess = true
       end if
-    else if itemSelectedId = m.constants.ui.sideNavIds.linearTV
-      if isKidsUIOn() = true
-        bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.sideNavIds.linearTV)
-      else
-        setUiMode(m.constants.ui.modes.standard)
-        showLinearTVScreen()
-        bNewScreenCalledSuccess = true
-      end if
-    else if itemSelectedId = m.constants.ui.sideNavIds.linearEPG
-      if isKidsUIOn() = true
-        bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.sideNavIds.linearEPG)
-      else if isParentalControlsAdultLevel() = false
-        bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.sideNavIds.linearEPG, "teens")
-      else
-        setUiMode(m.constants.ui.modes.standard)
-        showDefaultEPGScreen()
-        bNewScreenCalledSuccess = true
-      end if
     else if itemSelectedId = m.constants.ui.sideNavIds.mylist
       if isKidsUIOn() <> true
         setUiMode(m.constants.ui.modes.standard)
@@ -366,12 +323,6 @@ Function displayMenuItemDisabled(sMenuItemID, parental = "")
   else if sMenuItemID = m.constants.ui.sideNavIds.espanol
     sTitle = getTranslation("dialog_espanolDisabled_title")
     sDialogSubTypeValue = "kids-mode-espanol"
-  else if sMenuItemID = m.constants.ui.sideNavIds.linearTV
-    sTitle = getTranslation("dialog_liveTVDisabled_title")
-    sDialogSubTypeValue = "kids-mode-livetv"
-  else if sMenuItemID = m.constants.ui.sideNavIds.linearEPG
-    sTitle = getTranslation("dialog_liveTVDisabled_title")
-    sDialogSubTypeValue = "kids-mode-epg"
   end if
 
   dialogEvent = {
@@ -544,29 +495,16 @@ Function getSideNavIdAssociatedWithScreen(screen)
 
   idsAssociatedWithHome = {}
   idsAssociatedWithHome[m.constants.ui.screenIds.homeScreen] = true
-  idsAssociatedWithHome[m.constants.ui.screenIds.linearTVScreen] = true
   idsAssociatedWithHome[m.constants.ui.screenIds.movieScreen] = true
   idsAssociatedWithHome[m.constants.ui.screenIds.tvScreen] = true
 
-  idsAssociatedWithEpg = {}
+  '//if the new EPG live TV option is in the homescreen top nav, not side nav
+  idsAssociatedWithHome[m.constants.ui.screenIds.epgScreen] = true
 
-  experiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false)
-  if experiment.side_nav = false
-    '//if the new EPG live TV option is in the homescreen top nav, not side nav
-    idsAssociatedWithHome[m.constants.ui.screenIds.epgScreen] = true
-  else
-    '//if the new EPG live TV option is in the side nav
-    idsAssociatedWithEpg[m.constants.ui.screenIds.epgScreen] = true
-    idsAssociatedWithEpg[m.constants.ui.screenIds.sportsEPGScreen] = true
-    idsAssociatedWithEpg[m.constants.ui.screenIds.newsEPGScreen] = true
-    idsAssociatedWithEpg[m.constants.ui.screenIds.entertainmentEPGScreen] = true
-  end if
 
   if screen.id <> invalid
     if idsAssociatedWithHome[screen.id] <> invalid
       sideNavId = m.constants.ui.sideNavIds.home
-    else if idsAssociatedWithEpg[screen.id] <> invalid
-      sideNavId = m.constants.ui.sideNavIds.linearEPG
     else if m.constants.ui.screenIdToSideNavId[screen.id] <> invalid
       sideNavId = m.constants.ui.screenIdToSideNavId[screen.id]
     end if

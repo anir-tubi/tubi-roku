@@ -200,10 +200,6 @@
     "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
     "message": "Español Disabled"
   },
-  "dialog_liveTVDisabled_title": {
-    "description": "Title of a Dialog Window that is shown when the user clicked the sidenav live TVs menu item but the item has been disabled",
-    "message": "Live TV Disabled"
-  },
   "dialog_moviesDisabled_title": {
     "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
     "message": "Movies Disabled"
@@ -663,10 +659,6 @@
   "screenTv_error_fetchScreenContent_description": {
     "description": "Onscreen message to indicate TV content could not be loaded",
     "message": "Unable to load the Tubi TV Shows screen."
-  },
-  "screenHome_item_tvguide_title": {
-    "description": "The title of the rowList item for the TV Guide. It should be in title case.",
-    "message": "TV Guide"
   },
   "screenHome_item_tvguide_subtitle": {
     "description": "The subtitle of the rowList item for the TV Guide. It should be in title case.",

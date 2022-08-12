@@ -242,7 +242,7 @@ Function setPosterValues(posterUri)
       m.oldPoster.loadHeight = "606"
       m.oldPoster.loadDisplayMode = "scaleToZoom"
     end if
-  else if m.aCurrentBackgroundInfo.type = m.constants.ui.backgroundTypes.linear
+  else if m.aCurrentBackgroundInfo.type = m.constants.ui.backgroundTypes.linearHomeScreen
     m.oldPoster.width = 1263
     m.oldPoster.height = 710
     m.oldPoster.posterTranslation = [657,0]
@@ -352,14 +352,14 @@ Function transitionGradients()
       m.fullScreenGradient.gradientOpacity = 0.0
       m.topRightGradient.gradientOpacity = 0.0
       m.leftGradient.gradientOpacity = 1.0
-    else if m.newBackgroundType = m.constants.ui.backgroundTypes.linear
-      'This comment will remind us to remove this section when we graduate EPG when we search for experiment name :roku_linear_epg->roku_linear_epg_v5
+    else if m.newBackgroundType = m.constants.ui.backgroundTypes.linearHomeScreen   
+      'For when the linear page is on the homescreen
       m.fullScreenGradient.gradientOpacity = 0.0
       m.leftBottomGradient.gradientOpacity = 0.0
       m.topRightGradient.gradientOpacity = 0.0
       m.leftGradient.gradientOpacity = 0.0
       m.linearGradient1.gradientOpacity = 1.0
-      m.linearGradient2.gradientOpacity = 1.0
+      m.linearGradient2.gradientOpacity = 1.0      
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.epg
       m.fullScreenGradient.gradientOpacity = 0.0
       m.leftBottomGradient.gradientOpacity = 0.0
@@ -374,7 +374,7 @@ Function transitionGradients()
         m.linearGradient1.gradientBlendColor = m.constants.ui.themes.default.gradientBlendColor
         m.linearGradient2.gradientBlendColor = m.constants.ui.themes.default.gradientBlendColor
       end if
-
+      
       m.linearGradient1.gradientOpacity = 1.0
       m.linearGradient2.gradientOpacity = 1.0
     end if
@@ -507,8 +507,8 @@ Function transitionGradients()
         m.topRightGradient.fadeOutControl = "start"
         m.topRightGradient.lastAnimationName = "GradientFadeOut"
       end if
-    else if m.newBackgroundType = m.constants.ui.backgroundTypes.linear
-      'This comment will remind us to remove this section when we graduate EPG when we search for experiment name :roku_linear_epg->roku_linear_epg_v5
+    else if m.newBackgroundType = m.constants.ui.backgroundTypes.linearHomeScreen
+      'For when the linear page is on the homescreen
       'don't fade in the linearGradient due to 2 reasons
       '1) if the old background poster was the default background, there is no gradient, so fading in the
       '   gradient while the linear background poster fades in shows the edges of the linear background
@@ -536,7 +536,7 @@ Function transitionGradients()
       if m.leftGradient.gradientOpacity > 0.0
         m.leftGradient.fadeOutControl = "start"
         m.leftGradient.lastAnimationName = "GradientFadeOut"
-      end if
+      end if            
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.epg
       'don't fade in the linearGradient due to 2 reasons
       '1) if the old background poster was the default background, there is no gradient, so fading in the
@@ -648,10 +648,10 @@ Function startTransitionIn()
       m.newPoster.topRightTransitionInControl = "start"
       m.newPoster.lastAnimationName = "TopRightTransitionIn"
     end if
-  else if m.newBackgroundType = m.constants.ui.backgroundTypes.linear
-    'This comment will remind us to remove this section when we graduate EPG when we search for experiment name :roku_linear_epg->roku_linear_epg_v5
+  else if m.newBackgroundType = m.constants.ui.backgroundTypes.linearHomeScreen
+    'For when the linear player is on the homescreen
     m.newPoster.linearTransitionInControl = "start"
-    m.newPoster.lastAnimationName = "linearTransitionIn"
+    m.newPoster.lastAnimationName = "linearTransitionIn"  
   else if m.newBackgroundType = m.constants.ui.backgroundTypes.epg
     m.newPoster.epgTransitionInControl = "start"
     m.newPoster.lastAnimationName = "epgTransitionIn"

@@ -42,7 +42,7 @@ Function init()
   '//It is best not to check the visible state of a UI element as it may be in a transitionary state. So m.bEPGVisible is used to know what is the intention of the EPG visble state.
   '//if the EPG is visible, then bEPGVisible is true. If the closed captioning is visible (and the EPG is not), then bEPGVisible is false. If there are more than 2 states, then this boolean will need to be changed to a different kind of variable
   m.bEPGVisible = true
-  m.nDelaySeconds = .5
+  m.nDelaySeconds = 1
   m.originalEPGTranslation = m.EPGHorizontalSlide.translation
   m.slideOutEPGTranslation = [390, m.EPGHorizontalSlide.translation[1]]
   resetUI(false)
@@ -51,7 +51,7 @@ End Function
 
 
 Function onChannelFocused()
-  tubiLog("LinearVideoPlayerNewScreenOverlay.onChannelFocused")
+  tubiLog("LinearVideoPlayerScreenOverlay.onChannelFocused")
   m.top.reactedToKeyPresss = true
   populateInfoPanel(m.EPG.linearChannelFocused)
 End Function
@@ -59,7 +59,7 @@ End Function
 
 '@contentNode: program content node
 Function populateInfoPanel(contentNode)
-  tubiLog("LinearVideoPlayerNewScreenOverlay. populateInfoPanel")
+  tubiLog("LinearVideoPlayerScreenOverlay. populateInfoPanel")
   if contentNode <> invalid
     m.InfoPanel.mode = m.constants.ui.infoPanelModes.epg
     m.InfoPanel.title = contentNode.title
@@ -82,7 +82,7 @@ End Function
 
 
 Function onLinearChannelToPlayChanged(msg)
-  tubiLog("LinearVideoPlayerNewScreenOverlay.onLinearChannelToPlayChanged")
+  tubiLog("LinearVideoPlayerScreenOverlay.onLinearChannelToPlayChanged")
 
   selectedChannelUpdated = msg.getData()
   if selectedChannelUpdated = true
@@ -100,13 +100,13 @@ End Function
 
 
 Function onSideNavFocusChange()
-  tubiLog("LinearVideoPlayerNewScreenOverlay.onSideNavFocusChange")
+  tubiLog("LinearVideoPlayerScreenOverlay.onSideNavFocusChange")
   m.top.reactedToKeyPresss = true
 End Function
 
 
 Function onSideNavSelectChange()
-  tubilog("LinearVideoPlayerNewScreenOverlay.onSideNavSelectChange")
+  tubilog("LinearVideoPlayerScreenOverlay.onSideNavSelectChange")
   userInteraction = "CONFIRM"
   selectedLinearSideNavId = ""
   if m.sideNav.selectedButtonID = m.constants.ui.linearSideNavIds.cc
@@ -124,7 +124,7 @@ End Function
 
 
 Function onOverlayDisplayChange()
-  tubiLog("LinearVideoPlayerNewScreenOverlay.onOverlayDisplayChange")
+  tubiLog("LinearVideoPlayerScreenOverlay.onOverlayDisplayChange")
   if m.top.isDisplaying = false and m.top.display = true
     displayOverlay(m.top.displayWithDelay)
   else if m.firstTimeEPGLaunched = true
@@ -137,7 +137,7 @@ End Function
 
 
 Function onCCContentFocused()
-  tubiLog("LinearVideoPlayerNewScreenOverlay.onCCContentFocused")
+  tubiLog("LinearVideoPlayerScreenOverlay.onCCContentFocused")
   '//When the closed captioning layer is focused, make sure to update reactedToKeyPresss so the transport overlay does not automatically hide
   m.top.reactedToKeyPresss = true
 End Function
@@ -145,7 +145,7 @@ End Function
 
 
 Function onCCContentSelected(msg)
-  tubiLog("LinearVideoPlayerNewScreenOverlay.onCCContentSelected")
+  tubiLog("LinearVideoPlayerScreenOverlay.onCCContentSelected")
   list = msg.getRoSGNode()
   item = msg.getData()
 
@@ -199,7 +199,7 @@ End Function
 
 
 Function displayOverlay(bDelay = false)
-  tubiLog("LinearVideoPlayerNewScreenOverlay.displayOverlay")
+  tubiLog("LinearVideoPlayerScreenOverlay.displayOverlay")
   '//open the the overlay
   if m.animationHide <> invalid
     m.animationHide.unobserveField("state")
@@ -223,7 +223,7 @@ End Function
 
 
 Function hideOverlay()
-  tubiLog("LinearVideoPlayerNewScreenOverlay.hideOverlay")
+  tubiLog("LinearVideoPlayerScreenOverlay.hideOverlay")
   '//close the the overlay
   if m.animationDisplay <> invalid
     m.animationDisplay.unobserveField("state")
@@ -249,7 +249,7 @@ End Function
 
 
 Function onHideAnimationStopped()
-  tubiLog("LinearVideoPlayerNewScreenOverlay.hideAnimationStopeed")
+  tubiLog("LinearVideoPlayerScreenOverlay.hideAnimationStopeed")
   if m.animationHide.state = "stopped"
     m.animationHide.unobserveField("state")
     m.animationHide = invalid
@@ -259,7 +259,7 @@ End Function
 
 
 Function onTimeContentChange()
-  tubiLog("LinearVideoPlayerNewScreenOverlay.onTimeContentChanged")
+  tubiLog("LinearVideoPlayerScreenOverlay.onTimeContentChanged")
   if m.top.updateTimeGridContent = true
     if m.top.timeGridContent <> invalid
       m.EPG.content = m.top.timeGridContent
@@ -276,7 +276,7 @@ End Function
 
 
 Function onTimeGridContentLoadingChange()
-  tubiLog("LinearVideoPlayerNewScreenOverlay.onTimeGridContentLoadingChange")
+  tubiLog("LinearVideoPlayerScreenOverlay.onTimeGridContentLoadingChange")
   if m.top.timeGridContentLoading = true
     '//indicate that the EPG is loading
     m.EPGSpinner.visible = true
@@ -297,7 +297,7 @@ End Function
 
 ' Update the EPG so the focused item is that of the playing video.
 Function jumpEPGToCurrentPlayingVideo(shouldSendComponentInteractionEvent = false)
-  tubiLog("LinearVideoPlayerNewScreenOverlay.jumpEPGToCurrentPlayingVideo")
+  tubiLog("LinearVideoPlayerScreenOverlay.jumpEPGToCurrentPlayingVideo")
   if m.top.currentLinearVideoContent <> invalid and m.EPG.contentUpdated = true
     ' second element of the array is not used in case of EPG. So, hardcoded to empty string.
 
@@ -315,7 +315,7 @@ End Function
 
 ' reset the overlay back to the original state
 Function resetUI(bAnimated = true)
-  tubiLog("LinearVideoPlayerNewScreenOverlay.resetUI")
+  tubiLog("LinearVideoPlayerScreenOverlay.resetUI")
   m.sideNav.setOpenState = "closed"
   if m.bEPGVisible = true
     if bAnimated = true
@@ -380,7 +380,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   bKeyReacted = false
 
   if m.top.isDisplaying = true and press = true then
-    tubiLog("LinearVideoPlayerNewScreenOverlay.onKeyEvent" + key)
+    tubiLog("LinearVideoPlayerScreenOverlay.onKeyEvent" + key)
     if key = "left"
       if m.EPG.isInFocusChain() = true and m.sideNav.visible = true
         '//if the EPG has focus and the side nav is visible, then move the focus to the subtitles button

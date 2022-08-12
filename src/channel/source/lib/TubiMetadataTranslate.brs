@@ -918,33 +918,6 @@ End Function
 Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = invalid, sOrientation = "", bFullData = false, contentMode = "homeScreen")
 
   categoryParent = m.buildCategoryParentInfo(container, contentMode, sOrientation)
-  if container.type = m.contentTypes.linear
-    if m.experiments.getExperimentResource("roku_linear_epg", "roku_linear_epg_v5").update_homescreen = true
-      if container.children <> invalid and container.children.count() > 0
-        '//add a TV guide list item to the linear container children
-
-        tvGuideItem = {
-          id: m.constants.ui.contentIds.tvGuide
-          title: getTranslation("screenHome_item_tvguide_title")
-          type: "l"
-          thumbnails: ["pkg:/images/icon-tvGuide.png"]
-        }
-        '//add the TV guide content back into the raw JSON
-        if contentsJson <> invalid
-          '//::TODO:: ParseJson and FormatJson are thread blocking actions that can take some time to resolve if there are large amounts
-          '//   of data to parse/format. We have an optimization in the function tubiMetadataTranslate_getContentsJson that uses string
-          '//   manipulation methods that are built in to the firmware to extract out the contents object out of the JSON. We could
-          '//   consider doing something similar to add items to the contentsJSON as well.
-          parsedJsonTvGuide = ParseJson(contentsJson)
-          parsedJsonTvGuide[tvGuideItem.id] = tvGuideItem
-          contentsJson = FormatJSON(parsedJsonTvGuide)
-        end if
-        container.children.push(tvGuideItem.id)
-        contents[tvGuideItem.id] = tvGuideItem
-      end if
-    end if
-  end if
-
   gridItemType = m.getGridItemType(container, sOrientation, m.constants)
   categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData)
 
@@ -1562,12 +1535,6 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
   if contentToTranslate.mode <> invalid
     if contentToTranslate.mode.id = m.constants.ui.contentMode.epgScreen
       translated.id = m.constants.ui.contentIds.timeGridContent
-    else if contentToTranslate.mode.id = m.constants.ui.contentMode.sportsEPGScreen
-      translated.id = m.constants.ui.contentIds.sportsTimeGridContent
-    else if contentToTranslate.mode.id = m.constants.ui.contentMode.newsEPGScreen
-      translated.id = m.constants.ui.contentIds.newsTimeGridContent
-    else if contentToTranslate.mode.id = m.constants.ui.contentMode.entertainmentEPGScreen
-      translated.id = m.constants.ui.contentIds.entertainmentTimeGridContent
     end if
   end if
 

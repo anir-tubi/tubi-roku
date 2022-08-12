@@ -332,10 +332,6 @@ Function getTranslation_en_US()
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
       "message": "Español Disabled"
     },
-    "dialog_liveTVDisabled_title": {
-      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav live TVs menu item but the item has been disabled",
-      "message": "Live TV Disabled"
-    },
     "dialog_moviesDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
       "message": "Movies Disabled"
@@ -795,10 +791,6 @@ Function getTranslation_en_US()
     "screenTv_error_fetchScreenContent_description": {
       "description": "Onscreen message to indicate TV content could not be loaded",
       "message": "Unable to load the Tubi TV Shows screen."
-    },
-    "screenHome_item_tvguide_title": {
-      "description": "The title of the rowList item for the TV Guide. It should be in title case.",
-      "message": "TV Guide"
     },
     "screenHome_item_tvguide_subtitle": {
       "description": "The subtitle of the rowList item for the TV Guide. It should be in title case.",
@@ -1574,10 +1566,6 @@ Function getTranslation_es_MX()
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
       "message": "Español desactivado"
     },
-    "dialog_liveTVDisabled_title": {
-      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav live TVs menu item but the item has been disabled",
-      "message": "TV En Vivo Desactivado"
-    },
     "dialog_moviesDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
       "message": "Películas desactivado"
@@ -2037,10 +2025,6 @@ Function getTranslation_es_MX()
     "screenTv_error_fetchScreenContent_description": {
       "description": "Onscreen message to indicate TV content could not be loaded",
       "message": "No se pudo cargar la pantalla de series de Tubi."
-    },
-    "screenHome_item_tvguide_title": {
-      "description": "The title of the rowList item for the TV Guide. It should be in title case.",
-      "message": "Guía de TV"
     },
     "screenHome_item_tvguide_subtitle": {
       "description": "The subtitle of the rowList item for the TV Guide. It should be in title case.",

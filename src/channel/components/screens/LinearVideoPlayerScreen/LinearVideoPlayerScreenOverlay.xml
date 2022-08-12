@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<component name="LinearVideoPlayerNewScreenOverlay" extends="Group" >
-  <script type="text/brightscript" uri="LinearVideoPlayerNewScreenOverlay.brs" />
+<component name="LinearVideoPlayerScreenOverlay" extends="Group" >
+  <script type="text/brightscript" uri="LinearVideoPlayerScreenOverlay.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />

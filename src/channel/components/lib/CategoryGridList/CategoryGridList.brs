@@ -238,16 +238,9 @@ Function setRowHeights()
       rowHeight = posterHeight
       showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.linear
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
-        rowItemSize.push(m.constants.ui.imageSizes.linearExperiment)
-        rowHeightAdjustment = 70
-        rowHeight = m.constants.ui.imageSizes.linearExperiment[1]
-        numRows = 3
-      else
-        rowItemSize.push(m.constants.ui.imageSizes.linear)
-        rowHeight = m.constants.ui.imageSizes.linear[1]
-        rowHeightAdjustment = 86
-      end if
+      rowItemSize.push(m.constants.ui.imageSizes.linear)
+      rowHeight = m.constants.ui.imageSizes.linear[1]
+      rowHeightAdjustment = 86
       showRowLabel.push(true)
     else if category.gridItemType = m.constants.ui.gridItemTypes.landscape
       posterWidth = m.constants.ui.imageSizes.landscape[0]

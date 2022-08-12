@@ -972,7 +972,6 @@ Function tubiTracking_getSideNavPageMap(constants)
     if sideNavIds.channels <> invalid then map[sideNavIds.channels] = "CHANNEL"
     if sideNavIds.categories <> invalid then map[sideNavIds.categories] = "CATEGORIES"
     if sideNavIds.movies <> invalid then map[sideNavIds.movies] = "MOVIES"
-    if sideNavIds.linearTV <> invalid then map[sideNavIds.linearTV] = "NEWS"
     if sideNavIds.tv <> invalid then map[sideNavIds.tv] = "SERIES"
     if sideNavIds.espanol <> invalid then map[sideNavIds.espanol] = "ESPANOL"
     if sideNavIds.mylist <> invalid then map[sideNavIds.mylist] = "QUEUE"
@@ -982,9 +981,6 @@ Function tubiTracking_getSideNavPageMap(constants)
     if sideNavIds.kidsMode <> invalid then map[sideNavIds.kidsMode] = "KIDS"
     if sideNavIds.profile <> invalid then map[sideNavIds.profile] = "ACCOUNT"
     if sideNavIds.linearEPG <> invalid then map[sideNavIds.linearEPG] = "LINEAR"
-    if sideNavIds.sports <> invalid then map[sideNavIds.sports] = "SPORTS"
-    if sideNavIds.news <> invalid then map[sideNavIds.news] = "NEWS"
-    if sideNavIds.entertainment <> invalid then map[sideNavIds.entertainment] = "ENTERTAINMENT"
     if sideNavIds.subtitles <> invalid then map[sideNavIds.subtitles] = "SUBTITLES"
     if sideNavIds.back <> invalid then map[sideNavIds.back] = "BACK"
   end if
@@ -1000,7 +996,6 @@ Function tubiTracking_getHomePageContentModeMap(constants)
     if screenIds.homeScreen <> invalid then map[screenIds.homeScreen] = "CONTENT_MODE_UNKNOWN"
     if screenIds.movieScreen <> invalid then map[screenIds.movieScreen] = "CONTENT_MODE_MOVIE"
     if screenIds.tvScreen <> invalid then map[screenIds.tvScreen] = "CONTENT_MODE_TV"
-    if screenIds.linearTVScreen <> invalid then map[screenIds.linearTVScreen] = "CONTENT_MODE_LINEAR"
     if screenIds.epgScreen <> invalid then map[screenIds.epgScreen] = "CONTENT_MODE_LINEAR"
     if screenIds.espanolScreen <> invalid then map[screenIds.espanolScreen] = "CONTENT_MODE_LATINO"
   end if

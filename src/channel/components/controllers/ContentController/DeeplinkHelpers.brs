@@ -244,11 +244,7 @@ End Function
 
 Function fetchSingleLinearChannel()
   tubilog("deeplinkHelpers.deeplinkPlayLinearChannel")
-  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = true
-    screenId = m.constants.ui.screenIds.epgScreen
-  else
-    screenId = m.constants.ui.screenIds.linearTVScreen
-  end if
+  screenId = m.constants.ui.screenIds.epgScreen
   fetchEPGChannel(screenId, m.deeplinkContent.id, onSingleChannelFetchForDeeplinkSuccess , showDeeplinkErrorModal)
 
 End Function
@@ -277,21 +273,15 @@ Function onSingleChannelFetchForDeeplinkSuccess(successResponse, storeInCache=fa
         setInContentCache(linearContent)
       end if
 
-      'if linear EPG experiment is on, then show epg Screen for linear content
-      ' if not, then display the linear Home Screen.
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = true
-        showDefaultEPGScreen()
-        epgScreen = getFromScreenCache(m.constants.ui.screenIds.epgScreen)
-        if epgScreen.timeGridContent = invalid or epgScreen.timeGridContentLoading = true
-          epgScreen.contentIdToFocusOnLoadComplete = linearContent.id
-        end if
-        playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.epgScreen)
-        sEPGSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.epgScreen]
-      else
-        showLinearTVScreen()
-        playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.linearTVScreen)
-        sEPGSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
+      'show epg Screen for linear content
+      showDefaultEPGScreen()
+      epgScreen = getFromScreenCache(m.constants.ui.screenIds.epgScreen)
+      if epgScreen.timeGridContent = invalid or epgScreen.timeGridContentLoading = true
+        epgScreen.contentIdToFocusOnLoadComplete = linearContent.id
       end if
+      playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.epgScreen)
+      sEPGSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.epgScreen]
+
       focusSideNavOption(sEPGSideNavID)
     end if
   else
@@ -449,26 +439,15 @@ Function handleLinearDeeplinkContent()
     ' linear deeplink request has been recieved with content ID to play, so fetch and start playing the content
     if m.deeplinkContent.id <> ""
       fetchSingleLinearChannel()
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).side_nav = true
-        sCatSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.EPGScreen]
-      else
-        sCatSideNavID = m.constants.ui.sideNavIds.home
-      end if
+      sCatSideNavID = m.constants.ui.sideNavIds.home
     else
-      ' without contentId(deeplinkContentId),  just display the default epg Screen or linear TV screen.
-      if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = true
-        if m.enteredFromDeepLink = true
-          sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.epg, m.Tracking, m.trackingLoggingTask, m.constants)
-        end if
-        showDefaultEPGScreen()
-        sCatSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.EPGScreen]
-      else
-        if m.enteredFromDeepLink = true
-          sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.news, m.Tracking, m.trackingLoggingTask, m.constants)
-        end if
-        showLinearTVScreen()
-        sCatSideNavID = m.constants.ui.sideNavIds.home
+      ' without contentId(deeplinkContentId), just display the default epg Screen
+      if m.enteredFromDeepLink = true
+        sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.epg, m.Tracking, m.trackingLoggingTask, m.constants)
       end if
+      showDefaultEPGScreen()
+      sCatSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.EPGScreen]
+
     end if
     focusSideNavOption(sCatSideNavID)
   end if

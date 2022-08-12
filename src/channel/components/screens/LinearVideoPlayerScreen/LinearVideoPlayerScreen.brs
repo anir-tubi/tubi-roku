@@ -1,5 +1,5 @@
 Function init()
-  tubiLog("LineaerVideoPlayerScreen.init")
+  tubiLog("LineaerVideoPlayerNewScreen.init")
 
   ' handle BaseScreen functionality (see BaseScreen.xml)
   m.constants = getConstantsFromGlobal()
@@ -12,17 +12,15 @@ Function init()
   m._ = rodash()
   m.NodeHelpers = TubiNodeHelpers()
   m.theme = m.global.theme
+  m.ProgrammingData = m.top.findNode("ProgrammingData")
   m.Loading = m.top.findNode("Loading")
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
   m.LoadingMessage = m.top.findNode("LoadingMessage")
-  m.Transport = m.top.findNode("Transport")
   m.AdsSSAITask = m.top.findNode("PlayerAdsSSAITask")
   m.AdsSSAITask.observeField("isPlayingAds", "onAdChange")
-  m.ButtonsGroup = m.top.findNode("ButtonsGroup")
-  '//Keep the state of the transport. Is the 1st trasnport page visible? 2nd page?
-  m.nTransportState = 0
+  m.gradiantOnMinimizedState = m.top.findNode("GradiantOnMinimizedState")
 
-  m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
+  m.Video = m.top.findNode("VideoNode") ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
@@ -31,41 +29,18 @@ Function init()
 
   m.Video.timedMetaDataSelectionKeys = ["*"]
 
+
   m.top.observeField("fullscreen", "onFullScreenChange")
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("control", "onControlChange")
-  m.top.observeField("channelsContent", "onChannelGuideContentChanged")
-  m.top.observeField("pollUrl","onPollUrlChange")
-  m.top.observeField("closeTransport", "hideTransport")
+  m.top.observeField("pollUrl", "onPollUrlChange")
+  m.top.observeField("closeTransport", "hideOverlay")
+  m.top.observeField("channelTimeGridContent", "onChannelTimeGridContentChanged")
+  m.top.observeField("width", "onWidthChange")
+  m.top.observeField("height", "onHeightChange")
 
   m.logo = m.top.findNode("tubiLogo")
 
-  m.Overlay1stScreen = m.top.findNode("Overlay1stScreen")
-  m.Overlay2ndScreen = m.top.findNode("Overlay2ndScreen")
-  m.HUD = m.top.findNode("HUD")
-  m.HUDIcon = m.top.findNode("HUDIcon")
-  m.TransportGradient = m.top.findNode("TransportGradient")
-
-  '//Channel Guide Nodes
-  m.channelsGuideGroup = m.top.findNode("channelsGuideGroup")
-  m.channelsGuideGroup.observeFieldScoped("navigateWithinPageInfo", "onChannelGuideNavigateWithChange")
-  m.channelsGuideGroup.observeFieldScoped("itemFocused", "onChannelGuideContentFocused")
-  m.channelsGuideGroup.observeFieldScoped("itemSelected", "onChannelGuideContentSelected")
-  m.channelsGuideGroup.observeFieldScoped("trackingComponentInfo", "onChannelGuideAnalyticsChanged")
-
-  '//Closed Captioning Nodes
-  m.closedCaptioningGroup = m.top.findNode("closedCaptioningGroup")
-  m.closedCaptioningButtonList = m.top.findNode("closedCaptioningButtonList")
-  m.closedCaptioningButtonListBackground = m.top.findNode("closedCaptioningButtonListBackground")
-  m.closedCaptioningCloseButton = m.top.findNode("cc_close_btn")
-  m.closedCaptioningCloseButton.text = getTranslation("dialog_button_close")
-  m.closedCaptioningButtonListBackground.observeFieldScoped("rowItemSelected", "onCCContentSelected")
-  m.closedCaptioningButtonListBackground.observeFieldScoped("rowItemFocused", "onCCContentFocused")
-  m.closedCaptioningButtonListBackground.focusBitmapBlendColor = m.global.theme.focused
-
-  if m.constants.deviceInfo.scaledUi = true
-    m.closedCaptioningButtonListBackground.focusBitmapUri = "pkg://images/menu-focus-hd.9.png"
-  end if
 
   'm.VideoState is source of truth for the state of the video player for the UI
   'possible values are "play", "pause", "rew", "ffw", "stop", "refresh", "skip", "hop"
@@ -74,23 +49,8 @@ Function init()
   m.playerPosition = 0
 
   m.lastButtonPressPos = 0
-  m.transportAutoHideTime = m.constants.player.transportAutoHideTime
+  m.overlayAutoHideTime = m.constants.player.transportAutoHideTime
   m.bufferingInfo = invalid
-
-  m.GuideTitle = m.top.findNode("GuideTitle")
-  m.ButtonClose = m.top.findNode("ButtonClose")
-
-  'buttons
-  m.TransportButtons = m.top.findNode("TransportButtons")
-  m.ButtonBack = m.TransportButtons.findNode("ButtonBack")
-  m.ButtonCaptions = m.TransportButtons.findNode("ButtonCaptions")
-  m.ButtonChannels = m.TransportButtons.findNode("ButtonChannels")
-
-  m.ButtonBack.text = getTranslation("linearVideoPlayer_buttonBack")
-  m.ButtonCaptions.text = getTranslation("linearVideoPlayer_buttonCaptions")
-  m.ButtonChannels.text = getTranslation("linearVideoPlayer_buttonGuide")
-  m.GuideTitle.text = getTranslation("linearVideoPlayer_channelGuideTitle")
-  m.ButtonClose.text = getTranslation("dialog_button_close")
 
   m.lastPingTime = 0
 
@@ -100,7 +60,6 @@ Function init()
 
   if m.constants.deviceInfo.scaledUi = true then
     m.LoadingProgressBar.scaledUI = m.constants.deviceInfo.scaledUi
-    m.TransportGradient.uri = "pkg:/images/playback-gradient-hd.9.png"
   end if
 
   ' m.didAdvanceDrm holds current state regarding if playback failed, and the player is going to try the
@@ -109,11 +68,41 @@ Function init()
 
   ' the video player screen should be false until placed upon the screen stack
   m.top.visible = false
+
+  setupOverlay()
+End Function
+
+
+' set up the video player's overlay controls
+Function setupOverlay()
+  m.VideoOverlay = m.top.findNode("VideoOverlay")
+  m.VideoOverlay.observeField("reactedToKeyPresss", "onOverlayReactedToKeyPress")
+  m.VideoOverlay.observeField("closedCaptioningSelectedLanguage", "onClosedCaptioningSelected")
+  m.VideoOverlay.observeField("isDisplaying", "onVideoOverlayIsDisplayingChanged")
+  m.VideoOverlay.observeField("linearChannelToPlayUpdated", "onChannelSelectedToPlayChanged")
+  m.VideoOverlay.observeField("okPressed", "onOKPressed")
+End Function
+
+
+Function onVideoOverlayIsDisplayingChanged(msg)
+  if msg <> invalid
+    if msg.getData() = false
+      '//if the overlay is no longer displaying, then change the focus to the the player
+      m.Video.setFocus(true)
+    end if
+  end if
+End Function
+
+
+Function onChannelSelectedToPlayChanged()
+  tubiLog("LineaerVideoPlayerNewScreen.onChannelSelectedToPlayChanged")
+  m.top.channelSelected = m.VideoOverlay.linearChannelToPlay
+  m.top.ChannelSelectedUpdated = true
 End Function
 
 
 Function playContent()
-  tubiLog("LineaerVideoPlayerScreen.playContent")
+  tubiLog("LineaerVideoPlayerNewScreen.playContent")
   m.lastButtonPressPos = 0
 
   'start_live_video user event analytics
@@ -136,8 +125,8 @@ Function playContent()
     type: "start_live_video"
     values: {
       video_id: m.Video.content.id.toInt()
-      current_cdn: ""   'not possible for Roku client
-      has_subtitles: hasSubtitles  'the video player will show subtitles at start
+      current_cdn: "" 'not possible for Roku client
+      has_subtitles: hasSubtitles 'the video player will show subtitles at start
       video_resource_url: m.top.content.url
       video_resource_type: resourceType
       video_player: videoPlayerType
@@ -156,11 +145,9 @@ Function updateColors()
 End Function
 
 
-Function onContentChange() As Void
-  tubiLog("LineaerVideoPlayerScreen.onContentChange")
+Function onContentChange() as void
+  tubiLog("LineaerVideoPlayerNewScreen.onContentChange")
   m.top.state = ""
-  hideTransport()
-  stopVideo()
 
   if m.top.content <> invalid
     'set page tracking values for analytics
@@ -176,7 +163,7 @@ End Function
 
 ' needed in case the pollUrl is set via the alias prior to the AdsSSAITask being in a "ready" state
 Function onPollUrlChange()
-  tubiLog("LineaerVideoPlayerScreen.onPollUrlChange")
+  tubiLog("LineaerVideoPlayerNewScreen.onPollUrlChange")
   if m.AdsSSAITask.state <> "ready"
     m.AdsSSAITask.observeField("state", "onAdsSSAITaskStateChange")
   end if
@@ -185,7 +172,7 @@ End Function
 
 ' If an ad is playing then temporary stop showing captions
 Function onAdChange(msg)
-  tubiLog("LineaerVideoPlayerScreen.onAdChange")
+  tubiLog("LineaerVideoPlayerNewScreen.onAdChange")
   isPlayingAds = msg.getData()
   if isPlayingAds = true
     ' Send a play_progress event before we show ads to be most accurate in case the user exits during ad playback
@@ -204,7 +191,7 @@ Function onAdChange(msg)
       type: "resume_after_break"
       values: {
         video_id: m.Video.content.id.toInt()
-        position: Int(m.playerPosition * 1000)    'without Int(), can return scientific notation, causing API error
+        position: Int(m.playerPosition * 1000) 'without Int(), can return scientific notation, causing API error
       }
     })
   end if
@@ -220,7 +207,7 @@ End Function
 
 
 Function onControlChange()
-  tubiLog("LineaerVideoPlayerScreen.onControlChange " + m.top.control)
+  tubiLog("LineaerVideoPlayerNewScreen.onControlChange " + m.top.control)
   if m.top.control = "play"
     if m.top.content <> invalid
       prepareToStartVideo(m.top.content, 0)
@@ -236,7 +223,7 @@ Function onControlChange()
     resumeFromPause()
   else if m.top.control = "error"
     stopVideo()
-    m.top.errorMsg = getTranslation("videoPlayer_error_playback_description")  'is used in error modal
+    m.top.errorMsg = getTranslation("videoPlayer_error_playback_description") 'is used in error modal
     m.top.state = "error"
   end if
 End Function
@@ -244,7 +231,7 @@ End Function
 
 'Occurs when m.Video.state changes (not when m.top.state changes)
 Function onVideoStateChange(msg)
-  tubiLog("LineaerVideoPlayerScreen.onVideoStateChange, state = " + msg.GetData())
+  tubiLog("LineaerVideoPlayerNewScreen.onVideoStateChange, state = " + msg.GetData())
   state = msg.GetData()
 
   sPreviousState = m.top.state
@@ -270,7 +257,7 @@ Function onVideoStateChange(msg)
     end if
   else if state = "error"
     content = m.Video.content
-    errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo,m.Video.errorCode, m.Video.errorMsg, content)
+    errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo, m.Video.errorCode, m.Video.errorMsg, content)
     tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-playback")
     m.top.sendYouboraError = true
 
@@ -278,8 +265,8 @@ Function onVideoStateChange(msg)
     ' right after error state occurs.
     m.didAdvanceDrm = advanceDrmOnContent(content)
     if m.didAdvanceDrm <> true
-      m.top.errorMsg = getTranslation("videoPlayer_error_playback_description")  'is used in error modal
-      m.top.state = state   'triggers error modal in ContentController
+      m.top.errorMsg = getTranslation("videoPlayer_error_playback_description") 'is used in error modal
+      m.top.state = state 'triggers error modal in ContentController
     end if
   else if state = "stopped" and m.VideoState = "stop"
     ' player has stopped (not due to an ad break)
@@ -302,7 +289,9 @@ Function onVideoStateChange(msg)
     m.Loading.visible = false
     m.top.state = state
     if m.top.state = "playing" and (sPreviousState = "stopped" or sPreviousState = "") and m.top.fullscreen = true
-      showTransport(true)
+      if m.VideoOverlay.timeGridContentLoading = false and m.VideoOverlay.timeGridContent <> invalid and m.top.associatedScreenID = m.constants.ui.screenIds.homeScreen
+        showOverlay(true)
+      end if
     end if
   else
     m.LoadingProgressBar.progress = 0
@@ -323,12 +312,10 @@ Function onVideoPositionChange()
     m.AdsSSAITask.videoPosition = m.Video.position
   end if
 
-  ' Auto hide transport
-  if m.VideoState = "play" and m.nTransportState > 0 and m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime and m.channelsGuideGroup.scrollingStatus <> true
-    '//After some time has elapsed and the channel guide isn't currently visible and loading, then hide the transport
-    hideTransport()
+  if m.VideoState = "play" and m.VideoOverlay <> invalid and m.VideoOverlay.isDisplaying = true and m.playerPosition > m.lastButtonPressPos + m.overlayAutoHideTime and m.VideoOverlay.epgScrollingStatus = false
+    '//After some time has elapsed and the channel guide isn't currently visible and loading, then hide the overlay
+    hideOverlay()
   end if
-
 
   ' Analytics
   if m.playerPosition >= m.lastPingTime + m.analyticsInterval
@@ -350,11 +337,35 @@ End Function
 
 
 Function onFullScreenChange()
-  if m.top.fullscreen = true and m.top.state = "playing"
-    '//Display transport when the playing video goes fullscreen
-    showTransport(true)
+  if m.top.fullscreen = true
+    m.gradiantOnMinimizedState.visible = false
+    hideProgrammingData()
+
+    if m.top.state = "playing"
+      ' // display overlay only if user landed on full screen from homescreen. If user landed here from EPG Screen, then do not show overlay.
+      if m.top.associatedScreenID = m.constants.ui.screenIds.homeScreen
+        if m.VideoOverlay.timeGridContentLoading = false and m.VideoOverlay.timeGridContent <> invalid and m.top.associatedScreenID = m.constants.ui.screenIds.homeScreen
+          '//Set the showOverlay() function's param to true to display on delay so player has time to animate into fullscreen and user has time to view the player w/o an overlay
+          showOverlay(true)
+        end if
+      end if
+    end if
+  else
+    m.gradiantOnMinimizedState.visible = true
+    '//Display program data when minimized (if it is available)
+    setMinimizedInfoPanelProgrammingDataWithChannelTimeGridContent()
   end if
   trackFullScreen(m.top.fullscreen)
+End Function
+
+
+Function onWidthChange()
+  m.gradiantOnMinimizedState.width = m.top.width
+  End Function
+
+
+  Function onHeightChange()
+  m.gradiantOnMinimizedState.height = m.top.height
 End Function
 
 
@@ -369,7 +380,7 @@ Function trackFullScreen(bFullScreen)
       type: "fullscreen_toggle"
       values: {
         video_id: m.top.content.id.toInt()
-        toggle_state: toggleState  'ToggleState enum
+        toggle_state: toggleState 'ToggleState enum
       }
     })
   end if
@@ -392,21 +403,21 @@ End Function
 
 
 Function onCaptionModeChange()
-  tubiLog("LineaerVideoPlayerScreen.onCaptionModeChange")
+  tubiLog("LineaerVideoPlayerNewScreen.onCaptionModeChange")
 
-  hideTransport()
-  '//update the closed captions UI. It may look the same but the enabled icon may be different
+  hideOverlay()
+  ' update the closed captions UI. It may look the same but the enabled icon may be different
   createContentForClosedCaptioning()
 
   if m.Video.globalCaptionMode = "On"
     toggleState = "ON"
-  else  'handles "Off", "Instant replay", and "When mute"
+  else 'handles "Off", "Instant replay", and "When mute"
     toggleState = "OFF"
   end if
 
   if m.Video.content <> invalid then
     language = "UNKNOWN"
-    for i=0 to m.Video.availableSubtitleTracks.count()-1
+    for i = 0 to m.Video.availableSubtitleTracks.count() - 1
       trackInfo = m.Video.availableSubtitleTracks[i]
       if m.Video.subtitleTrack = trackInfo.TrackName
         if trackInfo.language = "eng"
@@ -430,16 +441,17 @@ Function onCaptionModeChange()
       type: "subtitles_toggle"
       values: {
         video_id: m.Video.content.id.toInt()
-        toggle_state: toggleState  'ToggleState enum
-        language_code: language  'LanguageCode enum
+        toggle_state: toggleState 'ToggleState enum
+        language_code: language 'LanguageCode enum
       }
     })
   end if
 End Function
 
 
+
 Function createContentForClosedCaptioning()
-  tubiLog("LineaerVideoPlayerScreen.createContentForClosedCaptioning")
+  tubiLog("LineaerVideoPlayerNewScreen.createContentForClosedCaptioning")
   bCaptionsAvailable = false
   availableSubtitleTracks = m.Video.availableSubtitleTracks
   if availableSubtitleTracks <> invalid and availableSubtitleTracks.Count() > 0
@@ -448,11 +460,6 @@ Function createContentForClosedCaptioning()
 
 
   if bCaptionsAvailable = true
-    if m.NodeHelpers.getChildIndex(m.ButtonsGroup, m.ButtonCaptions) < 0
-      '//add captions button if it had previously been removed
-      m.ButtonsGroup.insertChild(m.ButtonCaptions, 1)
-      m.ButtonCaptions.visible = true
-    end if
     root = CreateObject("roSGNode", "ContentNode")
     row = root.createChild("ContentNode")
 
@@ -468,7 +475,7 @@ Function createContentForClosedCaptioning()
         bEnabled = false
         if bCaptionsOn = true
           if m.Video.subtitleTrack = track.trackname
-          '//Get the enabled state of language
+            '//Get the enabled state of language
             bEnabled = true
           end if
         end if
@@ -477,24 +484,10 @@ Function createContentForClosedCaptioning()
         row.appendChild(content)
       end if
     end for
-    m.closedCaptioningButtonList.content = root
 
-    backgroundCaptionsContent = root.clone(true)
-    for i=0 to backgroundCaptionsContent.getChild(0).getChildCount()-1
-      clonedCaptionNode = backgroundCaptionsContent.getChild(0).getChild(i)
-      clonedCaptionNode.isForeground = false
-    end for
-
-    for i=0 to backgroundCaptionsContent.getChildCount()-1
-      clonedCaptionNode = backgroundCaptionsContent.getChild(i)
-    end for
-
-    m.closedCaptioningButtonListBackground.content = backgroundCaptionsContent
-    centerClosedCaptioning()
+    m.VideoOverlay.closedCaptioningItems = root
   else
-    '//Remove the captions button since there are no captions
-    m.ButtonCaptions.visible = false
-    m.ButtonsGroup.removeChild(m.ButtonCaptions)
+    m.VideoOverlay.closedCaptioningItems = invalid
   end if
 End Function
 
@@ -530,16 +523,16 @@ Function onBufferingStatus(msg)
 End Function
 
 
-Function trackEvent(event As Object)
+Function trackEvent(event as object)
   m.global.trackingLoggingTask.trackEvent = event
 End Function
 
 
 'exit the video player due to back button while no transport displaying, or during ad break
 Function backButtonExit()
-  m.nTransportState = 0
   m.top.backButtonPressed = true
-  animateTransport("out", 0, 0)
+  m.VideoOverlay.animationDuration = 0
+  m.VideoOverlay.display = false
 End Function
 
 
@@ -551,7 +544,8 @@ Function prepareToStartVideo(content, drmIndex)
   m.AdsSSAITask.content = content
   m.AdsSSAITask.updateContent = true
 
-  m.top.content = content  'sends content to video node and makes current content available to contentController
+  m.VideoOverlay.currentLinearVideoContent = content
+  m.top.content = content 'sends content to video node and makes current content available to contentController
   m.top.sendVideoTrackingStart = true
 End Function
 
@@ -568,7 +562,7 @@ End Function
 
 
 Function stopVideo()
-  tubiLog("LineaerVideoPlayerScreen.stopVideo")
+  tubiLog("LineaerVideoPlayerNewScreen.stopVideo")
   m.VideoState = "stop"
   ' add check so that onVideoStateChange doesn't get called
   ' if the video is already in a non playing state.
@@ -577,38 +571,34 @@ Function stopVideo()
   end if
 End Function
 
-
 Function pauseVideo()
-  tubiLog("LinearVideoPlayerScreen.pauseVideo not implemented yet")
+  tubiLog("LineaerVideoPlayerNewScreen.pauseVideo not implemented yet")
 End Function
 
 
 Function resumeFromPause()
-  tubiLog("LinearVideoPlayerScreen.resumeFromPause not implemented yet")
+  tubiLog("LineaerVideoPlayerNewScreen.resumeFromPause not implemented yet")
 End Function
 
 
 ' Set video player state based on passed in content
 ' @content: TubiContentNode
-Function updateVideoPlayerState(content) as Void
+Function updateVideoPlayerState(content) as void
   if type(content) <> "roSGNode" then return
 
   ' make the content available to the video node
   m.Video.content = content
 
-  '//Update the channel icon here
-  m.HUDIcon.uri = m.top.content.inlineLogoUri
-
-  '//Update the closed captioning
+  ' Update the closed captioning
   createContentForClosedCaptioning()
 End Function
 
 
 Function advanceDrmOnContent(contentNode)
-  tubiLog("LineaerVideoPlayerScreen.advanceDrmOnContent")
+  tubiLog("LineaerVideoPlayerNewScreen.advanceDrmOnContent")
   nextIndex = 0
   if contentNode.drmType <> ""
-    for i=0 to contentNode.videoResources.count()-1
+    for i = 0 to contentNode.videoResources.count() - 1
       resource = contentNode.videoResources[i]
       if contentNode.drmType = resource.type
         nextIndex = i + 1
@@ -748,7 +738,7 @@ Function getPlayProgressEvent()
       type: "live_play_progress"
       values: {
         video_id: m.Video.content.id.toInt()
-        view_time: Int((m.playerPosition - m.lastPingTime) * 1000)   'ms
+        view_time: Int((m.playerPosition - m.lastPingTime) * 1000) 'ms
         video_player: videoPlayerType
       }
     }
@@ -758,246 +748,152 @@ Function getPlayProgressEvent()
 End Function
 
 
-'show transport
-Function showTransport(bDelay = false)
+'show the overlay
+Function showOverlay(bDelay = false)
   m.lastButtonPressPos = m.playerPosition
-  if m.nTransportState = 0
-    m.nTransportState = 1
-  end if
-  m.Transport.opacity = 1.0
-  m.Transport.translation = [0,0]
-  m.TransportGradient.opacity = 1.0
-  nDelay = 0
-  if bDelay = true
-    nDelay = .5
-  end if
-  animateTransport("in", nDelay)
+  m.VideoOverlay.displayWithDelay = bDelay
+  m.VideoOverlay.animationDuration = .15
+  m.VideoOverlay.display = true
 End Function
 
 
-' Hide all transports and return to video
-Function hideTransport()
-  animateTransport("out")
-  close2ndScreen()
-  m.nTransportState = 0
+' Hide the overlay
+Function hideOverlay()
+  m.VideoOverlay.display = false
 End Function
 
 
-'aggregates all the animation for showing/hiding the transport
-'@direction: string, value may be "out" or "in"
-Function animateTransport(direction, nDelay = 0, nDuration = 0.6)
-  tubiLog("LineaerVideoPlayerScreen.AnimateTransport, direction = " + direction)
-  slideFade(m.HUD, "below", direction, 0.6, nDelay)
-  slideFade(m.HUDIcon, "above", direction, 0.6, nDelay)
-  fade(m.Overlay1stScreen, direction, nDuration, nDelay)
-End Function
-
-
-'aggregates all the animation for showing/hiding the channel guide
-'@direction: string, value may be "out" or "in"
-Function animateGuide(direction, nDelay = 0, nDuration = 0.6)
-  tubiLog("LineaerVideoPlayerScreen.animateGuide, direction = " + direction)
-  slideFade(m.channelsGuideGroup, "left", direction, 0.6, nDelay)
-  fade(m.Overlay2ndScreen, direction, nDuration, nDelay)
-End Function
-
-
-Function displayChannelGuide()
-  animateGuide("in")
-
-  if m.top.channelsContent = invalid or shouldRefresh(m.top.channelsContent.getChild(0)) = true
-    m.top.refreshChannels = true
-    m.channelsGuideGroup.display = false
-  else
-    displayChannelGuideList()
+' display the programming data
+Function displayProgrammingData()
+  '//if already visible, then no need to display it
+  if m.ProgrammingData.opacity <= 0
+    '//Set End Position
+    m.ProgrammingData.translation = [0, m.top.height]
+    '//Animate m.ProgrammingData into end position
+    slideFade(m.ProgrammingData, "above", "in", .25, .5)
   end if
 End Function
 
 
-Function hideChannelGuide()
-  m.top.displayingChannelGuide = false
-  animateGuide("out")
+Function hideProgrammingData()
+  m.ProgrammingData.opacity = 0
 End Function
 
 
-Function displayClosedCaptioning()
-  m.closedCaptioningButtonListBackground.setFocus(true)
-  m.closedCaptioningButtonListBackground.setFocus(false) ' workaround for roku focus indicator bug
-  m.closedCaptioningButtonListBackground.setFocus(true)  ' workaround for roku focus indicator bug
+' When the TimeGridContent for a channel has been loaded, then display it in the minmized info panel
+Function onChannelTimeGridContentChanged()
+  setMinimizedInfoPanelProgrammingDataWithChannelTimeGridContent()
+End Function
 
-  ' preselect the caption option that the user currently has enabled
-  nJumpTo = 0
-  if m.closedCaptioningButtonListBackground.content <> invalid and m.closedCaptioningButtonListBackground.content.getChildCount() > 0
-    captions = m.closedCaptioningButtonListBackground.content.getChild(0)
-    for i = 0 to captions.getChildCount()-1
-      caption = captions.getChild(i)
-      if caption.enabled = true
-        nJumpTo = i
+
+' Set the minimized info panel using m.top.channelTimeGridContent
+Function setMinimizedInfoPanelProgrammingDataWithChannelTimeGridContent()
+  hideProgrammingData()
+
+  if m.top.channelTimeGridContent <> invalid and m.top.content <> invalid and m.top.content.id = m.top.channelTimeGridContent.id
+    'if in minimized state and video playing
+    if m.top.fullscreen = false and m.top.state = "playing" and m.top.channelTimeGridContent <> invalid and m.top.channelTimeGridContent.getChildCount() > 0
+
+      programData1 = invalid
+      programData2 = invalid
+      sProgramTitle1 = ""
+      nMinutesLeftOfProgram1 = -1
+      nDurationOfProgram1 = -1
+      sProgramTitle2 = ""
+      sStartTimeProgram2 = ""
+
+      '//go thru the program guide to get the latest 2 programs
+      for i = 0 to m.top.channelTimeGridContent.getChildCount() - 1
+        programCheck = m.top.channelTimeGridContent.getChild(i)
+        if programCheck <> invalid
+          if isProgramLive(programCheck) = true
+            programData1 = programCheck
+            if (i+1) < m.top.channelTimeGridContent.getChildCount()
+              programData2 = m.top.channelTimeGridContent.getChild(i+1)
+            end if
+            exit for
+          end if
+        end if
+      end for
+
+      if programData1 <> invalid and programData1.title <> invalid
+        '//First, the check that the programData1 is valid. If it is not, then no need to go on as it would look weird to display programData2 w/o displaying programData1
+        sProgramTitle1 = programData1.title
+        if programData1.endTime <> invalid and programData1.endTime > 0
+
+          now = getCurrentLocalTime()
+          nMinutesLeftOfProgram1 = convertSecondsToMins(programData1.endTime - now)
+          if programData1.startTime <> invalid and programData1.startTime > 0
+            nDurationOfProgram1 = convertSecondsToMins(programData1.endTime - programData1.startTime)
+          end if
+
+          if programData2 <> invalid
+            if programData2.title <> invalid and programData2.startTime <> invalid and programData2.startTime > 0
+              sProgramTitle2 = programData2.title
+              sStartTimeProgram2 = programData2.ShortDescriptionLine1
+            end if
+          end if
+        end if
       end if
-    end for
-    m.closedCaptioningButtonListBackground.jumpToRowItem = [0, nJumpTo]
-  end if
 
-  animateClosedCaptioning("in")
-End Function
+      setMinimizedInfoPanelProgrammingData(sProgramTitle1, sProgramTitle2, nMinutesLeftOfProgram1, nDurationOfProgram1, sStartTimeProgram2)
 
-
-'aggregates all the animation for showing/hiding the closed captioning
-'@direction: string, value may be "out" or "in"
-Function animateClosedCaptioning(direction, nDelay = 0, nDuration = 0.6)
-  tubiLog("LineaerVideoPlayerScreen.animateClosedCaptioning, direction = " + direction)
-  slideFade(m.closedCaptioningGroup, "below", direction, 0.6, nDelay)
-  fade(m.Overlay2ndScreen, direction, nDuration, nDelay)
-End Function
-
-
-Function centerClosedCaptioning()
-  nSpacing = m.closedCaptioningButtonList.rowItemSpacing[0][0]
-  nItemWidth = m.closedCaptioningButtonList.rowItemSize[0][0]
-  nItems = m.closedCaptioningButtonList.content.getChild(0).getChildCount()
-  nListWidth = (nItems * nItemWidth) + ((nItems-1) * nSpacing)
-
-  nCenterPointX = (1920-nListWidth)/2
-  m.closedCaptioningButtonList.translation = [nCenterPointX, m.closedCaptioningButtonList.translation[1]]
-  m.closedCaptioningButtonListBackground.translation = [nCenterPointX, m.closedCaptioningButtonList.translation[1]]
-End Function
-
-
-
-Function onChannelGuideContentChanged()
-  tubiLog("LinearVideoPlayerScreen.onChannelGuideContentChanged()")
-  if m.nTransportState = 2 and m.channelsGuideGroup.opacity > 0
-    if m.top.channelsContent <> invalid and m.top.channelsContent.getChildCount() > 0
-      '//Display channel guide
-      displayChannelGuideList(m.top.channelsContent)
     end if
   end if
 End Function
 
 
-Function onCCContentFocused()
-  tubiLog("LinearVideoPlayerScreen.onCCContentFocused")
-  '//When the closed captioning layer is focused, make sure to update lastButtonPressPos so the transport overlay does not automatically hide
-  m.lastButtonPressPos = m.playerPosition
+
+' Set the minimized info panel with the passed parameters
+' @param program1: String - The title of the 1st program in the lineup
+' @param program2: String - The title of the 2nd program in the lineup
+' @param minutesLeft: integer - The Number of minutes before the current program switches to the next program
+' @param currentDuration: integer - The Number of minutes of the duration of the current program
+' @param time: string - The start time of the 2nd program
+Function setMinimizedInfoPanelProgrammingData(program1 = "", program2 = "", minutesLeft = -1, currentDuration = -1, time = "" )
+  metadata = {
+    channelURI: m.top.content.inlineLogoUri
+    title1: program1
+    title2: program2
+    minutesLeft: minutesLeft
+    currentDuration: currentDuration
+    time: time
+    }
+  m.ProgrammingData.metadata = metadata
+
+  displayProgrammingData()
 End Function
 
 
 
-Function onCCContentSelected(msg)
-  tubiLog("LinearVideoPlayerScreen.onCCContentSelected")
-  list = msg.getRoSGNode()
-  item = msg.getData()
+' When the overlay reacts to the key press, then ensure the timer that hides the overlay gets prolonged
+Function onOverlayReactedToKeyPress()
+  m.lastButtonPressPos = m.playerPosition
+End Function
 
-  hideTransport()
-  itemContent = list.content.getChild(item[0]).getChild(item[1])
+
+Function onClosedCaptioningSelected()
   '//::NOTE:: - When  m.Video.globalCaptionMode is changed, it triggers an observer which will change the enabled status of the closed captioning UI options
-  if itemContent.trackname <> invalid and itemContent.trackname <> ""
-    if itemContent.trackname = "off"
-      m.Video.globalCaptionMode = "Off"
-    else
-      m.Video.subtitleTrack = itemContent.trackname
-      m.Video.globalCaptionMode = "On"
-    end if
+  if m.VideoOverlay.closedCaptioningSelectedLanguage <> invalid and m.VideoOverlay.closedCaptioningSelectedLanguage <> ""
+    m.Video.subtitleTrack = m.VideoOverlay.closedCaptioningSelectedLanguage
+    m.Video.globalCaptionMode = "On"
+  else
+    m.Video.globalCaptionMode = "Off"
   end if
 End Function
 
 
-Function onChannelGuideNavigateWithChange()
-  m.top.navigateWithinPageInfo = m.channelsGuideGroup.navigateWithinPageInfo
-End function
-
-
-Function onChannelGuideContentFocused()
-  tubiLog("LinearVideoPlayerScreen.onChannelGuideContentFocused")
-  '//When the guide is focused, make sure to update lastButtonPressPos so the transport overlay does not automatically hide
-  m.lastButtonPressPos = m.playerPosition
-End Function
-
-
-Function onChannelGuideContentSelected(msg)
-  tubiLog("LinearVideoPlayerScreen.onChannelGuideContentSelected")
-  channel = msg.getData()
-  hideTransport()
-
-  if channel.id <> m.top.content.id
-    '//if user does not select the channel that is playing, then report the new channel.
-    m.top.channelSelected = channel
-  end if
-End Function
-
-
-Function onChannelGuideAnalyticsChanged()
-  m.top.trackingComponentInfo = m.channelsGuideGroup.trackingComponentInfo
-End Function
-
-
-Function displayChannelGuideList(content = invalid)
-  if content <> invalid
-    m.channelsGuideGroup.content = content
-    m.channelsGuideGroup.contentUpdated = true
-  end if
-  m.channelsGuideGroup.jumpToID = m.top.content.id
-  m.channelsGuideGroup.display = true
-
-  m.top.displayingChannelGuide = true
-  m.top.userDisplayingChannelGuide = true
-End Function
-
-
-Function close2ndScreen()
-  if m.Overlay2ndScreen.opacity > 0
-    '//hide all 2nd screens and put focus back on video player
-    if m.top.fullscreen = true
-      m.Video.setFocus(true)
-    end if
-    hideChannelGuide()
-    animateClosedCaptioning("out")
-  end if
-End Function
-
-
-Function onKeyEvent(key As String, press As Boolean) as Boolean
+Function onKeyEvent(key as string, press as boolean) as boolean
   if press and m.top.fullscreen = true
     tubiLog("LinearVideoPlayerScreen.onKeyEvent key = " + key)
     m.lastButtonPressPos = m.playerPosition
-    if m.nTransportState = 2
-      '//2nd HUD screen is visible
-      if key = "back" or (m.closedCaptioningGroup.opacity > 0 and key = "down") or (m.channelsGuideGroup.opacity > 0 and key = "left")
-        if (m.top.displayingChannelGuide = true)
-          '//Report that the user is purposely closing the channel guide
-          m.top.userDisplayingChannelGuide = false
-        end if
-        '//Close the 2nd screen
-        close2ndScreen()
-        animateTransport("in")
-        m.nTransportState = 1
-      end if
-    else if m.nTransportState = 1
-      '//root HUD screen is visible
-      if key = "back"
-        'close the transport
-        animateTransport("out")
-        m.nTransportState = 0
-      else if key = "left"
-        backButtonExit()
-      else if key = "right"
-        displayChannelGuide()
-        animateTransport("out")
-        m.nTransportState = 2
-      else if key = "up" and m.ButtonCaptions.visible = true
-        '//If the closed captions option is available, then open that overlay
-        displayClosedCaptioning()
-        animateTransport("out")
-        m.nTransportState = 2
-      end if
-    else
+    if m.VideoOverlay.isDisplaying <> true
       '//only the video player is visible
       if key = "back"
         backButtonExit()
       else if m.top.state = "playing"
         '// Any button should wake the overlays as long as the video is playing
-        m.nTransportState = 1
-        showTransport()
+        showOverlay()
       end if
     end if
 
@@ -1008,4 +904,13 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   ' Allow unconsumed keypress to trickle up to ContentController, which is using
   ' keypresses to reset an inactivity timer
   return false
+End Function
+
+
+' dismiss the epg when ok is pressed on live program
+Function onOKPressed()
+  item = m.VideoOverlay.rowItemfocused
+  if item <> invalid and item.count() = 2 and item[1] = 0
+    hideOverlay()
+  end if
 End Function

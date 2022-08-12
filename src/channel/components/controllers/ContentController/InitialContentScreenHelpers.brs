@@ -87,17 +87,9 @@ Function displayFirstContentScreen(sSelectedID)
   sideNavIds = m.constants.ui.sideNavIds
   sideNavFocus = sideNavIds.home
 
-  if sSelectedID = sideNavIds.linearTV
-    epgExperiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false)
+  if sSelectedID = sideNavIds.linearEPG
     sideNavFocus = sideNavIds.home
-    if epgExperiment.enabled = true
-      showDefaultEPGScreen()
-      if epgExperiment.side_nav = true
-        sideNavFocus = sideNavIds.linearEPG
-      end if
-    else
-      showLinearTVScreen()
-    end if
+    showDefaultEPGScreen()
   else if sSelectedID = sideNavIds.kidsMode
     sideNavFocus = sideNavIds.home
     setUiMode(m.constants.ui.modes.kids)

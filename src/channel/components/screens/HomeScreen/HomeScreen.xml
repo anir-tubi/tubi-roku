@@ -63,7 +63,7 @@
       <!-- Indicates if that when the server is contacted, it should indicate that the app is in kidsMode. -->
       <field id="shouldKidsModeBeSentToServer" type="boolean" alias="CategoryGridList.shouldKidsModeBeSentToServer"/>
 
-      <!--LinearTV is allowed in topNav if parental control is set to adult and also liveTV not part of sideNav.-->
+      <!--LinearTV is allowed in topNav if parental control is set to adult.-->
       <field id="isLinearTVAllowedInTopNav" type="boolean"/>
 
       <field id="animateToCategory" alias="CategoryGridList.animateToCategory" />

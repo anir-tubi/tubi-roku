@@ -7,15 +7,12 @@ Function init()
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("stringSignIn", "onSignInChange")
   m.top.observeFieldScoped("displayEspanol", "onEspanolDisplayChanged")
-  m.top.observeFieldScoped("displayLinearTV", "onLinearTVDisplayChanged")
-  m.top.observeFieldScoped("displayLinearEPG","onLinearEPGDisplayChanged")
   m.top.observeFieldScoped("displayMoviesTV", "onMovieTVDisplayChanged")
   m.top.observeFieldScoped("displayChannels", "onChannelsDisplayChanged")
   m.top.observeFieldScoped("displaySignIn", "onSignInDisplayChanged")
   m.top.observeFieldScoped("displayKids", "onKidsDisplayChanged")
   m.top.observeFieldScoped("espanolItemTurnedOn", "onEspanolItemTurnedOnChanged")
   m.top.observeFieldScoped("kidsItemTurnedOn", "onKidsItemTurnedOnChanged")
-  m.top.observeFieldScoped("linearEPGTurnedOn", "onLinearEPGTurnedOnChanged")
   m.top.observeFieldScoped("uiMode", "onUiModeChanged")
   m.top.observeFieldScoped("opened", "onOpenedChanged")
   m.top.observeFieldScoped("itemRequested", "onItemRequested")
@@ -72,9 +69,6 @@ Function createMainContent(item)
   else if item = m.constants.ui.sideNavIds.espanol
     contentNode.title = "Español"
     contentNode.iconUrl = "pkg:/images/sideNavEspanol.png"
-  else if item = m.constants.ui.sideNavIds.linearEPG
-    contentNode.title = getTranslation("menu_livetv")
-    contentNode.iconUrl = "pkg:/images/sideNavLinearTV.png"
   else if item = m.constants.ui.sideNavIds.myList
     contentNode.title = getTranslation("menu_mylist")
     contentNode.iconUrl = "pkg:/images/icon-add-to-queue.webp"
@@ -125,38 +119,20 @@ Function onCreateMenuItems()
   m.mainItems = m.top.findNode("mainItems")
   m.mainItemsSelected = m.top.findNode("mainItemsSelected")
 
-  if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).enabled = true
-    menuItems = [
-      m.constants.ui.sideNavIds.profile
-      m.constants.ui.sideNavIds.kidsMode
-      m.constants.ui.sideNavIds.search
-      m.constants.ui.sideNavIds.linearEPG
-      m.constants.ui.sideNavIds.home
-      m.constants.ui.sideNavIds.movies
-      m.constants.ui.sideNavIds.tv
-      m.constants.ui.sideNavIds.myList
-      m.constants.ui.sideNavIds.categories
-      m.constants.ui.sideNavIds.channels
-      m.constants.ui.sideNavIds.espanol
-      m.constants.ui.sideNavIds.settings
-      m.constants.ui.sideNavIds.exit
-    ]
-  else
-    menuItems = [
-      m.constants.ui.sideNavIds.profile
-      m.constants.ui.sideNavIds.kidsMode
-      m.constants.ui.sideNavIds.search
-      m.constants.ui.sideNavIds.home
-      m.constants.ui.sideNavIds.movies
-      m.constants.ui.sideNavIds.tv
-      m.constants.ui.sideNavIds.myList
-      m.constants.ui.sideNavIds.categories
-      m.constants.ui.sideNavIds.channels
-      m.constants.ui.sideNavIds.espanol
-      m.constants.ui.sideNavIds.settings
-      m.constants.ui.sideNavIds.exit
+  menuItems = [
+    m.constants.ui.sideNavIds.profile
+    m.constants.ui.sideNavIds.kidsMode
+    m.constants.ui.sideNavIds.search
+    m.constants.ui.sideNavIds.home
+    m.constants.ui.sideNavIds.movies
+    m.constants.ui.sideNavIds.tv
+    m.constants.ui.sideNavIds.myList
+    m.constants.ui.sideNavIds.categories
+    m.constants.ui.sideNavIds.channels
+    m.constants.ui.sideNavIds.espanol
+    m.constants.ui.sideNavIds.settings
+    m.constants.ui.sideNavIds.exit
   ]
-  end if
 
   ' Creates roSGNode dynamically
   m.MenuItemIDs = menuItems
@@ -257,32 +233,6 @@ Function onEspanolDisplayChanged()
   else
     ' Display the menu item if it should be displayed
     insertMenuItemInMenuLists(m.constants.ui.sideNavIds.espanol)
-  end if
-End Function
-
-
-' Hide the live TV item if this is called
-Function onLinearTVDisplayChanged()
-  if m.top.displayLinearTV = false
-    '//Remove line TV if those items should be hidden.
-    removeLinearTV()
-    verticallyCenterSideNav()
-  else
-    ' Display the menu item if it should be displayed
-    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.linearTV)
-  end if
-End Function
-
-
-'Hide the linear EPG
-Function onLinearEPGDisplayChanged()
-  if m.top.displayLinearEPG = false
-    '//Remove line TV if those items should be hidden.
-    removeLinearEPG()
-    verticallyCenterSideNav()
-  else
-    ' Display the menu item if it should be displayed
-    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.linearEPG)
   end if
 End Function
 
@@ -399,13 +349,6 @@ Function onEspanolItemTurnedOnChanged()
 End Function
 
 
-Function onLinearEPGTurnedOnChanged()
-  if m.linearEPGContent <> invalid
-    m.linearEPGContent.turnedOn = m.top.linearEPGTurnedOn
-  end if
-End Function
-
-
 Function onKidsItemTurnedOnChanged()
   if m.kidsModeContent <> invalid
     m.kidsModeContent.turnedOn = m.top.kidsItemTurnedOn
@@ -431,8 +374,6 @@ Function onUiModeChanged()
     removeTv()
     removeChannels()
     removeEspanol()
-    removeLinearTV()
-    removeLinearEPG()
     removeMyList()
     verticallyCenterSideNav()
     m.sideNavBackground.uri = m.constants.ui.uris.sideNavBackground_kidsMode
@@ -442,8 +383,6 @@ Function onUiModeChanged()
     if m.moviesContent <> invalid then m.moviesContent.turnedOn = true
     if m.tvContent <> invalid then m.tvContent.turnedOn = true
     if m.espanolContent <> invalid then m.espanolContent.turnedOn = true
-    if m.linearTVContent <> invalid then m.linearTVContent.turnedOn = true
-    if m.linearEPGContent <> invalid then m.linearEPGContent.turnedOn = true
     if m.kidsModeContent <> invalid then m.kidsModeContent.title = getTranslation("menu_kids")
     m.sideNavBackground.uri = ""
   else if m.top.uiMode = m.constants.ui.modes.standard
@@ -452,8 +391,6 @@ Function onUiModeChanged()
     if m.moviesContent <> invalid then m.moviesContent.turnedOn = true
     if m.tvContent <> invalid then m.tvContent.turnedOn = true
     if m.espanolContent <> invalid then m.espanolContent.turnedOn = true
-    if m.linearTVContent <> invalid then m.linearTVContent.turnedOn = true
-    if m.linearEPGContent <> invalid then m.linearEPGContent.turnedOn = true
     if m.kidsModeContent <> invalid
       m.kidsModeContent.turnedOn = true
       m.kidsModeContent.title = getTranslation("menu_kids")
@@ -471,8 +408,6 @@ Function setCommonSideNavKidsValues()
   if m.moviesContent <> invalid then m.moviesContent.turnedOn = false
   if m.tvContent <> invalid then m.tvContent.turnedOn = false
   if m.espanolContent <> invalid then m.espanolContent.turnedOn = false
-  if m.linearTVContent <> invalid then m.linearTVContent.turnedOn = false
-  if m.linearEPGContent <> invalid then m.linearEPGContent.turnedOn = false
   if m.kidsModeContent <> invalid then m.kidsModeContent.title = getTranslation("menu_exitKids")
   m.sideNavBackground.uri = m.constants.ui.uris.sideNavBackground_kidsMode
 End Function
@@ -546,30 +481,6 @@ Function removeEspanol()
   if m.espanolContentSelect <> invalid
     m.MainContentSelect.removeChild(m.espanolContentSelect)
     m.espanolContentSelect = invalid
-  end if
-End Function
-
-
-Function removeLinearTV()
-  if m.linearTVContent <> invalid
-    m.MainContent.removeChild(m.linearTVContent)
-    m.linearTVContent = invalid
-  end if
-  if m.linearTVContentSelect <> invalid
-    m.MainContentSelect.removeChild(m.linearTVContentSelect)
-    m.linearTVContentSelect = invalid
-  end if
-End Function
-
-
-Function removeLinearEPG()
-  if m.linearEPGContent <> invalid
-    m.MainContent.removeChild(m.linearEPGContent)
-    m.linearEPGContent = invalid
-  end if
-  if m.linearEPGContentSelect <> invalid
-    m.MainContentSelect.removeChild(m.linearEPGContentSelect)
-    m.linearEPGContentSelect = invalid
   end if
 End Function
 

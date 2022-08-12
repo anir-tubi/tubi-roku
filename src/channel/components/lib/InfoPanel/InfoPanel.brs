@@ -491,15 +491,15 @@ Function onModeChange()
     m.Offset.appendChild(m.TwoLineInfo)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.itemSpacings = [25, 18]
-  else if m.top.mode = m.constants.ui.infoPanelModes.linear and getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).update_homescreen = true
-    m.Offset.itemSpacings = [25, 15]
-  else if m.top.mode = m.constants.ui.infoPanelModes.linear
+  else if m.top.mode = m.constants.ui.infoPanelModes.linearHomeScreen
+    '//For when the linear player is on the homepage
     m.Offset.appendChild(m.LiveVideoIndicator)
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.DescriptionGroup)
     m.Offset.appendChild(m.PlayerCountdownGroup)
     m.Offset.itemSpacings = [25,15]
   else if m.top.mode = m.constants.ui.infoPanelModes.epg
+    '//For when the linear player is on its own EPG page
     m.infoPanelGroup.insertChild(m.HeaderImage,0)
     m.Offset.appendChild(m.TitleGroup)
     m.Offset.appendChild(m.TwoLineInfo)

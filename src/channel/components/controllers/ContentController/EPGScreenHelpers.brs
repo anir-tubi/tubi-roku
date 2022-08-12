@@ -36,12 +36,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     displayDefaultBackground()  ' clear background from previous screens until epgscreen loads
     showHideSpinner(true)
 
-    if getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false).side_nav = true
-      epgScreen = CreateObject("roSGNode", "EPGScreen")
-    else
-      epgScreen = CreateObject("roSGNode", "EPGHomeScreen")
-    end if
-
+    epgScreen = CreateObject("roSGNode", "EPGHomeScreen")
     epgScreen.observeFieldScoped("backgroundUriList", "onEPGScreenBackgroundChange")
     epgScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     epgScreen.observeFieldScoped("programGuideNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
@@ -56,7 +51,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     epgScreen.observeFieldScoped("epgScreenOkPressed", "onEPGScreenOKPressed")
     epgScreen.signedIn = isLoggedInUser()
 
-    '//::TODO:: epg - remove this observer once the roku_linear_epg_v5 experiment is done
+    '//::TODO:: remove this observer once the roku_registration_subtext_homegrid experiments are done
     epgScreen.observeField("focusedChild", "onEPGScreenFocusChange")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop lsitenting to timer before listing to it in case a previous screen started the timer
@@ -91,16 +86,12 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
 End Function
 
 
+
+'//::TODO:: remove this function once the roku_registration_subtext_homegrid experiments are done
 Function onEPGScreenFocusChange(msg)
   tubiLog("EPGScreenHelpers.onEPGScreenFocusChange")
   epgScreen = msg.getRoSGNode()
   if epgScreen <> invalid and epgScreen.isInFocusChain() = true
-    '//Fire experiment exposure event when the EPG Screen is focused - just in case there is a deep link to linear content
-    '//::TODO NOTE:: delete this function once the experiment is over
-    if m.deeplinkContent = invalid
-      getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", true)
-    end if
-
     if isLoggedInUser() = false
       getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", true)
       getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", true)
@@ -112,22 +103,10 @@ End Function
 '//Refresh the content and the enabling of the top nav of the epg screen
 Function refreshEPGScreen(epgScreen)
   tubiLog("EPGScreenHelpers.refreshEPGscreen")
-  mode = ""
-  epgChannelList = invalid
-  if epgScreen.id = m.constants.ui.screenIds.sportsEPGScreen
-    mode = m.constants.ui.contentMode.sportsEPGScreen
-    epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.sports
-  else if epgScreen.id = m.constants.ui.screenIds.newsEPGScreen
-    mode = m.constants.ui.contentMode.newsEPGScreen
-    epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.news
-  else if epgScreen.id = m.constants.ui.screenIds.entertainmentEPGScreen
-    mode = m.constants.ui.contentMode.entertainmentEPGScreen
-    epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.entertainment
-  else
-    mode = m.constants.ui.contentMode.epgScreen
-    epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.linearEPG
-    epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
-  end if
+  mode = m.constants.ui.contentMode.epgScreen
+  epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.linearEPG
+  epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
+
 
   if epgChannelList = invalid or (epgChannelList <> invalid and shouldRefresh(epgChannelList.getChild(0)) = true)'There is no cached contents
     setEPGScreenLoading(epgScreen)
@@ -535,27 +514,6 @@ Function showDefaultEPGScreen(componentToFocus = "")
 End Function
 
 
-' @componentToFocus: string, one of the values in constants.ui.epgScreen.focusItems
-Function showSportsEPGScreen(componentToFocus = "")
-  tubiLog("EPGScreenHelpers.showSportsEPGScreen")
-  showEPGScreen(m.constants, m.constants.ui.screenIds.sportsEPGScreen, componentToFocus)
-End Function
-
-
-' @componentToFocus: string, one of the values in constants.ui.epgScreen.focusItems
-Function showNewsEPGScreen(componentToFocus = "")
-  tubiLog("EPGScreenHelpers.showNewsEPGScreen")
-  showEPGScreen(m.constants, m.constants.ui.screenIds.newsEPGScreen, componentToFocus)
-End Function
-
-
-' @componentToFocus: string, one of the values in constants.ui.epgScreen.focusItems
-Function showEntertainmentEPGScreen(componentToFocus = "")
-  tubiLog("EPGScreenHelpers.showEntertainmentEPGScreen")
-  showEPGScreen(m.constants, m.constants.ui.screenIds.entertainmentEPGScreen, componentToFocus)
-End Function
-
-
 Function onLoadAllEPGChannels(msg)
   tubiLog("EPGScreenHelpers.onLoadAllEPGChannels")
   epgScreen = msg.getRoSGNode()
@@ -608,12 +566,7 @@ End Function
 
 Function isAnEpgScreen(screen)
   tubiLog("EPGScreenHelpers.isAnEpgScreen")
-  experiment = getExperimentResource("roku_linear_epg", "roku_linear_epg_v5", false)
-  if experiment.side_nav = true
-    return screen.isSubType("EPGScreen")
-  else
-    return screen.isSubType("EPGHomeScreen")
-  end if
+  return screen.isSubType("EPGHomeScreen")
 End Function
 
 
@@ -621,12 +574,7 @@ End Function
 ' @sID: string, the id of a screen component
 Function isAnEPGScreenID(sID)
   tubiLog("EPGScreenHelpers.isAnEPGScreenID")
-  bReturn = false
-  if sID = m.constants.ui.screenIds.epgScreen or sID = m.constants.ui.screenIds.sportsEPGScreen or sID = m.constants.ui.screenIds.newsEPGScreen or sID = m.constants.ui.screenIds.entertainmentEPGScreen
-    bReturn = true
-  end if
-
-  return bReturn
+  return (sID = m.constants.ui.screenIds.epgScreen)
 End Function
 
 
