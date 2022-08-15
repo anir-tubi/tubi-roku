@@ -89,15 +89,14 @@ Function createMainContent(item)
       contentNode.title = signTxt
     end if
 
-    if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", false).subtext_sidenav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_sidenav = true
-      if contentNode.title = signTxt  'if title is 'SignIn', that means, user has signed out=>set subtext also 'SignIn'
-        contentNode.shortDescriptionLine1 = signTxt
-        contentNode.ShortDescriptionLine2 = getTranslation("registration_signup_button_free")
-      else
-        contentNode.shortDescriptionLine1 = "" 'If title is not "SignIn" but something like 'hi user' then user has signedIn and no need to show subtext
-        contentNode.ShortDescriptionLine2 = ""
-      end if
+    if contentNode.title = signTxt  'if title is 'SignIn', that means, user has signed out=>set subtext also 'SignIn'
+      contentNode.shortDescriptionLine1 = signTxt
+      contentNode.ShortDescriptionLine2 = getTranslation("registration_signup_button_free")
+    else
+      contentNode.shortDescriptionLine1 = "" 'If title is not "SignIn" but something like 'hi user' then user has signedIn and no need to show subtext
+      contentNode.ShortDescriptionLine2 = ""
     end if
+
 
     contentNode.iconUrl = "pkg:/images/icon-sign-in.webp"
   else if item = m.constants.ui.sideNavIds.settings
@@ -148,14 +147,10 @@ Function onCreateMenuItems()
   m.mainItemsSelected.numRows = 12
   m.mainItems.itemSpacing = [0,24]
   m.mainItemsSelected.itemSpacing = [0,24]
-  if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", false).subtext_sidenav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_sidenav = true
-    'this is to accommodate spanish signIn text + free Icon
-    m.mainItems.itemSize = [467,60]
-    m.mainItemsSelected.itemSize = [467,60]
-  else
-    m.mainItems.itemSize = [397,60]
-    m.mainItemsSelected.itemSize = [397,60]
-  end if
+  'this is to accommodate spanish signIn text + free Icon
+  m.mainItems.itemSize = [467,60]
+  m.mainItemsSelected.itemSize = [467,60]
+
   m.itemGroups.translation = [0,40]
   m.mainItems.wrapDividerBitmapUri = ""
   m.mainItemsSelected.wrapDividerBitmapUri = ""
@@ -178,17 +173,15 @@ End Function
 Function onSignInChange()
   if m.profileContent <> invalid
     m.profileContent.title = m.top.stringSignIn
-    if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", false).subtext_sidenav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_sidenav = true
-
-      signTxt = getTranslation("menu_signIn")
-      if m.profileContent.title = signTxt
-        m.profileContent.shortDescriptionLine1 = signTxt
-        m.profileContent.shortDescriptionLine2 = getTranslation("registration_signup_button_free")
-      else
-        m.profileContent.shortDescriptionLine1 = ""
-        m.profileContent.shortDescriptionLine2 = ""
-      end if
+    signTxt = getTranslation("menu_signIn")
+    if m.profileContent.title = signTxt
+      m.profileContent.shortDescriptionLine1 = signTxt
+      m.profileContent.shortDescriptionLine2 = getTranslation("registration_signup_button_free")
+    else
+      m.profileContent.shortDescriptionLine1 = ""
+      m.profileContent.shortDescriptionLine2 = ""
     end if
+
   end if
 End Function
 
@@ -536,7 +529,7 @@ Function onOpenedChanged()
       list = m.top.findNode(m.itemSelectedRemembered.list)
       index = getIndexByID(list, m.itemSelectedRemembered.id)
       list.jumpToItem = index
-      
+
       if list.id = m.mainItems.id
         '//make sure the other mainItemsSelected matches with  mainItems
         m.mainItemsSelected.jumpToItem = index

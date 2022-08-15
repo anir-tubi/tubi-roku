@@ -8,7 +8,6 @@ Function init()
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("height", "onHeightChange")
   m.top.observeField("active", "onActiveChange")
-  m.sidenavSubtxtExp = getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", false).subtext_sidenav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_sidenav = true
   m.sideIconLabel = invalid
 End Function
 
@@ -22,17 +21,15 @@ Function onContentChange(data)
   if item <> invalid then
     m.Icon.uri = item.iconUrl
     m.Label.text = item.title
-    if m.sidenavSubtxtExp = true
-      if item.shortDescriptionLine1 <> invalid
-        m.subTxt.text = item.shortDescriptionLine1
-        if m.subTxt.text <> ""
-          'subTxt needs to be centered on the sideNav. Center position of the subtext calculated using safezone start point(114) + center point of the profile icon.
-          subTxtCenterPt = (114 + (m.Icon.boundingRect().width / 2)) - ( m.subTxt.boundingRect().width / 2 )
-          m.subTxt.translation = [subTxtCenterPt, 52]
-        end if
-      else
-        m.subTxt.text = ""
+
+    if item.shortDescriptionLine1 <> invalid
+      m.subTxt.text = item.shortDescriptionLine1
+      if m.subTxt.text <> ""
+        'subTxt needs to be centered on the sideNav. Center position of the subtext calculated using safezone start point(114) + center point of the profile icon.
+        subTxtCenterPt = (114 + (m.Icon.boundingRect().width / 2)) - ( m.subTxt.boundingRect().width / 2 )
+        m.subTxt.translation = [subTxtCenterPt, 52]
       end if
+
 
       'add free icon next to Label when sideNav is open
       if item.shortDescriptionLine2 <> invalid
@@ -76,22 +73,22 @@ Function onActiveChange()
   if m.top.itemContent.active = true
     if m.top.itemContent.turnedOn <> false
       m.Icon.opacity = 1
-      if m.sidenavSubtxtExp = true
-        m.subTxt.opacity = 0
-        if m.sideIconLabel <> invalid
-          m.sideIconLabel.opacity = 1
-        end if
+
+      m.subTxt.opacity = 0
+      if m.sideIconLabel <> invalid
+        m.sideIconLabel.opacity = 1
       end if
+
       fade(m.Label, "in", .1)
     else
       '// if the item is not enabled, then still don't bring up the opacity
       m.Icon.opacity = .31
-      if m.sidenavSubtxtExp = true
-        m.subTxt.opacity = 0.8
-        if m.sideIconLabel <> invalid
-          m.sideIconLabel.opacity = 1
-        end if
+
+      m.subTxt.opacity = 0.8
+      if m.sideIconLabel <> invalid
+        m.sideIconLabel.opacity = 1
       end if
+
       fade(m.Label, "in", .1, 0, .31)
     end if
   else
@@ -100,20 +97,18 @@ Function onActiveChange()
     '//The selected item should appear bolder
     if m.top.itemContent.selected = true
       m.Icon.opacity = 1
-      if m.sidenavSubtxtExp = true
-        m.subTxt.opacity = 0
-        if m.sideIconLabel <> invalid
-          m.sideIconLabel.opacity = 0
-        end if
+      m.subTxt.opacity = 0
+      if m.sideIconLabel <> invalid
+        m.sideIconLabel.opacity = 0
       end if
     else
       m.Icon.opacity = .31
-      if m.sidenavSubtxtExp = true
-        m.subTxt.opacity = 0.8
-        if m.sideIconLabel <> invalid
-          m.sideIconLabel.opacity = 0
-        end if
+
+      m.subTxt.opacity = 0.8
+      if m.sideIconLabel <> invalid
+        m.sideIconLabel.opacity = 0
       end if
+
     end if
   end if
 End Function

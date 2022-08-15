@@ -19,8 +19,8 @@ Function TubiExperiments(constants) as Object
     ' }
     '
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
-    
-    defaultResources: { 
+
+    defaultResources: {
       '//Experiment to test what happens when previously played linear video is lauched when the app is relaunched
       '// When enabled is set to "true", the "resetTiming" determines when the last linear channel ID is reset back to an empty value
       '//   - "linearstop" = When the linear video is no longer playing in fullscreen
@@ -46,15 +46,6 @@ Function TubiExperiments(constants) as Object
       roku_regist_enhanced_onboarding: {
         roku_enhanced_onboarding_v1: {"enabled": false}
       }
-
-      roku_registration_subtext_homegrid: {
-        roku_registration_subtext_homegrid_recommended: {"subtext_recommended": true}
-        roku_registration_subtext_homegrid_topnav: {"subtext_topnav": false}
-        roku_registration_subtext_homegrid_sidenav: {"subtext_sidenav": true}
-        ' roku_registration_subtext_homegrid_sidenav, roku_registration_subtext_homegrid_topnav, roku_registration_subtext_homegrid_recommended, experiments are present at a time.
-        roku_registration_subtext_homegrid_all: {"subtext_sidenav": false, "subtext_topnav": false, "subtext_recommended": false}
-      }
-
 
       ' enabled = true : after the video preview of the selected title ends, the user sees the hero image again.
       ' autostart = true : after the video preview of the selected title ends, the user sees the title start autoplaying in full screen mode.

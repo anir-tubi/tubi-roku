@@ -62,21 +62,18 @@ Function onContentChange()
 
     m.CategoryName.width = 1000
     m.subText.visible = false
-    'to clean roku_registration_subtext_homegrid, remove entire if/else
-    'to graaduate roku_registration_subtext_homegrid, just remove line if getExperimentResource("roku_r...
+
     if item.subtext <> invalid and item.subtext <> ""
       authInfo = getFieldFromGlobal("authInfo")
       if (authInfo = invalid or (authInfo <> invalid and authInfo.userId = invalid))  'signedOut user or new user
-        if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_recommended", true).subtext_recommended = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_recommended = true
-          'recalculate the width of the rowlabel. This is required because Spanish titles might be different width than english.
-          m.CategoryName.width = 0
-          m.CategoryName.text = item.title
-          width = m.CategoryName.boundingRect().width + 25
-          m.CategoryName.width = width
-          m.subText.text = item.subtext
-          m.subText.translation = [width, 5]
-          m.subText.visible = true
-        end if
+        'recalculate the width of the rowlabel. This is required because Spanish titles might be different width than english.
+        m.CategoryName.width = 0
+        m.CategoryName.text = item.title
+        width = m.CategoryName.boundingRect().width + 25
+        m.CategoryName.width = width
+        m.subText.text = item.subtext
+        m.subText.translation = [width, 5]
+        m.subText.visible = true
       end if
     end if
 

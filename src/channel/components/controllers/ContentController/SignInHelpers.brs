@@ -498,9 +498,6 @@ Function onSideNavSignInCompleted()
   setContentToRefreshAllPersonalizedScreens()
 
   refreshAllDetailScreens()
-  if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_topnav = true
-    refreshAllHomeScreenTopNav()
-  end if
   setSideNavSignedInItem(m.global.authInfo)
 
   ' this happens when a user signs out or user signs in from the side nav or from settings side nav
@@ -595,9 +592,6 @@ Function onQueueAfterSignIn()
 
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
-  if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_topnav = true
-    refreshAllHomeScreenTopNav()
-  end if
 
   if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
     currentScreen.removeSignupButton = true
@@ -632,9 +626,6 @@ Function onRegistrationProcessCompletedOnDetailsScreen()
     currentScreen.refreshContent = true
     currentScreen.setFocus(true)
     currentScreen.jumpToItem = 0
-    if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_topnav = true
-      refreshAllHomeScreenTopNav()
-    end if
   end if
 End Function
 
@@ -686,9 +677,6 @@ Function onSideNavMyListAfterSignIn()
     ' this happens when user logs in via categoryDetailsScreen (queue/mylist)
     content = CreateObject("roSGNode", "CategoryContentNode")
     content.id = m.constants.ui.categoryIds.queue
-    if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_topnav = true
-      refreshAllHomeScreenTopNav()
-    end if
     fetchCategoryDetails(content)
     setContentToRefreshAllPersonalizedScreens()
   else
@@ -704,9 +692,6 @@ Function onAutoplayPreviewAfterSignIn()
 
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
-  if getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_topnav = true
-    refreshAllHomeScreenTopNav()
-  end if
 
   if currentScreen <> invalid and currentScreen.getSubtype() = "SettingsScreen"
     setSettingsScreenSignInInfo()

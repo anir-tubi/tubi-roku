@@ -193,14 +193,7 @@ Function refreshAllHomeScreenTopNav()
   for i = 0 to m.screenStack.getChildCount() - 1
     screen = m.screenStack.getChild(i)
     if screen.subType() = "HomeScreen"
-      isLoggedIn = isLoggedInUser()
-      'screen.signedIn is not always notify field. In case of Parental Control,  refresh will not tigger.
-      if screen.signedIn <> invalid and screen.signedIn <> isLoggedIn and (getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_topnav = true)
-        screen.signedIn = isLoggedIn 'refresh will happen on observer callback
-      else
-        refreshHomescreenTopNav(screen)
-      end if
-
+      refreshHomescreenTopNav(screen)
     end if
   end for
 End Function

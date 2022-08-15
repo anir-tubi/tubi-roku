@@ -51,9 +51,6 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     epgScreen.observeFieldScoped("epgScreenOkPressed", "onEPGScreenOKPressed")
     epgScreen.signedIn = isLoggedInUser()
 
-    '//::TODO:: remove this observer once the roku_registration_subtext_homegrid experiments are done
-    epgScreen.observeField("focusedChild", "onEPGScreenFocusChange")
-
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop lsitenting to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
 
@@ -83,20 +80,6 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
   end if
 
   m.totalNumEPGBatches = 0 ' good practice to initialize m. scope variable in init functions
-End Function
-
-
-
-'//::TODO:: remove this function once the roku_registration_subtext_homegrid experiments are done
-Function onEPGScreenFocusChange(msg)
-  tubiLog("EPGScreenHelpers.onEPGScreenFocusChange")
-  epgScreen = msg.getRoSGNode()
-  if epgScreen <> invalid and epgScreen.isInFocusChain() = true
-    if isLoggedInUser() = false
-      getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", true)
-      getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", true)
-    end if
-  end if
 End Function
 
 

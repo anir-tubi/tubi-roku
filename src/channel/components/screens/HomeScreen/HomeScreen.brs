@@ -168,9 +168,6 @@ Function generateTopNavContentItems(includeLinearTV = false)
 
     if id = m.constants.ui.sideNavIds.home
       item.title = getTranslation("menu_foryou")
-      if m.top.signedIn = false and m.top.enableTopNav = true and (getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", true).subtext_topnav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_topnav = true)
-        item.title = getTranslation("menu_epg_all")
-      end if
     else if id = m.constants.ui.sideNavIds.movies
       item.title = getTranslation("menu_movies")
     else if id = m.constants.ui.sideNavIds.tv

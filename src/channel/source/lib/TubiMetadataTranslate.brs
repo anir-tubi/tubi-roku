@@ -1007,7 +1007,7 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, contentMode = 
       gridItemType: ""
       subtext: ""
     }
-    'TODO Remove this if "roku_registration_subtext_homegrid"->"roku_registration_subtext_homegrid_recommended" does not get graduated
+
     m.categorySubtexts  = {}
     m.categorySubtexts[m.constants.ui.categoryIds.recommendedForYou] = getTranslation("registration_signIn_recommended")
 
@@ -1040,7 +1040,6 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, contentMode = 
     else
       updateMetadata.validUntil = Uptime(0) + m.constants.cacheTimes.category
     end if
-    'TODO Remove this if "roku_registration_subtext_homegrid"->"roku_registration_subtext_homegrid_recommended" does NOT get graduated
     updateMetadata.subtext = m.categorySubtexts[container.id]
 
   end if

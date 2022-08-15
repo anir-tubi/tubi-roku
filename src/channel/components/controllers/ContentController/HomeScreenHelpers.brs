@@ -63,9 +63,6 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     homeScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
 
-    '//::TODO:: remove this observer once the roku_registration_subtext_homegrid experiments are done
-    homeScreen.observeField("focusedChild", "onHomeScreenFocusChange")
-
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
 
@@ -105,21 +102,6 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     pushScreen(homeScreen, true, false)
   end if
 End Function
-
-
-
-Function onHomeScreenFocusChange(msg)
-  tubiLog("HomeScreenHelpers.onHomeScreenFocusChange")
-  screen = msg.getRoSGNode()
-  if screen <> invalid and screen.isInFocusChain() = true
-    if isLoggedInUser() = false
-      getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_sidenav", true)
-      getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", true)
-    end if
-  end if
-
-End Function
-
 
 
 Function homeBatchResponse(response)
@@ -363,9 +345,8 @@ Function setEnableTopNavOnHomescreen(homeScreen)
   if homeScreen <> invalid
     isPCAdult = isParentalControlsAdultLevel()
 
-    if homeScreen.isLinearTVAllowedInTopNav <> isPCAdult 
+    if homeScreen.isLinearTVAllowedInTopNav <> isPCAdult
       preState = homeScreen.isLinearTVAllowedInTopNav
-      
       homeScreen.isLinearTVAllowedInTopNav = (isPCAdult = true)
       if preState <> homeScreen.isLinearTVAllowedInTopNav
         refreshNeeded = true
@@ -381,10 +362,6 @@ Function setEnableTopNavOnHomescreen(homeScreen)
 
     if homeScreen.enableTopNav <> bTopNavAllowed
       homeScreen.enableTopNav = bTopNavAllowed
-      refreshNeeded = true
-    end if
-
-    if homeScreen.signedIn <> isLoggedInUser() and (getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_topnav", false).subtext_topnav = true or getExperimentResource("roku_registration_subtext_homegrid", "roku_registration_subtext_homegrid_all", false).subtext_topnav = true)
       refreshNeeded = true
     end if
   end if
@@ -857,7 +834,7 @@ Function stopCountdownTimer()
   if homeScreen <> invalid
     homeScreen.fullscreenCountdown = -1
   end if
-    
+
   epgScreen = getFromScreenCache(m.constants.ui.screenIds.epgScreen)
   if epgScreen <> invalid
     epgScreen.fullscreenCountdown = -1
