@@ -562,7 +562,7 @@ Function startUserExperience()
       ' show on-boarding screens only for new users (guest)
       showOnBoardingWelcomeScreen()
     else
-      '//When starting the app again, check if the last played linear video should play      
+      '//When starting the app again, check if the last played linear video should play
       sLastLinearID = getOverrideLinearId()
       if isNonEmptyString(sLastLinearID) = true
         '//If a linear video should automatically play....
@@ -1465,9 +1465,7 @@ Function getBackgroundtype(backgroundUriList, contentType = "")
       backgroundType = m.constants.ui.backgroundTypes.fullScreen
     else if backgroundUriList[0] = m.marketingBackgroundUri
       backgroundType = m.constants.ui.backgroundTypes.marketingScreen
-    else if contentType = m.constants.ui.contentTypes.linear
-      backgroundType = m.constants.ui.backgroundTypes.linearHomeScreen
-    else if contentType = m.constants.ui.contentTypes.epg
+    else if contentType = m.constants.ui.contentTypes.linear or contentType = m.constants.ui.contentTypes.epg
       backgroundType = m.constants.ui.backgroundTypes.epg
     else
       backgroundType = m.constants.ui.backgroundTypes.topRight
@@ -1630,47 +1628,47 @@ End Function
 Function onCustomResume(msg)
   tubiLog("ContentController.onCustomResume")
   args = msg.getData()
-  
+
   lastSuspendOrResumeReason = invalid
   customResumeLaunchParams = invalid
   bRestartApp = false
   bStartChannel = false
   sLastLinearID = ""
-  
+
   if args <> invalid
     customResumeLaunchParams = args.launchParams
     lastSuspendOrResumeReason = args.lastSuspendOrResumeReason
   end if
-  
+
   if lastSuspendOrResumeReason = "home" and customResumeLaunchParams <> invalid
     currentScreen = getCurrentScreen()
     bLinearVideoOverride = false
-    '//When starting the app again, check if the last played linear video should play      
+    '//When starting the app again, check if the last played linear video should play
     sLastLinearID = getOverrideLinearId()
 
-    
+
     if isNonEmptyString(sLastLinearID) = true
       '//If a previously played, overriding linear video exists, then check for another condition to see if the linear video should override the instant resume process
       if currentScreen <> invalid and (currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen or currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen or currentScreen.id = m.constants.ui.screenIds.detailScreen)
-        '//If the previous app state was playing a video or displaying on a detail screen, 
-        '//   then the user should be taken back to that on Instant Resume 
+        '//If the previous app state was playing a video or displaying on a detail screen,
+        '//   then the user should be taken back to that on Instant Resume
         '//   rather than playing a previous linear video
         bLinearVideoOverride = false
       else
         bLinearVideoOverride = true
       end if
     end if
-    
+
     ' User coming back to app via instant resume is considered as returning user
     m.global.isNewUser = false
-    
+
     lastAppSuspendInSecs = m.appSuspendTimer.TotalSeconds()
     lastAppRestartInDays = m.lastAppRestartTimer.TotalSeconds() / 24 / 60 / 60
-    
+
     if m.Request = invalid
       m.Request = TubiRequest(m.constants.settings)
     end if
-    
+
     if (customResumeLaunchParams.contentId <> invalid and customResumeLaunchParams.mediaType <> invalid) or customResumeLaunchParams.page <> invalid
       ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates
       ' lots of edge cases, so for consistency, restarting the app is easiest.
@@ -1747,19 +1745,19 @@ Function onCustomResume(msg)
 End Function
 
 
-' Has the App registered before that it has played a linear video? 
+' Has the App registered before that it has played a linear video?
 Function hasLinearVideoPlayed() as Boolean
   bRegistryValue = RegRead(m.constants.registryIDs.hasLinearVideoPlayed, m.constants.registrySectionIDs.lastPlayedLinearSectionId)
   return (bRegistryValue = "true")
 End Function
 
 
-' Get the ID of the previously played linear video if it should be played. If no linear channel had been prevuouysly been 
+' Get the ID of the previously played linear video if it should be played. If no linear channel had been prevuouysly been
 ' played OR if it is not the right conditions to play the video, then return an empty string
 Function getOverrideLinearId() as String
   sLastLinearIDReturn =  ""
   if hasLinearVideoPlayed() = true
-    '//If the registry indicates that a linear has ever played, then dispatch an experiment exposure event. 
+    '//If the registry indicates that a linear has ever played, then dispatch an experiment exposure event.
     '//Once the experiment is over, then this check of the registry variable and the registry variable itself can be eliminated.
 
     if getExperimentResource("roku_relaunch_linear", "roku_relaunch_linear_v1", true).enabled = true
@@ -1780,29 +1778,29 @@ End Function
 Function resumeToLinearVideo(sVideoID, fnFailSafeFunction)
   fetchEPGChannel(m.constants.ui.screenIds.epgScreen, sVideoID, onSingleChannelFetchForLinearRelaunchSuccess , fnFailSafeFunction)
 End Function
-  
 
-' This is the fail safe startChannel function to be called if the previously played linear video could not be played 
+
+' This is the fail safe startChannel function to be called if the previously played linear video could not be played
 Function startChannelFromAppLoad(response = invalid)
   startChannel()
   showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary
 End Function
 
 
-' This is the fail safe startChannel function to be called if the previously played linear video could not be played 
+' This is the fail safe startChannel function to be called if the previously played linear video could not be played
 Function startChannelFromInstantResume(response = invalid)
   sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
   startChannel()
 End Function
 
 
-' This is the fail safe restartApp function to be called if the previously played linear video could not be played 
+' This is the fail safe restartApp function to be called if the previously played linear video could not be played
 Function restartAppFromInstantResume(response = invalid)
   restartApp()
 End Function
 
 
-' When the app loads or instantly resumes, then sometimes it will try to launch a previously played linear video. This function is used 
+' When the app loads or instantly resumes, then sometimes it will try to launch a previously played linear video. This function is used
 ' when the call to get the linear channel info is a success.
 ' @param successResponse, The response from the server
 ' @param _storeInCache, This secondary param is not used but it is required for a calback of fetchEPGChannel()
@@ -1822,7 +1820,7 @@ Function onSingleChannelFetchForLinearRelaunchSuccess(successResponse, _storeInC
   else
     restartApp()
   end if
-End Function 
+End Function
 
 
 

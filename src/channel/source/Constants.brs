@@ -881,7 +881,6 @@ Function getConstants()
       constants.ui.backgroundTypes.fullScreen = "fullscreen"
       constants.ui.backgroundTypes.topRight = "topright"
       constants.ui.backgroundTypes.feature = "feature"
-      constants.ui.backgroundTypes.linearHomeScreen = "linearHomeScreen"
       constants.ui.backgroundTypes.epg = "epg"
       constants.ui.backgroundTypes.marketingScreen = "marketingScreen"
       constants.ui.backgroundTypes.rightScreen = "rightScreen"

@@ -192,10 +192,7 @@ Function maximizeLinearPlayer(content)
     if videoPlayer.fullscreen = false
       '//stop the background artwork from transitioning and from displaying while player is in fullscreen. We can't use shouldRotateBackgrounds because we still need the gradients from backgroundGroup
       sBackgroundType = m.constants.ui.backgroundTypes.epg
-      if isCurrentScreenHomeScreen() = true
-        sBackgroundType = m.constants.ui.backgroundTypes.linearHomeScreen
-      end if
-      
+
       m.backgroundGroup.backgroundInfo = {
         type: sBackgroundType
         uriList: []
@@ -450,7 +447,7 @@ Function repositionLinearVideoPlayerToMaxState(bAnimate)
     if bAnimate = true
       nDuration = .6
     end if
-    
+
     clearMinimizedLinearPlayerAnimation()
     resizeToLocation(videoPlayer, 1920, 1080, [0,0], nDuration)
   end if
@@ -469,18 +466,12 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
 
     linearPlayerParentGroup = m.LinearPlayerGroup
     currentScreen = getCurrentScreen()
-    if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.homeScreen
-      nWidth = m.constants.ui.imageSizes.linearVideoPlayer_minimizedDimension[0]
-      nHeight = m.constants.ui.imageSizes.linearVideoPlayer_minimizedDimension[1]
-      nPosition = m.constants.ui.imageTranslations.linearVideoPlayer_minimizedTranslation
-      m.LinearVideoPlayerSpinner.translation = [1576, 660]
-    else
-      '//then the screen is coming from the EPG Screen
-      nWidth = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[0]
-      nHeight = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[1]
-      nPosition = m.constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation
-      m.LinearVideoPlayerSpinner.translation = [1260, 320]
-    end if
+
+    nWidth = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[0]
+    nHeight = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[1]
+    nPosition = m.constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation
+    m.LinearVideoPlayerSpinner.translation = [1260, 320]
+
 
     linearPlayerParentGroup.appendChild(videoPlayer)
 
@@ -784,7 +775,7 @@ Function onLinearChannelSelectedFromGuide(msg)
   tubiLog("LinearVideoPlayerScreenHelpers.onLinearChannelSelectedFromGuide")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   channel = videoPlayer.channelSelected
-    
+
   'this flag is used to differenciate whether a channel is always played or only played if it is different than whats already playing.
   ' In case of EPG we do not want to attempt to play the channel which is already playing full screen.
   playProvidedChannel = true
