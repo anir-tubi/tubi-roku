@@ -413,8 +413,9 @@ End Function
 
 
 Function onComponentFocus()
-  tubiLog("ContentController.onComponentFocus")
-  if m.top.isInFocusChain() and m.top.hasFocus()
+  if m.top.hasFocus() = true then
+    ' If this is called outside the if it will get called every focus change in the entire application so moving in here
+    tubiLog("ContentController.onComponentFocus")
     if m.SideNav.opened = true
       displayNavMenu()
     else if getCurrentScreen() <> invalid
