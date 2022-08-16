@@ -58,7 +58,7 @@ Function init()
 
   m.screenStack = m.top.findNode("ScreenStack")
   m.screenStack.observeFieldScoped("isEmpty", "onScreenStackEmpty")
-  m.screenStack.observeFieldScoped("current", "onScreenChange")
+  m.screenStack.observeFieldScoped("currentUpdated", "onScreenChange")
 
   ' the screen cache holds the top level screens in memory so they are not recreated and reloaded unecessarily
   m.cache = TubiCache(m.NodeHelpers, m.constants.ui.cacheableScreenIds, m.constants.ui.permanentlyCachedContentIds)

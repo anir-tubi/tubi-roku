@@ -26,6 +26,7 @@ Function onPop()
   newCurrent = getCurrent()
   if newCurrent <> invalid
     m.top.current = newCurrent
+    m.top.currentUpdated = true
     newCurrent.setFocus(true)
     newCurrent.visible = true
   else
@@ -73,6 +74,7 @@ Function onPush(msg)
 
     m.top.appendChild(newChild)
     m.top.current = newChild
+    m.top.currentUpdated = true
     if newChild.shouldFocusWhenPushed <> false
       newChild.setFocus(true)
     end if
@@ -109,6 +111,7 @@ Function onClearStack()
   end while
 
   m.top.current = invalid
+  m.top.currentUpdated = true
 End Function
 
 

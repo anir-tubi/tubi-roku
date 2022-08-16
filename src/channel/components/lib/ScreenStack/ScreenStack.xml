@@ -21,7 +21,7 @@
   <script type="text/brightscript" uri="ScreenStack.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
-  
+
   <interface>
     <!-- INPUTS -->
       <!-- add a screen to the top of the stack -->
@@ -45,8 +45,12 @@
 
       <!-- the top most screen in the stack -->
       <field id="current" type="node" />
+
+      <!--set when top most screen has changed-->
+      <field id="currentUpdated" type="boolean" alwaysNotify="true" />
+
   </interface>
-        
+
     <children />
 
 </component>

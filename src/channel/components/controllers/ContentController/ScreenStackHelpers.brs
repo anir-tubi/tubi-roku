@@ -211,8 +211,9 @@ End Function
 
 
 Function onScreenChange()
-  if getCurrentScreen() <> invalid and getCurrentScreen().id <> invalid
-    bSideNavVisible = (m.constants.ui.sideNavOpenIds[getCurrentScreen().id] = true)
+  currentScreen = getCurrentScreen()
+  if currentScreen <> invalid and currentScreen.id <> invalid
+    bSideNavVisible = (m.constants.ui.sideNavOpenIds[currentScreen.id] = true)
     m.sideNav.visible = bSideNavVisible
   end if
 End Function
