@@ -221,6 +221,18 @@ Function tubiLog_getLogPrintout_(level="" as String, subtype="" as String, messa
     printout = printout + "(" + subtype + ") "
   end if
 
+  #if consoleLoggingIncludeTimestamp
+    lpad = Function (value, padLength = 2, padCharacter = "0")
+      value = value.toStr()
+      while value.len() < padLength
+        value = padCharacter + value
+      end while
+      return value
+    End Function
+
+    date = createObject("roDateTime")
+    printout += lpad(date.getHours()) + ":" + lpad(date.getMinutes()) + ":" + lpad(date.getSeconds()) + "." + lpad(date.getMilliseconds(), 3)
+  #end if
   if message <> ""
     printout = printout + ": " + message
   end if

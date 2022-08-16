@@ -477,12 +477,21 @@ End Function
 ' ----------------------------------------------
 ' adBufferingCallback
 '
-' callback during RAF buffering
-Function tubiAds_adBufferingCallback(_eventType, ctx)
+' callback during RAF buffering. Will not be called if enableInPodStitching(true)
+Function tubiAds_adBufferingCallback(eventType, ctx)
+  ' We need to hide the raf container while we're buffering and show it again when buffering ends
+  if eventType = "BufferingStart" AND ctx.adIndex > 1 then
+    ' Avoiding a rendezvous by only doing on adIndex greater than 1 since we already hide the raf container there
+    ' RebufferingStart will handle any subsequent buffer event during ad playback, including when adIndex = 1.
+    m.containerNode.visible = false
+  else if eventType = "ReBufferingStart" then
+    m.containerNode.visible = false
+  else if eventType = "BufferingEnd" OR eventType = "ReBufferingEnd" then
+    m.containerNode.visible = true
+  end if
+
   if ctx.progress <> invalid
     m.controlNode.adProgress = ctx.progress
-  else
-    m.containerNode.visible = false
   end if
 End Function
 
@@ -521,7 +530,6 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
 
     if eventType = "Impression" and m.isInteracting <> true and m.adPlaybackPos = 0
       'Impression events fire when ads start, but also when a user begins interacting with an interactive ad
-      m.containerNode.visible = true  '//Display ad
       startAdEvent = {
         ad_started: m.tracking.getAnalyticsAd(ctx)
         video_id: m.controlNode.content.id.toInt()
@@ -603,6 +611,13 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       }
       m.trackUserEvent("ad_click", clickAdEvent, m.requestQueue)
       m.isInteracting = true
+    else if eventType = "AdStateChange" then
+      ' enableInPodStitching(true) makes this get called and tubiAds_adBufferingCallback not get called
+      if ctx.state = "playing" then
+        m.containerNode.visible = true '//Display ad
+      else if ctx.state = "buffering" then
+        m.containerNode.visible = false ' Hide ad while buffering
+      end if
     end if
   else
     if ctx <> invalid then

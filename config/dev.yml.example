@@ -42,3 +42,4 @@ settings:
   # bs_consts values set in the various manifests in default.yml
   bs_const:
     consoleLoggingEnabled: true
+    consoleLoggingIncludeTimestamp: false # whether to include timestamp in log outputs

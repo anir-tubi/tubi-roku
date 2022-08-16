@@ -22,6 +22,7 @@ settings:
   # configurations via the handlebars templates
   bs_const:
     consoleLoggingEnabled: false
+    consoleLoggingIncludeTimestamp: false # whether to include timestamp in log outputs
 
 manifest:
   title: "Tubi"
@@ -31,7 +32,7 @@ manifest:
   splash_screen_hd: "pkg:/images/splash-hd.jpg"
   splash_screen_sd: "pkg:/images/splash-sd.jpg"
   bs_libs_required: roku_ads_lib
-  # We have a workaround for 9-patch handling when ui_resolutions is "fhd" and scaling down for non-4k devices. 
+  # We have a workaround for 9-patch handling when ui_resolutions is "fhd" and scaling down for non-4k devices.
   # If we ever add "sd" or "hd", the workaround will also need to be removed.
   ui_resolutions: "fhd"
   uri_resolution_autosub: "$$RES$$,sd,hd,fhd"
@@ -39,8 +40,8 @@ manifest:
   requires_widevine_version: "1.0"
   supports_input_launch: 1
   supports_voice_roinput: 1
-  supports_etc_seek: 1 
-  supports_etc_next: 1 
+  supports_etc_seek: 1
+  supports_etc_next: 1
   splash_min_time: 2000
   rsg_version: 1.2
   confirm_partner_button: 1
