@@ -1817,6 +1817,13 @@ Function onSingleChannelFetchForLinearRelaunchSuccess(successResponse, _storeInC
     showDefaultEPGScreen()
     hideNavMenu(false) '//ensure the side nav is closed.
     playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.epgScreen)
+
+    '//Change the background to regular fullscreen so there isn't the normal corner linear video background for a moment
+    m.backgroundGroup.backgroundInfo = {
+      type : m.constants.ui.backgroundTypes.fullscreen
+      uriList : []
+    }
+    
     focusSideNavOption(m.constants.ui.sideNavIds.home)
   else
     restartApp()
