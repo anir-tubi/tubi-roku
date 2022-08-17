@@ -289,7 +289,7 @@ Function onVideoStateChange(msg)
     m.Loading.visible = false
     m.top.state = state
     if m.top.state = "playing" and (sPreviousState = "stopped" or sPreviousState = "") and m.top.fullscreen = true
-      if m.VideoOverlay.timeGridContentLoading = false and m.VideoOverlay.timeGridContent <> invalid and m.top.associatedScreenID = m.constants.ui.screenIds.homeScreen
+      if m.VideoOverlay.timeGridContentLoading = false and m.VideoOverlay.timeGridContent <> invalid and m.top.allowTransportToAppear = true
         showOverlay(true)
       end if
     end if
@@ -342,12 +342,9 @@ Function onFullScreenChange()
     hideProgrammingData()
 
     if m.top.state = "playing"
-      ' // display overlay only if user landed on full screen from homescreen. If user landed here from EPG Screen, then do not show overlay.
-      if m.top.associatedScreenID = m.constants.ui.screenIds.homeScreen
-        if m.VideoOverlay.timeGridContentLoading = false and m.VideoOverlay.timeGridContent <> invalid and m.top.associatedScreenID = m.constants.ui.screenIds.homeScreen
-          '//Set the showOverlay() function's param to true to display on delay so player has time to animate into fullscreen and user has time to view the player w/o an overlay
-          showOverlay(true)
-        end if
+      if m.VideoOverlay.timeGridContentLoading = false and m.VideoOverlay.timeGridContent <> invalid and m.top.allowTransportToAppear = true
+        '//Set the showOverlay() function's param to true to display on delay so player has time to animate into fullscreen and user has time to view the player w/o an overlay
+        showOverlay(true)
       end if
     end if
   else

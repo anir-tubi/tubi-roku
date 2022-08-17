@@ -5,7 +5,8 @@
 ' @content: TubiContentNode, the content to be played
 ' @bMinimized: boolean, Should the player be playing in its minmized state on the homescreen? If false, then it will be at fullscreen.
 ' @sAssociatedScreenID: String, Often times the screen right before the linear video player screen is displayed has a close association. Keep a record of the ID associated with the associated screen.
-Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID = "")
+' @bAllowTransportToAppear: Boolean, Should the EPG Overlay appear automatically when video starts to play and goes fullscreen?
+Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID = "", bAllowTransportToAppear = false)
   if content <> invalid
     tubiLog("LinearVideoPlayerScreenHelpers.playLinearVideoContent")
 
@@ -37,6 +38,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
 
     unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
     videoPlayer.associatedScreenID = sAssociatedScreenID
+    videoPlayer.allowTransportToAppear = bAllowTransportToAppear
 
     ' set general observers for all content
     videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
@@ -608,23 +610,24 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
   if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen
     if bContinueToPlay = true
       ' sports epg screen, news epg screen, or entertainment epg screen might not have the contentID. So search for content ID and handle the back logic
-      if isAnEPGScreenID(currentScreen.associatedScreenID) = true
-        handleBackToEPGScreen(videoPlayer.originalContent, currentScreen.associatedScreenID)
+      sBackScreenID = currentScreen.associatedScreenID
+      if isAnEPGScreenID(sBackScreenID) = true
+        handleBackToEPGScreen(videoPlayer.originalContent, sBackScreenID)
 
         '//animate the video player into the corner
         animateLinearVideoPlayerToMinState()
-      else if currentScreen.associatedScreenID = m.constants.ui.screenIds.epgScreen
-        jumpToParentScreenContentByID(videoPlayer.content.id, "", currentScreen.associatedScreenID)
+      else if sBackScreenID = m.constants.ui.screenIds.epgScreen
+        jumpToParentScreenContentByID(videoPlayer.content.id, "", sBackScreenID)
         popScreen(true, true)
 
         '//animate the video player into the corner
         animateLinearVideoPlayerToMinState()
-      else if currentScreen.associatedScreenID = m.constants.ui.screenIds.searchScreen
+      else if sBackScreenID = m.constants.ui.screenIds.searchScreen
         popScreen(true, true)
         stopAndHideLinearVideoPlayer()
       else
         if m.enteredFromDeeplink = true
-          jumpToParentScreenContentByID(videoPlayer.content.id, "", currentScreen.associatedScreenID)
+          jumpToParentScreenContentByID(videoPlayer.content.id, "", sBackScreenID)
         end if
         popScreen(true, true)
 
@@ -789,7 +792,7 @@ Function onLinearChannelSelectedFromGuide(msg)
         oldTrackingPageInfo = videoPlayer.trackingPageInfo
         trackingComponentInfo = videoPlayer.trackingComponentInfo
         stopLinearVideoContent()
-        playLinearVideoContent(channel, false, videoPlayer.associatedScreenID)
+        playLinearVideoContent(channel, false, videoPlayer.associatedScreenID, videoPlayer.allowTransportToAppear)
         newTrackingPageInfo = videoPlayer.trackingPageInfo
         screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, trackingComponentInfo)
 
@@ -899,7 +902,7 @@ Function onRetryLinearPlayerError()
   if videoPlayer <> invalid
     content = videoPlayer.content
     stopLinearVideoContent()
-    playLinearVideoContent(content, false, videoPlayer.associatedScreenID)
+    playLinearVideoContent(content, false, videoPlayer.associatedScreenID, videoPlayer.allowTransportToAppear)
   end if
 End Function
 

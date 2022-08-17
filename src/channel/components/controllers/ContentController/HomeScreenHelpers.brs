@@ -730,7 +730,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
         '//tell player to load and play the video associated with the focused item
         m.backgroundGroup.posterVisible = true '//reset the background so it can be seen
         stopLinearVideoContent()
-        playLinearVideoContent(focusedContent, true, homeScreen.id)
+        playLinearVideoContent(focusedContent, true, homeScreen.id, true)
       else
         bStopCountdownTimer = false
         startCountdownTimer()
@@ -818,7 +818,7 @@ Function selectLinearContent(content)
       else
         '//If the user selects the linear content that is not yet playing, then stop the previous content (if any) and start playing the content.
         stopLinearVideoContent()
-        playLinearVideoContent(content, false, homeScreen.id)
+        playLinearVideoContent(content, false, homeScreen.id, true)
       end if
     else
       showDefaultEPGScreen()

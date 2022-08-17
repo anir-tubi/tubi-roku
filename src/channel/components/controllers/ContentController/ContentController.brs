@@ -1596,7 +1596,7 @@ Function onCustomSuspend(msg)
       ' if the focus is on live TV row, stop the playback
       linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
       if linearVideoPlayer <> invalid
-        linearVideoPlayer.closeTransport = true
+        closeLinearVideoPlayerTransport()
         linearVideoPlayer.control = "stop"
       end if
     end if
@@ -1816,14 +1816,14 @@ Function onSingleChannelFetchForLinearRelaunchSuccess(successResponse, _storeInC
     '//deeplink to the EPG SCreen, then launch the linear video player, and ensure the side nav displays the proper focus
     showDefaultEPGScreen()
     hideNavMenu(false) '//ensure the side nav is closed.
-    playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.epgScreen)
+    playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.epgScreen, true)
 
     '//Change the background to regular fullscreen so there isn't the normal corner linear video background for a moment
     m.backgroundGroup.backgroundInfo = {
       type : m.constants.ui.backgroundTypes.fullscreen
       uriList : []
     }
-    
+     
     focusSideNavOption(m.constants.ui.sideNavIds.home)
   else
     restartApp()
