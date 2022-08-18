@@ -432,8 +432,14 @@ Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
           ' any ad buffering visual.
           m.roAdFramework.setAdBufferScreenLayer(2, [{}])
           ' Simple shim to make a global-scope callback into a module-scoped method call
-          m.roAdFramework.setAdBufferRenderCallback(function(m,e,c): m.adBufferingCallback(e,c): end function, m, 0)
-          m.roAdFramework.setTrackingCallback(function(m,e,c): m.adTrackingCallback(e,c): end function, m)
+          m.roAdFramework.setAdBufferRenderCallback(function(_m, eventType, ctx)
+            ads = getGlobalAA().tubiAds
+            ads.adBufferingCallback(eventType, ctx)
+          end function, {}, 0)
+          m.roAdFramework.setTrackingCallback(function(_m, eventType, ctx)
+            ads = getGlobalAA().tubiAds
+            ads.adTrackingCallback(eventType, ctx)
+          end function, {})
           isCompleted = m.roAdFramework.showAds(adUnitsListContainer.adUnitsList[0], screenCount, containerNode)
 
           ' This will hide the buffering messaging and reset the progress bar
