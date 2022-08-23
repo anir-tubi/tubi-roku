@@ -573,7 +573,7 @@ Function startUserExperience()
         displayInitialContentScreen()
         showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary
       else
-          startChannelFromAppLoad()
+        startChannelFromAppLoad()
       end if
     end if
 
@@ -1640,26 +1640,8 @@ Function onCustomResume(msg)
     customResumeLaunchParams = args.launchParams
     lastSuspendOrResumeReason = args.lastSuspendOrResumeReason
   end if
-
+  currentScreen = getCurrentScreen()
   if lastSuspendOrResumeReason = "home" and customResumeLaunchParams <> invalid
-    currentScreen = getCurrentScreen()
-    bLinearVideoOverride = false
-    '//When starting the app again, check if the last played linear video should play
-    sLastLinearID = getOverrideLinearId()
-
-
-    if isNonEmptyString(sLastLinearID) = true
-      '//If a previously played, overriding linear video exists, then check for another condition to see if the linear video should override the instant resume process
-      if currentScreen <> invalid and (currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen or currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen or currentScreen.id = m.constants.ui.screenIds.detailScreen)
-        '//If the previous app state was playing a video or displaying on a detail screen,
-        '//   then the user should be taken back to that on Instant Resume
-        '//   rather than playing a previous linear video
-        bLinearVideoOverride = false
-      else
-        bLinearVideoOverride = true
-      end if
-    end if
-
     ' User coming back to app via instant resume is considered as returning user
     m.global.isNewUser = false
 
@@ -1674,53 +1656,72 @@ Function onCustomResume(msg)
       ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates
       ' lots of edge cases, so for consistency, restarting the app is easiest.
       bRestartApp = true
-    else if isLoggedInUser() = false and (lastAppSuspendInSecs > m.constants.timers.coppaFailTimeout or lastAppRestartInDays >= 4 or bLinearVideoOverride = true)
-      ' For guest users, if the time between last suspend and current resume is more than 24 hours,
-      ' disable Instant Resume & relaunch app from scratch.
-      ' Also every 4 days once the app restarts in order to get starter/remote components
-      bRestartApp = true
-    else if isLoggedInUser() = true and (lastAppRestartInDays >= 4 or bLinearVideoOverride = true)
-      ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
-      bRestartApp = true
     else
-      'Removes the RFIScreen
-      if m.billing <> invalid
-        m.billing.unobserveFieldScoped("userData")
-        m.billing = invalid
-      end if
-      modal = getTopModal()
-      ' Modal gets removed/hidden based on the instantResumeAction when the app was suspended.
-      ' Modals that inform a user about an action have instantResumeAction = "closeDialog" and are
-      ' removed while suspending the app. Modals that display errors have instantResumeActions of
-      ' "restartApp" for which we set visibility to false in customSuspend and then restart the app
-      ' during onCustomResume. Screens that have instantResumeAction of "startChannel" return the
-      ' user to the homescreen during onCustomResume.
-      ' Functionality that requires the app to restart is given precedence over functionality that
-      ' starts the channel or resumes the app.
-
-      if modal <> invalid
-        if modal.instantResumeAction = m.constants.instantResumeActions.restartApp
-          bRestartApp = true
-        else if modal.instantResumeAction = m.constants.instantResumeActions.startChannel
-          'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen
-          bStartChannel = true
-        end if
-      else if currentScreen <> invalid
-        if currentScreen.instantResumeAction = m.constants.instantResumeActions.restartApp
-          bRestartApp = true
-        else if (lastAppSuspendInSecs >= 1200 and currentScreen.id = m.constants.ui.screenIds.settingsScreen)
-          'user is on the settings page and returns to the app after 20 or more minutes then retun to the homescreen
-          bStartChannel = true
-        else if currentScreen.instantResumeAction = m.constants.instantResumeActions.startChannel
-          'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen
-          bStartChannel = true
-        else
-          sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
-          resumeApp()
+      '//When starting the app again, check if the last played linear video should play
+      sLastLinearID = getOverrideLinearId()
+      '//When coming back from instant resume, the default assumption is to assume the linear video should resume playing. 
+      '//The next following code will determine when NOT to assume this.
+      bLinearVideoOverride = true
+      if isNonEmptyString(sLastLinearID) = true
+        '//If a previously played, overriding linear video exists, then check for another condition to see if the linear video should override the instant resume process
+        if currentScreen <> invalid and (currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen or currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen or currentScreen.id = m.constants.ui.screenIds.detailScreen)
+          '//If the previous app state was playing a video or displaying on a detail screen,
+          '//   then the user should be taken back to that on Instant Resume
+          '//   rather than playing a previous linear video
+          bLinearVideoOverride = false
         end if
       else
-        'Unknown state, backup solution to restart app.
+        bLinearVideoOverride = false
+      end if
+      
+      if isLoggedInUser() = false and (lastAppSuspendInSecs > m.constants.timers.coppaFailTimeout or lastAppRestartInDays >= 4 or bLinearVideoOverride = true)
+        ' For guest users, if the time between last suspend and current resume is more than 24 hours,
+        ' disable Instant Resume & relaunch app from scratch.
+        ' Also every 4 days once the app restarts in order to get starter/remote components
         bRestartApp = true
+      else if isLoggedInUser() = true and (lastAppRestartInDays >= 4 or bLinearVideoOverride = true)
+        ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
+        bRestartApp = true
+      else
+        'Removes the RFIScreen
+        if m.billing <> invalid
+          m.billing.unobserveFieldScoped("userData")
+          m.billing = invalid
+        end if
+        modal = getTopModal()
+        ' Modal gets removed/hidden based on the instantResumeAction when the app was suspended.
+        ' Modals that inform a user about an action have instantResumeAction = "closeDialog" and are
+        ' removed while suspending the app. Modals that display errors have instantResumeActions of
+        ' "restartApp" for which we set visibility to false in customSuspend and then restart the app
+        ' during onCustomResume. Screens that have instantResumeAction of "startChannel" return the
+        ' user to the homescreen during onCustomResume.
+        ' Functionality that requires the app to restart is given precedence over functionality that
+        ' starts the channel or resumes the app.
+
+        if modal <> invalid
+          if modal.instantResumeAction = m.constants.instantResumeActions.restartApp
+            bRestartApp = true
+          else if modal.instantResumeAction = m.constants.instantResumeActions.startChannel
+            'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen
+            bStartChannel = true
+          end if
+        else if currentScreen <> invalid
+          if currentScreen.instantResumeAction = m.constants.instantResumeActions.restartApp
+            bRestartApp = true
+          else if (lastAppSuspendInSecs >= 1200 and currentScreen.id = m.constants.ui.screenIds.settingsScreen)
+            'user is on the settings page and returns to the app after 20 or more minutes then retun to the homescreen
+            bStartChannel = true
+          else if currentScreen.instantResumeAction = m.constants.instantResumeActions.startChannel
+            'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen
+            bStartChannel = true
+          else
+            sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
+            resumeApp()
+          end if
+        else
+          'Unknown state, backup solution to restart app.
+          bRestartApp = true
+        end if
       end if
     end if
   else if lastSuspendOrResumeReason = "screensaver"
