@@ -36,7 +36,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_in_pod_stitching: {
-        roku_in_pod_stitching_v1: {"enabled": false}
+        roku_in_pod_stitching_v1: {"enabled": true}
       }
 
       roku_register_signup_to_save: {
