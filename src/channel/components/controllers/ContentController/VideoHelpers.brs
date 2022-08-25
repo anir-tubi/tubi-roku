@@ -183,12 +183,9 @@ Function onEpisodePosition()
 
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
   if videoPlayer <> invalid
-    ' Don't send history updates to the server if the user hasn't watched at least a certain amount of video
-    if videoPlayer.historyPosition >= m.constants.player.historyFrequency
-      videoContent = videoPlayer.content
-      nowPos = videoPlayer.historyPosition
-      updateHistory(videoContent, nowPos)
-    end if
+    videoContent = videoPlayer.content
+    nowPos = videoPlayer.historyPosition
+    updateHistory(videoContent, nowPos)
   end if
 End Function
 
@@ -202,7 +199,8 @@ End Function
 ' @isFireAndForget: boolean, true to not handle the history response
 '                            false to handle the history response (only needed when exiting playback)
 Function updateHistory(content, nowPos, isFireAndForget = true)
-  if isLoggedInUser() and content["type"] = m.constants.ui.contentTypes.video
+  ' Don't send history updates to the server if the user hasn't watched at least a certain amount of video
+  if nowPos >= m.constants.player.historyFrequency and isLoggedInUser() and content["type"] = m.constants.ui.contentTypes.video
 
     bKidsMode = shouldKidsModeBeSentToServer()
     postUserHistory = m.Bookmarks.addHistoryReq(content, nowPos, bKidsMode)
@@ -257,7 +255,9 @@ End Function
 '
 ' updates the history locally for signedIn user & guest user
 Function updateHistoryLocally(content as Object, position as Integer)
-  m.Bookmarks.addHistoryLocally(content, position, m.global)
+  if position >= m.constants.player.historyFrequency
+    m.Bookmarks.addHistoryLocally(content, position, m.global)
+  end if
 End Function
 
 

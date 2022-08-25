@@ -319,7 +319,6 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     detailScreen.starring = stateSource.actors
 
     setIsBookmark(detailScreen, (bookmark <> invalid))
-    setIsHistory(detailScreen, (history <> invalid))
     sLikedState = ""
     if like <> invalid
       sLikedState = like.state
@@ -337,16 +336,24 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     else if content.type = m.constants.ui.contentTypes.video and history <> invalid and history.nowPos > 0
       nResumePoint = history.nowPos
     end if
+    if nResumePoint < m.constants.player.historyFrequency
+      '//make sure the resume point is at least the client side constant minimum
+      nResumePoint = 0
+    end if
 
-    if nSavedPosition >= 0 and m.global.authInfo <> invalid
+    if nSavedPosition >= m.constants.player.historyFrequency and isLoggedInUser() = true
       '//nSavedPosition is only used for signed in users and ignored for guest users.
-      '//If the saved position is passed as greater than 0 than use that number instead.
+      '//If the saved position is passed as greater than the constant historyFrequency, then use that number instead.
       '//This parameter was put in place to display the updated resume point before having to wait to backend to confirm that the resume point is correct
       nResumePoint = nSavedPosition
-      if nSavedPosition > 0
-        setIsHistory(detailScreen, true)
-      end if
     end if
+
+    if nResumePoint >= m.constants.player.historyFrequency
+      setIsHistory(detailScreen, true)
+    else 
+      setIsHistory(detailScreen, false)
+    end if
+    
     detailScreen.resumePoint = nResumePoint
 
     'tell the detail screen/info panel to vertically center the info panel

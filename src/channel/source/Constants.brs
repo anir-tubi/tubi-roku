@@ -603,6 +603,8 @@ Function getConstants()
     constants.player.pingFrequency = 10
 
     'how often the video player records history
+    '   This doubles as the number of seconds after which the video player should save/display the resume/progress point. 
+    '   This is the client side minimum point. The server side minimum may be different. If the server side minimum is less than this number, the progress point will not be displayed.
     constants.player.historyFrequency = 60
 
     ' time to fetch next content before credit cuepoints
