@@ -54,11 +54,11 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_coppa_registration_age_vs_yob: {
-        roku_coppa_registration_age_vs_yob_v1: {"enabled": false}
+        roku_coppa_registration_age_vs_yob_v1: {"enabled": true}
       }
 
       roku_skip_icts: {
-        roku_skip_icts_v1 : {"enabled": false}
+        roku_skip_icts_v1 : {"enabled": true}
       }
 
       roku_featured_landscape: {
