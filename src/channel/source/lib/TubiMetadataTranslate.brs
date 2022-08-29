@@ -1663,7 +1663,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
             dateString = datetimeObj.AsDateString("short-date")
             dayOfWeek = "day_" + StrI(datetimeObj.GetDayOfWeek()).trim()
             dayOfMonth = StrI(datetimeObj.GetDayOfMonth()).trim()
-            startTime = GetAMPMTimeString(datetimeObj)
+            startTime = GetAMPMTimeString(datetimeObj, false)
           end if
 
           endTime = ""
@@ -1674,7 +1674,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
             datetimeObjEnd.ToLocalTime()
             program.endTime = datetimeObjEnd.asSeconds()
 
-            endTime = GetAMPMTimeString(datetimeObjEnd)
+            endTime = GetAMPMTimeString(datetimeObjEnd, false)
           end if
 
           if programFromServer.images <> invalid and programFromServer.images.poster <> invalid and programFromServer.images.poster.count() > 0
@@ -1724,12 +1724,12 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
               timeLeft = (program.endTime - program.startTime) / 60
               program.ShortDescriptionLine1 = startTime
             end if
-          else if dateString = tomorrow.AsDateString("short-date") ' tomorrow programs eg: 10 AM Tomorrow
+          else if dateString = tomorrow.AsDateString("short-date") ' tomorrow programs eg: 10:00AM, TOMORROW
             timeLeft = (program.endTime - program.startTime) / 60
-            program.ShortDescriptionLine1 =  startTime + " " + getTranslation("tomorrow")
+            program.ShortDescriptionLine1 =  startTime + ", " + getTranslation("tomorrow")
           else 'future day programs eg: Jan, 8 10:00 AM
             timeLeft = (program.endTime - program.startTime) / 60
-            program.ShortDescriptionLine1 = startTime + " " + getTranslation(dayOfWeek) + dayOfMonth
+            program.ShortDescriptionLine1 = startTime + ", " + getTranslation(dayOfWeek) + dayOfMonth
           end if
 
           'the value 19.2 is the width for every minute of the program as per the EPG Design. This value will change if EPG design changes in future.

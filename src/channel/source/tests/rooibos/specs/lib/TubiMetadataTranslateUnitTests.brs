@@ -394,12 +394,12 @@ Function tubiMetadataTranslate_translateEPGPrograms_test()
   datetimeObj.FromISO8601String(programInfo.start_time)
   datetimeObj.ToLocalTime()
   program_startTime = datetimeObj.asSeconds()
-  start_Time = GetAMPMTimeString(datetimeObj)
+  start_Time = GetAMPMTimeString(datetimeObj, false)
 
   datetimeObj.FromISO8601String(programInfo.end_time)
   datetimeObj.ToLocalTime()
   program_endTime= datetimeObj.asSeconds()
-  end_Time = GetAMPMTimeString(datetimeObj)
+  end_Time = GetAMPMTimeString(datetimeObj, false)
 
   hours_of_airing = start_Time + " - " + end_Time
 

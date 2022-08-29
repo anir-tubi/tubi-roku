@@ -802,7 +802,7 @@ Function getTranslation_en_US()
     },
     "tomorrow":{
       "description": "Tomorrow",
-      "message": "Tomorrow"
+      "message": "TOMORROW"
     },
     "day_1":{
       "description": "shortened version Monday, formatted with , and a space",
