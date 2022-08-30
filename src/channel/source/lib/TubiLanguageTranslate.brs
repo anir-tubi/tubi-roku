@@ -2036,7 +2036,7 @@ Function getTranslation_es_MX()
     },
     "tomorrow": {
       "description": "Tomorrow",
-      "message": "Mañana"
+      "message": "MAÑANA"
     },
     "day_1": {
       "description": "shortened version Monday, formatted with , and a space",
