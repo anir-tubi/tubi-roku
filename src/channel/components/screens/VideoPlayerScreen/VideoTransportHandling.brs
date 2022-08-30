@@ -95,8 +95,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         if m.Overlay.opacity = 0
           showTransport()
         else if m.progressBarFocused = true
-          button = m.TransportButtons.getChild(m.focusedButtonIndex)
-          setFocusedButton(button)
+          setFocusedButton(m.PlayPauseButton)
         else if m.skipIntro.hasFocus() = true
           setFocusedButton(m.ProgressBar)
         else
