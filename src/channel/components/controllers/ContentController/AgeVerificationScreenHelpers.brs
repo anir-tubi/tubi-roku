@@ -611,8 +611,7 @@ Function onAgeSubmitted(verifyAgeCallback) as Void
   tubiLog("AgeVerificationScreenHelpers.onAgeSubmitted")
 
   ageVerificationScreen = getCurrentScreen()
-  nodeSubtype = getNodeSubtype(ageVerificationScreen)
-  if nodeSubtype <> "AgeVerificationScreen" AND nodeSubtype <> "SignUpAgeVerificationScreen" then
+  if isAgeVerificationScreen(ageVerificationScreen) = false then
     tubiLog("AgeVerificationScreen could not be found")
     return
   end if
@@ -747,7 +746,7 @@ End Function
 
 Function exitAgeVerificationScreenUnverified()
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid AND currentScreen.id = "ageVerificationScreen" then
+  if isAgeVerificationScreen(currentScreen) = true then
     uiMode = currentScreen.previousUiMode
     if uiMode <> "" then
       setUiMode(uiMode)
@@ -846,8 +845,7 @@ End Function
 Function patchSignedInUserAge()
   birthdate = ""
   currentScreen = getCurrentScreen()
-  nodeSubtype = getNodeSubtype(currentScreen)
-  if nodeSubtype = "AgeVerificationScreen" OR nodeSubtype = "SignUpAgeVerificationScreen" then
+  if isAgeVerificationScreen(currentScreen) then
     birthdate = currentScreen.birthdate
   end if
 
@@ -871,4 +869,13 @@ Function patchSignedInUserAge()
       })
     end if
   end if
+End Function
+
+
+Function isAgeVerificationScreen(screen)
+  nodeSubtype = getNodeSubtype(screen)
+  if nodeSubtype = "AgeVerificationScreen" OR nodeSubtype = "SignUpAgeVerificationScreen" then
+    return true
+  end if
+  return false
 End Function
