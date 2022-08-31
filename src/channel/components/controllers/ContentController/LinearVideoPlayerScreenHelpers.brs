@@ -85,7 +85,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         getLiveStreamManifest(streamUrl)
       else
         ' no stream url so show an error
-        showLinearPlayerError()
+        reactToLinearVideoPlayerErrorState()
       end if
     end if
   end if
@@ -357,15 +357,11 @@ Function onManifestError(error)
   tubiLog("LinearVideoPlayerScreenHelpers.onManifestError")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
-    if videoPlayer.fullscreen = true
-      code = invalid
-      if error <> invalid
-        code = error.code
-      end if
-      showLinearPlayerError("", code)
-    else
-      reactToLinearVideoPlayerErrorStateInNonFullscreenState()
+    code = invalid
+    if error <> invalid
+      code = error.code
     end if
+    reactToLinearVideoPlayerErrorState("", code)
   end if
 End Function
 
@@ -573,13 +569,13 @@ Function onLinearVideoPlayerState(msg)
     tubiLog("LinearVideoPlayerScreenHelpers.onLinearVideoPlayerState state = " + msg.GetData())
     state = msg.GetData()
     if state = "error"
-      showLinearPlayerError(videoPlayer.errorMsg, videoPlayer.videoErrorCode)
+      reactToLinearVideoPlayerErrorState(videoPlayer.errorMsg, videoPlayer.videoErrorCode)
     else if state = "playing"
       showHideLinearVideoPlayerSpinner(false)
       videoPlayer.loading = false
     else if state = "finished"
       '//Assume a finished video stream is an error
-      showLinearPlayerError()
+      reactToLinearVideoPlayerErrorState()
     end if
   end if
 End Function
@@ -670,15 +666,14 @@ End Function
 
 
 '''''''''''''''''''
-' showLinearPlayerError
+' reactToLinearVideoPlayerErrorState
 '
 ' @error_message: string, an error message that will be displayed to the user
 ' @errorCode: integer, the video player error code (usually a negative number)
-Function showLinearPlayerError(error_message = "", errorCode = invalid)
+Function reactToLinearVideoPlayerErrorState(error_message = "", errorCode = invalid)
   tubiLog("LinearVideoPlayerScreenHelpers.showLinearPlayerError")
-
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-  if videoPlayer <> invalid
+  if videoPlayer <> invalid and videoPlayer.fullscreen = true
     returnToPreviousScreenFromLinearVideo(false)
     errorMessage = getTranslation("videoPlayer_error_failed_description")
     if error_message <> invalid and error_message <> ""
@@ -721,6 +716,9 @@ Function showLinearPlayerError(error_message = "", errorCode = invalid)
     end if
 
     stopLinearVideoContent() '//In case the video is still playing
+  else
+    '//If in mimimum mode, do not show error modal but instead error out gracefully
+    reactToLinearVideoPlayerErrorStateInNonFullscreenState()
   end if
 End Function
 
@@ -808,7 +806,7 @@ Function onLinearChannelSelectedFromGuide(msg)
       end if
     else
       '//Incorrect data, display an error
-      showLinearPlayerError()
+      reactToLinearVideoPlayerErrorState()
     end if
   end if
 End Function
