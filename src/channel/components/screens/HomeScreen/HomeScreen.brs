@@ -409,13 +409,6 @@ Function onCurrFocusRowChange()
     categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
   end if
 
-  if m.constants.deviceInfo.scaledUi = true
-    m.CategoryGridList.getChild(0).focusBitmapUri = "pkg:/images/selector-hd.9.png"
-  else
-    m.CategoryGridList.getChild(0).focusBitmapUri = "pkg:/images/selector-fhd.9.png"
-  end if
-  m.CategoryGridList.getChild(0).drawFocusFeedbackOnTop = true
-
   if categoryEnteringFocus <> invalid
     sSponsorBackgroundURL = ""
     if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg

@@ -32,7 +32,10 @@ Function init()
 
   if m.constants.deviceInfo.scaledUi = true then
     m.RowList.focusBitmapUri = "pkg:/images/selector-hd.9.png"
+  else
+    m.RowList.focusBitmapUri = "pkg:/images/selector-fhd.9.png"
   end if
+  m.RowList.drawFocusFeedbackOnTop = true
   m.RowList.focusBitmapBlendColor = m.global.theme.focused
   m.global.observeField("theme", "onThemeChange")
 
