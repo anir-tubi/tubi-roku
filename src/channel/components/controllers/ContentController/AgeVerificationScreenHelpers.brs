@@ -748,7 +748,7 @@ Function exitAgeVerificationScreenUnverified()
   currentScreen = getCurrentScreen()
   if isAgeVerificationScreen(currentScreen) = true then
     uiMode = currentScreen.previousUiMode
-    if uiMode <> "" then
+    if isNonEmptyString(uiMode) then
       setUiMode(uiMode)
     end if
   end if
