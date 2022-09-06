@@ -564,7 +564,19 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       end if
     end if
 
-    if eventType = "Impression" and m.isInteracting <> true and m.adPlaybackPos = 0
+    ' We have do the second check for start event because for Innovid interactive ads our Impression code block won't get called because m.adPlaybackPos is already 1. In other words, the position callback where ctx.time = 1 occurs prior to the Impression event for Innovid interactive ads.
+    if (eventType = "Impression" and m.isInteracting <> true and m.adPlaybackPos = 0) OR (eventType = "Start" AND ctx.ad.adSystem.instr("Innovid") >= 0) then
+      if getGlobalAA().enableInPodStitching = true then
+        ' Storing ad context to work around RAF stitched ads bug that causes complete event to have data for next ad or invalid if it is the last ad
+        if ctx.duration <> invalid AND ctx.ad <> invalid then
+          m._lastContextWithValidDurationAndAdInfo = ctx
+        end if
+      else
+        ' Without setting RAF container back to visible here interactive ads will not show because tubiAds_adBufferingCallback never gets called
+        ' Not needed when stitched ads are enabled as AdStateChange properly gets called in that case
+        m.containerNode.visible = true
+      end if
+
       'Impression events fire when ads start, but also when a user begins interacting with an interactive ad
       startAdEvent = {
         ad_started: m.tracking.getAnalyticsAd(ctx)
