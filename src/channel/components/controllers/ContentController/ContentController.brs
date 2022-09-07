@@ -1808,7 +1808,7 @@ End Function
 ' @param _storeInCache, This secondary param is not used but it is required for a calback of fetchEPGChannel()
 Function onSingleChannelFetchForLinearRelaunchSuccess(successResponse, _storeInCache = false)
   linearContent = invalid
-  if successResponse.getChildCount() > 0
+  if successResponse <> invalid and successResponse.getChildCount() > 0
     linearContent = successResponse.getChild(0)
     linearContent.deeplinktype = "linear"
   end if
@@ -1827,7 +1827,7 @@ Function onSingleChannelFetchForLinearRelaunchSuccess(successResponse, _storeInC
      
     focusSideNavOption(m.constants.ui.sideNavIds.home)
   else
-    restartApp()
+    startChannelFromAppLoad()
   end if
 End Function
 
