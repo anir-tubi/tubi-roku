@@ -865,10 +865,8 @@ Function setUiMode(mode)
     m.sideNav.uiMode = mode
     m.backgroundGroup.kidsMode = false
     m.trackingLoggingTask.analyticsAppMode = "DEFAULT_MODE"
+    showHideLogo("tubi")
 
-    hideKidsLogo()
-    hideEspanolLogo()
-    showTubiLogo()
   else if mode = m.constants.ui.modes.kids
     'kids
     if m.kidsModeFeatureOn
@@ -899,9 +897,7 @@ Function setUiMode(mode)
     m.sideNav.uiMode = mode
     m.backgroundGroup.kidsMode = false
     m.trackingLoggingTask.analyticsAppMode = "LATINO_MODE"
-    hideTubiLogo()
-    hideKidsLogo()
-    showEspanolLogo()
+    showHideLogo("tubi_espanol")
   end if
 
   ' How to access uiMode:
@@ -975,10 +971,7 @@ Function setCommonKidsModeElements()
     if m.global.theme = invalid or m.global.theme.id <> m.constants.ui.themeIDs.kidsMode
       m.global.theme = m.constants.ui.themes.kidsMode
     end if
-
-    hideTubiLogo()
-    hideEspanolLogo()
-    showKidsLogo()
+    showHideLogo("tubi_kids")
     m.backgroundGroup.kidsMode = true
     m.trackingLoggingTask.analyticsAppMode = "KIDS_MODE"
     tellScreensIfKidsModeBeSentToServer()
@@ -1015,40 +1008,6 @@ Function isKidsUIOn()
     return true
   end if
   return false
-End Function
-
-
-Function showTubiLogo()
-
-  m.logo.visible = true
-
-End Function
-
-
-Function hideTubiLogo()
-
-  m.logo.visible = false
-
-End Function
-
-
-Function showKidsLogo()
- m.logoKids.visible = true
-End Function
-
-
-Function hideKidsLogo()
-  m.logoKids.visible = false
-End Function
-
-
-Function showEspanolLogo()
-  m.logoEspanol.visible = true
-End Function
-
-
-Function hideEspanolLogo()
-  m.logoEspanol.visible = false
 End Function
 
 
@@ -1659,7 +1618,7 @@ Function onCustomResume(msg)
     else
       '//When starting the app again, check if the last played linear video should play
       sLastLinearID = getOverrideLinearId()
-      '//When coming back from instant resume, the default assumption is to assume the linear video should resume playing. 
+      '//When coming back from instant resume, the default assumption is to assume the linear video should resume playing.
       '//The next following code will determine when NOT to assume this.
       bLinearVideoOverride = true
       if isNonEmptyString(sLastLinearID) = true
@@ -1673,7 +1632,7 @@ Function onCustomResume(msg)
       else
         bLinearVideoOverride = false
       end if
-      
+
       if isLoggedInUser() = false and (lastAppSuspendInSecs > m.constants.timers.coppaFailTimeout or lastAppRestartInDays >= 4 or bLinearVideoOverride = true)
         ' For guest users, if the time between last suspend and current resume is more than 24 hours,
         ' disable Instant Resume & relaunch app from scratch.
@@ -1824,7 +1783,7 @@ Function onSingleChannelFetchForLinearRelaunchSuccess(successResponse, _storeInC
       type : m.constants.ui.backgroundTypes.fullscreen
       uriList : []
     }
-     
+
     focusSideNavOption(m.constants.ui.sideNavIds.home)
   else
     startChannelFromAppLoad()
@@ -1930,4 +1889,37 @@ Function sendNielsenPing(pingType, content = invalid, successCallback = invalid,
     responseType: "string"
     retries: 0
   })
+End Function
+
+
+' TODO: convert into constants ?
+' @logoType : string, one of the following :
+          ' "tubi" =  show tubi logo,
+          ' "tubi_kids" = show tubi kids logo,
+          ' "tubi_espanol" = show espanol logo,
+          ' "tubi_fifa" = show FIFA + tubi logo
+          ' "hide" = hide all logos
+Function showHideLogo(logoType)
+  tubilog("ContentController.showHideLogo")
+
+  if logoType = "hide"
+    m.logoEspanol.visible = false
+    m.logoKids.visible = false
+    m.logo.visible = false
+  else
+    if logoType = "tubi_kids"
+      m.logoKids.visible = true
+      m.logo.visible = false
+      m.logoEspanol.visible = false
+    else if logoType = "tubi_espanol"
+      m.logoEspanol.visible = true
+      m.logoKids.visible = false
+      m.logo.visible = false
+    else
+      m.logo.visible = true
+      m.logoEspanol.visible = false
+      m.logoKids.visible = false
+    end if
+  end if
+
 End Function

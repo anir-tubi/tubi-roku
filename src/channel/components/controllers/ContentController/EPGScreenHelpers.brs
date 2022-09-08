@@ -7,7 +7,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
   if isNonEmptyString(screenID) <> true
     screenID = constants.ui.screenIds.epgScreen
   end if
-  hideTubiLogo()
+  showHideLogo("hide")
 
   epgScreen = getFromScreenCache(screenID)
   if epgScreen <> invalid

@@ -63,15 +63,15 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
     if m.constants.ui.screenIdToSideNavId[screen.id] <> topNavItem.id
       if topNavItem.id = m.constants.ui.sideNavIds.movies
         ' Fixes logo not showing up after returning from EPG
-        showTubiLogo()
+        showHideLogo("tubi")
         showMoviesScreen(componentToFocus)
       else if topNavItem.id = m.constants.ui.sideNavIds.tv
         ' Fixes logo not showing up after returning from EPG
-        showTubiLogo()
+        showHideLogo("tubi")
         showTVScreen(componentToFocus)
       else if topNavItem.id = m.constants.ui.sideNavIds.home
         ' Fixes logo not showing up after returning from EPG
-        showTubiLogo()
+        showHideLogo("tubi")
         showDefaultHomeScreen(componentToFocus)
       else if topNavItem.id = m.constants.ui.sideNavIds.espanol
         showEspanolScreen(componentToFocus)
