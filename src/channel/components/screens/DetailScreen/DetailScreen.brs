@@ -162,7 +162,7 @@ Function changeButtonText(sButtonStringId, sButtonText)
       tempChannelMenuItem.itemContent = stringNode
 
       potentialWidth = tempChannelMenuItem.calculatedTextWidth + tempChannelMenuItem.leftTextPadding + tempChannelMenuItem.rightTextPadding
-      if potentialWidth > m.defaultMenuWidth
+      if potentialWidth > m.defaultMenuWidth and potentialWidth > m.Menu.itemSize[0]
         m.Menu.itemSize = [potentialWidth, m.Menu.itemSize[1]]
 
         '//move SecondaryMenu to ensure it is not overlapping the Menu
