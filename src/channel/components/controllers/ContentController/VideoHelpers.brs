@@ -16,7 +16,7 @@ Function playVideoContent(content, playbackSource = "unknown", position = 0)
       ' if the user has been age gated during the deeplink process, a modal will be shown.
       ' We need to remove the modal so it is not overlaying the video.
       modal = getTopModal()
-      if modal <> invalid and modal.isSubtype("ModalDialogScreen") and modal.isInFocusChain() = true
+      if modal <> invalid AND modal.isSubtype("ModalDialogScreen") AND modal.isInFocusChain() = true
         closeModal(modal)
       end if
 
@@ -27,7 +27,7 @@ Function playVideoContent(content, playbackSource = "unknown", position = 0)
   end if
 
   experimentLinearRelaunch = getExperimentResource("roku_relaunch_linear", "roku_relaunch_linear_v1", false)
-  if experimentLinearRelaunch <> invalid and experimentLinearRelaunch.enabled = true and experimentLinearRelaunch.resetTiming = "vod"
+  if experimentLinearRelaunch <> invalid AND experimentLinearRelaunch.enabled = true AND experimentLinearRelaunch.resetTiming = "vod"
     '//Delete linear video ID, if the experiment variant is set to reset after playing of VOD video
     RegDelete(m.constants.registryIDs.lastPlayedLinearId, m.constants.registrySectionIDs.lastPlayedLinearSectionId)
   end if
@@ -50,7 +50,7 @@ Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrack
 
   ' send custom navigateToPage event, since a details screen was added to the screen stack but the user
   ' never saw it, we want to navigate from the screen under the most recently added details screen.
-  if currentTrackingPageInfo <> invalid and isNonEmptyString(currentTrackingPageInfo.pageType)
+  if currentTrackingPageInfo <> invalid AND isNonEmptyString(currentTrackingPageInfo.pageType)
     ' but only send the navigateToPage event if there is a page to navigate from
     screenTrackingNavigate(currentTrackingPageInfo, videoPlayer.trackingPageInfo, trackingComponentInfo)
   end if
@@ -153,7 +153,7 @@ Function setupVideoPlayer(content, playbackSource = "unknown", position = 0)
     videoPlayer.observeFieldScoped("backButtonPressed", "onVideoPlayerBackPressed")
     videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
 
-    if (content.creditsCuePoints <> invalid and content.creditsCuePoints.postlude <> invalid and position >= content.creditsCuePoints.postlude)
+    if (content.creditsCuePoints <> invalid AND content.creditsCuePoints.postlude <> invalid AND position >= content.creditsCuePoints.postlude)
       position = 0
     else if content.length - position <= 5
       position = 0
@@ -200,7 +200,7 @@ End Function
 '                            false to handle the history response (only needed when exiting playback)
 Function updateHistory(content, nowPos, isFireAndForget = true)
   ' Don't send history updates to the server if the user hasn't watched at least a certain amount of video
-  if nowPos >= m.constants.player.historyFrequency and isLoggedInUser() and content["type"] = m.constants.ui.contentTypes.video
+  if nowPos >= m.constants.player.historyFrequency AND isLoggedInUser() AND content["type"] = m.constants.ui.contentTypes.video
 
     bKidsMode = shouldKidsModeBeSentToServer()
     postUserHistory = m.Bookmarks.addHistoryReq(content, nowPos, bKidsMode)
@@ -307,7 +307,7 @@ Function playUpNextContent(nextContent, playbackSource)
   if videoPlayer <> invalid
 
     videoContent = videoPlayer.content
-    if videoContent <> invalid and videoContent.parentType = m.constants.ui.contentTypes.series
+    if videoContent <> invalid AND videoContent.parentType = m.constants.ui.contentTypes.series
       detailScreen = getTopDetailScreenFromStack()
       if detailScreen <> invalid
         detailContent = detailScreen.content
@@ -323,7 +323,7 @@ Function playUpNextContent(nextContent, playbackSource)
     'A series can be included into the autoplaylist of a Movie.
     'In that case, exctract the episode info to play from nextContent
     if nextContent.type = m.constants.ui.contentTypes.series
-      if nextContent.getChild(0) <> invalid and nextContent.getChild(0).getchild(0) <> invalid
+      if nextContent.getChild(0) <> invalid AND nextContent.getChild(0).getchild(0) <> invalid
         content = nextContent.getChild(0).getchild(0)
         analyticId = content.id.toInt()
       end if
@@ -389,7 +389,7 @@ Function onVideoPlayerState(msg)
       videoPlayer.errorMsg = ""
 
       currentScreen = getCurrentScreen()
-      if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
+      if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
         popScreen(true, true)
       end if
 
@@ -465,13 +465,13 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
     historyPosition = round(videoPlayer.position)
     detailScreenResumePosition = historyPosition
 
-    isEndReached = (videoContent.creditsCuePoints <> invalid and videoContent.creditsCuePoints.postlude <> invalid and videoContent.creditsCuePoints.postlude > 0 and detailScreenResumePosition > videoContent.creditsCuePoints.postlude)
+    isEndReached = (videoContent.creditsCuePoints <> invalid AND videoContent.creditsCuePoints.postlude <> invalid AND videoContent.creditsCuePoints.postlude > 0 AND detailScreenResumePosition > videoContent.creditsCuePoints.postlude)
     ' So the detailed page does not have a refresh issue, pass the local resume number before the backend communicates.
     ' The problem with this is that if the backend comes back with a different number than the local
     ' number then there is still a screen redraw issue: i.e. user watches only 2 seconds of a video.
     ' The local number is 2 seconds and displays the resume button, but the backend determines that 2
     ' seconds is not enough to warrant a resume button and returns 0 as the resume point.
-    if detailScreenResumePosition < m.constants.player.historyFrequency or (isEndReached = true and detailContent <> invalid and detailContent.type <> m.constants.ui.contentTypes.series)
+    if detailScreenResumePosition < m.constants.player.historyFrequency or (isEndReached = true AND detailContent <> invalid AND detailContent.type <> m.constants.ui.contentTypes.series)
       '//If the video is either at the very beginning or at the very end, then it should pass the local resume point as 0.
       ' if content type is series, we do not need to reset the resumepoint to 0 because it will lose the watch history. But in case of movies,
       ' if user watches till the end, we need to reset the resumepoint to 0.
@@ -479,7 +479,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
     end if
 
     ' Do the appropriate action based on the cases as described in the function definition comments
-    if detailContent <> invalid and videoContent.parentType = m.constants.ui.contentTypes.series
+    if detailContent <> invalid AND videoContent.parentType = m.constants.ui.contentTypes.series
       ' Video player was playing a series episode
       if videoContent.parentId <> detailContent.id
         ' Case 5
@@ -578,7 +578,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
 
   ' remove the video player screen to reveal the details screen (or episodes list screen)
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
+  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
     if sendAnalyticsEvent = true
       popScreen(true, true)
     else
@@ -633,7 +633,7 @@ Function onSkipTrailer(msg)
     if videoPlayer <> invalid
       stopVideoContent(videoPlayer)
 
-      if getHiddenScreen() <> invalid and getHiddenScreen().id = m.constants.ui.screenIds.detailScreen
+      if getHiddenScreen() <> invalid AND getHiddenScreen().id = m.constants.ui.screenIds.detailScreen
         detailScreen = getHiddenScreen()
         detailScreenContent = getDetailScreenContent(detailScreen)
         playVideoContent(detailScreenContent)
@@ -662,7 +662,7 @@ Function showPlayerError(errorMessage, errorCode)
     userErrorCode = getUserFacingErrorCode(m.constants.errors.context.playerScreen, m.constants.errors.subtypes.playerPlaybackError, errorCode.toStr())
 
     videoId = 0
-    if videoPlayer <> invalid and videoPlayer.content <> invalid and videoPlayer.content.id <> invalid
+    if videoPlayer <> invalid AND videoPlayer.content <> invalid AND videoPlayer.content.id <> invalid
       videoId = videoPlayer.content.id.toInt()
     end if
 
@@ -704,8 +704,8 @@ End Function
 ' @content: episode content node with metadata from the up next api
 ' @oldContent: episode content with full metadata, including parentType (usually from the player)
 Function addSeriesTitle(content, oldContent)
-  if content.parentId <> invalid and oldContent.parentId <> invalid
-    if oldContent.parentId <> "" and content.parentId = oldContent.parentId
+  if content.parentId <> invalid AND oldContent.parentId <> invalid
+    if oldContent.parentId <> "" AND content.parentId = oldContent.parentId
       content.parentType = "series"
       content.parentTitle = oldContent.parentTitle
     end if
@@ -740,7 +740,7 @@ End Function
 Function onUpNextCuepointReached(msg)
   videoPlayer = msg.getRoSGNode()
   if m.upNextRequest = invalid
-    if videoPlayer.content <> invalid and videoPlayer.content.isTrailer = false
+    if videoPlayer.content <> invalid AND videoPlayer.content.isTrailer = false
       m.upNextRequest = fetchUpNextContent(videoPlayer)
     end if
   end if
@@ -780,7 +780,7 @@ Function onVideoTrackingStart(msg)
   if m.constants.thirdParty.youbora.enabled = true
     youboraConfig = m.constants.thirdParty.youbora.config
 
-    if videoPlayer <> invalid and videoPlayer.content <> invalid
+    if videoPlayer <> invalid AND videoPlayer.content <> invalid
       youboraConfig["extraparam.1"] = videoPlayer.content.id
       youboraConfig["content.id"] = videoPlayer.content.id
 
@@ -854,7 +854,7 @@ End Function
 '                         upNext request will be mad
 ' returns invalid if there is no videoPlayer or valid videoPlayerContent
 Function fetchUpNextContent(videoPlayer)
-  if videoPlayer <> invalid and videoPlayer.content <> invalid and videoPlayer.content.id.Len() > 0
+  if videoPlayer <> invalid AND videoPlayer.content <> invalid AND videoPlayer.content.id.Len() > 0
     options = {
       params: {
         "isKidsMode": shouldKidsModeBeSentToServer()
@@ -950,7 +950,7 @@ Function constructYouboraRendition(segInfo)
         rendAux = Cint(rendAux * 100) / 100.0
         segBitrate = rendAux.ToStr() + "Mbps"
       end if
-      if segInfo.Width <> invalid and segInfo.Height <> invalid then
+      if segInfo.Width <> invalid AND segInfo.Height <> invalid then
         width = segInfo.Width.ToStr()
         height = segInfo.Height.ToStr()
       else

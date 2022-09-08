@@ -20,7 +20,7 @@ Function showEpisodeScreen(content, shouldSendNavigationAnalytics)
   episodesScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   episodesScreen.observeFieldScoped("backButtonPressed", "onEpisodeBackPressed")
   episodesScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
-  if episodesScreen.content <> invalid and episodesScreen.content.id <> invalid
+  if episodesScreen.content <> invalid AND episodesScreen.content.id <> invalid
     contentId = Mid(episodesScreen.content.id, 2)  ' trim leading "0" off series id
 
     'update tracking info - have to set the whole AA, can't update only a portion on the AA field
@@ -46,7 +46,7 @@ Function onEpisodeSelected(msg)
       if episode <> invalid then
         content = episode.clone(false)
         bMature = isMatureRating(content)
-        if isLoggedInUser() = false and bMature = true
+        if isLoggedInUser() = false AND bMature = true
           '//if user is a guest and is trying to play content geared for only adults, then ask them to register
           displayMaturePlayWarning("mature-episode", episodesScreen.trackingPageInfo)
         else
@@ -54,7 +54,7 @@ Function onEpisodeSelected(msg)
           ' find the position in global history
           history = getHistory(content.id)
 
-          if history <> invalid and history.nowPos > 0
+          if history <> invalid AND history.nowPos > 0
             nowPos = history.nowPos
             content.nowPos = nowPos
           end if

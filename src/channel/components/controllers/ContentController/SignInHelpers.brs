@@ -28,10 +28,10 @@ Function showRFIScreen()
   settingsPassword = m.constants.settings.password
   mode = m.constants.settings.mode
 
-  if mode <> "production" and isNonEmptyString(settingsEmail) = true and isNonEmptyString(settingsPassword) = true
+  if mode <> "production" AND isNonEmptyString(settingsEmail) = true AND isNonEmptyString(settingsPassword) = true
     hideNavMenu()
     signUserIn(settingsEmail, settingsPassword)
-  else if mode <> "production" and suitest = true and automaticActivation = true
+  else if mode <> "production" AND suitest = true AND automaticActivation = true
     hideNavMenu()
     signUserUpForQAAutomation()
   else
@@ -74,7 +74,7 @@ Function onRfiUserData(msg)
     billing.unobserveFieldScoped("userData")
   end if
 
-  if billing <> invalid and billing.userData <> invalid
+  if billing <> invalid AND billing.userData <> invalid
 
     dialogEvent = {
       type: "dialog"
@@ -181,7 +181,7 @@ Function onEmailExistsResponse(response)
     parsedresponse = response.parsedresponse
     requestInput = response.requestInput
 
-    if parsedresponse <> invalid and requestInput <> invalid
+    if parsedresponse <> invalid AND requestInput <> invalid
       if parsedresponse.taken = true
         showSignInScreen(requestInput.email)
       else
@@ -231,7 +231,7 @@ Function onEmailExistsError(errorResponse)
   buttons = [getTranslation("dialog_button_tryAgain"), getTranslation("dialog_button_cancel")]
   simpleModalInfo = getSimpleModalInfo(title, message, buttons, dialogEvent, m.trackingLoggingTask, checkEmailExists, invalid, m.constants.instantResumeActions.restartApp)
 
-  if simpleModalInfo <> invalid and simpleModalInfo.buttonInfo <> invalid and simpleModalInfo.buttonInfo[0] <> invalid
+  if simpleModalInfo <> invalid AND simpleModalInfo.buttonInfo <> invalid AND simpleModalInfo.buttonInfo[0] <> invalid
     simpleModalInfo.buttonInfo[0].callbackParams = {
       email : requestInput.email
       emailType : requestInput.emailType
@@ -295,7 +295,7 @@ Function onStaticPageSelected(evt)
   ' sending static page name(ToS/PP/DoNotSellMyInfo) & screen level
   currentScreen = getCurrentScreen()
   pageSource = ""
-  if currentScreen <> invalid and currentScreen.getSubtype() = "SignInScreen"
+  if currentScreen <> invalid AND currentScreen.getSubtype() = "SignInScreen"
     pageSource = m.constants.ui.screenIds.signInScreen
   end if
   showSettingsScreen(staticPageSelected, 150, pageSource)
@@ -417,7 +417,7 @@ End Function
 Function onReEnterPasswordSelected()
 
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and currentScreen.getSubtype() =  "SignInScreen"
+  if currentScreen <> invalid AND currentScreen.getSubtype() =  "SignInScreen"
     currentScreen.resetFocus = true
   end if
 
@@ -451,7 +451,7 @@ End Function
 Function onPostSignInAuthInfoUpdated()
   tubiLog("SignInHelpers.onPostSignInAuthInfoUpdated")
   authInfo = handleUpdatedAuth()
-  if (shouldShowAgeGate() and authInfo <> invalid and authInfo.hasAge <> true)
+  if (shouldShowAgeGate() AND authInfo <> invalid AND authInfo.hasAge <> true)
     m.spinner.visible = false
     signInInfo = invalid
     if authInfo <> invalid
@@ -514,7 +514,7 @@ Function onMatureContentWarningSignInCompleted()
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
 
-  if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
+  if currentScreen <> invalid AND currentScreen.getSubtype() = "DetailScreen"
     refreshAllDetailScreens()
     currentScreen.removeSignupButton = true
     currentScreen.jumpToItem = 0
@@ -593,7 +593,7 @@ Function onQueueAfterSignIn()
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
 
-  if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
+  if currentScreen <> invalid AND currentScreen.getSubtype() = "DetailScreen"
     currentScreen.removeSignupButton = true
     currentScreen.jumpToItem = 0
     onAddToQueue(currentScreen, onBookmarkedAfterSignIn)
@@ -621,7 +621,7 @@ Function onRegistrationProcessCompletedOnDetailsScreen()
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
 
-  if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
+  if currentScreen <> invalid AND currentScreen.getSubtype() = "DetailScreen"
     currentScreen.removeSignupButton = true
     currentScreen.refreshContent = true
     currentScreen.setFocus(true)
@@ -639,7 +639,7 @@ Function onParentalControlAfterSignIn()
 
   setContentToRefreshAllPersonalizedScreens()
 
-  if currentScreen <> invalid and currentScreen.getSubtype() = "SettingsScreen"
+  if currentScreen <> invalid AND currentScreen.getSubtype() = "SettingsScreen"
     setSettingsScreenSignInInfo()
     currentScreen.setFocus(true)
 
@@ -673,7 +673,7 @@ Function onSideNavMyListAfterSignIn()
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
 
-  if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.categoryDetailsScreen and currentScreen.categoryId = m.constants.ui.categoryIds.queue
+  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.categoryDetailsScreen AND currentScreen.categoryId = m.constants.ui.categoryIds.queue
     ' this happens when user logs in via categoryDetailsScreen (queue/mylist)
     content = CreateObject("roSGNode", "CategoryContentNode")
     content.id = m.constants.ui.categoryIds.queue
@@ -693,7 +693,7 @@ Function onAutoplayPreviewAfterSignIn()
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
 
-  if currentScreen <> invalid and currentScreen.getSubtype() = "SettingsScreen"
+  if currentScreen <> invalid AND currentScreen.getSubtype() = "SettingsScreen"
     setSettingsScreenSignInInfo()
     currentScreen.setFocus(true)
   end if
@@ -723,7 +723,7 @@ Function popScreenAfterSignInProcess()
   count = m.screenStack.getChildCount()-1
   for i = count to 0 step -1
     screen = m.screenStack.getChild(i)
-    if screen <> invalid and poppableScreenSubtypes[screen.getSubtype()] = true
+    if screen <> invalid AND poppableScreenSubtypes[screen.getSubtype()] = true
       popScreen(false, false)
     else
       exit for
@@ -833,9 +833,9 @@ End Function
 
 Function onQueryStatusOfMagicLinkResponse(response)
   tubiLog("SignInHelpers.onqueryStatusOfMagicLinkResponse")
-  if response <> invalid and response.status = "PENDING"
+  if response <> invalid AND response.status = "PENDING"
     m.emailVerificationTimer.control = "start"
-  else if response <> invalid and response.access_token <> invalid
+  else if response <> invalid AND response.access_token <> invalid
     onStopAndClearEmailVerificationTimer()
     Auth = TubiAuth(m.constants, m.Request)
     Auth.handleRegistration(response)

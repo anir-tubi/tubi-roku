@@ -20,7 +20,7 @@ Function pushScreen(screen As Object, sendNavigateEvents = true, sendLoadingEven
 
   ' don't focus the pushed screen if there is an active modal
   modal = m.NodeHelpers.getLastChild(m.top)
-  if modal.isSubtype("ModalDialogScreen") and modal.isInFocusChain() = true
+  if modal.isSubtype("ModalDialogScreen") AND modal.isInFocusChain() = true
     screen.shouldFocusWhenPushed = false
   end if
 
@@ -66,11 +66,11 @@ Function popScreen(sendNavigateEvents = true, sendLoadingEvents = true)
     }
   end if
 
-  if sendNavigateEvents = true and topHidden <> invalid and toBePopped <> invalid
+  if sendNavigateEvents = true AND topHidden <> invalid AND toBePopped <> invalid
     screenTrackingNavigate(toBePopped.trackingPageInfo, topHidden.trackingPageInfo)
   end if
 
-  if sendLoadingEvents = true and topHidden <> invalid
+  if sendLoadingEvents = true AND topHidden <> invalid
     screenTrackingLoad(topHidden.trackingPageInfo)
   end if
 
@@ -212,7 +212,7 @@ End Function
 
 Function onScreenChange()
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and currentScreen.id <> invalid
+  if currentScreen <> invalid AND currentScreen.id <> invalid
     bSideNavVisible = (m.constants.ui.sideNavOpenIds[currentScreen.id] = true)
     m.sideNav.visible = bSideNavVisible
   end if

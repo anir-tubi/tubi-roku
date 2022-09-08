@@ -338,7 +338,7 @@ End Function
 
 
 Function onAgeNotVerifiedAtSignIn(err)
-  if err <> invalid and err.code <> invalid
+  if err <> invalid AND err.code <> invalid
     if err.code = 422 or err.code = 451
       handle_422_451_error(restartChannelAfterAgeVerification) ' happens when user enters age less than 13
     else
@@ -357,7 +357,7 @@ Function handle_422_451_errorAtInputDeeplinkCallback()
 End Function
 
 Function onAgeNotVerifiedAtKidsModeExit(err)
-  if err <> invalid and err.code <> invalid
+  if err <> invalid AND err.code <> invalid
     if err.code = 422 or err.code = 451
       ' happens when user enters age less than 13
       handle_422_451_error(handle_422_451_errorAtKidsModeExitCallback)
@@ -369,7 +369,7 @@ End Function
 
 
 Function onAgeNotVerifiedAtInputDeeplink(err)
-  if err <> invalid and err.code <> invalid
+  if err <> invalid AND err.code <> invalid
     if err.code = 422 or err.code = 451
       ' happens when user enters age less than 13
       handle_422_451_error(handle_422_451_errorAtInputDeeplinkCallback)
@@ -381,7 +381,7 @@ End Function
 
 
 Function onAgeNotVerifiedAtStartup(err)
-  if err <> invalid and err.code <> invalid
+  if err <> invalid AND err.code <> invalid
     if err.code = 422 or err.code = 451
       handle_422_451_error(startUserExperienceAsAgeNotVerifiedOnStartUp) ' happens when user enters age less than 13
     else
@@ -392,7 +392,7 @@ End Function
 
 
 Function onAgeNotVerifiedAtSignup(err)
-  if err <> invalid and err.code <> invalid
+  if err <> invalid AND err.code <> invalid
     if err.code = 422 or err.code = 451
       handle_422_451_error(restartChannelAfterAgeVerification) ' happens when user enters age less than 13
     else if err.code = 403
@@ -619,7 +619,7 @@ Function onAgeSubmitted(verifyAgeCallback) as Void
   birthdate = ageVerificationScreen.birthdate
   signInInfo = ageVerificationScreen.signInInfo
 
-  if verifyAgeCallback <> invalid and verifyAgeCallback = verifyAgeAtSignup
+  if verifyAgeCallback <> invalid AND verifyAgeCallback = verifyAgeAtSignup
     verifyAgeCallback(signInInfo, birthdate)
   else if verifyAgeCallback <> invalid
     verifyAgeCallback(birthdate)
@@ -639,7 +639,7 @@ End Function
 Function verifyAge(birthdate, successCallback, errorCallback)
   tubiLog("AgeVerificationScreenHelpers.verifyAge")
 
-  if isString(birthdate) and birthdate <> "" 'triggers when signedIn user gives age information
+  if isString(birthdate) AND birthdate <> "" 'triggers when signedIn user gives age information
 
     confirmBirthdateRequestInfo = m.UserDeviceApi.deviceRegisterInfo(birthdate)
     m.makeRequest({
@@ -678,7 +678,7 @@ Function hasValidSignUpCredentials(birthdate, signInInfo)
     emailType = signInInfo.emailType
   end if
 
-  if isString(birthdate) and birthdate <> "" and email <> "" and firstName <> "" and emailType <> ""
+  if isString(birthdate) AND birthdate <> "" AND email <> "" AND firstName <> "" AND emailType <> ""
     isValid = true
   end if
 
@@ -695,11 +695,11 @@ Function onAgeVerified(age)
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
 
-  if isLoggedInUser() and age >= m.constants.ui.ages.ageGate
+  if isLoggedInUser() AND age >= m.constants.ui.ages.ageGate
     ' age verified for logged in user so update auth info
     authInfo = m.global.authInfo
     updatedAuthInfo = Auth.updateAuthInfoWithAge(true)
-    if isAA(authInfo) = true and isAA(updatedAuthInfo) = true
+    if isAA(authInfo) = true AND isAA(updatedAuthInfo) = true
       ' append updatedAuthInfo to the global authInfo to maintain the existing additional fields from global that aren't stored in registry
       authInfo.append(updatedAuthInfo)
       updatedAuthInfo = authInfo
@@ -760,13 +760,13 @@ End Function
 Function onBirthdayCheckSuccess(hasAgeInfo)
   tubiLog("AgeVerificationScreenHelpers.onBirthdayCheckSuccess")
 
-  if hasAgeInfo <> invalid and hasAgeInfo.hasAge = true
+  if hasAgeInfo <> invalid AND hasAgeInfo.hasAge = true
     Request = TubiRequest(m.constants.settings)
     Auth = TubiAuth(m.constants, Request)
 
     authInfo = m.global.authInfo
     updatedAuthInfo = Auth.updateAuthInfoWithAge(true)
-    if isAA(authInfo) = true and isAA(updatedAuthInfo) = true
+    if isAA(authInfo) = true AND isAA(updatedAuthInfo) = true
       ' append updatedAuthInfo to the global authInfo to maintain the existing additional fields from global that aren't stored in registry
       authInfo.append(updatedAuthInfo)
       updatedAuthInfo = authInfo
@@ -781,7 +781,7 @@ Function onBirthdayCheckSuccess(hasAgeInfo)
 
     signInInfo = {}
     authInfo = m.global.authInfo
-    if isLoggedInUser(authInfo) and authInfo.firstname <> invalid
+    if isLoggedInUser(authInfo) AND authInfo.firstname <> invalid
       signInInfo.email = authInfo.email
       signInInfo.firstname = authInfo.firstname
     end if

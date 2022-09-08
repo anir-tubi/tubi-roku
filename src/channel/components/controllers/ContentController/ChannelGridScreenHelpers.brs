@@ -98,11 +98,11 @@ End Function
 Function onVisibleItemsChange(msg)
   tubiLog("ChannelGridScreenHelpers.onVisibleItemsChange")
   aVisibleContentNodes = msg.getData()
-  if aVisibleContentNodes <> invalid and aVisibleContentNodes.Count() > 0
+  if aVisibleContentNodes <> invalid AND aVisibleContentNodes.Count() > 0
     '//Check thru the array of content nodes of the visible items to see if any of the items within those rows
     '//have sponsorships, and then send out the pixels for those items (if they have not been sent already)
     for each contentNode in aVisibleContentNodes
-      if contentNode <> invalid and contentNode.sponsorImages <> invalid and contentNode.sponsorImages.pixels <> invalid and contentNode.sponsorImages.pixels["container_list"] <> invalid
+      if contentNode <> invalid AND contentNode.sponsorImages <> invalid AND contentNode.sponsorImages.pixels <> invalid AND contentNode.sponsorImages.pixels["container_list"] <> invalid
         containerId = contentNode.id
         sponsorPixels = contentNode.sponsorImages.pixels["container_list"]
         '//Only send sponsor pixels once per page load
@@ -180,7 +180,7 @@ Function onCategoriesListError(errorInfo)
 
   screen = getFromScreenCache(errorInfo.screenId)
 
-  if screen <> invalid and (screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.categoryListScreen)
+  if screen <> invalid AND (screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.categoryListScreen)
     'the channelListScreen will be popped from the stack after the user closes the error modal
 
     'delete the screen from the screen cache so that the next time the user attempts to load the page, the page will be loaded

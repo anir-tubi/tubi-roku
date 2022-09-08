@@ -57,7 +57,7 @@ Function createDeeplinkContentFromStartupArgs(args)
     end if
 
     ' the device id of the device deeplinking to roku. Might be an iOS or android device that is "casting" to roku.
-    if args.deviceId <> invalid and args.deviceId.unescape() <> ""
+    if args.deviceId <> invalid AND args.deviceId.unescape() <> ""
       content.sourceDeviceId = args.deviceId.unescape()
     end if
 
@@ -74,7 +74,7 @@ Function createDeeplinkContentFromStartupArgs(args)
     ' or page=network&contentId=fox
     ' See full list of mediaType at https://sdkdocs.roku.com/display/sdkdoc/External+Control+Guide
 
-    if content.id <> "" and args.mediaType <> invalid ' video request expect for season
+    if content.id <> "" AND args.mediaType <> invalid ' video request expect for season
       if args.mediaType = "series"
         content.type = "series"
         content.deeplinkType = "series"
@@ -91,7 +91,7 @@ Function createDeeplinkContentFromStartupArgs(args)
         content.type = "linear"
         content.deeplinkType = "linear"
       end if
-    else if args.mediaType = invalid and args.page <> invalid ' page request
+    else if args.mediaType = invalid AND args.page <> invalid ' page request
       if args.page = "movies"
         content.deeplinkType = "moviePage"
       else if args.page = "live"
@@ -150,7 +150,7 @@ Function handleInputDeeplink(inputInfo) as Void
   tubilog("DeeplinkHelpers.handleInputDeeplink")
   resetSideNav(false)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
-  stopVideoContent(videoPlayer) 'sets m.enteredFromDeeplink = false and m.deeplinkContent = invalid
+  stopVideoContent(videoPlayer) 'sets m.enteredFromDeeplink = false AND m.deeplinkContent = invalid
   stopCountdownTimer() 'stop previous counter
   stopAndHideLinearVideoPlayer()
   if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
@@ -183,7 +183,7 @@ Function handleInputDeeplink(inputInfo) as Void
   ' close any opened modal/pop-up when deeplinking via roInput
   for i=0 to m.top.getChildCount()-1
     screen = m.top.getChild(i)
-    if screen <> invalid and screen.subType() = "ModalDialogScreen"
+    if screen <> invalid AND screen.subType() = "ModalDialogScreen"
       closeModal(screen, "back")
     end if
   end for
@@ -375,7 +375,7 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
       source_device_id: deepLinkContent.sourceDeviceId
     }
 
-    if (deepLinkContent.type = m.constants.ui.contentTypes.linear or deepLinkContent.type = m.constants.ui.contentTypes.video or (deepLinkContent.type = "series" and deepLinkContent.deeplinkType = "series")) and deepLinkContent.id <> invalid and deepLinkContent.id <> ""
+    if (deepLinkContent.type = m.constants.ui.contentTypes.linear or deepLinkContent.type = m.constants.ui.contentTypes.video or (deepLinkContent.type = "series" AND deepLinkContent.deeplinkType = "series")) AND deepLinkContent.id <> invalid AND deepLinkContent.id <> ""
       pageInfo = {
         pageType: "video_player_page"
         pageValues: {
@@ -416,7 +416,7 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
         seriesId = deepLinkContent.id.toInt()
         referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("episode_video_list_page", { series_id: seriesId })
       end if
-    else if entryPoint =  m.constants.deeplinks.entryPoints.video and pageInfo <> invalid
+    else if entryPoint =  m.constants.deeplinks.entryPoints.video AND pageInfo <> invalid
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
     end if
 
@@ -478,7 +478,7 @@ Function handleCategoryDeeplinkContent()
   end if
   sCatSideNavID = m.constants.ui.sideNavIds.categories
 
-  if (isParentalControlsAdultLevel() = true or isParentalControlsTeensLevel() = true) and m.uiMode <> m.constants.ui.modes.kidsAgeGate
+  if (isParentalControlsAdultLevel() = true or isParentalControlsTeensLevel() = true) AND m.uiMode <> m.constants.ui.modes.kidsAgeGate
     setUiMode(m.constants.ui.modes.standard)
   end if
 
@@ -641,7 +641,7 @@ Function handleDeeplinkSeriesSuccessResponse(refreshedContent)
 
     episodeHistory = getHistory(episode.id)
 
-    if episodeHistory <> invalid and episodeHistory.nowPos > 0
+    if episodeHistory <> invalid AND episodeHistory.nowPos > 0
       episode.nowPos = episodeHistory.nowPos
       afterFn = resumeHelper
     end if
@@ -720,7 +720,7 @@ Function handleDeeplinkEpisodeSuccessResponse(refreshedContent)
   if history <> invalid
     episode = getEpisodeContent(refreshedContent)
     episodeHistory = getHistory(episode.id)
-    if episodeHistory <> invalid and episodeHistory.nowPos > 0
+    if episodeHistory <> invalid AND episodeHistory.nowPos > 0
       episode.nowPos = episodeHistory.nowPos
     end if
     afterFn = resumeHelper
@@ -774,12 +774,12 @@ Function handleSingleContentDeeplinkError(error)
   tubilog("DeeplinkHelpers.handleSingleContentDeeplinkError")
 
   message = getTranslation("screenDetails_error_getContent_description")
-  if m.enteredFromDeepLink = false and m.deepLinkContent <> invalid
+  if m.enteredFromDeepLink = false AND m.deepLinkContent <> invalid
     'only in case of the movie, we have already sneaked the showdetail screen, so we need to
     'bring the user to previous screen.
     if m.deepLinkContent.deeplinktype = "movie"
       detailScreen = getTopDetailScreenFromStack()
-      if detailScreen <> invalid and detailScreen.content.id = m.deepLinkContent.id
+      if detailScreen <> invalid AND detailScreen.content.id = m.deepLinkContent.id
         'Simply popping the screen is resulting in issues, so calling onDetailBackPressed function.
         onDetailBackPressed()
       end if

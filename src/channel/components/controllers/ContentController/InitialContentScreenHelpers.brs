@@ -28,7 +28,7 @@ End Function
 ' If the startup logo animation is done, then animate this screen into view.
 Function onStartupAnimationDone()
   screen = getCurrentScreen()
-  if screen <> invalid and screen.id = m.constants.ui.screenIds.initialContentScreen
+  if screen <> invalid AND screen.id = m.constants.ui.screenIds.initialContentScreen
     screen.animateIntoView = true
   end if
 End Function

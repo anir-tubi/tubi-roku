@@ -53,7 +53,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
         setPageTypeForVideoPreview(pageType) ' this will help to trigger analytics
       else
         previewState = getVideoPreviewState()
-        if previewState <> "stopped" and previewState <> "finished" ' this means video not stopped/finished for previous content, so we need to stop it
+        if previewState <> "stopped" AND previewState <> "finished" ' this means video not stopped/finished for previous content, so we need to stop it
           stopVideoPreview()
         end if
       end if
@@ -82,7 +82,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.content = content
 
     ' waiting to populate the details screen for series until after we fetch episode data
-    if m.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video and content.seriesId <> invalid and content.seriesId <> "")
+    if m.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video AND content.seriesId <> invalid AND content.seriesId <> "")
       detailScreen.isLoading = true
     else if successCb <> invalid
       detailScreen.isLoading = true
@@ -138,7 +138,7 @@ End Function
 ' @screen: roSGNode, a node with subtype BaseScreen
 ' @returns: boolean, true if the passed in parameter is a detail screen, false otherwise
 Function isDetailScreen(screen)
-  return (type(screen) = "roSGNode" and screen.isSubType("DetailScreen") = true)
+  return (type(screen) = "roSGNode" AND screen.isSubType("DetailScreen") = true)
 End Function
 
 
@@ -219,7 +219,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
   tubiLog("DetailScreenHelpers.populateDetailScreen")
   'initialize default background - will be overwritten later in most cases
   backgroundUriList = [m.defaultBackgroundUri]
-  if isDetailScreen(detailScreen) = true and type(content) = "roSGNode"
+  if isDetailScreen(detailScreen) = true AND type(content) = "roSGNode"
     'hide the spinner
     detailScreen.isLoading = false
 
@@ -245,7 +245,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     history = getHistory(content.id)
     like = getLike(content.id)
 
-    if isLoggedInUser() = false and history <> invalid
+    if isLoggedInUser() = false AND history <> invalid
       '//if user is signed out but has history of current item, make sure it has been less than guest user resume limit,
       '//   because beyond that time we are restricted legally from showing data of signed out users.
 
@@ -296,9 +296,9 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     lineOneData.releaseDate = content.releaseDate
     lineOneData.partnerLogoUri = content.inlineLogoUri
 
-    if episode <> invalid and (episode.hasSubtitles = true or not m._.empty(episode.subtitleTracks))
+    if episode <> invalid AND (episode.hasSubtitles = true or not m._.empty(episode.subtitleTracks))
       lineOneData.hasCC = true
-    else if content <> invalid and content.type = m.constants.ui.contentTypes.video and (content.hasSubtitles = true or not m._.empty(content.subtitleTracks))
+    else if content <> invalid AND content.type = m.constants.ui.contentTypes.video AND (content.hasSubtitles = true or not m._.empty(content.subtitleTracks))
       lineOneData.hasCC = true
     else
       lineOneData.hasCC = false
@@ -306,9 +306,9 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
 
     lineOneData.descriptorCode = content.descriptorCode
 
-    if content.availabilityEnds <> invalid and content.availabilityEnds <> ""
+    if content.availabilityEnds <> invalid AND content.availabilityEnds <> ""
       lineOneData.availabilityEnds = content.availabilityEnds
-    else if episode <> invalid and episode.availabilityEnds <> invalid
+    else if episode <> invalid AND episode.availabilityEnds <> invalid
       lineOneData.availabilityEnds = episode.availabilityEnds
     end if
 
@@ -326,14 +326,14 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     detailScreen.likeDislikeState = sLikedState
 
     '//right now in kids mode, there are no channels showing up, so hardcode it so the channel's button doesn't show
-    detailScreen.isChannelItem = (content.channelId <> invalid and content.channelId <> "" and isKidsUIOn() = false)
+    detailScreen.isChannelItem = (content.channelId <> invalid AND content.channelId <> "" AND isKidsUIOn() = false)
     detailScreen.stringChannelButton = getTranslation("screenDetails_button_gotoChannel", {channel: content.channelName})
     detailScreen.length = stateSource.length 'needed to compute the resume bar on the resume button
 
     nResumePoint = 0
-    if content.type = m.constants.ui.contentTypes.series and episodeHistory <> invalid and episodeHistory.nowPos > 0
+    if content.type = m.constants.ui.contentTypes.series AND episodeHistory <> invalid AND episodeHistory.nowPos > 0
       nResumePoint = episodeHistory.nowPos
-    else if content.type = m.constants.ui.contentTypes.video and history <> invalid and history.nowPos > 0
+    else if content.type = m.constants.ui.contentTypes.video AND history <> invalid AND history.nowPos > 0
       nResumePoint = history.nowPos
     end if
     if nResumePoint < m.constants.player.historyFrequency
@@ -341,7 +341,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       nResumePoint = 0
     end if
 
-    if nSavedPosition >= m.constants.player.historyFrequency and isLoggedInUser() = true
+    if nSavedPosition >= m.constants.player.historyFrequency AND isLoggedInUser() = true
       '//nSavedPosition is only used for signed in users and ignored for guest users.
       '//If the saved position is passed as greater than the constant historyFrequency, then use that number instead.
       '//This parameter was put in place to display the updated resume point before having to wait to backend to confirm that the resume point is correct
@@ -365,7 +365,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     end if
 
     'update the background images for the detail screen
-    if content.backgrounds <> invalid and content.backgrounds.count() > 0
+    if content.backgrounds <> invalid AND content.backgrounds.count() > 0
       backgroundUriList = content.backgrounds
     end if
 
@@ -410,8 +410,8 @@ End Function
 'wrapper around getSingleContentFromServer for use as a callback in the error modal
 '@params: 4 index array containing params that should be passed to getSingleContentFromServer()
 Function getSingleContentFromServerRetry(params)
-  if type(params) = "roArray" and params.count() = 4
-    if type(params[3]) = "roSGNode" and params[3].subtype() = "DetailScreen"
+  if type(params) = "roArray" AND params.count() = 4
+    if type(params[3]) = "roSGNode" AND params[3].subtype() = "DetailScreen"
       params[3].isLoading = true
     end if
     getSingleContentFromServer(params[0], params[1], params[2])
@@ -437,7 +437,7 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
   tubiLog("DetailScreenHelpers.handleSingleContentResponse")
   detailScreen = getTopDetailScreenFromStack()
 
-  if detailScreen <> invalid and detailScreen.content.id = refreshedContent.id
+  if detailScreen <> invalid AND detailScreen.content.id = refreshedContent.id
     detailScreen.contentFetchError = false
 
     ' Replace the top of the detail screen content stack with the refreshed content
@@ -446,8 +446,8 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
     history = getHistory(refreshedContent.id)
     ' Find a default episode to land on, in case no specific episode requested.
     ' NOTE: If the series is a daily, recurring series then we always want to go to the most recent
-    if refreshedContent.type = m.constants.ui.contentTypes.series and refreshedContent.currentEpisodeId = "" and refreshedContent.isRecurring = false
-      if oldContent <> invalid and oldContent.type = m.constants.ui.contentTypes.video
+    if refreshedContent.type = m.constants.ui.contentTypes.series AND refreshedContent.currentEpisodeId = "" AND refreshedContent.isRecurring = false
+      if oldContent <> invalid AND oldContent.type = m.constants.ui.contentTypes.video
         ' a specific episode was requested by id
         refreshedContent.currentEpisodeId = oldContent.id
       else
@@ -458,7 +458,7 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
           refreshedContent.currentEpisodeId = ""
         end if
       end if
-    else if refreshedContent.type = m.constants.ui.contentTypes.video and refreshedContent.seriesId <> invalid and refreshedContent.seriesId <> ""
+    else if refreshedContent.type = m.constants.ui.contentTypes.video AND refreshedContent.seriesId <> invalid AND refreshedContent.seriesId <> ""
       ' Case here of having an episode outside of a series (probably from autoplay)
       emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
       emptySeriesNode.type = m.constants.ui.contentTypes.series
@@ -546,11 +546,11 @@ Function handleSingleContentError(error, onRetrySuccessCallback, onRetryErrorCal
   detailScreen = getTopDetailScreenFromStack()
   message = ""
 
-  if detailScreen <> invalid and m.isScreenLoaded = false
+  if detailScreen <> invalid AND m.isScreenLoaded = false
     populateDetailScreen(detailScreen, detailScreen.content)
   end if
 
-  if detailScreen <> invalid and detailScreen.isInFocusChain() = true
+  if detailScreen <> invalid AND detailScreen.isInFocusChain() = true
     content = getDetailScreenContent(detailScreen)
 
     ' set up the error modal dialog
@@ -588,7 +588,7 @@ End Function
 Function getRelatedContent(content)
   ' get related (You May Also Like) content along with metadata for the content
   ' (but not if in any of the kids modes, since it won't be displayed)
-  if content <> invalid and isKidsUIOn() = false
+  if content <> invalid AND isKidsUIOn() = false
     relatedRequestInfo = m.cmsApi.relatedContentReqInfo(content.id, shouldKidsModeBeSentToServer())
     m.makeRequest({
       url: relatedRequestInfo.url
@@ -605,7 +605,7 @@ End Function
 
 Function handleRelatedResponse(relatedContent)
   detailScreen = getTopDetailScreenFromStack()
-  if detailScreen <> invalid and relatedContent <> invalid
+  if detailScreen <> invalid AND relatedContent <> invalid
     if detailScreen.content.id = relatedContent.id
       'After AutoPlay or refresh required and when pressing back from Player to detail screen
       'related content(YMAL) thumbnails are not loading. Resetting relatedContent node fixes the issue.
@@ -643,7 +643,7 @@ End Function
 '   for example, if currentItemFocused = [3,2], this function will return [3,3] if second episode is not the last episode in season 3
 '   or [4,0] if there is a season 4 and second episode is last episode in season 3.
 Function findNextEpisode2dIndex(currentItemFocused, contentNode)
-  if contentNode <> invalid and currentItemFocused <> invalid and currentItemFocused.count() = 2
+  if contentNode <> invalid AND currentItemFocused <> invalid AND currentItemFocused.count() = 2
     seasonIndex = currentItemFocused[0]
     episodeIndex = currentItemFocused[1]
 
@@ -665,7 +665,7 @@ End Function
 Function findNextEpisode(currentItemFocused, seriesContent)
   nextEpisode = [0, 0] ' initialize next episode to be first episode
 
-  if seriesContent <> invalid and currentItemFocused <> invalid and currentItemFocused.count() = 2
+  if seriesContent <> invalid AND currentItemFocused <> invalid AND currentItemFocused.count() = 2
 
     nextEpisode = findNextEpisode2dIndex(currentItemFocused, seriesContent)
     seasonIndex = nextEpisode[0]
@@ -679,13 +679,13 @@ Function findNextEpisode(currentItemFocused, seriesContent)
           item = seriesContent.getchild(i).getChild(j)
           history = historyIds.findNode(item.id)
 
-          if history <> invalid and history.nowPos <> invalid and history.nowPos <> 0
+          if history <> invalid AND history.nowPos <> invalid AND history.nowPos <> 0
             nowPos = history.nowPos
           else
             nowPos = 0
           end if
 
-          if item.creditsCuePoints <> invalid and item.creditsCuePoints.postlude <> invalid and nowPos < item.creditsCuePoints.postlude then
+          if item.creditsCuePoints <> invalid AND item.creditsCuePoints.postlude <> invalid AND nowPos < item.creditsCuePoints.postlude then
             return [i, j] ' first unwatched episode next to currently watched episode
           end if
         end for
@@ -695,7 +695,7 @@ Function findNextEpisode(currentItemFocused, seriesContent)
 
 
       'if we ran out of all the episodes, return first episode as next episode
-      if i = seriesContent.getChildCount() - 1 and j = seriesContent.getChild(i).getChildCount() - 1
+      if i = seriesContent.getChildCount() - 1 AND j = seriesContent.getChild(i).getChildCount() - 1
         nextEpisode = [0, 0]
       end if
     end if
@@ -708,7 +708,7 @@ End Function
 ' returns episode detail as node, if episode detail not present it returns invalid
 Function getEpisodeDetail(content)
   if content <> invalid
-    if content.currentEpisodeId <> invalid and content.currentEpisodeId <> ""
+    if content.currentEpisodeId <> invalid AND content.currentEpisodeId <> ""
       return content.findNode(content.currentEpisodeId)
     else
       season = content.getChild(0)
@@ -728,7 +728,7 @@ Function getEpisodeContent(content)
   episode = invalid
 
   if content <> invalid
-    if content.currentEpisodeId <> invalid and content.currentEpisodeId <> ""
+    if content.currentEpisodeId <> invalid AND content.currentEpisodeId <> ""
       episode = content.findNode(content.currentEpisodeId)
     end if
 
@@ -753,7 +753,7 @@ End Function
 ' @content: tubiContentNode - video or series
 Function getCurrentEpisode(content)
   episode = invalid
-  if content <> invalid and content.type = m.constants.ui.contentTypes.series
+  if content <> invalid AND content.type = m.constants.ui.contentTypes.series
     episode = getEpisodeContent(content)
   end if
   return episode
@@ -766,7 +766,7 @@ Function getDetailScreenContent(screen = invalid)
     screen = getTopDetailScreenFromStack()
   end if
 
-  if screen <> invalid and screen.subType() = "DetailScreen" and screen.content <> invalid
+  if screen <> invalid AND screen.subType() = "DetailScreen" AND screen.content <> invalid
     return screen.content
   else
     return invalid
@@ -817,18 +817,18 @@ Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
       end if
       buttons = [getTranslation("dialog_button_continue"), getTranslation("dialog_button_cancel")]
       showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, addToQueueSignInSelected)
-    else if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
+    else if detailScreen <> invalid AND detailScreen.isWaitingForServerResponse <> true
       detailScreen.stringQueueButton = getTranslation("screenDetails_button_queueNow")
 
       authInfo = getFieldFromGlobal("authInfo")
       userId = 0
-      if authInfo <> invalid and authInfo.userId <> invalid
+      if authInfo <> invalid AND authInfo.userId <> invalid
         userId = authInfo.userId.toInt()
       end if
       contentType = ""
-      if detailScreen.content <> invalid and detailScreen.content["type"] = m.constants.ui.contentTypes.video
+      if detailScreen.content <> invalid AND detailScreen.content["type"] = m.constants.ui.contentTypes.video
         contentType = m.constants.uapiContentTypes.movie
-      else if detailScreen.content <> invalid and detailScreen.content["type"] = m.constants.ui.contentTypes.series
+      else if detailScreen.content <> invalid AND detailScreen.content["type"] = m.constants.ui.contentTypes.series
         contentType = m.constants.uapiContentTypes.series
       end if
 
@@ -862,7 +862,7 @@ End Function
 
 'Wraps onAddToQueueSelected in the case of an error modal and a user attempting to retry adding the content to their queue
 Function onAddToQueueRetry(params)
-  if type(params) = "roArray" and params.count() = 1
+  if type(params) = "roArray" AND params.count() = 1
     onAddToQueue(params[0])
   end if
 End Function
@@ -936,7 +936,7 @@ Function onBookmarkedAfterSignIn(response)
       end if
 
       tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
-      if response <> invalid and response.parsedresponse <> invalid and detailScreen.content.id.toInt() = response.parsedresponse.content_id
+      if response <> invalid AND response.parsedresponse <> invalid AND detailScreen.content.id.toInt() = response.parsedresponse.content_id
         setIsBookmark(detailScreen, true)
       end if
 
@@ -971,7 +971,7 @@ Function onResumeAllowedTimerFired()
     '//Go thru the entire stack to find detailScreens
     while getHiddenScreen(screenStackDepth) <> invalid
       hiddenScreen = getHiddenScreen(screenStackDepth)
-      if hiddenScreen <> invalid and hiddenScreen.id = m.constants.ui.screenIds.detailScreen
+      if hiddenScreen <> invalid AND hiddenScreen.id = m.constants.ui.screenIds.detailScreen
         detailScreen = hiddenScreen
         bDetailScreenExistsInStack = true
 
@@ -1029,7 +1029,7 @@ End Function
 
 Function onRemoveFromQueue(detailScreen)
   tubiLog("DetailScreenHelpers.onRemoveFromQueue")
-  if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
+  if detailScreen <> invalid AND detailScreen.isWaitingForServerResponse <> true
     content = detailScreen.content.clone(false)
     bookmark = m.global.bookmarkIds.findNode(content.id)
     if bookmark <> invalid
@@ -1056,7 +1056,7 @@ End Function
 
 'Wraps onAddToQueueSelected in the case of an error modal and a user attempting to retry removing the content from their queue
 Function onRemoveFromQueueRetry(params)
-  if type(params) = "roArray" and params.count() = 1
+  if type(params) = "roArray" AND params.count() = 1
     onRemoveFromQueue(params[0])
   end if
 End Function
@@ -1098,7 +1098,7 @@ End Function
 ' @param params, Array: The 1st element is the detailscreen and the 2nd element should be the returnedAction of the failed likeDislike rating action: @see the parameters match updateLikeDislike()
 Function onLikeDislikeRetry(params)
   tubiLog("DetailScreenHelpers.onLikeDislikeRetry")
-  if type(params) = "roArray" and params.count() = 2
+  if type(params) = "roArray" AND params.count() = 2
     updateLikeDislike(params[0], params[1])
   end if
 End Function
@@ -1106,7 +1106,7 @@ End Function
 
 ' @param sRating, String: The like/dislike rating that the content like state should be changed. Or is the remove enum that will indicate the removal of the like/dislike state. The possible values are all under m.constants.ui.likeDislikeActions
 Function updateLikeDislike(detailScreen, sRatingChange)
-  if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true
+  if detailScreen <> invalid AND detailScreen.isWaitingForServerResponse <> true
     detailScreen.isWaitingForServerResponse = true
 
     '//While the backend is setting the rating, change the like state to changing
@@ -1141,14 +1141,14 @@ End Function
 Function onLikeChangedSuccess(requestBody)
   tubiLog("DetailScreenHelpers.onLikeChangedSuccess")
   detailScreen = getTopDetailScreenFromStack()
-  if requestBody <> invalid and type(requestBody.data) = "roArray"
+  if requestBody <> invalid AND type(requestBody.data) = "roArray"
     returnedContentId = requestBody.data[0]
     sReturnedAction = requestBody.action
     m.Bookmarks.updateLikesLocally(returnedContentId, sReturnedAction, m.global)
 
     '//Tell Detail Screen how to react to user interacting with the like/dislike button
-    if detailScreen <> invalid and detailScreen.content <> invalid
-      if detailScreen.content.id <> invalid and returnedContentId <> invalid and returnedContentId = detailScreen.content.id
+    if detailScreen <> invalid AND detailScreen.content <> invalid
+      if detailScreen.content.id <> invalid AND returnedContentId <> invalid AND returnedContentId = detailScreen.content.id
         '//if the returned server call is associated with the the current video title, then proceed
         '//Proceed to take the proper action based on the action requested
         detailScreen.isWaitingForServerResponse = false
@@ -1186,17 +1186,17 @@ Function onLikeChangedError(parsedReturn)
   code = parsedReturn.code
   returnedContentId = invalid
   returnedAction = invalid
-  if parsedReturn.action <> invalid and parsedReturn.data <> invalid and parsedReturn.data.Count() > 0
+  if parsedReturn.action <> invalid AND parsedReturn.data <> invalid AND parsedReturn.data.Count() > 0
     returnedContentId = parsedReturn.data[0]
     returnedAction = parsedReturn.action
   end if
 
   detailScreen = getTopDetailScreenFromStack()
 
-  if detailScreen <> invalid and detailScreen.content <> invalid
+  if detailScreen <> invalid AND detailScreen.content <> invalid
     '//return the likeDislike button to the way it was before trying to unsuccessfully set the like/dislike
     currentScreen = getCurrentScreen()
-    if currentScreen <> invalid and currentScreen.id = detailScreen.id
+    if currentScreen <> invalid AND currentScreen.id = detailScreen.id
       detailScreen.isWaitingForServerResponse = false
 
       '//set back to the previous like state before the failed attempt
@@ -1204,7 +1204,7 @@ Function onLikeChangedError(parsedReturn)
       setDetailScreenLikeDislikeStateFromLikeAction(detailScreen, sPreviousLikeState)
 
       '//Make sure the current screen is associated with the detail screen that caused the error
-      if code <> invalid and detailScreen.content.id <> invalid and returnedContentId <> invalid and returnedContentId = detailScreen.content.id
+      if code <> invalid AND detailScreen.content.id <> invalid AND returnedContentId <> invalid AND returnedContentId = detailScreen.content.id
         sErrorSubtype = ""
         dialogEvent = ""
         sAnalyticsDialogType = "SERVER_ERROR"
@@ -1248,7 +1248,7 @@ End Function
 
 
 Function onRemoveFromHistory(detailScreen)
-  if detailScreen <> invalid and detailScreen.isWaitingForServerResponse <> true and detailScreen.content <> invalid
+  if detailScreen <> invalid AND detailScreen.isWaitingForServerResponse <> true AND detailScreen.content <> invalid
     contentId = detailScreen.content.id
     history = getHistory(contentId)
 
@@ -1256,7 +1256,7 @@ Function onRemoveFromHistory(detailScreen)
 
     isLoggedInUser = isLoggedInUser(authInfo)
 
-    if isLoggedInUser = true and  history <> invalid and isNonEmptyString(history.historyId) = true
+    if isLoggedInUser = true AND  history <> invalid AND isNonEmptyString(history.historyId) = true
       content = detailScreen.content.clone(false)
       detailScreen.stringNoHistoryButton = getTranslation("screenDetails_button_removing")
       content.historyId = history.historyId
@@ -1283,7 +1283,7 @@ End Function
 
 'Wraps onRemoveFromHistorySelected in the case of an error modal and a user attempting to retry removing the content from their history
 Function onRemoveFromHistoryRetry(params)
-  if type(params) = "roArray" and params.count() = 1
+  if type(params) = "roArray" AND params.count() = 1
     onRemoveFromHistory(params[0])
   end if
 End Function
@@ -1331,7 +1331,7 @@ End Function
 Function onRelatedContentSelected(msg)
   detailScreen = msg.getRoSGNode()
   content = invalid
-  if detailScreen <> invalid and detailScreen.relatedContent <> invalid
+  if detailScreen <> invalid AND detailScreen.relatedContent <> invalid
     content = detailScreen.relatedContent.getChild(detailScreen.relatedContentSelected)
   end if
 
@@ -1422,7 +1422,7 @@ Function trailerHelper(screen)
 
   if content <> invalid then
     bMature = isMatureRating(content)
-    if isLoggedInUser() = false and bMature = true
+    if isLoggedInUser() = false AND bMature = true
       '//if user is a guest and is trying to play content geared for only adults, then ask them to register
       dialogSubtype = "mature-trailer"
       displayDetailScreenMaturePlayWarning(content, dialogSubtype)
@@ -1440,7 +1440,7 @@ Function trailerHelper(screen)
       trailerContent.nowPos = 0
       trailerContent.isTrailer = true
 
-      if content.hasTrailer and content.trailerInfo <> invalid and content.trailerInfo.url <> invalid
+      if content.hasTrailer AND content.trailerInfo <> invalid AND content.trailerInfo.url <> invalid
         trailerContent.url = content.trailerInfo.url
         trailerContent.id = content.trailerInfo.id
         trailerContent.subtitleTracks = []
@@ -1485,7 +1485,7 @@ Function isFetchingInProgress(screen) as Boolean
   bReturn = false
   task = screen.task
 
-  if task <> invalid and task.subType() = "DetailMetadataTask"
+  if task <> invalid AND task.subType() = "DetailMetadataTask"
     bReturn = true
   end if
 
@@ -1502,16 +1502,16 @@ Function isPlayable(screen) as Boolean
   bReturn = false
   content = screen.content
 
-  if content <> invalid and content.type <> invalid
+  if content <> invalid AND content.type <> invalid
     if content.type = "series"
       episodeDetail = getEpisodeDetail(screen.content)
-      if episodeDetail <> invalid and episodeDetail.url <> invalid and Len(episodeDetail.url) > 0
-        if episodeDetail.validUntil <> invalid and episodeDetail.validUntil >= UpTime(0)
+      if episodeDetail <> invalid AND episodeDetail.url <> invalid AND Len(episodeDetail.url) > 0
+        if episodeDetail.validUntil <> invalid AND episodeDetail.validUntil >= UpTime(0)
           bReturn = true
         end if
       end if
-    else if content.type = "video" and content.url <> invalid and Len(content.url) > 0
-      if content.validUntil <> invalid and content.validUntil >= UpTime(0)
+    else if content.type = "video" AND content.url <> invalid AND Len(content.url) > 0
+      if content.validUntil <> invalid AND content.validUntil >= UpTime(0)
         bReturn = true
       end if
     end if
@@ -1537,7 +1537,7 @@ End Function
 ' @playbackSource: string, valid values are "automatic", "deliberate", "previews" or "unknown"
 Function resumeVideoDetailScreen(detailScreen, playbackSource = "unknown")
   tubiLog("DetailScreenHelpers.resumeVideoDetailScreen")
-  if detailScreen <> invalid and isFetchingInProgress(detailScreen) <> true
+  if detailScreen <> invalid AND isFetchingInProgress(detailScreen) <> true
     detailScreen.playbackSource = playbackSource
     if isPlayable(detailScreen) = true
       resumeHelper(detailScreen)
@@ -1567,7 +1567,7 @@ End Function
 ' @playbackSource: string, valid values are "automatic", "deliberate", "previews" or "unknown"
 Function playVideoDetailScreen(detailScreen, playbackSource = "unknown")
   tubiLog("DetailScreenHelpers.playVideoDetailScreen")
-  if detailScreen <> invalid and isFetchingInProgress(detailScreen) <> true
+  if detailScreen <> invalid AND isFetchingInProgress(detailScreen) <> true
     detailScreen.playbackSource = playbackSource
     if isPlayable(detailScreen) = true
       playHelper(detailScreen)
@@ -1582,10 +1582,10 @@ End Function
 
 'Is the rating of the content in the passed screen set for mature audience?
 Function isMatureRating(content)
-  if content <> invalid and content.rating <> invalid
+  if content <> invalid AND content.rating <> invalid
     sRating = UCase(content.rating)
     aRatings = m.constants.ui.matureRatings[m.constants.deviceInfo.countryCode]
-    if aRatings <> invalid and aRatings.Count() > 0
+    if aRatings <> invalid AND aRatings.Count() > 0
       for i = 0 to aRatings.Count() - 1
         if sRating = aRatings[i]
           return true
@@ -1609,9 +1609,9 @@ End Function
 
 Function playHelper(screen)
   episode = getEpisodeContent(screen.content)
-  if episode <> invalid and screen.isLoading <> true then
+  if episode <> invalid AND screen.isLoading <> true then
     bMature = isMatureRating(episode)
-    if isLoggedInUser() = false and bMature = true
+    if isLoggedInUser() = false AND bMature = true
       '//if user is a guest and is trying to play content geared for only adults, then ask them to register
       dialogSubtype = "mature-play"
       if m.deepLinkContent <> invalid
@@ -1648,7 +1648,7 @@ End Function
 Function processResume(episode)
   bMature = isMatureRating(episode)
   nowPos = -1
-  if isLoggedInUser() = false and bMature = true
+  if isLoggedInUser() = false AND bMature = true
     '//if user is a guest and is trying to play content geared for only adults, then ask them to register dialogSubtype = "mature-play"
     dialogSubtype = "mature-resume"
     if m.deepLinkContent <> invalid
@@ -1659,13 +1659,13 @@ Function processResume(episode)
   else
     nowPos = 0
     ' using nowPos that was passed in with deeplink, when playback initiated via deeplink
-    if m.deeplinkContent <> invalid and episode.nowPos > 0
+    if m.deeplinkContent <> invalid AND episode.nowPos > 0
       nowPos = episode.nowPos
     else
       ' find the position in global history
       history = getHistory(episode.id)
 
-      if history <> invalid and history.nowPos > 0
+      if history <> invalid AND history.nowPos > 0
         nowPos = history.nowPos
       end if
     end if
@@ -1691,7 +1691,7 @@ Function skipDetailScreen(refreshedContent)
   detailScreen = getTopDetailScreenFromStack()
   if detailScreen <> invalid
     populateDetailScreen(detailScreen, refreshedContent)
-    if refreshedContent.type = m.constants.ui.contentTypes.series and refreshedContent.currentEpisodeId = "" and refreshedContent.isRecurring = false
+    if refreshedContent.type = m.constants.ui.contentTypes.series AND refreshedContent.currentEpisodeId = "" AND refreshedContent.isRecurring = false
       ' first see if there was a specific episode id we wanted
       history = getHistory(refreshedContent.id)
       if history <> invalid
@@ -1702,7 +1702,7 @@ Function skipDetailScreen(refreshedContent)
     episode = getEpisodeContent(refreshedContent)
 
     if episode <> invalid
-      if m.enteredFromDeepLink = true and m.deeplinkContent <> invalid
+      if m.enteredFromDeepLink = true AND m.deeplinkContent <> invalid
         sendDeeplinkAnalytics(m.deeplinkContent, episode, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
       end if
       nowPos = processResume(episode)
@@ -1738,7 +1738,7 @@ Function sendBookmarkAnalytics(content, operation, trackingLib, trackingTask, co
     op: operation
     component: {} 'menu component not currently included in protos definition
   }
-  if type(content) = "roSGNode" and content.isSubtype("ContentNode") = true
+  if type(content) = "roSGNode" AND content.isSubtype("ContentNode") = true
     pageInfo = getDetailScreenAnalyticsPageInfo(content, constants)
     bookmarkAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
   end if
@@ -1808,7 +1808,7 @@ Function onDetailScreenButtonToggleOn(msg)
   analyticsButtonValue = msg.getData()
   detailScreen = msg.getRoSGNode()
 
-  if analyticsButtonValue <> "" and isDetailScreen(detailScreen) = true
+  if analyticsButtonValue <> "" AND isDetailScreen(detailScreen) = true
     sendDetailMenuFocusAnalytics(detailScreen, analyticsButtonValue, "TOGGLE_ON")
   end if
 End Function
@@ -1819,7 +1819,7 @@ Function onDetailScreenButtonToggleOff(msg)
   analyticsButtonValue = msg.getData()
   detailScreen = msg.getRoSGNode()
 
-  if analyticsButtonValue <> "" and isDetailScreen(detailScreen) = true
+  if analyticsButtonValue <> "" AND isDetailScreen(detailScreen) = true
     sendDetailMenuFocusAnalytics(detailScreen, analyticsButtonValue, "TOGGLE_OFF")
   end if
 End Function
@@ -1830,7 +1830,7 @@ Function onDetailScreenButtonConfirm(msg)
   analyticsButtonValue = msg.getData()
   detailScreen = msg.getRoSGNode()
 
-  if analyticsButtonValue <> "" and isDetailScreen(detailScreen) = true
+  if analyticsButtonValue <> "" AND isDetailScreen(detailScreen) = true
     sendDetailMenuFocusAnalytics(detailScreen, analyticsButtonValue, "CONFIRM")
   end if
 End Function
@@ -1841,7 +1841,7 @@ End Function
 ' @param sAnalyticsValue:String, The analytics string value that represent a menu item or menu being focused or unfocused
 ' @param sUserInteraction: The protos enum related to the user interaction
 Function sendDetailMenuFocusAnalytics(screen, sAnalyticsValue, sUserInteraction)
-  if sAnalyticsValue <> invalid and sAnalyticsValue <> ""
+  if sAnalyticsValue <> invalid AND sAnalyticsValue <> ""
     componentInteractionEvent =  {
       pageOneof: {}
       componentOneof: {}
@@ -1869,7 +1869,7 @@ End Function
 'send the navigateToPage and pageLoad analytics in the case of an error loading the details screen
 Function sendDetailScreenErrorAnalytics(detailScreen)
   ' Handle navigate_to_page and page_load tracking for detail screen for error cases
-  if detailScreen <> invalid and detailScreen.contentFetchError = false
+  if detailScreen <> invalid AND detailScreen.contentFetchError = false
     oldScreen = getHiddenScreen(1) 'we already pushed the details screen, so the previous screen is 1 screen below the top screen/details screen
     if oldScreen <> invalid
       screenTrackingNavigate(oldScreen.trackingPageInfo, detailScreen.trackingPageInfo, oldScreen.trackingComponentInfo)
@@ -1887,7 +1887,7 @@ End Function
 ' @dialogSubtype: string, a string limited to 20 characters, used to distinguish different dialogs from each other
 ' @constants: assocArray, an instance of m.constants
 Function getDetailScreenDialogAnalyticEvent(content, dialogType, dialogSubtype, constants)
-  if type(content) = "roSGNode" and content.isSubtype("ContentNode") = true
+  if type(content) = "roSGNode" AND content.isSubtype("ContentNode") = true
     pageInfo = getDetailScreenAnalyticsPageInfo(content, constants)
   end if
 
@@ -1905,7 +1905,7 @@ End Function
 ' @content: roSGNode, the content that is residing on the details page content field, can be a movie or series
 Function getDetailScreenAnalyticsPageInfo(content, constants)
   pageInfo = invalid
-  if content <> invalid and type(content.id) = "roString"
+  if content <> invalid AND type(content.id) = "roString"
     if content.type = constants.ui.contentTypes.series
       pageInfo = {
         pageType: "series_detail_page"
@@ -1956,7 +1956,7 @@ Function removeFromQueueErrorResponse(error)
     code = ""
     content = getDetailScreenContent(detailScreen)
 
-    if content <> invalid and content.type = m.constants.ui.contentTypes.series
+    if content <> invalid AND content.type = m.constants.ui.contentTypes.series
       message = getTranslation("screenDetails_error_noQueueSeries_description")
     else
       message = getTranslation("screenDetails_error_noQueueMovie_description")
@@ -1997,7 +1997,7 @@ Function addToQueueSuccessResponse(response)
 
       if bookmarkId <> invalid
         tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
-        if response <> invalid and detailScreen.content.id.toInt() = response.content_id
+        if response <> invalid AND detailScreen.content.id.toInt() = response.content_id
           setIsBookmark(detailScreen, true)
         end if
         sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)

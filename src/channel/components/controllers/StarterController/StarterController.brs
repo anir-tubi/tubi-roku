@@ -17,7 +17,7 @@ End Function
 
 
 Function onUrlRequest()
-  if m.top.getUrl = true and m.hasExperiments = true and m.hasRemoteConfigs = true
+  if m.top.getUrl = true AND m.hasExperiments = true AND m.hasRemoteConfigs = true
     'Handle any remote config updates here:
     'Let youbora be enabled by the remote config
 
@@ -70,7 +70,7 @@ End Function
 Function onExternalConfigInfoReturned(msg)
   m.constants.externalConfig.info = msg.getData()
   if m.constants.externalConfig.info <> invalid
-    if m.constants.externalConfig.info.country <> invalid and m.constants.externalConfig.info.country <> ""
+    if m.constants.externalConfig.info.country <> invalid AND m.constants.externalConfig.info.country <> ""
       m.constants.deviceInfo.countryCode = UCase(m.constants.externalConfig.info.country)
     end if
   end if
@@ -142,7 +142,7 @@ End Function
 
 Function playAnimationLogo()
 
-  if m.bufferingCompleted = true and m.customSplashTimerCount >= m.splashScreenMin
+  if m.bufferingCompleted = true AND m.customSplashTimerCount >= m.splashScreenMin
     m.top.fadeOutCustomSplash = true
     m.videoPlayed = true
     m.animationLogo.control = "play"
@@ -161,11 +161,11 @@ Function onBufferingStatus(msg)
   buffering = msg.GetData()
   ' we are fadingIn startupScreens(VideoNode) only when the buffering percent is >= 99%
   ' this is to avoid black(videoNode) screen appearing before the video starts playing especially on slow internet connection
-  if buffering <> invalid and buffering.percentage >= 99
+  if buffering <> invalid AND buffering.percentage >= 99
     m.animationLogo.unobserveField("bufferingStatus")
     customFadeIn(m.startupScreens, 0.5, 0)
   ' starting the playback when the buffering percent is >= 33%
-  else if buffering <> invalid and buffering.percentage >= 33 and m.bufferingCompleted = false
+  else if buffering <> invalid AND buffering.percentage >= 33 AND m.bufferingCompleted = false
     m.bufferingCompleted = true
     playAnimationLogo()
   end if
@@ -205,7 +205,7 @@ End Function
 Function onAnimationLogoChange(msg)
 
   state = msg.GetData()
-  if (state = "finished" or state = "stopped") and m.videoPlayed = true
+  if (state = "finished" or state = "stopped") AND m.videoPlayed = true
     m.top.fadeInRemoteComponent = true
   end if
 

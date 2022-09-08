@@ -95,7 +95,7 @@ End Function
 ' The Linear Video Screen has indicated that the EPG Screen should be displayed now.
 Function onLinearVideoPlayerRequestingTVGuide()
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen and currentScreen.content <> invalid
+  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen AND currentScreen.content <> invalid
     if currentScreen.associatedScreenID = m.constants.ui.screenIds.epgScreen
       '//If the previous screen was the EPGScreen then simply back out of the player using the following function
       returnToPreviousScreenFromLinearVideo()
@@ -108,7 +108,7 @@ Function onLinearVideoPlayerRequestingTVGuide()
       animateLinearVideoPlayerToMinState()
 
       cachedAllEPGChannels = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
-      isEPGDataPrecached = (cachedAllEPGChannels <> invalid and cachedAllEPGChannels.getChildCount() > 0 and shouldRefresh(cachedAllEPGChannels.getChild(0)) = false)
+      isEPGDataPrecached = (cachedAllEPGChannels <> invalid AND cachedAllEPGChannels.getChildCount() > 0 AND shouldRefresh(cachedAllEPGChannels.getChild(0)) = false)
       if isEPGDataPrecached = true
         '//If the EPG data has not already been cached, then there is no need to try to jumpToRow now. This will happen once the data loads
         epgScreen.jumpToRowItemByID = [channelId, ""]
@@ -138,7 +138,7 @@ Function getUpdatedLinearVideoResources(content)
 
   newResource = {}
 
-  if content <> invalid and content.videoResources <> invalid
+  if content <> invalid AND content.videoResources <> invalid
     for each resource in content.videoResources
       if resource.type = m.constants.player.drmTypes.hlsv3
         if resource.url <> invalid
@@ -171,7 +171,7 @@ Function maximizeLinearPlayer(content)
   tubiLog("LinearVideoPlayerScreenHelpers.maximizeLinearPlayer")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
 
-  if videoPlayer <> invalid and videoPlayer.content <> invalid
+  if videoPlayer <> invalid AND videoPlayer.content <> invalid
     if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
       pushScreen(videoPlayer, true, true)
     end if
@@ -215,7 +215,7 @@ Function getDataForTimeGrid()
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
   if videoPlayer <> invalid
-    if epgChannelList = invalid or (epgChannelList <> invalid and shouldRefresh(epgChannelList.getChild(0)) = true) 'There is no cached contents
+    if epgChannelList = invalid or (epgChannelList <> invalid AND shouldRefresh(epgChannelList.getChild(0)) = true) 'There is no cached contents
       fetchEPGScreenChannels(videoPlayer)
     else if epgChannelList <> invalid
       videoPlayer.timeGridContent = epgChannelList
@@ -229,8 +229,8 @@ End Function
 Function isLinearPlayerPlayingThisContent(content)
   bPlaying = false
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-  if content <> invalid and videoPlayer <> invalid and videoPlayer.content <> invalid
-    if videoPlayer.content.id = content.id and videoPlayer.state = "playing"
+  if content <> invalid AND videoPlayer <> invalid AND videoPlayer.content <> invalid
+    if videoPlayer.content.id = content.id AND videoPlayer.state = "playing"
       bPlaying = true
     end if
   end if
@@ -242,7 +242,7 @@ End Function
 Function isLinearPlayerPlaying()
   bPlaying = false
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-  if videoPlayer <> invalid and videoPlayer.state = "playing"
+  if videoPlayer <> invalid AND videoPlayer.state = "playing"
     bPlaying = true
   end if
 
@@ -282,7 +282,7 @@ End Function
 Function onLiveStreamManifestResponse(response)
   tubiLog("LinearVideoPlayerScreenHelpers.onLiveStreamManifestResponse")
 
-  if response <> invalid and isString(response.res)
+  if response <> invalid AND isString(response.res)
     ' find the analytics url
     ' ("analytics url" is the YoSpace name for the url that will be polled for ad responses)
     pollUrl = invalid
@@ -315,7 +315,7 @@ Function onLiveStreamManifestResponse(response)
     originalUrl = invalid
 
     modifiedUrl = ""
-    if content <> invalid and content.videoResources <> invalid
+    if content <> invalid AND content.videoResources <> invalid
       videoResources = content.videoResources
       newVideoResources = []
 
@@ -329,7 +329,7 @@ Function onLiveStreamManifestResponse(response)
             ' session id, we need to use the original YoSpace stream url and not the video resource url
             ' provided by UAPI. We get the original YoSpace stream url from the "location" header since
             ' it is a redirect.
-            if response.headers <> invalid and response.headers.location <> invalid
+            if response.headers <> invalid AND response.headers.location <> invalid
               originalUrl = m.request.removeCharlesProxy(response.headers.location) ' Remove Charles proxy appended by Charles rule for clean redirect.
             else
               originalUrl = resource.url
@@ -368,12 +368,12 @@ End Function
 
 Function constructModifiedLinearVideoUrl(originalUrl, pollUrl)
   modifiedUrl = originalUrl
-  if isString(originalUrl) and isString(pollUrl)
+  if isString(originalUrl) AND isString(pollUrl)
     pollUrl = pollUrl.trim()
     pollUrlParts = getUrlParts(pollUrl, ";")
     originalUrl = originalUrl.trim()
     originalUrlParts = getUrlParts(originalUrl)
-    if pollUrlParts <> invalid and originalUrlParts <> invalid
+    if pollUrlParts <> invalid AND originalUrlParts <> invalid
       protocol = pollUrlParts.protocol
       host = pollUrlParts.host
       path = originalUrlParts.path
@@ -475,7 +475,7 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
 
     clearMinimizedLinearPlayerAnimation()
     m.animationMinimizedLinearPlayer = resizeToLocation(videoPlayer, nWidth, nHeight, nPosition, nDuration)
-    if nDuration > 0 and m.animationMinimizedLinearPlayer <> invalid
+    if nDuration > 0 AND m.animationMinimizedLinearPlayer <> invalid
       m.animationMinimizedLinearPlayer.observeField("state", "onLinearPlayerMinimizedComplete")
     else
       '//If the animation is instant (and/or this is on a limited UI device), then call the animation-complete function immediately
@@ -505,7 +505,7 @@ End Function
 ' Display the programming data for the video player, but only do this on the homescreen
 Function displayLinearPlayerProgrammingDataOnHomescreen()
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and currentScreen.subType() = "HomeScreen"
+  if currentScreen <> invalid AND currentScreen.subType() = "HomeScreen"
     clearMinimizedLinearPlayerAnimation()
   end if
 End Function
@@ -542,7 +542,7 @@ Function onLinearVideoPlayerVisibleFullscreenChange(msg)
   bFullScreen = videoPlayer.fullscreen
   if bFullScreen = false
     experimentLinearRelaunch = getExperimentResource("roku_relaunch_linear", "roku_relaunch_linear_v1", false)
-    if experimentLinearRelaunch <> invalid and experimentLinearRelaunch.enabled = true and experimentLinearRelaunch.resetTiming = "linearstop"
+    if experimentLinearRelaunch <> invalid AND experimentLinearRelaunch.enabled = true AND experimentLinearRelaunch.resetTiming = "linearstop"
       '//Delete linear video ID, if the experiment variant is set to reset after stopping of linear video in full screen
       RegDelete(m.constants.registryIDs.lastPlayedLinearId, m.constants.registrySectionIDs.lastPlayedLinearSectionId)
     end if
@@ -603,7 +603,7 @@ Function returnToPreviousScreenFromLinearVideo(bContinueToPlay = true)
   end if
 
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid and currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen
+  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen
     if bContinueToPlay = true
       ' sports epg screen, news epg screen, or entertainment epg screen might not have the contentID. So search for content ID and handle the back logic
       sBackScreenID = currentScreen.associatedScreenID
@@ -673,10 +673,10 @@ End Function
 Function reactToLinearVideoPlayerErrorState(error_message = "", errorCode = invalid)
   tubiLog("LinearVideoPlayerScreenHelpers.showLinearPlayerError")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-  if videoPlayer <> invalid and videoPlayer.fullscreen = true
+  if videoPlayer <> invalid AND videoPlayer.fullscreen = true
     returnToPreviousScreenFromLinearVideo(false)
     errorMessage = getTranslation("videoPlayer_error_failed_description")
-    if error_message <> invalid and error_message <> ""
+    if error_message <> invalid AND error_message <> ""
       errorMessage = error_message
     end if
 
@@ -689,7 +689,7 @@ Function reactToLinearVideoPlayerErrorState(error_message = "", errorCode = inva
     userErrorCode = getUserFacingErrorCode(m.constants.errors.context.linearPlayerScreen, m.constants.errors.subtypes.playerPlaybackError, errorCode.toStr())
 
     videoId = 0
-    if videoPlayer <> invalid and videoPlayer.content <> invalid and videoPlayer.content.id <> invalid
+    if videoPlayer <> invalid AND videoPlayer.content <> invalid AND videoPlayer.content.id <> invalid
       videoId = videoPlayer.content.id.toInt()
     end if
 
@@ -744,7 +744,7 @@ Function onChannelGuideVisibleStateChangedByUser(msg)
   pageValues = {}
   screen = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
 
-  if screen <> invalid and screen.trackingPageInfo <> invalid and screen.trackingComponentInfo <> invalid and screen.trackingComponentInfo.componentValues <> invalid
+  if screen <> invalid AND screen.trackingPageInfo <> invalid AND screen.trackingComponentInfo <> invalid AND screen.trackingComponentInfo.componentValues <> invalid
     pageType = screen.trackingPageInfo.pageType
     pageValues = screen.trackingPageInfo.pageValues
 
@@ -781,7 +781,7 @@ Function onLinearChannelSelectedFromGuide(msg)
   ' In case of EPG we do not want to attempt to play the channel which is already playing full screen.
   playProvidedChannel = true
   if videoPlayer <> invalid
-    if channel <> invalid and channel.videoResources <> invalid
+    if channel <> invalid AND channel.videoResources <> invalid
       if isLinearPlayerPlayingThisContent(channel) = true
         playProvidedChannel = false
       end if
@@ -794,7 +794,7 @@ Function onLinearChannelSelectedFromGuide(msg)
         newTrackingPageInfo = videoPlayer.trackingPageInfo
         screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, trackingComponentInfo)
 
-        if videoPlayer.associatedScreenID <> invalid and videoPlayer.associatedScreenID <> ""
+        if videoPlayer.associatedScreenID <> invalid AND videoPlayer.associatedScreenID <> ""
           '//Tell the homescreen to focus on the same channel so when the user backs out, the channel that is playing is the same one that is in focus
           '//   Note: since the video channel guide and the homescreen's live TV container are loaded independently from each other, we cannot assume they are in sync
           sContainerID = ""
@@ -817,7 +817,7 @@ Function onChannelsRequested()
   tubiLog("LinearVideoPlayerScreenHelpers.onChannelsRequested")
   currentContent = getCurrentLinearContent()
 
-  if currentContent <> invalid and currentContent.parentId <> invalid
+  if currentContent <> invalid AND currentContent.parentId <> invalid
 
     options = {}
     params = {}
@@ -861,7 +861,7 @@ Function onChannelGuideFetchError(response)
   tubiLog("LinearVideoPlayerScreenHelpers.onChannelGuideFetchError")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   '//Only show an error modal if the channel guide is still visible
-  if videoPlayer <> invalid and videoPlayer.displayingChannelGuide = true
+  if videoPlayer <> invalid AND videoPlayer.displayingChannelGuide = true
     errorMessage = getTranslation("channelGuide_error_fetchContent_description")
     errorCode = getUserFacingErrorCode(m.constants.errors.context.linearPlayerScreen, m.constants.errors.subtypes.fetchError, response.code)
 
@@ -928,7 +928,7 @@ End Function
 Function doesEpgScreenHaveContent(contentId, screenId) as boolean
   screen = getFromScreenCache(screenId)
   isContentPresent = false
-  if isAnEPGScreen(screen) = true and screen.timeGridContent <> invalid
+  if isAnEPGScreen(screen) = true AND screen.timeGridContent <> invalid
     for i = 0 to screen.timeGridContent.getChildCount() - 1
       if screen.timeGridContent.getChild(i).id = contentId
         isContentPresent = true

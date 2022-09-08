@@ -55,7 +55,7 @@ End Function
 Function focusSideNavOption(sID)
 
   screen = getCurrentScreen()
-  if isNonEmptyString(sID) and m.constants.ui.sideNavIds[sID] <> invalid
+  if isNonEmptyString(sID) AND m.constants.ui.sideNavIds[sID] <> invalid
     m.SideNav.itemRequested = sID '//set itemRequested so the focus is on the proper button in the sideNav
   end if
 End Function
@@ -69,7 +69,7 @@ End Function
 
 ' Is the side nav open and in focus
 Function isSideNavActive() as Boolean
-  return (m.SideNav.isInFocusChain() = true and m.SideNav.opened = true)
+  return (m.SideNav.isInFocusChain() = true AND m.SideNav.opened = true)
 End Function
 
 
@@ -98,7 +98,7 @@ Function onSideNavNavigateWithinPageInfoChanged()
   navigateWithinPageInfo = m.SideNav.navigateWithinPageInfo
   currentScreen = getCurrentScreen()
 
-  if currentScreen <> invalid and currentScreen.trackingPageInfo <> invalid
+  if currentScreen <> invalid AND currentScreen.trackingPageInfo <> invalid
     navigateWithinPageInfo.pageOneof = m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
     sendNavigateWithinPageInfo(navigateWithinPageInfo)
   end if
@@ -142,7 +142,7 @@ Function onSideNavItemSelected()
         setUiMode(m.constants.ui.modes.standard)
       end if
 
-      if authInfo = invalid or (authInfo <> invalid and authInfo.userId = invalid)
+      if authInfo = invalid or (authInfo <> invalid AND authInfo.userId = invalid)
         '//if user is not signed in, then bring up the sign on page; otherwise, don't do anything
         startSignIn(onSideNavSignInCompleted)
         bNewScreenCalledSuccess = false ' setting bNewScreenCalledSuccess as false to keep the sidenav open when RFI modal is displayed. This is to avoid focus issue.
@@ -382,7 +382,7 @@ Function openSideNav(b = true)
     topScreen = getCurrentScreen()
     sideNavId = m.constants.ui.screenIdToSideNavId[topScreen.id]
     itemSelectedId = m.SideNav.itemSelectedId
-    if itemSelectedId = m.constants.ui.sideNavIds.kidsMode and sideNavId <> invalid
+    if itemSelectedId = m.constants.ui.sideNavIds.kidsMode AND sideNavId <> invalid
       '//if the sidenav has been closed and the kidsNav had been last selected; it is currently in focus,
       '//   then change the focus to the option relating to the current screen
       focusSideNavOption(sideNavId)
@@ -400,7 +400,7 @@ Function getSideNavInteractionEvent(screen, trackingLib, userInteraction)
   pageType = ""
   pageValues = {}
 
-  if screen <> invalid and screen.trackingPageInfo <> invalid
+  if screen <> invalid AND screen.trackingPageInfo <> invalid
     pageType = screen.trackingPageInfo.pageType
     pageValues = screen.trackingPageInfo.pageValues
 
@@ -475,7 +475,7 @@ Function hideNavMenu(shouldTrackComponentInteraction = true)
 
     topScreen = getCurrentScreen()
 
-    if shouldTrackComponentInteraction = true and topScreen <> invalid
+    if shouldTrackComponentInteraction = true AND topScreen <> invalid
       topScreen.enabled = true
 
       interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "off")

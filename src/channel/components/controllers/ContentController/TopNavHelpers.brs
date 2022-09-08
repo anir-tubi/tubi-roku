@@ -2,7 +2,7 @@
 Function isTopNavHomeScreenEnabled()
   bReturn = false
 
-  if m.constants.deviceInfo.countryCode <> invalid and UCase(m.constants.deviceInfo.countryCode) = "US"
+  if m.constants.deviceInfo.countryCode <> invalid AND UCase(m.constants.deviceInfo.countryCode) = "US"
     if isKidsUIOn() = false
       bReturn = true
     end if
@@ -33,7 +33,7 @@ End Function
 ' @isFocusRetainedOnTopNav: boolean, pass true if focus should be returned to top nav after a selection.
 '                                    This typically happens if the user presses back from the top nav
 Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = false)
-  if topNavItem <> invalid and screen <> invalid
+  if topNavItem <> invalid AND screen <> invalid
     if screen.trackingPageInfo <> invalid
       '//Dispatch a selection component_interaction analytic event when a top nav item is selected
       navComponent = {
@@ -104,7 +104,7 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
     end if
 
     currentScreen = getCurrentScreen()
-    if currentScreen.id <> screen.id and screen.hasField("jumpToRowItem") = true
+    if currentScreen.id <> screen.id AND screen.hasField("jumpToRowItem") = true
       screen.jumpToRowItem = [0, 0] '//reset original homescreen so it is set back to the origin content item.
     end if
   end if
@@ -147,14 +147,14 @@ End Function
 Function onNavigatedFromTopNavToSideNav(msg)
   tubiLog("TopNavHelpers.onNavigatedFromTopNavToSideNav")
   screen = msg.getRoSGNode()
-  if screen <> invalid and m.sideNav <> invalid
+  if screen <> invalid AND m.sideNav <> invalid
     sendTopNavToSideNavNavigationEvent(screen, m.sidenav)
   end if
 End Function
 
 
 Function sendTopNavToSideNavNavigationEvent(screen, sideNav)
-  if screen <> invalid and sideNav <> invalid
+  if screen <> invalid AND sideNav <> invalid
     focusedNavId = m.constants.ui.screenIdToSideNavId[screen.id]
     buttonID = m.Tracking.sideNavPageMap[focusedNavId]
 

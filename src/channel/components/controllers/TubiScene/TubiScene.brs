@@ -55,7 +55,7 @@ Function onCustomSplashFadeStateChange(msg)
   animationState = msg.getData()
   customSplashFade = msg.getRoSGNode()
   if animationState = "stopped"
-    if m.spinner <> invalid and m.spinner.opacity = 0
+    if m.spinner <> invalid AND m.spinner.opacity = 0
       m.spinnerFade = customFadeIn(m.spinner, 1, 0)
     end if
     customSplashFade.unobserveField("state")
@@ -66,11 +66,11 @@ End Function
 
 Function onFadeOutSpinner()
 
-  if m.spinnerFade <> invalid and m.spinnerFade.state = "running"
+  if m.spinnerFade <> invalid AND m.spinnerFade.state = "running"
     m.spinnerFade.control = "stop"
   end if
 
-  if m.spinner <> invalid and m.spinner.opacity > 0
+  if m.spinner <> invalid AND m.spinner.opacity > 0
     customFadeOut(m.spinner, 1, 0)
   end if
 

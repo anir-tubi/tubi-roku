@@ -5,7 +5,7 @@ Function getVideoPreviewStateForThisContent(content=invalid)
   tubiLog("VideoPreviewHelpers.getVideoPreviewStateForThisContent")
   state = "none"
   videoPreview = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
-  if content <> invalid and videoPreview <> invalid and videoPreview.content <> invalid
+  if content <> invalid AND videoPreview <> invalid AND videoPreview.content <> invalid
     if videoPreview.content.id = content.id
       state = videoPreview.state
     end if
@@ -42,7 +42,7 @@ Function stopVideoPreview(node=invalid)
   if node = invalid
     node = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
   end if
-  if node <> invalid and node.subType() = "VideoPreviewPlayer"
+  if node <> invalid AND node.subType() = "VideoPreviewPlayer"
     node.control = "stop"
     node.visible = false
   end if
@@ -58,7 +58,7 @@ Function stopVideoPreviewIfPlaying(node = invalid)
     node = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
   end if
 
-  if node <> invalid and node.subType() = "VideoPreviewPlayer" and (node.state = "buffering" or node.state = "playing" ) 'this means video preview not stopped/finished for previous content, so we need to stop it
+  if node <> invalid AND node.subType() = "VideoPreviewPlayer" AND (node.state = "buffering" or node.state = "playing" ) 'this means video preview not stopped/finished for previous content, so we need to stop it
     node.control = "stop"
     node.visible = false
   end if
@@ -134,14 +134,14 @@ End Function
 ' @pageType : string, the type(video_page, series_detail_page, home_page) of page which is used in analytics event
 Function startVideoPreview(content, pageType="home_page")
   tubiLog("VideoPreviewHelpers.startVideoPreview")
-  if content <> invalid and m.isAutoplayVideoPreviewOn = true
+  if content <> invalid AND m.isAutoplayVideoPreviewOn = true
     videoPreview = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
     if videoPreview = invalid
       videoPreview = CreateObject("roSGNode", "VideoPreviewPlayer")
       videoPreview.visible = false
       videoPreview.id = m.constants.ui.componentIds.videoPreviewPlayer
     end if
-    ' unobserve field just in case previous state was error and start observing a fresh status.
+    ' unobserve field just in case previous state was errorsstart observing a fresh status.
     videoPreview.unobserveFieldScoped("state")
     videoPreview.observeFieldScoped("state", "onVideoPreviewStateChanged")
     videoPreview.pageTypeForAnalytics = pageType

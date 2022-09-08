@@ -91,7 +91,7 @@ Function refreshEPGScreen(epgScreen)
   epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
 
 
-  if epgChannelList = invalid or (epgChannelList <> invalid and shouldRefresh(epgChannelList.getChild(0)) = true)'There is no cached contents
+  if epgChannelList = invalid or (epgChannelList <> invalid AND shouldRefresh(epgChannelList.getChild(0)) = true)'There is no cached contents
     setEPGScreenLoading(epgScreen)
     fetchEPGScreenChannels(epgScreen, mode)
   else if epgChannelList <> invalid
@@ -136,7 +136,7 @@ Function fetchEPGChannel(screenId, channelID, successCallback, errorCallback)
   cachedChannel = invalid
   cachedAllChannels = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
 
-  if cachedAllChannels <> invalid and cachedAllChannels.getChildCount() > 0 and shouldRefresh(cachedAllChannels.getChild(0)) = false
+  if cachedAllChannels <> invalid AND cachedAllChannels.getChildCount() > 0 AND shouldRefresh(cachedAllChannels.getChild(0)) = false
     '//go thru the channels and find the desired channel
     for i = 0 to cachedAllChannels.getChildCount() - 1
       cachedChannelTemp = cachedAllChannels.getChild(i)
@@ -196,7 +196,7 @@ Function onEpgChannelListResponse(response)
   tubiLog("EPGScreenHelpers.onEpgChannelListResponse")
   'check if this is the epgScreen for which response was meant to be.
   currentScreen = getCurrentScreen()
-  if response <> invalid and currentScreen <> invalid and response.requestorID <> invalid and response.requestorID = currentScreen.id
+  if response <> invalid AND currentScreen <> invalid AND response.requestorID <> invalid AND response.requestorID = currentScreen.id
     currentScreen.timeGridContent = response
     nFetchInBatch = 10
     m.totalNumEPGBatches = 0
@@ -303,7 +303,7 @@ Function onEpgProgramError(response)
   m.totalNumEPGBatches = m.totalNumEPGBatches - 1
   screen = getCurrentScreen()
   'Check if the screen which requested the program info is the current Screen and user not moved away from this Screen. (especially in case of request timeout or slow internet cases)
-  if screen <> invalid and screen.id = response.requestorID and response.contentId <> invalid and screen.timeGridContent <> invalid
+  if screen <> invalid AND screen.id = response.requestorID AND response.contentId <> invalid AND screen.timeGridContent <> invalid
     'response.contentID will have list of comma separated contentIDs for which the reponse was requested.
     'remove each of the channel Ids from TimeGrid which does not have any channel/program information. Please note that at this point, this node is an empty row on TimeGrid.
     contentIDList = response.contentId.Tokenize(",")
@@ -312,7 +312,7 @@ Function onEpgProgramError(response)
       screen.timeGridContent.removeChildIndex(i)
     end for
 
-    if screen.timeGridContent <> invalid and screen.timeGridContent.getChildCount() > 0
+    if screen.timeGridContent <> invalid AND screen.timeGridContent.getChildCount() > 0
       'Since a batch of programs errored out, set the validUntil to 0 so that next time, content will refetch.
       screen.timeGridContent.getChild(0).validUntil = 0
     end if
@@ -333,7 +333,7 @@ Function onEpgError(response)
   showHideSpinner(false)
   code = 0
   'check if this error is meant for current Screen.
-  if screen <> invalid and response <> invalid and screen.id = response.requestorID
+  if screen <> invalid AND response <> invalid AND screen.id = response.requestorID
     screen.timeGridContent = invalid
     setTimeGridContentLoadingToComplete(screen)
 
@@ -375,7 +375,7 @@ End Function
 Function appendOrAddTimeGridNewContents(response, epgScreen)
   tubiLog("EPGScreenHelpers.appendOrAddTimeGridNewContents")
 
-  if response <> invalid and epgScreen.timeGridContent <> invalid
+  if response <> invalid AND epgScreen.timeGridContent <> invalid
     for i = 0 to response.getChildCount() - 1
       if response.getChild(i) <> invalid
         newId = response.getChild(i).id
@@ -389,7 +389,7 @@ Function appendOrAddTimeGridNewContents(response, epgScreen)
             if epgScreen.timeGridContent.getChild(oldNodeIndex) <> invalid
               containerName = epgScreen.timeGridContent.getChild(oldNodeIndex).containerName 'containerName is present only in getChannelList api call.
 
-              if containerName <> invalid and containerName <> ""
+              if containerName <> invalid AND containerName <> ""
                 newNode = response.getChild(i).clone(true)
                 newNode.parentTitle = containerName
                 epgScreen.timeGridContent.replaceChild(newNode, oldNodeIndex)
@@ -408,13 +408,13 @@ Function onEPGScreenOKPressed()
   currentScreen = getCurrentScreen()
   stopCountdownTimer() 'stop previous counter
 
-  if currentScreen <> invalid and isAnEpgScreen(currentScreen)
+  if currentScreen <> invalid AND isAnEpgScreen(currentScreen)
     contentToPlay = currentScreen.LinearChannelToPlay
     if contentToPlay <> invalid
       startPlayVideo = true
       linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-      if linearVideoPlayer <> invalid and linearVideoPlayer.content <> invalid
-        if linearVideoPlayer.content.id = contentToPlay.id and linearVideoPlayer.state = "playing"
+      if linearVideoPlayer <> invalid AND linearVideoPlayer.content <> invalid
+        if linearVideoPlayer.content.id = contentToPlay.id AND linearVideoPlayer.state = "playing"
           'do not Re-play same content
           startPlayVideo = false
         end if
@@ -458,7 +458,7 @@ Function onRefreshEPGScreenVideoPlay(msg)
     linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
 
     changeEPGScreenBackground(epgScreen)
-    if linearVideoPlayer <> invalid and linearVideoPlayer.state = "playing"
+    if linearVideoPlayer <> invalid AND linearVideoPlayer.state = "playing"
       if epgScreen.timeGridContent = invalid or epgScreen.timeGridContentLoading = true
         'Anytime Video is playing and epgScreen is empty, then refresh the epgScreen.  This situation might happen when
         'when we play content directly from deeplink and epgScreen still does not have content if user presses backbutton.
@@ -470,7 +470,7 @@ Function onRefreshEPGScreenVideoPlay(msg)
 
         '//if the linear player is playing a video and it does not match with the current focus, then change focus to that of the playing video
         focusedChannel = epgScreen.linearChannelFocused
-        if focusedChannel <> invalid and focusedChannel.id <> invalid and isLinearPlayerPlayingThisContent(focusedChannel) = false
+        if focusedChannel <> invalid AND focusedChannel.id <> invalid AND isLinearPlayerPlayingThisContent(focusedChannel) = false
           channelId = linearVideoPlayer.content.id
           epgScreen.jumpToRowItemByID = [channelId, ""]
         end if
@@ -480,7 +480,7 @@ Function onRefreshEPGScreenVideoPlay(msg)
     else ' from top/side Nav
       m.backgroundGroup.posterVisible = true
 
-      if currentScreen <> invalid and isAnEpgScreen(currentScreen) and currentScreen.linearChannelToPlay <> invalid
+      if currentScreen <> invalid AND isAnEpgScreen(currentScreen) AND currentScreen.linearChannelToPlay <> invalid
         playLinearVideoContent(currentScreen.linearChannelToPlay, true, currentScreen.id)
       end if
     end if
@@ -513,7 +513,7 @@ Function onEPGScrollingStatusChange(msg)
     screen.fullscreenCountdown = -1
   else if screen.linearChannelToPlay <> invalid
     linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-    if linearVideoPlayer <> invalid and linearVideoPlayer.state = "playing"
+    if linearVideoPlayer <> invalid AND linearVideoPlayer.state = "playing"
       startCountdownTimer()
     end if
   end if
@@ -569,7 +569,7 @@ End Function
 
 
 Function changeEPGScreenBackground(EPGScreen)
-  if EPGScreen <> invalid and EPGScreen.backgroundUriList <> invalid
+  if EPGScreen <> invalid AND EPGScreen.backgroundUriList <> invalid
     m.backgroundGroup.backgroundInfo = {
       type : getBackgroundtype(EPGScreen.backgroundUriList, m.constants.ui.contentTypes.epg)
       uriList : EPGScreen.backgroundUriList
@@ -582,7 +582,7 @@ Function resetEPGScreenContent()
   tubiLog("EPGSCreenHelpers.resetEPGScreenContent")
   stopCountdownTimer()
   epgScreen = getCurrentScreen()
-  if epgScreen <> invalid and isAnEpgScreen(epgScreen) = true
+  if epgScreen <> invalid AND isAnEpgScreen(epgScreen) = true
     epgScreen.fullScreenCountdown = -1
   end if
   stopAndHideLinearVideoPlayer()
@@ -615,11 +615,11 @@ End Function
 
 Function cleanUpInvalidsInEPG(screen)
   tubiLog("EPGSCreenHelpers.cleanUpInvalidsInEPG")
-  if screen.timeGridContent <> invalid and screen.timeGridContent.getchildCount() > 0 'just in case of error and no programs has been retrived
+  if screen.timeGridContent <> invalid AND screen.timeGridContent.getchildCount() > 0 'just in case of error and no programs has been retrived
     for i = 0 to screen.timeGridContent.getchildCount() - 1
       item = screen.timeGridContent.getChild(i)
 
-      if item = invalid or (item <> invalid and (item.channelName = invalid or item.channelName = ""))
+      if item = invalid or (item <> invalid AND (item.channelName = invalid or item.channelName = ""))
         screen.timeGridContent.removeChildindex(i)
       end if
     end for

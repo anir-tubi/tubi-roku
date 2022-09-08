@@ -227,11 +227,11 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
       ' 2) new category has content, old category doesn't exist - add the new category
       ' 3) new category doesn't have content (will be invalid), old category does have content - remove old category
       ' 4) new category doesn't have content (will be invalid), old category doesn't exist - do nothing
-      if newCategory <> invalid and oldCategory <> invalid
+      if newCategory <> invalid AND oldCategory <> invalid
         'replace old category with new category
         homeScreen.content.replaceChild(newCategory, m.NodeHelpers.getChildIndex(homeScreen.content, oldCategory))
         homeScreen.repopulateContent = true
-      else if newCategory <> invalid and oldCategory = invalid
+      else if newCategory <> invalid AND oldCategory = invalid
         'add new category
         'if new category is history, put it one before queue, or if queue doens't exist put it in 2nd position
         'if new category is queue put it one after history, or if history doesn't exist, put it in 2nd position
@@ -248,7 +248,7 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
         end if
 
         homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
-      else if newCategory = invalid and oldCategory <> invalid
+      else if newCategory = invalid AND oldCategory <> invalid
         if oldCategory.id = m.constants.ui.categoryIds.history
           homeScreen.rowRemoved = m.constants.ui.categoryIds.history
         else if oldCategory.id = m.constants.ui.categoryIds.queue
@@ -258,7 +258,7 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
         'remove old category
         homeScreen.content.removeChild(oldCategory)
         homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
-      else if newCategory = invalid and oldCategory = invalid
+      else if newCategory = invalid AND oldCategory = invalid
         'do nothing
       end if
     end if
@@ -292,7 +292,7 @@ Function onErrorReloadUserCategories(response, screenID = "")
   end if
   homeScreen = getFromScreenCache(screenID)
 
-  if homeScreen <> invalid and response <> invalid
+  if homeScreen <> invalid AND response <> invalid
     analyticsContentMode = m.Tracking.getAnalyticsHomePageContentMode(screenID)
 
     ' if we were loading in the background, don't show an error modal
@@ -434,7 +434,7 @@ Function fetchHomeScreen(homeScreen)
 
     isKidsMode = shouldKidsModeBeSentToServer()
 
-    if m.constants.settings.mode = "dev" and m.constants.settings.numContainers <> invalid
+    if m.constants.settings.mode = "dev" AND m.constants.settings.numContainers <> invalid
       params["group_size"] = m.constants.settings.numContainers
     end if
 
@@ -712,11 +712,11 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
     getExperimentResource("roku_featured_landscape", "roku_featured_landscape_v1", true)
   end if
 
-  if focusedContent <> invalid and getCurrentScreen() <> invalid and getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
+  if focusedContent <> invalid AND getCurrentScreen() <> invalid AND getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
     '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
     '//we should stop the countdown timer
     bStopCountdownTimer = true
-    if focusedContent.type = m.constants.ui.categoryTypes.linear and focusedContent.id <> m.constants.ui.contentIds.tvGuide and m.SideNav.opened <> true
+    if focusedContent.type = m.constants.ui.categoryTypes.linear AND focusedContent.id <> m.constants.ui.contentIds.tvGuide AND m.SideNav.opened <> true
       bPlayVideo = true
       if isLinearPlayerPlayingThisContent(focusedContent) = true
         '//No need to play the video. It already is playing the video
@@ -739,7 +739,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
       stopAndHideLinearVideoPlayer()
     end if
 
-    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true and focusedContent.type <> invalid and m.SideNav.opened <> true
+    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true AND focusedContent.type <> invalid AND m.SideNav.opened <> true
       previewState = getVideoPreviewStateForThisContent(focusedContent)
       if previewState = "buffering" or previewState = "playing"
         videoPreview = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
@@ -764,7 +764,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
           startVideoPreview(focusedContent, "home_page")
         end if
       end if
-    else if focusedContent.type <> invalid and m.SideNav.opened <> true and focusedContent.videoPreviewUrl <> ""
+    else if focusedContent.type <> invalid AND m.SideNav.opened <> true AND focusedContent.videoPreviewUrl <> ""
       ' fire exposure event for video preview control group
       getExperimentResource("roku_video_preview", "roku_video_preview_v2", true)
     end if
@@ -805,12 +805,12 @@ Function selectLinearContent(content)
 
   '//stop timer and tell player to go fullscreen
   stopCountdownTimer()
-  if content <> invalid and content.type = m.constants.ui.contentTypes.linear
+  if content <> invalid AND content.type = m.constants.ui.contentTypes.linear
 
     stopVideoPreviewIfPlaying() 'stop the videopreview if it is still playing.
     if content.id <> m.constants.ui.contentIds.tvGuide
       linearContent = getCurrentLinearContent()
-      if linearContent <> invalid and linearContent.id <> invalid and content.id = linearContent.id
+      if linearContent <> invalid AND linearContent.id <> invalid AND content.id = linearContent.id
         '//If the user selects the linear content that is already playing, then just maximize it.
         maximizeLinearPlayer(content)
       else
@@ -845,11 +845,11 @@ End Function
 Function startCountdownTimer()
   tubiLog("HomeScreenHelpers.stopCountdownTimer")
   Screen = getCurrentScreen()
-  if Screen <> invalid and Screen.id = m.constants.ui.screenIds.homeScreen
+  if Screen <> invalid AND Screen.id = m.constants.ui.screenIds.homeScreen
     stopCountdownTimer()
     Screen.fullscreenCountdown = m.constants.timers.linearFullscreenTimeout
     m.playerFullscreenCountdownTimer.control = "start"
-  else if Screen <> invalid and isAnEpgScreen(Screen) = true
+  else if Screen <> invalid AND isAnEpgScreen(Screen) = true
     stopCountdownTimer()
     Screen.fullscreenCountdown = m.constants.timers.linearFullscreenTimeout
     m.playerFullscreenCountdownTimer.control = "start"
@@ -928,7 +928,7 @@ End Function
 Function onUserCategoriesFailed(screenID)
   tubiLog("HomescreenHelpers.onUserCategoriesFailed")
   homeScreen = getFromScreenCache(screenID)
-  if homeScreen <> invalid and homeScreen.content = invalid
+  if homeScreen <> invalid AND homeScreen.content = invalid
     fetchHomescreen(homeScreen)
   end if
 End Function

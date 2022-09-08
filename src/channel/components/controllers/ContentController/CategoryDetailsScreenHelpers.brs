@@ -33,7 +33,7 @@ Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoad
   end if
 
   ' make queue API request only if the user loggedIn
-  if content.id = m.constants.ui.categoryIds.queue and isLoggedInUser() = false
+  if content.id = m.constants.ui.categoryIds.queue AND isLoggedInUser() = false
     displaySignInRequiredModal(categoryDetailsScreen)
   else
     fetchCategoryDetails(content)
@@ -47,7 +47,7 @@ Function onSignInRequiredModal(msg)
   tubiLog("CategoryDetailsScreenHelpers.onSignInRequiredModal")
   screen = msg.getRoSGNode()
 
-  if screen <> invalid and screen.content = invalid
+  if screen <> invalid AND screen.content = invalid
     displaySignInRequiredModal(screen)
   end if
 
@@ -90,7 +90,7 @@ Function onCategoryContentSelected(msg)
 
   '//Keep track of the sponsored exposure ID if the selected video is within a sponsored container
   categoryContent = categoryDetailsScreen.content
-  if categoryContent <> invalid and categoryContent.sponsorExp <> invalid
+  if categoryContent <> invalid AND categoryContent.sponsorExp <> invalid
     m.videoSponsorExposureId = categoryContent.sponsorExp
   end if
 
@@ -100,7 +100,7 @@ End Function
 
 Function onRefreshCategoryDetailsSignal(msg)
   categoryDetailsScreen = msg.getRoSGNode()
-  if categoryDetailsScreen <> invalid and categoryDetailsScreen.content <> invalid
+  if categoryDetailsScreen <> invalid AND categoryDetailsScreen.content <> invalid
     categoryContent = categoryDetailsScreen.content
   end if
 
@@ -154,10 +154,10 @@ Function onCategoryDetailResponse(categoryContent)
   if screen.id = m.constants.ui.screenIds.categoryDetailsScreen
     ' the category details screen is still the top screen after receiving the response
 
-    if categoryContent <> invalid and categoryContent.getChildCount() > 0
+    if categoryContent <> invalid AND categoryContent.getChildCount() > 0
       screen.isLoading = false
 
-      if categoryContent.sponsorImages <> invalid and categoryContent.sponsorImages.pixels <> invalid and categoryContent.sponsorImages.pixels["container_details"] <> invalid
+      if categoryContent.sponsorImages <> invalid AND categoryContent.sponsorImages.pixels <> invalid AND categoryContent.sponsorImages.pixels["container_details"] <> invalid
         '//When a sponsored container is made visible, then call the pixels
         sponsorPixels = categoryContent.sponsorImages.pixels["container_details"]
         sendSponsorPixels(sponsorPixels)
@@ -169,7 +169,7 @@ Function onCategoryDetailResponse(categoryContent)
       screen.isLoading = true
 
       '//if no content, then display appropriate empty modal
-      if categoryContent <> invalid and categoryContent.id = m.constants.ui.categoryIds.queue
+      if categoryContent <> invalid AND categoryContent.id = m.constants.ui.categoryIds.queue
         showEmptyContentModal(screen)
       else
         showCategoryDetailError(invalid, true)
@@ -256,7 +256,7 @@ Function showCategoryDetailError(error, bContentEmptyError = false)
     ' categoryDetailsScreen is created/pushed in showCategoryDetailsScreen, since there is no content,
     ' remove it from the stack will occur after the user closes the modal.
     code = ""
-    if error <> invalid and error.code <> invalid
+    if error <> invalid AND error.code <> invalid
       code = error.code.toStr()
     end if
 

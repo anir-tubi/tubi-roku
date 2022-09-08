@@ -26,7 +26,7 @@ Function onSearchContentSelected(msg)
 
   selectedContent = msg.getData()
   'Launch the full player if it's linear contnet otherwise launch details screen
-  if selectedContent <> invalid and selectedContent.type = "linear" and selectedContent.videoResources.count() > 0
+  if selectedContent <> invalid AND selectedContent.type = "linear" AND selectedContent.videoResources.count() > 0
     playLinearVideoContent(selectedContent, false, searchScreen.id)
   else
     showDetailScreen(searchScreen.contentSelected, true)
@@ -44,7 +44,7 @@ Function onSearchTextChanged(msg)
   ' cancel any in-flight requests
   searchScreen = msg.getRoSGNode()
   searchText = searchScreen.searchText
-  bSearchNonDefaultResults = (searchText <> invalid and Len(searchText) > 0)
+  bSearchNonDefaultResults = (searchText <> invalid AND Len(searchText) > 0)
 
   if m.currentSearchScreenRequestInfo <> invalid
     m.cancelRequest(m.currentSearchScreenRequestInfo)
@@ -90,7 +90,7 @@ End Function
 Function getSearchScreen()
   screen = invalid
   searchScreen = getCurrentScreen()
-  if searchScreen <> invalid and searchScreen.id = m.constants.ui.screenIds.searchScreen
+  if searchScreen <> invalid AND searchScreen.id = m.constants.ui.screenIds.searchScreen
     screen = searchScreen
   end if
   return screen
@@ -104,7 +104,7 @@ End Function
 Function onSearchSuccessResponse(response)
   tubiLog("SearchScreenHelpers.onSearchSuccessResponse")
   searchScreen = getSearchScreen()
-  if searchScreen <> invalid and response <> invalid
+  if searchScreen <> invalid AND response <> invalid
     searchScreen.content = response
     searchScreen.contentUpdated = true
   end if
@@ -118,7 +118,7 @@ End Function
 Function onSearchErrorResponse(result)
   tubiLog("SearchScreenHelpers.onSearchErrorResponse")
   searchScreen = getSearchScreen()
-  if searchScreen <> invalid and result <> invalid
+  if searchScreen <> invalid AND result <> invalid
     searchScreen.content = invalid
     searchScreen.contentUpdated = true
   end if
@@ -132,7 +132,7 @@ End Function
 Function onSearchDefaultSuccessResponse(response)
   tubiLog("SearchScreenHelpers.onSearchDefaultSuccessResponse")
   searchScreen = getSearchScreen()
-  if searchScreen <> invalid and response <> invalid
+  if searchScreen <> invalid AND response <> invalid
     response.isDefaultSearchResults = true
     searchScreen.content = response
     searchScreen.contentUpdated = true
@@ -147,7 +147,7 @@ End Function
 Function onSearchDefaultErrorResponse(result)
   tubiLog("SearchScreenHelpers.onSearchDefaultErrorResponse")
   searchScreen = getSearchScreen()
-  if searchScreen <> invalid and result <> invalid
+  if searchScreen <> invalid AND result <> invalid
     searchScreen.content = invalid
     searchScreen.contentUpdated = true
   end if

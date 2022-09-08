@@ -46,7 +46,7 @@ Function setSettingsScreenSignInInfo()
     if authInfo <> invalid
       aaSignIn.signedIn = true
       aaSignIn.email = authInfo.email
-      if authInfo.firstName <> "" and authInfo.lastName <> ""
+      if authInfo.firstName <> "" AND authInfo.lastName <> ""
         sName = authInfo.firstName + " " + authInfo.lastName
       else
         sName = authInfo.name
@@ -124,7 +124,7 @@ End Function
 Function onAutoPreviewSettingSelected()
   tubiLog("SettingsScreenHelpers.onAutoPreviewSettingSelected")
   userInteraction = ""
-  if m.settingsScreen.signInInfo <> invalid and m.settingsScreen.signInInfo.signedIn = true
+  if m.settingsScreen.signInInfo <> invalid AND m.settingsScreen.signInInfo.signedIn = true
     if m.settingsScreen.autoPreviewSettingSelected = 0
       choice = true
       userInteraction = "TOGGLE_ON"
@@ -181,10 +181,10 @@ End Function
 Function onParentalSettingSelected()
   tubiLog("SettingsScreenHelpers.onParentalSettingSelected")
   parentalSetting = m.settingsScreen.parentalSettingSelected
-  if m.settingsScreen.signInInfo <> invalid and m.settingsScreen.signInInfo.signedIn = true
+  if m.settingsScreen.signInInfo <> invalid AND m.settingsScreen.signInInfo.signedIn = true
     m.settingsScreen.actionAfterActivation = ""
     authInfo = getFieldFromGlobal("authInfo")
-    if isLoggedInUser(authInfo) and parentalSetting <> authInfo.parentalrating
+    if isLoggedInUser(authInfo) AND parentalSetting <> authInfo.parentalrating
       ' parental settings have been updated
       nNowDate = getNowSeconds()
       nSavedSeconds = 0
@@ -216,7 +216,7 @@ Function onParentalSettingSelected()
 
         showSimpleModal("Password Required", message, buttons, dialogEvent, m.trackingLoggingTask, showConfirmPasswordScreen, invalid)
       else
-        if authInfo.passwordText <> invalid and (nNowDate - nSavedSeconds) < 300
+        if authInfo.passwordText <> invalid AND (nNowDate - nSavedSeconds) < 300
           tubiLog("SettingsScreenHelpers.onParentalSettingSelected(), use saved password")
           '//if there is a saved password, was it submitted within the last 5 minutes (300 seconds), if so, then use that password
           onPasswordConfirm()
@@ -250,7 +250,7 @@ End Function
 Function isConfirmPasswordScreen() as boolean
   '//Is the current screen the confirmPasswordScreen?
   screen = getCurrentScreen()
-  b = (m.confirmPasswordScreen <> invalid and m.confirmPasswordScreen.subType() = screen.subType())
+  b = (m.confirmPasswordScreen <> invalid AND m.confirmPasswordScreen.subType() = screen.subType())
   return b
 End Function
 
@@ -296,7 +296,7 @@ Function refreshScreenAfterParentalChanges()
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   if homeScreen <> invalid
     authInfo = getFieldFromGlobal("authInfo")
-    if isLoggedInUser(authInfo) and authInfo.parentalrating <> invalid
+    if isLoggedInUser(authInfo) AND authInfo.parentalrating <> invalid
       homeScreen.parentalRating = authInfo.parentalrating
     end if
     fetchHomescreen(homeScreen)
@@ -402,7 +402,7 @@ Function updateParentalSettingsErrorResponse(_error)
     buttons = [getTranslation("dialog_button_ok")]
 
     showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask)
-  else if authInfo <> invalid and authInfo.secondsOfSavedPassword <> invalid and authInfo.secondsOfSavedPassword > 0
+  else if authInfo <> invalid AND authInfo.secondsOfSavedPassword <> invalid AND authInfo.secondsOfSavedPassword > 0
     '//if not showing ConfirmPasswordScreen and showing parentalControls panel AND this came from a saved password,
     '//   then display the ConfirmPasswordScreen instead of error message
     setAuthInfoValue("secondsOfSavedPassword", 0)
@@ -484,7 +484,7 @@ Function setAutoplayVideoPreviewFromGlobal(authInfo = invalid)
     authInfo = getFieldFromGlobal("authInfo")
   end if
 
-  if isLoggedInUser(authInfo) = true and getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+  if isLoggedInUser(authInfo) = true AND getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
     if authInfo.enableVideoPreview <> invalid
       bEnabled = authInfo.enableVideoPreview
     end if
