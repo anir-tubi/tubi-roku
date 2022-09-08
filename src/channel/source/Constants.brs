@@ -252,8 +252,10 @@ Function getConstants()
     constants.reqNames.deleteFromQueue = "deleteFromQueue"
     constants.reqNames.postToQueue = "postToQueue"
     constants.reqNames.deleteHistory = "deleteHistory"
+    constants.reqNames.getScreenSaverContainer = "getScreenSaverContainer"
+    constants.reqNames.getScreenSaverHomeScreenContainerIds = "getScreenSaverHomeScreenContainerIds"
 
-    ' a list of reqnames that the general task should expect to handle 403 errors for
+    ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getQueue] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.patchUserSettings] = true
@@ -281,6 +283,8 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postToQueue] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.deviceRegister] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.deleteHistory] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverContainer] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverHomeScreenContainerIds] = true
 
   constants.anonymous = {}
     constants.anonymous.algorithm = "TUBI-HMAC-SHA256"
@@ -585,6 +589,9 @@ Function getConstants()
       constants.timers.coppaFailTimeout = constants.settings.coppaHasAgeDuration
     end if
 
+    ' How long each slide stays on screen for the screen saver
+    constants.timers.screenSaverSlideDuration = 10 ' In seconds
+
   'constants needed for the video player
   constants.player = {}
 
@@ -813,15 +820,17 @@ Function getConstants()
       constants.ui.categoryList.westerns = "Westerns"
 
     constants.ui.categoryIds = {}
-      'these map to matrix api container ids
+      'these map to tensor api container ids
       constants.ui.categoryIds.history = "continue_watching"
       constants.ui.categoryIds.queue = "queue"
       constants.ui.categoryIds.featured = "featured"
       constants.ui.categoryIds.recommendedForYou = "recommended_for_you"
-
+      constants.ui.categoryIds.mostPopular = "most_popular"
+      constants.ui.categoryIds.movieNight = "movie_night"
+      constants.ui.categoryIds.seriesSpotlight = "series_spotlight"
 
     constants.ui.categoryTypes = {}
-      'these map to matrix api container types
+      'these map to tensor api container types
       constants.ui.categoryTypes.history = "continue_watching"
       constants.ui.categoryTypes.queue = "queue"
       constants.ui.categoryTypes.regular = "regular"
@@ -830,9 +839,8 @@ Function getConstants()
       constants.ui.categoryTypes.preview = "video_preview"
       constants.ui.categoryTypes.historySignedOutUser = "continue_watching_signed_out_user"
 
-
     constants.ui.likeDislikeActions = {}
-      'these map to matrix api like/dislike rating actions
+      'these map to account api like/dislike rating actions
       constants.ui.likeDislikeActions.like = "like"
       constants.ui.likeDislikeActions.dislike = "dislike"
       constants.ui.likeDislikeActions.removeLike = "remove-like"
@@ -996,7 +1004,7 @@ Function getConstants()
       constants.ui.imageSizes.poster = [186,267]
 
       'Sizes of landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.landscape= [384,216]
+      constants.ui.imageSizes.landscape = [384,216]
 
       'Sizes of landscape VITG that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.vitg = [981,552]

@@ -26,6 +26,17 @@ Function Main(startupArgs)
 End Function
 
 
+Function RunScreenSaver(args)
+  screen = createObject("roSGScreen")
+  scene = screen.createScene("TubiScreenSaverScene")
+  screen.show()
+  scene.startupArgs = args
+  while true
+    sleep(1000)
+  end while
+End Function
+
+
 ' @constants: assocArray, constants as returned by getConstants()
 ' @log: assocArray, an instance of the log module as returned by TubiLog()
 ' @request: assocArray, an instance of the request module as returned by TubiRequest()
@@ -312,9 +323,9 @@ Function resetComponentLibrary(componentLibrary, scene, port)
   scene.removeChild(componentLibrary)
 
   newComponentLibrary = scene.createChild("ComponentLibrary")
+  newComponentLibrary.observeField("loadStatus", port)
   newComponentLibrary.id = componentId
   newComponentLibrary.uri = componentUri
-  newComponentLibrary.observeField("loadStatus", port)
 End Function
 
 

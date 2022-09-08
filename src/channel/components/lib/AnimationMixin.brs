@@ -169,6 +169,7 @@ End Function
 '           duration: float, the duration of the animation
 '           delay: float, a delay time before the animation begins
 '           easeFunction: string, one of the allowed SceneGraph animation ease functions
+'           completeCallback: function, callback function fired when animation completes
 
 ' NOTE!: It's CRITICAL that the target object has a globally unique id.  This is a limitation
 '        of the Animation node which references the target by ID.
@@ -179,7 +180,7 @@ End Function
 '         may be removed and go out of scope, their animations don't get garbage collected with them.
 ' TODO(Chris): check for abandoned animations here and remove them
 Function animate(target As Object, options as Object) As Object
-  if target <> invalid and target.id <> invalid and type(target) = "roSGNode"
+  if type(target) = "roSGNode" and target.id <> ""
     if options.origin = invalid then options.origin = target.translation
     if options.duration = invalid then options.duration = 2.0
     if options.delay = invalid then options.delay = 0
@@ -193,22 +194,22 @@ Function animate(target As Object, options as Object) As Object
     ' if low-spec device, then instantly change to target option rather than using animation
     globalAA = m.global
     if globalAA <> invalid and globalAA.constants <> invalid and globalAA.constants.deviceInfo.limitedUi = true
-      
+
       ' hardcoding easeFunction=linear for better performance in lower-end even if allowOnLowSpecDevices=true
       options.easeFunction = "linear"
-      
+
       if options.allowOnLowSpecDevices = false
         tubiLog("Do not animate due to being a low-spec device, " + target.id)
         bAnimate = false
       end if
-      
+
     end if
 
     if options.duration <= 0
       tubiLog("Do not animate due to duration being 0")
       bAnimate = false
     end if
-    
+
     ' Reuse an existing animation if available
     animation = m.top.findNode(animationId)
     if animation = invalid then
@@ -345,6 +346,11 @@ Function animate(target As Object, options as Object) As Object
     if bAnimate = true
       animation.duration = totalTime
       animation.easeFunction = options.easeFunction
+      animation.unobserveFieldScoped("state")
+      if options.completeCallback <> invalid then
+        m[animationId + "CompleteCallback"] = options.completeCallback
+        animation.observeFieldScoped("state", "AnimationMixin_onAnimationStateChange")
+      end if
       animation.control = "start"
       return animation
     else
@@ -352,6 +358,20 @@ Function animate(target As Object, options as Object) As Object
     end if
   else
     return invalid
+  end if
+End Function
+
+
+' callback intermediary for all animations with a complete callback
+Function AnimationMixin_onAnimationStateChange(msg)
+  if msg.getData() = "stopped" then
+    animationId = msg.getRoSGNode().id
+    key = animationId + "CompleteCallback"
+    completeCallback = m[key]
+    if completeCallback <> invalid then
+      m.delete(key)
+      completeCallback()
+    end if
   end if
 End Function
 

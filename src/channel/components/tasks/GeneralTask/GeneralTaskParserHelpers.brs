@@ -159,17 +159,29 @@ Function createParsingCallbacks()
     parseError: parseGenericError
   }
 
-  'queue bookmarks 
+  'queue bookmarks
   m.requestTypes[m.constants.reqNames.postToQueue] = {
     parseSuccess: parseAddToQueueSuccess
     parseError: parseAddToQueueError
   }
-  
-  'delete queue bookmarks 
+
+  'delete queue bookmarks
   m.requestTypes[m.constants.reqNames.deleteFromQueue] = {
     parseSuccess: parseRemoveFromQueueSuccess
     parseError: parseRemoveFromQueueError
   }
+
+    'screen saver get container
+    m.requestTypes[m.constants.reqNames.getScreenSaverContainer] = {
+      parseSuccess: parseGetScreenSaverContainerSuccess
+      parseError: parseGenericError
+    }
+
+    'screen saver get home screen container ids
+    m.requestTypes[m.constants.reqNames.getScreenSaverHomeScreenContainerIds] = {
+      parseSuccess: parseGetScreenSaverHomeScreenContainerIdsSuccess
+      parseError: parseGenericError
+    }
 
 End Function
 

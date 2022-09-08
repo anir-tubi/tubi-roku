@@ -15,7 +15,6 @@ Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
     singleContentReqInfo: cmsApi_getSingleContentRequestInfo
     thumbnailsReqInfo: cmsApi_getThumbnailsRequestInfo
     getCategoriesListRequestInfo: cmsApi_getCategoriesListRequestInfo
-    homeScreenReq: cmsApi_getHomeScreenRequest
     homeScreenReqInfo: cmsApi_getHomeScreenRequestInfo
     categoryReqInfo: cmsApi_getCategoryRequestInfo
     searchReq: cmsApi_getSearchRequest
@@ -138,18 +137,6 @@ End Function
 '''''''''''''''''''''
 ' homeScreenReq()
 '
-' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
-'                 see request.brs for more info
-Function cmsApi_getHomeScreenRequest(bKidsMode = false, passedOptions = {})
-  homeScreenReqInfo = m.homeScreenReqInfo(bKidsMode, passedOptions)
-
-  url = homeScreenReqInfo.url
-  options = homeScreenReqInfo.options
-
-  return m.createAuthRequest(url, m.constants.reqNames.getHomescreen, options)
-End Function
-
 
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)

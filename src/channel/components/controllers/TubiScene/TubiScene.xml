@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  - TubiScene
  -
@@ -6,34 +6,30 @@
  - In order for remote loading of the scenegraph app to work, we have to sign the package, that is downloaded via the url in the
  - ComponentLibrary tag, with the same developer id as is used to create the Tubi app.
  -
- - Please see https://sdkdocs.roku.com/display/sdkdoc/ComponentLibrary for more info on remotely loading scenegraph components 
+ - Please see https://sdkdocs.roku.com/display/sdkdoc/ComponentLibrary for more info on remotely loading scenegraph components
  -
  -
- - The ComponentLibary's uri field is populated in the build process.
- - The URI-TO-REPLACE value will be set to the value of remoteComponentDir in the 
- - settings section of default.yml when in production mode, and will be set to the local ip of the computer
- - doing the build when in dev mode. Change from production or dev mode by setting
- - the ROKU_PROFILE environment variable.
+ - The ComponentLibrary's uri field is populated in main.brs from the value set on starterComponentsUrl in the appropriate environment's config yml.
  -->
 <component name="TubiScene" extends="Scene">
 
   <script type="text/brightscript" uri="TubiScene.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
-  
+
   <interface>
-  
+
     <!-- fadeOutCustomSplash is used to fadeOut the CustomSplashPoster -->
     <field id="fadeOutCustomSplash" type="boolean"/>
 
     <!-- fadeOutSpinner is used to fadeOut the TubiSceneSpinner -->
-    <field id="fadeOutSpinner" type="boolean"/>    
-    
+    <field id="fadeOutSpinner" type="boolean"/>
+
   </interface>
 
   <!-- suspendhandler will be set when app got suspended by pressing Home key or other Channel on remote -->
   <customization suspendhandler="customSuspend" />
-  
+
   <!-- resumehandler will be set when app got resumed after suspended by user -->
   <customization resumehandler="customResume" />
 
@@ -50,13 +46,13 @@
       width="1920"
       opacity="0"
       height="1080"/>
-   
+
     <Poster
       id="customSplashPoster"
       width="1920"
       height="1080"
       visible="true" />
-        
+
   </children>
 
 </component>

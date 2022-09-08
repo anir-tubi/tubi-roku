@@ -15,6 +15,7 @@ Function TubiAuth(constants, request)
     request: request
 
     'public methods
+    getAuthInfoNoUpdate: tubiAuth_getAuthInfoNoUpdate
     getAuthInfo: tubiAuth_getAuthInfo
     setAuthInfo: tubiAuth_setAuthInfo
     getFirstVisit: tubiAuth_getFirstVisit
@@ -97,7 +98,9 @@ End Function
 '  accessToken: someAccessToken(String)
 '  expireTime: numberOfSecondsUntilExpires(Integer)
 '}
-Function tubiAuth_getAuthInfo()
+' tubiAuth_getAuthInfo will try to make a roUrlTransfer if the token needs to be updated which isn't allowed on the render thread.
+' This function allows accessing auth info from the render thread without this issue
+Function tubiAuth_getAuthInfoNoUpdate()
   authInfo = m.regReadAll(m.authRegSection) 'returns empty assocArray if nothing in the auth registry
 
   firstName = authInfo.fn
@@ -120,7 +123,6 @@ Function tubiAuth_getAuthInfo()
     end if
   end if
 
-  newAuthInfo = invalid
   if authInfo.expireTime <> invalid   'used as test to determine if we have any auth info in the auth registry
     authInfo.expireTime = authInfo.expireTime.toInt()
 
@@ -131,9 +133,20 @@ Function tubiAuth_getAuthInfo()
         authInfo.hasAge = false
       end if
     end if
+    return authInfo
+  end if
 
-    isExpired = m.checkIfAuthExpired(authInfo)
+  return authInfo  'can return invalid
+End Function
 
+' Same as getAuthInfoNoUpdate but will request a new auth token and update the registry if necessary.
+' Should not be called from render thread!
+Function tubiAuth_getAuthInfo()
+  authInfo = m.getAuthInfoNoUpdate()
+
+  isExpired = m.checkIfAuthExpired(authInfo)
+  newAuthInfo = invalid
+  if authInfo.expireTime <> invalid   'used as test to determine if we have any auth info in the auth registry
     if isExpired = true
       if authInfo.userId <> invalid
         newAuthInfo = m.refreshAuthToken(authInfo, 3) 'can return invalid
@@ -150,7 +163,7 @@ Function tubiAuth_getAuthInfo()
     newAuthInfo = m.fetchAndSaveAnonymousAuthInfo()
   end if
 
-  return newAuthInfo  'can return invalid
+  return newAuthInfo 'can return invalid
 End Function
 
 

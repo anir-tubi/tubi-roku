@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - TubiScreenSaverScene
+ -
+ - This is the main scene that remotely loads the ScreenSaverController which in turn builds the ScreenSaverScreen
+ - In order for remote loading of the scenegraph app to work, we have to sign the package, that is downloaded via the url in the
+ - ComponentLibrary tag, with the same developer id as is used to create the Tubi app.
+ -
+ - Please see https://sdkdocs.roku.com/display/sdkdoc/ComponentLibrary for more info on remotely loading scenegraph components
+ -
+ -
+ - The ComponentLibrary's uri field is populated in TubiScreenSaverScene.brs from the value set on starterComponentsUrl in the appropriate environment's config yml.
+ -->
+<component name="TubiScreenSaverScene" extends="Scene">
+  <script type="text/brightscript" uri="TubiScreenSaverScene.brs" />
+  <script type="text/brightscript" uri="pkg:/source/Constants.brs" />
+  <script type="text/brightscript" uri="pkg:/source/Settings.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <!-- the arguments that are passed into the screensaver at startup, as an associative array -->
+    <field id="startupArgs" type="assocarray"/>
+  </interface>
+
+  <children>
+    <Group id="controllerContainer" />
+    <Poster
+      id="fallbackPoster"
+      width="309"
+      height="135"
+      uri="pkg:/images/logo-white-xlarge.png"
+      visible="false" />
+
+    <BusySpinner
+      id="busySpinner"
+      translation="[927, 507]" />
+
+    <ComponentLibrary
+      id="starterComponentLibrary" />
+
+    <ComponentLibrary
+      id="remoteComponentLibrary" />
+
+    <Timer
+      id="fallbackPosterTimer"
+      duration="3" />
+
+    <Timer id="retryTimer" />
+  </children>
+</component>

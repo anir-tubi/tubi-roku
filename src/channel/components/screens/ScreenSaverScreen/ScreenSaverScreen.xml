@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ScreenSaverScreen" extends="Group">
+  <script type="text/brightscript" uri="ScreenSaverScreen.brs" />
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <!-- Contains list of responses from the requested containers with each node having an `items` array field with the list of filtered items for that container -->
+    <field id="containerResponses" type="nodearray"/>
+
+    <!-- OUTPUTS -->
+    <!-- communicates to scene to remove the busy spinner or to fallback to built in screen saver in case of failure -->
+    <!-- loading | ready | failed -->
+    <field id="loadStatus" type="string" value="loading" />
+  </interface>
+  <children>
+    <!-- used to preload images in advance -->
+    <Poster
+      id="preloadPoster"
+      visible="false" />
+    <Rectangle
+      width="1920"
+      height="1080"
+      color="#10141F" />
+    <Poster
+      id="poster"
+      width="1920"
+      height="1080"
+      scaleRotateCenter="[960, 540]"
+      opacity="0" />
+    <Poster
+      width="1260"
+      height="1080"
+      uri="pkg:/images/screensaver_title_gradient.webp" />
+    <LayoutGroup
+      id="titleLayoutGroup"
+      layoutDirection="vert"
+      itemSpacings="[12]"
+      opacity="0"
+      translation="[126, 846]">
+      <SimpleLabel
+        id="titleLabel"
+        color="#FFFFFF"
+        fontUri="pkg:/fonts/Vaud-Bold.ttf"
+        fontSize="42" />
+        <SimpleLabel
+          id="tagsLabel"
+          color="#FFFFFF7A"
+          fontUri="pkg:/fonts/Vaud-Medium.ttf"
+          fontSize="27" />
+    </LayoutGroup>
+
+    <!-- Can only have one animation for each item with animate() and in this case we need two due to the different durations -->
+    <Animation
+      id="zoomAnimation"
+      easeFunction="outQuad">
+      <Vector2DFieldInterpolator
+        key="[0.0, 1.0]"
+        keyValue="[[1.0, 1.0], [1.12, 1.12]]"
+        fieldToInterp="poster.scale" />
+    </Animation>
+
+    <Timer
+      id="slideTimer" />
+  </children>
+</component>

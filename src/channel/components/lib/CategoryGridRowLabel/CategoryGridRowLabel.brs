@@ -136,7 +136,7 @@ Function drawItemCount()
     ' It's odd to see '0 of 0' so we hide the counter
     m.ItemCount.text = ""
     m.FocusIndex.text = ""
-  endif
+  end if
 End Function
 
 

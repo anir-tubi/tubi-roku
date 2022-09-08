@@ -420,8 +420,6 @@ Function fetchHomeScreen(homeScreen)
     headers = {}
     params = {}
 
-    isKidsMode = shouldKidsModeBeSentToServer()
-
     limitParamName = "contents_limit"
     contentModeParamName = "content_mode"
 

@@ -47,7 +47,7 @@ End Function
 ' pushRequest - add a request to the queue and start the request
 '
 ' request - a request created by createAsyncHTTPRequest
-' 
+'
 Function tubiq_pushRequest(request As Object) As Object
   ' make room first
   m.advanceQueue_()
@@ -61,7 +61,7 @@ Function tubiq_pushRequest(request As Object) As Object
       m.queue.Push(m.WrapRequest_(request))
       m.AdvanceQueue_()
       return request
-    endif
+    end if
   end if
   return invalid
 End Function
@@ -154,7 +154,7 @@ Function tubiq_advanceQueue_()
     if m.timeout <> invalid and m.timeout <> 0 then
       if now - entry.startTime > m.timeout then
         entry.request.cancel()
-        m.queue.Delete(i)        
+        m.queue.Delete(i)
         i = i - 1 'to account for shift
       end if
     end if

@@ -313,6 +313,7 @@ function buildRemote() {
       '!src/channel/components/tests/**',
       '!src/channel/components/controllers/StarterController/**',
       '!src/channel/components/controllers/TubiScene/**',
+      '!src/channel/components/controllers/TubiScreenSaverScene/**',
       '!src/channel/components/controllers/BackgroundScene/**',
       '!src/channel/components/tasks/ExperimentsTask/**',
       '!src/channel/components/tasks/AnalyticsTask/**',

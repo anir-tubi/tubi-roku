@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - This is the primary controller for the screensaver which manages the only screen ScreenSaverScreen
+ -
+ - Scene Startup Sequence:
+ -  1) This component is created and init() is run
+ -  2) During ScreenSaverController.init(), the GeneralTask is initialized and we make our request for our item feed
+ -  3) When a successful response is received we make ScreenSaverScreen and pass along the response to it
+ -
+ -->
+<component name="ScreenSaverController" extends="Group">
+  <script type="text/brightscript" uri="ScreenSaverController.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/GeneralTaskModule.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/ApiUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/CmsApi.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <!-- the arguments that are passed into the screensaver at startup, as an associative array -->
+    <field id="startupArgs" type="assocarray"/>
+
+    <!-- OUTPUTS -->
+    <!-- communicates to scene to remove the busy spinner or to fallback to built in screen saver in case of failure -->
+    <!-- loading | ready | failed -->
+    <field id="loadStatus" alias="screenSaverScreen.loadStatus" />
+  </interface>
+
+  <children>
+    <ScreenSaverScreen id="screenSaverScreen" />
+
+    <Group
+      id="logoGroup">
+      <Poster
+        id="tubiLogo"
+        height="45"
+        width="103"
+        uri="pkg:/images/logo-white-large.png"
+        opacity="0.5"
+        translation="[1719, 60]"/>
+      </Group>
+  </children>
+</component>

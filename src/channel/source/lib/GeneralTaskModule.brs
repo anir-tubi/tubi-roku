@@ -236,6 +236,9 @@ Function generalTask_makeBatchRequest(batchInfo = {})
 
   ' Going in reverse order to avoid index getting off if we have to remove a request
   for i = requests.count() - 1 to 0 step -1
+    request = requests[i]
+    request.silenceCallbackWarnings = true
+
     ' If verification fails go ahead and kick it out
     if m.verifyRequestInfo(requests[i]) = false then
       requests.delete(i)
@@ -347,9 +350,9 @@ End Function
 
 ' helper function to determine if the successResponseType is valid for a batch response.
 Function generalTask_isValidBatchResponseType(responseType)
-  if type(responseType) = "String" or type(responseType) = "roString"
+  if isString(responseType) = true then
     nodeHelpers = m.NodeHelpers
-    if nodeHelpers = invalid and type(TubiNodeHelpers) = "roFunction"
+    if nodeHelpers = invalid AND isFunction(TubiNodeHelpers) = true then
       nodeHelpers = TubiNodeHelpers()
     end if
 
