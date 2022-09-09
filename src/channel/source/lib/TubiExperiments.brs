@@ -64,10 +64,6 @@ Function TubiExperiments(constants) as Object
       roku_featured_landscape: {
         roku_featured_landscape_v2: {"enabled": false}
       }
-
-      roku_raf_local_vast: {
-        roku_raf_local_vast_v1 : {"enabled": false}
-      }
     }
 
     'public methods

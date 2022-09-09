@@ -294,36 +294,28 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
   adFetchTimer = createObject("roTimeSpan")
   currentAdUnitsList = invalid
 
-  if getGlobalAA().enableRafLocalVast <> true then
-    'set the url for the Roku Advertising Framework
-    m.roAdFramework.setAdUrl(rainmakerVastUrl)
-    'get the array of ad units back from the Roku Advertising Framework(RAF)
-    'adUnits are called adPods in RAF documentation
-    currentAdUnitsList = m.roAdFramework.getAds()
-  else
-    ' RAF has a hard 5 second cutoff for download time.
-    ' We make the network request to rainmaker ourselves to work around this.
-    tubiReq = m.request.createAsync(rainmakerVastUrl)
-    port = createObject("roMessagePort")
-    if tubiReq.start(port) = true then
-      timeout = 10000 ' in milliseconds
-      msg = wait(timeout, port)
-      if type(msg) = "roUrlEvent" then
-        responseCode = msg.getResponseCode()
-        if responseCode >= 200 AND responseCode < 400 then
-          ' If we got a valid result write it to tmp and then have RAF read it from there
-          rainmakerResponse = msg.getString()
-          localRafVastUrl = "tmp:/local_raf_vast.xml"
-          if writeAsciiFile(localRafVastUrl, rainmakerResponse) = true then
-            m.roAdFramework.setAdUrl(localRafVastUrl)
-            'get the array of ad units back from the Roku Advertising Framework(RAF)
-            'adUnits are called adPods in RAF documentation
-            currentAdUnitsList = m.roAdFramework.getAds()
-          else
-            tubiLog("Failed to write local vast response to " + localRafVastUrl)
-          end if
-          deleteFile(localRafVastUrl)
+  ' RAF has a hard 5 second cutoff for download time.
+  ' We make the network request to rainmaker ourselves to work around this.
+  tubiReq = m.request.createAsync(rainmakerVastUrl)
+  port = createObject("roMessagePort")
+  if tubiReq.start(port) = true then
+    timeout = 10000 ' in milliseconds
+    msg = wait(timeout, port)
+    if type(msg) = "roUrlEvent" then
+      responseCode = msg.getResponseCode()
+      if responseCode >= 200 AND responseCode < 400 then
+        ' If we got a valid result write it to tmp and then have RAF read it from there
+        rainmakerResponse = msg.getString()
+        localRafVastUrl = "tmp:/local_raf_vast.xml"
+        if writeAsciiFile(localRafVastUrl, rainmakerResponse) = true then
+          m.roAdFramework.setAdUrl(localRafVastUrl)
+          'get the array of ad units back from the Roku Advertising Framework(RAF)
+          'adUnits are called adPods in RAF documentation
+          currentAdUnitsList = m.roAdFramework.getAds()
+        else
+          tubiLog("Failed to write local vast response to " + localRafVastUrl)
         end if
+        deleteFile(localRafVastUrl)
       end if
     end if
   end if
