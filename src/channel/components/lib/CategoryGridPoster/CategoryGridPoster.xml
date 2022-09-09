@@ -31,7 +31,8 @@
       itemSpacings="[6]">
       <Poster
         id="Poster"
-        loadingBitmapUri="pkg:/images/placeholder.jpg">
+        loadingBitmapUri="pkg:/images/placeholder.jpg"
+        failedBitmapUri="pkg:/images/placeholder.jpg">
         <Rectangle
           id="ResumeProgressBar"
           height="6"
@@ -58,7 +59,8 @@
     <Poster
       id="LinearPoster"
       visible="false"
-      loadingBitmapUri="pkg:/images/placeholder.jpg"/>
+      loadingBitmapUri="pkg:/images/placeholder.jpg"
+      failedBitmapUri="pkg:/images/placeholder.jpg" />
     <Label
       id="LinearSubTitle"
       color="0xFFFFFFFF"

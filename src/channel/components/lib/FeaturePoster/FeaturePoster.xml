@@ -12,7 +12,7 @@
 
   <interface>
     <field id="itemContent" type="node" />
-    
+
     <!-- index ignored but here for compatibility -->
     <field id="index" type="integer" />
 
@@ -25,9 +25,10 @@
   </interface>
 
   <children>
-    <Poster 
-      id="Background" 
+    <Poster
+      id="Background"
       loadingBitmapUri="pkg:/images/placeholder-featured.jpg"
+      failedBitmapUri="pkg:/images/placeholder.jpg"
       width="430"
       height="242"
       translation="[0,0]" />

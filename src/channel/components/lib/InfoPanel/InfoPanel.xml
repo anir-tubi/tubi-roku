@@ -98,6 +98,7 @@
       <Poster
         id="HeaderImage"
         loadingBitmapUri="pkg:/images/placeholder.jpg"
+        failedBitmapUri="pkg:/images/placeholder.jpg"
         width="186"
         height="264"
         visible="false"

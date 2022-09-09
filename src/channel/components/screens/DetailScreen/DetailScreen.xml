@@ -302,6 +302,7 @@
           <PosterGrid
             id="RelatedGrid"
             loadingBitmapUri="pkg:/images/placeholder.jpg"
+            failedBitmapUri="pkg:/images/placeholder.jpg"
             itemSize="[1920,267]"
             numRows="1"
             basePosterSize="[186,267]"
