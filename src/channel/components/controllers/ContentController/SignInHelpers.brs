@@ -602,6 +602,45 @@ Function onQueueAfterSignIn()
 End Function
 
 
+' onLikeAfterSignIn - occurs after activation success via Like Button on Details page
+Function onLikeAfterSignIn()
+  tubiLog("SignInHelpers.onLikeAfterSignIn")
+
+  setContentToRefreshAllPersonalizedScreens()
+
+  currentScreen = popScreenAfterSignInProcess()
+  m.spinner.visible = false
+
+  if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
+    currentScreen.removeSignupButton = true
+    currentScreen.jumpToItem = 0
+    onLike(currentScreen)
+    'refresh the detail screen in case the newly signed in user has any progress with the current content
+    refreshDetailScreenContent(currentScreen)
+  end if
+End Function
+
+
+' onDislikeAfterSignIn - occurs after activation success via Dislike Button on Details page
+Function onDislikeAfterSignIn()
+  tubiLog("SignInHelpers.onDislikeAfterSignIn")
+
+  setContentToRefreshAllPersonalizedScreens()
+
+  currentScreen = popScreenAfterSignInProcess()
+  m.spinner.visible = false
+
+  if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
+    currentScreen.removeSignupButton = true
+    currentScreen.jumpToItem = 0
+    onDislike(currentScreen)
+    'refresh the detail screen in case the newly signed in user has any progress with the current content
+    refreshDetailScreenContent(currentScreen)
+  end if
+End Function
+
+
+
 ' onCWRowAfterSignIn - occurs after activation success via CWRow on homescreen
 Function onCWRowAfterSignIn()
   tubiLog("SignInHelpers.onCWRowAfterSignIn")

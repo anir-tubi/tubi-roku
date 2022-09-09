@@ -65,11 +65,7 @@ Function init()
 
   m.defaultHeroUri = "pkg:/images/art-blur-background.png"
   setInitialMenuItems()
-
-  m.isLikeDislikeExperimentEnabled = getExperimentResource("roku_title_reactions", "roku_title_reactions_v1", false).enabled
-  if m.isLikeDislikeExperimentEnabled = true
-    setInitialSecondaryMenuItems()
-  end if
+  setInitialSecondaryMenuItems()
 
   setDetailStrings()
   m.focusAnimationDuration = 0.4
@@ -101,6 +97,13 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.detailScreen
   m.top.isStackable = true
   m.top.handlesTransportVoiceRequests = true
+End Function
+
+
+' @param bSendExposureEvent: Boolean, Should the experiment exposure event be sent? true=send event.
+Function isLikeDislikeEnabled(bSendExposureEvent = false)
+  bLikeDislikeEnabled = (getExperimentResource("roku_title_reactions", "roku_title_reactions_v2", bSendExposureEvent).enabled = true or isLoggedInUser() = true)
+  return bLikeDislikeEnabled
 End Function
 
 
@@ -156,7 +159,7 @@ Function changeButtonText(sButtonStringId, sButtonText)
 
     ' Adjust the width of the menu if the Channel name, the signin button (if signin conditions), or the like/dislike button (if signin conditions) is too long for the default width
     isSignUpButton = (sButtonStringId = "stringSignUpButton" and isLoggedInUser() = false and isNewUser() = false)
-    isLikeButton = (sButtonStringId = "stringLikeDislikeButton" and isLoggedInUser() = true and getExperimentResource("roku_title_reactions", "roku_title_reactions_v1", false).enabled = true)
+    isLikeButton = (sButtonStringId = "stringLikeDislikeButton" and (isLikeDislikeEnabled() = true))
     if sButtonStringId = "stringChannelButton" or isSignUpButton = true or isLikeButton = true
       tempChannelMenuItem = CreateObject("roSGNode", "DetailMenuItem")
       tempChannelMenuItem.itemContent = stringNode
@@ -299,7 +302,7 @@ End Function
 
 
 Function changeLikeDislikeButtonText()
-  if m.isLikeDislikeExperimentEnabled = true
+  if isLikeDislikeEnabled() = true 
     sButtonText = ""
     sIconUrl = ""
     if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked or m.top.likeDislikeState = m.constants.ui.likeDislikeStates.disliked
@@ -393,11 +396,13 @@ Function onRemoveSignupButton()
   if signUpIndex <> invalid
     addRemoveMenuItem(false, signUpIndex)
 
-    if m.top.isInKidsMode = false and isLoggedInUser() = true
-      if getExperimentResource("roku_title_reactions", "roku_title_reactions_v1", true).enabled = true
-        '//add like/dislike button
-        addRemoveMenuItem(true, -1, m.LikeDislikeMenuItem, [m.PlayMenuItem])
-      end if
+    if m.top.isInKidsMode = false
+      '//add like/dislike button
+      nLikeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
+      if nLikeIndex = -1
+        '//if the like/dislke button does not exist yet, then add it
+        addRemoveMenuItem(true, nLikeIndex, m.LikeDislikeMenuItem, [m.PlayMenuItem])
+      end if 
     end if
   end if
 End Function
@@ -417,10 +422,13 @@ Function onIsInKidsMode()
     '//remove like/dislike button
     likeDislikeButtonIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
     addRemoveMenuItem(false, likeDislikeButtonIndex)
-  else if isLoggedInUser() = true
-    if getExperimentResource("roku_title_reactions", "roku_title_reactions_v1", true).enabled = true
+  else 
+    if isLikeDislikeEnabled(true) = true
       '//add like/dislike button
-      addRemoveMenuItem(true, -1, m.LikeDislikeMenuItem, [m.PlayMenuItem])
+      nLikeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
+      if nLikeIndex = -1
+        addRemoveMenuItem(true, nLikeIndex, m.LikeDislikeMenuItem, [m.PlayMenuItem])
+      end if
     end if
   end if
 End Function
@@ -431,8 +439,8 @@ Function onHasTrailer()
   trailerIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.WatchTrailerMenuItem.id)
 
   previousItems = [
-    m.signUpMenuItem
     m.LikeDislikeMenuItem
+    m.signUpMenuItem
     m.PlayMenuItem
   ]
 
@@ -493,12 +501,14 @@ Function setInitialMenuItems() As Void
   if isLoggedInUser() = false and isNewUser() = false
     menuItems.appendChild(m.signUpMenuItem)
   end if
-  if isLoggedInUser() = true
-    '//as long as the user is loggd in, send the like/dislike experiment exposure event here
-    if getExperimentResource("roku_title_reactions", "roku_title_reactions_v1", true).enabled = true
-      '//if the experiment is enabled then add the add like button
+  if isLoggedInUser() = false
+    '//as long as the user is logged out, send the like/dislike experiment exposure event here
+    if isLikeDislikeEnabled(true) = true
+      '//if the experiment is enabled then add the add like button for a guest user
       menuItems.appendChild(m.LikeDislikeMenuItem)
     end if
+  else
+    menuItems.appendChild(m.LikeDislikeMenuItem)
   end if
   menuItems.appendChild(m.AddQueueMenuItem)
   m.Menu.content = menuItems
@@ -638,7 +648,7 @@ End Function
 Function setVisibilityOfSecondaryMenu()
   result = false
 
-  if m.isLikeDislikeExperimentEnabled = true
+  if isLikeDislikeEnabled() = true
     itemFocused = m.Menu.content.getChild(m.Menu.itemFocused)
     if m.SecondaryMenu.isInFocusChain() = true or (m.Menu.isInFocusChain() = true and itemFocused <> invalid and itemFocused.id = "LikeDislikeMenuItem" and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked and m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing)
       alignSecondaryMenuWithMenu()
@@ -704,10 +714,16 @@ Function handleMenuItemSelected(itemSelected)
       end if
     else if itemSelected.id = "LikeMenuItem"
       m.top.likeSelected = true
-      focusMenu()
+      if isLoggedInUser() = true
+        '//if the user is logged in, then focus back onto the main menu
+        focusMenu()
+      end if
     else if itemSelected.id = "DislikeMenuItem"
       m.top.dislikeSelected = true
-      focusMenu()
+      if isLoggedInUser() = true
+        '//if the user is logged in, then focus back onto the main menu
+        focusMenu()
+      end if
     else if itemSelected.id = "WatchTrailerMenuItem"
       m.top.watchTrailerSelected = true
     else if itemSelected.id = "EpisodesMenuItem"

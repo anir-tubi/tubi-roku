@@ -21,8 +21,8 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.observeFieldScoped("confirmButtonValue", "onDetailScreenButtonConfirm")
     detailScreen.observeFieldScoped("playSelected", "onPlay")
     detailScreen.observeFieldScoped("resumeSelected", "onResume")
-    detailScreen.observeFieldScoped("likeSelected", "onLike")
-    detailScreen.observeFieldScoped("dislikeSelected", "onDislike")
+    detailScreen.observeFieldScoped("likeSelected", "onLikeSelected")
+    detailScreen.observeFieldScoped("dislikeSelected", "onDislikeSelected")
     detailScreen.observeFieldScoped("removeLikeSelected", "onRemoveLike")
     detailScreen.observeFieldScoped("removeDislikeSelected", "onRemoveDislike")
     detailScreen.observeFieldScoped("watchTrailerSelected", "onWatchTrailer")
@@ -195,6 +195,11 @@ End Function
 'detail screen has told us that the content or related content is out of cache window, so refresh
 Function onRefreshContentSignal(msg)
   detailScreen = msg.getRoSGNode()
+  refreshDetailScreenContent(detailScreen)
+End Function
+
+
+Function refreshDetailScreenContent(detailScreen)
   getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
 End Function
 
@@ -1062,21 +1067,55 @@ Function onRemoveFromQueueRetry(params)
 End Function
 
 
-'''''''''''
-' onLike
-'
-' Observer that is called when the like button is selected
-Function onLike(msg)
-  tubiLog("DetailScreenHelpers.onLike")
-  detailScreen = msg.getRoSGNode()
-  updateLikeDislike(detailScreen, m.constants.ui.likeDislikeActions.like)
+' @param bLike: Boolean, Did the user like the video? true = liked; false = disliked
+Function signInAndLike(bLike = true)
+  if bLike = true
+    startSignIn(onLikeAfterSignIn)
+  else
+    startSignIn(onDislikeAfterSignIn)
+  end if
 End Function
 
 
-Function onDislike(msg)
-  tubiLog("DetailScreenHelpers.onDislike")
+'''''''''''
+' onLikeSelected
+'
+' Observer that is called when the like button is selected
+Function onLikeSelected(msg)
+  tubiLog("DetailScreenHelpers.onLikeSelected")
   detailScreen = msg.getRoSGNode()
-  updateLikeDislike(detailScreen, m.constants.ui.likeDislikeActions.dislike)
+  onLike(detailScreen)
+End Function
+
+
+Function onLike(detailScreen)
+  tubiLog("DetailScreenHelpers.onLike")
+  if isLoggedInUser() = true
+    updateLikeDislike(detailScreen, m.constants.ui.likeDislikeActions.like)
+  else
+    signInAndLike(true)
+  end if
+End Function
+
+
+'''''''''''
+' onDislikeSelected
+'
+' Observer that is called when the dislike button is selected
+Function onDislikeSelected(msg)
+  tubiLog("DetailScreenHelpers.onDislikeSelected")
+  detailScreen = msg.getRoSGNode()
+  onDislike(detailScreen)
+End Function
+
+
+Function onDislike(detailScreen)
+  tubiLog("DetailScreenHelpers.onDislike")
+  if isLoggedInUser() = true
+    updateLikeDislike(detailScreen, m.constants.ui.likeDislikeActions.dislike)
+  else
+    signInAndLike(false)
+  end if
 End Function
 
 
