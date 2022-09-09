@@ -322,11 +322,8 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {})
       '//Tell backend to provide a specific sized image
       existingParams["images[poster_tb]"] = "w" + posterSize[0].ToStr() + "h" + posterSize[1].ToStr() + "_poster"
     else if imageType = "landscape"
-      if (UCase(m.constants.deviceInfo.countryCode) = "US") and m.experiments <> invalid and m.experiments.getExperimentResource("roku_featured_landscape", "roku_featured_landscape_v1").enabled = true
-        existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_landscape"
-      else
-        existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_hero"
-      end if
+      existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_landscape"
+
     else if imageType = "vitg"
       existingParams["images[vitg_tb]"] = "w" + vitgSize[0].ToStr() + "h" + vitgSize[1].ToStr() + "_hero"
     end if

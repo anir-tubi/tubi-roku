@@ -58,7 +58,8 @@
     "type": "pickString",
     "options": [
       "build",
-      "addMissingImages"
+      "addMissingImages",
+      "test"
     ]
   }]
 }

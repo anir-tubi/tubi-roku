@@ -221,44 +221,43 @@ Function setRowHeights()
   'determine the height of each row in the RowList so we can set it on RowList.rowItemSize
   rowItemSize = []
   rowHeights = []
-  showRowLabel = []
   numRows = 2
   for i=0 to m.top.content.getChildCount()-1
     category = m.top.content.getChild(i)
     rowHeight = 0
     rowHeightAdjustment = 0
-    if category.gridItemType = m.constants.ui.gridItemTypes.historySignedOutUser
+    gridItemType = category.gridItemType
+    gridItemTypes = m.constants.ui.gridItemTypes
+    if gridItemType = gridItemTypes.historySignedOutUser
       rowHeightAdjustment = 80
       posterHeight = m.constants.ui.imageSizes.poster[1]
       rowItemSize.push([1693, posterHeight])
       rowHeight = posterHeight
-      showRowLabel.push(true)
-    else if category.gridItemType = m.constants.ui.gridItemTypes.portrait
+    else if gridItemType = gridItemTypes.portrait
       posterWidth = m.constants.ui.imageSizes.poster[0]
       posterHeight = m.constants.ui.imageSizes.poster[1]
       rowHeightAdjustment = 80
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
-      showRowLabel.push(true)
-    else if category.gridItemType = m.constants.ui.gridItemTypes.linear
+    else if gridItemType = gridItemTypes.linear
       rowItemSize.push(m.constants.ui.imageSizes.linear)
       rowHeight = m.constants.ui.imageSizes.linear[1]
       rowHeightAdjustment = 86
-      showRowLabel.push(true)
-    else if category.gridItemType = m.constants.ui.gridItemTypes.landscape
+    else if gridItemType = gridItemTypes.landscape OR gridItemType = gridItemTypes.landscapeNoTitle
       posterWidth = m.constants.ui.imageSizes.landscape[0]
       posterHeight = m.constants.ui.imageSizes.landscape[1]
       rowHeightAdjustment = 122
-      rowItemSize.push([posterWidth,posterHeight])
+      if gridItemType = gridItemTypes.landscapeNoTitle then
+        rowHeightAdjustment = 100
+      end if
+      rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
-      showRowLabel.push(true)
-    else if category.gridItemType = m.constants.ui.gridItemTypes.vitg
+    else if gridItemType = gridItemTypes.vitg
       rowHeightAdjustment = 122
       posterWidth = m.constants.ui.imageSizes.vitg[0]
       posterHeight = m.constants.ui.imageSizes.vitg[1]
-      rowItemSize.push([posterWidth,posterHeight])
+      rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
-      showRowLabel.push(true)
       numRows = 3
     end if
 
@@ -270,12 +269,12 @@ Function setRowHeights()
   end for
 
   '//setting the height of the m.RowList.itemSize is superceded by the rowHeight of each row
-  itemSize = [1752,364]
+  itemSize = [1752, 364]
   m.Rowlist.update({
-    "itemSize" : itemsize,
-    "rowItemSize": rowItemSize,
-    "rowHeights": rowHeights,
-    "showRowLabel": showRowLabel,
+    "itemSize" : itemSize
+    "rowItemSize": rowItemSize
+    "rowHeights": rowHeights
+    "showRowLabel": [true]
     "numRows": numRows
   })
   m.RowList.content = m.top.content

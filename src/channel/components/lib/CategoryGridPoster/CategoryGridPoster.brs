@@ -36,7 +36,8 @@ End Function
 ' onContentChange
 '
 ' Update the title and background on 'content' being set
-Function onContentChange()
+Function onContentChange(msg)
+  itemContent = msg.getData()
   ' set some defaults
   m.LinearPoster.visible = false
   m.title.visible = false
@@ -57,7 +58,7 @@ Function onContentChange()
   ' next line shouldn't be necessary but is added in order to try and quell crashes as reported by roku crash logs
   if m.resumeProgressBar = invalid then m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
   m.resumeProgressBar.visible = false
-  
+
   ' settings continueWatchingLayout Group visibility false to avoid image caching issue.
   if m.continueWatchingLayout <> invalid
     m.continueWatchingLayout.visible = false
@@ -65,27 +66,27 @@ Function onContentChange()
   ' settings poster visibility true to avoid image caching issue. if it is not set to true, seeing some blank posters
   m.poster.visible = true
 
-  if m.top.itemContent <> invalid then
-    categoryContent = m.top.itemContent.getParent()
+  if itemContent <> invalid then
+    categoryContent = itemContent.getParent()
 
-    if categoryContent <> invalid and m.top.itemContent.gridItemType <> invalid then
-      m.poster.uri = m.top.itemContent.hdgridposterurl
-      if m.top.itemContent.gridItemType = m.gridItemTypes.landscape
+    if categoryContent <> invalid and itemContent.gridItemType <> invalid then
+      m.poster.uri = itemContent.hdgridposterurl
+      if itemContent.gridItemType = m.gridItemTypes.landscape
         m.title.visible = true
-        m.title.text = m.top.itemContent.title
-      else if isVitg(m.top.itemContent, m.gridItemTypes) = true
+        m.title.text = itemContent.title
+      else if isVitg(itemContent, m.gridItemTypes) = true
         setUpVitg()
       else if categoryContent.gridItemType = m.gridItemTypes.historySignedOutUser
         setUpSignedOutContinueWatching()
       else if categoryContent.id = "continue_watching"
         drawHistoryProgressBar()
-      'm.top.itemContent.gridItemType is not an empty string on the home screen,
+      'itemContent.gridItemType is not an empty string on the home screen,
       'and we want this to set Live logo and text just on the search screen.
-      else  if (m.top.itemContent.gridItemType = "" and m.top.itemContent.type = "linear")
+      else if (itemContent.gridItemType = "" and itemContent.type = "linear")
         setLiveIconAndText()
       end if
     else
-      m.poster.uri = m.top.itemContent.hdgridposterurl
+      m.poster.uri = itemContent.hdgridposterurl
     end if
   end if
 End Function
@@ -361,7 +362,7 @@ End Function
 
 Function setLiveIconAndText()
   tubiLog("SearchScreenGridPoster.setLiveIconAndText")
-  if m.poster <>invalid
+  if m.poster <> invalid
     gradientPoster = m.poster.createChild("Poster")
     gradientPoster.width = m.poster.width
     gradientPoster.height = m.poster.height

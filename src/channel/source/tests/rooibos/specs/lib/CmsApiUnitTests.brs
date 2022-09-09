@@ -154,7 +154,7 @@ Function cmsApi_singleContentReqInfo_test()
       "isKidsMode": false
       "includeChannels": true
       "video_resources": m.cmsApi.constants.player.drmOrder
-      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_hero"
+      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_landscape"
     }
   }
 
@@ -287,7 +287,7 @@ Function cmsApi_homeScreenReqInfo_test()
       "include_empty_queue": true
       "is_kids_mode": false
       "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
-      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_hero"
+      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_landscape"
       "images[vitg_tb]": "w" + m.cmsApi.constants.ui.imageSizes.vitg[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.vitg[1].ToStr() + "_hero"
       "contentMode": m.cmsApi.constants.ui.contentMode.homescreen
       "customParam": "custom_param_value"
@@ -469,7 +469,7 @@ Function cmsApi_categoryReqInfo_test()
       "cursor": 0
       "contents_limit": 19
       "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
-      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_hero"
+      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_landscape"
       "images[vitg_tb]": "w" + m.cmsApi.constants.ui.imageSizes.vitg[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.vitg[1].ToStr() + "_hero"
       "contentMode": m.cmsApi.constants.ui.contentMode.homescreen
       "customParam": "custom_param_value"
@@ -741,7 +741,7 @@ End Function
 '@Test unit tests setImageParams
 Function cmsApi_setImageParams_test()
   posterParam = "w186h267_poster"
-  landscapeParam = "w384h216_hero"
+  landscapeParam = "w384h216_landscape"
   vitgParam = "w981h552_hero"
 
   ' test add poster only
@@ -844,7 +844,7 @@ End Function
 
 '@Test unit tests setTupianLandscapeParam
 Function cmsApi_setTupianLandscapeParam_test()
-  landscapeParam = "w384h216_hero"
+  landscapeParam = "w384h216_landscape"
 
   existingParams = {
     userid: "1234"

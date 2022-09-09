@@ -62,7 +62,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_featured_landscape: {
-        roku_featured_landscape_v1: {"enabled": true}
+        roku_featured_landscape_v2: {"enabled": false}
       }
 
       roku_raf_local_vast: {

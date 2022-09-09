@@ -66,35 +66,36 @@ End Function
 Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "")
   canvasImages = contentFromServer.images
   sThumbnailURL = ""
+  gridItemTypes = m.constants.ui.gridItemTypes
   if gridType = ""
-    gridType = m.constants.ui.gridItemTypes.portrait
+    gridType = gridItemTypes.portrait
   end if
 
-  if gridType = m.constants.ui.gridItemTypes.portrait
-    if canvasImages <> invalid and type(canvasImages.poster_tb) = "roArray" and canvasImages.poster_tb[0] <> invalid and canvasImages.poster_tb[0] <> ""
+  if gridType = gridItemTypes.portrait
+    if canvasImages <> invalid AND type(canvasImages.poster_tb) = "roArray" AND isNonEmptyString(canvasImages.poster_tb[0]) = true
       '//A custom portrait size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.poster_tb[0]
-    else if contentFromServer.posterarts <> invalid and type(contentFromServer.posterarts) = "roArray" and contentFromServer.posterarts.count() > 0
+    else if contentFromServer.posterarts <> invalid AND isNonEmptyArray(contentFromServer.posterarts) = true
       sThumbnailURL = contentFromServer.posterarts[0]
     end if
-  else if gridType = m.constants.ui.gridItemTypes.landscape
-    if canvasImages <> invalid and type(canvasImages.landscape_tb) = "roArray" and canvasImages.landscape_tb[0] <> invalid and canvasImages.landscape_tb[0] <> ""
+  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle
+    if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
       '//A custom landscape size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.landscape_tb[0]
-    else if contentFromServer.hero_images <> invalid and type(contentFromServer.hero_images) = "roArray" and contentFromServer.hero_images.count() > 0
+    else if isNonEmptyArray(contentFromServer.hero_images) = true
       sThumbnailURL = contentFromServer.hero_images[0]
-    else if contentFromServer.thumbnails <> invalid and type(contentFromServer.thumbnails) = "roArray" and contentFromServer.thumbnails.count() > 0
+    else if isNonEmptyArray(contentFromServer.thumbnails) = true
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
-  else if gridType = m.constants.ui.gridItemTypes.linear
-    if contentFromServer.landscape_images <> invalid and type(contentFromServer.landscape_images) = "roArray" and contentFromServer.landscape_images.count() > 0
+  else if gridType = gridItemTypes.linear
+    if isNonEmptyArray(contentFromServer.landscape_images)
       sThumbnailURL = contentFromServer.landscape_images[0]
     end if
-  else if gridType = m.constants.ui.gridItemTypes.vitg
-    if canvasImages <> invalid and type(canvasImages.vitg_tb) = "roArray" and canvasImages.vitg_tb[0] <> invalid and canvasImages.vitg_tb[0] <> ""
+  else if gridType = gridItemTypes.vitg
+    if canvasImages <> invalid AND type(canvasImages.vitg_tb) = "roArray" AND isNonEmptyString(canvasImages.vitg_tb[0]) = true
       '//A custom vitg size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.vitg_tb[0]
-    else if contentFromServer.hero_images <> invalid and type(contentFromServer.hero_images) = "roArray" and contentFromServer.hero_images.count() > 0
+    else if isNonEmptyArray(contentFromServer.hero_images) = true
       if contentFromServer.hero_images.count() >= 2
         '//::TEMP:: The Tupian image server will not return the resized image yet in the proper place, so look for the resized image in the old image array, but at a different index placement than the usual index location
         sThumbnailURL = contentFromServer.hero_images[1]
@@ -105,7 +106,6 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
   end if
   return sThumbnailURL
 End Function
-
 
 
 '''''''''''''''''''''
@@ -132,7 +132,6 @@ Function tubiMetadataTranslate_translateBackendTypeToClientSideType(sBackendType
 
   return sReturn
 End Function
-
 
 
 '''''''''''''''''''''
@@ -1104,30 +1103,24 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           end if
 
           gridType = ""
-          if parentGridItemType = m.constants.ui.gridItemTypes.portrait
-            gridType = m.constants.ui.gridItemTypes.portrait
-          else if parentGridItemType = m.constants.ui.gridItemTypes.landscape
-            gridType = m.constants.ui.gridItemTypes.landscape
-          else if container.id = m.constants.ui.categoryIds.featured
-            gridType = m.constants.ui.gridItemTypes.landscape
-          else if parentGridItemType = m.constants.ui.gridItemTypes.vitg
-            gridType = m.constants.ui.gridItemTypes.vitg
-          else if parentGridItemType = m.constants.ui.gridItemTypes.linear
-            gridType = m.constants.ui.gridItemTypes.linear
+          gridItemTypes = m.constants.ui.gridItemTypes
+          if gridItemTypes[parentGridItemType] <> invalid then
+            gridType = parentGridItemType
           end if
+
           if childAA.type <> "ContentNode"
             '//if the subtype is not the default ContentNode, then set the gridItemType field
             childAA.gridItemType = gridType
           end if
 
           bLandscape = false
-          if parentGridItemType = m.constants.ui.gridItemTypes.portrait
+          if parentGridItemType = gridItemTypes.portrait
             bLandscape = false
-          else if parentGridItemType = m.constants.ui.gridItemTypes.landscape and fullChild.hero_images <> invalid
+          else if parentGridItemType = gridItemTypes.landscape and fullChild.hero_images <> invalid
             bLandscape = true
           else if container.id = m.constants.ui.categoryIds.featured and fullChild.hero_images <> invalid
             bLandscape = true
-          else if parentGridItemType = m.constants.ui.gridItemTypes.vitg
+          else if parentGridItemType = gridItemTypes.vitg
             bLandscape = true
           end if
 
@@ -1138,12 +1131,12 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           end if
           childAA.hdgridposterurl = m.getThumbnailImage(fullChild, gridType)
 
-          if parentGridItemType = m.constants.ui.gridItemTypes.linear and fullChild.thumbnails <> invalid
+          if parentGridItemType = gridItemTypes.linear and fullChild.thumbnails <> invalid
             childAA.inlineLogoUri = fullChild.thumbnails[0]
           end if
 
           'add the trailer url to vitg content items - don't include vitg content if there is no trailer
-          if parentGridItemType = m.constants.ui.gridItemTypes.vitg
+          if parentGridItemType = gridItemTypes.vitg
             childIsPushable = false
             if fullChild.has_trailer = true
               if fullChild.trailers <> invalid and type(fullChild.trailers) = "roArray" and fullChild.trailers.count() > 0
@@ -1198,10 +1191,10 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
     end if
   end if
 
-return {
-  children: childrenReturn
-  contentsJson: contentsJson
-}
+  return {
+    children: childrenReturn
+    contentsJson: contentsJson
+  }
 End Function
 
 
@@ -1399,15 +1392,22 @@ End Function
 ' @constants: assocArray, m.constants
 ' returns: string, one of the gridItemTypes as found in m.constants.ui.gridItemTypes
 Function tubiMetadataTranslate_getGridItemType(container, orientation, constants)
-  gridItemType = constants.ui.gridItemTypes.portrait
+  gridItemTypes = constants.ui.gridItemTypes
+  gridItemType = gridItemTypes.portrait
   if container.type = constants.ui.categoryTypes.preview
     if constants.deviceInfo.limitedUI <> true
-      gridItemType = constants.ui.gridItemTypes.vitg
+      gridItemType = gridItemTypes.vitg
     end if
   else if container.type = constants.ui.categoryTypes.linear
-    gridItemType = constants.ui.gridItemTypes.linear
-  else if container.id = constants.ui.categoryIds.featured and orientation <> constants.ui.gridItemTypes.portrait
-    gridItemType = constants.ui.gridItemTypes.landscape
+    gridItemType = gridItemTypes.linear
+  else if container.id = constants.ui.categoryIds.featured and orientation <> gridItemTypes.portrait
+    ' `orientation <> gridItemTypes.portrait` is required as the search screen container.id is featured but uses portrait imagery
+    'bs:disable-next-line 1001 LINT1001
+    if getExperimentResource("roku_featured_landscape", "roku_featured_landscape_v2", false).enabled = true then
+      gridItemType = gridItemTypes.landscapeNoTitle
+    else
+      gridItemType = gridItemTypes.landscape
+    end if
   end if
 
   return gridItemType
