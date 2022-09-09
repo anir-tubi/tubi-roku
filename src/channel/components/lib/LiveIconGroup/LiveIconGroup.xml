@@ -6,7 +6,7 @@
       <!-- INPUT -->
       <field id="shouldAnimate" type="bool" value="false" alwaysNotify="true"/>
     </interface>
-     
+
     <children>
       <Poster
         id="LiveAnimateImage"

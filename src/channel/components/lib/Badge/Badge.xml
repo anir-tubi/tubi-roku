@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="Badge" extends="Group">
+  <script type="text/brightscript" uri="Badge.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+
+  <interface>
+    <field id="backgroundUri" type="string" alias="BadgeBackground.uri"/>
+    <field id="backgroundColor" type="string" alias="BadgeBackground.blendColor"/>
+    <field id="textColor" type="string" alias="BadgeText.color"/>
+    <field id="iconUri" type="string"/>
+    <field id="text" type="string"/>
+  </interface>
+
+  <children>
+    <Poster
+      id="BadgeBackground"
+      height="36"
+      width="0"
+      uri="pkg:/images/menu-focus-fhd.9.png"/>
+    <LayoutGroup
+      id="BadgeInfoLayout"
+      layoutDirection="horiz"
+      vertAlignment="center"
+      horizAlignment="left"
+      translation="[0,0]">
+      <Poster
+        id="BadgeIcon"
+        height="21"
+        width="0"/>
+      <Label
+        id="BadgeText"
+        color="0xFFFFFF">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="18" />
+      </Label>
+    </LayoutGroup>
+  </children>
+</component>

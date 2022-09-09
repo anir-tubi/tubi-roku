@@ -516,13 +516,31 @@ Function onModeChange()
       m.twoLineInfo.removeChild(m.firstLineGroup)
     end if
 
-    if m.liveIconGroup = invalid then
-      m.liveIconGroup = createObject("roSGNode", "LiveIconGroup")
+    if getExperimentResource("roku_search_live_badge", "roku_search_live_badge_v1", true).enabled = true
+      if m.badge = invalid then
+        setLiveBadge()
+      end if
+      m.SecondLineGroup.insertChild(m.badge, 0)
+    else
+      if m.liveIconGroup = invalid then
+        m.liveIconGroup = createObject("roSGNode", "LiveIconGroup")
+      end if
+      m.liveIconGroup.shouldAnimate = true
+      m.SecondLineGroup.insertChild(m.liveIconGroup, 0)
     end if
-    m.liveIconGroup.shouldAnimate = true
-    m.SecondLineGroup.insertChild(m.liveIconGroup, 0)
   end if
 
+End Function
+
+
+Function setLiveBadge()
+  tubiLog("InfoPanel.setLiveBadge")
+  m.badge = CreateObject("roSGNode", "Badge")
+  m.badge.translation = [12,12]
+  m.badge.backgroundColor = "0xCC090B"
+  m.badge.textColor = "0xFFFFFF"
+  m.badge.iconUri = "pkg:/images/live-icon.png"
+  m.badge.text = UCase(getTranslation("screenSearch_liveText"))
 End Function
 
 

@@ -83,7 +83,11 @@ Function onContentChange(msg)
       'itemContent.gridItemType is not an empty string on the home screen,
       'and we want this to set Live logo and text just on the search screen.
       else if (itemContent.gridItemType = "" and itemContent.type = "linear")
-        setLiveIconAndText()
+        if getExperimentResource("roku_search_live_badge", "roku_search_live_badge_v1", true).enabled = true
+          setLiveBadge()
+        else
+          setLiveIconAndText()
+        end if
       end if
     else
       m.poster.uri = itemContent.hdgridposterurl
@@ -361,8 +365,8 @@ End Function
 
 
 Function setLiveIconAndText()
-  tubiLog("SearchScreenGridPoster.setLiveIconAndText")
-  if m.poster <> invalid
+  tubiLog("CategoryGridPoster.setLiveIconAndText")
+  if m.poster <>invalid
     gradientPoster = m.poster.createChild("Poster")
     gradientPoster.width = m.poster.width
     gradientPoster.height = m.poster.height
@@ -373,4 +377,15 @@ Function setLiveIconAndText()
     livePoster.translation = [59, 225]
     livePoster.shouldAnimate = false
   end if
+End Function
+
+
+Function setLiveBadge()
+  tubiLog("CategoryGridPoster.setLiveBadge")
+  m.badge = m.top.createChild("Badge")
+  m.badge.translation = [12,12]
+  m.badge.backgroundColor = "0xCC090B"
+  m.badge.textColor = "0xFFFFFF"
+  m.badge.iconUri = "pkg:/images/live-icon.png"
+  m.badge.text = UCase(getTranslation("screenSearch_liveText"))
 End Function
