@@ -128,9 +128,9 @@ End Function
 
 Function onContentChange()
   tubiLog("UpNext.onContentChange")
-  if m.top.content <> invalid and m.top.content.getChildCount() > 0
+  if m.top.content <> invalid AND m.top.content.getChildCount() > 0
     firstContent = m.top.content.getChild(0)
-    if firstContent.seriesId <> invalid and firstContent.seriesId <> ""
+    if firstContent.seriesId <> invalid AND firstContent.seriesId <> ""
       ' show the episode experience
       m.MovieGroup.visible = false
       m.SeriesGroup.visible = true
@@ -172,7 +172,7 @@ Function onKeyEvent(key, press) as Boolean
     if key = "back"
       stopTimer()
       return false
-    else if key = "play" and m.top.invalidCommand = ""
+    else if key = "play" AND m.top.invalidCommand = ""
       if m.MovieGroup.isInFocusChain() = true
         handleMovieItemSelected(m.GridMovie.itemFocused)
       else if m.SeriesGroup.isInFocusChain() = true
@@ -253,7 +253,7 @@ Function itemFocusedHelper(grid, info)
       m.top.contentFocused = content
       m.top.itemFocused = grid.itemFocused
       ' reset countdown while user is interacting
-      if content.seriesId <> invalid and content.seriesId <> ""
+      if content.seriesId <> invalid AND content.seriesId <> ""
         m.timeRemaining = m.constants.player.upNextCountdownForSeries
       else
         m.timeRemaining = m.constants.player.upNextCountdown

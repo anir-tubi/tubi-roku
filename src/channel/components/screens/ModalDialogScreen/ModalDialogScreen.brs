@@ -79,11 +79,11 @@ End Function
 Function onKeyEvent(key As String, press As Boolean) As Boolean
   if press 
     if m.top.scrollable then
-      if key = "up" and m.ButtonList.hasFocus() then
+      if key = "up" AND m.ButtonList.hasFocus() then
         m.ScrollableMessage.scrollbarThumbBitmapUri = "pkg:/images/menu-focus-fhd.9.png"
         m.ScrollableMessage.setFocus(true)
         return true
-      else if (key = "down" or key = "left" or key = "right" or key = "OK") and m.ScrollableMessage.hasFocus() then
+      else if (key = "down" or key = "left" or key = "right" or key = "OK") AND m.ScrollableMessage.hasFocus() then
         m.ScrollableMessage.scrollbarThumbBitmapUri = "pkg:/images/menu-disabled-focus-fhd.9.png"
         m.ButtonList.setFocus(true)
         return true
@@ -91,7 +91,7 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
     end if
     
     ' removed alias from xml and setting buttonSelected interface value here, to play default Roku positive audio sound whne user press "OK" on any dialog modal button
-    if key = "OK" and m.ButtonList.hasFocus() = true
+    if key = "OK" AND m.ButtonList.hasFocus() = true
       m.top.buttonSelected = m.ButtonList.itemSelected
     end if
     

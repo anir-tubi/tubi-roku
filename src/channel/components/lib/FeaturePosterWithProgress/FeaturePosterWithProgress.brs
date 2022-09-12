@@ -33,7 +33,7 @@ Function drawProgressBar()
     history = getHistory(m.top.itemContent.id)
   end if
 
-  if history <> invalid and history.nowPos <> invalid and history.nowPos <> 0 and m.top.itemContent.length <> invalid and m.top.itemContent.length <> 0 then
+  if history <> invalid AND history.nowPos <> invalid AND history.nowPos <> 0 AND m.top.itemContent.length <> invalid AND m.top.itemContent.length <> 0 then
     percentage = history.nowPos / m.top.itemContent.length
     if percentage > 1.0 then percentage = 1.0
     if percentage < 0.0 then percentage = 0.0

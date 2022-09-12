@@ -69,7 +69,7 @@ Function parseHistorySuccess(fullResponse, reqInfo)
   content = reqInfo.content.clone(true)
   nowPos = reqInfo.nowPos
 
-  isResponseSeries = (response.content_type = m.constants.uapiContentTypes.series and response.episodes <> invalid and type(response.episodes) = "roArray" and response.episodes.count() > 0)
+  isResponseSeries = (response.content_type = m.constants.uapiContentTypes.series AND response.episodes <> invalid AND type(response.episodes) = "roArray" AND response.episodes.count() > 0)
   episode = invalid
 
   if isResponseSeries = true
@@ -92,9 +92,9 @@ Function parseHistorySuccess(fullResponse, reqInfo)
   mustCreateNewContent = false
   if type(content) <> "roSGNode"
     mustCreateNewContent = true
-  else if isResponseSeries = true and episode.content_id.toStr() <> content.id
+  else if isResponseSeries = true AND episode.content_id.toStr() <> content.id
     mustCreateNewContent = true
-  else if isResponseSeries = false and response.content_id.toStr() <> content.id
+  else if isResponseSeries = false AND response.content_id.toStr() <> content.id
     mustCreateNewContent = true
   end if
 

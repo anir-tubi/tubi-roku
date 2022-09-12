@@ -25,7 +25,7 @@ Function onItemContentChange()
   tubiLog("CategoryListItem.onItemContentChange")
   if m.top.itemContent <> invalid then
     m.categoryText.text = m.top.itemContent.title
-    if m.top.itemContent.totalCount <> invalid and m.top.itemContent.totalCount > 0 then
+    if m.top.itemContent.totalCount <> invalid AND m.top.itemContent.totalCount > 0 then
       m.categoryCountText.text = stri(m.top.itemContent.totalCount)
       m.categoryCountGroup.visible = true
     else

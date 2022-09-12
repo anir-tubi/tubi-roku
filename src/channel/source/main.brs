@@ -72,7 +72,7 @@ Function runChannel(constants, log, request)
   screen.show()
 
   'add RALE for dev builds - children can not be added to tubiScene until after screen.show has run
-  if constants <> invalid and constants.settings <> invalid and constants.settings.mode = "dev" and constants.settings.raleEnabled = true
+  if constants <> invalid AND constants.settings <> invalid AND constants.settings.mode = "dev" AND constants.settings.raleEnabled = true
     tubiScene.createChild("TrackerTask")
   end if
   ' Used to add required node creation needed for RALE component during vscode build
@@ -89,7 +89,7 @@ Function runChannel(constants, log, request)
   end if
 
   ' execute suitest libray only if the mode is qa & suitest attribute enabled in qa config yml
-  if constants.thirdParty.suiteTest.enabled = true and constants.settings.mode = "qa"
+  if constants.thirdParty.suiteTest.enabled = true AND constants.settings.mode = "qa"
     SuitestLibrary = createObject("roSGNode", "SuitestLibrary")
     SuitestLibrary.app_id = constants.thirdParty.suiteTest.app_id
     tubiScene.InsertChild(SuitestLibrary, 0)
@@ -131,7 +131,7 @@ Function runChannel(constants, log, request)
     msgType = type(msg)
 
     if msgType = "roInputEvent"
-      if controller <> invalid and msg.GetInfo() <> invalid
+      if controller <> invalid AND msg.GetInfo() <> invalid
         inputInfo = msg.GetInfo()
         if inputInfo.rale = invalid
           ' We don't want to handle rale events in our deeplinking code
@@ -202,7 +202,7 @@ Function runChannel(constants, log, request)
               controller.startupArgs = startupArgs
 
               starterController = tubiScene.findNode("StarterController")
-              if starterController <> invalid and starterController.fadeInRemoteComponent = true and controller.fadeInContentController <> true
+              if starterController <> invalid AND starterController.fadeInRemoteComponent = true AND controller.fadeInContentController <> true
                 starterController.unobserveField("fadeInRemoteComponent")
                 tubiScene.fadeOutSpinner = true
                 controller.fadeInContentController = true
@@ -267,7 +267,7 @@ Function runChannel(constants, log, request)
       else if msg.GetField() = "fadeInRemoteComponent"
         starterController = msg.GetRoSGNode()
         contentController = tubiScene.findNode("ContentController")
-        if contentController <> invalid and contentController.fadeInContentController <> true
+        if contentController <> invalid AND contentController.fadeInContentController <> true
           starterController.unobserveField("fadeInRemoteComponent")
           tubiScene.fadeOutSpinner = true
           contentController.fadeInContentController = true
@@ -284,7 +284,7 @@ Function runChannel(constants, log, request)
     end if
 
     ' handle starterComponents and remoteComponents timeouts
-    if componentsLoaded = false and componentTimer <> invalid and componentTimer.totalMilliseconds() > 30000
+    if componentsLoaded = false AND componentTimer <> invalid AND componentTimer.totalMilliseconds() > 30000
       if retries < maxRetries
         retries += 1
         componentTimer.mark()
@@ -372,7 +372,7 @@ Function showStartupErrorDialog(screen, constants)
   ' scene.CreateChild("ErrorController") can unexplicably return invalid at times.
   controllerCreated = false
   attempts = 0
-  while controllerCreated = false and attempts < 100
+  while controllerCreated = false AND attempts < 100
     controller = scene.CreateChild("ErrorController")
 
     if controller <> invalid
@@ -407,7 +407,7 @@ Function logCrashesOnStartup(args, log, constants)
   }
 
   reason = args.lastExitOrTerminationReason
-  if reason <> invalid and reasonBlacklist[reason] = invalid
+  if reason <> invalid AND reasonBlacklist[reason] = invalid
     messageInfo = {
       message: "Crash detected on previous run"
       reason: reason

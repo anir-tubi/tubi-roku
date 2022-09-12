@@ -29,7 +29,7 @@ Function sendExposureEvent()
     while true
       msg = wait(0, port)
       if type(msg) = "roUrlEvent"
-        if userRequest <> invalid and userRequest.urltransfer <> invalid and msg.getSourceIdentity() = userRequest.urltransfer.getIdentity()
+        if userRequest <> invalid AND userRequest.urltransfer <> invalid AND msg.getSourceIdentity() = userRequest.urltransfer.getIdentity()
           m.top.analyticsResponse = true
         end if
       end if

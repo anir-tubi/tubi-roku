@@ -43,7 +43,7 @@ Function tensorApi_getEPGChannelIdsReqInfo(mode = "")
   url = m.constants.urls.tensor.epgChannelIds
 
   options = m.commonOptions()
-  if mode <> invalid and mode <> ""
+  if mode <> invalid AND mode <> ""
     options.params["mode"] = mode
   end if
 

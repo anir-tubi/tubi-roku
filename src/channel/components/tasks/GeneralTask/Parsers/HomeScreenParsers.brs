@@ -12,10 +12,10 @@ Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
   authInfo = invalid
   uiMode = "standard"
 
-  if reqInfo <> invalid and reqInfo.options <> invalid
+  if reqInfo <> invalid AND reqInfo.options <> invalid
 
     options = reqInfo.options
-    if options <> invalid and options.params <> invalid
+    if options <> invalid AND options.params <> invalid
       contentMode = options.params.contentMode
 
       if contentMode = invalid
@@ -52,7 +52,7 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
 
   if reqInfo <> invalid
     options = reqInfo.options
-    if options <> invalid and options.params <> invalid
+    if options <> invalid AND options.params <> invalid
       contentMode = options.params.contentMode
     end if
   end if

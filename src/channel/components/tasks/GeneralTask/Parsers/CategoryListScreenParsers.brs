@@ -8,7 +8,7 @@ Function parseCategoryListSuccess(fullResponse, reqInfo)
 
   isChannels = false
 
-  if reqInfo <> invalid and reqInfo.screenId <> invalid
+  if reqInfo <> invalid AND reqInfo.screenId <> invalid
     screenId = reqInfo.screenId
 
     if screenId = m.constants.ui.screenIds.channelListScreen

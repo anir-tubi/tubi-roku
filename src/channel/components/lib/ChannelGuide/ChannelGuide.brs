@@ -18,7 +18,7 @@ Function onChannelGuideContentFocused(msg)
   guide = msg.getRoSGNode()
   item = msg.getData()
 
-  if guide <> invalid and guide.content <> invalid
+  if guide <> invalid AND guide.content <> invalid
     channel = guide.content.getChild(item)
 
     row = item + 1  '1 based index
@@ -80,7 +80,7 @@ Function onDisplayChanged()
     m.channelsGuide.visible = true
 
     nJumpToItem = 0
-    if m.top.jumpToID <> invalid and m.top.jumpToID <> "" and m.top.content <> invalid
+    if m.top.jumpToID <> invalid AND m.top.jumpToID <> "" AND m.top.content <> invalid
       '//Go thru the content and get the index of the ID referred to in the jumpToID field 
       for i=0 to m.top.content.getChildCount()-1
         channel = m.top.content.getChild(i)

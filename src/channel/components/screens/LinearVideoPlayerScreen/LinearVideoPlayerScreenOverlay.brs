@@ -69,7 +69,7 @@ Function populateInfoPanel(contentNode)
     lineOneData = {}
     lineOneData.rating = contentNode.rating
     lineOneData.hasCC = contentNode.hasSubtitles
-    if contentNode.descriptors <> invalid and contentNode.descriptors.Count() > 0
+    if contentNode.descriptors <> invalid AND contentNode.descriptors.Count() > 0
       lineOneData.descriptorCode = contentNode.descriptors.join(", ") ' ::TODO:: When when we get real values into TAGS
     end if
     lineOneData.releaseDate = contentNode.ReleaseDate
@@ -87,7 +87,7 @@ Function onLinearChannelToPlayChanged(msg)
   selectedChannelUpdated = msg.getData()
   if selectedChannelUpdated = true
     selectedChannel = m.EPG.linearChannelToPlay
-    if selectedChannel <> invalid and m.firstTimeEPGLaunched <> true
+    if selectedChannel <> invalid AND m.firstTimeEPGLaunched <> true
       m.top.linearChannelToPlay = selectedChannel
       m.top.linearChannelToPlayUpdated = true
     end if
@@ -125,11 +125,11 @@ End Function
 
 Function onOverlayDisplayChange()
   tubiLog("LinearVideoPlayerScreenOverlay.onOverlayDisplayChange")
-  if m.top.isDisplaying = false and m.top.display = true
+  if m.top.isDisplaying = false AND m.top.display = true
     displayOverlay(m.top.displayWithDelay)
   else if m.firstTimeEPGLaunched = true
       'EPG is still loading, so keep the overlay with spinning  wheel
-  else if m.top.isDisplaying = true and m.top.display = false
+  else if m.top.isDisplaying = true AND m.top.display = false
     hideOverlay()
   end if
 End Function
@@ -151,7 +151,7 @@ Function onCCContentSelected(msg)
 
   hideOverlay()
   ccItemContent = list.content.getChild(item[0]).getChild(item[1])
-  if ccItemContent.trackname <> invalid and ccItemContent.trackname <> ""
+  if ccItemContent.trackname <> invalid AND ccItemContent.trackname <> ""
     if ccItemContent.trackname = "off"
       m.top.closedCaptioningSelectedLanguage = ""
     else
@@ -298,7 +298,7 @@ End Function
 ' Update the EPG so the focused item is that of the playing video.
 Function jumpEPGToCurrentPlayingVideo(shouldSendComponentInteractionEvent = false)
   tubiLog("LinearVideoPlayerScreenOverlay.jumpEPGToCurrentPlayingVideo")
-  if m.top.currentLinearVideoContent <> invalid and m.EPG.contentUpdated = true
+  if m.top.currentLinearVideoContent <> invalid AND m.EPG.contentUpdated = true
     ' second element of the array is not used in case of EPG. So, hardcoded to empty string.
 
     m.EPG.trackingPageInfo = {
@@ -341,7 +341,7 @@ Function displayClosedCaptioningMenu()
 
     ' preselect the caption option that the user currently has enabled
     nJumpTo = 0
-    if m.closedCaptioningButtonListBackground.content <> invalid and m.closedCaptioningButtonListBackground.content.getChildCount() > 0
+    if m.closedCaptioningButtonListBackground.content <> invalid AND m.closedCaptioningButtonListBackground.content.getChildCount() > 0
       captions = m.closedCaptioningButtonListBackground.content.getChild(0)
       for i = 0 to captions.getChildCount()-1
         caption = captions.getChild(i)
@@ -379,10 +379,10 @@ End Function
 Function onKeyEvent(key As String, press As Boolean) as Boolean
   bKeyReacted = false
 
-  if m.top.isDisplaying = true and press = true then
+  if m.top.isDisplaying = true AND press = true then
     tubiLog("LinearVideoPlayerScreenOverlay.onKeyEvent" + key)
     if key = "left"
-      if m.EPG.isInFocusChain() = true and m.sideNav.visible = true
+      if m.EPG.isInFocusChain() = true AND m.sideNav.visible = true
         '//if the EPG has focus and the side nav is visible, then move the focus to the subtitles button
         slideTo(m.EPGHorizontalSlide, m.slideOutEPGTranslation, m.top.animationDuration)
         m.sideNav.setOpenState = "openedAndInFocus"
@@ -399,13 +399,13 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         bKeyReacted = true
       end if
     else if key = "right"
-      if m.bEPGVisible = true and m.EPG.isInFocusChain() = false
+      if m.bEPGVisible = true AND m.EPG.isInFocusChain() = false
         userInteraction = "TOGGLE_OFF"
         selectedLinearSideNavId = getAnalyticsIdFromFocusedSideNavItem()
         setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, selectedLinearSideNavId)
         goBackToEPGFromSideNav()
         bKeyReacted = true
-      else if m.bEPGVisible = false and m.closedCaptioningGroup.isInFocusChain() = false
+      else if m.bEPGVisible = false AND m.closedCaptioningGroup.isInFocusChain() = false
         displayClosedCaptioningMenu()
         slideTo(m.EPGHorizontalSlide, m.slideOutEPGTranslation, m.top.animationDuration)
         bKeyReacted = true

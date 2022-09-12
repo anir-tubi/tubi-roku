@@ -54,7 +54,7 @@ End Function
 Function onSetCallOfAction()
   sPreviousPage = m.top.callingPage
   sCallToAction = ""
-  if sPreviousPage <> invalid and Len(sPreviousPage) > 0
+  if sPreviousPage <> invalid AND Len(sPreviousPage) > 0
     if UCase(sPreviousPage) = UCase(m.constants.ui.screenIds.signInScreen)
       sCallToAction = getTranslation("goBack_signIn")
     end if
@@ -266,7 +266,7 @@ Function onParentalSettingsReceived(msg)
   task = msg.getRoSGNode()
   if task <> invalid
     panel = task.getParent()
-    if panel <> invalid and panel.isLoading <> invalid
+    if panel <> invalid AND panel.isLoading <> invalid
       panel.isLoading = false
       userInfo = msg.GetData()
       if userInfo <> invalid
@@ -347,7 +347,7 @@ Function onLegalState(msg)
     task = msg.getRoSGNode()
     if task <> invalid
       panel = task.getParent()
-      if panel <> invalid and panel.isLoading <> invalid
+      if panel <> invalid AND panel.isLoading <> invalid
         panel.isLoading = false
       end if
     end if
@@ -452,7 +452,7 @@ Function onItemRequested()
     if list.itemFocused <> invalid
       buttonContent = list.content.getChild(list.itemFocused)
 
-      if m.top.itemRequested <> invalid and m.top.itemRequested <> "" and m.top.itemRequested <> buttonContent.id
+      if m.top.itemRequested <> invalid AND m.top.itemRequested <> "" AND m.top.itemRequested <> buttonContent.id
         focusItemInList(list, m.top.itemRequested)
       end if
     end if

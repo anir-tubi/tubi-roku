@@ -26,7 +26,7 @@ Function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
   'a port used for sending logging requests
   adLoggingPort = CreateObject("roMessagePort")
 
-  if adContentType <> "hls" and adContentType <> "mp4"
+  if adContentType <> "hls" AND adContentType <> "mp4"
     adContentType = "mp4"  ' safety fallback
   end if
 
@@ -113,11 +113,11 @@ End Function
 ' ----------------------------------------------
 Function tubiAds_hasAds(allAdUnitsList)
   hasAds = false
-  if allAdUnitsList <> invalid and allAdUnitsList.count() > 0
+  if allAdUnitsList <> invalid AND allAdUnitsList.count() > 0
     firstAdUnitsListContainer = m.allAdUnitsList[0]
-    if firstAdUnitsListContainer.adUnitsList <> invalid and firstAdUnitsListContainer.adUnitsList.count() > 0
+    if firstAdUnitsListContainer.adUnitsList <> invalid AND firstAdUnitsListContainer.adUnitsList.count() > 0
       adUnitsList = firstAdUnitsListContainer.adUnitsList[0]
-      if adUnitsList.ads <> invalid and adUnitsList.ads.count() > 0
+      if adUnitsList.ads <> invalid AND adUnitsList.ads.count() > 0
         hasAds = true
       end if
     end if
@@ -168,7 +168,7 @@ End Function
 ' getCachedAdsList
 ' ----------------------------------------------
 Function tubiAds_getCachedAdsList(episode, breakPos)
-  if m.lastAdsList <> invalid and episode.id = m.lastAdsList.cid and breakPos = m.lastAdsList.breakPos
+  if m.lastAdsList <> invalid AND episode.id = m.lastAdsList.cid AND breakPos = m.lastAdsList.breakPos
     return m.lastAdsList.list
   end if
   return invalid
@@ -217,7 +217,7 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
   }
 
   '//send sponored exposure value if the user call this video from a spnsored contaner.
-  if content.videoSponsorExposureId <> invalid and content.videoSponsorExposureId <> ""
+  if content.videoSponsorExposureId <> invalid AND content.videoSponsorExposureId <> ""
     params["spon_exp"] = content.videoSponsorExposureId
   end if
 
@@ -234,7 +234,7 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
 
   'add TubiTV user/registration id to ad call url
   authInfo = m.auth.getAuthInfo()
-  if authInfo <> invalid and authInfo.userId <> invalid
+  if authInfo <> invalid AND authInfo.userId <> invalid
     params["user_id"] = authInfo.userId
   end if
 
@@ -269,16 +269,16 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
   authInfo = m.auth.getAuthInfo()
 
   ' don't pass content information for child directed content if the user is not logged in
-  if episode.isCdc = false or (authInfo <> invalid and authInfo.userId <> invalid)
+  if episode.isCdc = false or (authInfo <> invalid AND authInfo.userId <> invalid)
     nielsenGenres = ["GV"] 'default Nielsen genre in case backend didn't associate any with this content
 
     'set the content genre (as stated in RAF documentation for Nielsen functionality)
-    if episode.rokuGenres <> invalid and episode.rokuGenres.count() > 0
+    if episode.rokuGenres <> invalid AND episode.rokuGenres.count() > 0
       nielsenGenres = episode.rokuGenres
     end if
 
     'set the program id/title (as stated in RAF documentation for Nielsen functionality)
-    if episode.parentType = m.constants.ui.contentTypes.series and episode.parentTitle <> invalid
+    if episode.parentType = m.constants.ui.contentTypes.series AND episode.parentTitle <> invalid
       nielsenProgramId = episode.parentTitle
     else if episode.title <> invalid
       nielsenProgramId = episode.title
@@ -335,11 +335,11 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
   'check to see if the ad server returns an ad that can be used by RAF or needs to use our ad SDK
   'traditional version of xml is in the clickThrough property/clickThrough VAST tag
   'traditional is used if adId of the first ad object in the first ad pod is set equal to 'default'
-  if currentAdUnitsList <> invalid and currentAdUnitsList.count() > 0 and currentAdUnitsList[0] <> invalid and currentAdUnitsList[0].ads <> invalid and currentAdUnitsList[0].ads.count() > 0
+  if currentAdUnitsList <> invalid AND currentAdUnitsList.count() > 0 AND currentAdUnitsList[0] <> invalid AND currentAdUnitsList[0].ads <> invalid AND currentAdUnitsList[0].ads.count() > 0
     adUnitType = "" 'keeps track of what kind adUnitsList/adPod is currently being built by the for loop - can be "adrise" or "roku"
 
     'set up the duration for use by the adRise pre ad splash screen
-    if currentAdUnitsList[0].duration <> invalid and currentAdUnitsList[0].duration > 0
+    if currentAdUnitsList[0].duration <> invalid AND currentAdUnitsList[0].duration > 0
         m.commercialDuration = m.commercialDuration + currentAdUnitsList[0].duration
     end if
 
@@ -383,7 +383,7 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos)
 
           'make sure we have the appropriate stream format. if stream format is mp4, but file is an HLS, the ad won't play
           for each stream in adUnit.streams
-            if stream.url <> invalid and right(stream.url, 4) = "m3u8"
+            if stream.url <> invalid AND right(stream.url, 4) = "m3u8"
               adUnit.streamFormat = "hls"
             end if
           end for
@@ -428,8 +428,8 @@ Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
   if m.hasAds(m.allAdUnitsList) = true
     currentAdPosition = 1
     for each adUnitsListContainer in m.allAdUnitsList
-      if adUnitsListContainer.adUnitsList <> invalid and adUnitsListContainer.adUnitsList.count() > 0
-        if adUnitsListContainer.type <> invalid and adUnitsListContainer.type = "roku"
+      if adUnitsListContainer.adUnitsList <> invalid AND adUnitsListContainer.adUnitsList.count() > 0
+        if adUnitsListContainer.type <> invalid AND adUnitsListContainer.type = "roku"
 
           'create the object that will populate the "Ad 1/5" text overlay in RAF
           screenCount = {
@@ -557,7 +557,7 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
     end if
 
     ' We have do the second check for start event because for Innovid interactive ads our Impression code block won't get called because m.adPlaybackPos is already 1. In other words, the position callback where ctx.time = 1 occurs prior to the Impression event for Innovid interactive ads.
-    if (eventType = "Impression" and m.isInteracting <> true and m.adPlaybackPos = 0) OR (eventType = "Start" AND ctx.ad.adSystem.instr("Innovid") >= 0) then
+    if (eventType = "Impression" AND m.isInteracting <> true AND m.adPlaybackPos = 0) OR (eventType = "Start" AND ctx.ad.adSystem.instr("Innovid") >= 0) then
       if getGlobalAA().enableInPodStitching = true then
         ' Storing ad context to work around RAF stitched ads bug that causes complete event to have data for next ad or invalid if it is the last ad
         if ctx.duration <> invalid AND ctx.ad <> invalid then
@@ -587,7 +587,7 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       youboraOptions = m.updateYouboraOptions(m.youboraTask, ctx, impressionCount)
     else if eventType = "Complete" or eventType = "Close"
       'Close events fire when a user backs out of an ad, or when a user backs out of the interactive portion of an ad
-      if eventType = "Close" and m.isInteracting = true
+      if eventType = "Close" AND m.isInteracting = true
         clickAdEvent = {
           ad_clicked: m.tracking.getAnalyticsAd(ctx)
           video_id: m.controlNode.content.id.toInt()
@@ -617,7 +617,7 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
           ' Send exposure after first ad finishes in a multi ad break
           ' NOTE the complete event for the first ad actually has adIndex as 2 #roku :|
           if isFunction(getExperimentResource)  'bs:disable-line LINT1001
-            if ctx.adCount <> invalid AND ctx.adCount > 1 AND ctx.adIndex <> invalid and ctx.adIndex = 2 then
+            if ctx.adCount <> invalid AND ctx.adCount > 1 AND ctx.adIndex <> invalid AND ctx.adIndex = 2 then
               'bs:disable-next-line 1001 LINT1001
               getExperimentResource("roku_in_pod_stitching", "roku_in_pod_stitching_v1", true)
             end if
@@ -688,15 +688,15 @@ Function tubiAds_updateYouboraOptions(youboraTask, ctx, impressionCount)
     youboraOptions = youboraTask.options
 
     if ctx.ad <> invalid
-      if ctx.ad.creativeAdId <> invalid and ctx.ad.creativeAdId <> ""
+      if ctx.ad.creativeAdId <> invalid AND ctx.ad.creativeAdId <> ""
         youboraOptions["ad.extraparam.1"] = ctx.ad.creativeAdId
       end if
 
-      if ctx.ad.streams <> invalid and ctx.ad.streams[0] <> invalid and ctx.ad.streams[0].id <> invalid
+      if ctx.ad.streams <> invalid AND ctx.ad.streams[0] <> invalid AND ctx.ad.streams[0].id <> invalid
         youboraOptions["ad.extraparam.2"] = ctx.ad.streams[0].id
       end if
 
-      if youboraOptions["ad.extraparam.1"] <> invalid and youboraOptions["ad.extraparam.2"] <> invalid
+      if youboraOptions["ad.extraparam.1"] <> invalid AND youboraOptions["ad.extraparam.2"] <> invalid
         youboraOptions["ad.extraparam.3"] = youboraOptions["ad.extraparam.1"] + "-" + youboraOptions["ad.extraparam.2"]
       end if
 
@@ -793,7 +793,7 @@ End Function
 '          or an empty string if we can't get the content id
 Function tubiAds_getNielsenStreamId(constants, content)
   streamId = ""
-  if content <> invalid and content.id <> ""
+  if content <> invalid AND content.id <> ""
     toHash = constants.deviceInfo.deviceId + content.id
     hashed = m.getMd5Hash(toHash)
     streamId = Left(hashed, 16)

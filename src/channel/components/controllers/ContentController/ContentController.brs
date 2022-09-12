@@ -80,7 +80,7 @@ Function init()
 
   ' initialize states needed for various parts of kids mode
   m.kidsModeFeatureOn = false 'Should the kids Mode feature be made available for the user to interact with
-  if m.constants.deviceInfo.countryCode <> invalid AND (UCase(m.constants.deviceInfo.countryCode) = "US" or UCase(m.constants.deviceInfo.countryCode) = "CA")
+  if m.constants.deviceInfo.countryCode <> invalid AND (UCase(m.constants.deviceInfo.countryCode) = "US" OR UCase(m.constants.deviceInfo.countryCode) = "CA")
     m.kidsModeFeatureOn = true
   end if
 
@@ -399,7 +399,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           openSideNavFromButton() '//"BUTTON_LEFT"
           bReacted = true
         end if
-      else if (key = "right" or key = "left") AND isSideNavActive() = true
+      else if (key = "right" OR key = "left") AND isSideNavActive() = true
         '//The RIGHT Key has been pressed, now hide the menu
         hideNavMenu(true)
         focusCurrentScreen()
@@ -485,7 +485,7 @@ Function startUserExperience()
     ' checks if auth info has been received after a deeplink from external tubi device (iOS) supplied a refresh token
     ' if m.authInfoReceived is false, it means that a refresh token has been supplied
     authInfo = m.global.authInfo
-    if authInfo = invalid or (authInfo <> invalid AND authInfo.userId = invalid)
+    if authInfo = invalid OR (authInfo <> invalid AND authInfo.userId = invalid)
       ' we only need to refresh if the user is currently signed out
       m.authTask = CreateObject("roSGNode", "AuthTask")
       m.authTask.observeFieldScoped("authInfoRefreshed", "onAuthInfoRefreshed")
@@ -614,7 +614,7 @@ End Function
 ' this is one of the pre-requisites to starting the SG user experience.
 Function onStartupArgs()
   m.deeplinkContent = invalid
-  if m.top.startUpArgs <> invalid AND (m.top.startUpArgs.contentID <> invalid or m.top.startUpArgs.page <> invalid)
+  if m.top.startUpArgs <> invalid AND (m.top.startUpArgs.contentID <> invalid OR m.top.startUpArgs.page <> invalid)
     m.deeplinkContent = createDeeplinkContentFromStartupArgs(m.top.startUpArgs)
   end if
 
@@ -671,7 +671,7 @@ Function getExternalAuthInfoFromStartupArgs(args)
 
   if args.refreshToken <> invalid AND args.userId <> invalid AND args.deviceId <> invalid AND args.entry <> invalid
     if args.refreshToken.unescape() <> "" AND args.userId.unescape() <> "" AND args.userId.unescape() <> "0" AND args.deviceId.unescape() <> ""
-      if Lcase(args.entry) = "iphone" or Lcase(args.entry) = "ipad" or Lcase(args.entry) = "ios" or Lcase(args.entry) = "android"
+      if Lcase(args.entry) = "iphone" OR Lcase(args.entry) = "ipad" OR Lcase(args.entry) = "ios" OR Lcase(args.entry) = "android"
         externalAuthInfo = {
           platform: args.entry
           externalDeviceId: args.deviceId.unescape()
@@ -858,7 +858,7 @@ Function setUiMode(mode)
 
     ' must set global theme prior to setting m.sideNav.uiMode, since the sideNav update
     ' depends on the global theme.
-    if m.global.theme = invalid or m.global.theme.id <> m.constants.ui.themeIDs.default
+    if m.global.theme = invalid OR m.global.theme.id <> m.constants.ui.themeIDs.default
       m.global.theme = m.constants.ui.themes.default
     end if
 
@@ -891,7 +891,7 @@ Function setUiMode(mode)
   else if mode = m.constants.ui.modes.latino
     'latino
     m.uiMode = mode
-    if m.global.theme = invalid or m.global.theme.id <> m.constants.ui.themeIDs.default
+    if m.global.theme = invalid OR m.global.theme.id <> m.constants.ui.themeIDs.default
       m.global.theme = m.constants.ui.themes.default
     end if
     m.sideNav.uiMode = mode
@@ -968,7 +968,7 @@ End Function
 ' called from within setUiMode()
 Function setCommonKidsModeElements()
   if m.kidsModeFeatureOn
-    if m.global.theme = invalid or m.global.theme.id <> m.constants.ui.themeIDs.kidsMode
+    if m.global.theme = invalid OR m.global.theme.id <> m.constants.ui.themeIDs.kidsMode
       m.global.theme = m.constants.ui.themes.kidsMode
     end if
     showHideLogo("tubi_kids")
@@ -1004,7 +1004,7 @@ End Function
 
 
 Function isKidsUIOn()
-  if m.uiMode = m.constants.ui.modes.kids or m.uiMode = m.constants.ui.modes.kidsAgeGate or m.uiMode = m.constants.ui.modes.kidsParental
+  if m.uiMode = m.constants.ui.modes.kids OR m.uiMode = m.constants.ui.modes.kidsAgeGate OR m.uiMode = m.constants.ui.modes.kidsParental
     return true
   end if
   return false
@@ -1033,7 +1033,7 @@ Function isParentalControlsAdultLevel() as Boolean
 
     authInfo = m.global.authInfo
 
-    if authInfo.parentalrating = invalid or authInfo.parentalrating <> 3
+    if authInfo.parentalrating = invalid OR authInfo.parentalrating <> 3
       bEnabled = false
     end if
 
@@ -1051,7 +1051,7 @@ Function isParentalControlsTeensLevel() as Boolean
 
     authInfo = m.global.authInfo
 
-    if authInfo.parentalrating = invalid or authInfo.parentalrating = 2
+    if authInfo.parentalrating = invalid OR authInfo.parentalrating = 2
       bEnabled = true
     end if
 
@@ -1312,7 +1312,7 @@ Function setHomeScreenBackground(homeScreen)
       contentType = homeScreen.contentFocused.type
     end if
     videoPreviewState = getVideoPreviewState()
-    if videoPreviewState = "playing" or videoPreviewState = "paused"
+    if videoPreviewState = "playing" OR videoPreviewState = "paused"
 
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.epg
@@ -1425,7 +1425,7 @@ Function getBackgroundtype(backgroundUriList, contentType = "")
       backgroundType = m.constants.ui.backgroundTypes.fullScreen
     else if backgroundUriList[0] = m.marketingBackgroundUri
       backgroundType = m.constants.ui.backgroundTypes.marketingScreen
-    else if contentType = m.constants.ui.contentTypes.linear or contentType = m.constants.ui.contentTypes.epg
+    else if contentType = m.constants.ui.contentTypes.linear OR contentType = m.constants.ui.contentTypes.epg
       backgroundType = m.constants.ui.backgroundTypes.epg
     else
       backgroundType = m.constants.ui.backgroundTypes.topRight
@@ -1512,7 +1512,7 @@ End Function
 
 
 Function isDeviceInUSorCA()
-  return (UCase(m.constants.deviceInfo.countryCode) = "US" or UCase(m.constants.deviceInfo.countryCode) = "CA")
+  return (UCase(m.constants.deviceInfo.countryCode) = "US" OR UCase(m.constants.deviceInfo.countryCode) = "CA")
 End Function
 
 
@@ -1566,7 +1566,7 @@ Function onCustomSuspend(msg)
       if modal.instantResumeAction = m.constants.instantResumeActions.restartApp
         'making visible = false to avoid showing error modal while app on relaunch
         modal.visible = false
-      else if modal.instantResumeAction = m.constants.instantResumeActions.closeDialog or modal.instantResumeAction = m.constants.instantResumeActions.startChannel
+      else if modal.instantResumeAction = m.constants.instantResumeActions.closeDialog OR modal.instantResumeAction = m.constants.instantResumeActions.startChannel
         closeModal(modal)
         if currentScreen <> invalid
           currentScreen.setFocus(true)
@@ -1611,7 +1611,7 @@ Function onCustomResume(msg)
       m.Request = TubiRequest(m.constants.settings)
     end if
 
-    if (customResumeLaunchParams.contentId <> invalid AND customResumeLaunchParams.mediaType <> invalid) or customResumeLaunchParams.page <> invalid
+    if (customResumeLaunchParams.contentId <> invalid AND customResumeLaunchParams.mediaType <> invalid) OR customResumeLaunchParams.page <> invalid
       ' if resuming due to a deeplink, restart the app. Deeplinking into a non standard state creates
       ' lots of edge cases, so for consistency, restarting the app is easiest.
       bRestartApp = true
@@ -1623,7 +1623,7 @@ Function onCustomResume(msg)
       bLinearVideoOverride = true
       if isNonEmptyString(sLastLinearID) = true
         '//If a previously played, overriding linear video exists, then check for another condition to see if the linear video should override the instant resume process
-        if currentScreen <> invalid AND (currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen or currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen or currentScreen.id = m.constants.ui.screenIds.detailScreen)
+        if currentScreen <> invalid AND (currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen OR currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen OR currentScreen.id = m.constants.ui.screenIds.detailScreen)
           '//If the previous app state was playing a video or displaying on a detail screen,
           '//   then the user should be taken back to that on Instant Resume
           '//   rather than playing a previous linear video
@@ -1638,7 +1638,7 @@ Function onCustomResume(msg)
         ' disable Instant Resume & relaunch app from scratch.
         ' Also every 4 days once the app restarts in order to get starter/remote components
         bRestartApp = true
-      else if isLoggedInUser() = true AND (lastAppRestartInDays >= 4 or bLinearVideoOverride = true)
+      else if isLoggedInUser() = true AND (lastAppRestartInDays >= 4 OR bLinearVideoOverride = true)
         ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
         bRestartApp = true
       else
@@ -1850,7 +1850,7 @@ Function onFullscreenCountdown()
   tubiLog("ContentController.onFullscreenCountdown")
   screen = getCurrentScreen()
   if screen <> invalid
-    if screen.id = m.constants.ui.screenIds.homeScreen or isAnEpgScreen(screen) = true
+    if screen.id = m.constants.ui.screenIds.homeScreen OR isAnEpgScreen(screen) = true
       bLinearOnHomeScreen = (screen.id = m.constants.ui.screenIds.homeScreen)
 
       nCurrentCount = screen.fullscreenCountdown

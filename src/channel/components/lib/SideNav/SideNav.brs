@@ -561,7 +561,7 @@ Function setContentActive(content, bActive = true)
   for i = 0 to content.getChildCount()-1
     item = content.getChild(i)
     item.active = bActive
-    if(m.itemSelectedRemembered <> invalid and m.itemSelectedRemembered.id = item.id)
+    if(m.itemSelectedRemembered <> invalid AND m.itemSelectedRemembered.id = item.id)
       item.selected = true
     else
       item.selected = false
@@ -571,7 +571,7 @@ End Function
 
 
 Function onItemRequested()
-  if m.top.itemRequested <> invalid and m.top.itemRequested <> "" and (m.itemSelectedRemembered = invalid or m.top.itemRequested <> m.itemSelectedRemembered.id)
+  if m.top.itemRequested <> invalid AND m.top.itemRequested <> "" AND (m.itemSelectedRemembered = invalid or m.top.itemRequested <> m.itemSelectedRemembered.id)
     '//Go thru the lists and select the option that matches the itemRequested
     focusItemInList(m.mainItems, m.top.itemRequested)
   end if
@@ -685,7 +685,7 @@ Function onItemFocused(msg)
   ' trigger navigate_within_page events in ContentController
   pageType = m.Tracking.sideNavPageMap[item.id]
 
-  if m.oldSideNavFocusedButton <> invalid and m.oldSideNavFocusedButton.left_nav_section <> pageType
+  if m.oldSideNavFocusedButton <> invalid AND m.oldSideNavFocusedButton.left_nav_section <> pageType
     row = itemFocused + 1
     col = 1
     m.top.navigateWithinPageInfo = {

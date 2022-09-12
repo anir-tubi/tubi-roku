@@ -147,7 +147,7 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
     return false
   end if
 
-  if m.params.Count() > 0  and isRetry = false then
+  if m.params.Count() > 0  AND isRetry = false then
     fullUrl = m.addParamsToUrl_(m.url, m.params)
     fulProxyUrl = m.passThroughCharlesProxy(fullUrl)
     m.urltransfer.SetUrl(fulProxyUrl)
@@ -175,7 +175,7 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
     print ""
   end if
 
-  if (m.configMode <> "production") and m.charlesProxyEnabled
+  if (m.configMode <> "production") AND m.charlesProxyEnabled
     m.urltransfer.enablePeerVerification(false)
     m.urltransfer.enableHostVerification(false)
   end if
@@ -220,7 +220,7 @@ Function tubihttp_runSynchronous(timeout = 5 as Integer) As Object
       request = m.handleEvent(msg)
 
       if request <> invalid
-        if request.response <> invalid and request.response.data <> invalid and request.response.data.len() > 0
+        if request.response <> invalid AND request.response.data <> invalid AND request.response.data.len() > 0
           res = request.response.data
           exit while
         else if request.response.code < 200 or request.response.code >= 400
@@ -261,7 +261,7 @@ Function tubi_handleHttpEvent(message As Object) As Object
         code = message.GetResponseCode()
 
         'server said our auth token was not valid
-        if m.authInfo <> invalid and m.authInfo.userId <> invalid and code = 403 and m.retries > 0
+        if m.authInfo <> invalid AND m.authInfo.userId <> invalid AND code = 403 AND m.retries > 0
           newAuthInfo = m.refreshAuthToken(m.authInfo, 100)
           if newAuthInfo <> invalid
             'replace any necessary new auth info in the headers and try again
@@ -287,7 +287,7 @@ Function tubi_handleHttpEvent(message As Object) As Object
             return m
           end if
 
-        else if code < 0 and m.retries > 0 then
+        else if code < 0 AND m.retries > 0 then
           m.retries = m.retries - 1
           m.start(m.urltransfer) ' fire off the request again
         else
@@ -332,7 +332,7 @@ End Function
 '
 ' small helper to check if the request has returned data and can be acted on
 Function tubihttp_hasData() as Boolean
-  if m.response <> invalid and m.response.data <> invalid and m.response.data.len() > 0
+  if m.response <> invalid AND m.response.data <> invalid AND m.response.data.len() > 0
     return true
   end if
 
@@ -429,10 +429,10 @@ End Function
 Function tubihttp_passThroughCharlesProxy(url as String) as string
   proxyedurl = url
   if m.charlesProxyEnabled
-    if m.configMode <> "production" and m.charlesProxyUrl <> ""
+    if m.configMode <> "production" AND m.charlesProxyUrl <> ""
       reg_exp = CreateObject("roRegex", "^(http|https)://", "")
       checkurlAA = reg_exp.Split(url)
-      if checkurlAA[1] <> invalid and Len(checkurlAA[1]) > 0 and url.instr(m.charlesProxyUrl) = -1
+      if checkurlAA[1] <> invalid AND Len(checkurlAA[1]) > 0 AND url.instr(m.charlesProxyUrl) = -1
         proxyedurl = m.charlesProxyUrl + "/;;" + url
       end if
     end if
@@ -444,7 +444,7 @@ End Function
 Function tubihttp_removeCharlesProxy(proxyedurl as String) as String
   returnUrl = proxyedurl
   if m.charlesProxyEnabled
-    if m.configMode <> "production" and proxyedurl <> "" and m.charlesProxyUrl <> ""
+    if m.configMode <> "production" AND proxyedurl <> "" AND m.charlesProxyUrl <> ""
       proxyAddress = m.charlesProxyUrl + "/;;"
       returnUrl = proxyedurl.Replace(proxyAddress, "")
     end if

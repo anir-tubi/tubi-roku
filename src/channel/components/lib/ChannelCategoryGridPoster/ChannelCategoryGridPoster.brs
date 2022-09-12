@@ -56,7 +56,7 @@ Function onContentChange(data)
 
     categoryContent = m.top.itemContent.getParent()
     if categoryContent <> invalid then
-        if m.top.itemContent.logouri <> invalid and m.top.itemContent.logouri <> ""
+        if m.top.itemContent.logouri <> invalid AND m.top.itemContent.logouri <> ""
           m.logo.uri = m.constants.urls.channelLogoBrandedPrefix + m.top.itemContent.id + m.constants.urls.channelLogoBrandedSuffix
         else
           displayTitle()

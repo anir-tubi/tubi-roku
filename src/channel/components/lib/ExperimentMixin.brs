@@ -10,7 +10,7 @@ Function getExperimentResource(namespaceName as string, experimentName as string
   experiments = TubiExperiments(m.constants)
   resource = experiments.getExperimentResource(namespaceName, experimentName)
 
-  if sendEvent = true and resource <> invalid
+  if sendEvent = true AND resource <> invalid
     sendOutExperimentTracking(namespaceName, experimentName, experiments)
   end if
 
@@ -27,9 +27,9 @@ Function sendOutExperimentTracking(namespaceName as string, experimentName as st
   end if
 
   localGlobal = m.global
-  if localGlobal <> invalid and localGlobal.trackingLoggingTask <> invalid
+  if localGlobal <> invalid AND localGlobal.trackingLoggingTask <> invalid
     experimentTracking = experiments.getExperimentTracking(namespaceName, experimentName)
-    if experimentTracking <> invalid and localGlobal.exposedExperimentParameters[experimentName] <> true
+    if experimentTracking <> invalid AND localGlobal.exposedExperimentParameters[experimentName] <> true
       localGlobal.trackingLoggingTask.trackEvent = experimentTracking
 
       'set the parameter on the global store

@@ -29,7 +29,7 @@
 Function createDeeplinkContentFromStartupArgs(args)
   tubilog("DeeplinkHelpers.createDeeplinkContentFromStartupArgs")
   'handle/set up any deep linking that may have occurred
-  if (args.contentId <> invalid or args.page <> invalid)
+  if (args.contentId <> invalid OR args.page <> invalid)
     content = CreateObject("roSGNode", "DeeplinkContentNode")
     if args.contentId <> invalid
       content.id = args.contentId
@@ -42,7 +42,7 @@ Function createDeeplinkContentFromStartupArgs(args)
 
     ' default deep link source is no-source
     sourceArg = args.source
-    if sourceArg = invalid or m.constants.deeplinks[sourceArg] = invalid
+    if sourceArg = invalid OR m.constants.deeplinks[sourceArg] = invalid
       content.source = "no-source"
     else
       content.source = m.constants.deeplinks[sourceArg]
@@ -197,7 +197,7 @@ End Function
 Function handleDeeplinkContentByType()
   tubilog("deeplinkHelpers.handleDeeplinkContentByType")
   if m.deepLinkContent <> invalid
-    if m.deepLinkContent.deeplinkType = "linear" or m.deepLinkContent.deeplinkType = "liveTV"
+    if m.deepLinkContent.deeplinkType = "linear" OR m.deepLinkContent.deeplinkType = "liveTV"
       'if fadeInContentController is still playing, then linear content can not play.
       'in that case, consider handling the linear deeplink content after fade in animation is over in onFadeInContentController
       if m.top.fadeInContentController = true
@@ -264,7 +264,7 @@ Function onSingleChannelFetchForDeeplinkSuccess(successResponse, storeInCache=fa
     end if
     ' if the uimode is locked by parentalControl or kidsAgeGate, then show the error model that the
     ' content can be played because of parental controls
-    if isKidsModeEnabledByParentalControls() = true or m.uiMode = m.constants.ui.modes.kidsAgeGate
+    if isKidsModeEnabledByParentalControls() = true OR m.uiMode = m.constants.ui.modes.kidsAgeGate
       message = getTranslation("dialog_contentNotAvailable_Parental_description")
       showDeeplinkErrorModal(invalid, message)
     else
@@ -276,7 +276,7 @@ Function onSingleChannelFetchForDeeplinkSuccess(successResponse, storeInCache=fa
       'show epg Screen for linear content
       showDefaultEPGScreen()
       epgScreen = getFromScreenCache(m.constants.ui.screenIds.epgScreen)
-      if epgScreen.timeGridContent = invalid or epgScreen.timeGridContentLoading = true
+      if epgScreen.timeGridContent = invalid OR epgScreen.timeGridContentLoading = true
         epgScreen.contentIdToFocusOnLoadComplete = linearContent.id
       end if
       playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.epgScreen)
@@ -306,11 +306,11 @@ Function showDeeplinkErrorModal(response=invalid,  message = "")
   if response <> invalid
     if response.code = 404
       dialogType = "CONTENT_NOT_FOUND" 'DialogType enum
-    else if response.code = 403 or response.code = 451 or response.code = 401 or response.code = 422
+    else if response.code = 403 OR response.code = 451 OR response.code = 401 OR response.code = 422
       dialogType = "RESTRICTED_CONTENT"
       message = getTranslation("dialog_contentNotAvailable_Parental_description")
     end if
-  else if isKidsModeEnabledByParentalControls() = true or m.uiMode = m.constants.ui.modes.kidsAgeGate
+  else if isKidsModeEnabledByParentalControls() = true OR m.uiMode = m.constants.ui.modes.kidsAgeGate
     dialogType = "RESTRICTED_CONTENT"
     message = getTranslation("dialog_contentNotAvailable_Parental_description")
   end if
@@ -375,7 +375,7 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
       source_device_id: deepLinkContent.sourceDeviceId
     }
 
-    if (deepLinkContent.type = m.constants.ui.contentTypes.linear or deepLinkContent.type = m.constants.ui.contentTypes.video or (deepLinkContent.type = "series" AND deepLinkContent.deeplinkType = "series")) AND deepLinkContent.id <> invalid AND deepLinkContent.id <> ""
+    if (deepLinkContent.type = m.constants.ui.contentTypes.linear OR deepLinkContent.type = m.constants.ui.contentTypes.video OR (deepLinkContent.type = "series" AND deepLinkContent.deeplinkType = "series")) AND deepLinkContent.id <> invalid AND deepLinkContent.id <> ""
       pageInfo = {
         pageType: "video_player_page"
         pageValues: {
@@ -431,7 +431,7 @@ End Function
 Function handleLinearDeeplinkContent()
   tubilog("DeeplinkHelpers.handleLinearDeeplinkContent")
 
-  if isParentalControlsAdultLevel() = false or m.uiMode = m.constants.ui.modes.kidsAgeGate
+  if isParentalControlsAdultLevel() = false OR m.uiMode = m.constants.ui.modes.kidsAgeGate
     ' Display error message indicating to turn off the parental controls
     message = getTranslation("dialog_contentNotAvailable_Parental_description")
     showDeeplinkErrorModal(invalid, message)
@@ -478,7 +478,7 @@ Function handleCategoryDeeplinkContent()
   end if
   sCatSideNavID = m.constants.ui.sideNavIds.categories
 
-  if (isParentalControlsAdultLevel() = true or isParentalControlsTeensLevel() = true) AND m.uiMode <> m.constants.ui.modes.kidsAgeGate
+  if (isParentalControlsAdultLevel() = true OR isParentalControlsTeensLevel() = true) AND m.uiMode <> m.constants.ui.modes.kidsAgeGate
     setUiMode(m.constants.ui.modes.standard)
   end if
 
@@ -491,7 +491,7 @@ End Function
 Function handleNetworkDeeplinkContent()
   tubilog("DeeplinkHelpers.handleNetworkDeeplinkContent")
 
-  if isParentalControlsAdultLevel() = false or m.uiMode = m.constants.ui.modes.kidsAgeGate
+  if isParentalControlsAdultLevel() = false OR m.uiMode = m.constants.ui.modes.kidsAgeGate
     ' Display error message indicating to turn off the parental controls
     message = getTranslation("dialog_sideNavItemDisabled_Parental_description")
     showDeeplinkErrorModal(invalid, message)
@@ -543,7 +543,7 @@ Function handleEspanolPageDeeplinkContent()
   if m.enteredFromDeepLink = true
     sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.espanol, m.Tracking, m.trackingLoggingTask, m.constants)
   end if
-  if isParentalControlsAdultLevel() = false or m.uiMode = m.constants.ui.modes.kidsAgeGate
+  if isParentalControlsAdultLevel() = false OR m.uiMode = m.constants.ui.modes.kidsAgeGate
     ' Display error message indicating to turn off the parental controls
     message = getTranslation("dialog_sideNavItemDisabled_Parental_description")
     showDeeplinkErrorModal(invalid, message)
@@ -566,7 +566,7 @@ Function handleMoviesPageDeeplinkContent()
     'teens get TV screen and movie screen
     showMoviesScreen()
     focusSideNavOption(m.constants.ui.sideNavIds.home)
-  else if isParentalControlsAdultLevel() = false or m.uiMode = m.constants.ui.modes.kidsAgeGate
+  else if isParentalControlsAdultLevel() = false OR m.uiMode = m.constants.ui.modes.kidsAgeGate
       ' Display error message indicating to turn off the parental controls
       message = getTranslation("dialog_sideNavItemDisabled_Parental_description")
       showDeeplinkErrorModal(invalid, message)
@@ -594,7 +594,7 @@ Function handleTVPageDeeplinkContent()
     'teens get TV screen and movie screen
     showTVScreen()
     focusSideNavOption(m.constants.ui.sideNavIds.home)
-  else if isParentalControlsAdultLevel() = false or m.uiMode = m.constants.ui.modes.kidsAgeGate
+  else if isParentalControlsAdultLevel() = false OR m.uiMode = m.constants.ui.modes.kidsAgeGate
     ' Display error message indicating to turn off the parental controls
     message = getTranslation("dialog_sideNavItemDisabled_Parental_description")
     showDeeplinkErrorModal(invalid, message)

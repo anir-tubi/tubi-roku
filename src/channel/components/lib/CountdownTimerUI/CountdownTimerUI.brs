@@ -9,7 +9,7 @@ Function init()
   m.top.observeFieldScoped("seconds", "onSecondChange")
   m.top.observeFieldScoped("display", "onDisplayChange")
 
-  if m.constants <> invalid and m.constants.deviceInfo.scaledUi = true
+  if m.constants <> invalid AND m.constants.deviceInfo.scaledUi = true
     m.PlayerCountdownBground.uri = "pkg:/images/tab_short_component_alt_hd.9.png"
   else
     m.PlayerCountdownBground.uri = "pkg:/images/tab_short_component_alt_fhd.9.png"

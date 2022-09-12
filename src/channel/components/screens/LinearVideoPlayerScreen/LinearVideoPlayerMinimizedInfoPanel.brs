@@ -26,7 +26,7 @@ Function onMetadataChanged()
     m.channelIcon.uri = ""
   end if
 
-  if metadata.minutesLeft >= 0 and metadata.currentDuration > 0 and metadata.minutesLeft < metadata.currentDuration
+  if metadata.minutesLeft >= 0 AND metadata.currentDuration > 0 AND metadata.minutesLeft < metadata.currentDuration
     nPercentDone = (metadata.currentDuration - metadata.minutesLeft)/metadata.currentDuration
     m.programProgressBar.width = m.background.width * nPercentDone
     m.programProgressBar.visible = true
@@ -35,7 +35,7 @@ Function onMetadataChanged()
     m.programProgressBar.visible = false
   end if
 
-  if metadata.minutesLeft <> invalid and metadata.minutesLeft >= 0
+  if metadata.minutesLeft <> invalid AND metadata.minutesLeft >= 0
     m.minutesLeft.text = getTranslation("epg_minutes_left", {minutes: toStr(metadata.minutesLeft)})
     m.title1.translation = [m.title1.translation[0],60]
   else

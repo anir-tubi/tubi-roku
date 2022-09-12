@@ -72,7 +72,7 @@ Function onScreenFocusChange()
   if m.top.hasFocus() = true
     ' since epg main content node does not have valid Until, just findout the validUntil from first child
     ' This check might be necessary if user stay on topnav/sidenav for very long time.
-    if m.epgTimeGrid.content <> invalid and shouldRefresh(m.epgTimeGrid.content.getChild(0)) = true
+    if m.epgTimeGrid.content <> invalid AND shouldRefresh(m.epgTimeGrid.content.getChild(0)) = true
       m.top.loadAllchannels = true
     end if
 
@@ -101,7 +101,7 @@ Function onLinearChannelFocused()
   tubiLog("EPGHomeScreen.onLinearChannelFocused")
   if m.epgTimeGrid <> invalid
     content = m.epgTimeGrid.linearChannelFocused
-    if content <> invalid and content.title <> invalid
+    if content <> invalid AND content.title <> invalid
       m.top.linearChannelFocused = content
       ' As per EPG requirement: if this is the first time content is focused after EPG started, then start playing the first content.
       ' all the other time, only selected content will get to play.
@@ -128,7 +128,7 @@ Function populateInfoPanel(contentNode)
     lineOneData = {}
     lineOneData.rating = contentNode.rating
     lineOneData.hasCC = contentNode.hasSubtitles
-    if contentNode.descriptors <> invalid and contentNode.descriptors.Count() > 0
+    if contentNode.descriptors <> invalid AND contentNode.descriptors.Count() > 0
       lineOneData.descriptorCode = contentNode.descriptors.join(", ") ' To DO : When when we get real values into TAGS
     end if
     lineOneData.releaseDate = contentNode.ReleaseDate
@@ -159,7 +159,7 @@ Function onLinearChannelToPlay(msg)
 
     col = 1
     row = 1
-    if m.epgTimeGrid <> invalid and m.epgTimeGrid.rowItemFocused <> invalid and m.epgTimeGrid.rowItemFocused.Count() > 0
+    if m.epgTimeGrid <> invalid AND m.epgTimeGrid.rowItemFocused <> invalid AND m.epgTimeGrid.rowItemFocused.Count() > 0
       col = m.epgTimeGrid.rowItemFocused[1] + 1
       row = m.epgTimeGrid.rowItemFocused[0] + 1
     end if
@@ -172,7 +172,7 @@ Function onLinearChannelToPlay(msg)
         }
       }
 
-      if m.top.linearChannelToPlay = invalid or (m.top.linearChannelToPlay <> invalid and linearChannelToPlay <> invalid and m.top.linearChannelToPlay.id <> linearChannelToPlay.id )
+      if m.top.linearChannelToPlay = invalid or (m.top.linearChannelToPlay <> invalid AND linearChannelToPlay <> invalid AND m.top.linearChannelToPlay.id <> linearChannelToPlay.id )
         m.top.linearChannelToPlay = linearChannelToPlay
         m.top.backgroundUriList = determineBackgroundImage(linearChannelToPlay)
       end if
@@ -184,7 +184,7 @@ End Function
 
 ' When OK has been pressed on EPG TimeGrid, maximize the player.
 Function onEPGTimegridOKPressed()
-  if m.top.linearChannelToPlay <> invalid and m.epgTimeGrid.linearChannelFocused <> invalid and m.epgTimeGrid.linearChannelFocused.id = m.top.linearChannelToPlay.id
+  if m.top.linearChannelToPlay <> invalid AND m.epgTimeGrid.linearChannelFocused <> invalid AND m.epgTimeGrid.linearChannelFocused.id = m.top.linearChannelToPlay.id
     m.top.epgScreenOkPressed = true
   end if
 End Function
@@ -193,7 +193,7 @@ End Function
 
 ' @selectedContent: TubiContentNode with metadata for an item in the epg
 Function determineBackgroundImage(selectedContent)
-  if selectedContent <> invalid and selectedContent.backgrounds <> invalid and selectedContent.backgrounds.count() > 0
+  if selectedContent <> invalid AND selectedContent.backgrounds <> invalid AND selectedContent.backgrounds.count() > 0
     return selectedContent.backgrounds
   else
     return [m.defaultBackgroundUri]
@@ -205,7 +205,7 @@ Function onTransportVoiceRequest(msg)
   response = "unhandled"
   inputInfo = msg.getData()
   command = ""
-  if inputInfo <> invalid and inputInfo.command <> invalid
+  if inputInfo <> invalid AND inputInfo.command <> invalid
     command = inputInfo.command
   end if
   tubiLog("EPGHomeScreen.onTransportVoiceRequest " + command)
@@ -266,10 +266,10 @@ Function onKeyEvent(key As string, press As boolean) As boolean
           return false
           end if
         end if
-      else if key = "up" and m.TopNav.isInFocusChain() = false
+      else if key = "up" AND m.TopNav.isInFocusChain() = false
         setFocusOntoTopNav(true)
         return true
-      else if key = "down" and m.TopNav.isInFocusChain() = true
+      else if key = "down" AND m.TopNav.isInFocusChain() = true
         setFocusOnepgTimeGrid()
         return true
       else if key = "left"
@@ -286,7 +286,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
         end if
       end if
     end if
-    if key = "play" and m.epgTimeGrid.isInFocusChain() = true
+    if key = "play" AND m.epgTimeGrid.isInFocusChain() = true
       handlePlayInput()
       return true
     end if
@@ -407,7 +407,7 @@ End Function
 ' Determine how far away the topNav is from the focus in the EPGGrid
 '@row: integer, the row of the epgTimeGrid that is gaining focus
 Function setTopNavFarAwayStatus(row)
-  if m.TopNav.visible = true and (m.TopNav.hasFocus() = false and m.TopNav.isInFocusChain() = false)
+  if m.TopNav.visible = true AND (m.TopNav.hasFocus() = false AND m.TopNav.isInFocusChain() = false)
     setTopNavUi(row)
   end if
 End Function
@@ -440,12 +440,12 @@ End Function
 ' The top nav will dispatch a navigateWithinPageInfo event which needs to be re-dispatched to the epgscreenHelpers
 Function onTopNavNavigateWithinPageInfoChange()
   navigateWithinPageInfo = m.topNav.navigateWithinPageInfo
-  if navigateWithinPageInfo <> invalid and navigateWithinPageInfo.means_of_navigation = "BUTTON"
+  if navigateWithinPageInfo <> invalid AND navigateWithinPageInfo.means_of_navigation = "BUTTON"
     '//The navigateWithinPageInfo is caused by the user going from the EPG to the Top Nav.
     '//Before navigateWithinPageInfo is communicated to the outside helper, add info about the EPG
     epgComponentInfo = getTrackingComponentInfoOfEPGGridList(m.epgTimeGrid.itemFocused, m.epgTimeGrid.rowItemfocused)
 
-    if epgComponentInfo <> invalid and epgComponentInfo.componentValues <> invalid
+    if epgComponentInfo <> invalid AND epgComponentInfo.componentValues <> invalid
       navigateWithinPageInfo.componentOneof = m.Tracking.getAnalyticsComponent("category_component", epgComponentInfo.componentValues)
     end if
   end if
@@ -459,7 +459,7 @@ End Function
 ' @itemPosition: array, 2d array with [x,y] grid coordinate information
 Function getTrackingComponentInfoOfEPGGridList(timegridItem, itemPosition)
   trackingComponentInfo = {}
-  if timegridItem <> invalid and itemPosition <> invalid and itemPosition.Count() = 2
+  if timegridItem <> invalid AND itemPosition <> invalid AND itemPosition.Count() = 2
     componentValues = {}
     tile = m.Tracking.getAnalyticsTile(timegridItem, itemPosition[1] + 1)
     componentValues["content_tile"] = tile

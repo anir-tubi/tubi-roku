@@ -90,7 +90,7 @@ Function init()
 
   authInfo = m.global.authInfo
 
-  if authInfo <> invalid and authInfo.parentalrating <> invalid
+  if authInfo <> invalid AND authInfo.parentalrating <> invalid
     m.top.parentalRating = authInfo.parentalrating
   end if
 
@@ -239,7 +239,7 @@ Function onScreenFocusChange()
   tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
 
   if m.top.hasFocus() = true
-    if m.CategoryGridList.content <> invalid and shouldRefresh(m.CategoryGridList.content) = true
+    if m.CategoryGridList.content <> invalid AND shouldRefresh(m.CategoryGridList.content) = true
       m.top.loadAllCategories = true
     end if
 
@@ -280,7 +280,7 @@ End Function
 ' Determine how far away the topNav is from the focus in the CategoryGridList
 '@row: integer, the row of the categoryGridList that is gaining focus
 Function setTopNavFarAwayStatus(row)
-  if m.TopNav.visible = true and (m.TopNav.hasFocus() = false and m.TopNav.isInFocusChain() = false)
+  if m.TopNav.visible = true AND (m.TopNav.hasFocus() = false AND m.TopNav.isInFocusChain() = false)
     setTopNavUi(row)
   end if
 End Function
@@ -299,7 +299,7 @@ End Function
 
 ' @row: roSGNode, a CategoryContentNode
 Function isSponsoredRow(row)
-  if row.sponsorImages <> invalid and row.sponsorImages.pixels <> invalid and row.sponsorImages.pixels["homescreen"] <> invalid
+  if row.sponsorImages <> invalid AND row.sponsorImages.pixels <> invalid AND row.sponsorImages.pixels["homescreen"] <> invalid
     return true
   end if
 
@@ -311,7 +311,7 @@ End Function
 Function onCurrFocusColumnChange(msg)
   column = msg.getData()
   newColumn = Int(column)
-  if newColumn <> invalid and newColumn <> m.currentColumn
+  if newColumn <> invalid AND newColumn <> m.currentColumn
     '//make sure we only report the new column for a whole integer
     m.currentColumn = newColumn
 
@@ -348,11 +348,11 @@ Function onCurrFocusRowChange()
   ' If a user quickly presses the up and down buttons quickly, before the
   ' rowList can set rowList.rowItemFocused, we need to correct lastFocusRow to be accurate
   if m.lastFocusPosition >= 0
-    if currFocusRow > m.lastFocusPosition and scrollDirection = "up"
+    if currFocusRow > m.lastFocusPosition AND scrollDirection = "up"
       ' currFocusRow > lastFocusRow indicates the user is scrolling down, but if scrollDirection = "up"
       ' it indicates a user did a down/up fast button press, so we need to update lastFocusRow
       lastFocusRow += 1
-    else if currFocusRow < m.lastFocusPosition and scrollDirection = "down"
+    else if currFocusRow < m.lastFocusPosition AND scrollDirection = "down"
       ' currFocusRow > lastFocusRow indicates the user is scrolling up, but if scrollDirection = "down"
       ' it indicates a user did a up/down fast button press, so we need to update lastFocusRow
       lastFocusRow -= 1
@@ -427,7 +427,7 @@ Function onCurrFocusRowChange()
     if categoryEnteringFocus.sponsorImages <> invalid
       '//if the entering row is sponsored, then take into account the extra room that the sponsor artwork takes up in the row header
       expandContentAreaForSponsorship(rowPercent)
-      if m.constants.deviceInfo.limitedUi = false and categoryEnteringFocus.sponsorImages.brandBackground <> ""
+      if m.constants.deviceInfo.limitedUi = false AND categoryEnteringFocus.sponsorImages.brandBackground <> ""
         sSponsorBackgroundURL = categoryEnteringFocus.sponsorImages.brandBackground
       else if categoryEnteringFocus.sponsorImages.brandColor <> ""
         sSponsorBackgroundURL = categoryEnteringFocus.sponsorImages.brandColor
@@ -463,7 +463,7 @@ Function contractContentAreaToOriginal(rowPercent)
 
       m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.ContentArea.translation[1] + nDiffContentAreaTranslation_y * rowPercent]
       m.ContentArea.maskOffset = [m.originalContentAreaMaskOffset[0], m.ContentArea.maskOffset[1] + nDiffContentAreaMaskOffset_y * rowPercent]
-      if m.InfoPanel.opacity < 1 and m.InfoPanel.opacity < rowPercent
+      if m.InfoPanel.opacity < 1 AND m.InfoPanel.opacity < rowPercent
         m.InfoPanel.opacity = rowPercent
       end if
     else
@@ -562,7 +562,7 @@ Function onGridFocusChange() as void
   newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + 1
   newAnalyticsCol = m.CategoryGridList.cursorPosition[1] + 1
 
-  if m.gridHasGainedInitialFocus = true and oldAnalyticsRow > 0 and oldAnalyticsCol > 0
+  if m.gridHasGainedInitialFocus = true AND oldAnalyticsRow > 0 AND oldAnalyticsCol > 0
     if oldAnalyticsRow <> newAnalyticsRow or oldAnalyticsCol <> newAnalyticsCol
 
       categoryComponentInfo = {}
@@ -593,12 +593,12 @@ End Function
 Function onTopNavNavigateWithinPageInfoChange()
   tubiLog("Homescreen.onTopNavNavigateWithinPageInfoChange")
   navigateWithinPageInfo = m.TopNav.navigateWithinPageInfo
-  if navigateWithinPageInfo <> invalid and navigateWithinPageInfo.means_of_navigation = "BUTTON"
+  if navigateWithinPageInfo <> invalid AND navigateWithinPageInfo.means_of_navigation = "BUTTON"
     '//The navigateWithinPageInfo is caused by the user going from the video CategoryGridList to the Top Nav.
     '//Before navigateWithinPageInfo is communicated to the outside helper, add info about the CategoryGridList
     categoryComponentInfo = getTrackingComponentInfoOfCategoryGridList(m.CategoryGridList.itemFocused, m.CategoryGridList.focusedPosition)
 
-    if categoryComponentInfo <> invalid and categoryComponentInfo.componentValues <> invalid
+    if categoryComponentInfo <> invalid AND categoryComponentInfo.componentValues <> invalid
       navigateWithinPageInfo.componentOneof = m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo.componentValues)
     end if
   end if
@@ -631,7 +631,7 @@ End Function
 ' @itemPosition: array, 2d array with [x,y] grid coordinate information
 Function getTrackingComponentInfoOfCategoryGridList(gridItem, itemPosition)
   trackingComponentInfo = {}
-  if gridItem <> invalid and itemPosition <> invalid and itemPosition.Count() = 2
+  if gridItem <> invalid AND itemPosition <> invalid AND itemPosition.Count() = 2
     componentValues = {}
     componentValues["category_slug"] = m.top.currCategoryId
     componentValues["category_row"] = itemPosition[0] + 1 'all analytics are 1 based
@@ -723,7 +723,7 @@ End Function
 
 
 Function determineBackgroundImage(focusedContent)
-  if focusedContent <> invalid and focusedContent.backgrounds <> invalid and focusedContent.backgrounds.count() > 0
+  if focusedContent <> invalid AND focusedContent.backgrounds <> invalid AND focusedContent.backgrounds.count() > 0
     return focusedContent.backgrounds
   else
     return [m.defaultBackgroundUri]
@@ -865,10 +865,10 @@ Function onKeyEvent(key, press) as boolean
             return false
           end if
         end if
-      else if key = "up" and m.TopNav.isInFocusChain() = false and m.CategoryGridList.currFocusRow = 0
+      else if key = "up" AND m.TopNav.isInFocusChain() = false AND m.CategoryGridList.currFocusRow = 0
         setFocusOntoTopNav(true)
         return true
-      else if key = "down" and m.TopNav.isInFocusChain() = true
+      else if key = "down" AND m.TopNav.isInFocusChain() = true
         setFocusOnCategoryGrid()
         return true
       else if key = "left"
@@ -902,7 +902,7 @@ Function onKeyEvent(key, press) as boolean
       end if
     end if
 
-    if key = "play" and m.CategoryGridList.isInFocusChain() = true
+    if key = "play" AND m.CategoryGridList.isInFocusChain() = true
       handlePlayInput()
       return true
     end if
@@ -916,7 +916,7 @@ Function onTransportVoiceRequest(msg)
   inputInfo = msg.getData()
   if m.CategoryGridList.isInFocusChain() = true
     command = ""
-    if inputInfo <> invalid and inputInfo.command <> invalid
+    if inputInfo <> invalid AND inputInfo.command <> invalid
       command = inputInfo.command
     end if
     tubiLog("HomeScreen.onTransportVoiceRequest " + command)
@@ -948,7 +948,7 @@ Function handlePlayInput()
     end if
 
     ' Content controller observes contentSelected to populate/push the detail screen
-    if itemFocused <> invalid and itemFocused.type <> m.constants.ui.contentTypes.linear
+    if itemFocused <> invalid AND itemFocused.type <> m.constants.ui.contentTypes.linear
       m.top.contentToPlay = itemFocused
       return true
     end if

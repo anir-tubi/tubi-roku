@@ -37,7 +37,7 @@ End Function
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseEPGProgramsError(fullResponse, reqInfo)
   contentId = ""
-  if reqInfo.options <> invalid and reqInfo.options.params <> invalid
+  if reqInfo.options <> invalid AND reqInfo.options.params <> invalid
     contentId = reqInfo.options.params.content_id
   end if
   return {

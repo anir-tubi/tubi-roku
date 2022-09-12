@@ -152,7 +152,7 @@ Function userDeviceApi_patchSettingsInfo(passedOptions)
 
   options = passedOptions
 
-  if passedOptions <> invalid and type(passedOptions.body) = "roAssociativeArray"
+  if passedOptions <> invalid AND type(passedOptions.body) = "roAssociativeArray"
     options["body"] = FormatJSON(passedOptions.body)
   end if
   headers = {}

@@ -127,7 +127,7 @@ Function tubiSGAdShim_handleControlMessage(state As String, control As String, e
   ' the midroll times exactly and there is a possibility of the video node 'position'
   ' field to be slightly off due to delays in thread synchronization.
   normalizedPosition = position
-  if episode.cuepoints <> invalid and type(episode.cuepoints) = "roArray" then
+  if episode.cuepoints <> invalid AND type(episode.cuepoints) = "roArray" then
     for each cuepoint in episode.cuepoints
       ' We'll give an allowance of 15 seconds here.  I don't expect any cuepoints to be
       ' within 15 seconds of each other so this should be safe

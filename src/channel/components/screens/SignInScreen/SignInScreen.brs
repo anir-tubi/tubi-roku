@@ -96,7 +96,7 @@ Function onScreenFocusChange()
   'When user start using microphone, even though email has focus and setting m.emailHasFocus to true, it  changes 
   'to m.emailHasFocus to false and email loses the focus and focus goes to keyboard. So, setting m.emailHasFocus to false only when 
   'email is not in focusChain and focusedChild is not passwordEntryKeyboard.
-  if m.email.isInFocusChain() = false and m.top.focusedChild <> invalid and m.top.focusedChild.id <> "passwordEntryKeyboard"
+  if m.email.isInFocusChain() = false AND m.top.focusedChild <> invalid AND m.top.focusedChild.id <> "passwordEntryKeyboard"
     m.emailHasFocus = false
   end if
 
@@ -354,7 +354,7 @@ End Function
 
 Function onKeyboardTextChanged()
   tubiLog("SignInScreen.onKeyboardTextChanged")
-  if m.keyboard.isInFocusChain() = true and m.emailHasFocus = false
+  if m.keyboard.isInFocusChain() = true AND m.emailHasFocus = false
     m.password.selected = true
     m.password.text = m.keyboard.text
   else if m.emailHasFocus = true

@@ -38,7 +38,7 @@ End Function
 Function tubiNodeHelpers_getChildIndexById(parent, childId)
   if parent.getChildCount() > 0
     for i=0 to parent.getChildCount()-1
-      if parent.getChild(i).id <> invalid and parent.getChild(i).id = childId
+      if parent.getChild(i).id <> invalid AND parent.getChild(i).id = childId
         return i
       end if
     end for
@@ -54,9 +54,9 @@ End Function
 ' returns the indices or [] if the passed in child does not belong to the parent
 Function tubiNodeHelpers_getChildIndicesById(parent, childId)
   indices = []
-  if parent <> invalid and parent.getChildCount() > 0
+  if parent <> invalid AND parent.getChildCount() > 0
     for i=0 to parent.getChildCount()-1
-      if parent.getChild(i).id <> invalid and parent.getChild(i).id = childId
+      if parent.getChild(i).id <> invalid AND parent.getChild(i).id = childId
         indices.push(i)
       end if
     end for
@@ -223,7 +223,7 @@ End Function
 Function tubiNodeHelpers_countNodes(node, depth = 0)
   nodeCount = 0
 
-  if (type(depth) <> "Integer" and type(depth) <> "roInt") or depth <= 0 or depth > 30
+  if (type(depth) <> "Integer" AND type(depth) <> "roInt") or depth <= 0 or depth > 30
     depth = 30
   end if
 

@@ -27,7 +27,7 @@ Function init()
   m.Menu.translation = [12,12]
   m.Menu.focusFootprintBlendColor = m.colors.white
 
-  if m.constants <> invalid and m.constants.deviceInfo.scaledUi = true
+  if m.constants <> invalid AND m.constants.deviceInfo.scaledUi = true
     m.Menu.focusBitmapUri = "pkg:/images/pill_top_nav_hd.9.png"
     m.Menu.focusFootprintBitmapUri="pkg:/images/pill_top_nav_hd.9.png"
     m.MenuBground.uri = "pkg:/images/tab_component_alt_hd.9.png"
@@ -188,7 +188,7 @@ Function onItemFocused()
   navigateWithinPageInfo = invalid
 
   ' set NavigateWithinPageInfo state values as appropriate
-  if m.oldTopNavFocusedButton <> invalid and m.oldTopNavFocusedButton.top_nav_section <> newTopNavFocusedButton.top_nav_section
+  if m.oldTopNavFocusedButton <> invalid AND m.oldTopNavFocusedButton.top_nav_section <> newTopNavFocusedButton.top_nav_section
     ' If oldTopNavFocusedButton exists and is not the same as the newTopNavFocusedButton,
     ' then the user is focusing from another topNav section
     navigateWithinPageInfo = buildNavigateWithinPageInfo(itemFocused, m.top.trackingPageInfo, newTopNavFocusedButton, "scroll_focus")
@@ -201,7 +201,7 @@ Function onItemFocused()
   end if
 
   '//When the user focuses on the top nav, then trigger a navigate_within_page event in ContentController
-  if m.top.handlingFocusFromOtherTopNavBackButton <> true and m.top.losingFocusToComponentOnSamePage <> true and m.top.losingFocusToExternalComponent <> true and m.isResetting <> true
+  if m.top.handlingFocusFromOtherTopNavBackButton <> true AND m.top.losingFocusToComponentOnSamePage <> true AND m.top.losingFocusToExternalComponent <> true AND m.isResetting <> true
     if navigateWithinPageInfo <> invalid
       m.top.navigateWithinPageInfo = navigateWithinPageInfo
     end if
@@ -219,7 +219,7 @@ Function onJumpIDChange(msg)
   tubiLog("TopNav.onJumpIDChange")
   id = msg.getData()
 
-  if id <> invalid and id <> ""
+  if id <> invalid AND id <> ""
     jumpToId(id)
   end if
 End Function
@@ -347,7 +347,7 @@ End Function
 
 ' updates which item in the top nav should be treated as selected
 Function updateSelectedItem(itemId)
-  if isNonEmptyString(itemId) and m.Menu.content <> invalid
+  if isNonEmptyString(itemId) AND m.Menu.content <> invalid
     for i = 0 to m.Menu.content.getChildCount() -1
       menuItem = m.Menu.content.getChild(i)
       if menuItem.id = itemId
@@ -383,7 +383,7 @@ Function onKeyEvent(key, press) as Boolean
       selectedItemId = getSelectedItemId()
       if m.Menu.content <> invalid
         firstChild = m.Menu.content.getChild(0)
-        if firstChild <> invalid and selectedItemId <> firstChild.id
+        if firstChild <> invalid AND selectedItemId <> firstChild.id
           ' only set backItemSelected if the currently selected item is not the first item
           m.top.backItemSelected = firstChild
           m.top.backItemSelected = invalid
@@ -407,12 +407,12 @@ End Function
 '                       with TubiTracking.trackUserEvent()
 Function buildNavigateWithinPageInfo(itemFocused, trackingPageInfo, newTopNavFocusedButton, focusChange)
   pageType = ""
-  if trackingPageInfo <> invalid and trackingPageInfo.pagetype <> invalid
+  if trackingPageInfo <> invalid AND trackingPageInfo.pagetype <> invalid
     pageType = trackingPageInfo.pagetype
   end if
 
   pageValues = {}
-  if trackingPageInfo <> invalid and trackingPageInfo.pageValues <> invalid
+  if trackingPageInfo <> invalid AND trackingPageInfo.pageValues <> invalid
     pageValues = trackingPageInfo.pageValues
   end if
 

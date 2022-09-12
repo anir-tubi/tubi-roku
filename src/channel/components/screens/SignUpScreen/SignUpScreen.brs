@@ -189,7 +189,7 @@ Function isPasswordValid()
 
   isValid = false
   passwordLength = Len(m.keyboard.text)
-  if passwordLength >= 6 and passwordLength <= 30
+  if passwordLength >= 6 AND passwordLength <= 30
     isValid = true
   end if
   return isValid
@@ -203,7 +203,7 @@ Function updatePasswordValidation()
   m.passwordValidationMsg.color = "0xEB9C00"
   m.passwordValidationMsg.opacity = 1.0
 
-  if passwordLength >= 6 and passwordLength <= 30
+  if passwordLength >= 6 AND passwordLength <= 30
     m.passwordValidationMsg.text = ""
   else if passwordLength = 0
     m.passwordValidationMsg.text = getTranslation("signUp_screen_password_validation")
@@ -244,7 +244,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   passwordLength = Len(m.keyboard.text)
   if key = "OK"
     m.password.text = m.keyboard.text
-    if passwordLength >= 6 and passwordLength <= 30
+    if passwordLength >= 6 AND passwordLength <= 30
       m.passwordValidationMsg.visible = false
       m.checkmark_circle.visible = true
     else

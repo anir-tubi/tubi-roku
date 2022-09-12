@@ -90,22 +90,22 @@ Function onNumberPadTextChanged(msg)
     decade = date.mid(2, 1).toInt()
     dateLength = date.len()
 
-    if dateLength = 1 and millenium <> 1 and millenium <> 2
+    if dateLength = 1 AND millenium <> 1 AND millenium <> 2
       m.ErrorPrompt.visible = true
       m.NumberPad.text = ""
-    else if dateLength = 2 and millenium = 1 and century <> 9
+    else if dateLength = 2 AND millenium = 1 AND century <> 9
       ' don't allow centuries that are not 19xx if millenium is 1xxx
       m.ErrorPrompt.visible = true
       m.NumberPad.text = date.left(1)
-    else if dateLength = 2 and millenium = 2 and checkValidCentury(millenium, century) = false
+    else if dateLength = 2 AND millenium = 2 AND checkValidCentury(millenium, century) = false
       ' don't allow centuries greater than the current century if millenium is 2xxx
       m.ErrorPrompt.visible = true
       m.NumberPad.text = date.left(1)
-    else if dateLength = 3 and millenium = 2 and checkValidDecade(century, decade) = false
+    else if dateLength = 3 AND millenium = 2 AND checkValidDecade(century, decade) = false
       ' don't allow decades greater than the current decade if millenium is 2xxx
       m.ErrorPrompt.visible = true
       m.NumberPad.text = date.left(2)
-    else if dateLength = 4 and checkValidYear(date) = false
+    else if dateLength = 4 AND checkValidYear(date) = false
       ' don't allow future years/month/dates
       m.ErrorPrompt.visible = true
       m.NumberPad.text = date.left(3)
@@ -116,7 +116,7 @@ Function onNumberPadTextChanged(msg)
         updateBirthdate(date)
 
         currentYear = createObject("roDateTime").getYear()
-        if isUserToddler(date, currentYear) = true and m.warningDisplayedCount = 0
+        if isUserToddler(date, currentYear) = true AND m.warningDisplayedCount = 0
           m.ErrorPrompt.text = getTranslation("screenAgeVerification_warning_prompt")
           m.ErrorPrompt.visible = true
           m.warningDisplayedCount += 1
@@ -258,8 +258,8 @@ End Function
 
 
 Function stopAllAnimations()
-  if m.yearEntryFade <> invalid and m.yearEntryFade.state <> "stopped" then m.yearEntryFade.control = "stop"
-  if m.yearBgFade <> invalid and m.yearBgFade.state <> "stopped" then m.yearBgFade.control = "stop"
+  if m.yearEntryFade <> invalid AND m.yearEntryFade.state <> "stopped" then m.yearEntryFade.control = "stop"
+  if m.yearBgFade <> invalid AND m.yearBgFade.state <> "stopped" then m.yearBgFade.control = "stop"
 End Function
 
 
@@ -304,7 +304,7 @@ Function checkValidCentury(submittedMillenium, submittedCentury)
 
   currentMillenium = currentYear \ 1000 * 1000
 
-  if submittedMillenium * 1000 = currentMillenium and (submittedCentury * 100) > currentCentury
+  if submittedMillenium * 1000 = currentMillenium AND (submittedCentury * 100) > currentCentury
     ' only check if the submitted century is greater than current century if the submitted millenium
     ' is equal to the current millenium. If the submitted millenium is a previous millenium, then
     ' we could expect centuries of value greater than the current century value. (ie. the 9 in 1987
@@ -330,7 +330,7 @@ Function checkValidDecade(submittedCentury, submittedDecade)
 
   currentCentury = (currentYear MOD 1000) \ 100 * 100
 
-  if submittedCentury * 100 = currentCentury and (submittedDecade * 10) > currentDecade
+  if submittedCentury * 100 = currentCentury AND (submittedDecade * 10) > currentDecade
     ' only check if the submitted decade is greater than current decade if the submitted century
     ' is equal to the current century. If the submitted century is a previous century, then
     ' we could expect decades of value greater than the current decade value. (ie. the 8 in 1987

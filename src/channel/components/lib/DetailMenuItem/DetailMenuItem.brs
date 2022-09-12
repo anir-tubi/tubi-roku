@@ -44,7 +44,7 @@ Function onItemContentChange()
       m.DetailsMenuText.text = m.top.itemContent.title + m.top.itemContent.badgeText
       iconWidth = 0
       'adding extra width for focus if icon is present
-      if m.top.itemContent.iconUrl <> invalid and m.top.itemContent.iconUrl <> ""
+      if m.top.itemContent.iconUrl <> invalid AND m.top.itemContent.iconUrl <> ""
         iconWidth = 36
       end if
       m.top.calculatedTextWidth = m.DetailsMenuText.boundingRect().width + iconWidth
@@ -58,7 +58,7 @@ Function onItemContentChange()
 
     m.buttonBG.visible = m.top.itemContent.isUnfocusedFootprintEnabled
 
-    if m.top.itemContent.playstart <> invalid and m.top.itemContent.playstart <> 0.0 and m.top.itemContent.length <> invalid and m.top.itemContent.length <> 0.0 then
+    if m.top.itemContent.playstart <> invalid AND m.top.itemContent.playstart <> 0.0 AND m.top.itemContent.length <> invalid AND m.top.itemContent.length <> 0.0 then
       showProgressBar(m.top.itemContent.playstart / m.top.itemContent.length)
     else
       m.Progress.visible = false
@@ -66,7 +66,7 @@ Function onItemContentChange()
     m.top.calculatedWidth = m.top.calculatedTextWidth + m.DetailsMenuText.translation[0]
 
     'Move the translation of Button text to left when there is no image
-    if m.top.itemContent.id = "signUpMenuItem" and m.top.itemContent.iconUrl = ""
+    if m.top.itemContent.id = "signUpMenuItem" AND m.top.itemContent.iconUrl = ""
       m.DetailsMenuText.translation = [22, 0]
     else
       m.DetailsMenuText.translation = [72, 0]

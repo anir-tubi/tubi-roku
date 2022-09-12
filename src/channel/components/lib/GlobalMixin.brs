@@ -20,9 +20,9 @@ Function getFieldFromGlobal(fieldName)
   fieldValue = invalid
   attempts = 0
   if fieldName <> invalid
-    while fieldValue = invalid and attempts < 100
+    while fieldValue = invalid AND attempts < 100
       globalAA = m.global
-      if globalAA <> invalid and globalAA[fieldName] <> invalid
+      if globalAA <> invalid AND globalAA[fieldName] <> invalid
         fieldValue = globalAA[fieldName]
       end if
       attempts += 1
@@ -57,7 +57,7 @@ Function removeHistoryLocally(contentId)
   if contentId <> invalid
     historyNode = getHistory(contentId)
     historyIds = getFieldFromGlobal("historyIds")
-    if historyIds <> invalid and historyNode <> invalid
+    if historyIds <> invalid AND historyNode <> invalid
       historyIds.removeChild(historyNode)
     end if
   end if

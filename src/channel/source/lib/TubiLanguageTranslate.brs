@@ -30,7 +30,7 @@ Function getTranslation(sID as string, aDynamicStrings = {}) as String
   end if
 
   sTranslatedString = getTranslationBasedOnLocale(sID, sLocaleID)
-  if sTranslatedString = "" and sLocaleID <> sDefaultLocaleID
+  if sTranslatedString = "" AND sLocaleID <> sDefaultLocaleID
     '//If no translation was found, then use the default locale
     sLocaleID = sDefaultLocaleID
     sTranslatedString = getTranslationBasedOnLocale(sID, sLocaleID)
@@ -38,7 +38,7 @@ Function getTranslation(sID as string, aDynamicStrings = {}) as String
 
   for each param in aDynamicStrings
     sToString = aDynamicStrings[param]
-    if param <> invalid and sToString <> invalid
+    if param <> invalid AND sToString <> invalid
       '//place dynamic text in the translation. Look for and replace brackets {} with the dynamic string
       sFromString = "{" + param + "}"
       sTranslatedString = sTranslatedString.replace(sFromString, sToString)
@@ -75,7 +75,7 @@ Function getTranslationBasedOnLocale(sStringID as String, sLocaleID as String) a
       translations = m.global.translationAA[sLocaleID]
     end if
   end if
-  if translations <> invalid and translations[sStringID] <> invalid and translations[sStringID].message <> invalid
+  if translations <> invalid AND translations[sStringID] <> invalid AND translations[sStringID].message <> invalid
     sTranslatedString = translations[sStringID].message
     sTranslatedString = sTranslatedString.replace("\n", chr(10))
   end if

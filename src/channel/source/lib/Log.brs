@@ -141,15 +141,15 @@ End Function
 '
 'returns invalid if the log was only printed to the console
 Function tubiLog_sendLogging_(logInfo as Object, queue as Object)
-  if logInfo <> invalid and logInfo.count() > 0
-    if logInfo.message <> "" and m.constants <> invalid
+  if logInfo <> invalid AND logInfo.count() > 0
+    if logInfo.message <> "" AND m.constants <> invalid
 
       ' user has set consoleLoggingEnabled to true in their dev.yml/qa.yml
 #if consoleLoggingEnabled
         print m.getLogPrintout(logInfo.level, logInfo.subtype, logInfo.message)
 #end if
 
-      if logInfo["type"] <> invalid and logInfo.level <> "" and logInfo.subtype <> "" and queue <> invalid
+      if logInfo["type"] <> invalid AND logInfo.level <> "" AND logInfo.subtype <> "" AND queue <> invalid
         'don't send debug or info statements unless the user id is in m.constants.idsToLog
         if m.constants.idsToLog.DoesExist(m.constants.deviceInfo.deviceId) or logInfo.level = m.logConsts.warn.name or logInfo.level = m.logConsts.error.name or logInfo.level = m.logConsts.info.name
           loggingRequest = m.getLoggingRequest(logInfo)
@@ -176,11 +176,11 @@ Function tubiLog_getLoggingRequest_(logInfo as Object) as Object
 
   loggingReqBody["user_id"] = 0
   authInfo = m.auth.getAuthInfo()
-  if authInfo <> invalid and authInfo.userId <> invalid
+  if authInfo <> invalid AND authInfo.userId <> invalid
     loggingReqBody["user_id"] = m.auth.getAuthInfo().userId.ToInt()
   end if
 
-  if m.auth <> invalid and m.auth.getAuthInfo() <> invalid and m.auth.getAuthInfo().userId <> invalid
+  if m.auth <> invalid AND m.auth.getAuthInfo() <> invalid AND m.auth.getAuthInfo().userId <> invalid
     loggingReqBody["user_id"] = m.auth.getAuthInfo().userId.ToInt()
   end if
 
@@ -213,7 +213,7 @@ Function tubiLog_getLogPrintout_(level="" as String, subtype="" as String, messa
 
   printout = "LOG "
 
-  if level <> "" and printLevel[level] <> invalid
+  if level <> "" AND printLevel[level] <> invalid
     printout = printout + printLevel[level] + " "
   end if
 
@@ -262,7 +262,7 @@ End Function
 ' @serverTypeName: string, (semi optional - required for sending log to server), a string that must exist in one of the server types in logConsts, (required by logging API)
 ' @subtype: string, (optional), a small string used to differentiate log messages (required by logging API)
 Function tubiLog_helper(logType, message="" as Dynamic, level="debug" as String, serverTypeName="" as String, subtype="" as String) as Void
-  if message <> invalid and message <> ""
+  if message <> invalid AND message <> ""
 
 #if consoleLoggingEnabled
       print tubiLog_getLogPrintout_(level, subtype, message)
@@ -270,9 +270,9 @@ Function tubiLog_helper(logType, message="" as Dynamic, level="debug" as String,
 
     ' if serverTypeName is non empty , involve the tracker task which will send log if
     ' deviceId exists in constants.idsToLog
-    if serverTypeName <> "" and m.global <> invalid and m.global.trackingLoggingTask <> invalid
+    if serverTypeName <> "" AND m.global <> invalid AND m.global.trackingLoggingTask <> invalid
 
-      if level <> "error" and level <> "info" and level <> "warn"
+      if level <> "error" AND level <> "info" AND level <> "warn"
         level = "debug"
       end if
 

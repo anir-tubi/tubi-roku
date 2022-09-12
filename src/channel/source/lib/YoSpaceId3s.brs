@@ -42,7 +42,7 @@ Function yoSpaceId3s_setTag(tag, value)
     if value = "S" then m.type = "start"
     if value = "M" then m.type = "middle"
     if value = "E" then m.type = "end"
-  else if tag = "YSEQ" and (type(value) = "String" or type(value) = "roString")
+  else if tag = "YSEQ" AND (type(value) = "String" or type(value) = "roString")
     segs = value.split(":")
     m.segment = segs[0].toInt()
     m.totalSegmentAmt = segs[1].toInt()

@@ -107,7 +107,7 @@ Function playContent()
 
   'start_live_video user event analytics
   hasSubtitles = false
-  if m.Video.globalCaptionMode = "On" and m.Video.content.hasSubtitles = true and m.top.fullscreen = true
+  if m.Video.globalCaptionMode = "On" AND m.Video.content.hasSubtitles = true AND m.top.fullscreen = true
     hasSubtitles = true
   end if
 
@@ -219,7 +219,7 @@ Function onControlChange()
     stopVideo()
   else if m.top.control = "pause" then
     pauseVideo()
-  else if m.top.control = "resume" and m.Video.state = "paused" then
+  else if m.top.control = "resume" AND m.Video.state = "paused" then
     resumeFromPause()
   else if m.top.control = "error"
     stopVideo()
@@ -235,7 +235,7 @@ Function onVideoStateChange(msg)
   state = msg.GetData()
 
   sPreviousState = m.top.state
-  if state = "finished" and m.VideoState = "play"
+  if state = "finished" AND m.VideoState = "play"
     if m.didAdvanceDrm = true
       ' video player always changes state to "finished" after reaching a state of "error"
       ' so we wait until the "finished" state is reached to play the next available stream for the video
@@ -268,7 +268,7 @@ Function onVideoStateChange(msg)
       m.top.errorMsg = getTranslation("videoPlayer_error_playback_description") 'is used in error modal
       m.top.state = state 'triggers error modal in ContentController
     end if
-  else if state = "stopped" and m.VideoState = "stop"
+  else if state = "stopped" AND m.VideoState = "stop"
     ' player has stopped (not due to an ad break)
     if m.Video.content <> invalid
       ' the video has been stopped, send a final playProgressEvent
@@ -278,7 +278,7 @@ Function onVideoStateChange(msg)
       end if
       m.top.state = state
     end if
-  else if state = "playing" and m.VideoState <> "pause"
+  else if state = "playing" AND m.VideoState <> "pause"
     ' reset the last ping time to the position at which video playback is starting or re-starting (after a seek)
     ' in order to avoid race conditions in which the video position might update while the handle logic is being completed.
     m.lastPingTime = m.Video.position
@@ -288,8 +288,8 @@ Function onVideoStateChange(msg)
   if state = "playing" or state = "paused"
     m.Loading.visible = false
     m.top.state = state
-    if m.top.state = "playing" and (sPreviousState = "stopped" or sPreviousState = "") and m.top.fullscreen = true
-      if m.VideoOverlay.timeGridContentLoading = false and m.VideoOverlay.timeGridContent <> invalid and m.top.allowTransportToAppear = true
+    if m.top.state = "playing" AND (sPreviousState = "stopped" or sPreviousState = "") AND m.top.fullscreen = true
+      if m.VideoOverlay.timeGridContentLoading = false AND m.VideoOverlay.timeGridContent <> invalid AND m.top.allowTransportToAppear = true
         showOverlay(true)
       end if
     end if
@@ -312,7 +312,7 @@ Function onVideoPositionChange()
     m.AdsSSAITask.videoPosition = m.Video.position
   end if
 
-  if m.VideoState = "play" and m.VideoOverlay <> invalid and m.VideoOverlay.isDisplaying = true and m.playerPosition > m.lastButtonPressPos + m.overlayAutoHideTime and m.VideoOverlay.epgScrollingStatus = false
+  if m.VideoState = "play" AND m.VideoOverlay <> invalid AND m.VideoOverlay.isDisplaying = true AND m.playerPosition > m.lastButtonPressPos + m.overlayAutoHideTime AND m.VideoOverlay.epgScrollingStatus = false
     '//After some time has elapsed and the channel guide isn't currently visible and loading, then hide the overlay
     hideOverlay()
   end if
@@ -342,7 +342,7 @@ Function onFullScreenChange()
     hideProgrammingData()
 
     if m.top.state = "playing"
-      if m.VideoOverlay.timeGridContentLoading = false and m.VideoOverlay.timeGridContent <> invalid and m.top.allowTransportToAppear = true
+      if m.VideoOverlay.timeGridContentLoading = false AND m.VideoOverlay.timeGridContent <> invalid AND m.top.allowTransportToAppear = true
         '//Set the showOverlay() function's param to true to display on delay so player has time to animate into fullscreen and user has time to view the player w/o an overlay
         showOverlay(true)
       end if
@@ -390,9 +390,9 @@ Function onResumePointChange()
   resumeIndex = m.NodeHelpers.getChildIndexById(menuItems, m.ResumeMenuItem.id)
 
   m.ResumeMenuItem.playstart = m.top.resumePoint
-  if resumeIndex = -1 and m.top.resumePoint > 0
+  if resumeIndex = -1 AND m.top.resumePoint > 0
     menuItems.insertChild(m.ResumeMenuItem, 0)
-  else if resumeIndex > -1 and m.top.resumePoint = 0
+  else if resumeIndex > -1 AND m.top.resumePoint = 0
     menuItems.removeChildIndex(resumeIndex)
   end if
   m.Menu.content = menuItems
@@ -451,7 +451,7 @@ Function createContentForClosedCaptioning()
   tubiLog("LineaerVideoPlayerNewScreen.createContentForClosedCaptioning")
   bCaptionsAvailable = false
   availableSubtitleTracks = m.Video.availableSubtitleTracks
-  if availableSubtitleTracks <> invalid and availableSubtitleTracks.Count() > 0
+  if availableSubtitleTracks <> invalid AND availableSubtitleTracks.Count() > 0
     bCaptionsAvailable = true
   end if
 
@@ -468,7 +468,7 @@ Function createContentForClosedCaptioning()
     row.appendChild(content)
     usedLanguage = {} '//make sure only a single language subtitle is displayed and used
     for each track in availableSubtitleTracks
-      if (track.language = "eng" or track.language = "spa") and usedLanguage[track.language] = invalid'//::TODO:: allow for multiple languages. When backend provides more captioning support, then this should be changed
+      if (track.language = "eng" or track.language = "spa") AND usedLanguage[track.language] = invalid'//::TODO:: allow for multiple languages. When backend provides more captioning support, then this should be changed
         bEnabled = false
         if bCaptionsOn = true
           if m.Video.subtitleTrack = track.trackname
@@ -514,7 +514,7 @@ End Function
 Function onBufferingStatus(msg)
   status = msg.GetData()
   m.LoadingMessage.text = ""
-  if status <> invalid and status.percentage <> invalid
+  if status <> invalid AND status.percentage <> invalid
     m.LoadingProgressBar.progress = status.percentage
   end if
 End Function
@@ -563,7 +563,7 @@ Function stopVideo()
   m.VideoState = "stop"
   ' add check so that onVideoStateChange doesn't get called
   ' if the video is already in a non playing state.
-  if m.Video.state <> "stopped" and m.Video.state <> "finished"
+  if m.Video.state <> "stopped" AND m.Video.state <> "finished"
     m.Video.control = "stop"
   end if
 End Function
@@ -629,7 +629,7 @@ End Function
 ' @contentNode: roSGNode, a TubiContentNode
 ' @index: int, the index of the video resource we want to use for DRM
 Function setDrmOnContent(contentNode, index)
-  if contentNode.videoResources <> invalid and contentNode.videoResources.count() > 0 and contentNode.videoResources[index] <> invalid
+  if contentNode.videoResources <> invalid AND contentNode.videoResources.count() > 0 AND contentNode.videoResources[index] <> invalid
     ' reset DRM fields
     contentNode.drmParams = {}
     contentNode.encodingType = ""
@@ -668,7 +668,7 @@ Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, str
     errorInfo.error_message = "Server did not respond with hls segment. Potential 504 or 404. Following segment likely has issue."
     ' Check for position to be > 0 in order to prevent segments from previous videos to populate
     ' the error messaging for the current video.
-    if position > 0 and downloadedSegment <> invalid
+    if position > 0 AND downloadedSegment <> invalid
       ' in the case of errorCode = -3, it likely means there was a 504 or 404 response from the server which ultimately was the source of the error.
       ' we get the last downloaded segment which is the last good segment instead of the current streaming segment, which may be several segments ahead of the bad segment.
       ' in this case, the segment causing the error is the segment AFTER the logged segment.
@@ -684,7 +684,7 @@ Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, str
     else
       errorInfo.error_message = errorMsg
     end if
-    if position > 0 and streamingSegment <> invalid
+    if position > 0 AND streamingSegment <> invalid
       ' streamingSegment can be invalid when the server returns a 504, 404, etc.
       errorInfo.segment_url = removeExcessUrl(streamingSegment.segUrl)
       errorInfo.segment_start_time = streamingSegment.segStartTime
@@ -696,7 +696,7 @@ Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, str
 
   if content <> invalid then errorInfo.video_id = content.id
 
-  if position > 0 and streamInfo <> invalid
+  if position > 0 AND streamInfo <> invalid
     errorInfo.video_url = removeExcessUrl(streamInfo.streamUrl)
   else if content <> invalid
     errorInfo.video_url = removeExcessUrl(content.url)
@@ -787,9 +787,9 @@ End Function
 Function setMinimizedInfoPanelProgrammingDataWithChannelTimeGridContent()
   hideProgrammingData()
 
-  if m.top.channelTimeGridContent <> invalid and m.top.content <> invalid and m.top.content.id = m.top.channelTimeGridContent.id
+  if m.top.channelTimeGridContent <> invalid AND m.top.content <> invalid AND m.top.content.id = m.top.channelTimeGridContent.id
     'if in minimized state and video playing
-    if m.top.fullscreen = false and m.top.state = "playing" and m.top.channelTimeGridContent <> invalid and m.top.channelTimeGridContent.getChildCount() > 0
+    if m.top.fullscreen = false AND m.top.state = "playing" AND m.top.channelTimeGridContent <> invalid AND m.top.channelTimeGridContent.getChildCount() > 0
 
       programData1 = invalid
       programData2 = invalid
@@ -813,19 +813,19 @@ Function setMinimizedInfoPanelProgrammingDataWithChannelTimeGridContent()
         end if
       end for
 
-      if programData1 <> invalid and programData1.title <> invalid
+      if programData1 <> invalid AND programData1.title <> invalid
         '//First, the check that the programData1 is valid. If it is not, then no need to go on as it would look weird to display programData2 w/o displaying programData1
         sProgramTitle1 = programData1.title
-        if programData1.endTime <> invalid and programData1.endTime > 0
+        if programData1.endTime <> invalid AND programData1.endTime > 0
 
           now = getCurrentLocalTime()
           nMinutesLeftOfProgram1 = convertSecondsToMins(programData1.endTime - now)
-          if programData1.startTime <> invalid and programData1.startTime > 0
+          if programData1.startTime <> invalid AND programData1.startTime > 0
             nDurationOfProgram1 = convertSecondsToMins(programData1.endTime - programData1.startTime)
           end if
 
           if programData2 <> invalid
-            if programData2.title <> invalid and programData2.startTime <> invalid and programData2.startTime > 0
+            if programData2.title <> invalid AND programData2.startTime <> invalid AND programData2.startTime > 0
               sProgramTitle2 = programData2.title
               sStartTimeProgram2 = programData2.ShortDescriptionLine1
             end if
@@ -871,7 +871,7 @@ End Function
 
 Function onClosedCaptioningSelected()
   '//::NOTE:: - When  m.Video.globalCaptionMode is changed, it triggers an observer which will change the enabled status of the closed captioning UI options
-  if m.VideoOverlay.closedCaptioningSelectedLanguage <> invalid and m.VideoOverlay.closedCaptioningSelectedLanguage <> ""
+  if m.VideoOverlay.closedCaptioningSelectedLanguage <> invalid AND m.VideoOverlay.closedCaptioningSelectedLanguage <> ""
     m.Video.subtitleTrack = m.VideoOverlay.closedCaptioningSelectedLanguage
     m.Video.globalCaptionMode = "On"
   else
@@ -881,7 +881,7 @@ End Function
 
 
 Function onKeyEvent(key as string, press as boolean) as boolean
-  if press and m.top.fullscreen = true
+  if press AND m.top.fullscreen = true
     tubiLog("LinearVideoPlayerScreen.onKeyEvent key = " + key)
     m.lastButtonPressPos = m.playerPosition
     if m.VideoOverlay.isDisplaying <> true
@@ -907,7 +907,7 @@ End Function
 ' dismiss the epg when ok is pressed on live program
 Function onOKPressed()
   item = m.VideoOverlay.rowItemfocused
-  if item <> invalid and item.count() = 2 and item[1] = 0
+  if item <> invalid AND item.count() = 2 AND item[1] = 0
     hideOverlay()
   end if
 End Function

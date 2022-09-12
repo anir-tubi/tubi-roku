@@ -48,7 +48,7 @@ Function onProgramGridContentFocused(msg)
   itemPosition = msg.getData()
 
   rowItemFocused = m.programGrid.rowItemFocused
-  if Type(rowItemFocused) = "roArray" and doesSendEvent(m.lastItemFocused, rowItemFocused) = true
+  if Type(rowItemFocused) = "roArray" AND doesSendEvent(m.lastItemFocused, rowItemFocused) = true
     previousItemFocused = invalid
     if m.programGrid.content.getChild(m.lastItemFocused[0]) <> invalid
       previousItemFocused = m.programGrid.content.getChild(m.lastItemFocused[0]).getchild(m.lastItemFocused[1])
@@ -63,12 +63,12 @@ Function onProgramGridContentFocused(msg)
     m.lastItemFocused = rowItemFocused
 
     pageType = ""
-    if m.top.trackingPageInfo <> invalid and m.top.trackingPageInfo.pagetype <> invalid
+    if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pagetype <> invalid
       pageType = m.top.trackingPageInfo.pagetype
     end if
 
     pageValues = {}
-    if m.top.trackingPageInfo <> invalid and m.top.trackingPageInfo.pageValues <> invalid
+    if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pageValues <> invalid
       pageValues = m.top.trackingPageInfo.pageValues
     end if
     navigateWithinPageInfo = {
@@ -82,15 +82,15 @@ Function onProgramGridContentFocused(msg)
 
   end if
 
-  if itemPosition <> invalid and itemPosition.count() = 2
+  if itemPosition <> invalid AND itemPosition.count() = 2
     channel = channelItem.content.getChild(itemPosition[0])
     if m.playOnFocusMode = true or m.top.linearChannelToPlay = invalid 'anytime linearChannelToPlay is invalid, assign focused channel to play?
-      if channel <> invalid and channel.videoResources <> invalid
+      if channel <> invalid AND channel.videoResources <> invalid
         m.top.linearChannelToPlay = channel
         m.top.linearChannelToPlayUpdated = true
       end if
     end if
-    if channel <> invalid and channel.getChildCount() > 0
+    if channel <> invalid AND channel.getChildCount() > 0
       program = channel.getChild(itemPosition[1])
       m.top.linearChannelFocused = program
       m.top.linearChannelFocusedUpdated = true
@@ -110,10 +110,10 @@ Function onProgramGridContentSelected(msg)
   tubiLog("ProgramGrid.onProgramGridContentSelected")
   programGrid = msg.getRoSGNode()
   itemPosition = msg.getData()
-  if itemPosition <> invalid and itemPosition.count() = 2
+  if itemPosition <> invalid AND itemPosition.count() = 2
     m.lastProgramGuideComponentFocused = invalid
     channelItem = programGrid.content.getChild(itemPosition[0])
-    if channelItem <> invalid and channelItem.getChildCount() > 0
+    if channelItem <> invalid AND channelItem.getChildCount() > 0
       programItem = channelItem.getChild(itemPosition[1])
 
       row = itemPosition[0] + 1
@@ -184,12 +184,12 @@ End Function
 'based on m.top.jumpToLinearChannelID, this function will jump to channel
 Function onJumpToLinearChannelID()
   tubiLog("ProgramGuide.onJumpToLinearChannelID")
-  if m.programGrid.content <> invalid and m.top.jumpToLinearChannelID <> invalid and m.top.jumpToLinearChannelID.count() = 2
+  if m.programGrid.content <> invalid AND m.top.jumpToLinearChannelID <> invalid AND m.top.jumpToLinearChannelID.count() = 2
     for i = 0 to m.programGrid.content.getchildCount() - 1
       item = m.programGrid.content.getchild(i)
       if item.id = m.top.jumpToLinearChannelID[0]
         m.programGrid.jumpToRowItem = [i , 0]
-        if item <> invalid and item.getChildCount() > 0
+        if item <> invalid AND item.getChildCount() > 0
           program = item.getChild(0)
           m.top.linearChannelFocused = program
           '//::TODO:: EPG - why doesn't setting of linearChannelFocusedUpdated trigger EPGScreen.onLinearChannelFocused from calling?
@@ -202,7 +202,7 @@ Function onJumpToLinearChannelID()
             setComponentInteractionEventForLiveAndFuturePrograms(program, rowNum, colNum)
           end if
         end if
-        if m.playOnFocusMode = false and m.top.linearChannelToPlay <> invalid and m.top.linearChannelToPlay.id <> item.id
+        if m.playOnFocusMode = false AND m.top.linearChannelToPlay <> invalid AND m.top.linearChannelToPlay.id <> item.id
           m.top.linearChannelToPlay = item 'after the jump, set the linearchannelToplay to focused content.
           m.top.linearChannelToPlayUpdated = true
         end if
@@ -241,7 +241,7 @@ Function onUpdateMinsLeftTimer()
       if channel <> invalid
         for j = 0 to channel.getChildCount() - 1
           program = channel.getChild(j)
-          if program <> invalid and program.endTime <> 0
+          if program <> invalid AND program.endTime <> 0
             if program.endTime - now <= 0
               channel.removeChildIndex(j)
             else if isProgramLive(program) = true
@@ -258,13 +258,13 @@ End Function
 
 Function onOkPressed()
   tubiLog("ProgramGrid.onOkPressed")
-  if m.top.linearChannelFocused <> invalid and isProgramLive(m.top.linearChannelFocused)
+  if m.top.linearChannelFocused <> invalid AND isProgramLive(m.top.linearChannelFocused)
    itemPosition =  m.programGrid.rowItemFocused
     m.top.linearChannelToPlay = m.top.linearChannelFocused.getParent()
     m.top.linearChannelToPlayUpdated = true
     m.top.okPressed = true
     channelItem = m.programGrid.content.getChild(itemPosition[0])
-    if channelItem <> invalid and channelItem.getChildCount() > 0
+    if channelItem <> invalid AND channelItem.getChildCount() > 0
       programItem = channelItem.getChild(itemPosition[1])
       row = itemPosition[0] + 1
       col = itemPosition[1] + 1
@@ -300,12 +300,12 @@ Function setComponentInteractionEventForLiveAndFuturePrograms(content, rowNum, c
     content_tile: m.Tracking.getAnalyticsTile(content, colNum, rowNum)
   }
   pageType = ""
-  if m.top.trackingPageInfo <> invalid and m.top.trackingPageInfo.pagetype <> invalid
+  if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pagetype <> invalid
     pageType = m.top.trackingPageInfo.pagetype
   end if
 
   pageValues = {}
-  if m.top.trackingPageInfo <> invalid and m.top.trackingPageInfo.pageValues <> invalid
+  if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pageValues <> invalid
     pageValues = m.top.trackingPageInfo.pageValues
   end if
   componentInteractionInfo = {
@@ -323,13 +323,13 @@ End Function
 '@rowItemFocused: roArray, currentFocusedItem on the programGrid
 Function doesSendEvent(lastItemFocused, rowItemFocused)
   isEqual = true
-  if lastItemFocused.count() = rowItemFocused.count() and rowItemFocused.count() = 2
+  if lastItemFocused.count() = rowItemFocused.count() AND rowItemFocused.count() = 2
     'to avoid duplicates, when onProgramGridContentFocused() gets invoked twice.
-    if rowItemFocused[1] = lastItemFocused[1] and rowItemFocused[0] = lastItemFocused[0]
+    if rowItemFocused[1] = lastItemFocused[1] AND rowItemFocused[0] = lastItemFocused[0]
       isEqual = false
     'this will avoid the duplicate events when up/down navigation, as the item
     'jumped to [currentRowFocused, 0] and then jump to the correct item.
-    else if rowItemFocused[1] = 0 and rowItemFocused[0] = lastItemFocused[0] and (m.programGrid.kepPressed = "up" or m.programGrid.kepPressed = "down")
+    else if rowItemFocused[1] = 0 AND rowItemFocused[0] = lastItemFocused[0] AND (m.programGrid.kepPressed = "up" or m.programGrid.kepPressed = "down")
       isEqual = false
     end if
   end if

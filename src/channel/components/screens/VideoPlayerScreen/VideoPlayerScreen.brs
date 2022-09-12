@@ -322,7 +322,7 @@ Function playContent()
     ' reset the seekReferenceQueue
     m.seekReferenceQueue = []
 
-    if m.Video.content.nowPos <> invalid and m.Video.content.nowPos >= 0
+    if m.Video.content.nowPos <> invalid AND m.Video.content.nowPos >= 0
       m.playerPosition = m.Video.content.nowPos
       m.lastSavedPosition = m.Video.content.nowPos
       updateLastPingTime(m.Video.content.nowPos)
@@ -352,7 +352,7 @@ Function playContent()
       isEmbedded = false
 
       hasSubtitles = false
-      if m.Video.globalCaptionMode = "On" and m.Video.content.hasSubtitles = true
+      if m.Video.globalCaptionMode = "On" AND m.Video.content.hasSubtitles = true
         hasSubtitles = true
       end if
 
@@ -457,7 +457,7 @@ Function onControlChange()
     end if
   else if m.top.control = "pause" then
     pauseVideo(false, false)
-  else if m.top.control = "resume" and m.Video.state = "paused" then
+  else if m.top.control = "resume" AND m.Video.state = "paused" then
     resumeFromPause(false)
   end if
 End Function
@@ -468,14 +468,14 @@ Function onVideoStateChange(msg)
   tubiLog("VideoPlayer.onVideoStateChange " + msg.GetData())
   state = msg.GetData()
 
-  if state = "finished" and m.VideoState = "play"
+  if state = "finished" AND m.VideoState = "play"
     if m.didAdvanceDrm = true
       ' video player always changes state to "finished" after reaching a state of "error"
       ' so we wait until the "finished" state is reached to play the next available stream for the video
       ' in order to prevent race conditions due to video player state changing.
       m.didAdvanceDrm = false
       ' ensure that when the new DRM resource plays, it starts where the previous resource had been playing - if it had been playing
-      if m.Video.content <> invalid and m.playerPosition >= 0
+      if m.Video.content <> invalid AND m.playerPosition >= 0
         m.Video.content.nowPos = m.playerPosition
       end if
       playContent()
@@ -521,7 +521,7 @@ Function onVideoStateChange(msg)
       m.top.errorMsg = getTranslation("videoPlayer_error_playback_description")  'is used in error modal
       m.top.state = state   'triggers error modal in ContentController
     end if
-  else if state = "stopped" and m.VideoState = "stop"
+  else if state = "stopped" AND m.VideoState = "stop"
     ' player has stopped (not due to an ad break)
     if m.top.adState = "noads" or m.top.adState = "init"
       if m.Video.content <> invalid
@@ -554,7 +554,7 @@ Function onVideoStateChange(msg)
   end if
 
   if state = "playing"
-    if m.showRatings = true and m.ratingOverlay.opacity  = 0.0 and m.AdHeadsUp.visible = false
+    if m.showRatings = true AND m.ratingOverlay.opacity  = 0.0 AND m.AdHeadsUp.visible = false
       m.showRatings = false
       showRatingOverlay()
     end if
@@ -578,7 +578,7 @@ End Function
 Function onVideoPositionChange()
 
   positionLog = ""
-  if m.Video <> invalid and m.Video.position <> invalid
+  if m.Video <> invalid AND m.Video.position <> invalid
     positionLog = m.Video.position.toStr()
   end if
   tubiLog("VideoPlayer.onVideoPositionChange position = " + positionLog)
@@ -590,7 +590,7 @@ Function onVideoPositionChange()
   end if
 
   ' show the TV Rating/Descriptors every hour
-  if m.ratingInterval  >= (60 * 60) and m.ratingOverlay.opacity = 0.0 and m.AdHeadsUp.visible = false
+  if m.ratingInterval  >= (60 * 60) AND m.ratingOverlay.opacity = 0.0 AND m.AdHeadsUp.visible = false
     showRatingOverlay()
   end if
 
@@ -600,12 +600,12 @@ Function onVideoPositionChange()
   end if
 
   ' Auto hide transport
-  if m.VideoState = "play" and m.HUD.opacity = 1 and m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime
+  if m.VideoState = "play" AND m.HUD.opacity = 1 AND m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime
     animateTransport("out")
   end if
 
   ' Cancel temporary captions
-  if m.replayCaptionEnd <> 0 and m.playerPosition >= m.replayCaptionEnd
+  if m.replayCaptionEnd <> 0 AND m.playerPosition >= m.replayCaptionEnd
     cancelReplayCaptions()
   end if
 
@@ -613,7 +613,7 @@ Function onVideoPositionChange()
   if m.VideoState = "play"
     ' videoPosition can change after the player has been paused (like right button press),
     ' we do not want to send play progress events in that case.
-    if m.playerPosition >= m.lastPingTime + m.analyticsInterval and playProgressOk = true
+    if m.playerPosition >= m.lastPingTime + m.analyticsInterval AND playProgressOk = true
       playProgressEvent = getPlayProgressEvent()
       if playProgressEvent <> invalid
         updateLastPingTime(m.playerPosition)
@@ -626,14 +626,14 @@ Function onVideoPositionChange()
   ' NOTE: historyPosition should not be set near an ad break due to race condition where RAF being
   ' invoked will cause the AuthTask thread to get stuck, never completing and staying in a "run"
   ' state perpetually.
-  if (m.playerPosition > m.lastsavedPosition + m.historyInterval or m.playerPosition < m.lastsavedPosition - m.historyInterval) and m.top.adState <> "adspending"
+  if (m.playerPosition > m.lastsavedPosition + m.historyInterval or m.playerPosition < m.lastsavedPosition - m.historyInterval) AND m.top.adState <> "adspending"
     historyPosition(m.playerPosition)
   end if
 
   ' Credits Cuepoint / Up Next (Autoplay)
   content = m.top.content
-  if content <> invalid and content.creditsCuePoints <> invalid and content.creditsCuePoints.postlude <> invalid and content.creditsCuePoints.postlude > 0
-    if m.playerPosition >= content.creditsCuePoints.postlude and m.shouldShowUpNext = true
+  if content <> invalid AND content.creditsCuePoints <> invalid AND content.creditsCuePoints.postlude <> invalid AND content.creditsCuePoints.postlude > 0
+    if m.playerPosition >= content.creditsCuePoints.postlude AND m.shouldShowUpNext = true
       ' Always fire history here to fix a race condition where the user has
       ' watched beyond the cuepoint but the title doesn't get removed due
       ' to no history events triggering after the cuepoint
@@ -665,7 +665,7 @@ Function onVideoPositionChange()
   end if
 
   'set the content, focus to SkipIntro and send exposure event when Skip Intro/recap/early credit cue points available
-    if content <> invalid and content.creditsCuePoints <> invalid
+    if content <> invalid AND content.creditsCuePoints <> invalid
       if isSkipIntroCuePointsReached(content.creditsCuePoints)
         'implement intro
         if canSkipIntroShown(m.constants.player.skipIntroId.intro, playProgressOk)
@@ -693,21 +693,21 @@ Function onVideoPositionChange()
     end if
 
     'Advertisements
-    if m.top.enableAds = true and m.midrolls.count() > 0 then
+    if m.top.enableAds = true AND m.midrolls.count() > 0 then
 
       m.AdHeadsUp.visible = false  ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown
 
       ' attempt to fetch midroll ads before actual cuepoint
       potentialCuepoint = m.playerPosition + m.adPrefetchTime
       isCuepointPrefetchTimeReached = m.midrolls[strI(potentialCuepoint)]
-      if isCuepointPrefetchTimeReached = true and m.UpNext.opacity = 0
+      if isCuepointPrefetchTimeReached = true AND m.UpNext.opacity = 0
         m.top.adPosition = potentialCuepoint
         m.top.adControl = "midroll"
       end if
 
       ' show the ads countdown if appropriate (show if ads are available and within adHeadsUpTime)
       adPosition = m.top.adPosition
-      if m.top.adState = "adspending" and isInWindow(m.playerPosition, adPosition, m.adHeadsUpTime) = true
+      if m.top.adState = "adspending" AND isInWindow(m.playerPosition, adPosition, m.adHeadsUpTime) = true
         if m.Overlay.opacity = 0
           ' Don't show the ad heads up when the transport/overlay is showing, since it crowds the space of the title on the overlay
           m.ratingOverlay.opacity = 0
@@ -717,7 +717,7 @@ Function onVideoPositionChange()
 
       ' check midroll and fire if any
       isCuepointReached = m.midrolls[strI(m.playerPosition)]
-      if isCuepointReached = true and m.UpNext.opacity = 0
+      if isCuepointReached = true AND m.UpNext.opacity = 0
         m.AdHeadsUp.visible = false
         if m.top.adState = "adspending" then
           ' Send a play_progress event before we show ads to be most accurate in case the user exits during ad playback
@@ -776,7 +776,7 @@ End Function
 
 ' Returns true if the position is between (target - window) and the target
 Function isInWindow(position, target, window)
-  return (position >= (target - window) and position < target)
+  return (position >= (target - window) AND position < target)
 End Function
 
 
@@ -800,16 +800,16 @@ Function onAdStateChange()
       ' to fix the issue.
       m.top.adControl = m.top.adControl
     end if
-  else if m.top.adState = "adspending" and (m.top.adControl = "preroll" or m.top.adControl = "seek") and m.top.enableAds = true then
+  else if m.top.adState = "adspending" AND (m.top.adControl = "preroll" or m.top.adControl = "seek") AND m.top.enableAds = true then
     ' Midrolls are triggered from position changes since they are prefetched.  Other ad breaks have
     ' video playback stopped and should play right away when we get adspending.
     ' pre-roll or resume-roll. Play ads right away
     showAdBreak()
     m.showRatings = true
-  else if m.top.adState = "noads" and (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip" or m.VideoState = "hop") and m.Video.state <> "playing" then
+  else if m.top.adState = "noads" AND (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip" or m.VideoState = "hop") AND m.Video.state <> "playing" then
     ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
     ' TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
-    if m.Video.content.url <> invalid and m.Video.content.url <> ""
+    if m.Video.content.url <> invalid AND m.Video.content.url <> ""
       m.top.setFocus(true)
       m.seekReferenceQueue.push(m.playerPosition)
       seekToPosition(m.playerPosition)
@@ -921,7 +921,7 @@ Function onSpritesReceived(msg)
     ' it's confusing when reading the logs.
     tubiLog("VideoPlayer.onSpritesReceived")
 
-    if thumbnailsInfo.thumbnailUrls <> invalid and thumbnailsInfo.thumbnailUrls.count() > 0
+    if thumbnailsInfo.thumbnailUrls <> invalid AND thumbnailsInfo.thumbnailUrls.count() > 0
       m.Thumbnail.numSprites = thumbnailsInfo.thumbnailSpan
       m.Thumbnail.rows = thumbnailsInfo.thumbnailRows
       m.Thumbnail.columns = thumbnailsInfo.thumbnailColumns
@@ -979,7 +979,7 @@ Function onUpNextOpacityChange(msg)
   ' in the case that the video finished and the up next UI was still showing, we did not update m.top.state
   ' which triggers the next video to autoplay. But now the up next UI has been closed, so we
   ' are ready to trigger the autoplay by setting m.top.state
-  if opacity = 0 and m.VideoState = "stop"
+  if opacity = 0 AND m.VideoState = "stop"
     ' we hard code finished instead of referencing m.VideoPlayer.state because m.VideoPlayer.state
     ' changes from "playing" to "finished" and then to "stopped" when video playback completes and
     ' VideoHelpers is looking specifically for the "finished" state.
@@ -1004,7 +1004,7 @@ End Function
 Function onBufferingStatus(msg)
   status = msg.GetData()
   m.LoadingMessage.text = ""
-  if status <> invalid and status.percentage <> invalid
+  if status <> invalid AND status.percentage <> invalid
     m.LoadingProgressBar.progress = status.percentage
   end if
 End Function
@@ -1056,7 +1056,7 @@ End Function
 
 
 Function cancelReplayCaptions()
-  if m.video.globalCaptionMode = "On" and m.replayCaptionEnd <> 0
+  if m.video.globalCaptionMode = "On" AND m.replayCaptionEnd <> 0
     tubilog("Turning off replay captions")
     m.replayCaptionEnd = 0
     m.video.globalCaptionMode = "Instant replay"
@@ -1135,7 +1135,7 @@ Function stopVideo()
 
   ' add check so that onVideoStateChange doesn't get called
   ' if the video is already in a non playing state.
-  if m.Video.state <> "stopped" and m.Video.state <> "finished"
+  if m.Video.state <> "stopped" AND m.Video.state <> "finished"
     m.Video.control = "stop"
   end if
 End Function
@@ -1161,7 +1161,7 @@ Function updateVideoPlayerState(content) as Void
   ' make the content available to the video node
   m.Video.content = content
   m.ratingLabel.text = ""
-  if content.rating <> invalid and content.rating <> ""
+  if content.rating <> invalid AND content.rating <> ""
 
     m.ratingLabel.width = 0
     m.ratingLabel.text = Ucase(content.rating)
@@ -1173,7 +1173,7 @@ Function updateVideoPlayerState(content) as Void
   m.descriptorCode.text = ""
   descriptorCode = content.descriptorCode
   sDescriptorCodeText = ""
-  if descriptorCode <> invalid and descriptorCode <> ""
+  if descriptorCode <> invalid AND descriptorCode <> ""
     sDescriptorCodeText = UCase(descriptorCode)
   end if
   m.descriptorCode.text = sDescriptorCodeText
@@ -1182,7 +1182,7 @@ Function updateVideoPlayerState(content) as Void
   descriptorDescription = content.descriptorDescription
   sDescriptorDescText = ""
   ' if the descriptor is not present, reduce the height of rating bar
-  if descriptorDescription <> invalid and descriptorDescription <> ""
+  if descriptorDescription <> invalid AND descriptorDescription <> ""
     sDescriptorDescText = descriptorDescription
     m.ratingBar.height = 87
   else
@@ -1275,7 +1275,7 @@ End Function
 ' @index: int, the index of the video resource we want to use for DRM
 Function setDrmOnContent(contentNode, index)
   tubiLog("VideoPlayer.setDrmOnContent")
-  if contentNode.videoResources <> invalid and contentNode.videoResources.count() > 0 and contentNode.videoResources[index] <> invalid and contentNode.isTrailer <> true
+  if contentNode.videoResources <> invalid AND contentNode.videoResources.count() > 0 AND contentNode.videoResources[index] <> invalid AND contentNode.isTrailer <> true
     ' reset DRM fields
     contentNode.drmParams = {}
     contentNode.encodingType = ""
@@ -1314,7 +1314,7 @@ Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, str
     errorInfo.error_message = "Server did not respond with hls segment. Potential 504 or 404. Following segment likely has issue."
     ' Check for position to be > 0 in order to prevent segments from previous videos to populate
     ' the error messaging for the current video.
-    if position > 0 and downloadedSegment <> invalid
+    if position > 0 AND downloadedSegment <> invalid
       ' in the case of errorCode = -3, it likely means there was a 504 or 404 response from the server which ultimately was the source of the error.
       ' we get the last downloaded segment which is the last good segment instead of the current streaming segment, which may be several segments ahead of the bad segment.
       ' in this case, the segment causing the error is the segment AFTER the logged segment.
@@ -1330,7 +1330,7 @@ Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, str
     else
       errorInfo.error_message = errorMsg
     end if
-    if position > 0 and streamingSegment <> invalid
+    if position > 0 AND streamingSegment <> invalid
       ' streamingSegment can be invalid when the server returns a 504, 404, etc.
       errorInfo.segment_url = removeExcessUrl(streamingSegment.segUrl)
       errorInfo.segment_start_time = streamingSegment.segStartTime
@@ -1342,7 +1342,7 @@ Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, str
 
   if content <> invalid then errorInfo.video_id = content.id
 
-  if position > 0 and streamInfo <> invalid
+  if position > 0 AND streamInfo <> invalid
     errorInfo.video_url = removeExcessUrl(streamInfo.streamUrl)
   else if content <> invalid
     errorInfo.video_url = removeExcessUrl(content.url)
@@ -1407,7 +1407,7 @@ Function getPlayProgressEvent()
 
     'nominal_speed will be added to the Connection message, rather than the PlayProgressEvent message,
     'but is still sent via this interface
-    if m.Video.streamInfo <> invalid and m.Video.streamInfo.measuredBitrate <> invalid
+    if m.Video.streamInfo <> invalid AND m.Video.streamInfo.measuredBitrate <> invalid
       'measuredBitrate appears to be reported in bits despite the documentation that it is kibibits
       playProgressEvent.values.nominal_speed = Int(m.Video.streamInfo.measuredBitrate / (10^6))
     end if
@@ -1469,7 +1469,7 @@ Function onStreamingSegmentChange(msg)
   streamingSegment = msg.GetData()
 
   'setting segInfo except for audio
-  if streamingSegment <> invalid and streamingSegment.segBitrateBps <> invalid and (streamingSegment.segType = invalid or streamingSegment.segType = 2 or streamingSegment.segType = 0) then
+  if streamingSegment <> invalid AND streamingSegment.segBitrateBps <> invalid AND (streamingSegment.segType = invalid or streamingSegment.segType = 2 or streamingSegment.segType = 0) then
     m.top.segInfo = streamingSegment
   end if
 End Function
@@ -1506,26 +1506,26 @@ End Function
 ' @isPlaying: boolean, videoPosition can change after the player has been paused (like right button press),
 ' we do not want to show when it's fastforward/rewind/buffering or already showing/shown
 Function canSkipIntroShown(skipIntroId, isPlaying)
-  return  m.cuePointsHistory[skipIntroId] = invalid and isPlaying = true and m.SkipIntro.visible = false and m.SkipIntro.id <> skipIntroId
+  return  m.cuePointsHistory[skipIntroId] = invalid AND isPlaying = true AND m.SkipIntro.visible = false AND m.SkipIntro.id <> skipIntroId
 End Function
 
 
 'This function to check Whether the current player position is in between skipIntro cuePoints
 '@creditsCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
 Function isSkipIntroCuePointsReached(creditsCuePoints)
-  return creditsCuePoints.intro_start <> invalid and creditsCuePoints.intro_end <> invalid and creditsCuePoints.intro_start > 0 and m.playerPosition >= creditsCuePoints.intro_start and m.playerPosition <= creditsCuePoints.intro_end
+  return creditsCuePoints.intro_start <> invalid AND creditsCuePoints.intro_end <> invalid AND creditsCuePoints.intro_start > 0 AND m.playerPosition >= creditsCuePoints.intro_start AND m.playerPosition <= creditsCuePoints.intro_end
 End Function
 
 
 'This function to check Whether the current player position is in between skipRecap cuePoints
 '@creditsCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
 Function isSkipRecapCuePointsReached(creditsCuePoints)
-  return creditsCuePoints.recap_start <> invalid and creditsCuePoints.recap_end <> invalid and creditsCuePoints.recap_start > 0 and m.playerPosition >= creditsCuePoints.recap_start and m.playerPosition <= creditsCuePoints.recap_end
+  return creditsCuePoints.recap_start <> invalid AND creditsCuePoints.recap_end <> invalid AND creditsCuePoints.recap_start > 0 AND m.playerPosition >= creditsCuePoints.recap_start AND m.playerPosition <= creditsCuePoints.recap_end
 End Function
 
 
 'This function to check Whether the current player position is in between skipEarlyCredets cuePoints
 '@creditsCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
 Function isSkipEarlyCreditCuePointsReached(creditsCuePoints)
-  return creditsCuePoints.earlycredits_start <> invalid and creditsCuePoints.earlycredits_end <> invalid and creditsCuePoints.earlycredits_start > 0 and m.playerPosition >= creditsCuePoints.earlycredits_start and m.playerPosition <= creditsCuePoints.earlycredits_end
+  return creditsCuePoints.earlycredits_start <> invalid AND creditsCuePoints.earlycredits_end <> invalid AND creditsCuePoints.earlycredits_start > 0 AND m.playerPosition >= creditsCuePoints.earlycredits_start AND m.playerPosition <= creditsCuePoints.earlycredits_end
 End Function

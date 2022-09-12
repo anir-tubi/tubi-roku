@@ -12,7 +12,7 @@ End Function
 
 Function onTextsChange()
   tubiLog("RotatingLabel.onTextsChange")
-  if m.top.texts <> invalid and m.top.texts.count() > 0 then
+  if m.top.texts <> invalid AND m.top.texts.count() > 0 then
     m.textsIndex = 0
   else
     m.textsIndex = -1
@@ -72,9 +72,9 @@ End Function
 Function onDisplayTimerFire()
   tubiLog("RotatingLabel.onDisplayTimerFire")
   m.DisplayTimer.unobserveField("fire")
-  if m.top.texts <> invalid and m.top.texts.count() > 0 then
+  if m.top.texts <> invalid AND m.top.texts.count() > 0 then
     m.textsIndex = m.textsIndex + 1
-    if m.top.texts <> invalid and m.textsIndex >= m.top.texts.count() then
+    if m.top.texts <> invalid AND m.textsIndex >= m.top.texts.count() then
       m.textsIndex = 0
     end if
     startCrossfade()

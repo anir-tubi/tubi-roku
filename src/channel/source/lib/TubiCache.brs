@@ -49,7 +49,7 @@ End Function
 '
 ' returns: boolean, true or false depending if the screen was successfully set
 Function tubiCache_setInScreenCache(screen)
-  if screen <> invalid and screen.id <> invalid and m.cacheableScreenIds[screen.id] = true
+  if screen <> invalid AND screen.id <> invalid AND m.cacheableScreenIds[screen.id] = true
     m.screenCache[screen.id] = screen
     return true
   end if
@@ -114,7 +114,7 @@ End Function
 '           This is ok and expected.
 ' returns: boolean, true or false depending if the content was successfully set
 Function tubiCache_setInContentCache(content)
-  if type(content) = "roSGNode" and content.isSubtype("ContentNode") = true and content.id <> invalid
+  if type(content) = "roSGNode" AND content.isSubtype("ContentNode") = true AND content.id <> invalid
 
     ' determine how many content nodes in incoming content
     incomingNodeCount = m.nodeHelpers.countNodes(content)
@@ -127,7 +127,7 @@ Function tubiCache_setInContentCache(content)
 
       ' remove any least recently used (LRU) content from the cache if the cache is too full
       ' to add the new content we want to set in the cache
-      while (cachedNodeCount + incomingNodeCount > m.maxContentNodes) and m.isOnlyPermanentCacheRemaining() = false
+      while (cachedNodeCount + incomingNodeCount > m.maxContentNodes) AND m.isOnlyPermanentCacheRemaining() = false
         leastRecentlyUsedContent = m.getLruContentFromCache()
 
         if leastRecentlyUsedContent <> invalid
@@ -175,7 +175,7 @@ Function tubiCache_getFromContentCache(contentId)
     cachedContent = m.contentCache[contentId]
 
     if cachedContent <> invalid
-      if cachedContent.validUntil <> invalid and cachedContent.validUntil < UpTime(0)
+      if cachedContent.validUntil <> invalid AND cachedContent.validUntil < UpTime(0)
         cachedContent = invalid
         m.deleteFromContentCache(contentId)
         m.deleteFromContentCacheOrder(contentId)
@@ -215,7 +215,7 @@ Function tubiCache_markContentNotValidOnCachedScreens(contentId)
     for each screenId in m.screenCache
       screen = m.screenCache[screenId]
 
-      if screen.content <> invalid and screen.content.id = contentId
+      if screen.content <> invalid AND screen.content.id = contentId
         isContentFound = true
         screen.content.validUntil = 0
       end if
@@ -308,7 +308,7 @@ End Function
 Function tubiCache_isOnlyPermanentCacheRemaining()
   if m.contentCacheOrder.count() > 0
     for each cacheOrderInfo in m.contentCacheOrder
-      if cacheOrderInfo <> invalid and cacheOrderInfo.isPermanent = false
+      if cacheOrderInfo <> invalid AND cacheOrderInfo.isPermanent = false
         return false
       end if
     end for
@@ -327,7 +327,7 @@ End Function
 '
 ' returns: boolean, true if content was successfully added to the contentCacheOrder, otherwise false
 Function tubiCache_addToContentCacheOrder(content)
-  if type(content) = "roSGNode" and content.id <> ""
+  if type(content) = "roSGNode" AND content.id <> ""
     cacheOrderInfo = {
       id: content.id
       totalContentNodeCount: m.nodeHelpers.countNodes(content)

@@ -73,7 +73,7 @@ End Function
 Function onVideoBufferChange()
   bufferPct = m.VideoPlayer.bufferingStatus
   ' when prebuffering, from observation, the buffer percentage never seems to go above 33%
-  if bufferPct <> invalid and bufferPct.percentage >= 33 and m.videoStartAttempted = false
+  if bufferPct <> invalid AND bufferPct.percentage >= 33 AND m.videoStartAttempted = false
     startVideo()
   end if
 End Function

@@ -25,7 +25,7 @@ End Function
 ' Success making changes to the like/dislike settings
 Function parseContentRateSuccess(_fullResponse, reqInfo)
   returnResponse = {}
-  if reqInfo <> invalid and reqInfo.options <> invalid and reqInfo.options.body <> invalid
+  if reqInfo <> invalid AND reqInfo.options <> invalid AND reqInfo.options.body <> invalid
     returnResponse = reqInfo.options.body
   end if
 
@@ -36,10 +36,10 @@ End Function
 ' Error making changes to the like/dislike settings
 Function parseContentRateError(fullResponse, reqInfo)
   returnParsed = {}
-  if reqInfo <> invalid and reqInfo.options <> invalid and reqInfo.options.body <> invalid
+  if reqInfo <> invalid AND reqInfo.options <> invalid AND reqInfo.options.body <> invalid
     returnParsed = parseJSON(reqInfo.options.body)
   end if
-  if fullResponse <> invalid and fullResponse.code <> invalid
+  if fullResponse <> invalid AND fullResponse.code <> invalid
     returnParsed.code = fullResponse.code
   end if
 

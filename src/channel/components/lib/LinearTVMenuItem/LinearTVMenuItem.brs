@@ -26,7 +26,7 @@ Function onItemContentChange()
     if m.top.itemContent.title <> invalid
       m.MenuText.text = m.top.itemContent.title
     end if
-    if m.top.itemContent.inlineLogoUri <> invalid and m.top.itemContent.inlineLogoUri <> ""
+    if m.top.itemContent.inlineLogoUri <> invalid AND m.top.itemContent.inlineLogoUri <> ""
       m.Icon.uri = m.top.itemContent.inlineLogoUri
     end if
   end if

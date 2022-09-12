@@ -155,7 +155,7 @@ End Function
 ' stops the video
 Function stopContent()
 
-  if m.Video.state <> "stopped" and m.Video.state <> "finished"
+  if m.Video.state <> "stopped" AND m.Video.state <> "finished"
     if m.Video.content.id <> invalid
       finishPreviewEvent = getFinishPreviewEvent()
       trackEvent(finishPreviewEvent)
@@ -180,7 +180,7 @@ End Function
 Function getPreviewProgressEvent(pageType)
 
   previewProgressEvent = invalid
-  if m.playerPosition > m.lastPingTime and m.Video.state = "playing"
+  if m.playerPosition > m.lastPingTime AND m.Video.state = "playing"
 
     viewTime = Int((m.playerPosition - m.lastPingTime) * 1000) 'ms
 
@@ -244,7 +244,7 @@ Function getPlaybackErrorInfo(position, streamInfo, errorCode, errorMsg, content
 
   if content <> invalid then errorInfo.video_id = content.id
 
-  if position > 0 and streamInfo <> invalid
+  if position > 0 AND streamInfo <> invalid
     errorInfo.video_url = removeExcessUrl(streamInfo.streamUrl)
   else if content <> invalid
     errorInfo.video_url = removeExcessUrl(content.url)

@@ -49,9 +49,9 @@ Function execSignUp() As Void
     msg = wait(0, port)
     if type(msg) = "roUrlEvent" then
       result = requestObject.handleEvent(msg)
-      if result <> invalid and result.response <> invalid then
+      if result <> invalid AND result.response <> invalid then
         tubiLog("Received sign up response")
-        if result.response.code >= 200 and result.response.code < 300 then
+        if result.response.code >= 200 AND result.response.code < 300 then
           parsed = ParseJSON(result.response.data)
           if parsed <> invalid
             user_id = parsed.user_id 
@@ -88,9 +88,9 @@ Function execSignUp() As Void
     msg = wait(0, port)
     if type(msg) = "roUrlEvent" then
       result = requestObject.handleEvent(msg)
-      if result <> invalid and result.response <> invalid then
+      if result <> invalid AND result.response <> invalid then
         tubiLog("Received registerCode response")
-        if result.response.code >= 200 and result.response.code < 300 then
+        if result.response.code >= 200 AND result.response.code < 300 then
           parsed = ParseJSON(result.response.data)
           if parsed = invalid
             m.top.error = "registerCode"

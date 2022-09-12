@@ -98,7 +98,7 @@ End Function
 ' a Request object that is cancelled does not emit an event on which handleEvent could
 ' clean up the queue.
 Function tubiq_cancelRequest(request As Object) As Boolean
-  if request <> invalid and request.uuid <> invalid then
+  if request <> invalid AND request.uuid <> invalid then
     i = m.findRequestByUuid_(request.uuid)
     if i <> -1 then
       m.queue[i].request.cancel()
@@ -151,7 +151,7 @@ Function tubiq_advanceQueue_()
   i = 0
   while i < m.queue.Count()
     entry = m.queue[i]
-    if m.timeout <> invalid and m.timeout <> 0 then
+    if m.timeout <> invalid AND m.timeout <> 0 then
       if now - entry.startTime > m.timeout then
         entry.request.cancel()
         m.queue.Delete(i)
@@ -179,7 +179,7 @@ End Function
 Function tubiq_findRequestById_(id As Integer) As Integer
   for i=0 to m.queue.Count() - 1
     entry = m.queue[i]
-    if entry.urltransfer <> invalid and entry.urltransfer.GetIdentity() = id then return i
+    if entry.urltransfer <> invalid AND entry.urltransfer.GetIdentity() = id then return i
   end for
   return -1
 End Function
@@ -187,7 +187,7 @@ End Function
 Function tubiq_findRequestByUuid_(uuid As String) As Integer
   for i=0 to m.queue.Count() - 1
     entry = m.queue[i]
-    if entry.request.uuid <> invalid and entry.request.uuid = uuid then return i
+    if entry.request.uuid <> invalid AND entry.request.uuid = uuid then return i
   end for
   return -1
 End Function

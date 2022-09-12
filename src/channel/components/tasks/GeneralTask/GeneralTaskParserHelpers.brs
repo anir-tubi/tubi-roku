@@ -190,8 +190,8 @@ Function getErrorCodeFromResponse(fullResponse)
   ' default code
   errCode = -1235
 
-  if fullResponse <> invalid and fullResponse.code <> invalid
-    if fullResponse.code >= 200 and fullResponse.code < 400
+  if fullResponse <> invalid AND fullResponse.code <> invalid
+    if fullResponse.code >= 200 AND fullResponse.code < 400
       ' got a valid response code from the server, but there was some other issue with the response
       errCode = -1237
     else

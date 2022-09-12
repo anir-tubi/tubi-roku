@@ -11,10 +11,10 @@ Function onURIChange()
   sCurrentBground = m.SponsorBground.uri
   url = m.top.uri
 
-  if (sCurrentBground <> url or m.FadingGroup.opacity < 1) and m.FadeInURL <> url
+  if (sCurrentBground <> url or m.FadingGroup.opacity < 1) AND m.FadeInURL <> url
     m.FadeInURL = url
     stopObservingFadeOutAnimation()
-    if sCurrentBground <> "" and m.FadingGroup.opacity > 0
+    if sCurrentBground <> "" AND m.FadingGroup.opacity > 0
       '//fade out the existing background. When the fadeOut animation is complete then fade in the new url
       m.animationFadeOut = fade(m.FadingGroup, "out", .25)
       if m.animationFadeOut <> invalid
@@ -39,7 +39,7 @@ End Function
 
 Function onAnimationStateChange(msg)
   state = msg.getData()
-  if m.FadingGroup.opacity = 0 and state = "stopped"
+  if m.FadingGroup.opacity = 0 AND state = "stopped"
     '//The fading group has completely faded out, now fade in the desired URL
     fadeInBackground()
   end if

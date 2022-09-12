@@ -60,7 +60,7 @@ Function tubiTracking_getAnalyticsUser_test()
   m.assertNotInvalid(user.auth_type)
   m.assertTrue(user.auth_type = "UNKNOWN" or user.auth_type = "NOT_AUTHED")
   m.assertTrue(type(user.user_id) = "roInteger")
-  m.assertTrue((user.auth_type = "UNKNOWN" and user.user_id > 0) or (user.auth_type = "NOT_AUTHED" and user.user_id = 0))
+  m.assertTrue((user.auth_type = "UNKNOWN" AND user.user_id > 0) or (user.auth_type = "NOT_AUTHED" AND user.user_id = 0))
 
 End Function
 

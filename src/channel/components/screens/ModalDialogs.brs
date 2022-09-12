@@ -25,7 +25,7 @@
 '               }
 Function showModal(modalInfo, buttonInfo)
   ' Don't create the modal if a modal already exists, or there is not enough info to create it
-  if m.tempModal = invalid and modalInfo <> invalid and buttonInfo <> invalid
+  if m.tempModal = invalid AND modalInfo <> invalid AND buttonInfo <> invalid
     modal = CreateObject("roSGNode", "ModalDialogScreen")
     modal.title = modalInfo.title
     modal.message = modalInfo.message
@@ -50,7 +50,7 @@ Function showModal(modalInfo, buttonInfo)
     modal.visible = true
     modal.setFocus(true)
     ' send the show dialog track event
-    if modalInfo.openTrackEvent <> invalid and modalInfo.trackingTask <> invalid
+    if modalInfo.openTrackEvent <> invalid AND modalInfo.trackingTask <> invalid
       modalInfo.trackingTask.trackEvent = modalInfo.openTrackEvent
     end if
 
@@ -89,7 +89,7 @@ Function closeModal(modal, buttonSelected = invalid)
   end if
 
   'send the dismiss dialog analytic event
-  if trackEvent <> invalid and trackEvent.values <> invalid and trackingTask <> invalid
+  if trackEvent <> invalid AND trackEvent.values <> invalid AND trackingTask <> invalid
     trackEvent.values.dialog_action = "DISMISS_AUTO"
 
     if buttonSelected = invalid
@@ -99,7 +99,7 @@ Function closeModal(modal, buttonSelected = invalid)
         'the user has pressed the back buttons on the remote
         trackEvent.values.dialog_action = "DISMISS_DELIBERATE"
       end if
-    else if buttonInfo <> invalid and buttonSelected <> invalid and buttonInfo[buttonSelected] <> invalid
+    else if buttonInfo <> invalid AND buttonSelected <> invalid AND buttonInfo[buttonSelected] <> invalid
       'the user selected one of the dialog buttons
       if buttonInfo[buttonSelected].type = "accept"
         trackEvent.values.dialog_action = "ACCEPT_DELIBERATE"
@@ -129,7 +129,7 @@ Function closeModal(modal, buttonSelected = invalid)
         end if 
       end if
     end if
-  else if buttonInfo <> invalid and buttonSelected <> invalid and buttonInfo[buttonSelected] <> invalid
+  else if buttonInfo <> invalid AND buttonSelected <> invalid AND buttonInfo[buttonSelected] <> invalid
     callback = buttonInfo[buttonSelected].callback
     if callback <> invalid
       callbackParams = buttonInfo[buttonSelected].callbackParams
@@ -370,7 +370,7 @@ Function getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, 
 
   'always create at least one button
   firstButtonText = getTranslation("dialog_button_ok")
-  if type(buttons) = "roArray" and (type(buttons[0]) = "roString" or type(buttons[0]) = "String")
+  if type(buttons) = "roArray" AND (type(buttons[0]) = "roString" or type(buttons[0]) = "String")
     firstButtonText = buttons[0]
   end if
   buttonOne = {
@@ -382,7 +382,7 @@ Function getSimpleModalInfo(title, message, buttons, dialogEvent, trackingTask, 
   buttonInfo.push(buttonOne)
 
   'second button is optional
-  if type(buttons) = "roArray" and (type(buttons[1]) = "roString" or type(buttons[1]) = "String")
+  if type(buttons) = "roArray" AND (type(buttons[1]) = "roString" or type(buttons[1]) = "String")
     buttonTwo = {
       text: buttons[1]
       type: "dismiss"

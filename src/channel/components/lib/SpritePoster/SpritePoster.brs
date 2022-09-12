@@ -63,7 +63,7 @@ Function showSprite()
 
   nSheetWidth = m.top.thumbnailWidth * nColumns
   nSheetHeight = m.top.thumbnailHeight * nRows
-  if (nSheetWidth > 0 and nSheetHeight > 0) and (nSheetWidth > m.constants.deviceInfo.displayWidth or nSheetHeight > m.constants.deviceInfo.displayHeight)
+  if (nSheetWidth > 0 AND nSheetHeight > 0) AND (nSheetWidth > m.constants.deviceInfo.displayWidth or nSheetHeight > m.constants.deviceInfo.displayHeight)
     loadDisplayMode = "scaleToFit"
     ' Scale the poster down should bring the image dimensions down below the 4kx4k texture size limit
     ' which would otherwise cause the images to fail to load.

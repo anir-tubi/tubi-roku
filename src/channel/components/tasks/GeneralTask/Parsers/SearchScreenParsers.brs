@@ -11,10 +11,10 @@ Function parseDefaultSearchSuccess(fullResponse, reqInfo)
   bFullData = true
   contentMode = invalid
 
-  if reqInfo <> invalid and reqInfo.options <> invalid
+  if reqInfo <> invalid AND reqInfo.options <> invalid
 
     options = reqInfo.options
-    if options <> invalid and options.params <> invalid
+    if options <> invalid AND options.params <> invalid
       contentMode = options.params.contentMode
     end if
 

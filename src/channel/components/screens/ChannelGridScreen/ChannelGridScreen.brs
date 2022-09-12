@@ -83,10 +83,10 @@ Function checkForContentAndRefresh(bContentEmpty, sCategoryID)
       end if
     end for
 
-    if bCategoryDisplayingOnScreen = true and bContentEmpty = false
+    if bCategoryDisplayingOnScreen = true AND bContentEmpty = false
       '//no need to refresh the screen if the category is already displaying AND the category isn't empty
       bRefresh = false
-    else if bCategoryDisplayingOnScreen = false and bContentEmpty = true
+    else if bCategoryDisplayingOnScreen = false AND bContentEmpty = true
       '//no need to refresh the screen if the empty category is already not displaying
       bRefresh = false
     end if
@@ -101,7 +101,7 @@ End Function
 Function onSetCallOfAction()
   sPreviousPage = m.top.callingPage
   sCallToAction = ""
-  if sPreviousPage <> invalid and Len(sPreviousPage) > 0
+  if sPreviousPage <> invalid AND Len(sPreviousPage) > 0
     if UCase(sPreviousPage) = UCase(m.constants.ui.terms.categories)
       sCallToAction = getTranslation("goBack_categories")
     else if UCase(sPreviousPage) = UCase(m.constants.ui.terms.channels)
@@ -132,7 +132,7 @@ Function onScreenFocusChange()
   tubiLog("ChannelGridScreen.onScreenFocusChange")
   if m.top.hasFocus() = true
     m.ChannelCategoryGrid.setFocus(true)
-    if m.top.content <> invalid and m.top.content.getChildCount() > 0
+    if m.top.content <> invalid AND m.top.content.getChildCount() > 0
       if shouldRefresh(m.top.content) = true  'cacheValidationMixin
         m.top.refreshChannel = true
       end if
@@ -206,7 +206,7 @@ End Function
 
 Function reportVisibleItems()
   '//When a sponsored container is made visible, then call the pixels
-  if m.top.content <> invalid and m.top.content.getChildCount() > 0
+  if m.top.content <> invalid AND m.top.content.getChildCount() > 0
     itemFocused = m.ChannelCategoryGrid.itemFocused
     nVisibleNumColumns = m.ChannelCategoryGrid.numColumns
     nVisibleNumRows = m.ChannelCategoryGrid.numRows - 1
@@ -269,7 +269,7 @@ Function jumpToItemById()
   nodeHelpers = TubiNodeHelpers()
   content = m.top.content
 
-  if content <> invalid and sCategoryID <> ""
+  if content <> invalid AND sCategoryID <> ""
     index = nodeHelpers.getChildIndexById(content, sCategoryID)
     if index <> -1
       m.ChannelCategoryGrid.jumpToItem = index

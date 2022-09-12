@@ -158,7 +158,7 @@ Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
   ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
   params["content_mode"] = "" ' default contentMode
 
-  if passedOptions.params <> invalid and passedOptions.params["content_mode"] <> invalid and passedOptions.params["content_mode"] <> ""
+  if passedOptions.params <> invalid AND passedOptions.params["content_mode"] <> invalid AND passedOptions.params["content_mode"] <> ""
     ' This will be overwritten by the same value later in this function
     ' when we append the passedOptions.params to params. We add it here so the default value
     ' is not used in the following logic, if a value was passed in for "contentMode"
@@ -216,7 +216,7 @@ Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOpti
   params["contents_limit"] = m.constants.performance.categoryGridList.finalBlockSize
 
   if passedOptions.params <> invalid
-    if passedOptions.params.content_mode <> invalid and passedOptions.params.content_mode <> ""
+    if passedOptions.params.content_mode <> invalid AND passedOptions.params.content_mode <> ""
       params["content_mode"] = passedOptions.params.content_mode
     end if
   end if
@@ -232,7 +232,7 @@ Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOpti
   headers["Accept-Version"] = "6.0.0"
   headers["x-tubi-inject-live-news"] = "false"
 
-  if passedOptions <> invalid and passedOptions.params <> invalid
+  if passedOptions <> invalid AND passedOptions.params <> invalid
     contentMode = passedOptions.params.content_mode
 
     if contentMode = "" or contentMode = m.constants.ui.contentMode.linear
@@ -323,7 +323,6 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {})
       existingParams["images[poster_tb]"] = "w" + posterSize[0].ToStr() + "h" + posterSize[1].ToStr() + "_poster"
     else if imageType = "landscape"
       existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_landscape"
-
     else if imageType = "vitg"
       existingParams["images[vitg_tb]"] = "w" + vitgSize[0].ToStr() + "h" + vitgSize[1].ToStr() + "_hero"
     end if
@@ -391,7 +390,7 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
 
           categoryId = m.getFullCategoryId(category)
 
-          if categoryId <> invalid and type(categoryId) = "roString"
+          if categoryId <> invalid AND type(categoryId) = "roString"
             tubiLog("CategoryGridList.fetch whole: Asking GeneralTask for " + categoryId)
 
             options = {
@@ -474,9 +473,9 @@ End Function
 ' if there is no categoryId, returns invalid
 Function cmsApi_getFullCategoryId(category)
   categoryId = invalid
-  if type(category) = "roSGNode" and category.id <> ""
+  if type(category) = "roSGNode" AND category.id <> ""
     categoryId = category.id
-    if category.parentId <> invalid and category.parentId <> ""
+    if category.parentId <> invalid AND category.parentId <> ""
       categoryId = category.parentId + "/sub/" + category.id
     end if
   end if

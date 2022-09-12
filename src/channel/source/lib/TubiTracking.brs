@@ -50,7 +50,7 @@ Function tubiTracking_trackUserEvent(eventType="", eventValues=invalid, requestQ
   if eventType <> ""
     trackData = m.getClientEvent(eventType, eventValues)
     userRequest = m.getUserTrackingRequest(eventType, trackData)
-    if userRequest <> invalid and requestQueue <> invalid
+    if userRequest <> invalid AND requestQueue <> invalid
       requestQueue.pushRequest(userRequest)
     end if
   end if
@@ -114,7 +114,7 @@ End Function
 ' See protos.analytics.client.protos -> User
 Function tubiTracking_getAnalyticsUser()
   authInfo = m.auth.getAuthInfo()
-  if authInfo <> invalid and m.isString(authInfo.userId) = true
+  if authInfo <> invalid AND m.isString(authInfo.userId) = true
     userId = authInfo.userId.toInt()
     authType = authInfo.authType
   else
@@ -153,7 +153,7 @@ Function tubiTracking_getAnalyticsDevice(eventValues = invalid)
     advertiser_id: "00000000-0000-0000-0000-000000000000"
     locale: currentLocale
   }
-  if m.constants.deviceInfo.isAdIdTrackingDisabled <> true and (eventValues = invalid or eventValues.appMode <> "KIDS_MODE")
+  if m.constants.deviceInfo.isAdIdTrackingDisabled <> true AND (eventValues = invalid or eventValues.appMode <> "KIDS_MODE")
     device.advertiser_id = m.constants.deviceInfo.deviceAdId
   end if
   return device
@@ -556,15 +556,15 @@ Function tubiTracking_getAnalyticsAd(ctx)
     ' vendor_id: ""       'not currently available
     ' creative_duration: 0  'not currently available
   }
-  if ctx <> invalid and ctx.ad <> invalid
+  if ctx <> invalid AND ctx.ad <> invalid
     ad = ctx.ad
     isInteractive = false
-    if type(ad.companionads) = "roArray" and ad.companionads.count() > 0
+    if type(ad.companionads) = "roArray" AND ad.companionads.count() > 0
       isInteractive = true
     end if
 
 
-    if type(ad.streams) = "roArray" and ad.streams[0] <> invalid
+    if type(ad.streams) = "roArray" AND ad.streams[0] <> invalid
       if m.isString(ad.streams[0].url) = true
         adEvent.creative_url = ad.streams[0].url   'expect adVideoUrl to be of the form "http://paella.adrise.tv/011127/3256277/v1004184820-,426x240-HD-366,640x360-HD-730,854x480-HD-1111,854x480-HD-1479,1280x720-HD-2139,1280x720-HD-2832,k.mp4.m3u8"
       end if
@@ -573,7 +573,7 @@ Function tubiTracking_getAnalyticsAd(ctx)
       end if
     end if
 
-    if isInteractive = true and ad.companionads[0] <> invalid
+    if isInteractive = true AND ad.companionads[0] <> invalid
       if ad.companionads[0].provider = "INNOVID"
         adEvent.ad_type = "INNOVID"
       else if ad.companionads[0].provider = "brightline_RSG"
@@ -670,11 +670,11 @@ End Function
 
 Function tubiTracking_isEmptyValue(value)
   if value <> invalid
-    if m.isString(value) = true and value = ""
+    if m.isString(value) = true AND value = ""
       return true
-    else if (type(value) = "roArray" or type(value) = "roAssociativeArray") and value.isEmpty()
+    else if (type(value) = "roArray" or type(value) = "roAssociativeArray") AND value.isEmpty()
       return true
-    else if m.isNumeric(value) and value < 0
+    else if m.isNumeric(value) AND value < 0
       return true
     else
       return false
@@ -966,7 +966,7 @@ End Function
 
 Function tubiTracking_getSideNavPageMap(constants)
   map = {}
-  if constants <> invalid and constants.ui <> invalid and constants.ui.sideNavIds <> invalid
+  if constants <> invalid AND constants.ui <> invalid AND constants.ui.sideNavIds <> invalid
     sideNavIds = constants.ui.sideNavIds
     if sideNavIds.home <> invalid then map[sideNavIds.home] = "HOME"
     if sideNavIds.channels <> invalid then map[sideNavIds.channels] = "CHANNEL"
@@ -991,7 +991,7 @@ End Function
 ' returns an AA that maps screen ids of homescreen instances to the appropriate analytics content mode
 Function tubiTracking_getHomePageContentModeMap(constants)
   map = {}
-  if constants <> invalid and constants.ui <> invalid and constants.ui.screenIds <> invalid
+  if constants <> invalid AND constants.ui <> invalid AND constants.ui.screenIds <> invalid
     screenIds = constants.ui.screenIds
     if screenIds.homeScreen <> invalid then map[screenIds.homeScreen] = "CONTENT_MODE_UNKNOWN"
     if screenIds.movieScreen <> invalid then map[screenIds.movieScreen] = "CONTENT_MODE_MOVIE"

@@ -129,12 +129,12 @@ End Function
 
 
 Function pollForAds(url)
-  if m.top.isPlayingAds <> true and m.top.isPlayingAdFiller <> true and url <> invalid and url <> ""
+  if m.top.isPlayingAds <> true AND m.top.isPlayingAdFiller <> true AND url <> invalid AND url <> ""
     charlesUrl = m.request.passThroughCharlesProxy(url)
     m.raf.setAdUrl(charlesUrl)
     adPods = m.raf.getAds()
 
-    if adPods <> invalid and adPods.count() > 0
+    if adPods <> invalid AND adPods.count() > 0
       if adPods[0].ads <> invalid
         m.adPod = adPods[0]
 
@@ -149,7 +149,7 @@ Function pollForAds(url)
           end if
 
           ' update ad tracking pixels to be sent via charles
-          if m.constants.settings.mode <> "production" and isArray(ad.tracking)
+          if m.constants.settings.mode <> "production" AND isArray(ad.tracking)
             for each pixel in ad.tracking
               pixel.url = m.request.passThroughCharlesProxy(pixel.url)
             end for
@@ -174,7 +174,7 @@ Function onVideoPosition(msg)
 
   position = msg.getData()
 
-  if m.positionAtLastId3 >= 0 and position > m.positionAtLastId3 + 60
+  if m.positionAtLastId3 >= 0 AND position > m.positionAtLastId3 + 60
     ' no id3 have been sent in over 1 minute of playback, so reset ad state as safety in case
     ' the id3 tag for the final segment of the final ad was not observed, and ad state was 
     ' not reset as expected
@@ -217,7 +217,7 @@ Function onTags(msg)
     m.positionWithinAd = 0
   end if
 
-  if id3s.currentSegment() = 1 and id3s.getType() = "start"
+  if id3s.currentSegment() = 1 AND id3s.getType() = "start"
     ' we are at the very beginning of an ad video
     if m.currentAdInPod <> invalid
       m.top.isPlayingAds = true
@@ -239,7 +239,7 @@ Function onTags(msg)
     else
       m.top.isPlayingAdFiller = true
     end if
-  else if id3s.getType() = "end" and id3s.currentSegment() = id3s.totalSegments()
+  else if id3s.getType() = "end" AND id3s.currentSegment() = id3s.totalSegments()
     ' we are at the very end of an ad
 
     if m.currentAdInPod <> invalid
@@ -285,11 +285,11 @@ End Function
 
 Function onPlaybackStopped()
   tubiLog(m.top.id + ".onPlaybackStopped")
-  if m.top.isPlayingAds = true and m.currentAdInPod <> invalid
+  if m.top.isPlayingAds = true AND m.currentAdInPod <> invalid
     ' log the number of impressions not fired for the ad break that is playing
     ' when the playback stops
     remainingAds = 0
-    if haveStoredAds(m.adPod) = true and m.currentAdInPod <> invalid
+    if haveStoredAds(m.adPod) = true AND m.currentAdInPod <> invalid
       remainingAds = m.adPod.ads.count() - (m.currentAdInPod.sequence + 1)
     end if
 
@@ -370,11 +370,11 @@ Function handleMidPixels(position)
 
     quartile = 0
     if ad.duration <> invalid
-      if position >= ad.duration * (1/4) and position < ad.duration * (1/2)
+      if position >= ad.duration * (1/4) AND position < ad.duration * (1/2)
         quartile = 0.25
-      else if position >= ad.duration * (1/2) and position < ad.duration * (3/4)
+      else if position >= ad.duration * (1/2) AND position < ad.duration * (3/4)
         quartile = 0.5
-      else if position >= ad.duration * (3/4) and position < ad.duration
+      else if position >= ad.duration * (3/4) AND position < ad.duration
         quartile = 0.75
       end if
     end if
@@ -445,7 +445,7 @@ End Function
 ' @pixelRecord: assocArray, an AA in the format returned by getNewPixelRecord()
 ' @quartile: float, one of the following accepted vaules: 0, 0.25, 0.5, 0.75, 1.0
 Function firePixels(ad, pixelRecord, quartile)
-  if isNumber(quartile) = true and isAA(ad) = true
+  if isNumber(quartile) = true AND isAA(ad) = true
     ctx = invalid
 
     if quartile = 0
@@ -486,7 +486,7 @@ End Function
 ' @ad: assocArray, an ad as returned by RAF.getAds()[0].ads[0]
 ' @exitType: string, one of the valid exit types from protos
 Function sendFinishAdAnalytics(ad, exitType = "AUTO")
-  if m.adPod <> invalid and m.adPod.ads <> invalid
+  if m.adPod <> invalid AND m.adPod.ads <> invalid
 
     ' send FinishAdEvent tracking
     analyticsCtx = getAnalyticsCtx(ad, m.adPod.ads.count())
@@ -518,7 +518,7 @@ End Function
 Function getAnalyticsCtx(ad, podCount)
   ' Currently RAF does not parse and store the id attribute of the MediaFile tag in the VAST response.
   ' We do not expect to be able to send the adVideoId until RAF begins parsing it.
-  if ad.streams <> invalid and ad.streams[0] <> invalid
+  if ad.streams <> invalid AND ad.streams[0] <> invalid
     ad.adVideoId = ad.streams[0].id
   end if
 
@@ -535,7 +535,7 @@ End Function
 ' @yospaceAdId: string, a yospace ad id taken from the VAST response or id3 tag
 ' @adPod: array, an array of ads AAs as parsed by VAST
 Function getAdFromYospaceAdId(yospaceAdId, adPod)
-  if isAA(adPod) = true and isArray(adPod.ads) = true
+  if isAA(adPod) = true AND isArray(adPod.ads) = true
     ' iterate over each ad in pod until yospaceAdId is found
     for each ad in adPod.ads
       if ad.yospaceId = yospaceAdId
@@ -569,7 +569,7 @@ End Function
 
 
 Function haveStoredAds(adPod)
-  return adPod <> invalid and adPod.ads <> invalid and adPod.ads.count() > 0
+  return adPod <> invalid AND adPod.ads <> invalid AND adPod.ads.count() > 0
 End Function
 
 
@@ -577,16 +577,16 @@ End Function
 ' @quartile: float, one of the following accepted vaules: 0, 0.25, 0.5, 0.75, 1.0
 ' @returns: assocArray the pixelRecord AA that is passed in, with updated values
 Function markPixelsAsSent(pixelRecord, quartile)
-  if pixelRecord <> invalid and isNumber(quartile) = true
-    if quartile = 0 and pixelRecord["0percent"] <> invalid
+  if pixelRecord <> invalid AND isNumber(quartile) = true
+    if quartile = 0 AND pixelRecord["0percent"] <> invalid
       pixelRecord["0percent"] = true
-    else if quartile = 0.25 and pixelRecord["25percent"] <> invalid
+    else if quartile = 0.25 AND pixelRecord["25percent"] <> invalid
       pixelRecord["25percent"] = true
-    else if quartile = 0.5 and pixelRecord["50percent"] <> invalid
+    else if quartile = 0.5 AND pixelRecord["50percent"] <> invalid
       pixelRecord["50percent"] = true
-    else if quartile = 0.75 and pixelRecord["75percent"] <> invalid
+    else if quartile = 0.75 AND pixelRecord["75percent"] <> invalid
       pixelRecord["75percent"] = true
-    else if quartile = 1.0 and pixelRecord["100percent"] <> invalid
+    else if quartile = 1.0 AND pixelRecord["100percent"] <> invalid
       pixelRecord["100percent"] = true
     end if
   end if
@@ -612,7 +612,7 @@ End Function
 ' @quartile: float, one of the following accepted vaules: 0, 0.25, 0.5, 0.75, 1.0
 ' @returns: boolean, true if pixels for the passed in quartile have already been sent, false otherwise
 Function checkPixelRecord(pixelRecord, quartile)
-  if pixelRecord <> invalid and isNumber(quartile) = true
+  if pixelRecord <> invalid AND isNumber(quartile) = true
     if quartile = 0
       return pixelRecord["0percent"]
     else if quartile = 0.25
@@ -635,7 +635,7 @@ End Function
 Function formatPixelRecordForAd(yospaceAdId, pixelRecord)
   pixelRecordForAd = {}
 
-  if isAA(pixelRecord) = true and isNonEmptyString(yospaceAdId) = true
+  if isAA(pixelRecord) = true AND isNonEmptyString(yospaceAdId) = true
     pixelRecordForAd[yospaceAdId] = pixelRecord
   end if
 

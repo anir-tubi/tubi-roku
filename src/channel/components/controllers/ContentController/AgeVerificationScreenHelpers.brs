@@ -241,7 +241,7 @@ Function verifyAgeAtSignup(signInInfo, birthdate)
 
     mode = m.constants.settings.mode
 
-    if signInInfo.automation = true or mode = "qa"
+    if signInInfo.automation = true OR mode = "qa"
       password = "111111" 'this password will be used during automation signup or when api is pointed to staging
     else
       password = right(deviceInfo.GetRandomUUID(), 12) ' taking only 12 characters from right since GetRandomUUID() length is more
@@ -339,7 +339,7 @@ End Function
 
 Function onAgeNotVerifiedAtSignIn(err)
   if err <> invalid AND err.code <> invalid
-    if err.code = 422 or err.code = 451
+    if err.code = 422 OR err.code = 451
       handle_422_451_error(restartChannelAfterAgeVerification) ' happens when user enters age less than 13
     else
       handleNetworkError(err, verifyAgeAtSignIn, startUserExperienceAsAgeNotVerified) ' happens when there is a network failure or some backend issue
@@ -358,7 +358,7 @@ End Function
 
 Function onAgeNotVerifiedAtKidsModeExit(err)
   if err <> invalid AND err.code <> invalid
-    if err.code = 422 or err.code = 451
+    if err.code = 422 OR err.code = 451
       ' happens when user enters age less than 13
       handle_422_451_error(handle_422_451_errorAtKidsModeExitCallback)
     else
@@ -370,7 +370,7 @@ End Function
 
 Function onAgeNotVerifiedAtInputDeeplink(err)
   if err <> invalid AND err.code <> invalid
-    if err.code = 422 or err.code = 451
+    if err.code = 422 OR err.code = 451
       ' happens when user enters age less than 13
       handle_422_451_error(handle_422_451_errorAtInputDeeplinkCallback)
     else
@@ -382,7 +382,7 @@ End Function
 
 Function onAgeNotVerifiedAtStartup(err)
   if err <> invalid AND err.code <> invalid
-    if err.code = 422 or err.code = 451
+    if err.code = 422 OR err.code = 451
       handle_422_451_error(startUserExperienceAsAgeNotVerifiedOnStartUp) ' happens when user enters age less than 13
     else
       handleNetworkError(err, verifyAgeAtStartUp, startUserExperienceAsAgeNotVerifiedOnStartUp) ' happens when there is a network failure or some backend issue
@@ -393,7 +393,7 @@ End Function
 
 Function onAgeNotVerifiedAtSignup(err)
   if err <> invalid AND err.code <> invalid
-    if err.code = 422 or err.code = 451
+    if err.code = 422 OR err.code = 451
       handle_422_451_error(restartChannelAfterAgeVerification) ' happens when user enters age less than 13
     else if err.code = 403
       handle_403_error() ' happens when user enters invalid email domain
@@ -800,7 +800,7 @@ Function onBirthdayCheckError(errorInfo)
     Request = TubiRequest(m.constants.settings)
     Auth = TubiAuth(m.constants, Request)
 
-    if code = 422 or code = 451
+    if code = 422 OR code = 451
       ' 422 signifies the user has birthdate under age 13 (COPPA)
       ' 451 signifies the user is too young internationally
       ' logout the user and prepare them for age gated kids mode

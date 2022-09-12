@@ -180,7 +180,7 @@ End Function
 '         may be removed and go out of scope, their animations don't get garbage collected with them.
 ' TODO(Chris): check for abandoned animations here and remove them
 Function animate(target As Object, options as Object) As Object
-  if type(target) = "roSGNode" and target.id <> ""
+  if type(target) = "roSGNode" AND target.id <> ""
     if options.origin = invalid then options.origin = target.translation
     if options.duration = invalid then options.duration = 2.0
     if options.delay = invalid then options.delay = 0
@@ -193,7 +193,7 @@ Function animate(target As Object, options as Object) As Object
     bAnimate = true
     ' if low-spec device, then instantly change to target option rather than using animation
     globalAA = m.global
-    if globalAA <> invalid and globalAA.constants <> invalid and globalAA.constants.deviceInfo.limitedUi = true
+    if globalAA <> invalid AND globalAA.constants <> invalid AND globalAA.constants.deviceInfo.limitedUi = true
 
       ' hardcoding easeFunction=linear for better performance in lower-end even if allowOnLowSpecDevices=true
       options.easeFunction = "linear"
@@ -220,58 +220,58 @@ Function animate(target As Object, options as Object) As Object
     end if
 
     fadeinterpolator = animation.findNode("FadeInterpolator-" + target.id)
-    if fadeinterpolator = invalid and options.opacity <> invalid
+    if fadeinterpolator = invalid AND options.opacity <> invalid
       fadeinterpolator = animation.createChild("FloatFieldInterpolator")
       fadeinterpolator.id = "FadeInterpolator-" + target.id
       fadeinterpolator.fieldToInterp = target.id + ".opacity"
-    else if fadeinterpolator <> invalid and options.opacity = invalid
+    else if fadeinterpolator <> invalid AND options.opacity = invalid
       animation.removeChild(fadeinterpolator)
     end if
 
     slideinterpolator = animation.findNode("SlideInterpolator-" + target.id)
-    if slideinterpolator = invalid and (options.destination <> invalid and options.origin <> invalid)
+    if slideinterpolator = invalid AND (options.destination <> invalid AND options.origin <> invalid)
       if options.origin[0] <> options.destination[0] or options.origin[1] <> options.destination[1]
         slideinterpolator = animation.createChild("Vector2DFieldInterpolator")
         slideinterpolator.id = "SlideInterpolator-" + target.id
         slideinterpolator.fieldToInterp = target.id + ".translation"
       end if
-    else if slideinterpolator <> invalid and (options.destination = invalid or options.origin = invalid)
+    else if slideinterpolator <> invalid AND (options.destination = invalid or options.origin = invalid)
       animation.removeChild(slideinterpolator)
     end if
 
     scaleinterpolator = animation.findNode("ScaleInterpolator-" + target.id)
-    if scaleinterpolator = invalid and options.scale <> invalid
+    if scaleinterpolator = invalid AND options.scale <> invalid
       scaleinterpolator = animation.createChild("Vector2DFieldInterpolator")
       scaleinterpolator.id = "ScaleInterpolator-" + target.id
       scaleinterpolator.fieldToInterp = target.id + ".scale"
-    else if scaleinterpolator <> invalid and options.scale = invalid
+    else if scaleinterpolator <> invalid AND options.scale = invalid
       animation.removeChild(scaleinterpolator)
     end if
 
     colorinterpolator = animation.findNode("ColorInterpolator-" + target.id)
-    if colorinterpolator = invalid and (options.color <> invalid and target.color <> invalid)
+    if colorinterpolator = invalid AND (options.color <> invalid AND target.color <> invalid)
       colorinterpolator = animation.createChild("ColorFieldInterpolator")
       colorinterpolator.id = "ColorInterpolator-" + target.id
       colorinterpolator.fieldToInterp = target.id + ".color"
-    else if colorinterpolator <> invalid and (options.color = invalid or target.color = invalid)
+    else if colorinterpolator <> invalid AND (options.color = invalid or target.color = invalid)
       animation.removeChild(colorinterpolator)
     end if
 
     heightInterpolator = animation.findNode("HeightInterpolator-" + target.id)
-    if heightInterpolator = invalid and (options.height <> invalid and target.height <> invalid and options.height <> target.height)
+    if heightInterpolator = invalid AND (options.height <> invalid AND target.height <> invalid AND options.height <> target.height)
       heightInterpolator = animation.createChild("FloatFieldInterpolator")
       heightInterpolator.id = "HeightInterpolator-" + target.id
       heightInterpolator.fieldToInterp = target.id + ".height"
-    else if heightInterpolator <> invalid and (options.height = invalid or options.height = target.height)
+    else if heightInterpolator <> invalid AND (options.height = invalid or options.height = target.height)
       animation.removeChild(heightInterpolator)
     end if
 
     widthInterpolator = animation.findNode("WidthInterpolator-" + target.id)
-    if widthInterpolator = invalid and (options.width <> invalid and target.width <> invalid and options.width <> target.width)
+    if widthInterpolator = invalid AND (options.width <> invalid AND target.width <> invalid AND options.width <> target.width)
       widthInterpolator = animation.createChild("FloatFieldInterpolator")
       widthInterpolator.id = "WidthInterpolator-" + target.id
       widthInterpolator.fieldToInterp = target.id + ".width"
-    else if widthInterpolator <> invalid and (options.width = invalid or options.width = target.width)
+    else if widthInterpolator <> invalid AND (options.width = invalid or options.width = target.width)
       animation.removeChild(widthInterpolator)
     end if
 
@@ -388,7 +388,7 @@ End Function
 ' Note: this function only works on ending animations created by using the animate() function in this AnimationMixin file.
 ' It will not end animations built from other sources (like animation nodes included in a component's XML)
 Function finishAnimation(target as Object) as Boolean
-  if target <> invalid and target.id <> invalid and type(target) = "roSGNode"
+  if target <> invalid AND target.id <> invalid AND type(target) = "roSGNode"
     'Find the existing animation
     animationId = "GeneralAnimation-" + target.id
     animation = m.top.findNode(animationId)
@@ -409,7 +409,7 @@ End Function
 '
 ' @animation: roSGNode, an Animation node (usually retuned by animate() in this mixin)
 Function stopAnimation(animation)
-  if type(animation) = "roSGNode" and animation.isSubType("AnimationBase")
+  if type(animation) = "roSGNode" AND animation.isSubType("AnimationBase")
     if animation.state <> "stopped"
       animation.control = "stop"
     end if

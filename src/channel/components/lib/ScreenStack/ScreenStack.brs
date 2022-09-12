@@ -58,10 +58,10 @@ Function onPush(msg)
       while true
         if stackTop = invalid
           exit while
-        else if stackTop.screenLevel <> invalid and newChild.screenLevel <> invalid
+        else if stackTop.screenLevel <> invalid AND newChild.screenLevel <> invalid
           if newChild.screenLevel > stackTop.screenLevel
             exit while
-          else if newChild.screenLevel = stackTop.screenLevel and stackTop.isStackable = true
+          else if newChild.screenLevel = stackTop.screenLevel AND stackTop.isStackable = true
             exit while
           else
             removeStackTop(m.top, m.nodeHelpers)
@@ -80,7 +80,7 @@ Function onPush(msg)
     end if
     newChild.visible = true
 
-    if oldCurrent <> invalid and oldCurrent.isSameNode(newChild) = false
+    if oldCurrent <> invalid AND oldCurrent.isSameNode(newChild) = false
       oldCurrent.visible = false
     end if
   end if

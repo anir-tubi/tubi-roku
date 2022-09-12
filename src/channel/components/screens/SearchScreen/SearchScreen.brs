@@ -193,7 +193,7 @@ End Function
 ' This may filter results based on parental controls so send it again on auth change
 Function onSignedInChange()
   tubiLog("SearchScreen.onSignedInChange")
-  if m.Keyboard.text <> invalid and m.Keyboard.text.len() > 0 then
+  if m.Keyboard.text <> invalid AND m.Keyboard.text.len() > 0 then
     loadSearchResults()
   else
     loadSearchResults(true)
@@ -255,7 +255,7 @@ Function onSearchContentChange()
   m.ResultGrid.content = invalid '//reset content everytime so in case the new results = previous results, then the contemt can refresh. Without refreshing content, then the content may appear blank
   m.ResultGrid.content = m.top.content
 
-  if m.top.content <> invalid and m.top.content.getChildCount() > 0 then
+  if m.top.content <> invalid AND m.top.content.getChildCount() > 0 then
     if m.top.content.isDefaultSearchResults = true
       '//display special text when the default search is displaying
       setDefaultText()
@@ -278,7 +278,7 @@ End Function
 
 Function onSearchDebounce()
 
-  if m.Keyboard.text <> invalid and m.Keyboard.text.trim().len() > 0 then
+  if m.Keyboard.text <> invalid AND m.Keyboard.text.trim().len() > 0 then
     loadSearchResults()
   else
     '//if the search text was empty, clear out any existing results and display the default search results
@@ -355,7 +355,7 @@ Function onItemFocused()
     ' Set up the info that the ContentController uses to send navigate_within_page events.
     ' Don't change m.top.navigateWithinPageInfo if the focused content hasn't changed
     ' (protects against re-setting when the focus is set upon returning to search page from details page)
-    if m.gridHasFocus = true and m.ResultGrid.itemFocused <> invalid
+    if m.gridHasFocus = true AND m.ResultGrid.itemFocused <> invalid
 
       searchComponent = invalid
       if m.ResultGrid.numColumns <> invalid
@@ -371,7 +371,7 @@ Function onItemFocused()
           horizontal_location_mode: "INDEX"  'LocationMode enum
         }
 
-        if searchComponent.componentValues <> invalid and searchComponent.componentValues.content_tile <> invalid
+        if searchComponent.componentValues <> invalid AND searchComponent.componentValues.content_tile <> invalid
           navigateWithinPageInfo.vertical_location = searchComponent.componentValues.content_tile.row
           navigateWithinPageInfo.horizontal_location = searchComponent.componentValues.content_tile.col
         end if
@@ -379,7 +379,7 @@ Function onItemFocused()
         m.top.navigateWithinPageInfo = navigateWithinPageInfo
         m.oldSearchComponent = searchComponent
       end if
-    else if m.gridHasFocus = false and m.ResultGrid.itemFocused <> invalid
+    else if m.gridHasFocus = false AND m.ResultGrid.itemFocused <> invalid
       'the search grid is gaining focus, so we don't send navigate_within_page events at this time. Instead we just cache information
       'for the next time we send a navigate_within_page event (when the user navigates the search grid)
       m.oldSearchComponent = getTrackingComponentInfo(m.ResultGrid.itemFocused, m.ResultGrid.numColumns, focusedContent, m.Tracking)
@@ -427,13 +427,13 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("SearchScreen.onKeyEvent")
   if press then
     ' Only focus on content grid if animation is not in process, and if there is actually content there
-    if key = "right" and m.Keyboard.isInFocusChain() and m.ResultGrid.content <> invalid and m.ResultGrid.content.getChildCount() > 0 then
+    if key = "right" AND m.Keyboard.isInFocusChain() AND m.ResultGrid.content <> invalid AND m.ResultGrid.content.getChildCount() > 0 then
       m.ResultGrid.setFocus(true)
       m.gridHasFocus = true
       m.bResultsInFocus = true
       handleKeyboardVoiceInput(m.bResultsInFocus)
       return true
-    else if key = "left" and m.ResultGrid.isInFocusChain() then
+    else if key = "left" AND m.ResultGrid.isInFocusChain() then
       handleInfoPanelVisibilityForLeftPress()
       m.Keyboard.setFocus(true)
       m.gridHasFocus = false
@@ -443,7 +443,7 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
     else if key = "play"
       handlePlayInput()
       return true
-    else if key = "back" and m.ResultGrid.isInFocusChain() then
+    else if key = "back" AND m.ResultGrid.isInFocusChain() then
       '//when the user hits BACK, then set the keyboard to focus
       '//jump to left most visible thumbnail in the grid
       nFocused = m.ResultGrid.itemFocused
@@ -466,7 +466,7 @@ Function onTransportVoiceRequest(msg)
   response = "unhandled"
   inputInfo = msg.getData()
   command = ""
-  if inputInfo <> invalid and inputInfo.command <> invalid
+  if inputInfo <> invalid AND inputInfo.command <> invalid
     command = inputInfo.command
   end if
   tubiLog("SearchScreen.onTransportVoiceRequest " + command)
@@ -608,7 +608,7 @@ End Function
 
 Function handleInfoPanelVisibilityForLeftPress()
   m.top.backgroundUriList = [m.defaultHeroUri]
-  if m.searchMenuText.text <> "" and m.searchMenuText.text <>  m.searchTitleText
+  if m.searchMenuText.text <> "" AND m.searchMenuText.text <>  m.searchTitleText
     m.searchScreenInfoPanel.visible = false
   else
     m.searchScreenInfoPanel.visible = false

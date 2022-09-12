@@ -63,9 +63,9 @@ Function onContentChange()
     m.CategoryName.width = 1000
     m.subText.visible = false
 
-    if item.subtext <> invalid and item.subtext <> ""
+    if item.subtext <> invalid AND item.subtext <> ""
       authInfo = getFieldFromGlobal("authInfo")
-      if (authInfo = invalid or (authInfo <> invalid and authInfo.userId = invalid))  'signedOut user or new user
+      if (authInfo = invalid or (authInfo <> invalid AND authInfo.userId = invalid))  'signedOut user or new user
         'recalculate the width of the rowlabel. This is required because Spanish titles might be different width than english.
         m.CategoryName.width = 0
         m.CategoryName.text = item.title

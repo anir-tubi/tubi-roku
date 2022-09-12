@@ -103,7 +103,7 @@ End Function
 
 Function onPosterLoadStatus(msg)
   poster = msg.getRoSGNode()
-  if poster <> invalid and poster.loadStatus = "ready"
+  if poster <> invalid AND poster.loadStatus = "ready"
     ' set width based on aspect ratio
     if poster.bitmapHeight > 0 'prevent divide by 0'
       poster.width = (poster.bitmapWidth / poster.bitmapHeight) * poster.height
@@ -116,7 +116,7 @@ End Function
 
 Function onComponentFocus()
   tubiLog("InfoPanel.onComponentFocus")
-  if m.top.isInFocusChain() and  m.top.description <> invalid and m.top.description <> ""
+  if m.top.isInFocusChain() AND  m.top.description <> invalid AND m.top.description <> ""
     m.DescriptionFocusButton.visible = true
   else
     m.DescriptionFocusButton.visible = false
@@ -193,10 +193,10 @@ Function onLineOneDataChange(msg)
   line1Label = m.TwoLineInfo.findNode("Line1")
 
   text = ""
-  if data.releasedate <> invalid and data.releasedate <> ""
+  if data.releasedate <> invalid AND data.releasedate <> ""
     text = data.releasedate + " "
   end if
-  if data.length <> invalid and data.length <> 0
+  if data.length <> invalid AND data.length <> 0
     ' add 'dot' spacer only if we had a release date
     if text.len() > 0
       text = text + Chr(&hb7) + " "
@@ -204,15 +204,15 @@ Function onLineOneDataChange(msg)
     text = text + formatLengthAsEnglish(data.length) + " "
   end if
 
-  if data.hoursOfAiring <> invalid and data.hoursOfAiring <> ""
+  if data.hoursOfAiring <> invalid AND data.hoursOfAiring <> ""
     text = text + data.hoursOfAiring
   end if
 
-  if data.type <> invalid and data.type = m.constants.ui.contentTypes.series
+  if data.type <> invalid AND data.type = m.constants.ui.contentTypes.series
     ' add 'dot' spacer
     text = text + Chr(&hb7) + " "
 
-    if data.seasons <> invalid and data.seasons > 0
+    if data.seasons <> invalid AND data.seasons > 0
       if data.seasons = 1
         text = text + getTranslation("metadata_seasons_singular") + " "
       else
@@ -241,7 +241,7 @@ Function onLineOneDataChange(msg)
     end if
   end if
 
-  if data.rating <> invalid and data.rating <> ""
+  if data.rating <> invalid AND data.rating <> ""
     if m.Rating.getParent() = invalid
       firstLineGroup.insertChild(m.Rating, insertIndex)
     end if
@@ -262,7 +262,7 @@ Function onLineOneDataChange(msg)
 
   descriptorCode = data.descriptorCode
 
-  if descriptorCode <> invalid and descriptorCode <> ""
+  if descriptorCode <> invalid AND descriptorCode <> ""
     if m.DescriptorCode.getParent() = invalid
       firstLineGroup.insertChild(m.DescriptorCode, insertIndex)
     end if
@@ -277,14 +277,14 @@ Function onLineOneDataChange(msg)
     m.DescriptorCode.visible = false
   end if
 
-  if data.availabilityEnds <> invalid and data.availabilityEnds <> ""
+  if data.availabilityEnds <> invalid AND data.availabilityEnds <> ""
     datetime = CreateObject("roDateTime")
     datetime.FromISO8601String(data.availabilityEnds)
     endSeconds = datetime.AsSeconds()
     nowSeconds = CreateObject("roDateTime").AsSeconds()
     daysRemaining = ((endSeconds - nowSeconds) \ 86400) + 1
     ' BIZ REQ: only titles expiring in the next 2 weeks should display message
-    if daysRemaining > 0 and daysRemaining <= 14
+    if daysRemaining > 0 AND daysRemaining <= 14
       if daysRemaining > 1
         m.ExpireWarning.text = getTranslation("metadata_expiresIn_plural", {days: daysRemaining.toStr()})
       else
@@ -303,7 +303,7 @@ Function onLineOneDataChange(msg)
     firstLineGroup.removeChild(m.ExpireWarning)
   end if
 
-  if data.partnerLogoUri <> invalid and data.partnerLogoUri <> ""
+  if data.partnerLogoUri <> invalid AND data.partnerLogoUri <> ""
     if m.PartnerLogo.getParent() = invalid
       firstLineGroup.insertChild(m.PartnerLogo, insertIndex)
     end if
@@ -321,7 +321,7 @@ Function onGenresChange()
   tubiLog("InfoPanel.onGenresChange")
   line2Label = m.TwoLineInfo.findNode("Line2")
   text = ""
-  if m.top.genres <> invalid and m.top.genres.count() > 0
+  if m.top.genres <> invalid AND m.top.genres.count() > 0
     capitalGenres = []
     for each c in m.top.genres
       capitalGenres.push(capitalize(c))
@@ -334,7 +334,7 @@ End Function
 
 Function onDescriptionChange()
   tubiLog("InfoPanel.onDescriptionChange")
-  if m.top.description <> invalid and m.top.description <> ""
+  if m.top.description <> invalid AND m.top.description <> ""
     m.Description.visible = true
     m.Description.height = 0  ' reset for calculations below
     m.Description.text = m.top.description
@@ -347,7 +347,7 @@ End Function
 Function onDirectorsChange()
   tubiLog("InfoPanel.onDirectorChange")
   text = ""
-  if m.top.directors <> invalid and m.top.directors.count() > 0
+  if m.top.directors <> invalid AND m.top.directors.count() > 0
     text = m.top.directors.Join(", ")
   end if
   if text = ""
@@ -363,7 +363,7 @@ End Function
 Function onStarringChange()
   tubiLog("InfoPanel.onStarringChange")
   text = ""
-  if m.top.starring <> invalid and m.top.starring.count() > 0
+  if m.top.starring <> invalid AND m.top.starring.count() > 0
     text = m.top.starring.Join(", ")
   end if
   if text = invalid or text = ""
@@ -390,7 +390,7 @@ End Function
 Function onCategoryContentCountChange()
   tubiLog("InfoPanel.onCategoryContentCountChange")
   categoryLine1 = m.CategoryDetails.findNode("CategoryLine1")
-  if m.top.categoryContentCount <> invalid and m.top.categoryContentCount > 0
+  if m.top.categoryContentCount <> invalid AND m.top.categoryContentCount > 0
     categoryLine1.text = stri(m.top.categoryContentCount).trim() + " titles in this category"
   else
     categoryLine1.text = ""
@@ -415,7 +415,7 @@ Function onCalculateHeight()
   bottomMargin = 8
   m.DescriptionFocusButton.height = m.Description.boundingRect().height + topMargin + bottomMargin
   ' try to shorten description to fit max height
-  if m.top.maxHeight <> 0 and m.top.maxHeight < m.Offset.BoundingRect().height
+  if m.top.maxHeight <> 0 AND m.top.maxHeight < m.Offset.BoundingRect().height
     m.Description.height = m.Description.boundingRect().height - (m.offset.BoundingRect().height - m.top.maxHeight)
     if m.Description.height <= 0
       m.Description.text = ""
@@ -545,7 +545,7 @@ End Function
 
 
 Function onKeyEvent(key, press) as Boolean
-  if press and key = "OK"
+  if press AND key = "OK"
     m.top.descriptionSelected = true
     return true
   end if

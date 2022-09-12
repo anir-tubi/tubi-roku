@@ -98,10 +98,10 @@ End Function
 Function isKidsMode()
   if isLoggedInUser() = true then
     authInfo = m.global.authInfo
-    if authInfo.parentalrating <> invalid and authInfo.parentalrating < 2 then
+    if authInfo.parentalrating <> invalid AND authInfo.parentalrating < 2 then
       return true
     end if
-  else if m.guestUserHasAgeInfo.hasAge = false and m.guestUserHasAgeInfo.expired = false then
+  else if m.guestUserHasAgeInfo.hasAge = false AND m.guestUserHasAgeInfo.expired = false then
     return true
   end if
   ' Note this currently returns an incomplete picture of kids mode being enabled for a user but is ok for now with Edward.

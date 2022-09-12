@@ -39,7 +39,7 @@ End Function
 ' @position: position where user left off of video
 ' @global: The global object to be used to save the data
 Function tubiBookmarks_addHistoryLocally(content as Object, position as Integer, global = invalid)
-  if content <> invalid and global <> invalid and global.historyIds <> invalid
+  if content <> invalid AND global <> invalid AND global.historyIds <> invalid
 
     nowDate = CreateObject("roDateTime")
     nLastSaved = nowDate.AsSeconds()
@@ -95,7 +95,7 @@ End Function
 ' @param contentId, String: the ID of the title to change it's liking
 ' @param sRatingAction, String: The Action enum to alter the like state of the provided content ID. The possible values are all under m.constants.ui.likeDislikeActions
 Function tubiBookmarks_updateLikesLocally(contentId as String, sRatingAction as String, global = invalid)
-  if contentId <> invalid and global <> invalid and global.likeIds <> invalid
+  if contentId <> invalid AND global <> invalid AND global.likeIds <> invalid
     likeNode = getLike(contentId) 'bs:disable-line 1001 LINT1001
 
     sState = ""
@@ -394,7 +394,7 @@ Function tubiBookmarks_handleInitialHistory(initialHistory)
         child.historyId = history.id
         child.type = m.constants.ui.contentTypes.series
 
-        if history.episodes <> invalid and history.position <> invalid and history.episodes[history.position] <> invalid
+        if history.episodes <> invalid AND history.position <> invalid AND history.episodes[history.position] <> invalid
           currentEpisode = history.episodes[history.position]
           if currentEpisode.content_id <> invalid
             child.currentEpisodeId = history.episodes[history.position].content_id.toStr()
@@ -424,7 +424,7 @@ Function tubiBookmarks_handleInitialLikes(initialLikes, bLiked = true)
   returnParsed = {}
   itemIds = CreateObject("roSGNode", "LikeContentNode")
   parsedInitialData = ParseJson(initialLikes)
-  if parsedInitialData <> invalid and parsedInitialData.data <> invalid and parsedInitialData.data.count() > 0
+  if parsedInitialData <> invalid AND parsedInitialData.data <> invalid AND parsedInitialData.data.count() > 0
     for i = 0 to parsedInitialData.data.count() - 1
       child = itemIds.createChild("LikeContentNode")
       child.id = parsedInitialData.data[i]
@@ -497,5 +497,5 @@ End Function
 
 
 Function tubiBookmarks_isLoggedInUser(authInfo)
-  return (authInfo <> invalid and authInfo.userId <> invalid)
+  return (authInfo <> invalid AND authInfo.userId <> invalid)
 End Function

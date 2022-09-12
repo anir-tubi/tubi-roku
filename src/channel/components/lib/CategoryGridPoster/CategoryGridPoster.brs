@@ -69,7 +69,7 @@ Function onContentChange(msg)
   if itemContent <> invalid then
     categoryContent = itemContent.getParent()
 
-    if categoryContent <> invalid and itemContent.gridItemType <> invalid then
+    if categoryContent <> invalid AND itemContent.gridItemType <> invalid then
       m.poster.uri = itemContent.hdgridposterurl
       if itemContent.gridItemType = m.gridItemTypes.landscape
         m.title.visible = true
@@ -82,7 +82,7 @@ Function onContentChange(msg)
         drawHistoryProgressBar()
       'itemContent.gridItemType is not an empty string on the home screen,
       'and we want this to set Live logo and text just on the search screen.
-      else if (itemContent.gridItemType = "" and itemContent.type = "linear")
+      else if (itemContent.gridItemType = "" AND itemContent.type = "linear")
         if getExperimentResource("roku_search_live_badge", "roku_search_live_badge_v1", true).enabled = true
           setLiveBadge()
         else
@@ -99,7 +99,7 @@ End Function
 Function drawHistoryProgressBar()
   history = getHistory(m.top.itemContent.id)
 
-  if m.top.itemContent <> invalid and history <> invalid and history.nowPos <> invalid and history.nowPos <> 0 and m.top.itemContent.length <> invalid and m.top.itemContent.length <> 0 then
+  if m.top.itemContent <> invalid AND history <> invalid AND history.nowPos <> invalid AND history.nowPos <> 0 AND m.top.itemContent.length <> invalid AND m.top.itemContent.length <> 0 then
     drawProgressBar(history.nowPos, m.top.itemContent.length)
   end if
 End Function
@@ -128,7 +128,7 @@ End Function
 ' @localFocus: boolean, the state of focus for the itemComponent
 Function handleLocalFocusChange(newLocalFocus)
   if m.top.itemContent.id <> m.itemIDs.tvGuide
-    if m.localFocus = false and newLocalFocus = true
+    if m.localFocus = false AND newLocalFocus = true
       ' item is gaining focus
       if isVitg(m.top.itemContent, m.gridItemTypes) = true
         if m.vitg = invalid
@@ -139,7 +139,7 @@ Function handleLocalFocusChange(newLocalFocus)
           end if
         end if
       end if
-    else if m.localFocus = true and newLocalFocus = false
+    else if m.localFocus = true AND newLocalFocus = false
       ' item is losing focus - so fade the poster in (as necessary) and destroy the video player
       if m.poster.opacity < 1.0
         ' stop any fade out animations that might be running
@@ -174,16 +174,16 @@ End Function
 
 
 Function onFocusPercentChange()
-  if m.top.focusPercent < 1.0 and m.localFocus = true
+  if m.top.focusPercent < 1.0 AND m.localFocus = true
     handleLocalFocusChange(false)
-  else if m.top.focusPercent = 1.0 and m.localFocus = false and m.top.rowListHasFocus = true
+  else if m.top.focusPercent = 1.0 AND m.localFocus = false AND m.top.rowListHasFocus = true
     handleLocalFocusChange(true)
   end if
 End Function
 
 
 Function onRowFocusPercentChange()
-  if isVitg(m.top.itemContent, m.gridItemTypes) = true and m.localFocus <> true
+  if isVitg(m.top.itemContent, m.gridItemTypes) = true AND m.localFocus <> true
     m.poster.opacity = m._.max(m.poster.opacity, 1 - m.top.rowFocusPercent)
   end if
 End Function

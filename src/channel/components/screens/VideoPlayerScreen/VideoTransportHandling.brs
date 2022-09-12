@@ -33,11 +33,11 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
       else if key = "left"
         'video is in playback mode and user wants to skip back
-        if m.HUD.opacity = 0 and m.progressBarFocused = false and isActiveVideoState(m.VideoState, m.Video)
+        if m.HUD.opacity = 0 AND m.progressBarFocused = false AND isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(-10, m.progressBarFocused)
 
         'user is in skip ahead mode (the progress bar is focused) and wants to skip back.
-        else if m.progressBarFocused = true and isActiveVideoState(m.VideoState, m.Video)
+        else if m.progressBarFocused = true AND isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(-10, m.progressBarFocused)
 
         else
@@ -57,11 +57,11 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
       else if key = "right"
         'video is in playback mode and user wants to skip ahead
-        if m.HUD.opacity = 0 and m.progressBarFocused = false and isActiveVideoState(m.VideoState, m.Video)
+        if m.HUD.opacity = 0 AND m.progressBarFocused = false AND isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(10, m.progressBarFocused)
 
         'user is in skip ahead mode (the progress bar is focused) and wants to skip ahead.
-        else if m.progressBarFocused = true and isActiveVideoState(m.VideoState, m.Video)
+        else if m.progressBarFocused = true AND isActiveVideoState(m.VideoState, m.Video)
           handleSkipVideo(10, m.progressBarFocused)
 
         else
@@ -82,9 +82,9 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       else if key = "up"
         if m.Overlay.opacity = 0
           showTransport()
-        else if m.progressBarFocused = false and m.SkipIntro.hasFocus() = false
+        else if m.progressBarFocused = false AND m.SkipIntro.hasFocus() = false
           setFocusedButton(m.ProgressBar)
-        else if m.progressBarFocused = true and m.SkipIntro <> invalid and m.SkipIntro.visible = true
+        else if m.progressBarFocused = true AND m.SkipIntro <> invalid AND m.SkipIntro.visible = true
           m.progressBarFocused = false
           m.SkipIntro.setFocus(true)
         else
@@ -117,7 +117,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           ' will not be interacting with the autoplay UI again.
           setAutoplayMode("automatic")
 
-          if m.VideoState = "stop" and m.UpNext.contentFocused <> invalid
+          if m.VideoState = "stop" AND m.UpNext.contentFocused <> invalid
             m.top.upNextContentToAutoplay = m.UpNext.contentFocused
           end if
 
@@ -176,14 +176,14 @@ Function handleTransportVoiceEvent()
   inputInfo = m.top.transportVoiceRequest
   command = ""
 
-  if inputInfo <> invalid and inputInfo.command <> invalid
+  if inputInfo <> invalid AND inputInfo.command <> invalid
     command = inputInfo.command
   end if
   tubiLog("VideoTransportHandling.handleTransportVoiceEvent " + command)
 
   response = "unhandled"
 
-  if m.top.visible = true and m.UpNext.opacity = 0
+  if m.top.visible = true AND m.UpNext.opacity = 0
     response = "success"
     if command = "play"
       resumeFromPause(true)
@@ -205,7 +205,7 @@ Function handleTransportVoiceEvent()
       handleFastForward()
     else if command = "seek"
       direction = ""
-      if inputInfo <> invalid and inputInfo.duration <> invalid and inputInfo.direction <> invalid
+      if inputInfo <> invalid AND inputInfo.duration <> invalid AND inputInfo.direction <> invalid
         duration = inputInfo.duration.toInt()
         direction = inputInfo.direction
       end if
@@ -290,7 +290,7 @@ Function resumeFromPause(shouldSendAnalytics)
   ' an additional time after pausing, but m.playerPosition will not update after pausing leading the
   ' two values to be out of sync. If the difference is less than 1 second, treat it as if the
   ' m.playerPosition and m.Video.positions are equal.
-  if m.playerPosition <> m.Video.position and Abs(m.playerPosition - m.Video.position) > 1
+  if m.playerPosition <> m.Video.position AND Abs(m.playerPosition - m.Video.position) > 1
     jumpToPosition(m.playerPosition)
   else
     m.Video.control = "resume"
@@ -325,7 +325,7 @@ Function resumeFromSkip()
   ' the Video.position can update an additional time after pausing, but m.playerPosition will
   ' not update after pausing leading the two values to be out of sync. If the difference is less
   ' than 1 second, treat it as if the m.playerPosition and m.Video.positions are equal.
-  if m.playerPosition <> m.Video.position and Abs(m.playerPosition - m.Video.position) > 1
+  if m.playerPosition <> m.Video.position AND Abs(m.playerPosition - m.Video.position) > 1
     jumpToPosition(m.playerPosition)
   else
     m.Video.control = "resume"
@@ -400,7 +400,7 @@ End Function
 
 
 Function handleOk()
-  if m.HUD.opacity = 0 and m.skipIntro.hasFocus() = false
+  if m.HUD.opacity = 0 AND m.skipIntro.hasFocus() = false
     showTransport()
   else
     'do action based on the current focused button
@@ -600,7 +600,7 @@ Function handleSkipVideo(amt, isProgressBarFocused)
     hideSkipIntroButton(m.top)
     clearSkipIntroTimer()
 
-    if m.VideoState <> "rew" and m.VideoState <> "ffw"
+    if m.VideoState <> "rew" AND m.VideoState <> "ffw"
       playProgressEvent = getPlayProgressEvent()
       if playProgressEvent <> invalid
         trackEvent(playProgressEvent)
@@ -800,7 +800,7 @@ Function updateScrubTime()
   scrubTime = timeSinceLastMark * m.scrubMultipliers[m.scrubAmt]
 
   '//Ensure scrub can't go past the timer for the UpNext Overlay
-  if m.Video.content.seriesId <> invalid and m.Video.content.seriesId <>""
+  if m.Video.content.seriesId <> invalid AND m.Video.content.seriesId <>""
     nMaxScrub = m.Video.duration - m.constants.player.upNextCountdownForSeries - 5
   else
     nMaxScrub = m.Video.duration - m.constants.player.upNextCountdown - 5
@@ -1003,11 +1003,11 @@ Function animateTransport(direction)
   'call function to handle the skipIntro button based on the direction
   handleSkipIntroButtonOnAnimateTransport(direction)
 
-  if direction = "in" and m.ratingOverlay.opacity = 1.0
+  if direction = "in" AND m.ratingOverlay.opacity = 1.0
     slideTo(m.ratingOverlay, [0,250], 0.6)
     fade(m.ratingGradient, "out", 0.2)
     fade(m.Overlay, direction, 0.6, 0.2)
-  else if direction = "out" and m.ratingOverlay.opacity = 1.0
+  else if direction = "out" AND m.ratingOverlay.opacity = 1.0
     fade(m.Overlay, direction, 0.6)
     slideTo(m.ratingOverlay, [0,0], 0.6, 0.2)
     fade(m.ratingGradient, "in", 0.6, 0.6)
@@ -1025,16 +1025,16 @@ Function handleSkipIntroButtonOnAnimateTransport(direction)
   skipIntroTransLation = m.SkipIntro.translation
   if direction = "in"
     if m.skipintro.id <> ""
-      if m.skipintro.visible = false and m.skipIntroButtonTimer = invalid
+      if m.skipintro.visible = false AND m.skipIntroButtonTimer = invalid
         showSkipIntroButton()
       end if
       slideTo(m.SkipIntro,[skipIntroTransLation[0], m.skipIntroUpTranslation], 0.6)
     end if
   else if direction = "out"
-    if m.skipintro.visible = true and m.skipIntroButtonTimer <> invalid
+    if m.skipintro.visible = true AND m.skipIntroButtonTimer <> invalid
       slideTo(m.SkipIntro,[skipIntroTransLation[0], m.skipIntroDownTranslation], 0.6)
       m.skipintro.setFocus(true)
-    else if m.skipintro.visible = true and m.skipIntroButtonTimer = invalid
+    else if m.skipintro.visible = true AND m.skipIntroButtonTimer = invalid
       hideSkipIntroButton()
     end if
   end if
@@ -1052,7 +1052,7 @@ End Function
 
 Function showThumbnail()
   tubiLog("videoTransportHandling.showThumbnail")
-  if m.Thumbnail.spriteUrls <> invalid and m.Thumbnail.spriteUrls.count() > 0
+  if m.Thumbnail.spriteUrls <> invalid AND m.Thumbnail.spriteUrls.count() > 0
     m.Thumbnail.visible = true
   else
     m.Thumbnail.visible = false
@@ -1075,7 +1075,7 @@ Function isButtonPressAllowed(key, videoState, videoNode)
 
   isAllowed  = true
   'in non active video states, we don't allow the disabled keys, non disable keys are always allowed
-  if not isActiveVideoState(videoState, videoNode) and disabledKeys[key] = true
+  if not isActiveVideoState(videoState, videoNode) AND disabledKeys[key] = true
     isAllowed = false
   end if
 

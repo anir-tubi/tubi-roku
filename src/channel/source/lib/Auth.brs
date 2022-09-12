@@ -172,7 +172,7 @@ End Function
 '@value: String, Value for the provided key
 Function tubiAuth_setAuthInfo(key, value)
 
-  if isString(key) = true and isString(value) = true
+  if isString(key) = true AND isString(value) = true
     m.regWrite(key, value, m.authRegSection)
   else
     tubiLog("Key/Value provided for SetAuthInfo Function are not Strings.", "warn")
@@ -331,7 +331,7 @@ Function tubiAuth_fetchAnonymousAuthInfo()
       msg = wait(100, authPort)
       token = m.handleAnonymousTokenResponse(msg, anonymousTokenReq)
       if token <> invalid
-        if token.access_token <> invalid and token.refresh_token <> invalid and token.expires_in <> invalid
+        if token.access_token <> invalid AND token.refresh_token <> invalid AND token.expires_in <> invalid
           authInfo = m.formatAuthInfoFromServer(token)
           authInfo["secretKey"] = signingKeyResponse.key ' store secretKey in registry, we need it for refreshing anonymous token
         end if
@@ -454,7 +454,7 @@ Function tubiAuth_handleAnonymousSigningKeyResponse(msg, anonymousSigningKeyReq)
 
   responseInfo = anonymousSigningKeyReq.handleEvent(msg)
 
-  if responseInfo <> invalid and responseInfo.response <> invalid and responseInfo.response.data <> invalid
+  if responseInfo <> invalid AND responseInfo.response <> invalid AND responseInfo.response.data <> invalid
     code = responseInfo.response.code
     if code < 200 or code >= 400
       ' challenge was not valid
@@ -479,7 +479,7 @@ Function tubiAuth_handleAnonymousTokenResponse(msg, anonymousTokenReq)
 
   responseInfo = anonymousTokenReq.handleEvent(msg)
 
-  if responseInfo <> invalid and responseInfo.response <> invalid and responseInfo.response.data <> invalid
+  if responseInfo <> invalid AND responseInfo.response <> invalid AND responseInfo.response.data <> invalid
     code = responseInfo.response.code
     if code < 200 or code >= 400
       ' signing key was not valid
@@ -503,7 +503,7 @@ Function tubiAuth_handleAnonymousRefreshTokenResponse(msg, anonymousTokenReq)
 
   responseInfo = anonymousTokenReq.handleEvent(msg)
 
-  if responseInfo <> invalid and responseInfo.response <> invalid and responseInfo.response.data <> invalid
+  if responseInfo <> invalid AND responseInfo.response <> invalid AND responseInfo.response.data <> invalid
     if responseInfo.response.code = 403
       ' refresh token was expired
       newAccess = {}
@@ -727,12 +727,12 @@ End Function
 '               headers - assoc array of headers and their values
 '
 ' returns a request objects as created by TubiRequest().createAsync() with an additional property(authInfo)
-'   and additional method(getAuthHeaders) - both are needed in request.handleEvent()
+' and additional method(getAuthHeaders) - both are needed in request.handleEvent()
 ' or returns invalid if there is no authInfo in the registry
 Function tubiAuth_createAuthRequest(url as String, name = "" as String, options={} as Object) as Object
   authReq = invalid
   authInfo = m.getAuthInfo()
-  if authInfo <> invalid and authInfo.accessToken <> invalid and authInfo.userId <> invalid
+  if authInfo <> invalid and authInfo.accessToken <> invalid AND authInfo.userId <> invalid
     authHeaders = m.getAuthHeaders(authInfo.accessToken)
     if authHeaders <> invalid
       if options.headers <> invalid
@@ -746,7 +746,7 @@ Function tubiAuth_createAuthRequest(url as String, name = "" as String, options=
     if options.params = invalid
       options.params = {}
     end if
-    if options.params["user_id"] = invalid and (url <> m.constants.urls.account.settings and url <> m.constants.urls.account.parentalRating)
+    if options.params["user_id"] = invalid AND (url <> m.constants.urls.account.settings AND url <> m.constants.urls.account.parentalRating)
       options.params["user_id"] = authInfo.userId
     end if
 
@@ -863,7 +863,7 @@ End Function
 '  hasAge: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '}
 Function tubiAuth_saveAuthInfo(authInfo)
-  if authInfo <> invalid and authInfo.refreshToken <> invalid and authInfo.accessToken <> invalid and authInfo.expireTime <> invalid and isString(authInfo.expireTime) = true
+  if authInfo <> invalid AND authInfo.refreshToken <> invalid AND authInfo.accessToken <> invalid AND authInfo.expireTime <> invalid AND isString(authInfo.expireTime) = true
     for each key in authInfo
       value = authInfo[key]
       if isString(value) = false
@@ -904,7 +904,7 @@ Function tubiAuth_checkIfAuthExpired(authInfo)
   dateTime = CreateObject("roDateTime")
   timeInSecs = dateTime.asSeconds()
 
-  if isInteger(authInfo.expireTime) and timeInSecs < authInfo.expireTime
+  if isInteger(authInfo.expireTime) AND timeInSecs < authInfo.expireTime
     isExpired = false
   end if
 
@@ -918,7 +918,7 @@ End Function
 Function tubiAuth_updateAuthInfo(newAccess, authInfo)
   updatedAuthInfo = invalid
 
-  if newAccess <> invalid and newAccess.expires_in <> invalid and newAccess.access_token <> invalid
+  if newAccess <> invalid AND newAccess.expires_in <> invalid AND newAccess.access_token <> invalid
     dateTime = CreateObject("roDateTime")
     newExpireTime = dateTime.asSeconds() + newAccess.expires_in
 
@@ -940,7 +940,7 @@ End Function
 Function tubiAuth_updateAnonymousAuthInfo(newAccess, authInfo)
   updatedAuthInfo = invalid
 
-  if newAccess <> invalid and newAccess.expires_in <> invalid and newAccess.access_token <> invalid and newAccess.refresh_token <> invalid
+  if newAccess <> invalid AND newAccess.expires_in <> invalid AND newAccess.access_token <> invalid AND newAccess.refresh_token <> invalid
     dateTime = CreateObject("roDateTime")
     newExpireTime = dateTime.asSeconds() + newAccess.expires_in
 
@@ -1023,7 +1023,7 @@ Function tubiAuth_handleRefreshResponse(msg, refreshRequest)
 
   responseInfo = refreshRequest.handleEvent(msg)
 
-  if responseInfo <> invalid and responseInfo.response <> invalid and responseInfo.response.data <> invalid
+  if responseInfo <> invalid AND responseInfo.response <> invalid AND responseInfo.response.data <> invalid
     if responseInfo.response.code = 403
       ' refresh token was expired
       newAccess = {}

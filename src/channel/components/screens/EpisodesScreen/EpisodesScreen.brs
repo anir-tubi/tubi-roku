@@ -60,7 +60,7 @@ End Function
 
 Function onSeasonChangeMenu()
   tubiLog("EpisodesScreen.onSeasonChangeMenu")
-  if m.Menu.isInFocusChain() and m.Menu.itemFocused <> invalid then
+  if m.Menu.isInFocusChain() AND m.Menu.itemFocused <> invalid then
     setSeasonInfo(m.Menu.itemFocused)
 
     if m.listIsFocused = true
@@ -99,9 +99,9 @@ Function onEpisodeFocused()
       lineOneData.releaseDate = content.releaseDate
       lineOneData.length = episode.length
       
-      if episode <> invalid and (episode.hasSubtitles = true or episode.subtitleTracks.Count() > 0)
+      if episode <> invalid AND (episode.hasSubtitles = true or episode.subtitleTracks.Count() > 0)
         lineOneData.hasCC = true
-      else if content <> invalid and content.type = m.constants.ui.contentTypes.video and (content.hasSubtitles = true or content.subtitleTracks.Count() > 0)
+      else if content <> invalid AND content.type = m.constants.ui.contentTypes.video AND (content.hasSubtitles = true or content.subtitleTracks.Count() > 0)
         lineOneData.hasCC = true
       else
         lineOneData.hasCC = false
@@ -109,9 +109,9 @@ Function onEpisodeFocused()
       
       lineOneData.descriptorCode = episode.descriptorCode
 
-      if content.availabilityEnds <> invalid and content.availabilityEnds <> ""
+      if content.availabilityEnds <> invalid AND content.availabilityEnds <> ""
         lineOneData.availabilityEnds = content.availabilityEnds
-      else if episode <> invalid and episode.availabilityEnds <> invalid
+      else if episode <> invalid AND episode.availabilityEnds <> invalid
         lineOneData.availabilityEnds = episode.availabilityEnds
       end if
     
@@ -132,7 +132,7 @@ Function onEpisodeFocused()
 
     ' trigger navigate_within_page events in ContentController
     rowItem = m.RowList.rowItemFocused
-    if m.gridIsFocused = true and (rowItem[0] <> m.oldRowItemFocused[0] or rowItem[1] <> m.oldRowItemFocused[1])
+    if m.gridIsFocused = true AND (rowItem[0] <> m.oldRowItemFocused[0] or rowItem[1] <> m.oldRowItemFocused[1])
       row = m.RowList.rowItemFocused[0] + 1
       col = m.RowList.rowItemFocused[1] + 1
 
@@ -231,7 +231,7 @@ Function onContentChange()
   m.Menu.content = m.top.content
 
   'set backgrounds
-  if m.top.content.backgrounds <> invalid and m.top.content.backgrounds.count() > 0 then 
+  if m.top.content.backgrounds <> invalid AND m.top.content.backgrounds.count() > 0 then 
     m.top.backgroundUriList = m.top.content.backgrounds
   else
     m.top.backgroundUriList = [m.defaultHeroUri]
@@ -249,12 +249,12 @@ End Function
 Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("EpisodesScreen.onKeyEvent" + key)
   if press then
-    if key = "play" and m.RowList.isInFocusChain() = true
+    if key = "play" AND m.RowList.isInFocusChain() = true
       handleEpisodeSelected(m.Rowlist.rowItemFocused)
-    else if key = "right" and m.Menu.isInFocusChain() then
+    else if key = "right" AND m.Menu.isInFocusChain() then
       focusGrid()
       return true
-    else if (key = "left") and m.RowList.isInFocusChain() then
+    else if (key = "left") AND m.RowList.isInFocusChain() then
       focusMenu()
       return true
     else if key = "left" then
@@ -270,7 +270,7 @@ End Function
 Function onTransportVoiceRequest(msg)
   inputInfo = msg.getData()
   command = ""
-  if inputInfo <> invalid and inputInfo.command <> invalid
+  if inputInfo <> invalid AND inputInfo.command <> invalid
     command = inputInfo.command
   end if
   tubiLog("DetailScreen.onTransportVoiceRequest " + command)
@@ -339,7 +339,7 @@ Function getEpisodeVideoListPage(series)
     series_id: 0
   }
 
-  if series.id <> invalid and series.id <> ""
+  if series.id <> invalid AND series.id <> ""
     seriesId = series.id
     if Left(series.id, 1) = "0"
       seriesId = Mid(series.id, 2).toInt()

@@ -90,7 +90,7 @@ Function onComponentFocusChange()
       rowItemFocused = [0,0]
     end if
 
-    if resolveAbbreviatedContent(rowItemFocused) <> invalid or (m.itemToJumpTo <> invalid and resolveAbbreviatedContent(m.itemToJumpTo) <> invalid)
+    if resolveAbbreviatedContent(rowItemFocused) <> invalid or (m.itemToJumpTo <> invalid AND resolveAbbreviatedContent(m.itemToJumpTo) <> invalid)
       if m.itemToJumpTo <> invalid
         m.RowList.jumpToRowItem = m.itemToJumpTo
         m.itemToJumpTo = invalid
@@ -182,7 +182,7 @@ Function onRepopulateContent()
       rowIndex = rowItemFocused[0]
     end if
 
-    while resolveAbbreviatedContent([rowIndex, 0]) = invalid and rowIndex >= 0
+    while resolveAbbreviatedContent([rowIndex, 0]) = invalid AND rowIndex >= 0
       rowIndex -= 1
     end while
 
@@ -194,7 +194,7 @@ Function onRepopulateContent()
   ' 2) new queue row got inserted, so increment the focus index by 1
   ' 3) continue_watching row got removed, so decrement the focus index by 1
   ' 4) queue row got removed, so decrement the focus index by 1
-  if m.Rowlist <> invalid and m.Rowlist.content <> invalid and rowItemFocused[0] <> invalid
+  if m.Rowlist <> invalid AND m.Rowlist.content <> invalid AND rowItemFocused[0] <> invalid
     if rowAdded = m.constants.ui.categoryIds.history
       if rowItemFocused[0] >= m.RowList.content.continueWatchingIndex
         m.itemToJumpTo = [m.itemToJumpTo[0] + 1, m.itemToJumpTo[1]]
@@ -311,7 +311,7 @@ End Function
 ' @rowItemIndex is 2D array of [rowindex, itemindex] from RowList.rowItemSelected or m.RowList.rowItemFocused
 Function resolveAbbreviatedContent(rowItemIndex)
   tubiLog("CategoryGridList.resolveAbbreviatedContent")
-  if m.top.content <> invalid and rowItemIndex[0] <> invalid and rowItemIndex[1] <> invalid
+  if m.top.content <> invalid AND rowItemIndex[0] <> invalid AND rowItemIndex[1] <> invalid
     contentId = invalid
     category = m.top.content.getChild(rowItemIndex[0])
     if category <> invalid
@@ -320,7 +320,7 @@ Function resolveAbbreviatedContent(rowItemIndex)
         contentId = content.id
       end if
     end if
-    if contentId <> invalid and contentId <> ""
+    if contentId <> invalid AND contentId <> ""
       return m.metadataTranslate.getContentFromCategoryJson(category, contentId) ' can return invalid
     end if
   end if
@@ -357,7 +357,7 @@ Function onRowItemFocused()
   else
     m.RowListItemDebounce.control = "start"
     ' immediately update the position counter
-    if m.top.content <> invalid and m.Rowlist <> invalid and m.Rowlist.rowItemFocused <> invalid
+    if m.top.content <> invalid AND m.Rowlist <> invalid AND m.Rowlist.rowItemFocused <> invalid
       category = m.top.content.getChild(m.RowList.rowItemFocused[0])
       if category <> invalid then
         category.focusIndex = m.RowList.rowItemFocused[1]
@@ -486,7 +486,7 @@ Function mergeMetadata(fetchedContent)
     categories = m.top.content.getChildren(m.top.content.getChildCount(), 0)
   end if
 
-  if categories <> invalid and fetchedContent <> invalid and fetchedContent.id <> invalid
+  if categories <> invalid AND fetchedContent <> invalid AND fetchedContent.id <> invalid
     for i=0 to categories.count()-1
       if categories[i].id = fetchedContent.id then
         index = i
@@ -527,13 +527,13 @@ Function setRowListFocus()
     m.justGainedFocus = true
     m.RowList.setFocus(true)
   else
-    if m.RowList.currFocusRow <> invalid and m.RowList.currFocusRow >= 0 and m.RowList.currFocusColumn <> invalid and m.RowList.currFocusColumn >= 0
+    if m.RowList.currFocusRow <> invalid AND m.RowList.currFocusRow >= 0 AND m.RowList.currFocusColumn <> invalid AND m.RowList.currFocusColumn >= 0
       '//If rowList is not in focus and new content is set, then one would think that rowItemFocused should be [0,0] but it isn't,
       '//so that is why we use currFocusRow and currFocusColumn - to ensure the proper item is announced
       row = Int(m.RowList.currFocusRow)
       col = Int(m.RowList.currFocusColumn)
       reloadedItemIndex = [row, col]
-    else if m.RowList.rowItemFocused <> invalid and m.RowList.rowItemFocused.count() > 1
+    else if m.RowList.rowItemFocused <> invalid AND m.RowList.rowItemFocused.count() > 1
       '//currFocusColumn is not available in firmware lower than Roku OS 10.5, so use rowItemFocused. It's imperfect, as it
       '// may think a different item is focused insteqd of the 1st colum/1st row,
       '// but it will not display a wrong metadata when the user quickly navigates away from 1st rowItem [0,0] as the content is loading

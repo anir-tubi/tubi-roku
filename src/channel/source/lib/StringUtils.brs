@@ -4,7 +4,7 @@
 ' take a float or integer length in seconds, transform to timestamp "HH:MM:SS".
 Function formatLengthAsTimestamp(length As Dynamic) As String
   if type(length) = "roFloat" or type(length) = "Double" then length = Int(length)
-  if (type(length) = "Integer" or type(length) = "roInteger") and length > 0 then
+  if (type(length) = "Integer" or type(length) = "roInteger") AND length > 0 then
     hours = length \ 3600
     minutes = (length mod 3600) \ 60
     seconds = length mod 60
@@ -15,7 +15,7 @@ Function formatLengthAsTimestamp(length As Dynamic) As String
   end if
 End Function
 
-
+ 
 '''''''''''''''''''
 ' formatLengthAsEnglish
 '
@@ -31,12 +31,12 @@ Function formatLengthAsEnglish(length As Dynamic) As String
     seconds = length mod 60
     result = ""
     sTranslationID = invalid
-    if hours = 0 and minutes = 0 then
+    if hours = 0 AND minutes = 0 then
       '//Display just seconds
       sTranslationID = "metadata_seconds"
     else
-      if hours > 0 and minutes > 0
-        '//Display hours and minutes
+      if hours > 0 AND minutes > 0
+        '//Display hours AND minutes
         sTranslationID = "metadata_hoursAndMinutes"
       else if hours > 0
         '//Display just hours
@@ -187,7 +187,7 @@ End Function
 ' @replacementValue: string, The value that should be the new value of the provided param
 Function replaceURLParameter(url, paramToReplace, replacementValue)
   sReplacementURL = url
-  if isString(url) = true and isString(paramToReplace) = true and isString(replacementValue) = true
+  if isString(url) = true AND isString(paramToReplace) = true AND isString(replacementValue) = true
     re = CreateObject("roRegex", "[\\?&]" + paramToReplace + "=([^&#]*)", "i")
     aMatches = re.Match(url)
     if aMatches.Count() > 0
@@ -268,7 +268,7 @@ End Function
 
 ' @str: string, the value to be checked for being a string and not being an empty string
 Function isNonEmptyString(str)
-  if isString(str) and str <> ""
+  if isString(str) AND str <> ""
     return true
   end if
   return false
@@ -295,7 +295,7 @@ Function buildQueryString(params)
       end if
 
       index = index + 1
-      if index <> params.count() and paramAdded = true
+      if index <> params.count() AND paramAdded = true
         queryString = queryString + "&"
       end if
 

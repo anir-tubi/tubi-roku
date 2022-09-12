@@ -55,7 +55,7 @@ End Function
 '           values: assocArray, fields that correspond to the fields specified for the eventType in m.tracking.getAnalyticsEvent()
 '@analyticsAppMode: string: corresponds to one of the App message Mode enum as in found in protos
 Function trackSceneGraphEvent(evtData, analyticsAppMode)
-  if evtData <> invalid and type(evtData.type) = "roString"
+  if evtData <> invalid AND type(evtData.type) = "roString"
     tubiLog("TrackingLoggingTask.trackSceneGraphEvent for " + evtData.type)
     evtData.values.appMode = analyticsAppMode
     m.tracking.trackUserEvent(evtData.type, evtData.values, m.queue)  'creates a request and adds it to the requestQueue

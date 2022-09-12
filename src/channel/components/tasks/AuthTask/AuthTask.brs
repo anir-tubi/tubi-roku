@@ -22,7 +22,7 @@ Function execInitializeUserData()
 
   userCats = getInitialUserCategories(Bookmarks, true, true, getUserInfo, true)
   ' enhance the auth tokens with the user profile information
-  if authInfo <> invalid and userCats.userInfo <> invalid
+  if authInfo <> invalid AND userCats.userInfo <> invalid
     tempAuthInfo = userCats.userInfo
     ' append the locally stored authInfo onto the newly received user info from the server
     ' to keep the userId as a string
@@ -147,7 +147,7 @@ Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false
     handledReq = queue.handleEvent(msg)
     if handledReq <> invalid
       'tubilog("*** execInitializeUserData: " + AnyToStringButNotInvalid(handledReq.localId) + " returned " + AnyToStringButNotInvalid(handledReq.response.code))
-      if handledReq.response <> invalid and handledReq.response.code >= 200 and handledReq.response.code < 300 and handledReq.hasData() = true
+      if handledReq.response <> invalid AND handledReq.response.code >= 200 AND handledReq.response.code < 300 AND handledReq.hasData() = true
         if handledReq.localId = localBookmarkReqId
           userCategories.newBookmarks = Bookmarks.handleInitialBookmarks(handledReq.response.data)
         else if handledReq.localId = localHistoryReqId
@@ -158,9 +158,9 @@ Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false
           bLiked = (handledReq.localId = "like")
           userLikes = Bookmarks.handleInitialLikes(handledReq.response.data, bLiked)
 
-          if type(userCategories.newLikes) = "roSGNode" and userCategories.newLikes.getChildCount() > 0
+          if type(userCategories.newLikes) = "roSGNode" AND userCategories.newLikes.getChildCount() > 0
             '//If newLikes already exists, then combine the other (like or disliked) array into one
-            if type(userLikes.content) = "roSGNode" and userLikes.content.getChildCount() > 0
+            if type(userLikes.content) = "roSGNode" AND userLikes.content.getChildCount() > 0
               userCategories.newLikes.appendChildren(userLikes.content.getChildren(-1,0))
             end if
           else
@@ -195,7 +195,7 @@ Function execGetUserInfo()
   authInfo = Auth.getAuthInfo()
 
   result = getInitialUserCategories(Bookmarks, false, false, true, false)
-  if result <> invalid and result.userInfo <> invalid
+  if result <> invalid AND result.userInfo <> invalid
     ' Just in case settings have changed, refresh the auth token
     Auth.refreshAuthToken(authInfo, 5)
     m.top.userInfo = result.userInfo

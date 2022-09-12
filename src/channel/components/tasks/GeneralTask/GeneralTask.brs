@@ -100,7 +100,7 @@ Function makeApiRequest(reqInfo, batchInfo = invalid) as Boolean
     end if
 
     m.authInfo = m.auth.getAuthInfo()
-    if m.authInfo <> invalid and m.authInfo.accessToken <> invalid
+    if m.authInfo <> invalid AND m.authInfo.accessToken <> invalid
       if m.constants.reqNames.acceptsTubiAuth[requestType] = true
         headers = m.auth.getAuthHeaders(m.authInfo.accessToken)
         if headers <> invalid
@@ -117,7 +117,7 @@ Function makeApiRequest(reqInfo, batchInfo = invalid) as Boolean
 
     urlTransfer = tubiReq.urlTransfer
 
-    if urlTransfer <> invalid and reqSent = true
+    if urlTransfer <> invalid AND reqSent = true
       id = urlTransfer.getIdentity().toStr()
 
       m.jobStore[id] = {
@@ -178,7 +178,7 @@ Function processResponse(msg)
     result = job.tubiReq.handleEvent(msg)
     retries = reqInfo.retries
 
-    if result <> invalid and result.response <> invalid
+    if result <> invalid AND result.response <> invalid
 
       if callbackTypes <> invalid
         noRetryErrorCodes = {
@@ -189,16 +189,16 @@ Function processResponse(msg)
 
         code = result.response.code
 
-        if code >= 200 and code < 400
+        if code >= 200 AND code < 400
           processSuccessResponse(result, callbackTypes, job)
         else if noRetryErrorCodes[code.toStr()] = true
           ' error expected to remain error on retry so don't bother retrying
           processErrorReponse(result, callbackTypes, job)
-        else if (code = 403 or code = 401) and m.constants.reqNames.acceptsTubiAuth[requestType] = true
+        else if (code = 403 or code = 401) AND m.constants.reqNames.acceptsTubiAuth[requestType] = true
           if retries > 0
             ' request could not be authed by backend so attempt to refresh the auth token and try again
             timeout = 100
-            if m.authInfo <> invalid and m.authInfo.userId <> invalid
+            if m.authInfo <> invalid AND m.authInfo.userId <> invalid
               newAuthInfo = m.auth.refreshAuthToken(m.authInfo, timeout)
             else
               newAuthInfo = m.auth.refreshAnonymousToken(m.authInfo, timeout)
@@ -248,7 +248,7 @@ Function processSuccessResponse(result, callbackTypes, job)
       ' ovesight by the backend service)
       fullJson = responseFromServer.data
       parsedJson = invalid
-      if fullJson <> invalid and fullJson <> ""
+      if fullJson <> invalid AND fullJson <> ""
         parsedJson = parseJson(responseFromServer.data)
       end if
 
@@ -263,7 +263,7 @@ Function processSuccessResponse(result, callbackTypes, job)
     else if Instr(1, responseHeaders["Content-Type"], "application/json") > 0
       fullJson = responseFromServer.data
       parsedJson = invalid
-      if fullJson <> invalid and fullJson <> ""
+      if fullJson <> invalid AND fullJson <> ""
         parsedJson = parseJson(responseFromServer.data)
       end if
 
@@ -293,7 +293,7 @@ Function processSuccessResponse(result, callbackTypes, job)
       output = parserCallback(result.response, job.reqInfo)
 
       ' this block will execute only for batch responses
-      if job.batchInfo <> invalid and job.batchInfo.id <> invalid
+      if job.batchInfo <> invalid AND job.batchInfo.id <> invalid
         accumulateBatchResponse(job, output)
       else
         job.reqInfo.callbackNode.response = output
@@ -326,7 +326,7 @@ Function accumulateBatchResponse(job, parsedResponse) as Void
   batchId = job.batchInfo.id
   batch = m.batchStore[batchId]
 
-  if batch <> invalid and batch.responseAccumulator <> invalid and batch.responseOrder <> invalid
+  if batch <> invalid AND batch.responseAccumulator <> invalid AND batch.responseOrder <> invalid
     batchResponseAccumulator = batch.responseAccumulator
     batchOrder = batch.responseOrder
 
@@ -411,7 +411,7 @@ Function processErrorReponse(result, callbackTypes, job)
   responseFromServer = result.response
   responseHeaders = responseFromServer.headers
 
-  if responseHeaders <> invalid and responseHeaders["Content-Type"] = "application/json"
+  if responseHeaders <> invalid AND responseHeaders["Content-Type"] = "application/json"
     responseFromServer.data = parseJson(result.response.data)
   end if
 
@@ -422,7 +422,7 @@ Function processErrorReponse(result, callbackTypes, job)
     output = parserCallback(result.response, job.reqInfo)
 
     ' this block will execute only for batch responses
-    if job.batchInfo <> invalid and job.batchInfo.id <> invalid
+    if job.batchInfo <> invalid AND job.batchInfo.id <> invalid
       accumulateBatchResponse(job, output)
     else
       job.reqInfo.callbackNode.error = output
@@ -445,7 +445,7 @@ Function cancelRequests(reqInfo) As Void
   requestId = reqInfo.id
   for each key in m.jobStore
     job = m.jobStore[key]
-    if job <> invalid and job.reqInfo <> invalid and job.tubiReq <> invalid
+    if job <> invalid AND job.reqInfo <> invalid AND job.tubiReq <> invalid
       if job.reqInfo.id = requestId
         job.tubiReq.cancel()
         exit for
@@ -481,13 +481,13 @@ Function isEmptyField(fieldValue)
 
   if fieldValue = invalid
     fieldIsEmpty = true
-  else if (type(fieldValue) = "roArray" or type(fieldValue) = "roAssociativeArray") and fieldValue.count() = 0
+  else if (type(fieldValue) = "roArray" or type(fieldValue) = "roAssociativeArray") AND fieldValue.count() = 0
     fieldIsEmpty = true
-  else if type(fieldValue) = "roSGNode" and fieldValue.getChildCount() = 0
+  else if type(fieldValue) = "roSGNode" AND fieldValue.getChildCount() = 0
     fieldIsEmpty = true
-  else if (type(fieldValue) = "String" or type(fieldValue) = "roString") and fieldValue = ""
+  else if (type(fieldValue) = "String" or type(fieldValue) = "roString") AND fieldValue = ""
     fieldIsEmpty = true
-  else if (type(fieldValue) = "Integer" or type(fieldValue) = "roInt" or type(fieldValue) = "roInteger") and fieldValue = 0
+  else if (type(fieldValue) = "Integer" or type(fieldValue) = "roInt" or type(fieldValue) = "roInteger") AND fieldValue = 0
     fieldIsEmpty = true
   end if
 

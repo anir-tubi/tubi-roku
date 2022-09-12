@@ -150,7 +150,7 @@ End Function
 Function tubiExperiments_handleNamespaceResponse(resData)
   namespaces = invalid
   parsedResults = ParseJson(resData)
-  if parsedResults <> invalid and parsedResults.namespace_results <> invalid
+  if parsedResults <> invalid AND parsedResults.namespace_results <> invalid
     namespaces = parsedResults.namespace_results
   end if
 
@@ -196,7 +196,7 @@ End Function
 '@namespaces: assocArray, an experiments namespace as returned by API
 Function tubiExperiments_parseNamespace(namespace as Object) as Object
   'The API returns a resource JSON object that still needs to be parsed into a JSON object
-  if namespace <> invalid and namespace.resource <> invalid
+  if namespace <> invalid AND namespace.resource <> invalid
     namespace.resource = ParseJson(namespace.resource) 'bs:disable-line 1016 1019 1056
   end if
   return namespace    'can return invalid
@@ -209,9 +209,9 @@ Function tubiExperiments_getExperiment(namespaceName as string, experimentName a
   experiment = invalid
 
   allExperiments = m.constants.experiments.info
-  if namespaceName <> invalid and experimentName <> invalid and allExperiments <> invalid
+  if namespaceName <> invalid AND experimentName <> invalid AND allExperiments <> invalid
     possibleExperiment = allExperiments[namespaceName]
-    if possibleExperiment <> invalid and possibleExperiment.experiment_result <> invalid and possibleExperiment.experiment_result.experiment_name <> invalid
+    if possibleExperiment <> invalid AND possibleExperiment.experiment_result <> invalid AND possibleExperiment.experiment_result.experiment_name <> invalid
       '//Make sure everything exists before proceeding
       if possibleExperiment.experiment_result.experiment_name = experimentName
         '//We found the desired experiment
@@ -274,7 +274,7 @@ Function tubiExperiments_getExperimentResource(namespaceName as string, experime
 
   oReturn = m.getDefaultResource(namespaceName, experimentName)
   experiment = m.getExperiment(namespaceName, experimentName)
-  if experiment <> invalid and experiment.resource <> invalid
+  if experiment <> invalid AND experiment.resource <> invalid
     oReturn = experiment.resource
   end if
 
@@ -290,7 +290,7 @@ End Function
 '@experimentName: string, the name of the experiment as found in the experiment definition
 Function tubiExperiments_getDefaultResource(namespaceName as string, experimentName as string) as Object
   defaultResource = invalid
-  if namespaceName <> invalid and experimentName <> invalid
+  if namespaceName <> invalid AND experimentName <> invalid
     if m.defaultResources[namespaceName] <> invalid
       defaultResource = m.defaultResources[namespaceName][experimentName]
     end if

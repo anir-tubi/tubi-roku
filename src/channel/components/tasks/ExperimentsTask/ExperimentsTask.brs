@@ -19,18 +19,18 @@ Function getExperiments()
     msg = wait(0, port)
 
     if type(msg) = "roUrlEvent"
-      if experimentsReq <> invalid and experimentsReq.urltransfer <> invalid and msg.getSourceIdentity() = experimentsReq.urltransfer.getIdentity()
+      if experimentsReq <> invalid AND experimentsReq.urltransfer <> invalid AND msg.getSourceIdentity() = experimentsReq.urltransfer.getIdentity()
         ' handle experiments
         experimentsReq.handleEvent(msg)
-        if experimentsReq.response <> invalid and resIsValid(experimentsReq.response) = true
+        if experimentsReq.response <> invalid AND resIsValid(experimentsReq.response) = true
           m.top.experimentsInfo = experiments.handleAsyncNamespaceResponse(experimentsReq.response.data)
         else
           m.top.experimentsInfo = {}
         end if
-      else if externalConfigReq <> invalid and externalConfigReq.urltransfer <> invalid and msg.getSourceIdentity() = externalConfigReq.urltransfer.getIdentity()
+      else if externalConfigReq <> invalid AND externalConfigReq.urltransfer <> invalid AND msg.getSourceIdentity() = externalConfigReq.urltransfer.getIdentity()
         ' handle external config
         externalConfigReq.handleEvent(msg)
-        if externalConfigReq.response <> invalid and resIsValid(externalConfigReq.response) = true
+        if externalConfigReq.response <> invalid AND resIsValid(externalConfigReq.response) = true
           m.top.externalConfigInfo = externalConfig.parseConfigs(externalConfigReq.response.data)
         else
           m.top.externalConfigInfo = invalid
@@ -43,7 +43,7 @@ End Function
 
 ' @res: assocArray, as returned by Request().handleEvent with keys: code, data, failReason
 Function resIsValid(res)
-  if res.code >= 200 and res.code < 400
+  if res.code >= 200 AND res.code < 400
     return true
   else
     return false

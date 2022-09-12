@@ -32,7 +32,7 @@ Function init()
   m.SkipButton.text = getTranslation("screenInitialContent_show_everything_title")
 
   authInfo = m.global.authInfo
-  if (authInfo <> invalid and authInfo.userId <> invalid)
+  if (authInfo <> invalid AND authInfo.userId <> invalid)
     m.SubTitle.text = getTranslation("screenInitialContent_subtitle_signedIn")
   else
     m.SubTitle.text = getTranslation("screenInitialContent_subtitle_signedOut")
@@ -171,7 +171,7 @@ Function onItemFocused(e)
     id = itemContent.id
     sButtonID = m.Tracking.sideNavPageMap[id]
 
-    if m.previousFocusedButton <> invalid and m.previousFocusedButton.top_nav_section <> invalid and m.previousFocusedButton.top_nav_section <> sButtonID and sButtonID <> invalid
+    if m.previousFocusedButton <> invalid AND m.previousFocusedButton.top_nav_section <> invalid AND m.previousFocusedButton.top_nav_section <> sButtonID AND sButtonID <> invalid
       '//::NOTE:: the top_nav_component is used for the navigateWithinPageInfo event of the initial content screen
       ' this triggers a navigate_within_page event in ContentController
       m.top.navigateWithinPageInfo = {
@@ -207,14 +207,14 @@ End Function
 
 
 Function onKeyEvent(key, press) as boolean
-  if press and m.screenReady = true
+  if press AND m.screenReady = true
     if key = "back"
       setActionableItemSelected(m.constants.ui.keyIds.back)
       return true
-    else if key = "down" and m.InitialContentMenu.hasFocus() = true
+    else if key = "down" AND m.InitialContentMenu.hasFocus() = true
       m.SkipButton.setFocus(true)
       return true
-    else if key = "up" and m.SkipButton.hasFocus() = true
+    else if key = "up" AND m.SkipButton.hasFocus() = true
       m.InitialContentMenu.setFocus(true)
       return true
     end if

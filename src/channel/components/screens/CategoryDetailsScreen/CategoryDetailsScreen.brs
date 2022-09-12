@@ -59,7 +59,7 @@ End Function
 Function onSetCallOfAction()
   sPreviousPage = m.top.callingPage
   sCallToAction = ""
-  if sPreviousPage <> invalid and Len(sPreviousPage) > 0
+  if sPreviousPage <> invalid AND Len(sPreviousPage) > 0
     if UCase(sPreviousPage) = UCase(m.constants.ui.terms.categories)
       sCallToAction = getTranslation("goBack_categories")
     else if UCase(sPreviousPage) = UCase(m.constants.ui.terms.channels)
@@ -117,7 +117,7 @@ Function onLoadContent()
 
         '//if a channel is sponsored, then display a background artwork related to the sponsor
         sSponsorBackgroundURL = ""
-        if m.constants.deviceInfo.limitedUi = false and category.sponsorImages.brandBackground <> ""
+        if m.constants.deviceInfo.limitedUi = false AND category.sponsorImages.brandBackground <> ""
           sSponsorBackgroundURL = category.sponsorImages.brandBackground
         else if category.sponsorImages.brandColor <> ""
           sSponsorBackgroundURL = category.sponsorImages.brandColor
@@ -172,7 +172,7 @@ Function onItemFocused()
       m.PageTitleAndCounter.currentIndex = item
 
       ' Update the background image
-      if type(content.backgrounds) = "roArray" and content.backgrounds.count() > 0
+      if type(content.backgrounds) = "roArray" AND content.backgrounds.count() > 0
         m.top.backgroundUriList = content.backgrounds
       else
         m.top.backgroundUriList = [m.defaultBackgroundUri]
@@ -327,7 +327,7 @@ Function populateInfoPanel(infoPanel, content, mode)
     infoPanel.genres = []
   end if
 
-  if content.totalCount <> invalid and content.totalCount >= 0
+  if content.totalCount <> invalid AND content.totalCount >= 0
     infoPanel.categoryContentCount = content.totalCount
   else
     infoPanel.categoryContentCount = 0
@@ -366,7 +366,7 @@ End Function
 
 
 Function getTrackingComponentInfo(itemIndex, numColumns, category, trackingLib)
-  if trackingLib <> invalid and category <> invalid
+  if trackingLib <> invalid AND category <> invalid
     column = 1 + (itemIndex MOD numColumns)
     row = 1 + (itemIndex \ numColumns)
     content = category.getChild(itemIndex)
@@ -400,7 +400,7 @@ Function onKeyEvent(key, press) as Boolean
     if key = "back"
       authInfo = m.global.authInfo
       ' show SignInRequired modal when guest user presses back from ActivationCode Screento CategoryDetailsScreen
-      if authInfo = invalid or (authInfo <> invalid and authInfo.userId = invalid)
+      if authInfo = invalid or (authInfo <> invalid AND authInfo.userId = invalid)
         m.top.signInRequired = true
         handled = true
       end if
@@ -415,7 +415,7 @@ Function onTransportVoiceRequest(msg)
   response = "unhandled"
   inputInfo = msg.getData()
   command = ""
-  if inputInfo <> invalid and inputInfo.command <> invalid
+  if inputInfo <> invalid AND inputInfo.command <> invalid
     command = inputInfo.command
   end if
   tubiLog("CategoryDetailsScreen.onTransportVoiceRequest " + command)

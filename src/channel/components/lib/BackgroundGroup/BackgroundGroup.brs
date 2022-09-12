@@ -97,9 +97,9 @@ Function newBackgroundSet()
 
   for i=0 to m.aCurrentBackgroundInfo.uriList.count()-1
     '//Modify the default background so the correct default background is used depending on the kids mode state
-    if m.top.kidsMode = true and m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground
+    if m.top.kidsMode = true AND m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground
       m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground_kidsMode
-    else if m.top.kidsMode = false and m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground_kidsMode
+    else if m.top.kidsMode = false AND m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground_kidsMode
       m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground
     end if
   end for
@@ -171,7 +171,7 @@ Function completePosterAnimations()
   ]
 
   for each poster in posterGroups
-    if poster.lastAnimationName <> invalid and poster.lastAnimationName <> ""
+    if poster.lastAnimationName <> invalid AND poster.lastAnimationName <> ""
       animation = poster.findNode(poster.lastAnimationName)
       if animation.state = "running" or animation.state = "paused"
         animation.control = "finish"

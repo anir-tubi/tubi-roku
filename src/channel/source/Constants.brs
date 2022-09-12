@@ -158,7 +158,7 @@ Function getConstants()
     'Use newer APIs over deprecated APIs when appropriate
     if FindMemberFunction(di, "GetChannelClientId") <> invalid
       storedDeviceId = RegRead(constants.registryIDs.deviceId, constants.registrySectionIDs.deviceInfoSectionId)
-      if storedDeviceId <> invalid and storedDeviceId <> "000000000000"
+      if storedDeviceId <> invalid AND storedDeviceId <> "000000000000"
         constants.deviceInfo.deviceId = storedDeviceId
       else
         constants.deviceInfo.deviceId = di.GetChannelClientId()
@@ -396,7 +396,7 @@ Function getConstants()
     'contents url
     constants.urls.cms = {}
       constants.urls.cms.urlBase = "https://uapi.adrise.tv/cms"
-      if constants.settings.mode <> "production" and constants.settings.stagingApis = true
+      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
         constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
       end if
       constants.urls.cms.singleContent = constants.urls.cms.urlBase + "/content"
@@ -409,7 +409,7 @@ Function getConstants()
     'matrix url
     constants.urls.matrix = {}
       constants.urls.matrix.urlBase = "https://uapi.adrise.tv/matrix"
-      if constants.settings.mode <> "production" and constants.settings.stagingApis = true
+      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
         constants.urls.matrix.urlBase = "https://uapi.staging-public.tubi.io/matrix"
       end if
       constants.urls.matrix.homescreen = constants.urls.matrix.urlBase + "/homescreen"
@@ -419,7 +419,7 @@ Function getConstants()
     'tensor url
     constants.urls.tensor = {}
       constants.urls.tensor.urlBase = "https://tensor.production-public.tubi.io/api/v1"
-      if constants.settings.mode <> "production" and constants.settings.stagingApis = true
+      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
         constants.urls.tensor.urlBase = "https://tensor.staging-public.tubi.io/api/v1"
       end if
       constants.urls.tensor.homescreen = constants.urls.tensor.urlBase + "/homescreen"
@@ -430,7 +430,7 @@ Function getConstants()
     'user devices url
     constants.urls.userDevice = {}
       constants.urls.userDevice.urlBase = "https://uapi.adrise.tv/user_device"
-      if constants.settings.mode <> "production" and constants.settings.stagingApis = true
+      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
         constants.urls.userDevice.urlBase = "https://uapi.staging-public.tubi.io/user_device"
       end if
       constants.urls.userDevice.signup = constants.urls.userDevice.urlBase + "/signup"
@@ -445,7 +445,7 @@ Function getConstants()
     ' account urls
     constants.urls.account = {}
       constants.urls.account.urlBase = "https://account.production-public.tubi.io"
-      if constants.settings.mode <> "production" and constants.settings.stagingApis = true
+      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
         constants.urls.account.urlBase = "https://account.staging-public.tubi.io"
       end if
       constants.urls.account.emailExists = constants.urls.account.urlBase + "/user/email_available"
@@ -483,7 +483,7 @@ Function getConstants()
       ' QA analytics proxy server
       if mode = "production"
         constants.urls.analytics.urlBase = "https://analytics-ingestion.production-public.tubi.io/analytics-ingestion"
-      else if mode = "qa" and constants.settings.suitestjs = true
+      else if mode = "qa" AND constants.settings.suitestjs = true
         constants.urls.analytics.urlBase = "https://qa-proxy.staging-public.tubi.io/analytics-ingestion"
       end if
       constants.urls.analytics.event = constants.urls.analytics.urlBase + "/v2/event"
@@ -533,7 +533,7 @@ Function getConstants()
     'epgProgram url
     constants.urls.content = {}
       constants.urls.content.epgProgramContentUrlBase = "https://content.production-public.tubi.io"
-      if constants.settings.mode <> "production" and constants.settings.stagingApis = true
+      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
         constants.urls.content.epgProgramContentUrlBase = "https://content.staging-public.tubi.io"
       end if
       constants.urls.content.epgProgramContent = constants.urls.content.epgProgramContentUrlBase + "/epg/programming"
@@ -585,7 +585,7 @@ Function getConstants()
     constants.timers.coppaPassTimeout = 60 * 24 * 60 * 60  ' 60 days
 
     ' allow the config to set the expire time for QA purposes
-    if constants.settings.mode <> "production" and constants.settings.coppaHasAgeDuration <> invalid
+    if constants.settings.mode <> "production" AND constants.settings.coppaHasAgeDuration <> invalid
       constants.timers.coppaFailTimeout = constants.settings.coppaHasAgeDuration
     end if
 

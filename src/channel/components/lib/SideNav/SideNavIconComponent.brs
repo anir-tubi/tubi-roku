@@ -46,7 +46,7 @@ Function onContentChange(data)
             m.sideIconLabel.opacity = 0
             m.sideIconLabel.translation = [0, 10]
           end if
-        else if item.shortDescriptionLine2 = "" and m.sideIconLabel <> invalid
+        else if item.shortDescriptionLine2 = "" AND m.sideIconLabel <> invalid
           m.labelParent.removeChild(m.sideIconLabel)
           m.sideIconLabel = invalid
         end if
