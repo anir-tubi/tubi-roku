@@ -68,6 +68,10 @@ Function TubiExperiments(constants) as Object
       roku_search_live_badge: {
         roku_search_live_badge_v1 : {"enabled": false}
       }
+
+      roku_show_ads_post_seek: {
+        roku_show_ads_post_seek_v1 : {"enabled": false}
+      }
     }
 
     'public methods
