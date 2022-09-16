@@ -858,20 +858,21 @@ Function jumpToPosition(position)
   if m.top.enableAds = true
     if m.positionAtJumpStart > -1 AND position > m.positionAtJumpStart
     ' only request ad breaks on fast forward (don't request on rewind)
-      if getExperimentResource("roku_show_ads_post_seek", "roku_show_ads_post_seek_v1", true).enabled = true
-        ' only request ad breaks if fast forward past a cue point
-        cuepoints = m.Video.content.cuepoints
-        for i = cuepoints.count() - 1 to 0 step -1  'iterate backwards to send last cuepoint that was seek passed
-          cuepoint = cuepoints[i]
-          if m.positionAtJumpStart < cuepoint AND position >= cuepoint
-            shouldAdBreak = true
+
+      cuepoints = m.Video.content.cuepoints
+      for i = cuepoints.count() - 1 to 0 step -1  'iterate backwards to send last cuepoint that was seek passed
+        cuepoint = cuepoints[i]
+        if m.positionAtJumpStart < cuepoint AND position >= cuepoint
+          ' only request ad breaks if fast forward past a cue point
+          shouldAdBreak = true
+
+          if getExperimentResource("roku_show_ads_post_seek", "roku_show_ads_post_seek_v1", true).enabled = true
             adPosition = cuepoint
-            exit for
           end if
-        end for
-      else
-        shouldAdBreak = true
-      end if
+
+          exit for
+        end if
+      end for
     end if
   end if
 
