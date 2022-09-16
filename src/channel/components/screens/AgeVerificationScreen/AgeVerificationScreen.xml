@@ -23,7 +23,8 @@
           eg.
             {
               email : "test@tubi.tv",
-              firstName : "test"
+              firstName : "test", 
+              gender : "Male"
             )
 
         case 2:  signInInfo will have below keys when user signs up
@@ -31,14 +32,16 @@
             {
               email : "test@tubi.tv",
               firstName : "test",
-              emailType : "manual/pre_fill"
+              emailType : "manual/pre_fill", 
+              gender : "Male"
             )
 
         case 3: signInInfo will have below keys when signedIn user launches app and does not have a valid age associated with their account yet.
           eg.
             {
               email : "test@tubi.tv",
-              firstName : "test"
+              firstName : "test", 
+              gender : "Male"
             )
             -->
       <field id="signInInfo" type="assocarray"/>

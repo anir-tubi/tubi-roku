@@ -20,6 +20,9 @@
       <!-- resetFocus will be triggered when user selects back/re-enter password from Invalid Password modal  -->
       <field id="resetFocus" type="boolean" alwaysNotify="true"/>
 
+      <!-- A record of the user's signin info: i.e. email, firstname, gender, etc. -->
+      <field id="signInInfo" type="assocarray"/>
+
     <!-- OUTPUT -->
 
       <!-- signInSelected is set to true when user selects signIn button, which redirects to Home Screen / Detail Screen -->

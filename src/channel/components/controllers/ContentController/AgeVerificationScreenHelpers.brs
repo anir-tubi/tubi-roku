@@ -251,6 +251,18 @@ Function verifyAgeAtSignup(signInInfo, birthdate)
     if signInInfo.emailType = "manual"
       usedEmailAsFirstName = true
     end if
+    gender = ""
+    if isNonEmptyString(signInInfo.gender)
+      if UCase(signInInfo.gender) <> "MALE" AND UCase(signInInfo.gender) <> "FEMALE"
+        gender = "OTHER"
+      else
+        gender = UCase(signInInfo.gender)
+      end if
+    end if
+    lastName = ""
+    if signInInfo.lastName <> invalid
+      lastName = signInInfo.lastName
+    end if
 
     options = {}
     options.body = {
@@ -259,9 +271,9 @@ Function verifyAgeAtSignup(signInInfo, birthdate)
       credentials: {
         email: signInInfo.email
         password: password 'used dummy password - user can change it by using forgot password
-        gender: ""
+        gender: gender
         first_name: signInInfo.firstName
-        last_name: ""
+        last_name: lastName
         birthday: birthdate
         email_type: signInInfo.emailType
         temporary_name: usedEmailAsFirstName
@@ -784,6 +796,7 @@ Function onBirthdayCheckSuccess(hasAgeInfo)
     if isLoggedInUser(authInfo) AND authInfo.firstname <> invalid
       signInInfo.email = authInfo.email
       signInInfo.firstname = authInfo.firstname
+      signInInfo.gender = authInfo.gender
     end if
 
     showContentGroup()

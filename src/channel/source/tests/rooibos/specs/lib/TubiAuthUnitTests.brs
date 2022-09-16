@@ -1,5 +1,6 @@
 '@TestSuite [TubiAuth] Auth.brs
 
+
 '@Setup
 Function TubiAuthSetup()
   m.constants = getConstants()
@@ -30,6 +31,7 @@ Function TubiAuthSetup()
     name: "somebody"
     first_name: "somebody"
     last_name: "special"
+    gender: "MALE"
     access_token: "abcdefgHIJKKV1QiLCJhbGciOiJIUzI1NiJ9"
     refresh_token: "LMNOPquestuvJKV1QiLCJhbGciOiJIUzI1NiJ9"
     expires_in: 1209600
@@ -147,6 +149,8 @@ Function tubiAuth_formatAuthInfoFromServer_test()
   m.assertEqual(authInfo.name, serverAuthInfo.name)
   m.assertNotInvalid(authInfo.firstName)
   m.assertEqual(authInfo.firstName, serverAuthInfo.first_name)
+  m.assertNotInvalid(authInfo.gender)
+  m.assertEqual(authInfo.gender, serverAuthInfo.gender)
   m.assertNotInvalid(authInfo.lastName)
   m.assertEqual(authInfo.lastName, serverAuthInfo.last_name)
   m.assertNotInvalid(authInfo.accessToken)

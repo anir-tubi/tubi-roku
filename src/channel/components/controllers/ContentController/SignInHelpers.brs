@@ -54,7 +54,11 @@ Function showRFIScreen()
     ' RFI screen is showing only if the channelStore node is stored in m variable
     m.billing = CreateObject("roSGNode", "ChannelStore")
     m.billing.observeFieldScoped("userData", "onRfiUserData")
-    m.billing.requestedUserData = "email, firstName, lastName"
+    if getExperimentResource("roku_registration_gender_data", "roku_registration_gender_data_v1", true).enabled = true
+      m.billing.requestedUserData = "email, firstName, lastName, gender"
+    else
+      m.billing.requestedUserData = "email, firstName, lastName"
+    end if
     m.billing.command = "getUserData"
   end if
 End Function
@@ -87,11 +91,16 @@ Function onRfiUserData(msg)
     }
     m.trackingLoggingTask.trackEvent = dialogEvent
 
-    email =  billing.userData.email
-    input = {
-      email : email
-      emailType : "pre_fill"
-    }
+    input = {}
+    '//userdata comes from https://developer.roku.com/en-gb/docs/references/scenegraph/control-nodes/channelstore.md#getuserdata
+    input.firstName = billing.userData.firstName
+    input.lastName = billing.userData.lastName
+    input.gender = billing.userData.gender
+    input.birth = billing.userData.birth
+    input.state = billing.userData.state
+    input.email = billing.userData.email
+    input.emailType = "pre_fill"
+
     checkEmailExists(input)
 
   else
@@ -114,9 +123,9 @@ Function onRfiUserData(msg)
 End Function
 
 
-' onEmailInputContinueSelected callback triggers when user clicks continue button from Email Input screen
+' onEmailInputContinueSelected callback triggers when user clicks continue button from Manual Email Input screen
 Function onEmailInputContinueSelected(evt)
-
+  TubiLog("SignInHelpers.onEmailInputContinueSelected")
   screen =  evt.getRoSGNode()
   input = {
     email : screen.email
@@ -148,9 +157,6 @@ End Function
 ' @input : assocarray, will contain email(user's email) & emailType(manual/pre_fill)
 Function checkEmailExists(input)
 
-  email = input.email
-  emailType = input.emailType
-
   options = {}
   options.params = {
     email: input.email
@@ -164,8 +170,7 @@ Function checkEmailExists(input)
     successCallback: onEmailExistsResponse
     errorCallback: onEmailExistsError
     responseType: "assocarray"
-    email: email
-    emailType : emailType
+    rawInput: input
   })
 
 End Function
@@ -174,22 +179,57 @@ End Function
 ' onEmailExistsResponse is the callback triggered when the emailExists API responds successfully
 ' @response : assocarray, the response of emailExists API in the form of AA
 Function onEmailExistsResponse(response)
-
+  TubiLog("SignInHelpers.onEmailExistsResponse")
   hideNavMenu()
-
+  
   if response <> invalid
     parsedresponse = response.parsedresponse
     requestInput = response.requestInput
 
     if parsedresponse <> invalid AND requestInput <> invalid
+      rawInput = requestInput.rawInput
+
+      gender = ""
+      firstName = ""
+      lastName = ""
+      email = ""
+      emailType = ""
+      if isAA(rawInput) = true
+        if rawInput.gender <> invalid
+          gender = rawInput.gender
+        end if
+        if rawInput.firstName <> invalid
+          firstName = rawInput.firstName
+        end if
+        if rawInput.lastName <> invalid
+          lastName = rawInput.lastName
+        end if
+        if rawInput.email <> invalid
+          email = rawInput.email
+        end if
+        if rawInput.emailType <> invalid
+          emailType = rawInput.emailType
+        end if
+      end if
+
       if parsedresponse.taken = true
-        showSignInScreen(requestInput.email)
+        '//user's email address exists in Tubi servers, so user can sign into their Tubi account
+        showSignInScreen(rawInput)
       else
+        '//user's email address does not exist in Tubi servers, so sign user up with a new Tubi account
         m.authInfoReceived = false
         signUpCredentials = {}
-        signUpCredentials.email =  requestInput.email
-        signUpCredentials.emailType = requestInput.emailType
-        signUpCredentials.firstName = Left(requestInput.email.split("@")[0], 20) ' limiting by 20 characters for the firstname field
+        signUpCredentials.email = email
+        signUpCredentials.emailType = emailType
+        signUpCredentials.gender = gender
+        signUpCredentials.lastName = lastName
+        if isNonEmptyString(firstName) = true
+          signUpCredentials.firstName = firstName
+        else
+          '//if first name does not exist, (i.e. when the user manually enters their email address), 
+          '// then use the 1st part of the email address
+          signUpCredentials.firstName = Left(email.split("@")[0], 20) ' limiting by 20 characters for the firstname field
+        end if
         showAgeVerificationScreenAtSignUp(signUpCredentials)
       end if
     end if
@@ -201,7 +241,7 @@ End Function
 ' onEmailExistsError is the callback triggered when the emailExists API fails
 ' @errorResponse : roSGNode, the error response (code, requestInput) of emailExists API in the form of AA
 Function onEmailExistsError(errorResponse)
-
+  TubiLog("SignInHelpers.onEmailExistsError")
   requestInput = errorResponse.requestInput
 
   accountEvent = {
@@ -232,21 +272,19 @@ Function onEmailExistsError(errorResponse)
   simpleModalInfo = getSimpleModalInfo(title, message, buttons, dialogEvent, m.trackingLoggingTask, checkEmailExists, invalid, m.constants.instantResumeActions.restartApp)
 
   if simpleModalInfo <> invalid AND simpleModalInfo.buttonInfo <> invalid AND simpleModalInfo.buttonInfo[0] <> invalid
-    simpleModalInfo.buttonInfo[0].callbackParams = {
-      email : requestInput.email
-      emailType : requestInput.emailType
-    }
+    simpleModalInfo.buttonInfo[0].callbackParams = requestInput.rawInput
   end if
   showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
 End Function
 
 
 ' showSignInScreen is used to display signIn screen
-' @email : string,  (either taken from roku account or user entered email)
-Function showSignInScreen(email)
+' @userInput : AssociativeArray,  (an associative array that contains at least email and possibly other data from the user's Roku profile)
+Function showSignInScreen(userInput)
   signInScreen = CreateObject("roSGNode", "SignInScreen")
-  signInScreen.id = m.constants.ui.screenIds.signInScreen
-  signInScreen.username = email
+  signInScreen.id = m.constants.ui.screenIds.signInScreen 
+  signInScreen.username = userInput.email
+  signInScreen.signInInfo = userInput
   signInScreen.observeFieldScoped("signInSelected", "onSignInSelected")
   signInScreen.observeFieldScoped("emailSelected", "onSignInScreenEmailSelected")
   signInScreen.observeFieldScoped("staticPageSelected", "onStaticPageSelected")
@@ -369,6 +407,44 @@ Function onSignInResponse(_response)
       status: "SUCCESS"
     }
   }
+  '//::TODO::roku_registration_gender_data - once the user is signed in, then call an API to ensure
+  '//   the Roku saved info (i.e. gender, first name, etc) are saved using the following API
+  '//   https://docs.tubi.io/api_docs/account#operations-User-patch-user-settings, 
+  '//
+  '//   Is there a problem if the user saved something different in the Roku accont as compared to Tubi account?
+  '//   For example, what if the user has the two accounts. In the Roku account, he is known as Thomas, and 
+  '//   in the Tubi account, he set his name to be his nickname, Tommy. So everytime we signs into his Roku app, it
+  '//   changes his name to Thomas. The user changes his name in Tubi.tv, but again everytime he signs into the Roku app,
+  '//   his name changes - very frustrating.
+  '//   Maybe things like names and gender only changes if that info is not present in Tubi but is present in the Account info?
+  '//   i.e. isNonEmptyString(_response.first_name) = false, isNonEmptyString(_response.gender) = false
+
+
+  ' signInScreen = getFromScreenCache(m.constants.ui.screenIds.signInScreen)
+  ' rokuUserInfo = signInScreen.signInInfo
+  ' if rokuUserInfo <> invalid
+  '   genderSend = ""
+  '   firstNameSend = ""
+  '   lastNameSend = ""
+  '   if isNonEmptyString(rokuUserInfo.gender) = true AND isNonEmptyString(_response.gender) = false
+  '     '//Roku account has gender info, but the Tubi account does not
+  '     genderSend = rokuUserInfo.gender
+  '   end if
+  '   if isNonEmptyString(rokuUserInfo.firstName) = true AND isNonEmptyString(_response.first_name) = false
+  '     '//Roku account has first name info, but the Tubi account does not
+  '     firstNameSend = rokuUserInfo.firstName
+  '   end if
+  '   if isNonEmptyString(rokuUserInfo.lastName) = true AND isNonEmptyString(_response.last_name) = false
+  '     '//Roku account has last name info, but the Tubi account does not
+  '     lastNameSend = rokuUserInfo.lastName
+  '   end if
+
+  '   if isNonEmptyString(lastNameSend) OR isNonEmptyString(firstNameSend) OR isNonEmptyString(lastNameSend)
+  '     '//if any of the data in not empty then send the data that is not empty using the following API
+  '     '//   https://docs.tubi.io/api_docs/account#operations-User-patch-user-settings, 
+  '   end if
+  ' end if
+
   onActivationSuccess()
 
 End Function
@@ -458,6 +534,7 @@ Function onPostSignInAuthInfoUpdated()
       signInInfo = {}
       signInInfo.email  = authInfo.email
       signInInfo.firstname = authInfo.firstname
+      signInInfo.gender = authInfo.gender
     end if
     showAgeVerificationScreenAtSignIn(signInInfo)
   else if m.callbackAfterSignIn <> invalid
