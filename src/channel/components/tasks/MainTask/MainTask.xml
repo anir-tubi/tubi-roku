@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - MainTask
+ -
+ - Since we are not able to update code in main.brs we use this task to handle code that would have normally run there
+ -
+ -->
+<component name="MainTask" extends="Task">
+    <script type="text/brightscript" uri="MainTask.brs" />
+
+    <interface>
+      <!-- OUTPUT -->
+      <!-- Combination of roHdmiStatus and roCECStatus hdmi checks to know if we're ok to playback video -->
+      <field id="isHdmiStatusOk" type="boolean" />
+    </interface>
+</component>

@@ -355,10 +355,10 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
 
     if nResumePoint >= m.constants.player.historyFrequency
       setIsHistory(detailScreen, true)
-    else 
+    else
       setIsHistory(detailScreen, false)
     end if
-    
+
     detailScreen.resumePoint = nResumePoint
 
     'tell the detail screen/info panel to vertically center the info panel
@@ -1579,9 +1579,9 @@ Function resumeVideoDetailScreen(detailScreen, playbackSource = "unknown")
   if detailScreen <> invalid AND isFetchingInProgress(detailScreen) <> true
     detailScreen.playbackSource = playbackSource
     if isPlayable(detailScreen) = true
-      resumeHelper(detailScreen)
+      detailScreenResumeHelper(detailScreen)
     else
-      m.actionType = resumeHelper
+      m.actionType = detailScreenResumeHelper
       detailScreen.isLoading = true
       getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
     end if
@@ -1667,7 +1667,7 @@ Function playHelper(screen)
 End Function
 
 
-Function resumeHelper(detailScreen)
+Function detailScreenResumeHelper(detailScreen)
   episode = getEpisodeContent(detailScreen.content)
   if episode <> invalid then
     nowPos = processResume(episode)
@@ -1751,7 +1751,7 @@ Function skipDetailScreen(refreshedContent)
         end if
       else
         if nowPos > 0
-          m.detailScreenAfterFn = resumeHelper
+          m.detailScreenAfterFn = detailScreenResumeHelper
         else
           m.detailScreenAfterFn = playHelper
         end if
@@ -1760,8 +1760,6 @@ Function skipDetailScreen(refreshedContent)
     end if
   end if
 End Function
-
-
 
 
 ' Organizes the information needed to create a "bookmark" tracking event and sends the information to the trackingTask which will
@@ -2020,7 +2018,6 @@ Function removeFromQueueErrorResponse(error)
 
     showErrorModal(modalInfo, onRemoveFromQueueRetry, [detailScreen])
   end if
-
 End Function
 
 
@@ -2044,7 +2041,6 @@ Function addToQueueSuccessResponse(response)
       end if
     end if
   end if
-
 End Function
 
 

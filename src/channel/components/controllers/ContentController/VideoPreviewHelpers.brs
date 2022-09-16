@@ -98,7 +98,7 @@ Function onVideoPreviewStateChanged(msg)
     end if
     m.backgroundGroup.posterVisible = false
   else if videoPreviewState = "error"
-    ' unobserve the state if we have any error while playing mp4 video previews to avoid autostarting the focused content on autostart varient of experiment.
+    ' unobserve the state if we have any error while playing mp4 video previews to avoid autostarting the focused content on autostart variant of experiment.
     videoPreview.unobserveFieldScoped("state")
   else
     if videoPreview <> invalid
@@ -109,7 +109,8 @@ Function onVideoPreviewStateChanged(msg)
 
   if videoPreviewState = "finished"
     if currentScreen <> invalid
-      if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).autostart = true
+      ' Don't want to continue playback if the user has their tv turned off
+      if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).autostart = true AND m.maintask.isHdmiStatusOk = true then
         if currentScreen.subType() = "HomeScreen"
           showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen, invalid, "previews")
         else if currentScreen.subType() = "DetailScreen"

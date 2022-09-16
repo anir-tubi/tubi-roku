@@ -11,7 +11,11 @@ Function init()
   ' Timer to find last time the app suspended
   m.appSuspendTimer = CreateObject("roTimespan")
 
-  generalTask = CreateObject("roSGNode", "GeneralTask") ' initiate GeneralTask
+  m.mainTask = createObject("roSGNode", "MainTask") ' initiate MainTask
+  m.mainTask.observeFieldScoped("isHdmiStatusOk", "onIsHdmiStatusOkChange")
+
+
+  generalTask = createObject("roSGNode", "GeneralTask") ' initiate GeneralTask
   ' Initiate GeneralTaskModule by passing caller context.
   ' Calling GeneralTaskModule() will append methods to the local m.
   ' DO NOT overwrite m variable methods/properties which belongs to GeneralTaskModule.
@@ -1549,7 +1553,6 @@ Function onCustomSuspend(msg)
     ' if the current screen is videoplayer, return to detail screen so that it will update historyPosition AND remove video screen from stack AND show previous screen from stack
     if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
       ' don't send analytics event when user presses "home" button during playback, so sending param as false
-      stopVideoContent(currentScreen)
       returnToDetailScreenFromVideo(false)
     else
       ' if the focus is on live TV row, stop the playback
@@ -1632,7 +1635,7 @@ Function onCustomResume(msg)
       else
         bLinearVideoOverride = false
       end if
-      
+
       if isLoggedInUser() = false AND (lastAppSuspendInSecs > m.constants.timers.coppaFailTimeout OR lastAppRestartInDays >= 4 OR bLinearVideoOverride = true)
         ' For guest users, if the time between last suspend and current resume is more than 24 hours,
         ' disable Instant Resume & relaunch app from scratch.
@@ -1816,7 +1819,7 @@ Function resumeApp()
       playLinearVideoContent(originalLinearContent, false, associatedScreenId)
     else if isAnEPGScreen(currentScreen)
       ' if current Screen epg Screen,  It will start counting the remaining seconds and full videoscreen will take over when it reaches 0
-      ' without content which will be a blank screen. To avoit it,  stop the counter and refresh the EPGScreen videoplay
+      ' without content which will be a blank screen. To avoid it, stop the counter and refresh the EPGScreen videoplay
       stopCountdownTimer()
       currentScreen.refreshEPGScreenVideoPlay = false
     end if
@@ -1922,4 +1925,55 @@ Function showHideLogo(logoType)
     end if
   end if
 
+End Function
+
+
+Function isHdmiPlaybackExperimentEnabled()
+  ' 11.5 now properly returns the roCECStatus events while run_as_process=1
+  ' We want to target only 11.5 plus for this experiment because of this
+  firmware = createObject("roDeviceInfo").getOSVersion()
+  isFirmwareOk = (firmware.major.toInt() >= 11 AND firmware.minor.toInt() >= 5)
+
+  if isFirmwareOk = true AND getExperimentResource("roku_hdmi_playback", "roku_hdmi_playback_v1", true).enabled = true then
+    return true
+  end if
+  return false
+End Function
+
+
+Function onIsHdmiStatusOkChange(msg)
+  isHdmiStatusOk = msg.getData()
+
+  currentScreen = getCurrentScreen()
+  if currentScreen <> invalid AND isHdmiPlaybackExperimentEnabled() = true then
+    currentScreenId = currentScreen.id
+    screenIds = m.constants.ui.screenIds
+
+    if currentScreenId = screenIds.detailScreen then
+      if isHdmiStatusOk = true AND currentScreen.shouldResumePlayback = true then
+        currentScreen.shouldResumePlayback = false
+        detailScreenResumeHelper(currentScreen)
+      end if
+    else if currentScreenId = screenIds.videoPlayerScreen then
+      if isHdmiStatusOk = false then
+        returnToDetailScreenFromVideo(false)
+        currentScreen = getCurrentScreen()
+        currentScreen.shouldResumePlayback = true
+      end if
+    else if currentScreenId = screenIds.episodeScreen then
+      if isHdmiStatusOk = true AND currentScreen.shouldResumePlayback = true then
+        currentScreen.shouldResumePlayback = false
+        episodeScreenResumeHelper(currentScreen)
+      end if
+    else
+      linearVideoPlayerScreen = getFromScreenCache(screenIds.linearVideoPlayerScreen)
+      if isNode(linearVideoPlayerScreen) = true then
+        if isHdmiStatusOk = true then
+          linearVideoPlayerScreen.control = "play"
+        else
+          linearVideoPlayerScreen.control = "stop"
+        end if
+      end if
+    end if
+  end if
 End Function

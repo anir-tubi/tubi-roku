@@ -32,7 +32,7 @@
       <field id="upNextContent" alias="UpNext.content"/>
       <field id="upNextUpdateContent" alias="UpNext.updateContent"/>
 
-      <!-- Only support "play" and "stop" for simple external interface -->
+      <!-- Valid values "play", "pause", "resume", "stop" -->
       <field id="control" type="string" value="none" alwaysNotify="true"/>
 
       <!-- interval in seconds for sending position data to the tracking server -->

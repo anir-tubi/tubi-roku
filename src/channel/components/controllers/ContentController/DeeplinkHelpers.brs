@@ -643,7 +643,7 @@ Function handleDeeplinkSeriesSuccessResponse(refreshedContent)
 
     if episodeHistory <> invalid AND episodeHistory.nowPos > 0
       episode.nowPos = episodeHistory.nowPos
-      afterFn = resumeHelper
+      afterFn = detailScreenResumeHelper
     end if
   else
     refreshedContent.currentEpisodeId = ""
@@ -723,7 +723,7 @@ Function handleDeeplinkEpisodeSuccessResponse(refreshedContent)
     if episodeHistory <> invalid AND episodeHistory.nowPos > 0
       episode.nowPos = episodeHistory.nowPos
     end if
-    afterFn = resumeHelper
+    afterFn = detailScreenResumeHelper
   else
     afterFn = playHelper
   end if

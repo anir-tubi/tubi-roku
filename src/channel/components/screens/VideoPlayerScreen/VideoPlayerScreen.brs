@@ -444,6 +444,7 @@ Function onControlChange()
     end if
 
   else if m.top.control = "stop" then
+    stopAdsPlayback()
     cancelReplayCaptions()
     clearSkipIntroButtonAndTimer()
     stopVideo()
@@ -1126,6 +1127,21 @@ Function resetVideoPlayerState(content = invalid)
   m.top.upNextContentToAutoplay = invalid
   m.shouldShowUpNext = true
   m.UpNext.resetContent = true
+End Function
+
+
+Function stopAdsPlayback()
+  tubilog("VideoPlayer.stopAdsPlayback")
+
+  renderer = m.RAFAdContainer.getChild(0)
+  rendererType = getNodeSubtype(renderer)
+  if rendererType = "RAFContentRenderer" then
+    ' stitched ads renderer
+    renderer.control = "stop"
+  else if rendererType = "RAFRenderer" then
+    ' nonstitched ads renderer
+    renderer.stopAd = true
+  end if
 End Function
 
 

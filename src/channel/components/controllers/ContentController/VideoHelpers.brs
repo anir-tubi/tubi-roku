@@ -694,7 +694,7 @@ Function onRetryPlayerError()
     if screen.watchTrailerSelected = true
       trailerHelper(screen)
     else
-      resumeHelper(screen)
+      detailScreenResumeHelper(screen)
     end if
   end if
 End Function

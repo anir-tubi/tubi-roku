@@ -24,7 +24,12 @@
            2d array describing the episode that needs to be focused with [seasonIndex, episodeIndex] -->
       <field id="episodeToFocus" alias="RowList.jumpToRowItem" />
 
+      <!-- Used to store state to determine if we should resume playback at a later time -->
+      <field id="shouldResumePlayback" type="boolean" value="false" />
+
     <!-- OUTPUT -->
+      <field id="episodeFocused" alias="RowList.rowItemFocused" />
+
       <!-- Set to the content of the episode that was clicked on -->
       <!-- mirrors RowList.rowItemSelected, but EpisodeScreen interjects before sending it to the ContentController -->
       <field id="episodeSelected" type="vector2d" alwaysNotify="true" />

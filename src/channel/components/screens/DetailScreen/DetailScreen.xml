@@ -113,6 +113,9 @@
         -->
     <field id="playbackSource" type="string"/>
 
+    <!-- Used to store state to determine if we should resume playback at a later time -->
+    <field id="shouldResumePlayback" type="boolean" value="false" />
+
     <!-- OUTPUTS -->
 
       <!-- Should the full description be displayed -->
