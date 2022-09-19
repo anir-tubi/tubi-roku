@@ -463,6 +463,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
     end if
 
     historyPosition = round(videoPlayer.position)
+
     detailScreenResumePosition = historyPosition
 
     isEndReached = (videoContent.creditsCuePoints <> invalid AND videoContent.creditsCuePoints.postlude <> invalid AND videoContent.creditsCuePoints.postlude > 0 AND detailScreenResumePosition > videoContent.creditsCuePoints.postlude)
