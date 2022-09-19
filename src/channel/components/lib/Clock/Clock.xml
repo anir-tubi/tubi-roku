@@ -9,16 +9,13 @@
 
   <interface>
     <!-- INPUTS -->
-    <!-- When display is changed, it will perform the operations that ar needed to properly display or hide the guide. -->
-    <field id="width" type="float"/>
-    <field id="height" type="float"/>
+    <!-- When display is changed, it will perform the operations that are needed to properly display or hide the guide. -->
+    <field id="width" alias="clockBground.width, time.width" />
+    <field id="height" alias="clockBground.height, time.height" />
 
     <!-- Setting the component's visblity will start or stop the timer, but this allows you to start and stop the timer w/o affecting the visibility. -->
     <!-- The available values for this field are the same a timer's control: start, stop, none -->
-    <field id="control" type="string"/>
-
-
-    <!-- OUTPUTS -->
+    <field id="control" alias="clockTimer.control" />
 
   </interface>
 
@@ -40,8 +37,6 @@
     </Label>
 
     <Timer
-      id="clockTimer"
-      repeat="true"
-      duration="10"/>
+      id="clockTimer" />
   </children>
 </component>

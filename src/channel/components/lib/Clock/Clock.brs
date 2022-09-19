@@ -1,64 +1,40 @@
 Function init()
-  m.constants = getConstantsFromGlobal()
-
-  m.background = m.top.findNode("clockBground")
   m.time = m.top.findNode("time")
   m.clockTimer = m.top.findNode("clockTimer")
 
-  m.top.observeField("width", "onWidthChange")
-  m.top.observeField("height", "onHeightChange")
-  m.top.observeField("visible", "onVisibleChange")
-  m.top.observeField("control", "onControlChange")
-  m.clockTimer.observeField("fire", "onTimerFire")
-
-  if m.top.visible = true
-    turnOn()
-  end if
-  
+  m.top.enableRenderTracking = true
+  m.top.observeFieldScoped("renderTracking", "onRenderTrackingChange")
+  m.top.observeFieldScoped("control", "onControlChange")
+  m.clockTimer.observeFieldScoped("fire", "onTimerFire")
 End Function
 
 
-' When the visibility of this compomnent is changed, start or stop the clock timer
-Function onVisibleChange()
-  if m.top.visible = false
+' When the clock is not visible then stop the timer and vice versa
+Function onRenderTrackingChange(msg)
+  if msg.getData() = "none" then
     m.clockTimer.control = "stop"
   else
-    turnOn()
+    onTimerFire()
   end if
 End Function
 
 
-'//If the control is changed, then update the timer accordingly 
-Function onControlChange()
-  m.clockTimer.control = m.top.control
-  if m.top.control = "start"
+'//If the control is changed, then update the timer accordingly
+Function onControlChange(msg)
+  if msg.getData() = "start" then
     setCurrentTime()
   end if
 End Function
 
 
-Function turnOn()
-  m.clockTimer.control = "start"
-  setCurrentTime()
-End Function
-
-
-
-Function onWidthChange()
-  m.background.width = m.top.width
-  m.time.width = m.top.width
-End Function
-
-
-Function onHeightChange()
-m.background.height = m.top.height
-m.time.height = m.top.height
-End Function
-
-
 Function onTimerFire()
+  ' We want the clock to fire at the start of each minute so we see how many seconds until the next minute and set the timer to that amount
+  date = CreateObject("roDateTime")
+  m.clockTimer.duration = 60 - date.getSeconds()
+  m.clockTimer.control = "start"
+
   setCurrentTime()
-End Function 
+End Function
 
 
 Function setCurrentTime()
