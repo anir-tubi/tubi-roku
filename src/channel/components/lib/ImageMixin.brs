@@ -6,7 +6,7 @@ Function setImageUriSize(uri, constants = m.constants)
       constants = getConstantsFromGlobal()
     end if
     resolution = "fhd"
-    if constants.deviceInfo.scaledUi = true
+    if constants <> invalid AND constants.deviceInfo.scaledUi = true
       resolution = "hd"
     end if
 
