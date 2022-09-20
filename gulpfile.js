@@ -685,6 +685,13 @@ async function confirmRelease(done) {
 }
 
 
+// Simple helper to avoid having to type the dashes each time to get the tasks list. Also prints a more compact version
+function listTasks(done) {
+  console.log(shell.exec(`gulp --tasks-simple`).stdout);
+  done();
+}
+
+
 exports.codeClean = series(listUnusedImages, listUnusedTranslations);
 exports.build = series(clean, buildInstalled, buildStarter, buildRemote);
 exports.sideload = sideLoad;
@@ -701,6 +708,7 @@ exports.release = series(confirmRelease, setProduction, bumpBuild, exports.build
 exports.compareProd = findCommitsNotOnProductionBranch;
 exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
 exports.addMissingImages = addMissingImagesToRemoteLibrary;
+exports.tasks = listTasks;
 
 //command lines related to the crowdin language translations
 exports.update_local_translations = updateLocalTranslations;
