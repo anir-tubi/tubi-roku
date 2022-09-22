@@ -21,15 +21,6 @@ Function TubiExperiments(constants) as Object
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
 
     defaultResources: {
-      '//Experiment to test what happens when previously played linear video is lauched when the app is relaunched
-      '// When enabled is set to "true", the "resetTiming" determines when the last linear channel ID is reset back to an empty value
-      '//   - "linearstop" = When the linear video is no longer playing in fullscreen
-      '//   - "vod" = When a VOD video is played
-      '//   - "never" = the linear channel ID is never reset; Note: this is assumed to be the default behavior, so any other value other than the previous 2 values will also have the same affect as "never".
-      roku_relaunch_linear: {
-        roku_relaunch_linear_v1: {"enabled": false, "resetTiming": "never"}
-      }
-
       '// When enabled=true, the roku_title_reactions_v2 experiment will display a Like/dislike button on the title details screen if a logged out user
       roku_title_reactions: {
         roku_title_reactions_v2: {"enabled": false}

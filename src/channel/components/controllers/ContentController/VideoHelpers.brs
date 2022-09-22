@@ -26,12 +26,6 @@ Function playVideoContent(content, playbackSource = "unknown", position = 0)
     end if
   end if
 
-  experimentLinearRelaunch = getExperimentResource("roku_relaunch_linear", "roku_relaunch_linear_v1", false)
-  if experimentLinearRelaunch <> invalid AND experimentLinearRelaunch.enabled = true AND experimentLinearRelaunch.resetTiming = "vod"
-    '//Delete linear video ID, if the experiment variant is set to reset after playing of VOD video
-    RegDelete(m.constants.registryIDs.lastPlayedLinearId, m.constants.registrySectionIDs.lastPlayedLinearSectionId)
-  end if
-
   '//send a copy of the videoSponsorExposureId to the videoPlayer
   videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
   videoPlayer.control = "play"

@@ -8,13 +8,10 @@ Function getConstants()
   'content IDs used to store things in the registry
   constants.registryIDs = {}
     constants.registryIDs.deviceId = "deviceId"
-    constants.registryIDs.lastPlayedLinearId = "lastPlayedLinearId"
-    constants.registryIDs.hasLinearVideoPlayed = "hasLinearVideoPlayed"
 
   'Registry Section IDs used to store things in a particular section of the registry
   constants.registrySectionIDs = {}
     constants.registrySectionIDs.deviceInfoSectionId = "deviceinfo"
-    constants.registrySectionIDs.lastPlayedLinearSectionId = "lastPlayedLinearSection"
 
   mode = constants.settings.mode
   if mode = invalid then mode = "dev"

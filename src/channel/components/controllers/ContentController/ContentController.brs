@@ -471,6 +471,15 @@ Function setExitApp()
 End Function
 
 
+' This function is used to get rid of unused items in the registry due to removal features, unused experiments, etc.
+' Each line that removes a registry item should include the date of when the the line is suspected to be included in production.
+' We can remove the lines as they get stale. At times this function will not have any lines, but we can still include a call to the 
+' function for future reference.
+Function cleanRegistry()
+  RegDelete("lastPlayedLinearId", "lastPlayedLinearSection")  '//Date Added to Production - 9/29/2022
+End Function
+
+
 '''''''''''''''''''''''''
 ' startUserExperience
 '
@@ -480,6 +489,7 @@ End Function
 '
 Function startUserExperience()
   tubiLog("ContentController.startUserExperience")
+  cleanRegistry()
 
   if m.authInfoReceived <> true
     ' checks if the initial auth info has been pulled from the registry
@@ -567,12 +577,7 @@ Function startUserExperience()
       ' show on-boarding screens only for new users (guest)
       showOnBoardingWelcomeScreen()
     else
-      '//When starting the app again, check if the last played linear video should play
-      sLastLinearID = getOverrideLinearId()
-      if isNonEmptyString(sLastLinearID) = true
-        '//If a linear video should automatically play....
-        resumeToLinearVideo(sLastLinearID, startChannelFromAppLoad)
-      else if shouldDisplayInitialContentScreen() = true
+      if shouldDisplayInitialContentScreen() = true
         ' Display the initial content screen to the user so they can choose the proper experience.
         displayInitialContentScreen()
         showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary
@@ -1596,7 +1601,6 @@ Function onCustomResume(msg)
   customResumeLaunchParams = invalid
   bRestartApp = false
   bStartChannel = false
-  sLastLinearID = ""
 
   if args <> invalid
     customResumeLaunchParams = args.launchParams
@@ -1619,29 +1623,12 @@ Function onCustomResume(msg)
       ' lots of edge cases, so for consistency, restarting the app is easiest.
       bRestartApp = true
     else
-      '//When starting the app again, check if the last played linear video should play
-      sLastLinearID = getOverrideLinearId()
-      '//When coming back from instant resume, the default assumption is to assume the linear video should resume playing.
-      '//The next following code will determine when NOT to assume this.
-      bLinearVideoOverride = true
-      if isNonEmptyString(sLastLinearID) = true
-        '//If a previously played, overriding linear video exists, then check for another condition to see if the linear video should override the instant resume process
-        if currentScreen <> invalid AND (currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen OR currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen OR currentScreen.id = m.constants.ui.screenIds.detailScreen)
-          '//If the previous app state was playing a video or displaying on a detail screen,
-          '//   then the user should be taken back to that on Instant Resume
-          '//   rather than playing a previous linear video
-          bLinearVideoOverride = false
-        end if
-      else
-        bLinearVideoOverride = false
-      end if
-
-      if isLoggedInUser() = false AND (lastAppSuspendInSecs > m.constants.timers.coppaFailTimeout OR lastAppRestartInDays >= 4 OR bLinearVideoOverride = true)
+      if isLoggedInUser() = false AND (lastAppSuspendInSecs > m.constants.timers.coppaFailTimeout OR lastAppRestartInDays >= 4)
         ' For guest users, if the time between last suspend and current resume is more than 24 hours,
         ' disable Instant Resume & relaunch app from scratch.
         ' Also every 4 days once the app restarts in order to get starter/remote components
         bRestartApp = true
-      else if isLoggedInUser() = true AND (lastAppRestartInDays >= 4 OR bLinearVideoOverride = true)
+      else if isLoggedInUser() = true AND (lastAppRestartInDays >= 4)
         ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
         bRestartApp = true
       else
@@ -1694,53 +1681,10 @@ Function onCustomResume(msg)
 
   '// If the resume app action is to restart the app or start the channel, then 1st see if the previously played linear video can be played (if one exists)
   if bRestartApp = true
-    if isNonEmptyString(sLastLinearID) = true
-      resumeToLinearVideo(sLastLinearID, restartAppFromInstantResume)
-    else
-      restartAppFromInstantResume()
-    end if
+    restartAppFromInstantResume()
   else if bStartChannel = true
-    if isNonEmptyString(sLastLinearID) = true
-      resumeToLinearVideo(sLastLinearID, startChannelFromInstantResume)
-    else
-      startChannelFromInstantResume()
-    end if
+    startChannelFromInstantResume()
   end if
-End Function
-
-
-' Has the App registered before that it has played a linear video?
-Function hasLinearVideoPlayed() as Boolean
-  bRegistryValue = RegRead(m.constants.registryIDs.hasLinearVideoPlayed, m.constants.registrySectionIDs.lastPlayedLinearSectionId)
-  return (bRegistryValue = "true")
-End Function
-
-
-' Get the ID of the previously played linear video if it should be played. If no linear channel had been prevuouysly been
-' played OR if it is not the right conditions to play the video, then return an empty string
-Function getOverrideLinearId() as String
-  sLastLinearIDReturn =  ""
-  if hasLinearVideoPlayed() = true
-    '//If the registry indicates that a linear has ever played, then dispatch an experiment exposure event.
-    '//Once the experiment is over, then this check of the registry variable and the registry variable itself can be eliminated.
-
-    if getExperimentResource("roku_relaunch_linear", "roku_relaunch_linear_v1", true).enabled = true
-      sLastLinearID = RegRead(m.constants.registryIDs.lastPlayedLinearId, m.constants.registrySectionIDs.lastPlayedLinearSectionId)
-      if sLastLinearID <> invalid AND isKidsUIOn() = false
-        sLastLinearIDReturn = sLastLinearID
-      end if
-    end if
-  end if
-
-  return sLastLinearIDReturn
-End Function
-
-
-' When the app loads or instant resumes, then the last linear video should play
-' @param sVideoID: String, The ID of the Linear channel video
-' @param fnFailSafeFunction: Function, The function to call if the linear video fails to play
-Function resumeToLinearVideo(sVideoID, fnFailSafeFunction)
-  fetchEPGChannel(m.constants.ui.screenIds.epgScreen, sVideoID, onSingleChannelFetchForLinearRelaunchSuccess , fnFailSafeFunction)
 End Function
 
 

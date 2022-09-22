@@ -181,11 +181,6 @@ Function maximizeLinearPlayer(content)
       bAnimate = true
     end if
 
-    'save the ID of the Linear Channel that is being played so it can posssibly be used later to resume playng when the app is relaunched
-    RegWrite(m.constants.registryIDs.lastPlayedLinearId, content.id, m.constants.registrySectionIDs.lastPlayedLinearSectionId)
-    '//Indicate that a linear video has played
-    RegWrite(m.constants.registryIDs.hasLinearVideoPlayed, "true", m.constants.registrySectionIDs.lastPlayedLinearSectionId)
-
     videoPlayer.unobserveFieldScoped("state")
     videoPlayer.unobserveFieldScoped("backButtonPressed")
     videoPlayer.observeFieldScoped("state", "onLinearVideoPlayerState")
@@ -541,12 +536,6 @@ Function onLinearVideoPlayerVisibleFullscreenChange(msg)
   bVisible = videoPlayer.visible
   bFullScreen = videoPlayer.fullscreen
   if bFullScreen = false
-    experimentLinearRelaunch = getExperimentResource("roku_relaunch_linear", "roku_relaunch_linear_v1", false)
-    if experimentLinearRelaunch <> invalid AND experimentLinearRelaunch.enabled = true AND experimentLinearRelaunch.resetTiming = "linearstop"
-      '//Delete linear video ID, if the experiment variant is set to reset after stopping of linear video in full screen
-      RegDelete(m.constants.registryIDs.lastPlayedLinearId, m.constants.registrySectionIDs.lastPlayedLinearSectionId)
-    end if
-
     m.SideNav.visible = true
     if bVisible = false
       '//Is the video player no longer visible and not in fullscreen? i.e. the news container is no longer in focus
