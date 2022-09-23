@@ -864,12 +864,8 @@ Function jumpToPosition(position)
         cuepoint = cuepoints[i]
         if m.positionAtJumpStart < cuepoint AND position >= cuepoint
           ' only request ad breaks if fast forward past a cue point
+          getExperimentResource("roku_show_ads_post_seek", "roku_show_ads_post_seek_v2", true) 'fire exposure event
           shouldAdBreak = true
-
-          if getExperimentResource("roku_show_ads_post_seek", "roku_show_ads_post_seek_v1", true).enabled = true
-            adPosition = cuepoint
-          end if
-
           exit for
         end if
       end for
