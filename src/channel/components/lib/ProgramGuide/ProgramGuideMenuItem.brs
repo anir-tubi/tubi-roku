@@ -47,7 +47,7 @@ Function onFocusPercentChange()
   item = m.top.itemContent
   ' //TODO : Find better logic to avoid multiple executions of this logic because of focuspercent being float and triggered multiple times.
   if m.top.focusPercent < 0.5
-    if item.selected
+    if item.selected = true
       if item.selectedItemAttributes <> invalid
         m.timeString.text = strReplace(item.ShortDescriptionLine1, item.selectedItemAttributes.title, "")
         ' color of the text has been passed along with string so that content Items need not to access global.

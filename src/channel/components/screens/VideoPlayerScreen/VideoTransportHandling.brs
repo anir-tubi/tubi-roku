@@ -2,7 +2,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   tubiLog("VideoTransportHandling.onKeyEvent key = " + key + " press: " + press.toStr())
   if press
     m.lastButtonPressPos = m.playerPosition
-    if isButtonPressAllowed(key,  m.VideoState, m.Video)
+    if isButtonPressAllowed(key, m.VideoState, m.Video) 
       if key = "OK"
         handleOk()
 
@@ -1068,6 +1068,10 @@ Function isButtonPressAllowed(key, videoState, videoNode)
     play: true
     replay: true
     options: true
+    up: true
+    down: true
+    left: true
+    rght: true
   }
 
   isAllowed  = true
@@ -1093,7 +1097,7 @@ Function isActiveVideoState(videoState, videoNode)
     isActive = false
   end if
 
-  if videoNode.state = "buffering" or videoNode.state = "stopped"
+  if videoNode.state = "buffering" OR videoNode.state = "stopped"
     isActive = false
   end if
 
