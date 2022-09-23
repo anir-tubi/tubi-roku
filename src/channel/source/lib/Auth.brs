@@ -150,11 +150,8 @@ Function tubiAuth_getAuthInfo()
     if isExpired = true
       if authInfo.userId <> invalid
         newAuthInfo = m.refreshAuthToken(authInfo, 3) 'can return invalid
-      else if isString(authInfo.secretKey) = true
-        newAuthInfo = m.refreshAnonymousToken(authInfo, 3) 'can return invalid
       else
-        tubiLog("AuthInfo did not have secretKey! This should not have happened: " + FormatJson(authInfo), "warn", "clientWarn", "no-secret-key")
-        newAuthInfo = m.fetchAndSaveAnonymousAuthInfo() 'can return invalid
+        newAuthInfo = m.refreshAnonymousToken(authInfo, 3) 'can return invalid
       end if
     else
       newAuthInfo = authInfo
@@ -193,7 +190,7 @@ End Function
 Function tubiAuth_refreshAnonymousToken(authInfo, timeout)
   newAuthInfo = invalid
 
-  if authInfo = invalid
+  if isAA(authInfo) = false OR isString(authInfo.secretKey) = false then
     newAuthInfo = m.fetchAndSaveAnonymousAuthInfo()
   else
     authPort = CreateObject("roMessagePort")
