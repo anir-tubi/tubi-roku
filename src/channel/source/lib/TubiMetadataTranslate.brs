@@ -1650,6 +1650,19 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
           end if
           program.title = programFromServer.title
 
+          'Add episode title
+          program.epgProgramTitle = programFromServer.title
+
+          if programFromServer.keywords <> invalid AND programFromServer.keywords.count() > 0
+            for each keyword in programFromServer.keywords
+              if keyword = "EpisodeTitle_IsPreferred" and isNonEmptyString(programFromServer.episode_title)
+                program.epgProgramTitle = programFromServer.episode_title
+                exit for
+              end if
+            end for
+
+          end if
+
           startTime = ""
           dayOfMonth = ""
           dayOfWeek = ""

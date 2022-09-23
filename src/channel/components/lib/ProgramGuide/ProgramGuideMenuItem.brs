@@ -12,7 +12,7 @@ End Function
 Function onContentChange()
   item = m.top.itemContent
   if item <> invalid
-    m.programString.text = item.title
+    m.programString.text = item.epgProgramTitle
     m.timeString.text = item.ShortDescriptionLine1
     m.cellRect.width = item.FHDItemWidth
     m.programString.width = item.FHDItemWidth - 24 'to provide some right margin
@@ -35,9 +35,9 @@ Function onContentChange()
   end if
 
 
-  if m.top.index = 0 
+  if m.top.index = 0
     m.staticOverlay.opacity = 1
-  else 
+  else
     m.staticOverlay.opacity = 0
   end if
 End Function
@@ -45,9 +45,9 @@ End Function
 
 Function onFocusPercentChange()
   item = m.top.itemContent
-  ' //TODO : Find better logic to avoid multiple executions of this logic because of focuspercent being float and triggered multiple times.  
+  ' //TODO : Find better logic to avoid multiple executions of this logic because of focuspercent being float and triggered multiple times.
   if m.top.focusPercent < 0.5
-    if item.selected 
+    if item.selected
       if item.selectedItemAttributes <> invalid
         m.timeString.text = strReplace(item.ShortDescriptionLine1, item.selectedItemAttributes.title, "")
         ' color of the text has been passed along with string so that content Items need not to access global.
@@ -60,8 +60,8 @@ Function onFocusPercentChange()
     else
       m.cellRect.blendColor = "0x1C1F29FF"
     end if
-  else 
-    m.cellRect.blendColor = "0x10141FFF"  
+  else
+    m.cellRect.blendColor = "0x10141FFF"
   end if
 End Function
 
