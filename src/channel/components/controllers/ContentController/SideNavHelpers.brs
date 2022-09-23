@@ -474,12 +474,14 @@ Function hideNavMenu(shouldTrackComponentInteraction = true)
     slideTo(m.ScreenStack, [m.nOriginalScreenStackX, m.ScreenStack.translation[1]], .3)
 
     topScreen = getCurrentScreen()
-
-    if shouldTrackComponentInteraction = true AND topScreen <> invalid
+    if topScreen <> invalid
       topScreen.enabled = true
 
-      interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "off")
-      m.trackingLoggingTask.trackEvent = interactionEvent
+      if shouldTrackComponentInteraction = true
+        interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "off")
+        m.trackingLoggingTask.trackEvent = interactionEvent
+      end if
+
     end if
   end if
 End Function

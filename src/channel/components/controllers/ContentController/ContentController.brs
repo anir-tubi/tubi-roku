@@ -332,14 +332,18 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
           popScreen(true, true)
 
           newTopScreen = getCurrentScreen()
-          if newTopScreen.id = m.constants.ui.screenIds.espanolScreen
-            setUiMode(m.constants.ui.modes.latino)
-          end if
+          if newTopScreen <> invalid
+            newTopScreen.enabled = true
+            if newTopScreen.id = m.constants.ui.screenIds.espanolScreen
+              setUiMode(m.constants.ui.modes.latino)
+            end if
 
-          sideNavId = m.constants.ui.screenIdToSideNavId[newTopScreen.id]
-          if sideNavId <> invalid
-            focusSideNavOption(sideNavId)
+            sideNavId = m.constants.ui.screenIdToSideNavId[newTopScreen.id]
+            if sideNavId <> invalid
+              focusSideNavOption(sideNavId)
+            end if
           end if
+          
         else
           ' remove the last screen, probably detail screen,
           ' this should trigger a restart of the app via onScreenStackEmpty()
