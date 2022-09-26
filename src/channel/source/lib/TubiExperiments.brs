@@ -68,10 +68,6 @@ Function TubiExperiments(constants) as Object
       roku_hdmi_playback: {
         roku_hdmi_playback_v1 : {"enabled": false}
       }
-
-      roku_show_ads_post_seek: {
-        roku_show_ads_post_seek_v2 : {"enabled": false}
-      }
     }
 
     'public methods

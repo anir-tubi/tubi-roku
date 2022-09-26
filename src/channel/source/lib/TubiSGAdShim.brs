@@ -211,7 +211,7 @@ Function tubiSGAdShim_resume(episode As Object, cuepoint As Integer)
   m.videoplayernode.adstate = "fetching"
   'NOTE: TubiAds sets resumePlayAdsList on 'm' here
 
-  if m.ads.getResumingPlayAds(episode, cuepoint, m.showAdsPostSeek) = true
+  if m.ads.getResumingPlayAds(episode, cuepoint, true) = true
     tubiLog("Setting adState to adspending")
     m.videoPlayerNode.adState = "adspending"
   else

@@ -496,8 +496,7 @@ End Function
 ' ----------------------------------------------
 ' getResumingPlayAds
 '
-' this function is to be called when resuming back to play after the player has stopped
-' (usually due to the user pressing play or the user fast forwarding or rewinding). This function
+' this function is to be called when resuming back to play after a user has fast forwarded. This function
 ' will make a call to the ads server and if it gets ads, store them in an appropriate place
 ' returns true if there are ads and false if there are no ads (aka the player can resume playing immediately without closing the player)
 ' SIDE EFFECT: updates the resumePlayAdsList property on the player object that is passed in

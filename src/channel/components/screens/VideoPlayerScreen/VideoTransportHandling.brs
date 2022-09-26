@@ -840,7 +840,7 @@ End Function
 'function calling jumpToPosition should reset m.positionAtJumpStart to -1 after calling jumpToPosition
 Function jumpToPosition(position)
   tubiLog("VideoTransportHandling.jumpToPosition")
-  cancelReplayCaptions() ' on any jump we cancel any temporary caption modifications
+  cancelReplayCaptions() 'on any jump we cancel any temporary caption modifications
 
   'Don't let position be out of bounds of the duration of the video
   if position > (m.Video.duration - 5)
@@ -864,7 +864,6 @@ Function jumpToPosition(position)
         cuepoint = cuepoints[i]
         if m.positionAtJumpStart < cuepoint AND position >= cuepoint
           ' only request ad breaks if fast forward past a cue point
-          getExperimentResource("roku_show_ads_post_seek", "roku_show_ads_post_seek_v2", true) 'fire exposure event
           shouldAdBreak = true
           exit for
         end if
