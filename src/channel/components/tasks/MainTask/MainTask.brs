@@ -27,5 +27,7 @@ Function taskThread()
       m.top.isHdmiStatusOk = (m.hdmiStatus.isConnected() = true AND m.cecStatus.isActiveSource() = true)
     end if
 
+    tubiLog("MainTask received " + messageType + " hdmiStatus.isConnected(): " + m.hdmiStatus.isConnected().toStr() + " cecStatus.isActiveSource(): " + m.cecStatus.isActiveSource().toStr())
+
   end while
 End Function
