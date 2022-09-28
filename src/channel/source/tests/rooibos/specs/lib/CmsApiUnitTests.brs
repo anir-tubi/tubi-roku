@@ -583,7 +583,7 @@ Function cmsApi_searchReqInfo_test()
     "images[poster_tb]"
   ]
 
-  searchUrl = m.cmsApi.constants.urls.cms.search
+  searchUrl = m.cmsApi.constants.urls.search
 
   searchOptions = {
     params: {

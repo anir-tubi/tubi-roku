@@ -283,6 +283,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverContainer] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverHomeScreenContainerIds] = true
 
+
   constants.anonymous = {}
     constants.anonymous.algorithm = "TUBI-HMAC-SHA256"
 
@@ -401,7 +402,14 @@ Function getConstants()
       constants.urls.cms.upNextContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/next"
       constants.urls.cms.relatedContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/related"
       constants.urls.cms.thumbnails = constants.urls.cms.urlBase + "/content" ' + content_id + "/thumbnail_sprites"
-      constants.urls.cms.search = constants.urls.cms.urlBase + "/search"
+
+
+    'search url
+    constants.urls.search = "https://search.production-public.tubi.io/api/v1/search"
+    if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
+      constants.urls.search = "https://search.staging-public.tubi.io/api/v1/search"
+    end if
+
 
     'matrix url
     constants.urls.matrix = {}

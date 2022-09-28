@@ -1,4 +1,4 @@
-' Thin wrapper for CMS API requests.  Collected here to facilitate easy
+' Thin wrapper for CMS API and Search API requests.  Collected here to facilitate easy
 ' integration tests
 Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
 
@@ -283,16 +283,15 @@ End Function
 ' @searchText: string, the text the user is attempting to search for
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 Function cmsApi_getSearchRequestInfo(searchText, bKidsMode = false)
-  url = m.constants.urls.cms.search
+  url = m.constants.urls.search
   options = m.getCommonOptions()
   options.params["search"] = searchText
   options.params["isKidsMode"] = bKidsMode
   options.params = m.setTupianPosterParam(options.params)
 
   if bKidsMode = false
-    headers = options.headers
-    'setting the x-tubi-inject-live-news header to true will enable the linear content available for serach screen from backend
-    headers["x-tubi-inject-live-news"] = "true"
+    'setting the include_linear param to true will enable the linear content available for serach screen from backend
+    options.params["include_linear"] = true
   end if
 
   return {
