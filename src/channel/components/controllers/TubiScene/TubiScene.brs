@@ -2,6 +2,8 @@ Function init()
   ' wait for any children to be added to the scene
   m.constants = m.global.constants
 
+  initTranslations() 'needed for spinner
+
   m.spinner = m.top.findNode("TubiSceneSpinner")
 
   m.customSplashPoster = m.top.findNode("customSplashPoster")

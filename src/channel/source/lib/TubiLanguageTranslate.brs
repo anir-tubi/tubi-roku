@@ -1,3 +1,12 @@
+' set translations on global
+' side effect: places a set of translations for the locale on m.global.translationsAA
+Function initTranslations()
+  clearTranslations()
+  locale = getLocale()
+  setTranslationAAOnGlobal(locale)
+End Function
+
+
 ' Tell the code to clear the translations. It is necessary to call this when the remote compontents is called and there
 ' are new strings that are contained in the remote components.
 Function clearTranslations()
@@ -5,6 +14,7 @@ Function clearTranslations()
     m.global.translationAA = invalid
   end if
 End Function
+
 
 'Pass the ID associated with the ID to get the translated string
 ' Note: the component calling getTranslation() must
@@ -17,23 +27,13 @@ End Function
 '@return String - The translated string associated with the string ID. If unsuccessful, it will return an empty string.
 Function getTranslation(sID as string, aDynamicStrings = {}) as String
   '//What is the current language
-  constants = m.constants
-  if constants = invalid
-    constants = m.global.constants
-  end if
+  locale = getLocale()
+  defaultLocale = getDefaultLocale()
 
-  sDefaultLocaleID = "en_US"
-  sLocaleID = sDefaultLocaleID
-
-  if constants <> invalid
-    sLocaleID = constants.deviceInfo.locale
-  end if
-
-  sTranslatedString = getTranslationBasedOnLocale(sID, sLocaleID)
-  if sTranslatedString = "" AND sLocaleID <> sDefaultLocaleID
+  sTranslatedString = getTranslationBasedOnLocale(sID, locale)
+  if sTranslatedString = "" AND locale <> defaultLocale
     '//If no translation was found, then use the default locale
-    sLocaleID = sDefaultLocaleID
-    sTranslatedString = getTranslationBasedOnLocale(sID, sLocaleID)
+    sTranslatedString = getTranslationBasedOnLocale(sID, defaultLocale)
   end if
 
   for each param in aDynamicStrings
@@ -46,6 +46,31 @@ Function getTranslation(sID as string, aDynamicStrings = {}) as String
   end for
 
   return sTranslatedString
+End Function
+
+
+Function getLocale()
+  constants = m.constants
+
+  if constants = invalid
+    localGlobal = m.global
+    if localGlobal <> invalid
+      constants = localGlobal.constants
+    end if
+  end if
+
+  locale = getDefaultLocale()
+  if constants <> invalid
+    locale = constants.deviceInfo.locale
+  end if
+
+  return locale
+End Function
+
+
+Function getDefaultLocale()
+  'setting en_US as the default/fall back option
+  return "en_US"
 End Function
 
 
@@ -67,10 +92,12 @@ Function getTranslationBasedOnLocale(sStringID as String, sLocaleID as String) a
   if translationAA <> invalid then
     translations = translationAA[sLocaleID]
   end if
+
   if translations = invalid
-    '//The associative array for the passed locale does not exist, so get the associative arra associated with that locale
-    getTranslationAA(sLocaleID)
-    '//If the previous line was successful in getting the proper AA, then the translation file associated with the passed locale will now exist on the m.global.translationArray"
+    '//The associative array for the passed locale does not exist, so get the associative array associated with that locale
+    setTranslationAAonGlobal(sLocaleID)
+    '//If the previous line was successful in getting the proper AA, then the translation file associated
+    ' with the passed locale will now exist on the m.global.translationArray"
     if m.global.translationAA <> invalid
       translations = m.global.translationAA[sLocaleID]
     end if
@@ -87,41 +114,51 @@ End Function
 'The getTranslationBasedOnLocale() method calls this function to get the proper associative array if it has not already
 'been stored into in memory
 '
-'@param sLocaleID: The ID associated with the desired language
+'@param locale: string, a valid locale (ex. "en_US", "es_MX")
 '@return Boolean - Was the language associative array been successfuly gotten?
-Function getTranslationAA(sLocaleID as String) as Boolean
+Function setTranslationAAOnGlobal(locale as String) as Boolean
   bSuccess = false
   '//ideally we would store the translation files in separate files but the ReadAsciiFile() function does not work in the remote compomnent package
-  ' url = "pkg:/locale/" + sLocaleID + "/translations.json"
+  ' url = "pkg:/locale/" + locale + "/translations.json"
   ' json = ReadAsciiFile(url)
 
-  parsed = invalid
   '//Go thru all the possible locales that Roku supports to return the proper associative array
-  sLocaleID = LCase(sLocaleID)
-  if sLocaleID = "en_us"
-    parsed = getTranslation_en_US()
-  else if Left(sLocaleID, 2) = "es"
-    'es_MX and es_ES
-    parsed = getTranslation_es_MX()
-  else if sLocaleID = "en_gb"
-  else if sLocaleID = "fr_ca"
-  else if sLocaleID = "de_de"
-  else if sLocaleID = "it_it"
-  else if sLocaleID = "pt_br"
-  end if
+  translationSet = invalid
+  locale = LCase(locale)
+  translationSet = getTranslationSetByLocale(locale)
 
-  if parsed <> invalid
+  if translationSet <> invalid
     if m.global.translationAA = invalid
       m.global.addField("translationAA", "assocarray", false)
       m.global.translationAA = {}
     end if
 
     copytranslationAA = m.global.translationAA
-    copytranslationAA[sLocaleID] = parsed
+    copytranslationAA[locale] = translationSet
     m.global.translationAA = copytranslationAA
     bSuccess = true
   end if
+
   return bSuccess
+End Function
+
+
+Function getTranslationSetByLocale(locale)
+  translationSet = invalid
+
+  if locale = "en_us"
+    translationSet = getTranslation_en_US()
+  else if Left(locale, 2) = "es"
+    'es_MX and es_ES
+    translationSet = getTranslation_es_MX()
+  else if locale = "en_gb"
+  else if locale = "fr_ca"
+  else if locale = "de_de"
+  else if locale = "it_it"
+  else if locale = "pt_br"
+  end if
+
+  return translationSet
 End Function
 
 '//::NOTE:: Below this line are functions to get associative arrays for various locales. The associative arrays within the functions

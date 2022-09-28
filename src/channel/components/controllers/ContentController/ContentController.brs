@@ -11,18 +11,19 @@ Function init()
   ' Timer to find last time the app suspended
   m.appSuspendTimer = CreateObject("roTimespan")
 
+  '//When ContentController initializes, clear all translations and reset translations in case the 
+  ' remote component translations are different from the local translations.
+  initTranslations()
+
   m.mainTask = createObject("roSGNode", "MainTask") ' initiate MainTask
   m.mainTask.observeFieldScoped("isHdmiStatusOk", "onIsHdmiStatusOkChange")
 
-
   generalTask = createObject("roSGNode", "GeneralTask") ' initiate GeneralTask
+
   ' Initiate GeneralTaskModule by passing caller context.
   ' Calling GeneralTaskModule() will append methods to the local m.
   ' DO NOT overwrite m variable methods/properties which belongs to GeneralTaskModule.
   GeneralTaskModule(m, generalTask)
-
-  '//When ContentController initializes, clear all trandslations in case this is contained in a remote component.
-  clearTranslations()
 
   m.Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, m.Request)
@@ -231,7 +232,6 @@ Function displayExitModal(trackingPageInfo)
   }
   showExitAppModal(dialogEvent, m.trackingLoggingTask, onExitAppModalButtonSelected)
 End Function
-
 
 
 'Display a warning that the user needs to be registered in order to see certain content
