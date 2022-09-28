@@ -443,10 +443,15 @@ Function onModeChange()
     m.top.removeChild(m.PlayerCountdownGroup)
   end if
 
+  secondLineGroup = m.SecondLineGroup.getChild(0)
 
-  if m.liveIconGroup <> invalid AND m.liveIconGroup.isSameNode(m.SecondLineGroup.getChild(0)) then
+  if m.liveIconGroup <> invalid AND m.liveIconGroup.isSameNode(secondLineGroup) then
     m.SecondLineGroup.removeChild(m.liveIconGroup)
     m.liveIconGroup.shouldAnimate = false
+  end if
+
+  if m.badge <> invalid AND m.badge.isSameNode(secondLineGroup) then
+    m.SecondLineGroup.removeChild(m.badge)
   end if
 
   if m.top.mode = m.constants.ui.infoPanelModes.category

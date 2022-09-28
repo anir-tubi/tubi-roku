@@ -111,5 +111,6 @@
           size="30" />
       </Label>
     </Group>
+    <Group id="badgeGroup"/>
   </children>
 </component>

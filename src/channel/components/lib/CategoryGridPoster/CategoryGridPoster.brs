@@ -3,8 +3,7 @@ Function init()
 
   m.poster = m.top.findNode("Poster")
   m.LinearPoster = m.top.findNode("LinearPoster")
-
-
+  m.badgeGroup = m.top.findNode("badgeGroup")
   m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
   m.top.observeField("itemContent", "onContentChange")
   m.resumeMargin = 4  'inset of resume bar
@@ -65,6 +64,9 @@ Function onContentChange(msg)
   end if
   ' settings poster visibility true to avoid image caching issue. if it is not set to true, seeing some blank posters
   m.poster.visible = true
+
+  ' removeBadges is required to avoid incorrect badges.
+  removeBadges()
 
   if itemContent <> invalid then
     categoryContent = itemContent.getParent()
@@ -382,10 +384,18 @@ End Function
 
 Function setLiveBadge()
   tubiLog("CategoryGridPoster.setLiveBadge")
-  m.badge = m.top.createChild("Badge")
-  m.badge.translation = [12,12]
-  m.badge.backgroundColor = "0xCC090B"
-  m.badge.textColor = "0xFFFFFF"
-  m.badge.iconUri = "pkg:/images/live-icon.png"
-  m.badge.text = UCase(getTranslation("screenSearch_liveText"))
+  badge = m.badgeGroup.createChild("Badge")
+  badge.translation = [12,12]
+  badge.backgroundColor = "0xCC090B"
+  badge.textColor = "0xFFFFFF"
+  badge.iconUri = "pkg:/images/live-icon.png"
+  badge.text = UCase(getTranslation("screenSearch_liveText"))
+End Function
+
+
+Function removeBadges()
+
+  childCount = m.badgeGroup.getChildCount()
+  m.badgeGroup.removeChildrenIndex(childCount, 0)
+
 End Function
