@@ -1,4 +1,4 @@
-'@TestSuite [TensorApi] TensorApi.brs 
+'@TestSuite [TensorApi] TensorApi.brs
 
 '@Setup
 Function TensorApiSetup()
@@ -69,7 +69,7 @@ Function tensorApi_getEPGChannelIdsReqInfo_test()
     "x-client-platform"
     "x-client-version"
   ]
-  
+
   params = [
     "app_id"
     "platform"
@@ -81,7 +81,7 @@ Function tensorApi_getEPGChannelIdsReqInfo_test()
   deviceId = m.tensorApi.constants.deviceInfo.deviceId
   appId = m.tensorApi.constants.settings.shortAppName
   mode = "news"
-  
+
   'test with mode as param
   epgReqWithMode = m.tensorApi.getEPGChannelIdsReqInfo(mode)
 
@@ -127,11 +127,12 @@ Function tensorApi_getEPGProgramReqInfo_test()
     "headers"
     "params"
   ]
-  
+
   headers = [
     "Content-Type"
     "x-client-platform"
     "x-client-version"
+    "x-capability"
   ]
 
   params = [
@@ -159,4 +160,5 @@ Function tensorApi_getEPGProgramReqInfo_test()
   m.assertEqual(epgProgramReq.options.params.lookahead, lookahead)
   m.assertEqual(epgProgramReq.options.params.content_id, content_id)
   m.assertEqual(epgProgramReq.options.headers["Content-Type"], "application/json")
+  m.assertEqual(epgProgramReq.options.headers["x-capability"], formatJson({"episode_title_on_row":true}))
 End Function

@@ -63,6 +63,10 @@ Function tensorApi_getEPGProgramReqInfo(contentIds)
 
   url = m.constants.urls.content.epgProgramContent
   options = m.commonOptions()
+
+  capability = formatJson({"episode_title_on_row" :true})
+  options.headers.append({"x-capability": capability})
+
   options.params["content_id"] = contentIdsString
   options.params["lookahead"] = 1
 
