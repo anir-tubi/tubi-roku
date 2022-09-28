@@ -29,6 +29,9 @@ Function onPop()
     m.top.currentUpdated = true
     newCurrent.setFocus(true)
     newCurrent.visible = true
+    if newCurrent.hasField("enabled") = true
+      newCurrent.enabled = true
+    end if
   else
     m.top.isEmpty = true
   end if
