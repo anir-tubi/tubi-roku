@@ -604,19 +604,21 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       else
         endPosition = invalid
         if eventType = "Complete"
+          if getGlobalAA().enableInPodStitching = true then
             replacementCtx = m._lastContextWithValidDurationAndAdInfo
             m.delete("_lastContextWithValidDurationAndAdInfo")
 
-          ' TODO When enableInPodStitching(true) is set the ad index is off which causes the wrong information or no information to be passed in ctx. We can pull these from the last position update for now until Roku fixes RAF to correctly return this. This was last tested in RAF version 3.0026. We can retest in the future once the next version comes out
+            ' TODO When enableInPodStitching(true) is set the ad index is off which causes the wrong information or no information to be passed in ctx. We can pull these from the last position update for now until Roku fixes RAF to correctly return this. This was last tested in RAF version 3.0026. We can retest in the future once the next version comes out
 
 
-          ' Do some basic verification to make sure this is for the same ad and pod
-          if ctx.adServer = replacementCtx.adServer AND ctx.adCount = replacementCtx.adCount then
-            ' Replace the information trying to match the expected ctx exactly as it normally would be
-            ctxType = ctx.type
-            ctx = replacementCtx
-            ctx.delete("time")
-            ctx.type = ctxType
+            ' Do some basic verification to make sure this is for the same ad and pod
+            if replacementCtx <> invalid AND ctx.adServer = replacementCtx.adServer AND ctx.adCount = replacementCtx.adCount then
+              ' Replace the information trying to match the expected ctx exactly as it normally would be
+              ctxType = ctx.type
+              ctx = replacementCtx
+              ctx.delete("time")
+              ctx.type = ctxType
+            end if
           end if
 
           endPosition = ctx.duration
