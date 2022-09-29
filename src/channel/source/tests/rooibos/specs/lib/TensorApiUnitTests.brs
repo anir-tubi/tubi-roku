@@ -160,5 +160,5 @@ Function tensorApi_getEPGProgramReqInfo_test()
   m.assertEqual(epgProgramReq.options.params.lookahead, lookahead)
   m.assertEqual(epgProgramReq.options.params.content_id, content_id)
   m.assertEqual(epgProgramReq.options.headers["Content-Type"], "application/json")
-  m.assertEqual(epgProgramReq.options.headers["x-capability"], formatJson({"episode_title_on_row":true}))
+  m.assertEqual(epgProgramReq.options.headers["x-capability"], formatJson({"program_title_differ_with_episode_title":true}))
 End Function
