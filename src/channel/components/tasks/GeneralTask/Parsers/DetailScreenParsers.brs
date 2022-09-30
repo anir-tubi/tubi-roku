@@ -2,7 +2,8 @@
 '                            .data value converted from JSON to AA already
 ' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseDetailScreenSingleContentSuccess(fullResponse, _reqInfo)
-  translate = TubiMetadataTranslate(m.constants)
+  experiments = TubiExperiments(m.constants)
+  translate = TubiMetadataTranslate(m.constants, experiments)
   parsedResponse = fullResponse.data
   updatedContent = CreateObject("roSGNode", "TubiContentNode")
   translate.translateRecursive(parsedResponse, updatedContent)

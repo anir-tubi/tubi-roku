@@ -93,6 +93,7 @@ Function cmsApi_getSingleContentRequestInfo(contentId, includeChannels=false, bK
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = includeChannels
   options.params["video_resources"] = m.constants.player.drmOrder
+  options.params["limit_resolutions"] = m.constants.player.limitResolutions
   options.params = m.setTupianLandscapeParam(options.params)
 
   return {

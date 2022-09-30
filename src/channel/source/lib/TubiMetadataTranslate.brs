@@ -1417,64 +1417,129 @@ End Function
 ' @contentFromServer: assocArray, AA representation of a single piece of content as
 '                                 returned by various APIs.
 Function tubiMetadataTranslate_composeVideoResources(contentFromServer)
+
+  ' videoResources structure example:
+  ' videoResources = [
+  '   [
+  '     {"codec": "H265", "resolution="2160P", ...},
+  '     {"codec": "H265", "resolution="1080P", ...}
+  '     ...
+  '     ...
+  '     ...
+  '   ]
+  '   [
+  '     {"codec": "H264", "resolution="1080P", ...},
+  '     {"codec": "H264", "resolution="720P", ...}
+  '     ...
+  '     ...
+  '     ...
+  '   ]
   videoResources = []
+
+  m.hevc4kExpEnabled = false
+  if m.experiments <> invalid
+    m.hevc4kExpEnabled = m.experiments.getExperimentResource("roku_hevc_drm_4k", "roku_hevc_drm_4k_v1").enabled
+  end if
+
+  ' has4kHevcStream helps to decide whether 4k/HEVC stream is available for the selected content.
+  has4kHevcStream = false
+
+  codecToVideoResourcesIndexMap = {}
 
   if type(contentFromServer.video_resources) = "roArray" AND contentFromServer.video_resources.count() > 0
     ' Create a "stub" ContentNode with just the DRM-oriented fields populated. This
     ' will make it easy to merge metadata plus drm info into one actionable
     ' contentnode for the video player
     for each video in contentFromServer.video_resources
+
       resource = {}
       if video.manifest <> invalid
         if video.manifest.url <> invalid then resource.url = video.manifest.url
         if video.manifest.duration <> invalid then resource.length = video.manifest.duration
       end if
 
-      if video.type = m.constants.player.drmTypes.dashWidevine
-        resource.type = m.constants.player.drmTypes.dashWidevine
-        resource.streamFormat = "dash"
-        if video.license_server <> invalid
-          resource.drmParams = {
-            keySystem: "Widevine"
-            licenseServerURL: video.license_server.url
-          }
-          if video.license_server.auth_header_key <> invalid AND video.license_server.auth_header_value <> invalid
-            resource.drmHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
-          end if
+      codec = ""
+      if video.codec <> invalid
+        codec = video.codec.replace("VIDEO_CODEC_","")
+        resource.codec = codec
+      end if
 
-          if video.license_server.hdcp_version <> invalid
-            resource.hdcpVersion = video.license_server.hdcp_version
+      resolution = ""
+      if video.resolution <> invalid
+        resolution = video.resolution.replace("VIDEO_RESOLUTION_","")
+        resource.resolution = resolution
+      end if
+
+      if codec = "H265" and resolution = "2160P"
+        has4kHevcStream = true
+      end if
+
+      validResource = false
+      if (codec = "H265" and has4kHevcStream = true and m.hevc4kExpEnabled = true) OR codec = "H264"
+        validResource = true
+      end if
+
+      if validResource = true
+
+        if video.type = m.constants.player.drmTypes.dashWidevine
+          resource.type = m.constants.player.drmTypes.dashWidevine
+          resource.streamFormat = "dash"
+          if video.license_server <> invalid
+            resource.drmParams = {
+              keySystem: "Widevine"
+              licenseServerURL: video.license_server.url
+            }
+            if video.license_server.auth_header_key <> invalid AND video.license_server.auth_header_value <> invalid
+              resource.drmHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
+            end if
+
+            if video.license_server.hdcp_version <> invalid
+              resource.hdcpVersion = video.license_server.hdcp_version
+            end if
           end if
+        else if video.type = m.constants.player.drmTypes.dashPlayReady
+          resource.type = m.constants.player.drmTypes.dashPlayReady
+          resource.streamFormat = "dash"
+          if video.license_server <> invalid
+            resource.encodingType = "PlayReadyLicenseAcquisitionUrl"
+            resource.encodingKey = video.license_server.url
+            if video.license_server.auth_header_key <> invalid AND video.license_server.auth_header_value <> invalid
+              resource.drmHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
+            end if
+
+            if video.license_server.hdcp_version <> invalid
+              resource.hdcpVersion = video.license_server.hdcp_version
+            end if
+          end if
+        else if video.type = m.constants.player.drmTypes.hlsv3
+          resource.type = m.constants.player.drmTypes.hlsv3
+          resource.streamFormat = "hls"
+        else
+          ' Don't add unsupported/unknown video resource types
+          resource = invalid
         end if
-      else if video.type = m.constants.player.drmTypes.dashPlayReady
-        resource.type = m.constants.player.drmTypes.dashPlayReady
-        resource.streamFormat = "dash"
-        if video.license_server <> invalid
-          resource.encodingType = "PlayReadyLicenseAcquisitionUrl"
-          resource.encodingKey = video.license_server.url
-          if video.license_server.auth_header_key <> invalid AND video.license_server.auth_header_value <> invalid
-            resource.drmHeaders = [video.license_server.auth_header_key + ":" + video.license_server.auth_header_value]
+
+        if resource <> invalid
+
+          if video.titan_version <> invalid AND video.titan_version <> ""
+            resource.titanVersion = video.titan_version
           end if
 
-          if video.license_server.hdcp_version <> invalid
-            resource.hdcpVersion = video.license_server.hdcp_version
+          ' the following logic groups all the video resources by their codec into a 2 dimensional array of arrays.
+          if codecToVideoResourcesIndexMap[codec] = invalid
+            videoResourcesIndex = videoResources.count()
+            codecToVideoResourcesIndexMap[codec] = videoResourcesIndex
+            videoResources.push([])
+          else
+            videoResourcesIndex = codecToVideoResourcesIndexMap[codec]
           end if
+
+          videoResources[videoResourcesIndex].push(resource)
+
         end if
-      else if video.type = m.constants.player.drmTypes.hlsv3
-        resource.type = m.constants.player.drmTypes.hlsv3
-        resource.streamFormat = "hls"
-      else
-        ' Don't add unsupported/unknown video resource types
-        resource = invalid
+
       end if
 
-      if video.titan_version <> invalid AND video.titan_version <> ""
-        resource.titanVersion = video.titan_version
-      end if
-
-      if resource <> invalid
-        videoResources.push(resource)
-      end if
     end for
   end if
 
@@ -1584,6 +1649,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
       end if
 
       channelNode.videoResources = m.composeVideoResources(channelFromServer)
+
       channelNode.description = channelFromServer.description
       channelNode.type = "linear"
       if contentToTranslate.valid_duration <> invalid

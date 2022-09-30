@@ -315,35 +315,45 @@ Function tubiMetadataTranslate_composeVideoResources_test()
   m.assertNotInvalid(videoResources)
 
   ' check the number of resources is accurate
-  m.assertEqual(videoResources.count(), content.video_resources.count())
-
-  for i=0 to 1
-    m.assertNotInvalid(videoResources[i].url)
-    m.assertNotInvalid(videoResources[i].drmHeaders)
-    m.assertNotInvalid(videoResources[i].length)
-    m.assertEqual(videoResources[i].streamformat, "dash")
-  end for
+  m.assertEqual(videoResources.count(), 1)
 
   'Widevine has drmParams
-  m.assertEqual(videoResources[0].type, "dash_widevine_psshv0")
-  m.assertNotInvalid(videoResources[0].drmParams)
-  m.assertNotInvalid(videoResources[0].drmParams.licenseServerUrl)
-  m.assertEqual(videoResources[0].drmParams.keySystem, "Widevine")
-  m.assertNotInvalid(videoResources[0].drmHeaders)
+  videoResource = videoResources[0][0]
+  m.assertNotInvalid(videoResource.url)
+  m.assertEqual(videoResource.type, "dash_widevine_psshv0")
+  m.assertNotInvalid(videoResource.drmParams)
+  m.assertNotInvalid(videoResource.drmParams.licenseServerUrl)
+  m.assertEqual(videoResource.drmParams.keySystem, "Widevine")
+  m.assertNotInvalid(videoResource.drmHeaders)
+  m.assertNotInvalid(videoResource.length)
+  m.assertEqual(videoResource.streamformat, "dash")
+  m.assertEqual(videoResource.codec, "H264")
+  m.assertEqual(videoResource.resolution, "1080P")
 
   'Playready doesn't have drmParams
-  m.assertEqual(videoResources[1].type, "dash_playready_psshv0")
-  m.assertInvalid(videoResources[1].drmParams)
-  m.assertNotInvalid(videoResources[1].encodingType)
-  m.assertNotInvalid(videoResources[1].encodingKey)
-  m.assertNotInvalid(videoResources[1].drmHeaders)
+  videoResourcePlayReady = videoResources[0][1]
+  m.assertNotInvalid(videoResource.url)
+  m.assertNotInvalid(videoResource.length)
+  m.assertEqual(videoResourcePlayReady.type, "dash_playready_psshv0")
+  m.assertInvalid(videoResourcePlayReady.drmParams)
+  m.assertNotInvalid(videoResourcePlayReady.encodingType)
+  m.assertNotInvalid(videoResourcePlayReady.encodingKey)
+  m.assertNotInvalid(videoResourcePlayReady.drmHeaders)
+  m.assertEqual(videoResourcePlayReady.streamformat, "dash")
+  m.assertEqual(videoResourcePlayReady.codec, "H264")
+  m.assertEqual(videoResourcePlayReady.resolution, "1080P")
 
   'HLS shouldn't have any drm fields
-  m.assertNotInvalid(videoResources[2].url)
-  m.assertNotInvalid(videoResources[2].length)
-  m.assertInvalid(videoResources[2].drmParams)
-  m.assertInvalid(videoResources[2].drmHeaders)
-  m.assertEqual(videoResources[2].streamformat, "hls")
+  videoResourceHls = videoResources[0][2]
+  m.assertNotInvalid(videoResourceHls.url)
+  m.assertNotInvalid(videoResourceHls.length)
+  m.assertInvalid(videoResourceHls.drmParams)
+  m.assertInvalid(videoResourceHls.drmHeaders)
+  m.assertEqual(videoResourceHls.type, "hlsv3")
+  m.assertEqual(videoResourceHls.streamformat, "hls")
+  m.assertEqual(videoResourceHls.codec, "H264")
+  m.assertEqual(videoResourceHls.resolution, "720P")
+
 End Function
 
 

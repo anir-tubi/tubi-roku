@@ -397,6 +397,10 @@ Function playContent()
       ' Start pre-roll fetch
       m.top.adControl = "preroll"
     else
+      if m.Video.content.codec = "H265" and m.Video.content.resolution = "2160P"
+        ' fire exposure event for video playback if manifest had HEVC/4k content
+        getExperimentResource("roku_hevc_drm_4k", "roku_hevc_drm_4k_v1", true)
+      end if
       m.Video.control = "play"
     end if
 
@@ -439,7 +443,7 @@ Function onControlChange()
   tubiLog("VideoPlayer.onControlChange " + m.top.control)
   if m.top.control = "play"
     if m.top.content <> invalid
-      prepareToStartVideo(m.top.content, 0)
+      prepareToStartVideo(m.top.content)
       playContent()
     end if
 
@@ -517,7 +521,12 @@ Function onVideoStateChange(msg)
 
     ' Set up the next DRM scheme. Playback of next DRM scheme is triggered when state = "finished",
     ' right after error state occurs.
-    m.didAdvanceDrm = advanceDrmOnContent(content)
+    if m.Video.errorCode = -5 ' Media error; the media format is unknown or unsupported
+      m.didAdvanceDrm = advanceCodecOnContent(content)
+    else
+      m.didAdvanceDrm = advanceDrmOnContent(content)
+    end if
+
     if m.didAdvanceDrm <> true
       m.top.errorMsg = getTranslation("videoPlayer_error_playback_description")  'is used in error modal
       m.top.state = state   'triggers error modal in ContentController
@@ -1101,10 +1110,18 @@ End Function
 
 
 ' Helper function that aggregates any tasks that need to be done before playing a new video
-Function prepareToStartVideo(content, drmIndex)
+' @contentNode: roSGNode, a TubiContentNode
+' @videoResourceIndex: intarray, [0] -> codexIndex & [1] -> drmIndex
+Function prepareToStartVideo(content, videoResourceIndex = [0,0])
 
   resetVideoPlayerState(content)
-  setDrmOnContent(content, drmIndex)
+
+  videoResources = content.videoResources
+  codecIndex = videoResourceIndex[0]
+  drmIndex = videoResourceIndex[1]
+  resource = videoResources[codecIndex][drmIndex]
+  setDrmOnContent(content, resource, videoResourceIndex)
+
   m.top.content = content  'sends content to video node and makes current content available to contentController
   m.top.sendVideoTrackingStart = true
 End Function
@@ -1249,31 +1266,81 @@ Function removeFocusFromUpNext()
 End Function
 
 
-Function advanceDrmOnContent(contentNode)
-  tubiLog("VideoPlayer.advanceDrmOnContent")
-  nextIndex = 0
-  if contentNode.drmType <> ""
-    for i=0 to contentNode.videoResources.count()-1
-      resource = contentNode.videoResources[i]
+' advanceCodecOnContent function gets triggered when player error occurs due to codec capability
+' @contentNode: roSGNode, a TubiContentNode
+Function advanceCodecOnContent(contentNode)
+  tubiLog("VideoPlayer.advanceCodecOnContent")
 
-      if contentNode.drmType = resource.type
-        ' hlsv3 resources doesn't have the hdcpVersion AA property.
-        ' Some widevine and playready content falls back from resources with hdcpVersion=hdcp_v1
-        ' to resources with hdcpVersion=hdcp_v2
-        if resource.hdcpVersion = invalid or resource.hdcpVersion = contentNode.hdcpVersion
-          nextIndex = i + 1
-          exit for
-        end if
-      end if
-    end for
+  videoResources = contentNode.videoResources
+  currentVideoResourceIndex = contentNode.currentVideoResourceIndex
+  currentCodecIndex = currentVideoResourceIndex[0]
+  currentDrmIndex = currentVideoResourceIndex[1]
+
+  currentResource = videoResources[currentCodecIndex][currentDrmIndex]
+
+  nextCodecIndex = currentCodecIndex + 1
+  nextDrmIndex = 0
+
+  nextResource = invalid
+  if videoResources[nextCodecIndex] <> invalid
+    nextResource = videoResources[nextCodecIndex][nextDrmIndex]
   end if
 
-  if setDrmOnContent(contentNode, nextIndex) = true
-    nextResource = contentNode.videoResources[nextIndex]
+  if nextResource <> invalid and setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
 
     fallbackInfo = {
-      failed_url: removeExcessUrl(resource.url)
-      failed_drm: resource.type
+      failed_url: removeExcessUrl(currentResource.url)
+      failed_codec: currentResource.codec
+      fallback_url: removeExcessUrl(nextResource.url)
+      fallback_codec: nextResource.codec
+      model: m.constants.deviceInfo.model
+      video_id: contentNode.id
+    }
+
+    ' log that we fell back to the next playback option after playback failed due to Codec
+    tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "codec-fallback")
+    return true
+  else
+    return false
+  end if
+
+End Function
+
+
+' advanceDrmOnContent function gets triggered when player error occurs due to drm
+' @contentNode: roSGNode, a TubiContentNode
+Function advanceDrmOnContent(contentNode)
+  tubiLog("VideoPlayer.advanceDrmOnContent")
+
+  videoResources = contentNode.videoResources
+  currentVideoResourceIndex = contentNode.currentVideoResourceIndex
+  currentCodecIndex = currentVideoResourceIndex[0]
+  currentDrmIndex = currentVideoResourceIndex[1]
+
+  currentResource = videoResources[currentCodecIndex][currentDrmIndex]
+
+  nextCodecIndex = currentCodecIndex
+  nextDrmIndex = currentDrmIndex + 1
+  nextResource = invalid
+
+  if videoResources[currentCodecIndex] <> invalid
+    nextResource = videoResources[currentCodecIndex][nextDrmIndex]
+  end if
+
+  if nextResource = invalid
+    nextCodecIndex = currentCodecIndex + 1
+    nextDrmIndex = 0
+
+    if videoResources[nextCodecIndex] <> invalid
+      nextResource = videoResources[nextCodecIndex][nextDrmIndex]
+    end if
+  end if
+
+  if nextResource <> invalid and setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
+
+    fallbackInfo = {
+      failed_url: removeExcessUrl(currentResource.url)
+      failed_drm: currentResource.type
       fallback_url: removeExcessUrl(nextResource.url)
       fallback_drm: nextResource.type
       model: m.constants.deviceInfo.model
@@ -1292,16 +1359,16 @@ End Function
 ' Updates the content node's url and httpHeaders fields with the videoResource info indicated by the index value
 '
 ' @contentNode: roSGNode, a TubiContentNode
-' @index: int, the index of the video resource we want to use for DRM
-Function setDrmOnContent(contentNode, index)
+' @resource: assocarray, contains manifest details
+' @videoResourceIndex: intarray, [0] -> codexIndex & [1] -> drmIndex
+Function setDrmOnContent(contentNode, resource, videoResourceIndex)
   tubiLog("VideoPlayer.setDrmOnContent")
-  if contentNode.videoResources <> invalid AND contentNode.videoResources.count() > 0 AND contentNode.videoResources[index] <> invalid AND contentNode.isTrailer <> true
+
+  if resource <> invalid
     ' reset DRM fields
     contentNode.drmParams = {}
     contentNode.encodingType = ""
     contentNode.encodingKey = ""
-
-    resource = contentNode.videoResources[index]
 
     ' set general fields related to DRM
     contentNode.httpHeaders = resource.drmHeaders
@@ -1310,6 +1377,9 @@ Function setDrmOnContent(contentNode, index)
     contentNode.length = resource.length
     contentNode.streamFormat = resource.streamFormat
     contentNode.drmType = resource.type
+    contentNode.codec = resource.codec
+    contentNode.resolution = resource.resolution
+    contentNode.currentVideoResourceIndex = videoResourceIndex
     contentNode.hdcpVersion = resource.hdcpVersion
 
     ' set DRM scheme specific fields

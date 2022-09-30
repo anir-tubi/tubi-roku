@@ -211,6 +211,8 @@ Function getConstants()
     constants.deviceInfo.language  = di.GetCurrentLocale().Left(2)
     constants.deviceInfo.locale  = di.GetCurrentLocale()
     constants.deviceInfo.scaledUi = scaledUi
+    constants.deviceInfo.videoMode = di.GetVideoMode()
+    videoResolution = constants.deviceInfo.videoMode.toInt()
 
   'names given to different request types for identification purposes (for example in the General Task)
   constants.reqNames = {}
@@ -708,6 +710,40 @@ Function getConstants()
         constants.player.drmTypes.dashPlayready
         constants.player.drmTypes.hlsv3
       ]
+
+      ' H265 is one of the video compression standards. This information is passed on api request in order to get the H265 transcoded manifests from backend.
+      ' H265 codec is supported only on higher end modals.
+      hevcCodec = "H265"
+
+      ' H264 is one of the video compression standards. This information is passed on api request in order to get the H264 transcoded manifests from backend.
+      ' H264 codec is supported by all modals.
+      avcCodec = "H264"
+
+      maxH265Resolution = videoResolution
+      if videoResolution >= 2160
+        maxH265Resolution = 2160 ' max supported resolution is 2160p for H265 from backend
+      end if
+
+      maxH264Resolution = videoResolution
+      if videoResolution >= 1080
+        maxH264Resolution = 1080 ' max supported resolution is 1080p for H264 from backend
+      end if
+
+      ' if the device only supports H264, then we are sending limitResolutions as "H264_<maxH265Resolution>".
+      ' Backend will respond with multiple manifests (but all are H264)
+      constants.player.limitResolutions = [
+        avcCodec + "_" + maxH264Resolution.toStr() + "p"
+      ]
+
+      ' if the device supports H265, then we are sending limitResolutions as "H265_<maxH265Resolution>" & "H264_<maxH264Resolution>"
+      ' Backend will respond with multiple manifests (both H265 & H264)
+      if di.CanDecodeVideo({Codec: "hevc"}).result = true ' checking whether device is capable of playing H265 transcoded content
+        constants.player.limitResolutions = [
+          hevcCodec + "_" + maxH265Resolution.toStr() + "p"
+          avcCodec + "_" + maxH264Resolution.toStr() + "p"
+        ]
+      end if
+
   ' constants used for EPG
   constants.EPGChannelPlayMode = {}
   constants.EPGChannelPlayMode.playItemOnSelect = "playItemOnSelect"

@@ -86,6 +86,15 @@
     <!-- the current drm type -->
     <field id="drmType" type="string"/>
 
+    <!-- the current codec, it will be inserted in client logs when playback fails -->
+    <field id="codec" type="string"/>
+
+    <!-- the current resolution, it will be inserted in client logs when playback fails -->
+    <field id="resolution" type="string"/>
+
+    <!-- the current VideoResource index, it helps to play the video in order -->
+    <field id="currentVideoResourceindex" type="vector2d" value="[0,0]"/>
+
     <!-- the hdcp_version as returned by cms/content API. example: "hdcp_v1" -->
     <field id="hdcpVersion" type="string"/>
 
