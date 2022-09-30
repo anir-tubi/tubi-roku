@@ -377,7 +377,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   ' DRM encoded streams
-  translatedContent.videoResources = m.composeVideoResources(contentFromServer)
+  translatedContent.videoResources = m.composeVideoResources(translatedContent, contentFromServer)
 
   'take care of any subtitles if they exist - should only happen on videos
   if contentFromServer.has_subtitle <> invalid then translatedContent.hasSubtitles = contentFromServer.has_subtitle
@@ -1414,9 +1414,10 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
 End Function
 
 
+' @contentNode: TubiContentNode
 ' @contentFromServer: assocArray, AA representation of a single piece of content as
 '                                 returned by various APIs.
-Function tubiMetadataTranslate_composeVideoResources(contentFromServer)
+Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromServer)
 
   ' videoResources structure example:
   ' videoResources = [
@@ -1472,6 +1473,10 @@ Function tubiMetadataTranslate_composeVideoResources(contentFromServer)
 
       if codec = "H265" and resolution = "2160P"
         has4kHevcStream = true
+        ' //REMOVE 'has4kHevcStream' field and its references once we graduate roku_hevc_drm_4k_v1 experiment.
+        ' has4kHevcStream interface is added to TubiContentNode in order to identify whether video resource has hevc4k content
+        contentNode.addField("has4kHevcStream", "boolean", false)
+        contentNode.has4kHevcStream = true
       end if
 
       validResource = false
@@ -1648,7 +1653,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
         channelNode.HDSMALLICONURL = channelFromServer.images.thumbnail[0]
       end if
 
-      channelNode.videoResources = m.composeVideoResources(channelFromServer)
+      channelNode.videoResources = m.composeVideoResources(channelNode, channelFromServer)
 
       channelNode.description = channelFromServer.description
       channelNode.type = "linear"

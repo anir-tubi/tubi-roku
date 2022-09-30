@@ -311,7 +311,8 @@ Function tubiMetadataTranslate_composeVideoResources_test()
   content = ParseJson(ReadAsciiFile("pkg:/source/tests/rooibos/units/video_resources.json"))
   m.assertNotInvalid(content)
 
-  videoResources = m.translate.composeVideoResources(content)
+  contentNode = CreateObject("roSGNode", "TubiContentNode")
+  videoResources = m.translate.composeVideoResources(contentNode, content)
   m.assertNotInvalid(videoResources)
 
   ' check the number of resources is accurate

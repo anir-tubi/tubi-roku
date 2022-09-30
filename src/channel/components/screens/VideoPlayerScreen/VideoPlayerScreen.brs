@@ -397,8 +397,8 @@ Function playContent()
       ' Start pre-roll fetch
       m.top.adControl = "preroll"
     else
-      if m.Video.content.codec = "H265" and m.Video.content.resolution = "2160P"
-        ' fire exposure event for video playback if manifest had HEVC/4k content
+      if m.Video.content.has4kHevcStream = true
+        ' fire exposure event for video playback if manifest had HEVC/4k content for treatment & control
         getExperimentResource("roku_hevc_drm_4k", "roku_hevc_drm_4k_v1", true)
       end if
       m.Video.control = "play"
