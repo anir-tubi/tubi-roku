@@ -65,7 +65,7 @@
 
       <!--
         - Written to by AdsTask.
-        - Possible values:  init, fetching, noads, adspending, adsplaying, adsclosed
+        - Possible values: init, fetching, noAds, adsPending, adsPlaying, adsClosed
         -->
       <field id="adState" type="string" value=""/>
 

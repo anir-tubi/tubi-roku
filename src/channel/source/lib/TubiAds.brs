@@ -40,9 +40,10 @@ Function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
 
     ' private
     updateYouboraOptions: tubiAds_updateYouboraOptions
+    parseOutNotUsedAdPodPixels: tubiAds_parseOutNotUsedAdPodPixels
     requestQueue: requestQueue.create(adLoggingPort)
     roAdFramework: roAdFramework
-    allAdUnitsList:[]
+    allAdUnitsList: []
     totalAdBreakAds: 0
     commercialDuration : 0
     adPlaybackPos: 0
@@ -66,7 +67,10 @@ Function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
     getNielsenSessionId: tubiAds_getNielsenSessionId
     getNielsenStreamId: tubiAds_getNielsenStreamId
     getMd5Hash: tubiAds_getMd5Hash
+    sendNotUsedAdPodPixels: tubiAds_sendNotUsedAdPodPixels
+    retrieveAds: tubiAds_retrieveAds
     appMode: "DEFAULT_MODE"
+    notUsedAdPodPixels: {} ' List of pixels for the current ad pod that should be sent if playback is stopped before we get an impression for that ad
   }
 End Function
 
@@ -133,6 +137,8 @@ End Function
 '  clear everything out
 ' ----------------------------------------------
 Function tubiAds_reset()
+  ' resets m.notUsedAdPodPixels after sending current pixels
+  m.sendNotUsedAdPodPixels("exit_pre_pod")
   m.allAdUnitsList = []
   m.commercialDuration = 0
   m.containerNode = invalid
@@ -188,7 +194,7 @@ Function tubiAds_populateUrlRainmaker(episode, breakPos = 0, isSeekPastCuepoint 
   params = m.getRainmakerParams(episode, breakPos, isSeekPastCuepoint)
   baseUrl = m.constants.urls.adsBaseUrlRainmaker + m.constants.analyticsPlatform
   paramAddedUrl = m.request.addParamsToUrl(baseUrl, params)
-  return m.request.passThroughCharlesProxy(paramAddedUrl)
+  return paramAddedUrl
 End Function
 
 
@@ -261,6 +267,45 @@ Function tubiAds_getRainmakerParamsForLinear(content)
 End Function
 
 
+Function tubiAds_retrieveAds(adsUrl)
+  currentAdUnitsList = invalid
+
+  ' RAF has a hard 5 second cutoff for download time.
+  ' We make the network request to rainmaker ourselves to work around this.
+  tubiReq = m.request.createAsync(adsUrl)
+  port = createObject("roMessagePort")
+  if tubiReq.start(port) = true then
+    timeout = 10000 ' in milliseconds
+    msg = wait(timeout, port)
+    if type(msg) = "roUrlEvent" then
+      responseCode = msg.getResponseCode()
+      if responseCode >= 200 AND responseCode < 400 then
+        ' If we got a valid result write it to tmp and then have RAF read it from there
+        rainmakerResponse = msg.getString()
+        localRafVastUrl = "tmp:/local_raf_vast.xml"
+        if writeAsciiFile(localRafVastUrl, rainmakerResponse) = true then
+          notUsedAdPodPixels = m.parseOutNotUsedAdPodPixels(rainmakerResponse)
+          ' Need to check that count is greater than zero as linear will keep polling even after receiving the upcoming ads which would then override the existing notUsed pixels
+          if notUsedAdPodPixels.count() > 0 then
+            m.notUsedAdPodPixels = notUsedAdPodPixels
+          end if
+
+          m.roAdFramework.setAdUrl(localRafVastUrl)
+          'get the array of ad units back from the Roku Advertising Framework(RAF)
+          'adUnits are called adPods in RAF documentation
+          currentAdUnitsList = m.roAdFramework.getAds()
+        else
+          tubiLog("Failed to write local vast response to " + localRafVastUrl)
+        end if
+
+        deleteFile(localRafVastUrl)
+      end if
+    end if
+  end if
+  return currentAdUnitsList
+End Function
+
+
 ' ----------------------------------------------
 '  m.getAdsListViaRoku(episode, breakPos)
 ' ----------------------------------------------
@@ -299,33 +344,7 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos, isSeekPastCuepoint = false
   rainmakerVastUrl = m.populateUrlRainmaker(episode, breakPos, isSeekPastCuepoint)
 
   adFetchTimer = createObject("roTimeSpan")
-  currentAdUnitsList = invalid
-
-  ' RAF has a hard 5 second cutoff for download time.
-  ' We make the network request to rainmaker ourselves to work around this.
-  tubiReq = m.request.createAsync(rainmakerVastUrl)
-  port = createObject("roMessagePort")
-  if tubiReq.start(port) = true then
-    timeout = 10000 ' in milliseconds
-    msg = wait(timeout, port)
-    if type(msg) = "roUrlEvent" then
-      responseCode = msg.getResponseCode()
-      if responseCode >= 200 AND responseCode < 400 then
-        ' If we got a valid result write it to tmp and then have RAF read it from there
-        rainmakerResponse = msg.getString()
-        localRafVastUrl = "tmp:/local_raf_vast.xml"
-        if writeAsciiFile(localRafVastUrl, rainmakerResponse) = true then
-          m.roAdFramework.setAdUrl(localRafVastUrl)
-          'get the array of ad units back from the Roku Advertising Framework(RAF)
-          'adUnits are called adPods in RAF documentation
-          currentAdUnitsList = m.roAdFramework.getAds()
-        else
-          tubiLog("Failed to write local vast response to " + localRafVastUrl)
-        end if
-        deleteFile(localRafVastUrl)
-      end if
-    end if
-  end if
+  currentAdUnitsList = m.retrieveAds(rainmakerVastUrl)
   timeToFetch = adFetchTimer.totalMilliseconds()
 
   'log ad fetch errors
@@ -395,13 +414,6 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos, isSeekPastCuepoint = false
             end if
           end for
 
-          ' allow sending pixels via charles
-          if m.constants.settings.mode <> "production"
-            for each pixel in adUnit.tracking
-              pixel.url = m.request.passThroughCharlesProxy(pixel.url)
-            end for
-          end if
-
           'add the roku ad unit to the adUnitsList in the current adUnitsListContainer
           adUnitsListContainer.adUnitsList[0].ads.push(adUnit)
 
@@ -469,7 +481,8 @@ Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
             ads = getGlobalAA().tubiAds
             ads.adTrackingCallback(eventType, ctx)
           end function, {})
-          isCompleted = m.roAdFramework.showAds(adUnitsListContainer.adUnitsList[0], screenCount, containerNode)
+          adPod = adUnitsListContainer.adUnitsList[0]
+          isCompleted = m.roAdFramework.showAds(adPod, screenCount, containerNode)
 
           ' This will hide the buffering messaging and reset the progress bar
           ' before the video loading takes over status
@@ -481,6 +494,15 @@ Function tubiAds_showCommercialBreakViaRoku(containerNode, controlNode)
 
           if isCompleted = false
             tubilog("RAF ads not completed")
+
+            notUsedAction = "exit_mid_pod"
+            if adPod.ads.count() = m.notUsedAdPodPixels.count() then
+              ' If notUsedAdPodPixels count equals total ad pod count then we haven't played any at all so user exited before ad playback started
+              notUsedAction = "exit_pre_pod"
+            end if
+            ' resets m.notUsedAdPodPixels after sending current pixels
+            m.sendNotUsedAdPodPixels(notUsedAction)
+
             return m.constants.player.playerResults.closed
           end if
           currentAdPosition = currentAdPosition + adUnitsListContainer.adUnitsList.count()
@@ -503,9 +525,59 @@ End Function
 ' (expect that the player object will be the main video player for the channel)
 ' ----------------------------------------------
 Function tubiAds_getResumingPlayAds(episode, position, isSeekPastCuepoint = false)
+  ' resets m.notUsedAdPodPixels after sending current pixels
+  m.sendNotUsedAdPodPixels("ffwd")
   m.getAdsListViaRoku(episode, position, isSeekPastCuepoint)
   return m.hasAds(m.allAdUnitsList)
 End Function
+
+
+' ----------------------------------------------
+' sendNotUsedAdPodPixels
+'
+' Used to centralize sending of notUsed ad pod pixels
+' @notUsedAction string, reason that ad impression was not sent. One of exit_pre_pod | exit_mid_pod | ffwd
+' SIDE EFFECT: resets m.notUsedAdPodPixels after sending current pixels
+Function tubiAds_sendNotUsedAdPodPixels(notUsedAction)
+  for each adId in m.notUsedAdPodPixels
+    notUsedPixelUrl = m.notUsedAdPodPixels[adId].replace("[TUBI:NOT_USED_ACTION]", notUsedAction)
+    notUsedPixelReq = m.request.createAsync(notUsedPixelUrl)
+    m.requestQueue.pushRequest(notUsedPixelReq)
+  end for
+  m.notUsedAdPodPixels = {}
+End Function
+
+
+Function tubiAds_parseOutNotUsedAdPodPixels(adResponse)
+  notUsedAdPodPixels = {}
+  xml = ParseXML(adResponse)
+  for each ad in xml.ad
+    adSequence = ad@sequence
+    if isNonEmptyString(adSequence) = true then
+      for each inline in ad.inline
+        for each creatives in inline.creatives
+          for each creative in creatives.creative
+            for each linear in creative.linear
+              for each trackingEvents in linear.trackingEvents
+                for each tracking in trackingEvents.tracking
+                  event = tracking@event
+                  if event = "notUsed" then
+                    ' Need trim due to extra whitespace and unescape because of encoding returned from yospace
+                    url = tracking.getText().trim().unescape()
+                    notUsedAdPodPixels[adSequence] = url
+                    exit for
+                  end if
+                end for
+              end for
+            end for
+          end for
+        end for
+      end for
+    end if
+  end for
+  return notUsedAdPodPixels
+End Function
+
 
 ' ----------------------------------------------
 ' adBufferingCallback
@@ -582,6 +654,9 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
         start_position: 0
         is_fullscreen: true
       }
+
+      ' Clear out notUsed pixel for the current ad since we sent an impression
+      m.notUsedAdPodPixels.delete(ctx.adIndex.toStr())
       m.trackUserEvent("start_ad", startAdEvent, m.requestQueue)
 
       impressionCount = 0

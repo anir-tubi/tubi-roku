@@ -453,7 +453,7 @@ Function onControlChange()
     m.UpNext.hide = true
 
     'in the case where an ad break has started, but RAF does not yet have control, we want to break out of ads on back button pressed
-    if m.top.adState = "fetching" or m.top.adState = "adsPending"
+    if m.top.adState = "fetching" OR m.top.adState = "adsPending" then
       m.top.adControl = "stop"
     end if
   else if m.top.control = "pause" then
@@ -524,7 +524,7 @@ Function onVideoStateChange(msg)
     end if
   else if state = "stopped" AND m.VideoState = "stop"
     ' player has stopped (not due to an ad break)
-    if m.top.adState = "noads" or m.top.adState = "init"
+    if m.top.adState = "noAds" or m.top.adState = "init"
       if m.Video.content <> invalid
         ' the video has been stopped, send a final playProgressEvent
         playProgressEvent = getPlayProgressEvent()
@@ -623,11 +623,13 @@ Function onVideoPositionChange()
     end if
   end if
 
+  adState = m.top.adState
+
   ' User history
   ' NOTE: historyPosition should not be set near an ad break due to race condition where RAF being
   ' invoked will cause the AuthTask thread to get stuck, never completing and staying in a "run"
   ' state perpetually.
-  if (m.playerPosition > m.lastsavedPosition + m.historyInterval or m.playerPosition < m.lastsavedPosition - m.historyInterval) AND m.top.adState <> "adspending"
+  if (m.playerPosition > m.lastsavedPosition + m.historyInterval or m.playerPosition < m.lastsavedPosition - m.historyInterval) AND adState <> "adsPending" then
     historyPosition(m.playerPosition)
   end if
 
@@ -708,7 +710,7 @@ Function onVideoPositionChange()
 
       ' show the ads countdown if appropriate (show if ads are available and within adHeadsUpTime)
       adPosition = m.top.adPosition
-      if m.top.adState = "adspending" AND isInWindow(m.playerPosition, adPosition, m.adHeadsUpTime) = true
+      if adState = "adsPending" AND isInWindow(m.playerPosition, adPosition, m.adHeadsUpTime) = true
         if m.Overlay.opacity = 0
           ' Don't show the ad heads up when the transport/overlay is showing, since it crowds the space of the title on the overlay
           m.ratingOverlay.opacity = 0
@@ -720,7 +722,7 @@ Function onVideoPositionChange()
       isCuepointReached = m.midrolls[strI(m.playerPosition)]
       if isCuepointReached = true AND m.UpNext.opacity = 0
         m.AdHeadsUp.visible = false
-        if m.top.adState = "adspending" then
+        if adState = "adsPending" then
           ' Send a play_progress event before we show ads to be most accurate in case the user exits during ad playback
           playProgressEvent = getPlayProgressEvent()
           if playProgressEvent <> invalid
@@ -738,7 +740,7 @@ Function onVideoPositionChange()
           ' system resources to the RAF video player
           showAdBreak()
           m.showRatings = true
-        else if m.top.adState = "noads"
+        else if adState = "noAds"
           ' when we reach the cuepoint, we find that the last ad call returned no ads
 
           if m.mostRecentCompletedCuepoint <> m.playerPosition
@@ -787,13 +789,14 @@ End Function
 '   "ready": the ad shim task is ready and listening for updates to the adControl field (should happen once per user session)
 '   "init": no ad request has yet to be made for this video (adState is reset back to init when video is about to be started)
 '   "fetching": a request has been made to the ad server, awaiting a response
-'   "adspending": an ad response has been returned, the player is waiting to reach the appropriate cuepoint in order to play it
-'   "adsplaying": ads are currently playing - RAF has control
-'   "adsclosed": a user has hit the back button while RAF has control, closing the ad experience
-'   "noads": an ad response has been received but there are no ads in it. Or an ad break has played to completion.
-Function onAdStateChange()
-  tubiLog("VideoPlayer.onAdStateChange adState = " + m.top.adState + " VideoState = " + m.VideoState + " Video.State = " + m.Video.state)
-  if m.top.adState = "ready"
+'   "adsPending": an ad response has been returned, the player is waiting to reach the appropriate cuepoint in order to play it
+'   "adsPlaying": ads are currently playing - RAF has control
+'   "adsClosed": a user has hit the back button while RAF has control, closing the ad experience
+'   "noAds": an ad response has been received but there are no ads in it. Or an ad break has played to completion.
+Function onAdStateChange(msg)
+  adState = msg.getData()
+  tubiLog("VideoPlayer.onAdStateChange adState = " + adState + " VideoState = " + m.VideoState + " Video.State = " + m.Video.state)
+  if adState = "ready"
     m.top.adState = "init"
     if m.top.adControl <> ""
       ' There is a race condition that can occur during deeplinks such that m.top.adControl can be set before the adShim is listening
@@ -801,13 +804,13 @@ Function onAdStateChange()
       ' to fix the issue.
       m.top.adControl = m.top.adControl
     end if
-  else if m.top.adState = "adspending" AND (m.top.adControl = "preroll" or m.top.adControl = "seek") AND m.top.enableAds = true then
+  else if adState = "adsPending" AND (m.top.adControl = "preroll" or m.top.adControl = "seek") AND m.top.enableAds = true then
     ' Midrolls are triggered from position changes since they are prefetched.  Other ad breaks have
-    ' video playback stopped and should play right away when we get adspending.
+    ' video playback stopped and should play right away when we get adsPending.
     ' pre-roll or resume-roll. Play ads right away
     showAdBreak()
     m.showRatings = true
-  else if m.top.adState = "noads" AND (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip" or m.VideoState = "hop") AND m.Video.state <> "playing" then
+  else if adState = "noAds" AND (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip" or m.VideoState = "hop") AND m.Video.state <> "playing" then
     ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
     ' TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
     if m.Video.content.url <> invalid AND m.Video.content.url <> ""
@@ -837,14 +840,14 @@ Function onAdStateChange()
       jsonErrorInfo = FormatJSON(errorInfo)
       tubiException(jsonErrorInfo, "error")
     end if
-  else if m.top.adState = "adsclosed"
+  else if adState = "adsClosed"
     m.top.setFocus(true)
     backButtonExit()
   end if
 End Function
 
 
-' While we have an adsplaying state for adState that doesn't actually mean that ads are playing yet or that RAF has been setup yet.
+' While we have an adsPlaying state for adState that doesn't actually mean that ads are playing yet or that RAF has been setup yet.
 ' For this reason we are observering the container we give to RAF to see when it adds its components and we can modify as needed
 Function onRAFAdContainerChangeChange(msg)
   change = msg.getData()

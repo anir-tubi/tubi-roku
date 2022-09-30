@@ -87,17 +87,27 @@ Function runSSAILoop(ssaiPort)
     msg = wait(0, ssaiPort)
 
     if type(msg) = "roSGNodeEvent"
-      if msg.getField() = "pollUrl"
+      messageField = msg.getField()
+      if messageField = "pollUrl"
         onPollUrlChange(msg)
-      else if msg.getField() = "videoPosition"
+      else if messageField = "videoPosition"
         onVideoPosition(msg)
-      else if msg.getField() = "id3Tags"
+      else if messageField = "id3Tags"
         onTags(msg)
-      else if msg.getField() = "videoIsFullscreen"
+      else if messageField = "videoIsFullscreen"
         m.videoIsFullscreen = msg.getData()
-      else if msg.getField() = "playbackStopped"
+      else if messageField = "playbackStopped"
+        if isArray(m.adPod.ads) = true then
+          notUsedAction = "exit_mid_pod"
+          if m.adPod.ads.count() = m.adLib.notUsedAdPodPixels.count() then
+            ' If notUsedAdPodPixels count equals total ad pod count then we haven't played any at all so user exited before ad playback started
+            notUsedAction = "exit_pre_pod"
+          end if
+          ' Resets m.adLib.notUsedAdPodPixels as well
+          m.adLib.sendNotUsedAdPodPixels(notUsedAction)
+        end if
         onPlaybackStopped()
-      else if msg.getField() = "exit"
+      else if messageField = "exit"
         ' send ad analytics events if necessary when the user exits playback
         if m.top.isPlayingAds = true
           sendFinishAdAnalytics(m.currentAdInPod, "DELIBERATE")
@@ -129,11 +139,9 @@ End Function
 
 
 Function pollForAds(url)
-  if m.top.isPlayingAds <> true AND m.top.isPlayingAdFiller <> true AND url <> invalid AND url <> ""
-    charlesUrl = m.request.passThroughCharlesProxy(url)
-    m.raf.setAdUrl(charlesUrl)
-    adPods = m.raf.getAds()
-
+  if isNonEmptyString(url) = true AND m.top.isPlayingAds <> true AND m.top.isPlayingAdFiller <> true then
+    ' Retrieves ads and also sets m.notUsedAdPodPixels
+    adPods = m.adLib.retrieveAds(url)
     if adPods <> invalid AND adPods.count() > 0
       if adPods[0].ads <> invalid
         m.adPod = adPods[0]
@@ -148,15 +156,8 @@ Function pollForAds(url)
             ad.yospaceId = adIdSplit[1]
           end if
 
-          ' update ad tracking pixels to be sent via charles
-          if m.constants.settings.mode <> "production" AND isArray(ad.tracking)
-            for each pixel in ad.tracking
-              pixel.url = m.request.passThroughCharlesProxy(pixel.url)
-            end for
-          end if
-
           ' add the sequence of the ad within the pod for future reference
-          ad.sequence = i
+          ad.sequence = i + 1
         end for
       end if
     end if
@@ -176,7 +177,7 @@ Function onVideoPosition(msg)
 
   if m.positionAtLastId3 >= 0 AND position > m.positionAtLastId3 + 60
     ' no id3 have been sent in over 1 minute of playback, so reset ad state as safety in case
-    ' the id3 tag for the final segment of the final ad was not observed, and ad state was 
+    ' the id3 tag for the final segment of the final ad was not observed, and ad state was
     ' not reset as expected
     resetAdState()
   end if
@@ -290,7 +291,7 @@ Function onPlaybackStopped()
     ' when the playback stops
     remainingAds = 0
     if haveStoredAds(m.adPod) = true AND m.currentAdInPod <> invalid
-      remainingAds = m.adPod.ads.count() - (m.currentAdInPod.sequence + 1)
+      remainingAds = m.adPod.ads.count() - m.currentAdInPod.sequence
     end if
 
     if remainingAds > 0
@@ -340,6 +341,10 @@ Function handleStartAdTracking()
 
     ' send StartAdEvent tracking
     analyticsCtx = getAnalyticsCtx(m.currentAdInPod, m.adPod.ads.count())
+
+    ' Clear out notUsed pixel for the current ad since we sent an impression
+    m.adLib.notUsedAdPodPixels.delete(m.currentAdInPod.sequence.toStr())
+
     startAdValues = {
       ad_started: m.tracking.getAnalyticsAd(analyticsCtx)  'Ad
       video_id: m.top.content.id
@@ -523,7 +528,7 @@ Function getAnalyticsCtx(ad, podCount)
   end if
 
   analyticsCtx = {
-    adIndex: ad.sequence + 1
+    adIndex: ad.sequence
     adCount: podCount
     ad: ad
   }

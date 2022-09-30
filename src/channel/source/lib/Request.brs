@@ -147,13 +147,18 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
     return false
   end if
 
-  if m.params.Count() > 0  AND isRetry = false then
+  if m.params.Count() > 0 AND isRetry = false then
     fullUrl = m.addParamsToUrl_(m.url, m.params)
-    fulProxyUrl = m.passThroughCharlesProxy(fullUrl)
-    m.urltransfer.SetUrl(fulProxyUrl)
-    m.url = fulProxyUrl
+    fullProxyUrl = m.passThroughCharlesProxy(fullUrl)
+    m.urltransfer.setUrl(fullProxyUrl)
+    m.url = fullProxyUrl
   else
-    m.urltransfer.SetUrl(m.url)
+    m.urltransfer.setUrl(m.url)
+  end if
+
+  if m.url <> m.urltransfer.getUrl() then
+    message = "Was not able to set url '" + m.url + "'"
+    tubiLog(message, "error")
   end if
 
 

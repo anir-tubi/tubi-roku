@@ -65,7 +65,7 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
           m.ads.appMode = m.videoPlayerNode.appMode
           m.handleControlMessage(m.videoPlayerNode.adState, value, episode, position)
         else
-          m.videoPlayerNode.adState = "noads"  ' if video player content was changed before we got here, return no ads
+          m.videoPlayerNode.adState = "noAds"  ' if video player content was changed before we got here, return no ads
         end if
       end if
     end if
@@ -79,42 +79,42 @@ End Function
 Function tubiSGAdShim_handleControlMessage(state As String, control As String, episode As Object, position As Integer)
 
   stateMachine = {
-    init: {
+    "init": {
       preroll: "preroll"
       midroll: "preroll"
       seek: "preroll"
       play: ""
       stop: ""
     }
-    fetching: {
+    "fetching": {
       preroll: "preroll"
       midroll: ""
       seek: "midroll"
       play: ""
       stop: "reset"
     }
-    noads: {
+    "noAds": {
       preroll: "preroll"
       midroll: "midroll"
       seek: "resume"
       play: ""
       stop: "reset"
     }
-    adspending: {
+    "adsPending": {
       preroll: "preroll"
       midroll: "midroll"
       seek: "resume"
       play: "playAds"
       stop: "reset"
     }
-    adsplaying: {
+    "adsPlaying": {
       preroll: "preroll"
       midroll: ""
       seek: ""
       play: ""
       stop: "reset"
     }
-    adsclosed: {
+    "adsClosed": {
       preroll: "preroll"
       midroll: ""
       seek: ""
@@ -151,16 +151,16 @@ End Function
 '
 '
 Function tubiSGAdShim_preroll(episode As Object, cuepoint As Integer)
-  m.videoplayernode.adstate = "fetching"
+  m.videoPlayerNode.adState = "fetching"
   m.ads.reset()
 
   'if the user is starting from beginning or resuming on a cue point, show ads
   'attempt to get list of ads and play them for preroll
   m.ads.getAdsListViaRoku(episode, cuepoint)
   if m.ads.hasAds(m.ads.allAdUnitsList) = true
-    m.videoPlayerNode.adState = "adspending"
+    m.videoPlayerNode.adState = "adsPending"
   else
-    m.videoPlayerNode.adState = "noads"
+    m.videoPlayerNode.adState = "noAds"
   end if
 End Function
 
@@ -172,14 +172,14 @@ End Function
 '      b) cached ads for non-RAF midrolls in m.videoAdsList
 '      c) cached ads in RAF which it stored internally
 Function tubiSGAdShim_playAds(_episode As Object, _cuepoint As Integer)
-  m.videoPlayerNode.adState = "adsplaying"
+  m.videoPlayerNode.adState = "adsPlaying"
 
   adContainer = m.videoPlayerNode.findNode("RAFAdContainer")
   status = m.ads.showCommercialBreakViaRoku(adContainer, m.videoPlayerNode)
   if status = m.constants_.player.playerResults.closed
-    m.videoPlayerNode.adState = "adsclosed"
+    m.videoPlayerNode.adState = "adsClosed"
   else
-    m.videoPlayerNode.adState = "noads"
+    m.videoPlayerNode.adState = "noAds"
   end if
 End Function
 
@@ -195,12 +195,12 @@ End Function
 ''''''''''''''''''
 ' midroll
 Function tubiSGAdShim_midroll(episode As Object, cuepoint As Integer)
-  m.videoplayernode.adstate = "fetching"
+  m.videoPlayerNode.adState = "fetching"
   m.ads.cacheAdsList(episode, cuepoint)
   if m.ads.getCachedAdsList(episode, cuepoint) <> invalid then
-    m.videoPlayerNode.adState = "adspending"
+    m.videoPlayerNode.adState = "adsPending"
   else
-    m.videoPlayerNode.adState = "noads"
+    m.videoPlayerNode.adState = "noAds"
   end if
 End Function
 
@@ -208,14 +208,13 @@ End Function
 '''''''''''''''''
 ' resume
 Function tubiSGAdShim_resume(episode As Object, cuepoint As Integer)
-  m.videoplayernode.adstate = "fetching"
+  m.videoPlayerNode.adState = "fetching"
   'NOTE: TubiAds sets resumePlayAdsList on 'm' here
-
-  if m.ads.getResumingPlayAds(episode, cuepoint, true) = true
-    tubiLog("Setting adState to adspending")
-    m.videoPlayerNode.adState = "adspending"
+  if m.ads.getResumingPlayAds(episode, cuepoint, true) = true then
+    tubiLog("Setting adState to adsPending")
+    m.videoPlayerNode.adState = "adsPending"
   else
-    tubiLog("Setting adState to noads")
-    m.videoPlayerNode.adState = "noads"
+    tubiLog("Setting adState to noAds")
+    m.videoPlayerNode.adState = "noAds"
   end if
 End Function

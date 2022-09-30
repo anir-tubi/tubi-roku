@@ -45,6 +45,7 @@ jobs:
               echo "Unit Tests are completed"
               break
             fi
+            sleep 1
           done
           actual=`grep 'RESULT:' log.txt  | tail -1`
           expected="RESULT: Success"
