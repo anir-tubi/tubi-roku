@@ -102,7 +102,7 @@ End Function
 
 ' @param bSendExposureEvent: Boolean, Should the experiment exposure event be sent? true=send event.
 Function isLikeDislikeEnabled(bSendExposureEvent = false)
-  bLikeDislikeEnabled = (getExperimentResource("roku_title_reactions", "roku_title_reactions_v2", bSendExposureEvent).enabled = true or isLoggedInUser() = true)
+  bLikeDislikeEnabled = (getExperimentResource("roku_title_reactions", "roku_title_reactions_v3", bSendExposureEvent).enabled = true or isLoggedInUser() = true)
   return bLikeDislikeEnabled
 End Function
 
@@ -370,6 +370,11 @@ Function onIsSeries()
   episodeListIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
   signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
   menuItems = [m.LikeDislikeMenuItem, m.signUpMenuItem, m.PlayMenuItem]
+  if isLoggedInUser() = false OR getExperimentResource("roku_title_reactions", "roku_title_reactions_v4", true).enabled = true
+    '//If a guest user (and if roku_title_reactions_v3 is enabled which is checked before OR if a registered user and roku_title_reactions_v4 is enabled,
+    '// then ensure the like/dislike button comes AFTER the episodeList button
+    menuItems = [m.signUpMenuItem, m.PlayMenuItem]
+  end if
 
   '//Change the button order of the signup button depending on isSeries state
   if isLoggedInUser() = false AND isNewUser() = false

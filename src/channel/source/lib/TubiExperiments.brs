@@ -21,9 +21,12 @@ Function TubiExperiments(constants) as Object
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
 
     defaultResources: {
-      '// When enabled=true, the roku_title_reactions_v2 experiment will display a Like/dislike button on the title details screen if a logged out user
+      '// When enabled=true, the roku_title_reactions_v3 experiment will display a Like/dislike button on the title details screen if a logged out user
+      '//   The difference between v2 and v3 is that with v3, the position of the like/dislike button is moved after the episode list for a guest user.
+      '//   The difference between v2 and v4 is that with v4, the position of the like/dislike button is moved after the episode list for a registered user.
       roku_title_reactions: {
-        roku_title_reactions_v2: {"enabled": false}
+        roku_title_reactions_v3: {"enabled": false}
+        roku_title_reactions_v4: {"enabled": false}
       }
 
       '// When enabled=true, the roku_registration_gender_data_v1 experiment will include gender data when the guest user signs in
