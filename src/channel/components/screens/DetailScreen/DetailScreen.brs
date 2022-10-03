@@ -171,8 +171,6 @@ Function changeButtonText(sButtonStringId, sButtonText)
         '//move SecondaryMenu to ensure it is not overlapping the Menu
         m.SecondaryMenu.translation = [potentialWidth + 200, m.SecondaryMenu.translation[1]]
       end if
-
-      tempChannelMenuItem = invalid
     end if
   end if
 
@@ -302,7 +300,7 @@ End Function
 
 
 Function changeLikeDislikeButtonText()
-  if isLikeDislikeEnabled() = true 
+  if isLikeDislikeEnabled() = true
     sButtonText = ""
     sIconUrl = ""
     if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked or m.top.likeDislikeState = m.constants.ui.likeDislikeStates.disliked
@@ -407,7 +405,7 @@ Function onRemoveSignupButton()
       if nLikeIndex = -1
         '//if the like/dislke button does not exist yet, then add it
         addRemoveMenuItem(true, nLikeIndex, m.LikeDislikeMenuItem, [m.PlayMenuItem])
-      end if 
+      end if
     end if
   end if
 End Function
@@ -427,7 +425,7 @@ Function onIsInKidsMode()
     '//remove like/dislike button
     likeDislikeButtonIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
     addRemoveMenuItem(false, likeDislikeButtonIndex)
-  else 
+  else
     if isLikeDislikeEnabled(true) = true
       '//add like/dislike button
       nLikeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)

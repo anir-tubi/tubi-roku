@@ -675,13 +675,16 @@ Function findNextEpisode(currentItemFocused, seriesContent)
     nextEpisode = findNextEpisode2dIndex(currentItemFocused, seriesContent)
     seasonIndex = nextEpisode[0]
     episodeIndex = nextEpisode[1]
+    currentSeasonIndex = -1
+    currentEpisodeIndex = -1
     historyIds = getFieldFromGlobal("historyIds") ' get the history to avoid accessing m.global every time
     if historyIds <> invalid
       for i = seasonIndex to seriesContent.getChildCount() - 1
+        currentSeasonIndex = i
         season = seriesContent.getChild(i)
         for j = episodeIndex to season.getChildCount() - 1
-
-          item = seriesContent.getchild(i).getChild(j)
+          currentEpisodeIndex = j
+          item = seriesContent.getChild(i).getChild(j)
           history = historyIds.findNode(item.id)
 
           if history <> invalid AND history.nowPos <> invalid AND history.nowPos <> 0
@@ -698,9 +701,10 @@ Function findNextEpisode(currentItemFocused, seriesContent)
         episodeIndex = 0 'next season, so start from beginning
       end for
 
-
       'if we ran out of all the episodes, return first episode as next episode
-      if i = seriesContent.getChildCount() - 1 AND j = seriesContent.getChild(i).getChildCount() - 1
+      seasonsTopIndex = seriesContent.getChildCount() - 1
+      episodesTopIndex = seriesContent.getChild(seasonsTopIndex).getChildCount() - 1
+      if currentSeasonIndex = seasonsTopIndex AND currentEpisodeIndex = episodesTopIndex then
         nextEpisode = [0, 0]
       end if
     end if
@@ -1924,6 +1928,7 @@ End Function
 ' @dialogSubtype: string, a string limited to 20 characters, used to distinguish different dialogs from each other
 ' @constants: assocArray, an instance of m.constants
 Function getDetailScreenDialogAnalyticEvent(content, dialogType, dialogSubtype, constants)
+  pageInfo = invalid
   if type(content) = "roSGNode" AND content.isSubtype("ContentNode") = true
     pageInfo = getDetailScreenAnalyticsPageInfo(content, constants)
   end if

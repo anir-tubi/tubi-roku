@@ -2,7 +2,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   tubiLog("VideoTransportHandling.onKeyEvent key = " + key + " press: " + press.toStr())
   if press
     m.lastButtonPressPos = m.playerPosition
-    if isButtonPressAllowed(key, m.VideoState, m.Video) 
+    if isButtonPressAllowed(key, m.VideoState, m.Video)
       if key = "OK"
         handleOk()
 
@@ -205,6 +205,7 @@ Function handleTransportVoiceEvent()
       handleFastForward()
     else if command = "seek"
       direction = ""
+      duration = 0
       if inputInfo <> invalid AND inputInfo.duration <> invalid AND inputInfo.direction <> invalid
         duration = inputInfo.duration.toInt()
         direction = inputInfo.direction

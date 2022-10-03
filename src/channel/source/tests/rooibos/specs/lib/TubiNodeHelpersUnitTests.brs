@@ -21,6 +21,7 @@ End Function
 
 '@Test getChildIndex unit tests
 Function tubiNodeHelpers_getChildIndex_test()
+  third = invalid
   for i=0 to 4
     child = m.parent.createChild("ContentNode")
     child.id = Mid(Str(i), 2)
@@ -38,6 +39,7 @@ End Function
 
 '@Test getChildIndexById unit tests
 Function tubiNodeHelpers_getChildIndexById_test()
+  idToRemove = ""
   for i=0 to 4
     child = m.parent.createChild("ContentNode")
     child.id = Mid(Str(i), 2)
@@ -94,6 +96,7 @@ Function tubiNodeHelpers_getLastChild_test()
   m.AssertInvalid(invalidLastChild)
 
   ' construct children with ids
+  fourth = invalid
   for i=0 to 4
     child = parent.createChild("ContentNode")
     child.id = Mid(Str(i), 2)
@@ -156,6 +159,7 @@ End Function
 Function tubiNodeHelpers_immutableInsertChildAlreadyExists_test()
   existingChildIndex = 3
   numChildren = 5
+  insertable = invalid
   for i=0 to numChildren-1
     child = m.parent.createChild("ContentNode")
     if i = existingChildIndex
@@ -179,6 +183,8 @@ End Function
 '@Test immutableRemoveChildIndex unit tests
 Function tubiNodeHelpers_immutableRemoveChildIndex_test()
   numChildren = 5
+  removeIndex = -1
+  removeId = ""
   for i=0 to numChildren-1
     child = m.parent.createChild("ContentNode")
     child.id = Mid(Str(i), 2)
@@ -197,6 +203,7 @@ End Function
 
 '@Test immutableRemoveChild unit tests
 Function tubiNodeHelpers_immutableRemoveChild_test()
+  third = invalid
   for i=0 to 4
     child = m.parent.createChild("ContentNode")
     child.id = Mid(Str(i), 2)

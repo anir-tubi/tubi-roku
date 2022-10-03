@@ -458,7 +458,6 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
     videoPlayer.observeFieldScoped("state", "onLinearVideoPlayerStateWhileInMinState")
 
     linearPlayerParentGroup = m.LinearPlayerGroup
-    currentScreen = getCurrentScreen()
 
     nWidth = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[0]
     nHeight = m.constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension[1]

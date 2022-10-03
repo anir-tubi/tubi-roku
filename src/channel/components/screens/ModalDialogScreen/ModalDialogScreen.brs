@@ -33,20 +33,19 @@ Function formatDialog()
       button = newContent.createChild("ContentNode")
       button.title = b
       button.id = b
-      '//   Temporarily create ModalListItem for each button text to find the largest width necessary for the set of buttons, 
+      '//   Temporarily create ModalListItem for each button text to find the largest width necessary for the set of buttons,
       '//   in order to determine how wide m.ButtonList should be.
       '//   Different languages may make the text wider than usual so we need to ensure the button displays the full text
       listItem = CreateObject("roSGNode", "ModalListItem")
-      listContent =  CreateObject("roSGNode", "ContentNode") 
-      listContent.title = b 
+      listContent =  CreateObject("roSGNode", "ContentNode")
+      listContent.title = b
       listItem.itemContent = listContent
 
-      if listItem.calculatedWidth > nWidestWidth 
+      if listItem.calculatedWidth > nWidestWidth
         nWidestWidth = listItem.calculatedWidth
       end if
-      listItem = invalid
     end for
-    'Keeping the default width of 475 for each button and if the text length is greater than 475 then we are 
+    'Keeping the default width of 475 for each button and if the text length is greater than 475 then we are
     'determining the width based on the text length.
     if nWidestWidth > m.ButtonList.itemSize[0]
       m.ButtonList.itemSize = [nWidestWidth, m.ButtonList.itemSize[1]]
@@ -77,7 +76,7 @@ Function formatDialog()
 End Function
 
 Function onKeyEvent(key As String, press As Boolean) As Boolean
-  if press 
+  if press
     if m.top.scrollable then
       if key = "up" AND m.ButtonList.hasFocus() then
         m.ScrollableMessage.scrollbarThumbBitmapUri = "pkg:/images/menu-focus-fhd.9.png"
@@ -87,14 +86,14 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
         m.ScrollableMessage.scrollbarThumbBitmapUri = "pkg:/images/menu-disabled-focus-fhd.9.png"
         m.ButtonList.setFocus(true)
         return true
-      end if 
+      end if
     end if
-    
+
     ' removed alias from xml and setting buttonSelected interface value here, to play default Roku positive audio sound whne user press "OK" on any dialog modal button
     if key = "OK" AND m.ButtonList.hasFocus() = true
       m.top.buttonSelected = m.ButtonList.itemSelected
     end if
-    
+
     if key = "back" or key = "options" then
       m.top.exitButton = key
     end if

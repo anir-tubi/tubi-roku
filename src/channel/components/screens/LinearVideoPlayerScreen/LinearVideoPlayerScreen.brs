@@ -1,5 +1,5 @@
 Function init()
-  tubiLog("LineaerVideoPlayerNewScreen.init")
+  tubiLog("LinearVideoPlayerScreen.init")
 
   ' handle BaseScreen functionality (see BaseScreen.xml)
   m.constants = getConstantsFromGlobal()
@@ -95,14 +95,14 @@ End Function
 
 
 Function onChannelSelectedToPlayChanged()
-  tubiLog("LineaerVideoPlayerNewScreen.onChannelSelectedToPlayChanged")
+  tubiLog("LinearVideoPlayerScreen.onChannelSelectedToPlayChanged")
   m.top.channelSelected = m.VideoOverlay.linearChannelToPlay
   m.top.ChannelSelectedUpdated = true
 End Function
 
 
 Function playContent()
-  tubiLog("LineaerVideoPlayerNewScreen.playContent")
+  tubiLog("LinearVideoPlayerScreen.playContent")
   m.lastButtonPressPos = 0
 
   'start_live_video user event analytics
@@ -146,7 +146,7 @@ End Function
 
 
 Function onContentChange() as void
-  tubiLog("LineaerVideoPlayerNewScreen.onContentChange")
+  tubiLog("LinearVideoPlayerScreen.onContentChange")
   m.top.state = ""
 
   if m.top.content <> invalid
@@ -163,7 +163,7 @@ End Function
 
 ' needed in case the pollUrl is set via the alias prior to the AdsSSAITask being in a "ready" state
 Function onPollUrlChange()
-  tubiLog("LineaerVideoPlayerNewScreen.onPollUrlChange")
+  tubiLog("LinearVideoPlayerScreen.onPollUrlChange")
   if m.AdsSSAITask.state <> "ready"
     m.AdsSSAITask.observeField("state", "onAdsSSAITaskStateChange")
   end if
@@ -172,7 +172,7 @@ End Function
 
 ' If an ad is playing then temporary stop showing captions
 Function onAdChange(msg)
-  tubiLog("LineaerVideoPlayerNewScreen.onAdChange")
+  tubiLog("LinearVideoPlayerScreen.onAdChange")
   isPlayingAds = msg.getData()
   if isPlayingAds = true
     ' Send a play_progress event before we show ads to be most accurate in case the user exits during ad playback
@@ -207,7 +207,7 @@ End Function
 
 
 Function onControlChange()
-  tubiLog("LineaerVideoPlayerNewScreen.onControlChange " + m.top.control)
+  tubiLog("LinearVideoPlayerScreen.onControlChange " + m.top.control)
   if m.top.control = "play"
     if m.top.content <> invalid
       prepareToStartVideo(m.top.content)
@@ -231,7 +231,7 @@ End Function
 
 'Occurs when m.Video.state changes (not when m.top.state changes)
 Function onVideoStateChange(msg)
-  tubiLog("LineaerVideoPlayerNewScreen.onVideoStateChange, state = " + msg.GetData())
+  tubiLog("LinearVideoPlayerScreen.onVideoStateChange, state = " + msg.GetData())
   state = msg.GetData()
 
   sPreviousState = m.top.state
@@ -405,7 +405,7 @@ End Function
 
 
 Function onCaptionModeChange()
-  tubiLog("LineaerVideoPlayerNewScreen.onCaptionModeChange")
+  tubiLog("LinearVideoPlayerScreen.onCaptionModeChange")
 
   hideOverlay()
   ' update the closed captions UI. It may look the same but the enabled icon may be different
@@ -453,7 +453,7 @@ End Function
 
 
 Function createContentForClosedCaptioning()
-  tubiLog("LineaerVideoPlayerNewScreen.createContentForClosedCaptioning")
+  tubiLog("LinearVideoPlayerScreen.createContentForClosedCaptioning")
   bCaptionsAvailable = false
   availableSubtitleTracks = m.Video.availableSubtitleTracks
   if availableSubtitleTracks <> invalid AND availableSubtitleTracks.Count() > 0
@@ -502,7 +502,7 @@ Function createClosedCaptioningNode(lang, bEnabled = false, trackname = invalid)
     language_label = "English"
   else if lang = "spa"
     language_label = "Español"
-  else if lang = "off"
+  else
     language_label = getTranslation("dialog_button_off")
     trackname = "off"
   end if
@@ -571,7 +571,7 @@ End Function
 
 
 Function stopVideo()
-  tubiLog("LineaerVideoPlayerNewScreen.stopVideo")
+  tubiLog("LinearVideoPlayerScreen.stopVideo")
   m.VideoState = "stop"
   ' add check so that onVideoStateChange doesn't get called
   ' if the video is already in a non playing state.
@@ -581,12 +581,12 @@ Function stopVideo()
 End Function
 
 Function pauseVideo()
-  tubiLog("LineaerVideoPlayerNewScreen.pauseVideo not implemented yet")
+  tubiLog("LinearVideoPlayerScreen.pauseVideo not implemented yet")
 End Function
 
 
 Function resumeFromPause()
-  tubiLog("LineaerVideoPlayerNewScreen.resumeFromPause not implemented yet")
+  tubiLog("LinearVideoPlayerScreen.resumeFromPause not implemented yet")
 End Function
 
 

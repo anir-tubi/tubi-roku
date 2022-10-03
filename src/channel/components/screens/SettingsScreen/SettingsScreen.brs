@@ -466,7 +466,6 @@ Function onKeyEvent(key, press) as Boolean
       m.top.backButtonPressed = true
       return true
     end if
-
-    return false
   end if
+  return false
 End Function

@@ -201,7 +201,6 @@ End Function
 '@Test translateContainer category unit tests
 Function tubiMetadataTranslate_translateContainer_category_test()
   categoryJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/category.json")
-  fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translateContainer(ParseJson(categoryJson), categoryJson)
   m.assertNotInvalid(translated)
   m.assertEqual(translated.id, "featured")
@@ -213,7 +212,6 @@ End Function
 '@Test translateContainer channel unit tests
 Function tubiMetadataTranslate_translateContainer_channel_test()
   channelJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/channel.json")
-  fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translateContainer(ParseJson(channelJson), channelJson)
   m.assertNotInvalid(translated)
   m.assertEqual(translated.id, "cbs")
@@ -232,7 +230,6 @@ End Function
 '@Test translateHomescreen unit tests
 Function tubiMetadataTranslate_translateHomescreen_test()
   homeJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/homescreen.json")
-  fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translateHomescreen(ParseJson(homeJson))
   m.assertNotInvalid(translated)
   m.assertEqual(translated.getChildCount(), 10)
@@ -244,7 +241,6 @@ End Function
 '@Test translate unit tests
 Function tubiMetadataTranslate_translate_test()
   matches = ReadAsciiFile("pkg:/source/tests/rooibos/units/search.json")
-  fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translate(ParseJson(matches))
   m.assertNotInvalid(translated)
 End Function
@@ -281,7 +277,6 @@ End Function
 '@Test getContentFromCategoryJson unit tests
 Function tubiMetadataTranslate_getContentFromCategoryJson_test()
   categoryJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/category.json")
-  fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translateContainer(ParseJson(categoryJson), categoryJson)
   m.assertNotInvalid(translated)
   child = m.translate.getContentFromCategoryJson(translated, translated.getChild(0).id)
@@ -361,7 +356,6 @@ End Function
 '@Test translateEPGChannelIds unit tests
 Function tubiMetadataTranslate_translateEPGChannelIds_test()
   epgChannelIdsJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/epgChannelIds.json")
-  fetchTime = CreateObject("roDateTime").AsSeconds()
   parsedLinearEPG = ParseJson(epgChannelIdsJson)
   translated = m.translate.translateEPGChannelIds(parsedLinearEPG, m.constants.ui.screenIds.epgScreen)
   m.assertNotInvalid(translated)
@@ -376,7 +370,6 @@ End Function
 Function tubiMetadataTranslate_translateEPGPrograms_test()
   'test for valid fields
   epgProgramsJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/epgProgram.json")
-  fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translateEPGPrograms(ParseJson(epgProgramsJson), m.constants.ui.screenIds.epgScreen)
   datetimeObj = CreateObject("roDateTime")
 
@@ -425,7 +418,6 @@ Function tubiMetadataTranslate_translateEPGPrograms_test()
   'test for optional fields for program
 
   epgProgramsJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/epgProgram.json")
-  fetchTime = CreateObject("roDateTime").AsSeconds()
   translated = m.translate.translateEPGPrograms(ParseJson(epgProgramsJson), m.constants.ui.screenIds.epgScreen)
 
   channelInfo = translated.getchild(0)

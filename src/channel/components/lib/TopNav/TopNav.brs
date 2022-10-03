@@ -82,7 +82,7 @@ Function onContentUpdated()
     aItemWidths.push(itemWidth)
 
     if i <= nMenuItems - 2 'Do not append the pad for last button
-      nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding + getColumnSpacing(i)
+      nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding
     end if
   end for
 
@@ -93,31 +93,12 @@ Function onContentUpdated()
     m.top.selectedIndex = 0
   end if
 
-  lastCoumnSpacing = getColumnSpacing(i)
-
-  nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nMenuOutsideSpacing -  nButtonPadding - lastCoumnSpacing 'No need of padding for last item and columnspacing
+  nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nMenuOutsideSpacing - nButtonPadding 'No need of padding for last item and columnspacing
   m.MenuBground.width = nBgroundWidth
 
   m.Menu.columnWidths = aItemWidths
   m.Menu.itemSize = [nBgroundWidth, m.Menu.itemSize[1]]
   m.Menu.content = m.top.content
-End Function
-
-
-' Get the column spacing (to the right) for the column number that is passed
-Function getColumnSpacing(nColumn)
-  spacing = -1
-  if nColumn < m.Menu.columnSpacings.Count() - 1
-    spacing = m.Menu.columnSpacings[nColumn]
-  end if
-  if spacing < 0
-    spacing = m.Menu.itemSpacing[0]
-  end if
-  if spacing < 0
-    '//The default spacing should be 0
-    spacing = 0
-  end if
-  return spacing
 End Function
 
 

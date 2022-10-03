@@ -11,7 +11,6 @@ Function TubiNodeHelpers()
     immutableRemoveChildren: tubiNodeHelpers_immutableRemoveChildren
     immutableRemoveChildIndex: tubiNodeHelpers_immutableRemoveChildIndex
     immutableRemoveChild: tubiNodeHelpers_immutableRemoveChild
-    synchronizeChildren: tubiNodeHelpers_synchronizeChildren
     countNodes: tubiNodeHelpers_countNodes
     getArrayInterfaceTypes: tubiNodeHelpers_getArrayInterfaceTypes
   }
@@ -174,40 +173,6 @@ Function tubiNodeHelpers_immutableRemoveChildren(parent as object, children as o
 
   if allFailed = true then return parent
   return clonedParent
-End Function
-
-
-
-' Specifically targeted at the use case of updating the local category list
-' on category screen instead of replacing the entire tree
-'
-' @truth: node with children that should be aligned to
-' @lies: node which should be changed to align with @truth
-'
-' Algorithm:
-'   Walk each child node in @truth
-'     Walk each child in @lies looking for a matching id
-'       - if @lies has a matching id in the same or a later position, remove any intermediate children from @lies
-'       - if @lies doesn't have a matching id at all, insert a new entry for it into @lies
-'
-Function tubiNodeHelpers_synchronizeChildren(truth, lies)
-  for i=0 to truth.getChildCount()-1
-    a = truth.getChild(i)
-    for j=i to lies.getChildCount()-1
-      b = lies.getChild(j)
-      if a.id = b.id
-        for k=i to j-1
-          tubiLog("Removing old category: " + b.id + " at index " + i.toStr())
-          lies.removeChildIndex(i)
-        end for
-        exit for
-      end if
-    end for
-    if a.id <> b.id
-      tubiLog("Adding new category: " + a.id + " at index " + i.toStr())
-      lies.insertChild(a.clone(false), i)
-    end if
-  end for
 End Function
 
 

@@ -53,8 +53,6 @@ End Function
 
 ' @sID: string: one of the menu item ids. A list of ids can be found in constants.ui.sideNavIds
 Function focusSideNavOption(sID)
-
-  screen = getCurrentScreen()
   if isNonEmptyString(sID) AND m.constants.ui.sideNavIds[sID] <> invalid
     m.SideNav.itemRequested = sID '//set itemRequested so the focus is on the proper button in the sideNav
   end if

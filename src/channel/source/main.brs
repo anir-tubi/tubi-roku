@@ -95,14 +95,15 @@ Function runChannel(constants, log, request)
     tubiScene.InsertChild(SuitestLibrary, 0)
   end if
 
+  retries = 0
+  maxRetries = 5
+  backoffFactor = 1.5
+  initialBackoff = 1000 'ms
+  pause = initialBackoff
+  libraryBeingFetched = invalid
+
   'this is the packaged constants - the submitted constants
   if constants.starterComponents <> false
-    retries = 0
-    maxRetries = 5
-    backoffFactor = 1.5
-    initialBackoff = 1000 'ms
-    pause = initialBackoff
-
     print "attempting to load TubiStarterLibrary "; constants.settings.starterComponentsUrl
     starterLibrary = tubiScene.findNode("TubiStarterLibrary")
     starterLibrary.observeField("loadStatus", port)
@@ -284,7 +285,7 @@ Function runChannel(constants, log, request)
     end if
 
     ' handle starterComponents and remoteComponents timeouts
-    if componentsLoaded = false AND componentTimer <> invalid AND componentTimer.totalMilliseconds() > 30000
+    if libraryBeingFetched <> invalid AND componentsLoaded = false AND componentTimer <> invalid AND componentTimer.totalMilliseconds() > 30000
       if retries < maxRetries
         retries += 1
         componentTimer.mark()
@@ -297,7 +298,7 @@ Function runChannel(constants, log, request)
       end if
     end if
   end while
-
+  return false
 End Function
 
 

@@ -29,10 +29,10 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   if press
 
     if key = "down"
-      if m.keyboard.isInFocusChain() = true 
+      if m.keyboard.isInFocusChain() = true
         m.continue.setFocus(true)
-      end if  
-    
+      end if
+
     else if key = "up"
       if m.continue.hasFocus() = true
         m.keyboard.setFocus(true)
@@ -43,29 +43,29 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       else if m.top.isInFocusChain() = true
         m.top.buttonSelected = "up"
       end if
-      
+
     else if key = "right"
-    
+
       if m.back.hasFocus() = true
         m.continue.setFocus(true)
       else if m.continue.hasFocus() = true
         m.showHidePassword.setFocus(true)
       end if
-      
+
     else if key = "left"
-    
+
       if m.continue.hasFocus() = true
         m.back.setFocus(true)
       else if m.showHidePassword.hasFocus() = true
-        m.continue.setFocus(true)    
-      end if    
+        m.continue.setFocus(true)
+      end if
     else if key = "back"
         handled = false
     end if
-    
+
     return handled
   end if
-  
+  return false
 End Function
 
 
@@ -82,7 +82,7 @@ Function onButtonSelected(evt)
           end if
     end if
     m.top.buttonSelected = buttonSelected.id
-        
+
 End Function
 
 

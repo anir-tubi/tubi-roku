@@ -11,7 +11,7 @@ Function init()
   ' Timer to find last time the app suspended
   m.appSuspendTimer = CreateObject("roTimespan")
 
-  '//When ContentController initializes, clear all translations and reset translations in case the 
+  '//When ContentController initializes, clear all translations and reset translations in case the
   ' remote component translations are different from the local translations.
   initTranslations()
 
@@ -28,12 +28,12 @@ Function init()
   m.Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, m.Request)
   m.NodeHelpers = TubiNodeHelpers()
-  apiUtils = ApiUtils(m.constants)
-  m.Bookmarks = TubiBookmarks(m.Request, Auth, m.constants, m.NodeHelpers, apiUtils)
+  apiUtilsLib = ApiUtils(m.constants)
+  m.Bookmarks = TubiBookmarks(m.Request, Auth, m.constants, m.NodeHelpers, apiUtilsLib)
   m.Tracking = TubiTracking(m.constants, m.Request, Auth)
   experiments = TubiExperiments(m.constants)
-  m.cmsApi = CmsApi(m.constants, m.Request, Auth, apiUtils, experiments)
-  m.userDeviceApi = UserDeviceApi(m.constants, apiUtils)
+  m.cmsApi = CmsApi(m.constants, m.Request, Auth, apiUtilsLib, experiments)
+  m.userDeviceApi = UserDeviceApi(m.constants, apiUtilsLib)
   m.tensorapi = TensorApi(m.constants, m.Request, Auth)
 
   m.background = m.top.findNode("ContentBackground")
@@ -343,7 +343,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
               focusSideNavOption(sideNavId)
             end if
           end if
-          
+
         else
           ' remove the last screen, probably detail screen,
           ' this should trigger a restart of the app via onScreenStackEmpty()
@@ -477,7 +477,7 @@ End Function
 
 ' This function is used to get rid of unused items in the registry due to removal features, unused experiments, etc.
 ' Each line that removes a registry item should include the date of when the the line is suspected to be included in production.
-' We can remove the lines as they get stale. At times this function will not have any lines, but we can still include a call to the 
+' We can remove the lines as they get stale. At times this function will not have any lines, but we can still include a call to the
 ' function for future reference.
 Function cleanRegistry()
   RegDelete("lastPlayedLinearId", "lastPlayedLinearSection")  '//Date Added to Production - 9/29/2022
@@ -1433,6 +1433,7 @@ End Function
 ' @backgroundUriList, array of uris
 ' @contentType, String - depending on the focused on content, it will determine the background type
 Function getBackgroundtype(backgroundUriList, contentType = "")
+  backgroundType = m.constants.ui.backgroundTypes.topRight
   if backgroundUriList <> invalid
     if backgroundUriList[0] = m.defaultBackgroundUri
       backgroundType = m.constants.ui.backgroundTypes.fullScreen
@@ -1440,8 +1441,6 @@ Function getBackgroundtype(backgroundUriList, contentType = "")
       backgroundType = m.constants.ui.backgroundTypes.marketingScreen
     else if contentType = m.constants.ui.contentTypes.linear OR contentType = m.constants.ui.contentTypes.epg
       backgroundType = m.constants.ui.backgroundTypes.epg
-    else
-      backgroundType = m.constants.ui.backgroundTypes.topRight
     end if
   end if
   return backgroundType

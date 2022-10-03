@@ -6,17 +6,17 @@ End Function
 Function execSignUp() As Void
   tubiLog("SignUpTask.execSignUp")
   constants = m.global.constants 'single thread-local reference to avoid thread rendezvous
-  
+
   Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   port = CreateObject("roMessagePort")
-  
+
   requestParams = m.top.requestParams
 
   ' SignUp using platform, deviceId & credentials(email,password,gender,firstName,lastName,birthday)
   url = constants.urls.userDevice.signup
   params = {
-    platform: constants.platform  
+    platform: constants.platform
     device_id: constants.deviceInfo.deviceId
     credentials: {
       email: requestParams.email
@@ -28,23 +28,22 @@ Function execSignUp() As Void
     }
   }
   body = FormatJSON(params)
-  
+
   reqOptions = {
     method: "POST"
     headers: {}
-    body: body 
+    body: body
   }
   reqOptions.headers.append(constants.headers.commonUapi)
   requestObject = Request.createAsync(url, "signup", reqOptions)
   requestObject.start(port)
 
-  user_id = invalid
   access_token = invalid
-  
+
   ' This helps to start signup/registerCode process during automation after a delay
   ' so that "press back from Activation Screen" test case will not fail during automation
   sleep(m.top.delay)
-  
+
   while true
     msg = wait(0, port)
     if type(msg) = "roUrlEvent" then
@@ -54,15 +53,14 @@ Function execSignUp() As Void
         if result.response.code >= 200 AND result.response.code < 300 then
           parsed = ParseJSON(result.response.data)
           if parsed <> invalid
-            user_id = parsed.user_id 
             access_token = parsed.access_token
             exit while
           else
-            m.top.error = "signup"  
+            m.top.error = "signup"
           end if
         else
-          m.top.error = "signup"  
-          return          
+          m.top.error = "signup"
+          return
         end if
       end if
     end if
@@ -75,15 +73,15 @@ Function execSignUp() As Void
     activation_code: requestParams.activationCode
   }
   body = FormatJSON(params)
-  
+
   reqOptions = {
     method: "POST"
     headers : headers
     body: body
   }
   requestObject = Request.createAsync(url, "registerCode", reqOptions)
-  requestObject.start(port)  
-  
+  requestObject.start(port)
+
   while true
     msg = wait(0, port)
     if type(msg) = "roUrlEvent" then
@@ -96,11 +94,11 @@ Function execSignUp() As Void
             m.top.error = "registerCode"
           end if
         else
-          m.top.error = "registerCode" 
+          m.top.error = "registerCode"
         end if
         return
       end if
     end if
-  end while  
-  
+  end while
+
 End Function

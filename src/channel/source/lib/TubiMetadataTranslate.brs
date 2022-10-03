@@ -1233,6 +1233,9 @@ Function tubiMetadataTranslate_getContentsJson(parsedJson, fullJson)
         end if
       end if
     end for
+  else
+    contentsStartPos = 0
+    contentsEndPos = 0
   end if
 
   if safetyEject = false

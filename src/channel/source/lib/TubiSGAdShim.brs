@@ -70,6 +70,7 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
       end if
     end if
   end while
+  return false
 End Function
 
 

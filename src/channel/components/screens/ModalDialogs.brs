@@ -8,13 +8,13 @@
 '                 title: <string>                   - The title to be displayed on the modal
 '                 message: <string>                 - The message to be displayed on the modal
 '                 scrollable: <boolean>             - Is the modal vertically scrollable
-'                 openTrackEvent: <assocArray>      - The analytics tracking info that was sent when the modal was shown, 
+'                 openTrackEvent: <assocArray>      - The analytics tracking info that was sent when the modal was shown,
 '                                                     will be re-purposed for sending the dismiss dialog tracking event.
 '                                                     Should contain "type" and "values" keys.
 '                 trackingTask: <roSGNode>          - The tracking task that can be used to send the dismiss dialog tracking event
 '                 backButtonCallback: <roFunction>  - A function called if a user attempts "back out" of the modal.
-'              }    
-' 
+'              }
+'
 ' @buttonInfo: array, each index contains an assocArray with the following format:
 '               {
 '                 text: <string>                - The text on the button
@@ -56,6 +56,7 @@ Function showModal(modalInfo, buttonInfo)
 
     return modal
   end if
+  return invalid
 End Function
 
 
@@ -84,7 +85,7 @@ Function closeModal(modal, buttonSelected = invalid)
       backButtonCallback = m.tempModal.modalInfo.backButtonCallback
       backButtonCallbackParams = m.tempModal.modalInfo.backButtonCallbackParams
     end if
-    
+
     m.tempModal = invalid
   end if
 
@@ -116,7 +117,7 @@ Function closeModal(modal, buttonSelected = invalid)
   modal.unobserveFieldScoped("exitButton")
   m.top.removeChild(modal)
   m.top.setFocus(true)
-  
+
   'run the callback associated with the selected button
   callback = invalid
   callbackParams = invalid
@@ -126,7 +127,7 @@ Function closeModal(modal, buttonSelected = invalid)
         callback = backButtonCallback
         if backButtonCallbackParams <> invalid
           callbackParams = backButtonCallbackParams
-        end if 
+        end if
       end if
     end if
   else if buttonInfo <> invalid AND buttonSelected <> invalid AND buttonInfo[buttonSelected] <> invalid
@@ -196,7 +197,7 @@ Function showErrorModal(modalInfo = {}, tryAgainCallback = invalid, tryAgainPara
 
   ' set a default error modal message (this should never happen in theory)
   if modalInfo.message = invalid or modalInfo.message = ""
-    modalInfo.message = getTranslation("dialog_defaultError_description") 
+    modalInfo.message = getTranslation("dialog_defaultError_description")
   end if
 
   ' use the cancel callback as the backButtonCallback - as the behavior should be the same
@@ -232,7 +233,7 @@ Function getUserFacingErrorCode(contextCode, subtypeCode, externalCode = "")
 
   '//The external code is optional, so if there is no external code, then do not include it in the returned code
   sExternalCode = ""
-  if externalCode <> invalid 
+  if externalCode <> invalid
     if modal_isstr(externalCode) = true
       sExternalCode = externalCode
     else if modal_isint(externalCode) = true
@@ -316,7 +317,7 @@ End Function
 
 ' Creates a modal dialog with 2 buttons. The expected behavior is that the 2nd button will act as a cancel option for the user
 ' and close the modal without taking any further action. This is just a wrapper around showModal() with simpler paramaters.
-' 
+'
 ' callbacks passed to showSimpleModal cannot take any parameters and if you want to have callbacks with parameters, use showModal()
 '
 ' @title: string, the title of the dialog, displayed in larger font
@@ -345,7 +346,7 @@ End Function
 ' @dialogEvent: assocArray, contains the info necessary to send a dialog open analytics event, has keys: "type" and "values"
 ' @trackingTask: roSGNode, an instance of the trackingLoggingTask - used to send close dialog events when the dialog is closed.
 ' @callback: (optional) roFunction, a function that will be triggered when the first button is selected
-' @cancelCallback: (optional) Function will be triggered when the second button is clicked (function will not have any params) 
+' @cancelCallback: (optional) Function will be triggered when the second button is clicked (function will not have any params)
 Function showSimpleInstantResumableModal(title, message, buttons, dialogEvent, trackingTask, callback = invalid, cancelCallback = invalid)
   showSimpleModal(title, message, buttons, dialogEvent, trackingTask, callback, cancelCallback, m.constants.instantResumeActions.closeDialog)
 End Function

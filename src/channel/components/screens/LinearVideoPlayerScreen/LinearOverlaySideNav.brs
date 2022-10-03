@@ -34,12 +34,12 @@ Function onSideNavFocusChange()
 End Function
 
 
-' The outside tells this component which side nav item to focus 
+' The outside tells this component which side nav item to focus
 Function onSideNavToFocusChange()
   if m.top.buttonToFocusID = m.constants.ui.linearSideNavIds.cc
     m.sideNav.focusButton = 0
   else if m.top.buttonToFocusID = m.constants.ui.linearSideNavIds.epg
-    m.sideNav.focusButton = 1 
+    m.sideNav.focusButton = 1
   end if
 End Function
 
@@ -61,12 +61,17 @@ Function focusSideNavButton(sButtonID)
   else if sButtonID = m.btnBack.id
     poster = m.btnBack_poster
     label = m.btnBack_label
+  else
+    poster = invalid
+    label = invalid
   end if
 
-  poster.blendColor = m.constants.ui.colors.focused
-  poster.opacity = 1
-  label.opacity = 1
-  label.color = m.constants.ui.colors.highlightedText
+  if poster <> invalid AND label <> invalid then
+    poster.blendColor = m.constants.ui.colors.focused
+    poster.opacity = 1
+    label.opacity = 1
+    label.color = m.constants.ui.colors.highlightedText
+  end if
 End Function
 
 
@@ -78,12 +83,17 @@ Function unFocusSideNavButton(sButtonID)
   else if sButtonID = m.btnBack.id
     poster = m.btnBack_poster
     label = m.btnBack_label
+  else
+    poster = invalid
+    label = invalid
   end if
 
-  poster.blendColor = m.constants.ui.colors.unfocused
-  poster.opacity = .5
-  label.opacity = .5
-  label.color = m.constants.ui.colors.primaryText
+  if poster <> invalid AND label <> invalid then
+    poster.blendColor = m.constants.ui.colors.unfocused
+    poster.opacity = .5
+    label.opacity = .5
+    label.color = m.constants.ui.colors.primaryText
+  end if
 End Function
 
 
@@ -112,7 +122,7 @@ Function onOpenStateChanged()
     poster.blendColor = m.constants.ui.colors.unfocused
     poster.opacity = 1
     label.opacity = 1
-    label.color = m.constants.ui.colors.primaryText 
+    label.color = m.constants.ui.colors.primaryText
     unFocusSideNavButton(m.btnBack.id)
   end if
 End Function

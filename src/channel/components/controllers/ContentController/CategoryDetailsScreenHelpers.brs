@@ -100,6 +100,7 @@ End Function
 
 Function onRefreshCategoryDetailsSignal(msg)
   categoryDetailsScreen = msg.getRoSGNode()
+  categoryContent = invalid
   if categoryDetailsScreen <> invalid AND categoryDetailsScreen.content <> invalid
     categoryContent = categoryDetailsScreen.content
   end if

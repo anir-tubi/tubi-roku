@@ -54,6 +54,8 @@ End Function
 
 Function onJumpToRowItemByIDChange()
   tubiLog("CategoryGridList.onJumpToRowItemByIDChange")
+  sDesiredContainerID = ""
+  sContentID = ""
   if m.top.jumpToRowItemByID <> invalid
     sContentID = m.top.jumpToRowItemByID[0]
     sDesiredContainerID = m.top.jumpToRowItemByID[1]

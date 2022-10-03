@@ -88,13 +88,13 @@ Function onScreenFocusChange()
     end if
   end if
 
-  if m.top.isInFocusChain() = false 
+  if m.top.isInFocusChain() = false
     m.voiceKeyboard.textEditBox.voiceEnabled = false
     m.keyboard.unobserveFieldScoped("text")
   end if
 
-  'When user start using microphone, even though email has focus and setting m.emailHasFocus to true, it  changes 
-  'to m.emailHasFocus to false and email loses the focus and focus goes to keyboard. So, setting m.emailHasFocus to false only when 
+  'When user start using microphone, even though email has focus and setting m.emailHasFocus to true, it  changes
+  'to m.emailHasFocus to false and email loses the focus and focus goes to keyboard. So, setting m.emailHasFocus to false only when
   'email is not in focusChain and focusedChild is not passwordEntryKeyboard.
   if m.email.isInFocusChain() = false AND m.top.focusedChild <> invalid AND m.top.focusedChild.id <> "passwordEntryKeyboard"
     m.emailHasFocus = false
@@ -315,7 +315,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
     return handled
   end if
-
+  return false
 End Function
 
 

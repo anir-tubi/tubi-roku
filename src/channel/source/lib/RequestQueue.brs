@@ -97,7 +97,7 @@ End Function
 ' Cancel a request and remove it from the queue.  We have to add this here because
 ' a Request object that is cancelled does not emit an event on which handleEvent could
 ' clean up the queue.
-Function tubiq_cancelRequest(request As Object) As Boolean
+Function tubiq_cancelRequest(request As Object)
   if request <> invalid AND request.uuid <> invalid then
     i = m.findRequestByUuid_(request.uuid)
     if i <> -1 then

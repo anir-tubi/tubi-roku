@@ -33,7 +33,7 @@ Function createGridOverlay(screen, spacingX=10, spacingY=10)
       line = vertLines.createChild("Rectangle")
       line.translation = [x, 0]
       line.height = height
-      
+
       if x MOD 100 = 0
         line.width = boldLineSize
         line.color = boldColor
@@ -73,6 +73,7 @@ Function createGridOverlay(screen, spacingX=10, spacingY=10)
 
   'attach nodes to screen
   screen.appendChild(allLines)
+  return true
 End Function
 
 Function safeZone(screen as object)
@@ -93,4 +94,5 @@ Function safeZone(screen as object)
   end if
 
   screen.appendChild(poster)
+  return true
 End Function

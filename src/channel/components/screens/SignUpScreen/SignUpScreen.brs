@@ -339,5 +339,5 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
     end if
     return handled
   end if
-
+  return false
 End Function

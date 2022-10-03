@@ -367,6 +367,10 @@ Function onCurrFocusRowChange()
     end if
   end if
 
+  rowPercent = -1
+  rowEnteringFocus = -1
+  rowLosingFocus = -1
+
   ' There are 4 options when focusing a new category
   ' 1) Both old and new focused categories are not vitg: do nothing
   ' 2) Both old and new focused categories are vitg: do nothing

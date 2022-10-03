@@ -515,9 +515,8 @@ Function onKeyEvent(key, press) as Boolean
     else if key = "down"
       return true
     end if
-
-    return false
   end if
+  return false
 End Function
 
 
