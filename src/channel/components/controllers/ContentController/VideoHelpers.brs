@@ -490,9 +490,6 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
       else
         ' Case 3 and 4
         ' Still in the same series - possibly autoplayed, or possibly same episode
-        ' update some info in the detail screen content and repopulate with that content
-        detailContent.currentEpisodeId = videoContent.id
-        populateDetailScreen(detailScreen, detailContent, false, detailScreenResumePosition)
 
         'updating the history if user has watched more than historyFrequency or postlude reached
         if historyPosition > 0 or isEndReached = true
@@ -507,6 +504,10 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
           ' request resolves.
           updateHistoryAndHandleResponse(videoContent, historyPosition)
         end if
+
+        ' update some info in the detail screen content and repopulate with that content
+        detailContent.currentEpisodeId = videoContent.id
+        populateDetailScreen(detailScreen, detailContent, false, detailScreenResumePosition)
 
         ' Repopulate the episodes screen if it is the screen under the video player screen in the call stack
         hiddenScreen = getHiddenScreen(1)
