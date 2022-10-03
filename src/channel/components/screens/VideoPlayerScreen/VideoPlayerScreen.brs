@@ -828,6 +828,10 @@ Function onAdStateChange(msg)
       seekToPosition(m.playerPosition)
       updateVideoState("play")
       updateLastPingTime(m.playerPosition) ' updating lastPingtime for extra safety
+      if m.Video.content.has4kHevcStream = true
+        ' fire exposure event for video playback if manifest had HEVC/4k content for treatment & control
+        getExperimentResource("roku_hevc_drm_4k", "roku_hevc_drm_4k_v1", true)
+      end if
       m.Video.control = "play"
       m.mostRecentCompletedCuepoint = m.playerPosition
       trackEvent({
