@@ -63,6 +63,7 @@ Function cmsApi_getUpNextContentRequestInfo(contentId, passedOptions)
   headers["accept-version"] = "6.0.0"
 
   params["video_resources"] = m.constants.player.drmOrder
+  params["limit_resolutions"] = m.constants.player.limitResolutions
 
   if passedOptions <> invalid
     if passedOptions.params <> invalid

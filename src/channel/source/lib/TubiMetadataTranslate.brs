@@ -1483,7 +1483,7 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
       end if
 
       validResource = false
-      if (codec = "H265" and has4kHevcStream = true and m.hevc4kExpEnabled = true) OR codec = "H264"
+      if (codec = "H265" and has4kHevcStream = true and m.hevc4kExpEnabled = true) OR codec = "H264" OR contentFromServer.type = "l"
         validResource = true
       end if
 

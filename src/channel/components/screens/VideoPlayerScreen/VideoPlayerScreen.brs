@@ -1123,7 +1123,12 @@ Function prepareToStartVideo(content, videoResourceIndex = [0,0])
   videoResources = content.videoResources
   codecIndex = videoResourceIndex[0]
   drmIndex = videoResourceIndex[1]
-  resource = videoResources[codecIndex][drmIndex]
+
+  resource = invalid
+  if videoResources[codecIndex] <> invalid
+    resource = videoResources[codecIndex][drmIndex]
+  end if
+
   setDrmOnContent(content, resource, videoResourceIndex)
 
   m.top.content = content  'sends content to video node and makes current content available to contentController
