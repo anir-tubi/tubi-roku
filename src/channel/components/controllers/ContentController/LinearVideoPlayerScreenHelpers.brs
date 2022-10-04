@@ -136,22 +136,31 @@ Function getUpdatedLinearVideoResources(content)
   ' so that YoSpace can have them when YoSpace makes ad requests for SSAI
   adParams = adLib.getRainmakerParamsForLinear(content)
 
-  newResource = {}
+  newVideoResources = []
+  newResource = invalid
 
   if content <> invalid AND content.videoResources <> invalid
-    for each resource in content.videoResources
-      if resource.type = m.constants.player.drmTypes.hlsv3
-        if resource.url <> invalid
-          newResource = resource
-          newResource.url = m.request.addParamsToUrl(newResource.url, adParams)
+    for each resources in content.videoResources
+      for each resource in resources
+        if resource.type = m.constants.player.drmTypes.hlsv3
+          if resource.url <> invalid
+            newResources = []
+            newResource = resource
+            newResource.url = m.request.addParamsToUrl(newResource.url, adParams)
+            newResources.push(newResource)
+            newVideoResources.push(newResources)
+          end if
+          exit for
         end if
+      end for
+      if newResource <> invalid
         exit for
       end if
     end for
   end if
 
   ' pass the updated url back through output interface so video helpers can proceed with playing the video
-  return [newResource]
+  return newVideoResources
 End Function
 
 
@@ -312,29 +321,36 @@ Function onLiveStreamManifestResponse(response)
     modifiedUrl = ""
     if content <> invalid AND content.videoResources <> invalid
       videoResources = content.videoResources
+
+      ' Eventhough LIVE has only hlsv3 contents, we are keeping newVideoResources as 2 dimensional array of arrays like VOD to make it consistent.
+      ' Also in future, we may have HEVC/4k/DRM support for LIVE as well. At that time, we need minor updates to 2 dimensional array with CODEC grouping.
       newVideoResources = []
 
-      for each resource in videoResources
-        newResource = resource
-        if resource.type = m.constants.player.drmTypes.hlsv3
-          if resource.url <> invalid
-            ' For linear content that is serving ads via YoSpace, the video resource that is used to fetch
-            ' the manifest actually redirects through a Tubi "manifest server" and to a YoSpace server
-            ' to get the manifest response. When reconstructing the YoSpace manifest url to include the
-            ' session id, we need to use the original YoSpace stream url and not the video resource url
-            ' provided by UAPI. We get the original YoSpace stream url from the "location" header since
-            ' it is a redirect.
-            if response.headers <> invalid AND response.headers.location <> invalid
-              originalUrl = m.request.removeCharlesProxy(response.headers.location) ' Remove Charles proxy appended by Charles rule for clean redirect.
-            else
-              originalUrl = resource.url
+      for each resources in videoResources
+        for each resource in resources
+          newResources = []
+          newResource = resource
+          if resource.type = m.constants.player.drmTypes.hlsv3
+            if resource.url <> invalid
+              ' For linear content that is serving ads via YoSpace, the video resource that is used to fetch
+              ' the manifest actually redirects through a Tubi "manifest server" and to a YoSpace server
+              ' to get the manifest response. When reconstructing the YoSpace manifest url to include the
+              ' session id, we need to use the original YoSpace stream url and not the video resource url
+              ' provided by UAPI. We get the original YoSpace stream url from the "location" header since
+              ' it is a redirect.
+              if response.headers <> invalid AND response.headers.location <> invalid
+                originalUrl = m.request.removeCharlesProxy(response.headers.location) ' Remove Charles proxy appended by Charles rule for clean redirect.
+              else
+                originalUrl = resource.url
+              end if
+              modifiedUrl = constructModifiedLinearVideoUrl(originalUrl, pollUrl)
+              newResource.url = m.request.passThroughCharlesProxy(modifiedUrl)
             end if
-            modifiedUrl = constructModifiedLinearVideoUrl(originalUrl, pollUrl)
-            newResource.url = m.request.passThroughCharlesProxy(modifiedUrl)
           end if
-        end if
 
-        newVideoResources.push(newResource)
+          newResources.push(newResource)
+          newVideoResources.push(newResources)
+        end for
       end for
 
       content.videoResources = newVideoResources
@@ -386,11 +402,13 @@ Function getLiveUrlFromResources(content)
   streamUrl = invalid
 
   if content <> invalid
-    for each resource in content.videoResources
-      if resource.type = m.constants.player.drmTypes.hlsv3
-        streamUrl = resource.url
-        exit for
-      end if
+    for each resources in content.videoResources
+      for each resource in resources
+        if resource.type = m.constants.player.drmTypes.hlsv3
+          streamUrl = resource.url
+          exit for
+        end if
+      end for
     end for
   end if
 
