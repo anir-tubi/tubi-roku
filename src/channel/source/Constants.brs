@@ -447,7 +447,6 @@ Function getConstants()
       constants.urls.userDevice.queues = constants.urls.userDevice.urlBase + "/queues"
       constants.urls.userDevice.history = constants.urls.userDevice.urlBase + "/histories"
       constants.urls.userDevice.config = constants.urls.userDevice.urlBase + "/config/" + constants.platform
-      constants.urls.userDevice.codeStatus = constants.urls.userDevice.urlBase + "/code/status"
 
     ' account urls
     constants.urls.account = {}

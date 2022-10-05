@@ -84,17 +84,6 @@
       <!-- customResume will be set by scene's resumehandler callback  -->
       <field id="customResume" type="assocarray" alwaysNotify="true"/>
 
-      <field id="reloadUserCategoriesResponse" type="assocarray"/>
-      <field id="reloadMovieUserCategoriesResponse" type="assocarray"/>
-      <field id="reloadTVUserCategoriesResponse" type="assocarray"/>
-      <field id="reloadEspanolUserCategoriesResponse" type="assocarray"/>
-
-      <field id="homescreenResponse" type="assocarray"/>
-      <field id="moviescreenResponse" type="assocarray"/>
-      <field id="tvscreenResponse" type="assocarray"/>
-      <field id="espanolscreenResponse" type="assocarray"/>
-      <field id="searchResponse" type="assocarray"/>
-
       <field id="transportVoiceRequest" type="assocarray"/>
 
       <!-- fadeInContentController will be set true once animation logo is finished during app launch -->
