@@ -217,14 +217,14 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0, isSeekPastCuepoint = 
     client_version: m.constants.deviceInfo.clientVersion
     nsid: m.getNielsenSessionId(m.constants)
 
-    ' the dubug parameter must be set to 1 in order to use the following "limit" parameters for testing
+    ' the debug parameter must be set to 1 in order to use the following "limit" parameters for testing
     ' limit_to_campaign_id: 0   'only allow ads with that particular campaign id through the pre-qual filters
     ' limit_to_lineitem_id: 0   'only allow ads with that particular line item id through the pre-qual filters
     ' limit_to_creative_id: 0   'only allow ads with that particular campaign id through the pre-qual filters
     ' debug: 0    'set to 1 in order to use the "limit" parameters above
   }
 
-  '//send sponored exposure value if the user call this video from a spnsored contaner.
+  '//send sponsored exposure value if the user call this video from a sponsored container.
   if content.videoSponsorExposureId <> invalid AND content.videoSponsorExposureId <> ""
     params["spon_exp"] = content.videoSponsorExposureId
   end if
@@ -315,7 +315,7 @@ End Function
 Function tubiAds_getAdsListViaRoku(episode, breakPos, isSeekPastCuepoint = false)
   m.allAdUnitsList = []
 
-  nielsenGenres = "" 'nielsenGenres may be set as an array of strigs later
+  nielsenGenres = "" 'nielsenGenres may be set as an array of strings later
   nielsenProgramId = ""
 
   authInfo = m.auth.getAuthInfo()
@@ -374,7 +374,7 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos, isSeekPastCuepoint = false
       adUnitsList: []
     }
 
-    'save the total number of ads in the adbreak before we (potentially) start breaking them up into different ad unit lists
+    'save the total number of ads in the ad break before we (potentially) start breaking them up into different ad unit lists
     m.totalAdBreakAds = currentAdUnitsList[0].ads.count()
 
     for each adUnit in currentAdUnitsList[0].ads
@@ -613,11 +613,11 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
     if ctx <> invalid
       '//make a subset of ctx and set it to m.controlNode.adTrackingObject
       adTrackingObject = {}
-      if ctx.adcount <> invalid
-        adTrackingObject.adcount = ctx.adcount
+      if ctx.adCount <> invalid
+        adTrackingObject.adCount = ctx.adCount
       end if
-      if ctx.adindex <> invalid
-        adTrackingObject.adindex = ctx.adindex
+      if ctx.adIndex <> invalid
+        adTrackingObject.adIndex = ctx.adIndex
       end if
       if ctx.duration <> invalid
         adTrackingObject.duration = ctx.duration
@@ -741,6 +741,9 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       else if ctx.state = "buffering" then
         m.containerNode.visible = false ' Hide ad while buffering
       end if
+    else if eventType = "Error" then
+      ' Clear out notUsed pixel for the current ad since RAF will fire the error pixel for this ad
+      m.notUsedAdPodPixels.delete(ctx.adIndex.toStr())
     end if
   else
     if ctx <> invalid then
@@ -759,7 +762,7 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
     if youboraOptions <> invalid
       m.youboraTask.options = youboraOptions
     end if
-    m.youboraTask.adevent = ctx
+    m.youboraTask.adEvent = ctx
   end if
 End Function
 
