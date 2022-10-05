@@ -61,7 +61,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_search_live_badge: {
-        roku_search_live_badge_v1 : {"enabled": false}
+        roku_search_live_badge_v1 : {"enabled": true}
       }
 
       roku_hdmi_playback: {
