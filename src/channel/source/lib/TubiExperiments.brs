@@ -57,7 +57,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_featured_landscape: {
-        roku_featured_landscape_v2: {"enabled": false}
+        roku_featured_landscape_v2: {"enabled": true}
       }
 
       roku_search_live_badge: {
