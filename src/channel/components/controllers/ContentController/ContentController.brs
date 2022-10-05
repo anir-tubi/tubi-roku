@@ -1076,10 +1076,18 @@ End Function
 
 Function refreshAllDetailScreens()
   ' Refresh all detail screens so they have proper history that's been loaded or unloaded
+  isUserSigedIn = isLoggedInUser()
+
   for i = 0 to m.screenStack.getChildCount() - 1
     screen = m.screenStack.getChild(i)
+
     if screen.subType() = "DetailScreen"
       populateDetailScreen(screen, screen.content)
+
+      if isUserSigedIn = true
+        screen.removeSignupButton = true
+      end if
+
     end if
   end for
 End Function

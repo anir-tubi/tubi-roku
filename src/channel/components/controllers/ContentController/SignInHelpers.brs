@@ -181,7 +181,7 @@ End Function
 Function onEmailExistsResponse(response)
   TubiLog("SignInHelpers.onEmailExistsResponse")
   hideNavMenu()
-  
+
   if response <> invalid
     parsedresponse = response.parsedresponse
     requestInput = response.requestInput
@@ -226,7 +226,7 @@ Function onEmailExistsResponse(response)
         if isNonEmptyString(firstName) = true
           signUpCredentials.firstName = firstName
         else
-          '//if first name does not exist, (i.e. when the user manually enters their email address), 
+          '//if first name does not exist, (i.e. when the user manually enters their email address),
           '// then use the 1st part of the email address
           signUpCredentials.firstName = Left(email.split("@")[0], 20) ' limiting by 20 characters for the firstname field
         end if
@@ -282,7 +282,7 @@ End Function
 ' @userInput : AssociativeArray,  (an associative array that contains at least email and possibly other data from the user's Roku profile)
 Function showSignInScreen(userInput)
   signInScreen = CreateObject("roSGNode", "SignInScreen")
-  signInScreen.id = m.constants.ui.screenIds.signInScreen 
+  signInScreen.id = m.constants.ui.screenIds.signInScreen
   signInScreen.username = userInput.email
   signInScreen.signInInfo = userInput
   signInScreen.observeFieldScoped("signInSelected", "onSignInSelected")
@@ -409,10 +409,10 @@ Function onSignInResponse(_response)
   }
   '//::TODO::roku_registration_gender_data - once the user is signed in, then call an API to ensure
   '//   the Roku saved info (i.e. gender, first name, etc) are saved using the following API
-  '//   https://docs.tubi.io/api_docs/account#operations-User-patch-user-settings, 
+  '//   https://docs.tubi.io/api_docs/account#operations-User-patch-user-settings,
   '//
   '//   Is there a problem if the user saved something different in the Roku accont as compared to Tubi account?
-  '//   For example, what if the user has the two accounts. In the Roku account, he is known as Thomas, and 
+  '//   For example, what if the user has the two accounts. In the Roku account, he is known as Thomas, and
   '//   in the Tubi account, he set his name to be his nickname, Tommy. So everytime we signs into his Roku app, it
   '//   changes his name to Thomas. The user changes his name in Tubi.tv, but again everytime he signs into the Roku app,
   '//   his name changes - very frustrating.
@@ -441,7 +441,7 @@ Function onSignInResponse(_response)
 
   '   if isNonEmptyString(lastNameSend) OR isNonEmptyString(firstNameSend) OR isNonEmptyString(lastNameSend)
   '     '//if any of the data in not empty then send the data that is not empty using the following API
-  '     '//   https://docs.tubi.io/api_docs/account#operations-User-patch-user-settings, 
+  '     '//   https://docs.tubi.io/api_docs/account#operations-User-patch-user-settings,
   '   end if
   ' end if
 
@@ -593,7 +593,6 @@ Function onMatureContentWarningSignInCompleted()
 
   if currentScreen <> invalid AND currentScreen.getSubtype() = "DetailScreen"
     refreshAllDetailScreens()
-    currentScreen.removeSignupButton = true
     currentScreen.jumpToItem = 0
   end if
 End Function
@@ -732,16 +731,15 @@ End Function
 
 Function onRegistrationProcessCompletedOnDetailsScreen()
   tubiLog("SignInHelpers.onRegistrationProcessCompletedOnDetailsScreen")
-  setContentToRefreshAllPersonalizedScreens(false)
+  setContentToRefreshAllPersonalizedScreens(true)
 
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
+  refreshAllDetailScreens()
 
-  if currentScreen <> invalid AND currentScreen.getSubtype() = "DetailScreen"
-    currentScreen.removeSignupButton = true
-    currentScreen.refreshContent = true
-    currentScreen.setFocus(true)
+  if currentScreen <> invalid and currentScreen.getSubtype() = "DetailScreen"
     currentScreen.jumpToItem = 0
+    currentScreen.setfocus(true)
   end if
 End Function
 

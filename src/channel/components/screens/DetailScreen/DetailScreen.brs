@@ -376,17 +376,15 @@ Function onIsSeries()
 
   '//Change the button order of the signup button depending on isSeries state
   if isLoggedInUser() = false AND isNewUser() = false
-    if getExperimentResource("roku_register_signup_to_save", "roku_register_signup_to_save_v3", true).enabled = true
-      if isSeries = true AND signUpIndex = 1
-        'Remove the signup button at 1st index and make signup button as default for series.
-        addRemoveMenuItem(false, signUpIndex)
-        addRemoveMenuItem(true, -1, m.signUpMenuItem, [])
-        menuItems = [m.PlayMenuItem, m.signUpMenuItem]
-      else if isSeries = false AND signUpIndex = 0
-        'Add sign up button after the Play button for movies
-        addRemoveMenuItem(false, signUpIndex)
-        addRemoveMenuItem(true, -1, m.signUpMenuItem, menuItems)
-      end if
+    if isSeries = true AND signUpIndex = 1
+      'Remove the signup button at 1st index and make signup button as default for series.
+      addRemoveMenuItem(false, signUpIndex)
+      addRemoveMenuItem(true, -1, m.signUpMenuItem, [])
+      menuItems = [m.PlayMenuItem, m.signUpMenuItem]
+    else if isSeries = false AND signUpIndex = 0
+      'Add sign up button after the Play button for movies
+      addRemoveMenuItem(false, signUpIndex)
+      addRemoveMenuItem(true, -1, m.signUpMenuItem, menuItems)
     end if
   end if
 
@@ -500,7 +498,6 @@ Function setInitialMenuItems() As Void
   menuItems = CreateObject("roSGNode", "ContentNode")
   menuItems.appendChild(m.PlayMenuItem)
 
-  'Add SignUp button for registration experiemnt at 1st index by default
   if isLoggedInUser() = false AND isNewUser() = false
     menuItems.appendChild(m.signUpMenuItem)
   end if
