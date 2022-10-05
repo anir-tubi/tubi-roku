@@ -22,7 +22,6 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
     handleUserInfo: tubiBookmarks_handleUserInfo
 
     'private methods
-    createHistoryRequest: tubiBookmarks_createHistoryRequest_
     isLoggedInUser: tubiBookmarks_isLoggedInUser
   }
 
@@ -124,38 +123,34 @@ End Function
 
 ' @content: roSGNode, content of Video Player
 ' @nowPos : integer, video position in seconds
-' @bKidsMode : boolean, kids mode can be true/false
 '
 ' returns url & options for making API request
 '
-Function tubiBookmarks_getAddHistoryRequestInfo(content as Object, nowPos as Integer, bKidsMode = false as Boolean) as Object
-
+Function tubiBookmarks_getAddHistoryRequestInfo(content as Object, nowPos as Integer) as Object
   authInfo = m.auth.getAuthInfo()
   if m.isLoggedInUser(authInfo) = false
     return invalid
   end if
 
-  url = m.constants.urls.userDevice.history
+  url = m.constants.urls.lishi.viewHistory
 
   body = {
     content_id: content.id
     position: nowPos
-    device_id: m.constants.deviceInfo.deviceId
-    user_id: authInfo.userid.toInt()
   }
 
   contentType = m.constants.uapiContentTypes.movie
   parentId = content.parentId
 
   'set the parentId to an integer or invalid as needed (expect to receive it as a string which is not compatible with API)
-  if type(parentId) = "string" or type(parentId) = "roString"
+  if isString(parentId) = true then
     if parentId.len() = 0
       body.parent_id = invalid    'is ok if parentId is invalid (ie. for movies)
     else
       body.parent_id = parentId.toInt()
       contentType = m.constants.uapiContentTypes.episode
     end if
-  else if type(parentId) = "integer" or type(parentId) = "roInt"
+  else if isInteger(parentId) = true then
     body.parent_id = parentId
     contentType = m.constants.uapiContentTypes.episode
   else
@@ -165,7 +160,6 @@ Function tubiBookmarks_getAddHistoryRequestInfo(content as Object, nowPos as Int
   body.content_type = contentType
 
   options = m.getCommonOptions()
-  options.params["isKidsMode"] = bKidsMode
   options["body"] = FormatJSON(body)
   options["method"] = m.constants.reqTypes.post
 
@@ -173,71 +167,6 @@ Function tubiBookmarks_getAddHistoryRequestInfo(content as Object, nowPos as Int
     url: url
     options: options
   }
-
-End Function
-
-
-'returns a request object that can be used to add or delete the history from the server, or invalid
-'@id: stringified content id of series or video that we are adding/deleting
-  'if add, @id should be the contentId
-  'if delete @id should be the 'previously viewed server id
-'@parentId: stringified content id of the parent series id for an episode - should be invalid for deletes or adding movies
-'@position: int(player positino or nowPos in seconds) - should be invalid for deletes
-'@action: string (should be "add" or "delete")
-'@contentType: string (should be "series" or "movie") - not necessary for deletes
-'@bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-'@port: roMessagePort that will be used to listen for the async response - probably the port defined in detailsPage.show()
-Function tubiBookmarks_createHistoryRequest_(id as String, parentId as Dynamic, position as Dynamic, action as String, contentType = "" as String, bKidsMode = false as Boolean) as Object
-  authInfo = m.auth.getAuthInfo()
-  if m.isLoggedInUser(authInfo) = false
-    return invalid
-  end if
-
-  body = {
-    content_id: id
-    content_type: contentType
-    position: position
-    device_id: m.constants.deviceInfo.deviceId
-  }
-  if authInfo <> invalid
-    body.user_id = authInfo.userId.toInt()
-  end if
-  if parentId <> invalid
-    body.parent_id = parentId
-  end if
-  bodyJson = FormatJson(body)
-
-  url = m.constants.urls.userDevice.history
-
-  if action = "add"
-    verb = m.constants.reqTypes.post
-  else if action = "delete"
-    bodyJson = invalid
-    verb = m.constants.reqTypes.del
-    url = url + "/" + id
-  else
-    return invalid
-  end if
-
-  options = {
-    method: verb
-    params: {
-      platform: m.constants.platform
-    }
-  }
-
-  options.params["isKidsMode"] = bKidsMode
-
-  if bodyJson <> invalid
-    options.body = bodyJson
-  end if
-
-  historyReq = m.auth.createAuthRequest(url, action+"History", options)
-  if historyReq = invalid
-    historyReq = m.Request.createAsync(url, action+"History", options)
-  end if
-
-  return historyReq
 End Function
 
 
@@ -280,14 +209,12 @@ Function tubiBookmarks_getInitialHistoryReq(localId) as Object
     return invalid
   end if
 
-  url = m.constants.urls.userDevice.history
+  url = m.constants.urls.lishi.viewHistory
 
   options = {
     method: m.constants.reqTypes.get
     params: {
       "page_enabled": false
-      platform: m.constants.platform
-      "deviceId": m.constants.deviceInfo.deviceId
     }
   }
 

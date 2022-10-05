@@ -27,7 +27,7 @@ Function TubiBookmarksSetup()
   m.episodeContent = CreateObject("roSGNode", "TubiContentNode")
   m.episodeContent.type = "episode"
 
-  m.historyUrl = constants.urls.userDevice.history
+  m.historyUrl = constants.urls.lishi.viewHistory
   m.deviceId = constants.deviceInfo.deviceId
   m.appName = constants.appName
   m.platform = constants.platform
@@ -159,11 +159,8 @@ Function tubiBookmarks_addHistoryReqVideo_ParentIdAsInvalid_test()
   body = ParseJson(options.body)
   m.assertEqual(content.id, body.content_id)
   m.assertEqual(content.type, body.content_type)
-  m.assertEqual(m.deviceId, body.device_id)
   m.assertInvalid(body.parent_id)
 
-  userId = BM.auth.getAuthInfo().userid
-  m.assertEqual(userId.toInt(), body.user_id)
   m.assertEqual(1478, body["position"])
 
   headers = options.headers
@@ -175,7 +172,6 @@ Function tubiBookmarks_addHistoryReqVideo_ParentIdAsInvalid_test()
 
   m.assertEqual(options.params.device_id, m.deviceId)
   m.assertEqual(options.params.app_id, m.appName)
-  m.assertEqual(options.params.isKidsMode, false)
   m.assertEqual(options.params.platform, m.platform)
 
 End Function
@@ -200,11 +196,8 @@ Function tubiBookmarks_addHistoryReqVideo_ParentIdAsEmpty_test()
   body = ParseJson(options.body)
   m.assertEqual(content.id, body.content_id)
   m.assertEqual(content.type, body.content_type)
-  m.assertEqual(m.deviceId, body.device_id)
   m.assertInvalid(body.parent_id)
 
-  userId = BM.auth.getAuthInfo().userid
-  m.assertEqual(userId.toInt(), body.user_id)
   m.assertEqual(1478, body["position"])
 
   headers = options.headers
@@ -216,9 +209,7 @@ Function tubiBookmarks_addHistoryReqVideo_ParentIdAsEmpty_test()
 
   m.assertEqual(options.params.device_id, m.deviceId)
   m.assertEqual(options.params.app_id, m.appName)
-  m.assertEqual(options.params.isKidsMode, false)
   m.assertEqual(options.params.platform, m.platform)
-
 End Function
 
 
@@ -242,12 +233,9 @@ Function tubiBookmarks_addHistoryReqEpisodeParentIdAsString_test()
   body = ParseJson(options.body)
   m.assertEqual(content.id, body.content_id)
   m.assertEqual(content.type, body.content_type)
-  m.assertEqual(m.deviceId, body.device_id)
 
   m.assertEqual(1079, body.parent_id)
 
-  userId = BM.auth.getAuthInfo().userid
-  m.assertEqual(userId.toInt(), body.user_id)
   m.assertEqual(1478, body["position"])
 
   headers = options.headers
@@ -259,7 +247,6 @@ Function tubiBookmarks_addHistoryReqEpisodeParentIdAsString_test()
 
   m.assertEqual(options.params.device_id, m.deviceId)
   m.assertEqual(options.params.app_id, m.appName)
-  m.assertEqual(options.params.isKidsMode, false)
   m.assertEqual(options.params.platform, m.platform)
 End Function
 
@@ -284,12 +271,9 @@ Function tubiBookmarks_addHistoryReqEpisodeParentIdAsInteger_test()
   body = ParseJson(options.body)
   m.assertEqual(content.id, body.content_id)
   m.assertEqual(content.type, body.content_type)
-  m.assertEqual(m.deviceId, body.device_id)
 
   m.assertEqual(1079, body.parent_id)
 
-  userId = BM.auth.getAuthInfo().userid
-  m.assertEqual(userId.toInt(), body.user_id)
   m.assertEqual(1478, body["position"])
 
   headers = options.headers
@@ -301,7 +285,6 @@ Function tubiBookmarks_addHistoryReqEpisodeParentIdAsInteger_test()
 
   m.assertEqual(options.params.device_id, m.deviceId)
   m.assertEqual(options.params.app_id, m.appName)
-  m.assertEqual(options.params.isKidsMode, false)
   m.assertEqual(options.params.platform, m.platform)
 End Function
 
@@ -352,7 +335,7 @@ End Function
 '@Test getInitialHistoryReqSignedIn unit tests
 Function tubiBookmarks_getInitialHistoryReqSignedIn_test()
   BM = m.authorizedBM
-  req = BM.getInitialHistoryReq("1234") 
+  req = BM.getInitialHistoryReq("1234")
   m.assertNotInvalid(req)
 End Function
 

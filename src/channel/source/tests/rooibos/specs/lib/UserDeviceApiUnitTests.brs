@@ -441,8 +441,8 @@ End Function
 '@Test deleteHistory unit tests
 Function userDeviceApi_deleteHistory_test()
 
-  historyId="56788"
-  url = m.constants.urls.userDevice.urlBase + "/histories/" + historyId
+  historyId = "56788"
+  url = m.constants.urls.lishi.viewHistory + "/" + historyId
 
   deleteHistory = m.userDeviceApi.deleteHistory(historyId)
 

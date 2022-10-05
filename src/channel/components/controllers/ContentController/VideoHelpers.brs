@@ -196,8 +196,7 @@ Function updateHistory(content, nowPos, isFireAndForget = true)
   ' Don't send history updates to the server if the user hasn't watched at least a certain amount of video
   if nowPos >= m.constants.player.historyFrequency AND isLoggedInUser() AND content["type"] = m.constants.ui.contentTypes.video
 
-    bKidsMode = shouldKidsModeBeSentToServer()
-    postUserHistory = m.Bookmarks.addHistoryReq(content, nowPos, bKidsMode)
+    postUserHistory = m.Bookmarks.addHistoryReq(content, nowPos)
 
     if postUserHistory <> invalid
 

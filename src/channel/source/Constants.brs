@@ -445,7 +445,6 @@ Function getConstants()
       constants.urls.userDevice.refreshToken = constants.urls.userDevice.urlBase + "/login/refresh"
       constants.urls.userDevice.transferToken = constants.urls.userDevice.urlBase + "/login/transfer"
       constants.urls.userDevice.queues = constants.urls.userDevice.urlBase + "/queues"
-      constants.urls.userDevice.history = constants.urls.userDevice.urlBase + "/histories"
       constants.urls.userDevice.config = constants.urls.userDevice.urlBase + "/config/" + constants.platform
 
     ' account urls
@@ -467,6 +466,13 @@ Function getConstants()
       constants.urls.account.anonymous.signingKey = constants.urls.account.urlBase + "/device/anonymous/signing_key"
       constants.urls.account.anonymous.token = constants.urls.account.urlBase + "/device/anonymous/token"
       constants.urls.account.anonymous.refreshToken = constants.urls.account.urlBase + "/device/anonymous/refresh"
+
+    constants.urls.lishi = {}
+      constants.urls.lishi.baseUrl = "https://lishi.production-public.tubi.io"
+      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true then
+        constants.urls.lishi.baseUrl = "https://lishi.staging-public.tubi.io"
+      end if
+      constants.urls.lishi.viewHistory = constants.urls.lishi.baseUrl + "/v1/view_history"
 
     'user event tracking url
     constants.urls.dataScience = {}

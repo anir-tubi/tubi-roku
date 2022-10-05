@@ -50,7 +50,7 @@ End Function
 'deleteHistory()
 '
 Function userDeviceApi_deleteHistory(historyId)
-  url = m.constants.urls.userDevice.history
+  url = m.constants.urls.lishi.viewHistory
 
   url = url + "/" + historyId
 
