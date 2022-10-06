@@ -519,12 +519,16 @@ Function onVideoStateChange(msg)
     tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-playback")
     m.top.sendYouboraError = true
 
-    ' Set up the next DRM scheme. Playback of next DRM scheme is triggered when state = "finished",
-    ' right after error state occurs.
-    if m.Video.errorCode = -5 ' Media error; the media format is unknown or unsupported
-      m.didAdvanceDrm = advanceCodecOnContent(content)
+    if content.isTrailer = true
+      m.didAdvanceDrm = false
     else
-      m.didAdvanceDrm = advanceDrmOnContent(content)
+      ' Set up the next DRM scheme. Playback of next DRM scheme is triggered when state = "finished",
+      ' right after error state occurs.
+      if m.Video.errorCode = -5 ' Media error; the media format is unknown or unsupported
+        m.didAdvanceDrm = advanceCodecOnContent(content)
+      else
+        m.didAdvanceDrm = advanceDrmOnContent(content)
+      end if
     end if
 
     if m.didAdvanceDrm <> true
@@ -1125,7 +1129,7 @@ Function prepareToStartVideo(content, videoResourceIndex = [0,0])
   drmIndex = videoResourceIndex[1]
 
   resource = invalid
-  if videoResources[codecIndex] <> invalid
+  if videoResources <> invalid AND videoResources[codecIndex] <> invalid
     resource = videoResources[codecIndex][drmIndex]
   end if
 
