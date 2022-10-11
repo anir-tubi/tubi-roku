@@ -271,8 +271,15 @@ Function onGridItemFocused()
     isReminderSet = false
 
     bookMarkIds = getFieldFromGlobal("bookmarkIds")
+   
+    airDateTime = focusedContent.airDatetime
+    hasVideoResources = focusedContent.hasVideoResources
+
+    info = getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime, hasVideoResources)
+    availabilityType = info.availabilityType
+
     for i = 0 to bookMarkIds.getChildCount() - 1
-      if bookMarkIds.getChild(i).id = focusedContent.id AND focusedContent.availabilityType = m.constants.ui.contentTimings.upcoming
+      if bookMarkIds.getChild(i).id = focusedContent.id AND availabilityType = m.constants.ui.contentTimings.upcoming
         isReminderSet = true
       end if
     end for
