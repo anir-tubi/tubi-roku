@@ -741,9 +741,19 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       else if ctx.state = "buffering" then
         m.containerNode.visible = false ' Hide ad while buffering
       end if
-    else if eventType = "Error" then
-      ' Clear out notUsed pixel for the current ad since RAF will fire the error pixel for this ad
-      m.notUsedAdPodPixels.delete(ctx.adIndex.toStr())
+    else if eventType = "Error" AND ctx <> invalid then
+      notUsedAdPodPixels = m.notUsedAdPodPixels
+      adIndex = ctx.adIndex
+      try
+        ' Clear out notUsed pixel for the current ad since RAF will fire the error pixel for this ad
+        notUsedAdPodPixels.delete(adIndex.toStr())
+      catch e
+        message = {
+          "notUsedAdPodPixels": notUsedAdPodPixels
+          "adIndex": adIndex
+        }
+        m.log.error(FormatJSON(message, 512), "adError", "error-clearing-not-used", m.requestQueue)
+      end try
     end if
   else
     if ctx <> invalid then
