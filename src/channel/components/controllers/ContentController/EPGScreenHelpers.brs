@@ -7,7 +7,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
   if isNonEmptyString(screenID) <> true
     screenID = constants.ui.screenIds.epgScreen
   end if
-  showHideLogo("hide")
+  showHideLogo(m.constants.logoType.hide)
 
   epgScreen = getFromScreenCache(screenID)
   if epgScreen <> invalid
@@ -88,6 +88,7 @@ Function refreshEPGScreen(epgScreen)
   tubiLog("EPGScreenHelpers.refreshEPGscreen")
   mode = m.constants.ui.contentMode.epgScreen
   epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.linearEPG
+  epgScreen.signedIn = isLoggedInUser()
   epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
 
 
@@ -175,6 +176,7 @@ Function fetchEPGChannel(screenId, channelID, successCallback, errorCallback)
   else
       '//call the API to get new channel data
       channelListIDs = [channelID]
+      isSignedIn = isLoggedInUser()
       epgProgramInfo = m.tensorapi.getEPGProgramReqInfo(channelListIDs)
       m.makeRequest({
         url : epgProgramInfo.url
@@ -185,6 +187,7 @@ Function fetchEPGChannel(screenId, channelID, successCallback, errorCallback)
         responseType : "node"
         storeInCacheUponSuccess: true
         requestorID : screenId
+        isSignedInUser: isSignedIn
       })
   end if
 
@@ -218,6 +221,7 @@ Function onEpgChannelListResponse(response)
       end for
 
       epgProgramInfo = m.tensorapi.getEPGProgramReqInfo(channelListIDs)
+      isSignedIn = isLoggedInUser()
 
       m.makeRequest({
         url : epgProgramInfo.url
@@ -227,6 +231,7 @@ Function onEpgChannelListResponse(response)
         errorCallback : onEpgProgramError
         responseType : "node"
         requestorID : response.requestorID
+        isSignedInUser: isSignedIn
       })
       completedChannels = completedChannels + nFetchInBatch
       remainingChannels = totalNumChannels - completedChannels
@@ -435,21 +440,30 @@ Function onEPGScreenOKPressed()
 End Function
 
 
-'This function will handle the minimized video player on EPG Screen
-' refreshEPGScreenVideoPlay = true  - Close the Video player since EPGScreen/EPG component lost focus (sideNav or topNav)
-' refreshEPGScreenVideoPlay = false, there are two possibilities
-'   1) epgScreen returning back from full video screen. Keep the video as it is, and make sure the video screen and focused channel are the same.
-'   2) epgScreen:EPG component is gaining focus from side/topNav. In this case restart the video.
+
 
 Function onRefreshEPGScreenVideoPlay(msg)
   tubiLog("EPGScreenHelpers.onRefreshEPGScreenVideoPlay")
-  refreshEPGScreenVideoPlay = msg.getData()
+  refreshVideoPlay = msg.getData()
   epgScreen = msg.getRoSGNode()
+
+  refreshEPGScreenVideoPlay(refreshVideoPlay, epgScreen)
+
+End Function
+
+
+'This function will handle the minimized video player on EPG Screen
+' refreshVideoPlay = true  - Close the Video player since EPGScreen/EPG component lost focus (sideNav or topNav)
+' refreshVideoPlay = false, there are two possibilities
+'   1) epgScreen returning back from full video screen. Keep the video as it is, and make sure the video screen and focused channel are the same.
+'   2) epgScreen:EPG component is gaining focus from side/topNav. In this case restart the video.
+'@epgScreen = node, Screen node
+Function refreshEPGScreenVideoPlay(refreshVideoPlay, epgScreen)
   currentScreen = getCurrentScreen()
   screenID = currentScreen.id
   if screenID = m.constants.ui.screenIds.linearVideoPlayerScreen
     'do nothing. Linear screen is taken over.
-  else if refreshEPGScreenVideoPlay = true
+  else if refreshVideoPlay = true
     m.backgroundGroup.posterVisible = true
     stopCountdownTimer()
     epgScreen.fullScreenCountdown = -1
@@ -598,7 +612,7 @@ End Function
 Function setTimeGridContentLoadingToComplete(screen)
   tubiLog("EPGSCreenHelpers.setTimeGridContentLoading")
   cleanUpInvalidsInEPG(screen)
-  if isNonEmptyString(screen.contentIdToFocusOnLoadComplete)
+  if isNonEmptyString(screen.contentIdToFocusOnLoadComplete) = true
     setLinearChannelDeeplink(screen)
   end if
   screen.updateTimeGridContent = true

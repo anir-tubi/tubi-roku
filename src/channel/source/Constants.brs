@@ -251,6 +251,7 @@ Function getConstants()
     constants.reqNames.deleteFromQueue = "deleteFromQueue"
     constants.reqNames.postToQueue = "postToQueue"
     constants.reqNames.deleteHistory = "deleteHistory"
+    constants.reqNames.getTournamentScreen = "getTournamentScreen"
     constants.reqNames.getScreenSaverContainer = "getScreenSaverContainer"
     constants.reqNames.getScreenSaverHomeScreenContainerIds = "getScreenSaverHomeScreenContainerIds"
 
@@ -282,6 +283,8 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postToQueue] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.deviceRegister] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.deleteHistory] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getTournamentScreen] = true
+
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverContainer] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverHomeScreenContainerIds] = true
 
@@ -344,13 +347,20 @@ Function getConstants()
   ' "startChannel" - will bring the user to the default homescreen
   ' "resumeChannel" -  will bring the user to where they left off
   constants.instantResumeActions = {}
-  constants.instantResumeActions.closeDialog = "closeDialog"
-  constants.instantResumeActions.startChannel = "startChannel"
-  constants.instantResumeActions.restartApp = "restartApp"
-  constants.instantResumeActions.resumeChannel = "resumeChannel"
+    constants.instantResumeActions.closeDialog = "closeDialog"
+    constants.instantResumeActions.startChannel = "startChannel"
+    constants.instantResumeActions.restartApp = "restartApp"
+    constants.instantResumeActions.resumeChannel = "resumeChannel"
 
   'previously found in settings as "shortAppName"
   constants.appName = "tubitv"
+
+  constants.logoType = {}
+    constants.logoType.tubi = "tubi"
+    constants.logoType.tubiKids = "tubi_kids"
+    constants.logoType.tubiEspanol = "tubi_espanol"
+    constants.logoType.tubiFifa = "tubi_fifa"
+    constants.logoType.hide = "hide"
 
   'experiment information will be placed here
   constants.experiments = {}
@@ -425,14 +435,15 @@ Function getConstants()
 
     'tensor url
     constants.urls.tensor = {}
-      constants.urls.tensor.urlBase = "https://tensor.production-public.tubi.io/api/v1"
+      constants.urls.tensor.urlBase = "https://tensor.production-public.tubi.io/api"
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-        constants.urls.tensor.urlBase = "https://tensor.staging-public.tubi.io/api/v1"
+        constants.urls.tensor.urlBase = "https://tensor.staging-public.tubi.io/api"
       end if
-      constants.urls.tensor.homescreen = constants.urls.tensor.urlBase + "/homescreen"
-      constants.urls.tensor.container = constants.urls.tensor.urlBase + "/containers"
-      constants.urls.tensor.channel = constants.urls.tensor.urlBase + "/containers"
-      constants.urls.tensor.epgChannelIds = constants.urls.tensor.urlBase + "/epg"
+      constants.urls.tensor.homescreen = constants.urls.tensor.urlBase + "/v2/homescreen"
+      constants.urls.tensor.container = constants.urls.tensor.urlBase + "/v2/containers"
+      constants.urls.tensor.channel = constants.urls.tensor.urlBase + "/v1/containers"
+      constants.urls.tensor.epgChannelIds = constants.urls.tensor.urlBase + "/v1/epg"
+      constants.urls.tensor.tournamentscreen = constants.urls.tensor.urlBase + "/v1/wc_tournament"
 
     'user devices url
     constants.urls.userDevice = {}
@@ -440,12 +451,22 @@ Function getConstants()
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
         constants.urls.userDevice.urlBase = "https://uapi.staging-public.tubi.io/user_device"
       end if
+
       constants.urls.userDevice.signup = constants.urls.userDevice.urlBase + "/signup"
       constants.urls.userDevice.registerCode = constants.urls.userDevice.urlBase + "/code/register"
       constants.urls.userDevice.refreshToken = constants.urls.userDevice.urlBase + "/login/refresh"
       constants.urls.userDevice.transferToken = constants.urls.userDevice.urlBase + "/login/transfer"
-      constants.urls.userDevice.queues = constants.urls.userDevice.urlBase + "/queues"
+      constants.urls.userDevice.history = constants.urls.userDevice.urlBase + "/histories"
       constants.urls.userDevice.config = constants.urls.userDevice.urlBase + "/config/" + constants.platform
+
+    'use queue urls
+    constants.urls.userQueues = {}
+    constants.urls.userQueues.urlBase = "https://user-queue.adrise.tv/api/"
+      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
+        constants.urls.userQueues.urlBase = "https://user-queue.staging-public.tubi.io/api/"
+      end if
+      constants.urls.userQueues.queues = constants.urls.userQueues.urlBase + "v2/queues"
+      constants.urls.userQueues.setReminder = constants.urls.userQueues.urlBase + "v2/queues"
 
     ' account urls
     constants.urls.account = {}
@@ -558,6 +579,11 @@ Function getConstants()
     constants.reqTypes.del = "DELETE"
     constants.reqTypes.patch = "PATCH"
 
+  'userQueue types
+  constants.userQueueType = {}
+    constants.userQueueType.watchLater = "watch_later"
+    constants.userQueueType.remindMe = "remind_me"
+
   'common http request headers
   constants.headers = {}
     constants.headers.language = {"Accept-Language": "en-US"}
@@ -577,6 +603,8 @@ Function getConstants()
     constants.uapiContentTypes.episode = "episode"
     constants.uapiContentTypes.container = "container"
     constants.uapiContentTypes.channel = "channel"
+    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    constants.uapiContentTypes.sportsEvent = "sports_event"
 
   'uapi actions - add or delete from user categories
   constants.uapiActions = {}
@@ -783,6 +811,7 @@ Function getConstants()
   constants.errors.context.linearPlayerScreen = "11"
   constants.errors.context.epgScreen = "12"
   constants.errors.context.emailVerificationScreen = "13"
+  constants.errors.context.tournament = "14"
 
   '//What is the actual error?
   constants.errors.subtypes = {}
@@ -871,6 +900,11 @@ Function getConstants()
       constants.ui.categoryIds.queue = "queue"
       constants.ui.categoryIds.featured = "featured"
       constants.ui.categoryIds.recommendedForYou = "recommended_for_you"
+      constants.ui.categoryIds.fifawc = "fifa_world_cup_2022_matches"
+      constants.ui.categoryIds.upcomings = "fifa_world_cup_upcoming_matches"
+      constants.ui.categoryIds.replays = "fifa_world_cup_match_replays"
+      constants.ui.categoryIds.noteWorthyfifa = "fifa_world_cup"
+
       constants.ui.categoryIds.mostPopular = "most_popular"
       constants.ui.categoryIds.movieNight = "movie_night"
       constants.ui.categoryIds.seriesSpotlight = "series_spotlight"
@@ -912,6 +946,11 @@ Function getConstants()
       constants.ui.infoPanelModes.linearHomeScreen = "linearHomeScreen"
       constants.ui.infoPanelModes.epg = "epg"
       constants.ui.infoPanelModes.linearsearch = "linear-search"
+      '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+      constants.ui.infoPanelModes.linearTournament = "linearTournament"
+      constants.ui.infoPanelModes.sportsEvent = "sportsEvent"
+      constants.ui.infoPanelModes.navigateSports = "navigateSports"
+      constants.ui.infoPanelModes.noteworthy = "noteworthy"
 
     constants.ui.contentMode = {}
       ' these are also used for the content experience choices but are the value that is sent to the back end in our api requests
@@ -932,6 +971,15 @@ Function getConstants()
       constants.ui.contentTypes.linear = "linear"
       constants.ui.contentTypes.historySignedOutUser = "continue_watching_signed_out_user"
       constants.ui.contentTypes.epg = "epg"
+      constants.ui.contentTypes.live = "live"
+      '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+      constants.ui.contentTypes.sportsEvent = "sports_event"
+      constants.ui.contentTypes.navigate = "navigate"
+
+    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    constants.ui.contentTimings = {}
+      constants.ui.contentTimings.upcoming = "upcoming"
+      constants.ui.contentTimings.replay = "replay"
 
     constants.ui.backgroundTypes = {}
       constants.ui.backgroundTypes.fullScreen = "fullscreen"
@@ -964,6 +1012,7 @@ Function getConstants()
       constants.ui.screenLevels.channelCategoryGridScreen = 20
       constants.ui.screenLevels.searchScreen = 20
       constants.ui.screenLevels.settingsScreen = 20
+      constants.ui.screenLevels.tournamentScreen = 20
       constants.ui.screenLevels.confirmPasswordScreen = 40
       constants.ui.screenLevels.categoryDetailsScreen = 40
       constants.ui.screenLevels.detailScreen = 50
@@ -1008,6 +1057,15 @@ Function getConstants()
       constants.ui.screenIds.freeForeverScreen = "freeForeverScreen"
       constants.ui.screenIds.availableDeviceScreen = "availableDeviceScreen"
       constants.ui.screenIds.landingScreen = "landingScreen"
+      constants.ui.screenIds.tournamentScreen = "tournamentScreen"
+
+    ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,
+    ' because currently we support only portrait style in category detail screen
+    constants.ui.notAllowedContainerIds = {}
+      constants.ui.notAllowedContainerIds[constants.ui.categoryIds.featured] = true
+      constants.ui.notAllowedContainerIds[constants.ui.categoryIds.fifawc] = true
+      constants.ui.notAllowedContainerIds[constants.ui.categoryIds.upcomings] = true
+      constants.ui.notAllowedContainerIds[constants.ui.categoryIds.replays] = true
 
     constants.ui.cacheableScreenIds = {}
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
@@ -1025,6 +1083,7 @@ Function getConstants()
       ' Note when returning to the page there were issues with MarkupGrid being in a bad state either
       ' due to the ArrayGrid items being recycled or some state of the MarkupGrid itself.
       constants.ui.cacheableScreenIds[constants.ui.screenIds.initialContentScreen] = false
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.tournamentScreen] = true 'TODO check if we can implement client logic
 
     constants.ui.componentIds = {}
     constants.ui.componentIds.videoPreviewPlayer = "VideoPreviewPlayer"
@@ -1039,6 +1098,7 @@ Function getConstants()
       constants.ui.contentIds.sportsTimeGridContent = "sportsTimeGridContent"
       constants.ui.contentIds.newsTimeGridContent = "newsTimeGridContent"
       constants.ui.contentIds.entertainmentTimeGridContent = "entertainmentTimeGridContent"
+      constants.ui.contentIds.showAllGames = "showAllGames"
 
     ' content ids of contents that should not be removed from the content cache
     constants.ui.permanentlyCachedContentIds = {}
@@ -1079,6 +1139,7 @@ Function getConstants()
       constants.ui.sideNavOpenIds[constants.ui.screenIds.movieScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.tvScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.searchScreen] = true
+      constants.ui.sideNavOpenIds[constants.ui.screenIds.tournamentScreen] = true
 
     constants.ui.onBoarding = {}
       constants.ui.onBoarding.pageSequence = {}
@@ -1106,6 +1167,7 @@ Function getConstants()
       constants.ui.sideNavIds.myList = "myList"
       constants.ui.sideNavIds.subtitles = "subtitles"
       constants.ui.sideNavIds.back = "back"
+      constants.ui.sideNavIds.tournament = "tournament"
 
     constants.ui.linearSideNavIds = {}
       constants.ui.linearSideNavIds.cc = "cc"
@@ -1122,6 +1184,7 @@ Function getConstants()
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.movieScreen] = constants.ui.sideNavIds.movies
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.tvScreen] = constants.ui.sideNavIds.tv
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.settingsScreen] = constants.ui.sideNavIds.settings
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.tournamentScreen] = constants.ui.sideNavIds.tournament
 
     constants.ui.gridItemTypes = {}
       constants.ui.gridItemTypes.portrait = "portrait"
@@ -1221,8 +1284,13 @@ Function getConstants()
     constants.ui.epgscreen = {}
       constants.ui.epgscreen.focusItems = {}
         constants.ui.epgscreen.focusItems.topNav = "topNav"
-        constants.ui.epgscreen.focusItems.epgTimeGridGrid = "epgTimeGrid"
+        constants.ui.epgscreen.focusItems.epgTimeGrid = "epgTimeGrid"
 
+    constants.ui.tournamentscreen = {}
+      constants.ui.tournamentscreen.focusItems = {}
+        constants.ui.tournamentscreen.focusItems.topNav = "topNav"
+        constants.ui.tournamentScreen.focusItems.epgTimeGrid = "epgTimeGrid"
+        constants.ui.tournamentScreen.focusItems.categoryGridList = "categoryGridList"
 
     ' Set some performance parementers based on device profile
     constants.performance = {}
@@ -1263,6 +1331,11 @@ Function getConstants()
         constants.performance.categoryGridList.eagerLoad = true
       end if
 
+      constants.timeInUnits = {}
+      constants.timeInUnits["hour"] = "HOUR(S)"
+      constants.timeInUnits["minute"] = "MIN(S)"
+      constants.timeInUnits["second"] = "SEC(S)"
+
       constants.deeplinks = {}
       constants.deeplinks["homescreen"] = "homescreen"
       constants.deeplinks["hs-search"] = "search"
@@ -1288,6 +1361,12 @@ Function getConstants()
       constants.deeplinks.entrypoints.news = "news"
       constants.deeplinks.entrypoints.episodeList =  "episodeList"
       constants.deeplinks.entrypoints.video = "video"
+
+      constants.tournament = {}
+
+        constants.tournament.startDate = "2022-11-20T20:00:00Z"
+        constants.tournament.endDate = "2022-12-18T20:00:00Z"
+        constants.tournament.clearRegistryDate = "2023-01-04T20:00:00Z"
 
   return constants
 end Function

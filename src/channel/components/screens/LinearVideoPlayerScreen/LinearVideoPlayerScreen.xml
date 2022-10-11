@@ -14,6 +14,8 @@
   <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
 
 
   <interface>
@@ -161,6 +163,12 @@
         color="0x000000FF"
         width="1920"
         height="1080"/>
+
+      <CrossFadePoster
+        id="backgroundImage"
+        width="1920"
+        height="1080"
+        visible="false"/>
 
       <Label
         id="LoadingMessage"

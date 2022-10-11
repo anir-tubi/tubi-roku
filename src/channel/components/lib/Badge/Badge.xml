@@ -9,6 +9,7 @@
     <field id="textColor" type="string" alias="BadgeText.color"/>
     <field id="iconUri" type="string"/>
     <field id="text" type="string"/>
+    <field id="width" type="string" alias="BadgeBackground.width"/>
   </interface>
 
   <children>

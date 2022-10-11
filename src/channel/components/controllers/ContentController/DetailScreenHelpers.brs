@@ -42,6 +42,8 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.observeFieldScoped("relatedContentToPlay", "onContentToPlay")
     detailScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     detailScreen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelected")
+    ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    detailScreen.observeFieldScoped("seeAllGamesSelected", "onSeeAllGamesSelected")
 
     if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
       previewState = getVideoPreviewStateForThisContent(content)
@@ -50,13 +52,16 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
         if content.type = m.constants.ui.contentTypes.series
           pageType = "series_detail_page"
         end if
+
         setPageTypeForVideoPreview(pageType) ' this will help to trigger analytics
       else
         previewState = getVideoPreviewState()
         if previewState <> "stopped" AND previewState <> "finished" ' this means video not stopped/finished for previous content, so we need to stop it
           stopVideoPreview()
         end if
+
       end if
+
     end if
 
 
@@ -72,9 +77,11 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     m.isScreenLoaded = false
 
     ' Update tracking info - have to set the whole AA, can't update only a portion on the AA field
+    airDateTime = content.airDateTime
+    hasVideoResources = content.hasVideoResources
     detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
 
-    setDetailStrings(detailScreen)
+    setDetailStrings(detailScreen, content.type, airDateTime, hasVideoResources)
 
     ' Setting the content on the detail screen here prior to getting a response back from server with full info,
     ' so that it may be used for analytics in the case of failing to fetch the full info from the server.
@@ -119,6 +126,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
       else
         getSingleContentFromServer(content, successCallback, errorCallback)
       end if
+
     else
       getSingleContentFromServer(content, successCallback, errorCallback)
     end if
@@ -142,11 +150,32 @@ Function isDetailScreen(screen)
 End Function
 
 
-Function setDetailStrings(screen)
+Function setDetailStrings(screen, contentType, airDatetime, hasVideoresources)
   screen.stringQueueButton = getTranslation("screenDetails_button_queue")
   screen.stringNoQueueButton = getTranslation("screenDetails_button_NoQueue")
   screen.stringNoHistoryButton = getTranslation("screenDetails_button_noHistory")
-  screen.stringSignUpButton = getTranslation("registration_signup_button") + ";" + getTranslation("registration_signup_button_free")
+
+  info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
+  availabilityType = info.availabilityType
+
+  ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+  if isNonEmptyString(availabilityType) = true AND availabilityType = m.constants.ui.contentTimings.upcoming
+
+    if isLoggedInUser() = false
+      screen.stringQueueButton = getTranslation("screenDetails_button_sign_in_to_set_reminder")
+    else
+      screen.stringQueueButton = getTranslation("screenDetails_button_set_reminder")
+    end if
+
+    screen.stringNoQueueButton = getTranslation("screenDetails_button_reminder_set")
+  end if
+
+  if contentType = m.constants.ui.contentTypes.sportsEvent AND isLoggedInUser() = false
+    screen.stringPlayButton = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
+  else '// KEEP BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    screen.stringSignUpButton = getTranslation("registration_signup_button") + ";" + getTranslation("registration_signup_button_free")
+    screen.stringPlayButton = getTranslation("screenDetails_button_play")
+  end if
 End Function
 
 
@@ -163,6 +192,7 @@ Function onDetailBackgroundChange(msg)
           uriList: detailScreen.backgroundUriList
         }
       end if
+
     else
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.topright
@@ -239,8 +269,16 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     end if
 
     'update detail screen state via the input interface
-    detailScreen.title = content.title
     detailScreen.genres = content.genres
+    detailScreen.needsLogin = content.needsLogin
+    detailScreen.selectedContentType = content.type
+    hasVideoresources = content.hasVideoresources
+    airDatetime = content.airDatetime
+    info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
+    matchTime = info.matchTime
+    badgeText = info.badgeText
+    availabilityType = info.availabilityType
+    detailScreen.availabilityType = availabilityType
 
     if content.hasTrailer = true
       detailScreen.hasTrailer = true
@@ -264,17 +302,21 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
           '//There may be multiple detail screens in the stack so the timer may already be started
           m.resumeAllowedTimer.control = "start"
         end if
+
       end if
+
     end if
 
     episode = getEpisodeContent(content)
     episodeHistory = invalid
     if content.type = m.constants.ui.contentTypes.series
+      detailScreen.title = content.title
       if episode <> invalid
         if history <> invalid
           '//if there is no history, then there is no episode history either
           episodeHistory = getHistory(episode.id)
         end if
+
         detailScreen.episodeTitle = episode.title
       end if
 
@@ -282,14 +324,28 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       lineOneData.seasons = content.totalCount
       detailScreen.isSeries = true
       detailScreen.mode = m.constants.ui.infoPanelModes.series
+    ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    else if content.type = m.constants.ui.contentTypes.sportsEvent
+      detailScreen.mode = m.constants.ui.infoPanelModes.sportsEvent
+      detailScreen.fifaWorldCupTitle = content.title
+      detailScreen.needsLoginHint = isContentLocked(content)
+      lineOneData.availabilityType = availabilityType
+      lineOneData.roundGroupInfo = content.roundGroupInfo
+      lineOneData.matchTime = matchTime
+      lineOneData.badgeText = badgeText
+      lineOneData.hasFifaWorldCupCC = content.hasSubtitles
+      lineOneData.hasFifaWorldCup4k = content.has4k
     else
+      detailScreen.title = content.title
       detailScreen.mode = m.constants.ui.infoPanelModes.movie
     end if
+
     if isKidsUIOn() = true
       detailScreen.isInKidsMode = true
     else
       detailScreen.isInKidsMode = false
     end if
+
     if episode <> invalid
       stateSource = episode
     else
@@ -301,9 +357,9 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     lineOneData.releaseDate = content.releaseDate
     lineOneData.partnerLogoUri = content.inlineLogoUri
 
-    if episode <> invalid AND (episode.hasSubtitles = true or not m._.empty(episode.subtitleTracks))
+    if episode <> invalid AND (episode.hasSubtitles = true OR m._.empty(episode.subtitleTracks) = false)
       lineOneData.hasCC = true
-    else if content <> invalid AND content.type = m.constants.ui.contentTypes.video AND (content.hasSubtitles = true or not m._.empty(content.subtitleTracks))
+    else if content <> invalid AND content.type = m.constants.ui.contentTypes.video AND (content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false)
       lineOneData.hasCC = true
     else
       lineOneData.hasCC = false
@@ -328,6 +384,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     if like <> invalid
       sLikedState = like.state
     end if
+
     detailScreen.likeDislikeState = sLikedState
 
     '//right now in kids mode, there are no channels showing up, so hardcode it so the channel's button doesn't show
@@ -341,6 +398,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     else if content.type = m.constants.ui.contentTypes.video AND history <> invalid AND history.nowPos > 0
       nResumePoint = history.nowPos
     end if
+
     if nResumePoint < m.constants.player.historyFrequency
       '//make sure the resume point is at least the client side constant minimum
       nResumePoint = 0
@@ -380,6 +438,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     'it is necessary to update trackingPageInfo here so that the correct pageInfo is stored in the case where a deeplink has an
     'episode content id, but the detail screen content will ultimately be a series content node. Updating here occurs when the
     'full content has been returned from the /contents API.
+
     detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
     detailScreen.content = content
 
@@ -419,6 +478,7 @@ Function getSingleContentFromServerRetry(params)
     if type(params[3]) = "roSGNode" AND params[3].subtype() = "DetailScreen"
       params[3].isLoading = true
     end if
+
     getSingleContentFromServer(params[0], params[1], params[2])
   end if
 End Function
@@ -462,7 +522,9 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
         else
           refreshedContent.currentEpisodeId = ""
         end if
+
       end if
+
     else if refreshedContent.type = m.constants.ui.contentTypes.video AND refreshedContent.seriesId <> invalid AND refreshedContent.seriesId <> ""
       ' Case here of having an episode outside of a series (probably from autoplay)
       emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
@@ -493,6 +555,7 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
     if afterFn <> invalid
       handleDetailScreenAfterFn(detailScreen, afterFn)
     end if
+
   end if
 
 End Function
@@ -507,6 +570,7 @@ Function handleDetailScreenAfterFn(detailScreen, afterFn)
     if afterFn <> invalid
       afterFn(detailScreen)
     end if
+
   else
     m.detailScreenAfterFn = afterFn
   end if
@@ -525,10 +589,12 @@ Function sendDetailScreenNavigateAndLoadEvent(detailScreen, refreshedContent, se
     if refreshedContent.type = m.constants.ui.contentTypes.series
       loadTime = Int((Uptime(0) - detailScreen.trackingLoadStartTime) * 1000) 'in ms
     end if
+
     oldScreen = getHiddenScreen(1) 'we already pushed the details screen, so the previous screen is 1 screen below the top screen/details screen
     if oldScreen <> invalid
       screenTrackingNavigate(oldScreen.trackingPageInfo, detailScreen.trackingPageInfo, oldScreen.trackingComponentInfo)
     end if
+
     screenTrackingLoad(detailScreen.trackingPageInfo, loadTime)
   end if
 End Function
@@ -617,6 +683,7 @@ Function handleRelatedResponse(relatedContent)
       detailScreen.relatedContent = invalid
       detailScreen.relatedContent = relatedContent
     end if
+
   end if
 End Function
 
@@ -633,9 +700,11 @@ Function findEpisode2dIndex(episodeId, contentNode)
           tubiLog("Episode is [" + stri(i) + "," + stri(j) + "]")
           return [i, j]
         end if
+
       end for
     end for
   end if
+
   return [0, 0]
 End Function
 
@@ -657,6 +726,7 @@ Function findNextEpisode2dIndex(currentItemFocused, contentNode)
     else if (seasonIndex + 1) < contentNode.getChildCount()
       return [seasonIndex + 1, 0]
     end if
+
   end if
   return [0, 0]
 End Function
@@ -696,6 +766,7 @@ Function findNextEpisode(currentItemFocused, seriesContent)
           if item.creditsCuePoints <> invalid AND item.creditsCuePoints.postlude <> invalid AND nowPos < item.creditsCuePoints.postlude then
             return [i, j] ' first unwatched episode next to currently watched episode
           end if
+
         end for
         'bs:disable-next-line LINT1005
         episodeIndex = 0 'next season, so start from beginning
@@ -707,8 +778,10 @@ Function findNextEpisode(currentItemFocused, seriesContent)
       if currentSeasonIndex = seasonsTopIndex AND currentEpisodeIndex = episodesTopIndex then
         nextEpisode = [0, 0]
       end if
+
     end if
   end if
+
   return nextEpisode
 End Function
 
@@ -725,8 +798,10 @@ Function getEpisodeDetail(content)
         ' return a default if no match
         return season.getChild(0)
       end if
+
     end if
   end if
+
   return invalid
 End Function
 
@@ -747,6 +822,7 @@ Function getEpisodeContent(content)
         ' return a default if no match
         episode = season.getChild(0)
       end if
+
     end if
   end if
 
@@ -755,6 +831,7 @@ Function getEpisodeContent(content)
   else
     return content
   end if
+
 End Function
 
 
@@ -765,6 +842,7 @@ Function getCurrentEpisode(content)
   if content <> invalid AND content.type = m.constants.ui.contentTypes.series
     episode = getEpisodeContent(content)
   end if
+
   return episode
 End Function
 
@@ -796,6 +874,7 @@ Function getTopDetailScreenFromStack()
     else
       screenStackDepth += 1
     end if
+
   end while
 
   return detailScreen
@@ -821,9 +900,14 @@ Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
       title = getTranslation("screenDetails_error_addQueue_title")
       if content.type = m.constants.ui.contentTypes.series
         message = getTranslation("screenDetails_error_addQueueSeries_description")
+      else if content.availabilityType = m.constants.ui.contentTimings.upcoming
+        message = getTranslation("screenDetails_error_setReminderSports_description")
+      else if content.availabilityType = m.constants.ui.contentTimings.replay
+        message = getTranslation("screenDetails_error_addQueueSports_description")
       else
         message = getTranslation("screenDetails_error_addQueueMovie_description")
       end if
+
       buttons = [getTranslation("dialog_button_continue"), getTranslation("dialog_button_cancel")]
       showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, addToQueueSignInSelected)
     else if detailScreen <> invalid AND detailScreen.isWaitingForServerResponse <> true
@@ -834,14 +918,24 @@ Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
       if authInfo <> invalid AND authInfo.userId <> invalid
         userId = authInfo.userId.toInt()
       end if
+
       contentType = ""
-      if detailScreen.content <> invalid AND detailScreen.content["type"] = m.constants.ui.contentTypes.video
-        contentType = m.constants.uapiContentTypes.movie
-      else if detailScreen.content <> invalid AND detailScreen.content["type"] = m.constants.ui.contentTypes.series
-        contentType = m.constants.uapiContentTypes.series
+      typeOfQueue = m.constants.userQueueType.watchLater
+      content = detailScreen.content
+      if content <> invalid and content.availabilityType = m.constants.ui.contentTimings.upcoming
+        setComponentInteractionEventForReminder(detailScreen, "on")
+        typeOfQueue = m.constants.userQueueType.remindMe
+      else
+        typeOfQueue = m.constants.userQueueType.watchLater
       end if
 
-      addToQueueReq = m.userDeviceApi.addToQueueReqInfo(userId, detailScreen.content.id, contentType)
+      if content.type = m.constants.ui.contentTypes.video
+        contentType = m.constants.uapiContentTypes.movie
+      else if content <> invalid and isNonEmptyString(content.type) = true
+        contentType = content.type
+      end if
+
+      addToQueueReq = m.userDeviceApi.addToQueueReqInfo(userId, detailScreen.content.id, contentType, typeOfQueue)
 
       callBackSuccessFunction = callBackAfterSignIn
       if callBackSuccessFunction = invalid
@@ -882,9 +976,7 @@ End Function
 ' @addBookmarkResult: assocarray, contains bookmarkId & response code
 Function bookmarkFailed(detailScreen, addBookmarkResult)
 
-  detailScreen.stringQueueButton = getTranslation("screenDetails_button_queue")
   content = getDetailScreenContent(detailScreen)
-
   responseCode = -1234
   if addBookmarkResult <> invalid
     responseCode = addBookmarkResult.code
@@ -892,11 +984,28 @@ Function bookmarkFailed(detailScreen, addBookmarkResult)
 
   ' set up the error modal dialog
   errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.addBookmarkError, responseCode)
-  dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", errorCode, m.constants)
-  if content.type = m.constants.ui.contentTypes.series
-    message = getTranslation("screenDetails_error_queueSeries_description")
+  message = ""
+  if content.availabilityType = m.constants.ui.contentTimings.upcoming
+    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "SET_REMINDER", errorCode, m.constants)
+
+    if isLoggedInUser() = false
+      detailScreen.stringQueueButton = getTranslation("screenDetails_button_sign_in_to_set_reminder")
+    else
+      detailScreen.stringQueueButton = getTranslation("screenDetails_button_set_reminder")
+    end if
+
+    message = getTranslation("screenDetails_error_noQueueUpcoming_description")
   else
-    message = getTranslation("screenDetails_error_queueMovie_description")
+    dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", errorCode, m.constants)
+    detailScreen.stringQueueButton = getTranslation("screenDetails_button_queue")
+    if content.type = m.constants.ui.contentTypes.series
+      message = getTranslation("screenDetails_error_queueSeries_description")
+    else if content.type = m.constants.ui.contentTypes.movie
+      message = getTranslation("screenDetails_error_queueMovie_description")
+    else if content.availabilityType = m.constants.ui.contentTimings.replay
+      message = getTranslation("screenDetails_error_noQueueReplay_description")
+    end if
+
   end if
   title = getTranslation("error_tryAgain_title")
 
@@ -930,11 +1039,15 @@ Function onBookmarkedAfterSignIn(response)
       content = getDetailScreenContent(detailScreen)
       dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", "add-queue-success", m.constants)
 
-      title = "Content"
+      title = getTranslation("screenDetails_queue_content_added_to_list_description")
       if isNonEmptyString(detailScreen.title) = true
         title = detailScreen.title
       end if
-      description = title + " has been added to the List"
+      if content.availabilityType <> invalid and content.availabilityType = m.constants.ui.contentTimings.upcoming
+        description = getTranslation("screenDetails_queue_added_to_reminder_list_description", {"upcomingTitle": title})
+      else
+        description = getTranslation("screenDetails_queue_added_to_list_description", {"contentTitle": title})
+      end if
 
       showSimpleInstantResumableModal("Success", description, [], dialogEvent, m.trackingLoggingTask)
 
@@ -944,7 +1057,6 @@ Function onBookmarkedAfterSignIn(response)
         fetchHomescreen(homeScreen)
       end if
 
-      tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
       if response <> invalid AND response.parsedresponse <> invalid AND detailScreen.content.id.toInt() = response.parsedresponse.content_id
         setIsBookmark(detailScreen, true)
       end if
@@ -952,6 +1064,7 @@ Function onBookmarkedAfterSignIn(response)
       sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
       onHistoryQueueChange(m.constants.ui.categoryIds.queue)
     end if
+
   end if
 
 End Function
@@ -994,6 +1107,7 @@ Function onResumeAllowedTimerFired()
             '//Call populateDetailScreen() which will remove the resume button for any guest users that have content that has history over a day old
             populateDetailScreen(detailScreen, detailScreen.content)
           end if
+
         end if
       end if
       screenStackDepth += 1
@@ -1004,6 +1118,7 @@ Function onResumeAllowedTimerFired()
       m.resumeAllowedTimer.unobserveFieldScoped("fire")
       m.resumeAllowedTimer.control = "stop"
     end if
+
   else
     '//User is signed in and is no longer a guest so cancel timer
     m.resumeAllowedTimer.unobserveFieldScoped("fire")
@@ -1015,8 +1130,20 @@ End Function
 
 Function setIsBookmark(detailScreen, isBookmark)
   'reset the value in the case that add to queue button was pressed and the button title is currently "Adding..."
-  detailScreen.stringQueueButton = getTranslation("screenDetails_button_queue")
-  detailScreen.stringNoQueueButton = getTranslation("screenDetails_button_noQueue")
+  availabilityType = detailScreen.availabilityType
+  if availabilityType <> invalid AND availabilityType = m.constants.ui.contentTimings.upcoming then
+
+    if isLoggedInUser() = false
+      detailScreen.stringQueueButton = getTranslation("screenDetails_button_sign_in_to_set_reminder")
+    else
+      detailScreen.stringQueueButton = getTranslation("screenDetails_button_set_reminder")
+    end if
+
+    detailScreen.stringNoQueueButton = getTranslation("screenDetails_button_reminder_set")
+  else
+    detailScreen.stringQueueButton = getTranslation("screenDetails_button_queue")
+    detailScreen.stringNoQueueButton = getTranslation("screenDetails_button_noQueue")
+  end if
 
   detailScreen.isBookmark = isBookmark
 End Function
@@ -1044,7 +1171,18 @@ Function onRemoveFromQueue(detailScreen)
     if bookmark <> invalid
       detailScreen.stringQueueButton = getTranslation("screenDetails_button_removing")
 
-      removeFromQueueReq = m.userDeviceApi.removeFromQueueReqInfo(bookmark.bookmarkId)
+      contentType = ""
+
+      if content.type = m.constants.ui.contentTypes.video
+        contentType = m.constants.uapiContentTypes.movie
+      else if content.type = m.constants.ui.contentTypes.sportsEvent
+        setComponentInteractionEventForReminder(detailScreen, "off")
+        contentType = m.constants.uapiContentTypes.sportsEvent
+      else
+        contentType = content.type
+      end if
+
+      removeFromQueueReq = m.userDeviceApi.removeFromQueueReqInfo(bookmark.bookmarkId, content.id, contentType)
 
       m.makeRequest({
         url: removeFromQueueReq.url
@@ -1059,6 +1197,7 @@ Function onRemoveFromQueue(detailScreen)
     else
       tubiLog("bookmark id not found")
     end if
+
   end if
 End Function
 
@@ -1167,6 +1306,7 @@ Function updateLikeDislike(detailScreen, sRatingChange)
     else if sRatingChange = m.constants.ui.likeDislikeActions.removeDislike
       sAnalyticsEventType = "UNDO_DISLIKE"
     end if
+
     sendLikeSelectAnalytics(detailScreen, sAnalyticsEventType)
 
     m.makeRequest({
@@ -1197,6 +1337,7 @@ Function onLikeChangedSuccess(requestBody)
         detailScreen.isWaitingForServerResponse = false
         setDetailScreenLikeDislikeStateFromLikeAction(detailScreen, sReturnedAction)
       end if
+
     end if
   end if
 End Function
@@ -1264,6 +1405,7 @@ Function onLikeChangedError(parsedReturn)
           sErrorSubtype = m.constants.errors.subtypes.ratingRemoveDislikeError
           ' sAnalyticsDialogType = "UNDO_DISLIKE" '//::TODO:: have backend provide a DialogType in protos that corresponds to failing to change a specific like action
         end if
+
         ' set up the error modal dialog
         errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, sErrorSubtype, code)
         content = getDetailScreenContent(detailScreen)
@@ -1278,7 +1420,9 @@ Function onLikeChangedError(parsedReturn)
         }
         showErrorModal(modalInfo, onLikeDislikeRetry, [detailScreen, returnedAction])
       end if
+
     end if
+
   end if
 End Function
 
@@ -1320,6 +1464,7 @@ Function onRemoveFromHistory(detailScreen)
       detailScreen.isWaitingForServerResponse = false
       setIsHistory(detailScreen, false)
     end if
+
   end if
 End Function
 
@@ -1352,6 +1497,7 @@ Function onHistoryRemovedError(response)
   if response <> invalid
     code = response.code
   end if
+
   message = getTranslation("screenDetails_error_noHistory_description")
   content = getDetailScreenContent(detailScreen)
 
@@ -1420,6 +1566,12 @@ Function onSignUpButtonSelected(msg)
   setComponentInteractionEventForSignUp(msg.getRoSGNode())
   startSignIn(onRegistrationProcessCompletedOnDetailsScreen)
 End function
+
+' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+Function onSeeAllGamesSelected()
+  tubiLog("DetailScreenHelper.onSeeAllGamesSelected")
+  showTournamentScreen(m.constants)
+End Function
 
 
 '@screen, screen info after selecting signUp button
@@ -1514,6 +1666,7 @@ Function onWatchTrailer(msg)
         detailScreen.isLoading = true
         getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
       end if
+
     end if
   end if
 End Function
@@ -1552,12 +1705,16 @@ Function isPlayable(screen) as Boolean
         if episodeDetail.validUntil <> invalid AND episodeDetail.validUntil >= UpTime(0)
           bReturn = true
         end if
+
       end if
+
     else if content.type = "video" AND content.url <> invalid AND Len(content.url) > 0
       if content.validUntil <> invalid AND content.validUntil >= UpTime(0)
         bReturn = true
       end if
+
     end if
+
   end if
 
   return bReturn
@@ -1589,6 +1746,7 @@ Function resumeVideoDetailScreen(detailScreen, playbackSource = "unknown")
       detailScreen.isLoading = true
       getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
     end if
+
   end if
 
 End Function
@@ -1619,6 +1777,7 @@ Function playVideoDetailScreen(detailScreen, playbackSource = "unknown")
       detailScreen.isLoading = true
       getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
     end if
+
   end if
 End Function
 
@@ -1633,8 +1792,11 @@ Function isMatureRating(content)
         if sRating = aRatings[i]
           return true
         end if
+
       end for
+
     end if
+
   end if
 
   return false
@@ -1665,6 +1827,7 @@ Function playHelper(screen)
     else
       playVideoContent(episode, screen.playbackSource)
     end if
+
   else
     tubiLog("ERROR: Play selected but content is invalid")
   end if
@@ -1678,6 +1841,7 @@ Function detailScreenResumeHelper(detailScreen)
     if nowPos >= 0
       playVideoContent(episode, detailScreen.playbackSource, nowPos)
     end if
+
   else
     tubiLog("ERROR: Resume selected but content is invalid")
   end if
@@ -1698,6 +1862,7 @@ Function processResume(episode)
       '//this is a deeplink so, indicate that the warning originatated from a deeplink
       dialogSubtype = "mature-resume-deep"
     end if
+
     displayDetailScreenMaturePlayWarning(episode, dialogSubtype)
   else
     nowPos = 0
@@ -1711,6 +1876,7 @@ Function processResume(episode)
       if history <> invalid AND history.nowPos > 0
         nowPos = history.nowPos
       end if
+
     end if
   end if
 
@@ -1740,6 +1906,7 @@ Function skipDetailScreen(refreshedContent)
       if history <> invalid
         refreshedContent.currentEpisodeId = history.currentEpisodeId
       end if
+
     end if
 
     episode = getEpisodeContent(refreshedContent)
@@ -1748,17 +1915,20 @@ Function skipDetailScreen(refreshedContent)
       if m.enteredFromDeepLink = true AND m.deeplinkContent <> invalid
         sendDeeplinkAnalytics(m.deeplinkContent, episode, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
       end if
+
       nowPos = processResume(episode)
       if m.top.fadeInContentController = true
         if nowPos >= 0
           playVideoContentWhileSkippingDetailScreen(episode, nowPos, trackingPageInfo, trackingComponentInfo, detailScreen.playbackSource)
         end if
+
       else
         if nowPos > 0
           m.detailScreenAfterFn = detailScreenResumeHelper
         else
           m.detailScreenAfterFn = playHelper
         end if
+
       end if
 
     end if
@@ -1791,6 +1961,8 @@ Function sendBookmarkAnalytics(content, operation, trackingLib, trackingTask, co
     end if
     bookmarkAnalyticsEvent.contentOneof.series_id = seriesId.toInt()
   else if content.type = m.constants.ui.contentTypes.video
+    bookmarkAnalyticsEvent.contentOneof.video_id = content.id.toInt()
+  else if content.type = m.constants.ui.contentTypes.sportsEvent
     bookmarkAnalyticsEvent.contentOneof.video_id = content.id.toInt()
   end if
 
@@ -1826,6 +1998,7 @@ Function sendLikeSelectAnalytics(screen, sLikeEventEnum)
     if Left(content.id, 1) = "0"
       seriesId = Mid(content.id, 2)
     end if
+
     componentValues.series_id = seriesId.toInt()
   else if content.type = m.constants.ui.contentTypes.video
     componentValues.video_id = content.id.toInt()
@@ -1915,6 +2088,7 @@ Function sendDetailScreenErrorAnalytics(detailScreen)
     if oldScreen <> invalid
       screenTrackingNavigate(oldScreen.trackingPageInfo, detailScreen.trackingPageInfo, oldScreen.trackingComponentInfo)
     end if
+
     loadTime = Int((Uptime(0) - detailScreen.trackingLoadStartTime) * 1000) 'in ms
     screenTrackingLoad(detailScreen.trackingPageInfo, loadTime, false)
   end if
@@ -1947,6 +2121,12 @@ End Function
 ' @content: roSGNode, the content that is residing on the details page content field, can be a movie or series
 Function getDetailScreenAnalyticsPageInfo(content, constants)
   pageInfo = invalid
+  airDateTime = content.airDatetime
+  hasVideoResources = content.hasVideoResources
+
+  info = getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime, hasVideoResources)
+  availabilityType = info.availabilityType
+
   if content <> invalid AND type(content.id) = "roString"
     if content.type = constants.ui.contentTypes.series
       pageInfo = {
@@ -1955,15 +2135,26 @@ Function getDetailScreenAnalyticsPageInfo(content, constants)
           series_id: content.id.toInt()
         }
       }
-    else if content.type = constants.ui.contentTypes.video
+    ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE (Remove SportsEvent OR condition only)
+    else if content.type = constants.ui.contentTypes.video OR (content.type = constants.ui.contentTypes.sportsEvent AND availabilityType = constants.ui.contentTimings.replay)
       pageInfo = {
         pageType: "video_page"
         pageValues: {
           video_id: content.id.toInt()
         }
       }
+    ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    else if content.type = constants.ui.contentTypes.sportsEvent AND availabilityType = constants.ui.contentTimings.upcoming 'replay games will be shown as video_page
+      pageInfo = {
+        pageType: "upcoming_content_page"
+        pageValues: {
+          video_id: content.id.toInt()
+        }
+      }
     end if
+
   end if
+
   return pageInfo
 End Function
 
@@ -1985,6 +2176,7 @@ Function removeFromQueueSuccessResponse(_response)
     detailScreen.isWaitingForServerResponse = false
     sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
   end if
+
   onHistoryQueueChange(m.constants.ui.categoryIds.queue)
 End Function
 
@@ -1998,15 +2190,19 @@ Function removeFromQueueErrorResponse(error)
     code = ""
     content = getDetailScreenContent(detailScreen)
 
+    message = getTranslation("screenDetails_error_noQueueMovie_description")
     if content <> invalid AND content.type = m.constants.ui.contentTypes.series
       message = getTranslation("screenDetails_error_noQueueSeries_description")
-    else
-      message = getTranslation("screenDetails_error_noQueueMovie_description")
+    else if content <> invalid AND content.availabilityType = m.constants.ui.contentTimings.upcoming
+      message = getTranslation("screenDetails_error_noQueueUpcoming_description")
+    else if content <> invalid AND content.availabilityType = m.constants.ui.contentTimings.replay
+      message = getTranslation("screenDetails_error_noQueueReplay_description")
     end if
 
     if error <> invalid
       code = error.code
     end if
+
     detailScreen.stringQueueButton = getTranslation("screenDetails_button_noQueue")
 
     ' set up the error modal dialog
@@ -2037,17 +2233,17 @@ Function addToQueueSuccessResponse(response)
       bookmarkId = response.id
 
       if bookmarkId <> invalid
-        tubiLog("Got bookmarkId " + bookmarkId + " for content " + detailScreen.content.id)
         if response <> invalid AND detailScreen.content.id.toInt() = response.content_id
           setIsBookmark(detailScreen, true)
         end if
+
         sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
         onHistoryQueueChange(m.constants.ui.categoryIds.queue)
       end if
+
     end if
   end if
 End Function
-
 
 Function addToQueueErrorResponse(error)
   tubiLog("DetailScreenHelpers.addToQueueErrorResponse")
@@ -2056,4 +2252,32 @@ Function addToQueueErrorResponse(error)
     detailScreen.isWaitingForServerResponse = false
     bookmarkFailed(detailScreen, error)
   end if
+End function
+
+' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+Function setComponentInteractionEventForReminder(screen, userInteraction)
+  tubiLog("DetailScreenHelpers.setComponentInteractionEventForReminder")
+
+  componentValues = {
+    video_id: screen.trackingPageInfo.pageValues.video_id
+  }
+  userInteractionValue = ""
+  if userInteraction = "on"
+    userInteractionValue = "TOGGLE_ON"
+  else if userInteraction = "off"
+    userInteractionValue = "TOGGLE_OFF"
+  end if
+
+  pageOneof = m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pagetype, screen.trackingPageInfo.pageValues)
+  componentOneof = m.Tracking.getAnalyticsComponent("reminder_component", componentValues)
+
+  componentInteractionEvent =  {
+    pageOneof: pageOneof
+    componentOneof: componentOneof
+    user_interaction: userInteractionValue
+  }
+  m.trackingLoggingTask.trackEvent = {
+    type: "component_interaction"
+    values: componentInteractionEvent
+  }
 End Function

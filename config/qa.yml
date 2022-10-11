@@ -20,6 +20,14 @@ settings:
   # This field is added for testing purpose
   showOnBoardingAlways: false
 
+ # enabling showFIFAIntroModalAlways will show FIFA Intro modal every time the app is launched as non-production mode for guest users.
+  # This field is added for testing purpose
+  showFIFAIntroModalAlways: false
+
+  #FIFA worldcup tournment start date/end date for testing purposes. Please follow the format
+  tournamentStartDate: "2022-11-20T00:00:00Z"
+  tournamentEndDate: "2022-12-18T00:00:00Z"
+
   # email/password values will be used to automatically sign a user in when "sign in" is selected
   email: ""
   password: ""

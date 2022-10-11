@@ -298,7 +298,7 @@ Function populateInfoPanel(infoPanel, content, mode)
     line1Data.length = 0
   end if
 
-  if (content.hasSubtitles = true or not m._.empty(content.subtitleTracks)) = true
+  if (content.hasSubtitles = true OR not m._.empty(content.subtitleTracks)) = true
     line1Data.hasCC = true
   else
     line1Data.hasCC = false

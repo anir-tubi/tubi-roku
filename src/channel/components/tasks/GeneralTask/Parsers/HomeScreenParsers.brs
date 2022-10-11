@@ -30,7 +30,7 @@ Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
 
   end if
 
-  convertedMetadata = translate.translateHomescreen(parsedResponse, contentMode, authInfo, isKidsMode, uiMode)
+  convertedMetadata = translate.translateFIFAHomescreen(parsedResponse, contentMode, authInfo, isKidsMode, uiMode)
 
   return convertedMetadata
 End Function
@@ -57,6 +57,6 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
     end if
   end if
 
-  convertedMetadata = translate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode)
+  convertedMetadata = translate.translateContainerForHomeScreen(parsedResponse, fullJson, orientation, bFullData, contentMode)
   return convertedMetadata  'may return an empty container
 End Function

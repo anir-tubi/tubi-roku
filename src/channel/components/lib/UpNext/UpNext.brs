@@ -330,7 +330,7 @@ Function updateInfoPanel(infoNode, content)
   end if
   lineOneData.releaseDate = content.releaseDate
   lineOneData.length = content.length
-  lineOneData.hasCC = (content.hasSubtitles or not m._.empty(content.subtitleTracks))
+  lineOneData.hasCC = (content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false)
   if content.availabilityEnds <> invalid
     lineOneData.availabilityEnds = content.availabilityEnds
   end if

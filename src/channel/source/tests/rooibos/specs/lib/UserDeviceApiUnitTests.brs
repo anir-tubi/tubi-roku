@@ -369,8 +369,10 @@ End Function
 '@Test removeFromQueueReqInfo unit tests
 Function userDeviceApi_removeFromQueueReqInfo_test()
   bookmarkId = "AABBCCDD"
-  url = m.constants.urls.userDevice.queues + "/" + bookmarkId
-  removeFromQueueReq = m.userDeviceApi.removeFromQueueReqInfo(bookmarkId)
+  contentId = "6682144"
+  contentType = "series"
+  url = m.constants.urls.userQueues.queues
+  removeFromQueueReq = m.userDeviceApi.removeFromQueueReqInfo(bookmarkId, contentId, contentType)
 
   m.assertNotInvalid(removeFromQueueReq)
 
@@ -381,6 +383,18 @@ Function userDeviceApi_removeFromQueueReqInfo_test()
 
   m.assertNotInvalid(removeFromQueueReq.options.headers)
   m.assertEqual(removeFromQueueReq.options.method, "DELETE")
+
+  params = removeFromQueueReq.options.params
+  m.assertNotInvalid(params)
+
+  m.assertNotInvalid(params.queue_id)
+  m.assertEqual(params.queue_id, "AABBCCDD")
+
+  m.assertNotInvalid(params.content_id)
+  m.assertEqual(params.content_id, "6682144")
+
+  m.assertNotInvalid(params.content_type)
+  m.assertEqual(params.content_type, "series")
 End Function
 
 
@@ -389,12 +403,13 @@ Function userDeviceApi_addToQueueReqMovie_test()
   userId = 1234
   contentId = "321221"
   contentType = "movie"
-  movieAddToQueueReq = m.userDeviceApi.addToQueueReqInfo(userId, contentId, contentType)
+  typeOfQueue = "watch_later"
+  movieAddToQueueReq = m.userDeviceApi.addToQueueReqInfo(userId, contentId, contentType, typeOfQueue)
 
   m.assertNotInvalid(movieAddToQueueReq)
 
   m.assertNotInvalid(movieAddToQueueReq.url)
-  m.assertEqual(movieAddToQueueReq.url, m.constants.urls.userDevice.queues)
+  m.assertEqual(movieAddToQueueReq.url, m.constants.urls.userQueues.queues)
 
   m.assertNotInvalid(movieAddToQueueReq.options)
   m.assertNotInvalid(movieAddToQueueReq.options.body)
@@ -405,6 +420,7 @@ Function userDeviceApi_addToQueueReqMovie_test()
   m.assertEqual(body.user_id, 1234)
   m.assertEqual(body.content_id, "321221")
   m.assertEqual(body.content_type, "movie")
+  m.assertEqual(body.type, "watch_later")
 
   m.assertNotInvalid(movieAddToQueueReq.options.headers)
   m.assertEqual(movieAddToQueueReq.options.method, "POST")
@@ -416,12 +432,13 @@ Function userDeviceApi_addToQueueReqSeries_test()
   userId = 1234
   contentId = "01079"
   contentType = "series"
-  seriesAddToQueueReqInfo = m.userDeviceApi.addToQueueReqInfo(userId, contentId, contentType)
+  typeOfQueue = "watch_later"
+  seriesAddToQueueReqInfo = m.userDeviceApi.addToQueueReqInfo(userId, contentId, contentType, typeOfQueue)
 
   m.assertNotInvalid(seriesAddToQueueReqInfo)
 
   m.assertNotInvalid(seriesAddToQueueReqInfo.url)
-  m.assertEqual(seriesAddToQueueReqInfo.url, m.constants.urls.userDevice.queues)
+  m.assertEqual(seriesAddToQueueReqInfo.url, m.constants.urls.userQueues.queues)
 
   m.assertNotInvalid(seriesAddToQueueReqInfo.options)
   m.assertNotInvalid(seriesAddToQueueReqInfo.options.body)
@@ -432,6 +449,7 @@ Function userDeviceApi_addToQueueReqSeries_test()
   m.assertEqual(body.user_id, 1234)
   m.assertEqual(body.content_id, "01079")
   m.assertEqual(body.content_type, "series")
+  m.assertEqual(body.type, "watch_later")
 
   m.assertNotInvalid(seriesAddToQueueReqInfo.options.headers)
   m.assertEqual(seriesAddToQueueReqInfo.options.method, "POST")

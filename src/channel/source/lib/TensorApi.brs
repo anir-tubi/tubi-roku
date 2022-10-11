@@ -11,6 +11,7 @@ Function TensorApi(constants, request, auth)
     ' public
     getEPGChannelIdsReqInfo: tensorApi_getEPGChannelIdsReqInfo
     getEPGProgramReqInfo: tensorApi_getEPGProgramReqInfo
+    getTournamentReqInfo: tensorApi_getTournamentReqInfo
 
     ' private
     commonOptions: tensorApi_commonOptions
@@ -74,4 +75,17 @@ Function tensorApi_getEPGProgramReqInfo(contentIds)
     url: url
     options: options
   }
+End Function
+
+
+'tournamentPage content request
+Function tensorApi_getTournamentReqInfo()
+  url = m.constants.urls.tensor.tournamentscreen
+
+  options = m.commonOptions()
+  return {
+    url: url
+    options: options
+  }
+
 End Function

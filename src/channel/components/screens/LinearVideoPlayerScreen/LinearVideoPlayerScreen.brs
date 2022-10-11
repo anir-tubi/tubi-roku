@@ -40,6 +40,7 @@ Function init()
   m.top.observeField("height", "onHeightChange")
 
   m.logo = m.top.findNode("tubiLogo")
+  m.backgroundImage = m.top.findNode("backgroundImage")
 
 
   'm.VideoState is source of truth for the state of the video player for the UI
@@ -95,9 +96,22 @@ End Function
 
 
 Function onChannelSelectedToPlayChanged()
-  tubiLog("LinearVideoPlayerScreen.onChannelSelectedToPlayChanged")
-  m.top.channelSelected = m.VideoOverlay.linearChannelToPlay
-  m.top.ChannelSelectedUpdated = true
+  tubiLog("LineaerVideoPlayerNewScreen.onChannelSelectedToPlayChanged")
+  playContent = true
+  if m.VideoOverlay.linearChannelToPlay.needsLogin = true
+    if isLoggedInUser() = true
+      m.top.control = "stop"
+      m.top.channelSelected = m.VideoOverlay.linearChannelToPlay
+      setVideoplayerLoadingScreenBackGround(true)
+      playContent = false
+    end if
+  end if
+
+  if playContent = true
+    m.top.channelSelected = m.VideoOverlay.linearChannelToPlay
+    setVideoplayerLoadingScreenBackGround(false)
+    m.top.ChannelSelectedUpdated = true
+  end if
 End Function
 
 
@@ -967,6 +981,9 @@ Function onKeyEvent(key as string, press as boolean) as boolean
       else if m.top.state = "playing"
         '// Any button should wake the overlays as long as the video is playing
         showOverlay()
+      else if m.top.state = "stopped" and m.top.channelSelected <> invalid and m.top.channelSelected.needsLogin = true and m.Loading.visible = true
+        '// Any button should wake the overlay even when video is not playing and channel selected is locked
+        showOverlay()
       end if
     end if
 
@@ -986,4 +1003,23 @@ Function onOKPressed()
   if item <> invalid AND item.count() = 2 AND item[1] = 0
     hideOverlay()
   end if
+  if m.top.channelSelected.needsLogin = true
+    m.top.ChannelSelectedUpdated = true
+  end if
+End Function
+
+
+Function setVideoplayerLoadingScreenBackGround(set = true)
+  tubilog("LinearVideoPlayerScreen.setVideoplayerLoadingScreenBackGround")
+  if set = true
+    if m.VideoOverlay.linearChannelToPlay <> invalid and m.VideoOverlay.linearChannelToPlay.backgrounds <> invalid
+      m.backgroundImage.uri = m.VideoOverlay.linearChannelToPlay.backgrounds[0]
+      m.backgroundImage.visible = true
+    end if
+  else
+    m.backgroundImage.uri = ""
+    m.backgroundImage.visible = false
+    m.backgroundImage.animationControl = "stop"
+  end if
+
 End Function

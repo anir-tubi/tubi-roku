@@ -7,6 +7,11 @@
 ' @position: integer, the position from which to start video playback
 Function playVideoContent(content, playbackSource = "unknown", position = 0)
   tubiLog("VideoHelpers.playVideoContent")
+  if isContentLocked(content) = true
+    callbackAfterSignInParams = {"content":content, "playbackSource": playbackSource, "position": position }
+    startSignIn(AfterSignInPlayLockedContent, callbackAfterSignInParams)
+  else
+
   videoPlayer = setupVideoPlayer(content, playbackSource, position)
 
   currentScreen = getCurrentScreen()
@@ -29,7 +34,9 @@ Function playVideoContent(content, playbackSource = "unknown", position = 0)
   '//send a copy of the videoSponsorExposureId to the videoPlayer
   videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
   videoPlayer.control = "play"
+end if
 End Function
+
 
 
 ' Called when a user uses voice controls to play or presses the play button from a content screen,

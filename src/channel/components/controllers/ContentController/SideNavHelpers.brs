@@ -501,6 +501,8 @@ Function getSideNavIdAssociatedWithScreen(screen)
   '//if the new EPG live TV option is in the homescreen top nav, not side nav
   idsAssociatedWithHome[m.constants.ui.screenIds.epgScreen] = true
 
+  '// adding tournamentScreen to be associated with homescreen topnav
+  idsAssociatedWithHome[m.constants.ui.screenIds.tournamentScreen] = true
 
   if screen.id <> invalid
     if idsAssociatedWithHome[screen.id] <> invalid

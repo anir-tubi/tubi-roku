@@ -399,6 +399,7 @@ Function fetchHomeScreen(homeScreen)
     reqName = m.constants.reqNames.getHomescreen
 
     homeScreen.trackingLoadStartTime = UpTime(0)
+    homeScreen.signedIn = isLoggedInUser()
     homeScreen.unobserveFieldScoped("contentReady")
     homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
 
@@ -686,6 +687,13 @@ Function onHomeScreenContentFocused(msg)
   tubiLog("HomeScreenHelpers.onHomeScreenContentFocused")
   focusedContent = msg.getData()
   homeScreen = msg.getRoSGNode()
+
+  if focusedContent <> invalid AND focusedContent.isFIFAContent = true
+    showHideLogo(m.constants.logoType.tubiFifa)
+  else
+    showHideLogo(m.constants.logoType.tubi)
+  end if
+
   setHomeScreenAfterFocus(focusedContent, homeScreen)
 End Function
 
@@ -803,20 +811,16 @@ Function selectLinearContent(content)
   '//stop timer and tell player to go fullscreen
   stopCountdownTimer()
   if content <> invalid AND content.type = m.constants.ui.contentTypes.linear
-
     stopVideoPreviewIfPlaying() 'stop the videopreview if it is still playing.
-    if content.id <> m.constants.ui.contentIds.tvGuide
-      linearContent = getCurrentLinearContent()
-      if linearContent <> invalid AND linearContent.id <> invalid AND content.id = linearContent.id
-        '//If the user selects the linear content that is already playing, then just maximize it.
-        maximizeLinearPlayer(content)
-      else
-        '//If the user selects the linear content that is not yet playing, then stop the previous content (if any) and start playing the content.
-        stopLinearVideoContent()
-        playLinearVideoContent(content, false, homeScreen.id, true)
-      end if
+
+    linearContent = getCurrentLinearContent()
+    if linearContent <> invalid AND linearContent.id <> invalid AND content.id = linearContent.id
+      '//If the user selects the linear content that is already playing, then just maximize it.
+      maximizeLinearPlayer(content)
     else
-      showDefaultEPGScreen()
+      '//If the user selects the linear content that is not yet playing, then stop the previous content (if any) and start playing the content.
+      stopLinearVideoContent()
+      playLinearVideoContent(content, false, homeScreen.id, true)
     end if
   end if
 End Function
@@ -835,20 +839,22 @@ Function stopCountdownTimer()
     epgScreen.fullscreenCountdown = -1
   end if
 
+  tournamentScreen = getFromScreenCache(m.constants.ui.screenIds.tournamentScreen)
+  if tournamentScreen <> invalid
+    tournamentScreen.fullscreenCountdown = -1
+  end if
+
   m.playerFullscreenCountdownTimer.control = "stop"
 End Function
 
 
 Function startCountdownTimer()
   tubiLog("HomeScreenHelpers.stopCountdownTimer")
-  Screen = getCurrentScreen()
-  if Screen <> invalid AND Screen.id = m.constants.ui.screenIds.homeScreen
+  screen = getCurrentScreen()
+
+  if screen <> invalid AND (screen.id = m.constants.ui.screenIds.homeScreen OR isAnEpgScreen(screen) = true OR isTournamentScreen(screen) = true)
     stopCountdownTimer()
-    Screen.fullscreenCountdown = m.constants.timers.linearFullscreenTimeout
-    m.playerFullscreenCountdownTimer.control = "start"
-  else if Screen <> invalid AND isAnEpgScreen(Screen) = true
-    stopCountdownTimer()
-    Screen.fullscreenCountdown = m.constants.timers.linearFullscreenTimeout
+    screen.fullscreenCountdown = m.constants.timers.linearFullscreenTimeout
     m.playerFullscreenCountdownTimer.control = "start"
   end if
 End Function
@@ -890,6 +896,9 @@ Function onContentSelected(msg)
     startSignIn(onCWRowAfterSignIn)
   else if content.type = m.constants.ui.contentTypes.linear
     selectLinearContent(content)
+  else if content.type = m.constants.ui.contentTypes.navigate
+    stopVideoPreview()
+    showTournamentScreen(m.constants)
   else
     showDetailScreen(content, true)
   end if
@@ -918,6 +927,11 @@ Function onHomescreenContentReady(msg)
     if currentScreen <> invalid AND currentScreen.isSubType("HomeScreen") = true
       screenTrackingLoad(homeScreen.trackingPageInfo, loadTime)
     end if
+
+    if isFIFAIntroModalShown() = false
+      showFIFAIntroModal()
+    end if
+
   end if
 End Function
 
@@ -961,4 +975,78 @@ Function onLoadCategoriesIndex(msg)
     })
   end if
   return true
+End Function
+
+
+'// REMOVE FIFA Intro modal related code after 01-11-2023.
+' checks the "fifaIntro" in device registry
+' return boolean
+Function isFIFAIntroModalShown()
+  isModalShown = true
+
+  request = TubiRequest(m.constants.settings)
+  auth = TubiAuth(m.constants, request)
+
+  if isDuringTournament() = true
+    isModalShown = auth.getEducationalModalEntry("fifaIntro")
+  end if
+
+  ' QA TESTING PURPOSE: below block can be removed during FIFA graduation.
+  if m.constants.settings.mode <> "production" AND m.constants.settings.showFIFAIntroModalAlways = true
+    auth.clearEducationalModalEntry("fifaIntro") ' clearing the registry when showFIFAIntroModalAlways = true
+    isModalShown = false
+  end if
+
+  '// This code is to clear the fifaIntro from registry after tournament ends
+  clearFIFARelatedRegDate = CreateObject("roDateTime")
+  clearFIFARelatedRegDate.FromISO8601String(m.constants.tournament.clearRegistryDate)
+  clearFIFARelatedRegDate.ToLocalTime()
+  today = CreateObject("roDateTime")
+  today.ToLocalTime()
+  if today.asSeconds() >= clearFIFARelatedRegDate.asSeconds()
+    auth.clearEducationalModalEntry("fifaIntro")
+  end if
+
+  return isModalShown
+End Function
+
+
+Function showFifaIntroModal()
+  tubiLog("HomeScreenHelpers.showFifaIntroModal")
+
+  screenID = m.constants.ui.screenIds.homeScreen
+  homeScreen = getFromScreenCache(screenID)
+
+  if homeScreen <> invalid
+    showHideSpinner(false)
+
+    Auth = TubiAuth(m.constants, m.Request)
+    Auth.setEducationalModalEntry("fifaIntro", "true")
+
+    title = getTranslation("menu_tournament") + " 2022"
+    message = getTranslation("explore_fifa_description")
+    buttons = [getTranslation("dialog_explore_fifa"), getTranslation("dialog_got_it")]
+
+    dialogEvent = {
+      type: "dialog"
+      values: {
+        dialog_type: "INFORMATION"
+        pageOneof: m.Tracking.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
+        dialog_action: "SHOW"
+        dialog_sub_type: "fifa_intro"
+      }
+    }
+    simpleModalInfo = getSimpleModalInfo(title, message, buttons, dialogEvent, m.trackingLoggingTask, showTournamentScreenWrapper, invalid)
+
+    if simpleModalInfo <> invalid AND simpleModalInfo.buttonInfo <> invalid
+      if simpleModalInfo.buttonInfo[0] <> invalid
+        simpleModalInfo.buttonInfo[0].callbackParams = {
+          constants : m.constants
+        }
+      end if
+    end if
+    showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo, homeScreen)
+  end if
+
+
 End Function

@@ -19,6 +19,18 @@
       <!-- The mode used by info panel, one of: 'category', 'item', 'movie', 'series', 'season', 'episode' -->
       <field id="mode" type="string" alias="DetailInfoPanel.mode" />
 
+      <!-- The availabilityType used by info panel, one of: 'Upcoming', 'Replay', 'Live'-->
+      <field id="availabilityType" type="string" alias="DetailInfoPanel.availabilityType"/>
+
+      <!-- The type of the selectedContentType to show/hide like/dislike CTA-->
+      <field id="selectedContentType" type="string" />
+
+      <!-- The title of the game displayed on the info panel -->
+      <field id="fifaWorldCupTitle" type="string" alias="DetailInfoPanel.fifaWorldCupTitle" />
+
+      <!-- Indicated whether to show/hide the signIn hint -->
+      <field id="needsLoginHint" type="boolean" alias="DetailInfoPanel.needsLogIn" />
+
       <!-- The following are the strings associated with this UI element -->
       <field id="stringQueueButton" type="string"/>
       <field id="stringNoQueueButton" type="string"/>
@@ -26,6 +38,7 @@
       <field id="stringNoHistoryButton" type="string"/>
       <field id="stringSignUpButton" type="string"/>
       <field id="stringLikeDislikeButton" type="string"/>
+      <field id="stringPlayButton" type="string"/>
 
       <!-- Pass through signal to the info panel that the height/placement should be recalculated -->
       <field id="calculateInfoHeight" type="boolean" alias="DetailInfoPanel.calculateHeight" />
@@ -56,6 +69,9 @@
 
       <!-- Indicates if the video is an episode of a series -->
       <field id="isSeries" type="boolean" value="false" />
+
+      <!-- Indicates whether the user is loggedIn or not -->
+      <field id="needsLogin" type="boolean" value="false" />
 
       <!-- Indicates if the video is in the user's bookmarks/queue -->
       <field id="isBookmark" type="boolean" value="false" />
@@ -160,6 +176,10 @@
       <!-- set to true when the user wants to sign-up -->
       <field id="signUpButtonSelected" type="boolean" alwaysNotify="true" />
 
+      <!-- REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE -->
+      <!-- set to true when the user wants to see all game -->
+      <field id="seeAllGamesSelected" type="boolean" alwaysNotify="true" />
+
       <!-- mirrors RelatedGrid.itemSelected, but DetailScreen interjects before sending it to the ContentController -->
       <field id="relatedContentSelected" type="integer" alwaysNotify="true" />
 
@@ -241,7 +261,10 @@
       iconUrl="pkg:/images/icon-trailer.webp"/>
     <DetailMenuItemContentNode
       id="signUpMenuItem"/>
-
+    <!-- REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE -->
+    <DetailMenuItemContentNode
+      id="SeeAllGamesMenuItem"
+      iconUrl="pkg:/images/icon_see_all_games.png"/>
     <Poster
       id="leftChevron"
       uri="pkg:/images/left-chevron.png"

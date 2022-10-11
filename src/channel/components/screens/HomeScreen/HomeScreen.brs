@@ -159,6 +159,10 @@ Function generateTopNavContentItems(includeLinearTV = false)
   ]
   if includeLinearTV = true
     menuItemIds.push(m.constants.ui.sideNavIds.linearEPG)
+
+    if getExperimentResource("roku_fifa_wc_topnav", "roku_fifa_wc_topnav_v1", true).enabled = true
+      menuItemIds.push(m.constants.ui.sideNavIds.tournament)
+    end if
   end if
 
   parent = CreateObject("roSGNode", "ContentNode")
@@ -174,6 +178,9 @@ Function generateTopNavContentItems(includeLinearTV = false)
       item.title = getTranslation("menu_tv")
     else if id = m.constants.ui.sideNavIds.linearEPG
       item.title = getTranslation("menu_livetv")
+    else if id = m.constants.ui.sideNavIds.tournament
+      item.title = getTranslation("menu_tournament")
+      item.subText = getTranslation("text_new")
     end if
   end for
 
@@ -506,13 +513,18 @@ End Function
 Function populateInfoPanelByContent(focusedContent)
   if focusedContent <> invalid
     sType = focusedContent.type
-
     if sType = m.constants.ui.categoryTypes.linear
       populateInfoPanel(m.constants.ui.infoPanelModes.linearHomeScreen, focusedContent)
     else if sType = m.constants.ui.categoryTypes.historySignedOutUser
       populateInfoPanel(m.constants.ui.infoPanelModes.continue_watching, focusedContent)
     else if sType = m.constants.ui.categoryTypes.preview
       populateInfoPanel(m.constants.ui.infoPanelModes.vitg, focusedContent)
+    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    else if sType = m.constants.ui.contentTypes.navigate
+      populateInfoPanel(m.constants.ui.infoPanelModes.navigateSports, focusedContent)
+    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    else if sType = m.constants.ui.contentTypes.sportsEvent
+      populateInfoPanel(m.constants.ui.infoPanelModes.sportsEvent, focusedContent)
     else
       populateInfoPanel(m.constants.ui.infoPanelModes.item, focusedContent)
     end if
@@ -672,6 +684,7 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.titleLogoUri = contentNode.logoUri
+      m.InfoPanel.needsLogIn = contentNode.needsLogin AND (m.top.signedIn <> true)
       m.InfoPanel.width = 960
     else if mode = m.constants.ui.infoPanelModes.vitg
       m.InfoPanel.mode = mode
@@ -687,7 +700,7 @@ Function populateInfoPanel(mode, contentNode)
       end if
       lineOneData.releaseDate = contentNode.releaseDate
       lineOneData.length = contentNode.length
-      lineOneData.hasCC = (contentNode.hasSubtitles or not m._.empty(contentNode.subtitleTracks))
+      lineOneData.hasCC = (contentNode.hasSubtitles = true OR m._.empty(contentNode.subtitleTracks) = false)
       if contentNode.availabilityEnds <> invalid
         lineOneData.availabilityEnds = contentNode.availabilityEnds
       end if
@@ -697,17 +710,59 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.lineOneData = lineOneData
       m.InfoPanel.titleLogoUri = contentNode.titleLogoUri
       m.InfoPanel.genres = contentNode.genres
+      m.InfoPanel.needsLogIn = contentNode.needsLogin AND (m.top.signedIn <> true)
       m.InfoPanel.width = 960
     else if mode = m.constants.ui.infoPanelModes.linearHomeScreen
       m.InfoPanel.mode = mode
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
+      m.InfoPanel.needsLogIn = contentNode.needsLogin AND (m.top.signedIn <> true)
       m.InfoPanel.width = 650
     else if mode = m.constants.ui.infoPanelModes.continue_watching
       m.InfoPanel.mode = mode
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
-      m.InfoPanel.width = 960
+      m.InfoPanel.needsLogIn = contentNode.needsLogin AND (m.top.signedIn <> true)
+      m.InfoPanel.width = 650
+    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    else if mode = m.constants.ui.infoPanelModes.navigateSports
+      m.InfoPanel.mode = mode
+      m.InfoPanel.fifaWorldCupTitle = contentNode.title
+      'Fifa Worldcup description and dates are constnat when show all games is focused, so hardcoding it
+      m.InfoPanel.fifaWorldCupDescription = getTranslation("show_all_games_description")
+      lineOneData = {}
+      lineOneData.availabilityType = m.constants.ui.categoryIds.fifawc
+      lineOneData.matchTime = getTranslation("show_all_games_gameInfo")
+      lineOneData.hasFifaWorldCupCC = contentNode.hasSubtitles
+      'Showing 4k badge by default for show all CTA Infopanel
+      lineOneData.hasFifaWorldCup4k = true
+      m.InfoPanel.lineOneData = lineOneData
+    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    else if mode = m.constants.ui.infoPanelModes.sportsEvent
+
+      hasVideoresources = contentNode.hasVideoresources
+      airDatetime = contentNode.airDatetime
+      info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
+      matchTime = info.matchTime
+      badgeText = info.badgeText
+      availabilityType = info.availabilityType
+
+      m.InfoPanel.fifaWorldCupTitle = contentNode.title
+      lineOneData = {}
+      lineOneData.availabilityType = availabilityType
+      lineOneData.roundGroupInfo = contentNode.roundGroupInfo
+      lineOneData.matchTime = matchTime
+      lineOneData.hasFifaWorldCupCC = (contentNode.hasSubtitles = true OR m._.empty(contentNode.subtitleTracks) = false)
+      if contentNode.has4k <> invalid and contentNode.has4k = true
+        lineOneData.hasFifaWorldCup4k = contentNode.has4k
+      end if
+      lineOneData.badgeText = badgeText
+      lineOneData.length = contentNode.length
+      lineOneData.fifaWorldCupRating = contentNode.RATING
+      m.InfoPanel.lineOneData = lineOneData
+      m.InfoPanel.needsLogIn = contentNode.needsLogin AND (m.top.signedIn <> true)
+      m.InfoPanel.availabilityType = availabilityType
+      m.InfoPanel.mode = mode
     end if
 
     m.InfoPanel.calculateHeight = true

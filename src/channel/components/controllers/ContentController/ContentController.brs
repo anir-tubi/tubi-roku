@@ -55,6 +55,7 @@ Function init()
   m.logo = m.logoGroup.findNode("tubiLogo")
   m.logoKids = m.logoGroup.findNode("tubiKidsLogo")
   m.logoEspanol = m.logoGroup.findNode("tubiEspanolLogo")
+  m.logoFIFA = m.logoGroup.findNode("tubiFIFALogo")
   m.clock = m.top.findNode("clock")
   m.spinner = m.top.findNode("ContentControllerSpinner")
   m.LinearVideoPlayerSpinner = m.top.findNode("LinearVideoPlayerSpinner")
@@ -114,6 +115,9 @@ Function init()
     m.logoKids.width = 259
     m.logoKids.translation = [1566, m.logoKids.translation[1]]
   end if
+  'this variable is used to stop unnessaccary execution of the entire showHideLogo function when content been focused.
+  m.logoType = m.constants.logoType.tubi
+
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
   m.marketingBackgroundUri = m.constants.ui.uris.marketingBackground
@@ -878,7 +882,7 @@ Function setUiMode(mode)
     m.sideNav.uiMode = mode
     m.backgroundGroup.kidsMode = false
     m.trackingLoggingTask.analyticsAppMode = "DEFAULT_MODE"
-    showHideLogo("tubi")
+    showHideLogo(m.constants.logoType.tubi)
 
   else if mode = m.constants.ui.modes.kids
     'kids
@@ -910,7 +914,7 @@ Function setUiMode(mode)
     m.sideNav.uiMode = mode
     m.backgroundGroup.kidsMode = false
     m.trackingLoggingTask.analyticsAppMode = "LATINO_MODE"
-    showHideLogo("tubi_espanol")
+    showHideLogo(m.constants.logoType.tubiEspanol)
   end if
 
   ' How to access uiMode:
@@ -984,7 +988,7 @@ Function setCommonKidsModeElements()
     if m.global.theme = invalid OR m.global.theme.id <> m.constants.ui.themeIDs.kidsMode
       m.global.theme = m.constants.ui.themes.kidsMode
     end if
-    showHideLogo("tubi_kids")
+    showHideLogo(m.constants.logoType.tubiKids)
     m.backgroundGroup.kidsMode = true
     m.trackingLoggingTask.analyticsAppMode = "KIDS_MODE"
     tellScreensIfKidsModeBeSentToServer()
@@ -1240,6 +1244,9 @@ Function setContentToRefresh(sID)
     if screen.content <> invalid AND screen.content.validUntil <> invalid
       screen.content.validUntil = 0
       return true
+    else if  isAnEpgScreen(screen) = true AND screen.timeGridContent <> invalid AND screen.timeGridContent.getChild(0).validUntil <> invalid
+      screen.timeGridContent.getChild(0).validUntil = 0
+      return true
     end if
   end if
   return false
@@ -1268,6 +1275,7 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
+  setContentToRefresh(m.constants.ui.screenIds.tournamentScreen)
 End Function
 
 
@@ -1772,11 +1780,14 @@ Function resumeApp()
       associatedScreenId = currentScreen.associatedScreenId
       originalLinearContent = currentScreen.originalContent
       playLinearVideoContent(originalLinearContent, false, associatedScreenId)
-    else if isAnEPGScreen(currentScreen)
+    else if isAnEPGScreen(currentScreen) = true
       ' if current Screen epg Screen,  It will start counting the remaining seconds and full videoscreen will take over when it reaches 0
       ' without content which will be a blank screen. To avoid it, stop the counter and refresh the EPGScreen videoplay
       stopCountdownTimer()
-      currentScreen.refreshEPGScreenVideoPlay = false
+      refreshEPGScreenVideoPlay(false, currentScreen)
+    else if isTournamentScreen(currentScreen) = true
+      stopCountdownTimer()
+      refreshTournamentScreenVideoPlay(false, currentScreen)
     end if
 
   end if
@@ -1807,18 +1818,24 @@ End Function
 Function onFullscreenCountdown()
   tubiLog("ContentController.onFullscreenCountdown")
   screen = getCurrentScreen()
-  if screen <> invalid
-    if screen.id = m.constants.ui.screenIds.homeScreen OR isAnEpgScreen(screen) = true
-      bLinearOnHomeScreen = (screen.id = m.constants.ui.screenIds.homeScreen)
 
-      nCurrentCount = screen.fullscreenCountdown
-      nNewCount = nCurrentCount - 1
-      screen.fullscreenCountdown = nNewCount
-      if nNewCount <= 0
-        if bLinearOnHomeScreen = true
-          selectLinearContent(screen.contentFocused)
-        else
-          selectLinearContent(screen.linearChannelToPlay)
+  if screen <> invalid
+    if screen.id = m.constants.ui.screenIds.homeScreen OR isAnEpgScreen(screen) = true OR isTournamentScreen(screen) = true
+      if screen.id = m.constants.ui.screenIds.homeScreen
+        contentToPlay = screen.contentFocused
+      else
+        contentToPlay = screen.linearChannelToPlay
+      end if
+
+      if isContentLocked(contentToPlay) = true
+        'if Content is locked and do not show countDown.
+        screen.fullscreenCountdown = -1
+      else
+        nCurrentCount = screen.fullscreenCountdown
+        nNewCount = nCurrentCount - 1
+        screen.fullscreenCountdown = nNewCount
+        if nNewCount <= 0
+          selectLinearContent(contentToPlay)
         end if
       end if
     end if
@@ -1858,26 +1875,41 @@ End Function
           ' "tubi_fifa" = show FIFA + tubi logo
           ' "hide" = hide all logos
 Function showHideLogo(logoType)
-  tubilog("ContentController.showHideLogo")
 
-  if logoType = "hide"
-    m.logoEspanol.visible = false
-    m.logoKids.visible = false
-    m.logo.visible = false
-  else
-    if logoType = "tubi_kids"
-      m.logoKids.visible = true
-      m.logo.visible = false
+  if m.logoType <> logoType
+    tubilog("ContentController.showHideLogo")
+
+    if logoType = m.constants.logoType.hide
       m.logoEspanol.visible = false
-    else if logoType = "tubi_espanol"
-      m.logoEspanol.visible = true
       m.logoKids.visible = false
       m.logo.visible = false
+      m.logoFIFA.visible = false
     else
-      m.logo.visible = true
-      m.logoEspanol.visible = false
-      m.logoKids.visible = false
+      if logoType = m.constants.logoType.tubiKids
+        m.logoKids.visible = true
+        m.logo.visible = false
+        m.logoEspanol.visible = false
+        m.logoFIFA.visible = false
+      else if logoType = m.constants.logoType.tubiEspanol
+        m.logoEspanol.visible = true
+        m.logoKids.visible = false
+        m.logo.visible = false
+        m.logoFIFA.visible = false
+      else if logoType = m.constants.logoType.tubiFifa
+        m.logoEspanol.visible = false
+        m.logoKids.visible = false
+        m.logo.visible = false
+        m.logoFIFA.visible = true
+      else 'default is tubi logo
+        m.logo.visible = true
+        m.logoEspanol.visible = false
+        m.logoKids.visible = false
+        m.logoFIFA.visible = false
+      end if
     end if
+
+    m.logoType = logoType
+
   end if
 
 End Function

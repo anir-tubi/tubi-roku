@@ -358,7 +358,7 @@ Function tubiBookmarks_handleInitialBookmarks_test()
   serverBookmarks = {
     "total_count": 2,
     "more": false,
-    "items": [
+    "queues": [
       {
         "content_id": 321251,
         "content_type": "movie",

@@ -14,78 +14,85 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
     ' a variety of unexpected and unwanted callbacks, as the passed in content potentially exists on a number
     ' of fields that are being observed (for instance: HomeScreen.contentFocused)
     clonedContent = content.clone(true)
+    if isContentLocked(clonedContent)
+      if bMinimized = false
+        callbackAfterSignInParams = {"content": content, "bMinimized": false, "sAssociatedScreenID": clonedContent.associatedScreenID, "bAllowTransportToAppear": bAllowTransportToAppear}
+        startSignIn(afterSignInPlayLockedLinearContent, callbackAfterSignInParams)
+      end if
+    else 'Content is not locked so just play the content
 
-    videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
+      videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
 
-    if videoPlayer = invalid
-      videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerScreen")
-      videoPlayer.observeFieldScoped("navigateToEPGScreen", "onLinearVideoPlayerRequestingTVGuide")
-      videoPlayer.id = m.constants.ui.screenIds.linearVideoPlayerScreen
+      if videoPlayer = invalid
+        videoPlayer = CreateObject("roSGNode", "LinearVideoPlayerScreen")
+        videoPlayer.observeFieldScoped("navigateToEPGScreen", "onLinearVideoPlayerRequestingTVGuide")
+        videoPlayer.id = m.constants.ui.screenIds.linearVideoPlayerScreen
 
-      ' onVideoPlayerVisibleChange exists in ContentController
-      videoPlayer.observeFieldScoped("visible", "onLinearVideoPlayerVisibleFullscreenChange")
-      videoPlayer.observeFieldScoped("refreshChannels", "onChannelsRequested")
-      videoPlayer.observeFieldScoped("fullscreen", "onLinearVideoPlayerVisibleFullscreenChange")
-      videoPlayer.observeFieldScoped("userDisplayingChannelGuide", "onChannelGuideVisibleStateChangedByUser")
-      videoPlayer.observeFieldScoped("channelSelectedUpdated", "onLinearChannelSelectedFromGuide")
-      videoPlayer.observeFieldScoped("linearOverlayNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-      videoPlayer.observeFieldScoped("linearOverlayComponentInteractionInfo", "onComponentInteractionInfoChange")
-      videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+        ' onVideoPlayerVisibleChange exists in ContentController
+        videoPlayer.observeFieldScoped("visible", "onLinearVideoPlayerVisibleFullscreenChange")
+        videoPlayer.observeFieldScoped("refreshChannels", "onChannelsRequested")
+        videoPlayer.observeFieldScoped("fullscreen", "onLinearVideoPlayerVisibleFullscreenChange")
+        videoPlayer.observeFieldScoped("userDisplayingChannelGuide", "onChannelGuideVisibleStateChangedByUser")
+        videoPlayer.observeFieldScoped("channelSelectedUpdated", "onLinearChannelSelectedFromGuide")
+        videoPlayer.observeFieldScoped("linearOverlayNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+        videoPlayer.observeFieldScoped("linearOverlayComponentInteractionInfo", "onComponentInteractionInfoChange")
+        videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
 
-      initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
-      setInScreenCache(videoPlayer)
-    end if
+        initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
+        setInScreenCache(videoPlayer)
+      end if
 
-    unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
-    videoPlayer.associatedScreenID = sAssociatedScreenID
-    videoPlayer.allowTransportToAppear = bAllowTransportToAppear
+      unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
+      videoPlayer.associatedScreenID = sAssociatedScreenID
+      videoPlayer.allowTransportToAppear = bAllowTransportToAppear
 
-    ' set general observers for all content
-    videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
-    if videoPlayer.visible = false
-      videoPlayer.visible = true
-    end if
-    ' it's necessary to push the screen after the content has been set on the videoPlayer component,
-    ' so NavigateToPage and PageLoad events contain the necessary content id information
+      ' set general observers for all content
+      videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
+      if videoPlayer.visible = false
+        videoPlayer.visible = true
+      end if
+      ' it's necessary to push the screen after the content has been set on the videoPlayer component,
+      ' so NavigateToPage and PageLoad events contain the necessary content id information
 
-    bLinearPlayerPlayingThisContent = isLinearPlayerPlayingThisContent(clonedContent)
-    if bLinearPlayerPlayingThisContent = false
-      videoPlayer.originalContent = content
-      videoPlayer.content = clonedContent
-      videoPlayer.updateContent = true
-    end if
-
-    if bMinimized = false
-      maximizeLinearPlayer(clonedContent)
-    else
-      '//play at minimized state
-      showHideLinearVideoPlayerSpinner(true)
-      videoPlayer.loading = true
-      animateLinearVideoPlayerToMinState(0, false)
-    end if
-
-    if bLinearPlayerPlayingThisContent = false
-      ' In order to prepare the linear stream, a number of actions need to be taken
-      ' 1) add the rainmaker parameters to the stream url - YoSpace will make calls to rainmaker in order to
-      '    to stitch the ads and needs the rainmaker parameters to make the rainamaker requests
-      ' 2) fetch the response from the hls manifest and parse out the YoSpace "analtyics url" which is the url
-      '    that will be used to poll for ads
-      ' 3) compose the final stream url from the "analytics url" and the original stream url found in the
-      '    matrix/homescreen response
-      ' 4) pass the content with the updated stream url to the linear video player
-
-      ' add ad params to video urls
-      updatedVideoResources = getUpdatedLinearVideoResources(clonedContent)
-      clonedContent.videoResources = updatedVideoResources
-
-      streamUrl = getLiveUrlFromResources(clonedContent)
-      if streamUrl <> invalid
-        ' store the content on videoPlayer so it can be retrieved after the manifest is fetched
+      bLinearPlayerPlayingThisContent = isLinearPlayerPlayingThisContent(clonedContent)
+      if bLinearPlayerPlayingThisContent = false
+        videoPlayer.originalContent = content
         videoPlayer.content = clonedContent
-        getLiveStreamManifest(streamUrl)
+        videoPlayer.updateContent = true
+      end if
+
+      if bMinimized = false
+        maximizeLinearPlayer(clonedContent)
       else
-        ' no stream url so show an error
-        reactToLinearVideoPlayerErrorState()
+        '//play at minimized state
+        showHideLinearVideoPlayerSpinner(true)
+        videoPlayer.loading = true
+        animateLinearVideoPlayerToMinState(0, false)
+      end if
+
+      if bLinearPlayerPlayingThisContent = false
+        ' In order to prepare the linear stream, a number of actions need to be taken
+        ' 1) add the rainmaker parameters to the stream url - YoSpace will make calls to rainmaker in order to
+        '    to stitch the ads and needs the rainmaker parameters to make the rainamaker requests
+        ' 2) fetch the response from the hls manifest and parse out the YoSpace "analtyics url" which is the url
+        '    that will be used to poll for ads
+        ' 3) compose the final stream url from the "analytics url" and the original stream url found in the
+        '    matrix/homescreen response
+        ' 4) pass the content with the updated stream url to the linear video player
+
+        ' add ad params to video urls
+        updatedVideoResources = getUpdatedLinearVideoResources(clonedContent)
+        clonedContent.videoResources = updatedVideoResources
+
+        streamUrl = getLiveUrlFromResources(clonedContent)
+        if streamUrl <> invalid
+          ' store the content on videoPlayer so it can be retrieved after the manifest is fetched
+          videoPlayer.content = clonedContent
+          getLiveStreamManifest(streamUrl)
+        else
+          ' no stream url so show an error
+          reactToLinearVideoPlayerErrorState()
+        end if
       end if
     end if
   end if
@@ -435,6 +442,7 @@ Function stopAndHideLinearVideoPlayer()
     stopLinearVideoContent()
     unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
     videoPlayer.visible = false
+    videoPlayer.content = invalid
   end if
 End Function
 

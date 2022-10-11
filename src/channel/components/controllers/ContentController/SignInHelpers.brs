@@ -3,7 +3,8 @@
 '
 ' Defer to the sign-in controller for sign in experience
 ' @callbackAfterSignIn: function, the function to run after the signIn process is complete.
-Function startSignIn(callbackAfterSignIn=invalid)
+' @callbackAfterSignInParams: AA of parameters to be passed to callback function after sign In.
+Function startSignIn(callbackAfterSignIn=invalid , callbackAfterSignInParams = invalid)
 
   tubiLog("SignInHelpers.startSignIn")
 
@@ -13,6 +14,7 @@ Function startSignIn(callbackAfterSignIn=invalid)
   end if
 
   m.callbackAfterSignIn = callbackAfterSignIn
+  m.callbackAfterSignInParams = callbackAfterSignInParams
   showRFIScreen()
 
 End Function
@@ -530,6 +532,7 @@ Function onPostSignInAuthInfoUpdated()
   if (shouldShowAgeGate() AND authInfo <> invalid AND authInfo.hasAge <> true)
     m.spinner.visible = false
     signInInfo = invalid
+
     if authInfo <> invalid
       signInInfo = {}
       signInInfo.email  = authInfo.email
@@ -537,10 +540,19 @@ Function onPostSignInAuthInfoUpdated()
       signInInfo.gender = authInfo.gender
     end if
     showAgeVerificationScreenAtSignIn(signInInfo)
+
   else if m.callbackAfterSignIn <> invalid
     callbackAfterSignIn = m.callbackAfterSignIn
     m.callbackAfterSignIn = invalid ' setting to invalid to avoid future callbacks
-    callbackAfterSignIn()
+
+    if m.callbackAfterSignInParams <> invalid
+      callbackAfterSignInParams = m.callbackAfterSignInParams
+      m.callbackAfterSignInParams = invalid
+      callbackAfterSignIn(callbackAfterSignInParams)
+    else
+      callbackAfterSignIn()
+    end if
+
   else
     ' this should not happen but start the channel in case it somehow does
     startChannel()
@@ -616,7 +628,8 @@ Function onSignOutCompleted()
 
   setContentToRefreshAllPersonalizedScreens()
   setSideNavSignedInItem(authInfo)
-
+  'clear the linearVideoplayer so that locked content will not get played.
+  stopAndHideLinearVideoPlayer()
   startChannel()
 End Function
 
@@ -714,7 +727,6 @@ Function onDislikeAfterSignIn()
     refreshDetailScreenContent(currentScreen)
   end if
 End Function
-
 
 
 ' onCWRowAfterSignIn - occurs after activation success via CWRow on homescreen
@@ -1047,4 +1059,29 @@ Function onOkButtonClickedOnLinkExpired()
     }
   }
   m.trackingLoggingTask.trackEvent = dialogEvent
+End Function
+
+
+Function afterSignInPlayLockedLinearContent(callbackAfterSignInParams)
+  tubilog("SignInHelpers.afterSignInPlayLockedLinearContent")
+  popScreenAfterSignInProcess()
+  if callbackAfterSignInParams <> invalid
+    playLinearVideoContent(callbackAfterSignInParams.content, callbackAfterSignInParams.bMinimized, callbackAfterSignInParams.AssociatedScreenID, callbackAfterSignInParams.bAllowTransportToAppear)
+  end if
+  showHideSpinner(false)
+  setContentToRefreshAllPersonalizedScreens(true)
+End Function
+
+
+Function AfterSignInPlayLockedContent(callbackAfterSignInParams)
+  tubilog("SignInHelpers.AfterSignInPlayLockedContent")
+
+  popScreenAfterSignInProcess()
+
+  if callbackAfterSignInParams <> invalid
+    playVideoContent(callbackAfterSignInParams.content, callbackAfterSignInParams.playbackSource, callbackAfterSignInParams.position)
+    refreshAllDetailScreens()
+    setContentToRefreshAllPersonalizedScreens(true)
+  end if
+  showHideSpinner(false)
 End Function

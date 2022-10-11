@@ -10,6 +10,7 @@ Function TubiAuth(constants, request)
     authRegSection: authRegSection
     firstVisitRegSection: "visit"
     guestUserHasAgeRegSection: "has_age"
+    educationalModal: "educationalModal"
 
     constants: constants
     request: request
@@ -32,6 +33,9 @@ Function TubiAuth(constants, request)
     setGuestUserHasAgeInfo: tubiAuth_setGuestUserHasAgeInfo
     deleteGuestUserHasAgeInfo: tubiAuth_deleteGuestUserHasAgeInfo
     setEnableVideoPreview: tubiAuth_setEnableVideoPreview
+    getEducationalModalEntry: tubiAuth_getEducationalModalEntry
+    setEducationalModalEntry: tubiAuth_setEducationalModalEntry
+    clearEducationalModalEntry: tubiAuth_clearEducationalModalEntry
 
 
     'private methods
@@ -540,6 +544,37 @@ Function tubiAuth_setFirstVisit()
   daysFromEpoch = Int(secondsFromEpoch / 60 / 60 / 24)
   m.regWrite("firstVisit", daysFromEpoch.toStr(), m.firstVisitRegSection)
   return daysFromEpoch
+End Function
+
+
+'reads device registry for key passed in educationalModal registry section
+'returns boolean value based on registry entry
+Function tubiAuth_getEducationalModalEntry(key="")
+  if key = ""
+    return true
+  end if
+  isModalShown = m.regRead(key, m.educationalModal)
+  if isModalShown <> invalid
+    return true
+  else
+    return false
+  end if
+End Function
+
+
+'writes device registry for name passed in educationalModal registry section
+Function tubiAuth_setEducationalModalEntry(key=invalid, value="true")
+  if key <> invalid
+    m.regWrite(key, value, m.educationalModal)
+  end if
+End Function
+
+
+'clears device registry for name passed in educationalModal registry section
+Function tubiAuth_clearEducationalModalEntry(key=invalid)
+  if key <> invalid
+    m.regDelete(key, m.educationalModal)
+  end if
 End Function
 
 

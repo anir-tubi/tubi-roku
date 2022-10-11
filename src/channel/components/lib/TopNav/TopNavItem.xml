@@ -17,7 +17,7 @@
 
     <field id="boundingRect" type="assocarray"/>
   </interface>
-  <children> 
+  <children>
     <Label
       id="BottomLabel"
       translation="[36, 23]"

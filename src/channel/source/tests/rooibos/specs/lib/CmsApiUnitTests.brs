@@ -458,7 +458,7 @@ Function cmsApi_categoryReqInfo_test()
     "x-client-version"
   ]
 
-  categoryUrl = m.cmsApi.constants.urls.tensor.channel + "/my_category"
+  categoryUrl = m.cmsApi.constants.urls.tensor.container + "/my_category"
   categoryOptions = {
     params: {
       "app_id": m.cmsApi.constants.settings.shortAppName

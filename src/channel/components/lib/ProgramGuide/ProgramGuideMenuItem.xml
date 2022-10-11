@@ -52,21 +52,29 @@
         uri="pkg:/fonts/Vaud-SemiBold.ttf"
         size="24" />
     </Label>
-    <Label
-      id="programString"
-      color="0xFFFFFFFF"
+
+    <LayoutGroup
+      id="titleLockGroup"
+      layoutDirection="horiz"
       translation="[24,54]"
-      height="36"
-      opacity="0.45"
-      horizAlign="left"
-      ellipsizeOnBoundary="true"
-      maxLines="1"
-      vertAlign="center">
-      <Font
-        id="titleFont"
-        role="font"
-        uri="pkg:/fonts/Vaud-Bold.ttf"
-        size="30" />
-    </Label>
+      itemSpacings="[12]">
+
+      <Label
+        id="programString"
+        color="0xFFFFFFFF"
+        translation="[24,54]"
+        height="36"
+        opacity="0.45"
+        horizAlign="left"
+        ellipsizeOnBoundary="true"
+        maxLines="1"
+        vertAlign="center">
+        <Font
+          id="titleFont"
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="30" />
+      </Label>
+    </LayoutGroup>
   </children>
 </component>

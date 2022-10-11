@@ -27,7 +27,7 @@ End Function
 Function parseEPGProgramsSuccess(fullResponse, reqInfo)
   translate = TubiMetadataTranslate(m.constants)
   parsedResponse = fullResponse.data
-  epgProgramsResponse = translate.translateEPGPrograms(parsedResponse, reqInfo.requestorID )
+  epgProgramsResponse = translate.translateEPGPrograms(parsedResponse, reqInfo.requestorID, reqInfo.isSignedInUser )
   return epgProgramsResponse
 End Function
 

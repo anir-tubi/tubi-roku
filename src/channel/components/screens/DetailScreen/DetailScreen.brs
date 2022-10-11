@@ -12,6 +12,8 @@ Function init()
   m.ResumeMenuItem = m.top.findNode("ResumeMenuItem")
   m.PlayMenuItem = m.top.findNode("PlayMenuItem")
   m.LikeMenuItem = m.top.findNode("LikeMenuItem")
+  ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+  m.SeeAllGamesMenuItem = m.top.findNode("SeeAllGamesMenuItem")
   m.DislikeMenuItem = m.top.findNode("DislikeMenuItem")
   m.LikeDislikeMenuItem = m.top.findNode("LikeDislikeMenuItem")
   m.EpisodesMenuItem = m.top.findNode("EpisodesMenuItem")
@@ -29,10 +31,12 @@ Function init()
   m.AnimationGroup = m.top.findNode("AnimationGroup")
   m.signUpMenuItem = m.top.findNode("signUpMenuItem")
   m.signUpMenuItem.iconUrl = "pkg:/images/icon-sign-in.webp"
+
   m.top.observeFieldScoped("removeSignupButton", "onRemoveSignupButton")
   m.top.observeFieldScoped("stringSignUpButton", "onStringChange")
   m.top.observeFieldScoped("length", "onLengthChange")
   m.top.observeFieldScoped("isSeries", "onIsSeries")
+  m.top.observeFieldScoped("availabilityType", "onAvailabilityTypeChange")
   m.top.observeFieldScoped("isInKidsMode", "onIsInKidsMode")
   m.top.observeFieldScoped("isBookmark", "onIsBookmark")
   m.top.observeFieldScoped("likeDislikeState", "onLikeDislikeStateChanged")
@@ -50,6 +54,7 @@ Function init()
   m.top.observeFieldScoped("stringChannelButton", "onStringChange")
   m.top.observeFieldScoped("stringNoHistoryButton", "onStringChange")
   m.top.observeFieldScoped("stringLikeDislikeButton", "onStringChange")
+  m.top.observeFieldScoped("stringPlayButton", "onStringChange")
 
 
   m.Menu.observeFieldScoped("itemSelected", "onMenuItemSelected")
@@ -102,13 +107,18 @@ End Function
 
 ' @param bSendExposureEvent: Boolean, Should the experiment exposure event be sent? true=send event.
 Function isLikeDislikeEnabled(bSendExposureEvent = false)
-  bLikeDislikeEnabled = (getExperimentResource("roku_title_reactions", "roku_title_reactions_v3", bSendExposureEvent).enabled = true or isLoggedInUser() = true)
+  bLikeDislikeEnabled = (getExperimentResource("roku_title_reactions", "roku_title_reactions_v3", bSendExposureEvent).enabled = true OR isLoggedInUser() = true)
   return bLikeDislikeEnabled
 End Function
 
 
 Function setDetailStrings()
-  m.PlayMenuItem.title = getTranslation("screenDetails_button_play")
+  if isLoggedInUser() = false
+    m.PlayMenuItem.title = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
+  else
+    m.PlayMenuItem.title = getTranslation("screenDetails_button_play")
+  end if
+
   m.LikeMenuItem.title = getTranslation("screenDetails_button_like")
   m.DislikeMenuItem.title = getTranslation("screenDetails_button_dislike")
   m.ResumeMenuItem.title = getTranslation("screenDetails_button_resume")
@@ -116,6 +126,8 @@ Function setDetailStrings()
   m.WatchTrailerMenuItem.title = getTranslation("screenDetails_button_trailer")
   RelatedRowLabelContent = m.top.findNode("RelatedRowLabelContent")
   RelatedRowLabelContent.title = getTranslation("screenDetails_relatedTitles")
+  ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+  m.SeeAllGamesMenuItem.title = getTranslation("screenDetails_button_see_all_games")
 End Function
 
 
@@ -128,11 +140,24 @@ End function
 
 Function changeButtonText(sButtonStringId, sButtonText)
   stringNode = invalid
-
   if sButtonStringId = "stringQueueButton"
     stringNode = m.AddQueueMenuItem
+
+    if sButtonText = getTranslation("screenDetails_button_queue")
+      stringNode.iconUrl = "pkg:/images/icon-add-to-queue.webp"
+    else
+      stringNode.iconUrl = "pkg:/images/set_reminder.png"
+    end if
+
   else if sButtonStringId = "stringNoQueueButton"
     stringNode = m.RemoveQueueMenuItem
+
+    if sButtonText = getTranslation("screenDetails_button_noQueue")
+      stringNode.iconUrl = "pkg:/images/icon-remove-from-queue.webp"
+    else
+      stringNode.iconUrl = "pkg:/images/reminder_set.png"
+    end if
+
   else if sButtonStringId = "stringChannelButton"
     stringNode = m.ChannelMenuItem
   else if sButtonStringId = "stringNoHistoryButton"
@@ -142,10 +167,14 @@ Function changeButtonText(sButtonStringId, sButtonText)
   else if sButtonStringId = "stringLikeDislikeButton"
     stringNode = m.LikeDislikeMenuItem
     setVisibilityOfSecondaryMenu()
+
     if sButtonText = getTranslation("screenDetails_button_changingRating")
       '//if the rating is changing, then change icon to default like button
       stringNode.iconUrl = "pkg:/images/icon-like.webp"
     end if
+    
+  else if sButtonStringId = "stringPlayButton"
+    stringNode = m.PlayMenuItem
   end if
 
   if stringNode <> invalid
@@ -160,18 +189,19 @@ Function changeButtonText(sButtonStringId, sButtonText)
     ' Adjust the width of the menu if the Channel name, the signin button (if signin conditions), or the like/dislike button (if signin conditions) is too long for the default width
     isSignUpButton = (sButtonStringId = "stringSignUpButton" AND isLoggedInUser() = false AND isNewUser() = false)
     isLikeButton = (sButtonStringId = "stringLikeDislikeButton" AND (isLikeDislikeEnabled() = true))
-    if sButtonStringId = "stringChannelButton" or isSignUpButton = true or isLikeButton = true
+    if sButtonStringId = "stringChannelButton" OR isSignUpButton = true OR isLikeButton = true
       tempChannelMenuItem = CreateObject("roSGNode", "DetailMenuItem")
       tempChannelMenuItem.itemContent = stringNode
 
       potentialWidth = tempChannelMenuItem.calculatedTextWidth + tempChannelMenuItem.leftTextPadding + tempChannelMenuItem.rightTextPadding
       if potentialWidth > m.defaultMenuWidth AND potentialWidth > m.Menu.itemSize[0]
         m.Menu.itemSize = [potentialWidth, m.Menu.itemSize[1]]
-
         '//move SecondaryMenu to ensure it is not overlapping the Menu
         m.SecondaryMenu.translation = [potentialWidth + 200, m.SecondaryMenu.translation[1]]
       end if
+
     end if
+
   end if
 
 End Function
@@ -191,7 +221,9 @@ Function refocusMenuItem()
       if jumpToItem >= 0
         m.Menu.jumpToItem = jumpToItem
       end if
+
     end if
+
   end if
   focusMenu(true)
 End Function
@@ -227,7 +259,9 @@ Function onScreenFocusChange()
         m.RelatedContentGroup.visible = false
         m.top.refreshRelatedContent = true
       end if
+
     end if
+
   end if
   ' force a background update
   m.top.backgroundUriList = m.top.backgroundUriList
@@ -251,6 +285,7 @@ Function onResumePointChange()
   else if resumeIndex > -1 AND m.top.resumePoint = 0
     m.Menu.content.removeChildIndex(resumeIndex)
   end if
+
 End Function
 
 
@@ -271,6 +306,7 @@ Function onIsBookmark()
         else
           m.Menu.content.appendChild(m.AddQueueMenuItem)
         end if
+
       else if removeQueueIndex > -1
         'both add to queue and remove from queue items exist... this shouldn't happen
         m.Menu.content.removeChildIndex(removeQueueIndex)
@@ -285,11 +321,14 @@ Function onIsBookmark()
         else
           m.Menu.content.appendChild(m.RemoveQueueMenuItem)
         end if
+
       else if addQueueIndex > -1
         'both add to queue and remove from queue items exist... this shouldn't happen
         m.Menu.content.removeChildIndex(m.AddQueueMenuItem)
       end if
+
     end if
+
   end if
 End Function
 
@@ -300,10 +339,10 @@ End Function
 
 
 Function changeLikeDislikeButtonText()
-  if isLikeDislikeEnabled() = true
+  if isLikeDislikeEnabled() = true AND m.top.selectedContentType <> m.constants.ui.contentTypes.sportsEvent
     sButtonText = ""
     sIconUrl = ""
-    if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked or m.top.likeDislikeState = m.constants.ui.likeDislikeStates.disliked
+    if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked OR m.top.likeDislikeState = m.constants.ui.likeDislikeStates.disliked
       if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked
         '//The Like State is "liked", so display liked state
         sButtonText = getTranslation("screenDetails_button_liked")
@@ -319,7 +358,9 @@ Function changeLikeDislikeButtonText()
         if m.Menu.isInFocusChain() = true AND focusedMenuItem <> invalid AND focusedMenuItem.id = "LikeDislikeMenuItem"
           sButtonText = sButtonText + getTranslation("screenDetails_button_like_instructions")
         end if
+
       end if
+
     else if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.changing
       sButtonText = getTranslation("screenDetails_button_changingRating")
       sIconUrl = m.LikeDislikeMenuItem.iconUrl '//Keep the icon as it is while the like state is set to changing
@@ -375,7 +416,8 @@ Function onIsSeries()
   end if
 
   '//Change the button order of the signup button depending on isSeries state
-  if isLoggedInUser() = false AND isNewUser() = false
+  if isLoggedInUser() = false AND isNewUser() = false AND m.top.availabilityType <> m.constants.ui.contentTimings.upcoming
+
     if isSeries = true AND signUpIndex = 1
       'Remove the signup button at 1st index and make signup button as default for series.
       addRemoveMenuItem(false, signUpIndex)
@@ -386,9 +428,52 @@ Function onIsSeries()
       addRemoveMenuItem(false, signUpIndex)
       addRemoveMenuItem(true, -1, m.signUpMenuItem, menuItems)
     end if
+
   end if
 
+
   addRemoveMenuItem(m.top.isSeries, episodeListIndex, m.EpisodesMenuItem, menuItems)
+End Function
+
+
+' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+Function onAvailabilityTypeChange()
+  tubiLog("DetailScreen.onAvailabilityTypeChange")
+  availabilityType = m.top.availabilityType
+  menuItems = []
+  signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
+  likeDisLikeIndex =  m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
+
+  if UCase(availabilityType) = UCase(m.constants.ui.contentTimings.replay)
+    if likeDisLikeIndex <> invalid
+      addRemoveMenuItem(false, likeDisLikeIndex)
+    end if
+
+    if signUpIndex <> invalid
+      addRemoveMenuItem(false, signUpIndex)
+    end if
+
+    menuItems = [m.AddQueueMenuItem]
+    if isFifaWorldCupTopNavEnabled() = true
+      addRemoveMenuItem(true, -1, m.SeeAllGamesMenuItem, menuItems)
+    end if
+  else if UCase(availabilityType) = UCase(m.constants.ui.contentTimings.upcoming)
+    if likeDisLikeIndex <> invalid
+      addRemoveMenuItem(false, likeDisLikeIndex)
+    end if
+
+    if signUpIndex <> invalid
+      addRemoveMenuItem(false, signUpIndex)
+    end if
+
+    playIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.PlayMenuItem.id)
+    addRemoveMenuItem(false, playIndex)
+    menuItems = [m.AddQueueMenuItem]
+    if isFifaWorldCupTopNavEnabled() = true
+      addRemoveMenuItem(true, -1, m.SeeAllGamesMenuItem, menuItems)
+    end if
+  end if
+
 End Function
 
 
@@ -397,15 +482,18 @@ Function onRemoveSignupButton()
   if signUpIndex <> invalid
     addRemoveMenuItem(false, signUpIndex)
 
-    if m.top.isInKidsMode = false
+    if m.top.isInKidsMode = false AND m.top.selectedContentType <> m.constants.ui.contentTypes.sportsEvent
       '//add like/dislike button
       nLikeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
       if nLikeIndex = -1
         '//if the like/dislke button does not exist yet, then add it
         addRemoveMenuItem(true, nLikeIndex, m.LikeDislikeMenuItem, [m.PlayMenuItem])
       end if
+
     end if
+
   end if
+
 End Function
 
 
@@ -417,6 +505,7 @@ Function onIsInKidsMode()
     else if m.top.isInKidsMode = false AND signUpIndex = -1
       addRemoveMenuItem(true, signUpIndex, m.signUpMenuItem, [m.PlayMenuItem])
     end if
+
   end if
 
   if m.top.isInKidsMode = true
@@ -430,7 +519,9 @@ Function onIsInKidsMode()
       if nLikeIndex = -1
         addRemoveMenuItem(true, nLikeIndex, m.LikeDislikeMenuItem, [m.PlayMenuItem])
       end if
+
     end if
+
   end if
 End Function
 
@@ -464,9 +555,11 @@ Function onIsLoading()
   else
     m.RelatedContentGroup.visible = false
   end if
+
   if m.top.isLoading = false
     focusMenu()
   end if
+
 End Function
 
 
@@ -484,9 +577,9 @@ Function onDisableBookmarksChange()
     if removeQueueIndex > -1
       m.Menu.content.removeChildIndex(removeQueueIndex)
     end if
+
   end if
 End Function
-
 
 ''''''''''''''''''''''
 ' setInitialMenuItems
@@ -501,15 +594,21 @@ Function setInitialMenuItems() As Void
   if isLoggedInUser() = false AND isNewUser() = false
     menuItems.appendChild(m.signUpMenuItem)
   end if
-  if isLoggedInUser() = false
-    '//as long as the user is logged out, send the like/dislike experiment exposure event here
-    if isLikeDislikeEnabled(true) = true
-      '//if the experiment is enabled then add the add like button for a guest user
+
+  if m.top.selectedContentType <> m.constants.ui.contentTypes.sportsEvent
+    if isLoggedInUser() = false
+      '//as long as the user is logged out, send the like/dislike experiment exposure event here
+      if isLikeDislikeEnabled(true) = true
+        '//if the experiment is enabled then add the add like button for a guest user
+        menuItems.appendChild(m.LikeDislikeMenuItem)
+      end if
+
+    else
       menuItems.appendChild(m.LikeDislikeMenuItem)
     end if
-  else
-    menuItems.appendChild(m.LikeDislikeMenuItem)
+
   end if
+
   menuItems.appendChild(m.AddQueueMenuItem)
   m.Menu.content = menuItems
 End Function
@@ -562,7 +661,9 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
           if previousItemIndex > -1
             exit for
           end if
+
         end if
+
       end for
     end if
 
@@ -573,7 +674,9 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
     else
       m.Menu.content.appendChild(itemToAdd)
     end if
+
     refocusMenuItem()
+
   end if
 End Function
 
@@ -584,6 +687,7 @@ Function setNewFocusedId(sCurrentFocusedId)
   if m.top.focusedMenuItemAnalyticsIds.Count() = 2
     sPreviousFocusedId = m.top.focusedMenuItemAnalyticsIds[0]
   end if
+
   m.top.focusedMenuItemAnalyticsIds = [sCurrentFocusedId, sPreviousFocusedId]
 End Function
 
@@ -607,6 +711,7 @@ Function onMenuItemFocused()
     '//When the user has liked or disliked content and then moves to or away from the like/dislike button, then change the text to be the focused or unfocused versions
     changeLikeDislikeButtonText()
   end if
+
 End Function
 
 
@@ -617,6 +722,7 @@ Function onMenuItemUnfocused(msg)
   if itemUnfocused <> invalid
     m.top.toggleOffButtonValue = itemUnfocused.analyticsButtonValue
   end if
+
 End Function
 
 
@@ -640,6 +746,7 @@ Function onSecondaryMenuItemUnfocused(msg)
   if itemUnfocused <> invalid
     m.top.toggleOffButtonValue = itemUnfocused.analyticsButtonValue
   end if
+
 End Function
 
 
@@ -650,7 +757,7 @@ Function setVisibilityOfSecondaryMenu()
 
   if isLikeDislikeEnabled() = true
     itemFocused = m.Menu.content.getChild(m.Menu.itemFocused)
-    if m.SecondaryMenu.isInFocusChain() = true or (m.Menu.isInFocusChain() = true AND itemFocused <> invalid AND itemFocused.id = "LikeDislikeMenuItem" AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing)
+    if m.SecondaryMenu.isInFocusChain() = true OR (m.Menu.isInFocusChain() = true AND itemFocused <> invalid AND itemFocused.id = "LikeDislikeMenuItem" AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing)
       alignSecondaryMenuWithMenu()
 
       m.SecondaryMenu.visible = true
@@ -659,11 +766,13 @@ Function setVisibilityOfSecondaryMenu()
       if m.constants.deviceInfo.scaledUi = true
         m.Menu.focusFootprintBitmapUri = "pkg://images/menu-focus-hd.9.png"
       end if
+
       result = true
     else
       m.SecondaryMenu.visible = false
       m.Menu.focusFootprintBitmapUri = ""
     end if
+
   end if
 
   return result
@@ -681,6 +790,7 @@ Function alignSecondaryMenuWithMenu()
   else
     m.SecondaryMenu.translation = [m.SecondaryMenu.translation[0], m.defaultSecondaryMenuY]
   end if
+
 End Function
 
 
@@ -691,6 +801,7 @@ Function handleMenuItemSelected(itemSelected)
     if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
       m.top.stopVideoPreview = true
     end if
+
     if itemSelected.id = "ResumeMenuItem"
       m.top.resumeSelected = true
       m.Menu.jumpToItem = 0 '//reset menu back to the top after a video is requested to play
@@ -712,18 +823,21 @@ Function handleMenuItemSelected(itemSelected)
         '//   the focus should move to the 2nd menu
         focusSecondaryMenu()
       end if
+
     else if itemSelected.id = "LikeMenuItem"
       m.top.likeSelected = true
       if isLoggedInUser() = true
         '//if the user is logged in, then focus back onto the main menu
         focusMenu()
       end if
+
     else if itemSelected.id = "DislikeMenuItem"
       m.top.dislikeSelected = true
       if isLoggedInUser() = true
         '//if the user is logged in, then focus back onto the main menu
         focusMenu()
       end if
+
     else if itemSelected.id = "WatchTrailerMenuItem"
       m.top.watchTrailerSelected = true
     else if itemSelected.id = "EpisodesMenuItem"
@@ -740,7 +854,11 @@ Function handleMenuItemSelected(itemSelected)
       m.isChannelMenuSelected = true
     else if itemSelected.id = "signUpMenuItem"
       m.top.signUpButtonSelected = true
+    ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    else if itemSelected.id = "SeeAllGamesMenuItem"
+      m.top.seeAllGamesSelected = true
     end if
+
   end if
 End Function
 
@@ -757,6 +875,7 @@ Function onRelatedContentChange()
     if m.RelatedContentGroup.isInFocusChain() = true
       focusMenu()
     end if
+
   end if
 End Function
 
@@ -773,6 +892,7 @@ Function handleRelatedContentSelected(selectedContent, position)
   m.relatedHasFocus = false
 
   'set the component info so it can be used in navigate_to_page event
+  'Need to check NavigateToPageEvent for Upcoming or Replay
   col = m.RelatedGrid.itemSelected + 1
   row = 1
   m.top.trackingComponentInfo = {
@@ -803,26 +923,75 @@ Function onRelatedItemFocused()
     col = m.RelatedGrid.itemFocused + 1
     row = 1
     videoId = m.top.content.id.toInt()
+    componentType = "related_component"
+    pageType = "video_page"
+    if (focusedContent.availabilityType = m.constants.ui.contentTimings.upcoming OR focusedContent.availabilityType = m.constants.ui.contentTimings.replay)
+      if focusedContent.availabilityType = m.constants.ui.contentTimings.upcoming
+        pageType = "upcoming_content_page"
+      end if
+
+      componentType = "category_component"
+      if m.relatedHasFocus = false
+        m.oldYmalComponent = {
+          category_slug: focusedContent.categorySlug
+          category_row: row
+          category_col: m.RelatedGrid.itemFocused + 1
+          content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
+        }
+      end if
+
+    else
+      pageType = "video_page"
+    end if
 
     ' trigger navigate_within_page events in ContentController
-    if m.relatedHasFocus = true
+    if (focusedContent.availabilityType = m.constants.ui.contentTimings.upcoming OR focusedContent.availabilityType = m.constants.ui.contentTimings.replay)
       m.top.navigateWithinPageInfo = {
-        pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: videoId})
-        componentOneof: m.Tracking.getAnalyticsComponent("related_component", m.oldYmalComponent) 'category_list_component doesn't exist in protos
+        pageOneof: m.Tracking.getAnalyticsPage(pageType, {video_id: videoId})
+        componentOneof: m.Tracking.getAnalyticsComponent(componentType, m.oldYmalComponent) 'category_list_component doesn't exist in protos
+        means_of_navigation: "BUTTON" 'MeansOfNavigation enum
+        vertical_location: row '1 based index
+        horizontal_location: col
+      }
+      if (focusedContent.availabilityType = m.constants.ui.contentTimings.upcoming OR focusedContent.availabilityType = m.constants.ui.contentTimings.replay)
+        m.oldYmalComponent = {
+          category_slug: focusedContent.categorySlug
+          category_row: row
+          category_col: col
+          content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
+        }
+      else
+        m.oldYmalComponent = {
+          content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
+        }
+      end if
+
+    else if m.relatedHasFocus = true
+      m.top.navigateWithinPageInfo = {
+        pageOneof: m.Tracking.getAnalyticsPage(pageType, {video_id: videoId})
+        componentOneof: m.Tracking.getAnalyticsComponent(componentType, m.oldYmalComponent) 'category_list_component doesn't exist in protos
         means_of_navigation: "BUTTON" 'MeansOfNavigation enum
         vertical_location: row '1 based index
         vertical_location_mode: "INDEX" 'LocationMode enum
         horizontal_location: col
         horizontal_location_mode: "INDEX" 'LocationMode enum
       }
-      m.oldYmalComponent = {
-        content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
-      }
     else
-      m.oldYmalComponent = {
-        content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
-      }
+      if (focusedContent.availabilityType = m.constants.ui.contentTimings.upcoming OR focusedContent.availabilityType = m.constants.ui.contentTimings.replay)
+        m.oldYmalComponent = {
+          category_slug: focusedContent.categorySlug
+          category_row: row
+          category_col: col
+          content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
+        }
+      else
+        m.oldYmalComponent = {
+          content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
+        }
+      end if
+
     end if
+
     m.relatedHasFocus = true
   end if
 End Function
@@ -839,6 +1008,7 @@ Function focusMenu(immediately = false)
     animate(m.RelatedContentGroup, {opacity: 0.2, duration: m.focusAnimationDuration})
     animate(m.Info, {opacity: 1.0, duration: m.focusAnimationDuration})
   end if
+
   if m.top.isInFocusChain() = true
     m.top.focusOnLikeMenu = false '//make sure this is set to false in case cominng from secondary menus
     m.Menu.setFocus(true)
@@ -864,6 +1034,7 @@ Function focusRelated()
     m.top.toggleOffButtonValue = focusedMenuItem.analyticsButtonValue
     m.RelatedGrid.setFocus(true)
   end if
+
   slideTo(m.AnimationGroup, [0, -392], m.focusAnimationDuration)
   animate(m.RelatedContentGroup, {opacity: 1.0, duration: m.focusAnimationDuration})
   animate(m.Info, {opacity: 0.2, duration: m.focusAnimationDuration})
@@ -879,6 +1050,7 @@ Function focusInfo()
     m.top.toggleOffButtonValue = focusedMenuItem.analyticsButtonValue
     m.Info.setFocus(true)
   end if
+
   setVisibilityOfSecondaryMenu()
 End Function
 
@@ -889,6 +1061,7 @@ Function onTransportVoiceRequest(msg)
   if inputInfo <> invalid AND inputInfo.command <> invalid
     command = inputInfo.command
   end if
+
   tubiLog("DetailScreen.onTransportVoiceRequest " + command)
 
   response = "unhandled"
@@ -905,6 +1078,7 @@ Function onTransportVoiceRequest(msg)
       handleRelatedContentSelected(selectedContent, m.RelatedGrid.itemFocused)
       response = "success"
     end if
+
   end if
 
   inputInfo.response = response
@@ -941,10 +1115,11 @@ End Function
 Function onKeyEvent(key As String, press As Boolean) as Boolean
   tubiLog("DetailScreen.onKeyEvent key = " + key)
   if press then
-    if key = "back" or (key = "left" AND m.SecondaryMenu.isInFocusChain() = false)
+    if key = "back" OR (key = "left" AND m.SecondaryMenu.isInFocusChain() = false)
       if not m.top.isWaitingForServerResponse
         m.top.backButtonPressed = true
       end if
+
       return true
       ' Down presses arrive here if not consumed by the menu, meaning it's already at the bottom button
     else if key = "down"
@@ -955,6 +1130,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         focusMenu()
         return true
       end if
+
     else if key = "up"
       if m.RelatedGrid.isInFocusChain() = true
         focusMenu()
@@ -968,6 +1144,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         m.isChannelMenuSelected = false
         m.top.channelSelected = true
       end if
+
       '//ensure this keypress is captured so the default Roku positive audio sound is played.
       return true
     else if key = "play"
@@ -984,7 +1161,14 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       focusMenu()
       return true
     end if
+    
   end if
 
   return false
+End Function
+
+
+Function isFifaWorldCupTopNavEnabled()
+  isFifaWorldCupTopNavEnabled = getExperimentResource("roku_fifa_wc_topnav", "roku_fifa_wc_topnav_v1", false).enabled = true
+  return isFifaWorldCupTopNavEnabled
 End Function

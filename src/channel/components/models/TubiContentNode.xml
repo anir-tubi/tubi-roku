@@ -30,6 +30,13 @@
     <field id="trailerInfo" type="assocarray" />
     <field id="deeplinkType" type="string" />
     <field id="videoPreviewUrl" type="string" />
+     <field id="releaseDate" type="string" />
+    <field id="roundGroupInfo" type="string" />
+    <field id="has4k" type="boolean" />
+
+    <field id="needsLogin" type="boolean"  value="false"/>
+    <field id="hasVideoResources" type="boolean" />
+    <field id="isFIFAContent" type="boolean" value="false"/>
 
     <!-- If the content is coming from a titan endpoint, then a titan version will be supplied. This will be used by Youbora -->
     <field id="titanVersion" type="string" />
@@ -98,8 +105,14 @@
     <!-- the hdcp_version as returned by cms/content API. example: "hdcp_v1" -->
     <field id="hdcpVersion" type="string"/>
 
-    <!-- availability_ends: "2019-03-31T00:00:00Z" -->
+    <!-- availability_starts: eg. "2019-03-01T00:00:00Z" -->
+    <field id="availabilityStarts" type="string"/>
+
+    <!-- availability_ends: eg. "2019-03-31T00:00:00Z" -->
     <field id="availabilityEnds" type="string"/>
+
+    <!-- air_datetime: eg. "2019-09-24T14:15:22Z" -->
+    <field id="airDateTime" type="string"/>
 
     <!-- if UpTime(0) > validUntil, then refetch metadata for this content -->
     <field id="validUntil" type="integer"/>

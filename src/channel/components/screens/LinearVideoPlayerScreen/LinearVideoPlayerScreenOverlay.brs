@@ -76,6 +76,7 @@ Function populateInfoPanel(contentNode)
     lineOneData.hoursOfAiring = contentNode.hoursOfAiring
     m.InfoPanel.lineOneData = lineOneData
     m.InfoPanel.genres = [contentNode.genre]
+    m.InfoPanel.needsLogIn = contentNode.needsLogin
   end if
   m.InfoPanel.calculateHeight = true
 End Function

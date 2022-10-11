@@ -23,10 +23,14 @@
 '                 callback: <roFunction>        - A function that will be called if the button is selected
 '                 callbackParams: <array>       - An array which will be passed to the callback as a single paramater
 '               }
-Function showModal(modalInfo, buttonInfo)
+'
+' @screen: node, (optional), default is m.top
+Function showModal(modalInfo, buttonInfo, screen=m.top)
   ' Don't create the modal if a modal already exists, or there is not enough info to create it
   if m.tempModal = invalid AND modalInfo <> invalid AND buttonInfo <> invalid
     modal = CreateObject("roSGNode", "ModalDialogScreen")
+    timeNow = CreateObject("roDateTime")
+    modal.id = timeNow.AsSeconds().tostr()
     modal.title = modalInfo.title
     modal.message = modalInfo.message
     modal.scrollable = modalInfo.scrollable
@@ -46,7 +50,7 @@ Function showModal(modalInfo, buttonInfo)
     modal.buttons = buttons
     modal.observeFieldScoped("buttonSelected", "onModalButtonSelected")
     modal.observeFieldScoped("exitButton", "onModalButtonSelected")
-    m.top.appendChild(modal)
+    screen.appendChild(modal)
     modal.visible = true
     modal.setFocus(true)
     ' send the show dialog track event
@@ -115,8 +119,9 @@ Function closeModal(modal, buttonSelected = invalid)
   'give focus back to the context that had it before invoking the modal
   modal.unobserveFieldScoped("buttonSelected")
   modal.unobserveFieldScoped("exitButton")
-  m.top.removeChild(modal)
-  m.top.setFocus(true)
+  parent = modal.getParent()
+  parent.removeChild(modal)
+  parent.setFocus(true)
 
   'run the callback associated with the selected button
   callback = invalid
@@ -402,6 +407,7 @@ End Function
 
 ' Helper function to return the top most modal being displayed with respect to the current m.top
 Function getTopModal()
+
   for i = m.top.getChildCount()-1 to 0 Step -1
     child = m.top.getChild(i)
     if child.isSubtype("ModalDialogScreen")

@@ -14,6 +14,7 @@
     <!-- INPUTS -->
     <field id="uri" type="string" />
     <field id="animationDuration" alias="animation.duration" value="1.0" />
+    <field id="animationControl" alias="animation.control" />
 
     <!-- forwarded to children -->
     <field id="width" alias="posterA.width, posterB.width" />

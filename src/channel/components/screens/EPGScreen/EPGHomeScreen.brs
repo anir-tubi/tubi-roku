@@ -135,6 +135,7 @@ Function populateInfoPanel(contentNode)
     lineOneData.hoursOfAiring = contentNode.hoursOfAiring
     m.InfoPanel.lineOneData = lineOneData
     m.InfoPanel.genres = [contentNode.genre]
+    m.InfoPanel.needsLogIn = contentNode.needsLogin = true AND (m.top.signedIn <> true)
   end if
   m.InfoPanel.calculateHeight = true
 End Function
@@ -377,12 +378,23 @@ End Function
 
 
 Function generateTopNavContentItems()
-  menuItemIds = [
+
+  if getExperimentResource("roku_fifa_wc_topnav", "roku_fifa_wc_topnav_v1", true).enabled = true
+    menuItemIds = [
     m.constants.ui.sideNavIds.home
     m.constants.ui.sideNavIds.movies
     m.constants.ui.sideNavIds.tv
     m.constants.ui.sideNavIds.linearEPG
-  ]
+    m.constants.ui.sideNavIds.tournament
+    ]
+  else
+    menuItemIds = [
+    m.constants.ui.sideNavIds.home
+    m.constants.ui.sideNavIds.movies
+    m.constants.ui.sideNavIds.tv
+    m.constants.ui.sideNavIds.linearEPG
+    ]
+  end if
 
   parent = CreateObject("roSGNode", "ContentNode")
   for each id in menuItemIds
@@ -397,6 +409,9 @@ Function generateTopNavContentItems()
       item.title = getTranslation("menu_tv")
     else if id = m.constants.ui.sideNavIds.linearEPG
       item.title = getTranslation("menu_livetv")
+    else if id = m.constants.ui.sideNavIds.tournament
+      item.title = getTranslation("menu_tournament")
+      item.subText = getTranslation("text_new")
     end if
   end for
 

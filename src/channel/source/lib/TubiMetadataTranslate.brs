@@ -6,13 +6,16 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     getContentFromCategoryJson: tubiMetadataTranslate_getContentFromCategoryJson
     translateRelatedContent: tubiMetadataTranslate_translateRelatedContent
     translate: tubiMetadataTranslate_translate
+    translateContainerForHomeScreen: tubiMetadataTranslate_translateContainerForHomeScreen
     translateContainer: tubiMetadataTranslate_translateContainer
     translateCategoryDetails: tubiMetadataTranslate_translateCategoryDetails
+    translateFIFAHomescreen: tubiMetadataTranslate_translateFIFAHomescreen
     translateHomescreen: tubiMetadataTranslate_translateHomescreen
     translateCategoriesListScreen: tubiMetadataTranslate_translateCategoriesListScreen
     translateLinearChannelGuide: tubiMetadataTranslate_translateLinearChannelGuide
     translateEPGChannelIds: tubiMetadataTranslate_translateEPGChannelIds
     translateEPGPrograms: tubiMetadataTranslate_translateEPGPrograms
+    translateTournamentScreen: tubiMetadataTranslate_translateTournamentScreen
     upNextTranslateRecursiveWrapper: tubiMetadataTranslate_upNextTranslateRecursiveWrapper
     setDescriptorCodeAndDescription: tubiMetadataTranslate_setDescriptorCodeAndDescription
 
@@ -128,6 +131,10 @@ Function tubiMetadataTranslate_translateBackendTypeToClientSideType(sBackendType
     sReturn = m.contentTypes.channel
   else if sBackendType = "l"
     sReturn = m.contentTypes.linear
+  else if sBackendType = "se"
+    sReturn = m.contentTypes.sportsEvent
+  else if sBackendType = "n"
+    sReturn = m.contentTypes.navigate
   end if
 
   return sReturn
@@ -242,6 +249,12 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.nowPos <> invalid then translatedContent.nowPos = contentFromServer.nowPos
   if contentFromServer.series_id <> invalid then translatedContent.seriesId = "0" + contentFromServer.series_id
   if contentFromServer.liveTvChannelType <> invalid then translatedContent.liveTvChannelType = contentFromServer.liveTvChannelType
+  if contentFromServer.needs_login <> invalid then translatedContent.needsLogin = contentFromServer.needs_login
+
+  if contentFromServer.type = "se" OR (contentFromServer.type = "l" AND contentFromServer.epg_feed <> invalid AND contentFromServer.epg_feed["callsign"]= "FIFA") OR (contentFromServer.type = "n" AND contentFromServer.id = m.constants.ui.contentIds.showAllGames)
+    translatedContent.isFIFAContent = true
+    translatedContent.needsLogin = true
+  end if
 
   ' in case isCdc was already set from the parent above, don't overwrite
   if translatedContent.isCdc <> true AND contentFromServer.is_cdc <> invalid
@@ -260,6 +273,12 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   if contentFromServer.directors <> invalid AND contentFromServer.directors.count() > 0
     translatedContent.directors = contentFromServer.directors
+  end if
+
+  if contentFromServer.league <> invalid
+    if contentFromServer.league.round <> invalid and contentFromServer.league.group <> invalid
+      translatedContent.roundGroupInfo = contentFromServer.league.round + "." + contentFromServer.league.group
+    end if
   end if
 
   creditsCuePoints = {}
@@ -382,6 +401,9 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   'take care of any subtitles if they exist - should only happen on videos
   if contentFromServer.has_subtitle <> invalid then translatedContent.hasSubtitles = contentFromServer.has_subtitle
 
+  'TODO: check the field once the FIFA World cup API's are fully ready
+  if contentFromServer.has4k <> invalid then translatedContent.has4k = contentFromServer.has4k
+
   ' linear subtitles
   if translatedContent[typeVar] = m.contentTypes.linear AND translatedContent.hasSubtitles = true
     '//::TODO::LiveNews::HARDCODE:: - The following code is a hardcoded.
@@ -445,7 +467,21 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.channel_name <> invalid then translatedContent.channelName = contentFromServer.channel_name
 
   if contentFromServer.is_recurring <> invalid then translatedContent.isRecurring = contentFromServer.is_recurring
+
+  if contentFromServer.availability_starts <> invalid then translatedContent.availabilityStarts = contentFromServer.availability_starts
+
   if contentFromServer.availability_ends <> invalid then translatedContent.availabilityEnds = contentFromServer.availability_ends
+
+  airDateTime = contentFromServer.air_datetime
+  translatedContent.airDateTime = airDateTime
+
+  hasVideoResources = false
+  if contentFromServer.has_video_resources = true
+    hasVideoResources = true
+  else if type(contentFromServer.video_resources) = "roArray" AND contentFromServer.video_resources.count() > 0
+    hasVideoResources = true
+  end if
+  translatedContent.hasVideoResources = hasVideoResources
 
   'set the time past which the content metadata should be refreshed from the server
   if contentFromServer.valid_duration <> invalid
@@ -561,6 +597,18 @@ Function tubiMetadataTranslate_translateRelatedContent(contentFromServer)
 End Function
 
 
+' @contentToTranslate: AA, json parsed response from the matrix/homescreen endpoint
+' @contentMode: string, the value of the contentMode parameter as sent as part of the matrix/homescreen request
+' @authInfo: AA, auth info as returned by Auth.getAuthInfo()
+' @isKidsMode: boolean, the value of the isKidsMode parameter as sent as part of the matrix/homescreen request
+' @uiMode: string, one of the allowed values from constants.ui.modes
+Function tubiMetadataTranslate_translateFIFAHomescreen(contentToTranslate, contentMode="homescreen", authInfo=invalid, isKidsMode=false, uiMode="standard") As Object
+  tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateFIFAHomescreen()")
+  translated = m.translateHomescreen(contentToTranslate, contentMode, authInfo, isKidsMode, uiMode, "homeScreen")
+  return translated
+End Function
+
+
 ''''''''''''''''''''''
 ' translateHomescreen
 ' Translate the initial homescreen call to matrix api
@@ -615,7 +663,8 @@ End Function
 ' @authInfo: AA, auth info as returned by Auth.getAuthInfo()
 ' @isKidsMode: boolean, the value of the isKidsMode parameter as sent as part of the matrix/homescreen request
 ' @uiMode: string, one of the allowed values from constants.ui.modes
-Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode="homescreen", authInfo=invalid, isKidsMode=false, uiMode="standard") As Object
+' @screenId: string, the id of the screen
+Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode="homescreen", authInfo=invalid, isKidsMode=false, uiMode="standard", screenId="") As Object
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateHomescreen()")
   isLoggedInUser = (authInfo <> invalid AND authInfo.userId <> invalid)
 
@@ -657,9 +706,9 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         ' then ensure row is empty except for 1 item that will entice users to sign in
         categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
       else if container.type = m.contentTypes.channel
-        categoryAA = m.buildCategoryAAWithPrepend(container, contents, invalid, "", false, contentMode)
+        categoryAA = m.buildCategoryAAWithPrepend(container, contents, invalid, "", false, contentMode, screenId)
       else
-        categoryAA = m.buildCategoryAA(container, contents, invalid, "", false, contentMode)
+        categoryAA = m.buildCategoryAA(container, contents, invalid, "", false, contentMode, screenId)
       end if
 
       if categoryAA <> invalid
@@ -744,7 +793,13 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
           sID = LCase(categoryAA.id)
         end if
 
-        if sID <> m.constants.ui.categoryIds.featured
+        validContainer = true
+        ' do not show the containers on Category screen which has landscape images on it
+        if m.constants.ui.notAllowedContainerIds[sID] = true
+          validContainer = false
+        end if
+
+        if validContainer = true
           if sID = m.constants.ui.categoryIds.recommendedForYou
             catRecommend = categoryAA
             catRecommend.isSpecial = true
@@ -831,6 +886,16 @@ End Function
 
 
 ''''''''''''''''''''
+' translateContainerForHomeScreen
+'
+Function tubiMetadataTranslate_translateContainerForHomeScreen(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode="homeScreen") As Object
+  tubiLog("TubiMetadataTranslate.translateContainerForHomeScreen")
+  translated = m.translateContainer(contentToTranslate, fullJson, sOrientation, bFullData, contentMode, "homeScreen")
+  return translated
+  End Function
+
+
+''''''''''''''''''''
 ' translateContainer
 '
 ' Translate content specifically targeted at CategoryGridList.  This is aimed at PERFORMANCE
@@ -839,7 +904,7 @@ End Function
 ' 1) Use ContentNode instead of TubiContentNode for item contents
 ' 2) Use ifSGNodeChildren.update() to leverage native code for node creation and setting fields
 ' 3) Avoid custom fields in favor of ContentNode's defined fields, this avoiding addField() calls in a loop
-Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode="homeScreen") As Object
+Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="") As Object
   tubiLog("TubiMetadataTranslate.translateContainer")
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
@@ -850,9 +915,9 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
 
   categoryMetadata = invalid
   if container.type = m.contentTypes.channel
-    categoryMetadata = m.buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation, bFullData, contentMode)
+    categoryMetadata = m.buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId)
   else
-    categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode)
+    categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId)
   end if
 
   if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
@@ -914,9 +979,31 @@ End Function
 ' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
 '
 ' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = invalid, sOrientation = "", bFullData = false, contentMode = "homeScreen")
+Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = invalid, sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId="")
 
   categoryParent = m.buildCategoryParentInfo(container, contentMode, sOrientation)
+
+  ' Inserting ShowAllGames title as first position on world cup row on homescreen
+  if screenId = "homeScreen" AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_fifa_wc_topnav", "roku_fifa_wc_topnav_v1").enabled = true AND container.id = m.constants.ui.categoryIds.fifawc 'WORLD CUP:: this check will be removed once the api is ready
+    if container.children <> invalid AND container.children.count() > 0
+      showAllGamesItem = {
+        id: m.constants.ui.contentIds.showAllGames
+        title: getTranslation("screenHome_item_showAllGames")
+        type: "n"
+        thumbnails: ["pkg:/images/fifa-showall.png"]
+        description: container.description
+      }
+      if contentsJson <> invalid
+        parsedJsonShowAllGames = ParseJson(contentsJson)
+        parsedJsonShowAllGames[showAllGamesItem.id] = showAllGamesItem
+        contentsJson = FormatJSON(parsedJsonShowAllGames)
+      end if
+      container.children.Unshift(showAllGamesItem.id)
+      contents[showAllGamesItem.id] = showAllGamesItem
+    end if
+  end if
+  'end if
+
   gridItemType = m.getGridItemType(container, sOrientation, m.constants)
   categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData)
 
@@ -947,7 +1034,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
 End Function
 
 
-Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation = "", bFullData = false, contentMode="homeScreen")
+Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="")
   categoryAA = invalid
 
   if container <> invalid AND container.children <> invalid
@@ -967,7 +1054,7 @@ Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, c
     ' force contentsJson to be regenerated with the prepended content in buildCategoryAA()
     contentsJson = invalid
 
-    categoryAA = m.buildCategoryAA(container, contentsWithPrepend, contentsJson, sOrientation, bFullData, contentMode)
+    categoryAA = m.buildCategoryAA(container, contentsWithPrepend, contentsJson, sOrientation, bFullData, contentMode, screenId)
   end if
 
   return categoryAA
@@ -1087,6 +1174,13 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             sType = "TubiContentNode"
           end if
 
+          hasVideoResources = false
+          if fullChild.has_video_resources = true
+            hasVideoResources = true
+          else if type(fullChild.video_resources) = "roArray" AND fullChild.video_resources.count() > 0
+            hasVideoResources = true
+          end if
+
           sContentType = m.translateBackendTypeToClientSideType(fullChild.type)
           childAA = {
             id: fullChild.id
@@ -1096,6 +1190,18 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             subtype: sType
             type: sContentType
           }
+
+          if fullChild.type = "se" OR (fullChild.type = "l" AND fullChild.epg_feed <> invalid AND fullChild.epg_feed["callsign"]= "FIFA")
+            childAA.append({needsLogin: true})
+          end if
+
+          if hasVideoResources = true
+            childAA.append({hasVideoResources: true})
+          end if
+
+          if fullChild.air_datetime <> invalid and fullChild.air_datetime <> ""
+            childAA.append({airDateTime: fullChild.air_datetime})
+          end if
 
           if bFullData = true
             'mutates childAA by populating all fields on childAA
@@ -1403,6 +1509,8 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
     end if
   else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
+  else if (container.id = constants.ui.categoryIds.fifawc or container.id = constants.ui.categoryIds.upcomings or container.id = constants.ui.categoryIds.replays) and orientation <> constants.ui.gridItemTypes.portrait
+    gridItemType = constants.ui.gridItemTypes.landscape
   else if container.id = constants.ui.categoryIds.featured AND orientation <> gridItemTypes.portrait
     ' `orientation <> gridItemTypes.portrait` is required as the search screen container.id is featured but uses portrait imagery
     'bs:disable-next-line 1001 LINT1001
@@ -1626,7 +1734,7 @@ End Function
 
 
 ' @contentToTranslate: AA, json parsed response from the epgProgramming endpoint
-Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requestorID )
+Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requestorID, isUserSignedIn = invalid )
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateEPGPrograms()")
   contentNode = CreateObject("roSGNode", "ContentNode")
   contentNode.addField("requestorID", "string", false)
@@ -1688,6 +1796,13 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
       if channelFromServer.publisher_id <> invalid
         channelNode.pubId = channelFromServer.publisher_id
       end if
+      'channel level needs_login
+      if channelFromServer.needs_login = true
+        channelNode.needsLogin = true
+        if isUserSignedIn = true
+          channelNode.needsLogin = false
+        end if
+      end if
 
       channelNode.backgrounds = m.dedupeBackgrounds(channelFromServer.images.background)
 
@@ -1712,6 +1827,13 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
         program.ReleaseDate = "24/7"
         if channelFromServer.tags <> invalid AND channelFromServer.tags.Count() > 0
           program.descriptors = channelFromServer.tags
+        end if
+        'programlevel
+        if channelFromServer.needs_login = true
+          program.needsLogin = true
+          if isUserSignedIn = true
+            program.needsLogin = false
+          end if
         end if
 
       else ' programs available
@@ -1785,7 +1907,20 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
             program.Rating = programFromServer.ratings[0].value
           end if
 
-          if programFromServer.description <> invalid AND programFromServer.description <> ""
+          program.needsLogin = false
+          if channelFromServer.needs_login = true
+            program.needsLogin = true
+            if isUserSignedIn = true
+              program.needsLogin = false
+            end if
+          end if
+
+          if programFromServer.has_4k <> invalid
+            program.has4k = programFromServer.has_4k
+          end if
+
+
+          if programFromServer.description <> invalid and programFromServer.description <> ""
             program.description = programFromServer.description
           else
             program.description = channelFromServer.description
@@ -1846,6 +1981,40 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
 
 return contentNode
 End Function
+
+
+Function tubiMetadataTranslate_translateTournamentScreen(contentToTranslate, requestorID, isSignedIn = invalid)
+  tubiLog("TubiMetadataTranslate.tubiMetadataTranslate_translateTournamentScreen")
+  contentNode = CreateObject("roSGNode", "TubiContentNode")
+  contentNode.addField("requestorID", "string", false)
+  contentNode.requestorID = requestorID
+  'store the validUntil in main contentNode Until Container specific validUntil is available
+
+  if contentToTranslate.valid_duration <> invalid
+    contentNode.validUntil = UpTime(0) + contentToTranslate.valid_duration
+  else
+    contentNode.validUntil = UpTime(0) + m.constants.cacheTimes.content
+  end if
+
+
+
+  if contentToTranslate <> invalid
+      epgRowToTranslate = {}
+      epgRowToTranslate.rows = []
+      epgRowToTranslate.rows[0] = contentToTranslate.epg_row
+      epgRowToTranslate.valid_duration = contentToTranslate.valid_duration
+      epgContentNode = m.translateEPGPrograms(epgRowToTranslate, requestorID, isSignedIn )
+      contentNode.appendChild(epgContentNode)
+      contentToTranslate.epg_row = invalid
+      contentToTranslate.Delete("epg_row")
+    end if
+
+  categoryContent = m.translateHomescreen(contentToTranslate, "tournamentSceen")
+  contentNode.appendChild(categoryContent)
+
+  return contentNode
+End Function
+
 
 ' @content: roAssocArray, series/movie content directly from the server
 ' @upnextContentItem: Node, Empty tubicontentNode to be passed over to translateRecursive Function.

@@ -99,9 +99,9 @@ Function onEpisodeFocused()
       lineOneData.releaseDate = content.releaseDate
       lineOneData.length = episode.length
       
-      if episode <> invalid AND (episode.hasSubtitles = true or episode.subtitleTracks.Count() > 0)
+      if episode <> invalid AND (episode.hasSubtitles = true OR episode.subtitleTracks.Count() > 0)
         lineOneData.hasCC = true
-      else if content <> invalid AND content.type = m.constants.ui.contentTypes.video AND (content.hasSubtitles = true or content.subtitleTracks.Count() > 0)
+      else if content <> invalid AND content.type = m.constants.ui.contentTypes.video AND (content.hasSubtitles = true OR content.subtitleTracks.Count() > 0)
         lineOneData.hasCC = true
       else
         lineOneData.hasCC = false
@@ -121,6 +121,7 @@ Function onEpisodeFocused()
       m.Info.lineOneData = lineOneData
       m.Info.titleLogoUri = episode.titleLogoUri
       m.Info.genres = episode.genres
+      m.Info.needsLogIn = episode.needsLogin
       m.Info.width = 1140   
       m.Info.calculateHeight = true   
       
@@ -220,6 +221,7 @@ Function setSeasonInfo(season As Integer)
   m.Info.seasonEpisodeCount = seasonContent.getChildCount()
   m.Info.description = m.top.content.description ' series description
   m.Info.mode = m.constants.ui.infoPanelModes.season
+  m.Info.needsLogIn = seasonContent.needsLogin
   m.Info.calculateHeight = true
 End Function
 

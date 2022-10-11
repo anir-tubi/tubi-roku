@@ -261,8 +261,8 @@ Function userDeviceApi_updateParentalRatingReqInfo(parentalRating, password)
 End Function
 
 
-Function userDeviceApi_addToQueueReqInfo(userId, contentId, contentType)
-  url = m.constants.urls.userDevice.queues
+Function userDeviceApi_addToQueueReqInfo(userId, contentId, contentType, typeOfQueue)
+  url = m.constants.urls.userQueues.queues
 
   options = {}
   headers = m.getCommonOptions().headers
@@ -270,6 +270,7 @@ Function userDeviceApi_addToQueueReqInfo(userId, contentId, contentType)
     user_id: userId
     content_id: contentId
     content_type: contentType
+    type: typeOfQueue
   }
 
   options["method"] = m.constants.reqTypes.post
@@ -283,10 +284,13 @@ Function userDeviceApi_addToQueueReqInfo(userId, contentId, contentType)
 End Function
 
 
-Function userDeviceApi_removeFromQueueReqInfo(bookmarkId)
+Function userDeviceApi_removeFromQueueReqInfo(bookmarkId, contentId, contentType)
 
-  url = m.constants.urls.userDevice.queues + "/" + bookmarkId
+  url = m.constants.urls.userQueues.queues
   options = m.getCommonOptions()
+  options.params["queue_id"] = bookmarkId
+  options.params["content_id"] = contentId
+  options.params["content_type"] = contentType
   options["method"] = m.constants.reqTypes.del
 
   return {

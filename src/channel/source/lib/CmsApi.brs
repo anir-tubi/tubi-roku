@@ -90,12 +90,15 @@ End Function
 
 Function cmsApi_getSingleContentRequestInfo(contentId, includeChannels=false, bKidsMode = false)
   options = m.getCommonOptions()
+
   options.params["content_id"] = contentId
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = includeChannels
   options.params["video_resources"] = m.constants.player.drmOrder
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
   options.params = m.setTupianLandscapeParam(options.params)
+  capability = formatJson({"content_types" :["se"]})
+  options.headers.append({"x-capability": capability})
 
   return {
     url: m.constants.urls.cms.singleContent

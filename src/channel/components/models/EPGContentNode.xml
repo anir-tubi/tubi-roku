@@ -14,6 +14,9 @@
     <!-- Field to tell whether program has subTitle or not-->
     <field id="hasSubtitles" type="boolean" />
 
+    <!-- Field to tell whether program has 4k content or not-->
+    <field id="has4k" type="boolean" />
+
     <!-- This field is to avoid access global node in program items.
     Selected Item Attributes has following formats
     title : is translated text "Starts at"
@@ -35,6 +38,9 @@
     <field id="subtitles" type="boolean"/>
 
     <field id="descriptors" type="array" />
+
+    <!--InfoPanel signInRequired title to display a hint in the info panel -->
+    <field id="needsLogIn" type="boolean" value="false"/>
 
     <!--Change this field to default secondaryTitle once it available in 11.5-->
     <field id="epgProgramTitle" type="string" />

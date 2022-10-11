@@ -39,6 +39,7 @@
   <script type="text/brightscript" uri="DeeplinkHelpers.brs" />
   <script type="text/brightscript" uri="VideoPreviewHelpers.brs" />
   <script type="text/brightscript" uri="OnBoardingHelpers.brs" />
+  <script type="text/brightscript" uri="TournamentScreenHelpers.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
@@ -94,7 +95,7 @@
            will be responsible for sending navigate_within_page events.
            See tubiTracking_getAnalyticsEvent for the format of the navigate_within_page AA
       -->
-    <field id="navigateWithinPageInfo" type="assocarray"/>
+      <field id="navigateWithinPageInfo" type="assocarray"/>
 
     <!-- OUTPUT -->
       <!-- Main thread listens for this and will exit the app if set to true-->
@@ -188,6 +189,14 @@
             width="322"
             uri="pkg:/images/logo-espanol-white-large.png"
             translation="[1503,60]"
+            opacity="1.0"
+            visible="false"/>
+          <Poster
+            id="tubiFIFALogo"
+            height="120"
+            width="385"
+            uri="pkg:/images/logo-tubi-FIFA.png"
+            translation="[1450,60]"
             opacity="1.0"
             visible="false"/>
         </Group>

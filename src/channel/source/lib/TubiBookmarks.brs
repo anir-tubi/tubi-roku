@@ -180,7 +180,7 @@ Function tubiBookmarks_getInitialBookmarksReq(localId) as Object
     return invalid
   end if
 
-  url = m.constants.urls.userDevice.queues
+  url = m.constants.urls.userQueues.queues
 
   options = {
     method: m.constants.reqTypes.get
@@ -285,7 +285,7 @@ Function tubiBookmarks_handleInitialBookmarks(initialBookmarks)
   bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
   parsedInitialBookmarks = ParseJson(initialBookmarks)
   if parsedInitialBookmarks <> Invalid
-    for each bookmark in parsedInitialBookmarks.items
+    for each bookmark in parsedInitialBookmarks.queues
       child = bookmarkIds.createChild("BookmarkContentNode")
       child.id = bookmark.content_id.toStr()
       child.bookmarkId = bookmark.id
@@ -294,6 +294,8 @@ Function tubiBookmarks_handleInitialBookmarks(initialBookmarks)
       else if bookmark.content_type = m.constants.uapiContentTypes.series
         child.id = "0" + child.id
         child.type = m.constants.ui.contentTypes.series
+      else if bookmark.content_type = m.constants.uapiContentTypes.sportsEvent
+        child.type = m.constants.ui.contentTypes.sportsEvent
       end if
     end for
   end if

@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="LiveIconGroup" extends="LayoutGroup">
-    <script type="text/brightscript" uri="LiveIconGroup.brs" />
-    <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
-    <interface>
-      <!-- INPUT -->
-      <field id="shouldAnimate" type="bool" value="false" alwaysNotify="true"/>
-    </interface>
+  <script type="text/brightscript" uri="LiveIconGroup.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  <interface>
+    <!-- INPUT -->
+    <field id="shouldAnimate" type="bool" value="false" alwaysNotify="true"/>
+  </interface>
 
-    <children>
-      <Poster
-        id="LiveAnimateImage"
-        height="37"
-        width="36"
-        loadWidth="36"
-        loadHeight="37"/>
-      <Label
-        id="liveTitle"
-        color="0xFFFFFFFF"
-        height="37"
-        vertAlign="center">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="17" />
-      </Label>
+  <children>
+    <Poster
+      id="LiveAnimateImage"
+      height="37"
+      width="36"
+      loadWidth="36"
+      loadHeight="37"/>
+    <Label
+      id="liveTitle"
+      color="0xFFFFFFFF"
+      height="37"
+      vertAlign="center">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Bold.ttf"
+        size="17" />
+    </Label>
   </children>
 </component>

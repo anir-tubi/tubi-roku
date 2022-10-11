@@ -13,9 +13,29 @@ Function init()
   m.SeasonDetails = m.top.findNode("SeasonDetails")
   m.TwoLineInfo = m.top.findNode("TwoLineInfo")
   m.ClosedCaptions = m.top.findNode("ClosedCaptionPoster")
+  m.resolutionPoster = m.top.findNode("resolutionPoster")
   m.Rating = m.top.findNode("Rating")
   m.RatingBackground = m.Rating.findNode("RatingBackground")
   m.RatingLabel = m.Rating.findNode("RatingLabel")
+
+  m.FifaWorldCupGameDetails = m.top.findNode("FifaWorldCupGameDetails")
+  m.fifaImage = m.top.findNode("fifaImage")
+  m.FifaWorldCupTitle = m.top.findNode("FifaWorldCupTitle")
+  m.sportsBadge = m.top.findNode("sportsBadge")
+  m.matchTime = m.FifaWorldCupGameDetails.findNode("matchTime")
+  m.roundGroupInfo = m.FifaWorldCupGameDetails.findNode("roundGroupInfo")
+  m.FifaWorldCupDescription = m.top.findNode("FifaWorldCupDescription")
+  m.FifaWorldCupClosedCaption = m.top.findNode("FifaWorldCupClosedCaptionPoster")
+  m.FifaWorldCup4k = m.top.findNode("FifaWorldCup4kPoster")
+  m.FifaWorldCupRating = m.top.findNode("FifaWorldCupRating")
+  m.FifaWorldCupRatingBackground = m.FifaWorldCupRating.findNode("FifaWorldCupRatingBackground")
+  m.FifaWorldCupRatingLabel = m.FifaWorldCupRating.findNode("FifaWorldCupRatingLabel")
+  m.ReminderGroup = m.top.findNode("ReminderGroup")
+  m.ReminderLogo = m.top.findNode("ReminderLogo")
+  m.ReminderTitle = m.top.findNode("ReminderTitle")
+  m.signInGroup = m.top.findNode("signInGroup")
+  m.lockIcon = m.top.findNode("lockIcon")
+  m.signInTitle = m.top.findNode("signInTitle")
 
   m.DescriptorCode = m.top.findNode("DescriptorCode")
 
@@ -48,6 +68,7 @@ Function init()
 
   m.top.observeField("titleLogoUri", "onTitleLogoUriChange")
   m.top.observeField("headerImageUri", "onHeaderImageUriChange")
+  m.top.observeFieldScoped("needsLogIn", "onNeedsLogInChange")
   m.top.observeField("lineOneData", "onLineOneDataChange")
   m.top.observeField("genres", "onGenresChange")
   m.top.observeField("description", "onDescriptionChange")
@@ -61,12 +82,18 @@ Function init()
   m.PartnerLogo.observeField("loadStatus", "onPosterLoadStatus")
   m.Rating.observeField("loadStatus", "onPosterLoadStatus")
   m.ClosedCaptions.observeField("loadStatus", "onPosterLoadStatus")
+  m.resolutionPoster.observeField("loadStatus", "onPosterLoadStatus")
+  m.FifaWorldCupClosedCaption.observeFieldScoped("loadStatus", "onPosterLoadStatus")
+  m.FifaWorldCup4k.observeFieldScoped("loadStatus", "onPosterLoadStatus")
+  m.FifaWorldCupRating.observeFieldScoped("loadStatus", "onPosterLoadStatus")
 
   onWidthChange()
 
   'set the default CC state to be no CC
   m.firstLineGroup = m.TwoLineInfo.findNode("FirstLineGroup")
 '  firstLineGroup.removeChild(m.ClosedCaptions)
+
+  m.FifaWorldCupFirstLineGroup = m.FifaWorldCupGameDetails.findNode("FifaWorldCupFirstLineGroup")
 
   'set the default title logo state to be no title logo
   m.TitleGroup.removeChild(m.TitleLogo)
@@ -101,6 +128,7 @@ Function init()
 
 End Function
 
+
 Function onPosterLoadStatus(msg)
   poster = msg.getRoSGNode()
   if poster <> invalid AND poster.loadStatus = "ready"
@@ -111,8 +139,10 @@ Function onPosterLoadStatus(msg)
     else
       poster.visible = false
     end if
+
   end if
 End Function
+
 
 Function onComponentFocus()
   tubiLog("InfoPanel.onComponentFocus")
@@ -138,7 +168,9 @@ Function onWidthChange()
     else
       m.Title.width = m.top.width - m.Title.translation[0]
     end if
+
   end if
+
   m.Episode.width = m.top.width - m.Episode.translation[0]
   categoryLine1 = m.CategoryDetails.findNode("CategoryLine1")
   categoryLine1.width = m.top.width - m.CategoryDetails.translation[0]
@@ -182,12 +214,27 @@ Function onHeaderImageUriChange()
 End Function
 
 
+Function onNeedsLogInChange()
+  tubiLog("InfoPanel.onNeedsLogInChange")
+  if m.signInGroup <> invalid
+    m.offset.removeChild(m.signInGroup)
+  end if
+
+  if m.top.needsLogIn = true
+    m.lockIcon.visible = true
+    m.signInTitle.text = getTranslation("registration_signIn_to_play_hint")
+    m.offset.appendChild(m.signInGroup)
+  end if
+End Function
+
+
 Function onLineOneDataChange(msg)
   tubiLog("InfoPanel.onLineOneDataChange")
   data = msg.getData()
   if m.TwoLineInfo.findNode("FirstLineGroup") <> invalid
     m.twoLineInfo.removeChild(m.firstLineGroup)
   end if
+
   m.twoLineInfo.insertChild(m.firstLineGroup, 0)
   firstLineGroup = m.firstLineGroup
   line1Label = m.TwoLineInfo.findNode("Line1")
@@ -196,11 +243,13 @@ Function onLineOneDataChange(msg)
   if data.releasedate <> invalid AND data.releasedate <> ""
     text = data.releasedate + " "
   end if
+
   if data.length <> invalid AND data.length <> 0
     ' add 'dot' spacer only if we had a release date
     if text.len() > 0
       text = text + Chr(&hb7) + " "
     end if
+
     text = text + formatLengthAsEnglish(data.length) + " "
   end if
 
@@ -213,11 +262,13 @@ Function onLineOneDataChange(msg)
     text = text + Chr(&hb7) + " "
 
     if data.seasons <> invalid AND data.seasons > 0
+
       if data.seasons = 1
         text = text + getTranslation("metadata_seasons_singular") + " "
       else
         text = text + getTranslation("metadata_seasons_plural", {seasons: data.seasons.toStr()}) + " "
       end if
+
     else
       text = text + getTranslation("metadata_series") + " "
     end if
@@ -231,6 +282,7 @@ Function onLineOneDataChange(msg)
     if m.ClosedCaptions.getParent() = invalid
       firstLineGroup.insertChild(m.ClosedCaptions, insertIndex)
     end if
+
     insertIndex++
     ' Although this uri does not change, if it is set in the component XML, the icon will appear
     ' during the initial channel load, so set it dynamically when it should appear
@@ -239,12 +291,30 @@ Function onLineOneDataChange(msg)
     if m.ClosedCaptions.getParent() <> invalid
       firstLineGroup.removeChild(m.ClosedCaptions)
     end if
+
+  end if
+
+  if data.has4k = true
+    if m.resolutionPoster.getParent() = invalid
+      firstLineGroup.insertChild(m.resolutionPoster, insertIndex)
+    end if
+
+    insertIndex++
+    ' Although this uri does not change, if it is set in the component XML, the icon will appear
+    ' during the initial channel load, so set it dynamically when it should appear
+    m.resolutionPoster.uri = "pkg:/images/icon-4k-ready-badge.png"
+  else
+    if m.resolutionPoster.getParent() <> invalid
+      firstLineGroup.removeChild(m.resolutionPoster)
+    end if
+
   end if
 
   if data.rating <> invalid AND data.rating <> ""
     if m.Rating.getParent() = invalid
       firstLineGroup.insertChild(m.Rating, insertIndex)
     end if
+
     insertIndex++
     m.RatingLabel.width = 0
     m.RatingLabel.text = Ucase(data.rating)
@@ -257,23 +327,180 @@ Function onLineOneDataChange(msg)
     if m.Rating.getParent() <> invalid
       firstLineGroup.removeChild(m.Rating)
     end if
+
     m.Rating.visible = false
+  end if
+
+  fifaWorldCupInsertIndex = 1
+  firstLineInsertIndex = 0
+
+  if m.FifaWorldCupGameDetails.findNode("FifaWorldCupFirstLineGroup") <> invalid
+    m.FifaWorldCupGameDetails.removeChild(m.FifaWorldCupFirstLineGroup)
+  end if
+
+  if m.FifaWorldCupGameDetails.findNode("ReminderGroup") <> invalid
+    m.FifaWorldCupGameDetails.removeChild(m.ReminderGroup)
+  end if
+
+  if data.availabilityType = m.constants.ui.categoryIds.fifawc
+    fifaWorldCupInsertIndex++
+  end if
+
+  m.FifaWorldCupGameDetails.insertChild(m.FifaWorldCupFirstLineGroup, fifaWorldCupInsertIndex)
+  FifaWorldCupFirstLineGroup = m.FifaWorldCupFirstLineGroup
+  fifaWorldCupInsertIndex++
+
+  'Upcoming and Replay Info
+  if isNonEmptyString(data.availabilityType) = true
+    'Need to add the correct background for badge
+    if isNonEmptyString(data.badgeText) = true
+      m.sportsBadge.visible = true
+      if UCase(data.availabilityType) = UCase(m.constants.ui.contentTimings.replay)
+        m.sportsBadge.backgroundColor = "0xF0F1F5"
+        m.sportsBadge.textColor = "0x1C1F29"
+      else if UCase(data.availabilityType) = UCase(m.constants.ui.contentTimings.upcoming)
+        m.sportsBadge.backgroundColor = "0x585B66"
+        m.sportsBadge.textColor = "0xF0F1F5"
+      end if
+
+      m.sportsBadge.text = Ucase(data.badgeText)
+      FifaWorldCupFirstLineGroup.insertChild(m.sportsBadge, firstLineInsertIndex)
+      firstLineInsertIndex++
+    else
+      m.sportsBadge.visible = false
+      if m.sportsBadge.getParent() <> invalid
+        FifaWorldCupFirstLineGroup.removeChild(m.sportsBadge)
+      end if
+
+    end if
+
+  else
+    m.sportsBadge.visible = false
+    if m.sportsBadge.getParent() <> invalid
+      FifaWorldCupFirstLineGroup.removeChild(m.sportsBadge)
+    end if
+
+  end if
+
+  if isNonEmptyString(data.matchTime) = true
+     m.matchTime.visible = true
+    text = ""
+    if data.length <> invalid AND data.length <> 0
+      ' add 'dot' spacer only if we had a release date
+      if text.len() > 0
+        text = text + Chr(&hb7) + " "
+      end if
+
+      text = text + formatLengthAsEnglish(data.length) + " "
+    end if
+
+    m.matchTime.text = data.matchTime + " . " + text
+    FifaWorldCupFirstLineGroup.insertChild(m.matchTime, firstLineInsertIndex)
+    firstLineInsertIndex++
+  else
+    FifaWorldCupFirstLineGroup.removeChild(m.matchTime)
+  end if
+
+  if data.hasFifaWorldCup4k = true
+    if m.FifaWorldCup4k.getParent() = invalid
+      FifaWorldCupFirstLineGroup.insertChild(m.FifaWorldCup4k, firstLineInsertIndex)
+    end if
+
+    firstLineInsertIndex++
+    ' Although this uri does not change, if it is set in the component XML, the icon will appear
+    ' during the initial channel load, so set it dynamically when it should appear
+    m.FifaWorldCup4k.uri = "pkg:/images/icon-4k-ready-badge.png"
+  else
+    if m.FifaWorldCup4k.getParent() <> invalid
+      FifaWorldCupFirstLineGroup.removeChild(m.FifaWorldCup4k)
+    end if
+
+  end if
+
+  if data.hasFifaWorldCupCC = true
+    if m.FifaWorldCupClosedCaption.getParent() = invalid
+      m.matchTime.visible = true
+      FifaWorldCupFirstLineGroup.insertChild(m.FifaWorldCupClosedCaption, firstLineInsertIndex)
+    end if
+
+    firstLineInsertIndex++
+    ' Although this uri does not change, if it is set in the component XML, the icon will appear
+    ' during the initial channel load, so set it dynamically when it should appear
+    m.FifaWorldCupClosedCaption.uri = "pkg:/images/icon-cc-filled.png"
+  else
+    if m.FifaWorldCupClosedCaption.getParent() <> invalid
+      FifaWorldCupFirstLineGroup.removeChild(m.FifaWorldCupClosedCaption)
+    end if
+
+  end if
+
+
+  if isNonEmptyString(data.fifaWorldCupRating)
+    if m.FifaWorldCupRating.getParent() = invalid
+      FifaWorldCupFirstLineGroup.insertChild(m.FifaWorldCupRating, firstLineInsertIndex)
+    end if
+
+    firstLineInsertIndex++
+    m.FifaWorldCupRatingLabel.width = 0
+    m.FifaWorldCupRatingLabel.text = Ucase(data.fifaWorldCupRating)
+
+    nRatingBoundingBoxIncrease = m.FifaWorldCupRatingLabel.boundingRect().width + 24
+    m.FifaWorldCupRatingBackground.width = nRatingBoundingBoxIncrease
+    m.FifaWorldCupRatingLabel.width = nRatingBoundingBoxIncrease
+    m.FifaWorldCupRating.visible = true
+  else
+    if m.FifaWorldCupRating.getParent() <> invalid
+      FifaWorldCupFirstLineGroup.removeChild(m.FifaWorldCupRating)
+    end if
+
+    m.FifaWorldCupRating.visible = false
+  end if
+
+  if isNonEmptyString(data.roundGroupInfo) = true
+    m.roundGroupInfo.text = data.roundGroupInfo
+    if m.roundGroupInfo.getParent() = invalid
+      m.FifaWorldCupGameDetails.insertChild(m.roundGroupInfo, fifaWorldCupInsertIndex)
+    end if
+
+    fifaWorldCupInsertIndex ++
+  else
+    if m.roundGroupInfo.getParent() <> invalid
+      m.FifaWorldCupGameDetails.removeChild(m.roundGroupInfo)
+    end if
+
+  end if
+
+  if data.isReminderSet <> invalid AND data.isReminderSet = true
+
+    if m.ReminderGroup.getParent() = invalid
+      m.ReminderLogo.visible = true
+      m.ReminderTitle.text = getTranslation("screenDetails_button_reminder_set")
+      m.FifaWorldCupGameDetails.insertChild(m.ReminderGroup, fifaWorldCupInsertIndex)
+      fifaWorldCupInsertIndex++
+    end if
+
+  else
+    m.FifaWorldCupGameDetails.removeChild(m.ReminderGroup)
   end if
 
   descriptorCode = data.descriptorCode
 
   if descriptorCode <> invalid AND descriptorCode <> ""
+
     if m.DescriptorCode.getParent() = invalid
       firstLineGroup.insertChild(m.DescriptorCode, insertIndex)
     end if
+
     insertIndex++
 
     m.DescriptorCode.text = UCase(descriptorCode)
     m.DescriptorCode.visible = true
   else
+
     if m.DescriptorCode.getParent() <> invalid
       firstLineGroup.removeChild(m.DescriptorCode)
     end if
+
     m.DescriptorCode.visible = false
   end if
 
@@ -290,14 +517,17 @@ Function onLineOneDataChange(msg)
       else
         m.ExpireWarning.text = getTranslation("metadata_expiresIn_singular")
       end if
+
       if m.ExpireWarning.getParent() = invalid
         firstLineGroup.insertChild(m.ExpireWarning, insertIndex)
       end if
+
       insertIndex++
     else
       if m.ExpireWarning.getParent() <> invalid
         firstLineGroup.removeChild(m.ExpireWarning)
       end if
+
     end if
   else
     firstLineGroup.removeChild(m.ExpireWarning)
@@ -307,18 +537,24 @@ Function onLineOneDataChange(msg)
     if m.PartnerLogo.getParent() = invalid
       firstLineGroup.insertChild(m.PartnerLogo, insertIndex)
     end if
+
     insertIndex++
     m.PartnerLogo.uri = data.partnerLogoUri
   else
     if m.PartnerLogo.getParent() <> invalid
       firstLineGroup.removeChild(m.PartnerLogo)
     end if
+
   end if
 End Function
 
 
 Function onGenresChange()
   tubiLog("InfoPanel.onGenresChange")
+  if m.SecondLineGroup.getParent() = invalid
+    m.TwoLineInfo.appendChild(m.SecondLineGroup)
+  end if
+
   line2Label = m.TwoLineInfo.findNode("Line2")
   text = ""
   if m.top.genres <> invalid AND m.top.genres.count() > 0
@@ -328,6 +564,7 @@ Function onGenresChange()
     end for
     text = capitalGenres.Join(", ")
   end if
+
   line2Label.text = text
 End Function
 
@@ -350,12 +587,14 @@ Function onDirectorsChange()
   if m.top.directors <> invalid AND m.top.directors.count() > 0
     text = m.top.directors.Join(", ")
   end if
+
   if text = ""
     ' hide the whole group if no directors listed
     m.DirectorGroup.visible = false
   else if m.DirectorGroup.visible = false
     m.DirectorGroup.visible = true
   end if
+
   m.Director.text = text
 End Function
 
@@ -366,12 +605,14 @@ Function onStarringChange()
   if m.top.starring <> invalid AND m.top.starring.count() > 0
     text = m.top.starring.Join(", ")
   end if
+
   if text = invalid or text = ""
     ' hide the whole group if no actors/starring listed
     m.StarringGroup.visible = false
   else
     m.StarringGroup.visible = true
   end if
+
   m.Starring.text = text
 End Function
 
@@ -420,7 +661,13 @@ Function onCalculateHeight()
     if m.Description.height <= 0
       m.Description.text = ""
     end if
+
     m.DescriptionFocusButton.height = m.Description.boundingRect().height + topMargin + bottomMargin
+  end if
+
+  if m.top.needsLogIn = false AND m.top.mode = m.constants.ui.infoPanelModes.linearTournament AND m.top.mode <> m.constants.ui.infoPanelModes.epg
+    m.top.appendChild(m.PlayerCountdownGroup)
+    m.PlayerCountdownGroup.translation = [0, m.infoPanelGroup.boundingRect().height + 40]
   end if
 End Function
 
@@ -432,12 +679,26 @@ End Function
 ' the children for rendering
 Function onModeChange()
   tubiLog("InfoPanel.onModeChange")
+  m.matchTime.visible = false
+  m.fifaImage.visible = false
   while m.Offset.getChildCount() > 0
     m.Offset.removeChildIndex(0)
   end while
+
+  if m.top.mode = m.constants.ui.infoPanelModes.navigateSports
+    m.FifaWorldCupGameDetails.insertChild(m.FifaWorldCupDescription, 4)
+  else if m.FifaWorldCupGameDetails.findNode("FifaWorldCupDescription") <> invalid
+    m.FifaWorldCupGameDetails.removeChild(m.FifaWorldCupDescription)
+  end if
+
   if m.HeaderImage <> invalid
     m.infoPanelGroup.removeChild(m.HeaderImage)
   end if
+
+  if m.SecondLineGroup.getParent() = invalid
+    m.TwoLineInfo.appendChild(m.SecondLineGroup)
+  end if
+
   'm.PlayerCountdownGroup has been added to parent to accommodate EPG Screen design
   if m.PlayerCountdownGroup <> invalid
     m.top.removeChild(m.PlayerCountdownGroup)
@@ -448,6 +709,10 @@ Function onModeChange()
   if m.liveIconGroup <> invalid AND m.liveIconGroup.isSameNode(secondLineGroup) then
     m.SecondLineGroup.removeChild(m.liveIconGroup)
     m.liveIconGroup.shouldAnimate = false
+  end if
+
+  if m.fifaImage <> invalid
+    m.FifaWorldCupGameDetails.removeChild(m.fifaImage)
   end if
 
   if m.badge <> invalid AND m.badge.isSameNode(secondLineGroup) then
@@ -525,14 +790,57 @@ Function onModeChange()
       if m.badge = invalid then
         setLiveBadge()
       end if
+
       m.SecondLineGroup.insertChild(m.badge, 0)
     else
       if m.liveIconGroup = invalid then
         m.liveIconGroup = createObject("roSGNode", "LiveIconGroup")
       end if
+
       m.liveIconGroup.shouldAnimate = true
       m.SecondLineGroup.insertChild(m.liveIconGroup, 0)
     end if
+
+  else if m.top.mode = m.constants.ui.infoPanelModes.linearTournament
+    if m.top.headerImageUri <> ""
+      m.infoPanelGroup.insertChild(m.HeaderImage,0)
+    end if
+
+    m.Offset.appendChild(m.TitleGroup)
+    if m.SecondLineGroup <> invalid
+      m.TwoLineInfo.removeChild(m.SecondLineGroup)
+    end if
+
+    m.Offset.appendChild(m.TwoLineInfo)
+    m.Offset.appendChild(m.DescriptionGroup)
+    m.Offset.itemSpacings = [12,0]
+  '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+  else if m.top.mode = m.constants.ui.infoPanelModes.sportsEvent
+    if UCase(m.top.availabilityType) = UCase(m.constants.ui.contentTimings.replay)
+      m.matchTime.visible = true
+    end if
+
+    if UCase(m.top.availabilityType) = UCase(m.constants.ui.contentTimings.upcoming)
+      m.matchTime.visible = false
+    end if
+
+    m.Offset.appendChild(m.FifaWorldCupGameDetails)
+  '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+  else if m.top.mode = m.constants.ui.infoPanelModes.navigateSports
+    m.fifaImage.visible = true
+    m.FifaWorldCupGameDetails.insertChild(m.fifaImage , 0)
+    m.matchTime.visible = true
+    if m.FifaWorldCupGameDetails <> invalid
+      m.FifaWorldCupGameDetails.removeChild(m.roundGroupInfo)
+    end if
+
+    m.Offset.appendChild(m.FifaWorldCupGameDetails)
+  '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+  else if m.top.mode = m.constants.ui.infoPanelModes.noteworthy
+    m.Offset.appendChild(m.TitleGroup)
+    m.Offset.appendChild(m.TwoLineInfo)
+    m.Offset.appendChild(m.DescriptionGroup)
+    m.Offset.itemSpacings = [25, 25, 15, 17, 11]
   end if
 
 End Function
@@ -554,5 +862,6 @@ Function onKeyEvent(key, press) as Boolean
     m.top.descriptionSelected = true
     return true
   end if
+
   return false
 End Function

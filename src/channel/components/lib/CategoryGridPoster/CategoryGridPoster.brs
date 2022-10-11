@@ -3,6 +3,7 @@ Function init()
 
   m.poster = m.top.findNode("Poster")
   m.LinearPoster = m.top.findNode("LinearPoster")
+
   m.badgeGroup = m.top.findNode("badgeGroup")
   m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
   m.top.observeField("itemContent", "onContentChange")
@@ -14,6 +15,28 @@ Function init()
   m.TVGuideNumberBground = m.top.findNode("TVGuideNumberBground")
   m.TVGuideNumberBground.blendColor = "0x9699A3FF"
   m.posterFadeTime = 0.5
+
+  '//recreate the contentTypes from constants so as not to access m.global.constants for every item on the home screen as they are created
+  m.contentTypes = {
+    series: "series"
+    video: "video"
+    episode: "episode"
+    season: "season"
+    category: "category"
+    channel: "channel"
+    linear: "linear"
+    historySignedOutUser: "continue_watching_signed_out_user"
+    epg: "epg"
+    live: "live"
+    sportsEvent: "sports_event"
+    navigate: "navigate"
+  }
+
+  '//recreate the contentTimings from constants so as not to access m.global.constants for every item on the home screen as they are created
+  m.contentTimings = {
+    replay: "replay"
+    upcoming: "upcoming"
+  }
 
   '//recreate the gridItemTypes (itemIDs) and uiResolution from constants so as not to access m.global.constants for every item on the home screen as they are created
   m.gridItemTypes = {
@@ -27,7 +50,20 @@ Function init()
     tvGuide: "tvGuide"
   }
   di = CreateObject("roDeviceInfo")
+  m.top.observeFieldScoped("focusPercent", "onItemFocusPercentChange")
+  m.top.observeFieldScoped("itemHasFocus", "onRowItemHasFocus")
   m.uiResolution = UCase(di.GetUiResolution().name)
+End Function
+
+
+Function onRowItemHasFocus()
+
+  if m.top.itemHasFocus = false
+    if m.lockIcon <> invalid then m.lockIcon.opacity = 0.0
+  else
+    if m.lockIcon <> invalid then m.lockIcon.opacity = 1.0
+  end if
+
 End Function
 
 
@@ -65,11 +101,30 @@ Function onContentChange(msg)
   ' settings poster visibility true to avoid image caching issue. if it is not set to true, seeing some blank posters
   m.poster.visible = true
 
-  ' removeBadges is required to avoid incorrect badges.
   removeBadges()
+  removeLockIcon()
+  removeShowALlLabel()
 
-  if itemContent <> invalid then
-    categoryContent = itemContent.getParent()
+  if m.top.itemContent <> invalid then
+
+    hasVideoresources = m.top.itemContent.hasVideoresources
+    airDatetime = m.top.itemContent.airDatetime
+
+    info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
+    badgeText = info.badgeText
+    if isNonEmptyString(badgeText) = true
+      setReplayOrUpcomingBadge(badgeText)
+    end if
+
+    if m.top.itemContent.type <> invalid AND m.top.itemContent.type = m.contentTypes.navigate AND m.top.itemContent.title <> invalid
+      setShowAllLabel(m.top.itemContent.title)
+    end if
+
+    if m.top.itemContent.needsLogin = true
+      setLockIcon()
+    end if
+
+    categoryContent = m.top.itemContent.getParent()
 
     if categoryContent <> invalid AND itemContent.gridItemType <> invalid then
       m.poster.uri = itemContent.hdgridposterurl
@@ -94,6 +149,13 @@ Function onContentChange(msg)
     else
       m.poster.uri = itemContent.hdgridposterurl
     end if
+  end if
+End Function
+
+
+Function onItemFocusPercentChange()
+  if m.top.itemContent <> invalid AND m.top.itemContent.needsLogin = true
+    if m.lockIcon <> invalid then m.lockIcon.opacity = m.top.focusPercent
   end if
 End Function
 
@@ -150,7 +212,7 @@ Function handleLocalFocusChange(newLocalFocus)
         end if
 
         ' fade in the poster, but if there is already a fade in animation running, let it run
-        if m.fadeInAnimation = invalid or m.fadeInAnimation.state <> "running"
+        if m.fadeInAnimation = invalid OR m.fadeInAnimation.state <> "running"
           m.fadeInAnimation = fade(m.poster, "in", m.posterFadeTime)
         end if
       end if
@@ -192,8 +254,10 @@ End Function
 
 
 Function setUpLinear()
+  m.top.unobserveField("itemHasFocus")
   m.top.observeField("itemHasFocus", "onItemFocus")
   m.top.observeField("rowListHasFocus", "onRowListHasFocus")
+  m.top.unobserveField("focusPercent")
   m.top.observeField("focusPercent", "onFocusPercentChange")
 
   ' local focus state; becomes true when focusPercent = 1.0 or itemHasFocus = true
@@ -253,6 +317,7 @@ Function setUpVitg()
   m.top.observeField("rowFocusPercent", "onRowFocusPercentChange")
   m.top.observeField("itemHasFocus", "onItemFocus")
   m.top.observeField("rowListHasFocus", "onRowListHasFocus")
+  m.top.unobserveField("focusPercent")
   m.top.observeField("focusPercent", "onFocusPercentChange")
 
   ' On various models, and due to long press horizontal scrolling, we cannot always count on
@@ -341,7 +406,7 @@ Function onVideoStateChange(msg)
       drawProgressBar(vitgPosSeconds, m.top.itemContent.playDuration)
       if m.localFocus = true
         'this only occurs when the video has played to completion
-        if m.fadeInAnimation = invalid or m.fadeInAnimation.state <> "running"
+        if m.fadeInAnimation = invalid OR m.fadeInAnimation.state <> "running"
           m.fadeInAnimation = fade(m.poster, "in", m.posterFadeTime)
         end if
       end if
@@ -394,8 +459,57 @@ End Function
 
 
 Function removeBadges()
-
+  tubiLog("CategoryGridPoster.removeBadges")
   childCount = m.badgeGroup.getChildCount()
   m.badgeGroup.removeChildrenIndex(childCount, 0)
+End Function
 
+
+Function setReplayOrUpcomingBadge(badgeText)
+  tubiLog("CategoryGridPoster.setReplayOrUpcomingBadge")
+  badge = m.badgeGroup.createChild("Badge")
+  badge.translation = [12,12]
+  if badgeText = m.contentTimings.replay
+    badge.backgroundColor = "0xF0F1F5"
+    badge.textColor = "0x1C1F29"
+  else
+    badge.backgroundColor = "0x585B66"
+    badge.textColor = "0xF0F1F5"
+  end if
+  badge.text = UCase(badgeText)
+End Function
+
+
+Function setLockIcon()
+  tubiLog("CategoryGridPoster.setLockIcon")
+  m.lockIcon = m.top.createChild("Poster")
+  m.lockIcon.opacity = 0.0
+  m.lockIcon.width = 21
+  m.lockIcon.height = 24
+  m.lockIcon.uri = "pkg:/images/lock_icon.png"
+  m.lockIcon.translation = [m.top.width-36, 14]
+End Function
+
+
+Function removeLockIcon()
+  tubiLog("CategoryGridPoster.removeLockIcon")
+  m.top.removeChild(m.lockIcon)
+End Function
+
+
+Function setShowAllLabel(text)
+  tubiLog("CategoryGridPoster.setShowAllLabel")
+  m.showAllLabel = m.top.createChild("Label")
+  m.showAllLabel.text = text
+  m.showAllLabel.color = "0xFFFFFFFF"
+  m.showAllLabel.width = 380
+  m.showAllLabel.height = 216
+  m.showAllLabel.horizAlign = "center"
+  m.showAllLabel.vertAlign = "center"
+End Function
+
+
+Function removeShowAllLabel()
+  tubiLog("CategoryGridPoster.removeShowAllLabel")
+  m.top.removeChild(m.showAllLabel)
 End Function

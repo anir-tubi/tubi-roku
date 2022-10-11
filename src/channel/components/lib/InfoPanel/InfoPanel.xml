@@ -54,6 +54,9 @@
     <field id="categoryContentCount" type="integer" />
     <field id="fullscreenCountdown" type="integer" value="0"/>
     <field id="calculateHeight" type="boolean" alwaysNotify="true" />
+    <field id="fifaWorldCupTitle" alias="FifaWorldCupTitle.text" />
+    <field id="fifaWorldCupDescription" alias="FifaWorldCupDescription.text" />
+    <field id="needsLogIn" type="boolean" alwaysNotify="true"/>
 
     <!-- handles changes to FirstLineGroup, has a structure like
       {
@@ -72,6 +75,9 @@
 
     <!-- mode is either: 'category', 'item', 'movie', 'series', 'season', 'episode' -->
     <field id="mode" type="string"/>
+
+    <!-- availabilityType is either 'Upcoming', 'Replay', 'Live'-->
+    <field id="availabilityType" type="string"/>
 
     <!-- maxHeight is the area in which the content should be centered -->
     <field id="maxHeight" type="int" value="0" />
@@ -175,6 +181,150 @@
         </LayoutGroup>
 
         <LayoutGroup
+          id="FifaWorldCupGameDetails"
+          layoutDirection="vert"
+          itemSpacings="[10]"
+          translation="[0,0]"
+          visible="true">
+          <Poster
+            id="fifaImage"
+            uri="pkg:/images/fifa_world_cup_icon.png"
+            width="186"
+            height="84"
+            visible="false" />
+          <Label
+            id="FifaWorldCupTitle"
+            width="1140"
+            wrap="true"
+            maxLines="2"
+            color="0xFFFFFFFF"
+            vertAlign="bottom">
+            <Font
+              id="TitleFont"
+              role="font"
+              uri="pkg:/fonts/Vaud-SemiBold.ttf"
+              size="48" />
+          </Label>
+          <LayoutGroup
+            id="FifaWorldCupFirstLineGroup"
+            layoutDirection="horiz"
+            itemSpacings="[10]"
+            visible="true">
+            <Badge
+              id="sportsBadge"
+              visible="false" />
+            <Label
+              id="matchTime"
+              height="36"
+              width="0"
+              color="0x9699A3"
+              numLines="1"
+              wrap="false"
+              visible="false"
+              horizAlign="center"
+              vertAlign="center">
+              <Font
+                role="font"
+                uri="pkg:/fonts/Vaud-Bold.ttf"
+                size="24" />
+            </Label>
+            <Poster
+              id="FifaWorldCup4kPoster"
+              height="36"
+              width="158"
+              loadDisplayMode="scaleToFit"
+              loadSync="true" />
+            <Poster
+              id="FifaWorldCupClosedCaptionPoster"
+              height="36"
+              width="56"
+              loadDisplayMode="scaleToFit"
+              loadSync="true" />
+            <Group
+              id="FifaWorldCupRating"
+              visible="false">
+              <Poster
+                id="FifaWorldCupRatingBackground"
+                height="36"
+                uri="pkg:/images/ratingBackground.9.png"
+                loadDisplayMode="scaleToFit"
+                loadSync="true" />
+              <Label
+                id="FifaWorldCupRatingLabel"
+                height="36"
+                width="0"
+                opacity="0.8"
+                color="0xFFFFFFFF"
+                numLines="1"
+                wrap="false"
+                translation="[0,3]"
+                horizAlign="center"
+                vertAlign="center">
+                <Font
+                  role="font"
+                  uri="pkg:/fonts/Vaud-Bold.ttf"
+                  size="22" />
+              </Label>
+            </Group>
+          </LayoutGroup>
+          <Label
+            id="roundGroupInfo"
+            height="36"
+            width="0"
+            color="0x9699A3"
+            numLines="1"
+            wrap="false"
+            translation="[0,3]"
+            horizAlign="center"
+            vertAlign="center">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="24" />
+          </Label>
+          <Label
+            id="FifaWorldCupDescription"
+            width="800"
+            lineSpacing="16"
+            maxLines="5"
+            wrap="true"
+            color="0xFFFFFFFF"
+            visible="true">
+            <Font
+              id="FifaWorldCupDescriptionFont"
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="27" />
+          </Label>
+          <LayoutGroup
+            id="ReminderGroup"
+            layoutDirection="horiz"
+            vertAlignment="center"
+            itemSpacings="[10]"
+            addItemSpacingAfterChild="true">
+            <Poster
+              id="ReminderLogo"
+              visible="false"
+              height="30"
+              width="28"
+              uri="pkg:/images/reminder_set.png"
+              loadDisplayMode="scaleToFit" />
+            <Label
+              id="ReminderTitle"
+              width="960"
+              wrap="true"
+              color="0x9699A3"
+              vertAlign="bottom">
+              <Font
+                id="ReminderFont"
+                role="font"
+                uri="pkg:/fonts/Vaud-Medium.ttf"
+                size="24" />
+            </Label>
+          </LayoutGroup>
+        </LayoutGroup>
+
+        <LayoutGroup
           id="SeasonDetails"
           layoutDirection="vert"
           itemSpacings="[10]"
@@ -208,6 +358,12 @@
                 uri="pkg:/fonts/Vaud-Medium.ttf"
                 size="27" />
             </Label>
+            <Poster
+              id="resolutionPoster"
+              height="36"
+              width="56"
+              loadDisplayMode="scaleToFit"
+              loadSync="true"/>
             <Poster
               id="ClosedCaptionPoster"
               height="36"
@@ -293,7 +449,7 @@
             id="Description"
             width="1140"
             lineSpacing="16"
-            maxLines="5"
+            maxLines="2"
             wrap="true"
             color="0xFFFFFFFF"
             translation="[25,15]"
@@ -393,6 +549,34 @@
               size="27" />
           </Label>
         </LayoutGroup>
+
+        <LayoutGroup
+          id="signInGroup"
+          layoutDirection="horiz"
+          vertAlignment="bottom"
+          itemSpacings="[10]"
+          addItemSpacingAfterChild="true">
+          <Poster
+            id="lockIcon"
+            blendColor="0xFF501A"
+            visible="false"
+            height="30"
+            width="24"
+            uri="pkg:/images/lock_icon.png"
+            loadDisplayMode="scaleToFit"
+            loadSync="true" />
+          <Label
+            id="signInTitle"
+            width="960"
+            color="0xFF501A">
+            <Font
+              id="signInFont"
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="24" />
+          </Label>
+        </LayoutGroup>
+
       </LayoutGroup>
     </LayoutGroup>
 

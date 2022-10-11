@@ -3,7 +3,7 @@ Function init()
   m.top.focusBitmapUri = "pkg://images/menu-focus-fhd.9.png"
 
   constants = getConstantsFromGlobal()
-  if constants <> invalid and constants.deviceInfo.scaledUi = true
+  if constants <> invalid AND constants.deviceInfo.scaledUi = true
     m.top.focusBitmapUri = "pkg://images/menu-focus-hd.9.png"
   end if
 

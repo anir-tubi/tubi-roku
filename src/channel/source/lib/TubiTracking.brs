@@ -709,6 +709,10 @@ Function tubiTracking_getOneOfs()
     i: "i"  'filler because empty fields are removed
   }
 
+  worldcup_browse_page = {
+    i: "i" 'filler because empty fields are removed
+  }
+
   entertainment_browse_page = {
     i: "i"  'filler because empty fields are removed
   }
@@ -786,6 +790,10 @@ Function tubiTracking_getOneOfs()
 
   age_gate_page = {}
 
+  upcoming_content_page = {
+    video_id: -1
+  }
+
   ' splash_page = {}   'not currently used
   ' forget_page = {}   'not currently used
 
@@ -828,6 +836,8 @@ Function tubiTracking_getOneOfs()
     onboarding_page: onboarding_page
     landing_page: landing_page
     age_gate_page: age_gate_page
+    worldcup_browse_page: worldcup_browse_page
+    upcoming_content_page: upcoming_content_page
     ' splash_page: splash_page
     ' forget_page: forget_page
   }
@@ -858,6 +868,8 @@ Function tubiTracking_getOneOfs()
     dest_onboarding_page: onboarding_page
     dest_landing_page: landing_page
     dest_age_gate_page: age_gate_page
+    dest_worldcup_browse_page: worldcup_browse_page
+    dest_upcoming_content_page: upcoming_content_page
     ' dest_splash_page: splash_page
     ' dest_forget_page: forget_page
   }
@@ -932,6 +944,11 @@ Function tubiTracking_getOneOfs()
       button_value: ""
     }
 
+    reminder_component: {
+      video_id: -1
+      series_id: -1
+    }
+
     content: {
       series_id: -1
       video_id: -1
@@ -983,6 +1000,7 @@ Function tubiTracking_getSideNavPageMap(constants)
     if sideNavIds.linearEPG <> invalid then map[sideNavIds.linearEPG] = "LINEAR"
     if sideNavIds.subtitles <> invalid then map[sideNavIds.subtitles] = "SUBTITLES"
     if sideNavIds.back <> invalid then map[sideNavIds.back] = "BACK"
+    if sideNavIds.tournament <> invalid then map[sideNavIds.tournament] = "SPORTS"
   end if
   return map
 End Function

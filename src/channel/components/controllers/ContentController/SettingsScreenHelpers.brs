@@ -308,6 +308,7 @@ Function refreshScreenAfterParentalChanges()
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
+  setContentToRefresh(m.constants.ui.screenIds.tournamentScreen)
 
   refreshAllHomeScreenTopNav()
 

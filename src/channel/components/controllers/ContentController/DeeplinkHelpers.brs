@@ -15,7 +15,7 @@
 ' Deep link args:
 '   contentId    - string identifier
 '   entry        - 'banner' or omitted for search source
-'   mediaType    - "season", "series", "episode", "movie", "shortform", and "live"
+'   mediaType    - "season", "series", "episode", "movie", "shortform", and "livefeed"
 '   entry        - string, custom parameter, used for tracking the source of deeplinks, passed to referred analytics events
 '   deviceId     - string, custom paramater, the device id of the device sending the deeplink (used when mobile "casts" to roku)
 '   resumeTime   - integer, custom paramater, the position from which a deeplink should resume (used when mobile "casts" to roku)
@@ -87,14 +87,17 @@ Function createDeeplinkContentFromStartupArgs(args)
       else if args.mediaType = "episode"
         content.type = "video"
         content.deeplinkType = "episode"
-      else if args.mediaType = "live"
+      else if args.mediaType = "livefeed"
         content.type = "linear"
         content.deeplinkType = "linear"
+      else if args.mediaType = "sports"
+        content.type = "video"
+        content.deeplinkType = "sports"
       end if
     else if args.mediaType = invalid AND args.page <> invalid ' page request
       if args.page = "movies"
         content.deeplinkType = "moviePage"
-      else if args.page = "live"
+      else if args.page = "livefeed"
         content.deeplinkType = "liveTV"
       else if args.page = "genre"
         content.deeplinkType = "category"
@@ -233,6 +236,8 @@ Function handleDeeplinkContentByType()
       end if
     else if m.deepLinkContent.deeplinktype = "movie"
       showDetailScreen(m.deeplinkContent, false, skipDetailScreen, handleSingleContentDeeplinkError)
+    else if m.deepLinkContent.deeplinktype = "sports"
+      showDetailScreen(m.deeplinkContent, false, skipDetailScreen, handleSingleContentDeeplinkError)
     else
       message = getTranslation("error_deeplink_page")
       showDeeplinkErrorModal(invalid, message)
@@ -279,9 +284,12 @@ Function onSingleChannelFetchForDeeplinkSuccess(successResponse, storeInCache=fa
       if epgScreen.timeGridContent = invalid OR epgScreen.timeGridContentLoading = true
         epgScreen.contentIdToFocusOnLoadComplete = linearContent.id
       end if
-      playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.epgScreen)
-      sEPGSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.epgScreen]
 
+      if linearContent.needsLogin = false OR (linearContent.needsLogin = true AND isLoggedInUser() = true)
+        playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.epgScreen)
+      end if
+
+      sEPGSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.epgScreen]
       focusSideNavOption(sEPGSideNavID)
     end if
   else
@@ -659,9 +667,12 @@ Function handleDeeplinkSeriesSuccessResponse(refreshedContent)
   if detailScreen <> invalid
     detailScreen.contentFetchError = false
     populateDetailScreen(detailScreen, refreshedContent)
-    handleDetailScreenAfterFn(detailScreen, afterFn)
+    if isContentLocked(refreshedContent) = false ' if content is locked, then stay on detail screen
+      handleDetailScreenAfterFn(detailScreen, afterFn)
+    end if
   end if
 End Function
+
 
 ' success handler for video fetch in case of series/season/episode deeplinks.
 ' @refreshedContent: roSGNode, success video response content
@@ -737,7 +748,10 @@ Function handleDeeplinkEpisodeSuccessResponse(refreshedContent)
   if detailScreen <> invalid
     detailScreen.contentFetchError = false
     populateDetailScreen(detailScreen, refreshedContent)
-    handleDetailScreenAfterFn(detailScreen, afterFn)
+    if isContentLocked(refreshedContent) = false ' if content is locked, then stay on detail screen
+      handleDetailScreenAfterFn(detailScreen, afterFn)
+    end if
+
   end if
 End Function
 
@@ -777,7 +791,7 @@ Function handleSingleContentDeeplinkError(error)
   if m.enteredFromDeepLink = false AND m.deepLinkContent <> invalid
     'only in case of the movie, we have already sneaked the showdetail screen, so we need to
     'bring the user to previous screen.
-    if m.deepLinkContent.deeplinktype = "movie"
+    if m.deepLinkContent.deeplinktype = "movie" OR m.deepLinkContent.deeplinktype = "sports"
       detailScreen = getTopDetailScreenFromStack()
       if detailScreen <> invalid AND detailScreen.content.id = m.deepLinkContent.id
         'Simply popping the screen is resulting in issues, so calling onDetailBackPressed function.

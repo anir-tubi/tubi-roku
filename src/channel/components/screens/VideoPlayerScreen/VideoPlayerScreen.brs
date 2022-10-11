@@ -1242,10 +1242,24 @@ Function updateVideoPlayerState(content) as Void
 
   ' add the title and episode title to the overlay
   title = m.Overlay.findNode("VideoOverlayTitle")
+  'This field is also used to display the gameInfo for Replay sports
   episodeTitle = m.Overlay.findNode("VideoOverlayEpisodeTitle")
   if content.parentType = "series"
     title.text = content.parentTitle
     episodeTitle.text = content.title
+  'TODO: check once the API data is reday and remove the hardcoded values
+  else if content.parentType = m.constants.uapiContentTypes.sportsEvent
+    title.text = content.title
+    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    episodeTitleText = ""
+    if content.length <> invalid and content.length <> 0
+      ' add 'dot' spacer only if we had a release date
+      if episodeTitleText.len() > 0
+        episodeTitleText = episodeTitleText + Chr(&hb7) + " "
+      end if
+      episodeTitleText = episodeTitleText + formatLengthAsEnglish(content.length) + " "
+    end if
+    episodeTitle.text = "" '.matchTime + " . " + episodeTitleText
   else
     title.text = content.title
     episodeTitle.text = ""
