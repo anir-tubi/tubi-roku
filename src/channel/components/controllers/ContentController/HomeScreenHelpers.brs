@@ -1023,7 +1023,7 @@ Function showFifaIntroModal()
     Auth = TubiAuth(m.constants, m.Request)
     Auth.setEducationalModalEntry("fifaIntro", "true")
 
-    title = getTranslation("menu_tournament") + " 2022"
+    title = getTranslation("menu_tournament", {"tradeMark": ""})
     message = getTranslation("explore_fifa_description")
     buttons = [getTranslation("dialog_explore_fifa"), getTranslation("dialog_got_it")]
 
