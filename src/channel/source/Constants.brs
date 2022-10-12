@@ -461,12 +461,13 @@ Function getConstants()
 
     'use queue urls
     constants.urls.userQueues = {}
-    constants.urls.userQueues.urlBase = "https://user-queue.adrise.tv/api/"
+    constants.urls.userQueues.urlBase = "https://user-queue.production-public.tubi.io/api/"
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
         constants.urls.userQueues.urlBase = "https://user-queue.staging-public.tubi.io/api/"
       end if
-      constants.urls.userQueues.queues = constants.urls.userQueues.urlBase + "v2/queues"
-      constants.urls.userQueues.setReminder = constants.urls.userQueues.urlBase + "v2/queues"
+
+      constants.urls.userQueues.queues = constants.urls.userQueues.urlBase + "v1/queues"
+      constants.urls.userQueues.setReminder = constants.urls.userQueues.urlBase + "v1/queues"
 
     ' account urls
     constants.urls.account = {}

@@ -267,7 +267,6 @@ Function userDeviceApi_addToQueueReqInfo(userId, contentId, contentType, typeOfQ
   options = {}
   headers = m.getCommonOptions().headers
   body = {
-    user_id: userId
     content_id: contentId
     content_type: contentType
     type: typeOfQueue
