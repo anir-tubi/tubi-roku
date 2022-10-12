@@ -121,6 +121,11 @@
       <!-- Pass through Program Guide component events to EpgScreen helper -->
       <field id="programGuideNavigateWithinPageInfo" alias="programGuide.navigateWithinPageInfo" />
 
+      <!-- Pass through Program Guide component events to EpgScreen helper -->
+      <field id="programGuidecomponentInteractionInfo" alias="programGuide.componentInteractionInfo" />
+
+      <field id="componentInteractionInfo" type="assocarray"/>
+
       <field id="EPGScrollingStatus" alias="programGuide.scrollingStatus"/>
 
       <!-- Communicates to the parent that the video preview should be stopped -->

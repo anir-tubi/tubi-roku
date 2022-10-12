@@ -620,6 +620,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
         else if m.epgTimeGrid.isInFocusChain() = true
           componentUPAnimation()
           setFocusOnCategoryGrid()
+          setComponentInteractionEventForEPG("TOGGLE_OFF")
           return true
         end if
       end if
@@ -643,11 +644,13 @@ Function onKeyEvent(key As string, press As boolean) As boolean
             setFocusOnCategoryGrid()
           else
             setFocusOnEPGTimeGrid()
+            setComponentInteractionEventForEPG("TOGGLE_ON")
           end if
           return true
         else if m.categoryGridList.isInFocusChain() = true
           componentDownAnimation()
           setFocusOnEPGTimeGrid()
+          setComponentInteractionEventForEPG("TOGGLE_ON")
           return true
         end if
       end if
@@ -834,4 +837,34 @@ End Function
 Function onTournamentRefreshTimer()
   tubiLog("TournamentScreen.onCategoryRefreshTimer")
   m.top.reloadTournamentScreen = true
+End Function
+
+
+Function setComponentInteractionEventForEPG(userInteraction)
+  content = m.EPGTimeGrid.linearChannelToplay
+  rowNum = 1 'as per document
+  colNum = 1 'as per document
+
+  if content <> invalid
+    componentValues = {
+      content_tile: m.Tracking.getAnalyticsTile(content, colNum, rowNum)
+    }
+
+    pageType = ""
+    if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pagetype <> invalid
+      pageType = m.top.trackingPageInfo.pagetype
+    end if
+
+    pageValues = {}
+    if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pageValues <> invalid
+      pageValues = m.top.trackingPageInfo.pageValues
+    end if
+    componentInteractionInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
+      componentOneof: m.Tracking.getAnalyticsComponent("epg_component",  componentValues)
+      user_interaction: userInteraction
+    }
+
+    m.top.componentInteractionInfo = componentInteractionInfo
+  end if
 End Function
