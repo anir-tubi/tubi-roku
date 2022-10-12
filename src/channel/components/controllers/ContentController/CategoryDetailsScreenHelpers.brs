@@ -143,6 +143,7 @@ Function fetchCategoryDetails(content)
       successCallback: onCategoryDetailResponse
       errorCallback: onCategoryDetailError
       responseType: "node"
+      isSignedInUser: isLoggedInUser()
     })
   end if
 End Function

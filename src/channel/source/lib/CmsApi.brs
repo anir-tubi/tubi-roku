@@ -373,9 +373,10 @@ End Function
 ' @homeScreen: roSGNode, homescreen
 ' @index: integer
 ' @bKidsMode : boolean
+' @isSignedInUser: boolean, value based on user loggedIn or not
 '
 ' returns batch requests
-Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = false)
+Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = false, isSignedInUser = false)
 
   m.categoryWindowSize = m.constants.performance.categoryGridList.categoryWindowSize
 
@@ -415,6 +416,7 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
             categoryReqInfo = m.categoryReqInfo(categoryId, bKidsMode, options)
             categoryReqInfo.requestType = reqName
             categoryReqInfo.responseType = "node"
+            categoryReqInfo.isSignedInUser = isSignedInUser
           end if
 
         end if

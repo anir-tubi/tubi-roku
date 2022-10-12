@@ -150,7 +150,8 @@ End Function
 '
 ' @contentFromServer: assocArray, AA representation of content metadata JSON as returned from server
 ' @translatedContent: empty ContentNode or AA that will be populated with content metadata
-Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, translatedContent As Object) as integer
+' @isSignedInUser: boolean, value based on user logged In or not
+Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, translatedContent As Object, isSignedInUser = false) as integer
   if contentFromServer = invalid or type(contentFromServer) <> "roAssociativeArray" then return 0
 
   count = 1
@@ -249,11 +250,13 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.nowPos <> invalid then translatedContent.nowPos = contentFromServer.nowPos
   if contentFromServer.series_id <> invalid then translatedContent.seriesId = "0" + contentFromServer.series_id
   if contentFromServer.liveTvChannelType <> invalid then translatedContent.liveTvChannelType = contentFromServer.liveTvChannelType
-  if contentFromServer.needs_login <> invalid then translatedContent.needsLogin = contentFromServer.needs_login
+
+  if contentFromServer.needs_login = true and isSignedInUser = false
+    translatedContent.needsLogin = true
+  end if
 
   if contentFromServer.type = "se" OR (contentFromServer.type = "l" AND contentFromServer.epg_feed <> invalid AND contentFromServer.epg_feed["callsign"]= "FIFA") OR (contentFromServer.type = "n" AND contentFromServer.id = m.constants.ui.contentIds.showAllGames)
     translatedContent.isFIFAContent = true
-    translatedContent.needsLogin = true
   end if
 
   ' in case isCdc was already set from the parent above, don't overwrite
@@ -500,10 +503,10 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     for each childContentFromServer in contentFromServer.children
       if type(translatedContent) = "roSGNode"
         translatedChild = translatedContent.createChild("TubiContentNode")
-        count = count + m.translateRecursive(childContentFromServer, translatedChild)
+        count = count + m.translateRecursive(childContentFromServer, translatedChild, isSignedInUser)
       else if type(translatedContent) = "roAssociativeArray"
         translatedChild = CreateObject("roAssociativeArray")
-        count = count + m.translateRecursive(childContentFromServer, translatedChild)
+        count = count + m.translateRecursive(childContentFromServer, translatedChild, isSignedInUser)
 
         if translatedContent.children = invalid
           translatedContent.children = []
@@ -527,13 +530,14 @@ End Function
 '
 ' @category: a category tubiContentNode with full category content stored in json format on the .json field
 ' @contentId: string, an id for a piece of content (movie or series)
-Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId)
+' @isSignedInUser: boolean, value based on user logged In or not
+Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId, isSignedInUser = false)
   if category <> invalid AND category.json <> invalid AND category.json <> ""
     parsed = ParseJson(category.json)
     if parsed <> invalid
       fullContent = parsed[contentId]
       translated = CreateObject("roSGNode", "TubiContentNode")
-      m.translateRecursive(fullContent, translated)
+      m.translateRecursive(fullContent, translated, isSignedInUser)
       translated.parentId = category.id
       translated.parentType = category.type
       translated.parentTitle = category.title
@@ -569,13 +573,15 @@ End Function
 ' translateRelatedContent
 '
 ' Expect content from the /related API, structured as an array of assocarrays
-Function tubiMetadataTranslate_translateRelatedContent(contentFromServer)
+' @contentFromServer: assocArray, AA representation of content metadata JSON as returned from server
+' @isSignedInUser: boolean, value based on user logged In or not
+Function tubiMetadataTranslate_translateRelatedContent(contentFromServer, isSignedInUser = false)
   translated = CreateObject("roSGNode", "CategoryContentNode")
   if type(contentFromServer) = "roArray"
     shortestValidDuration = invalid
     for each content in contentFromServer
       node = translated.createChild("TubiContentNode")
-      m.translateRecursive(content, node)
+      m.translateRecursive(content, node, isSignedInUser)
 
       if shortestValidDuration = invalid
         shortestValidDuration = content.valid_duration
@@ -599,12 +605,12 @@ End Function
 
 ' @contentToTranslate: AA, json parsed response from the matrix/homescreen endpoint
 ' @contentMode: string, the value of the contentMode parameter as sent as part of the matrix/homescreen request
-' @authInfo: AA, auth info as returned by Auth.getAuthInfo()
 ' @isKidsMode: boolean, the value of the isKidsMode parameter as sent as part of the matrix/homescreen request
 ' @uiMode: string, one of the allowed values from constants.ui.modes
-Function tubiMetadataTranslate_translateFIFAHomescreen(contentToTranslate, contentMode="homescreen", authInfo=invalid, isKidsMode=false, uiMode="standard") As Object
+' @isSignedInUser: boolean, value based on user logged In or not
+Function tubiMetadataTranslate_translateFIFAHomescreen(contentToTranslate, contentMode="homescreen", isKidsMode=false, uiMode="standard", isSignedInUser = false) As Object
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateFIFAHomescreen()")
-  translated = m.translateHomescreen(contentToTranslate, contentMode, authInfo, isKidsMode, uiMode, "homeScreen")
+  translated = m.translateHomescreen(contentToTranslate, contentMode, isKidsMode, uiMode, "homeScreen", isSignedInUser)
   return translated
 End Function
 
@@ -656,17 +662,16 @@ End Function
 '   </CategoryContentNode>
 ' </CategoryContentNode>
 '
-'//::TODO:: Remove the contentMode, authInfo & isKidsMode parameters once we have API support
+'//::TODO:: Remove the contentMode, isSignedInUser & isKidsMode parameters once we have API support
 '
 ' @contentToTranslate: AA, json parsed response from the matrix/homescreen endpoint
 ' @contentMode: string, the value of the contentMode parameter as sent as part of the matrix/homescreen request
-' @authInfo: AA, auth info as returned by Auth.getAuthInfo()
 ' @isKidsMode: boolean, the value of the isKidsMode parameter as sent as part of the matrix/homescreen request
 ' @uiMode: string, one of the allowed values from constants.ui.modes
 ' @screenId: string, the id of the screen
-Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode="homescreen", authInfo=invalid, isKidsMode=false, uiMode="standard", screenId="") As Object
+' @isSignedInUser: boolean, value based on user logged In or not
+Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMode="homescreen", isKidsMode=false, uiMode="standard", screenId="", isSignedInUser = false) As Object
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateHomescreen()")
-  isLoggedInUser = (authInfo <> invalid AND authInfo.userId <> invalid)
 
   translated = CreateObject("roSGNode", "CategoryContentNode")
   homescreenAA = {
@@ -701,14 +706,14 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
       end if
 
       categoryAA = invalid
-      if container.id = m.constants.ui.categoryIds.history AND isLoggedInUser = false AND uiMode <> m.constants.ui.modes.kidsAgeGate
+      if container.id = m.constants.ui.categoryIds.history AND isSignedInUser = false AND uiMode <> m.constants.ui.modes.kidsAgeGate
         '//if continue watching container while user is signed out,
         ' then ensure row is empty except for 1 item that will entice users to sign in
         categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
       else if container.type = m.contentTypes.channel
-        categoryAA = m.buildCategoryAAWithPrepend(container, contents, invalid, "", false, contentMode, screenId)
+        categoryAA = m.buildCategoryAAWithPrepend(container, contents, invalid, "", false, contentMode, screenId, isSignedInUser)
       else
-        categoryAA = m.buildCategoryAA(container, contents, invalid, "", false, contentMode, screenId)
+        categoryAA = m.buildCategoryAA(container, contents, invalid, "", false, contentMode, screenId, isSignedInUser)
       end if
 
       if categoryAA <> invalid
@@ -888,9 +893,9 @@ End Function
 ''''''''''''''''''''
 ' translateContainerForHomeScreen
 '
-Function tubiMetadataTranslate_translateContainerForHomeScreen(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode="homeScreen") As Object
+Function tubiMetadataTranslate_translateContainerForHomeScreen(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode="homeScreen", isSignedInUser = false) As Object
   tubiLog("TubiMetadataTranslate.translateContainerForHomeScreen")
-  translated = m.translateContainer(contentToTranslate, fullJson, sOrientation, bFullData, contentMode, "homeScreen")
+  translated = m.translateContainer(contentToTranslate, fullJson, sOrientation, bFullData, contentMode, "homeScreen", isSignedInUser)
   return translated
   End Function
 
@@ -904,7 +909,14 @@ Function tubiMetadataTranslate_translateContainerForHomeScreen(contentToTranslat
 ' 1) Use ContentNode instead of TubiContentNode for item contents
 ' 2) Use ifSGNodeChildren.update() to leverage native code for node creation and setting fields
 ' 3) Avoid custom fields in favor of ContentNode's defined fields, this avoiding addField() calls in a loop
-Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="") As Object
+' @contentToTranslate: AA, json parsed response from the matrix/homescreen endpoint
+' @fullJson: string, the full JSON of the /container API repsonse
+' @sOrientation: string, should the thumbnail be a "portrait" or "landscape" (match against m.constants.ui.gridItemTypes values)
+' @bFullData: boolean, Should the full data be parsed and passed to the video children?
+' @contentNode: TubiContentNode
+' @screenId: string, the id of the screen
+' @isSignedInUser: boolean, value based on user logged In or not
+Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false) As Object
   tubiLog("TubiMetadataTranslate.translateContainer")
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
@@ -915,9 +927,9 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
 
   categoryMetadata = invalid
   if container.type = m.contentTypes.channel
-    categoryMetadata = m.buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId)
+    categoryMetadata = m.buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
   else
-    categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId)
+    categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
   end if
 
   if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
@@ -942,9 +954,10 @@ End Function
 
 ' @contentToTranslate: assocArray, the AA resulting from JSON parsing the /container API response
 ' @fullJson: string, the full JSON of the /container API repsonse
+' @isSignedInUser: boolean, value based on user logged In or not
 '
 ' @returns: roSGNode, a CategoryContentNode with children TubiContentNodes for each content in the container/category
-Function tubiMetadataTranslate_translateCategoryDetails(contentToTranslate, fullJson)
+Function tubiMetadataTranslate_translateCategoryDetails(contentToTranslate, fullJson, isSignedInUser)
   tubiLog("TubiMetadataTranslate.translateCategoryDetails")
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
@@ -955,7 +968,7 @@ Function tubiMetadataTranslate_translateCategoryDetails(contentToTranslate, full
   bFullData = true
   contentMode = m.constants.ui.contentMode.homescreen
 
-  categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode)
+  categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, "", isSignedInUser)
 
   if categoryMetadata <> invalid
     translated.update(categoryMetadata)
@@ -977,9 +990,9 @@ End Function
 ' @sOrientation: string, should the thumbnail be a "portrait" or "landscape" (match against m.constants.ui.gridItemTypes values)
 ' @bFullData: boolean, Should the full data be parsed and passed to the video children?
 ' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
-'
+' @isSignedInUser: boolean, value based on user logged In or not
 ' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = invalid, sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId="")
+Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = invalid, sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId="", isSignedInUser = false)
 
   categoryParent = m.buildCategoryParentInfo(container, contentMode, sOrientation)
 
@@ -1005,7 +1018,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
   'end if
 
   gridItemType = m.getGridItemType(container, sOrientation, m.constants)
-  categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData)
+  categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData, isSignedInUser)
 
   categoryParent.children = categoryChildrenInfo.children
   categoryParent.json = categoryChildrenInfo.contentsJson
@@ -1034,7 +1047,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
 End Function
 
 
-Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="")
+Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false)
   categoryAA = invalid
 
   if container <> invalid AND container.children <> invalid
@@ -1054,7 +1067,7 @@ Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, c
     ' force contentsJson to be regenerated with the prepended content in buildCategoryAA()
     contentsJson = invalid
 
-    categoryAA = m.buildCategoryAA(container, contentsWithPrepend, contentsJson, sOrientation, bFullData, contentMode, screenId)
+    categoryAA = m.buildCategoryAA(container, contentsWithPrepend, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
   end if
 
   return categoryAA
@@ -1143,11 +1156,12 @@ End Function
 ' @parentGridItemType: string, the gridItemType of the parent container/category
 ' @bfullData: boolean, true if each child should contain full metadata, false if children should contain
 '                      a limited set of metadata
+' @isSignedInUser: boolean, value based on user logged In or not
 '
 ' @returns: assocArray, an AA with keys:
 '                       "children", as an array of AAs containing content metadata
 '                       "contentsJson", a JSON formatted string of contents belonging to the container/category
-Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, contentsJson, parentGridItemType, bFullData)
+Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, contentsJson, parentGridItemType, bFullData, isSignedInUser = false)
   childrenReturn = CreateObject("roArray", 0, false)
 
   if type(container) = "roAssociativeArray" AND type(container.children) = "roArray"
@@ -1191,7 +1205,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             type: sContentType
           }
 
-          if fullChild.type = "se" OR (fullChild.type = "l" AND fullChild.epg_feed <> invalid AND fullChild.epg_feed["callsign"]= "FIFA")
+          if fullChild.needs_login = true AND isSignedInUser = false
             childAA.append({needsLogin: true})
           end if
 
@@ -1205,7 +1219,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           if bFullData = true
             'mutates childAA by populating all fields on childAA
-            m.translateRecursive(fullChild, childAA)
+            m.translateRecursive(fullChild, childAA, isSignedInUser)
           end if
 
           gridType = ""
@@ -1365,7 +1379,8 @@ End Function
 '
 ' Translates content from server into format that roku understands
 ' contentToTranslate should be parsed from JSON before it hits this Function
-Function tubiMetadataTranslate_translate(contentToTranslate) As Object
+' @isSignedInUser: boolean, value based on user logged In or not
+Function tubiMetadataTranslate_translate(contentToTranslate, isSignedInUser = false) As Object
   translated = CreateObject("roSGNode", "TubiContentNode")
   node_count = 0
 
@@ -1375,7 +1390,7 @@ Function tubiMetadataTranslate_translate(contentToTranslate) As Object
       for each content in contentToTranslate
         if content.title <> "After Hours" or m.allowAfterHours = true
           node = translated.createChild("TubiContentNode")
-          node_count = node_count + m.translateRecursive(content, node)
+          node_count = node_count + m.translateRecursive(content, node, isSignedInUser)
         end if
       end for
 
@@ -1384,14 +1399,14 @@ Function tubiMetadataTranslate_translate(contentToTranslate) As Object
 
       'expect this to happen just for the search API
       if contentToTranslate.children <> invalid
-        node_count = m.translateRecursive(contentToTranslate, translated)
+        node_count = m.translateRecursive(contentToTranslate, translated, isSignedInUser)
 
         'expect this to happen for history/queue content
       else
         for each content in contentToTranslate
           if contentToTranslate[content] <> invalid
             node = translated.createChild("TubiContentNode")
-            node_count = node_count + m.translateRecursive(contentToTranslate[content], node)
+            node_count = node_count + m.translateRecursive(contentToTranslate[content], node, isSignedInUser)
           end if
         end for
       end if
@@ -1734,7 +1749,7 @@ End Function
 
 
 ' @contentToTranslate: AA, json parsed response from the epgProgramming endpoint
-Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requestorID, isUserSignedIn = invalid )
+Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requestorID, isUserSignedIn = false )
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateEPGPrograms()")
   contentNode = CreateObject("roSGNode", "ContentNode")
   contentNode.addField("requestorID", "string", false)
@@ -1983,7 +1998,7 @@ return contentNode
 End Function
 
 
-Function tubiMetadataTranslate_translateTournamentScreen(contentToTranslate, requestorID, isSignedIn = invalid)
+Function tubiMetadataTranslate_translateTournamentScreen(contentToTranslate, requestorID, isSignedInUser = false)
   tubiLog("TubiMetadataTranslate.tubiMetadataTranslate_translateTournamentScreen")
   contentNode = CreateObject("roSGNode", "TubiContentNode")
   contentNode.addField("requestorID", "string", false)
@@ -1996,20 +2011,18 @@ Function tubiMetadataTranslate_translateTournamentScreen(contentToTranslate, req
     contentNode.validUntil = UpTime(0) + m.constants.cacheTimes.content
   end if
 
-
-
   if contentToTranslate <> invalid
-      epgRowToTranslate = {}
-      epgRowToTranslate.rows = []
-      epgRowToTranslate.rows[0] = contentToTranslate.epg_row
-      epgRowToTranslate.valid_duration = contentToTranslate.valid_duration
-      epgContentNode = m.translateEPGPrograms(epgRowToTranslate, requestorID, isSignedIn )
-      contentNode.appendChild(epgContentNode)
-      contentToTranslate.epg_row = invalid
-      contentToTranslate.Delete("epg_row")
-    end if
+    epgRowToTranslate = {}
+    epgRowToTranslate.rows = []
+    epgRowToTranslate.rows[0] = contentToTranslate.epg_row
+    epgRowToTranslate.valid_duration = contentToTranslate.valid_duration
+    epgContentNode = m.translateEPGPrograms(epgRowToTranslate, requestorID, isSignedInUser)
+    contentNode.appendChild(epgContentNode)
+    contentToTranslate.epg_row = invalid
+    contentToTranslate.Delete("epg_row")
+  end if
 
-  categoryContent = m.translateHomescreen(contentToTranslate, "tournamentSceen")
+  categoryContent = m.translateHomescreen(contentToTranslate, "tournamentSceen", false, "standard", "tournamentSceen", isSignedInUser)
   contentNode.appendChild(categoryContent)
 
   return contentNode
@@ -2018,10 +2031,11 @@ End Function
 
 ' @content: roAssocArray, series/movie content directly from the server
 ' @upnextContentItem: Node, Empty tubicontentNode to be passed over to translateRecursive Function.
+' @isSignedInUser: boolean, value based on user logged In or not
 '
 ' This function will wrap the TranslateRecursive function and removes any series without seasons and any seasons without episode
 
-Function tubiMetadataTranslate_upNextTranslateRecursiveWrapper(content, upnextContentItem)
+Function tubiMetadataTranslate_upNextTranslateRecursiveWrapper(content, upnextContentItem, isSignedInUser = false)
   bInclude = true
 
   if content.type <> invalid
@@ -2048,7 +2062,7 @@ Function tubiMetadataTranslate_upNextTranslateRecursiveWrapper(content, upnextCo
   end if
 
   if bInclude = true
-    m.translateRecursive(content, upnextContentItem)
+    m.translateRecursive(content, upnextContentItem, isSignedInUser)
   else
     parent = upnextContentItem.getParent()
     parent.removeChild(upnextContentItem)

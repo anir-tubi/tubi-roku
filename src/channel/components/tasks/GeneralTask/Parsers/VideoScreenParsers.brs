@@ -24,14 +24,20 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
-Function parseVideoScreenUpNextSuccess(fullResponse, _reqInfo)
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseVideoScreenUpNextSuccess(fullResponse, reqInfo)
   parsedResponse = fullResponse.data
   translate = TubiMetadataTranslate(m.constants)
   upNextContent = CreateObject("roSGNode", "ContentNode")
+
+  isSignedInUser = false
+  if reqInfo <> invalid
+    isSignedInUser = reqInfo.isSignedInUser
+  end if
+
   for each content in parsedResponse
     upNextItem = upNextContent.createChild("TubiContentNode")
-    translate.upNextTranslateRecursiveWrapper(content, upNextItem)
+    translate.upNextTranslateRecursiveWrapper(content, upNextItem, isSignedInUser)
   end for
   return upNextContent
 End Function

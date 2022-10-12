@@ -5,7 +5,13 @@ Function parseTournamentSuccess(fullResponse, reqInfo)
   experiments = TubiExperiments(m.constants)
   translate = TubiMetadataTranslate(m.constants, experiments)
   parsedResponse = fullResponse.data
-  tournamentResponse = translate.translateTournamentScreen(parsedResponse, reqInfo.requestorID, reqInfo.isSignedInUser )
+
+  isSignedInUser = false
+  if reqInfo <> invalid
+    isSignedInUser = reqInfo.isSignedInUser
+  end if
+
+  tournamentResponse = translate.translateTournamentScreen(parsedResponse, reqInfo.requestorID, isSignedInUser)
   return tournamentResponse
 End Function
 

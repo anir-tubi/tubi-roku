@@ -9,7 +9,6 @@ Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
   contentMode = invalid
   isKidsMode = invalid
 
-  authInfo = invalid
   uiMode = "standard"
 
   if reqInfo <> invalid AND reqInfo.options <> invalid
@@ -25,12 +24,16 @@ Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
       isKidsMode = options.params.isKidsMode
     end if
 
-    authInfo = reqInfo.authInfo
     uiMode = reqInfo.uiMode
 
   end if
 
-  convertedMetadata = translate.translateFIFAHomescreen(parsedResponse, contentMode, authInfo, isKidsMode, uiMode)
+  isSignedInUser = false
+  if reqInfo <> invalid
+    isSignedInUser = reqInfo.isSignedInUser
+  end if
+
+  convertedMetadata = translate.translateFIFAHomescreen(parsedResponse, contentMode, isKidsMode, uiMode, isSignedInUser)
 
   return convertedMetadata
 End Function
@@ -50,13 +53,18 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
   bFullData = false
   contentMode = "homeScreen"
 
+  isSignedInUser = false
+
   if reqInfo <> invalid
+    isSignedInUser = reqInfo.isSignedInUser
+
     options = reqInfo.options
     if options <> invalid AND options.params <> invalid
       contentMode = options.params.contentMode
     end if
   end if
 
-  convertedMetadata = translate.translateContainerForHomeScreen(parsedResponse, fullJson, orientation, bFullData, contentMode)
+
+  convertedMetadata = translate.translateContainerForHomeScreen(parsedResponse, fullJson, orientation, bFullData, contentMode, isSignedInUser)
   return convertedMetadata  'may return an empty container
 End Function

@@ -28,10 +28,16 @@ End Function
 
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
-Function parseSearchAPISuccess(fullResponse, _reqInfo)
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseSearchAPISuccess(fullResponse, reqInfo)
   metadataTranslate = TubiMetadataTranslate(m.constants)
   parsedResponse = fullResponse.data
-  convertedMetadata = metadataTranslate.translate(parsedResponse)
+
+  isSignedInUser = false
+  if reqInfo <> invalid
+    isSignedInUser = reqInfo.isSignedInUser
+  end if
+
+  convertedMetadata = metadataTranslate.translate(parsedResponse, isSignedInUser)
   return convertedMetadata
 End Function

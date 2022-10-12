@@ -452,7 +452,7 @@ Function fetchHomeScreen(homeScreen)
       successCallback: sucessHandler
       errorCallback: errorHandler
       responseType: "node"
-      authInfo: m.global.authInfo
+      isSignedInUser: isLoggedInUser()
       uiMode: m.uiMode
     })
 
@@ -965,7 +965,8 @@ Function onLoadCategoriesIndex(msg)
   end if
 
   isKidsMode = shouldKidsModeBeSentToServer()
-  batchRequests = m.cmsApi.createHomeScreenBatchReqInfo(homeScreen, index, isKidsMode)
+  isLoggedInUser = isLoggedInUser()
+  batchRequests = m.cmsApi.createHomeScreenBatchReqInfo(homeScreen, index, isKidsMode, isLoggedInUser)
 
   if batchRequests <> invalid
     m.makeBatchRequest({

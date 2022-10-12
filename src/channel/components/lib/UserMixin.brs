@@ -48,7 +48,11 @@ Function getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime = "", hasVideoRe
   badgeText = ""
   badgeAndInfoPanelValues = {}
 
-  if dateTimeString <> invalid AND dateTimeString <> "" and hasVideoResources <> invalid
+  if hasVideoResources = invalid
+    hasVideoResources = false
+  end if
+
+  if isNonEmptyString(dateTimeString) = true
     startDateTime = CreateObject("roDateTime")
     startDateTime.FromISO8601String(dateTimeString)
     startDateTime.ToLocalTime()

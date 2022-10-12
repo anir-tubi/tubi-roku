@@ -27,7 +27,13 @@ End Function
 Function parseEPGProgramsSuccess(fullResponse, reqInfo)
   translate = TubiMetadataTranslate(m.constants)
   parsedResponse = fullResponse.data
-  epgProgramsResponse = translate.translateEPGPrograms(parsedResponse, reqInfo.requestorID, reqInfo.isSignedInUser )
+
+  isSignedInUser = false
+  if reqInfo <> invalid
+    isSignedInUser = reqInfo.isSignedInUser
+  end if
+
+  epgProgramsResponse = translate.translateEPGPrograms(parsedResponse, reqInfo.requestorID, isSignedInUser)
   return epgProgramsResponse
 End Function
 

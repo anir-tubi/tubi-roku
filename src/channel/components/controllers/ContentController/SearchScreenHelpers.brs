@@ -62,6 +62,7 @@ Function onSearchTextChanged(msg)
       successCallback: onSearchSuccessResponse
       errorCallback: onSearchErrorResponse
       responseType: "node"
+      isSignedInUser: isLoggedInUser()
     })
 
     m.trackingLoggingTask.trackEvent = {
@@ -81,6 +82,7 @@ Function onSearchTextChanged(msg)
       successCallback: onSearchDefaultSuccessResponse
       errorCallback: onSearchDefaultErrorResponse
       responseType: "node"
+      isSignedInUser: isLoggedInUser
     })
 
   end if

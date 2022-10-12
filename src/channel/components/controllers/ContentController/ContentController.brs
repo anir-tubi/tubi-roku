@@ -772,6 +772,7 @@ Function setDirtyUserCategories(categoryId)
       errorCallback: onErrorReloadUserCategories
       responseType: "node"
       id: categoryId
+      isSignedInUser: isLoggedInUser()
     })
 
     '//Apply the movie, TV, and Espanol filters if those screens exist
@@ -791,6 +792,7 @@ Function setDirtyUserCategories(categoryId)
         errorCallback: onErrorReloadUserCategoriesInMovieScreen
         responseType: "node"
         id: categoryId
+        isSignedInUser: isLoggedInUser()
       })
     end if
 
@@ -810,6 +812,7 @@ Function setDirtyUserCategories(categoryId)
         errorCallback: onErrorReloadUserCategoriesInTVScreen
         responseType: "node"
         id: categoryId
+        isSignedInUser: isLoggedInUser()
       })
     end if
 
@@ -830,6 +833,7 @@ Function setDirtyUserCategories(categoryId)
         errorCallback: onErrorReloadUserCategoriesInEspanolScreen
         responseType: "node"
         id: categoryId
+        isSignedInUser: isLoggedInUser()
       })
     end if
   end if
