@@ -225,21 +225,35 @@ Function populateInfoPanel(focusedContent, isReminderSet=false)
       m.InfoPanel.availabilityType = availabilityType
       m.InfoPanel.needsLogin = focusedContent.needsLogIn AND (m.top.signedIn <> true)
       m.top.backgroundUriList = determineBackgroundImage(focusedContent)
-    else if focusedContent.type = m.constants.ui.contentTypes.video
-      m.InfoPanel.mode = m.constants.ui.infoPanelModes.movie
+    else if focusedContent.type = m.constants.ui.contentTypes.video or focusedContent.type = m.constants.ui.contentTypes.series
+      m.InfoPanel.mode = m.constants.ui.infoPanelModes.item
       m.InfoPanel.title = focusedContent.title
       m.InfoPanel.description = focusedContent.description
       lineOneData.hasCC = focusedContent.hasSubtitles
       lineOneData.rating = focusedContent.rating
       lineOneData.releaseDate = focusedContent.releaseDate
       lineOneData.length = focusedContent.length
+
+      if focusedContent.type = m.constants.ui.contentTypes.series
+        lineOneData.type = m.constants.ui.contentTypes.series
+        ' lineOneData.seasons =  '//If available, get the number of seasons and set the value here
+      end if
+      lineOneData.releaseDate = focusedContent.releaseDate
+      lineOneData.length = focusedContent.length
+      lineOneData.hasCC = focusedContent.hasSubtitles
+
+      if focusedContent.availabilityEnds <> invalid
+        lineOneData.availabilityEnds = focusedContent.availabilityEnds
+      end if
+
+      lineOneData.rating = focusedContent.rating
+      lineOneData.partnerLogoUri = focusedContent.inlineLogoUri
+
       m.InfoPanel.lineOneData = lineOneData
+      m.InfoPanel.titleLogoUri = focusedContent.titleLogoUri
       m.InfoPanel.genres = focusedContent.genres
-      m.InfoPanel.directors = focusedContent.directors
-      m.InfoPanel.starring = focusedContent.actors
       m.InfoPanel.needsLogin = focusedContent.needsLogIn AND (m.top.signedIn <> true)
       m.InfoPanel.width = 960
-    else if focusedContent.type = m.constants.ui.contentTypes.series
     else
       m.top.backgroundUriList = determineBackgroundImage(focusedContent)
     end if
@@ -271,7 +285,7 @@ Function onGridItemFocused()
     isReminderSet = false
 
     bookMarkIds = getFieldFromGlobal("bookmarkIds")
-   
+
     airDateTime = focusedContent.airDatetime
     hasVideoResources = focusedContent.hasVideoResources
 
