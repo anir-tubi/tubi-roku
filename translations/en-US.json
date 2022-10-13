@@ -1286,6 +1286,10 @@
     "description": "Button text displayed on onBoarding screens takes to Initial Content Type Selector Screen or Home Screen",
     "message": "Continue as Guest"
   },
+  "onBoarding_welcomeScreen_heading": {
+    "description": "Label displayed on onBoarding welcome screen",
+    "message": "Welcome to unlimited movies,\nTV shows and Live TV"
+  },
   "show_all_games_gameInfo": {
     "description": "Text displayed on Fifa World Cup 2022 infopanel second line when Show all games is focused",
     "message": "Nov 20, 2022 - Dec 18, 2022"

@@ -1455,6 +1455,10 @@ Function getTranslation_en_US()
       "description": "Button text displayed on onBoarding screens takes to Initial Content Type Selector Screen or Home Screen",
       "message": "Continue as Guest"
     },
+    "onBoarding_welcomeScreen_heading": {
+      "description": "Label displayed on onBoarding welcome screen",
+      "message": "Welcome to unlimited movies,\nTV shows and Live TV"
+    },
     "show_all_games_gameInfo": {
       "description": "Text displayed on Fifa World Cup 2022 infopanel second line when Show all games is focused",
       "message": "Nov 20, 2022 - Dec 18, 2022"
@@ -1622,6 +1626,14 @@ Function getTranslation_es_MX()
     "menu_exit": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to exit the app.",
       "message": "Salir"
+    },
+    "menu_tournament": {
+      "description": "Menu option on the app's side/top nav, (length of text should not be too long). Allows the user to display FIFA tournament the page.",
+      "message": "Copa Mundial de la FIFA 2022 {tradeMark}"
+    },
+    "screenHome_item_showAllGames": {
+      "description": "The text to display on Show All Games tile",
+      "message": "Mostrar Todos Los Partidos"
     },
     "loadingIndicator": {
       "description": "When something is loading, this text appears so the user knows something is loading.",
@@ -1955,6 +1967,14 @@ Function getTranslation_es_MX()
       "description": "Description of the warning dialog when user is attempting to add a TV show/series to their list but are not signed in",
       "message": "Inicia sesión o regístrate en Tubi para agregar esta serie a tu lista."
     },
+    "screenDetails_error_setReminderSports_description": {
+      "description": "Description of the warning dialog when user is attempting to set reminder but are not signed in",
+      "message": "Inicia sesión o regístrate para obtener una cuenta de Tubi y establecer un recordatorio."
+    },
+    "screenDetails_error_addQueueSports_description": {
+      "description": "Description of the warning dialog when user is attempting to add a game to their list but are not signed in",
+      "message": "Inicia sesión o regístrate en Tubi para agregar este juego a tu lista."
+    },
     "screenDetails_error_getContent_description": {
       "description": "Description of error when app is not able to get content.",
       "message": "No se pudo recuperar la información del contenido del servidor."
@@ -1987,6 +2007,18 @@ Function getTranslation_es_MX()
       "description": "title for button a user clicks to skip selecting a content experience",
       "message": "Muestrame Todo"
     },
+    "screenDetails_queue_content_added_to_list_description": {
+      "description": "Message when a content is added to the user's list after sign in.",
+      "message": "Contenido"
+    },
+    "screenDetails_queue_added_to_list_description": {
+      "description": "Message when a movie/series/replay game is added to the user's list after sign in.",
+      "message": "{contentTitle} ha sido agregado a la lista."
+    },
+    "screenDetails_queue_added_to_reminder_list_description": {
+      "description": "Message when a upcoming game is added to the user's reminder list after sign in.",
+      "message": "{upcomingTitle} ha sido establecido en los recordatorios."
+    },
     "screenDetails_error_queueMovie_description": {
       "description": "Error message when a movie is not added to the user's list.",
       "message": "No estamos seguros de lo que pasó, pero algo salió mal al tratar de agregar esta película a tu lista."
@@ -2002,6 +2034,14 @@ Function getTranslation_es_MX()
     "screenDetails_error_noQueueSeries_description": {
       "description": "Error message when a tv show/series is not removed from the user's list.",
       "message": "No estamos seguros de lo que pasó, pero algo salió mal al tratar de eliminar esta serie de tu lista."
+    },
+    "screenDetails_error_noQueueUpcoming_description": {
+      "description": "Error message when a upcoming game is not removed from the user's reminders list.",
+      "message": "No estamos seguros de lo que sucedió, pero algo salió mal al intentar retirar el recordatorio."
+    },
+    "screenDetails_error_noQueueReplay_description": {
+      "description": "Error message when a replay game is not removed from the user's list.",
+      "message": "No estamos seguros de lo que pasó, pero algo salió mal al tratar de eliminar el evento deportivo de la lista."
     },
     "screenDetails_error_likeDislike_description": {
       "description": "Error message when a video title's like/dislike rating is not changed.",
@@ -2195,6 +2235,10 @@ Function getTranslation_es_MX()
       "description": "Onscreen message to indicate TV content could not be loaded",
       "message": "No se pudo cargar la pantalla de series de Tubi."
     },
+    "screenTournament_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate Tournament content could not be loaded",
+      "message": "No se puede cargar la pantalla del Torneo en Tubi."
+    },
     "screenHome_item_tvguide_subtitle": {
       "description": "The subtitle of the rowList item for the TV Guide. It should be in title case.",
       "message": "Ver Todos Los Canales"
@@ -2234,6 +2278,54 @@ Function getTranslation_es_MX()
     "day_7": {
       "description": "shortened version Sunday, formatted with , and a space",
       "message": "Dom, "
+    },
+    "short_version_month_1": {
+      "description": "shortened version January",
+      "message": "ene "
+    },
+    "short_version_month_2": {
+      "description": "shortened version February",
+      "message": "feb"
+    },
+    "short_version_month_3": {
+      "description": "shortened version March",
+      "message": "mar"
+    },
+    "short_version_month_4": {
+      "description": "shortened version April",
+      "message": "abr"
+    },
+    "short_version_month_5": {
+      "description": "shortened version May",
+      "message": "may"
+    },
+    "short_version_month_6": {
+      "description": "shortened version June",
+      "message": "jun"
+    },
+    "short_version_month_7": {
+      "description": "shortened version July",
+      "message": "jul"
+    },
+    "short_version_month_8": {
+      "description": "shortened version August",
+      "message": "ago"
+    },
+    "short_version_month_9": {
+      "description": "shortened version September",
+      "message": "sep"
+    },
+    "short_version_month_10": {
+      "description": "shortened version October",
+      "message": "oct"
+    },
+    "short_version_month_11": {
+      "description": "shortened version November",
+      "message": "nov"
+    },
+    "short_version_month_12": {
+      "description": "shortened version December",
+      "message": "dic"
     },
     "channelGuide_error_fetchContent_description": {
       "description": "Onscreen message to indicate channel Guide content could not be loaded",
@@ -2278,6 +2370,22 @@ Function getTranslation_es_MX()
     "screenDetails_button_likeDislike": {
       "description": "Label of unfocused button to allow users to like or dislike the current video title",
       "message": "Me Gusta o No Me Gusta"
+    },
+    "screenDetails_button_see_all_games": {
+      "description": "Label of button to allow users to see all the games in the current video title",
+      "message": "Ver Todos Los Partidos"
+    },
+    "screenDetails_button_sign_in_to_set_reminder": {
+      "description": "Label of button to allow users to set the reminder to the current video title when the user is not signed in.",
+      "message": "Inicia sesión para programar un Recordatorio"
+    },
+    "screenDetails_button_set_reminder": {
+      "description": "Label of button to allow users to set the reminder to the current video title when the user is signed in.",
+      "message": "Programar recordatorio"
+    },
+    "screenDetails_button_reminder_set": {
+      "description": "Label of button to indicate the users that reminder is set on the current video title",
+      "message": "Recordatorio programado"
     },
     "screenDetails_button_resume": {
       "description": "Label of button to allow users to resume the current video title",
@@ -2677,6 +2785,18 @@ Function getTranslation_es_MX()
       "description": "button text on top of background image next to sign up text for when a non registered user focuses on details screen",
       "message": "GRATIS"
     },
+    "registration_signIn_to_play_button": {
+      "description": "button text for when a non registered user focuses on details screen for sportsEvent",
+      "message": "Inicia sesión para Ver"
+    },
+    "registration_signIn_to_play_hint": {
+      "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
+      "message": "Inicia sesión para ver gratis. No se requiere tarjeta de crédito."
+    },
+    "text_new": {
+      "description": "simple text to use anywhere to indicate item is new",
+      "message": "NUEVO"
+    },
     "screenEmailVerification_resend_verification_link": {
       "description": "Label of button to allow users to resend the email verification link for sign in",
       "message": "Reenviar Enlace de Verificación"
@@ -2708,6 +2828,14 @@ Function getTranslation_es_MX()
     "onBoarding_welcomeScreen_heading": {
       "description": "Label displayed on onBoarding welcome screen",
       "message": "Bienvenido a películas ilimitadas,\nSeries y TV en Vivo"
+    },
+    "show_all_games_gameInfo": {
+      "description": "Text displayed on Fifa World Cup 2022 infopanel second line when Show all games is focused",
+      "message": "20 de nov, de 2022 - 18 de dic, de 2022"
+    },
+    "show_all_games_description": {
+      "description": "Description displayed on Fifa World Cup 2022 infopanel when Show all games is focused",
+      "message": "La Copa Mundial de la FIFA, que se celebra cada cuatro años, cuenta con la participación de 32 naciones que compiten por el título."
     },
     "onBoarding_welcomeScreen_description": {
       "description": "Description displayed on onBoarding welcome screen",
@@ -2760,6 +2888,18 @@ Function getTranslation_es_MX()
     "onBoarding_landingScreen_madeForYouBody": {
       "description": "Body displayed on onBoarding Landing screen informing better recommendations",
       "message": "Desbloquea mejores recomendaciones"
+    },
+    "dialog_got_it": {
+      "description": "button display on fifa intro modal",
+      "message": "Lo entiendo"
+    },
+    "dialog_explore_fifa": {
+      "description": "button display on fifa intro modal",
+      "message": "Descubre FIFA 2022"
+    },
+    "explore_fifa_description": {
+      "description": "description displayed on fifa intro modal",
+      "message": "Llamando a todos los aficionados del fútbol! Ver el Mundial de la FIFA 2022 gratis en Tubi. Crea una cuenta para acceder a todos los partidos. No se requiere tarjeta de crédito. Sin suscripciones."
     }
   }
 End Function
