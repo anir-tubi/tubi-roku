@@ -42,6 +42,11 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         setInScreenCache(videoPlayer)
       end if
 
+      screen = getFromScreenCache(sAssociatedScreenID)
+      if screen <> invalid
+        videoPlayer.trackingPageInfo = screen.trackingPageInfo
+      end if
+
       unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
       videoPlayer.associatedScreenID = sAssociatedScreenID
       videoPlayer.allowTransportToAppear = bAllowTransportToAppear

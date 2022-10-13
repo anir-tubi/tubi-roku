@@ -821,12 +821,19 @@ Function getPlayProgressEvent()
     if m.top.fullscreen = false
       videoPlayerType = "BANNER"
     end if
+
+    pageType = ""
+    if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pageType <> invalid
+      pageType = m.top.trackingPageInfo.pageType
+    end if
+
     playProgressEvent = {
       type: "live_play_progress"
       values: {
         video_id: m.Video.content.id.toInt()
         view_time: Int((m.playerPosition - m.lastPingTime) * 1000) 'ms
         video_player: videoPlayerType
+        page_type: pageType
       }
     }
   end if
