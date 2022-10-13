@@ -75,7 +75,8 @@ Function onItemContentChange()
     if m.top.itemContent.badgeText <> ""
       m.badgeLabel.fontColor = "0x10141F"
       m.badgeLabel.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
-      m.badgeLabel.fontSize = 21
+      m.badgeLabel.fontSize = 18
+      m.badgeLabel.padding = [12, 9]
       m.badgeLabel.text = m.top.itemContent.badgeText
       m.badgeLabel.visible = true
       m.badgeLabel.translation = [calculatedWidth + 20, 20]

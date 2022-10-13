@@ -93,7 +93,6 @@ Function init()
   if authInfo <> invalid AND authInfo.parentalrating <> invalid
     m.top.parentalRating = authInfo.parentalrating
   end if
-
 End Function
 
 
