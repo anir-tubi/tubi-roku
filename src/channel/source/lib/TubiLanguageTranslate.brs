@@ -1629,7 +1629,7 @@ Function getTranslation_es_MX()
     },
     "menu_tournament": {
       "description": "Menu option on the app's side/top nav, (length of text should not be too long). Allows the user to display FIFA tournament the page.",
-      "message": "Copa Mundial de la FIFA 2022 {tradeMark}"
+      "message": "Copa Mundial de la FIFA 2022{tradeMark}"
     },
     "screenHome_item_showAllGames": {
       "description": "The text to display on Show All Games tile",
