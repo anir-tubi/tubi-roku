@@ -216,7 +216,9 @@ Function onEmailExistsResponse(response)
 
       if parsedresponse.taken = true
         '//user's email address exists in Tubi servers, so user can sign into their Tubi account
-        showSignInScreen(rawInput)
+        showEmailVerificationScreen(email)
+        m.email = email
+        createMagicLinkRequest(email)
       else
         '//user's email address does not exist in Tubi servers, so sign user up with a new Tubi account
         m.authInfoReceived = false
