@@ -1830,6 +1830,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
         end if
         if channelNode.channelName <> invalid
           program.epgProgramTitle = channelNode.channelName
+          program.title = channelNode.channelName
         end if
         program.description = channelNode.description
         program.FHDItemWidth = 1700
