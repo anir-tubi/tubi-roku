@@ -449,7 +449,7 @@
             id="Description"
             width="1140"
             lineSpacing="16"
-            maxLines="2"
+            maxLines="5"
             wrap="true"
             color="0xFFFFFFFF"
             translation="[25,15]"
