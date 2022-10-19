@@ -59,25 +59,27 @@ End Function
 
 '@contentNode: program content node
 Function populateInfoPanel(contentNode)
-  tubiLog("LinearVideoPlayerScreenOverlay. populateInfoPanel")
+  tubiLog("LinearVideoPlayerScreenOverlay.populateInfoPanel")
   if contentNode <> invalid
     m.InfoPanel.mode = m.constants.ui.infoPanelModes.epg
     m.InfoPanel.title = contentNode.title
-    m.InfoPanel.description = contentNode.description
     m.InfoPanel.width = 650
-    m.InfoPanel.headerImageUri = contentNode.FHDPosterUrl
+    m.InfoPanel.leftHeaderImageUri = contentNode.FHDPosterUrl
+
     lineOneData = {}
+    lineOneData.hoursOfAiring = contentNode.hoursOfAiring
     lineOneData.rating = contentNode.rating
     lineOneData.hasCC = contentNode.hasSubtitles
+
     if contentNode.descriptors <> invalid AND contentNode.descriptors.Count() > 0
       lineOneData.descriptorCode = contentNode.descriptors.join(", ") ' ::TODO:: When when we get real values into TAGS
     end if
-    lineOneData.releaseDate = contentNode.ReleaseDate
-    lineOneData.hoursOfAiring = contentNode.hoursOfAiring
+
     m.InfoPanel.lineOneData = lineOneData
-    m.InfoPanel.genres = [contentNode.genre]
+    m.InfoPanel.description = contentNode.description
     m.InfoPanel.needsLogIn = contentNode.needsLogin
   end if
+
   m.InfoPanel.calculateHeight = true
 End Function
 

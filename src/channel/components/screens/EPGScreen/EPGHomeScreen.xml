@@ -39,6 +39,8 @@
     <!-- The number that is used as how many more seconds until the linear video player will be going fullscreen -->
     <field id="fullscreenCountdown" type="integer" alias="InfoPanel.fullscreenCountdown"/>
 
+    <field id="infoPanelVisible" alias="InfoPanel.visible" />
+
     <field id="jumpToRowItem" alias="programGuide.jumpToRowItem" />
 
     <field id="jumpToRowItemByID" alias="programGuide.jumpToLinearChannelID" />
@@ -54,7 +56,7 @@
     <field id="topNavSelectedId" type="string" alias="topNav.selectedId" />
 
     <!-- set to true if the user is signed in and we want to change the experience based on that -->
-    <field id="signedIn" type="boolean" value="false" />
+    <field id="signedIn" type="boolean" />
 
     <!-- OUTPUTS -->
 
@@ -112,7 +114,8 @@
         id="infoPanel"
         maxHeight="355"
         translation="[192,180]"
-        maxTitleLines="2"/>
+        maxTitleLines="2"
+        visible="false"/>
     </Group>
 
     <ProgramGuide

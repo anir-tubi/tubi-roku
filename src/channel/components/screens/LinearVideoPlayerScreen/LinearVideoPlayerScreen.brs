@@ -99,7 +99,7 @@ Function onChannelSelectedToPlayChanged()
   tubiLog("LineaerVideoPlayerNewScreen.onChannelSelectedToPlayChanged")
   playContent = true
   if m.VideoOverlay.linearChannelToPlay.needsLogin = true
-    if isLoggedInUser() = true
+    if isLoggedInUser() = false
       m.top.control = "stop"
       m.top.channelSelected = m.VideoOverlay.linearChannelToPlay
       setVideoplayerLoadingScreenBackGround(true)

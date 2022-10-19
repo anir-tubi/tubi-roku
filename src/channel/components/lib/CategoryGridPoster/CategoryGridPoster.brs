@@ -128,7 +128,8 @@ Function onContentChange(msg)
 
     if categoryContent <> invalid AND itemContent.gridItemType <> invalid then
       m.poster.uri = itemContent.hdgridposterurl
-      if itemContent.gridItemType = m.gridItemTypes.landscape
+      ' do not show title below the poster for featured row & show All poster
+      if itemContent.gridItemType = m.gridItemTypes.landscape AND m.top.itemContent.type <> m.contentTypes.navigate
         m.title.visible = true
         m.title.text = itemContent.title
       else if isVitg(itemContent, m.gridItemTypes) = true
@@ -140,11 +141,7 @@ Function onContentChange(msg)
       'itemContent.gridItemType is not an empty string on the home screen,
       'and we want this to set Live logo and text just on the search screen.
       else if (itemContent.gridItemType = "" AND itemContent.type = "linear")
-        if getExperimentResource("roku_search_live_badge", "roku_search_live_badge_v1", true).enabled = true
-          setLiveBadge()
-        else
-          setLiveIconAndText()
-        end if
+        setLiveBadge()
       end if
     else
       m.poster.uri = itemContent.hdgridposterurl
@@ -486,7 +483,7 @@ Function setLockIcon()
   m.lockIcon.opacity = 0.0
   m.lockIcon.width = 21
   m.lockIcon.height = 24
-  m.lockIcon.uri = "pkg:/images/lock_icon.png"
+  m.lockIcon.uri = "pkg:/images/icon-lock.png"
   m.lockIcon.translation = [m.top.width-36, 14]
 End Function
 

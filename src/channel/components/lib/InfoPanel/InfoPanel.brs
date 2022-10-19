@@ -1,116 +1,96 @@
 Function init()
-  m.constants = getConstantsFromGlobal()
-
-  m.nodeHelpers = TubiNodeHelpers()
-  m.TitleGroup = m.top.findNode("TitleGroup")
-  m.Title = m.top.findNode("Title")
-  m.infoPanelGroup = m.top.findNode("infoPanelGroup")
-  m.LiveVideoIndicator = m.top.findNode("LiveVideoIndicator")
-  m.TitleLogo = m.top.findNode("TitleLogo")
-  m.HeaderImage = m.top.findNode("HeaderImage")
-  m.Episode = m.top.findNode("Episode")
-  m.CategoryDetails = m.top.findNode("CategoryDetails")
-  m.SeasonDetails = m.top.findNode("SeasonDetails")
-  m.TwoLineInfo = m.top.findNode("TwoLineInfo")
-  m.ClosedCaptions = m.top.findNode("ClosedCaptionPoster")
-  m.resolutionPoster = m.top.findNode("resolutionPoster")
-  m.Rating = m.top.findNode("Rating")
-  m.RatingBackground = m.Rating.findNode("RatingBackground")
-  m.RatingLabel = m.Rating.findNode("RatingLabel")
-
-  m.FifaWorldCupGameDetails = m.top.findNode("FifaWorldCupGameDetails")
-  m.fifaImage = m.top.findNode("fifaImage")
-  m.FifaWorldCupTitle = m.top.findNode("FifaWorldCupTitle")
-  m.sportsBadge = m.top.findNode("sportsBadge")
-  m.matchTime = m.FifaWorldCupGameDetails.findNode("matchTime")
-  m.roundGroupInfo = m.FifaWorldCupGameDetails.findNode("roundGroupInfo")
-  m.FifaWorldCupDescription = m.top.findNode("FifaWorldCupDescription")
-  m.FifaWorldCupClosedCaption = m.top.findNode("FifaWorldCupClosedCaptionPoster")
-  m.FifaWorldCup4k = m.top.findNode("FifaWorldCup4kPoster")
-  m.FifaWorldCupRating = m.top.findNode("FifaWorldCupRating")
-  m.FifaWorldCupRatingBackground = m.FifaWorldCupRating.findNode("FifaWorldCupRatingBackground")
-  m.FifaWorldCupRatingLabel = m.FifaWorldCupRating.findNode("FifaWorldCupRatingLabel")
-  m.ReminderGroup = m.top.findNode("ReminderGroup")
-  m.ReminderLogo = m.top.findNode("ReminderLogo")
-  m.ReminderTitle = m.top.findNode("ReminderTitle")
-  m.signInGroup = m.top.findNode("signInGroup")
-  m.lockIcon = m.top.findNode("lockIcon")
-  m.signInTitle = m.top.findNode("signInTitle")
-
-  m.DescriptorCode = m.top.findNode("DescriptorCode")
-
-  m.Description = m.top.findNode("Description")
-  m.DescriptionGroup = m.top.findNode("DescriptionGroup")
-  m.DescriptionFocusButton = m.top.findNode("DescriptionFocusButton")
-
   ' trying to access m.global can sometimes/rarely time out creating a run time error if we
   ' try to access m.global.theme directly, so use GlobalMixin.getThemeFromGlobal() which retries if issues arise.
+  m.constants = getConstantsFromGlobal()
   theme = getThemeFromGlobal()
+
+  m.nodeHelpers = TubiNodeHelpers()
+
+  m.offset = m.top.findNode("Offset")
+  m.infoPanelGroup = m.top.findNode("infoPanelGroup")
+  m.topHeaderImage = m.top.findNode("TopHeaderImage")
+  m.leftHeaderImage = m.top.findNode("LeftHeaderImage")
+
+  m.title = m.top.findNode("Title")
+  m.episode = m.top.findNode("Episode")
+  m.twoLineInfo = m.top.findNode("TwoLineInfo")
+  
+  m.firstLineGroup = m.twoLineInfo.findNode("FirstLineGroup")
+  m.firstLineAvailabilityBadge = m.firstLineGroup.findNode("FirstLineAvailabilityBadge")
+  m.line1 = m.firstLineGroup.findNode("Line1")
+  m.line1Bold = m.firstLineGroup.findNode("Line1Bold")
+  m.resolutionPoster = m.firstLineGroup.findNode("ResolutionPoster")
+  m.closedCaptions = m.firstLineGroup.findNode("ClosedCaptionPoster")
+  m.rating = m.firstLineGroup.findNode("Rating")
+  m.ratingBackground = m.rating.findNode("RatingBackground")
+  m.ratingLabel = m.rating.findNode("RatingLabel")
+  m.descriptorCode = m.firstLineGroup.findNode("DescriptorCode")
+  m.expireWarning = m.firstLineGroup.findNode("ExpireWarning")
+  m.partnerLogo = m.firstLineGroup.findNode("PartnerLogo")
+
+  m.secondLineGroup = m.top.findNode("SecondLineGroup")
+  m.secondLineAvailabilityBadge = m.secondLineGroup.findNode("SecondLineAvailabilityBadge")
+  m.line2 = m.secondLineGroup.findNode("Line2")
+
+  m.descriptionGroup = m.top.findNode("DescriptionGroup")
+  m.description = m.top.findNode("Description")
+  m.descriptionFocusButton = m.top.findNode("DescriptionFocusButton")
+
+  m.signInGroup = m.top.findNode("signInGroup")
+  m.signInText = m.top.findNode("signInText")
+  m.reminderGroup = m.top.findNode("ReminderGroup")
+  m.reminderTitle = m.top.findNode("ReminderTitle")
+
+  m.directorGroup = m.top.findNode("DirectorGroup")
+  m.director = m.top.findNode("Director")
+  m.directorTag = m.top.findNode("DirectorTag")
+  DirectorRect = m.top.findNode("DirectorRect")
+  m.starringGroup = m.top.findNode("StarringGroup")
+  m.starring = m.top.findNode("Starring")
+  m.starringTag = m.top.findNode("StarringTag")
+  StarringRect = m.top.findNode("StarringRect")
+
+  m.playerCountdownGroup = m.top.findNode("PlayerCountdownGroup")
+  m.countdownText = m.top.findNode("CountdownText")
+
+  m.top.observeFieldScoped("mode", "onModeChange")
+  m.top.observeFieldScoped("width", "onWidthChange")
+  m.top.observeFieldScoped("leftHeaderImageUri", "onLeftHeaderImageUriChange")
+  m.top.observeFieldScoped("description", "onDescriptionChange")
+  m.top.observeFieldScoped("lineOneData", "onLineOneDataChange")
+  m.top.observeFieldScoped("lineTwoData", "onLineTwoDataChange")
+  m.top.observeFieldScoped("seasonEpisodeCount", "onSeasonEpisodeCountChange")
+  m.top.observeFieldScoped("directors", "onDirectorsChange")
+  m.top.observeFieldScoped("starring", "onStarringChange")
+  m.top.observeFieldScoped("needsLogin", "onNeedsLoginChange")
+  m.top.observeFieldScoped("reminderIsSet", "onReminderChange")
+  m.top.observeFieldScoped("fullscreenCountdown", "onPlayerCountDownChange")
+  m.top.observeFieldScoped("calculateHeight", "onCalculateHeight")
+  m.top.observeFieldScoped("focusedChild", "onComponentFocus")
+  m.partnerLogo.observeFieldScoped("loadStatus", "onPosterLoadStatus")
+  m.rating.observeFieldScoped("loadStatus", "onPosterLoadStatus")
+  m.closedCaptions.observeFieldScoped("loadStatus", "onPosterLoadStatus")
+  m.resolutionPoster.observeFieldScoped("loadStatus", "onPosterLoadStatus")
+
+  m.expireWarning.color = m.constants.ui.colors.expirationWarning
+  m.signInText.text = getTranslation("registration_signIn_to_play_hint")
+  m.reminderTitle.text = getTranslation("screenDetails_button_reminder_set")
+
   if theme <> invalid
-    m.DescriptionFocusButton.blendColor = theme.focused
+    m.descriptionFocusButton.blendColor = theme.focused
   end if
-
-  m.StarringTag = m.top.findNode("StarringTag")
-  m.DirectorTag = m.top.findNode("DirectorTag")
-  m.Director = m.top.findNode("Director")
-  m.DirectorGroup = m.top.findNode("DirectorGroup")
-  m.StarringGroup = m.top.findNode("StarringGroup")
-  m.Starring = m.top.findNode("Starring")
-  m.PlayerCountdownGroup = m.top.findNode("PlayerCountdownGroup")
-  m.CountdownText = m.top.findNode("CountdownText")
-  m.Offset = m.top.findNode("Offset")
-  m.PartnerLogo = m.top.findNode("PartnerLogo")
-  m.ExpireWarning = m.top.findNode("ExpireWarning")
-  m.ExpireWarning.color = m.constants.ui.colors.expirationWarning
-  m.SecondLineGroup = m.top.findNode("SecondLineGroup")
-  m.top.observeField("mode", "onModeChange")
-  m.top.observeField("width", "onWidthChange")
-
-  m.top.observeField("titleLogoUri", "onTitleLogoUriChange")
-  m.top.observeField("headerImageUri", "onHeaderImageUriChange")
-  m.top.observeFieldScoped("needsLogIn", "onNeedsLogInChange")
-  m.top.observeField("lineOneData", "onLineOneDataChange")
-  m.top.observeField("genres", "onGenresChange")
-  m.top.observeField("description", "onDescriptionChange")
-  m.top.observeField("directors", "onDirectorsChange")
-  m.top.observeField("starring", "onStarringChange")
-  m.top.observeField("seasonEpisodeCount", "onSeasonEpisodeCountChange")
-  m.top.observeField("categoryContentCount", "onCategoryContentCountChange")
-  m.top.observeField("fullscreenCountdown", "onPlayerCountDownChange")
-  m.top.observeField("calculateHeight", "onCalculateHeight")
-  m.top.observeField("focusedChild", "onComponentFocus")
-  m.PartnerLogo.observeField("loadStatus", "onPosterLoadStatus")
-  m.Rating.observeField("loadStatus", "onPosterLoadStatus")
-  m.ClosedCaptions.observeField("loadStatus", "onPosterLoadStatus")
-  m.resolutionPoster.observeField("loadStatus", "onPosterLoadStatus")
-  m.FifaWorldCupClosedCaption.observeFieldScoped("loadStatus", "onPosterLoadStatus")
-  m.FifaWorldCup4k.observeFieldScoped("loadStatus", "onPosterLoadStatus")
-  m.FifaWorldCupRating.observeFieldScoped("loadStatus", "onPosterLoadStatus")
 
   onWidthChange()
 
-  'set the default CC state to be no CC
-  m.firstLineGroup = m.TwoLineInfo.findNode("FirstLineGroup")
-'  firstLineGroup.removeChild(m.ClosedCaptions)
-
-  m.FifaWorldCupFirstLineGroup = m.FifaWorldCupGameDetails.findNode("FifaWorldCupFirstLineGroup")
-
-  'set the default title logo state to be no title logo
-  m.TitleGroup.removeChild(m.TitleLogo)
-
-  'Remove LiveVideoIndicator here because otherwise the poster is visible prior to any information being passed to info panel, when we open the app
-  m.offset.removeChild(m.LiveVideoIndicator)
-
-  m.StarringTag.width = 0
-  m.DirectorTag.width = 0
-  m.DirectorTag.text = getTranslation("metadata_directed")
-  m.StarringTag.text = getTranslation("metadata_starring")
-
+  m.starringTag.width = 0
+  m.directorTag.width = 0
+  m.directorTag.text = getTranslation("metadata_directed")
+  m.starringTag.text = getTranslation("metadata_starring")
 
   '//Set a line after the directed by and starring text to be right aligned so the values associated with those lines are left aligned
-  nStarringWidth = m.StarringTag.boundingRect().width
-  nDirectorWidth = m.DirectorTag.boundingRect().width
-  nLineMin = 43
+  nStarringWidth = m.starringTag.boundingRect().width
+  nDirectorWidth = m.directorTag.boundingRect().width
+  spacerWidth = 43
   nMatchDirectorWidth = nStarringWidth - nDirectorWidth
   nMatchStarringWidth = nDirectorWidth - nStarringWidth
 
@@ -120,12 +100,8 @@ Function init()
     nMatchStarringWidth = 0
   end if
 
-  DirectorRect = m.top.findNode("DirectorRect")
-  StarringRect = m.top.findNode("StarringRect")
-
-  DirectorRect.width = nMatchDirectorWidth + nLineMin
-  StarringRect.width = nMatchStarringWidth + nLineMin
-
+  DirectorRect.width = nMatchDirectorWidth + spacerWidth
+  StarringRect.width = nMatchStarringWidth + spacerWidth
 End Function
 
 
@@ -139,7 +115,6 @@ Function onPosterLoadStatus(msg)
     else
       poster.visible = false
     end if
-
   end if
 End Function
 
@@ -147,9 +122,9 @@ End Function
 Function onComponentFocus()
   tubiLog("InfoPanel.onComponentFocus")
   if m.top.isInFocusChain() AND  m.top.description <> invalid AND m.top.description <> ""
-    m.DescriptionFocusButton.visible = true
+    m.descriptionFocusButton.visible = true
   else
-    m.DescriptionFocusButton.visible = false
+    m.descriptionFocusButton.visible = false
   end if
 End Function
 
@@ -161,69 +136,89 @@ End Function
 Function onWidthChange()
   tubiLog("InfoPanel.onWidthChange")
 
-  if m.Title.width <> 0
+  if m.title.width <> 0
     '//if the title is set to 0, then we do not want to make changes to the width of the title
-    if m.TitleLogo.visible = true
-      m.Title.width = m.top.width - m.Title.translation[0] - m.TitleGroup.itemSpacings[0] - m.TitleLogo.width - m.TitleLogo.translation[0]
-    else
-      m.Title.width = m.top.width - m.Title.translation[0]
-    end if
-
+    m.title.width = m.top.width - m.title.translation[0]
   end if
 
-  m.Episode.width = m.top.width - m.Episode.translation[0]
-  categoryLine1 = m.CategoryDetails.findNode("CategoryLine1")
-  categoryLine1.width = m.top.width - m.CategoryDetails.translation[0]
-  seasonLine1 = m.SeasonDetails.findNode("SeasonLine1")
-  seasonLine1.width = m.top.width - m.SeasonDetails.translation[0]
-  line2 = m.TwoLineInfo.findNode("Line2")
-  line2.width = m.top.width - m.TwoLineInfo.translation[0]
+  m.episode.width = m.top.width - m.episode.translation[0]
+  m.line2.width = m.top.width - m.twoLineInfo.translation[0]
 
   ' The description text needs a right margin which matches its left margin
-  m.Description.width = m.top.width - 2 * m.Description.translation[0]
+  m.description.width = m.top.width - 2 * m.description.translation[0]
   ' Reduce the director width based on "Direct by..." prefix
   directorPrefixBoundingRect = m.top.findNode("DirectorPrefix").boundingRect()
-  m.Director.width = m.top.width - directorPrefixBoundingRect.width + m.DirectorGroup.itemSpacings[0] - m.DirectorGroup.translation[0]
+  m.director.width = m.top.width - directorPrefixBoundingRect.width + m.directorGroup.itemSpacings[0] - m.directorGroup.translation[0]
   starringPrefixBoundingRect = m.top.findNode("StarringPrefix").boundingRect()
-  m.Starring.width = m.top.width - starringPrefixBoundingRect.width + m.StarringGroup.itemSpacings[0] - m.StarringGroup.translation[0]
-  m.DescriptionFocusButton.width = m.top.width + -m.DescriptionGroup.translation[0]
+  m.starring.width = m.top.width - starringPrefixBoundingRect.width + m.starringGroup.itemSpacings[0] - m.starringGroup.translation[0]
+  m.descriptionFocusButton.width = m.top.width + -m.descriptionGroup.translation[0]
 End Function
 
 
-Function onTitleLogoUriChange()
-  tubiLog("InfoPanel.onTitleLogoUriChange")
-  if m.top.titleLogoUri <> ""
-    m.TitleLogo.uri = m.top.titleLogoUri
-    m.TitleGroup.insertChild(m.TitleLogo, 0)
-    m.TitleLogo.visible = true
-  else
-    m.TitleGroup.removeChild(m.TitleLogo)
-    m.TitleLogo.visible = false
-  end if
-End Function
+' Needed in case the mode doesn't change but the leftHeaderImageUri does
+Function onLeftHeaderImageUriChange(msg)
+  tubiLog("InfoPanel.onLeftHeaderImageUriChange")
+  leftHeaderUri = msg.getData()
+  leftHeaderIsPresent = (m.leftHeaderImage.getParent() <> invalid)
+  if isNonEmptyString(leftHeaderUri) = true
+    if leftHeaderIsPresent = false
+      m.infoPanelGroup.insertChild(m.leftHeaderImage, 0)
+    end if
 
-Function onHeaderImageUriChange()
-  tubiLog("InfoPanel.onHeaderImageUriChange")
-  if m.top.headerImageUri <> ""
-    m.HeaderImage.uri = m.top.headerImageUri
-    m.infoPanelGroup.insertChild(m.HeaderImage, 0)
-    m.HeaderImage.visible = true
-  else
-    m.infoPanelGroup.removeChild(m.HeaderImage)
+    m.leftHeaderImage.uri = m.top.leftHeaderImageUri
+  else if leftHeaderIsPresent = true
+    m.infoPanelGroup.removeChild(m.leftHeaderImage)
   end if
 End Function
 
 
-Function onNeedsLogInChange()
-  tubiLog("InfoPanel.onNeedsLogInChange")
-  if m.signInGroup <> invalid
+Function onNeedsLoginChange(msg)
+  tubiLog("InfoPanel.onNeedsLoginChange")
+  needsLogin = msg.getData()
+  mode = m.top.mode
+  signInGroupIsPresent = (m.signInGroup.getParent() <> invalid)
+
+  modesWithTimerAtBottom = {}
+  modesWithTimerAtBottom[m.constants.ui.infoPanelModes.linearTournament] = true
+  modesWithTimerAtBottom[m.constants.ui.infoPanelModes.linearHomeScreen] = true
+
+
+  if needsLogin = false AND signInGroupIsPresent = true
     m.offset.removeChild(m.signInGroup)
-  end if
+    
+    ' login info overwrites countdown timer or reminder text if the user is not logged in
+    ' add them back as appropriate, if login info is not necessary
+    if modesWithTimerAtBottom[mode] = true
+      m.offset.appendChild(m.playerCountdownGroup)
+    else if m.top.reminderIsSet = true
+      m.offset.appendChild(m.reminderGroup)
+    end if
+  else if needsLogin = true AND signInGroupIsPresent = false
+    ' login info overwrites countdown timer or reminder text if the user is not logged in
+    ' remove them back as appropriate, if login info is necessary
+    countdownTimerPresent = (m.playerCountdownGroup.getParent() <> invalid AND modesWithTimerAtBottom[mode] = true)
+    reminderPresent = (m.reminderGroup.getParent() <> invalid)
 
-  if m.top.needsLogIn = true
-    m.lockIcon.visible = true
-    m.signInTitle.text = getTranslation("registration_signIn_to_play_hint")
+    if countdownTimerPresent = true
+      m.offset.removeChild(m.playerCountdownGroup)
+    else if reminderPresent = true
+      m.offset.removeChild(m.reminderGroup)
+    end if
+
     m.offset.appendChild(m.signInGroup)
+  end if
+End Function
+
+
+Function onReminderChange(msg)
+  tubiLog("InfoPanel.onReminderChange")
+  isReminder = msg.getData()
+
+  reminderIsPresent = (m.reminderGroup.getParent() <> invalid)
+  if isReminder = true and reminderIsPresent = false
+    m.offset.appendChild(m.reminderGroup)
+  else if isReminder = false and reminderIsPresent = true
+    m.offset.removeChild(m.reminderGroup)
   end if
 End Function
 
@@ -231,410 +226,315 @@ End Function
 Function onLineOneDataChange(msg)
   tubiLog("InfoPanel.onLineOneDataChange")
   data = msg.getData()
-  if m.TwoLineInfo.findNode("FirstLineGroup") <> invalid
-    m.twoLineInfo.removeChild(m.firstLineGroup)
-  end if
-
-  m.twoLineInfo.insertChild(m.firstLineGroup, 0)
   firstLineGroup = m.firstLineGroup
-  line1Label = m.TwoLineInfo.findNode("Line1")
+  firstLineGroupIsPresent = (firstLineGroup.getParent() <> invalid)
 
-  text = ""
-  if data.releasedate <> invalid AND data.releasedate <> ""
-    text = data.releasedate + " "
+  if isAA(data) AND data.count() > 0 AND firstLineGroupIsPresent = false
+    m.twoLineInfo.insertChild(firstLineGroup, 0)
+  else if (isAA(data) = false OR data.count() = 0) AND firstLineGroupIsPresent = true
+    m.twoLineInfo.removeChild(firstLineGroup)
   end if
 
-  if data.length <> invalid AND data.length <> 0
-    ' add 'dot' spacer only if we had a release date
-    if text.len() > 0
-      text = text + Chr(&hb7) + " "
-    end if
+  if isAA(data)
+    insertIndex = 0
 
-    text = text + formatLengthAsEnglish(data.length) + " "
-  end if
-
-  if data.hoursOfAiring <> invalid AND data.hoursOfAiring <> ""
-    text = text + data.hoursOfAiring
-  end if
-
-  if data.type <> invalid AND data.type = m.constants.ui.contentTypes.series
-    ' add 'dot' spacer
-    text = text + Chr(&hb7) + " "
-
-    if data.seasons <> invalid AND data.seasons > 0
-
-      if data.seasons = 1
-        text = text + getTranslation("metadata_seasons_singular") + " "
-      else
-        text = text + getTranslation("metadata_seasons_plural", {seasons: data.seasons.toStr()}) + " "
+    ' handle availability badge
+    availabilityBadgeIsPresent = (m.firstLineAvailabilityBadge.getParent() <> invalid)
+    if isNonEmptyString(data.badgeText)
+      if availabilityBadgeIsPresent = false
+        firstLineGroup.insertChild(m.firstLineAvailabilityBadge, insertIndex)
       end if
 
+      formatBadge(data.badgeText, m.firstLineAvailabilityBadge)
+      insertIndex++
     else
-      text = text + getTranslation("metadata_series") + " "
-    end if
-
-  end if
-  line1Label.text = text
-
-  insertIndex = 1
-
-  if data.hasCC = true
-    if m.ClosedCaptions.getParent() = invalid
-      firstLineGroup.insertChild(m.ClosedCaptions, insertIndex)
-    end if
-
-    insertIndex++
-    ' Although this uri does not change, if it is set in the component XML, the icon will appear
-    ' during the initial channel load, so set it dynamically when it should appear
-    m.ClosedCaptions.uri = "pkg:/images/icon-closed-caption.png"
-  else
-    if m.ClosedCaptions.getParent() <> invalid
-      firstLineGroup.removeChild(m.ClosedCaptions)
-    end if
-
-  end if
-
-  if data.has4k = true
-    if m.resolutionPoster.getParent() = invalid
-      firstLineGroup.insertChild(m.resolutionPoster, insertIndex)
-    end if
-
-    insertIndex++
-    ' Although this uri does not change, if it is set in the component XML, the icon will appear
-    ' during the initial channel load, so set it dynamically when it should appear
-    m.resolutionPoster.uri = "pkg:/images/icon-4k-ready-badge.png"
-  else
-    if m.resolutionPoster.getParent() <> invalid
-      firstLineGroup.removeChild(m.resolutionPoster)
-    end if
-
-  end if
-
-  if data.rating <> invalid AND data.rating <> ""
-    if m.Rating.getParent() = invalid
-      firstLineGroup.insertChild(m.Rating, insertIndex)
-    end if
-
-    insertIndex++
-    m.RatingLabel.width = 0
-    m.RatingLabel.text = Ucase(data.rating)
-
-    nRatingBoundingBoxIncrease = m.RatingLabel.boundingRect().width + 24
-    m.RatingBackground.width = nRatingBoundingBoxIncrease
-    m.RatingLabel.width = nRatingBoundingBoxIncrease
-    m.Rating.visible = true
-  else
-    if m.Rating.getParent() <> invalid
-      firstLineGroup.removeChild(m.Rating)
-    end if
-
-    m.Rating.visible = false
-  end if
-
-  fifaWorldCupInsertIndex = 1
-  firstLineInsertIndex = 0
-
-  if m.FifaWorldCupGameDetails.findNode("FifaWorldCupFirstLineGroup") <> invalid
-    m.FifaWorldCupGameDetails.removeChild(m.FifaWorldCupFirstLineGroup)
-  end if
-
-  if m.FifaWorldCupGameDetails.findNode("ReminderGroup") <> invalid
-    m.FifaWorldCupGameDetails.removeChild(m.ReminderGroup)
-  end if
-
-  if data.availabilityType = m.constants.ui.categoryIds.fifawc
-    fifaWorldCupInsertIndex++
-  end if
-
-  m.FifaWorldCupGameDetails.insertChild(m.FifaWorldCupFirstLineGroup, fifaWorldCupInsertIndex)
-  FifaWorldCupFirstLineGroup = m.FifaWorldCupFirstLineGroup
-  fifaWorldCupInsertIndex++
-
-  'Upcoming and Replay Info
-  if isNonEmptyString(data.availabilityType) = true
-    'Need to add the correct background for badge
-    if isNonEmptyString(data.badgeText) = true
-      m.sportsBadge.visible = true
-      if UCase(data.availabilityType) = UCase(m.constants.ui.contentTimings.replay)
-        m.sportsBadge.backgroundColor = "0xF0F1F5"
-        m.sportsBadge.textColor = "0x1C1F29"
-      else if UCase(data.availabilityType) = UCase(m.constants.ui.contentTimings.upcoming)
-        m.sportsBadge.backgroundColor = "0x585B66"
-        m.sportsBadge.textColor = "0xF0F1F5"
+      if availabilityBadgeIsPresent = true
+        firstLineGroup.removeChild(m.firstLineAvailabilityBadge)
       end if
-
-      m.sportsBadge.text = Ucase(data.badgeText)
-      FifaWorldCupFirstLineGroup.insertChild(m.sportsBadge, firstLineInsertIndex)
-      firstLineInsertIndex++
-    else
-      m.sportsBadge.visible = false
-      if m.sportsBadge.getParent() <> invalid
-        FifaWorldCupFirstLineGroup.removeChild(m.sportsBadge)
-      end if
-
     end if
 
-  else
-    m.sportsBadge.visible = false
-    if m.sportsBadge.getParent() <> invalid
-      FifaWorldCupFirstLineGroup.removeChild(m.sportsBadge)
-    end if
-
-  end if
-
-  if isNonEmptyString(data.matchTime) = true
-     m.matchTime.visible = true
+    ' handle text
     text = ""
+
+    ' expect that data.releaseDate and data.hoursOfAiring are mutually exclusive
+    if isNonEmptyString(data.releaseDate)
+      text = data.releaseDate + " "
+    else if isNonEmptyString(data.hoursOfAiring) = true
+      text = data.hoursOfAiring + " "
+    end if
+
     if data.length <> invalid AND data.length <> 0
       ' add 'dot' spacer only if we had a release date
       if text.len() > 0
-        text = text + Chr(&hb7) + " "
+        text += Chr(&hb7) + " "
       end if
 
-      text = text + formatLengthAsEnglish(data.length) + " "
+      text += formatLengthAsEnglish(data.length) + " "
     end if
 
-    m.matchTime.text = data.matchTime + " . " + text
-    FifaWorldCupFirstLineGroup.insertChild(m.matchTime, firstLineInsertIndex)
-    firstLineInsertIndex++
-  else
-    FifaWorldCupFirstLineGroup.removeChild(m.matchTime)
-  end if
 
-  if data.hasFifaWorldCup4k = true
-    if m.FifaWorldCup4k.getParent() = invalid
-      FifaWorldCupFirstLineGroup.insertChild(m.FifaWorldCup4k, firstLineInsertIndex)
-    end if
+    if data.type <> invalid AND data.type = m.constants.ui.contentTypes.series
+      ' add 'dot' spacer
+      text += Chr(&hb7) + " "
 
-    firstLineInsertIndex++
-    ' Although this uri does not change, if it is set in the component XML, the icon will appear
-    ' during the initial channel load, so set it dynamically when it should appear
-    m.FifaWorldCup4k.uri = "pkg:/images/icon-4k-ready-badge.png"
-  else
-    if m.FifaWorldCup4k.getParent() <> invalid
-      FifaWorldCupFirstLineGroup.removeChild(m.FifaWorldCup4k)
-    end if
-
-  end if
-
-  if data.hasFifaWorldCupCC = true
-    if m.FifaWorldCupClosedCaption.getParent() = invalid
-      m.matchTime.visible = true
-      FifaWorldCupFirstLineGroup.insertChild(m.FifaWorldCupClosedCaption, firstLineInsertIndex)
-    end if
-
-    firstLineInsertIndex++
-    ' Although this uri does not change, if it is set in the component XML, the icon will appear
-    ' during the initial channel load, so set it dynamically when it should appear
-    m.FifaWorldCupClosedCaption.uri = "pkg:/images/icon-cc-filled.png"
-  else
-    if m.FifaWorldCupClosedCaption.getParent() <> invalid
-      FifaWorldCupFirstLineGroup.removeChild(m.FifaWorldCupClosedCaption)
-    end if
-
-  end if
-
-
-  if isNonEmptyString(data.fifaWorldCupRating)
-    if m.FifaWorldCupRating.getParent() = invalid
-      FifaWorldCupFirstLineGroup.insertChild(m.FifaWorldCupRating, firstLineInsertIndex)
-    end if
-
-    firstLineInsertIndex++
-    m.FifaWorldCupRatingLabel.width = 0
-    m.FifaWorldCupRatingLabel.text = Ucase(data.fifaWorldCupRating)
-
-    nRatingBoundingBoxIncrease = m.FifaWorldCupRatingLabel.boundingRect().width + 24
-    m.FifaWorldCupRatingBackground.width = nRatingBoundingBoxIncrease
-    m.FifaWorldCupRatingLabel.width = nRatingBoundingBoxIncrease
-    m.FifaWorldCupRating.visible = true
-  else
-    if m.FifaWorldCupRating.getParent() <> invalid
-      FifaWorldCupFirstLineGroup.removeChild(m.FifaWorldCupRating)
-    end if
-
-    m.FifaWorldCupRating.visible = false
-  end if
-
-  if isNonEmptyString(data.roundGroupInfo) = true
-    m.roundGroupInfo.text = data.roundGroupInfo
-    if m.roundGroupInfo.getParent() = invalid
-      m.FifaWorldCupGameDetails.insertChild(m.roundGroupInfo, fifaWorldCupInsertIndex)
-    end if
-
-    fifaWorldCupInsertIndex ++
-  else
-    if m.roundGroupInfo.getParent() <> invalid
-      m.FifaWorldCupGameDetails.removeChild(m.roundGroupInfo)
-    end if
-
-  end if
-
-  if data.isReminderSet <> invalid AND data.isReminderSet = true
-
-    if m.ReminderGroup.getParent() = invalid
-      m.ReminderLogo.visible = true
-      m.ReminderTitle.text = getTranslation("screenDetails_button_reminder_set")
-      m.FifaWorldCupGameDetails.insertChild(m.ReminderGroup, fifaWorldCupInsertIndex)
-      fifaWorldCupInsertIndex++
-    end if
-
-  else
-    m.FifaWorldCupGameDetails.removeChild(m.ReminderGroup)
-  end if
-
-  descriptorCode = data.descriptorCode
-
-  if descriptorCode <> invalid AND descriptorCode <> ""
-
-    if m.DescriptorCode.getParent() = invalid
-      firstLineGroup.insertChild(m.DescriptorCode, insertIndex)
-    end if
-
-    insertIndex++
-
-    m.DescriptorCode.text = UCase(descriptorCode)
-    m.DescriptorCode.visible = true
-  else
-
-    if m.DescriptorCode.getParent() <> invalid
-      firstLineGroup.removeChild(m.DescriptorCode)
-    end if
-
-    m.DescriptorCode.visible = false
-  end if
-
-  if data.availabilityEnds <> invalid AND data.availabilityEnds <> ""
-    datetime = CreateObject("roDateTime")
-    datetime.FromISO8601String(data.availabilityEnds)
-    endSeconds = datetime.AsSeconds()
-    nowSeconds = CreateObject("roDateTime").AsSeconds()
-    daysRemaining = ((endSeconds - nowSeconds) \ 86400) + 1
-    ' BIZ REQ: only titles expiring in the next 2 weeks should display message
-    if daysRemaining > 0 AND daysRemaining <= 14
-      if daysRemaining > 1
-        m.ExpireWarning.text = getTranslation("metadata_expiresIn_plural", {days: daysRemaining.toStr()})
+      if data.seasons <> invalid AND data.seasons > 0
+        if data.seasons = 1
+          text += getTranslation("metadata_seasons_singular") + " "
+        else
+          text += getTranslation("metadata_seasons_plural", {seasons: data.seasons.toStr()}) + " "
+        end if
       else
-        m.ExpireWarning.text = getTranslation("metadata_expiresIn_singular")
+        text += getTranslation("metadata_series") + " "
+      end if
+    end if
+
+    line1IsPresent = (m.line1.getParent() <> invalid)
+    line1BoldIsPresent = (m.line1Bold.getParent() <> invalid)
+    textIsPresent = (line1IsPresent = true OR line1BoldIsPresent = true)
+
+    if isNonEmptyString(text)
+      if textIsPresent = false
+        mode = m.top.mode
+        if mode = m.constants.ui.infoPanelModes.sportsEvent OR mode = m.constants.ui.infoPanelModes.navigateSports
+          firstLineGroup.insertChild(m.line1Bold, insertIndex)
+        else
+          firstLineGroup.insertChild(m.line1, insertIndex)
+        end if
       end if
 
-      if m.ExpireWarning.getParent() = invalid
-        firstLineGroup.insertChild(m.ExpireWarning, insertIndex)
+      m.line1Bold.text = text
+      m.line1.text = text
+      insertIndex++
+    else
+      if textIsPresent = true
+        firstLineGroup.removeChild(m.line1)
+        firstLineGroup.removeChild(m.line1Bold)
+      end if
+    end if
+
+    ' handle resolution poster (4k)
+    resolutionPosterIsPresent = (m.resolutionPoster.getParent() <> invalid)
+    if data.has4k = true
+      if resolutionPosterIsPresent = false
+        firstLineGroup.insertChild(m.resolutionPoster, insertIndex)
       end if
 
       insertIndex++
+      ' Although this uri does not change, if it is set in the component XML, the icon will appear
+      ' during the initial channel load, so set it dynamically when it should appear
+      m.resolutionPoster.uri = "pkg:/images/icon-4k-ready-badge.png"
     else
-      if m.ExpireWarning.getParent() <> invalid
-        firstLineGroup.removeChild(m.ExpireWarning)
+      if resolutionPosterIsPresent = true
+        firstLineGroup.removeChild(m.resolutionPoster)
+      end if
+    end if
+
+    ' handle closed captions
+    closedCaptionsIsPresent = (m.closedCaptions.getParent() <> invalid)
+    if data.hasCC = true
+      if closedCaptionsIsPresent = false
+        firstLineGroup.insertChild(m.closedCaptions, insertIndex)
       end if
 
-    end if
-  else
-    firstLineGroup.removeChild(m.ExpireWarning)
-  end if
-
-  if data.partnerLogoUri <> invalid AND data.partnerLogoUri <> ""
-    if m.PartnerLogo.getParent() = invalid
-      firstLineGroup.insertChild(m.PartnerLogo, insertIndex)
-    end if
-
-    insertIndex++
-    m.PartnerLogo.uri = data.partnerLogoUri
-  else
-    if m.PartnerLogo.getParent() <> invalid
-      firstLineGroup.removeChild(m.PartnerLogo)
+      insertIndex++
+      ' Although this uri does not change, if it is set in the component XML, the icon will appear
+      ' during the initial channel load, so set it dynamically when it should appear
+      m.closedCaptions.uri = "pkg:/images/icon-closed-caption.png"
+    else
+      if closedCaptionsIsPresent = true
+        firstLineGroup.removeChild(m.closedCaptions)
+      end if
     end if
 
+    ' handle rating
+    ratingIsPresent = (m.rating.getParent() <> invalid)
+    if isNonEmptyString(data.rating) = true AND m.top.mode <> m.constants.ui.infoPanelModes.sportsEvent
+      if ratingIsPresent = false
+        firstLineGroup.insertChild(m.rating, insertIndex)
+      end if
+
+      m.ratingLabel.width = 0
+      m.ratingLabel.text = Ucase(data.rating)
+
+      nRatingBoundingBoxIncrease = m.ratingLabel.boundingRect().width + 24
+      m.ratingBackground.width = nRatingBoundingBoxIncrease
+      m.ratingLabel.width = nRatingBoundingBoxIncrease
+      insertIndex++
+    else
+      if ratingIsPresent = true
+        firstLineGroup.removeChild(m.rating)
+      end if
+    end if
+
+    ' handle descriptor codes
+    descriptorsArePresent = (m.descriptorCode.getParent() <> invalid)
+    if isNonEmptyString(data.descriptorCode)
+      if descriptorsArePresent = false
+        firstLineGroup.insertChild(m.descriptorCode, insertIndex)
+      end if
+
+      m.descriptorCode.text = UCase(data.descriptorCode)
+      insertIndex++
+    else
+      if descriptorsArePresent = true
+        firstLineGroup.removeChild(m.descriptorCode)
+      end if
+    end if
+
+    ' handle expiration warning
+    expirationWarningPresent = (m.expireWarning.getParent() <> invalid)
+    if isNonEmptyString(data.availabilityEnds)
+      datetime = CreateObject("roDateTime")
+      datetime.FromISO8601String(data.availabilityEnds)
+      endSeconds = datetime.AsSeconds()
+      nowSeconds = CreateObject("roDateTime").AsSeconds()
+      daysRemaining = ((endSeconds - nowSeconds) \ 86400) + 1
+      ' BIZ REQ: only titles expiring in the next 2 weeks should display message
+      if daysRemaining > 0 AND daysRemaining <= 14
+        if daysRemaining > 1
+          m.expireWarning.text = getTranslation("metadata_expiresIn_plural", {days: daysRemaining.toStr()})
+        else
+          m.expireWarning.text = getTranslation("metadata_expiresIn_singular")
+        end if
+
+        if expirationWarningPresent = false
+          firstLineGroup.insertChild(m.expireWarning, insertIndex)
+        end if
+
+        insertIndex++
+      else if expirationWarningPresent = true
+        firstLineGroup.removeChild(m.expireWarning)
+      end if
+    else if expirationWarningPresent = true
+      firstLineGroup.removeChild(m.expireWarning)
+    end if
+
+    ' handle parter logos
+    partnerLogoIsPresent = (m.partnerLogo.getParent() <> invalid)
+    if isNonEmptyString(data.partnerLogoUri)
+      if partnerLogoIsPresent = false
+        firstLineGroup.insertChild(m.partnerLogo, insertIndex)
+      end if
+
+      m.partnerLogo.uri = data.partnerLogoUri
+      insertIndex++
+    else
+      if partnerLogoIsPresent = true
+        firstLineGroup.removeChild(m.partnerLogo)
+      end if
+    end if
   end if
 End Function
 
 
-Function onGenresChange()
-  tubiLog("InfoPanel.onGenresChange")
-  if m.SecondLineGroup.getParent() = invalid
-    m.TwoLineInfo.appendChild(m.SecondLineGroup)
+Function onLineTwoDataChange(msg)
+  tubiLog("InfoPanel.onLineTwoDataChange")
+  data = msg.getData()
+  secondLineGroup = m.firstLineGroup
+  secondLineGroupIsPresent = (secondLineGroup.getParent() <> invalid)
+
+  if isAA(data) AND data.count() > 0 AND secondLineGroupIsPresent = false
+    m.twoLineInfo.appendChild(secondLineGroup)
+  else if (isAA(data) = false OR data.count() = 0) AND secondLineGroupIsPresent = true
+    m.twoLineInfo.removeChild(secondLineGroup)
   end if
 
-  line2Label = m.TwoLineInfo.findNode("Line2")
-  text = ""
-  if m.top.genres <> invalid AND m.top.genres.count() > 0
-    capitalGenres = []
-    for each c in m.top.genres
-      capitalGenres.push(capitalize(c))
-    end for
-    text = capitalGenres.Join(", ")
-  end if
+  if isAA(data) = true
+    insertIndex = 0
 
-  line2Label.text = text
+    ' handle availability badge
+    availabilityBadgeIsPresent = (m.secondLineAvailabilityBadge.getParent() <> invalid)
+    if isNonEmptyString(data.badgeText)
+      if availabilityBadgeIsPresent = false
+        secondLineGroup.insertChild(m.secondLineAvailabilityBadge, insertIndex)
+      end if
+
+      formatBadge(data.badgeText, m.secondLineAvailabilityBadge)
+      insertIndex++
+    else
+      if availabilityBadgeIsPresent = true
+        secondLineGroup.removeChild(m.secondLineAvailabilityBadge)
+      end if
+    end if
+
+    ' handle 2nd line text
+    text = getSecondLineText(data)
+    line2IsPresent = (m.line2.getParent() <> invalid)
+
+    if isNonEmptyString(text) = true
+      if line2IsPresent = false
+        secondLineGroup.insertChild(m.line2, insertIndex)
+      end if
+
+      m.line2.text = text
+      insertIndex++
+    else
+      if line2IsPresent = true
+        secondLineGroup.removeChild(m.line2)
+      end if
+    end if
+  end if
 End Function
 
 
-Function onDescriptionChange()
+Function onDescriptionChange(msg)
   tubiLog("InfoPanel.onDescriptionChange")
-  if m.top.description <> invalid AND m.top.description <> ""
-    m.Description.visible = true
-    m.Description.height = 0  ' reset for calculations below
-    m.Description.text = m.top.description
+  description = msg.getData()
+  if isNonEmptyString(description) = true
+    m.description.visible = true
+    m.description.height = 0  ' reset for calculations below
+    m.description.text = description
   else
-    m.Description.visible = false
+    m.description.visible = false
   end if
 End Function
 
 
-Function onDirectorsChange()
+Function onDirectorsChange(msg)
   tubiLog("InfoPanel.onDirectorChange")
+  directors = msg.getData()
   text = ""
-  if m.top.directors <> invalid AND m.top.directors.count() > 0
-    text = m.top.directors.Join(", ")
+  if isNonEmptyArray(directors) = true
+    text = directors.Join(", ")
   end if
 
   if text = ""
     ' hide the whole group if no directors listed
-    m.DirectorGroup.visible = false
-  else if m.DirectorGroup.visible = false
-    m.DirectorGroup.visible = true
+    m.directorGroup.visible = false
+  else if m.directorGroup.visible = false
+    m.directorGroup.visible = true
   end if
 
-  m.Director.text = text
+  m.director.text = text
 End Function
 
 
-Function onStarringChange()
+Function onStarringChange(msg)
   tubiLog("InfoPanel.onStarringChange")
+  starring = msg.getData()
   text = ""
-  if m.top.starring <> invalid AND m.top.starring.count() > 0
-    text = m.top.starring.Join(", ")
+  if isArray(starring) AND starring.count() > 0
+    text = starring.Join(", ")
   end if
 
   if text = invalid or text = ""
     ' hide the whole group if no actors/starring listed
-    m.StarringGroup.visible = false
+    m.starringGroup.visible = false
   else
-    m.StarringGroup.visible = true
+    m.starringGroup.visible = true
   end if
 
-  m.Starring.text = text
+  m.starring.text = text
 End Function
 
 
-Function onSeasonEpisodeCountChange()
+Function onSeasonEpisodeCountChange(msg)
   tubiLog("InfoPanel.onSeasonEpisodeCountChange")
-  seasonLabel = m.SeasonDetails.findNode("SeasonLine1")
-  if m.top.seasonEpisodeCount > 0
-    seasonLabel.text = stri(m.top.seasonEpisodeCount).trim() + " episodes"
+  seasonEpisodeCount = msg.getData()
+  if seasonEpisodeCount > 0
+    m.line2.text = stri(seasonEpisodeCount).trim() + " episodes"
   else
-    seasonLabel.text = ""
-  end if
-End Function
-
-
-Function onCategoryContentCountChange()
-  tubiLog("InfoPanel.onCategoryContentCountChange")
-  categoryLine1 = m.CategoryDetails.findNode("CategoryLine1")
-  if m.top.categoryContentCount <> invalid AND m.top.categoryContentCount > 0
-    categoryLine1.text = stri(m.top.categoryContentCount).trim() + " titles in this category"
-  else
-    categoryLine1.text = ""
+    m.line2.text = ""
   end if
 End Function
 
@@ -642,10 +542,10 @@ End Function
 Function onPlayerCountDownChange()
   tubiLog("InfoPanel.onPlayerCountDownChange")
   if m.top.fullscreenCountdown >= 0
-    m.PlayerCountdownGroup.visible = true
-    m.CountdownText.text = getTranslation("metadata_fullscreen_countdown_plural", {seconds: m.top.fullscreenCountdown.toStr()})
+    m.playerCountdownGroup.visible = true
+    m.countdownText.text = getTranslation("metadata_fullscreen_countdown_plural", {seconds: m.top.fullscreenCountdown.toStr()})
   else
-    m.PlayerCountdownGroup.visible = false
+    m.playerCountdownGroup.visible = false
   end if
 End Function
 
@@ -654,21 +554,50 @@ Function onCalculateHeight()
   tubiLog("InfoPanel.onCalculateHeight")
   topMargin = 15
   bottomMargin = 8
-  m.DescriptionFocusButton.height = m.Description.boundingRect().height + topMargin + bottomMargin
+  descriptionBoundingHeight = m.description.boundingRect().height
+  m.descriptionFocusButton.height = descriptionBoundingHeight + topMargin + bottomMargin
+
   ' try to shorten description to fit max height
-  if m.top.maxHeight <> 0 AND m.top.maxHeight < m.Offset.BoundingRect().height
-    m.Description.height = m.Description.boundingRect().height - (m.offset.BoundingRect().height - m.top.maxHeight)
-    if m.Description.height <= 0
-      m.Description.text = ""
+  offsetBoundingHeight = m.offset.BoundingRect().height
+  if m.top.maxHeight <> 0 AND m.top.maxHeight < offsetBoundingHeight
+    m.description.height = descriptionBoundingHeight - (offsetBoundingHeight - m.top.maxHeight)
+    if m.description.height <= 0
+      m.description.text = ""
     end if
 
-    m.DescriptionFocusButton.height = m.Description.boundingRect().height + topMargin + bottomMargin
+    updatedDescriptionBoundingHeight = m.description.boundingRect().height
+    m.descriptionFocusButton.height = updatedDescriptionBoundingHeight + topMargin + bottomMargin
   end if
 
-  if m.top.needsLogIn = false AND m.top.mode = m.constants.ui.infoPanelModes.linearTournament AND m.top.mode <> m.constants.ui.infoPanelModes.epg
-    m.top.appendChild(m.PlayerCountdownGroup)
-    m.PlayerCountdownGroup.translation = [0, m.infoPanelGroup.boundingRect().height + 40]
+  if m.top.needsLogin = false AND m.top.mode = m.constants.ui.infoPanelModes.linearTournament
+    m.top.appendChild(m.playerCountdownGroup)
+    m.playerCountdownGroup.translation = [0, m.infoPanelGroup.boundingRect().height + 40]
   end if
+End Function
+
+
+Function resetDefaultState()
+  infoPanelGroupChildrenCount = m.infoPanelGroup.getChildCount()
+  m.infoPanelGroup.removeChildrenIndex(infoPanelGroupChildrenCount, 0)
+
+  offsetChildrenCount = m.offset.getChildCount()
+  m.offset.removeChildrenIndex(offsetChildrenCount, 0)
+
+  twoLineInfoChildrenCount = m.twoLineInfo.getChildCount()
+  m.twoLineInfo.removeChildrenIndex(twoLineInfoChildrenCount, 0)
+
+  firstLineGroupChildrenCount = m.firstLineGroup.getChildCount()
+  m.firstLineGroup.removeChildrenIndex(firstLineGroupChildrenCount, 0)
+
+  secondLineGroupChildrenCount = m.secondLineGroup.getChildCount()
+  m.secondLineGroup.removeChildrenIndex(secondLineGroupChildrenCount, 0)
+
+  'm.playerCountdownGroup has been added to parent to accommodate EPG Screen design
+  if m.playerCountdownGroup <> invalid
+    m.top.removeChild(m.playerCountdownGroup)
+  end if
+
+  m.top.descriptionMaxLines = 5
 End Function
 
 
@@ -679,181 +608,248 @@ End Function
 ' the children for rendering
 Function onModeChange()
   tubiLog("InfoPanel.onModeChange")
-  m.matchTime.visible = false
-  m.fifaImage.visible = false
-  while m.Offset.getChildCount() > 0
-    m.Offset.removeChildIndex(0)
-  end while
+  resetDefaultState()
 
-  if m.top.mode = m.constants.ui.infoPanelModes.navigateSports
-    m.FifaWorldCupGameDetails.insertChild(m.FifaWorldCupDescription, 4)
-  else if m.FifaWorldCupGameDetails.findNode("FifaWorldCupDescription") <> invalid
-    m.FifaWorldCupGameDetails.removeChild(m.FifaWorldCupDescription)
-  end if
-
-  if m.HeaderImage <> invalid
-    m.infoPanelGroup.removeChild(m.HeaderImage)
-  end if
-
-  if m.SecondLineGroup.getParent() = invalid
-    m.TwoLineInfo.appendChild(m.SecondLineGroup)
-  end if
-
-  'm.PlayerCountdownGroup has been added to parent to accommodate EPG Screen design
-  if m.PlayerCountdownGroup <> invalid
-    m.top.removeChild(m.PlayerCountdownGroup)
-  end if
-
-  secondLineGroup = m.SecondLineGroup.getChild(0)
-
-  if m.liveIconGroup <> invalid AND m.liveIconGroup.isSameNode(secondLineGroup) then
-    m.SecondLineGroup.removeChild(m.liveIconGroup)
-    m.liveIconGroup.shouldAnimate = false
-  end if
-
-  if m.fifaImage <> invalid
-    m.FifaWorldCupGameDetails.removeChild(m.fifaImage)
-  end if
-
-  if m.badge <> invalid AND m.badge.isSameNode(secondLineGroup) then
-    m.SecondLineGroup.removeChild(m.badge)
-  end if
-
-  if m.top.mode = m.constants.ui.infoPanelModes.category
-    m.Offset.appendChild(m.TitleGroup)
-    m.Offset.appendChild(m.CategoryDetails)
-    m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.itemSpacings = [52, 15]
-  else if m.top.mode = m.constants.ui.infoPanelModes.vitg
-    m.Offset.itemSpacings = [25, 15]
+  if m.top.mode = m.constants.ui.infoPanelModes.vitg
+    m.infoPanelGroup.appendChild(m.offset)
   else if m.top.mode = m.constants.ui.infoPanelModes.item
-    m.Offset.appendChild(m.TitleGroup)
-    m.Offset.appendChild(m.TwoLineInfo)
-    m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.itemSpacings = [25, 15]
+    ' used for movies and series on the homescreen and similar screens
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.twoLineInfo)
+    m.offset.appendChild(m.descriptionGroup)
+    m.offset.itemSpacings = [24, 15]
+
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
+    m.firstLineGroup.appendChild(m.line1)
+    m.firstLineGroup.appendChild(m.resolutionPoster)
+    m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.rating)
+    m.firstLineGroup.appendChild(m.descriptorCode)
+    m.firstLineGroup.appendChild(m.expireWarning)
+    m.firstLineGroup.appendChild(m.partnerLogo)
+
+    m.twoLineInfo.appendChild(m.secondLineGroup)
+    m.secondLineGroup.appendChild(m.line2)
   else if m.top.mode = m.constants.ui.infoPanelModes.movie
-    m.Offset.appendChild(m.TitleGroup)
-    m.Offset.appendChild(m.TwoLineInfo)
-    m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.appendChild(m.StarringGroup)
-    m.Offset.appendChild(m.DirectorGroup)
-    m.Offset.itemSpacings = [25, 15, 17, 11]
+    ' used for movies on the details screen
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.twoLineInfo)
+    m.offset.appendChild(m.descriptionGroup)
+    m.offset.appendChild(m.starringGroup)
+    m.offset.appendChild(m.directorGroup)
+
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
+    m.firstLineGroup.appendChild(m.line1)
+    m.firstLineGroup.appendChild(m.resolutionPoster)
+    m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.rating)
+    m.firstLineGroup.appendChild(m.descriptorCode)
+    m.firstLineGroup.appendChild(m.expireWarning)
+    m.firstLineGroup.appendChild(m.partnerLogo)
+
+    m.twoLineInfo.appendChild(m.secondLineGroup)
+    m.secondLineGroup.appendChild(m.line2)
+
+    m.offset.itemSpacings = [24, 15, 18, 12]
   else if m.top.mode = m.constants.ui.infoPanelModes.series
-    m.Offset.appendChild(m.TitleGroup)
-    m.Offset.appendChild(m.Episode)
-    m.Offset.appendChild(m.TwoLineInfo)
-    m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.appendChild(m.StarringGroup)
-    m.Offset.appendChild(m.DirectorGroup)
-    m.Offset.itemSpacings = [25, 25, 15, 17, 11]
-  else if m.top.mode = m.constants.ui.infoPanelModes.season
-    m.Offset.appendChild(m.TitleGroup)
-    m.Offset.appendChild(m.SeasonDetails)
-    m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.itemSpacings = [52, 15]
-  else if m.top.mode = m.constants.ui.infoPanelModes.continue_watching
-    m.Offset.appendChild(m.TitleGroup)
-    m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.itemSpacings = [15]
+    ' used for episodes/series on the details screen
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.episode)
+    m.offset.appendChild(m.twoLineInfo)
+    m.offset.appendChild(m.descriptionGroup)
+    m.offset.appendChild(m.starringGroup)
+    m.offset.appendChild(m.directorGroup)
+
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
+    m.firstLineGroup.appendChild(m.line1)
+    m.firstLineGroup.appendChild(m.resolutionPoster)
+    m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.rating)
+    m.firstLineGroup.appendChild(m.descriptorCode)
+    m.firstLineGroup.appendChild(m.expireWarning)
+    m.firstLineGroup.appendChild(m.partnerLogo)
+
+    m.twoLineInfo.appendChild(m.secondLineGroup)
+    m.secondLineGroup.appendChild(m.line2)
+
+    m.offset.itemSpacings = [24, 24, 15, 18, 12]
   else if m.top.mode = m.constants.ui.infoPanelModes.episode
-    m.Offset.appendChild(m.TitleGroup)
-    m.Offset.appendChild(m.Episode)
-    m.Offset.appendChild(m.TwoLineInfo)
-    m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.itemSpacings = [25, 18]
+    ' used for episodes on the episode list screen
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.episode)
+    m.offset.appendChild(m.twoLineInfo)
+    m.offset.appendChild(m.descriptionGroup)
+
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
+    m.firstLineGroup.appendChild(m.line1)
+    m.firstLineGroup.appendChild(m.resolutionPoster)
+    m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.rating)
+    m.firstLineGroup.appendChild(m.descriptorCode)
+    m.firstLineGroup.appendChild(m.expireWarning)
+    m.firstLineGroup.appendChild(m.partnerLogo)
+
+    m.twoLineInfo.appendChild(m.secondLineGroup)
+    m.secondLineGroup.appendChild(m.line2)
+    m.offset.itemSpacings = [24, 24, 15, 18]
+  else if m.top.mode = m.constants.ui.infoPanelModes.season
+    ' used when the side nav season item is focused on the episode list screen
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.twoLineInfo)
+    m.offset.appendChild(m.descriptionGroup)
+
+    m.twoLineInfo.appendChild(m.secondLineGroup)
+    m.secondLineGroup.appendChild(m.line2)
+
+    m.offset.itemSpacings = [24, 24]
+  else if m.top.mode = m.constants.ui.infoPanelModes.continueWatching
+    ' used for guest user continue watching row on the home screen
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.descriptionGroup)
+    m.offset.itemSpacings = [15]
   else if m.top.mode = m.constants.ui.infoPanelModes.linearHomeScreen
-    '//For when the linear player is on the homepage
-    m.Offset.appendChild(m.LiveVideoIndicator)
-    m.Offset.appendChild(m.TitleGroup)
-    m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.appendChild(m.PlayerCountdownGroup)
-    m.Offset.itemSpacings = [25,15]
+    '//For when the linear player is on the home screen
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.topHeaderImage)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.descriptionGroup)
+    m.offset.appendChild(m.playerCountdownGroup)
+    m.offset.itemSpacings = [24, 15]
   else if m.top.mode = m.constants.ui.infoPanelModes.epg
-    '//For when the linear player is on its own EPG page
-    m.infoPanelGroup.insertChild(m.HeaderImage,0)
-    m.Offset.appendChild(m.TitleGroup)
-    m.Offset.appendChild(m.TwoLineInfo)
-    m.Offset.appendChild(m.DescriptionGroup)
-    m.top.appendChild(m.PlayerCountdownGroup)
-    m.PlayerCountdownGroup.translation = [1216,-78]
-    m.Offset.itemSpacings = [12,0,12,11]
-  else if m.top.mode = m.constants.ui.infoPanelModes.linearsearch
-    m.Offset.appendChild(m.TitleGroup)
-    m.Offset.appendChild(m.TwoLineInfo)
-    m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.itemSpacings = [25, 15]
-    if m.firstLineGroup <> invalid
-      m.twoLineInfo.removeChild(m.firstLineGroup)
-    end if
+    '//For when the linear player is on its own EPG screen
+    m.infoPanelGroup.appendChild(m.leftHeaderImage)
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.twoLineInfo)
+    m.offset.appendChild(m.descriptionGroup)
 
-    if getExperimentResource("roku_search_live_badge", "roku_search_live_badge_v1", true).enabled = true
-      if m.badge = invalid then
-        setLiveBadge()
-      end if
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.line1)
+    m.firstLineGroup.appendChild(m.resolutionPoster)
+    m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.rating)
+    m.firstLineGroup.appendChild(m.descriptorCode)
 
-      m.SecondLineGroup.insertChild(m.badge, 0)
-    else
-      if m.liveIconGroup = invalid then
-        m.liveIconGroup = createObject("roSGNode", "LiveIconGroup")
-      end if
+    m.offset.itemSpacings = [15, 15]
+    m.top.appendChild(m.playerCountdownGroup)
+    m.playerCountdownGroup.translation = [1216, -78]
+  else if m.top.mode = m.constants.ui.infoPanelModes.linearSearch
+    ' when linear content is focused on the search screen
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.twoLineInfo)
+    m.offset.appendChild(m.descriptionGroup)
 
-      m.liveIconGroup.shouldAnimate = true
-      m.SecondLineGroup.insertChild(m.liveIconGroup, 0)
-    end if
-
-  else if m.top.mode = m.constants.ui.infoPanelModes.linearTournament
-    if m.top.headerImageUri <> ""
-      m.infoPanelGroup.insertChild(m.HeaderImage,0)
-    end if
-
-    m.Offset.appendChild(m.TitleGroup)
-    if m.SecondLineGroup <> invalid
-      m.TwoLineInfo.removeChild(m.SecondLineGroup)
-    end if
-
-    m.Offset.appendChild(m.TwoLineInfo)
-    m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.itemSpacings = [12,0]
+    m.twoLineInfo.appendChild(m.secondLineGroup)
+    m.secondLineGroup.appendChild(m.secondLineAvailabilityBadge)
+    m.secondLineGroup.appendChild(m.line2)
+    
+    m.offset.itemSpacings = [24, 15]
   '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+  else if m.top.mode = m.constants.ui.infoPanelModes.linearTournament
+    ' when linear content is focused on the tournament screen
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.twoLineInfo)
+    m.offset.appendChild(m.descriptionGroup)
+    m.offset.appendChild(m.playerCountdownGroup)
+
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.line1)
+    m.firstLineGroup.appendChild(m.resolutionPoster)
+    m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.rating)
+
+    m.offset.itemSpacings = [15, 15]
   else if m.top.mode = m.constants.ui.infoPanelModes.sportsEvent
-    if UCase(m.top.availabilityType) = UCase(m.constants.ui.contentTimings.replay)
-      m.matchTime.visible = true
-    end if
+    ' when sprot event content is focused on the tournament screen
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.twoLineInfo)
+    m.offset.appendChild(m.reminderGroup)
 
-    if UCase(m.top.availabilityType) = UCase(m.constants.ui.contentTimings.upcoming)
-      m.matchTime.visible = false
-    end if
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)
+    m.firstLineGroup.appendChild(m.line1Bold)
+    m.firstLineGroup.appendChild(m.resolutionPoster)
+    m.firstLineGroup.appendChild(m.closedCaptionPoster)
 
-    m.Offset.appendChild(m.FifaWorldCupGameDetails)
+    m.twoLineInfo.appendChild(m.secondLineGroup)
+    m.secondLineGroup.appendChild(m.line2)
+
+    m.offset.itemSpacings = [15]
   '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
   else if m.top.mode = m.constants.ui.infoPanelModes.navigateSports
-    m.fifaImage.visible = true
-    m.FifaWorldCupGameDetails.insertChild(m.fifaImage , 0)
-    m.matchTime.visible = true
-    if m.FifaWorldCupGameDetails <> invalid
-      m.FifaWorldCupGameDetails.removeChild(m.roundGroupInfo)
-    end if
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.topHeaderImage)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.twoLineInfo)
+    m.offset.appendChild(m.descriptionGroup)
 
-    m.Offset.appendChild(m.FifaWorldCupGameDetails)
-  '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-  else if m.top.mode = m.constants.ui.infoPanelModes.noteworthy
-    m.Offset.appendChild(m.TitleGroup)
-    m.Offset.appendChild(m.TwoLineInfo)
-    m.Offset.appendChild(m.DescriptionGroup)
-    m.Offset.itemSpacings = [25, 25, 15, 17, 11]
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.line1Bold)
+    m.firstLineGroup.appendChild(m.resolutionPoster)
+    m.firstLineGroup.appendChild(m.closedCaptionPoster)
+
+    m.offset.itemSpacings = [15, 24, 24]
   end if
-
 End Function
 
 
-Function setLiveBadge()
-  tubiLog("InfoPanel.setLiveBadge")
-  m.badge = CreateObject("roSGNode", "Badge")
-  m.badge.translation = [12,12]
-  m.badge.backgroundColor = "0xCC090B"
-  m.badge.textColor = "0xFFFFFF"
-  m.badge.iconUri = "pkg:/images/live-icon.png"
-  m.badge.text = UCase(getTranslation("screenSearch_liveText"))
+' @data: assocArray, that matches form of m.top.lineTwoData
+Function getSecondLineText(data)
+  ' handle genres
+  text = ""
+  genres = data.genres
+  if isNonEmptyArray(genres) = true
+    capitalGenres = []
+    for each genre in genres
+      capitalGenres.push(capitalize(genre))
+    end for
+    text = capitalGenres.Join(", ")
+  end if
+
+  ' handle sports event round/group info
+  ' expect that genres and sports event group info don't both exist
+  roundGroupInfo = data.roundGroupInfo
+  if isNonEmptyString(roundGroupInfo) = true
+    text = roundGroupInfo
+  end if
+
+  return text
+End Function
+
+
+' @text: string, the translated text that will appear on the badge
+' @badgeComponent: a Badge node
+Function formatBadge(text, badgeComponent)
+  tubiLog("InfoPanel.formatBadge")
+  if UCase(text) = UCase(getTranslation("screenSearch_liveText"))
+    ' LIVE badge
+    badgeComponent.backgroundColor = "0xCC090B"
+    badgeComponent.textColor = "0xFFFFFF"
+    badgeComponent.iconUri = "pkg:/images/live-icon.png"
+  else if UCase(text) = UCase(getTranslation("replay"))
+    ' REPLAY badge
+    badgeComponent.backgroundColor = "0xF0F1F5"
+    badgeComponent.textColor = "0x1C1F29"
+  else
+    ' TODAY, TOMORROW, <<Date>> badge
+    badgeComponent.backgroundColor = "0x585B66"
+    badgeComponent.textColor = "0xF0F1F5"
+  end if
+
+  badgeComponent.text = UCase(text)
 End Function
 
 

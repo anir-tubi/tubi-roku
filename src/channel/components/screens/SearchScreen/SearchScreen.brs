@@ -329,56 +329,74 @@ Function onItemFocused()
     focusedContent = m.ResultGrid.content.getChild(m.ResultGrid.itemFocused)
     m.top.backgroundUriList = focusedContent.backgrounds
     m.searchScreenInfoPanel.visible = true
+
     if m.microphone <> invalid
       m.microphone.visible = false
     end if
+
     setVisibilityForDefaultText(false)
     m.searchScreenInfoPanel.title = focusedContent.title
     m.searchScreenInfoPanel.description = focusedContent.DESCRIPTION
+
     if focusedContent.type = "linear"
-      m.searchScreenInfoPanel.genres = focusedContent.genres
-      m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.linearsearch
+      m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.linearSearch
+      lineOneData = {}
+      lineTwoData = {
+        badgeText: getTranslation("screenSearch_liveText")
+        genres: focusedContent.genres
+      }
       m.searchScreenInfoPanel.needsLogIn = focusedContent.needsLogin AND (m.top.signedIn <> true)
-    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     else if focusedContent.type = m.constants.ui.contentTypes.sportsEvent
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.sportsEvent
-      m.searchScreenInfoPanel.fifaWorldCupTitle = focusedContent.title
-      lineOneData = {}
 
       hasVideoresources = focusedContent.hasVideoresources
       airDatetime = focusedContent.airDatetime
       info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
       badgeText = info.badgeText
       matchTime = info.matchTime
-      availabilityType = info.availabilityType
 
-      lineOneData.availabilityType = availabilityType
-      lineOneData.roundGroupInfo = focusedContent.roundGroupInfo
-      lineOneData.badgeText = badgeText
-      lineOneData.matchTime = matchTime
-      lineOneData.hasFifaWorldCupCC = (focusedContent.hasSubtitles = true OR m._.empty(focusedContent.subtitleTracks) = false)
-      if focusedContent.has4k <> invalid and focusedContent.has4k = true
-        lineOneData.hasFifaWorldCup4k = focusedContent.has4k
+      lineOneData = {
+        badgeText: badgeText
+        hoursOfAiring: matchTime
+        hasCC: (focusedContent.hasSubtitles = true OR m._.empty(focusedContent.subtitleTracks) = false)
+        length: focusedContent.length
+      }
+
+      if focusedContent.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+        lineOneData.has4k = true
       end if
-      lineOneData.length = focusedContent.length
-      m.searchScreenInfoPanel.lineOneData = lineOneData
+
+      lineTwoData = {
+        roundGroupInfo: focusedContent.roundGroupInfo
+      }
+
       m.searchScreenInfoPanel.needsLogIn =  focusedContent.needsLogin AND (m.top.signedIn <> true)
     else
-      lineOneData = {}
-      lineOneData.releasedate = focusedContent.releaseDate
-      lineOneData.descriptorCode = UCase(focusedContent.descriptorCode)
-      lineOneData.length = focusedContent.length
-      lineOneData.hasCC = (focusedContent.hasSubtitles = true OR m._.empty(focusedContent.subtitleTracks) = false)
-      lineOneData.rating = focusedContent.rating
-      m.searchScreenInfoPanel.lineOneData = lineOneData
-      m.searchScreenInfoPanel.genres = focusedContent.genres
-      m.searchScreenInfoPanel.needsLogIn = focusedContent.needsLogin AND (m.top.signedIn <> true)
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.item
+      lineOneData = {
+        releasedate: focusedContent.releaseDate
+        descriptorCode: UCase(focusedContent.descriptorCode)
+        length: focusedContent.length
+        hasCC: (focusedContent.hasSubtitles = true OR m._.empty(focusedContent.subtitleTracks) = false)
+        rating: focusedContent.rating
+      }
+
+      lineTwoData = {
+        genres: focusedContent.genres
+      }
+
+      m.searchScreenInfoPanel.needsLogIn = (focusedContent.needsLogin AND m.top.signedIn <> true)
     end if
-    description = m.searchScreenInfoPanel.findNode("Description")
-    description.maxLines = 2
-    description.width = 960
+
+    ' description = m.searchScreenInfoPanel.findNode("Description")
+    ' description.width = 960
+    ' m.searchScreenInfoPanel.width = 960
+
+    m.searchScreenInfoPanel.lineOneData = lineOneData
+    m.searchScreenInfoPanel.lineTwoData = lineTwoData
+    m.searchScreenInfoPanel.descriptionMaxLines = 2
     m.searchScreenInfoPanel.calculateHeight = true
+
     ' Set up the info that the ContentController uses to send navigate_within_page events.
     ' Don't change m.top.navigateWithinPageInfo if the focused content hasn't changed
     ' (protects against re-setting when the focus is set upon returning to search page from details page)

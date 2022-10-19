@@ -24,8 +24,7 @@
 '                 callbackParams: <array>       - An array which will be passed to the callback as a single paramater
 '               }
 '
-' @screen: node, (optional), default is m.top
-Function showModal(modalInfo, buttonInfo, screen=m.top)
+Function showModal(modalInfo, buttonInfo)
   ' Don't create the modal if a modal already exists, or there is not enough info to create it
   if m.tempModal = invalid AND modalInfo <> invalid AND buttonInfo <> invalid
     modal = CreateObject("roSGNode", "ModalDialogScreen")
@@ -50,7 +49,7 @@ Function showModal(modalInfo, buttonInfo, screen=m.top)
     modal.buttons = buttons
     modal.observeFieldScoped("buttonSelected", "onModalButtonSelected")
     modal.observeFieldScoped("exitButton", "onModalButtonSelected")
-    screen.appendChild(modal)
+    m.top.appendChild(modal)
     modal.visible = true
     modal.setFocus(true)
     ' send the show dialog track event
@@ -119,9 +118,8 @@ Function closeModal(modal, buttonSelected = invalid)
   'give focus back to the context that had it before invoking the modal
   modal.unobserveFieldScoped("buttonSelected")
   modal.unobserveFieldScoped("exitButton")
-  parent = modal.getParent()
-  parent.removeChild(modal)
-  parent.setFocus(true)
+  m.top.removeChild(modal)
+  m.top.setFocus(true)
 
   'run the callback associated with the selected button
   callback = invalid

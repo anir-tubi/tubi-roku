@@ -667,7 +667,9 @@ Function handleDeeplinkSeriesSuccessResponse(refreshedContent)
   if detailScreen <> invalid
     detailScreen.contentFetchError = false
     populateDetailScreen(detailScreen, refreshedContent)
-    if isContentLocked(refreshedContent) = false ' if content is locked, then stay on detail screen
+
+    if refreshedContent <> invalid and refreshedContent.needsLogin = false
+      ' only if content is not locked, then move past detail screen
       handleDetailScreenAfterFn(detailScreen, afterFn)
     end if
   end if
@@ -748,10 +750,11 @@ Function handleDeeplinkEpisodeSuccessResponse(refreshedContent)
   if detailScreen <> invalid
     detailScreen.contentFetchError = false
     populateDetailScreen(detailScreen, refreshedContent)
-    if isContentLocked(refreshedContent) = false ' if content is locked, then stay on detail screen
+
+    if refreshedContent <> invalid and refreshedContent.needsLogin = false
+      ' only if content is not locked, then move past detail screen
       handleDetailScreenAfterFn(detailScreen, afterFn)
     end if
-
   end if
 End Function
 

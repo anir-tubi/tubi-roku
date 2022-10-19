@@ -1015,39 +1015,33 @@ End Function
 Function showFifaIntroModal()
   tubiLog("HomeScreenHelpers.showFifaIntroModal")
 
-  screenID = m.constants.ui.screenIds.homeScreen
-  homeScreen = getFromScreenCache(screenID)
+  showHideSpinner(false)
 
-  if homeScreen <> invalid
-    showHideSpinner(false)
+  Auth = TubiAuth(m.constants, m.Request)
+  Auth.setEducationalModalEntry("fifaIntro", "true")
 
-    Auth = TubiAuth(m.constants, m.Request)
-    Auth.setEducationalModalEntry("fifaIntro", "true")
+  title = getTranslation("menu_tournament", {"tradeMark": chr(8482)})
+  message = getTranslation("explore_fifa_description")
+  buttons = [getTranslation("dialog_explore_fifa"), getTranslation("dialog_got_it")]
 
-    title = getTranslation("menu_tournament", {"tradeMark": ""})
-    message = getTranslation("explore_fifa_description")
-    buttons = [getTranslation("dialog_explore_fifa"), getTranslation("dialog_got_it")]
-
-    dialogEvent = {
-      type: "dialog"
-      values: {
-        dialog_type: "INFORMATION"
-        pageOneof: m.Tracking.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
-        dialog_action: "SHOW"
-        dialog_sub_type: "fifa_intro"
-      }
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "INFORMATION"
+      pageOneof: m.Tracking.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
+      dialog_action: "SHOW"
+      dialog_sub_type: "fifa_intro"
     }
-    simpleModalInfo = getSimpleModalInfo(title, message, buttons, dialogEvent, m.trackingLoggingTask, showTournamentScreenWrapper, invalid)
+  }
+  simpleModalInfo = getSimpleModalInfo(title, message, buttons, dialogEvent, m.trackingLoggingTask, showTournamentScreenWrapper, invalid)
 
-    if simpleModalInfo <> invalid AND simpleModalInfo.buttonInfo <> invalid
-      if simpleModalInfo.buttonInfo[0] <> invalid
-        simpleModalInfo.buttonInfo[0].callbackParams = {
-          constants : m.constants
-        }
-      end if
+  if simpleModalInfo <> invalid AND simpleModalInfo.buttonInfo <> invalid
+    if simpleModalInfo.buttonInfo[0] <> invalid
+      simpleModalInfo.buttonInfo[0].callbackParams = {
+        constants : m.constants
+      }
     end if
-    showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo, homeScreen)
   end if
-
+  showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
 
 End Function

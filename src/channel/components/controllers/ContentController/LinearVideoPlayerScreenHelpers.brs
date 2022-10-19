@@ -14,7 +14,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
     ' a variety of unexpected and unwanted callbacks, as the passed in content potentially exists on a number
     ' of fields that are being observed (for instance: HomeScreen.contentFocused)
     clonedContent = content.clone(true)
-    if isContentLocked(clonedContent)
+    if clonedContent.needsLogin = true
       if bMinimized = false
         callbackAfterSignInParams = {"content": content, "bMinimized": false, "sAssociatedScreenID": clonedContent.associatedScreenID, "bAllowTransportToAppear": bAllowTransportToAppear}
         startSignIn(afterSignInPlayLockedLinearContent, callbackAfterSignInParams)

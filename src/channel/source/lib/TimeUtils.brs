@@ -57,31 +57,41 @@ End Function
 
 
 '******************************************************
-'returns datetime in this format : DEC 15
+'returns datetime in this format : Dec 15
 '******************************************************
 Function getMonthAndDay(datetime)
-  month = getShortMonthName(datetime.GetMonth())
+  month = datetime.GetMonth().tostr()
   day = datetime.GetDayOfMonth().tostr()
-  return UCase(month) + " " + day
+  shortVersionOfDateFormat = getShortVersionOfDateFormat(month, day)
+  ' replacing "," with empty string as the string does not have year.
+  return shortVersionOfDateFormat.replace(",","")
 End Function
 
 
 '******************************************************
-'returns datetime in this format : DEC 15
+'returns datetime in this format : Dec 15, 2022
 '******************************************************
 Function getMonthAndDayWithYear(datetime)
-  year = datetime.getYear().toStr()
-  month = getShortMonthName(datetime.GetMonth())
+  month = datetime.GetMonth().tostr()
   day = datetime.GetDayOfMonth().tostr()
-  return UCase(month) + " " + day + ", " + year
+  year = datetime.getYear().toStr()
+  shortVersionOfDateFormat = getShortVersionOfDateFormat(month, day, year)
+  return shortVersionOfDateFormat
 End Function
 
 
 '******************************************************
-'@month: integer, month as integer. possible values are (1 to 12)
-'returns translated month name in shortest version. Eg. Jan
+'@month: string, between 1 and 12
+'@day: string, between 1 and 31
+'@year: string, year in 4 digit
+'returns translated month name, day, year in shortest version. Eg. Nov 25, 2022
 '******************************************************
-Function getShortMonthName(month as integer)
-  monthName = getTranslation("short_version_month_" + month.tostr())
-  return monthName
+Function getShortVersionOfDateFormat(month = "", day = "", year = "")
+  dynamicValues = {
+    month: month
+    day: day
+    year: year
+  }
+  shortVersionOfDateFormat = getTranslation("short_version_date_format_" + month, dynamicValues)
+  return shortVersionOfDateFormat
 End Function

@@ -32,7 +32,7 @@
     <field id="videoPreviewUrl" type="string" />
      <field id="releaseDate" type="string" />
     <field id="roundGroupInfo" type="string" />
-    <field id="has4k" type="boolean" />
+    <field id="highestRendition" type="string" />
 
     <field id="needsLogin" type="boolean"  value="false"/>
     <field id="hasVideoResources" type="boolean" />
@@ -81,7 +81,6 @@
 
     <!-- channels feature -->
     <field id="inlineLogoUri" type="string" />
-    <field id="titleLogoUri" type="string" />
     <field id="channelId" type="string" />
     <field id="channelName" type="string" />
 
@@ -100,7 +99,7 @@
     <field id="resolution" type="string"/>
 
     <!-- the current VideoResource index, it helps to play the video in order -->
-    <field id="currentVideoResourceindex" type="vector2d" value="[0,0]"/>
+    <field id="currentVideoResourceIndex" type="vector2d" value="[0,0]"/>
 
     <!-- the hdcp_version as returned by cms/content API. example: "hdcp_v1" -->
     <field id="hdcpVersion" type="string"/>

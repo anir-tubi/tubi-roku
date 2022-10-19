@@ -1280,6 +1280,13 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
   setContentToRefresh(m.constants.ui.screenIds.tournamentScreen)
+
+  searchScreen = getScreenFromStackById(m.constants.ui.screenIds.searchScreen)
+  if searchScreen <> invalid
+    ' calling updateSearchContentNode to removes the Lock icon from search result posters once user sign-in.
+    updateSearchContentNode(searchScreen)
+  end if
+
 End Function
 
 
@@ -1831,7 +1838,7 @@ Function onFullscreenCountdown()
         contentToPlay = screen.linearChannelToPlay
       end if
 
-      if isContentLocked(contentToPlay) = true
+      if contentToPlay <> invalid and contentToPlay.needsLogin = true
         'if Content is locked and do not show countDown.
         screen.fullscreenCountdown = -1
       else

@@ -321,8 +321,6 @@ End Function
 
 Function updateInfoPanel(infoNode, content)
   infoNode.title = content.title
-  infoNode.genres = content.genres
-
 
   lineOneData = {}
   if content.type = m.constants.ui.contentTypes.series
@@ -331,14 +329,25 @@ Function updateInfoPanel(infoNode, content)
   lineOneData.releaseDate = content.releaseDate
   lineOneData.length = content.length
   lineOneData.hasCC = (content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false)
+
+  if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+    lineOneData.has4k = true
+  end if
+
   if content.availabilityEnds <> invalid
     lineOneData.availabilityEnds = content.availabilityEnds
   end if
+
   lineOneData.descriptorCode = content.descriptorCode
   lineOneData.rating = content.rating
   lineOneData.partnerLogoUri = content.inlineLogoUri
 
+  lineTwoData = {
+    genres: content.genres
+  }
+
   infoNode.lineOneData = lineOneData
+  infoNode.lineTwoData = lineTwoData
   infoNode.description = content.description
   infoNode.directors = content.directors
   infoNode.starring = content.actors

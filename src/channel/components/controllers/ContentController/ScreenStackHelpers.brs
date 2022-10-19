@@ -92,7 +92,7 @@ End Function
 ' @screenId: string, the id of the screen that is being searched for
 Function getScreenFromStackById(screenId)
   for i = m.screenStack.getChildCount() - 1 to 0 step -1
-    screen = m.screenStack.getChild(0)
+    screen = m.screenStack.getChild(i)
 
     if screen.id = screenId
       return screen

@@ -119,24 +119,27 @@ End Function
 
 '@contentNode: program content node
 Function populateInfoPanel(contentNode)
+  tubilog("EPGHomeScreen.populateInfoPanel")
   if contentNode <> invalid
     m.InfoPanel.mode = m.constants.ui.infoPanelModes.epg
     m.InfoPanel.title = contentNode.title
-    m.InfoPanel.description = contentNode.description
     m.InfoPanel.width = 650
-    m.InfoPanel.headerImageUri = contentNode.FHDPosterUrl
+    m.InfoPanel.leftHeaderImageUri = contentNode.FHDPosterUrl
+
     lineOneData = {}
+    lineOneData.hoursOfAiring = contentNode.hoursOfAiring
     lineOneData.rating = contentNode.rating
     lineOneData.hasCC = contentNode.hasSubtitles
+
     if contentNode.descriptors <> invalid AND contentNode.descriptors.Count() > 0
       lineOneData.descriptorCode = contentNode.descriptors.join(", ") ' To DO : When when we get real values into TAGS
     end if
-    lineOneData.releaseDate = contentNode.ReleaseDate
-    lineOneData.hoursOfAiring = contentNode.hoursOfAiring
+
     m.InfoPanel.lineOneData = lineOneData
-    m.InfoPanel.genres = [contentNode.genre]
-    m.InfoPanel.needsLogIn = contentNode.needsLogin = true AND (m.top.signedIn <> true)
+    m.InfoPanel.description = contentNode.description
+    m.InfoPanel.needsLogIn = (contentNode.needsLogin = true AND m.top.signedIn <> true)
   end if
+
   m.InfoPanel.calculateHeight = true
 End Function
 
@@ -148,6 +151,7 @@ Function onTimeContentChange()
     m.epgTimeGrid.content = m.top.timeGridContent
     m.epgTimeGrid.contentUpdated = true
     m.top.contentReady = true
+    m.InfoPanel.visible = true
   end if
 End Function
 

@@ -7,7 +7,7 @@
 ' @position: integer, the position from which to start video playback
 Function playVideoContent(content, playbackSource = "unknown", position = 0)
   tubiLog("VideoHelpers.playVideoContent")
-  if isContentLocked(content) = true
+  if content <> invalid and content.needsLogin = true
     callbackAfterSignInParams = {"content":content, "playbackSource": playbackSource, "position": position }
     startSignIn(AfterSignInPlayLockedContent, callbackAfterSignInParams)
   else

@@ -279,9 +279,19 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   if contentFromServer.league <> invalid
-    if contentFromServer.league.round <> invalid and contentFromServer.league.group <> invalid
-      translatedContent.roundGroupInfo = contentFromServer.league.round + "." + contentFromServer.league.group
+    league = contentFromServer.league
+    roundGroupInfo = ""
+    if league.round <> invalid
+      roundGroupInfo = league.round
     end if
+
+    if roundGroupInfo <> "" and league.group <> invalid
+      roundGroupInfo += " " + Chr(&hb7) + " "
+    else if league.group <> invalid
+      roundGroupInfo += league.group
+    end if
+
+    translatedContent.roundGroupInfo = roundGroupInfo
   end if
 
   creditsCuePoints = {}
@@ -404,8 +414,15 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   'take care of any subtitles if they exist - should only happen on videos
   if contentFromServer.has_subtitle <> invalid then translatedContent.hasSubtitles = contentFromServer.has_subtitle
 
-  'TODO: check the field once the FIFA World cup API's are fully ready
-  if contentFromServer.has4k <> invalid then translatedContent.has4k = contentFromServer.has4k
+  ' compare list of renditions to device and enviroment capabilities to get the highest rendition
+  if contentFromServer.video_renditions <> invalid
+    ' for now, only worry about 4k
+    if contentFromServer.video_renditions[0] = m.constants.serverValues.tensorVideoRenditions.fourK
+      if m.constants.deviceInfo.videoMode.toInt() >= 2160
+        translatedContent.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+      end if
+    end if
+  end if
 
   ' linear subtitles
   if translatedContent[typeVar] = m.contentTypes.linear AND translatedContent.hasSubtitles = true
@@ -466,17 +483,12 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   ' Channels
   if contentFromServer.channel_id <> invalid then translatedContent.channelId = contentFromServer.channel_id
   if contentFromServer.channel_logo <> invalid then translatedContent.inlineLogoUri = contentFromServer.channel_logo
-  if contentFromServer.logo <> invalid then translatedContent.titleLogoUri = contentFromServer.logo
   if contentFromServer.channel_name <> invalid then translatedContent.channelName = contentFromServer.channel_name
 
   if contentFromServer.is_recurring <> invalid then translatedContent.isRecurring = contentFromServer.is_recurring
-
   if contentFromServer.availability_starts <> invalid then translatedContent.availabilityStarts = contentFromServer.availability_starts
-
   if contentFromServer.availability_ends <> invalid then translatedContent.availabilityEnds = contentFromServer.availability_ends
-
-  airDateTime = contentFromServer.air_datetime
-  translatedContent.airDateTime = airDateTime
+  if contentFromServer.air_datetime <> invalid then translatedContent.airDateTime = contentFromServer.air_datetime
 
   hasVideoResources = false
   if contentFromServer.has_video_resources = true
@@ -710,7 +722,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         '//if continue watching container while user is signed out,
         ' then ensure row is empty except for 1 item that will entice users to sign in
         categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
-      else if container.type = m.contentTypes.channel
+      else if container.type = m.contentTypes.channel OR container.id = m.constants.ui.categoryIds.fifawc
         categoryAA = m.buildCategoryAAWithPrepend(container, contents, invalid, "", false, contentMode, screenId, isSignedInUser)
       else
         categoryAA = m.buildCategoryAA(container, contents, invalid, "", false, contentMode, screenId, isSignedInUser)
@@ -926,7 +938,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
   nodeCount = 0
 
   categoryMetadata = invalid
-  if container.type = m.contentTypes.channel
+  if container.type = m.contentTypes.channel OR container.id = m.constants.ui.categoryIds.fifawc
     categoryMetadata = m.buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
   else
     categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
@@ -996,27 +1008,6 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
 
   categoryParent = m.buildCategoryParentInfo(container, contentMode, sOrientation)
 
-  ' Inserting ShowAllGames title as first position on world cup row on homescreen
-  if screenId = "homeScreen" AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_fifa_wc_topnav", "roku_fifa_wc_topnav_v1").enabled = true AND container.id = m.constants.ui.categoryIds.fifawc 'WORLD CUP:: this check will be removed once the api is ready
-    if container.children <> invalid AND container.children.count() > 0
-      showAllGamesItem = {
-        id: m.constants.ui.contentIds.showAllGames
-        title: getTranslation("screenHome_item_showAllGames")
-        type: "n"
-        thumbnails: ["pkg:/images/fifa-showall.png"]
-        description: container.description
-      }
-      if contentsJson <> invalid
-        parsedJsonShowAllGames = ParseJson(contentsJson)
-        parsedJsonShowAllGames[showAllGamesItem.id] = showAllGamesItem
-        contentsJson = FormatJSON(parsedJsonShowAllGames)
-      end if
-      container.children.Unshift(showAllGamesItem.id)
-      contents[showAllGamesItem.id] = showAllGamesItem
-    end if
-  end if
-  'end if
-
   gridItemType = m.getGridItemType(container, sOrientation, m.constants)
   categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData, isSignedInUser)
 
@@ -1047,27 +1038,57 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
 End Function
 
 
+''''''''''''''''''''''
+' buildCategoryAAWithPrepend
+'
+' prepends the content to the given container based on container ID OR container type
+'
+' @container: assocArray, a single container as found in the matrix API
+' @contents: assocArray, a set of content meta data as found in the matrix API
+' @contentsJson: string, the JSON string of just the contents portion of the matrix API
+' @sOrientation: string, should the thumbnail be a "portrait" or "landscape" (match against m.constants.ui.gridItemTypes values)
+' @bFullData: boolean, Should the full data be parsed and passed to the video children?
+' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
+' @screenId: string, one of the screenIds found at constants.ui.screenIds
+' @isSignedInUser: boolean, value based on user logged In or not
+' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
 Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false)
   categoryAA = invalid
 
-  if container <> invalid AND container.children <> invalid
-    'add the channel content to the beginning of the category
-    container.children.Unshift(container.id)
+  if container <> invalid AND container.children <> invalid AND container.children.count() > 0
 
-    ' create and add a new content to the contents which hold the container metadata
     prependContent = {}
-    prependContent.append(container)
-    prependContent.delete("children")  ' need to make sure there isn't a recursion later when getContentFromCategoryJson is called
-    prependContent.posterarts = [m.generateChannelPosterUrl(container.id)]
+    if screenId = "homeScreen" AND container.id = m.constants.ui.categoryIds.fifawc AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_fifa_wc_topnav", "roku_fifa_wc_topnav_v1").enabled = true
+      ' create and add a showAll content to the contents which hold the container metadata
+      prependContent = {
+        id: m.constants.ui.contentIds.showAllGames
+        title: getTranslation("screenHome_item_showAllGames")
+        type: "n"
+        thumbnails: [m.constants.urls.fifaShowAllPoster]
+        description: container.description
+        backgrounds: [m.constants.urls.fifaShowAllBackground]
+      }
+    else if container.type = m.contentTypes.channel
+      ' create and add a new content to the contents which hold the container metadata
+      prependContent = {}
+      prependContent.append(container)
+      prependContent.delete("children")  ' need to make sure there isn't a recursion later when getContentFromCategoryJson is called
+      prependContent.posterarts = [m.generateChannelPosterUrl(container.id)]
+    end if
 
-    contentsWithPrepend = {}
-    contentsWithPrepend[container.id] = prependContent
-    contentsWithPrepend.append(contents)
+    if prependContent.id <> invalid
+      'add the content to the beginning of the category
+      container.children.Unshift(prependContent.id)
 
-    ' force contentsJson to be regenerated with the prepended content in buildCategoryAA()
-    contentsJson = invalid
+      contentsWithPrepend = {}
+      contentsWithPrepend[prependContent.id] = prependContent
+      contentsWithPrepend.append(contents)
 
-    categoryAA = m.buildCategoryAA(container, contentsWithPrepend, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
+      ' force contentsJson to be regenerated with the prepended content in buildCategoryAA()
+      contentsJson = invalid
+      categoryAA = m.buildCategoryAA(container, contentsWithPrepend, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
+    end if
+
   end if
 
   return categoryAA
@@ -1249,6 +1270,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           else if fullChild.posterarts <> invalid then
             childAA.hdgridposterurl = fullChild.posterarts[0]
           end if
+
           childAA.hdgridposterurl = m.getThumbnailImage(fullChild, gridType)
 
           if parentGridItemType = gridItemTypes.linear AND fullChild.thumbnails <> invalid
@@ -1811,12 +1833,10 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
       if channelFromServer.publisher_id <> invalid
         channelNode.pubId = channelFromServer.publisher_id
       end if
+
       'channel level needs_login
-      if channelFromServer.needs_login = true
+      if channelFromServer.needs_login = true and isUserSignedIn = false
         channelNode.needsLogin = true
-        if isUserSignedIn = true
-          channelNode.needsLogin = false
-        end if
       end if
 
       channelNode.backgrounds = m.dedupeBackgrounds(channelFromServer.images.background)
@@ -1845,11 +1865,8 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
           program.descriptors = channelFromServer.tags
         end if
         'programlevel
-        if channelFromServer.needs_login = true
+        if channelFromServer.needs_login = true and isUserSignedIn = false
           program.needsLogin = true
-          if isUserSignedIn = true
-            program.needsLogin = false
-          end if
         end if
 
       else ' programs available
@@ -1923,18 +1940,18 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
             program.Rating = programFromServer.ratings[0].value
           end if
 
-          program.needsLogin = false
-          if channelFromServer.needs_login = true
+          if channelFromServer.needs_login = true and isUserSignedIn = false
             program.needsLogin = true
-            if isUserSignedIn = true
-              program.needsLogin = false
+          end if
+
+          if programFromServer.videoRenditions <> invalid
+            ' for now, only worry about 4k
+            if programFromServer.videoRenditions[0] = m.constants.serverValues.tensorVideoRenditions.fourK
+              if m.constants.deviceInfo.videoMode.toInt() >= 2160
+                program.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+              end if
             end if
           end if
-
-          if programFromServer.has_4k <> invalid
-            program.has4k = programFromServer.has_4k
-          end if
-
 
           if programFromServer.description <> invalid and programFromServer.description <> ""
             program.description = programFromServer.description

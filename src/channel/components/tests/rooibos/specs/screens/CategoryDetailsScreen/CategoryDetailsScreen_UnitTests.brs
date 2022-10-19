@@ -50,7 +50,6 @@ Function categoryDetailsScreen_populateInfoPanelItem_test()
   controlInfoPanel.hasCC = content.hasSubtitles
   controlInfoPanel.rating = content.rating
   controlInfoPanel.partnerLogoUri = content.inlineLogoUri
-  controlInfoPanel.genres = content.genres
   controlInfoPanel.description = content.description
   controlInfoPanel.mode = "item"
   controlInfoPanel.calculateHeight = true
@@ -62,36 +61,12 @@ Function categoryDetailsScreen_populateInfoPanelItem_test()
     releaseDate: content.releaseDate
     availabilityEnds: content.availabilityEnds
   }
+  controlInfoPanel.lineTwoData = {
+    genres: content.genres
+  }
   
   emptyInfoPanel = CreateObject("roSGNode", "InfoPanel")
-  populatedInfoPanel = populateInfoPanel(emptyInfoPanel, content, "item")
-
-  ' can't test equality of nodes, so test if they have the same fields
-  return m.assertEqual(populatedInfoPanel.getFields(), controlInfoPanel.getFields())
-End Function
-
-
-'@Test populateInfoPanelChannel unit test
-Function categoryDetailsScreen_populateInfoPanelChannel_test()
-  content = m.channelContent
-  controlInfoPanel = CreateObject("roSGNode", "InfoPanel")
-  controlInfoPanel.title = content.title
-  controlInfoPanel.titleLogoUri = content.logoUri
-  controlInfoPanel.description = content.description
-  controlInfoPanel.categoryContentCount = content.totalCount
-  controlInfoPanel.mode = "category"
-  controlInfoPanel.calculateHeight = true
-  controlInfoPanel.lineOneData = {
-    hasCC: content.hasSubtitles
-    length: content.length
-    partnerLogoUri: content.inlineLogoUri
-    rating: content.rating
-    releaseDate: content.releaseDate
-    availabilityEnds: content.availabilityEnds
-  }
-
-  emptyInfoPanel = CreateObject("roSGNode", "InfoPanel")
-  populatedInfoPanel = populateInfoPanel(emptyInfoPanel, content, "category")
+  populatedInfoPanel = populateInfoPanel(emptyInfoPanel, content)
 
   ' can't test equality of nodes, so test if they have the same fields
   return m.assertEqual(populatedInfoPanel.getFields(), controlInfoPanel.getFields())

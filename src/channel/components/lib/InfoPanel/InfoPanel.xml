@@ -30,36 +30,39 @@
 
   <script type="text/brightscript" uri="InfoPanel.brs" />
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/ContentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
-
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
-  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
 
   <interface>
     <!-- INPUTS -->
+    <!-- a list of allowed modes can be found at constants.ui.infoPanelModes -->
+    <field id="mode" type="string"/>
+
     <field id="title" alias="Title.text" />
-    <field id="titleLogoUri" type="string" />
-    <field id="headerImageUri" type="string" />
+    <field id="leftHeaderImageUri" type="string" />
+    <field id="topHeaderImageUri" alias="TopHeaderImage.uri" />
     <field id="episodeTitle" alias="Episode.text" />
-    <field id="genres" type="stringarray" />
     <field id="description" type="string" />
+    <field id="descriptionMaxLines" alias="Description.maxLines" />
     <field id="directors" type="stringarray" />
     <field id="starring" type="stringarray" />
     <field id="seasonEpisodeCount" type="integer" />
-    <field id="categoryContentCount" type="integer" />
     <field id="fullscreenCountdown" type="integer" value="0"/>
+    <field id="needsLogin" type="boolean" />
+    <field id="reminderIsSet" type="boolean" />
     <field id="calculateHeight" type="boolean" alwaysNotify="true" />
-    <field id="fifaWorldCupTitle" alias="FifaWorldCupTitle.text" />
-    <field id="fifaWorldCupDescription" alias="FifaWorldCupDescription.text" />
-    <field id="needsLogIn" type="boolean" alwaysNotify="true"/>
 
     <!-- handles changes to FirstLineGroup, has a structure like
       {
+        type: "series"        'the content type, "series", "movie"
         releaseDate: "1924"   'The year the video was released
         length: 0             'The length of the video in seconds
         hasCC: true           'Indicates if the video has captions
@@ -67,17 +70,24 @@
                                "TV-MA", "TV-PG", "TV-Y", "TV-Y7"  or lowercase
         partnerLogoUri: ""    'The URI used to display the partner/channel logo
         availabilityEnds: "2019-03-31T00:00:00Z"
-        DescriptorCode: "L V"  'This is rating descriptor code for a program'
+        descriptorCode: "L V"  'This is rating descriptor code for a program
+        badgeText: "Upcoming"  'Upcoming, Replay, Live
+        has4k: true            'indicates if 4k is available
+        hoursOfAiring: "9:00PM - 9:30PM"  'the time the program will be shown
       }
       Handling these at once is more efficient than handling them all individually
-     -->
+    -->
     <field id="lineOneData" type="assocarray" />
 
-    <!-- mode is either: 'category', 'item', 'movie', 'series', 'season', 'episode' -->
-    <field id="mode" type="string"/>
-
-    <!-- availabilityType is either 'Upcoming', 'Replay', 'Live'-->
-    <field id="availabilityType" type="string"/>
+    <!-- handles changes to SecondLineGroup, has a structure like
+      {
+        badgeText: "Upcoming"  'Upcoming, Replay, Live
+        genres: ["Comedy", "Drama"]   'The genres of the content in an array of strings
+        roundGroupInfo: "Group Stage . Group B"
+      }
+      Handling these at once is more efficient than handling them all individually
+    -->
+    <field id="lineTwoData" type="assocarray" />
 
     <!-- maxHeight is the area in which the content should be centered -->
     <field id="maxHeight" type="int" value="0" />
@@ -102,12 +112,11 @@
       translation="[0,0]"
       itemSpacings="[12]">
       <Poster
-        id="HeaderImage"
+        id="LeftHeaderImage"
         loadingBitmapUri="pkg:/images/placeholder.jpg"
         failedBitmapUri="pkg:/images/placeholder.jpg"
         width="186"
         height="264"
-        visible="false"
         translation="[0,0]"
         loadDisplayMode="scaleToFit"/>
 
@@ -118,10 +127,7 @@
         translation="[0,0]">
 
         <Poster
-          id="LiveVideoIndicator"
-          uri="pkg:/images/icon-live.png"
-          width="94"
-          height="37"
+          id="TopHeaderImage"
           visible="true"/>
 
         <LayoutGroup
@@ -130,12 +136,6 @@
           vertAlignment="center"
           itemSpacings="[20]"
           addItemSpacingAfterChild="true">
-          <Poster
-            id="TitleLogo"
-            visible="false"
-            height="80"
-            width="80"
-            loadDisplayMode="scaleToFit" />
           <Label
             id="Title"
             width="1140"
@@ -151,7 +151,6 @@
           </Label>
         </LayoutGroup>
 
-
         <Label
           id="Episode">
           <Font
@@ -161,185 +160,6 @@
         </Label>
 
         <LayoutGroup
-          id="CategoryDetails"
-          layoutDirection="vert"
-          itemSpacings="[10]"
-          opacity="0.5"
-          visible="true">
-          <Label
-            id="CategoryLine1">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="27" />
-          </Label>
-          <!-- This is supposed to say "Updated Wednesday" or some other data we don't have yet.
-          <Label
-            id="CategoryLine2"
-            font="dictionary:Vaud22px"/>
-          -->
-        </LayoutGroup>
-
-        <LayoutGroup
-          id="FifaWorldCupGameDetails"
-          layoutDirection="vert"
-          itemSpacings="[10]"
-          translation="[0,0]"
-          visible="true">
-          <Poster
-            id="fifaImage"
-            uri="pkg:/images/fifa_world_cup_icon.png"
-            width="186"
-            height="84"
-            visible="false" />
-          <Label
-            id="FifaWorldCupTitle"
-            width="1140"
-            wrap="true"
-            maxLines="2"
-            color="0xFFFFFFFF"
-            vertAlign="bottom">
-            <Font
-              id="TitleFont"
-              role="font"
-              uri="pkg:/fonts/Vaud-SemiBold.ttf"
-              size="48" />
-          </Label>
-          <LayoutGroup
-            id="FifaWorldCupFirstLineGroup"
-            layoutDirection="horiz"
-            itemSpacings="[10]"
-            visible="true">
-            <Badge
-              id="sportsBadge"
-              visible="false" />
-            <Label
-              id="matchTime"
-              height="36"
-              width="0"
-              color="0x9699A3"
-              numLines="1"
-              wrap="false"
-              visible="false"
-              horizAlign="center"
-              vertAlign="center">
-              <Font
-                role="font"
-                uri="pkg:/fonts/Vaud-Bold.ttf"
-                size="24" />
-            </Label>
-            <Poster
-              id="FifaWorldCup4kPoster"
-              height="36"
-              width="158"
-              loadDisplayMode="scaleToFit"
-              loadSync="true" />
-            <Poster
-              id="FifaWorldCupClosedCaptionPoster"
-              height="36"
-              width="56"
-              loadDisplayMode="scaleToFit"
-              loadSync="true" />
-            <Group
-              id="FifaWorldCupRating"
-              visible="false">
-              <Poster
-                id="FifaWorldCupRatingBackground"
-                height="36"
-                uri="pkg:/images/ratingBackground.9.png"
-                loadDisplayMode="scaleToFit"
-                loadSync="true" />
-              <Label
-                id="FifaWorldCupRatingLabel"
-                height="36"
-                width="0"
-                opacity="0.8"
-                color="0xFFFFFFFF"
-                numLines="1"
-                wrap="false"
-                translation="[0,3]"
-                horizAlign="center"
-                vertAlign="center">
-                <Font
-                  role="font"
-                  uri="pkg:/fonts/Vaud-Bold.ttf"
-                  size="22" />
-              </Label>
-            </Group>
-          </LayoutGroup>
-          <Label
-            id="roundGroupInfo"
-            height="36"
-            width="0"
-            color="0x9699A3"
-            numLines="1"
-            wrap="false"
-            translation="[0,3]"
-            horizAlign="center"
-            vertAlign="center">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="24" />
-          </Label>
-          <Label
-            id="FifaWorldCupDescription"
-            width="800"
-            lineSpacing="16"
-            maxLines="5"
-            wrap="true"
-            color="0xFFFFFFFF"
-            visible="true">
-            <Font
-              id="FifaWorldCupDescriptionFont"
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="27" />
-          </Label>
-          <LayoutGroup
-            id="ReminderGroup"
-            layoutDirection="horiz"
-            vertAlignment="center"
-            itemSpacings="[10]"
-            addItemSpacingAfterChild="true">
-            <Poster
-              id="ReminderLogo"
-              visible="false"
-              height="30"
-              width="28"
-              uri="pkg:/images/reminder_set.png"
-              loadDisplayMode="scaleToFit" />
-            <Label
-              id="ReminderTitle"
-              width="960"
-              wrap="true"
-              color="0x9699A3"
-              vertAlign="bottom">
-              <Font
-                id="ReminderFont"
-                role="font"
-                uri="pkg:/fonts/Vaud-Medium.ttf"
-                size="24" />
-            </Label>
-          </LayoutGroup>
-        </LayoutGroup>
-
-        <LayoutGroup
-          id="SeasonDetails"
-          layoutDirection="vert"
-          itemSpacings="[10]"
-          opacity="0.5"
-          visible="true">
-          <Label
-            id="SeasonLine1">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="27" />
-          </Label>
-        </LayoutGroup>
-
-        <LayoutGroup
           id="TwoLineInfo"
           layoutDirection="vert"
           itemSpacings="[8]"
@@ -347,32 +167,42 @@
           <LayoutGroup
             id="FirstLineGroup"
             layoutDirection="horiz"
-            vertAlignment="center"
             itemSpacings="[10]"
+            vertAlignment="custom"
             addItemSpacingAfterChild="true">
+            <Badge
+              id="FirstLineAvailabilityBadge"/>
             <Label
               id="Line1"
+              translation="[0,6]"
               opacity="0.5">
               <Font
                 role="font"
                 uri="pkg:/fonts/Vaud-Medium.ttf"
                 size="27" />
             </Label>
-            <Poster
-              id="resolutionPoster"
-              height="36"
-              width="56"
-              loadDisplayMode="scaleToFit"
-              loadSync="true"/>
+            <Label
+              id="Line1Bold"
+              translation="[0,9]"
+              opacity="0.5">
+              <Font
+                role="font"
+                uri="pkg:/fonts/Vaud-Bold.ttf"
+                size="27" />
+            </Label>
             <Poster
               id="ClosedCaptionPoster"
               height="36"
               width="56"
               loadDisplayMode="scaleToFit"
               loadSync="true"/>
+            <Poster
+              id="ResolutionPoster"
+              translation="[0,6]"
+              loadDisplayMode="scaleToFit"
+              loadSync="true"/>
             <Group
-              id="Rating"
-              visible="false">
+              id="Rating">
               <Poster
                 id="RatingBackground"
                 height="36"
@@ -398,7 +228,7 @@
             </Group>
             <Label
               id="DescriptorCode"
-              visible="false">
+              translation="[0, 9]">
               <Font
               role="font"
               uri="pkg:/fonts/Vaud-Bold.ttf"
@@ -423,6 +253,8 @@
             vertAlignment="center"
             itemSpacings="[10]"
             addItemSpacingAfterChild="true">
+            <Badge
+              id="SecondLineAvailabilityBadge"/>
             <Label
               id="Line2"
               opacity="0.5"
@@ -461,6 +293,60 @@
               size="27" />
           </Label>
         </Group>
+
+        <LayoutGroup
+          id="SignInGroup"
+          layoutDirection="horiz"
+          vertAlignment="custom"
+          itemSpacings="[10]"
+          addItemSpacingAfterChild="true">
+          <Poster
+            id="SignInLock"
+            width="20"
+            height="25"
+            uri="pkg:/images/icon-lock.png"
+            blendColor="0xFF501A"
+            loadDisplayMode="scaleToFit" />
+          <Label
+            id="SignInText"
+            width="1140"
+            wrap="false"
+            color="0xFF501A"
+            translation="[0,3]">
+            <Font
+              id="SignInFont"
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="27" />
+          </Label>
+        </LayoutGroup>
+
+        <LayoutGroup
+          id="ReminderGroup"
+          layoutDirection="horiz"
+          vertAlignment="center"
+          itemSpacings="[10]"
+          addItemSpacingAfterChild="true">
+          <Poster
+            id="ReminderLogo"
+            visible="false"
+            height="30"
+            width="28"
+            uri="pkg:/images/reminder_set.png"
+            loadDisplayMode="scaleToFit" />
+          <Label
+            id="ReminderTitle"
+            width="960"
+            wrap="true"
+            color="0x9699A3"
+            vertAlign="bottom">
+            <Font
+              id="ReminderFont"
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="27" />
+          </Label>
+        </LayoutGroup>
 
         <LayoutGroup
           id="DirectorGroup"
@@ -549,34 +435,6 @@
               size="27" />
           </Label>
         </LayoutGroup>
-
-        <LayoutGroup
-          id="signInGroup"
-          layoutDirection="horiz"
-          vertAlignment="bottom"
-          itemSpacings="[10]"
-          addItemSpacingAfterChild="true">
-          <Poster
-            id="lockIcon"
-            blendColor="0xFF501A"
-            visible="false"
-            height="30"
-            width="24"
-            uri="pkg:/images/lock_icon.png"
-            loadDisplayMode="scaleToFit"
-            loadSync="true" />
-          <Label
-            id="signInTitle"
-            width="960"
-            color="0xFF501A">
-            <Font
-              id="signInFont"
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="24" />
-          </Label>
-        </LayoutGroup>
-
       </LayoutGroup>
     </LayoutGroup>
 

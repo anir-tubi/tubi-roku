@@ -258,8 +258,6 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     'hide the spinner
     detailScreen.isLoading = false
 
-    lineOneData = {}
-
     ' don't show related content if the user is in any of the kids modes
     detailScreen.showRelated = not isKidsUIOn()
 
@@ -269,8 +267,6 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     end if
 
     'update detail screen state via the input interface
-    detailScreen.genres = content.genres
-    detailScreen.needsLogin = content.needsLogin
     detailScreen.selectedContentType = content.type
     hasVideoresources = content.hasVideoresources
     airDatetime = content.airDatetime
@@ -302,15 +298,17 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
           '//There may be multiple detail screens in the stack so the timer may already be started
           m.resumeAllowedTimer.control = "start"
         end if
-
       end if
-
     end if
 
     episode = getEpisodeContent(content)
     episodeHistory = invalid
+
+    lineOneData = {}
+    lineTwoData = {}
+
     if content.type = m.constants.ui.contentTypes.series
-      detailScreen.title = content.title
+      detailScreen.mode = m.constants.ui.infoPanelModes.series
       if episode <> invalid
         if history <> invalid
           '//if there is no history, then there is no episode history either
@@ -322,22 +320,16 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
 
       lineOneData.type = m.constants.ui.contentTypes.series
       lineOneData.seasons = content.totalCount
+      lineTwoData.genres = content.genres
       detailScreen.isSeries = true
-      detailScreen.mode = m.constants.ui.infoPanelModes.series
-    ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     else if content.type = m.constants.ui.contentTypes.sportsEvent
       detailScreen.mode = m.constants.ui.infoPanelModes.sportsEvent
-      detailScreen.fifaWorldCupTitle = content.title
-      detailScreen.needsLoginHint = isContentLocked(content)
-      lineOneData.availabilityType = availabilityType
-      lineOneData.roundGroupInfo = content.roundGroupInfo
-      lineOneData.matchTime = matchTime
       lineOneData.badgeText = badgeText
-      lineOneData.hasFifaWorldCupCC = content.hasSubtitles
-      lineOneData.hasFifaWorldCup4k = content.has4k
+      lineOneData.hoursOfAiring = matchTime
+      lineTwoData.roundGroupInfo = content.roundGroupInfo
     else
-      detailScreen.title = content.title
       detailScreen.mode = m.constants.ui.infoPanelModes.movie
+      lineTwoData.genres = content.genres
     end if
 
     if isKidsUIOn() = true
@@ -355,17 +347,20 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     lineOneData.length = stateSource.length
     lineOneData.rating = stateSource.rating
     lineOneData.releaseDate = content.releaseDate
+    lineOneData.descriptorCode = content.descriptorCode
     lineOneData.partnerLogoUri = content.inlineLogoUri
+
+    if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+      lineOneData.has4k = true
+    end if
 
     if episode <> invalid AND (episode.hasSubtitles = true OR m._.empty(episode.subtitleTracks) = false)
       lineOneData.hasCC = true
-    else if content <> invalid AND content.type = m.constants.ui.contentTypes.video AND (content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false)
+    else if content <> invalid AND (content.type = m.constants.ui.contentTypes.video OR content.type = m.constants.ui.contentTypes.sportsEvent) AND (content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false)
       lineOneData.hasCC = true
     else
       lineOneData.hasCC = false
     end if
-
-    lineOneData.descriptorCode = content.descriptorCode
 
     if content.availabilityEnds <> invalid AND content.availabilityEnds <> ""
       lineOneData.availabilityEnds = content.availabilityEnds
@@ -373,11 +368,15 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       lineOneData.availabilityEnds = episode.availabilityEnds
     end if
 
-    detailScreen.lineOneData = lineOneData
-
+    detailScreen.title = content.title
     detailScreen.description = stateSource.description
+    detailScreen.lineOneData = lineOneData
+    detailScreen.lineTwoData = lineTwoData
     detailScreen.directors = stateSource.directors
     detailScreen.starring = stateSource.actors
+    detailScreen.reminderIsSet = (availabilityType = "upcoming" AND bookmark <> invalid)
+    detailScreen.needsLoginHint = content.needsLogin
+    detailScreen.infoPanelVisible = true
 
     setIsBookmark(detailScreen, (bookmark <> invalid))
     sLikedState = ""

@@ -154,3 +154,20 @@ Function onSearchDefaultErrorResponse(result)
     searchScreen.contentUpdated = true
   end if
 End Function
+
+
+'''''''''''''''''''''
+' updateSearchContentNode function sets needsLogin to false for all nodes in search results. so lock icon will not be displayed.
+'
+' @screen: node, search screen
+Function updateSearchContentNode(searchScreen)
+
+  content = searchScreen.content
+  if content <> invalid
+    for i = 0 to content.getChildCount()-1
+      content.getChild(i).needsLogin = false
+    end for
+    searchScreen.contentUpdated = true
+  end if
+
+End Function

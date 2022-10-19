@@ -1,5 +1,6 @@
 Function init()
   tubiLog("TournamentScreen.init")
+  m._ = rodash()
   m.constants = getConstantsFromGlobal()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
@@ -180,85 +181,63 @@ End Function
 '@isReminderSet: boolean, this is used show on the infoPanel whether the reminderSet or not on the focusedContent
 Function populateInfoPanel(focusedContent, isReminderSet=false)
   tubiLog("TournamentScreen.populateInfoPanel")
-  lineOneData = {}
+
   if focusedContent <> invalid
     if focusedContent.type = m.constants.ui.categoryTypes.linear
       m.InfoPanel.mode = m.constants.ui.infoPanelModes.linearTournament
       m.InfoPanel.title = focusedContent.title
       m.InfoPanel.description = focusedContent.description
       m.InfoPanel.width = 650
+
       lineOneData = {}
       lineOneData.rating = focusedContent.rating
       lineOneData.hasCC = focusedContent.hasSubtitles
-      if focusedContent.has4k <> invalid AND focusedContent.has4k = true
-        lineOneData.has4k = focusedContent.has4k
+      lineOneData.releaseDate = focusedContent.ReleaseDate
+      lineOneData.hoursOfAiring = focusedContent.hoursOfAiring
+
+      if focusedContent.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+        lineOneData.has4k = true
       end if
+
       if focusedContent.descriptors <> invalid AND focusedContent.descriptors.Count() > 0
         lineOneData.descriptorCode = focusedContent.descriptors.join(", ") ' To DO : When when we get real values into TAGS
       end if
-      lineOneData.releaseDate = focusedContent.ReleaseDate
-      lineOneData.hoursOfAiring = focusedContent.hoursOfAiring
+
       m.InfoPanel.lineOneData = lineOneData
       m.InfoPanel.needsLogIn = focusedContent.needsLogIn AND (m.top.signedIn <> true)
       m.top.backgroundUriList = determineBackgroundImage(focusedContent.getparent())
     else if focusedContent.type = m.constants.ui.contentTypes.sportsEvent
       m.InfoPanel.mode = m.constants.ui.infoPanelModes.sportsEvent
-      m.InfoPanel.fifaWorldCupTitle = focusedContent.title
-      lineOneData = {}
+      m.InfoPanel.title = focusedContent.title
 
       hasVideoresources = focusedContent.hasVideoresources
       airDatetime = focusedContent.airDatetime
       info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
       matchTime = info.matchTime
       badgeText = info.badgeText
-      availabilityType = info.availabilityType
 
-      lineOneData.availabilityType = availabilityType
+      lineOneData = {}
       lineOneData.roundGroupInfo = focusedContent.roundGroupInfo
-      lineOneData.matchTime = matchTime
+      lineOneData.hoursOfAiring = matchTime
       lineOneData.badgeText = badgeText
-      lineOneData.hasFifaWorldCupCC = focusedContent.hasSubtitles
-      lineOneData.hasFifaWorldCup4k = focusedContent.has4k
+      lineOneData.hasCC = focusedContent.hasSubtitles
       lineOneData.length = focusedContent.length
       lineOneData.isReminderSet = isReminderSet
+
+      if focusedContent.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+        lineOneData.has4k = true
+      end if
+
       m.InfoPanel.lineOneData = lineOneData
-      m.InfoPanel.availabilityType = availabilityType
       m.InfoPanel.needsLogin = focusedContent.needsLogIn AND (m.top.signedIn <> true)
       m.top.backgroundUriList = determineBackgroundImage(focusedContent)
-    else if focusedContent.type = m.constants.ui.contentTypes.video or focusedContent.type = m.constants.ui.contentTypes.series
-      m.InfoPanel.mode = m.constants.ui.infoPanelModes.item
-      m.InfoPanel.title = focusedContent.title
-      m.InfoPanel.description = focusedContent.description
-      lineOneData.hasCC = focusedContent.hasSubtitles
-      lineOneData.rating = focusedContent.rating
-      lineOneData.releaseDate = focusedContent.releaseDate
-      lineOneData.length = focusedContent.length
-
-      if focusedContent.type = m.constants.ui.contentTypes.series
-        lineOneData.type = m.constants.ui.contentTypes.series
-        ' lineOneData.seasons =  '//If available, get the number of seasons and set the value here
-      end if
-      lineOneData.releaseDate = focusedContent.releaseDate
-      lineOneData.length = focusedContent.length
-      lineOneData.hasCC = focusedContent.hasSubtitles
-
-      if focusedContent.availabilityEnds <> invalid
-        lineOneData.availabilityEnds = focusedContent.availabilityEnds
-      end if
-
-      lineOneData.rating = focusedContent.rating
-      lineOneData.partnerLogoUri = focusedContent.inlineLogoUri
-
-      m.InfoPanel.lineOneData = lineOneData
-      m.InfoPanel.titleLogoUri = focusedContent.titleLogoUri
-      m.InfoPanel.genres = focusedContent.genres
-      m.InfoPanel.needsLogin = focusedContent.needsLogIn AND (m.top.signedIn <> true)
-      m.InfoPanel.width = 960
+    else if focusedContent.type = m.constants.ui.contentTypes.video OR focusedContent.type = m.constants.ui.contentTypes.series
+      populateInfoPanelWithHomescreenStyleItemMode(focusedContent, m.InfoPanel)
+      m.top.backgroundUriList = determineBackgroundImage(focusedContent)
     else
       m.top.backgroundUriList = determineBackgroundImage(focusedContent)
     end if
     m.InfoPanel.calculateHeight = true
-
   end if
 End Function
 
@@ -285,7 +264,6 @@ Function onGridItemFocused()
     isReminderSet = false
 
     bookMarkIds = getFieldFromGlobal("bookmarkIds")
-
     airDateTime = focusedContent.airDatetime
     hasVideoResources = focusedContent.hasVideoResources
 
@@ -445,6 +423,7 @@ Function onContentUpdated()
       m.categoryGridList.contentUpdated = true
     end if
 
+    m.infoPanel.visible = true
     m.top.contentReady = true
   end if
 

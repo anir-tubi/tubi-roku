@@ -223,7 +223,7 @@ Note: If you are adding a new unit test, then you can test only this new unit te
 
   - Save the modified image as `channel-store/channel-store-poster-staging-540x405.png`, overwriting the old staging channel launch icon.
 
-- Make a new PR of the `x_y_branch` against master. Once the PR has been merged delete the branch as normal.
+- Make a new PR of the `updates_for_x_y_submission` against master. Once the PR has been merged delete the branch as normal.
 
 - Create a new branch off of master named "x_y_branch", where x is the Major Release number and where y is the Minor Release number: i.e. `2_14_branch`. Push this branch to Github. This branch will serve as the source of truth for what is in production until the next submission release.
 

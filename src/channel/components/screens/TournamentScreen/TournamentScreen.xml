@@ -7,7 +7,9 @@
   <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/FocusMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ContentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/InfoPanelMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
@@ -144,7 +146,8 @@
         id="InfoPanel"
         translation="[192,168]"
         maxHeight="354"
-        maxTitleLines="2"/>
+        maxTitleLines="2"
+        visible="false"/>
     </Group>
 
     <CategoryGridList

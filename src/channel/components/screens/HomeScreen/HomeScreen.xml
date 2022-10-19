@@ -8,6 +8,8 @@
   <script type="text/brightscript" uri="../../lib/FocusMixin.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/ContentMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/InfoPanelMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/ApiUtils.brs" />

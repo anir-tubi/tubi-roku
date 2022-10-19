@@ -35,7 +35,7 @@ End Function
 ' getHistory finds the historyIds based on contentId provided
 '
 ' @contentId: string, the id of any content
-' returns history of the given content
+' returns history of the passed content id or invalid if there is no history for the content id
 Function getHistory(contentId)
 
   history = invalid

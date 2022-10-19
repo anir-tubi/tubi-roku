@@ -119,13 +119,14 @@ Function onEpisodeFocused()
       lineOneData.partnerLogoUri = episode.inlineLogoUri
 
       m.Info.lineOneData = lineOneData
-      m.Info.titleLogoUri = episode.titleLogoUri
-      m.Info.genres = episode.genres
+      m.Info.twoLineData = {
+        genres: episode.genres
+      }
       m.Info.needsLogIn = episode.needsLogin
       m.Info.width = 1140   
       m.Info.calculateHeight = true   
-      
     end if
+
     season = m.top.content.getChild(m.RowList.rowItemFocused[0])
     if season <> invalid then
       season.focusIndex = m.RowList.rowItemFocused[1]

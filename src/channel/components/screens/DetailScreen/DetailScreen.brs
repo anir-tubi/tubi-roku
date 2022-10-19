@@ -436,7 +436,6 @@ Function onIsSeries()
 End Function
 
 
-' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
 Function onAvailabilityTypeChange()
   tubiLog("DetailScreen.onAvailabilityTypeChange")
   availabilityType = m.top.availabilityType

@@ -10,6 +10,7 @@
   <script type="text/brightscript" uri="CategoryDetailsScreen.brs" />
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/InfoPanelMixin.brs" />
   <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
   <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
@@ -107,7 +108,7 @@
 
     <InfoPanel
       id="ChannelsInfoPanel"
-      mode="category"
+      mode="item"
       translation="[192,133]"
       maxHeight="355"
       maxTitleLines="2"

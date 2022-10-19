@@ -93,7 +93,7 @@
   },
   "screenHome_item_showAllGames": {
     "description": "The text to display on Show All Games tile",
-    "message": "Show All Games"
+    "message": "Show All"
   },
   "loadingIndicator": {
     "description": "When something is loading, this text appears so the user knows something is loading.",
@@ -740,53 +740,53 @@
     "description": "shortened version Sunday, formatted with , and a space",
     "message": "Sun, "
   },
-  "short_version_month_1":{
-    "description": "shortened version January",
-    "message": "Jan "
+  "short_version_date_format_1":{
+    "description": "Shortened version of date format for the month of January",
+    "message": "Jan {day}, {year}"
   },
-  "short_version_month_2":{
-    "description": "shortened version February",
-    "message": "Feb"
+  "short_version_date_format_2":{
+    "description": "Shortened version of date format for the month of February",
+    "message": "Feb {day}, {year}"
   },
-  "short_version_month_3":{
-    "description": "shortened version March",
-    "message": "Mar"
+  "short_version_date_format_3":{
+    "description": "Shortened version of date format for the month of March",
+    "message": "Mar {day}, {year}"
   },
-  "short_version_month_4":{
-    "description": "shortened version April",
-    "message": "Apr"
+  "short_version_date_format_4":{
+    "description": "Shortened version of date format for the month of April",
+    "message": "Apr {day}, {year}"
   },
-  "short_version_month_5":{
-    "description": "shortened version May",
-    "message": "May"
+  "short_version_date_format_5":{
+    "description": "Shortened version of date format for the month of May",
+    "message": "May {day}, {year}"
   },
-  "short_version_month_6":{
-    "description": "shortened version June",
-    "message": "Jun"
+  "short_version_date_format_6":{
+    "description": "Shortened version of date format for the month of June",
+    "message": "Jun {day}, {year}"
   },
-  "short_version_month_7":{
-    "description": "shortened version July",
-    "message": "Jul"
+  "short_version_date_format_7":{
+    "description": "Shortened version of date format for the month of July",
+    "message": "Jul {day}, {year}"
   },
-  "short_version_month_8":{
-    "description": "shortened version August",
-    "message": "Aug"
+  "short_version_date_format_8":{
+    "description": "Shortened version of date format for the month of August",
+    "message": "Aug {day}, {year}"
   },
-  "short_version_month_9":{
-    "description": "shortened version September",
-    "message": "Sep"
+  "short_version_date_format_9":{
+    "description": "Shortened version of date format for the month of September",
+    "message": "Sep {day}, {year}"
   },
-  "short_version_month_10":{
-    "description": "shortened version October",
-    "message": "Oct"
+  "short_version_date_format_10":{
+    "description": "Shortened version of date format for the month of October",
+    "message": "Oct {day}, {year}"
   },
-  "short_version_month_11":{
-    "description": "shortened version November",
-    "message": "Nov"
+  "short_version_date_format_11":{
+    "description": "Shortened version of date format for the month of November",
+    "message": "Nov {day}, {year}"
   },
-  "short_version_month_12":{
-    "description": "shortened version December",
-    "message": "Dec"
+  "short_version_date_format_12":{
+    "description": "Shortened version of date format for the month of December",
+    "message": "Dec {day}, {year}"
   },
   "channelGuide_error_fetchContent_description": {
     "description": "Onscreen message to indicate channel Guide content could not be loaded",
@@ -1360,6 +1360,10 @@
   },
   "explore_fifa_description": {
     "description": "description displayed on fifa intro modal",
-    "message": "Calling all soccer fans! Watch the 2022 FIFA World Cup for free on Tubi. Create an account to access all matches. No credit card required. No subscriptions."
-  }
+    "message": "Tubi has full replays of all 64 World Cup matches available for free. Sign up to stream every match on your favorite device. No subscription or credit card required."
+  },
+  "replay": {
+    "description": "This label used for badge to indicate the content availability",
+    "message": "Replay"
+  },
 }

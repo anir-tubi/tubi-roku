@@ -20,16 +20,19 @@
       <field id="mode" type="string" alias="DetailInfoPanel.mode" />
 
       <!-- The availabilityType used by info panel, one of: 'Upcoming', 'Replay', 'Live'-->
-      <field id="availabilityType" type="string" alias="DetailInfoPanel.availabilityType"/>
+      <field id="availabilityType" type="string" />
 
       <!-- The type of the selectedContentType to show/hide like/dislike CTA-->
       <field id="selectedContentType" type="string" />
 
-      <!-- The title of the game displayed on the info panel -->
-      <field id="fifaWorldCupTitle" type="string" alias="DetailInfoPanel.fifaWorldCupTitle" />
-
       <!-- Indicated whether to show/hide the signIn hint -->
       <field id="needsLoginHint" type="boolean" alias="DetailInfoPanel.needsLogIn" />
+
+      <!-- Indicated whether to show/hide the signIn hint -->
+      <field id="reminderIsSet" type="boolean" alias="DetailInfoPanel.reminderIsSet" />
+
+      <!-- Indicated whether to show/hide the signIn hint -->
+      <field id="infoPanelVisible" type="boolean" alias="DetailInfoPanel.visible" />
 
       <!-- The following are the strings associated with this UI element -->
       <field id="stringQueueButton" type="string"/>
@@ -52,8 +55,8 @@
       <!-- An assoc array of key/values that populate the items in FirstLineGroup in the DetailInfoPanel -->
       <field id="lineOneData" type="assocarray" alias="DetailInfoPanel.lineOneData" />
 
-      <!-- Array of strings of genres for the video -->
-      <field id="genres" type="stringarray" alias="DetailInfoPanel.genres" />
+      <!-- An assoc array of key/values that populate the items in SecondLineGroup in the DetailInfoPanel -->
+      <field id="lineTwoData" type="assocarray" alias="DetailInfoPanel.lineTwoData" />
 
       <!-- Description of the video displayed on the info panel -->
       <field id="description" type="string" alias="DetailInfoPanel.description" />
@@ -71,7 +74,7 @@
       <field id="isSeries" type="boolean" value="false" />
 
       <!-- Indicates whether the user is loggedIn or not -->
-      <field id="needsLogin" type="boolean" value="false" />
+      <field id="needsLogin" alias="DetailInfoPanel.needsLogin" />
 
       <!-- Indicates if the video is in the user's bookmarks/queue -->
       <field id="isBookmark" type="boolean" value="false" />
@@ -288,7 +291,7 @@
         translation="[192,133]"
         maxHeight="433"
         maxTitleLines="2"
-        visible="true" />
+        visible="false" />
 
       <FilledButtonMarkupGrid
         id="Menu"

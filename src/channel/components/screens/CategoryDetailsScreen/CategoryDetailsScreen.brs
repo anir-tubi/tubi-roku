@@ -167,7 +167,7 @@ Function onItemFocused()
 
     if content <> invalid
       ' Update the info panel
-      populateInfoPanel(m.InfoPanel, content, m.constants.ui.infoPanelModes.item)
+      populateInfoPanel(m.InfoPanel, content)
 
       m.PageTitleAndCounter.currentIndex = item
 
@@ -266,81 +266,9 @@ End Function
 
 '@infoPanel: roSGNode, an InfoPanel component
 '@content: roSGNode, a content node
-Function populateInfoPanel(infoPanel, content, mode)
-  infoPanel.mode = mode
-  
-  if content.title <> invalid
-    infoPanel.title = content.title
-  else
-    infoPanel.title = ""
-  end if
-
-  if content.description <> invalid
-    infoPanel.description = content.description
-  else
-    infoPanel.description = ""
-  end if
-
-  line1Data = {}
-  if content.type = m.constants.ui.contentTypes.series
-    line1Data.type = m.constants.ui.contentTypes.series  
-    ' line1Data.seasons =  '//If available, get the number of seasons and set the value here
-  end if
-  if content.releaseDate <> invalid
-    line1Data.releaseDate = content.releaseDate
-  else
-    line1Data.releaseDate = ""
-  end if
-
-  if content.length <> invalid
-    line1Data.length = content.length
-  else
-    line1Data.length = 0
-  end if
-
-  if (content.hasSubtitles = true OR not m._.empty(content.subtitleTracks)) = true
-    line1Data.hasCC = true
-  else
-    line1Data.hasCC = false
-  end if
-
-  if content.rating <> invalid
-    line1Data.rating = content.rating
-  else
-    line1Data.rating = 0
-  end if
-
-  if content.inlineLogoUri <> invalid
-    line1Data.partnerLogoUri = content.inlineLogoUri
-  else
-    line1Data.partnerLogoUri = ""
-  end if
-  if content.availabilityEnds <> invalid
-    line1Data.availabilityEnds = content.availabilityEnds
-  end if
-  
-  infoPanel.lineOneData = line1Data
-
-  if content.genres <> invalid
-    infoPanel.genres = content.genres
-  else
-    infoPanel.genres = []
-  end if
-
-  if content.totalCount <> invalid AND content.totalCount >= 0
-    infoPanel.categoryContentCount = content.totalCount
-  else
-    infoPanel.categoryContentCount = 0
-  end if
-
-  if content.logoUri <> invalid
-    infoPanel.titleLogoUri = content.logoUri
-  else
-    infoPanel.titleLogoUri = ""
-  end if
-
+Function populateInfoPanel(infoPanel, content)
+  populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
   infoPanel.calculateHeight = true
-
   return infoPanel
 End Function
 

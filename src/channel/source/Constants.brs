@@ -439,8 +439,8 @@ Function getConstants()
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
         constants.urls.tensor.urlBase = "https://tensor.staging-public.tubi.io/api"
       end if
-      constants.urls.tensor.homescreen = constants.urls.tensor.urlBase + "/v1/homescreen"
-      constants.urls.tensor.container = constants.urls.tensor.urlBase + "/v1/containers"
+      constants.urls.tensor.homescreen = constants.urls.tensor.urlBase + "/v2/homescreen"
+      constants.urls.tensor.container = constants.urls.tensor.urlBase + "/v2/containers"
       constants.urls.tensor.channel = constants.urls.tensor.urlBase + "/v1/containers"
       constants.urls.tensor.epgChannelIds = constants.urls.tensor.urlBase + "/v1/epg"
       constants.urls.tensor.tournamentscreen = constants.urls.tensor.urlBase + "/v1/wc_tournament"
@@ -561,6 +561,10 @@ Function getConstants()
       "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-8.webp"
      ]
 
+     ' // REMOVE fifa showAll images & it's references after fifa world cup is done.
+     constants.urls.fifaShowAllPoster = "https://cdn.adrise.tv/image/roku_support_images/fifa-showall-poster.png"
+     constants.urls.fifaShowAllBackground = "https://cdn.adrise.tv/image/roku_support_images/fifa-showall-background.webp"
+
     ' url for pinging Nielsen
     constants.urls.nielsenPing = "https://audit.imrworldwide.com/cgi-bin/gn"
 
@@ -611,6 +615,10 @@ Function getConstants()
   constants.uapiActions = {}
     constants.uapiActions.add = "add"
     constants.uapiActions.remove = "remove"
+
+  constants.serverValues = {}
+    constants.serverValues.tensorVideoRenditions = {}
+      constants.serverValues.tensorVideoRenditions.fourK = "4K_READY"
 
   constants.timers = {}
     constants.timers.remoteComponentTimeout = 30000
@@ -933,20 +941,18 @@ Function getConstants()
       constants.ui.likeDislikeStates.disliked = "disliked"
       constants.ui.likeDislikeStates.changing = "changing"
 
-
     constants.ui.infoPanelModes = {}
       'these map to different InfoPanel modes/types
       constants.ui.infoPanelModes.vitg = "vitg"
-      constants.ui.infoPanelModes.category = "category"
       constants.ui.infoPanelModes.item = "item"
-      constants.ui.infoPanelModes.continue_watching = "continue_watching"
+      constants.ui.infoPanelModes.continueWatching = "continueWatching"
       constants.ui.infoPanelModes.movie = "movie"
       constants.ui.infoPanelModes.series = "series"
       constants.ui.infoPanelModes.season = "season"
       constants.ui.infoPanelModes.episode = "episode"
       constants.ui.infoPanelModes.linearHomeScreen = "linearHomeScreen"
       constants.ui.infoPanelModes.epg = "epg"
-      constants.ui.infoPanelModes.linearsearch = "linear-search"
+      constants.ui.infoPanelModes.linearSearch = "linearSearch"
       '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
       constants.ui.infoPanelModes.linearTournament = "linearTournament"
       constants.ui.infoPanelModes.sportsEvent = "sportsEvent"
@@ -1199,6 +1205,13 @@ Function getConstants()
       'background gradient urls
       constants.ui.uris.detailBackgroundGradient = "pkg:/images/detail-gradient-25.png"
 
+      ' portrait format default image
+      constants.ui.uris.portraitPlaceholder = "pkg:/images/placeholder.jpg"
+
+      'info panel images not populated from content backend
+      constants.ui.uris.infoPanelEpgLiveIcon = "pkg:/images/icon-live.png"
+      constants.ui.uris.infoPanelWorldCupLogo = "pkg:/images/fifa_world_cup_icon.png"
+
       'category background thumbnails
       constants.ui.uris.categoryBackgrounds = {}
       constants.ui.uris.categoryBackgrounds.urlBase = "https://cdn.adrise.tv/image/roku_support_images/category_"
@@ -1209,6 +1222,7 @@ Function getConstants()
 
       'default background image uri
       constants.ui.uris.defaultBackground = "pkg:/images/art-blur-background.png"
+
       'kidsMode background image uri
       constants.ui.uris.kidsModeBackground = "pkg:/images/art-blur-background_kids.png"
       constants.ui.uris.backgroundFullScreenGradient = "pkg:/images/detail-gradient-25.png"
