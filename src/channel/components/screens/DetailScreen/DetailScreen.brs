@@ -172,7 +172,7 @@ Function changeButtonText(sButtonStringId, sButtonText)
       '//if the rating is changing, then change icon to default like button
       stringNode.iconUrl = "pkg:/images/icon-like.webp"
     end if
-    
+
   else if sButtonStringId = "stringPlayButton"
     stringNode = m.PlayMenuItem
   end if
@@ -453,9 +453,7 @@ Function onAvailabilityTypeChange()
     end if
 
     menuItems = [m.AddQueueMenuItem]
-    if isFifaWorldCupTopNavEnabled() = true
-      addRemoveMenuItem(true, -1, m.SeeAllGamesMenuItem, menuItems)
-    end if
+    addRemoveMenuItem(true, -1, m.SeeAllGamesMenuItem, menuItems)
   else if UCase(availabilityType) = UCase(m.constants.ui.contentTimings.upcoming)
     if likeDisLikeIndex <> invalid
       addRemoveMenuItem(false, likeDisLikeIndex)
@@ -468,9 +466,7 @@ Function onAvailabilityTypeChange()
     playIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.PlayMenuItem.id)
     addRemoveMenuItem(false, playIndex)
     menuItems = [m.AddQueueMenuItem]
-    if isFifaWorldCupTopNavEnabled() = true
-      addRemoveMenuItem(true, -1, m.SeeAllGamesMenuItem, menuItems)
-    end if
+    addRemoveMenuItem(true, -1, m.SeeAllGamesMenuItem, menuItems)
   end if
 
 End Function
@@ -1160,14 +1156,8 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       focusMenu()
       return true
     end if
-    
+
   end if
 
   return false
-End Function
-
-
-Function isFifaWorldCupTopNavEnabled()
-  isFifaWorldCupTopNavEnabled = getExperimentResource("roku_fifa_wc_topnav", "roku_fifa_wc_topnav_v1", false).enabled = true
-  return isFifaWorldCupTopNavEnabled
 End Function

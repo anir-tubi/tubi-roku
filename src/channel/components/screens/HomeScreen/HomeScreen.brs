@@ -158,10 +158,7 @@ Function generateTopNavContentItems(includeLinearTV = false)
   ]
   if includeLinearTV = true
     menuItemIds.push(m.constants.ui.sideNavIds.linearEPG)
-
-    if getExperimentResource("roku_fifa_wc_topnav", "roku_fifa_wc_topnav_v1", true).enabled = true
-      menuItemIds.push(m.constants.ui.sideNavIds.tournament)
-    end if
+    menuItemIds.push(m.constants.ui.sideNavIds.tournament)
   end if
 
   parent = CreateObject("roSGNode", "ContentNode")

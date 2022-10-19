@@ -417,9 +417,9 @@ Function getConstants()
 
 
     'search url
-    constants.urls.search = "https://search.production-public.tubi.io/api/v2/search"
+    constants.urls.search = "https://search.production-public.tubi.io/api/v1/search"
     if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-      constants.urls.search = "https://search.staging-public.tubi.io/api/v2/search"
+      constants.urls.search = "https://search.staging-public.tubi.io/api/v1/search"
     end if
 
 

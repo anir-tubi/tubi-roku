@@ -383,22 +383,14 @@ End Function
 
 Function generateTopNavContentItems()
 
-  if getExperimentResource("roku_fifa_wc_topnav", "roku_fifa_wc_topnav_v1", true).enabled = true
-    menuItemIds = [
+  menuItemIds = [
     m.constants.ui.sideNavIds.home
     m.constants.ui.sideNavIds.movies
     m.constants.ui.sideNavIds.tv
     m.constants.ui.sideNavIds.linearEPG
     m.constants.ui.sideNavIds.tournament
     ]
-  else
-    menuItemIds = [
-    m.constants.ui.sideNavIds.home
-    m.constants.ui.sideNavIds.movies
-    m.constants.ui.sideNavIds.tv
-    m.constants.ui.sideNavIds.linearEPG
-    ]
-  end if
+
 
   parent = CreateObject("roSGNode", "ContentNode")
   for each id in menuItemIds

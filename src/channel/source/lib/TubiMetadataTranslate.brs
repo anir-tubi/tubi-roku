@@ -1058,7 +1058,7 @@ Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, c
   if container <> invalid AND container.children <> invalid AND container.children.count() > 0
 
     prependContent = {}
-    if screenId = "homeScreen" AND container.id = m.constants.ui.categoryIds.fifawc AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_fifa_wc_topnav", "roku_fifa_wc_topnav_v1").enabled = true
+    if screenId = "homeScreen" AND container.id = m.constants.ui.categoryIds.fifawc
       ' create and add a showAll content to the contents which hold the container metadata
       prependContent = {
         id: m.constants.ui.contentIds.showAllGames

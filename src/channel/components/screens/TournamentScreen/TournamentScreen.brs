@@ -118,7 +118,6 @@ End Function
 ' @includeLinearTV: boolean, true if a linear TV item should be included
 Function generateTopNavContentItems(includeLinearTV = false)
   tubilog("TournamentScreen.generateTopNavContentItems")
-  getExperimentResource("roku_fifa_wc_topnav", "roku_fifa_wc_topnav_v1", true)
 
   if includeLinearTV = true
     menuItemIds = [
