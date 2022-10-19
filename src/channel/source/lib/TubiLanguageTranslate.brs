@@ -1013,9 +1013,9 @@ Function getTranslation_en_US()
       "description": "Label of button to allow users to set the reminder to the current video title when the user is signed in.",
       "message": "Set Reminder"
     },
-    "screenDetails_button_reminder_set": {
+    "screenDetails_button_remove_reminder": {
       "description": "Label of button to indicate the users that reminder is set on the current video title",
-      "message": "Reminder Set"
+      "message": "Remove Reminder"
     },
     "screenDetails_button_resume": {
       "description": "Label of button to allow users to resume the current video title",
@@ -2338,10 +2338,6 @@ Function getTranslation_es_MX()
     "screenDetails_button_set_reminder": {
       "description": "Label of button to allow users to set the reminder to the current video title when the user is signed in.",
       "message": "Programar recordatorio"
-    },
-    "screenDetails_button_reminder_set": {
-      "description": "Label of button to indicate the users that reminder is set on the current video title",
-      "message": "Recordatorio programado"
     },
     "screenDetails_button_resume": {
       "description": "Label of button to allow users to resume the current video title",

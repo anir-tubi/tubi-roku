@@ -1082,8 +1082,8 @@ Function AfterSignInPlayLockedContent(callbackAfterSignInParams)
 
   if callbackAfterSignInParams <> invalid
     playVideoContent(callbackAfterSignInParams.content, callbackAfterSignInParams.playbackSource, callbackAfterSignInParams.position)
-    refreshAllDetailScreens()
-    setContentToRefreshAllPersonalizedScreens(true)
   end if
+  refreshAllDetailScreens()
+  setContentToRefreshAllPersonalizedScreens(true)
   showHideSpinner(false)
 End Function

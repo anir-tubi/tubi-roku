@@ -1090,10 +1090,12 @@ Function refreshAllDetailScreens()
     screen = m.screenStack.getChild(i)
 
     if screen.subType() = "DetailScreen"
-      populateDetailScreen(screen, screen.content)
+      content = screen.content 'No need to re fetch the content, just re populate the screen content
+      populateDetailScreen(screen, content)
 
       if isUserSigedIn = true
         screen.removeSignupButton = true
+        setDetailStrings(screen, content)
       end if
 
     end if

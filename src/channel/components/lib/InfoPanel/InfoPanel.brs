@@ -14,7 +14,7 @@ Function init()
   m.title = m.top.findNode("Title")
   m.episode = m.top.findNode("Episode")
   m.twoLineInfo = m.top.findNode("TwoLineInfo")
-  
+
   m.firstLineGroup = m.twoLineInfo.findNode("FirstLineGroup")
   m.firstLineAvailabilityBadge = m.firstLineGroup.findNode("FirstLineAvailabilityBadge")
   m.line1 = m.firstLineGroup.findNode("Line1")
@@ -74,7 +74,7 @@ Function init()
 
   m.expireWarning.color = m.constants.ui.colors.expirationWarning
   m.signInText.text = getTranslation("registration_signIn_to_play_hint")
-  m.reminderTitle.text = getTranslation("screenDetails_button_reminder_set")
+  m.reminderTitle.text = getTranslation("screenDetails_button_remove_reminder")
 
   if theme <> invalid
     m.descriptionFocusButton.blendColor = theme.focused
@@ -185,7 +185,7 @@ Function onNeedsLoginChange(msg)
 
   if needsLogin = false AND signInGroupIsPresent = true
     m.offset.removeChild(m.signInGroup)
-    
+
     ' login info overwrites countdown timer or reminder text if the user is not logged in
     ' add them back as appropriate, if login info is not necessary
     if modesWithTimerAtBottom[mode] = true
@@ -753,7 +753,7 @@ Function onModeChange()
     m.twoLineInfo.appendChild(m.secondLineGroup)
     m.secondLineGroup.appendChild(m.secondLineAvailabilityBadge)
     m.secondLineGroup.appendChild(m.line2)
-    
+
     m.offset.itemSpacings = [24, 15]
   '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
   else if m.top.mode = m.constants.ui.infoPanelModes.linearTournament

@@ -77,11 +77,9 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     m.isScreenLoaded = false
 
     ' Update tracking info - have to set the whole AA, can't update only a portion on the AA field
-    airDateTime = content.airDateTime
-    hasVideoResources = content.hasVideoResources
     detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
 
-    setDetailStrings(detailScreen, content.type, airDateTime, hasVideoResources)
+    setDetailStrings(detailScreen, content)
 
     ' Setting the content on the detail screen here prior to getting a response back from server with full info,
     ' so that it may be used for analytics in the case of failing to fetch the full info from the server.
@@ -150,12 +148,15 @@ Function isDetailScreen(screen)
 End Function
 
 
-Function setDetailStrings(screen, contentType, airDatetime, hasVideoresources)
+Function setDetailStrings(screen,content)
+  contentType = content.type
+  airDateTime = content.airDateTime
+  hasVideoResources = content.hasVideoResources
   screen.stringQueueButton = getTranslation("screenDetails_button_queue")
   screen.stringNoQueueButton = getTranslation("screenDetails_button_NoQueue")
   screen.stringNoHistoryButton = getTranslation("screenDetails_button_noHistory")
 
-  info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
+  info = getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime, hasVideoResources)
   availabilityType = info.availabilityType
 
   ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
@@ -167,7 +168,7 @@ Function setDetailStrings(screen, contentType, airDatetime, hasVideoresources)
       screen.stringQueueButton = getTranslation("screenDetails_button_set_reminder")
     end if
 
-    screen.stringNoQueueButton = getTranslation("screenDetails_button_reminder_set")
+    screen.stringNoQueueButton = getTranslation("screenDetails_button_remove_reminder")
   end if
 
   if contentType = m.constants.ui.contentTypes.sportsEvent AND isLoggedInUser() = false
@@ -283,8 +284,9 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     bookmark = getBookmark(content.id)
     history = getHistory(content.id)
     like = getLike(content.id)
+    isSignedInUser = isLoggedInUser()
 
-    if isLoggedInUser() = false AND history <> invalid
+    if isSignedInUser = false AND history <> invalid
       '//if user is signed out but has history of current item, make sure it has been less than guest user resume limit,
       '//   because beyond that time we are restricted legally from showing data of signed out users.
 
@@ -375,7 +377,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     detailScreen.directors = stateSource.directors
     detailScreen.starring = stateSource.actors
     detailScreen.reminderIsSet = (availabilityType = "upcoming" AND bookmark <> invalid)
-    detailScreen.needsLoginHint = content.needsLogin
+    detailScreen.needsLoginHint = (content.needsLogin = true AND isSignedInUser = false) ' because we do not repull the content after signed in.
     detailScreen.infoPanelVisible = true
 
     setIsBookmark(detailScreen, (bookmark <> invalid))
@@ -403,7 +405,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       nResumePoint = 0
     end if
 
-    if nSavedPosition >= m.constants.player.historyFrequency AND isLoggedInUser() = true
+    if nSavedPosition >= m.constants.player.historyFrequency AND isSignedInUser = true
       '//nSavedPosition is only used for signed in users and ignored for guest users.
       '//If the saved position is passed as greater than the constant historyFrequency, then use that number instead.
       '//This parameter was put in place to display the updated resume point before having to wait to backend to confirm that the resume point is correct
@@ -1138,7 +1140,7 @@ Function setIsBookmark(detailScreen, isBookmark)
       detailScreen.stringQueueButton = getTranslation("screenDetails_button_set_reminder")
     end if
 
-    detailScreen.stringNoQueueButton = getTranslation("screenDetails_button_reminder_set")
+    detailScreen.stringNoQueueButton = getTranslation("screenDetails_button_remove_reminder")
   else
     detailScreen.stringQueueButton = getTranslation("screenDetails_button_queue")
     detailScreen.stringNoQueueButton = getTranslation("screenDetails_button_noQueue")
