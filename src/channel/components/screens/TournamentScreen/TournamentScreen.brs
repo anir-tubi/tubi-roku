@@ -230,6 +230,7 @@ Function populateInfoPanel(focusedContent, isReminderSet=false)
 
       m.InfoPanel.lineOneData = lineOneData
       m.InfoPanel.needsLogin = focusedContent.needsLogIn AND (m.top.signedIn <> true)
+      m.InfoPanel.width = 960
       m.top.backgroundUriList = determineBackgroundImage(focusedContent)
     else if focusedContent.type = m.constants.ui.contentTypes.video OR focusedContent.type = m.constants.ui.contentTypes.series
       populateInfoPanelWithHomescreenStyleItemMode(focusedContent, m.InfoPanel)

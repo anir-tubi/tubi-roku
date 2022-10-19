@@ -89,7 +89,7 @@ Function parseHistorySuccess(fullResponse, reqInfo)
     if episode = invalid or episode.content_id = invalid
       return invalid
     end if
-  else if response.content_type <> m.constants.uapiContentTypes.movie
+  else if response.content_type <> m.constants.uapiContentTypes.movie  AND response.content_type <> m.constants.uapiContentTypes.sportsEvent
     ' the response is a series type, but missing some necessary information
     return invalid
   end if
@@ -110,6 +110,9 @@ Function parseHistorySuccess(fullResponse, reqInfo)
     if isResponseSeries = true
       content.id = episode.content_id.toStr()
       content.type = m.constants.uapiContentTypes.episode
+    else if response.content_type = m.constants.uapiContentTypes.sportsEvent
+      content.id = response.content_id.toStr()
+      content.type = m.constants.uapiContentTypes.sportsEvent
     else
       content.id = response.content_id.toStr()
       content.type = m.constants.uapiContentTypes.movie

@@ -417,9 +417,9 @@ Function getConstants()
 
 
     'search url
-    constants.urls.search = "https://search.production-public.tubi.io/api/v1/search"
+    constants.urls.search = "https://search.production-public.tubi.io/api/v2/search"
     if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-      constants.urls.search = "https://search.staging-public.tubi.io/api/v1/search"
+      constants.urls.search = "https://search.staging-public.tubi.io/api/v2/search"
     end if
 
 
@@ -441,7 +441,7 @@ Function getConstants()
       end if
       constants.urls.tensor.homescreen = constants.urls.tensor.urlBase + "/v2/homescreen"
       constants.urls.tensor.container = constants.urls.tensor.urlBase + "/v2/containers"
-      constants.urls.tensor.channel = constants.urls.tensor.urlBase + "/v1/containers"
+      constants.urls.tensor.channel = constants.urls.tensor.urlBase + "/v2/containers"
       constants.urls.tensor.epgChannelIds = constants.urls.tensor.urlBase + "/v1/epg"
       constants.urls.tensor.tournamentscreen = constants.urls.tensor.urlBase + "/v1/wc_tournament"
 
@@ -466,8 +466,7 @@ Function getConstants()
         constants.urls.userQueues.urlBase = "https://user-queue.staging-public.tubi.io/api/"
       end if
 
-      constants.urls.userQueues.queues = constants.urls.userQueues.urlBase + "v1/queues"
-      constants.urls.userQueues.setReminder = constants.urls.userQueues.urlBase + "v1/queues"
+      constants.urls.userQueues.queues = constants.urls.userQueues.urlBase + "v2/queues"
 
     ' account urls
     constants.urls.account = {}
@@ -494,7 +493,7 @@ Function getConstants()
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true then
         constants.urls.lishi.baseUrl = "https://lishi.staging-public.tubi.io"
       end if
-      constants.urls.lishi.viewHistory = constants.urls.lishi.baseUrl + "/v1/view_history"
+      constants.urls.lishi.viewHistory = constants.urls.lishi.baseUrl + "/api/v2/view_history"
 
     'user event tracking url
     constants.urls.dataScience = {}

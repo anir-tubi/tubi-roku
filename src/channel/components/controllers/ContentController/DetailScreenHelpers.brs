@@ -394,7 +394,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     nResumePoint = 0
     if content.type = m.constants.ui.contentTypes.series AND episodeHistory <> invalid AND episodeHistory.nowPos > 0
       nResumePoint = episodeHistory.nowPos
-    else if content.type = m.constants.ui.contentTypes.video AND history <> invalid AND history.nowPos > 0
+    else if history <> invalid AND history.nowPos > 0 AND (content.type = m.constants.ui.contentTypes.sportsEvent OR content.type = m.constants.ui.contentTypes.video)
       nResumePoint = history.nowPos
     end if
 

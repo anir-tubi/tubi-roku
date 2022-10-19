@@ -146,6 +146,9 @@ Function tubiBookmarks_getAddHistoryRequestInfo(content as Object, nowPos as Int
   if isString(parentId) = true then
     if parentId.len() = 0
       body.parent_id = invalid    'is ok if parentId is invalid (ie. for movies)
+      if content.type = m.constants.uapiContentTypes.sportsEvent
+        contentType = m.constants.uapiContentTypes.sportsEvent
+      end if
     else
       body.parent_id = parentId.toInt()
       contentType = m.constants.uapiContentTypes.episode
@@ -153,6 +156,9 @@ Function tubiBookmarks_getAddHistoryRequestInfo(content as Object, nowPos as Int
   else if isInteger(parentId) = true then
     body.parent_id = parentId
     contentType = m.constants.uapiContentTypes.episode
+  else if content.type = m.constants.uapiContentTypes.sportsEvent
+    body.parent_id = invalid
+    contentType = m.constants.uapiContentTypes.sportsEvent
   else
     body.parent_id = invalid
   end if
@@ -314,7 +320,7 @@ Function tubiBookmarks_handleInitialHistory(initialHistory)
     for each history in parsedInitialHistory.items
       child = historyIds.createChild("HistoryContentNode")
       child.id = history.content_id.toStr()
-      if history.content_type = m.constants.uapiContentTypes.movie
+      if history.content_type = m.constants.uapiContentTypes.movie OR history.content_type = m.constants.uapiContentTypes.sportsEvent
         child.historyId = history.id
         child.nowPos = history.position
         child.type = m.constants.ui.contentTypes.video
