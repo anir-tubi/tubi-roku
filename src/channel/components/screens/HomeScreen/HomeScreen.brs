@@ -982,7 +982,7 @@ Function handlePlayInput()
     end if
 
     ' Content controller observes contentSelected to populate/push the detail screen
-    if itemFocused <> invalid AND itemFocused.type <> m.constants.ui.contentTypes.linear
+    if itemFocused <> invalid AND itemFocused.type <> m.constants.ui.contentTypes.linear AND itemFocused.type <> m.constants.ui.contentTypes.navigate
       m.top.contentToPlay = itemFocused
       return true
     end if

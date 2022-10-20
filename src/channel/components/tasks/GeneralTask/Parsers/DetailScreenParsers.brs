@@ -1,12 +1,12 @@
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
-' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
-Function parseDetailScreenSingleContentSuccess(fullResponse, _reqInfo)
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseDetailScreenSingleContentSuccess(fullResponse, reqInfo)
   experiments = TubiExperiments(m.constants)
   translate = TubiMetadataTranslate(m.constants, experiments)
   parsedResponse = fullResponse.data
   updatedContent = CreateObject("roSGNode", "TubiContentNode")
-  translate.translateRecursive(parsedResponse, updatedContent)
+  translate.translateRecursive(parsedResponse, updatedContent, reqInfo.issignedinuser)
   return updatedContent
 End Function
 
@@ -17,7 +17,7 @@ End Function
 Function parseDetailScreenRelatedContentSuccess(fullResponse, reqInfo)
   translate = TubiMetadataTranslate(m.constants)
   parsedResponse = fullResponse.data
-  relatedContent = translate.translateRelatedContent(parsedResponse)
+  relatedContent = translate.translateRelatedContent(parsedResponse, reqInfo.issignedinuser)
   relatedContent.id = reqInfo.contentId
   return relatedContent
 End Function

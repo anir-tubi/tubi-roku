@@ -47,22 +47,27 @@ End Function
 ' @currentTrackingPageInfo: assocArray, trackingPageInfo of the screen being navigated from
 ' @trackingComponentInfo: assocArray, trackingPageInfo of the screen being navigated from
 Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrackingPageInfo, trackingComponentInfo = invalid, playbackSource="unknown")
-  videoPlayer = setupVideoPlayer(content, playbackSource, nowPos)
+  if content <> invalid and content.needsLogin = true
+    callbackAfterSignInParams = {"content":content, "nowPos": nowPos , "currentTrackingPageInfo":currentTrackingPageInfo, "trackingComponentInfo": trackingComponentInfo, "playbackSource": playbackSource }
+    startSignIn(AfterSignInPlayLockedContentWhileSkippingDetailScreen, callbackAfterSignInParams)
+  else
+    videoPlayer = setupVideoPlayer(content, playbackSource, nowPos)
 
-  ' send custom navigateToPage event, since a details screen was added to the screen stack but the user
-  ' never saw it, we want to navigate from the screen under the most recently added details screen.
-  if currentTrackingPageInfo <> invalid AND isNonEmptyString(currentTrackingPageInfo.pageType)
-    ' but only send the navigateToPage event if there is a page to navigate from
-    screenTrackingNavigate(currentTrackingPageInfo, videoPlayer.trackingPageInfo, trackingComponentInfo)
+    ' send custom navigateToPage event, since a details screen was added to the screen stack but the user
+    ' never saw it, we want to navigate from the screen under the most recently added details screen.
+    if currentTrackingPageInfo <> invalid AND isNonEmptyString(currentTrackingPageInfo.pageType)
+      ' but only send the navigateToPage event if there is a page to navigate from
+      screenTrackingNavigate(currentTrackingPageInfo, videoPlayer.trackingPageInfo, trackingComponentInfo)
+    end if
+
+    if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.videoPlayerScreen
+      pushScreen(videoPlayer, false, true)
+    end if
+
+    '//send a copy of the videoSponsorExposureId to the videoPlayer
+    videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
+    videoPlayer.control = "play"
   end if
-
-  if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.videoPlayerScreen
-    pushScreen(videoPlayer, false, true)
-  end if
-
-  '//send a copy of the videoSponsorExposureId to the videoPlayer
-  videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
-  videoPlayer.control = "play"
 End Function
 
 
@@ -882,6 +887,7 @@ Function fetchUpNextContent(videoPlayer)
       successCallback: onUpNextResponse
       errorCallback: onUpNextError
       responseType: "node"
+      isSignedInUser: isLoggedInUser()
     })
   end if
   return invalid

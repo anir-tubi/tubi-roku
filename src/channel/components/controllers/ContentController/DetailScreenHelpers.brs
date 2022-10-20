@@ -149,7 +149,6 @@ End Function
 
 
 Function setDetailStrings(screen,content)
-  contentType = content.type
   airDateTime = content.airDateTime
   hasVideoResources = content.hasVideoResources
   screen.stringQueueButton = getTranslation("screenDetails_button_queue")
@@ -171,7 +170,7 @@ Function setDetailStrings(screen,content)
     screen.stringNoQueueButton = getTranslation("screenDetails_button_remove_reminder")
   end if
 
-  if contentType = m.constants.ui.contentTypes.sportsEvent AND isLoggedInUser() = false
+  if content.needsLogin = true AND isLoggedInUser() = false  'check user signedIn status because we might use same content without passing through parser
     screen.stringPlayButton = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
   else '// KEEP BELOW CODE ONCE FIFA WORLD CUP IS DONE
     screen.stringSignUpButton = getTranslation("registration_signup_button") + ";" + getTranslation("registration_signup_button_free")
@@ -467,6 +466,7 @@ Function getSingleContentFromServer(content, successCallback, errorCallback)
       successCallback: successCallback
       errorCallback: errorCallback
       responseType: "node"
+      isSignedInUser: isLoggedInUser()
     })
   end if
 End Function
@@ -670,6 +670,7 @@ Function getRelatedContent(content)
       responseType: "node"
       silenceCallbackWarnings: true
       contentId: content.id
+      isSignedInUser: isLoggedInUser()
     })
   end if
 End Function
@@ -1901,37 +1902,41 @@ Function skipDetailScreen(refreshedContent)
   detailScreen = getTopDetailScreenFromStack()
   if detailScreen <> invalid
     populateDetailScreen(detailScreen, refreshedContent)
-    if refreshedContent.type = m.constants.ui.contentTypes.series AND refreshedContent.currentEpisodeId = "" AND refreshedContent.isRecurring = false
-      ' first see if there was a specific episode id we wanted
-      history = getHistory(refreshedContent.id)
-      if history <> invalid
-        refreshedContent.currentEpisodeId = history.currentEpisodeId
-      end if
-
-    end if
-
-    episode = getEpisodeContent(refreshedContent)
-
-    if episode <> invalid
-      if m.enteredFromDeepLink = true AND m.deeplinkContent <> invalid
-        sendDeeplinkAnalytics(m.deeplinkContent, episode, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
-      end if
-
-      nowPos = processResume(episode)
-      if m.top.fadeInContentController = true
-        if nowPos >= 0
-          playVideoContentWhileSkippingDetailScreen(episode, nowPos, trackingPageInfo, trackingComponentInfo, detailScreen.playbackSource)
+    if refreshedContent.needsLogin = false
+      if refreshedContent.type = m.constants.ui.contentTypes.series AND refreshedContent.currentEpisodeId = "" AND refreshedContent.isRecurring = false
+        ' first see if there was a specific episode id we wanted
+        history = getHistory(refreshedContent.id)
+        if history <> invalid
+          refreshedContent.currentEpisodeId = history.currentEpisodeId
         end if
 
-      else
-        if nowPos > 0
-          m.detailScreenAfterFn = detailScreenResumeHelper
+      end if
+
+      episode = getEpisodeContent(refreshedContent)
+
+      if episode <> invalid
+        if m.enteredFromDeepLink = true AND m.deeplinkContent <> invalid
+          sendDeeplinkAnalytics(m.deeplinkContent, episode, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
+        end if
+
+        nowPos = processResume(episode)
+        if m.top.fadeInContentController = true
+          if nowPos >= 0
+            playVideoContentWhileSkippingDetailScreen(episode, nowPos, trackingPageInfo, trackingComponentInfo, detailScreen.playbackSource)
+          end if
+
         else
-          m.detailScreenAfterFn = playHelper
+          if nowPos > 0
+            m.detailScreenAfterFn = detailScreenResumeHelper
+          else
+            m.detailScreenAfterFn = playHelper
+          end if
+
         end if
 
       end if
-
+    else
+      setDetailStrings(detailScreen, refreshedContent)  'if deeplink content is locked, refresh the initial buttons to reflect content and user status.
     end if
   end if
 End Function

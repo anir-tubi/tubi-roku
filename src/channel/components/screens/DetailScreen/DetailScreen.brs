@@ -184,6 +184,7 @@ Function changeButtonText(sButtonStringId, sButtonText)
       stringNode.badgeText = sButtonText.split(";")[1]
     else
       stringNode.title = sButtonText
+      stringNode.badgeText = ""
     end if
 
     ' Adjust the width of the menu if the Channel name, the signin button (if signin conditions), or the like/dislike button (if signin conditions) is too long for the default width

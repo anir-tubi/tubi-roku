@@ -830,7 +830,7 @@ Function onLinearChannelSelectedFromGuide(msg)
   end if
 End Function
 
-
+' TODO check and delete this function
 ' Triggered when the player requests the channels info in order to display the channel guide
 Function onChannelsRequested()
   tubiLog("LinearVideoPlayerScreenHelpers.onChannelsRequested")
@@ -860,6 +860,7 @@ Function onChannelsRequested()
       successCallback: onChannelGuideFetchSuccess
       errorCallback: onChannelGuideFetchError
       responseType: "node"
+      isSignedInUser: isLoggedInUser()
     })
   end if
 End Function

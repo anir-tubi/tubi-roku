@@ -1087,3 +1087,18 @@ Function AfterSignInPlayLockedContent(callbackAfterSignInParams)
   setContentToRefreshAllPersonalizedScreens(true)
   showHideSpinner(false)
 End Function
+
+
+Function AfterSignInPlayLockedContentWhileSkippingDetailScreen(params)
+  tubilog("SignInHelpers.AfterSignInPlayLockedContentWhileSkippingDetailScreen")
+
+  popScreenAfterSignInProcess()
+
+  if params <> invalid
+    playVideoContentWhileSkippingDetailScreen(params.content, params.nowPos, params.currentTrackingPageInfo, params.trackingComponentInfo, params.playbackSource)
+  end if
+  refreshAllDetailScreens()
+  setContentToRefreshAllPersonalizedScreens(true)
+  showHideSpinner(false)
+
+End Function
