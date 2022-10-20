@@ -722,10 +722,8 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         '//if continue watching container while user is signed out,
         ' then ensure row is empty except for 1 item that will entice users to sign in
         categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
-      else if container.type = m.contentTypes.channel OR container.id = m.constants.ui.categoryIds.fifawc
-        categoryAA = m.buildCategoryAAWithPrepend(container, contents, invalid, "", false, contentMode, screenId, isSignedInUser)
       else
-        categoryAA = m.buildCategoryAA(container, contents, invalid, "", false, contentMode, screenId, isSignedInUser)
+        categoryAA = m.buildCategoryAAWithPrepend(container, contents, invalid, "", false, contentMode, screenId, isSignedInUser)
       end if
 
       if categoryAA <> invalid
@@ -937,12 +935,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
 
   nodeCount = 0
 
-  categoryMetadata = invalid
-  if container.type = m.contentTypes.channel OR container.id = m.constants.ui.categoryIds.fifawc
-    categoryMetadata = m.buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
-  else
-    categoryMetadata = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
-  end if
+  categoryMetadata = m.buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
 
   if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
     translated.id = container.id
@@ -1041,7 +1034,8 @@ End Function
 ''''''''''''''''''''''
 ' buildCategoryAAWithPrepend
 '
-' prepends the content to the given container based on container ID OR container type
+' It is wrapper function of buildCategoryAA.
+' It prepends the content to the given container based on container ID OR container type if necessary
 '
 ' @container: assocArray, a single container as found in the matrix API
 ' @contents: assocArray, a set of content meta data as found in the matrix API
@@ -1051,14 +1045,14 @@ End Function
 ' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
 ' @screenId: string, one of the screenIds found at constants.ui.screenIds
 ' @isSignedInUser: boolean, value based on user logged In or not
-' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
+' returns an associative array that can be passed to ContentNode.update() to populate the ContentNode and it's children
 Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false)
   categoryAA = invalid
 
   if container <> invalid AND container.children <> invalid AND container.children.count() > 0
 
-    prependContent = {}
-    if screenId = "homeScreen" AND container.id = m.constants.ui.categoryIds.fifawc
+    prependContent = invalid
+    if screenId = m.constants.ui.screenIds.homeScreen AND container.id = m.constants.ui.categoryIds.fifawc
       ' create and add a showAll content to the contents which hold the container metadata
       prependContent = {
         id: m.constants.ui.contentIds.showAllGames
@@ -1077,17 +1071,17 @@ Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, c
       prependContent.posterarts = [m.generateChannelPosterUrl(container.id)]
     end if
 
-    if prependContent.id <> invalid
+    if prependContent <> invalid AND prependContent.id <> invalid
       'add the content to the beginning of the category
       container.children.Unshift(prependContent.id)
-
       contentsWithPrepend = {}
       contentsWithPrepend[prependContent.id] = prependContent
       contentsWithPrepend.append(contents)
-
       ' force contentsJson to be regenerated with the prepended content in buildCategoryAA()
       contentsJson = invalid
       categoryAA = m.buildCategoryAA(container, contentsWithPrepend, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
+    else
+      categoryAA = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
     end if
 
   end if
