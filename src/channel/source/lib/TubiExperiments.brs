@@ -31,7 +31,7 @@ Function TubiExperiments(constants) as Object
 
       '// When enabled=true, the roku_registration_gender_data_v1 experiment will include gender data when the guest user signs in
       roku_registration_gender_data: {
-        roku_registration_gender_data_v1: {"enabled": false}
+        roku_registration_gender_data_v1: {"enabled": true}
       }
 
       roku_in_pod_stitching: {
