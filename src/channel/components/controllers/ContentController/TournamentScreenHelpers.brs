@@ -59,6 +59,7 @@ Function showTournamentScreen(constants, componentToFocus = "")
     tournamentScreen.observeFieldScoped("linearChannelToPlay", "onTournamentScreenLinearContentToPlay")
     tournamentScreen.observeFieldScoped("contentSelected", "onTournamentScreenVodContentToPlay")
     tournamentScreen.observeFieldScoped("reloadTournamentScreen", "onReloadTournamentScreen")
+    tournamentScreen.observeFieldScoped("reloadTournamentScreenContainerID", "onReloadTournamentScreenContainerID")
     tournamentScreen.signedIn = isLoggedInUser()
     tournamentScreen.isPreTournament = isPreTournament
     tournamentScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel() '
@@ -69,7 +70,7 @@ Function showTournamentScreen(constants, componentToFocus = "")
     tournamentScreen.shouldFocusWhenPushed = m.top.fadeInContentController 'just in case if get deeplink this page in future.
     tournamentScreen.refreshTopNav = true
 
-    refreshtournamentScreen(tournamentScreen)
+    fetchTournamentScreenContent(tournamentScreen)
 
     setInScreenCache(tournamentScreen)
 
@@ -140,12 +141,6 @@ Function changeTournamentScreenBackground(tournamentScreen)
       uriList : tournamentScreen.backgroundUriList
     }
   end if
-End Function
-
-
-Function refreshtournamentScreen(tournamentScreen)
-  tubilog("TournamentScreenHelpers.refreshtournamentScreen")
-  fetchTournamentScreenContent(tournamentScreen)
 End Function
 
 
@@ -364,11 +359,95 @@ End Function
 Function onReloadTournamentScreen(msg)
   tubiLog("TournamentSceenHelpers.onReloadTournamentScreen")
   screen = msg.getRoSGNode()
-  refreshTournamentScreen(screen)
+  fetchTournamentScreenContent(screen)
 End Function
 
 
 Function showTournamentScreenWrapper(param)
   stopVideoPreview()
   showTournamentScreen(param.constants, param.componentToFocus)
+End Function
+
+
+Function onReloadTournamentScreenContainerID(msg)
+  tubilog("TournamentSceenHelpers.onReloadTournamentScreenContainerID")
+  categoryId = msg.getData()
+  screen = msg.getRoSGNode()
+  if screen <> invalid AND categoryId <> ""
+
+    isKidsMode = false 'no touramentscreen for kids
+    reqName = m.constants.reqNames.getCategory
+
+    options = {}
+    params = {}
+    ' content_mode is mandatory param and its value needs to be passed as empty for fetching tournament content
+    params["content_mode"] = ""
+    options.params = params
+    categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, options)
+
+    m.makeRequest({
+      url: categoryReqInfo.url
+      requestType: reqName
+      options: categoryReqInfo.options
+      successCallback: onReloadTournamentScreenCategory
+      errorCallback: onErrorReloadUserCategoriesTournamentScreen
+      responseType: "node"
+      id: categoryId
+      isSignedInUser: isLoggedInUser()
+    })
+  end if
+End Function
+
+
+Function onReloadTournamentScreenCategory(response)
+  if response <> invalid
+    screenID = m.constants.ui.screenIds.tournamentScreen
+    tournamentScreen = getFromScreenCache(screenID)
+
+    if tournamentScreen <> invalid
+      if tournamentScreen.categoryContent <> invalid
+        newCategory = invalid
+        oldCategory = invalid
+
+        if type(response) = "roSGNode"
+          if response.getChildCount() > 0
+            newCategory = response
+          end if
+
+          oldCategory = tournamentScreen.categoryContent.findNode(response.id)
+        end if
+
+        ' there are 3 options here
+        ' 1) new category and old category both have content in them - replace the old with the new
+        ' 2) new category doesn't have content (will be invalid), old category does have content - remove old category
+        ' 3) new category doesn't have content (will be invalid), old category doesn't exist - do nothing
+        if newCategory <> invalid AND oldCategory <> invalid
+          oldCategoryIndex = m.NodeHelpers.getChildIndex(tournamentScreen.categoryContent, oldCategory)
+          'replace old category with new category
+          tournamentScreen.categoryContent.replaceChild(newCategory, oldCategoryIndex)
+          tournamentScreen.repopulateContent = true
+        else if newCategory = invalid AND oldCategory <> invalid
+          'This should not happen. just in case.
+          'remove old category
+          tournamentScreen.categoryContent.removeChild(oldCategory)
+          tournamentScreen.repopulateContent = true '//In case the rows are of different heights, tell tournamentScreen to refresh to display rows correctly
+        else if newCategory = invalid AND oldCategory = invalid
+          'do nothing
+        end if
+      end if
+
+      tournamentScreen.isLoading = false
+    end if
+  end if
+End Function
+
+
+Function onErrorReloadUserCategoriesTournamentScreen(response)
+  tubilog("TournamentScreenHelpers.onErrorReloadUserCategoriesTournamentScreen")
+  ' Container refresh failed.  Just try refreshing entire screen.
+  if response <> invalid
+    screenID = m.constants.ui.screenIds.tournamentScreen
+    tournamentScreen = getFromScreenCache(screenID)
+    fetchTournamentScreenContent(tournamentScreen)
+  end if
 End Function

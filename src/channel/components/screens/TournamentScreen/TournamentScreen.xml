@@ -64,6 +64,9 @@
       <!-- Trigger the content to be loaded. -->
       <field id="reloadTournamentScreen" type="boolean" value="false" alwaysNotify="true"/>
 
+      <!-- tells the rowList to re-populate the content because rows have been added/removed and that may affect the look of some rows that have different heights compared to other rows  -->
+      <field id="repopulateContent" type="boolean" alias="CategoryGridList.repopulateContent" />
+
     <!-- OUTPUTS -->
 
       <field id="tournamentScreenEPGOkPressed" type="boolean" alwaysNotify="true"/>
@@ -132,6 +135,12 @@
 
       <!-- Communicates to the parent that the video preview should be stopped -->
       <field id="stopVideoPreview" type="boolean" alwaysNotify="true"/>
+
+      <!-- Valid duration has expiered on a container. So reload the container with ID -->
+      <field id="reloadTournamentScreenContainerID" type="string" alwaysNotify="true" />
+
+      <!-- When the Helper receives valid category data from the server, it sets the new value to this field. -->
+      <field id="categoryContent" alias="CategoryGridList.content" />
 
   </interface>
 

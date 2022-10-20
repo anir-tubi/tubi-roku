@@ -416,9 +416,9 @@ Function onContentUpdated()
     end if
 
     if m.top.content.getChild(1) <> invalid
-      categoryContent = m.top.content.getChild(1).clone(true)
-      m.numRowsInCategoryGridList = categoryContent.getChildCount() - 1
-      m.categoryGridList.content = categoryContent
+      m.top.categoryContent = m.top.content.getChild(1).clone(true)
+      m.numRowsInCategoryGridList = m.top.categoryContent.getChildCount() - 1
+      m.categoryGridList.content = m.top.categoryContent
       m.categoryGridList.visible = true
       m.categoryGridList.contentUpdated = true
     end if
@@ -435,8 +435,10 @@ Function onScreenFocusChange()
 
 
   if m.top.hasFocus() = true
-    if shouldRefresh(m.top.content) = true
-      m.top.reloadTournamentScreen = true
+   if shouldRefresh(m.top.content) = true
+      m.top.reloadTournamentScreen = true 'refresh entire screen
+    else
+      refreshCategoryContainers() 'just refresh the container which has expired
     end if
 
     if m.top.componentToFocus = m.constants.ui.tournamentScreen.focusItems.topNav
@@ -865,4 +867,18 @@ Function setComponentInteractionEventForEPG(userInteraction)
 
     m.top.componentInteractionInfo = componentInteractionInfo
   end if
+End Function
+
+
+Function refreshCategoryContainers()
+  tubilog("TournamentScreen.refreshCategoryContainers")
+  if m.top.categoryContent <> invalid
+    for i = 0 to m.top.categoryContent.getchildCount() - 1
+      container = m.top.categoryContent.getChild(i)
+      if shouldRefresh(container) = true
+        m.top.reloadTournamentScreenContainerID = container.id
+      end if
+    end for
+  end if
+
 End Function
