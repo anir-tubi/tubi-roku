@@ -1062,7 +1062,8 @@ Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, c
       ' create and add a showAll content to the contents which hold the container metadata
       prependContent = {
         id: m.constants.ui.contentIds.showAllGames
-        title: getTranslation("screenHome_item_showAllGames")
+        title: getTranslation("menu_tournament", {"tradeMark": ""})
+        showAllText: getTranslation("screenHome_item_showAllGames")
         type: "n"
         thumbnails: [m.constants.urls.fifaShowAllPoster]
         description: container.description
@@ -1225,6 +1226,10 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             subtype: sType
             type: sContentType
           }
+
+          if fullChild.showAllText <> invalid
+            childAA.append({showAllText: fullChild.showAllText})
+          end if
 
           if fullChild.needs_login = true AND isSignedInUser = false
             childAA.append({needsLogin: true})

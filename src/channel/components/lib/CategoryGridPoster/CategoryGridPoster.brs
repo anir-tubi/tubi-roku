@@ -116,8 +116,8 @@ Function onContentChange(msg)
       setReplayOrUpcomingBadge(badgeText)
     end if
 
-    if m.top.itemContent.type <> invalid AND m.top.itemContent.type = m.contentTypes.navigate AND m.top.itemContent.title <> invalid
-      setShowAllLabel(m.top.itemContent.title)
+    if m.top.itemContent.type <> invalid AND m.top.itemContent.type = m.contentTypes.navigate AND m.top.itemContent.showAllText <> invalid
+      setShowAllLabel(m.top.itemContent.showAllText)
     end if
 
     if m.top.itemContent.needsLogin = true
@@ -503,6 +503,10 @@ Function setShowAllLabel(text)
   m.showAllLabel.height = 216
   m.showAllLabel.horizAlign = "center"
   m.showAllLabel.vertAlign = "center"
+  font = CreateObject("roSGNode", "Font")
+  font.uri = "pkg:/fonts/Vaud-Bold.ttf"
+  font.size = 27
+  m.showAllLabel.font = font
 End Function
 
 
