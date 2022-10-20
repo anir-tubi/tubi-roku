@@ -1902,7 +1902,8 @@ Function skipDetailScreen(refreshedContent)
   detailScreen = getTopDetailScreenFromStack()
   if detailScreen <> invalid
     populateDetailScreen(detailScreen, refreshedContent)
-    if refreshedContent.needsLogin = false
+
+    if refreshedContent.needsLogin = false AND detailScreen.availabilityType <> m.constants.ui.contentTimings.upcoming
       if refreshedContent.type = m.constants.ui.contentTypes.series AND refreshedContent.currentEpisodeId = "" AND refreshedContent.isRecurring = false
         ' first see if there was a specific episode id we wanted
         history = getHistory(refreshedContent.id)

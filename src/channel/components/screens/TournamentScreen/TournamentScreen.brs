@@ -660,6 +660,11 @@ Function onKeyEvent(key As string, press As boolean) As boolean
     end if
   end if
 
+  if key = "play"
+    handlePlayInput()
+    return true
+  end if
+
   return false
 End Function
 
