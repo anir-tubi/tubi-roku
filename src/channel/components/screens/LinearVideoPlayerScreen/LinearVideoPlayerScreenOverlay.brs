@@ -77,7 +77,7 @@ Function populateInfoPanel(contentNode)
 
     m.InfoPanel.lineOneData = lineOneData
     m.InfoPanel.description = contentNode.description
-    m.InfoPanel.needsLogIn = contentNode.needsLogin
+    m.InfoPanel.needsLogin = contentNode.needsLogin
   end if
 
   m.InfoPanel.calculateHeight = true

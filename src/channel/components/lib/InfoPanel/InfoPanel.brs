@@ -597,6 +597,10 @@ Function resetDefaultState()
     m.top.removeChild(m.playerCountdownGroup)
   end if
 
+  ' reset any boolean INPUT state fields m.top
+  m.top.needsLogin = false
+  m.top.reminderIsSet = false
+
   m.top.descriptionMaxLines = 5
 End Function
 

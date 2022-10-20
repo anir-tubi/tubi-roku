@@ -122,7 +122,7 @@ Function onEpisodeFocused()
       m.Info.twoLineData = {
         genres: episode.genres
       }
-      m.Info.needsLogIn = episode.needsLogin
+      m.Info.needsLogin = episode.needsLogin
       m.Info.width = 1140   
       m.Info.calculateHeight = true   
     end if
@@ -222,7 +222,7 @@ Function setSeasonInfo(season As Integer)
   m.Info.seasonEpisodeCount = seasonContent.getChildCount()
   m.Info.description = m.top.content.description ' series description
   m.Info.mode = m.constants.ui.infoPanelModes.season
-  m.Info.needsLogIn = seasonContent.needsLogin
+  m.Info.needsLogin = seasonContent.needsLogin
   m.Info.calculateHeight = true
 End Function
 

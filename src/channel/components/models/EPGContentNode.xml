@@ -40,7 +40,7 @@
     <field id="descriptors" type="array" />
 
     <!--InfoPanel signInRequired title to display a hint in the info panel -->
-    <field id="needsLogIn" type="boolean" value="false"/>
+    <field id="needsLogin" type="boolean" value="false"/>
 
     <!--Change this field to default secondaryTitle once it available in 11.5-->
     <field id="epgProgramTitle" type="string" />

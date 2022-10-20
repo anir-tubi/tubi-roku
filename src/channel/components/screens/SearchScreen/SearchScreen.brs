@@ -345,7 +345,7 @@ Function onItemFocused()
         badgeText: getTranslation("screenSearch_liveText")
         genres: focusedContent.genres
       }
-      m.searchScreenInfoPanel.needsLogIn = focusedContent.needsLogin AND (m.top.signedIn <> true)
+      m.searchScreenInfoPanel.needsLogin = focusedContent.needsLogin AND (m.top.signedIn <> true)
     else if focusedContent.type = m.constants.ui.contentTypes.sportsEvent
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.sportsEvent
 
@@ -370,7 +370,7 @@ Function onItemFocused()
         roundGroupInfo: focusedContent.roundGroupInfo
       }
 
-      m.searchScreenInfoPanel.needsLogIn =  focusedContent.needsLogin AND (m.top.signedIn <> true)
+      m.searchScreenInfoPanel.needsLogin =  focusedContent.needsLogin AND (m.top.signedIn <> true)
     else
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.item
       lineOneData = {
@@ -385,7 +385,7 @@ Function onItemFocused()
         genres: focusedContent.genres
       }
 
-      m.searchScreenInfoPanel.needsLogIn = (focusedContent.needsLogin AND m.top.signedIn <> true)
+      m.searchScreenInfoPanel.needsLogin = (focusedContent.needsLogin AND m.top.signedIn <> true)
     end if
 
     ' description = m.searchScreenInfoPanel.findNode("Description")

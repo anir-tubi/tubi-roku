@@ -11,7 +11,6 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
   infoPanel.mode = m.constants.ui.infoPanelModes.item
   infoPanel.title = content.title
   infoPanel.description = content.description
-  print "content.description "; content.description
 
   lineOneData = {}
   lineOneData.releaseDate = content.releaseDate

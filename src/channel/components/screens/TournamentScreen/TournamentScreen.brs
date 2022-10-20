@@ -203,7 +203,7 @@ Function populateInfoPanel(focusedContent, isReminderSet=false)
       end if
 
       m.InfoPanel.lineOneData = lineOneData
-      m.InfoPanel.needsLogIn = focusedContent.needsLogIn AND (m.top.signedIn <> true)
+      m.InfoPanel.needsLogin = (focusedContent.needsLogin AND m.top.signedIn <> true)
       m.top.backgroundUriList = determineBackgroundImage(focusedContent.getparent())
     else if focusedContent.type = m.constants.ui.contentTypes.sportsEvent
       m.InfoPanel.mode = m.constants.ui.infoPanelModes.sportsEvent
@@ -228,7 +228,7 @@ Function populateInfoPanel(focusedContent, isReminderSet=false)
       end if
 
       m.InfoPanel.lineOneData = lineOneData
-      m.InfoPanel.needsLogin = focusedContent.needsLogIn AND (m.top.signedIn <> true)
+      m.InfoPanel.needsLogin = focusedContent.needsLogin AND (m.top.signedIn <> true)
       m.InfoPanel.width = 960
       m.top.backgroundUriList = determineBackgroundImage(focusedContent)
     else if focusedContent.type = m.constants.ui.contentTypes.video OR focusedContent.type = m.constants.ui.contentTypes.series

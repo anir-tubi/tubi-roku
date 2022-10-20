@@ -683,14 +683,14 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.topHeaderImageUri = m.constants.ui.uris.infoPanelEpgLiveIcon
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
-      m.InfoPanel.needsLogIn = contentNode.needsLogin AND (m.top.signedIn <> true)
+      m.InfoPanel.needsLogin = contentNode.needsLogin AND (m.top.signedIn <> true)
       m.InfoPanel.reminderIsSet = false
       m.InfoPanel.width = 650
     else if mode = m.constants.ui.infoPanelModes.continueWatching
       m.InfoPanel.mode = mode
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
-      m.InfoPanel.needsLogIn = contentNode.needsLogin AND (m.top.signedIn <> true)
+      m.InfoPanel.needsLogin = contentNode.needsLogin AND (m.top.signedIn <> true)
       m.InfoPanel.reminderIsSet = false
       m.InfoPanel.width = 960
     '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
@@ -736,7 +736,7 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.lineTwoData = lineTwoData
 
       m.Infopanel.reminderIsSet = (info.availabilityType = "upcoming" AND getBookmark(contentNode.id) <> invalid)
-      m.InfoPanel.needsLogIn = (contentNode.needsLogin AND m.top.signedIn <> true)
+      m.InfoPanel.needsLogin = (contentNode.needsLogin AND m.top.signedIn <> true)
       m.InfoPanel.width = 960
     end if
 

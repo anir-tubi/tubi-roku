@@ -26,7 +26,7 @@
       <field id="selectedContentType" type="string" />
 
       <!-- Indicated whether to show/hide the signIn hint -->
-      <field id="needsLoginHint" type="boolean" alias="DetailInfoPanel.needsLogIn" />
+      <field id="needsLoginHint" type="boolean" alias="DetailInfoPanel.needsLogin" />
 
       <!-- Indicated whether to show/hide the signIn hint -->
       <field id="reminderIsSet" type="boolean" alias="DetailInfoPanel.reminderIsSet" />
