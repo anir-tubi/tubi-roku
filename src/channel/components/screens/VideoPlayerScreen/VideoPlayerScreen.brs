@@ -365,6 +365,16 @@ Function playContent()
         resourceType = "VIDEO_RESOURCE_TYPE_HLSV3"
       end if
 
+      codeType = "VIDEO_CODEC_UNKNOWN"
+      if isNonEmptyString(m.Video.content.codec) = true
+        codeType = "VIDEO_CODEC_" + m.Video.content.codec
+      end if
+
+      resolution = "VIDEO_RESOLUTION_UNKNOWN"
+      if isNonEmptyString(m.Video.content.resolution) = true
+        resolution = "VIDEO_RESOLUTION_" + m.Video.content.resolution
+      end if
+
       trackEvent({
         type: "start_video"
         values: {
@@ -379,6 +389,8 @@ Function playContent()
           video_player: "DEFAULT"
           video_resource_type: resourceType
           video_resource_url: m.Video.content.URL
+          video_codec_type: codeType
+          video_resolution: resolution
         }
       })
     end if

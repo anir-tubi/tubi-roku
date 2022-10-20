@@ -307,6 +307,8 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       video_resource_type: "" ' The type of video resource
       video_resource_url: "" 'The playable url in video resource
       video_player: ""  'VideoPlayer enum
+      video_codec_type: "" ' The codec type of video resource
+      video_resolution: ""  'The resolution of video resource
     }
 
     play_progress: {
@@ -324,6 +326,8 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       video_resource_url: "" 'The playable url in video resource
       video_resource_type: "" ' The type of video resource
       video_player: ""  'VideoPlayer enum
+      video_codec_type: "" ' The codec type of video resource
+      video_resolution: ""  'The resolution of video resource
     }
 
     live_play_progress: {
