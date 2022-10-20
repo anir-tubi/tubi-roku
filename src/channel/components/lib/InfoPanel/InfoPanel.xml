@@ -324,12 +324,12 @@
         <LayoutGroup
           id="ReminderGroup"
           layoutDirection="horiz"
-          vertAlignment="center"
+          vertAlignment="custom"
           itemSpacings="[10]"
           addItemSpacingAfterChild="true">
           <Poster
             id="ReminderLogo"
-            visible="false"
+            visible="true"
             height="30"
             width="28"
             uri="pkg:/images/reminder_set.png"
@@ -338,8 +338,8 @@
             id="ReminderTitle"
             width="960"
             wrap="true"
-            color="0x9699A3"
-            vertAlign="bottom">
+            opacity="0.5"
+            translation="[0,6]">
             <Font
               id="ReminderFont"
               role="font"

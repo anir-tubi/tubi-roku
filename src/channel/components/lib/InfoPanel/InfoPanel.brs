@@ -74,7 +74,7 @@ Function init()
 
   m.expireWarning.color = m.constants.ui.colors.expirationWarning
   m.signInText.text = getTranslation("registration_signIn_to_play_hint")
-  m.reminderTitle.text = getTranslation("screenDetails_button_remove_reminder")
+  m.reminderTitle.text = getTranslation("info_panel_reminder_is_set")
 
   if theme <> invalid
     m.descriptionFocusButton.blendColor = theme.focused
@@ -776,7 +776,6 @@ Function onModeChange()
     m.infoPanelGroup.appendChild(m.offset)
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.twoLineInfo)
-    m.offset.appendChild(m.reminderGroup)
 
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.firstLineAvailabilityBadge)

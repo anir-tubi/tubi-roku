@@ -1290,14 +1290,6 @@
     "description": "Label displayed on onBoarding welcome screen",
     "message": "Welcome to unlimited movies,\nTV shows and Live TV"
   },
-  "show_all_games_gameInfo": {
-    "description": "Text displayed on Fifa World Cup 2022 infopanel second line when Show all games is focused",
-    "message": "Nov 20, 2022 - Dec 18, 2022"
-  },
-  "show_all_games_description": {
-    "description": "Description displayed on Fifa World Cup 2022 infopanel when Show all games is focused",
-    "message": "Taking place every four years, the FIFA Men's World Cup sees 32 nations compete against each other for the prize."
-  },
   "onBoarding_welcomeScreen_description": {
     "description": "Description displayed on onBoarding welcome screen",
     "message": "For all your Entertainment, News, and Sports needs.\nAlways free. No subscription. 100% legal."
@@ -1366,4 +1358,16 @@
     "description": "This label used for badge to indicate the content availability",
     "message": "Replay"
   },
+  "show_all_games_gameInfo": {
+    "description": "Text displayed on Fifa World Cup 2022 infopanel second line when Show all games is focused",
+    "message": "Nov 20, 2022 - Dec 18, 2022"
+  },
+  "show_all_games_description": {
+    "description": "Description displayed on Fifa World Cup 2022 infopanel when Show all games is focused",
+    "message": "Taking place every four years, the FIFA Men's World Cup sees 32 nations compete against each other for the prize."
+  },
+  "info_panel_reminder_is_set": {
+    "description": "Hint in the content metadata area informing the user that the reminder is set for this content",
+    "message": "Reminder set"
+  }
 }
