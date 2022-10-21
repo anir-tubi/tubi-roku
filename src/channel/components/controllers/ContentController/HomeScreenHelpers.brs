@@ -62,6 +62,7 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     homeScreen.observeFieldScoped("columnFocused", "onColumnFocusChanged")
     homeScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
+    homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
@@ -965,8 +966,8 @@ Function onLoadCategoriesIndex(msg)
   end if
 
   isKidsMode = shouldKidsModeBeSentToServer()
-  isLoggedInUser = isLoggedInUser()
-  batchRequests = m.cmsApi.createHomeScreenBatchReqInfo(homeScreen, index, isKidsMode, isLoggedInUser)
+  isSignedInUser = isLoggedInUser()
+  batchRequests = m.cmsApi.createHomeScreenBatchReqInfo(homeScreen, index, isKidsMode, isSignedInUser)
 
   if batchRequests <> invalid
     m.makeBatchRequest({
@@ -1045,3 +1046,45 @@ Function showFifaIntroModal()
   showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
 
 End Function
+
+
+
+' load category content
+Function onLoadCategoryForIds(msg)
+  tubiLog("HomeScreenHelpers.onLoadCategoryForIds")
+  homeScreen = msg.getRoSGNode()
+  categoryIDs = msg.getData()
+
+  if homeScreen = invalid OR homeScreen.content = invalid OR categoryIDs.count() <= 0
+    return false
+  end if
+
+  batchResponseHandler = homeBatchResponse
+  if homeScreen.id = m.constants.ui.screenIds.movieScreen
+    batchResponseHandler = movieBatchResponse
+  else if homeScreen.id = m.constants.ui.screenIds.tvScreen
+    batchResponseHandler = tvBatchResponse
+  else if homeScreen.id = m.constants.ui.screenIds.espanolScreen
+    batchResponseHandler = espanolBatchResponse
+  end if
+
+  isKidsMode = shouldKidsModeBeSentToServer()
+  isSignedInUser = isLoggedInUser()
+
+  if homeScreen.contentMode = m.constants.ui.contentMode.homescreen
+    contentMode = ""
+  else
+    contentMode = homeScreen.contentMode
+  end if
+
+  batchRequests = m.cmsApi.createHomeScreenBatchRequestInfoForContainers(categoryIDs, contentMode, isKidsMode, isSignedInUser)
+
+  if batchRequests <> invalid
+    m.makeBatchRequest({
+      requests: batchRequests
+      responseType: "node"
+      successCallback: batchResponseHandler
+    })
+  end if
+  return true
+End function

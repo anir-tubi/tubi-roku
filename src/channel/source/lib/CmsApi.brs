@@ -20,6 +20,7 @@ Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
     searchReq: cmsApi_getSearchRequest
     searchReqInfo: cmsApi_getSearchRequestInfo
     createHomeScreenBatchReqInfo: cmsApi_createHomeScreenBatchRequestInfo
+    createHomeScreenBatchRequestInfoForContainers: cmsApi_createHomeScreenBatchRequestInfoForContainers
 
     ' private
     createAuthRequest: cmsApi_createAuthRequest
@@ -486,4 +487,46 @@ Function cmsApi_getFullCategoryId(category)
     end if
   end if
   return categoryId
+End Function
+
+
+
+' This Function will pull the contents for container array
+' @containerIds: Array of container ids
+' @contentMode: one of enum values constants.ui.contentMode
+' @bKidsMode : boolean
+' @isSignedInUser: boolean, value based on user loggedIn or not
+'
+' returns batch requests
+Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, contentMode = "", bKidsMode = false, isSignedInUser = false)
+
+  reqName = m.constants.reqNames.getCategory
+
+  requests = []
+
+    for each containerId in containerIds
+      categoryReqInfo = invalid
+      if isNonEmptyString(containerId) = true
+        options = {
+          params: {}
+        }
+
+        contentModeParam = {
+          "content_mode": contentMode
+        }
+
+        options.params.append(contentModeParam)
+        categoryReqInfo = m.categoryReqInfo(containerId, bKidsMode, options)
+        categoryReqInfo.requestType = reqName
+        categoryReqInfo.responseType = "node"
+        categoryReqInfo.isSignedInUser = isSignedInUser
+      end if
+
+      if categoryReqInfo <> invalid then
+        requests.push(categoryReqInfo)
+      end if
+    end for
+
+  return requests
+
 End Function

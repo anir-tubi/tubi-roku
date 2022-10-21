@@ -242,8 +242,12 @@ Function onScreenFocusChange()
   tubiLog("HomeScreen.onScreenFocusChange " + focusState(m.top))
 
   if m.top.hasFocus() = true
-    if m.CategoryGridList.content <> invalid AND shouldRefresh(m.CategoryGridList.content) = true
-      m.top.loadAllCategories = true
+    if m.CategoryGridList.content <> invalid
+      if shouldRefresh(m.CategoryGridList.content) = true
+        m.top.loadAllCategories = true
+      else 'check if any containers has expired
+        refreshHomeScreenContainers()
+      end if
     end if
 
     if m.top.componentToFocus = m.constants.ui.homescreen.focusItems.topNav
@@ -988,4 +992,19 @@ Function handlePlayInput()
     end if
   end if
   return false
+End Function
+
+
+Function refreshHomeScreenContainers()
+  tubilog("homeScreen.refreshHomeScreenContainers")
+  loadCategoryForIds = []
+  for i = 0 to m.CategoryGridList.content.getChildCount() - 1
+    container = m.CategoryGridList.content.getChild(i)
+    if shouldRefresh(container) = true
+      loadCategoryForIds.push(container.id)
+    end if
+  end for
+  if loadCategoryForIds.count() > 0
+    m.top.loadCategoryForIds = loadCategoryForIds
+  end if
 End Function
