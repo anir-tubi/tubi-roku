@@ -722,7 +722,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         ' then ensure row is empty except for 1 item that will entice users to sign in
         categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
       else
-        categoryAA = m.buildCategoryAAWithPrepend(container, contents, invalid, "", false, contentMode, screenId, isSignedInUser)
+        categoryAA = m.buildCategoryAAWithPrepend(container, contents, "", "", false, contentMode, screenId, isSignedInUser)
       end if
 
       if categoryAA <> invalid
@@ -886,7 +886,7 @@ Function tubiMetadataTranslate_translateLinearChannelGuide(homescreenRes)
     }
 
     for each container in containers
-      categoryAA = m.buildCategoryAA(container, contents, invalid, "", true, "linear")
+      categoryAA = m.buildCategoryAA(container, contents, "", "", true, "linear")
       allChannels.children.append(categoryAA.children)
     end for
 
@@ -931,7 +931,6 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     return translated
   end if
 
-
   if type(categoryMetadata) = "roAssociativeArray"
     ' buildCategoryAA always returns AA.state = "partial",
     ' but any single category request should be considered fully loaded
@@ -939,7 +938,6 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     translated.update(categoryMetadata, true)
     nodeCount = 1 + translated.getChildCount()
   end if
-
 
   tubiLog("TranslateMetadata converted " + stri(nodeCount) + " nodes")
   return translated
@@ -956,8 +954,7 @@ Function tubiMetadataTranslate_translateCategoryDetails(contentToTranslate, full
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
   contents = contentToTranslate.contents
-  contentsJson = m.getContentsJson(contentToTranslate, fullJson)
-
+  contentsJson = ""
   sOrientation = m.constants.ui.gridItemTypes.portrait
   bFullData = true
   contentMode = m.constants.ui.contentMode.homescreen
@@ -967,7 +964,7 @@ Function tubiMetadataTranslate_translateCategoryDetails(contentToTranslate, full
   if categoryMetadata <> invalid
     translated.update(categoryMetadata)
   else if container <> invalid
-    ' ensure we at least strore the container id, even if there is no content
+    ' ensure we at least store the container id, even if there is no content
     translated.id = container.id
   end if
 
@@ -986,7 +983,7 @@ End Function
 ' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
 ' @isSignedInUser: boolean, value based on user logged In or not
 ' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = invalid, sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId="", isSignedInUser = false)
+Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId="", isSignedInUser = false)
 
   categoryParent = m.buildCategoryParentInfo(container, contentMode, sOrientation)
 
@@ -1034,8 +1031,9 @@ End Function
 ' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
 ' @screenId: string, one of the screenIds found at constants.ui.screenIds
 ' @isSignedInUser: boolean, value based on user logged In or not
-' returns an associative array that can be passed to ContentNode.update() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false)
+' 
+' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
+Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false)
   categoryAA = invalid
 
   if container <> invalid AND container.children <> invalid AND container.children.count() > 0
@@ -1171,7 +1169,13 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
   if type(container) = "roAssociativeArray" AND type(container.children) = "roArray"
     childrenReturn = CreateObject("roArray", container.children.count(), false)
+
     jsonAA = {}
+    if isNonEmptyString(contentsJson) = true OR bFullData = true
+      ' only need to build a jsonAA if we need to replace contentsJson
+      ' we don't need to if contentsJson has content already or we are giving all the children their full data
+      jsonAA = invalid
+    end if
 
     if type(contents) = "roAssociativeArray"
       for each child in container.children
@@ -1215,15 +1219,15 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           end if
 
           if fullChild.needs_login = true AND isSignedInUser = false
-            childAA.append({needsLogin: true})
+            childAA.needsLogin = true
           end if
 
           if hasVideoResources = true
-            childAA.append({hasVideoResources: true})
+            childAA.hasVideoResources = true
           end if
 
           if fullChild.air_datetime <> invalid and fullChild.air_datetime <> ""
-            childAA.append({airDateTime: fullChild.air_datetime})
+            childAA.airDateTime = fullChild.air_datetime
           end if
 
           if bFullData = true
@@ -1307,7 +1311,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             childAA.id = "0" + sFullChildID
           end if
 
-          if childIsPushable = true
+          if childIsPushable = true and jsonAA <> invalid
             jsonAA[childAA.id] = fullChild
           end if
 
@@ -1316,8 +1320,12 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
       end for
     end if
 
-    if contentsJson = invalid
+    if jsonAA <> invalid and isNonEmptyString(contentsJson) = false
       contentsJson = FormatJSON(jsonAA)
+    else if bFullData = true
+      ' no need for contents Json if contents have the full data (bFullData = true)
+      ' however, leave the original contentsJson if bFullData = false and contentsJson is a non empty string.
+      contentsJson = ""
     end if
   end if
 
@@ -1335,7 +1343,7 @@ End Function
 '@parsedJson: assocArray, the container response that has already been run through ParseJSON()
 '@fullJson: string, the full json formatted response
 Function tubiMetadataTranslate_getContentsJson(parsedJson, fullJson)
-  contentsJson = invalid
+  contentsJson = ""
 
   'Doing string operations to isolate the contents portion of the JSON matrix response is ~4x faster than re-formatting the JSON
   contentsIdentifier =  Chr(34) + "contents" + Chr(34) + ":{"

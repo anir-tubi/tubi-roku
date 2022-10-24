@@ -714,34 +714,7 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.reminderIsSet = false
       m.InfoPanel.width = 960
     else if mode = m.constants.ui.infoPanelModes.sportsEvent
-      m.InfoPanel.mode = mode
-
-      hasVideoresources = contentNode.hasVideoresources
-      airDateTime = contentNode.airDateTime
-      info = getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime, hasVideoresources)
-
-      m.InfoPanel.title = contentNode.title
-      lineOneData = {}
-      lineOneData.badgeText = info.badgeText
-      lineOneData.length = contentNode.length
-      lineOneData.hasCC = (contentNode.hasSubtitles = true OR m._.empty(contentNode.subtitleTracks) = false)
-
-      if contentNode.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
-        lineOneData.has4k = true
-      end if
-
-      if info.availabilityType <> m.constants.ui.contentTimings.upcoming
-        lineOneData.hoursOfAiring = info.matchTime
-      end if
-      m.InfoPanel.lineOneData = lineOneData
-
-      lineTwoData = {}
-      lineTwoData.roundGroupInfo = contentNode.roundGroupInfo
-      m.InfoPanel.lineTwoData = lineTwoData
-
-      m.Infopanel.reminderIsSet = (info.availabilityType = "upcoming" AND getBookmark(contentNode.id) <> invalid)
-      m.InfoPanel.needsLogin = (contentNode.needsLogin AND m.top.signedIn <> true)
-      m.InfoPanel.width = 960
+      populateInfoPanelWithHomescreenStyleSportsMode(contentNode, m.InfoPanel)
     end if
 
     m.InfoPanel.calculateHeight = true

@@ -322,10 +322,12 @@ Function resolveAbbreviatedContent(rowItemIndex)
         contentId = content.id
       end if
     end if
-    if contentId <> invalid AND contentId <> ""
+
+    if isNonEmptyString(contentId) = true
       return m.metadataTranslate.getContentFromCategoryJson(category, contentId) ' can return invalid
     end if
   end if
+
   return invalid
 End Function
 

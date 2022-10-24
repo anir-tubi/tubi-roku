@@ -123,8 +123,8 @@ Function onLoadContent()
           sSponsorBackgroundURL = category.sponsorImages.brandColor
         end if
         m.top.sponsorshipBackground = sSponsorBackgroundURL
-
       end if
+
       m.PageTitleAndCounter.content = category
       m.VideoGrid.content = category
       m.VideoGrid.setFocus(true)
@@ -157,13 +157,7 @@ Function onItemFocused()
   if m.top.content <> invalid
     item = m.VideoGrid.itemFocused
     category = m.top.content 'contentNode
-
-    content = invalid
-    partialContent = category.getChild(item) 'contentNode
-
-    if partialContent <> invalid
-      content = m.metadataTranslate.getContentFromCategoryJson(category, partialContent.id)
-    end if
+    content = category.getChild(item) 'contentNode
 
     if content <> invalid
       ' Update the info panel
@@ -267,7 +261,12 @@ End Function
 '@infoPanel: roSGNode, an InfoPanel component
 '@content: roSGNode, a content node
 Function populateInfoPanel(infoPanel, content)
-  populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
+  if content.type = m.constants.ui.contentTypes.sportsEvent
+    populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
+  else 'movies, series
+    populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
+  end if
+
   infoPanel.calculateHeight = true
   return infoPanel
 End Function

@@ -235,7 +235,8 @@
               size="22" />
             </Label>
             <Label
-              id="ExpireWarning">
+              id="ExpireWarning"
+              translation="[0, 9]">
               <Font
                 role="font"
                 uri="pkg:/fonts/Vaud-Medium.ttf"

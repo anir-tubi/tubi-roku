@@ -177,8 +177,7 @@ End Function
 
 
 '@focusedContent: node, focused content whose information to be displayed on infopanel
-'@isReminderSet: boolean, this is used show on the infoPanel whether the reminderSet or not on the focusedContent
-Function populateInfoPanel(focusedContent, isReminderSet=false)
+Function populateInfoPanel(focusedContent)
   tubiLog("TournamentScreen.populateInfoPanel")
 
   if focusedContent <> invalid
@@ -206,31 +205,7 @@ Function populateInfoPanel(focusedContent, isReminderSet=false)
       m.InfoPanel.needsLogin = (focusedContent.needsLogin AND m.top.signedIn <> true)
       m.top.backgroundUriList = determineBackgroundImage(focusedContent.getparent())
     else if focusedContent.type = m.constants.ui.contentTypes.sportsEvent
-      m.InfoPanel.mode = m.constants.ui.infoPanelModes.sportsEvent
-      m.InfoPanel.title = focusedContent.title
-
-      hasVideoresources = focusedContent.hasVideoresources
-      airDatetime = focusedContent.airDatetime
-      info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
-      matchTime = info.matchTime
-      badgeText = info.badgeText
-
-      lineOneData = {}
-      lineOneData.roundGroupInfo = focusedContent.roundGroupInfo
-      lineOneData.hoursOfAiring = matchTime
-      lineOneData.badgeText = badgeText
-      lineOneData.hasCC = focusedContent.hasSubtitles
-      lineOneData.length = focusedContent.length
-      lineOneData.isReminderSet = isReminderSet
-
-      if focusedContent.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
-        lineOneData.has4k = true
-      end if
-
-      m.InfoPanel.lineOneData = lineOneData
-      m.InfoPanel.needsLogin = focusedContent.needsLogin AND (m.top.signedIn <> true)
-      m.InfoPanel.width = 960
-      m.top.backgroundUriList = determineBackgroundImage(focusedContent)
+      populateInfoPanelWithHomescreenStyleSportsMode(focusedContent, m.InfoPanel)
     else if focusedContent.type = m.constants.ui.contentTypes.video OR focusedContent.type = m.constants.ui.contentTypes.series
       populateInfoPanelWithHomescreenStyleItemMode(focusedContent, m.InfoPanel)
       m.top.backgroundUriList = determineBackgroundImage(focusedContent)
@@ -261,29 +236,13 @@ Function onGridItemFocused()
 
   if m.CategoryGridList.isInFocusChain() = true
     focusedContent = m.CategoryGridList.itemFocused
-    isReminderSet = false
-
-    bookMarkIds = getFieldFromGlobal("bookmarkIds")
-    airDateTime = focusedContent.airDatetime
-    hasVideoResources = focusedContent.hasVideoResources
-
-    info = getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime, hasVideoResources)
-    availabilityType = info.availabilityType
-
-    for i = 0 to bookMarkIds.getChildCount() - 1
-      if bookMarkIds.getChild(i).id = focusedContent.id AND availabilityType = m.constants.ui.contentTimings.upcoming
-        isReminderSet = true
-      end if
-    end for
 
     if focusedContent <> invalid
       m.top.contentFocused = focusedContent
       sendNavigateWithinPageEvent()
-      populateInfoPanel(focusedContent, isReminderSet)
+      populateInfoPanel(focusedContent)
     end if
-
   end if
-
 End Function
 
 
@@ -433,7 +392,6 @@ End Function
 Function onScreenFocusChange()
   tubiLog("TournamentScreen.onScreenFocusChange")
 
-
   if m.top.hasFocus() = true
    if shouldRefresh(m.top.content) = true
       m.top.reloadTournamentScreen = true 'refresh entire screen
@@ -468,7 +426,6 @@ Function onScreenFocusChange()
       m.top.refreshtournamentScreenVideoPlay = true
       fadeInContentArea()
   end if
-
 End Function
 
 
@@ -534,11 +491,11 @@ Function setFocusOnCategoryGrid()
     setTopNavUi(int(m.categoryGridList.currFocusRow))
     m.topNav.losingFocusToComponentOnSamePage = false
   end if
+
   m.top.focusedComponent = m.constants.ui.tournamentScreen.focusItems.categoryGridList
   m.categoryGridList.setFocus(true)
   m.categoryGridList.opacity = 1
   m.top.refreshtournamentScreenVideoPlay = true
-
 End Function
 
 
