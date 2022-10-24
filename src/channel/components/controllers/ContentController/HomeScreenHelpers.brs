@@ -692,7 +692,7 @@ Function onHomeScreenContentFocused(msg)
   if focusedContent <> invalid AND focusedContent.isFIFAContent = true
     showHideLogo(m.constants.logoType.tubiFifa)
   else
-    showHideLogo(m.constants.logoType.tubi)
+    showHideLogoBasedOnUiMode()
   end if
 
   setHomeScreenAfterFocus(focusedContent, homeScreen)

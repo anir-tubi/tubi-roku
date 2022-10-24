@@ -1884,8 +1884,22 @@ Function sendNielsenPing(pingType, content = invalid, successCallback = invalid,
 End Function
 
 
-' TODO: convert into constants ?
-' @logoType : string, one of the following :
+' show appropriate logo based on the app mode like kids, espanol, standard
+Function showHideLogoBasedOnUiMode()
+  mode = m.uiMode
+
+  if mode = m.constants.ui.modes.standard
+    showHideLogo(m.constants.logoType.tubi)
+  else if mode = m.constants.ui.modes.kids OR mode = m.constants.ui.modes.kidsAgeGate OR mode = m.constants.ui.modes.kidsParental
+    showHideLogo(m.constants.logoType.tubiKids)
+  else if mode = m.constants.ui.modes.latino
+    showHideLogo(m.constants.logoType.tubiEspanol)
+  end if
+
+End Function
+
+
+' @logoType : string, one of the following from m.constants.ui.modes
           ' "tubi" =  show tubi logo,
           ' "tubi_kids" = show tubi kids logo,
           ' "tubi_espanol" = show espanol logo,
