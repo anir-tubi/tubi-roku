@@ -418,6 +418,7 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
             categoryReqInfo.requestType = reqName
             categoryReqInfo.responseType = "node"
             categoryReqInfo.isSignedInUser = isSignedInUser
+            categoryReqInfo.screenId = m.constants.ui.screenIds.homeScreen
           end if
 
         end if
@@ -520,6 +521,7 @@ Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, cont
         categoryReqInfo.requestType = reqName
         categoryReqInfo.responseType = "node"
         categoryReqInfo.isSignedInUser = isSignedInUser
+        categoryReqInfo.screenId = m.constants.ui.screenIds.homeScreen
       end if
 
       if categoryReqInfo <> invalid then

@@ -394,6 +394,7 @@ Function onReloadTournamentScreenContainerID(msg)
       responseType: "node"
       id: categoryId
       isSignedInUser: isLoggedInUser()
+      screenId: m.constants.ui.screenIds.tournamentScreen
     })
   end if
 End Function

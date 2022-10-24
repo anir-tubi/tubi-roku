@@ -6,7 +6,6 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     getContentFromCategoryJson: tubiMetadataTranslate_getContentFromCategoryJson
     translateRelatedContent: tubiMetadataTranslate_translateRelatedContent
     translate: tubiMetadataTranslate_translate
-    translateContainerForHomeScreen: tubiMetadataTranslate_translateContainerForHomeScreen
     translateContainer: tubiMetadataTranslate_translateContainer
     translateCategoryDetails: tubiMetadataTranslate_translateCategoryDetails
     translateFIFAHomescreen: tubiMetadataTranslate_translateFIFAHomescreen
@@ -898,16 +897,6 @@ Function tubiMetadataTranslate_translateLinearChannelGuide(homescreenRes)
     return invalid
   end if
 End Function
-
-
-''''''''''''''''''''
-' translateContainerForHomeScreen
-'
-Function tubiMetadataTranslate_translateContainerForHomeScreen(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode="homeScreen", isSignedInUser = false) As Object
-  tubiLog("TubiMetadataTranslate.translateContainerForHomeScreen")
-  translated = m.translateContainer(contentToTranslate, fullJson, sOrientation, bFullData, contentMode, "homeScreen", isSignedInUser)
-  return translated
-  End Function
 
 
 ''''''''''''''''''''

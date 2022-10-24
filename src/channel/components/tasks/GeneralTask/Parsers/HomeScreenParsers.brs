@@ -52,8 +52,8 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
   orientation = ""
   bFullData = false
   contentMode = "homeScreen"
-
   isSignedInUser = false
+  screenId = m.constants.ui.screenIds.homeScreen
 
   if reqInfo <> invalid
     isSignedInUser = reqInfo.isSignedInUser
@@ -62,9 +62,13 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
     if options <> invalid AND options.params <> invalid
       contentMode = options.params.contentMode
     end if
+
+    if reqInfo.screenId <> invalid
+      screenId = reqInfo.screenId
+    end if
+
   end if
 
-
-  convertedMetadata = translate.translateContainerForHomeScreen(parsedResponse, fullJson, orientation, bFullData, contentMode, isSignedInUser)
+  convertedMetadata = translate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, screenId, isSignedInUser)
   return convertedMetadata  'may return an empty container
 End Function
