@@ -56,11 +56,7 @@ Function showRFIScreen()
     ' RFI screen is showing only if the channelStore node is stored in m variable
     m.billing = CreateObject("roSGNode", "ChannelStore")
     m.billing.observeFieldScoped("userData", "onRfiUserData")
-    if getExperimentResource("roku_registration_gender_data", "roku_registration_gender_data_v1", true).enabled = true
-      m.billing.requestedUserData = "email, firstName, lastName, gender"
-    else
-      m.billing.requestedUserData = "email, firstName, lastName"
-    end if
+    m.billing.requestedUserData = "email, firstName, lastName, gender"
     m.billing.command = "getUserData"
   end if
 End Function
