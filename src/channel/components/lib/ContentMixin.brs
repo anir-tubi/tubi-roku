@@ -15,20 +15,25 @@ Function getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime = "", hasVideoRe
   end if
 
   if isNonEmptyString(dateTimeString) = true
+    'find current time
+    currentDateTime = CreateObject("roDateTime")
+    currentTimeAsSeconds = currentDateTime.AsSeconds()
+    currentDateTime.ToLocalTime()
+    today = currentDateTime.asDateString("short-date")
+
+    'Find program start
     startDateTime = CreateObject("roDateTime")
     startDateTime.FromISO8601String(dateTimeString)
-    startDateTime.ToLocalTime()
     startTimeAsSeconds = startDateTime.AsSeconds()
-    programYear = startDateTime.GetYear()
-    programMonth = startDateTime.GetMonth()
-    programDay = startDateTime.GetDayOfMonth()
+    startDateTime.ToLocalTime()
+    programDate = startDateTime.asDateString("short-date")
 
-    currentDateTime = CreateObject("roDateTime")
-    currentDateTime.ToLocalTime()
-    currentTimeAsSeconds = currentDateTime.AsSeconds()
-    currentYear = currentDateTime.GetYear()
-    currentMonth = currentDateTime.GetMonth()
-    today = currentDateTime.GetDayOfMonth()
+
+    'Find tomorrow
+    tomorrowDate = createObject("roDateTime")
+    tomorrowDate.fromSeconds(currentTimeAsSeconds + 86400)
+    tomorrowDate.ToLocalTime()
+    tomorrow = tomorrowDate.asDateString("short-date")
 
     availabilityType = ""
     if (hasVideoResources = true) AND currentTimeAsSeconds > startTimeAsSeconds
@@ -37,13 +42,10 @@ Function getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime = "", hasVideoRe
       availabilityType = "upcoming"
     end if
 
-    currentDateTime.FromSeconds(currentDateTime.AsSeconds() + 86400)
-    tomorrow = currentDateTime.GetDayOfMonth()
-
     if availabilityType = "upcoming"
-      if programDay = today AND programMonth = currentMonth AND programYear = currentYear
+      if programDate = today
         badgeText = getTranslation("today")
-      else if programDay = tomorrow
+      else if programDate = tomorrow
         badgeText = getTranslation("tomorrow")
       else
         date = getMonthAndDay(startDateTime)
