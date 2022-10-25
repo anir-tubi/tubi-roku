@@ -25,8 +25,8 @@ Function TubiExperiments(constants) as Object
       '//   The difference between v2 and v3 is that with v3, the position of the like/dislike button is moved after the episode list for a guest user.
       '//   The difference between v2 and v4 is that with v4, the position of the like/dislike button is moved after the episode list for a registered user.
       roku_title_reactions: {
-        roku_title_reactions_v3: {"enabled": false}
-        roku_title_reactions_v4: {"enabled": false}
+        roku_title_reactions_v3: {"enabled": true}
+        roku_title_reactions_v4: {"enabled": true}
       }
 
       roku_in_pod_stitching: {
