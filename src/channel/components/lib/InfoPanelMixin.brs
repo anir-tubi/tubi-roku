@@ -1,9 +1,9 @@
 ' Populates the info panel with the fields necessary for the "item" mode so that it looks
 ' like the info panel on the homescreen
-' 
+'
 ' @content: TubiContentNode, containing a movie or series
 ' @infoPanel: InfoPanel node
-' 
+'
 ' @sideEffects: updates fields on the passed in infoPanel node
 Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
   ' used by homescreen, category details screen, tournament screen, etc.
@@ -68,7 +68,6 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
   lineOneData.badgeText = badgeText
   lineOneData.hasCC = content.hasSubtitles
   lineOneData.length = content.length
-  lineOneData.isReminderSet = (availabilityType = m.constants.ui.contentTimings.upcoming AND getBookmark(content.id) <> invalid)
 
   if availabilityType <> m.constants.ui.contentTimings.upcoming
     lineOneData.hoursOfAiring = matchTime
@@ -82,6 +81,7 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
   infoPanel.lineTwoData = {
     roundGroupInfo: content.roundGroupInfo
   }
+  infoPanel.reminderIsSet = (availabilityType = m.constants.ui.contentTimings.upcoming AND getBookmark(content.id) <> invalid)
   infoPanel.needsLogin = (content.needsLogin AND m.top.signedIn <> true)
   infoPanel.width = 960
 End Function
