@@ -918,74 +918,27 @@ Function onRelatedItemFocused()
 
     col = m.RelatedGrid.itemFocused + 1
     row = 1
-    videoId = m.top.content.id.toInt()
-    componentType = "related_component"
-    pageType = "video_page"
-    if (focusedContent.availabilityType = m.constants.ui.contentTimings.upcoming OR focusedContent.availabilityType = m.constants.ui.contentTimings.replay)
-      if focusedContent.availabilityType = m.constants.ui.contentTimings.upcoming
-        pageType = "upcoming_content_page"
-      end if
 
-      componentType = "category_component"
-      if m.relatedHasFocus = false
-        m.oldYmalComponent = {
-          category_slug: focusedContent.categorySlug
-          category_row: row
-          category_col: m.RelatedGrid.itemFocused + 1
-          content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
-        }
-      end if
-
-    else
-      pageType = "video_page"
-    end if
+    pageInfo = m.top.trackingPageInfo
 
     ' trigger navigate_within_page events in ContentController
-    if (focusedContent.availabilityType = m.constants.ui.contentTimings.upcoming OR focusedContent.availabilityType = m.constants.ui.contentTimings.replay)
+    if m.relatedHasFocus = true
       m.top.navigateWithinPageInfo = {
-        pageOneof: m.Tracking.getAnalyticsPage(pageType, {video_id: videoId})
-        componentOneof: m.Tracking.getAnalyticsComponent(componentType, m.oldYmalComponent) 'category_list_component doesn't exist in protos
-        means_of_navigation: "BUTTON" 'MeansOfNavigation enum
-        vertical_location: row '1 based index
-        horizontal_location: col
-      }
-      if (focusedContent.availabilityType = m.constants.ui.contentTimings.upcoming OR focusedContent.availabilityType = m.constants.ui.contentTimings.replay)
-        m.oldYmalComponent = {
-          category_slug: focusedContent.categorySlug
-          category_row: row
-          category_col: col
-          content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
-        }
-      else
-        m.oldYmalComponent = {
-          content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
-        }
-      end if
-
-    else if m.relatedHasFocus = true
-      m.top.navigateWithinPageInfo = {
-        pageOneof: m.Tracking.getAnalyticsPage(pageType, {video_id: videoId})
-        componentOneof: m.Tracking.getAnalyticsComponent(componentType, m.oldYmalComponent) 'category_list_component doesn't exist in protos
+        pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+        componentOneof: m.Tracking.getAnalyticsComponent("related_component", m.oldYmalComponent) 'category_list_component doesn't exist in protos
         means_of_navigation: "BUTTON" 'MeansOfNavigation enum
         vertical_location: row '1 based index
         vertical_location_mode: "INDEX" 'LocationMode enum
         horizontal_location: col
         horizontal_location_mode: "INDEX" 'LocationMode enum
       }
+      m.oldYmalComponent = {
+        content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
+      }
     else
-      if (focusedContent.availabilityType = m.constants.ui.contentTimings.upcoming OR focusedContent.availabilityType = m.constants.ui.contentTimings.replay)
-        m.oldYmalComponent = {
-          category_slug: focusedContent.categorySlug
-          category_row: row
-          category_col: col
-          content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
-        }
-      else
-        m.oldYmalComponent = {
-          content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
-        }
-      end if
-
+      m.oldYmalComponent = {
+        content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
+      }
     end if
 
     m.relatedHasFocus = true

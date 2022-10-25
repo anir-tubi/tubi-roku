@@ -2136,28 +2136,37 @@ Function getDetailScreenAnalyticsPageInfo(content, constants)
 
   if content <> invalid AND type(content.id) = "roString"
     if content.type = constants.ui.contentTypes.series
-      pageInfo = {
-        pageType: "series_detail_page"
-        pageValues: {
-          series_id: content.id.toInt()
+      if availabilityType = constants.ui.contentTimings.upcoming
+        pageInfo = {
+          pageType: "upcoming_content_page"
+          pageValues: {
+            series_id: content.id.toInt()
+          }
         }
-      }
-    ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE (Remove SportsEvent OR condition only)
-    else if content.type = constants.ui.contentTypes.video OR (content.type = constants.ui.contentTypes.sportsEvent AND availabilityType = constants.ui.contentTimings.replay)
-      pageInfo = {
-        pageType: "video_page"
-        pageValues: {
-          video_id: content.id.toInt()
+      else
+        pageInfo = {
+          pageType: "series_detail_page"
+          pageValues: {
+            series_id: content.id.toInt()
+          }
         }
-      }
-    ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-    else if content.type = constants.ui.contentTypes.sportsEvent AND availabilityType = constants.ui.contentTimings.upcoming 'replay games will be shown as video_page
-      pageInfo = {
-        pageType: "upcoming_content_page"
-        pageValues: {
-          video_id: content.id.toInt()
+      end if
+    else if content.type = constants.ui.contentTypes.video OR content.type = constants.ui.contentTypes.sportsEvent
+      if availabilityType = constants.ui.contentTimings.upcoming
+        pageInfo = {
+          pageType: "upcoming_content_page"
+          pageValues: {
+            video_id: content.id.toInt()
+          }
         }
-      }
+      else
+        pageInfo = {
+          pageType: "video_page"
+          pageValues: {
+            video_id: content.id.toInt()
+          }
+        }
+      end if
     end if
 
   end if
