@@ -1031,31 +1031,32 @@ End Function
 ' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
 ' @screenId: string, one of the screenIds found at constants.ui.screenIds
 ' @isSignedInUser: boolean, value based on user logged In or not
-' 
+'
 ' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
 Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false)
   categoryAA = invalid
 
-  if container <> invalid AND container.children <> invalid AND container.children.count() > 0
-
+  if container <> invalid AND container.children <> invalid
     prependContent = invalid
-    if screenId = m.constants.ui.screenIds.homeScreen AND container.id = m.constants.ui.categoryIds.fifawc
-      ' create and add a showAll content to the contents which hold the container metadata
-      prependContent = {
-        id: m.constants.ui.contentIds.showAllGames
-        title: getTranslation("menu_tournament", {"tradeMark": ""})
-        showAllText: getTranslation("screenHome_item_showAllGames")
-        type: "n"
-        thumbnails: [m.constants.urls.fifaShowAllPoster]
-        description: container.description
-        backgrounds: [m.constants.urls.fifaShowAllBackground]
-      }
-    else if container.type = m.contentTypes.channel
-      ' create and add a new content to the contents which hold the container metadata
-      prependContent = {}
-      prependContent.append(container)
-      prependContent.delete("children")  ' need to make sure there isn't a recursion later when getContentFromCategoryJson is called
-      prependContent.posterarts = [m.generateChannelPosterUrl(container.id)]
+    if container.children.count() > 0 then
+      if screenId = m.constants.ui.screenIds.homeScreen AND container.id = m.constants.ui.categoryIds.fifawc
+        ' create and add a showAll content to the contents which hold the container metadata
+        prependContent = {
+          id: m.constants.ui.contentIds.showAllGames
+          title: getTranslation("menu_tournament", {"tradeMark": ""})
+          showAllText: getTranslation("screenHome_item_showAllGames")
+          type: "n"
+          thumbnails: [m.constants.urls.fifaShowAllPoster]
+          description: container.description
+          backgrounds: [m.constants.urls.fifaShowAllBackground]
+        }
+      else if container.type = m.contentTypes.channel
+        ' create and add a new content to the contents which hold the container metadata
+        prependContent = {}
+        prependContent.append(container)
+        prependContent.delete("children")  ' need to make sure there isn't a recursion later when getContentFromCategoryJson is called
+        prependContent.posterarts = [m.generateChannelPosterUrl(container.id)]
+      end if
     end if
 
     if prependContent <> invalid AND prependContent.id <> invalid
