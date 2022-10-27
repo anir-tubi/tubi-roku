@@ -105,13 +105,6 @@ Function init()
 End Function
 
 
-' @param bSendExposureEvent: Boolean, Should the experiment exposure event be sent? true=send event.
-Function isLikeDislikeEnabled(bSendExposureEvent = false)
-  bLikeDislikeEnabled = (getExperimentResource("roku_title_reactions", "roku_title_reactions_v3", bSendExposureEvent).enabled = true OR isLoggedInUser() = true)
-  return bLikeDislikeEnabled
-End Function
-
-
 Function setDetailStrings()
   if isLoggedInUser() = false
     m.PlayMenuItem.title = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
@@ -189,7 +182,7 @@ Function changeButtonText(sButtonStringId, sButtonText)
 
     ' Adjust the width of the menu if the Channel name, the signin button (if signin conditions), or the like/dislike button (if signin conditions) is too long for the default width
     isSignUpButton = (sButtonStringId = "stringSignUpButton" AND isLoggedInUser() = false AND isNewUser() = false)
-    isLikeButton = (sButtonStringId = "stringLikeDislikeButton" AND (isLikeDislikeEnabled() = true))
+    isLikeButton = (sButtonStringId = "stringLikeDislikeButton")
     if sButtonStringId = "stringChannelButton" OR isSignUpButton = true OR isLikeButton = true
       tempChannelMenuItem = CreateObject("roSGNode", "DetailMenuItem")
       tempChannelMenuItem.itemContent = stringNode
@@ -340,7 +333,7 @@ End Function
 
 
 Function changeLikeDislikeButtonText()
-  if isLikeDislikeEnabled() = true AND m.top.selectedContentType <> m.constants.ui.contentTypes.sportsEvent
+  if m.top.selectedContentType <> m.constants.ui.contentTypes.sportsEvent
     sButtonText = ""
     sIconUrl = ""
     if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked OR m.top.likeDislikeState = m.constants.ui.likeDislikeStates.disliked
@@ -409,12 +402,7 @@ Function onIsSeries()
   isSeries = m.top.isSeries
   episodeListIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
   signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
-  menuItems = [m.LikeDislikeMenuItem, m.signUpMenuItem, m.PlayMenuItem]
-  if isLoggedInUser() = false OR getExperimentResource("roku_title_reactions", "roku_title_reactions_v4", true).enabled = true
-    '//If a guest user (and if roku_title_reactions_v3 is enabled which is checked before OR if a registered user and roku_title_reactions_v4 is enabled,
-    '// then ensure the like/dislike button comes AFTER the episodeList button
-    menuItems = [m.signUpMenuItem, m.PlayMenuItem]
-  end if
+  menuItems = [m.signUpMenuItem, m.PlayMenuItem]
 
   '//Change the button order of the signup button depending on isSeries state
   if isLoggedInUser() = false AND isNewUser() = false AND m.top.availabilityType <> m.constants.ui.contentTimings.upcoming
@@ -509,15 +497,11 @@ Function onIsInKidsMode()
     likeDislikeButtonIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
     addRemoveMenuItem(false, likeDislikeButtonIndex)
   else
-    if isLikeDislikeEnabled(true) = true
-      '//add like/dislike button
-      nLikeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
-      if nLikeIndex = -1
-        addRemoveMenuItem(true, nLikeIndex, m.LikeDislikeMenuItem, [m.PlayMenuItem])
-      end if
-
+    '//add like/dislike button
+    nLikeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
+    if nLikeIndex = -1
+      addRemoveMenuItem(true, nLikeIndex, m.LikeDislikeMenuItem, [m.PlayMenuItem])
     end if
-
   end if
 End Function
 
@@ -592,17 +576,7 @@ Function setInitialMenuItems() As Void
   end if
 
   if m.top.selectedContentType <> m.constants.ui.contentTypes.sportsEvent
-    if isLoggedInUser() = false
-      '//as long as the user is logged out, send the like/dislike experiment exposure event here
-      if isLikeDislikeEnabled(true) = true
-        '//if the experiment is enabled then add the add like button for a guest user
-        menuItems.appendChild(m.LikeDislikeMenuItem)
-      end if
-
-    else
-      menuItems.appendChild(m.LikeDislikeMenuItem)
-    end if
-
+    menuItems.appendChild(m.LikeDislikeMenuItem)
   end if
 
   menuItems.appendChild(m.AddQueueMenuItem)
@@ -750,25 +724,21 @@ End Function
 ' @return boolean, Should the menu be seen? (The function will ensure the menu is made visible if it should and not if it should not.)
 Function setVisibilityOfSecondaryMenu()
   result = false
+  itemFocused = m.Menu.content.getChild(m.Menu.itemFocused)
+  if m.SecondaryMenu.isInFocusChain() = true OR (m.Menu.isInFocusChain() = true AND itemFocused <> invalid AND itemFocused.id = "LikeDislikeMenuItem" AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing)
+    alignSecondaryMenuWithMenu()
 
-  if isLikeDislikeEnabled() = true
-    itemFocused = m.Menu.content.getChild(m.Menu.itemFocused)
-    if m.SecondaryMenu.isInFocusChain() = true OR (m.Menu.isInFocusChain() = true AND itemFocused <> invalid AND itemFocused.id = "LikeDislikeMenuItem" AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing)
-      alignSecondaryMenuWithMenu()
-
-      m.SecondaryMenu.visible = true
-      m.Menu.focusFootprintBlendColor = m.constants.ui.colors.selectedListItem
-      m.Menu.focusFootprintBitmapUri = "pkg://images/menu-focus-fhd.9.png"
-      if m.constants.deviceInfo.scaledUi = true
-        m.Menu.focusFootprintBitmapUri = "pkg://images/menu-focus-hd.9.png"
-      end if
-
-      result = true
-    else
-      m.SecondaryMenu.visible = false
-      m.Menu.focusFootprintBitmapUri = ""
+    m.SecondaryMenu.visible = true
+    m.Menu.focusFootprintBlendColor = m.constants.ui.colors.selectedListItem
+    m.Menu.focusFootprintBitmapUri = "pkg://images/menu-focus-fhd.9.png"
+    if m.constants.deviceInfo.scaledUi = true
+      m.Menu.focusFootprintBitmapUri = "pkg://images/menu-focus-hd.9.png"
     end if
 
+    result = true
+  else
+    m.SecondaryMenu.visible = false
+    m.Menu.focusFootprintBitmapUri = ""
   end if
 
   return result
