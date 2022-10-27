@@ -49,6 +49,16 @@ function createManifest(options, filename, manifestName) {
  */
 function createSettings(options, filename) {
   const data = load(options);
+
+  // If a testingTimeOffset is specified then we need to calculate what the time offset is from the current time
+  if (data.settings.testingTimeOffset) {
+    // This is the time the app will treat as the current time when the app is compiled, based on the value passed from the yml settings
+    const requestedAppStartTimeStamp = Math.trunc(new Date(data.settings.testingTimeOffset).getTime() / 1000);
+
+    // Now we subtract the current time to figure out our offset
+    data.settings.testingTimeOffset = Math.trunc(requestedAppStartTimeStamp - Date.now() / 1000);
+  }
+
   const functions = Object.keys(data).map(key => genConfigFunction(key, data[key]));
   fs.writeFileSync(filename, functions.join('\n'));
   log(`Generated the file: ${filename}.`);

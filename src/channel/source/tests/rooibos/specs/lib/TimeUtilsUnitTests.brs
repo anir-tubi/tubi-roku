@@ -13,7 +13,7 @@ End Function
 Function timeUtils_getCurrentUTCTime_test()
   dt = CreateObject("roDateTime")
   now = dt.AsSeconds()
-  diff = getCurrentUTCTime() - now
+  diff = getCurrentUTCTime(invalid) - now
   ' check if current time retured by getCurrentUTCTime is very close to current time
   m.AssertTrue(diff < 2)
 End Function
@@ -24,7 +24,7 @@ Function timeUtils_getCurrentLocalTime_test()
   dt = CreateObject("roDateTime")
   dt.ToLocalTime()
   now = dt.AsSeconds()
-  diff = getCurrentLocalTime() - now
+  diff = getCurrentLocalTime(invalid) - now
 
   'Check if local Time returned by getCurrentLocalTime is very close to current time
   m.AssertTrue(diff < 2)

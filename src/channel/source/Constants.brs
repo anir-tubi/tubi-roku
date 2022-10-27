@@ -1377,10 +1377,13 @@ Function getConstants()
       constants.deeplinks.entrypoints.video = "video"
 
       constants.tournament = {}
+      constants.tournament.startDate = "2022-11-20T20:00:00Z"
+      constants.tournament.endDate = "2022-12-18T20:00:00Z"
+      constants.tournament.clearRegistryDate = "2023-01-04T20:00:00Z"
 
-        constants.tournament.startDate = "2022-11-20T20:00:00Z"
-        constants.tournament.endDate = "2022-12-18T20:00:00Z"
-        constants.tournament.clearRegistryDate = "2023-01-04T20:00:00Z"
+      constants.time = {}
+      constants.time.magicLinkStartDate = "2022-11-14T20:00:00Z"
+      constants.time.magicLinkEndDate = "2022-12-19T20:00:00Z"
 
   return constants
 end Function

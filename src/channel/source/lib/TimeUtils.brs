@@ -1,12 +1,24 @@
+'******************************************************
+'
+'returns time offset for testing purposes if it has been specified
+'******************************************************
+
+Function getTestingTimeOffset(constants) as integer
+  if constants <> invalid AND constants.settings.mode <> "production" AND isNumber(constants.settings.testingTimeOffset) = true then
+    return constants.settings.testingTimeOffset
+  end if
+  return 0
+End Function
+
 
 '******************************************************
 '
 'returns current time in UTC seconds
 '******************************************************
 
-Function getCurrentUTCTime() as integer
+Function getCurrentUTCTime(constants) as integer
   now = CreateObject("roDateTime")
-  return now.AsSeconds()
+  return now.AsSeconds() + getTestingTimeOffset(constants)
 End Function
 
 '******************************************************
@@ -14,10 +26,10 @@ End Function
 'returns current time in UTC seconds
 '******************************************************
 
-Function getCurrentLocalTime() as integer
+Function getCurrentLocalTime(constants) as integer
   now = CreateObject("roDateTime")
   now.ToLocalTime()
-  return now.AsSeconds()
+  return now.AsSeconds() + getTestingTimeOffset(constants)
 End Function
 
 

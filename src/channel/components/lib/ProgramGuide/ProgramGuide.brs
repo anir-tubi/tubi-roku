@@ -231,7 +231,7 @@ End Function
 Function onUpdateMinsLeftTimer()
   tubiLog("ProgramGrid.onUpdateMinsLeftTimer")
   content = m.programGrid.content
-  now = getCurrentLocalTime()
+  now = getCurrentLocalTime(m.constants)
 
 
 
