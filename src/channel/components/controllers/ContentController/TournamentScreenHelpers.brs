@@ -46,6 +46,7 @@ Function showTournamentScreen(constants, componentToFocus = "")
     tournamentScreen.id = screenID
     tournamentScreen.observeFieldScoped("backgroundUriList", "ontournamentScreenBackgroundChange")
     tournamentScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+    tournamentScreen.observeFieldScoped("programGuideNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     tournamentScreen.observeFieldScoped("programGuidecomponentInteractionInfo", "onComponentInteractionInfoChange")
     tournamentScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     tournamentScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")

@@ -170,7 +170,6 @@ Function onLinearChannelFocused()
     if content <> invalid AND content.title <> invalid
       m.top.linearChannelFocused = content
       populateInfoPanel(m.epgTimeGrid.linearChannelFocused)
-      sendNavigateWithinPageEvent()
     end if
   end if
 End Function
@@ -710,18 +709,6 @@ Function sendNavigateWithinPageEvent()
         horizontal_location_mode: "INDEX" 'LocationMode enum
       }
     end if
-
-  else if m.top.focusedComponent = m.constants.ui.tournamentScreen.focusItems.epgTimeGrid
-
-    if m.top.isPreTournament = true
-      m.top.navigateWithinPageInfo = m.top.programGuideNavigateWithinPageInfo
-    else
-      if m.top.programGuideNavigateWithinPageInfo <> invalid
-        m.top.programGuideNavigateWithinPageInfo.vertical_location = m.numRowsInCategoryGridList + 1 ' epg is last row
-        m.top.navigateWithinPageInfo = m.top.programGuideNavigateWithinPageInfo
-      end if
-    end if
-
   end if
 End Function
 
