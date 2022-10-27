@@ -1002,8 +1002,8 @@ Function getTranslation_en_US()
       "message": "Like or Dislike"
     },
     "screenDetails_button_see_all_games": {
-      "description": "Label of button to allow users to see all the games in the current video title",
-      "message": "See All Games"
+      "description": "Label of button to allow users to a new page where they can see all the games related to the current sports title",
+      "message": "See All Matches"
     },
     "screenDetails_button_sign_in_to_set_reminder": {
       "description": "Label of button to allow users to set the reminder to the current video title when the user is not signed in.",
