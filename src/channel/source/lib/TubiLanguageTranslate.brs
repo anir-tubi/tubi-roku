@@ -2287,6 +2287,54 @@ Function getTranslation_es_MX()
       "description": "shortened version Sunday, formatted with , and a space",
       "message": "Dom, "
     },
+    "short_version_date_format_1": {
+      "description": "Shortened version of date format for the month of January",
+      "message": "ene {day}, {year}"
+    },
+    "short_version_date_format_2": {
+      "description": "Shortened version of date format for the month of February",
+      "message": "feb {day}, {year}"
+    },
+    "short_version_date_format_3": {
+      "description": "Shortened version of date format for the month of March",
+      "message": "mar {day}, {year}"
+    },
+    "short_version_date_format_4": {
+      "description": "Shortened version of date format for the month of April",
+      "message": "abr {day}, {year}"
+    },
+    "short_version_date_format_5": {
+      "description": "Shortened version of date format for the month of May",
+      "message": "may {day}, {year}"
+    },
+    "short_version_date_format_6": {
+      "description": "Shortened version of date format for the month of June",
+      "message": "jun {day}, {year}"
+    },
+    "short_version_date_format_7": {
+      "description": "Shortened version of date format for the month of July",
+      "message": "jul {day}, {year}"
+    },
+    "short_version_date_format_8": {
+      "description": "Shortened version of date format for the month of August",
+      "message": "ago {day}, {year}"
+    },
+    "short_version_date_format_9": {
+      "description": "Shortened version of date format for the month of September",
+      "message": "sep {day}, {year}"
+    },
+    "short_version_date_format_10": {
+      "description": "Shortened version of date format for the month of October",
+      "message": "oct {day}, {year}"
+    },
+    "short_version_date_format_11": {
+      "description": "Shortened version of date format for the month of November",
+      "message": "nov {day}, {year}"
+    },
+    "short_version_date_format_12": {
+      "description": "Shortened version of date format for the month of December",
+      "message": "dic {day}, {year}"
+    },
     "channelGuide_error_fetchContent_description": {
       "description": "Onscreen message to indicate channel Guide content could not be loaded",
       "message": "No se pudo cargar el guía de canales."
@@ -2342,6 +2390,10 @@ Function getTranslation_es_MX()
     "screenDetails_button_set_reminder": {
       "description": "Label of button to allow users to set the reminder to the current video title when the user is signed in.",
       "message": "Programar recordatorio"
+    },
+    "screenDetails_button_remove_reminder": {
+      "description": "Label of button to indicate the users that reminder is set on the current video title",
+      "message": "Eliminar Recordatorio"
     },
     "screenDetails_button_resume": {
       "description": "Label of button to allow users to resume the current video title",
@@ -2785,14 +2837,6 @@ Function getTranslation_es_MX()
       "description": "Label displayed on onBoarding welcome screen",
       "message": "Bienvenido a películas ilimitadas,\nSeries y TV en Vivo"
     },
-    "show_all_games_gameInfo": {
-      "description": "Text displayed on Fifa World Cup 2022 infopanel second line when Show all games is focused",
-      "message": "20 de nov, de 2022 - 18 de dic, de 2022"
-    },
-    "show_all_games_description": {
-      "description": "Description displayed on Fifa World Cup 2022 infopanel when Show all games is focused",
-      "message": "La Copa Mundial de la FIFA, que se celebra cada cuatro años, cuenta con la participación de 32 naciones que compiten por el título."
-    },
     "onBoarding_welcomeScreen_description": {
       "description": "Description displayed on onBoarding welcome screen",
       "message": "Para todas tus necesidades de entretenimiento, Noticias y Deportes.\nSiempre gratis. Sin suscripción. 100% legal."
@@ -2856,6 +2900,22 @@ Function getTranslation_es_MX()
     "explore_fifa_description": {
       "description": "description displayed on fifa intro modal",
       "message": "Llamando a todos los aficionados del fútbol! Ver el Mundial de la FIFA 2022 gratis en Tubi. Crea una cuenta para acceder a todos los partidos. No se requiere tarjeta de crédito. Sin suscripciones."
+    },
+    "replay": {
+      "description": "This label used for badge to indicate the content availability",
+      "message": "Repetición"
+    },
+    "show_all_games_gameInfo": {
+      "description": "Text displayed on Fifa World Cup 2022 infopanel second line when Show all games is focused",
+      "message": "20 de nov, de 2022 - 18 de dic, de 2022"
+    },
+    "show_all_games_description": {
+      "description": "Description displayed on Fifa World Cup 2022 infopanel when Show all games is focused",
+      "message": "La Copa Mundial de la FIFA, que se celebra cada cuatro años, cuenta con la participación de 32 naciones que compiten por el título."
+    },
+    "info_panel_reminder_is_set": {
+      "description": "Hint in the content metadata area informing the user that the reminder is set for this content",
+      "message": "Recordatorio programado"
     }
   }
 End Function
