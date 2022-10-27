@@ -83,6 +83,9 @@ Function tensorApi_getTournamentReqInfo()
   url = m.constants.urls.tensor.tournamentscreen
 
   options = m.commonOptions()
+  ' hardcode value 70 to cover all the FIFA matches in the FIFA container instead of using "constants.performance.categoryGridList.finalBlockSize"
+  ' which limits the count 50 on lower end devices
+  options.params["contents_limit"] = 70
   return {
     url: url
     options: options
