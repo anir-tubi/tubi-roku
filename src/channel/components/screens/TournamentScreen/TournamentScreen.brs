@@ -567,11 +567,13 @@ Function onKeyEvent(key As string, press As boolean) As boolean
       else
         if m.categoryGridList.isInFocusChain() = true
           setFocusOntoTopNav(true)
+          setComponentInteractionEventForCategoryGrid("TOGGLE_OFF")
           return true
         else if m.epgTimeGrid.isInFocusChain() = true
           componentUPAnimation()
           setFocusOnCategoryGrid()
           setComponentInteractionEventForEPG("TOGGLE_OFF")
+          setComponentInteractionEventForCategoryGrid("TOGGLE_ON")
           return true
         end if
       end if
@@ -593,6 +595,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
         if m.TopNav.isInFocusChain() = true
           if m.top.focusedComponent = m.constants.ui.tournamentScreen.focusItems.categoryGridList
             setFocusOnCategoryGrid()
+            setComponentInteractionEventForCategoryGrid("TOGGLE_ON")
           else
             setFocusOnEPGTimeGrid()
             setComponentInteractionEventForEPG("TOGGLE_ON")
@@ -601,6 +604,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
         else if m.categoryGridList.isInFocusChain() = true
           componentDownAnimation()
           setFocusOnEPGTimeGrid()
+          setComponentInteractionEventForCategoryGrid("TOGGLE_OFF")
           setComponentInteractionEventForEPG("TOGGLE_ON")
           return true
         end if
@@ -809,6 +813,31 @@ Function setComponentInteractionEventForEPG(userInteraction)
       user_interaction: userInteraction
     }
 
+    m.top.componentInteractionInfo = componentInteractionInfo
+  end if
+End Function
+
+
+Function setComponentInteractionEventForCategoryGrid(userInteraction)
+
+  if m.CategoryGridList.itemFocused <> invalid AND m.categoryGridList.focusedPosition <> invalid
+
+    componentInfo = getTrackingComponentInfoOfCategoryGridList(m.categoryGridList.itemFocused, m.categoryGridList.focusedPosition)
+
+    pageType = ""
+    if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pagetype <> invalid
+      pageType = m.top.trackingPageInfo.pagetype
+    end if
+    pageValues = {}
+    if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pageValues <> invalid
+      pageValues = m.top.trackingPageInfo.pageValues
+    end if
+
+    componentInteractionInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
+      componentOneof: m.Tracking.getAnalyticsComponent(componentInfo.componentType, componentInfo.componentValues)
+      user_interaction: userInteraction
+    }
     m.top.componentInteractionInfo = componentInteractionInfo
   end if
 End Function
