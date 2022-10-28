@@ -81,6 +81,10 @@
        -->
       <field id="isFullWidth" type="boolean" value="true" />
 
+      <!-- set to true if the user is signed in and we want to change the experience based on that -->
+      <field id="signedIn" type="boolean" value="false" />
+
+
     <!-- OUTPUT -->
       <field id="itemSelected" type="node"/>
 

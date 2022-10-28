@@ -180,20 +180,15 @@ Function changeButtonText(sButtonStringId, sButtonText)
       stringNode.badgeText = ""
     end if
 
-    ' Adjust the width of the menu if the Channel name, the signin button (if signin conditions), or the like/dislike button (if signin conditions) is too long for the default width
-    isSignUpButton = (sButtonStringId = "stringSignUpButton" AND isLoggedInUser() = false AND isNewUser() = false)
-    isLikeButton = (sButtonStringId = "stringLikeDislikeButton")
-    if sButtonStringId = "stringChannelButton" OR isSignUpButton = true OR isLikeButton = true
-      tempChannelMenuItem = CreateObject("roSGNode", "DetailMenuItem")
-      tempChannelMenuItem.itemContent = stringNode
+    ' Adjust the width of the menu if text of the button is too long for the default width. Mostly spanish text are generally longer in length.
+    tempChannelMenuItem = CreateObject("roSGNode", "DetailMenuItem")
+    tempChannelMenuItem.itemContent = stringNode
 
-      potentialWidth = tempChannelMenuItem.calculatedTextWidth + tempChannelMenuItem.leftTextPadding + tempChannelMenuItem.rightTextPadding
-      if potentialWidth > m.defaultMenuWidth AND potentialWidth > m.Menu.itemSize[0]
-        m.Menu.itemSize = [potentialWidth, m.Menu.itemSize[1]]
-        '//move SecondaryMenu to ensure it is not overlapping the Menu
-        m.SecondaryMenu.translation = [potentialWidth + 200, m.SecondaryMenu.translation[1]]
-      end if
-
+    potentialWidth = tempChannelMenuItem.calculatedTextWidth + tempChannelMenuItem.leftTextPadding + tempChannelMenuItem.rightTextPadding
+    if potentialWidth > m.defaultMenuWidth AND potentialWidth > m.Menu.itemSize[0]
+      m.Menu.itemSize = [potentialWidth, m.Menu.itemSize[1]]
+      '//move SecondaryMenu to ensure it is not overlapping the Menu
+      m.SecondaryMenu.translation = [potentialWidth + 200, m.SecondaryMenu.translation[1]]
     end if
 
   end if

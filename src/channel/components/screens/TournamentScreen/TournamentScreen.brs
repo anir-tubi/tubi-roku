@@ -377,6 +377,7 @@ Function onContentUpdated()
       m.top.categoryContent = m.top.content.getChild(1).clone(true)
       m.numRowsInCategoryGridList = m.top.categoryContent.getChildCount() - 1
       m.categoryGridList.content = m.top.categoryContent
+      m.categoryGridList.signedIn = m.top.signedIn
       m.categoryGridList.visible = true
       m.categoryGridList.contentUpdated = true
     end if

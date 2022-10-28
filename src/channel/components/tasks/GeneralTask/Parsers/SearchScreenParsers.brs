@@ -10,8 +10,17 @@ Function parseDefaultSearchSuccess(fullResponse, reqInfo)
   orientation = m.constants.ui.gridItemTypes.portrait
   bFullData = true
   contentMode = invalid
+  isSignedInUser = false
+  screenId = m.constants.ui.screenIds.searchScreen
 
   if reqInfo <> invalid AND reqInfo.options <> invalid
+    if reqInfo.isSignedInUser <> invalid
+      isSignedInUser = reqInfo.isSignedInUser
+    end if
+
+    if reqInfo.screenId <> invalid
+      screenId = reqInfo.screenId
+    end if
 
     options = reqInfo.options
     if options <> invalid AND options.params <> invalid
@@ -20,7 +29,7 @@ Function parseDefaultSearchSuccess(fullResponse, reqInfo)
 
   end if
 
-  convertedMetadata = metadataTranslate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode)
+  convertedMetadata = metadataTranslate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, screenId, isSignedInUser)
 
   return convertedMetadata
 End Function

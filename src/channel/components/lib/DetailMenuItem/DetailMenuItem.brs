@@ -37,47 +37,43 @@ Function onItemContentChange()
   tubiLog("DetailMenuItem.onItemContentChange")
   if m.top.itemContent <> invalid then
 
-    if m.top.itemContent.id = "signUpMenuItem"
-      'If the button has title and BadgeText, calculated width will be width of both title and badgeText to avoid button crop. To get the
-      'calculated width we are assigning the title and badgeText to the m.DetailsMenuText and get the calculated value
-      'and after setting the calculatedWidth resetting m.DetailsMenuText.text to title.
-      m.DetailsMenuText.text = m.top.itemContent.title + m.top.itemContent.badgeText
-      iconWidth = 0
-      'adding extra width for focus if icon is present
-      if m.top.itemContent.iconUrl <> invalid AND m.top.itemContent.iconUrl <> ""
-        iconWidth = 36
-      end if
-      m.top.calculatedTextWidth = m.DetailsMenuText.boundingRect().width + iconWidth
-      m.DetailsMenuText.text = m.top.itemContent.title
-    else
-      m.DetailsMenuText.text = m.top.itemContent.title
-      m.top.calculatedTextWidth = m.DetailsMenuText.boundingRect().width
+    item = m.top.itemContent
+    'If the button has title and BadgeText, calculated width will be width of both title and badgeText to avoid button crop. To get the
+    'calculated width we are assigning the title and badgeText to the m.DetailsMenuText and get the calculated value
+    'and after setting the calculatedWidth resetting m.DetailsMenuText.text to title.
+    m.DetailsMenuText.text = item.title + item.badgeText
+    iconWidth = 0
+    'adding extra width for focus if icon is present
+    if item.iconUrl <> invalid AND item.iconUrl <> ""
+      iconWidth = 36
     end if
+    m.top.calculatedTextWidth = m.DetailsMenuText.boundingRect().width + iconWidth
+    m.DetailsMenuText.text = item.title
 
-    m.Icon.uri = m.top.itemContent.iconUrl
+    m.Icon.uri = item.iconUrl
 
-    m.buttonBG.visible = m.top.itemContent.isUnfocusedFootprintEnabled
+    m.buttonBG.visible = item.isUnfocusedFootprintEnabled
 
-    if m.top.itemContent.playstart <> invalid AND m.top.itemContent.playstart <> 0.0 AND m.top.itemContent.length <> invalid AND m.top.itemContent.length <> 0.0 then
-      showProgressBar(m.top.itemContent.playstart / m.top.itemContent.length)
+    if item.playstart <> invalid AND item.playstart <> 0.0 AND item.length <> invalid AND item.length <> 0.0 then
+      showProgressBar(m.top.itemContent.playstart / item.length)
     else
       m.Progress.visible = false
     end if
     m.top.calculatedWidth = m.top.calculatedTextWidth + m.DetailsMenuText.translation[0]
 
     'Move the translation of Button text to left when there is no image
-    if m.top.itemContent.id = "signUpMenuItem" AND m.top.itemContent.iconUrl = ""
+    if item.id = "signUpMenuItem" AND item.iconUrl = ""
       m.DetailsMenuText.translation = [22, 0]
     else
       m.DetailsMenuText.translation = [72, 0]
     end if
     calculatedWidth = m.DetailsMenuText.boundingRect().width + m.DetailsMenuText.translation[0]
-    if m.top.itemContent.badgeText <> ""
+    if item.badgeText <> ""
       m.badgeLabel.fontColor = "0x10141F"
       m.badgeLabel.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
       m.badgeLabel.fontSize = 18
       m.badgeLabel.padding = [12, 9]
-      m.badgeLabel.text = m.top.itemContent.badgeText
+      m.badgeLabel.text = item.badgeText
       m.badgeLabel.visible = true
       m.badgeLabel.translation = [calculatedWidth + 20, 20]
     else
@@ -85,7 +81,7 @@ Function onItemContentChange()
     end if
 
     'Adjusting the DetailsMenuText text to center when there is no icoUrl and badge label text.
-    if m.top.itemContent.align = "center"
+    if item.align = "center"
       xTranslation = (m.top.width - m.top.calculatedTextWidth) / 2
       m.DetailsMenuText.translation = [xTranslation, 0]
     end if

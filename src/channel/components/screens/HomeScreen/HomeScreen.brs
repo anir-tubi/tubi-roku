@@ -276,6 +276,7 @@ End Function
 Function onSignedInChange()
   tubiLog("HomeScreen.onSignedInChange")
   onRefreshTopNav()
+  m.CategoryGridList.signedIn = m.top.signedIn
 End Function
 
 

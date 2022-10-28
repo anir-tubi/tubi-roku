@@ -62,6 +62,7 @@ Function onSearchTextChanged(msg)
       successCallback: onSearchSuccessResponse
       errorCallback: onSearchErrorResponse
       responseType: "node"
+      screenId: m.constants.ui.screenIds.searchScreen
       isSignedInUser: isLoggedInUser()
     })
 
@@ -82,7 +83,8 @@ Function onSearchTextChanged(msg)
       successCallback: onSearchDefaultSuccessResponse
       errorCallback: onSearchDefaultErrorResponse
       responseType: "node"
-      isSignedInUser: isLoggedInUser
+      screenId: m.constants.ui.screenIds.searchScreen
+      isSignedInUser: isLoggedInUser()
     })
 
   end if
