@@ -52,7 +52,7 @@
       <field id="rowRemoved" type="string" alias="CategoryGridList.rowRemoved" />
 
       <!-- set to true if the user is signed in and we want to change the experience based on that -->
-      <field id="signedIn" type="boolean" value="false" />
+      <field id="signedIn" alias="CategoryGridList.signedIn" />
 
       <!-- show/hide the category menu -->
       <field id="categoryMenuVisible" type="boolean"/>

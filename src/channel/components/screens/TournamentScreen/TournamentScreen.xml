@@ -38,7 +38,7 @@
       <field id="isLoading" type="boolean" />
 
       <!-- set to true if the user is signed in and we want to change the experience based on that -->
-      <field id="signedIn" type="boolean" value="false" />
+      <field id="signedIn" alias="CategoryGridList.signedIn" />
 
       <!-- should the topNav refresh? -->
       <field id="refreshTopNav" type="boolean" alwaysNotify="true" />
