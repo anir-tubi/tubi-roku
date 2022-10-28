@@ -1,15 +1,19 @@
 Function init()
   tubiLog("LinearVideoPlayerScreen.init")
+  m._ = rodash()
 
   ' handle BaseScreen functionality (see BaseScreen.xml)
   m.constants = getConstantsFromGlobal()
   m.metadataTranslate = TubiMetadataTranslate(m.constants)
   m.top.screenLevel = m.constants.ui.screenLevels.linearVideoPlayerScreen
-  m.top.trackingPageInfo = {
+
+  trackingPageInfo = {
     pageType: "video_player_page"
     pageValues: {}
   }
-  m._ = rodash()
+  m.top.trackingPageInfo = trackingPageInfo
+  m.top.trackingPageContext = trackingPageInfo
+
   m.NodeHelpers = TubiNodeHelpers()
   m.theme = m.global.theme
   m.ProgrammingData = m.top.findNode("ProgrammingData")
@@ -178,7 +182,7 @@ Function onContentChange() as void
   if m.top.content <> invalid
     'set page tracking values for analytics
     m.top.trackingPageInfo = {
-      pageType: m.top.trackingPageInfo.pageType
+      pageType: "video_player_page"
       pageValues: {
         video_id: m.top.content.id.toInt()
       }
@@ -835,8 +839,8 @@ Function getPlayProgressEvent()
     end if
 
     pageType = ""
-    if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pageType <> invalid
-      pageType = m.top.trackingPageInfo.pageType
+    if m.top.trackingPageContext <> invalid AND m.top.trackingPageContext.pageType <> invalid
+      pageType = m.top.trackingPageContext.pageType
     end if
 
     playProgressEvent = {

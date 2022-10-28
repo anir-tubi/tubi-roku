@@ -32,7 +32,6 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         videoPlayer.observeFieldScoped("visible", "onLinearVideoPlayerVisibleFullscreenChange")
         videoPlayer.observeFieldScoped("refreshChannels", "onChannelsRequested")
         videoPlayer.observeFieldScoped("fullscreen", "onLinearVideoPlayerVisibleFullscreenChange")
-        videoPlayer.observeFieldScoped("userDisplayingChannelGuide", "onChannelGuideVisibleStateChangedByUser")
         videoPlayer.observeFieldScoped("channelSelectedUpdated", "onLinearChannelSelectedFromGuide")
         videoPlayer.observeFieldScoped("linearOverlayNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
         videoPlayer.observeFieldScoped("linearOverlayComponentInteractionInfo", "onComponentInteractionInfoChange")
@@ -44,7 +43,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
 
       screen = getFromScreenCache(sAssociatedScreenID)
       if screen <> invalid
-        videoPlayer.trackingPageInfo = screen.trackingPageInfo
+        videoPlayer.trackingPageContext = screen.trackingPageInfo
       end if
 
       unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
@@ -210,11 +209,12 @@ Function maximizeLinearPlayer(content)
     if videoPlayer.fullscreen = false
       '//stop the background artwork from transitioning and from displaying while player is in fullscreen. We can't use shouldRotateBackgrounds because we still need the gradients from backgroundGroup
       sBackgroundType = m.constants.ui.backgroundTypes.epg
-
       m.backgroundGroup.backgroundInfo = {
         type: sBackgroundType
         uriList: []
       }
+
+      videoPlayer.trackingPageContext = videoPlayer.trackingPageInfo
       m.backgroundGroup.posterVisible = true
       showHideLinearVideoPlayerSpinner(false)
       videoPlayer.loading = false
@@ -484,6 +484,12 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
   tubiLog("LinearVideoPlayerScreenHelpers.animateLinearVideoPlayerToMinState")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
+
+    screen = getFromScreenCache(videoPlayer.associatedScreenID)
+    if screen <> invalid
+      videoPlayer.trackingPageContext = screen.trackingPageInfo
+    end if
+
     videoPlayer.fullscreen = false
     videoPlayer.unobserveFieldScoped("state")
     videoPlayer.observeFieldScoped("state", "onLinearVideoPlayerStateWhileInMinState")
@@ -750,43 +756,6 @@ Function reactToLinearVideoPlayerErrorStateInNonFullscreenState()
   stopAndHideLinearVideoPlayer()
   homescreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
   setHomeScreenBackground(homescreen)
-End Function
-
-
-' When the user purposely opens or closes the channel guide (userDisplayingChannelGuide), then this handler will be called.
-Function onChannelGuideVisibleStateChangedByUser(msg)
-  tubiLog("LinearVideoPlayerScreenHelpers.onChannelGuideVisibleStateChangedByUser")
-  bChannelGuideVisible = msg.getData()
-
-  event = invalid
-  pageType = ""
-  pageValues = {}
-  screen = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-
-  if screen <> invalid AND screen.trackingPageInfo <> invalid AND screen.trackingComponentInfo <> invalid AND screen.trackingComponentInfo.componentValues <> invalid
-    pageType = screen.trackingPageInfo.pageType
-    pageValues = screen.trackingPageInfo.pageValues
-
-    componentInfo = screen.trackingComponentInfo.componentValues
-
-    toggle = ""
-    if bChannelGuideVisible = true
-      toggle = "TOGGLE_ON"
-    else
-      toggle = "TOGGLE_OFF"
-    end if
-
-    event = {
-      type: "component_interaction"
-      values: {
-        pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
-        componentOneof: m.Tracking.getAnalyticsComponent(screen.trackingComponentInfo.componentType, componentInfo)
-        user_interaction: toggle
-      }
-    }
-
-    m.trackingLoggingTask.trackEvent = event
-  end if
 End Function
 
 

@@ -93,9 +93,6 @@
       <!-- If true, then the player is currently playing the channel guide -->
       <field id="displayingChannelGuide" type="boolean" />
 
-      <!-- Has the user purposely told the channel guide to open? -->
-      <field id="userDisplayingChannelGuide" type="boolean"  alwaysNotify="true" />
-
       <field id="state" type="string" />
 
       <!-- Used to store the loading state. It should not be used as an observed field. -->
@@ -130,6 +127,12 @@
 
       <!-- Pass through LinearVideoPlayerOverlay component events to LinearVideoPlayerScreen helper -->
       <field id="linearOverlayComponentInteractionInfo" alias="VideoOverlay.programGuidecomponentInteractionInfo" />
+
+      <!-- holds the information of the screen the video is playing in.  This could be the linear video player
+           screen or it could be the homescreen (playing as a minimized version). The format is the same as
+           trackingPageInfo (see BaseScreen.xml)
+      -->
+      <field id="trackingPageContext" type="assocarray" />
   </interface>
 
   <children>
