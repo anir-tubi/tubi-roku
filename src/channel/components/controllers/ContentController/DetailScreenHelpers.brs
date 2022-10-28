@@ -897,22 +897,28 @@ Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
     if isLoggedInUser() = false
 
       content = getDetailScreenContent(detailScreen)
-      dialogEvent = getDetailScreenDialogAnalyticEvent(content, "ADD_TO_QUEUE", "sign-in-bookmark", m.constants)
+
 
       title = getTranslation("screenDetails_error_addQueue_title")
+      dialogType = "ADD_TO_QUEUE"
+      dialogSubType = "sign-in-bookmark"
       if content.type = m.constants.ui.contentTypes.series
         message = getTranslation("screenDetails_error_addQueueSeries_description")
-      else if content.availabilityType = m.constants.ui.contentTimings.upcoming
+      else if detailScreen.availabilityType = m.constants.ui.contentTimings.upcoming
+        dialogType = "SIGNIN_REQUIRED"
+        dialogSubType = "set_reminder"
         message = getTranslation("screenDetails_error_setReminderSports_description")
-      else if content.availabilityType = m.constants.ui.contentTimings.replay
+      else if detailScreen.availabilityType = m.constants.ui.contentTimings.replay
         message = getTranslation("screenDetails_error_addQueueSports_description")
       else
         message = getTranslation("screenDetails_error_addQueueMovie_description")
       end if
 
+      dialogEvent = getDetailScreenDialogAnalyticEvent(content, dialogType, dialogSubType, m.constants)
+
       buttons = [getTranslation("dialog_button_continue"), getTranslation("dialog_button_cancel")]
       showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, addToQueueSignInSelected)
-    else if detailScreen <> invalid AND detailScreen.isWaitingForServerResponse <> true
+    else if detailScreen.isWaitingForServerResponse <> true
       detailScreen.stringQueueButton = getTranslation("screenDetails_button_queueNow")
 
       authInfo = getFieldFromGlobal("authInfo")
@@ -924,8 +930,8 @@ Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
       contentType = ""
       typeOfQueue = m.constants.userQueueType.watchLater
       content = detailScreen.content
-      if content <> invalid and content.availabilityType = m.constants.ui.contentTimings.upcoming
-        setComponentInteractionEventForReminder(detailScreen, "on")
+      if detailScreen.availabilityType = m.constants.ui.contentTimings.upcoming
+        setComponentInteractionEventForReminder(detailScreen, true)
         typeOfQueue = m.constants.userQueueType.remindMe
       else
         typeOfQueue = m.constants.userQueueType.watchLater
@@ -987,7 +993,7 @@ Function bookmarkFailed(detailScreen, addBookmarkResult)
   ' set up the error modal dialog
   errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.addBookmarkError, responseCode)
   message = ""
-  if content.availabilityType = m.constants.ui.contentTimings.upcoming
+  if detailScreen.availabilityType = m.constants.ui.contentTimings.upcoming
     dialogEvent = getDetailScreenDialogAnalyticEvent(content, "SET_REMINDER", errorCode, m.constants)
 
     if isLoggedInUser() = false
@@ -1004,7 +1010,7 @@ Function bookmarkFailed(detailScreen, addBookmarkResult)
       message = getTranslation("screenDetails_error_queueSeries_description")
     else if content.type = m.constants.ui.contentTypes.movie
       message = getTranslation("screenDetails_error_queueMovie_description")
-    else if content.availabilityType = m.constants.ui.contentTimings.replay
+    else if detailScreen.availabilityType = m.constants.ui.contentTimings.replay
       message = getTranslation("screenDetails_error_noQueueReplay_description")
     end if
 
@@ -1045,7 +1051,7 @@ Function onBookmarkedAfterSignIn(response)
       if isNonEmptyString(detailScreen.title) = true
         title = detailScreen.title
       end if
-      if content.availabilityType <> invalid and content.availabilityType = m.constants.ui.contentTimings.upcoming
+      if detailScreen.availabilityType <> invalid and detailScreen.availabilityType = m.constants.ui.contentTimings.upcoming
         description = getTranslation("screenDetails_queue_added_to_reminder_list_description", {"upcomingTitle": title})
       else
         description = getTranslation("screenDetails_queue_added_to_list_description", {"contentTitle": title})
@@ -1178,7 +1184,9 @@ Function onRemoveFromQueue(detailScreen)
       if content.type = m.constants.ui.contentTypes.video
         contentType = m.constants.uapiContentTypes.movie
       else if content.type = m.constants.ui.contentTypes.sportsEvent
-        setComponentInteractionEventForReminder(detailScreen, "off")
+        if detailScreen.availabilityType = m.constants.ui.contentTimings.upcoming
+          setComponentInteractionEventForReminder(detailScreen, false)
+        end if
         contentType = m.constants.uapiContentTypes.sportsEvent
       else
         contentType = content.type
@@ -2209,9 +2217,9 @@ Function removeFromQueueErrorResponse(error)
     message = getTranslation("screenDetails_error_noQueueMovie_description")
     if content <> invalid AND content.type = m.constants.ui.contentTypes.series
       message = getTranslation("screenDetails_error_noQueueSeries_description")
-    else if content <> invalid AND content.availabilityType = m.constants.ui.contentTimings.upcoming
+    else if content <> invalid AND detailScreen.availabilityType = m.constants.ui.contentTimings.upcoming
       message = getTranslation("screenDetails_error_noQueueUpcoming_description")
-    else if content <> invalid AND content.availabilityType = m.constants.ui.contentTimings.replay
+    else if content <> invalid AND detailScreen.availabilityType = m.constants.ui.contentTimings.replay
       message = getTranslation("screenDetails_error_noQueueReplay_description")
     end if
 
@@ -2271,16 +2279,18 @@ Function addToQueueErrorResponse(error)
 End function
 
 ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-Function setComponentInteractionEventForReminder(screen, userInteraction)
+' @screen: node - screen node
+' @isReminderSet: boolean, true = "TOGGLE_ON" ; false = "TOGGLE_OFF"
+Function setComponentInteractionEventForReminder(screen, isReminderSet)
   tubiLog("DetailScreenHelpers.setComponentInteractionEventForReminder")
 
   componentValues = {
     video_id: screen.trackingPageInfo.pageValues.video_id
   }
-  userInteractionValue = ""
-  if userInteraction = "on"
+
+  if isReminderSet = true
     userInteractionValue = "TOGGLE_ON"
-  else if userInteraction = "off"
+  else
     userInteractionValue = "TOGGLE_OFF"
   end if
 
