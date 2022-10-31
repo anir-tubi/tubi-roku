@@ -277,21 +277,18 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.directors = contentFromServer.directors
   end if
 
-  if contentFromServer.league <> invalid
-    league = contentFromServer.league
-    roundGroupInfo = ""
-    if league.round <> invalid
-      roundGroupInfo = league.round
+  roundGroupInfo = ""
+  league = contentFromServer.league
+  if league <> invalid AND league.round <> invalid
+    roundGroupInfo += league.round
+    if league.round = "Group Stage" ' hack for world cup
+      teams = contentFromServer.teams
+      if isNonEmptyArray(teams) = true AND teams[0].group <> invalid
+        roundGroupInfo += " " + Chr(&hb7) + " " + teams[0].group
+      end if
     end if
-
-    if roundGroupInfo <> "" and league.group <> invalid
-      roundGroupInfo += " " + Chr(&hb7) + " "
-    else if league.group <> invalid
-      roundGroupInfo += league.group
-    end if
-
-    translatedContent.roundGroupInfo = roundGroupInfo
   end if
+  translatedContent.roundGroupInfo = roundGroupInfo
 
   creditsCuePoints = {}
   postlude = 0
