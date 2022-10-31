@@ -490,7 +490,10 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
       videoPlayer.trackingPageContext = screen.trackingPageInfo
     end if
 
-    videoPlayer.fullscreen = false
+    if videoPlayer.fullscreen <> false
+      videoPlayer.fullscreen = false
+    end if
+
     videoPlayer.unobserveFieldScoped("state")
     videoPlayer.observeFieldScoped("state", "onLinearVideoPlayerStateWhileInMinState")
 

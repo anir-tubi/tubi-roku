@@ -356,7 +356,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       language_code: ""  'LanguageCode enum
     }
 
-    fullscreen_toggle: {  'Not used by Roku client
+    fullscreen_toggle: {
       video_id: -1
       toggle_state: "" 'ToggleState enum
     }
