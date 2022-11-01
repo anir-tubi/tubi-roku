@@ -26,15 +26,15 @@ Function Main(startupArgs)
 End Function
 
 
-Function RunScreenSaver(args)
-  screen = createObject("roSGScreen")
-  scene = screen.createScene("TubiScreenSaverScene")
-  screen.show()
-  scene.startupArgs = args
-  while true
-    sleep(1000)
-  end while
-End Function
+' Function RunScreenSaver(args)
+'   screen = createObject("roSGScreen")
+'   scene = screen.createScene("TubiScreenSaverScene")
+'   screen.show()
+'   scene.startupArgs = args
+'   while true
+'     sleep(1000)
+'   end while
+' End Function
 
 
 ' @constants: assocArray, constants as returned by getConstants()
