@@ -450,7 +450,7 @@ Function setLiveBadge()
   badge.translation = [12,12]
   badge.backgroundColor = "0xCC090B"
   badge.textColor = "0xFFFFFF"
-  badge.iconUri = "pkg:/images/live-icon.png"
+  badge.iconUri = "pkg:/images/live-icon.webp"
   badge.text = UCase(getTranslation("screenSearch_liveText"))
 End Function
 
@@ -483,7 +483,7 @@ Function setLockIcon()
   m.lockIcon.opacity = 0.0
   m.lockIcon.width = 21
   m.lockIcon.height = 24
-  m.lockIcon.uri = "pkg:/images/icon-lock.png"
+  m.lockIcon.uri = "pkg:/images/icon-lock.webp"
   m.lockIcon.translation = [m.top.width-36, 14]
 End Function
 

@@ -323,7 +323,7 @@ Function onLineOneDataChange(msg)
       insertIndex++
       ' Although this uri does not change, if it is set in the component XML, the icon will appear
       ' during the initial channel load, so set it dynamically when it should appear
-      m.resolutionPoster.uri = "pkg:/images/icon-4k-ready-badge.png"
+      m.resolutionPoster.uri = "pkg:/images/icon-4k-ready-badge.webp"
     else
       if resolutionPosterIsPresent = true
         firstLineGroup.removeChild(m.resolutionPoster)
@@ -340,7 +340,7 @@ Function onLineOneDataChange(msg)
       insertIndex++
       ' Although this uri does not change, if it is set in the component XML, the icon will appear
       ' during the initial channel load, so set it dynamically when it should appear
-      m.closedCaptions.uri = "pkg:/images/icon-closed-caption.png"
+      m.closedCaptions.uri = "pkg:/images/icon-closed-caption.webp"
     else
       if closedCaptionsIsPresent = true
         firstLineGroup.removeChild(m.closedCaptions)
@@ -854,7 +854,7 @@ Function formatBadge(text, badgeComponent)
     ' LIVE badge
     badgeComponent.backgroundColor = "0xCC090B"
     badgeComponent.textColor = "0xFFFFFF"
-    badgeComponent.iconUri = "pkg:/images/live-icon.png"
+    badgeComponent.iconUri = "pkg:/images/live-icon.webp"
   else if UCase(text) = UCase(getTranslation("replay"))
     ' REPLAY badge
     badgeComponent.backgroundColor = "0xF0F1F5"

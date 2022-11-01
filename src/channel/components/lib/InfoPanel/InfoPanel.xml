@@ -305,7 +305,7 @@
             id="SignInLock"
             width="20"
             height="25"
-            uri="pkg:/images/icon-lock.png"
+            uri="pkg:/images/icon-lock.webp"
             blendColor="0xFF501A"
             loadDisplayMode="scaleToFit" />
           <Label
@@ -333,7 +333,7 @@
             visible="true"
             height="30"
             width="28"
-            uri="pkg:/images/reminder_set.png"
+            uri="pkg:/images/reminder-set.webp"
             loadDisplayMode="scaleToFit" />
           <Label
             id="ReminderTitle"

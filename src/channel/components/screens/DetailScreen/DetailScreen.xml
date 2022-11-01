@@ -267,7 +267,7 @@
     <!-- REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE -->
     <DetailMenuItemContentNode
       id="SeeAllGamesMenuItem"
-      iconUrl="pkg:/images/icon_see_all_games.png"/>
+      iconUrl="pkg:/images/icon-see-all-games.webp"/>
     <Poster
       id="leftChevron"
       uri="pkg:/images/left-chevron.png"

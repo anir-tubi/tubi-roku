@@ -196,7 +196,7 @@
             id="tubiFIFALogo"
             height="120"
             width="385"
-            uri="pkg:/images/logo-tubi-FIFA.png"
+            uri="pkg:/images/logo-tubi-FIFA.webp"
             translation="[1450,60]"
             opacity="1.0"
             visible="false"/>

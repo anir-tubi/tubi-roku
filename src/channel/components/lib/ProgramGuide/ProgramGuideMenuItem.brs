@@ -35,7 +35,7 @@ Function onContentChange()
         m.lockIcon.width = 21
         m.lockIcon.height = 24
         m.lockIcon.opacity = 1
-        m.lockIcon.uri="pkg:/images/icon-lock.png"
+        m.lockIcon.uri="pkg:/images/icon-lock.webp"
         m.titleLockGroup.insertChild(m.lockIcon, 0)
         m.programString.width = item.FHDItemWidth - m.lockIcon.width - 12
       end if

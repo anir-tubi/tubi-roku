@@ -139,7 +139,7 @@ Function changeButtonText(sButtonStringId, sButtonText)
     if sButtonText = getTranslation("screenDetails_button_queue")
       stringNode.iconUrl = "pkg:/images/icon-add-to-queue.webp"
     else
-      stringNode.iconUrl = "pkg:/images/set_reminder.png"
+      stringNode.iconUrl = "pkg:/images/set-reminder.webp"
     end if
 
   else if sButtonStringId = "stringNoQueueButton"
@@ -148,7 +148,7 @@ Function changeButtonText(sButtonStringId, sButtonText)
     if sButtonText = getTranslation("screenDetails_button_noQueue")
       stringNode.iconUrl = "pkg:/images/icon-remove-from-queue.webp"
     else
-      stringNode.iconUrl = "pkg:/images/reminder_set.png"
+      stringNode.iconUrl = "pkg:/images/reminder-set.webp"
     end if
 
   else if sButtonStringId = "stringChannelButton"

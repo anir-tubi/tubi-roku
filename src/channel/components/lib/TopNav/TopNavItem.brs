@@ -87,7 +87,7 @@ Function onItemContentChange()
         m.iconSubtext.padding = [12, 12]
         m.iconSubtext.blendColor = "0xEB9C00FF"
         m.iconSubtext.text = itemContent.subText
-        m.iconSubtext.uri = "pkg:/images/new-frame.png"
+        m.iconSubtext.uri = "pkg:/images/new-frame.webp"
         m.iconSubtext.opacity = 1
        m.top.insertChild(m.iconSubtext, 2)
       else if m.iconSubtext <> invalid
