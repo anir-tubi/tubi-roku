@@ -163,6 +163,14 @@ Function onRepopulateContent()
   ' at the location or else the RowList loses focus and can't get it back.
   if resolveAbbreviatedContent(rowItemFocused) <> invalid
     ' re-focus the most recently focused content
+  ' the state stored on m.itemToJumpTo is used to determine which item should be jumped to when the
+   ' grid list gains focus. In some instances, we want to jump to an item after the grid list has already
+   ' gained focus, due to categories being updated while the user is on the page. Jumping to an item
+   ' here and also when the grid list gains focus means there may be multiple jumps (to the same grid
+   ' index). This should not cause problems in the short term. In the long term, we should explore
+   ' removing the jump when the grid list gains focus, and just do the jump in onRepopulateContent().
+
+    m.RowList.jumpToRowItem = rowItemFocused
     m.itemToJumpTo = rowItemFocused
   else if resolveAbbreviatedContent([rowItemFocused[0], 0]) <> invalid
     ' if there is no content at the most recently focused coordinates, then

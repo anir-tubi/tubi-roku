@@ -67,6 +67,9 @@
       <!-- tells the rowList to re-populate the content because rows have been added/removed and that may affect the look of some rows that have different heights compared to other rows  -->
       <field id="repopulateContent" type="boolean" alias="CategoryGridList.repopulateContent" />
 
+      <!-- If the screen is not enabled, then user should not be able to select anything -->
+      <field id="enabled" type="boolean" />
+
     <!-- OUTPUTS -->
 
       <field id="tournamentScreenEPGOkPressed" type="boolean" alwaysNotify="true"/>
