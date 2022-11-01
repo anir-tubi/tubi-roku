@@ -16,9 +16,20 @@ End Function
 'returns current time in UTC seconds
 '******************************************************
 
-Function getCurrentUTCTime(constants) as integer
+Function getCurrentUTCTime() as integer
   now = CreateObject("roDateTime")
-  return now.AsSeconds() + getTestingTimeOffset(constants)
+  return now.AsSeconds()
+End Function
+
+
+'******************************************************
+'
+'returns current time in UTC seconds with the testing offset if it has been set
+'******************************************************
+
+Function getCurrentUTCTimeWithOffset(constants) as Integer
+  now = createObject("roDateTime")
+  return now.asSeconds() + getTestingTimeOffset(constants)
 End Function
 
 '******************************************************
@@ -26,10 +37,22 @@ End Function
 'returns current time in UTC seconds
 '******************************************************
 
-Function getCurrentLocalTime(constants) as integer
+Function getCurrentLocalTime() as integer
   now = CreateObject("roDateTime")
   now.ToLocalTime()
-  return now.AsSeconds() + getTestingTimeOffset(constants)
+  return now.AsSeconds()
+End Function
+
+
+'******************************************************
+'
+'returns current time in UTC seconds with the testing offset if it has been set
+'******************************************************
+
+Function getCurrentLocalTimeWithOffset(constants) as Integer
+  now = createObject("roDateTime")
+  now.toLocalTime()
+  return now.asSeconds() + getTestingTimeOffset(constants)
 End Function
 
 
@@ -72,8 +95,8 @@ End Function
 'returns datetime in this format : Dec 15
 '******************************************************
 Function getMonthAndDay(datetime)
-  month = datetime.GetMonth().tostr()
-  day = datetime.GetDayOfMonth().tostr()
+  month = datetime.GetMonth().toStr()
+  day = datetime.GetDayOfMonth().toStr()
   shortVersionOfDateFormat = getShortVersionOfDateFormat(month, day)
   ' replacing "," with empty string as the string does not have year.
   return shortVersionOfDateFormat.replace(",","")
@@ -84,8 +107,8 @@ End Function
 'returns datetime in this format : Dec 15, 2022
 '******************************************************
 Function getMonthAndDayWithYear(datetime)
-  month = datetime.GetMonth().tostr()
-  day = datetime.GetDayOfMonth().tostr()
+  month = datetime.GetMonth().toStr()
+  day = datetime.GetDayOfMonth().toStr()
   year = datetime.getYear().toStr()
   shortVersionOfDateFormat = getShortVersionOfDateFormat(month, day, year)
   return shortVersionOfDateFormat

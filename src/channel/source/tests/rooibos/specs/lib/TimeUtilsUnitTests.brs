@@ -13,9 +13,28 @@ End Function
 Function timeUtils_getCurrentUTCTime_test()
   dt = CreateObject("roDateTime")
   now = dt.AsSeconds()
-  diff = getCurrentUTCTime(invalid) - now
-  ' check if current time retured by getCurrentUTCTime is very close to current time
+  diff = getCurrentUTCTime() - now
+  ' check if current time returned by getCurrentUTCTime is very close to current time
   m.AssertTrue(diff < 2)
+End Function
+
+
+'@Test getCurrentUTCTimeWithOffset unit tests
+Function timeUtils_getCurrentUTCTimeWithOffset_test()
+  dt = createObject("roDateTime")
+  now = dt.asSeconds()
+
+  testingTimeOffset = 10
+  constants = {
+    "settings": {
+      "mode": "dev"
+      "testingTimeOffset": testingTimeOffset
+    }
+  }
+  diff = getCurrentUTCTimeWithOffset(constants) - now
+
+  'Check if local Time returned by getCurrentLocalTime is very close to current time
+  m.assertEqual(diff, testingTimeOffset)
 End Function
 
 
@@ -24,10 +43,30 @@ Function timeUtils_getCurrentLocalTime_test()
   dt = CreateObject("roDateTime")
   dt.ToLocalTime()
   now = dt.AsSeconds()
-  diff = getCurrentLocalTime(invalid) - now
+  diff = getCurrentLocalTime() - now
 
   'Check if local Time returned by getCurrentLocalTime is very close to current time
   m.AssertTrue(diff < 2)
+End Function
+
+
+'@Test getCurrentLocalTimeWithOffset unit tests
+Function timeUtils_getCurrentLocalTimeWithOffset_test()
+  dt = createObject("roDateTime")
+  dt.toLocalTime()
+  now = dt.asSeconds()
+
+  testingTimeOffset = 10
+  constants = {
+    "settings": {
+      "mode": "dev"
+      "testingTimeOffset": testingTimeOffset
+    }
+  }
+  diff = getCurrentLocalTimeWithOffset(constants) - now
+
+  'Check if local Time returned by getCurrentLocalTime is very close to current time
+  m.assertEqual(diff, testingTimeOffset)
 End Function
 
 

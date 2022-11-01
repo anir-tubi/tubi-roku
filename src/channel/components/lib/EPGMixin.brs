@@ -2,7 +2,7 @@
 ' This function requires the importation of source/lib/TimeUtils.brs
 ' @param program: roSGNode, EPG program node
 Function isProgramLive(program)
-  now = getCurrentLocalTime(m.constants)
+  now = getCurrentLocalTime()
   if program <> invalid AND program.startTime = 0 AND program.endTime = 0 ' No programs and EPG has single element and click will play live
     return true
   else if program <> invalid AND isint(program.startTime) AND isint(program.endTime)

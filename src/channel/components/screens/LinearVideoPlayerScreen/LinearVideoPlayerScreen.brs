@@ -934,7 +934,7 @@ Function setMinimizedInfoPanelProgrammingDataWithChannelTimeGridContent()
         sProgramTitle1 = programData1.title
         if programData1.endTime <> invalid AND programData1.endTime > 0
 
-          now = getCurrentLocalTime(m.constants)
+          now = getCurrentLocalTime()
           nMinutesLeftOfProgram1 = convertSecondsToMins(programData1.endTime - now)
           if programData1.startTime <> invalid AND programData1.startTime > 0
             nDurationOfProgram1 = convertSecondsToMins(programData1.endTime - programData1.startTime)

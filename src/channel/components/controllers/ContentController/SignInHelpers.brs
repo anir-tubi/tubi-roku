@@ -219,7 +219,7 @@ Function onEmailExistsResponse(response)
         dateTime.fromISO8601String(m.constants.time.magicLinkEndDate)
         magicLinkEndDate = dateTime.asSeconds()
 
-        currentUnixTime = getCurrentUTCTime(m.constants)
+        currentUnixTime = getCurrentUTCTimeWithOffset(m.constants)
 
         ' Can only use magic link when Roku allows us to
         if currentUnixTime >= magicLinkStartDate AND currentUnixTime <= magicLinkEndDate then
@@ -682,7 +682,7 @@ End Function
 
 
 
-' onQueueAfterSignIn - occurs after activation success via AddtoMyList on Details page
+' onQueueAfterSignIn - occurs after activation success via Add to My List on Details page
 Function onQueueAfterSignIn()
   tubiLog("SignInHelpers.onQueueAfterSignIn")
 
@@ -932,7 +932,7 @@ End Function
 
 ' showEmailVerificationScreen will send verification email to the roku account or
 ' user entered email if user choose different email.
-' once user verified their email, it will redirect to the appropriae screen.
+' once user verified their email, it will redirect to the appropriate screen.
 ' If the user doesn't receive verification link, they can select resend verification.
 
 ' @email : string,  (either taken from roku account or user entered email)
@@ -943,7 +943,7 @@ Function showEmailVerificationScreen(email)
   emailVerificationScreen.username = email
   emailVerificationScreen.observeFieldScoped("selectedDifferentEmail", "showEmailScreen")
   emailVerificationScreen.observeFieldScoped("backButtonSelected", "onStopAndClearEmailVerificationTimer")
-  emailVerificationScreen.observeFieldScoped("resendVerificationLink", "onResendVeficationLink")
+  emailVerificationScreen.observeFieldScoped("resendVerificationLink", "onResendVerificationLink")
   pushScreen(emailVerificationScreen, true, true)
   displayDefaultBackground()
 End Function
@@ -970,7 +970,7 @@ End Function
 
 
 Function onQueryStatusOfMagicLinkResponse(response)
-  tubiLog("SignInHelpers.onqueryStatusOfMagicLinkResponse")
+  tubiLog("SignInHelpers.onQueryStatusOfMagicLinkResponse")
   if response <> invalid AND response.status = "PENDING"
     m.emailVerificationTimer.control = "start"
   else if response <> invalid AND response.access_token <> invalid
@@ -994,7 +994,7 @@ End Function
 
 
 Function onQueryStatusOfMagicLinkError(errorResponse)
-  tubiLog("SignInHelpers.onqueryStatusOfMagicLinkError")
+  tubiLog("SignInHelpers.onQueryStatusOfMagicLinkError")
   currentScreen = getCurrentScreen()
   if currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen
     currentScreen.queryResponseError = currentScreen.queryResponseError + 1
@@ -1025,8 +1025,8 @@ Function onQueryStatusOfMagicLinkError(errorResponse)
 End Function
 
 
-Function onResendVeficationLink()
-  tubiLog("SignInHelpers.onResendVeficationLink")
+Function onResendVerificationLink()
+  tubiLog("SignInHelpers.onResendVerificationLink")
   createMagicLinkRequest(m.email)
 End Function
 
