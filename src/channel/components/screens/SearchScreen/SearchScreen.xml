@@ -135,7 +135,7 @@
     <InfoPanel
       id="SearchScreenInfoPanel"
       visible="false"
-      translation="[167,120]"/>
+      translation="[192, 120]"/>
     <Group
       id="searchGroup"
       translation="[192, 414]">

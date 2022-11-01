@@ -67,6 +67,7 @@ Function init()
   m.top.observeFieldScoped("fullscreenCountdown", "onPlayerCountDownChange")
   m.top.observeFieldScoped("calculateHeight", "onCalculateHeight")
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
+  m.offset.observeFieldScoped("translation", "onOffsetTranslationChange")
   m.partnerLogo.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.rating.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.closedCaptions.observeFieldScoped("loadStatus", "onPosterLoadStatus")
@@ -546,6 +547,18 @@ Function onPlayerCountDownChange()
     m.countdownText.text = getTranslation("metadata_fullscreen_countdown_plural", {seconds: m.top.fullscreenCountdown.toStr()})
   else
     m.playerCountdownGroup.visible = false
+  end if
+End Function
+
+
+Function onOffsetTranslationChange(msg)
+  leftHeaderIsPresent = (m.leftHeaderImage.getParent() <> invalid)
+  if leftHeaderIsPresent = false then
+    ' We are using custom x translation for offset LayoutGroup. We use a negative value on DescriptionGroup which shifts over infoPanelGroup that much to the right to compensate. This code below counteracts that change. We only want to do that if leftHeaderImage isn't present though
+    offsetTranslation = msg.getData()
+    translation = m.infoPanelGroup.translation
+    translation[0] = offsetTranslation[0] * -1
+    m.infoPanelGroup.translation = translation
   end if
 End Function
 
