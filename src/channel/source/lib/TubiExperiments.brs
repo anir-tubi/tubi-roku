@@ -56,7 +56,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_hevc_drm_4k: {
-        roku_hevc_drm_4k_v1 : {"enabled": false}
+        roku_hevc_drm_4k_v1 : {"enabled": true}
       }
     }
 

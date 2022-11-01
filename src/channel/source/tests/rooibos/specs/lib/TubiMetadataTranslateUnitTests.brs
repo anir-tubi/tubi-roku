@@ -311,7 +311,7 @@ Function tubiMetadataTranslate_composeVideoResources_test()
   m.assertNotInvalid(videoResources)
 
   ' check the number of resources is accurate
-  m.assertEqual(videoResources.count(), 1)
+  m.assertEqual(videoResources.count(), 2)
 
   'Widevine has drmParams
   videoResource = videoResources[0][0]
@@ -323,8 +323,8 @@ Function tubiMetadataTranslate_composeVideoResources_test()
   m.assertNotInvalid(videoResource.drmHeaders)
   m.assertNotInvalid(videoResource.length)
   m.assertEqual(videoResource.streamformat, "dash")
-  m.assertEqual(videoResource.codec, "H264")
-  m.assertEqual(videoResource.resolution, "1080P")
+  m.assertEqual(videoResource.codec, "H265")
+  m.assertEqual(videoResource.resolution, "2160P")
 
   'Playready doesn't have drmParams
   videoResourcePlayReady = videoResources[0][1]
@@ -336,8 +336,8 @@ Function tubiMetadataTranslate_composeVideoResources_test()
   m.assertNotInvalid(videoResourcePlayReady.encodingKey)
   m.assertNotInvalid(videoResourcePlayReady.drmHeaders)
   m.assertEqual(videoResourcePlayReady.streamformat, "dash")
-  m.assertEqual(videoResourcePlayReady.codec, "H264")
-  m.assertEqual(videoResourcePlayReady.resolution, "1080P")
+  m.assertEqual(videoResourcePlayReady.codec, "H265")
+  m.assertEqual(videoResourcePlayReady.resolution, "2160P")
 
   'HLS shouldn't have any drm fields
   videoResourceHls = videoResources[0][2]
@@ -347,7 +347,7 @@ Function tubiMetadataTranslate_composeVideoResources_test()
   m.assertInvalid(videoResourceHls.drmHeaders)
   m.assertEqual(videoResourceHls.type, "hlsv3")
   m.assertEqual(videoResourceHls.streamformat, "hls")
-  m.assertEqual(videoResourceHls.codec, "H264")
+  m.assertEqual(videoResourceHls.codec, "H265")
   m.assertEqual(videoResourceHls.resolution, "720P")
 
 End Function
