@@ -129,8 +129,10 @@ Function playContent()
     hasSubtitles = true
   end if
 
+  isFullScreen = m.top.fullScreen
+
   videoPlayerType = "DEFAULT"
-  if m.top.fullscreen = false
+  if isFullScreen = false
     videoPlayerType = "BANNER"
   end if
 
@@ -160,6 +162,7 @@ Function playContent()
       video_player: videoPlayerType
       video_codec_type: codeType
       video_resolution: resolution
+      is_fullscreen: isFullScreen
     }
   })
 
