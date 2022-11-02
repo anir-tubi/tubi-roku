@@ -1805,6 +1805,7 @@ Function resumeApp()
     else if isTournamentScreen(currentScreen) = true
       stopCountdownTimer()
       refreshTournamentScreenVideoPlay(false, currentScreen)
+      currentScreen.setForceRefreshCategoryContainers = true
     end if
 
   end if

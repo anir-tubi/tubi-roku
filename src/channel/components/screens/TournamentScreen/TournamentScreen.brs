@@ -43,6 +43,7 @@ Function init()
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
   m.top.observeFieldScoped("contentUpdated", "onContentUpdated")
   m.top.observeFieldScoped("isPreTournament", "onPreTournament")
+  m.top.observeFieldScoped("setForceRefreshCategoryContainers", "onForceRefreshCategoryContainers")
   m.top.screenLevel = m.constants.ui.screenLevels.tournamentScreen
   m.defaultBackgroundUri = "pkg:/images/art-blur-background.png"
   m.top.backgroundUriList = [m.defaultBackgroundUri]
@@ -393,7 +394,7 @@ Function onScreenFocusChange()
   tubiLog("TournamentScreen.onScreenFocusChange")
 
   if m.top.hasFocus() = true
-   if shouldRefresh(m.top.content) = true
+    if shouldRefresh(m.top.content) = true
       m.top.reloadTournamentScreen = true 'refresh entire screen
     else
       refreshCategoryContainers() 'just refresh the container which has expired
@@ -855,4 +856,9 @@ Function refreshCategoryContainers()
     end for
   end if
 
+End Function
+
+
+Function onForceRefreshCategoryContainers()
+  refreshCategoryContainers()
 End Function

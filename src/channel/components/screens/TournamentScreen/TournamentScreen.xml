@@ -71,6 +71,10 @@
       <!-- If the screen is not enabled, then user should not be able to select anything -->
       <field id="enabled" type="boolean" />
 
+      <!--force a refresh of containers on instant resume because containers might be stale-->
+      <field id="setForceRefreshCategoryContainers" type="boolean" alwaysNotify="true" />
+
+
     <!-- OUTPUTS -->
 
       <field id="tournamentScreenEPGOkPressed" type="boolean" alwaysNotify="true"/>
