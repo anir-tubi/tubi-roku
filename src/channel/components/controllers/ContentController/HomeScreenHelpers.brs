@@ -929,8 +929,8 @@ Function onHomescreenContentReady(msg)
       screenTrackingLoad(homeScreen.trackingPageInfo, loadTime)
     end if
 
-    ' show fifa intro modal only for non-kids ui
-    if isFIFAIntroModalShown() = false AND isKidsUIOn() = false
+    ' show fifa intro modal only for non-kids ui and adult pc
+    if isFIFAIntroModalShown() = false AND isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
       showFIFAIntroModal()
     end if
 
