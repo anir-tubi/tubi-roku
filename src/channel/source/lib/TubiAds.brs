@@ -655,8 +655,11 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
         is_fullscreen: true
       }
 
-      ' Clear out notUsed pixel for the current ad since we sent an impression
-      m.notUsedAdPodPixels.delete(ctx.adIndex.toStr())
+      if ctx.adIndex <> invalid then
+        ' Clear out notUsed pixel for the current ad since we sent an impression
+        m.notUsedAdPodPixels.delete(ctx.adIndex.toStr())
+      end if
+
       m.trackUserEvent("start_ad", startAdEvent, m.requestQueue)
 
       impressionCount = 0
@@ -741,20 +744,9 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       else if ctx.state = "buffering" then
         m.containerNode.visible = false ' Hide ad while buffering
       end if
-    else if eventType = "Error" AND ctx <> invalid then
-      try
-        ' Clear out notUsed pixel for the current ad since RAF will fire the error pixel for this ad
-        m.notUsedAdPodPixels.delete(ctx.adIndex.toStr())
-      catch e
-        ' Logs don't appear to be coming through. In addition to the changes below, trying to send super simple message to see if that comes through
-        m.log.error("hit error", "adError", "error-clearing-not-used", m.requestQueue)
-
-        message = {
-          "adIndexType": type(ctx.adIndex)
-          "notUsedType": type(m.notUsedAdPodPixels)
-        }
-        m.log.error(FormatJSON(message, 512), "adError", "error-clearing-not-used", m.requestQueue)
-      end try
+    else if eventType = "Error" AND ctx <> invalid AND ctx.adIndex <> invalid then
+      ' Clear out notUsed pixel for the current ad since RAF will fire the error pixel for this ad
+      m.notUsedAdPodPixels.delete(ctx.adIndex.toStr())
     end if
   else
     if ctx <> invalid then
