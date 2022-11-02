@@ -774,6 +774,7 @@ Function setDirtyUserCategories(categoryId)
       id: categoryId
       isSignedInUser: isLoggedInUser()
       screenId: m.constants.ui.screenIds.homeScreen
+      uiMode: m.uiMode
     })
 
     '//Apply the movie, TV, and Espanol filters if those screens exist
@@ -795,6 +796,7 @@ Function setDirtyUserCategories(categoryId)
         id: categoryId
         isSignedInUser: isLoggedInUser()
         screenId: m.constants.ui.screenIds.movieScreen
+        uiMode: m.uiMode
       })
     end if
 
@@ -816,6 +818,7 @@ Function setDirtyUserCategories(categoryId)
         id: categoryId
         isSignedInUser: isLoggedInUser()
         screenId: m.constants.ui.screenIds.tvScreen
+        uiMode: m.uiMode
       })
     end if
 
@@ -838,6 +841,7 @@ Function setDirtyUserCategories(categoryId)
         id: categoryId
         isSignedInUser: isLoggedInUser()
         screenId: m.constants.ui.screenIds.espanolScreen
+        uiMode: m.uiMode
       })
     end if
   end if

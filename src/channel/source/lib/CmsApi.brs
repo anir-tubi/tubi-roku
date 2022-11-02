@@ -375,9 +375,10 @@ End Function
 ' @index: integer
 ' @bKidsMode : boolean
 ' @isSignedInUser: boolean, value based on user loggedIn or not
+' @uiMode: string, one of the allowed values from constants.ui.modes
 '
 ' returns batch requests
-Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = false, isSignedInUser = false)
+Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = false, isSignedInUser = false, uiMode="standard")
 
   m.categoryWindowSize = m.constants.performance.categoryGridList.categoryWindowSize
 
@@ -419,6 +420,7 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
             categoryReqInfo.responseType = "node"
             categoryReqInfo.isSignedInUser = isSignedInUser
             categoryReqInfo.screenId = m.constants.ui.screenIds.homeScreen
+            categoryReqInfo.uiMode = uiMode
           end if
 
         end if
@@ -497,9 +499,10 @@ End Function
 ' @contentMode: one of enum values constants.ui.contentMode
 ' @bKidsMode : boolean
 ' @isSignedInUser: boolean, value based on user loggedIn or not
+' @uiMode: string, one of the allowed values from constants.ui.modes
 '
 ' returns batch requests
-Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, contentMode = "", bKidsMode = false, isSignedInUser = false)
+Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, contentMode = "", bKidsMode = false, isSignedInUser = false, uiMode="standard")
 
   reqName = m.constants.reqNames.getCategory
 
@@ -522,6 +525,7 @@ Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, cont
         categoryReqInfo.responseType = "node"
         categoryReqInfo.isSignedInUser = isSignedInUser
         categoryReqInfo.screenId = m.constants.ui.screenIds.homeScreen
+        categoryReqInfo.uiMode = uiMode
       end if
 
       if categoryReqInfo <> invalid then

@@ -360,6 +360,7 @@ Function onReloadTournamentScreenContainerID(msg)
       id: categoryId
       isSignedInUser: isLoggedInUser()
       screenId: m.constants.ui.screenIds.tournamentScreen
+      uiMode: m.uiMode
     })
   end if
 End Function

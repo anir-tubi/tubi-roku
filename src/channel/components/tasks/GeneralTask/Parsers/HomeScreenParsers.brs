@@ -55,20 +55,28 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
   isSignedInUser = false
   screenId = m.constants.ui.screenIds.homeScreen
 
+  isKidsMode = false
+  uiMode = "standard"
+
   if reqInfo <> invalid
     isSignedInUser = reqInfo.isSignedInUser
 
     options = reqInfo.options
     if options <> invalid AND options.params <> invalid
       contentMode = options.params.contentMode
+      isKidsMode = options.params.is_kids_mode
     end if
 
     if reqInfo.screenId <> invalid
       screenId = reqInfo.screenId
     end if
 
+    if reqInfo.uiMode <> invalid
+      uiMode = reqInfo.uiMode
+    end if
+
   end if
 
-  convertedMetadata = translate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, screenId, isSignedInUser)
+  convertedMetadata = translate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, screenId, isSignedInUser, isKidsMode, uiMode)
   return convertedMetadata  'may return an empty container
 End Function

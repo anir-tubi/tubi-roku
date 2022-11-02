@@ -912,7 +912,10 @@ End Function
 ' @contentNode: TubiContentNode
 ' @screenId: string, the id of the screen
 ' @isSignedInUser: boolean, value based on user logged In or not
-Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false) As Object
+' @isKidsMode: boolean, the value of the isKidsMode parameter as sent as part of the matrix/homescreen request
+' @uiMode: string, one of the allowed values from constants.ui.modes
+'
+Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false, isKidsMode=false, uiMode="standard") As Object
   tubiLog("TubiMetadataTranslate.translateContainer")
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
@@ -921,7 +924,13 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
 
   nodeCount = 0
 
-  categoryMetadata = m.buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
+  if container.id = m.constants.ui.categoryIds.history AND isSignedInUser = false AND uiMode <> m.constants.ui.modes.kidsAgeGate
+    '//if continue watching container while user is signed out,
+    ' then ensure row is empty except for 1 item that will entice users to sign in
+    categoryMetadata = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
+  else
+    categoryMetadata = m.buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
+  end if
 
   if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
     translated.id = container.id

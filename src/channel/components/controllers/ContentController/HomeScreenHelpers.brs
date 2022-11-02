@@ -968,7 +968,8 @@ Function onLoadCategoriesIndex(msg)
 
   isKidsMode = shouldKidsModeBeSentToServer()
   isSignedInUser = isLoggedInUser()
-  batchRequests = m.cmsApi.createHomeScreenBatchReqInfo(homeScreen, index, isKidsMode, isSignedInUser)
+  uiMode = m.uiMode
+  batchRequests = m.cmsApi.createHomeScreenBatchReqInfo(homeScreen, index, isKidsMode, isSignedInUser, uiMode)
 
   if batchRequests <> invalid
     m.makeBatchRequest({

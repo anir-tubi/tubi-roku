@@ -144,6 +144,7 @@ Function fetchCategoryDetails(content)
       errorCallback: onCategoryDetailError
       responseType: "node"
       isSignedInUser: isLoggedInUser()
+      uiMode: m.uiMode
     })
   end if
 End Function
