@@ -206,6 +206,7 @@ Function populateInfoPanel(focusedContent)
       m.top.backgroundUriList = determineBackgroundImage(focusedContent.getparent())
     else if focusedContent.type = m.constants.ui.contentTypes.sportsEvent
       populateInfoPanelWithHomescreenStyleSportsMode(focusedContent, m.InfoPanel)
+      m.top.backgroundUriList = determineBackgroundImage(focusedContent)
     else if focusedContent.type = m.constants.ui.contentTypes.video OR focusedContent.type = m.constants.ui.contentTypes.series
       populateInfoPanelWithHomescreenStyleItemMode(focusedContent, m.InfoPanel)
       m.top.backgroundUriList = determineBackgroundImage(focusedContent)
