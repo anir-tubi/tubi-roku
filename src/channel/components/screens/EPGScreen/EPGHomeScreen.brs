@@ -382,14 +382,18 @@ End Function
 
 
 Function generateTopNavContentItems()
-
   menuItemIds = [
     m.constants.ui.sideNavIds.home
     m.constants.ui.sideNavIds.movies
     m.constants.ui.sideNavIds.tv
     m.constants.ui.sideNavIds.linearEPG
-    m.constants.ui.sideNavIds.tournament
     ]
+
+  isTournamentTime = tournamentTimeFrame()
+
+  if isTournamentTime = "duringTournament" OR isTournamentTime = "preTournament"
+    menuItemIds.push(m.constants.ui.sideNavIds.tournament)
+  end if
 
 
   parent = CreateObject("roSGNode", "ContentNode")

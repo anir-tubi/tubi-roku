@@ -39,6 +39,7 @@
     <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
     <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/FIFAMixin.brs" />
 
     <!-- StringUtils needed for Auth.brs -->
     <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />

@@ -13,6 +13,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/FIFAMixin.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -219,6 +220,7 @@
 
       <!-- Called to report that the Like/Dislike Menu has gained focus or lost focus -->
       <field id="focusOnLikeMenu" type="boolean" value="false"/>
+
 
   </interface>
 

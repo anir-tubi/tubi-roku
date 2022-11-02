@@ -1036,7 +1036,8 @@ Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, c
   if container <> invalid AND container.children <> invalid
     prependContent = invalid
     if container.children.count() > 0 then
-      if screenId = m.constants.ui.screenIds.homeScreen AND container.id = m.constants.ui.categoryIds.fifawc
+      'bs:disable-next-line 1001 LINT1001
+      if screenId = m.constants.ui.screenIds.homeScreen AND container.id = m.constants.ui.categoryIds.fifawc AND tournamentTimeFrame() <> "afterTournament"
         ' create and add a showAll content to the contents which hold the container metadata
         prependContent = {
           id: m.constants.ui.contentIds.showAllGames

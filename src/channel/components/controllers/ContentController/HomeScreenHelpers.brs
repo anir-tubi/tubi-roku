@@ -990,7 +990,7 @@ Function isFIFAIntroModalShown()
   request = TubiRequest(m.constants.settings)
   auth = TubiAuth(m.constants, request)
 
-  if isDuringTournament() = true
+  if tournamentTimeFrame() = "duringTournament"
     isModalShown = auth.getEducationalModalEntry("fifaIntro")
   end if
 

@@ -91,42 +91,6 @@ Function showTournamentScreen(constants, componentToFocus = "")
 End Function
 
 
-Function isDuringTournament() as Boolean
-  tubilog("TournamentScreenHelpers.isDuringTournament")
-
-  today = CreateObject("roDateTime")
-  today.ToLocalTime()
-
-  startDate = m.constants.tournament.startDate
-  endDate = m.constants.tournament.endDate
-
-  ' //BELOW BLOCK IS ADDED FOR QA TESTING. QA can change the dates on <env>.yml file for testing pre/during/post tournament cases
-  if m.constants.settings.mode <> "production"
-    if isNonEmptyString(m.constants.settings.tournamentStartDate)
-      startDate = m.constants.settings.tournamentStartDate
-    end if
-    if isNonEmptyString(m.constants.settings.tournamentEndDate)
-      endDate = m.constants.settings.tournamentEndDate
-    end if
-  end if
-
-  tournamentStartDate = CreateObject("roDateTime")
-  tournamentStartDate.FromISO8601String(startDate)
-  tournamentStartDate.ToLocalTime()
-
-  tournamentEndDate = CreateObject("roDateTime")
-  tournamentEndDate.FromISO8601String(endDate)
-  tournamentEndDate.ToLocalTime()
-
-  if today.asSeconds() >= tournamentStartDate.asSeconds() and today.asSeconds() <= tournamentEndDate.asSeconds()
-    return true
-  else
-    return false
-  end if
-
-End Function
-
-
 Function onTournamentScreenBackgroundChange(msg)
   tubiLog("TournamentScreenHelpers.onTournamentScreenBackgroundChange")
   tournamentScreen = msg.getRoSGNode()

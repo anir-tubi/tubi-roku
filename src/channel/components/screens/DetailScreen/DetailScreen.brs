@@ -424,6 +424,7 @@ Function onAvailabilityTypeChange()
   tubiLog("DetailScreen.onAvailabilityTypeChange")
   availabilityType = m.top.availabilityType
   menuItems = []
+  isTournamentTime = tournamentTimeFrame()
   signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
   likeDisLikeIndex =  m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
 
@@ -437,7 +438,9 @@ Function onAvailabilityTypeChange()
     end if
 
     menuItems = [m.AddQueueMenuItem]
-    addRemoveMenuItem(true, -1, m.SeeAllGamesMenuItem, menuItems)
+    if isTournamentTime = "duringTournament" OR isTournamentTime = "preTournament"
+      addRemoveMenuItem(true, -1, m.SeeAllGamesMenuItem, menuItems)
+    end if
   else if UCase(availabilityType) = UCase(m.constants.ui.contentTimings.upcoming)
     if likeDisLikeIndex <> invalid
       addRemoveMenuItem(false, likeDisLikeIndex)
@@ -450,7 +453,9 @@ Function onAvailabilityTypeChange()
     playIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.PlayMenuItem.id)
     addRemoveMenuItem(false, playIndex)
     menuItems = [m.AddQueueMenuItem]
-    addRemoveMenuItem(true, -1, m.SeeAllGamesMenuItem, menuItems)
+    if isTournamentTime = "duringTournament" OR isTournamentTime = "preTournament"
+      addRemoveMenuItem(true, -1, m.SeeAllGamesMenuItem, menuItems)
+    end if
   end if
 
 End Function
