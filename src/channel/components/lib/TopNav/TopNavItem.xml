@@ -2,10 +2,10 @@
 <component name="TopNavItem" extends="Group" >
   <script type="text/brightscript" uri="TopNavItem.brs" />
   <script type="text/brightscript" uri="../AnimationMixin.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../ExperimentMixin.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
 
   <interface>
     <field id="itemHasFocus" type="boolean" />
@@ -14,9 +14,9 @@
     <field id="itemContent" type="node" />
     <field id="height" type="float"/>
     <field id="width" type="float"/>
-
     <field id="boundingRect" type="assocarray"/>
   </interface>
+
   <children>
     <Label
       id="BottomLabel"
