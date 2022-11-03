@@ -101,8 +101,15 @@ End Function
 Function changeTournamentScreenBackground(tournamentScreen)
   tubilog("TournamentScreenHelpers.changeTournamentScreenBackground")
   if tournamentScreen <> invalid AND tournamentScreen.backgroundUriList <> invalid
+    contentType = m.constants.ui.backgroundTypes.epg ' lets have a default value to start with
+    if tournamentScreen.focusedComponent =  m.constants.ui.tournamentScreen.focusItems.epgTimeGrid
+      contentType = m.constants.ui.contentTypes.epg
+    else if tournamentScreen.contentFocused <> invalid
+      contentType = tournamentScreen.contentFocused.type
+    end if
+
     m.backgroundGroup.backgroundInfo = {
-      type: m.constants.ui.backgroundTypes.epg
+      type: getBackgroundtype(tournamentScreen.backgroundUriList, contentType)
       uriList : tournamentScreen.backgroundUriList
     }
   end if
