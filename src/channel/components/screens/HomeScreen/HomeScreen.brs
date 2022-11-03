@@ -178,7 +178,7 @@ Function generateTopNavContentItems(includeLinearTV = false)
     else if id = m.constants.ui.sideNavIds.linearEPG
       item.title = getTranslation("menu_livetv")
     else if id = m.constants.ui.sideNavIds.tournament
-      item.title = getTranslation("menu_tournament", {"tradeMark": chr(8482)})
+      item.title = "FIFA World Cup 2022" + chr(8482)
       item.subText = getTranslation("text_new")
     end if
   end for

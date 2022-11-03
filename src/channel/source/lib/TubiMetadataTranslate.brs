@@ -1050,7 +1050,7 @@ Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, c
         ' create and add a showAll content to the contents which hold the container metadata
         prependContent = {
           id: m.constants.ui.contentIds.showAllGames
-          title: getTranslation("menu_tournament", {"tradeMark": ""})
+          title: "FIFA World Cup 2022" + chr(8482)
           showAllText: getTranslation("screenHome_item_showAllGames")
           type: "n"
           thumbnails: [m.constants.urls.fifaShowAllPoster]
