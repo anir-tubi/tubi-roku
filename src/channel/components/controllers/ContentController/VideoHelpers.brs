@@ -820,6 +820,7 @@ Function onVideoTrackingStart(msg)
     youboraConfig["device.model"] = m.constants.deviceInfo.model
     youboraConfig["device.id"] = m.constants.deviceInfo.deviceId
     youboraConfig["app.releaseVersion"] = m.constants.deviceInfo.clientVersion
+    youboraConfig["content.encoding.videoCodec"] = videoPlayer.content.codec
 
     m.youboraTask.options = youboraConfig
     m.youboraTask.event = { handler: "play" }
