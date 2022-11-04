@@ -24,10 +24,8 @@ Function getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime = "", hasVideoRe
     'Find program start
     startDateTime = CreateObject("roDateTime")
     startDateTime.FromISO8601String(dateTimeString)
-    startTimeAsSeconds = startDateTime.AsSeconds()
     startDateTime.ToLocalTime()
     programDate = startDateTime.asDateString("short-date")
-
 
     'Find tomorrow
     tomorrowDate = createObject("roDateTime")
@@ -36,7 +34,7 @@ Function getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime = "", hasVideoRe
     tomorrow = tomorrowDate.asDateString("short-date")
 
     availabilityType = ""
-    if (hasVideoResources = true) AND currentTimeAsSeconds > startTimeAsSeconds
+    if (hasVideoResources = true)
       availabilityType = "replay"
     else
       availabilityType = "upcoming"
