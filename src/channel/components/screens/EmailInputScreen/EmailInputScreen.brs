@@ -56,6 +56,7 @@ Function onScreenFocusChange()
     m.top.backgroundUriList = m.backgroundUriList
     m.keyboard.keyGrid.setFocus(true)
   end if
+
   if m.top.isInFocusChain() = false
     m.keyboard.unobserveFieldScoped("text")
     m.Keyboard.textEditBox.voiceEnabled = false
@@ -90,6 +91,11 @@ Function onContinueButtonSelected(evt)
     if isEmailValid() = true
       fade(m.emailValidationMsg, "out", 0.3)
       m.top.email = m.email.text
+      ' we must set voinceEnabled = false here because if we rely on isInFocusChain() in
+      ' onScreenFocusChange(), voiceEnabled is not set to false until after voiceEnabled is set to true
+      ' on the SignInScreen, which prevents voiceEnabled is getting to true
+      ' on the SignInScreen.
+      m.keyboard.textEditBox.voiceEnabled = false
       m.top.continueSelected = true
     else
       fade(m.emailValidationMsg, "in", 0.3)

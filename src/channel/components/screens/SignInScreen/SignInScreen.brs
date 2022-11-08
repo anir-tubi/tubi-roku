@@ -49,6 +49,7 @@ Function init()
 
   m.email = m.top.findNode("email")
   m.email.hint = getTranslation("signIn_email_hint")
+  m.email.observeFieldScoped("selected", "onEmailSelected")
 
   'emailHasFocus is used to store the state of whether or not the email text entry field has been focused.
   'We need to store this state, and can't simply rely on m.email.isInFocusChain() because when user starts using microphone,
@@ -100,6 +101,18 @@ Function onScreenFocusChange()
     m.emailHasFocus = false
   end if
 
+End Function
+
+
+Function onEmailSelected(msg)
+  isSelected = msg.getData()
+  if isSelected = true
+    ' we must set voinceEnabled = false here because if we rely on isInFocusChain() in
+    ' onScreenFocusChange(), voiceEnabled is not set to false until after voiceEnabled is set to true
+    ' on the EmailInputScreen, which prevents voiceEnabled is getting to true
+    ' on the EmailInputScreen.
+    m.keyboard.voiceEnabled = false
+  end if
 End Function
 
 
