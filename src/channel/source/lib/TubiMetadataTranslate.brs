@@ -1045,19 +1045,21 @@ Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, c
   if container <> invalid AND container.children <> invalid
     prependContent = invalid
     if container.children.count() > 0 then
-      'bs:disable-next-line 1001 LINT1001
-      isTournamentTime = tournamentTimeFrame()
-      if screenId = m.constants.ui.screenIds.homeScreen AND container.id = m.constants.ui.categoryIds.fifawc AND (isTournamentTime = "duringTournament" OR isTournamentTime = "preTournament")
-        ' create and add a showAll content to the contents which hold the container metadata
-        prependContent = {
-          id: m.constants.ui.contentIds.showAllGames
-          title: "FIFA World Cup 2022" + chr(8482)
-          showAllText: getTranslation("screenHome_item_showAllGames")
-          type: "n"
-          thumbnails: [m.constants.urls.fifaShowAllPoster]
-          description: container.description
-          backgrounds: [m.constants.urls.fifaShowAllBackground]
-        }
+
+      if screenId = m.constants.ui.screenIds.homeScreen AND container.id = m.constants.ui.categoryIds.fifawc
+        isTournamentTime = tournamentTimeFrame()   'bs:disable-line 1001 LINT1001
+        if (isTournamentTime = "duringTournament" OR isTournamentTime = "preTournament")
+          ' create and add a showAll content to the contents which hold the container metadata
+          prependContent = {
+            id: m.constants.ui.contentIds.showAllGames
+            title: "FIFA World Cup 2022" + chr(8482)
+            showAllText: getTranslation("screenHome_item_showAllGames")
+            type: "n"
+            thumbnails: [m.constants.urls.fifaShowAllPoster]
+            description: container.description
+            backgrounds: [m.constants.urls.fifaShowAllBackground]
+          }
+        end if
       else if container.type = m.contentTypes.channel
         ' create and add a new content to the contents which hold the container metadata
         prependContent = {}
