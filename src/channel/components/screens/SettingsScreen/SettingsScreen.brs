@@ -285,9 +285,11 @@ Function createAboutPanel()
 
   sVersion = m.constants.deviceInfo.clientVersion
   if m.constants.settings.mode <> "production"
-    '//show the revision number when not in production
+    '//show the revision number and country code when not in production
     sVersion = sVersion + "." + m.constants.deviceInfo.revisionVersion
+    sVersion += " : " + m.constants.deviceInfo.countryCode
   end if
+
   sShortDeviceID = Right(m.constants.deviceInfo.deviceId, 7)
   sYear = CreateObject("roDateTime").GetYear().toStr()
   dynamicText = {
