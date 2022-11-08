@@ -6,6 +6,9 @@
 
 Function tournamentTimeFrame() as String
   tubilog("TournamentScreenHelpers.tournamentTimeFrame")
+  if m.constants.deviceInfo.countryCode <> invalid AND UCase(m.constants.deviceInfo.countryCode) <> "US"
+    return ""
+  end if
 
   todayDate = CreateObject("roDateTime")
   todayDate.ToLocalTime()
