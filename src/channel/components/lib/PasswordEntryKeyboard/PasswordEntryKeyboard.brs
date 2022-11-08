@@ -1,26 +1,27 @@
 Function init()
-    m.constants = m.global.constants
-    m.theme = m.global.theme
-    m.passwordMode = true
-    m.back = m.top.findNode("back")
-    m.back.text = getTranslation("linearVideoPlayer_buttonBack")
-    m.back.observeFieldScoped("selected", "onButtonSelected")
+  m.constants = m.global.constants
+  m.theme = m.global.theme
+  m.passwordMode = true
+  m.back = m.top.findNode("back")
+  m.back.text = getTranslation("linearVideoPlayer_buttonBack")
+  m.back.observeFieldScoped("selected", "onButtonSelected")
 
-    m.showHidePassword = m.top.findNode("showHidePassword")
-    m.showHidePassword.text = getTranslation("screenSettings_parentalPassword_button_show")
-    m.showHidePassword.observeFieldScoped("selected", "onButtonSelected")
+  m.showHidePassword = m.top.findNode("showHidePassword")
+  m.showHidePassword.text = getTranslation("screenSettings_parentalPassword_button_show")
+  m.showHidePassword.observeFieldScoped("selected", "onButtonSelected")
 
-    m.continue = m.top.findNode("continue")
-    m.continue.text = getTranslation("dialog_button_continue")
-    m.continue.observeFieldScoped("selected", "onButtonSelected")
+  m.continue = m.top.findNode("continue")
+  m.continue.text = getTranslation("dialog_button_continue")
+  m.continue.observeFieldScoped("selected", "onButtonSelected")
 
-    m.keyboard = m.top.findNode("Keyboard")
-    m.keyboard.domain = "password"
-    m.keyboard.textEditBox.visible = false
-    m.keyboard.palette = handleKeyboardColors()
+  m.keyboard = m.top.findNode("Keyboard")
+  m.keyboard.domain = "password"
+  m.keyboard.textEditBox.opacity = 0.00001
+  m.keyboard.palette = handleKeyboardColors()
 
-    m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
-    m.keyboard.textEditBox.observeFieldScoped("focusedChild", "onTextEditBoxFocusedChildChange")
+  m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
+  m.top.observeFieldScoped("voiceEnabled", "onVoiceEnabledChange")
+  m.keyboard.textEditBox.observeFieldScoped("focusedChild", "onTextEditBoxFocusedChildChange")
 End Function
 
 
@@ -96,9 +97,11 @@ End Function
 
 Function onScreenFocusChange()
   if m.top.hasFocus()
-    m.keyboard.textEditBox.voiceEnabled = true
     m.keyboard.keyGrid.setFocus(true)
-  else if m.top.isInFocusChain() = false
-    m.keyboard.textEditBox.voiceEnabled = false
   end if
+End Function
+
+
+Function onVoiceEnabledChange(msg)
+  m.keyboard.textEditBox.voiceEnabled = msg.getData()
 End Function

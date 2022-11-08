@@ -13,9 +13,7 @@ Function init()
   m.email = m.top.findNode("email")
 
   m.keyboard = m.top.findNode("Keyboard")
-
-  m.Keyboard.textEditBox.voiceEnabled = true
-  m.keyboard.textEditBox.visible = false
+  m.keyboard.textEditBox.opacity = 0.00001
   m.Keyboard.textEditBox.maxTextLength = 100
 
   m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")

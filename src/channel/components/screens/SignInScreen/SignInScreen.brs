@@ -33,9 +33,9 @@ Function init()
   m.ppBtn.text = getTranslation("screenSettings_menu_privacyPolicy")
   m.ppBtn.observeFieldScoped("selected", "onPrivacyPolicyButtonSelected")
 
-  m.donotsellMyInfoBtn = m.top.findNode("donotsellMyInfoBtn")
-  m.donotsellMyInfoBtn.text = getTranslation("screenSettings_menu_doNotSellPolicy")
-  m.donotsellMyInfoBtn.observeFieldScoped("selected", "onDoNotSellMyInfoButtonSelected")
+  m.doNotSellMyInfoBtn = m.top.findNode("doNotSellMyInfoBtn")
+  m.doNotSellMyInfoBtn.text = getTranslation("screenSettings_menu_doNotSellPolicy")
+  m.doNotSellMyInfoBtn.observeFieldScoped("selected", "onDoNotSellMyInfoButtonSelected")
 
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
   m.voiceKeyboard = m.keyboard.findNode("Keyboard")
@@ -79,7 +79,7 @@ Function onScreenFocusChange()
   m.top.backgroundUriList = m.backgroundUriList
   if m.top.hasFocus() then
     m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
-    m.voiceKeyboard.textEditBox.voiceEnabled = true
+    m.keyboard.voiceEnabled = true
     if m.email.text = "" 'if email field is empty when screen gains focus, then setting focus to email field
       m.email.setFocus(true)
       m.emailHasFocus = true
@@ -89,7 +89,7 @@ Function onScreenFocusChange()
   end if
 
   if m.top.isInFocusChain() = false
-    m.voiceKeyboard.textEditBox.voiceEnabled = false
+    m.keyboard.voiceEnabled = false
     m.keyboard.unobserveFieldScoped("text")
   end if
 
@@ -286,7 +286,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         m.continueBtn.setFocus(true)
       else if m.ppBtn.hasFocus() = true
         m.continueBtn.setFocus(true)
-      else if m.donotsellMyInfoBtn.hasFocus() = true
+      else if m.doNotSellMyInfoBtn.hasFocus() = true
         m.continueBtn.setFocus(true)
       else if m.keyboard.isInFocusChain() = true
         updatePasswordValidation()
@@ -300,12 +300,12 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       if m.termsBtn.hasFocus() = true
         m.ppBtn.setFocus(true)
       else if m.ppBtn.hasFocus() = true
-        m.donotsellMyInfoBtn.setFocus(true)
+        m.doNotSellMyInfoBtn.setFocus(true)
       end if
 
     else if key = "left"
 
-      if m.donotsellMyInfoBtn.hasFocus() = true
+      if m.doNotSellMyInfoBtn.hasFocus() = true
         m.ppBtn.setFocus(true)
       else if m.ppBtn.hasFocus() = true
         m.termsBtn.setFocus(true)
@@ -358,7 +358,7 @@ Function onKeyboardTextChanged()
     m.password.selected = true
     m.password.text = m.keyboard.text
   else if m.emailHasFocus = true
-    m.voiceKeyboard.textEditBox.voiceEnabled = false
+    m.keyboard.voiceEnabled = false
     m.top.emailSelected = true
   end if
  End Function

@@ -6,8 +6,6 @@ Function init()
 
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
-  m.voiceKeyboard = m.keyboard.findNode("Keyboard")
-  m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
   m.keyboard.observeFieldScoped("buttonSelected", "onButtonSelected")
 
   'set initial tracking values
@@ -19,7 +17,6 @@ Function init()
   }
 
   m.top.screenLevel = m.constants.ui.screenLevels.confirmPasswordScreen
-
   m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
 End Function
 
@@ -31,9 +28,10 @@ Function onScreenFocusChange()
   tubiLog("ConfirmPasswordScreen.onScreenFocusChange")
   if m.top.hasFocus()
     ' force a background update
+    m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
     m.top.backgroundUriList = m.backgroundUriList
-    m.Keyboard.setFocus(true)
-    m.voiceKeyboard.textEditBox.voiceEnabled = true
+    m.keyboard.setFocus(true)
+    m.keyboard.voiceEnabled = true
     if m.constants.settings.mode <> "production" and m.constants.settings.password <> invalid
       m.keyboard.text = m.constants.settings.password
       m.password.text = m.constants.settings.password
@@ -41,7 +39,7 @@ Function onScreenFocusChange()
   end if
   
   if m.top.isInFocusChain() = false
-    m.voiceKeyboard.textEditBox.voiceEnabled = false
+    m.keyboard.voiceEnabled = false
     m.keyboard.unobserveFieldScoped("text")
   end if
 End Function
