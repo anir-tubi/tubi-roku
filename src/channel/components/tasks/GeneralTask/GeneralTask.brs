@@ -181,20 +181,20 @@ Function processResponse(msg)
     if result <> invalid AND result.response <> invalid
 
       if callbackTypes <> invalid
-        noRetryErrorCodes = {
-          "404": true  ' content is unavailable, expect it will continue to be unavailable on retry
-          "422": true  ' user is under age with respect to COPPA, will continue to be under age on retry
-          "451": true  ' user is under age internationally, will continue to be under age on retry
+        canRetry4xxCodes = {
+          "401": true  ' not authorized, get a new auth token and try again
+          "403": true  ' forbidden, get a new auth token and try again
+          "408": true  ' request timed out, might not time out next time
         }
 
         code = result.response.code
 
         if code >= 200 AND code < 400
           processSuccessResponse(result, callbackTypes, job)
-        else if noRetryErrorCodes[code.toStr()] = true
+        else if code >= 400 AND code < 500 AND canRetry4xxCodes[code.toStr()] <> true
           ' error expected to remain error on retry so don't bother retrying
           processErrorReponse(result, callbackTypes, job)
-        else if (code = 403 or code = 401) AND m.constants.reqNames.acceptsTubiAuth[requestType] = true
+        else if (code = 403 OR code = 401) AND m.constants.reqNames.acceptsTubiAuth[requestType] = true
           if retries > 0
             ' request could not be authed by backend so attempt to refresh the auth token and try again
             timeout = 100
