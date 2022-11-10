@@ -30,7 +30,6 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
 
         ' onVideoPlayerVisibleChange exists in ContentController
         videoPlayer.observeFieldScoped("visible", "onLinearVideoPlayerVisibleFullscreenChange")
-        videoPlayer.observeFieldScoped("refreshChannels", "onChannelsRequested")
         videoPlayer.observeFieldScoped("fullscreen", "onLinearVideoPlayerVisibleFullscreenChange")
         videoPlayer.observeFieldScoped("channelSelectedUpdated", "onLinearChannelSelectedFromGuide")
         videoPlayer.observeFieldScoped("linearOverlayNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
@@ -799,81 +798,6 @@ Function onLinearChannelSelectedFromGuide(msg)
       '//Incorrect data, display an error
       reactToLinearVideoPlayerErrorState()
     end if
-  end if
-End Function
-
-' TODO check and delete this function
-' Triggered when the player requests the channels info in order to display the channel guide
-Function onChannelsRequested()
-  tubiLog("LinearVideoPlayerScreenHelpers.onChannelsRequested")
-  currentContent = getCurrentLinearContent()
-
-  if currentContent <> invalid AND currentContent.parentId <> invalid
-
-    options = {}
-    params = {}
-    headers = {}
-
-    params = {
-      "content_mode": m.constants.ui.contentMode.linear
-      "contents_limit": m.constants.performance.categoryGridList.finalBlockSize
-    }
-
-    options.params = params
-    options.headers = headers
-
-    isKids = shouldKidsModeBeSentToServer()
-    homescreenRequestInfo = m.cmsApi.homeScreenReqInfo(isKids, options)
-
-    m.makeRequest({
-      url: homescreenRequestInfo.url
-      options: homescreenRequestInfo.options
-      requestType: m.constants.reqNames.getChannelGuide
-      successCallback: onChannelGuideFetchSuccess
-      errorCallback: onChannelGuideFetchError
-      responseType: "node"
-      isSignedInUser: isLoggedInUser()
-    })
-  end if
-End Function
-
-
-Function onChannelGuideFetchSuccess(channelGuideContent)
-  tubiLog("LinearVideoPlayerScreenHelpers.onChannelGuideFetchSuccess")
-  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-  if videoPlayer <> invalid
-    if channelGuideContent <> invalid then
-      videoPlayer.channelsContent = channelGuideContent
-    end if
-  end if
-End Function
-
-
-Function onChannelGuideFetchError(response)
-  tubiLog("LinearVideoPlayerScreenHelpers.onChannelGuideFetchError")
-  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-  '//Only show an error modal if the channel guide is still visible
-  if videoPlayer <> invalid AND videoPlayer.displayingChannelGuide = true
-    errorMessage = getTranslation("channelGuide_error_fetchContent_description")
-    errorCode = getUserFacingErrorCode(m.constants.errors.context.linearPlayerScreen, m.constants.errors.subtypes.fetchError, response.code)
-
-    dialogEvent = {
-      type: "dialog"
-      values: {
-        dialog_type: "NETWORK_ERROR"
-        pageOneof: m.Tracking.getAnalyticsPage("", {})  'TODO: Add the linear video player page
-        dialog_action: "SHOW"
-        dialog_sub_type: errorCode
-      }
-    }
-
-    modalInfo = {
-      message: getErrorMessage(errorMessage, errorCode)
-      openTrackEvent: dialogEvent
-      trackingTask: m.trackingLoggingTask
-    }
-
-    showErrorModal(modalInfo, onChannelsRequested, invalid, closeLinearVideoPlayerTransport, invalid)
   end if
 End Function
 

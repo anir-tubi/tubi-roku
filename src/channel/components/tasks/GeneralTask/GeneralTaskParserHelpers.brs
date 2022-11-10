@@ -94,12 +94,6 @@ Function createParsingCallbacks()
     parseSuccess: parseDetailScreenRelatedContentSuccess
   }
 
-  ' channel guide
-  m.requestTypes[m.constants.reqNames.getChannelGuide] = {
-    parseSuccess: parseChannelGuideFetchSuccess
-    parseError: parseGenericError
-  }
-
   'epgChannelIds
   m.requestTypes[m.constants.reqNames.getEPGChannelIds] = {
     parseSuccess: parseEPGChannelIdsSuccess

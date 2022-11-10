@@ -246,34 +246,6 @@ Function tubiMetadataTranslate_translate_test()
 End Function
 
 
-'@Test translateLinearChannelGuide unit tests
-Function tubiMetadataTranslate_translateLinearChannelGuide_test()
-  linearHomescreenJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/linearHomescreen.json")
-  parsedLinearHomescreen = ParseJson(linearHomescreenJson)
-  translatedChannelGuide = m.translate.translateLinearChannelGuide(parsedLinearHomescreen)
-
-  ' testing the mocked json first, as a foundation for the functional tests
-  m.assertNotInvalid(parsedLinearHomescreen)
-  m.assertNotInvalid(parsedLinearHomescreen.containers)
-  m.assertNotInvalid(parsedLinearHomescreen.contents)
-  m.assertTrue(parsedLinearHomescreen.containers.count() > 1)
-  m.assertTrue(parsedLinearHomescreen.contents.count() > 1)
-
-  ' functional tests
-  m.assertNotInvalid(translatedChannelGuide)
-  m.assertTrue(type(translatedChannelGuide) = "roSGNode")
-
-  concatenatedContainerContentCount = 0
-  for each container in parsedLinearHomescreen.containers
-    if container.children <> invalid
-      concatenatedContainerContentCount += container.children.count()
-    end if
-  end for
-
-  m.assertTrue(translatedChannelGuide.getChildCount() = concatenatedContainerContentCount)
-End Function
-
-
 '@Test getContentFromCategoryJson unit tests
 Function tubiMetadataTranslate_getContentFromCategoryJson_test()
   categoryJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/category.json")

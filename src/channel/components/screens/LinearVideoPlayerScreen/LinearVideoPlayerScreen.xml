@@ -88,12 +88,6 @@
       <!-- When this is called, then the helper should display the EPGScreen-->
       <field id="navigateToEPGScreen" alias="VideoOverlay.navigateToEPGScreen"/>
 
-      <!-- Set when the video player needs to display the channel guide -->
-      <field id="refreshChannels" type="boolean" alwaysNotify="true" />
-
-      <!-- If true, then the player is currently playing the channel guide -->
-      <field id="displayingChannelGuide" type="boolean" />
-
       <field id="state" type="string" />
 
       <!-- Used to store the loading state. It should not be used as an observed field. -->

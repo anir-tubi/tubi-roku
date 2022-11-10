@@ -11,7 +11,6 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     translateFIFAHomescreen: tubiMetadataTranslate_translateFIFAHomescreen
     translateHomescreen: tubiMetadataTranslate_translateHomescreen
     translateCategoriesListScreen: tubiMetadataTranslate_translateCategoriesListScreen
-    translateLinearChannelGuide: tubiMetadataTranslate_translateLinearChannelGuide
     translateEPGChannelIds: tubiMetadataTranslate_translateEPGChannelIds
     translateEPGPrograms: tubiMetadataTranslate_translateEPGPrograms
     translateTournamentScreen: tubiMetadataTranslate_translateTournamentScreen
@@ -859,40 +858,6 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
   tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
 
   return translated
-End Function
-
-
-' The linear channel guide UI expects a list of linear contents within a
-' single parent content node. Here, we concatenate each container of the
-' homescreen response into a single "container".
-'
-' @homescreenResponse: assocArray, the AA representation of the matrix/homescreen response
-'
-' @returns: a parent content node containing children content nodes,
-'           each representing a linear channel or invalid on invalid input
-Function tubiMetadataTranslate_translateLinearChannelGuide(homescreenRes)
-  tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateLinearChannelGuide()")
-  if homescreenRes <> invalid AND homescreenRes.containers <> invalid
-    channelsParent = CreateObject("roSGNode", "CategoryContentNode")
-    containers = homescreenRes.containers
-    contents = homescreenRes.contents
-
-    allChannels = {
-      children: []
-      subtype: "TubiContentNode"
-    }
-
-    for each container in containers
-      categoryAA = m.buildCategoryAA(container, contents, "", "", true, "linear")
-      allChannels.children.append(categoryAA.children)
-    end for
-
-    channelsParent.update(allChannels)
-
-    return channelsParent
-  else
-    return invalid
-  end if
 End Function
 
 

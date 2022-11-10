@@ -16,7 +16,6 @@
     <script type="text/brightscript" uri="Parsers/CategoryDetailsScreenParsers.brs" />
     <script type="text/brightscript" uri="Parsers/SearchScreenParsers.brs" />
     <script type="text/brightscript" uri="Parsers/AgeVerificationScreenParsers.brs" />
-    <script type="text/brightscript" uri="Parsers/LinearVideoScreenParsers.brs" />
     <script type="text/brightscript" uri="Parsers/EPGScreenParser.brs" />
     <script type="text/brightscript" uri="Parsers/UncategorizedParsers.brs" />
     <script type="text/brightscript" uri="Parsers/UpdateParentalRatingParsers.brs" />

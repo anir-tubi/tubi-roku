@@ -236,7 +236,6 @@ Function getConstants()
     constants.reqNames.checkBirthdayInfo = "checkBirthdayInfo" 'verify age
     constants.reqNames.patchUserSettings = "patchUserSettings"
     constants.reqNames.sponsorPixel = "sponsorPixel"
-    constants.reqNames.getChannelGuide = "getChannelGuide"
     constants.reqNames.getEPGChannelIds = "getEPGChannelIds"
     constants.reqNames.getEPGPrograms = "getEPGPrograms"
     constants.reqNames.postUserHistory = "postUserHistory"
@@ -273,7 +272,6 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getChannel] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getLiveManifest] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.emailExists] = true
-      constants.reqNames.acceptsTubiAuth[constants.reqNames.getChannelGuide] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postUserHistory] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.signup] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.signIn] = true

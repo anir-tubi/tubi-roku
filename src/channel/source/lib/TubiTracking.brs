@@ -904,13 +904,6 @@ Function tubiTracking_getOneOfs()
 
     top_nav_component: section_topNav
 
-    channel_guide_component: {
-      category_slug: ""
-      category_row: -1   ' 1 based index
-      category_col: -1   ' 1 based index
-      content_tile: {}  ' ContentTile message - optional
-    }
-
     category_component: {   ' Used for category screen, channel details screen, channel/category grid screen
       category_slug: ""
       category_row: -1   ' 1 based index
