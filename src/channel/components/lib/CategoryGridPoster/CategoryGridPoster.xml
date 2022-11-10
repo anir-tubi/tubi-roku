@@ -92,29 +92,6 @@
         uri="pkg:/fonts/Vaud-Medium.ttf"
         size="30" />
     </Label>
-    <Group
-      id="TVGuideNumberChannels"
-      visible="false">
-      <Poster
-        id="TVGuideNumberBground"
-        width="81"
-        height="36"
-        opacity=".16"
-        uri="pkg:/images/tab_short_component_alt_fhd.9.png"/>
-      <Label
-        color="0xFFFFFFFF"
-        width="80"
-        height="36"
-        text="95+"
-        translation="[2,3]"
-        horizAlign="center"
-        vertAlign="center">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="30" />
-      </Label>
-    </Group>
     <Group id="badgeGroup"/>
   </children>
 </component>

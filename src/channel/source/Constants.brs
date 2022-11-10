@@ -1097,7 +1097,6 @@ Function getConstants()
       constants.ui.contentIds.homegrid = "homegrid"
       constants.ui.contentIds.categoryList = "categoriesList"
       constants.ui.contentIds.channelList = "channelsList"
-      constants.ui.contentIds.tvGuide = "tvGuide"
       constants.ui.contentIds.timeGridContent = "timeGridContent"
       constants.ui.contentIds.sportsTimeGridContent = "sportsTimeGridContent"
       constants.ui.contentIds.newsTimeGridContent = "newsTimeGridContent"

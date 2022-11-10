@@ -865,10 +865,6 @@ Function getTranslation_en_US()
       "description": "Onscreen message to indicate Tournament content could not be loaded",
       "message": "Unable to load the Tubi Tournament screen."
     },
-    "screenHome_item_tvguide_subtitle": {
-      "description": "The subtitle of the rowList item for the TV Guide. It should be in title case.",
-      "message": "See All Channels"
-    },
     "epg_minutes_left": {
       "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
       "message": "{minutes}m left"
@@ -2238,10 +2234,6 @@ Function getTranslation_es_MX()
     "screenTournament_error_fetchScreenContent_description": {
       "description": "Onscreen message to indicate Tournament content could not be loaded",
       "message": "No se puede cargar la pantalla del Torneo en Tubi."
-    },
-    "screenHome_item_tvguide_subtitle": {
-      "description": "The subtitle of the rowList item for the TV Guide. It should be in title case.",
-      "message": "Ver Todos Los Canales"
     },
     "epg_minutes_left": {
       "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",

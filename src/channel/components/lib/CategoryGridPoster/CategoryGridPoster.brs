@@ -11,9 +11,6 @@ Function init()
   m.title = m.top.findNode("Title")
   m.LinearTitle = m.top.findNode("LinearTitle")
   m.LinearSubTitle = m.top.findNode("LinearSubTitle")
-  m.tVGuideNumberChannels = m.top.findNode("TVGuideNumberChannels")
-  m.TVGuideNumberBground = m.top.findNode("TVGuideNumberBground")
-  m.TVGuideNumberBground.blendColor = "0x9699A3FF"
   m.posterFadeTime = 0.5
 
   '//recreate the contentTypes from constants so as not to access m.global.constants for every item on the home screen as they are created
@@ -46,9 +43,7 @@ Function init()
     vitg: "vitg"
     historySignedOutUser: "continue_watching_signed_out_user"
   }
-  m.itemIDs = {
-    tvGuide: "tvGuide"
-  }
+
   di = CreateObject("roDeviceInfo")
   m.top.observeFieldScoped("focusPercent", "onItemFocusPercentChange")
   m.top.observeFieldScoped("itemHasFocus", "onRowItemHasFocus")
@@ -78,7 +73,6 @@ Function onContentChange(msg)
   m.title.visible = false
   m.LinearTitle.visible = false
   m.LinearSubTitle.visible = false
-  m.tVGuideNumberChannels.visible = false
 
   gradientPoster =  m.poster.findNode("gradientPoster")
   if gradientPoster <> invalid
@@ -188,40 +182,40 @@ End Function
 
 ' @localFocus: boolean, the state of focus for the itemComponent
 Function handleLocalFocusChange(newLocalFocus)
-  if m.top.itemContent.id <> m.itemIDs.tvGuide
-    if m.localFocus = false AND newLocalFocus = true
-      ' item is gaining focus
-      if isVitg(m.top.itemContent, m.gridItemTypes) = true
-        if m.vitg = invalid
-          '// create the video player when the vitig item gains focus
-          m.vitg = createVitgVideo()
-          if m.vitg <> invalid
-            m.vitg.hasFocus = newLocalFocus
-          end if
-        end if
-      end if
-    else if m.localFocus = true AND newLocalFocus = false
-      ' item is losing focus - so fade the poster in (as necessary) and destroy the video player
-      if m.poster.opacity < 1.0
-        ' stop any fade out animations that might be running
-        if m.fadeOutAnimation <> invalid
-          m.fadeOutAnimation.control = "stop"
-        end if
 
-        ' fade in the poster, but if there is already a fade in animation running, let it run
-        if m.fadeInAnimation = invalid OR m.fadeInAnimation.state <> "running"
-          m.fadeInAnimation = fade(m.poster, "in", m.posterFadeTime)
+  if m.localFocus = false AND newLocalFocus = true
+    ' item is gaining focus
+    if isVitg(m.top.itemContent, m.gridItemTypes) = true
+      if m.vitg = invalid
+        '// create the video player when the vitig item gains focus
+        m.vitg = createVitgVideo()
+        if m.vitg <> invalid
+          m.vitg.hasFocus = newLocalFocus
         end if
-      end if
-
-      ' destroy the video player
-      if m.vitg <> invalid
-        ' removing focus before destroying vitg lets finish_trailer events be fired from the vitg node
-        m.vitg.hasFocus = newLocalFocus
-        destroyVitgVideo()
       end if
     end if
+  else if m.localFocus = true AND newLocalFocus = false
+    ' item is losing focus - so fade the poster in (as necessary) and destroy the video player
+    if m.poster.opacity < 1.0
+      ' stop any fade out animations that might be running
+      if m.fadeOutAnimation <> invalid
+        m.fadeOutAnimation.control = "stop"
+      end if
+
+      ' fade in the poster, but if there is already a fade in animation running, let it run
+      if m.fadeInAnimation = invalid OR m.fadeInAnimation.state <> "running"
+        m.fadeInAnimation = fade(m.poster, "in", m.posterFadeTime)
+      end if
+    end if
+
+    ' destroy the video player
+    if m.vitg <> invalid
+      ' removing focus before destroying vitg lets finish_trailer events be fired from the vitg node
+      m.vitg.hasFocus = newLocalFocus
+      destroyVitgVideo()
+    end if
   end if
+
   m.localFocus = newLocalFocus
 End Function
 
@@ -273,33 +267,8 @@ Function setUpLinear()
   nLinearTitlePlacement = m.top.height - m.LinearTitle.height - 36
   m.LinearTitle.translation = [0,nLinearTitlePlacement]
 
-
-  if m.top.itemContent.id <> m.itemIDs.tvGuide
-    m.poster.uri = "pkg:/images/gradientBground-linearItem-vertical.png"
-    m.LinearTitle.text = m.top.itemContent.title
-  else
-    if m.uiResolution <> "FHD"
-      m.poster.uri = "https://cdn.adrise.tv/image/roku_support_images/gradientBground-linearItem-tvGuide_hd.png"
-    else
-      m.poster.uri = "https://cdn.adrise.tv/image/roku_support_images/gradientBground-linearItem-tvGuide_fhd.png"
-    end if
-    '//Note: For the TV Guide item, the title is set to the subtitle component and the subtitle is set to the title component.
-    m.LinearSubTitle.visible = true
-    m.LinearSubTitle.width = m.top.width * .9
-    nLinearSubTitle_X = (m.top.width - m.LinearSubTitle.width)/2
-    m.LinearSubTitle.translation = [nLinearSubTitle_X, m.LinearSubTitle.translation[1]]
-    m.LinearSubTitle.text = m.top.itemContent.title
-    m.LinearTitle.text = getTranslation("screenHome_item_tvguide_subtitle")
-    m.tVGuideNumberChannels.visible = true
-
-    '//Set the X,Y coordinates of the tVGuideNumberChannels component
-    nTVGuideNumberChannels_X = (m.top.width - m.TVGuideNumberBground.width)/2
-    m.tVGuideNumberChannels.translation = [nTVGuideNumberChannels_X,nLinearTitlePlacement]
-
-    '//Set the new Y position for the title text
-    nLinearTitlePlacement = nLinearTitlePlacement - m.TVGuideNumberBground.height - 18
-    m.LinearTitle.translation = [0, nLinearTitlePlacement]
-  end if
+  m.poster.uri = "pkg:/images/gradientBground-linearItem-vertical.png"
+  m.LinearTitle.text = m.top.itemContent.title
   m.LinearPoster.translation = [381,198]
 
   ' It is possible when fast scrolling to the row, that the item can gain focus before setUpLinear() runs.
