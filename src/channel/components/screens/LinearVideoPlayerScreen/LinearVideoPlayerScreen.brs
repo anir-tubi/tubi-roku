@@ -28,7 +28,6 @@ Function init()
   m.Video.observeField("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
-  m.Video.observeField("globalCaptionMode", "onCaptionModeChange")
   m.Video.observeField("timedMetaData", "onId3")
 
   m.Video.timedMetaDataSelectionKeys = ["*"]
@@ -376,6 +375,7 @@ End Function
 
 Function onFullScreenChange()
   if m.top.fullscreen = true
+    m.Video.observeFieldScoped("globalCaptionMode", "onCaptionModeChange")
     m.gradiantOnMinimizedState.visible = false
     hideProgrammingData()
 
@@ -386,6 +386,7 @@ Function onFullScreenChange()
       end if
     end if
   else
+    m.Video.unobserveFieldScoped("globalCaptionMode")
     m.gradiantOnMinimizedState.visible = true
     '//Display program data when minimized (if it is available)
     setMinimizedInfoPanelProgrammingDataWithChannelTimeGridContent()

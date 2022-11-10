@@ -57,7 +57,6 @@ Function init()
   m.Video.observeField("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
-  m.Video.observeField("globalCaptionMode", "onCaptionModeChange")
   m.Video.observeField("streamingSegment", "onStreamingSegmentChange")
 
   m.top.observeField("updateContent", "onContentChange")
@@ -931,7 +930,6 @@ Function onCaptionModeChange()
         end if
       end if
     end for
-
     trackEvent({
       type: "subtitles_toggle"
       values: {
@@ -1135,6 +1133,7 @@ End Function
 Function prepareToStartVideo(content, videoResourceIndex = [0,0])
 
   resetVideoPlayerState(content)
+  m.Video.observeFieldScoped("globalCaptionMode", "onCaptionModeChange")
 
   videoResources = content.videoResources
   codecIndex = videoResourceIndex[0]
@@ -1193,6 +1192,7 @@ End Function
 
 Function stopVideo()
   tubilog("VideoPlayer.stopVideo")
+  m.Video.unobserveFieldScoped("globalCaptionMode")
   updateVideoState("stop")
 
   ' add check so that onVideoStateChange doesn't get called
