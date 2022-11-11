@@ -1024,7 +1024,6 @@ Function getConstants()
       constants.ui.screenLevels.videoPlayerScreen = 60
       constants.ui.screenLevels.linearVideoPlayerScreen = 60
       constants.ui.screenLevels.emailInputScreen = 90
-      constants.ui.screenLevels.signUpScreen = 90
       constants.ui.screenLevels.signInScreen = 90
       constants.ui.screenLevels.ageGateScreen = 90
       constants.ui.screenLevels.emailVerificationScreen = 90
@@ -1048,7 +1047,6 @@ Function getConstants()
       constants.ui.screenIds.detailScreen = "detailScreen"
       constants.ui.screenIds.episodeScreen = "episodeScreen"
       constants.ui.screenIds.emailInputScreen = "emailInputScreen"
-      constants.ui.screenIds.signUpScreen = "signUpScreen"
       constants.ui.screenIds.signInScreen = "signInScreen"
       constants.ui.screenIds.upNextScreen = "upNextScreen"
       constants.ui.screenIds.modalDialogScreen = "modalDialogScreen"

@@ -851,7 +851,6 @@ End Function
 Function popScreenAfterSignInProcess()
   poppableScreenSubtypes = {
     "SignInScreen": true
-    "SignUpScreen": true
     "EmailInputScreen": true
     "AgeVerificationScreen": true
     "SignUpAgeVerificationScreen": true
