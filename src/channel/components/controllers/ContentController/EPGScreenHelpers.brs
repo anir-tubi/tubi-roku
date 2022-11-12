@@ -14,15 +14,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     ' this is required for setting focus to epgscreen after activation/signout
     epgScreen.shouldFocusWhenPushed = m.top.fadeInContentController
     changeEPGScreenBackground(epgScreen) ' ensure background of the epg screen is used immediatly instead of previous screen's background
-    shouldSendPageLoadEvent = true
     epgScreen.signedIn = isLoggedInUser()
-    if epgScreen.contentReady = false
-      'First batch of Contents are not ready. So send the pageloadEvent after onContentReady()
-      shouldSendPageLoadEvent = false
-      showHideSpinner(true)
-    else
-      showHideSpinner(false)
-    end if
 
     ' set which component to focus on once the screen gains focus
     if componentToFocus = m.constants.ui.epgScreen.focusItems.topNav
@@ -31,7 +23,6 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
       epgScreen.componentToFocus = m.constants.ui.epgScreen.focusItems.epgTimeGrid
     end if
 
-    pushScreen(epgScreen, true, shouldSendPageLoadEvent)
   else
     displayDefaultBackground()  ' clear background from previous screens until epgscreen loads
     showHideSpinner(true)
@@ -71,9 +62,18 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     else
       epgScreen.componentToFocus = m.constants.ui.epgScreen.focusItems.epgTimeGrid
     end if
-
-    pushScreen(epgScreen, true, true)
   end if
+
+  shouldSendPageLoadEvent = true
+  if epgScreen.contentReady = false
+    'First batch of Contents are not ready. So send the pageloadEvent after onContentReady()
+    shouldSendPageLoadEvent = false
+    showHideSpinner(true)
+  else
+    showHideSpinner(false)
+  end if
+
+  pushScreen(epgScreen, true, shouldSendPageLoadEvent)
 
   if screenID = m.constants.ui.screenIds.epgScreen
     epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.linearEPG
