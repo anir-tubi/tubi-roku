@@ -15,8 +15,7 @@ Function init()
   m.KidsModeMessage = m.top.findNode("KidsModeMessage")
   m.leftSide = m.top.findNode("leftSide")
   m.SearchText = m.top.findNode("SearchText")
-  m.searchScreenInfoPanel = m.top.findNode("SearchSCreenInfoPanel")
-  hasVoiceRemoteFeature = m.constants.deviceInfo.hasVoiceRemoteFeature
+  m.searchScreenInfoPanel = m.top.findNode("SearchScreenInfoPanel")
 
   m.voiceHintfont = CreateObject("roSGNode", "Font")
   m.voiceHintfont.uri = "pkg:/fonts/Vaud-SemiBold.ttf"
@@ -24,20 +23,19 @@ Function init()
   m.searchMenuText = m.top.findNode("searchMenuText")
   m.searchHintText = m.top.findNode("searchHintText")
 
-
-  'show voice hint message if user has voice remote
-  if hasVoiceRemoteFeature = true
-    setTextForVoiceHint()
-  end if
-
   m.keyboard = m.top.findNode("Keyboard")
 
   m.keyboard.id = "SearchKeyboard"
   m.keyboard.setFocus(true)
-  m.Keyboard.textEditBox.maxTextLength = 100
+  m.keyboard.textEditBox.maxTextLength = 100
 
-  m.Keyboard.keyGrid.keyDefinitionUri = "pkg:/components/data/CustomAddressKDF.json"
-  m.keyboard.textEditBox.visible = false
+  m.keyboard.keyGrid.keyDefinitionUri = "pkg:/components/data/CustomAddressKDF.json"
+
+  ' A value of zero or setting visible to false will cause voiceEnabled to not get updated properly when its state changed
+  m.keyboard.textEditBox.opacity = 0.00001
+
+  m.keyboard.textEditBox.observeFieldScoped("voiceEnabled", "onKeyboardTextEditBoxVoiceEnabledChange")
+  onKeyboardTextEditBoxVoiceEnabledChange()
 
   ' searchDebounce timer helps to reduce number of search api requests
   m.searchDebounce = m.top.findNode("searchDebounce")
@@ -99,6 +97,18 @@ Function init()
   if m.constants.deviceInfo.uiResolution <> "FHD"
     '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
+  end if
+End Function
+
+
+Function onKeyboardTextEditBoxVoiceEnabledChange()
+  if m.keyboard.textEditBox.voiceEnabled = true then
+    if m.microphone = invalid then
+      setTextForVoiceHint()
+    end if
+    m.microphone.visible = true
+  else if m.microphone <> invalid then
+    m.microphone.visible = false
   end if
 End Function
 
@@ -558,83 +568,6 @@ Function onTextEditBoxFocused()
   m.Keyboard.setFocus(true)
 End Function
 
-
-'Set the text that tells users that they can use the remote
-'control's microphone button on the search screen. Because
-'the voice hint text can be different widths based on the language,
-'this function will also determine where exactly to place the microphone button,
-'which needs to be placed immediately after the text.
-Function setVoiceHint()
-  hint = getTranslation("search_hint")
-  hintArr = hint.split(" ")
-  m.voiceHint.wrap = true
-  m.voiceHint.text = ""
-  'Array of Labels(each item in the array = each label in the layoutgroup)
-  labelListArray = []
-  'Array to determine the number of words in a line
-  sentenceArray = []
-  wordCount = hintArr.count()
-  'width to determine microphone x translation
-  lastLineWidth = 0
-  labelWidth = m.keyboard.boundingRect().width
-  'Below logic is to handle the custom wrap to add microphone image at the end of the translated text.
-  'splitting the sentence into words by space, we are adding the words
-  'to the labelListArray until it satisfies the lineWidth. If the width exceeds,
-  'will move the words to the next line. Later each line converted to a label.
-  for i = 0 to wordCount - 1
-    if i = 0
-      m.voiceHint.text = hintArr[i]
-    else
-      m.voiceHint.text = m.voiceHint.text + " " + hintArr[i]
-    end if
-    width = m.voiceHint.boundingRect().width
-    'if the total width of combined words is exceeding the line width move to next line
-    'else append to the sentenceArray
-    if width > labelWidth or i = wordCount - 1
-      labelListArray.push(sentenceArray.join(" "))
-      'if it's last word determine the lastline width
-      'else initiate the next line
-      if i = wordCount - 1
-        'if the total width of combined words is exceeding the line width move to next line
-        'else consider it as last line and set the last line width
-        if width > labelWidth
-         labelListArray.push(hintArr[i])
-         m.voiceHint.text = hintArr[i]
-         lastLineWidth = m.voiceHint.boundingRect().width
-        else
-          sentenceArray.push(hintArr[i])
-          labelListArray[labelListArray.count() -1] = sentenceArray.join(" ")
-          lastLineWidth = width
-        end if
-      else
-        sentenceArray = [hintArr[i]]
-        m.voiceHint.text = hintArr[i]
-      end if
-    else
-      sentenceArray.push(hintArr[i])
-    end if
-  end for
-  noOfLines = labelListArray.count()
-  m.voiceHint.width = labelWidth
-  if noOfLines > 0
-    m.voiceHint.text = labelListArray[0]
-    'createLayoutGroup for eachline in labelListArray and ifit's lastline append microphone icon at the end
-    for i = 1 to noOfLines - 1
-      voiceHintLine = m.voiceHint.clone(true)
-      voiceHintLine.id = "voiceHint" + i.toStr()
-      voiceHintLine.text = labelListArray[i]
-      m.searchHintGroup.appendChild(voiceHintLine)
-      if i = noOfLines - 1
-        microphone = voiceHintLine.createChild("Poster")
-        microphone.uri = "pkg:/images/microphone.png"
-        microphone.width = "36"
-        microphone.height = "36"
-        microphone.translation = [lastLineWidth + 3, -5]
-      end if
-    end for
-  end if
-
-End Function
 
 
 Function setDefaultText()
