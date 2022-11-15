@@ -109,6 +109,9 @@ Function createDeeplinkContentFromStartupArgs(args)
         content.deeplinkType = "espanolPage"
       else if args.page = "kids"
         content.deeplinkType = "kids"
+      ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+      else if args.page = "tournament"
+        content.deeplinkType = "tournamentPage"
       end if
     end if
 
@@ -218,6 +221,8 @@ Function handleDeeplinkContentByType()
       handleKidsPageDeeplinkContent()
     else if m.deepLinkContent.deeplinktype = "espanolPage"
       handleEspanolPageDeeplinkContent()
+    else if m.deepLinkContent.deeplinktype = "tournamentPage"
+      handleTournamentPageDeeplinkContent()
     else if m.deepLinkContent.deeplinktype = "tvPage"
       handleTVPageDeeplinkContent()
     else if m.deepLinkContent.deeplinktype = "series"
@@ -306,9 +311,6 @@ End Function
 ' @message: string, message to show on the deeplink error modal if not using the default
 Function showDeeplinkErrorModal(response=invalid,  message = "")
   tubilog("deeplinkHelpers.showDeeplinkErrorModal")
-  if message = ""
-    message = getTranslation("error_deeplink_content")
-  end if
 
   dialogType = "CONTENT_NOT_FOUND"
   if response <> invalid
@@ -320,7 +322,13 @@ Function showDeeplinkErrorModal(response=invalid,  message = "")
     end if
   else if isKidsModeEnabledByParentalControls() = true OR m.uiMode = m.constants.ui.modes.kidsAgeGate
     dialogType = "RESTRICTED_CONTENT"
-    message = getTranslation("dialog_contentNotAvailable_Parental_description")
+    if message = ""
+      message = getTranslation("dialog_contentNotAvailable_Parental_description")
+    end if
+  end if
+
+  if message = ""
+    message = getTranslation("error_deeplink_content")
   end if
 
   title = getTranslation("dialog_errorOops_title")
@@ -405,6 +413,8 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
     else if entryPoint = m.constants.deeplinks.entryPoints.epg
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("linear_browse_page", {})
+    else if entryPoint = m.constants.deeplinks.entryPoints.tournament
+      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("worldcup_browse_page", {})
     else if entryPoint = m.constants.deeplinks.entryPoints.category
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("category_list_page", {})
     else if entryPoint = m.constants.deeplinks.entryPoints.channel
@@ -459,6 +469,25 @@ Function handleLinearDeeplinkContent()
     end if
     focusSideNavOption(sCatSideNavID)
   end if
+End Function
+
+
+Function handleTournamentPageDeeplinkContent()
+  tubilog("DeeplinkHelpers.handleTournamentPageDeeplinkContent")
+  if m.enteredFromDeepLink = true
+    sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.tournament, m.Tracking, m.trackingLoggingTask, m.constants)
+  end if
+  if isParentalControlsAdultLevel() = false OR m.uiMode = m.constants.ui.modes.kidsAgeGate
+    ' Display error message indicating to turn off the parental controls
+    message = getTranslation("dialog_sideNavItemDisabled_Parental_description")
+    showDeeplinkErrorModal(invalid, message)
+  else
+    setUiMode(m.constants.ui.modes.standard)
+    showTournamentScreen(m.constants)
+    focusSideNavOption(m.constants.ui.sideNavIds.home)
+  end if
+  resetDeeplinkValues()
+
 End Function
 
 

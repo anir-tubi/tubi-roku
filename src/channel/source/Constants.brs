@@ -1370,6 +1370,7 @@ Function getConstants()
       constants.deeplinks.entrypoints.news = "news"
       constants.deeplinks.entrypoints.episodeList =  "episodeList"
       constants.deeplinks.entrypoints.video = "video"
+      constants.deeplinks.entrypoints.tournament = "tournament"
 
       constants.tournament = {}
       constants.tournament.startDate = "2022-11-20T08:00:00Z"
