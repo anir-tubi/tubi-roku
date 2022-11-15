@@ -300,6 +300,7 @@ End Function
 
 ' Call this function when the left or back buttons are pressed and the side nav should be opened.
 Function openSideNavFromButton()
+  tubilog("ContentController.openSideNavFromButton")
   '//reset videoSponsorExposureId when the side nav is opened
   m.videoSponsorExposureId = ""
   displayNavMenu(true)

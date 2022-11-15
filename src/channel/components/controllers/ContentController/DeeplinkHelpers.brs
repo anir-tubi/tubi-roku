@@ -243,6 +243,9 @@ Function handleDeeplinkContentByType()
       showDetailScreen(m.deeplinkContent, false, skipDetailScreen, handleSingleContentDeeplinkError)
     else if m.deepLinkContent.deeplinktype = "sports"
       showDetailScreen(m.deeplinkContent, false, skipDetailScreen, handleSingleContentDeeplinkError)
+      'Set the sideNav id to be "home" because tournament Screen's left button should focus on sideNav->home menu item.
+      sideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
+      focusSideNavOption(sideNavID)
     else
       message = getTranslation("error_deeplink_page")
       showDeeplinkErrorModal(invalid, message)
