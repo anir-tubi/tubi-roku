@@ -796,6 +796,8 @@ Function onDeeplinkSeriesContentSuccess(singleContent)
   tubilog("deeplinkHelpers.onDeeplinkSeriesContentSuccess")
   if singleContent.type = m.constants.ui.contentTypes.video
     handleDeeplinkVideoSuccessResponse(singleContent, handleDeeplinkSeriesSuccessResponse, handleSingleContentDeeplinkError)
+  else
+    showDeeplinkErrorModal()
   end if
 End Function
 
@@ -806,6 +808,8 @@ Function onDeeplinkEpisodeContentSuccess(singleContent)
 
   if singleContent.type = m.constants.ui.contentTypes.video
     handleDeeplinkVideoSuccessResponse(singleContent,  handleDeeplinkEpisodeSuccessResponse, handleSingleContentDeeplinkError)
+  else
+    showDeeplinkErrorModal()
   end if
 
 End Function
@@ -815,6 +819,8 @@ Function onDeeplinkSeasonContentSuccess(singleContent)
   tubilog("deeplinkHelpers.onDeeplinkSeasonContentSuccess")
   if singleContent.type = m.constants.ui.contentTypes.video
     handleDeeplinkVideoSuccessResponse( singleContent, handleDeeplinkSeasonSuccessResponse, handleSingleContentDeeplinkError)
+  else
+    showDeeplinkErrorModal()
   end if
 End Function
 
