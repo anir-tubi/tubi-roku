@@ -976,7 +976,7 @@ Function onQueryStatusOfMagicLinkResponse(response)
     onStopAndClearEmailVerificationTimer()
     Auth = TubiAuth(m.constants, m.Request)
     Auth.handleRegistration(response)
-    onSignUpResponse(invalid)
+    onSignInResponse(invalid)
   end if
 
 End Function
