@@ -579,7 +579,7 @@ Function cmsApi_searchReqInfo_test()
     "platform"
     "device_id"
     "search"
-    "isKidsMode"
+    "is_kids_mode"
     "images[poster_tb]"
   ]
 
@@ -591,7 +591,7 @@ Function cmsApi_searchReqInfo_test()
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "search": "search_text"
-      "isKidsMode": false
+      "is_kids_mode": false
       "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
     }
   }

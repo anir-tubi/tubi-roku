@@ -292,7 +292,7 @@ Function cmsApi_getSearchRequestInfo(searchText, bKidsMode = false)
   url = m.constants.urls.search
   options = m.getCommonOptions()
   options.params["search"] = searchText
-  options.params["isKidsMode"] = bKidsMode
+  options.params["is_kids_mode"] = bKidsMode
   options.params = m.setTupianPosterParam(options.params)
 
   if bKidsMode = false
