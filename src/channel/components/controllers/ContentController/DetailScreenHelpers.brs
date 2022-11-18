@@ -1898,6 +1898,8 @@ End Function
 ' Used when a user presses the "play" button on the homescreen, for instance.
 ' @refreshedContent: roSGNode, full metadata as received from the cms/content route
 Function skipDetailScreen(refreshedContent)
+  tubilog("detailScreenHelpers.skipDetailScreen")
+
   subScreen = getHiddenScreen(1)
 
   trackingPageInfo = {}
@@ -1942,7 +1944,6 @@ Function skipDetailScreen(refreshedContent)
           end if
 
         end if
-
       end if
     else
       setDetailStrings(detailScreen, refreshedContent)  'if deeplink content is locked, refresh the initial buttons to reflect content and user status.

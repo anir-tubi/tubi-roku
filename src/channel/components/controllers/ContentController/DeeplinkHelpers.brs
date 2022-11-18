@@ -227,7 +227,7 @@ Function handleDeeplinkContentByType()
       handleTVPageDeeplinkContent()
     else if m.deepLinkContent.deeplinktype = "series"
       if Left(m.deepLinkContent.id, 1) = "0"
-        showDetailScreen(m.deepLinkContent, false, skipDetailScreen, handleSingleContentDeeplinkError)
+        showDetailScreen(m.deepLinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError)
       else
         getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeriesContentSuccess, handleSingleContentDeeplinkError)
       end if
@@ -235,14 +235,14 @@ Function handleDeeplinkContentByType()
       getSingleContentFromServer(m.deeplinkContent, onDeeplinkEpisodeContentSuccess, handleSingleContentDeeplinkError)
     else if m.deepLinkContent.deeplinktype = "season"
       if Left(m.deepLinkContent.id, 1) = "0"
-        showDetailScreen(m.deepLinkContent, false, skipDetailScreen, handleSingleContentDeeplinkError)
+        showDetailScreen(m.deepLinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError)
       else
         getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeasonContentSuccess, handleSingleContentDeeplinkError)
       end if
     else if m.deepLinkContent.deeplinktype = "movie"
-      showDetailScreen(m.deeplinkContent, false, skipDetailScreen, handleSingleContentDeeplinkError)
+      showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError)
     else if m.deepLinkContent.deeplinktype = "sports"
-      showDetailScreen(m.deeplinkContent, false, skipDetailScreen, handleSingleContentDeeplinkError)
+      showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError)
       'Set the sideNav id to be "home" because tournament Screen's left button should focus on sideNav->home menu item.
       sideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
       focusSideNavOption(sideNavID)
@@ -851,4 +851,13 @@ Function handleSingleContentDeeplinkError(error)
   end if
 
   showDeeplinkErrorModal(error, message)
+End Function
+
+
+Function skipDetailScreenDeeplinkWrapper(refreshedContent)
+  if refreshedContent.type = m.constants.ui.contentTypes.linear
+    handleSingleContentDeeplinkError(invalid) 'if the content type is linear, then do not show detailScreen instead show error dialog.
+  else
+    skipDetailScreen(refreshedContent)
+  end if
 End Function
