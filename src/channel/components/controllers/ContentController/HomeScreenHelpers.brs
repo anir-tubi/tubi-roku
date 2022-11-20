@@ -1011,6 +1011,9 @@ Function isFIFAIntroModalShown()
     auth.clearEducationalModalEntry("fifaIntro")
   end if
 
+  '// HARDCODING TO DISABLE FIFA Intro Modal as it loses focus on production. REMOVE below line once we have fix.
+  isModalShown = true
+
   return isModalShown
 End Function
 
