@@ -869,6 +869,10 @@ Function getTranslation_en_US()
       "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
       "message": "{minutes}m left"
     },
+    "today":{
+      "description": "Today",
+      "message": "TODAY"
+    },
     "tomorrow":{
       "description": "Tomorrow",
       "message": "TOMORROW"
