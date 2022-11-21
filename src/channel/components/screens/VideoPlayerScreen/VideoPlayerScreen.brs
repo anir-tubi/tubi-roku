@@ -1161,6 +1161,7 @@ Function resetVideoPlayerState(content = invalid)
   m.AdHeadsUp.visible = false
   m.top.adPosition = 0
 
+  m.ratingOverlay.opacity = 0
   m.showRatings = true
   m.ratingInterval = 0
 
@@ -1607,13 +1608,16 @@ End Function
 ' showratingOverlay helps to show the rating overlay and start the timer to hide it after certain amount of time.
 Function showRatingOverlay()
 
-  fade(m.ratingOverlay, "in", 0.6)
-  if m.Overlay.opacity > 0.0
-    m.ratingOverlay.translation = [0,250]
-  else
-    m.ratingOverlay.translation = [0,0]
+  content = m.Video.content
+  if content <> invalid AND isNonEmptyString(content.rating) = true
+    fade(m.ratingOverlay, "in", 0.6)
+    if m.Overlay.opacity > 0.0
+      m.ratingOverlay.translation = [0,250]
+    else
+      m.ratingOverlay.translation = [0,0]
+    end if
+    m.ratingOverlayTimer.control = "start"
   end if
-  m.ratingOverlayTimer.control = "start"
 
 End Function
 
