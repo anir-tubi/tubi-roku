@@ -2243,6 +2243,10 @@ Function getTranslation_es_MX()
       "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
       "message": "quedan {minutes} m"
     },
+    "today": {
+      "description": "Today",
+      "message": "HOY"
+    },
     "tomorrow": {
       "description": "Tomorrow",
       "message": "MAÑANA"
@@ -2368,7 +2372,7 @@ Function getTranslation_es_MX()
       "message": "Me Gusta o No Me Gusta"
     },
     "screenDetails_button_see_all_games": {
-      "description": "Label of button to allow users to see all the games in the current video title",
+      "description": "Label of button to allow users to a new page where they can see all the games related to the current sports title",
       "message": "Ver Todos Los Partidos"
     },
     "screenDetails_button_sign_in_to_set_reminder": {
