@@ -502,9 +502,12 @@ End Function
 ' @uiMode: string, one of the allowed values from constants.ui.modes
 '
 ' returns batch requests
-Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, contentMode = "", bKidsMode = false, isSignedInUser = false, uiMode="standard")
+Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, contentMode = "", bKidsMode = false, isSignedInUser = false, uiMode="standard", screenId="")
 
   reqName = m.constants.reqNames.getCategory
+  if screenId = ""
+    screenId = m.constants.ui.screenIds.homeScreen
+  end if
 
   requests = []
 
@@ -524,7 +527,7 @@ Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, cont
         categoryReqInfo.requestType = reqName
         categoryReqInfo.responseType = "node"
         categoryReqInfo.isSignedInUser = isSignedInUser
-        categoryReqInfo.screenId = m.constants.ui.screenIds.homeScreen
+        categoryReqInfo.screenId = screenId
         categoryReqInfo.uiMode = uiMode
       end if
 

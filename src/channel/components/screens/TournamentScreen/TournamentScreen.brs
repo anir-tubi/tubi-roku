@@ -848,13 +848,18 @@ End Function
 
 Function refreshCategoryContainers()
   tubilog("TournamentScreen.refreshCategoryContainers")
+  loadCategoryForIds = []
   if m.top.categoryContent <> invalid
     for i = 0 to m.top.categoryContent.getchildCount() - 1
       container = m.top.categoryContent.getChild(i)
       if shouldRefresh(container) = true
-        m.top.reloadTournamentScreenContainerID = container.id
+        loadCategoryForIds.push(container.id)
       end if
     end for
+
+    if loadCategoryForIds.count() > 0
+      m.top.reloadTournamentScreenContainerID = loadCategoryForIds
+    end if
   end if
 
 End Function

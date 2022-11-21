@@ -60,7 +60,7 @@ Function showTournamentScreen(constants, componentToFocus = "")
     tournamentScreen.observeFieldScoped("linearChannelToPlay", "onTournamentScreenLinearContentToPlay")
     tournamentScreen.observeFieldScoped("contentSelected", "onTournamentScreenVodContentToPlay")
     tournamentScreen.observeFieldScoped("reloadTournamentScreen", "onReloadTournamentScreen")
-    tournamentScreen.observeFieldScoped("reloadTournamentScreenContainerID", "onReloadTournamentScreenContainerID")
+    tournamentScreen.observeFieldScoped("reloadTournamentScreenContainerID", "onReloadTournamentScreenContainerIds")
     tournamentScreen.signedIn = isLoggedInUser()
     tournamentScreen.isPreTournament = isPreTournament
     tournamentScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel() '
@@ -341,87 +341,31 @@ Function showTournamentScreenWrapper(param)
 End Function
 
 
-Function onReloadTournamentScreenContainerID(msg)
-  tubilog("TournamentSceenHelpers.onReloadTournamentScreenContainerID")
-  categoryId = msg.getData()
+Function onReloadTournamentScreenContainerIds(msg)
+  tubilog("TournamentSceenHelpers.onReloadTournamentScreenContainerIds")
+  categoryIds = msg.getData()
   screen = msg.getRoSGNode()
-  if screen <> invalid AND categoryId <> ""
 
+  if screen <> invalid AND isNonEmptyArray(categoryIds) = true
     isKidsMode = false 'no touramentscreen for kids
-    reqName = m.constants.reqNames.getCategory
+    isSignedInUser = isLoggedInUser()
 
-    options = {}
-    params = {}
-    ' content_mode is mandatory param and its value needs to be passed as empty for fetching tournament content
-    params["content_mode"] = ""
-    options.params = params
-    categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, options)
+    batchRequests = m.cmsApi.createHomeScreenBatchRequestInfoForContainers(categoryIds, "", isKidsMode, isSignedInUser, m.uiMode, m.constants.ui.screenIds.tournamentScreen)
 
-    m.makeRequest({
-      url: categoryReqInfo.url
-      requestType: reqName
-      options: categoryReqInfo.options
-      successCallback: onReloadTournamentScreenCategory
-      errorCallback: onErrorReloadUserCategoriesTournamentScreen
+    m.makeBatchRequest({
+      requests: batchRequests
       responseType: "node"
-      id: categoryId
-      isSignedInUser: isLoggedInUser()
-      screenId: m.constants.ui.screenIds.tournamentScreen
-      uiMode: m.uiMode
+      successCallback: onReloadTournamentScreenCategories
     })
   end if
 End Function
 
 
-Function onReloadTournamentScreenCategory(response)
-  if response <> invalid
-    screenID = m.constants.ui.screenIds.tournamentScreen
-    tournamentScreen = getFromScreenCache(screenID)
-
-    if tournamentScreen <> invalid
-      if tournamentScreen.categoryContent <> invalid
-        newCategory = invalid
-        oldCategory = invalid
-
-        if type(response) = "roSGNode"
-          if response.getChildCount() > 0
-            newCategory = response
-          end if
-
-          oldCategory = tournamentScreen.categoryContent.findNode(response.id)
-        end if
-
-        ' there are 3 options here
-        ' 1) new category and old category both have content in them - replace the old with the new
-        ' 2) new category doesn't have content (will be invalid), old category does have content - remove old category
-        ' 3) new category doesn't have content (will be invalid), old category doesn't exist - do nothing
-        if newCategory <> invalid AND oldCategory <> invalid
-          oldCategoryIndex = m.NodeHelpers.getChildIndex(tournamentScreen.categoryContent, oldCategory)
-          'replace old category with new category
-          tournamentScreen.categoryContent.replaceChild(newCategory, oldCategoryIndex)
-          tournamentScreen.repopulateContent = true
-        else if newCategory = invalid AND oldCategory <> invalid
-          'This should not happen. just in case.
-          'remove old category
-          tournamentScreen.categoryContent.removeChild(oldCategory)
-          tournamentScreen.repopulateContent = true '//In case the rows are of different heights, tell tournamentScreen to refresh to display rows correctly
-        else if newCategory = invalid AND oldCategory = invalid
-          'do nothing
-        end if
-      end if
-
-      tournamentScreen.isLoading = false
-    end if
+Function onReloadTournamentScreenCategories(response)
+  screenID = m.constants.ui.screenIds.tournamentScreen
+  screen = getFromScreenCache(screenID)
+  if screen <> invalid
+    screen.batchResponse = response
   end if
-End Function
 
-
-Function onErrorReloadUserCategoriesTournamentScreen(response)
-  tubilog("TournamentScreenHelpers.onErrorReloadUserCategoriesTournamentScreen")
-  ' Container refresh failed.  Just try refreshing entire screen.
-  if response <> invalid
-    screenID = m.constants.ui.screenIds.tournamentScreen
-    tournamentScreen = getFromScreenCache(screenID)
-    fetchTournamentScreenContent(tournamentScreen)
-  end if
 End Function
