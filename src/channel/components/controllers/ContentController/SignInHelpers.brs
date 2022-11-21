@@ -952,7 +952,7 @@ Function onEmailVerificationTimerFired()
   'Make Request
   uid = ""
   currentScreen = getCurrentScreen()
-  if currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen
+  if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen
     uid = currentScreen.uid
     requestInfo = m.userDeviceApi.queryStatusOfMagicLink(uid)
     m.makeRequest({
