@@ -612,10 +612,11 @@ End Function
 Function setTimeGridContentLoadingToComplete(screen)
   tubiLog("EPGSCreenHelpers.setTimeGridContentLoading")
   cleanUpInvalidsInEPG(screen)
+  screen.updateTimeGridContent = true
   if isNonEmptyString(screen.contentIdToFocusOnLoadComplete) = true
     setLinearChannelDeeplink(screen)
   end if
-  screen.updateTimeGridContent = true
+
   screen.timeGridContentLoading = false
   showHideSpinner(false)
 End Function
@@ -645,6 +646,5 @@ End Function
 Function  setLinearChannelDeeplink(screen)
   tubilog("EPGSCreenHelpers.setLinearChannelDeeplink")
   contentIdToFocusOnLoadComplete = screen.contentIdToFocusOnLoadComplete
-  screen.contentIdToFocusOnLoadComplete = ""
-  jumpToParentScreenContentByID(contentIdToFocusOnLoadComplete, "", m.constants.ui.screenIds.EPGScreen)
+  screen.jumpToRowItemByID = [contentIdToFocusOnLoadComplete, ""]
 End Function

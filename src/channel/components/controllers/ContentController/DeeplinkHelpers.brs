@@ -467,7 +467,8 @@ Function handleLinearDeeplinkContent()
         sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.epg, m.Tracking, m.trackingLoggingTask, m.constants)
       end if
       showDefaultEPGScreen()
-      sCatSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.EPGScreen]
+      'EPG screen is part of homescreen in topnav.
+      sCatSideNavID = m.constants.ui.sideNavIds.home
 
     end if
     focusSideNavOption(sCatSideNavID)

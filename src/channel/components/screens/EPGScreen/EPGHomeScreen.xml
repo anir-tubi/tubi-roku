@@ -61,6 +61,8 @@
     <!-- set to true if the user is signed in and we want to change the experience based on that -->
     <field id="signedIn" type="boolean" />
 
+    <field id="contentIdToFocusOnLoadComplete" type="string" />
+
     <!-- OUTPUTS -->
 
     <field id="epgScreenOkPressed" type="boolean" alwaysNotify="true"/>

@@ -105,11 +105,16 @@ Function onLinearChannelFocused()
       m.top.linearChannelFocused = content
       ' As per EPG requirement: if this is the first time content is focused after EPG started, then start playing the first content.
       ' all the other time, only selected content will get to play.
-      if m.firstTime = true
+      ' if contentIdToFocusOnLoadComplete has been set, that would mean the content play has been requested from deeplink
+      ' so do not play the first channel but play the focused channel.
+      if m.firstTime = true AND m.top.contentIdToFocusOnLoadComplete = ""
         m.firstTime = false
         'TODO:: check if race condition happens.
         m.epgTimeGrid.setFocusedToPlay = true
         m.top.refreshEPGScreenVideoPlay = false
+      else if m.top.contentIdToFocusOnLoadComplete <> ""
+        m.firstTime = false
+        m.top.contentIdToFocusOnLoadComplete = ""
       end if
       populateInfoPanel(m.epgTimeGrid.linearChannelFocused)
     end if
