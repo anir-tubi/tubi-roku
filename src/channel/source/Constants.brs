@@ -1059,6 +1059,7 @@ Function getConstants()
       constants.ui.screenIds.freeForeverScreen = "freeForeverScreen"
       constants.ui.screenIds.availableDeviceScreen = "availableDeviceScreen"
       constants.ui.screenIds.landingScreen = "landingScreen"
+      constants.ui.screenIds.baseScreen = "baseScreen"
       constants.ui.screenIds.tournamentScreen = "tournamentScreen"
 
     ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,

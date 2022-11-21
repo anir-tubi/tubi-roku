@@ -25,8 +25,11 @@ Function TubiExperiments(constants) as Object
         roku_in_pod_stitching_v1: {"enabled": false}
       }
 
+      ' roku_enhanced_onboarding_v2_roku_path - have new user use the Roku modal to start the sign in process
+      ' roku_enhanced_onboarding_v2_registration_path - show on-boarding screens only for new users (guest)
       roku_regist_enhanced_onboarding: {
-        roku_enhanced_onboarding_v1: {"enabled": false}
+        roku_enhanced_onboarding_v2_roku_path: {"enabled": false}
+        roku_enhanced_onboarding_v2_registration_path: {"enabled": false}
       }
 
       ' enabled = true : after the video preview of the selected title ends, the user sees the hero image again.

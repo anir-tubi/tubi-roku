@@ -1445,7 +1445,7 @@ Function getTranslation_en_US()
     },
     "registerOrSignIn_button": {
       "description": "Button text displayed on onBoarding screens takes to Roku Request for Information modal",
-      "message": "Register or Sign In"
+      "message": "Continue with Roku"
     },
     "continueAsGuest_button": {
       "description": "Button text displayed on onBoarding screens takes to Initial Content Type Selector Screen or Home Screen",
@@ -2815,7 +2815,7 @@ Function getTranslation_es_MX()
     },
     "registerOrSignIn_button": {
       "description": "Button text displayed on onBoarding screens takes to Roku Request for Information modal",
-      "message": "Regístrate o Iniciar Sesión"
+      "message": "Continuar con Roku"
     },
     "continueAsGuest_button": {
       "description": "Button text displayed on onBoarding screens takes to Initial Content Type Selector Screen or Home Screen",

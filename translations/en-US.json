@@ -1276,7 +1276,7 @@
   },
   "registerOrSignIn_button": {
     "description": "Button text displayed on onBoarding screens takes to Roku Request for Information modal",
-    "message": "Register or Sign In"
+    "message": "Continue with Roku"
   },
   "continueAsGuest_button": {
     "description": "Button text displayed on onBoarding screens takes to Initial Content Type Selector Screen or Home Screen",

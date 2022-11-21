@@ -104,7 +104,6 @@ Function onRfiUserData(msg)
   else
 
     hideNavMenu(false)
-
     dialogEvent = {
       type: "dialog"
       values: {

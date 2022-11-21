@@ -112,6 +112,24 @@ Function showOnBoardingLandingScreen()
 End Function
 
 
+' creates a blank screen with the Roku sign in modal in the foreground
+Function showRokuSignInScreen()
+  tubiLog("OnBoardingHelpers.showRokuSignInScreen")
+  screen = CreateObject("roSGNode", "BaseScreen")
+  screen.trackingPageInfo = {
+    pageType: "onboarding_page"
+    pageValues: {
+      name: "roku_rfi"
+    }
+  }
+  screen.id = m.constants.ui.screenIds.baseScreen
+  screen.screenLevel = m.constants.ui.screenLevels.landingScreen
+  screen.instantResumeAction = m.constants.instantResumeActions.startChannel
+  pushScreen(screen, true, true)
+  startSignIn()
+End Function
+
+
 Function onLandingScreenRegisterOrSignInButtonPressed()
   startSignIn()
 End Function

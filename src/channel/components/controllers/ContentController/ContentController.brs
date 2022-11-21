@@ -582,9 +582,17 @@ Function startUserExperience()
       ' we were asked to deep link into a content item. Go to it
       ' whether we were logged in or not.
       handleDeeplink()
-    else if isNewUser() = true AND getExperimentResource("roku_regist_enhanced_onboarding", "roku_enhanced_onboarding_v1", true).enabled = true then
-      ' show on-boarding screens only for new users (guest)
-      showOnBoardingWelcomeScreen()
+    else if isNewUser() = true AND (getExperimentResource("roku_regist_enhanced_onboarding", "roku_enhanced_onboarding_v2_roku_path", true).enabled = true OR getExperimentResource("roku_regist_enhanced_onboarding", "roku_enhanced_onboarding_v2_registration_path", true).enabled = true) then
+      '//for new users who are in one of the onboarding experiments 
+      '//(Note: both experiments should send exposure events here.)
+      
+      if getExperimentResource("roku_regist_enhanced_onboarding", "roku_enhanced_onboarding_v2_registration_path", true).enabled = true
+        ' show on-boarding screens only for new users (guest)
+        showOnBoardingLandingScreen()
+      else
+        ' have new user use the Roku modal to start the sign in process
+        showRokuSignInScreen()
+      end if
     else
       if shouldDisplayInitialContentScreen() = true
         ' Display the initial content screen to the user so they can choose the proper experience.
