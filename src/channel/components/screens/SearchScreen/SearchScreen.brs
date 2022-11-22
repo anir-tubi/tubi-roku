@@ -337,7 +337,7 @@ Function onItemFocused()
   tubiLog("SearchScreen.onItemFocused")
   if m.ResultGrid.content <> invalid
     focusedContent = m.ResultGrid.content.getChild(m.ResultGrid.itemFocused)
-    m.top.backgroundUriList = focusedContent.backgrounds
+    m.top.backgroundUriList = determineBackgroundImage(focusedContent)
     m.searchScreenInfoPanel.visible = true
 
     if m.microphone <> invalid

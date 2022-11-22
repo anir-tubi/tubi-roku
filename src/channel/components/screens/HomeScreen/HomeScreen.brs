@@ -737,15 +737,6 @@ Function onCategoryRefreshTimer()
 End Function
 
 
-Function determineBackgroundImage(focusedContent)
-  if focusedContent <> invalid AND focusedContent.backgrounds <> invalid AND focusedContent.backgrounds.count() > 0
-    return focusedContent.backgrounds
-  else
-    return [m.defaultBackgroundUri]
-  end if
-End Function
-
-
 ' @isToggle: boolean, true if the user is toggling focus to the top nav from a different component.
 '                     false if the user is focusing the default top nav option by pressing back
 '                     while focused on the top nav of another page

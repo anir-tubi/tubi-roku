@@ -200,17 +200,6 @@ Function onEPGTimegridOKPressed()
 End Function
 
 
-
-' @selectedContent: TubiContentNode with metadata for an item in the epg
-Function determineBackgroundImage(selectedContent)
-  if selectedContent <> invalid AND selectedContent.backgrounds <> invalid AND selectedContent.backgrounds.count() > 0
-    return selectedContent.backgrounds
-  else
-    return [m.defaultBackgroundUri]
-  end if
-End Function
-
-
 Function onTransportVoiceRequest(msg)
   response = "unhandled"
   inputInfo = msg.getData()

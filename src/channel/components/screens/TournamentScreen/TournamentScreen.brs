@@ -501,16 +501,6 @@ Function setFocusOnCategoryGrid()
 End Function
 
 
-' @selectedContent: TubiContentNode with metadata for an item in the epg/game
-Function determineBackgroundImage(selectedContent)
-  if selectedContent <> invalid AND selectedContent.backgrounds <> invalid AND selectedContent.backgrounds.count() > 0
-    return selectedContent.backgrounds
-  else
-    return [m.defaultBackgroundUri]
-  end if
-End Function
-
-
 Function fadeInContentArea()
   stopAnimation(m.gridFade)
   if m.mask.opacity <> 0
