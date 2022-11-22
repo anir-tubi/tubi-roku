@@ -484,7 +484,7 @@ Function refreshEPGScreenVideoPlay(refreshVideoPlay, epgScreen)
 
         '//if the linear player is playing a video and it does not match with the current focus, then change focus to that of the playing video
         focusedChannel = epgScreen.linearChannelFocused
-        if focusedChannel <> invalid AND focusedChannel.id <> invalid AND isLinearPlayerPlayingThisContent(focusedChannel) = false
+        if focusedChannel <> invalid AND focusedChannel.id <> invalid AND linearVideoPlayer.content <> invalid AND isLinearPlayerPlayingThisContent(focusedChannel) = false
           channelId = linearVideoPlayer.content.id
           epgScreen.jumpToRowItemByID = [channelId, ""]
         end if
