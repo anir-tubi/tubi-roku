@@ -114,7 +114,9 @@ Function onLinearChannelFocused()
         m.top.refreshEPGScreenVideoPlay = false
       else if m.top.contentIdToFocusOnLoadComplete <> ""
         m.firstTime = false
+        contentIdToFocusOnLoadComplete = m.top.contentIdToFocusOnLoadComplete
         m.top.contentIdToFocusOnLoadComplete = ""
+        m.top.jumpToRowItemByID = [contentIdToFocusOnLoadComplete, ""]
       end if
       populateInfoPanel(m.epgTimeGrid.linearChannelFocused)
     end if
