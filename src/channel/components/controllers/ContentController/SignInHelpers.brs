@@ -1072,7 +1072,7 @@ Function onOkButtonClickedOnLinkExpired()
 End Function
 
 
-Function afterSignInPlayLockedLinearContent(callbackAfterSignInParams)
+Function afterSignInPlayLockedLinearContent(callbackAfterSignInParams = invalid)
   tubilog("SignInHelpers.afterSignInPlayLockedLinearContent")
   popScreenAfterSignInProcess()
   if callbackAfterSignInParams <> invalid
