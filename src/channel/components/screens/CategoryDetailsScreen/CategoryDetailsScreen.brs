@@ -40,15 +40,15 @@ Function init()
 
   BackLabel = m.top.findNode("callToAction")
   if m.constants.deviceInfo.uiResolution <> "FHD"
-    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment 
+    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
 
   m.top.screenLevel = m.constants.ui.screenLevels.categoryDetailsScreen
   m.top.handlesTransportVoiceRequests = true
-  
+
   m.bLeftButtonActsLikeBackButton = true
-  m.VideoGrid.itemSize = posterSize 
+  m.VideoGrid.itemSize = posterSize
 End Function
 
 Function onThemeChange()
@@ -67,12 +67,12 @@ Function onSetCallOfAction()
     else if UCase(sPreviousPage) = UCase(m.constants.ui.terms.menu)
       sCallToAction = getTranslation("goBack_menu")
     else if UCase(sPreviousPage) = UCase(m.constants.ui.terms.home)
-      sCallToAction = getTranslation("goBack_home")  
+      sCallToAction = getTranslation("goBack_home")
     end if
   end if
   if sCallToAction = ""
     sCallToAction = getTranslation("goBack_default")
-  end if 
+  end if
 
   callToAction = m.top.findNode("callToAction")
   callToAction.text = sCallToAction
@@ -98,9 +98,9 @@ Function onScreenFocusChange()
       if shouldRefresh(m.top.content) = true  'cacheValidationMixin
         m.top.refreshCategoryDetailsScreen = true
       end if
-    end if    
+    end if
   end if
-  
+
 End Function
 
 
@@ -130,7 +130,7 @@ Function onLoadContent()
       m.VideoGrid.setFocus(true)
       m.VideoGrid.visible = true
     end if
-    
+
     if category <> invalid
       m.top.trackingPageInfo = createTrackingPageInfo(category)
     end if
@@ -175,7 +175,7 @@ Function onItemFocused()
       numColumns = m.VideoGrid.numColumns
 
       if m.contentLoadedAndFocused = true
-        '//Do not send out tracking when the grid is initially loaded. When an item 1st gain focus, this indocates that the grid was just loaded.
+        '//Do not send out tracking when the grid is initially loaded. When an item 1st gain focus, this indicates that the grid was just loaded.
         ' Update the tracking info.
         trackingPageInfo = createTrackingPageInfo(category)
         m.top.trackingPageInfo = trackingPageInfo
@@ -193,15 +193,15 @@ Function onItemFocused()
           horizontal_location: col
           horizontal_location_mode: "INDEX"  'LocationMode enum
         }
-        
+
         m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)
       else
         m.contentLoadedAndFocused = true
         m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)
       end if
     else
-      '//if content is not valid, then we should refresh the screen. 
-      '//Most likely what happened is that the content was modified while the screen is off screen: i.e. ContinuedWatching screen no lomnger has any content so refreshing the page will most likely result in a content error.
+      '//if content is not valid, then we should refresh the screen.
+      '//Most likely what happened is that the content was modified while the screen is off screen: i.e. ContinuedWatching screen no longer has any content so refreshing the page will most likely result in a content error.
       m.top.refreshChannel = true
     end if
   end if
@@ -326,14 +326,14 @@ Function onKeyEvent(key, press) as Boolean
   else
     if key = "back"
       authInfo = m.global.authInfo
-      ' show SignInRequired modal when guest user presses back from ActivationCode Screento CategoryDetailsScreen
+      ' show SignInRequired modal when guest user presses back from ActivationCodeScreen to CategoryDetailsScreen
       if authInfo = invalid or (authInfo <> invalid AND authInfo.userId = invalid)
         m.top.signInRequired = true
         handled = true
       end if
     end if
   end if
-  
+
   return handled
 End Function
 

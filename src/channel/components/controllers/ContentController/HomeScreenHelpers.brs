@@ -234,7 +234,7 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
         homeScreen.repopulateContent = true
       else if newCategory <> invalid AND oldCategory = invalid
         'add new category
-        'if new category is history, put it one before queue, or if queue doens't exist put it in 2nd position
+        'if new category is history, put it one before queue, or if queue doesn't exist put it in 2nd position
         'if new category is queue put it one after history, or if history doesn't exist, put it in 2nd position
         if newCategory.id = m.constants.ui.categoryIds.history
           clonedContent = homeScreen.content.clone(true)
@@ -354,7 +354,7 @@ Function setEnableTopNavOnHomescreen(homeScreen)
       end if
     end if
 
-    '//When the screen loads new content, make sure the topNav is displayed if it is supposed to. For example, if the user changes the parental settings from adults to older kids, then the app is in kidsMode and should not display the top nav. Changing the topNav status when reloading the content will ensure the top nav is diosplayed when it should be.
+    ' //When the screen loads new content, make sure the topNav is displayed if it is supposed to. For example, if the user changes the parental settings from adults to older kids, then the app is in kidsMode and should not display the top nav. Changing the topNav status when reloading the content will ensure the top nav is displayed when it should be.
     bTopNavAllowed = isTopNavHomeScreenEnabled()
     if homeScreen.id = m.constants.ui.screenIds.espanolScreen
       '//espanol is not in the topNav
@@ -404,16 +404,16 @@ Function fetchHomeScreen(homeScreen)
     homeScreen.unobserveFieldScoped("contentReady")
     homeScreen.observeFieldScoped("contentReady", "onHomescreenContentReady")
 
-    sucessHandler = onHomeScreenSuccessResponse
+    successHandler = onHomeScreenSuccessResponse
     errorHandler = onHomeScreenErrorResponse
     if homeScreen.id = m.constants.ui.screenIds.movieScreen
-      sucessHandler = onMovieScreenSuccessResponse
+      successHandler = onMovieScreenSuccessResponse
       errorHandler = onMovieScreenErrorResponse
     else if homeScreen.id = m.constants.ui.screenIds.tvScreen
-      sucessHandler = onTVScreenSuccessResponse
+      successHandler = onTVScreenSuccessResponse
       errorHandler = onTVScreenErrorResponse
     else if homeScreen.id = m.constants.ui.screenIds.espanolScreen
-      sucessHandler = onEspanolScreenSuccessResponse
+      successHandler = onEspanolScreenSuccessResponse
       errorHandler = onEspanolScreenErrorResponse
     end if
 
@@ -450,7 +450,7 @@ Function fetchHomeScreen(homeScreen)
       url: homeScreenReqInfo.url
       requestType: reqName
       options: homeScreenReqInfo.options
-      successCallback: sucessHandler
+      successCallback: successHandler
       errorCallback: errorHandler
       responseType: "node"
       isSignedInUser: isLoggedInUser()
@@ -669,7 +669,7 @@ End Function
 '
 ' Focus on a specific item within the screen
 ' @sID, String = The ID of the content item that should be in focused
-' @sDesiredContainerID, String = If there is a desire for a specific container to be in focuse, then this is the ID of the desired container
+' @sDesiredContainerID, String = If there is a desire for a specific container to be in focused, then this is the ID of the desired container
 ' @ScreenID, String = the ID of screen that should jump to the content associated with the sID. If screenId is missing, homeScreen is assumed.
 Function jumpToParentScreenContentByID(sID, sDesiredContainerID = "", sParentScreenID = "")
   tubiLog("HomeScreenHelpers.jumpToParentScreenContentByID")
@@ -861,7 +861,7 @@ Function startCountdownTimer()
 End Function
 
 
-' Display a countdown timer over the minmized linear video player to show how many seconds are left before the player goes fullscreen
+' Display a countdown timer over the minimized linear video player to show how many seconds are left before the player goes fullscreen
 ' @param nFullscreenCountdown, Integer - The number of seconds left in the countdown timer. If less than 0, then the timer is hidden.
 Function setPlayerCountDownChange(nFullscreenCountdown)
   tubiLog("HomeScreenHelpers.setPlayerCountDownChange")

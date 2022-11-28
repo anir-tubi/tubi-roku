@@ -471,7 +471,7 @@ Function onCategoryResponseInBatch(msg) As Void
     if shouldInformHomeScreen = true
       ' set focus once we have content to focus on.
       ' will only affect limitedUI models as high spec models will set focus on m.RowList when m.top gains focus
-      ' because their homescreen response contains content in it, but limiteUI models homescreen responses don't.
+      ' because their homescreen response contains content in it, but limitedUI models homescreen responses don't.
       setRowListFocus()   'only happens if m.top has focus, ie. when the app is launched or signin/signout
     end if
 
@@ -539,7 +539,7 @@ Function setRowListFocus()
       reloadedItemIndex = [row, col]
     else if m.RowList.rowItemFocused <> invalid AND m.RowList.rowItemFocused.count() > 1
       '//currFocusColumn is not available in firmware lower than Roku OS 10.5, so use rowItemFocused. It's imperfect, as it
-      '// may think a different item is focused insteqd of the 1st colum/1st row,
+      '// may think a different item is focused instead of the 1st colum/1st row,
       '// but it will not display a wrong metadata when the user quickly navigates away from 1st rowItem [0,0] as the content is loading
       reloadedItemIndex = m.RowList.rowItemFocused
     else

@@ -224,7 +224,7 @@ Function onScreenFocusChange()
   if m.top.hasFocus() = true
 
     'After Instant Resume, when pressing back from one detail screen to another detail screen via YMAL
-    'related content(YMAL) thunbnails are not loading. Resetting relatedContent node fixes the issue.
+    'related content(YMAL) thumbnails are not loading. Resetting relatedContent node fixes the issue.
     relatedContent = m.top.relatedContent
     m.top.relatedContent = invalid
     m.top.relatedContent = relatedContent
@@ -470,7 +470,7 @@ Function onRemoveSignupButton()
       '//add like/dislike button
       nLikeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
       if nLikeIndex = -1
-        '//if the like/dislke button does not exist yet, then add it
+        '//if the like/dislike button does not exist yet, then add it
         addRemoveMenuItem(true, nLikeIndex, m.LikeDislikeMenuItem, [m.PlayMenuItem])
       end if
 
@@ -776,7 +776,7 @@ Function handleMenuItemSelected(itemSelected)
       m.Menu.jumpToItem = 0 '//reset menu back to the top after a video is requested to play
     else if itemSelected.id = "LikeDislikeMenuItem"
       if m.LikeDislikeMenuItem.title = getTranslation("screenDetails_button_changingRating")
-        '//If it is still trying to change the rating then do nothing if this btton is clicked again
+        '//If it is still trying to change the rating then do nothing if this button is clicked again
       else if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked
         '//when the current item is liked, then remove the like state
         m.top.removeLikeSelected = true
@@ -785,7 +785,7 @@ Function handleMenuItemSelected(itemSelected)
         m.top.removeDislikeSelected = true
       else
         '//if displaying the like or dislike button, then clicking this should not cause a change of like status,
-        '//   but it may be confusing to the useer if nothing happens, so
+        '//   but it may be confusing to the user if nothing happens, so
         '//   the focus should move to the 2nd menu
         focusSecondaryMenu()
       end if
@@ -929,7 +929,7 @@ Function focusMenu(immediately = false)
   end if
 
   if m.top.isInFocusChain() = true
-    m.top.focusOnLikeMenu = false '//make sure this is set to false in case cominng from secondary menus
+    m.top.focusOnLikeMenu = false '//make sure this is set to false in case coming from secondary menus
     m.Menu.setFocus(true)
     m.relatedHasFocus = false
   end if

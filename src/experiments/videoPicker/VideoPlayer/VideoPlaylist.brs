@@ -5,7 +5,7 @@
 Function onPlaylistChange(msg) As Void
   tubiLog("VideoPlayer.onPlaylistChange")
   if msg.GetData() = invalid or msg.GetData().getChildCount() = 0 return
-  
+
   m.top.playlistIndex = 0
   m.Video.control = "stop"
   m.VideoState = "stop"
@@ -22,7 +22,7 @@ Function onSeekPlaylist(msg) As Void
   if msg.GetData() = invalid or type(msg.GetData()) <> "roArray" or msg.GetData().count() <> 2 return
 
   newIndex = msg.GetData()
-  if newIndex[0] >= m.top.playlist.getChildCount() then 
+  if newIndex[0] >= m.top.playlist.getChildCount() then
     newIndex = [0, 0]
   else if newIndex[0] < 0
     newIndex = [0, 0]
@@ -113,7 +113,7 @@ Function refreshContent(nowPos)
   tubiLog("VideoPlayer.refreshContent")
   content = currentPlaylistContent()
 
-  if content <> invalid then 
+  if content <> invalid then
     tubiLog("VideoPlayer current content id = " + content.id)
 
     'reset thumbnail state
@@ -386,7 +386,7 @@ Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, str
     end if
   else if errorMsg <> invalid
     if errorCode = 0
-      ' orignal network error message is to long:
+      ' original network error message is to long:
       ' "Network error.  This could be caused by any of the following problems: (1) The server is down or unresponsive. (2) The server is unreachable. (3) There is a network setup issue on the client."
       errorInfo.error_message = "Network error"
     else

@@ -8,7 +8,7 @@ Function init()
 
   m.analyticsInterval = m.constants.player.pingFrequency
 
-  ' The analytics event needs to be tracked during transition between home screen & detail screenn,
+  ' The analytics event needs to be tracked during transition between home screen & detail screen,
   ' so maintaining pageTypes for previous screen & current screen
   m.previousPageType= "home_page"
   m.currentPageType= "home_page"
@@ -232,7 +232,7 @@ Function getPlaybackErrorInfo(position, streamInfo, errorCode, errorMsg, content
   }
   if errorMsg <> invalid
     if errorCode = 0
-      ' orignal network error message is to long:
+      ' original network error message is to long:
       ' "Network error.  This could be caused by any of the following problems: (1) The server is down or unresponsive. (2) The server is unreachable. (3) There is a network setup issue on the client."
       errorInfo.error_message = "Network error"
     else

@@ -337,7 +337,7 @@ Function updateParentalSettingsSuccessResponse(response)
       setAuthInfoValue("passwordText", response.requestInput.password)
       setAuthInfoValue("secondsOfSavedPassword", getNowSeconds())
     else
-      '//Update menu so it appears updated. This is only needed if the password has been saved locally and was not entered immediately from the password screeen
+      '//Update menu so it appears updated. This is only needed if the password has been saved locally and was not entered immediately from the password screen
       m.settingsScreen.parentalSettingUpdated = true
     end if
 

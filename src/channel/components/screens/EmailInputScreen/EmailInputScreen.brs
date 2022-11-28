@@ -91,7 +91,7 @@ Function onContinueButtonSelected(evt)
     if isEmailValid() = true
       fade(m.emailValidationMsg, "out", 0.3)
       m.top.email = m.email.text
-      ' we must set voinceEnabled = false here because if we rely on isInFocusChain() in
+      ' we must set voiceEnabled = false here because if we rely on isInFocusChain() in
       ' onScreenFocusChange(), voiceEnabled is not set to false until after voiceEnabled is set to true
       ' on the SignInScreen, which prevents voiceEnabled is getting to true
       ' on the SignInScreen.

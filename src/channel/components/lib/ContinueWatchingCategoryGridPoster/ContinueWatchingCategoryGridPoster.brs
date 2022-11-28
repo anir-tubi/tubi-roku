@@ -1,10 +1,10 @@
 Function init()
   ' Typically for content items in a grid, we do not want to access global, as it will rendezvous
   ' for each of the items created. However, only one instance of a ContinueWatchingCategoryGridPoster
-  ' is ever expected in the home screeen, so we can accept the single rendezvous.
+  ' is ever expected in the home screen, so we can accept the single rendezvous.
   ' constants is added to m here because there are several calls to get getTranslation() below.
   ' Since getTranslation() will fetch constants from global if there is no m.constants, fetching
-  ' constanst from global once here, requires less rendezvous than fetching constants from global
+  ' constant from global once here, requires less rendezvous than fetching constants from global
   ' each time getTranslation() is called.
   m.constants = getConstantsFromGlobal()
   m.continueWatchingLayout = m.top.findNode("continueWatchingLayout")

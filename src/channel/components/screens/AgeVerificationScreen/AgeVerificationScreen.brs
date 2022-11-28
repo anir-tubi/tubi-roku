@@ -54,24 +54,24 @@ End Function
 
 Function onNumberPadTextChanged(msg)
   date = msg.getData()
-  millenium = date.left(1).toInt()
+  millennium = date.left(1).toInt()
   century = date.mid(1, 1).toInt()
   decade = date.mid(2, 1).toInt()
   dateLength = date.len()
 
-  if dateLength = 1 AND millenium <> 1 AND millenium <> 2
+  if dateLength = 1 AND millennium <> 1 AND millennium <> 2
     m.Prompt.visible = true
     m.NumberPad.text = ""
-  else if dateLength = 2 AND millenium = 1 AND century <> 9
-    ' don't allow centuries that are not 19xx if millenium is 1xxx
+  else if dateLength = 2 AND millennium = 1 AND century <> 9
+    ' don't allow centuries that are not 19xx if millennium is 1xxx
     m.Prompt.visible = true
     m.NumberPad.text = date.left(1)
-  else if dateLength = 2 AND millenium = 2 AND checkValidCentury(millenium, century) = false
-    ' don't allow centuries greater than the current century if millenium is 2xxx
+  else if dateLength = 2 AND millennium = 2 AND checkValidCentury(millennium, century) = false
+    ' don't allow centuries greater than the current century if millennium is 2xxx
     m.Prompt.visible = true
     m.NumberPad.text = date.left(1)
-  else if dateLength = 3 AND millenium = 2 AND checkValidDecade(century, decade) = false
-    ' don't allow decades greater than the current decade if millenium is 2xxx
+  else if dateLength = 3 AND millennium = 2 AND checkValidDecade(century, decade) = false
+    ' don't allow decades greater than the current decade if millennium is 2xxx
     m.Prompt.visible = true
     m.NumberPad.text = date.left(2)
   else if dateLength = 4 AND checkValidYear(date) = false
@@ -218,11 +218,11 @@ Function onKeyEvent(key, press) as Boolean
 End Function
 
 
-' @submittedMillenium: integer, single digit representation of millenium. For the year 2019,
-'                                submittedMillenium should be 2.
+' @submittedMillennium: integer, single digit representation of millennium. For the year 2019,
+'                                submittedMillennium should be 2.
 ' @submittedCentury: integer, single digit representation of century. For the year 2019,
 '                             submittedCentury should be 0.
-Function checkValidCentury(submittedMillenium, submittedCentury)
+Function checkValidCentury(submittedMillennium, submittedCentury)
   dateTime = createObject("roDateTime")
   currentYear = dateTime.getYear()
 
@@ -230,11 +230,11 @@ Function checkValidCentury(submittedMillenium, submittedCentury)
   ' (2021 MOD 1000) \ 100 * 100 = 0
   ' (2221 MOD 1000) \ 100 * 100 = 200
 
-  currentMillenium = currentYear \ 1000 * 1000
+  currentMillennium = currentYear \ 1000 * 1000
 
-  if submittedMillenium * 1000 = currentMillenium AND (submittedCentury * 100) > currentCentury
-    ' only check if the submitted century is greater than current century if the submitted millenium
-    ' is equal to the current millenium. If the submitted millenium is a previous millenium, then
+  if submittedMillennium * 1000 = currentMillennium AND (submittedCentury * 100) > currentCentury
+    ' only check if the submitted century is greater than current century if the submitted millennium
+    ' is equal to the current millennium. If the submitted millennium is a previous millennium, then
     ' we could expect centuries of value greater than the current century value. (ie. the 9 in 1987
     ' is greater than the 0 in 2021 and should be allowed, but 29xx should not be allowed).
     return false

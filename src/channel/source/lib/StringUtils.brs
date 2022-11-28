@@ -15,7 +15,7 @@ Function formatLengthAsTimestamp(length As Dynamic) As String
   end if
 End Function
 
- 
+
 '''''''''''''''''''
 ' formatLengthAsEnglish
 '
@@ -90,8 +90,8 @@ End Function
 '         @padString: String, will be prepended
 ' return: result with paddedstring with more than minimum width
 '
-' pad the provided string with padString(gernally spaces) to length provided.
-' PadStringLeft differes from padString only when padString + originalstring > minLenth
+' pad the provided string with padString(generally spaces) to length provided.
+' PadStringLeft differences from padString only when padString + originalstring > minLength
 ' padStringLeft("bbb", "0123", 8) = "01230123bbb"
 ' padString("bbb", 8, "0123") = "30123bbb"
 
@@ -119,7 +119,7 @@ End Function
 
 ' Helper function that breaks down a url into its component parts
 ' @url: string, a url
-' @paramsAA: AA, An associative array that comntaines the param names as the keys and the corresponding values as strings
+' @paramsAA: AA, An associative array that contains the param names as the keys and the corresponding values as strings
 ' @paramsSeparator: string, a character used to define the start of parameters (typically "?")
 '
 ' returns an AA with the following keys:
@@ -275,7 +275,7 @@ Function isNonEmptyString(str)
 End Function
 
 
-' buildQueryString is used to contruct the query params in canonical form
+' buildQueryString is used to construct the query params in canonical form
 '
 ' @params : assocarray where key/value pairs will be turned into a query parameter string
 '

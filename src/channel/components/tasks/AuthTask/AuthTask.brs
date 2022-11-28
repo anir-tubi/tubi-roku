@@ -71,7 +71,7 @@ End Function
 
 Function execSignOut()
   tubiLog("AuthTask.execSignOut")
-  constants = m.global.constants 'single thread-local reference to avoid thread rendevue
+  constants = m.global.constants 'single thread-local reference to avoid thread rendezvous
   Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()

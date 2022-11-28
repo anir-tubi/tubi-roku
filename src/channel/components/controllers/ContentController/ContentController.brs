@@ -66,7 +66,7 @@ Function init()
   m.screenStack.observeFieldScoped("isEmpty", "onScreenStackEmpty")
   m.screenStack.observeFieldScoped("currentUpdated", "onScreenChange")
 
-  ' the screen cache holds the top level screens in memory so they are not recreated and reloaded unecessarily
+  ' the screen cache holds the top level screens in memory so they are not recreated and reloaded unnecessarily
   m.cache = TubiCache(m.NodeHelpers, m.constants.ui.cacheableScreenIds, m.constants.ui.permanentlyCachedContentIds)
 
   ' This is an associative array that keeps track of when pixels are sent out when sponsored containers are displayed. The pixels should only be sent once per page load.
@@ -115,7 +115,7 @@ Function init()
     m.logoKids.width = 259
     m.logoKids.translation = [1566, m.logoKids.translation[1]]
   end if
-  'this variable is used to stop unnessaccary execution of the entire showHideLogo function when content been focused.
+  'this variable is used to stop unnecessary execution of the entire showHideLogo function when content been focused.
   m.logoType = m.constants.logoType.tubi
 
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
@@ -390,7 +390,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
             ' PageLoad event will be sent by fireAppLoadBeacon() when home page finishes loading
             popScreen(true, false)
             ' reset appStartTime so that the home screen load event will have the correct loadTime value
-            ' which will be set in fireAppLoadBeacon() if the beacon hasn';t fired yet
+            ' which will be set in fireAppLoadBeacon() if the beacon hasn't fired yet
             m.top.appStartTime = Int(Uptime(0))
             m.deeplinkContent = invalid
           else
@@ -469,7 +469,7 @@ End Function
 ' The @response param is not used but will be set by the generalTaskModule,
 ' and as such is necessary.
 '
-' @_response: string or assocArray, string if request was succesful, AA if request errored.
+' @_response: string or assocArray, string if request was successful, AA if request errored.
 Function setExitAppWrapper(_response)
   setExitApp()
 End Function
@@ -539,7 +539,7 @@ Function startUserExperience()
           responseType: "assocarray"
         })
       else
-        ' the user is a signed in user who has been age verfied, so set m.ageVerificationComplete = true
+        ' the user is a signed in user who has been age verified, so set m.ageVerificationComplete = true
         ' and recursively call this function so we can move past the m.ageVerificationComplete check
         m.ageVerificationComplete = true
         startUserExperience()
@@ -583,9 +583,9 @@ Function startUserExperience()
       ' whether we were logged in or not.
       handleDeeplink()
     else if isNewUser() = true AND (getExperimentResource("roku_regist_enhanced_onboarding", "roku_enhanced_onboarding_v2_roku_path", true).enabled = true OR getExperimentResource("roku_regist_enhanced_onboarding", "roku_enhanced_onboarding_v2_registration_path", true).enabled = true) then
-      '//for new users who are in one of the onboarding experiments 
+      '//for new users who are in one of the onboarding experiments
       '//(Note: both experiments should send exposure events here.)
-      
+
       if getExperimentResource("roku_regist_enhanced_onboarding", "roku_enhanced_onboarding_v2_registration_path", true).enabled = true
         ' show on-boarding screens only for new users (guest)
         showOnBoardingLandingScreen()
@@ -863,7 +863,7 @@ Function onReloadUserCategoriesResponse(handledRequest)
   ' update the main home screen with the updated user category
   onReloadUserCategoriesInHomeScreen(handledRequest)
 
-  ' inform the category list screen of the udpated user category
+  ' inform the category list screen of the updated user category
   categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
   if categoryListScreen <> invalid
     categoryListScreen.reloadUserCategoriesResponse = handledRequest
@@ -1031,7 +1031,7 @@ End Function
 
 ' Tell some screens of the kidsMode value. This is to ensure that any calls to the backend are sending the proper kids mode state
 ' This should be done when a screen is created or when kids mode state changes
-' This only needs to be done for screens that are cached and kidsMode is set upon initiatiation of the screen and never anytime else.
+' This only needs to be done for screens that are cached and kidsMode is set upon initiation of the screen and never anytime else.
 Function tellScreensIfKidsModeBeSentToServer()
   bKidsMode = shouldKidsModeBeSentToServer()
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
@@ -1124,7 +1124,7 @@ End Function
 ' Any screen that is displaying this category should be updated.
 ' @sCategoryID: string, the category id we are searching for in the stack
 Function refreshStackedUserScreenWithChangedCategory(sCategoryID)
-  ' Tell the screen that contains the categroy associated with the passed ID to refresh the next time is is on screen by setting the validUntil variable to 0
+  ' Tell the screen that contains the category associated with the passed ID to refresh the next time is is on screen by setting the validUntil variable to 0
   for i = 0 to m.screenStack.getChildCount() - 1
     screen = m.screenStack.getChild(i)
     if screen <> invalid AND screen.isSubType("CategoryDetailsScreen")
@@ -1707,7 +1707,7 @@ Function onCustomResume(msg)
           if currentScreen.instantResumeAction = m.constants.instantResumeActions.restartApp
             bRestartApp = true
           else if (lastAppSuspendInSecs >= 1200 AND currentScreen.id = m.constants.ui.screenIds.settingsScreen)
-            'user is on the settings page and returns to the app after 20 or more minutes then retun to the homescreen
+            'user is on the settings page and returns to the app after 20 or more minutes then return to the homescreen
             bStartChannel = true
           else if currentScreen.instantResumeAction = m.constants.instantResumeActions.startChannel
             'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen

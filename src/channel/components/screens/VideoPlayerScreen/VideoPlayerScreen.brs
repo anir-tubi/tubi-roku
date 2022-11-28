@@ -380,7 +380,7 @@ Function playContent()
           video_id: m.Video.content.id.toInt()
           start_position: Int(m.playerPosition * 1000)
           current_cdn: ""   'not possible for Roku client
-          has_subtitles: hasSubtitles  'the video player will show subtititles at start
+          has_subtitles: hasSubtitles  'the video player will show subtitles at start
           is_livetv: isLiveTv
           is_embedded: isEmbedded
           is_fullscreen: isFullScreen
@@ -620,7 +620,7 @@ Function onVideoPositionChange()
   end if
 
   playProgressOk = true
-  if positionInSeekReferenceQueue(m.playerPosition, m.seekReferenceQueue) = true 'updates m.seekReferenceQueue as neccessary
+  if positionInSeekReferenceQueue(m.playerPosition, m.seekReferenceQueue) = true 'updates m.seekReferenceQueue as necessary
     playProgressOk = false
   end if
 
@@ -1260,7 +1260,7 @@ Function updateVideoPlayerState(content) as Void
   if content.parentType = "series"
     title.text = content.parentTitle
     episodeTitle.text = content.title
-  'TODO: check once the API data is reday and remove the hardcoded values
+  'TODO: check once the API data is ready and remove the hardcoded values
   else if content.parentType = m.constants.uapiContentTypes.sportsEvent
     title.text = content.title
     '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
@@ -1454,7 +1454,7 @@ Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, str
     end if
   else if errorMsg <> invalid
     if errorCode = 0
-      ' orignal network error message is to long:
+      ' original network error message is to long:
       ' "Network error.  This could be caused by any of the following problems: (1) The server is down or unresponsive. (2) The server is unreachable. (3) There is a network setup issue on the client."
       errorInfo.error_message = "Network error"
     else
@@ -1657,7 +1657,7 @@ Function isSkipRecapCuePointsReached(creditsCuePoints)
 End Function
 
 
-'This function to check Whether the current player position is in between skipEarlyCredets cuePoints
+'This function to check Whether the current player position is in between skipEarlyCredits cuePoints
 '@creditsCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
 Function isSkipEarlyCreditCuePointsReached(creditsCuePoints)
   return creditsCuePoints.earlycredits_start <> invalid AND creditsCuePoints.earlycredits_end <> invalid AND creditsCuePoints.earlycredits_start > 0 AND m.playerPosition >= creditsCuePoints.earlycredits_start AND m.playerPosition <= creditsCuePoints.earlycredits_end

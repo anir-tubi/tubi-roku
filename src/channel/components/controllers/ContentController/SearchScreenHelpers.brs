@@ -38,7 +38,7 @@ End Function
 '''''''''''''''''''''
 ' onSearchTextChanged
 '
-' The search Text has changed so c  reate a request object for the search and hand the request to the metaDataFetchTask which will actually make the request
+' The search Text has changed so create a request object for the search and hand the request to the metaDataFetchTask which will actually make the request
 Function onSearchTextChanged(msg)
   tubiLog("SearchScreenHelpers.onSearchTextChanged")
   ' cancel any in-flight requests

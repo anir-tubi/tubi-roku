@@ -13,7 +13,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
   if epgScreen <> invalid
     ' this is required for setting focus to epgscreen after activation/signout
     epgScreen.shouldFocusWhenPushed = m.top.fadeInContentController
-    changeEPGScreenBackground(epgScreen) ' ensure background of the epg screen is used immediatly instead of previous screen's background
+    changeEPGScreenBackground(epgScreen) ' ensure background of the epg screen is used immediately instead of previous screen's background
     epgScreen.signedIn = isLoggedInUser()
 
     ' set which component to focus on once the screen gains focus
@@ -42,7 +42,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     epgScreen.observeFieldScoped("epgScreenOkPressed", "onEPGScreenOKPressed")
     epgScreen.signedIn = isLoggedInUser()
 
-    m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop lsitenting to timer before listing to it in case a previous screen started the timer
+    m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
 
     epgScreen.shouldFocusWhenPushed = m.top.fadeInContentController
@@ -241,7 +241,7 @@ Function onEpgChannelListResponse(response)
 End Function
 
 
-'This function calls appendOrAddTimeGridNewContents function which inturn adds or appends the batch data recieved to EPG TimeGrid.
+'This function calls appendOrAddTimeGridNewContents function which inturn adds or appends the batch data received to EPG TimeGrid.
 '@response: roSGNode, The response contains program info for a set of channel
 Function onEPGProgramSuccess(response)
   tubiLog("EPGScreenHelpers.onEPGProgramSuccess")
@@ -309,7 +309,7 @@ Function onEpgProgramError(response)
   screen = getCurrentScreen()
   'Check if the screen which requested the program info is the current Screen and user not moved away from this Screen. (especially in case of request timeout or slow internet cases)
   if screen <> invalid AND screen.id = response.requestorID AND response.contentId <> invalid AND screen.timeGridContent <> invalid
-    'response.contentID will have list of comma separated contentIDs for which the reponse was requested.
+    'response.contentID will have list of comma separated contentIDs for which the response was requested.
     'remove each of the channel Ids from TimeGrid which does not have any channel/program information. Please note that at this point, this node is an empty row on TimeGrid.
     contentIDList = response.contentId.Tokenize(",")
     for each content in contentIDList
@@ -621,7 +621,7 @@ End Function
 
 'This function is cleanup after epgData all been fetched.
 'There might be 3 conditions that we need to handle before rendering.
-'Invalids - just for some reason, if there is a invalid node on timeGridConent, we need to remove those(might never happen)
+'Invalids - just for some reason, if there is a invalid node on timeGridContent, we need to remove those(might never happen)
 'EmptyContentNode - emptyContentNode will have channelID and ContainerName but without any information like ChannelName, video resources to play etc.  We need to remove empty nodes too.
 
 Function cleanUpInvalidsInEPG(screen)

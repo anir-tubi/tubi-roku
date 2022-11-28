@@ -216,7 +216,7 @@ End Function
 '''''''''''''''''''''''
 ' getErrorMessage
 '
-' @pmessage: string, The message to be displayed to the user
+' @message: string, The message to be displayed to the user
 ' @userFacingErrorCode: string, an error code as returned by getUserFacingErrorCode()
 Function getErrorMessage(message = "", userFacingErrorCode = "") as Object
   errorMessage = message + Chr(10)

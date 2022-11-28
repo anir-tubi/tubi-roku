@@ -1071,7 +1071,7 @@ Function isButtonPressAllowed(key, videoState, videoNode)
     up: true
     down: true
     left: true
-    rght: true
+    right: true
   }
 
   isAllowed  = true

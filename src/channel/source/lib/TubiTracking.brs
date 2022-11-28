@@ -231,7 +231,7 @@ End Function
 '
 Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
   ' The eventTypes below act as a source of truth for the varios information to be collected for each event type on the client.
-  ' They should be updated as the protobufs spec is updated.
+  ' They should be updated as the protobuf's spec is updated.
   eventTypes = {
     active: {
       resume: false 'optional
@@ -299,7 +299,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       video_id: -1
       start_position: -1
       current_cdn: ""   'not possible for Roku client
-      has_subtitles: false  'the video player will show subtititles at start
+      has_subtitles: false  'the video player will show subtitles at start
       is_livetv: false
       is_embedded: false
       is_fullscreen: true
@@ -322,7 +322,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
     start_live_video: {
       video_id: -1
       current_cdn: ""   'not possible for Roku client
-      has_subtitles: false  'the video player will show subtititles at start
+      has_subtitles: false  'the video player will show subtitles at start
       video_resource_url: "" 'The playable url in video resource
       video_resource_type: "" ' The type of video resource
       video_player: ""  'VideoPlayer enum
@@ -1030,7 +1030,7 @@ Function tubiTracking_isNumeric(value)
 End Function
 
 
-' Helper functtion to determine if the value is a string
+' Helper function to determine if the value is a string
 Function tubiTracking_isString(value)
   return type(value) = "String" or type(value) = "roString"
 End Function

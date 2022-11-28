@@ -20,7 +20,7 @@ Function onTextChange()
   m.textBackground.height = textHeight + yPadding * 2
 
   ' The y translation is calculated based on the following info
-  ' 1) we are using m.textLabel.vertOrigin = "baseline" which means the top of the text is higer than the origin
+  ' 1) we are using m.textLabel.vertOrigin = "baseline" which means the top of the text is higher than the origin
   '    so we need to add the textHeight to the y translation to bring the top of the text even with the origin
   ' 2) drop the text by the yPadding amount so there is space between the top of the background and the top of
   '    the text

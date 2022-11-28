@@ -83,7 +83,7 @@ Function onScreenFocusChange()
         m.top.backgroundUriList = determineBackgroundImage(m.top.linearChannelToPlay)
       end if
     else
-      setFocusOnEPGTimeGrid()
+      setFocusOnEpgTimeGrid()
     end if
 
     m.top.componentToFocus = m.constants.ui.epgScreen.focusItems.epgTimeGrid
@@ -271,7 +271,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
         setFocusOntoTopNav(true)
         return true
       else if key = "down" AND m.TopNav.isInFocusChain() = true
-        setFocusOnepgTimeGrid()
+        setFocusOnEpgTimeGrid()
         return true
       else if key = "left"
         ' navigating to the side nav
@@ -312,8 +312,8 @@ Function setFocusOntoTopNav(isToggle)
 End Function
 
 
-Function setFocusOnepgTimeGrid()
-  tubiLog("EPGHomeScreen.setFocusOnepgTimeGrid ")
+Function setFocusOnEpgTimeGrid()
+  tubiLog("EPGHomeScreen.setFocusOnEpgTimeGrid ")
   'setting this field to false will trigger the focused channel to play in minimized window
   if m.topNav.isInFocusChain()
     ' only send top nav toggle event if the top nav is losing focus

@@ -409,7 +409,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   'take care of any subtitles if they exist - should only happen on videos
   if contentFromServer.has_subtitle <> invalid then translatedContent.hasSubtitles = contentFromServer.has_subtitle
 
-  ' compare list of renditions to device and enviroment capabilities to get the highest rendition
+  ' compare list of renditions to device and environment capabilities to get the highest rendition
   if contentFromServer.video_renditions <> invalid
     ' for now, only worry about 4k
     if contentFromServer.video_renditions[0] = m.constants.serverValues.tensorVideoRenditions.fourK
@@ -782,7 +782,7 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
   containers = contentToTranslate.browser_list
 
   '//The following code adds a transparency to the thumbnails and for categories, it shifts a few categories to the top of the list
-  '//::HARDCODED:: If this is categories, then place few catrgories in the front and get rid of featured
+  '//::HARDCODED:: If this is categories, then place few categories in the front and get rid of featured
   '//::TODO:: have the backend filter and sort categories when they have more bandwidth
   'set up AAs for all categories including any nested categories
 
@@ -871,7 +871,7 @@ End Function
 ' 2) Use ifSGNodeChildren.update() to leverage native code for node creation and setting fields
 ' 3) Avoid custom fields in favor of ContentNode's defined fields, this avoiding addField() calls in a loop
 ' @contentToTranslate: AA, json parsed response from the matrix/homescreen endpoint
-' @fullJson: string, the full JSON of the /container API repsonse
+' @fullJson: string, the full JSON of the /container API response
 ' @sOrientation: string, should the thumbnail be a "portrait" or "landscape" (match against m.constants.ui.gridItemTypes values)
 ' @bFullData: boolean, Should the full data be parsed and passed to the video children?
 ' @contentNode: TubiContentNode
@@ -916,7 +916,7 @@ End Function
 
 
 ' @contentToTranslate: assocArray, the AA resulting from JSON parsing the /container API response
-' @fullJson: string, the full JSON of the /container API repsonse
+' @fullJson: string, the full JSON of the /container API response
 ' @isSignedInUser: boolean, value based on user logged In or not
 '
 ' @returns: roSGNode, a CategoryContentNode with children TubiContentNodes for each content in the container/category
@@ -953,7 +953,7 @@ End Function
 ' @bFullData: boolean, Should the full data be parsed and passed to the video children?
 ' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
 ' @isSignedInUser: boolean, value based on user logged In or not
-' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
+' returns an associative array that can be passed to ContentNode.update() to populate the ContentNode and it's children
 Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId="", isSignedInUser = false)
 
   categoryParent = m.buildCategoryParentInfo(container, contentMode, sOrientation)
@@ -1003,7 +1003,7 @@ End Function
 ' @screenId: string, one of the screenIds found at constants.ui.screenIds
 ' @isSignedInUser: boolean, value based on user logged In or not
 '
-' returns an associative array that can be passed to ContentNode.udpate() to populate the ContentNode and it's children
+' returns an associative array that can be passed to ContentNode.update() to populate the ContentNode and it's children
 Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false)
   categoryAA = invalid
 
@@ -1133,7 +1133,7 @@ End Function
 ' @contentsJson: string, the JSON string value for the 'contents' key of the API response. Should be
 '                        the same data as @contents, only in a JSON string
 ' @parentGridItemType: string, the gridItemType of the parent container/category
-' @bfullData: boolean, true if each child should contain full metadata, false if children should contain
+' @bFullData: boolean, true if each child should contain full metadata, false if children should contain
 '                      a limited set of metadata
 ' @isSignedInUser: boolean, value based on user logged In or not
 '
@@ -1815,7 +1815,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
 
       programs = channelFromServer.programs
       programCount = programs.count()
-      if programCount = 0 ' No program avaialble
+      if programCount = 0 ' No program available
         program = channelNode.createChild("EPGContentNode")
         if channelNode.id <> invalid
           program.id = channelNode.id
@@ -1883,7 +1883,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
           endTime = ""
           endTimeFromServer = programFromServer.end_time
           if endTimeFromServer <> invalid AND (type(endTimeFromServer) = "String" or type(startTimeFromServer) = "roString") AND endTimeFromServer <> ""
-            datetimeObjEnd = CreateObject("roDateTime") 'create new dateTime object otherwise local time retured will be wrong.
+            datetimeObjEnd = CreateObject("roDateTime") 'create new dateTime object otherwise local time returned will be wrong.
             datetimeObjEnd.FromISO8601String(endTimeFromServer)
             datetimeObjEnd.ToLocalTime()
             program.endTime = datetimeObjEnd.asSeconds()
@@ -2012,7 +2012,7 @@ Function tubiMetadataTranslate_translateTournamentScreen(contentToTranslate, req
     contentToTranslate.Delete("epg_row")
   end if
 
-  categoryContent = m.translateHomescreen(contentToTranslate, "tournamentSceen", false, "standard", "tournamentSceen", isSignedInUser)
+  categoryContent = m.translateHomescreen(contentToTranslate, "tournamentScreen", false, "standard", "tournamentScreen", isSignedInUser)
   contentNode.appendChild(categoryContent)
 
   return contentNode
@@ -2037,7 +2037,7 @@ Function tubiMetadataTranslate_upNextTranslateRecursiveWrapper(content, upnextCo
         else if content.children.count() > 0 'there are seasons so check each season for emptiness
           for i = content.children.count() -1 to 0 step -1
             season = content.children[i]
-            if season.children = invalid or (season.children <> invalid AND season.children.count() <= 0) 'empt season
+            if season.children = invalid or (season.children <> invalid AND season.children.count() <= 0) 'empty season
               content.children.delete(i) 'remove season
             end if
           end for

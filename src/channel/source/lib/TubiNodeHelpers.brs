@@ -121,7 +121,7 @@ End Function
 ' Clones the parent node and inserts the child node at the given index.
 ' Returns an updated copy of the original parent node with a copy of the child inserted into it,
 ' or the unchanged parent node if the insert didn't work.
-' Insering the original child node instead of a clone of the child would remove the child from the original parent.
+' Inserting the original child node instead of a clone of the child would remove the child from the original parent.
 Function tubiNodeHelpers_immutableInsertChild(parent as object, child as object, index as Integer)
   clonedParent = parent.clone(true)
   clonedChild = child.clone(true)

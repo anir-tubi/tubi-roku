@@ -83,7 +83,7 @@ End Function
 
 ' @reqest: assocArray, a request module as returned by TubiRequest()
 Function tubiExperiments_init(request)
-  '//go through all the exisiting namespaces and call the backend to get the data of existing experiments
+  '//go through all the existing namespaces and call the backend to get the data of existing experiments
   namespaces = m.getNamespaces(request)
   allNamespaces = invalid
 

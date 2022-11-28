@@ -1,3 +1,5 @@
+'/* cSpell:disable */
+
 ' set translations on global
 ' side effect: places a set of translations for the locale on m.global.translationsAA
 Function initTranslations()
@@ -7,7 +9,7 @@ Function initTranslations()
 End Function
 
 
-' Tell the code to clear the translations. It is necessary to call this when the remote compontents is called and there
+' Tell the code to clear the translations. It is necessary to call this when the remote components is called and there
 ' are new strings that are contained in the remote components.
 Function clearTranslations()
   if m.global.translationAA <> invalid
@@ -115,10 +117,10 @@ End Function
 'been stored into in memory
 '
 '@param locale: string, a valid locale (ex. "en_US", "es_MX")
-'@return Boolean - Was the language associative array been successfuly gotten?
+'@return Boolean - Was the language associative array been successfully gotten?
 Function setTranslationAAOnGlobal(locale as String) as Boolean
   bSuccess = false
-  '//ideally we would store the translation files in separate files but the ReadAsciiFile() function does not work in the remote compomnent package
+  '//ideally we would store the translation files in separate files but the ReadAsciiFile() function does not work in the remote component package
   ' url = "pkg:/locale/" + locale + "/translations.json"
   ' json = ReadAsciiFile(url)
 

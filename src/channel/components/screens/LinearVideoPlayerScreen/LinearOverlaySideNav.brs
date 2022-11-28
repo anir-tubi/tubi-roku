@@ -110,7 +110,7 @@ Function onOpenStateChanged()
     m.btnBack_label.visible = false
     m.btnCC_label.visible = false
   else if m.top.setOpenState = "openedAndInFocus"
-    '//make the side nav appear oppened and in focus. Also set the focus onto the sidenav.
+    '//make the side nav appear opened and in focus. Also set the focus onto the sidenav.
     m.sideNav.setFocus(true)
     m.btnBack_label.visible = true
     m.btnCC_label.visible = true

@@ -94,7 +94,7 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
       if screen.subType() = "HomeScreen"
         screen.componentToFocus = m.constants.ui.homescreen.focusItems.contentGrid
 
-        ' if we don't set focus to false here, and one the top nav alreday has focus
+        ' if we don't set focus to false here, and one the top nav already has focus
         ' (so screen.isInFocusChain() = true), then screen.setFocus(true) will not
         ' set focus on the screen, which needs to happen for the appropriate focus
         ' logic to occur in the screen.
@@ -151,7 +151,7 @@ Function onScreenTopNavToggled(msg)
 End Function
 
 
-' report an anaytic event that user is opening the sidenav by
+' report an analytic event that user is opening the sidenav by
 ' navigating from the top nav to the side nav
 '
 ' @screen: roSGNode, a screen component

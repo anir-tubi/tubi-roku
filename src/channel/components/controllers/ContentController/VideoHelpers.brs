@@ -508,7 +508,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
           updateHistoryLocally(videoContent, historyPosition)
 
           ' For SignedIn user, update resume point to backend.
-          ' When the update history response's succcess callback  is triggered, it will overwrite
+          ' When the update history response's success callback  is triggered, it will overwrite
           ' whatever was set in the global history object by the previous call to updateHistoryLocally.
           ' We keep both calls in case there is an error when sending to the server, and also to
           ' avoid race conditions where the user could see the details screen before the history
@@ -570,7 +570,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
           updateHistoryLocally(videoContent, historyPosition)
 
           ' For SignedIn user, update resume point to backend
-          ' When the update history response's succcess callback  is triggered, it will overwrite
+          ' When the update history response's success callback  is triggered, it will overwrite
           ' whatever was set in the global history object by the previous call to updateHistoryLocally.
           ' We keep both calls in case there is an error when sending to the server, and also to
           ' avoid race conditions where the user could see the details screen before the history
@@ -836,7 +836,7 @@ End Function
 
 
 ' We observe the VideoNode state change and when the state = "error", the call back chain of events
-' eventually sets VideoNode.control = "stop". Due to an idiosyncracy in Roku behavior, this prevents
+' eventually sets VideoNode.control = "stop". Due to an idiosyncrasy in Roku behavior, this prevents
 ' the Youbora plugin from observing the error state on the video node, and so, we must manually trigger
 ' the Youbora plugin with the error info.
 Function onSendYouboraError(msg)

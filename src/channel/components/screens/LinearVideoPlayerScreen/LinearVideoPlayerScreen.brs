@@ -99,7 +99,7 @@ End Function
 
 
 Function onChannelSelectedToPlayChanged()
-  tubiLog("LineaerVideoPlayerNewScreen.onChannelSelectedToPlayChanged")
+  tubiLog("LinearVideoPlayerScreen.onChannelSelectedToPlayChanged")
   playContent = true
   if m.VideoOverlay.linearChannelToPlay.needsLogin = true
     if isLoggedInUser() = false
@@ -788,7 +788,7 @@ Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, str
     end if
   else if errorMsg <> invalid
     if errorCode = 0
-      ' orignal network error message is to long:
+      ' original network error message is to long:
       ' "Network error.  This could be caused by any of the following problems: (1) The server is down or unresponsive. (2) The server is unreachable. (3) There is a network setup issue on the client."
       errorInfo.error_message = "Network error"
     else
@@ -894,7 +894,7 @@ Function hideProgrammingData()
 End Function
 
 
-' When the TimeGridContent for a channel has been loaded, then display it in the minmized info panel
+' When the TimeGridContent for a channel has been loaded, then display it in the minimized info panel
 Function onChannelTimeGridContentChanged()
   setMinimizedInfoPanelProgrammingDataWithChannelTimeGridContent()
 End Function

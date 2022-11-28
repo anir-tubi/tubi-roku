@@ -193,7 +193,7 @@ End Function
 
 ' @choice: boolean, user selection of Video preview on/off
 '         true - video Preview on
-'         flase - video preview off
+'         false - video preview off
 Function userDeviceApi_patchAutoplayPreviewSettingInfo(choice)
   url = m.constants.urls.account.settings
   options = {}

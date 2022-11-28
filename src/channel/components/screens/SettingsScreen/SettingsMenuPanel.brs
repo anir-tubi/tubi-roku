@@ -120,6 +120,6 @@ Function resetSettingsMenuVerticalPosition()
   ' translation in SettingsScreen.PanelSet.translation, which assumes 5 items in the settings menu.
   ' We need to adjust the vertical translation if there are more or less than 5 items in the settings menu.
   numButtons = m.SettingsMenu.content.getChildCount()
-  ytrans = (5 - numButtons) * (m.SettingsMenu.itemSize[1] + m.SettingsMenu.itemSpacing[1])
-  m.SettingsMenuGroup.translation = [0, ytrans]
+  yTrans = (5 - numButtons) * (m.SettingsMenu.itemSize[1] + m.SettingsMenu.itemSpacing[1])
+  m.SettingsMenuGroup.translation = [0, yTrans]
 End Function

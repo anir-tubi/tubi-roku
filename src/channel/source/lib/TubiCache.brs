@@ -64,7 +64,7 @@ End Function
 ' returns: roSGNode/invalid, the screen node or invalid if no screens were found with the passed in id
 Function tubiCache_getFromScreenCache(screenId)
   if type(screenId) = "String" or type(screenId) = "roString"
-    return m.screenCache[screenId] 
+    return m.screenCache[screenId]
   end if
   return invalid
 End Function
@@ -104,7 +104,7 @@ Function tubiCache_emptyScreenCache()
 End Function
 
 
-' a setter for the content cache - can overwrite top level contents in the cache if the passed 
+' a setter for the content cache - can overwrite top level contents in the cache if the passed
 ' in content has the same id as a content already existing in the content cache.
 '
 ' @content: roSGNode, a ContentNode or a node that extends ContentNode
@@ -143,7 +143,7 @@ Function tubiCache_setInContentCache(content)
       end while
 
       ' It may be the case that the while loop exited because there are only "permanent" content nodes
-      ' left in the cache that should not be removed (ex. homescreen content nodes), but 
+      ' left in the cache that should not be removed (ex. homescreen content nodes), but
       ' adding the incoming content nodes would still take us over the max content nodes.
       ' Only cache if there is still room.
       if cachedNodeCount + incomingNodeCount <= m.maxContentNodes
@@ -161,10 +161,10 @@ End Function
 ' a getter for the content cache - getting does not remove the content from the cache
 '
 ' @contentId: string, the id of the content that is to be retrieved
-' 
+'
 ' returns: roSGNode/invalid, the content node or invalid if no content was found with the passed in id
 '                            or the content node is found to no longer be valid based on the validUntil field.
-' 
+'
 ' side effects: 1) If a content is found in the cache with the passed in contentId, the content
 '               is moved in the cachedOrder, since has been recently accessed.
 '               2) If a content is found in the cache and has a validUntil field with a value that
@@ -203,7 +203,7 @@ End Function
 
 ' iterates over each screen in the screen cache and if the content of the screen has the same
 ' id as the passed in content, sets the validUntil field of the content on the screen to 0
-' 
+'
 ' @contentId: string, the id of the content to which the validUntil field will be updated
 '
 ' returns: boolean, true if a content node with the passed in contentID was found on any screen in
@@ -242,9 +242,9 @@ End Function
 
 ' Deletes the content cache order information from the content cache order store based
 ' on the passed in content id.
-' 
+'
 ' @contentId: string, the id of the content that is to be deleted from the contentCacheOrder array
-' 
+'
 ' returns: boolean, true if the cacheOrderInfo was successfully deleted from the contentCacheOrder
 '                   or false if not successfully deleted
 Function tubiCache_deleteFromContentCacheOrder(contentId)
@@ -348,4 +348,3 @@ Function tubiCache_addToContentCacheOrder(content)
 
   return false
 End Function
-

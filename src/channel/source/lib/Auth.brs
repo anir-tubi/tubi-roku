@@ -1,4 +1,4 @@
-'@constants: assocArray, the constants object returned from getContstants()
+'@constants: assocArray, the constants object returned from getConstants()
 '@request: assocArray, the object returned from TubiRequest()
 Function TubiAuth(constants, request)
   authRegSection = "auth"
@@ -666,7 +666,7 @@ Function tubiAuth_refreshAuthToken(authInfo, timeout)
           end if
           newAuthInfo = m.saveAuthInfo(newAuthInfo) 'returns invalid if not saved to the registry
         else
-          ' Be careful to only do this if the service rejected suth refresh.  We don't
+          ' Be careful to only do this if the service rejected auth refresh.  We don't
           ' want to sign users out for transient errors like network down.
           m.deleteAuthInfo()
         end if

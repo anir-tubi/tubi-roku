@@ -41,7 +41,7 @@ End Function
 
 
 Function onVideoPositionChange(msg)
-  ' set currentPos as milliseconds and integer because doing float math leads to incosistent rounding
+  ' set currentPos as milliseconds and integer because doing float math leads to inconsistent rounding
   ' which throws analytics off slightly
   currentPos = Int(msg.getData() * 1000) 'ms
 
@@ -50,7 +50,7 @@ Function onVideoPositionChange(msg)
     ' and the user navigated away, and then back to the vitg content.
     m.top.nowPos = currentPos
   end if
-  
+
   m.playProgressCounter = calculatePlayProgressCounter(m.playProgressCounter, currentPos, m.top.nowPos)
 
   if m.playProgressCounter >= 10000
@@ -93,7 +93,7 @@ Function stopVideo()
   m.VideoPlayer.visible = false
   m.VideoPlayer.control = "stop"
 
-  ' set currentPos as milliseconds and integer because doing float math leads to incosistent rounding
+  ' set currentPos as milliseconds and integer because doing float math leads to inconsistent rounding
   ' which throws analytics off slightly
   currentPos = Int(m.VideoPlayer.position * 1000)
   m.playProgressCounter = calculatePlayProgressCounter(m.playProgressCounter, currentPos, m.top.nowPos)

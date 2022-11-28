@@ -187,7 +187,7 @@ Function handleLocalFocusChange(newLocalFocus)
     ' item is gaining focus
     if isVitg(m.top.itemContent, m.gridItemTypes) = true
       if m.vitg = invalid
-        '// create the video player when the vitig item gains focus
+        '// create the video player when the vitg item gains focus
         m.vitg = createVitgVideo()
         if m.vitg <> invalid
           m.vitg.hasFocus = newLocalFocus

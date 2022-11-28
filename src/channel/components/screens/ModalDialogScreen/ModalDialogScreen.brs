@@ -89,7 +89,7 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
       end if
     end if
 
-    ' removed alias from xml and setting buttonSelected interface value here, to play default Roku positive audio sound whne user press "OK" on any dialog modal button
+    ' removed alias from xml and setting buttonSelected interface value here, to play default Roku positive audio sound when user press "OK" on any dialog modal button
     if key = "OK" AND m.ButtonList.hasFocus() = true
       m.top.buttonSelected = m.ButtonList.itemSelected
     end if

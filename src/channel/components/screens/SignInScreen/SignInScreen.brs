@@ -107,7 +107,7 @@ End Function
 Function onEmailSelected(msg)
   isSelected = msg.getData()
   if isSelected = true
-    ' we must set voinceEnabled = false here because if we rely on isInFocusChain() in
+    ' we must set voiceEnabled = false here because if we rely on isInFocusChain() in
     ' onScreenFocusChange(), voiceEnabled is not set to false until after voiceEnabled is set to true
     ' on the EmailInputScreen, which prevents voiceEnabled is getting to true
     ' on the EmailInputScreen.

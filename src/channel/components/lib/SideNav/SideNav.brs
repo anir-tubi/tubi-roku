@@ -159,7 +159,7 @@ Function onCreateMenuItems()
 
   initList(m.mainItems)
 
-  '//Inititate the default view
+  '//Initiate the default view
   onOpenedChanged()
   '//::TODO::SIDENAV set the width of the items of the lists dynamically to the width of m.top.width, plus some spacing
   '//::TODO::SIDENAV - set all references to sideNav IDs to be called from Constants: i.e. m.constants.ui.sideNavIds.home.
@@ -497,7 +497,7 @@ Function onListFocusChange(msg)
 End Function
 
 
-' Control whether the focus indiocator is displayed or not based on if the list has focus
+' Control whether the focus indicator is displayed or not based on if the list has focus
 Function setDrawFocusFeedback(list)
   if list.isInFocusChain() = true
     list.drawFocusFeedback = true

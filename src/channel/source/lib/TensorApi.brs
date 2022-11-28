@@ -21,7 +21,7 @@ End Function
 
 Function tensorApi_commonOptions()
   headers = {}
-  ' appending in this style is neccessary to prevent m.constants.headers.commonUapi from being
+  ' appending in this style is necessary to prevent m.constants.headers.commonUapi from being
   ' mutated by potential later appends, since assoc arrays are passed by reference.
   headers.append(m.constants.headers.commonUapi)
 

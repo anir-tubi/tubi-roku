@@ -192,7 +192,7 @@ Function onItemFocused()
         horizontal_location_mode: "INDEX"  'LocationMode enum
       }
 
-      ' cateogory component is used even though this is not an actual category, it can be modeled as a category
+      ' category component is used even though this is not an actual category, it can be modeled as a category
       ' of categories or a category of channels
       m.oldCategoryComponent = getTrackingCategoryComponent(item, numColumns, category)
     else

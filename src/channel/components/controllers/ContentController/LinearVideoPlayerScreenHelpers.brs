@@ -3,7 +3,7 @@
 '
 ' Helper function for onResume and onPlay to launch content
 ' @content: TubiContentNode, the content to be played
-' @bMinimized: boolean, Should the player be playing in its minmized state on the homescreen? If false, then it will be at fullscreen.
+' @bMinimized: boolean, Should the player be playing in its minimized state on the homescreen? If false, then it will be at fullscreen.
 ' @sAssociatedScreenID: String, Often times the screen right before the linear video player screen is displayed has a close association. Keep a record of the ID associated with the associated screen.
 ' @bAllowTransportToAppear: Boolean, Should the EPG Overlay appear automatically when video starts to play and goes fullscreen?
 Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID = "", bAllowTransportToAppear = false)
@@ -76,8 +76,8 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
       if bLinearPlayerPlayingThisContent = false
         ' In order to prepare the linear stream, a number of actions need to be taken
         ' 1) add the rainmaker parameters to the stream url - YoSpace will make calls to rainmaker in order to
-        '    to stitch the ads and needs the rainmaker parameters to make the rainamaker requests
-        ' 2) fetch the response from the hls manifest and parse out the YoSpace "analtyics url" which is the url
+        '    to stitch the ads and needs the rainmaker parameters to make the rainmaker requests
+        ' 2) fetch the response from the hls manifest and parse out the YoSpace "analytics url" which is the url
         '    that will be used to poll for ads
         ' 3) compose the final stream url from the "analytics url" and the original stream url found in the
         '    matrix/homescreen response
@@ -196,7 +196,7 @@ Function maximizeLinearPlayer(content)
     end if
     bAnimate = false
     if isLinearPlayerPlayingThisContent(content) = true
-      '//If the video is already playing then animate it view in case it is being displayed on the homscreen in a corner
+      '//If the video is already playing then animate it view in case it is being displayed on the homescreen in a corner
       bAnimate = true
     end if
 
@@ -767,7 +767,7 @@ Function onLinearChannelSelectedFromGuide(msg)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   channel = videoPlayer.channelSelected
 
-  'this flag is used to differenciate whether a channel is always played or only played if it is different than whats already playing.
+  'this flag is used to differentiate whether a channel is always played or only played if it is different than whats already playing.
   ' In case of EPG we do not want to attempt to play the channel which is already playing full screen.
   playProvidedChannel = true
   if videoPlayer <> invalid

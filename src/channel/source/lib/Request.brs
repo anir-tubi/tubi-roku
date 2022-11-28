@@ -26,7 +26,7 @@ End Function
 ' the functions inside this module is more generic and can be used other endpoints
 Function Request(settings = {mode: "production",CharlesProxyEnabled: false})
   request = TubiRequest(settings)
-  request.handleEvent = tubi_handleHttpEventv2
+  request.handleEvent = tubi_handleHttpEventV2
   return request
 End Function
 
@@ -432,26 +432,26 @@ Function tubihttp_addParamsToUrl_(url As String, params As Object) As String
 End Function
 
 Function tubihttp_passThroughCharlesProxy(url as String) as string
-  proxyedurl = url
+  proxiedUrl = url
   if m.charlesProxyEnabled
     if m.configMode <> "production" AND m.charlesProxyUrl <> ""
       reg_exp = CreateObject("roRegex", "^(http|https)://", "")
       checkurlAA = reg_exp.Split(url)
       if checkurlAA[1] <> invalid AND Len(checkurlAA[1]) > 0 AND url.instr(m.charlesProxyUrl) = -1
-        proxyedurl = m.charlesProxyUrl + "/;;" + url
+        proxiedUrl = m.charlesProxyUrl + "/;;" + url
       end if
     end if
   end if
-  return proxyedurl
+  return proxiedUrl
 End Function
 
 
-Function tubihttp_removeCharlesProxy(proxyedurl as String) as String
-  returnUrl = proxyedurl
+Function tubihttp_removeCharlesProxy(proxiedUrl as String) as String
+  returnUrl = proxiedUrl
   if m.charlesProxyEnabled
-    if m.configMode <> "production" AND proxyedurl <> "" AND m.charlesProxyUrl <> ""
+    if m.configMode <> "production" AND proxiedUrl <> "" AND m.charlesProxyUrl <> ""
       proxyAddress = m.charlesProxyUrl + "/;;"
-      returnUrl = proxyedurl.Replace(proxyAddress, "")
+      returnUrl = proxiedUrl.Replace(proxyAddress, "")
     end if
   end if
   return returnUrl
@@ -459,14 +459,14 @@ End Function
 
 
 '''''''''''''''''''''''
-' tubi_handleHttpEventv2 - ingest a received message.  If the message is not
+' tubi_handleHttpEventV2 - ingest a received message.  If the message is not
 '               relevant to this request, return invalid.  If there is a
 '               response available, it is returned. Requests will be
 '               retried on failures.
 '
 ' message - the roUrlEvent received on the caller's roMessagePort
 '
-Function tubi_handleHttpEventv2(message As Object) As Object
+Function tubi_handleHttpEventV2(message As Object) As Object
   ' perhaps .start() was not called yet
   if m.urltransfer = invalid
     return invalid

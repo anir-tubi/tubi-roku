@@ -296,7 +296,7 @@ Function cmsApi_getSearchRequestInfo(searchText, bKidsMode = false)
   options.params = m.setTupianPosterParam(options.params)
 
   if bKidsMode = false
-    'setting the include_linear param to true will enable the linear content available for serach screen from backend
+    'setting the include_linear param to true will enable the linear content available for search screen from backend
     options.params["include_linear"] = true
   end if
 
@@ -477,7 +477,7 @@ End Function
 '
 '
 ' Helper function to build category ids for nested categories that matrix API can recognize
-' @category: sgNode, a CateogorContentNode
+' @category: sgNode, a CategoryContentNode
 ' if a nested category returns an id in the form of 'parentCat/sub/childCat'
 ' if not a nested category, returns the categoryId
 ' if there is no categoryId, returns invalid

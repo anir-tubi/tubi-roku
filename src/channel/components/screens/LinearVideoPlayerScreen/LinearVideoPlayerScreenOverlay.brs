@@ -39,7 +39,7 @@ Function init()
     m.closedCaptioningButtonListBackground.focusFootprintBitmapUri = "pkg://images/menu-focus-hd.9.png"
   end if
 
-  '//It is best not to check the visible state of a UI element as it may be in a transitionary state. So m.bEPGVisible is used to know what is the intention of the EPG visble state.
+  '//It is best not to check the visible state of a UI element as it may be in a transitionary state. So m.bEPGVisible is used to know what is the intention of the EPG visible state.
   '//if the EPG is visible, then bEPGVisible is true. If the closed captioning is visible (and the EPG is not), then bEPGVisible is false. If there are more than 2 states, then this boolean will need to be changed to a different kind of variable
   m.bEPGVisible = true
   m.nDelaySeconds = 1
@@ -252,7 +252,7 @@ End Function
 
 
 Function onHideAnimationStopped()
-  tubiLog("LinearVideoPlayerScreenOverlay.hideAnimationStopeed")
+  tubiLog("LinearVideoPlayerScreenOverlay.onHideAnimationStopped")
   if m.animationHide.state = "stopped"
     m.animationHide.unobserveField("state")
     m.animationHide = invalid

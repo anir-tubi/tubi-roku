@@ -1,9 +1,9 @@
-' A helper library to work with YoSpace id3 tags that are sent during ad plaback
+' A helper library to work with YoSpace id3 tags that are sent during ad playback
 ' of server side ad inserted (SSAI) ads.
 
 ' YoSpace id3s have 5 keys, per YoSpace, and they are as follows:
 ' YMID - The Yospace Media ID (each transcoded ad asset has a unique ID) - eg "525123456".
-' YTYP - The "type" of ID3 packet - Values will be a single-character string "S", "M" or "E" 
+' YTYP - The "type" of ID3 packet - Values will be a single-character string "S", "M" or "E"
 '        (for "Start", "Middle" and "End" respectively).
 ' YSEQ - The sequence number of the segment within a single ad - This will be a string in the form
 '        "X:Y" where X is the segment number, and Y the total number of segments which comprise the ad

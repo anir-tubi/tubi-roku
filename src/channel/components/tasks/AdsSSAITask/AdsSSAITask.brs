@@ -40,7 +40,7 @@ Function execAdsSSAITask()
   m.currentAdInPod = invalid
 
   ' used to keep track of the playback position within each ad. This is needed because ads can
-  ' have multiple segments, but ID3 tags only give us the position within a sinlge segment.
+  ' have multiple segments, but ID3 tags only give us the position within a single segment.
   m.positionWithinAd = 0
 
   ' ad pod as returned by raf.getAds()[0]
@@ -420,7 +420,7 @@ End Function
 '
 ' @ad: assocArray, an ad as returned by RAF.getAds()[0].ads[0]
 ' @pixelRecord: assocArray, an AA in the format returned by getNewPixelRecord()
-' @maxQuartile: float, one of the following accepted vaules: 0, 0.25, 0.5, 0.75, 1.0
+' @maxQuartile: float, one of the following accepted values: 0, 0.25, 0.5, 0.75, 1.0
 Function fireCurrentAndPreviousPixels(ad, pixelRecord, maxQuartile)
   quartiles = [
     0
@@ -448,7 +448,7 @@ End Function
 
 ' @ad: assocArray, an ad as returned by RAF.getAds()[0].ads[0]
 ' @pixelRecord: assocArray, an AA in the format returned by getNewPixelRecord()
-' @quartile: float, one of the following accepted vaules: 0, 0.25, 0.5, 0.75, 1.0
+' @quartile: float, one of the following accepted values: 0, 0.25, 0.5, 0.75, 1.0
 Function firePixels(ad, pixelRecord, quartile)
   if isNumber(quartile) = true AND isAA(ad) = true
     ctx = invalid
@@ -507,7 +507,7 @@ End Function
 
 ' Helper to populate the analyticsCtx that will get passed to m.tracking.getAnalyticsAd()
 ' The returned analyticsCtx should have the same format as the ctx that RAF passes to the
-' TubiAds.adTrackingCallback(), plus the ammended pieces that are added in TubiAds.enhanceCtx()
+' TubiAds.adTrackingCallback(), plus the amended pieces that are added in TubiAds.enhanceCtx()
 ' ctx.adIndex
 ' ctx.adCount
 ' ctx.ad
@@ -579,7 +579,7 @@ End Function
 
 
 ' @pixelRecord: assocArray, an AA in the format returned by getNewPixelRecord()
-' @quartile: float, one of the following accepted vaules: 0, 0.25, 0.5, 0.75, 1.0
+' @quartile: float, one of the following accepted values: 0, 0.25, 0.5, 0.75, 1.0
 ' @returns: assocArray the pixelRecord AA that is passed in, with updated values
 Function markPixelsAsSent(pixelRecord, quartile)
   if pixelRecord <> invalid AND isNumber(quartile) = true
@@ -614,7 +614,7 @@ End Function
 
 
 ' @pixelRecord: assocArray, an AA in the format returned by getNewPixelRecord()
-' @quartile: float, one of the following accepted vaules: 0, 0.25, 0.5, 0.75, 1.0
+' @quartile: float, one of the following accepted values: 0, 0.25, 0.5, 0.75, 1.0
 ' @returns: boolean, true if pixels for the passed in quartile have already been sent, false otherwise
 Function checkPixelRecord(pixelRecord, quartile)
   if pixelRecord <> invalid AND isNumber(quartile) = true

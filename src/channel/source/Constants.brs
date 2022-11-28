@@ -192,7 +192,7 @@ Function getConstants()
     'This will return true for any remote that has voice input
     constants.deviceInfo.hasVoiceRemoteFeature = (di.HasFeature("voice_remote") or di.HasFeature("handsfree_voice"))
     if constants.deviceInfo.rokuCountryCode <> invalid
-      'rokuCountryCode will be used for the value of countryCode, unless it is overriden by externalConfig.info.country.
+      'rokuCountryCode will be used for the value of countryCode, unless it is overridden by externalConfig.info.country.
       'Keep a record of the original rokuCountryCode value in case we ever need to know the non-overwritten value.
       constants.deviceInfo.rokuCountryCode = UCase(constants.deviceInfo.rokuCountryCode)
     end if
@@ -333,7 +333,7 @@ Function getConstants()
     constants.platform = "telstra"
   end if
 
-  'analyticsPlatform is used when sending analytics events and making raimaker ad requests
+  'analyticsPlatform is used when sending analytics events and making rainmaker ad requests
   constants.analyticsPlatform = "ROKU"
   if LCase(constants.deviceInfo.channelStore) = "telstra"
     constants.analyticsPlatform = "TELSTRA"
@@ -1121,13 +1121,13 @@ Function getConstants()
       constants.ui.imageSizes.linear = [384,144]
       constants.ui.imageSizes.linearExperiment = [978,660]
 
-      'Sizes of the linear background and minmized linear video player
+      'Sizes of the linear background and minimized linear video player
       constants.ui.imageSizes.linearVideoPlayer_minimizedDimension = [1263,710]
       constants.ui.imageSizes.epgLinearVideoPlayer_minimizedDimension = [978,552]
       constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension = [1120,630]
 
     constants.ui.imageTranslations = {}
-      'Location of the linear background and minmized linear video player
+      'Location of the linear background and minimized linear video player
       constants.ui.imageTranslations.linearVideoPlayer_minimizedTranslation = [657,0]
       constants.ui.imageTranslations.epgLinearVideoPlayer_minimizedTranslation = [192,228]
       constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation = [800,0]
@@ -1302,7 +1302,7 @@ Function getConstants()
         constants.ui.tournamentScreen.focusItems.epgTimeGrid = "epgTimeGrid"
         constants.ui.tournamentScreen.focusItems.categoryGridList = "categoryGridList"
 
-    ' Set some performance parementers based on device profile
+    ' Set some performance parameters based on device profile
     constants.performance = {}
       constants.performance.categoryGridList = {}
       constants.performance.categoryGridList.initialBlockSize = 12

@@ -105,7 +105,7 @@ End Function
 
 
 ' Set the ContentNode of one menu button of this screen and add it to the passed parentNode
-' @itemID - string, The ID of the propsed menu button
+' @itemID - string, The ID of the proposed menu button
 ' @parentNode - The node to which the new button info will be added
 Function setMainContent(itemID, parentNode)
   contentNode = CreateObject("roSGNode", "ContentNode")

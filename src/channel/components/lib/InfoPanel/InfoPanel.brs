@@ -789,7 +789,7 @@ Function onModeChange()
 
     m.offset.itemSpacings = [15, 15]
   else if m.top.mode = m.constants.ui.infoPanelModes.sportsEvent
-    ' when sprot event content is focused on the tournament screen
+    ' when sport event content is focused on the tournament screen
     m.infoPanelGroup.appendChild(m.offset)
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.twoLineInfo)

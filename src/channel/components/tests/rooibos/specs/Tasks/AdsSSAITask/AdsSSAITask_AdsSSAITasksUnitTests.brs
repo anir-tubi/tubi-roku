@@ -19,7 +19,7 @@ End function
 
 
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-'@It tests felper functions in AdsSSAITask.brs
+'@It tests helper functions in AdsSSAITask.brs
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 

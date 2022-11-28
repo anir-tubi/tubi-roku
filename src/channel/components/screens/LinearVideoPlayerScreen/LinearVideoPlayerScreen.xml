@@ -78,7 +78,7 @@
       <!-- When this is set to true, then change LoadingMessage.text to reflect the propper message -->
       <field id="displayAdLoadingMessage" type="boolean" value="false" alwaysNotify="true"/>
 
-      <!-- The id of the screen associated with this screen. Used to keep a record of the previous (home) screen with which has a close association: i.e. the linear screen is displayed as a minmized version on the previous screen. In the future, th previous screen may be other screens like the search screen, which may not necessarilly have a close association with this linear screen -->
+      <!-- The id of the screen associated with this screen. Used to keep a record of the previous (home) screen with which has a close association: i.e. the linear screen is displayed as a minimized version on the previous screen. In the future, th previous screen may be other screens like the search screen, which may not necessarilly have a close association with this linear screen -->
       <field id="associatedScreenID" type="string" value="" />
 
     <!-- OUTPUT -->

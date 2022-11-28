@@ -72,7 +72,7 @@ Function init()
   ' It is reset to -1 at the conclusion of a grid scroll animation.
   m.lastFocusPosition = -1
 
-  ' initilize the currentColumn variable to keep track of the current focused column item. It is used in the helper to stop the linear video player, but it could be used for other things.
+  ' initialize the currentColumn variable to keep track of the current focused column item. It is used in the helper to stop the linear video player, but it could be used for other things.
   m.currentColumn = -1
 
   ' Video in the grid constants
@@ -434,7 +434,7 @@ Function onCurrFocusRowChange()
       expandContentAreaForLinear(rowPercent)
     else
       ' In the case of fast scrolling many rows of the grid, across the large vitg or linear rows, the category grid list may
-      ' not finish it's translation animation as the focus leaves the vitg or linear rows. We correct for that as the focus scolls
+      ' not finish it's translation animation as the focus leaves the vitg or linear rows. We correct for that as the focus scrolls
       ' through non video in the grid rows.
       contractContentAreaToOriginal(rowPercent)
     end if
@@ -492,7 +492,7 @@ End Function
 
 
 ' Adjust the RowList based on the difference of the normal and sponsored row title heights and relative to where the rowList already is.
-'   So if a gridType already adjusted the rowList's position, then adjust it more but relatibve to where it already had been adjusted.
+'   So if a gridType already adjusted the rowList's position, then adjust it more but relative to where it already had been adjusted.
 ' @rowPercent: float, the percentage that the Sponsorship row is focused
 Function expandContentAreaForSponsorship(rowPercent)
   m.ContentArea.translation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - (m.sponsorSlideAmt  * rowPercent)]
@@ -706,7 +706,7 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.mode = mode
       m.InfoPanel.topHeaderImageUri = m.constants.ui.uris.infoPanelWorldCupLogo
       m.InfoPanel.title = contentNode.title
-      'Fifa Worldcup description and dates are constnat when show all games is focused, so hardcoding it
+      'Fifa Worldcup description and dates are constant when show all games is focused, so hardcoding it
       m.InfoPanel.description = getTranslation("show_all_games_description")
       lineOneData = {}
       lineOneData.hoursOfAiring = getTranslation("show_all_games_gameInfo")

@@ -6,7 +6,7 @@ Function showTournamentScreen(constants, componentToFocus = "")
 
 
 ' isPreTournament is used to decide whether epgRow on tournament page should be first row, or last row.
-' currently isPreTournement is hard coded to false, because of the decision to keep the epgRow at the end on tournament page.
+' currently isPreTournament is hard coded to false, because of the decision to keep the epgRow at the end on tournament page.
   isPreTournament = false
 
   screenID = constants.ui.screenIds.tournamentScreen
@@ -65,7 +65,7 @@ Function showTournamentScreen(constants, componentToFocus = "")
     tournamentScreen.isPreTournament = isPreTournament
     tournamentScreen.isLinearTVAllowedInTopNav = isParentalControlsAdultLevel() '
 
-    m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop lsitenting to timer before listing to it in case a previous screen started the timer
+    m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
 
     tournamentScreen.shouldFocusWhenPushed = m.top.fadeInContentController 'just in case if get deeplink this page in future.
@@ -214,7 +214,7 @@ Function onTournamentScreenErrorResponse(response)
   if response <> invalid AND isTournamentScreen(screen) = true AND screen.id = response.requestorID
     screen.unobserveFieldScoped("contentReady")
     showHideSpinner(false)
-    'No data has been receieved. So pop the screen and let user go back to previous screen.
+    'No data has been received. So pop the screen and let user go back to previous screen.
     popScreen(false, false)
     errorMessage = getTranslation("screenTournament_error_fetchScreenContent_description")
 
@@ -329,7 +329,7 @@ End Function
 
 
 Function onReloadTournamentScreen(msg)
-  tubiLog("TournamentSceenHelpers.onReloadTournamentScreen")
+  tubiLog("TournamentScreenHelpers.onReloadTournamentScreen")
   screen = msg.getRoSGNode()
   fetchTournamentScreenContent(screen)
 End Function
@@ -342,7 +342,7 @@ End Function
 
 
 Function onReloadTournamentScreenContainerIds(msg)
-  tubilog("TournamentSceenHelpers.onReloadTournamentScreenContainerIds")
+  tubilog("TournamentScreenHelpers.onReloadTournamentScreenContainerIds")
   categoryIds = msg.getData()
   screen = msg.getRoSGNode()
 

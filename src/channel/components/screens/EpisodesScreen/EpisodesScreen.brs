@@ -52,7 +52,7 @@ Function onScreenFocusChange()
     m.gridIsFocused = false
     m.RowList.setFocus(true)
   else if m.top.isInFocusChain() = false
-    m.gridIsFocused = false 
+    m.gridIsFocused = false
     m.listIsFocused = false
   end if
 End Function
@@ -87,18 +87,18 @@ Function onEpisodeFocused()
   if m.RowList.isInFocusChain() then
     episode = getEpisodeContent(m.RowList.rowItemFocused)
     if episode <> invalid then
-    
+
       content = m.top.content
-    
+
       m.Info.mode = m.constants.ui.infoPanelModes.episode
       m.Info.title = content.title
       m.Info.episodeTitle = episode.title
       m.Info.description = episode.description
-      
+
       lineOneData = {}
       lineOneData.releaseDate = content.releaseDate
       lineOneData.length = episode.length
-      
+
       if episode <> invalid AND (episode.hasSubtitles = true OR episode.subtitleTracks.Count() > 0)
         lineOneData.hasCC = true
       else if content <> invalid AND content.type = m.constants.ui.contentTypes.video AND (content.hasSubtitles = true OR content.subtitleTracks.Count() > 0)
@@ -106,7 +106,7 @@ Function onEpisodeFocused()
       else
         lineOneData.hasCC = false
       end if
-      
+
       lineOneData.descriptorCode = episode.descriptorCode
 
       if content.availabilityEnds <> invalid AND content.availabilityEnds <> ""
@@ -114,7 +114,7 @@ Function onEpisodeFocused()
       else if episode <> invalid AND episode.availabilityEnds <> invalid
         lineOneData.availabilityEnds = episode.availabilityEnds
       end if
-    
+
       lineOneData.rating = episode.rating
       lineOneData.partnerLogoUri = episode.inlineLogoUri
 
@@ -123,8 +123,8 @@ Function onEpisodeFocused()
         genres: episode.genres
       }
       m.Info.needsLogin = episode.needsLogin
-      m.Info.width = 1140   
-      m.Info.calculateHeight = true   
+      m.Info.width = 1140
+      m.Info.calculateHeight = true
     end if
 
     season = m.top.content.getChild(m.RowList.rowItemFocused[0])
@@ -174,7 +174,7 @@ Function onEpisodeSelected()
 End Function
 
 
-' @itemSelected: Array, 2D array with [row, column] (as outpt from Rowlist.rowitemFocused or .rowItemSelected)
+' @itemSelected: Array, 2D array with [row, column] (as output from Rowlist.rowitemFocused or .rowItemSelected)
 Function handleEpisodeSelected(itemSelected)
   'set the component info so it can be used in navigate_to_page event
   episode = getEpisodeContent(itemSelected)
@@ -234,7 +234,7 @@ Function onContentChange()
   m.Menu.content = m.top.content
 
   'set backgrounds
-  if m.top.content.backgrounds <> invalid AND m.top.content.backgrounds.count() > 0 then 
+  if m.top.content.backgrounds <> invalid AND m.top.content.backgrounds.count() > 0 then
     m.top.backgroundUriList = m.top.content.backgrounds
   else
     m.top.backgroundUriList = [m.defaultHeroUri]
@@ -329,7 +329,7 @@ Function focusMenu()
     slideTo(m.Menu, [192, m.Menu.translation[1]], 0.5)
     slideTo(m.RowList, [634, m.RowList.translation[1]], 0.5)
   end if
-  
+
 End Function
 
 

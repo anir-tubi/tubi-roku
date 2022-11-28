@@ -193,7 +193,7 @@ Function processResponse(msg)
           processSuccessResponse(result, callbackTypes, job)
         else if code >= 400 AND code < 500 AND canRetry4xxCodes[code.toStr()] <> true
           ' error expected to remain error on retry so don't bother retrying
-          processErrorReponse(result, callbackTypes, job)
+          processErrorResponse(result, callbackTypes, job)
         else if (code = 403 OR code = 401) AND m.constants.reqNames.acceptsTubiAuth[requestType] = true
           if retries > 0
             ' request could not be authed by backend so attempt to refresh the auth token and try again
@@ -207,16 +207,16 @@ Function processResponse(msg)
             if newAuthInfo <> invalid
               handleBackoff(job, retries) 'pause before retry to relieve pressure on the backend
             else
-              processErrorReponse(result, callbackTypes, job)
+              processErrorResponse(result, callbackTypes, job)
             end if
           else
-            processErrorReponse(result, callbackTypes, job)
+            processErrorResponse(result, callbackTypes, job)
           end if
         else
           if retries > 0
             handleBackoff(job, retries) 'pause before retry to relieve pressure on the backend
           else
-            processErrorReponse(result, callbackTypes, job)
+            processErrorResponse(result, callbackTypes, job)
           end if
         end if
 
@@ -245,7 +245,7 @@ Function processSuccessResponse(result, callbackTypes, job)
   if responseHeaders <> invalid
     if responseHeaders["Content-Type"] = invalid
       ' fallback, try parsing JSON in case no responseHeaders were set (most likely an
-      ' ovesight by the backend service)
+      ' oversight by the backend service)
       fullJson = responseFromServer.data
       parsedJson = invalid
       if fullJson <> invalid AND fullJson <> ""
@@ -283,7 +283,7 @@ Function processSuccessResponse(result, callbackTypes, job)
   if serializationParseError = true
     ' even though we got success response headers, the response could not be parsed from
     ' JSON/XML, so we should treat it as an error
-    processErrorReponse(result, callbackTypes, job)
+    processErrorResponse(result, callbackTypes, job)
   else
     parserCallback = callbackTypes.parseSuccess
 
@@ -400,13 +400,13 @@ Function accumulateBatchResponse(job, parsedResponse) as Void
 End Function
 
 
-'processErrorReponse, triggers when api fails
+'processErrorResponse, triggers when api fails
 '
 ' @result : assocarray, this is the request handleEvent AA with response
 ' @callbackTypes : assocarray, it holds parseerror & parsesuccess callbacks
 ' @job : assocarray, it has reqInfo, tubiReq, batchInfo(invalid for single request, valid for batch request)
 '
-Function processErrorReponse(result, callbackTypes, job)
+Function processErrorResponse(result, callbackTypes, job)
   ' end result of parsedResponse type may vary depending on API response format
   responseFromServer = result.response
   responseHeaders = responseFromServer.headers

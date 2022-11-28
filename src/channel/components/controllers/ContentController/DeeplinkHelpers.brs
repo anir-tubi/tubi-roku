@@ -199,7 +199,7 @@ Function handleInputDeeplink(inputInfo) as Void
 End Function
 
 
-' this function calls appropriate functions to andle the deeplinks based on deeplink type
+' this function calls appropriate functions to handle the deeplinks based on deeplink type
 Function handleDeeplinkContentByType()
   tubilog("deeplinkHelpers.handleDeeplinkContentByType")
   if m.deepLinkContent <> invalid
@@ -385,7 +385,7 @@ End Function
 ' @trackingTask: roSGNode, an instance of the TrackingLoggingTask
 ' @constants: associativeArray, m.constants
 Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, trackingLib, trackingTask, constants)
-  if deepLinkContent <> invalid  'if deeplinkContent is invalid then, there is no point in sending refferedanalyticsEvent
+  if deepLinkContent <> invalid  'if deeplinkContent is invalid then, there is no point in sending referredAnalyticsEvent
     referredAnalyticsEvent = {
       referred_type: "DEEP_LINK"
       campaign: deepLinkContent.campaign
@@ -457,7 +457,7 @@ Function handleLinearDeeplinkContent()
     message = getTranslation("dialog_contentNotAvailable_Parental_description")
     showDeeplinkErrorModal(invalid, message)
   else
-    ' linear deeplink request has been recieved with content ID to play, so fetch and start playing the content
+    ' linear deeplink request has been received with content ID to play, so fetch and start playing the content
     if m.deeplinkContent.id <> ""
       fetchSingleLinearChannel()
       sCatSideNavID = m.constants.ui.sideNavIds.home
@@ -507,9 +507,9 @@ Function handleCategoryDeeplinkContent()
     contentNode = CreateObject("roSGNode", "CategoryContentNode")
     contentNode.id = m.deeplinkContent.id
     showCategoryDetailsScreen(contentNode, m.constants.ui.terms.categories, false)
-    categorylListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
-    if categorylListScreen <> invalid
-      categorylListScreen.jumpToItemById = m.deeplinkContent.id
+    categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
+    if categoryListScreen <> invalid
+      categoryListScreen.jumpToItemById = m.deeplinkContent.id
     end if
   else
     if m.enteredFromDeepLink = true
@@ -661,7 +661,7 @@ End Function
 ' success handler for Series deeplinks.
 ' @detailScreen: roSGNode, series detail page
 ' @refreshedContent: roSGNode, success response content
-' @sendTracking: boolean , this paramter is used to control whether NavigateToPage events needs to send or not. In case of deeplinks, no need to send NavigateToPage Event
+' @sendTracking: boolean , this parameter is used to control whether NavigateToPage events needs to send or not. In case of deeplinks, no need to send NavigateToPage Event
 Function handleDeeplinkSeriesSuccessResponse(refreshedContent)
   history = getHistory(refreshedContent.id)
 

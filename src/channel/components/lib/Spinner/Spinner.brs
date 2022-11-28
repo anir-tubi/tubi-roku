@@ -78,7 +78,7 @@ Function onDimensionsChange()
     spinner.height = rect.height
     spinner.scaleRotateCenter=[rect.width / 2, rect.height / 2]
     if m.top.displayText = true
-      '//vertically center both sprinner and message
+      '//vertically center both spinner and message
       nMessageSpacing = 37
       nAdditionalMessageHeight = message.height + nMessageSpacing
       nSpinnerY = rect.y - nAdditionalMessageHeight / 2

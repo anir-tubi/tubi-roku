@@ -1,4 +1,4 @@
-' This function will retrun whether the current date is during tournament, after or pre torunament
+' This function will retrun whether the current date is during tournament, after or pre tournament
 ' return values are
 '     = duringTournament - during the tournament time period
 '     = afterTournament  - after end date of tournament

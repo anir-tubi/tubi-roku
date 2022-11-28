@@ -407,7 +407,7 @@ End Function
 ' on a UI component that is still running an animation (in which case we should stop it before
 ' starting the new animation)
 '
-' @animation: roSGNode, an Animation node (usually retuned by animate() in this mixin)
+' @animation: roSGNode, an Animation node (usually returned by animate() in this mixin)
 Function stopAnimation(animation)
   if type(animation) = "roSGNode" AND animation.isSubType("AnimationBase")
     if animation.state <> "stopped"

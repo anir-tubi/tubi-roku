@@ -370,7 +370,7 @@ Function showStartupErrorDialog(screen, constants)
   scene = screen.GetScene()
 
   ' the following while loop is necessary because roku crash logs indicate that
-  ' scene.CreateChild("ErrorController") can unexplicably return invalid at times.
+  ' scene.CreateChild("ErrorController") can inexplicably return invalid at times.
   controllerCreated = false
   attempts = 0
   while controllerCreated = false AND attempts < 100

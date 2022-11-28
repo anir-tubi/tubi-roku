@@ -16,7 +16,7 @@ Function init()
   m.verificationHintText = m.top.findNode("verificationHintText")
   m.resendVerificationLinkButton = m.top.findNode("resendVerificationLinkButton")
   m.useDifferentEmailButton = m.top.findNode("useDifferentEmailButton")
-  'setting the alignement of the item in the list to make the text center when no iconUrl and badge text.
+  'setting the alignment of the item in the list to make the text center when no iconUrl and badge text.
   m.resendVerificationLinkButton.align = "center"
   m.useDifferentEmailButton.align = "center"
 
@@ -61,11 +61,11 @@ Function onEmailVerificationMenuItemSelected(msg)
     title = getTranslation("dialog_exitApp_title")
     message = getTranslation("dialog_email_verification_email_already_sent") + Chr(10) + m.email.text + Chr(10) + getTranslation("dialog_email_verification_check_spam")
     buttons = [getTranslation("dialog_button_resend_verification_link"), getTranslation("dialog_button_cancel")]
-    showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onResendVerificationLinkSelected, onResendVerificationCancelSlected)
+    showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onResendVerificationLinkSelected, onResendVerificationCancelSelected)
   else if selection.id = "useDifferentEmailButton"
     'show the email input screen
     m.top.selectedDifferentEmail = true
-    
+
   end if
 End Function
 
@@ -78,7 +78,7 @@ Function onResendVerificationLinkSelected()
     dialogEvent = {
       type: "dialog"
       values: {
-        dialog_type: "LOGIN_REQUEST" 
+        dialog_type: "LOGIN_REQUEST"
         pageOneof:  m.Tracking.getAnalyticsPage("login_page", {"choice": "LINK"})
         dialog_action: "SHOW"
         dialog_sub_type: "many_attempts"
@@ -105,8 +105,8 @@ Function onResendVerificationLinkSelected()
 End Function
 
 
-Function onResendVerificationCancelSlected()
-  tubiLog("EmailVerificationScreen.onResendVerificationCancelSlected")
+Function onResendVerificationCancelSelected()
+  tubiLog("EmailVerificationScreen.onResendVerificationCancelSelected")
   dialogEvent = {
     type: "dialog"
     values: {

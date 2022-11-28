@@ -288,7 +288,7 @@ End Function
 '                     false if the user is focusing the default top nav option by pressing back
 '                     while focused on the top nav of another page
 Function setFocusOntoTopNav(isToggle)
-  tubiLog("TorunamentScreen.setFocusOntoTopNav")
+  tubiLog("TournamentScreen.setFocusOntoTopNav")
   if isToggle = true
     ' only send top nav toggle event if the top nav is gaining focus from the category grid list.
     ' Do not set top nav toggle event if the top nav is gaining focus from another page.
@@ -359,7 +359,7 @@ End Function
 
 
 Function onContentUpdated()
-  tubilog("TournamentScreem.onContentUpdated")
+  tubilog("TournamentScreen.onContentUpdated")
 
   if m.top.content <> invalid
 
@@ -411,7 +411,7 @@ Function onScreenFocusChange()
       end if
 
     else if m.top.focusedComponent = m.constants.ui.tournamentScreen.focusItems.epgTimeGrid then
-      setFocusOnEPGTimeGrid()
+      setFocusOnEpgTimeGrid()
     else
       setFocusOnCategoryGrid()
     end if
@@ -431,8 +431,8 @@ Function onScreenFocusChange()
 End Function
 
 
-Function setFocusOnEPGTimeGrid()
-  tubiLog("TournamentScreen.setFocusOnEPGTimeGrid ")
+Function setFocusOnEpgTimeGrid()
+  tubiLog("TournamentScreen.setFocusOnEpgTimeGrid ")
   'setting this field to false will trigger the focused channel to play in minimized window
   if m.topNav.isInFocusChain() = true
     ' only send top nav toggle event if the top nav is losing focus
@@ -554,7 +554,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
           return true
         else if m.categoryGridList.isInFocusChain() = true
           componentUPAnimation()
-          setFocusOnEPGTimeGrid()
+          setFocusOnEpgTimeGrid()
           return true
         end if
       else
@@ -574,7 +574,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
       if m.top.isPreTournament = true
         if m.TopNav.isInFocusChain() = true
           if m.top.focusedComponent = m.constants.ui.tournamentScreen.focusItems.epgTimeGrid
-            setFocusOnEPGTimeGrid()
+            setFocusOnEpgTimeGrid()
           else
             setFocusOnCategoryGrid()
           end if
@@ -590,13 +590,13 @@ Function onKeyEvent(key As string, press As boolean) As boolean
             setFocusOnCategoryGrid()
             setComponentInteractionEventForCategoryGrid("TOGGLE_ON")
           else
-            setFocusOnEPGTimeGrid()
+            setFocusOnEpgTimeGrid()
             setComponentInteractionEventForEPG("TOGGLE_ON")
           end if
           return true
         else if m.categoryGridList.isInFocusChain() = true
           componentDownAnimation()
-          setFocusOnEPGTimeGrid()
+          setFocusOnEpgTimeGrid()
           setComponentInteractionEventForCategoryGrid("TOGGLE_OFF")
           setComponentInteractionEventForEPG("TOGGLE_ON")
           return true
@@ -718,8 +718,8 @@ Function onTransportVoiceRequest(msg)
   if inputInfo <> invalid AND inputInfo.command <> invalid
     command = inputInfo.command
   end if
-  tubiLog("TorunamentScreen.onTransportVoiceRequest " + command)
-    ' Only replays/noteworty content and FIFA channel can be played.
+  tubiLog("TournamentScreen.onTransportVoiceRequest " + command)
+    ' Only replays/noteworthy content and FIFA channel can be played.
   if m.epgTimeGrid.isInFocusChain() = true OR (m.categoryGridList.isInFocusChain() = true AND m.top.contentFocused.Type = "sports_event" AND m.top.contentFocused.availabilityType <> m.constants.ui.contentTimings.upcoming)
     if command = "play"
       handlePlayInput()

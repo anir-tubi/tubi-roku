@@ -1,5 +1,5 @@
 Function init()
-  print "init Scene Graph Erorr Controller"
+  print "init Scene Graph Error Controller"
   m.constants = m.global.constants
   m.trackingLoggingTask = m.top.findNode("TrackingLoggingTask")
   m.trackingLoggingTask.control = "RUN"
@@ -11,11 +11,11 @@ End Function
 
 Function showConnectionError()
     errorObj = {}
-    errorObj.contextCode = m.constants.errors.context.homeScreen 
+    errorObj.contextCode = m.constants.errors.context.homeScreen
     errorObj.subtypeCode = m.constants.errors.subtypes.networkError
     errorObj.title = getTranslation("error_connection_title")
     errorObj.message = getTranslation("error_connection_description")
-    
+
     error = {
       info: errorObj
       buttonText: getTranslation("dialog_button_exit")

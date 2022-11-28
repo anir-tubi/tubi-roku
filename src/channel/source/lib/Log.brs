@@ -128,7 +128,7 @@ Function tubiLog_buildLogInfo_(message as String, serverType as Dynamic, subtype
 End Function
 
 
-'sends the logging info to the server by creating a logging request and adding the loggging request to the passed in request queue
+'sends the logging info to the server by creating a logging request and adding the logging request to the passed in request queue
 '@logInfo: roAssociativeArray ie.
 '  logInfo = {
 '    level: "error"

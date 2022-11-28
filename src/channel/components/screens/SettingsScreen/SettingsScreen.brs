@@ -100,7 +100,7 @@ End Function
 '       which particular panel is focused, otherwise we could just set focus
 '       in onComponentFocusChange.  Instead, this method, along with
 '       onComponentFocusChange, are the only way I have been able to
-'       acheive the desired opacity as focus moves left/right across panels
+'       achieve the desired opacity as focus moves left/right across panels
 '       and in/out of the screen, such as when a sign in dialog shows.
 Function onDetailScreenMenuItemFocused()
   tubiLog("SettingsScreen.onDetailScreenMenuItemFocused")

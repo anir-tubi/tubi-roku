@@ -66,7 +66,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
 
 
     ' m.actionType variable is used for setting a callback function after successful a data fetch retry in the case where
-    ' users select a menu button from the detail screen, but the origial data fetch was unsuccessful. In this way,
+    ' users select a menu button from the detail screen, but the original data fetch was unsuccessful. In this way,
     ' the action will happen automatically after the successful retry.
     m.actionType = invalid
 
@@ -93,7 +93,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
       detailScreen.isLoading = true
     else
       populateDetailScreen(detailScreen, content, true)
-      detailScreen.isLoading = true '//1st set to true before settng to false. For some reason setting it to false by itself does not get registered, even if he isLoading field's alwaysNotify property is set to true
+      detailScreen.isLoading = true '//1st set to true before setting to false. For some reason setting it to false by itself does not get registered, even if he isLoading field's alwaysNotify property is set to true
       detailScreen.isLoading = false
     end if
 
@@ -107,7 +107,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
       errorCallback = onSingleContentErrorWithoutTracking
     end if
 
-    'NOTE: SuceessCb and ErrorCb should handle analytics tracking.
+    'NOTE: SuccessCb and ErrorCb should handle analytics tracking.
     if successCb <> invalid
       successCallback = successCb
     end if
@@ -423,7 +423,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     detailScreen.calculateInfoHeight = true
 
     if detailScreen.relatedContent = invalid
-      '//Only change the related content if it hasn't alreeady been loaded. If we try to reload the related content, then the thunbnails may not display due to (porobably) a firmware issue
+      '//Only change the related content if it hasn't already been loaded. If we try to reload the related content, then the thumbnails may not display due to (probably) a firmware issue
       detailScreen.relatedContent = content.relatedContent
     end if
 
@@ -1830,7 +1830,7 @@ Function playHelper(screen)
       '//if user is a guest and is trying to play content geared for only adults, then ask them to register
       dialogSubtype = "mature-play"
       if m.deepLinkContent <> invalid
-        '//this is a deeplink so, indicate that the warning originatated from a deeplink
+        '//this is a deeplink so, indicate that the warning originated from a deeplink
         dialogSubtype = "mature-play-deep"
       end if
       displayDetailScreenMaturePlayWarning(episode, dialogSubtype)
@@ -1869,7 +1869,7 @@ Function processResume(episode)
     '//if user is a guest and is trying to play content geared for only adults, then ask them to register dialogSubtype = "mature-play"
     dialogSubtype = "mature-resume"
     if m.deepLinkContent <> invalid
-      '//this is a deeplink so, indicate that the warning originatated from a deeplink
+      '//this is a deeplink so, indicate that the warning originated from a deeplink
       dialogSubtype = "mature-resume-deep"
     end if
 
@@ -1993,7 +1993,7 @@ End Function
 ' sends the information to the trackingTask which will actually send the event.
 '
 ' @screen: the detail screen
-' @sLikeEventEnum: string, one of the valid event strngs as defined in events.protos -> enum ExplicitInteraction
+' @sLikeEventEnum: string, one of the valid event strings as defined in events.protos -> enum ExplicitInteraction
 Function sendLikeSelectAnalytics(screen, sLikeEventEnum)
   tubiLog("DetailScreenHelper.sendLikeSelectAnalytics")
 

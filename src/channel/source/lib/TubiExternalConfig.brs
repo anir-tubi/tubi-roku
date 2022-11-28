@@ -75,7 +75,7 @@ Function tubiExternalConfig_getConfigsRequest(request, constants)
 End Function
 
 
-' @responseData: string, the JSON object returned by req.runSynchrounous() or req.response.data
+' @responseData: string, the JSON object returned by req.runSynchronous() or req.response.data
 Function tubiExternalConfig_parseConfigs(responseData)
   configs = invalid
   if responseData <> invalid
