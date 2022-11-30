@@ -221,10 +221,8 @@ Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOpti
   params["include_sponsorships"] = true
   params["contents_limit"] = m.constants.performance.categoryGridList.finalBlockSize
 
-  if passedOptions.params <> invalid
-    if passedOptions.params.content_mode <> invalid AND passedOptions.params.content_mode <> ""
-      params["content_mode"] = passedOptions.params.content_mode
-    end if
+  if passedOptions.params <> invalid AND isNonEmptyString(passedOptions.params.content_mode)
+    params["content_mode"] = passedOptions.params.content_mode
   end if
 
   imageParamTypes = [
@@ -236,19 +234,6 @@ Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOpti
 
   headers = options.headers
   headers["Accept-Version"] = "6.0.0"
-  headers["x-tubi-inject-live-news"] = "false"
-
-  if passedOptions <> invalid AND passedOptions.params <> invalid
-    contentMode = passedOptions.params.content_mode
-
-    if contentMode = "" or contentMode = m.constants.ui.contentMode.linear
-      if bKidsMode = false
-        ' add custom linear content header for all homescreen or linear TV category fetches
-        ' per a request from back end team, in order to facilitate better caching.
-        headers["x-tubi-inject-live-news"] = "true"
-      end if
-    end if
-  end if
 
   if passedOptions <> invalid
     if passedOptions.params <> invalid
