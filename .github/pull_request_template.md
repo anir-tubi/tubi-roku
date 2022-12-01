@@ -4,6 +4,12 @@
 
 <<Replace this with a non technical description of what should be provided for this PR in the release notes. If no release notes are needed, remove this line.>>
 
+## QA What Changed
+
+---
+
+<<Replace this with a description for QA of what changed. If we don't want this to show in the QA ticket, remove this line.>>
+
 ## QA Testing Steps
 
 ---

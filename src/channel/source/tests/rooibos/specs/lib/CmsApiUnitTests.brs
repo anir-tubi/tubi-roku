@@ -271,7 +271,6 @@ Function cmsApi_homeScreenReqInfo_test()
     "customParam"
   ]
   headers = [
-    "x-tubi-inject-live-news"
     "x-custom-header"
     "x-client-platform"
     "x-client-version"
@@ -293,7 +292,6 @@ Function cmsApi_homeScreenReqInfo_test()
       "customParam": "custom_param_value"
     }
     headers: {
-      "x-tubi-inject-live-news": "true"
       "x-custom-header": "custom_header_value"
       "x-client-platform": m.cmsApi.constants.headers.commonUapi["x-client-platform"]
       "x-client-version": m.cmsApi.constants.headers.commonUapi["x-client-version"]
@@ -306,7 +304,6 @@ Function cmsApi_homeScreenReqInfo_test()
       "customParam": "custom_param_value"
     }
     headers: {
-      "x-tubi-inject-live-news": "true"
       "x-custom-header": "custom_header_value"
     }
   }
@@ -330,7 +327,6 @@ Function cmsApi_homeScreenReqInfo_test()
   m.assertEqual(homeInfo.options.params["images[vitg_tb]"], homeOptions.params["images[vitg_tb]"])
   m.assertEqual(homeInfo.options.params["contentMode"], homeOptions.params["contentMode"])
   m.assertEqual(homeInfo.options.params["customParam"], homeOptions.params["customParam"])
-  m.assertEqual(homeInfo.options.headers["x-tubi-inject-live-news"], homeOptions.headers["x-tubi-inject-live-news"])
   m.assertEqual(homeInfo.options.headers["x-custom-header"], homeOptions.headers["x-custom-header"])
   m.assertEqual(homeInfo.options.headers["x-client-platform"], homeOptions.headers["x-client-platform"])
   m.assertEqual(homeInfo.options.headers["x-client-version"], homeOptions.headers["x-client-version"])
@@ -355,18 +351,15 @@ Function cmsApi_homeScreenReqInfo_test()
   m.assertEqual(homeInfo.options.params["images[vitg_tb]"], homeOptions.params["images[vitg_tb]"])
   m.assertEqual(homeInfo.options.params["contentMode"], homeOptions.params["contentMode"])
   m.assertEqual(homeInfo.options.params["customParam"], homeOptions.params["customParam"])
-  m.assertEqual(homeInfo.options.headers["x-tubi-inject-live-news"], homeOptions.headers["x-tubi-inject-live-news"])
   m.assertEqual(homeInfo.options.headers["x-custom-header"], homeOptions.headers["x-custom-header"])
   m.assertEqual(homeInfo.options.headers["x-client-platform"], homeOptions.headers["x-client-platform"])
   m.assertEqual(homeInfo.options.headers["x-client-version"], homeOptions.headers["x-client-version"])
 
   ' with contentMode = "tv"
   passedOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.tv
-  passedOptions.headers["x-tubi-inject-live-news"] = "false"
   homeInfo = m.cmsApi.homeScreenReqInfo(false, passedOptions)
   homeOptions.params["is_kids_mode"] = false
   homeOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.tv
-  homeOptions.headers["x-tubi-inject-live-news"] = "false"
 
   m.assertEqual(homeInfo.count(), 2)
   m.assertAAHasKeys(homeInfo, infoKeys)
@@ -384,14 +377,12 @@ Function cmsApi_homeScreenReqInfo_test()
   m.assertEqual(homeInfo.options.params["images[vitg_tb]"], homeOptions.params["images[vitg_tb]"])
   m.assertEqual(homeInfo.options.params["contentMode"], homeOptions.params["contentMode"])
   m.assertEqual(homeInfo.options.params["customParam"], homeOptions.params["customParam"])
-  m.assertEqual(homeInfo.options.headers["x-tubi-inject-live-news"], homeOptions.headers["x-tubi-inject-live-news"])
   m.assertEqual(homeInfo.options.headers["x-custom-header"], homeOptions.headers["x-custom-header"])
   m.assertEqual(homeInfo.options.headers["x-client-platform"], homeOptions.headers["x-client-platform"])
   m.assertEqual(homeInfo.options.headers["x-client-version"], homeOptions.headers["x-client-version"])
 
   ' with contentMode = "linear"
   passedOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.linear
-  passedOptions.headers["x-tubi-inject-live-news"] = "true"
   homeInfo = m.cmsApi.homeScreenReqInfo(false, passedOptions)
   homeOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.linear
   homeOptions.params.delete("images[landscape_tb]")
@@ -405,9 +396,7 @@ Function cmsApi_homeScreenReqInfo_test()
     "include_empty_queue"
     "is_kids_mode"
   ]
-  homeOptions.headers["x-tubi-inject-live-news"] = "true"
   headers = [
-    "x-tubi-inject-live-news"
     "x-custom-header"
   ]
 
@@ -424,7 +413,6 @@ Function cmsApi_homeScreenReqInfo_test()
   m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
   m.assertEqual(homeInfo.options.params["contentMode"], homeOptions.params["contentMode"])
   m.assertEqual(homeInfo.options.params["customParam"], homeOptions.params["customParam"])
-  m.assertEqual(homeInfo.options.headers["x-tubi-inject-live-news"], homeOptions.headers["x-tubi-inject-live-news"])
   m.assertEqual(homeInfo.options.headers["x-custom-header"], homeOptions.headers["x-custom-header"])
   m.assertEqual(homeInfo.options.headers["x-client-platform"], homeOptions.headers["x-client-platform"])
   m.assertEqual(homeInfo.options.headers["x-client-version"], homeOptions.headers["x-client-version"])
@@ -452,7 +440,6 @@ Function cmsApi_categoryReqInfo_test()
     "customParam"
   ]
   headers = [
-    "x-tubi-inject-live-news"
     "x-custom-header"
     "x-client-platform"
     "x-client-version"
@@ -475,7 +462,6 @@ Function cmsApi_categoryReqInfo_test()
       "customParam": "custom_param_value"
     }
     headers: {
-      "x-tubi-inject-live-news": "false"
       "x-custom-header": "custom_header_value"
       "x-client-platform": m.cmsApi.constants.headers.commonUapi["x-client-platform"]
       "x-client-version": m.cmsApi.constants.headers.commonUapi["x-client-version"]
@@ -509,14 +495,12 @@ Function cmsApi_categoryReqInfo_test()
   m.assertEqual(categoryInfo.options.params["images[vitg_tb]"], categoryOptions.params["images[vitg_tb]"])
   m.assertEqual(categoryInfo.options.params["contentMode"], categoryOptions.params["contentMode"])
   m.assertEqual(categoryInfo.options.params["customParam"], categoryOptions.params["customParam"])
-  m.assertEqual(categoryInfo.options.headers["x-tubi-inject-live-news"], categoryOptions.headers["x-tubi-inject-live-news"])
   m.assertEqual(categoryInfo.options.headers["x-custom-header"], categoryOptions.headers["x-custom-header"])
   m.assertEqual(categoryInfo.options.headers["x-client-platform"], categoryOptions.headers["x-client-platform"])
   m.assertEqual(categoryInfo.options.headers["x-client-version"], categoryOptions.headers["x-client-version"])
 
   ' with kids mode
   categoryOptions.params["is_kids_mode"] = true
-  categoryOptions.headers["x-tubi-inject-live-news"] = "false"
   categoryInfo = m.cmsApi.categoryReqInfo("my_category", true, passedOptions)
 
   m.assertEqual(categoryInfo.count(), 3)
@@ -534,7 +518,6 @@ Function cmsApi_categoryReqInfo_test()
   m.assertEqual(categoryInfo.options.params["images[vitg_tb]"], categoryOptions.params["images[vitg_tb]"])
   m.assertEqual(categoryInfo.options.params["contentMode"], categoryOptions.params["contentMode"])
   m.assertEqual(categoryInfo.options.params["customParam"], categoryOptions.params["customParam"])
-  m.assertEqual(categoryInfo.options.headers["x-tubi-inject-live-news"], categoryOptions.headers["x-tubi-inject-live-news"])
   m.assertEqual(categoryInfo.options.headers["x-custom-header"], categoryOptions.headers["x-custom-header"])
   m.assertEqual(categoryInfo.options.headers["x-client-platform"], categoryOptions.headers["x-client-platform"])
   m.assertEqual(categoryInfo.options.headers["x-client-version"], categoryOptions.headers["x-client-version"])
@@ -542,7 +525,6 @@ Function cmsApi_categoryReqInfo_test()
   ' with contentMode not homescreen
   categoryOptions.params["is_kids_mode"] = false
   categoryOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.latino
-  categoryOptions.headers["x-tubi-inject-live-news"] = "false"
   passedOptions.params.contentMode = m.cmsApi.constants.ui.contentMode.latino
   categoryInfo = m.cmsApi.categoryReqInfo("my_category", false, passedOptions)
 
@@ -561,7 +543,6 @@ Function cmsApi_categoryReqInfo_test()
   m.assertEqual(categoryInfo.options.params["images[vitg_tb]"], categoryOptions.params["images[vitg_tb]"])
   m.assertEqual(categoryInfo.options.params["contentMode"], categoryOptions.params["contentMode"])
   m.assertEqual(categoryInfo.options.params["customParam"], categoryOptions.params["customParam"])
-  m.assertEqual(categoryInfo.options.headers["x-tubi-inject-live-news"], categoryOptions.headers["x-tubi-inject-live-news"])
   m.assertEqual(categoryInfo.options.headers["x-custom-header"], categoryOptions.headers["x-custom-header"])
   m.assertEqual(categoryInfo.options.headers["x-client-platform"], categoryOptions.headers["x-client-platform"])
   m.assertEqual(categoryInfo.options.headers["x-client-version"], categoryOptions.headers["x-client-version"])
