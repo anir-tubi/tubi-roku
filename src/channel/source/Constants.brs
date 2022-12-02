@@ -454,7 +454,6 @@ Function getConstants()
       constants.urls.userDevice.registerCode = constants.urls.userDevice.urlBase + "/code/register"
       constants.urls.userDevice.refreshToken = constants.urls.userDevice.urlBase + "/login/refresh"
       constants.urls.userDevice.transferToken = constants.urls.userDevice.urlBase + "/login/transfer"
-      constants.urls.userDevice.history = constants.urls.userDevice.urlBase + "/histories"
       constants.urls.userDevice.config = constants.urls.userDevice.urlBase + "/config/" + constants.platform
 
     'use queue urls
