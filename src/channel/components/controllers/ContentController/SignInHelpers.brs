@@ -343,7 +343,7 @@ End Function
 Function onStaticPageSelected(evt)
 
   staticPageSelected = evt.getData()
-  ' sending static page name(ToS/PP/DoNotSellMyInfo) & screen level
+  ' sending static page name(ToS/PP/YourPrivacyChoices) & screen level
   currentScreen = getCurrentScreen()
   pageSource = ""
   if currentScreen <> invalid AND currentScreen.getSubtype() = "SignInScreen"

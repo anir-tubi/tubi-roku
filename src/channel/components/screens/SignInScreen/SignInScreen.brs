@@ -33,9 +33,9 @@ Function init()
   m.ppBtn.text = getTranslation("screenSettings_menu_privacyPolicy")
   m.ppBtn.observeFieldScoped("selected", "onPrivacyPolicyButtonSelected")
 
-  m.doNotSellMyInfoBtn = m.top.findNode("doNotSellMyInfoBtn")
-  m.doNotSellMyInfoBtn.text = getTranslation("screenSettings_menu_doNotSellPolicy")
-  m.doNotSellMyInfoBtn.observeFieldScoped("selected", "onDoNotSellMyInfoButtonSelected")
+  m.yourPrivacyChoicesBtn = m.top.findNode("YourPrivacyChoicesButton")
+  m.yourPrivacyChoicesBtn.text = getTranslation("screenSettings_menu_yourPrivacyChoices")
+  m.yourPrivacyChoicesBtn.observeFieldScoped("selected", "onYourPrvacyChoicesButtonSelected")
 
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
   m.voiceKeyboard = m.keyboard.findNode("Keyboard")
@@ -145,11 +145,11 @@ Function onPrivacyPolicyButtonSelected(evt)
 End Function
 
 
-Function onDoNotSellMyInfoButtonSelected(evt)
+Function onYourPrvacyChoicesButtonSelected(evt)
 
   isButtonSelected = evt.getData()
   if isButtonSelected = true
-    m.top.staticPageSelected = "DoNotSellPolicyButton"
+    m.top.staticPageSelected = "YourPrivacyChoicesButton"
   end if
 
 End Function
@@ -299,7 +299,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         m.continueBtn.setFocus(true)
       else if m.ppBtn.hasFocus() = true
         m.continueBtn.setFocus(true)
-      else if m.doNotSellMyInfoBtn.hasFocus() = true
+      else if m.yourPrivacyChoicesBtn.hasFocus() = true
         m.continueBtn.setFocus(true)
       else if m.keyboard.isInFocusChain() = true
         updatePasswordValidation()
@@ -313,12 +313,12 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       if m.termsBtn.hasFocus() = true
         m.ppBtn.setFocus(true)
       else if m.ppBtn.hasFocus() = true
-        m.doNotSellMyInfoBtn.setFocus(true)
+        m.yourPrivacyChoicesBtn.setFocus(true)
       end if
 
     else if key = "left"
 
-      if m.doNotSellMyInfoBtn.hasFocus() = true
+      if m.yourPrivacyChoicesBtn.hasFocus() = true
         m.ppBtn.setFocus(true)
       else if m.ppBtn.hasFocus() = true
         m.termsBtn.setFocus(true)

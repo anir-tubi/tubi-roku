@@ -50,7 +50,7 @@
             id="TermsOfServiceButton"
             iconUrl="pkg:/images/icon-terms.webp" />
           <DetailMenuItemContentNode
-            id="DoNotSellPolicyButton"
+            id="YourPrivacyChoicesButton"
             iconUrl="pkg:/images/icon-dns.webp" />
           <DetailMenuItemContentNode
             id="SignInOutButton"

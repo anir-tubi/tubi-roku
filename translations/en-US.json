@@ -588,9 +588,9 @@
     "description": "A menu Item for the Settings screen",
     "message": "Terms of Service"
   },
-  "screenSettings_menu_doNotSellPolicy": {
+  "screenSettings_menu_yourPrivacyChoices": {
     "description": "A menu Item for the Settings screen",
-    "message": "Do Not Sell My Info"
+    "message": "Your Privacy Choices"
   },
   "screenSettings_menu_signOut": {
     "description": "A menu Item for the Settings screen",

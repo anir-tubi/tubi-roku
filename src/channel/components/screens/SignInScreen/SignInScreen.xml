@@ -28,7 +28,7 @@
       <!-- signInSelected is set to true when user selects signIn button, which redirects to Home Screen / Detail Screen -->
       <field id="signInSelected" type="assocarray"/>
 
-      <!-- staticPageSelected is triggered when user selects ToS/PP/DoNotSell button, which redirects to Settings Page -->
+      <!-- staticPageSelected is triggered when user selects ToS/PP/YourPrvacyChoices button, which redirects to Settings Page -->
       <field id="staticPageSelected" type="String" alwaysNotify="true"/>
 
       <!-- emailSelected is triggered when user selects email text box, which redirects to EmailEntry screen to enter different email -->
@@ -152,7 +152,7 @@
             unfocusedBackgroundOpacity="0"/>
 
           <SimpleButton
-            id="donotsellMyInfoBtn"
+            id="YourPrivacyChoicesButton"
             color="0x10141F"
             unfocusedBackgroundOpacity="0"/>
 

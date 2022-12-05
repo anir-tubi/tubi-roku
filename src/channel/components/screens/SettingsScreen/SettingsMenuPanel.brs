@@ -21,7 +21,7 @@ Function init()
   setSettingsMenuStringsAndIcons()
 
   if UCase(m.constants.deviceInfo.countryCode) <> "US"
-    removeDoNotSellButton()
+    removeYourPrivacyChoicesButton()
   end if
 
   resetSettingsMenuVerticalPosition()
@@ -42,8 +42,8 @@ Function setSettingsMenuStringsAndIcons()
     PrivacyPolicyButton.title = getTranslation("screenSettings_menu_privacyPolicy")
     TermsOfServiceButton =  m.top.findNode("TermsOfServiceButton")
     TermsOfServiceButton.title = getTranslation("screenSettings_menu_tos")
-    DoNotSellPolicyButton = m.top.findNode("DoNotSellPolicyButton")
-    DoNotSellPolicyButton.title = getTranslation("screenSettings_menu_doNotSellPolicy")
+    YourPrivacyChoicesButton = m.top.findNode("YourPrivacyChoicesButton")
+    YourPrivacyChoicesButton.title = getTranslation("screenSettings_menu_yourPrivacyChoices")
 
     if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
       AutoplayPreviewButton = CreateObject("roSGNode", "DetailMenuItemContentNode")
@@ -103,9 +103,9 @@ Function removeSignInButton()
 End Function
 
 
-Function removeDoNotSellButton()
-  doNotSellPolicyButton = m.top.findNode("DoNotSellPolicyButton")
-  removeButton(doNotSellPolicyButton)
+Function removeYourPrivacyChoicesButton()
+  yourPrivacyChoicesButton = m.top.findNode("YourPrivacyChoicesButton")
+  removeButton(yourPrivacyChoicesButton)
 End Function
 
 

@@ -159,8 +159,8 @@ Function createNextPanel(buttonContent)
       nextPanel = createLegalPanel(buttonContent.title, m.constants.urls.privacyUrl)
     else if buttonContent.id = "TermsOfServiceButton"
       nextPanel = createLegalPanel(buttonContent.title, m.constants.urls.termsOfUseUrl)
-    else if buttonContent.id = "DoNotSellPolicyButton"
-      nextPanel = createLegalPanel(buttonContent.title, m.constants.urls.doNotSellUrl)
+    else if buttonContent.id = "YourPrivacyChoicesButton"
+      nextPanel = createLegalPanel(buttonContent.title, m.constants.urls.yourPrivacyChoicesUrl)
     else if buttonContent.id = "SignInOutButton"
       if isSignedIn() = true
         nextPanel = createSignOutPanel()

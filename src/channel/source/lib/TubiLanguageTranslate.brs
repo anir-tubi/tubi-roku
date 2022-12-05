@@ -759,9 +759,9 @@ Function getTranslation_en_US()
       "description": "A menu Item for the Settings screen",
       "message": "Terms of Service"
     },
-    "screenSettings_menu_doNotSellPolicy": {
+    "screenSettings_menu_yourPrivacyChoices": {
       "description": "A menu Item for the Settings screen",
-      "message": "Do Not Sell My Info"
+      "message": "Your Privacy Choices"
     },
     "screenSettings_menu_signOut": {
       "description": "A menu Item for the Settings screen",
@@ -2132,10 +2132,6 @@ Function getTranslation_es_MX()
     "screenSettings_menu_tos": {
       "description": "A menu Item for the Settings screen",
       "message": "Términos de servicio"
-    },
-    "screenSettings_menu_doNotSellPolicy": {
-      "description": "A menu Item for the Settings screen",
-      "message": "No venda mi información"
     },
     "screenSettings_menu_signOut": {
       "description": "A menu Item for the Settings screen",
