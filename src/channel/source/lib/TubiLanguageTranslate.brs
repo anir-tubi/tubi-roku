@@ -2133,6 +2133,10 @@ Function getTranslation_es_MX()
       "description": "A menu Item for the Settings screen",
       "message": "Términos de servicio"
     },
+    "screenSettings_menu_yourPrivacyChoices": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Sus Opciones de Privacidad"
+    },
     "screenSettings_menu_signOut": {
       "description": "A menu Item for the Settings screen",
       "message": "Cerrar sesión"

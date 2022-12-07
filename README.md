@@ -603,7 +603,7 @@ If you need to make a change or addition to the American English text
 
   - Upload the new change to the Crowdin server so the change can be recorded and our translators can work on obtaining translations for the new change.
 
-If you need to make a change to text that is not the default English, then log into [Crowdin](https://crowdin.com/project/tubiapps) and adjust the translation. Then you will need to follow the directions on how to update the app with the latest translations.
+If you need to make a change to text that is not the default English, then log into [Crowdin](https://crowdin.com/project/tubiapps) and adjust the translation. Then you will need to follow the directions on how to update the app with the latest translations. Better yet, create a ticket for the translation team to update the translaton. More details can be found at https://www.notion.so/tubi/Localization-d5007e6666d1436bac4391acef5c73bf
 
 If you need to get the latest translations from the Crowdin servers, then create a new GIT branch and run the below command line within the project's root folder, where "KEY" is the key used for our Crowdin account. This will modify the TubiLanguageTranslate.brs to contain all the translations available within Crowdin. You later need to create a PR to start the process of getting the new translations merged to the master branch.
 
