@@ -136,6 +136,11 @@ Function init()
   m.positionAtJumpStart = -1
   m.playerPosition = 0
 
+  ' m.previousPlayerPosition and m.previousPlayProgressCallSource are used to help diagnose the large
+  ' playProgressEvent bug, and should be removed after a fix is in place.
+  m.previousPlayerPosition = 0
+  m.previousPlayProgressCallSource = ""
+
   ' ratingInterval is time in seconds which helps to show tv ratings/descriptors on player
   m.ratingInterval = 0
   ' m.showRatings boolean variable is to avoid showing ratingoverlay every time when player state changes from buffering to playing.
@@ -499,7 +504,7 @@ Function onVideoStateChange(msg)
       ' the video reached the end
       if m.Video.content <> invalid
         ' the video has been stopped, send a final playProgressEvent
-        playProgressEvent = getPlayProgressEvent()
+        playProgressEvent = getPlayProgressEvent("onVideoStateChange:finished")
         if playProgressEvent <> invalid
           trackEvent(playProgressEvent)
         end if
@@ -551,7 +556,7 @@ Function onVideoStateChange(msg)
     if m.top.adState = "noAds" or m.top.adState = "init"
       if m.Video.content <> invalid
         ' the video has been stopped, send a final playProgressEvent
-        playProgressEvent = getPlayProgressEvent()
+        playProgressEvent = getPlayProgressEvent("onVideoStateChange:stopped")
         if playProgressEvent <> invalid
           trackEvent(playProgressEvent)
         end if
@@ -600,11 +605,12 @@ End Function
 '
 ' The notificationInterval and analyticsInterval are not necessarily equal or evenly divisible
 ' so we check the time passage before we send playProgress events
-Function onVideoPositionChange()
+Function onVideoPositionChange(msg)
+  position = msg.getData()
 
   positionLog = ""
-  if m.Video <> invalid AND m.Video.position <> invalid
-    positionLog = m.Video.position.toStr()
+  if position <> invalid
+    positionLog = position.toStr()
   end if
   tubiLog("VideoPlayer.onVideoPositionChange position = " + positionLog)
 
@@ -639,7 +645,7 @@ Function onVideoPositionChange()
     ' videoPosition can change after the player has been paused (like right button press),
     ' we do not want to send play progress events in that case.
     if m.playerPosition >= m.lastPingTime + m.analyticsInterval AND playProgressOk = true
-      playProgressEvent = getPlayProgressEvent()
+      playProgressEvent = getPlayProgressEvent("onVideoPositionChange:playing")
       if playProgressEvent <> invalid
         updateLastPingTime(m.playerPosition)
         trackEvent(playProgressEvent)
@@ -692,103 +698,104 @@ Function onVideoPositionChange()
   end if
 
   'set the content, focus to SkipIntro and send exposure event when Skip Intro/recap/early credit cue points available
-    if content <> invalid AND content.creditsCuePoints <> invalid
-      if isSkipIntroCuePointsReached(content.creditsCuePoints)
-        'implement intro
-        if canSkipIntroShown(m.constants.player.skipIntroId.intro, playProgressOk)
-          m.cuePointsHistory[m.constants.player.skipIntroId.intro] = true
-          skipIntroText = getTranslation("skipIntro_Player")
-          setSkipIntroButtonAndTimer(skipIntroText, m.constants.player.skipIntroId.intro)
-        end if
-      else if isSkipRecapCuePointsReached(content.creditsCuePoints)
-        'Implement recap
-        if canSkipIntroShown(m.constants.player.skipIntroId.recap, playProgressOk)
-          m.cuePointsHistory[m.constants.player.skipIntroId.recap] = true
-          skipRecapText = getTranslation("skipRecap_Player")
-          setSkipIntroButtonAndTimer(skipRecapText, m.constants.player.skipIntroId.recap)
-        end if
-      else if isSkipEarlyCreditCuePointsReached(content.creditsCuePoints)
-        'Implement Early credits
-        if canSkipIntroShown(m.constants.player.skipIntroId.earlyCredits, playProgressOk)
-          m.cuePointsHistory[m.constants.player.skipIntroId.earlyCredits] = true
-          skipEarlyCredits = getTranslation("skipEarlyCredits_Player")
-          setSkipIntroButtonAndTimer(skipEarlyCredits, m.constants.player.skipIntroId.earlyCredits)
-        end if
-      else if m.skipIntro.id <> ""
-        clearSkipIntroButtonAndTimer()
+  if content <> invalid AND content.creditsCuePoints <> invalid
+    if isSkipIntroCuePointsReached(content.creditsCuePoints)
+      'implement intro
+      if canSkipIntroShown(m.constants.player.skipIntroId.intro, playProgressOk)
+        m.cuePointsHistory[m.constants.player.skipIntroId.intro] = true
+        skipIntroText = getTranslation("skipIntro_Player")
+        setSkipIntroButtonAndTimer(skipIntroText, m.constants.player.skipIntroId.intro)
+      end if
+    else if isSkipRecapCuePointsReached(content.creditsCuePoints)
+      'Implement recap
+      if canSkipIntroShown(m.constants.player.skipIntroId.recap, playProgressOk)
+        m.cuePointsHistory[m.constants.player.skipIntroId.recap] = true
+        skipRecapText = getTranslation("skipRecap_Player")
+        setSkipIntroButtonAndTimer(skipRecapText, m.constants.player.skipIntroId.recap)
+      end if
+    else if isSkipEarlyCreditCuePointsReached(content.creditsCuePoints)
+      'Implement Early credits
+      if canSkipIntroShown(m.constants.player.skipIntroId.earlyCredits, playProgressOk)
+        m.cuePointsHistory[m.constants.player.skipIntroId.earlyCredits] = true
+        skipEarlyCredits = getTranslation("skipEarlyCredits_Player")
+        setSkipIntroButtonAndTimer(skipEarlyCredits, m.constants.player.skipIntroId.earlyCredits)
+      end if
+    else if m.skipIntro.id <> ""
+      clearSkipIntroButtonAndTimer()
+    end if
+  end if
+
+  'Advertisements
+  if m.top.enableAds = true AND m.midrolls.count() > 0 then
+
+    m.AdHeadsUp.visible = false  ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown
+
+    ' attempt to fetch midroll ads before actual cuepoint
+    potentialCuepoint = m.playerPosition + m.adPrefetchTime
+    isCuepointPrefetchTimeReached = m.midrolls[strI(potentialCuepoint)]
+    if isCuepointPrefetchTimeReached = true AND m.UpNext.opacity = 0
+      m.top.adPosition = potentialCuepoint
+      m.top.adControl = "midroll"
+    end if
+
+    ' show the ads countdown if appropriate (show if ads are available and within adHeadsUpTime)
+    adPosition = m.top.adPosition
+    if adState = "adsPending" AND isInWindow(m.playerPosition, adPosition, m.adHeadsUpTime) = true
+      if m.Overlay.opacity = 0
+        ' Don't show the ad heads up when the transport/overlay is showing, since it crowds the space of the title on the overlay
+        m.ratingOverlay.opacity = 0
+        showAdHeadUpText(adPosition)
       end if
     end if
 
-    'Advertisements
-    if m.top.enableAds = true AND m.midrolls.count() > 0 then
+    ' check midroll and fire if any
+    isCuepointReached = m.midrolls[strI(m.playerPosition)]
+    if isCuepointReached = true AND m.UpNext.opacity = 0
+      m.AdHeadsUp.visible = false
+      if adState = "adsPending" then
+        ' Send a play_progress event before we show ads to be most accurate in case the user exits during ad playback
+        playProgressEvent = getPlayProgressEvent("onVideoPositionChange:ads")
+        if playProgressEvent <> invalid
+          trackEvent(playProgressEvent)
 
-      m.AdHeadsUp.visible = false  ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown
-
-      ' attempt to fetch midroll ads before actual cuepoint
-      potentialCuepoint = m.playerPosition + m.adPrefetchTime
-      isCuepointPrefetchTimeReached = m.midrolls[strI(potentialCuepoint)]
-      if isCuepointPrefetchTimeReached = true AND m.UpNext.opacity = 0
-        m.top.adPosition = potentialCuepoint
-        m.top.adControl = "midroll"
-      end if
-
-      ' show the ads countdown if appropriate (show if ads are available and within adHeadsUpTime)
-      adPosition = m.top.adPosition
-      if adState = "adsPending" AND isInWindow(m.playerPosition, adPosition, m.adHeadsUpTime) = true
-        if m.Overlay.opacity = 0
-          ' Don't show the ad heads up when the transport/overlay is showing, since it crowds the space of the title on the overlay
-          m.ratingOverlay.opacity = 0
-          showAdHeadUpText(adPosition)
+          ' set m.lastPingTime here to prevent an extra playProgressEvent if a user backs out of the ads
+          ' thereby triggering backButtonExit() which also sends a playProgressEvent.
+          updateLastPingTime(m.playerPosition)
         end if
-      end if
 
-      ' check midroll and fire if any
-      isCuepointReached = m.midrolls[strI(m.playerPosition)]
-      if isCuepointReached = true AND m.UpNext.opacity = 0
-        m.AdHeadsUp.visible = false
-        if adState = "adsPending" then
-          ' Send a play_progress event before we show ads to be most accurate in case the user exits during ad playback
-          playProgressEvent = getPlayProgressEvent()
-          if playProgressEvent <> invalid
-            trackEvent(playProgressEvent)
+        ' update history when showing adBreak
+        historyPosition(m.playerPosition)
 
-            ' set m.lastPingTime here to prevent an extra playProgressEvent if a user backs out of the ads
-            ' thereby triggering backButtonExit() which also sends a playProgressEvent.
-            updateLastPingTime(m.playerPosition)
-          end if
+        ' We must stop the video here, not just pause it, in order to release
+        ' system resources to the RAF video player
+        showAdBreak()
+        m.showRatings = true
+      else if adState = "noAds"
+        ' when we reach the cuepoint, we find that the last ad call returned no ads
 
-          ' update history when showing adBreak
-          historyPosition(m.playerPosition)
-
-          ' We must stop the video here, not just pause it, in order to release
-          ' system resources to the RAF video player
-          showAdBreak()
-          m.showRatings = true
-        else if adState = "noAds"
-          ' when we reach the cuepoint, we find that the last ad call returned no ads
-
-          if m.mostRecentCompletedCuepoint <> m.playerPosition
-            ' If ad playback concluded, a resume_after_break event will be fired in onAdStateChange().
-            ' Restarting playback after ads could also trigger this resume_after_break event to fire
-            ' if the player position hits the cuepoint again. We check against m.mostRecentCompletedCuepoint
-            ' to prevent two resume_after_break from firing. We need to send the resume_after_break event
-            ' here if we make a request for ads but no ads are returned and we pass over the cuepoint without
-            ' playing any ads.
-            trackEvent({
-              type: "resume_after_break"
-              values: {
-                video_id: m.Video.content.id.toInt()
-                position: Int(m.playerPosition * 1000)  'without Int(), can return scientific notation, causing API error
-              }
-            })
-          end if
-
-          m.mostRecentCompletedCuepoint = -1
+        if m.mostRecentCompletedCuepoint <> m.playerPosition
+          ' If ad playback concluded, a resume_after_break event will be fired in onAdStateChange().
+          ' Restarting playback after ads could also trigger this resume_after_break event to fire
+          ' if the player position hits the cuepoint again. We check against m.mostRecentCompletedCuepoint
+          ' to prevent two resume_after_break from firing. We need to send the resume_after_break event
+          ' here if we make a request for ads but no ads are returned and we pass over the cuepoint without
+          ' playing any ads.
+          trackEvent({
+            type: "resume_after_break"
+            values: {
+              video_id: m.Video.content.id.toInt()
+              position: Int(m.playerPosition * 1000)  'without Int(), can return scientific notation, causing API error
+            }
+          })
         end if
-      end if
 
+        m.mostRecentCompletedCuepoint = -1
+      end if
     end if
+  end if
 
+  ' for logging/debugging purposes, we keep track of the video position each time this function is called
+  m.previousPlayerPosition = position
 End Function
 
 
@@ -1502,7 +1509,10 @@ End Function
 ' an ad break starts
 ' a user begins a "seek" functionality (skip 10s, hop 30s, ff/rew, jump to beginning)
 ' a user selects to "jump to next video"
-Function getPlayProgressEvent()
+'
+' @callSource: string, temporary param used for debugging large playProgressEvents,
+'              should be removed after issue is fixed.
+Function getPlayProgressEvent(callSource = "")
   playProgressEvent = invalid
   if m.playerPosition > m.lastPingTime
 
@@ -1526,6 +1536,9 @@ Function getPlayProgressEvent()
       videoInfo.viewTime = viewTime.tostr()
       videoInfo.videoState = m.VideoState
       videoInfo.playerPosition = m.playerPosition
+      videoInfo.previousPlayerPosition = m.previousPlayerPosition
+      videoInfo.callSource = callSource
+      videoInfo.previousCallSource = m.previousPlayProgressCallSource
       tubiLog(FormatJSON(videoInfo), "info", "videoInfo", "view-time-exceeds")
     end if
 
@@ -1543,6 +1556,7 @@ Function getPlayProgressEvent()
     end if
   end if
 
+  m.previousPlayProgressCallSource = callSource
   return playProgressEvent
 End Function
 

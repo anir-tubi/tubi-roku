@@ -152,17 +152,21 @@ End Function
 
 ' m.playerPosition is the main source of truth for position.
 ' It can be updated by the video node or by calculations made while scrubbing
-Function updatePlayerPosition(amt=0)
+' @amt: integer, the amount of time in seconds by which m.playerPosition should be updated
+Function updatePlayerPosition(amt = 0)
+  videoPosition = m.Video.position
+  videoDuration = m.Video.duration
+
   if amt > 0
-    m.playerPosition = m._.min(m.playerPosition + amt, m.Video.duration - 5)
+    m.playerPosition = m._.min(m.playerPosition + amt, videoDuration - 5)
   else if amt < 0
     m.playerPosition = m._.max(m.playerPosition + amt, 0)
-  else if m.Video.position < 0
+  else if videoPosition < 0
     m.playerPosition = 0
-  else if m.Video.position > m.Video.duration
-    m.playerPosition = m.Video.duration
+  else if videoPosition > videoDuration
+    m.playerPosition = videoDuration
   else
-    m.playerPosition = m.Video.position
+    m.playerPosition = videoPosition
   end if
 
   ' update transport details only when it is shown
@@ -366,7 +370,7 @@ Function goToStart()
     endScrub(false)
     setFocusedButton(m.StartButton)
   else if m.VideoState <> "skip"
-    playProgressEvent = getPlayProgressEvent()
+    playProgressEvent = getPlayProgressEvent("goToStart")
     if playProgressEvent <> invalid
       trackEvent(playProgressEvent)
     end if
@@ -524,7 +528,7 @@ Function handleHopForward(duration)
     endScrub(false)
     setFocusedButton(m.HopForwardButton)
   else if m.VideoState <> "skip"
-    playProgressEvent = getPlayProgressEvent()
+    playProgressEvent = getPlayProgressEvent("handleHopForward")
     if playProgressEvent <> invalid
       trackEvent(playProgressEvent)
     end if
@@ -554,7 +558,7 @@ Function handleHopBack(remoteReplayButton, duration)
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(false)
   else if m.VideoState <> "skip"
-    playProgressEvent = getPlayProgressEvent()
+    playProgressEvent = getPlayProgressEvent("handleHopBack")
     if playProgressEvent <> invalid
       trackEvent(playProgressEvent)
     end if
@@ -602,7 +606,7 @@ Function handleSkipVideo(amt, isProgressBarFocused)
     clearSkipIntroTimer()
 
     if m.VideoState <> "rew" AND m.VideoState <> "ffw"
-      playProgressEvent = getPlayProgressEvent()
+      playProgressEvent = getPlayProgressEvent("handleSkipVideo")
       if playProgressEvent <> invalid
         trackEvent(playProgressEvent)
       end if
@@ -760,7 +764,7 @@ Function beginScrub()
 
   ' playProgress analytics
   if m.VideoState <> "skip"
-    playProgressEvent = getPlayProgressEvent()
+    playProgressEvent = getPlayProgressEvent("beginScrub")
     if playProgressEvent <> invalid
       trackEvent(playProgressEvent)
     end if
