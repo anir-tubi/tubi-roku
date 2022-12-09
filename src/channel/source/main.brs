@@ -90,7 +90,7 @@ Function runChannel(constants, log, request)
 
   ' execute suitest libray only if the mode is qa & suitest attribute enabled in qa config yml
   if constants.thirdParty.suiteTest.enabled = true AND constants.settings.mode = "qa"
-    SuitestLibrary = createObject("roSGNode", "SuitestLibrary")
+    SuitestLibrary = createObject("roSGNode", "SuitestLibrary") 'bs:disable-line 1128
     SuitestLibrary.app_id = constants.thirdParty.suiteTest.app_id
     tubiScene.InsertChild(SuitestLibrary, 0)
   end if
