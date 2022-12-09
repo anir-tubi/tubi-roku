@@ -1793,6 +1793,9 @@ Function restartApp()
   tubiLog("ContentController.restartApp")
   clearScreenStack()
   m.top.disableInstantResume = true
+  m.mainTask.control = "done"
+  m.trackingLoggingTask.control = "done"
+  m.generalTask.control = "done"
 End Function
 
 
