@@ -473,9 +473,7 @@ Function onControlChange()
     m.UpNext.hide = true
 
     'in the case where an ad break has started, but RAF does not yet have control, we want to break out of ads on back button pressed
-    if m.top.adState = "fetching" OR m.top.adState = "adsPending" then
-      m.top.adControl = "stop"
-    end if
+    m.top.adControl = "stop"
   else if m.top.control = "pause" then
     pauseVideo(false, false)
   else if m.top.control = "resume" AND m.Video.state = "paused" then
@@ -1201,11 +1199,12 @@ End Function
 Function stopVideo()
   tubilog("VideoPlayer.stopVideo")
   m.Video.unobserveFieldScoped("globalCaptionMode")
+  videoState = m.videoState
   updateVideoState("stop")
 
   ' add check so that onVideoStateChange doesn't get called
   ' if the video is already in a non playing state.
-  if m.Video.state <> "stopped" AND m.Video.state <> "finished"
+  if videoState <> "stop"
     m.Video.control = "stop"
   end if
 End Function
