@@ -147,11 +147,18 @@ Function init()
   ' we want to show only first time when playing state happens & after every ad break & timer. Also we are setting m.showRatings = true after every ad break.
   m.showRatings = true
 
+  ' startUpBuffering will be true for initial buffering (play/resume) and will be false when buffering happens in middle of playback
+  m.startUpBuffering = true
+
   m.lastButtonPressPos = 0
   m.transportAutoHideTime = m.constants.player.transportAutoHideTime
   m.ignoreOptionsKey = m.constants.deviceInfo.firmwareCaptionMenu
   m.bufferingInfo = invalid
   m.progressBarFocused = false
+
+  m.bufferingTimer = m.top.createChild("Timer")
+  m.bufferingTimer.duration = 10
+  m.bufferingTimer.repeat = false
 
   'buttons
   m.TransportButtons = m.top.findNode("TransportButtons")
@@ -487,6 +494,16 @@ Function onVideoStateChange(msg)
   tubiLog("VideoPlayer.onVideoStateChange " + msg.GetData())
   state = msg.GetData()
 
+  if state = "buffering"
+    m.bufferingTimer.observeFieldScoped("fire", "onBufferingTimerFired")
+    m.bufferingTimer.control = "start"
+  else
+    ' setting startUpBuffering to false as this block will be triggered when the video is not buffering.
+    m.startUpBuffering = false
+    m.bufferingTimer.unobserveFieldScoped("fire")
+    m.bufferingTimer.control = "stop"
+  end if
+
   if state = "finished" AND m.VideoState = "play"
     if m.didAdvanceDrm = true
       ' video player always changes state to "finished" after reaching a state of "error"
@@ -530,7 +547,13 @@ Function onVideoStateChange(msg)
   else if state = "error"
     content = m.Video.content
     errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo,m.Video.errorCode, m.Video.errorMsg, content)
-    tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-playback")
+    jsonErrorInfo = FormatJSON(errorInfo)
+
+    ' sending the logs to uapi
+    tubiLog(jsonErrorInfo, "error", "videoPlayback", "video-playback", 0.1)
+    ' sending the logs to sentry sdk
+    tubiException(jsonErrorInfo, "error", 0.1)
+
     m.top.sendYouboraError = true
 
     if content.isTrailer = true
@@ -871,7 +894,10 @@ Function onAdStateChange(msg)
         video_url: m.top.content.url
       }
       jsonErrorInfo = FormatJSON(errorInfo)
-      tubiException(jsonErrorInfo, "error")
+      ' sending the logs to uapi
+      tubiLog(jsonErrorInfo, "error", "adError", "ad-invalid-url", 0.1)
+      ' sending the logs to sentry sdk
+      tubiException(jsonErrorInfo, "error", 0.1)
     end if
   else if adState = "adsClosed"
     m.top.setFocus(true)
@@ -1046,6 +1072,23 @@ Function onBufferingStatus(msg)
 End Function
 
 
+Function onBufferingTimerFired()
+
+  m.bufferingTimer.unobserveFieldScoped("fire")
+  m.bufferingTimer.control = "stop"
+
+  content = m.Video.content
+  errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo, m.Video.errorCode, m.Video.errorMsg, content)
+
+  if m.startUpBuffering = true
+    tubiLog(FormatJSON(errorInfo), "warn", "videoBuffer", "video-buffer-startup", 0.1)
+  else
+    tubiLog(FormatJSON(errorInfo), "warn", "videoBuffer", "video-re-buffer", 0.1)
+  end if
+
+End Function
+
+
 Function onKidsModeChange()
   tubilog("VideoPlayer.onKidsModeChange")
   m.theme = m.global.theme
@@ -1159,6 +1202,8 @@ End Function
 ' Reset video player state to a state relevant to starting a video
 ' @content: TubiContentNode
 Function resetVideoPlayerState(content = invalid)
+  ' setting startUpBuffering to true as this function will be triggered when user tries to play or resume video
+  m.startUpBuffering = true
   m.Video.position = 0
   m.LoadingProgressBar.progress = 0
   m.LoadingMessage.text = ""
@@ -1344,7 +1389,7 @@ Function advanceCodecOnContent(contentNode)
     }
 
     ' log that we fell back to the next playback option after playback failed due to Codec
-    tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "codec-fallback")
+    tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "codec-fallback", 0.1)
     return true
   else
     return false
@@ -1394,7 +1439,7 @@ Function advanceDrmOnContent(contentNode)
     }
 
     ' log that we fell back to the next playback option after playback failed due to DRM
-    tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "drm-fallback")
+    tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "drm-fallback", 0.1)
     return true
   else
     return false

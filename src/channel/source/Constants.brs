@@ -314,6 +314,9 @@ Function getConstants()
 
         constants.thirdParty.youbora.config.expectAds = true
 
+    constants.thirdParty.sentry = {}
+      constants.thirdParty.sentry.dsn = "https://f8edcfe8baf140b4b91b46dfb8af9a19:acdf43f7c38a47f1ab85583035ff1798@sentry.io/1377102"
+
     constants.thirdParty.suiteTest = {}
 
       'toggle for using suitest or not. Should only be set to true for testing situations.

@@ -1,4 +1,4 @@
-Function TubiAds (constants, log, request, requestQueue, auth, tracking, adContentType)
+Function TubiAds (constants, request, requestQueue, auth, tracking, adContentType)
   'Add Support for Roku Advertising Framework
   roAdFramework = Roku_Ads()
 
@@ -35,7 +35,6 @@ Function TubiAds (constants, log, request, requestQueue, auth, tracking, adConte
     constants: constants
     auth: auth
     request: request
-    log: log
     tracking: tracking
 
     ' private
@@ -299,6 +298,19 @@ Function tubiAds_retrieveAds(adsUrl)
         end if
 
         deleteFile(localRafVastUrl)
+      else
+        errorInfo = {
+          code: responseCode.tostr()
+          message: "RAF bad response"
+          raf_version: m.roAdFramework.getLibVersion()
+          ad_url: adsUrl
+          deviceId: m.constants.deviceInfo.deviceId
+        }
+        errorInfo = FormatJSON(errorInfo)
+        ' sending error logs to uapi
+        tubiLog(errorInfo, "warn", "adBadResponse", "ad-bad-response", 0.1)
+        ' sending error logs to sentry sdk
+        tubiException(errorInfo, "warn", 0.1)
       end if
     end if
   end if
@@ -354,8 +366,13 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos, isSeekPastCuepoint = false
       call_duration: timeToFetch
       raf_version: m.roAdFramework.getLibVersion()
       ad_url: rainmakerVastUrl
+      device_id: m.constants.deviceInfo.deviceId
     }
-    m.log.error(FormatJSON(timeToFetchMessage), "adError", "no-ad-response", m.requestQueue)
+    timeToFetchMessage = FormatJSON(timeToFetchMessage)
+    ' sending error logs to uapi
+    tubiLog(timeToFetchMessage, "error", "adError", "no-ad-response", 0.1)
+    ' sending error logs to sentry sdk
+    tubiException(timeToFetchMessage, "error", 0.1)
   end if
 
   'check to see if the ad server returns an ad that can be used by RAF or needs to use our ad SDK

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <component name="LinearOverlaySideNav" extends="Group" >
   <script type="text/brightscript" uri="LinearOverlaySideNav.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
@@ -6,11 +6,11 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
 
   <interface>
-  
+
     <!-- INPUT -->
       <!-- Tell the side nav how it should appear ("closed", "openedAndInFocus", "openedAndNotInFocus"). When set to "openedAndInFocus", the side nav will gain focus. -->
       <field id="setOpenState" type="string"/>
-      
+
       <!-- The ID of the button that should receive focus -->
       <field id="buttonToFocusID" type="string" alwaysNotify="true"/>
 
@@ -32,7 +32,7 @@
           id="btnCC"
           focusFootprintBitmapUri=" "
           focusBitmapUri=" "
-          iconUri=" " 
+          iconUri=" "
           focusedIconUri=" ">
           <Poster
             id="btnCC_poster"
@@ -58,7 +58,7 @@
           id="btnBack"
           focusFootprintBitmapUri=" "
           focusBitmapUri=" "
-          iconUri=" " 
+          iconUri=" "
           focusedIconUri=" ">
           <Poster
             id="btnBack_poster"

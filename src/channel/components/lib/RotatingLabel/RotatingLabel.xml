@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  - RotatingLabel
  -
@@ -54,7 +54,7 @@
         keyValue="[0.0, 0.0, 1.0]"
         fieldtoInterp="NewLabel.opacity"/>
     </Animation>
-      
+
     <Timer
      id="DisplayTimer"/>
   </children>

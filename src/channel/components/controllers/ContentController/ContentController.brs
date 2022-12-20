@@ -572,8 +572,8 @@ Function startUserExperience()
     end if
 
     m.spinner.visible = false ' the spinner in the contentController component
-    sendHdcpLog()
     sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
+    sendDeviceLog()
 
     setUiModeFromState()
 
@@ -619,19 +619,13 @@ Function shouldDisplayInitialContentScreen()
 End Function
 
 
-' sendHdcpLog will check HDCP link and send hdcp-version to logging API
-Function sendHdcpLog()
+' sendDeviceLog will check deviceInfo and send device-info to logging API
+Function sendDeviceLog()
 
-  hdmiStatus = CreateObject("roHdmiStatus")
-
-  if hdmiStatus <> invalid
-    hdcpVersion = hdmiStatus.GetHdcpVersion()
-    isActive = hdmiStatus.IsHdcpActive(hdcpVersion)
-    if isActive = false
-      hdcpVersion = "none"
-    end if
-    tubiLog(hdcpVersion, "info", "clientInfo", "hdcp-version") 'send info to server
-  end if
+  deviceInfo = {
+    isVideoPreviewOn: m.isAutoplayVideoPreviewOn
+  }
+  tubiLog(FormatJSON(deviceInfo), "info", "clientInfo", "device-info", 0.1) 'send info to server
 
 End Function
 
@@ -1468,7 +1462,7 @@ Function fireAppLoadTimeEvent(loadTime)
     loadtime: loadTime
     model: m.constants.deviceInfo.model
   }
-  tubiLog(FormatJSON(messageInfo), "info", "clientInfo", "time-to-load") 'send info to server
+  tubiLog(FormatJSON(messageInfo), "info", "clientInfo", "time-to-load", 0.1) 'send info to server
 End Function
 
 

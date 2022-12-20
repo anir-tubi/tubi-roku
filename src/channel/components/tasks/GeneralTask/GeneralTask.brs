@@ -205,7 +205,7 @@ Function processResponse(msg)
             end if
 
             if newAuthInfo <> invalid
-              handleBackoff(job, retries) 'pause before retry to relieve pressure on the backend
+              handleBackoff(result, job, retries) 'pause before retry to relieve pressure on the backend
             else
               processErrorResponse(result, callbackTypes, job)
             end if
@@ -214,7 +214,7 @@ Function processResponse(msg)
           end if
         else
           if retries > 0
-            handleBackoff(job, retries) 'pause before retry to relieve pressure on the backend
+            handleBackoff(result, job, retries) 'pause before retry to relieve pressure on the backend
           else
             processErrorResponse(result, callbackTypes, job)
           end if
@@ -417,6 +417,8 @@ Function processErrorResponse(result, callbackTypes, job)
 
   parserCallback = callbackTypes.parseError
 
+  sendApiErrorLog(responseFromServer)
+
   ' some requests might not require error handling, and therefore may not have a parseError callback
   if parserCallback <> invalid
     output = parserCallback(result.response, job.reqInfo)
@@ -458,11 +460,13 @@ End Function
 
 ' Helper function to setup logic to store the job before retrying after the requested amount of time has passed
 '
+' @result : assocarray, this is the request handleEvent AA with response
 ' @job: AssocArray, the job for this request as created in makeApiRequest
 ' @retries: integer, the number of remaining retries for a request/request node
 '
 ' side effects: updates the retries and pause fields of the passed in reqInfo
-Function handleBackoff(job, retries)
+Function handleBackoff(result, job, retries)
+  sendApiErrorLog(result.response)
   reqInfo = job.reqInfo
   backoffFactor = reqInfo.backoffFactor
   backoffDuration = reqInfo.pause * backoffFactor
@@ -473,6 +477,24 @@ Function handleBackoff(job, retries)
     "job": job
     "backoffDuration": backoffDuration
   }
+End Function
+
+
+' @responseFromServer: assocarray, this is the response field on the AA returned by request.handleAA()
+Function sendApiErrorLog(responseFromServer)
+
+  errorInfo = {
+    name: responseFromServer.name
+    failReason: responseFromServer.failReason
+    code: responseFromServer.code
+  }
+
+  jsonErrorInfo = FormatJSON(errorInfo)
+  ' sending error logs to uapi
+  tubiLog(jsonErrorInfo, "error", "apiError", responseFromServer.name, 0.1)
+  ' sending error logs to sentry sdk
+  tubiException(jsonErrorInfo, "error", 0.1)
+
 End Function
 
 

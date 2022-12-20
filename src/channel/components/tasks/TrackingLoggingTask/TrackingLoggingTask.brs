@@ -25,7 +25,8 @@ Function watchLoop()
   m.queue = TubiRequestQueue().create(m.port)
   m.request = TubiRequest(m.constants.settings)
   m.auth = TubiAuth(m.constants, m.request)
-  m.logger = TubiLogger(m.constants, m.request, m.auth)
+  sentryInfo = Sentry(m.constants, m.auth)
+  m.logger = TubiLogger(m.constants, m.request, m.auth, sentryInfo)
   m.tracking = TubiTracking(m.constants, m.request, m.auth)
   m.analyticsAppMode = "DEFAULT_MODE"
 
@@ -65,11 +66,11 @@ End Function
 
 Function sendSceneGraphLog(logInfo)
   'runs the appropriate method (debug, error, etc.) from the logger object and add the log request to the tracking/logging queue
-  m.logger[logInfo.level](logInfo.message, logInfo.serverTypeName, logInfo.subtype, m.queue)
+  m.logger[logInfo.level](logInfo.message, logInfo.serverTypeName, logInfo.subtype, m.queue, logInfo.samplePercent)
 End Function
 
 
 Function sendSceneGraphException(logInfo)
-  'runs the appropriate method (debug, error, etc.) from the logger object and add the log request to the tracking/logging queue
-  m.logger.exception(logInfo.level, logInfo.message)
+  'runs the exception method from the logger object and send the log request to the sentry sdk
+  m.logger.exception(logInfo.message, logInfo.level, logInfo.samplePercent)
 End Function

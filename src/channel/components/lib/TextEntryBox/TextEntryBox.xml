@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  - TextEntryBox
  -
@@ -10,28 +10,28 @@
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
 
   <interface>
-  
+
     <!-- INPUTS -->
-  
+
       <!-- The text to display.  This is not wired up to anything by default -->
       <field id="text" type="string"/>
-    
+
       <!-- Hint text to display when 'text' is empty -->
       <field id="hint" type="string"/>
-    
+
       <!-- Text attributes, not applied to 'hint' -->
       <field id="boxWidth" type="Integer"/>
       <field id="boxHeight" type="Integer"/>
-    
+
       <!-- Password mode will only display the last character entered -->
       <field id="passwordMode" type="boolean" value="false" />
-      
+
       <!-- highlight field can be used to highlight the textbox even the focus is not in this component-->
       <field id="highlight" type="boolean" value="false"/>
-      
+
     <!-- OUTPUTS -->
-      <field id="selected" type="boolean" alwaysNotify="true" />      
-    
+      <field id="selected" type="boolean" alwaysNotify="true" />
+
   </interface>
 
   <children>

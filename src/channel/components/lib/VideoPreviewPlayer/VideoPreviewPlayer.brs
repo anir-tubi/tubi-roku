@@ -98,7 +98,10 @@ Function onVideoStateChange(msg)
   else if state = "error"
     content = m.video.content
     errorInfo = getPlaybackErrorInfo(m.video.position, m.video.streamInfo, m.video.errorCode, m.video.errorMsg, content)
-    tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-preview-playback")
+    jsonErrorInfo = FormatJSON(errorInfo)
+    tubiLog(jsonErrorInfo, "error", "videoPlayback", "video-preview-playback", 0.1)
+    ' sending the logs to sentry sdk
+    tubiException(jsonErrorInfo, "error", 0.1)
   end if
   m.top.state = state
 End Function

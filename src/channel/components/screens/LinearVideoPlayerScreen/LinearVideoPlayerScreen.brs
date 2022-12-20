@@ -290,7 +290,12 @@ Function onVideoStateChange(msg)
   else if state = "error"
     content = m.Video.content
     errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo, m.Video.errorCode, m.Video.errorMsg, content)
-    tubiLog(FormatJSON(errorInfo), "error", "videoPlayback", "video-playback")
+    jsonErrorInfo = FormatJSON(errorInfo)
+    ' sending the logs to uapi
+    tubiLog(jsonErrorInfo, "error", "videoPlayback", "video-playback", 0.1)
+    ' sending the logs to sentry sdk
+    tubiException(jsonErrorInfo, "error", 0.1)
+
     m.top.sendYouboraError = true
 
     ' Set up the next DRM scheme. Playback of next DRM scheme is triggered when state = "finished",
@@ -674,7 +679,7 @@ Function advanceCodecOnContent(contentNode)
     }
 
     ' log that we fell back to the next playback option after playback failed due to Codec
-    tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "codec-fallback")
+    tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "codec-fallback", 0.1)
     return true
   else
     return false
@@ -724,7 +729,7 @@ Function advanceDrmOnContent(contentNode)
     }
 
     ' log that we fell back to the next playback option after playback failed due to DRM
-    tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "drm-fallback")
+    tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "drm-fallback", 0.1)
     return true
   else
     return false

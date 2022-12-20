@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  - KeyboardMenuItem
  -
@@ -12,7 +12,7 @@
   <interface>
     <!-- hide the progress bar when focus changes -->
     <field id="focusPercent" type="float" value="0.0"/>
-    
+
     <!-- Content expected for a KeyboardMenuItem:
      -
      - title - The label text
@@ -29,4 +29,3 @@
       size="43" />
   </children>
 </component>
-    

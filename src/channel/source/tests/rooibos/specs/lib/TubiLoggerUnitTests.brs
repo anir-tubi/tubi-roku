@@ -1,4 +1,4 @@
-'@TestSuite [TubiLogger] Log.brs 
+'@TestSuite [TubiLogger] Log.brs
 
 
 '@Setup
@@ -132,7 +132,7 @@ Function tubiLogger_sendLogging_test()
   subtype = "403_code"
   errorServerType = "API:ERROR"
   errorLevel = "error"
-  
+
   'test a valid error log
   logInfo1 = log.buildLogInfo(message, errorServerType, subtype, errorLevel)
   logResult1 = log.sendLogging(logInfo1, requestQueue)

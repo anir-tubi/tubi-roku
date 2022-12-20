@@ -9,7 +9,8 @@ Function Main(startupArgs)
   constants = getConstants()
   request = TubiRequest(constants.settings)
   auth = TubiAuth(constants, request)
-  log = TubiLogger(constants, request, auth)
+  sentryInfo = Sentry(constants, auth)
+  log = TubiLogger(constants, request, auth, sentryInfo)
 
   logCrashesOnStartup(m.startupArgs, log, constants)
 
@@ -344,7 +345,7 @@ Function showComponentsTimedOutError(library, log, screen, constants)
     loadStatus: "timeout"
     url: library.uri
   }
-  log.exception("error", error)
+  log.exception(FormatJSON(error), "error", 0.1)
   return showStartupErrorDialog(screen, constants)
 End Function
 
@@ -356,7 +357,7 @@ Function showComponentsFailedToLoadError(msg, log, screen, constants)
     loadStatus: msg.getData()
     url: msg.GetRoSGNode().uri
   }
-  log.exception("error", error)
+  log.exception(FormatJSON(error), "error", 0.1)
   return showStartupErrorDialog(screen, constants)
 End Function
 
@@ -414,6 +415,6 @@ Function logCrashesOnStartup(args, log, constants)
       reason: reason
       model: constants.deviceInfo.model
     }
-    log.exception("warn", messageInfo)
+    log.exception(FormatJSON(messageInfo), "warn", 0.5)
   end if
 End Function

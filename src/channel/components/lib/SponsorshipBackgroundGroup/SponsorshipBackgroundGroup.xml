@@ -8,8 +8,8 @@
 <component name="SponsorshipBackgroundGroup" extends="Group">
   <script type="text/brightscript" uri="SponsorshipBackgroundGroup.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
-  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />  
-  
+  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+
   <interface>
     <!-- INPUT -->
     <field id="uri" type="string" alwaysNotify="true" />

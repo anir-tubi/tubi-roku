@@ -172,7 +172,7 @@ End Function
 
 
 Function onThemeChange()
-  m.focusedColor = m.global.theme.focused 
+  m.focusedColor = m.global.theme.focused
   m.ProgressBar.focusColor = m.focusedColor
   m.LoadingProgressBar.focusColor = m.focusedColor
   m.LoadingProgressBar.unfocusColor = m.focusedColor
@@ -253,8 +253,8 @@ Function updateScrubTime()
   else if m.VideoState = "ffw"
   '//Ensure scrub can't go past the timer for the UpNext Overlay
     nMaxScrub = m.Video.duration - m.global.constants.player.upNextCountdown - 5
-    
-    if m.playerPosition + scrubTime > nMaxScrub 
+
+    if m.playerPosition + scrubTime > nMaxScrub
       m.playerPosition = nMaxScrub
     else
       m.playerPosition = Int(m.playerPosition + scrubTime)
@@ -393,7 +393,7 @@ Function onVideoPositionChange()
         end if
       end if
     end for
-  end if 
+  end if
 End Function
 
 
@@ -460,7 +460,7 @@ Function playContent()
     m.lastButtonPressPos = 0
   end if
   m.top.midrolls = []  ' Always reset midrolls when we first start playback.  Preroll will populate these
-    
+
   'start_video user event analytics
   if m.top.analyticsMode = "trailer"
     'set up tracking for trailer
@@ -724,7 +724,7 @@ Function onAdStateChange()
         video_id: m.top.content.id.toInt()
         video_url: m.top.content.url
       }
-      tubiException(errorInfo, "error")
+      tubiException(FormatJSON(errorInfo), "error", 0.1)
     end if
   else if m.top.adState = "adsclosed"
     m.top.setFocus(true)
@@ -776,7 +776,7 @@ Function animateTransport(direction)
   tubiLog("VideoPlayer.AnimateTransport, direction = " + direction)
   slideFade(m.HUD, "below", direction, 0.6)
   fade(m.Overlay, direction, 0.6)
-  
+
   ' always set focus back to here when hiding transport, that way left/right won't navigate VideoPicker overlay
   if m.top.isInFocusChain()
     if direction = "out" and m.PickerGroup.opacity > 0
@@ -829,7 +829,7 @@ Function pauseVideo(shouldShowTransport)
 
   m.PlayPauseButton.uri = m.buttonUris.play
   setFocusedButton(m.PlayPauseButton)
-  
+
   updateTransport()
   trackEvent({
     type: "pause_toggle"
@@ -963,7 +963,7 @@ End Function
 Function handleSkipTrailer()
   m.top.skipTrailer = true
   animateTransport("out")
-  resetTransportButtons()  
+  resetTransportButtons()
   setFocusedButton(m.PlayPauseButton)
 End Function
 

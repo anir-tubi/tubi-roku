@@ -7,7 +7,7 @@
   <script type="text/brightscript" uri="FeaturePosterWithProgress.brs" />
   <script type="text/brightscript" uri="../GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
-  
+
   <interface>
     <field id="itemContent" alias="FeaturePoster.itemContent"/>
     <field id="index" alias="FeaturePoster.index"/>

@@ -18,8 +18,7 @@ Function execAdsSSAITask()
   auth = TubiAuth(m.constants, m.request)
   m.tracking = TubiTracking(m.constants, m.request, auth)
 
-  log = TubiLogger(m.constants, m.request, auth)
-  m.adLib = TubiAds(m.constants, log, m.request, requestQueueLib, auth, m.tracking, "mp4")
+  m.adLib = TubiAds(m.constants, m.request, requestQueueLib, auth, m.tracking, "mp4")
   m.raf = m.adLib.roAdFramework
 
   ' used to determine when to poll for ads
