@@ -22,6 +22,10 @@ Function init()
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
   m.top.observeFieldScoped("voiceEnabled", "onVoiceEnabledChange")
   m.keyboard.textEditBox.observeFieldScoped("focusedChild", "onTextEditBoxFocusedChildChange")
+
+  m.back.color = m.constants.ui.colors.backgroundColorLight
+  m.continue.color = m.constants.ui.colors.backgroundColorLight
+  m.showHidePassword.color = m.constants.ui.colors.backgroundColorLight
 End Function
 
 

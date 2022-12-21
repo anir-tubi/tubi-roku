@@ -306,13 +306,13 @@
             width="20"
             height="25"
             uri="pkg:/images/icon-lock.webp"
-            blendColor="0xFF501A"
+            blendColor="0xEB9C00"
             loadDisplayMode="scaleToFit" />
           <Label
             id="SignInText"
             width="1140"
             wrap="false"
-            color="0xFF501A"
+            color="0xEB9C00"
             translation="[0,3]">
             <Font
               id="SignInFont"

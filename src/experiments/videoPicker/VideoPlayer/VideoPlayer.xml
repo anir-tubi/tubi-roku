@@ -173,7 +173,7 @@
         id="LoadingProgressBar"
         width="750"
         progress="50"
-        trackColor="0xFFFFFF14"
+        trackColor="0xFFFFFF1A"
         translation="[584,696]"/>
     </Group>
 
@@ -215,7 +215,7 @@
         <Label
           height="66"
           vertAlign="center"
-          color="0xff501aff"
+          color="0xEB9C00FF"
           text="   break">
           <Font
             id="Vaud34px"
@@ -371,7 +371,7 @@
       <TubiProgressBar
         id="ProgressBar"
         width="1752"
-        trackColor="0xFFFFFF14"
+        trackColor="0xFFFFFF1A"
         translation="[85,896]"/>
 
       <!-- Time -->

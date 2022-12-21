@@ -7,6 +7,9 @@ Function init()
   end if
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("itemHasFocus", "onItemHasFocus")
+
+  '//Make sure the colors are set properly, so call the onItemHasFocus() function
+  onItemHasFocus()
 End Function
 
 
@@ -19,10 +22,8 @@ End Function
 
 Function onItemHasFocus()
   if m.top.itemHasFocus = true
-    m.buttonBG.opacity = 1.0
-    m.buttonBG.blendcolor = "0xFF501A"
+    m.buttonBG.blendcolor = m.constants.ui.colors.focused
   else if m.top.itemHasFocus = false
-    m.buttonBG.opacity = 0.16
-    m.buttonBG.blendcolor = "0x9699A3"
+    m.buttonBG.blendcolor = m.constants.ui.colors.neutralColor3
   end if
 End Function

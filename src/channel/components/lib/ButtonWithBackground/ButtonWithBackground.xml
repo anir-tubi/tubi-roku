@@ -19,8 +19,6 @@
       width="450"
       height="96"
       uri="pkg:/images/menu-focus-fhd.9.png"
-      blendColor="0x9699A3"
-      opacity="0.16"
       translation="[0,0]"/>
     <Label
       id="label"

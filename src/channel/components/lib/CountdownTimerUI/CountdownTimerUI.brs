@@ -14,8 +14,7 @@ Function init()
   else
     m.PlayerCountdownBground.uri = "pkg:/images/tab_short_component_alt_fhd.9.png"
   end if
-  m.PlayerCountdownBground.blendColor = "0x000000FF"
-  
+
   '//Use a 2 digit number to determine and set the max width of the background.
   setSeconds(00)
   m.PlayerCountdownBground.width = (m.TextAndIconLayoutGroup.translation[0] * 2) +  m.FullscreenIcon.width + m.TextAndIconLayoutGroup.itemSpacings[0] +  m.CountdownText.boundingRect().width

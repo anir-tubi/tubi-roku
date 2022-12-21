@@ -11,8 +11,8 @@ Function init()
 
   m.colors = {
     white: m.constants.ui.colors.unfocused
-    lightGray: "0x9699A3FF"
-    darkGray: "0x10141FFF"
+    lightGray: m.constants.ui.colors.secondaryText
+    darkGray: m.constants.ui.colors.backgroundColor
     orange: m.constants.ui.colors.highlightedText
   }
 
@@ -293,7 +293,7 @@ End Function
 
 Function setUnfocusedFarVisuals()
   tubiLog("TopNav.setUnfocusedFarVisuals")
-  m.Menu.focusFootprintBlendColor = "0x585B66FF"
+  m.Menu.focusFootprintBlendColor = m.constants.ui.colors.neutralColor
 
   ' account for any animations that may be in process on the menu
   stopAnimation(m.menuFade)

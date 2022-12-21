@@ -153,7 +153,7 @@
       id="channelsGrid"
       translation="[0, 96]"
       numRows="4"
-      focusFootPrintBlendColor="0x9699A3"
+      focusFootPrintBlendColor="0xFFFFFFBF"
       focusFootprintBitmapUri="pkg:/images/ratingBackground.9.png"
       itemSize="[186,108]"
       itemSpacing="[0,12]"

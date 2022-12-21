@@ -27,7 +27,7 @@
       width="127"
       height="60"
       uri="pkg:/images/live_tv_button_fhd.9.png"
-      blendColor="0x1C1F29ff"
+      blendColor="0xFFFFFF1A"
       loadSync="true"
       visible="true" />
     <LayoutGroup

@@ -21,8 +21,7 @@
   <children>
     <Rectangle
       id="PosterRect"
-      opacity="0.16"
-      color = "0x9699A3" />
+      color="0xFFFFFF1A"/>
     <Poster
       opacity=".64"
       id="Poster"
@@ -55,8 +54,8 @@
         id="SponsoredByText"
         text=""
         vertAlign="bottom"
-        opacity=".8"
-        width="0"
+        color="0xFFFFFFBF"
+        width="0" 
         height="18">
         <Font
           role="font"

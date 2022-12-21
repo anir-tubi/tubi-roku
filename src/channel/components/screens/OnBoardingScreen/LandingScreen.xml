@@ -42,7 +42,6 @@
       <Label
         id="pageDescription"
         horizAlign="left"
-        color="#D81A79"
         width="900">
         <Font
           role="font"
@@ -81,7 +80,6 @@
           <Label
             id="addtoYourListBody"
             horizAlign="left"
-            opacity="0.64"
             width="700">
             <Font
               role="font"
@@ -124,7 +122,6 @@
           <Label
             id="saveYourProgressBody"
             horizAlign="left"
-            opacity="0.64"
             width="700">
             <Font
               role="font"
@@ -167,7 +164,6 @@
           <Label
             id="madeForYouBody"
             horizAlign="left"
-            opacity="0.64"
             width="700">
             <Font
               role="font"

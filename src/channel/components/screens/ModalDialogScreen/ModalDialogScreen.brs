@@ -7,11 +7,18 @@ Function init()
   m.ContentArea = m.top.findNode("ContentArea")
   m.DialogBox = m.top.findNode("DialogBox")
   m.Message = m.top.findNode("Message")
+  m.MessageGroup = m.top.findNode("MessageGroup")
   m.ScrollableMessage = m.top.findNode("ScrollableMessage")
   m.ScrollableBackground = m.top.findNode("ScrollableBackground")
-  m.MessageGroup = m.top.findNode("MessageGroup")
+  m.Shade = m.top.findNode("Shade")
+  m.Title = m.top.findNode("Title")
 
+  
   m.constants = getConstantsFromGlobal()
+  m.Shade.color = m.constants.ui.colors.shade
+  m.ScrollableBackground.color = m.constants.ui.colors.shade
+  m.Message.color = m.constants.ui.colors.primaryText
+  m.Title.color = m.constants.ui.colors.primaryText
 
   m.top.screenLevel = m.constants.ui.screenLevels.modalDialogScreen
 End Function

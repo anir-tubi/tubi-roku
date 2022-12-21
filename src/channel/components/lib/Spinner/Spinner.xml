@@ -34,6 +34,7 @@
       id="Shade"
       opacity="0.8"
       color="0x191919FF"/>
+    <!--::TODO::colors - 0x2C2C2CFF should have a different standard color -->
     <Rectangle
       id="SpinnerBox"
       height="200"

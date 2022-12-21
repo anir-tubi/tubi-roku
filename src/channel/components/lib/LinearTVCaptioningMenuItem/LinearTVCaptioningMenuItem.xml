@@ -23,7 +23,7 @@
     <Poster
      id="Bground"
      uri="pkg://images/menu-focus-fhd.9.png"
-     blendColor="0xF0F1F528"
+     blendColor="0xFFFFFF33"
      width="225"
      height="72"
      visible="false"

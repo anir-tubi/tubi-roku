@@ -16,7 +16,7 @@ Function onDrawDots()
       if carouselIndex = i
         dot.blendColor = ""
       else
-        dot.blendColor = "0x3B312F"
+        dot.blendColor = "0xFFFFFF1A"
       end if
     end for
 

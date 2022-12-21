@@ -4,14 +4,13 @@ Function init()
   m.border.color = m.global.theme.focused
 
   m.rectBG = m.top.findNode("rectBG")
-  m.rectBG.color = "0x9699A3"
-  m.rectBG.opacity = 0.17
+  m.rectBG.color = "0xFFFFFF33"
 
   m.Text = m.top.findNode("Text")
   m.Text.text = m.top.hint
   
-  m.Text.color = "0x585B66"
-  m.Text.opacity = 0.7
+  '//::TODO::colors - change the following color dynamically to be associated with m.constants.ui.colors.neutralColor
+  m.Text.color = "0xFFFFFF33"
   
   m.top.observeField("boxWidth", "onBoxWidth")
   m.top.observeField("boxHeight", "onBoxHeight")
@@ -49,7 +48,8 @@ Function onHighlight()
     
     m.rectBG.color = "0xFFFFFF"
     m.rectBG.opacity = 0.8
-    m.Text.color = "0x1C1F29"
+    '//::TODO::colors - change the following color dynamically to be associated with m.constants.ui.colors.neutralColor2
+    m.Text.color = "0xFFFFFF1A"
     
     if m.top.text = invalid or m.top.text = "" then
       m.Text.text = m.top.hint
@@ -59,15 +59,14 @@ Function onHighlight()
     end if  
   else
     
-    m.rectBG.color = "0x9699A3"
-    m.rectBG.opacity = 0.17
+    m.rectBG.color = "0xFFFFFF1A"
     
     if m.top.text = invalid or m.top.text = "" then
-      m.Text.color = "0x585B66"
-      m.Text.opacity = 0.7
+      '//::TODO::colors - change the following color dynamically to be associated with m.constants.ui.colors.neutralColor
+      m.Text.color = "0xFFFFFF33"
     else
+      '//::TODO::colors - change the following color dynamically to be associated with m.constants.ui.colors.primaryText
       m.Text.color = "0xFFFFFF"
-      m.Text.opacity = 1.0    
     end if  
   end if
 
@@ -106,7 +105,7 @@ Function formatTextBox()
     m.Text.text = m.top.hint
     m.Text.opacity = 0.7
   else
-    m.Text.opacity = 1.0
+    '//::TODO::colors - change the following color dynamically to be associated with m.constants.ui.colors.primaryText
     m.Text.color = "0xFFFFFF"
     onPasswordModeChange()
   end if

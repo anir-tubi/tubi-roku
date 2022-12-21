@@ -67,7 +67,9 @@ Function init()
   m.top.observeField("contentUpdated", "onSearchContentChange")
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
 
-  m.SearchText.color = m.global.constants.ui.colors.titleHeader
+  m.SearchText.color = m.constants.ui.colors.titleHeader
+  m.KidsModeMessage.color = m.constants.ui.colors.secondaryText
+  m.searchMenuText.color = m.constants.ui.colors.primaryText
 
   m.defaultHeroUri = "pkg:/images/art-blur-background.png"
 

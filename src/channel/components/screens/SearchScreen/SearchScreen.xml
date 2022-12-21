@@ -80,7 +80,6 @@
       <Label
         id="searchMenuText"
         vertAlign="bottom"
-        color="0xFFFFFF"
         width="550">
         <Font
           role="font"
@@ -107,7 +106,6 @@
         <Label
           id="KidsModeMessage"
           vertAlign="top"
-          opacity="0.6"
           width="550"
           height="50">
             <Font

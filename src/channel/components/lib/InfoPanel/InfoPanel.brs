@@ -852,17 +852,17 @@ Function formatBadge(text, badgeComponent)
   tubiLog("InfoPanel.formatBadge")
   if UCase(text) = UCase(getTranslation("screenSearch_liveText"))
     ' LIVE badge
-    badgeComponent.backgroundColor = "0xCC090B"
-    badgeComponent.textColor = "0xFFFFFF"
+    badgeComponent.backgroundColor = m.constants.ui.colors.focused2
+    badgeComponent.textColor = m.constants.ui.colors.primaryText
     badgeComponent.iconUri = "pkg:/images/live-icon.webp"
   else if UCase(text) = UCase(getTranslation("replay"))
     ' REPLAY badge
-    badgeComponent.backgroundColor = "0xF0F1F5"
-    badgeComponent.textColor = "0x1C1F29"
+    badgeComponent.backgroundColor = m.constants.ui.colors.backgroundColorLight
+    badgeComponent.textColor = m.constants.ui.colors.textDark
   else
     ' TODAY, TOMORROW, <<Date>> badge
-    badgeComponent.backgroundColor = "0x585B66"
-    badgeComponent.textColor = "0xF0F1F5"
+    badgeComponent.backgroundColor = m.constants.ui.colors.neutralColor
+    badgeComponent.textColor = m.constants.ui.colors.primaryText
   end if
 
   badgeComponent.text = UCase(text)

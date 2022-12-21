@@ -1229,38 +1229,69 @@ Function getConstants()
 
       constants.ui.uris.marketingBackground = "pkg:/images/marketing-background.jpg"
 
+
+    ' Default Dark Primary Background
+    defaultDarkPrimaryBackground = "0x000000FF"
+    defaultDarkStatusAlert = "0xF52D2DFF"
+
+    darkTransparentForeground5 = "0xFFFFFF0D"
+    darkTransparentForeground10 = "0xFFFFFF1A"
+    darkTransparentForeground20 = "0xFFFFFF33"
+    darkTransparentForeground75 = "0xFFFFFFBF"
+    darkTransparentForeground95 = "0xFFFFFFF2"
+
+    defaultDarkPrimaryAccent = "0xE13100FF"
+    darkTransparentAccent10 = "0xE131001A"
+
+    defaultDarkPrimaryForeground = "0xFFFFFFFF"
+    kidsDarkPrimaryBackground = "0x002F8AFF"
+    kidsDarkPrimaryAccent= "0xF08600FF"
+    defaultDarkStatusCaution = "0xEB9C00FF"
+
     constants.ui.colors = {}
       'template colors
       constants.ui.colors.transparent = "0x00000000"
-      constants.ui.colors.backgroundColor = "0x191919FF"
-      constants.ui.colors.focused = "0xFF501AFF"
-      constants.ui.colors.unfocused = "0xFFFFFFFF"
-      constants.ui.colors.selectedListItem = "0xFFFFFF33"
-      constants.ui.colors.primaryText = "0xFFFFFFFF"
-      constants.ui.colors.secondaryText = "0x777777FF"
-      constants.ui.colors.focusedText = "0xFFFFFFFF"
+      constants.ui.colors.caution = defaultDarkStatusCaution
+      constants.ui.colors.backgroundColor = defaultDarkPrimaryBackground
+      constants.ui.colors.backgroundColorKids = kidsDarkPrimaryBackground
+      constants.ui.colors.neutralColor = darkTransparentForeground20
+      constants.ui.colors.neutralColor2 = darkTransparentForeground10
+      constants.ui.colors.neutralColor3 = darkTransparentForeground5
+      constants.ui.colors.backgroundColorLight = defaultDarkPrimaryForeground
+      constants.ui.colors.backgroundColorLight2 = darkTransparentForeground75
+      constants.ui.colors.shade = "0x191919FF" '//::TODO::colors - not listed in figma
+
+      constants.ui.colors.focused = defaultDarkPrimaryAccent
+      constants.ui.colors.focusedTransparent10 = darkTransparentAccent10
+      constants.ui.colors.focusedKids = kidsDarkPrimaryAccent
+      constants.ui.colors.focused2 = defaultDarkStatusAlert      
+      constants.ui.colors.unfocused = defaultDarkPrimaryForeground
+      constants.ui.colors.selectedListItem = darkTransparentForeground5
+      constants.ui.colors.primaryText = defaultDarkPrimaryForeground
+      constants.ui.colors.textDark = defaultDarkPrimaryBackground
+      constants.ui.colors.secondaryText = darkTransparentForeground75
+      constants.ui.colors.tertiaryText = darkTransparentForeground95
+      constants.ui.colors.focusedText = defaultDarkPrimaryForeground
       '//::NOTE::HARDCODED:: there is a BUG in the built in roku keyboard component'
       '// If the color is white, then it will make the focus color to a nearly-black gray.
       '// To combat this limitation, the color is set to white with a very slight, hardly-noticeable opacity.
       constants.ui.colors.keyboardFocusedText = "0xFFFFFFFE"
-      constants.ui.colors.highlightedText = "0xFF501AFF"
-      constants.ui.colors.shade = "0x191919FF"
-      constants.ui.colors.spinnerBox = "0x2C2C2CFF"
+      constants.ui.colors.highlightedText = defaultDarkPrimaryAccent
 
       'textbox text colors
-      constants.ui.colors.unselectedEntryText = "0x191919FF"
-      constants.ui.colors.selectedEntryText = "0x191919FF"
-      constants.ui.colors.selectedEntryBox = "0xF3C4B6FF"
-      constants.ui.colors.unselectedEntryBox = "0xFFFFFFFF"
+      constants.ui.colors.unselectedEntryBox = defaultDarkPrimaryForeground
 
       'colors for individual elements - can be made individual or controlled by template colors
-      constants.ui.colors.titleHeader = constants.ui.colors.primaryText
-      constants.ui.colors.expirationWarning = "0xFF9933FF"
+      constants.ui.colors.titleHeader = defaultDarkPrimaryForeground
+      constants.ui.colors.expirationWarning = defaultDarkStatusCaution
 
       'colors for timeGrid
-      constants.ui.colors.futureItemSelected = "0xEB9C00FF"
-      constants.ui.colors.EPGProgramSelected = "0x1C1F29FF"
-      constants.ui.colors.EPGProgramFocused = "0x9699A3FF"
+      constants.ui.colors.futureItemSelected = defaultDarkStatusCaution
+      constants.ui.colors.EPGProgramFocused = darkTransparentForeground75
+      
+
+
+
 
     'The IDs of the available themes that can be used for the app
     constants.ui.themeIDs = {}
@@ -1277,15 +1308,17 @@ Function getConstants()
         scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground.9.png"
         scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground.9.png"
         gradientBlendColor: "0x10141FFF"
+        ' ::TODO::colors - The gradiant color needs to match the color of the background image. Right now the image is bluish but perhaps the new color scheme will want to do away with that
+        ' gradientBlendColor: constants.ui.colors.backgroundColor
       }
       constants.ui.themes.kidsMode = {
         id: constants.ui.themeIDs.kidsMode
-        focused: "0xFEA534FF"
-        highlightedText: "0xFEA534FF"
+        focused: constants.ui.colors.focusedKids
+        highlightedText: constants.ui.colors.focusedKids
         keyboard_focused_key: "pkg:/images/keyboard_search_focused_key_kidsMode.9.png"
         scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground_kidsMode.9.png"
         scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground_kidsMode.9.png"
-        gradientBlendColor: "0x2865B7FF"
+        gradientBlendColor: constants.ui.colors.backgroundColorKids
       }
 
     constants.ui.homescreen = {}

@@ -46,7 +46,6 @@
       itemSpacings="[30, 40, 10]">
       <Label
         id="pageHeading"
-        color="0xFFFFFF"
         horizAlign="center"
         width="1920">
         <Font
@@ -61,11 +60,9 @@
           id="emailBackground"
           width="630"
           height="84"
-          opacity="0.17"
-          color="0x9699A3"/>
+          opacity="0.17"/>
         <Label
           id="email"
-          color="0xFFFFFF"
           horizAlign="left"
           width="600"
           height="84"
@@ -82,7 +79,6 @@
         id="emailValidationMsg"
         translation="[670,-5]"
         opacity="0.0"
-        color="0xEB9C00"
         width="600">
         <Font
           role="font"
@@ -114,12 +110,10 @@
 
               <SimpleButton
                 id="back"
-                color="0xF0F1F5"
                 width="177"/>
 
               <SimpleButton
                 id="continue"
-                color="0xF0F1F5"
                 width="1149"/>
 
             </ButtonGroup>

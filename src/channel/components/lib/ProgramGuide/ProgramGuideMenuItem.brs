@@ -21,11 +21,11 @@ Function onContentChange()
     if item.selected = true
       if item.selectedItemAttributes <> invalid and item.selectedItemAttributes.title <> invalid
         m.timeString.text = item.selectedItemAttributes.title + item.ShortDescriptionLine1
-        m.timeString.color = item.selectedItemAttributes.unFocusedColor ' "0xEB9C00FF"
+        m.timeString.color = item.selectedItemAttributes.unFocusedColor
       end if
     else
       if item.selectedItemAttributes <> invalid
-        m.timeString.color = item.selectedItemAttributes.focusedColor ' "0x9699A3FF"
+        m.timeString.color = item.selectedItemAttributes.focusedColor
       end if
     end if
     if item.needsLogin = true
@@ -75,12 +75,12 @@ Function onFocusPercentChange()
       item.selected = false
     end if
     if m.top.rowFocusPercent > 0.9
-      m.cellRect.blendColor = "0x9699A3FF"
+      m.cellRect.blendColor = "0xFFFFFFBF"
     else
-      m.cellRect.blendColor = "0x1C1F29FF"
+      m.cellRect.blendColor = "0xFFFFFF1A"
     end if
   else
-    m.cellRect.blendColor = "0x10141FFF"
+    m.cellRect.blendColor = "0x000000FF"
   end if
 End Function
 
@@ -89,11 +89,11 @@ Function onRowFocusPercentChange()
   if m.top.rowFocusPercent > 0.5
     m.programString.opacity = 1
     m.timeString.opacity = 1
-    m.cellRect.blendColor = "0x9699A3FF"
+    m.cellRect.blendColor = "0xFFFFFFBF"
   else
     m.programString.opacity = 0.45
     m.timeString.opacity = 0.45
-    m.cellRect.blendColor = "0x1C1F29FF"
-    m.timeString.color = "0x9699A3FF"
+    m.cellRect.blendColor = "0xFFFFFF1A"
+    m.timeString.color = "0xFFFFFFBF"
   end if
 End Function

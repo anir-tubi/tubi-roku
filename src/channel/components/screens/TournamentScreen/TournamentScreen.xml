@@ -177,7 +177,9 @@
 
     <ProgramGuide
       id="programGuide"/>
-
+<!--::TODO::colors- Following color needs to be used b/c of background image is blue. Used to show the screen is out of focus when 
+  when top nav is in focus. Perhaps the page elements can be in a group and the group's opacity can change opacity when
+  the top nav gains focus; thus, not needing the mask to change its opacity? Or maybe we add this blue color to the master color scheme? -->
     <Rectangle
       id="mask"
       color="0x10141FFF"

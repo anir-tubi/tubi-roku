@@ -48,7 +48,6 @@
         id="emailInboxText"
         horizAlign="center"
         vertAlign="bottom"
-        color="0xFFFFFF"
         width="1248">
         <Font
           role="font"
@@ -57,7 +56,6 @@
       </Label>
       <Label
         id="verificationLinkText"
-        color="0xD7DAE0"
         horizAlign="center"
         width="1248"
         vertAlign="bottom">
@@ -68,7 +66,6 @@
       </Label>
       <Label
         id="email"
-        color="0xFFFFFF"
         width="1248"
         horizAlign="center"
         vertAlign="bottom">
@@ -81,7 +78,6 @@
         id="verificationHintText"
         width="1248"
         horizAlign="center"
-        color="0xD7DAE0"
         vertAlign="bottom">
         <Font
           role="font"

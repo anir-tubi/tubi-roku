@@ -20,13 +20,12 @@
   <children>
     <Rectangle
       id="background"
-      color="0x10141FFF"
+      color="0x000000FF"
       width="978"
       height="108"/>
     <Rectangle
       id="programProgressBar"
-      color="0x9699A3FF"
-      opacity=".16"
+      color="0xFFFFFF1A"
       width="0"
       height="108"/>
     <Poster

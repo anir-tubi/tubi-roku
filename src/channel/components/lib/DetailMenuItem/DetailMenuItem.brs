@@ -69,7 +69,7 @@ Function onItemContentChange()
     end if
     calculatedWidth = m.DetailsMenuText.boundingRect().width + m.DetailsMenuText.translation[0]
     if item.badgeText <> ""
-      m.badgeLabel.fontColor = "0x10141F"
+      m.badgeLabel.fontColor = m.constants.ui.colors.backgroundColor
       m.badgeLabel.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
       m.badgeLabel.fontSize = 18
       m.badgeLabel.padding = [12, 9]
@@ -101,10 +101,8 @@ End Function
 
 Function onItemHasFocus()
   if m.top.itemHasFocus = true
-    m.buttonBG.opacity = 1.0
     m.buttonBG.blendcolor = m.constants.ui.colors.focused
   else
-    m.buttonBG.opacity = 0.16
-    m.buttonBG.blendcolor = "0x9699A3"
+    m.buttonBG.blendcolor = m.constants.ui.colors.neutralColor
   end if
 End Function

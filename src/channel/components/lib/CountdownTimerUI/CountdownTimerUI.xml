@@ -33,6 +33,7 @@
       opacity="0">
       <Poster
         id="PlayerCountdownBground"
+        blendColor="0x000000FF"
         width="210"
         height="41"
         opacity=".26"/>

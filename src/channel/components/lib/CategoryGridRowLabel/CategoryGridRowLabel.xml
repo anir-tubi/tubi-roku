@@ -46,9 +46,8 @@
       height="36"
       width="800"
       vertAlign="center"
-      color="0xD7DAE0FF"
-      visible="false"
-      opacity="0.64">
+      color="0xFFFFFFF2"
+      visible="false">
       <Font
         role="font"
         id="subTextFont"

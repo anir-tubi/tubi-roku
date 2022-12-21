@@ -183,7 +183,7 @@
         id="LoadingProgressBar"
         width="750"
         progress="50"
-        trackColor="0xFFFFFF14"
+        trackColor="0xFFFFFF1A"
         translation="[584,696]"/>
     </Group>
 

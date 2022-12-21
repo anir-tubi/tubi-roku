@@ -21,8 +21,7 @@
       width="186"
       opacity="1"
       uri="pkg:/images/ratingBackground.9.png"
-      blendColor="0x10141F"/>
-
+      blendColor="0x000000FF"/>
     <Poster
       id="ChannelPoster"
       loadingBitmapUri="pkg:/images/placeholder.jpg"

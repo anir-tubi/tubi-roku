@@ -1,9 +1,11 @@
 Function init()
   m.limitedUi = true
 
+  m.Shade = m.top.findNode("shade")
   constants = getConstantsFromGlobal()
   if constants <> invalid
     m.limitedUi = constants.deviceInfo.limitedUi
+    m.Shade.color = constants.ui.colors.shade
   end if
 
   m.top.opacity = "0.8"

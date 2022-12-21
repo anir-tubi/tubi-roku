@@ -33,7 +33,7 @@ Function onFocusUpdate()
     end if
 
   else
-    m.top.blendColor = "0xffffffff"
+    m.top.blendColor = "0xFFFFFFFF"
 
     'skip trailer button is a special case where text color also needs to be updated
     if m.top.id = "SkipTrailerButton"

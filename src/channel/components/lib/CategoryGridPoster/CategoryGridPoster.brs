@@ -417,13 +417,17 @@ Function setLiveBadge()
   tubiLog("CategoryGridPoster.setLiveBadge")
   badge = m.badgeGroup.createChild("Badge")
   badge.translation = [12,12]
-  badge.backgroundColor = "0xCC090B"
-  badge.textColor = "0xFFFFFF"
+  '//::TODO::colors - replace this color with the one in constants, but since we don't have a reliable reference to constants then need to do this dynamically at build process
+  ' badge.backgroundColor = m.constants.ui.colors.focused2
+  badge.backgroundColor = "0xF52D2DFF"
+  '//::TODO::colors - replace this color with the one in constants, but since we don't have a reliable reference to constants then need to do this dynamically at build process
+  ' badge.textColor = m.constants.ui.colors.primaryText
+  badge.textColor = "0xFFFFFFFF"
   badge.iconUri = "pkg:/images/live-icon.webp"
   badge.text = UCase(getTranslation("screenSearch_liveText"))
 End Function
-
-
+  
+  
 Function removeBadges()
   tubiLog("CategoryGridPoster.removeBadges")
   childCount = m.badgeGroup.getChildCount()
@@ -436,11 +440,17 @@ Function setReplayOrUpcomingBadge(badgeText)
   badge = m.badgeGroup.createChild("Badge")
   badge.translation = [12,12]
   if badgeText = m.contentTimings.replay
-    badge.backgroundColor = "0xF0F1F5"
+    '//::TODO::colors - replace this color with the one in constants, but since we don't have a reliable reference to constants then need to do this dynamically at build process
+    ' badge.backgroundColor = m.constants.ui.colors.backgroundColorLight
+    badge.backgroundColor = "0xFFFFFFFF" 
+    '//::TODO::colors - replace this color at build with m.constants.ui.colors.neutralColor2; note text color may need to be opaque
     badge.textColor = "0x1C1F29"
   else
+    '//::TODO::colors - replace this color at build with m.constants.ui.colors.neutralColor 
     badge.backgroundColor = "0x585B66"
-    badge.textColor = "0xF0F1F5"
+    '//::TODO::colors - replace this color with the one in constants, but since we don't have a reliable reference to constants then need to do this dynamically at build process; note text color may need to be opaque
+    ' badge.textColor = m.constants.ui.colors.primaryText
+    badge.textColor = "0xFFFFFFFF"
   end if
   badge.text = UCase(badgeText)
 End Function

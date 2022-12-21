@@ -26,7 +26,7 @@
     <Rectangle
       width="1920"
       height="1080"
-      color="#10141F" />
+      color="#000000FF" />
     <Poster
       id="poster"
       width="1920"
@@ -45,12 +45,12 @@
       translation="[126, 846]">
       <SimpleLabel
         id="titleLabel"
-        color="#FFFFFF"
+        color="#FFFFFFFF"
         fontUri="pkg:/fonts/Vaud-Bold.ttf"
         fontSize="42" />
         <SimpleLabel
           id="tagsLabel"
-          color="#FFFFFF7A"
+          color="#FFFFFFBF"
           fontUri="pkg:/fonts/Vaud-Medium.ttf"
           fontSize="27" />
     </LayoutGroup>

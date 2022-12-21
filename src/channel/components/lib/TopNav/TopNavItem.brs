@@ -7,7 +7,7 @@ Function init()
   m.TopLabel = m.top.findNode("TopLabel")
   m.BottomLabel = m.top.findNode("BottomLabel")
 
-  m.BottomLabel.color = "0x10141FFF"
+  m.BottomLabel.color = "0x000000FF"
   m.nLabelXSpacing = m.TopLabel.translation[0]
   m.handledInitialItemContent = false
 
@@ -133,7 +133,7 @@ Function onItemContentChange()
           m.bottomIconSubtext.padding = [12, 12]
           m.bottomIconSubtext.text = itemContent.subText
           m.bottomIconSubtext.uri = "pkg:/images/new-frame.webp"
-          m.bottomIconSubtext.blendColor = "0xFF501A"
+          m.bottomIconSubtext.blendColor = "0xE13100FF"
           m.bottomIconSubtext.opacity = 1.0
         end if
 

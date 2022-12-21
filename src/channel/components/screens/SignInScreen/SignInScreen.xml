@@ -47,7 +47,6 @@
       itemSpacings="[20, 45, 17, 17, 20]">
       <Label
         id="pageHeading"
-        color="0xFFFFFF"
         horizAlign="center"
         width="1920">
         <Font
@@ -58,7 +57,6 @@
 
       <Label
         id="pageSubHeading"
-        color="0xFFFFFF"
         horizAlign="center"
         width="1920">
         <Font
@@ -83,7 +81,6 @@
       <Label
         id="passwordValidationMsg"
         translation="[670,0]"
-        color="0xEB9C00"
         width="600">
         <Font
           role="font"
@@ -102,7 +99,6 @@
         <SimpleButton
           translation="[756,0]"
           id="continueBtn"
-          color="0x9699A3"
           width="408"/>
 
         <LayoutGroup
@@ -114,8 +110,7 @@
           itemSpacings="[12]">
 
           <Label
-            id="newPasswordLabel"
-            color="#FFFFFF">
+            id="newPasswordLabel">
             <Font
               role="font"
               uri="pkg:/fonts/Vaud-Medium.ttf"
@@ -123,8 +118,7 @@
           </Label>
 
           <Label
-            id="newPasswordLink"
-            color="#FFFFFF">
+            id="newPasswordLink">
             <Font
               role="font"
               uri="pkg:/fonts/Vaud-Medium.ttf"
@@ -143,17 +137,14 @@
 
           <SimpleButton
             id="termsBtn"
-            color="0x10141F"
             unfocusedBackgroundOpacity="0"/>
 
           <SimpleButton
             id="ppBtn"
-            color="0x10141F"
             unfocusedBackgroundOpacity="0"/>
 
           <SimpleButton
             id="YourPrivacyChoicesButton"
-            color="0x10141F"
             unfocusedBackgroundOpacity="0"/>
 
         </ButtonGroup>

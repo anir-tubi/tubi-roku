@@ -17,22 +17,28 @@ Function init()
 
   addtoYourListLabel = m.top.findNode("addtoYourListLabel")
   addtoYourListLabel.text = getTranslation("onBoarding_landingScreen_addListLabel")
+  addtoYourListLabel.color = m.constants.ui.colors.primaryText
 
   addtoYourListBody = m.top.findNode("addtoYourListBody")
   addtoYourListBody.text = getTranslation("onBoarding_landingScreen_addListBody")
+  addtoYourListBody.color = m.constants.ui.colors.secondaryText
 
   saveYourProgressLabel = m.top.findNode("saveYourProgressLabel")
   saveYourProgressLabel.text = getTranslation("onBoarding_landingScreen_saveProgressLabel")
+  saveYourProgressLabel.color = m.constants.ui.colors.primaryText
 
   saveYourProgressBody = m.top.findNode("saveYourProgressBody")
   saveYourProgressBody.text = getTranslation("onBoarding_landingScreen_saveProgressBody")
-
+  saveYourProgressBody.color = m.constants.ui.colors.secondaryText
+  
   madeForYouLabel = m.top.findNode("madeForYouLabel")
   madeForYouLabel.text = getTranslation("onBoarding_landingScreen_madeForYouLabel")
-
+  madeForYouLabel.color = m.constants.ui.colors.primaryText
+  
   madeForYouBody = m.top.findNode("madeForYouBody")
   madeForYouBody.text = getTranslation("onBoarding_landingScreen_madeForYouBody")
-
+  madeForYouBody.color = m.constants.ui.colors.secondaryText
+  
   m.buttons = [
     "onBoarding_registerOrSignIn_button"
     "onBoarding_continueAsGuest_button"
@@ -40,9 +46,11 @@ Function init()
   m.buttonList = m.top.findNode("buttonList")
   m.buttonList.observeFieldScoped("itemSelected", "onButtonSelected")
   setButtonListContent()
-
+  
   m.pageHeading.text = getTranslation("onBoarding_landingScreen_heading")
+  m.pageHeading.color = m.constants.ui.colors.primaryText
   m.pageDescription.text = getTranslation("onBoarding_landingScreen_description")
+  m.pageDescription.color = m.constants.ui.colors.caution
 
 End Function
 

@@ -207,7 +207,7 @@
         id="LoadingProgressBar"
         width="750"
         progress="50"
-        trackColor="0xFFFFFF14"
+        trackColor="0xFFFFFF1A"
         translation="[584,696]"/>
     </Group>
 
@@ -290,7 +290,7 @@
 
     <SimpleButton
       id="SkipIntro"
-      color="0x9699A3"
+      color="0xFFFFFFBF"
       visible="false"/>
 
     <Group
@@ -311,7 +311,7 @@
         <TubiProgressBar
           id="ProgressBar"
           width="1752"
-          trackColor="0xFFFFFF14"
+          trackColor="0xFFFFFF1A"
           translation="[85,896]"/>
 
         <!-- Time -->
@@ -460,7 +460,7 @@
       <Rectangle
         id="ratingBar"
         translation="[126,55]"
-        color="0xFD4C1D"
+        color="0xE13100FF"
         width="3"
         height="87"/>
       <LayoutGroup

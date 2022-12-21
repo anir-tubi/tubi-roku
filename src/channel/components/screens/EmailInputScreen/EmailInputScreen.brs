@@ -6,7 +6,8 @@ Function init()
 
   m.pageHeading = m.top.findNode("pageHeading")
   m.pageHeading.text = getTranslation("email_screen_heading")
-
+  
+  m.emailBackground = m.top.findNode("emailBackground")
   m.emailValidationMsg = m.top.findNode("emailValidationMsg")
   m.emailValidationMsg.text = getTranslation("invalid_email_title")
 
@@ -43,6 +44,13 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.emailInputScreen
 
   m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
+
+  m.back.color = m.constants.ui.colors.backgroundColorLight
+  m.continue.color = m.constants.ui.colors.backgroundColorLight
+  m.emailValidationMsg.color = m.constants.ui.colors.caution
+  m.pageHeading.color = m.constants.ui.colors.primaryText
+  m.email.color = m.constants.ui.colors.primaryText
+  m.emailBackground.color = m.constants.ui.colors.backgroundColorLight2
 
 End Function
 

@@ -14,21 +14,21 @@ Function init()
 
   m.passwordValidationMsg = m.top.findNode("passwordValidationMsg")
   m.passwordValidationMsg.text = getTranslation("signIn_screen_enter_password")
-
+  
   m.continueBtn = m.top.findNode("continueBtn")
   m.continueBtn.text = getTranslation("dialog_button_continue")
   m.continueBtn.observeFieldScoped("selected", "onContinueButtonSelected")
-
+  
   m.newPasswordLabel = m.top.findNode("newPasswordLabel")
   m.newPasswordLabel.text = getTranslation("new_password_text")
-
+  
   m.newPasswordLink = m.top.findNode("newPasswordLink")
   m.newPasswordLink.text = getTranslation("new_password_link")
-
+  
   m.termsBtn = m.top.findNode("termsBtn")
   m.termsBtn.text = getTranslation("screenSettings_menu_tos")
   m.termsBtn.observeFieldScoped("selected", "onTermsButtonSelected")
-
+  
   m.ppBtn = m.top.findNode("ppBtn")
   m.ppBtn.text = getTranslation("screenSettings_menu_privacyPolicy")
   m.ppBtn.observeFieldScoped("selected", "onPrivacyPolicyButtonSelected")
@@ -40,24 +40,24 @@ Function init()
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
   m.voiceKeyboard = m.keyboard.findNode("Keyboard")
   m.keyboard.observeFieldScoped("buttonSelected", "onButtonSelected")
-
+  
   m.buttonsGroup = m.top.findNode("buttonsGroup")
-
+  
   m.password = m.top.findNode("password")
   m.password.hint = getTranslation("signIn_password_hint")
   m.password.observeFieldScoped("selected", "onPasswordButtonSelected")
-
+  
   m.email = m.top.findNode("email")
   m.email.hint = getTranslation("signIn_email_hint")
   m.email.observeFieldScoped("selected", "onEmailSelected")
-
+  
   'emailHasFocus is used to store the state of whether or not the email text entry field has been focused.
   'We need to store this state, and can't simply rely on m.email.isInFocusChain() because when user starts using microphone,
   'the email entry text field loses focus and keyboard gains the focus.
   m.emailHasFocus = false
-
+  
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
-
+  
   'set initial tracking values
   m.top.trackingPageInfo = {
     pageType: "login_page"
@@ -65,15 +65,25 @@ Function init()
       choice: "EMAIL"
     }
   }
+  
+  m.newPasswordLabel.color = m.constants.ui.colors.primaryText
+  m.pageHeading.color = m.constants.ui.colors.primaryText
+  m.pageSubHeading.color = m.constants.ui.colors.primaryText
+  m.newPasswordLink.color = m.constants.ui.colors.primaryText
+  m.passwordValidationMsg.color = m.constants.ui.colors.caution
+  m.continueBtn.color = m.constants.ui.colors.backgroundColorLight2
+  m.termsBtn.color = m.constants.ui.colors.backgroundColor
+  m.ppBtn.color = m.constants.ui.colors.backgroundColor
+  m.yourPrivacyChoicesBtn.color = m.constants.ui.colors.backgroundColor
 
   m.top.isStackable = true
   m.top.screenLevel = m.constants.ui.screenLevels.signInScreen
   m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
-
-End Function
-
-
-Function onScreenFocusChange()
+  
+  End Function
+  
+  
+  Function onScreenFocusChange()
 
   tubiLog("SignInScreen.onScreenFocusChange")
   ' force a background update
@@ -203,8 +213,7 @@ End Function
 
 Function resetPasswordValidation()
 
-  m.passwordValidationMsg.color = "0xF0F1F5"
-  m.passwordValidationMsg.opacity = 0.64
+  m.passwordValidationMsg.color = m.constants.ui.colors.secondaryText
 
 End Function
 
@@ -213,11 +222,9 @@ Function updatePasswordValidation()
 
   passwordLength = Len(m.keyboard.text)
   if passwordLength > 0
-    m.passwordValidationMsg.color = "0xF0F1F5"
-    m.passwordValidationMsg.opacity = 0.64
+    m.passwordValidationMsg.color = m.constants.ui.colors.secondaryText
   else
-    m.passwordValidationMsg.color = "0xEB9C00"
-    m.passwordValidationMsg.opacity = 1.0
+    m.passwordValidationMsg.color = m.constants.ui.colors.caution
   end if
 
 End Function

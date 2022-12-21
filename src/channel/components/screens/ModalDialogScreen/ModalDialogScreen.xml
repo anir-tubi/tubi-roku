@@ -49,12 +49,11 @@
   <children>
     <Rectangle
       id="Shade"
-      color="0x191919FF"
       width="1920"
       height="1080"
       opacity="0.8"
       translation="[0,0]"/>
-         
+    <!--::TODO::colors - 0x2C2C2CFF should be associated with a possible different standards UIO color -->
     <Rectangle
       id="DialogBox"
       color="0x2C2C2CFF" 
@@ -69,7 +68,6 @@
         itemSpacings="[50,36]">
         <Label
           id="Title"
-          color="0xFFFFFFFF"
           width="763"
           translation="[44,0]">
           <Font
@@ -83,7 +81,6 @@
           translation="[44,0]">
           <Label
             id="Message"
-            color="0xFFFFFFFF"
             width="822"
             wrap="true"
             maxLines="6"
@@ -95,7 +92,6 @@
           </Label>
           <Rectangle
             id="ScrollableBackground"
-            color="0x191919FF"
             height="320"
             width="822">
             <ScrollableText

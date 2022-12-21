@@ -26,21 +26,20 @@
       width="291"
       opacity="1"
       uri="pkg:/images/timeProgress.png"
-      blendColor="0x9699A3FF"/>
+      blendColor="0xFFFFFFBF"/>
 
     <Poster
       id="cellRect"
       height="108"
       opacity="1"
       uri="pkg:/images/ratingBackground.9.png"
-      blendColor="0x1C1F29FF"/>
+      blendColor="0xFFFFFF1A"/>
 
     <Label
       id="timeString"
       translation="[24,18]"
       height="30"
-      opacity="0.45"
-      color="0x9699A3FF"
+      color="0xFFFFFFBF"
       horizAlign="left"
       vertAlign="center"
       maxLines="1"

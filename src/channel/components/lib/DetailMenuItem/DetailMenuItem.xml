@@ -39,15 +39,13 @@
   </interface>
 
   <children>
-
     <Poster
       id="buttonBG"
       width="0"
       height="0"
       uri="pkg:/images/menu-focus-fhd.9.png"
-      blendColor="0x9699A3"
+      blendColor="0xFFFFFF1A"
       visible="false"
-      opacity="0.16"
       translation="[0,0]"/>
 
     <Poster

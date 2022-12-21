@@ -48,7 +48,6 @@
       id="AgeVerificationPageText">
       <Label
         id="AgeVerificationPageHeader"
-        color="#FFFFFF"
         horizAlign="left"
         width="1668"
         translation="[126,204]">
@@ -59,8 +58,6 @@
       </Label>
       <Label
         id="AgeVerificationPageSubHeader"
-        color="#F0F1F5"
-        opacity="0.8"
         horizAlign="left"
         width="1668"
         translation="[126,300]">
@@ -79,7 +76,6 @@
       <SimpleButton
         translation="[0,434]"
         id="AgeVerificationStartButton"
-        color="#9699A3"
         width="489"/>
     </Group>
 
@@ -93,7 +89,6 @@
 
           <Label
             id="AgeVerificationYearText"
-            color="#FFFFFF"
             width="426"
             height="144"
             horizAlign="center"
@@ -115,7 +110,6 @@
             opacity="1.0"/>
           <Label
             id="AgeVerificationYearEntry"
-            color="#000000"
             width="300"
             height="144"
             horizAlign="center"
@@ -129,7 +123,6 @@
           </Label>
           <Label
             id="AgeVerificationYear"
-            color="#FFFFFF"
             width="300"
             horizAlign="center"
             opacity="0.4"
@@ -152,7 +145,6 @@
 
         <Label
           id="AgeVerificationAgePrefixLabel"
-          color="#FFFFFF"
           height="144"
           vertAlign="center"
           opacity="0.4">
@@ -169,7 +161,6 @@
           height="144">
           <Label
             id="AgeVerificationAgeEntry"
-            color="#000000"
             width="198"
             height="144"
             horizAlign="center"
@@ -185,7 +176,6 @@
 
         <Label
           id="AgeVerificationAgePostfixLabel"
-          color="#FFFFFF"
           height="144"
           vertAlign="center"
           opacity="0.4">
@@ -200,7 +190,6 @@
     <Label
       id="AgeVerificationErrorPrompt"
       translation="[626,804]"
-      color="#EB9C00"
       width="1000"
       horizAlign="right"
       visible="false">
@@ -211,7 +200,6 @@
     </Label>
     <SimpleLabel
       id="AgeErrorPrompt"
-      color="#EB9C00"
       fontUri="pkg:/fonts/Vaud-Medium.ttf"
       fontSize="27"
       horizOrigin="center"
@@ -219,7 +207,6 @@
       visible="false" />
     <SimpleLabel
       id="AgeWarningPrompt"
-      color="#EB9C00"
       fontUri="pkg:/fonts/Vaud-Medium.ttf"
       fontSize="27"
       horizOrigin="center"
@@ -228,7 +215,6 @@
     <Label
       id="AgeVerificationInfoLabel"
       translation="[126,948]"
-      color="#FFFFFF"
       numLines="2"
       wrap="true"
       width="1710"

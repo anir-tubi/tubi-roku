@@ -17,8 +17,7 @@
   <children>
     <Rectangle
       id="NumberPadGridItemBg"
-      color="0x9699A3"
-      opacity="0.16"
+      color="0xFFFFFF1A"
       width="159"
       height="96" />
     <Label

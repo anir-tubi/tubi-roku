@@ -67,7 +67,6 @@
       id="AgeVerificationPageText">
       <Label
         id="AgeVerificationPageHeader"
-        color="0xFFFFFF"
         horizAlign="left"
         width="1668"
         translation="[126,204]">
@@ -78,8 +77,6 @@
       </Label>
       <Label
         id="AgeVerificationPageSubHeader"
-        color="0xF0F1F5"
-        opacity="0.8"
         horizAlign="left"
         width="1668"
         translation="[126,300]">
@@ -98,7 +95,6 @@
       <SimpleButton
         translation="[0,434]"
         id="AgeVerificationStartButton"
-        color="0x9699A3"
         width="489"/>
     </Group>
     <Group
@@ -111,7 +107,6 @@
 
           <Label
             id="AgeVerificationYearText"
-            color="0xFFFFFF"
             width="426"
             height="144"
             horizAlign="center"
@@ -135,12 +130,10 @@
             opacity="1.0"/>
           <Label
             id="AgeVerificationYearEntryBack"
-            color="0xFFFFFF"
             width="300"
             height="144"
             horizAlign="center"
             vertAlign="center"
-            opacity="0.64"
             translation="[0,9]">
             <Font
               role="font"
@@ -149,7 +142,6 @@
           </Label>
           <Label
             id="AgeVerificationYearEntryFront"
-            color="0x000000"
             width="300"
             height="144"
             horizAlign="center"
@@ -163,7 +155,6 @@
           </Label>
           <Label
             id="AgeVerificationYear"
-            color="0xFFFFFF"
             width="300"
             horizAlign="center"
             opacity="0.4"
@@ -179,7 +170,6 @@
     <Label
       id="AgeVerificationErrorPrompt"
       translation="[626,804]"
-      color="0xEB9C00"
       width="1000"
       horizAlign="right"
       visible="false">
@@ -191,7 +181,6 @@
     <Label
       id="AgeVerificationInfoLabel"
       translation="[126,948]"
-      color="0xFFFFFF"
       numLines="2"
       wrap="true"
       width="1710"

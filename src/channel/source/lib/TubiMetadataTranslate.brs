@@ -1750,8 +1750,8 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
   contentNode.requestorID = requestorID
 
   ' taking these variables out of for loop for performance
-  unFocusedColor = m.constants.ui.colors.futureItemSelected  '0xEB9C00FF
-  focusedColor = m.constants.ui.colors.EPGProgramFocused '0x9699A3FF
+  unFocusedColor = m.constants.ui.colors.futureItemSelected
+  focusedColor = m.constants.ui.colors.EPGProgramFocused
   selectedAttributeText = getTranslation("epg_starts_at") + " "
 
   rows = contentToTranslate.rows
@@ -1975,8 +1975,8 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
 
           program.selectedItemAttributes = {
             "title" : selectedAttributeText ,
-            "unFocusedColor" : unFocusedColor , '0xEB9C00FF
-            "focusedColor" : focusedColor '0x9699A3FF
+            "unFocusedColor" : unFocusedColor ,
+            "focusedColor" : focusedColor
           }
 
         end for

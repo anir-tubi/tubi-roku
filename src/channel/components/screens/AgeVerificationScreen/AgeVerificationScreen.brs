@@ -40,6 +40,19 @@ Function init()
   m.top.observeField("focusedChild", "onComponentFocusChanged")
   m.NumberPad.observeField("text", "onNumberPadTextChanged")
   m.top.observeFieldScoped("ageSubmitted", "onAgeSubmittedChanged")
+
+  m.SubHeader.color = m.constants.ui.colors.secondaryText
+  m.Header.color = m.constants.ui.colors.primaryText
+  m.bornYear.color = m.constants.ui.colors.primaryText
+  m.YearEntryBack.color = m.constants.ui.colors.secondaryText
+  m.StartButton.color = m.constants.ui.colors.backgroundColorLight2
+  m.Header.color = m.constants.ui.colors.primaryText
+
+  m.YearLabel.color = m.constants.ui.colors.primaryText
+  m.infoLabel.color = m.constants.ui.colors.primaryText
+  m.YearEntryFront.color = m.constants.ui.colors.textDark
+  m.YearEntryBack.color = m.constants.ui.colors.textDark
+  m.Prompt.color = m.constants.ui.colors.caution
 End Function
 
 

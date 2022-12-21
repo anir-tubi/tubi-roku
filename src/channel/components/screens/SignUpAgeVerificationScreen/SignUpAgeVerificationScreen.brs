@@ -54,6 +54,21 @@ Function init()
 
   m.top.screenLevel = m.constants.ui.screenLevels.ageGateScreen
 
+
+  m.ErrorPrompt.color = m.constants.ui.colors.caution
+  m.AgeErrorPrompt.color = m.constants.ui.colors.caution
+  m.AgeWarningPrompt.color = m.constants.ui.colors.caution
+  m.infoLabel.color = m.constants.ui.colors.primaryText
+  m.Header.color = m.constants.ui.colors.primaryText
+  m.bornYear.color = m.constants.ui.colors.primaryText
+  m.YearLabel.color = m.constants.ui.colors.primaryText
+  m.AgePrefixLabel.color = m.constants.ui.colors.primaryText
+  m.AgePostfixLabel.color = m.constants.ui.colors.primaryText
+  m.SubHeader.color = m.constants.ui.colors.secondaryText
+  m.StartButton.color = m.constants.ui.colors.backgroundColorLight2
+  m.YearEntry.color = m.constants.ui.colors.textDark
+  m.AgeEntry.color = m.constants.ui.colors.textDark
+
   m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocusChanged")
