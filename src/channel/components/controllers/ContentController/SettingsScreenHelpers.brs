@@ -18,6 +18,9 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.observeFieldScoped("showDeviceModal", "onShowDeviceModal")
   m.settingsScreen.observeFieldScoped("backButtonPressed", "onSettingsBackPressed")
   m.settingsScreen.observeFieldScoped("autoPreviewSettingSelected", "onAutoPreviewSettingSelected")
+  if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" 'this is for extra protection not to restart the app
+    m.settingsScreen.observeFieldScoped("appRestartRequested", "onAppRestartRequested")
+  end if
 
   if screenLevel <> 0
     m.settingsScreen.screenLevel = screenLevel
@@ -498,4 +501,12 @@ Function onSettingsSignInSelected()
   tubiLog("SettingsScreenHelpers.onSettingsSignInSelected")
   m.settingsScreen.actionAfterActivation = ""
   startSignIn(onSideNavSignInCompleted)
+End Function
+
+
+Function onAppRestartRequested()
+  tubilog("SettingsScreenHelpers.onAppRestartRequested")
+  if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" 'this is for extra protection not to restart the app
+    restartApp()
+  end if
 End Function

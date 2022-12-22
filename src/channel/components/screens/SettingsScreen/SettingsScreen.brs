@@ -36,6 +36,10 @@ Function init()
 
   m.top.observeField("autoPreviewItemUpdated", "onSignInInfoChange")
 
+  if m.constants.settings.mode <> "production"
+    m.top.addField("appRestartRequested", "boolean", true)
+  end if
+
   'set initial tracking values
   m.top.trackingPageInfo = {
     pageType: "account_page"
@@ -159,6 +163,8 @@ Function createNextPanel(buttonContent)
       nextPanel = createLegalPanel(buttonContent.title, m.constants.urls.privacyUrl)
     else if buttonContent.id = "TermsOfServiceButton"
       nextPanel = createLegalPanel(buttonContent.title, m.constants.urls.termsOfUseUrl)
+    else if buttonContent.id = "TestingAidButton"
+      nextPanel = createTestingAidPanel()
     else if buttonContent.id = "YourPrivacyChoicesButton"
       nextPanel = createLegalPanel(buttonContent.title, m.constants.urls.yourPrivacyChoicesUrl)
     else if buttonContent.id = "SignInOutButton"
@@ -402,6 +408,23 @@ Function createSignOutPanel()
 End Function
 
 
+Function createTestingAidPanel()
+
+  TestingPanel = CreateObject("roSGNode", "TestingAidPanel")
+  if TestingPanel <> invalid
+    TestingPanel.observeFieldScoped("appRestartRequested", "onAppRestartRequested")
+    TestingPanel.width = m.rightPanelWidth
+    TestingPanel.focusable = true
+    TestingPanel.hasNextPanel = false
+    TestingPanel.leftOnly = false
+    TestingPanel.selectButtonMovesPanelForward = false
+    TestingPanel.offset = m.rightPanelOffset
+  end if
+
+  return TestingPanel
+End Function
+
+
 Function focusItemInList(list, sID)
   index = -1
   content = list.content
@@ -470,4 +493,11 @@ Function onKeyEvent(key, press) as Boolean
     end if
   end if
   return false
+End Function
+
+
+Function onAppRestartRequested(msg)
+  if m.top.appRestartRequested <> invalid
+    m.top.appRestartRequested = msg.getData()
+  end if
 End Function

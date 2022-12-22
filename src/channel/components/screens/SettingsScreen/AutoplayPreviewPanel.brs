@@ -49,7 +49,7 @@ End Function
 
 
 Function onComponentFocus()
-  if m.top.isInFocusChain() AND m.top.hasFocus()
+  if m.top.isInFocusChain() = true AND m.top.hasFocus() = true
     m.Menu.setFocus(true)
     sendComponentInteractionEventForAutoplayPreview()
   end if

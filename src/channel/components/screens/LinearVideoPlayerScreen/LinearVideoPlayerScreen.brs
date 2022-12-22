@@ -1035,7 +1035,7 @@ Function onOKPressed()
   if item <> invalid AND item.count() = 2 AND item[1] = 0
     hideOverlay()
   end if
-  if m.top.channelSelected.needsLogin = true
+  if m.top.channelSelected <> invalid AND  m.top.channelSelected.needsLogin = true
     m.top.ChannelSelectedUpdated = true
   end if
 End Function

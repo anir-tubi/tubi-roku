@@ -1,6 +1,6 @@
 Function init()
-  m.top.observeField("focusedChild", "onComponentFocus")
-  m.top.observeField("isLoading", "onIsLoading")
+  m.top.observeFieldScoped("focusedChild", "onComponentFocus")
+  m.top.observeFieldScoped("isLoading", "onIsLoading")
   m.ContentGroup = m.top.findNode("ContentGroup")
   m.Spinner = m.top.findNode("Spinner")
   m.Text = m.top.findNode("Text")
@@ -21,7 +21,7 @@ End Function
 
 Function onComponentFocus()
  tubiLog("ScrollingTextPanel.onComponentFocus")
- if m.top.isInFocusChain() 
+ if m.top.isInFocusChain() = true
    if m.top.hasFocus()
      m.Text.setFocus(true)
    end if

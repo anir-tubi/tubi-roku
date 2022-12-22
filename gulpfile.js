@@ -170,6 +170,10 @@ function buildInstalled() {
     if (options.config !== 'qa' || settings.suitest === false) {
       sources.push('!src/channel/components/controllers/Suitest/**')
     }
+    // don't include TestAid files if config is production
+    if (options.config === 'production') {
+      sources.push('!src/channel/components/screens/SettingsScreen/TestAid/**')
+    }
 
     let srcOptions = {
       base: 'src/channel'
@@ -318,6 +322,11 @@ function buildRemote() {
       '!src/channel/source/Settings.brs',
       '!src/channel/components/controllers/TubiScene/TrackerTask.xml'
     ];
+
+    // don't include TestAid files if config is production
+    if (options.config === 'production') {
+      sources.push('!src/channel/components/screens/SettingsScreen/TestAid/**')
+    }
 
     let srcOptions = {
       base: 'src/channel'

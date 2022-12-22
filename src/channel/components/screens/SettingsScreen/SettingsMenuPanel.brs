@@ -54,6 +54,13 @@ Function setSettingsMenuStringsAndIcons()
       settingContentNode.insertChild(AutoplayPreviewButton, 1)
     end if
 
+    if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" 'this is for extra protection not to restart the app
+      testingAidButton = createObject("roSGNode","DetailMenuItemContentNode" )
+      testingAidButton.title = "TestAid"
+      testingAidButton.id = "TestingAidButton"
+      m.SettingsMenu.content.appendChild(testingAidButton)
+    end if
+
 End Function
 
 
@@ -117,9 +124,10 @@ End Function
 
 Function resetSettingsMenuVerticalPosition()
   ' the default translation is [0, 0] and the default positioning on the page is due to the
-  ' translation in SettingsScreen.PanelSet.translation, which assumes 5 items in the settings menu.
-  ' We need to adjust the vertical translation if there are more or less than 5 items in the settings menu.
+  ' translation in SettingsScreen.PanelSet.translation, which assumes 6 items in the settings menu.
+  ' We need to adjust the vertical translation if there are more or less than 6 items in the settings menu.
   numButtons = m.SettingsMenu.content.getChildCount()
-  yTrans = (5 - numButtons) * (m.SettingsMenu.itemSize[1] + m.SettingsMenu.itemSpacing[1])
+  yTrans = (6 - numButtons) * (m.SettingsMenu.itemSize[1] + m.SettingsMenu.itemSpacing[1])
   m.SettingsMenuGroup.translation = [0, yTrans]
+
 End Function
