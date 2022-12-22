@@ -2,7 +2,11 @@ Function init()
   m.constants = getConstants()
   m._ = rodash()
 
-  processAnimationLogo()
+  if m.constants.settings.mode = "dev" AND m.constants.settings.fasterDevBuild = true
+    m.top.fadeInRemoteComponent = true
+  else
+    processAnimationLogo()
+  end if
 
   m.hasExperiments = false
   m.hasRemoteConfigs = false

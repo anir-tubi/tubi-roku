@@ -374,7 +374,7 @@ Function getConstants()
   'toggle for using starter components or not. Should only be set to false in testing situations.
   'production should always use starter components!
   constants.starterComponents = true
-  if mode = "qa"
+  if mode = "qa" OR (mode = "dev" AND constants.settings.fasterDevBuild = true)
     constants.starterComponents = false
   end if
 
@@ -382,7 +382,7 @@ Function getConstants()
   'only change to false for production in case of emergencies or side load builds that are not connected to a localhost server,
   'as installed components will likely break after many remote releases.
   constants.remoteComponents = true
-  if mode = "qa"
+  if mode = "qa" OR (mode = "dev" AND constants.settings.fasterDevBuild = true)
     constants.remoteComponents = false
   end if
 
