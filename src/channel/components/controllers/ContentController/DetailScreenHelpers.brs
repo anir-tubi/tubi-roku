@@ -765,7 +765,7 @@ Function findNextEpisode(currentItemFocused, seriesContent)
             nowPos = 0
           end if
 
-          if item.creditsCuePoints <> invalid AND item.creditsCuePoints.postlude <> invalid AND nowPos < item.creditsCuePoints.postlude then
+          if item.creditCuePoints <> invalid AND item.creditCuePoints.postlude <> invalid AND nowPos < item.creditCuePoints.postlude then
             return [i, j] ' first unwatched episode next to currently watched episode
           end if
 

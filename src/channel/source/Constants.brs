@@ -746,11 +746,11 @@ Function getConstants()
       constants.player.transportButtons.closedCaptionFocus = "pkg:/images/transport/sgplayer/cc-icon-focus.png"
       constants.player.transportButtons.closedCaptionDisabled = "pkg:/images/transport/sgplayer/cc-icon-disabled.png"
 
-      'Constants for skipIntro Id's
-      constants.player.skipIntroId = {}
-      constants.player.skipIntroId.intro = "skipIntro"
-      constants.player.skipIntroId.recap = "skipRecap"
-      constants.player.skipIntroId.earlyCredits = "skipEarlyCredits"
+      ' "ids" for the different skip button texts 
+      constants.player.skipCuepointsButtonTypes = {}
+      constants.player.skipCuepointsButtonTypes.intro = "skipIntro"
+      constants.player.skipCuepointsButtonTypes.recap = "skipRecap"
+      constants.player.skipCuepointsButtonTypes.earlyCredits = "skipEarlyCredits"
 
       ' Drm types/schemes, as named and supported by UAPI
       constants.player.drmTypes = {}

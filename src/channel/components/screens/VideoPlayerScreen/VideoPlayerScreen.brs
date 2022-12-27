@@ -97,15 +97,19 @@ Function init()
   m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
   m.Thumbnail = m.top.findNode("Thumbnail")
 
-  m.SkipIntro = m.top.findNode("SkipIntro")
-  m.SkipIntro.observeField("selected", "onSkipIntroSelected")
-  m.skipIntroUpTranslation = 740
-  m.skipIntroDownTranslation = 840
+  m.skipCuepointsButton = m.top.findNode("SkipCuepointsButton")
+  m.skipCuepointsButton.observeFieldScoped("selected", "onSkipCuepointsButtonSelected")
+  m.skipCuepointsButtonUpTranslation = 740
+  m.skipCuepointsButtonDownTranslation = 840
+
+  ' Map to store the history whether cuePoints button were shown or not.
+  ' skip button for each cuepoint should only be shown once per video
+  m.cuePointsHistory = {}
 
   if m.constants.deviceInfo.scaledUi = true
-    m.SkipIntro.uri = "pkg:/images/selector-hd.9.png"
+    m.skipCuepointsButton.uri = "pkg:/images/selector-hd.9.png"
   else
-    m.SkipIntro.uri = "pkg:/images/selector-fhd.9.png"
+    m.skipCuepointsButton.uri = "pkg:/images/selector-fhd.9.png"
   end if
 
   BackLabel = m.top.findNode("BackLabel")
@@ -250,74 +254,76 @@ Function init()
 End Function
 
 
-'set the text for skipIntro button, making it visible and timer to autohide
-'@skipIntroTitle: string, text of the skipIntro button
-'@skipIntroId: string, id of the SkipIntro button
-Function setSkipIntroButtonAndTimer(skipIntroTitle as string, skipIntroId as string) As Void
-  tubiLog("VideoPlayer.setSkipIntroButtonAndTimer")
-  m.skipIntroButtonTimer = m.top.createChild("Timer")
-  m.skipIntroButtonTimer.duration = 10
-  m.skipIntroButtonTimer.repeat = false
-  m.skipIntroButtonTimer.observeField("fire", "autoHideSkipIntroButton")
-  m.skipIntroButtonTimer.control = "start"
-  m.SkipIntro.id = skipIntroId
-  m.SkipIntro.text = skipIntroTitle
-
-  showSkipIntroButton()
+'set the text for skipCuepoints button, making it visible and timer to autohide
+'@skipCuepointsTitle: string, text of the skipCuepoints button
+Function setSkipCuepointsButtonTextAndTimer(skipCuepointsTitle as string) As Void
+  tubiLog("VideoPlayer.setSkipCuepointsButtonTextAndTimer")
+  m.skipCuepointsButtonTimer = m.top.createChild("Timer")
+  m.skipCuepointsButtonTimer.duration = 10
+  m.skipCuepointsButtonTimer.repeat = false
+  m.skipCuepointsButtonTimer.observeFieldScoped("fire", "autoHideSkipCuepointsButton")
+  m.skipCuepointsButtonTimer.control = "start"
+  m.skipCuepointsButton.text = skipCuepointsTitle
+  showSkipCuepointsButton()
 End Function
 
 
-'Make the skipIntro Button visible and based on transport
+'Make the skipCuepoints Button visible and based on transport
 'control visibility, set the translation and focus
-Function showSkipIntroButton()
-  xPosition = m.top.width - (m.skipintro.boundingRect().width + 60)
+Function showSkipCuepointsButton()
+  tubiLog("videoPlayerScreen.showSkipCuepointsButton")
+  xPosition = m.top.width - (m.skipCuepointsButton.boundingRect().width + 60)
+
   if m.HUD.opacity = 1
-    m.SkipIntro.translation = [xPosition, m.skipIntroUpTranslation]
+    m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonUpTranslation]
+  else if m.HUD.opacity > 0
+    setFocusedButton(m.skipCuepointsButton)
+    m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonUpTranslation]
   else
-    m.SkipIntro.setFocus(true)
-    m.SkipIntro.translation = [xPosition, m.skipIntroDownTranslation]
-    m.progressBarFocused = false
+    setFocusedButton(m.skipCuepointsButton)
+    m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonDownTranslation]
   end if
-  m.SkipIntro.visible = true
+
+  m.skipCuepointsButton.visible = true
 End Function
 
 
 'Removes the skip intro button from the screen and sets focus on the appropriate component
 '@componentToFocus: roSGNode, the component to focus after the skip intro button loses focus.
 'Don't send this parameter if no focus should be set (for instance if the transport is open and has focus)
-Function hideSkipIntroButton(componentToFocus = invalid)
-  m.SkipIntro.visible = false
+Function hideSkipCuepointsButton(componentToFocus = invalid)
+  m.skipCuepointsButton.visible = false
   if componentToFocus <> invalid
     if componentToFocus.isSameNode(m.top) = true
-      m.SkipIntro.setFocus(false)
+      m.skipCuepointsButton.setFocus(false)
     end if
     componentToFocus.setFocus(true)
   end if
 End Function
 
 
-'Autohide the SkipIntro button after timer reached and HUD is not visible
-Function autoHideSkipIntroButton()
-  clearSkipIntroTimer()
+'Autohide the SkipCuepoints button after timer reached and HUD is not visible
+Function autoHideSkipCuepointsButton()
+  clearSkipCuepointsTimer()
   if m.HUD.opacity < 1
-    hideSkipIntroButton(m.top)
+    hideSkipCuepointsButton(m.top)
   end if
 End Function
 
 
-Function clearSkipIntroButtonAndTimer()
-  m.skipIntro.id = ""
-  m.SkipIntro.text = ""
-  clearSkipIntroTimer()
-  hideSkipIntroButton(m.top)
+Function clearSkipCuepointsButtonAndTimer()
+  m.skipCuepointsButton.text = ""
+  clearSkipCuepointsTimer()
+  hideSkipCuepointsButton(m.top)
 End Function
 
-Function clearSkipIntroTimer()
-  if m.skipIntroButtonTimer <> invalid
-    m.skipIntroButtonTimer.control = "stop"
-    m.top.removeChild(m.skipIntroButtonTimer)
-    m.skipIntroButtonTimer.unobserveField("fire")
-    m.skipIntroButtonTimer = invalid
+
+Function clearSkipCuepointsTimer()
+  if m.skipCuepointsButtonTimer <> invalid
+    m.skipCuepointsButtonTimer.control = "stop"
+    m.top.removeChild(m.skipCuepointsButtonTimer)
+    m.skipCuepointsButtonTimer.unobserveFieldScoped("fire")
+    m.skipCuepointsButtonTimer = invalid
   end if
 End Function
 
@@ -445,9 +451,6 @@ Function onContentChange() As Void
   tubiLog("VideoPlayer.onContentChange")
   stopVideo()
 
-  'Map to store the history whether cuePoints button were shown or not
-  m.cuePointsHistory = {}
-
   if m.top.content <> invalid
     'set page tracking values for analytics
     m.top.trackingPageInfo = {
@@ -473,7 +476,7 @@ Function onControlChange()
   else if m.top.control = "stop" then
     stopAdsPlayback()
     cancelReplayCaptions()
-    clearSkipIntroButtonAndTimer()
+    clearSkipCuepointsButtonAndTimer()
     stopVideo()
     animateTransport("out")
     m.UpNext.stopAutoPlayTimer = true
@@ -686,8 +689,8 @@ Function onVideoPositionChange(msg)
 
   ' Credits Cuepoint / Up Next (Autoplay)
   content = m.top.content
-  if content <> invalid AND content.creditsCuePoints <> invalid AND content.creditsCuePoints.postlude <> invalid AND content.creditsCuePoints.postlude > 0
-    if m.playerPosition >= content.creditsCuePoints.postlude AND m.shouldShowUpNext = true
+  if content <> invalid AND content.creditCuePoints <> invalid AND content.creditCuePoints.postlude <> invalid AND content.creditCuePoints.postlude > 0
+    if m.playerPosition >= content.creditCuePoints.postlude AND m.shouldShowUpNext = true
       ' Always fire history here to fix a race condition where the user has
       ' watched beyond the cuepoint but the title doesn't get removed due
       ' to no history events triggering after the cuepoint
@@ -695,7 +698,7 @@ Function onVideoPositionChange(msg)
 
       if m.UpNext.content <> invalid
         animateTransport("out")
-        clearSkipIntroButtonAndTimer()
+        clearSkipCuepointsButtonAndTimer()
         m.UpNext.show = true
         m.UpNext.setFocus(true)
         m.shouldShowUpNext = false
@@ -709,40 +712,40 @@ Function onVideoPositionChange(msg)
           })
         end if
       end if
-    else if m.playerPosition < content.creditsCuePoints.postlude
+    else if m.playerPosition < content.creditCuePoints.postlude
       m.shouldShowUpNext = true
     end if
 
-    if m.playerPosition + m.constants.player.fetchNextDuration >= content.creditsCuePoints.postlude
+    if m.playerPosition + m.constants.player.fetchNextDuration >= content.creditCuePoints.postlude
       m.top.upNextCuepointReached = true
     end if
   end if
-
-  'set the content, focus to SkipIntro and send exposure event when Skip Intro/recap/early credit cue points available
-  if content <> invalid AND content.creditsCuePoints <> invalid
-    if isSkipIntroCuePointsReached(content.creditsCuePoints)
+  
+  'set the content, focus to SkipCuepoints and send exposure event when Skip Intro/recap/early credit cue points available
+  if content <> invalid AND content.creditCuePoints <> invalid
+    if isSkipIntroCuePointsReached(content.creditCuePoints)
       'implement intro
-      if canSkipIntroShown(m.constants.player.skipIntroId.intro, playProgressOk)
-        m.cuePointsHistory[m.constants.player.skipIntroId.intro] = true
-        skipIntroText = getTranslation("skipIntro_Player")
-        setSkipIntroButtonAndTimer(skipIntroText, m.constants.player.skipIntroId.intro)
+      if canSkipCuepointsButtonBeShown(m.constants.player.skipCuepointsButtonTypes.intro, playProgressOk)
+        m.cuePointsHistory[m.constants.player.skipCuepointsButtonTypes.intro] = true
+        skipCuepointsText = getTranslation("skipIntro_Player")
+        setSkipCuepointsButtonTextAndTimer(skipCuepointsText)
       end if
-    else if isSkipRecapCuePointsReached(content.creditsCuePoints)
+    else if isSkipRecapCuePointsReached(content.creditCuePoints)
       'Implement recap
-      if canSkipIntroShown(m.constants.player.skipIntroId.recap, playProgressOk)
-        m.cuePointsHistory[m.constants.player.skipIntroId.recap] = true
+      if canSkipCuepointsButtonBeShown(m.constants.player.skipCuepointsButtonTypes.recap, playProgressOk)
+        m.cuePointsHistory[m.constants.player.skipCuepointsButtonTypes.recap] = true
         skipRecapText = getTranslation("skipRecap_Player")
-        setSkipIntroButtonAndTimer(skipRecapText, m.constants.player.skipIntroId.recap)
+        setSkipCuepointsButtonTextAndTimer(skipRecapText)
       end if
-    else if isSkipEarlyCreditCuePointsReached(content.creditsCuePoints)
+    else if isSkipEarlyCreditCuePointsReached(content.creditCuePoints)
       'Implement Early credits
-      if canSkipIntroShown(m.constants.player.skipIntroId.earlyCredits, playProgressOk)
-        m.cuePointsHistory[m.constants.player.skipIntroId.earlyCredits] = true
+      if canSkipCuepointsButtonBeShown(m.constants.player.skipCuepointsButtonTypes.earlyCredits, playProgressOk)
+        m.cuePointsHistory[m.constants.player.skipCuepointsButtonTypes.earlyCredits] = true
         skipEarlyCredits = getTranslation("skipEarlyCredits_Player")
-        setSkipIntroButtonAndTimer(skipEarlyCredits, m.constants.player.skipIntroId.earlyCredits)
+        setSkipCuepointsButtonTextAndTimer(skipEarlyCredits)
       end if
-    else if m.skipIntro.id <> ""
-      clearSkipIntroButtonAndTimer()
+    else if m.skipCuepointsButton.text <> ""
+      clearSkipCuepointsButtonAndTimer()
     end if
   end if
 
@@ -1219,10 +1222,14 @@ Function resetVideoPlayerState(content = invalid)
     m.top.adPosition = content.nowPos
     updateVideoPlayerState(content)
   end if
+
   m.top.adState = "init"
   m.top.upNextContentToAutoplay = invalid
   m.shouldShowUpNext = true
   m.UpNext.resetContent = true
+
+  clearSkipCuepointsButtonAndTimer()
+  m.cuePointsHistory = {}
 End Function
 
 
@@ -1692,31 +1699,68 @@ Function hideRatingOverlay()
 End Function
 
 
-' This function tells whether the SkipIntro/SkipRecap/SkipEarlyCredits is already shown or not created yet.
-' @skipIntroId: string, id of the SkipIntro/SkipRecap/SkipEarlyCredits button
+' This function tells whether the SkipCuepoints/SkipRecap/SkipEarlyCredits is already shown or not created yet.
+' @skipCuepointsButtonId: string, the cuepoint button type, one of the options in m.constants.player.skipCuepointsButtonTypes
 ' @isPlaying: boolean, videoPosition can change after the player has been paused (like right button press),
 ' we do not want to show when it's fastforward/rewind/buffering or already showing/shown
-Function canSkipIntroShown(skipIntroId, isPlaying)
-  return  m.cuePointsHistory[skipIntroId] = invalid AND isPlaying = true AND m.SkipIntro.visible = false AND m.SkipIntro.id <> skipIntroId
+Function canSkipCuepointsButtonBeShown(skipCuepointsButtonType, isPlaying)
+  return isSkipCuepointButtonAlreadyShown(skipCuepointsButtonType) = false AND isPlaying = true AND m.skipCuepointsButton.visible = false
 End Function
 
 
-'This function to check Whether the current player position is in between skipIntro cuePoints
-'@creditsCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
-Function isSkipIntroCuePointsReached(creditsCuePoints)
-  return creditsCuePoints.intro_start <> invalid AND creditsCuePoints.intro_end <> invalid AND creditsCuePoints.intro_start > 0 AND m.playerPosition >= creditsCuePoints.intro_start AND m.playerPosition <= creditsCuePoints.intro_end
+' @skipCuepointsButtonId: string, the cuepoint button type, one of the options in m.constants.player.skipCuepointsButtonTypes
+Function isSkipCuepointButtonAlreadyShown(skipCuepointsButtonType)
+  return (m.cuePointsHistory[skipCuepointsButtonType] = true)
+End Function
+
+
+'This function to check Whether the current player position is in between skipCuepoints cuePoints
+'@creditCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
+Function isSkipIntroCuePointsReached(creditCuePoints)
+  return creditCuePoints.intro_start <> invalid AND creditCuePoints.intro_end <> invalid AND creditCuePoints.intro_start > 0 AND m.playerPosition >= creditCuePoints.intro_start AND m.playerPosition <= creditCuePoints.intro_end
 End Function
 
 
 'This function to check Whether the current player position is in between skipRecap cuePoints
-'@creditsCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
-Function isSkipRecapCuePointsReached(creditsCuePoints)
-  return creditsCuePoints.recap_start <> invalid AND creditsCuePoints.recap_end <> invalid AND creditsCuePoints.recap_start > 0 AND m.playerPosition >= creditsCuePoints.recap_start AND m.playerPosition <= creditsCuePoints.recap_end
+'@creditCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
+Function isSkipRecapCuePointsReached(creditCuePoints)
+  return creditCuePoints.recap_start <> invalid AND creditCuePoints.recap_end <> invalid AND creditCuePoints.recap_start > 0 AND m.playerPosition >= creditCuePoints.recap_start AND m.playerPosition <= creditCuePoints.recap_end
 End Function
 
 
-'This function to check Whether the current player position is in between skipEarlyCredits cuePoints
-'@creditsCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
-Function isSkipEarlyCreditCuePointsReached(creditsCuePoints)
-  return creditsCuePoints.earlycredits_start <> invalid AND creditsCuePoints.earlycredits_end <> invalid AND creditsCuePoints.earlycredits_start > 0 AND m.playerPosition >= creditsCuePoints.earlycredits_start AND m.playerPosition <= creditsCuePoints.earlycredits_end
+'This function to check Whether the current player position is in between skipEarlyCredets cuePoints
+'@creditCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
+Function isSkipEarlyCreditCuePointsReached(creditCuePoints)
+  return creditCuePoints.earlycredits_start <> invalid AND creditCuePoints.earlycredits_end <> invalid AND creditCuePoints.earlycredits_start > 0 AND m.playerPosition >= creditCuePoints.earlycredits_start AND m.playerPosition <= creditCuePoints.earlycredits_end
+End Function
+
+
+' @creditCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
+' @returns: string, one of the values in constants.player.skipCuepointsButtonTypes or empty string if
+'                   the cureent playback position does not correspond to one of the cuepoints
+Function getCurrentCuepoint(creditCuePoints)
+  currentCuepoint = ""
+
+  if isSkipIntroCuePointsReached(creditCuePoints) = true
+    currentCuepoint = m.constants.player.skipCuepointsButtonTypes.intro
+  else if isSkipRecapCuePointsReached(creditCuePoints) = true
+    currentCuepoint = m.constants.player.skipCuepointsButtonTypes.recap
+  else if isSkipEarlyCreditCuePointsReached(creditCuePoints) = true
+    currentCuepoint = m.constants.player.skipCuepointsButtonTypes.earlyCredits
+  end if
+
+  return currentCuepoint
+End Function
+
+
+' Extracts the credit cuepoints AA from the passed in content, or returns an empty AA, so that the output
+' can be used with isSkipIntroCuePointsReached() etc.
+' @content: roSGNode, ContentNode
+Function getCreditCuepointsFromContent(content)
+  creditCuePoints = {}
+  if content <> invalid and content.creditCuePoints <> invalid
+    creditCuePoints = content.creditCuePoints
+  end if
+
+  return creditCuePoints
 End Function

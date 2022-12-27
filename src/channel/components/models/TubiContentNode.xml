@@ -50,7 +50,7 @@
     <field id="descriptorCode" type="string" />
     <!-- descriptorDescription value is taken from descriptor array eg. "Coarse or crude language, Violence"-->
     <field id="descriptorDescription" type="string" />
-    <field id="creditsCuePoints" type="assocarray" />
+    <field id="creditCuePoints" type="assocarray" />
 
     <!-- text to display for a category whose content is empty -->
     <field id="placeholderText" type="string" />

@@ -3,20 +3,28 @@ Function init()
   m.label = m.top.findNode("label")
   m.buttonBG.opacity = m.top.unfocusedBackgroundOpacity
 
-  m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.top.observeField("unfocusedBackgroundOpacity", "onOpacityChanged")
+  m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
+  m.top.observeFieldScoped("unfocusedBackgroundOpacity", "onOpacityChanged")
 
-  m.top.observeField("text", "onTextChanged")
+  m.top.observeFieldScoped("width", "onWidthChanged")
+  m.top.observeFieldScoped("text", "onTextChanged")
 End Function
 
 
+Function onWidthChanged(msg)
+  ' not using an alias so updates to label.width and buttonBG.width don't feed back to overwrite m.top.width
+  ' which is used in onTextChanged() to determine if the button should be auto resized or not
+  width = msg.getData()
+  m.label.width = width
+  m.buttonBG.width = width
+End Function
+
 
 Function onTextChanged()
-
   ' m.label.width should be reset to 0 before the new text is set so the boundingRect().width
   ' calculation is accurate. Otherwise, boundingRect().width will be the previously set
   ' m.label.width value
-  if m.top.width = 0
+  if m.top.width = 0 'indicates the button should auto resize
     m.label.width = 0
     m.label.text = m.top.text
     width = m.label.boundingRect().width + 60

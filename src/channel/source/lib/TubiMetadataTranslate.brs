@@ -289,13 +289,13 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
   translatedContent.roundGroupInfo = roundGroupInfo
 
-  creditsCuePoints = {}
+  creditCuePoints = {}
   postlude = 0
 
   if contentFromServer.credit_cuepoints <> invalid
     'adding creditCuePoints for episide to implement SkipIntro feature for episode
     if contentFromServer.detailed_type = "episode"
-      creditsCuePoints = contentFromServer.credit_cuepoints
+      creditCuePoints = contentFromServer.credit_cuepoints
     end if
     if contentFromServer.credit_cuepoints.postlude <> invalid
       postlude = contentFromServer.credit_cuepoints.postlude
@@ -322,19 +322,19 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   ' Rounding the value to down for all the end creditcuepoints
-  earlycredits_end = creditsCuePoints.earlycredits_end
+  earlycredits_end = creditCuePoints.earlycredits_end
   if earlycredits_end <> invalid AND earlycredits_end > 0
-    creditsCuePoints.AddReplace("earlycredits_end", roundDown(earlycredits_end))
+    creditCuePoints.AddReplace("earlycredits_end", roundDown(earlycredits_end))
   end if
 
-  intro_end = creditsCuePoints.intro_end
+  intro_end = creditCuePoints.intro_end
   if intro_end <> invalid AND intro_end > 0
-    creditsCuePoints.AddReplace("intro_end", roundDown(intro_end))
+    creditCuePoints.AddReplace("intro_end", roundDown(intro_end))
   end if
 
-  recap_end = creditsCuePoints.recap_end
+  recap_end = creditCuePoints.recap_end
   if recap_end <> invalid AND recap_end > 0
-    creditsCuePoints.AddReplace("recap_end", roundDown(recap_end))
+    creditCuePoints.AddReplace("recap_end", roundDown(recap_end))
   end if
 
   ' Rounding the value to up for all the start creditcuepoints
@@ -342,28 +342,28 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     postlude = roundUp(postlude)
   end if
 
-  prelogue = creditsCuePoints.prelogue
+  prelogue = creditCuePoints.prelogue
   if prelogue <> invalid
-    creditsCuePoints.AddReplace("prelogue", roundUp(prelogue))
+    creditCuePoints.AddReplace("prelogue", roundUp(prelogue))
   end if
 
-  earlycredits_start = creditsCuePoints.earlycredits_start
+  earlycredits_start = creditCuePoints.earlycredits_start
   if earlycredits_start <> invalid AND earlycredits_start > 0
-    creditsCuePoints.AddReplace("earlycredits_start", roundUp(earlycredits_start))
+    creditCuePoints.AddReplace("earlycredits_start", roundUp(earlycredits_start))
   end if
 
-  intro_start = creditsCuePoints.intro_start
+  intro_start = creditCuePoints.intro_start
   if intro_start <> invalid AND intro_start > 0
-    creditsCuePoints.AddReplace("intro_start", roundUp(intro_start))
+    creditCuePoints.AddReplace("intro_start", roundUp(intro_start))
   end if
 
-  recap_start = creditsCuePoints.recap_start
+  recap_start = creditCuePoints.recap_start
   if recap_start <> invalid AND recap_start > 0
-    creditsCuePoints.AddReplace("recap_start", roundUp(recap_start))
+    creditCuePoints.AddReplace("recap_start", roundUp(recap_start))
   end if
 
-  creditsCuePoints.AddReplace("postlude", postlude)
-  translatedContent.creditsCuePoints = creditsCuePoints
+  creditCuePoints.AddReplace("postlude", postlude)
+  translatedContent.creditCuePoints = creditCuePoints
 
   translatedContent.landscape  = m.getThumbnailImage(contentFromServer, m.constants.ui.gridItemTypes.landscape)
   sPortraitURL = m.getThumbnailImage(contentFromServer)

@@ -159,7 +159,7 @@ Function setupVideoPlayer(content, playbackSource = "unknown", position = 0)
     videoPlayer.observeFieldScoped("backButtonPressed", "onVideoPlayerBackPressed")
     videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
 
-    if (content.creditsCuePoints <> invalid AND content.creditsCuePoints.postlude <> invalid AND position >= content.creditsCuePoints.postlude)
+    if (content.creditCuePoints <> invalid AND content.creditCuePoints.postlude <> invalid AND position >= content.creditCuePoints.postlude)
       position = 0
     else if content.length - position <= 5
       position = 0
@@ -471,7 +471,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
 
     detailScreenResumePosition = historyPosition
 
-    isEndReached = (videoContent.creditsCuePoints <> invalid AND videoContent.creditsCuePoints.postlude <> invalid AND videoContent.creditsCuePoints.postlude > 0 AND detailScreenResumePosition > videoContent.creditsCuePoints.postlude)
+    isEndReached = (videoContent.creditCuePoints <> invalid AND videoContent.creditCuePoints.postlude <> invalid AND videoContent.creditCuePoints.postlude > 0 AND detailScreenResumePosition > videoContent.creditCuePoints.postlude)
     ' So the detailed page does not have a refresh issue, pass the local resume number before the backend communicates.
     ' The problem with this is that if the backend comes back with a different number than the local
     ' number then there is still a screen redraw issue: i.e. user watches only 2 seconds of a video.

@@ -80,8 +80,8 @@ Function tubiMetadataTranslate_translateRecursive_testParentTypes_test()
 End Function
 
 
-'@Test translateRecursive testCreditsCuepoints unit tests
-Function tubiMetadataTranslate_translateRecursive_testCreditsCuepoints_test()
+'@Test translateRecursive testCreditCuepoints unit tests
+Function tubiMetadataTranslate_translateRecursive_testCreditCuepoints_test()
   ' normal cuepoint
   source = {
     id: "12345"
@@ -96,7 +96,7 @@ Function tubiMetadataTranslate_translateRecursive_testCreditsCuepoints_test()
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(source, dest)
   m.assertTrue(dest.length = 600)
-  m.assertTrue(dest.creditsCuePoints.postlude = 550)
+  m.assertTrue(dest.creditCuePoints.postlude = 550)
 
   ' default cuepoint
   source = {
@@ -111,7 +111,7 @@ Function tubiMetadataTranslate_translateRecursive_testCreditsCuepoints_test()
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(source, dest)
   m.assertTrue(dest.length = 600)
-  m.assertTrue(dest.creditsCuePoints.postlude = 595) 'defined by constants.player.creditsDuration
+  m.assertTrue(dest.creditCuePoints.postlude = 595) 'defined by constants.player.creditsDuration
 
   ' missing cuepoints
   source = {
@@ -122,7 +122,7 @@ Function tubiMetadataTranslate_translateRecursive_testCreditsCuepoints_test()
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(source, dest)
   m.assertTrue(dest.length = 600)
-  m.assertTrue(dest.creditsCuePoints.postlude = 595) 'defined by constants.player.creditsDuration
+  m.assertTrue(dest.creditCuePoints.postlude = 595) 'defined by constants.player.creditsDuration
 
   ' cuepoint too close to the end
   source = {
@@ -137,7 +137,7 @@ Function tubiMetadataTranslate_translateRecursive_testCreditsCuepoints_test()
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(source, dest)
   m.assertTrue(dest.length = 600)
-  m.assertTrue(dest.creditsCuePoints.postlude = 595)
+  m.assertTrue(dest.creditCuePoints.postlude = 595)
 
   ' no cuepoint or length given
   source = {
@@ -147,7 +147,7 @@ Function tubiMetadataTranslate_translateRecursive_testCreditsCuepoints_test()
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(source, dest)
   m.assertTrue(dest.length = 0)
-  m.assertTrue(dest.creditsCuePoints.postlude = 0)
+  m.assertTrue(dest.creditCuePoints.postlude = 0)
 
   ' title isn't long enough for default cuepoint placement (no cuepoints)
   source = {
@@ -158,7 +158,7 @@ Function tubiMetadataTranslate_translateRecursive_testCreditsCuepoints_test()
   dest = CreateObject("roSGNode", "TubiContentNode")
   m.translate.translateRecursive(source, dest)
   m.assertTrue(dest.length = 3)
-  m.assertTrue(dest.creditsCuePoints.postlude = 0)
+  m.assertTrue(dest.creditCuePoints.postlude = 0)
 End Function
 
 

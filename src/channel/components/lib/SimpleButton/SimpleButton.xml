@@ -14,7 +14,10 @@
 
     <!-- INPUTS -->
       <field id="color" type="String" value="0x9699A3"/>
-      <field id="width" alias="label.width, buttonBG.width" />
+
+      <!-- only set a width for fixed width buttons. -->
+      <field id="width" type="integer" />
+
       <field id="height" alias="buttonBG.height"/>
       <field id="uri" alias="buttonBG.uri"/>
       <field id="fontSize" alias="labelFont.size"/>
