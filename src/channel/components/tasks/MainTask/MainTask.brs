@@ -3,9 +3,16 @@ Function init()
 
   m.hdmiStatus = createObject("roHdmiStatus")
   m.hdmiStatus.setMessagePort(m.port)
+  constants = getConstantsFromGlobal()
 
   ' Go ahead and set our starting isHdmiStatusOk state
-  m.top.isHdmiStatusOk = (m.hdmiStatus.isConnected() = true)
+  isHdmiStatusOk = (m.hdmiStatus.isConnected() = true)
+  modelType = createObject("roDeviceInfo").getModelType()
+  if modelType <> "STB" OR constants.deviceInfo.isAnalogOutputDevice = true then
+    isHdmiStatusOk = true
+  end if
+
+  m.top.isHdmiStatusOk = isHdmiStatusOk
 
   m.cecStatus = createObject("roCECStatus")
   m.cecStatus.setMessagePort(m.port)

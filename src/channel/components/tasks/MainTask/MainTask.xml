@@ -8,6 +8,7 @@
 <component name="MainTask" extends="Task">
     <script type="text/brightscript" uri="MainTask.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
     <interface>
       <!-- OUTPUT -->

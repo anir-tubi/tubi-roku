@@ -109,8 +109,15 @@ Function onVideoPreviewStateChanged(msg)
 
   if videoPreviewState = "finished"
     if currentScreen <> invalid
+      isVideoPreviewAutoStartEnabled = getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).autostart
+
+      isHdmiStatusOk = m.maintask.isHdmiStatusOk
+      if isHdmiPlaybackExperimentEnabled() = false then
+        isHdmiStatusOk = true
+      end if
+
       ' Don't want to continue playback if the user has their tv turned off
-      if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).autostart = true AND m.maintask.isHdmiStatusOk = true then
+      if isVideoPreviewAutoStartEnabled = true AND isHdmiStatusOk = true then
         if currentScreen.subType() = "HomeScreen"
           showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen, invalid, "previews")
         else if currentScreen.subType() = "DetailScreen"

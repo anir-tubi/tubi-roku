@@ -100,6 +100,18 @@ Function getConstants()
       "4400X": true  ' 4
     }
 
+    ' List all devices with analog output that we support still
+    devicesWithAnalogOutput = {
+      "2700X": true
+      "2710X": true
+      "2720X": true
+      "3710X": true
+      "3910X": true
+    }
+
+    deviceModel = di.getModel()
+    isAnalogOutputDevice = (devicesWithAnalogOutput[deviceModel] = true)
+
     ' Firmware 8.0.0 added a system dialog for captions on Roku 4
     if Val(firmware.major) >= 8
       noFirmwareCaptionMenuModels.delete("4400X")
@@ -203,6 +215,7 @@ Function getConstants()
     constants.deviceInfo.lowVram = lowVram
     constants.deviceInfo.firmwareCaptionMenu = firmwareCaptionMenu
     constants.deviceInfo.limitedUi = limitedUi
+    constants.deviceInfo.isAnalogOutputDevice = isAnalogOutputDevice
     constants.deviceInfo.clientVersion = clientVersion
     constants.deviceInfo.majorVersion = majorVersion
     constants.deviceInfo.minorVersion = minorVersion
@@ -1264,7 +1277,7 @@ Function getConstants()
       constants.ui.colors.focused = defaultDarkPrimaryAccent
       constants.ui.colors.focusedTransparent10 = darkTransparentAccent10
       constants.ui.colors.focusedKids = kidsDarkPrimaryAccent
-      constants.ui.colors.focused2 = defaultDarkStatusAlert      
+      constants.ui.colors.focused2 = defaultDarkStatusAlert
       constants.ui.colors.unfocused = defaultDarkPrimaryForeground
       constants.ui.colors.selectedListItem = darkTransparentForeground5
       constants.ui.colors.primaryText = defaultDarkPrimaryForeground
@@ -1288,7 +1301,7 @@ Function getConstants()
       'colors for timeGrid
       constants.ui.colors.futureItemSelected = defaultDarkStatusCaution
       constants.ui.colors.EPGProgramFocused = darkTransparentForeground75
-      
+
 
 
 
