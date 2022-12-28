@@ -634,11 +634,14 @@ End Function
 ' this is one of the pre-requisites to starting the SG user experience.
 Function onStartupArgs()
   m.deeplinkContent = invalid
-  if m.top.startUpArgs <> invalid AND (m.top.startUpArgs.contentID <> invalid OR m.top.startUpArgs.page <> invalid)
-    m.deeplinkContent = createDeeplinkContentFromStartupArgs(m.top.startUpArgs)
+  startupArgs = m.top.startupArgs
+  if startupArgs <> invalid then
+    m.deeplinkContent = createDeeplinkContentFromStartupArgs(startupArgs)
+    utmCampaignConfig = generateUtmCampaignConfig(startupArgs)
+    m.cmsApi.setUtmCampaignConfig(utmCampaignConfig)
   end if
 
-  externalAuthInfo = getExternalAuthInfoFromStartupArgs(m.top.startUpArgs)
+  externalAuthInfo = getExternalAuthInfoFromStartupArgs(startupArgs)
 
   if externalAuthInfo <> invalid
     m.authInfoRefreshed = false

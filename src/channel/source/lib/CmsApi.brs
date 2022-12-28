@@ -10,6 +10,7 @@ Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
     experiments: experiments
 
     ' public
+    setUtmCampaignConfig: cmsApi_setUtmCampaignConfig
     relatedContentReqInfo: cmsApi_getRelatedContentRequestInfo
     upNextContentRequestInfo: cmsApi_getUpNextContentRequestInfo
     singleContentReqInfo: cmsApi_getSingleContentRequestInfo
@@ -37,6 +38,11 @@ Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
   cmsApi.append(defaultValues)
   return cmsApi
 
+End Function
+
+
+Function cmsApi_setUtmCampaignConfig(utmCampaignConfig)
+  m.utmCampaignConfig = utmCampaignConfig
 End Function
 
 
@@ -181,6 +187,11 @@ Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
     params = m.setImageParams(imageParamTypes, options.params)
   end if
 
+  utmCampaignConfig = m.utmCampaignConfig
+  if isString(utmCampaignConfig) = true then
+    params["utm_campaign_config"] = utmCampaignConfig
+  end if
+
   if passedOptions <> invalid
     if passedOptions.params <> invalid
       params.append(passedOptions.params)
@@ -223,6 +234,11 @@ Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOpti
 
   if passedOptions.params <> invalid AND isNonEmptyString(passedOptions.params.content_mode)
     params["content_mode"] = passedOptions.params.content_mode
+  end if
+
+  utmCampaignConfig = m.utmCampaignConfig
+  if isString(utmCampaignConfig) = true then
+    params["utm_campaign_config"] = utmCampaignConfig
   end if
 
   imageParamTypes = [

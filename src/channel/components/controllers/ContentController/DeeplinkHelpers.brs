@@ -29,120 +29,142 @@
 Function createDeeplinkContentFromStartupArgs(args)
   tubilog("DeeplinkHelpers.createDeeplinkContentFromStartupArgs")
   'handle/set up any deep linking that may have occurred
-  if (args.contentId <> invalid OR args.page <> invalid)
-    content = CreateObject("roSGNode", "DeeplinkContentNode")
-    if args.contentId <> invalid
-      content.id = args.contentId
-      tubiLog("Deep Link detected for content id " + content.id )
-    else
-      content.id = ""
-      tubiLog("Deep Link detected for page ")
-    end if
-
-
-    ' default deep link source is no-source
-    sourceArg = args.source
-    if sourceArg = invalid OR m.constants.deeplinks[sourceArg] = invalid
-      content.source = "no-source"
-    else
-      content.source = m.constants.deeplinks[sourceArg]
-    end if
-
-    ' if there is a parameter called entry with a value, that is the source of the deep link
-    ' typically entry = banner from the Roku banner ads ('entry' is a custom parameter)
-    ' deep link urls with entry source should look like:
-    ' contentID=18267&entry=banner
-    if args.entry <> invalid
-      content.source = args.entry
-    end if
-
-    ' the device id of the device deeplinking to roku. Might be an iOS or android device that is "casting" to roku.
-    if args.deviceId <> invalid AND args.deviceId.unescape() <> ""
-      content.sourceDeviceId = args.deviceId.unescape()
-    end if
-
-    ' set up the resume time if we are deeplinking to a specific point in the video
-    if args.resumeTime <> invalid
-      content.nowPos = args.resumeTime.ToInt()
-    end if
-
-    ' if deep linked from Roku search it's possible that we are deep linking to a series, instead of actual video content
-    ' deep links from search for series should like:
-    ' contentID=335&mediaType=series
-    ' or deeplinks for pages within the app where page parameter has been provided in which case mediatype will not provided
-    ' page=network
-    ' or page=network&contentId=fox
-    ' See full list of mediaType at https://sdkdocs.roku.com/display/sdkdoc/External+Control+Guide
-
-    if content.id <> "" AND args.mediaType <> invalid ' video request expect for season
-      if args.mediaType = "series"
-        content.type = "series"
-        content.deeplinkType = "series"
-      else if args.mediaType = "season"
-        content.type = "series"
-        content.deeplinkType = "season"
-      else if args.mediaType = "movie"
-        content.type = "video"
-        content.deeplinkType = "movie"
-      else if args.mediaType = "episode"
-        content.type = "video"
-        content.deeplinkType = "episode"
-      else if args.mediaType = "livefeed"
-        content.type = "linear"
-        content.deeplinkType = "linear"
-      else if args.mediaType = "sports"
-        content.type = "video"
-        content.deeplinkType = "sports"
-      end if
-    else if args.mediaType = invalid AND args.page <> invalid ' page request
-      if args.page = "movies"
-        content.deeplinkType = "moviePage"
-      else if args.page = "livefeed"
-        content.deeplinkType = "liveTV"
-      else if args.page = "genre"
-        content.deeplinkType = "category"
-      else if args.page = "network"
-        content.deeplinkType = "channel"
-      else if args.page = "tv"
-        content.deeplinkType = "tvPage"
-      else if args.page = "espanol"
-        content.deeplinkType = "espanolPage"
-      else if args.page = "kids"
-        content.deeplinkType = "kids"
-      ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-      else if args.page = "tournament"
-        content.deeplinkType = "tournamentPage"
-      end if
-    end if
-
-    ' remove any 0s that might be prepended to the content id
-    if content.source = "search"
-      prepend = "0"
-      while prepend = "0"
-        prepend = left(content.id, 1)
-        if prepend = "0"
-          length = content.id.len()
-          content.id = content.id.right(length - 1)
-        end if
-      end while
-    end if
-
-    'see tubitv.atlassian.net/wiki/display/EC/Referrals
-    content.medium = "partnership"
-    if args.medium <> invalid
-      content.medium = args.medium
-    end if
-
-    'see tubitv.atlassian.net/wiki/display/EC/Referrals
-    content.campaign = "default-campaign"
-    if args.campaign <> invalid
-      content.campaign = args.campaign
-    end if
-
-    return content
-  else
+  if (args.contentId = invalid AND args.page = invalid) then
     return invalid
   end if
+
+  content = CreateObject("roSGNode", "DeeplinkContentNode")
+  if args.contentId <> invalid
+    content.id = args.contentId
+    tubiLog("Deep Link detected for content id " + content.id )
+  else
+    content.id = ""
+    tubiLog("Deep Link detected for page")
+  end if
+
+
+  ' default deep link source is no-source
+  sourceArg = args.source
+  if sourceArg = invalid OR m.constants.deeplinks[sourceArg] = invalid
+    content.source = "no-source"
+  else
+    content.source = m.constants.deeplinks[sourceArg]
+  end if
+
+  ' if there is a parameter called entry with a value, that is the source of the deep link
+  ' typically entry = banner from the Roku banner ads ('entry' is a custom parameter)
+  ' deep link urls with entry source should look like:
+  ' contentID=18267&entry=banner
+  if args.entry <> invalid
+    content.source = args.entry
+  end if
+
+  ' the device id of the device deeplinking to roku. Might be an iOS or android device that is "casting" to roku.
+  if args.deviceId <> invalid AND args.deviceId.unescape() <> ""
+    content.sourceDeviceId = args.deviceId.unescape()
+  end if
+
+  ' set up the resume time if we are deeplinking to a specific point in the video
+  if args.resumeTime <> invalid
+    content.nowPos = args.resumeTime.ToInt()
+  end if
+
+  ' if deep linked from Roku search it's possible that we are deep linking to a series, instead of actual video content
+  ' deep links from search for series should like:
+  ' contentID=335&mediaType=series
+  ' or deeplinks for pages within the app where page parameter has been provided in which case mediatype will not provided
+  ' page=network
+  ' or page=network&contentId=fox
+  ' See full list of mediaType at https://sdkdocs.roku.com/display/sdkdoc/External+Control+Guide
+
+  if content.id <> "" AND args.mediaType <> invalid ' video request expect for season
+    if args.mediaType = "series"
+      content.type = "series"
+      content.deeplinkType = "series"
+    else if args.mediaType = "season"
+      content.type = "series"
+      content.deeplinkType = "season"
+    else if args.mediaType = "movie"
+      content.type = "video"
+      content.deeplinkType = "movie"
+    else if args.mediaType = "episode"
+      content.type = "video"
+      content.deeplinkType = "episode"
+    else if args.mediaType = "livefeed"
+      content.type = "linear"
+      content.deeplinkType = "linear"
+    else if args.mediaType = "sports"
+      content.type = "video"
+      content.deeplinkType = "sports"
+    end if
+  else if args.mediaType = invalid AND args.page <> invalid ' page request
+    if args.page = "movies"
+      content.deeplinkType = "moviePage"
+    else if args.page = "livefeed"
+      content.deeplinkType = "liveTV"
+    else if args.page = "genre"
+      content.deeplinkType = "category"
+    else if args.page = "network"
+      content.deeplinkType = "channel"
+    else if args.page = "tv"
+      content.deeplinkType = "tvPage"
+    else if args.page = "espanol"
+      content.deeplinkType = "espanolPage"
+    else if args.page = "kids"
+      content.deeplinkType = "kids"
+    ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    else if args.page = "tournament"
+      content.deeplinkType = "tournamentPage"
+    end if
+  end if
+
+  ' remove any 0s that might be prepended to the content id
+  if content.source = "search"
+    prepend = "0"
+    while prepend = "0"
+      prepend = left(content.id, 1)
+      if prepend = "0"
+        length = content.id.len()
+        content.id = content.id.right(length - 1)
+      end if
+    end while
+  end if
+
+  'see tubitv.atlassian.net/wiki/display/EC/Referrals
+  content.medium = "partnership"
+  if args.medium <> invalid
+    content.medium = args.medium
+  end if
+
+  'see tubitv.atlassian.net/wiki/display/EC/Referrals
+  content.campaign = "default-campaign"
+  if args.campaign <> invalid
+    content.campaign = args.campaign
+  end if
+
+  return content
+End Function
+
+
+' Creates utmCampaignConfig AA for use with tensor API
+' Returns AA or invalid
+' @args: assocArray, the args passed to main() at startup
+' Deep link args:
+'   avd - string, custom parameter, provides a means of identifying what creative someone saw that brought them into the application
+'   utm_campaign_config - string, custom parameter, JSON string containing avd. If both are passed in avd will be used instead
+Function generateUtmCampaignConfig(args)
+  utmCampaignConfig = invalid
+  if isString(args.avd) = true then
+    json = formatJson({
+      "avd": args.avd
+    })
+    ba = createObject("roByteArray")
+    ba.fromAsciiString(json)
+    utmCampaignConfig = ba.toBase64String()
+  else if isString(args.utm_campaign_config) = true then
+    utmCampaignConfig = args.utm_campaign_config
+  end if
+  return utmCampaignConfig
 End Function
 
 
