@@ -302,7 +302,7 @@ Function setFocusOntoTopNav(isToggle)
     m.TopNav.handlingFocusFromOtherTopNavBackButton = true
   end if
 
-  if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+  if isVideoPreviewEnabled() = true
     m.top.stopVideoPreview = true
   end if
 

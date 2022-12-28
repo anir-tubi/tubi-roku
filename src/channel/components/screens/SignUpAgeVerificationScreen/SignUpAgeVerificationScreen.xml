@@ -12,8 +12,6 @@
   <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
 
   <interface>
 

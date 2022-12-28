@@ -45,7 +45,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     detailScreen.observeFieldScoped("seeAllGamesSelected", "onSeeAllGamesSelected")
 
-    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+    if isVideoPreviewEnabled() = true
       previewState = getVideoPreviewStateForThisContent(content)
       if previewState = "buffering" or previewState = "playing"
         pageType = "video_page"
@@ -184,7 +184,7 @@ Function onDetailBackgroundChange(msg)
   detailScreen = msg.getRoSGNode()
   if detailScreen.isInFocusChain()
 
-    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+    if isVideoPreviewEnabled() = true
       previewState = getVideoPreviewState()
       if previewState <> "playing"
         m.backgroundGroup.backgroundInfo = {

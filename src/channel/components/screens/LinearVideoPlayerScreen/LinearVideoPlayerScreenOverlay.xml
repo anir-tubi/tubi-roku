@@ -51,7 +51,7 @@
       <!-- Tell when the overlay has reacted to a key press-->
       <field id="reactedToKeyPresss" type="boolean" alwaysNotify="true"/>
 
-      <!-- When the user seledts a closed captioning language, then this will be set and an observer will need to react accordingly to modify the video's subtitleTrack and globalCaptionMode properties-->
+      <!-- When the user selects a closed captioning language, then this will be set and an observer will need to react accordingly to modify the video's subtitleTrack and globalCaptionMode properties-->
       <field id="closedCaptioningSelectedLanguage" type="string" alwaysNotify="true"/>
 
       <!--When the user selects a new channel from the epg channel guide, this field is set-->
@@ -66,7 +66,7 @@
 
       <field id="epgScrollingStatus" alias="EPG.scrollingStatus" />
 
-      <!-- Holds the information needed to populate a navigate_witin_page event. This will
+      <!-- Holds the information needed to populate a navigate_within_page event. This will
            be observed by the contentController via LinearVideoPlayerScreenHelper
            which will be responsible for sending navigate_within_page events.
       -->

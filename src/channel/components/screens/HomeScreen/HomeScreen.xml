@@ -4,13 +4,11 @@
 
   <script type="text/brightscript" uri="HomeScreen.brs" />
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
-  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../lib/FocusMixin.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
   <script type="text/brightscript" uri="../../lib/ContentMixin.brs" />
   <script type="text/brightscript" uri="../../lib/InfoPanelMixin.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/ApiUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
@@ -238,7 +236,7 @@
 
     <Animation
       id="Fades">
-      <!-- keyValues here are in relation to CategorGridList.currFocusRow when less than 1.0 -->
+      <!-- keyValues here are in relation to CategoryGridList.currFocusRow when less than 1.0 -->
       <FloatFieldInterpolator
         id="HintGroupFade"
         fieldToInterp="UpHintGroup.opacity"

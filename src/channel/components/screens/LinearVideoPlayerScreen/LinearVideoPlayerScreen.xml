@@ -4,9 +4,7 @@
   <script type="text/brightscript" uri="../../lib/CacheValidationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/EPGMixin.brs" />
-  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
@@ -48,7 +46,7 @@
       <field id="channelTimeGridContent" type="node" alwaysNotify="true"/>
 
 
-      <!-- content that is used to display a channel guide overliad the video player -->
+      <!-- content that is used to display a channel guide overlaid the video player -->
       <field id="channelsContent" type="node"/>
 
       <!-- Fields to pass through to AdsSSAITask -->
@@ -78,7 +76,7 @@
       <!-- When this is set to true, then change LoadingMessage.text to reflect the propper message -->
       <field id="displayAdLoadingMessage" type="boolean" value="false" alwaysNotify="true"/>
 
-      <!-- The id of the screen associated with this screen. Used to keep a record of the previous (home) screen with which has a close association: i.e. the linear screen is displayed as a minimized version on the previous screen. In the future, th previous screen may be other screens like the search screen, which may not necessarilly have a close association with this linear screen -->
+      <!-- The id of the screen associated with this screen. Used to keep a record of the previous (home) screen with which has a close association: i.e. the linear screen is displayed as a minimized version on the previous screen. In the future, th previous screen may be other screens like the search screen, which may not necessarily have a close association with this linear screen -->
       <field id="associatedScreenID" type="string" value="" />
 
     <!-- OUTPUT -->
@@ -109,7 +107,7 @@
       <field id="videoErrorCode" type="integer" alias="VideoNode.errorCode" />
 
       <!-- We observe the VideoNode state change and when the state = "error", the call back chain of events
-           eventually sets VideoNode.control = "stop". Due to an idiosyncracy in Roku behavior, this prevents
+           eventually sets VideoNode.control = "stop". Due to an idiosyncrasy in Roku behavior, this prevents
            the Youbora plugin from observing the error state on the video node, and so, we must manually trigger
            the Youbora plugin with the error info. The content controller observes this field and sends error info to Youbora.
       -->

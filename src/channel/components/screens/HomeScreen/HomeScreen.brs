@@ -115,7 +115,7 @@ Function onTopNavSelection()
   tubiLog("HomeScreen.onTopNavSelection")
 
   ' stop the video preview when user selects any item from topnav
-  if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+  if isVideoPreviewEnabled() = true
     m.top.stopVideoPreview = true
   end if
 
@@ -756,7 +756,7 @@ Function setFocusOntoTopNav(isToggle)
   end if
 
   m.top.stopLinearVideoPlayer = true
-  if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+  if isVideoPreviewEnabled() = true
     m.top.pauseVideoPreview = true
   end if
 
@@ -880,7 +880,7 @@ Function onKeyEvent(key, press) as boolean
       else if key = "left"
         ' navigating to the side nav
         m.top.stopLinearVideoPlayer = true
-        if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+        if isVideoPreviewEnabled() = true
           m.top.pauseVideoPreview = true
         end if
 
@@ -899,7 +899,7 @@ Function onKeyEvent(key, press) as boolean
       if key = "left" or key = "back"
         ' This is required because the homescreens without topNav will keep playing video Preview when focus is out of
         ' screen
-        if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+        if isVideoPreviewEnabled() = true
           m.top.pauseVideoPreview = true
         end if
 
@@ -949,7 +949,7 @@ Function handlePlayInput()
     positionFocused = m.top.cursorPosition
     m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(itemFocused, positionFocused)
 
-    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+    if isVideoPreviewEnabled() = true
       m.top.stopVideoPreview = true
     end if
 

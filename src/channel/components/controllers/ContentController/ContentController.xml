@@ -68,6 +68,7 @@
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/FIFAMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/VideoPreviewMixin.brs" />
 
   <interface>
 
@@ -91,7 +92,7 @@
       <!-- fadeInContentController will be set true once animation logo is finished during app launch -->
       <field id="fadeInContentController" type="boolean"/>
 
-      <!-- Holds the information needed to populate a navigate_witin_page event. This info is usually set elsewhere by screens and
+      <!-- Holds the information needed to populate a navigate_within_page event. This info is usually set elsewhere by screens and
            observed by their helpers, but in rare cases, ContentController can set this associative array, which
            will be responsible for sending navigate_within_page events.
            See tubiTracking_getAnalyticsEvent for the format of the navigate_within_page AA

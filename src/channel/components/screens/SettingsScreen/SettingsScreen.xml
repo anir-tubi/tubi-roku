@@ -32,7 +32,7 @@
       <!-- The outside can request an item to be selected. The ID of the button. -->
       <field id="itemRequested" type="string" alwaysNotify="true"/>
 
-      <!-- associative array that will indocate if the user is signed in and if so, the aa will contain their info.  -->
+      <!-- associative array that will indicate if the user is signed in and if so, the aa will contain their info.  -->
       <field id="signInInfo" type="assocarray" alwaysNotify="true" />
 
       <!-- actionAfterActivation value will be set when user tried any action before signIn/activation
@@ -63,7 +63,7 @@
       -->
       <field id="trackingPageInfo" type="assocarray" />
 
-      <!-- Holds the information needed to populate a navigate_witin_page event. be passed to the contentController
+      <!-- Holds the information needed to populate a navigate_within_page event. be passed to the contentController
            which will be responsible for sending navigate_within_page events.
            See tubiTracking_getAnalyticsEvent for the format of the navigate_within_page AA
       -->
@@ -78,7 +78,7 @@
       <!-- Holds the "level" of the screen relative to other screens.
            Screens with smaller screenLevel values cannot be stacked on top of screens with higher screenLevel values.
            Attempting to do this action will result in screens being removed from the stack before the screen with the lower
-           vaule is pushed to the stack.
+           value is pushed to the stack.
        -->
       <field id="screenLevel" type="integer" />
 

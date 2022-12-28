@@ -4,9 +4,7 @@
   <script type="text/brightscript" uri="VideoTransportHandling.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
-  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
@@ -72,7 +70,7 @@
 
       <!--
         - When the RAF changes the playback tracking state, this AA object is set]
-        - Possble keys are adcount, adindex, duration, rendersequence, type
+        - Possible keys are adcount, adindex, duration, rendersequence, type
         - For an update set of keys, see where this object is set: TubiAds.tubiAds_adTrackingCallback
         @see https://developer.roku.com/docs/developer-program/advertising/integrating-roku-advertising-framework.md#tracking
         -->
@@ -144,7 +142,7 @@
       <field id="upNextCuepointReached" type="boolean" alwaysNotify="true"/>
 
       <!-- We observe the VideoNode state change and when the state = "error", the call back chain of events
-           eventually sets VideoNode.control = "stop". Due to an idiosyncracy in Roku behavior, this prevents
+           eventually sets VideoNode.control = "stop". Due to an idiosyncrasy in Roku behavior, this prevents
            the Youbora plugin from observing the error state on the video node, and so, we must manually trigger
            the Youbora plugin with the error info. The content controller observes this field and sends error info to Youbora.
       -->

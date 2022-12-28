@@ -45,7 +45,7 @@ Function setSettingsMenuStringsAndIcons()
     YourPrivacyChoicesButton = m.top.findNode("YourPrivacyChoicesButton")
     YourPrivacyChoicesButton.title = getTranslation("screenSettings_menu_yourPrivacyChoices")
 
-    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+    if isVideoPreviewEnabled() = true then
       AutoplayPreviewButton = CreateObject("roSGNode", "DetailMenuItemContentNode")
       AutoplayPreviewButton.title = getTranslation("screenSettings_menu_autoplayPreview")
       AutoplayPreviewButton.id="AutoplayPreviewButton"

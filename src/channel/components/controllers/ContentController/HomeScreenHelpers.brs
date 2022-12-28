@@ -745,34 +745,36 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
       stopAndHideLinearVideoPlayer()
     end if
 
-    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true AND focusedContent.type <> invalid AND m.SideNav.opened <> true
-      previewState = getVideoPreviewStateForThisContent(focusedContent)
-      if previewState = "buffering" or previewState = "playing"
-        videoPreview = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
-        if videoPreview <> invalid
-          setPageTypeForVideoPreview("home_page")
-        end if
-        m.backgroundGroup.posterVisible = false
-      else if previewState = "paused"
-        resumeVideoPreview()
-      else
-        ' this block is needed if user focuses to different content,
-        ' it stops the preview of current content & starts the preview of new content
-        stopVideoPreview()
+    if focusedContent.type <> invalid AND m.SideNav.opened <> true then
+      if isVideoPreviewEnabled() = true then
+        previewState = getVideoPreviewStateForThisContent(focusedContent)
+        if previewState = "buffering" or previewState = "playing"
+          videoPreview = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
+          if videoPreview <> invalid
+            setPageTypeForVideoPreview("home_page")
+          end if
+          m.backgroundGroup.posterVisible = false
+        else if previewState = "paused"
+          resumeVideoPreview()
+        else
+          ' this block is needed if user focuses to different content,
+          ' it stops the preview of current content & starts the preview of new content
+          stopVideoPreview()
 
-        if isLinearPlayerPlayingThisContent(focusedContent) = false
-          m.backgroundGroup.posterVisible = true
-        end if
+          if isLinearPlayerPlayingThisContent(focusedContent) = false
+            m.backgroundGroup.posterVisible = true
+          end if
 
-        if focusedContent.videoPreviewUrl <> ""
-           ' fire exposure event for video preview non-control group
-          getExperimentResource("roku_video_preview", "roku_video_preview_v2", true)
-          startVideoPreview(focusedContent, "home_page")
+          if focusedContent.videoPreviewUrl <> ""
+            ' fire exposure event for video preview non-control group
+            getExperimentResource("roku_video_preview", "roku_video_preview_v2", true)
+            startVideoPreview(focusedContent, "home_page")
+          end if
         end if
+      else if focusedContent.videoPreviewUrl <> "" then
+        ' fire exposure event for video preview control group
+        getExperimentResource("roku_video_preview", "roku_video_preview_v2", true)
       end if
-    else if focusedContent.type <> invalid AND m.SideNav.opened <> true AND focusedContent.videoPreviewUrl <> ""
-      ' fire exposure event for video preview control group
-      getExperimentResource("roku_video_preview", "roku_video_preview_v2", true)
     end if
 
     if bStopCountdownTimer = true

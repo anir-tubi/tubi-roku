@@ -6,10 +6,12 @@
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/VideoPreviewMixin.brs" />
 
   <interface>
     <!-- INPUTS -->
-      <!-- associative array that will indocate if the user is signed in and if so, the aa will contain their info.  -->
+      <!-- associative array that will indicate if the user is signed in and if so, the aa will contain their info.  -->
       <field id="signInInfo" type="assocarray" alwaysNotify="true" />
 
       <!-- Allowed values are those in constants.ui.modes -->

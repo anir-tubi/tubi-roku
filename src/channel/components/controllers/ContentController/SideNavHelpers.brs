@@ -119,7 +119,7 @@ Function onSideNavItemSelected()
     '// If a new screen is to be called, then collapse the side nav and remember which side nav button was last clicked
     bNewScreenCalledSuccess = false
 
-    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+    if isVideoPreviewEnabled() = true
       ' stop the video preview when user selects any item from sidenav
       stopVideoPreview()
     end if

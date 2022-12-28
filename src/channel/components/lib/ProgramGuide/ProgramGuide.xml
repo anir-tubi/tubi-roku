@@ -83,7 +83,7 @@
       -->
     <field id="componentInteractionInfo" type="assocarray"/>
 
-    <!-- Holds the information needed to populate a navigate_witin_page event. This will
+    <!-- Holds the information needed to populate a navigate_within_page event. This will
            be observed by the contentController via epgScreenHelper
            which will be responsible for sending navigate_within_page events.
       -->

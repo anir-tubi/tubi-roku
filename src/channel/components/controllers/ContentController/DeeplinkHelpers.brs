@@ -181,7 +181,7 @@ Function handleInputDeeplink(inputInfo) as Void
   stopVideoContent(videoPlayer) 'sets m.enteredFromDeeplink = false AND m.deeplinkContent = invalid
   stopCountdownTimer() 'stop previous counter
   stopAndHideLinearVideoPlayer()
-  if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+  if isVideoPreviewEnabled() = true
     stopVideoPreview()
   end if
 

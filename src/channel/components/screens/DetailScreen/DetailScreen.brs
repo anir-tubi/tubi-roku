@@ -764,7 +764,7 @@ End Function
 Function handleMenuItemSelected(itemSelected)
   if itemSelected <> invalid then
     tubiLog("DetailScreen.handleMenuItemSelected" + itemSelected.title)
-    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+    if isVideoPreviewEnabled() = true
       m.top.stopVideoPreview = true
     end if
 
@@ -875,7 +875,7 @@ End Function
 Function onRelatedItemFocused()
   tubiLog("DetailScreen.onRelatedItemFocused")
   if m.RelatedGrid.content <> invalid
-    if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+    if isVideoPreviewEnabled() = true
       m.top.stopVideoPreview = true
       ' force a background update
       m.top.backgroundUriList = m.top.backgroundUriList
@@ -1007,7 +1007,7 @@ End Function
 
 Function handlePlayInput()
   itemFocused = m.Menu.content.getChild(m.Menu.itemFocused)
-  if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
+  if isVideoPreviewEnabled() = true
     m.top.stopVideoPreview = true
   end if
 

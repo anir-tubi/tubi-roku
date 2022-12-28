@@ -56,7 +56,7 @@
       <!-- acceptable strings are "automatic" if the timer expires or "deliberate" if the an item is selected-->
       <field id="autoplayMode" type="string" />
 
-      <!-- Holds the information needed to populate a navigate_witin_page event. This will
+      <!-- Holds the information needed to populate a navigate_within_page event. This will
            be observed by the contentController via videoHelpers
            which will be responsible for sending navigate_within_page events.
       -->

@@ -97,7 +97,6 @@ Function getConstants()
       "4200X": true  ' 3 (2013)
       "4210X": true  ' 2 (2015)
       "4230X": true  ' 3 (2015)
-      "4400X": true  ' 4
     }
 
     ' List all devices with analog output that we support still
@@ -109,7 +108,8 @@ Function getConstants()
       "3910X": true
     }
 
-    deviceModel = di.getModel()
+    deviceModel = di.GetModel()
+
     isAnalogOutputDevice = (devicesWithAnalogOutput[deviceModel] = true)
 
     ' Firmware 8.0.0 added a system dialog for captions on Roku 4
@@ -117,15 +117,15 @@ Function getConstants()
       noFirmwareCaptionMenuModels.delete("4400X")
     end if
 
-    if lowMemoryModels[di.GetModel()] <> invalid
+    if lowMemoryModels[deviceModel] <> invalid
       lowMemory = true
     else
       lowMemory = false
     end if
 
-    if limitedUIModels[di.GetModel()] <> invalid
+    if limitedUIModels[deviceModel] <> invalid
       limitedUi = true
-      if limitedUIWithFastCPU[di.GetModel()] <> invalid
+      if limitedUIWithFastCPU[deviceModel] <> invalid
         fastCpu = true
       else
         fastCpu = false
@@ -135,13 +135,13 @@ Function getConstants()
       fastCpu = true
     end if
 
-    if lowVram[di.GetModel()] <> invalid
+    if lowVram[deviceModel] <> invalid
       lowVram = true
     else
       lowVram = false
     end if
 
-    if noFirmwareCaptionMenuModels[di.GetModel()] <> invalid
+    if noFirmwareCaptionMenuModels[deviceModel] <> invalid
       firmwareCaptionMenu = false
     else
       firmwareCaptionMenu = true
@@ -190,8 +190,8 @@ Function getConstants()
     constants.deviceInfo.firmwareVersion = firmware.major + "." +  firmware.minor
     constants.deviceInfo.firmwareBuild = firmware.build
     constants.deviceInfo.userAgent = "Roku/DVP-" + firmware.major + "." + firmware.minor + " (" + firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build + ")"
-    constants.deviceInfo.userAgentModel = "Roku/DVP-" + firmware.major + "." + firmware.minor + " (" + firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build + ") " + di.GetModel()
-    constants.deviceInfo.model = di.GetModel()
+    constants.deviceInfo.userAgentModel = "Roku/DVP-" + firmware.major + "." + firmware.minor + " (" + firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build + ") " + deviceModel
+    constants.deviceInfo.model = deviceModel
     constants.deviceInfo.vendorName = di.GetModelDetails().VendorName
     constants.deviceInfo.definition = definition
     constants.deviceInfo.displayType = di.GetDisplayType()
