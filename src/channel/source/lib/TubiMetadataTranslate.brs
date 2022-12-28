@@ -1716,28 +1716,99 @@ End Function
 '
 '
 ' @contentToTranslate: AA, json parsed response from the epgChannelIds endpoint
-Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, requestorID) As Object
+Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, requestorID, isUserSignedIn = false) As Object
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateEPGChannelIds")
+
   translated = CreateObject("roSGNode", "ContentNode")
   translated.addField("requestorID", "string", false)
   translated.requestorID = requestorID
-  if contentToTranslate.mode <> invalid
-    if contentToTranslate.mode.id = m.constants.ui.contentMode.epgScreen
-      translated.id = m.constants.ui.contentIds.timeGridContent
-    end if
-  end if
+  translated.id = m.constants.ui.contentIds.timeGridContent
 
-  containers = contentToTranslate.mode.containers
-  for i = 0 to containers.count() - 1
-    container = containers[i]
-    containerContents = container.contents
-    for j = 0 to containerContents.count() - 1
-      channelContentNode = translated.createChild("ContentNode")
-      channelContentNode.id = containerContents[j]
-      channelContentNode.addField("containerName", "string", false)
-      channelContentNode.containerName = container.name
+  if contentToTranslate <> invalid AND contentToTranslate.contents <> invalid AND contentToTranslate.containers <> invalid
+    containers = contentToTranslate.containers
+    for i = 0 to containers.count() - 1
+      container = containers[i]
+      containerContents = container.contents
+
+      for j = 0 to containerContents.count() - 1
+        channelFromServer = contentToTranslate.contents[containerContents[j]]
+
+        if channelFromServer <> invalid
+          channelContentNode = translated.createChild("TubiContentNode")
+          channelContentNode.id = containerContents[j]
+
+          if container.name <> invalid
+            channelContentNode.parentTitle = container.name
+          end if
+
+          channelContentNode.channelName = channelFromServer.title
+
+          channelContentNode.videoResources = m.composeVideoResources(channelContentNode, channelFromServer)
+
+          if channelContentNode.videoResources <> invalid
+            channelContentNode.hasVideoResources = true
+          end if
+
+          channelContentNode.description = channelFromServer.description
+          channelContentNode.type = "linear"
+
+          if contentToTranslate.valid_duration <> invalid
+            channelContentNode.validUntil = Uptime(0) + contentToTranslate.valid_duration
+          else
+            channelContentNode.validUntil = UpTime(0) + m.constants.cacheTimes.epgscreen
+          end if
+
+          if channelFromServer.subtitles <> invalid
+            channelContentNode.hasSubtitles = true
+            channelContentNode.subtitleTracks = channelFromServer.subtitles
+            channelContentNode.subtitleConfig = {TrackName: "eia608/CC1"}
+          else
+            channelContentNode.hasSubtitles = false
+          end if
+
+          if channelFromServer.needs_login = true and isUserSignedIn = false
+            channelContentNode.needsLogin = true
+          end if
+
+          channelContentNode.pubId = channelFromServer.publisher_id
+
+          ' If programs does not show up for the channel during next call, epg/programs, then below program serves as default program node for entire channel.
+          ' This child node helps with basic channel metadata and user can play the channel without entire program list.
+          program = channelContentNode.createChild("EPGContentNode")
+          program.id = channelFromServer.id
+          program.epgProgramTitle = channelFromServer.title
+          program.title = channelFromServer.title
+          program.description = channelFromServer.description
+          program.FHDItemWidth = 1700
+
+          if channelFromServer.images <> invalid
+            if channelFromServer.images.poster <> invalid
+              program.FHDPosterUrl = channelFromServer.images.poster[0]
+            end if
+
+            if  channelFromServer.images.thumbnail <> invalid
+              channelContentNode.HDSMALLICONURL = channelFromServer.images.thumbnail[0]
+            end if
+
+            if channelFromServer.images.background <> invalid
+              channelContentNode.backgrounds = m.dedupeBackgrounds(channelFromServer.images.background)
+            end if
+          end if
+
+          program.ReleaseDate = "24/7"
+          if channelFromServer.tags <> invalid AND channelFromServer.tags.Count() > 0
+            program.descriptors = channelFromServer.tags
+          end if
+
+          'programlevel
+          if channelFromServer.needs_login = true and isUserSignedIn = false
+            program.needsLogin = true
+          end if
+        end if
+
+      end for
     end for
-  end for
+  end if
   return translated
 End Function
 
@@ -1746,20 +1817,35 @@ End Function
 Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requestorID, isUserSignedIn = false )
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateEPGPrograms()")
   contentNode = CreateObject("roSGNode", "ContentNode")
-  contentNode.addField("requestorID", "string", false)
-  contentNode.requestorID = requestorID
+  channelArray= []
+  updateAA = {
+    "requestorID": requestorID
+    "children": channelArray
+  }
 
   ' taking these variables out of for loop for performance
   unFocusedColor = m.constants.ui.colors.futureItemSelected
   focusedColor = m.constants.ui.colors.EPGProgramFocused
   selectedAttributeText = getTranslation("epg_starts_at") + " "
+  translatedTomorrow = getTranslation("tomorrow")
+  selectedItemAttributes = {
+    "title" : selectedAttributeText ,
+    "unFocusedColor" : unFocusedColor , '0xEB9C00FF
+    "focusedColor" : focusedColor '0x9699A3FF
+  }
 
   rows = contentToTranslate.rows
   totalRows = rows.count()
   for rowIndex = 0 to totalRows - 1
     channelFromServer = rows[rowIndex]
-    if channelFromServer <> invalid
-      channelNode = contentNode.createChild("TubiContentNode")
+    if channelFromServer <> invalid AND channelFromServer.programs <> invalid AND channelFromServer.programs.count() > 0
+      programArray = []
+      channelNode = {
+        "subtype": "TubiContentNode"
+        "children": programArray
+      }
+
+      channelArray.push(channelNode)
 
       if channelFromServer.content_id <> invalid
         channelNode.id = channelFromServer.content_id
@@ -1773,6 +1859,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
         channelNode.HDSMALLICONURL = channelFromServer.images.thumbnail[0]
       end if
 
+      'This is part of program metadata. We need videoresources when we fetch single channel to play for deeplink
       channelNode.videoResources = m.composeVideoResources(channelNode, channelFromServer)
 
       channelNode.description = channelFromServer.description
@@ -1815,176 +1902,149 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
 
       programs = channelFromServer.programs
       programCount = programs.count()
-      if programCount = 0 ' No program available
-        program = channelNode.createChild("EPGContentNode")
+
+      for i=0 to programCount -1
+        program = {
+          "subtype": "EPGContentNode"
+        }
+        programArray.push(program)
+
+        programFromServer = programs[i]
         if channelNode.id <> invalid
           program.id = channelNode.id
         end if
-        if channelNode.channelName <> invalid
-          program.epgProgramTitle = channelNode.channelName
-          program.title = channelNode.channelName
+        program.title = programFromServer.title
+
+        'Add episode title
+        program.epgProgramTitle = programFromServer.title
+
+        if programFromServer.keywords <> invalid AND programFromServer.keywords.count() > 0
+          for each keyword in programFromServer.keywords
+            if keyword = "EpisodeTitle_IsPreferred" and isNonEmptyString(programFromServer.episode_title)
+              program.epgProgramTitle = programFromServer.episode_title
+              exit for
+            end if
+          end for
+
         end if
-        program.description = channelNode.description
-        program.FHDItemWidth = 1700
-        if channelFromServer.images <> invalid AND channelFromServer.images.poster <> invalid
+
+        startTime = ""
+        dayOfMonth = ""
+        dayOfWeek = ""
+        dateString = ""
+        startTimeFromServer = programFromServer.start_time
+        if startTimeFromServer <> invalid AND (type(startTimeFromServer) = "String" or type(startTimeFromServer) = "roString") AND startTimeFromServer <> ""
+          datetimeObj = CreateObject("roDateTime")
+          datetimeObj.FromISO8601String(startTimeFromServer)
+          datetimeObj.ToLocalTime()
+          program.startTime = datetimeObj.asSeconds()
+          dateString = datetimeObj.AsDateString("short-date")
+          dayOfWeek = "day_" + StrI(datetimeObj.GetDayOfWeek()).trim()
+          dayOfMonth = StrI(datetimeObj.GetDayOfMonth()).trim()
+          startTime = GetAMPMTimeString(datetimeObj, false)
+        end if
+
+        endTime = ""
+        endTimeFromServer = programFromServer.end_time
+        if endTimeFromServer <> invalid AND (type(endTimeFromServer) = "String" or type(startTimeFromServer) = "roString") AND endTimeFromServer <> ""
+          datetimeObjEnd = CreateObject("roDateTime") 'create new dateTime object otherwise local time returned will be wrong.
+          datetimeObjEnd.FromISO8601String(endTimeFromServer)
+          datetimeObjEnd.ToLocalTime()
+          program.endTime = datetimeObjEnd.asSeconds()
+
+          endTime = GetAMPMTimeString(datetimeObjEnd, false)
+        end if
+
+        if programFromServer.images <> invalid AND programFromServer.images.poster <> invalid AND programFromServer.images.poster.count() > 0
+          program.FHDPosterUrl = programFromServer.images.poster[0]
+        else if channelFromServer.images <> invalid AND channelFromServer.images.poster <> invalid AND channelFromServer.images.poster.count() > 0
           program.FHDPosterUrl = channelFromServer.images.poster[0]
         end if
-        if channelFromServer.has_subtitle <> invalid
-          program.hasSubtitles = channelFromServer.has_subtitle
+
+        if programFromServer.has_subtitle <> invalid
+          program.hasSubtitles = programFromServer.has_subtitle
         end if
-        program.ReleaseDate = "24/7"
-        if channelFromServer.tags <> invalid AND channelFromServer.tags.Count() > 0
-          program.descriptors = channelFromServer.tags
+        if programFromServer.year <> invalid
+          program.ReleaseDate = programFromServer.year
         end if
-        'programlevel
+
+        if startTime <> "" AND endTime <> ""
+          program.hoursOfAiring = startTime + " - " +  endTime
+        end if
+
+        if programFromServer.ratings <> invalid AND programFromServer.ratings[0] <> invalid AND programFromServer.ratings[0].value <> invalid
+          program.Rating = programFromServer.ratings[0].value
+        end if
+
         if channelFromServer.needs_login = true and isUserSignedIn = false
           program.needsLogin = true
         end if
 
-      else ' programs available
-
-        for i=0 to programCount -1
-          program = channelNode.createChild("EPGContentNode")
-          programFromServer = programs[i]
-          if channelNode.id <> invalid
-            program.id = channelNode.id
-          end if
-          program.title = programFromServer.title
-
-          'Add episode title
-          program.epgProgramTitle = programFromServer.title
-
-          if programFromServer.keywords <> invalid AND programFromServer.keywords.count() > 0
-            for each keyword in programFromServer.keywords
-              if keyword = "EpisodeTitle_IsPreferred" and isNonEmptyString(programFromServer.episode_title)
-                program.epgProgramTitle = programFromServer.episode_title
-                exit for
-              end if
-            end for
-
-          end if
-
-          startTime = ""
-          dayOfMonth = ""
-          dayOfWeek = ""
-          dateString = ""
-          startTimeFromServer = programFromServer.start_time
-          if startTimeFromServer <> invalid AND (type(startTimeFromServer) = "String" or type(startTimeFromServer) = "roString") AND startTimeFromServer <> ""
-            datetimeObj = CreateObject("roDateTime")
-            datetimeObj.FromISO8601String(startTimeFromServer)
-            datetimeObj.ToLocalTime()
-            program.startTime = datetimeObj.asSeconds()
-            dateString = datetimeObj.AsDateString("short-date")
-            dayOfWeek = "day_" + StrI(datetimeObj.GetDayOfWeek()).trim()
-            dayOfMonth = StrI(datetimeObj.GetDayOfMonth()).trim()
-            startTime = GetAMPMTimeString(datetimeObj, false)
-          end if
-
-          endTime = ""
-          endTimeFromServer = programFromServer.end_time
-          if endTimeFromServer <> invalid AND (type(endTimeFromServer) = "String" or type(startTimeFromServer) = "roString") AND endTimeFromServer <> ""
-            datetimeObjEnd = CreateObject("roDateTime") 'create new dateTime object otherwise local time returned will be wrong.
-            datetimeObjEnd.FromISO8601String(endTimeFromServer)
-            datetimeObjEnd.ToLocalTime()
-            program.endTime = datetimeObjEnd.asSeconds()
-
-            endTime = GetAMPMTimeString(datetimeObjEnd, false)
-          end if
-
-          if programFromServer.images <> invalid AND programFromServer.images.poster <> invalid AND programFromServer.images.poster.count() > 0
-            program.FHDPosterUrl = programFromServer.images.poster[0]
-          else if channelFromServer.images <> invalid AND channelFromServer.images.poster <> invalid AND channelFromServer.images.poster.count() > 0
-            program.FHDPosterUrl = channelFromServer.images.poster[0]
-          end if
-
-          if programFromServer.has_subtitle <> invalid
-            program.hasSubtitles = programFromServer.has_subtitle
-          end if
-          if programFromServer.year <> invalid
-            program.ReleaseDate = programFromServer.year
-          end if
-
-          if startTime <> "" AND endTime <> ""
-            program.hoursOfAiring = startTime + " - " +  endTime
-          end if
-
-          if programFromServer.ratings <> invalid AND programFromServer.ratings[0] <> invalid AND programFromServer.ratings[0].value <> invalid
-            program.Rating = programFromServer.ratings[0].value
-          end if
-
-          if channelFromServer.needs_login = true and isUserSignedIn = false
-            program.needsLogin = true
-          end if
-
-          if programFromServer.videoRenditions <> invalid
-            ' for now, only worry about 4k
-            if programFromServer.videoRenditions[0] = m.constants.serverValues.tensorVideoRenditions.fourK
-              if m.constants.deviceInfo.videoMode.toInt() >= 2160
-                program.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
-              end if
+        if programFromServer.videoRenditions <> invalid
+          ' for now, only worry about 4k
+          if programFromServer.videoRenditions[0] = m.constants.serverValues.tensorVideoRenditions.fourK
+            if m.constants.deviceInfo.videoMode.toInt() >= 2160
+              program.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
             end if
           end if
+        end if
 
-          if programFromServer.description <> invalid and programFromServer.description <> ""
-            program.description = programFromServer.description
-          else
-            program.description = channelFromServer.description
-          end if
+        if programFromServer.description <> invalid and programFromServer.description <> ""
+          program.description = programFromServer.description
+        else
+          program.description = channelFromServer.description
+        end if
 
-          if programFromServer.tags <> invalid AND programFromServer.tags.Count() > 0
-            program.descriptors = programFromServer.tags
-          end if
+        if programFromServer.tags <> invalid AND programFromServer.tags.Count() > 0
+          program.descriptors = programFromServer.tags
+        end if
 
-          now  = CreateObject("roDateTime")
-          now.ToLocalTime()
-          nowTime = now.asSeconds()
-          tomorrowSecs = nowTime + 86400 'seconds per day
-          tomorrow = CreateObject("roDateTime")
-          tomorrow.FromSeconds(tomorrowSecs)
+        now  = CreateObject("roDateTime")
+        now.ToLocalTime()
+        nowTime = now.asSeconds()
+        tomorrowSecs = nowTime + 86400 'seconds per day
+        tomorrow = CreateObject("roDateTime")
+        tomorrow.FromSeconds(tomorrowSecs)
 
-          'Today
-          if dateString = now.AsDateString("short-date")
-            if program.startTime <= nowTime AND program.endTime > nowTime  ' current program eg:20M left
-              timeLeft = (program.endTime -  nowTime) / 60
-              program.ShortDescriptionLine1 = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(program.endTime - nowTime))})
-            else   'Today future program eg: 10:00 AM
-              timeLeft = (program.endTime - program.startTime) / 60
-              program.ShortDescriptionLine1 = startTime
-            end if
-          else if dateString = tomorrow.AsDateString("short-date") ' tomorrow programs eg: 10:00AM, TOMORROW
+        'Today
+        if dateString = now.AsDateString("short-date")
+          if program.startTime <= nowTime AND program.endTime > nowTime  ' current program eg:20M left
+            timeLeft = (program.endTime -  nowTime) / 60
+            program.ShortDescriptionLine1 = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(program.endTime - nowTime))})
+          else   'Today future program eg: 10:00 AM
             timeLeft = (program.endTime - program.startTime) / 60
-            program.ShortDescriptionLine1 =  startTime + ", " + getTranslation("tomorrow")
-          else 'future day programs eg: Jan, 8 10:00 AM
-            timeLeft = (program.endTime - program.startTime) / 60
-            program.ShortDescriptionLine1 = startTime + ", " + getTranslation(dayOfWeek) + dayOfMonth
+            program.ShortDescriptionLine1 = startTime
           end if
+        else if dateString = tomorrow.AsDateString("short-date") ' tomorrow programs eg: 10:00AM, TOMORROW
+          timeLeft = (program.endTime - program.startTime) / 60
+          program.ShortDescriptionLine1 =  startTime + ", " + translatedTomorrow
+        else 'future day programs eg: Jan, 8 10:00 AM
+          timeLeft = (program.endTime - program.startTime) / 60
+          program.ShortDescriptionLine1 = startTime + ", " + getTranslation(dayOfWeek) + dayOfMonth
+        end if
 
-          'the value 19.2 is the width for every minute of the program as per the EPG Design. This value will change if EPG design changes in future.
-          '186 is min width
-          width = timeLeft * 19.2
-          if width < 186
-            program.FHDItemWidth = 186
-          else
-            program.FHDItemWidth = width
-          end if
+        'the value 19.2 is the width for every minute of the program as per the EPG Design. This value will change if EPG design changes in future.
+        '186 is min width
+        width = timeLeft * 19.2
+        if width < 186
+          program.FHDItemWidth = 186
+        else
+          program.FHDItemWidth = width
+        end if
 
 
-          if programFromServer.genres <> invalid AND programFromServer.genres.count() > 0
-            program.Categories = programFromServer.genres
-          end if
+        if programFromServer.genres <> invalid AND programFromServer.genres.count() > 0
+          program.Categories = programFromServer.genres
+        end if
 
-          program.selectedItemAttributes = {
-            "title" : selectedAttributeText ,
-            "unFocusedColor" : unFocusedColor ,
-            "focusedColor" : focusedColor
-          }
+        program.selectedItemAttributes = selectedItemAttributes
 
-        end for
-      end if
+      end for
     end if
   end for
 
-return contentNode
+  contentNode.update(updateAA, true)
+  return contentNode
 End Function
 
 

@@ -5,7 +5,7 @@ Function parseEPGChannelIdsSuccess(fullResponse, reqInfo)
   translate = TubiMetadataTranslate(m.constants)
 
   parsedResponse = fullResponse.data
-  epgChannelIdsResponse = translate.translateEPGChannelIds(parsedResponse, reqInfo.requestorID)
+  epgChannelIdsResponse = translate.translateEPGChannelIds(parsedResponse, reqInfo.requestorID, reqInfo.isSignedInUser)
   return epgChannelIdsResponse
 End Function
 

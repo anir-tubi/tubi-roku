@@ -121,6 +121,7 @@ Function fetchEPGChannels(screen, mode = "tubitv_us_linear")
 
   screen.timeGridContentLoading = true
   screen.timeGridContent = invalid 'a fresh start
+  isSignedIn = isLoggedInUser()
   m.makeRequest({
     url : epgContainerInfo.url
     requestType : m.constants.reqNames.getEPGChannelIds
@@ -129,6 +130,7 @@ Function fetchEPGChannels(screen, mode = "tubitv_us_linear")
     errorCallback : onEpgError 'if there is no program list then there wont be any programs to pull.
     responseType : "node"
     requestorID : screen.ID
+    isSignedInUser: isSignedIn
   })
 End Function
 
@@ -198,45 +200,117 @@ End Function
 Function onEpgChannelListResponse(response)
   tubiLog("EPGScreenHelpers.onEpgChannelListResponse")
   'check if this is the epgScreen for which response was meant to be.
-  currentScreen = getCurrentScreen()
-  if response <> invalid AND currentScreen <> invalid AND response.requestorID <> invalid AND response.requestorID = currentScreen.id
-    currentScreen.timeGridContent = response
-    nFetchInBatch = 10
-    m.totalNumEPGBatches = 0
-    totalNumChannels = response.getChildCount()
-    remainingChannels = totalNumChannels
-    completedChannels = 0
-    if totalNumChannels <= 0
-      onEPGError(response)
+  if response <> invalid AND response.requestorID <> invalid
+    screen = getFromScreenCache(response.requestorID)
+    if screen = invalid
+      screen = getCurrentScreen()
     end if
-    while remainingChannels > 0
-      if remainingChannels <= nFetchInBatch
-        nFetchInBatch = remainingChannels
+
+    if screen.id = response.requestorID
+
+      screen.timeGridContent = response
+      setInContentCache(screen.timeGridContent)
+
+      nFetchInBatch = 10
+      m.totalNumEPGBatches = 0
+      ' If jump_to certain channel(contentIdToFocusOnLoadComplete) has been requested after the load is complete, then start with fetching that channel + 5 up + 5 down channels from v2/epg API response.
+      ' This way, we can render the epg as soon as the first batch is in and then load the rest of the epg.
+      ' This happens on deeplink and epg overlay on the channel selected from the home-screen.
+      ' If no jump_to channel(contentIdToFocusOnLoadComplete) has been specified, then just load from the first to last channel(else part)
+
+      ' UniqueIdsList: array of channelIds that are unique and are in the order by which the channels need to be fetched from the epg/programming API.
+      ' ChannelListAA: a temporary AA, is used to remove the duplicate channel IDs so that we do not have to fetch the same channel twice.
+      ' using both channelListAA and UniqueIdsList duplicates are removed without affecting the order that channel-programs need to be fetched.
+
+      ' logic explanation:
+      ' lets say v2/epg api returned channels Id list: [567888,567889,567890,567891,567892,567889,567893,567889]
+      ' EPG will be rendered as [567888,567889,567890,567891,567892,567889,567893,567889] 567888 as first, 567889 as second and 567889 as last, and so on.
+      ' if contentIdToFocusOnLoadComplete = 567892 then
+      '     channelListAA list is only used to check if channel-Id has been already added to the uniqueIdlist or not.
+      '     uniqueIdsList=[567892, 567891, 567889, 567890, 567893,567888]
+
+      channelListAA = {}
+      index = 0
+      uniqueIdsList = []
+
+      if isNonEmptyString(screen.contentIdToFocusOnLoadComplete) = true
+        for i = 0 to response.getChildCount() - 1
+          epgChannel = response.getChild(i)
+
+          if epgChannel.id = screen.contentIdToFocusOnLoadComplete
+            index = i
+            channelListAA[epgChannel.id] = true
+            uniqueIdsList[0] = epgChannel.id
+
+            upIndex = response.getChildCount()
+            for j = 1 to upIndex
+              if index - j >= 0
+                epgChannel = response.getChild(index - j)
+                if channelListAA[epgChannel.id] <>  true
+                  channelListAA[epgChannel.id] =  true
+                  uniqueIdsList.push(epgChannel.id)  ' store it Array to preserve the order of the original list from the server.
+                end if
+              end if
+
+              if index + j < upIndex
+                epgChannel = response.getChild(index + j)
+                if channelListAA[epgChannel.id] <>  true
+                  channelListAA[epgChannel.id] = true
+                  uniqueIdsList.push(epgChannel.id) ' store it Array to preserve the order of the original list from the server.
+                end if
+              end if
+
+            end for
+
+            exit for
+          end if
+        end for
+      else
+        for i = 0 to response.getChildCount() - 1 'If no jump_to channel has been specified, then just load from first to last channel(epg screen)
+          epgChannel = response.getChild(i)
+          if channelListAA[epgChannel.id] <>  true
+            channelListAA[epgChannel.id] = true
+            uniqueIdsList.push(epgChannel.id) ' store it Array to preserve the order of the original list from the server.
+          end if
+        end for
       end if
-      loopEnd = nFetchInBatch + completedChannels
-      channelListIDs = []
-      for i = completedChannels to loopEnd - 1
-        epgChannel = response.getChild(i)
-        channelListIDs.push(epgChannel.id) ' [613683,613761,....]
-      end for
 
-      epgProgramInfo = m.tensorapi.getEPGProgramReqInfo(channelListIDs)
-      isSignedIn = isLoggedInUser()
+      totalNumChannels = uniqueIdsList.Count()
+      remainingChannels = totalNumChannels
+      completedChannels = 0
+      if totalNumChannels <= 0
+        onEPGError(response)
+      end if
 
-      m.makeRequest({
-        url : epgProgramInfo.url
-        requestType : m.constants.reqNames.getEPGPrograms
-        options : epgProgramInfo.options
-        successCallback : onEPGProgramSuccess
-        errorCallback : onEpgProgramError
-        responseType : "node"
-        requestorID : response.requestorID
-        isSignedInUser: isSignedIn
-      })
-      completedChannels = completedChannels + nFetchInBatch
-      remainingChannels = totalNumChannels - completedChannels
-      m.totalNumEPGBatches = m.totalNumEPGBatches + 1 ' keep track of number of batches.
-    end while
+      while remainingChannels > 0
+        if remainingChannels <= nFetchInBatch
+          nFetchInBatch = remainingChannels
+        end if
+        loopEnd = nFetchInBatch + completedChannels
+        channelListIDs = []
+        for i = completedChannels to loopEnd - 1
+          epgChannel = uniqueIdsList[i]
+          channelListIDs.push(epgChannel) ' [613683,613761,....]
+        end for
+
+        epgProgramInfo = m.tensorapi.getEPGProgramReqInfo(channelListIDs)
+        isSignedIn = isLoggedInUser()
+
+        m.makeRequest({
+          url : epgProgramInfo.url
+          requestType : m.constants.reqNames.getEPGPrograms
+          options : epgProgramInfo.options
+          successCallback : onEPGProgramSuccess
+          errorCallback : onEpgProgramError
+          responseType : "node"
+          requestorID : response.requestorID
+          isSignedInUser: isSignedIn
+        })
+        completedChannels = completedChannels + nFetchInBatch
+        remainingChannels = totalNumChannels - completedChannels
+        m.totalNumEPGBatches = m.totalNumEPGBatches + 1 ' keep track of number of batches.
+      end while
+    end if
   end if
 End Function
 
@@ -248,18 +322,23 @@ Function onEPGProgramSuccess(response)
   if response <> invalid
     m.totalNumEPGBatches = m.totalNumEPGBatches - 1 'reduce the totalNumEPGBatches
     screen = getFromScreenCache(response.requestorID)
+
     if screen = invalid
       screen = getCurrentScreen()
     end if
     if response.requestorID = screen.id
       appendOrAddTimeGridNewContents(response, screen)
 
-      if  m.totalNumEPGBatches = 0
+      if screen.timeGridContentLoading = true
         setTimeGridContentLoadingToComplete(screen)
-        setInContentCache(screen.timeGridContent)
-
       end if
+
+      if  m.totalNumEPGBatches = 0
+        setInContentCache(screen.timeGridContent)
+      end if
+
     end if
+
   end if
 End Function
 
@@ -309,14 +388,6 @@ Function onEpgProgramError(response)
   screen = getCurrentScreen()
   'Check if the screen which requested the program info is the current Screen and user not moved away from this Screen. (especially in case of request timeout or slow internet cases)
   if screen <> invalid AND screen.id = response.requestorID AND response.contentId <> invalid AND screen.timeGridContent <> invalid
-    'response.contentID will have list of comma separated contentIDs for which the response was requested.
-    'remove each of the channel Ids from TimeGrid which does not have any channel/program information. Please note that at this point, this node is an empty row on TimeGrid.
-    contentIDList = response.contentId.Tokenize(",")
-    for each content in contentIDList
-      i = m.NodeHelpers.getChildIndexById(screen.timeGridContent, content)
-      screen.timeGridContent.removeChildIndex(i)
-    end for
-
     if screen.timeGridContent <> invalid AND screen.timeGridContent.getChildCount() > 0
       'Since a batch of programs errored out, set the validUntil to 0 so that next time, content will refetch.
       screen.timeGridContent.getChild(0).validUntil = 0
@@ -383,25 +454,20 @@ Function appendOrAddTimeGridNewContents(response, epgScreen)
   if response <> invalid AND epgScreen.timeGridContent <> invalid
     for i = 0 to response.getChildCount() - 1
       if response.getChild(i) <> invalid
-        newId = response.getChild(i).id
-        indices = m.NodeHelpers.getChildIndicesById(epgScreen.timeGridContent, newId)
+        newNodeid = response.getChild(i).id
 
-        if indices.Count() <= 0
+        indices = m.NodeHelpers.getChildIndicesById(epgScreen.timeGridContent, newNodeid)
+        for each oldNodeIndex in indices
           newNode = response.getChild(i).clone(true)
-          epgScreen.timeGridContent.appendChild(newNode)
-        else
-          for each oldNodeIndex in indices
-            if epgScreen.timeGridContent.getChild(oldNodeIndex) <> invalid
-              containerName = epgScreen.timeGridContent.getChild(oldNodeIndex).containerName 'containerName is present only in getChannelList api call.
+          oldNode = epgScreen.timeGridContent.getChild(oldNodeIndex)
+          oldNode.removeChildIndex(0)
+          if oldNode <> invalid AND newNode <> invalid
+            for j = newNode.getChildCount() - 1 to 0 step -1
+              newNode.getChild(0).reparent(oldNode, false)
+            end for
 
-              if containerName <> invalid AND containerName <> ""
-                newNode = response.getChild(i).clone(true)
-                newNode.parentTitle = containerName
-                epgScreen.timeGridContent.replaceChild(newNode, oldNodeIndex)
-              end if
-            end if
-          end for
-        end if
+          end if
+        end for
       end if
     end for
   end if
@@ -471,15 +537,17 @@ Function refreshEPGScreenVideoPlay(refreshVideoPlay, epgScreen)
   else 'from FullScreen video
     linearVideoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
 
-    changeEPGScreenBackground(epgScreen)
+
     if linearVideoPlayer <> invalid AND linearVideoPlayer.state = "playing"
-      if epgScreen.timeGridContent = invalid or epgScreen.timeGridContentLoading = true
+      if epgScreen.timeGridContent = invalid
         'Anytime Video is playing and epgScreen is empty, then refresh the epgScreen.  This situation might happen when
         'when we play content directly from deeplink and epgScreen still does not have content if user presses backbutton.
         refreshEPGScreen(epgScreen)
+        changeEPGScreenBackground(epgScreen)
         m.backgroundGroup.posterVisible = false
         startCountdownTimer()
       else
+        changeEPGScreenBackground(epgScreen)
         m.backgroundGroup.posterVisible = false
 
         '//if the linear player is playing a video and it does not match with the current focus, then change focus to that of the playing video
@@ -492,6 +560,7 @@ Function refreshEPGScreenVideoPlay(refreshVideoPlay, epgScreen)
         startCountdownTimer()
       end if
     else ' from top/side Nav
+      changeEPGScreenBackground(epgScreen)
       m.backgroundGroup.posterVisible = true
 
       if currentScreen <> invalid AND isAnEpgScreen(currentScreen) AND currentScreen.linearChannelToPlay <> invalid
@@ -600,7 +669,7 @@ Function resetEPGScreenContent()
     epgScreen.fullScreenCountdown = -1
   end if
   stopAndHideLinearVideoPlayer()
-  if epgScreen.timeGridContent = invalid or epgScreen.timeGridContentLoading = true
+  if epgScreen.timeGridContent = invalid
     ' Any time, due to player error EPGscreen has been presented (for example deeplink content is failed to play)
     ' and epgScreen.timeGridContent is still empty, in that case fetch/use cache
     refreshEPGScreen(epgScreen)
@@ -611,29 +680,11 @@ End Function
 
 Function setTimeGridContentLoadingToComplete(screen)
   tubiLog("EPGSCreenHelpers.setTimeGridContentLoading")
-  cleanUpInvalidsInEPG(screen)
   screen.updateTimeGridContent = true
   screen.timeGridContentLoading = false
   showHideSpinner(false)
-End Function
-
-
-
-'This function is cleanup after epgData all been fetched.
-'There might be 3 conditions that we need to handle before rendering.
-'Invalids - just for some reason, if there is a invalid node on timeGridContent, we need to remove those(might never happen)
-'EmptyContentNode - emptyContentNode will have channelID and ContainerName but without any information like ChannelName, video resources to play etc.  We need to remove empty nodes too.
-
-Function cleanUpInvalidsInEPG(screen)
-  tubiLog("EPGSCreenHelpers.cleanUpInvalidsInEPG")
-  if screen.timeGridContent <> invalid AND screen.timeGridContent.getchildCount() > 0 'just in case of error and no programs has been retrived
-    for i = 0 to screen.timeGridContent.getchildCount() - 1
-      item = screen.timeGridContent.getChild(i)
-
-      if item = invalid or (item <> invalid AND (item.channelName = invalid or item.channelName = ""))
-        screen.timeGridContent.removeChildindex(i)
-      end if
-    end for
+  if m.enteredFromDeepLink = true
+    getDataForVideoPlayerTimeGrid()
   end if
-
+  screen.contentIdToFocusOnLoadComplete = ""
 End Function

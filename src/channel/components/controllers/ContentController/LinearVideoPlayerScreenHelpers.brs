@@ -217,7 +217,7 @@ Function maximizeLinearPlayer(content)
       m.backgroundGroup.posterVisible = true
       showHideLinearVideoPlayerSpinner(false)
       videoPlayer.loading = false
-      getDataForTimeGrid()
+      getDataForVideoPlayerTimeGrid()
       repositionLinearVideoPlayerToMaxState(bAnimate)
     end if
 
@@ -225,13 +225,16 @@ Function maximizeLinearPlayer(content)
 End Function
 
 
-Function getDataForTimeGrid()
-  tubilog("LinearVideoPlayerScreenHelpers.getDataForTimeGrid")
+Function getDataForVideoPlayerTimeGrid()
+  tubilog("LinearVideoPlayerScreenHelpers.getDataForVideoPlayerTimeGrid")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
   if videoPlayer <> invalid
     if epgChannelList = invalid or (epgChannelList <> invalid AND shouldRefresh(epgChannelList.getChild(0)) = true) 'There is no cached contents
-      fetchEPGScreenChannels(videoPlayer)
+      if m.enteredFromDeepLink <> true
+        videoPlayer.contentIdToFocusOnLoadComplete = videoPlayer.content.id
+        fetchEPGScreenChannels(videoPlayer)
+      end if
     else if epgChannelList <> invalid
       videoPlayer.timeGridContent = epgChannelList
       videoPlayer.updateTimeGridContent = true

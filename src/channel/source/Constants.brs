@@ -295,6 +295,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.deviceRegister] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.deleteHistory] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getTournamentScreen] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getEPGChannelIds] = true
 
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverContainer] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverHomeScreenContainerIds] = true
@@ -456,7 +457,7 @@ Function getConstants()
       constants.urls.tensor.homescreen = constants.urls.tensor.urlBase + "/v2/homescreen"
       constants.urls.tensor.container = constants.urls.tensor.urlBase + "/v2/containers"
       constants.urls.tensor.channel = constants.urls.tensor.urlBase + "/v2/containers"
-      constants.urls.tensor.epgChannelIds = constants.urls.tensor.urlBase + "/v1/epg"
+      constants.urls.tensor.epgChannelIds = constants.urls.tensor.urlBase + "/v2/epg"
       constants.urls.tensor.tournamentscreen = constants.urls.tensor.urlBase + "/v1/wc_tournament"
 
     'user devices url

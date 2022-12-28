@@ -290,8 +290,13 @@ Function onTimeGridContentLoadingChange()
     m.EPG.content = m.top.timeGridContent
   else
     m.EPGSpinner.visible = false
-    m.InfoPanel.visible = true
     m.EPG.visible = true
+    if m.top.timeGridContent <> invalid
+      m.InfoPanel.visible = true
+    else
+      m.InfoPanel.visible = false
+    end if
+
   end if
 End Function
 
