@@ -294,6 +294,12 @@ Function createAboutPanel()
     '//show the revision number and country code when not in production
     sVersion = sVersion + "." + m.constants.deviceInfo.revisionVersion
     sVersion += " : " + m.constants.deviceInfo.countryCode
+
+    if m.constants.settings.stagingApis = true
+      sVersion += " : Staging"
+    else
+      sVersion += " : Production"
+    end if
   end if
 
   sShortDeviceID = Right(m.constants.deviceInfo.deviceId, 7)
