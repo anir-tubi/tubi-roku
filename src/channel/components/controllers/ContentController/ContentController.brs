@@ -594,29 +594,12 @@ Function startUserExperience()
         showRokuSignInScreen()
       end if
     else
-      if shouldDisplayInitialContentScreen() = true
-        ' Display the initial content screen to the user so they can choose the proper experience.
-        displayInitialContentScreen()
-        showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary
-      else
-        startChannelFromAppLoad()
-      end if
+      startChannelFromAppLoad()
     end if
 
   end if
 End Function
 
-
-' Contain the logic to determine if the Initial Content Screen should be displayed.
-Function shouldDisplayInitialContentScreen()
-  bDisplay = false
-  if m.constants.deviceInfo.countryCode = "US" AND isParentalControlsAdultLevel() = true AND m.uiMode <> m.constants.ui.modes.kidsAgeGate AND getExperimentResource("roku_skip_icts", "roku_skip_icts_v1", true).enabled = false
-    ' Do not display this screen if they are outside of the US or are going to display kids mode or parental control is set to anything other than the adult level
-    ' Also skip this screen if the user is coming from a deeplink
-    bDisplay = true
-  end if
-  return bDisplay
-End Function
 
 
 ' sendDeviceLog will check deviceInfo and send device-info to logging API
@@ -1169,12 +1152,7 @@ End Function
 ' wraps startChannel but forces an age gate if the user is signed out
 Function restartChannel()
   tubiLog("ContentController.restartChannel")
-
-  if shouldDisplayInitialContentScreen() = true
-    displayInitialContentScreen()
-  else
-    startChannel()
-  end if
+  startChannel()
 End Function
 
 

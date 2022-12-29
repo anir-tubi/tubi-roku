@@ -448,22 +448,6 @@
     "description": "Error message when the user has the option to try the operation again.",
     "message": "Let’s try that again"
   },
-  "screenInitialContent_title": {
-    "description": "Title of the initial content screen",
-    "message": "What do you want to watch?"
-  },
-  "screenInitialContent_subtitle_signedOut": {
-    "description": "subTitle of the initial content screen when user is signed out",
-    "message": "Start watching free! No sign-in required!"
-  },
-  "screenInitialContent_subtitle_signedIn": {
-    "description": "subTitle of the initial content screen when user is signed in",
-    "message": "Pick something to watch"
-  },
-  "screenInitialContent_show_everything_title": {
-    "description": "title for button a user clicks to skip selecting a content experience",
-    "message": "Show Me Everything"
-  },
   "screenDetails_queue_content_added_to_list_description": {
     "description": "Message when a content is added to the user's list after sign in.",
     "message": "Content"

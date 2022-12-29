@@ -840,13 +840,6 @@ Function onAutoplayPreviewAfterSignIn()
 End Function
 
 
-' After the user clicks on the Sign In Menu item and then signs in, then this function should be called to display the home screen
-Function onSignInAfterInitialContentScreen()
-  reloadDefaultHomeScreenContent()
-  showDefaultHomeScreen()
-End Function
-
-
 Function popScreenAfterSignInProcess()
   poppableScreenSubtypes = {
     "SignInScreen": true

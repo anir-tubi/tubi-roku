@@ -747,7 +747,7 @@ Function getConstants()
       constants.player.transportButtons.closedCaptionFocus = "pkg:/images/transport/sgplayer/cc-icon-focus.png"
       constants.player.transportButtons.closedCaptionDisabled = "pkg:/images/transport/sgplayer/cc-icon-disabled.png"
 
-      ' "ids" for the different skip button texts 
+      ' "ids" for the different skip button texts
       constants.player.skipCuepointsButtonTypes = {}
       constants.player.skipCuepointsButtonTypes.intro = "skipIntro"
       constants.player.skipCuepointsButtonTypes.recap = "skipRecap"
@@ -1024,7 +1024,6 @@ Function getConstants()
     constants.ui.screenLevels = {}
       ' NOTE : screen level 150 is RESERVED for settings screen when going via signup/signin screen
       constants.ui.screenLevels.homeScreen = 10
-      constants.ui.screenLevels.initialContentScreen = 20
       constants.ui.screenLevels.espanolScreen = 20
       constants.ui.screenLevels.epgScreen = 20
       constants.ui.screenLevels.movieScreen = 20
@@ -1068,7 +1067,6 @@ Function getConstants()
       constants.ui.screenIds.modalDialogScreen = "modalDialogScreen"
       constants.ui.screenIds.videoPlayerScreen = "videoPlayerScreen"
       constants.ui.screenIds.linearVideoPlayerScreen = "linearVideoPlayerScreen"
-      constants.ui.screenIds.initialContentScreen = "initialContentScreen"
       constants.ui.screenIds.epgScreen = "epgScreen"
       constants.ui.screenIds.emailVerificationScreen = "emailVerificationScreen"
       constants.ui.screenIds.welcomeScreen = "welcomeScreen"
@@ -1099,9 +1097,6 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.emailInputScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.signInScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.epgScreen] = true
-      ' Note when returning to the page there were issues with MarkupGrid being in a bad state either
-      ' due to the ArrayGrid items being recycled or some state of the MarkupGrid itself.
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.initialContentScreen] = false
       constants.ui.cacheableScreenIds[constants.ui.screenIds.tournamentScreen] = true 'TODO check if we can implement client logic
 
     constants.ui.componentIds = {}

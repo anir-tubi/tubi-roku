@@ -9,7 +9,6 @@ Function init()
 
   m.BottomLabel.color = "0x000000FF"
   m.nLabelXSpacing = m.TopLabel.translation[0]
-  m.handledInitialItemContent = false
 
   m.top.observeField("itemContent", "onItemContentChange")
   m.top.observeField("focusPercent", "onFocusPercentChange")

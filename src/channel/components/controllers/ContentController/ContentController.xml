@@ -25,7 +25,6 @@
   <script type="text/brightscript" uri="HomeScreenHelpers.brs" />
   <script type="text/brightscript" uri="SearchScreenHelpers.brs" />
   <script type="text/brightscript" uri="EPGScreenHelpers.brs" />
-  <script type="text/brightscript" uri="InitialContentScreenHelpers.brs" />
   <script type="text/brightscript" uri="EpisodeScreenHelpers.brs" />
   <script type="text/brightscript" uri="SideNavHelpers.brs" />
   <script type="text/brightscript" uri="VideoHelpers.brs" />
