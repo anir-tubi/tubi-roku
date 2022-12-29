@@ -564,7 +564,7 @@ Function onGridFocusChange() as void
     '//if the CategoryGridList is in focus, then alter the UI. No need to do this for topnav as it may cause the linear video player
     '// to start to play when the top nav is in focus because there is a delay of reporting of the focused item by the CategoryGridList
     if focusedContent <> invalid
-      if focusedContent.type <> m.constants.ui.gridItemTypes.linear
+      if focusedContent.type <> m.constants.ui.gridItemTypes.linear AND oldFocusedContent <> invalid AND oldFocusedContent.type = m.constants.ui.gridItemTypes.linear
         m.top.stopLinearVideoPlayer = true
       end if
 

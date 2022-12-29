@@ -641,7 +641,7 @@ Function onStopLinearVideoPlayer(msg)
 
     ' Check if the video player has not gone to full screen before stopping.
     ' This is never expected to happen, but might be possible in the case of a race condition.
-    if getCurrentScreen() = invalid or getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
+    if getCurrentScreen() = invalid OR getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
       stopAndHideLinearVideoPlayer()
     end if
   end if
@@ -742,7 +742,9 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
         m.backgroundGroup.posterVisible = false
       end if
     else
-      stopAndHideLinearVideoPlayer()
+      if isLinearPlayerLoading() = true OR isLinearPlayerPlaying() = true
+        stopAndHideLinearVideoPlayer()
+      end if
     end if
 
     if focusedContent.type <> invalid AND m.SideNav.opened <> true then
