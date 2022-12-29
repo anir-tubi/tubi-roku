@@ -1522,12 +1522,7 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
     gridItemType = constants.ui.gridItemTypes.landscape
   else if container.id = constants.ui.categoryIds.featured AND orientation <> gridItemTypes.portrait
     ' `orientation <> gridItemTypes.portrait` is required as the search screen container.id is featured but uses portrait imagery
-    'bs:disable-next-line 1001 LINT1001
-    if getExperimentResource("roku_featured_landscape", "roku_featured_landscape_v2", false).enabled = true then
-      gridItemType = gridItemTypes.landscapeNoTitle
-    else
-      gridItemType = gridItemTypes.landscape
-    end if
+    gridItemType = gridItemTypes.landscapeNoTitle
   end if
 
   return gridItemType

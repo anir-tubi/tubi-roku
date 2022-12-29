@@ -716,8 +716,6 @@ End Function
 ' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content
 Function setHomeScreenAfterFocus(focusedContent, homeScreen)
 
-  getExperimentResource("roku_featured_landscape", "roku_featured_landscape_v2", true)
-
   if focusedContent <> invalid AND getCurrentScreen() <> invalid AND getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
     '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
     '//we should stop the countdown timer

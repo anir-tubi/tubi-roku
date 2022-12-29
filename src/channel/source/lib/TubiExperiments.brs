@@ -42,14 +42,6 @@ Function TubiExperiments(constants) as Object
         roku_coppa_registration_age_vs_yob_v1: {"enabled": true}
       }
 
-      roku_featured_landscape: {
-        roku_featured_landscape_v2: {"enabled": true}
-      }
-
-      roku_search_live_badge: {
-        roku_search_live_badge_v1 : {"enabled": true}
-      }
-
       roku_hdmi_playback: {
         roku_hdmi_playback_v1 : {"enabled": false}
       }
