@@ -21,7 +21,6 @@ Function init()
   m.ChannelCategoryGrid.observeField("itemFocused", "onItemFocused")
   m.ChannelCategoryGrid.observeField("itemSelected", "onItemSelected")
 
-  m.contentLoadedAndFocused = false
   m.top.screenLevel = m.constants.ui.screenLevels.channelCategoryGridScreen
 
   if m.constants.deviceInfo.scaledUi = true then
@@ -41,6 +40,7 @@ End Function
 
 
 Function onThemeChange()
+  tubiLog("ChannelGridScreen.onThemeChange")
   m.ChannelCategoryGrid.focusBitmapBlendColor = m.global.theme.focused
 End Function
 
@@ -69,6 +69,7 @@ End Function
 ' to see if the content should be refreshed. If it should, then validUntil will be set to 0 so the next time this screen
 ' is on screen, then the content will be reloaded.
 Function checkForContentAndRefresh(bContentEmpty, sCategoryID)
+  tubiLog("ChannelGridScreen.checkForContentAndRefresh")
   '//Go thru the content and see if category associated with sCategoryID should be hidden or not
   if m.top.content <> invalid
     bRefresh = true
@@ -99,6 +100,7 @@ End Function
 
 
 Function onSetCallOfAction()
+  tubiLog("ChannelGridScreen.onSetCallOfAction")
   sPreviousPage = m.top.callingPage
   sCallToAction = ""
   if sPreviousPage <> invalid AND Len(sPreviousPage) > 0
@@ -120,6 +122,7 @@ End Function
 
 
 Function onEnableChange()
+  tubiLog("ChannelGridScreen.onEnableChange")
   if m.top.enabled = true
     fade(m.NavSection, "in", 0.3)
   else
@@ -144,6 +147,7 @@ End Function
 
 
 Function onLoadContent()
+  tubiLog("ChannelGridScreen.onLoadContent")
   if m.top.content <> invalid
     items = m.top.content
     m.contentLoadedAndFocused = false

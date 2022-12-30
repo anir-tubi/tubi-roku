@@ -4,6 +4,7 @@
 '                       to let the user know what page they will go to when they click the back button
 ' @sendNavigationLoadEvents: boolean, when the page is loaded, do the navigation to page, pageload events needs to be sent
 Function showChannelListScreen(constants, sPageSource, sendNavigationLoadEvents = true)
+  tubiLog("ChannelGridScreenHelers.showChannelListScreen")
   channelListScreen = getFromScreenCache(m.constants.ui.screenIds.channelListScreen)
   if channelListScreen <> invalid
     if sendNavigationLoadEvents = false
@@ -22,6 +23,7 @@ End Function
 ' @sPageSource: string, What page is calling this function? This string is what is displayed on the top of the page
 '                       to let the user know what page they will go to when they click the back button
 Function showCategoryListScreen(constants, sPageSource, sendNavigationLoadEvents = true)
+  tubiLog("ChannelGridScreenHelers.showCategoryListScreen")
   categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
   if categoryListScreen <> invalid
     if sendNavigationLoadEvents = false
@@ -43,6 +45,7 @@ End Function
 ' @bChannel: boolean, Is this a grid page displaying channels? If not, it will be a grid page displaying categories
 ' @screenLevel: integer, Should this screen have a different screenlevel other than its default one?
 Function showChannelGridScreen(constants, sPageSource, bChannel = true, screenLevel = -1, sendNavigationLoadEvents = true)
+  tubiLog("ChannelGridScreenHelers.showChannelGridScreen")
   gridScreen = CreateObject("roSGNode", "ChannelGridScreen")
 
   gridScreenId = constants.ui.screenIds.channelListScreen
@@ -118,6 +121,7 @@ End Function
 
 
 Function refreshGridScreen(gridScreen)
+  tubiLog("ChannelGridScreenHelers.refreshGridScreen")
   m.refreshingChannelGridCache = true
   gridScreen.isLoading = true
   getGridDataFromServer(gridScreen)
@@ -125,6 +129,7 @@ End Function
 
 
 Function onRefreshGridSignal(msg)
+  tubiLog("ChannelGridScreenHelers.onRefreshGridSignal")
   gridScreen = msg.getRoSGNode()
   refreshGridScreen(gridScreen)
 End Function

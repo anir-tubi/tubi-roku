@@ -38,6 +38,7 @@ Function init()
 
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
 
+
   BackLabel = m.top.findNode("callToAction")
   if m.constants.deviceInfo.uiResolution <> "FHD"
     '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
