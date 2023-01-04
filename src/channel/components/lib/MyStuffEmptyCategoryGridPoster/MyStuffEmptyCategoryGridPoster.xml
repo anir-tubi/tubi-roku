@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="MyStuffEmptyCategoryGridPoster" extends="Rectangle" >
+  <interface>
+    <!-- INPUTS -->
+
+      <!-- The title of the poster -->
+      <field id="title" alias="Title.text" />
+      <!-- The subtitle of the poster -->
+      <field id="subtitle" alias="Subtitle.text" />
+      <!-- The uri of the poster's icon -->
+      <field id="iconUri" alias="icon.uri" />
+  </interface>
+
+  <children>
+    <Group>
+    <LayoutGroup
+      id="myStuffLayout"
+      layoutDirection="vert"
+      horizAlignment="center"
+      itemSpacings="[22]">
+      <Poster
+        id="Icon"
+        width="84"
+        height="84"
+        />
+      <Label
+        id="Title"
+        color="0xFFFFFFFF"
+        height="20"
+        vertAlign="center">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="34" />
+        </Label>
+      <Label
+        id="Subtitle"
+        color="0xFFFFFFFF"
+        wrap="true"
+        ellipsizeOnBoundary="true"
+        width="600"
+        numLines="2"
+        height="64"
+        vertAlign="center"
+        horizAlign="center">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="24" />
+        </Label>
+    </LayoutGroup>
+    </Group>
+  </children>
+</component>

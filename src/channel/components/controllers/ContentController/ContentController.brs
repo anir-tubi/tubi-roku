@@ -724,6 +724,7 @@ Function onHistoryQueueChange(categoryId)
     m.authTask.functionName = "execInitializeUserData"
     m.authTask.control = "RUN"
 
+    setContentToRefresh(m.constants.ui.screenIds.myStuffScreen) '//when history changes, then indicate that myStuff should reload
     setDirtyUserCategories(categoryId)
   end if
 End Function
@@ -1273,6 +1274,7 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
+  setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
   setContentToRefresh(m.constants.ui.screenIds.tournamentScreen)
 
   searchScreen = getScreenFromStackById(m.constants.ui.screenIds.searchScreen)

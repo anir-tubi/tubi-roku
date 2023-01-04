@@ -767,6 +767,21 @@ Function onRegistrationProcessCompletedOnDetailsScreen()
 End Function
 
 
+Function onRegistrationProcessCompletedOnMyStuffScreen()
+  tubiLog("SignInHelpers.onRegistrationProcessCompletedOnMyStuffScreen")
+  setContentToRefreshAllPersonalizedScreens(true)
+
+  currentScreen = popScreenAfterSignInProcess()
+  m.spinner.visible = false
+
+  if currentScreen <> invalid and currentScreen.getSubtype() = "MyStuffScreen"
+    currentScreen.signedIn = true
+    currentScreen.setfocus(true)
+    refreshContentSignalForMyStuffScreen(currentScreen)
+  end if
+End Function
+
+
 ' onParentalControlAfterSignIn - occurs after activation success via Parental Control
 Function onParentalControlAfterSignIn()
   tubiLog("SignInHelpers.onParentalControlAfterSignIn")

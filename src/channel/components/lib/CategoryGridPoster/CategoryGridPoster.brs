@@ -2,10 +2,14 @@ Function init()
   m._ = rodash()
 
   m.poster = m.top.findNode("Poster")
+  m.InnerTitle = m.top.findNode("InnerTitle")
+  m.InnerLayout = m.top.findNode("InnerLayout")
+  m.TimeRemaining = m.top.findNode("TimeRemaining")
   m.LinearPoster = m.top.findNode("LinearPoster")
 
   m.badgeGroup = m.top.findNode("badgeGroup")
   m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
+  m.DurationBar = m.top.findNode("DurationBar")
   m.top.observeField("itemContent", "onContentChange")
   m.resumeMargin = 4  'inset of resume bar
   m.title = m.top.findNode("Title")
@@ -39,9 +43,11 @@ Function init()
   m.gridItemTypes = {
     portrait: "portrait"
     landscape: "landscape"
+    landscapeLarge: "landscapeLarge"
     linear: "linear"
     vitg: "vitg"
     historySignedOutUser: "continue_watching_signed_out_user"
+    emptyContainer: "emptyContainer"
   }
 
   di = CreateObject("roDeviceInfo")
@@ -71,27 +77,40 @@ Function onContentChange(msg)
   ' set some defaults
   m.LinearPoster.visible = false
   m.title.visible = false
+  m.InnerTitle.visible = false
+  m.TimeRemaining.visible = false
   m.LinearTitle.visible = false
   m.LinearSubTitle.visible = false
+  m.resumeMargin = 6
 
   gradientPoster =  m.poster.findNode("gradientPoster")
   if gradientPoster <> invalid
     m.poster.removeChild(gradientPoster)
-    liveIconGroup = m.poster.findNode("liveIconGroup")
-    if liveIconGroup <> invalid
-      gradientPoster.removeChild(liveIconGroup)
-    end if
   end if
+
+  liveIconGroup =  m.poster.findNode("liveIconGroup")
+  if liveIconGroup <> invalid
+    liveIconGroup.removeChild(liveIconGroup)
+  end if
+
   m.poster.opacity = 1
 
   ' next line shouldn't be necessary but is added in order to try and quell crashes as reported by roku crash logs
   if m.resumeProgressBar = invalid then m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
-  m.resumeProgressBar.visible = false
+  if m.DurationBar  = invalid then m.DurationBar  = m.top.findNode("m.DurationBar")
 
-  ' settings continueWatchingLayout Group visibility false to avoid image caching issue.
+  m.resumeProgressBar.visible = false
+  m.DurationBar.visible = false
+
+  ' settings continueWatchingLayout and myStuffEmptyLayout Group visibility false to avoid image caching issue.
   if m.continueWatchingLayout <> invalid
     m.continueWatchingLayout.visible = false
   end if
+
+  if m.myStuffEmptyLayout <> invalid
+    m.myStuffEmptyLayout.visible = false
+  end if
+
   ' settings poster visibility true to avoid image caching issue. if it is not set to true, seeing some blank posters
   m.poster.visible = true
 
@@ -130,7 +149,16 @@ Function onContentChange(msg)
         setUpVitg()
       else if categoryContent.gridItemType = m.gridItemTypes.historySignedOutUser
         setUpSignedOutContinueWatching()
+      else if categoryContent.gridItemType = m.gridItemTypes.emptyContainer
+        setUpEmptyContainer()
       else if categoryContent.id = "continue_watching"
+        if itemContent.gridItemType = m.gridItemTypes.landscapeLarge
+          m.InnerTitle.text = itemContent.title
+          m.InnerTitle.visible = true
+          setInnerGradient()
+          m.TimeRemaining.text = ""
+          m.resumeMargin = 24
+        end if
         drawHistoryProgressBar()
       'itemContent.gridItemType is not an empty string on the home screen,
       'and we want this to set Live logo and text just on the search screen.
@@ -141,6 +169,13 @@ Function onContentChange(msg)
       m.poster.uri = itemContent.hdgridposterurl
     end if
   end if
+End Function
+
+
+' Make sure the assets within the inner part of the poster like the resume Progress bar 
+' is located towards the bottom of the poster based on the current dimensions of the poster.
+Function moveInnerAssets() 
+  m.InnerLayout.translation = [m.resumeMargin, m.top.height - m.resumeProgressBar.height - m.resumeMargin - m.InnerTitle.height - m.TimeRemaining.height - (m.InnerLayout.itemSpacings[0] * 2) ]
 End Function
 
 
@@ -156,6 +191,8 @@ Function drawHistoryProgressBar()
 
   if m.top.itemContent <> invalid AND history <> invalid AND history.nowPos <> invalid AND history.nowPos <> 0 AND m.top.itemContent.length <> invalid AND m.top.itemContent.length <> 0 then
     drawProgressBar(history.nowPos, m.top.itemContent.length)
+  else
+    moveInnerAssets()
   end if
 End Function
 
@@ -169,9 +206,17 @@ Function drawProgressBar(nowPos, duration)
   if percentage > 1.0 then percentage = 1.0
   if percentage < 0.0 then percentage = 0.0
   m.resumeProgressBar.width = (m.top.width - (2 * m.resumeMargin)) * percentage
-  m.resumeProgressBar.translation = [m.resumeMargin, m.top.height - m.resumeProgressBar.height - m.resumeMargin]
   m.resumeProgressBar.color = m.global.theme.focused
   m.resumeProgressBar.visible = true
+  m.DurationBar.width = (m.top.width - (2 * m.resumeMargin))
+  m.DurationBar.visible = true
+
+  if m.top.itemContent.gridItemType = m.gridItemTypes.landscapeLarge
+    m.TimeRemaining.visible = true
+    m.TimeRemaining.text = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(duration - nowPos))})
+  end if
+
+  moveInnerAssets()
 End Function
 
 
@@ -397,9 +442,19 @@ Function setUpSignedOutContinueWatching()
 End Function
 
 
+Function setUpEmptyContainer()
+  m.myStuffEmptyLayout = m.top.createChild("MyStuffEmptyCategoryGridPoster")
+  m.myStuffEmptyLayout.translation = [(m.top.width-m.myStuffEmptyLayout.width)/2, 87]
+  m.myStuffEmptyLayout.title = m.top.itemContent.title
+  m.myStuffEmptyLayout.subtitle = m.top.itemContent.description
+  m.myStuffEmptyLayout.iconUri = m.top.itemContent.iconUrl
+  m.myStuffEmptyLayout.visible = true
+End Function
+
+
 Function setLiveIconAndText()
   tubiLog("CategoryGridPoster.setLiveIconAndText")
-  if m.poster <>invalid
+  if m.poster <> invalid
     gradientPoster = m.poster.createChild("Poster")
     gradientPoster.width = m.poster.width
     gradientPoster.height = m.poster.height
@@ -409,6 +464,19 @@ Function setLiveIconAndText()
     livePoster.id = "liveIconGroup"
     livePoster.translation = [59, 225]
     livePoster.shouldAnimate = false
+  end if
+End Function
+
+
+Function setInnerGradient()
+  tubiLog("CategoryGridPoster.setInnerGradient")
+  if m.poster <> invalid
+    gradientPoster = m.poster.createChild("Poster")
+    m.poster.insertChild(gradientPoster, 0)
+    gradientPoster.width = m.poster.width
+    gradientPoster.height = m.poster.height
+    gradientPoster.uri = "pkg:/images/categoryGridPosterInnerGradient.png"
+    gradientPoster.id = "gradientPoster"
   end if
 End Function
 

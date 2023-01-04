@@ -21,6 +21,7 @@ Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
     searchReq: cmsApi_getSearchRequest
     searchReqInfo: cmsApi_getSearchRequestInfo
     createHomeScreenBatchReqInfo: cmsApi_createHomeScreenBatchRequestInfo
+    createMyStuffScreenBatchReqInfo: cmsApi_createMyStuffScreenBatchReqInfo
     createHomeScreenBatchRequestInfoForContainers: cmsApi_createHomeScreenBatchRequestInfoForContainers
 
     ' private
@@ -220,7 +221,8 @@ End Function
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
 '                 see request.brs for more info
-Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOptions = {})
+' @imageParamTypes: Array, What image types/sizes should be requested from the backend. If none are passed, then a default set of types will be used. 
+Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOptions = {}, imageParamTypes = invalid)
   options = m.getCommonOptions()
   params = options.params
 
@@ -232,7 +234,7 @@ Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOpti
   params["include_sponsorships"] = true
   params["contents_limit"] = m.constants.performance.categoryGridList.finalBlockSize
 
-  if passedOptions.params <> invalid AND isNonEmptyString(passedOptions.params.content_mode)
+  if passedOptions.params <> invalid AND isNonEmptyString(passedOptions.params.content_mode) = true
     params["content_mode"] = passedOptions.params.content_mode
   end if
 
@@ -240,12 +242,15 @@ Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOpti
   if isString(utmCampaignConfig) = true then
     params["utm_campaign_config"] = utmCampaignConfig
   end if
+  
+  if imageParamTypes = invalid
+    imageParamTypes = [
+      "poster"
+      "landscape"
+      "vitg"
+    ]
+  end if
 
-  imageParamTypes = [
-    "poster"
-    "landscape"
-    "vitg"
-  ]
   params = m.setImageParams(imageParamTypes, params)
 
   headers = options.headers
@@ -316,11 +321,12 @@ End Function
 ' https://docs.google.com/document/d/1T9qL5otwgjIAEW4pPwvKiq0PxIYEK-ExKrFBYRkx6BY
 '
 ' @imageTypes, array - an array of strings corresponding to which types of images to request from Tupian
-'                      Accepted values are "poster", "landscape", "vitg"
+'                      Accepted values are "poster", "landscape", "landscapeLarge", "vitg"
 ' @existingParams: assocArray, any parameters that have already been defined that need to be added to
 Function cmsApi_setImageParams(imageTypes, existingParams = {})
   posterSize = m.constants.ui.imageSizes.poster
   landscapeSize = m.constants.ui.imageSizes.landscape
+  landscapeLargeSize = m.constants.ui.imageSizes.landscapeLarge
   vitgSize = m.constants.ui.imageSizes.vitg
 
   for each imageType in imageTypes
@@ -329,6 +335,8 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {})
       existingParams["images[poster_tb]"] = "w" + posterSize[0].ToStr() + "h" + posterSize[1].ToStr() + "_poster"
     else if imageType = "landscape"
       existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_landscape"
+    else if imageType = "landscapeLarge"
+      existingParams["images[landscapeLarge_tb]"] = "w" + landscapeLargeSize[0].ToStr() + "h" + landscapeLargeSize[1].ToStr() + "_landscape"
     else if imageType = "vitg"
       existingParams["images[vitg_tb]"] = "w" + vitgSize[0].ToStr() + "h" + vitgSize[1].ToStr() + "_hero"
     end if
@@ -398,7 +406,7 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
 
           categoryId = m.getFullCategoryId(category)
 
-          if categoryId <> invalid AND type(categoryId) = "roString"
+          if isNonEmptyString(categoryId) = true
             tubiLog("CategoryGridList.fetch whole: Asking GeneralTask for " + categoryId)
 
             options = {
@@ -436,6 +444,57 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
 
   return requests
 
+End Function
+
+
+' cmsApi_createMyStuffScreenBatchReqInfo
+' @sideEffect: In addition to creating the batch request, this function will also set the state of the categories within the passed content 
+' param to "loading"
+'
+' @content: roSGNode, A parent ContentNode containing a child node for each container to be fetched. 
+'   Each child node should be of a CategoryContentNode type, with the ID assigned to the desired constant that maps 
+'   to a container id on the backend: i.e. constants.ui.categoryIds.queue 
+' @bKidsMode : boolean
+' @isSignedInUser: boolean, value based on user loggedIn or not
+'
+' returns batch requests
+Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSignedInUser = false)
+
+  reqName = m.constants.reqNames.getMyStuffContainers
+
+  requests = []
+  'Create requests for each category in the window
+  for i = 0 to content.getChildCount() - 1
+    category = content.getChild(i)
+    if category <> invalid
+      categoryReqInfo = invalid
+
+      if category.state = "partial" OR category.state = "none"
+        categoryId = m.getFullCategoryId(category)
+
+        if isNonEmptyString(categoryId) = true
+          options = {
+            params: {}
+          }
+          imageParamTypes = [
+            "poster"
+            "landscapeLarge"
+          ]
+          categoryReqInfo = m.categoryReqInfo(categoryId, bKidsMode, options, imageParamTypes)  
+          categoryReqInfo.requestType = reqName
+          categoryReqInfo.responseType = "node"
+          categoryReqInfo.isSignedInUser = isSignedInUser
+        end if
+      end if
+
+      if categoryReqInfo <> invalid then
+        requests.push(categoryReqInfo)
+        category.state = "loading"
+      end if
+    end if
+  end for
+
+  return requests
 End Function
 
 

@@ -51,7 +51,7 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
 
   orientation = ""
   bFullData = false
-  contentMode = "homeScreen"
+  contentMode = m.constants.ui.contentMode.homescreen
   isSignedInUser = false
   screenId = m.constants.ui.screenIds.homeScreen
 

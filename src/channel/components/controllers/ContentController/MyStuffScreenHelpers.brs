@@ -1,0 +1,201 @@
+' Show the "my stuff" screen
+Function showMyStuffScreen()
+  tubiLog("MyStuffScreenHelpers.showMyStuffScreen")
+  screen = getFromScreenCache(m.constants.ui.screenIds.myStuffScreen)
+  bLoadData = true
+  bLoggedInUser = isLoggedInUser()
+
+  if screen <> invalid
+    bLoadData = false
+    screen.isLoading = false
+    showHideSpinner(false)
+  else
+
+    screen = CreateObject("roSGNode", "MyStuffScreen")
+    screen.trackingLoadStartTime = UpTime(0)
+    screen.observeFieldScoped("contentSelected", "onMyStuffContentSelected")
+    screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+    screen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
+    screen.observeFieldScoped("contentToPlay", "onContentToPlay")
+    screen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
+    screen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelectedOnMyStuffScreen")
+    screen.observeFieldScoped("refreshContent", "onRefreshContentSignalForMyStuffScreen")
+
+    if bLoggedInUser = true
+      screen.isLoading = true
+      showHideSpinner(true)
+    else
+      bLoadData = false
+    end if
+  end if
+
+  setInScreenCache(screen)
+
+  screen.trackingPageInfo = {
+    pageType: "for_you_page"
+    pageValues: {}
+  }
+
+  displayDefaultBackground()
+  screen.signedIn = bLoggedInUser '//display the guest or signed-in user profile experience
+  
+  ' make queue API request only if bLoadData is set to true
+  if bLoadData = true
+    fetchMyStuffCategoryDetails(screen)
+  else
+    showHideSpinner(false)
+  end if
+  
+  ' don't send page load tracking until screen details content is returned from the API
+  pushScreen(screen, true, false)
+End Function
+  
+
+' Get the content for the MyStuff Screen: continue watching and queue containers
+' @param screen, roSGNode - the MyStuff Screen
+Function fetchMyStuffCategoryDetails(screen)
+  tubiLog("MyStuffScreenHelpers.fetchMyStuffCategoryDetails")
+
+  isKidsMode = shouldKidsModeBeSentToServer()
+
+  '//Set the categories of the screen. This is static so can be hardcoded
+  content = CreateObject("roSGNode", "CategoryContentNode")
+    
+  '//Add the Continue Watching container
+  contentNode = CreateObject("roSGNode", "CategoryContentNode")
+  contentNode.id = m.constants.ui.categoryIds.history
+  content.appendChild(contentNode)
+
+  '//Add the MyList container
+  contentNode = CreateObject("roSGNode", "CategoryContentNode")
+  contentNode.id = m.constants.ui.categoryIds.queue
+  content.appendChild(contentNode)
+  isSignedInUser = isLoggedInUser()
+
+  batchRequests = m.cmsApi.createMyStuffScreenBatchReqInfo(content, isKidsMode, isSignedInUser)
+  if batchRequests <> invalid
+    m.makeBatchRequest({
+      requests: batchRequests
+      responseType: "node"
+      isSignedInUser: isSignedInUser
+      successCallback: onMyStuffBatchResponse
+    })
+  end if
+End Function
+
+
+Function onMyStuffBatchResponse(response)
+  tubiLog("MyStuffScreenHelpers.onMyStuffBatchResponse")
+  screenID = m.constants.ui.screenIds.myStuffScreen
+  screen = getFromScreenCache(screenID)
+  if screen <> invalid
+    rowItemFocused = invalid
+    oldFocusedContentID = ""
+    if response <> invalid
+      nValidUntil = determineValidUntilDurationBasedOnChildren(response)
+      response.addField("validUntil", "integer", false)
+      cursorPosition = screen.cursorPosition
+      if cursorPosition <> invalid AND cursorPosition[0] >= 0 AND cursorPosition[1] >= 0
+        rowItemFocused = screen.cursorPosition
+      end if
+      if screen.contentFocused <> invalid
+        oldFocusedContentID = screen.contentFocused.id
+      end if
+      response.validUntil = nValidUntil
+    end if
+
+    screen.content = response
+    screen.contentUpdated = true
+
+    if rowItemFocused <> invalid
+      '//try to focus on the previous focused item before the content was reloaded.
+      screen.jumpToRowItemByIdAndIndex  = {
+        id: oldFocusedContentID, 
+        index: rowItemFocused
+      }
+    end if
+    
+    screen.isLoading = false
+    showHideSpinner(false)
+  
+    '//Report the page_load analytics
+    loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
+    currentScreen = getCurrentScreen()
+
+    if currentScreen <> invalid AND currentScreen.isSubType("MyStuffScreen") = true
+      screenTrackingLoad(screen.trackingPageInfo, loadTime)
+    end if
+  end if
+End Function
+
+
+' Determine the valid until duration baed on the passed content's container children. 
+' The shortest duration of the containers should be chosen for the duration of the parent.
+' @param content: node - the content node that has children with validUntil values.
+Function determineValidUntilDurationBasedOnChildren(content)
+  nValidReturn = 0
+  shortestValidDuration = invalid
+
+  if content <> invalid
+    for i = 0 to content.getChildCount() - 1
+      category = content.getChild(i)
+
+      '//Find out the shortest validUntil duration to set this to the valudUntil property of the entire array of categories 
+      if shortestValidDuration = invalid
+        shortestValidDuration = category.validUntil
+      else if category.validUntil <> invalid
+        if category.validUntil < shortestValidDuration
+          shortestValidDuration = category.validUntil
+        end if
+      end if
+    end for
+
+    '//Set the validUntil property of the array of categories
+    if shortestValidDuration <> invalid
+      nValidReturn = shortestValidDuration
+    else
+      nValidReturn = Uptime(0) + m.constants.cacheTimes.category
+    end if
+  end if
+
+  return nValidReturn
+End function
+
+
+Function onSignUpButtonSelectedOnMyStuffScreen(msg)
+  tubiLog("MyStuffScreenHelpers.onSignUpButtonSelectedOnMyStuffScreen")
+  setComponentInteractionEventForSignUp(msg.getRoSGNode())
+  startSignIn(onRegistrationProcessCompletedOnMyStuffScreen)
+End function
+
+
+'myStuff screen has told us that the content is out of cache window, so refresh
+Function onRefreshContentSignalForMyStuffScreen(msg)
+  tubiLog("MyStuffScreenHelpers.onRefreshContentSignalForMyStuffScreen")
+  screen = msg.getRoSGNode()
+  refreshContentSignalForMyStuffScreen(screen)
+End Function
+
+
+' @param screen, roSGNode - the MyStuff Screen
+Function refreshContentSignalForMyStuffScreen(screen)
+  tubiLog("MyStuffScreenHelpers.refreshContentSignalForMyStuffScreen")
+  screen.isLoading = true
+  showHideSpinner(true)
+  screen.content = invalid
+  screen.contentUpdated = true
+  fetchMyStuffCategoryDetails(screen)
+End Function
+
+
+' Show the detail screen for the selected content
+Function onMyStuffContentSelected(msg)
+  tubiLog("MyStuffScreenHelpers.onMyStuffContentSelected")
+  content = msg.getData()
+  if content.type <> m.constants.ui.contentTypes.emptyContainer
+    '//NOTE: If the content type is empty, then it is most likely the user has no items in a myList row  (i.e. continue watching, myList)
+    ' and the user attempted to click on an empty row. 
+    ' Nothing show happen.
+    showDetailScreen(content, true)
+  end if
+End Function

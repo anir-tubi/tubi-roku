@@ -396,7 +396,7 @@ End Function
 
 
 Function onCategoryResponseInBatch(msg) As Void
-  tubiLog("CategoryGridList.categoryResponseInBatch")
+  tubiLog("CategoryGridList.categoryResponseInBatch") 
 
   response = msg.getData()
   shouldInformHomeScreen = false

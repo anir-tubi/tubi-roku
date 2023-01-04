@@ -8,7 +8,7 @@ Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoad
   categoryDetailsScreen.observeFieldScoped("focusedChild", "onCategoryDetailsScreenFocusChanged")
   categoryDetailsScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   categoryDetailsScreen.observeFieldScoped("refreshCategoryDetailsScreen", "onRefreshCategoryDetailsSignal")
-  categoryDetailsScreen.observeFieldScoped("signInRequired", "onSignInRequiredModal")
+  categoryDetailsScreen.observeFieldScoped("signInRequired", "onSignInRequired")
   categoryDetailsScreen.observeFieldScoped("backButtonPressed", "onCategoryDetailsScreenBackPressed")
   categoryDetailsScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
   categoryDetailsScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
@@ -42,9 +42,9 @@ Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoad
 End Function
 
 
-Function onSignInRequiredModal(msg)
+Function onSignInRequired(msg)
 
-  tubiLog("CategoryDetailsScreenHelpers.onSignInRequiredModal")
+  tubiLog("CategoryDetailsScreenHelpers.onSignInRequired")
   screen = msg.getRoSGNode()
 
   if screen <> invalid AND screen.content = invalid

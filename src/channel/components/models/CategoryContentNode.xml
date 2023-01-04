@@ -29,7 +29,7 @@
     <!-- A logo that will be displayed for channels -->
     <field id="logoUri" type="string" />
 
-    <!-- A thumbnail that will be displayed as the background of channel and catrgory containers -->
+    <!-- A thumbnail that will be displayed as the background of channel and category containers -->
     <field id="thumbnail" type="string" />
 
     <!-- special categories are "Recommended", "Continue Watching", and "Queue" -->

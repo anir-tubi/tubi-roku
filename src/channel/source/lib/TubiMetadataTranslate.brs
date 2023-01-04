@@ -13,6 +13,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     translateCategoriesListScreen: tubiMetadataTranslate_translateCategoriesListScreen
     translateEPGChannelIds: tubiMetadataTranslate_translateEPGChannelIds
     translateEPGPrograms: tubiMetadataTranslate_translateEPGPrograms
+    translateEmptyMyStuffContainer: tubiMetadataTranslate_translateEmptyMyStuffContainer
     translateTournamentScreen: tubiMetadataTranslate_translateTournamentScreen
     upNextTranslateRecursiveWrapper: tubiMetadataTranslate_upNextTranslateRecursiveWrapper
     setDescriptorCodeAndDescription: tubiMetadataTranslate_setDescriptorCodeAndDescription
@@ -32,6 +33,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     buildCategoryAAWithPrepend: tubiMetadataTranslate_buildCategoryAAWithPrepend
     buildCategoryParentInfo: tubiMetadataTranslate_buildCategoryParentInfo
     buildCategoryChildrenInfo: tubiMetadataTranslate_buildCategoryChildrenInfo
+    buildEmptyMyStuffCategoryAA: tubiMetadataTranslate_buildEmptyMyStuffCategoryAA
     buildContinueWatchingSignedOutUserCategoryAA: tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA
     generateChannelPosterUrl: tubiMetadataTranslate_generateChannelPosterUrl
     fetchedAtTimestamp: tubiMetadataTranslate_fetchedAtTimestamp
@@ -78,6 +80,10 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
       sThumbnailURL = canvasImages.poster_tb[0]
     else if contentFromServer.posterarts <> invalid AND isNonEmptyArray(contentFromServer.posterarts) = true
       sThumbnailURL = contentFromServer.posterarts[0]
+    end if
+  else if gridType = gridItemTypes.landscapeLarge
+    if canvasImages <> invalid AND isNonEmptyArray(canvasImages.landscapeLarge_tb) = true AND isNonEmptyString(canvasImages.landscapeLarge_tb[0]) = true
+      sThumbnailURL = canvasImages.landscapeLarge_tb[0]
     end if
   else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle
     if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
@@ -157,9 +163,12 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.id <> invalid then translatedContent.id = contentFromServer.id
   typeVar = "type"
   if contentFromServer[typeVar] <> invalid
-    sType = m.translateBackendTypeToClientSideType(contentFromServer[typeVar])
+    sType = contentFromServer[typeVar]
+    if contentFromServer[typeVar] <> m.constants.ui.contentTypes.emptyContainer
+      sType = m.translateBackendTypeToClientSideType(contentFromServer[typeVar])
+    end if
     translatedContent[typeVar] = sType
-
+    
     if sType = m.contentTypes.series
       ' prefix "0" to series
       if translatedContent.id <> "" then translatedContent.id = "0" + translatedContent.id
@@ -907,10 +916,32 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     ' but any single category request should be considered fully loaded
     categoryMetadata.state = "loaded"
     translated.update(categoryMetadata, true)
-    nodeCount = 1 + translated.getChildCount()
+    nodeCount = 1 + translated.getChildCount() 
   end if
 
   tubiLog("TranslateMetadata converted " + stri(nodeCount) + " nodes")
+  return translated
+End Function
+
+
+''''''''''''''''''''
+' translateEmptyMyStuffContainer
+'
+' @contentToTranslate: assocArray, the AA resulting from JSON parsing the /container API response
+Function tubiMetadataTranslate_translateEmptyMyStuffContainer(contentToTranslate) As Object
+  tubiLog("TubiMetadataTranslate.translateEmptyMyStuffContainer")
+  translated = CreateObject("roSGNode", "CategoryContentNode")
+  container = contentToTranslate.container
+
+  categoryMetadata = m.buildEmptyMyStuffCategoryAA(container)
+
+  if type(categoryMetadata) = "roAssociativeArray"
+    ' buildEmptyMyStuffCategoryAA always returns AA.state = "partial",
+    ' but any single category request should be considered fully loaded
+    categoryMetadata.state = "loaded"
+    translated.update(categoryMetadata, true)
+  end if
+
   return translated
 End Function
 
@@ -1179,7 +1210,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           else if type(fullChild.video_resources) = "roArray" AND fullChild.video_resources.count() > 0
             hasVideoResources = true
           end if
-
+          
           sContentType = m.translateBackendTypeToClientSideType(fullChild.type)
           childAA = {
             id: fullChild.id
@@ -1465,6 +1496,65 @@ Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(cont
 End Function
 
 
+''''''''''''''''''''''
+' buildEmptyMyStuffCategoryAA
+'
+' @contents: assocArray, content meta data representing a container as returned by the tensor/containers API
+Function tubiMetadataTranslate_buildEmptyMyStuffCategoryAA(container)
+  updateMetadata = {}
+  if container <> invalid
+    updateMetadata = {
+      id: container.id
+      slug: container.slug
+      title: container.title
+      description: container.description
+      totalCount: 0
+      offset: m.constants.performance.categoryGridList.initialBlockSize
+      validUntil: UpTime(0) + m.constants.cacheTimes.content
+      json: ""
+      state: "full"
+      gridItemType: m.constants.ui.gridItemTypes.emptyContainer
+      type: m.contentTypes.emptyContainer
+    }
+
+    jsonAA = {}
+
+    sTitle = "" 
+    sDescription = ""
+    sIconURL = ""
+
+    if container.id = m.constants.ui.categoryIds.history
+      sTitle = getTranslation("metadata_myStuff_empty_continueWatching_title")
+      sDescription = getTranslation("metadata_myStuff_empty_continueWatching_description")
+      sIconURL = m.constants.ui.uris.myStuffContinueWatchingIcon
+    else if container.id = m.constants.ui.categoryIds.queue
+      sTitle = getTranslation("metadata_myStuff_empty_myList_title")
+      sDescription = getTranslation("metadata_myStuff_empty_myList_description")
+      sIconURL = m.constants.ui.uris.myStuffMyListIcon
+    end if
+
+    childAA = {
+      id: m.constants.ui.contentTypes.emptyContainer
+      subtype: "EmptyMyStuffContentNode"
+      type: m.constants.ui.contentTypes.emptyContainer
+      title: sTitle
+      description: sDescription
+      iconUrl: sIconURL
+      gridItemType: m.constants.ui.gridItemTypes.emptyContainer
+    }
+    childAA.hdgridposterurl = m.constants.ui.uris.emptyContainerMyStuffBackground
+
+    updateMetadata.children = CreateObject("roArray", 1, false)
+    updateMetadata.children.push(childAA)
+    jsonAA[childAA.id] = childAA
+
+    updateMetadata.json = FormatJSON(jsonAA)
+
+  end if
+
+  return updateMetadata
+End Function
+
 ' add sponsorship info, if it exists, to the metadata
 ' @metadata: object, The metadata associative array or CategoryContentNode that needs to add the sponsorship info
 ' @sponsorshipInfo: assocArray, The associative array that contains the raw data of the sponsor info
@@ -1518,7 +1608,9 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
     end if
   else if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
-  else if (container.id = constants.ui.categoryIds.fifawc or container.id = constants.ui.categoryIds.upcomings or container.id = constants.ui.categoryIds.replays) and orientation <> constants.ui.gridItemTypes.portrait
+  else if orientation = gridItemTypes.landscapeLarge
+    gridItemType = gridItemTypes.landscapeLarge
+  else if (container.id = constants.ui.categoryIds.fifawc OR container.id = constants.ui.categoryIds.upcomings OR container.id = constants.ui.categoryIds.replays) AND orientation <> constants.ui.gridItemTypes.portrait
     gridItemType = constants.ui.gridItemTypes.landscape
   else if container.id = constants.ui.categoryIds.featured AND orientation <> gridItemTypes.portrait
     ' `orientation <> gridItemTypes.portrait` is required as the search screen container.id is featured but uses portrait imagery

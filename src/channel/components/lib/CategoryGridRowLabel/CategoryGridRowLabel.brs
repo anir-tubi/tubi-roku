@@ -115,7 +115,7 @@ Function onContentChange()
     end if
 
     drawItemCount()
-    if item.gridItemType = "linear" or item.gridItemType = "continue_watching_signed_out_user"
+    if item.gridItemType = "linear" OR item.gridItemType = "continue_watching_signed_out_user"
       m.CategoryCount.visible = false
     else
       m.CategoryCount.visible = true

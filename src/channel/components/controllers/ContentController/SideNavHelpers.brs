@@ -257,14 +257,20 @@ Function onSideNavItemSelected()
         showEspanolScreen()
         bNewScreenCalledSuccess = true
       end if
-    else if itemSelectedId = m.constants.ui.sideNavIds.mylist
+    else if itemSelectedId = m.constants.ui.sideNavIds.myList
       if isKidsUIOn() <> true
         setUiMode(m.constants.ui.modes.standard)
       end if
-
-      contentNode = CreateObject("roSGNode", "CategoryContentNode")
-      contentNode.id = m.constants.ui.categoryIds.queue
-      showCategoryDetailsScreen(contentNode, "MENU")
+      
+      if getExperimentResource("roku_my_stuff", "roku_my_stuff_v1", false).enabled = true
+        '//Display the MyStuff Screen while also sending the experiment exposure event upon the user selecting the myStuff or MyList screen
+        showMyStuffScreen()
+      else
+        contentNode = CreateObject("roSGNode", "CategoryContentNode")
+        contentNode.id = m.constants.ui.categoryIds.queue
+        showCategoryDetailsScreen(contentNode, "MENU")
+      end if
+      
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.settings
       if isKidsUIOn() <> true
@@ -440,6 +446,9 @@ Function displayNavMenu(shouldTrackComponentInteraction = true)
   bSideNavOpened = m.SideNav.opened
   m.SideNav.setFocus(true)
   if bSideNavOpened = false
+    '//Send exposure event when the side nav has been opened.
+    getExperimentResource("roku_my_stuff", "roku_my_stuff_v1", true)
+
     openSideNav()
     if m.nOriginalSideNavX = invalid
       m.nOriginalSideNavX = m.SideNav.translation[0]

@@ -707,6 +707,9 @@ Function tubiTracking_getOneOfs()
     content_mode: "CONTENT_MODE_UNKNOWN"  'filler because empty fields are removed
   }
 
+  for_you_page = {
+  }
+
   news_browse_page = {
     i: "i"  'filler because empty fields are removed
   }
@@ -821,6 +824,7 @@ Function tubiTracking_getOneOfs()
     current_page: current_page
     static_page: static_page
     home_page: home_page
+    for_you_page: for_you_page
     category_page: category_page
     sub_category_page: sub_category_page
     category_list_page: category_list_page
@@ -852,6 +856,7 @@ Function tubiTracking_getOneOfs()
     dest_current_page: current_page
     dest_static_page: static_page
     dest_home_page: home_page
+    dest_for_you_page: for_you_page
     dest_category_page: category_page
     dest_category_page: category_page
     dest_sub_category_page: sub_category_page
@@ -990,7 +995,7 @@ Function tubiTracking_getSideNavPageMap(constants)
     if sideNavIds.movies <> invalid then map[sideNavIds.movies] = "MOVIES"
     if sideNavIds.tv <> invalid then map[sideNavIds.tv] = "SERIES"
     if sideNavIds.espanol <> invalid then map[sideNavIds.espanol] = "ESPANOL"
-    if sideNavIds.mylist <> invalid then map[sideNavIds.mylist] = "QUEUE"
+    if sideNavIds.myList <> invalid then map[sideNavIds.myList] = "QUEUE"
     if sideNavIds.settings <> invalid then map[sideNavIds.settings] = "SETTINGS"
     if sideNavIds.search <> invalid then map[sideNavIds.search] = "SEARCH"
     if sideNavIds.exit <> invalid then map[sideNavIds.exit] = "EXIT"

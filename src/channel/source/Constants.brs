@@ -235,6 +235,7 @@ Function getConstants()
     constants.reqNames.getCategoryDetailsScreen = "getCategoryDetailsScreen"
     constants.reqNames.getSearchDefault = "getSearchDefault"
     constants.reqNames.getCategory = "getCategory"
+    constants.reqNames.getMyStuffContainers = "getMyStuffContainers"
     constants.reqNames.getSingleContent = "getSingleContent"
     constants.reqNames.getUpNextContent = "getUpNextContent"
     constants.reqNames.getRelatedContent = "getRelatedContent"
@@ -278,6 +279,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategoryDetailsScreen] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getSearchDefault] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategory] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getMyStuffContainers] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getSingleContent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getUpNextContent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getRelatedContent] = true
@@ -990,6 +992,7 @@ Function getConstants()
       constants.ui.contentTypes.channel = "channel"
       constants.ui.contentTypes.linear = "linear"
       constants.ui.contentTypes.historySignedOutUser = "continue_watching_signed_out_user"
+      constants.ui.contentTypes.emptyContainer = "emptyContainer"
       constants.ui.contentTypes.epg = "epg"
       constants.ui.contentTypes.live = "live"
       '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
@@ -1034,6 +1037,7 @@ Function getConstants()
       constants.ui.screenLevels.tournamentScreen = 20
       constants.ui.screenLevels.confirmPasswordScreen = 40
       constants.ui.screenLevels.categoryDetailsScreen = 40
+      constants.ui.screenLevels.myStuffScreen = 40
       constants.ui.screenLevels.detailScreen = 50
       constants.ui.screenLevels.episodeScreen = 50
       constants.ui.screenLevels.videoPlayerScreen = 60
@@ -1058,6 +1062,7 @@ Function getConstants()
       constants.ui.screenIds.categoryListScreen = "categoryListScreen"
       constants.ui.screenIds.espanolScreen = "espanolScreen"
       constants.ui.screenIds.movieScreen = "movieScreen"
+      constants.ui.screenIds.myStuffScreen = "myStuffScreen"
       constants.ui.screenIds.tvScreen = "tvScreen"
       constants.ui.screenIds.detailScreen = "detailScreen"
       constants.ui.screenIds.episodeScreen = "episodeScreen"
@@ -1090,6 +1095,7 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.categoryListScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.espanolScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.movieScreen] = true
+      constants.ui.cacheableScreenIds[constants.ui.screenIds.myStuffScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.tvScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.searchScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.videoPlayerScreen] = true
@@ -1120,17 +1126,23 @@ Function getConstants()
     constants.ui.imageSizes = {}
 
       'Sizes of poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.poster = [186,267]
+      constants.ui.imageSizes.poster = [186, 267]
+
+      'Sizes of large landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images. The MyStuff Screen uses this image size.
+      constants.ui.imageSizes.landscapeLarge = [582, 327]
+
+      'Size of the thumbnail/background of the single element representing an empty container that we wish to show: i.e. on the MyStuff Screen 
+      constants.ui.imageSizes.emptyContainer = [1634, 384]
 
       'Sizes of landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.landscape = [384,216]
+      constants.ui.imageSizes.landscape = [384, 216]
 
       'Sizes of landscape VITG that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.vitg = [981,552]
+      constants.ui.imageSizes.vitg = [981, 552]
 
       'Sizes of linear to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.linear = [384,144]
-      constants.ui.imageSizes.linearExperiment = [978,660]
+      constants.ui.imageSizes.linear = [384, 144]
+      constants.ui.imageSizes.linearExperiment = [978, 660]
 
       'Sizes of the linear background and minimized linear video player
       constants.ui.imageSizes.linearVideoPlayer_minimizedDimension = [1263,710]
@@ -1150,6 +1162,7 @@ Function getConstants()
       constants.ui.sideNavOpenIds[constants.ui.screenIds.espanolScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.epgScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.movieScreen] = true
+      constants.ui.sideNavOpenIds[constants.ui.screenIds.myStuffScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.tvScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.searchScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.tournamentScreen] = true
@@ -1202,10 +1215,12 @@ Function getConstants()
     constants.ui.gridItemTypes = {}
       constants.ui.gridItemTypes.portrait = "portrait"
       constants.ui.gridItemTypes.landscape = "landscape"
+      constants.ui.gridItemTypes.landscapeLarge = "landscapeLarge"
       constants.ui.gridItemTypes.landscapeNoTitle = "landscapeNoTitle"
       constants.ui.gridItemTypes.linear = "linear"
       constants.ui.gridItemTypes.vitg = "vitg"  'video in the grid
       constants.ui.gridItemTypes.historySignedOutUser = "continue_watching_signed_out_user"
+      constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
 
     constants.ui.uris = {}
       'background gradient urls
@@ -1235,8 +1250,10 @@ Function getConstants()
       constants.ui.uris.backgroundFullScreenGradient_kidsMode = "pkg:/images/detail-gradient_kids.png"
       constants.ui.uris.backgroundTopRightGradient_kidsMode = "pkg:/images/home-gradient_kids.png"
       constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_kidsmode.png"
-
       constants.ui.uris.marketingBackground = "pkg:/images/marketing-background.jpg"
+      constants.ui.uris.emptyContainerMyStuffBackground = "pkg:/images/screenMyStuffEmptyContainer.9.png"
+      constants.ui.uris.myStuffMyListIcon = "pkg:/images/screenMyStuffMyListIcon.webp"
+      constants.ui.uris.myStuffContinueWatchingIcon = "pkg:/images/screenMyStuffContinueWatchingIcon.webp"
 
 
     ' Default Dark Primary Background
@@ -1279,8 +1296,10 @@ Function getConstants()
       constants.ui.colors.primaryText = defaultDarkPrimaryForeground
       constants.ui.colors.textDark = defaultDarkPrimaryBackground
       constants.ui.colors.secondaryText = darkTransparentForeground75
+      constants.ui.colors.secondaryTextAlt = darkTransparentForeground95
       constants.ui.colors.tertiaryText = darkTransparentForeground95
       constants.ui.colors.focusedText = defaultDarkPrimaryForeground
+      
       '//::NOTE::HARDCODED:: there is a BUG in the built in roku keyboard component'
       '// If the color is white, then it will make the focus color to a nearly-black gray.
       '// To combat this limitation, the color is set to white with a very slight, hardly-noticeable opacity.

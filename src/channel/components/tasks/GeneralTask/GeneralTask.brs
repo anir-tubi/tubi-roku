@@ -359,7 +359,6 @@ Function accumulateBatchResponse(job, parsedResponse) as Void
       ' input information from the original batch node into the batch response.
 
       batchResponseType = job.batchInfo.responseType
-
       if batchResponseType = "node"
         batchResponse = CreateObject("roSGNode", "ContentNode")
 

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="MyStuffScreen" extends="BaseScreen">
+
+
+  <script type="text/brightscript" uri="MyStuffScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/CacheValidationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/ApiUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+
+      <!-- When the Helper receives valid category data from the server, it sets the new value to this field. -->
+      <field id="content" type="node"/>
+
+      <!-- contentUpdated should be set when the new content is ready to be displayed on the screen. -->
+      <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
+
+      <!-- removes any existing content on the RowList! -->
+      <field id="isLoading" type="boolean" />
+
+      <!-- set to true if the user is signed in and we want to change the experience based on that -->
+      <field id="signedIn" type="boolean" value="true" />
+
+      <!-- If the screen is not enabled, then user should not be able to select anything -->
+      <field id="enabled" type="boolean" alwaysNotify="true"/>
+
+      <!-- An associative array containing 2 params (id, index) detailing where the focus indicator should jump to.
+          The ID param is a string of the content ID that should be focused on - IF it exists in the current rowList content.
+          The index is a 2-element array containing the row and column numbers where the rowList shluld focus on. -->
+      <field id="jumpToRowItemByIdAndIndex" type="assocarray" alwaysNotify="true"/>
+
+    <!-- OUTPUTS -->
+      <!-- set to the contentNode of the RowList item which was clicked on -->
+      <field id="contentSelected" type="node"/>
+
+      <!-- set to the contentNode of the RowList item which was focused on -->
+      <field id="contentFocused" type="node"/>
+
+      <!-- set to the contentNode of the RowList item which was focused when
+           the "play" input transport deeplink was triggered
+      -->
+      <field id="contentToPlay" type="node"/>
+
+      <!-- content on the mystuffScreen is loaded and spinner can be turned off -->
+      <field id="contentReady" type="boolean" value="false" alwaysNotify="true" />
+
+      <!-- Holds a load time start value [returned from UpTime()] that can be used to determine how long the page took to load. -->
+      <field id="trackingLoadStartTime" type="integer" />
+
+      <!-- A 2-element array where the focus indicator is located in the screen's rowList -->
+      <field id="cursorPosition" type="Array" />
+
+      <!-- set to true when the user wants to sign-up -->
+      <field id="signUpButtonSelected" type="boolean" alwaysNotify="true" />
+
+      <!-- tells ContentController/Helpers that the content metadata is 
+            out of the cache window and should be updated -->
+      <field id="refreshContent" type="boolean" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <Group id="nav">
+      <LayoutGroup
+        id="ScreenNavigationHint"
+        layoutDirection="horiz"
+        vertAlignment="custom"
+        opacity="0.5"
+        itemSpacings="[9]"
+        translation="[192,60]">
+        <Poster
+          uri="pkg:/images/back.png"
+          width="29"
+          height="47"/>
+        <Label
+          id="callToAction"
+          vertAlign="center"
+          height="47"
+          translation="[0,2]">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="22" />
+        </Label>
+      </LayoutGroup>
+    </Group>
+
+    <LayoutGroup id="SignedOutUI"
+        layoutDirection="vert"
+        vertAlignment="custom"
+        horizAlignment="center"
+        itemSpacings="[34]"
+        visible="false"
+        translation="[960,316]">
+      <Poster
+        width="186"
+        height="84"
+        uri="pkg:/images/screenMyStuffGuestIcons.webp"/>
+      <Label
+        id="SignedOutUITitle"
+        width="1536"
+        maxLines="1"
+        horizAlign="center"
+        vertAlign="bottom">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="48" />
+      </Label>
+      <Label
+        id="SignedOutUISubtitle"
+        width="1536"
+        maxLines="1"
+        horizAlign="center"
+        vertAlign="bottom">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="34" />
+      </Label>
+      <MarkupGrid
+        id="GuestMenu"
+        drawFocusFeedbackOnTop="false"
+        numRows="1"
+        itemSize="[211,80]"
+        itemSpacing="[0,8]"
+        numColumns="1"
+        itemComponentName="DetailMenuItem"
+        vertFocusAnimationStyle="floatingFocus">
+        <ContentNode
+          id="GuestMenuContent"
+          role="content">
+          <DetailMenuItemContentNode
+            id="SignInOutButton"
+            iconUrl="pkg:/images/icon-sign-in.webp" />
+        </ContentNode>
+      </MarkupGrid>
+      <Label
+        id="SignedOutUIBlurb"
+        width="1536"
+        maxLines="1"
+        horizAlign="center"
+        vertAlign="bottom">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="34" />
+      </Label>
+    </LayoutGroup>
+
+    <MaskGroup
+      id="ContentArea"
+      maskSize="[0,0]"
+      maskOffset="[0,317]"
+      translation="[192,140]">
+      <Label
+        id="ScreenTitle"
+        width="1140"
+        maxLines="1"
+        color="0xFFFFFFFF"
+        vertAlign="bottom">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="48" />
+      </Label>
+      <RowList
+        id="RowList"
+        translation="[0,75]"
+        itemComponentName="CategoryGridPoster"
+        rowTitleComponentName="CategoryGridRowLabel"
+        itemSize="[1776,364]"
+        itemSpacing="[0,36]"
+        numRows="2"
+        rowSpacings="[36]"
+        rowItemSpacing="[[12,0]]"
+        showRowCounter="[false]"
+        fadeFocusFeedbackWhenAutoScrolling="true"
+        rowFocusAnimationStyle="floatingFocus"
+        vertFocusAnimationStyle="floatingFocus"/>
+    </MaskGroup>
+
+  </children>
+</component>

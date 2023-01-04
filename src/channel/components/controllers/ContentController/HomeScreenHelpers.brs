@@ -955,7 +955,7 @@ Function onLoadCategoriesIndex(msg)
   homeScreen = msg.getRoSGNode()
   index = msg.getData()
 
-  if homeScreen = invalid or homeScreen.content = invalid or index < 0
+  if homeScreen = invalid OR homeScreen.content = invalid OR index < 0
     return false
   end if
 

@@ -159,6 +159,12 @@ Function createParsingCallbacks()
     parseError: parseGenericError
   }
 
+  ' my stuff screen
+  m.requestTypes[m.constants.reqNames.getMyStuffContainers] = {
+    parseSuccess: parseCategoryMyStuffContentSuccess
+    parseError: parseGenericError
+  }
+
   'queue bookmarks
   m.requestTypes[m.constants.reqNames.postToQueue] = {
     parseSuccess: parseAddToQueueSuccess

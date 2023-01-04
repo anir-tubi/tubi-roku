@@ -79,6 +79,10 @@
     "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the mylist/queue screen.",
     "message": "My List"
   },
+  "menu_mystuff": {
+    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the my stuff screen.",
+    "message": "My Stuff"
+  },
   "menu_settings": {
     "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the settings screen.",
     "message": "Settings"
@@ -772,6 +776,22 @@
     "description": "Onscreen message to indicate channel Guide content could not be loaded",
     "message": "Unable to load the Channel Guide."
   },
+  "screenMyStuff_title": {
+    "description": "The title of the MyStuff Screen which contains the continueWatching and queue/myList channels.",
+    "message": "My Stuff"
+  },
+  "screenMyStuff_signedOutUITitle": {
+    "description": "The title of the MyStuff Screen for the guest user.",
+    "message": "Make Tubi Yours, For Free"
+  },
+  "screenMyStuff_signedOutUISubtitle": {
+    "description": "The subtitle of the MyStuff Screen for the guest user.",
+    "message": "Save all your favorites, pick up where you left off - all in one place"
+  },
+  "screenMyStuff_signedOutUIBlurb": {
+    "description": "The blurb of the MyStuff Screen for the guest user.",
+    "message": "No credit card required • Free forever"
+  },
   "screenDetails_button_trailer": {
     "description": "Label of button to allow users to watch a preview of the current video title",
     "message": "Watch Trailer"
@@ -891,6 +911,22 @@
   "metadata_expiresIn_singular": {
     "description": "label to indicate the user has exactly 1 day to watch a video",
     "message": "Expires in 1 day"
+  },
+  "metadata_myStuff_empty_myList_title": {
+    "description": "For an empty MyList container, this is the title that is displayed in the empty container",
+    "message": "My List"
+  },
+  "metadata_myStuff_empty_myList_description": {
+    "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
+    "message": "Movies and TV shows added\nto your list will appear here"
+  },
+  "metadata_myStuff_empty_continueWatching_title": {
+    "description": "For an empty continueWatching container, this is the title that is display in the empty container",
+    "message": "Continue Watching"
+  },
+  "metadata_myStuff_empty_continueWatching_description": {
+    "description": "For an empty continueWatching container, this is the description/subtitle that is display in the empty container",
+    "message": "Movies and TV shows you haven’t finished\nwatching will appear here"
   },
   "metadata_continueWatching_notSignedIn_title": {
     "description": "tells non registered user what they need to do to see the continue watching container",
