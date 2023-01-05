@@ -411,11 +411,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       nResumePoint = nSavedPosition
     end if
 
-    if nResumePoint >= m.constants.player.historyFrequency
-      setIsHistory(detailScreen, true)
-    else
-      setIsHistory(detailScreen, false)
-    end if
+    setIsHistory(detailScreen, history <> invalid)
 
     detailScreen.resumePoint = nResumePoint
 

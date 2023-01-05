@@ -121,7 +121,7 @@ Function onVideoPreviewStateChanged(msg)
         if currentScreen.subType() = "HomeScreen"
           showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen, invalid, "previews")
         else if currentScreen.subType() = "DetailScreen"
-          if currentScreen.isHistory = true
+          if currentScreen.resumePosition > 0
             resumeVideoDetailScreen(currentScreen, "previews")
           else
             playVideoDetailScreen(currentScreen, "previews")
