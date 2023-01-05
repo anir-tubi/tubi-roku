@@ -10,10 +10,10 @@ Function TubiBookmarksSetup()
   unauthorized = tubiBookmarks_mockAuth_Unauthorized_testHelper(constants, request)
   utils = ApiUtils(constants)
 
-  m.unauthorizedBM = TubiBookmarks(request, unauthorized, constants, nodeHelpers, utils)
+  m.unauthorizedBM = TubiBookmarksForAuthTask(request, unauthorized, constants, nodeHelpers, utils)
 
   authorized = tubiBookmarks_mockAuth_Authorized_testHelper(constants, request)
-  m.authorizedBM = TubiBookmarks(request, authorized, constants, nodeHelpers, utils)
+  m.authorizedBM = TubiBookmarksForAuthTask(request, authorized, constants, nodeHelpers, utils)
 
   m.videoContent = CreateObject("roSGNode", "TubiContentNode")
   m.videoContent.type = "video"
@@ -26,11 +26,6 @@ Function TubiBookmarksSetup()
 
   m.episodeContent = CreateObject("roSGNode", "TubiContentNode")
   m.episodeContent.type = "episode"
-
-  m.historyUrl = constants.urls.lishi.viewHistory
-  m.deviceId = constants.deviceInfo.deviceId
-  m.appName = constants.appName
-  m.platform = constants.platform
 
 End Function
 
@@ -140,155 +135,6 @@ Function tubiBookmarks_updateLikesLocallySuccessful_test()
 End Function
 
 
-'@Test addHistoryReqVideo_ParentIdAsInvalid unit tests
-Function tubiBookmarks_addHistoryReqVideo_ParentIdAsInvalid_test()
-  BM = m.authorizedBM
-  content = m.movieContent
-  content.id = "321221"
-  content.title = "We Are Young"
-  content.parentId = invalid
-  req = BM.addHistoryReq(content, 1478)
-
-  m.assertNotInvalid(req)
-  m.assertNotInvalid(req.url)
-  m.assertEqual(m.historyUrl, req.url)
-
-  options = req.options
-  m.assertNotInvalid(options)
-
-  body = ParseJson(options.body)
-  m.assertEqual(content.id, body.content_id)
-  m.assertEqual(content.type, body.content_type)
-  m.assertInvalid(body.parent_id)
-
-  m.assertEqual(1478, body["position"])
-
-  headers = options.headers
-
-  clientVersion = BM.constants.deviceInfo.clientVersion
-
-  m.assertEqual(headers["x-client-version"], clientVersion)
-  m.assertEqual(headers["x-client-platform"], "roku")
-
-  m.assertEqual(options.params.device_id, m.deviceId)
-  m.assertEqual(options.params.app_id, m.appName)
-  m.assertEqual(options.params.platform, m.platform)
-
-End Function
-
-
-'@Test addHistoryReqVideo_ParentIdAsEmpty unit tests
-Function tubiBookmarks_addHistoryReqVideo_ParentIdAsEmpty_test()
-  BM = m.authorizedBM
-  content = m.movieContent
-  content.id = "321221"
-  content.title = "We Are Young"
-  content.parentId = ""
-  req = BM.addHistoryReq(content, 1478)
-
-  m.assertNotInvalid(req)
-  m.assertNotInvalid(req.url)
-  m.assertEqual(m.historyUrl, req.url)
-
-  options = req.options
-  m.assertNotInvalid(options)
-
-  body = ParseJson(options.body)
-  m.assertEqual(content.id, body.content_id)
-  m.assertEqual(content.type, body.content_type)
-  m.assertInvalid(body.parent_id)
-
-  m.assertEqual(1478, body["position"])
-
-  headers = options.headers
-
-  clientVersion = BM.constants.deviceInfo.clientVersion
-
-  m.assertEqual(headers["x-client-version"], clientVersion)
-  m.assertEqual(headers["x-client-platform"], "roku")
-
-  m.assertEqual(options.params.device_id, m.deviceId)
-  m.assertEqual(options.params.app_id, m.appName)
-  m.assertEqual(options.params.platform, m.platform)
-End Function
-
-
-'@Test addHistoryReqEpisodeParentIdAsString unit tests
-Function tubiBookmarks_addHistoryReqEpisodeParentIdAsString_test()
-  BM = m.authorizedBM
-  content = m.episodeContent
-  content.id = "302800"
-  content.title = "S02:E05 - You, I'll Be Following"
-  content.parentId = "1079"
-
-  req = BM.addHistoryReq(content, 1478)
-
-  m.assertNotInvalid(req)
-  m.assertNotInvalid(req.url)
-  m.assertEqual(m.historyUrl, req.url)
-
-  options = req.options
-  m.assertNotInvalid(options)
-
-  body = ParseJson(options.body)
-  m.assertEqual(content.id, body.content_id)
-  m.assertEqual(content.type, body.content_type)
-
-  m.assertEqual(1079, body.parent_id)
-
-  m.assertEqual(1478, body["position"])
-
-  headers = options.headers
-
-  clientVersion = BM.constants.deviceInfo.clientVersion
-
-  m.assertEqual(headers["x-client-version"], clientVersion)
-  m.assertEqual(headers["x-client-platform"], "roku")
-
-  m.assertEqual(options.params.device_id, m.deviceId)
-  m.assertEqual(options.params.app_id, m.appName)
-  m.assertEqual(options.params.platform, m.platform)
-End Function
-
-
-'@Test addHistoryReqEpisodeParentIdAsInteger unit tests
-Function tubiBookmarks_addHistoryReqEpisodeParentIdAsInteger_test()
-  BM = m.authorizedBM
-  content = m.episodeContent
-  content.id = "302800"
-  content.title = "S02:E05 - You, I'll Be Following"
-  content.parentId = 1079
-
-  req = BM.addHistoryReq(content, 1478)
-
-  m.assertNotInvalid(req)
-  m.assertNotInvalid(req.url)
-  m.assertEqual(m.historyUrl, req.url)
-
-  options = req.options
-  m.assertNotInvalid(options)
-
-  body = ParseJson(options.body)
-  m.assertEqual(content.id, body.content_id)
-  m.assertEqual(content.type, body.content_type)
-
-  m.assertEqual(1079, body.parent_id)
-
-  m.assertEqual(1478, body["position"])
-
-  headers = options.headers
-
-  clientVersion = BM.constants.deviceInfo.clientVersion
-
-  m.assertEqual(headers["x-client-version"], clientVersion)
-  m.assertEqual(headers["x-client-platform"], "roku")
-
-  m.assertEqual(options.params.device_id, m.deviceId)
-  m.assertEqual(options.params.app_id, m.appName)
-  m.assertEqual(options.params.platform, m.platform)
-End Function
-
-
 '@Test getInitialBookmarksReqSignedOut unit tests
 Function tubiBookmarks_getInitialBookmarksReqSignedOut_test()
   BM = m.unauthorizedBM
@@ -312,7 +158,7 @@ Function tubiBookmarks_getInitialHistoryReqSignedOut_test()
   AUTH = tubiBookmarks_mockAuth_Unauthorized_testHelper(constants, REQUEST)
   NODEHELPERS = TubiNodeHelpers()
   utils = ApiUtils(constants)
-  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS, utils)
+  BM = TubiBookmarksForAuthTask(REQUEST, AUTH, constants, NODEHELPERS, utils)
   req = BM.getInitialHistoryReq("1234")
   m.assertInvalid(req)
 End Function
@@ -325,7 +171,7 @@ Function tubiBookmarks_getInitialLikeReqSignedOut_test()
   AUTH = tubiBookmarks_mockAuth_Unauthorized_testHelper(constants, REQUEST)
   NODEHELPERS = TubiNodeHelpers()
   utils = ApiUtils(constants)
-  BM = TubiBookmarks(REQUEST, AUTH, constants, NODEHELPERS, utils)
+  BM = TubiBookmarksForAuthTask(REQUEST, AUTH, constants, NODEHELPERS, utils)
   req = BM.getInitialLikeReq("1234")
   m.assertInvalid(req)
 End Function

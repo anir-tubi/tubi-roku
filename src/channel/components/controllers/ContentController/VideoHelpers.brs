@@ -206,15 +206,15 @@ End Function
 '                            false to handle the history response (only needed when exiting playback)
 Function updateHistory(content, nowPos, isFireAndForget = true)
   ' Don't send history updates to the server if the user hasn't watched at least a certain amount of video
-  if nowPos >= m.constants.player.historyFrequency AND isLoggedInUser() AND ( content["type"] = m.constants.ui.contentTypes.video OR content["type"] = m.constants.ui.contentTypes.sportsEvent)
+  if nowPos >= m.constants.player.historyFrequency AND isLoggedInUser() = true AND (content["type"] = m.constants.ui.contentTypes.video OR content["type"] = m.constants.ui.contentTypes.sportsEvent)
 
-    postUserHistory = m.Bookmarks.addHistoryReq(content, nowPos)
+    postUserHistory = m.userDeviceApi.getAddHistoryRequestInfo(content, nowPos)
 
     if postUserHistory <> invalid
-
       successCallback = invalid
       inputContent = invalid
       inputNowPos = invalid
+
       if isFireAndForget = false
         successCallback = onHistorySuccess
         inputContent = content
@@ -625,7 +625,7 @@ Function stopVideoContent(videoPlayer)
     videoPlayer.control = "stop"
 
     ' reload history
-    onHistoryQueueChange(m.constants.ui.categoryIds.history)
+    handleHistoryChange()
   end if
 End Function
 

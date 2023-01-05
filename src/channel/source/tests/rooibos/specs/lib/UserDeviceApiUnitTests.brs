@@ -11,12 +11,19 @@ Function UserDeviceApiSetup()
   m.deviceRegisterUrl = m.constants.urls.account.deviceRegister
   m.checkBirthdayUrl = m.constants.urls.account.checkBirthday
   m.patchSettingsUrl = m.constants.urls.account.settings
+  m.historyUrl = m.constants.urls.lishi.viewHistory
   m.app_id = m.constants.settings.shortAppName
   m.platform = m.constants.platform
   m.device_id = m.constants.deviceInfo.deviceId
   m.testEmail = "test@tubi.tv"
   m.testPassword = "111111"
-  m.app_id = "tubitv"
+  m.deviceId = m.constants.deviceInfo.deviceId
+
+  m.movieContent = CreateObject("roSGNode", "TubiContentNode")
+  m.movieContent.type = "movie"
+
+  m.episodeContent = CreateObject("roSGNode", "TubiContentNode")
+  m.episodeContent.type = "episode"
 
 End function
 
@@ -471,4 +478,148 @@ Function userDeviceApi_deleteHistory_test()
   params = deleteHistory.options.params
   m.assertNotInvalid(params)
 
+End Function
+
+
+'@Test addHistoryReqVideo_ParentIdAsInvalid unit tests
+Function userDeviceApi_addHistoryReqVideo_ParentIdAsInvalid_test()
+  content = m.movieContent
+  content.id = "321221"
+  content.title = "We Are Young"
+  content.parentId = invalid
+  reqInfo = m.userDeviceApi.getAddHistoryRequestInfo(content, 1478)
+
+  m.assertNotInvalid(reqInfo)
+  m.assertNotInvalid(reqInfo.url)
+  m.assertEqual(m.historyUrl, reqInfo.url)
+
+  options = reqInfo.options
+  m.assertNotInvalid(options)
+
+  body = ParseJson(options.body)
+  m.assertEqual(content.id, body.content_id)
+  m.assertEqual(content.type, body.content_type)
+  m.assertInvalid(body.parent_id)
+
+  m.assertEqual(1478, body["position"])
+
+  headers = options.headers
+
+  clientVersion = m.userDeviceApi.constants.deviceInfo.clientVersion
+
+  m.assertEqual(headers["x-client-version"], clientVersion)
+  m.assertEqual(headers["x-client-platform"], "roku")
+
+  m.assertEqual(options.params.device_id, m.deviceId)
+  m.assertEqual(options.params.app_id, m.app_id)
+  m.assertEqual(options.params.platform, m.platform)
+End Function
+
+
+'@Test addHistoryReqVideo_ParentIdAsEmpty unit tests
+Function userDeviceApi_addHistoryReqVideo_ParentIdAsEmpty_test()
+  content = m.movieContent
+  content.id = "321221"
+  content.title = "We Are Young"
+  content.parentId = ""
+  reqInfo = m.userDeviceApi.getAddHistoryRequestInfo(content, 1478)
+
+  m.assertNotInvalid(reqInfo)
+  m.assertNotInvalid(reqInfo.url)
+  m.assertEqual(m.historyUrl, reqInfo.url)
+
+  options = reqInfo.options
+  m.assertNotInvalid(options)
+
+  body = ParseJson(options.body)
+  m.assertEqual(content.id, body.content_id)
+  m.assertEqual(content.type, body.content_type)
+  m.assertInvalid(body.parent_id)
+
+  m.assertEqual(1478, body["position"])
+
+  headers = options.headers
+
+  clientVersion = m.userDeviceApi.constants.deviceInfo.clientVersion
+
+  m.assertEqual(headers["x-client-version"], clientVersion)
+  m.assertEqual(headers["x-client-platform"], "roku")
+
+  m.assertEqual(options.params.device_id, m.deviceId)
+  m.assertEqual(options.params.app_id, m.app_id)
+  m.assertEqual(options.params.platform, m.platform)
+End Function
+
+
+'@Test addHistoryReqEpisodeParentIdAsString unit tests
+Function userDeviceApi_addHistoryReqEpisodeParentIdAsString_test()
+  content = m.episodeContent
+  content.id = "302800"
+  content.title = "S02:E05 - You, I'll Be Following"
+  content.parentId = "1079"
+
+  reqInfo = m.userDeviceApi.getAddHistoryRequestInfo(content, 1478)
+
+  m.assertNotInvalid(reqInfo)
+  m.assertNotInvalid(reqInfo.url)
+  m.assertEqual(m.historyUrl, reqInfo.url)
+
+  options = reqInfo.options
+  m.assertNotInvalid(options)
+
+  body = ParseJson(options.body)
+  m.assertEqual(content.id, body.content_id)
+  m.assertEqual(content.type, body.content_type)
+
+  m.assertEqual(1079, body.parent_id)
+
+  m.assertEqual(1478, body["position"])
+
+  headers = options.headers
+
+  clientVersion = m.userDeviceApi.constants.deviceInfo.clientVersion
+
+  m.assertEqual(headers["x-client-version"], clientVersion)
+  m.assertEqual(headers["x-client-platform"], "roku")
+
+  m.assertEqual(options.params.device_id, m.deviceId)
+  m.assertEqual(options.params.app_id, m.app_id)
+  m.assertEqual(options.params.platform, m.platform)
+End Function
+
+
+'@Test addHistoryReqEpisodeParentIdAsInteger unit tests
+Function userDeviceApi_addHistoryReqEpisodeParentIdAsInteger_test()
+  content = m.episodeContent
+  content.id = "302800"
+  content.title = "S02:E05 - You, I'll Be Following"
+  content.parentId = 1079
+
+  req = m.userDeviceApi.getAddHistoryRequestInfo(content, 1478)
+
+  m.assertNotInvalid(req)
+  m.assertNotInvalid(req.url)
+  m.assertEqual(m.historyUrl, req.url)
+
+  options = req.options
+  m.assertNotInvalid(options)
+
+  body = ParseJson(options.body)
+  m.assertEqual(content.id, body.content_id)
+  m.assertEqual(content.type, body.content_type)
+
+  m.assertEqual(1079, body.parent_id)
+
+  m.assertEqual(1478, body["position"])
+
+  headers = options.headers
+
+  clientVersion = m.userDeviceApi.constants.deviceInfo.clientVersion
+
+  m.assertEqual(headers["x-client-version"], clientVersion)
+  m.assertEqual(headers["x-client-platform"], "roku")
+
+  m.assertEqual(options.params.device_id, m.deviceId)
+  m.assertEqual(options.params.app_id, m.app_id)
+  m.assertEqual(options.params.platform, m.platform)
 End Function

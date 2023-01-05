@@ -24,20 +24,20 @@
     <script type="text/brightscript" uri="Parsers/ScreenSaverParsers.brs" />
     <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
     <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
-    <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
-    <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
     <script type="text/brightscript" uri="../../../source/lib/ApiUtils.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
     <script type="text/brightscript" uri="../../../source/lib/CmsApi.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
     <script type="text/brightscript" uri="../../../source/lib/MathUtils.brs" />
-    <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
-    <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
-    <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
-    <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
     <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
-    <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />
+    <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
+    <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
     <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
     <script type="text/brightscript" uri="pkg:/components/lib/FIFAMixin.brs" />
 

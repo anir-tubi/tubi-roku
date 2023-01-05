@@ -1070,7 +1070,7 @@ Function onBookmarkedAfterSignIn(response)
       end if
 
       sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
-      onHistoryQueueChange(m.constants.ui.categoryIds.queue)
+      handleQueueChange()
     end if
 
   end if
@@ -1493,8 +1493,7 @@ Function onHistoryRemovedSuccess(_response) As Void
   detailScreen.isWaitingForServerResponse = false
   setIsHistory(detailScreen, false)
   sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_CONTINUE_WATCHING", m.Tracking, m.trackingLoggingTask, m.constants)
-  onHistoryQueueChange(m.constants.ui.categoryIds.history)
-
+  handleHistoryChange()
 End Function
 
 
@@ -2202,7 +2201,7 @@ Function removeFromQueueSuccessResponse(_response)
     sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
   end if
 
-  onHistoryQueueChange(m.constants.ui.categoryIds.queue)
+  handleQueueChange()
 End Function
 
 
@@ -2263,7 +2262,7 @@ Function addToQueueSuccessResponse(response)
         end if
 
         sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
-        onHistoryQueueChange(m.constants.ui.categoryIds.queue)
+        handleQueueChange()
       end if
 
     end if

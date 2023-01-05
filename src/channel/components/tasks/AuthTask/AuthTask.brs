@@ -12,7 +12,7 @@ Function execInitializeUserData()
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
   apiUtilsLib = ApiUtils(constants)
-  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers, apiUtilsLib)
+  Bookmarks = TubiBookmarksForAuthTask(Request, Auth, constants, NodeHelpers, apiUtilsLib)
   authInfo = Auth.getAuthInfo()
 
   getUserInfo = false
@@ -80,7 +80,7 @@ Function execSignOut()
   Auth.deleteGuestUserHasAgeInfo()
 
   apiUtilsLib = ApiUtils(constants)
-  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers, apiUtilsLib)
+  Bookmarks = TubiBookmarksForAuthTask(Request, Auth, constants, NodeHelpers, apiUtilsLib)
 
   userCats = getInitialUserCategories(Bookmarks, true, false, false, true)
 
@@ -191,7 +191,7 @@ Function execGetUserInfo()
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
   apiUtilsLib = ApiUtils(constants)
-  Bookmarks = TubiBookmarks(Request, Auth, constants, NodeHelpers, apiUtilsLib)
+  Bookmarks = TubiBookmarksForAuthTask(Request, Auth, constants, NodeHelpers, apiUtilsLib)
   authInfo = Auth.getAuthInfo()
 
   result = getInitialUserCategories(Bookmarks, false, false, true, false)

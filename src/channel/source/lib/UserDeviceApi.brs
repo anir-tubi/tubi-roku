@@ -20,6 +20,9 @@ Function UserDeviceApi(constants, apiUtils)
     updateParentalRatingReqInfo: userDeviceApi_updateParentalRatingReqInfo
     removeFromQueueReqInfo: userDeviceApi_removeFromQueueReqInfo
     addToQueueReqInfo: userDeviceApi_addToQueueReqInfo
+    getQueueReqInfo: userDeviceApi_getQueueReqInfo
+    getHistoryReqInfo: userDeviceApi_getHistoryReqInfo
+    getAddHistoryRequestInfo: userDeviceApi_getAddHistoryRequestInfo
   }
 
   userDeviceApi = {}
@@ -284,13 +287,87 @@ End Function
 
 
 Function userDeviceApi_removeFromQueueReqInfo(bookmarkId, contentId, contentType)
-
   url = m.constants.urls.userQueues.queues
   options = m.getCommonOptions()
   options.params["queue_id"] = bookmarkId
   options.params["content_id"] = contentId
   options.params["content_type"] = contentType
   options["method"] = m.constants.reqTypes.del
+
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
+Function userDeviceApi_getQueueReqInfo()
+  url = m.constants.urls.userQueues.queues
+  options = m.getCommonOptions()
+  options.method = m.constants.reqTypes.get
+  options.params["page_enabled"] = false
+
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
+Function userDeviceApi_getHistoryReqInfo()
+  url = m.constants.urls.lishi.viewHistory
+  options = m.getCommonOptions()
+  options.method = m.constants.reqTypes.get
+  options.params["page_enabled"] = false
+
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
+' @content: roSGNode, content of Video Player
+' @nowPos : integer, video position in seconds
+'
+' returns url & options for making API request
+Function userDeviceApi_getAddHistoryRequestInfo(content as Object, nowPos as Integer) as Object
+  url = m.constants.urls.lishi.viewHistory
+
+  body = {
+    content_id: content.id
+    position: nowPos
+  }
+
+  contentType = m.constants.uapiContentTypes.movie
+  parentId = content.parentId
+
+  'set the parentId to an integer or invalid as needed (expect to receive it as a string which is not compatible with API)
+  if isString(parentId) = true then
+    if parentId.len() = 0
+      body.parent_id = invalid  'is ok if parentId is invalid (ie. for movies)
+      if content.type = m.constants.uapiContentTypes.sportsEvent
+        contentType = m.constants.uapiContentTypes.sportsEvent
+      end if
+    else
+      body.parent_id = parentId.toInt()
+      contentType = m.constants.uapiContentTypes.episode
+    end if
+  else if isInteger(parentId) = true then
+    body.parent_id = parentId
+    contentType = m.constants.uapiContentTypes.episode
+  else if content.type = m.constants.uapiContentTypes.sportsEvent
+    body.parent_id = invalid
+    contentType = m.constants.uapiContentTypes.sportsEvent
+  else
+    body.parent_id = invalid
+  end if
+
+  body.content_type = contentType
+
+  options = m.getCommonOptions()
+  options["body"] = FormatJSON(body)
+  options["method"] = m.constants.reqTypes.post
 
   return {
     url: url

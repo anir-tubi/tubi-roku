@@ -29,7 +29,7 @@ Function init()
   Auth = TubiAuth(m.constants, m.Request)
   m.NodeHelpers = TubiNodeHelpers()
   apiUtilsLib = ApiUtils(m.constants)
-  m.Bookmarks = TubiBookmarks(m.Request, Auth, m.constants, m.NodeHelpers, apiUtilsLib)
+  m.Bookmarks = TubiBookmarks(m.constants)
   m.Tracking = TubiTracking(m.constants, m.Request, Auth)
   experiments = TubiExperiments(m.constants)
   m.cmsApi = CmsApi(m.constants, m.Request, Auth, apiUtilsLib, experiments)
@@ -669,7 +669,6 @@ Function onTransportVoiceResponse(msg)
 End Function
 
 
-
 '@args: assocArray, the startupArgs passed into main when the channel starts
 Function getExternalAuthInfoFromStartupArgs(args)
   ' deeplinks coming from ios or android devices need to be authenticated
@@ -707,29 +706,60 @@ Function onAuthInfoRefreshed()
 End Function
 
 
-''''''''''''''''''''
-' onHistoryQueueChange
-'
-' @categoryId: string, the categoryId/containerId of the category we will refresh
-Function onHistoryQueueChange(categoryId)
-  tubiLog("ContentController.onHistoryQueueChange")
+' called when a user's My List/Bookmarks/Queue is updated
+Function handleQueueChange()
   if isLoggedInUser() = true
-    if m.authTask <> invalid
-      m.authTask.unobserveFieldScoped("authInfo")
-    end if
-    ' TODO Bryan: only get the history/queue ids of the categoryIds instead of both every time
-    m.authTask = CreateObject("roSGNode", "AuthTask")
-    m.authTask.observeFieldScoped("authInfo", "onHistoryQueueRefresh")
+    ' make request to get bookmarks/queue ids
+    getQueueIds(onQueueRefresh)
 
-    m.authTask.functionName = "execInitializeUserData"
-    m.authTask.control = "RUN"
+    ' update My List containers on various home screens
+    setDirtyUserCategories(m.constants.ui.categoryIds.queue)
 
-    setContentToRefresh(m.constants.ui.screenIds.myStuffScreen) '//when history changes, then indicate that myStuff should reload
-    setDirtyUserCategories(categoryId)
+    '//when queue changes, then indicate that the myStuff screen should reload
+    setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
   end if
 End Function
 
 
+' called when a user's History is updated
+Function handleHistoryChange()
+  if isLoggedInUser() = true
+    ' make request to get history/continue watching ids
+    getHistoryIds(onHistoryRefresh)
+
+    ' update Continue Watching containers on various home screens
+    setDirtyUserCategories(m.constants.ui.categoryIds.history)
+
+    '//when history changes, then indicate that the myStuff screen should reload
+    setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
+  end if
+End Function
+
+
+Function getQueueIds(successCallback = invalid)
+  reqInfo = m.userDeviceApi.getQueueReqInfo()
+  m.makeRequest({
+    requestType: m.constants.reqNames.getQueue
+    url: reqInfo.url
+    options: reqInfo.options
+    successCallback: successCallback
+    responseType: "node"
+    silenceCallbackWarnings: true
+  })
+End Function
+
+
+Function getHistoryIds(successCallback = invalid)
+  reqInfo = m.userDeviceApi.getHistoryReqInfo()
+  m.makeRequest({
+    requestType: m.constants.reqNames.getHistory
+    url: reqInfo.url
+    options: reqInfo.options
+    successCallback: successCallback
+    responseType: "node"
+    silenceCallbackWarnings: true
+  })
+End Function
 
 
 ''''''''''''''''''''''''''''
@@ -857,13 +887,18 @@ Function onReloadUserCategoriesResponse(handledRequest)
 End Function
 
 
-Function onHistoryQueueRefresh()
-  tubiLog("ContentController.onHistoryQueueRefresh")
-  m.authTask.unobserveFieldScoped("authInfo")
-  ' These will be empty parent nodes (no children) if user is not authenticated
-  m.global.bookmarkIds = m.authTask.bookmarks
-  m.global.historyIds = m.authTask.history
-  m.global.likeIds = m.authTask.likes
+' @queueIds: roSGNode, a parent node with children nodes. Each child node representing an item in the user's queue.
+Function onQueueRefresh(queueIds)
+  tubiLog("ContentController.onQueueRefresh")
+  m.global.bookmarkIds = queueIds
+  refreshAllDetailScreens()
+End Function
+
+
+' @historyIds: roSGNode, a parent node with children nodes. Each child node representing an item in the user's history.
+Function onHistoryRefresh(historyIds)
+  tubiLog("ContentController.onHistoryRefresh")
+  m.global.historyIds = historyIds
   refreshAllDetailScreens()
 End Function
 

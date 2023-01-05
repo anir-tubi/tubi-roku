@@ -1,7 +1,6 @@
 'a set of helper functions that facilitate sending and receiving "Continue Watching"/history and "My Queue"/bookmarks
 'info to the server (UAPI at the time of writing this comment)
-Function TubiBookmarks(request as Object, auth as Object, constants as Object, nodeHelpers as Object, apiUtils as Object) as Object
-
+Function TubiBookmarksForAuthTask(request as Object, auth as Object, constants as Object, nodeHelpers as Object, apiUtils as Object) as Object
   defaultValues = {
     request: request
     auth: auth
@@ -9,7 +8,6 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
     nodeHelpers: nodeHelpers
 
     'public methods
-    addHistoryReq: tubiBookmarks_getAddHistoryRequestInfo
     addHistoryLocally: tubiBookmarks_addHistoryLocally
     updateLikesLocally: tubiBookmarks_updateLikesLocally
     getInitialBookmarksReq: tubiBookmarks_getInitialBookmarksReq
@@ -28,9 +26,24 @@ Function TubiBookmarks(request as Object, auth as Object, constants as Object, n
   tubiBookmarks = {}
   tubiBookmarks.append(apiUtils)
   tubiBookmarks.append(defaultValues)
-  return tubiBookmarks
 
+  return tubiBookmarks
 End Function
+
+
+' Creates queue/bookmark/my list and history/continue watching functionality for use in general task parsers
+Function TubiBookmarks(constants)
+  return {
+    constants: constants
+
+    'public methods
+    translateQueueIds: tubiBookmarks_translateQueueIds
+    translateHistoryIds: tubiBookmarks_translateHistoryIds
+    addHistoryLocally: tubiBookmarks_addHistoryLocally
+    updateLikesLocally: tubiBookmarks_updateLikesLocally
+  }
+End Function
+
 
 
 'saves the resume point locally and does not communicate to the backend.
@@ -118,61 +131,6 @@ Function tubiBookmarks_updateLikesLocally(contentId as String, sRatingAction as 
       likeNode.state = sState
     end if
   end if
-End Function
-
-
-' @content: roSGNode, content of Video Player
-' @nowPos : integer, video position in seconds
-'
-' returns url & options for making API request
-'
-Function tubiBookmarks_getAddHistoryRequestInfo(content as Object, nowPos as Integer) as Object
-  authInfo = m.auth.getAuthInfo()
-  if m.isLoggedInUser(authInfo) = false
-    return invalid
-  end if
-
-  url = m.constants.urls.lishi.viewHistory
-
-  body = {
-    content_id: content.id
-    position: nowPos
-  }
-
-  contentType = m.constants.uapiContentTypes.movie
-  parentId = content.parentId
-
-  'set the parentId to an integer or invalid as needed (expect to receive it as a string which is not compatible with API)
-  if isString(parentId) = true then
-    if parentId.len() = 0
-      body.parent_id = invalid    'is ok if parentId is invalid (ie. for movies)
-      if content.type = m.constants.uapiContentTypes.sportsEvent
-        contentType = m.constants.uapiContentTypes.sportsEvent
-      end if
-    else
-      body.parent_id = parentId.toInt()
-      contentType = m.constants.uapiContentTypes.episode
-    end if
-  else if isInteger(parentId) = true then
-    body.parent_id = parentId
-    contentType = m.constants.uapiContentTypes.episode
-  else if content.type = m.constants.uapiContentTypes.sportsEvent
-    body.parent_id = invalid
-    contentType = m.constants.uapiContentTypes.sportsEvent
-  else
-    body.parent_id = invalid
-  end if
-
-  body.content_type = contentType
-
-  options = m.getCommonOptions()
-  options["body"] = FormatJSON(body)
-  options["method"] = m.constants.reqTypes.post
-
-  return {
-    url: url
-    options: options
-  }
 End Function
 
 
@@ -309,7 +267,6 @@ Function tubiBookmarks_handleInitialBookmarks(initialBookmarks)
 End Function
 
 
-
 '@initialHistory: string, JSON server response when making the first call to UAPI to get a user's basic history info
 'returns historyIds ordered node tree with series having episode children
 Function tubiBookmarks_handleInitialHistory(initialHistory)
@@ -433,4 +390,82 @@ End Function
 
 Function tubiBookmarks_isLoggedInUser(authInfo)
   return (authInfo <> invalid AND authInfo.userId <> invalid)
+End Function
+
+
+'@initialBookmarks: array, brightscript representation of backend's JSON response upon fetching a user's bookmarks/queue/MyList
+'@returns: roSGNode, parent node with each child representing a content in the user's queue.
+'                    Children nodes are ordered in the same order as returned by the backend.
+Function tubiBookmarks_translateQueueIds(initialBookmarks)
+  bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
+
+  if initialBookmarks <> invalid
+    for each bookmark in initialBookmarks.queues
+      if bookmark.content_id <> invalid
+        child = bookmarkIds.createChild("BookmarkContentNode")
+        childId = bookmark.content_id.toStr()
+        child.bookmarkId = bookmark.id
+
+        if bookmark.content_type = m.constants.uapiContentTypes.movie
+          child.id = childId
+          child.type = m.constants.ui.contentTypes.video
+        else if bookmark.content_type = m.constants.uapiContentTypes.series
+          child.id = "0" + childId
+          child.type = m.constants.ui.contentTypes.series
+        else if bookmark.content_type = m.constants.uapiContentTypes.sportsEvent
+          child.id = childId
+          child.type = m.constants.ui.contentTypes.sportsEvent
+        end if
+      end if
+    end for
+  end if
+
+  return bookmarkIds
+End Function
+
+
+'@initialBookmarks: array, brightscript representation of backend's JSON response upon fetching a user's history/continue watching
+'@returns: roSGNode, parent node with each child representing a content in the user's history.
+'                    Series nodes have children representing episodes.
+'                    Children nodes are ordered in the same order as returned by the backend.
+Function tubiBookmarks_translateHistoryIds(initialHistory)
+  historyIds = CreateObject("roSGNode", "HistoryContentNode")
+
+  if initialHistory <> invalid then
+    for each history in initialHistory.items
+      if history.content_id <> invalid
+        child = historyIds.createChild("HistoryContentNode")
+        childId = history.content_id.toStr()
+        if history.content_type = m.constants.uapiContentTypes.movie OR history.content_type = m.constants.uapiContentTypes.sportsEvent
+          child.id = childId
+          child.historyId = history.id
+          child.nowPos = history.position
+          child.type = m.constants.ui.contentTypes.video
+        else if history.content_type = m.constants.uapiContentTypes.series
+          child.id = "0" + childId
+          child.historyId = history.id
+          child.type = m.constants.ui.contentTypes.series
+
+          if history.episodes <> invalid AND history.position <> invalid AND history.episodes[history.position] <> invalid
+            currentEpisode = history.episodes[history.position]
+            if currentEpisode.content_id <> invalid
+              child.currentEpisodeId = currentEpisode.content_id.toStr()
+            end if
+          end if
+
+          for each episode in history.episodes
+            if episode.content_id <> invalid
+              grandchild = child.createChild("HistoryContentNode")
+              grandchild.id = episode.content_id.toStr()
+              grandchild.historyId = episode.id
+              grandchild.nowPos = episode.position
+              grandchild.type = m.constants.ui.contentTypes.video
+            end if
+          end for
+        end if
+      end if
+    end for
+  end if
+
+  return historyIds
 End Function

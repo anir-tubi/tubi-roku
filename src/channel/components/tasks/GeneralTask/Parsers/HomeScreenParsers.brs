@@ -80,3 +80,21 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
   convertedMetadata = translate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, screenId, isSignedInUser, isKidsMode, uiMode)
   return convertedMetadata  'may return an empty container
 End Function
+
+
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseGetQueueIdsSuccess(fullResponse, _reqInfo)
+  bookmarkLib = TubiBookmarks(m.constants)
+  return bookmarkLib.translateQueueIds(fullResponse.data)
+End Function
+
+
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseGetHistoryIdsSuccess(fullResponse, _reqInfo)
+  bookmarkLib = TubiBookmarks(m.constants)
+  return bookmarkLib.translateHistoryIds(fullResponse.data)
+End Function

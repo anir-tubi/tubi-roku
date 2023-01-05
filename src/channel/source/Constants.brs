@@ -254,6 +254,7 @@ Function getConstants()
     constants.reqNames.getEPGPrograms = "getEPGPrograms"
     constants.reqNames.postUserHistory = "postUserHistory"
     constants.reqNames.getQueue = "getQueue"
+    constants.reqNames.getHistory = "getHistory"
     constants.reqNames.refreshToken = "refreshToken"
     constants.reqNames.transferToken = "transferToken"
     constants.reqNames.generic = "generic"
@@ -271,6 +272,7 @@ Function getConstants()
     ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getQueue] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getHistory] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.patchUserSettings] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.checkBirthdayInfo] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getSearchScreen] = true

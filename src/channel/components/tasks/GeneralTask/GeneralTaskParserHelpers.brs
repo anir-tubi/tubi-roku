@@ -112,7 +112,7 @@ Function createParsingCallbacks()
     parseError: parseTournamentError
   }
 
-  ' history
+  ' post history
   m.requestTypes[m.constants.reqNames.postUserHistory] = {
     parseSuccess: parseHistorySuccess
   }
@@ -121,6 +121,28 @@ Function createParsingCallbacks()
   m.requestTypes[m.constants.reqNames.deleteHistory] = {
     parseSuccess: parseDeleteFromHistorySuccess
     parseError: parseDeleteFromHistoryError
+  }
+
+  'get history list
+  m.requestTypes[m.constants.reqNames.getHistory] = {
+    parseSuccess: parseGetHistoryIdsSuccess
+  }
+
+  'queue bookmarks
+  m.requestTypes[m.constants.reqNames.postToQueue] = {
+    parseSuccess: parseAddToQueueSuccess
+    parseError: parseAddToQueueError
+  }
+
+  'delete queue bookmarks
+  m.requestTypes[m.constants.reqNames.deleteFromQueue] = {
+    parseSuccess: parseRemoveFromQueueSuccess
+    parseError: parseRemoveFromQueueError
+  }
+
+  'get queue bookmarks list
+  m.requestTypes[m.constants.reqNames.getQueue] = {
+    parseSuccess: parseGetQueueIdsSuccess
   }
 
   ' homescreen
@@ -159,6 +181,18 @@ Function createParsingCallbacks()
     parseError: parseGenericError
   }
 
+  'screen saver get container
+  m.requestTypes[m.constants.reqNames.getScreenSaverContainer] = {
+    parseSuccess: parseGetScreenSaverContainerSuccess
+    parseError: parseGenericError
+  }
+
+  'screen saver get home screen container ids
+  m.requestTypes[m.constants.reqNames.getScreenSaverHomeScreenContainerIds] = {
+    parseSuccess: parseGetScreenSaverHomeScreenContainerIdsSuccess
+    parseError: parseGenericError
+  }
+
   ' my stuff screen
   m.requestTypes[m.constants.reqNames.getMyStuffContainers] = {
     parseSuccess: parseCategoryMyStuffContentSuccess
@@ -170,24 +204,6 @@ Function createParsingCallbacks()
     parseSuccess: parseAddToQueueSuccess
     parseError: parseAddToQueueError
   }
-
-  'delete queue bookmarks
-  m.requestTypes[m.constants.reqNames.deleteFromQueue] = {
-    parseSuccess: parseRemoveFromQueueSuccess
-    parseError: parseRemoveFromQueueError
-  }
-
-    'screen saver get container
-    m.requestTypes[m.constants.reqNames.getScreenSaverContainer] = {
-      parseSuccess: parseGetScreenSaverContainerSuccess
-      parseError: parseGenericError
-    }
-
-    'screen saver get home screen container ids
-    m.requestTypes[m.constants.reqNames.getScreenSaverHomeScreenContainerIds] = {
-      parseSuccess: parseGetScreenSaverHomeScreenContainerIdsSuccess
-      parseError: parseGenericError
-    }
 
 End Function
 
