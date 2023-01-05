@@ -119,7 +119,7 @@ Function onEpisodeFocused()
       lineOneData.partnerLogoUri = episode.inlineLogoUri
 
       m.Info.lineOneData = lineOneData
-      m.Info.twoLineData = {
+      m.Info.lineTwoData = {
         genres: episode.genres
       }
       m.Info.needsLogin = episode.needsLogin

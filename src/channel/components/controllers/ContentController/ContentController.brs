@@ -338,7 +338,10 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
 
           newTopScreen = getCurrentScreen()
           if newTopScreen <> invalid
-            newTopScreen.enabled = true
+            if newTopScreen.hasField("enabled") then
+              newTopScreen.enabled = true
+            end if
+
             if newTopScreen.id = m.constants.ui.screenIds.espanolScreen
               setUiMode(m.constants.ui.modes.latino)
             end if
@@ -1621,7 +1624,7 @@ Function onCustomSuspend(msg)
       ' don't send analytics event when user presses "home" button during playback, so sending param as false
       returnToDetailScreenFromVideo(false)
     else if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.categoryDetailsScreen
-      ' if current screen is categoryDetailsScreen, instant resume action is to start the channel from the homescreen (not a full channel restart). 
+      ' if current screen is categoryDetailsScreen, instant resume action is to start the channel from the homescreen (not a full channel restart).
       ' Remove the parent screen from the cache so that it is reloaded if a user navigates back to it in order to prevent a UX bug such that the cached screen
       ' is displayed but nothing is displayed on the screen.
       deleteFromScreenCache(m.constants.ui.screenIds.channelListScreen)
