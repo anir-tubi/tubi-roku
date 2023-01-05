@@ -2,7 +2,8 @@ Function init()
   m.constants = m.global.constants
   m.theme = m.global.theme
 
-  m.top.observeField("focusedChild", "onScreenFocusChange")
+  m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
+  m.top.observeFieldScoped("isEmailValid", "onIsEmailValidChange")
 
   m.pageHeading = m.top.findNode("pageHeading")
   m.pageHeading.text = getTranslation("email_screen_heading")
@@ -16,8 +17,6 @@ Function init()
   m.keyboard = m.top.findNode("Keyboard")
   m.keyboard.textEditBox.opacity = 0.00001
   m.Keyboard.textEditBox.maxTextLength = 100
-
-  m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
 
   m.keyboard.palette = handleKeyboardColors()
 
@@ -59,9 +58,13 @@ Function onScreenFocusChange()
 
   tubiLog("EmailInputScreen.onScreenFocusChange")
   if m.top.hasFocus() then
+    m.keyboard.unobserveFieldScoped("text")
+    m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
+
     ' force a background update
-    m.Keyboard.textEditBox.voiceEnabled = true
     m.top.backgroundUriList = m.backgroundUriList
+
+    m.Keyboard.textEditBox.voiceEnabled = true
     m.keyboard.keyGrid.setFocus(true)
   end if
 
@@ -72,7 +75,9 @@ Function onScreenFocusChange()
 
 End Function
 
+
 Function onKeyboardTextEditBoxFocusedChildChange()
+  tubiLog("EmailInputScreen.onKeyboardTextEditBoxFocusedChildChange")
   ' Don't allow textEditBox to take focus since we're not showing it
   if m.keyboard.textEditBox.hasFocus()
     m.keyboard.keyGrid.setFocus(true)
@@ -96,33 +101,25 @@ Function onContinueButtonSelected(evt)
 
   isButtonSelected = evt.getData()
   if isButtonSelected = true
-    if isEmailValid() = true
-      fade(m.emailValidationMsg, "out", 0.3)
-      m.top.email = m.email.text
-      ' we must set voiceEnabled = false here because if we rely on isInFocusChain() in
-      ' onScreenFocusChange(), voiceEnabled is not set to false until after voiceEnabled is set to true
-      ' on the SignInScreen, which prevents voiceEnabled is getting to true
-      ' on the SignInScreen.
-      m.keyboard.textEditBox.voiceEnabled = false
-      m.top.continueSelected = true
-    else
-      fade(m.emailValidationMsg, "in", 0.3)
-    end if
+    m.top.email = m.email.text
+    ' we must set voiceEnabled = false here because if we rely on isInFocusChain() in
+    ' onScreenFocusChange(), voiceEnabled is not set to false until after voiceEnabled is set to true
+    ' on the SignInScreen, which prevents voiceEnabled is getting to true
+    ' on the SignInScreen.
+    m.keyboard.textEditBox.voiceEnabled = false
+    m.top.continueSelected = true
   end if
-
 End Function
 
 
-Function isEmailValid()
+Function onIsEmailValidChange(msg)
+  isEmailValid = msg.getData()
 
-  isValid = false
-  email = m.email.text
-  emailPattern = CreateObject("roRegex", "[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", "i")
-  if emailPattern.IsMatch(email)
-    isValid = true
+  if isEmailValid = true
+    fade(m.emailValidationMsg, "out", 0.3)
+  else
+    fade(m.emailValidationMsg, "in", 0.3)
   end if
-  return isValid
-
 End Function
 
 

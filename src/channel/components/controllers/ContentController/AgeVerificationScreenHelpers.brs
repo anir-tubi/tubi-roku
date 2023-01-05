@@ -319,6 +319,7 @@ Function onAgeVerifiedAtKidsModeExit(age)
   disableKidsModeFromSideNav()
 End Function
 
+
 ' @age: integer, the age as returned by the backend
 Function onAgeVerifiedAtInputDeeplink(age)
   tubiLog("AgeVerificationScreenHelpers.onAgeVerifiedAtInputDeeplink")
@@ -364,9 +365,11 @@ Function handle_422_451_errorAtKidsModeExitCallback()
   popScreen(false, false)
 End Function
 
+
 Function handle_422_451_errorAtInputDeeplinkCallback()
   popScreen(false, false)
 End Function
+
 
 Function onAgeNotVerifiedAtKidsModeExit(err)
   if err <> invalid AND err.code <> invalid

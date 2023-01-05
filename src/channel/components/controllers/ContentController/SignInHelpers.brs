@@ -100,7 +100,6 @@ Function onRfiUserData(msg)
     input.emailType = "pre_fill"
 
     checkEmailExists(input)
-
   else
 
     hideNavMenu(false)
@@ -123,12 +122,22 @@ End Function
 ' onEmailInputContinueSelected callback triggers when user clicks continue button from Manual Email Input screen
 Function onEmailInputContinueSelected(evt)
   TubiLog("SignInHelpers.onEmailInputContinueSelected")
-  screen =  evt.getRoSGNode()
-  input = {
-    email : screen.email
-    emailType : "manual"
-  }
-  checkEmailExists(input)
+  screen = evt.getRoSGNode() 'emailInputScreen
+  email = screen.email
+
+  if isEmailValid(email) = true
+    input = {
+      email: email
+      emailType: "manual"
+    }
+
+    checkEmailExists(input)
+  else
+    screen.isEmailValid = false
+    ' re-setting focus on the screen is necessary to re-set voiceEnabled on the keyboard
+    screen.setFocus(false)
+    screen.setFocus(true)
+  end if
 
 End Function
 
@@ -180,10 +189,10 @@ Function onEmailExistsResponse(response)
   hideNavMenu()
 
   if response <> invalid
-    parsedresponse = response.parsedresponse
+    parsedResponse = response.parsedResponse
     requestInput = response.requestInput
 
-    if parsedresponse <> invalid AND requestInput <> invalid
+    if parsedResponse <> invalid AND requestInput <> invalid
       rawInput = requestInput.rawInput
 
       gender = ""
@@ -209,7 +218,17 @@ Function onEmailExistsResponse(response)
         end if
       end if
 
-      if parsedresponse.taken = true
+      emailScreen = invalid
+      screen = getCurrentScreen()
+      if screen <> invalid AND screen.isSubType("EmailInputScreen") = true
+        emailScreen = screen
+      end if
+
+      if parsedResponse.taken = true
+        if emailScreen <> invalid
+          emailScreen.isEmailValid = true
+        end if
+
         '//user's email address exists in Tubi servers, so user can sign into their Tubi account
         dateTime = createObject("roDateTime")
         dateTime.fromISO8601String(m.constants.time.magicLinkStartDate)
@@ -229,25 +248,46 @@ Function onEmailExistsResponse(response)
           showSignInScreen(rawInput)
         end if
       else
-        '//user's email address does not exist in Tubi servers, so sign user up with a new Tubi account
-        m.authInfoReceived = false
-        signUpCredentials = {}
-        signUpCredentials.email = email
-        signUpCredentials.emailType = emailType
-        signUpCredentials.gender = gender
-        signUpCredentials.lastName = lastName
-        if isNonEmptyString(firstName) = true
-          signUpCredentials.firstName = firstName
-        else
-          '//if first name does not exist, (i.e. when the user manually enters their email address),
-          '// then use the 1st part of the email address
-          signUpCredentials.firstName = Left(email.split("@")[0], 20) ' limiting by 20 characters for the firstname field
+        if parsedResponse.code = "AVAILABLE"
+          '//user's email address does not exist in Tubi servers, so sign user up with a new Tubi account
+          m.authInfoReceived = false
+          signUpCredentials = {}
+          signUpCredentials.email = email
+          signUpCredentials.emailType = emailType
+          signUpCredentials.gender = gender
+          signUpCredentials.lastName = lastName
+          if isNonEmptyString(firstName) = true
+            signUpCredentials.firstName = firstName
+          else
+            '//if first name does not exist, (i.e. when the user manually enters their email address),
+            '// then use the 1st part of the email address
+            signUpCredentials.firstName = Left(email.split("@")[0], 20) ' limiting by 20 characters for the firstname field
+          end if
+
+          if emailScreen <> invalid
+            emailScreen.isEmailValid = true
+          end if
+
+          showAgeVerificationScreenAtSignUp(signUpCredentials)
+        else if parsedResponse.code = "INVALID_FORMAT"
+          ' user's email address is not acceptable. Could be valid from a semantic point of view,
+          ' but might be blocked by backend due to known spam domain
+
+          ' show email screen if top screen not email screen
+          if screen = invalid OR screen.isSubType("EmailInputScreen") <> true
+            emailScreen = showEmailScreen()
+          else
+            ' re-setting focus on the screen is necessary to re-set voiceEnabled on the keyboard
+            emailScreen.setFocus(false)
+            emailScreen.setFocus(true)
+          end if
+
+          ' tell email screen to show not valid email message
+          emailScreen.isEmailValid = false
         end if
-        showAgeVerificationScreenAtSignUp(signUpCredentials)
       end if
     end if
   end if
-
 End Function
 
 
@@ -287,6 +327,7 @@ Function onEmailExistsError(errorResponse)
   if simpleModalInfo <> invalid AND simpleModalInfo.buttonInfo <> invalid AND simpleModalInfo.buttonInfo[0] <> invalid
     simpleModalInfo.buttonInfo[0].callbackParams = requestInput.rawInput
   end if
+
   showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
 End Function
 
@@ -308,9 +349,7 @@ End Function
 
 ' onSignInScreenEmailSelected callback triggers when user selects the email text box
 Function onSignInScreenEmailSelected()
-
   showEmailScreen()
-
 End Function
 
 
@@ -324,6 +363,7 @@ Function showEmailScreen()
   emailScreen.observeFieldScoped("backButtonSelected", "onEmailInputBackButtonSelected")
   emailScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
   pushScreen(emailScreen, true, true)
+  return emailScreen
 End Function
 
 

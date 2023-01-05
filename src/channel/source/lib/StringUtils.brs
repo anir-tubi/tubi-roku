@@ -305,3 +305,13 @@ Function buildQueryString(params)
   return queryString
 
 End Function
+
+
+' @email: string, an email address to check for validity
+' @returns: boolean,  true if the email passes a trivial email validation check, false otherwise.
+'                     Addiotional, better validation will occur on the backend.
+Function isEmailValid(email)
+  emailPattern = CreateObject("roRegex", "[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", "i")
+
+  return emailPattern.IsMatch(email)
+End Function

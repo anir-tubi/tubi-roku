@@ -16,6 +16,10 @@
 
   <interface>
 
+    <!-- INPUT -->
+      <!-- when set to false, a message indicating that the user should enter a valid email appears -->
+      <field id="isEmailValid" type="boolean" value="true" />
+
     <!-- OUTPUT -->
 
       <!-- continueSelected is triggered when user selects continue button, which checks email exists in database -->
