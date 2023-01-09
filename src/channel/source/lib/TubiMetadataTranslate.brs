@@ -168,7 +168,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
       sType = m.translateBackendTypeToClientSideType(contentFromServer[typeVar])
     end if
     translatedContent[typeVar] = sType
-    
+
     if sType = m.contentTypes.series
       ' prefix "0" to series
       if translatedContent.id <> "" then translatedContent.id = "0" + translatedContent.id
@@ -916,7 +916,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     ' but any single category request should be considered fully loaded
     categoryMetadata.state = "loaded"
     translated.update(categoryMetadata, true)
-    nodeCount = 1 + translated.getChildCount() 
+    nodeCount = 1 + translated.getChildCount()
   end if
 
   tubiLog("TranslateMetadata converted " + stri(nodeCount) + " nodes")
@@ -1210,7 +1210,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           else if type(fullChild.video_resources) = "roArray" AND fullChild.video_resources.count() > 0
             hasVideoResources = true
           end if
-          
+
           sContentType = m.translateBackendTypeToClientSideType(fullChild.type)
           childAA = {
             id: fullChild.id
@@ -1519,7 +1519,7 @@ Function tubiMetadataTranslate_buildEmptyMyStuffCategoryAA(container)
 
     jsonAA = {}
 
-    sTitle = "" 
+    sTitle = ""
     sDescription = ""
     sIconURL = ""
 
@@ -1847,7 +1847,21 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
 
           if channelFromServer.subtitles <> invalid
             channelContentNode.hasSubtitles = true
-            channelContentNode.subtitleTracks = channelFromServer.subtitles
+            subtitleTracks = channelFromServer.subtitles
+
+            if  subtitleTracks[0] <> invalid
+              langDescription = subtitleTracks[0].language
+            else
+              langDescription = "English"
+            end if
+
+
+            '//::TODO::LiveNews::HARDCODE:: - The following code is a hardcoded. The following information has not been sent from backend which is required to show CC
+            subtitleTracks.push({
+              description: langDescription
+              trackname: "eia608/CC1"
+            })
+            channelContentNode.subtitleTracks = subtitleTracks
             channelContentNode.subtitleConfig = {TrackName: "eia608/CC1"}
           else
             channelContentNode.hasSubtitles = false
