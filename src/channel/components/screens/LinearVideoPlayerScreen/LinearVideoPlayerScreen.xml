@@ -167,6 +167,16 @@
         width="1920"
         height="1080"
         visible="false"/>
+      <Group
+        id="logoGroup">
+        <Poster
+          id="tubiLogo"
+          width="309"
+          height="135"
+          uri="pkg:/images/logo-white-xlarge.png"
+          loadSync="true"
+          translation="[810,382]"/>
+      </Group>
 
       <Label
         id="LoadingMessage"

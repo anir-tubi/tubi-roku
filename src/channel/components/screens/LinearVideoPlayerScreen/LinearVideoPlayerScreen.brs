@@ -19,6 +19,7 @@ Function init()
   m.ProgrammingData = m.top.findNode("ProgrammingData")
   m.Loading = m.top.findNode("Loading")
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
+  m.logoGroup = m.top.findNode("logoGroup")
   m.LoadingMessage = m.top.findNode("LoadingMessage")
   m.AdsSSAITask = m.top.findNode("PlayerAdsSSAITask")
   m.AdsSSAITask.observeField("isPlayingAds", "onAdChange")
@@ -336,8 +337,13 @@ Function onVideoStateChange(msg)
       end if
     end if
   else
-    m.LoadingProgressBar.progress = 0
+    m.LoadingProgressBar.progress = 2
     m.Loading.visible = true
+    if m.VideoOverlay <> invalid AND m.VideoOverlay.isDisplaying = true
+      m.logoGroup.visible = false
+    else
+      m.logoGroup.visible = true
+    end if
   end if
 End Function
 
