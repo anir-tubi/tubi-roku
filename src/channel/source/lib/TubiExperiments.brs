@@ -47,7 +47,8 @@ Function TubiExperiments(constants) as Object
         roku_coppa_registration_age_vs_yob_v1: {"enabled": true}
       }
 
-      roku_hdmi_playback: {
+      ' ads_configuration_ prefix is used to specify additional primary metrics.
+      ads_configuration_roku_hdmi_playback: {
         roku_hdmi_playback_v1 : {"enabled": false}
       }
 
