@@ -795,7 +795,9 @@ Function tubiTracking_getOneOfs()
     i: "i"
   }
 
-  landing_page = {}
+  landing_page = {
+    name: ""
+  }
 
   age_gate_page = {}
 

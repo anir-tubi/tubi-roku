@@ -9,6 +9,7 @@ Function init()
     pageType: "landing_page"
     pageValues: {
       page_sequence: m.constants.ui.onBoarding.pageSequence.landingScreen
+      name: "roku_rfi"
     }
   }
 

@@ -131,10 +131,20 @@ End Function
 
 
 Function onLandingScreenRegisterOrSignInButtonPressed()
+  tubiLog("OnBoardingHelpers.onLandingScreenRegisterOrSignInButtonPressed")
   startSignIn()
 End Function
 
 
-Function onLandingScreenGuestButtonPressed()
+Function onLandingScreenGuestButtonPressed(msg)
+  tubiLog("OnBoardingHelpers.onLandingScreenGuestButtonPressed")
+  screen = msg.getRoSGNode()
+  screen.trackingComponentInfo = {
+    componentType : "button_component"
+    componentValues : {
+      button_type: "TEXT"
+      button_value: "CONTINUE_AS_GUEST" 'Button value is always upper case and concatinated by "_"
+    }
+  }
   restartChannel()
 End Function
