@@ -77,113 +77,53 @@
         width="489"/>
     </Group>
 
-    <Group
-      id="AgeVerificationDateInfo"
-      visible="false"
+    <LayoutGroup
+      layoutDirection="horiz"
+      itemSpacings="[24]"
       translation="[890,496]">
-      <LayoutGroup
-        layoutDirection="horiz"
-        itemSpacings="[12]">
 
-          <Label
-            id="AgeVerificationYearText"
-            width="426"
-            height="144"
-            horizAlign="center"
-            vertAlign="center"
-            opacity="0.4"
-            translation="[0,9]">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="70"/>
-          </Label>
+      <Label
+        id="AgeVerificationAgePrefixLabel"
+        height="144"
+        vertAlign="center"
+        opacity="0.4">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="70"/>
+      </Label>
 
-        <Rectangle width="300">
-          <Poster
-            id="AgeVerificationYearBg"
-            uri="pkg:/images/menu-focus-fhd.9.png"
-            width="300"
-            height="144"
-            opacity="1.0"/>
-          <Label
-            id="AgeVerificationYearEntry"
-            width="300"
-            height="144"
-            horizAlign="center"
-            vertAlign="center"
-            opacity="1.0"
-            translation="[0,9]">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="84"/>
-          </Label>
-          <Label
-            id="AgeVerificationYear"
-            width="300"
-            horizAlign="center"
-            opacity="0.4"
-            translation="[0,168]">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="33"/>
-          </Label>
-        </Rectangle>
-      </LayoutGroup>
-    </Group>
-
-    <Group
-      id="AgeVerificationAgeInfo"
-      translation="[890,496]">
-      <LayoutGroup
-        layoutDirection="horiz"
-        itemSpacings="[24]">
-
+      <Poster
+        id="AgeVerificationAgeBg"
+        uri="pkg:/images/menu-focus-fhd.9.png"
+        width="198"
+        height="144">
         <Label
-          id="AgeVerificationAgePrefixLabel"
-          height="144"
-          vertAlign="center"
-          opacity="0.4">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="70"/>
-        </Label>
-
-        <Poster
-          id="AgeVerificationAgeBg"
-          uri="pkg:/images/menu-focus-fhd.9.png"
+          id="AgeVerificationAgeEntry"
           width="198"
-          height="144">
-          <Label
-            id="AgeVerificationAgeEntry"
-            width="198"
-            height="144"
-            horizAlign="center"
-            vertAlign="center"
-            opacity="1.0"
-            translation="[0,9]">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="84"/>
-          </Label>
-        </Poster>
-
-        <Label
-          id="AgeVerificationAgePostfixLabel"
           height="144"
+          horizAlign="center"
           vertAlign="center"
-          opacity="0.4">
+          opacity="1.0"
+          translation="[0,9]">
           <Font
             role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="70" />
+            uri="pkg:/fonts/Vaud-Bold.ttf"
+            size="84"/>
         </Label>
-      </LayoutGroup>
-    </Group>
+      </Poster>
+
+      <Label
+        id="AgeVerificationAgePostfixLabel"
+        height="144"
+        vertAlign="center"
+        opacity="0.4">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="70" />
+      </Label>
+    </LayoutGroup>
 
     <Label
       id="AgeVerificationErrorPrompt"

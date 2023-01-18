@@ -171,7 +171,7 @@ Function conditionallyConfirmBirthYear(ageVerificationScreen, verifyAgeCallback,
     }
 
     title = getTranslation("dialog_confirmCorrectAge_title", {"birthYear": birthYear})
-    if getExperimentResource("roku_coppa_registration_age_vs_yob", "roku_coppa_registration_age_vs_yob_v1", true).enabled = true then
+    if getNodeSubtype(ageVerificationScreen) = "SignUpAgeVerificationScreen" then
       age = currentYear - birthYear.toInt() - 1
       title = getTranslation("dialog_confirmCorrectAge_title_age", {"age": age.toStr()})
     end if
