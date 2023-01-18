@@ -116,7 +116,7 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
     end if
 
     currentScreen = getCurrentScreen()
-    if currentScreen.id <> screen.id AND screen.hasField("jumpToRowItem") = true
+    if currentScreen.id <> screen.id AND isAnEpgScreen(screen) <> true AND screen.hasField("jumpToRowItem") = true
       screen.jumpToRowItem = [0, 0] '//reset original homescreen so it is set back to the origin content item.
     end if
   end if
