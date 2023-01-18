@@ -673,19 +673,19 @@ Function getTranslation_en_US()
     },
     "screenSettings_signOut_description": {
       "description": "Description on SignIn page when user is signed in",
-      "message": " You're signed in as {name}"
+      "message": "You're signed in as {name}"
     },
     "screenSettings_signOut_description2": {
       "description": "More details on the SignIn page when user is signed in",
-      "message": " Email: {email}"
+      "message": "Email: {email}"
     },
     "screenSettings_fullDeviceID": {
       "description": "Text proceeding the full device ID",
-      "message": " Full Device ID"
+      "message": "Full Device ID"
     },
     "screenSettings_about_title": {
       "description": "The title of the about screen",
-      "message": " About Tubi"
+      "message": "About Tubi"
     },
     "screenSettings_about_description": {
       "description": "The description on the about screen",
@@ -697,7 +697,7 @@ Function getTranslation_en_US()
     },
     "screenSettings_about_description2": {
       "description": "The 2nd description on the about screen",
-      "message": "Visit {help_url} \n \n Email our Support team at support@tubi.tv \n \n Reach us on Facebook, Instagram, Twitter, and on our website at: \n {support_url} \n \n Version {version} \n Short Device ID: {id} (press OK to see full Device ID) \n \n © {year} Tubi, Inc. all rights reserved."
+      "message": "Visit {help_url}\n\nEmail our Support team at support@tubi.tv\n\nReach us on Facebook, Instagram, Twitter, and on our website at:\n{support_url}\n\nVersion {version}\nShort Device ID: {id} (press OK to see full Device ID)\n\n© {year} Tubi, Inc. all rights reserved."
     },
     "screenSettings_menu_parentalControls": {
       "description": "The label for the parental controls",
@@ -1443,7 +1443,7 @@ Function getTranslation_en_US()
     },
     "text_new":{
       "description": "simple text to use anywhere to indicate item is new",
-      "message" : "NEW"
+      "message": "NEW"
     },
     "screenEmailVerification_resend_verification_link": {
       "description": "Label of button to allow users to resend the email verification link for sign in",
@@ -2013,22 +2013,6 @@ Function getTranslation_es_MX()
       "description": "Error message when the user has the option to try the operation again.",
       "message": "Intentémoslo de nuevo"
     },
-    "screenInitialContent_title": {
-      "description": "Title of the initial content screen",
-      "message": "¿Qué quieres ver?"
-    },
-    "screenInitialContent_subtitle_signedOut": {
-      "description": "subTitle of the initial content screen when user is signed out",
-      "message": "¡Comienza a ver Gratis! ¡Sin iniciar sesión!"
-    },
-    "screenInitialContent_subtitle_signedIn": {
-      "description": "subTitle of the initial content screen when user is signed in",
-      "message": "Elige algo para ver"
-    },
-    "screenInitialContent_show_everything_title": {
-      "description": "title for button a user clicks to skip selecting a content experience",
-      "message": "Muestrame Todo"
-    },
     "screenDetails_queue_content_added_to_list_description": {
       "description": "Message when a content is added to the user's list after sign in.",
       "message": "Contenido"
@@ -2079,19 +2063,19 @@ Function getTranslation_es_MX()
     },
     "screenSettings_signOut_description": {
       "description": "Description on SignIn page when user is signed in",
-      "message": " Has iniciado sesión como {name}"
+      "message": "Has iniciado sesión como {name}"
     },
     "screenSettings_signOut_description2": {
       "description": "More details on the SignIn page when user is signed in",
-      "message": " Correo electrónico: {email}"
+      "message": "Correo electrónico: {email}"
     },
     "screenSettings_fullDeviceID": {
       "description": "Text proceeding the full device ID",
-      "message": " ID de dispositivo completo"
+      "message": "ID de dispositivo completo"
     },
     "screenSettings_about_title": {
       "description": "The title of the about screen",
-      "message": " Acerca de Tubi"
+      "message": "Acerca de Tubi"
     },
     "screenSettings_about_description": {
       "description": "The description on the about screen",
