@@ -241,7 +241,6 @@ async function pushBranch(done){
 }
 
 
-
 async function createGithubRelease(done) {
   // Prompt if the dev wants to make a release via the CLI (as opposed to Github UI)
   const {releaseConfirmation} = await prompts({
@@ -336,37 +335,27 @@ async function createGithubRelease(done) {
     },
   ]);
 
-  // prompt the dev for the release notes to be used as the Release body
-  let releaseNotes = preReleaseDate ? preReleaseDate.toLocaleDateString("en-US") : new Date().toLocaleDateString("en-US");  // '12/25/2020'
+  const releaseNotes = await buildReleaseNotes(done);
 
-  while (true) {
-    // multi-line string
-    let releaseNotesState = `Current release notes:\n${releaseNotes}`;
+  const date = preReleaseDate ? preReleaseDate.toLocaleDateString("en-US") : new Date().toLocaleDateString("en-US") // '12/25/2020'
+  releaseNotes.unshift(date);
 
-    log(releaseNotesState); //this is part of the CLI UI - leave in
-    const {releaseNotesConfirmation, releaseNote} = await prompts([
-      {
-        type: 'confirm',
-        name: 'releaseNotesConfirmation',
-        message: 'Add another release note? (y/n)'
-      },
-      {
-        type: (prev) => {
-          // only show this prompt if user selected yes in previous prompt.
-          // returning null won't show this prompt.
-          return prev ? 'text' : null;
-        },
-        name: 'releaseNote',
-        message: "Please type the next release note: "
-      }
-    ]);
+  let formattedReleaseNotes = releaseNotes.join('\n')
 
-    if (!releaseNotesConfirmation) {
-      break;
-    } else if (releaseNotesConfirmation && releaseNote) {
-      // only add release notes if something was typed
-      releaseNotes += `\n${releaseNote}`;
+  let releaseNotesState = `Current release notes:\n\n${formattedReleaseNotes}\n`;
+
+  // prompt the dev to confirm the generated release notes
+  log(releaseNotesState); //this is part of the CLI UI - leave in
+  const {releaseNotesConfirmation} = await prompts([
+    {
+      type: 'confirm',
+      name: 'releaseNotesConfirmation',
+      message: 'Do the release notes above look correct? If you choose "no", you will need to update the release notes in Github manually. (y/n)'
     }
+  ]);
+
+  if (!releaseNotesConfirmation) {
+    formattedReleaseNotes = date;
   }
 
   log(`...Creating a release from the ${buildTag} tag on Github`);
@@ -376,7 +365,7 @@ async function createGithubRelease(done) {
       repo: ghInfo.rokuRepo,
       tag_name: buildTag,
       name: releaseType,
-      body: releaseNotes,
+      body: formattedReleaseNotes,
       //mark as pre-release if there is a date associated with the pre release.
       prerelease: preReleaseDate ? true : false
     });
@@ -385,6 +374,87 @@ async function createGithubRelease(done) {
     done(new NoStackError(err));
   }
 }
+
+
+// Helper to work around the fact you can't fetch if you're already on the branch
+async function pullOrFetchBranch(branch, done) {
+  // pull origin of compareBranch
+  if (getCurrentBranch(done) === branch) {
+    // Have to pull if on the current branch as fetch will fail https://stackoverflow.com/questions/2236743/git-refusing-to-fetch-into-current-branch
+    execGitCommand(`git pull`, `Could not pull ${branch} branch`, done);
+  } else {
+    execGitCommand(`git fetch origin ${branch}:${branch}`, `Could not fetch ${branch} branch`, done);
+  }
+}
+
+
+async function buildReleaseNotes(done) {
+  verifyGit(done);
+
+  const prodBranch = getProductionBranchName();
+  const currentBranch = getCurrentBranch(done);
+
+  // Add a prompt asking if engineer wants to fetch latest from prodBranch and currentBranch branches
+  const {prepareConfirmation} = await prompts({
+    type: 'confirm',
+    name: 'prepareConfirmation',
+    message: `Running this script will apply updates from origin ${prodBranch} and origin ${currentBranch} to your local ${prodBranch} and ${currentBranch} branches. Do you wish to proceed? (y/n)`,
+  });
+
+  if (!prepareConfirmation) {
+    const declineMsg = 'Script aborted';
+    log(declineMsg);
+    return done();
+  }
+
+  pullOrFetchBranch(prodBranch, done);
+  const prodBranchCommits = getPullRequestCommitsForBranch(prodBranch, done);
+
+
+  pullOrFetchBranch(currentBranch, done);
+  const currentBranchCommits = getPullRequestCommitsForBranch(currentBranch,done);
+
+  const releaseNotes = [];
+
+  // filter down to pull requests from currentBranch that aren't on prodBranch
+  for (const prId in currentBranchCommits) {
+    // If we didn't find the pull request then we want to add it to to the release notes
+    if (!prodBranchCommits[prId]) {
+      const response = await octokit.pulls.get({
+        owner: ghInfo.owner,
+        repo: ghInfo.rokuRepo,
+        pull_number: +prId
+      });
+
+      const prReleaseNotesMatch = response.data.body.match(/## Release Notes.*?---(.*)## QA What Changed/s)
+      if (!prReleaseNotesMatch) {
+        console.log(`Could not retrieve release notes for pull request #${prId}`);
+      } else {
+        const prReleaseNotes = prReleaseNotesMatch[1].trim();
+        if (prReleaseNotes) {
+          releaseNotes.push(prReleaseNotes);
+        }
+      }
+    }
+  }
+  return releaseNotes;
+}
+
+
+function getPullRequestCommitsForBranch(branch, done) {
+  const gitLogs = execGitCommand(`git log ${branch} -200`, `Could not get git logs from ${branch} branch.`, done);
+  const pullRequestCommits = {};
+  gitLogs.split('\n')
+    .forEach((item) => {
+      const prId = extractPrIdFromCommitInfo(item);
+      if (prId) {
+        pullRequestCommits[prId] = item;
+      }
+    });
+    return pullRequestCommits;
+}
+
+
 // @compareBranch: string, the branch name we are comparing to master"
 async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
   // verify clean working directory
@@ -403,40 +473,23 @@ async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
     return done();
   }
 
-  // pull origin of compareBranch
-  if (getCurrentBranch(done) === compareBranch) {
-    // Have to pull if on the current branch as fetch will fail https://stackoverflow.com/questions/2236743/git-refusing-to-fetch-into-current-branch
-    execGitCommand(`git pull`, `Could not pull ${compareBranch} branch`, done);
-  } else {
-    execGitCommand(`git fetch origin ${compareBranch}:${compareBranch}`, `Could not fetch ${compareBranch} branch`, done);
-  }
-
-  // get commits on compareBranch
-  const gitLogs = execGitCommand(`git log ${compareBranch} -200`, `Could not get git logs from ${compareBranch} branch.`, done);
-
-  // process/store commits on compareBranch branch
-  const foundPullRequests = {}
-  gitLogs.split('\n')
-    .forEach((item) => {
-      const prId = extractPrIdFromCommitInfo(item);
-      if (prId) {
-        foundPullRequests[prId] = true;
-      }
-    });
+  // process/store pull requests on compareBranch branch
+  pullOrFetchBranch(compareBranch, done);
+  const compareBranchCommits = getPullRequestCommitsForBranch(compareBranch, done)
 
   // pull origin master
-  execGitCommand('git fetch origin master:master', 'Could not fetch origin from master.', done);
+  pullOrFetchBranch('master', done);
+  const masterBranchCommits = getPullRequestCommitsForBranch('master');
 
-  // get commits on master
-  const gitLogMaster = execGitCommand('git log master --oneline -200', 'Could not get git logs from master branch.', done);
+  const commitsFromMasterNotOnCompareBranch = []
 
-  // filter logs from master that aren't on compareBranch
-  const commitsFromMasterNotOnCompareBranch = gitLogMaster
-    .split('\n')
-    .filter((item) => {
-      const prId = extractPrIdFromCommitInfo(item);
-      return prId && !foundPullRequests[prId];
-    });
+  // filter down to pullRequests from master that aren't on compareBranch
+  for (const prId in masterBranchCommits) {
+    // If we didn't find the pull request then add it to the list
+    if (!compareBranchCommits[prId]) {
+      commitsFromMasterNotOnCompareBranch.push(masterBranchCommits[prId]);
+    }
+  }
 
   console.log('');
   console.log(`COMMITS THAT HAVE NOT BEEN CHERRY PICKED FROM master TO ${compareBranch}`);
@@ -449,10 +502,10 @@ async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
 }
 
 
-function findCommitsNotOnProductionBranch(done) {
+function getProductionBranchName() {
   const minorVersionNumber = getBuildTag(true, false);
   const prodBranch = `${minorVersionNumber}_branch`;
-  return findCommitsOnMasterNotOnBranch(done, prodBranch);
+  return prodBranch;
 }
 
 
@@ -460,6 +513,12 @@ function getCurrentBranch(done) {
   const errorMsg = 'Could not get current branch';
   const currentBranch = execGitCommand('git branch --show-current', errorMsg, done).trim();
   return currentBranch;
+}
+
+
+function findCommitsNotOnProductionBranch(done) {
+  const prodBranch = getProductionBranchName();
+  return findCommitsOnMasterNotOnBranch(done, prodBranch);
 }
 
 
@@ -490,27 +549,14 @@ function execGitCommand(gitCommand, defaultErrorMsg, done) {
 // extractPrIdFromCommitInfo extracts a Github PR ID from the end of a string, presumably
 // a line as returned by 'git log'. For example the following line has a Github PR ID of (#1666):
 // '34a35ht7 change the linear countdown timer to 20 sec before fullscreen (#1666)'
+// The PR ID can be found at the end of any PR commit message and is formatted like "(#1234)". This function returns just the number portion  "1234" for easier usage with other APIs using the PR ID.
 //
 // @commitInfo: string
 //
-// @returns: string, the PR ID like '(#1234)'
+// @returns: string, the PR ID like '1234'
 function extractPrIdFromCommitInfo(commitInfo) {
-  const rev = commitInfo
-    .split('')
-    .reverse()
-    .join('')
-
-  const prIdPosition = rev.indexOf('#( ')
-
-  if (prIdPosition > 0){
-    return rev
-      .slice(0, prIdPosition + 2)
-      .split('')
-      .reverse()
-      .join('')
-  } else {
-    return ""
-  }
+  const match = commitInfo.match(/\(#(\d+)\)$/);
+  return match?.[1];
 }
 
 
@@ -601,5 +647,6 @@ module.exports = {
   findCommitsNotOnProductionBranch,
   findCommitsNotOnCurrentBranch,
   addMissingImagesToRemoteLibrary,
-  pushBranch
+  pushBranch,
+  buildReleaseNotes
 };

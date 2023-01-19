@@ -284,6 +284,8 @@ TBD
   - make a PR against `master` from the `roku_x_y_z` branch.
   - push the `release_x_y_z` branch to Github.
   - make a PR to the `x_y_branch` on Github from the `release_x_y_z` branch.
+  - prompt you to make a Github release (including adding build notes) in the CLI based on the tag that was just created. __If you choose not to make a release in the CLI, you must do step 14.__
+    - Automatic release note generation has now been added. If you choose not to use the automatically generated release notes, please make sure that the release notes adhere to the following. Each build note should be correspond to a change that was submitted as part of the QA Shortcut ticket that you made earlier. Remember, do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
   - copy the Github urls for the two PRs made above to the clipboard.
 
     __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Submission Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#submission-release)
@@ -325,7 +327,7 @@ TBD
 
 - In the description area, add the date on which the release was actually deployed (ideally this is the same day as the Github release is being created, but sometimes it might not be.
 
-- Also within the description area, add the changes that were included in the release to the "Describe this release" description text box. As it was mentioned earlier, use the the changes that were submitted to the QA Club House ticket that you made earlier. Each change should be on its own line and end with a period. Remember do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
+- Also within the description area, add the changes that were included in the release to the "Describe this release" description text box if you did not use the automatic release note generation. As it was mentioned earlier, use the the changes that were submitted to the QA Shortcut ticket that you made earlier. Each change should be on its own line and end with a period. Remember do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
 
 - Select "Publish Release"
 
@@ -410,7 +412,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
   - create a tag based on the last commit named `x_y_z`
   - push the tag to Github
   - prompt you to make a Github release (including adding build notes) in the CLI based on the tag that was just created. __If you choose not to make a release in the CLI, you must do step 14.__
-    - Each build note should be correspond to a change that was submitted as part of the QA Club House ticket that you made earlier. Remember, do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
+    - Automatic release note generation has now been added. If you choose not to use the automatically generated release notes, please make sure that the release notes adhere to the following. Each build note should be correspond to a change that was submitted as part of the QA Shortcut ticket that you made earlier. Remember, do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
 
   __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Remote Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#remote-release)
 
@@ -452,7 +454,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 - In the description area, add the date on which the release was actually deployed (ideally this is the same day as the Github release is being created, but sometimes it might not be).
 
-- Also within the description area, add the changes that were included in the release to the "Describe this release" description text box. As it was mentioned earlier, use the the changes that were submitted to the QA Club House ticket that you made earlier. Each change should be on its own line and end with a period. Remember do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
+- Also within the description area, add the changes that were included in the release to the "Describe this release" description text box if you did not use the automatic release note generation. As it was mentioned earlier, use the the changes that were submitted to the QA Shortcut ticket that you made earlier. Each change should be on its own line and end with a period. Remember do not use commit messages, but rather write simple phrases or sentences that are easy to digest and accurately describe what the change was. Assume non technical readers will be consuming this information.
 
 - Select "Publish Release"
 
@@ -469,7 +471,7 @@ The build will have the following features:
 - Content APIs are set to production. Analytics ingestion API, and Logging API set to staging.
 - No starter components or remote components are used.
 
-Send the .zip that is created to the appropriate QA team member along with a Club House ticket requesting testing.
+Send the .zip that is created to the appropriate QA team member along with a Shortcut ticket requesting testing.
 
 # Suitest
 

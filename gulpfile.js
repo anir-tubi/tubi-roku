@@ -31,7 +31,7 @@ const {listUnusedImages,listUnusedTranslations} = require('./js/codeclean.js');
 const {NoStackError} = require('./js/utilities')
 
 // Importing functions with Git functionality
-const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch} = require('./js/git');
+const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes} = require('./js/git');
 
 /* Allow some environment variables to drive which config we're building.
    Environment variables are set on options, along with any parameters passed in
@@ -707,6 +707,16 @@ async function confirmRelease(done) {
 }
 
 
+async function buildReleaseNotesOutput(done) {
+  const releaseNotes = await buildReleaseNotes(done);
+  console.log('');
+  console.log(`RELEASE NOTES`);
+  console.log('-----------------------------------------------------------------------');
+  console.log(releaseNotes.join('\n'));
+  done();
+}
+
+
 // Simple helper to avoid having to type the dashes each time to get the tasks list. Also prints a more compact version
 function listTasks(done) {
   console.log(shell.exec(`gulp --tasks-simple`).stdout);
@@ -731,6 +741,7 @@ exports.compareProd = findCommitsNotOnProductionBranch;
 exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
 exports.addMissingImages = addMissingImagesToRemoteLibrary;
 exports.tasks = listTasks;
+exports.buildReleaseNotes = buildReleaseNotesOutput;
 exports.runPerformanceTests = series(setPerformanceTestsConfig, clean, buildInstalled, runPerformanceTests);
 
 //command lines related to the crowdin language translations
