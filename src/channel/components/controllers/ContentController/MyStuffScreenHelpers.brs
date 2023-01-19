@@ -6,9 +6,15 @@ Function showMyStuffScreen()
   bLoggedInUser = isLoggedInUser()
 
   if screen <> invalid
-    bLoadData = false
-    screen.isLoading = false
-    showHideSpinner(false)
+    if bLoggedInUser = false OR (screen.content <> invalid AND shouldRefresh(screen.content) = false)
+      '//If not logged in, or if content has not been indicated to be stale, then no need to load data
+      bLoadData = false
+      screen.isLoading = false
+      showHideSpinner(false)
+    else
+      screen.isLoading = true
+      showHideSpinner(true)
+    end if
   else
 
     screen = CreateObject("roSGNode", "MyStuffScreen")
@@ -38,11 +44,12 @@ Function showMyStuffScreen()
 
   displayDefaultBackground()
   screen.signedIn = bLoggedInUser '//display the guest or signed-in user profile experience
-  
+
   ' make queue API request only if bLoadData is set to true
   if bLoadData = true
     fetchMyStuffCategoryDetails(screen)
   else
+    jumpToPreviousFocusedItem() 
     showHideSpinner(false)
   end if
   
@@ -89,31 +96,17 @@ Function onMyStuffBatchResponse(response)
   screenID = m.constants.ui.screenIds.myStuffScreen
   screen = getFromScreenCache(screenID)
   if screen <> invalid
-    rowItemFocused = invalid
-    oldFocusedContentID = ""
     if response <> invalid
       nValidUntil = determineValidUntilDurationBasedOnChildren(response)
       response.addField("validUntil", "integer", false)
-      cursorPosition = screen.cursorPosition
-      if cursorPosition <> invalid AND cursorPosition[0] >= 0 AND cursorPosition[1] >= 0
-        rowItemFocused = screen.cursorPosition
-      end if
-      if screen.contentFocused <> invalid
-        oldFocusedContentID = screen.contentFocused.id
-      end if
       response.validUntil = nValidUntil
     end if
 
     screen.content = response
     screen.contentUpdated = true
 
-    if rowItemFocused <> invalid
-      '//try to focus on the previous focused item before the content was reloaded.
-      screen.jumpToRowItemByIdAndIndex  = {
-        id: oldFocusedContentID, 
-        index: rowItemFocused
-      }
-    end if
+    jumpToPreviousFocusedItem()
+    
     
     screen.isLoading = false
     showHideSpinner(false)
@@ -127,6 +120,39 @@ Function onMyStuffBatchResponse(response)
     end if
   end if
 End Function
+
+
+Function jumpToPreviousFocusedItem()
+  tubiLog("MyStuffScreenHelpers.jumpToPreviousFocusedItem")
+  screenID = m.constants.ui.screenIds.myStuffScreen
+  screen = getFromScreenCache(screenID)
+  if screen <> invalid
+    rowItemFocused = invalid
+    oldFocusedContentID = ""
+    cursorPosition = screen.cursorPosition
+    if cursorPosition <> invalid AND cursorPosition[0] >= 0 AND cursorPosition[1] >= 0
+      rowItemFocused = screen.cursorPosition
+    end if
+    if screen.contentFocused <> invalid
+      '//Does the screen have a previous focused item?
+      oldFocusedContentID = screen.contentFocused.id
+    end if
+
+    if rowItemFocused <> invalid
+      '//try to focus on the previous focused item before the content was reloaded.
+      screen.jumpToRowItemByIdAndIndex  = {
+        id: oldFocusedContentID, 
+        index: rowItemFocused
+      }
+    else
+      '//focus on the left most item
+      screen.jumpToRowItemByIdAndIndex  = {
+        index: [0,0]
+      }
+    end if
+
+  end if
+End FUnction
 
 
 ' Determine the valid until duration baed on the passed content's container children. 
@@ -173,7 +199,9 @@ End function
 Function onRefreshContentSignalForMyStuffScreen(msg)
   tubiLog("MyStuffScreenHelpers.onRefreshContentSignalForMyStuffScreen")
   screen = msg.getRoSGNode()
-  refreshContentSignalForMyStuffScreen(screen)
+  if screen.isLoading = false
+    refreshContentSignalForMyStuffScreen(screen)
+  end if
 End Function
 
 

@@ -21,7 +21,7 @@
 
       <!-- When the Helper receives valid category data from the server, it sets the new value to this field. -->
       <field id="content" type="node"/>
-
+      
       <!-- contentUpdated should be set when the new content is ready to be displayed on the screen. -->
       <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
 

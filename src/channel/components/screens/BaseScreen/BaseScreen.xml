@@ -76,6 +76,9 @@
       <!-- Holds the information of how to handle when the screen is active after instant resume.
            Action will be taken when instantResumeAction values are "restartApp", "startChannel" and resumeChannel. -->
       <field id="instantResumeAction" type="string" value="resumeChannel"/>
+
+      <!-- Tells the screen to reset values back to what they were when the screen 1st loaded. -->
+      <field id="reset" type="boolean" alwaysNotify="true"/>
   </interface>
 
   <children>

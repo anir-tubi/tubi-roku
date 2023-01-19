@@ -964,7 +964,7 @@ End Function
 
 
 Function refreshHomeScreenContainers()
-  tubilog("homeScreen.refreshHomeScreenContainers")
+  tubilog("HomeScreen.refreshHomeScreenContainers")
   loadCategoryForIds = []
   for i = 0 to m.CategoryGridList.content.getChildCount() - 1
     container = m.CategoryGridList.content.getChild(i)

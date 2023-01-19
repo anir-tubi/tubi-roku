@@ -114,7 +114,6 @@ Function onSideNavItemSelected()
   ' screenIdToSideNavId map in constants to point multiple screen ids (home, movies, tv)
   ' to a single side nav id and we will not need a function like getSideNavIdAssociatedWithScreen()
   currentScreenSideNavId = getSideNavIdAssociatedWithScreen(currentScreenNow)
-
   if currentScreenSideNavId <> itemSelectedId
     '// If a new screen is to be called, then collapse the side nav and remember which side nav button was last clicked
     bNewScreenCalledSuccess = false
@@ -129,6 +128,10 @@ Function onSideNavItemSelected()
     sideNavComponentValues = {
       left_nav_section: m.Tracking.sideNavPageMap[itemSelectedId]
     }
+    if currentScreenNow.hasField("reset") = true
+      '//reset the previous current screen
+      currentScreenNow.reset = true
+    end if
 
     currentScreenNow.trackingComponentInfo = {
       componentType: "left_side_nav_component"

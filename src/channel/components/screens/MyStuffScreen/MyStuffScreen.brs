@@ -68,6 +68,7 @@ Function init()
   m.top.observeFieldScoped("transportVoiceRequest", "onTransportVoiceRequest")
   m.top.observeFieldScoped("signedIn", "onSignedInChange")
   m.top.observeFieldScoped("jumpToRowItemByIdAndIndex", "onJumpToRowItemChange")
+  m.top.observeFieldScoped("reset", "onResetChange")
 End Function
 
 
@@ -386,33 +387,68 @@ End Function
 Function onJumpToRowItemChange(msg)
   tubiLog("MyStuffScreen.onJumpToRowItemChange")
   rowItemToSetFocus = msg.getData()
-  if m.RowList.content <> invalid AND rowItemToSetFocus <> invalid AND isNonEmptyString(rowItemToSetFocus.id) = true AND isNonEmptyArray(rowItemToSetFocus.index)
-    itemIndex = rowItemToSetFocus.index
+  if m.RowList.content <> invalid AND rowItemToSetFocus <> invalid AND (isNonEmptyString(rowItemToSetFocus.id) = true OR isNonEmptyArray(rowItemToSetFocus.index) = true)
+    itemIndex = [0,0]
+    if isNonEmptyArray(rowItemToSetFocus.index) = true
+      itemIndex = rowItemToSetFocus.index
+    end if
     sItemID = rowItemToSetFocus.id
     row = itemIndex[0]
     column = itemIndex[1]
-    focusRow = m.RowList.content.getChild(row)
-    nRowCount = focusRow.getChildCount() - 1
 
-    '//Try to find the content within the provided row
-    bFindByID = false
-    for i = 0 to nRowCount
-      item = focusRow.getChild(i)
-      if item.id = sItemID
-        bFindByID = true
-        column = i
-        exit for
+    if isNonEmptyString(sItemID) = true 
+      focusRow = m.RowList.content.getChild(row)
+      nColumnCount = focusRow.getChildCount() - 1
+
+      '//Try to find the content within the provided row
+      bFindByID = false
+      for i = 0 to nColumnCount
+        item = focusRow.getChild(i)
+        if item.id = sItemID
+          bFindByID = true
+          column = i
+          exit for
+        end if
+      end for
+
+      '//If the content cannot be located, (it may have been removed from the container), then use the provided column or the closest column available within that row if that column no longer exists.
+      if bFindByID = false
+        if column > nColumnCount
+          column = nColumnCount
+        end if
       end if
-    end for
+    end if
 
-    '//If the content cannot be located, (it may have been removed from the container), then use the provided column or the closest column available within that row if that column no longer exists.
-    if bFindByID = false
-      if column > nRowCount
-        column = nRowCount
+    if m.RowList.content.getChild(row).gridItemType = m.constants.ui.gridItemTypes.emptyContainer
+      '//If the current row is empty, then check if the other row is empty
+      column = 0
+      nOtherRow = Abs(row - 1)
+      if m.RowList.content.getChild(nOtherRow).gridItemType <> m.constants.ui.gridItemTypes.emptyContainer
+        '//if the other row is not empty, then set focus on other row
+        row = nOtherRow
+      else
+        '//if the other row is empty, then default focus on the top row
+        row = 0
       end if
     end if
 
     m.RowList.jumpToRowItem = [row, column]
   end if
 
+End Function
+
+
+'''''''''''''''''''''''''''
+' onResetChange
+'
+' When the reset field is set to true, then reset some values back to where they were when the screen 1st loaded.
+Function onResetChange(msg)
+  tubiLog("MyStuffScreen.onResetChange")
+  bReset = msg.getData()
+  if bReset = true
+    m.top.contentFocused  = invalid
+    m.oldCursorPosition = [-1,-1]
+    m.top.cursorPosition = [-1,-1]
+    m.RowList.jumpToRowItem = [0, 0]
+  end if
 End Function

@@ -1094,4 +1094,4 @@ Function onLoadCategoryForIds(msg)
     })
   end if
   return true
-End function
+End Function
