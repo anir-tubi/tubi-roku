@@ -48,7 +48,6 @@ manifest:
   sdk_instant_resume: 1
   run_as_process: 1
   bs_const: {{bsConst}}
-  screensaver_title: Tubi Screen Saver
 
 component_library_manifest:
   title: "Tubi Component Library"
