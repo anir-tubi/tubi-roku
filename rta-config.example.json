@@ -1,0 +1,25 @@
+{
+    "RokuDevice": {
+        "devices": [
+            {
+                "host": "<DEVICE-IP>",
+                "password": "<DEVICE-PASSWORD>"
+            }
+        ],
+        "deviceIndex": 0
+    },
+    "OnDeviceComponent": {
+        "logLevel": "error",
+        "clientDebugLogging": false,
+        "disableTelnet": true
+    },
+    "NetworkProxy": {
+        "clientDebugLogging": false
+    },
+    "ECP": {
+        "default": {
+            "keyPressDelay": 0,
+            "launchChannelId": "dev"
+        }
+    }
+}

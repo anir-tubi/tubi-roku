@@ -1,20 +1,18 @@
 'use strict';
-const {series, parallel, src, dest} = require('gulp');
+const {series, src, dest} = require('gulp');
 const del = require('del');
 const fs = require('fs');
-const debug = require('gulp-debug-streams');
 const dedupe = require('gulp-dedupe');
 const replace = require('gulp-replace');
 const { server, serverClose } = require('gulp-connect');
 const filter = require('gulp-filter');
 const zip = require('gulp-zip');
+const mocha = require('gulp-mocha');
 const mergeStream = require('merge-stream');
 const log = require('fancy-log');
-const http = require('http');
 const mkdirp = require('mkdirp');
-const request = require('request');
 const prompts = require('prompts');
-const { RooibosProcessor, createProcessorConfig, ProcessorConfig } = require('rooibos-cli');
+const { RooibosProcessor, createProcessorConfig } = require('rooibos-cli');
 const shell = require('shelljs');
 shell.config.silent = true;
 // Uncomment the next line if there are connection issues to the Roku device
@@ -619,6 +617,31 @@ function setStaging(done) {
 }
 
 
+// force qa on options, so we ensure our build is using the qa config and set other automated test config settings
+function setPerformanceTestsConfig(done) {
+  if(options) {
+    options.config = 'qa';
+    options.overrides = {
+      settings: {
+        injectRtaOnDeviceComponent: true,
+        printReqAndResInfo: false,
+        bs_const: {
+          consoleLoggingEnabled: false
+        }
+      }
+    }
+    done();
+  } else {
+    done(new Error('setBenchmarkTestsConfig: options not found.'));
+  }
+}
+
+function runPerformanceTests() {
+  return src(['js/automated-tests/performance-tests/*.js'], { read: false })
+    .pipe(mocha({}));
+};
+
+
 // force test on options, so we ensure our build is using the test config
 function setTest(done) {
   if(options) {
@@ -708,6 +731,7 @@ exports.compareProd = findCommitsNotOnProductionBranch;
 exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
 exports.addMissingImages = addMissingImagesToRemoteLibrary;
 exports.tasks = listTasks;
+exports.runPerformanceTests = series(setPerformanceTestsConfig, clean, buildInstalled, runPerformanceTests);
 
 //command lines related to the crowdin language translations
 exports.update_local_translations = updateLocalTranslations;

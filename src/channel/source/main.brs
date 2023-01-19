@@ -22,6 +22,10 @@ Function Main(startupArgs)
   permaScreen.CreateScene("BackgroundScene")
   permaScreen.show()
 
+  if constants.settings.injectRtaOnDeviceComponent = true then
+    m.odc = createObject("roSGNode", "RTA_OnDeviceComponent") 'bs:disable-line 1128
+  end if
+
   while runChannel(constants, log, request) = true
   end while
 End Function
@@ -89,7 +93,7 @@ Function runChannel(constants, log, request)
     return false
   end if
 
-  ' execute suitest libray only if the mode is qa & suitest attribute enabled in qa config yml
+  ' execute suitest library only if the mode is qa & suitest attribute enabled in qa config yml
   if constants.thirdParty.suiteTest.enabled = true AND constants.settings.mode = "qa"
     SuitestLibrary = createObject("roSGNode", "SuitestLibrary") 'bs:disable-line 1128
     SuitestLibrary.app_id = constants.thirdParty.suiteTest.app_id

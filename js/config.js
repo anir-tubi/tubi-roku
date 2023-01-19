@@ -55,8 +55,9 @@ function formatBuildTag(build, isMinor, isDot) {
  * @returns {*}
  */
 function load(options) {
-  const env = options.config
-  const { port } = options
+  const env = options.config;
+  const { port } = options;
+  const overrides = options.overrides ?? {};
   const build = parse(buildProfile);
 
   // Preliminarily gather all the values from the default/environment/build ymls.
@@ -67,7 +68,7 @@ function load(options) {
   // placeholders with template values that exist in the same profile/file.
   const defaultDataPre = parse(defaultProfile, {});
   const envDataPre = parse(env, {});
-  const overWrittenDataPre = extend(true, defaultDataPre, envDataPre, build);
+  const overWrittenDataPre = extend(true, defaultDataPre, envDataPre, build, overrides);
 
   let templateValues = {
     localHostAddress: `${localIp}`,
@@ -84,7 +85,7 @@ function load(options) {
 
   // Squashes the build, envData, and defaultData objects into a single object.
   // Overwriting (if necessary) happens in reverse parameter order (ie. build overwrites envData, etc.)
-  return extend(true, defaultDataPost, envDataPost, build);
+  return extend(true, defaultDataPost, envDataPost, build, overrides);
 }
 
 
