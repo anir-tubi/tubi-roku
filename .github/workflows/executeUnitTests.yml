@@ -35,21 +35,10 @@ jobs:
       # runs gulp command to upload package to roku device and runs all unit tests
       - name: run gulp command
         run: |
-          gulp test --sametab > log.txt 2> log.txt &
           echo "Unit Tests are running"
-          PROCESS_ID=$!
-          while true
-          do
-            if cat log.txt | grep "unit_tests_completed"
-            then
-              echo "Unit Tests are completed"
-              break
-            fi
-            sleep 1
-          done
-          actual=`grep 'RESULT:' log.txt  | tail -1`
+          gulp test --sametab > log.txt 2> log.txt
+          actual=`grep 'RESULT:' log.txt | tail -1`
           expected="RESULT: Success"
-          kill -SIGINT $PROCESS_ID
           cat log.txt
           if [ "$actual" = "$expected" ]; then
               echo "Success"

@@ -409,6 +409,16 @@ function upload(zipPath) {
   });
 }
 
+function serverMiddleware(req, res, next) {
+  // If we receive a request to this endpoint then we know our unit test have finished so we should stop the process.
+  if (req.url === '/unit_tests_completed') {
+    setTimeout(() => {
+      process.exit();
+    }, 2000);
+  }
+  next();
+}
+
 
 // Uploads the tubi_x_y_z.zip to the roku and launches a server to serve the starter and remote components
 function sideLoad(done) {
@@ -421,7 +431,12 @@ function sideLoad(done) {
       host: "0.0.0.0",
       port: options.port,
       root: 'build',
-      debug: true
+      debug: true,
+      middleware: () => {
+        return [
+          serverMiddleware
+        ]
+      }
     })
   )
   .catch((err) => {
