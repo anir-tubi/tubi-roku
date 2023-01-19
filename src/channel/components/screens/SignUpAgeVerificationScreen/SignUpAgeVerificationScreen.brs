@@ -65,16 +65,20 @@ End Function
 
 Function onNumberPadTextChanged(msg)
   text = msg.getData()
-  ' We don't handle our checks until a user actually clicks start watching just update the onscreen text
-  ' Only allow a max of 3 digits
-  if text.len() > 3 then
-    text = text.left(3)
-    ' Have to also set the numberpad to prevent getting out of sync
-    m.NumberPad.text = text
+  age = text.toInt()
+
+  m.AgeErrorPrompt.visible = false
+  if text = "0" then
+    m.AgeErrorPrompt.visible = true
+    text = ""
+  else if age > 125
+    m.AgeErrorPrompt.visible = true
+    text = text.left(text.len() - 1)
   end if
 
+' Have to also set the numberpad to prevent getting out of sync
+  m.NumberPad.text = text
   m.AgeEntry.text = text
-
 End Function
 
 ' @year: String - year we are saying the user was born in
@@ -100,10 +104,6 @@ Function onStartButtonSelected()
   else if age <= 4 AND m.warningDisplayedCount = 0 then
     m.AgeWarningPrompt.visible = true
     m.warningDisplayedCount += 1
-    m.NumberPad.setFocus(true)
-    m.NumberPad.moveFocusToDelete = true
-  else if age > 125 then
-    m.AgeErrorPrompt.visible = true
     m.NumberPad.setFocus(true)
     m.NumberPad.moveFocusToDelete = true
   else
