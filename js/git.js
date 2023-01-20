@@ -441,8 +441,12 @@ async function buildReleaseNotes(done) {
 }
 
 
-function getPullRequestCommitsForBranch(branch, done) {
-  const gitLogs = execGitCommand(`git log ${branch} -200`, `Could not get git logs from ${branch} branch.`, done);
+function getPullRequestCommitsForBranch(branch, done, oneLine = false) {
+  let command = `git log ${branch} -200`;
+  if (oneLine) {
+    command += ' --oneline';
+  }
+  const gitLogs = execGitCommand(command, `Could not get git logs from ${branch} branch.`, done);
   const pullRequestCommits = {};
   gitLogs.split('\n')
     .forEach((item) => {
@@ -479,7 +483,7 @@ async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
 
   // pull origin master
   pullOrFetchBranch('master', done);
-  const masterBranchCommits = getPullRequestCommitsForBranch('master');
+  const masterBranchCommits = getPullRequestCommitsForBranch('master', done, true);
 
   const commitsFromMasterNotOnCompareBranch = []
 
