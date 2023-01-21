@@ -42,11 +42,11 @@ Function stopVideoPreview(node=invalid)
   if node = invalid
     node = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
   end if
+
   if node <> invalid AND node.subType() = "VideoPreviewPlayer"
     node.control = "stop"
     node.visible = false
   end if
-
 End Function
 
 
@@ -62,7 +62,6 @@ Function stopVideoPreviewIfPlaying(node = invalid)
     node.control = "stop"
     node.visible = false
   end if
-
 End Function
 
 
@@ -78,7 +77,6 @@ Function pauseVideoPreview()
   if videoPreview <> invalid
     videoPreview.control = "pause"
   end if
-
 End Function
 
 
@@ -121,7 +119,7 @@ Function onVideoPreviewStateChanged(msg)
         if currentScreen.subType() = "HomeScreen"
           showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen, invalid, "previews")
         else if currentScreen.subType() = "DetailScreen"
-          if currentScreen.resumePosition > 0
+          if currentScreen.resumePoint > 0
             resumeVideoDetailScreen(currentScreen, "previews")
           else
             playVideoDetailScreen(currentScreen, "previews")
