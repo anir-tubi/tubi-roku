@@ -1873,6 +1873,8 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
 
           channelContentNode.pubId = channelFromServer.publisher_id
 
+          channelContentNode.state = "partial"
+
           ' If programs does not show up for the channel during next call, epg/programs, then below program serves as default program node for entire channel.
           ' This child node helps with basic channel metadata and user can play the channel without entire program list.
           program = channelContentNode.createChild("EPGContentNode")
@@ -1881,6 +1883,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
           program.title = channelFromServer.title
           program.description = channelFromServer.description
           program.FHDItemWidth = 1700
+
 
           if channelFromServer.images <> invalid
             if channelFromServer.images.poster <> invalid
@@ -1993,6 +1996,8 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
       if channelFromServer.publisher_id <> invalid
         channelNode.pubId = channelFromServer.publisher_id
       end if
+
+      channelNode.state = "loaded"
 
       'channel level needs_login
       if channelFromServer.needs_login = true and isUserSignedIn = false

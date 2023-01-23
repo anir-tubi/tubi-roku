@@ -79,7 +79,6 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.linearEPG
   end if
 
-  m.totalNumEPGBatches = 0 ' good practice to initialize m. scope variable in init functions
 End Function
 
 
@@ -106,7 +105,6 @@ Function fetchEPGScreenChannels(screen, mode="")
   tubiLog("EPGScreenHelpers.fetchEPGScreenChannels")
 
   screen.trackingLoadStartTime = UpTime(0)
-  m.totalNumEPGBatches = 0
 
   screen.unobserveFieldScoped("contentReady")
   screen.observeFieldScoped("contentReady", "onEPGscreenContentReady")
@@ -210,28 +208,26 @@ Function onEpgChannelListResponse(response)
 
       screen.timeGridContent = response
       setInContentCache(screen.timeGridContent)
-
       nFetchInBatch = 10
-      m.totalNumEPGBatches = 0
       ' If jump_to certain channel(contentIdToFocusOnLoadComplete) has been requested after the load is complete, then start with fetching that channel + 5 up + 5 down channels from v2/epg API response.
       ' This way, we can render the epg as soon as the first batch is in and then load the rest of the epg.
       ' This happens on deeplink and epg overlay on the channel selected from the home-screen.
       ' If no jump_to channel(contentIdToFocusOnLoadComplete) has been specified, then just load from the first to last channel(else part)
 
-      ' UniqueIdsList: array of channelIds that are unique and are in the order by which the channels need to be fetched from the epg/programming API.
+      ' uniqueChannelIdsList: array of channelIds that are unique and are in the order by which the channels need to be fetched from the epg/programming API.
       ' ChannelListAA: a temporary AA, is used to remove the duplicate channel IDs so that we do not have to fetch the same channel twice.
-      ' using both channelListAA and UniqueIdsList duplicates are removed without affecting the order that channel-programs need to be fetched.
+      ' using both channelListAA and uniqueChannelIdsList duplicates are removed without affecting the order that channel-programs need to be fetched.
 
       ' logic explanation:
       ' lets say v2/epg api returned channels Id list: [567888,567889,567890,567891,567892,567889,567893,567889]
       ' EPG will be rendered as [567888,567889,567890,567891,567892,567889,567893,567889] 567888 as first, 567889 as second and 567889 as last, and so on.
       ' if contentIdToFocusOnLoadComplete = 567892 then
       '     channelListAA list is only used to check if channel-Id has been already added to the uniqueIdlist or not.
-      '     uniqueIdsList=[567892, 567891, 567889, 567890, 567893,567888]
+      '     uniqueChannelIdsList=[567892, 567891, 567889, 567890, 567893,567888]
 
       channelListAA = {}
       index = 0
-      uniqueIdsList = []
+      m.uniqueChannelIdsList = []
 
       if isNonEmptyString(screen.contentIdToFocusOnLoadComplete) = true
         for i = 0 to response.getChildCount() - 1
@@ -240,7 +236,7 @@ Function onEpgChannelListResponse(response)
           if epgChannel.id = screen.contentIdToFocusOnLoadComplete
             index = i
             channelListAA[epgChannel.id] = true
-            uniqueIdsList[0] = epgChannel.id
+            m.uniqueChannelIdsList[0] = epgChannel.id
 
             upIndex = response.getChildCount()
             for j = 1 to upIndex
@@ -248,7 +244,7 @@ Function onEpgChannelListResponse(response)
                 epgChannel = response.getChild(index - j)
                 if channelListAA[epgChannel.id] <>  true
                   channelListAA[epgChannel.id] =  true
-                  uniqueIdsList.push(epgChannel.id)  ' store it Array to preserve the order of the original list from the server.
+                  m.uniqueChannelIdsList.push(epgChannel.id)  ' store it Array to preserve the order of the original list from the server.
                 end if
               end if
 
@@ -256,10 +252,9 @@ Function onEpgChannelListResponse(response)
                 epgChannel = response.getChild(index + j)
                 if channelListAA[epgChannel.id] <>  true
                   channelListAA[epgChannel.id] = true
-                  uniqueIdsList.push(epgChannel.id) ' store it Array to preserve the order of the original list from the server.
+                  m.uniqueChannelIdsList.push(epgChannel.id) ' store it Array to preserve the order of the original list from the server.
                 end if
               end if
-
             end for
 
             exit for
@@ -270,48 +265,53 @@ Function onEpgChannelListResponse(response)
           epgChannel = response.getChild(i)
           if channelListAA[epgChannel.id] <>  true
             channelListAA[epgChannel.id] = true
-            uniqueIdsList.push(epgChannel.id) ' store it Array to preserve the order of the original list from the server.
+            m.uniqueChannelIdsList.push(epgChannel.id) ' store it Array to preserve the order of the original list from the server.
           end if
         end for
       end if
+      totalNumChannels = m.uniqueChannelIdsList.Count()
 
-      totalNumChannels = uniqueIdsList.Count()
-      remainingChannels = totalNumChannels
-      completedChannels = 0
       if totalNumChannels <= 0
         onEPGError(response)
       end if
+      ' make api request for first 10 visible channels. Then rest will be fetched after we receive programs for first 10 channels
+      makeEPGProgramCalls(response.requestorID, nFetchInBatch)
 
-      while remainingChannels > 0
-        if remainingChannels <= nFetchInBatch
-          nFetchInBatch = remainingChannels
-        end if
-        loopEnd = nFetchInBatch + completedChannels
-        channelListIDs = []
-        for i = completedChannels to loopEnd - 1
-          epgChannel = uniqueIdsList[i]
-          channelListIDs.push(epgChannel) ' [613683,613761,....]
-        end for
-
-        epgProgramInfo = m.tensorapi.getEPGProgramReqInfo(channelListIDs)
-        isSignedIn = isLoggedInUser()
-
-        m.makeRequest({
-          url : epgProgramInfo.url
-          requestType : m.constants.reqNames.getEPGPrograms
-          options : epgProgramInfo.options
-          successCallback : onEPGProgramSuccess
-          errorCallback : onEpgProgramError
-          responseType : "node"
-          requestorID : response.requestorID
-          isSignedInUser: isSignedIn
-        })
-        completedChannels = completedChannels + nFetchInBatch
-        remainingChannels = totalNumChannels - completedChannels
-        m.totalNumEPGBatches = m.totalNumEPGBatches + 1 ' keep track of number of batches.
-      end while
     end if
   end if
+End Function
+
+
+' @param requestorID: String, Id for the requesting screen - epgScreen, Linear Video Player Screen
+' @param nFetchInBatch: integer, number of channels to be fetched in one single api call
+Function makeEPGProgramCalls(requestorID, nFetchInBatch = 10)
+  remainingChannels = m.uniqueChannelIdsList.Count()
+  if remainingChannels > 0
+    if remainingChannels <= nFetchInBatch
+      nFetchInBatch = remainingChannels
+    end if
+
+    channelListIDs = []
+    for i = 0 to nFetchInBatch - 1
+      epgChannel = m.uniqueChannelIdsList.shift()
+      channelListIDs.push(epgChannel) ' [613683,613761,....]
+    end for
+
+    epgProgramInfo = m.tensorapi.getEPGProgramReqInfo(channelListIDs)
+    isSignedIn = isLoggedInUser()
+
+    m.makeRequest({
+      url : epgProgramInfo.url
+      requestType : m.constants.reqNames.getEPGPrograms
+      options : epgProgramInfo.options
+      successCallback : onEPGProgramSuccess
+      errorCallback : onEpgProgramError
+      responseType : "node"
+      requestorID : requestorID
+      isSignedInUser: isSignedIn
+    })
+  end if
+
 End Function
 
 
@@ -319,24 +319,25 @@ End Function
 '@response: roSGNode, The response contains program info for a set of channel
 Function onEPGProgramSuccess(response)
   tubiLog("EPGScreenHelpers.onEPGProgramSuccess")
-  if response <> invalid
-    m.totalNumEPGBatches = m.totalNumEPGBatches - 1 'reduce the totalNumEPGBatches
-    screen = getFromScreenCache(response.requestorID)
+  screen = getFromScreenCache(response.requestorID)
 
-    if screen = invalid
-      screen = getCurrentScreen()
+  if screen = invalid
+    screen = getCurrentScreen()
+  end if
+
+  if response.requestorID = screen.id
+    appendOrAddTimeGridNewContents(response, screen)
+
+    if screen.timeGridContentLoading = true
+      setTimeGridContentLoadingToComplete(screen)
     end if
-    if response.requestorID = screen.id
-      appendOrAddTimeGridNewContents(response, screen)
 
-      if screen.timeGridContentLoading = true
-        setTimeGridContentLoadingToComplete(screen)
-      end if
+    toBeFetchedChannelCount = m.uniqueChannelIdsList.count()
 
-      if  m.totalNumEPGBatches = 0
-        setInContentCache(screen.timeGridContent)
-      end if
-
+    if toBeFetchedChannelCount = 0
+      setInContentCache(screen.timeGridContent)
+    else if toBeFetchedChannelCount > 0
+      makeEPGProgramCalls(response.requestorID)
     end if
 
   end if
@@ -352,6 +353,7 @@ Function onEPGChannelProgramSuccess(response, storeInCacheUponSuccess = true)
     if screen = invalid
       screen = getCurrentScreen()
     end if
+
     if response.requestorID = screen.id
       channelData = response.getChild(0)
       if channelData <> invalid
@@ -374,6 +376,7 @@ Function onEPGChannelProgramError(response)
     if screen = invalid
       screen = getCurrentScreen()
     end if
+
     if response.requestorID = screen.id
       screen.channelTimeGridContent = invalid
     end if
@@ -384,20 +387,23 @@ End Function
 ' This function is used for batch of channels
 Function onEpgProgramError(response)
   tubiLog("EPGScreenHelpers.onEpgProgramError ")
-  m.totalNumEPGBatches = m.totalNumEPGBatches - 1
   screen = getCurrentScreen()
   'Check if the screen which requested the program info is the current Screen and user not moved away from this Screen. (especially in case of request timeout or slow internet cases)
-  if screen <> invalid AND screen.id = response.requestorID AND response.contentId <> invalid AND screen.timeGridContent <> invalid
-    if screen.timeGridContent <> invalid AND screen.timeGridContent.getChildCount() > 0
+  if screen <> invalid AND response <> invalid AND screen.id = response.requestorID AND response.contentId <> invalid AND screen.timeGridContent <> invalid
+    if screen.timeGridContent.getChildCount() > 0
       'Since a batch of programs errored out, set the validUntil to 0 so that next time, content will refetch.
       screen.timeGridContent.getChild(0).validUntil = 0
     end if
 
+    toBeFetchedChannelCount = m.uniqueChannelIdsList.count()
+
     ' if all the responses for Channel infomation errored out then timeGrid will not have any content.
     if screen.timeGridContent.getChildCount() = 0
       onEPGError(response)
-    else if  m.totalNumEPGBatches = 0 ' all the batches are over and there are channels in the list, show whatever has been fetched successfully.
+    else if toBeFetchedChannelCount = 0 ' all the batches are over and there are channels in the list, show whatever has been fetched successfully.
       setTimeGridContentLoadingToComplete(screen)
+    else if toBeFetchedChannelCount > 0 'a batch of programs has errored out. So make rest of the api calls
+      makeEPGProgramCalls(response.requestorID)
     end if
   end if
 End Function
@@ -457,11 +463,20 @@ Function appendOrAddTimeGridNewContents(response, epgScreen)
         newNodeid = response.getChild(i).id
 
         indices = m.NodeHelpers.getChildIndicesById(epgScreen.timeGridContent, newNodeid)
+        loopCount = indices.Count()
         for each oldNodeIndex in indices
-          newNode = response.getChild(i).clone(true)
+          if loopCount > 1 'if indices.count() > 1, it means there are duplicate channels in the timegrid, so clone the repsonse content to copy it over.
+            newNode = response.getChild(i).clone(true)
+          else
+            newNode = response.getChild(i)
+          end if
+
           oldNode = epgScreen.timeGridContent.getChild(oldNodeIndex)
-          oldNode.removeChildIndex(0)
+
           if oldNode <> invalid AND newNode <> invalid
+            if oldNode.state = "partial" 'if state of programming node is partial that means channel info is serving as program node and so real programs can replace it.
+              oldNode.removeChildIndex(0)
+            end if
             for j = newNode.getChildCount() - 1 to 0 step -1
               newNode.getChild(0).reparent(oldNode, false)
             end for

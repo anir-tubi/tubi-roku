@@ -52,9 +52,6 @@
     <field id="descriptorDescription" type="string" />
     <field id="creditCuePoints" type="assocarray" />
 
-    <!-- text to display for a category whose content is empty -->
-    <field id="placeholderText" type="string" />
-
     <!-- these will come in for paginated responses -->
     <field id="totalCount" type="int" value="-1"/>
     <field id="more" type="boolean" />
@@ -115,6 +112,9 @@
 
     <!-- if UpTime(0) > validUntil, then refetch metadata for this content -->
     <field id="validUntil" type="integer"/>
+
+    <!-- State of channel program: none, loading, partial, loaded -->
+    <field id="state" type="string" value="none" />
 
   </interface>
 </component>
