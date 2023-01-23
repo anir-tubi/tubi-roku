@@ -212,6 +212,7 @@ End Function
 
 
 Function onLoadingChange()
+  tubiLog("HomeScreen.onLoadingChange")
   bLoaded = (m.top.isLoading = false)
   m.CategoryGridList.visible = bLoaded
   if m.top.isLoading = true

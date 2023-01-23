@@ -471,6 +471,7 @@ Function onLineTwoDataChange(msg)
       insertIndex++
     else
       if line2IsPresent = true
+        m.line2.text = ""
         secondLineGroup.removeChild(m.line2)
       end if
     end if
