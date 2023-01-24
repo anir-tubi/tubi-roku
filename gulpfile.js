@@ -614,6 +614,11 @@ function tagBuild(done) {
 function setProduction(done) {
   if(options) {
     options.config = 'production';
+    options.overrides = {
+      settings: {
+        useStarterComponents: true
+      }
+    };
     done();
   } else {
     done(new Error('setProduction: options not found.'));

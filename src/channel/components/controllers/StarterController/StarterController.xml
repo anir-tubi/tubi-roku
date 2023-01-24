@@ -33,8 +33,8 @@
       <!-- the SceneGraph app will be built using the remote components pkg existing at this url -->
       <field id="remoteComponentsUrl" type="string"  alwaysNotify="true"/>
 
-      <!-- should be set from Constants.remoteComponents in the main thread - indicates if we want to load remote components -->
-      <field id="useRemoteComponents" type="boolean" alwaysNotify="true" />
+      <!-- should be set from constants.settings.useRemoteComponents - communicates to the main thread if we want to load remote components -->
+      <field id="useRemoteComponents" type="boolean" value="true" alwaysNotify="true" />
 
       <!-- fadeOutCustomSplash is used to fadeOut the CustomSplashPoster -->
       <field id="fadeOutCustomSplash" type="boolean" />

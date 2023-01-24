@@ -108,7 +108,7 @@ Function runChannel(constants, log, request)
   libraryBeingFetched = invalid
 
   'this is the packaged constants - the submitted constants
-  if constants.starterComponents <> false
+  if constants.settings.useStarterComponents <> false
     print "attempting to load TubiStarterLibrary "; constants.settings.starterComponentsUrl
     starterLibrary = tubiScene.findNode("TubiStarterLibrary")
     starterLibrary.observeField("loadStatus", port)

@@ -18,6 +18,10 @@ settings:
   charlesProxyEnabled: false
   charlesProxyUrl: ""
 
+  # useStarterComponents MUST ALWAYS BE TRUE FOR PRODUCTION
+  useStarterComponents: true
+  useRemoteComponents: true
+
   # Any configs added to the bs_const setting will be included in the various manifest
   # configurations via the handlebars templates
   bs_const:

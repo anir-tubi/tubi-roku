@@ -39,6 +39,9 @@ settings:
   charlesProxyUrl: "http://{{localHostAddress}}:8888"
   charlesProxyEnabled: false
 
+  useStarterComponents: false
+  useRemoteComponents: false
+
   # A date which will be used as the current date within the app. Use this to simulate a date in the past or future. If a date is provided this gets converted to a time offset in seconds to allow testing of features only available at a particular time
   # testingTimeOffset: "2022-12-18T20:00:00Z"
 

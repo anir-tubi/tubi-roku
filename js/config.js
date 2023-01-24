@@ -77,7 +77,7 @@ function load(options) {
     versionMinorUnderscored: formatBuildTag(build, true, false),
     versionMinorDotted: formatBuildTag(build, true, true),
     fileType: overWrittenDataPre.settings.remoteComponentsExtension,
-    bsConst: getBsConstsFromSettings(overWrittenDataPre.settings)
+    bsConst: getBsConstsFromSettings(overWrittenDataPre.settings),
   };
 
   const defaultDataPost = parse(defaultProfile, templateValues);

@@ -2,7 +2,7 @@ Function init()
   m.constants = getConstants()
   m._ = rodash()
 
-  if m.constants.settings.mode = "dev" AND m.constants.settings.fasterDevBuild = true
+  if m.constants.settings.mode = "dev" AND m.constants.settings.processAnimationLogo = false
     m.top.fadeInRemoteComponent = true
   else
     processAnimationLogo()
@@ -32,8 +32,8 @@ Function onUrlRequest()
 
     m.top.newBuildConstants = m.constants
 
-    if m.constants.remoteComponents = false
-      m.top.useRemoteComponents = m.constants.remoteComponents
+    if m.constants.settings.useRemoteComponents = false
+      m.top.useRemoteComponents = m.constants.settings.useRemoteComponents
     else
       remoteComponentsUrl = m.constants.settings.remoteComponentsUrl
 

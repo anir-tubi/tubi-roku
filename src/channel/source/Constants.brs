@@ -389,21 +389,6 @@ Function getConstants()
   constants.externalConfig = {}
     constants.externalConfig.info = invalid   'will be replaced in main.brs
 
-  'toggle for using starter components or not. Should only be set to false in testing situations.
-  'production should always use starter components!
-  constants.starterComponents = true
-  if mode = "qa" OR (mode = "dev" AND constants.settings.fasterDevBuild = true)
-    constants.starterComponents = false
-  end if
-
-  'dictates if the channel should use the remote components (or if false, the installed components)
-  'only change to false for production in case of emergencies or side load builds that are not connected to a localhost server,
-  'as installed components will likely break after many remote releases.
-  constants.remoteComponents = true
-  if mode = "qa" OR (mode = "dev" AND constants.settings.fasterDevBuild = true)
-    constants.remoteComponents = false
-  end if
-
   ' Should the user be shown the upgrade alert to help them upgrade to the latest version.
   '   Used within the hotpatch after a point release to nudge users to use the latest app
   constants.showUpgradeAlert = false
