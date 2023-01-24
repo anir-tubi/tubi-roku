@@ -7,12 +7,12 @@ Function init()
 
   m.pageHeading = m.top.findNode("pageHeading")
   m.pageHeading.text = getTranslation("email_screen_heading")
-  
-  m.emailBackground = m.top.findNode("emailBackground")
+
+  m.emailTextEditBox = m.top.findNode("emailTextEditBox")
+  m.emailTextEditBox.maxTextLength = 100
+
   m.emailValidationMsg = m.top.findNode("emailValidationMsg")
   m.emailValidationMsg.text = getTranslation("invalid_email_title")
-
-  m.email = m.top.findNode("email")
 
   m.keyboard = m.top.findNode("Keyboard")
   m.keyboard.textEditBox.opacity = 0.00001
@@ -28,6 +28,8 @@ Function init()
   m.continue.observeFieldScoped("selected", "onContinueButtonSelected")
 
   m.keyboard.textEditBox.observeFieldScoped("focusedChild", "onKeyboardTextEditBoxFocusedChildChange")
+
+  m.keyboard.textEditBox.observeFieldScoped("cursorPosition", "onKeyboardTextEditBoxCursorPositionChange")
 
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
 
@@ -48,9 +50,6 @@ Function init()
   m.continue.color = m.constants.ui.colors.backgroundColorLight
   m.emailValidationMsg.color = m.constants.ui.colors.caution
   m.pageHeading.color = m.constants.ui.colors.primaryText
-  m.email.color = m.constants.ui.colors.primaryText
-  m.emailBackground.color = m.constants.ui.colors.backgroundColorLight2
-
 End Function
 
 
@@ -58,6 +57,7 @@ Function onScreenFocusChange()
 
   tubiLog("EmailInputScreen.onScreenFocusChange")
   if m.top.hasFocus() then
+    m.emailTextEditBox.active = true
     m.keyboard.unobserveFieldScoped("text")
     m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
 
@@ -69,6 +69,7 @@ Function onScreenFocusChange()
   end if
 
   if m.top.isInFocusChain() = false
+    m.emailTextEditBox.active = false
     m.keyboard.unobserveFieldScoped("text")
     m.Keyboard.textEditBox.voiceEnabled = false
   end if
@@ -85,8 +86,13 @@ Function onKeyboardTextEditBoxFocusedChildChange()
 End Function
 
 
+Function onKeyboardTextEditBoxCursorPositionChange(msg)
+  m.emailTextEditBox.cursorPosition = msg.getData()
+End Function
+
+
 Function onKeyboardTextChanged()
-  m.email.text = m.keyboard.text
+  m.emailTextEditBox.text = m.keyboard.text
 End Function
 
 
@@ -101,7 +107,7 @@ Function onContinueButtonSelected(evt)
 
   isButtonSelected = evt.getData()
   if isButtonSelected = true
-    m.top.email = m.email.text
+    m.top.email = m.emailTextEditBox.text
     ' we must set voiceEnabled = false here because if we rely on isInFocusChain() in
     ' onScreenFocusChange(), voiceEnabled is not set to false until after voiceEnabled is set to true
     ' on the SignInScreen, which prevents voiceEnabled is getting to true
@@ -126,7 +132,7 @@ End Function
 Function onKeyEvent(key As String, press As Boolean) as Boolean
 
   if key = "OK"
-    m.email.text = m.keyboard.text
+    m.emailTextEditBox.text = m.keyboard.text
   end if
 
   handled = true

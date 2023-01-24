@@ -23,12 +23,12 @@
     <!-- OUTPUT -->
 
       <!-- continueSelected is triggered when user selects continue button, which checks email exists in database -->
-      <field id="continueSelected" type="boolean" alwaysNotify="true"/>
+      <field id="continueSelected" type="boolean" alwaysNotify="true" />
 
       <!-- email field will have user entered email and it will be set when user selects continue button -->
-      <field id="email" type="String"/>
+      <field id="email" type="string" />
 
-     <!-- backButtonSelected is triggered when user selects back button on keyboard-->
+      <!-- backButtonSelected is triggered when user selects back button on keyboard-->
       <field id="backButtonSelected" type="integer" alias="back.selected"/>
 
   </interface>
@@ -60,23 +60,10 @@
 
       <Group
         translation="[645,0]">
-        <Rectangle
-          id="emailBackground"
+        <TextEditBox
+          id="emailTextEditBox"
           width="630"
-          height="84"
-          opacity="0.17"/>
-        <Label
-          id="email"
-          horizAlign="left"
-          width="600"
-          height="84"
-          translation="[20,0]"
-          vertAlign="center">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="27" />
-        </Label>
+          height="84" />
       </Group>
 
       <Label
