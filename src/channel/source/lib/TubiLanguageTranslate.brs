@@ -1645,6 +1645,10 @@ Function getTranslation_es_MX()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the mylist/queue screen.",
       "message": "Mi Lista"
     },
+    "menu_mystuff": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the my stuff screen.",
+      "message": "Mis Cosas"
+    },
     "menu_settings": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the settings screen.",
       "message": "Configuración"
@@ -1655,7 +1659,7 @@ Function getTranslation_es_MX()
     },
     "screenHome_item_showAllGames": {
       "description": "The text to display on Show All Games tile",
-      "message": "Mostrar Todos Los Partidos"
+      "message": "Mostrar Todo"
     },
     "loadingIndicator": {
       "description": "When something is loading, this text appears so the user knows something is loading.",
@@ -2337,6 +2341,22 @@ Function getTranslation_es_MX()
       "description": "Onscreen message to indicate channel Guide content could not be loaded",
       "message": "No se pudo cargar el guía de canales."
     },
+    "screenMyStuff_title": {
+      "description": "The title of the MyStuff Screen which contains the continueWatching and queue/myList channels.",
+      "message": "Mis Cosas"
+    },
+    "screenMyStuff_signedOutUITitle": {
+      "description": "The title of the MyStuff Screen for the guest user.",
+      "message": "Haz Tubi tuyo, Es Gratis"
+    },
+    "screenMyStuff_signedOutUISubtitle": {
+      "description": "The subtitle of the MyStuff Screen for the guest user.",
+      "message": "Guarda todos tus favoritos, recoje donde lo dejaste -- todo en un solo lugar"
+    },
+    "screenMyStuff_signedOutUIBlurb": {
+      "description": "The blurb of the MyStuff Screen for the guest user.",
+      "message": "No se requiere tarjeta de crédito • Gratis siempre"
+    },
     "screenDetails_button_trailer": {
       "description": "Label of button to allow users to watch a preview of the current video title",
       "message": "Ver Tráiler"
@@ -2456,6 +2476,22 @@ Function getTranslation_es_MX()
     "metadata_expiresIn_singular": {
       "description": "label to indicate the user has exactly 1 day to watch a video",
       "message": "Expira en 1 día"
+    },
+    "metadata_myStuff_empty_myList_title": {
+      "description": "For an empty MyList container, this is the title that is displayed in the empty container",
+      "message": "Mi Lista"
+    },
+    "metadata_myStuff_empty_myList_description": {
+      "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
+      "message": "Películas y Series añadidos\na tu lista aparecerá aquí"
+    },
+    "metadata_myStuff_empty_continueWatching_title": {
+      "description": "For an empty continueWatching container, this is the title that is display in the empty container",
+      "message": "Seguir Viendo"
+    },
+    "metadata_myStuff_empty_continueWatching_description": {
+      "description": "For an empty continueWatching container, this is the description/subtitle that is display in the empty container",
+      "message": "Películas y series que no hayas terminado \nde ver aparecerán aquí"
     },
     "metadata_continueWatching_notSignedIn_title": {
       "description": "tells non registered user what they need to do to see the continue watching container",
@@ -2897,7 +2933,7 @@ Function getTranslation_es_MX()
     },
     "explore_fifa_description": {
       "description": "description displayed on fifa intro modal",
-      "message": "Llamando a todos los aficionados del fútbol! Ver el Mundial de la FIFA 2022 gratis en Tubi. Crea una cuenta para acceder a todos los partidos. No se requiere tarjeta de crédito. Sin suscripciones."
+      "message": "Tubi tiene repeticiones completas de los 64 partidos de la Copa Mundial disponibles de forma gratuita. Regístrate para ver todos los partidos en tu dispositivo favorito."
     },
     "replay": {
       "description": "This label used for badge to indicate the content availability",
