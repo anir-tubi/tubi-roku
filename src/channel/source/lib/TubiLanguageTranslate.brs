@@ -2347,7 +2347,7 @@ Function getTranslation_es_MX()
     },
     "screenMyStuff_signedOutUITitle": {
       "description": "The title of the MyStuff Screen for the guest user.",
-      "message": "Haz Tubi tuyo, Es Gratis"
+      "message": "Haz Tubi Tuyo, Es Gratis"
     },
     "screenMyStuff_signedOutUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",

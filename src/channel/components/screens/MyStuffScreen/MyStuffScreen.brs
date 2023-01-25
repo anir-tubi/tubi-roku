@@ -55,8 +55,18 @@ Function init()
     m.RowList.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
 
+  defaultGuestMenuWidth = m.GuestMenu.itemSize[0]
   signInOutButton = m.top.findNode("SignInOutButton")
   signInOutButton.title = getTranslation("menu_signIn")
+  
+  ' Adjust the width of the guest menu if text of the button is too long for the default width. Mostly spanish text are generally longer in length.
+  tempChannelMenuItem = CreateObject("roSGNode", "DetailMenuItem")
+  tempChannelMenuItem.itemContent = signInOutButton
+
+  potentialWidth = tempChannelMenuItem.calculatedTextWidth + tempChannelMenuItem.leftTextPadding + tempChannelMenuItem.rightTextPadding
+  if potentialWidth > defaultGuestMenuWidth AND potentialWidth > m.GuestMenu.itemSize[0]
+    m.GuestMenu.itemSize = [potentialWidth, m.GuestMenu.itemSize[1]]
+  end if
 
   m.RowList.observeFieldScoped("rowItemFocused", "onRowItemFocused")
   m.RowList.observeFieldScoped("rowItemSelected", "onRowItemSelected")
