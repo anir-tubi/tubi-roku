@@ -426,19 +426,25 @@ function sideLoad(done) {
   const buildTag = getBuildTag(false, false);
   const zipPath = `build/tubi_${buildTag}.zip`;
   upload(zipPath)
-  .then(
-    server({
-      host: "0.0.0.0",
-      port: options.port,
-      root: 'build',
-      debug: true,
-      middleware: () => {
-        return [
-          serverMiddleware
-        ]
-      }
-    })
-  )
+  .then(() => {
+    let { settings } = load(options);
+
+    if (!settings.useStarterComponents) {
+      done();
+    } else {
+      return server({
+        host: "0.0.0.0",
+        port: options.port,
+        root: 'build',
+        debug: true,
+        middleware: () => {
+          return [
+            serverMiddleware
+          ]
+        }
+      });
+    }
+  })
   .catch((err) => {
     if (typeof err === 'string' && err.trim() === 'Application Received: Identical to previous version -- not replacing.') {
       log('Build already installed, launching dev channel via deeplink.');
