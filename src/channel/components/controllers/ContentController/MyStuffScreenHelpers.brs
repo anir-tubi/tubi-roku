@@ -52,6 +52,12 @@ Function showMyStuffScreen()
     jumpToPreviousFocusedItem() 
     showHideSpinner(false)
   end if
+
+  if bLoadData = false
+    '//Report the page_load analytics if the screen content does not have to (re)load.
+    '// If the content needs to load, then the page load event will get fired later when the content is done loading
+    screenTrackingLoad(screen.trackingPageInfo, 0)
+  end if
   
   ' don't send page load tracking until screen details content is returned from the API
   pushScreen(screen, true, false)
