@@ -179,7 +179,7 @@ End Function
 
 
 Function onRowItemFocused(msg) as Boolean
-  if m.top.content <> invalid
+  if m.RowList.content <> invalid
     tubiLog("MyStuffScreen.onRowItemFocused")
     newCursorPosition = msg.getData()
 
@@ -194,10 +194,13 @@ Function onRowItemFocused(msg) as Boolean
     oldFocusedContent = m.top.contentFocused
     m.top.contentFocused = getAbbreviatedContent(newCursorPosition)
 
-    category = m.top.content.getChild(newCursorPosition[0])
+    category = m.RowList.content.getChild(newCursorPosition[0])
     if category <> invalid
       m.oldCategoryId = m.currCategoryId
       m.currCategoryId = category.id
+
+      ' immediately update the position counter
+      category.focusIndex = newCursorPosition[1]
     end if
 
     'Set up the navigateWithinPageInfo to send to ContentController.
@@ -443,6 +446,13 @@ Function onJumpToRowItemChange(msg)
     end if
 
     m.RowList.jumpToRowItem = [row, column]
+
+    '//After jumping to a row item, then immediately reset the row's counter index
+    '//   This is when an item is added to the list and the user backs up to the MyStuffScreen again
+    category = m.RowList.content.getChild(m.RowList.rowItemFocused[0])
+    if category <> invalid
+      category.focusIndex = m.RowList.rowItemFocused[1]
+    end if
   end if
 
 End Function
