@@ -7,7 +7,7 @@ Function showSearchScreen()
   searchScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   searchScreen.observeFieldScoped("searchText", "onSearchTextChanged")
   searchScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
-  searchScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
+  searchScreen.observeFieldScoped("contentToPlay", "onSearchContentToPlay")
 
   searchScreen.id = m.constants.ui.screenIds.searchScreen
   searchScreen.kidsModeEnabled = isKidsUIOn()
@@ -26,12 +26,23 @@ Function onSearchContentSelected(msg)
 
   selectedContent = msg.getData()
   'Launch the full player if it's linear contnet otherwise launch details screen
-  if selectedContent <> invalid AND selectedContent.type = "linear" AND selectedContent.videoResources.count() > 0
+  if selectedContent <> invalid AND selectedContent.type = m.constants.ui.contentTypes.linear
     playLinearVideoContent(selectedContent, false, searchScreen.id)
   else
     showDetailScreen(searchScreen.contentSelected, true)
   end if
+End Function
 
+
+Function onSearchContentToPlay(msg)
+  searchScreen = msg.getRoSGNode()
+  content = msg.getData()
+
+  if content <> invalid AND content.type = m.constants.ui.contentTypes.linear
+    playLinearVideoContent(content, false, searchScreen.id)
+  else
+    onContentToPlay(msg)
+  end if
 End Function
 
 
