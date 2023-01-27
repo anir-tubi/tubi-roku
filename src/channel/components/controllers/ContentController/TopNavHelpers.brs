@@ -116,8 +116,15 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
     end if
 
     currentScreen = getCurrentScreen()
-    if currentScreen.id <> screen.id AND isAnEpgScreen(screen) <> true AND screen.hasField("jumpToRowItem") = true
-      screen.jumpToRowItem = [0, 0] '//reset original homescreen so it is set back to the origin content item.
+
+    if currentScreen.id <> screen.id AND screen.hasField("jumpToRowItem") = true
+      if isAnEpgScreen(screen) = true
+        if getExperimentResource("roku_linear_epg_position", "roku_linear_epg_position_v1", true).enabled <> true
+          screen.jumpToRowItem = [0, 0]
+        end if
+      else
+        screen.jumpToRowItem = [0, 0] '//reset original homescreen so it is set back to the origin content item.
+      end if
     end if
   end if
 End Function

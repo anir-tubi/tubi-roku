@@ -51,6 +51,10 @@ Function TubiExperiments(constants) as Object
       roku_hevc_drm_4k: {
         roku_hevc_drm_4k_v1 : {"enabled": true}
       }
+
+      roku_linear_epg_position: {
+        roku_linear_epg_position_v1 : {"enabled": false}
+      }
     }
 
     'public methods
