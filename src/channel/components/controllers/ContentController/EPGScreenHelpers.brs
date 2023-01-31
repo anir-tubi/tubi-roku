@@ -23,6 +23,8 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
       epgScreen.componentToFocus = m.constants.ui.epgScreen.focusItems.epgTimeGrid
     end if
 
+    getExperimentResource("roku_linear_epg_position", "roku_linear_epg_position_v1", true)
+
   else
     displayDefaultBackground()  ' clear background from previous screens until epgscreen loads
     showHideSpinner(true)

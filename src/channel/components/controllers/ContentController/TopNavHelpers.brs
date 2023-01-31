@@ -119,7 +119,7 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
 
     if currentScreen.id <> screen.id AND screen.hasField("jumpToRowItem") = true
       if isAnEpgScreen(screen) = true
-        if getExperimentResource("roku_linear_epg_position", "roku_linear_epg_position_v1", true).enabled <> true
+        if getExperimentResource("roku_linear_epg_position", "roku_linear_epg_position_v1", false).enabled <> true
           screen.jumpToRowItem = [0, 0]
         end if
       else
