@@ -433,11 +433,11 @@ Function getTranslation_en_US()
     },
     "dialog_confirmCorrectAge_title": {
       "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
-      "message": "Were you born in {birthYear}"
+      "message": "Were you born in {birthYear}?"
     },
     "dialog_confirmCorrectAge_title_age": {
       "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct age",
-      "message": "Are you {age} years old"
+      "message": "Are you {age} years old?"
     },
     "dialog_confirmCorrectAge_description": {
       "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
