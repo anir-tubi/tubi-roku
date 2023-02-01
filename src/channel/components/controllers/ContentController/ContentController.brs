@@ -1984,13 +1984,15 @@ Function showHideLogo(logoType)
 End Function
 
 
-Function isHdmiPlaybackExperimentEnabled()
+Function isHdmiPlaybackExperimentEnabled(sendEvent = false)
   ' 11.5 now properly returns the roCECStatus events while run_as_process=1
   ' We want to target only 11.5 plus for this experiment because of this
   firmware = createObject("roDeviceInfo").getOSVersion()
   isFirmwareOk = (firmware.major.toInt() >= 11 AND firmware.minor.toInt() >= 5)
 
-  if isFirmwareOk = true AND getExperimentResource("ads_configuration_roku_hdmi_playback", "roku_hdmi_playback_v1", true).enabled = true then
+  experiment = getExperimentResource("ads_configuration_roku_hdmi_playback", "roku_hdmi_playback_v2", sendEvent)
+
+  if isFirmwareOk = true AND experiment.enabled = true then
     return true
   end if
   return false
@@ -2010,16 +2012,19 @@ Function onIsHdmiStatusOkChange(msg)
         currentScreen.shouldResumePlayback = false
         detailScreenResumeHelper(currentScreen)
       end if
-    else if currentScreenId = screenIds.videoPlayerScreen then
-      if isHdmiStatusOk = false then
-        returnToDetailScreenFromVideo(false)
-        currentScreen = getCurrentScreen()
-        currentScreen.shouldResumePlayback = true
-      end if
     else if currentScreenId = screenIds.episodeScreen then
       if isHdmiStatusOk = true AND currentScreen.shouldResumePlayback = true then
         currentScreen.shouldResumePlayback = false
         episodeScreenResumeHelper(currentScreen)
+      end if
+    else if currentScreenId = screenIds.videoPlayerScreen then
+      state = currentScreen.state
+      if state <> "finished" AND state <> "error" AND isHdmiStatusOk = false then
+        ' Send exposure event for experiment
+        isHdmiPlaybackExperimentEnabled(true)
+        returnToDetailScreenFromVideo(false)
+        currentScreen = getCurrentScreen()
+        currentScreen.shouldResumePlayback = true
       end if
     else
       linearVideoPlayerScreen = getFromScreenCache(screenIds.linearVideoPlayerScreen)
@@ -2027,7 +2032,12 @@ Function onIsHdmiStatusOkChange(msg)
         if isHdmiStatusOk = true then
           linearVideoPlayerScreen.control = "play"
         else
-          linearVideoPlayerScreen.control = "stop"
+          state = currentScreen.state
+          if state <> "finished" AND state <> "error" then
+            ' Send exposure event for experiment
+            isHdmiPlaybackExperimentEnabled(true)
+            linearVideoPlayerScreen.control = "stop"
+          end if
         end if
       end if
     end if

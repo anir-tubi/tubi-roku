@@ -720,7 +720,7 @@ Function onVideoPositionChange(msg)
       m.top.upNextCuepointReached = true
     end if
   end if
-  
+
   'set the content, focus to SkipCuepoints and send exposure event when Skip Intro/recap/early credit cue points available
   if content <> invalid AND content.creditCuePoints <> invalid
     if isSkipIntroCuePointsReached(content.creditCuePoints)
@@ -1728,7 +1728,7 @@ Function isSkipRecapCuePointsReached(creditCuePoints)
 End Function
 
 
-'This function to check Whether the current player position is in between skipEarlyCredets cuePoints
+'This function to check Whether the current player position is in between skipEarlyCredits cuePoints
 '@creditCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
 Function isSkipEarlyCreditCuePointsReached(creditCuePoints)
   return creditCuePoints.earlycredits_start <> invalid AND creditCuePoints.earlycredits_end <> invalid AND creditCuePoints.earlycredits_start > 0 AND m.playerPosition >= creditCuePoints.earlycredits_start AND m.playerPosition <= creditCuePoints.earlycredits_end
@@ -1737,7 +1737,7 @@ End Function
 
 ' @creditCuePoints: assocArray, which has intro, recap, earlyCredit cuepointes and prelogue and postlude
 ' @returns: string, one of the values in constants.player.skipCuepointsButtonTypes or empty string if
-'                   the cureent playback position does not correspond to one of the cuepoints
+'                   the current playback position does not correspond to one of the cuepoints
 Function getCurrentCuepoint(creditCuePoints)
   currentCuepoint = ""
 
