@@ -1827,11 +1827,11 @@ Function getTranslation_es_MX()
     },
     "dialog_confirmCorrectAge_title": {
       "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
-      "message": "Naciste en {birthYear}"
+      "message": "¿Naciste en {birthYear}?"
     },
     "dialog_confirmCorrectAge_title_age": {
       "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct age",
-      "message": "Tienes {age} años"
+      "message": "¿Tienes {age} años?"
     },
     "dialog_confirmCorrectAge_description": {
       "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
