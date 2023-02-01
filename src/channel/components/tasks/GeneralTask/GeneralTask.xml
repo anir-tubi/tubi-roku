@@ -31,7 +31,8 @@
     <script type="text/brightscript" uri="../../../source/lib/MathUtils.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
     <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
-    <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TimeOffsetUtils.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />

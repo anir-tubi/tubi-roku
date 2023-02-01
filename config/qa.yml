@@ -24,9 +24,12 @@ settings:
   # This field is added for testing purpose
   showFIFAIntroModalAlways: false
 
-  #FIFA worldcup tournment start date/end date for testing purposes. Please follow the format
+  #FIFA worldcup tournament start date/end date for testing purposes. Please follow the format
   tournamentStartDate: "2022-11-20T00:00:00Z"
   tournamentEndDate: "2022-12-18T00:00:00Z"
+
+  # A date which will be used as the current date within the app. Use this to simulate a date in the past or future. If a date is provided this gets converted to a time offset in seconds to allow testing of features only available at a particular time
+  # testingTimeOffset: "2023-02-12T20:00:00Z"
 
   # email/password values will be used to automatically sign a user in when "sign in" is selected
   email: ""

@@ -9,7 +9,6 @@
   <script type="text/brightscript" uri="AgeVerificationScreen.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
 
@@ -23,7 +22,7 @@
           eg.
             {
               email : "test@tubi.tv",
-              firstName : "test", 
+              firstName : "test",
               gender : "Male"
             )
 
@@ -32,7 +31,7 @@
             {
               email : "test@tubi.tv",
               firstName : "test",
-              emailType : "manual/pre_fill", 
+              emailType : "manual/pre_fill",
               gender : "Male"
             )
 
@@ -40,7 +39,7 @@
           eg.
             {
               email : "test@tubi.tv",
-              firstName : "test", 
+              firstName : "test",
               gender : "Male"
             )
             -->

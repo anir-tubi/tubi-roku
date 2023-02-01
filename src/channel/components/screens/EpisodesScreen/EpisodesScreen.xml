@@ -8,7 +8,6 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
 
   <interface>
     <!-- INPUT -->

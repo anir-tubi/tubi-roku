@@ -244,7 +244,8 @@ function buildStarter() {
       'src/channel/source/lib/TubiExternalConfig.brs',
       'src/channel/source/lib/TubiTracking.brs',
       'src/channel/source/3rdparty/rta/typeUtils.brs',
-      'src/channel/source/3rdparty/rodash/rodash.cat.brs'
+      'src/channel/source/3rdparty/rodash/rodash.cat.brs',
+      'src/channel/source/lib/TimeOffsetUtils.brs'
     ];
     let sourceLibsSrcOptions = {
       base: 'src/channel/source'

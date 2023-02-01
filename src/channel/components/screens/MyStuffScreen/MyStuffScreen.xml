@@ -13,7 +13,6 @@
   <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
 
   <interface>
@@ -21,7 +20,7 @@
 
       <!-- When the Helper receives valid category data from the server, it sets the new value to this field. -->
       <field id="content" type="node"/>
-      
+
       <!-- contentUpdated should be set when the new content is ready to be displayed on the screen. -->
       <field id="contentUpdated" type="boolean" alwaysNotify="true"/>
 
@@ -63,7 +62,7 @@
       <!-- set to true when the user wants to sign-up -->
       <field id="signUpButtonSelected" type="boolean" alwaysNotify="true" />
 
-      <!-- tells ContentController/Helpers that the content metadata is 
+      <!-- tells ContentController/Helpers that the content metadata is
             out of the cache window and should be updated -->
       <field id="refreshContent" type="boolean" alwaysNotify="true" />
   </interface>

@@ -546,7 +546,9 @@ Function getConstants()
     constants.urls.channelLogoBrandedSuffix = "/logo_center.png"
 
     ' animationLogo Url which plays during app launch
-    constants.urls.animationLogo = "https://cdn.adrise.tv/video/roku/animation_logo_2.mp4"
+    constants.urls.animationLogo = "http://cdn.adrise.tv/video/roku/animation_logo_2.mp4"
+    constants.urls.superbowlRabbitHoleCampaignAnimationLogo = "https://cdn.adrise.tv/video/roku/rabbit_hole_animation_logo.mp4"
+
     ' The background images on the continue watching container row when the user is signed out
     constants.urls.continueWatchingItemBackground = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingNonRegisteredItemBground.png"
     constants.urls.continueWatchingItemBackground_kidsMode = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingNonRegisteredItemBground_kidsMode.png"
@@ -1118,7 +1120,7 @@ Function getConstants()
       'Sizes of large landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images. The MyStuff Screen uses this image size.
       constants.ui.imageSizes.landscapeLarge = [582, 327]
 
-      'Size of the thumbnail/background of the single element representing an empty container that we wish to show: i.e. on the MyStuff Screen 
+      'Size of the thumbnail/background of the single element representing an empty container that we wish to show: i.e. on the MyStuff Screen
       constants.ui.imageSizes.emptyContainer = [1634, 384]
 
       'Sizes of landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
@@ -1287,7 +1289,7 @@ Function getConstants()
       constants.ui.colors.secondaryTextAlt = darkTransparentForeground95
       constants.ui.colors.tertiaryText = darkTransparentForeground95
       constants.ui.colors.focusedText = defaultDarkPrimaryForeground
-      
+
       '//::NOTE::HARDCODED:: there is a BUG in the built in roku keyboard component'
       '// If the color is white, then it will make the focus color to a nearly-black gray.
       '// To combat this limitation, the color is set to white with a very slight, hardly-noticeable opacity.
@@ -1432,6 +1434,8 @@ Function getConstants()
       constants.time = {}
       constants.time.magicLinkStartDate = "2022-11-14T20:00:00Z"
       constants.time.magicLinkEndDate = "2022-12-19T20:00:00Z"
+      constants.time.superbowlRabbitHoleCampaignStartDate = "2023-02-09T20:00:00Z"
+      constants.time.superbowlRabbitHoleCampaignEndDate = "2023-03-30T20:00:00Z"
 
   return constants
 end Function

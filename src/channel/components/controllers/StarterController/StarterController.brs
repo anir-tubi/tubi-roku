@@ -114,7 +114,22 @@ Function processAnimationLogo()
   m.customSplashTimer.control = "start"
 
   videoContent = createObject("RoSGNode", "ContentNode")
+
+  dateTime = createObject("roDateTime")
+  dateTime.fromISO8601String(m.constants.time.superbowlRabbitHoleCampaignStartDate)
+  superbowlRabbitHoleCampaignStartDate = dateTime.asSeconds()
+
+  dateTime.fromISO8601String(m.constants.time.superbowlRabbitHoleCampaignEndDate)
+  superbowlRabbitHoleCampaignEndDate = dateTime.asSeconds()
+
+  currentUnixTime = getCurrentUTCTimeWithOffset(m.constants)
+
+  ' Want to show rabbit hole intro video during our campaign period
   videoContent.url = m.constants.urls.animationLogo
+  if currentUnixTime >= superbowlRabbitHoleCampaignStartDate AND currentUnixTime <= superbowlRabbitHoleCampaignEndDate then
+    videoContent.url = m.constants.urls.superbowlRabbitHoleCampaignAnimationLogo
+  end if
+
   videoContent.title = "AnimationLogo"
   videoContent.streamformat = "mp4"
 

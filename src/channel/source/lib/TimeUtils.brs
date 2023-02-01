@@ -1,18 +1,5 @@
 '******************************************************
 '
-'returns time offset for testing purposes if it has been specified
-'******************************************************
-
-Function getTestingTimeOffset(constants) as integer
-  if constants <> invalid AND constants.settings.mode <> "production" AND isNumber(constants.settings.testingTimeOffset) = true then
-    return constants.settings.testingTimeOffset
-  end if
-  return 0
-End Function
-
-
-'******************************************************
-'
 'returns current time in UTC seconds
 '******************************************************
 
@@ -24,16 +11,6 @@ End Function
 
 '******************************************************
 '
-'returns current time in UTC seconds with the testing offset if it has been set
-'******************************************************
-
-Function getCurrentUTCTimeWithOffset(constants) as Integer
-  now = createObject("roDateTime")
-  return now.asSeconds() + getTestingTimeOffset(constants)
-End Function
-
-'******************************************************
-'
 'returns current time in UTC seconds
 '******************************************************
 
@@ -41,18 +18,6 @@ Function getCurrentLocalTime() as integer
   now = CreateObject("roDateTime")
   now.ToLocalTime()
   return now.AsSeconds()
-End Function
-
-
-'******************************************************
-'
-'returns current time in UTC seconds with the testing offset if it has been set
-'******************************************************
-
-Function getCurrentLocalTimeWithOffset(constants) as Integer
-  now = createObject("roDateTime")
-  now.toLocalTime()
-  return now.asSeconds() + getTestingTimeOffset(constants)
 End Function
 
 
@@ -92,30 +57,6 @@ End Function
 
 
 '******************************************************
-'returns datetime in this format : Dec 15
-'******************************************************
-Function getMonthAndDay(datetime)
-  month = datetime.GetMonth().toStr()
-  day = datetime.GetDayOfMonth().toStr()
-  shortVersionOfDateFormat = getShortVersionOfDateFormat(month, day)
-  ' replacing "," with empty string as the string does not have year.
-  return shortVersionOfDateFormat.replace(",","")
-End Function
-
-
-'******************************************************
-'returns datetime in this format : Dec 15, 2022
-'******************************************************
-Function getMonthAndDayWithYear(datetime)
-  month = datetime.GetMonth().toStr()
-  day = datetime.GetDayOfMonth().toStr()
-  year = datetime.getYear().toStr()
-  shortVersionOfDateFormat = getShortVersionOfDateFormat(month, day, year)
-  return shortVersionOfDateFormat
-End Function
-
-
-'******************************************************
 '@month: string, between 1 and 12
 '@day: string, between 1 and 31
 '@year: string, year in 4 digit
@@ -128,5 +69,29 @@ Function getShortVersionOfDateFormat(month = "", day = "", year = "")
     year: year
   }
   shortVersionOfDateFormat = getTranslation("short_version_date_format_" + month, dynamicValues)
+  return shortVersionOfDateFormat
+End Function
+
+
+'******************************************************
+'returns string in this format : Dec 15
+'******************************************************
+Function getMonthAndDay(datetime)
+  month = datetime.GetMonth().toStr()
+  day = datetime.GetDayOfMonth().toStr()
+  shortVersionOfDateFormat = getShortVersionOfDateFormat(month, day)
+  ' replacing "," with empty string as the string does not have year.
+  return shortVersionOfDateFormat.replace(",","")
+End Function
+
+
+'******************************************************
+'returns string in this format : Dec 15, 2022
+'******************************************************
+Function getMonthAndDayWithYear(datetime)
+  month = datetime.GetMonth().toStr()
+  day = datetime.GetDayOfMonth().toStr()
+  year = datetime.getYear().toStr()
+  shortVersionOfDateFormat = getShortVersionOfDateFormat(month, day, year)
   return shortVersionOfDateFormat
 End Function
