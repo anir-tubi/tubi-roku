@@ -16,6 +16,7 @@ Function init()
 
   m.cecStatus = createObject("roCECStatus")
   m.cecStatus.setMessagePort(m.port)
+  m.lastCecStatusIsActiveSource = true
 
   m.top.functionName = "taskThread"
   m.top.control = "run"
@@ -29,9 +30,10 @@ Function taskThread()
 
     if messageType = "roHdmiStatusEvent" OR messageType = "roHdmiHotPlugEvent" then
       ' We can't check cecStatus.isActiveSource() here because there are cases where it will have the wrong value until it receives another roCECStatusEvent
-      m.top.isHdmiStatusOk = (m.hdmiStatus.isConnected() = true)
+      m.top.isHdmiStatusOk = (m.hdmiStatus.isConnected() = true AND m.lastCecStatusIsActiveSource = true)
     else if messageType = "roCECStatusEvent" then
-      m.top.isHdmiStatusOk = (m.hdmiStatus.isConnected() = true AND m.cecStatus.isActiveSource() = true)
+      m.lastCecStatusIsActiveSource = m.cecStatus.isActiveSource()
+      m.top.isHdmiStatusOk = (m.hdmiStatus.isConnected() = true AND m.lastCecStatusIsActiveSource = true)
     end if
 
     tubiLog("MainTask received " + messageType + " hdmiStatus.isConnected(): " + m.hdmiStatus.isConnected().toStr() + " cecStatus.isActiveSource(): " + m.cecStatus.isActiveSource().toStr())
