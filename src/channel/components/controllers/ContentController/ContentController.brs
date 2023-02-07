@@ -2003,7 +2003,7 @@ Function onIsHdmiStatusOkChange(msg)
   isHdmiStatusOk = msg.getData()
 
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid AND isHdmiPlaybackExperimentEnabled() = true then
+  if currentScreen <> invalid then
     currentScreenId = currentScreen.id
     screenIds = m.constants.ui.screenIds
 
@@ -2020,11 +2020,12 @@ Function onIsHdmiStatusOkChange(msg)
     else if currentScreenId = screenIds.videoPlayerScreen then
       state = currentScreen.state
       if state <> "finished" AND state <> "error" AND isHdmiStatusOk = false then
-        ' Send exposure event for experiment
-        isHdmiPlaybackExperimentEnabled(true)
-        returnToDetailScreenFromVideo(false)
-        currentScreen = getCurrentScreen()
-        currentScreen.shouldResumePlayback = true
+        ' Send exposure event for experiment and stop playback if enabled
+        if isHdmiPlaybackExperimentEnabled(true) = true then
+          returnToDetailScreenFromVideo(false)
+          currentScreen = getCurrentScreen()
+          currentScreen.shouldResumePlayback = true
+        end if
       end if
     else
       linearVideoPlayerScreen = getFromScreenCache(screenIds.linearVideoPlayerScreen)
@@ -2034,9 +2035,10 @@ Function onIsHdmiStatusOkChange(msg)
         else
           state = currentScreen.state
           if state <> "finished" AND state <> "error" then
-            ' Send exposure event for experiment
-            isHdmiPlaybackExperimentEnabled(true)
-            linearVideoPlayerScreen.control = "stop"
+            ' Send exposure event for experiment and stop playback if enabled
+            if isHdmiPlaybackExperimentEnabled(true) = true then
+              linearVideoPlayerScreen.control = "stop"
+            end if
           end if
         end if
       end if
