@@ -1307,8 +1307,10 @@ Function getConstants()
       constants.ui.colors.futureItemSelected = defaultDarkStatusCaution
       constants.ui.colors.EPGProgramFocused = darkTransparentForeground75
 
-
-
+      'colors for toast
+      constants.ui.colors.toastTitle = "0x1C1F29FF" '//::TODO::colors - not listed in theme Json
+      constants.ui.colors.toastBackGround = "0xF0F1F5FF" '//::TODO::colors - not listed in theme Json
+      constants.ui.colors.toastMessage = "0x585B66FF" '//::TODO::colors - not listed in theme Json
 
 
     'The IDs of the available themes that can be used for the app

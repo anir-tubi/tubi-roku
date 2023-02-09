@@ -169,6 +169,9 @@
           height="36"
           visible="false"
           translation="[1729,72]"/>
+        <TubiToast
+          id="tubiToast" 
+          translation="[1182, 60]"/>
         <Group
           id="logoGroup">
           <Poster

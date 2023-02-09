@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - tubiToast
+ -->
+<component name="TubiToast" extends="Group" >
+  <script type="text/brightscript" uri="TubiToast.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+
+  <interface>
+    <!-- INPUT -->
+      <!-- Tells the ContentController to show a toast message formatted as :
+            {
+              message: string,  message to be displayed
+              headerText : string, title (can be empty)
+              imageUri: string, image to be displayed left side of message
+              selfDestructTimer: integer, number of seconds toast should be displayed
+              headerColor: colorstring for HeaderText
+              messageColor: colorString for message
+              backGroundColor : toast background color
+              imageWidth: interger, width of the image if imageUri is provided.
+              imageHeight: interger, height of the image if imageUri is provided.
+            } -->
+      <field id="showToastMessage" type="assocarray" />
+      <field id="show" type="boolean" alwaysNotify="true" />
+
+  </interface>
+
+  <children>
+    <Group
+      id="itemContainer"/>
+    <Timer
+      id="toastTimer"
+      duration="0.5"
+      repeat="true"/>
+  </children>
+</component>

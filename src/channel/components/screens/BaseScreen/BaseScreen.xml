@@ -81,6 +81,21 @@
 
       <!-- Tells the screen to reset values back to what they were when the screen 1st loaded. -->
       <field id="reset" type="boolean" alwaysNotify="true"/>
+
+      <!-- Tells the ContentController to show a toast message formatted as :
+            {
+              message: string,  message to be displayed
+              headerText : string, title (can be empty)
+              imageUri: string, image to be displayed left side of message
+              selfDestructTimer: integer, number of seconds toast should be displayed
+              headerColor: colorstring for HeaderText
+              messageColor: colorString for message
+              backGroundColor : toast background color
+              imageWidth: interger, width of the image if imageUri is provided.
+              imageHeight: interger, height of the image if imageUri is provided.
+            } -->
+      <field id="showToastMessage" type="assocarray" alwaysNotify="true"/>
+
   </interface>
 
   <children>

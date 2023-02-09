@@ -58,6 +58,7 @@ Function init()
   m.logoFIFA = m.logoGroup.findNode("tubiFIFALogo")
   m.clock = m.top.findNode("clock")
   m.spinner = m.top.findNode("ContentControllerSpinner")
+  m.tubiToast = m.top.findNode("tubiToast")
   m.LinearVideoPlayerSpinner = m.top.findNode("LinearVideoPlayerSpinner")
   m.playerFullscreenCountdownTimer = m.top.findNode("PlayerFullscreenCountdownTimer")
   m.resumeAllowedTimer = m.top.findNode("ResumeAllowedTimer")
@@ -2045,3 +2046,36 @@ Function onIsHdmiStatusOkChange(msg)
     end if
   end if
 End Function
+
+
+' Screens can request to show a toast by assigning proper values to showToastMessage field.
+Function onShowToastMessage(msg)
+  toastMsg = msg.getData()
+  showToast(toastMsg)
+End Function
+
+
+' showToast -  displays the message on screen like Android toast message.
+' Toast width is based on message or title length whichever is lengthier.
+'   max width = 642
+'   min width = 444
+'   max height = 176
+'   min height = 112
+'
+' @message: string,  message to be displayed
+' @headerText : string, title
+' @imageUri: string, image to be displayed left side of message
+' @selfDestructTimer: integer, number of seconds toast should be displayed
+' @headerColor: colorstring for HeaderText
+' @messageColor: colorString for message
+' @backGroundColor : toast background color
+' @imageWidth: interger, width of the image if imageUri is provided.
+' @imageHeight: interger, height of the image if imageUri is provided.
+Function showToast(toastMsg)
+    m.tubiToast = m.top.findNode("tubiToast")
+    if isAA(toastMsg) = true
+      m.tubiToast.showToastMessage = toastMsg
+      m.tubiToast.show = true
+    end if
+
+End Function'

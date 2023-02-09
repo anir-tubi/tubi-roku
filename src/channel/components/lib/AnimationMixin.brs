@@ -50,6 +50,45 @@ Function slideFade(target As Object, startOrEndLocation As String, inOrOut As St
 End Function
 
 
+' Animate the target component in or out with a slide and fade effect.
+' Similar to slideFade but allows arbitrary directions, not only 90 degrees
+'
+' @target: roSGNode: the component that will be animated
+' @endTranslation: 2d Array, the translation to which the target will be slid
+' @inOrOut: "in" or "out", "in" to animate opacity to 1.0. "out" to animate opacity to 0.0
+' @duration: float, the amount of time it will take the animation to complete, in seconds
+' @delay: float, the amount of time to wait before starting the animation, in seconds
+Function slideFadeGeneral(target, endTranslation, inOrOut, duration=2.0, delay=0.0)
+  animationOptions = {
+    duration: duration
+    delay: delay
+  }
+
+  ' this function persists an origin so the caller doesn't have to
+  if target.hasField("slideFadeOrigin") then
+    target.translation = target.slideFadeOrigin
+  else
+    target.addField("slideFadeOrigin", "vector2d", false)
+    target.slideFadeOrigin = target.translation
+  end if
+
+  if type(endTranslation) = "roArray" AND endTranslation.count() = 2
+    slideX = endTranslation[0]
+    slideY = endTranslation[1]
+    animationOptions.origin = target.translation
+    animationOptions.destination = [slideX, slideY]
+  end if
+
+  if inOrOut = "in"
+    animationOptions.opacity = 1.0
+  else
+    animationOptions.opacity = 0.0
+  end if
+
+  return animate(target, animationOptions)
+End Function
+
+
 '''''''''''''
 ' slideTo
 '
@@ -130,6 +169,7 @@ Function fade(target As Object, outOrIn As String, duration As Float, delay=0.0 
     duration: duration
     delay: delay
   }
+
   if endingOpacity < 0
     if outOrIn = "out"
       animationOptions.opacity = 0.0
@@ -143,7 +183,6 @@ Function fade(target As Object, outOrIn As String, duration As Float, delay=0.0 
     end if
     animationOptions.opacity = endingOpacity
   end if
-
 
   if animationOptions.opacity = target.opacity
     '//The desired opacity has already been reached, so no need to animate
@@ -347,10 +386,12 @@ Function animate(target As Object, options as Object) As Object
       animation.duration = totalTime
       animation.easeFunction = options.easeFunction
       animation.unobserveFieldScoped("state")
+
       if options.completeCallback <> invalid then
         m[animationId + "CompleteCallback"] = options.completeCallback
         animation.observeFieldScoped("state", "AnimationMixin_onAnimationStateChange")
       end if
+
       animation.control = "start"
       return animation
     else

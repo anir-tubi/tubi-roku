@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - tubiToastItem
+ -
+ -->
+<component name="TubiToastItem" extends="Group" >
+  <script type="text/brightscript" uri="TubiToastItem.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+
+  <interface>
+    <!-- INPUT -->
+
+      <!-- Tells the ContentController to show a toast message formatted as :
+            {
+              message: string,  message to be displayed
+              headerText : string, title (can be empty)
+              imageUri: string, image to be displayed left side of message
+              selfDestructTimer: integer, number of seconds toast should be displayed
+            } -->
+      <field id="showToastMessage" type="assocarray" />
+      <field id="show" type="boolean" alwaysNotify="true" />
+      <field id="animationId" type="string" />
+
+    <!--OUTPUT-->
+      <field id="height" alias="infoPaneBg.height" />
+      <field id="width" alias="infoPaneBg.width" />
+      <field id="finalHorizTranslation" type="integer" />
+      <field id="finalVertTranslation" type="integer" />
+      <field id="ttl" type="float" />
+      <field id="startingTtl" type="float" />
+  </interface>
+
+  <children>
+
+    <Poster
+      id="infoPaneBg"
+      translation="[0,0]"
+      opacity="1"/>
+    <LayoutGroup
+      id="infoPaneContainer"
+      translation="[48,36]"
+      layoutDirection="horiz"
+      horizAlignment="left"
+      vertAlignment="center"
+      itemSpacings="[24]">
+      <LayoutGroup
+        id="infoPaneMsgArea"
+        layoutDirection="vert"
+        itemSpacings="[12]"
+        vertAlignment="bottom">
+        <Label
+          id="infoPaneText"
+          maxLines="2"
+          wrap="true">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Medium.ttf"
+            size="24" />
+        </Label>
+      </LayoutGroup>
+    </LayoutGroup>
+  </children>
+</component>
