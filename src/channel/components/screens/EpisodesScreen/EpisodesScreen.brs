@@ -86,22 +86,21 @@ Function onEpisodeFocused()
   tubiLog("EpisodesScreen.onEpisodeFocused")
   if m.RowList.isInFocusChain() then
     episode = getEpisodeContent(m.RowList.rowItemFocused)
-    if episode <> invalid then
 
-      content = m.top.content
-
+    content = m.top.content
+    if episode <> invalid AND content <> invalid then
       m.Info.mode = m.constants.ui.infoPanelModes.episode
       m.Info.title = content.title
       m.Info.episodeTitle = episode.title
       m.Info.description = episode.description
 
       lineOneData = {}
-      lineOneData.releaseDate = content.releaseDate
+      lineOneData.releaseDate = episode.releaseDate
       lineOneData.length = episode.length
 
-      if episode <> invalid AND (episode.hasSubtitles = true OR episode.subtitleTracks.Count() > 0)
+      if (episode.hasSubtitles = true OR episode.subtitleTracks.Count() > 0)
         lineOneData.hasCC = true
-      else if content <> invalid AND content.type = m.constants.ui.contentTypes.video AND (content.hasSubtitles = true OR content.subtitleTracks.Count() > 0)
+      else if content.type = m.constants.ui.contentTypes.video AND (content.hasSubtitles = true OR content.subtitleTracks.Count() > 0)
         lineOneData.hasCC = true
       else
         lineOneData.hasCC = false
