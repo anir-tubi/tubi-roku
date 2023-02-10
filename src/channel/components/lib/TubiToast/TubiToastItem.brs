@@ -69,7 +69,7 @@ Function onShow(msg)
     else if msgWidth + imageWidth < 345
       m.infoPaneText.width = 345 - imageWidth
     else if msgWidth + imageWidth >= 345
-      m.infoPaneText.width = msgWidth - imageWidth
+      m.infoPaneText.width = msgWidth
     end if
 
     if inputArgs.messageColor <> invalid AND inputArgs.messageColor <> ""
