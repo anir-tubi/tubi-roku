@@ -45,7 +45,7 @@ Function TubiExperiments(constants) as Object
 
       ' ads_configuration_ prefix is used to specify additional primary metrics.
       ads_configuration_roku_hdmi_playback: {
-        roku_hdmi_playback_v2: {"enabled": false}
+        roku_hdmi_playback_v3: {"enabled": false}
       }
 
       roku_hevc_drm_4k: {

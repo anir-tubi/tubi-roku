@@ -1991,7 +1991,7 @@ Function isHdmiPlaybackExperimentEnabled(sendEvent = false)
   firmware = createObject("roDeviceInfo").getOSVersion()
   isFirmwareOk = (firmware.major.toInt() >= 11 AND firmware.minor.toInt() >= 5)
 
-  experiment = getExperimentResource("ads_configuration_roku_hdmi_playback", "roku_hdmi_playback_v2", sendEvent)
+  experiment = getExperimentResource("ads_configuration_roku_hdmi_playback", "roku_hdmi_playback_v3", sendEvent)
 
   if isFirmwareOk = true AND experiment.enabled = true then
     return true
