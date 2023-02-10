@@ -2032,12 +2032,17 @@ Function onIsHdmiStatusOkChange(msg)
       linearVideoPlayerScreen = getFromScreenCache(screenIds.linearVideoPlayerScreen)
       if isNode(linearVideoPlayerScreen) = true then
         if isHdmiStatusOk = true then
-          linearVideoPlayerScreen.control = "play"
+          ' if the current screen is linearVideoPlayerScreen, then re-start the playback.
+          ' We restart to make sure that the proper video start time is included in the manifest
+          associatedScreenId = currentScreen.associatedScreenId
+          originalLinearContent = currentScreen.originalContent
+          playLinearVideoContent(originalLinearContent, false, associatedScreenId)
         else
           state = currentScreen.state
           if state <> "finished" AND state <> "error" then
             ' Send exposure event for experiment and stop playback if enabled
             if isHdmiPlaybackExperimentEnabled(true) = true then
+              closeLinearVideoPlayerTransport()
               linearVideoPlayerScreen.control = "stop"
             end if
           end if
