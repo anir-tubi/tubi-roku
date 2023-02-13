@@ -46,25 +46,21 @@
       id="GradientGroup">
       <BackgroundGradientGroup
         id="FullScreenGradient"
-        uri="pkg:/images/detail-gradient-25.png"
+        uri="pkg:/images/detail-gradient-25.webp"
         gradientOpacity="1.0"/>
       <MultipleGradientGroup
         id="LeftBottomGradient"/>
       <BackgroundGradientGroup
-        id="TopRightGradient"
-        uri="pkg:/images/home-gradient_kids.png"
-        gradientOpacity="0.0"/>
-      <BackgroundGradientGroup
         id="LinearGradient1"
-        uri="pkg:/images/horizGradientEPG.png"
+        uri="pkg:/images/horizGradientEPG.webp"
         gradientOpacity="0.0"/>
       <BackgroundGradientGroup
         id="LinearGradient2"
-        uri="pkg:/images/vertGradientEPG.png"
+        uri="pkg:/images/vertGradientEPG.webp"
         gradientOpacity="0.0"/>
       <BackgroundGradientGroup
         id="LeftGradient"
-        uri="pkg:/images/leftGradient.png"
+        uri="pkg:/images/leftGradient.webp"
         gradientOpacity="0.0"/>
     </Group>
   </children>

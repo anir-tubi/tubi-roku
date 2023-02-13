@@ -1214,7 +1214,7 @@ Function getConstants()
 
     constants.ui.uris = {}
       'background gradient urls
-      constants.ui.uris.detailBackgroundGradient = "pkg:/images/detail-gradient-25.png"
+      constants.ui.uris.detailBackgroundGradient = "pkg:/images/detail-gradient-25.webp"
 
       ' portrait format default image
       constants.ui.uris.portraitPlaceholder = "pkg:/images/placeholder.jpg"
@@ -1232,62 +1232,117 @@ Function getConstants()
       constants.ui.uris.categoryBackgrounds.queue = constants.ui.uris.categoryBackgrounds.urlBase + "queue" + constants.ui.uris.categoryBackgrounds.urlEnding
 
       'default background image uri
-      constants.ui.uris.defaultBackground = "pkg:/images/art-blur-background.png"
+      constants.ui.uris.defaultBackground = "pkg:/images/art-blur-background.webp"
 
       'kidsMode background image uri
-      constants.ui.uris.kidsModeBackground = "pkg:/images/art-blur-background_kids.png"
-      constants.ui.uris.backgroundFullScreenGradient = "pkg:/images/detail-gradient-25.png"
-      constants.ui.uris.backgroundFullScreenGradient_kidsMode = "pkg:/images/detail-gradient_kids.png"
-      constants.ui.uris.backgroundTopRightGradient_kidsMode = "pkg:/images/home-gradient_kids.png"
-      constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_kidsmode.png"
+      constants.ui.uris.kidsModeBackground = "pkg:/images/art-blur-background_kids.webp"
+      constants.ui.uris.backgroundFullScreenGradient = "pkg:/images/detail-gradient-25.webp"
+      constants.ui.uris.backgroundFullScreenGradient_kidsMode = "pkg:/images/detail-gradient_kids.webp"
+      constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_kidsmode.webp"
       constants.ui.uris.marketingBackground = "pkg:/images/marketing-background.jpg"
       constants.ui.uris.emptyContainerMyStuffBackground = "pkg:/images/screenMyStuffEmptyContainer.9.png"
       constants.ui.uris.myStuffMyListIcon = "pkg:/images/screenMyStuffMyListIcon.webp"
       constants.ui.uris.myStuffContinueWatchingIcon = "pkg:/images/screenMyStuffContinueWatchingIcon.webp"
 
+    '//::TODO::colors - all theme_ constants (default, kids, holiday, etc) should be listed below. 
+    '//   When the app changes themes, the values associated with the "constants.ui.colors.etc" constants should change
+    '//   in constants.ui.themes.etc.
+    '//   There should be no theme specific "constants.ui.colors.etc" constant: i.e.  "constants.ui.colors.backgroundColorKids"
+    '//   When the app assigns a color, it should use a variable within a theme (constants.ui.themes.kidsMode). Maybe a variable called: "backgroundColor", 
+    '//   instead of calling directly constants.ui.colors.backgroundColorKids
+    '//   All themes under "constants.ui.themes" should have the same color variables.
 
-    ' Default Dark Primary Background
-    defaultDarkPrimaryBackground = "0x000000FF"
-    defaultDarkStatusAlert = "0xF52D2DFF"
+    '//The use of the "THEME_" constants will be replaced with hexidecimal color strings during the gulp install process.
+    '//::TODO:: Keeping the colors commented next to the THEME_ constants for now. There are hardcoded instances of 
+    '//   these colors throughout the app. Keeping the colors here will make it easier to track down and eventually replace
+    '//   with theme colors in the init or observer functions of the BRS file. Once the hardcoded color instances have been replaced,
+    '//   we can remove the commented out color codes below.
 
-    darkTransparentForeground5 = "0xFFFFFF0D"
-    darkTransparentForeground10 = "0xFFFFFF1A"
-    darkTransparentForeground20 = "0xFFFFFF33"
-    darkTransparentForeground75 = "0xFFFFFFBF"
-    darkTransparentForeground95 = "0xFFFFFFF2"
+    '//defaultDark theme constants
+    defaultDarkPrimaryAccent = "THEME_defaultDarkPrimaryAccent"                     '// "0xE13100FF"
+    defaultDarkPrimaryBackground = "THEME_defaultDarkPrimaryBackground"
+    defaultDarkPrimaryForeground = "THEME_defaultDarkPrimaryForeground"                '// "0xFFFFFFFF"
+    defaultDarkTransparentBackground75 = "THEME_defaultDarkTransparentBackground75"  '//"0x191919FF"
+    ' defaultDarkTransparentForeground0 = "THEME_defaultDarktransparentforeground0"    '//::NOTE::  not currently being used
+    defaultDarkTransparentForeground5 = "THEME_defaultDarkTransparentForeground5"     '//"0xFFFFFF0D"
+    defaultDarkTransparentForeground10 = "THEME_defaultDarkTransparentForeground10"  '// "0xFFFFFF1A"
+    defaultDarkTransparentForeground20 = "THEME_defaultDarkTransparentForeground20"  '//  "0xFFFFFF33"
+    defaultDarkTransparentForeground75 = "THEME_defaultDarkTransparentForeground75"  '//  "0xFFFFFFBF"
+    ' defaultDarkStatusSuccess = "THEME_defaultDarkStatusSuccess"   '//::NOTE:: not currently being used
+    defaultDarkStatusCaution = "THEME_defaultDarkStatusCaution"   '// "0xEB9C00FF"
+    defaultDarkStatusAlert = "THEME_defaultDarkStatusAlert"       '//"0xF52D2DFF"
 
-    defaultDarkPrimaryAccent = "0xE13100FF"
-    darkTransparentAccent10 = "0xE131001A"
 
-    defaultDarkPrimaryForeground = "0xFFFFFFFF"
-    kidsDarkPrimaryBackground = "0x002F8AFF"
-    kidsDarkPrimaryAccent= "0xF08600FF"
-    defaultDarkStatusCaution = "0xEB9C00FF"
+    '//defaultLight theme constants
+    ' defaultLightPrimaryAccent = "THEME_defaultLightPrimaryAccent"
+    ' defaultLightPrimaryBackground = "THEME_defaultLightPrimaryBackground"
+    ' defaultLightPrimaryForeground = "THEME_defaultLightPrimaryForeground"
+    ' defaultLightTransparentBackground75 = "THEME_defaultLightTransparentBackground75"
+    ' defaultLightTransparentForeground0 = "THEME_defaultLighttransparentforeground0"
+    ' defaultLightTransparentForeground5 = "THEME_defaultLightTransparentForeground5"
+    ' defaultLightTransparentForeground10 = "THEME_defaultLightTransparentForeground10"
+    ' defaultLightTransparentForeground20 = "THEME_defaultLightTransparentForeground20"
+    ' defaultLightTransparentForeground75 = "THEME_defaultLightTransparentForeground75"
+    ' defaultLightStatusSuccess = "THEME_defaultLightStatusSuccess"
+    ' defaultLightStatusCaution = "THEME_defaultLightStatusCaution"
+    ' defaultLightStatusAlert = "THEME_defaultLightStatusAlert"
+
+
+    '//kidsDark theme constants
+    kidsDarkPrimaryAccent = "THEME_kidsDarkPrimaryAccent"              '// "0xF08600FF"
+    kidsDarkPrimaryBackground = "THEME_kidsDarkPrimaryBackground"      '// "0x002F8AFF"
+    ' kidsDarkPrimaryForeground = "THEME_kidsDarkPrimaryForeground"
+    ' kidsDarkTransparentBackground75 = "THEME_kidsDarkTransparentBackground75"
+    ' kidsDarkTransparentForeground0 = "THEME_kidsDarktransparentforeground0"
+    ' kidsDarkTransparentForeground5 = "THEME_kidsDarkTransparentForeground5"
+    ' kidsDarkTransparentForeground10 = "THEME_kidsDarkTransparentForeground10"
+    ' kidsDarkTransparentForeground20 = "THEME_kidsDarkTransparentForeground20"
+    ' kidsDarkTransparentForeground75 = "THEME_kidsDarkTransparentForeground75"
+    ' kidsDarkStatusSuccess = "THEME_kidsDarkStatusSuccess"
+    ' kidsDarkStatusCaution = "THEME_kidsDarkStatusCaution"
+    ' kidsDarkStatusAlert = "THEME_kidsDarkStatusAlert"
+
+
+    '//holidaysDark theme constants
+    ' holidaysDarkPrimaryAccent = "THEME_holidaysDarkPrimaryAccent"
+    ' holidaysDarkPrimaryBackground = "THEME_holidaysDarkPrimaryBackground"
+    ' holidaysDarkPrimaryForeground = "THEME_holidaysDarkPrimaryForeground"
+    ' holidaysDarkTransparentBackground75 = "THEME_holidaysDarkTransparentBackground75"
+    ' holidaysDarkTransparentForeground0 = "THEME_holidaysDarktransparentforeground0"
+    ' holidaysDarkTransparentForeground5 = "THEME_holidaysDarkTransparentForeground5"
+    ' holidaysDarkTransparentForeground10 = "THEME_holidaysDarkTransparentForeground10"
+    ' holidaysDarkTransparentForeground20 = "THEME_holidaysDarkTransparentForeground20"
+    ' holidaysDarkTransparentForeground75 = "THEME_holidaysDarkTransparentForeground75"
+    ' holidaysDarkStatusSuccess = "THEME_holidaysDarkStatusSuccess"
+    ' holidaysDarkStatusCaution = "THEME_holidaysDarkStatusCaution"
+    ' holidaysDarkStatusAlert = "THEME_holidaysDarkStatusAlert"
+
 
     constants.ui.colors = {}
+    
+      '//::TODO::colors - when a theme is changed, then the following constants should be changed. 
+      '//   Each theme under constants.ui.themes should contain the following constants
+
       'template colors
       constants.ui.colors.transparent = "0x00000000"
       constants.ui.colors.caution = defaultDarkStatusCaution
       constants.ui.colors.backgroundColor = defaultDarkPrimaryBackground
       constants.ui.colors.backgroundColorKids = kidsDarkPrimaryBackground
-      constants.ui.colors.neutralColor = darkTransparentForeground20
-      constants.ui.colors.neutralColor2 = darkTransparentForeground10
-      constants.ui.colors.neutralColor3 = darkTransparentForeground5
+      constants.ui.colors.neutralColor = defaultDarkTransparentForeground20
+      constants.ui.colors.neutralColor2 = defaultDarkTransparentForeground10
+      constants.ui.colors.neutralColor3 = defaultDarkTransparentForeground5
       constants.ui.colors.backgroundColorLight = defaultDarkPrimaryForeground
-      constants.ui.colors.backgroundColorLight2 = darkTransparentForeground75
-      constants.ui.colors.shade = "0x191919FF" '//::TODO::colors - not listed in figma
+      constants.ui.colors.backgroundColorLight2 = defaultDarkTransparentForeground75
+      constants.ui.colors.shade = defaultDarkTransparentBackground75
 
       constants.ui.colors.focused = defaultDarkPrimaryAccent
-      constants.ui.colors.focusedTransparent10 = darkTransparentAccent10
       constants.ui.colors.focusedKids = kidsDarkPrimaryAccent
       constants.ui.colors.focused2 = defaultDarkStatusAlert
       constants.ui.colors.unfocused = defaultDarkPrimaryForeground
-      constants.ui.colors.selectedListItem = darkTransparentForeground5
+      constants.ui.colors.selectedListItem = defaultDarkTransparentForeground5
       constants.ui.colors.primaryText = defaultDarkPrimaryForeground
       constants.ui.colors.textDark = defaultDarkPrimaryBackground
-      constants.ui.colors.secondaryText = darkTransparentForeground75
-      constants.ui.colors.secondaryTextAlt = darkTransparentForeground95
-      constants.ui.colors.tertiaryText = darkTransparentForeground95
+      constants.ui.colors.secondaryText = defaultDarkTransparentForeground75
       constants.ui.colors.focusedText = defaultDarkPrimaryForeground
 
       '//::NOTE::HARDCODED:: there is a BUG in the built in roku keyboard component'
@@ -1305,7 +1360,7 @@ Function getConstants()
 
       'colors for timeGrid
       constants.ui.colors.futureItemSelected = defaultDarkStatusCaution
-      constants.ui.colors.EPGProgramFocused = darkTransparentForeground75
+      constants.ui.colors.EPGProgramFocused = defaultDarkTransparentForeground75
 
       'colors for toast
       constants.ui.colors.toastTitle = "0x1C1F29FF" '//::TODO::colors - not listed in theme Json
@@ -1327,9 +1382,7 @@ Function getConstants()
         keyboard_focused_key: "pkg:/images/keyboard_search_focused_key.9.png"
         scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground.9.png"
         scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground.9.png"
-        gradientBlendColor: "0x10141FFF"
-        ' ::TODO::colors - The gradiant color needs to match the color of the background image. Right now the image is bluish but perhaps the new color scheme will want to do away with that
-        ' gradientBlendColor: constants.ui.colors.backgroundColor
+        gradientBlendColor: constants.ui.colors.backgroundColor
       }
       constants.ui.themes.kidsMode = {
         id: constants.ui.themeIDs.kidsMode

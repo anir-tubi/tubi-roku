@@ -29,8 +29,8 @@ Function init()
       choice: "LINK"
     }
   }
-  m.verificationLinkText.color = m.constants.ui.colors.tertiaryText
-  m.verificationHintText.color = m.constants.ui.colors.tertiaryText
+  m.verificationLinkText.color = m.constants.ui.colors.secondaryText
+  m.verificationHintText.color = m.constants.ui.colors.secondaryText
   m.emailInboxText.color = m.constants.ui.colors.primaryText
   m.email.color = m.constants.ui.colors.primaryText
   m.top.screenLevel = m.constants.ui.screenLevels.emailVerificationScreen

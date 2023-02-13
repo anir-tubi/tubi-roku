@@ -312,7 +312,7 @@ Function setUpLinear()
   nLinearTitlePlacement = m.top.height - m.LinearTitle.height - 36
   m.LinearTitle.translation = [0,nLinearTitlePlacement]
 
-  m.poster.uri = "pkg:/images/gradientBground-linearItem-vertical.png"
+  m.poster.uri = "pkg:/images/gradientBground-linearItem-vertical.webp"
   m.LinearTitle.text = m.top.itemContent.title
   m.LinearPoster.translation = [381,198]
 

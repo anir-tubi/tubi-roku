@@ -98,7 +98,7 @@
   <Poster
     id="LinearPosterBground"
     visible="false"
-    uri="pkg:/images/gradientBground-linearItem-vertical.png"/>
+    uri="pkg:/images/gradientBground-linearItem-vertical.webp"/>
     <Poster
       id="LinearPoster"
       visible="false"

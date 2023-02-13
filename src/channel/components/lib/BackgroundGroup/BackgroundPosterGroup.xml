@@ -29,7 +29,7 @@
       id="BackgroundPoster"
       width="1920"
       height="1080"
-      uri="pkg:/images/art-blur-background.png"
+      uri="pkg:/images/art-blur-background.webp"
       translation="[0,0]"
       opacity="0.0" />
     <Animation

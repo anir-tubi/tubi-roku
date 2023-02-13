@@ -45,7 +45,7 @@ Function init()
   m.top.observeFieldScoped("isPreTournament", "onPreTournament")
   m.top.observeFieldScoped("setForceRefreshCategoryContainers", "onForceRefreshCategoryContainers")
   m.top.screenLevel = m.constants.ui.screenLevels.tournamentScreen
-  m.defaultBackgroundUri = "pkg:/images/art-blur-background.png"
+  m.defaultBackgroundUri = "pkg:/images/art-blur-background.webp"
   m.top.backgroundUriList = [m.defaultBackgroundUri]
   m.top.handlesTransportVoiceRequests = true
   'set initial tracking values and change thevalues once the document is ready

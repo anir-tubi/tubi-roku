@@ -26,6 +26,7 @@ const {keypress, deeplink, uploadPkg, signPkg, convertToSquashfs} = require('./j
 //Functions to upload and download static string translations
 const {downloadTranslations, updateLocalTranslations, uploadTranslations} = require('./js/translate');
 const {listUnusedImages,listUnusedTranslations} = require('./js/codeclean.js');
+const {replaceColorConstants} = require('./js/colorreplace.js');
 
 // Importing functions with Git functionality
 const {NoStackError} = require('./js/utilities')
@@ -187,6 +188,7 @@ function buildInstalled() {
 
   return build
     .then(() => {
+      replaceColorConstants("build/local");
       createSettings(options, 'build/local/source/Settings.brs');
       createManifest(options, 'build/local/manifest', 'manifest');
       return zipAsPromise('build/local/**/*', `tubi_${buildTag}.zip`, 'build/');
@@ -283,6 +285,7 @@ function buildStarter() {
   // then zip up the starter component files after all the files have been moved
   return build
   .then(() => {
+    replaceColorConstants("build/starter");
     createSettings(options, 'build/starter/source/Settings.brs');
     createManifest(options, 'build/starter/manifest', 'starter_library_manifest');
     return zipAsPromise('build/starter/**/*', `tubi_starter_components_${minorBuildTag}.zip`, 'build/');
@@ -387,6 +390,7 @@ function buildRemote() {
   // zip up the remote components
   return build
   .then(() => {
+    replaceColorConstants("build/remote");
     createManifest(options, 'build/remote/manifest', 'component_library_manifest');
     return zipAsPromise('build/remote/**/*', `tubi_remote_components_${buildTag}.zip`, 'build/');
   });

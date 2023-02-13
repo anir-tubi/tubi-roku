@@ -15,7 +15,7 @@ Function init()
   m.SignedOutUISubtitle.text = getTranslation("screenMyStuff_signedOutUISubtitle")
   m.SignedOutUIBlurb.text = getTranslation("screenMyStuff_signedOutUIBlurb")
   m.SignedOutUITitle.color = m.constants.ui.colors.primaryText
-  m.SignedOutUISubtitle.color = m.constants.ui.colors.secondaryTextAlt
+  m.SignedOutUISubtitle.color = m.constants.ui.colors.secondaryText
   m.SignedOutUIBlurb.color = m.constants.ui.colors.focused
   m.top.screenLevel = m.constants.ui.screenLevels.myStuffScreen
   m.top.id = m.constants.ui.screenIds.myStuffScreen

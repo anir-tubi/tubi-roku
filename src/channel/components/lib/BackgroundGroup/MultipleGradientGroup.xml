@@ -12,7 +12,7 @@
     <!-- Store the last animation that was triggered in case we need to stop it later-->
     <field id="lastAnimationName" type="string" alwaysNotify="true"/>
     <!-- uriList field accepts array of backgroundUris for a content. BackgroundgradientGroup will be created based on this.
-      eg. ["pkg:/images/leftGradient.png", "pkg:/images/bottomGradient.png"]  -->
+      eg. ["pkg:/images/leftGradient.webp", "pkg:/images/bottomGradient.webp"]  -->
     <field id="uriList" type="array"/>
     <!-- allowed values are none, start, stop, pause, resume, finish -->
     <field id="fadeInControl" type="string" alwaysNotify="true"/>

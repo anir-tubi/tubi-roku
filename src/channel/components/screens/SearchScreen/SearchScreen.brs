@@ -71,7 +71,7 @@ Function init()
   m.KidsModeMessage.color = m.constants.ui.colors.secondaryText
   m.searchMenuText.color = m.constants.ui.colors.primaryText
 
-  m.defaultHeroUri = "pkg:/images/art-blur-background.png"
+  m.defaultHeroUri = "pkg:/images/art-blur-background.webp"
 
   if m.constants.deviceInfo.scaledUi = true then
     m.ResultGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"

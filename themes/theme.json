@@ -1,0 +1,362 @@
+{
+	"themes": {
+		"default": {
+			"dark": {
+				"$description": "design tokens for default dark theme",
+				"tokens": {
+					"colors": {
+						"$type": "color",
+						"primary": {
+							"$description": "core theme colors",
+							"accent": {
+								"$value": "#E13100",
+								"$description": "primary ctas, focus indicator"
+							},
+							"background": {
+								"$value": "#000000",
+								"$description": "background"
+							},
+							"foreground": {
+								"$value": "#FFFFFF",
+								"$description": "text, icons"
+							}
+						},
+						"transparent": {
+							"$description": "transparent colors derived from the foreground and accent values",
+							"background-75": {
+								"$value": "#000000BF",
+								"$description": "modal overlay"
+							},
+							"foreground-0": {
+								"$value": "#FFFFFF00",
+								"$description": "for use on gradients that fade to a transparent color stop"
+							},
+							"foreground-5": {
+								"$value": "#FFFFFF0D",
+								"$description": "input background rest"
+							},
+							"foreground-10": {
+								"$value": "#FFFFFF1A",
+								"$description": "input background hover, hr"
+							},
+							"foreground-20": {
+								"$value": "#FFFFFF33",
+								"$description": "input strokes rest, input disabled text, button background, label background"
+							},
+							"foreground-75": {
+								"$value": "#FFFFFFBF",
+								"$description": "secondary copy, input placeholder text, input strokes hover"
+							}
+						},
+						"status": {
+							"$description": "status colors",
+							"success": {
+								"$value": "#0DA335",
+								"$description": "text, icons"
+							},
+							"caution": {
+								"$value": "#EB9C00",
+								"$description": "text, icons"
+							},
+							"alert": {
+								"$value": "#F52D2D",
+								"$description": "text, icons"
+							}
+						}
+					},
+					"border-radius": {
+						"$type": "geometry",
+						"border-radius-4": {
+							"$value": "4",
+							"$description": "posters on mobile and web"
+						},
+						"border-radius-8": {
+							"$value": "8",
+							"$description": "posters on tv, buttons on mobile and web"
+						},
+						"border-radius-12": {
+							"$value": "12",
+							"$description": "buttons on tv"
+						},
+						"border-radius-24": {
+							"$value": "24",
+							"$description": "modals on tv"
+						},
+						"border-radius-999": {
+							"$value": "999",
+							"$description": "pill shaped elements"
+						}
+					}
+				}
+			},
+			"light": {
+				"$description": "design tokens for default light theme",
+				"tokens": {
+					"colors": {
+						"$type": "color",
+						"primary": {
+							"$description": "core theme colors",
+							"accent": {
+								"$value": "#E13100",
+								"$description": "primary ctas, focus indicator"
+							},
+							"background": {
+								"$value": "#FFFFFF",
+								"$description": "background"
+							},
+							"foreground": {
+								"$value": "#000000",
+								"$description": "text, icons"
+							}
+						},
+						"transparent": {
+							"$description": "transparent colors derived from the foreground and accent values",
+							"background-75": {
+								"$value": "#FFFFFFBF",
+								"$description": "modal overlay"
+							},
+							"foreground-0": {
+								"$value": "#00000000",
+								"$description": "for use on gradients that fade to a transparent color stop"
+							},
+							"foreground-5": {
+								"$value": "#0000000D",
+								"$description": "input background rest"
+							},
+							"foreground-10": {
+								"$value": "#0000001A",
+								"$description": "input background hover, hr"
+							},
+							"foreground-20": {
+								"$value": "#00000033",
+								"$description": "input strokes rest, input disabled text, button background, label background"
+							},
+							"foreground-75": {
+								"$value": "#000000BF",
+								"$description": "secondary copy, input placeholder text, input strokes hover"
+							}
+						},
+						"status": {
+							"$description": "status colors",
+							"success": {
+								"$value": "#0B7F2A",
+								"$description": "text, icons"
+							},
+							"caution": {
+								"$value": "#966508",
+								"$description": "text, icons"
+							},
+							"alert": {
+								"$value": "#DC1A1A",
+								"$description": "text, icons"
+							}
+						}
+					},
+					"border-radius": {
+						"$type": "geometry",
+						"border-radius-4": {
+							"$value": "4",
+							"$description": "posters on mobile and web"
+						},
+						"border-radius-8": {
+							"$value": "8",
+							"$description": "posters on tv, buttons on mobile and web"
+						},
+						"border-radius-12": {
+							"$value": "12",
+							"$description": "buttons on tv"
+						},
+						"border-radius-24": {
+							"$value": "24",
+							"$description": "modals on tv"
+						},
+						"border-radius-999": {
+							"$value": "999",
+							"$description": "pill shaped elements"
+						}
+					}
+				}
+			}
+		},
+		"kids": {
+			"dark": {
+				"$description": "design tokens for kids dark theme",
+				"tokens": {
+					"colors": {
+						"$type": "color",
+						"primary": {
+							"$description": "core theme colors",
+							"accent": {
+								"$value": "#F08600",
+								"$description": "primary ctas, focus indicator"
+							},
+							"background": {
+								"$value": "#002F8A",
+								"$description": "background"
+							},
+							"foreground": {
+								"$value": "#FFFFFF",
+								"$description": "text, icons"
+							}
+						},
+						"transparent": {
+							"$description": "transparent colors derived from the foreground and accent values",
+							"background-75": {
+								"$value": "#002F8ABF",
+								"$description": "modal overlay"
+							},
+							"foreground-0": {
+								"$value": "#FFFFFF00",
+								"$description": "for use on gradients that fade to a transparent color stop"
+							},
+							"foreground-5": {
+								"$value": "#FFFFFF0D",
+								"$description": "input background rest"
+							},
+							"foreground-10": {
+								"$value": "#FFFFFF1A",
+								"$description": "input background hover, hr"
+							},
+							"foreground-20": {
+								"$value": "#FFFFFF33",
+								"$description": "input strokes rest, input disabled text, button background, label background"
+							},
+							"foreground-75": {
+								"$value": "#FFFFFFBF",
+								"$description": "secondary copy, input placeholder text, input strokes hover"
+							}
+						},
+						"status": {
+							"$description": "status colors",
+							"success": {
+								"$value": "#FFB524",
+								"$description": "text, icons"
+							},
+							"caution": {
+								"$value": "#EB9C00",
+								"$description": "text, icons"
+							},
+							"alert": {
+								"$value": "#FF7979",
+								"$description": "text, icons"
+							}
+						}
+					},
+					"border-radius": {
+						"$type": "geometry",
+						"border-radius-4": {
+							"$value": "6",
+							"$description": "posters on mobile and web"
+						},
+						"border-radius-8": {
+							"$value": "12",
+							"$description": "posters on tv, buttons on mobile and web"
+						},
+						"border-radius-12": {
+							"$value": "18",
+							"$description": "buttons on tv"
+						},
+						"border-radius-24": {
+							"$value": "36",
+							"$description": "modals on tv"
+						},
+						"border-radius-999": {
+							"$value": "999",
+							"$description": "pill shaped elements"
+						}
+					}
+				}
+			}
+		},
+		"holidays": {
+			"dark": {
+				"$description": "design tokens for holydays dark theme",
+				"tokens": {
+					"colors": {
+						"$type": "color",
+						"primary": {
+							"$description": "core theme colors",
+							"accent": {
+								"$value": "#E13100",
+								"$description": "primary ctas, focus indicator"
+							},
+							"background": {
+								"$value": "#041F18",
+								"$description": "background"
+							},
+							"foreground": {
+								"$value": "#FFFFFF",
+								"$description": "text, icons"
+							}
+						},
+						"transparent": {
+							"$description": "transparent colors derived from the foreground and accent values",
+							"background-75": {
+								"$value": "#041F18BF",
+								"$description": "modal overlay"
+							},
+							"foreground-0": {
+								"$value": "#FFFFFF00",
+								"$description": "for use on gradients that fade to a transparent color stop"
+							},
+							"foreground-5": {
+								"$value": "#FFFFFF0D",
+								"$description": "input background rest"
+							},
+							"foreground-10": {
+								"$value": "#FFFFFF1A",
+								"$description": "input background hover, hr"
+							},
+							"foreground-20": {
+								"$value": "#FFFFFF33",
+								"$description": "input strokes rest, input disabled text, button background, label background"
+							},
+							"foreground-75": {
+								"$value": "#FFFFFFBF",
+								"$description": "secondary copy, input placeholder text, input strokes hover"
+							}
+						},
+						"status": {
+							"$description": "status colors",
+							"success": {
+								"$value": "#0DA335",
+								"$description": "text, icons"
+							},
+							"caution": {
+								"$value": "#EB9C00",
+								"$description": "text, icons"
+							},
+							"alert": {
+								"$value": "#F52D2D",
+								"$description": "text, icons"
+							}
+						}
+					},
+					"border-radius": {
+						"$type": "geometry",
+						"border-radius-4": {
+							"$value": "4",
+							"$description": "posters on mobile and web"
+						},
+						"border-radius-8": {
+							"$value": "8",
+							"$description": "posters on tv, buttons on mobile and web"
+						},
+						"border-radius-12": {
+							"$value": "12",
+							"$description": "buttons on tv"
+						},
+						"border-radius-24": {
+							"$value": "24",
+							"$description": "modals on tv"
+						},
+						"border-radius-999": {
+							"$value": "999",
+							"$description": "pill shaped elements"
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -35,7 +35,7 @@ Function init()
   m.firstTime = true
 
   'm.top
-  m.defaultBackgroundUri = "pkg:/images/art-blur-background.png"
+  m.defaultBackgroundUri = "pkg:/images/art-blur-background.webp"
   m.top.screenLevel = m.constants.ui.screenLevels.epgScreen
   m.top.observeField("updateTimeGridContent", "onTimeContentChange")
   m.top.observeField("focusedChild", "onScreenFocusChange")
