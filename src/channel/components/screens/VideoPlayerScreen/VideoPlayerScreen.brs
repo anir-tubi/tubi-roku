@@ -551,11 +551,13 @@ Function onVideoStateChange(msg)
     content = m.Video.content
     errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo,m.Video.errorCode, m.Video.errorMsg, content)
     jsonErrorInfo = FormatJSON(errorInfo)
-
     ' sending the logs to uapi
     tubiLog(jsonErrorInfo, "error", "videoPlayback", "video-playback", 0.1)
+
+    errorInfo.type = m.constants.errors.type.videoError + " " + m.video.errorCode.toStr()
+    errorInfo.name = m.constants.errors.message.videoPlayer
     ' sending the logs to sentry sdk
-    tubiException(jsonErrorInfo, "error", 0.1)
+    tubiException(errorInfo, "error", 0.1)
 
     m.top.sendYouboraError = true
 
@@ -898,9 +900,12 @@ Function onAdStateChange(msg)
       }
       jsonErrorInfo = FormatJSON(errorInfo)
       ' sending the logs to uapi
-      tubiLog(jsonErrorInfo, "error", "adError", "ad-invalid-url", 0.1)
+      tubiLog(jsonErrorInfo, "error", "videoPlayback", "invalid-video-url", 0.1)
+
+      errorInfo.type = m.constants.errors.type.videoError
+      errorInfo.name = m.constants.errors.message.invalidVideoUrl
       ' sending the logs to sentry sdk
-      tubiException(jsonErrorInfo, "error", 0.1)
+      tubiException(errorInfo, "error", 0.1)
     end if
   else if adState = "adsClosed"
     m.top.setFocus(true)

@@ -71,23 +71,36 @@ Function sentry_deepAppend_test()
 End Function
 
 
-'@Test captureMessage unit tests
-Function sentry_captureMessage_test()
+'@Test getReqInfo unit tests
+Function sentry_getReqInfo_test()
   s = Sentry(m.constants, m.auth)
-  s._sendEvent = Function(event)
-    m._testEvent = event
-  End Function
-  s.captureMessage("Test Message")
-  m.assertEqual(s._testEvent["message"], "Test Message")
-  m.assertEqual(s._testEvent["level"], "info")
+  message = "Test Message"
 
-  s.captureMessage("Test Message", "warning")
-  m.assertEqual(s._testEvent["message"], "Test Message")
-  m.assertEqual(s._testEvent["level"], "warning")
+  reqInfo = s.getReqInfo(message, "error")
+  url = reqInfo.url
+  m.assertEqual("https://sentry.io/api/1377102/store/", url)
 
-  s.captureMessage("Test Message", "error")
-  m.assertEqual(s._testEvent["message"], "Test Message")
-  m.assertEqual(s._testEvent["level"], "error")
+  reqOptions = reqInfo.reqOptions
+  body = ParseJson(reqOptions.body)
+  m.assertEqual("Test Message", body.message)
+
+  message = {
+    type: "ApiError"
+    name: "postToQueue"
+    code: "404"
+    failreason: "The requested URL returned error: 404"
+    url: "https://user-queue.production-public.tubi.io/api/v2/queues"
+  }
+  reqInfo = s.getReqInfo(message, "error")
+  reqOptions = reqInfo.reqOptions
+
+  body = ParseJson(reqOptions.body)
+  m.assertEqual("https://user-queue.production-public.tubi.io/api/v2/queues", body.extra.url)
+  m.assertEqual("404", body.extra.code)
+  m.assertEqual("The requested URL returned error: 404", body.extra.failreason)
+  m.assertEqual("ApiError", body.exception.values[0].type)
+  m.assertEqual("postToQueue", body.exception.values[0].value)
+
 End Function
 
 

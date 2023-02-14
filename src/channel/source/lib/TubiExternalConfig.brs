@@ -70,7 +70,6 @@ Function tubiExternalConfig_getConfigsRequest(request, constants)
     headers:{}
   }
   options.headers.append(constants.headers.commonUapi)
-
   return request.createAsync(url, "getExternalConfigs", options)
 End Function
 

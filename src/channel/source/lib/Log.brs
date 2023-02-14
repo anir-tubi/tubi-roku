@@ -1,4 +1,4 @@
-Function TubiLogger(constants, request, auth, sentry=invalid)
+Function TubiLogger(constants, request, auth, sentry = invalid)
   return {
     request: request
     auth: auth
@@ -63,6 +63,7 @@ Function TubiLogger(constants, request, auth, sentry=invalid)
     buildLogInfo: tubiLog_buildLogInfo_
     sendLogging: tubiLog_sendLogging_
     getLoggingRequest: tubiLog_getLoggingRequest_
+    sendSentryLogging: tubiLog_sendSentryLogging_
     getLogPrintout: tubiLog_getLogPrintout_
   }
 End Function
@@ -74,7 +75,7 @@ End Function
 'however, anything worthy of warn or error severity should be sent to the server (ie. fill all the parameters for warn and error)
 
 'debug will only send logging to the server if the device id is in m.idsToLog
-Function tubiLog_debug(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object, samplePercent=1.0 as Float)
+Function tubiLog_debug(message = "" as String, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
   logInfo = m.buildLogInfo(message, m.logConsts.debug.serverType[serverTypeName], subtype, m.logConsts.debug.name)
   m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
   if isSampled(samplePercent) = true
@@ -83,7 +84,7 @@ Function tubiLog_debug(message="" as String, serverTypeName="" as String, subtyp
 End Function
 
 
-Function tubiLog_info(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object, samplePercent=1.0 as Float)
+Function tubiLog_info(message = "" as String, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
   logInfo = m.buildLogInfo(message, m.logConsts.info.serverType[serverTypeName], subtype, m.logConsts.info.name)
   m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
   if isSampled(samplePercent) = true
@@ -92,7 +93,7 @@ Function tubiLog_info(message="" as String, serverTypeName="" as String, subtype
 End Function
 
 
-Function tubiLog_error(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object, samplePercent=1.0 as Float)
+Function tubiLog_error(message = "" as String, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
   logInfo = m.buildLogInfo(message, m.logConsts.error.serverType[serverTypeName], subtype, m.logConsts.error.name)
   m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
   if isSampled(samplePercent) = true
@@ -101,7 +102,7 @@ Function tubiLog_error(message="" as String, serverTypeName="" as String, subtyp
 End Function
 
 
-Function tubiLog_warn(message="" as String, serverTypeName="" as String, subtype="" as String, queue=invalid as Object, samplePercent=1.0 as Float)
+Function tubiLog_warn(message = "" as String, serverTypeName = "" as String, subtype = "" as String, queue = invalid as Object, samplePercent = 1.0 as Float)
   logInfo = m.buildLogInfo(message, m.logConsts.warn.serverType[serverTypeName], subtype, m.logConsts.warn.name)
   m.printLogInfo(logInfo.level, logInfo.subtype, logInfo.message)
   if isSampled(samplePercent) = true
@@ -110,7 +111,11 @@ Function tubiLog_warn(message="" as String, serverTypeName="" as String, subtype
 End Function
 
 
-Function tubiLog_exception(message="" as String, level="exception" as String, samplePercent=1.0 as Float) as void
+'@message: string or roAssociativeArray, the message to be logged
+'@level: string, (optional), possible log levels are "debug", "info", "warn", or "error"
+'@queue: roAssociativeArray, object as created by RequestQueue()
+'@samplePercent: float (optional), possible values are between 0 and 1. default is 1.0
+Function tubiLog_exception(message = "" as Dynamic, level = "exception" as String, queue = invalid as Object, samplePercent = 1.0 as Float) as void
   m.printLogInfo(level, "", message)
 
   if isSampled(samplePercent) = true AND m.sentry <> invalid
@@ -118,7 +123,7 @@ Function tubiLog_exception(message="" as String, level="exception" as String, sa
     tubiToSentry[m.logConsts.error.name] = "error"
     tubiToSentry[m.logConsts.warn.name] = "warning"
     tubiToSentry[m.logConsts.info.name] = "info"
-    m.sentry.captureMessage(message, tubiToSentry[level])
+    m.sendSentryLogging(message, tubiToSentry[level], queue)
   end if
 End Function
 
@@ -142,10 +147,13 @@ End Function
 
 
 ' prints the log on console based
-'@level: string, (optional), a log level, one of "debug", "info", "warn", or "error"
+'@level: string, (optional), possible log levels are "debug", "info", "warn", or "error"
 '@subtype: string, (optional), a small string used to differentiate log messages
-'@message: string, the message to be logged
-Function tubiLog_printLogInfo_(level as String, subType as String, message as String)
+'@message: string or roAssociativeArray, the message to be logged
+Function tubiLog_printLogInfo_(level as String, subType as String, message as Dynamic)
+  if type(message) = "roAssociativeArray"
+    message = FormatJson(message)
+  end if
   ' user has set consoleLoggingEnabled to true in their dev.yml/qa.yml
   #if consoleLoggingEnabled
     print tubiLog_getLogPrintout_(level, subtype, message)
@@ -200,6 +208,26 @@ Function tubiLog_sendLogging_(logInfo as Object, queue as Object)
 End Function
 
 
+'uses Request().createAsync() to build a request that is ready to be sent to the sentry API
+'@message: string or roAssociativeArray, the message to be logged
+'@level: string, (optional), possible log levels are "debug", "info", "warn", or "error"
+'@queue: roAssociativeArray, object as created by RequestQueue()
+'
+'returns invalid if the log was only printed to the console, else requestObject
+Function tubiLog_sendSentryLogging_(message = "" as Dynamic, level = "info" as String, queue = invalid as Object)
+  reqInfo = m.sentry.getReqInfo(message, level)
+
+  if reqInfo = invalid OR queue = invalid
+    return invalid
+  end if
+
+  url = reqInfo.url
+  reqOptions = reqInfo.reqOptions
+  sentryRequest = m.request.createAsync(url, "scenegraphException " + level, reqOptions)
+  return queue.pushRequest(sentryRequest)
+End Function
+
+
 'uses Request().createAsync() to build a request that is ready to be sent to the logging API
 '@logInfo: associativeArray, a logInfo object as returned by m.buildLogInfo()
 Function tubiLog_getLoggingRequest_(logInfo as Object) as Object
@@ -235,10 +263,10 @@ End Function
 
 
 'Builds the full log string that will be printed to the console
-'@level: string, (optional), a log level, one of "debug", "info", "warn", or "error"
+'@level: string, (optional), possible log levels are "debug", "info", "warn", or "error"
 '@subtype: string, (optional), a small string used to differentiate log messages
 '@message: string, the message to be logged
-Function tubiLog_getLogPrintout_(level="" as String, subtype="" as String, message="" as String)
+Function tubiLog_getLogPrintout_(level = "" as String, subtype = "" as String, message = "" as String)
   printLevel = {
     debug: "DEBUG"
     error: "ERROR"
@@ -290,19 +318,19 @@ End Function
 ' Wrapper for logging.  Only used by scenegraph, and only sends to server if the trackingLoggingTask is ready
 ' By default prints to console
 ' @logType: "exception" or "log"
-' @message: string, the message to be logged
+' @message: string or roAssociativeArray, the message to be logged
 ' @level: string, (optional), the type of debug, must be one of "debug", "error", "info", "warn"
 ' @serverTypeName: string, (semi optional - required for sending log to server), a string that must exist in one of the server types in logConsts, (required by logging API)
 ' @subtype: string, (optional), a small string used to differentiate log messages (required by logging API)
 ' @samplePercent: float (optional), possible values are between 0 and 1. default is 1.0
 ' 1 means send log always, 0 means don't send log
-Function tubiLog_helper(logType, message="" as Dynamic, level="debug" as String, serverTypeName="" as String, subtype="" as String, samplePercent=1.0 as Float) as Void
+Function tubiLog_helper(logType, message = "" as Dynamic, level = "debug" as String, serverTypeName = "" as String, subtype = "" as String, samplePercent = 1.0 as Float) as Void
 
   if level <> "error" and level <> "info" and level <> "warn"
     level = "debug"
   end if
 
-  if message <> invalid AND message <> ""
+  if type(message) = "roString" OR type(message) = "String" OR type(message) = "roAssociativeArray"
     if m.global <> invalid AND m.global.trackingLoggingTask <> invalid
       if logType = "exception" ' sentry
         m.global.trackingLoggingTask.logException = {
@@ -333,11 +361,11 @@ Function tubiLog_helper(logType, message="" as Dynamic, level="debug" as String,
 End Function
 
 
-Function tubiException(message="" as Dynamic, level="error" as String, samplePercent=1.0 as Float) as Void
+Function tubiException(message = "" as Dynamic, level = "error" as String, samplePercent = 1.0 as Float) as Void
   tubiLog_helper("exception", message, level, "", "", samplePercent)
 End Function
 
 
-Function tubiLog(message="" as Dynamic, level="debug" as String, serverTypeName="" as String, subtype="" as String, samplePercent=1.0 as Float) as Void
+Function tubiLog(message = "" as Dynamic, level = "debug" as String, serverTypeName = "" as String, subtype = "" as String, samplePercent = 1.0 as Float) as Void
   tubiLog_helper("log", message, level, serverTypeName, subtype, samplePercent)
 End Function

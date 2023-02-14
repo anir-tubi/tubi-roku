@@ -308,9 +308,12 @@ Function tubiAds_retrieveAds(adsUrl)
           ad_url: adsUrl
           deviceId: m.constants.deviceInfo.deviceId
         }
-        errorInfo = FormatJSON(errorInfo)
+        jsonErrorInfo = FormatJSON(errorInfo)
         ' sending error logs to uapi
-        tubiLog(errorInfo, "warn", "adBadResponse", "ad-bad-response", 0.1)
+        tubiLog(jsonErrorInfo, "warn", "adBadResponse", "ad-bad-response", 0.1)
+
+        errorInfo.type = m.constants.errors.type.adError + " " + responseCode.tostr()
+        errorInfo.name = m.constants.errors.message.badResponse
         ' sending error logs to sentry sdk
         tubiException(errorInfo, "warn", 0.1)
       end if
@@ -370,9 +373,12 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos, isSeekPastCuepoint = false
       ad_url: rainmakerVastUrl
       device_id: m.constants.deviceInfo.deviceId
     }
-    timeToFetchMessage = FormatJSON(timeToFetchMessage)
+    jsonTimeToFetchMessage = FormatJSON(timeToFetchMessage)
     ' sending error logs to uapi
-    tubiLog(timeToFetchMessage, "error", "adError", "no-ad-response", 0.1)
+    tubiLog(jsonTimeToFetchMessage, "error", "adError", "no-ad-response", 0.1)
+
+    timeToFetchMessage.type = m.constants.errors.type.adError
+    timeToFetchMessage.name = m.constants.errors.message.noResponse
     ' sending error logs to sentry sdk
     tubiException(timeToFetchMessage, "error", 0.1)
   end if

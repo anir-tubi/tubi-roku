@@ -72,5 +72,5 @@ End Function
 
 Function sendSceneGraphException(logInfo)
   'runs the exception method from the logger object and send the log request to the sentry sdk
-  m.logger.exception(logInfo.message, logInfo.level, logInfo.samplePercent)
+  m.logger.exception(logInfo.message, logInfo.level, m.queue, logInfo.samplePercent)
 End Function

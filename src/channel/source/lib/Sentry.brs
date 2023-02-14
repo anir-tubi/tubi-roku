@@ -2,6 +2,7 @@
 
 ' Attributes documented at https://docs.sentry.io/development/sdk-dev/attributes/
 '
+' https://develop.sentry.dev/sdk/
 '
 ' This should *roughly* follow guidance at https://docs.sentry.io/development/sdk-dev/unified-api/,
 ' but seeing as this is not public, we can omit huge chunks of features there.
@@ -20,11 +21,21 @@
 ' @auth: assocArray, an instance of the auth module as returned by TubiAuth()
 Function Sentry(constants, auth)
 
+  sentry = constants.thirdParty.sentry
+  if sentry = invalid
+    return invalid
+  end if
+
   dsn = constants.thirdParty.sentry.dsn
+  environment = "staging"
+  if constants.settings.mode = "production"
+    environment = "production"
+  end if
 
   ' sentry for remote error logging
   sentryAttributes = {
     "release": constants.deviceInfo.clientVersion
+    "environment": environment
   }
   sentryContext = {
     "app": {
@@ -46,7 +57,7 @@ End function
 ' @dsn: string, sentry url
 ' @attributes: Single-level assocarray with attributes defined by Sentry
 ' @context: nested assocarray with context interfaces defined by Sentry
-Function initSentry(dsn, attributes=invalid, context=invalid)
+Function initSentry(dsn, attributes = invalid, context = invalid)
 
   di = CreateObject("roDeviceInfo")
 
@@ -98,14 +109,14 @@ Function initSentry(dsn, attributes=invalid, context=invalid)
 
   return {
     ' public
-    captureMessage: sentry_captureMessage
+    getReqInfo: sentry_getReqInfo
 
     ' private
     _dsn: dsn
     _SEVERITIES: sentry_severities()
-    _getUrl: sentry_getUrl
     _parseDsn: sentry_parseDsn
-    _sendEvent: sentry_sendEvent
+    _getHeader: sentry_getHeader
+    _getUrl: sentry_getUrl
     _generateEventId: sentry_generateEventId
     _defaultEvent: defaultEvent
   }
@@ -135,6 +146,7 @@ Function sentry_parseDsn(dsnString)
     "project":   result[6]
   }
 End Function
+
 
 ''''''''''''''''''
 ' getUrl
@@ -166,13 +178,26 @@ End Function
 
 
 ''''''''''''''''''
-' captureMessage
+' getReqInfo
 '
 ' @message - String or Assocarray with a field 'message'.  If assocarray, all
 '            other fields will be captured as extra info.
-Function sentry_captureMessage(message, level="info") as Void
+'   example of fields inside message assocarray.
+'     {
+'        body: "{"content_id":"713116","content_type":"movie","type":"watch_later"}"
+'        code: 404
+'        failreason: "The requested URL returned error: 404"
+'        headers: <Component: roAssociativeArray>
+'        method: "POST"
+'        name: "postToQueue"
+'        type: "Api Error"
+'        url: "https://user-queue.production-public.tubi.io/api/v3/queues"
+'     }
+'
+' @level - string (optional), possible log levels are "debug", "info", "warn", or "error"
+Function sentry_getReqInfo(message = "" as Dynamic, level = "info" as String) as Object
   if type(message) <> "roString" and type(message) <> "String" and type(message) <> "roAssociativeArray"
-    return
+    return invalid
   end if
 
   ' Default to Info
@@ -189,24 +214,55 @@ Function sentry_captureMessage(message, level="info") as Void
   event["timestamp"] = CreateObject("roDateTime").ToISOString()
   event["level"] = LCase(level)
 
+  errorType = "Error"
+  name = ""
   if type(message) = "roAssociativeArray"
-    event["message"] = message["message"]
+    errorType = message.type
+    name = message.name
     extra = {}
     extra.append(message)
-    extra.delete("message")
+    'removing name & type from additional info as it is present on heading/sub-heading
+    extra.delete("name")
+    extra.delete("type")
+    ' extra values will be shown in additional info in sentry dashboard
     event["extra"] = extra
   else
+    errorType = message
+    name = message
     event["message"] = message
   end if
 
-  m._sendEvent(event)
+  if errorType = invalid OR errorType = ""
+    errorType = "Error"
+  end if
+
+  values = {}
+  values["type"] = errorType
+  values["value"] = name
+  event["exception"] = {
+    "values" : [values]
+  }
+
+  reqOptions = {
+    body: FormatJson(event)
+    method: "POST"
+    headers: m._getHeader()
+  }
+
+  reqInfo = {
+    url: m._getUrl()
+    reqOptions: reqOptions
+  }
+
+  return reqInfo
+
 End Function
 
 
 ''''''''''''''''''
-' sendEvent
+' getHeader
 '
-Function sentry_sendEvent(event)
+Function sentry_getHeader()
 
   ' https://docs.sentry.io/development/sdk-dev/overview/#authentication
   auth = {
@@ -225,23 +281,12 @@ Function sentry_sendEvent(event)
   end for
   authString = "Sentry " + authValues.join(", ")
 
-  url = m._getUrl()
+  header = {
+      "Content-type": "application/json"
+      "X-Sentry-Auth": authString
+    }
 
-  port = CreateObject("roMessagePort")
-  urltransfer = CreateObject("roURLTransfer")
-  urltransfer.SetPort(port)
-  urltransfer.SetUrl(url)
-  urltransfer.SetRequest("POST")
-  urltransfer.EnableEncodings(true)
-  urltransfer.SetCertificatesFile("common:/certs/ca-bundle.crt")
-  urltransfer.SetHeaders({
-    "Content-type": "application/json"
-    "X-Sentry-Auth": authString
-  })
-  urltransfer.RetainBodyOnError(true)
-  body = FormatJson(event)
-  urltransfer.AsyncPostFromString(body)
-  return true
+  return header
 End Function
 
 

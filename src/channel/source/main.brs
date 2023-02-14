@@ -7,6 +7,8 @@ Function Main(startupArgs)
   m.startupArgs = startupArgs
 
   constants = getConstants()
+  port = CreateObject("roMessagePort")
+  m.queue = TubiRequestQueue().create(port)
   request = TubiRequest(constants.settings)
   auth = TubiAuth(constants, request)
   sentryInfo = Sentry(constants, auth)
@@ -347,23 +349,28 @@ Function showComponentsTimedOutError(library, log, screen, constants)
   message = "Fetching " + libraryId + " timed out"
   print message
   error = {
+    type: constants.errors.type.timedOut
+    name: libraryId
     message: message
     loadStatus: "timeout"
     url: library.uri
   }
-  log.exception(FormatJSON(error), "error", 0.1)
+  log.exception(error, "error", m.queue, 0.1)
   return showStartupErrorDialog(screen, constants)
 End Function
 
 
 Function showComponentsFailedToLoadError(msg, log, screen, constants)
-  print msg.GetRoSGNode().id + " status is failed"
+  message = msg.GetRoSGNode().id + " failed to load"
+  print message
   error = {
-    message: msg.GetRoSGNode().id + " failed to load"
+    type: constants.errors.type.loadFailed
+    name: msg.GetRoSGNode().id
+    message: message
     loadStatus: msg.getData()
     url: msg.GetRoSGNode().uri
   }
-  log.exception(FormatJSON(error), "error", 0.1)
+  log.exception(error, "error", m.queue, 0.1)
   return showStartupErrorDialog(screen, constants)
 End Function
 
@@ -417,10 +424,11 @@ Function logCrashesOnStartup(args, log, constants)
   reason = args.lastExitOrTerminationReason
   if reason <> invalid AND reasonBlacklist[reason] = invalid
     messageInfo = {
-      message: "Crash detected on previous run"
-      reason: reason
+      message: constants.errors.type.crashOnPreviousRun
       model: constants.deviceInfo.model
+      name: reason
+      type: constants.errors.type.crashOnPreviousRun
     }
-    log.exception(FormatJSON(messageInfo), "warn", 0.5)
+    log.exception(messageInfo, "warn", m.queue, 0.5)
   end if
 End Function

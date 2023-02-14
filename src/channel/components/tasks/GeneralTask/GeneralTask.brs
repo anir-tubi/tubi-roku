@@ -416,7 +416,7 @@ Function processErrorResponse(result, callbackTypes, job)
 
   parserCallback = callbackTypes.parseError
 
-  sendApiErrorLog(responseFromServer)
+  sendApiErrorLog(result)
 
   ' some requests might not require error handling, and therefore may not have a parseError callback
   if parserCallback <> invalid
@@ -465,7 +465,7 @@ End Function
 '
 ' side effects: updates the retries and pause fields of the passed in reqInfo
 Function handleBackoff(result, job, retries)
-  sendApiErrorLog(result.response)
+  sendApiErrorLog(result)
   reqInfo = job.reqInfo
   backoffFactor = reqInfo.backoffFactor
   backoffDuration = reqInfo.pause * backoffFactor
@@ -479,20 +479,28 @@ Function handleBackoff(result, job, retries)
 End Function
 
 
-' @responseFromServer: assocarray, this is the response field on the AA returned by request.handleAA()
-Function sendApiErrorLog(responseFromServer)
+' @result: assocarray, this is the result field as AA returned by handleEvent()
+Function sendApiErrorLog(result)
+
+  responseFromServer = result.response
 
   errorInfo = {
     name: responseFromServer.name
     failReason: responseFromServer.failReason
     code: responseFromServer.code
+    url: result.url
   }
 
   jsonErrorInfo = FormatJSON(errorInfo)
   ' sending error logs to uapi
   tubiLog(jsonErrorInfo, "error", "apiError", responseFromServer.name, 0.1)
+
+  errorInfo.type = m.constants.errors.type.apiError
+  errorInfo.method = result.method
+  errorInfo.body = result.body
+  errorInfo.headers = result.headers
   ' sending error logs to sentry sdk
-  tubiException(jsonErrorInfo, "error", 0.1)
+  tubiException(errorInfo, "error", 0.1)
 
 End Function
 

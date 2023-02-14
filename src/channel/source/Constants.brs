@@ -843,6 +843,26 @@ Function getConstants()
   constants.errors.subtypes.playerPlaybackError = "201"
   constants.errors.subtypes.networkError = "300"
 
+  ' errors will be grouped by the combination of constants.errors.type and constants.errors.message in sentry dashboard
+  ' error types are passed to sentry api as exception->type and displayed in sentry dashboard
+  constants.errors.type = {}
+    constants.errors.type.videoError = "Video Error"
+    constants.errors.type.apiError = "Api Error"
+    constants.errors.type.adError = "Ad Error"
+    constants.errors.type.timedOut = "Timed Out"
+    constants.errors.type.loadFailed = "Failed to Load"
+    constants.errors.type.crashOnPreviousRun = "Crash detected on previous run"
+
+  ' errors will be grouped by the combination of constants.errors.type and constants.errors.message in sentry dashboard
+  ' error messages are passed to sentry api as exception->value and displayed in sentry dashboard
+  constants.errors.message = {}
+    constants.errors.message.videoPreview = "Video Preview"
+    constants.errors.message.linearVideoPlayer = "Linear Video Player"
+    constants.errors.message.videoPlayer = "Video Player"
+    constants.errors.message.invalidVideoUrl = "Invalid Video URL"
+    constants.errors.message.badResponse = "Bad Response"
+    constants.errors.message.noResponse = "No Response"
+
   'UI properties that should be passed into the scene graph
   constants.ui = {}
 
