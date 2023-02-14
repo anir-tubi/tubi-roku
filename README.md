@@ -111,6 +111,7 @@ __The most commonly used Gulp commands__
 * `$ gulp addMissingImages` - updates new_images_since file with images that need to be included in the remote component library.
 * `$ gulp bumpQA` - bumps the revision number. This is used during the QA process. As changes are made and new QA builds are created, the revision number is used to distinguish between builds.
 * `$ gulp release` - bump the build number, build starter and remote components .pkgs using the "production" config. This command will also make PRs to the CDN repo and this project-total-recall repo on Github.
+* `$ gulp buildQaChanges` - Generates the output for the ticket that we give to QA of the changes between the current branch and the current production branch. Will automatically copy to the clipboard.
 
 __Gulp options__
 
@@ -386,7 +387,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   Note: This will also push the current qa branch to github.
 
-9\. Create a CH ticket with any changes that have been made and give the ticket the QA team for manual testing. Make sure the changes are written in such a way that non technical readers will be able to consume this information. The title of the changes will be used in one of the last steps when creating a release within Github.
+9\. Create a CH ticket with any changes that have been made and give the ticket the QA team for manual testing. You can build most of the copy for this ticket by running `gulp buildQaChanges`. Make sure that no work is missing in the list and that the included info looks correct.
 
 10\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build. Use the following command to update the staging channel with the latest version of the QA branch.
 

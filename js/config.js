@@ -26,25 +26,38 @@ function parse(profile, templateValues={}) {
 
 
 /**
- * A simple function that returns the version number as defined in build.yml
- * @returns string (ex. '2_1_3_0')
+ * A simple function that returns the version number as defined in build.yml with version out to section specified by includeTo param
+ * @includeTo 'minor' outputs "2.19", 'build' outputs "2.19.0", 'revision' outputs "2.19.0.0"
+ * @connector string - string we join the version parts together with. Defaults to `_`
+ * @returns string
  */
-function getBuildTag(isMinor, isDot) {
+function getBuildTag(includeTo, connector = '_') {
   let build = parse(buildProfile, {});
-  return formatBuildTag(build, isMinor, isDot);
+  return formatBuildTag(build, includeTo, connector);
 }
 
+/**
+ * A simple function that returns the version number as defined in build param with version out to section specified by includeTo param
+ * @build build object - build information including manifest object that we pull version info from
+ * @includeTo string - 'minor' outputs "1.2", 'build' outputs "1.2.3", 'revision' outputs "1.2.3.4"
+ * @connector string - string we join the version parts together with. Defaults to '_'. Use '.' to connect with dots. 
+ * @returns string
+ */
+function formatBuildTag(build, includeTo, connector = '_') {
+  const buildParts = [];
+  const manifest = build.manifest;
+  buildParts.push(manifest.major_version);
+  buildParts.push(manifest.minor_version);
 
-function formatBuildTag(build, isMinor, isDot) {
-  let connector = '.';
-  if (!isDot || isDot === 'false') {
-    connector = '_';
+  if (includeTo === 'build' || includeTo === 'revision') {
+    buildParts.push(manifest.build_version);
   }
-  if (!isMinor || isMinor === 'false') {
-    return `${build.manifest.major_version}${connector}${build.manifest.minor_version}${connector}${build.manifest.build_version}${connector}${build.manifest.revision_version}`;
-  } else {
-    return `${build.manifest.major_version}${connector}${build.manifest.minor_version}`;
+
+  if (includeTo === 'revision') {
+    buildParts.push(manifest.revision_version);
   }
+
+  return buildParts.join(connector);
 }
 
 
@@ -73,9 +86,9 @@ function load(options) {
   let templateValues = {
     localHostAddress: `${localIp}`,
     localHostUri: `${localIp}:${port}`,
-    versionUnderscored: formatBuildTag(build, false, false),
-    versionMinorUnderscored: formatBuildTag(build, true, false),
-    versionMinorDotted: formatBuildTag(build, true, true),
+    versionUnderscored: formatBuildTag(build, 'revision'),
+    versionMinorUnderscored: formatBuildTag(build, 'minor'),
+    versionMinorDotted: formatBuildTag(build, 'minor', '.'),
     fileType: overWrittenDataPre.settings.remoteComponentsExtension,
     bsConst: getBsConstsFromSettings(overWrittenDataPre.settings),
   };

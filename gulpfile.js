@@ -15,6 +15,7 @@ const prompts = require('prompts');
 const { RooibosProcessor, createProcessorConfig } = require('rooibos-cli');
 const shell = require('shelljs');
 shell.config.silent = true;
+const clipboardy = require('clipboardy');
 // Uncomment the next line if there are connection issues to the Roku device
 // const requestDebug = require('request-debug')(request);
 
@@ -32,7 +33,7 @@ const {replaceColorConstants} = require('./js/colorreplace.js');
 const {NoStackError} = require('./js/utilities')
 
 // Importing functions with Git functionality
-const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes} = require('./js/git');
+const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges} = require('./js/git');
 
 /* Allow some environment variables to drive which config we're building.
    Environment variables are set on options, along with any parameters passed in
@@ -132,7 +133,7 @@ function zipAsPromise(srcPath, zipPath, destPath) {
 
 
 function buildInstalled() {
-  const buildTag = getBuildTag(false, false);
+  const buildTag = getBuildTag('revision');
   let build = new Promise((res, rej) => {
     /* Installed bundle */
     mkdirp.sync(`${process.env.PWD}/build/local/source`);
@@ -197,7 +198,7 @@ function buildInstalled() {
 
 
 function buildStarter() {
-  const minorBuildTag = getBuildTag(true, false);
+  const minorBuildTag = getBuildTag('minor');
 
   let build = new Promise((res, rej) => {
     /* Installed bundle */
@@ -295,8 +296,8 @@ function buildStarter() {
 
 function buildRemote() {
   /* Remote components */
-  const buildTag = getBuildTag(false, false);
-  const minorBuildTag = getBuildTag(true, false);
+  const buildTag = getBuildTag('revision');
+  const minorBuildTag = getBuildTag('minor');
 
   let build = new Promise((res, rej) => {
     mkdirp.sync(`${process.env.PWD}/build/remote/source`);
@@ -428,7 +429,7 @@ function serverMiddleware(req, res, next) {
 // Uploads the tubi_x_y_z.zip to the roku and launches a server to serve the starter and remote components
 function sideLoad(done) {
   const address = options.target;
-  const buildTag = getBuildTag(false, false);
+  const buildTag = getBuildTag('revision');
   const zipPath = `build/tubi_${buildTag}.zip`;
   upload(zipPath)
   .then(() => {
@@ -482,7 +483,7 @@ function sideLoad(done) {
 
 function packageLocal(done) {
   log('Starting packageLocal');
-  let buildTag = getBuildTag(false, false);
+  let buildTag = getBuildTag('revision');
   let zipPath = `build/tubi_${buildTag}.zip`;
   let appName = `tubi_${buildTag}`;
   return upload(zipPath)
@@ -508,7 +509,7 @@ function packageLocal(done) {
 
 function packageStarter(done) {
   log('Starting packageStarter');
-  let minorBuildTag = getBuildTag(true, false);
+  let minorBuildTag = getBuildTag('minor');
   var appName = `tubi_starter_components_${minorBuildTag}`;
   var zipPath = `build/tubi_starter_components_${minorBuildTag}.zip`;
   return upload(zipPath)
@@ -534,7 +535,7 @@ function packageStarter(done) {
 
 function packageRemote(done) {
   log('Starting packageRemote');
-  let buildTag = getBuildTag(false, false);
+  let buildTag = getBuildTag('revision');
   let zipPath = `build/tubi_remote_components_${buildTag}.zip`;
   let appName = `tubi_remote_components_${buildTag}`;
   return upload(zipPath)
@@ -588,7 +589,7 @@ function packageAll(done) {
 function bumpBuild(done) {
   if (verifyGit(done)) {
     incrementBuildNumber();
-    const buildTag = getBuildTag(false, false);
+    const buildTag = getBuildTag('revision');
     log(`Committing build bump to ${buildTag}`);
     shell.exec(`git commit -m "incrementbuild: Bump build number to ${buildTag}" config/build.yml`, {silent: true});
     done();
@@ -602,7 +603,7 @@ function bumpBuild(done) {
 function bumpRevision(done) {
   if (verifyGit(done)) {
     incrementRevisionNumber();
-    const buildTag = getBuildTag(false, false);
+    const buildTag = getBuildTag('revision');
     log(`Committing build bump to ${buildTag}`);
     shell.exec(`git commit -m "incrementbuild: Bump revision number to ${buildTag}" config/build.yml`, {silent: true});
     done();
@@ -614,7 +615,7 @@ function bumpRevision(done) {
 
 // tag the build that will be released
 function tagBuild(done) {
-  const buildTag = getBuildTag(false, false);
+  const buildTag = getBuildTag('revision');
   log(`Tagging ${buildTag}`);
   shell.exec(`git tag ${buildTag}`);
   done();
@@ -703,8 +704,8 @@ async function preprocessTests() {
 
 //send starter components and remote components to AWS S3
 function pushStaging(done) {
-  const buildTag = getBuildTag(false, false);
-  const minorBuildTag = getBuildTag(true, false);
+  const buildTag = getBuildTag('revision');
+  const minorBuildTag = getBuildTag('minor');
   const localRemoteComponentsPath = `build/tubi_remote_components_${buildTag}.pkg`;
   const s3RemoteComponentsPath = `s3://adrise-bryan-playground/roku-staging/components/tubi_remote_components_${buildTag}.pkg`
   const localStarterComponentsPath = `build/tubi_starter_components_${minorBuildTag}.pkg`;
@@ -748,6 +749,32 @@ async function buildReleaseNotesOutput(done) {
 }
 
 
+async function buildQaChangesOutput(done) {
+  const qaChanges = await buildQaChanges(done);
+  console.log('');
+  console.log(`QA Changes`);
+  console.log('-----------------------------------------------------------------------');
+  console.log(qaChanges.text);
+  console.log('-----------------------------------------------------------------------');
+  console.log('');
+  console.log(`Cherry Pick Commits`);
+  console.log('-----------------------------------------------------------------------');
+  for (const change of qaChanges.changes) {
+    console.log(`${change.commit}: ${change.whatChanged}`);
+    if(change.ticketUrl) {
+      console.log(change.ticketUrl);
+    }
+    console.log('');
+  }
+  console.log('-----------------------------------------------------------------------');
+  console.log('');
+  clipboardy.writeSync(qaChanges.text);
+  console.log('QA Changes have been copied to your clipboard! Paste into QA ticket.');
+
+  done();
+}
+
+
 // Simple helper to avoid having to type the dashes each time to get the tasks list. Also prints a more compact version
 function listTasks(done) {
   console.log(shell.exec(`gulp --tasks-simple`).stdout);
@@ -773,6 +800,7 @@ exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
 exports.addMissingImages = addMissingImagesToRemoteLibrary;
 exports.tasks = listTasks;
 exports.buildReleaseNotes = buildReleaseNotesOutput;
+exports.buildQaChanges = buildQaChangesOutput;
 exports.runPerformanceTests = series(setPerformanceTestsConfig, clean, buildInstalled, runPerformanceTests);
 
 //command lines related to the crowdin language translations

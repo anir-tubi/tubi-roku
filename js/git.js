@@ -8,6 +8,8 @@ shell.config.silent = true;
 const {getBuildTag} = require('./config');
 const {NoStackError} = require('./utilities');
 
+const githubDeveloperInfo = require('./github-developer-info.json');
+
 // constants used for interacting with the github API
 const ghInfo = {
   owner: 'adRise',
@@ -59,8 +61,8 @@ async function makeReleasePrs(done) {
   // Note that git commands will have a code = 0 when there is no error and code > 0 when an error occurred.
   // Also note that git commands have a stderr output even if the code === 0.
 
-  const minorBuildTag = getBuildTag(true, false);
-  const fullBuildTag = getBuildTag(false, false);
+  const minorBuildTag = getBuildTag('minor');
+  const fullBuildTag = getBuildTag('revision');
   const cdnPath = process.env.CDN_GIT_DIRECTORY;
 
   // check if the environment variable for the path to the CDN repo has been set
@@ -77,19 +79,19 @@ async function makeReleasePrs(done) {
   log(`...Renaming the local branch to ${releaseBranchName}`);
   const gitRename = `git branch -m ${releaseBranchName}`;
   const gitRenameErrorMsg = `Could not rename the local branch to ${releaseBranchName}`;
-  execGitCommand(gitRename, gitRenameErrorMsg, done);
+  execGitCommand(done, gitRename, gitRenameErrorMsg);
 
   // attempt to checkout master in the CDN repo
   log(`...Checking out master on the local ${ghInfo.cdnRepo} repo`)
   const gitCheckoutMasterCDN = `git -C ${cdnPath} checkout master`;
   const gitCheckoutMasterCDNErrorMsg = `Could not checkout master on the ${cdnPath}`;
-  execGitCommand(gitCheckoutMasterCDN, gitCheckoutMasterCDNErrorMsg, done);
+  execGitCommand(done, gitCheckoutMasterCDN, gitCheckoutMasterCDNErrorMsg);
 
   // attempt to pull origin master for the CDN repo
   log(`...Pulling remote master to the local ${ghInfo.cdnRepo} repo`);
   const gitPullMasterCDN = `git -C ${cdnPath} pull origin master`;
   const gitPullMasterCDNErrorMsg = `Could not pull master from origin at ${cdnPath}`;
-  execGitCommand(gitPullMasterCDN, gitPullMasterCDNErrorMsg, done);
+  execGitCommand(done, gitPullMasterCDN, gitPullMasterCDNErrorMsg);
 
   // attempt to check out a new branch off master for the CDN repo
   const cdnBranchName = `roku_${fullBuildTag}`;
@@ -97,7 +99,7 @@ async function makeReleasePrs(done) {
   log(`...Checking if there already exists a local branch named ${cdnBranchName} on ${cdnPath}`);
   const gitListCDNBranch = `git -C ${cdnPath} branch --list ${cdnBranchName}`;
   const gitListCDNBranchErrorMsg = `Could not list the "${cdnBranchName}" at ${cdnPath}`;
-  const gitListRes = execGitCommand(gitListCDNBranch, gitListCDNBranchErrorMsg, done);
+  const gitListRes = execGitCommand(done, gitListCDNBranch, gitListCDNBranchErrorMsg);
 
   if (gitListRes) {
     // there exists a branch with the cdnBranchName already, so delete it.
@@ -105,13 +107,13 @@ async function makeReleasePrs(done) {
     log(`...Deleting the ${cdnBranchName} on ${cdnPath}`);
     const gitDeleteCDNBranch = `git -C ${cdnPath} branch -D ${cdnBranchName}`;
     const gitDeleteCDNBranchErrorMsg = `Could not delete the "${cdnBranchName}" branch at ${cdnPath}`;
-    execGitCommand(gitDeleteCDNBranch, gitDeleteCDNBranchErrorMsg, done);
+    execGitCommand(done, gitDeleteCDNBranch, gitDeleteCDNBranchErrorMsg);
   }
 
   log(`...Creating a new ${cdnBranchName} branch on the local ${ghInfo.cdnRepo} repo`);
   const gitCheckoutNewCDNBranch = `git -C ${cdnPath} checkout -b ${cdnBranchName}`;
   const gitCheckoutNewCDNBranchErrorMsg = `Could not checkout a new branch "${cdnBranchName}" at ${cdnPath}`;
-  execGitCommand(gitCheckoutNewCDNBranch, gitCheckoutNewCDNBranchErrorMsg, done);
+  execGitCommand(done, gitCheckoutNewCDNBranch, gitCheckoutNewCDNBranchErrorMsg);
 
   const starterComponentsFileName = `tubi_starter_components_${minorBuildTag}.pkg`;
   const remoteComponentsFileName = `tubi_remote_components_${fullBuildTag}.pkg`;
@@ -144,19 +146,19 @@ async function makeReleasePrs(done) {
   log(`...Staging changes for commit on the local ${ghInfo.cdnRepo} repo`);
   const gitAddCDNBranch = `git -C ${cdnPath} add . `;
   const gitAddCDNBranchErrorMsg = `Could not run "git add . " on ${cdnPath}`;
-  execGitCommand(gitAddCDNBranch, gitAddCDNBranchErrorMsg, done);
+  execGitCommand(done, gitAddCDNBranch, gitAddCDNBranchErrorMsg);
 
   // commit the updates to the branch
   log(`...Committing the staged changes on the local ${ghInfo.cdnRepo} repo`);
   const gitCommitCDNBranch = `git -C ${cdnPath} commit -m 'Updating the starter and remote components for ${cdnBranchName}'`;
   const gitCommitCDNBranchErrorMsg = `"git commit" failed on ${cdnPath}`;
-  execGitCommand(gitCommitCDNBranch, gitCommitCDNBranchErrorMsg, done);
+  execGitCommand(done, gitCommitCDNBranch, gitCommitCDNBranchErrorMsg);
 
   // push the branch to Github
   log(`...Pushing the local ${cdnBranchName} branch to the remote ${ghInfo.rokuRepo} repo`)
   const gitPushCDNBranch = `git -C ${cdnPath} push origin ${cdnBranchName}`;
   const gitPushCDNBranchErrorMsg = `Could not push ${cdnBranchName} to origin (Github) at ${cdnPath}`;
-  execGitCommand(gitPushCDNBranch, gitPushCDNBranchErrorMsg, done);
+  execGitCommand(done, gitPushCDNBranch, gitPushCDNBranchErrorMsg);
 
   // make a PR against master on the CDN repo at Github
   log(`...Making a PR on ${ghInfo.cdnRepo} against the remote master branch`);
@@ -179,7 +181,7 @@ async function makeReleasePrs(done) {
   log(`...Pushing the local ${releaseBranchName} branch to the remote ${ghInfo.rokuRepo} repo`);
   const gitPushReleaseBranch = `git push origin ${releaseBranchName}`;
   const gitPushReleaseBranchErrorMsg = `Could not push ${releaseBranchName} to ${ghInfo.rokuRepo} origin (Github)`;
-  execGitCommand(gitPushReleaseBranch, gitPushReleaseBranchErrorMsg, done);
+  execGitCommand(done, gitPushReleaseBranch, gitPushReleaseBranchErrorMsg);
 
   // make a PR against the production branch on the project-total-recall repo at Github
   const prodRokuBranchName = `${minorBuildTag}_branch`;
@@ -217,7 +219,7 @@ ${cdnPrUrl}`;
 
 
 async function pushTag(done) {
-  const buildTag = getBuildTag(false, false);
+  const buildTag = getBuildTag('revision');
   log(`...Pushing the ${buildTag} tag to origin (Github)`);
   const pushTagRes = shell.exec(`git push origin ${buildTag}`);
 
@@ -237,7 +239,7 @@ async function pushBranch(done){
   const gitPushCurrentBranch = `git push origin ${currentBranch}`;
   const gitPushCurrentBranchErrorMsg = `Could not push ${currentBranch} to origin (Github). Please push it manually`;
 
-  execGitCommand(gitPushCurrentBranch, gitPushCurrentBranchErrorMsg, done);
+  execGitCommand(done, gitPushCurrentBranch, gitPushCurrentBranchErrorMsg);
 }
 
 
@@ -261,7 +263,7 @@ async function createGithubRelease(done) {
   // https://octokit.github.io/rest.js/v18#repos-create-release
   // https://octokit.github.io/rest.js/v18#repos-list-tags
 
-  const buildTag = getBuildTag(false, false);
+  const buildTag = getBuildTag('revision');
 
   log(`...Double checking that the ${buildTag} tag exists on Github`);
   const gitLocalTagShaRes = shell.exec(`git rev-parse ${buildTag}`);
@@ -377,63 +379,40 @@ async function createGithubRelease(done) {
 
 
 // Helper to work around the fact you can't fetch if you're already on the branch
-async function pullOrFetchBranch(branch, done) {
+async function pullOrFetchBranch(done, branch) {
   // pull origin of compareBranch
   if (getCurrentBranch(done) === branch) {
     // Have to pull if on the current branch as fetch will fail https://stackoverflow.com/questions/2236743/git-refusing-to-fetch-into-current-branch
-    execGitCommand(`git pull`, `Could not pull ${branch} branch`, done);
+    execGitCommand(done, `git pull`, `Could not pull ${branch} branch`);
   } else {
-    execGitCommand(`git fetch origin ${branch}:${branch}`, `Could not fetch ${branch} branch`, done);
+    execGitCommand(done, `git fetch origin ${branch}:${branch}`, `Could not fetch ${branch} branch`);
   }
 }
 
 
 async function buildReleaseNotes(done) {
-  verifyGit(done);
-
   const prodBranch = getProductionBranchName();
   const currentBranch = getCurrentBranch(done);
 
-  // Add a prompt asking if engineer wants to fetch latest from prodBranch and currentBranch branches
-  const {prepareConfirmation} = await prompts({
-    type: 'confirm',
-    name: 'prepareConfirmation',
-    message: `Running this script will apply updates from origin ${prodBranch} and origin ${currentBranch} to your local ${prodBranch} and ${currentBranch} branches. Do you wish to proceed? (y/n)`,
-  });
-
-  if (!prepareConfirmation) {
-    const declineMsg = 'Script aborted';
-    log(declineMsg);
-    return done();
-  }
-
-  pullOrFetchBranch(prodBranch, done);
-  const prodBranchCommits = getPullRequestCommitsForBranch(prodBranch, done);
-
-
-  pullOrFetchBranch(currentBranch, done);
-  const currentBranchCommits = getPullRequestCommitsForBranch(currentBranch,done);
+  const pullRequestCommits = await findPullRequestCommitDifferences(done, currentBranch, prodBranch);
 
   const releaseNotes = [];
 
   // filter down to pull requests from currentBranch that aren't on prodBranch
-  for (const prId in currentBranchCommits) {
-    // If we didn't find the pull request then we want to add it to to the release notes
-    if (!prodBranchCommits[prId]) {
-      const response = await octokit.pulls.get({
-        owner: ghInfo.owner,
-        repo: ghInfo.rokuRepo,
-        pull_number: +prId
-      });
+  for (const prId in pullRequestCommits) {
+    const response = await octokit.pulls.get({
+      owner: ghInfo.owner,
+      repo: ghInfo.rokuRepo,
+      pull_number: +prId
+    });
 
-      const prReleaseNotesMatch = response.data.body.match(/## Release Notes.*?---(.*)## QA What Changed/s)
-      if (!prReleaseNotesMatch) {
-        console.log(`Could not retrieve release notes for pull request #${prId}`);
-      } else {
-        const prReleaseNotes = prReleaseNotesMatch[1].trim();
-        if (prReleaseNotes) {
-          releaseNotes.push(prReleaseNotes);
-        }
+    const prReleaseNotesMatch = response.data.body.match(/## Release Notes.*?---(.*)## QA What Changed/s)
+    if (!prReleaseNotesMatch) {
+      console.log(`Could not retrieve release notes for pull request #${prId}`);
+    } else {
+      const prReleaseNotes = prReleaseNotesMatch[1].trim();
+      if (prReleaseNotes) {
+        releaseNotes.push(prReleaseNotes);
       }
     }
   }
@@ -441,12 +420,108 @@ async function buildReleaseNotes(done) {
 }
 
 
-function getPullRequestCommitsForBranch(branch, done, oneLine = false) {
+
+async function buildQaChanges(done) {
+  const prodBranch = getProductionBranchName();
+  const currentBranch = getCurrentBranch(done);
+
+  const pullRequestCommits = await findPullRequestCommitDifferences(done, currentBranch, prodBranch);
+
+  const qaChangesData = [];
+  const qaChangesText = [];
+
+  // filter down to pull requests from currentBranch that aren't on prodBranch
+  for (const prId in pullRequestCommits) {
+    const commit = pullRequestCommits[prId].split(' ')[0];
+
+    const octokitRequestSharedParams = {
+      owner: ghInfo.owner,
+      repo: ghInfo.rokuRepo,
+    };
+    const {data: pullRequest} = await octokit.pulls.get({
+      ...octokitRequestSharedParams,
+      pull_number: +prId
+    });
+
+    const qaInfoMatch = pullRequest.body?.match(/## QA What Changed.*?---(.*)## QA Testing Steps.*?---(.*)/s);
+
+    if (!qaInfoMatch) {
+      console.log(`Could not retrieve qa info for pull request #${prId}`);
+      continue;
+    }
+
+    const whatChanged = qaInfoMatch[1].trim();
+    if (!whatChanged) {
+      continue;
+    }
+
+    const testingSteps = qaInfoMatch[2].trim();
+
+    let ticketUrl = '';
+    const {data: prComments} = await octokit.issues.listComments({...octokitRequestSharedParams, issue_number: +prId});
+    for (const prComment of prComments) {
+      const commentShortcutLinkMatch = prComment.body.match(/\((https:\/\/app.shortcut.com\/tubi\/story\/[^\)]+)\)/);
+      if (commentShortcutLinkMatch) {
+        ticketUrl = commentShortcutLinkMatch[1];
+      }
+      break;
+    }
+
+    const userLogin = pullRequest.user.login;
+    const qaChange = {
+        pullNumber: prId,
+        commit: commit,
+        whatChanged: whatChanged,
+        testingSteps: testingSteps,
+        pointDeveloper: githubDeveloperInfo[userLogin],
+        ticketUrl: ticketUrl
+    };
+    qaChangesData.push(qaChange);
+
+    let formattedWhatChangedText = qaChange.whatChanged;
+    if (ticketUrl) {
+      formattedWhatChangedText += '\n' + ticketUrl;
+    }
+
+    qaChangesText.push(`**${qaChangesData.length}) What changed**
+${formattedWhatChangedText}
+
+**How to test (plus any other areas this change might affect)**
+${qaChange.testingSteps}
+
+**Point Developer**
+${qaChange.pointDeveloper.name}`);
+  }
+
+  const minorVersionNumber = getBuildTag('minor');
+  const buildVersionNumber = getBuildTag('build')
+  let qaChangesTextOutput = `**Target Release Date**
+<DEVELOPER-TO-FILL-IN>
+
+**Staging Channel**
+${minorVersionNumber}
+
+**Branch Name (for automated testing)**
+\`qa_${buildVersionNumber}\`
+https://github.com/adRise/project-total-recall/tree/qa_${buildVersionNumber}
+
+## Changes
+
+${qaChangesText.join('\n\n<hr>\n\n')}`;
+
+  return {
+    changes: qaChangesData,
+    text: qaChangesTextOutput
+  };
+}
+
+
+function getPullRequestCommitsForBranch(done, branch, oneLine = false) {
   let command = `git log ${branch} -200`;
   if (oneLine) {
     command += ' --oneline';
   }
-  const gitLogs = execGitCommand(command, `Could not get git logs from ${branch} branch.`, done);
+  const gitLogs = execGitCommand(done, command, `Could not get git logs from ${branch} branch.`);
   const pullRequestCommits = {};
   gitLogs.split('\n')
     .forEach((item) => {
@@ -458,9 +533,11 @@ function getPullRequestCommitsForBranch(branch, done, oneLine = false) {
     return pullRequestCommits;
 }
 
-
-// @compareBranch: string, the branch name we are comparing to master"
-async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
+// Compares the commits on branchA against the commits on branchB, based on their pull request numbers, and returns an array of commit messages for the commits that exist on branchA but do not exist on branchB.
+// @branchA: string, the branch name we are comparing to branchA
+// @branchB: string, the branch name we are comparing to branchB
+// @returns: string[], the PR ID like '1234'
+async function findPullRequestCommitDifferences(done, branchA, branchB) {
   // verify clean working directory
   verifyGit(done);
 
@@ -468,7 +545,7 @@ async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
   const {prepareConfirmation} = await prompts({
     type: 'confirm',
     name: 'prepareConfirmation',
-    message: `Running this script will apply updates from origin master and origin ${compareBranch} to your local master and ${compareBranch} branches. Do you wish to proceed? (y/n)`,
+    message: `Running this script will apply updates from origin ${branchA} and origin ${branchB} to your local ${branchA} and ${branchB} branches. Do you wish to proceed? (y/n)`,
   });
 
   if (!prepareConfirmation) {
@@ -477,23 +554,30 @@ async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
     return done();
   }
 
-  // process/store pull requests on compareBranch branch
-  pullOrFetchBranch(compareBranch, done);
-  const compareBranchCommits = getPullRequestCommitsForBranch(compareBranch, done)
+  // process/store pull requests on branchA branch
+  pullOrFetchBranch(done, branchA);
+  const branchACommits = getPullRequestCommitsForBranch(done, branchA, true);
 
-  // pull origin master
-  pullOrFetchBranch('master', done);
-  const masterBranchCommits = getPullRequestCommitsForBranch('master', done, true);
+  // process/store pull requests on branchB branch
+  pullOrFetchBranch(done, branchB);
+  const branchBCommits = getPullRequestCommitsForBranch(done, branchB); // Note we need to use oneLine output to include pull requests that may have been squash merged in.
 
-  const commitsFromMasterNotOnCompareBranch = []
-
+  const pullRequestCommitsNotInBranchB = {};
   // filter down to pullRequests from master that aren't on compareBranch
-  for (const prId in masterBranchCommits) {
+  for (const prId in branchACommits) {
     // If we didn't find the pull request then add it to the list
-    if (!compareBranchCommits[prId]) {
-      commitsFromMasterNotOnCompareBranch.push(masterBranchCommits[prId]);
+    if (!branchBCommits[prId]) {
+      pullRequestCommitsNotInBranchB[prId] = branchACommits[prId];
     }
   }
+
+  return pullRequestCommitsNotInBranchB;
+}
+
+
+// @compareBranch: string, the branch name we are comparing to master
+async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
+  const commitsFromMasterNotOnCompareBranch = await findPullRequestCommitDifferences(done, 'master', compareBranch);
 
   console.log('');
   console.log(`COMMITS THAT HAVE NOT BEEN CHERRY PICKED FROM master TO ${compareBranch}`);
@@ -507,7 +591,7 @@ async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
 
 
 function getProductionBranchName() {
-  const minorVersionNumber = getBuildTag(true, false);
+  const minorVersionNumber = getBuildTag('minor');
   const prodBranch = `${minorVersionNumber}_branch`;
   return prodBranch;
 }
@@ -515,7 +599,7 @@ function getProductionBranchName() {
 
 function getCurrentBranch(done) {
   const errorMsg = 'Could not get current branch';
-  const currentBranch = execGitCommand('git branch --show-current', errorMsg, done).trim();
+  const currentBranch = execGitCommand(done, 'git branch --show-current', errorMsg).trim();
   return currentBranch;
 }
 
@@ -535,7 +619,7 @@ function findCommitsNotOnCurrentBranch(done) {
 // @gitCommand: string, a git command to be executed, for example "git pull origin master"
 // @defaultErrorMessage: string, an error message explaining which command was not able to be completed
 // @done: function, the 'done' function from gulp.
-function execGitCommand(gitCommand, defaultErrorMsg, done) {
+function execGitCommand(done, gitCommand, defaultErrorMsg) {
   log(`Performing: ${gitCommand}`)
   const gitCommandRes = shell.exec(gitCommand);
   // console.log(gitCommand, ' - ', gitCommandRes);
@@ -588,7 +672,7 @@ async function addMissingImagesToRemoteLibrary(done) {
   log(`Found last submission release: '${lastSubmissionReleaseTag}' continuing`);
 
   // Do sanity check that we're on the same major/minor version
-  const [currentBranchMajorVersion, currentBranchMinorVersion] = getBuildTag().split('_').slice(0, 2);
+  const [currentBranchMajorVersion, currentBranchMinorVersion] = getBuildTag('minor', '_').split('_');
   const [lastSubmissionMajorVersion, lastSubmissionMinorVersion] = lastSubmissionReleaseTag.split('_').slice(0, 2);
   if (currentBranchMajorVersion !== lastSubmissionMajorVersion) {
     log('Major version did not match last submission release. Exiting.');
@@ -605,7 +689,7 @@ async function addMissingImagesToRemoteLibrary(done) {
   // Now we need to find what images changed
   const baseChannelPath = 'src/channel/';
   const errorMsg = `Could not get git diff for ${lastSubmissionReleaseTag}`;
-  const output = execGitCommand(`git diff --name-only ${lastSubmissionReleaseTag} ${baseChannelPath}`, errorMsg, done);
+  const output = execGitCommand(done, `git diff --name-only ${lastSubmissionReleaseTag} ${baseChannelPath}`, errorMsg);
   const changedImageFilePaths = output.match(/^.*\.png|^.*\.jpg|^.*\.webp/gm)
 
   // And whether they're already included in our file
@@ -652,5 +736,6 @@ module.exports = {
   findCommitsNotOnCurrentBranch,
   addMissingImagesToRemoteLibrary,
   pushBranch,
-  buildReleaseNotes
+  buildReleaseNotes,
+  buildQaChanges
 };
