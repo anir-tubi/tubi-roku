@@ -1244,16 +1244,16 @@ Function getConstants()
       constants.ui.uris.myStuffMyListIcon = "pkg:/images/screenMyStuffMyListIcon.webp"
       constants.ui.uris.myStuffContinueWatchingIcon = "pkg:/images/screenMyStuffContinueWatchingIcon.webp"
 
-    '//::TODO::colors - all theme_ constants (default, kids, holiday, etc) should be listed below. 
+    '//::TODO::colors - all theme_ constants (default, kids, holiday, etc) should be listed below.
     '//   When the app changes themes, the values associated with the "constants.ui.colors.etc" constants should change
     '//   in constants.ui.themes.etc.
     '//   There should be no theme specific "constants.ui.colors.etc" constant: i.e.  "constants.ui.colors.backgroundColorKids"
-    '//   When the app assigns a color, it should use a variable within a theme (constants.ui.themes.kidsMode). Maybe a variable called: "backgroundColor", 
+    '//   When the app assigns a color, it should use a variable within a theme (constants.ui.themes.kidsMode). Maybe a variable called: "backgroundColor",
     '//   instead of calling directly constants.ui.colors.backgroundColorKids
     '//   All themes under "constants.ui.themes" should have the same color variables.
 
     '//The use of the "THEME_" constants will be replaced with hexidecimal color strings during the gulp install process.
-    '//::TODO:: Keeping the colors commented next to the THEME_ constants for now. There are hardcoded instances of 
+    '//::TODO:: Keeping the colors commented next to the THEME_ constants for now. There are hardcoded instances of
     '//   these colors throughout the app. Keeping the colors here will make it easier to track down and eventually replace
     '//   with theme colors in the init or observer functions of the BRS file. Once the hardcoded color instances have been replaced,
     '//   we can remove the commented out color codes below.
@@ -1275,14 +1275,14 @@ Function getConstants()
 
     '//defaultLight theme constants
     ' defaultLightPrimaryAccent = "THEME_defaultLightPrimaryAccent"
-    ' defaultLightPrimaryBackground = "THEME_defaultLightPrimaryBackground"
-    ' defaultLightPrimaryForeground = "THEME_defaultLightPrimaryForeground"
+      defaultLightPrimaryBackground = "THEME_defaultLightPrimaryBackground"
+      defaultLightPrimaryForeground = "THEME_defaultLightPrimaryForeground"
     ' defaultLightTransparentBackground75 = "THEME_defaultLightTransparentBackground75"
     ' defaultLightTransparentForeground0 = "THEME_defaultLighttransparentforeground0"
     ' defaultLightTransparentForeground5 = "THEME_defaultLightTransparentForeground5"
     ' defaultLightTransparentForeground10 = "THEME_defaultLightTransparentForeground10"
     ' defaultLightTransparentForeground20 = "THEME_defaultLightTransparentForeground20"
-    ' defaultLightTransparentForeground75 = "THEME_defaultLightTransparentForeground75"
+      defaultLightTransparentForeground75 = "THEME_defaultLightTransparentForeground75"
     ' defaultLightStatusSuccess = "THEME_defaultLightStatusSuccess"
     ' defaultLightStatusCaution = "THEME_defaultLightStatusCaution"
     ' defaultLightStatusAlert = "THEME_defaultLightStatusAlert"
@@ -1319,8 +1319,8 @@ Function getConstants()
 
 
     constants.ui.colors = {}
-    
-      '//::TODO::colors - when a theme is changed, then the following constants should be changed. 
+
+      '//::TODO::colors - when a theme is changed, then the following constants should be changed.
       '//   Each theme under constants.ui.themes should contain the following constants
 
       'template colors
@@ -1363,10 +1363,9 @@ Function getConstants()
       constants.ui.colors.EPGProgramFocused = defaultDarkTransparentForeground75
 
       'colors for toast
-      constants.ui.colors.toastTitle = "0x1C1F29FF" '//::TODO::colors - not listed in theme Json
-      constants.ui.colors.toastBackGround = "0xF0F1F5FF" '//::TODO::colors - not listed in theme Json
-      constants.ui.colors.toastMessage = "0x585B66FF" '//::TODO::colors - not listed in theme Json
-
+      constants.ui.colors.toastTitle = defaultLightPrimaryForeground
+      constants.ui.colors.toastBackGround = defaultLightPrimaryBackground
+      constants.ui.colors.toastMessage = defaultLightTransparentForeground75
 
     'The IDs of the available themes that can be used for the app
     constants.ui.themeIDs = {}
