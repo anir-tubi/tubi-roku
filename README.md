@@ -353,7 +353,7 @@ __NOTE__ you can also use the new `gulp compareCheckedOut` after the initial qa 
 
 Ensure the cherry pick commit names include the name of PR number. This usually is done automatically but be aware that we need to have the PR numbers to make it easier later on so we know which PRs have been pushed and which ones have not.
 
-5\. Check each of the cherry picked commits for images that have been added or updated as part of any UI updates. Update the `new_images_since/new_images_since_x_y` file with the image locations of any new or updated images. This can now be automated by running `gulp addMissingImages`.
+5\. Run the command `gulp addMissingImages` to update the `new_images_since/new_images_since_x_y` file with any new or updated images.
 
 6\. Make a new commit on the `qa_x_y_z` branch with the hotpatch and new images updates. Push `qa_x_y_z` branch to github.
 
@@ -387,7 +387,13 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   Note: This will also push the current qa branch to github.
 
-9\. Create a CH ticket with any changes that have been made and give the ticket the QA team for manual testing. You can build most of the copy for this ticket by running `gulp buildQaChanges`. Make sure that no work is missing in the list and that the included info looks correct.
+9\. Create a SC ticket with any changes that have been made and give the ticket to the QA team for manual testing. 
+  - Go to the [ShortCut tool](https://app.shortcut.com/tubi/team/61525f46-2903-4bfc-afa4-83f9d7fefbfb?stories_sort_by=priority&stories_group_by=workflow_state_id)
+  - Create a QA ticket by navigating to the following menu items: Create Story in Team> Create Story> Product QA Team> Roku QA Template
+  - Run the command `gulp buildQaChanges`, which will build most of the copy for this ticket and place it in your clipboard
+  - Paste the copy in the newly created SC ticket from the previous step
+  - Make sure that no work is missing in the list and that the included info looks correct
+  - Provide QA with a link to the ticket within the roku_qa slack channel
 
 10\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build. Use the following command to update the staging channel with the latest version of the QA branch.
 
