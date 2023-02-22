@@ -1359,7 +1359,7 @@ Function getConstants()
       constants.ui.colors.focusedKids = kidsDarkPrimaryAccent
       constants.ui.colors.focused2 = defaultDarkStatusAlert
       constants.ui.colors.unfocused = defaultDarkPrimaryForeground
-      constants.ui.colors.selectedListItem = defaultDarkTransparentForeground5
+      constants.ui.colors.selectedListItem = defaultDarkTransparentForeground20
       constants.ui.colors.primaryText = defaultDarkPrimaryForeground
       constants.ui.colors.textDark = defaultDarkPrimaryBackground
       constants.ui.colors.secondaryText = defaultDarkTransparentForeground75
