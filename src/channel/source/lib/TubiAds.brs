@@ -423,7 +423,7 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos, isSeekPastCuepoint = false
               adUnitsList: [
                 {
                   viewed: currentAdUnitsList[0].viewed
-                  renderSequence: m._.cond(episode.nowPos > 0, "midroll", "preroll")
+                  renderSequence: m._.cond(breakPos > 0, "midroll", "preroll")
                   duration: currentAdUnitsList[0].duration
                   renderTime: currentAdUnitsList[0].renderTime
                   ads: []
