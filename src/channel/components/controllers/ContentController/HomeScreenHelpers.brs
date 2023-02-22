@@ -651,14 +651,13 @@ End Function
 ' the homescreen has communicated that a sponsored row has been focused
 Function onHomescreenSponsoredRowFocused(msg)
   isSponsoredRowFocused = msg.getData()
-  if isSponsoredRowFocused = true
-    homeScreen = msg.getRoSGNode()
-    if homeScreen <> invalid
-      row = homeScreen.rowFocused
-      if row <> invalid
-        manageHomescreenSponsorPixels(row)
-        setSponsorshipBackground(homeScreen.sponsorshipBackground)
-      end if
+  homeScreen = msg.getRoSGNode()
+  currentScreen = getCurrentScreen()
+  if isSponsoredRowFocused = true AND homeScreen <> invalid AND currentScreen <> invalid AND currentScreen.isSameNode(homeScreen)
+    row = homeScreen.rowFocused
+    if row <> invalid
+      manageHomescreenSponsorPixels(row)
+      setSponsorshipBackground(homeScreen.sponsorshipBackground)
     end if
   end if
 End Function

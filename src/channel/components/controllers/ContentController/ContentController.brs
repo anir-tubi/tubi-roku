@@ -1404,7 +1404,11 @@ End Function
 
 
 Function onSponsorshipBackgroundChanged(msg)
-  setSponsorshipBackground(msg.getData())
+  screenWithSponsorship = msg.getRoSGNode()
+  currentScreen = getCurrentScreen() 'gets the top screen in the screen stack
+  if currentScreen <> invalid AND currentScreen.isSameNode(screenWithSponsorship)
+    setSponsorshipBackground(msg.getData())
+  end if
 End Function
 
 
