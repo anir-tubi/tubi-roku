@@ -615,6 +615,11 @@ Function resetDefaultState()
   m.top.needsLogin = false
   m.top.reminderIsSet = false
 
+  if m.topHeaderImage <> invalid
+    m.topHeaderImage.height = 0
+    m.topHeaderImage.width = 0
+  end if
+
   m.top.descriptionMaxLines = 5
 End Function
 
@@ -819,6 +824,22 @@ Function onModeChange()
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
 
     m.offset.itemSpacings = [15, 24, 24]
+  else if m.top.mode = m.constants.ui.infoPanelModes.programHomescreen
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.topHeaderImage)
+    m.topHeaderImage.height = 72
+    m.topHeaderImage.width = 72
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.episode)
+    m.offset.appendChild(m.twoLineInfo)
+
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.line1Bold)
+    m.firstLineGroup.appendChild(m.closedCaptionPoster)
+
+    m.offset.appendChild(m.descriptionGroup)
+    m.offset.appendChild(m.playerCountdownGroup)
+    m.offset.itemSpacings = [15, 15]
   end if
 End Function
 

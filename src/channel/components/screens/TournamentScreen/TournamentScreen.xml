@@ -9,6 +9,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/ContentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/InfoPanelMixin.brs" />
+  <script type="text/brightscript" uri="../../lib/EPGMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/ApiUtils.brs" />

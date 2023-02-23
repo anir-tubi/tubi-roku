@@ -17,6 +17,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     translateTournamentScreen: tubiMetadataTranslate_translateTournamentScreen
     upNextTranslateRecursiveWrapper: tubiMetadataTranslate_upNextTranslateRecursiveWrapper
     setDescriptorCodeAndDescription: tubiMetadataTranslate_setDescriptorCodeAndDescription
+    translateProgram: tubiMetadataTranslate_translateProgram
 
     ' private
     constants: constants
@@ -91,6 +92,8 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
       sThumbnailURL = canvasImages.landscape_tb[0]
     else if isNonEmptyArray(contentFromServer.hero_images) = true
       sThumbnailURL = contentFromServer.hero_images[0]
+    else if contentFromServer.type = "l" 'linear content in non-linear row
+      sThumbnailURL = contentFromServer.landscape_images[0] 'default channel image
     else if isNonEmptyArray(contentFromServer.thumbnails) = true
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
@@ -531,6 +534,42 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
         translatedContent.children.push(translatedChild)
       end if
     end for
+  else if contentFromServer.type = "l" AND contentFromServer.programs <> invalid AND contentFromServer.programs.count() > 0
+
+    programs = contentFromServer.programs
+    programCount = programs.count()
+
+    if translatedContent.totalCount = -1
+      translatedContent.totalCount = programCount
+    end if
+
+    if type(translatedContent) = "roSGNode"
+      for i = 0 to programCount - 1
+        programFromServer = programs[i]
+
+        if programFromServer <> invalid
+          translatedChild = translatedContent.createChild("EPGContentNode")
+          m.translateProgram(contentFromServer, programFromServer, translatedChild, m.constants.ui.screenIds.homeScreen, isSignedInUser)
+          count = count + 1
+        end if
+      end for
+    else if type(translatedContent) = "roAssociativeArray"
+
+      if translatedContent.children = invalid
+        translatedContent.children = []
+      end if
+
+      for i = 0 to programCount - 1
+        programFromServer = programs[i]
+
+        if programFromServer <> invalid
+          translatedChild = CreateObject("roAssociativeArray")
+          m.translateProgram(contentFromServer, programFromServer, translatedChild, m.constants.ui.screenIds.homeScreen, isSignedInUser)
+          count = count + 1
+          translatedContent.children.push(translatedChild)
+        end if
+      end for
+    end if
   end if
 
   ' return the total number of children converted
@@ -1237,7 +1276,13 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             childAA.airDateTime = fullChild.air_datetime
           end if
 
-          if bFullData = true
+          if parentGridItemType <> m.constants.ui.gridItemTypes.linear AND fullChild.type = "l" AND fullChild.programs <> invalid AND fullChild.programs.count() > 0
+            bSingleContentFullData = true
+          else
+            bSingleContentFullData = false
+          end if
+
+          if bFullData = true OR bSingleContentFullData = true
             'mutates childAA by populating all fields on childAA
             m.translateRecursive(fullChild, childAA, isSignedInUser)
           end if
@@ -1251,23 +1296,6 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           if childAA.type <> "ContentNode"
             '//if the subtype is not the default ContentNode, then set the gridItemType field
             childAA.gridItemType = gridType
-          end if
-
-          bLandscape = false
-          if parentGridItemType = gridItemTypes.portrait
-            bLandscape = false
-          else if parentGridItemType = gridItemTypes.landscape AND fullChild.hero_images <> invalid
-            bLandscape = true
-          else if container.id = m.constants.ui.categoryIds.featured AND fullChild.hero_images <> invalid
-            bLandscape = true
-          else if parentGridItemType = gridItemTypes.vitg
-            bLandscape = true
-          end if
-
-          if bLandscape = true then
-            childAA.hdgridposterurl = fullChild.hero_images[0]
-          else if fullChild.posterarts <> invalid then
-            childAA.hdgridposterurl = fullChild.posterarts[0]
           end if
 
           childAA.hdgridposterurl = m.getThumbnailImage(fullChild, gridType)
@@ -1867,7 +1895,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
             channelContentNode.hasSubtitles = false
           end if
 
-          if channelFromServer.needs_login = true and isUserSignedIn = false
+          if channelFromServer.needs_login = true AND isUserSignedIn = false
             channelContentNode.needsLogin = true
           end if
 
@@ -1905,7 +1933,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
           end if
 
           'programlevel
-          if channelFromServer.needs_login = true and isUserSignedIn = false
+          if channelFromServer.needs_login = true AND isUserSignedIn = false
             program.needsLogin = true
           end if
         end if
@@ -1925,17 +1953,6 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
   updateAA = {
     "requestorID": requestorID
     "children": channelArray
-  }
-
-  ' taking these variables out of for loop for performance
-  unFocusedColor = m.constants.ui.colors.futureItemSelected
-  focusedColor = m.constants.ui.colors.EPGProgramFocused
-  selectedAttributeText = getTranslation("epg_starts_at") + " "
-  translatedTomorrow = getTranslation("tomorrow")
-  selectedItemAttributes = {
-    "title" : selectedAttributeText ,
-    "unFocusedColor" : unFocusedColor , '0xEB9C00FF
-    "focusedColor" : focusedColor '0x9699A3FF
   }
 
   rows = contentToTranslate.rows
@@ -2000,7 +2017,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
       channelNode.state = "loaded"
 
       'channel level needs_login
-      if channelFromServer.needs_login = true and isUserSignedIn = false
+      if channelFromServer.needs_login = true AND isUserSignedIn = false
         channelNode.needsLogin = true
       end if
 
@@ -2010,141 +2027,14 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
       programCount = programs.count()
 
       for i=0 to programCount -1
-        program = {
-          "subtype": "EPGContentNode"
-        }
-        programArray.push(program)
-
         programFromServer = programs[i]
-        if channelNode.id <> invalid
-          program.id = channelNode.id
+        if programFromServer <> invalid
+          translatedProgram = {
+            "subtype": "EPGContentNode"
+          }
+          m.translateProgram(channelFromServer, programFromServer, translatedProgram, requestorID, isUserSignedIn)
+          programArray.push(translatedProgram)
         end if
-        program.title = programFromServer.title
-
-        'Add episode title
-        program.epgProgramTitle = programFromServer.title
-
-        if programFromServer.keywords <> invalid AND programFromServer.keywords.count() > 0
-          for each keyword in programFromServer.keywords
-            if keyword = "EpisodeTitle_IsPreferred" and isNonEmptyString(programFromServer.episode_title)
-              program.epgProgramTitle = programFromServer.episode_title
-              exit for
-            end if
-          end for
-
-        end if
-
-        startTime = ""
-        dayOfMonth = ""
-        dayOfWeek = ""
-        dateString = ""
-        startTimeFromServer = programFromServer.start_time
-        if startTimeFromServer <> invalid AND (type(startTimeFromServer) = "String" or type(startTimeFromServer) = "roString") AND startTimeFromServer <> ""
-          datetimeObj = CreateObject("roDateTime")
-          datetimeObj.FromISO8601String(startTimeFromServer)
-          datetimeObj.ToLocalTime()
-          program.startTime = datetimeObj.asSeconds()
-          dateString = datetimeObj.AsDateString("short-date")
-          dayOfWeek = "day_" + StrI(datetimeObj.GetDayOfWeek()).trim()
-          dayOfMonth = StrI(datetimeObj.GetDayOfMonth()).trim()
-          startTime = GetAMPMTimeString(datetimeObj, false)
-        end if
-
-        endTime = ""
-        endTimeFromServer = programFromServer.end_time
-        if endTimeFromServer <> invalid AND (type(endTimeFromServer) = "String" or type(startTimeFromServer) = "roString") AND endTimeFromServer <> ""
-          datetimeObjEnd = CreateObject("roDateTime") 'create new dateTime object otherwise local time returned will be wrong.
-          datetimeObjEnd.FromISO8601String(endTimeFromServer)
-          datetimeObjEnd.ToLocalTime()
-          program.endTime = datetimeObjEnd.asSeconds()
-
-          endTime = GetAMPMTimeString(datetimeObjEnd, false)
-        end if
-
-        if programFromServer.images <> invalid AND programFromServer.images.poster <> invalid AND programFromServer.images.poster.count() > 0
-          program.FHDPosterUrl = programFromServer.images.poster[0]
-        else if channelFromServer.images <> invalid AND channelFromServer.images.poster <> invalid AND channelFromServer.images.poster.count() > 0
-          program.FHDPosterUrl = channelFromServer.images.poster[0]
-        end if
-
-        if programFromServer.has_subtitle <> invalid
-          program.hasSubtitles = programFromServer.has_subtitle
-        end if
-        if programFromServer.year <> invalid
-          program.ReleaseDate = programFromServer.year
-        end if
-
-        if startTime <> "" AND endTime <> ""
-          program.hoursOfAiring = startTime + " - " +  endTime
-        end if
-
-        if programFromServer.ratings <> invalid AND programFromServer.ratings[0] <> invalid AND programFromServer.ratings[0].value <> invalid
-          program.Rating = programFromServer.ratings[0].value
-        end if
-
-        if channelFromServer.needs_login = true and isUserSignedIn = false
-          program.needsLogin = true
-        end if
-
-        if programFromServer.videoRenditions <> invalid
-          ' for now, only worry about 4k
-          if programFromServer.videoRenditions[0] = m.constants.serverValues.tensorVideoRenditions.fourK
-            if m.constants.deviceInfo.videoMode.toInt() >= 2160
-              program.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
-            end if
-          end if
-        end if
-
-        if programFromServer.description <> invalid and programFromServer.description <> ""
-          program.description = programFromServer.description
-        else
-          program.description = channelFromServer.description
-        end if
-
-        if programFromServer.tags <> invalid AND programFromServer.tags.Count() > 0
-          program.descriptors = programFromServer.tags
-        end if
-
-        now  = CreateObject("roDateTime")
-        now.ToLocalTime()
-        nowTime = now.asSeconds()
-        tomorrowSecs = nowTime + 86400 'seconds per day
-        tomorrow = CreateObject("roDateTime")
-        tomorrow.FromSeconds(tomorrowSecs)
-
-        'Today
-        if dateString = now.AsDateString("short-date")
-          if program.startTime <= nowTime AND program.endTime > nowTime  ' current program eg:20M left
-            timeLeft = (program.endTime -  nowTime) / 60
-            program.ShortDescriptionLine1 = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(program.endTime - nowTime))})
-          else   'Today future program eg: 10:00 AM
-            timeLeft = (program.endTime - program.startTime) / 60
-            program.ShortDescriptionLine1 = startTime
-          end if
-        else if dateString = tomorrow.AsDateString("short-date") ' tomorrow programs eg: 10:00AM, TOMORROW
-          timeLeft = (program.endTime - program.startTime) / 60
-          program.ShortDescriptionLine1 =  startTime + ", " + translatedTomorrow
-        else 'future day programs eg: Jan, 8 10:00 AM
-          timeLeft = (program.endTime - program.startTime) / 60
-          program.ShortDescriptionLine1 = startTime + ", " + getTranslation(dayOfWeek) + dayOfMonth
-        end if
-
-        'the value 19.2 is the width for every minute of the program as per the EPG Design. This value will change if EPG design changes in future.
-        '186 is min width
-        width = timeLeft * 19.2
-        if width < 186
-          program.FHDItemWidth = 186
-        else
-          program.FHDItemWidth = width
-        end if
-
-
-        if programFromServer.genres <> invalid AND programFromServer.genres.count() > 0
-          program.Categories = programFromServer.genres
-        end if
-
-        program.selectedItemAttributes = selectedItemAttributes
-
       end for
     end if
   end for
@@ -2152,6 +2042,165 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
   contentNode.update(updateAA, true)
   return contentNode
 End Function
+
+
+Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromServer, translatedProgram, requestorID, isUserSignedIn = false)
+
+  if channelFromServer.content_id  <> invalid
+    translatedProgram.id = channelFromServer.content_id
+  end if
+
+  translatedProgram.title = programFromServer.title
+
+  'Add episode title
+  translatedProgram.epgProgramTitle = programFromServer.title
+
+  if programFromServer.keywords <> invalid AND programFromServer.keywords.count() > 0
+    for each keyword in programFromServer.keywords
+      if keyword = "EpisodeTitle_IsPreferred" and isNonEmptyString(programFromServer.episode_title)
+        translatedProgram.epgProgramTitle = programFromServer.episode_title
+        exit for
+      end if
+    end for
+
+  end if
+
+  startTime = ""
+  dayOfMonth = ""
+  dayOfWeek = ""
+  dateString = ""
+  startTimeFromServer = programFromServer.start_time
+  if isNonEmptyString(startTimeFromServer)
+    datetimeObj = CreateObject("roDateTime")
+    datetimeObj.FromISO8601String(startTimeFromServer)
+    datetimeObj.ToLocalTime()
+    translatedProgram.startTime = datetimeObj.asSeconds()
+    dateString = datetimeObj.AsDateString("short-date")
+    dayOfWeek = "day_" + StrI(datetimeObj.GetDayOfWeek()).trim()
+    dayOfMonth = StrI(datetimeObj.GetDayOfMonth()).trim()
+    startTime = GetAMPMTimeString(datetimeObj, false)
+  end if
+
+  endTime = ""
+  endTimeFromServer = programFromServer.end_time
+  if isNonEmptyString(endTimeFromServer)
+    datetimeObjEnd = CreateObject("roDateTime") 'create new dateTime object otherwise local time returned will be wrong.
+    datetimeObjEnd.FromISO8601String(endTimeFromServer)
+    datetimeObjEnd.ToLocalTime()
+    translatedProgram.endTime = datetimeObjEnd.asSeconds()
+
+    endTime = GetAMPMTimeString(datetimeObjEnd, false)
+  end if
+
+  if programFromServer.images <> invalid
+    if isNonEmptyArray(programFromServer.images.poster)
+      translatedProgram.FHDPosterUrl = programFromServer.images.poster[0]
+    end if
+
+    if isNonEmptyArray(programFromServer.images.landscape)
+      translatedProgram.hdgridposterurl  = programFromServer.images.landscape[0]
+    end if
+
+  else if channelFromServer.images <> invalid 'if program images are not available, consider channel images for substitute.
+    if isNonEmptyArray(channelFromServer.images.poster)
+      translatedProgram.FHDPosterUrl = channelFromServer.images.poster[0]
+    end if
+
+    if isNonEmptyArray(channelFromServer.landscape_image)
+      translatedProgram.hdgridposterurl  = channelFromServer.landscape_images[0]
+    end if
+  end if
+
+  if programFromServer.has_subtitle <> invalid
+    translatedProgram.hasSubtitles = programFromServer.has_subtitle
+  end if
+  if programFromServer.year <> invalid
+    translatedProgram.releaseDate = programFromServer.year
+  end if
+
+  if startTime <> "" AND endTime <> ""
+    translatedProgram.hoursOfAiring = startTime + " - " +  endTime
+  end if
+
+  if programFromServer.ratings <> invalid AND programFromServer.ratings[0] <> invalid AND programFromServer.ratings[0].value <> invalid
+    translatedProgram.Rating = programFromServer.ratings[0].value
+  end if
+
+  if channelFromServer.needs_login = true AND isUserSignedIn = false
+    translatedProgram.needsLogin = true
+  end if
+
+  if programFromServer.videoRenditions <> invalid
+    ' for now, only worry about 4k
+    if programFromServer.videoRenditions[0] = m.constants.serverValues.tensorVideoRenditions.fourK
+      if m.constants.deviceInfo.videoMode.toInt() >= 2160
+        translatedProgram.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
+      end if
+    end if
+  end if
+
+  if programFromServer.description <> invalid and programFromServer.description <> ""
+    translatedProgram.description = programFromServer.description
+  else
+    translatedProgram.description = channelFromServer.description
+  end if
+
+  if programFromServer.tags <> invalid AND programFromServer.tags.Count() > 0
+    translatedProgram.descriptors = programFromServer.tags
+  end if
+
+  now  = CreateObject("roDateTime")
+  now.ToLocalTime()
+  nowTime = now.asSeconds()
+  tomorrowSecs = nowTime + 86400 'seconds per day
+  tomorrow = CreateObject("roDateTime")
+  tomorrow.FromSeconds(tomorrowSecs)
+
+  'Today
+  if dateString = now.AsDateString("short-date")
+    if translatedProgram.startTime <= nowTime AND translatedProgram.endTime > nowTime  ' current program eg:20M left
+      timeLeft = (translatedProgram.endTime -  nowTime) / 60
+      translatedProgram.ShortDescriptionLine1 = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(translatedProgram.endTime - nowTime))})
+    else   'Today future program eg: 10:00 AM
+      timeLeft = (translatedProgram.endTime - translatedProgram.startTime) / 60
+      translatedProgram.ShortDescriptionLine1 = startTime
+    end if
+  else if dateString = tomorrow.AsDateString("short-date") ' tomorrow programs eg: 10:00AM, TOMORROW
+    timeLeft = (translatedProgram.endTime - translatedProgram.startTime) / 60
+    translatedTomorrow = getTranslation("tomorrow")
+    translatedProgram.ShortDescriptionLine1 =  startTime + ", " + translatedTomorrow
+  else 'future day programs eg: Jan, 8 10:00 AM
+    timeLeft = (translatedProgram.endTime - translatedProgram.startTime) / 60
+    translatedProgram.ShortDescriptionLine1 = startTime + ", " + getTranslation(dayOfWeek) + dayOfMonth
+  end if
+
+  'the value 19.2 is the width for every minute of the program as per the EPG Design. This value will change if EPG design changes in future.
+  '186 is min width
+  width = timeLeft * 19.2
+  if width < 186
+    translatedProgram.FHDItemWidth = 186
+  else
+    translatedProgram.FHDItemWidth = width
+  end if
+
+
+  if programFromServer.genres <> invalid AND programFromServer.genres.count() > 0
+    translatedProgram.Categories = programFromServer.genres
+  end if
+
+  unFocusedColor = m.constants.ui.colors.futureItemSelected
+  focusedColor = m.constants.ui.colors.EPGProgramFocused
+  selectedAttributeText = getTranslation("epg_starts_at") + " "
+
+  selectedItemAttributes = {
+    "title" : selectedAttributeText ,
+    "unFocusedColor" : unFocusedColor , '0xEB9C00FF
+    "focusedColor" : focusedColor '0x9699A3FF
+  }
+
+  translatedProgram.selectedItemAttributes = selectedItemAttributes
+
+  End Function
 
 
 Function tubiMetadataTranslate_translateTournamentScreen(contentToTranslate, requestorID, isSignedInUser = false)

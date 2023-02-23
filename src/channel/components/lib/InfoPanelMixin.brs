@@ -85,3 +85,44 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
   infoPanel.needsLogin = (content.needsLogin AND m.top.signedIn <> true)
   infoPanel.width = 960
 End Function
+
+
+' Populates the info panel with the fields necessary for the Linear programs in homeScreen(linear content on non-linear category) mode so that it looks
+' like the info panel on the homescreen
+'
+' @content: TubiContentNode, containing a linear channel with programs as children
+' @infoPanel: InfoPanel node
+'
+' @sideEffects: updates fields on the passed in infoPanel node
+
+Function populateInfoPanelWithProgramHomescreenMode(content, infoPanel)
+  infoPanel.mode = m.constants.ui.infoPanelModes.programHomescreen
+  '//TODO - Check if we use thumbnail URIs here or inlineLogoUri ??
+  infoPanel.topHeaderImageUri = content.inlineLogoUri
+
+  currentProgram = getCurrentLiveProgram(content)
+  badgeText = ""
+  programTime = ""
+  infoPanel.description = content.description
+
+  if currentProgram <> invalid
+    infoPanel.title = currentProgram.title
+    infoPanel.episodeTitle = currentProgram.epgProgramTitle
+    badgeText = UCase(getTranslation("screenSearch_liveText"))
+    programTime = currentProgram.hoursOfAiring
+    infoPanel.description = currentProgram.description
+  else
+    infoPanel.description = content.description
+    infoPanel.title = content.title
+  end if
+
+  lineOneData = {}
+  lineOneData.badgeText = badgeText
+  lineOneData.hasCC = content.hasSubtitles
+  lineOneData.hoursOfAiring = programTime
+
+  infoPanel.lineOneData = lineOneData
+
+  infoPanel.needsLogin = (content.needsLogin AND m.top.signedIn <> true)
+  infoPanel.width = 960
+End Function

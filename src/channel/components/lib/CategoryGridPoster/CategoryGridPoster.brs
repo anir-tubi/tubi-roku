@@ -43,6 +43,7 @@ Function init()
   m.gridItemTypes = {
     portrait: "portrait"
     landscape: "landscape"
+    landscapeNoTitle: "landscapeNoTitle"
     landscapeLarge: "landscapeLarge"
     linear: "linear"
     vitg: "vitg"
@@ -160,10 +161,20 @@ Function onContentChange(msg)
           m.resumeMargin = 24
         end if
         drawHistoryProgressBar()
-      'itemContent.gridItemType is not an empty string on the home screen,
-      'and we want this to set Live logo and text just on the search screen.
-      else if (itemContent.gridItemType = "" AND itemContent.type = "linear")
-        setLiveBadge()
+      else if itemContent.type = m.contentTypes.linear
+        if (categoryContent.gridItemType = m.gridItemTypes.landscape OR categoryContent.gridItemType = m.gridItemTypes.landscapeNoTitle) 'linear content on landscape row
+          currentProgram = getCurrentLiveProgram(itemContent)
+
+          if currentProgram <> invalid AND isNonEmptyString(currentProgram.hdgridposterurl)
+            m.poster.uri = currentProgram.hdgridposterurl
+          end if
+
+          setLiveBadge()
+        else if itemContent.gridItemType = ""
+           'itemContent.gridItemType is not an empty string on the home screen,
+          'and we want this to set Live logo and text just on the search screen.
+          setLiveBadge()
+        end if
       end if
     else
       m.poster.uri = itemContent.hdgridposterurl
@@ -172,9 +183,9 @@ Function onContentChange(msg)
 End Function
 
 
-' Make sure the assets within the inner part of the poster like the resume Progress bar 
+' Make sure the assets within the inner part of the poster like the resume Progress bar
 ' is located towards the bottom of the poster based on the current dimensions of the poster.
-Function moveInnerAssets() 
+Function moveInnerAssets()
   m.InnerLayout.translation = [m.resumeMargin, m.top.height - m.resumeProgressBar.height - m.resumeMargin - m.InnerTitle.height - m.TimeRemaining.height - (m.InnerLayout.itemSpacings[0] * 2) ]
 End Function
 
@@ -494,8 +505,8 @@ Function setLiveBadge()
   badge.iconUri = "pkg:/images/live-icon.webp"
   badge.text = UCase(getTranslation("screenSearch_liveText"))
 End Function
-  
-  
+
+
 Function removeBadges()
   tubiLog("CategoryGridPoster.removeBadges")
   childCount = m.badgeGroup.getChildCount()
@@ -510,11 +521,11 @@ Function setReplayOrUpcomingBadge(badgeText)
   if badgeText = m.contentTimings.replay
     '//::TODO::colors - replace this color with the one in constants, but since we don't have a reliable reference to constants then need to do this dynamically at build process
     ' badge.backgroundColor = m.constants.ui.colors.backgroundColorLight
-    badge.backgroundColor = "0xFFFFFFFF" 
+    badge.backgroundColor = "0xFFFFFFFF"
     '//::TODO::colors - replace this color at build with m.constants.ui.colors.neutralColor2; note text color may need to be opaque
     badge.textColor = "0x1C1F29"
   else
-    '//::TODO::colors - replace this color at build with m.constants.ui.colors.neutralColor 
+    '//::TODO::colors - replace this color at build with m.constants.ui.colors.neutralColor
     badge.backgroundColor = "0x585B66"
     '//::TODO::colors - replace this color with the one in constants, but since we don't have a reliable reference to constants then need to do this dynamically at build process; note text color may need to be opaque
     ' badge.textColor = m.constants.ui.colors.primaryText

@@ -519,7 +519,12 @@ Function populateInfoPanelByContent(focusedContent)
   if focusedContent <> invalid
     sType = focusedContent.type
     if sType = m.constants.ui.categoryTypes.linear
-      populateInfoPanel(m.constants.ui.infoPanelModes.linearHomeScreen, focusedContent)
+      '// TODO: Currently we can not use focusedContent.parentType to differenciate between linear and non-linear rows.
+      if focusedContent.parentId = "featured" 'linearContent in featured row
+        populateInfoPanel(m.constants.ui.infoPanelModes.programHomescreen, focusedContent)
+      else
+        populateInfoPanel(m.constants.ui.infoPanelModes.linearHomeScreen, focusedContent)
+      end if
     else if sType = m.constants.ui.categoryTypes.historySignedOutUser
       populateInfoPanel(m.constants.ui.infoPanelModes.continueWatching, focusedContent)
     else if sType = m.constants.ui.categoryTypes.preview
@@ -702,6 +707,8 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.needsLogin = contentNode.needsLogin AND (m.top.signedIn <> true)
       m.InfoPanel.reminderIsSet = false
       m.InfoPanel.width = 960
+    else if mode = m.constants.ui.infoPanelModes.programHomescreen
+      populateInfoPanelWithProgramHomescreenMode(contentNode, m.InfoPanel)
     '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     else if mode = m.constants.ui.infoPanelModes.navigateSports
       m.InfoPanel.mode = mode

@@ -443,9 +443,9 @@ Function getConstants()
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
         constants.urls.tensor.urlBase = "https://tensor.staging-public.tubi.io/api"
       end if
-      constants.urls.tensor.homescreen = constants.urls.tensor.urlBase + "/v2/homescreen"
-      constants.urls.tensor.container = constants.urls.tensor.urlBase + "/v2/containers"
-      constants.urls.tensor.channel = constants.urls.tensor.urlBase + "/v2/containers"
+      constants.urls.tensor.homescreen = constants.urls.tensor.urlBase + "/v3/homescreen"
+      constants.urls.tensor.container = constants.urls.tensor.urlBase + "/v3/containers"
+      constants.urls.tensor.channel = constants.urls.tensor.urlBase + "/v3/containers"
       constants.urls.tensor.epgChannelIds = constants.urls.tensor.urlBase + "/v2/epg"
       constants.urls.tensor.tournamentscreen = constants.urls.tensor.urlBase + "/v1/wc_tournament"
 
@@ -977,6 +977,7 @@ Function getConstants()
       constants.ui.infoPanelModes.linearHomeScreen = "linearHomeScreen"
       constants.ui.infoPanelModes.epg = "epg"
       constants.ui.infoPanelModes.linearSearch = "linearSearch"
+      constants.ui.infoPanelModes.programHomescreen = "programHomescreen"
       '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
       constants.ui.infoPanelModes.linearTournament = "linearTournament"
       constants.ui.infoPanelModes.sportsEvent = "sportsEvent"

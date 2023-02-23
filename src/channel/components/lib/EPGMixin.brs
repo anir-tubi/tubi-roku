@@ -11,3 +11,19 @@ Function isProgramLive(program)
     return false
   end if
 End Function
+
+
+' This function will return the current live program of a linear content if it can be found.
+' This function requires the importation of source/lib/TimeUtils.brs
+' @param content: roSGNode, linear Content node or EPG node
+Function getCurrentLiveProgram(content)
+  if content <> invalid
+    for i = 0 to content.getChildCount() - 1
+      program = content.getChild(i)
+      if isProgramLive(program) = true
+        return program
+      end if
+    end for
+  end if
+  return invalid
+End Function

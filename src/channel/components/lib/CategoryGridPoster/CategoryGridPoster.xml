@@ -15,6 +15,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
@@ -52,7 +53,7 @@
                 role="font"
                 uri="pkg:/fonts/Vaud-Bold.ttf"
                 size="30" />
-            </Label> 
+            </Label>
             <Label
               id="TimeRemaining"
               color="0xFFFFFFFF"
