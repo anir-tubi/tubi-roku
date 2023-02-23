@@ -394,6 +394,10 @@ Function goToNext()
   'reset before endScrub because we don't want an ad call made when moving to the next video, let prerolls hit instead
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(true)
+  else if m.VideoState = "skip"
+    ' this block get executes when video plays if user presses "right" key few times and then press "Go to next" button on transport layer.
+    ' in this case we need to update the last-ping time to current video position to fix large play progress issue
+    updateLastPingTime(m.playerPosition)
   end if
   clearSkipCuepointsButtonAndTimer()
   stopVideo()
