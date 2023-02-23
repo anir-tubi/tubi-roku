@@ -399,7 +399,8 @@ async function buildReleaseNotes(done) {
   const releaseNotes = [];
 
   // filter down to pull requests from currentBranch that aren't on prodBranch
-  for (const prId in pullRequestCommits) {
+  for (const commit of pullRequestCommits) {
+    const prId = commit.prId;
     const response = await octokit.pulls.get({
       owner: ghInfo.owner,
       repo: ghInfo.rokuRepo,
@@ -431,8 +432,9 @@ async function buildQaChanges(done) {
   const qaChangesText = [];
 
   // filter down to pull requests from currentBranch that aren't on prodBranch
-  for (const prId in pullRequestCommits) {
-    const commit = pullRequestCommits[prId].split(' ')[0];
+  for (const commit of pullRequestCommits) {
+    const prId = commit.prId;
+    const commitHash = pullRequestCommits[prId].split(' ')[0];
 
     const octokitRequestSharedParams = {
       owner: ghInfo.owner,
@@ -470,7 +472,7 @@ async function buildQaChanges(done) {
     const userLogin = pullRequest.user.login;
     const qaChange = {
         pullNumber: prId,
-        commit: commit,
+        commit: commitHash,
         whatChanged: whatChanged,
         testingSteps: testingSteps,
         pointDeveloper: githubDeveloperInfo[userLogin],
@@ -522,15 +524,18 @@ function getPullRequestCommitsForBranch(done, branch, oneLine = false) {
     command += ' --oneline';
   }
   const gitLogs = execGitCommand(done, command, `Could not get git logs from ${branch} branch.`);
-  const pullRequestCommits = {};
+  const pullRequestCommits = [];
   gitLogs.split('\n')
-    .forEach((item) => {
-      const prId = extractPrIdFromCommitInfo(item);
+    .forEach((message) => {
+      const prId = extractPrIdFromCommitInfo(message);
       if (prId) {
-        pullRequestCommits[prId] = item;
+        pullRequestCommits.push({
+          message: message,
+          prId: prId
+        });
       }
     });
-    return pullRequestCommits;
+  return pullRequestCommits;
 }
 
 // Compares the commits on branchA against the commits on branchB, based on their pull request numbers, and returns an array of commit messages for the commits that exist on branchA but do not exist on branchB.
@@ -562,12 +567,12 @@ async function findPullRequestCommitDifferences(done, branchA, branchB) {
   pullOrFetchBranch(done, branchB);
   const branchBCommits = getPullRequestCommitsForBranch(done, branchB); // Note we need to use oneLine output to include pull requests that may have been squash merged in.
 
-  const pullRequestCommitsNotInBranchB = {};
+  const pullRequestCommitsNotInBranchB = [];
   // filter down to pullRequests from master that aren't on compareBranch
-  for (const prId in branchACommits) {
+  for (const branchACommit of branchACommits) {
     // If we didn't find the pull request then add it to the list
-    if (!branchBCommits[prId]) {
-      pullRequestCommitsNotInBranchB[prId] = branchACommits[prId];
+    if (!branchBCommits.find(branchBCommit => branchBCommit.prId === branchACommit.prId)) {
+      pullRequestCommitsNotInBranchB.push(branchACommit);
     }
   }
 
@@ -583,7 +588,7 @@ async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
   console.log(`COMMITS THAT HAVE NOT BEEN CHERRY PICKED FROM master TO ${compareBranch}`);
   console.log('-----------------------------------------------------------------------');
   commitsFromMasterNotOnCompareBranch.forEach((item) => {
-    console.log(item);
+    console.log(item.message);
   });
   console.log('-----------------------------------------------------------------------');
   return done();
