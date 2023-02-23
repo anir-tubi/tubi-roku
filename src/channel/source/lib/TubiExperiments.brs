@@ -53,7 +53,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_linear_epg_position: {
-        roku_linear_epg_position_v1 : {"enabled": false}
+        roku_linear_epg_position_v1 : {"enabled": true}
       }
     }
 
