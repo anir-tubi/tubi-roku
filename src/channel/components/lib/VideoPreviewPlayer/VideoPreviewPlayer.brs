@@ -20,7 +20,10 @@ Function init()
   m.top.observeField("pageTypeForAnalytics", "onPageTypeUpdatedForAnalytics")
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("control", "onControlChange")
-
+  ' Creating a local variable to hold the video playback state so that we can avoid rare conditions where video node state 
+  ' does not update on time.
+  ' Allowed values are "stop", "play", "pause", "prebuffer"
+  m.videoState = "stop"
 End Function
 
 
@@ -43,6 +46,7 @@ End Function
 
 ' plays the video
 Function playContent()
+  m.videoState = "play"
   m.Video.control = "play"
   m.lastPingTime = 0
 
@@ -95,6 +99,7 @@ Function onVideoStateChange(msg)
     finishPreviewEvent = getFinishPreviewEvent(true)
     trackEvent(finishPreviewEvent)
     m.top.content = invalid
+    m.videoState = "stop"
   else if state = "error"
     content = m.video.content
     errorInfo = getPlaybackErrorInfo(m.video.position, m.video.streamInfo, m.video.errorCode, m.video.errorMsg, content)
@@ -105,6 +110,7 @@ Function onVideoStateChange(msg)
     errorInfo.name = m.constants.errors.message.videoPreview
     ' sending the logs to sentry sdk
     tubiException(errorInfo, "error", 0.1)
+    m.videoState = "stop"
   end if
   m.top.state = state
 End Function
@@ -135,6 +141,7 @@ Function prepareToStartVideo(content)
   m.Video.content = invalid
   if type(content) = "roSGNode"
     m.Video.content = content
+    m.videoState = "prebuffer"
     m.Video.control = "prebuffer"
   end if
 End Function
@@ -142,7 +149,8 @@ End Function
 
 ' resumes the video
 Function resumeContent()
-  if m.Video.state = "paused"
+  if m.videoState = "pause"
+    m.videoState = "play"
     m.Video.control = "resume"
   end if
 End Function
@@ -150,9 +158,11 @@ End Function
 
 ' pauses the video
 Function pauseContent()
-  if m.Video.state = "playing"
+  if m.videoState = "play"
+    m.videoState = "pause"
     m.Video.control = "pause"
-  else if m.Video.state = "buffering" ' added this check to avoid playing content once the buffering is completed when focus is on sidenav/topnav
+  else if m.videoState <> "stop" ' added this check to avoid playing content once the buffering is completed when focus is on sidenav/topnav
+    m.videoState = "stop"
     m.Video.control = "stop"
   end if
 End Function
@@ -160,13 +170,13 @@ End Function
 
 ' stops the video
 Function stopContent()
-
-  if m.Video.state <> "stopped" AND m.Video.state <> "finished"
-    if m.Video.content.id <> invalid
+  if m.videoState <> "stop"
+    if m.Video.content.id <> invalid AND m.playerPosition > 0
       finishPreviewEvent = getFinishPreviewEvent()
       trackEvent(finishPreviewEvent)
     end if
     m.Video.control = "stop"
+    m.videoState = "stop"
   end if
   m.top.content = invalid
 End Function
@@ -186,7 +196,7 @@ End Function
 Function getPreviewProgressEvent(pageType)
 
   previewProgressEvent = invalid
-  if m.playerPosition > m.lastPingTime AND m.Video.state = "playing"
+  if m.playerPosition > m.lastPingTime AND m.videoState = "play"
 
     viewTime = Int((m.playerPosition - m.lastPingTime) * 1000) 'ms
 
