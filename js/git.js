@@ -421,7 +421,6 @@ async function buildReleaseNotes(done) {
 }
 
 
-
 async function buildQaChanges(done) {
   const prodBranch = getProductionBranchName();
   const currentBranch = getCurrentBranch(done);
@@ -434,7 +433,8 @@ async function buildQaChanges(done) {
   // filter down to pull requests from currentBranch that aren't on prodBranch
   for (const commit of pullRequestCommits) {
     const prId = commit.prId;
-    const commitHash = pullRequestCommits[prId].split(' ')[0];
+    const message = commit.message;
+    const commitHash = message.split(' ')[0];
 
     const octokitRequestSharedParams = {
       owner: ghInfo.owner,
@@ -537,6 +537,7 @@ function getPullRequestCommitsForBranch(done, branch, oneLine = false) {
     });
   return pullRequestCommits;
 }
+
 
 // Compares the commits on branchA against the commits on branchB, based on their pull request numbers, and returns an array of commit messages for the commits that exist on branchA but do not exist on branchB.
 // @branchA: string, the branch name we are comparing to branchA
