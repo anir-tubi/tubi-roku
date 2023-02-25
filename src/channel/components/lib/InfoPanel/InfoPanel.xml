@@ -49,7 +49,7 @@
     <field id="title" alias="Title.text" />
     <field id="leftHeaderImageUri" type="string" />
     <field id="topHeaderImageUri" alias="TopHeaderImage.uri" />
-    <field id="episodeTitle" alias="Episode.text" />
+    <field id="episodeTitle" type="string" />
     <field id="description" type="string" />
     <field id="descriptionMaxLines" alias="Description.maxLines" />
     <field id="directors" type="stringarray" />

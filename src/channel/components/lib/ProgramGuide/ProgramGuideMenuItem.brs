@@ -13,21 +13,26 @@ End Function
 Function onContentChange()
   item = m.top.itemContent
   if item <> invalid
-    m.programString.text = item.epgProgramTitle
+    m.programString.text = item.title
     m.timeString.text = item.ShortDescriptionLine1
     m.cellRect.width = item.FHDItemWidth
     m.programString.width = item.FHDItemWidth - 24
     m.timeString.width = item.FHDItemWidth - 24
     if item.selected = true
-      if item.selectedItemAttributes <> invalid and item.selectedItemAttributes.title <> invalid
-        m.timeString.text = item.selectedItemAttributes.title + item.ShortDescriptionLine1
-        m.timeString.color = item.selectedItemAttributes.unFocusedColor
+      if item.itemAttributes <> invalid and item.itemAttributes.title <> invalid
+        m.timeString.text = item.itemAttributes.title + item.ShortDescriptionLine1
+        m.timeString.color = item.itemAttributes.unFocusedColor
       end if
     else
-      if item.selectedItemAttributes <> invalid
-        m.timeString.color = item.selectedItemAttributes.focusedColor
+      if item.itemAttributes <> invalid
+        m.timeString.color = item.itemAttributes.focusedColor
       end if
     end if
+
+    if item.itemAttributes <> invalid AND item.itemAttributes.EpisodeTitle_IsPreferred = true
+      m.programString.text = item.epgProgramTitle
+    end if
+
     if item.needsLogin = true
       if m.lockIcon = invalid
         m.lockIcon = createObject("roSGNode","Poster")
@@ -67,10 +72,10 @@ Function onFocusPercentChange()
   ' //TODO : Find better logic to avoid multiple executions of this logic because of focuspercent being float and triggered multiple times.
   if m.top.focusPercent < 0.5
     if item.selected = true
-      if item.selectedItemAttributes <> invalid
-        m.timeString.text = strReplace(item.ShortDescriptionLine1, item.selectedItemAttributes.title, "")
+      if item.itemAttributes <> invalid
+        m.timeString.text = strReplace(item.ShortDescriptionLine1, item.itemAttributes.title, "")
         ' color of the text has been passed along with string so that content Items need not to access global.
-        m.timeString.color = item.selectedItemAttributes.focusedColor '"0x9699A3FF"
+        m.timeString.color = item.itemAttributes.focusedColor '"0x9699A3FF"
       end if
       item.selected = false
     end if

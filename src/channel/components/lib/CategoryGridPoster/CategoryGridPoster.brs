@@ -170,7 +170,7 @@ Function onContentChange(msg)
           end if
 
           setLiveBadge()
-        else if itemContent.gridItemType = ""
+        else if itemContent.gridItemType = "" OR categoryContent.gridItemType <> m.gridItemTypes.linear
            'itemContent.gridItemType is not an empty string on the home screen,
           'and we want this to set Live logo and text just on the search screen.
           setLiveBadge()

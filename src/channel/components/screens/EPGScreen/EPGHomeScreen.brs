@@ -130,6 +130,7 @@ Function populateInfoPanel(contentNode)
   if contentNode <> invalid
     m.InfoPanel.mode = m.constants.ui.infoPanelModes.epg
     m.InfoPanel.title = contentNode.title
+    m.InfoPanel.episodeTitle = contentNode.epgProgramTitle
     m.InfoPanel.width = 650
     m.InfoPanel.leftHeaderImageUri = contentNode.FHDPosterUrl
 

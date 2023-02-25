@@ -1907,7 +1907,6 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
           ' This child node helps with basic channel metadata and user can play the channel without entire program list.
           program = channelContentNode.createChild("EPGContentNode")
           program.id = channelFromServer.id
-          program.epgProgramTitle = channelFromServer.title
           program.title = channelFromServer.title
           program.description = channelFromServer.description
           program.FHDItemWidth = 1700
@@ -2053,16 +2052,8 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
   translatedProgram.title = programFromServer.title
 
   'Add episode title
-  translatedProgram.epgProgramTitle = programFromServer.title
-
-  if programFromServer.keywords <> invalid AND programFromServer.keywords.count() > 0
-    for each keyword in programFromServer.keywords
-      if keyword = "EpisodeTitle_IsPreferred" and isNonEmptyString(programFromServer.episode_title)
-        translatedProgram.epgProgramTitle = programFromServer.episode_title
-        exit for
-      end if
-    end for
-
+  if isNonEmptyString(programFromServer.episode_title)
+    translatedProgram.epgProgramTitle = programFromServer.episode_title
   end if
 
   startTime = ""
@@ -2192,13 +2183,23 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
   focusedColor = m.constants.ui.colors.EPGProgramFocused
   selectedAttributeText = getTranslation("epg_starts_at") + " "
 
-  selectedItemAttributes = {
+  itemAttributes = {
     "title" : selectedAttributeText ,
     "unFocusedColor" : unFocusedColor , '0xEB9C00FF
     "focusedColor" : focusedColor '0x9699A3FF
   }
 
-  translatedProgram.selectedItemAttributes = selectedItemAttributes
+  if programFromServer.keywords <> invalid AND programFromServer.keywords.count() > 0
+    for each keyword in programFromServer.keywords
+      if keyword = "EpisodeTitle_IsPreferred" and isNonEmptyString(programFromServer.episode_title)
+        itemAttributes["EpisodeTitle_IsPreferred"] = true
+        exit for
+      end if
+    end for
+
+  end if
+
+  translatedProgram.itemAttributes = itemAttributes
 
   End Function
 

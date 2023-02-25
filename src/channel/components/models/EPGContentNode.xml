@@ -18,12 +18,13 @@
     <field id="highestRendition" type="string" />
 
     <!-- This field is to avoid access global node in program items.
-    Selected Item Attributes has following formats
+    Item Attributes has following formats
     title : is translated text "Starts at"
     focusedColor : Focused color from constants
     unFocusedColor: unFocused Color from constants
+    EpisodeTitle_IsPreferred: true if episode title needs to be displyed on program tile in EPG.
     -->
-    <field id="selectedItemAttributes" type="assocarray" />
+    <field id="itemAttributes" type="assocarray" />
 
     <!--Variable width of the timeGird = duration * 19.5 populated by programGrid itself-->
     <field id="FHDItemWidth" type="float"/>

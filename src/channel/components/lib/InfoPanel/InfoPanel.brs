@@ -64,6 +64,7 @@ Function init()
   m.top.observeFieldScoped("starring", "onStarringChange")
   m.top.observeFieldScoped("needsLogin", "onNeedsLoginChange")
   m.top.observeFieldScoped("reminderIsSet", "onReminderChange")
+  m.top.observeFieldScoped("episodeTitle","onEpisodeTitleChange")
   m.top.observeFieldScoped("fullscreenCountdown", "onPlayerCountDownChange")
   m.top.observeFieldScoped("calculateHeight", "onCalculateHeight")
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
@@ -136,23 +137,24 @@ End Function
 ' setting each width here so that the children don't go beyond the right edge.
 Function onWidthChange()
   tubiLog("InfoPanel.onWidthChange")
+  topWidth = m.top.width
 
   if m.title.width <> 0
     '//if the title is set to 0, then we do not want to make changes to the width of the title
-    m.title.width = m.top.width - m.title.translation[0]
+    m.title.width = topWidth - m.title.translation[0]
   end if
 
-  m.episode.width = m.top.width - m.episode.translation[0]
-  m.line2.width = m.top.width - m.twoLineInfo.translation[0]
+  m.episode.width = topWidth - m.episode.translation[0]
+  m.line2.width = topWidth - m.twoLineInfo.translation[0]
 
   ' The description text needs a right margin which matches its left margin
-  m.description.width = m.top.width - 2 * m.description.translation[0]
+  m.description.width = topWidth - 2 * m.description.translation[0]
   ' Reduce the director width based on "Direct by..." prefix
   directorPrefixBoundingRect = m.top.findNode("DirectorPrefix").boundingRect()
-  m.director.width = m.top.width - directorPrefixBoundingRect.width + m.directorGroup.itemSpacings[0] - m.directorGroup.translation[0]
+  m.director.width =topWidth - directorPrefixBoundingRect.width + m.directorGroup.itemSpacings[0] - m.directorGroup.translation[0]
   starringPrefixBoundingRect = m.top.findNode("StarringPrefix").boundingRect()
-  m.starring.width = m.top.width - starringPrefixBoundingRect.width + m.starringGroup.itemSpacings[0] - m.starringGroup.translation[0]
-  m.descriptionFocusButton.width = m.top.width + -m.descriptionGroup.translation[0]
+  m.starring.width = topWidth - starringPrefixBoundingRect.width + m.starringGroup.itemSpacings[0] - m.starringGroup.translation[0]
+  m.descriptionFocusButton.width = topWidth + -m.descriptionGroup.translation[0]
 End Function
 
 
@@ -169,6 +171,24 @@ Function onLeftHeaderImageUriChange(msg)
     m.leftHeaderImage.uri = m.top.leftHeaderImageUri
   else if leftHeaderIsPresent = true
     m.infoPanelGroup.removeChild(m.leftHeaderImage)
+  end if
+End Function
+
+
+Function onEpisodeTitleChange(msg)
+  tubiLog("InfoPanel.onEpisodeTitleChange")
+
+  episodeTitle = msg.getData()
+  episodeIsPresent = (m.episode.getParent() <> invalid)
+
+  if isNonEmptyString(episodeTitle) = true
+    if episodeIsPresent = false
+      programEpisodeIndex = m.nodeHelpers.getChildIndex(m.offset, m.title) + 1
+      m.offset.insertChild(m.episode, programEpisodeIndex)
+    end if
+    m.episode.text = episodeTitle
+  else if episodeIsPresent = true
+      m.offset.removeChild(m.episode)
   end if
 End Function
 
@@ -830,7 +850,6 @@ Function onModeChange()
     m.topHeaderImage.height = 72
     m.topHeaderImage.width = 72
     m.offset.appendChild(m.title)
-    m.offset.appendChild(m.episode)
     m.offset.appendChild(m.twoLineInfo)
 
     m.twoLineInfo.appendChild(m.firstLineGroup)
