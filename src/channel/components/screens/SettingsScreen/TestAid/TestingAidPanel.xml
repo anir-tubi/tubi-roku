@@ -7,6 +7,7 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/screens/ModalDialogs.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -53,6 +54,9 @@
             <CheckButtonContentNode
               id="clearRegistry"
               title="Clear Registry"/>
+            <CheckButtonContentNode
+              id="showEnabledExp"
+              title="Show Enabled Experiments"/>
           </ContentNode>
         </MarkupList>
 

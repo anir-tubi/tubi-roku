@@ -5,14 +5,23 @@
 <script type="text/brightscript" uri="ScrollingDialog.brs"/>
 <interface>
   <field id="text" alias="textItem.text"/>
+  <field id="title" alias="primaryTitle.primaryTitle" />
 </interface>
+
 <children>
-  <StdDlgTitleArea primaryTitle="Registry" />
+  <StdDlgTitleArea
+    id="primaryTitle"
+    primaryTitle="Registry" />
   <StdDlgContentArea>
-      <StdDlgMultiStyleTextItem id="textItem" scrollable="true" text="NO DATA"/>
+      <StdDlgMultiStyleTextItem
+      id="textItem"
+      scrollable="true"
+      text="NO DATA"/>
   </StdDlgContentArea>
-  <StdDlgButtonArea id="buttonArea" >
-    <StdDlgButton text="Close" />
+  <StdDlgButtonArea
+    id="buttonArea" >
+    <StdDlgButton
+      text="Close" />
   </StdDlgButtonArea>
 </children>
 

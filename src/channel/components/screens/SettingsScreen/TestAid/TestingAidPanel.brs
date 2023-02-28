@@ -1,5 +1,6 @@
 Function init()
   m.constants = getConstantsFromGlobal()
+  m.experiments = TubiExperiments(m.constants)
   m.top.selectButtonMovesPanelForward = true
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
   m.top.observeFieldScoped("isLoading", "onIsLoading")
@@ -17,6 +18,10 @@ Function init()
     m.Menu.focusBitmapUri = "pkg:/images/menu-focus-hd.9.png"
     m.Menu.focusFootprintBitmapUri = "pkg:/images/menu-footprint-hd.9.png"
   end if
+
+  title = m.top.findNode("title")
+  title.text = "Testing Aid Config for: " + m.constants.settings.mode
+
 
   m.Menu.observeFieldScoped("itemSelected", "onTestingAidPanelItemSelected")
   m.Menu.observeFieldScoped("itemFocused", "onItemFocused")
@@ -37,6 +42,9 @@ Function onItemFocused(msg)
     m.infoArea.text = "Current Registry values are printed by each section. Press OK to see full registry."
   else if buttonFocused = 1
     m.infoArea.text = "It will delete all the registry values and restart the app."
+  else if buttonFocused = 2
+    enabledExperiments = getEnabledExperiments()
+    m.infoArea.text = "Experiments enabled:" + chr(10) + chr(10) + enabledExperiments
   end if
 
 End Function
@@ -63,6 +71,8 @@ Function onTestingAidPanelItemSelected(msg)
     showRegistryValues()
   else if item.id = "clearRegistry"
     clearRegistry()
+  else if item.id = "showEnabledExp"
+    showEnabledExperiments()
   end if
 End Function
 
@@ -96,8 +106,33 @@ Function showRegistryValues()
 End Function
 
 
-Function showData(data = "")
+Function getEnabledExperiments()
+
+  enabledExperiments = ""
+  for each expNamespace in m.experiments.defaultResources.keys()
+    for each exp in m.experiments.defaultResources[expNamespace].keys()
+      if m.experiments.defaultResources[expNamespace][exp].enabled = true
+        enabledExperiments = enabledExperiments + exp + chr(10)
+      end if
+    end for
+  end for
+  return enabledExperiments
+End Function
+
+
+Function showEnabledExperiments()
+  print "*******************Enabled Experiments******************************"
+  enabledExperiments = getEnabledExperiments()
+  print enabledExperiments
+  print "-----------------------------------------------------------"
+  showData(enabledExperiments, "Experiments Enabled")
+End Function
+
+
+
+Function showData(data = "", title = "")
   dialog = createObject("roSGNode", "ScrollingDialog")
+  dialog.title = title
   dialog.text = data
   '// TODO: WHEN SCROLLABLE MULTISTYLE TEXT IS AVAILABLE, REMOVE SCROLLINGDIALOG FROM THE CODEBASE AND USE TUBI'S SHOWMODAL() WITH MULTISTYLE TEXT
   m.top.getScene().dialog = dialog
