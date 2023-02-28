@@ -1034,13 +1034,13 @@ End Function
 Function onKeyEvent(key As String, press As Boolean) as Boolean
   tubiLog("DetailScreen.onKeyEvent key = " + key)
   if press then
-    if key = "back" OR (key = "left" AND m.SecondaryMenu.isInFocusChain() = false)
+    if key = "back"
       if not m.top.isWaitingForServerResponse
         m.top.backButtonPressed = true
+        return true
       end if
 
-      return true
-      ' Down presses arrive here if not consumed by the menu, meaning it's already at the bottom button
+    ' Down presses arrive here if not consumed by the menu, meaning it's already at the bottom button
     else if key = "down"
       if m.Menu.isInFocusChain() = true AND m.RelatedContentParentGroup.visible = true AND m.RelatedContentGroup.visible = true then
         focusRelated()
@@ -1074,11 +1074,16 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       m.top.toggleOffButtonValue = focusedItem.analyticsButtonValue
       focusSecondaryMenu()
       return true
-    else if key = "left" AND m.SecondaryMenu.isInFocusChain() = true
-      focusedItem = m.SecondaryMenu.content.getChild(m.SecondaryMenu.itemFocused)
-      m.top.toggleOffButtonValue = focusedItem.analyticsButtonValue
-      focusMenu()
-      return true
+    else if key = "left"
+      if m.SecondaryMenu.isInFocusChain() = false AND m.RelatedGrid.isInFocusChain() = false
+        m.top.backButtonPressed = true
+        return true
+      else if m.SecondaryMenu.isInFocusChain() = true
+        focusedItem = m.SecondaryMenu.content.getChild(m.SecondaryMenu.itemFocused)
+        m.top.toggleOffButtonValue = focusedItem.analyticsButtonValue
+        focusMenu()
+        return true
+      end if
     end if
 
   end if
