@@ -850,6 +850,7 @@ Function onModeChange()
     m.topHeaderImage.height = 72
     m.topHeaderImage.width = 72
     m.offset.appendChild(m.title)
+    m.offset.appendChild(m.episode)
     m.offset.appendChild(m.twoLineInfo)
 
     m.twoLineInfo.appendChild(m.firstLineGroup)
