@@ -603,7 +603,6 @@ Function handleSkipVideo(amt, isProgressBarFocused)
   if m.VideoState <> "skip"
     m.Video.control = "pause"
 
-    m.PlayPauseButton.uri = m.buttonUris.play
     'Only hide the button, don't clear the button so that the button will be shown again
     'if the transport is shown during playback between the intro or other skippable cuepoints'
     hideSkipCuepointsButton(m.top)
@@ -624,9 +623,13 @@ Function handleSkipVideo(amt, isProgressBarFocused)
     updateVideoState("skip")
   end if
 
-  if isProgressBarFocused <> true
+  if m.HUD.opacity < 1.0
     showTransport()
-    m.PlayPauseButton.uri = m.buttonUris.play
+  end if
+
+  m.PlayPauseButton.uri = m.buttonUris.play
+
+  if isProgressBarFocused <> true
     setFocusedButton(m.ProgressBar)
   end if
   showThumbnail()
