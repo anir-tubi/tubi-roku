@@ -189,6 +189,7 @@ Function onJumpToLinearChannelID()
       item = m.programGrid.content.getchild(i)
       if item.id = m.top.jumpToLinearChannelID[0]
         m.programGrid.jumpToRowItem = [i , 0]
+        m.programGrid.itemFocused = i
         if item <> invalid AND item.getChildCount() > 0
           program = item.getChild(0)
           m.top.linearChannelFocused = program
