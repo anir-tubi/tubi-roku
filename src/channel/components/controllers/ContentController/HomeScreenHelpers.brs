@@ -577,7 +577,7 @@ Function handleHomeScreenErrorResponse(screenID, response)
       else if screenID = m.constants.ui.screenIds.tvScreen
         errorMessage = getTranslation("screenTv_error_fetchScreenContent_description")
       else
-        if homeScreen.kidsModeFeatureOn = true
+        if isKidsUIOn() = true
           errorMessage = getTranslation("screenKids_error_fetchScreenContent_description")
         else
           errorMessage = getTranslation("screenHome_error_fetchScreenContent_description")
