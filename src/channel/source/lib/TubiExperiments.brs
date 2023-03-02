@@ -63,6 +63,7 @@ Function TubiExperiments(constants) as Object
     getExperimentResource: tubiExperiments_getExperimentResource
     getNamespaceRequest: tubiExperiments_getNamespaceRequest
     handleAsyncNamespaceResponse: tubiExperiments_handleAsyncNamespaceResponse
+    getNamespaceRequestInfo: tubiExperiments_getNamespaceRequestInfo
 
     'private methods
     getNamespaces: tubiExperiments_getNamespaces
@@ -110,9 +111,20 @@ End Function
 ' returns a request object that can be run asynchronously or synchronously - but may return invalid
 ' @reqest: assocArray, a request module as returned by TubiRequest()
 Function tubiExperiments_getNamespaceRequest(request)
+  requestInfo = m.getNamespaceRequestInfo(m.constants)
   expRequest = invalid
+  if requestInfo <> invalid
+    expRequest = request.createAsync(requestInfo.url, requestInfo.requestType)
+  end if
+
+  return expRequest 'may return invalid
+End Function
+
+' returns a request info required for expirements request.
+Function tubiExperiments_getNamespaceRequestInfo(constants)
+  requestInfo = invalid
   namespaces = m.defaultResources
-  url = m.constants.urls.experiments.evaluate + "?request_context.device_id=" + m.constants.deviceInfo.deviceId
+  url = m.constants.urls.experiments.evaluate + "?request_context.device_id=" + constants.deviceInfo.deviceId
 
   nameSpaceQuery = ""
   for each namespace in namespaces
@@ -122,10 +134,14 @@ Function tubiExperiments_getNamespaceRequest(request)
   if Len(nameSpaceQuery) > 0
     '//if no experiments then do not call create request. Just return invalid
     url = url + nameSpaceQuery
-    expRequest = request.createAsync(url, "getExperiment")
+    requestInfo = {
+      url: url
+      requestType: m.constants.reqNames.getNamespaces
+      responseType: "assocarray"
+    }
   end if
 
-  return expRequest 'may return invalid
+  return requestInfo 'may return invalid
 End Function
 
 

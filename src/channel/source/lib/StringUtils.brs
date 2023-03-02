@@ -17,53 +17,6 @@ End Function
 
 
 '''''''''''''''''''
-' formatLengthAsEnglish
-'
-' take an integer length in seconds and give it an English descriptions like "1 h 36 min"
-' ::NOTE:: when calling this function, make sure the calling file is including TubiLanguageTranslate.brs as a dependency
-Function formatLengthAsEnglish(length As Dynamic) As String
-  if type(length) = "roFloat" or type(length) = "Float" or type(length) = "Double" then
-    length = Int(length)
-  end if
-  if type(length) = "Integer" or type(length) = "roInt"
-    hours = length \ 3600
-    minutes = (length mod 3600) \ 60
-    seconds = length mod 60
-    result = ""
-    sTranslationID = invalid
-    if hours = 0 AND minutes = 0 then
-      '//Display just seconds
-      sTranslationID = "metadata_seconds"
-    else
-      if hours > 0 AND minutes > 0
-        '//Display hours AND minutes
-        sTranslationID = "metadata_hoursAndMinutes"
-      else if hours > 0
-        '//Display just hours
-        sTranslationID = "metadata_hours"
-      else
-        '//Display just minutes
-        sTranslationID = "metadata_minutes"
-      end if
-    end if
-
-    if sTranslationID <> invalid
-      aaParams = {
-        hours: stri(hours).trim(),
-        minutes: stri(minutes).trim(),
-        seconds: stri(seconds).trim()
-      }
-      result = getTranslation(sTranslationID, aaParams)
-    end if
-
-    return result
-  else
-    return ""
-  end if
-End Function
-
-
-'''''''''''''''''''
 ' padString
 '
 ' simple left padding of a string with a given character

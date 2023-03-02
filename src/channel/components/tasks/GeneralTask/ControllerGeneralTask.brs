@@ -1,11 +1,7 @@
-' createParsingCallbacks
-'
+
 ' sets requestTypes with various success and error callbacks
 ' add new assocarray (api requestType key & value) into m.requestTypes to handle new api parsing
-Function createParsingCallbacks()
-
-  m.requestTypes = {}
-
+Function registerParsingCallbacks()
   ' generic requests
   m.requestTypes[m.constants.reqNames.generic] = {
     parseSuccess: parseGenericSuccess
@@ -204,29 +200,4 @@ Function createParsingCallbacks()
     parseSuccess: parseAddToQueueSuccess
     parseError: parseAddToQueueError
   }
-
-End Function
-
-
-Function getErrorCodeFromResponse(fullResponse)
-  ' default code
-  errCode = -1235
-
-  if fullResponse <> invalid AND fullResponse.code <> invalid
-    if fullResponse.code >= 200 AND fullResponse.code < 400
-      ' got a valid response code from the server, but there was some other issue with the response
-      errCode = -1237
-    else
-      ' HTTP or Curl code
-      errCode = fullResponse.code
-    end if
-  else
-    deviceInfo = CreateObject("roDeviceInfo")
-    if deviceInfo.GetLinkStatus() = false
-      ' firmware thinks the device does not have internet access
-      errCode = -1236
-    end if
-  end if
-
-  return errCode
 End Function

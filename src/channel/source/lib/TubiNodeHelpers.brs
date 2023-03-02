@@ -12,7 +12,6 @@ Function TubiNodeHelpers()
     immutableRemoveChildIndex: tubiNodeHelpers_immutableRemoveChildIndex
     immutableRemoveChild: tubiNodeHelpers_immutableRemoveChild
     countNodes: tubiNodeHelpers_countNodes
-    getArrayInterfaceTypes: tubiNodeHelpers_getArrayInterfaceTypes
   }
 End Function
 
@@ -207,18 +206,3 @@ Function tubiNodeHelpers_countNodes(node, depth = 0)
   return nodeCount
 End Function
 
-
-' returns an AA of all the interface types that are arrays (not including a single vector2D)
-Function tubiNodeHelpers_getArrayInterfaceTypes()
-  return {
-    "floatarray": true
-    "intarray": true
-    "boolarray": true
-    "stringarray": true
-    "vector2darray": true
-    "colorarray": true
-    "timearray": true
-    "nodearray": true
-    "array": true
-  }
-End Function

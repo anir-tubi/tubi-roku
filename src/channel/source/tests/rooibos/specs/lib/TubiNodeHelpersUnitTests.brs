@@ -314,21 +314,3 @@ Function tubiNodeHelpersTest_generateNodeTree(x, y)
   return parent
 End Function
 
-
-'@Test getArrayInterfaceTypes unit tests
-Function tubiNodeHelpers_getArrayInterfaceTypes_test()
-  arrayInterfaceTypes = m.nodeHelpers.getArrayInterfaceTypes()
-  m.AssertNotInvalid(arrayInterfaceTypes.floatarray)
-  m.AssertNotInvalid(arrayInterfaceTypes.intarray)
-  m.AssertNotInvalid(arrayInterfaceTypes.boolarray)
-  m.AssertNotInvalid(arrayInterfaceTypes.stringarray)
-  m.AssertNotInvalid(arrayInterfaceTypes.vector2darray)
-  m.AssertNotInvalid(arrayInterfaceTypes.colorarray)
-  m.AssertNotInvalid(arrayInterfaceTypes.timearray)
-  m.AssertNotInvalid(arrayInterfaceTypes.nodearray)
-  m.AssertNotInvalid(arrayInterfaceTypes.array)
-  m.AssertInvalid(arrayInterfaceTypes.otherarray)
-  m.AssertInvalid(arrayInterfaceTypes.node)
-  m.AssertInvalid(arrayInterfaceTypes.string)
-  m.AssertInvalid(arrayInterfaceTypes.boolean)
-End Function

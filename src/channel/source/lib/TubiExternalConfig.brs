@@ -12,6 +12,7 @@ Function TubiExternalConfig(request as Object, constants as Object) as Object
     init: tubiExternalConfig_init
     getConfigsRequest: tubiExternalConfig_getConfigsRequest
     parseConfigs: tubiExternalConfig_parseConfigs
+    getConfigsRequestInfo: tubiExternalConfig_getConfigsRequestInfo
 
     ' private methods
     getConfigs: tubiExternalConfig_getConfigs_
@@ -62,7 +63,14 @@ End Function
 
 
 Function tubiExternalConfig_getConfigsRequest(request, constants)
-  url = constants.urls.userDevice.config
+  requestInfo = m.getConfigsRequestInfo(constants)
+
+  return request.createAsync(requestInfo.url, requestInfo.requestType, requestInfo.options)
+End Function
+
+
+' Returns of assoc array containing info related to get config request.
+Function tubiExternalConfig_getConfigsRequestInfo(constants)
   options = {
     params: {
       "device_id": constants.deviceInfo.deviceId
@@ -70,7 +78,13 @@ Function tubiExternalConfig_getConfigsRequest(request, constants)
     headers:{}
   }
   options.headers.append(constants.headers.commonUapi)
-  return request.createAsync(url, "getExternalConfigs", options)
+
+  return {
+    url: constants.urls.userDevice.config
+    requestType: constants.reqNames.getExternalConfigs
+    responseType: "assocarray"
+    options: options
+  }
 End Function
 
 

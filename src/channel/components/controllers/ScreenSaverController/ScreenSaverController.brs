@@ -11,7 +11,7 @@ Function init()
 
   m.guestUserHasAgeInfo = m.auth.getGuestUserHasAgeInfo()
 
-  generalTask = createObject("roSGNode", "GeneralTask") ' initiate GeneralTask
+  generalTask = createObject("roSGNode", "ControllerGeneralTask") ' initiate GeneralTask
   ' Initiate GeneralTaskModule by passing caller context.
   ' Calling GeneralTaskModule() will append methods to the local m.
   ' DO NOT overwrite m variable methods/properties which belongs to GeneralTaskModule.

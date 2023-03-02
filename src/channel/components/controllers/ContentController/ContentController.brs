@@ -18,7 +18,7 @@ Function init()
   m.mainTask = createObject("roSGNode", "MainTask") ' initiate MainTask
   m.mainTask.observeFieldScoped("isHdmiStatusOk", "onIsHdmiStatusOkChange")
 
-  generalTask = createObject("roSGNode", "GeneralTask") ' initiate GeneralTask
+  generalTask = createObject("roSGNode", "ControllerGeneralTask") ' initiate GeneralTask
 
   ' Initiate GeneralTaskModule by passing caller context.
   ' Calling GeneralTaskModule() will append methods to the local m.

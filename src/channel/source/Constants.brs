@@ -268,7 +268,9 @@ Function getConstants()
     constants.reqNames.getTournamentScreen = "getTournamentScreen"
     constants.reqNames.getScreenSaverContainer = "getScreenSaverContainer"
     constants.reqNames.getScreenSaverHomeScreenContainerIds = "getScreenSaverHomeScreenContainerIds"
-
+    constants.reqNames.getNamespaces = "getNamespaces"
+    constants.reqNames.getExternalConfigs = "getExternalConfigs"
+    
     ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getQueue] = true

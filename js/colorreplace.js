@@ -20,7 +20,7 @@ function findAndReplaceColorConstantsInFiles(aaListOfColors, files) {
 
       if (data !== originalData){
         //if the data has changed, then replace the file with the new data
-        log(`Color constants have been changed in the file: $(file}`);
+        log(`Color constants have been changed in the file: ${file}`);
         fs.writeFileSync(file, data, 'utf-8');
       }
 

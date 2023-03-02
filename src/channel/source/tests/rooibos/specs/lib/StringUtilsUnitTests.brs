@@ -68,17 +68,6 @@ Function stringUtils_formatLengthAsTimestamp_test()
   end for
 End Function
 
-
-'@Test formatLengthAsEnglish unit tests
-Function stringUtils_formatLengthAsEnglish_test()
-  m.AssertEqual(formatLengthAsEnglish(invalid), "")
-  m.AssertEqual(formatLengthAsEnglish(60), "1 min")
-  m.AssertEqual(formatLengthAsEnglish(123.45), "2 min")
-  m.AssertEqual(formatLengthAsEnglish(3610), "1 h")
-  m.AssertEqual(formatLengthAsEnglish(3660), "1 h 1 min")
-End Function
-
-
 '@Test capitalize unit tests
 Function stringUtils_capitalize_test()
   m.AssertEqual(capitalize("lowercase"), "Lowercase")

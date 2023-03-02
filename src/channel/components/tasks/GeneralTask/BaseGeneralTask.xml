@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="BaseGeneralTask" extends="Task">
+    <script type="text/brightscript" uri="BaseGeneralTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+
+    <interface>
+      <field id="request" type="assocarray" />
+      <field id="batchRequest" type="assocarray" />
+      <field id="cancel" type="assocarray" />
+    </interface>
+</component>

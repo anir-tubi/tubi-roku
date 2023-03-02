@@ -8,20 +8,19 @@ Function init()
     processAnimationLogo()
   end if
 
-  m.hasExperiments = false
-  m.hasRemoteConfigs = false
-  m.experimentsTask = m.top.createChild("ExperimentsTask")
-  m.experimentsTask.observeField("experimentsInfo", "onExperimentsInfoReturned")
-  m.experimentsTask.observeField("externalConfigInfo", "onExternalConfigInfoReturned")
-  m.experimentsTask.constants = m.constants
-  m.experimentsTask.control = "RUN"
-
+  m.isExperimentConfigReady = false
+  m.isExternalConfigReady = false
   m.top.observeField("getUrl", "onUrlRequest")
+
+  starterTask = createObject("roSGNode", "StarterGeneralTask") ' initiate StarterTask
+  GeneralTaskModule(m, starterTask)
+  sendRequestForExperimentsAndConfig()
 End Function
 
 
-Function onUrlRequest()
-  if m.top.getUrl = true AND m.hasExperiments = true AND m.hasRemoteConfigs = true
+' Proceed with loading comp lib after experiments and external config is ready for use.
+Function checkIfExperimentAndRemoteConfigReadyAndProceed()
+  if m.top.getUrl = true AND m.isExperimentConfigReady = true AND m.isExternalConfigReady = true
     'Handle any remote config updates here:
     'Let youbora be enabled by the remote config
 
@@ -63,25 +62,66 @@ Function onUrlRequest()
 End Function
 
 
-Function onExperimentsInfoReturned(msg)
-  m.constants.experiments.info = msg.getData()
-  m.experiments = TubiExperiments(m.constants)
-  m.hasExperiments = true
-  onUrlRequest()
-End Function
+' Performs network request to get experiments and external config.
+Function sendRequestForExperimentsAndConfig()
+  constants = m.constants
+  request = TubiRequest(constants.settings)
+  externalConfig = TubiExternalConfig(request, constants)
+  experiments = TubiExperiments(constants)
 
-
-Function onExternalConfigInfoReturned(msg)
-  m.constants.externalConfig.info = msg.getData()
-  if m.constants.externalConfig.info <> invalid
-    if m.constants.externalConfig.info.country <> invalid AND m.constants.externalConfig.info.country <> ""
-      m.constants.deviceInfo.countryCode = UCase(m.constants.externalConfig.info.country)
-    end if
+  experimentsRequest = experiments.getNamespaceRequestInfo(constants)
+  if experimentsRequest <> invalid
+    experimentsRequest.successCallback = onExperimentsRequestSuccess
+    experimentsRequest.errorCallback = onExperimentsRequestFailure
+    m.makeRequest(experimentsRequest)
+  else
+    ' If there are no namespaces then skip the request.
+    m.isExperimentConfigReady = true
   end if
 
-  m.hasRemoteConfigs = true
-  onUrlRequest()
+  externalConfigRequestInfo = externalConfig.getConfigsRequestInfo(constants)
+  externalConfigRequestInfo.successCallback = onExternalConfigRequestSuccess
+  externalConfigRequestInfo.errorCallback = onExternalConfigRequestFailure
+  m.makeRequest(externalConfigRequestInfo)
 End Function
+
+
+' Callback triggered once the experiments request is successful.
+Function onExperimentsRequestSuccess(experimentInfo)
+  m.constants.experiments.info = experimentInfo
+  m.isExperimentConfigReady = true
+  checkIfExperimentAndRemoteConfigReadyAndProceed()
+End Function
+
+
+' Callback triggered if the experiment request fails.
+Function onExperimentsRequestFailure(_responses)
+  ' Continue using the local defaults.
+  m.isExperimentConfigReady = true
+  checkIfExperimentAndRemoteConfigReadyAndProceed()
+End Function
+
+
+' Callback triggered once the config request is successful.
+Function onExternalConfigRequestSuccess(config)
+  if config <> invalid
+    if config.country <> invalid AND config.country <> ""
+      m.constants.deviceInfo.countryCode = UCase(config.country)
+    end if
+    m.constants.externalConfig.info = config
+  end if
+  
+  m.isExternalConfigReady = true
+  checkIfExperimentAndRemoteConfigReadyAndProceed()
+End Function
+
+
+' Callback triggered once the config request is fails.
+Function onExternalConfigRequestFailure(_error)
+  m.isExternalConfigReady = true
+  checkIfExperimentAndRemoteConfigReadyAndProceed()
+End Function
+
 
 Function processAnimationLogo()
 

@@ -351,12 +351,7 @@ End Function
 ' helper function to determine if the successResponseType is valid for a batch response.
 Function generalTask_isValidBatchResponseType(responseType)
   if isString(responseType) = true then
-    nodeHelpers = m.NodeHelpers
-    if nodeHelpers = invalid AND isFunction(TubiNodeHelpers) = true then
-      nodeHelpers = TubiNodeHelpers()
-    end if
-
-    arrayTypes = nodeHelpers.getArrayInterfaceTypes()
+    arrayTypes = getArrayInterfaceTypes()
 
     responseType = Lcase(responseType)
     if arrayTypes[responseType] <> invalid or responseType = "node" or responseType = "assocarray"
@@ -365,4 +360,20 @@ Function generalTask_isValidBatchResponseType(responseType)
   end if
 
   return false
+End Function
+
+
+' returns an AA of all the interface types that are arrays (not including a single vector2D)
+Function getArrayInterfaceTypes()
+  return {
+    "floatarray": true
+    "intarray": true
+    "boolarray": true
+    "stringarray": true
+    "vector2darray": true
+    "colorarray": true
+    "timearray": true
+    "nodearray": true
+    "array": true
+  }
 End Function

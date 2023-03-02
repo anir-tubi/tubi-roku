@@ -67,3 +67,33 @@ Function tubiExternalConfig_initFailed_test()
   m.assertNotInvalid(constants.externalConfig.info)
   m.assertEqual(constants.externalConfig.info, defaultConfig)
 End Function
+
+
+'@Test getConfigsRequestInfo unit tests
+Function tubiExternalConfig_getConfigsRequestInfo_test()
+  requestInfo = m.config.getConfigsRequestInfo(m.constants)
+  options = requestInfo.options
+  m.assertNotInvalid(options)
+
+  if options <> invalid
+    params = options.params
+    m.assertNotInvalid(params)
+    if params <> invalid
+      m.assertNotEmpty(params.device_id)
+    end if
+
+    headers = options.headers
+    m.assertNotInvalid(headers)
+
+    if headers <> invalid
+      m.assertNotEmpty(headers["x-client-platform"])
+      m.assertNotEmpty(headers["x-client-version"])
+      m.assertNotEmpty(headers["Accept-Language"])
+    end if
+  end if
+
+  m.assertNotInvalid(options)
+  m.assertNotInvalid(requestInfo.url)
+  m.assertEqual(requestInfo.requestType, "getExternalConfigs")
+  m.assertEqual(requestInfo.responseType, "assocarray")
+End Function

@@ -1342,7 +1342,7 @@ Function updateVideoPlayerState(content) as Void
       if episodeTitleText.len() > 0
         episodeTitleText = episodeTitleText + Chr(&hb7) + " "
       end if
-      episodeTitleText = episodeTitleText + formatLengthAsEnglish(content.length) + " "
+      episodeTitleText = episodeTitleText + formatLengthSelectedLocale(content.length) + " "
     end if
     episodeTitle.text = "" '.matchTime + " . " + episodeTitleText
   else

@@ -88,3 +88,12 @@ Function tubiExperiments_initFailed_test()
   m.assertInvalid(trackinfo)
   m.assertInvalid(moreinfo)
 End Function
+
+
+'@Test getNamespaceRequestInfo unit tests
+Function tubiExperiments_getNamespaceRequestInfo_test()
+  requestInfo = m.experiments.getNamespaceRequestInfo(m.constants)
+  m.assertNotInvalid(requestInfo.url)
+  m.assertEqual(requestInfo.requestType, "getNamespaces")
+  m.assertEqual(requestInfo.responseType, "assocarray")
+End Function

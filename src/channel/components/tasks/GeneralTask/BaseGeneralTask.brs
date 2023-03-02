@@ -1,10 +1,13 @@
 'General long running task which handles the api request & response, success and error callbacks
 Function init()
   m.port = createObject("roMessagePort")
+  ' Setting up observers for the request and batch request fields.
   m.top.observeField("request", m.port)
   m.top.observeField("batchRequest", m.port)
   m.top.observeField("cancel", m.port)
   m.constants = getConstantsFromGlobal()
+  ' Creating a scope variable that will be overriden by each sub task 
+  m.requestTypes = {}
   ' We store a local copy of the translations so we don't have to do a rendezvous each time we request a translation during parsing
   m.translationAA = getFieldFromGlobal("translationAA")
   m.top.functionName = "listen"
@@ -17,11 +20,9 @@ End Function
 ' this task listens for new request in port and makes api request & response calls
 Function listen()
   tubiLog("GeneralTask.listen loop started")
-  m.nodeHelpers = TubiNodeHelpers()
 
   ' Ready the translator
-  experiments = TubiExperiments(m.constants)
-  m.metadataTranslate = TubiMetadataTranslate(m.constants, experiments)
+  m.experiments = TubiExperiments(m.constants)
 
   ' batchStore helps to store containers responses as batches
   m.batchStore = {}
@@ -43,9 +44,13 @@ Function listen()
       '}
 
   m.jobStore = {}
-  m.requestTypes = {}
   m.backedOffJobs = {}
-  createParsingCallbacks()
+  m.requestTypes = {}
+
+  ' calling method to register parsing callbacks
+  registerParsingCallbacks()
+  
+  ' Calling register parsing callback which will be overridden by every sub tasks.
 
   m.requestModule = Request(m.constants.settings)
   m.auth = TubiAuth(m.constants, m.requestModule)
@@ -377,7 +382,7 @@ Function accumulateBatchResponse(job, parsedResponse) as Void
         ' batchResponseAccumulator is already an AA, so no need to re-arrange anything
         batchResponse = batchResponseAccumulator
 
-      else if m.nodeHelpers.getArrayInterfaceTypes()[batchResponseType] = true
+      else if m.getArrayInterfaceTypes()[batchResponseType] = true
         ' batch response type is one of the various field array types
         batchResponse = []
 
@@ -521,4 +526,35 @@ Function isEmptyField(fieldValue)
   end if
 
   return fieldIsEmpty
+End Function
+
+
+
+Function getErrorCodeFromResponse(fullResponse)
+  ' default code
+  errCode = -1235
+
+  if fullResponse <> invalid AND fullResponse.code <> invalid
+    if fullResponse.code >= 200 AND fullResponse.code < 400
+      ' got a valid response code from the server, but there was some other issue with the response
+      errCode = -1237
+    else
+      ' HTTP or Curl code
+      errCode = fullResponse.code
+    end if
+  else
+    deviceInfo = CreateObject("roDeviceInfo")
+    if deviceInfo.GetLinkStatus() = false
+      ' firmware thinks the device does not have internet access
+      errCode = -1236
+    end if
+  end if
+
+  return errCode
+End Function
+
+
+' Creating a defualt method which will be overridden by sub tasks.
+Function registerParsingCallbacks()
+  m.requestTypes = {}
 End Function

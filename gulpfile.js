@@ -8,7 +8,6 @@ const { server, serverClose } = require('gulp-connect');
 const filter = require('gulp-filter');
 const zip = require('gulp-zip');
 const mocha = require('gulp-mocha');
-const mergeStream = require('merge-stream');
 const log = require('fancy-log');
 const mkdirp = require('mkdirp');
 const prompts = require('prompts');
@@ -146,7 +145,8 @@ function buildInstalled() {
       '!src/channel/**/.DS_Store',
       '!src/channel/**/*.md',
       '!src/channel/components/controllers/StarterController/**',
-      '!src/channel/components/tasks/ExperimentsTask/**',
+      '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.xml',
+      '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.brs',
       '!src/channel/components/tasks/AnalyticsTask/**',
     ];
 
@@ -200,97 +200,134 @@ function buildInstalled() {
 function buildStarter() {
   const minorBuildTag = getBuildTag('minor');
 
-  let build = new Promise((res, rej) => {
-    /* Installed bundle */
-    mkdirp.sync(`${process.env.PWD}/build/starter/source`);
+  mkdirp.sync(`${process.env.PWD}/build/starter/source`);
 
-    // touch the main.brs, can be empty for starter components
-    fs.closeSync(fs.openSync('build/starter/source/main.brs', 'w'));
+  // touch the main.brs, can be empty for starter components
+  fs.closeSync(fs.openSync('build/starter/source/main.brs', 'w'));
 
-    // include StarterController in starter components
-    let starterControllerSrc = [
-      'src/channel/components/controllers/StarterController/**/*',
-    ];
-    let starterControllerSrcOptions = {
-      base: 'src/channel/components'
-    };
+  // include StarterController in starter components
+  let starterControllerSrc = [
+    'src/channel/components/controllers/StarterController/**/*'
+  ];
+  let starterControllerSrcOptions = {
+    base: 'src/channel/components'
+  };
 
-    // include ExperimentsTask in starterComponents
-    let experimentsTaskSrc = [
-      'src/channel/components/tasks/ExperimentsTask/**/*'
-    ];
-    let experimentsTaskSrcOptions = {
-      base: 'src/channel/components'
-    };
+  // include GeneralTask in starterComponents
+  let generalTaskSrc = [
+    'src/channel/components/tasks/GeneralTask/BaseGeneralTask.xml',
+    'src/channel/components/tasks/GeneralTask/BaseGeneralTask.brs',
+    'src/channel/components/tasks/GeneralTask/StarterGeneralTask.xml',
+    'src/channel/components/tasks/GeneralTask/StarterGeneralTask.brs',
+    'src/channel/components/tasks/GeneralTask/Parsers/TubiExperimentParsers.brs',
+    'src/channel/components/tasks/GeneralTask/Parsers/UncategorizedParsers.brs',
+  ];
+  let generalTaskSrcOptions = {
+    base: 'src/channel/components'
+  };
 
-    // include Constants in starter components
-    let constantsSrc = [
-      'src/channel/source/Constants.brs'
-    ];
-    let constantsSrcOptions = {
-      base: 'src/channel'
-    };
+  // include Constants in starter components
+  let constantsSrc = [
+    'src/channel/source/Constants.brs'
+  ];
+  let constantsSrcOptions = {
+    base: 'src/channel'
+  };
 
-    // include generalUtils in starterComponents
-    let genUtilSrc = [
-      'src/channel/source/3rdparty/roku/generalUtils.brs'
-    ];
-    let genUtilSrcOptions = {
-      base: 'src/channel/source'
-    };
+  // include generalUtils in starterComponents
+  let genUtilSrc = [
+    'src/channel/source/3rdparty/roku/generalUtils.brs',
+    'src/channel/source/3rdparty/rta/typeUtils.brs',
+    'src/channel/source/3rdparty/rodash/rodash.cat.brs'
+  ];
+  let genUtilSrcOptions = {
+    base: 'src/channel/source'
+  };
 
-    // include TubiExperiments, TubiExternalConfig, and Request modules in starterComponents
-    let sourceLibsSrc = [
-      'src/channel/source/lib/Request.brs',
-      'src/channel/source/lib/Log.brs',
-      'src/channel/source/lib/TubiExperiments.brs',
-      'src/channel/source/lib/TubiExternalConfig.brs',
-      'src/channel/source/lib/TubiTracking.brs',
-      'src/channel/source/3rdparty/rta/typeUtils.brs',
-      'src/channel/source/3rdparty/rodash/rodash.cat.brs',
-      'src/channel/source/lib/TimeOffsetUtils.brs'
-    ];
-    let sourceLibsSrcOptions = {
-      base: 'src/channel/source'
-    };
+  // include TubiExperiments, TubiExternalConfig, and Request modules in starterComponents
+  let sourceLibsSrc = [
+    'src/channel/source/lib/GeneralTaskModule.brs',
+    'src/channel/source/lib/Auth.brs',
+    'src/channel/source/lib/Request.brs',
+    'src/channel/source/lib/Log.brs',
+    'src/channel/source/lib/TubiExperiments.brs',
+    'src/channel/source/lib/TubiExternalConfig.brs',
+    'src/channel/source/lib/TubiTracking.brs',
+    'src/channel/source/lib/TimeOffsetUtils.brs',
+    'src/channel/source/lib/StringUtils.brs'
+  ];
+  let sourceLibsSrcOptions = {
+    base: 'src/channel/source'
+  };
 
-    // include AnimationMixin in starterComponents
-    let componentLibSrc = [
-      'src/channel/components/lib/AnimationMixin.brs',
-    ];
-    let componentLibSrcOptions = {
-      base: 'src/channel/components'
-    };
+  // include Mixin in starterComponents
+  let componentLibSrc = [
+    'src/channel/components/lib/AnimationMixin.brs',
+    'src/channel/components/lib/GlobalMixin.brs'
+  ];
+  let componentLibSrcOptions = {
+    base: 'src/channel/components'
+  };
+  
+  // Creating a list that holds all the sub tasks.
+  const subTaskPaths = [
+    {
+      src: starterControllerSrc,
+      options: starterControllerSrcOptions,
+      dest: 'build/starter/components'
+    },
+    {
+      src: constantsSrc,
+      options: constantsSrcOptions,
+      dest: 'build/starter/'
+    },
+    {
+      src: genUtilSrc,
+      options: genUtilSrcOptions,
+      dest: 'build/starter/source'
+    },
+    {
+      src: sourceLibsSrc,
+      options: sourceLibsSrcOptions,
+      dest: 'build/starter/source'
+    },
+    {
+      src: componentLibSrc,
+      options: componentLibSrcOptions,
+      dest: 'build/starter/components'
+    },
+    {
+      src: generalTaskSrc,
+      options: generalTaskSrcOptions,
+      dest: 'build/starter/components'
+    }
+  ]
 
-    //move all the necessary starter component files to the build/starter directory
-    let stream = mergeStream(
-      collect(starterControllerSrc, starterControllerSrcOptions)
-        .pipe(dest('build/starter/components/')),
-      collect(experimentsTaskSrc, experimentsTaskSrcOptions)
-        .pipe(dest('build/starter/components/')),
-      collect(constantsSrc, constantsSrcOptions)
-        .pipe(dest('build/starter/')),
-      collect(genUtilSrc, genUtilSrcOptions)
-        .pipe(dest('build/starter/source')),
-      collect(sourceLibsSrc, sourceLibsSrcOptions)
-        .pipe(dest('build/starter/source')),
-      collect(componentLibSrc, componentLibSrcOptions)
-        .pipe(dest('build/starter/components'))
-    );
-
-    stream.on('finish', () => {
-      res();
+  // Loops through each item in the sub task and creates individual promises.
+  const promises = []
+  subTaskPaths.forEach(subTaskPath => {
+    // Creating promise and adding it to the promises array.
+    // Each task promises will be resolved or rejected.
+    let stream = new Promise((resolve, reject) => {
+      collect(subTaskPath.src, subTaskPath.options).pipe(dest(subTaskPath.dest))
+        .on('finish', () => {
+          resolve();
+        })
+        .on('error', () => {
+          reject();
+        })
     })
-  })
-
-  // then zip up the starter component files after all the files have been moved
-  return build
-  .then(() => {
-    replaceColorConstants("build/starter");
-    createSettings(options, 'build/starter/source/Settings.brs');
-    createManifest(options, 'build/starter/manifest', 'starter_library_manifest');
-    return zipAsPromise('build/starter/**/*', `tubi_starter_components_${minorBuildTag}.zip`, 'build/');
+    // Pushing the promise to list.
+    promises.push(stream)
   });
+  // Adding a promies all which will make sure that success callback will be triggered only after all file moving is completed.
+  return Promise.all(promises)
+    .then(() => {
+      replaceColorConstants("build/starter");
+      createSettings(options, 'build/starter/source/Settings.brs');
+      createManifest(options, 'build/starter/manifest', 'starter_library_manifest');
+      return zipAsPromise('build/starter/**/*', `tubi_starter_components_${minorBuildTag}.zip`, 'build/');
+    })
 };
 
 
@@ -314,16 +351,18 @@ function buildRemote() {
       //make sure not to include the following files
       '!src/channel/components/tests/**',
       '!src/channel/components/controllers/StarterController/**',
+      '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.xml',
+      '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.brs',
       '!src/channel/components/controllers/TubiScene/**',
       '!src/channel/components/controllers/TubiScreenSaverScene/**',
       '!src/channel/components/controllers/BackgroundScene/**',
-      '!src/channel/components/tasks/ExperimentsTask/**',
       '!src/channel/components/tasks/AnalyticsTask/**',
       '!src/channel/source/3rdparty/roku/NotesOnRokuTestFramework.brs',
       '!src/channel/source/3rdparty/roku/UnitTestFramework.brs',
       '!src/channel/source/tests/**',
       '!src/channel/source/Settings.brs',
-      '!src/channel/components/controllers/TubiScene/TrackerTask.xml'
+      '!src/channel/components/controllers/TubiScene/TrackerTask.xml',
+      '!src/channel/components/tasks/GeneralTask/Parsers/TubiExperimentParsers.brs'
     ];
 
     // don't include TestAid files if config is production

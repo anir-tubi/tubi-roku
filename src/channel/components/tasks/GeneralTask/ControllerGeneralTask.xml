@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - GeneralTaskLibrary
+ -
+ - This is the long running task to invoke APIs
+ -
+ -->
+<component name="ControllerGeneralTask" extends="BaseGeneralTask">
+    <script type="text/brightscript" uri="ControllerGeneralTask.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
+    <script type="text/brightscript" uri="Parsers/VideoScreenParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/SignInScreenParser.brs" />
+    <script type="text/brightscript" uri="Parsers/DetailScreenParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/HomeScreenParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/CategoryListScreenParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/CategoryDetailsScreenParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/CategoryMyStuffScreenParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/SearchScreenParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/AgeVerificationScreenParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/EPGScreenParser.brs" />
+    <script type="text/brightscript" uri="Parsers/UpdateParentalRatingParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/TournamentScreenParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/ScreenSaverParsers.brs" />
+    <script type="text/brightscript" uri="Parsers/UncategorizedParsers.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/CmsApi.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/ApiUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TimeOffsetUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/FIFAMixin.brs" />
+</component>

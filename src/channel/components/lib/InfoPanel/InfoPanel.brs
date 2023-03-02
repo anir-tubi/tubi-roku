@@ -290,7 +290,7 @@ Function onLineOneDataChange(msg)
         text += Chr(&hb7) + " "
       end if
 
-      text += formatLengthAsEnglish(data.length) + " "
+      text += formatLengthSelectedLocale(data.length) + " "
     end if
 
 
