@@ -201,3 +201,11 @@ Function registerParsingCallbacks()
     parseError: parseAddToQueueError
   }
 End Function
+
+
+' Called from the base general task listen method. Below overridden method will be used to register helpers/utilities.
+Function instantiateLibs()
+  experiments = TubiExperiments(m.constants)
+  m.metadataTranslate = TubiMetadataTranslate(m.constants, experiments)
+End Function
+

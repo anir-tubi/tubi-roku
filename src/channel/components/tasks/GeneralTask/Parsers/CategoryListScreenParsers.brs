@@ -2,8 +2,6 @@
 '                            .data value converted from JSON to AA already
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseCategoryListSuccess(fullResponse, reqInfo)
-  experiments = TubiExperiments(m.constants)
-  translate = TubiMetadataTranslate(m.constants, experiments)
   parsedResponse = fullResponse.data
 
   isChannels = false
@@ -16,7 +14,7 @@ Function parseCategoryListSuccess(fullResponse, reqInfo)
     end if
   end if
 
-  categoriesListContent = translate.translateCategoriesListScreen(parsedResponse, isChannels)
+  categoriesListContent = m.metadataTranslate.translateCategoriesListScreen(parsedResponse, isChannels)
 
   return categoriesListContent
 End Function

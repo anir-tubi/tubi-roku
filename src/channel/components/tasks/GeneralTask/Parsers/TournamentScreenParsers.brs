@@ -2,8 +2,6 @@
 '                            .data value converted from JSON to Array already
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseTournamentSuccess(fullResponse, reqInfo)
-  experiments = TubiExperiments(m.constants)
-  translate = TubiMetadataTranslate(m.constants, experiments)
   parsedResponse = fullResponse.data
 
   isSignedInUser = false
@@ -11,7 +9,7 @@ Function parseTournamentSuccess(fullResponse, reqInfo)
     isSignedInUser = reqInfo.isSignedInUser
   end if
 
-  tournamentResponse = translate.translateTournamentScreen(parsedResponse, reqInfo.requestorID, isSignedInUser)
+  tournamentResponse = m.metadataTranslate.translateTournamentScreen(parsedResponse, reqInfo.requestorID, isSignedInUser)
   return tournamentResponse
 End Function
 

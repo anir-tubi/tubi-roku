@@ -2,11 +2,9 @@
 '                            .data value converted from JSON to AA already
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseDetailScreenSingleContentSuccess(fullResponse, reqInfo)
-  experiments = TubiExperiments(m.constants)
-  translate = TubiMetadataTranslate(m.constants, experiments)
   parsedResponse = fullResponse.data
   updatedContent = CreateObject("roSGNode", "TubiContentNode")
-  translate.translateRecursive(parsedResponse, updatedContent, reqInfo.issignedinuser)
+  m.metadataTranslate.translateRecursive(parsedResponse, updatedContent, reqInfo.issignedinuser)
   return updatedContent
 End Function
 
@@ -15,9 +13,8 @@ End Function
 '                            .data value converted from JSON to AA already
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseDetailScreenRelatedContentSuccess(fullResponse, reqInfo)
-  translate = TubiMetadataTranslate(m.constants)
   parsedResponse = fullResponse.data
-  relatedContent = translate.translateRelatedContent(parsedResponse, reqInfo.issignedinuser)
+  relatedContent = m.metadataTranslate.translateRelatedContent(parsedResponse, reqInfo.issignedinuser)
   relatedContent.id = reqInfo.contentId
   return relatedContent
 End Function

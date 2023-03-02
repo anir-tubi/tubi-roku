@@ -27,7 +27,6 @@ End Function
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseVideoScreenUpNextSuccess(fullResponse, reqInfo)
   parsedResponse = fullResponse.data
-  translate = TubiMetadataTranslate(m.constants)
   upNextContent = CreateObject("roSGNode", "ContentNode")
 
   isSignedInUser = false
@@ -37,7 +36,7 @@ Function parseVideoScreenUpNextSuccess(fullResponse, reqInfo)
 
   for each content in parsedResponse
     upNextItem = upNextContent.createChild("TubiContentNode")
-    translate.upNextTranslateRecursiveWrapper(content, upNextItem, isSignedInUser)
+    m.metadataTranslate.upNextTranslateRecursiveWrapper(content, upNextItem, isSignedInUser)
   end for
   return upNextContent
 End Function

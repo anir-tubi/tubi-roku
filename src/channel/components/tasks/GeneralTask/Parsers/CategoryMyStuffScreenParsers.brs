@@ -3,8 +3,6 @@
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseCategoryMyStuffContentSuccess(fullResponse, reqInfo)
   tubiLog("CategoryMyStuffScreenParsers.parseCategoryMyStuffContentSuccess")
-  experiments = TubiExperiments(m.constants)
-  translate = TubiMetadataTranslate(m.constants, experiments)
   parsedResponse = fullResponse.data
   fullJson = fullResponse.fullJson
 
@@ -32,9 +30,9 @@ Function parseCategoryMyStuffContentSuccess(fullResponse, reqInfo)
       isSignedInUser = reqInfo.isSignedInUser
     end if
 
-    convertedMetadata = translate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, m.constants.ui.screenIds.myStuffScreen, isSignedInUser)
+    convertedMetadata = m.metadataTranslate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, m.constants.ui.screenIds.myStuffScreen, isSignedInUser)
   else
-    convertedMetadata = translate.translateEmptyMyStuffContainer(parsedResponse)
+    convertedMetadata = m.metadataTranslate.translateEmptyMyStuffContainer(parsedResponse)
   end if
 
   

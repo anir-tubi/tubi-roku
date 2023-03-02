@@ -2,8 +2,6 @@
 '                            .data value converted from JSON to AA already
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseDefaultSearchSuccess(fullResponse, reqInfo)
-  metadataTranslate = TubiMetadataTranslate(m.constants)
-
   parsedResponse = fullResponse.data
   fullJson = fullResponse.fullJson
 
@@ -29,7 +27,7 @@ Function parseDefaultSearchSuccess(fullResponse, reqInfo)
 
   end if
 
-  convertedMetadata = metadataTranslate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, screenId, isSignedInUser)
+  convertedMetadata = m.metadataTranslate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, screenId, isSignedInUser)
 
   return convertedMetadata
 End Function
@@ -39,7 +37,6 @@ End Function
 '                            .data value converted from JSON to AA already
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseSearchAPISuccess(fullResponse, reqInfo)
-  metadataTranslate = TubiMetadataTranslate(m.constants)
   parsedResponse = fullResponse.data
 
   isSignedInUser = false
@@ -47,6 +44,6 @@ Function parseSearchAPISuccess(fullResponse, reqInfo)
     isSignedInUser = reqInfo.isSignedInUser
   end if
 
-  convertedMetadata = metadataTranslate.translate(parsedResponse, isSignedInUser)
+  convertedMetadata = m.metadataTranslate.translate(parsedResponse, isSignedInUser)
   return convertedMetadata
 End Function

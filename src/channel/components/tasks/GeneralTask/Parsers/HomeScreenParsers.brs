@@ -2,8 +2,6 @@
 '                            .data value converted from JSON to AA already
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
-  experiments = TubiExperiments(m.constants)
-  translate = TubiMetadataTranslate(m.constants, experiments)
   parsedResponse = fullResponse.data
 
   contentMode = invalid
@@ -33,7 +31,7 @@ Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
     isSignedInUser = reqInfo.isSignedInUser
   end if
 
-  convertedMetadata = translate.translateFIFAHomescreen(parsedResponse, contentMode, isKidsMode, uiMode, isSignedInUser)
+  convertedMetadata = m.metadataTranslate.translateFIFAHomescreen(parsedResponse, contentMode, isKidsMode, uiMode, isSignedInUser)
 
   return convertedMetadata
 End Function
@@ -43,9 +41,6 @@ End Function
 '                            .data value converted from JSON to AA already
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseCategoryContentSuccess(fullResponse, reqInfo)
-  experiments = TubiExperiments(m.constants)
-  translate = TubiMetadataTranslate(m.constants, experiments)
-
   parsedResponse = fullResponse.data
   fullJson = fullResponse.fullJson
 
@@ -77,7 +72,7 @@ Function parseCategoryContentSuccess(fullResponse, reqInfo)
 
   end if
 
-  convertedMetadata = translate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, screenId, isSignedInUser, isKidsMode, uiMode)
+  convertedMetadata = m.metadataTranslate.translateContainer(parsedResponse, fullJson, orientation, bFullData, contentMode, screenId, isSignedInUser, isKidsMode, uiMode)
   return convertedMetadata  'may return an empty container
 End Function
 

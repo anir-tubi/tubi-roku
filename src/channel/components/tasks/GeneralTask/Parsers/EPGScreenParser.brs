@@ -2,10 +2,8 @@
 '                            .data value converted from JSON to AA already
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseEPGChannelIdsSuccess(fullResponse, reqInfo)
-  translate = TubiMetadataTranslate(m.constants)
-
   parsedResponse = fullResponse.data
-  epgChannelIdsResponse = translate.translateEPGChannelIds(parsedResponse, reqInfo.requestorID, reqInfo.isSignedInUser)
+  epgChannelIdsResponse = m.metadataTranslate.translateEPGChannelIds(parsedResponse, reqInfo.requestorID, reqInfo.isSignedInUser)
   return epgChannelIdsResponse
 End Function
 
@@ -25,7 +23,6 @@ End Function
 '                            .data value converted from JSON to Array already
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseEPGProgramsSuccess(fullResponse, reqInfo)
-  translate = TubiMetadataTranslate(m.constants)
   parsedResponse = fullResponse.data
 
   isSignedInUser = false
@@ -33,7 +30,7 @@ Function parseEPGProgramsSuccess(fullResponse, reqInfo)
     isSignedInUser = reqInfo.isSignedInUser
   end if
 
-  epgProgramsResponse = translate.translateEPGPrograms(parsedResponse, reqInfo.requestorID, isSignedInUser)
+  epgProgramsResponse = m.metadataTranslate.translateEPGPrograms(parsedResponse, reqInfo.requestorID, isSignedInUser)
   return epgProgramsResponse
 End Function
 
