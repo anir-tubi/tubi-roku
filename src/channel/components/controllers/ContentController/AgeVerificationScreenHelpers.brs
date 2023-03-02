@@ -406,15 +406,30 @@ Function onAgeNotVerifiedAtStartup(err)
 End Function
 
 
-Function onAgeNotVerifiedAtSignup(err)
-  if err <> invalid AND err.code <> invalid
-    if err.code = 422 OR err.code = 451
-      handle_422_451_error(restartChannelAfterAgeVerification) ' happens when user enters age less than 13
-    else if err.code = 403
-      handle_403_error() ' happens when user enters invalid email domain
-    else
-      handleNetworkErrorOnSignUp(err) ' happens when there is a network failure or some backend issue
+Function onAgeNotVerifiedAtSignup(error)
+  if error <> invalid AND error.code <> invalid
+    ' Below code will hold values related to the http error code that is 400,403 etc.
+    httpCode = error.code
+    ' Below info field will hold the associative array that is return from backend. ex: {"code": "INVALID_PARAMS", "message": "invalid email"}
+    info = error.info
+    errorCode = invalid
+
+    if info <> invalid
+      ' Below error code field will hold the value from backend returned error object. ex: INVALID_PARAMS.
+      errorCode = info.code
     end if
+
+    ' List of error codes from the constants.
+    errorCodes = m.constants.errors.codes
+    
+    if httpCode = 422 OR httpCode = 451
+      handle_422_451_error(restartChannelAfterAgeVerification) ' happens when user enters age less than 13
+    else if httpCode = 400 AND errorCode <> invalid AND (errorCode = errorCodes.invalidParams OR errorCode = errorCodes.invalidEmailDomain OR errorCode = errorCodes.blockedEmailDomain OR errorCode = errorCodes.emailExists)
+      handleInvalidEmailError() ' happens when user enters invalid email domain
+    else
+      handleNetworkErrorOnSignUp(error) ' happens when there is a network failure or some backend issue
+    end if
+    
   end if
 End Function
 
@@ -546,9 +561,8 @@ Function handle_422_451_error(callback)
 End Function
 
 
-' this happens during signup flow, if users enters invalid email domain
-Function handle_403_error()
-
+' This error could be a request of following use cases "The email domain provided is invalid", "Email already exists", "The email domain provided is not supported at this time"
+Function handleInvalidEmailError()
   accountEvent = {
     type: "account"
     values: {
@@ -578,7 +592,6 @@ Function handle_403_error()
   message = getTranslation("could_not_verify_email") + ". " + getTranslation("dialog_defaultError_description")
   buttons = [getTranslation("dialog_button_ok")]
   showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, invalid)
-
 End Function
 
 

@@ -458,7 +458,6 @@ Function getConstants()
         constants.urls.userDevice.urlBase = "https://uapi.staging-public.tubi.io/user_device"
       end if
 
-      constants.urls.userDevice.signup = constants.urls.userDevice.urlBase + "/signup"
       constants.urls.userDevice.registerCode = constants.urls.userDevice.urlBase + "/code/register"
       constants.urls.userDevice.refreshToken = constants.urls.userDevice.urlBase + "/login/refresh"
       constants.urls.userDevice.transferToken = constants.urls.userDevice.urlBase + "/login/transfer"
@@ -487,6 +486,7 @@ Function getConstants()
       constants.urls.account.contentRating = constants.urls.account.urlBase + "/user/preferences/rate"
       constants.urls.account.parentalRating = constants.urls.account.settings + "/parental_rating"
       constants.urls.account.magicLink = constants.urls.account.urlBase + "/device/magic_link"
+      constants.urls.account.signup = constants.urls.account.urlBase + "/user/signup"
 
       constants.urls.account.anonymous = {}
       constants.urls.account.anonymous.signingKey = constants.urls.account.urlBase + "/device/anonymous/signing_key"
@@ -864,6 +864,14 @@ Function getConstants()
     constants.errors.message.invalidVideoUrl = "Invalid Video URL"
     constants.errors.message.badResponse = "Bad Response"
     constants.errors.message.noResponse = "No Response"
+  
+  ' creating mapping to backend error codes.
+  constants.errors.codes = {}
+    constants.errors.codes.expiredToken = "EXPIRED_TOKEN"
+    constants.errors.codes.invalidParams = "INVALID_PARAMS"
+    constants.errors.codes.invalidEmailDomain = "INVALID_EMAIL_DOMAIN"
+    constants.errors.codes.blockedEmailDomain = "BLOCKED_EMAIL_DOMAIN"
+    constants.errors.codes.emailExists = "EMAIL_USER_EXISTS"
 
   'UI properties that should be passed into the scene graph
   constants.ui = {}

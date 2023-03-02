@@ -41,6 +41,7 @@ Function parseSignUpError(fullResponse, reqInfo)
   return {
     reqInfo: reqInfo
     code: fullResponse.code
+    info: fullResponse.data
   }
 End Function
 

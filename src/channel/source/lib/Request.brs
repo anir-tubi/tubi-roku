@@ -163,6 +163,7 @@ Function tubihttp_start(urltransfer_or_messageport As Object) As Boolean
 
 
   m.urltransfer.EnableEncodings(true)
+  m.urlTransfer.RetainBodyOnError(true)
   if m.isHttps then
     m.urltransfer.SetCertificatesFile("common:/certs/ca-bundle.crt")
   end if

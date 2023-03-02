@@ -71,7 +71,7 @@ End Function
 'signUpReqInfo()
 '
 Function userDeviceApi_signUpReqInfo(passedOptions = {})
-  url = m.constants.urls.userDevice.signup
+  url = m.constants.urls.account.signup
   options = {}
   headers = {}
   headers.append(m.getCommonOptions().headers)

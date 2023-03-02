@@ -198,7 +198,7 @@ Function processResponse(msg)
         else if code >= 400 AND code < 500 AND canRetry4xxCodes[code.toStr()] <> true
           ' error expected to remain error on retry so don't bother retrying
           processErrorResponse(result, callbackTypes, job)
-        else if (code = 403 OR code = 401) AND m.constants.reqNames.acceptsTubiAuth[requestType] = true
+        else if (code = 403 OR code = 401) AND m.constants.reqNames.acceptsTubiAuth[requestType] = true AND checkIfTokenExpiredError(result.response) = true
           if retries > 0
             ' request could not be authed by backend so attempt to refresh the auth token and try again
             timeout = 100
@@ -563,3 +563,15 @@ End Function
 Function instantiateLibs()
 End Function
 
+
+' Checks the backend response to see if backend returned a error code with expired token.
+Function checkIfTokenExpiredError(response)
+  if response <> invalid AND response.data <> invalid AND response.data <> ""
+    parsedResponse = parseJson(response.data)
+    if parsedResponse <> invalid AND parsedResponse["code"] = m.constants.errors.codes.expiredToken
+      return true
+    end if
+  end if
+
+  return false
+End Function
