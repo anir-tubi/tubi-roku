@@ -6,7 +6,7 @@ Function init()
   m.top.observeField("batchRequest", m.port)
   m.top.observeField("cancel", m.port)
   m.constants = getConstantsFromGlobal()
-  ' Creating a scope variable that will be overriden by each sub task 
+  ' Creating a scope variable that will be overridden by each sub task
   m.requestTypes = {}
   ' We store a local copy of the translations so we don't have to do a rendezvous each time we request a translation during parsing
   m.translationAA = getFieldFromGlobal("translationAA")
@@ -45,10 +45,10 @@ Function listen()
   m.requestTypes = {}
 
   instantiateLibs()
-  
+
   ' calling method to register parsing callbacks
   registerParsingCallbacks()
-  
+
   ' Calling register parsing callback which will be overridden by every sub tasks.
 
   m.requestModule = Request(m.constants.settings)
@@ -381,7 +381,7 @@ Function accumulateBatchResponse(job, parsedResponse) as Void
         ' batchResponseAccumulator is already an AA, so no need to re-arrange anything
         batchResponse = batchResponseAccumulator
 
-      else if m.getArrayInterfaceTypes()[batchResponseType] = true
+      else if getArrayInterfaceTypes()[batchResponseType] = true
         ' batch response type is one of the various field array types
         batchResponse = []
 
@@ -553,7 +553,7 @@ Function getErrorCodeFromResponse(fullResponse)
 End Function
 
 
-' Creating a defualt method which will be overridden by sub tasks.
+' Creating a default method which will be overridden by sub tasks.
 Function registerParsingCallbacks()
   m.requestTypes = {}
 End Function

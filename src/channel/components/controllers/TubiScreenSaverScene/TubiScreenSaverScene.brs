@@ -6,6 +6,9 @@ Function init()
   m.retryCount = 0
 
   m.constants = getConstants()
+  m.global.update({
+    "constants": m.constants
+  }, true)
 
   m.controllerContainer = m.top.findNode("controllerContainer")
   m.starterComponentLibrary = m.top.findNode("starterComponentLibrary")
@@ -59,9 +62,7 @@ End Function
 Function onStarterControllerRemoteComponentsUrlChange(msg)
   ' Setup global constants with our new constants from the starter component library
     ' NOTE must be called after the url is set as that is also when the constants has been updated with experiment info
-    m.global.update({
-      constants: m.starterController.newBuildConstants
-    }, true)
+    m.global.constants = m.starterController.newBuildConstants
 
   m.remoteComponentLibrary.observeFieldScoped("loadStatus", "onRemoteComponentLibraryLoadStatusChange")
   m.remoteComponentLibrary.uri = msg.getData()

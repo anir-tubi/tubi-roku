@@ -10,11 +10,16 @@ Function init()
 
   m.isExperimentConfigReady = false
   m.isExternalConfigReady = false
-  m.top.observeField("getUrl", "onUrlRequest")
+  m.top.observeFieldScoped("getUrl", "onUrlRequest")
 
   starterTask = createObject("roSGNode", "StarterGeneralTask") ' initiate StarterTask
   GeneralTaskModule(m, starterTask)
   sendRequestForExperimentsAndConfig()
+End Function
+
+
+Function onUrlRequest()
+  checkIfExperimentAndRemoteConfigReadyAndProceed()
 End Function
 
 
@@ -110,7 +115,7 @@ Function onExternalConfigRequestSuccess(config)
     end if
     m.constants.externalConfig.info = config
   end if
-  
+
   m.isExternalConfigReady = true
   checkIfExperimentAndRemoteConfigReadyAndProceed()
 End Function
