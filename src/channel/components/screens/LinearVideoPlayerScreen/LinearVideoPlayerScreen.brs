@@ -661,38 +661,45 @@ End Function
 Function advanceCodecOnContent(contentNode)
   tubiLog("VideoPlayer.advanceCodecOnContent")
 
-  videoResources = contentNode.videoResources
-  currentVideoResourceIndex = contentNode.currentVideoResourceIndex
-  currentCodecIndex = currentVideoResourceIndex[0]
-  currentDrmIndex = currentVideoResourceIndex[1]
+  if contentNode <> invalid
 
-  currentResource = videoResources[currentCodecIndex][currentDrmIndex]
+    videoResources = contentNode.videoResources
+    currentVideoResourceIndex = contentNode.currentVideoResourceIndex
 
-  nextCodecIndex = currentCodecIndex + 1
-  nextDrmIndex = 0
+    if videoResources <> invalid AND currentVideoResourceIndex <> invalid
+      currentCodecIndex = currentVideoResourceIndex[0]
+      currentDrmIndex = currentVideoResourceIndex[1]
 
-  nextResource = invalid
-  if videoResources[nextCodecIndex] <> invalid
-    nextResource = videoResources[nextCodecIndex][nextDrmIndex]
+      currentResource = videoResources[currentCodecIndex][currentDrmIndex]
+
+      nextCodecIndex = currentCodecIndex + 1
+      nextDrmIndex = 0
+
+      nextResource = invalid
+      if videoResources[nextCodecIndex] <> invalid
+        nextResource = videoResources[nextCodecIndex][nextDrmIndex]
+      end if
+
+      if nextResource <> invalid and setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
+
+        fallbackInfo = {
+          failed_url: removeExcessUrl(currentResource.url)
+          failed_codec: currentResource.codec
+          fallback_url: removeExcessUrl(nextResource.url)
+          fallback_codec: nextResource.codec
+          model: m.constants.deviceInfo.model
+          video_id: contentNode.id
+        }
+
+        ' log that we fell back to the next playback option after playback failed due to Codec
+        tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "codec-fallback", 0.1)
+        return true
+      end if
+    end if
   end if
 
-  if nextResource <> invalid and setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
+  return false
 
-    fallbackInfo = {
-      failed_url: removeExcessUrl(currentResource.url)
-      failed_codec: currentResource.codec
-      fallback_url: removeExcessUrl(nextResource.url)
-      fallback_codec: nextResource.codec
-      model: m.constants.deviceInfo.model
-      video_id: contentNode.id
-    }
-
-    ' log that we fell back to the next playback option after playback failed due to Codec
-    tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "codec-fallback", 0.1)
-    return true
-  else
-    return false
-  end if
 
 End Function
 
@@ -702,47 +709,51 @@ End Function
 Function advanceDrmOnContent(contentNode)
   tubiLog("VideoPlayer.advanceDrmOnContent")
 
-  videoResources = contentNode.videoResources
-  currentVideoResourceIndex = contentNode.currentVideoResourceIndex
-  currentCodecIndex = currentVideoResourceIndex[0]
-  currentDrmIndex = currentVideoResourceIndex[1]
+  if contentNode <> invalid
+    videoResources = contentNode.videoResources
+    currentVideoResourceIndex = contentNode.currentVideoResourceIndex
 
-  currentResource = videoResources[currentCodecIndex][currentDrmIndex]
+    if videoResources <> invalid AND currentVideoResourceIndex <> invalid AND currentVideoResourceIndex.Count() >= 2
+      currentCodecIndex = currentVideoResourceIndex[0]
+      currentDrmIndex = currentVideoResourceIndex[1]
 
-  nextCodecIndex = currentCodecIndex
-  nextDrmIndex = currentDrmIndex + 1
-  nextResource = invalid
+      currentResource = videoResources[currentCodecIndex][currentDrmIndex]
 
-  if videoResources[currentCodecIndex] <> invalid
-    nextResource = videoResources[currentCodecIndex][nextDrmIndex]
-  end if
+      nextCodecIndex = currentCodecIndex
+      nextDrmIndex = currentDrmIndex + 1
+      nextResource = invalid
 
-  if nextResource = invalid
-    nextCodecIndex = currentCodecIndex + 1
-    nextDrmIndex = 0
+      if videoResources[currentCodecIndex] <> invalid
+        nextResource = videoResources[currentCodecIndex][nextDrmIndex]
+      end if
 
-    if videoResources[nextCodecIndex] <> invalid
-      nextResource = videoResources[nextCodecIndex][nextDrmIndex]
+      if nextResource = invalid
+        nextCodecIndex = currentCodecIndex + 1
+        nextDrmIndex = 0
+
+        if videoResources[nextCodecIndex] <> invalid
+          nextResource = videoResources[nextCodecIndex][nextDrmIndex]
+        end if
+      end if
+
+      if nextResource <> invalid and setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
+
+        fallbackInfo = {
+          failed_url: removeExcessUrl(currentResource.url)
+          failed_drm: currentResource.type
+          fallback_url: removeExcessUrl(nextResource.url)
+          fallback_drm: nextResource.type
+          model: m.constants.deviceInfo.model
+          video_id: contentNode.id
+        }
+
+        ' log that we fell back to the next playback option after playback failed due to DRM
+        tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "drm-fallback", 0.1)
+        return true
+      end if
     end if
   end if
-
-  if nextResource <> invalid and setDrmOnContent(contentNode, nextResource, [nextCodecIndex, nextDrmIndex]) = true
-
-    fallbackInfo = {
-      failed_url: removeExcessUrl(currentResource.url)
-      failed_drm: currentResource.type
-      fallback_url: removeExcessUrl(nextResource.url)
-      fallback_drm: nextResource.type
-      model: m.constants.deviceInfo.model
-      video_id: contentNode.id
-    }
-
-    ' log that we fell back to the next playback option after playback failed due to DRM
-    tubiLog(FormatJSON(fallbackInfo), "error", "videoLoad", "drm-fallback", 0.1)
-    return true
-  else
-    return false
-  end if
+  return false
 End Function
 
 
