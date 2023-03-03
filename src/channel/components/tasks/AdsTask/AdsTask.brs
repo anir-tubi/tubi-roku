@@ -2,7 +2,7 @@ Library "Roku_Ads.brs"
 
 Function init()
   m.top.functionName = "execAdsTask"
-  m.enableInPodStitching = getExperimentResource("roku_in_pod_stitching", "roku_in_pod_stitching_v1", false).enabled = true
+  m.enableInPodStitching = getExperimentResource("roku_in_pod_stitching", "roku_in_pod_stitching_v2", false).enabled = true
   m.constants = getConstantsFromGlobal()
 End Function
 

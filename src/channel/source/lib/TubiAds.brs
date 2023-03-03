@@ -731,7 +731,7 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
           if isFunction(getExperimentResource)
             if ctx.adCount <> invalid AND ctx.adCount > 1 AND ctx.adIndex <> invalid AND ctx.adIndex = 2 then
               'bs:disable-next-line 1001 LINT1001
-              getExperimentResource("roku_in_pod_stitching", "roku_in_pod_stitching_v1", true)
+              getExperimentResource("roku_in_pod_stitching", "roku_in_pod_stitching_v2", true)
             end if
           end if
         else if eventType = "Close"
