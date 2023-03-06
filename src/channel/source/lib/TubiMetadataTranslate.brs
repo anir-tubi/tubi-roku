@@ -1135,12 +1135,6 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, contentMode = 
   if type(container) = "roAssociativeArray"
     ' the metadata for the category
     sTitle = container.title
-    if container.id = m.constants.ui.categoryIds.queue
-      '//::HARDCODE:: this is a temporary hardcode until the backend is ready to play My List Instead of Queue as the title
-      if contentMode <> m.constants.ui.contentMode.latino
-        sTitle = "My List"
-      end if
-    end if
 
     updateMetadata = {
       id: container.id
