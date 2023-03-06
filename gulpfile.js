@@ -268,7 +268,7 @@ function buildStarter() {
   let componentLibSrcOptions = {
     base: 'src/channel/components'
   };
-  
+
   // Creating a list that holds all the sub tasks.
   const subTaskPaths = [
     {

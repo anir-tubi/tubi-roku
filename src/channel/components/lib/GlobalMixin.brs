@@ -21,9 +21,9 @@ Function getFieldFromGlobal(fieldName)
   attempts = 0
   if fieldName <> invalid
     while fieldValue = invalid AND attempts < 100
-      globalAA = m.global
-      if globalAA <> invalid AND globalAA[fieldName] <> invalid
-        fieldValue = globalAA[fieldName]
+      nodeGlobal = m.global
+      if nodeGlobal <> invalid
+        fieldValue = nodeGlobal[fieldName]
       end if
       attempts += 1
     end while

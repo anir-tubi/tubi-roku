@@ -151,11 +151,14 @@ End Function
 '@subtype: string, (optional), a small string used to differentiate log messages
 '@message: string or roAssociativeArray, the message to be logged
 Function tubiLog_printLogInfo_(level as String, subType as String, message as Dynamic)
-  if type(message) = "roAssociativeArray"
-    message = FormatJson(message)
-  end if
-  ' user has set consoleLoggingEnabled to true in their dev.yml/qa.yml
+
   #if consoleLoggingEnabled
+
+    if type(message) = "roAssociativeArray"
+      message = FormatJson(message)
+    end if
+
+    ' user has set consoleLoggingEnabled to true in their dev.yml/qa.yml
     print tubiLog_getLogPrintout_(level, subtype, message)
   #end if
 End Function
@@ -331,16 +334,30 @@ Function tubiLog_helper(logType, message = "" as Dynamic, level = "debug" as Str
   end if
 
   if type(message) = "roString" OR type(message) = "String" OR type(message) = "roAssociativeArray"
-    if m.global <> invalid AND m.global.trackingLoggingTask <> invalid
-      if logType = "exception" ' sentry
-        m.global.trackingLoggingTask.logException = {
+    globalTrackingLogging = invalid
+
+    if logType = "exception" OR serverTypeName <> ""
+      if m.trackingLoggingTask = invalid 'most of the caller already have m.trackingLoggingTask, so no need for global.
+
+        if m.global <> invalid
+          globalTrackingLogging = m.global.trackingLoggingTask
+        end if
+      else
+        globalTrackingLogging = m.trackingLoggingTask
+      end if
+    end if
+
+    if globalTrackingLogging <> invalid ' sentry
+      if logType = "exception"
+        globalTrackingLogging.logException = {
           message: message
           level: level
           samplePercent: samplePercent
         }
       else
+
         if serverTypeName <> "" ' logging uapi
-          m.global.trackingLoggingTask.logMsg = {
+          globalTrackingLogging.logMsg = {
             message: message
             serverTypeName: serverTypeName
             subtype: subtype
@@ -348,16 +365,14 @@ Function tubiLog_helper(logType, message = "" as Dynamic, level = "debug" as Str
             samplePercent: samplePercent
           }
         else
-          ' tubiLog_printLogInfo_ is to print console log when tubiLog() is triggered with only message param.
           tubiLog_printLogInfo_(level, subtype, message)
         end if
+
       end if
     else
-      ' tubiLog_printLogInfo_ is to print console log when tubiLog() is triggered with only message param.
       tubiLog_printLogInfo_(level, subtype, message)
     end if
   end if
-
 End Function
 
 

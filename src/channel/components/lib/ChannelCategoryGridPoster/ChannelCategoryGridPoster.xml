@@ -8,6 +8,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs"/>
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="../ExperimentMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
@@ -55,7 +56,7 @@
         text=""
         vertAlign="bottom"
         color="0xFFFFFFBF"
-        width="0" 
+        width="0"
         height="18">
         <Font
           role="font"

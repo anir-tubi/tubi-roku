@@ -231,9 +231,12 @@ Function animate(target As Object, options as Object) As Object
 
     bAnimate = true
     ' if low-spec device, then instantly change to target option rather than using animation
-    globalAA = m.global
-    if globalAA <> invalid AND globalAA.constants <> invalid AND globalAA.constants.deviceInfo.limitedUi = true
+    '//TODO investigate using optional=true parameter on animation
+    if m.constants = invalid
+      m.constants = getConstantsFromGlobal()
+    end if
 
+    if m.constants <> invalid AND m.constants.deviceInfo.limitedUi = true
       ' hardcoding easeFunction=linear for better performance in lower-end even if allowOnLowSpecDevices=true
       options.easeFunction = "linear"
 
