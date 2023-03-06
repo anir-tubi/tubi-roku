@@ -489,7 +489,6 @@ End Function
 ' We can remove the lines as they get stale. At times this function will not have any lines, but we can still include a call to the
 ' function for future reference.
 Function cleanRegistry()
-  RegDelete("lastPlayedLinearId", "lastPlayedLinearSection")  '//Date Added to Production - 9/29/2022
 End Function
 
 
