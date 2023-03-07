@@ -25,6 +25,7 @@ Function onThemeChange(msg = invalid)
   end if
   
   if theme <> invalid
+    m.theme = theme
     m.label.color = theme.primaryTextColor
   end if
 End Function
@@ -68,15 +69,18 @@ Function onScreenFocusChange()
   tubiLog("SimpleButton.onScreenFocusChange")
 
   if m.top.hasFocus() then
-    theme = getThemeFromGlobal()
-    if theme <> invalid
-      m.buttonBG.blendColor = theme.focusedColor
-      m.label.color = theme.focusedTextColor
+    if m.theme <> invalid
+      m.buttonBG.blendColor = m.theme.focusedColor
+      m.label.color = m.theme.focusedTextColor
     end if
     m.buttonBG.opacity = 1.0
   else
     m.buttonBG.blendColor = m.top.color
-    m.label.color = theme.primaryTextColor
+
+    if m.theme <> invalid
+      m.label.color = m.theme.primaryTextColor
+    end if
+
     m.buttonBG.opacity = m.top.unfocusedBackgroundOpacity
   end if
 
