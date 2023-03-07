@@ -665,10 +665,21 @@ Function tubiAuth_refreshAuthToken(authInfo, timeout)
             newAuthInfo.authType = "CODE"
           end if
           newAuthInfo = m.saveAuthInfo(newAuthInfo) 'returns invalid if not saved to the registry
-        else
+        else if newAccess.code = m.constants.errors.codes.invalidToken
           ' Be careful to only do this if the service rejected auth refresh.  We don't
           ' want to sign users out for transient errors like network down.
+
+          ' We are deleting the stored token info since backend said it cannot use the refresh token to provide
+          ' a new access token.
           m.deleteAuthInfo()
+          ' Since we logged out the user we can make a request for anonymous token.
+          newAuthInfo = m.fetchAndSaveAnonymousAuthInfo()
+        else
+          ' Since the refresh token call failed.
+          ' This else part is triggered because backend HTTP code was not 401 or 403.
+          ' Assuming it is some temporary issue we are not logging the user out but instead returning the same token
+          ' So that we can re-use existing registry values to refresh the token again during relaunch or next re-try.
+          newAuthInfo = authInfo
         end if
         exit while
       end if
@@ -1055,11 +1066,14 @@ Function tubiAuth_handleRefreshResponse(msg, refreshRequest)
 
   responseInfo = refreshRequest.handleEvent(msg)
 
-  if responseInfo <> invalid AND responseInfo.response <> invalid AND responseInfo.response.data <> invalid
-    if responseInfo.response.code = 403
-      ' refresh token was expired
-      newAccess = {}
-    else if responseInfo.response.data.len() > 0
+  if responseInfo <> invalid AND responseInfo.response <> invalid
+    if responseInfo.response.code = 401 OR responseInfo.response.code = 403
+      ' We are returning a error code similar to what is been returned by content api's
+      ' if the token passed is invalid, so that we can remove this override in future once backend returns us the response.
+      newAccess = {
+        "code": m.constants.errors.codes.invalidToken
+      }
+    else if responseInfo.response.data <> invalid AND responseInfo.response.data.len() > 0
       newAccess = ParseJson(responseInfo.response.data)
     end if
   end if

@@ -118,7 +118,9 @@ Function tubiAuth_refreshAuthToken_403_test()
   auth.saveAuthInfo(oldAuthInfo)  ' save it to the registry to verify clearing
 
   auth.handleRefreshResponse = Function(msg, refreshReq)
-    return {} ' indicative of the old tokens being invalid and should not be stored
+    return {
+      "code": "INVALID_TOKEN"
+    }
   End Function
 
   savedAuthInfo = RegReadAll(auth.authRegSection)
@@ -126,11 +128,13 @@ Function tubiAuth_refreshAuthToken_403_test()
   m.AssertNotInvalid(savedAuthInfo.accessToken)
   m.AssertNotInvalid(savedAuthInfo.refreshToken)
   newAuthInfo = auth.refreshAuthToken(oldAuthInfo, 1)
-  m.AssertInvalid(newAuthInfo)
+  ' Changing it since we send back annonymous token now.
+  m.AssertNotInvalid(newAuthInfo)
   savedAuthInfo = RegReadAll(auth.authRegSection)
   m.AssertNotInvalid(savedAuthInfo)
-  m.AssertInvalid(savedAuthInfo.accessToken)
-  m.AssertInvalid(savedAuthInfo.refreshToken)
+  m.AssertNotInvalid(savedAuthInfo.accessToken)
+  m.AssertNotInvalid(savedAuthInfo.refreshToken)
+  m.AssertInvalid(savedAuthInfo.userid)
 End Function
 
 

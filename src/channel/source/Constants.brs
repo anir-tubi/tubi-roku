@@ -872,6 +872,7 @@ Function getConstants()
     constants.errors.codes.invalidEmailDomain = "INVALID_EMAIL_DOMAIN"
     constants.errors.codes.blockedEmailDomain = "BLOCKED_EMAIL_DOMAIN"
     constants.errors.codes.emailExists = "EMAIL_USER_EXISTS"
+    constants.errors.codes.invalidToken = "INVALID_TOKEN"
 
   'UI properties that should be passed into the scene graph
   constants.ui = {}
