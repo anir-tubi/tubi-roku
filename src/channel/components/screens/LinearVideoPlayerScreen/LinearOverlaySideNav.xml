@@ -42,7 +42,6 @@
             uri="pkg:/images/icon-subtitles.png"/>
           <Label
             id="btnCC_label"
-            color="0xFFFFFFFF"
             height="36"
             opacity=".5"
             vertAlign="center"
@@ -68,7 +67,6 @@
             uri="pkg:/images/icon-backToGuide.png"/>
           <Label
             id="btnBack_label"
-            color="0xFFFFFFFF"
             height="36"
             opacity=".5"
             vertAlign="center"

@@ -16,7 +16,10 @@ Function onDrawDots()
       if carouselIndex = i
         dot.blendColor = ""
       else
-        dot.blendColor = "0xFFFFFF1A"
+        theme = getThemeFromGlobal()
+        if theme <> invalid
+          dot.blendColor = theme.neutralColor2
+        end if
       end if
     end for
 

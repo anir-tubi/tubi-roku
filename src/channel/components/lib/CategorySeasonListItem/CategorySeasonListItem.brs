@@ -8,11 +8,25 @@ Function init()
   m.top.observeField("gridHasFocus", "onContainerHasFocus")
   m.top.observeField("rowListHasFocus", "onContainerHasFocus")
 
-  ' trying to access m.global can sometimes/rarely time out creating a run time error if we
-  ' try to access m.global.theme directly, so use GlobalMixin.getThemeFromGlobal() which retries if issues arise.
-  theme = getThemeFromGlobal()
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
   if theme <> invalid
-    m.categoryCountText.color = theme.focused
+    m.categoryCountText.color = theme.focusedColor
+    m.categoryText.color = theme.primaryTextColor
+    '//::TODO::colors - is this the right color to replace FF501AFF that is located in the XML?
+    ' m.categoryCountText.color = theme.cautionColor
   end if
 End Function
 

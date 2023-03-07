@@ -5,7 +5,6 @@ Function init()
   constants = getConstantsFromGlobal()
   if constants <> invalid
     m.limitedUi = constants.deviceInfo.limitedUi
-    m.Shade.color = constants.ui.colors.shade
   end if
 
   m.top.opacity = "0.8"
@@ -33,6 +32,24 @@ Function init()
     spinner.visible = false
   end if
   onDimensionsChange() '//update the placement of spinners
+  
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.Shade.color = theme.shadeColor
+  end if
 End Function
 
 

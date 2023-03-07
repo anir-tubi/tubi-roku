@@ -105,9 +105,9 @@
       opacity="0">
 
       <Poster
+        id="leftIcon"
         width="20"
         height="20"
-        blendColor="0xFFFFFFFF"
         uri="pkg:/images/left-arrow.png"/>
 
       <Label
@@ -116,7 +116,6 @@
         height="24"
         text="Back to Live"
         opacity="1"
-        color="0xFFFFFFFF"
         horizAlign="left"
         vertAlign="center"
         maxLines="1"
@@ -137,7 +136,6 @@
       width="1000"
       horizAlign="left"
       vertAlign="center"
-      color="0xFFFFFFFF"
       opacity="1.0"
       maxLines="1"
       numLines="1"
@@ -153,7 +151,6 @@
       id="channelsGrid"
       translation="[0, 96]"
       numRows="4"
-      focusFootPrintBlendColor="0xFFFFFFBF"
       focusFootprintBitmapUri="pkg:/images/ratingBackground.9.png"
       itemSize="[186,108]"
       itemSpacing="[0,12]"

@@ -1263,167 +1263,212 @@ Function getConstants()
       constants.ui.uris.categoryBackgrounds.continueWatching = constants.ui.uris.categoryBackgrounds.urlBase + "continuewatching" + constants.ui.uris.categoryBackgrounds.urlEnding
       constants.ui.uris.categoryBackgrounds.queue = constants.ui.uris.categoryBackgrounds.urlBase + "queue" + constants.ui.uris.categoryBackgrounds.urlEnding
 
-      'default background image uri
-      constants.ui.uris.defaultBackground = "pkg:/images/art-blur-background.webp"
-
-      'kidsMode background image uri
-      constants.ui.uris.kidsModeBackground = "pkg:/images/art-blur-background_kids.webp"
-      constants.ui.uris.backgroundFullScreenGradient = "pkg:/images/detail-gradient-25.webp"
-      constants.ui.uris.backgroundFullScreenGradient_kidsMode = "pkg:/images/detail-gradient_kids.webp"
-      constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_kidsmode.webp"
-      constants.ui.uris.marketingBackground = "pkg:/images/marketing-background.jpg"
       constants.ui.uris.emptyContainerMyStuffBackground = "pkg:/images/screenMyStuffEmptyContainer.9.png"
       constants.ui.uris.myStuffMyListIcon = "pkg:/images/screenMyStuffMyListIcon.webp"
       constants.ui.uris.myStuffContinueWatchingIcon = "pkg:/images/screenMyStuffContinueWatchingIcon.webp"
 
-    '//::TODO::colors - all theme_ constants (default, kids, holiday, etc) should be listed below.
-    '//   When the app changes themes, the values associated with the "constants.ui.colors.etc" constants should change
-    '//   in constants.ui.themes.etc.
-    '//   There should be no theme specific "constants.ui.colors.etc" constant: i.e.  "constants.ui.colors.backgroundColorKids"
-    '//   When the app assigns a color, it should use a variable within a theme (constants.ui.themes.kidsMode). Maybe a variable called: "backgroundColor",
-    '//   instead of calling directly constants.ui.colors.backgroundColorKids
-    '//   All themes under "constants.ui.themes" should have the same color variables.
 
-    '//The use of the "THEME_" constants will be replaced with hexidecimal color strings during the gulp install process.
-    '//::TODO:: Keeping the colors commented next to the THEME_ constants for now. There are hardcoded instances of
-    '//   these colors throughout the app. Keeping the colors here will make it easier to track down and eventually replace
-    '//   with theme colors in the init or observer functions of the BRS file. Once the hardcoded color instances have been replaced,
-    '//   we can remove the commented out color codes below.
+'THEME/COLOR START///////////////////////
+'//::TODO::colors - the following constants should be moved to themes. The app should not call these constants
+constants.ui.uris.defaultBackground = "pkg:/images/art-blur-background.webp"
+constants.ui.uris.kidsModeBackground = "pkg:/images/art-blur-background_kids.webp"
+constants.ui.uris.marketingBackground = "pkg:/images/background_activation_default.webp"
+constants.ui.uris.marketingBackground_kids = "pkg:/images/background_activation_kids.webp"
+constants.ui.uris.backgroundFullScreenGradient = "pkg:/images/detail-gradient-25.webp"
+constants.ui.uris.backgroundFullScreenGradient_kidsMode = "pkg:/images/detail-gradient_kids.webp"
+constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_kidsmode.webp"
 
-    '//defaultDark theme constants
-    defaultDarkPrimaryAccent = "THEME_defaultDarkPrimaryAccent"                     '// "0xE13100FF"
+'//The use of the "THEME_" constants will be replaced with hexidecimal color strings during the gulp install process.
+'//Source of JSON theme colors are located in /themes/theme.json which is sourced from:
+'//   https://github.com/adRise/design-tokens/blob/main/src/tokens/themes.json
+
+
+'//defaul theme
+    '//default dark sub theme
+    defaultDarkPrimaryAccent = "THEME_defaultDarkPrimaryAccent"
     defaultDarkPrimaryBackground = "THEME_defaultDarkPrimaryBackground"
-    defaultDarkPrimaryForeground = "THEME_defaultDarkPrimaryForeground"                '// "0xFFFFFFFF"
-    defaultDarkTransparentBackground75 = "THEME_defaultDarkTransparentBackground75"  '//"0x191919FF"
+    defaultDarkPrimaryForeground = "THEME_defaultDarkPrimaryForeground"
+    defaultDarkTransparentBackground75 = "THEME_defaultDarkTransparentBackground75"
     ' defaultDarkTransparentForeground0 = "THEME_defaultDarktransparentforeground0"    '//::NOTE::  not currently being used
-    defaultDarkTransparentForeground5 = "THEME_defaultDarkTransparentForeground5"     '//"0xFFFFFF0D"
-    defaultDarkTransparentForeground10 = "THEME_defaultDarkTransparentForeground10"  '// "0xFFFFFF1A"
-    defaultDarkTransparentForeground20 = "THEME_defaultDarkTransparentForeground20"  '//  "0xFFFFFF33"
-    defaultDarkTransparentForeground75 = "THEME_defaultDarkTransparentForeground75"  '//  "0xFFFFFFBF"
+    defaultDarkTransparentForeground5 = "THEME_defaultDarkTransparentForeground5"
+    defaultDarkTransparentForeground10 = "THEME_defaultDarkTransparentForeground10"
+    defaultDarkTransparentForeground20 = "THEME_defaultDarkTransparentForeground20"
+    defaultDarkTransparentForeground75 = "THEME_defaultDarkTransparentForeground75"
     ' defaultDarkStatusSuccess = "THEME_defaultDarkStatusSuccess"   '//::NOTE:: not currently being used
-    defaultDarkStatusCaution = "THEME_defaultDarkStatusCaution"   '// "0xEB9C00FF"
-    defaultDarkStatusAlert = "THEME_defaultDarkStatusAlert"       '//"0xF52D2DFF"
+    defaultDarkStatusCaution = "THEME_defaultDarkStatusCaution"
+    defaultDarkStatusAlert = "THEME_defaultDarkStatusAlert"
+
+    '//default light sub theme
+    defaultLightPrimaryBackground = "THEME_defaultLightPrimaryBackground"
+    defaultLightPrimaryForeground = "THEME_defaultLightPrimaryForeground"
+    defaultLightTransparentForeground75 = "THEME_defaultLightTransparentForeground75"
 
 
-    '//defaultLight theme constants
-    ' defaultLightPrimaryAccent = "THEME_defaultLightPrimaryAccent"
-      defaultLightPrimaryBackground = "THEME_defaultLightPrimaryBackground"
-      defaultLightPrimaryForeground = "THEME_defaultLightPrimaryForeground"
-    ' defaultLightTransparentBackground75 = "THEME_defaultLightTransparentBackground75"
-    ' defaultLightTransparentForeground0 = "THEME_defaultLighttransparentforeground0"
-    ' defaultLightTransparentForeground5 = "THEME_defaultLightTransparentForeground5"
-    ' defaultLightTransparentForeground10 = "THEME_defaultLightTransparentForeground10"
-    ' defaultLightTransparentForeground20 = "THEME_defaultLightTransparentForeground20"
-      defaultLightTransparentForeground75 = "THEME_defaultLightTransparentForeground75"
-    ' defaultLightStatusSuccess = "THEME_defaultLightStatusSuccess"
-    ' defaultLightStatusCaution = "THEME_defaultLightStatusCaution"
-    ' defaultLightStatusAlert = "THEME_defaultLightStatusAlert"
+'//kids theme constants
+    kidsDarkPrimaryAccent = "THEME_kidsDarkPrimaryAccent"
+    kidsDarkPrimaryBackground = "THEME_kidsDarkPrimaryBackground"
+    kidsDarkPrimaryForeground = "THEME_kidsDarkPrimaryForeground"
+    kidsDarkTransparentBackground75 = "THEME_kidsDarkTransparentBackground75"
+    ' kidsDarkTransparentForeground0 = "THEME_kidsDarktransparentforeground0"   '//::NOTE:: not currently being used
+    kidsDarkTransparentForeground5 = "THEME_kidsDarkTransparentForeground5"
+    kidsDarkTransparentForeground10 = "THEME_kidsDarkTransparentForeground10"
+    kidsDarkTransparentForeground20 = "THEME_kidsDarkTransparentForeground20"
+    kidsDarkTransparentForeground75 = "THEME_kidsDarkTransparentForeground75"
+    ' kidsDarkStatusSuccess = "THEME_kidsDarkStatusSuccess"   '//::NOTE:: not currently being used
+    kidsDarkStatusCaution = "THEME_kidsDarkStatusCaution"
+    kidsDarkStatusAlert = "THEME_kidsDarkStatusAlert"
+
+    '//kids light sub theme
+    kidsLightPrimaryBackground = "THEME_kidsLightPrimaryBackground"
+    kidsLightPrimaryForeground = "THEME_kidsLightPrimaryForeground"
+    kidsLightTransparentForeground75 = "THEME_kidsLightTransparentForeground75"
 
 
-    '//kidsDark theme constants
-    kidsDarkPrimaryAccent = "THEME_kidsDarkPrimaryAccent"              '// "0xF08600FF"
-    kidsDarkPrimaryBackground = "THEME_kidsDarkPrimaryBackground"      '// "0x002F8AFF"
-    ' kidsDarkPrimaryForeground = "THEME_kidsDarkPrimaryForeground"
-    ' kidsDarkTransparentBackground75 = "THEME_kidsDarkTransparentBackground75"
-    ' kidsDarkTransparentForeground0 = "THEME_kidsDarktransparentforeground0"
-    ' kidsDarkTransparentForeground5 = "THEME_kidsDarkTransparentForeground5"
-    ' kidsDarkTransparentForeground10 = "THEME_kidsDarkTransparentForeground10"
-    ' kidsDarkTransparentForeground20 = "THEME_kidsDarkTransparentForeground20"
-    ' kidsDarkTransparentForeground75 = "THEME_kidsDarkTransparentForeground75"
-    ' kidsDarkStatusSuccess = "THEME_kidsDarkStatusSuccess"
-    ' kidsDarkStatusCaution = "THEME_kidsDarkStatusCaution"
-    ' kidsDarkStatusAlert = "THEME_kidsDarkStatusAlert"
+'//holidays theme constants
+    holidaysDarkPrimaryAccent = "THEME_holidaysDarkPrimaryAccent"
+    holidaysDarkPrimaryBackground = "THEME_holidaysDarkPrimaryBackground"
+    holidaysDarkPrimaryForeground = "THEME_holidaysDarkPrimaryForeground"
+    holidaysDarkTransparentBackground75 = "THEME_holidaysDarkTransparentBackground75"
+    ' holidaysDarkTransparentForeground0 = "THEME_holidaysDarktransparentforeground0"   '//::NOTE:: not currently being used
+    holidaysDarkTransparentForeground5 = "THEME_holidaysDarkTransparentForeground5"
+    holidaysDarkTransparentForeground10 = "THEME_holidaysDarkTransparentForeground10"
+    holidaysDarkTransparentForeground20 = "THEME_holidaysDarkTransparentForeground20"
+    holidaysDarkTransparentForeground75 = "THEME_holidaysDarkTransparentForeground75"
+    ' holidaysDarkStatusSuccess = "THEME_holidaysDarkStatusSuccess"   '//::NOTE:: not currently being used
+    holidaysDarkStatusCaution = "THEME_holidaysDarkStatusCaution"
+    holidaysDarkStatusAlert = "THEME_holidaysDarkStatusAlert"
 
 
-    '//holidaysDark theme constants
-    ' holidaysDarkPrimaryAccent = "THEME_holidaysDarkPrimaryAccent"
-    ' holidaysDarkPrimaryBackground = "THEME_holidaysDarkPrimaryBackground"
-    ' holidaysDarkPrimaryForeground = "THEME_holidaysDarkPrimaryForeground"
-    ' holidaysDarkTransparentBackground75 = "THEME_holidaysDarkTransparentBackground75"
-    ' holidaysDarkTransparentForeground0 = "THEME_holidaysDarktransparentforeground0"
-    ' holidaysDarkTransparentForeground5 = "THEME_holidaysDarkTransparentForeground5"
-    ' holidaysDarkTransparentForeground10 = "THEME_holidaysDarkTransparentForeground10"
-    ' holidaysDarkTransparentForeground20 = "THEME_holidaysDarkTransparentForeground20"
-    ' holidaysDarkTransparentForeground75 = "THEME_holidaysDarkTransparentForeground75"
-    ' holidaysDarkStatusSuccess = "THEME_holidaysDarkStatusSuccess"
-    ' holidaysDarkStatusCaution = "THEME_holidaysDarkStatusCaution"
-    ' holidaysDarkStatusAlert = "THEME_holidaysDarkStatusAlert"
+    '//holidays light sub theme
+    holidaysLightPrimaryBackground = "THEME_holidaysLightPrimaryBackground"
+    holidaysLightPrimaryForeground = "THEME_holidaysLightPrimaryForeground"
+    holidaysLightTransparentForeground75 = "THEME_holidaysLightTransparentForeground75"
 
 
-    constants.ui.colors = {}
+constants.ui.colors = {}
+    constants.ui.colors.transparent = "0x00000000"
 
-      '//::TODO::colors - when a theme is changed, then the following constants should be changed.
-      '//   Each theme under constants.ui.themes should contain the following constants
+'The IDs of the available themes that can be used for the app
+constants.ui.themeIDs = {}
+constants.ui.themeIDs.default = "default"
+constants.ui.themeIDs.kidsMode = "kidsMode"
+constants.ui.themeIDs.holidays = "holidays"
 
-      'template colors
-      constants.ui.colors.transparent = "0x00000000"
-      constants.ui.colors.caution = defaultDarkStatusCaution
-      constants.ui.colors.backgroundColor = defaultDarkPrimaryBackground
-      constants.ui.colors.backgroundColorKids = kidsDarkPrimaryBackground
-      constants.ui.colors.neutralColor = defaultDarkTransparentForeground20
-      constants.ui.colors.neutralColor2 = defaultDarkTransparentForeground10
-      constants.ui.colors.neutralColor3 = defaultDarkTransparentForeground5
-      constants.ui.colors.backgroundColorLight = defaultDarkPrimaryForeground
-      constants.ui.colors.backgroundColorLight2 = defaultDarkTransparentForeground75
-      constants.ui.colors.shade = defaultDarkTransparentBackground75
 
-      constants.ui.colors.focused = defaultDarkPrimaryAccent
-      constants.ui.colors.focusedKids = kidsDarkPrimaryAccent
-      constants.ui.colors.focused2 = defaultDarkStatusAlert
-      constants.ui.colors.unfocused = defaultDarkPrimaryForeground
-      constants.ui.colors.selectedListItem = defaultDarkTransparentForeground20
-      constants.ui.colors.primaryText = defaultDarkPrimaryForeground
-      constants.ui.colors.textDark = defaultDarkPrimaryBackground
-      constants.ui.colors.secondaryText = defaultDarkTransparentForeground75
-      constants.ui.colors.focusedText = defaultDarkPrimaryForeground
-
-      '//::NOTE::HARDCODED:: there is a BUG in the built in roku keyboard component'
-      '// If the color is white, then it will make the focus color to a nearly-black gray.
-      '// To combat this limitation, the color is set to white with a very slight, hardly-noticeable opacity.
-      constants.ui.colors.keyboardFocusedText = "0xFFFFFFFE"
-      constants.ui.colors.highlightedText = defaultDarkPrimaryAccent
-
-      'textbox text colors
-      constants.ui.colors.unselectedEntryBox = defaultDarkPrimaryForeground
-
-      'colors for individual elements - can be made individual or controlled by template colors
-      constants.ui.colors.titleHeader = defaultDarkPrimaryForeground
-      constants.ui.colors.expirationWarning = defaultDarkStatusCaution
-
-      'colors for timeGrid
-      constants.ui.colors.futureItemSelected = defaultDarkStatusCaution
-      constants.ui.colors.EPGProgramFocused = defaultDarkTransparentForeground75
-
-      'colors for toast
-      constants.ui.colors.toastTitle = defaultLightPrimaryForeground
-      constants.ui.colors.toastBackGround = defaultLightPrimaryBackground
-      constants.ui.colors.toastMessage = defaultLightTransparentForeground75
-
-    'The IDs of the available themes that can be used for the app
-    constants.ui.themeIDs = {}
-    constants.ui.themeIDs.default = "default"
-    constants.ui.themeIDs.kidsMode = "kidsMode"
-
-    'available themes that can be used for the app
-    constants.ui.themes = {}
-      constants.ui.themes.default = {
+'available themes that can be used for the app
+constants.ui.themes = {}
+    constants.ui.themes.default = {
         id: constants.ui.themeIDs.default
-        focused: constants.ui.colors.focused
-        highlightedText: constants.ui.colors.highlightcolor
+        focusedColor: defaultDarkPrimaryAccent
+        highlightedTextColor: defaultDarkPrimaryAccent
         keyboard_focused_key: "pkg:/images/keyboard_search_focused_key.9.png"
         scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground.9.png"
         scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground.9.png"
-        gradientBlendColor: constants.ui.colors.backgroundColor
-      }
-      constants.ui.themes.kidsMode = {
+        gradientBlendColor: defaultDarkPrimaryBackground
+
+        cautionColor: defaultDarkStatusCaution
+        backgroundColor: defaultDarkPrimaryBackground
+        neutralColor: defaultDarkTransparentForeground20
+        neutralColor2: defaultDarkTransparentForeground10
+        neutralColor3: defaultDarkTransparentForeground5
+        backgroundColorLight: defaultDarkPrimaryForeground
+        backgroundColorLight2: defaultDarkTransparentForeground75
+        shadeColor: defaultDarkTransparentBackground75
+        focused2Color: defaultDarkStatusAlert
+        unfocusedColor: defaultDarkPrimaryForeground
+        selectedListItemColor: defaultDarkTransparentForeground5
+        primaryTextColor: defaultDarkPrimaryForeground
+        textDarkColor: defaultDarkPrimaryBackground
+        secondaryTextColor: defaultDarkTransparentForeground75
+        focusedTextColor: defaultDarkPrimaryForeground
+        highlightedTextColor: defaultDarkPrimaryAccent
+        keyboardFocusedTextColor: defaultDarkPrimaryForeground
+
+        inverseBackgroundColor: defaultLightPrimaryBackground
+        inversePrimaryTextColor: defaultLightPrimaryForeground
+        inverseSecondaryTextColor: defaultLightTransparentForeground75
+    }
+    
+    constants.ui.themes.kidsMode = {
         id: constants.ui.themeIDs.kidsMode
-        focused: constants.ui.colors.focusedKids
-        highlightedText: constants.ui.colors.focusedKids
+        focusedColor: kidsDarkPrimaryAccent
+        highlightedTextColor: kidsDarkPrimaryAccent
         keyboard_focused_key: "pkg:/images/keyboard_search_focused_key_kidsMode.9.png"
         scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground_kidsMode.9.png"
         scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground_kidsMode.9.png"
-        gradientBlendColor: constants.ui.colors.backgroundColorKids
-      }
+        gradientBlendColor: kidsDarkPrimaryBackground
+
+        cautionColor: kidsDarkStatusCaution
+        backgroundColor: kidsDarkPrimaryBackground
+        neutralColor: kidsDarkTransparentForeground20
+        neutralColor2: kidsDarkTransparentForeground10
+        neutralColor3: kidsDarkTransparentForeground5
+        backgroundColorLight: kidsDarkPrimaryForeground
+        backgroundColorLight2: kidsDarkTransparentForeground75
+        shadeColor: kidsDarkTransparentBackground75
+        focused2Color: kidsDarkStatusAlert
+        unfocusedColor: kidsDarkPrimaryForeground
+        selectedListItemColor: kidsDarkTransparentForeground5
+        primaryTextColor: kidsDarkPrimaryForeground
+        textDarkColor: kidsDarkPrimaryBackground
+        secondaryTextColor: kidsDarkTransparentForeground75
+        focusedTextColor: kidsDarkPrimaryBackground
+        highlightedTextColor: kidsDarkPrimaryAccent
+        keyboardFocusedTextColor: kidsDarkPrimaryBackground
+
+        inverseBackgroundColor: kidsLightPrimaryBackground
+        inversePrimaryTextColor: kidsLightPrimaryForeground
+        inverseSecondaryTextColor: kidsLightTransparentForeground75
+    }
+
+    constants.ui.themes.holidays = {
+        id: constants.ui.themeIDs.holidays
+        focusedColor: holidaysDarkPrimaryAccent
+        highlightedTextColor: holidaysDarkPrimaryAccent
+        keyboard_focused_key: "pkg:/images/keyboard_search_focused_key.9.png"
+        scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground.9.png"
+        scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground.9.png"
+        gradientBlendColor: holidaysDarkPrimaryBackground
+        
+        cautionColor: holidaysDarkStatusCaution
+        backgroundColor: holidaysDarkPrimaryBackground
+        neutralColor: holidaysDarkTransparentForeground20
+        neutralColor2: holidaysDarkTransparentForeground10
+        neutralColor3: holidaysDarkTransparentForeground5
+        backgroundColorLight: holidaysDarkPrimaryForeground
+        backgroundColorLight2: holidaysDarkTransparentForeground75
+        shadeColor: holidaysDarkTransparentBackground75
+        focused2Color: holidaysDarkStatusAlert
+        unfocusedColor: holidaysDarkPrimaryForeground
+        selectedListItemColor: holidaysDarkTransparentForeground5
+        primaryTextColor: holidaysDarkPrimaryForeground
+        textDarkColor: holidaysDarkPrimaryBackground
+        secondaryTextColor: holidaysDarkTransparentForeground75
+        focusedTextColor: holidaysDarkPrimaryForeground
+        highlightedTextColor: holidaysDarkPrimaryAccent
+        keyboardFocusedTextColor: holidaysDarkPrimaryForeground
+
+        inverseBackgroundColor: holidaysLightPrimaryBackground
+        inversePrimaryTextColor: holidaysLightPrimaryForeground
+        inverseSecondaryTextColor: holidaysLightTransparentForeground75
+    }
+
+
+    '//::NOTE::HARDCODED:: there is a BUG in the built in roku keyboard component
+    '// If the color is white, then it will make the focus color to a nearly-black gray.
+    '// To combat this limitation, the color is set to white with a very slight, hardly-noticeable opacity.
+    if UCase(constants.ui.themes.default.keyboardFocusedTextColor) = "0XFFFFFFFF"
+    constants.ui.themes.default.keyboardFocusedTextColor  = "0xFFFFFFFE"
+    end if
+    if UCase(constants.ui.themes.kidsMode.keyboardFocusedTextColor) = "0XFFFFFFFF"
+    constants.ui.themes.kidsMode.keyboardFocusedTextColor  = "0xFFFFFFFE"
+    end if
+    if UCase(constants.ui.themes.holidays.keyboardFocusedTextColor) = "0XFFFFFFFF"
+    constants.ui.themes.holidays.keyboardFocusedTextColor  = "0xFFFFFFFE"
+    end if
+
+
+'THEME/COLOR END///////////////////////
 
     constants.ui.homescreen = {}
       constants.ui.homescreen.focusItems = {}

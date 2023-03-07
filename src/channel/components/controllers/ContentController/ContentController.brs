@@ -37,7 +37,6 @@ Function init()
   m.tensorapi = TensorApi(m.constants, m.Request, Auth)
 
   m.background = m.top.findNode("ContentBackground")
-  m.background.color = m.constants.ui.colors.backgroundColor
   m.SponsorBground = m.top.findNode("SponsorshipBackgroundGroup")
 
   m.uiGroup = m.top.findNode("uiGroup")
@@ -94,6 +93,10 @@ Function init()
   ' TODO: Once MetadataFetchTask functionality is refactored to use the GeneralTask remove uiMode from m.global
   m.global.addField("uiMode", "string", false)
   setUiMode(m.constants.ui.modes.standard)
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.background.color = theme.backgroundColor 
+  end if
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
 
@@ -120,7 +123,6 @@ Function init()
   m.logoType = m.constants.logoType.tubi
 
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
-
   m.marketingBackgroundUri = m.constants.ui.uris.marketingBackground
 
   'This variable has been used to keep track of user's choice on autoplay. Without maintaining this variable, we might have to access m.global everytime
@@ -1394,7 +1396,7 @@ Function setHomeScreenBackground(homeScreen)
       }
     else
       m.backgroundGroup.backgroundInfo = {
-        type: getBackgroundtype(homeScreen.backgroundUriList, contentType)
+        type: getBackgroundType(homeScreen.backgroundUriList, contentType)
         uriList: homeScreen.backgroundUriList
       }
     end if
@@ -1421,7 +1423,7 @@ Function onEpisodeBackgroundChange(msg)
   TubiLog("ContentController.onEpisodeBackgroundChange")
   episodeScreen = msg.getRoSGNode()
   m.backgroundGroup.backgroundInfo = {
-    type: getBackgroundtype(episodeScreen.backgroundUriList)
+    type: getBackgroundType(episodeScreen.backgroundUriList)
     uriList: episodeScreen.backgroundUriList
   }
 End Function
@@ -1431,7 +1433,7 @@ Function onSearchBackgroundChange(msg)
   TubiLog("ContentController.onSearchBackgroundChange")
   searchScreen = msg.getRoSGNode()
   m.backgroundGroup.backgroundInfo = {
-    type: getBackgroundtype(searchScreen.backgroundUriList)
+    type: getBackgroundType(searchScreen.backgroundUriList)
     uriList: searchScreen.backgroundUriList
   }
 End Function
@@ -1441,7 +1443,7 @@ Function onCategoryScreenBackgroundChange(msg)
   TubiLog("ContentController.onCategoryScreenBackgroundChange")
   categoryDetailsScreen = msg.getRoSGNode()
   m.backgroundGroup.backgroundInfo = {
-    type: getBackgroundtype(categoryDetailsScreen.backgroundUriList)
+    type: getBackgroundType(categoryDetailsScreen.backgroundUriList)
     uriList: categoryDetailsScreen.backgroundUriList
   }
 End Function
@@ -1449,7 +1451,7 @@ End Function
 Function displayDefaultBackground()
   TubiLog("ContentController.displayDefaultBackground")
   m.backgroundGroup.backgroundInfo = {
-    type: getBackgroundtype([m.defaultBackgroundUri])
+    type: getBackgroundType([m.defaultBackgroundUri])
     uriList: [m.defaultBackgroundUri]
   }
 End Function
@@ -1460,7 +1462,7 @@ Function onScreenBackgroundUpdated(msg)
   screen = msg.getRoSGNode()
   if screen <> invalid
     m.backgroundGroup.backgroundInfo = {
-      type: getBackgroundtype(screen.backgroundUriList)
+      type: getBackgroundType(screen.backgroundUriList)
       uriList: screen.backgroundUriList
     }
   end if
@@ -1497,7 +1499,8 @@ End Function
 ' Helper function to get the background type depending on if passed in uri list is using the default image
 ' @backgroundUriList, array of uris
 ' @contentType, String - depending on the focused on content, it will determine the background type
-Function getBackgroundtype(backgroundUriList, contentType = "")
+Function getBackgroundType(backgroundUriList, contentType = "")
+  
   backgroundType = m.constants.ui.backgroundTypes.topRight
   if backgroundUriList <> invalid
     if backgroundUriList[0] = m.defaultBackgroundUri

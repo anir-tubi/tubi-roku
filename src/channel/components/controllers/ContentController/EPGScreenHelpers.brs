@@ -671,7 +671,7 @@ End Function
 Function changeEPGScreenBackground(EPGScreen)
   if EPGScreen <> invalid AND EPGScreen.backgroundUriList <> invalid
     m.backgroundGroup.backgroundInfo = {
-      type : getBackgroundtype(EPGScreen.backgroundUriList, m.constants.ui.contentTypes.epg)
+      type : getBackgroundType(EPGScreen.backgroundUriList, m.constants.ui.contentTypes.epg)
       uriList : EPGScreen.backgroundUriList
     }
   end if

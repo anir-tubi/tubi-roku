@@ -41,18 +41,34 @@ Function init()
   m.NumberPad.observeField("text", "onNumberPadTextChanged")
   m.top.observeFieldScoped("ageSubmitted", "onAgeSubmittedChanged")
 
-  m.SubHeader.color = m.constants.ui.colors.secondaryText
-  m.Header.color = m.constants.ui.colors.primaryText
-  m.bornYear.color = m.constants.ui.colors.primaryText
-  m.YearEntryBack.color = m.constants.ui.colors.secondaryText
-  m.StartButton.color = m.constants.ui.colors.backgroundColorLight2
-  m.Header.color = m.constants.ui.colors.primaryText
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
 
-  m.YearLabel.color = m.constants.ui.colors.primaryText
-  m.infoLabel.color = m.constants.ui.colors.primaryText
-  m.YearEntryFront.color = m.constants.ui.colors.textDark
-  m.YearEntryBack.color = m.constants.ui.colors.textDark
-  m.Prompt.color = m.constants.ui.colors.caution
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.SubHeader.color = theme.secondaryText
+    m.Header.color = theme.primaryText
+    m.bornYear.color = theme.primaryText
+    m.YearEntryBack.color = theme.secondaryText
+    m.StartButton.color = theme.backgroundColorLight2
+    m.Header.color = theme.primaryText
+    
+    m.YearLabel.color = theme.primaryText
+    m.infoLabel.color = theme.primaryText
+    m.YearEntryFront.color = theme.textDark
+    m.YearEntryBack.color = theme.textDark
+    m.Prompt.color = theme.caution
+  end if
 End Function
 
 

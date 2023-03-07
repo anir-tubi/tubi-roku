@@ -11,7 +11,10 @@ Function init()
   m.ContentGroup = m.top.findNode("ContentGroup")
   m.Menu = m.top.findNode("ParentalControlsMenu")
   m.Menu.focusBitmapUri = "pkg:/images/menu-focus-fhd.9.png"
-  m.Menu.focusBitmapBlendColor = m.global.theme.focused
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.Menu.focusBitmapBlendColor = theme.focusedColor
+  end if
   m.Menu.focusFootprintBitmapUri = "pkg:/images/menu-footprint-fhd.9.png"
   if m.constants.deviceInfo.scaledUi = true
     m.Menu.focusBitmapUri = "pkg:/images/menu-focus-hd.9.png"

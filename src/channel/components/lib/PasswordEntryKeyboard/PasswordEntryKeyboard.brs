@@ -1,6 +1,6 @@
 Function init()
   m.constants = m.global.constants
-  m.theme = m.global.theme
+  theme = getThemeFromGlobal()
   m.passwordMode = true
   m.back = m.top.findNode("back")
   m.back.text = getTranslation("linearVideoPlayer_buttonBack")
@@ -23,9 +23,11 @@ Function init()
   m.top.observeFieldScoped("voiceEnabled", "onVoiceEnabledChange")
   m.keyboard.textEditBox.observeFieldScoped("focusedChild", "onTextEditBoxFocusedChildChange")
 
-  m.back.color = m.constants.ui.colors.backgroundColorLight
-  m.continue.color = m.constants.ui.colors.backgroundColorLight
-  m.showHidePassword.color = m.constants.ui.colors.backgroundColorLight
+  if theme <> invalid
+    m.back.color = theme.backgroundColorLight
+    m.continue.color = theme.backgroundColorLight
+    m.showHidePassword.color = theme.backgroundColorLight
+  end if
 End Function
 
 

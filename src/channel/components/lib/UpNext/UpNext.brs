@@ -21,9 +21,7 @@ Function init()
   m.InfoSeries = m.top.findNode("InfoSeries")
   m.Timer = m.top.findNode("UpNextCountdownTimer")
   m.CountdownMovie = m.top.findNode("CountdownLabelMovie")
-  m.CountdownMovie.color =  m.global.theme.highlightedText
   m.CountdownSeries = m.top.findNode("CountdownLabelSeries")
-  m.CountdownSeries.color =  m.global.theme.highlightedText
   m.Timer.observeField("fire", "onCountdownTimer")
   m.MovieGroup = m.top.findNode("UpNextMovieGroup")
   m.SeriesGroup = m.top.findNode("UpNextSeriesGroup")
@@ -39,7 +37,7 @@ Function init()
     '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
-
+  
   focusBox = m.top.findNode("FocusBox")
   if m.global.constants.deviceInfo.scaledUi = true then
     focusBox.uri = "pkg:/images/selector-hd.9.png"
@@ -51,8 +49,14 @@ Function init()
   else
     focusBoxMargin = 6
   end if
-  focusBox.blendColor = m.global.theme.focused
-  m.GridSeries.focusBitmapBlendColor = m.global.theme.focused
+
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    focusBox.blendColor = theme.focusedColor
+    m.GridSeries.focusBitmapBlendColor = theme.focusedColor
+    m.CountdownMovie.color =  theme.highlightedTextColor
+    m.CountdownSeries.color =  theme.highlightedTextColor
+  end if
 
   focusBox.width = 210 + focusBoxMargin * 2
   focusBox.height = 300 + focusBoxMargin * 2

@@ -2,6 +2,13 @@ Function init()
   m.background = m.top.findNode("ProgressBarBackground")
   m.background.observeField("bitmapWidth", "drawProgressBar")
   m.foreground = m.top.findNode("ProgressBarForeground")
+
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.top.focusColor = theme.primaryTextColor
+    m.top.unfocusColor = theme.primaryTextColor
+  end if
+
   m.foreground.observeField("bitmapWidth", "drawProgressBar")
   m.top.observeField("width", "drawProgressBar")
   m.top.observeField("progress", "drawProgressBar")

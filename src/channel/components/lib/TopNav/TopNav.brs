@@ -1,5 +1,9 @@
 Function init()
   tubiLog("TopNav.init")
+  theme = getThemeFromGlobal()
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
 
   m.Menu = m.top.findNode("TopNavMenu")
   m.MenuBground = m.top.findNode("TopNavMenuBground")
@@ -9,12 +13,14 @@ Function init()
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 
-  m.colors = {
-    white: m.constants.ui.colors.unfocused
-    lightGray: m.constants.ui.colors.secondaryText
-    darkGray: m.constants.ui.colors.backgroundColor
-    orange: m.constants.ui.colors.highlightedText
-  }
+  if theme <> invalid
+    m.colors = {
+      white: theme.unfocusedColor
+      lightGray: theme.secondaryTextColor
+      darkGray: theme.backgroundColor
+      orange: theme.highlightedTextColor
+    }
+  end if
 
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("jumpToID", "onJumpIDChange")
@@ -23,9 +29,11 @@ Function init()
   m.top.observeFieldScoped("selectedId", "onSelectedIdChange")
 
   m.Menu.numRows = 1
-  m.MenuBground.blendColor = m.colors.lightGray
   m.Menu.translation = [12,12]
-  m.Menu.focusFootprintBlendColor = m.colors.white
+  if m.colors <> invalid
+    m.MenuBground.blendColor = m.colors.lightGray
+    m.Menu.focusFootprintBlendColor = m.colors.white
+  end if
 
   if m.constants <> invalid AND m.constants.deviceInfo.scaledUi = true
     m.Menu.focusBitmapUri = "pkg:/images/pill_top_nav_hd.9.png"
@@ -45,11 +53,34 @@ Function init()
 End Function
 
 
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+
+  if theme <> invalid
+    m.colors = {
+      white: theme.unfocusedColor
+      lightGray: theme.secondaryTextColor
+      darkGray: theme.backgroundColor
+      orange: theme.highlightedTextColor
+    }
+    
+    m.MenuBground.blendColor = m.colors.lightGray
+    setUiState(m.top.uiState)
+  end if
+End Function
+
+
 ' Draw the navigational items in the top nav. Do not call this in the init() function as it may slow the app down as the content is loading
 Function onContentUpdated()
   tubiLog("TopNav.onContentUpdated")
   theme = getThemeFromGlobal()
-  m.Menu.focusBitmapBlendColor = theme.focused
+  if theme <> invalid
+    m.Menu.focusBitmapBlendColor = theme.focusedColor
+  end if
 
   ' HARDCODED:: nButtonPadding is the total horizontal padding of the buttons to ensure
   ' MenuBground is the proper width. Since this cannot be determined easily programatically,
@@ -69,13 +100,15 @@ Function onContentUpdated()
       selectedWasSet = true
       m.top.selectedIndex = i
     end if
-
-    if m.top.uiState = "unfocusedFar"
-      menuItem.selectedItemColor = m.colors.white
-    else if m.top.uiState = "unfocusedNear"
-      menuItem.selectedItemColor = m.colors.darkGray
-    else if m.top.uiState = "focused"
-      menuItem.selectedItemColor = m.colors.orange
+    
+    if m.colors <> invalid
+      if m.top.uiState = "unfocusedFar"
+        menuItem.selectedItemColor = m.colors.white
+      else if m.top.uiState = "unfocusedNear"
+        menuItem.selectedItemColor = m.colors.darkGray
+      else if m.top.uiState = "focused"
+        menuItem.selectedItemColor = m.colors.orange
+      end if
     end if
 
     itemWidth = getItemWidth(menuItem)
@@ -242,6 +275,7 @@ End Function
 Function onUiStateChange(msg)
   tubiLog("TopNav.onUiStateChange")
   uiState = msg.getData()
+
   setUiState(uiState)
 End Function
 
@@ -267,8 +301,10 @@ End Function
 
 Function setFocusedVisuals()
   tubiLog("TopNav.setFocusedVisuals")
-  m.Menu.focusFootprintBlendColor = m.colors.orange
-  setSelectedItemColorOnMenuItems(m.colors.orange)
+  if m.colors <> invalid
+    m.Menu.focusFootprintBlendColor = m.colors.orange
+    setSelectedItemColorOnMenuItems(m.colors.orange)
+  end if
 
   ' account for any animations that may be in process on the menu
   stopAnimation(m.menuFade)
@@ -280,8 +316,10 @@ End Function
 
 Function setUnfocusedNearVisuals()
   tubiLog("TopNav.setUnfocusedNearVisuals")
-  m.Menu.focusFootprintBlendColor = m.colors.white
-  setSelectedItemColorOnMenuItems(m.colors.darkGray)
+  if m.colors <> invalid
+    m.Menu.focusFootprintBlendColor = m.colors.white
+    setSelectedItemColorOnMenuItems(m.colors.darkGray)
+  end if
 
   ' account for any animations that may be in process on the menu
   stopAnimation(m.menuFade)
@@ -293,7 +331,10 @@ End Function
 
 Function setUnfocusedFarVisuals()
   tubiLog("TopNav.setUnfocusedFarVisuals")
-  m.Menu.focusFootprintBlendColor = m.constants.ui.colors.neutralColor
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.Menu.focusFootprintBlendColor = theme.neutralColor
+  end if
 
   ' account for any animations that may be in process on the menu
   stopAnimation(m.menuFade)
@@ -301,7 +342,7 @@ Function setUnfocusedFarVisuals()
   ' fade out the Menu to make labels 64% opacity (give a gray look)
   m.menuFade = fade(m.Menu, "out", 0.4, 0.0, 0.64)
 
-  setSelectedItemColorOnMenuItems("0xFFFFFFFF")
+  setSelectedItemColorOnMenuItems(theme.primaryTextColor)
 End Function
 
 

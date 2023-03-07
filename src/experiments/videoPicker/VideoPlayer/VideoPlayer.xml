@@ -173,7 +173,6 @@
         id="LoadingProgressBar"
         width="750"
         progress="50"
-        trackColor="0xFFFFFF1A"
         translation="[584,696]"/>
     </Group>
 
@@ -198,6 +197,7 @@
         opacity="0.4">
       </Poster>
       <Label
+        id="AdHeadsUpAdBreak1"
         translation="[87,74]"
         width="66"
         height="66"
@@ -213,9 +213,9 @@
         translation="[131,72]"
         layoutDirection="horiz">
         <Label
+          id="AdHeadsUpAdBreak2"
           height="66"
           vertAlign="center"
-          color="0xEB9C00FF"
           text="   break">
           <Font
             id="Vaud34px"
@@ -371,7 +371,6 @@
       <TubiProgressBar
         id="ProgressBar"
         width="1752"
-        trackColor="0xFFFFFF1A"
         translation="[85,896]"/>
 
       <!-- Time -->

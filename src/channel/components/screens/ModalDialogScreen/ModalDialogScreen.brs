@@ -15,12 +15,27 @@ Function init()
 
   
   m.constants = getConstantsFromGlobal()
-  m.Shade.color = m.constants.ui.colors.shade
-  m.ScrollableBackground.color = m.constants.ui.colors.shade
-  m.Message.color = m.constants.ui.colors.primaryText
-  m.Title.color = m.constants.ui.colors.primaryText
-
   m.top.screenLevel = m.constants.ui.screenLevels.modalDialogScreen
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.Shade.color = theme.shadeColor
+    m.ScrollableBackground.color = theme.shadeColor
+    m.Message.color = theme.primaryTextColor
+    m.Title.color = theme.primaryTextColor
+  end if
 End Function
 
 

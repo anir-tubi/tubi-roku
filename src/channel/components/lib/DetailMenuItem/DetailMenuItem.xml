@@ -11,6 +11,7 @@
 
     <!-- hide the progress bar when focus changes -->
     <field id="focusPercent" alias="ResumeProgressBar.opacity" value="0.0"/>
+    <field id="itemHasFocus" type="boolean" />
 
     <!-- Content expected for a DetailMenuItem:
      -
@@ -44,7 +45,6 @@
       width="0"
       height="0"
       uri="pkg:/images/menu-focus-fhd.9.png"
-      blendColor="0xFFFFFF1A"
       visible="false"
       translation="[0,0]"/>
 
@@ -61,7 +61,6 @@
      vertAlign="center"
      horizAlign="left"
      height="80"
-     color="0xFFFFFFFF"
      opacity="1.0">
       <Font
        role="font"

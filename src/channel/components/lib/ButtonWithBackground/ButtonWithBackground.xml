@@ -22,7 +22,6 @@
       translation="[0,0]"/>
     <Label
       id="label"
-      color="0xFFFFFF"
       height="80"
       width="450"
       horizAlign="center"

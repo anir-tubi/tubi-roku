@@ -627,7 +627,7 @@ Function onAgeVerificationScreenBackgroundUpdated(msg)
   ageVerificationScreen = msg.getRoSGNode()
   if ageVerificationScreen <> invalid
     m.backgroundGroup.backgroundInfo = {
-      type: getBackgroundtype(ageVerificationScreen.backgroundUriList)
+      type: getBackgroundType(ageVerificationScreen.backgroundUriList)
       uriList: ageVerificationScreen.backgroundUriList
     }
   end if

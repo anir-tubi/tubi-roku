@@ -344,7 +344,6 @@
             width="875"
             wrap="false"
             maxLines="1"
-            color="0xFFFFFFFF"
             translation="[0,366]">
             <Font
               role="font"

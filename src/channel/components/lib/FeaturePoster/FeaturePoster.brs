@@ -3,7 +3,26 @@ Function init()
   m.Title = m.top.findNode("Title")
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("width", "onWidthChange")
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
 End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.Title.color = theme.primaryTextColor
+  end if
+End Function
+
 
 
 ''''''''''''''''''

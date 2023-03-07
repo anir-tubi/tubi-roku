@@ -9,11 +9,9 @@ Function init()
   m.channelsGrid = m.top.findNode("channelsGrid")
   m.headerText = m.top.findNode("headerText")
   m.backToLive = m.top.findNode("backToLive")
+  m.backToLiveText = m.top.findNode("backToLiveText")
   m.programGrid = m.top.findNode("programGrid")
-  theme = getThemeFromGlobal()
-  if theme <> invalid
-    m.programGrid.focusBitmapBlendColor = theme.focused
-  end if
+  m.leftIcon = m.top.findNode("leftIcon")
   m.playOnFocusMode = true
   m.lastFocused = -1
 
@@ -29,6 +27,28 @@ Function init()
   m.updateMinsLeftTimer = m.top.findNode("updateMinsLeftTimer")
   m.updateMinsLeftTimer.observeField("fire", "onUpdateMinsLeftTimer")
   m.programGrid.observeFieldScoped("okPressed", "onOkPressed")
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.programGrid.focusBitmapBlendColor = theme.focusedColor
+    m.channelsGrid.focusFootPrintBlendColor = theme.backgroundColorLight2
+    m.headerText.color = theme.primaryTextColor
+    m.backToLiveText.color = theme.primaryTextColor
+    m.leftIcon.blendColor = theme.primaryTextColor
+  end if
 End Function
 
 

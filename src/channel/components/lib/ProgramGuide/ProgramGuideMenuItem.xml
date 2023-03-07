@@ -7,6 +7,7 @@
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
@@ -25,21 +26,18 @@
       height="108"
       width="291"
       opacity="1"
-      uri="pkg:/images/timeProgress.png"
-      blendColor="0xFFFFFFBF"/>
+      uri="pkg:/images/timeProgress.png"/>
 
     <Poster
       id="cellRect"
       height="108"
       opacity="1"
-      uri="pkg:/images/ratingBackground.9.png"
-      blendColor="0xFFFFFF1A"/>
+      uri="pkg:/images/ratingBackground.9.png"/>
 
     <Label
       id="timeString"
       translation="[24,18]"
       height="30"
-      color="0xFFFFFFBF"
       horizAlign="left"
       vertAlign="center"
       maxLines="1"
@@ -60,7 +58,6 @@
 
       <Label
         id="programString"
-        color="0xFFFFFFFF"
         translation="[24,54]"
         height="36"
         opacity="0.45"

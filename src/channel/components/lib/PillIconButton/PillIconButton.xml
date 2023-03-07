@@ -10,6 +10,7 @@
   <script type="text/brightscript" uri="PillIconButton.brs" />
   <script type="text/brightscript" uri="../ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -27,7 +28,6 @@
       width="127"
       height="60"
       uri="pkg:/images/live_tv_button_fhd.9.png"
-      blendColor="0xFFFFFF1A"
       loadSync="true"
       visible="true" />
     <LayoutGroup
@@ -44,8 +44,7 @@
         id="Title"
         width="0"
         height="44"
-        vertAlign="center"
-        color="0xFFFFFFFF">
+        vertAlign="center">
         <Font
           id="TitleFont"
           role="font"

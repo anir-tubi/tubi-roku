@@ -1,16 +1,9 @@
 Function init()
-
   m.border = m.top.findNode("border")
-  m.border.color = m.global.theme.focused
-
   m.rectBG = m.top.findNode("rectBG")
-  m.rectBG.color = "0xFFFFFF33"
-
   m.Text = m.top.findNode("Text")
   m.Text.text = m.top.hint
   
-  '//::TODO::colors - change the following color dynamically to be associated with m.constants.ui.colors.neutralColor
-  m.Text.color = "0xFFFFFF33"
   
   m.top.observeField("boxWidth", "onBoxWidth")
   m.top.observeField("boxHeight", "onBoxHeight")
@@ -22,34 +15,50 @@ Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("highlight", "onHighlight")
   m.top.observeField("passwordMode", "onPasswordModeChange")
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
   
+  if theme <> invalid
+    m.border.color = theme.focusedColor
+    m.rectBG.color = theme.neutralColor
+    m.Text.color = theme.neutralColor
+  end if
 End Function
 
 
 Function onBoxWidth()
-
   m.rectBG.width = m.top.boxWidth
   m.border.width = m.top.boxWidth + 8
-
 End Function
 
 
 Function onBoxHeight()
-
   m.rectBG.height = m.top.boxHeight
   m.border.height = m.top.boxHeight + 8
-
 End Function
 
 
 Function onHighlight()
-
+  theme = getThemeFromGlobal()
   if m.top.highlight = true
     
-    m.rectBG.color = "0xFFFFFF"
     m.rectBG.opacity = 0.8
-    '//::TODO::colors - change the following color dynamically to be associated with m.constants.ui.colors.neutralColor2
-    m.Text.color = "0xFFFFFF1A"
+    if theme <> invalid
+      m.rectBG.color = theme.primaryTextColor
+      m.Text.color = theme.neutralColor2
+    end if
     
     if m.top.text = invalid or m.top.text = "" then
       m.Text.text = m.top.hint
@@ -59,15 +68,15 @@ Function onHighlight()
     end if  
   else
     
-    m.rectBG.color = "0xFFFFFF1A"
-    
-    if m.top.text = invalid or m.top.text = "" then
-      '//::TODO::colors - change the following color dynamically to be associated with m.constants.ui.colors.neutralColor
-      m.Text.color = "0xFFFFFF33"
-    else
-      '//::TODO::colors - change the following color dynamically to be associated with m.constants.ui.colors.primaryText
-      m.Text.color = "0xFFFFFF"
-    end if  
+    if theme <> invalid
+      m.rectBG.color = theme.neutralColor2
+      
+      if m.top.text = invalid or m.top.text = "" then
+        m.Text.color = theme.neutralColor
+      else
+        m.Text.color = theme.primaryText
+      end if  
+    end if
   end if
 
 End Function
@@ -100,13 +109,15 @@ End Function
 '       shortening algorithm.
 Function formatTextBox()
   tubiLog("TextEntryBox.formatTextBox")
+  theme = getThemeFromGlobal()
 
   if m.top.text = invalid or m.top.text = "" then
     m.Text.text = m.top.hint
     m.Text.opacity = 0.7
   else
-    '//::TODO::colors - change the following color dynamically to be associated with m.constants.ui.colors.primaryText
-    m.Text.color = "0xFFFFFF"
+    if theme <> invalid
+      m.Text.color = theme.primaryTextColor
+    end if
     onPasswordModeChange()
   end if
   

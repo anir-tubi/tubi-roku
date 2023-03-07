@@ -10,15 +10,37 @@ Function init()
   m.top.leftTextPadding = m.DetailsMenuText.translation[0]
   m.Progress = m.top.findNode("ResumeProgressBar")
   m.badgeLabel = m.top.findNode("badgeLabel")
+  m.badgeLabel.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
+  m.badgeLabel.fontSize = 18
+  m.badgeLabel.padding = [12, 9]
 
   m.constants = getConstantsFromGlobal()
   if m.constants <> invalid
     m.top.color = m.constants.ui.colors.transparent
-    m.Progress.color = m.constants.ui.colors.focusedText
-
     if m.constants.deviceInfo.scaledUi = true
       m.buttonBG.uri = "pkg:/images/menu-focus-hd.9.png"
     end if
+  end if
+  
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.Progress.color = theme.focusedTextColor
+    m.buttonBG.blendColor = theme.neutralColor2
+    m.DetailsMenuText.color = theme.primaryTextColor
+    m.badgeLabel.fontColor = theme.backgroundColor
   end if
 End Function
 
@@ -36,7 +58,6 @@ End Function
 Function onItemContentChange()
   tubiLog("DetailMenuItem.onItemContentChange")
   if m.top.itemContent <> invalid then
-
     item = m.top.itemContent
     'If the button has title and BadgeText, calculated width will be width of both title and badgeText to avoid button crop. To get the
     'calculated width we are assigning the title and badgeText to the m.DetailsMenuText and get the calculated value
@@ -69,10 +90,6 @@ Function onItemContentChange()
     end if
     calculatedWidth = m.DetailsMenuText.boundingRect().width + m.DetailsMenuText.translation[0]
     if item.badgeText <> ""
-      m.badgeLabel.fontColor = m.constants.ui.colors.backgroundColor
-      m.badgeLabel.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
-      m.badgeLabel.fontSize = 18
-      m.badgeLabel.padding = [12, 9]
       m.badgeLabel.text = item.badgeText
       m.badgeLabel.visible = true
       m.badgeLabel.translation = [calculatedWidth + 20, 20]
@@ -100,9 +117,18 @@ End Function
 
 
 Function onItemHasFocus()
-  if m.top.itemHasFocus = true
-    m.buttonBG.blendcolor = m.constants.ui.colors.focused
-  else
-    m.buttonBG.blendcolor = m.constants.ui.colors.neutralColor
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    if m.top.itemHasFocus = true
+      m.buttonBG.blendcolor = theme.focusedColor
+      m.DetailsMenuText.color = theme.focusedTextColor
+      m.Icon.blendcolor = theme.focusedTextColor
+      m.Progress.color = theme.focusedTextColor
+    else
+      m.Progress.color = theme.primaryTextColor
+      m.buttonBG.blendcolor = theme.neutralColor
+      m.DetailsMenuText.color = theme.primaryTextColor
+      m.Icon.blendcolor = theme.primaryTextColor
+    end if
   end if
 End Function

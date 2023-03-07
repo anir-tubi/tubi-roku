@@ -10,6 +10,8 @@
  -->
 <component name="TubiProgressBar" extends="Group" >
   <script type="text/brightscript" uri="TubiProgressBar.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+
   <interface>
     <!-- INPUT -->
 
@@ -19,8 +21,8 @@
       <!-- The percentage to fill the loading bar -->
       <field id="progress"      type="float" value="0.0" />
       <field id="trackColor"    alias="ProgressBarBackground.blendColor" />
-      <field id="focusColor"    type="color" value="0xFFFFFFFF" />
-      <field id="unfocusColor"  type="color" value="0xFFFFFFFF" />
+      <field id="focusColor"    type="color"/>
+      <field id="unfocusColor"  type="color"/>
 
       <field id="scaledUI"      type="boolean" value="false" />
   </interface>

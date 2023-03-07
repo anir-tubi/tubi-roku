@@ -36,19 +36,30 @@ Function init()
     m.RowList.focusBitmapUri = "pkg:/images/selector-fhd.9.png"
   end if
   m.RowList.drawFocusFeedbackOnTop = true
-  m.RowList.focusBitmapBlendColor = m.global.theme.focused
-  m.global.observeField("theme", "onThemeChange")
-
+  
   ' suppress debounce if we have just gained focus
   m.justGainedFocus = false
-
+  
   ' stores an array of the form [y, x], which can be set on RowList.jumpToItem
   m.itemToJumpTo = invalid
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
 End Function
 
 
-Function onThemeChange()
-  m.RowList.focusBitmapBlendColor = m.global.theme.focused
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.RowList.focusBitmapBlendColor = theme.focusedColor
+  end if
 End Function
 
 

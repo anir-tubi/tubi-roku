@@ -7,9 +7,11 @@
  -->
 <component name="ModalListItem" extends="Group" >
   <script type="text/brightscript" uri="ModalListItem.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
+    <field id="itemHasFocus" type="boolean" />
     <field id="width" type="float" alias = "buttonText.width" />
     <field id="height" type="float" value="80.0" />
     <field id="calculatedWidth" type="float"/>
@@ -22,8 +24,7 @@
       vertAlign="center"
       height="79"
       translation="[44,1]"
-      opacity="1.0"
-      color="0xFFFFFFFF">
+      opacity="1.0">
       <Font
       role="font"
       size="33"

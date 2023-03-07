@@ -4,7 +4,7 @@
   <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
-  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
 
   <interface>
@@ -20,12 +20,10 @@
   <children>
     <Rectangle
       id="background"
-      color="0x000000FF"
       width="978"
       height="108"/>
     <Rectangle
       id="programProgressBar"
-      color="0xFFFFFF1A"
       width="0"
       height="108"/>
     <Poster

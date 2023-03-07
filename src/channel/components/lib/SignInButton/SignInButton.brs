@@ -2,7 +2,10 @@ Function init()
   m.Text = m.top.findNode("Text")
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("content", "onContentChange")
-  m.Text.color = m.global.constants.ui.colors.primaryText
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.Text.color = theme.primaryTextColor
+  end if
 End Function
 
 

@@ -141,7 +141,6 @@
             width="1140"
             wrap="true"
             maxLines="2"
-            color="0xFFFFFFFF"
             vertAlign="bottom">
             <Font
               id="TitleFont"
@@ -214,7 +213,6 @@
                 height="36"
                 width="0"
                 opacity="0.8"
-                color="0xFFFFFFFF"
                 numLines="1"
                 wrap="false"
                 translation="[0,3]"
@@ -284,7 +282,6 @@
             lineSpacing="16"
             maxLines="5"
             wrap="true"
-            color="0xFFFFFFFF"
             translation="[25,15]"
             visible="false">
             <Font
@@ -306,13 +303,11 @@
             width="20"
             height="25"
             uri="pkg:/images/icon-lock.webp"
-            blendColor="0xEB9C00"
             loadDisplayMode="scaleToFit" />
           <Label
             id="SignInText"
             width="1140"
             wrap="false"
-            color="0xEB9C00"
             translation="[0,3]">
             <Font
               id="SignInFont"
@@ -383,7 +378,6 @@
           </LayoutGroup>
           <Label
             id="Director"
-            color="0xFFFFFFFF"
             ellipsizeOnBoundary="true"
             width="710">
             <Font
@@ -427,7 +421,6 @@
           </LayoutGroup>
           <Label
             id="Starring"
-            color="0xFFFFFFFF"
             ellipsizeOnBoundary="true"
             width="710">
             <Font
@@ -454,8 +447,7 @@
         loadDisplayMode="scaleToFit"
         loadSync="true"/>
       <Label
-        id="CountdownText"
-        color="0xFFFFFFFF">
+        id="CountdownText">
         <Font
           role="font"
           uri="pkg:/fonts/Vaud-Medium.ttf"

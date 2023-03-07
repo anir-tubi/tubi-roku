@@ -4,16 +4,21 @@ Function init()
   m.ContentGroup = m.top.findNode("ContentGroup")
   m.Spinner = m.top.findNode("Spinner")
   m.Text = m.top.findNode("Text")
-  m.theme = m.global.theme
-
+  
+  theme = getThemeFromGlobal()
+  
   m.Text.scrollbarTrackBitmapUri = "pkg:/does-not-exist.png" ' Setting this to an empty string or invalid will cause
-                                                             ' the default track image to show.  We hide it by
-                                                             ' setting a garbage value here
+  ' the default track image to show.  We hide it by
+  ' setting a garbage value here
   if m.global.constants.deviceInfo.scaledUi = true
-    m.focusBitmapUri = m.theme.scrollbarThumbBitmapUri_hd
+    if theme <> invalid
+      m.focusBitmapUri = theme.scrollbarThumbBitmapUri_hd
+    end if
     m.focusFootprintUri = "pkg:/images/transport/sgplayer/hd/unfocused-progress-foreground.9.png"
   else
-    m.focusBitmapUri = m.theme.scrollbarThumbBitmapUri_fhd
+    if theme <> invalid
+      m.focusBitmapUri = theme.scrollbarThumbBitmapUri_fhd
+    end if
     m.focusFootprintUri = "pkg:/images/transport/sgplayer/fhd/unfocused-progress-foreground.9.png"
   end if
    m.Text.scrollbarThumbBitmapUri = m.focusFootprintUri

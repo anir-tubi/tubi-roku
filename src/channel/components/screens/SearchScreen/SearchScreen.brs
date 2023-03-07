@@ -1,8 +1,7 @@
 Function init()
   tubiLog("SearchScreen.init")
   m._ = rodash()
-  m.constants = m.global.constants
-  m.theme = m.global.theme
+  m.constants = getConstantsFromGlobal()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
@@ -54,22 +53,14 @@ Function init()
   m.ResultGrid.observeField("itemFocused", "onItemFocused")
 
   m.keyboard.palette = handleKeyboardColors()
-  m.ResultGrid.focusBitmapBlendColor = m.theme.focused
-
   m.NoResultsMessage = m.top.findNode("NoResultsMessage")
-  m.NoResultsMessage.color = m.constants.ui.colors.primaryText
 
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("visible", "onVisible")
   m.top.observeField("enabled", "onEnableChange")
-  m.top.observeField("kidsModeEnabled", "onKidsModeEnableChange")
   m.top.observeField("contentUpdated", "onSearchContentChange")
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
-
-  m.SearchText.color = m.constants.ui.colors.titleHeader
-  m.KidsModeMessage.color = m.constants.ui.colors.secondaryText
-  m.searchMenuText.color = m.constants.ui.colors.primaryText
 
   m.defaultHeroUri = "pkg:/images/art-blur-background.webp"
 
@@ -99,6 +90,38 @@ Function init()
   if m.constants.deviceInfo.uiResolution <> "FHD"
     '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
+  end if
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.SearchText.color = theme.primaryTextColor
+    m.KidsModeMessage.color = theme.secondaryTextColor
+    m.searchMenuText.color = theme.primaryTextColor
+    m.NoResultsMessage.color = theme.primaryTextColor
+    m.ResultGrid.focusBitmapBlendColor = theme.focusedColor
+
+    m.keyboard.palette = handleKeyboardColors()
+    if theme.id = m.constants.ui.themeIDs.kidsMode
+      m.top.kidsModeEnabled = true
+      m.KidsModeMessage.visible = false
+      m.KidsModeMessageSpacer.width = 1
+    else
+      m.KidsModeMessage.visible = true
+      m.KidsModeMessageSpacer.width = 0
+    end if
   end if
 End Function
 
@@ -187,17 +210,6 @@ Function onEnableChange()
     fade(m.NavSection, "in", 0.3)
   else
     fade(m.NavSection, "out", 0.3)
-  end if
-End Function
-
-Function onKidsModeEnableChange()
-  m.keyboard.palette = handleKeyboardColors()
-  m.ResultGrid.focusBitmapBlendColor = m.theme.focused
-  if m.top.kidsModeEnabled = true
-    m.KidsModeMessage.visible = false
-  else
-    m.KidsModeMessage.visible = true
-    m.KidsModeMessageSpacer.width = 0
   end if
 End Function
 

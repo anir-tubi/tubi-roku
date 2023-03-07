@@ -8,6 +8,25 @@ Function init()
 
   m.top.observeFieldScoped("width", "onWidthChanged")
   m.top.observeFieldScoped("text", "onTextChanged")
+
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.label.color = theme.primaryTextColor
+  end if
 End Function
 
 
@@ -49,10 +68,15 @@ Function onScreenFocusChange()
   tubiLog("SimpleButton.onScreenFocusChange")
 
   if m.top.hasFocus() then
-    m.buttonBG.blendColor = m.global.theme.focused
+    theme = getThemeFromGlobal()
+    if theme <> invalid
+      m.buttonBG.blendColor = theme.focusedColor
+      m.label.color = theme.focusedTextColor
+    end if
     m.buttonBG.opacity = 1.0
   else
     m.buttonBG.blendColor = m.top.color
+    m.label.color = theme.primaryTextColor
     m.buttonBG.opacity = m.top.unfocusedBackgroundOpacity
   end if
 

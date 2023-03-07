@@ -7,12 +7,30 @@ Function init()
   m.TopLabel = m.top.findNode("TopLabel")
   m.BottomLabel = m.top.findNode("BottomLabel")
 
-  m.BottomLabel.color = "0x000000FF"
   m.nLabelXSpacing = m.TopLabel.translation[0]
 
   m.top.observeField("itemContent", "onItemContentChange")
   m.top.observeField("focusPercent", "onFocusPercentChange")
   m.top.observeField("gridHasFocus", "onGridHasFocusChange")
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.BottomLabel.color = theme.backgroundColor
+    m.Underline.color = theme.focusedColor
+  end if
 End Function
 
 
@@ -26,14 +44,20 @@ End Function
 
 ' @itemContent: roSGNode, TopNavContentNode used to create the list item
 Function setItemUI(itemContent)
+  theme = getThemeFromGlobal()
   if m.top.gridHasFocus = true
-    m.TopLabel.color = "0xFFFFFFFF"
+    if theme <> invalid
+      m.TopLabel.color = theme.primaryTextColor
+    end if
+
     m.TopLabel.opacity = 1.0
     m.Underline.opacity = 0
     m.BottomLabel.opacity = 0
 
     if m.bottomIconSubtext <> invalid
-      m.bottomIconSubtext.fontColor = "0xFFFFFFFF"
+      if theme <> invalid
+        m.bottomIconSubtext.fontColor = theme.primaryTextColor
+      end if
     end if
 
     if itemContent.selected = true
@@ -49,7 +73,10 @@ Function setItemUI(itemContent)
       end if
     end if
   else
-    m.TopLabel.color = "0xFFFFFFFF"
+    if theme <> invalid
+      m.TopLabel.color = theme.primaryTextColor
+    end if
+    
     m.TopLabel.opacity = 1.0
     m.BottomLabel.opacity = 0
     m.Underline.opacity = 0
@@ -100,6 +127,7 @@ End Function
 '//When the content of the item is changed.
 Function onItemContentChange()
   itemContent = m.top.itemContent
+  theme = getThemeFromGlobal()
   if itemContent <> invalid
     if itemContent.title <> m.TopLabel.text
       ' only handles setting text and width if the text has changed
@@ -114,7 +142,11 @@ Function onItemContentChange()
           m.topIconSubtext = CreateObject("roSGNode","TextIcon")
           m.topIconSubtext.id = "topIconSubtext"
           m.topIconSubtext.fontSize = 14
-          m.topIconSubtext.fontColor = "0xFFFFFFFF"
+
+          if theme <> invalid
+            m.topIconSubtext.fontColor = theme.primaryTextColor
+          end if
+
           m.topIconSubtext.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
           m.topIconSubtext.padding = [12, 12]
           m.topIconSubtext.text = itemContent.subText
@@ -127,12 +159,16 @@ Function onItemContentChange()
           m.bottomIconSubtext = CreateObject("roSGNode","TextIcon")
           m.bottomIconSubtext.id = "bottomIconSubtext"
           m.bottomIconSubtext.fontSize = 14
-          m.bottomIconSubtext.fontColor = "0xFFFFFFFF"
           m.bottomIconSubtext.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
           m.bottomIconSubtext.padding = [12, 12]
           m.bottomIconSubtext.text = itemContent.subText
           m.bottomIconSubtext.uri = "pkg:/images/new-frame.webp"
-          m.bottomIconSubtext.blendColor = "0xE13100FF"
+
+          if theme <> invalid
+            m.bottomIconSubtext.fontColor = theme.primaryTextColor
+            m.bottomIconSubtext.blendColor = theme.focusedColor
+          end if
+
           m.bottomIconSubtext.opacity = 1.0
         end if
 

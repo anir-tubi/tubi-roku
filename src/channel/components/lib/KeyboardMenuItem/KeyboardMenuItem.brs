@@ -1,10 +1,10 @@
 Function init()
   tubiLog("KeyboardMenuItem.init")
   m.top.observeField("itemContent", "onContentChange")
-  constants = m.global.constants
-  m.focusColor = constants.ui.colors.primaryText
-  m.highlightColor = m.global.theme.highlightedText
-  m.top.color = m.focusColor
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.top.color = theme.primaryTextColor
+  end if
   m.top.observeField("gridHasFocus", "onFocusChange")
   m.top.observeField("focusPercent", "onFocusChange")
   m.top.vertAlign = "center"
@@ -12,10 +12,13 @@ Function init()
 End Function
 
 Function onFocusChange()
-  if m.top.focusPercent = 1 and not m.top.gridHasFocus
-    m.top.color = m.highlightColor
-  else
-    m.top.color = m.focusColor
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    if m.top.focusPercent = 1 and not m.top.gridHasFocus
+      m.top.color = theme.highlightedTextColor
+    else
+      m.top.color = theme.focusColor
+    end if
   end if
 End Function
 

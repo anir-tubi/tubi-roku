@@ -8,28 +8,33 @@ Function init()
   m.SponsoredByText = m.top.findNode("SponsoredByText")
   m.SponsoredByPoster = m.top.findNode("SponsoredByPoster")
   m.CategoryCount = m.top.findNode("CategoryCount")
+  m.subText = m.top.findNode("subText")
+
   m.top.observeField("content", "onContentChange")
   m.top.observeField("currentIndex", "onIndexChange")
 
-  m.subText = m.top.findNode("subText")
-
-  ' trying to access m.global can sometimes/rarely time out creating a run time error if we
-  ' try to access m.global.theme directly, so use GlobalMixin.getThemeFromGlobal() which retries if issues arise.
-  theme = getThemeFromGlobal()
-  if theme <> invalid
-    m.FocusIndex.color = theme.focused
-  end if
-
-  if m.global <> invalid
-    m.global.observeField("theme", "onThemeChange")
-  end if
-
   m.originalTranslation_CategoryName = m.CategoryName.translation
   m.originalTranslation_CategoryCount = m.CategoryCount.translation
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
 End Function
 
-Function onThemeChange()
-  m.FocusIndex.color = m.global.theme.focused
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.FocusIndex.color = theme.focusedColor
+    m.subText.color = theme.primaryTextColor
+    m.CategoryName.color = theme.primaryTextColor
+  end if
 End Function
 
 

@@ -75,6 +75,8 @@ Function runChannel(constants, log, request)
   'setting constants here is just to get the scene up and running.
   'Global constants will be overwritten with constants pulled from starterController that are the most recent version of constants
   sgGlobal.setField("constants", constants)
+  'set a default theme
+  sgGlobal.setField("theme", constants.ui.themes.default)
 
   screen.show()
 

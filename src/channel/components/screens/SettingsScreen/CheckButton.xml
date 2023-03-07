@@ -7,6 +7,7 @@
  -->
 <component name="CheckButton" extends="Group" >
   <script type="text/brightscript" uri="CheckButton.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
     <!-- Content expected for a KeyboardMenuItem:
@@ -16,6 +17,7 @@
      -->
     <!-- INPUT-->
     <field id="itemContent" type="node"/>
+    <field id="itemHasFocus" type="boolean" />
     <field id="content" type="node" />
     <field id="width" type="float"/>
     <field id="height" type="float"/>

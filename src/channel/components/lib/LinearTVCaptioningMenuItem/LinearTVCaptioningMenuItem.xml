@@ -23,7 +23,6 @@
     <Poster
      id="Bground"
      uri="pkg://images/menu-focus-fhd.9.png"
-     blendColor="0xFFFFFF33"
      width="225"
      height="72"
      visible="false"
@@ -35,7 +34,6 @@
      vertAlign="top"
      horizAlign="left"
      ellipsizeOnBoundary="true"
-     color="0xFFFFFFFF"
      width="135"
      height="72">
       <Font

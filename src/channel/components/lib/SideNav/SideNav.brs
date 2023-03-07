@@ -145,9 +145,6 @@ Function onCreateMenuItems()
   '// This is the item to focus on when the sidenav opens. This implies that this was the last item (that has an associated screen) selected
   m.itemSelectedRemembered = invalid
 
-  m.mainItemsSelected.focusBitmapBlendColor = m.constants.ui.colors.selectedListItem
-  m.mainItemsSelected.focusFootprintBlendColor = m.constants.ui.colors.selectedListItem
-
   m.mainItems.numRows = 12
   m.mainItemsSelected.numRows = 12
   m.mainItems.itemSpacing = [0,24]
@@ -170,6 +167,25 @@ Function onCreateMenuItems()
   '//::TODO::SIDENAV - set all references to sideNav IDs to be called from Constants: i.e. m.constants.ui.sideNavIds.home.
   '//   To do this, set content in brs instead of xml?
 
+
+  if m.global <> invalid
+    m.global.observeField("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.mainItemsSelected.focusBitmapBlendColor = theme.selectedListItemColor
+    m.mainItemsSelected.focusFootprintBlendColor = theme.selectedListItemColor
+  end if
 End Function
 
 
@@ -203,7 +219,10 @@ End Function
 
 Function setListFocusedBlendColor(list)
   if list <> invalid
-    list.focusBitmapBlendColor = m.global.theme.focused
+    theme = getThemeFromGlobal()
+    if theme <> invalid
+      list.focusBitmapBlendColor = theme.focusedColor
+    end if
   end if
 End Function
 

@@ -1,17 +1,16 @@
 Function init()
   m.trackingLoggingTask = m.global.trackingLoggingTask
   m.constants = m.global.constants
-  m.theme = m.global.theme
-
+  
   m.top.observeFieldScoped("resetFocus", "onResetFocus")
   m.top.observeField("focusedChild", "onScreenFocusChange")
-
+  
   m.pageHeading = m.top.findNode("pageHeading")
   m.pageHeading.text = getTranslation("signIn_screen_heading")
-
+  
   m.pageSubHeading = m.top.findNode("pageSubHeading")
   m.pageSubHeading.text = getTranslation("signIn_screen_subheading")
-
+  
   m.passwordValidationMsg = m.top.findNode("passwordValidationMsg")
   m.passwordValidationMsg.text = getTranslation("signIn_screen_enter_password")
   
@@ -32,11 +31,11 @@ Function init()
   m.ppBtn = m.top.findNode("ppBtn")
   m.ppBtn.text = getTranslation("screenSettings_menu_privacyPolicy")
   m.ppBtn.observeFieldScoped("selected", "onPrivacyPolicyButtonSelected")
-
+  
   m.yourPrivacyChoicesBtn = m.top.findNode("YourPrivacyChoicesButton")
   m.yourPrivacyChoicesBtn.text = getTranslation("screenSettings_menu_yourPrivacyChoices")
   m.yourPrivacyChoicesBtn.observeFieldScoped("selected", "onYourPrvacyChoicesButtonSelected")
-
+  
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
   m.voiceKeyboard = m.keyboard.findNode("Keyboard")
   m.keyboard.observeFieldScoped("buttonSelected", "onButtonSelected")
@@ -66,24 +65,40 @@ Function init()
     }
   }
   
-  m.newPasswordLabel.color = m.constants.ui.colors.primaryText
-  m.pageHeading.color = m.constants.ui.colors.primaryText
-  m.pageSubHeading.color = m.constants.ui.colors.primaryText
-  m.newPasswordLink.color = m.constants.ui.colors.primaryText
-  m.passwordValidationMsg.color = m.constants.ui.colors.caution
-  m.continueBtn.color = m.constants.ui.colors.backgroundColorLight2
-  m.termsBtn.color = m.constants.ui.colors.backgroundColor
-  m.ppBtn.color = m.constants.ui.colors.backgroundColor
-  m.yourPrivacyChoicesBtn.color = m.constants.ui.colors.backgroundColor
-
+  
   m.top.isStackable = true
   m.top.screenLevel = m.constants.ui.screenLevels.signInScreen
   m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
   
-  End Function
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
   
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
   
-  Function onScreenFocusChange()
+  if theme <> invalid
+    m.newPasswordLabel.color = theme.primaryTextColor
+    m.pageHeading.color = theme.primaryTextColor
+    m.pageSubHeading.color = theme.primaryTextColor
+    m.newPasswordLink.color = theme.primaryTextColor
+    m.passwordValidationMsg.color = theme.cautionColor
+    m.continueBtn.color = theme.backgroundColorLight2
+    m.termsBtn.color = theme.backgroundColor
+    m.ppBtn.color = theme.backgroundColor
+    m.yourPrivacyChoicesBtn.color = theme.backgroundColor
+  end if
+End Function
+
+  
+Function onScreenFocusChange()
 
   tubiLog("SignInScreen.onScreenFocusChange")
   ' force a background update
@@ -212,19 +227,22 @@ End Function
 
 
 Function resetPasswordValidation()
-
-  m.passwordValidationMsg.color = m.constants.ui.colors.secondaryText
-
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.passwordValidationMsg.color = theme.secondaryTextColor
+  end if
 End Function
 
 
 Function updatePasswordValidation()
-
+  theme = getThemeFromGlobal()
   passwordLength = Len(m.keyboard.text)
-  if passwordLength > 0
-    m.passwordValidationMsg.color = m.constants.ui.colors.secondaryText
-  else
-    m.passwordValidationMsg.color = m.constants.ui.colors.caution
+  if theme <> invalid
+    if passwordLength > 0
+      m.passwordValidationMsg.color = theme.secondaryText
+    else
+      m.passwordValidationMsg.color = theme.cautionColor
+    end if
   end if
 
 End Function

@@ -31,8 +31,12 @@ Function init()
   m.closedCaptioningButtonListBackground = m.top.findNode("closedCaptioningButtonListBackground")
   m.closedCaptioningButtonListBackground.observeFieldScoped("rowItemSelected", "onCCContentSelected")
   m.closedCaptioningButtonListBackground.observeFieldScoped("rowItemFocused", "onCCContentFocused")
-  m.closedCaptioningButtonListBackground.focusBitmapBlendColor = m.global.theme.focused
-  m.closedCaptioningButtonListBackground.focusFootprintBlendColor = m.constants.ui.colors.neutralColor
+
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.closedCaptioningButtonListBackground.focusBitmapBlendColor = theme.focusedColor
+    m.closedCaptioningButtonListBackground.focusFootprintBlendColor = theme.neutralColor
+  end if
 
   if m.constants.deviceInfo.scaledUi = true
     m.closedCaptioningButtonListBackground.focusBitmapUri = "pkg://images/menu-focus-hd.9.png"

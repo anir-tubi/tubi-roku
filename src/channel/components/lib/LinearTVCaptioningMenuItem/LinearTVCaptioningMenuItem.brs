@@ -9,6 +9,25 @@ Function init()
   if m.constants.deviceInfo.scaledUi = true
     m.Bground.uri = "pkg://images/menu-focus-hd.9.png"
   end if
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.Bground.blendColor = theme.neutralColor
+    m.MenuText.color = theme.primaryTextColor
+  end if
 End Function
 
 

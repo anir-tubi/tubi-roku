@@ -9,12 +9,30 @@ Function init()
   m.programProgressBar = m.top.findNode("programProgressBar")
   m.background = m.top.findNode("background")
 
-  m.minutesLeft.color = m.constants.ui.colors.secondaryText
-  m.title1.color = m.constants.ui.colors.primaryText
-  m.title2.color = m.constants.ui.colors.secondaryText
-  m.time.color = m.constants.ui.colors.secondaryText
 
   m.top.observeField("metadata", "onMetadataChanged")
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.background.color = theme.backgroundColor
+    m.programProgressBar.color = theme.neutralColor2
+    m.minutesLeft.color = theme.secondaryTextColor
+    m.title1.color = theme.primaryTextColor
+    m.title2.color = theme.secondaryTextColor
+    m.time.color = theme.secondaryTextColor
+  end if
 End Function
 
 

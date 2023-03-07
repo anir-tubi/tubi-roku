@@ -24,6 +24,7 @@ Function init()
   }
 
   palette = createObject("roSGNode", "RSGPalette")
+  '//::TODO::colors - find replacement colors mentioned in this file
   palette.colors = {
     "DialogFocusColor": "0xFF501AFF"
     "DialogFocusItemColor" : "0xEFEFEFFF"

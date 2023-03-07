@@ -10,6 +10,25 @@ Function init()
   if m.global.constants.deviceInfo.scaledUi = true
     m.Background.uri = "pkg:/images/live_tv_button_hd.9.png"
   end if
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.Background.blendColor = theme.neutralColor2
+    m.Title.color = theme.primaryTextColor
+  end if
 End Function
 
 

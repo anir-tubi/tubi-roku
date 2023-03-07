@@ -65,6 +65,8 @@ Function init()
   m.VideoPicker.observeField("contentSelected", "onVideoPickerSelected")
   m.AdHeadsUp = m.top.findNode("AdHeadsUp")
   m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
+  m.AdHeadsUpAdBreak1 = m.top.findNode("AdHeadsUpAdBreak1")
+  m.AdHeadsUpAdBreak2 = m.top.findNode("AdHeadsUpAdBreak2")
   m.Thumbnail = m.top.findNode("Thumbnail")
 
   m.AdsTask = m.top.findNode("AdsTask")
@@ -120,6 +122,10 @@ Function init()
   m.adHeadsUpTime = 10
   m.adBreakAdvance = 0.5
 
+  '//::TODO:: use translations for the following Ad text & m.AdHeadsUpText
+  m.AdHeadsUpAdBreak1.text = "AD"
+  m.AdHeadsUpAdBreak2.text = "   break"
+  
   ' checking m.recentCuepointFetch and m.recentCuepoint prevents multiple ad calls and multiple tracking events
   ' for a single cuepoint if the position callback happens at 10.2 and 10.7 for instance
   m.recentCuepointFetch = 0
@@ -138,7 +144,9 @@ Function init()
     m.CCNipple.translation = m.CCNippleOnTranslation
   end if
 
-  m.global.observeField("theme", "onThemeChange")
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+	end if
   '//Set the theme colors of the video player
   onThemeChange()
 
@@ -171,11 +179,22 @@ Function init()
 End Function
 
 
-Function onThemeChange()
-  m.focusedColor = m.global.theme.focused
-  m.ProgressBar.focusColor = m.focusedColor
-  m.LoadingProgressBar.focusColor = m.focusedColor
-  m.LoadingProgressBar.unfocusColor = m.focusedColor
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.focusedColor = theme.focusedColor
+    m.ProgressBar.focusColor = m.focusedColor
+    m.LoadingProgressBar.focusColor = m.focusedColor
+    m.LoadingProgressBar.unfocusColor = m.focusedColor
+    m.AdHeadsUpAdBreak2.color = theme.cautionColor
+    m.ProgressBar.trackColor = theme.neutralColor2
+    m.LoadingProgressBar.trackColor = theme.neutralColor2
+  end if
 End Function
 
 
@@ -359,6 +378,7 @@ Function onVideoPositionChange()
       if isInWindow(m.playerPosition, cuepoint, m.adHeadsUpTime) and m.top.adState = "adspending"
         if m.Overlay.opacity = 0
           ' Don't show the ad heads up when the transport/overlay is showing, since it crowds the space of the title on the overlay
+          '//::TODO:: should this text be translated?
           m.AdHeadsUp.visible = true
           m.AdHeadsUpText.text = " " + Chr(&hb7) + " Starts in " + stri(cuepoint - m.playerPosition).trim() + " s"
         end if

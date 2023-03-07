@@ -16,29 +16,23 @@ Function init()
   m.pageHeading = m.top.findNode("pageHeading")
   m.pageDescription = m.top.findNode("pageDescription")
 
-  addtoYourListLabel = m.top.findNode("addtoYourListLabel")
-  addtoYourListLabel.text = getTranslation("onBoarding_landingScreen_addListLabel")
-  addtoYourListLabel.color = m.constants.ui.colors.primaryText
+  m.addtoYourListLabel = m.top.findNode("addtoYourListLabel")
+  m.addtoYourListLabel.text = getTranslation("onBoarding_landingScreen_addListLabel")
 
-  addtoYourListBody = m.top.findNode("addtoYourListBody")
-  addtoYourListBody.text = getTranslation("onBoarding_landingScreen_addListBody")
-  addtoYourListBody.color = m.constants.ui.colors.secondaryText
+  m.addtoYourListBody = m.top.findNode("addtoYourListBody")
+  m.addtoYourListBody.text = getTranslation("onBoarding_landingScreen_addListBody")
 
-  saveYourProgressLabel = m.top.findNode("saveYourProgressLabel")
-  saveYourProgressLabel.text = getTranslation("onBoarding_landingScreen_saveProgressLabel")
-  saveYourProgressLabel.color = m.constants.ui.colors.primaryText
+  m.saveYourProgressLabel = m.top.findNode("saveYourProgressLabel")
+  m.saveYourProgressLabel.text = getTranslation("onBoarding_landingScreen_saveProgressLabel")
 
-  saveYourProgressBody = m.top.findNode("saveYourProgressBody")
-  saveYourProgressBody.text = getTranslation("onBoarding_landingScreen_saveProgressBody")
-  saveYourProgressBody.color = m.constants.ui.colors.secondaryText
+  m.saveYourProgressBody = m.top.findNode("saveYourProgressBody")
+  m.saveYourProgressBody.text = getTranslation("onBoarding_landingScreen_saveProgressBody")
   
-  madeForYouLabel = m.top.findNode("madeForYouLabel")
-  madeForYouLabel.text = getTranslation("onBoarding_landingScreen_madeForYouLabel")
-  madeForYouLabel.color = m.constants.ui.colors.primaryText
+  m.madeForYouLabel = m.top.findNode("madeForYouLabel")
+  m.madeForYouLabel.text = getTranslation("onBoarding_landingScreen_madeForYouLabel")
   
-  madeForYouBody = m.top.findNode("madeForYouBody")
-  madeForYouBody.text = getTranslation("onBoarding_landingScreen_madeForYouBody")
-  madeForYouBody.color = m.constants.ui.colors.secondaryText
+  m.madeForYouBody = m.top.findNode("madeForYouBody")
+  m.madeForYouBody.text = getTranslation("onBoarding_landingScreen_madeForYouBody")
   
   m.buttons = [
     "onBoarding_registerOrSignIn_button"
@@ -49,10 +43,34 @@ Function init()
   setButtonListContent()
   
   m.pageHeading.text = getTranslation("onBoarding_landingScreen_heading")
-  m.pageHeading.color = m.constants.ui.colors.primaryText
   m.pageDescription.text = getTranslation("onBoarding_landingScreen_description")
-  m.pageDescription.color = m.constants.ui.colors.caution
 
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.saveYourProgressBody.color = theme.secondaryTextColor
+    m.madeForYouLabel.color = theme.primaryTextColor
+    m.madeForYouBody.color = theme.secondaryTextColor
+    
+    m.addtoYourListLabel.color = theme.primaryTextColor
+    m.addtoYourListBody.color = theme.secondaryTextColor
+    m.saveYourProgressLabel.color = theme.primaryTextColor
+    
+    m.pageHeading.color = theme.primaryTextColor
+    m.pageDescription.color = theme.cautionColor
+  end if
 End Function
 
 

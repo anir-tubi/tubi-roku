@@ -40,7 +40,6 @@ Function init()
   m.top.handlesTransportVoiceRequests = true
   m._ = rodash()
   m.NodeHelpers = TubiNodeHelpers()
-  m.theme = m.global.theme
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
@@ -63,7 +62,6 @@ Function init()
   m.top.observeField("sprites", "onSpritesReceived")
   m.top.observeField("control", "onControlChange")
   m.top.observeField("transportVoiceRequest", "handleTransportVoiceEvent")
-  m.top.observeField("kidsMode", "onKidsModeChange")
   m.top.observeField("adState", "onAdStateChange")
   m.top.observeField("adProgress", "onAdProgressChange")
   m.top.observeField("displayAdLoadingMessage", "onDisplayAdLoadingMessage")
@@ -220,8 +218,6 @@ Function init()
     m.CCNipple.translation = m.CCNippleOnTranslation
   end if
 
-  updateColors()
-
   ' set to the end position of replay if caption mode is temporarily turned on during a replay
   m.replayCaptionEnd = 0
 
@@ -257,6 +253,11 @@ Function init()
 
   ' the video player screen should be false until placed upon the screen stack
   m.top.visible = false
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
 End Function
 
 
@@ -444,12 +445,33 @@ Function playContent()
 End Function
 
 
-Function updateColors()
-  m.focusedColor = m.theme.focused
-  m.ProgressBar.focusColor = m.focusedColor
-  m.LoadingProgressBar.focusColor = m.focusedColor
-  m.LoadingProgressBar.unfocusColor = m.focusedColor
-  m.CCRailOn.blendColor = m.focusedColor
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.focusedColor = theme.focusedColor
+    m.ProgressBar.focusColor = m.focusedColor
+    m.LoadingProgressBar.focusColor = m.focusedColor
+    m.LoadingProgressBar.unfocusColor = m.focusedColor
+    m.CCRailOn.blendColor = m.focusedColor
+    m.ratingBar.color = m.focusedColor
+    m.ratingLabel.color = theme.primaryTextColor
+    m.LoadingProgressBar.trackColor = theme.neutralColor2
+    m.ProgressBar.trackColor = theme.neutralColor2
+    m.SkipCuepointsButton.color = theme.backgroundColorLight2
+
+    if theme.id = m.constants.ui.themeIDs.kidsMode
+      m.logo.visible = false
+      m.logoKids.visible = true
+    else
+      m.logo.visible = true
+      m.logoKids.visible = false
+    end if
+  end if
 End Function
 
 
@@ -1103,19 +1125,6 @@ Function onBufferingTimerFired()
 
 End Function
 
-
-Function onKidsModeChange()
-  tubilog("VideoPlayer.onKidsModeChange")
-  m.theme = m.global.theme
-  updateColors()
-  if m.top.kidsMode = false
-    m.logo.visible = true
-    m.logoKids.visible = false
-  else
-    m.logo.visible = false
-    m.logoKids.visible = true
-  end if
-End Function
 
 
 ' Helper function to prevent tracking events being sent for trailers

@@ -2,6 +2,7 @@
 <component name="LiveIconGroup" extends="LayoutGroup">
   <script type="text/brightscript" uri="LiveIconGroup.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <interface>
     <!-- INPUT -->
     <field id="shouldAnimate" type="bool" value="false" alwaysNotify="true"/>
@@ -16,7 +17,6 @@
       loadHeight="37"/>
     <Label
       id="liveTitle"
-      color="0xFFFFFFFF"
       height="37"
       vertAlign="center">
       <Font

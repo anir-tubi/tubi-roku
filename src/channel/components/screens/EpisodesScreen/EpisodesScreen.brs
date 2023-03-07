@@ -20,7 +20,11 @@ Function init()
   if m.constants.deviceInfo.scaledUi = true then
     m.RowList.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
-  m.RowList.focusBitmapBlendColor = m.global.theme.focused
+
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.RowList.focusBitmapBlendColor = theme.focusedColor
+  end if
 
   'set initial tracking values
   m.top.trackingPageInfo = {

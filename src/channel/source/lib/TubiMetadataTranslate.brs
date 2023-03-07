@@ -2173,14 +2173,10 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
     translatedProgram.Categories = programFromServer.genres
   end if
 
-  unFocusedColor = m.constants.ui.colors.futureItemSelected
-  focusedColor = m.constants.ui.colors.EPGProgramFocused
   selectedAttributeText = getTranslation("epg_starts_at") + " "
 
   itemAttributes = {
-    "title" : selectedAttributeText ,
-    "unFocusedColor" : unFocusedColor , '0xEB9C00FF
-    "focusedColor" : focusedColor '0x9699A3FF
+    "title" : selectedAttributeText
   }
 
   if programFromServer.keywords <> invalid AND programFromServer.keywords.count() > 0

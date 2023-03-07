@@ -90,7 +90,6 @@ Function init()
     m.RelatedGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
 
-  m.RelatedGrid.focusBitmapBlendColor = m.global.theme.focused
 
   ' Used to determine if navigate_within_page events should be sent. Only send when the related content already
   ' has focus, not when it gains focus.
@@ -102,7 +101,27 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.detailScreen
   m.top.isStackable = true
   m.top.handlesTransportVoiceRequests = true
+  
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
 End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.RelatedGrid.focusBitmapBlendColor = theme.focusedColor
+    m.RelatedTitle.color = theme.primaryTextColor
+  end if
+End Function
+
 
 
 Function setDetailStrings()
@@ -729,7 +748,10 @@ Function setVisibilityOfSecondaryMenu()
     alignSecondaryMenuWithMenu()
 
     m.SecondaryMenu.visible = true
-    m.Menu.focusFootprintBlendColor = m.constants.ui.colors.selectedListItem
+    theme = getThemeFromGlobal()
+    if theme <> invalid
+      m.Menu.focusFootprintBlendColor = theme.selectedListItemColor
+    end if
     m.Menu.focusFootprintBitmapUri = "pkg://images/menu-focus-fhd.9.png"
     if m.constants.deviceInfo.scaledUi = true
       m.Menu.focusFootprintBitmapUri = "pkg://images/menu-focus-hd.9.png"

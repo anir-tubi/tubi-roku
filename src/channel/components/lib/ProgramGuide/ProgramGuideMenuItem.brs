@@ -7,6 +7,28 @@ Function init()
   m.top.observeField("rowFocusPercent", "onRowFocusPercentChange")
   m.top.observeField("focusPercent", "onFocusPercentChange")
   m.top.observeField("itemContent", "onContentChange")
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  m.theme = theme
+
+  if theme <> invalid
+    m.staticOverlay.blendColor = theme.backgroundColorLight2
+    m.staticOverlay.color = theme.backgroundColorLight2
+    m.programString.color = theme.primaryTextColor
+    onFocusPercentChange()    '//This function also sets the color - but depending on the focus state
+  end if
 End Function
 
 
@@ -21,11 +43,13 @@ Function onContentChange()
     if item.selected = true
       if item.itemAttributes <> invalid and item.itemAttributes.title <> invalid
         m.timeString.text = item.itemAttributes.title + item.ShortDescriptionLine1
-        m.timeString.color = item.itemAttributes.unFocusedColor
+        if m.theme <> invalid
+          m.timeString.color = m.theme.cautionColor
+        end if
       end if
     else
-      if item.itemAttributes <> invalid
-        m.timeString.color = item.itemAttributes.focusedColor
+      if m.theme <> invalid
+        m.timeString.color = m.theme.backgroundColorLight2
       end if
     end if
 
@@ -74,18 +98,25 @@ Function onFocusPercentChange()
     if item.selected = true
       if item.itemAttributes <> invalid
         m.timeString.text = strReplace(item.ShortDescriptionLine1, item.itemAttributes.title, "")
-        ' color of the text has been passed along with string so that content Items need not to access global.
-        m.timeString.color = item.itemAttributes.focusedColor '"0x9699A3FF"
+      end if
+      
+      if m.theme <> invalid
+        m.timeString.color = m.theme.backgroundColorLight2
       end if
       item.selected = false
     end if
-    if m.top.rowFocusPercent > 0.9
-      m.cellRect.blendColor = "0xFFFFFFBF"
-    else
-      m.cellRect.blendColor = "0xFFFFFF1A"
+
+    if m.theme <> invalid
+      if m.top.rowFocusPercent > 0.9
+        m.cellRect.blendColor = m.theme.backgroundColorLight2
+      else
+        m.cellRect.blendColor = m.theme.neutralColor2
+      end if
     end if
   else
-    m.cellRect.blendColor = "0x000000FF"
+    if m.theme <> invalid
+      m.cellRect.blendColor = m.theme.backgroundColor
+    end if
   end if
 End Function
 
@@ -94,11 +125,15 @@ Function onRowFocusPercentChange()
   if m.top.rowFocusPercent > 0.5
     m.programString.opacity = 1
     m.timeString.opacity = 1
-    m.cellRect.blendColor = "0xFFFFFFBF"
+    if m.theme <> invalid
+      m.cellRect.blendColor = m.theme.backgroundColorLight2
+    end if
   else
     m.programString.opacity = 0.45
     m.timeString.opacity = 0.45
-    m.cellRect.blendColor = "0xFFFFFF1A"
-    m.timeString.color = "0xFFFFFFBF"
+    if m.theme <> invalid
+      m.cellRect.blendColor = m.theme.neutralColor2
+      m.timeString.color = m.theme.backgroundColorLight2
+    end if
   end if
 End Function

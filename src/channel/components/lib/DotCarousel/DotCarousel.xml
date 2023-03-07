@@ -5,6 +5,7 @@
  -->
 <component name="DotCarousel" extends="Group" >
   <script type="text/brightscript" uri="DotCarousel.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
     <!-- INPUT -->

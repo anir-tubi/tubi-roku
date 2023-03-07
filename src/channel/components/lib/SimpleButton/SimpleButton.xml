@@ -9,6 +9,7 @@
 <component name="SimpleButton" extends="Group" >
   <script type="text/brightscript" uri="SimpleButton.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
 
@@ -37,7 +38,6 @@
       translation="[0,0]"/>
     <Label
       id="label"
-      color="0xFFFFFF"
       opacity="1.0"
       height="80"
       horizAlign="center"

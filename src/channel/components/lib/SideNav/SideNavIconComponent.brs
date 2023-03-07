@@ -5,11 +5,36 @@ Function init()
   m.Icon = m.top.findNode("Icon")
   m.subTxt = m.top.findNode("subTxt")
   m.labelParent = m.top.findNode("LabelParent")
-  m.top.observeField("itemContent", "onContentChange")
-  m.top.observeField("height", "onHeightChange")
-  m.top.observeField("active", "onActiveChange")
+  m.top.observeFieldScoped("itemContent", "onContentChange")
+  m.top.observeFieldScoped("height", "onHeightChange")
+  m.top.observeFieldScoped("active", "onActiveChange")
+  m.top.observeFieldScoped("itemHasFocus", "onFocusChange")
   m.sideIconLabel = invalid
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
 End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.subTxt.color = theme.backgroundColorLight2
+    m.Label.color = theme.primaryTextColor
+    m.Icon.blendColor = theme.primaryTextColor
+    if m.sideIconLabel <> invalid
+      m.sideIconLabel.fontColor = theme.backgroundColor
+    end if
+  end if
+End Function
+
 
 ''''''''''''''''''
 ' onContentChange
@@ -30,15 +55,19 @@ Function onContentChange(data)
         m.subTxt.translation = [subTxtCenterPt, 52]
       end if
 
-
       'add free icon next to Label when sideNav is open
       if item.shortDescriptionLine2 <> invalid
         if item.shortDescriptionLine2 <> ""
           if m.sideIconLabel = invalid
+            theme = getThemeFromGlobal()
             m.sideIconLabel = m.labelParent.createChild("TextIcon")
             m.sideIconLabel.id = "SideIconLabel"
             m.sideIconLabel.fontSize = 18
-            m.sideIconLabel.fontColor = "0x000000"
+
+            if theme <> invalid
+              m.sideIconLabel.fontColor = theme.backgroundColor
+            end if
+            
             m.sideIconLabel.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
             m.sideIconLabel.padding = [12, 9]
             m.sideIconLabel.text = item.shortDescriptionLine2
@@ -69,9 +98,27 @@ Function onContentChange(data)
 End Function
 
 
+Function onFocusChange(msg)
+  theme = getThemeFromGlobal()
+
+  bFocused = msg.getData()
+  if theme <> invalid
+    if bFocused = true
+      m.Label.color = theme.focusedTextColor
+      m.Icon.blendColor = theme.focusedTextColor
+    else
+      m.Label.color = theme.primaryTextColor
+      m.Icon.blendColor = theme.primaryTextColor
+    end if
+  end if
+End FUnction
+
+
 Function onActiveChange()
+
   if m.top.itemContent.active = true
     if m.top.itemContent.turnedOn <> false
+    
       m.Icon.opacity = 1
 
       m.subTxt.opacity = 0

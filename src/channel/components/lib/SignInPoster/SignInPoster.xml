@@ -3,6 +3,7 @@
 
   <script type="text/brightscript" uri="SignInPoster.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
@@ -18,7 +19,6 @@
 
     <Label
       id="ToolText"
-      color="0xFFFFFFFF"
       horizAlign="center"
       translation="[0,288]"
       width="430">

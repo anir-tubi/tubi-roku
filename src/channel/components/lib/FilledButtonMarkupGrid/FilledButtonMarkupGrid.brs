@@ -9,6 +9,6 @@ Function init()
 
   theme = getThemeFromGlobal()
   if theme <> invalid
-    m.top.focusBitmapBlendColor = theme.focused
+    m.top.focusBitmapBlendColor = theme.focusedColor
   end if
 End Function

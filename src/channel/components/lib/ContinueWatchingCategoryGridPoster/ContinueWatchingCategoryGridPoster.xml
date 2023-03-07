@@ -17,7 +17,6 @@
       itemSpacings="[24]">
       <Label
         id="Title"
-        color="0xFFFFFFFF"
         height="36"
         vertAlign="center">
         <Font

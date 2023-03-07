@@ -4,9 +4,8 @@ Function init()
   m.infoPaneMsgArea = m.top.findNode("infoPaneMsgArea")
   m.infoPaneBg = m.top.findNode("infoPaneBg")
   m.constants = getConstantsFromGlobal()
-  m.infoPaneBg.blendColor = m.constants.ui.colors.backgroundColorLight
   m.infoPaneText = m.top.findNode("infoPaneText")
-  m.infoPaneText.color = m.constants.ui.colors.toastMessage
+  
   m.top.enableRenderTracking = true
   m.top.observeFieldScoped("show", "onShow")
   m.top.opacity = 0
@@ -15,8 +14,25 @@ Function init()
   else
     m.infoPaneBg.uri = "pkg:/images/tab_short_component_alt_fhd.9.png"
   end if
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
 End Function
 
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.infoPaneBg.blendColor = theme.inverseBackgroundColor
+    m.infoPaneText.color = theme.inverseSecondaryTextColor
+  end if
+End Function
 
 Function onShow(msg)
   tubilog("TubiToast.onShow")
@@ -149,10 +165,13 @@ End Function
 
 
 Function createHeaderText(inputArgs)
+  theme = getThemeFromGlobal()
   if m.header = invalid
     m.header = createObject("roSGNode", "Label")
     m.header.id = "infoPaneHeader"
-    m.header.color = m.constants.ui.colors.toastTitle
+    if theme <> invalid
+      m.header.color = theme.inversePrimaryTextColor
+    end if
     m.header.maxLines = "1"
     m.header.numLines = "1"
     m.header.width = "0"

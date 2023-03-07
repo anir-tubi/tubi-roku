@@ -99,7 +99,7 @@ End Function
 Function onSettingsBackgroundChange()
   tubiLog("SettingsScreenHelpers.onSettingsBackgroundChange")
   m.backgroundGroup.backgroundInfo = {
-    type: getBackgroundtype(m.settingsScreen.backgroundUriList)
+    type: getBackgroundType(m.settingsScreen.backgroundUriList)
     uriList: m.settingsScreen.backgroundUriList
   }
 End Function

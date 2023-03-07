@@ -16,6 +16,25 @@ Function init()
 
   m.top.observeFieldScoped("setOpenState", "onOpenStateChanged")
   m.top.observeFieldScoped("buttonToFocusID", "onSideNavToFocusChange")
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.btnBack_label.color = theme.primaryTextColor
+    m.btnCC_label.color = theme.primaryTextColor
+  end if
 End Function
 
 
@@ -67,10 +86,14 @@ Function focusSideNavButton(sButtonID)
   end if
 
   if poster <> invalid AND label <> invalid then
-    poster.blendColor = m.constants.ui.colors.focused
+    theme = getThemeFromGlobal()
+    if theme <> invalid
+      poster.blendColor = theme.focusedColor
+      label.color = theme.highlightedTextColor
+    end if
+    
     poster.opacity = 1
     label.opacity = 1
-    label.color = m.constants.ui.colors.highlightedText
   end if
 End Function
 
@@ -89,10 +112,14 @@ Function unFocusSideNavButton(sButtonID)
   end if
 
   if poster <> invalid AND label <> invalid then
-    poster.blendColor = m.constants.ui.colors.unfocused
+    theme = getThemeFromGlobal()
+    if theme <> invalid
+      poster.blendColor = theme.unfocusedColor
+      label.color = theme.primaryTextColor
+    end if
+
     poster.opacity = .5
     label.opacity = .5
-    label.color = m.constants.ui.colors.primaryText
   end if
 End Function
 
@@ -119,10 +146,14 @@ Function onOpenStateChanged()
     poster = m.btnCC_poster
     label = m.btnCC_label
 
-    poster.blendColor = m.constants.ui.colors.unfocused
+    theme = getThemeFromGlobal()
+    if theme <> invalid
+      poster.blendColor = theme.unfocusedColor
+      label.color = theme.primaryTextColor
+    end if
+
     poster.opacity = 1
     label.opacity = 1
-    label.color = m.constants.ui.colors.primaryText
     unFocusSideNavButton(m.btnBack.id)
   end if
 End Function

@@ -21,8 +21,7 @@
 
   <children>
     <Rectangle
-      id="PosterRect"
-      color="0xFFFFFF1A"/>
+      id="PosterRect"/>
     <Poster
       opacity=".64"
       id="Poster"
@@ -36,7 +35,6 @@
       id="Title"
       numLines="2"
       wrap="true"
-      color="0xFFFFFFFF"
       ellipsizeOnBoundary="true"
       vertAlign="center"
       horizAlign="center"
@@ -55,8 +53,7 @@
         id="SponsoredByText"
         text=""
         vertAlign="bottom"
-        color="0xFFFFFFBF"
-        width="0"
+        width="0" 
         height="18">
         <Font
           role="font"

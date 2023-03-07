@@ -14,6 +14,26 @@ Function init()
   ' used to keep track of if the grid has focus or not, onGridFocusChange fires every time any focus changes including
   ' scrolling between tiles.
   m.gridIsFocused = false
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.PosterRect.color = theme.neutralColor2
+    m.Title.color = theme.primaryTextColor
+    m.SponsoredByText.color = theme.backgroundColorLight2
+  end if
 End Function
 
 

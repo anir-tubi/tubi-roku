@@ -372,7 +372,7 @@ Function onBackgroundScreenUpdated(msg)
   screen = msg.getRoSGNode()
   if screen <> invalid
     m.backgroundGroup.backgroundInfo = {
-      type: getBackgroundtype(screen.backgroundUriList)
+      type: getBackgroundType(screen.backgroundUriList)
       uriList: screen.backgroundUriList
     }
   end if

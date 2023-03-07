@@ -13,6 +13,24 @@ Function init()
   m.nonAnimatingUri = "pkg:/images/icon_live_4.png"
   m.liveAnimateImage.uri = m.nonAnimatingUri
   m.animateIndex = 0
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.liveTitle.color = theme.primaryTextColor
+  end if
 End Function
 
 

@@ -21,9 +21,14 @@ End Function
 
 
 Function onItemHasFocus()
-  if m.top.itemHasFocus = true
-    m.buttonBG.blendcolor = m.constants.ui.colors.focused
-  else if m.top.itemHasFocus = false
-    m.buttonBG.blendcolor = m.constants.ui.colors.neutralColor3
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    if m.top.itemHasFocus = true
+      m.buttonBG.blendcolor = theme.focusedColor
+      m.label.color = theme.keyboardFocusedTextColor
+    else if m.top.itemHasFocus = false
+      m.buttonBG.blendcolor = theme.neutralColor3
+      m.label.color = theme.primaryTextColor
+    end if
   end if
 End Function

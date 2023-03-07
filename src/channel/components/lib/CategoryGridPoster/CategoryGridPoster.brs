@@ -55,6 +55,25 @@ Function init()
   m.top.observeFieldScoped("focusPercent", "onItemFocusPercentChange")
   m.top.observeFieldScoped("itemHasFocus", "onRowItemHasFocus")
   m.uiResolution = UCase(di.GetUiResolution().name)
+
+  onThemeChange()
+End Function
+
+
+Function onThemeChange()
+  theme = getThemeFromGlobal()
+  
+  if theme <> invalid
+    m.InnerTitle.color = theme.primaryTextColor
+    m.TimeRemaining.color = theme.primaryTextColor
+    m.DurationBar.color = theme.primaryTextColor
+    m.Title.color = theme.primaryTextColor
+    m.LinearSubTitle.color = theme.primaryTextColor
+    m.LinearTitle.color = theme.primaryTextColor
+    if m.showAllLabel <> invalid
+      m.showAllLabel.color = theme.primaryTextColor
+    end if
+  end if
 End Function
 
 
@@ -217,7 +236,12 @@ Function drawProgressBar(nowPos, duration)
   if percentage > 1.0 then percentage = 1.0
   if percentage < 0.0 then percentage = 0.0
   m.resumeProgressBar.width = (m.top.width - (2 * m.resumeMargin)) * percentage
-  m.resumeProgressBar.color = m.global.theme.focused
+
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.resumeProgressBar.color = theme.focusedColor
+  end if
+  
   m.resumeProgressBar.visible = true
   m.DurationBar.width = (m.top.width - (2 * m.resumeMargin))
   m.DurationBar.visible = true
@@ -495,13 +519,12 @@ End Function
 Function setLiveBadge()
   tubiLog("CategoryGridPoster.setLiveBadge")
   badge = m.badgeGroup.createChild("Badge")
+  theme = getThemeFromGlobal()
   badge.translation = [12,12]
-  '//::TODO::colors - replace this color with the one in constants, but since we don't have a reliable reference to constants then need to do this dynamically at build process
-  ' badge.backgroundColor = m.constants.ui.colors.focused2
-  badge.backgroundColor = "0xF52D2DFF"
-  '//::TODO::colors - replace this color with the one in constants, but since we don't have a reliable reference to constants then need to do this dynamically at build process
-  ' badge.textColor = m.constants.ui.colors.primaryText
-  badge.textColor = "0xFFFFFFFF"
+  if theme <> invalid
+    badge.backgroundColor = theme.focused2Color
+    badge.textColor = theme.primaryTextColor
+  end if
   badge.iconUri = "pkg:/images/live-icon.webp"
   badge.text = UCase(getTranslation("screenSearch_liveText"))
 End Function
@@ -516,20 +539,17 @@ End Function
 
 Function setReplayOrUpcomingBadge(badgeText)
   tubiLog("CategoryGridPoster.setReplayOrUpcomingBadge")
+  theme = getThemeFromGlobal()
   badge = m.badgeGroup.createChild("Badge")
   badge.translation = [12,12]
-  if badgeText = m.contentTimings.replay
-    '//::TODO::colors - replace this color with the one in constants, but since we don't have a reliable reference to constants then need to do this dynamically at build process
-    ' badge.backgroundColor = m.constants.ui.colors.backgroundColorLight
-    badge.backgroundColor = "0xFFFFFFFF"
-    '//::TODO::colors - replace this color at build with m.constants.ui.colors.neutralColor2; note text color may need to be opaque
-    badge.textColor = "0x1C1F29"
-  else
-    '//::TODO::colors - replace this color at build with m.constants.ui.colors.neutralColor
-    badge.backgroundColor = "0x585B66"
-    '//::TODO::colors - replace this color with the one in constants, but since we don't have a reliable reference to constants then need to do this dynamically at build process; note text color may need to be opaque
-    ' badge.textColor = m.constants.ui.colors.primaryText
-    badge.textColor = "0xFFFFFFFF"
+  if theme <> invalid
+    if badgeText = m.contentTimings.replay
+      badge.backgroundColor = theme.backgroundColorLight
+      badge.textColor = theme.neutralColor2
+    else
+      badge.backgroundColor = theme.neutralColor 
+      badge.textColor = theme.primaryText 
+    end if
   end if
   badge.text = UCase(badgeText)
 End Function
@@ -554,9 +574,14 @@ End Function
 
 Function setShowAllLabel(text)
   tubiLog("CategoryGridPoster.setShowAllLabel")
+  theme = getThemeFromGlobal()
   m.showAllLabel = m.top.createChild("Label")
   m.showAllLabel.text = text
-  m.showAllLabel.color = "0xFFFFFFFF"
+
+  if theme <> invalid
+    m.showAllLabel.color = theme.primaryTextColor
+  end if
+  
   m.showAllLabel.width = 380
   m.showAllLabel.height = 216
   m.showAllLabel.horizAlign = "center"

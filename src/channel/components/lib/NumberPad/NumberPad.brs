@@ -10,12 +10,14 @@ Function init()
   keyGrid = m.keyboard.keyGrid
   keyGrid.keyDefinitionUri = "pkg:/components/data/NumberPadKDF.json"
 
-  palette = createObject("roSGNode", "RSGPalette")
-  palette.colors = {
-    "FocusColor": theme.focused
-    "FocusItemColor": m.constants.ui.colors.keyboardFocusedText
-  }
-  keyGrid.palette = palette
+  if theme <> invalid
+    palette = createObject("roSGNode", "RSGPalette")
+    palette.colors = {
+      "FocusColor": theme.focusedColor
+      "FocusItemColor": theme.keyboardFocusedTextColor
+    }
+    keyGrid.palette = palette
+  end if
 
   m.top.observeFieldScoped("focusedChild", "onTopFocusedChildChange")
   ' Need to observe textEditBox focusedChild as well to avoid voice input bug where voice input does not work properly after we have setFocus in the callback from m.top.focusedChild. m.keyboard.textEditBox.focusedChild gets called later which seems to fix it.

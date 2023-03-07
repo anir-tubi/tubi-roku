@@ -22,16 +22,30 @@ Function init()
 
 
   m.buttonBG = m.top.findNode("buttonBg")
-  theme = getThemeFromGlobal()
-  if theme <> invalid
-    m.buttonBG.blendColor = theme.focused
-  end if
-
   setButtonWidthAndAlignment()
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
 End Function
 
-Function setButtonWidthAndAlignment()
 
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.buttonBG.blendColor = theme.focusedColor
+    m.Title.color = theme.primaryTextColor
+  end if
+End Function
+
+
+Function setButtonWidthAndAlignment()
   nMinSpacing = 80
   if m.button.leftTextPadding > nMinSpacing
     nMinSpacing = m.button.leftTextPadding

@@ -8,7 +8,6 @@ Function init()
 
   m.trackingLoggingTask = getFieldFromGlobal("trackingLoggingTask")
   m.EmailVerificationMenu = m.top.findNode("EmailVerificationMenu")
-  m.EmailVerificationMenu.focusBitmapBlendColor = getThemeFromGlobal().focused
   m.emailNotificationPoster = m.top.findNode("emailNotificationPoster")
   m.emailInboxText = m.top.findNode("emailInboxText")
   m.verificationLinkText = m.top.findNode("verificationLinkText")
@@ -19,7 +18,7 @@ Function init()
   'setting the alignment of the item in the list to make the text center when no iconUrl and badge text.
   m.resendVerificationLinkButton.align = "center"
   m.useDifferentEmailButton.align = "center"
-
+  
   m.EmailVerificationMenu.observeField("itemSelected", "onEmailVerificationMenuItemSelected")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   setInitialStrings()
@@ -29,11 +28,28 @@ Function init()
       choice: "LINK"
     }
   }
-  m.verificationLinkText.color = m.constants.ui.colors.secondaryText
-  m.verificationHintText.color = m.constants.ui.colors.secondaryText
-  m.emailInboxText.color = m.constants.ui.colors.primaryText
-  m.email.color = m.constants.ui.colors.primaryText
   m.top.screenLevel = m.constants.ui.screenLevels.emailVerificationScreen
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+  
+  
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.EmailVerificationMenu.focusBitmapBlendColor = theme.focused
+    m.verificationLinkText.color = theme.secondaryTextColor
+    m.verificationHintText.color = theme.secondaryTextColor
+    m.emailInboxText.color = theme.primaryTextColor
+    m.email.color = theme.primaryTextColor
+  end if
 End Function
 
 

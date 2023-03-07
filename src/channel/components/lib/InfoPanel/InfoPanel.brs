@@ -1,8 +1,5 @@
 Function init()
-  ' trying to access m.global can sometimes/rarely time out creating a run time error if we
-  ' try to access m.global.theme directly, so use GlobalMixin.getThemeFromGlobal() which retries if issues arise.
   m.constants = getConstantsFromGlobal()
-  theme = getThemeFromGlobal()
 
   m.nodeHelpers = TubiNodeHelpers()
 
@@ -37,6 +34,7 @@ Function init()
   m.descriptionFocusButton = m.top.findNode("DescriptionFocusButton")
 
   m.signInGroup = m.top.findNode("signInGroup")
+  m.SignInLock = m.twoLineInfo.findNode("SignInLock")
   m.signInText = m.top.findNode("signInText")
   m.reminderGroup = m.top.findNode("ReminderGroup")
   m.reminderTitle = m.top.findNode("ReminderTitle")
@@ -74,13 +72,8 @@ Function init()
   m.closedCaptions.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.resolutionPoster.observeFieldScoped("loadStatus", "onPosterLoadStatus")
 
-  m.expireWarning.color = m.constants.ui.colors.expirationWarning
   m.signInText.text = getTranslation("registration_signIn_to_play_hint")
   m.reminderTitle.text = getTranslation("info_panel_reminder_is_set")
-
-  if theme <> invalid
-    m.descriptionFocusButton.blendColor = theme.focused
-  end if
 
   onWidthChange()
 
@@ -104,7 +97,35 @@ Function init()
 
   DirectorRect.width = nMatchDirectorWidth + spacerWidth
   StarringRect.width = nMatchStarringWidth + spacerWidth
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
 End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.descriptionFocusButton.blendColor = theme.focusedColor
+    m.expireWarning.color = theme.cautionColor
+    m.SignInLock.blendColor = theme.cautionColor
+    m.signInText.color = theme.cautionColor
+    m.Title.color = theme.primaryTextColor
+    m.RatingLabel.color = theme.primaryTextColor
+    m.Description.color = theme.primaryTextColor
+    m.Director.color = theme.primaryTextColor
+    m.Starring.color = theme.primaryTextColor
+    m.CountdownText.color = theme.primaryTextColor
+  end if
+End Function
+
 
 
 Function onPosterLoadStatus(msg)
@@ -896,19 +917,22 @@ End Function
 ' @badgeComponent: a Badge node
 Function formatBadge(text, badgeComponent)
   tubiLog("InfoPanel.formatBadge")
-  if UCase(text) = UCase(getTranslation("screenSearch_liveText"))
-    ' LIVE badge
-    badgeComponent.backgroundColor = m.constants.ui.colors.focused2
-    badgeComponent.textColor = m.constants.ui.colors.primaryText
-    badgeComponent.iconUri = "pkg:/images/live-icon.webp"
-  else if UCase(text) = UCase(getTranslation("replay"))
-    ' REPLAY badge
-    badgeComponent.backgroundColor = m.constants.ui.colors.backgroundColorLight
-    badgeComponent.textColor = m.constants.ui.colors.textDark
-  else
-    ' TODAY, TOMORROW, <<Date>> badge
-    badgeComponent.backgroundColor = m.constants.ui.colors.neutralColor
-    badgeComponent.textColor = m.constants.ui.colors.primaryText
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    if UCase(text) = UCase(getTranslation("screenSearch_liveText"))
+      ' LIVE badge
+      badgeComponent.backgroundColor = theme.focused2Color
+      badgeComponent.textColor = theme.primaryTextColor
+      badgeComponent.iconUri = "pkg:/images/live-icon.webp"
+    else if UCase(text) = UCase(getTranslation("replay"))
+      ' REPLAY badge
+      badgeComponent.backgroundColor = theme.backgroundColorLight
+      badgeComponent.textColor = theme.textDarkColor
+    else
+      ' TODAY, TOMORROW, <<Date>> badge
+      badgeComponent.backgroundColor = theme.neutralColor
+      badgeComponent.textColor = theme.primaryTextColor
+    end if
   end if
 
   badgeComponent.text = UCase(text)

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="MyStuffEmptyCategoryGridPoster" extends="Rectangle" >
+
+  <script type="text/brightscript" uri="MyStuffEmptyCategoryGridPoster.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+
   <interface>
     <!-- INPUTS -->
 
@@ -25,7 +29,6 @@
         />
       <Label
         id="Title"
-        color="0xFFFFFFFF"
         height="20"
         vertAlign="center">
         <Font
@@ -35,7 +38,6 @@
         </Label>
       <Label
         id="Subtitle"
-        color="0xFFFFFFFF"
         wrap="true"
         ellipsizeOnBoundary="true"
         width="600"

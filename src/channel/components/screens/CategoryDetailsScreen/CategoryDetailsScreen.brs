@@ -33,27 +33,38 @@ Function init()
     m.VideoGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
 
-  m.VideoGrid.focusBitmapBlendColor = m.global.theme.focused
-  m.global.observeField("theme", "onThemeChange")
-
+  
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
-
-
+  
+  
   BackLabel = m.top.findNode("callToAction")
   if m.constants.deviceInfo.uiResolution <> "FHD"
     '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
-
+  
   m.top.screenLevel = m.constants.ui.screenLevels.categoryDetailsScreen
   m.top.handlesTransportVoiceRequests = true
-
+  
   m.bLeftButtonActsLikeBackButton = true
   m.VideoGrid.itemSize = posterSize
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
 End Function
 
-Function onThemeChange()
-  m.VideoGrid.focusBitmapBlendColor = m.global.theme.focused
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.VideoGrid.focusBitmapBlendColor = theme.focusedColor
+  end if
 End Function
 
 

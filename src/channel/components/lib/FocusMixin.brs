@@ -13,8 +13,8 @@ Function handleKeyboardColors()
   keyboardPalette = createObject("roSGNode", "RSGPalette")
   if theme <> invalid
     keyboardPalette.colors = {
-      "FocusColor": theme.focused,
-      "FocusItemColor": m.constants.ui.colors.keyboardFocusedText
+      "FocusColor": theme.focusedColor,
+      "FocusItemColor": theme.keyboardFocusedTextColor
     }
   end if
   return keyboardPalette

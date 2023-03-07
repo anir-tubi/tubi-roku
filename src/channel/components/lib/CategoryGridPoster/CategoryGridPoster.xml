@@ -45,7 +45,6 @@
           itemSpacings="[0]">
             <Label
               id="InnerTitle"
-              color="0xFFFFFFFF"
               width="380"
               height="36"
               vertAlign="top"
@@ -57,7 +56,6 @@
             </Label>
             <Label
               id="TimeRemaining"
-              color="0xFFFFFFFF"
               width="380"
               height="28"
               vertAlign="top"
@@ -71,7 +69,6 @@
               <Rectangle
                 id="DurationBar"
                 opacity=".2"
-                color="0xFFFFFFFF"
                 height="6"
                 width="0"
                 visible="false"/>
@@ -85,7 +82,6 @@
       </Poster>
       <Label
         id="Title"
-        color="0xFFFFFFFF"
         width="380"
         height="36"
         vertAlign="center"
@@ -108,7 +104,6 @@
       failedBitmapUri="pkg:/images/placeholder.jpg" />
     <Label
       id="LinearSubTitle"
-      color="0xFFFFFFFF"
       width="380"
       height="36"
       horizAlign="center"
@@ -122,7 +117,6 @@
     </Label>
     <Label
       id="LinearTitle"
-      color="0xFFFFFFFF"
       width="380"
       height="36"
       horizAlign="center"

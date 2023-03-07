@@ -2,12 +2,32 @@ Function init()
   m.Text = m.top.findNode("Text")
   m.Check = m.top.findNode("Check")
   m.BtnLayout = m.top.findNode("BtnLayout")
-  m.top.observeField("itemContent", "onContentChange")
-  m.top.observeField("content", "onContentChange")
-  m.top.observeField("width", "onWidthChange")
-  m.top.observeField("height", "onHeightChange")
-  m.Text.color = m.global.constants.ui.colors.primaryText
+  m.top.observeFieldScoped("itemContent", "onContentChange")
+  m.top.observeFieldScoped("content", "onContentChange")
+  m.top.observeFieldScoped("width", "onWidthChange")
+  m.top.observeFieldScoped("height", "onHeightChange")
+  m.top.observeFieldScoped("itemHasFocus", "onItemHasFocus")
+  
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
 End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.Text.color = theme.primaryTextColor
+    m.Check.blendColor = theme.primaryTextColor
+  end if
+End Function
+
 
 ''''''''''''''''''
 ' onContentChange
@@ -52,4 +72,18 @@ End Function
 Function getWidthMinusText()
   '//The width include the checkbox, the space in between the checkbox and the label, and the space before the 1st and last elements of the checkbutton
   return m.Check.width + m.BtnLayout.itemSpacings[0] + m.BtnLayout.translation[0]*2
+End Function
+
+
+Function onItemHasFocus()
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    if m.top.itemHasFocus = true
+      m.Text.color = theme.focusedTextColor
+      m.Check.blendColor = theme.focusedTextColor
+    else
+      m.Text.color = theme.primaryTextColor
+      m.Check.blendColor = theme.primaryTextColor
+    end if
+  end if
 End Function

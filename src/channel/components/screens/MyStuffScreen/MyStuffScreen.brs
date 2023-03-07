@@ -14,9 +14,6 @@ Function init()
   m.SignedOutUITitle.text = getTranslation("screenMyStuff_signedOutUITitle")
   m.SignedOutUISubtitle.text = getTranslation("screenMyStuff_signedOutUISubtitle")
   m.SignedOutUIBlurb.text = getTranslation("screenMyStuff_signedOutUIBlurb")
-  m.SignedOutUITitle.color = m.constants.ui.colors.primaryText
-  m.SignedOutUISubtitle.color = m.constants.ui.colors.secondaryText
-  m.SignedOutUIBlurb.color = m.constants.ui.colors.focused
   m.top.screenLevel = m.constants.ui.screenLevels.myStuffScreen
   m.top.id = m.constants.ui.screenIds.myStuffScreen
 
@@ -46,8 +43,6 @@ Function init()
   m.GuestMenu = m.top.findNode("GuestMenu")
   m.GuestMenu.focusBitmapUri = "pkg:/images/menu-focus-fhd.9.png"
   m.RowList.focusBitmapUri = "pkg:/images/selector-fhd.9.png"
-  m.GuestMenu.focusBitmapBlendColor = m.global.theme.focused
-  m.RowList.focusBitmapBlendColor = m.global.theme.focused
   m.GuestMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-fhd.9.png"
   if m.constants.deviceInfo.scaledUi = true
     m.GuestMenu.focusBitmapUri = "pkg:/images/menu-focus-hd.9.png"
@@ -79,6 +74,29 @@ Function init()
   m.top.observeFieldScoped("signedIn", "onSignedInChange")
   m.top.observeFieldScoped("jumpToRowItemByIdAndIndex", "onJumpToRowItemChange")
   m.top.observeFieldScoped("reset", "onResetChange")
+  
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.SignedOutUITitle.color = theme.primaryTextColor
+    m.ScreenTitle.color = theme.primaryTextColor
+    m.SignedOutUISubtitle.color = theme.secondaryTextColor
+    m.SignedOutUIBlurb.color = theme.focusedColor
+    m.GuestMenu.focusBitmapBlendColor = theme.focusedColor
+    m.RowList.focusBitmapBlendColor = theme.focusedColor
+  end if
 End Function
 
 

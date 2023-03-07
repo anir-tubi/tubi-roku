@@ -5,6 +5,12 @@ Function init()
 
   m.top.observeField("itemContent", "onItemContentChange")
   m.top.observeField("itemHasFocus", "onItemFocusChange")
+
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.ForegroundLabel.color = theme.primaryTextColor
+    m.Background.color = theme.neutralColor2
+  end if
 End Function
 
 

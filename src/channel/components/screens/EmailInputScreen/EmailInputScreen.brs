@@ -1,6 +1,5 @@
 Function init()
   m.constants = m.global.constants
-  m.theme = m.global.theme
 
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
   m.top.observeFieldScoped("isEmailValid", "onIsEmailValidChange")
@@ -46,15 +45,30 @@ Function init()
 
   m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
 
-  m.back.color = m.constants.ui.colors.backgroundColorLight
-  m.continue.color = m.constants.ui.colors.backgroundColorLight
-  m.emailValidationMsg.color = m.constants.ui.colors.caution
-  m.pageHeading.color = m.constants.ui.colors.primaryText
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.back.color = theme.backgroundColorLight
+    m.continue.color = theme.backgroundColorLight
+    m.emailValidationMsg.color = theme.cautionColor
+    m.pageHeading.color = theme.primaryTextColor
+  end if
 End Function
 
 
 Function onScreenFocusChange()
-
   tubiLog("EmailInputScreen.onScreenFocusChange")
   if m.top.hasFocus() then
     m.emailTextEditBox.active = true

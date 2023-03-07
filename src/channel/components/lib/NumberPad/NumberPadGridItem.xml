@@ -5,6 +5,7 @@
 <component name="NumberPadGridItem" extends="Group">
 
   <script type="text/brightscript" uri="NumberPadGridItem.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   
   <interface>
     <!-- INPUT -->
@@ -17,12 +18,10 @@
   <children>
     <Rectangle
       id="NumberPadGridItemBg"
-      color="0xFFFFFF1A"
       width="159"
       height="96" />
     <Label
       id="NumberPadGridItemFgLabel"
-      color="0xFFFFFF"
       horizAlign="center"
       vertAlign="center"
       visible="true"

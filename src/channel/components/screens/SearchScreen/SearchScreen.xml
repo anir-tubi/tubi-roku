@@ -25,10 +25,6 @@
       <!-- If the screen is not enabled, then user should not be able to select anything -->
       <field id="enabled" type="boolean" alwaysNotify="true"/>
 
-      <!-- Change the UI based on the value of this field. -->
-      <field id="kidsModeEnabled" value="false" type="boolean"/>
-
-
     <!-- OUTPUT -->
       <!-- set to the tubi content id of the item which was clicked on -->
       <field id="contentSelected" type="node" alwaysNotify="true"/>

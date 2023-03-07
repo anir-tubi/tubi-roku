@@ -10,6 +10,7 @@
 
   <interface>
     <field id="itemContent" type="node" />
+    <field id="itemHasFocus" type="boolean" />
     <field id="active" value="false" type="boolean" alwaysNotify="true"/>
     <field id="height" type="float" alwaysNotify="true" />
     <field id="width" type="float"/>
@@ -26,8 +27,7 @@
     <Label
       id="subTxt"
       vertAlign="center"
-      horizAlign="left"
-      color="0xFFFFFFBF">
+      horizAlign="left">
       <Font
         id="subtextFont"
         role="font"
@@ -43,7 +43,6 @@
       <Label
         id="Label"
         vertAlign="center"
-        color="0xFFFFFFFF"
         opacity="0">
         <Font
             id="Font"

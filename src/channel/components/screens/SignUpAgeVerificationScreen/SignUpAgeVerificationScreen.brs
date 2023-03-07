@@ -34,23 +34,37 @@ Function init()
 
   m.top.screenLevel = m.constants.ui.screenLevels.ageGateScreen
 
-
-  m.ErrorPrompt.color = m.constants.ui.colors.caution
-  m.AgeErrorPrompt.color = m.constants.ui.colors.caution
-  m.AgeWarningPrompt.color = m.constants.ui.colors.caution
-  m.infoLabel.color = m.constants.ui.colors.primaryText
-  m.Header.color = m.constants.ui.colors.primaryText
-  m.AgePrefixLabel.color = m.constants.ui.colors.primaryText
-  m.AgePostfixLabel.color = m.constants.ui.colors.primaryText
-  m.SubHeader.color = m.constants.ui.colors.secondaryText
-  m.StartButton.color = m.constants.ui.colors.backgroundColorLight2
-  m.AgeEntry.color = m.constants.ui.colors.textDark
-
   m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocusChanged")
   m.NumberPad.observeFieldScoped("text", "onNumberPadTextChanged")
   m.StartButton.observeFieldScoped("selected", "onStartButtonSelected")
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.ErrorPrompt.color = theme.cautionColor
+    m.AgeErrorPrompt.color = theme.cautionColor
+    m.AgeWarningPrompt.color = theme.cautionColor
+    m.infoLabel.color = theme.primaryTextColor
+    m.Header.color = theme.primaryTextColor
+    m.AgePrefixLabel.color = theme.primaryTextColor
+    m.AgePostfixLabel.color = theme.primaryTextColor
+    m.SubHeader.color = theme.secondaryTextColor
+    m.StartButton.color = theme.backgroundColorLight2
+    m.AgeEntry.color = theme.textDarkColor
+  end if
 End Function
 
 

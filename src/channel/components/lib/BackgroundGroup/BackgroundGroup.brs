@@ -5,6 +5,12 @@ Function init()
 
   m.blurredDefaultBackground = m.constants.ui.uris.defaultBackground
   m.blurredDefaultBackground_kidsMode = m.constants.ui.uris.kidsModeBackground
+
+  m.marketingBackground_defaultMode = m.constants.ui.uris.marketingBackground
+  m.marketingBackground_kidsMode = m.constants.ui.uris.marketingBackground_kids
+
+  m.blurredDefaultBackground = m.constants.ui.uris.defaultBackground
+  m.blurredDefaultBackground_kidsMode = m.constants.ui.uris.kidsModeBackground
   '// The blurred background that we are currently using
   m.blurredDefaultBackground_current = m.blurredDefaultBackground
 
@@ -99,6 +105,12 @@ Function newBackgroundSet()
       m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground_kidsMode
     else if m.top.kidsMode = false AND m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground_kidsMode
       m.aCurrentBackgroundInfo.uriList[i] = m.blurredDefaultBackground
+    end if
+
+    if m.top.kidsMode = true AND m.aCurrentBackgroundInfo.uriList[i] = m.marketingBackground_defaultMode
+      m.aCurrentBackgroundInfo.uriList[i] = m.marketingBackground_kidsMode
+    else if m.top.kidsMode = false AND m.aCurrentBackgroundInfo.uriList[i] = m.marketingBackground_kidsMode
+      m.aCurrentBackgroundInfo.uriList[i] = m.marketingBackground_defaultMode
     end if
   end for
 
@@ -421,7 +433,7 @@ Function transitionGradients()
         m.leftGradient.lastAnimationName = "GradientFadeOut"
       end if
     else if m.newBackgroundType = m.constants.ui.backgroundTypes.topRight
-      'don't fade in the topRightGradient due to 2 reasons
+      'don't fade in the fullScreenGradient/leftBottomGradient due to 2 reasons
       '1) if the old background poster was the default background, there is no gradient, so fading in the
       '   gradient while the topRight background poster fades in shows the edges of the topRight background
       '   poster since it is not full screen

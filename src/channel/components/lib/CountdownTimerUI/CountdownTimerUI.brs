@@ -19,7 +19,27 @@ Function init()
   setSeconds(00)
   m.PlayerCountdownBground.width = (m.TextAndIconLayoutGroup.translation[0] * 2) +  m.FullscreenIcon.width + m.TextAndIconLayoutGroup.itemSpacings[0] +  m.CountdownText.boundingRect().width
   m.top.width = m.PlayerCountdownBground.width
-End Function 
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.CountdownText.color = theme.primaryTextColor
+    m.PlayerCountdownBground.blendColor = theme.backgroundColor
+  end if
+End Function
+
 
 
 Function onSecondChange()

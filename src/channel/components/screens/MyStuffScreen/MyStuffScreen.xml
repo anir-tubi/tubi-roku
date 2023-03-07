@@ -165,7 +165,6 @@
         id="ScreenTitle"
         width="1140"
         maxLines="1"
-        color="0xFFFFFFFF"
         vertAlign="bottom">
         <Font
           role="font"

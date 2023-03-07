@@ -15,8 +15,8 @@ Function init()
   m.top.trackingPageContext = trackingPageInfo
 
   m.NodeHelpers = TubiNodeHelpers()
-  m.theme = m.global.theme
   m.ProgrammingData = m.top.findNode("ProgrammingData")
+  m.LoadingBackground = m.top.findNode("LoadingBackground")
   m.Loading = m.top.findNode("Loading")
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
   m.logoGroup = m.top.findNode("logoGroup")
@@ -172,9 +172,14 @@ End Function
 
 
 Function updateColors()
-  m.focusedColor = m.theme.focused
-  m.LoadingProgressBar.focusColor = m.focusedColor
-  m.LoadingProgressBar.unfocusColor = m.focusedColor
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.focusedColor = theme.focusedColor
+    m.LoadingProgressBar.focusColor = m.focusedColor
+    m.LoadingProgressBar.unfocusColor = m.focusedColor
+    m.LoadingBackground.color = theme.backgroundColor
+    m.LoadingProgressBar.trackColor = theme.neutralColor2
+  end if
 End Function
 
 

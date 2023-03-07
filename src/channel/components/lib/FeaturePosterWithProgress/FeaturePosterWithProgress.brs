@@ -6,7 +6,7 @@ Function init()
 
   theme = getThemeFromGlobal()
   if theme <> invalid
-    m.progressBar.color = theme.focused
+    m.progressBar.color = theme.focusedColor
   end if
 
   m.resumeMargin = 6  'inset of resume bar

@@ -109,7 +109,7 @@ Function changeTournamentScreenBackground(tournamentScreen)
     end if
 
     m.backgroundGroup.backgroundInfo = {
-      type: getBackgroundtype(tournamentScreen.backgroundUriList, contentType)
+      type: getBackgroundType(tournamentScreen.backgroundUriList, contentType)
       uriList : tournamentScreen.backgroundUriList
     }
   end if

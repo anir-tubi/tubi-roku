@@ -26,22 +26,31 @@ Function init()
   if m.constants.deviceInfo.scaledUi = true then
     m.ChannelCategoryGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
   end if
-  m.global.observeField("theme", "onThemeChange")
 
-  m.ChannelCategoryGrid.focusBitmapBlendColor = m.global.theme.focused
-
+  
   BackLabel = m.top.findNode("callToAction")
   if m.constants.deviceInfo.uiResolution <> "FHD"
     '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
-
+  
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
 End Function
 
 
-Function onThemeChange()
-  tubiLog("ChannelGridScreen.onThemeChange")
-  m.ChannelCategoryGrid.focusBitmapBlendColor = m.global.theme.focused
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.ChannelCategoryGrid.focusBitmapBlendColor = theme.focusedColor
+  end if
 End Function
 
 
