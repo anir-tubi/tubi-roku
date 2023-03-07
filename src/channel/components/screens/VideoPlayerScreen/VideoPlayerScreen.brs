@@ -353,6 +353,14 @@ Function playContent()
       m.lastButtonPressPos = m.Video.content.nowPos
       m.seekReferenceQueue.push(m.Video.content.nowPos)
       seekToPosition(m.Video.content.nowPos)
+
+      if m.Video.content.nowPos = 0
+        ' At this point seekReferenceQueue will have value 0. But the player position callback starts from 1
+        ' and the play progress event does not fire as per logic written in onVideoPositionChange() in 10 seconds because m.isSeeking is not setting to false.
+        ' If the video is seeked to 0, set the m.isSeeking to false, so that play progress event fires correctly.
+        m.isSeeking = false
+      end if
+
     else
       m.lastButtonPressPos = 0
       updateLastPingTime(0)
@@ -851,6 +859,7 @@ Function onVideoPositionChange(msg)
 
   ' for logging/debugging purposes, we keep track of the video position each time this function is called
   m.previousPlayerPosition = position
+
 End Function
 
 
@@ -903,6 +912,14 @@ Function onAdStateChange(msg)
       m.top.setFocus(true)
       m.seekReferenceQueue.push(m.playerPosition)
       seekToPosition(m.playerPosition)
+
+      if m.playerPosition = 0
+        ' At this point seekReferenceQueue will have value 0. But the player position callback starts from 1
+        ' and the play progress event does not fire as per logic written in onVideoPositionChange() in 10 seconds because m.isSeeking is not setting to false.
+        ' If the video is seeked to 0, set the m.isSeeking to false, so that play progress event fires correctly.
+        m.isSeeking = false
+      end if
+
       updateVideoState("play")
       updateLastPingTime(m.playerPosition) ' updating lastPingtime for extra safety
       if m.Video.content.has4kHevcStream = true
