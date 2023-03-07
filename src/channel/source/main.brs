@@ -33,17 +33,6 @@ Function Main(startupArgs)
 End Function
 
 
-Function RunScreenSaver(args)
-  screen = createObject("roSGScreen")
-  scene = screen.createScene("TubiScreenSaverScene")
-  screen.show()
-  scene.startupArgs = args
-  while true
-    sleep(1000)
-  end while
-End Function
-
-
 ' @constants: assocArray, constants as returned by getConstants()
 ' @log: assocArray, an instance of the log module as returned by TubiLog()
 ' @request: assocArray, an instance of the request module as returned by TubiRequest()
