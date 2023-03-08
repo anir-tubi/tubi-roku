@@ -380,6 +380,21 @@ async function createGithubRelease(done) {
 
 // Helper to work around the fact you can't fetch if you're already on the branch
 async function pullOrFetchBranch(done, branch) {
+  if (!isRemoteTrackingPresent(done, branch)) {
+    // Add a prompt asking if engineer wants to proceed with the build.
+    const {proceedWithGitPull} = await prompts({
+      type: 'confirm',
+      name: 'proceedWithGitPull',
+      message: `${branch} is missing remote tracking. Do you wish to proceed? (y/n)`,
+    });
+
+    if (!proceedWithGitPull) {
+      return done(new NoStackError('Script aborted'));
+    } else {
+      return;
+    }
+  }
+
   // pull origin of compareBranch
   if (getCurrentBranch(done) === branch) {
     // Have to pull if on the current branch as fetch will fail https://stackoverflow.com/questions/2236743/git-refusing-to-fetch-into-current-branch
@@ -387,6 +402,14 @@ async function pullOrFetchBranch(done, branch) {
   } else {
     execGitCommand(done, `git fetch origin ${branch}:${branch}`, `Could not fetch ${branch} branch`);
   }
+}
+
+
+// Checking if the branch has a remote branch tracking.
+function isRemoteTrackingPresent(done, branchName) {
+  const remoteTrackingInfo = execGitCommand(done, `git ls-remote --heads origin ${branchName}`, `Could not execute get remote tracking info`);
+
+  return remoteTrackingInfo.trim().length > 0
 }
 
 
@@ -555,17 +578,15 @@ async function findPullRequestCommitDifferences(done, branchA, branchB) {
   });
 
   if (!prepareConfirmation) {
-    const declineMsg = 'Script aborted';
-    log(declineMsg);
-    return done();
+    return done(new NoStackError('Script aborted'));
   }
 
   // process/store pull requests on branchA branch
-  pullOrFetchBranch(done, branchA);
+  await pullOrFetchBranch(done, branchA);
   const branchACommits = getPullRequestCommitsForBranch(done, branchA, true);
 
   // process/store pull requests on branchB branch
-  pullOrFetchBranch(done, branchB);
+  await pullOrFetchBranch(done, branchB);
   const branchBCommits = getPullRequestCommitsForBranch(done, branchB); // Note we need to use oneLine output to include pull requests that may have been squash merged in.
 
   const pullRequestCommitsNotInBranchB = [];
