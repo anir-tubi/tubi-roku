@@ -35,14 +35,15 @@ End Function
 Function onContentChange()
   item = m.top.itemContent
   if item <> invalid
+    itemAttributes = item.itemAttributes
     m.programString.text = item.title
     m.timeString.text = item.ShortDescriptionLine1
     m.cellRect.width = item.FHDItemWidth
     m.programString.width = item.FHDItemWidth - 24
     m.timeString.width = item.FHDItemWidth - 24
     if item.selected = true
-      if item.itemAttributes <> invalid and item.itemAttributes.title <> invalid
-        m.timeString.text = item.itemAttributes.title + item.ShortDescriptionLine1
+      if itemAttributes <> invalid and itemAttributes.title <> invalid
+        m.timeString.text = itemAttributes.title + item.ShortDescriptionLine1
         if m.theme <> invalid
           m.timeString.color = m.theme.cautionColor
         end if
@@ -53,7 +54,7 @@ Function onContentChange()
       end if
     end if
 
-    if item.itemAttributes <> invalid AND item.itemAttributes.EpisodeTitle_IsPreferred = true
+    if itemAttributes <> invalid AND itemAttributes.EpisodeTitle_IsPreferred = true
       m.programString.text = item.epgProgramTitle
     end if
 
@@ -94,28 +95,32 @@ End Function
 Function onFocusPercentChange()
   item = m.top.itemContent
   ' //TODO : Find better logic to avoid multiple executions of this logic because of focuspercent being float and triggered multiple times.
-  if m.top.focusPercent < 0.5
-    if item.selected = true
-      if item.itemAttributes <> invalid
-        m.timeString.text = strReplace(item.ShortDescriptionLine1, item.itemAttributes.title, "")
-      end if
-      
-      if m.theme <> invalid
-        m.timeString.color = m.theme.backgroundColorLight2
-      end if
-      item.selected = false
-    end if
+  if item <> invalid
+    if m.top.focusPercent < 0.5
+      if item.selected = true
 
-    if m.theme <> invalid
-      if m.top.rowFocusPercent > 0.9
-        m.cellRect.blendColor = m.theme.backgroundColorLight2
-      else
-        m.cellRect.blendColor = m.theme.neutralColor2
+        itemAttributes = item.itemAttributes
+        if itemAttributes <> invalid
+          m.timeString.text = strReplace(item.ShortDescriptionLine1, itemAttributes.title, "")
+        end if
+        
+        if m.theme <> invalid
+          m.timeString.color = m.theme.backgroundColorLight2
+        end if
+        item.selected = false
       end if
-    end if
-  else
-    if m.theme <> invalid
-      m.cellRect.blendColor = m.theme.backgroundColor
+
+      if m.theme <> invalid
+        if m.top.rowFocusPercent > 0.9
+          m.cellRect.blendColor = m.theme.backgroundColorLight2
+        else
+          m.cellRect.blendColor = m.theme.neutralColor2
+        end if
+      end if
+    else
+      if m.theme <> invalid
+        m.cellRect.blendColor = m.theme.backgroundColor
+      end if
     end if
   end if
 End Function

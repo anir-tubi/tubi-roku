@@ -56,18 +56,18 @@ Function onThemeChange(msg = invalid)
   end if
   
   if theme <> invalid
-    m.SubHeader.color = theme.secondaryText
-    m.Header.color = theme.primaryText
-    m.bornYear.color = theme.primaryText
-    m.YearEntryBack.color = theme.secondaryText
+    m.SubHeader.color = theme.secondaryTextColor
+    m.Header.color = theme.primaryTextColor
+    m.bornYear.color = theme.primaryTextColor
+    m.YearEntryBack.color = theme.secondaryTextColor
     m.StartButton.color = theme.backgroundColorLight2
-    m.Header.color = theme.primaryText
+    m.Header.color = theme.primaryTextColor
     
-    m.YearLabel.color = theme.primaryText
-    m.infoLabel.color = theme.primaryText
-    m.YearEntryFront.color = theme.textDark
-    m.YearEntryBack.color = theme.textDark
-    m.Prompt.color = theme.caution
+    m.YearLabel.color = theme.primaryTextColor
+    m.infoLabel.color = theme.primaryTextColor
+    m.YearEntryFront.color = theme.textDarkColor
+    m.YearEntryBack.color = theme.textDarkColor
+    m.Prompt.color = theme.cautionColor
   end if
 End Function
 

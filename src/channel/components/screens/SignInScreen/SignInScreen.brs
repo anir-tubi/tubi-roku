@@ -239,7 +239,7 @@ Function updatePasswordValidation()
   passwordLength = Len(m.keyboard.text)
   if theme <> invalid
     if passwordLength > 0
-      m.passwordValidationMsg.color = theme.secondaryText
+      m.passwordValidationMsg.color = theme.secondaryTextColor
     else
       m.passwordValidationMsg.color = theme.cautionColor
     end if
