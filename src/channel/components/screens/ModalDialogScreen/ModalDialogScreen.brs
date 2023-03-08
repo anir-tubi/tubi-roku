@@ -3,6 +3,7 @@ Function init()
   m.top.observeField("title", "formatDialog")
   m.top.observeField("message", "formatDialog")
   m.top.observeField("scrollable", "formatDialog")
+  m.top.observeFieldScoped("focusedChild", "onFocsedChildChange")
   m.ButtonList = m.top.findNode("ButtonList")
   m.ContentArea = m.top.findNode("ContentArea")
   m.DialogBox = m.top.findNode("DialogBox")
@@ -13,7 +14,7 @@ Function init()
   m.Shade = m.top.findNode("Shade")
   m.Title = m.top.findNode("Title")
 
-  
+
   m.constants = getConstantsFromGlobal()
   m.top.screenLevel = m.constants.ui.screenLevels.modalDialogScreen
   if m.global <> invalid
@@ -23,13 +24,21 @@ Function init()
 End Function
 
 
+Function onFocsedChildChange()
+  'if modal loses focus (mainly because videoplayer gains focus or homescreen gains focus), Just close the modal
+  if m.top.hasFocus() = false AND m.top.isInFocusChain() = false
+    m.top.exitButton = "back"
+  end if
+End Function
+
+
 Function onThemeChange(msg = invalid)
   if msg <> invalid
     theme = msg.getData()
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.Shade.color = theme.shadeColor
     m.ScrollableBackground.color = theme.shadeColor
