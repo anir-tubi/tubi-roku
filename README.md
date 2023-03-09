@@ -232,6 +232,8 @@ Note: If you are adding a new unit test, then you can test only this new unit te
 
 - Run `$ gulp install --staging`
 
+   You may see a Connection Error modal on roku device, it is because the starter and remote components are not yet there in aws. We will upload it to aws in coming steps. So you may ignore the error modal now. Just make sure the 'tubi_x_y_z.pkg' got created in /build directory.
+
 - In a browser, navigate to [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and follow the process to create a new private channel.
 
   - Upload the `tubi_x_y_z.pkg` file from the `/build` directory.
@@ -271,7 +273,28 @@ Note: If you are adding a new unit test, then you can test only this new unit te
 TBD
 ```
 
-7\. After QA Sign Off, run `$ gulp release`. This will:
+7\. Create a SC ticket with any changes that have been made and give the ticket to the QA team for manual testing.
+
+  - Go to the ShortCut tool
+  - Create a QA ticket by navigating to the following menu items: Create Story in Team> Create Story> Product QA Team> Roku QA Template
+  - Run the command gulp buildQaChanges, which will build most of the copy for this ticket and place it in your clipboard
+  - Paste the copy in the newly created SC ticket from the previous step
+  - Make sure that no work is missing in the list and that the included info looks correct
+  - Provide QA with a link to the ticket within the roku_qa slack channel
+
+8\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA branch and update private channel. 
+ 
+  - Run `$ gulp install --staging`
+
+  - In a browser, navigate to [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and find the private channel you just created in step 4.
+
+  - Upload the `tubi_x_y_z.pkg` file from the `/build` directory.
+
+  - Upload the starter components and remote components onto the staging AWS server, run:
+
+    `$ gulp stage`
+
+9\. After QA Sign Off, run `$ gulp release`. This will:
 
   - increment the version number once more (the QA build should not be the same version number as the production build)
   - install a new build using the "production" config, to create the .pkgs needed to update the production build.
@@ -291,15 +314,15 @@ TBD
 
     __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Submission Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#submission-release)
 
-8\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#roku_dev slack channel`. The PR URLs can also be found on the project-total-recall and adrise_cdn repos respectively), and wait for approval.
+10\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#roku_dev slack channel`. The PR URLs can also be found on the project-total-recall and adrise_cdn repos respectively), and wait for approval.
 
-9\. Merge the new PR in the adrise_cdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
+11\. Merge the new PR in the adrise_cdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
 
-10\. check if you need to tun multifactor authentication for AWS. Typically this means running `$ vauth`. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
+12\. check if you need to tun multifactor authentication for AWS. Typically this means running `$ vauth`. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
 
 - __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THE PR FOR THE adRise_cdn REPO AND THE PR FOR THE project-total-recall REPO ARE APPROVED AND MERGED.__
 
-11\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
+13\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
 
 - Ensure you have the latest files. Update your local version of the [adrise_infrastructure repo](https://github.com/adRise/adrise_infrastructure)
 - You may find during this step, that you may not have the correct version of python. If that is the case, then you will need to update your version on python based on your system requirmements. If you are on Mac, you may simply have to run the following command within your adrise_infrastructure repo:
@@ -309,15 +332,15 @@ TBD
 - If you still need to setup Infra, then in terminal, navigate to your adrise_infrastructure repo and run the setup instructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure#setup)
 - Deploy to the CDN by running the Infra script which is detailed on the [CDN README file](https://github.com/adRise/adrise_cdn/#deploy-to-aws-s3).
 
-12\. Submit build to Roku
+14\. Submit build to Roku
 
 - In a browser, visit [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and follow the process to update the "Tubi - Free Movies & TV" channel with the `/build/roku_x_y_z.pkg` file.
 
-13\. Email Roku Partner Success to let them know the build is in their queue.
+15\. Email Roku Partner Success to let them know the build is in their queue.
 
-14\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
+16\. Push the tag corresponding to the build that was just pushed to Github `$ git push origin x_y_z`
 
-15\. Once the channel update has been released by Roku, create a release on Github
+17\. Once the channel update has been released by Roku, create a release on Github
 
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
   - [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
