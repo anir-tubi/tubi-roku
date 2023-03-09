@@ -21,7 +21,7 @@ End Function
 Function sendOutExperimentTracking(namespaceName as string, experimentName as string, experiments)
   ' set up a list of experiment parameters that we've already sent exposure events for
   ' this will prevent multiple exposure events per session for the same experiment
-  if m.global.exposedExperimentParameters = invalid
+  if m.global <> invalid AND m.global.exposedExperimentParameters = invalid
     m.global.addField("exposedExperimentParameters", "assocarray", false)
     m.global.exposedExperimentParameters = {}
   end if

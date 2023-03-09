@@ -55,6 +55,10 @@ Function TubiExperiments(constants) as Object
       roku_linear_epg_position: {
         roku_linear_epg_position_v1 : {"enabled": true}
       }
+
+      roku_epg_channel_poster_bigger_size: {
+        roku_epg_channel_poster_bigger_size_v1: {"enabled": false}
+      }
     }
 
     'public methods

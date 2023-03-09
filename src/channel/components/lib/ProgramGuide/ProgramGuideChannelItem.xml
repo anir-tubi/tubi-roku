@@ -4,8 +4,11 @@
  -->
 <component name="ProgramGuideChannelItem" extends="Group" >
   <script type="text/brightscript" uri="ProgramGuideChannelItem.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
-  
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+
   <interface>
     <field id="itemContent" type="node" />
 
@@ -32,7 +35,7 @@
       width="72"
       loadheight="72"
       loadwidth="72"
-      translation="[57,18]"
+      translation="[51,12]"
       loadDisplayMode="scaleToFit"/>
   </children>
 </component>
