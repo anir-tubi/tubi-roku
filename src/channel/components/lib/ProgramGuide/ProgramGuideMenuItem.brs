@@ -25,7 +25,6 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.staticOverlay.blendColor = theme.backgroundColorLight2
-    m.staticOverlay.color = theme.backgroundColorLight2
     m.programString.color = theme.primaryTextColor
     onFocusPercentChange()    '//This function also sets the color - but depending on the focus state
   end if
