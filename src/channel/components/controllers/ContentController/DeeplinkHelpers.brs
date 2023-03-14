@@ -115,6 +115,8 @@ Function createDeeplinkContentFromStartupArgs(args)
     ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     else if args.page = "tournament"
       content.deeplinkType = "tournamentPage"
+    else if args.page = "home"
+      content.deeplinkType = "homePage"
     end if
   end if
 
@@ -245,6 +247,8 @@ Function handleDeeplinkContentByType()
       handleEspanolPageDeeplinkContent()
     else if m.deepLinkContent.deeplinktype = "tournamentPage"
       handleTournamentPageDeeplinkContent()
+    else if m.deepLinkContent.deeplinktype = "homePage"
+      handleHomePageDeeplinkContent()
     else if m.deepLinkContent.deeplinktype = "tvPage"
       handleTVPageDeeplinkContent()
     else if m.deepLinkContent.deeplinktype = "series"
@@ -512,6 +516,25 @@ Function handleTournamentPageDeeplinkContent()
     showTournamentScreen(m.constants)
     focusSideNavOption(m.constants.ui.sideNavIds.home)
   end if
+  resetDeeplinkValues()
+
+End Function
+
+
+Function handleHomePageDeeplinkContent()
+  tubilog("DeeplinkHelpers.handleHomePageDeeplinkContent")
+  if m.enteredFromDeepLink = true
+    sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.home, m.Tracking, m.trackingLoggingTask, m.constants)
+  end if
+
+  if (isParentalControlsAdultLevel() <> true AND isParentalControlsTeensLevel() <> true)  OR m.uiMode = m.constants.ui.modes.kidsAgeGate
+    setUiMode(m.constants.ui.modes.kids)
+  else
+    setUiMode(m.constants.ui.modes.standard)
+  end if
+
+  showDefaultHomeScreen()
+  focusSideNavOption(m.constants.ui.sideNavIds.home)
   resetDeeplinkValues()
 
 End Function
