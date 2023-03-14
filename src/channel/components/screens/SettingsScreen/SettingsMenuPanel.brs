@@ -4,24 +4,22 @@ Function init()
   m.SettingsMenuGroup = m.top.findNode("SettingsMenuGroup")
   m.top.list = m.SettingsMenu
 
-  m.SettingsMenu.focusBitmapUri = "pkg:/images/menu-focus-fhd.9.png"
-  m.SettingsMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-fhd.9.png"
-  if m.constants.deviceInfo.scaledUi = true
-    m.SettingsMenu.focusBitmapUri = "pkg:/images/menu-focus-hd.9.png"
-    m.SettingsMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-hd.9.png"
-  end if
+  m.SettingsMenu.focusBitmapUri = "pkg:/images/menu-focus-{size}.9.png"
+
+  m.SettingsMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-{size}.9.png"
+
   m.SignInOutButtonContent = m.top.findNode("SignInOutButton")
   m.top.observeField("focusedChild", "onComponentFocus")
 
   m.top.observeFieldScoped("signInInfo", "onSignInInfoChange")
   m.top.observeFieldScoped("uiMode", "onUiModeChange")
-  
+
   setSettingsMenuStringsAndIcons()
-  
+
   if UCase(m.constants.deviceInfo.countryCode) <> "US"
     removeYourPrivacyChoicesButton()
   end if
-  
+
   resetSettingsMenuVerticalPosition()
 
   if m.global <> invalid
@@ -37,7 +35,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.SettingsMenu.focusBitmapBlendColor = theme.focusedColor
   end if

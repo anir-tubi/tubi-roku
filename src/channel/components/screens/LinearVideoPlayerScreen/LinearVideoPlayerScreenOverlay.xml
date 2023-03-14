@@ -162,8 +162,8 @@
             rowItemSpacing="[[18,0]]"
             fadeFocusFeedbackWhenAutoScrolling="true"
             drawFocusFeedbackOnTop="true"
-            focusBitmapUri="pkg://images/menu-focus-fhd.9.png"
-            focusFootprintBitmapUri="pkg://images/menu-focus-fhd.9.png"
+            focusBitmapUri="pkg://images/menu-focus-{size}.9.png"
+            focusFootprintBitmapUri="pkg://images/menu-focus-{size}.9.png"
             itemComponentName="LinearTVCaptioningMenuItem"
             rowFocusAnimationStyle="floatingFocus"/>
           <RowList

@@ -5,15 +5,11 @@ Function init()
   m.infoPaneBg = m.top.findNode("infoPaneBg")
   m.constants = getConstantsFromGlobal()
   m.infoPaneText = m.top.findNode("infoPaneText")
-  
+
   m.top.enableRenderTracking = true
   m.top.observeFieldScoped("show", "onShow")
   m.top.opacity = 0
-  if m.constants.deviceInfo.scaledUi = true
-    m.infoPaneBg.uri = "pkg:/images/tab_short_component_alt_hd.9.png"
-  else
-    m.infoPaneBg.uri = "pkg:/images/tab_short_component_alt_fhd.9.png"
-  end if
+  m.infoPaneBg.uri = "pkg:/images/tab_short_component_alt_{size}.9.png"
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -27,7 +23,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.infoPaneBg.blendColor = theme.inverseBackgroundColor
     m.infoPaneText.color = theme.inverseSecondaryTextColor

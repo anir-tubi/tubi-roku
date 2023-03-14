@@ -39,13 +39,8 @@ Function init()
   end if
   
   focusBox = m.top.findNode("FocusBox")
-  if m.global.constants.deviceInfo.scaledUi = true then
-    focusBox.uri = "pkg:/images/selector-hd.9.png"
-    m.GridSeries.focusBitmapUri = "pkg:/images/selector-hd.9.png"
+  if m.constants.deviceInfo.scaledUi = true then
     focusBoxMargin = 4
-    if m.UpNextGradient <> invalid
-      m.UpNextGradient.uri = "pkg:/images/up-next-gradient-hd.9.png"
-    end if
   else
     focusBoxMargin = 6
   end if

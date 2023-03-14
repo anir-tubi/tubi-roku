@@ -30,11 +30,6 @@ Function init()
 
   m.metadataTranslate = TubiMetadataTranslate(m.constants)
 
-  if m.constants.deviceInfo.scaledUi = true then
-    m.RowList.focusBitmapUri = "pkg:/images/selector-hd.9.png"
-  else
-    m.RowList.focusBitmapUri = "pkg:/images/selector-fhd.9.png"
-  end if
   m.RowList.drawFocusFeedbackOnTop = true
   
   ' suppress debounce if we have just gained focus
@@ -407,7 +402,7 @@ End Function
 
 
 Function onCategoryResponseInBatch(msg) As Void
-  tubiLog("CategoryGridList.categoryResponseInBatch") 
+  tubiLog("CategoryGridList.categoryResponseInBatch")
 
   response = msg.getData()
   shouldInformHomeScreen = false

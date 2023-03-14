@@ -30,7 +30,7 @@
       loadSync="true"
       width="1920"
       height="1080"
-      uri="pkg:/images/splash-fhd.jpg"/>
+      uri="pkg:/images/splash-{size}.jpg"/>
 
     <TrackingLoggingTask
       id="TrackingLoggingTask" />

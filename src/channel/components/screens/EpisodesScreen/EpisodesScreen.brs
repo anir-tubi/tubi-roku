@@ -17,10 +17,6 @@ Function init()
   m.Menu.observeField("rowScrollFocused", "onMenuScrollFocused")
   m.defaultHeroUri = "pkg:/images/art-blur-background.webp"
 
-  if m.constants.deviceInfo.scaledUi = true then
-    m.RowList.focusBitmapUri = "pkg:/images/selector-hd.9.png"
-  end if
-
   theme = getThemeFromGlobal()
   if theme <> invalid
     m.RowList.focusBitmapBlendColor = theme.focusedColor

@@ -34,7 +34,7 @@
     <Poster
       id="buttonBG"
       height="80"
-      uri="pkg:/images/menu-focus-fhd.9.png"
+      uri="pkg:/images/menu-focus-{size}.9.png"
       translation="[0,0]"/>
     <Label
       id="label"

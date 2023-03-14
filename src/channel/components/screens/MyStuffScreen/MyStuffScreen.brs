@@ -41,19 +41,14 @@ Function init()
   'Content area
   m.RowList = m.top.findNode("RowList")
   m.GuestMenu = m.top.findNode("GuestMenu")
-  m.GuestMenu.focusBitmapUri = "pkg:/images/menu-focus-fhd.9.png"
-  m.RowList.focusBitmapUri = "pkg:/images/selector-fhd.9.png"
-  m.GuestMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-fhd.9.png"
-  if m.constants.deviceInfo.scaledUi = true
-    m.GuestMenu.focusBitmapUri = "pkg:/images/menu-focus-hd.9.png"
-    m.GuestMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-hd.9.png"
-    m.RowList.focusBitmapUri = "pkg:/images/selector-hd.9.png"
-  end if
+  m.GuestMenu.focusBitmapUri = "pkg:/images/menu-focus-{size}.9.png"
+  m.RowList.focusBitmapUri = "pkg:/images/selector-{size}.9.png"
+  m.GuestMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-{size}.9.png"
 
   defaultGuestMenuWidth = m.GuestMenu.itemSize[0]
   signInOutButton = m.top.findNode("SignInOutButton")
   signInOutButton.title = getTranslation("menu_signIn")
-  
+
   ' Adjust the width of the guest menu if text of the button is too long for the default width. Mostly spanish text are generally longer in length.
   tempChannelMenuItem = CreateObject("roSGNode", "DetailMenuItem")
   tempChannelMenuItem.itemContent = signInOutButton
@@ -74,7 +69,7 @@ Function init()
   m.top.observeFieldScoped("signedIn", "onSignedInChange")
   m.top.observeFieldScoped("jumpToRowItemByIdAndIndex", "onJumpToRowItemChange")
   m.top.observeFieldScoped("reset", "onResetChange")
-  
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -88,7 +83,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.SignedOutUITitle.color = theme.primaryTextColor
     m.ScreenTitle.color = theme.primaryTextColor
@@ -119,7 +114,7 @@ Function onScreenFocusChange()
       end if
     end if
 
-    m.top.backgroundUriList = [m.defaultBackgroundUri]  
+    m.top.backgroundUriList = [m.defaultBackgroundUri]
   end if
 End Function
 
@@ -135,14 +130,14 @@ End Function
 
 
 Function onContentUpdateChange(msg) As Void
-  tubiLog("MyStuffScreen.onContentUpdateChange") 
+  tubiLog("MyStuffScreen.onContentUpdateChange")
   content = m.top.content
   if content <> invalid
     ' Delayed setting of Rowlist content until first batch arrives
     setRowHeights()
 
     if content.getChildCount() > 0 AND m.top.hasFocus() = true
-      m.RowList.setFocus(true) 
+      m.RowList.setFocus(true)
     end if
   else
     m.RowList.content = invalid
@@ -261,7 +256,7 @@ Function onRowItemSelected(msg)
   selectedPosition = msg.getData()
   handleItemSelected(selectedPosition)
 End Function
-  
+
 
 Function onMenuItemSelected(msg)
   tubiLog("MyStuffScreen.onMenuItemSelected")
@@ -274,7 +269,7 @@ Function handleItemSelected(selectedPosition)
   tubiLog("MyStuffScreen.handleItemSelected")
   if m.top.content <> invalid
     itemSelected = resolveAbbreviatedContent(selectedPosition)
-    
+
     m.top.trackingComponentInfo = getTrackingComponentInfoOfRowList(itemSelected, selectedPosition)
 
     if itemSelected <> invalid
@@ -410,7 +405,7 @@ End Function
 
 '''''''''''''''''''''''''''
 ' onJumpToRowItemChange
-' 
+'
 ' Jump to the desired row item. The data object within the event object should be an associative array. It should have 2 params: id AND index;
 ' where ID is the ID string of the item that should be jumped to, and index is the 2-element array containing the desired row and column to jump to.
 ' The function will attempt to jump to the element with the desired ID, in the desired row. This may be the desired index, but since the content may have changed,
@@ -427,7 +422,7 @@ Function onJumpToRowItemChange(msg)
     row = itemIndex[0]
     column = itemIndex[1]
 
-    if isNonEmptyString(sItemID) = true 
+    if isNonEmptyString(sItemID) = true
       focusRow = m.RowList.content.getChild(row)
       nColumnCount = focusRow.getChildCount() - 1
 

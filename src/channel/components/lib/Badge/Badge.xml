@@ -17,7 +17,7 @@
       id="BadgeBackground"
       height="36"
       width="0"
-      uri="pkg:/images/menu-focus-fhd.9.png"/>
+      uri="pkg:/images/menu-focus-{size}.9.png"/>
     <LayoutGroup
       id="BadgeInfoLayout"
       layoutDirection="horiz"

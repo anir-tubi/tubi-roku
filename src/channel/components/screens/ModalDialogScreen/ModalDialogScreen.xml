@@ -9,7 +9,7 @@
 
   <script type="text/brightscript" uri="ModalDialogScreen.brs" />
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
-  
+
   <interface>
     <!-- INPUT -->
       <!-- The text of buttons.  The button list will grow to the size of this array -->
@@ -56,7 +56,7 @@
     <!--::TODO::colors - 0x2C2C2CFF should be associated with a possible different standards UIO color -->
     <Rectangle
       id="DialogBox"
-      color="0x2C2C2CFF" 
+      color="0x2C2C2CFF"
       width="960"
       height="540"
       translation="[480,270]">
@@ -75,7 +75,7 @@
             uri="pkg:/fonts/Vaud-SemiBold.ttf"
             size="43" />
         </Label>
-        
+
         <Group
           id="MessageGroup"
           translation="[44,0]">
@@ -99,7 +99,7 @@
               width="802"
               height="300"
               visible="false"
-              scrollbarThumbBitmapUri="pkg:/images/menu-disabled-focus-fhd.9.png"
+              scrollbarThumbBitmapUri="pkg:/images/menu-disabled-focus-{size}.9.png"
               translation="[10,10]">
               <Font
                 role="font"
@@ -108,7 +108,7 @@
             </ScrollableText>
           </Rectangle>
         </Group>
-        
+
         <FilledButtonMarkupGrid
           id="ButtonList"
           translation="[0,0]"

@@ -64,10 +64,6 @@ Function init()
 
   m.defaultHeroUri = "pkg:/images/art-blur-background.webp"
 
-  if m.constants.deviceInfo.scaledUi = true then
-    m.ResultGrid.focusBitmapUri = "pkg:/images/selector-hd.9.png"
-  end if
-
   m.top.backgroundUriList = [m.defaultHeroUri]
 
   'set initial tracking values

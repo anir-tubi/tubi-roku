@@ -2,9 +2,7 @@ Function init()
   m.constants = getConstantsFromGlobal()
   m.buttonBG = m.top.findNode("buttonBG")
   m.label = m.top.findNode("label")
-  if m.constants.deviceInfo.scaledUi = true
-    m.buttonBG.uri = "pkg:/images/menu-focus-hd.9.png"
-  end if
+
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("itemHasFocus", "onItemHasFocus")
 

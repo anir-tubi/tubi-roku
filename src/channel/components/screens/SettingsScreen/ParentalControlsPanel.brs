@@ -1,5 +1,4 @@
 Function init()
-  m.constants = m.global.constants
   m.top.width = 1034
   m.top.focusable = true
   m.top.hasNextPanel = false
@@ -10,17 +9,12 @@ Function init()
   m.top.observeField("isLoading", "onIsLoading")
   m.ContentGroup = m.top.findNode("ContentGroup")
   m.Menu = m.top.findNode("ParentalControlsMenu")
-  m.Menu.focusBitmapUri = "pkg:/images/menu-focus-fhd.9.png"
+  m.Menu.focusBitmapUri = "pkg:/images/menu-focus-{size}.9.png"
   theme = getThemeFromGlobal()
   if theme <> invalid
     m.Menu.focusBitmapBlendColor = theme.focusedColor
   end if
-  m.Menu.focusFootprintBitmapUri = "pkg:/images/menu-footprint-fhd.9.png"
-  if m.constants.deviceInfo.scaledUi = true
-    m.Menu.focusBitmapUri = "pkg:/images/menu-focus-hd.9.png"
-    m.Menu.focusFootprintBitmapUri = "pkg:/images/menu-footprint-hd.9.png"
-  end if
-
+  m.Menu.focusFootprintBitmapUri = "pkg:/images/menu-footprint-{size}.9.png"
   setParentalControlStrings()
   m.Spinner = m.top.findNode("Spinner")
   checkItemHelper(m.top.selectItem)

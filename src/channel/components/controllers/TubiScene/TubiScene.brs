@@ -7,11 +7,6 @@ Function init()
   m.spinner = m.top.findNode("TubiSceneSpinner")
 
   m.customSplashPoster = m.top.findNode("customSplashPoster")
-  if m.constants.deviceInfo.scaledUi = true then
-    m.customSplashPoster.uri = "pkg:/images/splash-hd.jpg"
-  else
-    m.customSplashPoster.uri = "pkg:/images/splash-fhd.jpg"
-  end if
 
   m.top.observeField("fadeOutCustomSplash", "onFadeOutCustomSplash")
   m.top.observeField("fadeOutSpinner", "onFadeOutSpinner")

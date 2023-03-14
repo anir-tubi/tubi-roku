@@ -104,11 +104,7 @@ Function init()
   ' skip button for each cuepoint should only be shown once per video
   m.cuePointsHistory = {}
 
-  if m.constants.deviceInfo.scaledUi = true
-    m.skipCuepointsButton.uri = "pkg:/images/selector-hd.9.png"
-  else
-    m.skipCuepointsButton.uri = "pkg:/images/selector-fhd.9.png"
-  end if
+  m.skipCuepointsButton.uri = "pkg:/images/selector-{size}.9.png"
 
   BackLabel = m.top.findNode("BackLabel")
   BackLabel.text = getTranslation("goBack_videoPlayer_controls")
@@ -234,10 +230,10 @@ Function init()
   m.thumbnailMaxXOffset = 1920 - 238 - m.Thumbnail.width
   m.thumbnailMaxYOffset = 889
 
-  if m.constants.deviceInfo.scaledUi = true then
-    m.ProgressBar.scaledUI = m.constants.deviceInfo.scaledUi
-    m.LoadingProgressBar.scaledUI = m.constants.deviceInfo.scaledUi
-    m.TransportGradient.uri = "pkg:/images/playback-gradient-hd.9.png"
+  isScaledUI = m.constants.deviceInfo.scaledUi
+  if isScaledUI = true then
+    m.ProgressBar.scaledUI = isScaledUI
+    m.LoadingProgressBar.scaledUI = isScaledUI
   end if
 
   ' m.didAdvanceDrm holds current state regarding if playback failed, and the player is going to try the

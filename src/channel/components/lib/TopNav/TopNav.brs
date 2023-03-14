@@ -35,12 +35,6 @@ Function init()
     m.Menu.focusFootprintBlendColor = m.colors.white
   end if
 
-  if m.constants <> invalid AND m.constants.deviceInfo.scaledUi = true
-    m.Menu.focusBitmapUri = "pkg:/images/pill_top_nav_hd.9.png"
-    m.Menu.focusFootprintBitmapUri="pkg:/images/pill_top_nav_hd.9.png"
-    m.MenuBground.uri = "pkg:/images/tab_component_alt_hd.9.png"
-  end if
-
   m.Menu.observeFieldScoped("itemSelected", "onItemSelected")
   m.Menu.observeFieldScoped("itemFocused", "onItemFocused")
 

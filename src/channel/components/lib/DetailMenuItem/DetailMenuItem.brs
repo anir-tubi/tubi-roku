@@ -17,11 +17,8 @@ Function init()
   m.constants = getConstantsFromGlobal()
   if m.constants <> invalid
     m.top.color = m.constants.ui.colors.transparent
-    if m.constants.deviceInfo.scaledUi = true
-      m.buttonBG.uri = "pkg:/images/menu-focus-hd.9.png"
-    end if
   end if
-  
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -35,7 +32,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.Progress.color = theme.focusedTextColor
     m.buttonBG.blendColor = theme.neutralColor2

@@ -10,16 +10,12 @@ Function init()
   m.top.observeField("isLoading", "onIsLoading")
   m.ContentGroup = m.top.findNode("ContentGroup")
   m.Menu = m.top.findNode("AutoplayPreviewMenu")
-  m.Menu.focusBitmapUri = "pkg:/images/menu-focus-fhd.9.png"
+  m.Menu.focusBitmapUri = "pkg:/images/menu-focus-{size}.9.png"
   theme = getThemeFromGlobal()
   if theme <> invalid
     m.Menu.focusBitmapBlendColor = theme.focusedColor
   end if
-  m.Menu.focusFootprintBitmapUri = "pkg:/images/menu-footprint-fhd.9.png"
-  if m.constants.deviceInfo.scaledUi = true
-    m.Menu.focusBitmapUri = "pkg:/images/menu-focus-hd.9.png"
-    m.Menu.focusFootprintBitmapUri = "pkg:/images/menu-footprint-hd.9.png"
-  end if
+  m.Menu.focusFootprintBitmapUri = "pkg:/images/menu-footprint-{size}.9.png"
 
   setAutoplayPreviewChoices()
   m.Spinner = m.top.findNode("Spinner")
