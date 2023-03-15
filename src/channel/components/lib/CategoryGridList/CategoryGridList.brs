@@ -94,11 +94,12 @@ Function onComponentFocusChange()
 
     rowItemFocused = m.RowList.rowItemFocused
     if rowItemFocused.count() <> 2
-      '//The rowList has not gained focus yet so either use the default upperleft item or the
+      '//The rowList has not gained focus yet so either use the default upperleft item
       rowItemFocused = [0,0]
     end if
 
-    if resolveAbbreviatedContent(rowItemFocused) <> invalid or (m.itemToJumpTo <> invalid AND resolveAbbreviatedContent(m.itemToJumpTo) <> invalid)
+    fullFocusedContent = resolveAbbreviatedContent(rowItemFocused)
+    if fullFocusedContent <> invalid OR (m.itemToJumpTo <> invalid AND resolveAbbreviatedContent(m.itemToJumpTo) <> invalid)
       if m.itemToJumpTo <> invalid
         m.RowList.jumpToRowItem = m.itemToJumpTo
         m.itemToJumpTo = invalid
@@ -110,7 +111,8 @@ Function onComponentFocusChange()
       '   This is especially true when the Rowlist does not have initial focus when the content has loaded.
       m.RowList.setFocus(false)
       m.RowList.setFocus(true)
-
+    else if fullFocusedContent = invalid
+      m.RowList.jumpToRowItem = [0, 0]
     end if
   end if
 End Function
