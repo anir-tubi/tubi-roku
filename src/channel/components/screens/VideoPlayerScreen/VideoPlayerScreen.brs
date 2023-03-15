@@ -455,7 +455,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.focusedColor = theme.focusedColor
     m.ProgressBar.focusColor = m.focusedColor
@@ -613,6 +613,7 @@ Function onVideoStateChange(msg)
     ' player has stopped (not due to an ad break)
     if m.top.adState = "noAds" or m.top.adState = "init"
       if m.Video.content <> invalid
+
         ' the video has been stopped, send a final playProgressEvent
         playProgressEvent = getPlayProgressEvent("onVideoStateChange:stopped")
         if playProgressEvent <> invalid
@@ -628,6 +629,7 @@ Function onVideoStateChange(msg)
             }
           })
         end if
+
       end if
     end if
   end if
@@ -1286,6 +1288,14 @@ Function stopVideo()
   tubilog("VideoPlayer.stopVideo")
   m.Video.unobserveFieldScoped("globalCaptionMode")
   videoState = m.videoState
+
+  ' updating last ping time with current player position if the video is not playing OR not paused.
+  ' this happens when user presses home button during seek
+  ' this prevents firing play progress event with larger view-time in stopped video state observer.
+  if videoState <> "play" AND videoState <> "pause"
+    updateLastPingTime(m.playerPosition)
+  end if
+
   updateVideoState("stop")
 
   ' add check so that onVideoStateChange doesn't get called
