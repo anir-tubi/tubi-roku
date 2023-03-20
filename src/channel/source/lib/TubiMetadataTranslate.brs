@@ -278,10 +278,12 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.description = contentFromServer.description
     translatedContent.longDescription = contentFromServer.description
 
-    ' QA - display content ids UI tests
-    if m.constants.settings.mode = "qa" AND m.constants.settings.suitestjs = true
-      translatedContent.description = translatedContent.id + " " + contentFromServer.description
-    end if
+    #if suitestjs
+      ' QA - display content ids UI tests
+      if m.constants.settings.mode = "qa"
+        translatedContent.description = translatedContent.id + " " + contentFromServer.description
+      end if
+    #end if
   end if
 
   if contentFromServer.directors <> invalid AND contentFromServer.directors.count() > 0
@@ -613,10 +615,11 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId, i
       end if
 
       ' QA - inject the category slug into the content description for automated UI testing
-      if m.constants.settings.mode = "qa" AND m.constants.settings.suitestjs = true
-        translated.description = category.id + " " + translated.description
-      end if
-
+      #if suitestjs
+        if m.constants.settings.mode = "qa"
+          translated.description = category.id + " " + translated.description
+        end if
+      #end if
       return translated
     end if
   end if
@@ -1172,10 +1175,12 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, contentMode = 
     updateMetadata.logoUri = container.logo
 
     ' QA - display category slug on channel/categories list pages for automated UI tests
-    if m.constants.settings.mode = "qa" AND m.constants.settings.suitestjs = true
-      updateMetadata.title = container.slug
-      updateMetadata.logoUri = ""
-    end if
+    #if suitestjs
+      if m.constants.settings.mode = "qa"
+        updateMetadata.title = container.slug
+        updateMetadata.logoUri = ""
+      end if
+    #end if
 
     if container.valid_duration <> invalid
       updateMetadata.validUntil = Uptime(0) + container.valid_duration
@@ -1684,7 +1689,27 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
 
       resource = {}
       if video.manifest <> invalid
-        if video.manifest.url <> invalid then resource.url = video.manifest.url
+        if video.manifest.url <> invalid then
+          resource.url = video.manifest.url
+
+          ' Below lines of code helps QA with automation by passing the linear manifest url through qa proxy server.
+          #if suitestjs
+            settings = m.constants.settings
+            if settings.mode = "qa" AND contentNode.type = m.contentTypes.linear
+              requestModule = Request(settings)
+              ' Removing charles proxy if included.
+              resourceUrl = requestModule.removeCharlesProxy(resource.url)              
+              ' Removing the protocol using split so that both https and http is removed.
+              regex = CreateObject("roRegex", "^(http|https)://", "")
+              urlSplitArray = regex.split(resourceUrl)
+              ' Picking the second part since first part will be protocol
+              resourceUrl = m.constants.urls.qaProxy.linearManifest + urlSplitArray[1]
+
+              resource.url = resourceUrl
+            end if
+          #end if
+        end if
+
         if video.manifest.duration <> invalid then resource.length = video.manifest.duration
       end if
 
@@ -1851,6 +1876,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
           end if
 
           channelContentNode.title = channelFromServer.title
+          channelContentNode.type = m.contentTypes.linear
           channelContentNode.channelName = channelFromServer.title
 
           channelContentNode.videoResources = m.composeVideoResources(channelContentNode, channelFromServer)
@@ -1860,7 +1886,6 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
           end if
 
           channelContentNode.description = channelFromServer.description
-          channelContentNode.type = "linear"
 
           if contentToTranslate.valid_duration <> invalid
             channelContentNode.validUntil = Uptime(0) + contentToTranslate.valid_duration
@@ -1975,11 +2000,11 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
         channelNode.HDSMALLICONURL = channelFromServer.images.thumbnail[0]
       end if
 
+      channelNode.type = m.contentTypes.linear
       'This is part of program metadata. We need videoresources when we fetch single channel to play for deeplink
       channelNode.videoResources = m.composeVideoResources(channelNode, channelFromServer)
 
       channelNode.description = channelFromServer.description
-      channelNode.type = "linear"
       if contentToTranslate.valid_duration <> invalid
         channelNode.validUntil = Uptime(0) + contentToTranslate.valid_duration
       else

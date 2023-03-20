@@ -52,12 +52,11 @@ settings:
     #By default nothing will be printed to debug console.(port : 8085 )
     #To enable console debuglogs, set consoleLoggingEnabled to true
     consoleLoggingEnabled: true
+    #setting to true will use analytics proxy server and display category slugs and content id in UI
+    suitestjs: false
 
   #setting to true will result in suitest being loaded
   suitest: false
-
-  #setting to true will use analytics proxy server and display category slugs and content id in UI
-  suitestjs: false
 
 manifest:
   # Set to 0 to prevent instant resume functionality.

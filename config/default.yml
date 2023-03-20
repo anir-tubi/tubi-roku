@@ -27,6 +27,7 @@ settings:
   bs_const:
     consoleLoggingEnabled: false
     consoleLoggingIncludeTimestamp: false # whether to include timestamp in log outputs
+    suitestjs: false
 
 manifest:
   title: "Tubi"

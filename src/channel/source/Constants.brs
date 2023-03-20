@@ -516,14 +516,23 @@ Function getConstants()
       end if
       constants.urls.experiments.evaluate = constants.urls.experiments.baseUrl + "evaluate-namespaces"
 
+    ' Configuring the live news manifest proxy url. 
+    constants.urls.qaProxy = {}
+      constants.urls.qaProxy.urlBase = "https://qa-proxy.staging-public.tubi.io"
+      constants.urls.qaProxy.linearManifest = constants.urls.qaProxy.urlBase + "/live-news-manifest/"
+      constants.urls.qaProxy.analytics = constants.urls.qaProxy.urlBase + "/analytics-ingestion"
+
     constants.urls.analytics = {}
       constants.urls.analytics.urlBase = "https://analytics-ingestion.staging-public.tubi.io/analytics-ingestion"
       ' QA analytics proxy server
       if mode = "production"
         constants.urls.analytics.urlBase = "https://analytics-ingestion.production-public.tubi.io/analytics-ingestion"
-      else if mode = "qa" AND constants.settings.suitestjs = true
-        constants.urls.analytics.urlBase = "https://qa-proxy.staging-public.tubi.io/analytics-ingestion"
+      else if mode = "qa"
+        #if suitestjs
+          constants.urls.analytics.urlBase = constants.urls.qaProxy.analytics
+        #end if
       end if
+
       constants.urls.analytics.event = constants.urls.analytics.urlBase + "/v2/event"
       constants.urls.analytics.singleEvent = constants.urls.analytics.urlBase + "/v2/single-event" 'preferred by back end team
 
