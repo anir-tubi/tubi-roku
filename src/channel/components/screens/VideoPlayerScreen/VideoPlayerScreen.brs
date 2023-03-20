@@ -441,6 +441,12 @@ Function playContent()
         ' fire exposure event for video playback if manifest had HEVC/4k content for treatment & control
         getExperimentResource("roku_hevc_drm_4k", "roku_hevc_drm_4k_v1", true)
       end if
+
+      if m.Video.content.isNonDrmContent = true
+        ' fire exposure event for video playback if manifest had only hlsv6 or hlsv3 content for treatment & control
+        getExperimentResource("roku_hlsv6", "roku_hlsv6_v1", true)
+      end if
+
       m.Video.control = "play"
     end if
 
@@ -923,6 +929,10 @@ Function onAdStateChange(msg)
       if m.Video.content.has4kHevcStream = true
         ' fire exposure event for video playback if manifest had HEVC/4k content for treatment & control
         getExperimentResource("roku_hevc_drm_4k", "roku_hevc_drm_4k_v1", true)
+      end if
+      if m.Video.content.isNonDrmContent = true
+        ' fire exposure event for video playback if manifest had only hlsv6 or hlsv3 content for treatment & control
+        getExperimentResource("roku_hlsv6", "roku_hlsv6_v1", true)
       end if
       m.Video.control = "play"
       m.mostRecentCompletedCuepoint = m.playerPosition
@@ -1528,7 +1538,7 @@ Function setDrmOnContent(contentNode, resource, videoResourceIndex)
     ' set general fields related to DRM
     contentNode.httpHeaders = resource.drmHeaders
     contentNode.url = resource.url
-    contentNode.titanVersion = resource.titanVersion
+    contentNode.titanVersionOrExperimentVersion = resource.titanVersionOrExperimentVersion
     contentNode.length = resource.length
     contentNode.streamFormat = resource.streamFormat
     contentNode.drmType = resource.type

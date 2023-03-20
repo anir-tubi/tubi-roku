@@ -813,8 +813,8 @@ Function onVideoTrackingStart(msg)
     else
       youboraConfig["content.isLive"] = false
     end if
-    if isNonEmptyString(videoPlayer.content.titanVersion) = true
-      youboraConfig["content.customDimension.2"] = videoPlayer.content.titanVersion
+    if isNonEmptyString(videoPlayer.content.titanVersionOrExperimentVersion) = true
+      youboraConfig["content.customDimension.2"] = videoPlayer.content.titanVersionOrExperimentVersion
     end if
     youboraConfig["content.resource"] = videoPlayer.content.URL
     youboraConfig["device.model"] = m.constants.deviceInfo.model

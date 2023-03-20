@@ -56,6 +56,11 @@ Function TubiExperiments(constants) as Object
         roku_linear_epg_position_v1 : {"enabled": true}
       }
 
+
+      roku_hlsv6: {
+        roku_hlsv6_v1 : {"enabled": false}
+      }
+      
       roku_epg_channel_poster_bigger_size: {
         roku_epg_channel_poster_bigger_size_v1: {"enabled": false}
       }
@@ -68,6 +73,7 @@ Function TubiExperiments(constants) as Object
     getNamespaceRequest: tubiExperiments_getNamespaceRequest
     handleAsyncNamespaceResponse: tubiExperiments_handleAsyncNamespaceResponse
     getNamespaceRequestInfo: tubiExperiments_getNamespaceRequestInfo
+    getExperimentResult: tubiExperiments_getExperimentResult
 
     'private methods
     getNamespaces: tubiExperiments_getNamespaces
@@ -266,6 +272,24 @@ Function tubiExperiments_getExperimentTracking(namespaceName as string, experime
   end if
 
   return trackInfo
+End Function
+
+
+' tubiExperiments_getExperimentResult
+'
+' namespaceName: string, namespace of experiment
+' experimentName: string, name of experiment
+'
+' returns the experiment result in assocarray if experiment is running in popper, or else returns invalid
+Function tubiExperiments_getExperimentResult(namespaceName as string, experimentName as string) as Object
+  experimentResult = invalid
+  experiment = m.getExperiment(namespaceName, experimentName)
+
+  if experiment <> invalid
+    experimentResult = experiment.experiment_result
+  end if
+
+  return experimentResult
 End Function
 
 

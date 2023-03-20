@@ -270,7 +270,7 @@ Function getConstants()
     constants.reqNames.getScreenSaverHomeScreenContainerIds = "getScreenSaverHomeScreenContainerIds"
     constants.reqNames.getNamespaces = "getNamespaces"
     constants.reqNames.getExternalConfigs = "getExternalConfigs"
-    
+
     ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getQueue] = true
@@ -759,6 +759,7 @@ Function getConstants()
       constants.player.drmTypes = {}
       constants.player.drmTypes.dashWidevine = "dash_widevine_psshv0"
       constants.player.drmTypes.dashPlayready = "dash_playready_psshv0"
+      constants.player.drmTypes.hlsv6 = "hlsv6"
       constants.player.drmTypes.hlsv3 = "hlsv3"
 
       ' Supported schemes, in order of preference
@@ -768,13 +769,22 @@ Function getConstants()
         constants.player.drmTypes.hlsv3
       ]
 
+      ' Supported schemes, in order of preference
+      constants.player.drmOrderHlsv6 = [
+        constants.player.drmTypes.dashWidevine
+        constants.player.drmTypes.dashPlayready
+        constants.player.drmTypes.hlsv6
+      ]
+
       ' H265 is one of the video compression standards. This information is passed on api request in order to get the H265 transcoded manifests from backend.
       ' H265 codec is supported only on higher end modals.
       hevcCodec = "H265"
+      constants.hevcCodec = hevcCodec
 
       ' H264 is one of the video compression standards. This information is passed on api request in order to get the H264 transcoded manifests from backend.
       ' H264 codec is supported by all modals.
       avcCodec = "H264"
+      constants.avcCodec = avcCodec
 
       maxH265Resolution = videoResolution
       if videoResolution >= 2160
@@ -873,7 +883,7 @@ Function getConstants()
     constants.errors.message.invalidVideoUrl = "Invalid Video URL"
     constants.errors.message.badResponse = "Bad Response"
     constants.errors.message.noResponse = "No Response"
-  
+
   ' creating mapping to backend error codes.
   constants.errors.codes = {}
     constants.errors.codes.expiredToken = "EXPIRED_TOKEN"

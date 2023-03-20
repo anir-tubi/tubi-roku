@@ -32,6 +32,7 @@ Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
     setTupianVitgParam: cmsApi_setTupianVitgParam
     getWindowInfo: cmsApi_getWindowInfo
     getFullCategoryId: cmsApi_getFullCategoryId
+    getVideoResources: cmsApi_getVideoResources
   }
 
   cmsApi = {}
@@ -51,7 +52,7 @@ Function cmsApi_getRelatedContentRequestInfo(contentId, bKidsMode = false)
   url = m.constants.urls.cms.relatedContent + "/" + contentId + "/related"
   options = m.getCommonOptions()
   options.params["isKidsMode"] = bKidsMode
-  options.params["video_resources"] = m.constants.player.drmOrder
+  options.params["video_resources"] = m.getVideoResources()
   options.params = m.setTupianPosterParam(options.params)
 
   return {
@@ -69,8 +70,7 @@ Function cmsApi_getUpNextContentRequestInfo(contentId, passedOptions)
   headers = options.headers
   'adding accept-version=6.0.0 in header will include series recommendations at the end of a movie
   headers["accept-version"] = "6.0.0"
-
-  params["video_resources"] = m.constants.player.drmOrder
+  params["video_resources"] = m.getVideoResources()
   params["limit_resolutions"] = m.constants.player.limitResolutions
 
   if passedOptions <> invalid
@@ -102,7 +102,7 @@ Function cmsApi_getSingleContentRequestInfo(contentId, includeChannels=false, bK
   options.params["content_id"] = contentId
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = includeChannels
-  options.params["video_resources"] = m.constants.player.drmOrder
+  options.params["video_resources"] = m.getVideoResources()
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
   options.params = m.setTupianLandscapeParam(options.params)
   capability = formatJson({"content_types" :["se"]})
@@ -221,7 +221,7 @@ End Function
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
 '                 see request.brs for more info
-' @imageParamTypes: Array, What image types/sizes should be requested from the backend. If none are passed, then a default set of types will be used. 
+' @imageParamTypes: Array, What image types/sizes should be requested from the backend. If none are passed, then a default set of types will be used.
 Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOptions = {}, imageParamTypes = invalid)
   options = m.getCommonOptions()
   params = options.params
@@ -242,7 +242,7 @@ Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOpti
   if isString(utmCampaignConfig) = true then
     params["utm_campaign_config"] = utmCampaignConfig
   end if
-  
+
   if imageParamTypes = invalid
     imageParamTypes = [
       "poster"
@@ -448,12 +448,12 @@ End Function
 
 
 ' cmsApi_createMyStuffScreenBatchReqInfo
-' @sideEffect: In addition to creating the batch request, this function will also set the state of the categories within the passed content 
+' @sideEffect: In addition to creating the batch request, this function will also set the state of the categories within the passed content
 ' param to "loading"
 '
-' @content: roSGNode, A parent ContentNode containing a child node for each container to be fetched. 
-'   Each child node should be of a CategoryContentNode type, with the ID assigned to the desired constant that maps 
-'   to a container id on the backend: i.e. constants.ui.categoryIds.queue 
+' @content: roSGNode, A parent ContentNode containing a child node for each container to be fetched.
+'   Each child node should be of a CategoryContentNode type, with the ID assigned to the desired constant that maps
+'   to a container id on the backend: i.e. constants.ui.categoryIds.queue
 ' @bKidsMode : boolean
 ' @isSignedInUser: boolean, value based on user loggedIn or not
 '
@@ -480,7 +480,7 @@ Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSi
             "poster"
             "landscapeLarge"
           ]
-          categoryReqInfo = m.categoryReqInfo(categoryId, bKidsMode, options, imageParamTypes)  
+          categoryReqInfo = m.categoryReqInfo(categoryId, bKidsMode, options, imageParamTypes)
           categoryReqInfo.requestType = reqName
           categoryReqInfo.responseType = "node"
           categoryReqInfo.isSignedInUser = isSignedInUser
@@ -598,4 +598,17 @@ Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, cont
 
   return requests
 
+End Function
+
+
+' cmsApi_getVideoResources returns video resources order based on experiment response
+Function cmsApi_getVideoResources()
+
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_hlsv6", "roku_hlsv6_v1").enabled = true
+    videoResources = m.constants.player.drmOrderHlsv6
+  else
+    videoResources = m.constants.player.drmOrder
+  end if
+
+  return videoResources
 End Function

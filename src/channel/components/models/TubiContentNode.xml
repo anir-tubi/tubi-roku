@@ -38,8 +38,11 @@
     <field id="hasVideoResources" type="boolean" />
     <field id="isFIFAContent" type="boolean" value="false"/>
 
-    <!-- If the content is coming from a titan endpoint, then a titan version will be supplied. This will be used by Youbora -->
-    <field id="titanVersion" type="string" />
+    <!-- If the content is coming from a titan endpoint, then a titan_version will be set to this field.
+    Or if any experiment is running on client side related to video stream formats, then experiment and treatment names will be set to this field
+    (eg. exp=<experimentName>.<treatmentName>)
+    This will be used by Youbora -->
+    <field id="titanVersionOrExperimentVersion" type="string" />
 
     <!-- true if the content is child directed content (CDC) -->
     <field id="isCdc" type="boolean" />

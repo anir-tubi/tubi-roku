@@ -1670,10 +1670,13 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
   '     ...
   '   ]
   videoResources = []
+  titanVersionOrExperimentVersion = ""
+  hevc4kExpEnabled = false
+  hlsv6ExpEnabled = false
 
-  m.hevc4kExpEnabled = false
   if m.experiments <> invalid
-    m.hevc4kExpEnabled = m.experiments.getExperimentResource("roku_hevc_drm_4k", "roku_hevc_drm_4k_v1").enabled
+    hevc4kExpEnabled = m.experiments.getExperimentResource("roku_hevc_drm_4k", "roku_hevc_drm_4k_v1").enabled
+    hlsv6ExpEnabled = m.experiments.getExperimentResource("roku_hlsv6", "roku_hlsv6_v1").enabled
   end if
 
   ' has4kHevcStream helps to decide whether 4k/HEVC stream is available for the selected content.
@@ -1682,6 +1685,29 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
   codecToVideoResourcesIndexMap = {}
 
   if type(contentFromServer.video_resources) = "roArray" AND contentFromServer.video_resources.count() > 0
+
+    ' Adding isNonDrmContent, if the videoResources has only hlsv6 or hlsv3 stream formats
+    resources = contentFromServer.video_resources
+
+    if contentFromServer.type <> m.constants.ui.categoryTypes.linear AND resources.Count() = 1
+      resource = resources[0]
+
+      if resource.codec <> invalid AND resource.codec.replace("VIDEO_CODEC_","") = m.constants.avcCodec AND (resource.type = m.constants.player.drmTypes.hlsv6 OR resource.type = m.constants.player.drmTypes.hlsv3)
+        ' //REMOVE 'isNonDrmContent' field and its references once we graduate roku_hlsv6_v1 experiment.
+        ' isNonDrmContent interface is added to TubiContentNode in order to identify whether video resource has only hlsv6 or hlsv3 content
+        contentNode.addField("isNonDrmContent", "boolean", false)
+        contentNode.isNonDrmContent = true
+
+        experimentResult = m.experiments.getExperimentResult("roku_hlsv6", "roku_hlsv6_v1")
+
+        if hlsv6ExpEnabled = true AND experimentResult <> invalid AND experimentResult.experiment_name <> invalid AND experimentResult.treatment <> invalid
+          titanVersionOrExperimentVersion = "exp=" + experimentResult.experiment_name + "." + experimentResult.treatment
+        end if
+
+      end if
+
+    end if
+
     ' Create a "stub" ContentNode with just the DRM-oriented fields populated. This
     ' will make it easy to merge metadata plus drm info into one actionable
     ' contentnode for the video player
@@ -1725,7 +1751,7 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
         resource.resolution = resolution
       end if
 
-      if codec = "H265" and resolution = "2160P"
+      if codec = m.constants.hevcCodec AND resolution = "2160P"
         has4kHevcStream = true
         ' //REMOVE 'has4kHevcStream' field and its references once we graduate roku_hevc_drm_4k_v1 experiment.
         ' has4kHevcStream interface is added to TubiContentNode in order to identify whether video resource has hevc4k content
@@ -1734,7 +1760,7 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
       end if
 
       validResource = false
-      if (codec = "H265" and has4kHevcStream = true and m.hevc4kExpEnabled = true) OR codec = "H264" OR contentFromServer.type = "l"
+      if (codec = m.constants.hevcCodec AND has4kHevcStream = true AND hevc4kExpEnabled = true) OR codec = "H264" OR contentFromServer.type = "l"
         validResource = true
       end if
 
@@ -1770,6 +1796,9 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
               resource.hdcpVersion = video.license_server.hdcp_version
             end if
           end if
+        else if video.type = m.constants.player.drmTypes.hlsv6
+          resource.type = m.constants.player.drmTypes.hlsv6
+          resource.streamFormat = "hls"
         else if video.type = m.constants.player.drmTypes.hlsv3
           resource.type = m.constants.player.drmTypes.hlsv3
           resource.streamFormat = "hls"
@@ -1781,7 +1810,9 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
         if resource <> invalid
 
           if video.titan_version <> invalid AND video.titan_version <> ""
-            resource.titanVersion = video.titan_version
+            resource.titanVersionOrExperimentVersion = video.titan_version
+          else if titanVersionOrExperimentVersion <> ""
+            resource.titanVersionOrExperimentVersion = titanVersionOrExperimentVersion
           end if
 
           ' the following logic groups all the video resources by their codec into a 2 dimensional array of arrays.
@@ -1878,6 +1909,10 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
           channelContentNode.title = channelFromServer.title
           channelContentNode.type = m.contentTypes.linear
           channelContentNode.channelName = channelFromServer.title
+
+          ' Setting the channelFromServer type as linear, as the backend is not returning type.
+          ' //REMOVE this once the roku_hlsv6 experiment is graduated, because in future api may return type in response.
+          channelFromServer.type = m.constants.ui.categoryTypes.linear
 
           channelContentNode.videoResources = m.composeVideoResources(channelContentNode, channelFromServer)
 
@@ -2000,7 +2035,12 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
         channelNode.HDSMALLICONURL = channelFromServer.images.thumbnail[0]
       end if
 
+      ' Setting the channelFromServer type as linear, as the backend is not returning type.
+      ' //REMOVE this once the roku_hlsv6 experiment is graduated, because in future api may return type in response.
+      channelFromServer.type = m.constants.ui.categoryTypes.linear
+
       channelNode.type = m.contentTypes.linear
+
       'This is part of program metadata. We need videoresources when we fetch single channel to play for deeplink
       channelNode.videoResources = m.composeVideoResources(channelNode, channelFromServer)
 

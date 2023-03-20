@@ -1,4 +1,4 @@
-'@TestSuite [TubiExperiments] TubiExperiments.brs 
+'@TestSuite [TubiExperiments] TubiExperiments.brs
 
 '@Setup
 Function TubiExperimentsSetup()
@@ -16,7 +16,7 @@ End function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-' Mock experiment response from swagger: 
+' Mock experiment response from swagger:
 ' https://default_server/datascience/evaluate/namespaces?platform=roku&inputs=%7B%22deviceId%22%3A%22AABBCCDDEE%22%7D
 Function tubiExperiments_mockGetNamespaces_testHelper(request) As Object
   return ParseJson("[{""namespace"": ""UserNamespace"",""resource"": ""{\""testParam\"":false}"",""experiment_result"": {""experiment_name"": ""qa.preroll_at_90"",""treatment"": ""off""}}]")
@@ -56,6 +56,20 @@ Function tubiExperiments_getExperimentResourceInvalid_test()
 End Function
 
 
+'@Test getExperimentResult unit tests
+Function tubiExperiments_getExperimentResult_test()
+  experiments = m.experiments
+  experiments.init(m.request)
+  experimentResult = experiments.getExperimentResult("UserNamespace", "roku_missing_experiment")
+  m.assertInvalid(experimentResult)
+  experimentResult = experiments.getExperimentResult("UserNamespace", "preroll_at_90")
+  m.assertNotInvalid(experimentResult)
+  m.assertEqual(experimentResult.experiment_name, "qa.preroll_at_90")
+  m.assertEqual(experimentResult.treatment, "off")
+
+End Function
+
+
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '@It initFailed in TubiExperiments.brs
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -71,7 +85,7 @@ End Function
 '@BeforeEach
 Function tubiExperiments_updateNamespaces()
 
-  m.experiments.getNamespaces = tubiExperiments_mockGetInvalidNamespaces_testHelper  
+  m.experiments.getNamespaces = tubiExperiments_mockGetInvalidNamespaces_testHelper
 
 End Function
 
