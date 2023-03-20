@@ -1264,6 +1264,9 @@ Function resetVideoPlayerState(content = invalid)
   m.shouldShowUpNext = true
   m.UpNext.resetContent = true
 
+  m.RewindButton.uri = m.buttonUris.rewind
+  m.FastForwardButton.uri = m.buttonUris.fastforward
+
   clearSkipCuepointsButtonAndTimer()
   m.cuePointsHistory = {}
 End Function
