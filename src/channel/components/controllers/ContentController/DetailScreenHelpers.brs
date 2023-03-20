@@ -389,7 +389,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
 
     '//right now in kids mode, there are no channels showing up, so hardcode it so the channel's button doesn't show
     detailScreen.isChannelItem = (content.channelId <> invalid AND content.channelId <> "" AND isKidsUIOn() = false)
-    detailScreen.stringChannelButton = getTranslation("screenDetails_button_gotoChannel", {channel: content.title})
+    detailScreen.stringChannelButton = getTranslation("screenDetails_button_gotoChannel", {channel: content.channelName})
     detailScreen.length = stateSource.length 'needed to compute the resume bar on the resume button
 
     nResumePoint = 0

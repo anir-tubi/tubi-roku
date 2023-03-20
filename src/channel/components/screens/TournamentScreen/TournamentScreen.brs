@@ -368,7 +368,7 @@ Function onContentUpdated()
       timeGridContent = epgRow
       if timeGridContent <> invalid
         if timeGridContent.getChild(0) <> invalid
-          timeGridContent.getChild(0).parentTitle = timeGridContent.getChild(0).title
+          timeGridContent.getChild(0).parentTitle = timeGridContent.getChild(0).channelName
         end if
         m.epgTimeGrid.content = timeGridContent
         m.epgTimeGrid.contentUpdated = true
@@ -683,7 +683,7 @@ Function sendNavigateWithinPageEvent()
         oldAnalyticsCol = 1
         if m.epgTimeGrid.linearChannelToPlay <> invalid
           oldFocusedContent = m.epgTimeGrid.linearChannelToPlay
-          categorySlug = m.epgTimeGrid.linearChannelToPlay.title ' TODO ONCE We know what is epg slug going to be
+          categorySlug = m.epgTimeGrid.linearChannelToPlay.channelName ' TODO ONCE We know what is epg slug going to be
         end if
       end if
     end if

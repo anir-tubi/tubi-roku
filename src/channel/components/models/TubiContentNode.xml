@@ -79,6 +79,7 @@
     <!-- channels feature -->
     <field id="inlineLogoUri" type="string" />
     <field id="channelId" type="string" />
+    <field id="channelName" type="string" />
 
     <!-- individual stream resources -->
     <field id="videoResources" type="array"/>

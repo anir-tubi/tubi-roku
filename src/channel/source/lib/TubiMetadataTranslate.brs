@@ -490,7 +490,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   ' Channels
   if contentFromServer.channel_id <> invalid then translatedContent.channelId = contentFromServer.channel_id
   if contentFromServer.channel_logo <> invalid then translatedContent.inlineLogoUri = contentFromServer.channel_logo
-  if contentFromServer.channel_name <> invalid then translatedContent.title = contentFromServer.channel_name
+  if contentFromServer.channel_name <> invalid then translatedContent.channelName = contentFromServer.channel_name
 
   if contentFromServer.is_recurring <> invalid then translatedContent.isRecurring = contentFromServer.is_recurring
   if contentFromServer.availability_starts <> invalid then translatedContent.availabilityStarts = contentFromServer.availability_starts
@@ -1851,6 +1851,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
           end if
 
           channelContentNode.title = channelFromServer.title
+          channelContentNode.channelName = channelFromServer.title
 
           channelContentNode.videoResources = m.composeVideoResources(channelContentNode, channelFromServer)
 
@@ -1967,6 +1968,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
 
       if channelFromServer.title <> invalid
         channelNode.title = channelFromServer.title
+        channelNode.channelName = channelFromServer.title
       end if
 
       if channelFromServer.images <> invalid AND channelFromServer.images.thumbnail <> invalid
