@@ -51,6 +51,7 @@ Function TubiAds (constants, request, requestQueue, auth, tracking, adContentTyp
     isInteracting: false
     _: rodash()
     adContentType: adContentType  ' "hls" or "mp4"
+    breakPos: 0
 
     ' public
     reset: tubiAds_reset
@@ -145,6 +146,7 @@ Function tubiAds_reset()
   m.containerNode = invalid
   m.adPlaybackPos = 0
   m.isInteracting = false
+  m.breakPos = 0
 End Function
 
 
@@ -336,6 +338,9 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos, isSeekPastCuepoint = false
   nielsenProgramId = ""
 
   authInfo = m.auth.getAuthInfo()
+
+  ' Storing the breakPos in m scope so that we can use it override the render sequence sent to youbora plugin.
+  m.breakPos = breakPos
 
   ' don't pass content information for child directed content if the user is not logged in
   if episode.isCdc = false or (authInfo <> invalid AND authInfo.userId <> invalid)
@@ -647,9 +652,17 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       if ctx.duration <> invalid
         adTrackingObject.duration = ctx.duration
       end if
-      if ctx.rendersequence <> invalid
-        adTrackingObject.rendersequence = ctx.rendersequence
+
+      ' Overriding the ads context to reset the sequence since ROKU does not have a way to figure out render sequence properly for VAST ad format.
+      ' And it always falls back to preroll. We are basing the value based on the current position when the break occurred.
+      renderSequence = "preroll"
+      if m.breakPos > 0
+        renderSequence = "midroll"
       end if
+
+      ctx.renderSequence = renderSequence
+      adTrackingObject.renderSequence = renderSequence
+
       if ctx.type <> invalid
         adTrackingObject.type = ctx.type
       end if
