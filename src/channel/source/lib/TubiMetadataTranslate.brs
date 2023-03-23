@@ -1672,11 +1672,9 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
   videoResources = []
   titanVersionOrExperimentVersion = ""
   hevc4kExpEnabled = false
-  hlsv6ExpEnabled = false
 
   if m.experiments <> invalid
     hevc4kExpEnabled = m.experiments.getExperimentResource("roku_hevc_drm_4k", "roku_hevc_drm_4k_v1").enabled
-    hlsv6ExpEnabled = m.experiments.getExperimentResource("roku_hlsv6", "roku_hlsv6_v1").enabled
   end if
 
   ' has4kHevcStream helps to decide whether 4k/HEVC stream is available for the selected content.
@@ -1698,10 +1696,13 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
         contentNode.addField("isNonDrmContent", "boolean", false)
         contentNode.isNonDrmContent = true
 
-        experimentResult = m.experiments.getExperimentResult("roku_hlsv6", "roku_hlsv6_v1")
+        if m.experiments <> invalid
+          experimentResult = m.experiments.getExperimentResult("roku_hlsv6", "roku_hlsv6_v1")
 
-        if hlsv6ExpEnabled = true AND experimentResult <> invalid AND experimentResult.experiment_name <> invalid AND experimentResult.treatment <> invalid
-          titanVersionOrExperimentVersion = "exp=" + experimentResult.experiment_name + "." + experimentResult.treatment
+          if experimentResult <> invalid AND experimentResult.experiment_name <> invalid AND experimentResult.treatment <> invalid
+            titanVersionOrExperimentVersion = "exp=" + experimentResult.experiment_name + "." + experimentResult.treatment
+          end if
+
         end if
 
       end if
@@ -1724,7 +1725,7 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
             if settings.mode = "qa" AND contentNode.type = m.contentTypes.linear
               requestModule = Request(settings)
               ' Removing charles proxy if included.
-              resourceUrl = requestModule.removeCharlesProxy(resource.url)              
+              resourceUrl = requestModule.removeCharlesProxy(resource.url)
               ' Removing the protocol using split so that both https and http is removed.
               regex = CreateObject("roRegex", "^(http|https)://", "")
               urlSplitArray = regex.split(resourceUrl)
