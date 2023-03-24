@@ -31,7 +31,7 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
 
     youboraEnabled = m._.get(m.constants, "externalConfig.info.youbora_enabled")
     if youboraEnabled = true
-      m.constants.thirdParty.youbora.enabled = youboraEnabled
+      m.constants.settings.youboraEnabled = youboraEnabled
     end if
 
     m.top.newBuildConstants = m.constants

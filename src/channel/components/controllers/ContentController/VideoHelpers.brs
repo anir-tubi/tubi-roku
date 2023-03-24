@@ -755,7 +755,7 @@ End Function
 
 
 Function initVideoTracking(videoPlayer)
-  if m.constants.thirdParty.youbora.enabled = true
+  if m.constants.settings.youboraEnabled = true
     if videoPlayer <> invalid
       'If we are switching from VOD to LIVE or LIVE to VOD, latest videoPlayerScreen's
       'sendYouboraError should be observed.
@@ -765,7 +765,7 @@ Function initVideoTracking(videoPlayer)
         m.youboraTask = m.top.createChild("YBPluginRokuVideo")
         m.youboraTask.id = "Youbora"
         m.youboraTask.options = m.constants.thirdParty.youbora.config
-        m.global.addFields({ YouboraLogActive: m.constants.thirdParty.youbora.debug })
+        m.global.addFields({ YouboraLogActive: m.constants.settings.youboraDebugEnabled })
         m.youboraTask.control = "RUN"
       else
         'Setting m.youboraTask.taskState to "stop" triggers the youboraTask to
@@ -784,7 +784,7 @@ Function onVideoTrackingStart(msg)
   tubiLog("VideoHelpers.onVideoTrackingStart")
   videoPlayer = msg.getRoSGNode()
   ' Youbora events
-  if m.constants.thirdParty.youbora.enabled = true
+  if m.constants.settings.youboraEnabled = true
     youboraConfig = m.constants.thirdParty.youbora.config
 
     if videoPlayer <> invalid AND videoPlayer.content <> invalid
@@ -829,7 +829,7 @@ End Function
 
 
 Function videoTrackingStop()
-  if m.constants.thirdParty.youbora.enabled = true
+  if m.constants.settings.youboraEnabled = true
     m.youboraTask.event = { handler: "stop" }
   end if
 End Function

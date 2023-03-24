@@ -22,6 +22,11 @@ settings:
   useStarterComponents: true
   useRemoteComponents: true
 
+  # Setting the below value to true will enable youbora tracking.
+  youboraEnabled: false
+  # Setting the below value to true will enable youbora request logging into the console.
+  youboraDebugEnabled: false
+
   # Any configs added to the bs_const setting will be included in the various manifest
   # configurations via the handlebars templates
   bs_const:

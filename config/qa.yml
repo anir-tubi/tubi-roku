@@ -42,6 +42,11 @@ settings:
   charlesProxyUrl: "http://{{localHostAddress}}:8888"
   charlesProxyEnabled: false
 
+  # Setting the below value to true will enable youbora tracking.
+  youboraEnabled: false
+  # Setting the below value to true will enable youbora request logging into the console.
+  youboraDebugEnabled: false
+
   useStarterComponents: false
   useRemoteComponents: false
 

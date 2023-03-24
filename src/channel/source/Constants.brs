@@ -324,8 +324,6 @@ Function getConstants()
         constants.thirdParty.nielsen.pingTypes.streamEnd = "stream_end"
 
     constants.thirdParty.youbora = {}
-      constants.thirdParty.youbora.enabled = false
-      constants.thirdParty.youbora.debug = false
       constants.thirdParty.youbora.config = {}
         ' DEVELOPMENT
         ' constants.thirdParty.youbora.config.accountCode = "tubitvdev" 'This is the only mandatory param

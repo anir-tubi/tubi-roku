@@ -34,6 +34,11 @@ settings:
   charlesProxyUrl: "http://{{localHostAddress}}:8888"
   charlesProxyEnabled: false
 
+  # Setting the below value to true will enable youbora tracking.
+  youboraEnabled: false
+  # Setting the below value to true will enable youbora request logging into the console.
+  youboraDebugEnabled: false
+
   stagingApis: false  # setting to true will use UAPI staging APIs (matrix, cms, user_device)
 
   raleEnabled: false # setting to true will enable RALE being included in dev builds
