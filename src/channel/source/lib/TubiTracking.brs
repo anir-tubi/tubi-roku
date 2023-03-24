@@ -1029,7 +1029,7 @@ Function tubiTracking_getDetailScreenMenuPageMap(constants)
   if constants <> invalid AND constants.ui <> invalid AND constants.ui.detailScreenMenuItemIds <> invalid
     detailScreenMenuItemIds = constants.ui.detailScreenMenuItemIds
     if detailScreenMenuItemIds.playMenuItem <> invalid then map[detailScreenMenuItemIds.playMenuItem] = "PLAY"
-    if detailScreenMenuItemIds.resumeMenuItem <> invalid then map[detailScreenMenuItemIds.resumeMenuItem] = "RESUME"
+    if detailScreenMenuItemIds.resumeMenuItem <> invalid then map[detailScreenMenuItemIds.resumeMenuItem] = "CONTINUE_WATCHING"
     if detailScreenMenuItemIds.watchTrailerMenuItem <> invalid then map[detailScreenMenuItemIds.watchTrailerMenuItem] = "WATCH_TRAILER"
     if detailScreenMenuItemIds.likeMenuItem <> invalid then map[detailScreenMenuItemIds.likeMenuItem] = "LIKE"
     if detailScreenMenuItemIds.dislikeMenuItem <> invalid then map[detailScreenMenuItemIds.dislikeMenuItem] = "DISLIKE"
