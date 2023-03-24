@@ -26,6 +26,7 @@ Function showMyStuffScreen()
     screen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
     screen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelectedOnMyStuffScreen")
     screen.observeFieldScoped("refreshContent", "onRefreshContentSignalForMyStuffScreen")
+    screen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
 
     if bLoggedInUser = true
       screen.isLoading = true
@@ -196,7 +197,6 @@ End function
 
 Function onSignUpButtonSelectedOnMyStuffScreen(msg)
   tubiLog("MyStuffScreenHelpers.onSignUpButtonSelectedOnMyStuffScreen")
-  setComponentInteractionEventForSignUp(msg.getRoSGNode())
   startSignIn(onRegistrationProcessCompletedOnMyStuffScreen)
 End function
 

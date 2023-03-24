@@ -33,6 +33,9 @@ Function TubiTracking (constants, request, auth)
 
     ' an AA map of page ids to their corresponding enum values for the LeftSideNavComponent Section
     sideNavPageMap: tubiTracking_getSideNavPageMap(constants)
+
+    ' an AA map of Menu items in the details screen to their corresponding enum values for the LeftSideNavComponent Section
+    detailScreenMenuItemMap: tubiTracking_getDetailScreenMenuPageMap(constants)
   }
 End Function
 
@@ -791,6 +794,10 @@ Function tubiTracking_getOneOfs()
     top_nav_section: ""  ' Section enum
   }
 
+  section_middleNav = {
+    middle_nav_section: ""  ' Section enum
+  }
+
   linear_browse_page = {
     i: "i"
   }
@@ -894,6 +901,8 @@ Function tubiTracking_getOneOfs()
     dest_left_side_nav_component: section_leftNav
 
     dest_top_nav_component: section_topNav
+
+    dest_middle_nav_component: section_middleNav
   }
 
   ' At some point we may need to split the component "Oneof" like we did with the page and dest_page "Oneof"
@@ -910,6 +919,8 @@ Function tubiTracking_getOneOfs()
     left_side_nav_component: section_leftNav
 
     top_nav_component: section_topNav
+
+    middle_nav_component: section_middleNav
 
     category_component: {   ' Used for category screen, channel details screen, channel/category grid screen
       category_slug: ""
@@ -1007,6 +1018,31 @@ Function tubiTracking_getSideNavPageMap(constants)
     if sideNavIds.subtitles <> invalid then map[sideNavIds.subtitles] = "SUBTITLES"
     if sideNavIds.back <> invalid then map[sideNavIds.back] = "BACK"
     if sideNavIds.tournament <> invalid then map[sideNavIds.tournament] = "SPORTS"
+  end if
+  return map
+End Function
+
+
+' returns an AA that maps menu items of detailscreen instances to the appropriate analytics content mode
+Function tubiTracking_getDetailScreenMenuPageMap(constants)
+  map = {}
+  if constants <> invalid AND constants.ui <> invalid AND constants.ui.detailScreenMenuItemIds <> invalid
+    detailScreenMenuItemIds = constants.ui.detailScreenMenuItemIds
+    if detailScreenMenuItemIds.playMenuItem <> invalid then map[detailScreenMenuItemIds.playMenuItem] = "PLAY"
+    if detailScreenMenuItemIds.resumeMenuItem <> invalid then map[detailScreenMenuItemIds.resumeMenuItem] = "RESUME"
+    if detailScreenMenuItemIds.watchTrailerMenuItem <> invalid then map[detailScreenMenuItemIds.watchTrailerMenuItem] = "WATCH_TRAILER"
+    if detailScreenMenuItemIds.likeMenuItem <> invalid then map[detailScreenMenuItemIds.likeMenuItem] = "LIKE"
+    if detailScreenMenuItemIds.dislikeMenuItem <> invalid then map[detailScreenMenuItemIds.dislikeMenuItem] = "DISLIKE"
+    if detailScreenMenuItemIds.likeDislikeMenuItem <> invalid then map[detailScreenMenuItemIds.likeDislikeMenuItem] = "LIKE_OR_DISLIKE"
+    if detailScreenMenuItemIds.episodesMenuItem <> invalid then map[detailScreenMenuItemIds.episodesMenuItem] = "EPISODES_LIST"
+    if detailScreenMenuItemIds.addQueueMenuItem <> invalid then map[detailScreenMenuItemIds.addQueueMenuItem] = "ADD_TO_MY_LIST"
+    if detailScreenMenuItemIds.removeQueueMenuItem <> invalid then map[detailScreenMenuItemIds.removeQueueMenuItem] = "REMOVE_FROM_MY_LIST"
+    if detailScreenMenuItemIds.removeHistoryMenuItem <> invalid then map[detailScreenMenuItemIds.removeHistoryMenuItem] = "REMOVE_FROM_HISTORY"
+    if detailScreenMenuItemIds.signUpMenuItem <> invalid then map[detailScreenMenuItemIds.signUpMenuItem] = "SIGNUP_TO_SAVE_PROGRESS"
+    if detailScreenMenuItemIds.setReminderMenuItem <> invalid then map[detailScreenMenuItemIds.setReminderMenuItem] = "SET_REMINDER"
+    if detailScreenMenuItemIds.removeReminderMenuItem <> invalid then map[detailScreenMenuItemIds.removeReminderMenuItem] = "REMOVE_REMINDER"
+    if detailScreenMenuItemIds.channelMenuItem <> invalid then map[detailScreenMenuItemIds.channelMenuItem] = "GO_TO_NETWORK"
+    if detailScreenMenuItemIds.seeAllGamesMenuItem <> invalid then map[detailScreenMenuItemIds.seeAllGamesMenuItem] = "SEE_ALL_GAMES"
   end if
   return map
 End Function

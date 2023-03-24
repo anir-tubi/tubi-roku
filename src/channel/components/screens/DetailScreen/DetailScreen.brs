@@ -32,6 +32,12 @@ Function init()
   m.signUpMenuItem = m.top.findNode("signUpMenuItem")
   m.signUpMenuItem.iconUrl = "pkg:/images/icon-sign-in.webp"
 
+  m.menuFocused = false
+  m.secondaryMenuFocused = false
+
+  m.Menu.observeFieldScoped("focusedChild", "onMenuFocusChange")
+  m.SecondaryMenu.observeFieldScoped("focusedChild", "onSecondaryMenuFocusChange")
+
   m.top.observeFieldScoped("removeSignupButton", "onRemoveSignupButton")
   m.top.observeFieldScoped("stringSignUpButton", "onStringChange")
   m.top.observeFieldScoped("length", "onLengthChange")
@@ -59,10 +65,8 @@ Function init()
 
   m.Menu.observeFieldScoped("itemSelected", "onMenuItemSelected")
   m.Menu.observeFieldScoped("itemFocused", "onMenuItemFocused")
-  m.Menu.observeFieldScoped("itemUnfocused", "onMenuItemUnfocused")
   m.SecondaryMenu.observeFieldScoped("itemSelected", "onSecondaryMenuItemSelected")
   m.SecondaryMenu.observeFieldScoped("itemFocused", "onSecondaryMenuItemFocused")
-  m.SecondaryMenu.observeFieldScoped("itemUnfocused", "onSecondaryMenuItemUnfocused")
   m.top.observeFieldScoped("relatedContent", "onRelatedContentChange")
   m.RelatedGrid.observeFieldScoped("itemSelected", "onRelatedContentSelected")
   m.RelatedGrid.observeFieldScoped("itemFocused", "onRelatedItemFocused")
@@ -74,6 +78,10 @@ Function init()
 
   setDetailStrings()
   m.focusAnimationDuration = 0.4
+
+  ' Used to send NavigateWithinPageInfo state values as appropriate.Only send when the menu is already
+  ' has focus, not when it gains focus.
+  m.oldFocusedMenuAnalyticsSection = invalid
 
   ' modal popup to show full, scrollable description
   m.descriptionModal = invalid
@@ -245,6 +253,12 @@ Function onScreenFocusChange()
 
     if m.focusTarget <> invalid
       m.focusTarget.setFocus(true)
+      if m.focusTarget.isSameNode(m.Menu) = true
+        focusedItem = m.Menu.content.getChild(m.Menu.itemFocused)
+        if focusedItem <> invalid
+          setComponentInteractionEventForMenu("TOGGLE_ON", focusedItem)
+        end if
+      end if
     end if
 
     'determine if the content should be refreshed
@@ -266,6 +280,7 @@ Function onScreenFocusChange()
     end if
 
   end if
+
   ' force a background update
   m.top.backgroundUriList = m.top.backgroundUriList
 End Function
@@ -412,6 +427,8 @@ Function onIsSeries()
   episodeListIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.EpisodesMenuItem.id)
   signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
   menuItems = [m.signUpMenuItem, m.PlayMenuItem]
+
+  m.menuFocused = false
 
   '//Change the button order of the signup button depending on isSeries state
   if isLoggedInUser() = false AND isNewUser() = false AND m.top.availabilityType <> m.constants.ui.contentTimings.upcoming
@@ -632,7 +649,10 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
     'menu item exists, so we need to remove it
     m.Menu.content.removeChildIndex(itemIndex)
 
-    refocusMenuItem()
+    if m.Menu.isInFocusChain() = false
+      refocusMenuItem()
+    end if
+
   else if add = true AND itemIndex = -1
     'we don't have menu item, and need to add one
     'find the previous item index, and insert the Watch Trailer item one index after
@@ -659,7 +679,9 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
       m.Menu.content.appendChild(itemToAdd)
     end if
 
-    refocusMenuItem()
+    if m.Menu.isInFocusChain() = false
+      refocusMenuItem()
+    end if
 
   end if
 End Function
@@ -681,7 +703,7 @@ End Function
 '
 Function onMenuItemSelected()
   selection = m.Menu.content.getChild(m.Menu.itemSelected)
-  m.top.confirmButtonValue = selection.analyticsButtonValue
+  setComponentInteractionEventForMenu("CONFIRM", selection)
   handleMenuItemSelected(selection)
 End Function
 
@@ -689,7 +711,33 @@ End Function
 Function onMenuItemFocused()
   setVisibilityOfSecondaryMenu()
   focused = m.Menu.content.getChild(m.Menu.itemFocused)
-  m.top.toggleOnButtonValue = focused.analyticsButtonValue
+  focusedMenuAnalyticsSection = m.Tracking.detailScreenMenuItemMap[focused.id]
+
+  newFocusedMenuAnalyticsSection = {
+    middle_nav_section: focusedMenuAnalyticsSection
+  }
+
+  ' If oldFocusedMenuAnalyticsSection exists and is not the same as the focusedMenuItem,
+  ' then the user is focusing from another menu item.
+  if m.oldFocusedMenuAnalyticsSection <> invalid AND m.oldFocusedMenuAnalyticsSection.middle_nav_section <> focusedMenuAnalyticsSection
+    row = m.Menu.itemFocused + 1
+    col = 1
+
+    pageInfo = m.top.trackingPageInfo
+    m.top.navigateWithinPageInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+      componentOneof: m.Tracking.getAnalyticsComponent("middle_nav_component", m.oldFocusedMenuAnalyticsSection)
+      dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_middle_nav_component", newFocusedMenuAnalyticsSection)
+      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+
+      vertical_location: row  '//The row location of the menu item
+      vertical_location_mode: "INDEX"  'LocationMode enum
+      horizontal_location: col  '//The column location of the menu item
+      horizontal_location_mode: "INDEX"  'LocationMode enum
+    }
+  end if
+
+  m.oldFocusedMenuAnalyticsSection = newFocusedMenuAnalyticsSection
 
   if m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing
     '//When the user has liked or disliked content and then moves to or away from the like/dislike button, then change the text to be the focused or unfocused versions
@@ -699,37 +747,99 @@ Function onMenuItemFocused()
 End Function
 
 
-Function onMenuItemUnfocused(msg)
-  itemUnfocusedIndex = msg.getData()
-  itemUnfocused = m.Menu.content.getChild(itemUnfocusedIndex)
+Function onMenuFocusChange(msg)
+  focusedItem = invalid
+  componentInteractionValue = ""
 
-  if itemUnfocused <> invalid
-    m.top.toggleOffButtonValue = itemUnfocused.analyticsButtonValue
+  if m.menuFocused = false AND m.Menu.isInFocusChain() = true AND m.Menu.itemFocused >= 0
+    'This block represents menu gaining focus
+    m.oldFocusedMenuAnalyticsSection = invalid
+    focusedItem = m.Menu.content.getChild(m.Menu.itemFocused)
+    componentInteractionValue = "TOGGLE_ON"
+  else if m.menuFocused = true AND m.Menu.isInFocusChain() = false AND m.Menu.itemFocused >= 0
+    'This block represents menu losing focus
+    focusedItem = m.Menu.content.getChild(m.Menu.itemFocused)
+    componentInteractionValue = "TOGGLE_OFF"
   end if
+
+  if isNonEmptyString(componentInteractionValue) = true and focusedItem <> invalid
+    setComponentInteractionEventForMenu(componentInteractionValue, focusedItem)
+  end if
+
+  m.menuFocused = m.Menu.isInFocusChain()
+
+End Function
+
+
+Function onSecondaryMenuFocusChange()
+  focusedItem = invalid
+  componentInteractionValue = ""
+
+  secondaryMenuIsInFocusChain = m.SecondaryMenu.isInFocusChain()
+
+  if m.secondaryMenuFocused = false AND secondaryMenuIsInFocusChain = true
+    'This block executed when SecondaryMenu gains focus.
+    if m.SecondaryMenu.itemFocused = -1
+      'This block executed when SecondaryMenu gains focus but not item has focus.
+      focusedItem = m.SecondaryMenu.content.getChild(0)
+    else
+      focusedItem = m.SecondaryMenu.content.getChild(m.SecondaryMenu.itemFocused)
+    end if
+
+    componentInteractionValue = "TOGGLE_ON"
+  else if m.secondaryMenuFocused = true AND secondaryMenuIsInFocusChain = false
+    'This block executed when SecondaryMenu loses focus.
+    focusedItem = m.SecondaryMenu.content.getChild(m.SecondaryMenu.itemFocused)
+    componentInteractionValue = "TOGGLE_OFF"
+  end if
+
+  if isNonEmptyString(componentInteractionValue) = true AND focusedItem <> invalid
+    setComponentInteractionEventForMenu(componentInteractionValue, focusedItem)
+  end if
+
+  m.secondaryMenuFocused = secondaryMenuIsInFocusChain
 
 End Function
 
 
 Function onSecondaryMenuItemSelected()
   selection = m.SecondaryMenu.content.getChild(m.SecondaryMenu.itemSelected)
-  m.top.confirmButtonValue = selection.analyticsButtonValue
+  if isNonEmptyString(selection.analyticsButtonValue) = true
+    setComponentInteractionEventForMenu("CONFIRM", selection)
+  end if
   handleMenuItemSelected(selection)
 End Function
 
 
 Function onSecondaryMenuItemFocused()
   focused = m.SecondaryMenu.content.getChild(m.SecondaryMenu.itemFocused)
-  m.top.toggleOnButtonValue = focused.analyticsButtonValue
-End Function
+  focusedSecondaryMenuAnalyticsSection = m.Tracking.detailScreenMenuItemMap[focused.id]
 
+  newFocusedSecondaryMenuAnalyticsSection = {
+    middle_nav_section: focusedSecondaryMenuAnalyticsSection
+  }
 
-Function onSecondaryMenuItemUnfocused(msg)
-  itemUnfocusedIndex = msg.getData()
-  itemUnfocused = m.SecondaryMenu.content.getChild(itemUnfocusedIndex)
+  ' If oldFocusedSecondaryMenuAnalyticsSection exists and is not the same as the focusedMenuItem,
+  ' then the user is focusing from another menu item.
+  if m.oldFocusedSecondaryMenuAnalyticsSection <> invalid AND m.oldFocusedSecondaryMenuAnalyticsSection.middle_nav_section <> focusedSecondaryMenuAnalyticsSection
+    row = m.SecondaryMenu.itemFocused + 1
+    col = 1
 
-  if itemUnfocused <> invalid
-    m.top.toggleOffButtonValue = itemUnfocused.analyticsButtonValue
+    pageInfo = m.top.trackingPageInfo
+    m.top.navigateWithinPageInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+      componentOneof: m.Tracking.getAnalyticsComponent("middle_nav_component", m.oldFocusedSecondaryMenuAnalyticsSection)
+      dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_middle_nav_component", newFocusedSecondaryMenuAnalyticsSection)
+      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+
+      vertical_location: row  '//The row location of the menu item
+      vertical_location_mode: "INDEX"  'LocationMode enum
+      horizontal_location: col  '//The column location of the menu item
+      horizontal_location_mode: "INDEX"  'LocationMode enum
+    }
   end if
+
+  m.oldFocusedSecondaryMenuAnalyticsSection = newFocusedSecondaryMenuAnalyticsSection
 
 End Function
 
@@ -945,17 +1055,16 @@ Function focusMenu(immediately = false)
   end if
 
   if m.top.isInFocusChain() = true
-    m.top.focusOnLikeMenu = false '//make sure this is set to false in case coming from secondary menus
     m.Menu.setFocus(true)
     m.relatedHasFocus = false
   end if
+
 End Function
 
 
 Function focusSecondaryMenu()
   m.focusTarget = m.SecondaryMenu
   if m.top.isInFocusChain() = true
-    m.top.focusOnLikeMenu = true
     m.SecondaryMenu.jumpToItem = 0  'reset focus to the 1st menu item
     m.SecondaryMenu.setFocus(true)
   end if
@@ -965,8 +1074,6 @@ End Function
 Function focusRelated()
   m.focusTarget = m.RelatedGrid
   if m.top.isInFocusChain() = true
-    focusedMenuItem = m.Menu.content.getChild(m.Menu.itemFocused)
-    m.top.toggleOffButtonValue = focusedMenuItem.analyticsButtonValue
     m.RelatedGrid.setFocus(true)
   end if
 
@@ -981,8 +1088,6 @@ End Function
 Function focusInfo()
   m.focusTarget = m.Info
   if m.top.isInFocusChain() = true
-    focusedMenuItem = m.Menu.content.getChild(m.Menu.itemFocused)
-    m.top.toggleOffButtonValue = focusedMenuItem.analyticsButtonValue
     m.Info.setFocus(true)
   end if
 
@@ -1086,8 +1191,6 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       handlePlayInput()
       return true
     else if key = "right" AND m.Menu.isInFocusChain() = true AND m.Menu.content.getChild(m.Menu.itemFocused).id = "LikeDislikeMenuItem" AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked
-      focusedItem = m.Menu.content.getChild(m.Menu.itemFocused)
-      m.top.toggleOffButtonValue = focusedItem.analyticsButtonValue
       focusSecondaryMenu()
       return true
     else if key = "left"
@@ -1095,8 +1198,6 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         m.top.backButtonPressed = true
         return true
       else if m.SecondaryMenu.isInFocusChain() = true
-        focusedItem = m.SecondaryMenu.content.getChild(m.SecondaryMenu.itemFocused)
-        m.top.toggleOffButtonValue = focusedItem.analyticsButtonValue
         focusMenu()
         return true
       end if
@@ -1105,4 +1206,57 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   end if
 
   return false
+End Function
+
+
+'Set the componentInteractionInfo value which will pass through to ContentController via DetailScreenHelper.brs
+'to fire a component_interaction analytics event.
+' @componentInteractionValue: the interaction that the user is having with the focused or selected menu item. Allowed values "TOGGLE_ON", "TOGGLE_OFF", and "CONFIRM".
+' @menuItem: Node, DetailMenuItemContentNode for focused, unfocused or selected item of menu or secondary menu.
+Function setComponentInteractionEventForMenu(componentInteractionValue, menuItem)
+  tubiLog("DetailScreen.setComponentInteractionEventForMenu")
+  menuItemTitle = ""
+  menuItemId = ""
+  middleNavSection = ""
+  componentValues = {}
+
+  if menuItem <> invalid
+    menuItemTitle = menuItem.title
+    menuItemId = menuItem.id
+
+    if isNonEmptyString(menuItemTitle) = true AND isNonEmptyString(menuItemId) = true
+      if menuItemId = m.constants.ui.detailScreenMenuItemIds.addQueueMenuItem
+        if menuItemTitle = getTranslation("screenDetails_button_set_reminder") OR menuItemTitle = getTranslation("screenDetails_button_sign_in_to_set_reminder")
+          middleNavSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.setReminderMenuItem]
+        else
+          middleNavSection = m.Tracking.detailScreenMenuItemMap[menuItemId]
+        end if
+      else if menuItemId = m.constants.ui.detailScreenMenuItemIds.removeQueueMenuItem
+        if menuItemTitle = getTranslation("screenDetails_button_remove_reminder")
+          middleNavSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.removeReminderMenuItem]
+        else
+          middleNavSection = m.Tracking.detailScreenMenuItemMap[menuItemId]
+        end if
+      else
+          middleNavSection = m.Tracking.detailScreenMenuItemMap[menuItemId]
+      end if
+    else if isNonEmptyString(menuItemId) = true
+      'This block won't execute. We added to avoid sending empty component Values when menuItem title is empty string.
+      middleNavSection = m.Tracking.detailScreenMenuItemMap[menuItemId]
+    end if
+  end if
+
+  if isNonEmptyString(middleNavSection) = true
+    componentValues.middle_nav_section = middleNavSection
+  end if
+
+  pageOneof = m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pagetype, m.top.trackingPageInfo.pageValues)
+  componentOneof = m.Tracking.getAnalyticsComponent("middle_nav_component", componentValues)
+
+  m.top.componentInteractionInfo = {
+    pageOneof: pageOneof
+    componentOneof: componentOneof
+    user_interaction: componentInteractionValue
+  }
+
 End Function

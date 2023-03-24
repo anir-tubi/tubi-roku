@@ -16,9 +16,6 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.trackingLoadStartTime = Uptime(0)
     detailScreen.shouldFocusWhenPushed = m.top.fadeInContentController
     detailScreen.playbackSource = playbackSource
-    detailScreen.observeFieldScoped("toggleOnButtonValue", "onDetailScreenButtonToggleOn")
-    detailScreen.observeFieldScoped("toggleOffButtonValue", "onDetailScreenButtonToggleOff")
-    detailScreen.observeFieldScoped("confirmButtonValue", "onDetailScreenButtonConfirm")
     detailScreen.observeFieldScoped("playSelected", "onPlay")
     detailScreen.observeFieldScoped("resumeSelected", "onResume")
     detailScreen.observeFieldScoped("likeSelected", "onLikeSelected")
@@ -42,6 +39,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.observeFieldScoped("relatedContentToPlay", "onContentToPlay")
     detailScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     detailScreen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelected")
+    detailScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     detailScreen.observeFieldScoped("seeAllGamesSelected", "onSeeAllGamesSelected")
 
@@ -1568,7 +1566,6 @@ End Function
 
 Function onSignUpButtonSelected(msg)
   tubiLog("DetailScreenHelper.onSignUpButtonSelected")
-  setComponentInteractionEventForSignUp(msg.getRoSGNode())
   startSignIn(onRegistrationProcessCompletedOnDetailsScreen)
 End function
 
@@ -1576,23 +1573,6 @@ End function
 Function onSeeAllGamesSelected()
   tubiLog("DetailScreenHelper.onSeeAllGamesSelected")
   showTournamentScreen(m.constants)
-End Function
-
-
-'@screen, screen info after selecting signUp button
-Function setComponentInteractionEventForSignUp(screen)
-  tubiLog("DetailScreenHelper.setComponentInteractionEventForSignUp")
-  componentValues = {
-    button_type: "TEXT"
-    button_value: "SIGNUP_TO_SAVE_PROGRESS" 'Button value is always upper case and concatinated by "_"
-  }
-  pageInfo = screen.trackingPageInfo
-  componentInteractionInfo = {
-    pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-    componentOneof: m.Tracking.getAnalyticsComponent("button_component", componentValues)
-    user_interaction: "CONFIRM"
-  }
-  sendComponentInteractionInfo(componentInteractionInfo)
 End Function
 
 
@@ -2028,69 +2008,6 @@ Function sendLikeSelectAnalytics(screen, sLikeEventEnum)
 End Function
 
 
-Function onDetailScreenButtonToggleOn(msg)
-  tubilog("DetailScreenHelpers.onDetailScreenButtonToggleOn")
-  analyticsButtonValue = msg.getData()
-  detailScreen = msg.getRoSGNode()
-
-  if analyticsButtonValue <> "" AND isDetailScreen(detailScreen) = true
-    sendDetailMenuFocusAnalytics(detailScreen, analyticsButtonValue, "TOGGLE_ON")
-  end if
-End Function
-
-
-Function onDetailScreenButtonToggleOff(msg)
-  tubilog("DetailScreenHelpers.onDetailScreenButtonToggleOff")
-  analyticsButtonValue = msg.getData()
-  detailScreen = msg.getRoSGNode()
-
-  if analyticsButtonValue <> "" AND isDetailScreen(detailScreen) = true
-    sendDetailMenuFocusAnalytics(detailScreen, analyticsButtonValue, "TOGGLE_OFF")
-  end if
-End Function
-
-
-Function onDetailScreenButtonConfirm(msg)
-  tubilog("DetailScreenHelpers.onDetailScreenButtonConfirm")
-  analyticsButtonValue = msg.getData()
-  detailScreen = msg.getRoSGNode()
-
-  if analyticsButtonValue <> "" AND isDetailScreen(detailScreen) = true
-    sendDetailMenuFocusAnalytics(detailScreen, analyticsButtonValue, "CONFIRM")
-  end if
-End Function
-
-
-' send out a call to analytics that a menu item has been focused or unfocused, or when the like/dislike menu has gained focus
-' @param screen, the detail screen that is causing this analytics event
-' @param sAnalyticsValue:String, The analytics string value that represent a menu item or menu being focused or unfocused
-' @param sUserInteraction: The protos enum related to the user interaction
-Function sendDetailMenuFocusAnalytics(screen, sAnalyticsValue, sUserInteraction)
-  if sAnalyticsValue <> invalid AND sAnalyticsValue <> ""
-    componentInteractionEvent =  {
-      pageOneof: {}
-      componentOneof: {}
-      user_interaction: sUserInteraction
-    }
-
-    pageInfo = screen.trackingPageInfo
-    componentInteractionEvent.pageOneof = m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-
-    componentValues = {
-      button_type: "TEXT"
-      button_value: sAnalyticsValue
-    }
-    componentInteractionEvent.componentOneof = m.Tracking.getAnalyticsComponent("button_component", componentValues)
-
-
-    m.trackingLoggingTask.trackEvent = {
-      type: "component_interaction"
-      values: componentInteractionEvent
-    }
-  end if
-End Function
-
-
 'send the navigateToPage and pageLoad analytics in the case of an error loading the details screen
 Function sendDetailScreenErrorAnalytics(detailScreen)
   ' Handle navigate_to_page and page_load tracking for detail screen for error cases
@@ -2265,6 +2182,7 @@ Function addToQueueSuccessResponse(response)
   end if
 End Function
 
+
 Function addToQueueErrorResponse(error)
   tubiLog("DetailScreenHelpers.addToQueueErrorResponse")
   detailScreen = getTopDetailScreenFromStack()
@@ -2273,6 +2191,7 @@ Function addToQueueErrorResponse(error)
     bookmarkFailed(detailScreen, error)
   end if
 End function
+
 
 ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
 ' @screen: node - screen node

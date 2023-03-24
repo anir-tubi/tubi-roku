@@ -262,6 +262,7 @@ Function onMenuItemSelected(msg)
   tubiLog("MyStuffScreen.onMenuItemSelected")
   '//communicate that the user is asking to start the sign in process
   m.top.signUpButtonSelected = true
+  setComponentInteractionEventForSignUp()
 End Function
 
 
@@ -358,6 +359,7 @@ Function onTransportVoiceRequest(msg)
       else
         '//communicate that the user is asking to start the sign in process
         m.top.signUpButtonSelected = true
+        setComponentInteractionEventForSignUp()
       end if
     end if
   end if
@@ -484,4 +486,20 @@ Function onResetChange(msg)
     m.top.cursorPosition = [-1,-1]
     m.RowList.jumpToRowItem = [0, 0]
   end if
+End Function
+
+
+'@screen, screen info after selecting signUp button
+Function setComponentInteractionEventForSignUp()
+  tubiLog("MyStuffScreen.setComponentInteractionEventForSignUp")
+  componentValues = {
+    button_type: "TEXT"
+    button_value: "SIGNUP_TO_SAVE_PROGRESS" 'Button value is always upper case and concatinated by "_"
+  }
+  pageInfo = m.top.trackingPageInfo
+  m.top.componentInteractionInfo = {
+    pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+    componentOneof: m.Tracking.getAnalyticsComponent(m.constants.componentTypes.buttonComponent, componentValues)
+    user_interaction: "CONFIRM"
+  }
 End Function

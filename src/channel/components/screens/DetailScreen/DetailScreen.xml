@@ -210,15 +210,6 @@
       <!-- Communicates to the parent that the video preview should be stopped -->
       <field id="stopVideoPreview" type="boolean" alwaysNotify="true"/>
 
-      <!-- The "button_value" for an analytics ButtonComponent -->
-      <field id="toggleOnButtonValue" type="string" alwaysNotify="true" />
-      <field id="toggleOffButtonValue" type="string" alwaysNotify="true" />
-      <field id="confirmButtonValue" type="string" alwaysNotify="true" />
-
-      <!-- Called to report that the Like/Dislike Menu has gained focus or lost focus -->
-      <field id="focusOnLikeMenu" type="boolean" value="false"/>
-
-
   </interface>
 
   <children>

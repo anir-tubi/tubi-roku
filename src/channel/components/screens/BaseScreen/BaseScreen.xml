@@ -60,6 +60,12 @@
       -->
       <field id="navigateWithinPageInfo" type="assocarray" />
 
+       <!-- Holds the information needed to populate a component_interaction event. This will
+           be observed by the contentController which will be responsible for sending
+           component_interaction events.
+      -->
+      <field id="componentInteractionInfo" type="assocarray"/>
+
       <!-- Holds the "level" of the screen relative to other screens.
            Screens with smaller screenLevel values cannot be stacked on top of screens with higher screenLevel values.
            Attempting to do this action will result in screens being removed from the stack before the screen with the lower
