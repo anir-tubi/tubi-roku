@@ -923,37 +923,6 @@ Function getConstants()
       aMX.push("D")
       constants.ui.matureRatings["MX"] = aMX
 
-    constants.ui.categoryList = {}
-      constants.ui.categoryList.action = "Action"
-      constants.ui.categoryList.recommended_for_you = "Recommended"
-      constants.ui.categoryList.anime = "Anime"
-      constants.ui.categoryList.award_winners_and_nominees = "Award Winners & Nominees"
-      constants.ui.categoryList.continue_watching = "Continue Watching"
-      constants.ui.categoryList.black_cinema = "Black Cinema"
-      constants.ui.categoryList.bollywood = "Bollywood Dreams"
-      constants.ui.categoryList.classics = "Classics"
-      constants.ui.categoryList.comedy = "Comedy"
-      constants.ui.categoryList.cult_favorites = "Cult Classics"
-      constants.ui.categoryList.documentary = "Documentary"
-      constants.ui.categoryList.docuseries = "Docuseries"
-      constants.ui.categoryList.drama = "Drama"
-      constants.ui.categoryList.faith = "Faith"
-      constants.ui.categoryList.family_movies = "Family Movies"
-      constants.ui.categoryList.foreign_films = "Foreign Language Films"
-      constants.ui.categoryList.horror = "Horror"
-      constants.ui.categoryList.indie_films = "Indie Films"
-      constants.ui.categoryList.kids_shows = "Kids Shows"
-      constants.ui.categoryList.leaving_soon = "Leaving Soon!"
-      constants.ui.categoryList.lgbt = "LGBTQ"
-      constants.ui.categoryList.music_musicals = "Music & Musicals"
-      constants.ui.categoryList.new_releases = "New Releases"
-      constants.ui.categoryList.reality_tv = "Reality TV"
-      constants.ui.categoryList.recently_added = "Recently Added"
-      constants.ui.categoryList.romance = "Romance"
-      constants.ui.categoryList.sci_fi_and_fantasy = "Scifi & Fantasy"
-      constants.ui.categoryList.thrillers = "Thrillers"
-      constants.ui.categoryList.westerns = "Westerns"
-
     constants.ui.categoryIds = {}
       'these map to tensor api container ids
       constants.ui.categoryIds.history = "continue_watching"
@@ -1105,7 +1074,6 @@ Function getConstants()
       constants.ui.screenIds.episodeScreen = "episodeScreen"
       constants.ui.screenIds.emailInputScreen = "emailInputScreen"
       constants.ui.screenIds.signInScreen = "signInScreen"
-      constants.ui.screenIds.upNextScreen = "upNextScreen"
       constants.ui.screenIds.modalDialogScreen = "modalDialogScreen"
       constants.ui.screenIds.videoPlayerScreen = "videoPlayerScreen"
       constants.ui.screenIds.linearVideoPlayerScreen = "linearVideoPlayerScreen"
@@ -1151,9 +1119,6 @@ Function getConstants()
       constants.ui.contentIds.categoryList = "categoriesList"
       constants.ui.contentIds.channelList = "channelsList"
       constants.ui.contentIds.timeGridContent = "timeGridContent"
-      constants.ui.contentIds.sportsTimeGridContent = "sportsTimeGridContent"
-      constants.ui.contentIds.newsTimeGridContent = "newsTimeGridContent"
-      constants.ui.contentIds.entertainmentTimeGridContent = "entertainmentTimeGridContent"
       constants.ui.contentIds.showAllGames = "showAllGames"
 
     ' content ids of contents that should not be removed from the content cache
@@ -1182,14 +1147,10 @@ Function getConstants()
       constants.ui.imageSizes.linearExperiment = [978, 660]
 
       'Sizes of the linear background and minimized linear video player
-      constants.ui.imageSizes.linearVideoPlayer_minimizedDimension = [1263,710]
-      constants.ui.imageSizes.epgLinearVideoPlayer_minimizedDimension = [978,552]
       constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension = [1120,630]
 
     constants.ui.imageTranslations = {}
       'Location of the linear background and minimized linear video player
-      constants.ui.imageTranslations.linearVideoPlayer_minimizedTranslation = [657,0]
-      constants.ui.imageTranslations.epgLinearVideoPlayer_minimizedTranslation = [192,228]
       constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation = [800,0]
 
     constants.ui.sideNavOpenIds = {}
