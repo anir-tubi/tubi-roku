@@ -28,10 +28,21 @@ Function showModal(modalInfo, buttonInfo)
   ' Don't create the modal if a modal already exists, or there is not enough info to create it
   if m.tempModal = invalid AND modalInfo <> invalid AND buttonInfo <> invalid
     modal = CreateObject("roSGNode", "ModalDialogScreen")
-    timeNow = CreateObject("roDateTime")
-    modal.id = timeNow.AsSeconds().tostr()
-    modal.title = modalInfo.title
-    modal.message = modalInfo.message
+
+    ' We need a unique id for our modals due to the animation but we need it to to be consistent across runs so we can test nodes within the dialog as part of our automation so we use a hash of the title and message to give a consistent id
+    title = modalInfo.title
+    message = modalInfo.message
+
+    ba = createObject("roByteArray")
+    ba.fromAsciiString(title + message)
+
+    digest = createObject("roEVPDigest")
+    digest.setup("md5")
+
+    modal.id = digest.process(ba).left(7)
+
+    modal.title = title
+    modal.message = message
     modal.scrollable = modalInfo.scrollable
     modal.instantResumeAction = modalInfo.instantResumeAction
 
