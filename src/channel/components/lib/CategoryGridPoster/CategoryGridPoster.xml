@@ -23,8 +23,6 @@
     <field id="itemHasFocus" type="boolean" />
     <field id="rowListHasFocus" type="boolean" />
     <field id="focusPercent" type="float" />
-    <!-- rowFocusPercent is needed so that onFocusPercent callback runs when navigationg between rows -->
-    <field id="rowFocusPercent" type="float" />
     <field id="width" alias="Poster.width" />
     <field id="height" alias="Poster.height" />
   </interface>

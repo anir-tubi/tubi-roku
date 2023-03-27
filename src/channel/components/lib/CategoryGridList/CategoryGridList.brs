@@ -31,10 +31,10 @@ Function init()
   m.metadataTranslate = TubiMetadataTranslate(m.constants)
 
   m.RowList.drawFocusFeedbackOnTop = true
-  
+
   ' suppress debounce if we have just gained focus
   m.justGainedFocus = false
-  
+
   ' stores an array of the form [y, x], which can be set on RowList.jumpToItem
   m.itemToJumpTo = invalid
 
@@ -51,7 +51,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.RowList.focusBitmapBlendColor = theme.focusedColor
   end if
@@ -262,13 +262,6 @@ Function setRowHeights()
       end if
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
-    else if gridItemType = gridItemTypes.vitg
-      rowHeightAdjustment = 122
-      posterWidth = m.constants.ui.imageSizes.vitg[0]
-      posterHeight = m.constants.ui.imageSizes.vitg[1]
-      rowItemSize.push([posterWidth, posterHeight])
-      rowHeight = posterHeight
-      numRows = 3
     end if
 
     if category.sponsorImages <> invalid

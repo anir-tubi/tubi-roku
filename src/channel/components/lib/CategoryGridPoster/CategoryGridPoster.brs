@@ -46,7 +46,6 @@ Function init()
     landscapeNoTitle: "landscapeNoTitle"
     landscapeLarge: "landscapeLarge"
     linear: "linear"
-    vitg: "vitg"
     historySignedOutUser: "continue_watching_signed_out_user"
     emptyContainer: "emptyContainer"
   }
@@ -62,7 +61,7 @@ End Function
 
 Function onThemeChange()
   theme = getThemeFromGlobal()
-  
+
   if theme <> invalid
     m.InnerTitle.color = theme.primaryTextColor
     m.TimeRemaining.color = theme.primaryTextColor
@@ -165,8 +164,6 @@ Function onContentChange(msg)
       if itemContent.gridItemType = m.gridItemTypes.landscape AND m.top.itemContent.type <> m.contentTypes.navigate
         m.title.visible = true
         m.title.text = itemContent.title
-      else if isVitg(itemContent, m.gridItemTypes) = true
-        setUpVitg()
       else if categoryContent.gridItemType = m.gridItemTypes.historySignedOutUser
         setUpSignedOutContinueWatching()
       else if categoryContent.gridItemType = m.gridItemTypes.emptyContainer
@@ -241,7 +238,7 @@ Function drawProgressBar(nowPos, duration)
   if theme <> invalid
     m.resumeProgressBar.color = theme.focusedColor
   end if
-  
+
   m.resumeProgressBar.visible = true
   m.DurationBar.width = (m.top.width - (2 * m.resumeMargin))
   m.DurationBar.visible = true
@@ -264,16 +261,7 @@ End Function
 Function handleLocalFocusChange(newLocalFocus)
 
   if m.localFocus = false AND newLocalFocus = true
-    ' item is gaining focus
-    if isVitg(m.top.itemContent, m.gridItemTypes) = true
-      if m.vitg = invalid
-        '// create the video player when the vitg item gains focus
-        m.vitg = createVitgVideo()
-        if m.vitg <> invalid
-          m.vitg.hasFocus = newLocalFocus
-        end if
-      end if
-    end if
+    'Do nothing for now. But we can add logic here when needed
   else if m.localFocus = true AND newLocalFocus = false
     ' item is losing focus - so fade the poster in (as necessary) and destroy the video player
     if m.poster.opacity < 1.0
@@ -288,12 +276,6 @@ Function handleLocalFocusChange(newLocalFocus)
       end if
     end if
 
-    ' destroy the video player
-    if m.vitg <> invalid
-      ' removing focus before destroying vitg lets finish_trailer events be fired from the vitg node
-      m.vitg.hasFocus = newLocalFocus
-      destroyVitgVideo()
-    end if
   end if
 
   m.localFocus = newLocalFocus
@@ -316,12 +298,6 @@ Function onFocusPercentChange()
   end if
 End Function
 
-
-Function onRowFocusPercentChange()
-  if isVitg(m.top.itemContent, m.gridItemTypes) = true AND m.localFocus <> true
-    m.poster.opacity = m._.max(m.poster.opacity, 1 - m.top.rowFocusPercent)
-  end if
-End Function
 
 
 Function setUpLinear()
@@ -356,117 +332,6 @@ Function setUpLinear()
   if m.top.itemHasFocus = true
     handleLocalFocusChange(m.top.itemHasFocus)
   end if
-End Function
-
-
-Function setUpVitg()
-  m.top.observeField("rowFocusPercent", "onRowFocusPercentChange")
-  m.top.observeField("itemHasFocus", "onItemFocus")
-  m.top.observeField("rowListHasFocus", "onRowListHasFocus")
-  m.top.unobserveField("focusPercent")
-  m.top.observeField("focusPercent", "onFocusPercentChange")
-
-  ' On various models, and due to long press horizontal scrolling, we cannot always count on
-  ' m.top.itemHasFocus and m.top.focusPercent to fire as expected. In order to get around these issues,
-  ' we maintain our own internal state and update it when we get info from the item component interface.
-
-  ' local focus state; becomes true when focusPercent = 1.0 or itemHasFocus = true
-  ' becomes false when focusPercent < 1.0 or itemFocus = false
-  if m.localFocus = invalid
-    m.localFocus = false
-  end if
-
-  m.top.id = m.top.itemContent.title
-
-  title = m.top.itemContent.title
-  if m.top.itemContent.gridItemType = "vitg"
-    m.title.width = 1205
-    title = title + " (" + m.top.itemContent.releaseDate + ") " + Chr(&hb7) + " " + formatLengthSelectedLocale(m.top.itemContent.length)
-  end if
-
-  m.title.visible = true
-  m.title.text = title
-
-  ' It is possible when fast scrolling to the VITG row, that the item can gain focus before setUpVitg() runs.
-  ' since itemHasFocus is true in this case, the callback onItemFocus won't get triggered. so manually calling handleLocalFocusChange to start trailer
-  if m.top.itemHasFocus = true
-    handleLocalFocusChange(m.top.itemHasFocus)
-  end if
-
-End Function
-
-
-' returns a CategoryVideoPlayer node
-Function createVitgVideo()
-  vitg = invalid
-  if m.top.itemContent.url <> ""
-    vitg = CreateObject("roSGNode", "CategoryVideoPlayer")
-    m.top.insertChild(vitg, 0)
-    vitg.observeField("videoState", "onVideoStateChange")
-    vitg.videoUrl = m.top.itemContent.url
-    vitg.trailerId = m.top.itemContent.episodeNumber 'abusing content node by using episodeNumber to store the trailer id
-    vitg.width = m.top.width
-    vitg.height = m.top.height
-
-    vitg.resumePos = m.top.itemContent.resumePos
-    if m.top.itemContent.resumePos >= (m.top.itemContent.playDuration - 1)   ' playDuration holds the length of the trailer
-      ' trailer has already been watched to completion, start it over again
-      vitg.resumePos = 0
-    end if
-
-    drawProgressBar(m.top.itemContent.resumePos, m.top.itemContent.playDuration)
-  end if
-
-  return vitg
-End Function
-
-
-Function destroyVitgVideo()
-  if m.vitg <> invalid
-    m.vitg.control = "stop"
-    m.vitg.unobserveField("videoState")
-    m.top.removeChild(m.vitg)
-    m.top.itemContent.resumePos = Int(m.vitg.nowPos / 1000)
-    drawProgressBar(m.top.itemContent.resumePos, m.top.itemContent.playDuration)
-    m.vitg = invalid
-  end if
-End Function
-
-
-Function onVideoStateChange(msg)
-  state = msg.getData()
-
-  if state = "playing"
-    if m.vitg <> invalid
-      m.vitg.visible = true
-    end if
-    m.fadeOutAnimation = fade(m.poster, "out", m.posterFadeTime)
-  else
-    if m.vitg <> invalid
-      m.vitg.visible = false
-    end if
-
-    if state = "stopped"
-      vitgPosSeconds = m.vitg.nowPos / 1000
-      m.top.itemContent.resumePos = vitgPosSeconds
-      drawProgressBar(vitgPosSeconds, m.top.itemContent.playDuration)
-      if m.localFocus = true
-        'this only occurs when the video has played to completion
-        if m.fadeInAnimation = invalid OR m.fadeInAnimation.state <> "running"
-          m.fadeInAnimation = fade(m.poster, "in", m.posterFadeTime)
-        end if
-      end if
-    end if
-  end if
-End Function
-
-
-Function isVitg(itemContent, gridItemTypes)
-  isVitg = false
-  if itemContent.gridItemType = gridItemTypes.vitg
-    isVitg = true
-  end if
-  return isVitg
 End Function
 
 
@@ -547,8 +412,8 @@ Function setReplayOrUpcomingBadge(badgeText)
       badge.backgroundColor = theme.backgroundColorLight
       badge.textColor = theme.neutralColor2
     else
-      badge.backgroundColor = theme.neutralColor 
-      badge.textColor = theme.primaryText 
+      badge.backgroundColor = theme.neutralColor
+      badge.textColor = theme.primaryText
     end if
   end if
   badge.text = UCase(badgeText)
@@ -581,7 +446,7 @@ Function setShowAllLabel(text)
   if theme <> invalid
     m.showAllLabel.color = theme.primaryTextColor
   end if
-  
+
   m.showAllLabel.width = 380
   m.showAllLabel.height = 216
   m.showAllLabel.horizAlign = "center"

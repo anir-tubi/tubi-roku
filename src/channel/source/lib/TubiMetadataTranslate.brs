@@ -101,18 +101,6 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     if isNonEmptyArray(contentFromServer.landscape_images)
       sThumbnailURL = contentFromServer.landscape_images[0]
     end if
-  else if gridType = gridItemTypes.vitg
-    if canvasImages <> invalid AND type(canvasImages.vitg_tb) = "roArray" AND isNonEmptyString(canvasImages.vitg_tb[0]) = true
-      '//A custom vitg size was requested, use this image instead of the default image
-      sThumbnailURL = canvasImages.vitg_tb[0]
-    else if isNonEmptyArray(contentFromServer.hero_images) = true
-      if contentFromServer.hero_images.count() >= 2
-        '//::TEMP:: The Tupian image server will not return the resized image yet in the proper place, so look for the resized image in the old image array, but at a different index placement than the usual index location
-        sThumbnailURL = contentFromServer.hero_images[1]
-      else
-        sThumbnailURL = contentFromServer.hero_images[0]
-      end if
-    end if
   end if
   return sThumbnailURL
 End Function
@@ -599,20 +587,10 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId, i
       translated.parentType = category.type
       translated.parentTitle = category.title
 
-      vitg_large = m.constants.ui.gridItemTypes.vitg
-      ' inject the default background for large vitg content items
-      if category.gridItemType = vitg_large
-        translated.backgrounds = [m.constants.ui.uris.defaultBackground]
-      else if category.gridItemType = m.constants.ui.gridItemTypes.historySignedOutUser
+      if category.gridItemType = m.constants.ui.gridItemTypes.historySignedOutUser
         translated.backgrounds = [m.constants.ui.uris.defaultBackground]
       end if
 
-      ' set vitg on the content node so various non item UI components can respond to it (ie. detail screen)
-      if category.gridItemType = vitg_large
-        translated.addField("isVitg", "boolean", false)
-        translated.isVitg = true
-        translated.type = m.constants.ui.categoryTypes.preview
-      end if
 
       ' QA - inject the category slug into the content description for automated UI testing
       #if suitestjs
@@ -1231,14 +1209,8 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           childIsPushable = true
           fullChild = contents[child]
           sType = "ContentNode"
-          if bFullData = true
+          if bFullData = true OR parentGridItemType = m.constants.ui.gridItemTypes.linear
             '//if true then set children to TubiContentNode type so more data is passed to the children
-            sType = "TubiContentNode"
-          end if
-
-          if parentGridItemType = m.constants.ui.gridItemTypes.vitg
-            sType = "VitgContentNode"
-          else if parentGridItemType = m.constants.ui.gridItemTypes.linear
             sType = "TubiContentNode"
           end if
 
@@ -1301,36 +1273,6 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           if parentGridItemType = gridItemTypes.linear AND fullChild.thumbnails <> invalid
             childAA.inlineLogoUri = fullChild.thumbnails[0]
-          end if
-
-          'add the trailer url to vitg content items - don't include vitg content if there is no trailer
-          if parentGridItemType = gridItemTypes.vitg
-            childIsPushable = false
-            if fullChild.has_trailer = true
-              if fullChild.trailers <> invalid AND type(fullChild.trailers) = "roArray" AND fullChild.trailers.count() > 0
-                if fullChild.trailers[0] <> invalid AND fullChild.trailers[0].url <> invalid AND fullChild.trailers[0].url <> ""
-                  childAA.url = fullChild.trailers[0].url
-                  ' abuse the contentNode fields to add vitg info to the content node
-                  ' so that we can continue to use the content node which is created faster than custom nodes
-                  if fullChild.trailers[0].duration <> invalid
-                    ' use deprecated playDuration as a store for the trailer duration since we are
-                    ' already using the length field for our content duration
-                    childAA.playDuration = fullChild.trailers[0].duration
-                  end if
-
-                  if fullChild.trailers[0].id <> invalid
-                    ' use the otherwise unused episodeNumber field as a store for the trailer id
-                    ' so that we have access to the trailer id for trailer analytics
-                    childAA.episodeNumber = fullChild.trailers[0].id
-                  end if
-                  childIsPushable = true
-                end if
-              end if
-            end if
-
-            if fullChild.year <> invalid
-              childAA.releaseDate = fullChild.year.toStr()
-            end if
           end if
 
           sFullChildID = fullChild.id
@@ -1629,11 +1571,8 @@ End Function
 Function tubiMetadataTranslate_getGridItemType(container, orientation, constants)
   gridItemTypes = constants.ui.gridItemTypes
   gridItemType = gridItemTypes.portrait
-  if container.type = constants.ui.categoryTypes.preview
-    if constants.deviceInfo.limitedUI <> true
-      gridItemType = gridItemTypes.vitg
-    end if
-  else if container.type = constants.ui.categoryTypes.linear
+
+  if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
   else if orientation = gridItemTypes.landscapeLarge
     gridItemType = gridItemTypes.landscapeLarge

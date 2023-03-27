@@ -282,8 +282,8 @@ TBD
   - Make sure that no work is missing in the list and that the included info looks correct
   - Provide QA with a link to the ticket within the roku_qa slack channel
 
-8\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA branch and update private channel. 
- 
+8\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA branch and update private channel.
+
   - Run `$ gulp install --staging`
 
   - In a browser, navigate to [https://developer.roku.com/developer-channels/channels](https://developer.roku.com/developer-channels/channels), sign in, and find the private channel you just created in step 4.
@@ -410,7 +410,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   Note: This will also push the current qa branch to github.
 
-9\. Create a SC ticket with any changes that have been made and give the ticket to the QA team for manual testing. 
+9\. Create a SC ticket with any changes that have been made and give the ticket to the QA team for manual testing.
   - Go to the [ShortCut tool](https://app.shortcut.com/tubi/team/61525f46-2903-4bfc-afa4-83f9d7fefbfb?stories_sort_by=priority&stories_group_by=workflow_state_id)
   - Create a QA ticket by navigating to the following menu items: Create Story in Team> Create Story> Product QA Team> Roku QA Template
   - Run the command `gulp buildQaChanges`, which will build most of the copy for this ticket and place it in your clipboard
@@ -547,8 +547,8 @@ Once all experiment branches for the release have been merged into the `roku_pop
 
 1. Go to https://github.com/adRise/popper-config/actions/workflows/deploy.yml. Click the `Run workflow` dropdown on the right and make sure the branch is `roku_popper_staging` and Target Popper Environment is `staging`. Once confirmed, click the `Run workflow` button.
 
-2. This should make a new Deploy workflow. Click into it. It will take some to complete but once it gets to the Create Git Tag step look at that steps output. It should look somethign like:  
-`* [new tag]           20220525.205906Z_ea68a278 -> 20220525.205906Z_ea68a278`  
+2. This should make a new Deploy workflow. Click into it. It will take some to complete but once it gets to the Create Git Tag step look at that steps output. It should look somethign like:
+`* [new tag]           20220525.205906Z_ea68a278 -> 20220525.205906Z_ea68a278`
 In this case `20220525.205906Z_ea68a278` is our build id.
 
 3. Connect to the VPN
@@ -645,7 +645,7 @@ If you need to get the latest translations from the Crowdin servers, then create
 
 NOTE: Instead of passing the crowdin key, you can set the crowdin key as system environment variable labeled as"ROKU_CROWDIN_KEY". This is actually the preferred way of doing things. Check your system on how to create an environment variable. Also note, that the Crowdin key can be gotten either from the company's LastPass Account or through the [Crowdin website](https://crowdin.com/project/tubiapps/settings#api).
 
-After some time of features being added/removed, some translations may no longer be needed. The following command line script should be used to check for any unnecessary translations. A PR should then be created to remove these no longer-needed translations. Please note that the script also displays other potentially unnecessary things in the codebase: i.e. images. 
+After some time of features being added/removed, some translations may no longer be needed. The following command line script should be used to check for any unnecessary translations. A PR should then be created to remove these no longer-needed translations. Please note that the script also displays other potentially unnecessary things in the codebase: i.e. images.
 
   ```shell
   gulp codeClean

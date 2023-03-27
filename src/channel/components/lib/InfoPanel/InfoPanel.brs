@@ -111,7 +111,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.descriptionFocusButton.blendColor = theme.focusedColor
     m.expireWarning.color = theme.cautionColor
@@ -674,9 +674,7 @@ Function onModeChange()
   tubiLog("InfoPanel.onModeChange")
   resetDefaultState()
 
-  if m.top.mode = m.constants.ui.infoPanelModes.vitg
-    m.infoPanelGroup.appendChild(m.offset)
-  else if m.top.mode = m.constants.ui.infoPanelModes.item
+  if m.top.mode = m.constants.ui.infoPanelModes.item
     ' used for movies and series on the homescreen and similar screens
     m.infoPanelGroup.appendChild(m.offset)
     m.offset.appendChild(m.title)

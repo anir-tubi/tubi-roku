@@ -29,7 +29,6 @@ Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
     setImageParams: cmsApi_setImageParams
     setTupianPosterParam: cmsApi_setTupianPosterParam
     setTupianLandscapeParam: cmsApi_setTupianLandscapeParam
-    setTupianVitgParam: cmsApi_setTupianVitgParam
     getWindowInfo: cmsApi_getWindowInfo
     getFullCategoryId: cmsApi_getFullCategoryId
     getVideoResources: cmsApi_getVideoResources
@@ -183,7 +182,6 @@ Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
     imageParamTypes = [
       "poster"
       "landscape"
-      "vitg"
     ]
     params = m.setImageParams(imageParamTypes, options.params)
   end if
@@ -247,7 +245,6 @@ Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOpti
     imageParamTypes = [
       "poster"
       "landscape"
-      "vitg"
     ]
   end if
 
@@ -321,13 +318,12 @@ End Function
 ' https://docs.google.com/document/d/1T9qL5otwgjIAEW4pPwvKiq0PxIYEK-ExKrFBYRkx6BY
 '
 ' @imageTypes, array - an array of strings corresponding to which types of images to request from Tupian
-'                      Accepted values are "poster", "landscape", "landscapeLarge", "vitg"
+'                      Accepted values are "poster", "landscape", "landscapeLarge"
 ' @existingParams: assocArray, any parameters that have already been defined that need to be added to
 Function cmsApi_setImageParams(imageTypes, existingParams = {})
   posterSize = m.constants.ui.imageSizes.poster
   landscapeSize = m.constants.ui.imageSizes.landscape
   landscapeLargeSize = m.constants.ui.imageSizes.landscapeLarge
-  vitgSize = m.constants.ui.imageSizes.vitg
 
   for each imageType in imageTypes
     if imageType = "poster"
@@ -337,8 +333,6 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {})
       existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_landscape"
     else if imageType = "landscapeLarge"
       existingParams["images[landscapeLarge_tb]"] = "w" + landscapeLargeSize[0].ToStr() + "h" + landscapeLargeSize[1].ToStr() + "_landscape"
-    else if imageType = "vitg"
-      existingParams["images[vitg_tb]"] = "w" + vitgSize[0].ToStr() + "h" + vitgSize[1].ToStr() + "_hero"
     end if
   end for
 
@@ -357,13 +351,6 @@ End Function
 ' @existingParams: assocArray, any parameters that have already been defined that need to be added to
 Function cmsApi_setTupianLandscapeParam(existingParams = {})
   return m.setImageParams(["landscape"], existingParams)
-End Function
-
-
-' Wrapper around setImageParams for the specific case of only adding a Tupian VITG param
-' @existingParams: assocArray, any parameters that have already been defined that need to be added to
-Function cmsApi_setTupianVitgParam(existingParams = {})
-  return m.setImageParams(["vitg"], existingParams)
 End Function
 
 

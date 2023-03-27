@@ -945,7 +945,6 @@ Function getConstants()
       constants.ui.categoryTypes.regular = "regular"
       constants.ui.categoryTypes.channel = "channel"
       constants.ui.categoryTypes.linear = "linear"
-      constants.ui.categoryTypes.preview = "video_preview"
       constants.ui.categoryTypes.historySignedOutUser = "continue_watching_signed_out_user"
 
     constants.ui.likeDislikeActions = {}
@@ -963,7 +962,6 @@ Function getConstants()
 
     constants.ui.infoPanelModes = {}
       'these map to different InfoPanel modes/types
-      constants.ui.infoPanelModes.vitg = "vitg"
       constants.ui.infoPanelModes.item = "item"
       constants.ui.infoPanelModes.continueWatching = "continueWatching"
       constants.ui.infoPanelModes.movie = "movie"
@@ -1139,9 +1137,6 @@ Function getConstants()
       'Sizes of landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.landscape = [384, 216]
 
-      'Sizes of landscape VITG that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.vitg = [981, 552]
-
       'Sizes of linear to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.linear = [384, 144]
       constants.ui.imageSizes.linearExperiment = [978, 660]
@@ -1234,7 +1229,6 @@ Function getConstants()
       constants.ui.gridItemTypes.landscapeLarge = "landscapeLarge"
       constants.ui.gridItemTypes.landscapeNoTitle = "landscapeNoTitle"
       constants.ui.gridItemTypes.linear = "linear"
-      constants.ui.gridItemTypes.vitg = "vitg"  'video in the grid
       constants.ui.gridItemTypes.historySignedOutUser = "continue_watching_signed_out_user"
       constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
 
@@ -1382,7 +1376,7 @@ constants.ui.themes = {}
         inversePrimaryTextColor: defaultLightPrimaryForeground
         inverseSecondaryTextColor: defaultLightTransparentForeground75
     }
-    
+
     constants.ui.themes.kidsMode = {
         id: constants.ui.themeIDs.kidsMode
         focusedColor: kidsDarkPrimaryAccent
@@ -1423,7 +1417,7 @@ constants.ui.themes = {}
         scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground.9.png"
         scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground.9.png"
         gradientBlendColor: holidaysDarkPrimaryBackground
-        
+
         cautionColor: holidaysDarkStatusCaution
         backgroundColor: holidaysDarkPrimaryBackground
         neutralColor: holidaysDarkTransparentForeground20

@@ -267,7 +267,6 @@ Function cmsApi_homeScreenReqInfo_test()
     "is_kids_mode"
     "images[landscape_tb]"
     "images[poster_tb]"
-    "images[vitg_tb]"
     "customParam"
   ]
   headers = [
@@ -287,7 +286,6 @@ Function cmsApi_homeScreenReqInfo_test()
       "is_kids_mode": false
       "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
       "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_landscape"
-      "images[vitg_tb]": "w" + m.cmsApi.constants.ui.imageSizes.vitg[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.vitg[1].ToStr() + "_hero"
       "contentMode": m.cmsApi.constants.ui.contentMode.homescreen
       "customParam": "custom_param_value"
     }
@@ -324,7 +322,6 @@ Function cmsApi_homeScreenReqInfo_test()
   m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
   m.assertEqual(homeInfo.options.params["images[poster_tb]"], homeOptions.params["images[poster_tb]"])
   m.assertEqual(homeInfo.options.params["images[landscape_tb]"], homeOptions.params["images[landscape_tb]"])
-  m.assertEqual(homeInfo.options.params["images[vitg_tb]"], homeOptions.params["images[vitg_tb]"])
   m.assertEqual(homeInfo.options.params["contentMode"], homeOptions.params["contentMode"])
   m.assertEqual(homeInfo.options.params["customParam"], homeOptions.params["customParam"])
   m.assertEqual(homeInfo.options.headers["x-custom-header"], homeOptions.headers["x-custom-header"])
@@ -348,7 +345,6 @@ Function cmsApi_homeScreenReqInfo_test()
   m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
   m.assertEqual(homeInfo.options.params["images[poster_tb]"], homeOptions.params["images[poster_tb]"])
   m.assertEqual(homeInfo.options.params["images[landscape_tb]"], homeOptions.params["images[landscape_tb]"])
-  m.assertEqual(homeInfo.options.params["images[vitg_tb]"], homeOptions.params["images[vitg_tb]"])
   m.assertEqual(homeInfo.options.params["contentMode"], homeOptions.params["contentMode"])
   m.assertEqual(homeInfo.options.params["customParam"], homeOptions.params["customParam"])
   m.assertEqual(homeInfo.options.headers["x-custom-header"], homeOptions.headers["x-custom-header"])
@@ -374,7 +370,6 @@ Function cmsApi_homeScreenReqInfo_test()
   m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
   m.assertEqual(homeInfo.options.params["images[poster_tb]"], homeOptions.params["images[poster_tb]"])
   m.assertEqual(homeInfo.options.params["images[landscape_tb]"], homeOptions.params["images[landscape_tb]"])
-  m.assertEqual(homeInfo.options.params["images[vitg_tb]"], homeOptions.params["images[vitg_tb]"])
   m.assertEqual(homeInfo.options.params["contentMode"], homeOptions.params["contentMode"])
   m.assertEqual(homeInfo.options.params["customParam"], homeOptions.params["customParam"])
   m.assertEqual(homeInfo.options.headers["x-custom-header"], homeOptions.headers["x-custom-header"])
@@ -387,7 +382,6 @@ Function cmsApi_homeScreenReqInfo_test()
   homeOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.linear
   homeOptions.params.delete("images[landscape_tb]")
   homeOptions.params.delete("images[poster_tb]")
-  homeOptions.params.delete("images[vitg_tb]")
   params = [
     "app_id"
     "platform"
@@ -435,7 +429,6 @@ Function cmsApi_categoryReqInfo_test()
     "contents_limit"
     "images[landscape_tb]"
     "images[poster_tb]"
-    "images[vitg_tb]"
     "contentMode"
     "customParam"
   ]
@@ -457,7 +450,6 @@ Function cmsApi_categoryReqInfo_test()
       "contents_limit": 19
       "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
       "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_landscape"
-      "images[vitg_tb]": "w" + m.cmsApi.constants.ui.imageSizes.vitg[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.vitg[1].ToStr() + "_hero"
       "contentMode": m.cmsApi.constants.ui.contentMode.homescreen
       "customParam": "custom_param_value"
     }
@@ -492,7 +484,6 @@ Function cmsApi_categoryReqInfo_test()
   m.assertEqual(categoryInfo.options.params["include_channels"], categoryOptions.params["include_channels"])
   m.assertEqual(categoryInfo.options.params["images[poster_tb]"], categoryOptions.params["images[poster_tb]"])
   m.assertEqual(categoryInfo.options.params["images[landscape_tb]"], categoryOptions.params["images[landscape_tb]"])
-  m.assertEqual(categoryInfo.options.params["images[vitg_tb]"], categoryOptions.params["images[vitg_tb]"])
   m.assertEqual(categoryInfo.options.params["contentMode"], categoryOptions.params["contentMode"])
   m.assertEqual(categoryInfo.options.params["customParam"], categoryOptions.params["customParam"])
   m.assertEqual(categoryInfo.options.headers["x-custom-header"], categoryOptions.headers["x-custom-header"])
@@ -515,7 +506,6 @@ Function cmsApi_categoryReqInfo_test()
   m.assertEqual(categoryInfo.options.params["include_channels"], categoryOptions.params["include_channels"])
   m.assertEqual(categoryInfo.options.params["images[poster_tb]"], categoryOptions.params["images[poster_tb]"])
   m.assertEqual(categoryInfo.options.params["images[landscape_tb]"], categoryOptions.params["images[landscape_tb]"])
-  m.assertEqual(categoryInfo.options.params["images[vitg_tb]"], categoryOptions.params["images[vitg_tb]"])
   m.assertEqual(categoryInfo.options.params["contentMode"], categoryOptions.params["contentMode"])
   m.assertEqual(categoryInfo.options.params["customParam"], categoryOptions.params["customParam"])
   m.assertEqual(categoryInfo.options.headers["x-custom-header"], categoryOptions.headers["x-custom-header"])
@@ -540,7 +530,6 @@ Function cmsApi_categoryReqInfo_test()
   m.assertEqual(categoryInfo.options.params["include_channels"], categoryOptions.params["include_channels"])
   m.assertEqual(categoryInfo.options.params["images[poster_tb]"], categoryOptions.params["images[poster_tb]"])
   m.assertEqual(categoryInfo.options.params["images[landscape_tb]"], categoryOptions.params["images[landscape_tb]"])
-  m.assertEqual(categoryInfo.options.params["images[vitg_tb]"], categoryOptions.params["images[vitg_tb]"])
   m.assertEqual(categoryInfo.options.params["contentMode"], categoryOptions.params["contentMode"])
   m.assertEqual(categoryInfo.options.params["customParam"], categoryOptions.params["customParam"])
   m.assertEqual(categoryInfo.options.headers["x-custom-header"], categoryOptions.headers["x-custom-header"])
@@ -723,7 +712,6 @@ End Function
 Function cmsApi_setImageParams_test()
   posterParam = "w186h267_poster"
   landscapeParam = "w384h216_landscape"
-  vitgParam = "w981h552_hero"
 
   ' test add poster only
   existingParams = {
@@ -739,7 +727,6 @@ Function cmsApi_setImageParams_test()
   m.assertNotInvalid(updatedParams.userid)
   m.assertNotInvalid(updatedParams.is_existing)
   m.assertInvalid(updatedParams["images[landscape_tb]"])
-  m.assertInvalid(updatedParams["images[vitg_tb]"])
   m.assertNotInvalid(updatedParams["images[poster_tb]"])
   m.assertEqual(updatedParams["images[poster_tb]"], posterParam)
 
@@ -756,28 +743,9 @@ Function cmsApi_setImageParams_test()
 
   m.assertNotInvalid(updatedParams.userid)
   m.assertNotInvalid(updatedParams.is_existing)
-  m.assertInvalid(updatedParams["images[vitg_tb]"])
   m.assertInvalid(updatedParams["images[poster_tb]"])
   m.assertNotInvalid(updatedParams["images[landscape_tb]"])
   m.assertEqual(updatedParams["images[landscape_tb]"], landscapeParam)
-
-  ' test add vitg only
-  existingParams = {
-    userid: "1234"
-    is_existing: true
-  }
-
-  imageTypes = [
-    "vitg"
-  ]
-  updatedParams = m.cmsApi.setImageParams(imageTypes, existingParams)
-
-  m.assertNotInvalid(updatedParams.userid)
-  m.assertNotInvalid(updatedParams.is_existing)
-  m.assertInvalid(updatedParams["images[poster_tb]"])
-  m.assertInvalid(updatedParams["images[landscape_tb]"])
-  m.assertNotInvalid(updatedParams["images[vitg_tb]"])
-  m.assertEqual(updatedParams["images[vitg_tb]"], vitgParam)
 
   ' test add all
   existingParams = {
@@ -788,7 +756,6 @@ Function cmsApi_setImageParams_test()
   imageTypes = [
     "poster"
     "landscape"
-    "vitg"
   ]
   updatedParams = m.cmsApi.setImageParams(imageTypes, existingParams)
 
@@ -796,8 +763,6 @@ Function cmsApi_setImageParams_test()
   m.assertNotInvalid(updatedParams.is_existing)
   m.assertNotInvalid(updatedParams["images[poster_tb]"])
   m.assertNotInvalid(updatedParams["images[landscape_tb]"])
-  m.assertNotInvalid(updatedParams["images[vitg_tb]"])
-  m.assertEqual(updatedParams["images[vitg_tb]"], vitgParam)
   m.assertEqual(updatedParams["images[landscape_tb]"], landscapeParam)
   m.assertEqual(updatedParams["images[poster_tb]"], posterParam)
 End Function
@@ -817,7 +782,6 @@ Function cmsApi_setTupianPosterParam_test()
   m.assertNotInvalid(updatedParams.userid)
   m.assertNotInvalid(updatedParams.is_existing)
   m.assertInvalid(updatedParams["images[landscape_tb]"])
-  m.assertInvalid(updatedParams["images[vitg_tb]"])
   m.assertNotInvalid(updatedParams["images[poster_tb]"])
   m.assertEqual(updatedParams["images[poster_tb]"], posterParam)
 End Function
@@ -836,28 +800,7 @@ Function cmsApi_setTupianLandscapeParam_test()
 
   m.assertNotInvalid(updatedParams.userid)
   m.assertNotInvalid(updatedParams.is_existing)
-  m.assertInvalid(updatedParams["images[vitg_tb]"])
   m.assertInvalid(updatedParams["images[poster_tb]"])
   m.assertNotInvalid(updatedParams["images[landscape_tb]"])
   m.assertEqual(updatedParams["images[landscape_tb]"], landscapeParam)
-End Function
-
-
-'@Test unit tests setTupianVitgParam
-Function cmsApi_setTupianVitgParam_test()
-  vitgParam = "w981h552_hero"
-
-  existingParams = {
-    userid: "1234"
-    is_existing: true
-  }
-
-  updatedParams = m.cmsApi.setTupianVitgParam(existingParams)
-
-  m.assertNotInvalid(updatedParams.userid)
-  m.assertNotInvalid(updatedParams.is_existing)
-  m.assertInvalid(updatedParams["images[poster_tb]"])
-  m.assertInvalid(updatedParams["images[landscape_tb]"])
-  m.assertNotInvalid(updatedParams["images[vitg_tb]"])
-  m.assertEqual(updatedParams["images[vitg_tb]"], vitgParam)
 End Function

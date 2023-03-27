@@ -75,16 +75,12 @@ Function init()
   ' initialize the currentColumn variable to keep track of the current focused column item. It is used in the helper to stop the linear video player, but it could be used for other things.
   m.currentColumn = -1
 
-  ' Video in the grid constants
-  m.vitgSlideAmt = 326 'the amount the grid slides up to fit the vitg content item
-  m.vitgMaskOffsetDiff = 352 'the diff in the amount the content area mask is offset in the up direction for vitg
   m.sponsorSlideAmt = 29 'the amount the grid slides up to fit the sponsored header. This is the difference of the heights of the sponsored and normal row titles
   m.sponsorMaskOffsetDiff = 29 'the diff in the amount the content area mask is offset in the up direction for sponsored rows. This is the difference of the heights of the sponsored and normal row titles
   m.linearSlideAmt = -115 'the amount the grid slides up to fit the linear content item
   m.linearMaskOffsetDiff = -99 'the diff in the amount the content area mask is offset in the up direction for the linear news container
 
   m.originalContentAreaTranslation = m.ContentArea.translation
-  m.vitgContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.vitgSlideAmt]
   m.linearContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.linearSlideAmt]
   m.originalContentAreaMaskOffset = m.ContentArea.maskOffset
 
@@ -427,10 +423,8 @@ Function onCurrFocusRowChange()
 
   if categoryEnteringFocus <> invalid
     sSponsorBackgroundURL = ""
-    if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.vitg
-      ' update contentArea translation, only when VITG gain focus
-      expandContentAreaForVitg(rowPercent)
-    else if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
+
+    if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
       ' update contentArea translation, only when linear gain focus
       expandContentAreaForLinear(rowPercent)
     else
@@ -501,14 +495,6 @@ Function expandContentAreaForSponsorship(rowPercent)
 End Function
 
 
-' @rowPercent: float, the percentage that the VITG row is focused
-Function expandContentAreaForVitg(rowPercent)
-  m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.vitgSlideAmt * rowPercent)]
-  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.vitgMaskOffsetDiff * rowPercent)]
-  m.InfoPanel.opacity = 1 - rowPercent
-End Function
-
-
 Function expandContentAreaForLinear(rowPercent)
   m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.linearSlideAmt * rowPercent)]
   m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.linearMaskOffsetDiff * rowPercent)]
@@ -527,8 +513,6 @@ Function populateInfoPanelByContent(focusedContent)
       end if
     else if sType = m.constants.ui.categoryTypes.historySignedOutUser
       populateInfoPanel(m.constants.ui.infoPanelModes.continueWatching, focusedContent)
-    else if sType = m.constants.ui.categoryTypes.preview
-      populateInfoPanel(m.constants.ui.infoPanelModes.vitg, focusedContent)
     '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     else if sType = m.constants.ui.contentTypes.navigate
       populateInfoPanel(m.constants.ui.infoPanelModes.navigateSports, focusedContent)
@@ -688,9 +672,7 @@ End Function
 '@contentNode: content node
 Function populateInfoPanel(mode, contentNode)
   if contentNode <> invalid
-    if mode = m.constants.ui.infoPanelModes.vitg
-      m.InfoPanel.mode = mode
-    else if mode = m.constants.ui.infoPanelModes.item
+    if mode = m.constants.ui.infoPanelModes.item
       populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel)
     else if mode = m.constants.ui.infoPanelModes.linearHomeScreen
       m.InfoPanel.mode = mode

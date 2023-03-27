@@ -21,7 +21,7 @@
     <!-- State of category children: none, loading, partial, loaded -->
     <field id="state" type="string" value="none"/>
 
-    <!-- One of the gridItemTypes in constants (ie. "portrait", "landscape", "vitg").
+    <!-- One of the gridItemTypes in constants (ie. "portrait", "landscape").
          Indicates which type of content will be shown in this category row.
      -->
     <field id="gridItemType" type="string" />
