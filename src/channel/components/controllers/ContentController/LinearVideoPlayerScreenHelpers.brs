@@ -511,23 +511,10 @@ Function animateLinearVideoPlayerToMinState(nDuration = .25, bVisible = true)
 
     clearMinimizedLinearPlayerAnimation()
     m.animationMinimizedLinearPlayer = resizeToLocation(videoPlayer, nWidth, nHeight, nPosition, nDuration)
-    if nDuration > 0 AND m.animationMinimizedLinearPlayer <> invalid
-      m.animationMinimizedLinearPlayer.observeField("state", "onLinearPlayerMinimizedComplete")
-    else
-      '//If the animation is instant (and/or this is on a limited UI device), then call the animation-complete function immediately
-      displayLinearPlayerProgrammingDataOnHomescreen()
-    end if
     videoPlayer.visible = bVisible
   end if
 End Function
 
-
-' The player is done getting to the minimized state
-Function onLinearPlayerMinimizedComplete(msg)
-  if msg.getData() = "stopped"
-    displayLinearPlayerProgrammingDataOnHomescreen()
-  end if
-End Function
 
 
 Function clearMinimizedLinearPlayerAnimation()
@@ -536,16 +523,6 @@ Function clearMinimizedLinearPlayerAnimation()
   end if
   m.animationMinimizedLinearPlayer = invalid
 End Function
-
-
-' Display the programming data for the video player, but only do this on the homescreen
-Function displayLinearPlayerProgrammingDataOnHomescreen()
-  currentScreen = getCurrentScreen()
-  if currentScreen <> invalid AND currentScreen.subType() = "HomeScreen"
-    clearMinimizedLinearPlayerAnimation()
-  end if
-End Function
-
 
 
 Function onLinearVideoPlayerStateWhileInMinState(msg)
@@ -559,8 +536,6 @@ Function onLinearVideoPlayerStateWhileInMinState(msg)
       '//Once the video player has loaded, then display video player
       showHideLinearVideoPlayerSpinner(false)
       videoPlayer.loading = false
-
-      displayLinearPlayerProgrammingDataOnHomescreen()
       startCountdownTimer()
       videoPlayer.visible = true
 

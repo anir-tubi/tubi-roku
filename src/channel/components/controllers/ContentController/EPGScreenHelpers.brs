@@ -346,46 +346,6 @@ Function onEPGProgramSuccess(response)
 End Function
 
 
-' Successfully loaded the program data of one channel.
-' This function is used for fetching the channel's program data for homeScreen.
-Function onEPGChannelProgramSuccess(response, storeInCacheUponSuccess = true)
-  tubiLog("EPGScreenHelpers.onEPGChannelProgramSuccess")
-  if response <> invalid
-    screen = getFromScreenCache(response.requestorID)
-    if screen = invalid
-      screen = getCurrentScreen()
-    end if
-
-    if response.requestorID = screen.id
-      channelData = response.getChild(0)
-      if channelData <> invalid
-        if storeInCacheUponSuccess = true
-          setInContentCache(channelData)
-        end if
-        screen.channelTimeGridContent = channelData
-      end if
-    end if
-  end if
-End Function
-
-
-
-' Unsuccessfully loaded the program data of one channel
-Function onEPGChannelProgramError(response)
-  tubiLog("EPGScreenHelpers.onEPGChannelProgramError")
-  if response <> invalid
-    screen = getFromScreenCache(response.requestorID)
-    if screen = invalid
-      screen = getCurrentScreen()
-    end if
-
-    if response.requestorID = screen.id
-      screen.channelTimeGridContent = invalid
-    end if
-  end if
-End Function
-
-
 ' This function is used for batch of channels
 Function onEpgProgramError(response)
   tubiLog("EPGScreenHelpers.onEpgProgramError ")

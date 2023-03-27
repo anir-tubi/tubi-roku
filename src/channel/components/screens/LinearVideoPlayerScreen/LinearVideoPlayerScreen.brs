@@ -15,7 +15,6 @@ Function init()
   m.top.trackingPageContext = trackingPageInfo
 
   m.NodeHelpers = TubiNodeHelpers()
-  m.ProgrammingData = m.top.findNode("ProgrammingData")
   m.LoadingBackground = m.top.findNode("LoadingBackground")
   m.Loading = m.top.findNode("Loading")
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
@@ -23,7 +22,6 @@ Function init()
   m.LoadingMessage = m.top.findNode("LoadingMessage")
   m.AdsSSAITask = m.top.findNode("PlayerAdsSSAITask")
   m.AdsSSAITask.observeField("isPlayingAds", "onAdChange")
-  m.gradiantOnMinimizedState = m.top.findNode("GradiantOnMinimizedState")
 
   m.Video = m.top.findNode("VideoNode") ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
@@ -39,9 +37,6 @@ Function init()
   m.top.observeField("control", "onControlChange")
   m.top.observeField("pollUrl", "onPollUrlChange")
   m.top.observeField("closeTransport", "hideOverlay")
-  m.top.observeField("channelTimeGridContent", "onChannelTimeGridContentChanged")
-  m.top.observeField("width", "onWidthChange")
-  m.top.observeField("height", "onHeightChange")
 
   m.logo = m.top.findNode("tubiLogo")
   m.backgroundImage = m.top.findNode("backgroundImage")
@@ -395,8 +390,6 @@ End Function
 Function onFullScreenChange()
   if m.top.fullscreen = true
     m.Video.observeFieldScoped("globalCaptionMode", "onCaptionModeChange")
-    m.gradiantOnMinimizedState.visible = false
-    hideProgrammingData()
 
     if m.top.state = "playing"
       if m.VideoOverlay.timeGridContentLoading = false AND m.VideoOverlay.timeGridContent <> invalid AND m.top.allowTransportToAppear = true
@@ -406,22 +399,11 @@ Function onFullScreenChange()
     end if
   else
     m.Video.unobserveFieldScoped("globalCaptionMode")
-    m.gradiantOnMinimizedState.visible = true
-    '//Display program data when minimized (if it is available)
-    setMinimizedInfoPanelProgrammingDataWithChannelTimeGridContent()
   end if
+
   trackFullScreen(m.top.fullscreen)
 End Function
 
-
-Function onWidthChange()
-  m.gradiantOnMinimizedState.width = m.top.width
-  End Function
-
-
-  Function onHeightChange()
-  m.gradiantOnMinimizedState.height = m.top.height
-End Function
 
 
 Function trackFullScreen(bFullScreen)
@@ -905,109 +887,6 @@ End Function
 Function hideOverlay()
   m.VideoOverlay.display = false
 End Function
-
-
-' display the programming data
-Function displayProgrammingData()
-  '//if already visible, then no need to display it
-  if m.ProgrammingData.opacity <= 0
-    '//Set End Position
-    m.ProgrammingData.translation = [0, m.top.height]
-    '//Animate m.ProgrammingData into end position
-    slideFade(m.ProgrammingData, "above", "in", .25, .5)
-  end if
-End Function
-
-
-Function hideProgrammingData()
-  m.ProgrammingData.opacity = 0
-End Function
-
-
-' When the TimeGridContent for a channel has been loaded, then display it in the minimized info panel
-Function onChannelTimeGridContentChanged()
-  setMinimizedInfoPanelProgrammingDataWithChannelTimeGridContent()
-End Function
-
-
-' Set the minimized info panel using m.top.channelTimeGridContent
-Function setMinimizedInfoPanelProgrammingDataWithChannelTimeGridContent()
-  hideProgrammingData()
-
-  if m.top.channelTimeGridContent <> invalid AND m.top.content <> invalid AND m.top.content.id = m.top.channelTimeGridContent.id
-    'if in minimized state and video playing
-    if m.top.fullscreen = false AND m.top.state = "playing" AND m.top.channelTimeGridContent <> invalid AND m.top.channelTimeGridContent.getChildCount() > 0
-
-      programData1 = invalid
-      programData2 = invalid
-      sProgramTitle1 = ""
-      nMinutesLeftOfProgram1 = -1
-      nDurationOfProgram1 = -1
-      sProgramTitle2 = ""
-      sStartTimeProgram2 = ""
-
-      '//go thru the program guide to get the latest 2 programs
-      for i = 0 to m.top.channelTimeGridContent.getChildCount() - 1
-        programCheck = m.top.channelTimeGridContent.getChild(i)
-        if programCheck <> invalid
-          if isProgramLive(programCheck) = true
-            programData1 = programCheck
-            if (i+1) < m.top.channelTimeGridContent.getChildCount()
-              programData2 = m.top.channelTimeGridContent.getChild(i+1)
-            end if
-            exit for
-          end if
-        end if
-      end for
-
-      if programData1 <> invalid AND programData1.title <> invalid
-        '//First, the check that the programData1 is valid. If it is not, then no need to go on as it would look weird to display programData2 w/o displaying programData1
-        sProgramTitle1 = programData1.title
-        if programData1.endTime <> invalid AND programData1.endTime > 0
-
-          now = getCurrentLocalTime()
-          nMinutesLeftOfProgram1 = convertSecondsToMins(programData1.endTime - now)
-          if programData1.startTime <> invalid AND programData1.startTime > 0
-            nDurationOfProgram1 = convertSecondsToMins(programData1.endTime - programData1.startTime)
-          end if
-
-          if programData2 <> invalid
-            if programData2.title <> invalid AND programData2.startTime <> invalid AND programData2.startTime > 0
-              sProgramTitle2 = programData2.title
-              sStartTimeProgram2 = programData2.ShortDescriptionLine1
-            end if
-          end if
-        end if
-      end if
-
-      setMinimizedInfoPanelProgrammingData(sProgramTitle1, sProgramTitle2, nMinutesLeftOfProgram1, nDurationOfProgram1, sStartTimeProgram2)
-
-    end if
-  end if
-End Function
-
-
-
-' Set the minimized info panel with the passed parameters
-' @param program1: String - The title of the 1st program in the lineup
-' @param program2: String - The title of the 2nd program in the lineup
-' @param minutesLeft: integer - The Number of minutes before the current program switches to the next program
-' @param currentDuration: integer - The Number of minutes of the duration of the current program
-' @param time: string - The start time of the 2nd program
-Function setMinimizedInfoPanelProgrammingData(program1 = "", program2 = "", minutesLeft = -1, currentDuration = -1, time = "" )
-  metadata = {
-    channelURI: m.top.content.inlineLogoUri
-    title1: program1
-    title2: program2
-    minutesLeft: minutesLeft
-    currentDuration: currentDuration
-    time: time
-    }
-  m.ProgrammingData.metadata = metadata
-
-  displayProgrammingData()
-End Function
-
 
 
 ' When the overlay reacts to the key press, then ensure the timer that hides the overlay gets prolonged

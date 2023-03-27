@@ -20,8 +20,6 @@
     <!-- INPUT -->
       <!-- Alias fields for the video node -->
       <field id="position" alias="VideoNode.position"/>
-      <field id="width" alias="VideoNode.width"/>
-      <field id="height" alias="VideoNode.height"/>
 
       <!-- New content has been added to the video player -->
       <field id="content" type="node"/>
@@ -41,10 +39,6 @@
       <!-- Is the content of the EPG component loading? -->
       <field id="timeGridContentLoading" type="boolean" alwaysNotify="true" alias="VideoOverlay.timeGridContentLoading"/>
 
-      <!-- When the screen asks for timegrid content for a particular channel, then the response will be set to this field. -->
-      <field id="channelTimeGridContent" type="node" alwaysNotify="true"/>
-
-
       <!-- content that is used to display a channel guide overlaid the video player -->
       <field id="channelsContent" type="node"/>
 
@@ -56,9 +50,6 @@
 
       <!-- Indicator that the outside would like the overlay to be closed -->
       <field id="closeTransport" type="boolean" alwaysNotify="true"/>
-
-      <!-- Should the video player show the programming data. This assumes the player is in minimized state. -->
-      <field id="displayProgrammingData" type="boolean" alwaysNotify="true"/>
 
       <!-- Is video player currently in fullscreen? -->
       <field id="fullscreen" type="boolean" value="false" alwaysNotify="true"/>
@@ -131,10 +122,6 @@
   </interface>
 
   <children>
-    <LinearVideoPlayerMinimizedInfoPanel
-      id="ProgrammingData"
-      opacity="0"
-      translation="[552,0]"/>
     <Video
       id="VideoNode"
       width="1920"
@@ -145,12 +132,6 @@
       enableTrickPlay="false"
       notificationInterval="0.5"
       visible="true" />
-    <Poster
-      id="GradiantOnMinimizedState"
-      width="1920"
-      height="1080"
-      uri="pkg:/images/gradient_linear_minimized_player.webp"
-      visible="false"/>
 
     <Group
       id="Loading"
