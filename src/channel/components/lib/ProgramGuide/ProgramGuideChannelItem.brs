@@ -6,10 +6,10 @@ Function init()
 
   if getExperimentResource("roku_epg_channel_poster_bigger_size", "roku_epg_channel_poster_bigger_size_v1", false).enabled = true
     'TODO:/while graduating this experiment, please remove request.brs, experiments.brs and experimentsMixin also
-    m.posterBg.height="84"
-    m.posterBg.width="84"
-    m.posterBg.loadheight="84"
-    m.posterBg.loadwidth="84"
+    m.poster.height="84"
+    m.poster.width="84"
+    m.poster.loadheight="84"
+    m.poster.loadwidth="84"
   end if
 
 End Function
