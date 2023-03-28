@@ -1591,7 +1591,6 @@ End Function
 ' @contentFromServer: assocArray, AA representation of a single piece of content as
 '                                 returned by various APIs.
 Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromServer)
-
   ' videoResources structure example:
   ' videoResources = [
   '   [
@@ -1619,29 +1618,37 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
   ' has4kHevcStream helps to decide whether 4k/HEVC stream is available for the selected content.
   has4kHevcStream = false
 
-  codecToVideoResourcesIndexMap = {}
+  ' hasOnlyNonDrm helps to decide whether video resources has only non-drm manifests by checking type hlsv3 or hlsv6
+  ' //REMOVE hasOnlyNonDrm once we graduate roku_hlsv6_v1 experiment.
+  hasOnlyNonDrm = true
 
-  if type(contentFromServer.video_resources) = "roArray" AND contentFromServer.video_resources.count() > 0
+  codecToVideoResourcesIndexMap = {}
+  resources = contentFromServer.video_resources
+
+  if type(resources) = "roArray" AND resources.count() > 0
 
     ' Adding isNonDrmContent, if the videoResources has only hlsv6 or hlsv3 stream formats
-    resources = contentFromServer.video_resources
+    for each video in resources
 
-    if contentFromServer.type <> m.constants.ui.categoryTypes.linear AND resources.Count() = 1
-      resource = resources[0]
+      if video.type <> m.constants.player.drmTypes.hlsv6 AND video.type <> m.constants.player.drmTypes.hlsv3
+        hasOnlyNonDrm = false
+        exit for
+      end if
 
-      if resource.codec <> invalid AND resource.codec.replace("VIDEO_CODEC_","") = m.constants.avcCodec AND (resource.type = m.constants.player.drmTypes.hlsv6 OR resource.type = m.constants.player.drmTypes.hlsv3)
-        ' //REMOVE 'isNonDrmContent' field and its references once we graduate roku_hlsv6_v1 experiment.
-        ' isNonDrmContent interface is added to TubiContentNode in order to identify whether video resource has only hlsv6 or hlsv3 content
-        contentNode.addField("isNonDrmContent", "boolean", false)
-        contentNode.isNonDrmContent = true
+    end for
 
-        if m.experiments <> invalid
-          experimentResult = m.experiments.getExperimentResult("roku_hlsv6", "roku_hlsv6_v1")
+    if contentFromServer.type <> m.constants.ui.categoryTypes.linear AND contentFromServer.type <> "l" AND hasOnlyNonDrm = true
 
-          if experimentResult <> invalid AND experimentResult.experiment_name <> invalid AND experimentResult.treatment <> invalid
-            titanVersionOrExperimentVersion = "exp=" + experimentResult.experiment_name + "." + experimentResult.treatment
-          end if
+      ' //REMOVE 'isNonDrmContent' field and its references once we graduate roku_hlsv6_v1 experiment.
+      ' isNonDrmContent interface is added to TubiContentNode in order to identify whether video resource has only hlsv6 or hlsv3 content
+      contentNode.addField("isNonDrmContent", "boolean", false)
+      contentNode.isNonDrmContent = true
 
+      if m.experiments <> invalid
+        experimentResult = m.experiments.getExperimentResult("roku_hlsv6", "roku_hlsv6_v1")
+
+        if experimentResult <> invalid AND experimentResult.experiment_name <> invalid AND experimentResult.treatment <> invalid
+          titanVersionOrExperimentVersion = "exp=" + experimentResult.experiment_name + "." + experimentResult.treatment
         end if
 
       end if
@@ -1651,7 +1658,7 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
     ' Create a "stub" ContentNode with just the DRM-oriented fields populated. This
     ' will make it easy to merge metadata plus drm info into one actionable
     ' contentnode for the video player
-    for each video in contentFromServer.video_resources
+    for each video in resources
 
       resource = {}
       if video.manifest <> invalid
@@ -1700,7 +1707,8 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
       end if
 
       validResource = false
-      if (codec = m.constants.hevcCodec AND has4kHevcStream = true AND hevc4kExpEnabled = true) OR codec = "H264" OR contentFromServer.type = "l"
+
+      if (codec = m.constants.hevcCodec AND has4kHevcStream = true AND hevc4kExpEnabled = true AND hasOnlyNonDrm = false) OR codec = m.constants.avcCodec OR contentFromServer.type = "l"
         validResource = true
       end if
 
