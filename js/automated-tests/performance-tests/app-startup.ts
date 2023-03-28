@@ -1,12 +1,11 @@
-'use strict';
-
-const { ecp, odc, utils } = require('roku-test-automation');
-const {waitForNodeCountStability, exitApplication, waitForApplicationShutdown, waitForAppLaunchBeaconToFire, writeOutTestData } = require('../performance-utils');
+import { ecp, odc, utils } from 'roku-test-automation';
+import { performanceTestUtils } from '../performance-test-utils';
+import { testUtils } from '../test-utils';
 
 describe('app-startup', function () {
   before(async function(){
     // Waiting for the application to fully load and try and make/cache its initial network calls to hopefully remove some of the variability in subsequent run
-    await waitForNodeCountStability();
+    await performanceTestUtils.waitForNodeCountStability();
   });
 
 
@@ -18,10 +17,7 @@ describe('app-startup', function () {
 
   it('app_launch', async function() {
     // Next want to exit the application since deploying auto launches the application and we want to give a more stable boot than the initial deploy does
-    await exitApplication();
-
-    // Wait until the application has shutdown
-    await waitForApplicationShutdown();
+    await testUtils.exitApplication();
 
     const startTime = Date.now();
 
@@ -29,17 +25,17 @@ describe('app-startup', function () {
     await ecp.sendLaunchChannel();
     await odc.startResponsivenessTesting();
 
-    await waitForAppLaunchBeaconToFire();
+    await testUtils.waitForAppLaunchBeaconToFire();
 
     // Start capturing our output data
-    const outputData = {};
+    const outputData = {} as any;
     outputData.launchDuration = Date.now() - startTime;
 
     const {testingTotals} = await odc.getResponsivenessTestingData();
     outputData.responsivenessTesting = testingTotals;
 
     // Waiting for all initial nodes to load to get a better idea of true node count and memory usage
-    const {totalNodes, nodeCountByType} = await waitForNodeCountStability();
+    const {totalNodes, nodeCountByType} = await performanceTestUtils.waitForNodeCountStability();
 
     const chanperf = await ecp.getChanperf();
     outputData.memory = chanperf.plugin.memory;
@@ -47,12 +43,12 @@ describe('app-startup', function () {
     outputData.totalNodes = totalNodes;
     outputData.nodeCountByType = nodeCountByType;
 
-    writeOutTestData(this, outputData);
+    performanceTestUtils.writeOutTestData(this, outputData);
   });
 
 
   it('app_resume', async function() {
-    const observeActiveEventPromise = odc.observeField({
+    const observeActiveEventPromise = odc.onFieldChangeOnce({
       base: 'global',
       keyPath: 'trackingLoggingTask.trackEvent',
       match: {
@@ -62,10 +58,10 @@ describe('app-startup', function () {
       }
     });
 
-    ecp.sendKeyPress(ecp.Key.HOME);
+    await ecp.sendKeyPress(ecp.Key.Home);
 
     // Wait until the application has shutdown
-    await waitForApplicationShutdown();
+    await testUtils.waitForApplicationShutdown();
 
     const startTime = Date.now();
 
@@ -76,18 +72,19 @@ describe('app-startup', function () {
     await observeActiveEventPromise;
 
     // Start capturing our output data
-    const outputData = {};
-    outputData.resumeDuration = Date.now() - startTime;
+    const resumeDuration = Date.now() - startTime;
 
-    const {totalNodes, nodeCountByType} = await waitForNodeCountStability();
+    const {totalNodes, nodeCountByType} = await performanceTestUtils.waitForNodeCountStability();
 
     const chanperf = await ecp.getChanperf();
-    outputData.memory = chanperf.plugin.memory;
+    const outputData = {
+      resumeDuration: resumeDuration,
+      memory: chanperf.plugin.memory,
+      totalNodes: totalNodes,
+      nodeCountByType: nodeCountByType
+    };
 
-    outputData.totalNodes = totalNodes;
-    outputData.nodeCountByType = nodeCountByType;
-
-    writeOutTestData(this, outputData);
+    performanceTestUtils.writeOutTestData(this, outputData);
   });
 
 
@@ -96,10 +93,10 @@ describe('app-startup', function () {
     const {totalNodes: previousTotalNodes} = await odc.storeNodeReferences({includeNodeCountInfo: true});
     await odc.deleteNodeReferences();
 
-    ecp.sendKeyPress(ecp.Key.HOME);
+    await ecp.sendKeyPress(ecp.Key.Home);
 
     // Wait until the application has shutdown
-    await waitForApplicationShutdown();
+    await testUtils.waitForApplicationShutdown();
 
     const startTime = Date.now();
 
@@ -110,28 +107,29 @@ describe('app-startup', function () {
       }
     });
 
-    await waitForAppLaunchBeaconToFire();
+    await testUtils.waitForAppLaunchBeaconToFire();
 
     // Start capturing our output data
-    const outputData = {};
-    outputData.restartDuration = Date.now() - startTime;
+    const restartDuration = Date.now() - startTime;
 
     // Have to wait for modal to appear before we try to remove it
     await utils.sleep(4000);
 
     // Remove the open modal for better node increase measurement
-    await ecp.sendKeyPress(ecp.Key.OK);
+    await ecp.sendKeyPress(ecp.Key.Ok);
 
     // Waiting for all initial nodes to load to get a better idea of true node count and memory usage
-    const {totalNodes, nodeCountByType} = await waitForNodeCountStability();
+    const {totalNodes, nodeCountByType} = await performanceTestUtils.waitForNodeCountStability();
 
     const chanperf = await ecp.getChanperf();
-    outputData.memory = chanperf.plugin.memory;
+    const outputData = {
+      restartDuration: restartDuration,
+      memory: chanperf.plugin.memory,
+      totalNodes: totalNodes,
+      nodeCountByType: nodeCountByType,
+      totalNodesChange: totalNodes - previousTotalNodes
+    };
 
-    outputData.totalNodes = totalNodes;
-    outputData.nodeCountByType = nodeCountByType;
-    outputData.totalNodesChange = totalNodes - previousTotalNodes;
-
-    writeOutTestData(this, outputData);
+    performanceTestUtils.writeOutTestData(this, outputData);
   });
 });

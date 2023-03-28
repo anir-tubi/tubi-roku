@@ -29,10 +29,13 @@ const {listUnusedImages,listUnusedTranslations} = require('./js/codeclean.js');
 const {replaceColorConstants} = require('./js/colorreplace.js');
 
 // Importing functions with Git functionality
-const {NoStackError} = require('./js/utilities')
+const {NoStackError} = require('./js/utilities');
 
 // Importing functions with Git functionality
 const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges} = require('./js/git');
+
+// Importing functions related to Suitest
+const {retrieveSuitestTests, runSuitestTests, convertXpathsToKeyPaths, convertSuitestTest} = require('./js/suitest');
 
 /* Allow some environment variables to drive which config we're building.
    Environment variables are set on options, along with any parameters passed in
@@ -46,7 +49,7 @@ const options = {
   rekeyPkg: '',
   port: 8090,
   telnet: process.env.ROKU_DEV_TELNET
-}
+};
 
 // overwrite the config and/or target default options with passed in arguments;
 // for example a -staging argument will set options.config to 'staging'
@@ -64,7 +67,7 @@ passedArgs.forEach(arg => {
 
   const allowedTelnetConfigs = {
     sametab: true,
-  }
+  };
 
   // only allow args with a single preceding "-", ie. '--staging'
   if (arg.slice(0, 2) === '--' && arg.charAt(2) !== '-') {
@@ -75,7 +78,7 @@ passedArgs.forEach(arg => {
     if (allowedConfigs[strippedArg]) {
       options.config = strippedArg;
     } else if (allowedTelnetConfigs[strippedArg]) {
-      options.telnet = strippedArg
+      options.telnet = strippedArg;
     } else if(strippedArg.split('.').length === 4) {
       //check if the arg is an IP address
       let ipBlocks = strippedArg.split('.');
@@ -93,15 +96,12 @@ passedArgs.forEach(arg => {
 
 log(`PROFILE = ${options.config}`);
 
-/* Timeout for any network traffic to the Roku device */
-const deviceTimeout = 15000;
-
 
 // deletes the contents of the build folder, all of which will be recreated.
 function clean(done) {
-  del.sync(['build/**/*'])
+  del.sync(['build/**/*']);
   done();  //inform gulp that the task has completed.
-};
+}
 
 
 // used by: buildLocal/buildInstalled
@@ -112,7 +112,7 @@ function collect(sources, srcOptions) {
     log(`Adding ${source}`);
   });
   return src(sources, srcOptions)
-        .pipe(dedupe())
+        .pipe(dedupe());
         // uncomment the next line for more info on which files are being collected
         // .pipe(debug())
 }
@@ -163,16 +163,16 @@ function buildInstalled() {
 
     // don't include RALE files if config is not 'dev' or it's disabled
     if (options.config !== 'dev' || settings.raleEnabled !== true) {
-      sources.push('!src/channel/components/controllers/TubiScene/TrackerTask.xml')
+      sources.push('!src/channel/components/controllers/TubiScene/TrackerTask.xml');
     }
 
     // don't include Suitest files if config is not 'qa' and suitest is not enabled
     if (options.config !== 'qa' || settings.suitest === false) {
-      sources.push('!src/channel/components/controllers/Suitest/**')
+      sources.push('!src/channel/components/controllers/Suitest/**');
     }
     // don't include TestAid files if config is production
     if (options.config === 'production') {
-      sources.push('!src/channel/components/screens/SettingsScreen/TestAid/**')
+      sources.push('!src/channel/components/screens/SettingsScreen/TestAid/**');
     }
 
     let srcOptions = {
@@ -184,17 +184,17 @@ function buildInstalled() {
 
     stream.on('end', () => {
       res();
-    })
+    });
   });
 
   return build
     .then(() => {
-      replaceColorConstants("build/local");
+      replaceColorConstants('build/local');
       createSettings(options, 'build/local/source/Settings.brs');
       createManifest(options, 'build/local/manifest', 'manifest');
       return zipAsPromise('build/local/**/*', `tubi_${buildTag}.zip`, 'build/');
     });
-};
+}
 
 
 function buildStarter() {
@@ -301,10 +301,10 @@ function buildStarter() {
       options: generalTaskSrcOptions,
       dest: 'build/starter/components'
     }
-  ]
+  ];
 
   // Loops through each item in the sub task and creates individual promises.
-  const promises = []
+  const promises = [];
   subTaskPaths.forEach(subTaskPath => {
     // Creating promise and adding it to the promises array.
     // Each task promises will be resolved or rejected.
@@ -315,20 +315,20 @@ function buildStarter() {
         })
         .on('error', () => {
           reject();
-        })
-    })
+        });
+    });
     // Pushing the promise to list.
-    promises.push(stream)
+    promises.push(stream);
   });
-  // Adding a promies all which will make sure that success callback will be triggered only after all file moving is completed.
+  // Adding a promises all which will make sure that success callback will be triggered only after all file moving is completed.
   return Promise.all(promises)
     .then(() => {
-      replaceColorConstants("build/starter");
+      replaceColorConstants('build/starter');
       createSettings(options, 'build/starter/source/Settings.brs');
       createManifest(options, 'build/starter/manifest', 'starter_library_manifest');
       return zipAsPromise('build/starter/**/*', `tubi_starter_components_${minorBuildTag}.zip`, 'build/');
-    })
-};
+    });
+}
 
 
 function buildRemote() {
@@ -345,9 +345,9 @@ function buildRemote() {
 
     let sources = [
       // "src/channel/images/**/*",
-      "src/channel/source/lib/**/*",
-      "src/channel/source/3rdparty/**/*",
-      "src/channel/components/**/*",
+      'src/channel/source/lib/**/*',
+      'src/channel/source/3rdparty/**/*',
+      'src/channel/components/**/*',
       //make sure not to include the following files
       '!src/channel/components/tests/**',
       '!src/channel/components/controllers/StarterController/**',
@@ -367,7 +367,7 @@ function buildRemote() {
 
     // don't include TestAid files if config is production
     if (options.config === 'production') {
-      sources.push('!src/channel/components/screens/SettingsScreen/TestAid/**')
+      sources.push('!src/channel/components/screens/SettingsScreen/TestAid/**');
     }
 
     let srcOptions = {
@@ -384,12 +384,12 @@ function buildRemote() {
      * the remote component package instead of the installed package.
      */
     const newImagesFile = `new_images_since/new_images_since_${minorBuildTag}`;
-    const newImages = fs.readFileSync(newImagesFile, "utf8").split('\n').filter(function(e) {
+    const newImages = fs.readFileSync(newImagesFile, 'utf8').split('\n').filter(function(e) {
       e = e.trim();
-      return (!e.startsWith("#") && (e.endsWith("png") || e.endsWith('jpg') || e.endsWith('webp')));
+      return (!e.startsWith('#') && (e.endsWith('png') || e.endsWith('jpg') || e.endsWith('webp')));
     });
     log(`Found ${newImages.length} lines in ${newImagesFile}`);
-    const imagePathRegex = /pkg:\/[0-9a-zA-Z\.\/\-_]*/g;
+    const imagePathRegex = /pkg:\/[0-9a-zA-Z./\-_]*/g;
 
     // prepare a map of new image file paths to make filtering quicker
     let newImagesMap = {};
@@ -424,17 +424,17 @@ function buildRemote() {
 
     stream.on('end', () => {
       res();
-    })
-  })
+    });
+  });
 
   // zip up the remote components
   return build
   .then(() => {
-    replaceColorConstants("build/remote");
+    replaceColorConstants('build/remote');
     createManifest(options, 'build/remote/manifest', 'component_library_manifest');
     return zipAsPromise('build/remote/**/*', `tubi_remote_components_${buildTag}.zip`, 'build/');
   });
-};
+}
 
 
 
@@ -470,7 +470,7 @@ function sideLoad(done) {
   const address = options.target;
   const buildTag = getBuildTag('revision');
   const zipPath = `build/tubi_${buildTag}.zip`;
-  upload(zipPath)
+  return upload(zipPath)
   .then(() => {
     let { settings } = load(options);
 
@@ -478,14 +478,14 @@ function sideLoad(done) {
       done();
     } else {
       return server({
-        host: "0.0.0.0",
+        host: '0.0.0.0',
         port: options.port,
         root: 'build',
         debug: true,
         middleware: () => {
           return [
             serverMiddleware
-          ]
+          ];
         }
       });
     }
@@ -505,7 +505,7 @@ function sideLoad(done) {
     }
   })
   .then(() => {
-    log(`${options.config.toUpperCase()} channel launched.`)
+    log(`${options.config.toUpperCase()} channel launched.`);
 
     if (options.telnet === 'sametab') {
       shell.config.silent = false;
@@ -532,7 +532,7 @@ function packageLocal(done) {
     })
     .then(() => {
       log(`Signing ${zipPath}`);
-      return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build')
+      return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build');
     })
     .then(path => {
       log(`Signed package at ${zipPath}`);
@@ -558,7 +558,7 @@ function packageStarter(done) {
     })
     .then(() => {
       log(`Signing ${zipPath}`);
-      return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build')
+      return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build');
     })
     .then(path => {
       log(`Signed package at ${zipPath}`);
@@ -584,7 +584,7 @@ function packageRemote(done) {
     })
     .then(() => {
       log(`Signing ${zipPath}`);
-      return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build')
+      return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build');
     })
     .then(path => {
       log(`Signed package at ${zipPath}`);
@@ -599,7 +599,7 @@ function packageRemote(done) {
 
 
 function conditionalPackage(done) {
-  let { config } = options
+  let { config } = options;
   let { settings } = load(options);
 
   const configsNotPkgd = {
@@ -617,10 +617,10 @@ function conditionalPackage(done) {
 
 
 function packageAll(done) {
-  log("starting packageAll");
+  log('starting packageAll');
   return packageStarter(done)
   .then(() => packageRemote(done))
-  .then(() => packageLocal(done))
+  .then(() => packageLocal(done));
 }
 
 
@@ -687,6 +687,27 @@ function setStaging(done) {
   }
 }
 
+// force qa on options, so we ensure our build is using the qa config and set other automated test config settings
+function setAutomatedTestsConfig(done) {
+  if(options) {
+    options.config = 'qa';
+    options.overrides = {
+      settings: {
+        suitest: true,
+        injectRtaOnDeviceComponent: true
+      }
+    };
+    done();
+  } else {
+    done(new Error('setAutomatedTestsConfig: options not found.'));
+  }
+}
+
+function runAutomatedTests() {
+  return src(['js/automated-tests/tests/*.ts'], { read: false })
+    .pipe(mocha({}));
+}
+
 
 // force qa on options, so we ensure our build is using the qa config and set other automated test config settings
 function setPerformanceTestsConfig(done) {
@@ -700,7 +721,7 @@ function setPerformanceTestsConfig(done) {
           consoleLoggingEnabled: false
         }
       }
-    }
+    };
     done();
   } else {
     done(new Error('setBenchmarkTestsConfig: options not found.'));
@@ -708,9 +729,9 @@ function setPerformanceTestsConfig(done) {
 }
 
 function runPerformanceTests() {
-  return src(['js/automated-tests/performance-tests/*.js'], { read: false })
+  return src(['js/automated-tests/performance-tests/*.ts'], { read: false })
     .pipe(mocha({}));
-};
+}
 
 
 // force test on options, so we ensure our build is using the test config
@@ -726,12 +747,12 @@ function setTest(done) {
 
 async function preprocessTests() {
   const configSettings = {
-    projectPath: "./src/channel",
+    projectPath: './src/channel',
     testsFilePattern: [
-      "**/tests/**/*.brs",
-      "!**/rooibosDist.brs",
-      "!**/rooibosFunctionMap.brs",
-      "!**/TestsScene.brs"
+      '**/tests/**/*.brs',
+      '!**/rooibosDist.brs',
+      '!**/rooibosFunctionMap.brs',
+      '!**/TestsScene.brs'
     ]
   };
 
@@ -746,9 +767,9 @@ function pushStaging(done) {
   const buildTag = getBuildTag('revision');
   const minorBuildTag = getBuildTag('minor');
   const localRemoteComponentsPath = `build/tubi_remote_components_${buildTag}.pkg`;
-  const s3RemoteComponentsPath = `s3://adrise-bryan-playground/roku-staging/components/tubi_remote_components_${buildTag}.pkg`
+  const s3RemoteComponentsPath = `s3://adrise-bryan-playground/roku-staging/components/tubi_remote_components_${buildTag}.pkg`;
   const localStarterComponentsPath = `build/tubi_starter_components_${minorBuildTag}.pkg`;
-  const s3starterComponentsPath = `s3://adrise-bryan-playground/roku-staging/starter-components/tubi_starter_components_${minorBuildTag}.pkg`
+  const s3starterComponentsPath = `s3://adrise-bryan-playground/roku-staging/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
 
   let pushResult = shell.exec(`aws s3 cp ${localRemoteComponentsPath} ${s3RemoteComponentsPath}`);
   if (!pushResult.stderr) {
@@ -764,7 +785,7 @@ function pushStaging(done) {
 
 
 async function confirmRelease(done) {
-  const msg = 'Are you sure you want to run the release process? This will push branches to Github and create multiple PRs in the appropriate places. (y/n)'
+  const msg = 'Are you sure you want to run the release process? This will push branches to Github and create multiple PRs in the appropriate places. (y/n)';
   const confirmation = await prompts({
     type: 'confirm',
     name: 'confirmRelease',
@@ -772,7 +793,7 @@ async function confirmRelease(done) {
   });
 
   if (!confirmation || !confirmation.confirmRelease) {
-    const errorMsg = 'Release process not confirmed'
+    const errorMsg = 'Release process not confirmed';
     done(new NoStackError(errorMsg));
   }
 }
@@ -838,6 +859,16 @@ exports.compareProd = findCommitsNotOnProductionBranch;
 exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
 exports.addMissingImages = addMissingImagesToRemoteLibrary;
 exports.tasks = listTasks;
+
+// Suitest related
+exports.retrieveSuitestTests = retrieveSuitestTests;
+exports.runSuitestTests = series(setAutomatedTestsConfig, clean, buildInstalled, runSuitestTests);
+exports.convertXpathsToKeyPaths = series(setAutomatedTestsConfig, clean, buildInstalled, convertXpathsToKeyPaths);
+exports.convertSuitestTest = convertSuitestTest;
+
+exports.runAutomatedTests = series(setAutomatedTestsConfig, buildInstalled, runAutomatedTests);
+exports.rerunAutomatedTests = runAutomatedTests;
+
 exports.buildReleaseNotes = buildReleaseNotesOutput;
 exports.buildQaChanges = buildQaChangesOutput;
 exports.runPerformanceTests = series(setPerformanceTestsConfig, clean, buildInstalled, runPerformanceTests);

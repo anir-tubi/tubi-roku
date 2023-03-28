@@ -1,0 +1,34 @@
+{
+  "homeScreenRowList": {
+    "description": "Component on the Home Screen that we can pull content for the Grid from",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList"
+  },
+  "movieScreenRowList": {
+    "description": "Component on the Movie Screen that we can pull content for the Grid from",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#ContentArea.#CategoryGridList.#RowList"
+  },
+  "detailScreenTitle": {
+    "description": "Content title on the detail screen",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#Title"
+  },
+  "backgroundGroup": {
+    "description": "Component that controls background image display",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup",
+    "base": "scene"
+  },
+  "mainMenu": {
+    "description": "Component contains main menu items. Useful for seeing which page is showing or to switch page is showing",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems"
+  },
+  "detailScreenYearAndDuration": {
+    "description": "Component containing year and duration of the current content",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Line1"
+  },
+  "detailScreenMenu": {
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu"
+  },
+  "previewVideoPlayer": {
+    "description": "Component for video preview playback. Useful for checking that video preview is playing the correct file",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#VideoPreviewGroup.#VideoPreviewPlayer.#VideoNode"
+  }
+}

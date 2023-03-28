@@ -1,0 +1,404 @@
+{
+  "tubiEspanolPage": {
+    "elementId": "1176a697-a715-4a34-a2b6-8817aa916f40",
+    "name": "tubiEspanolPage",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList/RowListItem/Group/CategoryGridRowLabel/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName"
+  },
+  "playBackVideoPlayer": {
+    "elementId": "154276eb-4878-4b79-b8a8-f4ed2aeb5775",
+    "name": "playBackVideoPlayer",
+    "xpath": "/TubiScene/ContentController/Group/Group/Group/VideoPreviewPlayer/Video",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#VideoPreviewGroup.#VideoPreviewPlayer.#VideoNode"
+  },
+  "tubiKidsLogo": {
+    "elementId": "184ceefc-8e08-47b1-834b-6351016857a8",
+    "name": "tubiKidsLogo",
+    "xpath": "/TubiScene/ContentController/Group/Group/BackgroundGroup/Group[2]/BackgroundGradientGroup[2]/Poster",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#GradientGroup.#LinearGradient1.#BackgroundGradient"
+  },
+  "exitKidsOption": {
+    "elementId": "1877616e-d328-49de-aec5-617e06d9b744",
+    "name": "exitKidsOption",
+    "xpath": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[2]/LayoutGroup/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.1.#LabelParent.#Label"
+  },
+  "homePageSponsoredByText": {
+    "elementId": "24e563eb-e057-4953-9f68-7839621e277a",
+    "name": "homePageSponsoredByText",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList/RowListItem[11]/Group/CategoryGridRowLabel/LayoutGroup/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#SponsoredBy.#SponsoredByText"
+  },
+  "sideNavItems": {
+    "elementId": "41912c49-7831-4487-9a17-40ff770bd66d",
+    "name": "sideNavItems",
+    "xpath": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[4]/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#subTxt"
+  },
+  "sideNavSignedInLabel": {
+    "elementId": "48cfca48-22a5-46f2-a2d8-9778b9be7183",
+    "name": "sideNavSignedInLabel",
+    "xpath": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent/LayoutGroup/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.0.#LabelParent.#Label"
+  },
+  "homeRowList": {
+    "elementId": "498b58d7-600d-4e92-a859-ccc2970a3fe1",
+    "name": "homeRowList",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList"
+  },
+  "topNavRecommendedRedLabel": {
+    "elementId": "4b0550b0-ae47-4d38-a30e-6e0288ef9a28",
+    "name": "topNavRecommendedRedLabel",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/TopNav/MarkupGrid/TopNavItem/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.0.#BottomLabel"
+  },
+  "topNavRecommendedWhiteLabel": {
+    "elementId": "50b66620-5836-4255-a6f7-63cd1bfaae2e",
+    "name": "topNavRecommendedWhiteLabel",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/TopNav/MarkupGrid/TopNavItem",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.0"
+  },
+  "sideNavHomeIcon": {
+    "elementId": "5153e919-9e7b-4c4f-bfbc-059b3d52b306",
+    "name": "sideNavHomeIcon",
+    "xpath": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[4]/Poster",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#Icon"
+  },
+  "loadingPoster": {
+    "elementId": "56a4d7bf-19cf-4111-a7b4-1fc0cd11c4cc",
+    "name": "loadingPoster",
+    "xpath": "/TubiScene/Poster[2]",
+    "keyPath": "#customSplashPoster"
+  },
+  "topNavForYouLabel": {
+    "elementId": "59f0f94e-167b-4fa9-a315-58010d7e9494",
+    "name": "topNavForYouLabel",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/TopNav/MarkupGrid/TopNavItem/Label[2]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.0.#TopLabel"
+  },
+  "BackgroundGradient": {
+    "elementId": "752a329d-adff-42c4-89ee-0a87af32bb12",
+    "name": "BackgroundGradient",
+    "xpath": "/TubiScene/ContentController/Group/Group/BackgroundGroup/Group[2]/MultipleGradientGroup/Group/BackgroundGradientGroup[2]/Poster",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#GradientGroup.#LeftBottomGradient.#gradientGroup.#gradient_1.#BackgroundGradient"
+  },
+  "NBCDescription": {
+    "elementId": "82a46f39-4b4a-4df5-98a9-11d8e7d60c4f",
+    "name": "NBCDescription",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#Title"
+  },
+  "homeScreenMyListRow": {
+    "elementId": "99883bec-7db7-4f4b-a4e1-5f3b78b6e883",
+    "name": "homeScreenMyListRow",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList/RowListItem[16]/Group/CategoryGridRowLabel/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName"
+  },
+  "homeInfoPanel": {
+    "elementId": "9ce5cc1c-97f3-4dae-a208-f4021f3b257c",
+    "name": "homeInfoPanel",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset"
+  },
+  "liveNewsHomeLinearPlayer": {
+    "elementId": "bb6bcd21-cd9b-4287-996c-bd2d814c238d",
+    "name": "liveNewsHomeLinearPlayer",
+    "xpath": "/TubiScene/ContentController/Group/Group/Group",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#VideoPreviewGroup"
+  },
+  "homeScreenPageBackgroundImage": {
+    "elementId": "d2b5e80e-c43a-444a-ba9e-db8acf38f2d5",
+    "name": "homeScreenPageBackgroundImage",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset"
+  },
+  "homescreenRowList": {
+    "elementId": "d51d0498-32f1-4971-a5b5-4bd3232eadf1",
+    "name": "homescreenRowList",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList"
+  },
+  "homeScreenRatingLabel": {
+    "elementId": "e19ad9ec-b013-4c29-be58-dbdcf4f2cf39",
+    "name": "homeScreenRatingLabel",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup/LayoutGroup/Group/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Rating.#RatingLabel"
+  },
+  "exitKidsGrayedOut": {
+    "elementId": "fbf2c422-9335-46e9-966b-b9fc37506916",
+    "name": "exitKidsGrayedOut",
+    "xpath": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[2]/LayoutGroup/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.1.#LabelParent.#Label"
+  },
+  "topNavNewsLabel": {
+    "elementId": "fd42554d-40c6-4f53-8080-3e1493f32ccb",
+    "name": "topNavNewsLabel",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/TopNav/MarkupGrid/TopNavItem[4]/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.3.#BottomLabel"
+  },
+  "topNavMenu": {
+    "elementId": "fda83e54-2c61-4f1e-ad16-bc1c4fe87de2",
+    "name": "topNavMenu",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/TopNav",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home"
+  },
+  "detailsPageMenu": {
+    "elementId": "2fcefcb8-7828-4d11-8c4f-8f5a7ea56fd0",
+    "name": "detailsPageMenu",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu"
+  },
+  "reactionsButton": {
+    "elementId": "3cd1dd12-7514-46f0-bfea-7d12a04ffb04",
+    "name": "reactionsButton",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid/DetailMenuItem[2]/Poster[2]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.1.#Icon"
+  },
+  "secondaryMenuactive": {
+    "elementId": "4bf3dfd7-ce5d-44f9-b386-78f92d5e049b",
+    "name": "secondaryMenuactive",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid[2]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#SecondaryMenu"
+  },
+  "titleRuntimeYear": {
+    "elementId": "51570323-c2b8-4e90-826e-2de079bb0654",
+    "name": "titleRuntimeYear",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup[2]/LayoutGroup/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#StarringGroup.#StarringPrefix.#StarringTag"
+  },
+  "titleInfoPanel": {
+    "elementId": "7e3cb7c4-fdde-4198-904f-5b6a5db269d6",
+    "name": "titleInfoPanel",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset"
+  },
+  "addToMyListSelected3": {
+    "elementId": "9af7daa2-c21b-4cd2-afed-58ae89f284e3",
+    "name": "addToMyListSelected3",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid/DetailMenuItem[4]/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.3.#DetailsMenuText"
+  },
+  "playButton": {
+    "elementId": "a735450c-2841-4d39-88af-0378c7bf7a0a",
+    "name": "playButton",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid/DetailMenuItem",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.0"
+  },
+  "removeFromMyList": {
+    "elementId": "aba8177e-7f39-4c55-bdb7-205b01b9d25e",
+    "name": "removeFromMyList",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid/DetailMenuItem[3]/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.2.#DetailsMenuText"
+  },
+  "secondaryMenu": {
+    "elementId": "b1b1a3fe-eca8-43b8-8c41-30fcecaf6bde",
+    "name": "secondaryMenu",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid[2]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#SecondaryMenu"
+  },
+  "titleSeriesBackgroundPoster": {
+    "elementId": "b9e76a64-2014-4797-a87a-94f2c84779f2",
+    "name": "titleSeriesBackgroundPoster",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/Group",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#RelatedContentParentGroup"
+  },
+  "titleStarringLabel": {
+    "elementId": "bdcb8ed9-3288-4142-8af0-e6b344fbb31b",
+    "name": "titleStarringLabel",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup[3]/LayoutGroup/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#DirectorGroup.#DirectorPrefix.#DirectorTag"
+  },
+  "titleResumeProgressBar": {
+    "elementId": "c568f1c6-6767-44be-9da6-e97f7050d899",
+    "name": "titleResumeProgressBar",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid/DetailMenuItem/Rectangle",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.0.#ResumeProgressBar"
+  },
+  "titleDescriptionNew": {
+    "elementId": "ce1704ba-87b9-4c5f-8b25-9730691eea63",
+    "name": "titleDescriptionNew",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Group/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
+  },
+  "titleDescription": {
+    "elementId": "e67f0794-4e6c-42ae-a785-c2886c91d0d2",
+    "name": "titleDescription",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Group/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
+  },
+  "rewindButton1x": {
+    "elementId": "02b85834-f166-48d3-927b-576d6f205de9",
+    "name": "rewindButton1x",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[2]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#RewindButton"
+  },
+  "fastForwardButton1x": {
+    "elementId": "12e5823e-2dd3-4147-b5ff-f0b714d6679b",
+    "name": "fastForwardButton1x",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[6]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#FastForwardButton"
+  },
+  "rewindButton3xPS4b": {
+    "elementId": "2645e7a9-a4ef-4202-baa3-6a9641c08dbd",
+    "name": "rewindButton3xPS4b",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[2]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#RewindButton"
+  },
+  "autoplayFirstTitleFocus": {
+    "elementId": "3bae9bcc-087f-4d98-bf3e-97f95993a7e9",
+    "name": "autoplayFirstTitleFocus",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/UpNext/Group/Group[2]/Poster",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextMovieGroup.#FocusBox"
+  },
+  "fastForwardButton3x": {
+    "elementId": "46907876-f15d-4960-b4cd-898472782887",
+    "name": "fastForwardButton3x",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[6]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#FastForwardButton"
+  },
+  "rewindButton3x": {
+    "elementId": "47a606ad-9280-4369-8612-5d78af3bec9f",
+    "name": "rewindButton3x",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[2]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#RewindButton"
+  },
+  "autoplayUpNextScreen": {
+    "elementId": "5f73bb44-9945-4f9f-baaa-949d5044826d",
+    "name": "autoplayUpNextScreen",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/UpNext/Group/Group[2]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextMovieGroup"
+  },
+  "autoplaySecondTitleFocus": {
+    "elementId": "73dfaf95-a64b-43ee-a4fd-dd0e143fa4db",
+    "name": "autoplaySecondTitleFocus",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/UpNext/Group/Group[2]/TargetList",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextMovieGroup.#GridMovie"
+  },
+  "videoPlayerActual": {
+    "elementId": "7de0d52e-42ac-4ddb-b763-adc06abd6cc6",
+    "name": "videoPlayerActual",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Video",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#VideoNode"
+  },
+  "autoplayNextEpisodeLabel": {
+    "elementId": "9140c620-4468-48bf-a1b6-97c0ab6ca5eb",
+    "name": "autoplayNextEpisodeLabel",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/UpNext/Group/Group[3]/InfoPanel/LayoutGroup/LayoutGroup/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextSeriesGroup.#InfoSeries.#infoPanelGroup.#Offset.#Title"
+  },
+  "fastForwardButton2x": {
+    "elementId": "a09bb022-2f81-4c4f-9154-d3048542507b",
+    "name": "fastForwardButton2x",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[6]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#FastForwardButton"
+  },
+  "autoplayLastTitleFocus": {
+    "elementId": "afc95e62-0209-41ea-8ee5-a54aa7f04f95",
+    "name": "autoplayLastTitleFocus",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/UpNext/Group/Group[2]/Poster",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextMovieGroup.#FocusBox"
+  },
+  "rewindButton2xb": {
+    "elementId": "daa408f3-79dd-43dd-8313-08dad98cc871",
+    "name": "rewindButton2xb",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[2]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#RewindButton"
+  },
+  "rewindButton2x": {
+    "elementId": "e50a3511-cc59-47eb-8378-dbecb44291c2",
+    "name": "rewindButton2x",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[2]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#RewindButton"
+  },
+  "parentalControlCheckButton": {
+    "elementId": "95d31b2f-5b81-4695-958c-bca5fef32608",
+    "name": "parentalControlCheckButton",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/ParentalControlsPanel/Group/Group/MarkupList/CheckButton[4]/LayoutGroup/Poster",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#ParentalControlsMenu.3.#BtnLayout.#Check"
+  },
+  "settingsScreen": {
+    "elementId": "de072bcf-c62f-4722-b0c7-88e998ebc08f",
+    "name": "settingsScreen",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen"
+  },
+  "searchResultChannelNameABC": {
+    "elementId": "18c31ad3-5b46-458b-93c1-215e54a149a3",
+    "name": "searchResultChannelNameABC",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/InfoPanel/LayoutGroup/LayoutGroup/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#Episode"
+  },
+  "searchResultsABC": {
+    "elementId": "22712fa3-9b75-49eb-8fa6-7adbe6823bdb",
+    "name": "searchResultsABC",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/InfoPanel/LayoutGroup/LayoutGroup/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#Episode"
+  },
+  "searchResultFoxWeather": {
+    "elementId": "408a43ea-285c-445d-a42c-fb7d7a9c6c9a",
+    "name": "searchResultFoxWeather",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/InfoPanel/LayoutGroup/LayoutGroup/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#Episode"
+  },
+  "searchResultsLiveIcon": {
+    "elementId": "5506ef62-8776-49eb-a33c-16b6ea371c14",
+    "name": "searchResultsLiveIcon",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/InfoPanel/LayoutGroup/LayoutGroup/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#Episode"
+  },
+  "kidsSearchText": {
+    "elementId": "8fc229d2-3a86-48ea-8543-bb68e3a760d0",
+    "name": "kidsSearchText",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchText"
+  },
+  "btnCC_label": {
+    "elementId": "0d766d36-c0f6-47f0-98b8-08309a068f8d",
+    "name": "btnCC_label",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/LinearVideoPlayerScreen/LinearVideoPlayerScreenOverlay/Group/Group/LinearOverlaySideNav/ButtonGroup/Button/Label[2]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen.#VideoOverlay.#overlayParent.#overlayContentArea.#sideNav.#sideNav.#btnCC.#btnCC_label"
+  },
+  "linearEPGFoxSportsDescription": {
+    "elementId": "20d0ae7e-4ef2-4fb3-84e1-ac58bb49135e",
+    "name": "linearEPGFoxSportsDescription",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/EPGHomeScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Group/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#infoPanelParent.#infoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
+  },
+  "epgFullTVGuide": {
+    "elementId": "2792c72a-dd18-4943-b9ba-555979cad59c",
+    "name": "epgFullTVGuide",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/LinearVideoPlayerScreen/LinearVideoPlayerScreenOverlay/Group/Group/LinearOverlaySideNav/ButtonGroup/Button[2]/Label[2]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen.#VideoOverlay.#overlayParent.#overlayContentArea.#sideNav.#sideNav.#btnBack.#btnBack_label"
+  },
+  "linearEPGNHRADescription": {
+    "elementId": "5ec236ce-b2aa-4b19-94e0-99253255fdba",
+    "name": "linearEPGNHRADescription",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/EPGHomeScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Group/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#infoPanelParent.#infoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
+  },
+  "liveNewsFullscreenPlayer": {
+    "elementId": "93fb2f38-757d-459b-a8a6-b4ecf4d6ed49",
+    "name": "liveNewsFullscreenPlayer",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/LinearVideoPlayerScreen",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen"
+  },
+  "linearEPGFoxSportsEnEspanolDescription": {
+    "elementId": "a08a11be-48e1-4e55-a2de-b4cf0bb5ac0f",
+    "name": "linearEPGFoxSportsEnEspanolDescription",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/EPGHomeScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Group/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#infoPanelParent.#infoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
+  },
+  "linearEPGSportsWireDescription": {
+    "elementId": "b12803b6-e2c9-44ec-85d1-dcc7e95ce19f",
+    "name": "linearEPGSportsWireDescription",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/EPGHomeScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Group/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#infoPanelParent.#infoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
+  },
+  "liveTVTitle": {
+    "elementId": "cbc0943f-7118-4998-a9a3-02f7b8be2794",
+    "name": "liveTVTitle",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/EPGHomeScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#infoPanelParent.#infoPanel.#infoPanelGroup.#Offset.#Title"
+  }
+}

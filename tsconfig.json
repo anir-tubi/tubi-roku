@@ -3,6 +3,11 @@
     "outDir": "./build",
     "allowJs": true,
     "checkJs": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noImplicitAny": false,
+    "target": "ES2017",
+    "module": "commonjs",
+    "sourceMap": true,
+    "declaration": true
   },
 }

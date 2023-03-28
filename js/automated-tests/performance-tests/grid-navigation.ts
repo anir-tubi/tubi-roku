@@ -1,12 +1,11 @@
-'use strict';
-const { ecp, odc } = require('roku-test-automation');
-const {waitForNodeCountStability, writeOutTestData } = require('../performance-utils');
-const {expect} = require('chai');
+import { expect } from 'chai';
+import { ecp, odc } from 'roku-test-automation';
+import { performanceTestUtils } from '../performance-test-utils';
 
 describe('grid-navigation', function () {
   before(async function(){
     // want to wait for initial load to finish to give a stable platform to test off of
-    await waitForNodeCountStability();
+    await performanceTestUtils.waitForNodeCountStability();
 
     // Make sure we're focused on the grid before we proceed
     const {node} = await odc.getFocusedNode();
@@ -21,42 +20,42 @@ describe('grid-navigation', function () {
 
   it('horizontal_navigation', async function() {
     // Here we're adding a test to see how long it takes to navigate horizontally from one RowList item to the one to the right of it.
-    const currFocusColumnObservePromise = odc.observeField({
+    const currFocusColumnObservePromise = odc.onFieldChangeOnce({
       base: 'focusedNode',
       keyPath: 'currFocusColumn',
       match: 1
-    })
+    });
     await odc.startResponsivenessTesting();
     const startTime = Date.now();
-    await ecp.sendKeyPress(ecp.Key.RIGHT);
+    await ecp.sendKeyPress(ecp.Key.Right);
     const chanperfPromise = ecp.getChanperf();
     await currFocusColumnObservePromise;
-    const outputData = {};
+    const outputData = {} as any;
     outputData.navigateDuration = Date.now() - startTime;
     outputData.cpuPercent = (await chanperfPromise).plugin.cpuPercent;
     const {testingTotals} = await odc.getResponsivenessTestingData();
     outputData.responsivenessTesting = testingTotals;
-    writeOutTestData(this, outputData);
+    performanceTestUtils.writeOutTestData(this, outputData);
   });
 
 
   it('vertical_navigation', async function() {
     // Here we're adding a test to see how long it takes to navigate vertically from one RowList item to the one to the right of it.
-    const currFocusRowObservePromise = odc.observeField({
+    const currFocusRowObservePromise = odc.onFieldChangeOnce({
       base: 'focusedNode',
       keyPath: 'currFocusRow',
       match: 1
     });
     await odc.startResponsivenessTesting();
     const startTime = Date.now();
-    await ecp.sendKeyPress(ecp.Key.DOWN);
+    await ecp.sendKeyPress(ecp.Key.Down);
     const chanperfPromise = ecp.getChanperf();
     await currFocusRowObservePromise;
-    const outputData = {};
+    const outputData = {} as any;
     outputData.navigateDuration = Date.now() - startTime;
     outputData.cpuPercent = (await chanperfPromise).plugin.cpuPercent;
     const {testingTotals} = await odc.getResponsivenessTestingData();
     outputData.responsivenessTesting = testingTotals;
-    writeOutTestData(this, outputData);
+    performanceTestUtils.writeOutTestData(this, outputData);
   });
 });

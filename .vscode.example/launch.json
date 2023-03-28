@@ -3,63 +3,147 @@
   // Hover to view descriptions of existing attributes.
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
-  "configurations": [{
-    "type": "brightscript",
-    "request": "launch",
-    "name": "Build & Deploy",
-    "host": "${env:ROKU_DEV_TARGET}",
-    "password": "${env:DEV_PASSWORD}",
-    "envFile": "${workspaceFolder}/.vscode/.env",
-    "preLaunchTask": "gulp-build",
-    "sourceDirs": [
-      "${workspaceFolder}/src/channel/"
-    ],
-    "rootDir": "${workspaceFolder}/build/local/",
-    "files": [
-      "**/*"
-    ],
-    "injectRdbOnDeviceComponent": true,
-    "componentLibrariesPort": 8090,
-    "componentLibraries": [{
-      "rootDir": "${workspaceFolder}/build/starter/",
-      "outFile": "tubi_starter_components_${major_version}_${minor_version}.zip",
+  "configurations": [
+    {
+      "type": "brightscript",
+      "request": "launch",
+      "name": "Build & Deploy",
+      "host": "${env:ROKU_DEV_TARGET}",
+      "password": "${env:DEV_PASSWORD}",
+      "envFile": "${workspaceFolder}/.vscode/.env",
+      "preLaunchTask": "gulp-build",
+      // "logLevel": "trace",
+      // "logfilePath": "${workspaceFolder}/build/logs.txt",
+      "sourceDirs": [
+        "${workspaceFolder}/src/channel/"
+      ],
+      "rootDir": "${workspaceFolder}/build/local/",
       "files": [
         "**/*"
       ],
-      "sourceDirs": [
-        "${workspaceFolder}/src/channel/"
+      "stopDebuggerOnAppExit": false,
+      "retainStagingFolder": false,
+      "injectRdbOnDeviceComponent": true,
+      "disableScreenSaver": true,
+      "componentLibrariesPort": 8090,
+      "logLevel": "debug",
+      "componentLibraries": [
+        {
+          "rootDir": "${workspaceFolder}/build/starter/",
+          "outFile": "tubi_starter_components_${major_version}_${minor_version}.zip",
+          "files": [
+            "**/*"
+          ],
+          "sourceDirs": [
+            "${workspaceFolder}/src/channel/"
+          ]
+        },
+        {
+          "rootDir": "${workspaceFolder}/build/remote/",
+          "outFile": "tubi_remote_components_${major_version}_${minor_version}_${build_version}_${revision_version}.zip",
+          "files": [
+            "**/*"
+          ],
+          "sourceDirs": [
+            "${workspaceFolder}/src/channel/"
+          ]
+        }
       ]
-    }, {
-      "rootDir": "${workspaceFolder}/build/remote/",
-      "outFile": "tubi_remote_components_${major_version}_${minor_version}_${build_version}_${revision_version}.zip",
-      "files": [
-        "**/*"
+    },
+    {
+      "name": "Run Unit Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
+      "args": [
+        "test"
       ],
-      "sourceDirs": [
-        "${workspaceFolder}/src/channel/"
+      "cwd": "${workspaceRoot}",
+      "runtimeArgs": [
+        "--nolazy"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Run Automated Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
+      "args": [
+        "runAutomatedTests"
+      ],
+      "cwd": "${workspaceRoot}",
+      "runtimeArgs": [
+        "--nolazy"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Run Performance Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
+      "args": [
+        "runPerformanceTests"
+      ],
+      "cwd": "${workspaceRoot}",
+      "runtimeArgs": [
+        "--nolazy"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug Gulp Specific Command",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
+      "args": [
+        "convertSuitestTest"
+      ],
+      "cwd": "${workspaceRoot}",
+      "runtimeArgs": [
+        "--nolazy"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug Gulp Command",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
+      "args": [
+        "${input:gulpCommands}"
+      ],
+      "cwd": "${workspaceRoot}",
+      "runtimeArgs": [
+        "--nolazy"
+      ],
+      "console": "integratedTerminal"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "gulpCommands",
+      "description": "Name of Gulp command",
+      "default": "addMissingImages",
+      "type": "pickString",
+      "options": [
+        "build",
+        "addMissingImages",
+        "test",
+        "stage",
+        "runSuitestTests",
+        "runAutomatedTests",
+        "runPerformanceTests",
+        "compareProd",
+        "compareCheckedOut",
+        "upload_translations",
+        "download_translations",
+        "buildReleaseNotes",
+        "buildQaChanges",
+        "convertXpathsToKeyPaths",
+        "convertSuitestTest"
       ]
-    }]
-  }, {
-    "name": "Debug Gulp Command",
-    "type": "node",
-    "request": "launch",
-    "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
-    "args": ["${input:gulpCommands}"],
-    "cwd": "${workspaceRoot}",
-    "runtimeArgs": [
-      "--nolazy"
-    ],
-    "console": "integratedTerminal"
-  }],
-  "inputs": [{
-    "id": "gulpCommands",
-    "description": "Name of Gulp command",
-    "default": "addMissingImages",
-    "type": "pickString",
-    "options": [
-      "build",
-      "addMissingImages",
-      "test"
-    ]
-  }]
+    }
+  ]
 }
