@@ -1029,11 +1029,14 @@ Function tubiTracking_getDetailScreenMenuPageMap(constants)
   if constants <> invalid AND constants.ui <> invalid AND constants.ui.detailScreenMenuItemIds <> invalid
     detailScreenMenuItemIds = constants.ui.detailScreenMenuItemIds
     if detailScreenMenuItemIds.playMenuItem <> invalid then map[detailScreenMenuItemIds.playMenuItem] = "PLAY"
+    if detailScreenMenuItemIds.startFromBeginningMenuItem <> invalid then map[detailScreenMenuItemIds.startFromBeginningMenuItem] = "START_FROM_BEGINNING"
     if detailScreenMenuItemIds.resumeMenuItem <> invalid then map[detailScreenMenuItemIds.resumeMenuItem] = "CONTINUE_WATCHING"
     if detailScreenMenuItemIds.watchTrailerMenuItem <> invalid then map[detailScreenMenuItemIds.watchTrailerMenuItem] = "WATCH_TRAILER"
     if detailScreenMenuItemIds.likeMenuItem <> invalid then map[detailScreenMenuItemIds.likeMenuItem] = "LIKE"
     if detailScreenMenuItemIds.dislikeMenuItem <> invalid then map[detailScreenMenuItemIds.dislikeMenuItem] = "DISLIKE"
     if detailScreenMenuItemIds.likeDislikeMenuItem <> invalid then map[detailScreenMenuItemIds.likeDislikeMenuItem] = "LIKE_OR_DISLIKE"
+    if detailScreenMenuItemIds.likeRemoveRatingMenuItem <> invalid then map[detailScreenMenuItemIds.likeRemoveRatingMenuItem] = "LIKE_REMOVE_RATING"
+    if detailScreenMenuItemIds.dislikeRemoveRatingMenuItem <> invalid then map[detailScreenMenuItemIds.dislikeRemoveRatingMenuItem] = "DISLIKE_REMOVE_RATING"
     if detailScreenMenuItemIds.episodesMenuItem <> invalid then map[detailScreenMenuItemIds.episodesMenuItem] = "EPISODES_LIST"
     if detailScreenMenuItemIds.addQueueMenuItem <> invalid then map[detailScreenMenuItemIds.addQueueMenuItem] = "ADD_TO_MY_LIST"
     if detailScreenMenuItemIds.removeQueueMenuItem <> invalid then map[detailScreenMenuItemIds.removeQueueMenuItem] = "REMOVE_FROM_MY_LIST"

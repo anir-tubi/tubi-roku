@@ -711,7 +711,22 @@ End Function
 Function onMenuItemFocused()
   setVisibilityOfSecondaryMenu()
   focused = m.Menu.content.getChild(m.Menu.itemFocused)
-  focusedMenuAnalyticsSection = m.Tracking.detailScreenMenuItemMap[focused.id]
+  focusedMenuAnalyticsSection = ""
+  
+  if focused.id = m.constants.ui.detailScreenMenuItemIds.PlayMenuItem AND m.top.isHistory = true
+    'When we have history, considering the play as Start from beginning.
+    focusedMenuAnalyticsSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.startFromBeginningMenuItem]
+  else if focused.id = m.constants.ui.detailScreenMenuItemIds.LikeDislikeMenuItem
+    if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked
+      focusedMenuAnalyticsSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.likeRemoveRatingMenuItem]
+    else if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.disliked
+      focusedMenuAnalyticsSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.dislikeRemoveRatingMenuItem]
+    else
+      focusedMenuAnalyticsSection = m.Tracking.detailScreenMenuItemMap[focused.id]
+    end if
+  else
+    focusedMenuAnalyticsSection = m.Tracking.detailScreenMenuItemMap[focused.id]
+  end if
 
   newFocusedMenuAnalyticsSection = {
     middle_nav_section: focusedMenuAnalyticsSection
@@ -1234,6 +1249,14 @@ Function setComponentInteractionEventForMenu(componentInteractionValue, menuItem
       else if menuItemId = m.constants.ui.detailScreenMenuItemIds.removeQueueMenuItem
         if menuItemTitle = getTranslation("screenDetails_button_remove_reminder")
           middleNavSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.removeReminderMenuItem]
+        else
+          middleNavSection = m.Tracking.detailScreenMenuItemMap[menuItemId]
+        end if
+      else if menuItemId = m.constants.ui.detailScreenMenuItemIds.LikeDislikeMenuItem
+        if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked
+          middleNavSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.likeRemoveRatingMenuItem]
+        else if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.disliked
+          middleNavSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.dislikeRemoveRatingMenuItem]
         else
           middleNavSection = m.Tracking.detailScreenMenuItemMap[menuItemId]
         end if

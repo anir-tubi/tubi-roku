@@ -1222,6 +1222,9 @@ Function getConstants()
       constants.ui.detailScreenMenuItemIds.seeAllGamesMenuItem = "SeeAllGamesMenuItem"
       constants.ui.detailScreenMenuItemIds.setReminderMenuItem  = "SetReminderMenuItem"
       constants.ui.detailScreenMenuItemIds.removeReminderMenuItem  = "RemoveReminderMenuItem"
+      constants.ui.detailScreenMenuItemIds.likeRemoveRatingMenuItem  = "LikeRemoveRatingMenuItem"
+      constants.ui.detailScreenMenuItemIds.dislikeRemoveRatingMenuItem  = "DislikeRemoveRatingMenuItem"
+      constants.ui.detailScreenMenuItemIds.startFromBeginningMenuItem  = "StartFromBeginningMenuItem"
 
     constants.ui.gridItemTypes = {}
       constants.ui.gridItemTypes.portrait = "portrait"
