@@ -68,13 +68,19 @@ Function getConstants()
     }
 
     lowVram = {
-      "3600X": true  ' QuadCore Stick (2016)
-      "3800X": true  ' Stick (2017)
-      "3900X": true  ' Express (2017)
-      "3910X": true  ' Express+ (2017)
-      "4200X": true  ' 3 (2013)
-      "4210X": true  ' 2 (2015)
-      "4230X": true  ' 3 (2015)
+      "3600X":  true  ' QuadCore Stick (2016)
+      "3800X": 	true  ' Stick (2017)
+      "3900X": 	true  ' Express (2017)
+      "3910X": 	true  ' Express+ (2017)
+      "3930X": 	true  ' Express (2019)
+      "3931X": 	true  ' Express+ 	(2019)
+      "3960X": 	true  ' Express (2022)
+      "4200X": 	true  ' 3 (2013)
+      "4210X": 	true  ' 2 (2015)
+      "4230X": 	true  ' 3 (2015)
+      "8000X": 	true  ' Roku TV midland
+      "D000X": 	true  ' Roku TV Roma
+      "H000X": 	true  ' 2K Roku TV Miami
     }
 
     'models that do not run the system CC overlay/dialog during video playback
@@ -514,7 +520,7 @@ Function getConstants()
       end if
       constants.urls.experiments.evaluate = constants.urls.experiments.baseUrl + "evaluate-namespaces"
 
-    ' Configuring the live news manifest proxy url. 
+    ' Configuring the live news manifest proxy url.
     constants.urls.qaProxy = {}
       constants.urls.qaProxy.urlBase = "https://qa-proxy.staging-public.tubi.io"
       constants.urls.qaProxy.linearManifest = constants.urls.qaProxy.urlBase + "/live-news-manifest/"
