@@ -1,5 +1,6 @@
 Function init()
   m.constants = getConstants()
+  m.global.constants = m.constants
   m._ = rodash()
 
   if m.constants.settings.mode = "dev" AND m.constants.settings.processAnimationLogo = false
