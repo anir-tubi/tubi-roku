@@ -1,4 +1,4 @@
-' ********** Copyright 2016 Nice People At Work.  All Rights Reserved. **********
+' ********** Copyright 2023 Nice People At Work.  All Rights Reserved. **********
 
 Library "Roku_Ads.brs"
 
@@ -9,7 +9,7 @@ end sub
 sub startMonitoring()
 
     m.pluginName = "RokuVideo"
-    m.pluginVersion = "6.5.27-" + m.pluginName
+    m.pluginVersion = "6.5.31-" + m.pluginName
 
     ' Let's cache the segment used on the bitrate to access less to it
     m.bitrateSegment = invalid
@@ -33,6 +33,34 @@ sub startMonitoring()
     ' Notify monitoring startup
     m.top.monitoring = true
     m.needsPlayer = true
+end sub
+
+function getParamsVideoError()
+  params = { "msg": m.top.videoplayer.errorMsg, "errorCode": m.top.videoplayer.errorCode.ToStr() }
+  if m.top.videoplayer.errorStr <> invalid
+  	errormd = m.top.videoplayer.errorStr
+    if m.top.videoplayer.errorinfo <> invalid
+    	if m.top.videoplayer.errorInfo.clipid <> invalid then errormd += ",clip_id:" + m.top.videoplayer.errorInfo.clipid.ToStr()
+        if m.top.videoplayer.errorInfo.ignored <> invalid then errormd += ",ignored:" + m.top.videoplayer.errorInfo.ignored.ToStr()
+        if m.top.videoplayer.errorInfo.source <> invalid then errormd += ",source:" + m.top.videoplayer.errorInfo.source
+        if m.top.videoplayer.errorInfo.category <> invalid then errormd += ",category:" + m.top.videoplayer.errorInfo.category
+    end if
+    params["metadata"] = errormd
+  end if
+  return params
+end function
+
+'This method can be overwritten to control retry scenarios, to keep them in one view
+'so its important to keep it unmodified calling only 'error' to avoid side effects
+sub onVideoError()
+  print "ERROR: "; m.top.videoplayer.error.code.toStr() + ": " + m.top.videoplayer.error.message
+  eventHandler("error", getParamsVideoError())
+end sub
+
+'This method can be overwritten to control retry scenarios, to keep them in one view
+'so its important to keep it unmodified calling only 'stop' to avoid side effects
+sub onStopVideo()
+  eventHandler("stop")
 end sub
 
 function onBufferingStatusChanged(bufferStatus) as void
@@ -69,8 +97,12 @@ sub processPlayerState(newState as string)
         if m.viewManager.isStartSent = false
             eventHandler("play")
         else
-            eventHandler("resume")
-            eventHandler("seeking")
+            if m.viewManager.isPaused = true
+                eventHandler("resume")
+                eventHandler("seeking")
+            else
+                eventHandler("buffering")
+            end if
         end if
     else if newState = "playing"
         'if m.viewManager.isStartSent = true
@@ -99,24 +131,13 @@ sub processPlayerState(newState as string)
         '     YouboraLog("Ignoring 'stopped' state; Video.control is not 'stop'")
         ' endif
     else if newState = "error"
-        params = { "msg": m.top.videoplayer.errorMsg, "errorCode": m.top.videoplayer.errorCode.ToStr() }
-        if m.top.videoplayer.errorStr <> invalid
-            errormd = m.top.videoplayer.errorStr
-            if m.top.videoplayer.errorinfo <> invalid
-                if m.top.videoplayer.errorInfo.clipid <> invalid then errormd += ",clip_id:" + m.top.videoplayer.errorInfo.clipid.ToStr()
-                if m.top.videoplayer.errorInfo.ignored <> invalid then errormd += ",ignored:" + m.top.videoplayer.errorInfo.ignored.ToStr()
-                if m.top.videoplayer.errorInfo.source <> invalid then errormd += ",source:" + m.top.videoplayer.errorInfo.source
-                if m.top.videoplayer.errorInfo.category <> invalid then errormd += ",category:" + m.top.videoplayer.errorInfo.category
-            end if
-            params["metadata"] = errormd
-        end if
-        eventHandler("error", params)
+        onVideoError()
     else if newState = "paused"
         eventHandler("pause")
     else if newState = "finished"
         m.viewManager.isFinished = true
         if m.top.videoplayer.control = "stop"
-            eventHandler("stop")
+            onStopVideo()
         else
             YouboraLog("Ignoring 'stopped' state; Video.control is not 'stop'")
         end if
@@ -139,6 +160,9 @@ sub processMessage(msg, port)
             m.top.unobserveFieldScoped("videoplayer")
             setNewPlayer(["state", "bufferingStatus"])
         else if msg.getField() = "downloadedSegment"
+            if m.viewManager.isJoinSent = false and m.viewManager.isshowingads = false and m.top.videoplayer.state = "playing"
+                eventHandler("join")
+            end if
             downloadedSegment = msg.getData()
             if downloadedSegment <> invalid
                 if downloadedSegment.Status = 0 AND (downloadedSegment.SegType = 0 OR downloadedSegment.SegType = 1 OR downloadedSegment.SegType = 2) AND m.lastChunkSeqNum <> downloadedSegment.Sequence
@@ -254,7 +278,7 @@ end function
 function getBitrate()
     'This is only for HLS and DASH
     m.bitrateSegment = m.top.videoplayer.streamingSegment
-    if m.bitrateSegment <> invalid AND m.bitrateSegment.segType <> 1 'not audio
+    if m.bitrateSegment <> invalid and m.bitrateSegment.segType <> 1 and m.bitrateSegment.segType <> 3 'not audio or captions
         br = m.bitrateSegment.segBitrateBps
     else
         br = -1

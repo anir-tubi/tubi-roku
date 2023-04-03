@@ -17,6 +17,7 @@ sub init()
     m.top.observeField("removePreloader", m.port)
     m.top.observeField("requestHost", m.port)
     m.top.observeField("nextView", m.port)
+    m.top.observeField("close", m.port)
 
     'Init ourselves
 	m.top.functionName = "_run"
@@ -54,6 +55,8 @@ sub _run()
             else if msg.getField() = "nextView"
             	dict = msg.getData()
             	_nextView(dict.live)
+            else if msg.getField() = "close"
+                exit while
             endif   
 
         else if mt = "roUrlEvent" 'request response

@@ -1,4 +1,4 @@
-' ********** Copyright 2016 Nice People At Work.  All Rights Reserved. **********
+' ********** Copyright 2023 Nice People At Work.  All Rights Reserved. **********
 
 sub init()
 
@@ -73,7 +73,7 @@ sub _run()
     YouboraLog("YBPluginGeneric.brs - run")
 
     m.pluginName = "Generic"
-    m.pluginVersion = "6.5.27-" + m.pluginName
+    m.pluginVersion = "6.5.30-" + m.pluginName
 
     m.infoManager = InfoManager(m)
     setOptions(m.top.options)
@@ -112,7 +112,13 @@ sub _run()
 
         if mt = "roSGNodeEvent"
             if msg.getField() = "event" 'Process event from outside
-                invokeHandler(msg.getData())
+                data = msg.getData()
+                if data.handler = "close"
+                    m.viewManager.com.close = true
+                    exit while
+                else
+                    invokeHandler(msg.getData())
+                end if
             else if msg.getField() = "fire" 'Timer callback
                 'm.viewManager.pingCallback()
                 if m.pingTimer.control = "stop" or m.pingTimer.control = "none"

@@ -18,6 +18,7 @@
     <field id = "request" type = "assocarray" />
     <field id = "addPreloader" type = "string" />
     <field id = "removePreloader" type = "string" />
+    <field id = "close" type = "boolean" />
     <field id = "nextView" type = "assocarray" />
 
   </interface>

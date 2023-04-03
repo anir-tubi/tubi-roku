@@ -340,7 +340,7 @@ function InfoManager(plugin, options = invalid)
     this.getAdNumber = function()
         number = m.plugin.getAdNumber()
 
-        if number = invalid
+        if number = invalid or number = 0
             number = 1
         end if
         return number
@@ -349,7 +349,7 @@ function InfoManager(plugin, options = invalid)
     this.getAdNumberInBreak = function()
         number = m.plugin.getAdNumberInBreak()
 
-        if number = invalid
+        if number = invalid or number = 0
             number = 1
         end if
         return number
@@ -424,6 +424,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         end if
         if outParams.DoesExist("email") = false then outParams["email"] = m.options["user.email"]
         if outParams.DoesExist("obfuscateIp") = false then outParams["obfuscateIp"] = m.options["user.obfuscateIp"]
+        if outParams.DoesExist("privacyProtocol") = false then outParams["privacyProtocol"] = m.options["user.privacyProtocol"]
         if outParams.DoesExist("userType") = false
             if m.options["user.type"] = invalid
                 outParams["userType"] = m.options["userType"]
@@ -536,7 +537,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("throughput") = false then outParams["throughput"] = m.getThroughput()
         if outParams.DoesExist("totalBytes") = false then outParams["totalBytes"] = m.getTotalBytes()
         if outParams.DoesExist("playrate") = false then outParams["playrate"] = m.getPlayrate()
-        if outParams.DoesExist("metrics") = false then outParams["metrics"] = m.getVideoMetrics()   
+        if outParams.DoesExist("metrics") = false then outParams["metrics"] = m.getVideoMetrics()
     else if requestName = "bufferEnd"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
         'Avoid sending a playhead of 0
@@ -558,7 +559,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
         if outParams.DoesExist("adNumberInBreak") = false then outParams["adNumberInBreak"] = m.getAdNumberInBreak()
-        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.27 Roku Adnalyzer"
+        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.31 Roku Adnalyzer"
         'Extra params
         nextraparams = 10
         index = 1
@@ -636,7 +637,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
                         end if
                     end if
                     if array[outParams["breakNumber"]] <> invalid
-                        outParams["expectedAds"] = array[outParams["breakNumber"]] 
+                        outParams["expectedAds"] = array[outParams["breakNumber"]]
                     end if
                 end if
             end if
