@@ -236,7 +236,13 @@ Function refocusMenuItem()
     end if
 
   end if
-  focusMenu(true)
+
+  ' Avoid refocusing the menu again if it is already in focus.
+  ' So that we do not fire unnecessary focus analytics events.
+  ' Since we add and remove menu items like during when we click remove from history button.
+  if m.Menu.isInFocusChain() = false
+    focusMenu(true)
+  end if
 End Function
 
 
@@ -649,9 +655,7 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
     'menu item exists, so we need to remove it
     m.Menu.content.removeChildIndex(itemIndex)
 
-    if m.Menu.isInFocusChain() = false
-      refocusMenuItem()
-    end if
+    refocusMenuItem()
 
   else if add = true AND itemIndex = -1
     'we don't have menu item, and need to add one
@@ -679,9 +683,7 @@ Function addRemoveMenuItem(add, itemIndex, itemToAdd = invalid, previousItems = 
       m.Menu.content.appendChild(itemToAdd)
     end if
 
-    if m.Menu.isInFocusChain() = false
-      refocusMenuItem()
-    end if
+    refocusMenuItem()
 
   end if
 End Function
