@@ -54,11 +54,13 @@ settings:
   # testingTimeOffset: "2022-12-18T20:00:00Z"
 
   bs_const:
-    #By default nothing will be printed to debug console.(port : 8085 )
-    #To enable console debuglogs, set consoleLoggingEnabled to true
+    #By default nothing will be printed to debug console.(port : 8085)
+    #To enable console debug logs, set consoleLoggingEnabled to true
     consoleLoggingEnabled: true
     #setting to true will use analytics proxy server and display category slugs and content id in UI
     suitestjs: false
+    # Setting to true will route linear playback manifest request through qa proxy.
+    linearQaProxyEnabled: false
 
   #setting to true will result in suitest being loaded
   suitest: false

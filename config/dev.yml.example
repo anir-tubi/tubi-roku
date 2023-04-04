@@ -67,3 +67,5 @@ settings:
   bs_const:
     consoleLoggingEnabled: true
     consoleLoggingIncludeTimestamp: false # whether to include timestamp in log outputs
+    # Setting to true will route linear playback manifest request through qa proxy.
+    linearQaProxyEnabled: false

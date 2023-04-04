@@ -33,6 +33,8 @@ settings:
     consoleLoggingEnabled: false
     consoleLoggingIncludeTimestamp: false # whether to include timestamp in log outputs
     suitestjs: false
+    # Setting to true will route linear playback manifest request through qa proxy.
+    linearQaProxyEnabled: false
 
 manifest:
   title: "Tubi"

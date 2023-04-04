@@ -1666,7 +1666,7 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
           resource.url = video.manifest.url
 
           ' Below lines of code helps QA with automation by passing the linear manifest url through qa proxy server.
-          #if suitestjs
+          #if linearQaProxyEnabled
             settings = m.constants.settings
             if settings.mode = "qa" AND contentNode.type = m.contentTypes.linear
               requestModule = Request(settings)
