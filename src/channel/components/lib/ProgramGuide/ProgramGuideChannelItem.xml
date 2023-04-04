@@ -8,6 +8,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
@@ -24,8 +25,7 @@
       height="108"
       width="186"
       opacity="1"
-      uri="pkg:/images/ratingBackground.9.png"
-      blendColor="0x000000FF"/>
+      uri="pkg:/images/ratingBackground.9.png"/>
     <Poster
       id="ChannelPoster"
       loadingBitmapUri="pkg:/images/placeholder.jpg"

@@ -8,7 +8,7 @@
 <component name="CategorySeasonListItem" extends="Group" >
   <script type="text/brightscript" uri="CategorySeasonListItem.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
-  <script type="text/brightscript" uri="../GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
     <field id="focusPercent" type="float" value="0.0"/>
@@ -50,8 +50,7 @@
         id="categoryCountText"
         horizAlign="center"
         width="48"
-        translation="[-2,18]"
-        color="0xFF501AFF">
+        translation="[-2,18]">
         <Font
         role="font"
         size="22"

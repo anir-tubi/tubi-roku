@@ -49,7 +49,7 @@ End Function
 
 
 Function onIsLoading()
-  tubiLog("TestingAirPanel.onIsLoading")
+  tubiLog("TestingAidPanel.onIsLoading")
   if m.top.isLoading = true
     m.Spinner.visible = true
     m.ContentGroup.visible = false
@@ -61,7 +61,7 @@ End Function
 
 
 Function onTestingAidPanelItemSelected(msg)
-  tubiLog("TestingAirPanel.onTestingAidPanelItemSelected")
+  tubiLog("TestingAidPanel.onTestingAidPanelItemSelected")
   itemSelected = msg.GetData()
 
   item = m.Menu.Content.getChild(itemSelected)

@@ -1,6 +1,7 @@
 Function init()
   m.buttonBG = m.top.findNode("buttonBG")
   m.label = m.top.findNode("label")
+  m.originalColor = ""  '//the default color based on the theme if no color is passed into the component via the m.top.color field
   m.buttonBG.opacity = m.top.unfocusedBackgroundOpacity
 
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
@@ -8,7 +9,6 @@ Function init()
 
   m.top.observeFieldScoped("width", "onWidthChanged")
   m.top.observeFieldScoped("text", "onTextChanged")
-
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -27,6 +27,7 @@ Function onThemeChange(msg = invalid)
   if theme <> invalid
     m.theme = theme
     m.label.color = theme.primaryTextColor
+    m.originalColor = theme.neutralColor
   end if
 End Function
 
@@ -75,7 +76,12 @@ Function onScreenFocusChange()
     end if
     m.buttonBG.opacity = 1.0
   else
-    m.buttonBG.blendColor = m.top.color
+    if isNonEmptyString(m.top.color) = true
+      '//if the color was set from the outside then use that color
+      m.buttonBG.blendColor = m.top.color
+    else
+      m.buttonBG.blendColor = m.originalColor
+    end if
 
     if m.theme <> invalid
       m.label.color = m.theme.primaryTextColor

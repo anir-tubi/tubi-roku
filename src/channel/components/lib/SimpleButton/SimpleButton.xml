@@ -9,12 +9,14 @@
 <component name="SimpleButton" extends="Group" >
   <script type="text/brightscript" uri="SimpleButton.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
 
     <!-- INPUTS -->
-      <field id="color" type="String" value="0x9699A3"/>
+      <field id="color" type="string"/>
 
       <!-- only set a width for fixed width buttons. -->
       <field id="width" type="integer" />

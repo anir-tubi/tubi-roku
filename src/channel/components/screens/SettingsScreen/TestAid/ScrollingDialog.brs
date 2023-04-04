@@ -9,30 +9,33 @@ Function init()
     "default": {
       "fontSize": {fhd:33,hd:22}
       "fontUri": "pkg:/fonts/Vaud-Medium.ttf"
-      "color": "#EFEFEFFF"
     }
     "subTitle": {
       "fontSize": {fhd:27,hd:18}
       "fontUri": "pkg:/fonts/Vaud-Bold.ttf"
-      "color": "#FFFDD0FF"
     }
     "header":{
       "fontSize": {fhd:40,hd:27}
       "fontUri": "pkg:/fonts/Vaud-Bold.ttf"
-      "color": "#EFEFEFFF"
     }
   }
 
   palette = createObject("roSGNode", "RSGPalette")
-  '//::TODO::colors - find replacement colors mentioned in this file
-  palette.colors = {
-    "DialogFocusColor": "0xFF501AFF"
-    "DialogFocusItemColor" : "0xEFEFEFFF"
-    "DialogBackgroundColor" : "0x2C2C2CFF"
-  }
-  m.top.palette = palette
 
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    palette.colors = {
+      "DialogFocusColor": theme.highlightedTextColor
+      "DialogFocusItemColor" : theme.primaryTextColor
+      "DialogBackgroundColor" : theme.neutralSolidColor
+    }
+    textItem.drawingStyles.default.color = theme.primaryTextColor
+    textItem.drawingStyles.header.color = theme.primaryTextColor
+    textItem.drawingStyles.subTitle.color = theme.primaryTextColor
+  end if
+  m.top.palette = palette
 End Function
+
 
 Function onDialogClose()
   m.top.close = true

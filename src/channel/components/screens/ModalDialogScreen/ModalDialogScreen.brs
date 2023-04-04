@@ -3,7 +3,7 @@ Function init()
   m.top.observeField("title", "formatDialog")
   m.top.observeField("message", "formatDialog")
   m.top.observeField("scrollable", "formatDialog")
-  m.top.observeFieldScoped("focusedChild", "onFocsedChildChange")
+  m.top.observeFieldScoped("focusedChild", "onFocusedChildChange")
   m.ButtonList = m.top.findNode("ButtonList")
   m.ContentArea = m.top.findNode("ContentArea")
   m.DialogBox = m.top.findNode("DialogBox")
@@ -17,18 +17,14 @@ Function init()
 
   m.constants = getConstantsFromGlobal()
   m.top.screenLevel = m.constants.ui.screenLevels.modalDialogScreen
+
+  '//::TODO::colors - Design will eventually add this black color to all themes but until then, hardcode this with the default shadeColor regardless of theme. 
+  '//   when Design adds the color to all themes, then set this color within the onThemeChange() observer using the new theme specific color
+  m.Shade.color = m.constants.ui.themes.default.shadeColor
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
   onThemeChange()
-End Function
-
-
-Function onFocsedChildChange()
-  'if modal loses focus (mainly because videoplayer gains focus or homescreen gains focus), Just close the modal
-  if m.top.hasFocus() = false AND m.top.isInFocusChain() = false
-    m.top.exitButton = "back"
-  end if
 End Function
 
 
@@ -40,10 +36,18 @@ Function onThemeChange(msg = invalid)
   end if
 
   if theme <> invalid
-    m.Shade.color = theme.shadeColor
     m.ScrollableBackground.color = theme.shadeColor
     m.Message.color = theme.primaryTextColor
     m.Title.color = theme.primaryTextColor
+    m.DialogBox.color = theme.neutralSolidColor
+  end if
+End Function
+
+
+Function onFocusedChildChange()
+  'if modal loses focus (mainly because videoplayer gains focus or homescreen gains focus), Just close the modal
+  if m.top.isInFocusChain() = false
+    m.top.exitButton = "back"
   end if
 End Function
 

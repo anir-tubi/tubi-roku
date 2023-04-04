@@ -2,6 +2,7 @@ Function init()
   m.limitedUi = true
 
   m.Shade = m.top.findNode("shade")
+  m.spinnerBox = m.top.findNode("SpinnerBox")
   constants = getConstantsFromGlobal()
   if constants <> invalid
     m.limitedUi = constants.deviceInfo.limitedUi
@@ -49,6 +50,7 @@ Function onThemeChange(msg = invalid)
   
   if theme <> invalid
     m.Shade.color = theme.shadeColor
+    m.spinnerBox.color = theme.neutralSolidColor
   end if
 End Function
 
@@ -68,11 +70,10 @@ Function onDimensionsChange()
   shade.height = m.top.height
 
   ' max size 200x200 for box
-  spinnerBox = m.top.findNode("SpinnerBox")
   rect = calculateRect(200, 200)
-  spinnerBox.translation = [rect.x, rect.y]
-  spinnerBox.width = rect.width
-  spinnerBox.height = rect.height
+  m.spinnerBox.translation = [rect.x, rect.y]
+  m.spinnerBox.width = rect.width
+  m.spinnerBox.height = rect.height
 
   ' max size 66x66 for spinner graphic
   spinner = m.top.findNode("SpinnerPoster")

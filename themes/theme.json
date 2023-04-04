@@ -48,6 +48,17 @@
 								"$description": "secondary copy, input placeholder text, input strokes hover"
 							}
 						},
+						"solid": {
+							"$description": "opaque combination of foreground layered on background colors",
+							"surface-10": {
+								"$value": "#1A1A1A",
+								"$description": "overlay background"
+							},
+							"surface-20": {
+								"$value": "#333333",
+								"$description": "poster skeleton"
+							}
+						},
 						"status": {
 							"$description": "status colors",
 							"success": {
@@ -134,6 +145,17 @@
 							"foreground-75": {
 								"$value": "#000000BF",
 								"$description": "secondary copy, input placeholder text, input strokes hover"
+							}
+						},
+						"solid": {
+							"$description": "opaque combination of foreground layered on background colors",
+							"surface-10": {
+								"$value": "#E5E5E5",
+								"$description": "overlay background"
+							},
+							"surface-20": {
+								"$value": "#CCCCCC",
+								"$description": "poster skeleton"
 							}
 						},
 						"status": {
@@ -226,6 +248,17 @@
 								"$description": "secondary copy, input placeholder text, input strokes hover"
 							}
 						},
+						"solid": {
+							"$description": "opaque combination of foreground layered on background colors",
+							"surface-10": {
+								"$value": "#194496",
+								"$description": "overlay background"
+							},
+							"surface-20": {
+								"$value": "#3359A1",
+								"$description": "poster skeleton"
+							}
+						},
 						"status": {
 							"$description": "status colors",
 							"success": {
@@ -316,6 +349,17 @@
 								"$description": "secondary copy, input placeholder text, input strokes hover"
 							}
 						},
+						"solid": {
+							"$description": "opaque combination of foreground layered on background colors",
+							"surface-10": {
+								"$value": "#1D352F",
+								"$description": "overlay background"
+							},
+							"surface-20": {
+								"$value": "#364C46",
+								"$description": "poster skeleton"
+							}
+						},
 						"status": {
 							"$description": "status colors",
 							"success": {
@@ -353,6 +397,27 @@
 						"border-radius-999": {
 							"$value": "999",
 							"$description": "pill shaped elements"
+						}
+					}
+				}
+			}
+		},
+		"extended": {
+			"dark": {
+				"$description": "design tokens to support additional brand expression",
+				"tokens": {
+					"colors": {
+						"$type": "color",
+						"primary": {
+							"$description": "supplemental brand palette",
+							"brand-purple": {
+								"$value": "#AE1184",
+								"$description": "decorative elements for brand expression"
+							},
+							"brand-blue": {
+								"$value": "#3740B0",
+								"$description": "decorative elements for brand expression"
+							}
 						}
 					}
 				}

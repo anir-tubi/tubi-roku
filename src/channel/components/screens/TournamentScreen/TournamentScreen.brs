@@ -62,7 +62,25 @@ Function init()
   m.TournamentRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
   m.TournamentRefreshTimer.observeField("fire", "onTournamentRefreshTimer")
   m.TournamentRefreshTimer.control = "start"
-End function
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.mask.color = theme.backgroundColor
+  end if
+End Function
 
 
 Function onPreTournament()

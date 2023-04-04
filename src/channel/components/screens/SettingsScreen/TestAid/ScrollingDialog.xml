@@ -2,27 +2,29 @@
 
 <component name="ScrollingDialog" extends="StandardDialog" >
 
-<script type="text/brightscript" uri="ScrollingDialog.brs"/>
-<interface>
-  <field id="text" alias="textItem.text"/>
-  <field id="title" alias="primaryTitle.primaryTitle" />
-</interface>
+  <script type="text/brightscript" uri="ScrollingDialog.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
-<children>
-  <StdDlgTitleArea
-    id="primaryTitle"
-    primaryTitle="Registry" />
-  <StdDlgContentArea>
-      <StdDlgMultiStyleTextItem
-      id="textItem"
-      scrollable="true"
-      text="NO DATA"/>
-  </StdDlgContentArea>
-  <StdDlgButtonArea
-    id="buttonArea" >
-    <StdDlgButton
-      text="Close" />
-  </StdDlgButtonArea>
-</children>
+  <interface>
+    <field id="text" alias="textItem.text"/>
+    <field id="title" alias="primaryTitle.primaryTitle" />
+  </interface>
+
+  <children>
+    <StdDlgTitleArea
+      id="primaryTitle"
+      primaryTitle="Registry" />
+    <StdDlgContentArea>
+        <StdDlgMultiStyleTextItem
+        id="textItem"
+        scrollable="true"
+        text="NO DATA"/>
+    </StdDlgContentArea>
+    <StdDlgButtonArea
+      id="buttonArea" >
+      <StdDlgButton
+        text="Close" />
+    </StdDlgButtonArea>
+  </children>
 
 </component>

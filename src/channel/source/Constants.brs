@@ -1277,10 +1277,10 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
 
 '//The use of the "THEME_" constants will be replaced with hexidecimal color strings during the gulp install process.
 '//Source of JSON theme colors are located in /themes/theme.json which is sourced from:
-'//   https://github.com/adRise/design-tokens/blob/main/src/tokens/themes.json
+'//   https://github.com/adRise/design-tokens/blob/main/src/tokens/themes.tokens.json
 
 
-'//defaul theme
+'//default theme
     '//default dark sub theme
     defaultDarkPrimaryAccent = "THEME_defaultDarkPrimaryAccent"
     defaultDarkPrimaryBackground = "THEME_defaultDarkPrimaryBackground"
@@ -1291,6 +1291,7 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
     defaultDarkTransparentForeground10 = "THEME_defaultDarkTransparentForeground10"
     defaultDarkTransparentForeground20 = "THEME_defaultDarkTransparentForeground20"
     defaultDarkTransparentForeground75 = "THEME_defaultDarkTransparentForeground75"
+    defaultDarkSolidSurface10 = "THEME_defaultDarkSolidSurface10"
     ' defaultDarkStatusSuccess = "THEME_defaultDarkStatusSuccess"   '//::NOTE:: not currently being used
     defaultDarkStatusCaution = "THEME_defaultDarkStatusCaution"
     defaultDarkStatusAlert = "THEME_defaultDarkStatusAlert"
@@ -1311,6 +1312,7 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
     kidsDarkTransparentForeground10 = "THEME_kidsDarkTransparentForeground10"
     kidsDarkTransparentForeground20 = "THEME_kidsDarkTransparentForeground20"
     kidsDarkTransparentForeground75 = "THEME_kidsDarkTransparentForeground75"
+    kidsDarkSolidSurface10 = "THEME_kidsDarkSolidSurface10"
     ' kidsDarkStatusSuccess = "THEME_kidsDarkStatusSuccess"   '//::NOTE:: not currently being used
     kidsDarkStatusCaution = "THEME_kidsDarkStatusCaution"
     kidsDarkStatusAlert = "THEME_kidsDarkStatusAlert"
@@ -1331,6 +1333,7 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
     holidaysDarkTransparentForeground10 = "THEME_holidaysDarkTransparentForeground10"
     holidaysDarkTransparentForeground20 = "THEME_holidaysDarkTransparentForeground20"
     holidaysDarkTransparentForeground75 = "THEME_holidaysDarkTransparentForeground75"
+    holidaysDarkSolidSurface10 = "THEME_holidaysDarkSolidSurface10"
     ' holidaysDarkStatusSuccess = "THEME_holidaysDarkStatusSuccess"   '//::NOTE:: not currently being used
     holidaysDarkStatusCaution = "THEME_holidaysDarkStatusCaution"
     holidaysDarkStatusAlert = "THEME_holidaysDarkStatusAlert"
@@ -1368,6 +1371,7 @@ constants.ui.themes = {}
         neutralColor: defaultDarkTransparentForeground20
         neutralColor2: defaultDarkTransparentForeground10
         neutralColor3: defaultDarkTransparentForeground5
+        neutralSolidColor: defaultDarkSolidSurface10
         backgroundColorLight: defaultDarkPrimaryForeground
         backgroundColorLight2: defaultDarkTransparentForeground75
         shadeColor: defaultDarkTransparentBackground75
@@ -1378,7 +1382,6 @@ constants.ui.themes = {}
         textDarkColor: defaultDarkPrimaryBackground
         secondaryTextColor: defaultDarkTransparentForeground75
         focusedTextColor: defaultDarkPrimaryForeground
-        highlightedTextColor: defaultDarkPrimaryAccent
         keyboardFocusedTextColor: defaultDarkPrimaryForeground
 
         inverseBackgroundColor: defaultLightPrimaryBackground
@@ -1400,6 +1403,7 @@ constants.ui.themes = {}
         neutralColor: kidsDarkTransparentForeground20
         neutralColor2: kidsDarkTransparentForeground10
         neutralColor3: kidsDarkTransparentForeground5
+        neutralSolidColor: kidsDarkSolidSurface10
         backgroundColorLight: kidsDarkPrimaryForeground
         backgroundColorLight2: kidsDarkTransparentForeground75
         shadeColor: kidsDarkTransparentBackground75
@@ -1410,7 +1414,6 @@ constants.ui.themes = {}
         textDarkColor: kidsDarkPrimaryBackground
         secondaryTextColor: kidsDarkTransparentForeground75
         focusedTextColor: kidsDarkPrimaryBackground
-        highlightedTextColor: kidsDarkPrimaryAccent
         keyboardFocusedTextColor: kidsDarkPrimaryBackground
 
         inverseBackgroundColor: kidsLightPrimaryBackground
@@ -1432,6 +1435,7 @@ constants.ui.themes = {}
         neutralColor: holidaysDarkTransparentForeground20
         neutralColor2: holidaysDarkTransparentForeground10
         neutralColor3: holidaysDarkTransparentForeground5
+        neutralSolidColor: holidaysDarkSolidSurface10
         backgroundColorLight: holidaysDarkPrimaryForeground
         backgroundColorLight2: holidaysDarkTransparentForeground75
         shadeColor: holidaysDarkTransparentBackground75
@@ -1442,7 +1446,6 @@ constants.ui.themes = {}
         textDarkColor: holidaysDarkPrimaryBackground
         secondaryTextColor: holidaysDarkTransparentForeground75
         focusedTextColor: holidaysDarkPrimaryForeground
-        highlightedTextColor: holidaysDarkPrimaryAccent
         keyboardFocusedTextColor: holidaysDarkPrimaryForeground
 
         inverseBackgroundColor: holidaysLightPrimaryBackground

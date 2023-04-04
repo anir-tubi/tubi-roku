@@ -33,15 +33,12 @@
     <Rectangle
       id="Shade"
       opacity="0.8"/>
-    <!--::TODO::colors - 0x2C2C2CFF should have a different standard color -->
     <Rectangle
       id="SpinnerBox"
       height="200"
       width="200"
       translation="[0,0]"
-      visible="false"
-      color="0x2C2C2CFF"/>
-
+      visible="false"/>
     <Group
       id="PosterOrMessage">
       <Poster

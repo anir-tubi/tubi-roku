@@ -53,10 +53,8 @@
       height="1080"
       opacity="0.8"
       translation="[0,0]"/>
-    <!--::TODO::colors - 0x2C2C2CFF should be associated with a possible different standards UIO color -->
     <Rectangle
       id="DialogBox"
-      color="0x2C2C2CFF"
       width="960"
       height="540"
       translation="[480,270]">

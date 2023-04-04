@@ -12,6 +12,12 @@ Function init()
     m.poster.loadwidth="84"
   end if
 
+  
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    m.posterBg.blendColor = theme.backgroundColor
+  end if
+
 End Function
 
 

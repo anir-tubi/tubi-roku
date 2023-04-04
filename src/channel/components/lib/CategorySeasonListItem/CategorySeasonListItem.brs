@@ -25,8 +25,6 @@ Function onThemeChange(msg = invalid)
   if theme <> invalid
     m.categoryCountText.color = theme.focusedColor
     m.categoryText.color = theme.primaryTextColor
-    '//::TODO::colors - is this the right color to replace FF501AFF that is located in the XML?
-    ' m.categoryCountText.color = theme.cautionColor
   end if
 End Function
 
