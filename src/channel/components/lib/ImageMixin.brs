@@ -1,6 +1,6 @@
-' Replaces "{size} with either fhd or hd depending on the resolution the device is running at"
+' Replaces "$$RES$$ with either fhd or hd depending on the resolution the device is running at"
 Function setImageUriSize(uri, constants = m.constants)
-  searchFor = "{size}"
+  searchFor = "$$RES$$"
   if uri.instr(searchFor) >= 0
     if constants = invalid
       constants = getConstantsFromGlobal()

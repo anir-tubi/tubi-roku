@@ -75,7 +75,7 @@
       height="1080"
       translation="[0,0]"
       opacity="0.0"
-      uri="pkg:/images/up-next-gradient-{size}.9.png"/>
+      uri="pkg:/images/up-next-gradient-$$RES$$.9.png"/>
     <Group
       id="UpNextUI"
       opacity="0.0">
@@ -112,7 +112,7 @@
           translation="[0,688]"/>
         <Poster
           id="FocusBox"
-          uri="pkg:/images/selector-{size}.9.png"/>
+          uri="pkg:/images/selector-$$RES$$.9.png"/>
         <Label
           id="CountdownLabelMovie"
           translation="[354,638]"
@@ -138,7 +138,7 @@
           id="GridSeries"
           itemComponentName="UpNextPoster"
           itemSize="[430,242]"
-          focusBitmapUri="pkg:/images/selector-{size}.9.png"
+          focusBitmapUri="pkg:/images/selector-$$RES$$.9.png"
           numColumns="1"
           numRows="1"
           translation="[85,688]" />

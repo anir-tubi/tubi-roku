@@ -734,7 +734,7 @@ Function onMenuItemFocused()
   setVisibilityOfSecondaryMenu()
   focused = m.Menu.content.getChild(m.Menu.itemFocused)
   focusedMenuAnalyticsSection = ""
-  
+
   if focused.id = m.constants.ui.detailScreenMenuItemIds.PlayMenuItem AND m.top.isHistory = true
     'When we have history, considering the play as Start from beginning.
     focusedMenuAnalyticsSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.startFromBeginningMenuItem]
@@ -884,7 +884,7 @@ Function setVisibilityOfSecondaryMenu()
     alignSecondaryMenuWithMenu()
 
     m.SecondaryMenu.visible = true
-    m.Menu.focusFootprintBitmapUri = "pkg://images/menu-focus-{size}.9.png"
+    m.Menu.focusFootprintBitmapUri = "pkg://images/menu-focus-$$RES$$.9.png"
 
     theme = getThemeFromGlobal()
 

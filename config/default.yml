@@ -48,8 +48,8 @@ manifest:
   # If we ever add "sd" or "hd", the workaround will also need to be removed.
   ui_resolutions: "fhd"
   # Provides a flexible way to specify graphical image URIs that are automatically modified to replace a specified string with a string that gets a resolution-specific graphical image.
-  # eg: "pkg:/images/selector-{size}.9.png" will be chagned to "pkg:/images/selector-fhd.9.png" at runtime, if player supports full high-definition resolution.
-  uri_resolution_autosub: "{size},sd,hd,fhd"
+  # eg: "pkg:/images/selector-$$RES$$.9.png" will be chagned to "pkg:/images/selector-fhd.9.png" at runtime, if player supports full high-definition resolution.
+  uri_resolution_autosub: "$$RES$$,sd,hd,fhd"
   requires_widevine_drm: 1
   requires_widevine_version: "1.0"
   supports_input_launch: 1

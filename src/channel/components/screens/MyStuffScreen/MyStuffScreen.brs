@@ -41,9 +41,9 @@ Function init()
   'Content area
   m.RowList = m.top.findNode("RowList")
   m.GuestMenu = m.top.findNode("GuestMenu")
-  m.GuestMenu.focusBitmapUri = "pkg:/images/menu-focus-{size}.9.png"
-  m.RowList.focusBitmapUri = "pkg:/images/selector-{size}.9.png"
-  m.GuestMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-{size}.9.png"
+  m.GuestMenu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
+  m.RowList.focusBitmapUri = "pkg:/images/selector-$$RES$$.9.png"
+  m.GuestMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-$$RES$$.9.png"
 
   defaultGuestMenuWidth = m.GuestMenu.itemSize[0]
   signInOutButton = m.top.findNode("SignInOutButton")

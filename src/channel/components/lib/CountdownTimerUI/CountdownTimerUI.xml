@@ -36,7 +36,7 @@
         width="210"
         height="41"
         opacity=".26"
-        uri="pkg:/images/tab_short_component_alt_{size}.9.png"/>
+        uri="pkg:/images/tab_short_component_alt_$$RES$$.9.png"/>
       <LayoutGroup
         id="TextAndIconLayoutGroup"
         layoutDirection="horiz"

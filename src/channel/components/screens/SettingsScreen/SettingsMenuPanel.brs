@@ -4,9 +4,9 @@ Function init()
   m.SettingsMenuGroup = m.top.findNode("SettingsMenuGroup")
   m.top.list = m.SettingsMenu
 
-  m.SettingsMenu.focusBitmapUri = "pkg:/images/menu-focus-{size}.9.png"
+  m.SettingsMenu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
 
-  m.SettingsMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-{size}.9.png"
+  m.SettingsMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-$$RES$$.9.png"
 
   m.SignInOutButtonContent = m.top.findNode("SignInOutButton")
   m.top.observeField("focusedChild", "onComponentFocus")

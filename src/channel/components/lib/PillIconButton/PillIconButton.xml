@@ -27,7 +27,7 @@
       id="Background"
       width="127"
       height="60"
-      uri="pkg:/images/live_tv_button_{size}.9.png"
+      uri="pkg:/images/live_tv_button_$$RES$$.9.png"
       loadSync="true"
       visible="true" />
     <LayoutGroup

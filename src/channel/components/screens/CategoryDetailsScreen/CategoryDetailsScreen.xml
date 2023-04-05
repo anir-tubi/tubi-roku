@@ -126,7 +126,7 @@
       numColumns="8"
       fadeFocusFeedbackWhenAutoScrolling="true"
       vertFocusAnimationStyle="fixedFocus"
-      focusBitmapUri="pkg:/images/selector-{size}.9.png"/>
+      focusBitmapUri="pkg:/images/selector-$$RES$$.9.png"/>
 
     <Spinner
       id="ChannelDetailSpinner"

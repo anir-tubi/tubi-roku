@@ -44,7 +44,7 @@
       id="buttonBG"
       width="0"
       height="0"
-      uri="pkg:/images/menu-focus-{size}.9.png"
+      uri="pkg:/images/menu-focus-$$RES$$.9.png"
       visible="false"
       translation="[0,0]"/>
 
@@ -76,7 +76,7 @@
       visible="false" />
     <TextIcon
       id="badgeLabel"
-      uri="pkg:/images/tag-rounded-rectangle-background-pull-{size}.9.png"
+      uri="pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
       visible="false" />
   </children>
 </component>

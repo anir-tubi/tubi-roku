@@ -9,7 +9,7 @@ Function init()
   m.top.enableRenderTracking = true
   m.top.observeFieldScoped("show", "onShow")
   m.top.opacity = 0
-  m.infoPaneBg.uri = "pkg:/images/tab_short_component_alt_{size}.9.png"
+  m.infoPaneBg.uri = "pkg:/images/tab_short_component_alt_$$RES$$.9.png"
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")

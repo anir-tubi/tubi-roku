@@ -123,7 +123,7 @@
           width="300">
           <Poster
             id="AgeVerificationYearBg"
-            uri="pkg:/images/menu-focus-{size}.9.png"
+            uri="pkg:/images/menu-focus-$$RES$$.9.png"
             width="300"
             height="144"
             opacity="1.0"/>

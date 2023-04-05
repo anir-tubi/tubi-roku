@@ -1,6 +1,6 @@
 Function init()
   m.top.drawFocusFeedbackOnTop = false
-  m.top.focusBitmapUri = "pkg://images/menu-focus-{size}.9.png"
+  m.top.focusBitmapUri = "pkg://images/menu-focus-$$RES$$.9.png"
 
   theme = getThemeFromGlobal()
   if theme <> invalid

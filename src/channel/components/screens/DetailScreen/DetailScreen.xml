@@ -325,7 +325,7 @@
             itemSpacing="[12,12]"
             fadeFocusFeedbackWhenAutoScrolling="true"
             horizFocusAnimationStyle="fixedFocus"
-            focusBitmapUri="pkg:/images/selector-{size}.9.png"
+            focusBitmapUri="pkg:/images/selector-$$RES$$.9.png"
             translation="[0,63]"/>
           <Label
             id="RelatedTitle"

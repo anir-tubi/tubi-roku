@@ -24,7 +24,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.subTxt.color = theme.backgroundColorLight2
     m.Label.color = theme.primaryTextColor
@@ -67,11 +67,11 @@ Function onContentChange(data)
             if theme <> invalid
               m.sideIconLabel.fontColor = theme.backgroundColor
             end if
-            
+
             m.sideIconLabel.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
             m.sideIconLabel.padding = [12, 9]
             m.sideIconLabel.text = item.shortDescriptionLine2
-            m.sideIconLabel.uri = "pkg:/images/tag-rounded-rectangle-background-pull-{size}.9.png"
+            m.sideIconLabel.uri = "pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
             m.sideIconLabel.opacity = 0
             m.sideIconLabel.translation = [0, 10]
           end if
@@ -118,7 +118,7 @@ Function onActiveChange()
 
   if m.top.itemContent.active = true
     if m.top.itemContent.turnedOn <> false
-    
+
       m.Icon.opacity = 1
 
       m.subTxt.opacity = 0

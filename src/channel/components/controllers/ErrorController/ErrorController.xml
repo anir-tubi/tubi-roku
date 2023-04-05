@@ -30,7 +30,7 @@
       loadSync="true"
       width="1920"
       height="1080"
-      uri="pkg:/images/splash-{size}.jpg"/>
+      uri="pkg:/images/splash-$$RES$$.jpg"/>
 
     <TrackingLoggingTask
       id="TrackingLoggingTask" />

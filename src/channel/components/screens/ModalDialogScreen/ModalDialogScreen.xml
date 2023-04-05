@@ -97,7 +97,7 @@
               width="802"
               height="300"
               visible="false"
-              scrollbarThumbBitmapUri="pkg:/images/menu-disabled-focus-{size}.9.png"
+              scrollbarThumbBitmapUri="pkg:/images/menu-disabled-focus-$$RES$$.9.png"
               translation="[10,10]">
               <Font
                 role="font"
