@@ -17,7 +17,6 @@ Function init()
   }
 
   m.top.screenLevel = m.constants.ui.screenLevels.confirmPasswordScreen
-  m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
 End Function
 
 
