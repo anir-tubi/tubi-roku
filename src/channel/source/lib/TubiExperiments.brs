@@ -56,6 +56,11 @@ Function TubiExperiments(constants) as Object
         roku_linear_epg_position_v1 : {"enabled": true}
       }
 
+      roku_see_all_container: {
+        roku_see_all_container_first_v1 : {"enabled": false}
+        roku_see_all_container_seventeen_v1: {"enabled" : false}
+        roku_show_all_floating_education_v1 : {"enabled": false}
+      }
 
       roku_hlsv6: {
         roku_hlsv6_v1 : {"enabled": false}
@@ -287,6 +292,10 @@ End Function
 ' experimentName: string, name of experiment
 '
 ' returns the experiment result in assocarray if experiment is running in popper, or else returns invalid
+'   eg. "experiment_name": "qa.roku_in_pod_stitching_v2",
+'       "treatment": "in_pod_stitching",
+'       "segment": "WHITELISTED"
+' this result can be used in youbora requests
 Function tubiExperiments_getExperimentResult(namespaceName as string, experimentName as string) as Object
   experimentResult = invalid
   experiment = m.getExperiment(namespaceName, experimentName)

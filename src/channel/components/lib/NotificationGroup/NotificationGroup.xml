@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="NotificationGroup" extends="Group" >
+
+  <script type="text/brightscript" uri="NotificationGroup.brs" />
+
+  <interface>
+    <!-- INPUT -->
+    <field id="backgroundColor" alias="notificationBorder.color" />
+    <field id="textColor" alias="notificationTitle.color" />
+    <field id="text" alias="notificationTitle.text" />
+  </interface>
+
+  <children>
+    <Rectangle
+      id="notificationBorder"
+      height="57" />
+    <Label
+      id="notificationTitle"
+      translation="[16,10]"
+      height="36"
+      vertAlign="center">
+      <Font
+        role="font"
+        uri="pkg:/fonts/Vaud-Bold.ttf"
+        size="17" />
+    </Label>
+  </children>
+
+</component>

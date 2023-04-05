@@ -343,7 +343,6 @@ Function onRowItemSelected()
       m.top.oldCategoryId = m.top.currCategoryId
       m.top.currCategoryId = category.id
     end if
-
     itemSelected = resolveAbbreviatedContent(m.RowList.rowItemSelected)
     if itemSelected <> invalid
       m.top.itemSelected = itemSelected
@@ -398,6 +397,7 @@ End Function
 
 Function onCategoryResponseInBatch(msg) As Void
   tubiLog("CategoryGridList.categoryResponseInBatch")
+  m.top.fireExposureEventSeeAllExp = true
 
   response = msg.getData()
   shouldInformHomeScreen = false

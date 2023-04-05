@@ -14,6 +14,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/ArrayUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TimeOffsetUtils.brs" />
@@ -120,6 +121,9 @@
       <field id="oldCategoryId" type="string" />
 
       <field id="loadCategoriesIndex" type="integer" alwaysNotify="true" />
+
+      <!-- //REMOVE fireExposureEventSeeAllExp interface once the roku_see_all_container experiment is graduated -->
+      <field id="fireExposureEventSeeAllExp" type="boolean" alwaysNotify="true" />
 
   </interface>
 

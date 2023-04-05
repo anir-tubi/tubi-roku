@@ -268,6 +268,7 @@ End Function
 Function onLineOneDataChange(msg)
   tubiLog("InfoPanel.onLineOneDataChange")
   data = msg.getData()
+
   firstLineGroup = m.firstLineGroup
   firstLineGroupIsPresent = (firstLineGroup.getParent() <> invalid)
 
@@ -328,6 +329,10 @@ Function onLineOneDataChange(msg)
       else
         text += getTranslation("metadata_series") + " "
       end if
+    end if
+
+    if data.movieAndTVShowCount <> invalid
+      text += data.movieAndTVShowCount
     end if
 
     line1IsPresent = (m.line1.getParent() <> invalid)
@@ -849,6 +854,16 @@ Function onModeChange()
     m.secondLineGroup.appendChild(m.line2)
 
     m.offset.itemSpacings = [15]
+  else if m.top.mode = m.constants.ui.infoPanelModes.seeAll 'this block is for seeAll tile
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.twoLineInfo)
+    m.offset.appendChild(m.descriptionGroup)
+
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.line1Bold)
+
+    m.offset.itemSpacings = [24, 9]
   '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
   else if m.top.mode = m.constants.ui.infoPanelModes.navigateSports
     m.infoPanelGroup.appendChild(m.offset)

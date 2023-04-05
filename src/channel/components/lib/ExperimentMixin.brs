@@ -39,3 +39,24 @@ Function sendOutExperimentTracking(namespaceName as string, experimentName as st
     end if
   end if
 End Function
+
+
+' getExperimentResult
+'
+' @namespaceName: string, namespace of experiment
+' @experimentName: string, name of experiment
+'
+' returns the experiment result in assocarray if experiment is running in popper, or else returns invalid
+'   eg. "experiment_name": "qa.roku_in_pod_stitching_v2",
+'       "treatment": "in_pod_stitching",
+'       "segment": "WHITELISTED"
+' this result can be used in youbora requests
+Function getExperimentResult(namespaceName as string, experimentName as string) as Object
+
+  if m.constants = invalid
+    m.constants = m.global.constants
+  end if
+
+  experiments = TubiExperiments(m.constants)
+  return experiments.getExperimentResult(namespaceName, experimentName)
+End Function

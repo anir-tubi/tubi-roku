@@ -1,4 +1,12 @@
-Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoadEvents = true)
+'''''''''''''''''''''
+' showCategoryDetailsScreen
+'
+' @content: roSGNode, a content node for a single pieces of content, might be a video or top level series
+' @sPageSource: String, this helps from where categoryDetailsScreen screen page is called
+' @sendNavigationLoadEvents: boolean, when the page is loaded, do the navigation to page, pageload events needs to be sent
+' @contentMode: string, the value from constants.ui.contentMode to be sent as param to the tensor request
+' @itemFocused: integer, the index of the content item that will be focused once the screen has loaded content.
+Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoadEvents = true, contentMode = "", itemFocused = -1)
   categoryDetailsScreen = CreateObject("roSGNode", "CategoryDetailsScreen")
   categoryDetailsScreen.callingPage = sPageSource
   categoryDetailsScreen.trackingLoadStartTime = UpTime(0)
@@ -15,6 +23,12 @@ Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoad
   categoryDetailsScreen.id = m.constants.ui.screenIds.categoryDetailsScreen
   categoryDetailsScreen.categoryId = content.id
   categoryDetailsScreen.isLoading = true
+
+  if itemFocused >= 0
+    ' This block will be executed when we select the see all tile/see all floating education
+    ' to focus on the correct item in categoryDetails screen.
+    categoryDetailsScreen.jumpToItemFocused = itemFocused
+  end if
 
   categoryDetailsScreen.trackingPageInfo = {
     pageType: "category_page"
@@ -36,7 +50,7 @@ Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoad
   if content.id = m.constants.ui.categoryIds.queue AND isLoggedInUser() = false
     displaySignInRequiredModal(categoryDetailsScreen)
   else
-    fetchCategoryDetails(content)
+    fetchCategoryDetails(content, 0, contentMode)
   end if
 
 End Function
@@ -126,7 +140,8 @@ End Function
 
 ' @content: roSGNode, CategoryContentNode
 ' @index: integer, the index from which to fetch content from within the category. For instance, if index = 12, the content we fetch will start from the 12th content in the category
-Function fetchCategoryDetails(content, index = 0)
+' @contentMode: string, the value from constants.ui.contentMode to be sent as param to the tensor request
+Function fetchCategoryDetails(content, index = 0, contentMode = "")
   tubiLog("CategoryDetailsScreenHelpers.fetchCategoryDetails")
   isKidsMode = shouldKidsModeBeSentToServer()
 
@@ -141,7 +156,13 @@ Function fetchCategoryDetails(content, index = 0)
     params = {}
 
     ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
-    params["content_mode"] = ""
+    ' For tensor API, we need to pass as empty string for homescreen
+    if contentMode = m.constants.ui.contentMode.homescreen
+      params["content_mode"] = ""
+    else
+      params["content_mode"] = contentMode
+    end if  
+    
     if getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", false).enabled = true
       params["cursor"] = index
       params["contents_limit"] =  m.constants.performance.categoryGridList.lazyLoadBatchSize

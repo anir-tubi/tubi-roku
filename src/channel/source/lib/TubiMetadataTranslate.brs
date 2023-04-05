@@ -81,6 +81,8 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
       sThumbnailURL = canvasImages.poster_tb[0]
     else if contentFromServer.posterarts <> invalid AND isNonEmptyArray(contentFromServer.posterarts) = true
       sThumbnailURL = contentFromServer.posterarts[0]
+    else if isNonEmptyArray(contentFromServer.thumbnails) = true
+      sThumbnailURL = contentFromServer.thumbnails[0]
     end if
   else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata
     if gridType = gridItemTypes.landscapeInnerMetadata AND isNonEmptyArray(contentFromServer.hero_images) = true
@@ -129,6 +131,8 @@ Function tubiMetadataTranslate_translateBackendTypeToClientSideType(sBackendType
     sReturn = m.contentTypes.linear
   else if sBackendType = "se"
     sReturn = m.contentTypes.sportsEvent
+  else if sBackendType = "seeAll"
+    sReturn = m.contentTypes.seeAll
   else if sBackendType = "n"
     sReturn = m.contentTypes.navigate
   end if
@@ -177,7 +181,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     '       it will by default have a parent of this Task node.  Apparently there is a rendezvous copy
     '       of the parent task node made when getParent() is called, and that can end up being invalid
     '       if the primary thread is stuck.
-    '
+
     parent = translatedContent.getParent()
     parentWhiteList = {}
     parentWhiteList[m.constants.ui.contentTypes.series] = true
@@ -227,6 +231,25 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     else
       translatedContent.parentId = invalid
     end if
+  end if
+
+  ' To display the Movies count and TVShows count on InfoPanel when SeeAll tile is focused
+  if contentFromServer.movieCount <> invalid OR contentFromServer.tvShowCount <> invalid
+    movieAndTVShowCount = ""
+
+    if contentFromServer.movieCount <> invalid AND contentFromServer.movieCount > 0
+      movieAndTVShowCount = contentFromServer.movieCount.tostr() + " " + getTranslation("menu_movies") + " "
+    end if
+
+    if contentFromServer.tvShowCount <> invalid AND contentFromServer.tvShowCount > 0
+      if movieAndTVShowCount <> ""
+        movieAndTVShowCount += Chr(&hb7) + " "
+      end if
+      movieAndTVShowCount += contentFromServer.tvShowCount.tostr() + " " + getTranslation("menu_tv")
+    end if
+
+    translatedContent.addField("movieAndTVShowCount", "string", false)
+    translatedContent.movieAndTVShowCount = movieAndTVShowCount
   end if
 
   'translate all the stuff from the server
@@ -1059,9 +1082,19 @@ End Function
 Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false)
   categoryAA = invalid
 
+  m.seeAllContainerFirst = false
+  m.seeAllContainerSeventeen = false
+  if m.experiments <> invalid
+    m.seeAllContainerFirst = m.experiments.getExperimentResource("roku_see_all_container", "roku_see_all_container_first_v1").enabled
+    m.seeAllContainerSeventeen = m.experiments.getExperimentResource("roku_see_all_container", "roku_see_all_container_seventeen_v1").enabled
+  end if
+
   if container <> invalid AND container.children <> invalid
     prependContent = invalid
-    if container.children.count() > 0 then
+
+    childrenCount = container.children.count()
+
+    if childrenCount > 0 then
 
       if screenId = m.constants.ui.screenIds.homeScreen AND container.id = m.constants.ui.categoryIds.fifawc
         isTournamentTime = tournamentTimeFrame()   'bs:disable-line 1001 LINT1001
@@ -1083,12 +1116,48 @@ Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, c
         prependContent.append(container)
         prependContent.delete("children")  ' need to make sure there isn't a recursion later when getContentFromCategoryJson is called
         prependContent.posterarts = [m.generateChannelPosterUrl(container.id)]
+      else if (m.seeAllContainerFirst = true OR m.seeAllContainerSeventeen = true) AND container.type <> m.constants.ui.categoryTypes.linear AND childrenCount >= 24
+
+        movieCount = 0
+        tvShowCount = 0
+
+        for each child in container.children
+          if contents[child] <> invalid
+            if contents[child].type = "v"
+              movieCount++
+            else if contents[child].type = "s"
+              tvShowCount++
+            end if
+          end if
+        end for
+
+        ' create and add a showAll content to the contents which hold the container metadata
+        prependContent = {
+          id: m.constants.ui.contentIds.seeAll
+          title: getTranslation("screenHome_item_seeAll", {"containerTitle": container.title})
+          showAllText: getTranslation("screenHome_item_seeAll", {"containerTitle": ""})
+          type: "seeAll"
+          thumbnails: [m.constants.urls.seeAllPoster]
+          description: container.description
+          backgrounds: [m.constants.urls.seeAllBackground]
+          movieCount: movieCount
+          tvShowCount: tvShowCount
+        }
       end if
     end if
 
     if prependContent <> invalid AND prependContent.id <> invalid
       'add the content to the beginning of the category
-      container.children.Unshift(prependContent.id)
+      if prependContent.id = m.constants.ui.contentIds.seeAll
+        if m.seeAllContainerFirst = true
+          container.children.Unshift(prependContent.id)
+        else if m.seeAllContainerSeventeen = true
+          children = insertItemIntoArray(container.children, prependContent.id, 16)
+          container.children = children
+        end if
+      else
+        container.children.Unshift(prependContent.id)
+      end if
       contentsWithPrepend = {}
       contentsWithPrepend[prependContent.id] = prependContent
       contentsWithPrepend.append(contents)
@@ -1202,6 +1271,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
     end if
 
     if type(contents) = "roAssociativeArray"
+
       for each child in container.children
         ' contents[child].valid is "true" or "false" for user categories and is invalid for all other categories.
         ' For all other categories, assume all contents are valid. Valid in this case means, the content is "in window"

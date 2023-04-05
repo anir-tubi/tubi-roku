@@ -105,6 +105,13 @@ Function getConstants()
       "4230X": true  ' 3 (2015)
     }
 
+    'models that are showing Roku default closed caption dialog when user selected options with video preview on.
+    showFirmwareCcWhenVideoNotFullScreenModels = {
+      "4800X": true  ' Roku Ultra
+      "3820X": true  ' Stick 4K+
+      "3941X": true  ' Roku Express 4k+
+    }
+
     ' List all devices with analog output that we support still
     devicesWithAnalogOutput = {
       "2700X": true
@@ -151,6 +158,12 @@ Function getConstants()
       firmwareCaptionMenu = false
     else
       firmwareCaptionMenu = true
+    end if
+
+    if showFirmwareCcWhenVideoNotFullScreenModels[deviceModel] <> invalid
+      showFirmwareCcWhenVideoNotFullScreen = true
+    else
+      showFirmwareCcWhenVideoNotFullScreen = false
     end if
 
     ' There is a bug with 9-patch handling when FHD is the only ui_resolution entry and display is 720p
@@ -219,6 +232,7 @@ Function getConstants()
     constants.deviceInfo.lowMemory = lowMemory
     constants.deviceInfo.fastCpu = fastCpu
     constants.deviceInfo.lowVram = lowVram
+    constants.deviceInfo.showFirmwareCcWhenVideoNotFullScreen = showFirmwareCcWhenVideoNotFullScreen
     constants.deviceInfo.firmwareCaptionMenu = firmwareCaptionMenu
     constants.deviceInfo.limitedUi = limitedUi
     constants.deviceInfo.isAnalogOutputDevice = isAnalogOutputDevice
@@ -583,6 +597,9 @@ Function getConstants()
      ' // REMOVE fifa showAll images & it's references after fifa world cup is done.
      constants.urls.fifaShowAllPoster = "https://cdn.adrise.tv/image/roku_support_images/fifa-showall-poster.png"
      constants.urls.fifaShowAllBackground = "https://cdn.adrise.tv/image/roku_support_images/fifa-showall-background.webp"
+
+     constants.urls.seeAllPoster = "https://cdn.adrise.tv/image/roku_support_images/see-all-poster.webp"
+     constants.urls.seeAllBackground = "https://cdn.adrise.tv/image/roku_support_images/see-all-background.webp"
 
     ' url for pinging Nielsen
     constants.urls.nielsenPing = "https://audit.imrworldwide.com/cgi-bin/gn"
@@ -978,6 +995,7 @@ Function getConstants()
       constants.ui.infoPanelModes.epg = "epg"
       constants.ui.infoPanelModes.linearSearch = "linearSearch"
       constants.ui.infoPanelModes.programHomescreen = "programHomescreen"
+      constants.ui.infoPanelModes.seeAll = "seeAll"
       '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
       constants.ui.infoPanelModes.linearTournament = "linearTournament"
       constants.ui.infoPanelModes.sportsEvent = "sportsEvent"
@@ -1005,6 +1023,7 @@ Function getConstants()
       constants.ui.contentTypes.emptyContainer = "emptyContainer"
       constants.ui.contentTypes.epg = "epg"
       constants.ui.contentTypes.live = "live"
+      constants.ui.contentTypes.seeAll = "seeAll"
       '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
       constants.ui.contentTypes.sportsEvent = "sports_event"
       constants.ui.contentTypes.navigate = "navigate"
@@ -1124,6 +1143,7 @@ Function getConstants()
       constants.ui.contentIds.channelList = "channelsList"
       constants.ui.contentIds.timeGridContent = "timeGridContent"
       constants.ui.contentIds.showAllGames = "showAllGames"
+      constants.ui.contentIds.seeAll = "seeAll"
 
     ' content ids of contents that should not be removed from the content cache
     constants.ui.permanentlyCachedContentIds = {}
@@ -1260,7 +1280,6 @@ Function getConstants()
       constants.ui.uris.emptyContainerMyStuffBackground = "pkg:/images/screenMyStuffEmptyContainer.9.png"
       constants.ui.uris.myStuffMyListIcon = "pkg:/images/screenMyStuffMyListIcon.webp"
       constants.ui.uris.myStuffContinueWatchingIcon = "pkg:/images/screenMyStuffContinueWatchingIcon.webp"
-
 
 'THEME/COLOR START///////////////////////
 '//::TODO::colors - the following constants should be moved to themes. The app should not call these constants

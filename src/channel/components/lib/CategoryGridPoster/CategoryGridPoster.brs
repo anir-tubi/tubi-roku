@@ -31,6 +31,7 @@ Function init()
     live: "live"
     sportsEvent: "sports_event"
     navigate: "navigate"
+    seeAll: "seeAll"
   }
 
   '//recreate the contentTimings from constants so as not to access m.global.constants for every item on the home screen as they are created
@@ -137,10 +138,10 @@ Function onContentChange(msg)
   removeLockIcon()
   removeShowALlLabel()
 
-  if m.top.itemContent <> invalid then
+  if itemContent <> invalid then
 
-    hasVideoresources = m.top.itemContent.hasVideoresources
-    airDatetime = m.top.itemContent.airDatetime
+    hasVideoresources = itemContent.hasVideoresources
+    airDatetime = itemContent.airDatetime
 
     info = getAvailabilityTypeBadgeAndMatchTimeValues(airDatetime, hasVideoresources)
     badgeText = info.badgeText
@@ -148,20 +149,26 @@ Function onContentChange(msg)
       setReplayOrUpcomingBadge(badgeText)
     end if
 
-    if m.top.itemContent.type <> invalid AND m.top.itemContent.type = m.contentTypes.navigate AND m.top.itemContent.showAllText <> invalid
-      setShowAllLabel(m.top.itemContent.showAllText)
+    if itemContent.type <> invalid AND (itemContent.type = m.contentTypes.navigate OR itemContent.type = m.contentTypes.seeAll) AND itemContent.showAllText <> invalid
+
+      griditemtype = itemContent.griditemtype
+      if griditemtype = invalid
+        gridItemType = "portrait"
+      end if
+
+      setShowAllLabel(itemContent.showAllText, gridItemType)
     end if
 
-    if m.top.itemContent.needsLogin = true
+    if itemContent.needsLogin = true
       setLockIcon()
     end if
 
-    categoryContent = m.top.itemContent.getParent()
+    categoryContent = itemContent.getParent()
 
     if categoryContent <> invalid AND itemContent.gridItemType <> invalid then
       m.poster.uri = itemContent.hdgridposterurl
       ' do not show title below the poster for featured row & show All poster
-      if itemContent.gridItemType = m.gridItemTypes.landscape AND m.top.itemContent.type <> m.contentTypes.navigate
+      if itemContent.gridItemType = m.gridItemTypes.landscape AND itemContent.type <> m.contentTypes.navigate
         m.title.visible = true
         m.title.text = itemContent.title
       else if categoryContent.gridItemType = m.gridItemTypes.historySignedOutUser
@@ -439,7 +446,12 @@ Function removeLockIcon()
 End Function
 
 
-Function setShowAllLabel(text)
+' setShowAllLabel is to set text/label inside poster. Currently this feature is available only for landscape & portrait gridTypes.
+' if we need to support any other gridTypes, then add the width & height to support those inside this function.
+'
+'@text: String, a text to be displayed inside SeeAll/ShowAll poster
+'@gridType: String, default is portrait. possible values are constants.ui.gridItemTypes
+Function setShowAllLabel(text, gridType = "portrait")
   tubiLog("CategoryGridPoster.setShowAllLabel")
   theme = getThemeFromGlobal()
   m.showAllLabel = m.top.createChild("Label")
@@ -449,8 +461,14 @@ Function setShowAllLabel(text)
     m.showAllLabel.color = theme.primaryTextColor
   end if
 
-  m.showAllLabel.width = 380
-  m.showAllLabel.height = 216
+  if gridType = "portrait"
+    m.showAllLabel.width = 186
+    m.showAllLabel.height = 267
+  else
+    m.showAllLabel.width = 380
+    m.showAllLabel.height = 216
+  end if
+
   m.showAllLabel.horizAlign = "center"
   m.showAllLabel.vertAlign = "center"
   font = CreateObject("roSGNode", "Font")

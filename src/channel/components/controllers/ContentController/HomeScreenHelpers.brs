@@ -63,6 +63,7 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     homeScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
     homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
+    homeScreen.observeFieldScoped("isSeeAllSelected", "onIsSeeAllSelected")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
@@ -715,7 +716,9 @@ End Function
 ' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content
 Function setHomeScreenAfterFocus(focusedContent, homeScreen)
 
-  if focusedContent <> invalid AND getCurrentScreen() <> invalid AND getCurrentScreen().id <> m.constants.ui.screenIds.linearVideoPlayerScreen
+  currentScreen = getCurrentScreen()
+
+  if focusedContent <> invalid AND currentScreen <> invalid AND currentScreen.id <> m.constants.ui.screenIds.linearVideoPlayerScreen
     '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
     '//we should stop the countdown timer
     bStopCountdownTimer = true
@@ -901,6 +904,8 @@ Function onContentSelected(msg)
   else if content.type = m.constants.ui.contentTypes.navigate
     stopVideoPreview()
     showTournamentScreen(m.constants)
+  else if content.type = m.constants.ui.contentTypes.seeAll
+    handleSeeAllSelected(homeScreen)
   else
     showDetailScreen(content, true)
   end if
@@ -1093,4 +1098,21 @@ Function onLoadCategoryForIds(msg)
     })
   end if
   return true
+End Function
+
+
+Function onIsSeeAllSelected(msg)
+  isSeeAllSelected = msg.getData()
+
+  if isSeeAllSelected = true
+    homeScreen = msg.getRoSGNode()
+    handleSeeAllSelected(homeScreen)
+  end if
+End Function
+
+
+Function handleSeeAllSelected(homeScreen)
+  stopVideoPreview()
+  focusedContainer = homeScreen.rowFocusedForSeeAll
+  showCategoryDetailsScreen(focusedContainer, "HOME", true, homeScreen.contentMode, homeScreen.columnFocused)
 End Function

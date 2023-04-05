@@ -146,7 +146,13 @@ Function onLoadContent()
 
       m.PageTitleAndCounter.content = category
       m.VideoGrid.content = category
+
       m.VideoGrid.setFocus(true)
+
+      if m.top.jumpToItemFocused >= 0
+        m.VideoGrid.jumpToItem = m.top.jumpToItemFocused
+      end if
+      
       m.VideoGrid.visible = true
     end if
 

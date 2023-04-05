@@ -14,6 +14,37 @@ Function init()
   m.HintGroup = m.top.findNode("UpHintGroup")
   fades = m.top.findNode("Fades")
   m.HintGroupFade = fades.findNode("HintGroupFade")
+
+  if getExperimentResource("roku_see_all_container", "roku_show_all_floating_education_v1", false).enabled = true
+    m.seeAllNotificationGroup = m.top.findNode("seeAllNotificationGroup")
+  end if
+
+  m.experimentName = ""
+  experimentResult = getExperimentResult("roku_see_all_container", "roku_see_all_container_first_v1")
+  if experimentResult <> invalid
+    m.experimentName = experimentResult.experiment_name
+  end if
+
+  experimentResult = getExperimentResult("roku_see_all_container", "roku_see_all_container_seventeen_v1")
+  if experimentResult <> invalid
+    m.experimentName = experimentResult.experiment_name
+  end if
+
+  experimentResult = getExperimentResult("roku_see_all_container", "roku_show_all_floating_education_v1")
+  if experimentResult <> invalid
+    m.experimentName = experimentResult.experiment_name
+  end if
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+
+  ' this variable helps to identify whether the seeAll exposure event was fired or not.
+  ' the reason for maintaining this variable is the 'onFireExposureEvent' function will be trigerred many times,
+  ' but we don't want to fire exposure all times
+  m.wasExposureEventForSeeAllFired = false
+
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeFieldScoped("signedIn", "onSignedInChange")
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
@@ -43,6 +74,8 @@ Function init()
   m.CategoryGridList.observeField("currFocusRow", "onCurrFocusRowChange")
   m.CategoryGridList.observeField("currFocusColumn", "onCurrFocusColumnChange")
   m.CategoryGridList.observeField("rowFocused", "onRowFocused")
+  ' //REMOVE below observeField once the roku_see_all_container experiment is graduated
+  m.CategoryGridList.observeField("fireExposureEventSeeAllExp", "onFireExposureEvent")
 
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
@@ -88,6 +121,20 @@ Function init()
 
   if authInfo <> invalid AND authInfo.parentalrating <> invalid
     m.top.parentalRating = authInfo.parentalrating
+  end if
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+
+  if theme <> invalid AND m.seeAllNotificationGroup <> invalid
+    m.seeAllNotificationGroup.backgroundColor = theme.backgroundColorLight
+    m.seeAllNotificationGroup.textColor = theme.backgroundColor
   end if
 End Function
 
@@ -297,6 +344,18 @@ End Function
 ' A new row has been focused in the CategoryGridList
 Function onRowFocused(msg)
   row = msg.getData()
+  rowCount = row.totalCount
+
+  if m.seeAllNotificationGroup <> invalid AND m.constants.deviceInfo.showFirmwareCcWhenVideoNotFullScreen = false
+    'checking gridItemType to handle linear rows.
+    if rowCount >= 24 AND row.gridItemType <> m.constants.ui.gridItemTypes.linear
+      m.seeAllNotificationGroup.text = getTranslation("screenHome_showAllNotification", {"containerTitle": row.title})
+      m.seeAllNotificationGroup.visible = true
+    else
+      m.seeAllNotificationGroup.visible = false
+    end if
+  end if
+
   if row <> invalid
     if isSponsoredRow(row) = true
       m.top.sponsoredRowFocused = true
@@ -422,6 +481,7 @@ Function onCurrFocusRowChange()
   end if
 
   if categoryEnteringFocus <> invalid
+    m.top.rowFocusedForSeeAll = categoryEnteringFocus
     sSponsorBackgroundURL = ""
 
     if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
@@ -504,15 +564,17 @@ End Function
 Function populateInfoPanelByContent(focusedContent)
   if focusedContent <> invalid
     sType = focusedContent.type
-    if sType = m.constants.ui.categoryTypes.linear
+    if sType = m.constants.ui.contentTypes.linear
       '// TODO: Currently we can not use focusedContent.parentType to differenciate between linear and non-linear rows.
       if focusedContent.parentId = "featured" 'linearContent in featured row
         populateInfoPanel(m.constants.ui.infoPanelModes.programHomescreen, focusedContent)
       else
         populateInfoPanel(m.constants.ui.infoPanelModes.linearHomeScreen, focusedContent)
       end if
-    else if sType = m.constants.ui.categoryTypes.historySignedOutUser
+    else if sType = m.constants.ui.contentTypes.historySignedOutUser
       populateInfoPanel(m.constants.ui.infoPanelModes.continueWatching, focusedContent)
+    else if sType = m.constants.ui.contentTypes.seeAll
+      populateInfoPanel(m.constants.ui.infoPanelModes.seeAll, focusedContent)
     '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     else if sType = m.constants.ui.contentTypes.navigate
       populateInfoPanel(m.constants.ui.infoPanelModes.navigateSports, focusedContent)
@@ -532,11 +594,89 @@ Function populateInfoPanelByContent(focusedContent)
 End Function
 
 
+' //REMOVE onFireExposureEvent function and its reference once the roku_see_all_container experiment is graduated
+' callback when seeAll tile or floating seeAll is shown to the user
+Function onFireExposureEvent(msg)
+  categoryGridList = msg.getRoSGNode()
+  fireExposureEventForSeeAll(categoryGridList)
+End function
+
+
+' //REMOVE fireExposureEventForSeeAll function and its reference once the roku_see_all_container experiment is graduated
+' Fires exposure event only once per session
+'
+' @categoryGridList: roSGNode, CategoryGridList node
+Function fireExposureEventForSeeAll(categoryGridList = invalid)
+
+  if m.wasExposureEventForSeeAllFired = false AND categoryGridList <> invalid AND categoryGridList.focusedPosition <> invalid
+
+    rowIndex = categoryGridList.focusedPosition[0]
+    colIndex = categoryGridList.focusedPosition[1]
+    content = categoryGridList.content
+
+    if doesContentHaveChild(content, rowIndex, colIndex) = true AND content.getChild(rowIndex).getChildCount() >= 24 AND isContentMovieOrSeriesOrSeeAll(content.getChild(rowIndex).getChild(colIndex)) = true
+      if m.experimentName = "roku_see_all_container_first_v1" OR m.experimentName = "roku_show_all_floating_education_v1"
+        getExperimentResource("roku_see_all_container", m.experimentName, true)
+        m.wasExposureEventForSeeAllFired = true
+      else if m.experimentName = "roku_see_all_container_seventeen_v1"
+         if colIndex >= 15 ' at this point the SeeAll tile will be visible to user, so firing exposure event
+           getExperimentResource("roku_see_all_container", "roku_see_all_container_seventeen_v1", true)
+           m.wasExposureEventForSeeAllFired = true
+         end if
+      end if
+
+    end if
+
+    if m.wasExposureEventForSeeAllFired = false AND doesContentHaveChild(content, rowIndex+1, 0) = true AND content.getChild(rowIndex+1).getChildCount() >= 24 AND isContentMovieOrSeriesOrSeeAll(content.getChild(rowIndex+1).getChild(0)) = true
+      if m.experimentName = "roku_see_all_container_first_v1"
+        getExperimentResource("roku_see_all_container", "roku_see_all_container_first_v1", true)
+        m.wasExposureEventForSeeAllFired = true
+      end if
+    end if
+
+  end if
+
+End Function
+
+
+' //REMOVE isContentMovieOrSeriesOrSeeAll function and its reference once the roku_see_all_container experiment is graduated
+Function isContentMovieOrSeriesOrSeeAll(content)
+  result = false
+  contentTypes = m.constants.ui.contentTypes
+
+  if content.type = contentTypes.video OR content.type = contentTypes.series OR content.type = contentTypes.seeAll
+    result = true
+  end if
+
+  return result
+End Function
+
+
+' //REMOVE doesContentHaveChild function and its reference once the roku_see_all_container experiment is graduated
+'
+' @content: roSGNode, CategoryContentNode for HomeScreen.
+' @rowIndex: integer, the index of row, 0 based index
+' @colIndex: integer, the index of column, 0 based index
+Function doesContentHaveChild(content, rowIndex, colIndex)
+  result = false
+
+  if content.getChild(rowIndex) <> invalid
+    if content.getChild(rowIndex).getChild(colIndex) <> invalid
+      result = true
+    end if
+  end if
+
+  return result
+End Function
+
+
 '''''''''''''''''''''
 ' onGridFocusChange
 '
 ' On grid focus change, update the info panel
 Function onGridFocusChange() as void
+  ' //REMOVE below block once the roku_see_all_container experiment is graduated
+  fireExposureEventForSeeAll(m.CategoryGridList)
 
   tubiLog("HomeScreen.onGridFocusChange")
   if m.top.contentReady = false
@@ -691,6 +831,19 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.width = 960
     else if mode = m.constants.ui.infoPanelModes.programHomescreen
       populateInfoPanelWithProgramHomescreenMode(contentNode, m.InfoPanel)
+    else if mode = m.constants.ui.infoPanelModes.seeAll
+      m.InfoPanel.mode = mode
+      m.InfoPanel.title = contentNode.title
+      'Fifa Worldcup description and dates are constant when show all games is focused, so hardcoding it
+      m.InfoPanel.description = contentNode.description
+      lineOneData = {}
+
+      if contentNode.movieAndTVShowCount <> invalid
+        lineOneData.movieAndTVShowCount = contentNode.movieAndTVShowCount
+      end if
+
+      m.InfoPanel.lineOneData = lineOneData
+      m.InfoPanel.width = 960
     '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     else if mode = m.constants.ui.infoPanelModes.navigateSports
       m.InfoPanel.mode = mode
@@ -902,6 +1055,15 @@ Function onKeyEvent(key, press) as boolean
       handlePlayInput()
       return true
     end if
+
+    if key = "options" AND m.seeAllNotificationGroup <> invalid AND m.seeAllNotificationGroup.visible = true
+      itemFocused = m.CategoryGridList.itemFocused
+      positionFocused = m.top.cursorPosition
+      m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(itemFocused, positionFocused)
+      m.top.isSeeAllSelected = true
+      return true
+    end if
+
   end if
   return false
 End Function

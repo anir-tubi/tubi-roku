@@ -128,6 +128,9 @@
       <!-- set to the tubi content of the new row container (row of contentFocused) which was focused on -->
       <field id="rowFocused" alias="CategoryGridList.rowFocused"/>
 
+      <!-- set to the tubi content of the new row container (row of contentFocused) which was focused on when user do fast and normal scroll -->
+      <field id="rowFocusedForSeeAll" type="node"/>
+
       <!-- As the rowlist column changes, even during scrolling, this will get dispatched. During scrolling, each new focused column between the start and end scrolled columns will be dispatched as they begin to gain partial focus.  -->
       <field id="columnFocused" type="integer" value="-1"/>
 
@@ -175,6 +178,9 @@
 
        <!--Communicates to the parent that some of the containers has expired and to be loaded-->
       <field id="loadCategoryForIds" type="array" alwaysNotify="true"/>
+
+      <!-- Indicates whether see all selected or not-->
+      <field id="isSeeAllSelected" type="boolean" alwaysNotify="true"/>
 
   </interface>
 
@@ -227,6 +233,10 @@
       <CategoryGridList
         id="CategoryGridList"/>
     </MaskGroup>
+
+    <NotificationGroup
+      id="seeAllNotificationGroup"
+      visible="false" />
 
 
     <!-- For viewers that watch a REALLY long time, or just never close the app, force a refresh -->

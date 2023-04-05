@@ -318,6 +318,14 @@ Function getTranslation_en_US()
       "description": "The text to display on Show All Games tile",
       "message": "Show All"
     },
+    "screenHome_showAllNotification": {
+      "description": "The text to display on floating educaion of show all",
+      "message": "Press * to explore {containerTitle}"
+    },
+    "screenHome_item_seeAll": {
+      "description": "The text to display on See All movies / shows",
+      "message": "See All {containerTitle}"
+    },
     "loadingIndicator": {
       "description": "When something is loading, this text appears so the user knows something is loading.",
       "message": "Loading..."
