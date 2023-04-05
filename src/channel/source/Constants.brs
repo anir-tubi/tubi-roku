@@ -1509,8 +1509,12 @@ constants.ui.themes = {}
         '    5000X:   160 ms
         if lowMemory
           constants.performance.categoryGridList.finalBlockSize = 50
+          constants.performance.categoryGridList.lazyLoadBatchSize = 48
+          constants.performance.categoryGridList.finalLazyLoadSize = 200
         else
           constants.performance.categoryGridList.finalBlockSize = 200
+          constants.performance.categoryGridList.lazyLoadBatchSize = 48
+          constants.performance.categoryGridList.finalLazyLoadSize = 500
         end if
         if fastCpu
           constants.performance.categoryGridList.categoryWindowSize = 10
@@ -1521,6 +1525,8 @@ constants.ui.themes = {}
         constants.performance.categoryGridList.eagerLoad = true
       else
         constants.performance.categoryGridList.finalBlockSize = 200
+        constants.performance.categoryGridList.lazyLoadBatchSize = 200
+        constants.performance.categoryGridList.finalLazyLoadSize = 1000
         constants.performance.categoryGridList.categoryWindowSize = 10
         constants.performance.categoryGridList.eagerLoad = true
       end if

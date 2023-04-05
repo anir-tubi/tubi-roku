@@ -11,6 +11,16 @@ Function init()
   m.experiments = TubiExperiments(m.constants)
   m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments)
 
+  m.lazyLoadingExp = (getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", false).enabled = true)
+
+  itemsInRowCount = 8
+
+  if m.lazyLoadingExp = true
+    m.upperRowIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize / itemsInRowCount ' items per row = 8 * 6 = 48
+    m.lowerRowIndex = 0
+    m.numRowsInBatch = m.constants.performance.categoryGridList.lazyLoadBatchSize / itemsInRowCount
+  end if
+
   m.InfoPanel = m.top.findNode("ChannelsInfoPanel")
   m.PageTitleAndCounter = m.top.findNode("pageTitleAndCounter")
   m.VideoGrid = m.top.findNode("ChannelsVideoGrid")
@@ -30,19 +40,19 @@ Function init()
   m.oldCategoryComponent = invalid
 
 
-  
+
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
-  
-  
+
+
   BackLabel = m.top.findNode("callToAction")
   if m.constants.deviceInfo.uiResolution <> "FHD"
     '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
-  
+
   m.top.screenLevel = m.constants.ui.screenLevels.categoryDetailsScreen
   m.top.handlesTransportVoiceRequests = true
-  
+
   m.bLeftButtonActsLikeBackButton = true
   m.VideoGrid.itemSize = posterSize
 
@@ -58,7 +68,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.VideoGrid.focusBitmapBlendColor = theme.focusedColor
   end if
@@ -105,7 +115,7 @@ Function onScreenFocusChange()
         m.VideoGrid.setFocus(true)
       end if
       if shouldRefresh(m.top.content) = true  'cacheValidationMixin
-        m.top.refreshCategoryDetailsScreen = true
+        m.top.categoryBatchIndex = 0
       end if
     end if
   end if
@@ -204,6 +214,21 @@ Function onItemFocused()
         }
 
         m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)
+
+        if m.lazyLoadingExp = true
+          'lazy loading logic:
+          ' start with fetching contents for row=0 to row= (total number per lazyload) / 8 contents per row (lowerRowIndex to upperRowIndex)
+          '
+          ' when user scrolls down to midway (say third row out of total 6 rows) , request next batch
+
+          rowForNextCall = (m.lowerRowIndex + m.upperRowIndex) / 2
+
+          if row > rowForNextCall
+            m.top.categoryBatchIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize +  m.top.categoryBatchIndex
+            m.lowerRowIndex = m.upperRowIndex + 1
+            m.upperRowIndex = m.upperRowIndex + m.numRowsInBatch
+          end if
+        end if
       else
         m.contentLoadedAndFocused = true
         m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)

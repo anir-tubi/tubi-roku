@@ -10,8 +10,10 @@ Function init()
   m.CategoryCount = m.top.findNode("CategoryCount")
   m.subText = m.top.findNode("subText")
 
-  m.top.observeField("content", "onContentChange")
-  m.top.observeField("currentIndex", "onIndexChange")
+  m.top.observeFieldScoped("content", "onContentChange")
+  m.top.observeFieldScoped("currentIndex", "onIndexChange")
+  'delete this observer in case of roku_category_detailscreen_lazy_load_v1 experiment does not graduate
+  m.top.observeFieldScoped("isFullyLoaded", "onIsFullyLoaded")
 
   m.originalTranslation_CategoryName = m.CategoryName.translation
   m.originalTranslation_CategoryCount = m.CategoryCount.translation
@@ -29,7 +31,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.FocusIndex.color = theme.focusedColor
     m.subText.color = theme.primaryTextColor
@@ -151,4 +153,21 @@ Function onIndexChange(msg)
   if focusIndex >= 0
     m.FocusIndex.text = stri(focusIndex + 1).trim()
   end if
+End Function
+
+
+Function onIsFullyLoaded(msg)
+  isFullyLoaded = msg.getData()
+
+  if m.ItemCount.text <> ""
+
+    if isFullyLoaded = false
+      m.ItemCount.text = m.ItemCount.text + "+"
+    else
+      countStr = m.ItemCount.text 'Not sure why directly calling replace does not work
+      m.ItemCount.text = countStr.Replace("+", "")
+    end if
+
+  end if
+
 End Function

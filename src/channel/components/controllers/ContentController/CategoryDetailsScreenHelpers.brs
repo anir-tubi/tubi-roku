@@ -7,7 +7,7 @@ Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoad
   categoryDetailsScreen.observeFieldScoped("sponsorshipBackground", "onSponsorshipBackgroundChanged")
   categoryDetailsScreen.observeFieldScoped("focusedChild", "onCategoryDetailsScreenFocusChanged")
   categoryDetailsScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
-  categoryDetailsScreen.observeFieldScoped("refreshCategoryDetailsScreen", "onRefreshCategoryDetailsSignal")
+  categoryDetailsScreen.observeFieldScoped("categoryBatchIndex", "onCategoryBatchIndexChange")
   categoryDetailsScreen.observeFieldScoped("signInRequired", "onSignInRequired")
   categoryDetailsScreen.observeFieldScoped("backButtonPressed", "onCategoryDetailsScreenBackPressed")
   categoryDetailsScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
@@ -98,9 +98,11 @@ Function onCategoryContentSelected(msg)
 End Function
 
 
-Function onRefreshCategoryDetailsSignal(msg)
+Function onCategoryBatchIndexChange(msg)
   categoryDetailsScreen = msg.getRoSGNode()
+  index = msg.getData()
   categoryContent = invalid
+
   if categoryDetailsScreen <> invalid AND categoryDetailsScreen.content <> invalid
     categoryContent = categoryDetailsScreen.content
   end if
@@ -109,13 +111,22 @@ Function onRefreshCategoryDetailsSignal(msg)
   ' Is used to determine when to send the PageLoad analytics event (don't send on refresh)
   m.refreshingCategoryDetailsCache = true
 
-  categoryDetailsScreen.isLoading = true
-  fetchCategoryDetails(categoryContent)
+  if getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", true).enabled = true
+
+    'fetch the content if screen is not fully loaded or a total refresh has been requested.
+    if categoryDetailsScreen.isFullyLoaded <> true OR index = 0
+      fetchCategoryDetails(categoryContent, index)
+    end if
+  else
+    categoryDetailsScreen.isLoading = true
+    fetchCategoryDetails(categoryContent)
+  end if
 End Function
 
 
 ' @content: roSGNode, CategoryContentNode
-Function fetchCategoryDetails(content)
+' @index: integer, the index from which to fetch content from within the category. For instance, if index = 12, the content we fetch will start from the 12th content in the category
+Function fetchCategoryDetails(content, index = 0)
   tubiLog("CategoryDetailsScreenHelpers.fetchCategoryDetails")
   isKidsMode = shouldKidsModeBeSentToServer()
 
@@ -131,6 +142,11 @@ Function fetchCategoryDetails(content)
 
     ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
     params["content_mode"] = ""
+    if getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", false).enabled = true
+      params["cursor"] = index
+      params["contents_limit"] =  m.constants.performance.categoryGridList.lazyLoadBatchSize
+      params["expanded"] = true
+    end if
 
     options.params = params
 
@@ -153,11 +169,16 @@ End Function
 Function onCategoryDetailResponse(categoryContent)
   tubiLog("CategoryDetailsScreenHelpers.onCategoryDetailResponse")
   screen = getCurrentScreen()
+  lazyloadingExp = (getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", false).enabled = true)
 
   if screen.id = m.constants.ui.screenIds.categoryDetailsScreen
     ' the category details screen is still the top screen after receiving the response
+    responseItemsCount = 0
+    if categoryContent <> invalid
+      responseItemsCount = categoryContent.getChildCount()
+    end if
 
-    if categoryContent <> invalid AND categoryContent.getChildCount() > 0
+    if responseItemsCount > 0
       screen.isLoading = false
 
       if categoryContent.sponsorImages <> invalid AND categoryContent.sponsorImages.pixels <> invalid AND categoryContent.sponsorImages.pixels["container_details"] <> invalid
@@ -166,8 +187,30 @@ Function onCategoryDetailResponse(categoryContent)
         sendSponsorPixels(sponsorPixels)
       end if
 
-      screen.content = categoryContent
-      screen.shouldLoadContent = true
+      if lazyloadingExp = true
+
+        if screen.content = invalid 'first time
+          screen.content = categoryContent
+          screen.shouldLoadContent = true
+        else
+          responseChildren = categoryContent.getChildren(-1, 0)
+          screen.content.appendChildren(responseChildren)
+        end if
+
+        'Total received content is less than batchsize that means we have reached the maximum available
+        'Number of contents on the screen + next batchsize is more than maximum limit
+        if responseItemsCount <  m.constants.performance.categoryGridList.lazyLoadBatchSize OR (screen.content.getChildCount() +  m.constants.performance.categoryGridList.lazyLoadBatchSize > m.constants.performance.categoryGridList.finalLazyLoadSize)
+          screen.isFullyLoaded = true
+        else
+          screen.isFullyLoaded =  false
+        end if
+      else
+        screen.content = categoryContent
+        screen.shouldLoadContent = true
+      end if
+
+    else if lazyloadingExp = true AND categoryContent <> invalid AND responseItemsCount = 0 AND screen.content <> invalid AND  screen.isLoading = false
+      screen.isFullyLoaded =  true
     else
       screen.isLoading = true
 
@@ -246,6 +289,7 @@ Function showCategoryDetailError(error, bContentEmptyError = false)
   topScreen = getCurrentScreen()
 
   categoryDetailsScreen = invalid
+  lazyLoadingExp =  (getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", false).enabled = true)
 
   ' If topScreen.id does not = the ID of a categoryDetailsScreen, another screen (like the sign in screen)
   ' has been pushed on top of the categoryDetailsScreen. Hold off on removing the screen and
@@ -256,48 +300,69 @@ Function showCategoryDetailError(error, bContentEmptyError = false)
   if topScreen.id = m.constants.ui.screenIds.categoryDetailsScreen
     categoryDetailsScreen = topScreen
 
-    ' categoryDetailsScreen is created/pushed in showCategoryDetailsScreen, since there is no content,
-    ' remove it from the stack will occur after the user closes the modal.
-    code = ""
-    if error <> invalid AND error.code <> invalid
-      code = error.code.toStr()
+    doShowError = true
+    'in case of lazy loading, if some batch fails donot show the error dialog.
+    if lazyLoadingExp = true AND (categoryDetailsScreen.content <> invalid OR categoryDetailsScreen.content.getChildCount() > 0)
+      doShowError = false
     end if
 
-    errorCode = getUserFacingErrorCode(m.constants.errors.context.categoryDetailsScreen, m.constants.errors.subtypes.fetchError, code)
 
-    dialogEvent = {
-      type: "dialog"
-      values: {
-        dialog_type: "NETWORK_ERROR" 'DialogType enum
-        pageOneof: m.Tracking.getAnalyticsPage(topScreen.trackingPageInfo.pageType, topScreen.trackingPageInfo.pageValues)
-        dialog_action: "SHOW"
-        dialog_sub_type: errorCode
+    if doShowError = true
+      ' categoryDetailsScreen is created/pushed in showCategoryDetailsScreen, since there is no content,
+      ' removing it from the stack will occur after the user closes the modal.
+      code = ""
+      if error <> invalid AND error.code <> invalid
+        code = error.code.toStr()
+      end if
+
+      errorCode = getUserFacingErrorCode(m.constants.errors.context.categoryDetailsScreen, m.constants.errors.subtypes.fetchError, code)
+
+      dialogEvent = {
+        type: "dialog"
+        values: {
+          dialog_type: "NETWORK_ERROR" 'DialogType enum
+          pageOneof: m.Tracking.getAnalyticsPage(topScreen.trackingPageInfo.pageType, topScreen.trackingPageInfo.pageValues)
+          dialog_action: "SHOW"
+          dialog_sub_type: errorCode
+        }
       }
-    }
 
-    sErrorTitle = ""
-    sErrorMessage = getTranslation("error_noGetChannels_description")
-    if bContentEmptyError = true
-      sErrorTitle = getTranslation("dialog_errorOops_title")
-      sErrorMessage = getTranslation("error_noContent_description")
+      sErrorTitle = ""
+      sErrorMessage = getTranslation("error_noGetChannels_description")
+      if bContentEmptyError = true
+        sErrorTitle = getTranslation("dialog_errorOops_title")
+        sErrorMessage = getTranslation("error_noContent_description")
+      end if
+
+      modalInfo = {
+        title: sErrorTitle
+        message: getErrorMessage(sErrorMessage, errorCode)
+        openTrackEvent: dialogEvent
+        trackingTask: m.trackingLoggingTask
+      }
+
+      showErrorModal(modalInfo, invalid, invalid, removeTopScreen)
+    else if lazyLoadingExp = true
+      categoryDetailsScreen.isFullyLoaded = true
     end if
 
-    modalInfo = {
-      title: sErrorTitle
-      message: getErrorMessage(sErrorMessage, errorCode)
-      openTrackEvent: dialogEvent
-      trackingTask: m.trackingLoggingTask
-    }
-
-    showErrorModal(modalInfo, invalid, invalid, removeTopScreen)
   else
     categoryDetailsScreen = getScreenFromStackById(m.constants.ui.screenIds.categoryDetailsScreen)
   end if
 
-  if categoryDetailsScreen <> invalid
-    loadTime = Int((Uptime(0) - categoryDetailsScreen.trackingLoadStartTime) * 1000) 'in ms
-    screenTrackingLoad(categoryDetailsScreen.trackingPageInfo, loadTime, false)
-  end If
+
+  if lazyLoadingExp = false
+    if categoryDetailsScreen <> invalid
+      loadTime = Int((Uptime(0) - categoryDetailsScreen.trackingLoadStartTime) * 1000) 'in ms
+      screenTrackingLoad(categoryDetailsScreen.trackingPageInfo, loadTime, false)
+    end If
+  else 'if categorydetailScreen is lazy loading then send the tracking event only for first batch
+    if categoryDetailsScreen <> invalid AND categoryDetailsScreen.categoryBatchIndex = 0 'first batch has failed, so send page load event
+      loadTime = Int((Uptime(0) - categoryDetailsScreen.trackingLoadStartTime) * 1000) 'in ms
+      screenTrackingLoad(categoryDetailsScreen.trackingPageInfo, loadTime, false)
+    end If
+  end if
+
 End Function
 
 

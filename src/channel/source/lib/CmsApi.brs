@@ -232,11 +232,25 @@ Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOpti
   params["include_sponsorships"] = true
   params["contents_limit"] = m.constants.performance.categoryGridList.finalBlockSize
 
-  if passedOptions.params <> invalid AND isNonEmptyString(passedOptions.params.content_mode) = true
-    params["content_mode"] = passedOptions.params.content_mode
+  if passedOptions.params <> invalid
+
+    if isNonEmptyString(passedOptions.params.content_mode) = true
+      params["content_mode"] = passedOptions.params.content_mode
+    end if
+
+    if passedOptions.params.cursor <> invalid
+      params["cursor"] = passedOptions.params.cursor
+
+      if params["contents_limit"] <>  invalid
+        params["contents_limit"] =  passedOptions.params.contents_limit
+      end if
+
+    end if
+
   end if
 
   utmCampaignConfig = m.utmCampaignConfig
+
   if isString(utmCampaignConfig) = true then
     params["utm_campaign_config"] = utmCampaignConfig
   end if

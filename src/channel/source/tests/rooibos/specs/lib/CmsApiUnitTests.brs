@@ -535,6 +535,57 @@ Function cmsApi_categoryReqInfo_test()
   m.assertEqual(categoryInfo.options.headers["x-custom-header"], categoryOptions.headers["x-custom-header"])
   m.assertEqual(categoryInfo.options.headers["x-client-platform"], categoryOptions.headers["x-client-platform"])
   m.assertEqual(categoryInfo.options.headers["x-client-version"], categoryOptions.headers["x-client-version"])
+
+
+  ' categorydetailPage lazy loading
+  ' //TODO delete or change this part based on experiment result : roku_category_detailscreen_lazy_load
+  ' lazy loading starting at 10 to next 48 contents
+  lazyCategoryOptions = {
+    params: {
+      "app_id": m.cmsApi.constants.settings.shortAppName
+      "platform": m.cmsApi.constants.platform
+      "device_id": m.cmsApi.constants.deviceInfo.deviceId
+      "is_kids_mode": false
+      "include_channels": true
+      "cursor": 10
+      "contents_limit": m.cmsApi.constants.performance.categoryGridList.lazyLoadBatchSize
+      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
+      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_landscape"
+      "contentMode": ""
+      "expanded":	true
+    }
+    headers: {
+      "x-client-platform": m.cmsApi.constants.headers.commonUapi["x-client-platform"]
+      "x-client-version": m.cmsApi.constants.headers.commonUapi["x-client-version"]
+    }
+  }
+
+  passedOptions = {
+    params: {
+      "cursor": 10
+      "contents_limit":  m.cmsApi.constants.performance.categoryGridList.lazyLoadBatchSize
+      "expanded":	true
+    }
+  }
+
+  categoryInfo = m.cmsApi.categoryReqInfo("my_category", false, passedOptions)
+
+  m.assertEqual(categoryInfo.count(), 3)
+  m.assertAAHasKeys(categoryInfo, infoKeys)
+  m.assertEqual(categoryInfo.url, categoryUrl)
+  m.assertEqual(categoryInfo.options.params["app_id"], lazyCategoryOptions.params["app_id"])
+  m.assertEqual(categoryInfo.options.params["platform"], lazyCategoryOptions.params["platform"])
+  m.assertEqual(categoryInfo.options.params["device_id"], lazyCategoryOptions.params["device_id"])
+  m.assertEqual(categoryInfo.options.params["is_kids_mode"], lazyCategoryOptions.params["is_kids_mode"])
+  m.assertEqual(categoryInfo.options.params["include_channels"], lazyCategoryOptions.params["include_channels"])
+  m.assertEqual(categoryInfo.options.params["images[poster_tb]"], lazyCategoryOptions.params["images[poster_tb]"])
+  m.assertEqual(categoryInfo.options.params["images[landscape_tb]"], lazyCategoryOptions.params["images[landscape_tb]"])
+  m.assertEqual(categoryInfo.options.params["cursor"], lazyCategoryOptions.params["cursor"])
+  m.assertEqual(categoryInfo.options.params["contents_limit"], lazyCategoryOptions.params["contents_limit"])
+  m.assertEqual(categoryInfo.options.headers["x-client-platform"], lazyCategoryOptions.headers["x-client-platform"])
+  m.assertEqual(categoryInfo.options.headers["x-client-version"], lazyCategoryOptions.headers["x-client-version"])
+  m.assertEqual(categoryInfo.options.params["expanded"], lazyCategoryOptions.params["expanded"])
+
 End Function
 
 

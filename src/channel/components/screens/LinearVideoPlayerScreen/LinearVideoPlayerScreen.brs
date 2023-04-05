@@ -264,8 +264,9 @@ End Function
 
 'Occurs when m.Video.state changes (not when m.top.state changes)
 Function onVideoStateChange(msg)
-  tubiLog("LinearVideoPlayerScreen.onVideoStateChange, state = " + msg.GetData())
+
   state = msg.GetData()
+  tubiLog("LinearVideoPlayerScreen.onVideoStateChange, state = " + state)
 
   sPreviousState = m.top.state
   if state = "finished" AND m.VideoState = "play"
