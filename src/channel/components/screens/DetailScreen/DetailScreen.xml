@@ -222,17 +222,14 @@
       iconUrl="pkg:/images/icon-play.webp"/>
     <DetailMenuItemContentNode
       id="LikeMenuItem"
-      analyticsButtonValue="LIKE"
       isUnfocusedFootprintEnabled="true"
       iconUrl="pkg:/images/icon-like.webp" />
     <DetailMenuItemContentNode
       id="DislikeMenuItem"
-      analyticsButtonValue="DISLIKE"
       isUnfocusedFootprintEnabled="true"
       iconUrl="pkg:/images/icon-dislike.webp" />
     <DetailMenuItemContentNode
       id="LikeDislikeMenuItem"
-      analyticsButtonValue="LIKE_OR_DISLIKE"
       iconUrl="pkg:/images/icon-like.webp" />
     <DetailMenuItemContentNode
       id="EpisodesMenuItem"

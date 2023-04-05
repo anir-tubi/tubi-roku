@@ -133,16 +133,29 @@ Function setDetailStrings()
   else
     m.PlayMenuItem.title = getTranslation("screenDetails_button_play")
   end if
+  m.PlayMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.PlayMenuItem.id]
 
   m.LikeMenuItem.title = getTranslation("screenDetails_button_like")
+  m.LikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.LikeMenuItem.id]
+
   m.DislikeMenuItem.title = getTranslation("screenDetails_button_dislike")
+  m.DislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.DislikeMenuItem.id]
+
   m.ResumeMenuItem.title = getTranslation("screenDetails_button_resume")
+  m.ResumeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.ResumeMenuItem.id]
+
   m.EpisodesMenuItem.title = getTranslation("screenDetails_button_episodes")
+  m.EpisodesMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.EpisodesMenuItem.id]
+
   m.WatchTrailerMenuItem.title = getTranslation("screenDetails_button_trailer")
+  m.WatchTrailerMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.WatchTrailerMenuItem.id]
+
   RelatedRowLabelContent = m.top.findNode("RelatedRowLabelContent")
   RelatedRowLabelContent.title = getTranslation("screenDetails_relatedTitles")
+
   ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
   m.SeeAllGamesMenuItem.title = getTranslation("screenDetails_button_see_all_games")
+  m.SeeAllGamesMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.SeeAllGamesMenuItem.id]
 End Function
 
 
@@ -159,8 +172,10 @@ Function changeButtonText(sButtonStringId, sButtonText)
     stringNode = m.AddQueueMenuItem
 
     if sButtonText = getTranslation("screenDetails_button_queue")
+      stringNode.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.AddQueueMenuItem.id]
       stringNode.iconUrl = "pkg:/images/icon-add-to-queue.webp"
     else
+      stringNode.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.setReminderMenuItem]
       stringNode.iconUrl = "pkg:/images/set-reminder.webp"
     end if
 
@@ -168,8 +183,10 @@ Function changeButtonText(sButtonStringId, sButtonText)
     stringNode = m.RemoveQueueMenuItem
 
     if sButtonText = getTranslation("screenDetails_button_noQueue")
+      stringNode.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.RemoveQueueMenuItem.id]
       stringNode.iconUrl = "pkg:/images/icon-remove-from-queue.webp"
     else
+      stringNode.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.removeReminderMenuItem]
       stringNode.iconUrl = "pkg:/images/reminder-set.webp"
     end if
 
@@ -370,10 +387,12 @@ Function changeLikeDislikeButtonText()
       if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked
         '//The Like State is "liked", so display liked state
         sButtonText = getTranslation("screenDetails_button_liked")
+        m.LikeDislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.likeRemoveRatingMenuItem]
         sIconUrl = "pkg:/images/icon-liked.webp"
       else
         '//The Like State is "disliked", so display disliked state
         sButtonText = getTranslation("screenDetails_button_disliked")
+        m.LikeDislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.dislikeRemoveRatingMenuItem]
         sIconUrl = "pkg:/images/icon-disliked.webp"
       end if
 
@@ -391,6 +410,7 @@ Function changeLikeDislikeButtonText()
     else
       '//The Like State is nothing so display default state
       sButtonText = getTranslation("screenDetails_button_likeDislike")
+      m.LikeDislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.LikeDislikeMenuItem.id]
       sIconUrl = "pkg:/images/icon-like.webp"
     end if
 
@@ -718,14 +738,8 @@ Function onMenuItemFocused()
   if focused.id = m.constants.ui.detailScreenMenuItemIds.PlayMenuItem AND m.top.isHistory = true
     'When we have history, considering the play as Start from beginning.
     focusedMenuAnalyticsSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.startFromBeginningMenuItem]
-  else if focused.id = m.constants.ui.detailScreenMenuItemIds.LikeDislikeMenuItem
-    if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked
-      focusedMenuAnalyticsSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.likeRemoveRatingMenuItem]
-    else if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.disliked
-      focusedMenuAnalyticsSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.dislikeRemoveRatingMenuItem]
-    else
-      focusedMenuAnalyticsSection = m.Tracking.detailScreenMenuItemMap[focused.id]
-    end if
+  else if isNonEmptyString(focused.analyticsButtonValue)
+    focusedMenuAnalyticsSection = focused.analyticsButtonValue
   else
     focusedMenuAnalyticsSection = m.Tracking.detailScreenMenuItemMap[focused.id]
   end if
@@ -1232,43 +1246,19 @@ End Function
 ' @menuItem: Node, DetailMenuItemContentNode for focused, unfocused or selected item of menu or secondary menu.
 Function setComponentInteractionEventForMenu(componentInteractionValue, menuItem)
   tubiLog("DetailScreen.setComponentInteractionEventForMenu")
-  menuItemTitle = ""
   menuItemId = ""
   middleNavSection = ""
   componentValues = {}
 
   if menuItem <> invalid
-    menuItemTitle = menuItem.title
     menuItemId = menuItem.id
 
-    if isNonEmptyString(menuItemTitle) = true AND isNonEmptyString(menuItemId) = true
-      if menuItemId = m.constants.ui.detailScreenMenuItemIds.addQueueMenuItem
-        if menuItemTitle = getTranslation("screenDetails_button_set_reminder") OR menuItemTitle = getTranslation("screenDetails_button_sign_in_to_set_reminder")
-          middleNavSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.setReminderMenuItem]
-        else
-          middleNavSection = m.Tracking.detailScreenMenuItemMap[menuItemId]
-        end if
-      else if menuItemId = m.constants.ui.detailScreenMenuItemIds.removeQueueMenuItem
-        if menuItemTitle = getTranslation("screenDetails_button_remove_reminder")
-          middleNavSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.removeReminderMenuItem]
-        else
-          middleNavSection = m.Tracking.detailScreenMenuItemMap[menuItemId]
-        end if
-      else if menuItemId = m.constants.ui.detailScreenMenuItemIds.LikeDislikeMenuItem
-        if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked
-          middleNavSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.likeRemoveRatingMenuItem]
-        else if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.disliked
-          middleNavSection = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.dislikeRemoveRatingMenuItem]
-        else
-          middleNavSection = m.Tracking.detailScreenMenuItemMap[menuItemId]
-        end if
-      else
-          middleNavSection = m.Tracking.detailScreenMenuItemMap[menuItemId]
-      end if
-    else if isNonEmptyString(menuItemId) = true
-      'This block won't execute. We added to avoid sending empty component Values when menuItem title is empty string.
+    if isNonEmptyString(menuItem.analyticsButtonValue)
+      middleNavSection = menuItem.analyticsButtonValue
+    else
       middleNavSection = m.Tracking.detailScreenMenuItemMap[menuItemId]
     end if
+
   end if
 
   if isNonEmptyString(middleNavSection) = true
