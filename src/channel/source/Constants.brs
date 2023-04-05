@@ -1134,11 +1134,8 @@ Function getConstants()
       'Sizes of poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.poster = [186, 267]
 
-      'Sizes of large landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images. The MyStuff Screen uses this image size.
-      constants.ui.imageSizes.landscapeLarge = [582, 327]
-
       'Size of the thumbnail/background of the single element representing an empty container that we wish to show: i.e. on the MyStuff Screen
-      constants.ui.imageSizes.emptyContainer = [1634, 384]
+      constants.ui.imageSizes.emptyContainer = [1572, 267]
 
       'Sizes of landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.landscape = [384, 216]
@@ -1235,7 +1232,7 @@ Function getConstants()
     constants.ui.gridItemTypes = {}
       constants.ui.gridItemTypes.portrait = "portrait"
       constants.ui.gridItemTypes.landscape = "landscape"
-      constants.ui.gridItemTypes.landscapeLarge = "landscapeLarge"
+      constants.ui.gridItemTypes.landscapeInnerMetadata = "landscapeInnerMetadata"
       constants.ui.gridItemTypes.landscapeNoTitle = "landscapeNoTitle"
       constants.ui.gridItemTypes.linear = "linear"
       constants.ui.gridItemTypes.historySignedOutUser = "continue_watching_signed_out_user"

@@ -12,7 +12,7 @@ Function parseCategoryMyStuffContentSuccess(fullResponse, reqInfo)
   if contents.Count() > 0
     if container.id = m.constants.ui.categoryIds.history
       '//if this is the continue watching container, then ensure the orientation is landscape
-      orientation = m.constants.ui.gridItemTypes.landscapeLarge
+      orientation = m.constants.ui.gridItemTypes.landscapeInnerMetadata
     end if
     
     bFullData = false

@@ -265,7 +265,7 @@ Function onSideNavItemSelected()
         setUiMode(m.constants.ui.modes.standard)
       end if
       
-      if getExperimentResource("roku_my_stuff", "roku_my_stuff_v1", false).enabled = true AND UCase(m.constants.deviceInfo.countryCode) = "US" 
+      if getExperimentResource("roku_my_stuff", "roku_my_stuff_v2", false).enabled = true AND UCase(m.constants.deviceInfo.countryCode) = "US" 
         '//Display the MyStuff Screen while also sending the experiment exposure event upon the user selecting the myStuff or MyList screen
         showMyStuffScreen()
       else
@@ -451,7 +451,7 @@ Function displayNavMenu(shouldTrackComponentInteraction = true)
   if bSideNavOpened = false
     '//Send exposure event when the side nav has been opened.
     if UCase(m.constants.deviceInfo.countryCode) = "US" 
-      getExperimentResource("roku_my_stuff", "roku_my_stuff_v1", true)
+      getExperimentResource("roku_my_stuff", "roku_my_stuff_v2", true)
     end if
 
     openSideNav()

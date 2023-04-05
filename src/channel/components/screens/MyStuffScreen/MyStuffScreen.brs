@@ -1,21 +1,34 @@
 Function init()
   tubiLog("MyStuffScreen.init")
   m.constants = getConstantsFromGlobal()
+  m._ = rodash()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.ContentArea = m.top.findNode("ContentArea")
-  m.ScreenTitle = m.top.findNode("ScreenTitle")
+  m.InfoPanel = m.top.findNode("InfoPanel")
   m.SignedOutUI = m.top.findNode("SignedOutUI")
   m.SignedOutUITitle = m.top.findNode("SignedOutUITitle")
   m.SignedOutUISubtitle = m.top.findNode("SignedOutUISubtitle")
   m.SignedOutUIBlurb = m.top.findNode("SignedOutUIBlurb")
-  m.ScreenTitle.text = getTranslation("screenMyStuff_title")
+  m.AllEmptyUI = m.top.findNode("AllEmptyUI")
+  m.AllEmptyUIMenu = m.top.findNode("AllEmptyUIMenu")
+  m.AllEmptyUITitle = m.top.findNode("AllEmptyUITitle")
+  m.AllEmptyUISubtitle = m.top.findNode("AllEmptyUISubtitle")
+  m.AllEmptyUISubtitle2 = m.top.findNode("AllEmptyUISubtitle2")
+  m.AllEmptyUISubtitle2Icon = m.top.findNode("AllEmptyUISubtitle2Icon")
+
   m.SignedOutUITitle.text = getTranslation("screenMyStuff_signedOutUITitle")
   m.SignedOutUISubtitle.text = getTranslation("screenMyStuff_signedOutUISubtitle")
   m.SignedOutUIBlurb.text = getTranslation("screenMyStuff_signedOutUIBlurb")
+  m.AllEmptyUITitle.text = getTranslation("screenMyStuff_allEmptyUITitle")
+  m.AllEmptyUISubtitle.text = getTranslation("screenMyStuff_signedOutUISubtitle")
+  m.AllEmptyUISubtitle2.text = getTranslation("screenMyStuff_allEmptyUISubtitle")
+  m.AllEmptyUISubtitle2.width = 0   '//set to 0 so the boundingRect()'s dimensions are properly set
+  m.AllEmptyUISubtitle2.width = m.AllEmptyUISubtitle2.boundingRect().width 
   m.top.screenLevel = m.constants.ui.screenLevels.myStuffScreen
   m.top.id = m.constants.ui.screenIds.myStuffScreen
+  m.isAllContentEmpty = false   '//when the content is loaded and it is discovered that all the containers are empty, then this is set to true
 
   m.top.handlesTransportVoiceRequests = true
 
@@ -26,8 +39,6 @@ Function init()
 
   'used to know when to send tracking info. Do not send focus tracking info when the rowlist is 1st loaded
   m.gridHasGainedInitialFocus = false
-
-  m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
   m.metadataTranslate = TubiMetadataTranslate(m.constants)
 
@@ -41,14 +52,19 @@ Function init()
   'Content area
   m.RowList = m.top.findNode("RowList")
   m.GuestMenu = m.top.findNode("GuestMenu")
-  m.GuestMenu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
   m.RowList.focusBitmapUri = "pkg:/images/selector-$$RES$$.9.png"
+  m.GuestMenu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
   m.GuestMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-$$RES$$.9.png"
+  m.AllEmptyUIMenu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$}.9.png"
+  m.AllEmptyUIMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-$$RES$$.9.png"
 
   defaultGuestMenuWidth = m.GuestMenu.itemSize[0]
   signInOutButton = m.top.findNode("SignInOutButton")
   signInOutButton.title = getTranslation("menu_signIn")
 
+  allEmptyUIButton = m.top.findNode("AllEmptyUIButton")
+  allEmptyUIButton.title = getTranslation("menu_goHome")
+  
   ' Adjust the width of the guest menu if text of the button is too long for the default width. Mostly spanish text are generally longer in length.
   tempChannelMenuItem = CreateObject("roSGNode", "DetailMenuItem")
   tempChannelMenuItem.itemContent = signInOutButton
@@ -58,9 +74,18 @@ Function init()
     m.GuestMenu.itemSize = [potentialWidth, m.GuestMenu.itemSize[1]]
   end if
 
+  ' Adjust the width of the guest menu if text of the button is too long for the default width. Mostly spanish text are generally longer in length.
+  tempChannelMenuItem.itemContent = allEmptyUIButton
+
+  potentialWidth = tempChannelMenuItem.calculatedTextWidth + tempChannelMenuItem.leftTextPadding + tempChannelMenuItem.rightTextPadding
+  if potentialWidth > defaultGuestMenuWidth AND potentialWidth > m.GuestMenu.itemSize[0]
+    m.AllEmptyUIMenu.itemSize = [potentialWidth, m.AllEmptyUIMenu.itemSize[1]]
+  end if
+
   m.RowList.observeFieldScoped("rowItemFocused", "onRowItemFocused")
   m.RowList.observeFieldScoped("rowItemSelected", "onRowItemSelected")
-  m.GuestMenu.observeFieldScoped("itemSelected", "onMenuItemSelected")
+  m.GuestMenu.observeFieldScoped("itemSelected", "onGuestMenuItemSelected")
+  m.AllEmptyUIMenu.observeFieldScoped("itemSelected", "onAllEmptyMenuItemSelected")
 
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
   m.top.observeFieldScoped("isLoading", "onLoadingChange")
@@ -83,14 +108,28 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
+  
+  bKidsTheme = false
 
   if theme <> invalid
     m.SignedOutUITitle.color = theme.primaryTextColor
-    m.ScreenTitle.color = theme.primaryTextColor
     m.SignedOutUISubtitle.color = theme.secondaryTextColor
-    m.SignedOutUIBlurb.color = theme.focusedColor
+    m.SignedOutUIBlurb.color = theme.primaryTextColor
+    m.AllEmptyUITitle.color = theme.primaryTextColor
+    m.AllEmptyUISubtitle.color = theme.secondaryTextColor
+    m.AllEmptyUISubtitle2.color = theme.secondaryTextColor
+    m.AllEmptyUISubtitle2Icon.blendColor = theme.secondaryTextColor
     m.GuestMenu.focusBitmapBlendColor = theme.focusedColor
+    m.AllEmptyUIMenu.focusBitmapBlendColor = theme.focusedColor
     m.RowList.focusBitmapBlendColor = theme.focusedColor
+
+    bKidsTheme = (theme.id = m.constants.ui.themeIDs.kidsMode)
+  end if
+  
+  if bKidsTheme = true
+    m.defaultBackgroundUri = "https://cdn.adrise.tv/image/roku_support_images/backgroundMyStuffDefault_kids.webp"
+  else
+    m.defaultBackgroundUri = "https://cdn.adrise.tv/image/roku_support_images/backgroundMyStuffDefault.webp"
   end if
 End Function
 
@@ -101,11 +140,15 @@ Function onScreenFocusChange()
       m.GuestMenu.setFocus(true)
     else if m.top.content <> invalid
       if m.top.content.getChildCount() > 0
-        oldFcousedRowItem = m.top.cursorPosition
-        m.RowList.setFocus(true)
-        if oldFcousedRowItem <> invalid
-          '//when regaining focus, focus on previous item instead of [0,0]
-          m.RowList.jumpToRowItem = oldFcousedRowItem
+        oldFocusedRowItem = m.top.cursorPosition
+        if m.isAllContentEmpty = true
+          m.AllEmptyUIMenu.setFocus(true)
+        else
+          m.RowList.setFocus(true)
+          if oldFocusedRowItem <> invalid
+            '//when regaining focus, focus on previous item instead of [0,0]
+            m.RowList.jumpToRowItem = oldFocusedRowItem
+          end if
         end if
       end if
 
@@ -113,18 +156,20 @@ Function onScreenFocusChange()
         m.top.refreshContent = true
       end if
     end if
-
-    m.top.backgroundUriList = [m.defaultBackgroundUri]
   end if
 End Function
 
 
 Function onLoadingChange(msg)
   tubiLog("MyStuffScreen.onLoadingChange")
-  isNotLoading = (msg.getData() = false)
-  m.RowList.visible = isNotLoading
-  if isNotLoading = false
+  isLoading = msg.getData()
+
+  if isLoading = true
+    m.RowList.visible = false
+    m.InfoPanel.visible = false
     m.RowList.content = invalid   'When not fully loaded, then the rowlist should not show any content
+    m.AllEmptyUI.visible = false
+    m.top.backgroundUriList = [m.defaultBackgroundUri]
   end if
 End Function
 
@@ -136,12 +181,36 @@ Function onContentUpdateChange(msg) As Void
     ' Delayed setting of Rowlist content until first batch arrives
     setRowHeights()
 
-    if content.getChildCount() > 0 AND m.top.hasFocus() = true
-      m.RowList.setFocus(true)
+    nContainers = content.getChildCount()
+    if nContainers > 0
+      m.isAllContentEmpty = true
+      for i = 0 to nContainers - 1
+        container = content.getChild(i)
+        if container.gridItemType <> m.constants.ui.gridItemTypes.emptyContainer
+          m.isAllContentEmpty = false
+          exit for
+        end if
+      end for
+      
+      if m.isAllContentEmpty = false
+        m.AllEmptyUI.visible = false
+        m.RowList.visible = true
+        m.InfoPanel.visible = true
+        m.RowList.setFocus(true)
+      else
+        m.AllEmptyUI.visible = true
+        m.RowList.visible = false
+        m.InfoPanel.visible = false
+        m.AllEmptyUIMenu.setFocus(true)
+        m.top.backgroundUriList = [m.defaultBackgroundUri]
+      end if
     end if
   else
+    m.AllEmptyUI.visible = false
     m.RowList.content = invalid
     m.RowList.visible = false
+    m.InfoPanel.visible = false
+    m.isAllContentEmpty = false
   end if
 End Function
 
@@ -150,32 +219,29 @@ Function setRowHeights()
   'determine the height of each row in the RowList so we can set it on RowList.rowItemSize
   rowItemSize = []
   rowHeights = []
-  aRowLabelVisible = []
   for i=0 to m.top.content.getChildCount()-1
-    bShowRowLabel = true
     category = m.top.content.getChild(i)
     rowHeight = 0
     rowHeightAdjustment = 0
     gridItemType = category.gridItemType
     gridItemTypes = m.constants.ui.gridItemTypes
     if gridItemType = gridItemTypes.emptyContainer
+      rowHeightAdjustment = m.constants.ui.imageSizes.emptyContainer[1] - m.constants.ui.imageSizes.landscape[1]
       rowItemSize.push(m.constants.ui.imageSizes.emptyContainer)
       rowHeight = m.constants.ui.imageSizes.emptyContainer[1]
-      bShowRowLabel = false
     else if gridItemType = gridItemTypes.portrait
       posterWidth = m.constants.ui.imageSizes.poster[0]
       posterHeight = m.constants.ui.imageSizes.poster[1]
       rowHeightAdjustment = 80
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
-    else if gridItemType = gridItemTypes.landscapeLarge
-      posterWidth = m.constants.ui.imageSizes.landscapeLarge[0]
-      posterHeight = m.constants.ui.imageSizes.landscapeLarge[1]
+    else if gridItemType = gridItemTypes.landscapeInnerMetadata
+      posterWidth = m.constants.ui.imageSizes.landscape[0]
+      posterHeight = m.constants.ui.imageSizes.landscape[1]
       rowHeightAdjustment = 50
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
     end if
-    aRowLabelVisible.push(bShowRowLabel)
     rowHeights.push(rowHeight + rowHeightAdjustment)
   end for
 
@@ -185,7 +251,7 @@ Function setRowHeights()
     "itemSize" : itemSize
     "rowItemSize": rowItemSize
     "rowHeights": rowHeights
-    "showRowLabel": aRowLabelVisible
+    "showRowLabel": [true]
   })
   m.RowList.content = m.top.content
 End Function
@@ -214,6 +280,28 @@ Function onRowItemFocused(msg) as Boolean
 
       ' immediately update the position counter
       category.focusIndex = newCursorPosition[1]
+    end if
+
+    '//Set the Metadata
+    itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
+    m.top.backgroundUriList = determineBackgroundImage(itemFocused)
+    
+    mode = m.constants.ui.infoPanelModes.item
+    if category.gridItemType = m.constants.ui.gridItemTypes.emptyContainer
+      emptyContentNode = CreateObject("roSGNode", "TubiContentNode")
+      if category.id = m.constants.ui.categoryIds.history
+        emptyContentNode.title = getTranslation("metadata_myStuff_empty_continueWatchingInfoPanel_title")
+        emptyContentNode.description = getTranslation("metadata_myStuff_empty_continueWatchingInfoPanel_description")
+        mode = m.constants.ui.infoPanelModes.continueWatching
+      else if category.id = m.constants.ui.categoryIds.queue
+        emptyContentNode.title = getTranslation("metadata_myStuff_empty_myListInfoPanel_title")
+        emptyContentNode.description = getTranslation("metadata_myStuff_empty_myListInfoPanel_description")
+        mode = m.constants.ui.infoPanelModes.continueWatching
+      end if
+
+      populateInfoPanel(mode, emptyContentNode) 'empties the info panel
+    else
+      populateInfoPanelByContent(itemFocused)
     end if
 
     'Set up the navigateWithinPageInfo to send to ContentController.
@@ -251,6 +339,78 @@ Function onRowItemFocused(msg) as Boolean
 End Function
 
 
+Function populateInfoPanelByContent(focusedContent)
+  if focusedContent <> invalid
+    sType = focusedContent.type
+    mode = m.constants.ui.infoPanelModes.item
+    if sType = m.constants.ui.categoryTypes.linear
+      mode = m.constants.ui.infoPanelModes.linearHomeScreen
+    else if sType = m.constants.ui.categoryTypes.historySignedOutUser
+      mode = m.constants.ui.infoPanelModes.continueWatching
+    else if sType = m.constants.ui.categoryTypes.preview
+      mode = m.constants.ui.infoPanelModes.vitg
+    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    else if sType = m.constants.ui.contentTypes.navigate
+      mode = m.constants.ui.infoPanelModes.navigateSports
+    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    else if sType = m.constants.ui.contentTypes.sportsEvent
+      mode = m.constants.ui.infoPanelModes.sportsEvent
+    end if
+
+    populateInfoPanel(mode, focusedContent)
+  end if
+End Function
+
+
+'@mode: string, one of the valid constants.ui.infoPanelModes info panel modes (see InfoPanel.xml for details)
+'@contentNode: content node
+Function populateInfoPanel(mode, contentNode)
+  if contentNode <> invalid
+    if mode = m.constants.ui.infoPanelModes.vitg
+      m.InfoPanel.mode = mode
+    else if mode = m.constants.ui.infoPanelModes.item
+      populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel)
+    else if mode = m.constants.ui.infoPanelModes.linearHomeScreen
+      m.InfoPanel.mode = mode
+      m.InfoPanel.topHeaderImageUri = m.constants.ui.uris.infoPanelEpgLiveIcon
+      m.InfoPanel.title = contentNode.title
+      m.InfoPanel.description = contentNode.description
+      m.InfoPanel.needsLogin = contentNode.needsLogin AND (m.top.signedIn <> true)
+      m.InfoPanel.reminderIsSet = false
+      m.InfoPanel.width = 650
+    else if mode = m.constants.ui.infoPanelModes.continueWatching
+      m.InfoPanel.mode = mode
+      m.InfoPanel.title = contentNode.title
+      m.InfoPanel.description = contentNode.description
+      m.InfoPanel.reminderIsSet = false
+      m.InfoPanel.width = 960
+    else if mode = m.constants.ui.infoPanelModes.programHomescreen
+      populateInfoPanelWithProgramHomescreenMode(contentNode, m.InfoPanel)
+    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    else if mode = m.constants.ui.infoPanelModes.navigateSports
+      m.InfoPanel.mode = mode
+      m.InfoPanel.topHeaderImageUri = m.constants.ui.uris.infoPanelWorldCupLogo
+      m.InfoPanel.title = contentNode.title
+      'Fifa Worldcup description and dates are constant when show all games is focused, so hardcoding it
+      m.InfoPanel.description = getTranslation("show_all_games_description")
+      lineOneData = {}
+      lineOneData.hoursOfAiring = getTranslation("show_all_games_gameInfo")
+      'Showing 4k badge by default for show all CTA Infopanel
+      lineOneData.has4k = true
+      lineOneData.hasCC = contentNode.hasSubtitles
+      m.InfoPanel.lineOneData = lineOneData
+      m.InfoPanel.needsLogin = false
+      m.InfoPanel.reminderIsSet = false
+      m.InfoPanel.width = 960
+    else if mode = m.constants.ui.infoPanelModes.sportsEvent
+      populateInfoPanelWithHomescreenStyleSportsMode(contentNode, m.InfoPanel)
+    end if
+
+    m.InfoPanel.calculateHeight = true
+  end if
+End Function
+
+
 Function onRowItemSelected(msg)
   tubiLog("MyStuffScreen.onRowItemSelected")
   selectedPosition = msg.getData()
@@ -258,11 +418,46 @@ Function onRowItemSelected(msg)
 End Function
 
 
-Function onMenuItemSelected(msg)
-  tubiLog("MyStuffScreen.onMenuItemSelected")
+Function onGuestMenuItemSelected(msg)
+  tubiLog("MyStuffScreen.onGuestMenuItemSelected")
+  setSignUpButtonSelectedIndicator()
+End Function
+
+
+Function onAllEmptyMenuItemSelected(msg)
+  tubiLog("MyStuffScreen.onAllEmptyMenuItemSelected")
+  setAllEmptyMenuItemSelectedIndicator()
+End Function
+
+
+Function setSignUpButtonSelectedIndicator()
+  sendButtonComponentAnalytics("SIGNUP_TO_SAVE_PROGRESS")
   '//communicate that the user is asking to start the sign in process
   m.top.signUpButtonSelected = true
-  setComponentInteractionEventForSignUp()
+End Function 
+
+
+Function setAllEmptyMenuItemSelectedIndicator()
+  sendButtonComponentAnalytics("GO_TO_HOME")
+  '//communicate that the user is asking to go to the homescreen
+  m.top.homeButtonSelected = true
+End Function
+
+
+' Set the componentInteractionInfo so the analytics of the button press is sent 
+' @sButtonValue: string, The 'section value' of the button to send to the analytics
+Function sendButtonComponentAnalytics(sButtonValue)
+  'send analytics that signin button was pressed
+  componentValues = {
+    button_type: "TEXT"
+    button_value: sButtonValue 'Button value is always upper case and concatinated by "_"
+  }
+  pageInfo = m.top.trackingPageInfo
+  m.top.componentInteractionInfo = {
+    pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+    componentOneof: m.Tracking.getAnalyticsComponent("button_component", componentValues)
+    user_interaction: "CONFIRM"
+  }
 End Function
 
 
@@ -271,10 +466,15 @@ Function handleItemSelected(selectedPosition)
   if m.top.content <> invalid
     itemSelected = resolveAbbreviatedContent(selectedPosition)
 
-    m.top.trackingComponentInfo = getTrackingComponentInfoOfRowList(itemSelected, selectedPosition)
+    category = m.RowList.content.getChild(selectedPosition[0])
+    if category.gridItemType <> m.constants.ui.gridItemTypes.emptyContainer
+      '//don't do anything if the empty container is selected
+      
+      m.top.trackingComponentInfo = getTrackingComponentInfoOfRowList(itemSelected, selectedPosition)
+      if itemSelected <> invalid
+        m.top.contentSelected = itemSelected
+      end if
 
-    if itemSelected <> invalid
-      m.top.contentSelected = itemSelected
     end if
   end if
 End Function
@@ -355,11 +555,18 @@ Function onTransportVoiceRequest(msg)
       end if
     else if command = "ok"
       if m.top.signedIn = true
-        handleItemSelected(m.top.cursorPosition)
+        if m.isAllContentEmpty = false
+          handleItemSelected(m.top.cursorPosition)
+          response = "success"
+        else
+          '//communicate that the user is asking to go to the home screen
+          setAllEmptyMenuItemSelectedIndicator()
+          response = "success"
+        end if
       else
         '//communicate that the user is asking to start the sign in process
-        m.top.signUpButtonSelected = true
-        setComponentInteractionEventForSignUp()
+        setSignUpButtonSelectedIndicator()
+        response = "success"
       end if
     end if
   end if
@@ -374,9 +581,9 @@ Function handlePlayInput()
   if m.top.isLoading <> true and m.top.signedIn = true
     itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
     positionFocused = m.top.cursorPosition
-
+    category = m.RowList.content.getChild(positionFocused[0])
     ' Content controller observes contentSelected to populate/push the detail screen
-    if itemFocused <> invalid AND itemFocused.type <> m.constants.ui.contentTypes.linear
+    if itemFocused <> invalid AND itemFocused.type <> m.constants.ui.contentTypes.linear AND category.gridItemType <> m.constants.ui.gridItemTypes.emptyContainer
       m.top.trackingComponentInfo = getTrackingComponentInfoOfRowList(itemFocused, positionFocused)
       m.top.contentToPlay = itemFocused
       return true
@@ -397,10 +604,13 @@ Function onSignedInChange()
     m.ContentArea.visible = false
     m.SignedOutUI.visible = true
     m.GuestMenu.setFocus(true)
+    m.AllEmptyUI.visible = false
+    m.InfoPanel.visible = false
+    m.isAllContentEmpty = false
+    m.top.backgroundUriList = [m.defaultBackgroundUri]
   else
     m.ContentArea.visible = true
     m.SignedOutUI.visible = false
-    m.RowList.setFocus(true)
   end if
 End Function
 
@@ -447,26 +657,16 @@ Function onJumpToRowItemChange(msg)
       end if
     end if
 
-    if m.RowList.content.getChild(row).gridItemType = m.constants.ui.gridItemTypes.emptyContainer
-      '//If the current row is empty, then check if the other row is empty
-      column = 0
-      nOtherRow = Abs(row - 1)
-      if m.RowList.content.getChild(nOtherRow).gridItemType <> m.constants.ui.gridItemTypes.emptyContainer
-        '//if the other row is not empty, then set focus on other row
-        row = nOtherRow
-      else
-        '//if the other row is empty, then default focus on the top row
-        row = 0
-      end if
-    end if
-
     m.RowList.jumpToRowItem = [row, column]
 
     '//After jumping to a row item, then immediately reset the row's counter index
     '//   This is when an item is added to the list and the user backs up to the MyStuffScreen again
-    category = m.RowList.content.getChild(m.RowList.rowItemFocused[0])
-    if category <> invalid
-      category.focusIndex = m.RowList.rowItemFocused[1]
+    rowItemFocused = m.RowList.rowItemFocused
+    if rowItemFocused[0] <> invalid
+      category = m.RowList.content.getChild(rowItemFocused[0])
+      if category <> invalid
+        category.focusIndex = rowItemFocused[1]
+      end if
     end if
   end if
 
@@ -488,18 +688,17 @@ Function onResetChange(msg)
   end if
 End Function
 
-
-'@screen, screen info after selecting signUp button
-Function setComponentInteractionEventForSignUp()
-  tubiLog("MyStuffScreen.setComponentInteractionEventForSignUp")
-  componentValues = {
-    button_type: "TEXT"
-    button_value: "SIGNUP_TO_SAVE_PROGRESS" 'Button value is always upper case and concatinated by "_"
-  }
-  pageInfo = m.top.trackingPageInfo
-  m.top.componentInteractionInfo = {
-    pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
-    componentOneof: m.Tracking.getAnalyticsComponent(m.constants.componentTypes.buttonComponent, componentValues)
-    user_interaction: "CONFIRM"
-  }
-End Function
+Function onKeyEvent(key As String, press As Boolean) as Boolean
+  tubiLog("MyStuffScreen.onKeyEvent key = " + key)
+  if press = true
+    if key = "OK"
+      '//ensure this keypress is captured so the default Roku positive audio sound is played.
+      return true
+    else if key = "play" AND m.RowList.isInFocusChain() = true
+        if handlePlayInput() = true
+          return true
+        end if
+    end if
+  end if
+  return false
+End function

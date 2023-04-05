@@ -332,12 +332,11 @@ End Function
 ' https://docs.google.com/document/d/1T9qL5otwgjIAEW4pPwvKiq0PxIYEK-ExKrFBYRkx6BY
 '
 ' @imageTypes, array - an array of strings corresponding to which types of images to request from Tupian
-'                      Accepted values are "poster", "landscape", "landscapeLarge"
+'                      Accepted values are "poster", "landscape"
 ' @existingParams: assocArray, any parameters that have already been defined that need to be added to
 Function cmsApi_setImageParams(imageTypes, existingParams = {})
   posterSize = m.constants.ui.imageSizes.poster
   landscapeSize = m.constants.ui.imageSizes.landscape
-  landscapeLargeSize = m.constants.ui.imageSizes.landscapeLarge
 
   for each imageType in imageTypes
     if imageType = "poster"
@@ -345,8 +344,6 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {})
       existingParams["images[poster_tb]"] = "w" + posterSize[0].ToStr() + "h" + posterSize[1].ToStr() + "_poster"
     else if imageType = "landscape"
       existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_landscape"
-    else if imageType = "landscapeLarge"
-      existingParams["images[landscapeLarge_tb]"] = "w" + landscapeLargeSize[0].ToStr() + "h" + landscapeLargeSize[1].ToStr() + "_landscape"
     end if
   end for
 
@@ -479,7 +476,7 @@ Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSi
           }
           imageParamTypes = [
             "poster"
-            "landscapeLarge"
+            "landscape"
           ]
           categoryReqInfo = m.categoryReqInfo(categoryId, bKidsMode, options, imageParamTypes)
           categoryReqInfo.requestType = reqName

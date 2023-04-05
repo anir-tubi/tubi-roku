@@ -82,12 +82,13 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     else if contentFromServer.posterarts <> invalid AND isNonEmptyArray(contentFromServer.posterarts) = true
       sThumbnailURL = contentFromServer.posterarts[0]
     end if
-  else if gridType = gridItemTypes.landscapeLarge
-    if canvasImages <> invalid AND isNonEmptyArray(canvasImages.landscapeLarge_tb) = true AND isNonEmptyString(canvasImages.landscapeLarge_tb[0]) = true
-      sThumbnailURL = canvasImages.landscapeLarge_tb[0]
-    end if
-  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle
-    if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
+  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata
+    if gridType = gridItemTypes.landscapeInnerMetadata AND isNonEmptyArray(contentFromServer.hero_images) = true
+      '//If a landscapde inner metadata image, then try to get a different thumbnail.
+      '//   The regular image most likely has the title embedded in the image, and 
+      '//   the landscapde inner metadata image has a title overlaid on top of the thumbnail.
+      sThumbnailURL = contentFromServer.hero_images[0]
+    else if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
       '//A custom landscape size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.landscape_tb[0]
     else if isNonEmptyArray(contentFromServer.hero_images) = true
@@ -367,7 +368,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   creditCuePoints.AddReplace("postlude", postlude)
   translatedContent.creditCuePoints = creditCuePoints
 
-  translatedContent.landscape  = m.getThumbnailImage(contentFromServer, m.constants.ui.gridItemTypes.landscape)
+  translatedContent.landscape = m.getThumbnailImage(contentFromServer, m.constants.ui.gridItemTypes.landscape)
   sPortraitURL = m.getThumbnailImage(contentFromServer)
   if sPortraitURL <> ""
     translatedContent.portrait = sPortraitURL
@@ -1574,13 +1575,13 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
 
   if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
-  else if orientation = gridItemTypes.landscapeLarge
-    gridItemType = gridItemTypes.landscapeLarge
   else if (container.id = constants.ui.categoryIds.fifawc OR container.id = constants.ui.categoryIds.upcomings OR container.id = constants.ui.categoryIds.replays) AND orientation <> constants.ui.gridItemTypes.portrait
     gridItemType = constants.ui.gridItemTypes.landscape
   else if container.id = constants.ui.categoryIds.featured AND orientation <> gridItemTypes.portrait
     ' `orientation <> gridItemTypes.portrait` is required as the search screen container.id is featured but uses portrait imagery
     gridItemType = gridItemTypes.landscapeNoTitle
+  else if orientation = gridItemTypes.landscapeInnerMetadata
+    gridItemType = gridItemTypes.landscapeInnerMetadata
   end if
 
   return gridItemType

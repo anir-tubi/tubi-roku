@@ -44,7 +44,7 @@ Function init()
     portrait: "portrait"
     landscape: "landscape"
     landscapeNoTitle: "landscapeNoTitle"
-    landscapeLarge: "landscapeLarge"
+    landscapeInnerMetadata: "landscapeInnerMetadata"
     linear: "linear"
     historySignedOutUser: "continue_watching_signed_out_user"
     emptyContainer: "emptyContainer"
@@ -168,8 +168,10 @@ Function onContentChange(msg)
         setUpSignedOutContinueWatching()
       else if categoryContent.gridItemType = m.gridItemTypes.emptyContainer
         setUpEmptyContainer()
+      else if categoryContent.gridItemType = m.gridItemTypes.historySignedOutUser
+        setUpSignedOutContinueWatching()
       else if categoryContent.id = "continue_watching"
-        if itemContent.gridItemType = m.gridItemTypes.landscapeLarge
+        if itemContent.gridItemType = m.gridItemTypes.landscapeInnerMetadata
           m.InnerTitle.text = itemContent.title
           m.InnerTitle.visible = true
           setInnerGradient()
@@ -243,7 +245,7 @@ Function drawProgressBar(nowPos, duration)
   m.DurationBar.width = (m.top.width - (2 * m.resumeMargin))
   m.DurationBar.visible = true
 
-  if m.top.itemContent.gridItemType = m.gridItemTypes.landscapeLarge
+  if m.top.itemContent.gridItemType = m.gridItemTypes.landscapeInnerMetadata
     m.TimeRemaining.visible = true
     m.TimeRemaining.text = getTranslation("epg_minutes_left", {minutes: toStr(convertSecondsToMins(duration - nowPos))})
   end if
@@ -344,7 +346,7 @@ End Function
 
 Function setUpEmptyContainer()
   m.myStuffEmptyLayout = m.top.createChild("MyStuffEmptyCategoryGridPoster")
-  m.myStuffEmptyLayout.translation = [(m.top.width-m.myStuffEmptyLayout.width)/2, 87]
+  m.myStuffEmptyLayout.translation = [(m.top.width-m.myStuffEmptyLayout.width)/2, 40]
   m.myStuffEmptyLayout.title = m.top.itemContent.title
   m.myStuffEmptyLayout.subtitle = m.top.itemContent.description
   m.myStuffEmptyLayout.iconUri = m.top.itemContent.iconUrl
@@ -375,7 +377,7 @@ Function setInnerGradient()
     m.poster.insertChild(gradientPoster, 0)
     gradientPoster.width = m.poster.width
     gradientPoster.height = m.poster.height
-    gradientPoster.uri = "pkg:/images/categoryGridPosterInnerGradient.png"
+    gradientPoster.uri = "pkg:/images/categoryGridPosterInnerGradient.webp"
     gradientPoster.id = "gradientPoster"
   end if
 End Function

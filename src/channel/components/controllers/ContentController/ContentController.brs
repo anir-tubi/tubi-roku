@@ -1460,6 +1460,7 @@ End Function
 Function onScreenBackgroundUpdated(msg)
   TubiLog("ContentController.onScreenBackgroundUpdated")
   screen = msg.getRoSGNode()
+
   if screen <> invalid
     m.backgroundGroup.backgroundInfo = {
       type: getBackgroundType(screen.backgroundUriList)

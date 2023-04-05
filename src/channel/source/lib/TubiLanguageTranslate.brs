@@ -222,6 +222,10 @@ Function getTranslation_en_US()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to sign into app.",
       "message": "Sign In"
     },
+    "menu_goHome": {
+      "description": "Menu option on the app's myStuff screen, Allows the user to  navigate to the home screen.",
+      "message": "Go to Home"
+    },
     "menu_signedIn": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Shows that the user is signed in.",
       "message": "Hi {name}"
@@ -994,21 +998,25 @@ Function getTranslation_en_US()
       "description": "Onscreen message to indicate channel Guide content could not be loaded",
       "message": "Unable to load the Channel Guide."
     },
-    "screenMyStuff_title": {
-      "description": "The title of the MyStuff Screen which contains the continueWatching and queue/myList channels.",
-      "message": "My Stuff"
-    },
     "screenMyStuff_signedOutUITitle": {
       "description": "The title of the MyStuff Screen for the guest user.",
       "message": "Make Tubi Yours, For Free"
     },
     "screenMyStuff_signedOutUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Save all your favorites, pick up where you left off - all in one place"
+      "message": "Save all your favorites, pick up where you left off -- all in one place"
     },
     "screenMyStuff_signedOutUIBlurb": {
       "description": "The blurb of the MyStuff Screen for the guest user.",
       "message": "No credit card required • Free forever"
+    },
+    "screenMyStuff_allEmptyUITitle": {
+      "description": "The title of the MyStuff Screen for the guest user.",
+      "message": "My Stuff is empty"
+    },
+    "screenMyStuff_allEmptyUISubtitle": {
+      "description": "The subtitle of the MyStuff Screen for the guest user.",
+      "message": "To add a title to your list, use the bookmark icon"
     },
     "screenDetails_button_trailer": {
       "description": "Label of button to allow users to watch a preview of the current video title",
@@ -1132,19 +1140,35 @@ Function getTranslation_en_US()
     },
     "metadata_myStuff_empty_myList_title": {
       "description": "For an empty MyList container, this is the title that is displayed in the empty container",
-      "message": "My List"
+      "message": "Your list is empty"
     },
     "metadata_myStuff_empty_myList_description": {
       "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
-      "message": "Movies and TV shows added\nto your list will appear here"
+      "message": "Movies and TV shows added to your list will appear here"
     },
     "metadata_myStuff_empty_continueWatching_title": {
       "description": "For an empty continueWatching container, this is the title that is display in the empty container",
-      "message": "Continue Watching"
+      "message": "You are all caught up"
     },
     "metadata_myStuff_empty_continueWatching_description": {
       "description": "For an empty continueWatching container, this is the description/subtitle that is display in the empty container",
-      "message": "Movies and TV shows you haven’t finished\nwatching will appear here"
+      "message": "Movies and TV shows you haven’t finished watching will appear here"
+    },
+    "metadata_myStuff_empty_continueWatchingInfoPanel_title": {
+      "description": "For an empty continueWatching container, this is the title that is display in the InfoPanel when the empty container is in focus",
+      "message": "Continue Watching"
+    },
+    "metadata_myStuff_empty_myListInfoPanel_description": {
+      "description": "For an empty myList container, this is the description/subtitle that is display in the InfoPanel when the empty container is in focus",
+      "message": "Watch what you saved for later"
+    },
+    "metadata_myStuff_empty_myListInfoPanel_title": {
+      "description": "For an empty myList container, this is the title that is display in the InfoPanel when the empty container is in focus",
+      "message": "My List"
+    },
+    "metadata_myStuff_empty_continueWatchingInfoPanel_description": {
+      "description": "For an empty continueWatching container, this is the description/subtitle that is display in the InfoPanel when the empty container is in focus",
+      "message": "Pick up where you left off"
     },
     "metadata_continueWatching_notSignedIn_title": {
       "description": "tells non registered user what they need to do to see the continue watching container",
@@ -2387,10 +2411,6 @@ Function getTranslation_es_MX()
     "channelGuide_error_fetchContent_description": {
       "description": "Onscreen message to indicate channel Guide content could not be loaded",
       "message": "No se pudo cargar el guía de canales."
-    },
-    "screenMyStuff_title": {
-      "description": "The title of the MyStuff Screen which contains the continueWatching and queue/myList channels.",
-      "message": "Mis Cosas"
     },
     "screenMyStuff_signedOutUITitle": {
       "description": "The title of the MyStuff Screen for the guest user.",

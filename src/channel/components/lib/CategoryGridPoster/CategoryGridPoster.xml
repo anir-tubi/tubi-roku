@@ -43,19 +43,19 @@
           itemSpacings="[0]">
             <Label
               id="InnerTitle"
-              width="380"
-              height="36"
+              width="342"
+              height="27"
               vertAlign="top"
               visible="false">
               <Font
                 role="font"
                 uri="pkg:/fonts/Vaud-Bold.ttf"
-                size="30" />
+                size="22" />
             </Label>
             <Label
               id="TimeRemaining"
-              width="380"
-              height="28"
+              width="381"
+              height="24"
               vertAlign="top"
               visible="false">
               <Font

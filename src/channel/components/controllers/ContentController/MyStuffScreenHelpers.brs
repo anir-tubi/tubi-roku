@@ -25,6 +25,7 @@ Function showMyStuffScreen()
     screen.observeFieldScoped("contentToPlay", "onContentToPlay")
     screen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
     screen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelectedOnMyStuffScreen")
+    screen.observeFieldScoped("homeButtonSelected", "onHomeButtonSelectedOnMyStuffScreen")
     screen.observeFieldScoped("refreshContent", "onRefreshContentSignalForMyStuffScreen")
     screen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
 
@@ -37,13 +38,11 @@ Function showMyStuffScreen()
   end if
 
   setInScreenCache(screen)
-
   screen.trackingPageInfo = {
     pageType: "for_you_page"
     pageValues: {}
   }
 
-  displayDefaultBackground()
   screen.signedIn = bLoggedInUser '//display the guest or signed-in user profile experience
 
   ' make queue API request only if bLoadData is set to true
@@ -109,13 +108,11 @@ Function onMyStuffBatchResponse(response)
       response.validUntil = nValidUntil
     end if
 
+    screen.isLoading = false
     screen.content = response
     screen.contentUpdated = true
-
+    
     jumpToPreviousFocusedItem()
-    
-    
-    screen.isLoading = false
     showHideSpinner(false)
   
     '//Report the page_load analytics
@@ -201,6 +198,15 @@ Function onSignUpButtonSelectedOnMyStuffScreen(msg)
 End function
 
 
+Function onHomeButtonSelectedOnMyStuffScreen(msg)
+  tubiLog("MyStuffScreenHelpers.onHomeButtonSelectedOnMyStuffScreen")
+  '//Take user to the homescreen
+  homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
+  focusSideNavOption(homeSideNavID)
+  showDefaultHomeScreen()
+End function
+
+
 'myStuff screen has told us that the content is out of cache window, so refresh
 Function onRefreshContentSignalForMyStuffScreen(msg)
   tubiLog("MyStuffScreenHelpers.onRefreshContentSignalForMyStuffScreen")
@@ -229,7 +235,7 @@ Function onMyStuffContentSelected(msg)
   if content.type <> m.constants.ui.contentTypes.emptyContainer
     '//NOTE: If the content type is empty, then it is most likely the user has no items in a myList row  (i.e. continue watching, myList)
     ' and the user attempted to click on an empty row. 
-    ' Nothing show happen.
+    ' Nothing should happen.
     showDetailScreen(content, true)
   end if
 End Function

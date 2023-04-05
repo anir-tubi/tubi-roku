@@ -21,7 +21,7 @@
       id="myStuffLayout"
       layoutDirection="vert"
       horizAlignment="center"
-      itemSpacings="[22]">
+      itemSpacings="[18]">
       <Poster
         id="Icon"
         width="84"
@@ -29,26 +29,26 @@
         />
       <Label
         id="Title"
-        height="20"
+        height="39"
         vertAlign="center">
         <Font
           role="font"
           uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="34" />
+          size="39" />
         </Label>
       <Label
         id="Subtitle"
         wrap="true"
         ellipsizeOnBoundary="true"
-        width="600"
-        numLines="2"
-        height="64"
+        width="900"
+        numLines="1"
+        height="27"
         vertAlign="center"
         horizAlign="center">
         <Font
           role="font"
           uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="24" />
+          size="27" />
         </Label>
     </LayoutGroup>
     </Group>

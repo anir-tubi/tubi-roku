@@ -23,7 +23,7 @@ Function TubiExperiments(constants) as Object
     defaultResources: {
       '// When enabled=true, the user will see the side nav option "my list" replaced with "my stuff". My Stuff will point to a new kind of page specific to the user
       roku_my_stuff: {
-        roku_my_stuff_v1: {"enabled": false}
+        roku_my_stuff_v2: {"enabled": false}
       }
 
       roku_in_pod_stitching: {

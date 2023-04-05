@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="MyStuffScreen" extends="BaseScreen">
 
-
   <script type="text/brightscript" uri="MyStuffScreen.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/CacheValidationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/InfoPanelMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiMetadataTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/ApiUtils.brs" />
@@ -14,6 +14,8 @@
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ContentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -62,6 +64,9 @@
       <!-- set to true when the user wants to sign-up -->
       <field id="signUpButtonSelected" type="boolean" alwaysNotify="true" />
 
+      <!-- set to true when the user wants to go to the home screen -->
+      <field id="homeButtonSelected" type="boolean" alwaysNotify="true" />
+
       <!-- tells ContentController/Helpers that the content metadata is
             out of the cache window and should be updated -->
       <field id="refreshContent" type="boolean" alwaysNotify="true" />
@@ -95,15 +100,23 @@
 
     <LayoutGroup id="SignedOutUI"
         layoutDirection="vert"
-        vertAlignment="custom"
         horizAlignment="center"
-        itemSpacings="[34]"
+        itemSpacings="[24]"
         visible="false"
-        translation="[960,316]">
-      <Poster
-        width="186"
-        height="84"
-        uri="pkg:/images/screenMyStuffGuestIcons.webp"/>
+        translation="[960,343]">
+      <LayoutGroup
+        layoutDirection="horiz"
+        horizAlignment="center"
+        itemSpacings="[18]">
+        <Poster
+          width="84"
+          height="84"
+          uri="pkg:/images/screenMyStuffContinueWatchingIcon.webp"/>
+        <Poster
+          width="84"
+          height="84"
+          uri="pkg:/images/screenMyStuffMyListIcon.webp"/>
+      </LayoutGroup>
       <Label
         id="SignedOutUITitle"
         width="1536"
@@ -140,7 +153,7 @@
           role="content">
           <DetailMenuItemContentNode
             id="SignInOutButton"
-            iconUrl="pkg:/images/icon-sign-in.webp" />
+            iconUrl="pkg:/images/icon-sign-in.webp"/>
         </ContentNode>
       </MarkupGrid>
       <Label
@@ -156,36 +169,115 @@
       </Label>
     </LayoutGroup>
 
+    <LayoutGroup id="AllEmptyUI"
+      layoutDirection="vert"
+      horizAlignment="center"
+      itemSpacings="[30]"
+      visible="false"
+      translation="[960,343]">
+      <LayoutGroup
+        id="AllEmptyUISubtitle2Parent"
+        layoutDirection="horiz"
+        vertAlignment="custom"
+        horizAlignment="center"
+        itemSpacings="[18]">
+        <Poster
+          width="84"
+          height="84"
+          uri="pkg:/images/screenMyStuffContinueWatchingIcon.webp"/>
+        <Poster
+          width="84"
+          height="84"
+          uri="pkg:/images/screenMyStuffMyListIcon.webp"/>
+      </LayoutGroup>
+      <Label
+        id="AllEmptyUITitle"
+        width="1536"
+        maxLines="1"
+        horizAlign="center"
+        vertAlign="bottom">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="48" />
+      </Label>
+      <Label
+        id="AllEmptyUISubtitle"
+        width="1536"
+        maxLines="1"
+        horizAlign="center"
+        vertAlign="bottom">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="34" />
+      </Label>
+      <LayoutGroup
+        id="AllEmptyUISubtitle2Parent"
+        layoutDirection="horiz"
+        vertAlignment="custom"
+        horizAlignment="center"
+        itemSpacings="[15]">
+        <Label
+          id="AllEmptyUISubtitle2"
+          maxLines="1"
+          horizAlign="center"
+          vertAlign="bottom">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Medium.ttf"
+            size="34" />
+        </Label>
+        <Poster
+          id="AllEmptyUISubtitle2Icon"
+          width="24"
+          height="30"
+          uri="pkg:/images/icon-add-to-queue.webp"/>
+      </LayoutGroup>
+      <MarkupGrid
+        id="AllEmptyUIMenu"
+        drawFocusFeedbackOnTop="false"
+        numRows="1"
+        itemSize="[211,80]"
+        itemSpacing="[0,8]"
+        numColumns="1"
+        itemComponentName="DetailMenuItem"
+        vertFocusAnimationStyle="floatingFocus">
+        <ContentNode
+          id="AllEmptyUIMenuContent"
+          role="content">
+          <DetailMenuItemContentNode
+            id="AllEmptyUIButton"
+            iconUrl="pkg:/images/sideNavHome.webp"/>
+        </ContentNode>
+      </MarkupGrid>
+    </LayoutGroup>
+
+    <InfoPanel
+      id="InfoPanel"
+      translation="[192,168]"
+      visible="false"
+      maxHeight="354"
+      maxTitleLines="2"/>
     <MaskGroup
       id="ContentArea"
       maskSize="[0,0]"
       maskOffset="[0,317]"
-      translation="[192,140]">
-      <Label
-        id="ScreenTitle"
-        width="1140"
-        maxLines="1"
-        vertAlign="bottom">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="48" />
-      </Label>
+      translation="[192,493]">
       <RowList
         id="RowList"
         translation="[0,75]"
         itemComponentName="CategoryGridPoster"
         rowTitleComponentName="CategoryGridRowLabel"
         itemSize="[1776,364]"
-        itemSpacing="[0,36]"
+        itemSpacing="[0,70]"
         numRows="2"
-        rowSpacings="[36]"
+        rowSpacings="[70]"
         rowItemSpacing="[[12,0]]"
         showRowCounter="[false]"
         fadeFocusFeedbackWhenAutoScrolling="true"
         rowFocusAnimationStyle="floatingFocus"
-        vertFocusAnimationStyle="floatingFocus"/>
+        vertFocusAnimationStyle="fixedFocus"/>
     </MaskGroup>
-
   </children>
 </component>
