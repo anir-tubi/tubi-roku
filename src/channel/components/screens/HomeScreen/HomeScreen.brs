@@ -608,7 +608,7 @@ End function
 ' @categoryGridList: roSGNode, CategoryGridList node
 Function fireExposureEventForSeeAll(categoryGridList = invalid)
 
-  if m.wasExposureEventForSeeAllFired = false AND categoryGridList <> invalid AND categoryGridList.focusedPosition <> invalid
+  if m.wasExposureEventForSeeAllFired = false AND categoryGridList <> invalid AND categoryGridList.focusedPosition <> invalid AND categoryGridList.content <> invalid
 
     rowIndex = categoryGridList.focusedPosition[0]
     colIndex = categoryGridList.focusedPosition[1]
@@ -660,7 +660,7 @@ End Function
 Function doesContentHaveChild(content, rowIndex, colIndex)
   result = false
 
-  if content.getChild(rowIndex) <> invalid
+  if content <> invalid AND content.getChild(rowIndex) <> invalid
     if content.getChild(rowIndex).getChild(colIndex) <> invalid
       result = true
     end if
