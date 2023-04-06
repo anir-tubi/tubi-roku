@@ -21,6 +21,9 @@
       <!-- Alias fields for the video node -->
       <field id="position" alias="VideoNode.position"/>
 
+      <field id="width" alias="VideoNode.width"/>
+      <field id="height" alias="VideoNode.height"/>
+
       <!-- New content has been added to the video player -->
       <field id="content" type="node"/>
 
