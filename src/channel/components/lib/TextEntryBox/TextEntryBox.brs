@@ -33,7 +33,10 @@ Function onThemeChange(msg = invalid)
   if theme <> invalid
     m.border.color = theme.focusedColor
     m.rectBG.color = theme.neutralColor
-    m.Text.color = theme.neutralColor
+    if isNonEmptyString(m.top.color) = false
+      '//if the color has not been set, then set it with a default color
+      m.Text.color = theme.neutralColor
+    end if
   end if
 End Function
 

@@ -17,6 +17,33 @@ Function init()
   }
 
   m.top.screenLevel = m.constants.ui.screenLevels.confirmPasswordScreen
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    m.theme  = msg.getData()
+  else
+    m.theme  = getThemeFromGlobal()
+  end if
+  
+  setPasswordColor()
+End Function
+
+
+Function setPasswordColor()
+  if m.theme <> invalid
+    if isNonEmptyString(m.password.text) = true
+      m.password.color = m.theme.primaryTextColor
+    else
+      '//if the textbox contains no user entered password and is revealing the hint text, then display text in a different color than the normal default color
+      m.password.color = m.theme.backgroundColorLight2
+    end if
+  end if
 End Function
 
 
@@ -67,6 +94,7 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
   tubiLog("ConfirmPasswordScreen.onKeyEvent")
   if key = "OK"
     m.password.text = m.keyboard.text
+    setPasswordColor()
   else if key = "back"
     m.top.backPressed = true
   end if
@@ -77,4 +105,5 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
  Function onKeyboardTextChanged()
   tubiLog("ConfirmPasswordScreen.onKeyboardTextChanged")
   m.password.text = m.keyboard.text
+  setPasswordColor()
  End Function

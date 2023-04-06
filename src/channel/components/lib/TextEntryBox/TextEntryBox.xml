@@ -9,6 +9,8 @@
   <script type="text/brightscript" uri="TextEntryBox.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
 
   <interface>
 
@@ -16,6 +18,9 @@
 
       <!-- The text to display.  This is not wired up to anything by default -->
       <field id="text" type="string"/>
+
+      <!--The color of the text if a different color is wanted than the default color-->
+      <field id="color" type="string" alias="Text.color"/>
 
       <!-- Hint text to display when 'text' is empty -->
       <field id="hint" type="string"/>
