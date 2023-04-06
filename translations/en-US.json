@@ -100,7 +100,7 @@
     "message": "Show All"
   },
   "screenHome_showAllNotification": {
-    "description": "The text to display on floating educaion of show all",
+    "description": "The text to display on floating education of show all",
     "message": "Press * to explore {containerTitle}"
   },
   "screenHome_item_seeAll": {

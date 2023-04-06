@@ -319,7 +319,7 @@ Function getTranslation_en_US()
       "message": "Show All"
     },
     "screenHome_showAllNotification": {
-      "description": "The text to display on floating educaion of show all",
+      "description": "The text to display on floating education of show all",
       "message": "Press * to explore {containerTitle}"
     },
     "screenHome_item_seeAll": {
@@ -1648,6 +1648,10 @@ Function getTranslation_es_MX()
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to sign into app.",
       "message": "Iniciar Sesión"
     },
+    "menu_goHome": {
+      "description": "Menu option on the app's myStuff screen, Allows the user to  navigate to the home screen.",
+      "message": "Ir a página de inicio"
+    },
     "menu_signedIn": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Shows that the user is signed in.",
       "message": "Hola {name}"
@@ -1739,6 +1743,14 @@ Function getTranslation_es_MX()
     "screenHome_item_showAllGames": {
       "description": "The text to display on Show All Games tile",
       "message": "Mostrar Todo"
+    },
+    "screenHome_showAllNotification": {
+      "description": "The text to display on floating education of show all",
+      "message": "Presiona * para explorar {containerTitle}"
+    },
+    "screenHome_item_seeAll": {
+      "description": "The text to display on See All movies / shows",
+      "message": "Ver Todo {containerTitle}"
     },
     "loadingIndicator": {
       "description": "When something is loading, this text appears so the user knows something is loading.",
@@ -2432,6 +2444,14 @@ Function getTranslation_es_MX()
       "description": "The blurb of the MyStuff Screen for the guest user.",
       "message": "No se requiere tarjeta de crédito • Gratis siempre"
     },
+    "screenMyStuff_allEmptyUITitle": {
+      "description": "The title of the MyStuff Screen for the guest user.",
+      "message": "Mis cosas están vacías"
+    },
+    "screenMyStuff_allEmptyUISubtitle": {
+      "description": "The subtitle of the MyStuff Screen for the guest user.",
+      "message": "Para añadir un título a tu lista, utilice el icono de marcador"
+    },
     "screenDetails_button_trailer": {
       "description": "Label of button to allow users to watch a preview of the current video title",
       "message": "Ver Tráiler"
@@ -2554,19 +2574,35 @@ Function getTranslation_es_MX()
     },
     "metadata_myStuff_empty_myList_title": {
       "description": "For an empty MyList container, this is the title that is displayed in the empty container",
-      "message": "Mi Lista"
+      "message": "Tu lista está vacía"
     },
     "metadata_myStuff_empty_myList_description": {
       "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
-      "message": "Películas y Series añadidos\na tu lista aparecerá aquí"
+      "message": "Películas y Series añadidos a tu lista aparecerán aquí"
     },
     "metadata_myStuff_empty_continueWatching_title": {
       "description": "For an empty continueWatching container, this is the title that is display in the empty container",
-      "message": "Seguir Viendo"
+      "message": "Ya estas al día"
     },
     "metadata_myStuff_empty_continueWatching_description": {
       "description": "For an empty continueWatching container, this is the description/subtitle that is display in the empty container",
-      "message": "Películas y series que no hayas terminado \nde ver aparecerán aquí"
+      "message": "Películas y series que no hayas terminado de ver aparecerán aquí"
+    },
+    "metadata_myStuff_empty_continueWatchingInfoPanel_title": {
+      "description": "For an empty continueWatching container, this is the title that is display in the InfoPanel when the empty container is in focus",
+      "message": "Seguir Viendo"
+    },
+    "metadata_myStuff_empty_myListInfoPanel_description": {
+      "description": "For an empty myList container, this is the description/subtitle that is display in the InfoPanel when the empty container is in focus",
+      "message": "Ver lo que guardaste para más tarde"
+    },
+    "metadata_myStuff_empty_myListInfoPanel_title": {
+      "description": "For an empty myList container, this is the title that is display in the InfoPanel when the empty container is in focus",
+      "message": "Mi Lista"
+    },
+    "metadata_myStuff_empty_continueWatchingInfoPanel_description": {
+      "description": "For an empty continueWatching container, this is the description/subtitle that is display in the InfoPanel when the empty container is in focus",
+      "message": "Recoge donde dejaste de ver"
     },
     "metadata_continueWatching_notSignedIn_title": {
       "description": "tells non registered user what they need to do to see the continue watching container",
