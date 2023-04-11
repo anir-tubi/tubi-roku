@@ -55,10 +55,5 @@
 
         <!-- indicates if the video is currently playing ads as indicated by yospace id3 tags -->
         <field id="isPlayingAds" type="boolean" value="false" />
-
-        <!-- due to ad filler behavior isPlayingAdFiller changes values frequently and cannot be
-             relied on to be 100% accurate at all times. Please be careful if using outside of AdsSSAITask
-        -->
-        <field id="isPlayingAdFiller" type="boolean" value="false" />
     </interface>
 </component>

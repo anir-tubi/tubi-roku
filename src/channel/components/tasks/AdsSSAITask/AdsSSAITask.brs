@@ -3,6 +3,13 @@ Library "Roku_Ads.brs"
 Function init()
   m.top.functionName = "execAdsSSAITask"
   m.top.control = "RUN"
+  m.pollUrl = ""
+  ' indicates if the current stream is displaying ads
+  m.isPlayingAds = false
+  ' Below field is currently not used anywhere outside the file so not exposing it as interface field.
+  ' Will add interface field when we have a use case.
+  ' indicates if the current stream is displaying filler video because there are no ads to play
+  m.isPlayingAdFiller = false
 End Function
 
 
@@ -27,12 +34,6 @@ Function execAdsSSAITask()
 
   ' indicates if the video player is playing the video in a full screen or not
   m.videoIsFullscreen = false
-
-  ' indicates if the current stream is displaying ads
-  m.top.isPlayingAds = false
-
-  ' indicates if the current stream is displaying filler video because there are no ads to play
-  m.top.isPlayingAdFiller = false
 
   ' used to keep track of which ad in the ad break/pod is currently being played in the stream.
   ' will contain an AA of as single ad as extracted from the parsed VAST response from yospace.
@@ -74,7 +75,7 @@ End Function
 
 
 Function runSSAILoop(ssaiPort)
-  tubiLog(m.top.id + ".runSSAILoop")
+  tubiLog("AdsSSAITask.runSSAILoop")
   m.top.observeField("pollUrl", ssaiPort)
   m.top.observeField("videoPosition", ssaiPort)
   m.top.observeField("id3Tags", ssaiPort)
@@ -108,7 +109,7 @@ Function runSSAILoop(ssaiPort)
         onPlaybackStopped()
       else if messageField = "exit"
         ' send ad analytics events if necessary when the user exits playback
-        if m.top.isPlayingAds = true
+        if m.isPlayingAds = true
           sendFinishAdAnalytics(m.currentAdInPod, "DELIBERATE")
         end if
 
@@ -123,9 +124,9 @@ End Function
 
 ' occurs when a new linear channel has been selected by the user.
 Function onPollUrlChange(msg)
-  tubiLog(m.top.id + ".onPollUrlChange")
+  tubiLog("AdsSSAITask.onPollUrlChange")
   pollUrl = msg.getData()
-
+  m.pollUrl = pollUrl
   ' old ad state may persist if a user changes channels in the middel of an ad, so reset ad state
   ' once we get a new poll url (can be invalid for certain channels that do not have ads yet),
   ' which indicates a new stream is starting.
@@ -138,7 +139,7 @@ End Function
 
 
 Function pollForAds(url)
-  if isNonEmptyString(url) = true AND m.top.isPlayingAds <> true AND m.top.isPlayingAdFiller <> true then
+  if isNonEmptyString(url) = true AND m.isPlayingAds <> true AND m.isPlayingAdFiller <> true then
     ' Retrieves ads and also sets m.notUsedAdPodPixels
     adPods = m.adLib.retrieveAds(url)
     if adPods <> invalid AND adPods.count() > 0
@@ -169,7 +170,7 @@ End Function
 Function onVideoPosition(msg)
   ' poll for ads if necessary
   if m.timeSpan.totalMilliseconds() >= m.pollFrequency
-    pollForAds(m.top.pollUrl)
+    pollForAds(m.pollUrl)
   end if
 
   position = msg.getData()
@@ -220,24 +221,24 @@ Function onTags(msg)
   if id3s.currentSegment() = 1 AND id3s.getType() = "start"
     ' we are at the very beginning of an ad video
     if m.currentAdInPod <> invalid
-      m.top.isPlayingAds = true
-      m.top.isPlayingAdFiller = false
+      setIsPlayingAds(true)
+      m.isPlayingAdFiller = false
 
       ' send "Impression" ad pixels and StartAdEvent analytics
       handleStartAdTracking()
     else
-      m.top.isPlayingAdFiller = true
+      m.isPlayingAdFiller = true
     end if
   else if id3s.getType() = "start"
     ' we are at the start of a segment, but not the first segment an ad video
     if m.currentAdInPod <> invalid
-      m.top.isPlayingAds = true
-      m.top.isPlayingAdFiller = false
+      setIsPlayingAds(true)
+      m.isPlayingAdFiller = false
 
       ' handle mid quartile tracking - will also send unsent pixels for earlier points in the ad
       handleMidPixels(m.positionWithinAd)
     else
-      m.top.isPlayingAdFiller = true
+      m.isPlayingAdFiller = true
     end if
   else if id3s.getType() = "end" AND id3s.currentSegment() = id3s.totalSegments()
     ' we are at the very end of an ad
@@ -266,26 +267,26 @@ Function onTags(msg)
       ' video concludes. This means we need to set isPlayingAdFiller false after each filler segment ends
       ' as we don't know if the next segment will be filler video. We will set isPlayingAdFiller back to true
       ' at the start of the next segment, if it is a filler video segment.
-      m.top.isPlayingAdFiller = false
+      m.isPlayingAdFiller = false
     end if
   else if id3s.getType() = "middle"
     ' At a middle point of a segment (there can be multiple middle points per segment).
     ' fire any quartile or midpoint pixels as necessary
     if m.currentAdInPod <> invalid
-      m.top.isPlayingAds = true
-      m.top.isPlayingAdFiller = false
+      setIsPlayingAds(true)
+      m.isPlayingAdFiller = false
       position = m.positionWithinAd + id3s.getPosition()
       handleMidPixels(position)
     else
-      m.top.isPlayingAdFiller = true
+      m.isPlayingAdFiller = true
     end if
   end if
 End Function
 
 
 Function onPlaybackStopped()
-  tubiLog(m.top.id + ".onPlaybackStopped")
-  if m.top.isPlayingAds = true AND m.currentAdInPod <> invalid
+  tubiLog("AdsSSAITask.onPlaybackStopped")
+  if m.isPlayingAds = true AND m.currentAdInPod <> invalid
     ' log the number of impressions not fired for the ad break that is playing
     ' when the playback stops
     remainingAds = 0
@@ -302,7 +303,7 @@ Function onPlaybackStopped()
       logMsg = {
         content_id: contentId
         expected_missed_impressions: remainingAds
-        ad_poll_url: m.top.pollUrl
+        ad_poll_url: m.pollUrl
       }
       logMsg = FormatJson(logMsg)
       tubiLog(logMsg, "info", "clientInfo", "linear-missed-impressions")
@@ -314,8 +315,8 @@ End Function
 Function resetAdState()
   ' reset task level values
   m.positionWithinAd = 0
-  m.top.isPlayingAds = false
-  m.top.isPlayingAdFiller = false
+  setIsPlayingAds(false)
+  m.isPlayingAdFiller = false
   m.currentAdInPod = invalid 'will be populated with an ad AA taken from the ad pod parsed from the VAST response'
   m.adPod = {}
   m.positionAtLastId3 = -1
@@ -644,4 +645,10 @@ Function formatPixelRecordForAd(yospaceAdId, pixelRecord)
   end if
 
   return pixelRecordForAd
+End Function
+
+
+Function setIsPlayingAds(isPlayingAds)
+  m.isPlayingAds = isPlayingAds
+  m.top.isPlayingAds = isPlayingAds
 End Function
