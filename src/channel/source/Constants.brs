@@ -109,6 +109,7 @@ Function getConstants()
     showFirmwareCcWhenVideoNotFullScreenModels = {
       "4800X": true  ' Roku Ultra
       "3820X": true  ' Stick 4K+
+      "3960X": true  ' Roku Express
       "3941X": true  ' Roku Express 4k+
     }
 
