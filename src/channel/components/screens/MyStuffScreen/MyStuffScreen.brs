@@ -55,7 +55,7 @@ Function init()
   m.RowList.focusBitmapUri = "pkg:/images/selector-$$RES$$.9.png"
   m.GuestMenu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
   m.GuestMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-$$RES$$.9.png"
-  m.AllEmptyUIMenu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$}.9.png"
+  m.AllEmptyUIMenu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
   m.AllEmptyUIMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-$$RES$$.9.png"
 
   defaultGuestMenuWidth = m.GuestMenu.itemSize[0]
