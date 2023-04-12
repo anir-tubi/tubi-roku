@@ -143,6 +143,7 @@ Function onScreenFocusChange()
         oldFocusedRowItem = m.top.cursorPosition
         if m.isAllContentEmpty = true
           m.AllEmptyUIMenu.setFocus(true)
+          m.top.backgroundUriList = [m.defaultBackgroundUri]
         else
           m.RowList.setFocus(true)
           if oldFocusedRowItem <> invalid
