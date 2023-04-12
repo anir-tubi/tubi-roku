@@ -320,7 +320,7 @@ Function getTranslation_en_US()
     },
     "screenHome_showAllNotification": {
       "description": "The text to display on floating education of show all",
-      "message": "To see all {containerTitle}, press "
+      "message": "To see all of {containerTitle}, press "
     },
     "screenHome_item_seeAll": {
       "description": "The text to display on See All movies / shows",
