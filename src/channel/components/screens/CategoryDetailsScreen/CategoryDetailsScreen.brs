@@ -53,7 +53,6 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.categoryDetailsScreen
   m.top.handlesTransportVoiceRequests = true
 
-  m.bLeftButtonActsLikeBackButton = true
   m.VideoGrid.itemSize = posterSize
 
   if m.global <> invalid
@@ -152,7 +151,7 @@ Function onLoadContent()
       if m.top.jumpToItemFocused >= 0
         m.VideoGrid.jumpToItem = m.top.jumpToItemFocused
       end if
-      
+
       m.VideoGrid.visible = true
     end if
 
@@ -185,6 +184,8 @@ Function onItemFocused()
     content = category.getChild(item) 'contentNode
 
     if content <> invalid
+      ' setting the focused content's Id to contentFocusedId field, later it will be used for setting focus on previous screen(home)
+      m.top.contentFocusedId = content.id
       ' Update the info panel
       populateInfoPanel(m.InfoPanel, content)
 
@@ -354,11 +355,9 @@ Function onKeyEvent(key, press) as Boolean
   handled = false
 
   if press = true
-    if key = "left"
-      if m.bLeftButtonActsLikeBackButton = true
-        m.top.backButtonPressed = true
-        handled = true
-      end if
+    if key = "left" OR key = "back"
+      m.top.backButtonPressed = true
+      handled = true
     else if key = "play"
       handlePlayInput()
       handled = true

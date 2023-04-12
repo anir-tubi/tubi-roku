@@ -895,7 +895,7 @@ Function onContentSelected(msg)
   m.autoplayContext = homeScreen.currCategoryId
 
   if content.type = "channel"
-    showCategoryDetailsScreen(content, "HOME")
+    showCategoryDetailsScreen(content, m.constants.ui.terms.home)
   else if content.type = m.constants.ui.contentTypes.historySignedOutUser
     '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
     startSignIn(onCWRowAfterSignIn)
@@ -1114,5 +1114,5 @@ End Function
 Function handleSeeAllSelected(homeScreen)
   stopVideoPreview()
   focusedContainer = homeScreen.rowFocusedForSeeAll
-  showCategoryDetailsScreen(focusedContainer, "HOME", true, homeScreen.contentMode, homeScreen.columnFocused)
+  showCategoryDetailsScreen(focusedContainer, m.constants.ui.terms.home, true, homeScreen.contentMode, homeScreen.columnFocused)
 End Function

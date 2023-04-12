@@ -271,7 +271,7 @@ Function onSideNavItemSelected()
       else
         contentNode = CreateObject("roSGNode", "CategoryContentNode")
         contentNode.id = m.constants.ui.categoryIds.queue
-        showCategoryDetailsScreen(contentNode, "MENU")
+        showCategoryDetailsScreen(contentNode, m.constants.ui.terms.menu)
       end if
 
       bNewScreenCalledSuccess = true

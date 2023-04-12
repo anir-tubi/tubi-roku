@@ -2,7 +2,8 @@
 ' showCategoryDetailsScreen
 '
 ' @content: roSGNode, a content node for a single pieces of content, might be a video or top level series
-' @sPageSource: String, this helps from where categoryDetailsScreen screen page is called
+' @sPageSource: string, What page is calling this function? This string is what is displayed on the top of the page
+'                       to let the user know what page they will go to when they click the back button. Possible values are from constants.ui.terms
 ' @sendNavigationLoadEvents: boolean, when the page is loaded, do the navigation to page, pageload events needs to be sent
 ' @contentMode: string, the value from constants.ui.contentMode to be sent as param to the tensor request
 ' @itemFocused: integer, the index of the content item that will be focused once the screen has loaded content.
@@ -17,9 +18,9 @@ Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoad
   categoryDetailsScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   categoryDetailsScreen.observeFieldScoped("categoryBatchIndex", "onCategoryBatchIndexChange")
   categoryDetailsScreen.observeFieldScoped("signInRequired", "onSignInRequired")
-  categoryDetailsScreen.observeFieldScoped("backButtonPressed", "onCategoryDetailsScreenBackPressed")
   categoryDetailsScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
   categoryDetailsScreen.observeFieldScoped("contentToPlay", "onContentToPlay")
+  categoryDetailsScreen.observeFieldScoped("backButtonPressed", "onCategoryDetailsScreenBackButtonPressed")
   categoryDetailsScreen.id = m.constants.ui.screenIds.categoryDetailsScreen
   categoryDetailsScreen.categoryId = content.id
   categoryDetailsScreen.isLoading = true
@@ -161,8 +162,8 @@ Function fetchCategoryDetails(content, index = 0, contentMode = "")
       params["content_mode"] = ""
     else
       params["content_mode"] = contentMode
-    end if  
-    
+    end if
+
     if getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", false).enabled = true
       params["cursor"] = index
       params["contents_limit"] =  m.constants.performance.categoryGridList.lazyLoadBatchSize
@@ -387,6 +388,14 @@ Function showCategoryDetailError(error, bContentEmptyError = false)
 End Function
 
 
-Function onCategoryDetailsScreenBackPressed()
+Function onCategoryDetailsScreenBackButtonPressed(msg)
+  screen = msg.getRoSGNode()
+
+  if screen <> invalid AND screen.callingPage <> invalid
+    if screen.callingPage = m.constants.ui.terms.home
+      jumpToParentScreenContentByID(screen.contentFocusedId, screen.categoryId, m.constants.ui.screenIds.homeScreen)
+    end if
+  end if
+
   onKeyEvent("back", true)
 End Function

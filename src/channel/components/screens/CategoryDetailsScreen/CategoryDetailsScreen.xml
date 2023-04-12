@@ -50,6 +50,9 @@
       <field id="categoryId" type="string"/>
 
     <!-- OUTPUT -->
+      <!-- the content Id representing the item which was focused on -->
+      <field id="contentFocusedId" type="string" alwaysNotify="true"/>
+
       <!-- the content node representing the item which was clicked on -->
       <field id="contentSelected" type="node" alwaysNotify="true"/>
 
@@ -70,8 +73,6 @@
       <!-- tells the ChannelScreenHelper to display SignIn Required modal-->
       <field id="signInRequired" type="boolean" alwaysNotify="true" />
 
-      <field id="backButtonPressed" type="boolean" alwaysNotify="true"/>
-
       <!-- will be used to change the sponsored background images on the content controller -->
       <field id="sponsorshipBackground" type="string" alwaysNotify="true" />
 
@@ -79,6 +80,8 @@
            Used when showing a series/episode page
       -->
       <field id="trackingLoadStartTime" type="integer" />
+
+      <field id="backButtonPressed" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>

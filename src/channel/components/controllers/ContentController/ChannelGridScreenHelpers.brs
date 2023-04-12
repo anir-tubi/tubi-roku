@@ -1,7 +1,7 @@
 ' gets the ChannelListScreen from the screen cache if it exists, otherwise wraps showChannelGridScreen()
 ' @constants: assocArray, constants as set in Constants.brs and updated in the hotpatch
 ' @sPageSource: string, What page is calling this function? This string is what is displayed on the top of the page
-'                       to let the user know what page they will go to when they click the back button
+'                       to let the user know what page they will go to when they click the back button. Possible values are from constants.ui.terms
 ' @sendNavigationLoadEvents: boolean, when the page is loaded, do the navigation to page, pageload events needs to be sent
 Function showChannelListScreen(constants, sPageSource, sendNavigationLoadEvents = true)
   tubiLog("ChannelGridScreenHelers.showChannelListScreen")
@@ -21,7 +21,7 @@ End Function
 ' gets the CategoryListScreen from the screen cache if it exists, otherwise wraps showChannelGridScreen()
 ' @constants: assocArray, constants as set in Constants.brs and updated in the hotpatch
 ' @sPageSource: string, What page is calling this function? This string is what is displayed on the top of the page
-'                       to let the user know what page they will go to when they click the back button
+'                       to let the user know what page they will go to when they click the back button. Possible values are from constants.ui.terms
 Function showCategoryListScreen(constants, sPageSource, sendNavigationLoadEvents = true)
   tubiLog("ChannelGridScreenHelers.showCategoryListScreen")
   categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
@@ -41,7 +41,8 @@ End Function
 ' showChannelGridScreen
 '
 ' @constants: assocArray, constants as set in Constants.brs and updated in the hotpatch
-' @sPageSource: string, What page is calling this function? This string is what is displayed on the top of the page to let the user know what page they will go to when they click the back button
+' @sPageSource: string, What page is calling this function? This string is what is displayed on the top of the page
+'                       to let the user know what page they will go to when they click the back button. Possible values are from constants.ui.terms
 ' @bChannel: boolean, Is this a grid page displaying channels? If not, it will be a grid page displaying categories
 ' @screenLevel: integer, Should this screen have a different screenlevel other than its default one?
 Function showChannelGridScreen(constants, sPageSource, bChannel = true, screenLevel = -1, sendNavigationLoadEvents = true)

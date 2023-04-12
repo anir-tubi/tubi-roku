@@ -921,6 +921,8 @@ Function getConstants()
       constants.ui.ages.ageGate = 13
 
     'static - pre defined text used in the app
+    'these terms are displayed on top of the page
+    'these terms are used as state as pageSource to indicate which page a user should return to when pressing the back button.
     constants.ui.terms = {}
       constants.ui.terms.categories = "Categories"
       constants.ui.terms.channels = "Channels"
