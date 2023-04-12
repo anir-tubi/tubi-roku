@@ -87,7 +87,7 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
   else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata
     if gridType = gridItemTypes.landscapeInnerMetadata AND isNonEmptyArray(contentFromServer.hero_images) = true
       '//If a landscapde inner metadata image, then try to get a different thumbnail.
-      '//   The regular image most likely has the title embedded in the image, and 
+      '//   The regular image most likely has the title embedded in the image, and
       '//   the landscapde inner metadata image has a title overlaid on top of the thumbnail.
       sThumbnailURL = contentFromServer.hero_images[0]
     else if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
@@ -771,7 +771,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         ' then ensure row is empty except for 1 item that will entice users to sign in
         categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
       else
-        categoryAA = m.buildCategoryAAWithPrepend(container, contents, "", "", false, contentMode, screenId, isSignedInUser)
+        categoryAA = m.buildCategoryAAWithPrepend(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode)
       end if
 
       if categoryAA <> invalid
@@ -947,7 +947,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     ' then ensure row is empty except for 1 item that will entice users to sign in
     categoryMetadata = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
   else
-    categoryMetadata = m.buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
+    categoryMetadata = m.buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode)
   end if
 
   if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
@@ -1077,9 +1077,10 @@ End Function
 ' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
 ' @screenId: string, one of the screenIds found at constants.ui.screenIds
 ' @isSignedInUser: boolean, value based on user logged In or not
+' @uiMode: string, one of the allowed values from constants.ui.modes
 '
 ' returns an associative array that can be passed to ContentNode.update() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false)
+Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false, uiMode = "standard")
   categoryAA = invalid
 
   m.seeAllContainerFirst = false
@@ -1116,7 +1117,7 @@ Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, c
         prependContent.append(container)
         prependContent.delete("children")  ' need to make sure there isn't a recursion later when getContentFromCategoryJson is called
         prependContent.posterarts = [m.generateChannelPosterUrl(container.id)]
-      else if (m.seeAllContainerFirst = true OR m.seeAllContainerSeventeen = true) AND container.type <> m.constants.ui.categoryTypes.linear AND childrenCount >= 24
+      else if (uiMode = m.constants.ui.modes.standard OR uiMode = m.constants.ui.modes.latino) AND (m.seeAllContainerFirst = true OR m.seeAllContainerSeventeen = true) AND container.type <> m.constants.ui.categoryTypes.linear AND childrenCount >= 24
 
         movieCount = 0
         tvShowCount = 0

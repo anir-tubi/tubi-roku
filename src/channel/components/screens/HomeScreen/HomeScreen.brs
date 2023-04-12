@@ -37,8 +37,13 @@ Function init()
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
+    '//REMOVE uiMode observer once the roku_see_all_container experiment is graduated
+    m.global.observeFieldScoped("uiMode", "onUIMode")
   end if
+
   onThemeChange()
+  '//REMOVE onUIMode() once the roku_see_all_container experiment is graduated
+  onUIMode()
 
   ' this variable helps to identify whether the seeAll exposure event was fired or not.
   ' the reason for maintaining this variable is the 'onFireExposureEvent' function will be trigerred many times,
@@ -135,6 +140,16 @@ Function onThemeChange(msg = invalid)
   if theme <> invalid AND m.seeAllNotificationGroup <> invalid
     m.seeAllNotificationGroup.backgroundColor = theme.backgroundColorLight
     m.seeAllNotificationGroup.textColor = theme.backgroundColor
+  end if
+End Function
+
+
+'//REMOVE onUIMode function once the roku_see_all_container experiment is graduated
+Function onUIMode(msg = invalid)
+  if msg <> invalid
+    m.uiMode = msg.getData()
+  else
+    m.uiMode = getFieldFromGlobal("uiMode")
   end if
 End Function
 
@@ -344,7 +359,7 @@ End Function
 ' A new row has been focused in the CategoryGridList
 Function onRowFocused(msg)
   row = msg.getData()
-  
+
   if row <> invalid
     if isSponsoredRow(row) = true
       m.top.sponsoredRowFocused = true
@@ -359,11 +374,11 @@ Function updateFloatingSeeAll(currentFocusRow)
   if row <> invalid
     rowCount = row.totalCount
     if m.seeAllNotificationGroup <> invalid AND m.constants.deviceInfo.showFirmwareCcWhenVideoNotFullScreen = false
-      'TODO:Create a gridItemType for channels and check against m.constants.ui.gridItemTypes.channel. 
+      'TODO:Create a gridItemType for channels and check against m.constants.ui.gridItemTypes.channel.
       'categoryTypes are values passed by the backend, we should be checking against values that we set within the app.
 
       'checking gridItemType to handle linear rows and row type to handle channel rows.
-      if rowCount >= 24 AND row.gridItemType <> m.constants.ui.gridItemTypes.linear AND row.type <> m.constants.ui.categoryTypes.channel
+      if (m.uiMode = m.constants.ui.modes.standard OR m.uiMode = m.constants.ui.modes.latino) AND rowCount >= 24 AND row.gridItemType <> m.constants.ui.gridItemTypes.linear AND row.type <> m.constants.ui.categoryTypes.channel
         m.seeAllNotificationGroup.text = getTranslation("screenHome_showAllNotification", {"containerTitle": row.title})
         m.seeAllNotificationGroup.visible = true
         m.top.rowFocusedForSeeAll = row
