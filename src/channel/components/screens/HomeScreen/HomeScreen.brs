@@ -919,6 +919,12 @@ End Function
 '                     while focused on the top nav of another page
 Function setFocusOntoTopNav(isToggle)
   tubiLog("Homescreen.setFocusOntoTopNav")
+
+  if m.seeAllNotificationGroup <> invalid
+    'hide floating education modal when we press back to topNav
+    m.seeAllNotificationGroup.visible = false
+  end if
+
   if isToggle = true
     ' only send top nav toggle event if the top nav is gaining focus from the category grid list.
     ' Do not set top nav toggle event if the top nav is gaining focus from another page.
@@ -983,6 +989,10 @@ Function setFocusOnCategoryGrid()
 
   fadeInContentArea()
   m.CategoryGridList.setFocus(true)
+  if m.seeAllNotificationGroup <> invalid
+    'Showing floating education modal when we back to category from topNav or sideNav
+    updateFloatingSeeAll(m.CategoryGridList.rowFocused)
+  end if
 End Function
 
 
@@ -1057,6 +1067,12 @@ Function onKeyEvent(key, press) as boolean
       else if key = "left"
         ' navigating to the side nav
         m.top.stopLinearVideoPlayer = true
+
+        if m.seeAllNotificationGroup <> invalid
+          'hide floating education modal when we back focus to side nav
+          m.seeAllNotificationGroup.visible = false
+        end if
+
         if isVideoPreviewEnabled() = true
           m.top.pauseVideoPreview = true
         end if
