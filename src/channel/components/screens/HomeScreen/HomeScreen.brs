@@ -344,21 +344,33 @@ End Function
 ' A new row has been focused in the CategoryGridList
 Function onRowFocused(msg)
   row = msg.getData()
-  rowCount = row.totalCount
-
-  if m.seeAllNotificationGroup <> invalid AND m.constants.deviceInfo.showFirmwareCcWhenVideoNotFullScreen = false
-    'checking gridItemType to handle linear rows.
-    if rowCount >= 24 AND row.gridItemType <> m.constants.ui.gridItemTypes.linear
-      m.seeAllNotificationGroup.text = getTranslation("screenHome_showAllNotification", {"containerTitle": row.title})
-      m.seeAllNotificationGroup.visible = true
-    else
-      m.seeAllNotificationGroup.visible = false
-    end if
-  end if
-
+  
   if row <> invalid
     if isSponsoredRow(row) = true
       m.top.sponsoredRowFocused = true
+    end if
+  end if
+End Function
+
+
+Function updateFloatingSeeAll(currentFocusRow)
+  row = currentFocusRow
+
+  if row <> invalid
+    rowCount = row.totalCount
+    if m.seeAllNotificationGroup <> invalid AND m.constants.deviceInfo.showFirmwareCcWhenVideoNotFullScreen = false
+      'TODO:Create a gridItemType for channels and check against m.constants.ui.gridItemTypes.channel. 
+      'categoryTypes are values passed by the backend, we should be checking against values that we set within the app.
+
+      'checking gridItemType to handle linear rows and row type to handle channel rows.
+      if rowCount >= 24 AND row.gridItemType <> m.constants.ui.gridItemTypes.linear AND row.type <> m.constants.ui.categoryTypes.channel
+        m.seeAllNotificationGroup.text = getTranslation("screenHome_showAllNotification", {"containerTitle": row.title})
+        m.seeAllNotificationGroup.visible = true
+        m.top.rowFocusedForSeeAll = row
+      else
+        m.seeAllNotificationGroup.visible = false
+        m.top.rowFocusedForSeeAll = invalid
+      end if
     end if
   end if
 End Function
@@ -481,7 +493,7 @@ Function onCurrFocusRowChange()
   end if
 
   if categoryEnteringFocus <> invalid
-    m.top.rowFocusedForSeeAll = categoryEnteringFocus
+    updateFloatingSeeAll(categoryEnteringFocus)
     sSponsorBackgroundURL = ""
 
     if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
@@ -1060,7 +1072,7 @@ Function onKeyEvent(key, press) as boolean
       return true
     end if
 
-    if key = "options" AND m.seeAllNotificationGroup <> invalid AND m.seeAllNotificationGroup.visible = true
+    if key = "options" AND m.seeAllNotificationGroup <> invalid AND m.top.rowFocusedForSeeAll <> invalid
       itemFocused = m.CategoryGridList.itemFocused
       positionFocused = m.top.cursorPosition
       m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(itemFocused, positionFocused)
