@@ -640,30 +640,33 @@ Function fireExposureEventForSeeAll(categoryGridList = invalid)
     rowIndex = categoryGridList.focusedPosition[0]
     colIndex = categoryGridList.focusedPosition[1]
     content = categoryGridList.content
-
+    
     if rowIndex <> invalid AND colIndex <> invalid
 
       if doesContentHaveChild(content, rowIndex, colIndex) = true AND content.getChild(rowIndex).getChildCount() >= 24 AND isContentMovieOrSeriesOrSeeAll(content.getChild(rowIndex).getChild(colIndex)) = true
-        if m.experimentName = "roku_see_all_container_first_v1" OR m.experimentName = "roku_show_all_floating_education_v1"
+        if m.experimentName = "roku_see_all_container_first_v1" OR m.experimentName = "qa.roku_see_all_container_first_v1"
           getExperimentResource("roku_see_all_container", m.experimentName, true)
           m.wasExposureEventForSeeAllFired = true
-        else if m.experimentName = "roku_see_all_container_seventeen_v1"
-          if colIndex >= 15 ' at this point the SeeAll tile will be visible to user, so firing exposure event
-            getExperimentResource("roku_see_all_container", "roku_see_all_container_seventeen_v1", true)
-            m.wasExposureEventForSeeAllFired = true
-          end if
+        else if m.experimentName = "roku_show_all_floating_education_v1" OR m.experimentName = "qa.roku_show_all_floating_education_v1"
+          getExperimentResource("roku_see_all_container", m.experimentName, true)
+          m.wasExposureEventForSeeAllFired = true
+        else if m.experimentName = "roku_see_all_container_seventeen_v1" OR m.experimentName = "qa.roku_see_all_container_seventeen_v1"
+           if colIndex >= 15 ' at this point the SeeAll tile will be visible to user, so firing exposure event
+             getExperimentResource("roku_see_all_container", m.experimentName, true)
+             m.wasExposureEventForSeeAllFired = true
+           end if
         end if
 
-      end if
+      end if  
 
       if m.wasExposureEventForSeeAllFired = false AND doesContentHaveChild(content, rowIndex+1, 0) = true AND content.getChild(rowIndex+1).getChildCount() >= 24 AND isContentMovieOrSeriesOrSeeAll(content.getChild(rowIndex+1).getChild(0)) = true
-        if m.experimentName = "roku_see_all_container_first_v1"
-          getExperimentResource("roku_see_all_container", "roku_see_all_container_first_v1", true)
+        if m.experimentName = "roku_see_all_container_first_v1" OR m.experimentName = "qa.roku_see_all_container_first_v1"
+          getExperimentResource("roku_see_all_container", m.experimentName, true)
           m.wasExposureEventForSeeAllFired = true
         end if
       end if
-
-    end if
+      
+    end if  
 
   end if
 
