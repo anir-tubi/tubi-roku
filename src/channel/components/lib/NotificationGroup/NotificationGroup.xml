@@ -18,9 +18,9 @@
     <LayoutGroup
       id="notificationLayout"
       layoutDirection="horiz"
-      vertAlignment="center"
+      vertAlignment="custom"
       itemSpacings="[6]"
-      translation="[18,33]"
+      translation="[18,12]"
       horizAlignment="left">
       <Label
         id="notificationTitle"

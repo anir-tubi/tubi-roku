@@ -16,6 +16,6 @@ Function onNotificationTextChanged()
   xTranslation = screenWidth - (calculatedTextWidth + widthOfNotification + asteriskIconWidth)
   yTranslation = 984
   m.top.translation = [xTranslation, yTranslation]
-  m.notificationBorder.width = calculatedTextWidth + 72
+  m.notificationBorder.width = calculatedTextWidth + 78
   m.notificationTitle.width = calculatedTextWidth
 End Function
