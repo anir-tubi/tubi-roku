@@ -545,27 +545,14 @@ For each experiment that needs to be added to the roku popper staging environmen
 
 Once all experiment branches for the release have been merged into the `roku_popper_staging` branch, then:
 
-1. Go to https://github.com/adRise/popper-config/actions/workflows/deploy.yml. Click the `Run workflow` dropdown on the right and make sure the branch is `roku_popper_staging` and Target Popper Environment is `staging`. Once confirmed, click the `Run workflow` button.
-
-2. This should make a new Deploy workflow. Click into it. It will take some to complete but once it gets to the Create Git Tag step look at that steps output. It should look somethign like:
+1. Go to https://github.com/adRise/popper-config/actions/workflows/deploy.yml. Click the `Run workflow` dropdown on the right and make sure the branch is `roku_popper_staging` and Target Popper Environment is `roku_staging`. Once confirmed, click the `Run workflow` button.
+2. This should make a new Deploy workflow. Click into it. It will take some to complete but once it gets to the Create Git Tag step look at that steps output. It should look something like:
 `* [new tag]           20220525.205906Z_ea68a278 -> 20220525.205906Z_ea68a278`
 In this case `20220525.205906Z_ea68a278` is our build id.
 
 3. Connect to the VPN
-
-4. Run multifactor authentication for AWS. Typically this means running `vauth`. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
-
-5. Activate conda `conda activate infra`
-
-6. Run the following conda command replacing `<BUILD-ID>` with your actual build id from step 2
-
-```shell
-infra -y deploy -e staging kustomization \
-    -x app=popper-engine \
-    -x image=370025973162.dkr.ecr.us-east-2.amazonaws.com/popper-config  \
-    -x tag=<BUILD-ID> \
-    -x base=apps/staging/base/namespaces/staging-popper-roku
-```
+4. Go to [Argo CD](https://argo.main-staging-custom.staging.k8s.tubi.io/applications/argocd/popper-engine-roku?view=network&resource=)
+5.  Press the buttons "SYNC"> "SYNCHRONIZE"
 
 If all was successful you should be able to login to https://popper.tubi.io/ and see the experiment show up under the `roku-staging` environment.
 
