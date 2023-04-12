@@ -138,8 +138,8 @@ Function onThemeChange(msg = invalid)
   end if
 
   if theme <> invalid AND m.seeAllNotificationGroup <> invalid
-    m.seeAllNotificationGroup.backgroundColor = theme.backgroundColorLight
-    m.seeAllNotificationGroup.textColor = theme.backgroundColor
+    m.seeAllNotificationGroup.blendColor = theme.neutralSolidColor2
+    m.seeAllNotificationGroup.textColor = theme.backgroundColorLight
   end if
 End Function
 

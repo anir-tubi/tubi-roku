@@ -1311,6 +1311,7 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
     defaultDarkTransparentForeground20 = "THEME_defaultDarkTransparentForeground20"
     defaultDarkTransparentForeground75 = "THEME_defaultDarkTransparentForeground75"
     defaultDarkSolidSurface10 = "THEME_defaultDarkSolidSurface10"
+    defaultDarkSolidSurface20 = "THEME_defaultDarkSolidSurface20"
     ' defaultDarkStatusSuccess = "THEME_defaultDarkStatusSuccess"   '//::NOTE:: not currently being used
     defaultDarkStatusCaution = "THEME_defaultDarkStatusCaution"
     defaultDarkStatusAlert = "THEME_defaultDarkStatusAlert"
@@ -1332,6 +1333,7 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
     kidsDarkTransparentForeground20 = "THEME_kidsDarkTransparentForeground20"
     kidsDarkTransparentForeground75 = "THEME_kidsDarkTransparentForeground75"
     kidsDarkSolidSurface10 = "THEME_kidsDarkSolidSurface10"
+    kidsDarkSolidSurface20 = "THEME_kidsDarkSolidSurface20"
     ' kidsDarkStatusSuccess = "THEME_kidsDarkStatusSuccess"   '//::NOTE:: not currently being used
     kidsDarkStatusCaution = "THEME_kidsDarkStatusCaution"
     kidsDarkStatusAlert = "THEME_kidsDarkStatusAlert"
@@ -1353,6 +1355,7 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
     holidaysDarkTransparentForeground20 = "THEME_holidaysDarkTransparentForeground20"
     holidaysDarkTransparentForeground75 = "THEME_holidaysDarkTransparentForeground75"
     holidaysDarkSolidSurface10 = "THEME_holidaysDarkSolidSurface10"
+    holidaysDarkSolidSurface20 = "THEME_holidaysDarkSolidSurface20"
     ' holidaysDarkStatusSuccess = "THEME_holidaysDarkStatusSuccess"   '//::NOTE:: not currently being used
     holidaysDarkStatusCaution = "THEME_holidaysDarkStatusCaution"
     holidaysDarkStatusAlert = "THEME_holidaysDarkStatusAlert"
@@ -1391,6 +1394,7 @@ constants.ui.themes = {}
         neutralColor2: defaultDarkTransparentForeground10
         neutralColor3: defaultDarkTransparentForeground5
         neutralSolidColor: defaultDarkSolidSurface10
+        neutralSolidColor2: defaultDarkSolidSurface20
         backgroundColorLight: defaultDarkPrimaryForeground
         backgroundColorLight2: defaultDarkTransparentForeground75
         shadeColor: defaultDarkTransparentBackground75
@@ -1423,6 +1427,7 @@ constants.ui.themes = {}
         neutralColor2: kidsDarkTransparentForeground10
         neutralColor3: kidsDarkTransparentForeground5
         neutralSolidColor: kidsDarkSolidSurface10
+        neutralSolidColor2: kidsDarkSolidSurface20
         backgroundColorLight: kidsDarkPrimaryForeground
         backgroundColorLight2: kidsDarkTransparentForeground75
         shadeColor: kidsDarkTransparentBackground75
@@ -1455,6 +1460,7 @@ constants.ui.themes = {}
         neutralColor2: holidaysDarkTransparentForeground10
         neutralColor3: holidaysDarkTransparentForeground5
         neutralSolidColor: holidaysDarkSolidSurface10
+        neutralSolidColor2: holidaysDarkSolidSurface20
         backgroundColorLight: holidaysDarkPrimaryForeground
         backgroundColorLight2: holidaysDarkTransparentForeground75
         shadeColor: holidaysDarkTransparentBackground75

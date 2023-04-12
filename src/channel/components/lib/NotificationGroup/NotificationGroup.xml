@@ -5,25 +5,38 @@
 
   <interface>
     <!-- INPUT -->
-    <field id="backgroundColor" alias="notificationBorder.color" />
+    <field id="blendColor" alias="notificationBorder.blendColor" />
     <field id="textColor" alias="notificationTitle.color" />
     <field id="text" alias="notificationTitle.text" />
   </interface>
 
   <children>
-    <Rectangle
+    <Poster
       id="notificationBorder"
+      uri="pkg:/images/menu-focus-$$RES$$.9.png"
       height="57" />
-    <Label
-      id="notificationTitle"
-      translation="[16,10]"
-      height="36"
-      vertAlign="center">
-      <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-Bold.ttf"
-        size="17" />
-    </Label>
+    <LayoutGroup
+      id="notificationLayout"
+      layoutDirection="horiz"
+      vertAlignment="center"
+      itemSpacings="[6]"
+      translation="[18,33]"
+      horizAlignment="left">
+      <Label
+        id="notificationTitle"
+        height="36"
+        vertAlign="center">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="24" />
+      </Label>
+      <Poster
+        id="asteriskIcon"
+        height="33"
+        width="33"
+        uri="pkg:/images/asterisk.png"/>
+    </LayoutGroup>
   </children>
 
 </component>
