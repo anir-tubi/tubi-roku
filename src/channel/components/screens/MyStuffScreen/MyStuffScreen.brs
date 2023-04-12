@@ -314,16 +314,15 @@ Function onRowItemFocused(msg) as Boolean
     if m.gridHasGainedInitialFocus = true AND oldAnalyticsRow > 0 AND oldAnalyticsCol > 0
       if oldAnalyticsRow <> newAnalyticsRow OR oldAnalyticsCol <> newAnalyticsCol
 
-        categoryComponentInfo = {}
-        categoryComponentInfo["category_slug"] = m.oldCategoryId
-        categoryComponentInfo["category_row"] = oldAnalyticsRow
-        'row is hardcoded to 1 in the line below because the row represents the row within the category_component, not within the grid
+        myStuffComponentInfo = {}
+        myStuffComponentInfo["category_slug"] = m.oldCategoryId
+        'row is hardcoded to 1 in the line below because the row represents the row within the mystuff_component, not within the grid
         'and the current design only has one row per category
         tile = m.Tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, 1)
-        categoryComponentInfo["content_tile"] = tile
+        myStuffComponentInfo["content_tile"] = tile
         m.top.navigateWithinPageInfo = {
           pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
-          componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo)
+          componentOneof: m.Tracking.getAnalyticsComponent("mystuff_component", myStuffComponentInfo)
           means_of_navigation: "BUTTON" 'MeansOfNavigation enum
           vertical_location: newAnalyticsRow
           vertical_location_mode: "INDEX" 'LocationMode enum
@@ -488,13 +487,12 @@ Function getTrackingComponentInfoOfRowList(gridItem, itemPosition)
   if gridItem <> invalid AND itemPosition <> invalid AND itemPosition.Count() = 2
     componentValues = {}
     componentValues["category_slug"] = m.currCategoryId
-    componentValues["category_row"] = itemPosition[0] + 1 'all analytics are 1 based
     tile = m.Tracking.getAnalyticsTile(gridItem, itemPosition[1] + 1)
     componentValues["content_tile"] = tile
 
     ' Set the tracking component of the gridItem that was passed so it can be accessed as part of the navigateToPage event
     trackingComponentInfo = {
-      componentType: "category_component"
+      componentType: "mystuff_component"
       componentValues: componentValues
     }
   end if

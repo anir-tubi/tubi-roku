@@ -786,18 +786,6 @@ Function tubiTracking_getOneOfs()
     name: ""
   }
 
-  section_leftNav = {
-    left_nav_section: ""  ' Section enum
-  }
-
-  section_topNav = {
-    top_nav_section: ""  ' Section enum
-  }
-
-  section_middleNav = {
-    middle_nav_section: ""  ' Section enum
-  }
-
   linear_browse_page = {
     i: "i"
   }
@@ -810,6 +798,18 @@ Function tubiTracking_getOneOfs()
 
   upcoming_content_page = {
     video_id: -1
+  }
+
+  section_leftNav = {
+    left_nav_section: ""  ' Section enum
+  }
+
+  section_topNav = {
+    top_nav_section: ""  ' Section enum
+  }
+
+  section_middleNav = {
+    middle_nav_section: ""  ' Section enum
   }
 
   ' splash_page = {}   'not currently used
@@ -894,9 +894,6 @@ Function tubiTracking_getOneOfs()
     ' dest_forget_page: forget_page
   }
 
-
-
-
   dest_componentOneof = {
     dest_left_side_nav_component: section_leftNav
 
@@ -969,6 +966,11 @@ Function tubiTracking_getOneOfs()
     content: {
       series_id: -1
       video_id: -1
+    }
+
+    mystuff_component: {
+      category_slug: ""
+      content_tile: {}
     }
   }
 
