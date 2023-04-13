@@ -1746,7 +1746,7 @@ Function getTranslation_es_MX()
     },
     "screenHome_showAllNotification": {
       "description": "The text to display on floating education of show all",
-      "message": "Para ver todo {containerTitle}, seleccione * "
+      "message": "Para ver todo {containerTitle}, seleccione "
     },
     "screenHome_item_seeAll": {
       "description": "The text to display on See All movies / shows",
