@@ -34,6 +34,7 @@
     "gulp-connect": "^5.7.0",
     "gulp-debug-streams": "^3.0.0",
     "gulp-dedupe": "^0.0.2",
+    "gulp-env": "^0.4.0",
     "gulp-filter": "^6.0.0",
     "gulp-mocha": "^8.0.0",
     "gulp-replace": "1.0.0",

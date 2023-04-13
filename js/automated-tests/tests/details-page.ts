@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { odc, ecp } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
 
-describe.only('Details Page', function () {
+describe('Details Page', function () {
   describe('Movie Details Page', function () {
     let itemData;
 

@@ -37,6 +37,9 @@ const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOn
 // Importing functions related to Suitest
 const {retrieveSuitestTests, runSuitestTests, convertXpathsToKeyPaths, convertSuitestTest} = require('./js/suitest');
 
+// Importing functions related to Automated Tests
+const {runAutomatedTestsCli} = require('./js/automated-tests');
+
 /* Allow some environment variables to drive which config we're building.
    Environment variables are set on options, along with any parameters passed in
    to the gulp command line call.
@@ -866,8 +869,11 @@ exports.runSuitestTests = series(setAutomatedTestsConfig, clean, buildInstalled,
 exports.convertXpathsToKeyPaths = series(setAutomatedTestsConfig, clean, buildInstalled, convertXpathsToKeyPaths);
 exports.convertSuitestTest = convertSuitestTest;
 
+// Automated test related
+exports.buildAutomatedTests = series(setAutomatedTestsConfig, buildInstalled);
 exports.runAutomatedTests = series(setAutomatedTestsConfig, buildInstalled, runAutomatedTests);
 exports.rerunAutomatedTests = runAutomatedTests;
+exports.runAutomatedTestsCli = runAutomatedTestsCli;
 
 exports.buildReleaseNotes = buildReleaseNotesOutput;
 exports.buildQaChanges = buildQaChangesOutput;

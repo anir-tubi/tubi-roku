@@ -6,7 +6,7 @@ const shell = require('shelljs');
 shell.config.silent = true;
 
 const {getBuildTag} = require('./config');
-const {NoStackError} = require('./utilities');
+const {NoStackError, execShellCommand} = require('./utilities');
 
 const githubDeveloperInfo = require('./github-developer-info.json');
 
@@ -41,11 +41,11 @@ function verifyGit(done, directory = '') {
     return false;
   } else if (shell.exec(`git ${gitDirectory} rev-parse --is-inside-work-tree`
     ).stdout.trim() !== 'true') {
-    directory = !!directory ? directory : process.cwd();
+    directory = directory ? directory : process.cwd();
     done(new NoStackError(`Git error: current directory (${directory}) is not part of a git repo.`));
     return false;
   } else if (shell.exec(`git ${gitDirectory} status --porcelain`).stdout) {
-    directory = !!directory ? directory : process.cwd();
+    directory = directory ? directory : process.cwd();
     done(new NoStackError(`Git error: working directory (${directory}) is dirty - stash or commit your changes before proceeding.`));
     return false;
   } else {
@@ -67,7 +67,7 @@ async function makeReleasePrs(done) {
 
   // check if the environment variable for the path to the CDN repo has been set
   if (!cdnPath) {
-    const errorMsg = `You did not set a CDN_GIT_DIRECTORY environment variable in your .bash_profile or .bashrc file.`
+    const errorMsg = `You did not set a CDN_GIT_DIRECTORY environment variable in your .bash_profile or .bashrc file.`;
     done(new NoStackError(errorMsg));
   }
 
@@ -75,23 +75,23 @@ async function makeReleasePrs(done) {
   verifyGit(done, cdnPath);
 
   // rename the local branch name so it looks like "release_2_14_34"
-  const releaseBranchName = `release_${fullBuildTag}`
+  const releaseBranchName = `release_${fullBuildTag}`;
   log(`...Renaming the local branch to ${releaseBranchName}`);
   const gitRename = `git branch -m ${releaseBranchName}`;
   const gitRenameErrorMsg = `Could not rename the local branch to ${releaseBranchName}`;
-  execGitCommand(done, gitRename, gitRenameErrorMsg);
+  execShellCommand(done, gitRename, gitRenameErrorMsg);
 
   // attempt to checkout master in the CDN repo
-  log(`...Checking out master on the local ${ghInfo.cdnRepo} repo`)
+  log(`...Checking out master on the local ${ghInfo.cdnRepo} repo`);
   const gitCheckoutMasterCDN = `git -C ${cdnPath} checkout master`;
   const gitCheckoutMasterCDNErrorMsg = `Could not checkout master on the ${cdnPath}`;
-  execGitCommand(done, gitCheckoutMasterCDN, gitCheckoutMasterCDNErrorMsg);
+  execShellCommand(done, gitCheckoutMasterCDN, gitCheckoutMasterCDNErrorMsg);
 
   // attempt to pull origin master for the CDN repo
   log(`...Pulling remote master to the local ${ghInfo.cdnRepo} repo`);
   const gitPullMasterCDN = `git -C ${cdnPath} pull origin master`;
   const gitPullMasterCDNErrorMsg = `Could not pull master from origin at ${cdnPath}`;
-  execGitCommand(done, gitPullMasterCDN, gitPullMasterCDNErrorMsg);
+  execShellCommand(done, gitPullMasterCDN, gitPullMasterCDNErrorMsg);
 
   // attempt to check out a new branch off master for the CDN repo
   const cdnBranchName = `roku_${fullBuildTag}`;
@@ -99,7 +99,7 @@ async function makeReleasePrs(done) {
   log(`...Checking if there already exists a local branch named ${cdnBranchName} on ${cdnPath}`);
   const gitListCDNBranch = `git -C ${cdnPath} branch --list ${cdnBranchName}`;
   const gitListCDNBranchErrorMsg = `Could not list the "${cdnBranchName}" at ${cdnPath}`;
-  const gitListRes = execGitCommand(done, gitListCDNBranch, gitListCDNBranchErrorMsg);
+  const gitListRes = execShellCommand(done, gitListCDNBranch, gitListCDNBranchErrorMsg);
 
   if (gitListRes) {
     // there exists a branch with the cdnBranchName already, so delete it.
@@ -107,13 +107,13 @@ async function makeReleasePrs(done) {
     log(`...Deleting the ${cdnBranchName} on ${cdnPath}`);
     const gitDeleteCDNBranch = `git -C ${cdnPath} branch -D ${cdnBranchName}`;
     const gitDeleteCDNBranchErrorMsg = `Could not delete the "${cdnBranchName}" branch at ${cdnPath}`;
-    execGitCommand(done, gitDeleteCDNBranch, gitDeleteCDNBranchErrorMsg);
+    execShellCommand(done, gitDeleteCDNBranch, gitDeleteCDNBranchErrorMsg);
   }
 
   log(`...Creating a new ${cdnBranchName} branch on the local ${ghInfo.cdnRepo} repo`);
   const gitCheckoutNewCDNBranch = `git -C ${cdnPath} checkout -b ${cdnBranchName}`;
   const gitCheckoutNewCDNBranchErrorMsg = `Could not checkout a new branch "${cdnBranchName}" at ${cdnPath}`;
-  execGitCommand(done, gitCheckoutNewCDNBranch, gitCheckoutNewCDNBranchErrorMsg);
+  execShellCommand(done, gitCheckoutNewCDNBranch, gitCheckoutNewCDNBranchErrorMsg);
 
   const starterComponentsFileName = `tubi_starter_components_${minorBuildTag}.pkg`;
   const remoteComponentsFileName = `tubi_remote_components_${fullBuildTag}.pkg`;
@@ -146,19 +146,19 @@ async function makeReleasePrs(done) {
   log(`...Staging changes for commit on the local ${ghInfo.cdnRepo} repo`);
   const gitAddCDNBranch = `git -C ${cdnPath} add . `;
   const gitAddCDNBranchErrorMsg = `Could not run "git add . " on ${cdnPath}`;
-  execGitCommand(done, gitAddCDNBranch, gitAddCDNBranchErrorMsg);
+  execShellCommand(done, gitAddCDNBranch, gitAddCDNBranchErrorMsg);
 
   // commit the updates to the branch
   log(`...Committing the staged changes on the local ${ghInfo.cdnRepo} repo`);
   const gitCommitCDNBranch = `git -C ${cdnPath} commit -m 'Updating the starter and remote components for ${cdnBranchName}'`;
   const gitCommitCDNBranchErrorMsg = `"git commit" failed on ${cdnPath}`;
-  execGitCommand(done, gitCommitCDNBranch, gitCommitCDNBranchErrorMsg);
+  execShellCommand(done, gitCommitCDNBranch, gitCommitCDNBranchErrorMsg);
 
   // push the branch to Github
-  log(`...Pushing the local ${cdnBranchName} branch to the remote ${ghInfo.rokuRepo} repo`)
+  log(`...Pushing the local ${cdnBranchName} branch to the remote ${ghInfo.rokuRepo} repo`);
   const gitPushCDNBranch = `git -C ${cdnPath} push origin ${cdnBranchName}`;
   const gitPushCDNBranchErrorMsg = `Could not push ${cdnBranchName} to origin (Github) at ${cdnPath}`;
-  execGitCommand(done, gitPushCDNBranch, gitPushCDNBranchErrorMsg);
+  execShellCommand(done, gitPushCDNBranch, gitPushCDNBranchErrorMsg);
 
   // make a PR against master on the CDN repo at Github
   log(`...Making a PR on ${ghInfo.cdnRepo} against the remote master branch`);
@@ -181,7 +181,7 @@ async function makeReleasePrs(done) {
   log(`...Pushing the local ${releaseBranchName} branch to the remote ${ghInfo.rokuRepo} repo`);
   const gitPushReleaseBranch = `git push origin ${releaseBranchName}`;
   const gitPushReleaseBranchErrorMsg = `Could not push ${releaseBranchName} to ${ghInfo.rokuRepo} origin (Github)`;
-  execGitCommand(done, gitPushReleaseBranch, gitPushReleaseBranchErrorMsg);
+  execShellCommand(done, gitPushReleaseBranch, gitPushReleaseBranchErrorMsg);
 
   // make a PR against the production branch on the project-total-recall repo at Github
   const prodRokuBranchName = `${minorBuildTag}_branch`;
@@ -210,15 +210,15 @@ async function makeReleasePrs(done) {
 ${cdnPrUrl}`;
 
     clipboardy.writeSync(prUrlsForPasting);
-    log(`The release PR url and the CDN PR url have been placed on your clipboard. Please share with the team!`)
+    log(`The release PR url and the CDN PR url have been placed on your clipboard. Please share with the team!`);
   } else {
-    const errorMsg = 'The urls for the release PR and the CDN PR are not available. Please share manually.'
+    const errorMsg = 'The urls for the release PR and the CDN PR are not available. Please share manually.';
     done(new NoStackError(errorMsg));
   }
 }
 
 
-async function pushTag(done) {
+function pushTag(done) {
   const buildTag = getBuildTag('revision');
   log(`...Pushing the ${buildTag} tag to origin (Github)`);
   const pushTagRes = shell.exec(`git push origin ${buildTag}`);
@@ -226,20 +226,20 @@ async function pushTag(done) {
   if (pushTagRes.code) {
     let errorMsg = `Could not push ${buildTag} tag to origin (Github)`;
     if (pushTagRes.stderr) {
-      errorMsg = pushTagRes.stderr
+      errorMsg = pushTagRes.stderr;
     }
     done(new NoStackError(errorMsg));
   }
 }
 
 
-async function pushBranch(done){
+function pushBranch(done){
   log(`...Pushing QA branch to origin (Github)`);
   const currentBranch = getCurrentBranch(done);
   const gitPushCurrentBranch = `git push origin ${currentBranch}`;
   const gitPushCurrentBranchErrorMsg = `Could not push ${currentBranch} to origin (Github). Please push it manually`;
 
-  execGitCommand(done, gitPushCurrentBranch, gitPushCurrentBranchErrorMsg);
+  execShellCommand(done, gitPushCurrentBranch, gitPushCurrentBranchErrorMsg);
 }
 
 
@@ -291,7 +291,7 @@ async function createGithubRelease(done) {
     }
 
     if (!isTagOnGithub) {
-      const errorMsg = `The ${buildTag} tag is not on Github. Not creating a release here or else Github will make automatically make a tag from master - which will be inaccurate for our purposes.`
+      const errorMsg = `The ${buildTag} tag is not on Github. Not creating a release here or else Github will make automatically make a tag from master - which will be inaccurate for our purposes.`;
       done(new NoStackError(errorMsg));
     }
   } catch(err) {
@@ -339,10 +339,10 @@ async function createGithubRelease(done) {
 
   const releaseNotes = await buildReleaseNotes(done);
 
-  const date = preReleaseDate ? preReleaseDate.toLocaleDateString("en-US") : new Date().toLocaleDateString("en-US") // '12/25/2020'
+  const date = preReleaseDate ? preReleaseDate.toLocaleDateString('en-US') : new Date().toLocaleDateString('en-US'); // '12/25/2020'
   releaseNotes.unshift(date);
 
-  let formattedReleaseNotes = releaseNotes.join('\n')
+  let formattedReleaseNotes = releaseNotes.join('\n');
 
   let releaseNotesState = `Current release notes:\n\n${formattedReleaseNotes}\n`;
 
@@ -398,18 +398,18 @@ async function pullOrFetchBranch(done, branch) {
   // pull origin of compareBranch
   if (getCurrentBranch(done) === branch) {
     // Have to pull if on the current branch as fetch will fail https://stackoverflow.com/questions/2236743/git-refusing-to-fetch-into-current-branch
-    execGitCommand(done, `git pull`, `Could not pull ${branch} branch`);
+    execShellCommand(done, `git pull`, `Could not pull ${branch} branch`);
   } else {
-    execGitCommand(done, `git fetch origin ${branch}:${branch}`, `Could not fetch ${branch} branch`);
+    execShellCommand(done, `git fetch origin ${branch}:${branch}`, `Could not fetch ${branch} branch`);
   }
 }
 
 
 // Checking if the branch has a remote branch tracking.
 function isRemoteTrackingPresent(done, branchName) {
-  const remoteTrackingInfo = execGitCommand(done, `git ls-remote --heads origin ${branchName}`, `Could not execute get remote tracking info`);
+  const remoteTrackingInfo = execShellCommand(done, `git ls-remote --heads origin ${branchName}`, `Could not execute get remote tracking info`);
 
-  return remoteTrackingInfo.trim().length > 0
+  return remoteTrackingInfo.trim().length > 0;
 }
 
 
@@ -430,7 +430,7 @@ async function buildReleaseNotes(done) {
       pull_number: +prId
     });
 
-    const prReleaseNotesMatch = response.data.body.match(/## Release Notes.*?---(.*)## QA What Changed/s)
+    const prReleaseNotesMatch = response.data.body.match(/## Release Notes.*?---(.*)## QA What Changed/s);
     if (!prReleaseNotesMatch) {
       console.log(`Could not retrieve release notes for pull request #${prId}`);
     } else {
@@ -519,7 +519,7 @@ ${qaChange.pointDeveloper.name}`);
   }
 
   const minorVersionNumber = getBuildTag('minor');
-  const buildVersionNumber = getBuildTag('build')
+  const buildVersionNumber = getBuildTag('build');
   let qaChangesTextOutput = `**Target Release Date**
 <DEVELOPER-TO-FILL-IN>
 
@@ -546,7 +546,7 @@ function getPullRequestCommitsForBranch(done, branch, oneLine = false) {
   if (oneLine) {
     command += ' --oneline';
   }
-  const gitLogs = execGitCommand(done, command, `Could not get git logs from ${branch} branch.`);
+  const gitLogs = execShellCommand(done, command, `Could not get git logs from ${branch} branch.`);
   const pullRequestCommits = [];
   gitLogs.split('\n')
     .forEach((message) => {
@@ -626,7 +626,7 @@ function getProductionBranchName() {
 
 function getCurrentBranch(done) {
   const errorMsg = 'Could not get current branch';
-  const currentBranch = execGitCommand(done, 'git branch --show-current', errorMsg).trim();
+  const currentBranch = execShellCommand(done, 'git branch --show-current', errorMsg).trim();
   return currentBranch;
 }
 
@@ -638,26 +638,8 @@ function findCommitsNotOnProductionBranch(done) {
 
 
 function findCommitsNotOnCurrentBranch(done) {
-  const currentBranch = getCurrentBranch(done)
+  const currentBranch = getCurrentBranch(done);
   return findCommitsOnMasterNotOnBranch(done, currentBranch);
-}
-
-
-// @gitCommand: string, a git command to be executed, for example "git pull origin master"
-// @defaultErrorMessage: string, an error message explaining which command was not able to be completed
-// @done: function, the 'done' function from gulp.
-function execGitCommand(done, gitCommand, defaultErrorMsg) {
-  log(`Performing: ${gitCommand}`)
-  const gitCommandRes = shell.exec(gitCommand);
-  // console.log(gitCommand, ' - ', gitCommandRes);
-
-  if (gitCommandRes.code) {
-    log(defaultErrorMsg);
-    const errorMsg = gitCommandRes.stderr ? gitCommandRes.stderr : defaultErrorMsg;
-    done(new NoStackError(errorMsg));
-  } else {
-    return gitCommandRes.stdout;
-  }
 }
 
 
@@ -716,8 +698,8 @@ async function addMissingImagesToRemoteLibrary(done) {
   // Now we need to find what images changed
   const baseChannelPath = 'src/channel/';
   const errorMsg = `Could not get git diff for ${lastSubmissionReleaseTag}`;
-  const output = execGitCommand(done, `git diff --name-only ${lastSubmissionReleaseTag} ${baseChannelPath}`, errorMsg);
-  const changedImageFilePaths = output.match(/^.*\.png|^.*\.jpg|^.*\.webp/gm)
+  const output = execShellCommand(done, `git diff --name-only ${lastSubmissionReleaseTag} ${baseChannelPath}`, errorMsg);
+  const changedImageFilePaths = output.match(/^.*\.png|^.*\.jpg|^.*\.webp/gm);
 
   // And whether they're already included in our file
   const newImagesSinceFilePath = `new_images_since/new_images_since_${lastSubmissionMajorVersion}_${lastSubmissionMinorVersion}`;
