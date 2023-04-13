@@ -392,8 +392,9 @@ Function onCategoryDetailsScreenBackButtonPressed(msg)
   screen = msg.getRoSGNode()
 
   if screen <> invalid AND screen.callingPage <> invalid
-    if screen.callingPage = m.constants.ui.terms.home
-      jumpToParentScreenContentByID(screen.contentFocusedId, screen.categoryId, m.constants.ui.screenIds.homeScreen)
+    previousScreen = getHiddenScreen(1)
+    if previousScreen <> invalid AND previousScreen.subType() = "HomeScreen"
+      jumpToParentScreenContentByID(screen.contentFocusedId, screen.categoryId, previousScreen.id)
     end if
   end if
 

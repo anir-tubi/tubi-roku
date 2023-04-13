@@ -670,7 +670,7 @@ End Function
 ' Focus on a specific item within the screen
 ' @sID, String = The ID of the content item that should be in focused
 ' @sDesiredContainerID, String = If there is a desire for a specific container to be in focused, then this is the ID of the desired container
-' @ScreenID, String = the ID of screen that should jump to the content associated with the sID. If screenId is missing, homeScreen is assumed.
+' @sParentScreenID, String = the ID of screen that should jump to the content associated with the sID. If screenId is missing, homeScreen is assumed.
 Function jumpToParentScreenContentByID(sID, sDesiredContainerID = "", sParentScreenID = "")
   tubiLog("HomeScreenHelpers.jumpToParentScreenContentByID")
   if sParentScreenID = ""
@@ -1111,8 +1111,8 @@ Function onIsSeeAllSelected(msg)
 End Function
 
 
-Function handleSeeAllSelected(homeScreen)
+Function handleSeeAllSelected(screen)
   stopVideoPreview()
-  focusedContainer = homeScreen.rowFocusedForSeeAll
-  showCategoryDetailsScreen(focusedContainer, m.constants.ui.terms.home, true, homeScreen.contentMode, homeScreen.columnFocused)
+  focusedContainer = screen.rowFocusedForSeeAll
+  showCategoryDetailsScreen(focusedContainer, m.constants.ui.terms.home, true, screen.contentMode, screen.columnFocused)
 End Function
