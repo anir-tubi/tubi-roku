@@ -368,23 +368,46 @@ Function onRowFocused(msg)
 End Function
 
 
-Function updateFloatingSeeAll(currentFocusRow)
+' @currentFocusRow: roSGNode, a CategoryContentNode
+Function updateRowFocusedForSeeAll(currentFocusRow)
+  if isCurrentRowHasSeeAll(currentFocusRow) = true
+    m.top.rowFocusedForSeeAll = currentFocusRow
+  else
+    m.top.rowFocusedForSeeAll = invalid
+  end if
+End Function
+
+
+' @currentFocusRow: roSGNode, a CategoryContentNode
+Function isCurrentRowHasSeeAll(currentFocusRow)
+  result = false
   row = currentFocusRow
 
   if row <> invalid
     rowCount = row.totalCount
-    if m.seeAllNotificationGroup <> invalid AND m.constants.deviceInfo.showFirmwareCcWhenVideoNotFullScreen = false
-      'TODO:Create a gridItemType for channels and check against m.constants.ui.gridItemTypes.channel.
-      'categoryTypes are values passed by the backend, we should be checking against values that we set within the app.
+    'TODO:Create a gridItemType for channels and check against m.constants.ui.gridItemTypes.channel.
+    'categoryTypes are values passed by the backend, we should be checking against values that we set within the app.
+    'checking gridItemType to handle linear rows and row type to handle channel rows.
+    if (m.uiMode = m.constants.ui.modes.standard OR m.uiMode = m.constants.ui.modes.latino) AND rowCount >= 24 AND row.gridItemType <> m.constants.ui.gridItemTypes.linear AND row.type <> m.constants.ui.categoryTypes.channel
+      result = true
+    end if
+  end if
 
-      'checking gridItemType to handle linear rows and row type to handle channel rows.
-      if (m.uiMode = m.constants.ui.modes.standard OR m.uiMode = m.constants.ui.modes.latino) AND rowCount >= 24 AND row.gridItemType <> m.constants.ui.gridItemTypes.linear AND row.type <> m.constants.ui.categoryTypes.channel
+  return result
+End Function
+
+
+' @currentFocusRow: roSGNode, a CategoryContentNode
+Function updateFloatingSeeAll(currentFocusRow)
+  row = currentFocusRow
+
+  if row <> invalid
+    if m.seeAllNotificationGroup <> invalid AND m.constants.deviceInfo.showFirmwareCcWhenVideoNotFullScreen = false
+      if isCurrentRowHasSeeAll(row) = true
         m.seeAllNotificationGroup.text = getTranslation("screenHome_showAllNotification", {"containerTitle": row.title})
         m.seeAllNotificationGroup.visible = true
-        m.top.rowFocusedForSeeAll = row
       else
         m.seeAllNotificationGroup.visible = false
-        m.top.rowFocusedForSeeAll = invalid
       end if
     end if
   end if
@@ -508,6 +531,7 @@ Function onCurrFocusRowChange()
   end if
 
   if categoryEnteringFocus <> invalid
+    updateRowFocusedForSeeAll(categoryEnteringFocus)
     updateFloatingSeeAll(categoryEnteringFocus)
     sSponsorBackgroundURL = ""
 
@@ -640,7 +664,7 @@ Function fireExposureEventForSeeAll(categoryGridList = invalid)
     rowIndex = categoryGridList.focusedPosition[0]
     colIndex = categoryGridList.focusedPosition[1]
     content = categoryGridList.content
-    
+
     if rowIndex <> invalid AND colIndex <> invalid
 
       if doesContentHaveChild(content, rowIndex, colIndex) = true AND content.getChild(rowIndex).getChildCount() >= 24 AND isContentMovieOrSeriesOrSeeAll(content.getChild(rowIndex).getChild(colIndex)) = true
@@ -657,7 +681,7 @@ Function fireExposureEventForSeeAll(categoryGridList = invalid)
            end if
         end if
 
-      end if  
+      end if
 
       if m.wasExposureEventForSeeAllFired = false AND doesContentHaveChild(content, rowIndex+1, 0) = true AND content.getChild(rowIndex+1).getChildCount() >= 24 AND isContentMovieOrSeriesOrSeeAll(content.getChild(rowIndex+1).getChild(0)) = true
         if m.experimentName = "roku_see_all_container_first_v1" OR m.experimentName = "qa.roku_see_all_container_first_v1"
@@ -665,8 +689,8 @@ Function fireExposureEventForSeeAll(categoryGridList = invalid)
           m.wasExposureEventForSeeAllFired = true
         end if
       end if
-      
-    end if  
+
+    end if
 
   end if
 
@@ -920,6 +944,9 @@ End Function
 Function setFocusOntoTopNav(isToggle)
   tubiLog("Homescreen.setFocusOntoTopNav")
 
+  ' setting rowFocusedForSeeAll as invalid, we have to disable "options" when focus is on topNav
+  m.top.rowFocusedForSeeAll = invalid
+
   if m.seeAllNotificationGroup <> invalid
     'hide floating education modal when we press back to topNav
     m.seeAllNotificationGroup.visible = false
@@ -991,6 +1018,7 @@ Function setFocusOnCategoryGrid()
   m.CategoryGridList.setFocus(true)
   if m.seeAllNotificationGroup <> invalid
     'Showing floating education modal when we back to category from topNav or sideNav
+    updateRowFocusedForSeeAll(m.CategoryGridList.rowFocused)
     updateFloatingSeeAll(m.CategoryGridList.rowFocused)
   end if
 End Function
@@ -1067,6 +1095,9 @@ Function onKeyEvent(key, press) as boolean
       else if key = "left"
         ' navigating to the side nav
         m.top.stopLinearVideoPlayer = true
+
+        ' setting rowFocusedForSeeAll as invalid, we have to disable "options" when focus is on topNav
+        m.top.rowFocusedForSeeAll = invalid
 
         if m.seeAllNotificationGroup <> invalid
           'hide floating education modal when we back focus to side nav

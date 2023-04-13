@@ -1111,8 +1111,10 @@ Function onIsSeeAllSelected(msg)
 End Function
 
 
-Function handleSeeAllSelected(screen)
+Function handleSeeAllSelected(homeScreen)
   stopVideoPreview()
-  focusedContainer = screen.rowFocusedForSeeAll
-  showCategoryDetailsScreen(focusedContainer, m.constants.ui.terms.home, true, screen.contentMode, screen.columnFocused)
+  focusedContainer = homeScreen.rowFocusedForSeeAll
+  if focusedContainer <> invalid
+    showCategoryDetailsScreen(focusedContainer, m.constants.ui.terms.home, true, homeScreen.contentMode, homeScreen.columnFocused)
+  end if
 End Function
