@@ -389,8 +389,8 @@ Function onRowListItemDebounce()
     m.top.oldCursorPosition = m.top.cursorPosition
     m.top.cursorPosition = m.RowList.rowItemFocused
     m.top.oldItemFocused = m.top.itemFocused
-    m.top.itemFocused = itemFocused
     m.top.rowFocused = m.top.content.getChild(m.RowList.rowItemFocused[0])
+    m.top.itemFocused = itemFocused
   end if
 End Function
 
@@ -546,6 +546,7 @@ Function setRowListFocus()
     else
       reloadedItemIndex = [0, 0]
     end if
+    m.top.rowFocused = m.RowList.content.getChild(reloadedItemIndex[0])
     m.top.reloadedItemToBeFocused = resolveAbbreviatedContent(reloadedItemIndex)
   end if
 End Function

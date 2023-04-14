@@ -531,8 +531,12 @@ Function onCurrFocusRowChange()
   end if
 
   if categoryEnteringFocus <> invalid
-    updateRowFocusedForSeeAll(categoryEnteringFocus)
-    updateFloatingSeeAll(categoryEnteringFocus)
+
+    if getExperimentResource("roku_see_all_container", m.experimentName, false).enabled = true
+      updateRowFocusedForSeeAll(categoryEnteringFocus)
+      updateFloatingSeeAll(categoryEnteringFocus)
+    end if
+
     sSponsorBackgroundURL = ""
 
     if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
@@ -741,6 +745,11 @@ Function onGridFocusChange() as void
     m.top.contentReady = true
   end if
 
+  if getExperimentResource("roku_see_all_container", m.experimentName, false).enabled = true
+    updateRowFocusedForSeeAll(m.CategoryGridList.rowFocused)
+    updateFloatingSeeAll(m.CategoryGridList.rowFocused)
+  end if
+
   '//if the screen is loading or if the grid is not in focus or the topnav is not in focus, then exit out of this function
   if not (m.TopNav.isInFocusChain() = true or m.CategoryGridList.isInFocusChain() = true) or m.top.isLoading = true
     return
@@ -761,8 +770,6 @@ Function onGridFocusChange() as void
 
     populateInfoPanelByContent(focusedContent)
   end if
-
-
 
   'Set up the navigateWithinPageInfo to send to ContentController via Homescreen. Need for when CategoryGridList or topNav are in focus
   oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + 1
@@ -862,6 +869,12 @@ Function onItemToBeFocusedChange()
   if m.top.contentReady = false
     m.top.contentReady = true
   end if
+
+  if getExperimentResource("roku_see_all_container", m.experimentName, false).enabled = true
+    updateRowFocusedForSeeAll(m.CategoryGridList.rowFocused)
+    updateFloatingSeeAll(m.CategoryGridList.rowFocused)
+  end if
+
   populateInfoPanelByContent(m.CategoryGridList.reloadedItemToBeFocused)
 End Function
 
