@@ -217,3 +217,16 @@ Function onScreenChange()
     m.sideNav.visible = bSideNavVisible
   end if
 End Function
+
+
+Function getScreenIdsFromStack()
+  ' Looping through the child nodes of stack to find all the screens in stack.
+  screenIds = []
+  ' Gets all childrens.
+  screens = m.screenStack.getChildren(-1, 0)
+  for each screen in screens
+    screenIds.push(screen.id)
+  end for
+
+  return screenIds
+End Function

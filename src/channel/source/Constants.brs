@@ -894,6 +894,7 @@ Function getConstants()
     constants.errors.type.timedOut = "Timed Out"
     constants.errors.type.loadFailed = "Failed to Load"
     constants.errors.type.crashOnPreviousRun = "Crash detected on previous run"
+    constants.errors.type.lowMemoryWarning = "Memory Warning"
 
   ' errors will be grouped by the combination of constants.errors.type and constants.errors.message in sentry dashboard
   ' error messages are passed to sentry api as exception->value and displayed in sentry dashboard
@@ -904,6 +905,7 @@ Function getConstants()
     constants.errors.message.invalidVideoUrl = "Invalid Video URL"
     constants.errors.message.badResponse = "Bad Response"
     constants.errors.message.noResponse = "No Response"
+    constants.errors.message.lowMemoryWarning = "Low Memory Warning"
 
   ' creating mapping to backend error codes.
   constants.errors.codes = {}

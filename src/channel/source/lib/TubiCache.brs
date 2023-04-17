@@ -20,9 +20,10 @@ Function TubiCache(nodeHelpers, cacheableScreenIds, permanentContentIds)
     getFromContentCache: tubiCache_getFromContentCache
     deleteFromContentCache: tubiCache_deleteFromContentCache
     emptyContentCache: tubiCache_emptyContentCache
+    getCachedNodeCount: tubiCache_getCachedNodeCount
+    getCachedScreenCount: tubiCache_getCachedScreenCount
 
     ' private methods
-    getCachedNodeCount: tubiCache_getCachedNodeCount
     getLruContentFromCache: tubiCache_getLruContentFromCache
     isOnlyPermanentCacheRemaining: tubiCache_isOnlyPermanentCacheRemaining
     addToContentCacheOrder: tubiCache_addToContentCacheOrder
@@ -279,6 +280,11 @@ Function tubiCache_getCachedNodeCount()
   end for
 
   return cachedNodesCount
+End Function
+
+
+Function tubiCache_getCachedScreenCount()
+  return m.screenCache.count()
 End Function
 
 

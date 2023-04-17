@@ -14,5 +14,7 @@
       <!-- OUTPUT -->
       <!-- Combination of roHdmiStatus and roCECStatus hdmi checks to know if we're ok to playback video -->
       <field id="isHdmiStatusOk" type="boolean" />
+      <!-- Will contain information related to the low memory event. -->
+      <field id="lowMemoryEventInfo" type="assocarray" />
     </interface>
 </component>
