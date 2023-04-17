@@ -94,7 +94,6 @@
     <LayoutGroup
         id="itemGroups"
         layoutDirection="vert"
-        translation="[0,60]"
         itemSpacings="[1]">
 
       <Group>
@@ -102,11 +101,10 @@
           numRows="8"
           numColumns="1"
           id="mainItemsSelected"
-          itemSize="[397,70]"
           itemSpacing="[0,17]"
           vertFocusAnimationStyle="floatingFocus"
-          focusFootprintBitmapUri="pkg:/images/sideNavItemComponent.9.png"
-          focusBitmapUri="pkg:/images/sideNavItemComponent.9.png"
+          focusFootprintBitmapUri="pkg:/images/menu-focus-$$RES$$.9.png"
+          focusBitmapUri="pkg:/images/menu-focus-$$RES$$.9.png"
           drawFocusFeedbackOnTop="false"
           itemComponentName="SideNavIconComponent">
           <ContentNode id="MainContent-select" role="content" >
@@ -116,11 +114,10 @@
           numRows="8"
           numColumns="1"
           id="mainItems"
-          itemSize="[397,70]"
           itemSpacing="[0,17]"
           vertFocusAnimationStyle="floatingFocus"
-          focusFootprintBitmapUri="pkg:/images/sideNavItemComponent.9.png"
-          focusBitmapUri="pkg:/images/sideNavItemComponent.9.png"
+          focusFootprintBitmapUri="pkg:/images/menu-focus-$$RES$$.9.png"
+          focusBitmapUri="pkg:/images/menu-focus-$$RES$$.9.png"
           drawFocusFeedbackOnTop="false"
           itemComponentName="SideNavIconComponent">
           <ContentNode id="MainContent" role="content" >

@@ -455,14 +455,10 @@ Function displayNavMenu(shouldTrackComponentInteraction = true)
     end if
 
     openSideNav()
-    if m.nOriginalSideNavX = invalid
-      m.nOriginalSideNavX = m.SideNav.translation[0]
-    end if
     if m.nOriginalScreenStackX = invalid
       m.nOriginalScreenStackX = m.ScreenStack.translation[0]
     end if
 
-    slideTo(m.SideNav, [0, m.SideNav.translation[1]], .2)
     slideTo(m.ScreenStack, [m.nOriginalScreenStackX + m.SideNav.width, m.ScreenStack.translation[1]], .2)
 
     topScreen = getCurrentScreen()
@@ -482,7 +478,6 @@ Function hideNavMenu(shouldTrackComponentInteraction = true)
   if m.SideNav.opened = true
     openSideNav(false)
 
-    slideTo(m.SideNav, [m.nOriginalSideNavX, m.SideNav.translation[1]], .3)
     slideTo(m.ScreenStack, [m.nOriginalScreenStackX, m.ScreenStack.translation[1]], .3)
 
     topScreen = getCurrentScreen()

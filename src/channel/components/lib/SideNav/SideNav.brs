@@ -147,13 +147,13 @@ Function onCreateMenuItems()
 
   m.mainItems.numRows = 12
   m.mainItemsSelected.numRows = 12
-  m.mainItems.itemSpacing = [0,24]
-  m.mainItemsSelected.itemSpacing = [0,24]
+  m.mainItems.itemSpacing = [0, 12]
+  m.mainItemsSelected.itemSpacing = [0, 12]
   'this is to accommodate spanish signIn text + free Icon
-  m.mainItems.itemSize = [467,60]
-  m.mainItemsSelected.itemSize = [467,60]
+  m.mainItems.itemSize = [438, 72]
+  m.mainItemsSelected.itemSize = [438,72]
 
-  m.itemGroups.translation = [0,40]
+  m.itemGroups.translation = [57,40]
   m.mainItems.wrapDividerBitmapUri = ""
   m.mainItemsSelected.wrapDividerBitmapUri = ""
   m.mainItems.wrapDividerHeight = 0
@@ -163,10 +163,6 @@ Function onCreateMenuItems()
 
   '//Initiate the default view
   onOpenedChanged()
-  '//::TODO::SIDENAV set the width of the items of the lists dynamically to the width of m.top.width, plus some spacing
-  '//::TODO::SIDENAV - set all references to sideNav IDs to be called from Constants: i.e. m.constants.ui.sideNavIds.home.
-  '//   To do this, set content in brs instead of xml?
-
 
   if m.global <> invalid
     m.global.observeField("theme", "onThemeChange")
@@ -183,8 +179,8 @@ Function onThemeChange(msg = invalid)
   end if
   
   if theme <> invalid
-    m.mainItemsSelected.focusBitmapBlendColor = theme.selectedListItemColor
-    m.mainItemsSelected.focusFootprintBlendColor = theme.selectedListItemColor
+    m.mainItemsSelected.focusBitmapBlendColor = theme.neutralColor
+    m.mainItemsSelected.focusFootprintBlendColor = theme.neutralColor 
   end if
 End Function
 
@@ -546,7 +542,7 @@ End Function
 
 Function onOpenedChanged()
   if m.top.opened = true
-    '//display hidden items, profile, settings, exit. Set all buttons to full opacity
+    '//display hidden items, profile, settings, exit.
 
     if m.itemSelectedRemembered <> invalid
       list = m.top.findNode(m.itemSelectedRemembered.list)
@@ -563,12 +559,12 @@ Function onOpenedChanged()
     fade(m.sideNavBackground, "in", 0.2)
 
     setContentActive(m.MainContent)
-    m.mainItemsSelected.visible = true
+    m.mainItemsSelected.itemSize = m.mainItems.itemSize
   else
     fade(m.sideNavBackground, "out", 0.2)
 
     setContentActive(m.MainContent, false)
-    m.mainItemsSelected.visible = false
+    m.mainItemsSelected.itemSize = [108, m.mainItemsSelected.itemSize[1]]
     m.listItemSelected = invalid
     m.oldSideNavFocusedButton = invalid
   end if

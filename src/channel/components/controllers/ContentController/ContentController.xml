@@ -161,7 +161,7 @@
 
         <SideNav
           id="SideNav"
-          translation="[-32,0]"
+          translation="[0,0]"
           width="338"/>
         <Clock
           id="clock"

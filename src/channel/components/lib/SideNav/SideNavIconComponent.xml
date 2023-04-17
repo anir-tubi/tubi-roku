@@ -19,7 +19,7 @@
   <children>
     <Poster
       id="Icon"
-      translation="[114, 0]"
+      translation="[36, 0]"
       loadSync="true"
       width="36"
       height="36"/>
@@ -36,7 +36,7 @@
     </Label>
     <LayoutGroup
       id="LabelParent"
-      translation="[162, 3]"
+      translation="[84, 3]"
       layoutDirection="horiz"
       itemSpacings="[12]"
       vertAlignment="custom">

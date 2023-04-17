@@ -117,6 +117,8 @@ End FUnction
 Function onActiveChange()
 
   if m.top.itemContent.active = true
+    '//when the side nav is maximized.
+    
     if m.top.itemContent.turnedOn <> false
 
       m.Icon.opacity = 1
@@ -126,7 +128,7 @@ Function onActiveChange()
         m.sideIconLabel.opacity = 1
       end if
 
-      fade(m.Label, "in", .1)
+      fade(m.Label, "in", .3)
     else
       '// if the item is not enabled, then still don't bring up the opacity
       m.Icon.opacity = .31
@@ -136,26 +138,22 @@ Function onActiveChange()
         m.sideIconLabel.opacity = 1
       end if
 
-      fade(m.Label, "in", .1, 0, .31)
+      fade(m.Label, "in", .3, 0, .31)
     end if
   else
-    fade(m.Label, "out", .1)
+    '//when the side nav is minimized.
 
-    '//The selected item should appear bolder
+    fade(m.Label, "out", .3)
+
+    m.Icon.opacity = 1
+    if m.sideIconLabel <> invalid
+      m.sideIconLabel.opacity = 0
+    end if
+    
     if m.top.itemContent.selected = true
-      m.Icon.opacity = 1
       m.subTxt.opacity = 0
-      if m.sideIconLabel <> invalid
-        m.sideIconLabel.opacity = 0
-      end if
     else
-      m.Icon.opacity = .31
-
       m.subTxt.opacity = 0.8
-      if m.sideIconLabel <> invalid
-        m.sideIconLabel.opacity = 0
-      end if
-
     end if
   end if
 End Function
