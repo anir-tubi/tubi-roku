@@ -101,7 +101,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.SearchText.color = theme.primaryTextColor
     m.KidsModeMessage.color = theme.secondaryTextColor

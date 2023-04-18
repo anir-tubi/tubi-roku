@@ -1,5 +1,5 @@
 Function init()
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
@@ -37,7 +37,7 @@ Function init()
     '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
-  
+
   focusBox = m.top.findNode("FocusBox")
   if m.constants.deviceInfo.scaledUi = true then
     focusBoxMargin = 4

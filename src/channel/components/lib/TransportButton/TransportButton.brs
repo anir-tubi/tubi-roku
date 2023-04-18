@@ -24,7 +24,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.colors = {
       focusedText: theme.focusedColor
@@ -54,7 +54,7 @@ Function onFocusUpdate()
   else
     theme = getThemeFromGlobal()
     if theme <> invalid
-      m.top.blendColor = theme.primaryTextColor 
+      m.top.blendColor = theme.primaryTextColor
     end if
 
     'skip trailer button is a special case where text color also needs to be updated
@@ -67,7 +67,7 @@ Function onFocusUpdate()
       end if
     end if
   end if
-  
+
   if m.top.enabled then
     m.top.opacity=1.0
   else

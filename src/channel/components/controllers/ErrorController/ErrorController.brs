@@ -1,6 +1,6 @@
 Function init()
   print "init Scene Graph Error Controller"
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
   m.trackingLoggingTask = m.top.findNode("TrackingLoggingTask")
   m.trackingLoggingTask.control = "RUN"
   Request = TubiRequest(m.constants.settings)

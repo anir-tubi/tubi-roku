@@ -1,5 +1,5 @@
 Function init()
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
@@ -70,7 +70,7 @@ Function createMainContent(item)
     contentNode.title = "Español"
     contentNode.iconUrl = "pkg:/images/sideNavEspanol.png"
   else if item = m.constants.ui.sideNavIds.myList
-    if getExperimentResource("roku_my_stuff", "roku_my_stuff_v2", false).enabled = true AND UCase(m.constants.deviceInfo.countryCode) = "US" 
+    if getExperimentResource("roku_my_stuff", "roku_my_stuff_v2", false).enabled = true AND UCase(m.constants.deviceInfo.countryCode) = "US"
       contentNode.title = getTranslation("menu_mystuff")
       contentNode.shortDescriptionLine2 = getTranslation("text_new")
     else
@@ -177,10 +177,10 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.mainItemsSelected.focusBitmapBlendColor = theme.neutralColor
-    m.mainItemsSelected.focusFootprintBlendColor = theme.neutralColor 
+    m.mainItemsSelected.focusFootprintBlendColor = theme.neutralColor
   end if
 End Function
 

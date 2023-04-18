@@ -1,5 +1,5 @@
 Function init()
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
   m.SettingsMenu = m.top.findNode("SettingsMenu")
   m.SettingsMenuGroup = m.top.findNode("SettingsMenuGroup")
   m.top.list = m.SettingsMenu

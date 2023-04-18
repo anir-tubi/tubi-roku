@@ -1,5 +1,5 @@
 Function init()
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
 
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
   m.top.observeFieldScoped("isEmailValid", "onIsEmailValidChange")
@@ -58,7 +58,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.back.color = theme.backgroundColorLight
     m.continue.color = theme.backgroundColorLight

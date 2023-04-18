@@ -1,7 +1,7 @@
 Function init()
   ' wait for any children to be added to the scene
   m.constants = getConstantsFromGlobal()
-  
+
   initTranslations() 'needed for spinner
 
   m.spinner = m.top.findNode("TubiSceneSpinner")

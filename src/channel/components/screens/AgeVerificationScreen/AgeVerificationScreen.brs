@@ -1,5 +1,5 @@
 Function init()
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
   m.Header = m.top.findNode("AgeVerificationPageHeader")
   m.SubHeader = m.top.findNode("AgeVerificationPageSubHeader")
   m.NumberPad = m.top.findNode("AgeVerificationNumberpad")

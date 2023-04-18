@@ -1,6 +1,6 @@
 Function init()
   tubiLog("EPGHomeScreen.init")
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)

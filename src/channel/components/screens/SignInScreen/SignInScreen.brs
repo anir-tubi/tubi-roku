@@ -1,62 +1,62 @@
 Function init()
   m.trackingLoggingTask = m.global.trackingLoggingTask
   m.constants = m.global.constants
-  
+
   m.top.observeFieldScoped("resetFocus", "onResetFocus")
   m.top.observeField("focusedChild", "onScreenFocusChange")
-  
+
   m.pageHeading = m.top.findNode("pageHeading")
   m.pageHeading.text = getTranslation("signIn_screen_heading")
-  
+
   m.pageSubHeading = m.top.findNode("pageSubHeading")
   m.pageSubHeading.text = getTranslation("signIn_screen_subheading")
-  
+
   m.passwordValidationMsg = m.top.findNode("passwordValidationMsg")
   m.passwordValidationMsg.text = getTranslation("signIn_screen_enter_password")
-  
+
   m.continueBtn = m.top.findNode("continueBtn")
   m.continueBtn.text = getTranslation("dialog_button_continue")
   m.continueBtn.observeFieldScoped("selected", "onContinueButtonSelected")
-  
+
   m.newPasswordLabel = m.top.findNode("newPasswordLabel")
   m.newPasswordLabel.text = getTranslation("new_password_text")
-  
+
   m.newPasswordLink = m.top.findNode("newPasswordLink")
   m.newPasswordLink.text = getTranslation("new_password_link")
-  
+
   m.termsBtn = m.top.findNode("termsBtn")
   m.termsBtn.text = getTranslation("screenSettings_menu_tos")
   m.termsBtn.observeFieldScoped("selected", "onTermsButtonSelected")
-  
+
   m.ppBtn = m.top.findNode("ppBtn")
   m.ppBtn.text = getTranslation("screenSettings_menu_privacyPolicy")
   m.ppBtn.observeFieldScoped("selected", "onPrivacyPolicyButtonSelected")
-  
+
   m.yourPrivacyChoicesBtn = m.top.findNode("YourPrivacyChoicesButton")
   m.yourPrivacyChoicesBtn.text = getTranslation("screenSettings_menu_yourPrivacyChoices")
   m.yourPrivacyChoicesBtn.observeFieldScoped("selected", "onYourPrvacyChoicesButtonSelected")
-  
+
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
   m.voiceKeyboard = m.keyboard.findNode("Keyboard")
   m.keyboard.observeFieldScoped("buttonSelected", "onButtonSelected")
-  
+
   m.buttonsGroup = m.top.findNode("buttonsGroup")
-  
+
   m.password = m.top.findNode("password")
   m.password.hint = getTranslation("signIn_password_hint")
   m.password.observeFieldScoped("selected", "onPasswordButtonSelected")
-  
+
   m.email = m.top.findNode("email")
   m.email.hint = getTranslation("signIn_email_hint")
   m.email.observeFieldScoped("selected", "onEmailSelected")
-  
+
   'emailHasFocus is used to store the state of whether or not the email text entry field has been focused.
   'We need to store this state, and can't simply rely on m.email.isInFocusChain() because when user starts using microphone,
   'the email entry text field loses focus and keyboard gains the focus.
   m.emailHasFocus = false
-  
+
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
-  
+
   'set initial tracking values
   m.top.trackingPageInfo = {
     pageType: "login_page"
@@ -64,18 +64,18 @@ Function init()
       choice: "EMAIL"
     }
   }
-  
-  
+
+
   m.top.isStackable = true
   m.top.screenLevel = m.constants.ui.screenLevels.signInScreen
   m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
-  
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
   onThemeChange()
 End Function
-  
+
 
 Function onThemeChange(msg = invalid)
   if msg <> invalid
@@ -83,7 +83,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.newPasswordLabel.color = theme.primaryTextColor
     m.pageHeading.color = theme.primaryTextColor
@@ -97,7 +97,7 @@ Function onThemeChange(msg = invalid)
   end if
 End Function
 
-  
+
 Function onScreenFocusChange()
 
   tubiLog("SignInScreen.onScreenFocusChange")

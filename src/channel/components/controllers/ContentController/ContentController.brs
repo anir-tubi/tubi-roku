@@ -3,7 +3,7 @@ Function init()
   tubiLog("Init Scenegraph----------------")
   m._ = rodash()
 
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
 
   ' Timer to find last time the app restarted
   m.lastAppRestartTimer = CreateObject("roTimespan")

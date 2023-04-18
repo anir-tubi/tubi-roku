@@ -4,7 +4,7 @@ End Function
 
 Function execSimpleRequestTask()
   tubiLog("SimpleRequestTask.execSimpleRequestTask " + m.top.uri)
-  constants = m.global.constants
+  constants = getConstantsFromGlobal()
   request = TubiRequest(constants.settings)
   response = request.createAsync(m.top.uri).runSynchronous()
   if m.top.node <> invalid AND m.top.field <> "" then

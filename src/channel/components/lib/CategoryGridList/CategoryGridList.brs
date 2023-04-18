@@ -1,6 +1,6 @@
 Function init()
   tubiLog("CategoryGridList.init")
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
 
   m.top.observeField("categoryResponseInBatch", "onCategoryResponseInBatch")
   m.top.observeField("focusedChild", "onComponentFocusChange")

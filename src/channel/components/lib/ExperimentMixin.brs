@@ -5,7 +5,7 @@
 ' have pkg:/source/lib/Request.brs and pkg:/source/lib/TubiExperiments.brs added as scripts
 Function getExperimentResource(namespaceName as string, experimentName as string, sendEvent=true as Boolean)
   if m.constants = invalid
-    m.constants = m.global.constants
+    m.constants = getConstantsFromGlobal()
   end if
   experiments = TubiExperiments(m.constants)
   resource = experiments.getExperimentResource(namespaceName, experimentName)

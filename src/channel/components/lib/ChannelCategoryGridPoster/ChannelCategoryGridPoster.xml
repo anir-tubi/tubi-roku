@@ -53,7 +53,7 @@
         id="SponsoredByText"
         text=""
         vertAlign="bottom"
-        width="0" 
+        width="0"
         height="18">
         <Font
           role="font"

@@ -7,7 +7,7 @@ Function init()
   m.top.observeFieldScoped("width", "onWidthChange")
   m.top.observeFieldScoped("height", "onHeightChange")
   m.top.observeFieldScoped("itemHasFocus", "onItemHasFocus")
-  
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -21,7 +21,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.Text.color = theme.primaryTextColor
     m.Check.blendColor = theme.primaryTextColor

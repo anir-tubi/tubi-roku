@@ -1,5 +1,5 @@
 Function init()
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
   m.top.observeField("spriteUrls", "showSprite")
   m.top.observeField("numSprites", "showSprite")
   m.top.observeField("width", "showSprite")

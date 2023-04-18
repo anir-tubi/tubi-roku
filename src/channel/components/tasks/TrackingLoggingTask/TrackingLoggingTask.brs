@@ -8,7 +8,7 @@ Function init()
   m.top.observeField("logException", m.port)
   m.top.observeField("analyticsAppMode", m.port)
 
-  m.constants = m.global.constants   ' this should grab a thread-local copy
+  m.constants = getConstantsFromGlobal()
 
   m.top.control = "RUN"
 End Function

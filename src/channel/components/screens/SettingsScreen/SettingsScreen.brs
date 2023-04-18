@@ -1,5 +1,5 @@
 Function init()
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
 
   m.leftPanelWidth = 470
   m.rightPanelWidth = 1034

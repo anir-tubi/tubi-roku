@@ -7,7 +7,7 @@ End Function
 ' Synchronously load auth info, followed by loading of user categories (if user is logged in)
 Function execInitializeUserData()
   tubiLog("AuthTask.execInitializeUserData")
-  constants = m.global.constants
+  constants = getConstantsFromGlobal()
   Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
@@ -53,7 +53,7 @@ End Function
 
 Function execRefreshAuthInfo()
   tubiLog("AuthTask.execRefreshAuthInfo")
-  constants = m.global.constants
+  constants = getConstantsFromGlobal()
   Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   newAuthInfo = invalid
@@ -71,7 +71,7 @@ End Function
 
 Function execSignOut()
   tubiLog("AuthTask.execSignOut")
-  constants = m.global.constants 'single thread-local reference to avoid thread rendezvous
+  constants = getConstantsFromGlobal() 'single thread-local reference to avoid thread rendezvous
   Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()
@@ -186,7 +186,7 @@ End Function
 
 Function execGetUserInfo()
   tubiLog("AuthTask.getUserInfo")
-  constants = m.global.constants
+  constants = getConstantsFromGlobal()
   Request = TubiRequest(constants.settings)
   Auth = TubiAuth(constants, Request)
   NodeHelpers = TubiNodeHelpers()

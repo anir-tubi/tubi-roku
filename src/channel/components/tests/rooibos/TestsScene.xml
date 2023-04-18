@@ -9,4 +9,5 @@
 
   <script type="text/brightscript" uri="TestsScene.brs" />
   <script type="text/brightscript" uri="../../../../source/tests/rooibos/rooibosDist.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 </component>

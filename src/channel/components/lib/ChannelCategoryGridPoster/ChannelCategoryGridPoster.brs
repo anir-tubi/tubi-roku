@@ -1,5 +1,5 @@
 Function init()
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
   m._ = rodash()
   m.poster = m.top.findNode("Poster")
   m.posterRect = m.top.findNode("PosterRect")
@@ -50,13 +50,13 @@ Function onContentChange(data)
 
   if m.top.itemContent <> invalid then
     thumbnail = invalid
-    if m.top.itemContent.sponsorImages <> invalid 
+    if m.top.itemContent.sponsorImages <> invalid
       '//If this tile is sponsored, then display the appropriate images
-      if m.top.itemContent.sponsorImages.tileBackground <> "" 
+      if m.top.itemContent.sponsorImages.tileBackground <> ""
         thumbnail = m.top.itemContent.sponsorImages.tileBackground
       end if
 
-      if m.top.itemContent.sponsorImages.brandLogo <> "" 
+      if m.top.itemContent.sponsorImages.brandLogo <> ""
         m.SponsoredBy.visible = true
         m.SponsoredByText.text = getTranslation("sponsor_brought_by")
         m.SponsoredByPoster.observeField("loadStatus", "onSponsorPosterLoadStatusChanged")
@@ -92,7 +92,7 @@ Function setTranslations()
   nYLogo = (m.top.height - m.logo.height)/2
   m.logo.translation = [nXLogo, nYLogo]
 
-  nTitleWidth = m.top.width * .9 
+  nTitleWidth = m.top.width * .9
   nXTitle = (m.top.width - nTitleWidth)/2
   nYTitle = (m.top.height - m.title.boundingRect().height)/2
   m.title.width = nTitleWidth
@@ -107,7 +107,7 @@ Function onSponsorPosterLoadStatusChanged(msg)
     m.SponsoredByPoster.unobserveField("loadStatus")
     nBoundingHeight = m.SponsoredByPoster.boundingRect().height
     nBoundingWidth = m.SponsoredByPoster.boundingRect().width
-    
+
     nMaxWidth = 150
     nMaxHeight = 30
     nHeight = nMaxHeight

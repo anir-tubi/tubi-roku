@@ -2,7 +2,7 @@ Function init()
   m._ = rodash()
   '//This var is used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.contentLoadedAndFocused = false
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
 
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
   Request = TubiRequest(m.constants.settings)

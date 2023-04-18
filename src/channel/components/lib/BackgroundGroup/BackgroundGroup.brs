@@ -1,7 +1,7 @@
 Function init()
   TubiLog("BackgroundGroup.init")
   m._ = rodash()
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
 
   m.blurredDefaultBackground = m.constants.ui.uris.defaultBackground
   m.blurredDefaultBackground_kidsMode = m.constants.ui.uris.kidsModeBackground

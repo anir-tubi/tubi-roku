@@ -11,6 +11,7 @@
     <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
     <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
     <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
     <interface>
       <!-- INPUT -->
