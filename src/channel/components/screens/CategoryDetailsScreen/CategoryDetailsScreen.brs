@@ -11,15 +11,13 @@ Function init()
   m.experiments = TubiExperiments(m.constants)
   m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments)
 
-  m.lazyLoadingExp = (getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", false).enabled = true)
-
   itemsInRowCount = 8
 
-  if m.lazyLoadingExp = true
-    m.upperRowIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize / itemsInRowCount ' items per row = 8 * 6 = 48
-    m.lowerRowIndex = 0
-    m.numRowsInBatch = m.constants.performance.categoryGridList.lazyLoadBatchSize / itemsInRowCount
-  end if
+  ' roku_category_detailscreen_lazy_load_v1 related variables.
+  m.upperRowIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize / itemsInRowCount ' items per row = 8 * 6 = 48
+  m.lowerRowIndex = 0
+  m.numRowsInBatch = m.constants.performance.categoryGridList.lazyLoadBatchSize / itemsInRowCount
+
 
   m.InfoPanel = m.top.findNode("ChannelsInfoPanel")
   m.PageTitleAndCounter = m.top.findNode("pageTitleAndCounter")
@@ -222,20 +220,22 @@ Function onItemFocused()
 
         m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)
 
-        if m.lazyLoadingExp = true
-          'lazy loading logic:
-          ' start with fetching contents for row=0 to row= (total number per lazyload) / 8 contents per row (lowerRowIndex to upperRowIndex)
-          '
-          ' when user scrolls down to midway (say third row out of total 6 rows) , request next batch
 
-          rowForNextCall = (m.lowerRowIndex + m.upperRowIndex) / 2
+        'lazy loading logic:
+        ' start with fetching contents for row=0 to row= (total number per lazyload) / 8 contents per row (lowerRowIndex to upperRowIndex)
+        '
+        ' when user scrolls down to midway (say third row out of total 6 rows) , request next batch
 
-          if row > rowForNextCall
+        rowForNextCall = (m.lowerRowIndex + m.upperRowIndex) / 2
+
+        if row > rowForNextCall
+          if getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", true).enabled = true
             m.top.categoryBatchIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize +  m.top.categoryBatchIndex
             m.lowerRowIndex = m.upperRowIndex + 1
             m.upperRowIndex = m.upperRowIndex + m.numRowsInBatch
           end if
         end if
+
       else
         m.contentLoadedAndFocused = true
         m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)

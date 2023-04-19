@@ -126,7 +126,7 @@ Function onCategoryBatchIndexChange(msg)
   ' Is used to determine when to send the PageLoad analytics event (don't send on refresh)
   m.refreshingCategoryDetailsCache = true
 
-  if getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", true).enabled = true
+  if getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", false).enabled = true
 
     'fetch the content if screen is not fully loaded or a total refresh has been requested.
     if categoryDetailsScreen.isFullyLoaded <> true OR index = 0
