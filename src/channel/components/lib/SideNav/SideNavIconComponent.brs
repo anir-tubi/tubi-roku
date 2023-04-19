@@ -50,9 +50,9 @@ Function onContentChange(data)
     if item.shortDescriptionLine1 <> invalid
       m.subTxt.text = item.shortDescriptionLine1
       if m.subTxt.text <> ""
-        'subTxt needs to be centered on the sideNav. Center position of the subtext calculated using safezone start point(114) + center point of the profile icon.
-        subTxtCenterPt = (114 + (m.Icon.boundingRect().width / 2)) - ( m.subTxt.boundingRect().width / 2 )
-        m.subTxt.translation = [subTxtCenterPt, 52]
+        'subTxt needs to be centered on the sideNav. Center position of the subtext calculated using the X Position of the icon + center point of the profile icon.
+        subTxtCenterPt = (m.Icon.translation[0] + (m.Icon.boundingRect().width / 2)) - ( m.subTxt.boundingRect().width / 2 )
+        m.subTxt.translation = [subTxtCenterPt, 57 ]
       end if
 
       'add free icon next to Label when sideNav is open
@@ -73,7 +73,7 @@ Function onContentChange(data)
             m.sideIconLabel.text = item.shortDescriptionLine2
             m.sideIconLabel.uri = "pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
             m.sideIconLabel.opacity = 0
-            m.sideIconLabel.translation = [0, 10]
+            m.sideIconLabel.translation = [0, 15]
           end if
         else if item.shortDescriptionLine2 = "" AND m.sideIconLabel <> invalid
           m.labelParent.removeChild(m.sideIconLabel)
