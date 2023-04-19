@@ -184,12 +184,6 @@ Function init()
   m.midrolls = {} ' midrolls holds all cuepoints from API response
   m.mostRecentCompletedCuepoint = -1 'used to prevent multiple resume_after_break events from firing
 
-  ' m.isSeeking is used keep track of the time from when m.Video.control = "seek" is set until the
-  ' onVideoPositionChange() callback is fired which indicates the video player has concluded the seek.
-  ' While m.isSeeking is true, we will not fire playProgressEvents from the onVideoPositionChange() callback
-  ' that may unexpectedly occur while the video player is in the process of performing the seek.
-  m.isSeeking = false
-
   ' m.seekReferenceQueue is used to record the playback positions to which m.Video.seek is set.
   ' Context: setting a value on m.Video.seek will cause the onVideoPositionChange() callback to fire.
   ' We do not want playProgressEvents to fire from onVideoPositionChange() if the callback occurs due to a seek,
@@ -349,14 +343,6 @@ Function playContent()
       m.lastButtonPressPos = m.Video.content.nowPos
       m.seekReferenceQueue.push(m.Video.content.nowPos)
       seekToPosition(m.Video.content.nowPos)
-
-      if m.Video.content.nowPos = 0
-        ' At this point seekReferenceQueue will have value 0. But the player position callback starts from 1
-        ' and the play progress event does not fire as per logic written in onVideoPositionChange() in 10 seconds because m.isSeeking is not setting to false.
-        ' If the video is seeked to 0, set the m.isSeeking to false, so that play progress event fires correctly.
-        m.isSeeking = false
-      end if
-
     else
       m.lastButtonPressPos = 0
       updateLastPingTime(0)
@@ -694,7 +680,6 @@ Function onVideoPositionChange(msg)
   playProgressOk = true
   if positionInSeekReferenceQueue(m.playerPosition, m.seekReferenceQueue) = true 'updates m.seekReferenceQueue as necessary
     playProgressOk = false
-    m.isSeeking = false
   end if
 
   ' Auto hide transport
@@ -711,7 +696,7 @@ Function onVideoPositionChange(msg)
   if m.VideoState = "play"
     ' videoPosition can change after the player has been paused (like right button press),
     ' we do not want to send play progress events in that case.
-    if m.playerPosition >= m.lastPingTime + m.analyticsInterval AND playProgressOk = true AND m.isSeeking = false
+    if m.playerPosition >= m.lastPingTime + m.analyticsInterval AND playProgressOk = true
       playProgressEvent = getPlayProgressEvent("onVideoPositionChange:playing")
       if playProgressEvent <> invalid
         updateLastPingTime(m.playerPosition)
@@ -916,14 +901,6 @@ Function onAdStateChange(msg)
       m.top.setFocus(true)
       m.seekReferenceQueue.push(m.playerPosition)
       seekToPosition(m.playerPosition)
-
-      if m.playerPosition = 0
-        ' At this point seekReferenceQueue will have value 0. But the player position callback starts from 1
-        ' and the play progress event does not fire as per logic written in onVideoPositionChange() in 10 seconds because m.isSeeking is not setting to false.
-        ' If the video is seeked to 0, set the m.isSeeking to false, so that play progress event fires correctly.
-        m.isSeeking = false
-      end if
-
       updateVideoState("play")
       updateLastPingTime(m.playerPosition) ' updating lastPingtime for extra safety
       if m.Video.content.has4kHevcStream = true
@@ -1327,8 +1304,6 @@ Function seekToPosition(position)
   if position < 0
     position = 0
   end if
-
-  m.isSeeking = true
 
   m.Video.seek = position
 End Function
