@@ -64,8 +64,9 @@
       <!-- This field accomplishes 2 things:
               1. tells ContentController/CategoryDetailsScreenHelpers that the category metadata
                   for the categroy content is out of the cache window and should be updated
-              2. user has scrolled down to an index where we need to load more contents. -->
-      <field id="categoryBatchIndex" type="integer" />
+              2. user has scrolled down to an index where we need to load more contents. 
+              Please note: that it is important that alwaysNotify is set to true so we can communicate to the Helper when the cache is out of date. -->
+      <field id="categoryBatchIndex" type="integer" alwaysNotify="true" />
 
       <!-- This field indicates that categorydetail page is fully loaded with all avialable contents or upto constants.performance.categoryGridList.finalLazyLoadSize-->
       <field id="isFullyLoaded" alias="pageTitleAndCounter.isFullyLoaded" />
