@@ -531,8 +531,7 @@ Function onCurrFocusRowChange()
   end if
 
   if categoryEnteringFocus <> invalid
-
-    if getExperimentResource("roku_see_all_container", m.experimentName, false).enabled = true
+    if isNonEmptyString(m.experimentName) = true AND getExperimentResource("roku_see_all_container", m.experimentName, false).enabled = true
       updateRowFocusedForSeeAll(categoryEnteringFocus)
       updateFloatingSeeAll(categoryEnteringFocus)
     end if
@@ -745,7 +744,7 @@ Function onGridFocusChange() as void
     m.top.contentReady = true
   end if
 
-  if getExperimentResource("roku_see_all_container", m.experimentName, false).enabled = true
+  if isNonEmptyString(m.experimentName) = true AND getExperimentResource("roku_see_all_container", m.experimentName, false).enabled = true
     updateRowFocusedForSeeAll(m.CategoryGridList.rowFocused)
     updateFloatingSeeAll(m.CategoryGridList.rowFocused)
   end if
@@ -870,7 +869,7 @@ Function onItemToBeFocusedChange()
     m.top.contentReady = true
   end if
 
-  if getExperimentResource("roku_see_all_container", m.experimentName, false).enabled = true
+  if isNonEmptyString(m.experimentName) = true AND getExperimentResource("roku_see_all_container", m.experimentName, false).enabled = true
     updateRowFocusedForSeeAll(m.CategoryGridList.rowFocused)
     updateFloatingSeeAll(m.CategoryGridList.rowFocused)
   end if
