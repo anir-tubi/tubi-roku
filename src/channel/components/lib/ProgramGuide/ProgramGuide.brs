@@ -41,7 +41,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.programGrid.focusBitmapBlendColor = theme.focusedColor
     m.channelsGrid.focusFootPrintBlendColor = theme.backgroundColorLight2
@@ -78,7 +78,12 @@ Function onProgramGridContentFocused(msg)
     lastItemFocusedRow = m.lastItemFocused[0] + 1
     contentTile = m.Tracking.getAnalyticsTile(previousItemFocused, lastItemFocusedCol, lastItemFocusedRow)
 
-    row = rowItemFocused[0] + 1
+    if rowItemFocused[0] >= 0
+      row = rowItemFocused[0] + 1
+    else
+      row = 1 'default row is first row.
+    end if
+
     col = rowItemFocused[1] + 1
     m.lastItemFocused = rowItemFocused
 
@@ -91,12 +96,15 @@ Function onProgramGridContentFocused(msg)
     if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pageValues <> invalid
       pageValues = m.top.trackingPageInfo.pageValues
     end if
+
     navigateWithinPageInfo = {
       pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
       componentOneof: m.Tracking.getAnalyticsComponent("epg_component",  {content_tile: contentTile})
       means_of_navigation: "BUTTON"
       vertical_location: row
+      vertical_location_mode: "INDEX"  'LocationMode enum
       horizontal_location: col
+      horizontal_location_mode: "INDEX"  'LocationMode enum
     }
     m.top.navigateWithinPageInfo = navigateWithinPageInfo
 
