@@ -75,10 +75,6 @@ Function TubiExperiments(constants) as Object
         roku_dash_v1 : {"enabled": false}
       }
 
-      roku_epg_channel_poster_bigger_size: {
-        roku_epg_channel_poster_bigger_size_v1: {"enabled": false}
-      }
-
       roku_category_detailscreen_lazy_load: {
         roku_category_detailscreen_lazy_load_v1: {
           "enabled": false

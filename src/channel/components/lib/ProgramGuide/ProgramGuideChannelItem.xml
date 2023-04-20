@@ -5,9 +5,6 @@
 <component name="ProgramGuideChannelItem" extends="Group" >
   <script type="text/brightscript" uri="ProgramGuideChannelItem.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
   <interface>
@@ -31,10 +28,10 @@
       loadingBitmapUri="pkg:/images/placeholder.jpg"
       failedBitmapUri="pkg:/images/logo-white-large.png"
       opacity="0.24"
-      height="72"
-      width="72"
-      loadheight="72"
-      loadwidth="72"
+      height="84"
+      width="84"
+      loadheight="84"
+      loadwidth="84"
       translation="[51,12]"
       loadDisplayMode="scaleToFit"/>
   </children>

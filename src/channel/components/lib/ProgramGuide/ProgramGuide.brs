@@ -169,7 +169,6 @@ Function onContentChanged()
 
   if m.top.content <> invalid
     m.programGrid.content = m.top.content
-    getExperimentResource("roku_epg_channel_poster_bigger_size", "roku_epg_channel_poster_bigger_size_v1", true)
     m.channelsGrid.content = m.top.content
   end if
 End Function
