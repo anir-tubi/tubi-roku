@@ -781,7 +781,7 @@ Function getConstants()
       constants.player.drmTypes = {}
       constants.player.drmTypes.dashWidevine = "dash_widevine_psshv0"
       constants.player.drmTypes.dashPlayready = "dash_playready_psshv0"
-      constants.player.drmTypes.hlsv6 = "hlsv6"
+      constants.player.drmTypes.dash = "dash"
       constants.player.drmTypes.hlsv3 = "hlsv3"
 
       ' Supported schemes, in order of preference
@@ -792,10 +792,10 @@ Function getConstants()
       ]
 
       ' Supported schemes, in order of preference
-      constants.player.drmOrderHlsv6 = [
+      constants.player.drmOrderDash = [
         constants.player.drmTypes.dashWidevine
         constants.player.drmTypes.dashPlayready
-        constants.player.drmTypes.hlsv6
+        constants.player.drmTypes.dash
       ]
 
       ' H265 is one of the video compression standards. This information is passed on api request in order to get the H265 transcoded manifests from backend.

@@ -429,8 +429,8 @@ Function playContent()
       end if
 
       if m.Video.content.isNonDrmContent = true
-        ' fire exposure event for video playback if manifest had only hlsv6 or hlsv3 content for treatment & control
-        getExperimentResource("roku_hlsv6", "roku_hlsv6_v1", true)
+        ' fire exposure event for video playback if manifest had only dash or hlsv3 content for treatment & control
+        getExperimentResource("roku_dash", "roku_dash_v1", true)
       end if
 
       m.Video.control = "play"
@@ -908,8 +908,8 @@ Function onAdStateChange(msg)
         getExperimentResource("roku_hevc_drm_4k", "roku_hevc_drm_4k_v1", true)
       end if
       if m.Video.content.isNonDrmContent = true
-        ' fire exposure event for video playback if manifest had only hlsv6 or hlsv3 content for treatment & control
-        getExperimentResource("roku_hlsv6", "roku_hlsv6_v1", true)
+        ' fire exposure event for video playback if manifest had only dash or hlsv3 content for treatment & control
+        getExperimentResource("roku_dash", "roku_dash_v1", true)
       end if
       m.Video.control = "play"
       m.mostRecentCompletedCuepoint = m.playerPosition

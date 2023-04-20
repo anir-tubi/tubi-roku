@@ -1690,8 +1690,8 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
   ' has4kHevcStream helps to decide whether 4k/HEVC stream is available for the selected content.
   has4kHevcStream = false
 
-  ' hasOnlyNonDrm helps to decide whether video resources has only non-drm manifests by checking type hlsv3 or hlsv6
-  ' //REMOVE hasOnlyNonDrm once we graduate roku_hlsv6_v1 experiment.
+  ' hasOnlyNonDrm helps to decide whether video resources has only non-drm manifests by checking type hlsv3 or dash
+  ' //REMOVE hasOnlyNonDrm once we graduate roku_dash_v1 experiment.
   hasOnlyNonDrm = true
 
   codecToVideoResourcesIndexMap = {}
@@ -1699,10 +1699,10 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
 
   if type(resources) = "roArray" AND resources.count() > 0
 
-    ' Adding isNonDrmContent, if the videoResources has only hlsv6 or hlsv3 stream formats
+    ' Adding isNonDrmContent, if the videoResources has only dash or hlsv3 stream formats
     for each video in resources
 
-      if video.type <> m.constants.player.drmTypes.hlsv6 AND video.type <> m.constants.player.drmTypes.hlsv3
+      if video.type <> m.constants.player.drmTypes.dash AND video.type <> m.constants.player.drmTypes.hlsv3
         hasOnlyNonDrm = false
         exit for
       end if
@@ -1711,13 +1711,13 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
 
     if contentFromServer.type <> m.constants.ui.categoryTypes.linear AND contentFromServer.type <> "l" AND hasOnlyNonDrm = true
 
-      ' //REMOVE 'isNonDrmContent' field and its references once we graduate roku_hlsv6_v1 experiment.
-      ' isNonDrmContent interface is added to TubiContentNode in order to identify whether video resource has only hlsv6 or hlsv3 content
+      ' //REMOVE 'isNonDrmContent' field and its references once we graduate roku_dash_v1 experiment.
+      ' isNonDrmContent interface is added to TubiContentNode in order to identify whether video resource has only dash or hlsv3 content
       contentNode.addField("isNonDrmContent", "boolean", false)
       contentNode.isNonDrmContent = true
 
       if m.experiments <> invalid
-        experimentResult = m.experiments.getExperimentResult("roku_hlsv6", "roku_hlsv6_v1")
+        experimentResult = m.experiments.getExperimentResult("roku_dash", "roku_dash_v1")
 
         if experimentResult <> invalid AND experimentResult.experiment_name <> invalid AND experimentResult.treatment <> invalid
           titanVersionOrExperimentVersion = "exp=" + experimentResult.experiment_name + "." + experimentResult.treatment
@@ -1816,9 +1816,9 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
               resource.hdcpVersion = video.license_server.hdcp_version
             end if
           end if
-        else if video.type = m.constants.player.drmTypes.hlsv6
-          resource.type = m.constants.player.drmTypes.hlsv6
-          resource.streamFormat = "hls"
+        else if video.type = m.constants.player.drmTypes.dash
+          resource.type = m.constants.player.drmTypes.dash
+          resource.streamFormat = "dash"
         else if video.type = m.constants.player.drmTypes.hlsv3
           resource.type = m.constants.player.drmTypes.hlsv3
           resource.streamFormat = "hls"
@@ -1931,7 +1931,7 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
           channelContentNode.channelName = channelFromServer.title
 
           ' Setting the channelFromServer type as linear, as the backend is not returning type.
-          ' //REMOVE this once the roku_hlsv6 experiment is graduated, because in future api may return type in response.
+          ' //REMOVE this once the roku_dash experiment is graduated, because in future api may return type in response.
           channelFromServer.type = m.constants.ui.categoryTypes.linear
 
           channelContentNode.videoResources = m.composeVideoResources(channelContentNode, channelFromServer)
@@ -2056,7 +2056,7 @@ Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requesto
       end if
 
       ' Setting the channelFromServer type as linear, as the backend is not returning type.
-      ' //REMOVE this once the roku_hlsv6 experiment is graduated, because in future api may return type in response.
+      ' //REMOVE this once the roku_dash experiment is graduated, because in future api may return type in response.
       channelFromServer.type = m.constants.ui.categoryTypes.linear
 
       channelNode.type = m.contentTypes.linear

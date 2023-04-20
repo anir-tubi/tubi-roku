@@ -62,8 +62,8 @@ Function TubiExperiments(constants) as Object
         roku_show_all_floating_education_v1 : {"enabled": false}
       }
 
-      roku_hlsv6: {
-        roku_hlsv6_v1 : {"enabled": false}
+      roku_dash: {
+        roku_dash_v1 : {"enabled": false}
       }
 
       roku_epg_channel_poster_bigger_size: {
