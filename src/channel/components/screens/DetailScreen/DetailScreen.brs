@@ -1265,13 +1265,29 @@ Function setComponentInteractionEventForMenu(componentInteractionValue, menuItem
     componentValues.middle_nav_section = middleNavSection
   end if
 
-  pageOneof = m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pagetype, m.top.trackingPageInfo.pageValues)
-  componentOneof = m.Tracking.getAnalyticsComponent("middle_nav_component", componentValues)
+  pageType = ""
+  pageValues = {}
+  trackingPageInfo = m.top.trackingPageInfo
 
-  m.top.componentInteractionInfo = {
-    pageOneof: pageOneof
-    componentOneof: componentOneof
-    user_interaction: componentInteractionValue
-  }
+  if trackingPageInfo <> invalid
+    if trackingPageInfo.pagetype <> invalid
+      pageType = trackingPageInfo.pagetype
+    end if
+
+    if trackingPageInfo.pageValues <> invalid
+      pageValues = trackingPageInfo.pageValues
+    end if
+  end if
+
+  if isNonEmptyString(pageType) = true
+    pageOneof = m.Tracking.getAnalyticsPage(pageType, pageValues)
+    componentOneof = m.Tracking.getAnalyticsComponent("middle_nav_component", componentValues)
+
+    m.top.componentInteractionInfo = {
+      pageOneof: pageOneof
+      componentOneof: componentOneof
+      user_interaction: componentInteractionValue
+    }
+  end if
 
 End Function
