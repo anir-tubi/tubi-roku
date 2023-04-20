@@ -4,7 +4,7 @@
 Function getVideoPreviewStateForThisContent(content=invalid)
   tubiLog("VideoPreviewHelpers.getVideoPreviewStateForThisContent")
   state = "none"
-  videoPreview = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
+  videoPreview = m.videoPreviewPlayer
   if content <> invalid AND videoPreview <> invalid AND videoPreview.content <> invalid
     if videoPreview.content.id = content.id
       state = videoPreview.state
@@ -20,7 +20,7 @@ End Function
 Function getVideoPreviewState()
   tubiLog("VideoPreviewHelpers.getVideoPreviewState")
   state = "none"
-  videoPreview = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
+  videoPreview = m.videoPreviewPlayer
   if videoPreview <> invalid
     state = videoPreview.state
   end if
@@ -40,7 +40,7 @@ End Function
 Function stopVideoPreview(node=invalid)
   tubiLog("VideoPreviewHelpers.stopVideoPreview")
   if node = invalid
-    node = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
+    node = m.videoPreviewPlayer
   end if
 
   if node <> invalid AND node.subType() = "VideoPreviewPlayer"
@@ -55,7 +55,7 @@ End Function
 Function stopVideoPreviewIfPlaying(node = invalid)
   tubiLog("VideoPreviewHelpers.stopVideoPreviewIfPlaying")
   if node = invalid
-    node = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
+    node = m.videoPreviewPlayer
   end if
 
   if node <> invalid AND node.subType() = "VideoPreviewPlayer" AND (node.state = "buffering" or node.state = "playing" ) 'this means video preview not stopped/finished for previous content, so we need to stop it
@@ -73,7 +73,7 @@ End Function
 
 Function pauseVideoPreview()
   tubiLog("VideoPreviewHelpers.pauseVideoPreview")
-  videoPreview = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
+  videoPreview = m.videoPreviewPlayer
   if videoPreview <> invalid
     videoPreview.control = "pause"
   end if
@@ -146,12 +146,7 @@ End Function
 Function startVideoPreview(content, pageType="home_page")
   tubiLog("VideoPreviewHelpers.startVideoPreview")
   if content <> invalid AND m.isAutoplayVideoPreviewOn = true
-    videoPreview = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
-    if videoPreview = invalid
-      videoPreview = CreateObject("roSGNode", "VideoPreviewPlayer")
-      videoPreview.visible = false
-      videoPreview.id = m.constants.ui.componentIds.videoPreviewPlayer
-    end if
+    videoPreview = m.videoPreviewPlayer
     ' unobserve field just in case previous state was errorsstart observing a fresh status.
     videoPreview.unobserveFieldScoped("state")
     videoPreview.observeFieldScoped("state", "onVideoPreviewStateChanged")
@@ -165,10 +160,6 @@ Function startVideoPreview(content, pageType="home_page")
     videoPreview.content = videoContent
     videoPreview.updateContent = true
     videoPreview.control = "play"
-
-    VideoPreviewParentGroup = m.VideoPreviewGroup
-    VideoPreviewParentGroup.appendChild(videoPreview)
-
   end if
 
 End Function
@@ -176,7 +167,7 @@ End Function
 
 Function resumeVideoPreview()
   tubiLog("VideoPreviewHelpers.resumeVideoPreview")
-  videoPreview = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
+  videoPreview = m.videoPreviewPlayer
   if videoPreview <> invalid
     videoPreview.control = "resume"
   end if
@@ -188,7 +179,7 @@ End Function
 ' @pageType : string, the type(video_page, series_detail_page, home_page) of page which is used in analytics event
 Function setPageTypeForVideoPreview(pageType)
   tubiLog("VideoPreviewHelpers.setPageTypeForVideoPreview")
-  videoPreview = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
+  videoPreview = m.videoPreviewPlayer
   if videoPreview <> invalid
     videoPreview.pageTypeForAnalytics = pageType
   end if

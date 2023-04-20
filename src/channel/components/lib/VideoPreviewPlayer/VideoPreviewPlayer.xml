@@ -20,6 +20,7 @@
       <!-- Alias fields for the video node -->
       <field id="width" alias="VideoNode.width"/>
       <field id="height" alias="VideoNode.height"/>
+      <field id="disableScreensaver" alias="VideoNode.disableScreensaver" />
 
       <field id="content" type="node"/>
       <field id="updateContent" type="boolean" alwaysNotify="true"/>
@@ -35,6 +36,8 @@
       <!-- Observing state interface helps to show/hide static poster background -->
       <field id="state" type="string" />
 
+      <!-- Unix timestamp of the last time we finished playing back video with this player. If -1 then we are currently playing back. -->
+      <field id="timestampOfLastVideoPlayback" type="integer" value="0" />
   </interface>
 
   <children>

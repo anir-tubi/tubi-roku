@@ -1085,6 +1085,7 @@ Function getConstants()
       constants.ui.screenLevels.availableDeviceScreen = 111
       constants.ui.screenLevels.landingScreen = 112
       constants.ui.screenLevels.modalDialogScreen = 1000
+      constants.ui.screenLevels.screensaverScreen = 1100
 
     constants.ui.screenIds = {}
       constants.ui.screenIds.homeScreen = "homeScreen"
@@ -1113,6 +1114,7 @@ Function getConstants()
       constants.ui.screenIds.landingScreen = "landingScreen"
       constants.ui.screenIds.baseScreen = "baseScreen"
       constants.ui.screenIds.tournamentScreen = "tournamentScreen"
+      constants.ui.screenIds.screensaverScreen = "screensaverScreen"
 
     ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,
     ' because currently we support only portrait style in category detail screen
@@ -1137,9 +1139,6 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.signInScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.epgScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.tournamentScreen] = true 'TODO check if we can implement client logic
-
-    constants.ui.componentIds = {}
-    constants.ui.componentIds.videoPreviewPlayer = "VideoPreviewPlayer"
 
       ' top level content ids for parent content nodes that don't have a content id from the backend
     constants.ui.contentIds = {}

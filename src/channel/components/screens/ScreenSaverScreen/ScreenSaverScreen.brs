@@ -1,9 +1,13 @@
 Function init()
   m.maxItemCount = 30
 
+  ' We always want to have the same absolute position. This works around the issue if the sideNav menu is open we don't want to be shifted over to the right.
+  m.top.inheritParentTransform = false
+
   m.fadeOutPosterAnimationDuration = 2.0
 
-  m.currentItemIndex = 0
+  m.loadingItemIndex = 0
+  m.showingItemIndex = -1
   m.items = []
 
   m.constants = getConstantsFromGlobal()
@@ -22,6 +26,10 @@ Function init()
 
   m.top.observeFieldScoped("containerResponses", "onContainerResponsesChange")
   m.slideTimer.observeFieldScoped("fire", "onSlideTimerFire")
+  m.preloadPoster.observeFieldScoped("loadStatus", "onPreloadPosterLoadStatusChange")
+
+  ' Used to track when we are ok to fade in the next image based off of preloadPoster loadStatus
+  m.animationIsFinished = false
 End Function
 
 
@@ -42,34 +50,50 @@ Function onContainerResponsesChange(msg)
     end for
   end for
 
-  ' Make sure we at least have one valid item or else fall back to built in screen saver
+  ' Make sure we at least have one valid item
   if items.count() > 0 then
     m.items = items
 
-    ' We want to load the first image before we fade in
-    m.preloadPoster.observeFieldScoped("loadStatus", "onPreloadPosterLoadStatusChange")
-    m.preloadPoster.uri = getImageUrl(m.items[m.currentItemIndex])
+    m.animationIsFinished = true ' Setting to true to allow autotransition after preloadPoster loads
 
-    m.top.loadStatus = "ready"
+    m.poster.observeFieldScoped("loadStatus", "onPosterLoadStatusChange")
+
+    ' We want to load the first image before we fade in. We use poster instead of preloadPoster because if the second image is already cached and the loadStatus changes again in the same render cycle it will stay in loadingStatus indefinitely. Ran into this issue on a 4670X
+    m.poster.uri = getImageUrl(items[m.loadingItemIndex])
   else
-    tubiLog("Screen saver had no valid items. Falling back to built in screen saver. Check if you are using staging apis")
-    m.top.loadStatus = "failed"
+    ' Go ahead and exit the screensaver since we don't have any content to show. Perhaps we eventually add back in the fallback screensaver
+    m.top.exitInfo = {}
   end if
-
 End Function
 
-Function onPreloadPosterLoadStatusChange(msg)
-  preloadPoster = msg.getRoSGNode()
 
+Function onPosterLoadStatusChange(msg)
+  if msg.getData() = "ready" then
+    m.poster.unobserveFieldScoped("loadStatus")
+    fadeInItemIndex(m.loadingItemIndex)
+  end if
+End Function
+
+
+Function onPreloadPosterLoadStatusChange(msg)
   loadStatus = msg.getData()
+
   if loadStatus = "ready" then
-    preloadPoster.unobserveFieldScoped("loadStatus")
-    fadeInItemIndex(m.currentItemIndex)
+    conditionallyFadeInNextItem()
   else if loadStatus = "failed" then
     ' If it failed preload the next poster
-    tubiLog("Failed to load " + preloadPoster.uri)
-    m.currentItemIndex = getNextItemIndex()
-    preloadPoster.uri = getImageUrl(m.items[m.currentItemIndex])
+    tubiLog("Failed to load " + m.preloadPoster.uri)
+
+    m.loadingItemIndex = getNextItemIndex()
+    m.preloadPoster.uri = getImageUrl(m.items[m.loadingItemIndex])
+  end if
+End Function
+
+
+Function conditionallyFadeInNextItem()
+  if m.preloadPoster.loadStatus = "ready" AND m.animationIsFinished = true then
+    m.animationIsFinished = false
+    fadeInItemIndex(m.loadingItemIndex)
   end if
 End Function
 
@@ -79,6 +103,7 @@ Function fadeInItemIndex(itemIndex)
 
   ' set the slide properties
   m.poster.uri = getImageUrl(item)
+  m.showingItemIndex = itemIndex
   m.titleLabel.text = item.title
   m.tagsLabel.text = item.tags.join(", ")
 
@@ -88,25 +113,22 @@ Function fadeInItemIndex(itemIndex)
   ' Slides down and fades in titleLayoutGroup to its set onscreen position
   slideFade(m.titleLayoutGroup, "above", "in", 0.5, 0.5, 30)
 
-  ' preload the next image
-  nextItem = m.items[getNextItemIndex()]
-  m.preloadPoster.uri = getImageUrl(nextItem)
-
   ' Start our timer for the next slide to show
   m.slideTimer.control = "start"
-
   m.zoomAnimation.control = "start"
-End Function
+  m.animationIsFinished = false
 
+  m.loadingItemIndex = getNextItemIndex()
+  m.preloadPoster.uri = getImageUrl(m.items[m.loadingItemIndex])
+End Function
 
 Function onSlideTimerFire()
   fadeOutCurrent()
-  m.currentItemIndex = getNextItemIndex()
 End Function
 
 
 Function fadeOutCurrent()
-  animate(m.poster, {
+  m.fadeOutPosterAnimation = animate(m.poster, {
     "opacity": 0
     "duration": m.fadeOutPosterAnimationDuration
     "completeCallback": onAnimationComplete
@@ -117,23 +139,13 @@ End Function
 
 
 Function onAnimationComplete()
-  loadStatus = m.preloadPoster.loadStatus
-  if loadStatus = "ready" then
-    fadeInItemIndex(m.currentItemIndex)
-  else
-    ' If the image isn't ready then we will wait for it to be ready to proceed
-    m.preloadPoster.observeFieldScoped("loadStatus", "onPreloadPosterLoadStatusChange")
-    if loadStatus = "failed" then
-      tubiLog("Failed to load " + m.preloadPoster.uri)
-      m.currentItemIndex = getNextItemIndex()
-      m.preloadPoster.uri = getImageUrl(m.items[m.currentItemIndex])
-    end if
-  end if
+  m.animationIsFinished = true
+  conditionallyFadeInNextItem()
 End Function
 
 
 Function getNextItemIndex()
-  index = m.currentItemIndex + 1
+  index = m.loadingItemIndex + 1
   if index >= m.items.count() then
     index = 0
   end if
@@ -153,4 +165,14 @@ Function getImageUrl(item)
     end if
   end if
   return ""
+End Function
+
+
+Function onKeyEvent(key as String, press as Boolean) as Boolean
+  if press then
+    ' Only passing an empty object for now
+    m.top.exitInfo = {}
+  end if
+
+  return true
 End Function

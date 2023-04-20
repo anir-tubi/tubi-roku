@@ -17,6 +17,7 @@ Function init()
 
   m.mainTask = createObject("roSGNode", "MainTask") ' initiate MainTask
   m.mainTask.observeFieldScoped("isHdmiStatusOk", "onIsHdmiStatusOkChange")
+  m.mainTask.observeFieldScoped("screensaverTimeout", "onScreensaverTimeoutChange") ' Declared in ScreensaverHelpers.brs
   m.mainTask.observeFieldScoped("lowMemoryEventInfo", "onLowMemoryEventInfoChange")
 
 
@@ -45,7 +46,10 @@ Function init()
   m.contentGroup = m.top.findNode("ContentGroup")
   m.SideNav = m.top.findNode("SideNav")
 
-  m.VideoPreviewGroup = m.top.findNode("VideoPreviewGroup")
+  m.videoPreviewPlayer = m.top.findNode("videoPreviewPlayer")
+  if getExperimentResource("roku_screensaver", "roku_screensaver_v1", false).enabled = true then
+    m.videoPreviewPlayer.disableScreensaver = true
+  end if
 
   m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")
   m.LinearPlayerGroupAboveScreenStack = m.top.findNode("LinearPlayerGroupAboveScreenStack")
@@ -63,6 +67,8 @@ Function init()
   m.LinearVideoPlayerSpinner = m.top.findNode("LinearVideoPlayerSpinner")
   m.playerFullscreenCountdownTimer = m.top.findNode("PlayerFullscreenCountdownTimer")
   m.resumeAllowedTimer = m.top.findNode("ResumeAllowedTimer")
+  m.screensaverTimer = m.top.findNode("screensaverTimer")
+  m.screensaverTimer.observeFieldScoped("fire", "onScreensaverTimerFired") ' Declared in ScreensaverHelpers.brs
 
   m.screenStack = m.top.findNode("ScreenStack")
   m.screenStack.observeFieldScoped("isEmpty", "onScreenStackEmpty")
@@ -97,7 +103,7 @@ Function init()
   setUiMode(m.constants.ui.modes.standard)
   theme = getThemeFromGlobal()
   if theme <> invalid
-    m.background.color = theme.backgroundColor 
+    m.background.color = theme.backgroundColor
   end if
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
@@ -181,8 +187,6 @@ Function init()
   ' or set to invalid elsewhere
   m.autoplayContext = invalid
 
-  m.lastUserActivity = Uptime(0) ' arbitrary marker when user last pressed a remote key
-
   ' holds state so we don't fire the app load beacon more than once
   m.appLoadedBeaconFired = false
 
@@ -225,8 +229,7 @@ Function onFadeInContentController()
       m.detailScreenAfterFn = invalid
     end if
   end if
-
-End Function
+  End Function
 
 
 Function displayExitModal(trackingPageInfo)
@@ -318,9 +321,7 @@ End Function
 ' Back pressed on detail screen should close it
 Function onKeyEvent(key as String, press as Boolean) as Boolean
   tubiLog("ContentController.onKeyEvent key = " + key)
-  if m.lastUserActivity <> invalid
-    m.lastUserActivity = Uptime(0)
-  end if
+
   if press then
     ' for autohide support, bring the UI back on any keypress
     if key = "back"
@@ -450,10 +451,8 @@ Function onVideoPlayerVisibleChange(msg)
   tubiLog("ContentController.onVideoPlayerVisibleChange")
   videoPlayerVisible = msg.getData()
   if videoPlayerVisible = true
-    m.SideNav.visible = false
     m.logoGroup.visible = false
   else
-    m.SideNav.visible = true
     m.logoGroup.visible = true
   end if
 End Function
@@ -1503,7 +1502,7 @@ End Function
 ' @backgroundUriList, array of uris
 ' @contentType, String - depending on the focused on content, it will determine the background type
 Function getBackgroundType(backgroundUriList, contentType = "")
-  
+
   backgroundType = m.constants.ui.backgroundTypes.topRight
   if backgroundUriList <> invalid
     if backgroundUriList[0] = m.defaultBackgroundUri
@@ -1647,6 +1646,12 @@ Function onCustomSuspend(msg)
         linearVideoPlayer.control = "stop"
       end if
     end if
+
+    screensaverScreen = getScreensaverScreen()
+    if screensaverScreen <> invalid then
+      closeScreensaverScreen()
+    end if
+
     'Modals with type errorDialog should made invisible and app should restarted on app relaunch.
     'Modals with type actionDialog should be closed and app should resume from the current screen
     modal = getTopModal()
@@ -1753,6 +1758,10 @@ Function onCustomResume(msg)
         end if
       end if
     end if
+
+    m.mainTask.request = {
+      "type": "updateScreensaverTimeout"
+    }
   else if lastSuspendOrResumeReason = "screensaver"
     ' Do nothing, but leave this as a place holder.
     ' The app will resume as normal for the screensaver.

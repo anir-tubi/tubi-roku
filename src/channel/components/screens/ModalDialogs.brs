@@ -161,6 +161,22 @@ Function closeModal(modal, buttonSelected = invalid)
 End Function
 
 
+'@modal: roSGNode, the modal node created in showModal()
+Function hideModal(modal)
+  modal.isHidden = true
+  modal.visible = false
+End Function
+
+
+'@modal: roSGNode, the modal node created in showModal()
+Function unhideModal(modal)
+  modal.isHidden = false
+  modal.visible = true
+
+  modal.setFocus(true)
+End Function
+
+
 ' @modalInfo: The Associative array that contains all the info for the error modal. See the modalInfo parameter of showModal() for format.
 ' @tryAgainCallback: (optional) Function to call when the try again button is clicked
 ' @tryAgainParams: (optional) The parameters to pass to the tryAgainCallback() function when it is called

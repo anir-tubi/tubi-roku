@@ -178,14 +178,14 @@ Function registerParsingCallbacks()
   }
 
   'screen saver get container
-  m.requestTypes[m.constants.reqNames.getScreenSaverContainer] = {
-    parseSuccess: parseGetScreenSaverContainerSuccess
+  m.requestTypes[m.constants.reqNames.getScreensaverContainer] = {
+    parseSuccess: parseGetScreensaverContainerSuccess
     parseError: parseGenericError
   }
 
   'screen saver get home screen container ids
-  m.requestTypes[m.constants.reqNames.getScreenSaverHomeScreenContainerIds] = {
-    parseSuccess: parseGetScreenSaverHomeScreenContainerIdsSuccess
+  m.requestTypes[m.constants.reqNames.getScreensaverHomeScreenContainerIds] = {
+    parseSuccess: parseGetScreensaverHomeScreenContainerIdsSuccess
     parseError: parseGenericError
   }
 
@@ -208,4 +208,3 @@ Function instantiateLibs()
   experiments = TubiExperiments(m.constants)
   m.metadataTranslate = TubiMetadataTranslate(m.constants, experiments)
 End Function
-

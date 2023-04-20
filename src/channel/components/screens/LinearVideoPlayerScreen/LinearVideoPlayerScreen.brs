@@ -349,6 +349,12 @@ Function onVideoStateChange(msg)
       m.logoGroup.visible = true
     end if
   end if
+
+  if state = "stopped" OR state = "finished" OR state = "error" then
+    m.top.timestampOfLastVideoPlayback = createObject("roDateTime").asSeconds()
+  else if state = "buffering" OR state = "playing" then
+    m.top.timestampOfLastVideoPlayback = -1
+  end if
 End Function
 
 

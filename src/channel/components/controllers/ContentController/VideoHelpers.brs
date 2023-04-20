@@ -86,6 +86,10 @@ Function setupVideoPlayer(content, playbackSource = "unknown", position = 0)
     videoPlayer.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     initVideoTracking(videoPlayer) 'initializeYoubora
     setInScreenCache(videoPlayer)
+
+    if getExperimentResource("roku_screensaver", "roku_screensaver_v1", false).enabled = true then
+      videoPlayer.disableScreensaver = true
+    end if
   end if
 
   stopVideoPreviewIfPlaying() 'stop videopreview just in case it is playing

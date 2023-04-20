@@ -23,6 +23,7 @@
 
       <field id="width" alias="VideoNode.width"/>
       <field id="height" alias="VideoNode.height"/>
+      <field id="disableScreensaver" alias="VideoNode.disableScreensaver" />
 
       <!-- New content has been added to the video player -->
       <field id="content" type="node"/>
@@ -122,6 +123,8 @@
 
       <field id="contentIdToFocusOnLoadComplete" type="string" />
 
+      <!-- Timestamp of the last time we finished playing back video with this player. If -1 then we are currently playing back. -->
+      <field id="timestampOfLastVideoPlayback" type="integer" value="0" />
   </interface>
 
   <children>

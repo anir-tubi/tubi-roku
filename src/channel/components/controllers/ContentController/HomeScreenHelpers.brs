@@ -751,7 +751,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
       if isVideoPreviewEnabled() = true then
         previewState = getVideoPreviewStateForThisContent(focusedContent)
         if previewState = "buffering" or previewState = "playing"
-          videoPreview = m.top.findNode(m.constants.ui.componentIds.videoPreviewPlayer)
+          videoPreview = m.videoPreviewPlayer
           if videoPreview <> invalid
             setPageTypeForVideoPreview("home_page")
           end if

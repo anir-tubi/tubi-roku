@@ -18,7 +18,7 @@ Function init()
   m.constants = getConstantsFromGlobal()
   m.top.screenLevel = m.constants.ui.screenLevels.modalDialogScreen
 
-  '//::TODO::colors - Design will eventually add this black color to all themes but until then, hardcode this with the default shadeColor regardless of theme. 
+  '//::TODO::colors - Design will eventually add this black color to all themes but until then, hardcode this with the default shadeColor regardless of theme.
   '//   when Design adds the color to all themes, then set this color within the onThemeChange() observer using the new theme specific color
   m.Shade.color = m.constants.ui.themes.default.shadeColor
   if m.global <> invalid
@@ -26,7 +26,6 @@ Function init()
   end if
   onThemeChange()
 End Function
-
 
 Function onThemeChange(msg = invalid)
   if msg <> invalid
@@ -45,8 +44,13 @@ End Function
 
 
 Function onFocusedChildChange()
-  'if modal loses focus (mainly because videoplayer gains focus or homescreen gains focus), Just close the modal
-  if m.top.isInFocusChain() = false
+  ' If we do not set focus 4670X was forcing device reboot :|
+  if m.top.hasFocus() = true then
+    m.ButtonList.setFocus(true)
+  end if
+
+  'if modal loses focus and we are not currently hidden (mainly because videoplayer gains focus or homescreen gains focus), Just close the modal
+  if m.top.hidden = false AND m.top.isInFocusChain() = false
     m.top.exitButton = "back"
   end if
 End Function

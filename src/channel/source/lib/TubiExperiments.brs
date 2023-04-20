@@ -56,6 +56,15 @@ Function TubiExperiments(constants) as Object
         roku_linear_epg_position_v1 : {"enabled": true}
       }
 
+      roku_screensaver: {
+        roku_screensaver_v1 : {"enabled": false}
+      }
+
+
+      roku_hlsv6: {
+        roku_hlsv6_v1 : {"enabled": false}
+      }
+
       roku_see_all_container: {
         roku_see_all_container_first_v1 : {"enabled": false}
         roku_see_all_container_seventeen_v1: {"enabled" : false}
@@ -141,7 +150,7 @@ Function tubiExperiments_getNamespaceRequest(request)
   return expRequest 'may return invalid
 End Function
 
-' returns a request info required for expirements request.
+' returns a request info required for experiments request.
 Function tubiExperiments_getNamespaceRequestInfo(constants)
   requestInfo = invalid
   namespaces = m.defaultResources

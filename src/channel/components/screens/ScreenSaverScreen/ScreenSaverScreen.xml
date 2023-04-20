@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<component name="ScreenSaverScreen" extends="Group">
+<component name="ScreenSaverScreen" extends="BaseScreen">
   <script type="text/brightscript" uri="ScreenSaverScreen.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-  <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -14,9 +9,8 @@
     <field id="containerResponses" type="nodearray"/>
 
     <!-- OUTPUTS -->
-    <!-- communicates to scene to remove the busy spinner or to fallback to built in screen saver in case of failure -->
-    <!-- loading | ready | failed -->
-    <field id="loadStatus" type="string" value="loading" />
+    <!-- communicates to ContentController that we want to close the screensaver. In the future will include info about the current item -->
+    <field id="exitInfo" type="assocarray" />
   </interface>
   <children>
     <!-- used to preload images in advance -->

@@ -855,3 +855,68 @@ Function cmsApi_setTupianLandscapeParam_test()
   m.assertNotInvalid(updatedParams["images[landscape_tb]"])
   m.assertEqual(updatedParams["images[landscape_tb]"], landscapeParam)
 End Function
+
+
+'@Test unit tests getCategoryRequestInfo
+Function cmsApi_getCategoryRequestInfo_test()
+  containerId = "featured"
+  isKidsMode = true
+  utmCampaignConfig = "utmCampaignConfigTest"
+  m.cmsApi.utmCampaignConfig = utmCampaignConfig
+  reqInfo = m.cmsApi.categoryReqInfo(containerId, isKidsMode)
+  m.cmsApi.delete("utmCampaignConfig")
+  url = reqInfo.url
+  params = reqInfo.options.params
+
+  ' Should include the containerId in the url
+  m.assertTrue(url.instr(containerId) >= 0)
+
+  ' Should include the following params
+  m.assertEqual(params.is_kids_mode, isKidsMode)
+  m.assertTrue(params.include_channels)
+  m.assertTrue(params.include_sponsorships)
+  m.assertTrue(params.contents_limit > 0)
+  m.assertEqual(params.utm_campaign_config, utmCampaignConfig)
+  m.assertEqual(params.content_mode, "")
+End Function
+
+
+'@Test unit tests cmsApi_containerForScreensaverReqInfo
+Function cmsApi_containerForScreensaverReqInfo_test()
+  isKidsMode = false
+  numberOfItemsPerContainer = 42
+  reqInfo = m.cmsApi.containerForScreensaverReqInfo("featured", numberOfItemsPerContainer, isKidsMode)
+  params = reqInfo.options.params
+
+  m.assertInvalid(params.include_channels)
+  m.assertInvalid(params.include_sponsorships)
+  m.assertEqual(params.contents_limit, numberOfItemsPerContainer)
+  m.assertEqual(params.content_mode, "")
+  m.assertEqual(params.is_kids_mode, isKidsMode)
+End Function
+
+
+'@Test unit tests cmsApi_getHomeScreenRequestInfo
+Function cmsApi_getHomeScreenRequestInfo_test()
+  isKidsMode = false
+  reqInfo = m.cmsApi.homeScreenReqInfo(isKidsMode)
+  params = reqInfo.options.params
+
+  m.assertTrue(params.include_empty_history)
+  m.assertTrue(params.include_empty_queue)
+  m.assertTrue(params.include_channels)
+  m.assertTrue(params.include_sponsorships)
+  m.assertEqual(params.is_kids_mode, isKidsMode)
+End Function
+
+
+'@Test unit tests cmsApi_homeScreenContainerIdsForScreensaverReqInfo
+Function cmsApi_homeScreenContainerIdsForScreensaverReqInfo_test()
+  isKidsMode = false
+  reqInfo = m.cmsApi.homeScreenContainerIdsForScreensaverReqInfo(isKidsMode)
+  params = reqInfo.options.params
+
+  m.assertEqual(params.contents_limit, 0)
+  m.assertEqual(params.group_size, 2)
+  m.assertEqual(params.is_kids_mode, isKidsMode)
+End Function

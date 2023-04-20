@@ -5,7 +5,7 @@
  - A modal dialog with a transparent background, title, message, and buttons.
  -
  -->
-<component name="ModalDialogScreen" extends="Group" initialFocus="ButtonList">
+<component name="ModalDialogScreen" extends="Group">
 
   <script type="text/brightscript" uri="ModalDialogScreen.brs" />
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
@@ -23,6 +23,9 @@
 
       <field id="scrollable" type="boolean" value="false"/>
 
+      <!-- Used by `hideModal()` to explicitly specify that this modal is hidden not just visible=false -->
+      <field id="isHidden" type="boolean" value="false"/>
+
 
     <!-- OUTPUT -->
       <!-- Set to the index into the 'buttons' array of a button which was selected -->
@@ -34,7 +37,7 @@
       <!-- Holds the "level" of the screen relative to other screens.
            Screens with smaller screenLevel values cannot be stacked on top of screens with higher screenLevel values.
            Attempting to do this action will result in screens being removed from the stack before the screen with the lower
-           vaule is pushed to the stack.
+           value is pushed to the stack.
        -->
       <field id="screenLevel" type="integer" />
 

@@ -323,7 +323,7 @@ function buildStarter() {
     // Pushing the promise to list.
     promises.push(stream);
   });
-  // Adding a promises all which will make sure that success callback will be triggered only after all file moving is completed.
+  // Adding a promise all which will make sure that success callback will be triggered only after all file moving is completed.
   return Promise.all(promises)
     .then(() => {
       replaceColorConstants('build/starter');
@@ -357,11 +357,8 @@ function buildRemote() {
       '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.xml',
       '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.brs',
       '!src/channel/components/controllers/TubiScene/**',
-      '!src/channel/components/controllers/TubiScreenSaverScene/**',
       '!src/channel/components/controllers/BackgroundScene/**',
       '!src/channel/components/tasks/AnalyticsTask/**',
-      '!src/channel/source/3rdparty/roku/NotesOnRokuTestFramework.brs',
-      '!src/channel/source/3rdparty/roku/UnitTestFramework.brs',
       '!src/channel/source/tests/**',
       '!src/channel/source/Settings.brs',
       '!src/channel/components/controllers/TubiScene/TrackerTask.xml',

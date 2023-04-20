@@ -23,6 +23,8 @@ Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
     createHomeScreenBatchReqInfo: cmsApi_createHomeScreenBatchRequestInfo
     createMyStuffScreenBatchReqInfo: cmsApi_createMyStuffScreenBatchReqInfo
     createHomeScreenBatchRequestInfoForContainers: cmsApi_createHomeScreenBatchRequestInfoForContainers
+    containerForScreensaverReqInfo: cmsApi_containerForScreensaverReqInfo
+    homeScreenContainerIdsForScreensaverReqInfo: cmsApi_homeScreenContainerIdsForScreensaverReqInfo
 
     ' private
     createAuthRequest: cmsApi_createAuthRequest
@@ -199,9 +201,7 @@ Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
     if passedOptions.headers <> invalid
       headers.append(passedOptions.headers)
     end if
-  end if
 
-  if passedOptions <> invalid
     options.append(passedOptions)
   end if
 
@@ -231,23 +231,7 @@ Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOpti
   params["cursor"] = 0
   params["include_sponsorships"] = true
   params["contents_limit"] = m.constants.performance.categoryGridList.finalBlockSize
-
-  if passedOptions.params <> invalid
-
-    if isNonEmptyString(passedOptions.params.content_mode) = true
-      params["content_mode"] = passedOptions.params.content_mode
-    end if
-
-    if passedOptions.params.cursor <> invalid
-      params["cursor"] = passedOptions.params.cursor
-
-      if params["contents_limit"] <>  invalid
-        params["contents_limit"] =  passedOptions.params.contents_limit
-      end if
-
-    end if
-
-  end if
+  params["content_mode"] = ""
 
   utmCampaignConfig = m.utmCampaignConfig
 
@@ -609,4 +593,45 @@ Function cmsApi_getVideoResources()
   end if
 
   return videoResources
+End Function
+
+
+'@containerId: string, container id that we should request the list of items for
+'@numberOfItemsPerContainer, integer - max number of items to request for each container request
+Function cmsApi_containerForScreensaverReqInfo(containerId, numberOfItemsPerContainer, isKidsMode)
+  reqInfo = m.categoryReqInfo(containerId, isKidsMode, {}, [])
+  reqInfo.requestType = m.constants.reqNames.getScreensaverContainer
+
+  params = {}
+  params.contents_limit = numberOfItemsPerContainer
+
+  imageWidth = 1920
+  imageHeight = 1080
+  if m.constants.deviceInfo.scaledUi = true then
+    imageWidth = 1280
+    imageHeight = 720
+  end if
+
+  params["images[landscape_tb]"] = "w" + imageWidth.toStr() + "h" + imageHeight.toStr() + "_hero"
+
+  reqInfo.options.params.append(params)
+
+  reqInfo.options.params.delete("include_channels")
+  reqInfo.options.params.delete("include_sponsorships")
+
+  return reqInfo
+End Function
+
+
+Function cmsApi_homeScreenContainerIdsForScreensaverReqInfo(kidsMode)
+  reqInfo = m.homeScreenReqInfo(kidsMode)
+
+  reqInfo.requestType = m.constants.reqNames.getScreensaverHomeScreenContainerIds
+
+  params = {}
+  params["group_size"] = 2 ' Only want first two container ids
+  params["contents_limit"] = 0 ' Do not need any items
+  reqInfo.options.params.append(params)
+
+  return reqInfo
 End Function

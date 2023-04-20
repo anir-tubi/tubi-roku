@@ -6,15 +6,23 @@
  -
  -->
 <component name="MainTask" extends="Task">
-    <script type="text/brightscript" uri="MainTask.brs" />
-    <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
-    <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="MainTask.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
-    <interface>
-      <!-- OUTPUT -->
-      <!-- Combination of roHdmiStatus and roCECStatus hdmi checks to know if we're ok to playback video -->
-      <field id="isHdmiStatusOk" type="boolean" />
-      <!-- Will contain information related to the low memory event. -->
-      <field id="lowMemoryEventInfo" type="assocarray" />
-    </interface>
+  <interface>
+    <!-- INPUTS -->
+    <!-- At minimum should have {type: <<REQUEST_TYPE>>} additional keys can be included if more information is needed for the request -->
+    <field id="request" type="assocarray" />
+
+    <!-- OUTPUT -->
+    <!-- Combination of roHdmiStatus and roCECStatus hdmi checks to know if we're ok to playback video -->
+    <field id="isHdmiStatusOk" type="boolean" />
+
+    <!-- The amount of time before the screensaver will start playing in. Value is in seconds -->
+    <field id="screensaverTimeout" type="integer" />
+
+    <!-- Will contain information related to the low memory event. -->
+    <field id="lowMemoryEventInfo" type="assocarray" />
+  </interface>
 </component>

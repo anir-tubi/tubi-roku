@@ -642,6 +642,11 @@ Function onVideoStateChange(msg)
     end if
   end if
 
+  if state = "stopped" OR state = "finished" OR state = "error" OR state = "paused" then
+    m.top.timestampOfLastVideoPlayback = createObject("roDateTime").asSeconds()
+  else if state = "buffering" OR state = "playing" then
+    m.top.timestampOfLastVideoPlayback = -1
+  end if
 End Function
 
 
@@ -1198,6 +1203,9 @@ Function showAdBreak()
 
   m.top.adPosition = m.playerPosition
   m.top.adControl = "play"
+
+  ' Update to notify we're still playing just an ad instead
+  m.top.timestampOfLastVideoPlayback = -1
 End Function
 
 

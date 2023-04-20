@@ -20,7 +20,7 @@ Function init()
   m.top.observeField("pageTypeForAnalytics", "onPageTypeUpdatedForAnalytics")
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("control", "onControlChange")
-  ' Creating a local variable to hold the video playback state so that we can avoid rare conditions where video node state 
+  ' Creating a local variable to hold the video playback state so that we can avoid rare conditions where video node state
   ' does not update on time.
   ' Allowed values are "stop", "play", "pause", "prebuffer"
   m.videoState = "stop"
@@ -112,6 +112,13 @@ Function onVideoStateChange(msg)
     tubiException(errorInfo, "error", 0.1)
     m.videoState = "stop"
   end if
+
+  if state = "stopped" OR state = "finished" OR state = "error" OR state = "paused" then
+    m.top.timestampOfLastVideoPlayback = createObject("roDateTime").asSeconds()
+  else if state = "buffering" OR state = "playing" then
+    m.top.timestampOfLastVideoPlayback = -1
+  end if
+
   m.top.state = state
 End Function
 

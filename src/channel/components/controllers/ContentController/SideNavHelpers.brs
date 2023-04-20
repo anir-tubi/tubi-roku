@@ -29,7 +29,6 @@ Function initSideNav()
 
   if isParentalControlsAdultLevel() <> true
     m.SideNav.espanolItemTurnedOn = false
-    m.SideNav.linearEPGTurnedOn = false
   end if
 
   ' stop displaying some side nav items if the top nav is being displayed

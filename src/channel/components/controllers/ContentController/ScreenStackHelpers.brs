@@ -19,8 +19,8 @@ Function pushScreen(screen As Object, sendNavigateEvents = true, sendLoadingEven
   end if
 
   ' don't focus the pushed screen if there is an active modal
-  modal = m.NodeHelpers.getLastChild(m.top)
-  if modal.isSubtype("ModalDialogScreen") AND modal.isInFocusChain() = true
+  modal = getTopModal()
+  if modal <> invalid AND modal.isInFocusChain() = true AND modal.isHidden = false then
     screen.shouldFocusWhenPushed = false
   end if
 

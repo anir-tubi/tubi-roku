@@ -1,6 +1,8 @@
 Function init()
   m.port = createObject("roMessagePort")
 
+  m.top.observeFieldScoped("request", m.port)
+
   m.hdmiStatus = createObject("roHdmiStatus")
   m.hdmiStatus.setMessagePort(m.port)
 
@@ -32,6 +34,9 @@ End Function
 
 ' All code run here is run on task thread
 Function taskThread()
+  ' We can not use roAppManager in the render thread so have to do it here
+  m.top.screensaverTimeout = getScreensaverTimeout()
+
   while true
     msg = wait(0, m.port)
     messageType = type(msg)
@@ -44,14 +49,30 @@ Function taskThread()
         m.lastCecStatusIsActiveSource = msg.getInfo().active
       end if
       m.top.isHdmiStatusOk = (m.hdmiStatus.isConnected() = true AND m.lastCecStatusIsActiveSource = true)
+    else if messageType = "roSGNodeEvent" then
+        if msg.getField() = "request" then
+          handleRequest(msg.getData())
+        end if
     else if messageType = "roAppMemoryNotificationEvent" AND m.wasLowMemoryEventFired = false
       m.wasLowMemoryEventFired = true
       m.top.lowMemoryEventInfo = getLowMemoryEventInfo()
     end if
 
     tubiLog("MainTask received " + messageType + " hdmiStatus.isConnected(): " + m.hdmiStatus.isConnected().toStr() + " lastCecStatusIsActiveSource: " + m.lastCecStatusIsActiveSource.toStr())
-
   end while
+End Function
+
+
+Function handleRequest(request)
+  requestType = request.type
+  if requestType = "updateScreensaverTimeout" then
+    m.top.screensaverTimeout = getScreensaverTimeout()
+  end if
+End Function
+
+
+Function getScreensaverTimeout()
+  return createObject("roAppManager").getScreensaverTimeout() * 60
 End Function
 
 
@@ -59,7 +80,7 @@ Function getLowMemoryEventInfo()
   return {
     ' Gets the total amount of time the user was using our application.
     "upTime": createObject("roAppManager").getUptime().totalMilliseconds()
-    ' Total number of nodes present at the scene level. Doing it in task since it is better performant when done inside task. 
+    ' Total number of nodes present at the scene level. Doing it in task since it is better performant when done inside task.
     "totalNodes": m.top.getAll().count()
   }
 End Function
