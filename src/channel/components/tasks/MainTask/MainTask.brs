@@ -15,6 +15,11 @@ Function init()
 
   constants = getConstantsFromGlobal()
 
+  settings = constants.settings
+  if settings.mode <> "production" then
+    m.overrideScreensaverTimeout = settings.overrideScreensaverTimeout
+  end if
+
   ' Go ahead and set our starting isHdmiStatusOk state
   isHdmiStatusOk = (m.hdmiStatus.isConnected() = true)
   modelType = createObject("roDeviceInfo").getModelType()
@@ -72,6 +77,10 @@ End Function
 
 
 Function getScreensaverTimeout()
+  if m.overrideScreensaverTimeout <> invalid then
+    return  m.overrideScreensaverTimeout
+  end if
+
   return createObject("roAppManager").getScreensaverTimeout() * 60
 End Function
 

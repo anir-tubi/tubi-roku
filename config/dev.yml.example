@@ -46,6 +46,9 @@ settings:
   # A date which will be used as the current date within the app. Use this to simulate a date in the past or future. If a date is provided this gets converted to a time offset in seconds to allow testing of features only available at a particular time
   # testingTimeOffset: "2022-12-18T20:00:00Z"
 
+  # Overrides the system level screenscaver timeout with this value (in seconds)
+  # overrideScreensaverTimeout: 10
+
   # To speed up app launches during development, we can do the following
   #   1. set processAnimationLogo to false in order to prevent the initial animated logo from playing at app launch
   #   2. set useStarterComponents and useRemoteComponents to false so as not to use component libraries
