@@ -17,7 +17,9 @@
      -->
     <!-- INPUT-->
     <field id="itemContent" type="node"/>
+    <field id="listHasFocus" type="boolean" />
     <field id="itemHasFocus" type="boolean" />
+    <field id="focusPercent" type="float" />
     <field id="content" type="node" />
     <field id="width" type="float"/>
     <field id="height" type="float"/>
@@ -34,23 +36,44 @@
       vertAlignment="center"
       horizAlignment="left"
       layoutDirection="horiz">
-      <Poster
-        id="Check"
-        width="20"
-        height="16"
-        uri="pkg:/images/check.png"
-        visible="false"/>
-      <Label
-        id="Text"
-        text=""
-        height="80"
-        horizAlign="left"
-        vertAlign="center">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="33" />
-      </Label>
-      </LayoutGroup>
+      <Group>
+        <Poster
+          id="Check"
+          width="20"
+          height="16"
+          uri="pkg:/images/check.png"
+          visible="false"/>
+        <Poster
+          id="CheckFocused"
+          width="20"
+          height="16"
+          uri="pkg:/images/check.png"
+          visible="false"/>
+      </Group>
+      <Group>
+        <Label
+          id="Text"
+          text=""
+          height="80"
+          horizAlign="left"
+          vertAlign="center">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="33" />
+        </Label>
+        <Label
+          id="TextFocused"
+          text=""
+          height="80"
+          horizAlign="left"
+          vertAlign="center">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="33" />
+        </Label>
+      </Group>
+    </LayoutGroup>
   </children>
 </component>

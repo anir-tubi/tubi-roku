@@ -3,12 +3,19 @@ Function init()
   m.top.observeFieldScoped("width", "onWidthChange")
   m.top.observeFieldScoped("height", "onHeightChange")
   m.top.observeFieldScoped("itemHasFocus", "onItemHasFocus")
+  m.top.observeFieldScoped("focusPercent", "onFocusPercentChange")
   m.buttonBG = m.top.findNode("buttonBG")
 
   m.Icon = m.top.findNode("Icon")
+  m.IconFocused = m.top.findNode("IconFocused")
+  m.DetailsMenuTextParent = m.top.findNode("DetailsMenuTextParent")
   m.DetailsMenuText = m.top.findNode("DetailsMenuText")
-  m.top.leftTextPadding = m.DetailsMenuText.translation[0]
+  m.DetailsMenuTextFocused = m.top.findNode("DetailsMenuTextFocused")
+  m.top.leftTextPadding = m.DetailsMenuTextParent.translation[0]
   m.Progress = m.top.findNode("ResumeProgressBar")
+  m.Progress.opacity = 0
+  m.DetailsMenuTextFocused.opacity = 0
+  m.IconFocused.opacity = 0
   m.badgeLabel = m.top.findNode("badgeLabel")
   m.badgeLabel.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
   m.badgeLabel.fontSize = 18
@@ -37,7 +44,10 @@ Function onThemeChange(msg = invalid)
     m.Progress.color = theme.focusedTextColor
     m.buttonBG.blendColor = theme.neutralColor2
     m.DetailsMenuText.color = theme.primaryTextColor
+    m.DetailsMenuTextFocused.color = theme.focusedTextColor
     m.badgeLabel.fontColor = theme.backgroundColor
+    m.Icon.blendcolor = theme.primaryTextColor
+    m.IconFocused.blendcolor = theme.focusedTextColor
   end if
 End Function
 
@@ -60,6 +70,7 @@ Function onItemContentChange()
     'calculated width we are assigning the title and badgeText to the m.DetailsMenuText and get the calculated value
     'and after setting the calculatedWidth resetting m.DetailsMenuText.text to title.
     m.DetailsMenuText.text = item.title + item.badgeText
+    m.DetailsMenuTextFocused.text = item.title + item.badgeText
     iconWidth = 0
     'adding extra width for focus if icon is present
     if item.iconUrl <> invalid AND item.iconUrl <> ""
@@ -67,8 +78,10 @@ Function onItemContentChange()
     end if
     m.top.calculatedTextWidth = m.DetailsMenuText.boundingRect().width + iconWidth
     m.DetailsMenuText.text = item.title
+    m.DetailsMenuTextFocused.text = item.title
 
     m.Icon.uri = item.iconUrl
+    m.IconFocused.uri = item.iconUrl
 
     m.buttonBG.visible = item.isUnfocusedFootprintEnabled
 
@@ -81,9 +94,9 @@ Function onItemContentChange()
 
     'Move the translation of Button text to left when there is no image
     if item.id = "signUpMenuItem" AND item.iconUrl = ""
-      m.DetailsMenuText.translation = [22, 0]
+      m.DetailsMenuTextParent.translation = [22, 0]
     else
-      m.DetailsMenuText.translation = [72, 0]
+      m.DetailsMenuTextParent.translation = [72, 0]
     end if
     calculatedWidth = m.DetailsMenuText.boundingRect().width + m.DetailsMenuText.translation[0]
     if item.badgeText <> ""
@@ -97,7 +110,7 @@ Function onItemContentChange()
     'Adjusting the DetailsMenuText text to center when there is no icoUrl and badge label text.
     if item.align = "center"
       xTranslation = (m.top.width - m.top.calculatedTextWidth) / 2
-      m.DetailsMenuText.translation = [xTranslation, 0]
+      m.DetailsMenuTextParent.translation = [xTranslation, 0]
     end if
   end if
 
@@ -118,14 +131,21 @@ Function onItemHasFocus()
   if theme <> invalid
     if m.top.itemHasFocus = true
       m.buttonBG.blendcolor = theme.focusedColor
-      m.DetailsMenuText.color = theme.focusedTextColor
-      m.Icon.blendcolor = theme.focusedTextColor
-      m.Progress.color = theme.focusedTextColor
     else
-      m.Progress.color = theme.primaryTextColor
       m.buttonBG.blendcolor = theme.neutralColor
-      m.DetailsMenuText.color = theme.primaryTextColor
-      m.Icon.blendcolor = theme.primaryTextColor
     end if
   end if
+End Function
+
+
+Function onFocusPercentChange()
+  focusPercent = m.top.focusPercent
+  if m.top.gridHasFocus = true
+    m.DetailsMenuTextFocused.opacity = focusPercent
+    m.IconFocused.opacity = focusPercent
+  else
+    m.DetailsMenuTextFocused.opacity = 0
+    m.IconFocused.opacity = 0
+  end if
+  m.Progress.opacity = focusPercent
 End Function

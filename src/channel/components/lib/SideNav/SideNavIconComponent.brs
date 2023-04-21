@@ -1,14 +1,20 @@
 Function init()
   tubiLog("SideNavIconComponent.init() ")
   m.font = m.top.findNode("Font")
+  m.focusedFont = m.top.findNode("focusedFont")
   m.Label = m.top.findNode("Label")
   m.Icon = m.top.findNode("Icon")
+  m.focusedLabel = m.top.findNode("focusedLabel")
+  m.focusedIcon = m.top.findNode("focusedIcon")
+  m.focusedLabel.opacity = 0
+  m.focusedIcon.opacity = 0
   m.subTxt = m.top.findNode("subTxt")
   m.labelParent = m.top.findNode("LabelParent")
   m.top.observeFieldScoped("itemContent", "onContentChange")
   m.top.observeFieldScoped("height", "onHeightChange")
   m.top.observeFieldScoped("active", "onActiveChange")
-  m.top.observeFieldScoped("itemHasFocus", "onFocusChange")
+  m.top.observeFieldScoped("focusPercent", "onFocusPercentChange")
+  m.top.observeFieldScoped("gridHasFocus", "onGridHasFocusChange")
   m.sideIconLabel = invalid
 
   if m.global <> invalid
@@ -29,6 +35,9 @@ Function onThemeChange(msg = invalid)
     m.subTxt.color = theme.backgroundColorLight2
     m.Label.color = theme.primaryTextColor
     m.Icon.blendColor = theme.primaryTextColor
+    m.focusedLabel.color = theme.focusedTextColor
+    m.focusedIcon.blendColor = theme.focusedTextColor
+
     if m.sideIconLabel <> invalid
       m.sideIconLabel.fontColor = theme.backgroundColor
     end if
@@ -45,7 +54,9 @@ Function onContentChange(data)
   item = m.top.itemContent
   if item <> invalid then
     m.Icon.uri = item.iconUrl
+    m.focusedIcon.uri = item.iconUrl
     m.Label.text = item.title
+    m.focusedLabel.text = item.title
 
     if item.shortDescriptionLine1 <> invalid
       m.subTxt.text = item.shortDescriptionLine1
@@ -86,43 +97,46 @@ Function onContentChange(data)
     end if
 
     m.font.size = item.fontSize
+    m.focusedFont.size = item.fontSize
     fontURI = "pkg:/fonts/Vaud-SemiBold.ttf"
     if item.bold = false
         fontURI = "pkg:/fonts/Vaud-Medium.ttf"
     end if
 
     m.font.uri = fontURI
+    m.focusedFont.uri = fontURI
+
 
     onActiveChange()
   end if
 End Function
 
 
-Function onFocusChange(msg)
-  theme = getThemeFromGlobal()
-
-  bFocused = msg.getData()
-  if theme <> invalid
-    if bFocused = true
-      m.Label.color = theme.focusedTextColor
-      m.Icon.blendColor = theme.focusedTextColor
-    else
-      m.Label.color = theme.primaryTextColor
-      m.Icon.blendColor = theme.primaryTextColor
-    end if
+Function onGridHasFocusChange()
+  gridHasFocus = m.top.gridHasFocus
+  m.focusedIcon.visible = gridHasFocus
+  m.focusedLabel.visible = gridHasFocus
+  if gridHasFocus = true
+    '//if the list has gained focus, then reset the opacity as well.
+    onFocusPercentChange()
   end if
-End FUnction
+End Function
+
+
+Function onFocusPercentChange()
+  focusPercent = m.top.focusPercent
+  m.focusedIcon.opacity = focusPercent
+  m.focusedLabel.opacity = focusPercent
+End Function
 
 
 Function onActiveChange()
-
   if m.top.itemContent.active = true
-    '//when the side nav is maximized.
-    
+    '//is the side nav open/active?
     if m.top.itemContent.turnedOn <> false
+      '//Is the button item available/turned on?
 
       m.Icon.opacity = 1
-
       m.subTxt.opacity = 0
       if m.sideIconLabel <> invalid
         m.sideIconLabel.opacity = 1
@@ -130,9 +144,9 @@ Function onActiveChange()
 
       fade(m.Label, "in", .3)
     else
-      '// if the item is not enabled, then still don't bring up the opacity
+      '// if the item is not enabled/available, then still don't bring up the opacity
+      
       m.Icon.opacity = .31
-
       m.subTxt.opacity = 0.8
       if m.sideIconLabel <> invalid
         m.sideIconLabel.opacity = 1
@@ -142,8 +156,10 @@ Function onActiveChange()
     end if
   else
     '//when the side nav is minimized.
-
     fade(m.Label, "out", .3)
+    m.focusedLabel.opacity = 0
+    m.focusedIcon.opacity = 0
+
 
     m.Icon.opacity = 1
     if m.sideIconLabel <> invalid
@@ -163,5 +179,7 @@ Function onHeightChange()
   nHeight = m.top.height
   nIconY = (nHeight - m.Icon.height)/2
   m.Icon.translation = [m.Icon.translation[0], nIconY]
+  m.focusedIcon.translation = [m.Icon.translation[0], nIconY]
   m.Label.height = nHeight
+  m.focusedLabel.height = nHeight
 End Function
