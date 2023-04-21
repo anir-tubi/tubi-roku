@@ -207,7 +207,7 @@ Function getConstants()
 
     constants.deviceInfo.uiResolution = UCase(di.GetUiResolution().name)
     constants.deviceInfo.ipAddresses = di.GetIPAddrs() 'array of network interface ip addresses (normally will only contain 1 element)
-    constants.deviceInfo.firmwareVersion = firmware.major + "." +  firmware.minor
+    constants.deviceInfo.firmwareVersion = firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build
     constants.deviceInfo.firmwareBuild = firmware.build
     constants.deviceInfo.userAgent = "Roku/DVP-" + firmware.major + "." + firmware.minor + " (" + firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build + ")"
     constants.deviceInfo.userAgentModel = "Roku/DVP-" + firmware.major + "." + firmware.minor + " (" + firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build + ") " + deviceModel
