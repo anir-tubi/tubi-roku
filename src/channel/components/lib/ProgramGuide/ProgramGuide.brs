@@ -84,7 +84,12 @@ Function onProgramGridContentFocused(msg)
       row = 1 'default row is first row.
     end if
 
-    col = rowItemFocused[1] + 1
+    if rowItemFocused[1] >= 0
+      col = rowItemFocused[1] + 1
+    else
+      col = 1
+    end if
+
     m.lastItemFocused = rowItemFocused
 
     pageType = ""
