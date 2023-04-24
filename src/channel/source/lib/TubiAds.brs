@@ -786,6 +786,10 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
     else if eventType = "Error" AND ctx <> invalid AND ctx.adIndex <> invalid then
       ' Clear out notUsed pixel for the current ad since RAF will fire the error pixel for this ad
       m.notUsedAdPodPixels.delete(ctx.adIndex.toStr())
+    else if eventType = "Pause" then
+      m.controlNode.timestampOfLastVideoPlayback = createObject("roDateTime").asSeconds()
+    else if eventType = "Resume" then
+      m.controlNode.timestampOfLastVideoPlayback = -1
     end if
   else
     if ctx <> invalid then
