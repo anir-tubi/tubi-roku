@@ -202,12 +202,6 @@ Function init()
   m.CCNippleOnTranslation = [89,0]
   m.CCNippleOffTranslation = [58,0]
 
-  if m.Video.globalCaptionMode = "On"
-    m.CCRailOn.opacity = 1.0
-    m.CCRailOff.opacity = 0.0
-    m.CCNipple.translation = m.CCNippleOnTranslation
-  end if
-
   ' set to the end position of replay if caption mode is temporarily turned on during a replay
   m.replayCaptionEnd = 0
 
@@ -1264,6 +1258,20 @@ Function resetVideoPlayerState(content = invalid)
 
   clearSkipCuepointsButtonAndTimer()
   m.cuePointsHistory = {}
+
+  ' Resetting the captions UI on every playback start so that we are in sync with the global settings.
+  ' Use case is when the VODPlayer screen is in stack and we change the global settings from linearPlayerScreen.
+  ' Since we used to update in init or on observer of globalCaptionMode. Which will not get triggered if the screen is in background.
+  ' So refreshing it on every playback start. Since we reset the player state on every new video playback adding it here.
+  if m.Video.globalCaptionMode = "On"
+    m.CCRailOn.opacity = 1
+    m.CCRailOff.opacity = 0
+    m.CCNipple.translation = m.CCNippleOnTranslation
+  else
+    m.CCRailOn.opacity = 0
+    m.CCRailOff.opacity = 1
+    m.CCNipple.translation = m.CCNippleOffTranslation
+  end if
 End Function
 
 
