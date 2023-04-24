@@ -53,7 +53,7 @@ end function
 'This method can be overwritten to control retry scenarios, to keep them in one view
 'so its important to keep it unmodified calling only 'error' to avoid side effects
 sub onVideoError()
-  print "ERROR: "; m.top.videoplayer.error.code.toStr() + ": " + m.top.videoplayer.error.message
+  ' print "ERROR: "; m.top.videoplayer.error.code.toStr() + ": " + m.top.videoplayer.error.message
   eventHandler("error", getParamsVideoError())
 end sub
 
