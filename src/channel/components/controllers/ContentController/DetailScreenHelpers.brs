@@ -1484,10 +1484,12 @@ End Function
 Function onHistoryRemovedSuccess(_response) As Void
   tubiLog("DetailScreenHelpers.onHistoryRemoved")
   detailScreen = getTopDetailScreenFromStack()
-  detailScreen.isWaitingForServerResponse = false
-  setIsHistory(detailScreen, false)
-  sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_CONTINUE_WATCHING", m.Tracking, m.trackingLoggingTask, m.constants)
-  handleHistoryChange()
+  if detailScreen <> invalid
+    detailScreen.isWaitingForServerResponse = false
+    setIsHistory(detailScreen, false)
+    sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_CONTINUE_WATCHING", m.Tracking, m.trackingLoggingTask, m.constants)
+    handleHistoryChange()
+  end if
 End Function
 
 

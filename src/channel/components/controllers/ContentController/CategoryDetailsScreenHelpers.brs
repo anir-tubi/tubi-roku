@@ -133,7 +133,7 @@ Function onCategoryBatchIndexChange(msg)
       fetchCategoryDetails(categoryContent, index)
     end if
   else
-    
+
     '//If index is 0, then refresh the page
     categoryDetailsScreen.content = invalid
     categoryDetailsScreen.isLoading = true
@@ -327,7 +327,7 @@ Function showCategoryDetailError(error, bContentEmptyError = false)
 
     doShowError = true
     'in case of lazy loading, if some batch fails donot show the error dialog.
-    if lazyLoadingExp = true AND (categoryDetailsScreen.content <> invalid OR categoryDetailsScreen.content.getChildCount() > 0)
+    if lazyLoadingExp = true AND (categoryDetailsScreen.content <> invalid AND categoryDetailsScreen.content.getChildCount() > 0)
       doShowError = false
     end if
 

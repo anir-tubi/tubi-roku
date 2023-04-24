@@ -708,48 +708,52 @@ End Function
 ' @refreshedContent: roSGNode, success response content
 ' @sendTracking: boolean , this parameter is used to control whether NavigateToPage events needs to send or not. In case of deeplinks, no need to send NavigateToPage Event
 Function handleDeeplinkSeriesSuccessResponse(refreshedContent)
-  history = getHistory(refreshedContent.id)
+  if refreshedContent <> invalid
+    history = getHistory(refreshedContent.id)
 
-  '  refreshedContent.id:       series id
-  '  refreshedContent.seriesId: invalid
-  '  refreshedContent.type:     series
-  '  m.deepLinkContent.deepLinkType: series
+    '  refreshedContent.id:       series id
+    '  refreshedContent.seriesId: invalid
+    '  refreshedContent.type:     series
+    '  m.deepLinkContent.deepLinkType: series
 
-  ' As of spring 2018 (firmware 8.1), "series" media types are valid and
-  ' will have a content id of an episode, not the series.  Roku states that
-  ' the episode id is NOT what should be played, rather we are allowed
-  ' to choose the most appropriate episode and automatically start playback.
-  ' Here we use the history to choose an episode or just default to the first one.
-  afterFn = playHelper
-  if history <> invalid
-    refreshedContent.currentEpisodeId = history.currentEpisodeId
-    episode = getEpisodeContent(refreshedContent)
+    ' As of spring 2018 (firmware 8.1), "series" media types are valid and
+    ' will have a content id of an episode, not the series.  Roku states that
+    ' the episode id is NOT what should be played, rather we are allowed
+    ' to choose the most appropriate episode and automatically start playback.
+    ' Here we use the history to choose an episode or just default to the first one.
+    afterFn = playHelper
+    if history <> invalid
+      refreshedContent.currentEpisodeId = history.currentEpisodeId
+      episode = getEpisodeContent(refreshedContent)
 
-    episodeHistory = getHistory(episode.id)
+      episodeHistory = getHistory(episode.id)
 
-    if episodeHistory <> invalid AND episodeHistory.nowPos > 0
-      episode.nowPos = episodeHistory.nowPos
-      afterFn = detailScreenResumeHelper
+      if episodeHistory <> invalid AND episodeHistory.nowPos > 0
+        episode.nowPos = episodeHistory.nowPos
+        afterFn = detailScreenResumeHelper
+      end if
+    else
+      refreshedContent.currentEpisodeId = ""
+    end if
+
+    if m.enteredFromDeepLink = true
+      ' m.enteredFromDeepLink will be set to false when the video is played
+      sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
+    end if
+
+    detailScreen = getTopDetailScreenFromStack()
+
+    if detailScreen <> invalid
+      detailScreen.contentFetchError = false
+      populateDetailScreen(detailScreen, refreshedContent)
+
+      if refreshedContent.needsLogin = false
+        ' only if content is not locked, then move past detail screen
+        handleDetailScreenAfterFn(detailScreen, afterFn)
+      end if
     end if
   else
-    refreshedContent.currentEpisodeId = ""
-  end if
-
-  if m.enteredFromDeepLink = true
-    ' m.enteredFromDeepLink will be set to false when the video is played
-    sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
-  end if
-
-  detailScreen = getTopDetailScreenFromStack()
-
-  if detailScreen <> invalid
-    detailScreen.contentFetchError = false
-    populateDetailScreen(detailScreen, refreshedContent)
-
-    if refreshedContent <> invalid and refreshedContent.needsLogin = false
-      ' only if content is not locked, then move past detail screen
-      handleDetailScreenAfterFn(detailScreen, afterFn)
-    end if
+    showDeeplinkErrorModal()
   end if
 End Function
 
@@ -774,65 +778,75 @@ End Function
 
 
 Function handleDeeplinkSeasonSuccessResponse(refreshedContent)
-  '  refreshedContent.id =       series id
-  '  refreshedContent.seriesId = invalid
-  '  refreshedContent.type =     series
-  '  m.deepLinkContent.deepLinkType = season
 
-  ' we've now received the full series info, so we can build the relevant screens
-  refreshedContent.currentEpisodeId = m.deepLinkContent.id
-  ' when deeplinkType = "season", deeplinkContent.id should be an episode id. We want to send tracking with the series id.
-  m.deepLinkContent.id = refreshedContent.id
-  afterFn = episodesHelper
+  if refreshedContent <> invalid
+    '  refreshedContent.id =       series id
+    '  refreshedContent.seriesId = invalid
+    '  refreshedContent.type =     series
+    '  m.deepLinkContent.deepLinkType = season
 
-  if m.enteredFromDeepLink = true
-    sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, m.constants.deeplinks.entryPoints.episodeList, m.Tracking, m.trackingLoggingTask, m.constants)
-    m.enteredFromDeepLink = false
-  end if
-  detailScreen = getTopDetailScreenFromStack()
-  if detailScreen <> invalid
-    detailScreen.contentFetchError = false
-    populateDetailScreen(detailScreen, refreshedContent)
-    handleDetailScreenAfterFn(detailScreen, afterFn)
+    ' we've now received the full series info, so we can build the relevant screens
+    refreshedContent.currentEpisodeId = m.deepLinkContent.id
+    ' when deeplinkType = "season", deeplinkContent.id should be an episode id. We want to send tracking with the series id.
+    m.deepLinkContent.id = refreshedContent.id
+    afterFn = episodesHelper
+
+    if m.enteredFromDeepLink = true
+      sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, m.constants.deeplinks.entryPoints.episodeList, m.Tracking, m.trackingLoggingTask, m.constants)
+      m.enteredFromDeepLink = false
+    end if
+    detailScreen = getTopDetailScreenFromStack()
+    if detailScreen <> invalid
+      detailScreen.contentFetchError = false
+      populateDetailScreen(detailScreen, refreshedContent)
+      handleDetailScreenAfterFn(detailScreen, afterFn)
+    end if
+  else
+    showDeeplinkErrorModal()
   end if
 End Function
 
 
 Function handleDeeplinkEpisodeSuccessResponse(refreshedContent)
-  history = getHistory(refreshedContent.id)
-  '  refreshedContent.id =       series id
-  '  refreshedContent.seriesId = invalid
-  '  refreshedContent.type =     series
-  '  m.deepLinkContent.deepLinkType = episode
 
-  ' we now have the full series info for episode deeplinks
-  refreshedContent.currentEpisodeId = m.deepLinkContent.id
-  'determine if we need to resume or play from start the deeplinked episode
-  if history <> invalid
-    episode = getEpisodeContent(refreshedContent)
-    episodeHistory = getHistory(episode.id)
-    if episodeHistory <> invalid AND episodeHistory.nowPos > 0
-      episode.nowPos = episodeHistory.nowPos
+  if refreshedContent <> invalid
+    history = getHistory(refreshedContent.id)
+    '  refreshedContent.id =       series id
+    '  refreshedContent.seriesId = invalid
+    '  refreshedContent.type =     series
+    '  m.deepLinkContent.deepLinkType = episode
+
+    ' we now have the full series info for episode deeplinks
+    refreshedContent.currentEpisodeId = m.deepLinkContent.id
+    'determine if we need to resume or play from start the deeplinked episode
+    if history <> invalid
+      episode = getEpisodeContent(refreshedContent)
+      episodeHistory = getHistory(episode.id)
+      if episodeHistory <> invalid AND episodeHistory.nowPos > 0
+        episode.nowPos = episodeHistory.nowPos
+      end if
+      afterFn = detailScreenResumeHelper
+    else
+      afterFn = playHelper
     end if
-    afterFn = detailScreenResumeHelper
+
+    if m.enteredFromDeepLink = true
+      ' m.enteredFromDeepLink will be set to false when the video is played
+      sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
+    end if
+    detailScreen = getTopDetailScreenFromStack()
+
+    if detailScreen <> invalid
+      detailScreen.contentFetchError = false
+      populateDetailScreen(detailScreen, refreshedContent)
+
+      if refreshedContent.needsLogin = false
+        ' only if content is not locked, then move past detail screen
+        handleDetailScreenAfterFn(detailScreen, afterFn)
+      end if
+    end if
   else
-    afterFn = playHelper
-  end if
-
-  if m.enteredFromDeepLink = true
-    ' m.enteredFromDeepLink will be set to false when the video is played
-    sendDeeplinkAnalytics(m.deepLinkContent, refreshedContent, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
-  end if
-  detailScreen = getTopDetailScreenFromStack()
-
-  if detailScreen <> invalid
-    detailScreen.contentFetchError = false
-    populateDetailScreen(detailScreen, refreshedContent)
-
-    if refreshedContent <> invalid and refreshedContent.needsLogin = false
-      ' only if content is not locked, then move past detail screen
-      handleDetailScreenAfterFn(detailScreen, afterFn)
-    end if
+    showDeeplinkErrorModal()
   end if
 End Function
 
