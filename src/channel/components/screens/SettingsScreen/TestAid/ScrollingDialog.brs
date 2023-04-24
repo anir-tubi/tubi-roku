@@ -18,6 +18,7 @@ Function init()
       "fontSize": {fhd:40,hd:27}
       "fontUri": "pkg:/fonts/Vaud-Bold.ttf"
     }
+
   }
 
   palette = createObject("roSGNode", "RSGPalette")

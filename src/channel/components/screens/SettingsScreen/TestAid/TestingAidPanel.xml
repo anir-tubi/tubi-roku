@@ -56,7 +56,7 @@
               title="Clear Registry"/>
             <CheckButtonContentNode
               id="showEnabledExp"
-              title="Show Enabled Experiments"/>
+              title="Show Current Experiments"/>
           </ContentNode>
         </MarkupList>
 

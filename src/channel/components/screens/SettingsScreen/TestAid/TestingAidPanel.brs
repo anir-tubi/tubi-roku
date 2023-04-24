@@ -41,8 +41,8 @@ Function onItemFocused(msg)
   else if buttonFocused = 1
     m.infoArea.text = "It will delete all the registry values and restart the app."
   else if buttonFocused = 2
-    enabledExperiments = getEnabledExperiments()
-    m.infoArea.text = "Experiments enabled:" + chr(10) + chr(10) + enabledExperiments
+    currExperiments = getCurrentExperiments()
+    m.infoArea.text = "Experiments enabled:" + chr(10) + chr(10) + currExperiments
   end if
 
 End Function
@@ -70,7 +70,7 @@ Function onTestingAidPanelItemSelected(msg)
   else if item.id = "clearRegistry"
     clearRegistry()
   else if item.id = "showEnabledExp"
-    showEnabledExperiments()
+    showCurrentExperiments()
   end if
 End Function
 
@@ -104,26 +104,31 @@ Function showRegistryValues()
 End Function
 
 
-Function getEnabledExperiments()
+Function getCurrentExperiments()
 
-  enabledExperiments = ""
+  enabledExperiments = "Enabled Experiments" + chr(10) + "--------------------------------------------------" + chr(10)
+  notEnabledExperiments = chr(10) + chr(10) + "Not Enabled Experiments" + chr(10) + "--------------------------------------------------" + chr(10)
   for each expNamespace in m.experiments.defaultResources.keys()
     for each exp in m.experiments.defaultResources[expNamespace].keys()
       if m.experiments.defaultResources[expNamespace][exp].enabled = true
         enabledExperiments = enabledExperiments + exp + chr(10)
+      else
+        notEnabledExperiments =   notEnabledExperiments + exp + chr(10)
       end if
     end for
   end for
-  return enabledExperiments
+
+
+  return enabledExperiments + notEnabledExperiments
 End Function
 
 
-Function showEnabledExperiments()
+Function showCurrentExperiments()
   print "*******************Enabled Experiments******************************"
-  enabledExperiments = getEnabledExperiments()
-  print enabledExperiments
+  currentExperiments = getCurrentExperiments()
+  print currentExperiments
   print "-----------------------------------------------------------"
-  showData(enabledExperiments, "Experiments Enabled")
+  showData(currentExperiments, "Current  Experiments")
 End Function
 
 
