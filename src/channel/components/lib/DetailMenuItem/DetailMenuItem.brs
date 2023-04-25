@@ -90,7 +90,7 @@ Function onItemContentChange()
     else
       m.Progress.visible = false
     end if
-    m.top.calculatedWidth = m.top.calculatedTextWidth + m.DetailsMenuText.translation[0]
+    m.top.calculatedWidth = m.top.calculatedTextWidth + m.DetailsMenuTextParent.translation[0]
 
     'Move the translation of Button text to left when there is no image
     if item.id = "signUpMenuItem" AND item.iconUrl = ""
@@ -98,7 +98,7 @@ Function onItemContentChange()
     else
       m.DetailsMenuTextParent.translation = [72, 0]
     end if
-    calculatedWidth = m.DetailsMenuText.boundingRect().width + m.DetailsMenuText.translation[0]
+    calculatedWidth = m.DetailsMenuText.boundingRect().width + m.DetailsMenuTextParent.translation[0]
     if item.badgeText <> ""
       m.badgeLabel.text = item.badgeText
       m.badgeLabel.visible = true
@@ -113,8 +113,8 @@ Function onItemContentChange()
       m.DetailsMenuTextParent.translation = [xTranslation, 0]
     end if
   end if
-
 End Function
+
 
 Function showProgressBar(percentage As Double)
   tubiLog("DetailMenuItem.showProgressBar")
