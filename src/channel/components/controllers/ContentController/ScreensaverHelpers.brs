@@ -107,6 +107,9 @@ End Function
 
 
 Function showScreensaverScreen()
+  ' There are certain cases like when an ad is paused that our settting to disable the screensaver is overridden. We reenforce our request by setting it again on a player we control
+  m.videoPreviewPlayer.disableScreensaver = false
+  m.videoPreviewPlayer.disableScreensaver = true
   screensaverScreen = createObject("roSGNode", "ScreensaverScreen")
   screensaverScreen.id = m.constants.ui.screenIds.screensaverScreen
   screensaverScreen.screenLevel = m.constants.ui.screenLevels.screensaverScreen
