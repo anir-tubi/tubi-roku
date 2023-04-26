@@ -37,6 +37,9 @@ Function init()
     pageType: "video_player_page"
     pageValues: {}
   }
+
+  m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
+
   m.top.handlesTransportVoiceRequests = true
   m._ = rodash()
   m.NodeHelpers = TubiNodeHelpers()
@@ -242,6 +245,19 @@ Function init()
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
   onThemeChange()
+End Function
+
+
+Function onScreenFocusChange()
+  if m.top.hasFocus() = true then
+    if m.top.adState = "adsPlaying" then
+      ' If the screensaver screen takes over while an ad is paused when they leave the screensaver they are brought back to the video player screen but the focus is on the screen itself not the RAF renderer. We are manually setting it back so a user can properly resume the ad.
+      rafChild = m.RAFAdContainer.getChild(0)
+      if rafChild <> invalid then
+        rafChild.setFocus(true)
+      end if
+    end if
+  end if
 End Function
 
 
