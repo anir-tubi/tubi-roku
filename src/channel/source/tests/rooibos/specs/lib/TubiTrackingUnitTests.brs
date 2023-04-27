@@ -410,7 +410,7 @@ Function tubiTracking_getAnalyticsAd_test()
 
   ad = {
     adid: "preroll-1"
-    adserver: "http://rainmaker.staging-public.tubi.io/rev/ROKU?coppa_enabled=false&now_pos=0&model=4400X&video_id=460055&app_id=tubitv&language=en&device_id=63961250-390b-543e-a1d2-7f761b049623&content_type=mp4&opt_out=0&adv_id=d0b0ea57-caa1-5a04-840b-741517492b7a&pub_id=f866e2677ea2f0dff719788e4f7f9195"
+    adserver: "http://rainmaker.staging-public.tubi.io/rev/ROKU?now_pos=0&model=4400X&video_id=460055&app_id=tubitv&language=en&device_id=63961250-390b-543e-a1d2-7f761b049623&content_type=mp4&opt_out=0&adv_id=d0b0ea57-caa1-5a04-840b-741517492b7a&pub_id=f866e2677ea2f0dff719788e4f7f9195"
     adtitle: "In-Stream Video"
     advideoid: adVideoId
     clickthrough: FormatJson(clickthrough)
@@ -438,7 +438,7 @@ Function tubiTracking_getAnalyticsAd_test()
     ad: ad
     adcount: 3
     adindex: 1
-    adserver: "http://rainmaker.staging-public.tubi.io/rev/ROKU?coppa_enabled=false&now_pos=0&model=4400X&video_id=460055&app_id=tubitv&language=en&device_id=63961250-390b-543e-a1d2-7f761b049623&content_type=mp4&opt_out=0&adv_id=d0b0ea57-caa1-5a04-840b-741517492b7a&pub_id=f866e2677ea2f0dff719788e4f7f9195"
+    adserver: "http://rainmaker.staging-public.tubi.io/rev/ROKU?now_pos=0&model=4400X&video_id=460055&app_id=tubitv&language=en&device_id=63961250-390b-543e-a1d2-7f761b049623&content_type=mp4&opt_out=0&adv_id=d0b0ea57-caa1-5a04-840b-741517492b7a&pub_id=f866e2677ea2f0dff719788e4f7f9195"
     duration: 30
     rendersequence: "preroll"
     time: 22

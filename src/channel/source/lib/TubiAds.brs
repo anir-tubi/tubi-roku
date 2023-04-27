@@ -215,7 +215,6 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0, isSeekPastCuepoint = 
     model: m.constants.deviceInfo.model
     app_id: m.constants.settings.shortAppName
     language: m.constants.deviceInfo.language
-    coppa_enabled: (m.appMode = "KIDS_MODE")
     app_mode: m.appMode
     client_version: m.constants.deviceInfo.clientVersion
     nsid: m.getNielsenSessionId(m.constants)
@@ -260,7 +259,6 @@ End Function
 Function tubiAds_getRainmakerParamsForLinear(content)
   params = m.getRainmakerParams(content, 0)
   params.platform = m.constants.analyticsPlatform
-  params.delete("coppa_enabled")
   params.delete("nsid")
 
   ' not needed for rainmaker, but the yo.ac=true parameter informs yospace
