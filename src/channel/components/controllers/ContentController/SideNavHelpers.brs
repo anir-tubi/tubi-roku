@@ -264,15 +264,7 @@ Function onSideNavItemSelected()
         setUiMode(m.constants.ui.modes.standard)
       end if
 
-      if getExperimentResource("roku_my_stuff", "roku_my_stuff_v2", false).enabled = true AND UCase(m.constants.deviceInfo.countryCode) = "US"
-        '//Display the MyStuff Screen while also sending the experiment exposure event upon the user selecting the myStuff or MyList screen
-        showMyStuffScreen()
-      else
-        contentNode = CreateObject("roSGNode", "CategoryContentNode")
-        contentNode.id = m.constants.ui.categoryIds.queue
-        showCategoryDetailsScreen(contentNode, m.constants.ui.terms.menu)
-      end if
-
+      showMyStuffScreen()
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.settings
       if isKidsUIOn() <> true
@@ -448,11 +440,6 @@ Function displayNavMenu(shouldTrackComponentInteraction = true)
   bSideNavOpened = m.SideNav.opened
   m.SideNav.setFocus(true)
   if bSideNavOpened = false
-    '//Send exposure event when the side nav has been opened.
-    if UCase(m.constants.deviceInfo.countryCode) = "US"
-      getExperimentResource("roku_my_stuff", "roku_my_stuff_v2", true)
-    end if
-
     openSideNav()
     if m.nOriginalScreenStackX = invalid
       m.nOriginalScreenStackX = m.ScreenStack.translation[0]

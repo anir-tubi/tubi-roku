@@ -70,12 +70,8 @@ Function createMainContent(item)
     contentNode.title = "Español"
     contentNode.iconUrl = "pkg:/images/sideNavEspanol.png"
   else if item = m.constants.ui.sideNavIds.myList
-    if getExperimentResource("roku_my_stuff", "roku_my_stuff_v2", false).enabled = true AND UCase(m.constants.deviceInfo.countryCode) = "US"
-      contentNode.title = getTranslation("menu_mystuff")
-      contentNode.shortDescriptionLine2 = getTranslation("text_new")
-    else
-      contentNode.title = getTranslation("menu_mylist")
-    end if
+    contentNode.title = getTranslation("menu_mystuff")
+    contentNode.shortDescriptionLine2 = getTranslation("text_new")
     contentNode.iconUrl = "pkg:/images/icon-add-to-queue.webp"
   else if item = m.constants.ui.sideNavIds.categories
     contentNode.title = getTranslation("menu_categories")
