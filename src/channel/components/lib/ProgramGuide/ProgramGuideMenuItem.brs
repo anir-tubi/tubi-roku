@@ -25,6 +25,8 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.staticOverlay.blendColor = theme.backgroundColorLight2
+    m.cellRect.blendColor = theme.neutralColor2
+    m.timeString.color = theme.secondaryTextColor
     m.programString.color = theme.primaryTextColor
     onFocusPercentChange()    '//This function also sets the color - but depending on the focus state
   end if
@@ -49,7 +51,7 @@ Function onContentChange()
       end if
     else
       if m.theme <> invalid
-        m.timeString.color = m.theme.backgroundColorLight2
+        m.timeString.color = m.theme.secondaryTextColor
       end if
     end if
 
@@ -99,12 +101,13 @@ Function onFocusPercentChange()
       if item.selected = true
 
         itemAttributes = item.itemAttributes
+
         if itemAttributes <> invalid
           m.timeString.text = strReplace(item.ShortDescriptionLine1, itemAttributes.title, "")
         end if
-        
+
         if m.theme <> invalid
-          m.timeString.color = m.theme.backgroundColorLight2
+          m.timeString.color = m.theme.secondaryTextColor
         end if
         item.selected = false
       end if
@@ -137,7 +140,7 @@ Function onRowFocusPercentChange()
     m.timeString.opacity = 0.45
     if m.theme <> invalid
       m.cellRect.blendColor = m.theme.neutralColor2
-      m.timeString.color = m.theme.backgroundColorLight2
+      m.timeString.color = m.theme.secondaryTextColor
     end if
   end if
 End Function
