@@ -1302,70 +1302,73 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
 
 '//default theme
     '//default dark sub theme
-    defaultDarkPrimaryAccent = "THEME_defaultDarkPrimaryAccent"
-    defaultDarkPrimaryBackground = "THEME_defaultDarkPrimaryBackground"
-    defaultDarkPrimaryForeground = "THEME_defaultDarkPrimaryForeground"
-    defaultDarkTransparentBackground75 = "THEME_defaultDarkTransparentBackground75"
-    ' defaultDarkTransparentForeground0 = "THEME_defaultDarktransparentforeground0"    '//::NOTE::  not currently being used
-    defaultDarkTransparentForeground5 = "THEME_defaultDarkTransparentForeground5"
-    defaultDarkTransparentForeground10 = "THEME_defaultDarkTransparentForeground10"
-    defaultDarkTransparentForeground20 = "THEME_defaultDarkTransparentForeground20"
-    defaultDarkTransparentForeground75 = "THEME_defaultDarkTransparentForeground75"
-    defaultDarkSolidSurface10 = "THEME_defaultDarkSolidSurface10"
-    defaultDarkSolidSurface20 = "THEME_defaultDarkSolidSurface20"
-    ' defaultDarkStatusSuccess = "THEME_defaultDarkStatusSuccess"   '//::NOTE:: not currently being used
-    defaultDarkStatusCaution = "THEME_defaultDarkStatusCaution"
-    defaultDarkStatusAlert = "THEME_defaultDarkStatusAlert"
+    defaultDarkPrimaryAccent = "THEME_defaultDarkPrimaryAccent_THEME"
+    defaultDarkPrimaryBackground = "THEME_defaultDarkPrimaryBackground_THEME"
+    defaultDarkPrimaryForeground = "THEME_defaultDarkPrimaryForeground_THEME"
+    defaultDarkTransparentBackground75 = "THEME_defaultDarkTransparentBackground75_THEME"
+    ' defaultDarkTransparentForeground0 = "THEME_defaultDarktransparentforeground0_THEME"    '//::NOTE::  not currently being used
+    defaultDarkTransparentForeground5 = "THEME_defaultDarkTransparentForeground5_THEME"
+    defaultDarkTransparentForeground10 = "THEME_defaultDarkTransparentForeground10_THEME"
+    defaultDarkTransparentForeground20 = "THEME_defaultDarkTransparentForeground20_THEME"
+    defaultDarkTransparentForeground50 = "THEME_defaultDarkTransparentForeground50_THEME"
+    defaultDarkTransparentForeground75 = "THEME_defaultDarkTransparentForeground75_THEME"
+    defaultDarkSolidSurface10 = "THEME_defaultDarkSolidSurface10_THEME"
+    defaultDarkSolidSurface20 = "THEME_defaultDarkSolidSurface20_THEME"
+    ' defaultDarkStatusSuccess = "THEME_defaultDarkStatusSuccess_THEME"   '//::NOTE:: not currently being used
+    defaultDarkStatusCaution = "THEME_defaultDarkStatusCaution_THEME"
+    defaultDarkStatusAlert = "THEME_defaultDarkStatusAlert_THEME"
 
     '//default light sub theme
-    defaultLightPrimaryBackground = "THEME_defaultLightPrimaryBackground"
-    defaultLightPrimaryForeground = "THEME_defaultLightPrimaryForeground"
-    defaultLightTransparentForeground75 = "THEME_defaultLightTransparentForeground75"
+    defaultLightPrimaryBackground = "THEME_defaultLightPrimaryBackground_THEME"
+    defaultLightPrimaryForeground = "THEME_defaultLightPrimaryForeground_THEME"
+    defaultLightTransparentForeground75 = "THEME_defaultLightTransparentForeground75_THEME"
 
 
 '//kids theme constants
-    kidsDarkPrimaryAccent = "THEME_kidsDarkPrimaryAccent"
-    kidsDarkPrimaryBackground = "THEME_kidsDarkPrimaryBackground"
-    kidsDarkPrimaryForeground = "THEME_kidsDarkPrimaryForeground"
-    kidsDarkTransparentBackground75 = "THEME_kidsDarkTransparentBackground75"
-    ' kidsDarkTransparentForeground0 = "THEME_kidsDarktransparentforeground0"   '//::NOTE:: not currently being used
-    kidsDarkTransparentForeground5 = "THEME_kidsDarkTransparentForeground5"
-    kidsDarkTransparentForeground10 = "THEME_kidsDarkTransparentForeground10"
-    kidsDarkTransparentForeground20 = "THEME_kidsDarkTransparentForeground20"
-    kidsDarkTransparentForeground75 = "THEME_kidsDarkTransparentForeground75"
-    kidsDarkSolidSurface10 = "THEME_kidsDarkSolidSurface10"
-    kidsDarkSolidSurface20 = "THEME_kidsDarkSolidSurface20"
-    ' kidsDarkStatusSuccess = "THEME_kidsDarkStatusSuccess"   '//::NOTE:: not currently being used
-    kidsDarkStatusCaution = "THEME_kidsDarkStatusCaution"
-    kidsDarkStatusAlert = "THEME_kidsDarkStatusAlert"
+    kidsDarkPrimaryAccent = "THEME_kidsDarkPrimaryAccent_THEME"
+    kidsDarkPrimaryBackground = "THEME_kidsDarkPrimaryBackground_THEME"
+    kidsDarkPrimaryForeground = "THEME_kidsDarkPrimaryForeground_THEME"
+    kidsDarkTransparentBackground75 = "THEME_kidsDarkTransparentBackground75_THEME"
+    ' kidsDarkTransparentForeground0 = "THEME_kidsDarktransparentforeground0_THEME"   '//::NOTE:: not currently being used
+    kidsDarkTransparentForeground5 = "THEME_kidsDarkTransparentForeground5_THEME"
+    kidsDarkTransparentForeground10 = "THEME_kidsDarkTransparentForeground10_THEME"
+    kidsDarkTransparentForeground20 = "THEME_kidsDarkTransparentForeground20_THEME"
+    kidsDarkTransparentForeground50 = "THEME_kidsDarkTransparentForeground50_THEME"
+    kidsDarkTransparentForeground75 = "THEME_kidsDarkTransparentForeground75_THEME"
+    kidsDarkSolidSurface10 = "THEME_kidsDarkSolidSurface10_THEME"
+    kidsDarkSolidSurface20 = "THEME_kidsDarkSolidSurface20_THEME"
+    ' kidsDarkStatusSuccess = "THEME_kidsDarkStatusSuccess_THEME"   '//::NOTE:: not currently being used
+    kidsDarkStatusCaution = "THEME_kidsDarkStatusCaution_THEME"
+    kidsDarkStatusAlert = "THEME_kidsDarkStatusAlert_THEME"
 
     '//kids light sub theme
-    kidsLightPrimaryBackground = "THEME_kidsLightPrimaryBackground"
-    kidsLightPrimaryForeground = "THEME_kidsLightPrimaryForeground"
-    kidsLightTransparentForeground75 = "THEME_kidsLightTransparentForeground75"
+    kidsLightPrimaryBackground = "THEME_kidsLightPrimaryBackground_THEME"
+    kidsLightPrimaryForeground = "THEME_kidsLightPrimaryForeground_THEME"
+    kidsLightTransparentForeground75 = "THEME_kidsLightTransparentForeground75_THEME"
 
 
 '//holidays theme constants
-    holidaysDarkPrimaryAccent = "THEME_holidaysDarkPrimaryAccent"
-    holidaysDarkPrimaryBackground = "THEME_holidaysDarkPrimaryBackground"
-    holidaysDarkPrimaryForeground = "THEME_holidaysDarkPrimaryForeground"
-    holidaysDarkTransparentBackground75 = "THEME_holidaysDarkTransparentBackground75"
-    ' holidaysDarkTransparentForeground0 = "THEME_holidaysDarktransparentforeground0"   '//::NOTE:: not currently being used
-    holidaysDarkTransparentForeground5 = "THEME_holidaysDarkTransparentForeground5"
-    holidaysDarkTransparentForeground10 = "THEME_holidaysDarkTransparentForeground10"
-    holidaysDarkTransparentForeground20 = "THEME_holidaysDarkTransparentForeground20"
-    holidaysDarkTransparentForeground75 = "THEME_holidaysDarkTransparentForeground75"
-    holidaysDarkSolidSurface10 = "THEME_holidaysDarkSolidSurface10"
-    holidaysDarkSolidSurface20 = "THEME_holidaysDarkSolidSurface20"
-    ' holidaysDarkStatusSuccess = "THEME_holidaysDarkStatusSuccess"   '//::NOTE:: not currently being used
-    holidaysDarkStatusCaution = "THEME_holidaysDarkStatusCaution"
-    holidaysDarkStatusAlert = "THEME_holidaysDarkStatusAlert"
+    holidaysDarkPrimaryAccent = "THEME_holidaysDarkPrimaryAccent_THEME"
+    holidaysDarkPrimaryBackground = "THEME_holidaysDarkPrimaryBackground_THEME"
+    holidaysDarkPrimaryForeground = "THEME_holidaysDarkPrimaryForeground_THEME"
+    holidaysDarkTransparentBackground75 = "THEME_holidaysDarkTransparentBackground75_THEME"
+    ' holidaysDarkTransparentForeground0 = "THEME_holidaysDarktransparentforeground0_THEME"   '//::NOTE:: not currently being used
+    holidaysDarkTransparentForeground5 = "THEME_holidaysDarkTransparentForeground5_THEME"
+    holidaysDarkTransparentForeground10 = "THEME_holidaysDarkTransparentForeground10_THEME"
+    holidaysDarkTransparentForeground20 = "THEME_holidaysDarkTransparentForeground20_THEME"
+    holidaysDarkTransparentForeground50 = "THEME_holidaysDarkTransparentForeground50_THEME"
+    holidaysDarkTransparentForeground75 = "THEME_holidaysDarkTransparentForeground75_THEME"
+    holidaysDarkSolidSurface10 = "THEME_holidaysDarkSolidSurface10_THEME"
+    holidaysDarkSolidSurface20 = "THEME_holidaysDarkSolidSurface20_THEME"
+    ' holidaysDarkStatusSuccess = "THEME_holidaysDarkStatusSuccess_THEME"   '//::NOTE:: not currently being used
+    holidaysDarkStatusCaution = "THEME_holidaysDarkStatusCaution_THEME"
+    holidaysDarkStatusAlert = "THEME_holidaysDarkStatusAlert_THEME"
 
 
     '//holidays light sub theme
-    holidaysLightPrimaryBackground = "THEME_holidaysLightPrimaryBackground"
-    holidaysLightPrimaryForeground = "THEME_holidaysLightPrimaryForeground"
-    holidaysLightTransparentForeground75 = "THEME_holidaysLightTransparentForeground75"
+    holidaysLightPrimaryBackground = "THEME_holidaysLightPrimaryBackground_THEME"
+    holidaysLightPrimaryForeground = "THEME_holidaysLightPrimaryForeground_THEME"
+    holidaysLightTransparentForeground75 = "THEME_holidaysLightTransparentForeground75_THEME"
 
 
 constants.ui.colors = {}
@@ -1405,6 +1408,7 @@ constants.ui.themes = {}
         primaryTextColor: defaultDarkPrimaryForeground
         textDarkColor: defaultDarkPrimaryBackground
         secondaryTextColor: defaultDarkTransparentForeground75
+        tertiaryTextColor: defaultDarkTransparentForeground50
         focusedTextColor: defaultDarkPrimaryForeground
         keyboardFocusedTextColor: defaultDarkPrimaryForeground
 
@@ -1438,6 +1442,7 @@ constants.ui.themes = {}
         primaryTextColor: kidsDarkPrimaryForeground
         textDarkColor: kidsDarkPrimaryBackground
         secondaryTextColor: kidsDarkTransparentForeground75
+        tertiaryTextColor: kidsDarkTransparentForeground50
         focusedTextColor: kidsDarkPrimaryBackground
         keyboardFocusedTextColor: kidsDarkPrimaryBackground
 
@@ -1471,6 +1476,7 @@ constants.ui.themes = {}
         primaryTextColor: holidaysDarkPrimaryForeground
         textDarkColor: holidaysDarkPrimaryBackground
         secondaryTextColor: holidaysDarkTransparentForeground75
+        tertiaryTextColor: holidaysDarkTransparentForeground50
         focusedTextColor: holidaysDarkPrimaryForeground
         keyboardFocusedTextColor: holidaysDarkPrimaryForeground
 

@@ -25,7 +25,15 @@
 							"$description": "transparent colors derived from the foreground and accent values",
 							"background-75": {
 								"$value": "#000000BF",
-								"$description": "modal overlay"
+								"$description": ""
+							},
+							"background-50": {
+								"$value": "#00000080",
+								"$description": "button alt background"
+							},
+							"background-0": {
+								"$value": "#00000000",
+								"$description": "gradient transparency"
 							},
 							"foreground-0": {
 								"$value": "#FFFFFF00",
@@ -43,9 +51,17 @@
 								"$value": "#FFFFFF33",
 								"$description": "input strokes rest, input disabled text, button background, label background"
 							},
+							"foreground-50": {
+								"$value": "#FFFFFF80",
+								"$description": "input placeholder text"
+							},
 							"foreground-75": {
 								"$value": "#FFFFFFBF",
 								"$description": "secondary copy, input placeholder text, input strokes hover"
+							},
+							"scrim": {
+								"$value": "#000000BF",
+								"$description": "modal overlay"
 							}
 						},
 						"solid": {
@@ -124,7 +140,15 @@
 							"$description": "transparent colors derived from the foreground and accent values",
 							"background-75": {
 								"$value": "#FFFFFFBF",
-								"$description": "modal overlay"
+								"$description": ""
+							},
+							"background-50": {
+								"$value": "#FFFFFF80",
+								"$description": "button alt background"
+							},
+							"background-0": {
+								"$value": "#FFFFFF00",
+								"$description": "gradient transparency"
 							},
 							"foreground-0": {
 								"$value": "#00000000",
@@ -142,9 +166,17 @@
 								"$value": "#00000033",
 								"$description": "input strokes rest, input disabled text, button background, label background"
 							},
+							"foreground-50": {
+								"$value": "#00000080",
+								"$description": "input placeholder text"
+							},
 							"foreground-75": {
 								"$value": "#000000BF",
 								"$description": "secondary copy, input placeholder text, input strokes hover"
+							},
+							"scrim": {
+								"$value": "#000000BF",
+								"$description": "modal overlay"
 							}
 						},
 						"solid": {
@@ -225,7 +257,15 @@
 							"$description": "transparent colors derived from the foreground and accent values",
 							"background-75": {
 								"$value": "#002F8ABF",
+								"$description": ""
+							},
+							"background-50": {
+								"$value": "#002F8A80",
 								"$description": "modal overlay"
+							},
+							"background-0": {
+								"$value": "#002F8A0",
+								"$description": "gradient transparency"
 							},
 							"foreground-0": {
 								"$value": "#FFFFFF00",
@@ -243,9 +283,17 @@
 								"$value": "#FFFFFF33",
 								"$description": "input strokes rest, input disabled text, button background, label background"
 							},
+							"foreground-50": {
+								"$value": "#FFFFFF80",
+								"$description": "input placeholder text"
+							},
 							"foreground-75": {
 								"$value": "#FFFFFFBF",
 								"$description": "secondary copy, input placeholder text, input strokes hover"
+							},
+							"scrim": {
+								"$value": "#000000BF",
+								"$description": "modal overlay"
 							}
 						},
 						"solid": {
@@ -326,7 +374,15 @@
 							"$description": "transparent colors derived from the foreground and accent values",
 							"background-75": {
 								"$value": "#041F18BF",
-								"$description": "modal overlay"
+								"$description": ""
+							},
+							"background-50": {
+								"$value": "#041F1880",
+								"$description": "button alt background"
+							},
+							"background-0": {
+								"$value": "#041F1800",
+								"$description": "gradient transparency"
 							},
 							"foreground-0": {
 								"$value": "#FFFFFF00",
@@ -344,9 +400,17 @@
 								"$value": "#FFFFFF33",
 								"$description": "input strokes rest, input disabled text, button background, label background"
 							},
+							"foreground-50": {
+								"$value": "#FFFFFF80",
+								"$description": "input placeholder text"
+							},
 							"foreground-75": {
 								"$value": "#FFFFFFBF",
 								"$description": "secondary copy, input placeholder text, input strokes hover"
+							},
+							"scrim": {
+								"$value": "#000000BF",
+								"$description": "modal overlay"
 							}
 						},
 						"solid": {

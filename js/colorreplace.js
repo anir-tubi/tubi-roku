@@ -49,6 +49,7 @@ function findAndReplaceForStringInData(findString, replacementString, data) {
 // returns: Associative Array, this is either the same AA as colorAA or it contains additional color key/value combos
 function getColorKeyValue(sColor, node, colorAA){
   const sColorConstantPrefix = `THEME_`
+  const sColorConstantSuffix = `_THEME`
   Object.entries(node).forEach(([colorName, colorNode]) => {
     if (colorName[0] !== `$`) {
       colorName = colorName.replace(/\-/gi, ""); //get rid of "-" as that cannot be used in a constant name in the Roku app
@@ -61,7 +62,7 @@ function getColorKeyValue(sColor, node, colorAA){
 
           //switch from using the "#" to "0x" to proceed color values, and ensure there is a transparency value at the end of the string
           const formattedColorValue = sColorValue.replace("#", "0x").padEnd(10, "FF");
-          colorAA[sColorConstantPrefix + sColorNew] = formattedColorValue;
+          colorAA[sColorConstantPrefix + sColorNew + sColorConstantSuffix] = formattedColorValue;
         }        
       } else {
         colorAA = getColorKeyValue(sColorNew, colorNode, colorAA);

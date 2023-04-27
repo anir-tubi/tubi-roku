@@ -13,7 +13,6 @@ Function init()
 
   m.passwordPlaceholder = "*"
   m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.top.observeField("highlight", "onHighlight")
   m.top.observeField("passwordMode", "onPasswordModeChange")
 
   if m.global <> invalid
@@ -31,12 +30,10 @@ Function onThemeChange(msg = invalid)
   end if
   
   if theme <> invalid
-    m.border.color = theme.focusedColor
-    m.rectBG.color = theme.neutralColor
-    if isNonEmptyString(m.top.color) = false
-      '//if the color has not been set, then set it with a default color
-      m.Text.color = theme.neutralColor
-    end if
+    m.theme = theme
+    m.border.blendColor = m.theme.focusedColor
+    m.rectBG.color = m.theme.neutralColor
+    setTextColor()
   end if
 End Function
 
@@ -53,36 +50,36 @@ Function onBoxHeight()
 End Function
 
 
-Function onHighlight()
-  theme = getThemeFromGlobal()
-  if m.top.highlight = true
-    
-    m.rectBG.opacity = 0.8
-    if theme <> invalid
-      m.rectBG.color = theme.primaryTextColor
-      m.Text.color = theme.neutralColor2
+' Set the main text color based on the contents of the textfield and if m.top.color had been set
+Function setTextColor()
+  bThemeSet = false
+  if isNonEmptyString(m.top.color) = false
+    if m.theme <> invalid
+
+      bThemeSet= true
+      m.Text.opacity = 1.0
+      if isNonEmptyString(m.top.text) = false
+        m.Text.color = m.theme.tertiaryTextColor
+      else
+        m.Text.color = m.theme.primaryText
+      end if 
+
     end if
-    
-    if m.top.text = invalid or m.top.text = "" then
-      m.Text.text = m.top.hint
+  else
+
+  end if
+
+
+  if bThemeSet = false
+    '//If the theme was not used to set the text color then set the opacity of the textfield based on the content
+    if isNonEmptyString(m.top.text) = false
       m.Text.opacity = 0.7
     else
       m.Text.opacity = 1.0
     end if  
-  else
-    
-    if theme <> invalid
-      m.rectBG.color = theme.neutralColor2
-      
-      if m.top.text = invalid or m.top.text = "" then
-        m.Text.color = theme.neutralColor
-      else
-        m.Text.color = theme.primaryText
-      end if  
-    end if
   end if
-
 End Function
+
 
 
 Function onScreenFocusChange()
@@ -112,18 +109,13 @@ End Function
 '       shortening algorithm.
 Function formatTextBox()
   tubiLog("TextEntryBox.formatTextBox")
-  theme = getThemeFromGlobal()
-
-  if m.top.text = invalid or m.top.text = "" then
+  if isNonEmptyString(m.top.text) = false
     m.Text.text = m.top.hint
-    m.Text.opacity = 0.7
   else
-    if theme <> invalid
-      m.Text.color = theme.primaryTextColor
-    end if
     onPasswordModeChange()
   end if
-  
+  setTextColor()
+
   textRect = m.Text.localBoundingRect()
   safetyWidth = 400   'Arbitrarily chosen, smaller than 428 max width
   if textRect.width > safetyWidth then
@@ -160,7 +152,6 @@ End Function
 
 
 Function onKeyEvent(key As String, press As Boolean) as Boolean
-
   tubiLog("TextEntryBox.onKeyEvent key = " + key)
   if press then
     if key = "OK"
