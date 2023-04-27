@@ -64,7 +64,7 @@ Function onSearchTextChanged(msg)
 
   if bSearchNonDefaultResults = true
 
-    searchReqInfo = m.CmsApi.searchReqInfo(searchText, kidsMode)
+    searchReqInfo = m.CmsApi.createSearchReqInfo(searchText, kidsMode)
     m.currentSearchScreenRequestInfo = m.makeRequest({
       url: searchReqInfo.url
       requestType: m.constants.reqNames.getSearchScreen
@@ -85,7 +85,7 @@ Function onSearchTextChanged(msg)
     }
   else
 
-    categoryReqInfo = m.CmsApi.categoryReqInfo(m.constants.ui.categoryIds.featured, kidsMode)
+    categoryReqInfo = m.CmsApi.createCategoryReqInfo(m.constants.ui.categoryIds.featured, kidsMode)
     m.currentSearchScreenRequestInfo = m.makeRequest({
       url: categoryReqInfo.url
       requestType: m.constants.reqNames.getSearchDefault

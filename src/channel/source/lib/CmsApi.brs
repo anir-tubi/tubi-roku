@@ -11,20 +11,19 @@ Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
 
     ' public
     setUtmCampaignConfig: cmsApi_setUtmCampaignConfig
-    relatedContentReqInfo: cmsApi_getRelatedContentRequestInfo
-    upNextContentRequestInfo: cmsApi_getUpNextContentRequestInfo
-    singleContentReqInfo: cmsApi_getSingleContentRequestInfo
-    thumbnailsReqInfo: cmsApi_getThumbnailsRequestInfo
-    getCategoriesListRequestInfo: cmsApi_getCategoriesListRequestInfo
-    homeScreenReqInfo: cmsApi_getHomeScreenRequestInfo
-    categoryReqInfo: cmsApi_getCategoryRequestInfo
-    searchReq: cmsApi_getSearchRequest
-    searchReqInfo: cmsApi_getSearchRequestInfo
+    createRelatedContentReqInfo: cmsApi_createRelatedContentReqInfo
+    createUpNextContentReqInfo: cmsApi_createUpNextContentReqInfo
+    createSingleContentReqInfo: cmsApi_createSingleContentReqInfo
+    createThumbnailsReqInfo: cmsApi_createThumbnailsReqInfo
+    createCategoriesListReqInfo: cmsApi_createCategoriesListReqInfo
+    createHomeScreenReqInfo: cmsApi_createHomeScreenReqInfo
+    createCategoryReqInfo: cmsApi_createCategoryReqInfo
+    createSearchReqInfo: cmsApi_createSearchRequestInfo
     createHomeScreenBatchReqInfo: cmsApi_createHomeScreenBatchRequestInfo
     createMyStuffScreenBatchReqInfo: cmsApi_createMyStuffScreenBatchReqInfo
     createHomeScreenBatchRequestInfoForContainers: cmsApi_createHomeScreenBatchRequestInfoForContainers
-    containerForScreensaverReqInfo: cmsApi_containerForScreensaverReqInfo
-    homeScreenContainerIdsForScreensaverReqInfo: cmsApi_homeScreenContainerIdsForScreensaverReqInfo
+    createContainerForScreensaverReqInfo: cmsApi_createContainerForScreensaverReqInfo
+    createHomeScreenContainerIdsForScreensaverReqInfo: cmsApi_createHomeScreenContainerIdsForScreensaverReqInfo
 
     ' private
     createAuthRequest: cmsApi_createAuthRequest
@@ -49,7 +48,7 @@ Function cmsApi_setUtmCampaignConfig(utmCampaignConfig)
 End Function
 
 
-Function cmsApi_getRelatedContentRequestInfo(contentId, bKidsMode = false)
+Function cmsApi_createRelatedContentReqInfo(contentId, bKidsMode = false)
   url = m.constants.urls.cms.relatedContent + "/" + contentId + "/related"
   options = m.getCommonOptions()
   options.params["isKidsMode"] = bKidsMode
@@ -64,7 +63,7 @@ End Function
 
 
 ' @passedOptions: assocArray, options to be added to the request object as created by Request().createAsync()
-Function cmsApi_getUpNextContentRequestInfo(contentId, passedOptions)
+Function cmsApi_createUpNextContentReqInfo(contentId, passedOptions)
   url = m.constants.urls.cms.upNextContent + "/" + contentId + "/next"
   options = m.getCommonOptions()
   params = options.params
@@ -97,7 +96,7 @@ Function cmsApi_getUpNextContentRequestInfo(contentId, passedOptions)
 End Function
 
 
-Function cmsApi_getSingleContentRequestInfo(contentId, includeChannels=false, bKidsMode = false)
+Function cmsApi_createSingleContentReqInfo(contentId, includeChannels=false, bKidsMode = false)
   options = m.getCommonOptions()
 
   options.params["content_id"] = contentId
@@ -116,7 +115,7 @@ Function cmsApi_getSingleContentRequestInfo(contentId, includeChannels=false, bK
 End Function
 
 
-Function cmsApi_getThumbnailsRequestInfo(contentId)
+Function cmsApi_createThumbnailsReqInfo(contentId)
   url = m.constants.urls.cms.thumbnails + "/" + contentId + "/thumbnail_sprites"
   options = m.getCommonOptions()
   options.params["type"] = "5x"
@@ -129,10 +128,10 @@ End Function
 
 
 '''''''''''''''''''''
-' cmsApi_getCategoriesListRequestInfo()
+' cmsApi_createCategoriesListReqInfo()
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 '
-Function cmsApi_getCategoriesListRequestInfo(bKidsMode = false)
+Function cmsApi_createCategoriesListReqInfo(bKidsMode = false)
   options = {
     params: {}
     headers: {}
@@ -144,7 +143,7 @@ Function cmsApi_getCategoriesListRequestInfo(bKidsMode = false)
   options.params["include_empty_history"] = "false"
   options.params["include_empty_queue"] = "false"
 
-  return m.homeScreenReqInfo(bKidsMode, options)
+  return m.createHomeScreenReqInfo(bKidsMode, options)
 End Function
 
 
@@ -155,7 +154,7 @@ End Function
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
 '                 see request.brs for more info
-Function cmsApi_getHomeScreenRequestInfo(bKidsMode = false, passedOptions = {})
+Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
 
   options = m.getCommonOptions()
   params = options.params
@@ -220,7 +219,7 @@ End Function
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
 '                 see request.brs for more info
 ' @imageParamTypes: Array, What image types/sizes should be requested from the backend. If none are passed, then a default set of types will be used.
-Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOptions = {}, imageParamTypes = invalid)
+Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptions = {}, imageParamTypes = invalid)
   options = m.getCommonOptions()
   params = options.params
 
@@ -276,20 +275,9 @@ Function cmsApi_getCategoryRequestInfo(categoryId, bKidsMode = false, passedOpti
 End Function
 
 
-''''''''''''''''''''''
-' searchreq()
-'
-Function cmsApi_getSearchRequest(searchText, bKidsMode = false)
-  searchReqInfo = m.searchReqInfo(searchText, bKidsMode)
-  url = searchReqInfo.url
-  options = searchReqInfo.options
-  return m.createAuthRequest(url, m.constants.reqNames.getSearchScreen, options)
-End Function
-
-
 ' @searchText: string, the text the user is attempting to search for
 ' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
-Function cmsApi_getSearchRequestInfo(searchText, bKidsMode = false)
+Function cmsApi_createSearchRequestInfo(searchText, bKidsMode = false)
   url = m.constants.urls.search
   options = m.getCommonOptions()
   options.params["search"] = searchText
@@ -406,7 +394,7 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
             }
 
             options.params.append(contentModeParam)
-            categoryReqInfo = m.categoryReqInfo(categoryId, bKidsMode, options)
+            categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options)
             categoryReqInfo.requestType = reqName
             categoryReqInfo.responseType = "node"
             categoryReqInfo.isSignedInUser = isSignedInUser
@@ -462,7 +450,7 @@ Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSi
             "poster"
             "landscape"
           ]
-          categoryReqInfo = m.categoryReqInfo(categoryId, bKidsMode, options, imageParamTypes)
+          categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, imageParamTypes)
           categoryReqInfo.requestType = reqName
           categoryReqInfo.responseType = "node"
           categoryReqInfo.isSignedInUser = isSignedInUser
@@ -565,7 +553,7 @@ Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, cont
         }
 
         options.params.append(contentModeParam)
-        categoryReqInfo = m.categoryReqInfo(containerId, bKidsMode, options)
+        categoryReqInfo = m.createCategoryReqInfo(containerId, bKidsMode, options)
         categoryReqInfo.requestType = reqName
         categoryReqInfo.responseType = "node"
         categoryReqInfo.isSignedInUser = isSignedInUser
@@ -598,8 +586,8 @@ End Function
 
 '@containerId: string, container id that we should request the list of items for
 '@numberOfItemsPerContainer, integer - max number of items to request for each container request
-Function cmsApi_containerForScreensaverReqInfo(containerId, numberOfItemsPerContainer, isKidsMode)
-  reqInfo = m.categoryReqInfo(containerId, isKidsMode, {}, [])
+Function cmsApi_createContainerForScreensaverReqInfo(containerId, numberOfItemsPerContainer, isKidsMode)
+  reqInfo = m.createCategoryReqInfo(containerId, isKidsMode, {}, [])
   reqInfo.requestType = m.constants.reqNames.getScreensaverContainer
 
   params = {}
@@ -623,8 +611,8 @@ Function cmsApi_containerForScreensaverReqInfo(containerId, numberOfItemsPerCont
 End Function
 
 
-Function cmsApi_homeScreenContainerIdsForScreensaverReqInfo(kidsMode)
-  reqInfo = m.homeScreenReqInfo(kidsMode)
+Function cmsApi_createHomeScreenContainerIdsForScreensaverReqInfo(kidsMode)
+  reqInfo = m.createHomeScreenReqInfo(kidsMode)
 
   reqInfo.requestType = m.constants.reqNames.getScreensaverHomeScreenContainerIds
 

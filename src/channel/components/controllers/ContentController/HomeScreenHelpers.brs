@@ -446,7 +446,7 @@ Function fetchHomeScreen(homeScreen)
     options.params = params
     options.headers = headers
 
-    homeScreenReqInfo = m.CmsApi.homeScreenReqInfo(isKidsMode, options)
+    homeScreenReqInfo = m.CmsApi.createHomeScreenReqInfo(isKidsMode, options)
     m.makeRequest({
       url: homeScreenReqInfo.url
       requestType: reqName

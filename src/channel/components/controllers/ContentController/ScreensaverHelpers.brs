@@ -181,7 +181,7 @@ Function sendBatchRequestForScreensaverContainers(containerIds, numberOfItemsPer
 
   isKidsMode = shouldKidsModeBeSentToServer()
   for each containerId in containerIds
-    request = m.cmsApi.containerForScreensaverReqInfo(containerId, numberOfItemsPerContainer, isKidsMode)
+    request = m.cmsApi.createContainerForScreensaverReqInfo(containerId, numberOfItemsPerContainer, isKidsMode)
     batchRequests.push(request)
   end for
 
@@ -213,7 +213,7 @@ End Function
 
 Function sendGetScreensaverHomeScreenContainerIdsRequest()
   isKidsMode = shouldKidsModeBeSentToServer()
-  reqInfo = m.cmsApi.homeScreenContainerIdsForScreensaverReqInfo(isKidsMode)
+  reqInfo = m.cmsApi.createHomeScreenContainerIdsForScreensaverReqInfo(isKidsMode)
   reqInfo.successCallback = onGetScreensaverHomeScreenContainerIdsRequestSuccessResponse
   reqInfo.errorCallback = onScreensaverRequestErrorResponse
   reqInfo.responseType = "node"

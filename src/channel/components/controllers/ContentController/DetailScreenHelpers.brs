@@ -452,7 +452,7 @@ End Function
 Function getSingleContentFromServer(content, successCallback, errorCallback)
   tubiLog("DetailScreenHelpers.getSingleContentFromServer")
   if content <> invalid
-    singleRequestInfo = m.cmsApi.singleContentReqInfo(content.id, true, shouldKidsModeBeSentToServer())
+    singleRequestInfo = m.cmsApi.createSingleContentReqInfo(content.id, true, shouldKidsModeBeSentToServer())
     m.makeRequest({
       url: singleRequestInfo.url
       requestType: m.constants.reqNames.getSingleContent
@@ -655,7 +655,7 @@ Function getRelatedContent(content)
   ' get related (You May Also Like) content along with metadata for the content
   ' (but not if in any of the kids modes, since it won't be displayed)
   if content <> invalid AND isKidsUIOn() = false
-    relatedRequestInfo = m.cmsApi.relatedContentReqInfo(content.id, shouldKidsModeBeSentToServer())
+    relatedRequestInfo = m.cmsApi.createRelatedContentReqInfo(content.id, shouldKidsModeBeSentToServer())
     m.makeRequest({
       url: relatedRequestInfo.url
       requestType: m.constants.reqNames.getRelatedContent

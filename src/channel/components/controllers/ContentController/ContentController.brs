@@ -791,7 +791,7 @@ Function setDirtyUserCategories(categoryId)
     ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
     params["content_mode"] = ""
     options.params = params
-    categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, options)
+    categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, options)
 
     m.makeRequest({
       url: categoryReqInfo.url
@@ -813,7 +813,7 @@ Function setDirtyUserCategories(categoryId)
       movieParams["content_mode"] = m.constants.ui.contentMode.movie
       optionMovie.params = movieParams
 
-      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, optionMovie)
+      categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, optionMovie)
 
       m.makeRequest({
         url: categoryReqInfo.url
@@ -835,7 +835,7 @@ Function setDirtyUserCategories(categoryId)
       tvParams["content_mode"] = m.constants.ui.contentMode.tv
       optionTV.params = tvParams
 
-      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, optionTV)
+      categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, optionTV)
 
       m.makeRequest({
         url: categoryReqInfo.url
@@ -858,7 +858,7 @@ Function setDirtyUserCategories(categoryId)
       esParams["content_mode"] = m.constants.ui.contentMode.latino
       optionEspanol.params = esParams
 
-      categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, optionEspanol)
+      categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, optionEspanol)
 
       m.makeRequest({
         url: categoryReqInfo.url

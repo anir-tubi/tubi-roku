@@ -175,7 +175,7 @@ Function fetchCategoryDetails(content, index = 0, contentMode = "")
 
     options.params = params
 
-    categoryReqInfo = m.CmsApi.categoryReqInfo(categoryId, isKidsMode, options)
+    categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, options)
 
     m.makeRequest({
       url: categoryReqInfo.url

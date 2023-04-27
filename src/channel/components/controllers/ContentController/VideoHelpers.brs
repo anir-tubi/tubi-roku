@@ -728,7 +728,7 @@ End Function
 
 Function getSprites(content)
   if content <> invalid
-    spritesReqInfo = m.cmsApi.thumbnailsReqInfo(content.id)
+    spritesReqInfo = m.cmsApi.createThumbnailsReqInfo(content.id)
     m.makeRequest({
       url: spritesReqInfo.url
       requestType: m.constants.reqNames.getThumbnails
@@ -883,7 +883,7 @@ Function fetchUpNextContent(videoPlayer)
       options.params.delete("container_id")
     end if
 
-    upNextReqInfo = m.cmsApi.upNextContentRequestInfo(videoPlayer.content.id, options)
+    upNextReqInfo = m.cmsApi.createUpNextContentReqInfo(videoPlayer.content.id, options)
 
     return m.makeRequest({
       requestType: m.constants.reqNames.getUpNextContent

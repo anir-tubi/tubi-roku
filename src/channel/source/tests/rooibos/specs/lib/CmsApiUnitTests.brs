@@ -15,8 +15,8 @@ End function
 '+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-'@Test unit tests relatedContentReqInfo
-Function cmsApi_relatedContentReqInfo_test()
+'@Test unit tests createRelatedContentReqInfo
+Function cmsApi_createRelatedContentReqInfo_test()
   infoKeys = [
     "url"
     "options"
@@ -42,7 +42,7 @@ Function cmsApi_relatedContentReqInfo_test()
     }
   }
 
-  kidsRelatedReqInfo = m.cmsApi.relatedContentReqInfo("123456", true)
+  kidsRelatedReqInfo = m.cmsApi.createRelatedContentReqInfo("123456", true)
 
   m.assertEqual(kidsRelatedReqInfo.count(), 2)
   m.assertAAHasKeys(kidsRelatedReqInfo, infoKeys)
@@ -67,7 +67,7 @@ Function cmsApi_relatedContentReqInfo_test()
     }
   }
 
-  relatedReqInfo = m.cmsApi.relatedContentReqInfo("123456", false)
+  relatedReqInfo = m.cmsApi.createRelatedContentReqInfo("123456", false)
 
   m.assertEqual(kidsRelatedReqInfo.count(), 2)
   m.assertAAHasKeys(kidsRelatedReqInfo, infoKeys)
@@ -82,8 +82,8 @@ Function cmsApi_relatedContentReqInfo_test()
 End Function
 
 
-'@Test unit tests getUpNextContentRequestInfo
-Function cmsApi_getUpNextContentRequestInfo_test()
+'@Test unit tests getcreateUpNextContentReqInfo
+Function cmsApi_createUpNextContentReqInfo_test()
   infoKeys = [
     "url"
     "options"
@@ -112,7 +112,7 @@ Function cmsApi_getUpNextContentRequestInfo_test()
       "custom_param": 42
     }
   }
-  upNextInfo = m.cmsApi.upNextContentRequestInfo("123456", passedOptions)
+  upNextInfo = m.cmsApi.createUpNextContentReqInfo("123456", passedOptions)
 
   m.assertEqual(upNextInfo.count(), 2)
   m.assertAAHasKeys(upNextInfo, infoKeys)
@@ -127,8 +127,8 @@ End Function
 
 
 
-'@Test unit tests singleContentReqInfo
-Function cmsApi_singleContentReqInfo_test()
+'@Test unit tests createSingleContentReqInfo
+Function cmsApi_createSingleContentReqInfo_test()
   infoKeys = [
     "url"
     "options"
@@ -159,7 +159,7 @@ Function cmsApi_singleContentReqInfo_test()
   }
 
   ' include channels, no kids mode
-  singleContentInfo = m.cmsApi.singleContentReqInfo("123456", true, false)
+  singleContentInfo = m.cmsApi.createSingleContentReqInfo("123456", true, false)
 
   m.assertEqual(singleContentInfo.count(), 2)
   m.assertAAHasKeys(singleContentInfo, infoKeys)
@@ -175,7 +175,7 @@ Function cmsApi_singleContentReqInfo_test()
   m.assertEqual(singleContentInfo.options.params["images[landscape_tb]"], singleContentOptions.params["images[landscape_tb]"])
 
   ' include channels, with kids mode
-  singleContentInfo = m.cmsApi.singleContentReqInfo("123456", true, true)
+  singleContentInfo = m.cmsApi.createSingleContentReqInfo("123456", true, true)
 
   singleContentOptions.params["isKidsMode"] = true
 
@@ -193,7 +193,7 @@ Function cmsApi_singleContentReqInfo_test()
   m.assertEqual(singleContentInfo.options.params["images[landscape_tb]"], singleContentOptions.params["images[landscape_tb]"])
 
   ' don't include channels, with kids mode
-  singleContentInfo = m.cmsApi.singleContentReqInfo("123456", false, true)
+  singleContentInfo = m.cmsApi.createSingleContentReqInfo("123456", false, true)
 
   singleContentOptions.params["includeChannels"] = false
   singleContentOptions.params["isKidsMode"] = true
@@ -213,8 +213,8 @@ Function cmsApi_singleContentReqInfo_test()
 End Function
 
 
-'@Test unit tests thumbnailsReqInfo
-Function cmsApi_thumbnailsReqInfo_test()
+'@Test unit tests createThumbnailsReqInfo
+Function cmsApi_createThumbnailsReqInfo_test()
   infoKeys = [
     "url"
     "options"
@@ -238,7 +238,7 @@ Function cmsApi_thumbnailsReqInfo_test()
     }
   }
 
-  thumbsInfo = m.cmsApi.thumbnailsReqInfo("123456")
+  thumbsInfo = m.cmsApi.createThumbnailsReqInfo("123456")
 
   m.assertEqual(thumbsInfo.count(), 2)
   m.assertAAHasKeys(thumbsInfo, infoKeys)
@@ -252,8 +252,8 @@ Function cmsApi_thumbnailsReqInfo_test()
 End Function
 
 
-'@Test unit tests homeScreenReqInfo
-Function cmsApi_homeScreenReqInfo_test()
+'@Test unit tests createHomeScreenReqInfo
+Function cmsApi_createHomeScreenReqInfo_test()
   infoKeys = [
     "url"
     "options"
@@ -307,7 +307,7 @@ Function cmsApi_homeScreenReqInfo_test()
   }
 
   ' no kids mode and homescreen contentMode
-  homeInfo = m.cmsApi.homeScreenReqInfo(false, passedOptions)
+  homeInfo = m.cmsApi.createHomeScreenReqInfo(false, passedOptions)
 
   m.assertEqual(homeInfo.count(), 2)
   m.assertAAHasKeys(homeInfo, infoKeys)
@@ -329,7 +329,7 @@ Function cmsApi_homeScreenReqInfo_test()
   m.assertEqual(homeInfo.options.headers["x-client-version"], homeOptions.headers["x-client-version"])
 
   ' with kids mode and homescreen contentMode
-  homeInfo = m.cmsApi.homeScreenReqInfo(true, passedOptions)
+  homeInfo = m.cmsApi.createHomeScreenReqInfo(true, passedOptions)
   homeOptions.params["is_kids_mode"] = true
 
   m.assertEqual(homeInfo.count(), 2)
@@ -353,7 +353,7 @@ Function cmsApi_homeScreenReqInfo_test()
 
   ' with contentMode = "tv"
   passedOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.tv
-  homeInfo = m.cmsApi.homeScreenReqInfo(false, passedOptions)
+  homeInfo = m.cmsApi.createHomeScreenReqInfo(false, passedOptions)
   homeOptions.params["is_kids_mode"] = false
   homeOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.tv
 
@@ -378,7 +378,7 @@ Function cmsApi_homeScreenReqInfo_test()
 
   ' with contentMode = "linear"
   passedOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.linear
-  homeInfo = m.cmsApi.homeScreenReqInfo(false, passedOptions)
+  homeInfo = m.cmsApi.createHomeScreenReqInfo(false, passedOptions)
   homeOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.linear
   homeOptions.params.delete("images[landscape_tb]")
   homeOptions.params.delete("images[poster_tb]")
@@ -413,8 +413,8 @@ Function cmsApi_homeScreenReqInfo_test()
 End Function
 
 
-'@Test unit tests categoryReqInfo
-Function cmsApi_categoryReqInfo_test()
+'@Test unit tests createCategoryReqInfo
+Function cmsApi_createCategoryReqInfo_test()
   infoKeys = [
     "url"
     "options"
@@ -470,7 +470,7 @@ Function cmsApi_categoryReqInfo_test()
       "x-custom-header": "custom_header_value"
     }
   }
-  categoryInfo = m.cmsApi.categoryReqInfo("my_category", false, passedOptions)
+  categoryInfo = m.cmsApi.createCategoryReqInfo("my_category", false, passedOptions)
 
   m.assertEqual(categoryInfo.count(), 3)
   m.assertAAHasKeys(categoryInfo, infoKeys)
@@ -492,7 +492,7 @@ Function cmsApi_categoryReqInfo_test()
 
   ' with kids mode
   categoryOptions.params["is_kids_mode"] = true
-  categoryInfo = m.cmsApi.categoryReqInfo("my_category", true, passedOptions)
+  categoryInfo = m.cmsApi.createCategoryReqInfo("my_category", true, passedOptions)
 
   m.assertEqual(categoryInfo.count(), 3)
   m.assertAAHasKeys(categoryInfo, infoKeys)
@@ -516,7 +516,7 @@ Function cmsApi_categoryReqInfo_test()
   categoryOptions.params["is_kids_mode"] = false
   categoryOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.latino
   passedOptions.params.contentMode = m.cmsApi.constants.ui.contentMode.latino
-  categoryInfo = m.cmsApi.categoryReqInfo("my_category", false, passedOptions)
+  categoryInfo = m.cmsApi.createCategoryReqInfo("my_category", false, passedOptions)
 
   m.assertEqual(categoryInfo.count(), 3)
   m.assertAAHasKeys(categoryInfo, infoKeys)
@@ -568,7 +568,7 @@ Function cmsApi_categoryReqInfo_test()
     }
   }
 
-  categoryInfo = m.cmsApi.categoryReqInfo("my_category", false, passedOptions)
+  categoryInfo = m.cmsApi.createCategoryReqInfo("my_category", false, passedOptions)
 
   m.assertEqual(categoryInfo.count(), 3)
   m.assertAAHasKeys(categoryInfo, infoKeys)
@@ -589,8 +589,8 @@ Function cmsApi_categoryReqInfo_test()
 End Function
 
 
-'@Test unit tests searchReqInfo
-Function cmsApi_searchReqInfo_test()
+'@Test unit tests createSearchReqInfo
+Function cmsApi_createSearchReqInfo_test()
   infoKeys = [
     "url"
     "options"
@@ -618,7 +618,7 @@ Function cmsApi_searchReqInfo_test()
   }
 
   ' without kids mode
-  searchInfo = m.cmsApi.searchReqInfo("search_text", false)
+  searchInfo = m.cmsApi.createSearchReqInfo("search_text", false)
 
   m.assertEqual(searchInfo.count(), 2)
   m.assertAAHasKeys(searchInfo, infoKeys)
@@ -632,7 +632,7 @@ Function cmsApi_searchReqInfo_test()
   m.assertEqual(searchInfo.options.params["images[poster_tb]"], searchOptions.params["images[poster_tb]"])
 
   ' with kids mode
-  searchInfo = m.cmsApi.searchReqInfo("search_text", false)
+  searchInfo = m.cmsApi.createSearchReqInfo("search_text", false)
 
   m.assertEqual(searchInfo.count(), 2)
   m.assertAAHasKeys(searchInfo, infoKeys)
@@ -857,35 +857,11 @@ Function cmsApi_setTupianLandscapeParam_test()
 End Function
 
 
-'@Test unit tests getCategoryRequestInfo
-Function cmsApi_getCategoryRequestInfo_test()
-  containerId = "featured"
-  isKidsMode = true
-  utmCampaignConfig = "utmCampaignConfigTest"
-  m.cmsApi.utmCampaignConfig = utmCampaignConfig
-  reqInfo = m.cmsApi.categoryReqInfo(containerId, isKidsMode)
-  m.cmsApi.delete("utmCampaignConfig")
-  url = reqInfo.url
-  params = reqInfo.options.params
-
-  ' Should include the containerId in the url
-  m.assertTrue(url.instr(containerId) >= 0)
-
-  ' Should include the following params
-  m.assertEqual(params.is_kids_mode, isKidsMode)
-  m.assertTrue(params.include_channels)
-  m.assertTrue(params.include_sponsorships)
-  m.assertTrue(params.contents_limit > 0)
-  m.assertEqual(params.utm_campaign_config, utmCampaignConfig)
-  m.assertEqual(params.content_mode, "")
-End Function
-
-
-'@Test unit tests cmsApi_containerForScreensaverReqInfo
-Function cmsApi_containerForScreensaverReqInfo_test()
+'@Test unit tests cmsApi_createContainerForScreensaverReqInfo
+Function cmsApi_createContainerForScreensaverReqInfo_test()
   isKidsMode = false
   numberOfItemsPerContainer = 42
-  reqInfo = m.cmsApi.containerForScreensaverReqInfo("featured", numberOfItemsPerContainer, isKidsMode)
+  reqInfo = m.cmsApi.createContainerForScreensaverReqInfo("featured", numberOfItemsPerContainer, isKidsMode)
   params = reqInfo.options.params
 
   m.assertInvalid(params.include_channels)
@@ -896,24 +872,10 @@ Function cmsApi_containerForScreensaverReqInfo_test()
 End Function
 
 
-'@Test unit tests cmsApi_getHomeScreenRequestInfo
-Function cmsApi_getHomeScreenRequestInfo_test()
+'@Test unit tests cmsApi_createHomeScreenContainerIdsForScreensaverReqInfo
+Function cmsApi_createHomeScreenContainerIdsForScreensaverReqInfo_test()
   isKidsMode = false
-  reqInfo = m.cmsApi.homeScreenReqInfo(isKidsMode)
-  params = reqInfo.options.params
-
-  m.assertTrue(params.include_empty_history)
-  m.assertTrue(params.include_empty_queue)
-  m.assertTrue(params.include_channels)
-  m.assertTrue(params.include_sponsorships)
-  m.assertEqual(params.is_kids_mode, isKidsMode)
-End Function
-
-
-'@Test unit tests cmsApi_homeScreenContainerIdsForScreensaverReqInfo
-Function cmsApi_homeScreenContainerIdsForScreensaverReqInfo_test()
-  isKidsMode = false
-  reqInfo = m.cmsApi.homeScreenContainerIdsForScreensaverReqInfo(isKidsMode)
+  reqInfo = m.cmsApi.createHomeScreenContainerIdsForScreensaverReqInfo(isKidsMode)
   params = reqInfo.options.params
 
   m.assertEqual(params.contents_limit, 0)

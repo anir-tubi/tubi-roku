@@ -140,7 +140,7 @@ Function getGridDataFromServer(screen)
   tubiLog("ChannelGridScreenHelpers.getGridDataFromServer")
   if screen <> invalid
     shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
-    categoriesListReqInfo = m.cmsApi.getCategoriesListRequestInfo(shouldKidsModeBeSentToServer)
+    categoriesListReqInfo = m.cmsApi.createCategoriesListReqInfo(shouldKidsModeBeSentToServer)
 
     m.makeRequest({
       url: categoriesListReqInfo.url
