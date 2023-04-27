@@ -76,6 +76,10 @@ Function TubiExperiments(constants) as Object
           "enabled": false
         }
       }
+
+      roku_large_play_progress: {
+        roku_large_play_progress_v1 : {"enabled": false}
+      }
     }
 
     'public methods
