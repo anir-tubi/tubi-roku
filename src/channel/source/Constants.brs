@@ -291,6 +291,8 @@ Function getConstants()
     constants.reqNames.getScreenSaverHomeScreenContainerIds = "getScreenSaverHomeScreenContainerIds"
     constants.reqNames.getNamespaces = "getNamespaces"
     constants.reqNames.getExternalConfigs = "getExternalConfigs"
+    constants.reqNames.getPreferences = "getPreferences"
+    constants.reqNames.patchPreferences = "patchPreferences"
 
     ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
@@ -326,6 +328,8 @@ Function getConstants()
 
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverContainer] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverHomeScreenContainerIds] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getPreferences] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.patchPreferences] = true
 
 
   constants.anonymous = {}
@@ -501,11 +505,12 @@ Function getConstants()
       constants.urls.account.login = constants.urls.account.urlBase + "/user/login"
       constants.urls.account.checkBirthday = constants.urls.account.urlBase + "/user/check_birthday_info"
       constants.urls.account.deviceRegister = constants.urls.account.urlBase + "/device/register"
-      constants.urls.account.settings = constants.urls.account.urlBase + "/user/settings"
+      constants.urls.account.userSettings = constants.urls.account.urlBase + "/user/settings"
       constants.urls.account.contentRating = constants.urls.account.urlBase + "/user/preferences/rate"
-      constants.urls.account.parentalRating = constants.urls.account.settings + "/parental_rating"
+      constants.urls.account.parentalRating = constants.urls.account.userSettings + "/parental_rating"
       constants.urls.account.magicLink = constants.urls.account.urlBase + "/device/magic_link"
       constants.urls.account.signup = constants.urls.account.urlBase + "/user/signup"
+      constants.urls.account.deviceSettings = constants.urls.account.urlBase + "/device/settings"
 
       constants.urls.account.anonymous = {}
       constants.urls.account.anonymous.signingKey = constants.urls.account.urlBase + "/device/anonymous/signing_key"
@@ -1605,6 +1610,11 @@ constants.ui.themes = {}
       constants.time.magicLinkEndDate = "2022-12-19T20:00:00Z"
       constants.time.superbowlRabbitHoleCampaignStartDate = "2023-02-09T20:00:00Z"
       constants.time.superbowlRabbitHoleCampaignEndDate = "2023-03-30T20:00:00Z"
+
+      ' Creating Backend/Frontend mapping for preference keys.
+      constants.preferenceKeys = {}
+      constants.preferenceKeys.isVideoPreviewOn = "enable_video_preview"
+      constants.preferenceKeys.audioTrack = "audio_track"
 
   return constants
 end Function

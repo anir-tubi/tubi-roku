@@ -567,7 +567,7 @@ Function onActivationSuccess()
   end if
 
   m.authTask = CreateObject("roSGNode", "AuthTask")
-  m.authTask.observeFieldScoped("authInfo", "onPostSignInAuthInfoUpdated")
+  m.authTask.observeFieldScoped("authInfo", "refreshPreferencesAfterSignIn")
   m.authTask.functionName = "execInitializeUserData"
   m.authTask.control = "RUN"
   m.spinner.visible = true
@@ -577,9 +577,20 @@ Function onActivationSuccess()
 End Function
 
 
+Function handleUpdatedAuthAndGetPreferences(callback)
+  handleUpdatedAuth()
+  getPreferences(callback)
+End Function
+
+
+Function refreshPreferencesAfterSignIn()
+  handleUpdatedAuthAndGetPreferences(onPostSignInAuthInfoUpdated)
+End Function
+
+
 Function onPostSignInAuthInfoUpdated()
   tubiLog("SignInHelpers.onPostSignInAuthInfoUpdated")
-  authInfo = handleUpdatedAuth()
+  authInfo = getFieldFromGlobal("authInfo")
   if (shouldShowAgeGate() AND authInfo <> invalid AND authInfo.hasAge <> true)
     m.spinner.visible = false
     signInInfo = invalid
@@ -672,8 +683,13 @@ Function onSignOutCompleted()
       status: "SUCCESS"
     }
   }
-  authInfo = handleUpdatedAuth()
 
+  handleUpdatedAuthAndGetPreferences(onPostSignOutPreferencesRefresh)
+End Function
+
+
+Function onPostSignOutPreferencesRefresh()
+  authInfo = getFieldFromGlobal("authInfo")
   ' set the mode before any changes are done to the UI
   setUiMode(m.constants.ui.modes.standard)
 
@@ -712,9 +728,6 @@ Function handleUpdatedAuth()
   m.authTask = invalid
 
   setSideNavSignedInItem(authInfo)
-
-  'set the autoplayVideoPreview on/off based on user global settings.
-  setAutoplayVideoPreviewFromGlobal(authInfo)
 
   return authInfo
 End Function

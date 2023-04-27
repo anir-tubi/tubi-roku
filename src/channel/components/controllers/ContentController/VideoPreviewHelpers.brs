@@ -145,7 +145,7 @@ End Function
 ' @pageType : string, the type(video_page, series_detail_page, home_page) of page which is used in analytics event
 Function startVideoPreview(content, pageType="home_page")
   tubiLog("VideoPreviewHelpers.startVideoPreview")
-  if content <> invalid AND m.isAutoplayVideoPreviewOn = true
+  if content <> invalid AND isVideoPreviewOn() = true
     videoPreview = m.videoPreviewPlayer
     ' unobserve field just in case previous state was errorsstart observing a fresh status.
     videoPreview.unobserveFieldScoped("state")

@@ -133,9 +133,6 @@ Function init()
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
   m.marketingBackgroundUri = m.constants.ui.uris.marketingBackground
 
-  'This variable has been used to keep track of user's choice on autoplay. Without maintaining this variable, we might have to access m.global everytime
-  m.isAutoplayVideoPreviewOn = true 'True by default
-
   ' Global state
   m.global.addField("bookmarkIds", "node", false)
   m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
@@ -168,6 +165,7 @@ Function init()
   m.authInfoReceived = false 'is the auth info returned from the registry
   m.authInfoRefreshed = true 'is the auth info refreshed after receiving a deeplink with a refresh token
   m.ageVerificationComplete = false 'has the user verified their age?
+  m.getPreferencesComplete = false 'did we finish fetching preferences. either user/device based on user logged in status.
   m.authTask = CreateObject("roSGNode", "AuthTask")
   m.authTask.observeFieldScoped("authInfo", "onStartupAuthInfoReceived")
   m.authTask.functionName = "execInitializeUserData"
@@ -193,6 +191,9 @@ Function init()
   m.trackingLoggingTask.trackEvent = {
     trackType: "startApp"
   }
+
+  ' Holds the value for user/device level settings. For ex: isVideoPreviewOn  or Selected Audio track.
+  m.preferences = createObject("roSGNode", "Preferences")
 End Function
 
 
@@ -526,6 +527,8 @@ Function startUserExperience()
       ' which is necessary to proceed past this step if m.authInfoRefreshed was set to false, but the user was already signed in.
       onAuthInfoRefreshed()
     end if
+  else if m.getPreferencesComplete <> true
+    getPreferences(startUserExperience)
   else if shouldShowAgeGate() = true AND m.ageVerificationComplete <> true
     ' check if we have age information for the user
     if isLoggedInUser() = true
@@ -612,7 +615,7 @@ End Function
 Function sendDeviceLog()
 
   deviceInfo = {
-    isVideoPreviewOn: m.isAutoplayVideoPreviewOn
+    isVideoPreviewOn: (isVideoPreviewOn() = true)
   }
   tubiLog(FormatJSON(deviceInfo), "info", "clientInfo", "device-info", 0.1) 'send info to server
 
@@ -2127,4 +2130,13 @@ Function onLowMemoryEventInfoChange(msg)
 
   ' Setting the samplePercent to 1 so that we send it always since we anyways send it only once per user.
   tubiException(eventInfo, "warn", 1)
+End Function
+
+
+Function isVideoPreviewOn()
+  if m.preferences <> invalid
+    return (isVideoPreviewEnabled() = true AND m.preferences.isVideoPreviewOn = true)
+  end if
+  
+  return false
 End Function

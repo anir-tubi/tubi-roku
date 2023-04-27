@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="Preferences" extends="Node">
+  <interface>
+    <!-- Holds the value of user preferred audio track. Sample Format: { "language": "en","role": "description" }. Where role can hold values description,main depending on if the track as audio description. -->
+    <field id="audioTrack" type="assocarray" value="{}" />
+    
+    <!-- Holds the value if video preview is allowed or not. -->
+    <field id="isVideoPreviewOn" type="boolean" value="true" />
+  </interface>
+</component>

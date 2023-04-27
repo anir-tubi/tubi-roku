@@ -32,7 +32,6 @@ Function TubiAuth(constants, request)
     getGuestUserHasAgeInfo: tubiAuth_getGuestUserHasAgeInfo
     setGuestUserHasAgeInfo: tubiAuth_setGuestUserHasAgeInfo
     deleteGuestUserHasAgeInfo: tubiAuth_deleteGuestUserHasAgeInfo
-    setEnableVideoPreview: tubiAuth_setEnableVideoPreview
     getEducationalModalEntry: tubiAuth_getEducationalModalEntry
     setEducationalModalEntry: tubiAuth_setEducationalModalEntry
     clearEducationalModalEntry: tubiAuth_clearEducationalModalEntry
@@ -117,14 +116,6 @@ Function tubiAuth_getAuthInfoNoUpdate()
   if lastName <> invalid then
     authInfo.lastName = lastName
     authInfo.delete("ln")
-  end if
-
-  if authInfo.enablevideopreview <> invalid 'convert string to boolean since authGlobal will have boolean.
-    if authInfo.enablevideopreview = "false"
-      authInfo.enablevideopreview = false
-    else
-      authInfo.enablevideopreview = true
-    end if
   end if
 
   if authInfo.expireTime <> invalid   'used as test to determine if we have any auth info in the auth registry
@@ -578,26 +569,6 @@ Function tubiAuth_clearEducationalModalEntry(key=invalid)
 End Function
 
 
-'@choice - user choice of Video preview
-'         true - show video preview
-'         false - do not show video preview
-Function tubiAuth_setEnableVideoPreview(choice)
-  if isString(choice) = true
-    if choice = "true"
-      m.setAuthInfo("enablevideopreview", "true")
-    else if choice = "false"
-      m.setAuthInfo("enablevideopreview", "false")
-    end if
-  else
-    if choice = true
-      m.setAuthInfo("enablevideopreview", "true")
-    else
-      m.setAuthInfo("enablevideopreview", "false")
-    end if
-  end if
-End Function
-
-
 'parses auth info from the server and saves it into the registry for further access
 'returns invalid or the authInfo assocArray that was successfully saved into the registry:
 'authInfo = {
@@ -789,7 +760,7 @@ Function tubiAuth_createAuthRequest(url as String, name = "" as String, options=
     if options.params = invalid
       options.params = {}
     end if
-    if options.params["user_id"] = invalid AND (url <> m.constants.urls.account.settings AND url <> m.constants.urls.account.parentalRating)
+    if options.params["user_id"] = invalid AND (url <> m.constants.urls.account.userSettings AND url <> m.constants.urls.account.parentalRating)
       options.params["user_id"] = authInfo.userId
     end if
 
@@ -1107,7 +1078,6 @@ Function tubiAuth_formatAuthInfoFromServer(serverAuthInfo)
   if serverAuthInfo.user_id <> invalid then authInfo.userId = serverAuthInfo.user_id.toStr()
   if serverAuthInfo.authType <> invalid then authInfo.authType = serverAuthInfo.authType
   if serverAuthInfo.has_age <> invalid then authInfo.hasAge = serverAuthInfo.has_age.toStr()
-  if serverAuthInfo.enable_video_preview <> invalid then authInfo.enableVideoPreview = serverAuthInfo.enable_video_preview
 
   authInfo.firstName = ""
   if serverAuthInfo.first_name <> invalid

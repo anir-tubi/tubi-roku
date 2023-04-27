@@ -1204,19 +1204,6 @@ Function tubiAuth_setAuthInfo_test()
   auth = m.auth
   auth.authRegSection = "testauth"
 
-  keyValue1 = {"enablevideopreview": "true"}
-  auth.setAuthInfo(keyValue1.keys()[0], keyValue1.enablevideopreview)
-  savedAuthInfo = RegReadAll(auth.authRegSection)
-  m.assertNotInvalid(savedAuthInfo)
-  m.assertEqual(savedAuthInfo.enablevideopreview, keyValue1.enablevideopreview)
-
-  keyValue2 = {"enablevideopreview": false}
-  auth.setAuthInfo(keyValue2.keys()[0],keyValue2.enablevideopreview )
-  savedAuthInfo = RegReadAll(auth.authRegSection)
-  m.assertNotInvalid(savedAuthInfo)
-  m.assertNotEqual(savedAuthInfo.enablevideopreview, keyValue2.enablevideopreview)
-  m.assertEqual(savedAuthInfo.enablevideopreview, "true")
-
   keyValue3 = {"userId" : "somebody"}
   auth.setAuthInfo(keyValue3.keys()[0], keyValue3.userId)
   savedAuthInfo = RegReadAll(auth.authRegSection)

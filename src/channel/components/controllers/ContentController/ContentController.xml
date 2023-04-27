@@ -71,6 +71,7 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/FIFAMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/VideoPreviewMixin.brs" />
+  <script type="text/brightscript" uri="Preferences/PreferencesHelpers.brs" />
 
   <interface>
 

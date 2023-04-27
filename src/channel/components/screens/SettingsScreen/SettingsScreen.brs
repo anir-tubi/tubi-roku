@@ -238,25 +238,19 @@ End Function
 
 Function createAutoPreviewPanel()
   videoPreviewPanel = CreateObject("roSGNode", "AutoplayPreviewPanel")
-  videoPreviewPanel.observeField("itemSelected", "onAutoplayPreviewPanelItemSelected")
-  videoPreviewPanel.observeField("componentInteractionInfo", "onAutoPlayPreviewComponentInteractionInfo")
+  videoPreviewPanel.observeFieldScoped("itemSelected", "onAutoplayPreviewPanelItemSelected")
+  videoPreviewPanel.observeFieldScoped("componentInteractionInfo", "onAutoPlayPreviewComponentInteractionInfo")
   videoPreviewPanel.width = m.rightPanelWidth
   videoPreviewPanel.focusable = true
   videoPreviewPanel.hasNextPanel = false
   videoPreviewPanel.leftOnly = false
   videoPreviewPanel.selectButtonMovesPanelForward = false
   videoPreviewPanel.offset = m.rightPanelOffset
-  if isSignedIn() = true
-    authInfo = getFieldFromGlobal("authInfo")
-      if authInfo <> invalid
-        if authInfo.enableVideoPreview = true
-          videoPreviewPanel.selectItem = 0
-        else
-          videoPreviewPanel.selectItem = 1
-        end if
-      end if
+  preferences = m.top.preferences
+  if preferences <> invalid AND preferences.isVideoPreviewOn = true    
+    videoPreviewPanel.selectItem = 0
   else
-    videoPreviewPanel.selectItem = 0 ' default if not signed in
+    videoPreviewPanel.selectItem = 1
   end if
   return videoPreviewPanel
 End Function

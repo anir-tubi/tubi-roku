@@ -10,7 +10,7 @@ Function UserDeviceApiSetup()
   m.signupUrl = m.constants.urls.account.signup
   m.deviceRegisterUrl = m.constants.urls.account.deviceRegister
   m.checkBirthdayUrl = m.constants.urls.account.checkBirthday
-  m.patchSettingsUrl = m.constants.urls.account.settings
+  m.patchSettingsUrl = m.constants.urls.account.userSettings
   m.historyUrl = m.constants.urls.lishi.viewHistory
   m.app_id = m.constants.settings.shortAppName
   m.platform = m.constants.platform
@@ -242,27 +242,6 @@ Function userDeviceApi_patchSettingsInfo_test()
   m.assertNotInvalid(body.random_setting)
   m.assertEqual(body.random_setting, true)
 
-  m.assertEqual(patchSettingsInfo.options.method, "PATCH")
-End Function
-
-
-'@Test patchAutoplayPreviewSettingInfo unit tests
-Function userDeviceApi_patchAutoplayPreviewSettingInfo_test()
-
-  patchSettingsInfo = m.userDeviceApi.patchAutoplayPreviewSettingInfo(false)
-
-  m.assertNotInvalid(patchSettingsInfo)
-
-  m.assertNotInvalid(patchSettingsInfo.url)
-  m.assertEqual(patchSettingsInfo.url, m.constants.urls.account.settings)
-
-  m.assertNotInvalid(patchSettingsInfo.options)
-  m.assertNotInvalid(patchSettingsInfo.options.body)
-  body = ParseJson(patchSettingsInfo.options.body)
-  m.assertNotInvalid(body.enable_video_preview)
-  m.assertFalse(body.enable_video_preview)
-
-  m.assertNotInvalid(patchSettingsInfo.options.headers)
   m.assertEqual(patchSettingsInfo.options.method, "PATCH")
 End Function
 
@@ -622,4 +601,70 @@ Function userDeviceApi_addHistoryReqEpisodeParentIdAsInteger_test()
   m.assertEqual(options.params.device_id, m.deviceId)
   m.assertEqual(options.params.app_id, m.app_id)
   m.assertEqual(options.params.platform, m.platform)
+End Function
+
+
+'@Test createUserSettingsReqInfo unit tests
+Function userDeviceApi_createUserSettingsReqInfo_test()
+  req = m.userDeviceApi.createUserSettingsReqInfo()
+
+  m.assertNotInvalid(req)
+  m.assertEqual(m.constants.urls.account.userSettings, req.url)
+
+  options = req.options
+  m.assertNotInvalid(options)
+
+  m.assertEqual(options.params.platform, m.platform)
+End Function
+
+
+'@Test createDeviceSettingsReqInfo unit tests
+Function userDeviceApi_createDeviceSettingsReqInfo_test()
+  req = m.userDeviceApi.createDeviceSettingsReqInfo()
+
+  m.assertNotInvalid(req)
+  m.assertEqual(m.constants.urls.account.deviceSettings, req.url)
+
+  options = req.options
+  m.assertNotInvalid(options)
+
+  m.assertEqual(options.params.platform, m.platform)
+End Function
+
+
+'@Test createPatchUserSettingsReqInfo unit tests
+Function userDeviceApi_createPatchUserSettingsReqInfo_test()
+  body = {
+    "enable_video_preview": true
+  }
+  req = m.userDeviceApi.createPatchUserSettingsReqInfo(body)
+
+  m.assertNotInvalid(req)
+  m.assertEqual(m.constants.urls.account.userSettings, req.url)
+
+  options = req.options
+  m.assertNotInvalid(options)
+  m.assertNotEmpty(options.body)
+
+  requestBody = ParseJson(options.body)
+  m.assertEqual(true, requestBody.enable_video_preview)
+End Function
+
+
+'@Test createPatchDeviceSettingsReqInfo unit tests
+Function userDeviceApi_createPatchDeviceSettingsReqInfo_test()
+  body = {
+    "enable_video_preview": true
+  }
+  req = m.userDeviceApi.createPatchDeviceSettingsReqInfo(body)
+
+  m.assertNotInvalid(req)
+  m.assertEqual(m.constants.urls.account.deviceSettings, req.url)
+
+  options = req.options
+  m.assertNotInvalid(options)
+  m.assertNotEmpty(options.body)
+
+  requestBody = ParseJson(options.body)
+  m.assertEqual(true, requestBody.enable_video_preview)
 End Function

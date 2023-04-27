@@ -7,6 +7,8 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.id = m.constants.ui.screenIds.settingsScreen
   m.settingsScreen.callingPage = sPageSource
   m.settingsScreen.uiMode = m.uiMode
+  ' Passing in the saved preferences.
+  m.settingsScreen.preferences = m.preferences
   setSettingsScreenSignInInfo()
   m.settingsScreen.actionAfterActivation = ""
   m.settingsScreen.observeFieldScoped("signOutSelected", "onSettingsSignOutSelected")
@@ -136,12 +138,11 @@ Function onAutoPreviewSettingSelected()
       userInteraction = "TOGGLE_OFF"
     end if
 
-    patchAutoplayPreviewChoice(choice)
-    setAuthInfoValue("enableVideoPreview", choice)
-    auth = TubiAuth(m.constants, m.Request)
-    auth.setEnableVideoPreview(choice) ' update the registry to mimic authGlobal.
+    savePreferences({
+      "isVideoPreviewOn": choice
+    })
+
     m.settingsScreen.autoPreviewItemUpdated = m.settingsScreen.autoPreviewSettingSelected
-    setAutoplayVideoPreviewFromGlobal()
 
     'Send ComponentInteractionEvent
 
@@ -453,48 +454,6 @@ Function showConfirmPasswordScreen()
   m.confirmPasswordScreen.observeField("backPressed", "onSettingsBackPressed")
   m.confirmPasswordScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
   pushScreen(m.confirmPasswordScreen)
-End Function
-
-
-'@choice : boolean, user's selection of autoplay preview preference.
-'          true - show video previews
-'          false - no video previews
-' PATCH user account info with their autoplay preview preference.
-Function patchAutoplayPreviewChoice(choice)
-  tubiLog("SettingScreenHelpers.patchAutoplayPreviewChoice")
-    authInfo = getFieldFromGlobal("authInfo")
-
-    if isLoggedInUser(authInfo)
-      patchSettingsInfo = m.userDeviceApi.patchAutoplayPreviewSettingInfo(choice)
-
-      m.makeRequest({
-        url: patchSettingsInfo.url
-        requestType: m.constants.reqNames.patchUserSettings
-        options: patchSettingsInfo.options
-        responseType: "assocarray"
-        silenceCallbackWarnings: true
-      })
-    end if
-End Function
-
-
-' @authInfo : AA, authInfo as stored on m.global.authInfo, optional parameter if calling function already has authInfo AA.
-' this function will set m.isAutoplayVideoPreviewOn based on user autoplay choice or auth global
-' m.isAutoplayVideoPreviewOn variable is used to avoid accessing global everytime to check user autoplay choice, everytime an item gets focus on homeScreen.
-Function setAutoplayVideoPreviewFromGlobal(authInfo = invalid)
-  tubiLog("SettingScreenHelpers.setAutoplayVideoPreviewFromGlobal")
-  bEnabled = true
-
-  if authInfo = invalid
-    authInfo = getFieldFromGlobal("authInfo")
-  end if
-
-  if isLoggedInUser(authInfo) = true AND isVideoPreviewEnabled() = true
-    if authInfo.enableVideoPreview <> invalid
-      bEnabled = authInfo.enableVideoPreview
-    end if
-  end if
-  m.isAutoplayVideoPreviewOn = bEnabled
 End Function
 
 

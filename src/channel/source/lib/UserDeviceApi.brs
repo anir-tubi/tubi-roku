@@ -12,7 +12,6 @@ Function UserDeviceApi(constants, apiUtils)
     deviceRegisterInfo: userDeviceApi_deviceRegisterInfo
     checkBirthdayInfo: userDeviceApi_checkBirthdayInfo
     patchSettingsInfo: userDeviceApi_patchSettingsInfo
-    patchAutoplayPreviewSettingInfo: userDeviceApi_patchAutoplayPreviewSettingInfo
     setContentRating: userDeviceApi_setContentRating
     magicLink: userDeviceApi_magicLink
     deleteHistory: userDeviceApi_deleteHistory
@@ -23,6 +22,12 @@ Function UserDeviceApi(constants, apiUtils)
     getQueueReqInfo: userDeviceApi_getQueueReqInfo
     getHistoryReqInfo: userDeviceApi_getHistoryReqInfo
     getAddHistoryRequestInfo: userDeviceApi_getAddHistoryRequestInfo
+
+    ' preference related methods.
+    createUserSettingsReqInfo: userDeviceApi_createUserSettingsReqInfo
+    createDeviceSettingsReqInfo: userDeviceApi_createDeviceSettingsReqInfo
+    createPatchUserSettingsReqInfo: userDeviceApi_createPatchUserSettingsReqInfo
+    createPatchDeviceSettingsReqInfo: userDeviceApi_createPatchDeviceSettingsReqInfo
   }
 
   userDeviceApi = {}
@@ -151,7 +156,7 @@ End Function
 ' @passedOptions: AA, options to be passed to TubiRequest().createAsync. The value for the "body"
 '                     key must be an AA (which will be turned into a JSON string)
 Function userDeviceApi_patchSettingsInfo(passedOptions)
-  url = m.constants.urls.account.settings
+  url = m.constants.urls.account.userSettings
 
   options = passedOptions
 
@@ -187,26 +192,6 @@ Function userDeviceApi_queryStatusOfMagicLink(uid)
   url = m.constants.urls.account.magicLink + "/" + uid
   options = m.getCommonOptions()
   options["method"] = m.constants.reqTypes.get
-  return {
-    url: url
-    options: options
-  }
-End Function
-
-
-' @choice: boolean, user selection of Video preview on/off
-'         true - video Preview on
-'         false - video preview off
-Function userDeviceApi_patchAutoplayPreviewSettingInfo(choice)
-  url = m.constants.urls.account.settings
-  options = {}
-  body = {enable_video_preview: choice}
-
-  options["body"] = FormatJson(body)
-  headers = {}
-  headers.append(m.getCommonOptions().headers)
-  options["method"] = m.constants.reqTypes.patch
-  options["headers"] = headers
   return {
     url: url
     options: options
@@ -372,5 +357,65 @@ Function userDeviceApi_getAddHistoryRequestInfo(content as Object, nowPos as Int
   return {
     url: url
     options: options
+  }
+End Function
+
+
+Function userDeviceApi_createUserSettingsReqInfo()
+  options = {
+    params: {
+      platform: m.constants.platform
+    }
+  }
+
+  return {
+    url: m.constants.urls.account.userSettings
+    options: options
+  }
+End Function
+
+
+Function userDeviceApi_createDeviceSettingsReqInfo()
+  options = {
+    params: {
+      platform: m.constants.platform
+    }
+  }
+
+  return {
+    url: m.constants.urls.account.deviceSettings
+    options: options
+  }
+End Function
+
+
+' @body: assocarray, contains a key value pair for ex: {"enable_video_preview": true}
+Function userDeviceApi_createPatchUserSettingsReqInfo(body)
+  headers = m.getCommonOptions().headers
+  options = {
+    method: m.constants.reqTypes.patch
+    body: FormatJson(body)
+    headers: headers
+  }
+
+  return {
+    url: m.constants.urls.account.userSettings
+    options: options 
+  }
+End Function
+
+
+' @body: assocarray, contains a key value pair for ex: {"enable_video_preview": true}
+Function userDeviceApi_createPatchDeviceSettingsReqInfo(body)
+  headers = m.getCommonOptions().headers
+  options = {
+    method: m.constants.reqTypes.patch
+    body: FormatJson(body)
+    headers: headers
+  }
+
+  return {
+    url: m.constants.urls.account.deviceSettings
+    options: options 
   }
 End Function

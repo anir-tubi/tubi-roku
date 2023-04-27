@@ -338,7 +338,7 @@ Function tubiBookmarks_getUserInfoReq()
   if m.isLoggedInUser(authInfo) = false
     return invalid
   end if
-  url = m.constants.urls.account.settings
+  url = m.constants.urls.account.userSettings
   options = {
     params: {
       platform: m.constants.platform
@@ -361,7 +361,6 @@ Function tubiBookmarks_handleUserInfo(userInfo)
     if parsed.enabled <> invalid then         result.enabled = parsed.enabled
     if parsed.has_password <> invalid then    result.hasPassword = parsed.has_password
     if parsed.parental_rating <> invalid then result.parentalRating = parsed.parental_rating
-    if parsed.enable_video_preview <> invalid then result.enableVideoPreview = parsed.enable_video_preview
 
     result.email = ""
     if parsed.email <> invalid

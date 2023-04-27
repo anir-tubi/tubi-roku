@@ -200,6 +200,12 @@ Function registerParsingCallbacks()
     parseSuccess: parseAddToQueueSuccess
     parseError: parseAddToQueueError
   }
+
+  ' gets the list of user/device preferences
+  m.requestTypes[m.constants.reqNames.getPreferences] = {
+    parseSuccess: parseGetPreferences
+    parseError: parseGenericError
+  }
 End Function
 
 
