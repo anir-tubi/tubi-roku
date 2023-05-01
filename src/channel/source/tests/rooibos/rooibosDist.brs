@@ -1379,12 +1379,12 @@ end function
         Name: "BaseTestSuite"
         invalidValue: "#ROIBOS#INVALID_VALUE" ' special value used in mock arguments
         ignoreValue: "#ROIBOS#IGNORE_VALUE" ' special value used in mock arguments
-        anyStringMatcher: { "matcher":  rbs_match_anyStringMatcher } 
-        anyBoolMatcher: { "matcher":  rbs_match_anyBoolMatcher } 
-        anyNumberMatcher: { "matcher":  rbs_match_anyNumberMatcher } 
-        anyAAMatcher: { "matcher":  rbs_match_anyAAMatcher } 
-        anyArrayMatcher: { "matcher":  rbs_match_anyArrayMatcher } 
-        anyNodeMatcher: { "matcher":  rbs_match_anyNodeMatcher } 
+        anyStringMatcher: { "matcher":  rbs_match_anyStringMatcher }
+        anyBoolMatcher: { "matcher":  rbs_match_anyBoolMatcher }
+        anyNumberMatcher: { "matcher":  rbs_match_anyNumberMatcher }
+        anyAAMatcher: { "matcher":  rbs_match_anyAAMatcher }
+        anyArrayMatcher: { "matcher":  rbs_match_anyArrayMatcher }
+        anyNodeMatcher: { "matcher":  rbs_match_anyNodeMatcher }
         allowNonExistingMethodsOnMocks: true
         isAutoAssertingMocks: true
         TestCases: []
@@ -1861,12 +1861,12 @@ function Rooibos__Init(preTestSetup = invalid, testUtilsDecoratorMethodName = in
   requiredRooibosPreprocessorVersion = "1.0.0"
   if not  rbs_cmn_isFunction(RBSFM_getPreprocessorVersion)
     versionError = "You are using a rooibos-preprocessor (i.e. rooibos-cli) version older than 1.0.0 - please update to " + requiredRooibosPreprocessorVersion
-  else 
+  else
     if  rooibos__versionCompare(RBSFM_getPreprocessorVersion(), requiredRooibosPreprocessorVersion) >= 0
       versionError = ""
     else
       versionError = "Your rooibos-preprocessor (i.e. rooibos-cli) version '" + RBSFM_getPreprocessorVersion() + "' is not compatible with rooibos version " + rooibosVersion + ". Please upgrade your rooibos-cli to version " + requiredRooibosPreprocessorVersion
-    end if 
+    end if
   end if
   if versionError = ""
     ? "######################################################"
@@ -1878,11 +1878,6 @@ function Rooibos__Init(preTestSetup = invalid, testUtilsDecoratorMethodName = in
     if scene.hasField("isReadyToStartTests") and scene.isReadyToStartTests = false
       ? "The scene is not ready yet - waiting for it to set isReadyToStartTests to true"
       scene.observeField("isReadyToStartTests", m.port)
-    else
-      ? "scene is ready; running tests now"
-      runner =     TestRunner(args)
-      runner.Run()
-    end if
     while(true)
       msg = wait(0, m.port)
       msgType = type(msg)
@@ -1899,6 +1894,11 @@ function Rooibos__Init(preTestSetup = invalid, testUtilsDecoratorMethodName = in
       end if
     end while
   else
+      ? "scene is ready; running tests now"
+      runner =     TestRunner(args)
+      runner.Run()
+    end if
+  else
     ? ""
     ? "#########################################################"
     ? "ERROR - VERSION MISMATCH"
@@ -1906,7 +1906,7 @@ function Rooibos__Init(preTestSetup = invalid, testUtilsDecoratorMethodName = in
     ? "#########################################################"
   end if
 end function
-function Rooibos__versionCompare(v1, v2) 
+function Rooibos__versionCompare(v1, v2)
   v1parts = v1.split(".")
   v2parts = v2.split(".")
   while v1parts.count() < v2parts.count()
@@ -1922,12 +1922,12 @@ function Rooibos__versionCompare(v1, v2)
     if (v1parts[i] <> v2parts[i])
       if (v1parts[i] > v2parts[i])
         return 1
-      else 
+      else
         return -1
       end if
     end if
   end for
-  if (v1parts.count() <> v2parts.count()) 
+  if (v1parts.count() <> v2parts.count())
     return -1
   end if
   return 0

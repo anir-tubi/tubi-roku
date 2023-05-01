@@ -83,6 +83,12 @@ Function runChannel(constants, log, request)
   if constants.settings.mode = "test"
     sgGlobal.setField("theme", constants.ui.themes.default) 'set theme for testing purposes
     if (type(Rooibos__Init) = "Function") then Rooibos__Init() 'bs:disable-line 1001 LINT1001
+
+    localHostUri = constants.settings.localHostUri
+    url = localHostUri + "/unit_tests_completed"
+    urlTransfer = createObject("roUrlTransfer")
+    urlTransfer.setUrl(url)
+    urlTransfer.getToString()
     return false
   end if
 
