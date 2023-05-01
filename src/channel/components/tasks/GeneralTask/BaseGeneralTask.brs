@@ -103,9 +103,13 @@ Function makeApiRequest(reqInfo, batchInfo = invalid) as Boolean
       options = {}
     end if
 
-    m.authInfo = m.auth.getAuthInfo()
-    if m.authInfo <> invalid AND m.authInfo.accessToken <> invalid
-      if m.constants.reqNames.acceptsTubiAuth[requestType] = true
+    if m.constants.reqNames.acceptsTubiAuth[requestType] = true
+      m.authInfo = m.auth.getAuthInfo()
+      if m.authInfo = invalid OR m.authInfo.accessToken = invalid
+        m.authInfo = m.auth.fetchAndSaveAnonymousAuthInfo()
+      end if
+      
+      if m.authInfo <> invalid AND m.authInfo.accessToken <> invalid
         headers = m.auth.getAuthHeaders(m.authInfo.accessToken)
         if headers <> invalid
           if options.headers = invalid
@@ -113,6 +117,11 @@ Function makeApiRequest(reqInfo, batchInfo = invalid) as Boolean
           end if
           options.headers.append(headers)
         end if
+      else
+        ' Since this request needs auth token and all tries to refetch token failed.
+        ' Even if we proceed it will fail. So short circuiting it.
+        ' TBD: If we throw a error or send a event to sentry.
+        return false
       end if
     end if
 
