@@ -107,32 +107,25 @@ Function onVideoPreviewStateChanged(msg)
 
   if videoPreviewState = "finished"
     if currentScreen <> invalid
-      isVideoPreviewAutoStartEnabled = getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).autostart
+      isHdmiStatusOk = m.maintask.isHdmiStatusOk
 
-      if isVideoPreviewAutoStartEnabled = true then
-        isHdmiStatusOk = m.maintask.isHdmiStatusOk
+      ' Only send exposure event if hdmi status was not ok and the user would have been effected
+      sendEvent = (isHdmiStatusOk = false)
+      if isHdmiPlaybackExperimentEnabled(sendEvent) = false then
+        isHdmiStatusOk = true
+      end if
 
-        ' Only send exposure event if hdmi status was not ok and the user would have been effected
-        sendEvent = (isHdmiStatusOk = false)
-        if isHdmiPlaybackExperimentEnabled(sendEvent) = false then
-          isHdmiStatusOk = true
-        end if
-
-        ' Don't want to continue playback if the user has their tv turned off
-        if isHdmiStatusOk = true then
-          if currentScreen.subType() = "HomeScreen"
-            showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen, invalid, "previews")
-          else if currentScreen.subType() = "DetailScreen"
-            if currentScreen.resumePoint > 0
-              resumeVideoDetailScreen(currentScreen, "previews")
-            else
-              playVideoDetailScreen(currentScreen, "previews")
-            end if
+      ' Don't want to continue playback if the user has their tv turned off
+      if isHdmiStatusOk = true then
+        if currentScreen.subType() = "HomeScreen"
+          showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen, invalid, "previews")
+        else if currentScreen.subType() = "DetailScreen"
+          if currentScreen.resumePoint > 0
+            resumeVideoDetailScreen(currentScreen, "previews")
+          else
+            playVideoDetailScreen(currentScreen, "previews")
           end if
         end if
-      else if getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled = true
-        ' updating backgroundUriList in order to change the backgroundType/gradient to topright when video preview is finished
-        currentScreen.backgroundUriList = currentScreen.backgroundUriList
       end if
     end if
   end if

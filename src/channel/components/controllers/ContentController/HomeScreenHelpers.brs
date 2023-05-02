@@ -768,14 +768,9 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
           end if
 
           if focusedContent.videoPreviewUrl <> ""
-            ' fire exposure event for video preview non-control group
-            getExperimentResource("roku_video_preview", "roku_video_preview_v2", true)
             startVideoPreview(focusedContent, "home_page")
           end if
         end if
-      else if focusedContent.videoPreviewUrl <> "" then
-        ' fire exposure event for video preview control group
-        getExperimentResource("roku_video_preview", "roku_video_preview_v2", true)
       end if
     end if
 

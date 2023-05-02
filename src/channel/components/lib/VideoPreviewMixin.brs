@@ -7,5 +7,5 @@ Function isVideoPreviewEnabled()
     return false
   end if
 
-  return getExperimentResource("roku_video_preview", "roku_video_preview_v2", false).enabled
+  return true
 End Function

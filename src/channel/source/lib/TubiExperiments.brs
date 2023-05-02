@@ -37,12 +37,6 @@ Function TubiExperiments(constants) as Object
         roku_enhanced_onboarding_v2_registration_path: {"enabled": false}
       }
 
-      ' enabled = true : after the video preview of the selected title ends, the user sees the hero image again.
-      ' autostart = true : after the video preview of the selected title ends, the user sees the title start autoplaying in full screen mode.
-      roku_video_preview: {
-        roku_video_preview_v2: {"enabled": true, "autostart": true}
-      }
-
       ' ads_configuration_ prefix is used to specify additional primary metrics.
       ads_configuration_roku_hdmi_playback: {
         roku_hdmi_playback_v3: {"enabled": true}
