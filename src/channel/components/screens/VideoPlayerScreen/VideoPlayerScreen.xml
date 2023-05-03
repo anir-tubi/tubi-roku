@@ -53,7 +53,7 @@
         -  'automatic'
         -  'deliberate'
         -->
-      <field id="playbackSource" type="string" value="unknown" />
+      <field id="playbackSource" type="assocArray" value="{}" />
 
       <!--
         -

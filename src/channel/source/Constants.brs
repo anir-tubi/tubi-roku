@@ -724,6 +724,16 @@ Function getConstants()
     constants.player.playbackSource.videoPreviews = "VIDEO_PREVIEWS"
     constants.player.playbackSource.unknown = "UNKNOWN_PLAYBACK_SOURCE"
 
+    constants.player.playbackOrigin = {}
+    constants.player.playbackOrigin.autoplay_auto = "ap_auto"
+    constants.player.playbackOrigin.autoplay_select = "ap_select"
+    constants.player.playbackOrigin.container = "container"
+    constants.player.playbackOrigin.ymal = "ymal"
+    constants.player.playbackOrigin.search = "search"
+    constants.player.playbackOrigin.deeplink = "deeplink"
+    constants.player.playbackOrigin.unknown = "unknown"
+    constants.player.playbackOrigin.epg = "epg"
+
     'video player returns one of the following
     constants.player.playerResults = {}
       constants.player.playerResults.completed = "COMPLETED"

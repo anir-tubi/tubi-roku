@@ -269,6 +269,20 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0, isSeekPastCuepoint = 
     params["user_id"] = authInfo.userId
   end if
 
+  origin =  m.constants.player.playbackOrigin.unknown
+
+  if content.adParam <> invalid
+    if content.adParam.srcForAds <> invalid
+      origin = content.adParam.srcForAds
+    end if
+
+    if isNonEmptyString(content.adParam.playbackContainer)
+      params["container_id"] = content.adParam.playbackContainer
+    end if
+  end if
+
+  params["origin"] = origin
+
   return params
 End Function
 

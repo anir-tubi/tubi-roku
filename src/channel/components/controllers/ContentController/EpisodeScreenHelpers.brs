@@ -1,20 +1,28 @@
-Function showEpisodeScreenWithNavigationTracking(content)
-  showEpisodeScreen(content, true)
+Function showEpisodeScreenWithNavigationTracking(content, playbackSource)
+  showEpisodeScreen(content, true, playbackSource )
 End Function
 
-Function showEpisodeScreenWithoutNavigationTracking(content)
-  showEpisodeScreen(content, false)
+
+Function showEpisodeScreenWithoutNavigationTracking(content, playbackSource )
+  showEpisodeScreen(content, false, playbackSource)
 End Function
 
 
 '@content: roSGNode, a series content node with seasons and episodes as children and grandchildren, respectively
 '@shouldSendAnalytics: boolean, dictates if navigate_to_page and page_load analytics are sent for the episode screen
-Function showEpisodeScreen(content, shouldSendNavigationAnalytics)
+' @playbackSource: associative Array, format : srcForAnalytic - this value is used for sending analytics;
+'                                                   valid values are "automatic", "deliberate", "unknown" or "previews"
+'                                               srcForAds - used for rainmaker request
+'                                                    valid values are "deeplink" , "ap_auto", "ap_select", "container", "ymal", "search", "epg", "unknown"
+
+'                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
+Function showEpisodeScreen(content, shouldSendNavigationAnalytics, playbackSource)
   episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
   episodesScreen.id = m.constants.ui.screenIds.episodeScreen
   episodesScreen.shouldFocusWhenPushed = m.top.fadeInContentController
   episodesScreen.content = content
   episodesScreen.updateContent = true
+  episodesScreen.playbackSource = playbackSource
   episodesScreen.observeFieldScoped("episodeSelected", "onEpisodeSelected")
   episodesScreen.observeFieldScoped("backgroundUriList", "onEpisodeBackgroundChange")
   episodesScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
@@ -76,8 +84,21 @@ Function playEpisodeIndex(episodesScreen, index)
               content_tile: m.Tracking.getAnalyticsTile(episode, col, row)
             }
           }
+          srcForAd = m.constants.player.playbackOrigin.container
+          playbackContainerId = ""
 
-          playVideoContent(content, "unknown", nowPos)
+          if episodesScreen.playbackSource <> invalid
+            srcForAd = episodesScreen.playbackSource.srcForAds
+            playbackContainerId = episodesScreen.playbackSource.playbackContainer
+          end if
+
+          playbackSource = {
+            "srcForAnalytic": m.constants.player.playbackSource.unknown
+            "srcForAds": srcForAd
+            "playbackContainer": playbackContainerId
+          }
+
+          playVideoContent(content, playbackSource, nowPos)
         end if
       end if
     end if

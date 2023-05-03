@@ -1137,7 +1137,7 @@ Function afterSignInPlayLockedLinearContent(callbackAfterSignInParams = invalid)
   tubilog("SignInHelpers.afterSignInPlayLockedLinearContent")
   popScreenAfterSignInProcess()
   if callbackAfterSignInParams <> invalid
-    playLinearVideoContent(callbackAfterSignInParams.content, callbackAfterSignInParams.bMinimized, callbackAfterSignInParams.AssociatedScreenID, callbackAfterSignInParams.bAllowTransportToAppear)
+    playLinearVideoContent(callbackAfterSignInParams.content, callbackAfterSignInParams.bMinimized, callbackAfterSignInParams.AssociatedScreenID, callbackAfterSignInParams.bAllowTransportToAppear, callbackAfterSignInParams.playbackSource )
   end if
   showHideSpinner(false)
   setContentToRefreshAllPersonalizedScreens(true)

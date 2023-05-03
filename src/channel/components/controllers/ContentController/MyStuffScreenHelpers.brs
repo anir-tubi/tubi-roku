@@ -49,7 +49,7 @@ Function showMyStuffScreen()
   if bLoadData = true
     fetchMyStuffCategoryDetails(screen)
   else
-    jumpToPreviousFocusedItem() 
+    jumpToPreviousFocusedItem()
     showHideSpinner(false)
   end if
 
@@ -58,11 +58,11 @@ Function showMyStuffScreen()
     '// If the content needs to load, then the page load event will get fired later when the content is done loading
     screenTrackingLoad(screen.trackingPageInfo, 0)
   end if
-  
+
   ' don't send page load tracking until screen details content is returned from the API
   pushScreen(screen, true, false)
 End Function
-  
+
 
 ' Get the content for the MyStuff Screen: continue watching and queue containers
 ' @param screen, roSGNode - the MyStuff Screen
@@ -73,7 +73,7 @@ Function fetchMyStuffCategoryDetails(screen)
 
   '//Set the categories of the screen. This is static so can be hardcoded
   content = CreateObject("roSGNode", "CategoryContentNode")
-    
+
   '//Add the Continue Watching container
   contentNode = CreateObject("roSGNode", "CategoryContentNode")
   contentNode.id = m.constants.ui.categoryIds.history
@@ -111,10 +111,10 @@ Function onMyStuffBatchResponse(response)
     screen.isLoading = false
     screen.content = response
     screen.contentUpdated = true
-    
+
     jumpToPreviousFocusedItem()
     showHideSpinner(false)
-  
+
     '//Report the page_load analytics
     loadTime = Int((Uptime(0) - screen.trackingLoadStartTime) * 1000) 'in ms
     currentScreen = getCurrentScreen()
@@ -145,7 +145,7 @@ Function jumpToPreviousFocusedItem()
     if rowItemFocused <> invalid
       '//try to focus on the previous focused item before the content was reloaded.
       screen.jumpToRowItemByIdAndIndex  = {
-        id: oldFocusedContentID, 
+        id: oldFocusedContentID,
         index: rowItemFocused
       }
     else
@@ -159,7 +159,7 @@ Function jumpToPreviousFocusedItem()
 End FUnction
 
 
-' Determine the valid until duration baed on the passed content's container children. 
+' Determine the valid until duration baed on the passed content's container children.
 ' The shortest duration of the containers should be chosen for the duration of the parent.
 ' @param content: node - the content node that has children with validUntil values.
 Function determineValidUntilDurationBasedOnChildren(content)
@@ -170,7 +170,7 @@ Function determineValidUntilDurationBasedOnChildren(content)
     for i = 0 to content.getChildCount() - 1
       category = content.getChild(i)
 
-      '//Find out the shortest validUntil duration to set this to the valudUntil property of the entire array of categories 
+      '//Find out the shortest validUntil duration to set this to the valudUntil property of the entire array of categories
       if shortestValidDuration = invalid
         shortestValidDuration = category.validUntil
       else if category.validUntil <> invalid
@@ -234,8 +234,13 @@ Function onMyStuffContentSelected(msg)
   content = msg.getData()
   if content.type <> m.constants.ui.contentTypes.emptyContainer
     '//NOTE: If the content type is empty, then it is most likely the user has no items in a myList row  (i.e. continue watching, myList)
-    ' and the user attempted to click on an empty row. 
+    ' and the user attempted to click on an empty row.
     ' Nothing should happen.
-    showDetailScreen(content, true)
+    playbackSource = {
+      "srcForAnalytic": m.constants.player.playbackSource.unknown
+      "srcForAds":m.constants.player.playbackOrigin.container
+      "playbackContainer": content.parentId
+    }
+    showDetailScreen(content, true, invalid, invalid, playbackSource)
   end if
 End Function

@@ -26,9 +26,18 @@ Function onSearchContentSelected(msg)
   selectedContent = msg.getData()
   'Launch the full player if it's linear contnet otherwise launch details screen
   if selectedContent <> invalid AND selectedContent.type = m.constants.ui.contentTypes.linear
-    playLinearVideoContent(selectedContent, false, searchScreen.id)
+    playbackSource = {
+      "srcForAnalytic": m.constants.player.playbackSource.unknown
+      "srcForAds":m.constants.player.playbackOrigin.search
+    }
+    playLinearVideoContent(selectedContent, false, searchScreen.id, false, playbackSource)
   else
-    showDetailScreen(searchScreen.contentSelected, true)
+    playbackSource = {
+      "srcForAnalytic": m.constants.player.playbackSource.unknown
+      "srcForAds":m.constants.player.playbackOrigin.search
+    }
+
+    showDetailScreen(searchScreen.contentSelected, true, invalid, invalid, playbackSource)
   end if
 End Function
 
@@ -37,10 +46,15 @@ Function onSearchContentToPlay(msg)
   searchScreen = msg.getRoSGNode()
   content = msg.getData()
 
+  playbackSource = {
+    "srcForAnalytic": m.constants.player.playbackSource.unknown
+    "srcForAds":m.constants.player.playbackOrigin.search
+  }
+
   if content <> invalid AND content.type = m.constants.ui.contentTypes.linear
-    playLinearVideoContent(content, false, searchScreen.id)
+    playLinearVideoContent(content, false, searchScreen.id, false, playbackSource)
   else
-    onContentToPlay(msg)
+    showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
   end if
 End Function
 

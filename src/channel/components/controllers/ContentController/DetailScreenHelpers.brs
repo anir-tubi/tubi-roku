@@ -7,8 +7,13 @@
 '                                   PlayProgressEvent analytics should be sent after fetching info from the backend.
 ' @successCb: roFunction, a callback to run upon successful fetching of single content metadata
 ' @errorCb: roFunction, a callback to run upon error while fetching of single content metadata
-' @playbackSource: string, valid values are "automatic", "deliberate", "unknown" or "previews"
-Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = invalid, errorCb = invalid, playbackSource = "unknown")
+' @playbackSource: associative Array, format : srcForAnalytic - this value is used for sending analytics;
+'                                                   valid values are "automatic", "deliberate", "unknown" or "previews"
+'                                               srcForAds - used for rainmaker request
+'                                                    valid values are "deeplink" , "ap_auto", "ap_select", "container", "ymal", "search", "epg", "unknown"
+
+'                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
+Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = invalid, errorCb = invalid, playbackSource = {"srcForAnalytic":"unknown","srcForAds":"unknown"})
   tubiLog("DetailScreenHelpers.showDetailScreen")
   if content <> invalid
     detailScreen = CreateObject("roSGNode", "DetailScreen")
@@ -36,7 +41,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.observeFieldScoped("refreshContent", "onRefreshContentSignal")
     detailScreen.observeFieldScoped("refreshRelatedContent", "onRefreshRelatedContentSignal")
     detailScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
-    detailScreen.observeFieldScoped("relatedContentToPlay", "onContentToPlay")
+    detailScreen.observeFieldScoped("relatedContentToPlay", "onRelatedContentToPlay")
     detailScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     detailScreen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelected")
     detailScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
@@ -1532,7 +1537,13 @@ Function onRelatedContentSelected(msg)
   if content <> invalid
     '//reset videoSponsorExposureId when going to a new detail screen
     m.videoSponsorExposureId = ""
-    showDetailScreen(content, true)
+
+    playbackSource = {
+      "srcForAnalytic": m.constants.player.playbackSource.unknown
+      "srcForAds": m.constants.player.playbackOrigin.ymal
+    }
+
+    showDetailScreen(content, true, invalid, invalid, playbackSource)
   end if
 End Function
 
@@ -1561,7 +1572,7 @@ Function onEpisodeList(msg)
     detailScreen.isLoading = true
     getSingleContentFromServer(detailScreen.content, onSingleContentResponseWithoutTracking, onSingleContentErrorWithoutTracking)
   else
-    showEpisodeScreenWithNavigationTracking(detailScreen.content)
+    showEpisodeScreenWithNavigationTracking(detailScreen.content, detailScreen.playbackSource)
   end if
 End Function
 
@@ -1595,7 +1606,7 @@ End Function
 
 
 Function episodesHelper(screen)
-  showEpisodeScreenWithoutNavigationTracking(screen.content)
+  showEpisodeScreenWithoutNavigationTracking(screen.content, screen.playbackSource)
 End Function
 
 
@@ -1716,13 +1727,21 @@ End Function
 Function onResume(msg)
   tubiLog("ContentController.onResume")
   detailScreen = msg.getRoSGNode()
-  resumeVideoDetailScreen(detailScreen)
+
+  if detailScreen <> invalid
+    resumeVideoDetailScreen(detailScreen, detailScreen.playbackSource)
+  end if
 End Function
 
 
 ' @detailScreen: roSGNode, detail screen node
-' @playbackSource: string, valid values are "automatic", "deliberate", "previews" or "unknown"
-Function resumeVideoDetailScreen(detailScreen, playbackSource = "unknown")
+' @playbackSource: associative Array, format : srcForAnalytic - this value is used for sending analytics;
+'                                                   valid values are "automatic", "deliberate", "unknown" or "previews"
+'                                               srcForAds - used for rainmaker request
+'                                                    valid values are "deeplink" , "ap_auto", "ap_select", "container", "ymal", "search", "epg", "unknown"
+
+'                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
+Function resumeVideoDetailScreen(detailScreen, playbackSource = {"srcForAnalytic":"unknown", "srcForAds":"unknown"})
   tubiLog("DetailScreenHelpers.resumeVideoDetailScreen")
   if detailScreen <> invalid AND isFetchingInProgress(detailScreen) <> true
     detailScreen.playbackSource = playbackSource
@@ -1746,14 +1765,20 @@ End Function
 Function onPlay(msg)
   tubiLog("DetailScreenHelpers.onPlay")
   detailScreen = msg.getRoSGNode()
-  playVideoDetailScreen(detailScreen)
+  playVideoDetailScreen(detailScreen, detailScreen.playbackSource)
 
 End Function
 
 
 ' @detailScreen: roSGNode, detail screen node
-' @playbackSource: string, valid values are "automatic", "deliberate", "previews" or "unknown"
-Function playVideoDetailScreen(detailScreen, playbackSource = "unknown")
+' @playbackSource: associative Array, format : srcForAnalytic - this value is used for sending analytics;
+'                                                   valid values are "automatic", "deliberate", "unknown" or "previews"
+'                                               srcForAds - used for rainmaker request
+'                                                    valid values are "deeplink" , "ap_auto", "ap_select", "container", "ymal", "search", "epg", "unknown"
+
+'                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
+
+Function playVideoDetailScreen(detailScreen, playbackSource = {"srcForAnalytic":"unknown","srcForAds":"unknown"})
   tubiLog("DetailScreenHelpers.playVideoDetailScreen")
   if detailScreen <> invalid AND isFetchingInProgress(detailScreen) <> true
     detailScreen.playbackSource = playbackSource
@@ -2223,4 +2248,15 @@ Function setComponentInteractionEventForReminder(screen, isReminderSet)
     type: "component_interaction"
     values: componentInteractionEvent
   }
+End Function
+
+
+Function onRelatedContentToPlay(msg)
+  content = msg.getData()
+  playbackSource = {
+    "srcForAnalytic": m.constants.player.playbackSource.unknown
+    "srcForAds":m.constants.player.playbackOrigin.ymal
+    }
+
+  showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
 End Function

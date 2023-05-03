@@ -102,6 +102,10 @@ Function init()
   m.skipCuepointsButton.observeFieldScoped("selected", "onSkipCuepointsButtonSelected")
   m.skipCuepointsButtonUpTranslation = 740
   m.skipCuepointsButtonDownTranslation = 840
+  m.top.playbackSource = {
+    "srcForAnalytic": m.constants.player.playbackSource.unknown
+    "srcForAds": m.constants.player.playbackOrigin.unknown
+  }
 
   ' Map to store the history whether cuePoints button were shown or not.
   ' skip button for each cuepoint should only be shown once per video
@@ -436,7 +440,7 @@ Function playContent()
           is_livetv: isLiveTv
           is_embedded: isEmbedded
           is_fullscreen: isFullScreen
-          playback_source: playbackSource
+          playback_source: playbackSource.srcForAnalytic
           video_player: "DEFAULT"
           video_resource_type: resourceType
           video_resource_url: m.Video.content.URL
@@ -1714,7 +1718,7 @@ Function getPlayProgressEvent(callSource = "")
     if m.top.isTrailer = true
       playProgressEvent.type = "trailer_play_progress"
     else
-      playProgressEvent.values.playback_source = m.top.playbackSource
+      playProgressEvent.values.playback_source = m.top.playbackSource.srcForAnalytic
     end if
 
     'nominal_speed will be added to the Connection message, rather than the PlayProgressEvent message,

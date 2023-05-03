@@ -721,7 +721,7 @@ End Function
 Function doesContentHaveChild(content, rowIndex, colIndex)
   result = false
 
-  if content <> invalid AND content.getChild(rowIndex) <> invalid
+  if content <> invalid AND rowIndex <> invalid AND colIndex <> invalid AND  content.getChild(rowIndex) <> invalid
     if content.getChild(rowIndex).getChild(colIndex) <> invalid
       result = true
     end if

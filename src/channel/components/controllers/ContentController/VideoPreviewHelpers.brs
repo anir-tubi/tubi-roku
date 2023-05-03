@@ -1,7 +1,7 @@
 ' gets the video player state for content passed as param
 ' @content : TubiContentNode, which has the details about the title/video
 ' returns state : string, the state of videopreview
-Function getVideoPreviewStateForThisContent(content=invalid)
+Function getVideoPreviewStateForThisContent(content = invalid)
   tubiLog("VideoPreviewHelpers.getVideoPreviewStateForThisContent")
   state = "none"
   videoPreview = m.videoPreviewPlayer
@@ -37,7 +37,7 @@ End Function
 
 ' stopVideoPreview stops the video preview
 ' @node : roSGNode, a VideoPreviewPlayer node
-Function stopVideoPreview(node=invalid)
+Function stopVideoPreview(node = invalid)
   tubiLog("VideoPreviewHelpers.stopVideoPreview")
   if node = invalid
     node = m.videoPreviewPlayer
@@ -58,7 +58,7 @@ Function stopVideoPreviewIfPlaying(node = invalid)
     node = m.videoPreviewPlayer
   end if
 
-  if node <> invalid AND node.subType() = "VideoPreviewPlayer" AND (node.state = "buffering" or node.state = "playing" ) 'this means video preview not stopped/finished for previous content, so we need to stop it
+  if node <> invalid AND node.subType() = "VideoPreviewPlayer" AND (node.state = "buffering" OR node.state = "playing") 'this means video preview not stopped/finished for previous content, so we need to stop it
     node.control = "stop"
     node.visible = false
   end if
@@ -86,7 +86,7 @@ Function onVideoPreviewStateChanged(msg)
   videoPreviewState = msg.getData()
   currentScreen = getCurrentScreen()
 
-  if videoPreviewState = "playing" or videoPreviewState = "paused"
+  if videoPreviewState = "playing" OR videoPreviewState = "paused"
     if videoPreview <> invalid
       videoPreview.visible = true
     end if
@@ -118,12 +118,25 @@ Function onVideoPreviewStateChanged(msg)
       ' Don't want to continue playback if the user has their tv turned off
       if isHdmiStatusOk = true then
         if currentScreen.subType() = "HomeScreen"
-          showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen, invalid, "previews")
+          playbackSource = {
+            "srcForAnalytic": "previews"
+            "srcForAds": m.constants.player.playbackOrigin.container
+            "playbackContainer": currentScreen.currCategoryId
+          }
+
+          showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen, invalid, playbackSource)
         else if currentScreen.subType() = "DetailScreen"
+
+          playbackSource = {
+            "srcForAnalytic": "previews"
+            "srcForAds": currentScreen.playbackSource.srcForAds
+            "playbackContainer": currentScreen.playbackSource.playbackContainer
+          }
+
           if currentScreen.resumePoint > 0
-            resumeVideoDetailScreen(currentScreen, "previews")
+            resumeVideoDetailScreen(currentScreen, playbackSource)
           else
-            playVideoDetailScreen(currentScreen, "previews")
+            playVideoDetailScreen(currentScreen, playbackSource)
           end if
         end if
       end if
@@ -136,7 +149,7 @@ End Function
 ' starts the video preview
 ' @content : TubiContentNode, it has all the required information to start the video preview
 ' @pageType : string, the type(video_page, series_detail_page, home_page) of page which is used in analytics event
-Function startVideoPreview(content, pageType="home_page")
+Function startVideoPreview(content, pageType = "home_page")
   tubiLog("VideoPreviewHelpers.startVideoPreview")
   if content <> invalid AND isVideoPreviewOn() = true
     videoPreview = m.videoPreviewPlayer

@@ -63,8 +63,6 @@
     <!-- these are not from the service but used internally for Scene Graph components -->
     <field id="episode_title" type="string" />
 
-    <!-- 3-entry array containing [channel, episode, position] -->
-    <field id="liveTVCursor" type="intarray" value="[-1,-1,-1]"/>
     <field id="liveTVChannelType" type="string" value=""/>
 
     <!-- used to deliver focus indices to EpisodeScreen RowList row item counter -->
@@ -118,6 +116,17 @@
 
     <!-- State of channel program: none, loading, partial, loaded -->
     <field id="state" type="string" value="none" />
+
+    <!-- This field is dynamically added to content before playing.
+      possible values are enum: constants.player.playbackOrigin:
+        deeplink
+        ap_auto
+        ap_select
+        container
+        ymal
+        search
+
+    <field id="adParam" type="assocArray" />-->
 
   </interface>
 </component>

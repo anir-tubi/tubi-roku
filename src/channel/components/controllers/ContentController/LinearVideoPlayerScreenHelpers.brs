@@ -6,7 +6,13 @@
 ' @bMinimized: boolean, Should the player be playing in its minimized state on the homescreen? If false, then it will be at fullscreen.
 ' @sAssociatedScreenID: String, Often times the screen right before the linear video player screen is displayed has a close association. Keep a record of the ID associated with the associated screen.
 ' @bAllowTransportToAppear: Boolean, Should the EPG Overlay appear automatically when video starts to play and goes fullscreen?
-Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID = "", bAllowTransportToAppear = false)
+' @playbackSource: associative Array, format : srcForAnalytic - this value is used for sending analytics;
+'                                                   valid values are "automatic", "deliberate", "unknown" or "previews"
+'                                               srcForAds - used for rainmaker request
+'                                                    valid values are "deeplink" , "ap_auto", "ap_select", "container", "ymal", "search", "epg", "unknown"
+'
+'                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
+Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID = "", bAllowTransportToAppear = false, playbackSource = {"srcForAnalytic": "unknown", "srcForAds": "unknown"})
   if content <> invalid
     tubiLog("LinearVideoPlayerScreenHelpers.playLinearVideoContent")
 
@@ -14,9 +20,9 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
     ' a variety of unexpected and unwanted callbacks, as the passed in content potentially exists on a number
     ' of fields that are being observed (for instance: HomeScreen.contentFocused)
     clonedContent = content.clone(true)
-    if clonedContent.needsLogin = true AND isLoggedInUser() = false  'Check for user signed In status because we do not refetch the content and so it will not pass through metadata translate process.
+    if clonedContent.needsLogin = true AND isLoggedInUser() = false 'Check for user signed In status because we do not refetch the content and so it will not pass through metadata translate process.
       if bMinimized = false
-        callbackAfterSignInParams = {"content": content, "bMinimized": false, "sAssociatedScreenID": clonedContent.associatedScreenID, "bAllowTransportToAppear": bAllowTransportToAppear}
+        callbackAfterSignInParams = {"content": content, "bMinimized": false, "sAssociatedScreenID": clonedContent.associatedScreenID, "bAllowTransportToAppear": bAllowTransportToAppear, "playbackSource": playbackSource}
         startSignIn(afterSignInPlayLockedLinearContent, callbackAfterSignInParams)
       end if
     else 'Content is not locked so just play the content
@@ -64,6 +70,12 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
       bLinearPlayerPlayingThisContent = isLinearPlayerPlayingThisContent(clonedContent)
       if bLinearPlayerPlayingThisContent = false
         videoPlayer.originalContent = content
+
+        if clonedContent.adParam = invalid
+          clonedContent.addField("adParam", "assocarray", false)
+        end if
+
+        clonedContent.adParam = playbackSource
         videoPlayer.content = clonedContent
         videoPlayer.updateContent = true
       end if
@@ -134,8 +146,8 @@ Function onLinearVideoPlayerRequestingTVGuide()
 
       '//Set EPGScreen background to ensure the epgScreen appears properly: i.e. background gradient is displayed, proper bground is displayed upon sideNav focus
       m.backgroundGroup.backgroundInfo = {
-        type : m.constants.ui.backgroundTypes.epg
-        uriList : currentScreen.content.backgrounds
+        type: m.constants.ui.backgroundTypes.epg
+        uriList: currentScreen.content.backgrounds
       }
     end if
   end if
@@ -232,7 +244,7 @@ End Function
 Function getDataForVideoPlayerTimeGrid()
   tubilog("LinearVideoPlayerScreenHelpers.getDataForVideoPlayerTimeGrid")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-  epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
+  epgChannelList = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
   if videoPlayer <> invalid
     if epgChannelList = invalid or (epgChannelList <> invalid AND shouldRefresh(epgChannelList.getChild(0)) = true) 'There is no cached contents
       if m.enteredFromDeepLink <> true
@@ -479,7 +491,7 @@ Function repositionLinearVideoPlayerToMaxState(bAnimate)
     end if
 
     clearMinimizedLinearPlayerAnimation()
-    resizeToLocation(videoPlayer, 1920, 1080, [0,0], nDuration)
+    resizeToLocation(videoPlayer, 1920, 1080, [0, 0], nDuration)
   end if
 End Function
 
@@ -706,7 +718,7 @@ Function reactToLinearVideoPlayerErrorState(error_message = "", errorCode = inva
       type: "dialog"
       values: {
         dialog_type: "PLAYER_ERROR"
-        pageOneof: m.Tracking.getAnalyticsPage("video_page", { video_id: videoId })
+        pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: videoId})
         dialog_action: "SHOW"
         dialog_sub_type: userErrorCode
       }
@@ -762,7 +774,11 @@ Function onLinearChannelSelectedFromGuide(msg)
         oldTrackingPageInfo = videoPlayer.trackingPageInfo
         trackingComponentInfo = videoPlayer.trackingComponentInfo
         stopLinearVideoContent()
-        playLinearVideoContent(channel, false, videoPlayer.associatedScreenID, videoPlayer.allowTransportToAppear)
+        playbackSource = {
+          "srcForAnalytic": m.constants.player.playbackSource.unknown
+          "srcForAds": m.constants.player.playbackOrigin.epg
+        }
+        playLinearVideoContent(channel, false, videoPlayer.associatedScreenID, videoPlayer.allowTransportToAppear, playbackSource)
         newTrackingPageInfo = videoPlayer.trackingPageInfo
         screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, trackingComponentInfo)
 
@@ -798,7 +814,11 @@ Function onRetryLinearPlayerError()
   if videoPlayer <> invalid
     content = videoPlayer.content
     stopLinearVideoContent()
-    playLinearVideoContent(content, false, videoPlayer.associatedScreenID, videoPlayer.allowTransportToAppear)
+    playbackSource = {
+      "srcForAnalytic": m.constants.player.playbackSource.unknown
+      "srcForAds": m.constants.player.playbackOrigin.epg
+    }
+    playLinearVideoContent(content, false, videoPlayer.associatedScreenID, videoPlayer.allowTransportToAppear, playbackSource)
   end if
 End Function
 
@@ -806,7 +826,7 @@ End Function
 Function handleBackToEPGScreen(content, screenId)
   if content <> invalid
     contentId = content.id
-    isContentPresent = doesEpgScreenHaveContent(contentId,screenId)
+    isContentPresent = doesEpgScreenHaveContent(contentId, screenId)
     'if Content is not present in sports, news, or entertainment screen, then go back to 'all epg' screen.
     if isContentPresent = false
       jumpToParentScreenContentByID(contentId, "", m.constants.ui.screenIds.EPGScreen)

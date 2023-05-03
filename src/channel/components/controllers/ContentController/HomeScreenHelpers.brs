@@ -734,7 +734,13 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
         '//tell player to load and play the video associated with the focused item
         m.backgroundGroup.posterVisible = true '//reset the background so it can be seen
         stopLinearVideoContent()
-        playLinearVideoContent(focusedContent, true, homeScreen.id, true)
+
+        playbackSource = {
+          "srcForAnalytic": m.constants.player.playbackSource.unknown
+          "srcForAds": m.constants.player.playbackOrigin.container
+          "playbackContainer": currentScreen.currCategoryId
+        }
+        playLinearVideoContent(focusedContent, true, homeScreen.id, true, playbackSource)
       else
         bStopCountdownTimer = false
         startCountdownTimer()
@@ -820,7 +826,12 @@ Function selectLinearContent(content)
     else
       '//If the user selects the linear content that is not yet playing, then stop the previous content (if any) and start playing the content.
       stopLinearVideoContent()
-      playLinearVideoContent(content, false, homeScreen.id, true)
+      playbackSource = {
+        "srcForAnalytic": m.constants.player.playbackSource.unknown
+        "srcForAds": m.constants.player.playbackOrigin.container
+        "playbackContainer": homeScreen.currCategoryId
+      }
+      playLinearVideoContent(content, false, homeScreen.id, true, playbackSource)
     end if
   end if
 End Function
@@ -902,14 +913,34 @@ Function onContentSelected(msg)
   else if content.type = m.constants.ui.contentTypes.seeAll
     handleSeeAllSelected(homeScreen)
   else
-    showDetailScreen(content, true)
+    playbackSource = {
+      "srcForAnalytic": m.constants.player.playbackSource.unknown
+      "srcForAds": m.constants.player.playbackOrigin.container
+      "playbackContainer": homeScreen.currCategoryId
+    }
+    showDetailScreen(content, true, invalid, invalid, playbackSource )
   end if
 End Function
 
 
 Function onContentToPlay(msg)
   content = msg.getData()
-  showDetailScreen(content, false, skipDetailScreen)
+  screen = msg.getRoSGNode()
+
+  if screen <> invalid AND screen.currCategoryId <> invalid
+    containerId = screen.currCategoryId
+  else if screen <> invalid AND screen.categoryId <> invalid 'category screen
+    containerId = screen.categoryId
+  else
+    containerId = content.parentId
+  end if
+
+  playbackSource = {
+    "srcForAnalytic": m.constants.player.playbackSource.unknown
+    "srcForAds":m.constants.player.playbackOrigin.container
+    "playbackContainer": containerId
+  }
+  showDetailScreen(content, false, skipDetailScreen, invalid,playbackSource )
 End Function
 
 

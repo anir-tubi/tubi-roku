@@ -3,12 +3,18 @@
 '
 ' Helper function for onResume and onPlay to launch content
 ' @content: TubiContentNode, the content to be played, can be a movie, episode, or trailer
-' @playbackSource: string, valid values are "automatic", "deliberate", "previews" or "unknown"
+' @playbackSource: associative Array, format : srcForAnalytic - this value is used for sending analytics;
+'                                                   valid values are "automatic", "deliberate", "unknown" or "previews"
+'                                               srcForAds - used for rainmaker request
+'                                                    valid values are "deeplink" , "ap_auto", "ap_select", "container", "ymal", "search", "epg", "unknown"
+
+'                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
+
 ' @position: integer, the position from which to start video playback
-Function playVideoContent(content, playbackSource = "unknown", position = 0)
+Function playVideoContent(content, playbackSource = {"srcForAnalytic": "unknown", "srcForAds": "unknown"}, position = 0)
   tubiLog("VideoHelpers.playVideoContent")
-  if content <> invalid and (content.needsLogin = true AND isLoggedInUser() = false)  'Check for user sign in status because we do not refetch the content and so it will not pass through metadata translate process.
-    callbackAfterSignInParams = {"content":content, "playbackSource": playbackSource, "position": position }
+  if content <> invalid and (content.needsLogin = true AND isLoggedInUser() = false) 'Check for user sign in status because we do not refetch the content and so it will not pass through metadata translate process.
+    callbackAfterSignInParams = {"content": content, "playbackSource": playbackSource, "position": position}
     startSignIn(AfterSignInPlayLockedContent, callbackAfterSignInParams)
   else
 
@@ -46,9 +52,9 @@ End Function
 ' @nowPos: integer, the position from which the video playback should be resumed
 ' @currentTrackingPageInfo: assocArray, trackingPageInfo of the screen being navigated from
 ' @trackingComponentInfo: assocArray, trackingPageInfo of the screen being navigated from
-Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrackingPageInfo, trackingComponentInfo = invalid, playbackSource="unknown")
+Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrackingPageInfo, trackingComponentInfo = invalid, playbackSource = {"srcForAnalytic": "unknown", "srcForAds": "unknown"})
   if content <> invalid and content.needsLogin = true
-    callbackAfterSignInParams = {"content":content, "nowPos": nowPos , "currentTrackingPageInfo":currentTrackingPageInfo, "trackingComponentInfo": trackingComponentInfo, "playbackSource": playbackSource }
+    callbackAfterSignInParams = {"content": content, "nowPos": nowPos, "currentTrackingPageInfo": currentTrackingPageInfo, "trackingComponentInfo": trackingComponentInfo, "playbackSource": playbackSource}
     startSignIn(AfterSignInPlayLockedContentWhileSkippingDetailScreen, callbackAfterSignInParams)
   else
     videoPlayer = setupVideoPlayer(content, playbackSource, nowPos)
@@ -73,9 +79,14 @@ End Function
 
 ' Helper function for onResume and onPlay to launch content
 ' @content: TubiContentNode, the content to be played, can be a movie, episode, or trailer
-' @playbackSource: string, valid values are "automatic", "deliberate", "previews" or "unknown"
+' @playbackSource: associative Array, format : srcForAnalytic - this value is used for sending analytics;
+'                                                   valid values are "automatic", "deliberate", "unknown" or "previews"
+'                                               srcForAds - used for rainmaker request
+'                                                    valid values are "deeplink" , "ap_auto", "ap_select", "container", "ymal", "search", "epg", "unknown"
+
+'                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
 ' @position: integer, the position from which to start video playback
-Function setupVideoPlayer(content, playbackSource = "unknown", position = 0)
+Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown", "srcForAds": "unknown"}, position = 0)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
   if videoPlayer = invalid
@@ -125,14 +136,36 @@ Function setupVideoPlayer(content, playbackSource = "unknown", position = 0)
       videoPlayer.observeFieldScoped("goToNext", "onSkipTrailer")
       videoPlayer.enableAds = false
     else
-      videoPlayer.playbackSource = m.constants.player.playbackSource.unknown
-      if playbackSource = "automatic"
-        videoPlayer.playbackSource = m.constants.player.playbackSource.autoplayAutomatic
-      else if playbackSource = "deliberate"
-        videoPlayer.playbackSource = m.constants.player.playbackSource.autoplayDeliberate
-      else if playbackSource = "previews"
-        videoPlayer.playbackSource = m.constants.player.playbackSource.videoPreviews
+      videoPlayer.playbackSource = {
+        "srcForAnalytic": m.constants.player.playbackSource.unknown
+        "srcForAds": playbackSource.srcForAds
+        "playbackContainer": playbackSource.playbackContainer
+      }
+
+      if playbackSource.srcForAnalytic = "automatic"
+        videoPlayer.playbackSource = {
+          "srcForAnalytic": m.constants.player.playbackSource.autoplayAutomatic
+          "srcForAds": m.constants.player.playbackOrigin.autoplay_auto
+        }
+      else if playbackSource.srcForAnalytic = "deliberate"
+        videoPlayer.playbackSource = {
+          "srcForAnalytic": m.constants.player.playbackSource.autoplayDeliberate
+          "srcForAds": m.constants.player.playbackOrigin.autoplay_select
+        }
+      else if playbackSource.srcForAnalytic = "previews"
+        videoPlayer.playbackSource = {
+          "srcForAnalytic": m.constants.player.playbackSource.videoPreviews
+          "srcForAds": playbackSource.srcForAds
+          "playbackContainer": playbackSource.playbackContainer
+        }
       end if
+
+      if content.adParam = invalid
+        content.addField("adParam", "assocarray", false)
+      end if
+
+      'set content origin and contaierID for rainmaker before playing. Setting it withing the content will help with rendezvous.
+      content.adParam = playbackSource
 
       ' set observers for non trailer content
       videoPlayer.observeFieldScoped("historyPosition", "onEpisodePosition")
@@ -263,7 +296,7 @@ End Function
 ' updateHistoryLocally
 '
 ' updates the history locally for signedIn user & guest user
-Function updateHistoryLocally(content as Object, position as Integer)
+Function updateHistoryLocally(content as object, position as integer)
   if position >= m.constants.player.historyFrequency
     m.Bookmarks.addHistoryLocally(content, position, m.global)
   end if
@@ -288,8 +321,18 @@ Function onGoToNext(msg)
             ' the up next content has expired, so fetch new content
             m.upNextRequest = fetchUpNextContent(videoPlayer)
           else
+            if videoPlayer.autoplayMode = "automatic"
+              srcForAd = m.constants.player.playbackOrigin.autoplay_auto
+            else
+              srcForAd = m.constants.player.playbackOrigin.autoplay_select
+            end if
             ' the up next content is good to go, so play it
-            playUpNextContent(nextContent, "unknown")
+            playbackSource = {
+              "srcForAnalytic": videoPlayer.autoplayMode
+              "srcForAds": srcForAd
+            }
+
+            playUpNextContent(nextContent, playbackSource)
           end if
         else
           returnToDetailScreenFromVideo()
@@ -305,8 +348,14 @@ End Function
 
 
 ' @nextContent: roSGNode, the content node representing the content that will be played next
-' @playbackSource: string, valid values are "automatic", "deliberate", "unknown" or "previews", refers to if the up next content was selected or is auto playing
-Function playUpNextContent(nextContent, playbackSource)
+' @playbackSource: associative Array, format : srcForAnalytic - this value is used for sending analytics;
+'                                                   valid values are "automatic", "deliberate", "unknown" or "previews"
+'                                               srcForAds - used for rainmaker request
+'                                                    valid values are "deeplink" , "ap_auto", "ap_select", "container", "ymal", "search", "epg", "unknown"
+
+'                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
+
+Function playUpNextContent(nextContent, playbackSource = {"srcForAnalytic": "unknown", "srcForAds": "unknown"})
   tubiLog("VideoHelpers.playUpNextContent")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
@@ -382,7 +431,16 @@ Function onUpNextContentToAutoplay(msg)
   if upNextContentToAutoplay <> invalid
     tubiLog("VideoHelpers.onUpNextContentToAutoplay")
     videoPlayer = msg.getRoSGNode()
-    playUpNextContent(upNextContentToAutoplay, videoPlayer.autoplayMode)
+    if videoPlayer.autoplayMode = "automatic"
+      srcForAd = m.constants.player.playbackOrigin.autoplay_auto
+    else
+      srcForAd = m.constants.player.playbackOrigin.autoplay_select
+    end if
+    playbackSource = {
+      "srcForAnalytic": videoPlayer.autoplayMode
+      "srcForAds": srcForAd
+    }
+    playUpNextContent(upNextContentToAutoplay, playbackSource)
   end if
 End Function
 
@@ -415,13 +473,32 @@ Function onVideoPlayerState(msg)
       else if videoPlayer.upNextContentToAutoplay <> invalid
         ' the video ended while the autoplay UI was still present, now autoplay the chosen video
         ' or autoplay the video that was focused when the timer expired
-        playUpNextContent(videoPlayer.upNextContentToAutoplay, videoPlayer.autoplayMode)
+        if videoPlayer.autoplayMode = "automatic"
+          srcForAd = m.constants.player.playbackOrigin.autoplay_auto
+        else
+          srcForAd = m.constants.player.playbackOrigin.autoplay_select
+        end if
+        playbackSource = {
+          "srcForAnalytic": videoPlayer.autoplayMode
+          "srcForAds": srcForAd
+        }
+
+        playUpNextContent(videoPlayer.upNextContentToAutoplay, playbackSource)
       else if videoPlayer.upNextContent <> invalid
         ' the video ended after the autoplay UI was dismissed, so autoplay the first content in
         ' the autoplay "container"
         autoplayContent = videoPlayer.upNextContent.getChild(0)
         if autoplayContent <> invalid
-          playUpNextContent(autoplayContent, videoPlayer.autoplayMode)
+          if videoPlayer.autoplayMode = "automatic"
+            srcForAd = m.constants.player.playbackOrigin.autoplay_auto
+          else
+            srcForAd = m.constants.player.playbackOrigin.autoplay_select
+          end if
+          playbackSource = {
+            "srcForAnalytic": videoPlayer.autoplayMode
+            "srcForAds": srcForAd
+          }
+          playUpNextContent(autoplayContent, playbackSource)
         else
           returnToDetailScreenFromVideo()
         end if
@@ -454,7 +531,7 @@ End Function
 '   - Deep link: exit video player movie after autoplay       : 2 - redraw detail screen with autoplayed content from video player; fetch new related items
 '   - Deep link: Exit video player series                     : 3 - redraw detail screen with existing detail content to updated resume positions; preserve related items
 '   - Deep link: Exit video player series after autoplay      : 4 - redraw detail screen with autoplayed episode metadata, but maintain series content; preserve related items
-Function returnToDetailScreenFromVideo(sendAnalyticsEvent=true)
+Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true)
   tubiLog("VideoHelpers.returnToDetailScreenFromVideo")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
@@ -681,7 +758,7 @@ Function showPlayerError(errorMessage, errorCode)
       type: "dialog"
       values: {
         dialog_type: "PLAYER_ERROR"
-        pageOneof: m.Tracking.getAnalyticsPage("video_page", { video_id: videoId })
+        pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: videoId})
         dialog_action: "SHOW"
         dialog_sub_type: userErrorCode
       }
@@ -769,7 +846,7 @@ Function initVideoTracking(videoPlayer)
         m.youboraTask = m.top.createChild("YBPluginRokuVideo")
         m.youboraTask.id = "Youbora"
         m.youboraTask.options = m.constants.thirdParty.youbora.config
-        m.global.addFields({ YouboraLogActive: m.constants.settings.youboraDebugEnabled })
+        m.global.addFields({YouboraLogActive: m.constants.settings.youboraDebugEnabled})
         m.youboraTask.control = "RUN"
       else
         'Setting m.youboraTask.taskState to "stop" triggers the youboraTask to
@@ -827,14 +904,14 @@ Function onVideoTrackingStart(msg)
     youboraConfig["content.encoding.videoCodec"] = videoPlayer.content.codec
 
     m.youboraTask.options = youboraConfig
-    m.youboraTask.event = { handler: "play" }
+    m.youboraTask.event = {handler: "play"}
   end if
 End Function
 
 
 Function videoTrackingStop()
   if m.constants.settings.youboraEnabled = true
-    m.youboraTask.event = { handler: "stop" }
+    m.youboraTask.event = {handler: "stop"}
   end if
 End Function
 
@@ -875,7 +952,7 @@ Function fetchUpNextContent(videoPlayer)
       }
     }
 
-    if videoPlayer.playbackSource = "automatic"
+    if videoPlayer.playbackSource <> invalid AND videoPlayer.playbackSource.srcForAnalytics = "automatic"
       options.params.mode = "ap"
     end if
 
@@ -908,7 +985,18 @@ Function onUpNextResponse(upNextContent)
       if m.receivedGoToNextPressed = true
         firstUpNextItem = upNextContent.getChild(0)
         if firstUpNextItem <> invalid
-          playUpNextContent(firstUpNextItem, "unknown")
+          if videoPlayer.autoplayMode = "automatic"
+            srcForAd = m.constants.player.playbackOrigin.autoplay_auto
+          else
+            srcForAd = m.constants.player.playbackOrigin.autoplay_select
+          end if
+
+          playbackSource = {
+            "srcForAnalytic": m.constants.player.playbackSource.unknown
+            "srcForAds": srcForAd
+          }
+
+          playUpNextContent(firstUpNextItem, playbackSource)
         else
           returnToDetailScreenFromVideo()
         end if
@@ -957,7 +1045,7 @@ Function constructYouboraRendition(segInfo)
       if segBitrate < 1000
         segBitrate = segBitrate.ToStr() + "bps"
       else if segBitrate < 1000000
-        segBitrate = (segBitrate/1000).ToStr() + "Kbps"
+        segBitrate = (segBitrate / 1000).ToStr() + "Kbps"
       else
         rendAux = segBitrate / 1000000.0 'Divide by mega
         rendAux = Cint(rendAux * 100) / 100.0

@@ -471,7 +471,11 @@ Function onEPGScreenOKPressed()
         'tell player to load and play the video associated with the selected item
         stopCountdownTimer() 'stop previous counter
         stopLinearVideoContent()
-        playLinearVideoContent(contentToPlay, false, currentScreen.id)
+        playbackSource = {
+          "srcForAnalytic": m.constants.player.playbackSource.unknown
+          "srcForAds": m.constants.player.playbackOrigin.epg
+          }
+        playLinearVideoContent(contentToPlay, false, currentScreen.id, false, playbackSource)
       else
         stopCountdownTimer()
         maximizeLinearPlayer(contentToPlay)
@@ -539,7 +543,13 @@ Function refreshEPGScreenVideoPlay(refreshVideoPlay, epgScreen)
       m.backgroundGroup.posterVisible = true
 
       if currentScreen <> invalid AND isAnEpgScreen(currentScreen) AND currentScreen.linearChannelToPlay <> invalid
-        playLinearVideoContent(currentScreen.linearChannelToPlay, true, currentScreen.id)
+        contentToPlay = currentScreen.linearChannelToPlay
+
+        playbackSource = {
+          "srcForAnalytic": m.constants.player.playbackSource.unknown
+          "srcForAds": m.constants.player.playbackOrigin.epg
+        }
+        playLinearVideoContent(contentToPlay, true, currentScreen.id, false, playbackSource)
       end if
     end if
   end if

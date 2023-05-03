@@ -109,7 +109,13 @@ Function onCategoryContentSelected(msg)
     m.videoSponsorExposureId = categoryContent.sponsorExp
   end if
 
-  showDetailScreen(categoryDetailsScreen.contentSelected, true)
+  playbackSource = {
+    "srcForAnalytic": m.constants.player.playbackSource.unknown
+    "srcForAds": m.constants.player.playbackOrigin.container
+    "playbackContainer": categoryContent.id
+  }
+
+  showDetailScreen(categoryDetailsScreen.contentSelected, true, invalid, invalid, playbackSource)
 End Function
 
 
