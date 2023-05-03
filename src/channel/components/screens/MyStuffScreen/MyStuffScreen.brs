@@ -24,16 +24,16 @@ Function init()
   m.AllEmptyUITitle.text = getTranslation("screenMyStuff_allEmptyUITitle")
   m.AllEmptyUISubtitle.text = getTranslation("screenMyStuff_signedOutUISubtitle")
   m.AllEmptyUISubtitle2.text = getTranslation("screenMyStuff_allEmptyUISubtitle")
-  m.AllEmptyUISubtitle2.width = 0   '//set to 0 so the boundingRect()'s dimensions are properly set
-  m.AllEmptyUISubtitle2.width = m.AllEmptyUISubtitle2.boundingRect().width 
+  m.AllEmptyUISubtitle2.width = 0 '//set to 0 so the boundingRect()'s dimensions are properly set
+  m.AllEmptyUISubtitle2.width = m.AllEmptyUISubtitle2.boundingRect().width
   m.top.screenLevel = m.constants.ui.screenLevels.myStuffScreen
   m.top.id = m.constants.ui.screenIds.myStuffScreen
-  m.isAllContentEmpty = false   '//when the content is loaded and it is discovered that all the containers are empty, then this is set to true
+  m.isAllContentEmpty = false '//when the content is loaded and it is discovered that all the containers are empty, then this is set to true
 
   m.top.handlesTransportVoiceRequests = true
 
-  m.oldCursorPosition = [-1,-1]
-  m.top.cursorPosition = [-1,-1]
+  m.oldCursorPosition = [-1, -1]
+  m.top.cursorPosition = [-1, -1]
   m.oldCategoryId = ""
   m.currCategoryId = ""
 
@@ -64,7 +64,7 @@ Function init()
 
   allEmptyUIButton = m.top.findNode("AllEmptyUIButton")
   allEmptyUIButton.title = getTranslation("menu_goHome")
-  
+
   ' Adjust the width of the guest menu if text of the button is too long for the default width. Mostly spanish text are generally longer in length.
   tempChannelMenuItem = CreateObject("roSGNode", "DetailMenuItem")
   tempChannelMenuItem.itemContent = signInOutButton
@@ -108,7 +108,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   bKidsTheme = false
 
   if theme <> invalid
@@ -125,7 +125,7 @@ Function onThemeChange(msg = invalid)
 
     bKidsTheme = (theme.id = m.constants.ui.themeIDs.kidsMode)
   end if
-  
+
   if bKidsTheme = true
     m.defaultBackgroundUri = "https://cdn.adrise.tv/image/roku_support_images/backgroundMyStuffDefault_kids.webp"
   else
@@ -153,7 +153,7 @@ Function onScreenFocusChange()
         end if
       end if
 
-      if m.RowList.content <> invalid AND shouldRefresh(m.RowList.content) = true  'cacheValidationMixin
+      if m.RowList.content <> invalid AND shouldRefresh(m.RowList.content) = true 'cacheValidationMixin
         m.top.refreshContent = true
       end if
     end if
@@ -168,7 +168,7 @@ Function onLoadingChange(msg)
   if isLoading = true
     m.RowList.visible = false
     m.InfoPanel.visible = false
-    m.RowList.content = invalid   'When not fully loaded, then the rowlist should not show any content
+    m.RowList.content = invalid 'When not fully loaded, then the rowlist should not show any content
     m.AllEmptyUI.visible = false
     m.top.backgroundUriList = [m.defaultBackgroundUri]
   end if
@@ -192,7 +192,7 @@ Function onContentUpdateChange(msg) As Void
           exit for
         end if
       end for
-      
+
       if m.isAllContentEmpty = false
         m.AllEmptyUI.visible = false
         m.RowList.visible = true
@@ -220,7 +220,7 @@ Function setRowHeights()
   'determine the height of each row in the RowList so we can set it on RowList.rowItemSize
   rowItemSize = []
   rowHeights = []
-  for i=0 to m.top.content.getChildCount()-1
+  for i = 0 to m.top.content.getChildCount() - 1
     category = m.top.content.getChild(i)
     rowHeight = 0
     rowHeightAdjustment = 0
@@ -249,7 +249,7 @@ Function setRowHeights()
   '//setting the height of the m.RowList.itemSize is superceded by the rowHeight of each row
   itemSize = [1752, 364]
   m.Rowlist.update({
-    "itemSize" : itemSize
+    "itemSize": itemSize
     "rowItemSize": rowItemSize
     "rowHeights": rowHeights
     "showRowLabel": [true]
@@ -286,7 +286,7 @@ Function onRowItemFocused(msg) as Boolean
     '//Set the Metadata
     itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
     m.top.backgroundUriList = determineBackgroundImage(itemFocused)
-    
+
     mode = m.constants.ui.infoPanelModes.item
     if category.gridItemType = m.constants.ui.gridItemTypes.emptyContainer
       emptyContentNode = CreateObject("roSGNode", "TubiContentNode")
@@ -325,9 +325,7 @@ Function onRowItemFocused(msg) as Boolean
           componentOneof: m.Tracking.getAnalyticsComponent("mystuff_component", myStuffComponentInfo)
           means_of_navigation: "BUTTON" 'MeansOfNavigation enum
           vertical_location: newAnalyticsRow
-          vertical_location_mode: "INDEX" 'LocationMode enum
           horizontal_location: newAnalyticsCol
-          horizontal_location_mode: "INDEX" 'LocationMode enum
         }
 
       end if
@@ -434,7 +432,7 @@ Function setSignUpButtonSelectedIndicator()
   sendButtonComponentAnalytics("SIGNUP_TO_SAVE_PROGRESS")
   '//communicate that the user is asking to start the sign in process
   m.top.signUpButtonSelected = true
-End Function 
+End Function
 
 
 Function setAllEmptyMenuItemSelectedIndicator()
@@ -444,7 +442,7 @@ Function setAllEmptyMenuItemSelectedIndicator()
 End Function
 
 
-' Set the componentInteractionInfo so the analytics of the button press is sent 
+' Set the componentInteractionInfo so the analytics of the button press is sent
 ' @sButtonValue: string, The 'section value' of the button to send to the analytics
 Function sendButtonComponentAnalytics(sButtonValue)
   'send analytics that signin button was pressed
@@ -469,7 +467,7 @@ Function handleItemSelected(selectedPosition)
     category = m.RowList.content.getChild(selectedPosition[0])
     if category.gridItemType <> m.constants.ui.gridItemTypes.emptyContainer
       '//don't do anything if the empty container is selected
-      
+
       m.top.trackingComponentInfo = getTrackingComponentInfoOfRowList(itemSelected, selectedPosition)
       if itemSelected <> invalid
         m.top.contentSelected = itemSelected
@@ -577,7 +575,7 @@ End Function
 
 ' returns true if action was taken based on the "play" input and false if no action taken
 Function handlePlayInput()
-  if m.top.isLoading <> true and m.top.signedIn = true
+  if m.top.isLoading <> true AND m.top.signedIn = true
     itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
     positionFocused = m.top.cursorPosition
     category = m.RowList.content.getChild(positionFocused[0])
@@ -625,7 +623,7 @@ Function onJumpToRowItemChange(msg)
   tubiLog("MyStuffScreen.onJumpToRowItemChange")
   rowItemToSetFocus = msg.getData()
   if m.RowList.content <> invalid AND rowItemToSetFocus <> invalid AND (isNonEmptyString(rowItemToSetFocus.id) = true OR isNonEmptyArray(rowItemToSetFocus.index) = true)
-    itemIndex = [0,0]
+    itemIndex = [0, 0]
     if isNonEmptyArray(rowItemToSetFocus.index) = true
       itemIndex = rowItemToSetFocus.index
     end if
@@ -680,9 +678,9 @@ Function onResetChange(msg)
   tubiLog("MyStuffScreen.onResetChange")
   bReset = msg.getData()
   if bReset = true
-    m.top.contentFocused  = invalid
-    m.oldCursorPosition = [-1,-1]
-    m.top.cursorPosition = [-1,-1]
+    m.top.contentFocused = invalid
+    m.oldCursorPosition = [-1, -1]
+    m.top.cursorPosition = [-1, -1]
     m.RowList.jumpToRowItem = [0, 0]
   end if
 End Function
@@ -694,10 +692,10 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       '//ensure this keypress is captured so the default Roku positive audio sound is played.
       return true
     else if key = "play" AND m.RowList.isInFocusChain() = true
-        if handlePlayInput() = true
-          return true
-        end if
+      if handlePlayInput() = true
+        return true
+      end if
     end if
   end if
   return false
-End function
+End Function

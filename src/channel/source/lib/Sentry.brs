@@ -105,7 +105,7 @@ Function initSentry(dsn, attributes = invalid, context = invalid)
   else
     dsn = sentry_parseDsn("")
   end if
-  print "Sentry client initialized with DSN: "; dsn
+ ' print "Sentry client initialized with DSN: "; dsn
 
   return {
     ' public

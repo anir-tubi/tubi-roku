@@ -139,12 +139,12 @@ Function setTextForVoiceHint()
   m.microphone.uri = "pkg:/images/microphone.png"
   m.microphone.width = "36"
   m.microphone.height = "36"
-  m.microphone.translation = [0,0]
+  m.microphone.translation = [0, 0]
   m.voiceHint = m.microphone.createChild("Label")
   m.voiceHint.text = getTranslation("search_voice_hint")
-  m.voiceHint.translation = [m.microphone.translation[0]+ 60, m.microphone.translation[1] - 5]
+  m.voiceHint.translation = [m.microphone.translation[0] + 60, m.microphone.translation[1] - 5]
   m.voiceHint.numLines = 2
-  m.voiceHint.wrap  = true
+  m.voiceHint.wrap = true
   m.voiceHint.width = 400
   m.voiceHintfont.size = 21
   m.voiceHint.font = m.voiceHintfont
@@ -312,7 +312,7 @@ Function onSearchDebounce()
     }
   }
 
-End function
+End Function
 
 
 ''''''''''''''''''''''''''
@@ -328,7 +328,7 @@ Function onKeyboardTextChanged()
   m.ResultGrid.visible = false
   m.NoResultsMessage.visible = false
 
-  m.SearchText.text =  ""
+  m.SearchText.text = ""
   m.searchHintText.text = ""
   m.KidsModeMessage.text = ""
   m.searchMenuText.text = LCase(m.Keyboard.text)
@@ -390,7 +390,7 @@ Function onItemFocused()
         roundGroupInfo: focusedContent.roundGroupInfo
       }
 
-      m.searchScreenInfoPanel.needsLogin =  focusedContent.needsLogin AND (m.top.signedIn <> true)
+      m.searchScreenInfoPanel.needsLogin = focusedContent.needsLogin AND (m.top.signedIn <> true)
     else
       m.searchScreenInfoPanel.mode = m.constants.ui.infoPanelModes.item
       lineOneData = {
@@ -431,9 +431,7 @@ Function onItemFocused()
         navigateWithinPageInfo = {
           pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
           componentOneof: m.Tracking.getAnalyticsComponent(m.oldSearchComponent.componentType, m.oldSearchComponent.componentValues)
-          means_of_navigation: "BUTTON"  'MeansOfNavigation enum
-          vertical_location_mode: "INDEX"  'LocationMode enum
-          horizontal_location_mode: "INDEX"  'LocationMode enum
+          means_of_navigation: "BUTTON" 'MeansOfNavigation enum
         }
 
         if searchComponent.componentValues <> invalid AND searchComponent.componentValues.content_tile <> invalid
@@ -488,7 +486,7 @@ End Function
 '''''''''''''''''''''''
 ' onKeyEvent
 '
-Function onKeyEvent(key As String, press As Boolean) As Boolean
+Function onKeyEvent(key As string, press As boolean) As boolean
   tubiLog("SearchScreen.onKeyEvent")
   if press then
     ' Only focus on content grid if animation is not in process, and if there is actually content there
@@ -513,7 +511,7 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
       '//jump to left most visible thumbnail in the grid
       nFocused = m.ResultGrid.itemFocused
       nColumns = m.ResultGrid.numColumns
-      nJumpTo = Int(nFocused/nColumns) * nColumns
+      nJumpTo = Int(nFocused / nColumns) * nColumns
 
       m.ResultGrid.jumpToItem = nJumpTo
       handleInfoPanelVisibilityForLeftPress()
@@ -596,7 +594,7 @@ End Function
 
 Function handleInfoPanelVisibilityForLeftPress()
   m.top.backgroundUriList = [m.defaultHeroUri]
-  if m.searchMenuText.text <> "" AND m.searchMenuText.text <>  m.searchTitleText
+  if m.searchMenuText.text <> "" AND m.searchMenuText.text <> m.searchTitleText
     m.searchScreenInfoPanel.visible = false
   else
     m.searchScreenInfoPanel.visible = false

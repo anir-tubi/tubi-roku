@@ -111,7 +111,7 @@ Function onScreenFocusChange()
       if m.top.content.getChildCount() > 0
         m.VideoGrid.setFocus(true)
       end if
-      if shouldRefresh(m.top.content) = true  'cacheValidationMixin
+      if shouldRefresh(m.top.content) = true 'cacheValidationMixin
         m.top.categoryBatchIndex = 0
       end if
     end if
@@ -211,11 +211,9 @@ Function onItemFocused()
         m.top.navigateWithinPageInfo = {
           pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
           componentOneof: m.Tracking.getAnalyticsComponent("category_component", m.oldCategoryComponent)
-          means_of_navigation: "BUTTON"  'MeansOfNavigation enum
+          means_of_navigation: "BUTTON" 'MeansOfNavigation enum
           vertical_location: row '1 based index
-          vertical_location_mode: "INDEX"  'LocationMode enum
           horizontal_location: col
-          horizontal_location_mode: "INDEX"  'LocationMode enum
         }
 
         m.oldCategoryComponent = getTrackingComponentInfo(item, numColumns, category, m.Tracking)
@@ -230,7 +228,7 @@ Function onItemFocused()
 
         if row > rowForNextCall
           if getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", true).enabled = true
-            m.top.categoryBatchIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize +  m.top.categoryBatchIndex
+            m.top.categoryBatchIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize + m.top.categoryBatchIndex
             m.lowerRowIndex = m.upperRowIndex + 1
             m.upperRowIndex = m.upperRowIndex + m.numRowsInBatch
           end if
@@ -366,7 +364,7 @@ Function onKeyEvent(key, press) as Boolean
     if key = "back"
       authInfo = m.global.authInfo
       ' show SignInRequired modal when guest user presses back from ActivationCodeScreen to CategoryDetailsScreen
-      if authInfo = invalid or (authInfo <> invalid AND authInfo.userId = invalid)
+      if authInfo = invalid OR (authInfo <> invalid AND authInfo.userId = invalid)
         m.top.signInRequired = true
         handled = true
       end if

@@ -2,7 +2,7 @@ Function init()
   m.constants = getConstantsFromGlobal()
   Request = TubiRequest(m.constants.settings)
   '//This var is used to know when to send tracking info. Do not send tracking info when lastFocused row and currentFocusedRow are equal
-  m.lastItemFocused = [0,0]
+  m.lastItemFocused = [0, 0]
 
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
@@ -104,12 +104,10 @@ Function onProgramGridContentFocused(msg)
 
     navigateWithinPageInfo = {
       pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
-      componentOneof: m.Tracking.getAnalyticsComponent("epg_component",  {content_tile: contentTile})
+      componentOneof: m.Tracking.getAnalyticsComponent("epg_component", {content_tile: contentTile})
       means_of_navigation: "BUTTON"
       vertical_location: row
-      vertical_location_mode: "INDEX"  'LocationMode enum
       horizontal_location: col
-      horizontal_location_mode: "INDEX"  'LocationMode enum
     }
     m.top.navigateWithinPageInfo = navigateWithinPageInfo
 
@@ -117,18 +115,20 @@ Function onProgramGridContentFocused(msg)
 
   if itemPosition <> invalid AND itemPosition.count() = 2
     channel = channelItem.content.getChild(itemPosition[0])
-    if m.playOnFocusMode = true or m.top.linearChannelToPlay = invalid 'anytime linearChannelToPlay is invalid, assign focused channel to play?
+
+    if m.playOnFocusMode = true OR m.top.linearChannelToPlay = invalid 'anytime linearChannelToPlay is invalid, assign focused channel to play?
       if channel <> invalid AND channel.videoResources <> invalid
         m.top.linearChannelToPlay = channel
         m.top.linearChannelToPlayUpdated = true
       end if
     end if
+
     if channel <> invalid AND channel.getChildCount() > 0
       program = channel.getChild(itemPosition[1])
       m.top.linearChannelFocused = program
       m.top.linearChannelFocusedUpdated = true
       if m.playOnFocusMode <> true
-        if isProgramLive(program) = true or program.startTime = 0 or program.endTime = 0
+        if isProgramLive(program) = true OR program.startTime = 0 OR program.endTime = 0
           fade(m.backToLive, "out", 0.1, 0, 0)
         else
           fade(m.backToLive, "in", 0.1, 0, 1)
@@ -221,7 +221,7 @@ Function onJumpToLinearChannelID()
     for i = 0 to m.programGrid.content.getchildCount() - 1
       item = m.programGrid.content.getchild(i)
       if item.id = m.top.jumpToLinearChannelID[0]
-        m.programGrid.jumpToRowItem = [i , 0]
+        m.programGrid.jumpToRowItem = [i, 0]
         m.programGrid.itemFocused = i
         if item <> invalid AND item.getChildCount() > 0
           program = item.getChild(0)
@@ -293,7 +293,7 @@ End Function
 Function onOkPressed()
   tubiLog("ProgramGrid.onOkPressed")
   if m.top.linearChannelFocused <> invalid AND isProgramLive(m.top.linearChannelFocused)
-   itemPosition =  m.programGrid.rowItemFocused
+    itemPosition = m.programGrid.rowItemFocused
     m.top.linearChannelToPlay = m.top.linearChannelFocused.getParent()
     m.top.linearChannelToPlayUpdated = true
     m.top.okPressed = true
@@ -344,7 +344,7 @@ Function setComponentInteractionEventForLiveAndFuturePrograms(content, rowNum, c
   end if
   componentInteractionInfo = {
     pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
-    componentOneof: m.Tracking.getAnalyticsComponent("epg_component",  componentValues)
+    componentOneof: m.Tracking.getAnalyticsComponent("epg_component", componentValues)
     user_interaction: "CONFIRM"
   }
 
@@ -363,7 +363,7 @@ Function doesSendEvent(lastItemFocused, rowItemFocused)
       isEqual = false
     'this will avoid the duplicate events when up/down navigation, as the item
     'jumped to [currentRowFocused, 0] and then jump to the correct item.
-    else if rowItemFocused[1] = 0 AND rowItemFocused[0] = lastItemFocused[0] AND (m.programGrid.kepPressed = "up" or m.programGrid.kepPressed = "down")
+    else if rowItemFocused[1] = 0 AND rowItemFocused[0] = lastItemFocused[0] AND (m.programGrid.kepPressed = "up" OR m.programGrid.kepPressed = "down")
       isEqual = false
     end if
   end if

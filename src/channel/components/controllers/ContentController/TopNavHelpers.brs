@@ -37,15 +37,15 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
     if screen.trackingPageInfo <> invalid
       '//Dispatch a selection component_interaction analytic event when a top nav item is selected
       navComponent = {
-        top_nav_section : m.Tracking.sideNavPageMap[topNavItem.id]
+        top_nav_section: m.Tracking.sideNavPageMap[topNavItem.id]
       }
       pageOneof = m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pagetype, screen.trackingPageInfo.pageValues)
       event = {
-        type : "component_interaction"
-        values : {
-          pageOneof : pageOneof
-          componentOneof : m.Tracking.getAnalyticsComponent("top_nav_component", navComponent)
-          user_interaction : "CONFIRM"
+        type: "component_interaction"
+        values: {
+          pageOneof: pageOneof
+          componentOneof: m.Tracking.getAnalyticsComponent("top_nav_component", navComponent)
+          user_interaction: "CONFIRM"
         }
       }
       m.trackingLoggingTask.trackEvent = event
@@ -139,15 +139,15 @@ Function onScreenTopNavToggled(msg)
 
   focusedNavId = m.constants.ui.screenIdToSideNavId[screen.id]
   navComponent = {
-    top_nav_section : m.Tracking.sideNavPageMap[focusedNavId]
+    top_nav_section: m.Tracking.sideNavPageMap[focusedNavId]
   }
 
   event = {
-    type : "component_interaction"
-    values : {
-      pageOneof : m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pagetype, screen.trackingPageInfo.pageValues)
-      componentOneof : m.Tracking.getAnalyticsComponent("top_nav_component", navComponent)
-      user_interaction : user_interaction
+    type: "component_interaction"
+    values: {
+      pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pagetype, screen.trackingPageInfo.pageValues)
+      componentOneof: m.Tracking.getAnalyticsComponent("top_nav_component", navComponent)
+      user_interaction: user_interaction
     }
   }
   m.trackingLoggingTask.trackEvent = event
@@ -192,19 +192,17 @@ Function sendTopNavToSideNavNavigationEvent(screen, sideNav)
     m.top.navigateWithinPageInfo = {
       pageOneof: pageOneof
       componentOneof: m.Tracking.getAnalyticsComponent("top_nav_component", component)
-      means_of_navigation: "BUTTON"  'MeansOfNavigation enum
+      means_of_navigation: "BUTTON" 'MeansOfNavigation enum
       dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_left_side_nav_component", destComponent)
-      vertical_location: row  '//The row location of the top nav
-      vertical_location_mode: "INDEX"  'LocationMode enum
-      horizontal_location: col  '//The column location of the top nav
-      horizontal_location_mode: "INDEX"  'LocationMode enum
+      vertical_location: row '//The row location of the top nav
+      horizontal_location: col '//The column location of the top nav
     }
   end if
 End Function
 
 
 Function refreshAllHomeScreenTopNav()
-' Refresh all home screens so their top navs are properly being displayed
+  ' Refresh all home screens so their top navs are properly being displayed
   for i = 0 to m.screenStack.getChildCount() - 1
     screen = m.screenStack.getChild(i)
     if screen.subType() = "HomeScreen"

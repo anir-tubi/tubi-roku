@@ -195,9 +195,7 @@ Function onItemFocused()
         componentOneof: m.Tracking.getAnalyticsComponent("category_component", m.oldCategoryComponent)
         means_of_navigation: "BUTTON"  'MeansOfNavigation enum
         vertical_location: row '1 based index
-        vertical_location_mode: "INDEX"  'LocationMode enum
         horizontal_location: col
-        horizontal_location_mode: "INDEX"  'LocationMode enum
       }
 
       ' category component is used even though this is not an actual category, it can be modeled as a category

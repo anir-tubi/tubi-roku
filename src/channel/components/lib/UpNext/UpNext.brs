@@ -49,13 +49,13 @@ Function init()
   if theme <> invalid
     focusBox.blendColor = theme.focusedColor
     m.GridSeries.focusBitmapBlendColor = theme.focusedColor
-    m.CountdownMovie.color =  theme.highlightedTextColor
-    m.CountdownSeries.color =  theme.highlightedTextColor
+    m.CountdownMovie.color = theme.highlightedTextColor
+    m.CountdownSeries.color = theme.highlightedTextColor
   end if
 
   focusBox.width = 210 + focusBoxMargin * 2
   focusBox.height = 300 + focusBoxMargin * 2
-  focusBox.translation= [85 - focusBoxMargin, 688 - focusBoxMargin]
+  focusBox.translation = [85 - focusBoxMargin, 688 - focusBoxMargin]
 
 
   targetSet = CreateObject("roSGNode", "TargetSet")
@@ -191,7 +191,7 @@ Function onCommand(msg)
   tubiLog("UpNext.onCommand")
   command = msg.getData()
 
-  if command = "ok" or command = "play"
+  if command = "ok" OR command = "play"
     if m.MovieGroup.isInFocusChain() = true
       handleMovieItemSelected(m.GridMovie.itemFocused)
     else if m.SeriesGroup.isInFocusChain() = true
@@ -204,9 +204,9 @@ End Function
 Function onMovieItemFocused()
   tubiLog("UpNext.onMovieItemFocused")
   itemFocused = m.GridMovie.itemFocused
-  col = itemFocused + 1  '1 based index
+  col = itemFocused + 1 '1 based index
   row = 1
-  itemFocusedHelper(m.GridMovie, m.InfoMovie)  'updates m.top.contentFocused
+  itemFocusedHelper(m.GridMovie, m.InfoMovie) 'updates m.top.contentFocused
 
   'Set the navigateWithinPageInfo value which will pass through to ContentController via videoHelpers.brs
   'to fire a navigate_within_page analytics event.
@@ -214,11 +214,9 @@ Function onMovieItemFocused()
     m.top.navigateWithinPageInfo = {
       pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: m.top.videoId.toInt()})
       componentOneof: m.Tracking.getAnalyticsComponent("auto_play_component", m.oldAutoPlayComponent)
-      means_of_navigation: "BUTTON"  'MeansOfNavigation enum
+      means_of_navigation: "BUTTON" 'MeansOfNavigation enum
       vertical_location: row
-      vertical_location_mode: "INDEX"  'LocationMode enum
       horizontal_location: col
-      horizontal_location_mode: "INDEX"  'LocationMode enum
     }
 
     contentTile = m.Tracking.getAnalyticsTile(m.top.contentFocused, col, row)

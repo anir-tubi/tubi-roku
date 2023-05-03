@@ -280,7 +280,7 @@ Function onLoadingChange()
     populateInfoPanel(m.constants.ui.infoPanelModes.item, emptyContentNode) 'empties the info panel
     m.CategoryGridList.content = invalid ' should be all categories with initial amounts of content in them
   else
-      m.CategoryGridList.content = m.top.content ' should be all categories with initial amounts of content in them
+    m.CategoryGridList.content = m.top.content ' should be all categories with initial amounts of content in them
   end if
 End Function
 
@@ -604,7 +604,7 @@ End Function
 '   So if a gridType already adjusted the rowList's position, then adjust it more but relative to where it already had been adjusted.
 ' @rowPercent: float, the percentage that the Sponsorship row is focused
 Function expandContentAreaForSponsorship(rowPercent)
-  m.ContentArea.translation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - (m.sponsorSlideAmt  * rowPercent)]
+  m.ContentArea.translation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - (m.sponsorSlideAmt * rowPercent)]
   m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.ContentArea.maskOffset[1] + (m.sponsorMaskOffsetDiff * rowPercent)]
 End Function
 
@@ -653,7 +653,7 @@ End Function
 Function onFireExposureEvent(msg)
   categoryGridList = msg.getRoSGNode()
   fireExposureEventForSeeAll(categoryGridList)
-End function
+End Function
 
 
 ' //REMOVE fireExposureEventForSeeAll function and its reference once the roku_see_all_container experiment is graduated
@@ -678,15 +678,15 @@ Function fireExposureEventForSeeAll(categoryGridList = invalid)
           getExperimentResource("roku_see_all_container", m.experimentName, true)
           m.wasExposureEventForSeeAllFired = true
         else if m.experimentName = "roku_see_all_container_seventeen_v1" OR m.experimentName = "qa.roku_see_all_container_seventeen_v1"
-           if colIndex >= 15 ' at this point the SeeAll tile will be visible to user, so firing exposure event
-             getExperimentResource("roku_see_all_container", m.experimentName, true)
-             m.wasExposureEventForSeeAllFired = true
-           end if
+          if colIndex >= 15 ' at this point the SeeAll tile will be visible to user, so firing exposure event
+            getExperimentResource("roku_see_all_container", m.experimentName, true)
+            m.wasExposureEventForSeeAllFired = true
+          end if
         end if
 
       end if
 
-      if m.wasExposureEventForSeeAllFired = false AND doesContentHaveChild(content, rowIndex+1, 0) = true AND content.getChild(rowIndex+1).getChildCount() >= 24 AND isContentMovieOrSeriesOrSeeAll(content.getChild(rowIndex+1).getChild(0)) = true
+      if m.wasExposureEventForSeeAllFired = false AND doesContentHaveChild(content, rowIndex + 1, 0) = true AND content.getChild(rowIndex + 1).getChildCount() >= 24 AND isContentMovieOrSeriesOrSeeAll(content.getChild(rowIndex + 1).getChild(0)) = true
         if m.experimentName = "roku_see_all_container_first_v1" OR m.experimentName = "qa.roku_see_all_container_first_v1"
           getExperimentResource("roku_see_all_container", m.experimentName, true)
           m.wasExposureEventForSeeAllFired = true
@@ -750,7 +750,7 @@ Function onGridFocusChange() as void
   end if
 
   '//if the screen is loading or if the grid is not in focus or the topnav is not in focus, then exit out of this function
-  if not (m.TopNav.isInFocusChain() = true or m.CategoryGridList.isInFocusChain() = true) or m.top.isLoading = true
+  if not (m.TopNav.isInFocusChain() = true OR m.CategoryGridList.isInFocusChain() = true) OR m.top.isLoading = true
     return
   end if
   oldFocusedContent = m.CategoryGridList.oldItemFocused
@@ -777,7 +777,7 @@ Function onGridFocusChange() as void
   newAnalyticsCol = m.CategoryGridList.cursorPosition[1] + 1
 
   if m.gridHasGainedInitialFocus = true AND oldAnalyticsRow > 0 AND oldAnalyticsCol > 0
-    if oldAnalyticsRow <> newAnalyticsRow or oldAnalyticsCol <> newAnalyticsCol
+    if oldAnalyticsRow <> newAnalyticsRow OR oldAnalyticsCol <> newAnalyticsCol
 
       categoryComponentInfo = {}
       categoryComponentInfo["category_slug"] = m.CategoryGridList.oldCategoryId
@@ -792,9 +792,7 @@ Function onGridFocusChange() as void
         componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo)
         means_of_navigation: "BUTTON" 'MeansOfNavigation enum
         vertical_location: newAnalyticsRow
-        vertical_location_mode: "INDEX" 'LocationMode enum
         horizontal_location: newAnalyticsCol
-        horizontal_location_mode: "INDEX" 'LocationMode enum
       }
     end if
   end if
@@ -1132,7 +1130,7 @@ Function onKeyEvent(key, press) as boolean
         end if
       end if
     else
-      if key = "left" or key = "back"
+      if key = "left" OR key = "back"
         ' This is required because the homescreens without topNav will keep playing video Preview when focus is out of
         ' screen
         if isVideoPreviewEnabled() = true

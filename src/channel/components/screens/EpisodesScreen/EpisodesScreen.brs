@@ -69,11 +69,9 @@ Function onSeasonChangeMenu()
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(seriesDetailPage.type, seriesDetailPage.values)
         componentOneof: m.Tracking.getAnalyticsComponent("seasons_component", {}) 'seasons_component doesn't exist in protos
-        means_of_navigation: "BUTTON"  'MeansOfNavigation enum
-        vertical_location: m.Menu.itemFocused + 1  '1 based index
-        vertical_location_mode: "INDEX"  'LocationMode enum
+        means_of_navigation: "BUTTON" 'MeansOfNavigation enum
+        vertical_location: m.Menu.itemFocused + 1 '1 based index
         horizontal_location: 1
-        horizontal_location_mode: "INDEX"  'LocationMode enum
       }
     end if
   end if
@@ -133,7 +131,7 @@ Function onEpisodeFocused()
 
     ' trigger navigate_within_page events in ContentController
     rowItem = m.RowList.rowItemFocused
-    if m.gridIsFocused = true AND (rowItem[0] <> m.oldRowItemFocused[0] or rowItem[1] <> m.oldRowItemFocused[1])
+    if m.gridIsFocused = true AND (rowItem[0] <> m.oldRowItemFocused[0] OR rowItem[1] <> m.oldRowItemFocused[1])
       row = m.RowList.rowItemFocused[0] + 1
       col = m.RowList.rowItemFocused[1] + 1
 
@@ -152,11 +150,9 @@ Function onEpisodeFocused()
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(seriesDetailPage.type, seriesDetailPage.values)
         componentOneof: m.Tracking.getAnalyticsComponent("episode_video_list_component", episodeListComponent)
-        means_of_navigation: "BUTTON"  'MeansOfNavigation enum
-        vertical_location: row  '1 based index
-        vertical_location_mode: "INDEX"  'LocationMode enum
+        means_of_navigation: "BUTTON" 'MeansOfNavigation enum
+        vertical_location: row '1 based index
         horizontal_location: col
-        horizontal_location_mode: "INDEX"  'LocationMode enum
       }
     end if
 
@@ -216,7 +212,7 @@ End Function
 
 Function setSeasonInfo(season As Integer)
   ' Display the series description when the season is being selected
-  seasonContent = m.top.content.getChild(season)   ' season
+  seasonContent = m.top.content.getChild(season) ' season
   m.Info.title = seasonContent.title
   m.Info.seasonEpisodeCount = seasonContent.getChildCount()
   m.Info.description = m.top.content.description ' series description
@@ -279,7 +275,7 @@ Function onTransportVoiceRequest(msg)
 
   response = "unhandled"
   if m.RowList.isInFocusChain()
-    if command = "play" or command = "ok"
+    if command = "play" OR command = "ok"
       handleEpisodeSelected(m.Rowlist.rowItemFocused)
       response = "success"
     end if

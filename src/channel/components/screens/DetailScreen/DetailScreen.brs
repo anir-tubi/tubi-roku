@@ -163,7 +163,7 @@ Function onStringChange(message)
   sButtonStringId = message.GetField()
   sButtonText = message.GetData()
   changeButtonText(sButtonStringId, sButtonText)
-End function
+End Function
 
 
 Function changeButtonText(sButtonStringId, sButtonText)
@@ -483,7 +483,7 @@ Function onAvailabilityTypeChange()
   menuItems = []
   isTournamentTime = tournamentTimeFrame()
   signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
-  likeDisLikeIndex =  m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
+  likeDisLikeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
 
   if UCase(availabilityType) = UCase(m.constants.ui.contentTimings.replay)
     if likeDisLikeIndex <> invalid
@@ -759,12 +759,10 @@ Function onMenuItemFocused()
       pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
       componentOneof: m.Tracking.getAnalyticsComponent("middle_nav_component", m.oldFocusedMenuAnalyticsSection)
       dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_middle_nav_component", newFocusedMenuAnalyticsSection)
-      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+      means_of_navigation: "SCROLL" 'MeansOfNavigation enum
 
-      vertical_location: row  '//The row location of the menu item
-      vertical_location_mode: "INDEX"  'LocationMode enum
-      horizontal_location: col  '//The column location of the menu item
-      horizontal_location_mode: "INDEX"  'LocationMode enum
+      vertical_location: row '//The row location of the menu item
+      horizontal_location: col '//The column location of the menu item
     }
   end if
 
@@ -793,7 +791,7 @@ Function onMenuFocusChange(msg)
     componentInteractionValue = "TOGGLE_OFF"
   end if
 
-  if isNonEmptyString(componentInteractionValue) = true and focusedItem <> invalid
+  if isNonEmptyString(componentInteractionValue) = true AND focusedItem <> invalid
     setComponentInteractionEventForMenu(componentInteractionValue, focusedItem)
   end if
 
@@ -861,12 +859,10 @@ Function onSecondaryMenuItemFocused()
       pageOneof: m.Tracking.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
       componentOneof: m.Tracking.getAnalyticsComponent("middle_nav_component", m.oldFocusedSecondaryMenuAnalyticsSection)
       dest_componentOneof: m.Tracking.getAnalyticsDestinationComponent("dest_middle_nav_component", newFocusedSecondaryMenuAnalyticsSection)
-      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+      means_of_navigation: "SCROLL" 'MeansOfNavigation enum
 
-      vertical_location: row  '//The row location of the menu item
-      vertical_location_mode: "INDEX"  'LocationMode enum
-      horizontal_location: col  '//The column location of the menu item
-      horizontal_location_mode: "INDEX"  'LocationMode enum
+      vertical_location: row '//The row location of the menu item
+      horizontal_location: col '//The column location of the menu item
     }
   end if
 
@@ -907,7 +903,7 @@ Function alignSecondaryMenuWithMenu()
   likeDislikeButtonIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
   boundingBoxLikeDislike = m.Menu.ancestorSubBoundingRect("item" + likeDislikeButtonIndex.toStr() + "_0", m.Menu)
   nMenuHeight = m.Menu.itemSize[1] + m.Menu.itemSpacing[1]
-  nSubMenuLocation = boundingBoxLikeDislike.y/nMenuHeight
+  nSubMenuLocation = boundingBoxLikeDislike.y / nMenuHeight
   if nSubMenuLocation = 0
     m.SecondaryMenu.translation = [m.SecondaryMenu.translation[0], m.Menu.translation[1]]
   else
@@ -1055,9 +1051,7 @@ Function onRelatedItemFocused()
         componentOneof: m.Tracking.getAnalyticsComponent("related_component", m.oldYmalComponent) 'category_list_component doesn't exist in protos
         means_of_navigation: "BUTTON" 'MeansOfNavigation enum
         vertical_location: row '1 based index
-        vertical_location_mode: "INDEX" 'LocationMode enum
         horizontal_location: col
-        horizontal_location_mode: "INDEX" 'LocationMode enum
       }
       m.oldYmalComponent = {
         content_tile: m.Tracking.getAnalyticsTile(focusedContent, col, row)
@@ -1096,7 +1090,7 @@ End Function
 Function focusSecondaryMenu()
   m.focusTarget = m.SecondaryMenu
   if m.top.isInFocusChain() = true
-    m.SecondaryMenu.jumpToItem = 0  'reset focus to the 1st menu item
+    m.SecondaryMenu.jumpToItem = 0 'reset focus to the 1st menu item
     m.SecondaryMenu.setFocus(true)
   end if
 End Function

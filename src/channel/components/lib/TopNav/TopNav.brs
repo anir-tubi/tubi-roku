@@ -29,7 +29,7 @@ Function init()
   m.top.observeFieldScoped("selectedId", "onSelectedIdChange")
 
   m.Menu.numRows = 1
-  m.Menu.translation = [12,12]
+  m.Menu.translation = [12, 12]
   if m.colors <> invalid
     m.MenuBground.blendColor = m.colors.lightGray
     m.Menu.focusFootprintBlendColor = m.colors.white
@@ -61,7 +61,7 @@ Function onThemeChange(msg = invalid)
       darkGray: theme.backgroundColor
       orange: theme.highlightedTextColor
     }
-    
+
     m.MenuBground.blendColor = m.colors.lightGray
     setUiState(m.top.uiState)
   end if
@@ -94,7 +94,7 @@ Function onContentUpdated()
       selectedWasSet = true
       m.top.selectedIndex = i
     end if
-    
+
     if m.colors <> invalid
       if m.top.uiState = "unfocusedFar"
         menuItem.selectedItemColor = m.colors.white
@@ -109,7 +109,7 @@ Function onContentUpdated()
     aItemWidths.push(itemWidth)
 
     if i <= nMenuItems - 2 'Do not append the pad for last button
-      nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nButtonPadding
+      nBgroundWidth += aItemWidths[aItemWidths.Count() - 1] + nButtonPadding
     end if
   end for
 
@@ -120,7 +120,7 @@ Function onContentUpdated()
     m.top.selectedIndex = 0
   end if
 
-  nBgroundWidth += aItemWidths[aItemWidths.Count()-1] + nMenuOutsideSpacing - nButtonPadding 'No need of padding for last item and columnspacing
+  nBgroundWidth += aItemWidths[aItemWidths.Count() - 1] + nMenuOutsideSpacing - nButtonPadding 'No need of padding for last item and columnspacing
   m.MenuBground.width = nBgroundWidth
 
   m.Menu.columnWidths = aItemWidths
@@ -240,7 +240,7 @@ Function jumpToId(id)
   if isNonEmptyString(id)
     content = m.Menu.content
     if content <> invalid
-      for i=0 to content.getChildCount()-1
+      for i = 0 to content.getChildCount() - 1
         child = content.getChild(i)
         if id = child.id
           nJumpToItem = i
@@ -364,7 +364,7 @@ End Function
 ' updates which item in the top nav should be treated as selected
 Function updateSelectedItem(itemId)
   if isNonEmptyString(itemId) AND m.Menu.content <> invalid
-    for i = 0 to m.Menu.content.getChildCount() -1
+    for i = 0 to m.Menu.content.getChildCount() - 1
       menuItem = m.Menu.content.getChild(i)
       if menuItem.id = itemId
         menuItem.selected = true
@@ -381,7 +381,7 @@ End Function
 ' Theoretically, there should only ever be exactly one menu item with .selected = true at any given time.
 Function getSelectedItemId()
   if m.Menu.content <> invalid
-    for i = 0 to m.Menu.content.getChildCount() -1
+    for i = 0 to m.Menu.content.getChildCount() - 1
       menuItem = m.Menu.content.getChild(i)
       if menuItem.selected = true
         return menuItem.id
@@ -439,9 +439,7 @@ Function buildNavigateWithinPageInfo(itemFocused, trackingPageInfo, newTopNavFoc
   row = 1
   col = 1 + itemFocused
   navigateWithinPageInfo.vertical_location = row '1 based index
-  navigateWithinPageInfo.vertical_location_mode = "INDEX"  'LocationMode enum
   navigateWithinPageInfo.horizontal_location = col
-  navigateWithinPageInfo.horizontal_location_mode = "INDEX"  'LocationMode enum
 
   if focusChange = "scroll_focus"
     navigateWithinPageInfo.means_of_navigation = "SCROLL"

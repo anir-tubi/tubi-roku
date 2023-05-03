@@ -29,7 +29,7 @@ End Function
 Function setMenuItems(menuItems)
   menuItemCount = menuItems.Count()
 
-  for i = 0 to menuItemCount-1
+  for i = 0 to menuItemCount - 1
     m.MainContent.appendChild(createMainContent(menuItems[i]))
     m.MainContentSelect.appendChild(createMainContentSelect(menuItems[i]))
   end for
@@ -90,7 +90,7 @@ Function createMainContent(item)
       contentNode.title = signTxt
     end if
 
-    if contentNode.title = signTxt  'if title is 'SignIn', that means, user has signed out=>set subtext also 'SignIn'
+    if contentNode.title = signTxt 'if title is 'SignIn', that means, user has signed out=>set subtext also 'SignIn'
       contentNode.shortDescriptionLine1 = signTxt
       contentNode.ShortDescriptionLine2 = getTranslation("registration_signup_button_free")
     else
@@ -147,9 +147,9 @@ Function onCreateMenuItems()
   m.mainItemsSelected.itemSpacing = [0, 12]
   'this is to accommodate spanish signIn text + free Icon
   m.mainItems.itemSize = [438, 72]
-  m.mainItemsSelected.itemSize = [438,72]
+  m.mainItemsSelected.itemSize = [438, 72]
 
-  m.itemGroups.translation = [57,40]
+  m.itemGroups.translation = [57, 40]
   m.mainItems.wrapDividerBitmapUri = ""
   m.mainItemsSelected.wrapDividerBitmapUri = ""
   m.mainItems.wrapDividerHeight = 0
@@ -306,7 +306,7 @@ Function insertMenuItemInMenuLists(sMenuID)
   if nMenuItemOriginalIndex >= 0
     '//menuItem belongs in the menu list, so allowed to proceed to determine where the menu item actually belongs in the list in its current state
     nIndex = 0
-    nMenuListCountUntil = m.MainContent.getChildCount()-1
+    nMenuListCountUntil = m.MainContent.getChildCount() - 1
     for i = 0 to nMenuListCountUntil
       menuContentItem = m.MainContent.getChild(i)
       sMenuContentItemID = menuContentItem.Id
@@ -573,7 +573,7 @@ End Function
 
 
 Function setContentActive(content, bActive = true)
-  for i = 0 to content.getChildCount()-1
+  for i = 0 to content.getChildCount() - 1
     item = content.getChild(i)
     item.active = bActive
     if(m.itemSelectedRemembered <> invalid AND m.itemSelectedRemembered.id = item.id)
@@ -586,7 +586,7 @@ End Function
 
 
 Function onItemRequested()
-  if m.top.itemRequested <> invalid AND m.top.itemRequested <> "" AND (m.itemSelectedRemembered = invalid or m.top.itemRequested <> m.itemSelectedRemembered.id)
+  if m.top.itemRequested <> invalid AND m.top.itemRequested <> "" AND (m.itemSelectedRemembered = invalid OR m.top.itemRequested <> m.itemSelectedRemembered.id)
     '//Go thru the lists and select the option that matches the itemRequested
     focusItemInList(m.mainItems, m.top.itemRequested)
   end if
@@ -603,7 +603,7 @@ End Function
 Function getIndexOfMenuID(sID)
   nIndex = -1
   if m.MenuItemIDs <> invalid
-    for i = 0 to m.MenuItemIDs.Count()-1
+    for i = 0 to m.MenuItemIDs.Count() - 1
       if sID = m.MenuItemIDs[i]
         nIndex = i
         exit for
@@ -705,12 +705,10 @@ Function onItemFocused(msg)
     col = 1
     m.top.navigateWithinPageInfo = {
       componentOneof: m.Tracking.getAnalyticsComponent("left_side_nav_component", m.oldSideNavFocusedButton)
-      means_of_navigation: "SCROLL"  'MeansOfNavigation enum
+      means_of_navigation: "SCROLL" 'MeansOfNavigation enum
 
-      vertical_location: row  '//The row location of the side nav
-      vertical_location_mode: "INDEX"  'LocationMode enum
-      horizontal_location: col  '//The column location of the side nav
-      horizontal_location_mode: "INDEX"  'LocationMode enum
+      vertical_location: row '//The row location of the side nav
+      horizontal_location: col '//The column location of the side nav
     }
   end if
 

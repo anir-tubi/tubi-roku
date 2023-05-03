@@ -1,4 +1,4 @@
-Function TubiTracking (constants, request, auth)
+Function TubiTracking(constants, request, auth)
   return {
     constants: constants
     request: request
@@ -49,7 +49,7 @@ End Function
 ' @eventType: string: one of the fields defined in the "oneof" definition within AppEvent. For example: "active" or "page_load"
 ' @eventValues: assocArray, keys/values that correspond to the fields within the event type specified in @eventType
 ' @requestQueue: assocArray, a request queue as returned by TubiRequestQueue().create()
-Function tubiTracking_trackUserEvent(eventType="", eventValues=invalid, requestQueue=invalid)
+Function tubiTracking_trackUserEvent(eventType = "", eventValues = invalid, requestQueue = invalid)
   if eventType <> ""
     trackData = m.getClientEvent(eventType, eventValues)
     userRequest = m.getUserTrackingRequest(eventType, trackData)
@@ -80,14 +80,14 @@ End Function
 Function tubiTracking_getUserTrackingRequest(eventType, trackData) as Object
   trackUrl = m.constants.urls.analytics.singleEvent
 
-    options = {
-      method: m.constants.reqTypes.post
-      body: FormatJson(trackData)
-    }
+  options = {
+    method: m.constants.reqTypes.post
+    body: FormatJson(trackData)
+  }
 
-    userRequest = m.request.createAsync(trackUrl, "track_" + eventType, options)
+  userRequest = m.request.createAsync(trackUrl, "track_" + eventType, options)
 
-    return userRequest
+  return userRequest
 End Function
 
 
@@ -107,7 +107,7 @@ End Function
 ' See protos.analytics.events.protos -> ClientEvent
 Function tubiTracking_getAnalyticsTimestamp()
   time = CreateObject("roDateTime")
-  timestamp =  time.ToISOString()  'see protos.google.protobuf.timestamp.protos -> Timestamp
+  timestamp = time.ToISOString() 'see protos.google.protobuf.timestamp.protos -> Timestamp
   return timestamp
 End Function
 
@@ -139,8 +139,8 @@ End Function
 Function tubiTracking_getAnalyticsDevice(eventValues = invalid)
 
   currentLocale = {
-    identifier : m.constants.deviceInfo.locale
-    language : UCase(m.constants.deviceInfo.language)
+    identifier: m.constants.deviceInfo.locale
+    language: UCase(m.constants.deviceInfo.language)
   }
 
   device = {
@@ -156,7 +156,7 @@ Function tubiTracking_getAnalyticsDevice(eventValues = invalid)
     advertiser_id: "00000000-0000-0000-0000-000000000000"
     locale: currentLocale
   }
-  if m.constants.deviceInfo.isAdIdTrackingDisabled <> true AND (eventValues = invalid or eventValues.appMode <> "KIDS_MODE")
+  if m.constants.deviceInfo.isAdIdTrackingDisabled <> true AND (eventValues = invalid OR eventValues.appMode <> "KIDS_MODE")
     device.advertiser_id = m.constants.deviceInfo.deviceAdId
   end if
   return device
@@ -204,7 +204,7 @@ Function tubiTracking_getAnalyticsConnection(eventValues)
   }
 
   if eventValues.nominal_speed <> invalid
-    connection["nominal_speed"] = eventValues.nominal_speed   'expect this only to be the case for play_progress events
+    connection["nominal_speed"] = eventValues.nominal_speed 'expect this only to be the case for play_progress events
   end if
 
   return connection
@@ -252,45 +252,43 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       source: ""
       medium: ""
       source_device_id: "" 'The source_device_id field is used to store device id of ios or android devices that deeplink to roku.
-      content: ""   ' This is not the content deep linked to, but is intended to store promotional copy related to the deeplink.
-                    ' The content field is also co-opted to store device ids of ios or android devices that deeplink to roku.
-      pageOneof: {}  'a valid page type (see ReferredEvent in events.protos)
+      content: "" ' This is not the content deep linked to, but is intended to store promotional copy related to the deeplink.
+      ' The content field is also co-opted to store device ids of ios or android devices that deeplink to roku.
+      pageOneof: {} 'a valid page type (see ReferredEvent in events.protos)
       ' adjust_id: ""   'not relevant for roku
     }
 
     page_load: {
-      pageOneof: {}  'a valid page type (see PageLoadEvent in events.protos)
+      pageOneof: {} 'a valid page type (see PageLoadEvent in events.protos)
       load_time: -1
-      status: ""  'ActionStatus enum
+      status: "" 'ActionStatus enum
     }
 
     navigate_to_page: {
-      pageOneof: {}  'page navigating from - a valid page type (see NavigateToPageEvent in events.protos)
+      pageOneof: {} 'page navigating from - a valid page type (see NavigateToPageEvent in events.protos)
       componentOneof: {} 'a valid component type (see NavigateToPageEvent in events.protos)
       dest_pageOneof: {} 'page navigating to - a valid page type (see NavigateToPageEvent in events.protos)
     }
 
     navigate_within_page: {
-      pageOneof: {}  'a valid page type (see NavigateWithinPageEvent in events.protos)
+      pageOneof: {} 'a valid page type (see NavigateWithinPageEvent in events.protos)
       componentOneof: {} 'a valid component type (see NavigateWithinPageEvent in events.protos)
       means_of_navigation: "" 'MeansOfNavigation enum
       vertical_location: -1
-      vertical_location_mode: ""  'LocationMode enum
       horizontal_location: -1
-      horizontal_location_mode: ""  'LocationMode enum
-      dest_componentOneof: {}  '(see dest_component in events.protos to see possible values. Right now it is just referring to top and side navigations )
+      dest_componentOneof: {} '(see dest_component in events.protos to see possible values. Right now it is just referring to top and side navigations )
     }
 
     bookmark: {
       contentOneOf: {} 'content message with either video_id or series_id
-      pageOneof: {}  'a valid page type (see BookmarkEvent in events.protos)
+      pageOneof: {} 'a valid page type (see BookmarkEvent in events.protos)
       componentOneof: {} 'a valid component type (see BookmarkEvent in events.protos)
-      op: ""  'Operation enum
+      op: "" 'Operation enum
     }
 
     explicit_feedback: {
       targetOneOf: {} 'a valid target, see ExplicitFeedbackEvent in events.protos.
-      pageOneof: {}  'a valid page type (see ExplicitFeedbackEvent in events.protos)
+      pageOneof: {} 'a valid page type (see ExplicitFeedbackEvent in events.protos)
     }
 
     search: {
@@ -301,17 +299,17 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
     start_video: {
       video_id: -1
       start_position: -1
-      current_cdn: ""   'not possible for Roku client
-      has_subtitles: false  'the video player will show subtitles at start
+      current_cdn: "" 'not possible for Roku client
+      has_subtitles: false 'the video player will show subtitles at start
       is_livetv: false
       is_embedded: false
       is_fullscreen: true
       playback_source: ""
       video_resource_type: "" ' The type of video resource
       video_resource_url: "" 'The playable url in video resource
-      video_player: ""  'VideoPlayer enum
+      video_player: "" 'VideoPlayer enum
       video_codec_type: "" ' The codec type of video resource
-      video_resolution: ""  'The resolution of video resource
+      video_resolution: "" 'The resolution of video resource
     }
 
     play_progress: {
@@ -319,25 +317,25 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       position: -1   'ms
       view_time: -1  'ms
       playback_source: ""
-      video_player: ""  'VideoPlayer enum
+      video_player: "" 'VideoPlayer enum
     }
 
     start_live_video: {
       video_id: -1
-      current_cdn: ""   'not possible for Roku client
-      has_subtitles: false  'the video player will show subtitles at start
+      current_cdn: "" 'not possible for Roku client
+      has_subtitles: false 'the video player will show subtitles at start
       video_resource_url: "" 'The playable url in video resource
       video_resource_type: "" ' The type of video resource
-      video_player: ""  'VideoPlayer enum
+      video_player: "" 'VideoPlayer enum
       video_codec_type: "" ' The codec type of video resource
-      video_resolution: ""  'The resolution of video resource
+      video_resolution: "" 'The resolution of video resource
       is_fullscreen: true 'the video player is being played in full screen format
     }
 
     live_play_progress: {
       video_id: -1
-      view_time: -1  'ms
-      video_player: ""  'VideoPlayer enum
+      view_time: -1 'ms
+      video_player: "" 'VideoPlayer enum
       page_type: "" 'current screen
     }
 
@@ -351,13 +349,13 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
     pause_toggle: {
       video_id: -1
       pause_state: "" 'PauseState enum
-      video_player: ""  'VideoPlayer enum
+      video_player: "" 'VideoPlayer enum
     }
 
     subtitles_toggle: {
       video_id: -1
-      toggle_state: ""  'ToggleState enum
-      language_code: ""  'LanguageCode enum
+      toggle_state: "" 'ToggleState enum
+      language_code: "" 'LanguageCode enum
     }
 
     fullscreen_toggle: {
@@ -376,9 +374,9 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
     }
 
     start_trailer: {
-      video_id: -1   'the content id of the trailer
+      video_id: -1 'the content id of the trailer
       is_fullscreen: true
-      video_player: ""  'VideoPlayer enum
+      video_player: "" 'VideoPlayer enum
     }
 
     trailer_play_progress: {
@@ -389,12 +387,12 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
     }
 
     finish_trailer: {
-      video_id: -1   'the content id of the trailer
+      video_id: -1 'the content id of the trailer
       end_position: -1
     }
 
     start_ad: {
-      ad_started: {}  'Ad
+      ad_started: {} 'Ad
       video_id: -1
       start_position: -1
       is_fullscreen: true
@@ -416,15 +414,15 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
 
     dialog: {
       dialog_type: "" 'DialogType enum
-      pageOneof: {}  'a valid page type (see DialogEvent in events.protos)
-      dialog_action: ""  'Action enum
-      dialog_sub_type: ""  'max 20 character string
+      pageOneof: {} 'a valid page type (see DialogEvent in events.protos)
+      dialog_action: "" 'Action enum
+      dialog_sub_type: "" 'max 20 character string
     }
 
     component_interaction: {
-      pageOneof: {}  'a valid page type (see ComponentInteractionEvent in events.protos)
-      componentOneof: {}  'a valid component type (see ComponentInteractionEvent in events.protos)
-      user_interaction: ""  'Interaction enum
+      pageOneof: {} 'a valid page type (see ComponentInteractionEvent in events.protos)
+      componentOneof: {} 'a valid component type (see ComponentInteractionEvent in events.protos)
+      user_interaction: "" 'Interaction enum
     }
 
     account: {
@@ -437,7 +435,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
     }
 
     exposure: {
-      experiment: {}  'Experiment
+      experiment: {} 'Experiment
     }
 
     viewable_impression: {   'TODO: not part of V1
@@ -467,8 +465,8 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
 
     preview_play_progress: {
       video_id: -1
-      position: -1 'ms
-      view_time: -1  'ms
+      position: -1  'ms
+      view_time: -1 'ms
       video_player: "BANNER"
       page_type: "" 'current screen
     }
@@ -532,7 +530,7 @@ End Function
 
 
 ' Build the structure for a ContentTile message
-Function tubiTracking_getAnalyticsTile(contentNode, colPos=1, rowPos=1)
+Function tubiTracking_getAnalyticsTile(contentNode, colPos = 1, rowPos = 1)
   tile = invalid
 
   if contentNode <> invalid
@@ -543,7 +541,7 @@ Function tubiTracking_getAnalyticsTile(contentNode, colPos=1, rowPos=1)
         contentId = Mid(contentNode.id, 2)
       end if
       tile.series_id = contentId.toInt()
-    else if contentNode.type = m.constants.ui.contentTypes.video or contentNode.type = m.constants.ui.contentTypes.linear
+    else if contentNode.type = m.constants.ui.contentTypes.video OR contentNode.type = m.constants.ui.contentTypes.linear
       tile.video_id = contentId.toInt()
     end if
 
@@ -560,7 +558,7 @@ End Function
 ' @ctx: AA, the ctx passed to TubiAds.adTrackingCallback
 Function tubiTracking_getAnalyticsAd(ctx)
   adEvent = {
-    ad_type: "VAST"    'adType enum
+    ad_type: "VAST" 'adType enum
     ' advertiser_id: ""   'not currently available
     ' vendor_id: ""       'not currently available
     ' creative_duration: 0  'not currently available
@@ -575,7 +573,7 @@ Function tubiTracking_getAnalyticsAd(ctx)
 
     if type(ad.streams) = "roArray" AND ad.streams[0] <> invalid
       if m.isString(ad.streams[0].url) = true
-        adEvent.creative_url = ad.streams[0].url   'expect adVideoUrl to be of the form "http://paella.adrise.tv/011127/3256277/v1004184820-,426x240-HD-366,640x360-HD-730,854x480-HD-1111,854x480-HD-1479,1280x720-HD-2139,1280x720-HD-2832,k.mp4.m3u8"
+        adEvent.creative_url = ad.streams[0].url 'expect adVideoUrl to be of the form "http://paella.adrise.tv/011127/3256277/v1004184820-,426x240-HD-366,640x360-HD-730,854x480-HD-1111,854x480-HD-1479,1280x720-HD-2139,1280x720-HD-2832,k.mp4.m3u8"
       end if
       if m.isString(ad.streams[0].id) = true
         adEvent.ad_video_id = ad.streams[0].id
@@ -593,7 +591,7 @@ Function tubiTracking_getAnalyticsAd(ctx)
     if ad.creativeAdId <> invalid then adEvent.ad_id = ad.creativeAdId
     if ad.creativeId <> invalid then adEvent.creative_id = ad.creativeId.toInt()
     if ad.adId <> invalid then adEvent.parent_id = ad.adId
-    if ad.duration <> invalid then adEvent.reported_duration = ad.duration * 1000  'ms
+    if ad.duration <> invalid then adEvent.reported_duration = ad.duration * 1000 'ms
     if ctx.adIndex <> invalid then adEvent.index = ctx.adIndex
     if ctx.adCount <> invalid then adEvent.pod_size = ctx.adCount
   end if
@@ -681,7 +679,7 @@ Function tubiTracking_isEmptyValue(value)
   if value <> invalid
     if m.isString(value) = true AND value = ""
       return true
-    else if (type(value) = "roArray" or type(value) = "roAssociativeArray") AND value.isEmpty()
+    else if (type(value) = "roArray" OR type(value) = "roAssociativeArray") AND value.isEmpty()
       return true
     else if m.isNumeric(value) AND value < 0
       return true
@@ -699,7 +697,7 @@ End Function
 Function tubiTracking_getOneOfs()
   ' pageTypes
   current_page = {
-    i: "i"  'filler because empty fields are removed
+    i: "i" 'filler because empty fields are removed
   }
 
   static_page = {
@@ -707,7 +705,7 @@ Function tubiTracking_getOneOfs()
   }
 
   home_page = {
-    content_mode: "CONTENT_MODE_UNKNOWN"  'filler because empty fields are removed
+    content_mode: "CONTENT_MODE_UNKNOWN" 'filler because empty fields are removed
   }
 
   for_you_page = {
@@ -759,24 +757,24 @@ Function tubiTracking_getOneOfs()
   }
 
   search_page = {
-    query: ""   'There is no query associated with the search page
+    query: "" 'There is no query associated with the search page
   }
 
-  auth_page = {  'TODO: Find out if we need this page - I think no
-    auth_action:  ""  'Action enum
+  auth_page = {'TODO: Find out if we need this page - I think no
+    auth_action: "" 'Action enum
   }
 
-  login_page = {   'TODO: Find out if we need this page - I think no
-    choice: ""  'Choice enum
+  login_page = {'TODO: Find out if we need this page - I think no
+    choice: "" 'Choice enum
   }
 
   register_page = {
-    auth_method: ""   'AuthMethod enum
-    register_action: ""   'Action enum
+    auth_method: "" 'AuthMethod enum
+    register_action: "" 'Action enum
   }
 
   account_page = {
-    account_page_type: ""   'PageType enum
+    account_page_type: "" 'PageType enum
   }
 
   access_menu_page = {}
@@ -801,15 +799,15 @@ Function tubiTracking_getOneOfs()
   }
 
   section_leftNav = {
-    left_nav_section: ""  ' Section enum
+    left_nav_section: "" ' Section enum
   }
 
   section_topNav = {
-    top_nav_section: ""  ' Section enum
+    top_nav_section: "" ' Section enum
   }
 
   section_middleNav = {
-    middle_nav_section: ""  ' Section enum
+    middle_nav_section: "" ' Section enum
   }
 
   ' splash_page = {}   'not currently used
@@ -909,8 +907,8 @@ Function tubiTracking_getOneOfs()
     '   category_slug: ""
     ' }
 
-    generic_component: {   ' Used for components that are not yet defined in protos
-      generic_component_type: ""  ' GenericComponentType enum
+    generic_component: {' Used for components that are not yet defined in protos
+      generic_component_type: "" ' GenericComponentType enum
     }
 
     left_side_nav_component: section_leftNav
@@ -919,11 +917,11 @@ Function tubiTracking_getOneOfs()
 
     middle_nav_component: section_middleNav
 
-    category_component: {   ' Used for category screen, channel details screen, channel/category grid screen
+    category_component: {' Used for category screen, channel details screen, channel/category grid screen
       category_slug: ""
-      category_row: -1   ' 1 based index
-      category_col: -1   ' 1 based index
-      content_tile: {}  ' ContentTile message - optional
+      category_row: -1 ' 1 based index
+      category_col: -1 ' 1 based index
+      content_tile: {} ' ContentTile message - optional
     }
 
     ' sub_category_component: {   'Does not currently exist in roku UI
@@ -934,27 +932,27 @@ Function tubiTracking_getOneOfs()
     ' }
 
     auto_play_component: {
-      content_tile: {}  ' ContentTile message
+      content_tile: {} ' ContentTile message
     }
 
     related_component: {
-      content_tile: {}  ' ContentTile message
+      content_tile: {} ' ContentTile message
     }
 
     episode_video_list_component: {
-      content_tile: {}  ' ContentTile message
+      content_tile: {} ' ContentTile message
     }
 
     search_result_component: {
-      content_tile: {}  ' ContentTile message
+      content_tile: {} ' ContentTile message
     }
 
     epg_component: {
-      content_tile: {}  ' ContentTile message
+      content_tile: {} ' ContentTile message
     }
 
     button_component: {
-      button_type: ""  'ButtonType enum
+      button_type: "" 'ButtonType enum
       button_value: ""
     }
 
@@ -1070,7 +1068,7 @@ End Function
 
 'helper function to determine if the value can be compared to a number
 Function tubiTracking_isNumeric(value)
-  if type(value) = "roInteger" or type(value) = "roInt" or type(value) = "Integer" or type(value) = "roFloat" or type(value) = "Float" or type(value) = "roDouble" or type(value) = "Double"
+  if type(value) = "roInteger" OR type(value) = "roInt" OR type(value) = "Integer" OR type(value) = "roFloat" OR type(value) = "Float" OR type(value) = "roDouble" OR type(value) = "Double"
     return true
   end if
 
@@ -1080,5 +1078,5 @@ End Function
 
 ' Helper function to determine if the value is a string
 Function tubiTracking_isString(value)
-  return type(value) = "String" or type(value) = "roString"
+  return type(value) = "String" OR type(value) = "roString"
 End Function

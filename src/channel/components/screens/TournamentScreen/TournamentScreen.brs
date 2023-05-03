@@ -24,7 +24,7 @@ Function init()
   m.epgTimeGrid = m.top.findNode("programGuide")
   m.epgTimeGrid.observeFieldScoped("linearChannelFocusedUpdated", "onLinearChannelFocused")
   m.epgTimeGrid.observeFieldScoped("linearChannelToPlayUpdated", "onLinearChannelToPlay")
-  m.epgTimeGrid.observeFieldScoped("okPressed","onEPGTimegridOKPressed")
+  m.epgTimeGrid.observeFieldScoped("okPressed", "onEPGTimegridOKPressed")
   m.epgTimeGrid.EPGChannelPlayMode = m.constants.EPGChannelPlayMode.playItemOnFocus
   m.epgTimeGrid.EPGFullMode = true
 
@@ -76,7 +76,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.mask.color = theme.backgroundColor
   end if
@@ -91,7 +91,7 @@ Function onPreTournament()
     m.top.focusedComponent = m.constants.ui.tournamentScreen.focusItems.epgTimeGrid
   else
     m.epgTimeGrid.translation = "[192,938]"
-    m.categoryGridList.translation ="[192,550]"
+    m.categoryGridList.translation = "[192,550]"
     m.top.focusedComponent = m.constants.ui.tournamentScreen.focusItems.categoryGridList
   end if
 
@@ -348,9 +348,9 @@ Function onLinearChannelToPlay(msg)
 
     if linearChannelToPlay <> invalid
       m.top.trackingComponentInfo = {
-        componentType : "epg_component"
-        componentValues : {
-          content_tile : m.Tracking.getAnalyticsTile(linearChannelToPlay, col, row)
+        componentType: "epg_component"
+        componentValues: {
+          content_tile: m.Tracking.getAnalyticsTile(linearChannelToPlay, col, row)
         }
       }
 
@@ -443,8 +443,8 @@ Function onScreenFocusChange()
     m.top.shouldFocusWhenPushed = true
 
   else if m.top.isInFocusChain() = false
-      m.top.refreshtournamentScreenVideoPlay = true
-      fadeInContentArea()
+    m.top.refreshtournamentScreenVideoPlay = true
+    fadeInContentArea()
   end if
 End Function
 
@@ -476,10 +476,10 @@ End Function
 
 Function componentDownAnimation()
   if m.top.isPreTournament = true
-    slideTo(m.categoryGridList, m.originalEPGTranslation, 0.15,0)
+    slideTo(m.categoryGridList, m.originalEPGTranslation, 0.15, 0)
     slideFade(m.epgTimeGrid, "above", "out", 0.15, 0)
   else
-    slideTo(m.epgTimeGrid, m.originalCategoryGridListTranslation , 0.15, 0)
+    slideTo(m.epgTimeGrid, m.originalCategoryGridListTranslation, 0.15, 0)
     slideFade(m.categoryGridList, "above", "out", 0.15, 0)
   end if
 End Function
@@ -487,7 +487,7 @@ End Function
 
 Function componentUPAnimation()
   if m.top.isPreTournament = true
-    slideTo(m.categoryGridList, m.originalCategoryGridListTranslation, 0.15,0)
+    slideTo(m.categoryGridList, m.originalCategoryGridListTranslation, 0.15, 0)
     slideFade(m.epgTimeGrid, "above", "in", 0.15, 0)
   else
     slideTo(m.epgTimeGrid, m.originalEPGTranslation, 0.15, 0)
@@ -554,14 +554,14 @@ Function onGridItemSelected(msg)
       m.top.contentSelected = itemSelected
     end if
   end if
-End function
+End Function
 
 
 Function onKeyEvent(key As string, press As boolean) As boolean
   tubiLog("TournamentScreen.onKeyEvent")
   if press
     if key = "back"
-      if  m.TopNav.isInFocusChain() = false
+      if m.TopNav.isInFocusChain() = false
         setFocusOntoTopNav(true)
         return true
       end if
@@ -627,7 +627,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
         ' navigating to the side nav from the top nav specifically
         m.top.topNavToggled = false
         m.top.navigatedAwayFromTopNav = true
-      '  fadeInContentArea()
+        '  fadeInContentArea()
         return false
       end if
     end if
@@ -696,7 +696,7 @@ Function sendNavigateWithinPageEvent()
 
     if m.top.isPreTournament = true
       oldAnalyticsRow = m.CategoryGridList.oldCursorPosition[0] + 2 'epg is first row
-      newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + 2  ' epg is first row
+      newAnalyticsRow = m.CategoryGridList.cursorPosition[0] + 2 ' epg is first row
       if oldAnalyticsCol = 0
         oldAnalyticsCol = 1
         if m.epgTimeGrid.linearChannelToPlay <> invalid
@@ -719,9 +719,7 @@ Function sendNavigateWithinPageEvent()
         componentOneof: m.Tracking.getAnalyticsComponent("category_component", categoryComponentInfo)
         means_of_navigation: "BUTTON" 'MeansOfNavigation enum
         vertical_location: newAnalyticsRow
-        vertical_location_mode: "INDEX" 'LocationMode enum
         horizontal_location: newAnalyticsCol
-        horizontal_location_mode: "INDEX" 'LocationMode enum
       }
     end if
   end if
@@ -737,7 +735,7 @@ Function onTransportVoiceRequest(msg)
     command = inputInfo.command
   end if
   tubiLog("TournamentScreen.onTransportVoiceRequest " + command)
-    ' Only replays/noteworthy content and FIFA channel can be played.
+  ' Only replays/noteworthy content and FIFA channel can be played.
   if m.epgTimeGrid.isInFocusChain() = true OR (m.categoryGridList.isInFocusChain() = true AND m.top.contentFocused.Type = "sports_event" AND m.top.contentFocused.availabilityType <> m.constants.ui.contentTimings.upcoming)
     if command = "play"
       handlePlayInput()
@@ -761,7 +759,7 @@ Function handlePlayInput()
       ' In EPG case both voice commands "play" and "ok" will play the content in full screen.
       onEPGTimegridOKPressed()
       'May not be required ?
-    '  m.top.trackingComponentInfo = getTrackingComponentInfoOfEPGGridList(m.epgTimeGrid.linearChannelFocused.getParent(), m.epgTimeGrid.rowItemfocused)
+      '  m.top.trackingComponentInfo = getTrackingComponentInfoOfEPGGridList(m.epgTimeGrid.linearChannelFocused.getParent(), m.epgTimeGrid.rowItemfocused)
     end if
   else if m.categoryGridList.isInFocusChain() = true
     if m.top.contentFocused <> invalid
@@ -784,8 +782,8 @@ Function getTrackingComponentInfoOfEPGGridList(timegridItem, itemPosition)
 
     ' Set the tracking component of the timegridItem that was passed so it can be accessed as part of the navigateToPage event
     trackingComponentInfo = {
-      componentType : "EPGComponent"
-      componentValues : componentValues
+      componentType: "EPGComponent"
+      componentValues: componentValues
     }
   end if
 
@@ -820,7 +818,7 @@ Function setComponentInteractionEventForEPG(userInteraction)
     end if
     componentInteractionInfo = {
       pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
-      componentOneof: m.Tracking.getAnalyticsComponent("epg_component",  componentValues)
+      componentOneof: m.Tracking.getAnalyticsComponent("epg_component", componentValues)
       user_interaction: userInteraction
     }
 
