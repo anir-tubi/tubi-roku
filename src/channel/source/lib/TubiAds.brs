@@ -1,6 +1,18 @@
-Function TubiAds (constants, request, requestQueue, auth, tracking, adContentType)
+Function TubiAds (constants, request, requestQueue, auth, tracking, adContentType, nonceFrameWork = invalid)
   'Add Support for Roku Advertising Framework
   roAdFramework = Roku_Ads()
+
+  ' Nonce is a string provided by google IMASDK. Nonce is helpful in increasing VOD ad revenue.
+  ' steps involed:
+  '   initialize the IMA SDK (which is done in adsTask.brs)
+  '   create nonceLoader
+  '   request a nonce string
+  '   pass this string to rainmaker call as x-tubi-paln header value
+  nonceLoader = invalid
+
+  if nonceFrameWork <> invalid
+    nonceLoader = nonceFrameWork.CreateNonceLoader()
+  end if
 
   'set the preferences for the Roku Advertising Framework so we never use their ad server if our server returns no ads
   'set to 0 retries - 1 max request, even if there are no ads returned from our server
@@ -42,6 +54,9 @@ Function TubiAds (constants, request, requestQueue, auth, tracking, adContentTyp
     ' private
     updateYouboraOptions: tubiAds_updateYouboraOptions
     parseOutNotUsedAdPodPixels: tubiAds_parseOutNotUsedAdPodPixels
+    getNonceForAds: tubiAds_getNonceForAds
+    getGoogleNonceHeader: tubiAds_getGoogleNonceHeader
+    getAdHeaders: tubiAds_getAdHeaders
     requestQueue: requestQueue.create(adLoggingPort)
     roAdFramework: roAdFramework
     allAdUnitsList: []
@@ -52,6 +67,8 @@ Function TubiAds (constants, request, requestQueue, auth, tracking, adContentTyp
     _: rodash()
     adContentType: adContentType  ' "hls" or "mp4"
     breakPos: 0
+    nonceFrameWork: nonceFrameWork
+    nonceLoader: nonceLoader
 
     ' public
     reset: tubiAds_reset
@@ -268,12 +285,57 @@ Function tubiAds_getRainmakerParamsForLinear(content)
 End Function
 
 
-Function tubiAds_retrieveAds(adsUrl)
+'This function is used enhance any additonal params or headers needed for rainmaker call
+Function tubiAds_getAdHeaders(isVod = false)
+
+  adHeaders = {}
+
+  if isVod = true
+    googleNonceHeader = m.getGoogleNonceHeader()
+    adHeaders.append(googleNonceHeader)
+  end if
+
+  return adHeaders
+End Function
+
+
+Function tubiAds_getGoogleNonceHeader()
+  nonce = ""
+  headers = {}
+
+  'try to get nonce and in case of exception just return empty options
+  TRY
+  'request for nonce from google before trying to retrive the ads
+    nonce = m.getNonceForAds()
+  CATCH e
+    tubilog("Google Nonce exception", "warn", "apiTimeout", "nonce-bad-response", 0.1)
+  END TRY
+
+  if isNonEmptyString(nonce)
+    'add the nonce as x-tubi-paln header to rainmaker request.
+    headers = {
+      "x-tubi-paln": nonce
+    }
+  end if
+
+  return headers
+End Function
+
+
+' @adsUrl: string, The url that is used to retrieve the ads. This url is already decorated with rainmaker params.
+' adHeaders: AA, The header that needs to be added when makeing the request to rainmaker. For example, 'x-tubi-paln' in case of VOD ad requests.
+Function tubiAds_retrieveAds(adsUrl, adHeaders = invalid)
   currentAdUnitsList = invalid
+
+  options = {}
+
+  if isAA(adHeaders) = true
+    options["headers"] = adHeaders
+  end if
 
   ' RAF has a hard 5 second cutoff for download time.
   ' We make the network request to rainmaker ourselves to work around this.
-  tubiReq = m.request.createAsync(adsUrl)
+  tubiReq = m.request.createAsync(adsUrl, "", options)
   port = createObject("roMessagePort")
   if tubiReq.start(port) = true then
     timeout = 10000 ' in milliseconds
@@ -323,6 +385,38 @@ Function tubiAds_retrieveAds(adsUrl)
 End Function
 
 
+' Requests a nonce from the PAL SDK.
+' refer https://developers.google.com/ad-manager/pal/roku#import_the_ima_sdk for more info on this module
+Function tubiAds_getNonceForAds() as String
+
+  nonce = ""
+  if m.nonceFrameWork <> invalid AND m.nonceLoader <> invalid
+
+    nonceRequestTimeStart = CreateObject("roTimespan")
+
+    nonceRequest = m.nonceFrameWork.CreateNonceRequest()
+
+    ' Include changes to storage consent here.
+    if m.constants.deviceInfo.isAdIdTrackingDisabled = true
+      nonceRequest.storageAllowed = false
+    else
+      nonceRequest.storageAllowed = true
+    end if
+
+    m.nonceManager = m.nonceLoader.loadNonceManager(nonceRequest)
+
+    nonce = m.nonceManager.getNonce()
+
+    'log if nonce request takes more than 2 seconds. This way we will know to make decision on how much time before ad should be requested to incorporate this delay.
+    if nonceRequestTimeStart.TotalMilliseconds() >= 2000
+      tubilog("Google Nonce exception", "warn", "apiSlow", "nonce_slow_response", 0.1)
+    end if
+
+  end if
+  return nonce
+End Function
+
+
 ' ----------------------------------------------
 '  m.getAdsListViaRoku(episode, breakPos)
 ' ----------------------------------------------
@@ -364,7 +458,10 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos, isSeekPastCuepoint = false
   rainmakerVastUrl = m.populateUrlRainmaker(episode, breakPos, isSeekPastCuepoint)
 
   adFetchTimer = createObject("roTimeSpan")
-  currentAdUnitsList = m.retrieveAds(rainmakerVastUrl)
+
+  headers = m.getAdHeaders(true)
+
+  currentAdUnitsList = m.retrieveAds(rainmakerVastUrl, headers)
   timeToFetch = adFetchTimer.totalMilliseconds()
 
   'log ad fetch errors
