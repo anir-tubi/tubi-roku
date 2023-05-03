@@ -4,6 +4,7 @@ Function TubiNodeHelpers()
     getChildIndexById: tubiNodeHelpers_getChildIndexById
     getChildIndicesById: tubiNodeHelpers_getChildIndicesById
     getLastChild: tubiNodeHelpers_getLastChild
+    getChildById: tubiNodeHelpers_getChildById
     unobserveAllScoped: tubiNodeHelpers_unobserveAllScoped
     unobserveAll: tubiNodeHelpers_unobserveAll
     convertNodesToIdsAA: tubiNodeHelpers_convertNodesToIdsAA
@@ -12,6 +13,8 @@ Function TubiNodeHelpers()
     immutableRemoveChildIndex: tubiNodeHelpers_immutableRemoveChildIndex
     immutableRemoveChild: tubiNodeHelpers_immutableRemoveChild
     countNodes: tubiNodeHelpers_countNodes
+    removeChildAtIndex: tubiNodeHelpers_removeChildAtIndex
+    removeChildAnimationNodes: tubiNodeHelpers_removeChildAnimationNodes
   }
 End Function
 
@@ -74,6 +77,19 @@ Function tubiNodeHelpers_getLastChild(parent)
   end if
 
   return lastChild
+End Function
+
+
+' Returns the first child matching the input childId value within the parent or invalid if there is no children with that id found.
+Function tubiNodeHelpers_getChildById(parent, childId)
+  for i=0 to parent.getChildCount()-1
+    child = parent.getChild(i)
+    if child.id = childId
+      return child
+    end if
+  end for
+
+  return invalid
 End Function
 
 
@@ -206,3 +222,29 @@ Function tubiNodeHelpers_countNodes(node, depth = 0)
   return nodeCount
 End Function
 
+
+' Removes any animation nodes related to the child being deleted.
+' @parent: roSGNode, parent node where the child is present.
+' @index: integer, index of the node that is been deleted.
+' @animationContext: assocarray, Contains a associative array with a parent field key of which value is node where the animation child is present ex: {parent: parentNode}.
+Function tubiNodeHelpers_removeChildAtIndex(parent, index, animationContext = invalid)
+  child = parent.getChild(index)
+  parent.removeChild(child)
+
+  if animationContext <> invalid AND animationContext.parent <> invalid
+    m.removeChildAnimationNodes(animationContext.parent, child.id)
+  else
+    m.removeChildAnimationNodes(parent, child.id)
+  end if
+End Function
+
+
+' Removes any animation nodes related to the child being deleted.
+' @parent: roSGNode, parent node where the animation is present.
+' @id: string, id of the node that is been deleted.
+Function tubiNodeHelpers_removeChildAnimationNodes(parent, id)
+  animationNode = m.getChildById(parent, "GeneralAnimation-" + id)
+  if animationNode <> invalid
+    parent.removeChild(animationNode)
+  end if
+End Function

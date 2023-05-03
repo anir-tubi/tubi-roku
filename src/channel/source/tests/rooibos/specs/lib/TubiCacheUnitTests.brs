@@ -7,6 +7,8 @@ Function TubiCacheSetup()
   m.cache = TubiCache(nodeHelpers, m.constants.ui.cacheableScreenIds, m.constants.ui.permanentlyCachedContentIds)
 
   m.generateNodeTree = tubiNodeHelpersTest_generateNodeTree
+
+  m.testScreenId = "UnitTestScreen"
 End Function
 
 
@@ -115,7 +117,7 @@ Function tubiCache_setInContentCache_test()
   content = m.generateNodeTree(2, 1) 'creates 2 nodes
   content.id = "test_content"
 
-  isCached = m.cache.setInContentCache(content)
+  isCached = m.cache.setInContentCache(content, m.testScreenId)
 
   ' check if content is in the content cache
   cachedContent = m.cache.contentCache["test_content"]
@@ -126,7 +128,7 @@ Function tubiCache_setInContentCache_test()
   ' check if content is kicked out of the cache if max nodes are reached
   subMaxContent = m.generateNodeTree(2, 99) ' creates 100 nodes
   subMaxContent.id = "submax_content"
-  isSubMaxedCached = m.cache.setInContentCache(subMaxContent)
+  isSubMaxedCached = m.cache.setInContentCache(subMaxContent, m.testScreenId)
 
   m.assertTrue(isSubMaxedCached)
   m.assertNotInvalid(m.cache.contentCache["submax_content"])
@@ -137,7 +139,7 @@ Function tubiCache_setInContentCache_test()
   ' check if content is kicked out of the cache if attempting to add more nodes than allowed in cache
   maxContent = m.generateNodeTree(2, 100) ' creates 101 nodes
   maxContent.id = "max_content"
-  isMaxedCached = m.cache.setInContentCache(maxContent)
+  isMaxedCached = m.cache.setInContentCache(maxContent, m.testScreenId)
 
   ' maxContent should not be added because it has too many content nodes
   m.assertFalse(isMaxedCached)
@@ -160,10 +162,10 @@ Function tubiCache_getFromContentCache_test()
   content2 = m.generateNodeTree(2, 1) 'creates 2 nodes
   content2.id = "test_content2"
 
-  isCached1 = m.cache.setInContentCache(content1)
+  isCached1 = m.cache.setInContentCache(content1, m.testScreenId)
   m.assertTrue(isCached1)
 
-  isCached2 = m.cache.setInContentCache(content2)
+  isCached2 = m.cache.setInContentCache(content2, m.testScreenId)
   m.assertTrue(isCached2)
 
   ' get content from content cache
@@ -230,8 +232,8 @@ Function tubiCache_deleteContentFromCache_test()
   content2 = m.generateNodeTree(2, 1) 'creates 2 nodes
   content2.id = "test_content2"
 
-  m.cache.setInContentCache(content1)
-  m.cache.setInContentCache(content2)
+  m.cache.setInContentCache(content1, m.testScreenId)
+  m.cache.setInContentCache(content2, m.testScreenId)
   m.assertTrue(m.cache.contentCache.count() = 2)
 
   isDeleted1 = m.cache.deleteContentFromCache("test_content1")
@@ -259,9 +261,9 @@ Function tubiCache_deleteFromContentCacheOrder_test()
   content3 = m.generateNodeTree(2, 1) 'creates 2 nodes
   content3.id = "test_content3"
 
-  m.cache.setInContentCache(content1)
-  m.cache.setInContentCache(content2)
-  m.cache.setInContentCache(content3)
+  m.cache.setInContentCache(content1, m.testScreenId)
+  m.cache.setInContentCache(content2, m.testScreenId)
+  m.cache.setInContentCache(content3, m.testScreenId)
   m.assertTrue(m.cache.contentCacheOrder.count() = 3)
 
   isDeleted3 = m.cache.deleteFromContentCacheOrder("test_content3")
@@ -281,9 +283,9 @@ Function tubiCache_deleteFromContentCacheOrder_test()
   content3 = m.generateNodeTree(2, 1) 'creates 2 nodes
   content3.id = "test_content3"
 
-  m.cache.setInContentCache(content1)
-  m.cache.setInContentCache(content2)
-  m.cache.setInContentCache(content3)
+  m.cache.setInContentCache(content1, m.testScreenId)
+  m.cache.setInContentCache(content2, m.testScreenId)
+  m.cache.setInContentCache(content3, m.testScreenId)
   m.assertTrue(m.cache.contentCacheOrder.count() = 3)
 
   isDeleted1 = m.cache.deleteFromContentCacheOrder("test_content1")
@@ -303,9 +305,9 @@ Function tubiCache_deleteFromContentCacheOrder_test()
   content3 = m.generateNodeTree(2, 1) 'creates 2 nodes
   content3.id = "test_content3"
 
-  m.cache.setInContentCache(content1)
-  m.cache.setInContentCache(content2)
-  m.cache.setInContentCache(content3)
+  m.cache.setInContentCache(content1, m.testScreenId)
+  m.cache.setInContentCache(content2, m.testScreenId)
+  m.cache.setInContentCache(content3, m.testScreenId)
   m.assertTrue(m.cache.contentCacheOrder.count() = 3)
 
   isDeleted2 = m.cache.deleteFromContentCacheOrder("test_content2")
@@ -327,9 +329,9 @@ Function tubiCache_emptyContentCache_test()
   content3 = m.generateNodeTree(2, 1) 'creates 2 nodes
   content3.id = "test_content3"
 
-  m.cache.setInContentCache(content1)
-  m.cache.setInContentCache(content2)
-  m.cache.setInContentCache(content3)
+  m.cache.setInContentCache(content1, m.testScreenId)
+  m.cache.setInContentCache(content2, m.testScreenId)
+  m.cache.setInContentCache(content3, m.testScreenId)
   m.assertTrue(m.cache.contentCache.count() = 3)
   m.assertTrue(m.cache.contentCacheOrder.count() = 3)
 
@@ -351,9 +353,9 @@ Function tubiCache_getCachedNodeCount_test()
   content3 = m.generateNodeTree(7, 1) 'generates 7 nodes
   content3.id = "content3"
 
-  m.cache.setInContentCache(content1)
-  m.cache.setInContentCache(content2)
-  m.cache.setInContentCache(content3)
+  m.cache.setInContentCache(content1, m.testScreenId)
+  m.cache.setInContentCache(content2, m.testScreenId)
+  m.cache.setInContentCache(content3, m.testScreenId)
 
   cachedNodeCount = m.cache.getCachedNodeCount()
   m.assertEqual(cachedNodeCount, 20)
@@ -372,9 +374,9 @@ Function tubiCache_getLruContentFromCache_test()
 
   m.cache.permanentContentIds["content2"] = true
 
-  m.cache.setInContentCache(content1)
-  m.cache.setInContentCache(content2)
-  m.cache.setInContentCache(content3)
+  m.cache.setInContentCache(content1, m.testScreenId)
+  m.cache.setInContentCache(content2, m.testScreenId)
+  m.cache.setInContentCache(content3, m.testScreenId)
 
   ' test last added content is LRU
   lruCachedContent = m.cache.getLruContentFromCache()
@@ -428,9 +430,9 @@ Function tubiCache_isOnlyPermanentCacheRemaining_test()
   content3 = m.generateNodeTree(2, 1)
   content3.id = "content3"
 
-  m.cache.setInContentCache(content1)
-  m.cache.setInContentCache(content2)
-  m.cache.setInContentCache(content3)
+  m.cache.setInContentCache(content1, m.testScreenId)
+  m.cache.setInContentCache(content2, m.testScreenId)
+  m.cache.setInContentCache(content3, m.testScreenId)
   m.assertFalse(m.cache.isOnlyPermanentCacheRemaining())
 
   ' test with all cached content as "permanent"
@@ -445,10 +447,27 @@ Function tubiCache_isOnlyPermanentCacheRemaining_test()
   content3 = m.generateNodeTree(2, 1)
   content3.id = "content3"
 
-  m.cache.setInContentCache(content1)
-  m.cache.setInContentCache(content2)
-  m.cache.setInContentCache(content3)
+  m.cache.setInContentCache(content1, m.testScreenId)
+  m.cache.setInContentCache(content2, m.testScreenId)
+  m.cache.setInContentCache(content3, m.testScreenId)
 
   m.assertTrue(m.cache.isOnlyPermanentCacheRemaining())
   m.cache.emptyContentCache()
+End Function
+
+
+'@Test deleteScreenContentCache unit tests
+Function tubiCache_deleteScreenContentCache_test()
+  content1 = m.generateNodeTree(2, 1) 'creates 2 nodes
+  content1.id = "test_content1"
+
+  content2 = m.generateNodeTree(2, 1) 'creates 2 nodes
+  content2.id = "test_content2"
+
+  m.cache.setInContentCache(content1, m.testScreenId)
+  m.cache.setInContentCache(content2, m.testScreenId)
+  m.assertTrue(m.cache.contentCache.count() = 2)
+
+  m.cache.deleteScreenContentCache(m.testScreenId)
+  m.assertTrue(m.cache.contentCache.count() = 0)
 End Function

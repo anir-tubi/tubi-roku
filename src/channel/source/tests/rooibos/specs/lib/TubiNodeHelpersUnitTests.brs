@@ -10,7 +10,7 @@ End Function
 Function tubiNodeHelpers_BeforeEach() as void
   m.parent = CreateObject("roSGNode", "ContentNode")
   m.parent.id = "parent"
-  m.NODEHELPERS = TubiNodeHelpers()
+  m.nodeHelpers = TubiNodeHelpers()
 End Function
 
 
@@ -30,8 +30,8 @@ Function tubiNodeHelpers_getChildIndex_test()
     end if
   end for
   fakeChild = CreateObject("roSGNode", "ContentNode")
-  childIndex = m.NODEHELPERS.getChildIndex(m.parent, third)
-  fakeChildIndex = m.NODEHELPERS.getChildIndex(m.parent, fakeChild)
+  childIndex = m.nodeHelpers.getChildIndex(m.parent, third)
+  fakeChildIndex = m.nodeHelpers.getChildIndex(m.parent, fakeChild)
   m.AssertEqual(childIndex, 3)
   m.AssertEqual(fakeChildIndex, -1)
 End Function
@@ -49,8 +49,8 @@ Function tubiNodeHelpers_getChildIndexById_test()
   end for
   fakeChild = CreateObject("roSGNode", "ContentNode")
   fakeChild.id = "fake"
-  childIndex = m.NODEHELPERS.getChildIndexById(m.parent, idToRemove)
-  fakeChildIndex = m.NODEHELPERS.getChildIndex(m.parent, "fake")
+  childIndex = m.nodeHelpers.getChildIndexById(m.parent, idToRemove)
+  fakeChildIndex = m.nodeHelpers.getChildIndex(m.parent, "fake")
   m.AssertEqual(childIndex, 3)
   m.AssertEqual(fakeChildIndex, -1)
 End Function
@@ -77,13 +77,13 @@ Function tubiNodeHelpers_getChildIndicesById_test()
   fakeChild = CreateObject("roSGNode", "ContentNode")
   fakeChild.id = "fake"
   'single index
-  childIndex = m.NODEHELPERS.getChildIndicesById(m.parent, idToRemove)
+  childIndex = m.nodeHelpers.getChildIndicesById(m.parent, idToRemove)
   m.AssertEqual(childIndex, [3])
   'No index
-  fakeChildIndex = m.NODEHELPERS.getChildIndicesById(m.parent, "fake")
+  fakeChildIndex = m.nodeHelpers.getChildIndicesById(m.parent, "fake")
   m.AssertEqual(fakeChildIndex, [])
   'duplicate items
-  childIndices = m.NODEHELPERS.getChildIndicesById(m.parent, dupItems)
+  childIndices = m.nodeHelpers.getChildIndicesById(m.parent, dupItems)
   m.AssertEqual(childIndices, [4,5])
 End Function
 
@@ -119,7 +119,7 @@ Function tubiNodeHelpers_convertNodesToIdsAA_test()
     child = m.parent.createChild("ContentNode")
     child.id = Mid(Str(i), 2)
   end for
-  aaIds = m.NODEHELPERS.convertNodesToIdsAA(m.parent)
+  aaIds = m.nodeHelpers.convertNodesToIdsAA(m.parent)
   mockAA = {
     "0": true
     "1": true
@@ -146,7 +146,7 @@ Function tubiNodeHelpers_immutableInsertChild_test()
   insertable = CreateObject("roSGNode", "ContentNode")
   insertable.id = "insertable"
   insertIndex = 2
-  clonedParent = m.NODEHELPERS.immutableInsertChild(m.parent, insertable, insertIndex)
+  clonedParent = m.nodeHelpers.immutableInsertChild(m.parent, insertable, insertIndex)
   m.AssertFalse(m.parent.isSameNode(clonedParent))
   m.AssertEqual(m.parent.id, clonedParent.id)
   m.AssertEqual(m.parent.getChildCount()+1, clonedParent.getChildCount())
@@ -170,7 +170,7 @@ Function tubiNodeHelpers_immutableInsertChildAlreadyExists_test()
     end if
   end for
   insertIndex = 2
-  clonedParent = m.NODEHELPERS.immutableInsertChild(m.parent, insertable, insertIndex)
+  clonedParent = m.nodeHelpers.immutableInsertChild(m.parent, insertable, insertIndex)
   m.AssertFalse(m.parent.isSameNode(clonedParent))
   m.AssertEqual(m.parent.id, clonedParent.id)
   m.AssertEqual(m.parent.getChildCount(), clonedParent.getChildCount())
@@ -193,7 +193,7 @@ Function tubiNodeHelpers_immutableRemoveChildIndex_test()
       removeId = child.id
     end if
   end for
-  clonedParent = m.NODEHELPERS.immutableRemoveChildIndex(m.parent, removeIndex)
+  clonedParent = m.nodeHelpers.immutableRemoveChildIndex(m.parent, removeIndex)
   m.AssertFalse(m.parent.isSameNode(clonedParent))
   m.AssertEqual(m.parent.id, clonedParent.id)
   m.AssertEqual(m.parent.getChildCount()-1, clonedParent.getChildCount())
@@ -211,7 +211,7 @@ Function tubiNodeHelpers_immutableRemoveChild_test()
       third = child   'node to remove
     end if
   end for
-  clonedParent = m.NODEHELPERS.immutableRemoveChild(m.parent, third)
+  clonedParent = m.nodeHelpers.immutableRemoveChild(m.parent, third)
   m.AssertFalse(m.parent.isSameNode(clonedParent))
   m.AssertEqual(m.parent.id, clonedParent.id)
   m.AssertEqual(m.parent.getChildCount()-1, clonedParent.getChildCount())
@@ -229,7 +229,7 @@ Function tubiNodeHelpers_immutableRemoveChildren_test()
       nodesToRemove.push(child)   'should remove 3 nodes
     end if
   end for
-  clonedParent = m.NODEHELPERS.immutableRemoveChildren(m.parent, nodesToRemove)
+  clonedParent = m.nodeHelpers.immutableRemoveChildren(m.parent, nodesToRemove)
   m.AssertFalse(m.parent.isSameNode(clonedParent))
   m.AssertEqual(m.parent.id, clonedParent.id)
   m.AssertEqual(m.parent.getChildCount()-3, clonedParent.getChildCount())
@@ -314,3 +314,67 @@ Function tubiNodeHelpersTest_generateNodeTree(x, y)
   return parent
 End Function
 
+'@Test removeChildAtIndex unit tests
+Function tubiNodeHelpers_removeChildAtIndex_test()
+  animationNode = CreateObject("roSGNode", "ContentNode")
+  animationNode.id = "GeneralAnimation-child"
+
+  child = CreateObject("roSGNode", "ContentNode")
+  child.id = "child"
+  m.parent.appendChild(child)
+  m.parent.appendChild(animationNode)
+
+  m.nodeHelpers.removeChildAtIndex(m.parent, 0, {parent: m.parent})
+  m.assertEqual(m.parent.getChildCount(), 0)
+
+  ' Testing where the animation parent and child parent is different.
+  m.parent.appendChild(child)
+  animationParent = CreateObject("roSGNode", "ContentNode")
+  animationParent.appendChild(animationNode)
+
+  m.nodeHelpers.removeChildAtIndex(m.parent, 0, {parent: animationParent})
+  m.assertEqual(m.parent.getChildCount(), 0)
+  m.assertEqual(animationParent.getChildCount(), 0)
+
+  ' Testing where the animation context is not passed.
+  m.parent.appendChild(child)
+  m.parent.appendChild(animationNode)
+
+  m.nodeHelpers.removeChildAtIndex(m.parent, 0)
+  m.assertEqual(m.parent.getChildCount(), 0)
+End Function
+
+'@Test removeChildAnimationNodes unit tests
+Function tubiNodeHelpers_removeChildAnimationNodes_test()
+  child = CreateObject("roSGNode", "ContentNode")
+  id = "child"
+  child.id = "GeneralAnimation-" + id
+  m.parent.appendChild(child)
+  m.nodeHelpers.removeChildAnimationNodes(m.parent, id)
+
+  m.assertEqual(m.parent.getChildCount(), 0)
+End Function
+
+
+'@Test getChildById unit tests
+Function tubiNodeHelpers_getChildById_test()
+  child1 = m.parent.createChild("ContentNode")
+  child1.id = "child1"
+
+  child2 = m.parent.createChild("ContentNode")
+  child2.id = "child2"
+
+  child3 = m.parent.createChild("ContentNode")
+  child3.id = "child3"
+
+  child4 = m.parent.createChild("ContentNode")
+  child4.id = "child3"
+
+  childNode = m.nodeHelpers.getChildById(m.parent, "child1")
+  m.AssertEqual(childNode.id, "child1")
+  m.AssertTrue(childNode.isSameNode(child1))
+
+  childNode = m.nodeHelpers.getChildById(m.parent, "child3")
+  m.AssertEqual(childNode.id, "child3")
+  m.AssertTrue(childNode.isSameNode(child3))
+End Function

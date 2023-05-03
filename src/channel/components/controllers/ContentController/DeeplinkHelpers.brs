@@ -317,7 +317,7 @@ Function onSingleChannelFetchForDeeplinkSuccess(successResponse, storeInCache = 
     else
       ' once the channel has been fetched and then set it in the cache to be used by EPG/homeScreen
       if storeInCache = true
-        setInContentCache(linearContent)
+        setInContentCache(linearContent, m.constants.ui.screenIds.epgScreen)
       end if
 
       'show epg Screen for linear content

@@ -87,6 +87,11 @@ End Function
 '                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
 ' @position: integer, the position from which to start video playback
 Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown", "srcForAds": "unknown"}, position = 0)
+  ' Limit to devices with 512Mb RAM as those are the most likely to crash from exceeding the memory limit during playback.
+  if m.constants.deviceInfo.lowVram = true AND getExperimentResource("roku_empty_cache_on_low_memory_devices", "roku_empty_cache_on_low_memory_devices_v1", true).enabled = true
+    updateScreenCacheOnPlayback(m.constants.ui.screenIds.VideoPlayerScreen)
+  end if
+  
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
   if videoPlayer = invalid

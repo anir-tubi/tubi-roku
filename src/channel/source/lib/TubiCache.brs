@@ -22,6 +22,7 @@ Function TubiCache(nodeHelpers, cacheableScreenIds, permanentContentIds)
     emptyContentCache: tubiCache_emptyContentCache
     getCachedNodeCount: tubiCache_getCachedNodeCount
     getCachedScreenCount: tubiCache_getCachedScreenCount
+    getCachedScreenIds: tubiCache_getCachedScreenIds
 
     ' private methods
     getLruContentFromCache: tubiCache_getLruContentFromCache
@@ -30,6 +31,7 @@ Function TubiCache(nodeHelpers, cacheableScreenIds, permanentContentIds)
     deleteContentFromCache: tubiCache_deleteContentFromCache
     deleteFromContentCacheOrder: tubiCache_deleteFromContentCacheOrder
     markContentNotValidOnCachedScreens: tubiCache_markContentNotValidOnCachedScreens
+    deleteScreenContentCache: tubiCache_deleteScreenContentCache
 
     ' private properties
     screenCache: {}
@@ -39,6 +41,9 @@ Function TubiCache(nodeHelpers, cacheableScreenIds, permanentContentIds)
     permanentContentIds: permanentContentIds
     nodeHelpers: nodeHelpers
     maxContentNodes: 30000 'tested over 31,000 nodes on 3700X with no issue
+    ' Creating a mapping of which screen is creating the content cache. So that we can clear the content cache when
+    ' screen gets deleted from cache.
+    screenIdToContentIdMapping: {}
   }
 End Function
 
@@ -78,13 +83,15 @@ End Function
 ' returns: boolean, true if the screen was successfully deleted, otherwise returns false
 Function tubiCache_deleteFromScreenCache(screenId)
   if type(screenId) = "String" or type(screenId) = "roString"
+    m.deleteScreenContentCache(screenId)
     screen = m.getFromScreenCache(screenId)
 
     if screen <> invalid
       m.nodeHelpers.unobserveAllScoped(screen)
     end if
 
-    return m.screenCache.delete(screenId)
+    m.screenCache.delete(screenId)
+    return true
   end if
 
   return false
@@ -114,7 +121,7 @@ End Function
 '           the same id may exists multiple times as children of different parent content nodes.
 '           This is ok and expected.
 ' returns: boolean, true or false depending if the content was successfully set
-Function tubiCache_setInContentCache(content)
+Function tubiCache_setInContentCache(content, screenId)
   if type(content) = "roSGNode" AND content.isSubtype("ContentNode") = true AND content.id <> invalid
 
     ' determine how many content nodes in incoming content
@@ -150,6 +157,13 @@ Function tubiCache_setInContentCache(content)
       if cachedNodeCount + incomingNodeCount <= m.maxContentNodes
         m.contentCache[content.id] = content
         m.addToContentCacheOrder(content)
+        ' Adding contentId to screen mapping.
+        if m.screenIdToContentIdMapping[screenId] = invalid
+          ' Making the value a array to allow flexibility in future to store more items in cache on a screen.
+          m.screenIdToContentIdMapping[screenId] = []
+        end if
+
+        m.screenIdToContentIdMapping[screenId].push(content.id)
         return true
       end if
     end if
@@ -353,4 +367,20 @@ Function tubiCache_addToContentCacheOrder(content)
   end if
 
   return false
+End Function
+
+
+Function tubiCache_getCachedScreenIds()
+  return m.screenCache.keys()
+End Function
+
+
+' @screenId: string, the id of the screen shows content cache needs to be cleared.
+Function tubiCache_deleteScreenContentCache(screenId)
+  contentIds = m.screenIdToContentIdMapping[screenId]
+  if contentIds <> invalid
+    for each id in contentIds
+      m.deleteFromContentCache(id)
+    end for
+  end if
 End Function

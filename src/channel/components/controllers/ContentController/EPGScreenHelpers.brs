@@ -207,7 +207,8 @@ Function onEpgChannelListResponse(response)
     if screen.id = response.requestorID
 
       screen.timeGridContent = response
-      setInContentCache(screen.timeGridContent)
+      ' Storing it under linear video player screen so that we clear it when we remove linear player screen from cache.
+      setInContentCache(screen.timeGridContent, m.constants.ui.screenIds.linearVideoPlayerScreen)
       nFetchInBatch = 10
       ' If jump_to certain channel(contentIdToFocusOnLoadComplete) has been requested after the load is complete, then start with fetching that channel + 5 up + 5 down channels from v2/epg API response.
       ' This way, we can render the epg as soon as the first batch is in and then load the rest of the epg.
@@ -335,7 +336,8 @@ Function onEPGProgramSuccess(response)
     toBeFetchedChannelCount = m.uniqueChannelIdsList.count()
 
     if toBeFetchedChannelCount = 0
-      setInContentCache(screen.timeGridContent)
+      ' Storing it under linear video player screen so that we clear it when we remove linear player screen from cache.
+      setInContentCache(screen.timeGridContent, m.constants.ui.screenIds.linearVideoPlayerScreen)
     else if toBeFetchedChannelCount > 0
       makeEPGProgramCalls(response.requestorID)
     end if

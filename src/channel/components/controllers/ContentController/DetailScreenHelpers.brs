@@ -485,13 +485,13 @@ End Function
 
 
 Function onSingleContentResponseWithTracking(singleContent)
-  setInContentCache(singleContent) ' adding the series content node into the content cache
+  setInContentCache(singleContent, m.constants.ui.screenIds.detailScreen) ' adding the series content node into the content cache
   handleSingleContentResponse(singleContent, true)
 End Function
 
 
 Function onSingleContentResponseWithoutTracking(singleContent)
-  setInContentCache(singleContent) ' adding the series content node into the content cache.
+  setInContentCache(singleContent, m.constants.ui.screenIds.detailScreen) ' adding the series content node into the content cache.
   handleSingleContentResponse(singleContent, false)
 End Function
 

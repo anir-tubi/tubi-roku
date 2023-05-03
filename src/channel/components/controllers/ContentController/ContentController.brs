@@ -1267,8 +1267,10 @@ End Function
 
 
 'a wrapper for setting a content in cache
-Function setInContentCache(content)
-  return m.cache.setInContentCache(content)
+' @content: roSGNode, content node that needs to be cached.
+' @screenId: string, the id of the screen whose is requesting to save the content.
+Function setInContentCache(content, screenId)
+  return m.cache.setInContentCache(content, screenId)
 End Function
 
 
@@ -2126,6 +2128,7 @@ Function onLowMemoryEventInfoChange(msg)
     "upTime": data.upTime
     "type": m.constants.errors.type.lowMemoryWarning
     "name": m.constants.errors.message.lowMemoryWarning
+    "isRokuEmptyCacheExperimentEnabled": (getExperimentResource("roku_empty_cache_on_low_memory_devices", "roku_empty_cache_on_low_memory_devices_v1", false).enabled = true)
   }
 
   ' Setting the samplePercent to 1 so that we send it always since we anyways send it only once per user.
@@ -2139,4 +2142,31 @@ Function isVideoPreviewOn()
   end if
   
   return false
+End Function
+
+
+Function updateScreenCacheOnPlayback(currentVideoScreenID)
+  screenIds = m.cache.getCachedScreenIds()
+  linearVideoPlayerScreenId = m.constants.ui.screenIds.linearVideoPlayerScreen
+  for each id in screenIds
+    ' Do not delete any screen from cache if it is in stack.
+    ' Delete Linear Player and cached content if we switch to VOD.
+
+    ' Adding a check to avoid deleting current screen.
+    if id <> currentVideoScreenID
+      ' Cleaning up linearPlayerScreen when the user switches to VOD.
+      if id = linearVideoPlayerScreenId
+        ' This is needed specifically for Linear only since it works slightly different than screens.
+        ' We have a copy of LinearVideoPlayerScreen outside of Screen Stack.
+        animationContext = {
+          parent: m.top
+        }
+        m.nodeHelpers.removeChildAtIndex(m.LinearPlayerGroup, 0, animationContext)
+      end if
+      ' Deleting screens from cache that are not in screen stack.
+      if getScreenFromStackById(id) = invalid
+        m.cache.deleteFromScreenCache(id)
+      end if
+    end if
+  end for
 End Function
