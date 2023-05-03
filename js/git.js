@@ -240,6 +240,7 @@ function pushBranch(done){
   const gitPushCurrentBranchErrorMsg = `Could not push ${currentBranch} to origin (Github). Please push it manually`;
 
   execShellCommand(done, gitPushCurrentBranch, gitPushCurrentBranchErrorMsg);
+  done();
 }
 
 
@@ -485,7 +486,7 @@ async function buildQaChanges(done) {
     let ticketUrl = '';
     const {data: prComments} = await octokit.issues.listComments({...octokitRequestSharedParams, issue_number: +prId});
     for (const prComment of prComments) {
-      const commentShortcutLinkMatch = prComment.body.match(/\((https:\/\/app.shortcut.com\/tubi\/story\/[^\)]+)\)/);
+      const commentShortcutLinkMatch = prComment.body.match(/\((https:\/\/app.shortcut.com\/tubi\/story\/[^)]+)\)/);
       if (commentShortcutLinkMatch) {
         ticketUrl = commentShortcutLinkMatch[1];
       }
