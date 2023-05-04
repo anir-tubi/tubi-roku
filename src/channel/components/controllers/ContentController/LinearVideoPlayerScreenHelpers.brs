@@ -48,7 +48,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
         setInScreenCache(videoPlayer)
 
-        if getExperimentResource("roku_screensaver", "roku_screensaver_v1", false).enabled = true then
+        if getExperimentResource("roku_screensaver", "roku_screensaver_v2", false).enabled = true then
           videoPlayer.disableScreensaver = true
         end if
       end if

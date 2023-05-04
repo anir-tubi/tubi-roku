@@ -16,16 +16,14 @@ End Function
 Function onScreensaverTimerFired()
   timeUntilScreensaverStart = getTimeUntilScreensaverStart()
 
-  if getExperimentResource("roku_screensaver", "roku_screensaver_v1", false).enabled <> true then
-    ' We don't prevent the system screensaver from taking over in the control variant.
-    ' In order to make sure we get our network request out in time for the experiment exposure event before the screensaver starts
-    ' we trigger one second earlier
-    timeUntilScreensaverStart -= 1
-  end if
+  ' We don't prevent the system screensaver from taking over in the control variant.
+  ' In order to make sure we get our network request out in time for the experiment exposure event before the screensaver starts
+  ' we trigger one second earlier
+  timeUntilScreensaverStart -= 1
 
   if timeUntilScreensaverStart > 0 then
     startScreensaverTimer(timeUntilScreensaverStart)
-  else if getExperimentResource("roku_screensaver", "roku_screensaver_v1", true).enabled = true then
+  else if getExperimentResource("roku_screensaver", "roku_screensaver_v2", true).enabled = true then
     ' Start our screensaver
     showScreensaverScreen()
   end if

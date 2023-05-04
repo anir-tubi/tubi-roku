@@ -47,7 +47,7 @@ Function init()
   m.SideNav = m.top.findNode("SideNav")
 
   m.videoPreviewPlayer = m.top.findNode("videoPreviewPlayer")
-  if getExperimentResource("roku_screensaver", "roku_screensaver_v1", false).enabled = true then
+  if getExperimentResource("roku_screensaver", "roku_screensaver_v2", false).enabled = true then
     m.videoPreviewPlayer.disableScreensaver = true
   end if
 
@@ -2140,7 +2140,7 @@ Function isVideoPreviewOn()
   if m.preferences <> invalid
     return (isVideoPreviewEnabled() = true AND m.preferences.isVideoPreviewOn = true)
   end if
-  
+
   return false
 End Function
 

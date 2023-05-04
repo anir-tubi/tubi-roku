@@ -47,7 +47,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_screensaver: {
-        roku_screensaver_v1 : {"enabled": false}
+        roku_screensaver_v2 : {"enabled": false}
       }
 
 

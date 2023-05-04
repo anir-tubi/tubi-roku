@@ -103,7 +103,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     initVideoTracking(videoPlayer) 'initializeYoubora
     setInScreenCache(videoPlayer)
 
-    if getExperimentResource("roku_screensaver", "roku_screensaver_v1", false).enabled = true then
+    if getExperimentResource("roku_screensaver", "roku_screensaver_v2", false).enabled = true then
       videoPlayer.disableScreensaver = true
     end if
   end if
