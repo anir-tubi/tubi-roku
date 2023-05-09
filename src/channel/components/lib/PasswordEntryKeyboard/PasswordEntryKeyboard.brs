@@ -19,6 +19,29 @@ Function init()
   m.keyboard.textEditBox.opacity = 0.00001
   m.keyboard.palette = handleKeyboardColors()
 
+  '//Keep a record of keys that are on the lower line of the left side of the keyboard
+  m.aLeftLowerKeys = {}
+  m.aLeftLowerKeys["left"] =  true
+  m.aLeftLowerKeys["right"] =  true
+
+  '//Keep a record of keys that are on the lower line of the right side of the keyboard
+  m.aRightLowerKeys = {}
+  m.aRightLowerKeys["@"] =  true
+  m.aRightLowerKeys["."] =  true
+  m.aRightLowerKeys["0"] =  true
+  m.aRightLowerKeys["accents"] =  true
+  m.aRightLowerKeys["÷"] =  true
+  m.aRightLowerKeys["±"] =  true
+  m.aRightLowerKeys["–"] =  true
+  m.aRightLowerKeys["—"] =  true
+  m.aRightLowerKeys["‚"] =  true
+  m.aRightLowerKeys["‰"] =  true
+  m.aRightLowerKeys["ß"] =  true
+  m.aRightLowerKeys["þ"] =  true
+  m.aRightLowerKeys["Ž"] =  true
+  m.aRightLowerKeys["Ð"] =  true
+  m.aRightLowerKeys["Þ"] =  true
+
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
   m.top.observeFieldScoped("voiceEnabled", "onVoiceEnabledChange")
   m.keyboard.textEditBox.observeFieldScoped("focusedChild", "onTextEditBoxFocusedChildChange")
@@ -37,7 +60,16 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
     if key = "down"
       if m.keyboard.isInFocusChain() = true
-        m.continue.setFocus(true)
+        sPreviouslyFocusedKey = m.keyboard.focusedChild.keyFocused
+        if sPreviouslyFocusedKey <> invalid AND m.aLeftLowerKeys[sPreviouslyFocusedKey] = true
+          '//if the key focus is on the lower left of the keyboard, then set focus on the back button
+          m.back.setFocus(true)
+        else if sPreviouslyFocusedKey <> invalid AND m.aRightLowerKeys[sPreviouslyFocusedKey] = true
+          '//if the key focus is on the lower right of the keyboard, then set focus on the showHidePassword button
+          m.showHidePassword.setFocus(true)
+        else
+          m.continue.setFocus(true)
+        end if
       end if
 
     else if key = "up"
