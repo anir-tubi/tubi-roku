@@ -146,8 +146,9 @@ Function onCreateMenuItems()
   m.mainItems.itemSpacing = [0, 12]
   m.mainItemsSelected.itemSpacing = [0, 12]
   'this is to accommodate spanish signIn text + free Icon
-  m.mainItems.itemSize = [438, 72]
-  m.mainItemsSelected.itemSize = [438, 72]
+  m.mainItemsOriginalItemSize = [438, 72]
+  m.mainItems.itemSize = m.mainItemsOriginalItemSize
+  m.mainItemsSelected.itemSize = m.mainItemsOriginalItemSize
 
   m.itemGroups.translation = [57, 40]
   m.mainItems.wrapDividerBitmapUri = ""
@@ -555,12 +556,14 @@ Function onOpenedChanged()
     fade(m.sideNavBackground, "in", 0.2)
 
     setContentActive(m.MainContent)
-    m.mainItemsSelected.itemSize = m.mainItems.itemSize
+    animateItemSize(m.mainItemsSelected, m.mainItemsOriginalItemSize, 0.2)
+    animateItemSize(m.mainItems, m.mainItemsOriginalItemSize, 0.2)
   else
     fade(m.sideNavBackground, "out", 0.2)
 
     setContentActive(m.MainContent, false)
-    m.mainItemsSelected.itemSize = [108, m.mainItemsSelected.itemSize[1]]
+    animateItemSize(m.mainItemsSelected, [108, m.mainItemsSelected.itemSize[1]], 0.2)
+    animateItemSize(m.mainItems, [108, m.mainItems.itemSize[1]], 0.2)
     m.listItemSelected = invalid
     m.oldSideNavFocusedButton = invalid
   end if

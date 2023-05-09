@@ -151,6 +151,24 @@ End Function
 
 
 '''''''''''''
+' animateItemSize
+'
+' animate the itemSize property of the target
+' @param target: Object, the target element that is being animated 
+' @param itemSize: vector2d array, the itemSize property of the target that will be animated
+' @param duration: float, the duration of the animation
+' @param delay: float, the delay (if any) of the animation
+Function animateItemSize(target As Object, itemSize As Object, duration As Float, delay=0.0 As Float)
+  animationOptions = {
+    duration: duration
+    delay: delay
+    itemSize: itemSize
+  }
+  return animate(target, animationOptions)
+End Function
+
+
+'''''''''''''
 ' colorSlide
 '
 ' transitions the color of a node
@@ -202,6 +220,7 @@ End Function
 ' @options: assocArray, animation options. Valid options are:
 '           origin: vector2d array, representing an x,y translation from which a slide animation starts
 '           destination: vector2d array, representing an x,y translation to which a slide animation ends
+'           itemSize: vector2d array, representing a width/height itemSize to which a resize animation ends
 '           opacity: float, representing the final opacity in a fade animation
 '           scale: float, representing the final scale of a resize animation
 '           color: hex value e.g. RGBA 0xFFFFFFFF, representing the final color of a color change animation
@@ -261,42 +280,54 @@ Function animate(target As Object, options as Object) As Object
       animation.control = "stop"
     end if
 
-    fadeinterpolator = animation.findNode("FadeInterpolator-" + target.id)
-    if fadeinterpolator = invalid AND options.opacity <> invalid
-      fadeinterpolator = animation.createChild("FloatFieldInterpolator")
-      fadeinterpolator.id = "FadeInterpolator-" + target.id
-      fadeinterpolator.fieldToInterp = target.id + ".opacity"
-    else if fadeinterpolator <> invalid AND options.opacity = invalid
-      animation.removeChild(fadeinterpolator)
+    fadeInterpolator = animation.findNode("FadeInterpolator-" + target.id)
+    if fadeInterpolator = invalid AND options.opacity <> invalid
+      fadeInterpolator = animation.createChild("FloatFieldInterpolator")
+      fadeInterpolator.id = "FadeInterpolator-" + target.id
+      fadeInterpolator.fieldToInterp = target.id + ".opacity"
+    else if fadeInterpolator <> invalid AND options.opacity = invalid
+      animation.removeChild(fadeInterpolator)
     end if
 
-    slideinterpolator = animation.findNode("SlideInterpolator-" + target.id)
-    if slideinterpolator = invalid AND (options.destination <> invalid AND options.origin <> invalid)
-      if options.origin[0] <> options.destination[0] or options.origin[1] <> options.destination[1]
-        slideinterpolator = animation.createChild("Vector2DFieldInterpolator")
-        slideinterpolator.id = "SlideInterpolator-" + target.id
-        slideinterpolator.fieldToInterp = target.id + ".translation"
+    slideInterpolator = animation.findNode("SlideInterpolator-" + target.id)
+    if slideInterpolator = invalid AND (options.destination <> invalid AND options.origin <> invalid)
+      if options.origin[0] <> options.destination[0] OR options.origin[1] <> options.destination[1]
+        slideInterpolator = animation.createChild("Vector2DFieldInterpolator")
+        slideInterpolator.id = "SlideInterpolator-" + target.id
+        slideInterpolator.fieldToInterp = target.id + ".translation"
       end if
-    else if slideinterpolator <> invalid AND (options.destination = invalid or options.origin = invalid)
-      animation.removeChild(slideinterpolator)
+    else if slideInterpolator <> invalid AND (options.destination = invalid OR options.origin = invalid)
+      animation.removeChild(slideInterpolator)
     end if
 
-    scaleinterpolator = animation.findNode("ScaleInterpolator-" + target.id)
-    if scaleinterpolator = invalid AND options.scale <> invalid
-      scaleinterpolator = animation.createChild("Vector2DFieldInterpolator")
-      scaleinterpolator.id = "ScaleInterpolator-" + target.id
-      scaleinterpolator.fieldToInterp = target.id + ".scale"
-    else if scaleinterpolator <> invalid AND options.scale = invalid
-      animation.removeChild(scaleinterpolator)
+    itemSizeInterpolator = animation.findNode("ItemSizeInterpolator-" + target.id)
+    targetItemSize = target.itemSize
+    if itemSizeInterpolator = invalid AND options.itemSize <> invalid AND targetItemSize <> invalid
+      if targetItemSize[0] <> options.itemSize[0] OR targetItemSize[1] <> options.itemSize[1]
+        itemSizeInterpolator = animation.createChild("Vector2DFieldInterpolator")
+        itemSizeInterpolator.id = "ItemSizeInterpolator-" + target.id
+        itemSizeInterpolator.fieldToInterp = target.id + ".itemSize"
+      end if
+    else if itemSizeInterpolator <> invalid AND options.itemSize = invalid
+      animation.removeChild(itemSizeInterpolator)
     end if
 
-    colorinterpolator = animation.findNode("ColorInterpolator-" + target.id)
-    if colorinterpolator = invalid AND (options.color <> invalid AND target.color <> invalid)
-      colorinterpolator = animation.createChild("ColorFieldInterpolator")
-      colorinterpolator.id = "ColorInterpolator-" + target.id
-      colorinterpolator.fieldToInterp = target.id + ".color"
-    else if colorinterpolator <> invalid AND (options.color = invalid or target.color = invalid)
-      animation.removeChild(colorinterpolator)
+    scaleInterpolator = animation.findNode("ScaleInterpolator-" + target.id)
+    if scaleInterpolator = invalid AND options.scale <> invalid
+      scaleInterpolator = animation.createChild("Vector2DFieldInterpolator")
+      scaleInterpolator.id = "ScaleInterpolator-" + target.id
+      scaleInterpolator.fieldToInterp = target.id + ".scale"
+    else if scaleInterpolator <> invalid AND options.scale = invalid
+      animation.removeChild(scaleInterpolator)
+    end if
+
+    colorInterpolator = animation.findNode("ColorInterpolator-" + target.id)
+    if colorInterpolator = invalid AND (options.color <> invalid AND target.color <> invalid)
+      colorInterpolator = animation.createChild("ColorFieldInterpolator")
+      colorInterpolator.id = "ColorInterpolator-" + target.id
+      colorInterpolator.fieldToInterp = target.id + ".color"
+    else if colorInterpolator <> invalid AND (options.color = invalid OR target.color = invalid)
+      animation.removeChild(colorInterpolator)
     end if
 
     heightInterpolator = animation.findNode("HeightInterpolator-" + target.id)
@@ -304,7 +335,7 @@ Function animate(target As Object, options as Object) As Object
       heightInterpolator = animation.createChild("FloatFieldInterpolator")
       heightInterpolator.id = "HeightInterpolator-" + target.id
       heightInterpolator.fieldToInterp = target.id + ".height"
-    else if heightInterpolator <> invalid AND (options.height = invalid or options.height = target.height)
+    else if heightInterpolator <> invalid AND (options.height = invalid OR options.height = target.height)
       animation.removeChild(heightInterpolator)
     end if
 
@@ -313,7 +344,7 @@ Function animate(target As Object, options as Object) As Object
       widthInterpolator = animation.createChild("FloatFieldInterpolator")
       widthInterpolator.id = "WidthInterpolator-" + target.id
       widthInterpolator.fieldToInterp = target.id + ".width"
-    else if widthInterpolator <> invalid AND (options.width = invalid or options.width = target.width)
+    else if widthInterpolator <> invalid AND (options.width = invalid OR options.width = target.width)
       animation.removeChild(widthInterpolator)
     end if
 
@@ -325,22 +356,22 @@ Function animate(target As Object, options as Object) As Object
       delayTime = options.delay / totalTime
     end if
 
-    if fadeinterpolator <> invalid
-      fadeinterpolator.key = [0.0, delayTime, 1.0]
-      fadeinterpolator.keyValue = [target.opacity, target.opacity, options.opacity]
+    if fadeInterpolator <> invalid
+      fadeInterpolator.key = [0.0, delayTime, 1.0]
+      fadeInterpolator.keyValue = [target.opacity, target.opacity, options.opacity]
 
       if bAnimate = false
         target.opacity = options.opacity
       end if
     end if
 
-    if slideinterpolator <> invalid
-      slideinterpolator.key = [0.0, delayTime, 1.0]
+    if slideInterpolator <> invalid
+      slideInterpolator.key = [0.0, delayTime, 1.0]
       ' BUG: For some reason, keyValue cannot be set with the following line.  The firmware complains
       '      about a type mismatch.  Hence the verbose line below that which seems overly pedantic.
-      '      slideinterpolator.keyValue = [origin, origin, destination]
+      '      slideInterpolator.keyValue = [origin, origin, destination]
       if options.destination <> invalid
-        slideinterpolator.keyValue = [[options.origin[0], options.origin[1]], [options.origin[0], options.origin[1]], [options.destination[0], options.destination[1]]]
+        slideInterpolator.keyValue = [[options.origin[0], options.origin[1]], [options.origin[0], options.origin[1]], [options.destination[0], options.destination[1]]]
 
         if bAnimate = false
           target.translation = [options.destination[0], options.destination[1]]
@@ -348,19 +379,31 @@ Function animate(target As Object, options as Object) As Object
       end if
     end if
 
-    if scaleinterpolator <> invalid
-      scaleinterpolator.key = [0.0, delayTime, 1.0]
-      'see above comment about slideinterpolator keyValue format
-      scaleinterpolator.keyValue = [[target.scale[0], target.scale[1]], [target.scale[0], target.scale[1]], [options.scale, options.scale]]
+    if itemSizeInterpolator <> invalid
+      itemSizeInterpolator.key = [0.0, delayTime, 1.0]
+      if options.itemSize <> invalid
+        'see above comment about slideInterpolator keyValue format
+        itemSizeInterpolator.keyValue = [[target.itemSize[0], target.itemSize[1]], [target.itemSize[0], target.itemSize[1]], [options.itemSize[0], options.itemSize[1]]]
+
+        if bAnimate = false
+          target.itemSize = [options.itemSize[0], options.itemSize[1]]
+        end if
+      end if
+    end if
+
+    if scaleInterpolator <> invalid
+      scaleInterpolator.key = [0.0, delayTime, 1.0]
+      'see above comment about slideInterpolator keyValue format
+      scaleInterpolator.keyValue = [[target.scale[0], target.scale[1]], [target.scale[0], target.scale[1]], [options.scale, options.scale]]
 
       if bAnimate = false
         target.scale = [options.scale, options.scale]
       end if
     end if
 
-    if colorinterpolator <> invalid
-      colorinterpolator.key = [0.0, delayTime, 1.0]
-      colorinterpolator.keyValue = [target.color, target.color, options.color]
+    if colorInterpolator <> invalid
+      colorInterpolator.key = [0.0, delayTime, 1.0]
+      colorInterpolator.keyValue = [target.color, target.color, options.color]
 
       if bAnimate = false
         target.color = options.color
