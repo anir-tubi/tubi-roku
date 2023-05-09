@@ -111,6 +111,7 @@ Function onScreenFocusChange()
       m.emailHasFocus = true
     else
       m.password.setFocus(true)
+      m.emailHasFocus = false
     end if
   end if
 
@@ -290,6 +291,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         hideKeyboard()
         showButtons()
         m.password.setFocus(true)
+        m.emailHasFocus = false
       else
         m.trackingLoggingTask.trackEvent = {
           type: "account"
@@ -307,6 +309,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
       if m.email.hasFocus() = true
         m.password.setFocus(true)
+        m.emailHasFocus = false
       else if m.password.hasFocus() = true
         m.continueBtn.setFocus(true)
       else if m.continueBtn.hasFocus() = true
@@ -320,6 +323,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         m.emailHasFocus = true
       else if m.continueBtn.hasFocus() = true
         m.password.setFocus(true)
+        m.emailHasFocus = false
       else if m.termsBtn.hasFocus() = true
         m.continueBtn.setFocus(true)
       else if m.ppBtn.hasFocus() = true
@@ -331,6 +335,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         hideKeyboard()
         showButtons()
         m.password.setFocus(true)
+        m.emailHasFocus = false
       end if
 
     else if key = "right"
@@ -373,6 +378,7 @@ Function onButtonSelected(evt)
     hideKeyboard()
     showButtons()
     m.password.setFocus(true)
+    m.emailHasFocus = false
   end if
 
 End Function
