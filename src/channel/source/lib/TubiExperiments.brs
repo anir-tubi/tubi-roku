@@ -62,7 +62,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_dash: {
-        roku_dash_v1 : {"enabled": false}
+        roku_dash_v2 : {"enabled": false}
       }
 
       roku_category_detailscreen_lazy_load: {

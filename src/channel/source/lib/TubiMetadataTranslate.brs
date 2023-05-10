@@ -484,8 +484,17 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   ' trailers
   if contentFromServer.trailers <> invalid AND type(contentFromServer.trailers) = "roArray" AND contentFromServer.trailers.count() > 0
-    if contentFromServer.trailers[0] <> invalid AND contentFromServer.trailers[0].url <> invalid AND contentFromServer.trailers[0].url <> ""
-      translatedContent.trailerInfo = contentFromServer.trailers[0]
+    trailerInfo = contentFromServer.trailers[0]
+
+    if trailerInfo <> invalid AND isNonEmptyString(trailerInfo.url)
+
+        if Lcase(trailerInfo.url).instr(1, ".mpd") > 0
+          trailerInfo.streamFormat = "dash"
+          translatedContent.trailerInfo = trailerInfo
+        else if Lcase(trailerInfo.url).instr(1, ".m3u8") > 0
+          trailerInfo.streamFormat = "hls"
+          translatedContent.trailerInfo = trailerInfo
+        end if
     end if
   end if
 
@@ -1691,7 +1700,7 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
   has4kHevcStream = false
 
   ' hasOnlyNonDrm helps to decide whether video resources has only non-drm manifests by checking type hlsv3 or dash
-  ' //REMOVE hasOnlyNonDrm once we graduate roku_dash_v1 experiment.
+  ' //REMOVE hasOnlyNonDrm once we graduate roku_dash_v2 experiment.
   hasOnlyNonDrm = true
 
   codecToVideoResourcesIndexMap = {}
@@ -1711,13 +1720,13 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
 
     if contentFromServer.type <> m.constants.ui.categoryTypes.linear AND contentFromServer.type <> "l" AND hasOnlyNonDrm = true
 
-      ' //REMOVE 'isNonDrmContent' field and its references once we graduate roku_dash_v1 experiment.
+      ' //REMOVE 'isNonDrmContent' field and its references once we graduate roku_dash_v2 experiment.
       ' isNonDrmContent interface is added to TubiContentNode in order to identify whether video resource has only dash or hlsv3 content
       contentNode.addField("isNonDrmContent", "boolean", false)
       contentNode.isNonDrmContent = true
 
       if m.experiments <> invalid
-        experimentResult = m.experiments.getExperimentResult("roku_dash", "roku_dash_v1")
+        experimentResult = m.experiments.getExperimentResult("roku_dash", "roku_dash_v2")
 
         if experimentResult <> invalid AND experimentResult.experiment_name <> invalid AND experimentResult.treatment <> invalid
           titanVersionOrExperimentVersion = "exp=" + experimentResult.experiment_name + "." + experimentResult.treatment
@@ -1736,7 +1745,7 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
       if video.manifest <> invalid
         if video.manifest.url <> invalid then
           resource.url = video.manifest.url
-          
+
           ' Below lines of code helps QA with automation by passing the linear manifest url through qa proxy server.
           #if linearQaProxyEnabled
             settings = m.constants.settings

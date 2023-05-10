@@ -1629,12 +1629,12 @@ Function trailerHelper(screen)
         trailerContent.title = getTranslation("videoPlayer_trailerTitle", {title: content.title})
       end if
 
-      trailerContent.streamformat = "hls"
       trailerContent.nowPos = 0
       trailerContent.isTrailer = true
 
       if content.hasTrailer AND content.trailerInfo <> invalid AND content.trailerInfo.url <> invalid
         trailerContent.url = content.trailerInfo.url
+        trailerContent.streamFormat = content.trailerInfo.streamFormat
         trailerContent.id = content.trailerInfo.id
         trailerContent.subtitleTracks = []
         trailerContent.subtitleConfig = invalid

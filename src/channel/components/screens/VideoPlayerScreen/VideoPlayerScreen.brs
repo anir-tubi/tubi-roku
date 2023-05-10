@@ -184,7 +184,7 @@ Function init()
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("wasBackButtonSelected", "onWasBackButtonSelectedChange")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("trackingEventInfo", "onTrackingEventInfoChange")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("audioTrack", "onAudioTrackChange")
-  
+
   m.buttonUris = m.constants.player.transportButtons
   m.focusedButtonIndex = 0
   setFocusedButton(m.PlayPauseButton)
@@ -463,10 +463,10 @@ Function playContent()
         ' fire exposure event for video playback if manifest had HEVC/4k content for treatment & control
         getExperimentResource("roku_hevc_drm_4k", "roku_hevc_drm_4k_v1", true)
       end if
-      
+
       if m.Video.content.isNonDrmContent = true
         ' fire exposure event for video playback if manifest had only dash or hlsv3 content for treatment & control
-        getExperimentResource("roku_dash", "roku_dash_v1", true)
+        getExperimentResource("roku_dash", "roku_dash_v2", true)
       end if
 
       m.Video.control = "play"
@@ -968,7 +968,7 @@ Function onAdStateChange(msg)
       end if
       if m.Video.content.isNonDrmContent = true
         ' fire exposure event for video playback if manifest had only dash or hlsv3 content for treatment & control
-        getExperimentResource("roku_dash", "roku_dash_v1", true)
+        getExperimentResource("roku_dash", "roku_dash_v2", true)
       end if
       m.Video.control = "play"
       m.mostRecentCompletedCuepoint = m.playerPosition
@@ -1255,7 +1255,7 @@ Function resetVideoPlayerState(content = invalid)
   m.top.upNextContentToAutoplay = invalid
   m.shouldShowUpNext = true
   m.UpNext.resetContent = true
-  
+
   m.RewindButton.uri = m.buttonUris.rewind
   m.FastForwardButton.uri = m.buttonUris.fastforward
 
@@ -1879,15 +1879,15 @@ End Function
 Function onAvailableAudioTracksChange(msg)
   availableAudioTracks = msg.getData()
   preferredAudioTrack = m.top.preferredAudioTrack
-  
+
   ' Proceeding only if we have stored device/user level settings.
-  if availableAudioTracks <> invalid AND availableAudioTracks.Count() > 1 AND isAA(preferredAudioTrack) = true AND isNonEmptyString(preferredAudioTrack.language) = true 
+  if availableAudioTracks <> invalid AND availableAudioTracks.Count() > 1 AND isAA(preferredAudioTrack) = true AND isNonEmptyString(preferredAudioTrack.language) = true
     ' Holds the value of the audioTrack to be set to the video node.
     updatedAudioTrack = invalid
     for each track in availableAudioTracks
 
       if isNonEmptyString(track.name) then
-        
+
         hasAccessibilityDescription = false
         if track.name.instr(m.constants.player.audioDescriptionTrackNamePrefix) > -1
           hasAccessibilityDescription = true

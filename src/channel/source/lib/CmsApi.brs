@@ -574,7 +574,7 @@ End Function
 ' cmsApi_getVideoResources returns video resources order based on experiment response
 Function cmsApi_getVideoResources()
 
-  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_dash", "roku_dash_v1").enabled = true
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_dash", "roku_dash_v2").enabled = true
     videoResources = m.constants.player.drmOrderDash
   else
     videoResources = m.constants.player.drmOrder
