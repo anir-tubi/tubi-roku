@@ -1736,7 +1736,7 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
       if video.manifest <> invalid
         if video.manifest.url <> invalid then
           resource.url = video.manifest.url
-
+          
           ' Below lines of code helps QA with automation by passing the linear manifest url through qa proxy server.
           #if linearQaProxyEnabled
             settings = m.constants.settings

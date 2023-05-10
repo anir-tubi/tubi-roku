@@ -60,6 +60,8 @@ Function init()
   m.Video.observeField("state", "onVideoStateChange")
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
   m.Video.observeField("streamingSegment", "onStreamingSegmentChange")
+  m.video.observeFieldScoped("availableSubtitleTracks", "setCCAudioTransportBarVisibility")
+  m.video.observeFieldScoped("availableAudioTracks", "onAvailableAudioTracksChange")
 
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("sprites", "onSpritesReceived")
@@ -175,14 +177,17 @@ Function init()
   m.HopForwardButton = m.TransportButtons.findNode("HopForwardButton")
   m.FastForwardButton = m.TransportButtons.findNode("FastForwardButton")
   m.EndButton = m.TransportButtons.findNode("EndButton")
-  m.ClosedCaption = m.TransportButtons.findNode("ClosedCaption")
-  m.CCRailOn = m.TransportButtons.findNode("CCRailOn")
-  m.CCRailOff = m.TransportButtons.findNode("CCRailOff")
-  m.CCNipple = m.TransportButtons.findNode("CCNipple")
+  m.closedCaptionAudioButton = m.top.findNode("closedCaptionAudioButton")
+  m.closedCaptionAndAudioSelectionOverlay = m.top.findNode("closedCaptionAndAudioSelectionOverlay")
+  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("globalCaptionTurnedOn", "onGlobalCaptionTurnedOnChange")
+  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("globalCaptionTurnedOff", "onGlobalCaptionTurnedOffChange")
+  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("wasBackButtonSelected", "onWasBackButtonSelectedChange")
+  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("trackingEventInfo", "onTrackingEventInfoChange")
+  m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("audioTrack", "onAudioTrackChange")
+  
   m.buttonUris = m.constants.player.transportButtons
   m.focusedButtonIndex = 0
   setFocusedButton(m.PlayPauseButton)
-  m.ClosedCaptionDisabled = m.top.findNode("ClosedCaptionDisabled")
 
   m.lastPingTime = 0
   m.lastSavedPosition = 0
@@ -224,21 +229,8 @@ Function init()
   m.analyticsInterval = m.constants.player.pingFrequency
   m.historyInterval = m.constants.player.historyFrequency
 
-  'if global captions are turned on, slide the closed caption toggle to on position
-  m.CCNippleOnTranslation = [89,0]
-  m.CCNippleOffTranslation = [58,0]
-
   ' set to the end position of replay if caption mode is temporarily turned on during a replay
   m.replayCaptionEnd = 0
-
-  ' used by CC dialog
-  m.ccSelections = [ 0 ]  ' modeled as an array for adding caption and audio tracks selection
-  m.ccModes = [
-    ' globalCaptionMode text,       Button text on software caption dialog      Dialog Subtype for analytics
-    ["Off",                          "Off",                                      "off"]
-    ["On",                           "On always",                                "on-always"]
-    ["Instant replay",               "On replay",                                "on-replay"]
-  ]
 
   m.thumbnailMinXOffset = 238 ' based on zeplin designs
   m.thumbnailMaxXOffset = 1920 - 238 - m.Thumbnail.width
@@ -263,6 +255,9 @@ Function init()
 
   ' the video player screen should be false until placed upon the screen stack
   m.top.visible = false
+
+  ' Creating internal state to track when the overlay is visible to users.
+  m.isClosedCaptionAudioOverlayShowing = false
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -468,7 +463,7 @@ Function playContent()
         ' fire exposure event for video playback if manifest had HEVC/4k content for treatment & control
         getExperimentResource("roku_hevc_drm_4k", "roku_hevc_drm_4k_v1", true)
       end if
-
+      
       if m.Video.content.isNonDrmContent = true
         ' fire exposure event for video playback if manifest had only dash or hlsv3 content for treatment & control
         getExperimentResource("roku_dash", "roku_dash_v1", true)
@@ -494,7 +489,6 @@ Function onThemeChange(msg = invalid)
     m.ProgressBar.focusColor = m.focusedColor
     m.LoadingProgressBar.focusColor = m.focusedColor
     m.LoadingProgressBar.unfocusColor = m.focusedColor
-    m.CCRailOn.blendColor = m.focusedColor
     m.ratingBar.color = m.focusedColor
     m.ratingLabel.color = theme.primaryTextColor
     m.LoadingProgressBar.trackColor = theme.neutralColor2
@@ -730,7 +724,7 @@ Function onVideoPositionChange(msg)
   end if
 
   ' Auto hide transport
-  if m.VideoState = "play" AND m.HUD.opacity = 1 AND m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime
+  if m.VideoState = "play" AND m.HUD.opacity = 1 AND m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime AND m.isClosedCaptionAudioOverlayShowing = false
     animateTransport("out")
   end if
 
@@ -1019,54 +1013,6 @@ Function onRAFAdContainerChangeChange(msg)
 End Function
 
 
-Function onCaptionModeChange()
-  tubiLog("VideoPlayer.onCaptionModeChange")
-  if m.Video.globalCaptionMode = "On"
-    fade(m.CCRailOn, "in", 0.5)
-    fade(m.CCRailOff, "out", 0.5)
-    slideTo(m.CCNipple, m.CCNippleOnTranslation, 0.5)
-    toggleState = "ON"
-  else  'handles "Off", "Instant replay", and "When mute"
-    fade(m.CCRailOn, "out", 0.5)
-    fade(m.CCRailOff, "in", 0.5)
-    slideTo(m.CCNipple, m.CCNippleOffTranslation, 0.5)
-    toggleState = "OFF"
-  end if
-
-  if m.Video.content <> invalid then
-    language = "UNKNOWN"
-    for i=0 to m.Video.availableSubtitleTracks.count()-1
-      trackInfo = m.Video.availableSubtitleTracks[i]
-      if m.Video.subtitleTrack = trackInfo.TrackName
-        if trackInfo.language = "eng"
-          language = "EN"
-        else if trackInfo.language = "spa"
-          language = "ES"
-        else if trackInfo.language = "fre"
-          language = "FR"
-        else if trackInfo.language = "fra"
-          language = "FR"
-        else if trackInfo.language = "kor"
-          language = "KO"
-        else if trackInfo.language = "cho"
-          language = "ZH"
-        else if trackInfo.language = "zhi"
-          language = "ZH"
-        end if
-      end if
-    end for
-    trackEvent({
-      type: "subtitles_toggle"
-      values: {
-        video_id: m.Video.content.id.toInt()
-        toggle_state: toggleState  'ToggleState enum
-        language_code: language  'LanguageCode enum
-      }
-    })
-  end if
-End Function
-
-
 Function onSpritesReceived(msg)
   thumbnailsInfo = msg.getData()  'expect a TubiContentNode with thumbnail fields populated
 
@@ -1224,21 +1170,6 @@ Function cancelReplayCaptions()
 End Function
 
 
-' Discover the current cc settings and format button text accordingly
-Function getCCButtons()
-  if m.top.content.subtitleTracks = invalid or m.top.content.subtitleTracks.count() = 0 then
-    return ["Close"]
-  else
-    for i=0 to m.ccModes.count()-1
-      if m.video.globalCaptionMode = m.ccModes[i][0]
-        m.ccSelections[0] = i
-      end if
-    end for
-    return ["Mode: " + m.ccModes[m.ccSelections[0]][1], "Close"]
-  end if
-End Function
-
-
 'exit the video player due to back button while no transport displaying, or during ad break
 Function backButtonExit()
   m.top.backButtonPressed = true
@@ -1249,7 +1180,7 @@ End Function
 Function showAdBreak()
   ' leave m.VideoState = "play" because from the component's perspective video is still playing
   m.Video.control = "stop"
-  closeCCDialog()  ' if dialog is showing, it's awkward to have it still show after ad break
+  hideClosedCaptionAudioTrackOverlay()  ' if dialog is showing, it's awkward to have it still show after ad break
 
   m.top.adPosition = m.playerPosition
   m.top.adControl = "play"
@@ -1283,6 +1214,12 @@ Function prepareToStartVideo(content, videoResourceIndex = [0,0])
 End Function
 
 
+Function onCaptionModeChange(msg)
+  globalCaptionMode = msg.getData()
+  setAudioSubtitleTransportBarIcon(globalCaptionMode)
+End Function
+
+
 ' Reset video player state to a state relevant to starting a video
 ' @content: TubiContentNode
 Function resetVideoPlayerState(content = invalid)
@@ -1308,26 +1245,14 @@ Function resetVideoPlayerState(content = invalid)
   m.top.upNextContentToAutoplay = invalid
   m.shouldShowUpNext = true
   m.UpNext.resetContent = true
-
+  
   m.RewindButton.uri = m.buttonUris.rewind
   m.FastForwardButton.uri = m.buttonUris.fastforward
 
   clearSkipCuepointsButtonAndTimer()
   m.cuePointsHistory = {}
-
-  ' Resetting the captions UI on every playback start so that we are in sync with the global settings.
-  ' Use case is when the VODPlayer screen is in stack and we change the global settings from linearPlayerScreen.
-  ' Since we used to update in init or on observer of globalCaptionMode. Which will not get triggered if the screen is in background.
-  ' So refreshing it on every playback start. Since we reset the player state on every new video playback adding it here.
-  if m.Video.globalCaptionMode = "On"
-    m.CCRailOn.opacity = 1
-    m.CCRailOff.opacity = 0
-    m.CCNipple.translation = m.CCNippleOnTranslation
-  else
-    m.CCRailOn.opacity = 0
-    m.CCRailOff.opacity = 1
-    m.CCNipple.translation = m.CCNippleOffTranslation
-  end if
+  ' Set the icon for audio/subtitle track based on the closed caption display status.
+  setAudioSubtitleTransportBarIcon(m.Video.globalCaptionMode)
 End Function
 
 
@@ -1444,17 +1369,6 @@ Function updateVideoPlayerState(content) as Void
   else
     title.text = content.title
     episodeTitle.text = ""
-  end if
-
-  'there are no subtitles so gray out the captions button
-  if content.subtitleTracks = invalid or content.subtitleTracks.count() = 0
-    m.TransportButtons.removeChild(m.ClosedCaption)
-    m.ClosedCaptionDisabled.visible = true
-
-  'there are subtitles, so check if captions button has been grayed out previously
-  else if m.NodeHelpers.getChildIndex(m.TransportButtons, m.ClosedCaption) < 0
-    m.TransportButtons.appendChild(m.ClosedCaption)
-    m.ClosedCaptionDisabled.visible = false
   end if
 
   'if it's not a trailer, remove the skip trailer button
@@ -1903,4 +1817,98 @@ Function getCreditCuepointsFromContent(content)
   end if
 
   return creditCuePoints
+End Function
+
+
+Function setCCAudioTransportBarVisibility()
+  m.closedCaptionAudioButton.visible = m.Video.availableAudioTracks.Count() > 1 OR m.Video.availableSubtitleTracks.Count() > 0
+End Function
+
+
+Function onGlobalCaptionTurnedOnChange(msg)
+  if msg.getData() = true
+    m.Video.globalCaptionMode = "On"
+  end if
+  setAudioSubtitleTransportBarIcon("On")
+End Function
+
+
+Function onGlobalCaptionTurnedOffChange(msg)
+  if msg.getData() = true
+    m.Video.globalCaptionMode = "Off"
+  end if
+  setAudioSubtitleTransportBarIcon("Off")
+End Function
+
+
+Function onWasBackButtonSelectedChange(msg)
+  wasSelected = msg.getData()
+
+  if wasSelected = true
+    hideClosedCaptionAudioTrackOverlay()
+  end if
+End Function
+
+
+Function onTrackingEventInfoChange(msg)
+  eventInfo = msg.getData()
+  trackEvent(eventInfo)
+End Function
+
+
+' @captionMode: string, will contain the current caption mode, "On"/"Off"/"Instant replay" are the possible values
+Function setAudioSubtitleTransportBarIcon(captionMode)
+  if captionMode = "Off"
+    m.closedCaptionAudioButton.uri = "pkg:/images/transport/sgplayer/icon-subtitles.webp"
+  else
+    m.closedCaptionAudioButton.uri = "pkg:/images/transport/sgplayer/icon-subtitles-enabled.webp"
+  end if
+End Function
+
+
+Function onAvailableAudioTracksChange(msg)
+  availableAudioTracks = msg.getData()
+  preferredAudioTrack = m.top.preferredAudioTrack
+  
+  ' Proceeding only if we have stored device/user level settings.
+  if availableAudioTracks <> invalid AND availableAudioTracks.Count() > 1 AND isAA(preferredAudioTrack) = true AND isNonEmptyString(preferredAudioTrack.language) = true 
+    ' Holds the value of the audioTrack to be set to the video node.
+    updatedAudioTrack = invalid
+    for each track in availableAudioTracks
+
+      if isNonEmptyString(track.name) then
+        
+        hasAccessibilityDescription = false
+        if track.name.instr(m.constants.player.audioDescriptionTrackNamePrefix) > -1
+          hasAccessibilityDescription = true
+        end if
+
+        if track.language = preferredAudioTrack.language
+          ' If it is normal audio track and user did not prefer one with audio description.
+          if hasAccessibilityDescription = false AND preferredAudioTrack.role = m.constants.player.audioTrackRoles.main
+            updatedAudioTrack = track
+          else if hasAccessibilityDescription = true AND preferredAudioTrack.role = m.constants.player.audioTrackRoles.description
+            updatedAudioTrack = track
+          end if
+        end if
+
+      end if
+    end for
+
+    ' Setting updated audio track to the video node.
+    if updatedAudioTrack <> invalid
+      ' Setting the default audio track.
+      m.Video.audioTrack = updatedAudioTrack.track
+      ' Setting the current audio track into the closed caption overlay.
+      m.closedCaptionAndAudioSelectionOverlay.currentAudioTrack = updatedAudioTrack.track
+    end if
+
+  end if
+  setCCAudioTransportBarVisibility()
+End Function
+
+
+Function onAudioTrackChange(msg)
+  audioTrack = msg.getData()
+  m.Video.audioTrack = audioTrack
 End Function

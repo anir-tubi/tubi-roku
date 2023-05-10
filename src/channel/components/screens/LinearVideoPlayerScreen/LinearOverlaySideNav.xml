@@ -39,7 +39,7 @@
             width="30"
             height="24"
             translation="[0,6]"
-            uri="pkg:/images/icon-subtitles.png"/>
+            uri="pkg:/images/transport/sgplayer/icon-subtitles.webp"/>
           <Label
             id="btnCC_label"
             height="36"

@@ -21,6 +21,44 @@ Function TubiTracking(constants, request, auth)
     getAnalyticsTile: tubiTracking_getAnalyticsTile
     getAnalyticsAd: tubiTracking_getAnalyticsAd
     getAnalyticsHomePageContentMode: tubiTracking_getAnalyticsHomePageContentMode
+    getLanguageCode: tubiTracking_getLanguageCode
+
+    populateMessage: tubiTracking_populateMessage
+    isEmptyValue: tubiTracking_isEmptyValue
+    isNumeric: tubiTracking_isNumeric
+    isString: tubiTracking_isString
+    getHomePageContentModeMap: tubiTracking_getHomePageContentModeMap
+
+    ' an AA structure of the valid "Oneofs" that are needed in various protos messages
+    allOneofs: tubiTracking_getOneOfs()
+
+    ' an AA map of page ids to their corresponding enum values for the LeftSideNavComponent Section
+    sideNavPageMap: tubiTracking_getSideNavPageMap(constants)
+
+    ' an AA map of Menu items in the details screen to their corresponding enum values for the LeftSideNavComponent Section
+    detailScreenMenuItemMap: tubiTracking_getDetailScreenMenuPageMap(constants)
+  }
+End Function
+
+Function TubiTrackingInfo(constants)
+  return {
+    constants: constants
+
+    getAnalyticsRequestIdempotency: tubiTracking_getAnalyticsRequestIdempotency
+    getAnalyticsTimestamp: tubiTracking_getAnalyticsTimestamp
+    getAnalyticsUser: tubiTracking_getAnalyticsUser
+    getAnalyticsDevice: tubiTracking_getAnalyticsDevice
+    getAnalyticsApp: tubiTracking_getAnalyticsApp
+    getAnalyticsConnection: tubiTracking_getAnalyticsConnection
+    getAnalyticsEvent: tubiTracking_getAnalyticsEvent
+    getAnalyticsPage: tubiTracking_getAnalyticsPage
+    getAnalyticsComponent: tubiTracking_getAnalyticsComponent
+    getAnalyticsDestinationComponent: tubiTracking_getAnalyticsDestinationComponent
+    getAnalyticsSelector: tubiTracking_getAnalyticsSelector
+    getAnalyticsTile: tubiTracking_getAnalyticsTile
+    getAnalyticsAd: tubiTracking_getAnalyticsAd
+    getAnalyticsHomePageContentMode: tubiTracking_getAnalyticsHomePageContentMode
+    getLanguageCode: tubiTracking_getLanguageCode
 
     populateMessage: tubiTracking_populateMessage
     isEmptyValue: tubiTracking_isEmptyValue
@@ -356,6 +394,12 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       video_id: -1
       toggle_state: "" 'ToggleState enum
       language_code: "" 'LanguageCode enum
+    }
+
+    audio_selection: {
+      video_id: -1
+      language_code: ""  'LanguageCode enum
+      descriptions_enabled: false ' Will be true/false based on which track was used.
     }
 
     fullscreen_toggle: {
@@ -1079,4 +1123,29 @@ End Function
 ' Helper function to determine if the value is a string
 Function tubiTracking_isString(value)
   return type(value) = "String" OR type(value) = "roString"
+End Function
+
+
+' Returns language code based on the language returned from backend.
+' @language: string, contains the language that is been returned from backend.
+Function tubiTracking_getLanguageCode(language)
+  languageCode = "UNKNOWN"
+
+  if language = "eng" OR language = "en"
+    languageCode = "EN"
+  else if language = "spa"
+    languageCode = "ES"
+  else if language = "fre"
+    languageCode = "FR"
+  else if language = "fra"
+    languageCode = "FR"
+  else if language = "kor"
+    languageCode = "KO"
+  else if language = "cho"
+    languageCode = "ZH"
+  else if language = "zhi"
+    languageCode = "ZH"
+  end if
+
+  return languageCode
 End Function

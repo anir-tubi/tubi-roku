@@ -97,9 +97,14 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
   if videoPlayer = invalid
     videoPlayer = CreateObject("roSGNode", "VideoPlayerScreen")
     videoPlayer.id = m.constants.ui.screenIds.videoPlayerScreen
+    ' Passing current user selected track.
+    if m.preferences <> invalid
+      videoPlayer.preferredAudioTrack = m.preferences.audioTrack
+    end if
     ' onVideoPlayerVisibleChange exists in ContentController
     videoPlayer.observeFieldScoped("visible", "onVideoPlayerVisibleChange")
     videoPlayer.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
+    videoPlayer.observeFieldScoped("audioTrackSettings", "onAudioTrackSettingsChange")
     initVideoTracking(videoPlayer) 'initializeYoubora
     setInScreenCache(videoPlayer)
 
@@ -1088,4 +1093,16 @@ Function updateNowPosForEpisode(detailContent, itemFocused, nResumePoint)
     end if
   end if
 
+End Function
+
+
+Function onAudioTrackSettingsChange(msg)
+  selectedAudioTrack = msg.getData()
+  ' Making sure we only call update when necessary.
+  currentAudioTrack = m.preferences.audioTrack
+  if (currentAudioTrack.language <> selectedAudioTrack.language) OR (currentAudioTrack.role <> selectedAudioTrack.role)
+    savePreferences({
+      "audioTrack": selectedAudioTrack
+    })
+  end if
 End Function

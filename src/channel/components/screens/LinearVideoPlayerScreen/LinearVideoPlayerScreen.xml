@@ -14,6 +14,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/FIFAMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
 
   <interface>
 

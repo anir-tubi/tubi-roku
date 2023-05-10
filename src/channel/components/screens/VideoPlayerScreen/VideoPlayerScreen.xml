@@ -88,8 +88,12 @@
       <!-- When this is set to true, then change LoadingMessage.text to reflect the propper message -->
       <field id="displayAdLoadingMessage" type="boolean" value="false" alwaysNotify="true"/>
 
-       <!-- isTrailer will be set true for trailers, otherwise false -->
+      <!-- isTrailer will be set true for trailers, otherwise false -->
       <field id="isTrailer" type="boolean" value="false"/>
+      
+      <!-- preferredAudioTrack will hold user previously selected track obtained from either device/user settings endpoint.  -->
+      <!-- Sample: {"language": "en","role": "main"} -->
+      <field id="preferredAudioTrack" type="assocarray" value="{}" />
 
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
@@ -149,8 +153,10 @@
       <field id="sendYouboraError" type="boolean" alwaysNotify="true" />
       <field id="sendVideoTrackingStart" type="boolean" alwaysNotify="true" />
 
+      <field id="closedCaptionTrack" type="string" alias="VideoNode.subtitleTrack, closedCaptionAndAudioSelectionOverlay.closedCaptionTrack" />
       <!-- Timestamp of the last time we finished playing back video with this player. If -1 then we are currently playing back. -->
       <field id="timestampOfLastVideoPlayback" type="integer" value="0" />
+      <field id="audioTrackSettings" type="assocarray" value="{}" alias="closedCaptionAndAudioSelectionOverlay.audioTrackSettings" />
   </interface>
 
   <children>
@@ -339,7 +345,6 @@
             width="260"
             height="80"
             uri=""
-            loadSync="false"
             translation="[85,949]" >
             <Label
               id="SkipTrailerButtonLabel"
@@ -355,21 +360,18 @@
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-to-start.png"
-            loadSync="false"
             translation="[540,958]" />
           <TransportButton
             id="RewindButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-rew.png"
-            loadSync="false"
             translation="[670,958]" />
           <TransportButton
             id="HopBackButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-rew-30s.png"
-            loadSync="false"
             translation="[800,958]" />
           <!-- play/pause uri will update based on playing state of video -->
           <TransportButton
@@ -377,71 +379,33 @@
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-play.png"
-            loadSync="false"
             translation="[930,958]" />
           <TransportButton
             id="HopForwardButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-fwd-30s.png"
-            loadSync="false"
             translation="[1060,958]" />
           <TransportButton
             id="FastForwardButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-ffw.png"
-            loadSync="false"
             translation="[1190,958]" />
           <TransportButton
             id="EndButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-to-end.png"
-            loadSync="false"
             translation="[1320,958]" />
           <TransportButton
-            id="ClosedCaption"
+            id="closedCaptionAudioButton"
             width="60"
-            height="60"
-            uri="pkg:/images/transport/sgplayer/cc-icon.png"
-            loadSync="false"
-            translation="[1697,958]" >
-              <Poster
-                id="CCRailOff"
-                width="80"
-                height="60"
-                opacity="1.0"
-                uri="pkg:/images/transport/sgplayer/cc-rail-off.png"
-                loadSync="false"
-                translation="[60,0]" />
-              <Poster
-                id="CCRailOn"
-                width="80"
-                height="60"
-                opacity="0.0"
-                uri="pkg:/images/transport/sgplayer/cc-rail-on.png"
-                loadSync="false"
-                translation="[60,0]" />
-              <Poster
-                id="CCNipple"
-                width="60"
-                height="60"
-                uri="pkg:/images/transport/sgplayer/cc-nipple.png"
-                loadSync="false"
-                translation="[58,0]" />
-          </TransportButton>
+            height="50"
+            uri="pkg:/images/transport/sgplayer/icon-subtitles.webp"
+            translation="[1697,958]"
+            visible="false" />  
         </Group>
-
-        <Poster
-          id="ClosedCaptionDisabled"
-          width="140"
-          height="60"
-          uri="pkg:/images/transport/sgplayer/cc-icon-disabled.png"
-          loadSync="false"
-          translation="[1697,958]"
-          visible="false" />
-
       </Group>  <!-- Transport -->
     </Group>  <!-- HUD -->
 
@@ -520,6 +484,11 @@
     <UpNext
       id="UpNext"
       opacity="0.0" />
+
+    <ClosedCaptionAndAudioSelectionOverlay
+      id="closedCaptionAndAudioSelectionOverlay"
+      opacity="0"
+      translation="[1230, 60]" />
 
     <!-- RAF needs a parent group with no other elements, otherwise it will use
       - the Group dimensions set by the other children and not scale appropriately.

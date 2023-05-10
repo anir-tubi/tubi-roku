@@ -70,6 +70,8 @@ Function init()
   m.top.visible = false
 
   setupOverlay()
+
+  m.tubiTrackingInfo = TubiTrackingInfo(m.constants)
 End Function
 
 
@@ -464,21 +466,7 @@ Function onCaptionModeChange()
     for i = 0 to m.Video.availableSubtitleTracks.count() - 1
       trackInfo = m.Video.availableSubtitleTracks[i]
       if m.Video.subtitleTrack = trackInfo.TrackName
-        if trackInfo.language = "eng"
-          language = "EN"
-        else if trackInfo.language = "spa"
-          language = "ES"
-        else if trackInfo.language = "fre"
-          language = "FR"
-        else if trackInfo.language = "fra"
-          language = "FR"
-        else if trackInfo.language = "kor"
-          language = "KO"
-        else if trackInfo.language = "cho"
-          language = "ZH"
-        else if trackInfo.language = "zhi"
-          language = "ZH"
-        end if
+        language = m.tubiTrackingInfo.getLanguageCode(trackInfo.language)
       end if
     end for
     trackEvent({

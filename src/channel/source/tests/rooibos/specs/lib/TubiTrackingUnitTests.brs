@@ -555,3 +555,17 @@ Function tubiTracking_isNumeric_test()
   m.assertFalse(Tracking.isNumeric(inv))
 
 End Function
+
+
+'@Test getLanguageCode unit tests
+Function tubiTracking_getLanguageCode_test()
+  languageCode = m.Tracking.getLanguageCode("en")
+  m.assertEqual(languageCode, "EN")
+
+  languageCode = m.Tracking.getLanguageCode("fra")
+  m.assertEqual(languageCode, "FR")
+
+  ' Passing a code which is not in the if else conditions.
+  languageCode = m.Tracking.getLanguageCode("jfk")
+  m.assertEqual(languageCode, "UNKNOWN")
+End Function

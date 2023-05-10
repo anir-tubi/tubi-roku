@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+ - CheckButton
+ -
+ - This component is used in use cases where we need to provide a selectable item inside list component.
+ -
+ -->
+<component name="CheckButton" extends="Group" >
+  <script type="text/brightscript" uri="CheckButton.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+
+  <interface>
+    <!-- Content expected for a item:
+     -
+     - title - The label text
+     - checked - Holds a true/false value based on if the item is selected
+     -
+     -->
+    <!-- INPUT-->
+    <field id="itemContent" type="node" />
+    <field id="itemHasFocus" type="boolean" />
+    <!-- Below field will be used if the component is used in a list component -->
+    <field id="listHasFocus" type="boolean" />
+    <field id="focusPercent" type="float" />
+    
+    <field id="width" type="float" alias="background.width" />
+    <field id="height" type="float" alias="label.height, background.height, labelFocused.height" />
+
+    <!-- OUTPUT-->
+    <field id="calculatedWidth" type="float"/>
+  </interface>
+
+  <children>
+    <Poster 
+      id="background"
+      uri="pkg:/images/menu-focus-$$RES$$.9.png" />
+    <LayoutGroup
+      id="container"
+      vertAlignment="center"
+      translation="[36, 0]"
+      itemSpacings="[15]"
+      layoutDirection="horiz">
+        <Group>
+          <Poster
+            id="checkIcon"
+            width="20"
+            height="16"
+            uri="pkg:/images/check.png"
+            visible="false"/>
+          <Poster
+            id="checkIconFocused"
+            width="20"
+            height="16"
+            uri="pkg:/images/check.png"
+            visible="false"/>
+        </Group>
+        <Group>
+          <Label
+            id="label"
+            text=""
+            height="81"
+            horizAlign="left"
+            vertAlign="center">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-SemiBold.ttf"
+              size="30" />
+          </Label>
+          <Label
+            id="labelFocused"
+            text=""
+            height="81"
+            horizAlign="left"
+            vertAlign="center">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-SemiBold.ttf"
+              size="30" />
+          </Label>
+        </Group>
+    </LayoutGroup>
+  </children>
+</component>

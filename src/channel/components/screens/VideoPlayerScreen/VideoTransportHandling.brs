@@ -1,5 +1,6 @@
 Function onKeyEvent(key As String, press As Boolean) as Boolean
   tubiLog("VideoTransportHandling.onKeyEvent key = " + key + " press: " + press.toStr())
+  ' Making sure when the closed captioning overlay is displayed playerscreen only handles back button and ignore rest of the events.
   if press
     m.lastButtonPressPos = m.playerPosition
     if isButtonPressAllowed(key, m.VideoState, m.Video)
@@ -28,7 +29,8 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
       else if key = "options"
         if m.ignoreOptionsKey = false then
-          showCCDialog()
+          showTransport()
+          showClosedCaptionAudioTrackOverlay()
         end if
 
       else if key = "left"
@@ -430,8 +432,8 @@ Function handleOk()
       handleFastForward()
     else if focusButtonId = m.EndButton.id
       goToNext()
-    else if focusButtonId = m.ClosedCaption.id
-      handleClosedCaption()
+    else if focusButtonId = m.closedCaptionAudioButton.id
+      showClosedCaptionAudioTrackOverlay()
     end if
   end if
 End Function
@@ -638,95 +640,37 @@ Function handleSkipVideo(amt, isProgressBarFocused)
 End Function
 
 
-'handles ClosedCaption button/toggle selection
-Function handleClosedCaption()
-  cancelReplayCaptions()
-  if m.HUD.opacity < 1.0
-    animateTransport("in")
+' Displays the closed caption and audio track selection overlay.
+Function showClosedCaptionAudioTrackOverlay()
+  m.closedCaptionAndAudioSelectionOverlay.globalCaptionMode = m.video.globalCaptionMode
+  m.closedCaptionAndAudioSelectionOverlay.availableClosedCaptionTracks = m.video.availableSubtitleTracks
+  m.closedCaptionAndAudioSelectionOverlay.availableAudioTracks = m.video.availableAudioTracks
+  m.closedCaptionAndAudioSelectionOverlay.setFocus(true)
+  setFocusedButton(m.closedCaptionAudioButton)
+  fade(m.closedCaptionAndAudioSelectionOverlay, "in", 0.6)
+  m.isClosedCaptionAudioOverlayShowing = true
+  trackingPageInfo = m.top.trackingPageInfo
+  if m.top.content <> invalid
+    m.closedCaptionAndAudioSelectionOverlay.videoId = m.top.content.id.toInt()
   end if
-
-  setFocusedButton(m.ClosedCaption)
-
-  'setting the globalCaptionMode will trigger a callback that updates the images and does user tracking
-  if m.Video.globalCaptionMode = "On"
-    m.Video.globalCaptionMode = "Off"
-  else ' If "When mute" or "Instant replay", also turn it on
-    m.Video.globalCaptionMode = "On"
-  end if
+  ' Fire button click event.
+  trackEvent({
+    type: "dialog"
+    values: {
+      dialog_type: "SUBTITLE_AUDIO"
+      pageOneof: m.Tracking.getAnalyticsPage(trackingPageInfo.pageType, trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+    }
+  })
 End Function
 
 
-Function showCCDialog()
-  ' show full options dialog
-  if m.VideoState = "play" or m.VideoState = "pause" then
-    m.ccWasPlaying = false
-    if m.VideoState = "play" then
-      m.ccWasPlaying = true
-      pauseVideo(false, false)
-    end if
-    m.ccDialog = CreateObject("roSGNode", "ModalDialogScreen")
-    m.ccDialog.id = "ccDialog"
-    m.ccDialog.title = "Closed Caption/Audio Configuration"
-    buttons = getCCButtons()
-    m.ccDialog.buttons = buttons
-    if buttons.count() = 1 then
-      m.ccDialog.message = "No captions are available for this video."
-    end if
-    m.ccDialog.observeField("buttonSelected", "onCCDialogButton")
-    m.ccDialog.observeField("exitButton", "closeCCDialog")
-    m.top.appendChild(m.ccDialog)
-    m.ccDialog.visible = true
-    m.ccDialog.setFocus(true)
-    trackEvent({
-      type: "dialog"
-      values: {
-        dialog_type: "CLOSED_CAPTIONS" 'DialogType enum
-        pageOneof: m.Tracking.getAnalyticsPage("", {})  'TODO: Add the video player page
-        dialog_action: "SHOW"  'Action enum
-        dialog_sub_type: m.ccModes[m.ccSelections[0]][2]  '"off", "on-always", "on-replay"
-      }
-    })
-  end if
-End Function
-
-
-Function closeCCDialog()
-  if m.ccDialog <> invalid then
-    if m.ccWasPlaying then
-      resumeFromPause(false)
-    end if
-    m.ccDialog.unobserveField("buttonSelected")
-    m.ccDialog.unobserveField("exitButton")
-    m.ccDialog.setFocus(false)
-    m.top.setFocus(true)
-    m.top.removeChild(m.ccDialog)
-    m.ccDialog = invalid
-
-    trackEvent({
-      type: "dialog"
-      values: {
-        dialog_type: "CLOSED_CAPTIONS" 'DialogType enum
-        pageOneof: m.Tracking.getAnalyticsPage("", {})  'TODO: Add the video player page
-        dialog_action: "ACCEPT_DELIBERATE"  'Action enum
-        dialog_sub_type: m.ccModes[m.ccSelections[0]][2]  '"off", "on-always", "on-replay"
-      }
-    })
-  end if
-End Function
-
-
-Function onCCDialogButton()
-  tubiLog("VideoTransportHandling.onCCDialogButton")
-  index = m.ccDialog.buttonSelected
-  if m.ccDialog.buttons[index] = "Close" then
-    ' Close
-    closeCCDialog()
-  else
-    ' Captions mode
-    m.ccSelections[0] = (m.ccSelections[0] + 1) MOD m.ccModes.count()
-    m.video.globalCaptionMode = m.ccModes[m.ccSelections[0]][0]
-    m.ccDialog.buttons = getCCButtons()
-  end if
+' Hides the closed caption and audio track selection overlay.
+Function hideClosedCaptionAudioTrackOverlay()
+  m.isClosedCaptionAudioOverlayShowing = false
+  m.closedCaptionAndAudioSelectionOverlay.setFocus(false)
+  fade(m.closedCaptionAndAudioSelectionOverlay, "out", 0.1, 0, 0)
+  m.top.setFocus(true)
 End Function
 
 
@@ -962,7 +906,7 @@ Function resetTransportButtons()
   m.FastForwardButton.uri = m.buttonUris.fastForward
   m.FastForwardButton.focusState = false
   m.EndButton.focusState = false
-  m.ClosedCaption.focusState = false
+  m.closedCaptionAudioButton.focusState = false
 End Function
 
 
@@ -1107,6 +1051,11 @@ Function isButtonPressAllowed(key, videoState, videoNode)
   isAllowed  = true
   'in non active video states, we don't allow the disabled keys, non disable keys are always allowed
   if not isActiveVideoState(videoState, videoNode) AND disabledKeys[key] = true
+    isAllowed = false
+  end if
+
+  ' If closed caption and audio overlay is showing then we ignore button press in the screen level.
+  if m.isClosedCaptionAudioOverlayShowing = true
     isAllowed = false
   end if
 

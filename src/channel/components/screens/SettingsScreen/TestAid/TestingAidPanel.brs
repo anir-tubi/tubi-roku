@@ -14,8 +14,9 @@ Function init()
   if theme <> invalid
     m.Menu.focusBitmapBlendColor = theme.focusedColor
   end if
-
-  m.Menu.focusFootprintBitmapUri = "pkg:/images/menu-footprint-$$RES$$.9.png"
+  ' Adding a transparent 1px image since leaving it empty causes roku to use it's default.
+  ' We do not want to show unfocused background as per designs.
+  m.Menu.focusFootprintBitmapUri = "pkg:/images/transparent.png"
 
   title = m.top.findNode("title")
   title.text = "Testing Aid Config for: " + m.constants.settings.mode

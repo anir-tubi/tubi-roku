@@ -848,6 +848,12 @@ Function getConstants()
         ]
       end if
 
+      constants.player.audioTrackRoles = {}
+        constants.player.audioTrackRoles.main = "main"
+        constants.player.audioTrackRoles.description = "description"
+
+      constants.player.audioDescriptionTrackNamePrefix = "Audio Description"
+
   ' constants used for EPG
   constants.EPGChannelPlayMode = {}
   constants.EPGChannelPlayMode.playItemOnSelect = "playItemOnSelect"

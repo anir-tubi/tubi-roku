@@ -1417,5 +1417,13 @@
   "info_panel_reminder_is_set": {
     "description": "Hint in the content metadata area informing the user that the reminder is set for this content",
     "message": "Reminder set"
+  },
+  "cc_audio_overlay_subtitles": {
+    "description": "Available closed caption tracks section header label.",
+    "message": "Subtitles"
+  },
+  "cc_audio_overlay_audio": {
+    "description": "Available audio tracks section header label.",
+    "message": "Audio"
   }
 }
