@@ -142,7 +142,7 @@
       id="ResultArea">
       <MarkupGrid
         id="ResultGrid"
-        itemComponentName="CategoryGridPoster"
+        itemComponentName="StarterGridItem"
         itemSize="[198,282]"
         itemSpacing="[12,12]"
         numRows="3"

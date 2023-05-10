@@ -64,7 +64,7 @@
       <!-- This field accomplishes 2 things:
               1. tells ContentController/CategoryDetailsScreenHelpers that the category metadata
                   for the categroy content is out of the cache window and should be updated
-              2. user has scrolled down to an index where we need to load more contents. 
+              2. user has scrolled down to an index where we need to load more contents.
               Please note: that it is important that alwaysNotify is set to true so we can communicate to the Helper when the cache is out of date. -->
       <field id="categoryBatchIndex" type="integer" alwaysNotify="true" />
 
@@ -131,7 +131,7 @@
     <MarkupGrid
       id="ChannelsVideoGrid"
       translation="[192,600]"
-      itemComponentName="CategoryGridPoster"
+      itemComponentName="StarterGridItem"
       itemSize="[198,282]"
       itemSpacing="[20,12]"
       numRows="2"

@@ -1,6 +1,4 @@
 Function init()
-  m._ = rodash()
-
   m.poster = m.top.findNode("Poster")
   m.InnerTitle = m.top.findNode("InnerTitle")
   m.InnerLayout = m.top.findNode("InnerLayout")
@@ -40,7 +38,7 @@ Function init()
     upcoming: "upcoming"
   }
 
-  '//recreate the gridItemTypes (itemIDs) and uiResolution from constants so as not to access m.global.constants for every item on the home screen as they are created
+  '//recreate the gridItemTypes (itemIDs) from constants so as not to access m.global.constants for every item on the home screen as they are created
   m.gridItemTypes = {
     portrait: "portrait"
     landscape: "landscape"
@@ -51,10 +49,8 @@ Function init()
     emptyContainer: "emptyContainer"
   }
 
-  di = CreateObject("roDeviceInfo")
   m.top.observeFieldScoped("focusPercent", "onItemFocusPercentChange")
   m.top.observeFieldScoped("itemHasFocus", "onRowItemHasFocus")
-  m.uiResolution = UCase(di.GetUiResolution().name)
 
   onThemeChange()
 End Function

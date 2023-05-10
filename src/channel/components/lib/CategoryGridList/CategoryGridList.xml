@@ -130,7 +130,7 @@
   <children>
     <RowList
       id="RowList"
-      itemComponentName="CategoryGridPoster"
+      itemComponentName="StarterGridItem"
       rowTitleComponentName="CategoryGridRowLabel"
       itemSize="[1776,364]"
       itemSpacing="[0,36]"

@@ -267,7 +267,7 @@
       <RowList
         id="RowList"
         translation="[0,75]"
-        itemComponentName="CategoryGridPoster"
+        itemComponentName="StarterGridItem"
         rowTitleComponentName="CategoryGridRowLabel"
         itemSize="[1776,364]"
         itemSpacing="[0,70]"
