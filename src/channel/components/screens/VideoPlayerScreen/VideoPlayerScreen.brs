@@ -844,6 +844,7 @@ Function onVideoPositionChange(msg)
     ' check midroll and fire if any
     isCuepointReached = m.midrolls[strI(m.playerPosition)]
     if isCuepointReached = true AND m.UpNext.opacity = 0
+
       m.AdHeadsUp.visible = false
       if adState = "adsPending" then
         ' Send a play_progress event before we show ads to be most accurate in case the user exits during ad playback
@@ -936,6 +937,15 @@ Function onAdStateChange(msg)
     showAdBreak()
     m.showRatings = true
   else if adState = "noAds" AND (m.VideoState = "play" or m.VideoState = "pause" or m.VideoState = "ffw" or m.VideoState = "rew" or m.VideoState = "skip" or m.VideoState = "hop") AND m.Video.state <> "playing" then
+    'The below check is to remove the resumeFrom ad param once we've already sent the resumeFrom param in the previous ad request to avoid sending it again for future midrolls if it is not expected.
+    content = m.top.content
+    if content.adParam <> invalid and content.adParam.resumeFrom <> invalid
+      adParams = content.adParam
+      adParams.resumeFrom = invalid
+      content.adParam = adParams
+      m.top.content = content
+    end if
+
     ' no ads were returned from preroll or resumeroll, or we just came back from an ad break.  Make sure we start playing
     ' TODO(Chris): model the ad break more explicitly in m.VideoState so we're not trying to glean state from m.VideoState, m.Video.State, video control and ad control
     if m.Video.content.url <> invalid AND m.Video.content.url <> ""

@@ -174,6 +174,10 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
         content.addField("adParam", "assocarray", false)
       end if
 
+      if position > 0
+        playbackSource["resumeFrom"] = "stop"
+      end if
+
       'set content origin and contaierID for rainmaker before playing. Setting it withing the content will help with rendezvous.
       content.adParam = playbackSource
 

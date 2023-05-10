@@ -261,6 +261,8 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0, isSeekPastCuepoint = 
 
   if isSeekPastCuepoint = true
     params["resume_from"] = "ffwd"
+  else if content.adParam <> invalid AND isNonEmptyString(content.adParam.resumeFrom) = true
+    params["resume_from"] = content.adParam.resumeFrom
   end if
 
   'add TubiTV user/registration id to ad call url
