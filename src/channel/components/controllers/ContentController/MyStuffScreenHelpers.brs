@@ -49,7 +49,7 @@ Function showMyStuffScreen()
   if bLoadData = true
     fetchMyStuffCategoryDetails(screen)
   else
-    jumpToPreviousFocusedItem()
+    jumpToPreviousFocusedItem(screen)
     showHideSpinner(false)
   end if
 
@@ -112,7 +112,7 @@ Function onMyStuffBatchResponse(response)
     screen.content = response
     screen.contentUpdated = true
 
-    jumpToPreviousFocusedItem()
+    jumpToPreviousFocusedItem(screen)
     showHideSpinner(false)
 
     '//Report the page_load analytics
@@ -126,10 +126,8 @@ Function onMyStuffBatchResponse(response)
 End Function
 
 
-Function jumpToPreviousFocusedItem()
+Function jumpToPreviousFocusedItem(screen)
   tubiLog("MyStuffScreenHelpers.jumpToPreviousFocusedItem")
-  screenID = m.constants.ui.screenIds.myStuffScreen
-  screen = getFromScreenCache(screenID)
   if screen <> invalid
     rowItemFocused = invalid
     oldFocusedContentID = ""

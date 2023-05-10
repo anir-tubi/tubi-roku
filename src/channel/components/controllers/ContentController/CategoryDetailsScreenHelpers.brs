@@ -8,6 +8,8 @@
 ' @contentMode: string, the value from constants.ui.contentMode to be sent as param to the tensor request
 ' @itemFocused: integer, the index of the content item that will be focused once the screen has loaded content.
 Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoadEvents = true, contentMode = "", itemFocused = -1)
+  tubiLog("CategoryDetailsScreenHelpers.showCategoryDetailsScreen")
+  
   categoryDetailsScreen = CreateObject("roSGNode", "CategoryDetailsScreen")
   categoryDetailsScreen.callingPage = sPageSource
   categoryDetailsScreen.trackingLoadStartTime = UpTime(0)
@@ -58,7 +60,6 @@ End Function
 
 
 Function onSignInRequired(msg)
-
   tubiLog("CategoryDetailsScreenHelpers.onSignInRequired")
   screen = msg.getRoSGNode()
 
@@ -70,6 +71,7 @@ End Function
 
 
 Function displaySignInRequiredModal(screen)
+  tubiLog("CategoryDetailsScreenHelpers.displaySignInRequiredModal")
 
   dialogEvent = {
     type: "dialog"
@@ -89,6 +91,7 @@ End Function
 
 
 Function onCategoryDetailsScreenFocusChanged(msg)
+  tubiLog("CategoryDetailsScreenHelpers.onCategoryDetailsScreenFocusChanged")
   categoryDetailsScreen = msg.getRoSGNode()
   if categoryDetailsScreen.isInFocusChain() = true
 
@@ -120,6 +123,7 @@ End Function
 
 
 Function onCategoryBatchIndexChange(msg)
+  tubiLog("CategoryDetailsScreenHelpers.onCategoryBatchIndexChange")
   categoryDetailsScreen = msg.getRoSGNode()
   index = msg.getData()
   categoryContent = invalid
@@ -398,6 +402,7 @@ End Function
 
 
 Function onCategoryDetailsScreenBackButtonPressed(msg)
+  tubiLog("CategoryDetailsScreenHelpers.onCategoryDetailsScreenBackButtonPressed")
   screen = msg.getRoSGNode()
 
   if screen <> invalid AND screen.callingPage <> invalid

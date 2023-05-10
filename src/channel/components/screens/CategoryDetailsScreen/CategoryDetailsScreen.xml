@@ -51,8 +51,8 @@
 
     <!-- OUTPUT -->
       <!-- the content Id representing the item which was focused on -->
-      <field id="contentFocusedId" type="string" alwaysNotify="true"/>
-
+      <field id="contentFocusedId" type="string"/>
+      
       <!-- the content node representing the item which was clicked on -->
       <field id="contentSelected" type="node" alwaysNotify="true"/>
 

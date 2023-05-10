@@ -112,6 +112,8 @@ Function onScreenFocusChange()
         m.VideoGrid.setFocus(true)
       end if
       if shouldRefresh(m.top.content) = true 'cacheValidationMixin
+        '//indicate that when the content is refreshed, it should attempt to focus close to where it was previously focused on.
+        m.top.jumpToItemFocused = m.VideoGrid.itemFocused
         m.top.categoryBatchIndex = 0
       end if
     end if
@@ -146,8 +148,13 @@ Function onLoadContent()
 
       m.VideoGrid.setFocus(true)
 
-      if m.top.jumpToItemFocused >= 0
-        m.VideoGrid.jumpToItem = m.top.jumpToItemFocused
+      nJumpToItemFocused = m.top.jumpToItemFocused
+      nContentMaxCount = category.getChildCount() - 1
+      if nJumpToItemFocused >= 0
+        if nJumpToItemFocused > nContentMaxCount
+          nJumpToItemFocused = nContentMaxCount
+        end if
+        m.VideoGrid.jumpToItem = nJumpToItemFocused
       end if
 
       m.VideoGrid.visible = true
@@ -174,7 +181,7 @@ Function onIsLoading()
 End Function
 
 
-Function onItemFocused()
+Function onItemFocused(msg)
   tubiLog("CategoryDetailsScreen.onItemFocused")
   if m.top.content <> invalid
     item = m.VideoGrid.itemFocused
@@ -184,6 +191,7 @@ Function onItemFocused()
     if content <> invalid
       ' setting the focused content's Id to contentFocusedId field, later it will be used for setting focus on previous screen(home)
       m.top.contentFocusedId = content.id
+
       ' Update the info panel
       populateInfoPanel(m.InfoPanel, content)
 
