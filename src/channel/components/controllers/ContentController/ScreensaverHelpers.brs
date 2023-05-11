@@ -16,11 +16,6 @@ End Function
 Function onScreensaverTimerFired()
   timeUntilScreensaverStart = getTimeUntilScreensaverStart()
 
-  ' We don't prevent the system screensaver from taking over in the control variant.
-  ' In order to make sure we get our network request out in time for the experiment exposure event before the screensaver starts
-  ' we trigger one second earlier
-  timeUntilScreensaverStart -= 1
-
   if timeUntilScreensaverStart > 0 then
     startScreensaverTimer(timeUntilScreensaverStart)
   else if getExperimentResource("roku_screensaver", "roku_screensaver_v2", true).enabled = true then
@@ -36,6 +31,13 @@ Function getTimeUntilScreensaverStart()
   ' First check if we've had a keypress that would preclude starting the screen saver
   lastKeypressTime = createObject("roDeviceInfo").timeSinceLastKeypress()
   screensaverTimeout = m.mainTask.screensaverTimeout
+
+
+  ' We don't prevent the system screensaver from taking over in the control variant.
+  ' In order to make sure we get our network request out in time for the experiment exposure event before the screensaver starts
+  ' we trigger one second earlier
+  screensaverTimeout -= 1
+
   if screensaverTimeout > lastKeypressTime then
     ' If so just set time to the remaining time and we'll check again at that time
     return screensaverTimeout - lastKeypressTime
