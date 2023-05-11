@@ -230,6 +230,7 @@ function pushTag(done) {
     }
     done(new NoStackError(errorMsg));
   }
+  done();
 }
 
 
