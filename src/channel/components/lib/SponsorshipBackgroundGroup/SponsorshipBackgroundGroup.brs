@@ -31,7 +31,7 @@ End Function
 
 
 Function stopObservingFadeOutAnimation()
-if m.animationFadeOut <> invalid
+  if m.animationFadeOut <> invalid
     m.animationFadeOut.unobserveFieldScoped("state")
   end if
 End Function

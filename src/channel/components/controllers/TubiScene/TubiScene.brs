@@ -42,7 +42,11 @@ End Function
 Function onFadeOutCustomSplash()
 
   customSplashFade = customFadeOut(m.customSplashPoster, 1, 0)
-  customSplashFade.observeField("state", "onCustomSplashFadeStateChange")
+  if customSplashFade <> invalid
+    customSplashFade.observeFieldScoped("state", "onCustomSplashFadeStateChange")
+  else
+    m.spinnerFade = customFadeIn(m.spinner, 1, 0)
+  end if
 
 End Function
 

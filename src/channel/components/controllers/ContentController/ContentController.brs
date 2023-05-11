@@ -201,7 +201,11 @@ End Function
 Function onFadeInContentController()
   tubiLog("ContentController.onFadeInContentController")
   fadeInUiGroup = customFadeIn(m.uiGroup, 2, 0.5)
-  fadeInUiGroup.observeField("state", "onUiGroupFadeStateChange")
+  if fadeInUiGroup <> invalid
+    fadeInUiGroup.observeFieldScoped("state", "onUiGroupFadeStateChange")
+  else
+    m.top.removeStartUpScreens = true
+  end if
 
   currentScreen = getCurrentScreen()
   'if m.linearScreenAfterFn is set in that case execute linearScreenAfterFn
