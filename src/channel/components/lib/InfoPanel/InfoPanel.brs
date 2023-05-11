@@ -85,7 +85,7 @@ Function init()
   '//Set a line after the directed by and starring text to be right aligned so the values associated with those lines are left aligned
   nStarringWidth = m.starringTag.boundingRect().width
   nDirectorWidth = m.directorTag.boundingRect().width
-  spacerWidth = 43
+  spacerWidth = 32
   nMatchDirectorWidth = nStarringWidth - nDirectorWidth
   nMatchStarringWidth = nDirectorWidth - nStarringWidth
 
