@@ -412,20 +412,23 @@ End Function
 Function logCrashesOnStartup(args, log, constants)
   ' These are reasons we don't care about
   reasonBlacklist = {
-    "EXIT_UNKNOWN":         "EXIT_UNKNOWN"        ' default exit reason
-    "EXIT_POWER_MODE":      "EXIT_POWER_MODE"
-    "EXIT_DIAL_DELETE":     "EXIT_DIAL_DELETE"
-    "EXIT_IDLE_AUTO_EXIT":  "EXIT_IDLE_AUTO_EXIT"
+    "EXIT_UNKNOWN": true ' default exit reason
+    "EXIT_POWER_MODE": true
+    "EXIT_DIAL_DELETE": true
+    "EXIT_IDLE_AUTO_EXIT": true
+    "EXIT_AM_LOWRESOURCE": true ' exited in the background because foreground application needed more memory
+    "EXIT_SETTINGS_UPDATE ": true ' User changed setting like their resolution which caused application to close
+    "EXIT_USER_NAV": true ' User pressed home button to exit application
   }
 
   reason = args.lastExitOrTerminationReason
-  if reason <> invalid AND reasonBlacklist[reason] = invalid
+  if reason <> invalid AND reasonBlacklist[reason] <> true
     messageInfo = {
       message: constants.errors.type.crashOnPreviousRun
       model: constants.deviceInfo.model
       name: reason
       type: constants.errors.type.crashOnPreviousRun
     }
-    log.exception(messageInfo, "warn", m.queue, 0.5)
+    log.exception(messageInfo, "warn", m.queue, 1)
   end if
 End Function
