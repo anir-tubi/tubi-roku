@@ -137,9 +137,9 @@ Function onActiveChange()
       '//Is the button item available/turned on?
 
       m.Icon.opacity = 1
-      m.subTxt.opacity = 0
+      fade(m.subTxt, "out", .3)
       if m.sideIconLabel <> invalid
-        m.sideIconLabel.opacity = 1
+        fade(m.sideIconLabel, "in", .3)
       end if
 
       fade(m.Label, "in", .3)
@@ -147,9 +147,9 @@ Function onActiveChange()
       '// if the item is not enabled/available, then still don't bring up the opacity
       
       m.Icon.opacity = .31
-      m.subTxt.opacity = 0.8
+      fade(m.subTxt, "out", .3)
       if m.sideIconLabel <> invalid
-        m.sideIconLabel.opacity = 1
+        fade(m.sideIconLabel, "in", .3, 0, .31)
       end if
 
       fade(m.Label, "in", .3, 0, .31)
@@ -163,13 +163,13 @@ Function onActiveChange()
 
     m.Icon.opacity = 1
     if m.sideIconLabel <> invalid
-      m.sideIconLabel.opacity = 0
+      fade(m.sideIconLabel, "out", .3)
     end if
     
     if m.top.itemContent.selected = true
-      m.subTxt.opacity = 0
+      fade(m.subTxt, "out", .3)
     else
-      m.subTxt.opacity = 0.8
+      fade(m.subTxt, "in", .3)
     end if
   end if
 End Function
