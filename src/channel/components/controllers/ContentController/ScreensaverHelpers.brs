@@ -156,7 +156,7 @@ Function loadScreensaverFeed()
   countryCode = UCase(m.constants.deviceInfo.countryCode)
   ' In the US and Canada we use a preset list of containers but for others we use the first two rows from homescreen instead
   if countryCode = "US" OR countryCode = "CA" then
-    if shouldKidsModeBeSentToServer() = true then
+    if isKidsUIOn() = true then
       sendBatchRequestForScreensaverContainers([
         categoryIds.featured
         categoryIds.mostPopular
