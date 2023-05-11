@@ -668,9 +668,6 @@ Function getConstants()
     ' Time in seconds after which we force a refresh of the categoryscreen
     constants.timers.categoryContentRefreshTimeout = 12 * 60 * 60
 
-    ' Time in seconds after which the linear video player goes fullscreen
-    constants.timers.linearFullscreenTimeout = 10
-
     ' Time in seconds after which stored hasAge info becomes expired for COPPA
     constants.timers.coppaFailTimeout = 24 * 60 * 60  ' 1 day
     constants.timers.coppaPassTimeout = 60 * 24 * 60 * 60  ' 60 days

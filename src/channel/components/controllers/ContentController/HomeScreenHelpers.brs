@@ -865,7 +865,7 @@ Function startCountdownTimer()
 
   if screen <> invalid AND (screen.id = m.constants.ui.screenIds.homeScreen OR isAnEpgScreen(screen) = true OR isTournamentScreen(screen) = true)
     stopCountdownTimer()
-    screen.fullscreenCountdown = m.constants.timers.linearFullscreenTimeout
+    screen.fullscreenCountdown = m.constants.settings.linearFullscreenTimeout
     m.playerFullscreenCountdownTimer.control = "start"
   end if
 End Function

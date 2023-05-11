@@ -16,6 +16,13 @@ settings:
   #Also controls instant resume timeout for signed out users
   coppaHasAgeDuration: 60
 
+  #time in seconds after which the linear video player goes fullscreen.
+  linearFullscreenTimeout: 10
+
+  #the number of seconds before the video overlay autohides in Live TV after last button pressed.
+  videoOverlayAutoHideTime: 5
+
+
   # enabling showOnBoardingAlways will show OnBoarding Screen every time the app is launched as non-production mode for guest users.
   # This field is added for testing purpose
   showOnBoardingAlways: false

@@ -34,6 +34,12 @@ settings:
   charlesProxyUrl: "http://{{localHostAddress}}:8888"
   charlesProxyEnabled: false
 
+  #time in seconds after which the linear video player goes fullscreen.
+  linearFullscreenTimeout: 10
+
+  #the number of seconds before the video overlay autohides in Live TV after last button pressed.
+  videoOverlayAutoHideTime: 5
+
   # Setting the below value to true will enable youbora tracking.
   youboraEnabled: false
   # Setting the below value to true will enable youbora request logging into the console.

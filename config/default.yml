@@ -18,6 +18,12 @@ settings:
   charlesProxyEnabled: false
   charlesProxyUrl: ""
 
+  #time in seconds after which the linear video player goes fullscreen.
+  linearFullscreenTimeout: 10
+
+  #the number of seconds before the video overlay autohides in Live TV after last button pressed.
+  videoOverlayAutoHideTime: 5
+
   # useStarterComponents MUST ALWAYS BE TRUE FOR PRODUCTION
   useStarterComponents: true
   useRemoteComponents: true

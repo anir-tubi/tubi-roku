@@ -49,7 +49,7 @@ Function init()
   m.playerPosition = 0
 
   m.lastButtonPressPos = 0
-  m.overlayAutoHideTime = m.constants.player.transportAutoHideTime
+  m.overlayAutoHideTime = m.constants.settings.videoOverlayAutoHideTime
   m.bufferingInfo = invalid
 
   m.lastPingTime = 0
