@@ -35,6 +35,10 @@ Function init()
   m.menuFocused = false
   m.secondaryMenuFocused = false
 
+  'These are used to avoid sending the component_interaction event with toggle_off event when user selected an item from the main/secondary menu.
+  m.mainMenuSelected = false
+  m.secondaryMenuSelected = false
+
   m.Menu.observeFieldScoped("focusedChild", "onMenuFocusChange")
   m.SecondaryMenu.observeFieldScoped("focusedChild", "onSecondaryMenuFocusChange")
 
@@ -724,6 +728,7 @@ End Function
 ' onMenuItemSelected
 '
 Function onMenuItemSelected()
+  m.mainMenuSelected = true
   selection = m.Menu.content.getChild(m.Menu.itemSelected)
   setComponentInteractionEventForMenu("CONFIRM", selection)
   handleMenuItemSelected(selection)
@@ -780,23 +785,25 @@ Function onMenuFocusChange(msg)
   focusedItem = invalid
   componentInteractionValue = ""
 
-  if m.menuFocused = false AND m.Menu.isInFocusChain() = true AND m.Menu.itemFocused >= 0
-    'This block represents menu gaining focus
-    m.oldFocusedMenuAnalyticsSection = invalid
-    focusedItem = m.Menu.content.getChild(m.Menu.itemFocused)
-    componentInteractionValue = "TOGGLE_ON"
-  else if m.menuFocused = true AND m.Menu.isInFocusChain() = false AND m.Menu.itemFocused >= 0
-    'This block represents menu losing focus
-    focusedItem = m.Menu.content.getChild(m.Menu.itemFocused)
-    componentInteractionValue = "TOGGLE_OFF"
+  'This will trigger when menu gains and loses the focus and avoid send the component interaction event with user interaction toggle_on/toggle_off when item is selected.
+  if m.top.isInFocusChain() = true
+    if m.menuFocused = false AND m.Menu.isInFocusChain() = true AND m.Menu.itemFocused >= 0
+      'This block represents menu gaining focus
+      m.oldFocusedMenuAnalyticsSection = invalid
+      focusedItem = m.Menu.content.getChild(m.Menu.itemFocused)
+      componentInteractionValue = "TOGGLE_ON"
+    else if m.menuFocused = true AND m.Menu.isInFocusChain() = false AND m.Menu.itemFocused >= 0 AND m.mainMenuSelected = false
+      'This block represents menu losing focus
+      focusedItem = m.Menu.content.getChild(m.Menu.itemFocused)
+      componentInteractionValue = "TOGGLE_OFF"
+    end if
+
+    if isNonEmptyString(componentInteractionValue) = true AND focusedItem <> invalid
+      setComponentInteractionEventForMenu(componentInteractionValue, focusedItem)
+    end if
+
+    m.menuFocused = m.Menu.isInFocusChain()
   end if
-
-  if isNonEmptyString(componentInteractionValue) = true AND focusedItem <> invalid
-    setComponentInteractionEventForMenu(componentInteractionValue, focusedItem)
-  end if
-
-  m.menuFocused = m.Menu.isInFocusChain()
-
 End Function
 
 
@@ -816,7 +823,7 @@ Function onSecondaryMenuFocusChange()
     end if
 
     componentInteractionValue = "TOGGLE_ON"
-  else if m.secondaryMenuFocused = true AND secondaryMenuIsInFocusChain = false
+  else if m.secondaryMenuFocused = true AND secondaryMenuIsInFocusChain = false AND m.secondaryMenuSelected = false
     'This block executed when SecondaryMenu loses focus.
     focusedItem = m.SecondaryMenu.content.getChild(m.SecondaryMenu.itemFocused)
     componentInteractionValue = "TOGGLE_OFF"
@@ -827,11 +834,11 @@ Function onSecondaryMenuFocusChange()
   end if
 
   m.secondaryMenuFocused = secondaryMenuIsInFocusChain
-
 End Function
 
 
 Function onSecondaryMenuItemSelected()
+  m.secondaryMenuSelected = true
   selection = m.SecondaryMenu.content.getChild(m.SecondaryMenu.itemSelected)
   if isNonEmptyString(selection.analyticsButtonValue) = true
     setComponentInteractionEventForMenu("CONFIRM", selection)
@@ -977,8 +984,10 @@ Function handleMenuItemSelected(itemSelected)
     else if itemSelected.id = "SeeAllGamesMenuItem"
       m.top.seeAllGamesSelected = true
     end if
-
   end if
+
+  m.mainMenuSelected = false
+  m.secondaryMenuSelected = false
 End Function
 
 
@@ -1216,6 +1225,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       handlePlayInput()
       return true
     else if key = "right" AND m.Menu.isInFocusChain() = true AND m.Menu.content.getChild(m.Menu.itemFocused).id = "LikeDislikeMenuItem" AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked
+      'This is to send component_interaction with toggle_off when user Liked and then removed the rating and then set focus to secondary menu.
       focusSecondaryMenu()
       return true
     else if key = "left"
