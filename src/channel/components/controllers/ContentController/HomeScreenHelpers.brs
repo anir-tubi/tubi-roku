@@ -940,7 +940,7 @@ Function onContentToPlay(msg)
     "srcForAds":m.constants.player.playbackOrigin.container
     "playbackContainer": containerId
   }
-  showDetailScreen(content, false, skipDetailScreen, invalid,playbackSource )
+  showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
 End Function
 
 

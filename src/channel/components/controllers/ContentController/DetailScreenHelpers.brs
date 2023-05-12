@@ -100,12 +100,27 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
       detailScreen.isLoading = false
     end if
 
-    pushScreen(detailScreen, false, false) ' don't send tracking until we resolve series episode
+    ' checking if the series content node exists in the content cache prior to fetching the content
+    seriesContent = invalid
+    if content.type = m.constants.ui.contentTypes.series
+      seriesContent = getFromContentCache(content.id)
+    end if
+
+    ' don't send tracking in case of series until we resolve series episode and send tracking if we already populate the detail screen to avoid wrong order of events
+    if sendTrackingOnResponse = true
+      if m.isScreenLoaded = true OR seriesContent <> invalid
+        pushScreen(detailScreen, true, true)
+      else
+        pushScreen(detailScreen, true, false)
+      end if
+    else
+      pushScreen(detailScreen, false, false)
+    end if
 
     ' determine the appropriate fetch callbacks based on the passed in parameters
     successCallback = onSingleContentResponseWithTracking
     errorCallback = onSingleContentErrorWithTracking
-    if sendTrackingOnResponse = false
+    if sendTrackingOnResponse = false OR seriesContent <> invalid OR m.isScreenLoaded = true
       successCallback = onSingleContentResponseWithoutTracking
       errorCallback = onSingleContentErrorWithoutTracking
     end if
@@ -119,10 +134,9 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
       errorCallback = errorCb
     end if
 
-    ' checking if the series content node exists in the content cache prior to fetching the content
     if content.type = m.constants.ui.contentTypes.series
-      seriesContent  = getFromContentCache(content.id)
       if seriesContent <> invalid
+        'we already have the series content in the cache and don't need to fetch it, so we can just call the successCallback
         successCallback(seriesContent)
       else
         getSingleContentFromServer(content, successCallback, errorCallback)
@@ -544,7 +558,7 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
 
     populateDetailScreen(detailScreen, refreshedContent)
 
-    sendDetailScreenNavigateAndLoadEvent(detailScreen, refreshedContent, sendTracking)
+    sendDetailScreenPageLoadEvent(detailScreen, refreshedContent, sendTracking)
 
     afterFn = invalid
     if m.actionType <> invalid
@@ -576,23 +590,18 @@ Function handleDetailScreenAfterFn(detailScreen, afterFn)
   end if
 End Function
 
-'Send NavigateToPage event and pageLoad event for detail screen after content has been fetched.
+'Send pageLoad event for detail screen after content has been fetched.
 '@detailScreen, roSGNode, a DetailScreen component to be populated
 '@refreshedContent, roSGNode, detail content
 '@sendTracking, boolean, to control whether to send Navigation and pageload events.
 '                       (In case of deeplink, we insert the detail page on screenstack and we do not need to send Navigate to page or pageload event)
-Function sendDetailScreenNavigateAndLoadEvent(detailScreen, refreshedContent, sendTracking = true)
-  tubilog("DeeplinkHelpers.sendDetailScreenNavigateAndLoadEvent")
+Function sendDetailScreenPageLoadEvent(detailScreen, refreshedContent, sendTracking = true)
+  tubilog("DetailScreenHelpers.sendDetailScreenPageLoadEvent")
 
   if sendTracking = true
     loadTime = 0
     if refreshedContent.type = m.constants.ui.contentTypes.series
       loadTime = Int((Uptime(0) - detailScreen.trackingLoadStartTime) * 1000) 'in ms
-    end if
-
-    oldScreen = getHiddenScreen(1) 'we already pushed the details screen, so the previous screen is 1 screen below the top screen/details screen
-    if oldScreen <> invalid
-      screenTrackingNavigate(oldScreen.trackingPageInfo, detailScreen.trackingPageInfo, oldScreen.trackingComponentInfo)
     end if
 
     screenTrackingLoad(detailScreen.trackingPageInfo, loadTime)
