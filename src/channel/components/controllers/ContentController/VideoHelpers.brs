@@ -97,10 +97,6 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
   if videoPlayer = invalid
     videoPlayer = CreateObject("roSGNode", "VideoPlayerScreen")
     videoPlayer.id = m.constants.ui.screenIds.videoPlayerScreen
-    ' Passing current user selected track.
-    if m.preferences <> invalid
-      videoPlayer.preferredAudioTrack = m.preferences.audioTrack
-    end if
     ' onVideoPlayerVisibleChange exists in ContentController
     videoPlayer.observeFieldScoped("visible", "onVideoPlayerVisibleChange")
     videoPlayer.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
@@ -111,6 +107,12 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     if getExperimentResource("roku_screensaver", "roku_screensaver_v2", false).enabled = true then
       videoPlayer.disableScreensaver = true
     end if
+  end if
+
+  ' Passing current user selected track.
+  ' Moving it out so that we always pass the updated value even when screen is obtained from cache.
+  if m.preferences <> invalid
+    videoPlayer.preferredAudioTrack = m.preferences.audioTrack
   end if
 
   stopVideoPreviewIfPlaying() 'stop videopreview just in case it is playing
