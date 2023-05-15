@@ -468,8 +468,19 @@ Function playContent()
         ' fire exposure event for video playback if manifest had only dash or hlsv3 content for treatment & control
         getExperimentResource("roku_dash", "roku_dash_v2", true)
       end if
-
       m.Video.control = "play"
+      
+      ' Calling the set initial audio track in the start of video playback.
+      ' The reason we are calling it here is to cover a use case where if we play the same video or the next video as the same value.
+      ' For ex: Between different video with audio tracks the available tracks value is exactly the same value.
+      ' It has 2 elements with Eng as language and track as dash/a~AAC~en~description~~2 and dash/a~AAC~en~main~~2.
+      ' Which results in the observer for available audio track not being fired.
+      ' With the below approach we are setting the value again using existing data from the previous content
+      ' that was played by the video player, which covers the case if the previous and current content have the 
+      ' same audio track. In the case where the previous and current content have different audio tracks,
+      ' setInitialAudioTrack() may attempt to set a track that the current content does not contain in which
+      ' case Roku's video player logic will choose an audio track
+      setInitialAudioTrack(m.Video.availableAudioTracks)
     end if
 
   end if
@@ -1878,6 +1889,11 @@ End Function
 
 Function onAvailableAudioTracksChange(msg)
   availableAudioTracks = msg.getData()
+  setInitialAudioTrack(availableAudioTracks)
+End Function
+
+
+Function setInitialAudioTrack(availableAudioTracks)
   preferredAudioTrack = m.top.preferredAudioTrack
 
   ' Proceeding only if we have stored device/user level settings.
