@@ -21,6 +21,8 @@
     <field id="itemHasFocus" type="boolean" />
     <!-- Below field will be used if the component is used in a list component -->
     <field id="listHasFocus" type="boolean" />
+    <!-- Below field will be used if the component is used in a grid component -->
+    <field id="gridHasFocus" type="boolean" />
     <field id="focusPercent" type="float" />
     
     <field id="width" type="float" alias="background.width" />

@@ -14,6 +14,7 @@ Function init()
   topRef.observeFieldScoped("height", "onHeightChange")
   topRef.observeFieldScoped("width", "onWidthChange")
   topRef.observeFieldScoped("listHasFocus", "onListHasFocusChange")
+  topRef.observeFieldScoped("gridHasFocus", "onListHasFocusChange")
   topRef.observeFieldScoped("itemHasFocus", "onItemHasFocus")
   topRef.observeFieldScoped("focusPercent", "onFocusPercentChange")
 
@@ -97,7 +98,9 @@ End Function
 
 
 Function onFocusPercentChange(msg)
-  if m.top.listHasFocus = true
+  hasFocus = listHasFocus()
+  
+  if hasFocus = true
     focusPercent = msg.getData()
     m.background.opacity = 1 - focusPercent
     m.labelFocused.opacity = focusPercent
@@ -116,7 +119,9 @@ Function onListHasFocusChange(msg)
     m.background.opacity = 1
   end if
 
-  if m.top.listHasFocus = true AND m.top.itemHasFocus = true
+  hasFocus = listHasFocus()
+  
+  if hasFocus = true AND m.top.itemHasFocus = true
     m.labelFocused.opacity = 1
     m.checkIconFocused.opacity = 1
   else
@@ -131,4 +136,9 @@ Function applyStyling()
   m.labelFocused.color = m.focusedThemeColor
   m.checkIcon.blendColor = m.unfocusedThemeColor
   m.checkIconFocused.blendColor = m.focusedThemeColor
+End Function
+
+
+Function listHasFocus()
+  return m.top.listHasFocus OR m.top.gridHasFocus
 End Function
