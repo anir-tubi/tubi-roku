@@ -1,10 +1,11 @@
 sub init()
-	YouboraLog("Created Communication")
+	YouboraLog("Created Communication", "Communication")
 
     'Fields
     m.port = createObject("roMessagePort")
     m.preloaders = CreateObject("roList")
     m.preloaders.AddTail("FastData")
+	m.validFDResponse = true
 	m.requests = {} 
 
 	m.requestHost = "a-fds.youborafds01.com"
@@ -15,9 +16,10 @@ sub init()
     m.top.observeField("request", m.port)
     m.top.observeField("addPreloader", m.port)
     m.top.observeField("removePreloader", m.port)
+    m.top.observeField("invalidFastDataResponse", m.port)
     m.top.observeField("requestHost", m.port)
     m.top.observeField("nextView", m.port)
-    m.top.observeField("close", m.port)
+	m.top.observeField("close", m.port)
 
     'Init ourselves
 	m.top.functionName = "_run"
@@ -48,23 +50,30 @@ sub _run()
             else if msg.getField() = "removePreloader"
                 preloader = msg.getData()
                 removePreloader(preloader)
+			else if msg.getField() = "invalidFastDataResponse"
+				YouboraLog("[Warning] Invalid FastData Response received!! Value: " + msg.getData().ToStr(), "Communication")
+				if msg.getData()
+					m.validFDResponse = false
+					cleanQueue()
+				end if
             else if msg.getField() = "requestHost"
 				' This will get executed before removing the preloader, so we make sure of saving the host just in case
 				m.requestHost = m.top.requestHost
             	setHost(m.requestHost)
             else if msg.getField() = "nextView"
+							'bs:disable-next-line LINT1005
             	dict = msg.getData()
-            	_nextView(dict.live)
-            else if msg.getField() = "close"
-                exit while
+            	_nextView()
+			else if msg.getField() = "close"
+				exit while
             endif   
 
         else if mt = "roUrlEvent" 'request response
             code = msg.GetResponseCode()
             if code = 200
-                YouboraLog("Request ok")
+                YouboraLog("Request ok", "Communication")
             else
-                YouboraLog("Invalid request response, code: " + code.ToStr() + ", reason: " + msg.GetFailureReason())
+				YouboraLog("Invalid request response, code: " + code.ToStr() + ", reason: " + msg.GetFailureReason(), "Communication")
             endif
 
             responseSourceIdentity = msg.GetSourceIdentity()
@@ -89,7 +98,6 @@ sub _run()
 
     end while
 end sub
-
 
 function getHost() as String
 	return addProtocol(m.host, m.httpSecure)
@@ -122,10 +130,8 @@ sub removePreloader(preloader as String)
 		topFields = m.top.getFields()
 
 		m.code = topFields["code"]
-		m.prefix = topFields["prefix"]
 		m.requestHost = topFields["requestHost"]
 		m.pingTime = topFields["pingTime"]
-		m.balancerEnabled = topFields["balancerEnabled"]
 		m.youboraId = topFields["youboraId"]
 
 		if nocodeRequests <> Invalid and nocodeRequests.Count() > 0
@@ -145,7 +151,7 @@ sub sendRequest(service, args = Invalid)
 	if args = Invalid
 		args = {}
 	endif
-	YouboraLog("Service: " + service)
+	YouboraLog("Service: " + service, "Communication")
 	'Remove code
 	args.delete("code")
 	
@@ -164,6 +170,17 @@ sub registerRequest(req)
 		m.requests[viewCode] = []
 	endif
 
+	if m.validFDResponse = false
+		YouboraLog("[Warning] The request cannot be registered because FastData did not provide a valid response", "Communication")
+		return
+	end if
+
+	currentQueueSize = queueSize(viewCode)
+	if currentQueueSize >= YouboraConstants().QUEUE_LIMIT_SIZE
+		YouboraLog("[Warning] Request queue size for code " + viewCode + " has reached the limit (Queue size: " + currentQueueSize.ToStr() + ")", "Communication")
+		return
+	end if
+
 	req.args.timemark = currentMillis().ToStr()
 
 	m.requests[viewCode].Push(req)
@@ -171,9 +188,34 @@ sub registerRequest(req)
 
 end sub
 
+sub cleanQueue()
+	YouboraLog("[Warning] Clean events queue", "Communication")
+    for each viewCode in m.requests
+        m.requests.delete(viewCode)
+    end for
+end sub
+
+function queueSize(viewCode as String)
+	try
+		reqs = m.requests
+
+		if reqs = invalid or viewCode = invalid
+			return 0
+		end if
+
+		if reqs.DoesExist(viewCode) = false
+			return 0
+		else
+			return reqs[viewCode].count()
+		endif
+	catch e
+		return 0
+	end try
+end function
+
 sub processRequests()
 
-	if m.preloaders.IsEmpty() = true and  m.requests.IsEmpty() = false
+	if m.preloaders.IsEmpty() = true and m.requests.IsEmpty() = false
 		for each viewCode in m.requests 'This iterates over requests's keys, ie. the view codes
 			requestsForCode = m.requests[viewCode]
 
@@ -220,32 +262,17 @@ sub processRequests()
 	endif
 end sub
 
-function _nextView(liveOrPrefix) as String
-
-	prefix = "U"
-
-	'We don't check boolean type as it may be boxed (roBoolean) or unboxed (Boolean)
-	' if liveOrPrefix = true
-	' 	prefix = "L"
-	' else if liveOrPrefix = false
-	' 	prefix = "V"
-	' else if type(liveOrPrefix) = "string"
-	' 	prefix = liveOrPrefix
-	' endif
-
+function _nextView() as String
 	m.view = m.view + 1
-	m.prefix = prefix
-
 	vcode = getViewCode()
 	return vcode
-
 end function
 
 function getViewCode() as String
 	if m.code = Invalid or m.code = ""
 		return "nocode"
 	else
-		return m.prefix + m.code + "_" + m.view.ToStr()
+		return m.code + "_" + m.view.ToStr()
 	endif
 end function
 
@@ -253,7 +280,7 @@ function getSessionRoot() as String
 	if m.code = Invalid or m.code = ""
 		return "noSessionRoot"
 	end if
-		return m.prefix + m.code
+		return m.code
 end function
 
 sub setHost(host as String)

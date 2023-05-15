@@ -4,7 +4,7 @@
 
 function Request(messagePort) As Object
 
-	YouboraLog("Created Request")
+	YouboraLog("Created Request", "Request")
     this = CreateObject("roAssociativeArray")
 
     'Methods
@@ -27,7 +27,7 @@ function Request_send() as Boolean
 	
 	url = m.getUrl()
     m.request.SetUrl(url)
-    YouboraLog("XHR Req: " + url)
+    YouboraLog("XHR Req: " + url, "Request")
     
     'We need a little setup if the request is https
     if url.Left(5) = "https"

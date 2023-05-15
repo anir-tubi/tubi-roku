@@ -3,13 +3,13 @@
 Library "Roku_Ads.brs"
 
 sub init()
-    YouboraLog("YBPluginRokuVideo.brs - init")
+    YouboraLog("YBPluginRokuVideo.brs - init", "YBPluginRokuVideo")
 end sub
 
 sub startMonitoring()
 
     m.pluginName = "RokuVideo"
-    m.pluginVersion = "6.5.31-" + m.pluginName
+    m.pluginVersion = "6.6.1-" + m.pluginName
 
     ' Let's cache the segment used on the bitrate to access less to it
     m.bitrateSegment = invalid
@@ -36,24 +36,27 @@ sub startMonitoring()
 end sub
 
 function getParamsVideoError()
-  params = { "msg": m.top.videoplayer.errorMsg, "errorCode": m.top.videoplayer.errorCode.ToStr() }
-  if m.top.videoplayer.errorStr <> invalid
-  	errormd = m.top.videoplayer.errorStr
-    if m.top.videoplayer.errorinfo <> invalid
-    	if m.top.videoplayer.errorInfo.clipid <> invalid then errormd += ",clip_id:" + m.top.videoplayer.errorInfo.clipid.ToStr()
-        if m.top.videoplayer.errorInfo.ignored <> invalid then errormd += ",ignored:" + m.top.videoplayer.errorInfo.ignored.ToStr()
-        if m.top.videoplayer.errorInfo.source <> invalid then errormd += ",source:" + m.top.videoplayer.errorInfo.source
-        if m.top.videoplayer.errorInfo.category <> invalid then errormd += ",category:" + m.top.videoplayer.errorInfo.category
-    end if
-    params["metadata"] = errormd
-  end if
-  return params
+    try
+        params = { "msg": m.top.videoplayer.errorMsg, "errorCode": m.top.videoplayer.errorCode.ToStr() }
+        if m.top.videoplayer.errorStr <> invalid
+            errormd = m.top.videoplayer.errorStr
+            if m.top.videoplayer.errorinfo <> invalid
+                if m.top.videoplayer.errorInfo.clipid <> invalid then errormd += ",clip_id:" + m.top.videoplayer.errorInfo.clipid.ToStr()
+                if m.top.videoplayer.errorInfo.ignored <> invalid then errormd += ",ignored:" + m.top.videoplayer.errorInfo.ignored.ToStr()
+                if m.top.videoplayer.errorInfo.source <> invalid then errormd += ",source:" + m.top.videoplayer.errorInfo.source
+                if m.top.videoplayer.errorInfo.category <> invalid then errormd += ",category:" + m.top.videoplayer.errorInfo.category
+            end if
+            params["metadata"] = errormd
+        end if
+        return params
+    catch e
+        return {}
+    end try
 end function
 
 'This method can be overwritten to control retry scenarios, to keep them in one view
 'so its important to keep it unmodified calling only 'error' to avoid side effects
 sub onVideoError()
-  ' print "ERROR: "; m.top.videoplayer.error.code.toStr() + ": " + m.top.videoplayer.error.message
   eventHandler("error", getParamsVideoError())
 end sub
 
@@ -70,7 +73,7 @@ function onBufferingStatusChanged(bufferStatus) as void
         if isBuffer = true
             if m.viewManager.isSeeking = true
 
-                YouboraLog("Converting seek to buffer...")
+                YouboraLog("Converting seek to buffer...", "YBPluginRokuVideo")
 
                 m.viewManager.isSeeking = false
                 m.viewManager.isBuffering = true
@@ -91,57 +94,61 @@ end function
 
 sub processPlayerState(newState as string)
 
-    YouboraLog("Player state: " + newState)
+    YouboraLog("Player state: " + newState, "YBPluginRokuVideo")
 
-    if newState = "buffering"
-        if m.viewManager.isStartSent = false
-            eventHandler("play")
-        else
-            if m.viewManager.isPaused = true
-                eventHandler("resume")
-                eventHandler("seeking")
+    try
+        if newState = "buffering"
+            if m.viewManager.isStartSent = false
+                eventHandler("play")
             else
-                eventHandler("buffering")
+                if m.viewManager.isPaused = true
+                    eventHandler("resume")
+                    eventHandler("seeking")
+                else
+                    eventHandler("buffering")
+                end if
+            end if
+        else if newState = "playing"
+            'if m.viewManager.isStartSent = true
+            if m.viewManager.isJoinSent = false
+                eventHandler("join")
+            else if m.viewManager.isPaused = true
+                eventHandler("resume")
+            end if
+
+            if m.viewManager.isBuffering = true
+                eventHandler("buffered")
+            else if m.viewManager.isSeeking = true
+                eventHandler("seeked")
+            end if
+            'endif
+        else if newState = "stopped"
+            'Sometimes when playing an HLS Live stream, the Video player
+            'enters the "stopped" state while buffering.
+            '
+            'Here we check for the control property of the video player
+            'and close the view only if it is stop. This avoids sending
+            'false stop events.
+            ' if m.top.videoplayer.control = "stop" AND m.viewManager.isShowingAds = false
+            '     'eventHandler("stop")
+            ' else
+            '     YouboraLog("Ignoring 'stopped' state; Video.control is not 'stop'")
+            ' endif
+        else if newState = "error"
+            onVideoError()
+        else if newState = "paused"
+            eventHandler("pause")
+        else if newState = "finished"
+            m.viewManager.isFinished = true
+            if m.top.videoplayer.control = "stop"
+                onStopVideo()
+            else
+                YouboraLog("Ignoring 'stopped' state; Video.control is not 'stop'", "YBPluginRokuVideo")
             end if
         end if
-    else if newState = "playing"
-        'if m.viewManager.isStartSent = true
-        if m.viewManager.isJoinSent = false
-            eventHandler("join")
-        else if m.viewManager.isPaused = true
-            eventHandler("resume")
-        end if
-
-        if m.viewManager.isBuffering = true
-            eventHandler("buffered")
-        else if m.viewManager.isSeeking = true
-            eventHandler("seeked")
-        end if
-        'endif
-    else if newState = "stopped"
-        'Sometimes when playing an HLS Live stream, the Video player
-        'enters the "stopped" state while buffering.
-        '
-        'Here we check for the control property of the video player
-        'and close the view only if it is stop. This avoids sending
-        'false stop events.
-        ' if m.top.videoplayer.control = "stop" AND m.viewManager.isShowingAds = false
-        '     'eventHandler("stop")
-        ' else
-        '     YouboraLog("Ignoring 'stopped' state; Video.control is not 'stop'")
-        ' endif
-    else if newState = "error"
-        onVideoError()
-    else if newState = "paused"
-        eventHandler("pause")
-    else if newState = "finished"
-        m.viewManager.isFinished = true
-        if m.top.videoplayer.control = "stop"
-            onStopVideo()
-        else
-            YouboraLog("Ignoring 'stopped' state; Video.control is not 'stop'")
-        end if
-    end if
+    catch e
+        YouboraLog("Exception managing player state: " + e.message, "YBPluginRokuVideo")
+    end try
 end sub
 
 'Overriden parent method

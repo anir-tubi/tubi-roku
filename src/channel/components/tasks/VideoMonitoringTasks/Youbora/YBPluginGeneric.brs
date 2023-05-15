@@ -2,7 +2,7 @@
 
 sub init()
 
-    YouboraLog("YBPluginGeneric.brs - init")
+    YouboraLog("YBPluginGeneric.brs - init", "YBPluginGeneric")
     m.top.functionName = "_run"
 
     m.port = createObject("roMessagePort")
@@ -70,10 +70,10 @@ end sub
 
 sub _run()
 
-    YouboraLog("YBPluginGeneric.brs - run")
+    YouboraLog("YBPluginGeneric.brs - run", "YBPluginGeneric")
 
     m.pluginName = "Generic"
-    m.pluginVersion = "6.5.30-" + m.pluginName
+    m.pluginVersion = "6.6.1-" + m.pluginName
 
     m.infoManager = InfoManager(m)
     setOptions(m.top.options)
@@ -152,7 +152,9 @@ sub _run()
                 receiveData(response)
                 m.dataRequest = invalid
             else
-                YouboraLog("Invalid data response, code: " + code.ToStr() + ", reason: " + msg.GetFailureReason())
+                YouboraLog("Invalid data response, code: " + code.ToStr() + ", reason: " + msg.GetFailureReason(), "YBPluginGeneric")
+                'Communicate to Communication an invalid FastData response
+                m.viewManager.com.invalidFastDataResponse = true
             end if
         end if
 
@@ -177,7 +179,7 @@ end sub
 'This method should be overriden in the specific plugin in order to process
 'the player events
 sub processMessage(msg, port)
-    YouboraLog("Youbora.brs -  processMessage")
+    YouboraLog("Youbora.brs -  processMessage", "YBPluginGeneric")
 end sub
 
 'Info methods
@@ -616,13 +618,13 @@ end sub
 
 sub receiveData(response as string)
     if response = invalid or response = ""
-        YouboraLog("FastData empty response")
+        YouboraLog("FastData empty response", "YBPluginGeneric")
         return
     end if
 
     'Convert jsonp to json
     responseJson = mid(response, 8, Len(response) - 8)
-    YouboraLog("responseJson: " + responseJson)
+    YouboraLog("responseJson: " + responseJson, "YBPluginGeneric")
     outerJson = ParseJSON(responseJson)
 
     if outerJson <> invalid
@@ -632,7 +634,6 @@ sub receiveData(response as string)
             host = ""
             code = ""
             pt = ""
-            balancer = ""
             yid = ""
 
             if innerJson.h <> invalid
@@ -644,26 +645,19 @@ sub receiveData(response as string)
             if innerJson.pt <> invalid
                 pt = innerJson.pt
             end if
-            if innerJson.b <> invalid
-                balancer = innerJson.b
-            end if
             if innerJson.f <> invalid
                 yid = innerJson.f.yid
             end if
 
 
-            if Len(host) > 0 and Len(code) > 0 and Len(pt) > 0 and Len(balancer) > 0
-                prefix = Left(code, 1)
-                firstCode = Right(code, Len(code) - 1)
+            if Len(host) > 0 and Len(code) > 0 and Len(pt) > 0
+                firstCode = code
                 pingTime = pt
-                balancerEnabled = balancer
 
                 updateFields = {}
-                updateFields["prefix"] = prefix
                 updateFields["code"] = firstCode
                 updateFields["requestHost"] = host
                 updateFields["pingTime"] = pingTime
-                updateFields["balancerEnabled"] = balancerEnabled
                 updateFields["youboraId"] = yid
 
                 m.viewManager.com.setFields(updateFields)
@@ -671,7 +665,7 @@ sub receiveData(response as string)
                 m.pingTimer.duration = pt
                 'update the copy we have with the ping timer
                 m.viewManager.pingTime = pt
-                YouboraLog("FastData " + code + " is ready.")
+                YouboraLog("FastData " + code + " is ready.", "YBPluginGeneric")
 
                 m.viewManager.com.removePreloader = "FastData"
             end if

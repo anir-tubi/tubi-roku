@@ -10,14 +10,26 @@ function currentMillis() as LongInteger
 
 end function
 
-sub YouboraLog(message as String)
-    if m.YouboraLogActive = invalid
-        m.YouboraLogActive = m.global.YouboraLogActive
-    end if
-    if m.YouboraLogActive = true
-        print message
-    endif
+sub YouboraLog(message as String, contextName as String)
+    try
+        if m.YouboraLogActive = invalid
+            m.YouboraLogActive = m.global.YouboraLogActive
+        end if
+        if m.YouboraLogActive = true
+            timeStamp = getCurrentTime()
+            print "[" + timeStamp + "] (" + contextName + ") " + message
+        endif
+    catch e
+    end try
 end sub
+
+function getCurrentTime() as String
+    result = "{0}.{1}"
+    time = CreateObject("roDateTime")
+    time.toLocalTime()
+    result = Substitute(result, time.ToISOString(), time.getMilliseconds().toStr())
+    return result
+end function
 
 ' Extracted from https://github.com/Roberto14/CompareAA
 

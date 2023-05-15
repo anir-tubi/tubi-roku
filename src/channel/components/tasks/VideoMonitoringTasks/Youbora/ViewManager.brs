@@ -1,6 +1,6 @@
 function ViewManager(_infoManager as Object, plugin) As Object
 
-	YouboraLog("Created ViewManager")
+	YouboraLog("Created ViewManager", "ViewManager")
     this = CreateObject("roAssociativeArray")
 
     'Methods
@@ -116,7 +116,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
 			m.com.nextView = {live:"U"} 'Live = true
 			m.com.request = {service: "/init", args:params}
-			YouboraLog("Request: NQS /init " + params["mediaResource"])
+			YouboraLog("Request: NQS /init " + params["mediaResource"], "ViewManager")
 		end if
 	else if req = "start"
 
@@ -138,7 +138,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 			end if 
 
 			m.com.request = {service: "/start", args:params}
-			YouboraLog("Request: NQS /start " + params["mediaResource"])
+			YouboraLog("Request: NQS /start " + params["mediaResource"], "ViewManager")
 		endif
 
 	else if req = "join"
@@ -169,7 +169,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 			'params.playhead = params.playhead.ToStr()
 
 			m.com.request = {service: "/joinTime", args:params}
-			YouboraLog("Request: NQS /joinTime " + params["joinDuration"].ToStr())
+			YouboraLog("Request: NQS /joinTime " + params["joinDuration"].ToStr(), "ViewManager")
 
 		endif
 
@@ -213,7 +213,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
 		m.com.request = {service: "/stop", args:params}
 
-        YouboraLog("Request: NQS /stop")
+        YouboraLog("Request: NQS /stop", "ViewManager")
 
 	endif
 
@@ -228,7 +228,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
 			m.com.request = {service: "/pause", args:params}
 
-			YouboraLog("Request: NQS /pause")
+			YouboraLog("Request: NQS /pause", "ViewManager")
 		endif
 
 	else if req = "resume"
@@ -242,7 +242,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
 			m.com.request = {service: "/resume", args:params}
 
-			YouboraLog("Request: NQS /resume")
+			YouboraLog("Request: NQS /resume", "ViewManager")
 		endif
 
 	else if req = "ping"
@@ -284,7 +284,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 			m.isBuffering = true
 			m.chronoBuffer.start()
 
-			YouboraLog("Method: /bufferStart")
+			YouboraLog("Method: /bufferStart", "ViewManager")
 		endif
 
 	else if req = "bufferEnd"
@@ -299,7 +299,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
 			m.com.request = {service: "/bufferUnderrun", args:params}
 
-			YouboraLog("Request: NQS /bufferUnderrun " + params["bufferDuration"].ToStr() + " ms")
+			YouboraLog("Request: NQS /bufferUnderrun " + params["bufferDuration"].ToStr() + " ms", "ViewManager")
 
 		endif
 
@@ -309,7 +309,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 			m.isSeeking = true
 			m.chronoSeek.start()
 
-			YouboraLog("Method /seekStart")
+			YouboraLog("Method /seekStart", "ViewManager")
 		endif
 
 	else if req = "seekEnd"
@@ -322,7 +322,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
 			m.com.request = {service: "/seek", args:params}
 
-			YouboraLog("Request: NQS /seek " + params["seekDuration"].ToStr() + " ms")
+			YouboraLog("Request: NQS /seek " + params["seekDuration"].ToStr() + " ms", "ViewManager")
 
 		endif
 
@@ -334,13 +334,13 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 
 		m.com.request = {service: "/error", args:params}
 
-		YouboraLog("Request: NQS /error " + params.msg)
+		YouboraLog("Request: NQS /error " + params.msg, "ViewManager")
 
 	else if req = "videoEvent"
 
 		params = m.infoManager.getRequestParams("videoEvent", params)
 		m.com.request = {service: "/infinity/video/event", args:params}
-		YouboraLog("Request: NQS /infinity/video/event " + params.name)
+		YouboraLog("Request: NQS /infinity/video/event " + params.name, "ViewManager")
 
 	else if req = "adInit"
 
@@ -354,7 +354,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 			params = m.infoManager.getRequestParams("adInit", params)
 			m.isAdInitiated = true
             m.com.request = {service: "/adInit", args:params}
-            YouboraLog("Request: NQS /adInit")
+            YouboraLog("Request: NQS /adInit", "ViewManager")
 		end if
 
 	else if req = "adStart"
@@ -370,7 +370,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
             params = m.infoManager.getRequestParams("adStart", params)
 
             m.com.request = {service: "/adStart", args:params}
-            YouboraLog("Request: NQS /adStart")
+            YouboraLog("Request: NQS /adStart", "ViewManager")
 
          end if
      else if req = "adJoin"
@@ -382,7 +382,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
             params = m.infoManager.getRequestParams("adJoin", params)
 
             m.com.request = {service: "/adJoin", args:params}
-            YouboraLog("Request: NQS /adJoin " + Str(params["adJoinDuration"]) + " ms")
+            YouboraLog("Request: NQS /adJoin " + Str(params["adJoinDuration"]) + " ms", "ViewManager")
 
          end if
 
@@ -393,7 +393,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
             params = m.infoManager.getRequestParams("adPause", params)
 
             m.com.request = {service: "/adPause", args:params}
-            YouboraLog("Request: NQS /adPause")
+            YouboraLog("Request: NQS /adPause", "ViewManager")
 
          end if
 
@@ -405,7 +405,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 			if params.DoesExist("adPauseDuration") = false then params["adPauseDuration"] = m.chronoAdPause.getDeltaTime()
 
             m.com.request = {service: "/adResume", args:params}
-            YouboraLog("Request: NQS /adResume")
+            YouboraLog("Request: NQS /adResume", "ViewManager")
 
          end if
 
@@ -422,7 +422,7 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
             params = m.infoManager.getRequestParams("adStop", params)
 
             m.com.request = {service: "/adStop", args:params}
-            YouboraLog("Request: NQS /adStop")
+            YouboraLog("Request: NQS /adStop", "ViewManager")
 
          end if
 
@@ -430,12 +430,12 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
      	params = m.infoManager.getRequestParams("adError", params)
 
         m.com.request = {service: "/adError", args:params}
-        YouboraLog("Request: NQS /adError")
+        YouboraLog("Request: NQS /adError", "ViewManager")
   else if req = "adManifest" AND m.isAdManifestSent = false
 		m.isAdManifestSent = true
 		params = m.infoManager.getRequestParams("adManifest", params)
 		m.com.request = {service: "/adManifest", args:params}
-		YouboraLog("Request: NQS /adManifest")
+		YouboraLog("Request: NQS /adManifest", "ViewManager")
 
 	else if req = "adBreakStart" AND m.isAdBreakStarted = false
 		m.isAdBreakStarted = true
@@ -445,12 +445,12 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 		end if
 
 		m.com.request = {service: "/adBreakStart", args:params}
-		YouboraLog("Request: NQS /adBreakStart")
+		YouboraLog("Request: NQS /adBreakStart", "ViewManager")
 
 	else if req = "adQuartile" AND m.isAdJoinSent = true
 		params = m.infoManager.getRequestParams("adQuartile", params)
 		m.com.request = {service: "/adQuartile", args:params}
-        YouboraLog("Request: NQS /adQuartile")
+        YouboraLog("Request: NQS /adQuartile", "ViewManager")
 
 	else if req = "adBreakStop" AND m.isAdBreakStarted = true
 			m.isAdBreakStarted = false
@@ -460,40 +460,40 @@ sub ViewManager_sendRequest(req as String, params = Invalid)
 			params = m.infoManager.getRequestParams("adBreakStop", params)
 
             m.com.request = {service: "/adBreakStop", args:params}
-            YouboraLog("Request: NQS /adBreakStop")
+            YouboraLog("Request: NQS /adBreakStop", "ViewManager")
 
 	else if req = "sessionStart"
 		m.infoManager.plugin._startBeatTimer()
 		params = m.infoManager.getRequestParams("sessionStart", params)
 		m.com.request = {service: "/infinity/session/start", args: params}
-		YouboraLog("Request: NQS /infinity/session/start")
+		YouboraLog("Request: NQS /infinity/session/start", "ViewManager")
 
 	else if req = "sessionStop"
 		m.infoManager.plugin._stopBeatTimer()
 		params = m.infoManager.getRequestParams("sessionStop", params)
 		m.com.request = {service: "/infinity/session/stop", args: params}
-		YouboraLog("Request: NQS /infinity/session/stop")	
+		YouboraLog("Request: NQS /infinity/session/stop", "ViewManager")	
 
 	else if req = "sessionEvent"
 		params = m.infoManager.getRequestParams("sessionEvent", params)
 		m.com.request = {service: "/infinity/session/event", args: params}
-		YouboraLog("Request: NQS /infinity/session/event")	
+		YouboraLog("Request: NQS /infinity/session/event", "ViewManager")	
 
 	else if req = "sessionNav"
 		params = m.infoManager.getRequestParams("sessionNav", params)
 		m.com.request = {service: "/infinity/session/nav", args: params}
-		YouboraLog("Request: NQS /infinity/session/nav")
+		YouboraLog("Request: NQS /infinity/session/nav", "ViewManager")
 
 	else if req = "sessionBeat"
 		params = m.infoManager.getRequestParams("sessionBeat", params)
 		m.com.request = {service: "/infinity/session/beat", args: params}
-		YouboraLog("Request: NQS /infinity/session/beat")
+		YouboraLog("Request: NQS /infinity/session/beat", "ViewManager")
 
 	else if req = "videoEvent"
 		if m.isStartSent = true
 			params = m.infoManager.getRequestParams("videoEvent", params)
 			m.com.request = {service: "/infinity/video/event", args: params}
-			YouboraLog("Request: NQS /infinity/video/event")
+			YouboraLog("Request: NQS /infinity/video/event", "ViewManager")
 		end if
 
     endif

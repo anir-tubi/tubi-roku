@@ -1,5 +1,5 @@
 function InfoManager(plugin, options = invalid)
-    YouboraLog("Created InfoManager")
+    YouboraLog("Created InfoManager", "InfoManager")
     this = CreateObject("roAssociativeArray")
 
     'Methods
@@ -559,7 +559,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
         if outParams.DoesExist("adNumberInBreak") = false then outParams["adNumberInBreak"] = m.getAdNumberInBreak()
-        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.5.31 Roku Adnalyzer"
+        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.6.1 Roku Adnalyzer"
         'Extra params
         nextraparams = 10
         index = 1
@@ -619,21 +619,21 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
                         if type(m.options["ad.expectedPattern"]["pre"]) = "roArray"
                             array.Append(m.options["ad.expectedPattern"]["pre"])
                         else
-                            YouboraLog("Values inside ad.expectedPattern must be arrays")
+                            YouboraLog("Values inside ad.expectedPattern must be arrays", "InfoManager")
                         end if
                     end if
                     if m.options["ad.expectedPattern"]["mid"] <> invalid
                         if type(m.options["ad.expectedPattern"]["mid"]) = "roArray"
                             array.Append(m.options["ad.expectedPattern"]["mid"])
                         else
-                            YouboraLog("Values inside ad.expectedPattern must be arrays")
+                            YouboraLog("Values inside ad.expectedPattern must be arrays", "InfoManager")
                         end if
                     end if
                     if m.options["ad.expectedPattern"]["post"] <> invalid
                         if type(m.options["ad.expectedPattern"]["post"]) = "roArray"
                             array.Append(m.options["ad.expectedPattern"]["post"])
                         else
-                            YouboraLog("Values inside ad.expectedPattern must be arrays")
+                            YouboraLog("Values inside ad.expectedPattern must be arrays", "InfoManager")
                         end if
                     end if
                     if array[outParams["breakNumber"]] <> invalid
@@ -654,21 +654,21 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
                     if type(m.options["ad.expectedPattern"]["pre"]) = "roArray"
                         length = length + m.options["ad.expectedPattern"]["pre"].Count()
                     else
-                        YouboraLog("Values inside ad.expectedPattern must be arrays")
+                        YouboraLog("Values inside ad.expectedPattern must be arrays", "InfoManager")
                     end if
                 endif
                 if m.options["ad.expectedPattern"]["mid"] <> invalid
                     if type(m.options["ad.expectedPattern"]["mid"]) = "roArray"
                         length = length + m.options["ad.expectedPattern"]["mid"].Count()
                     else
-                        YouboraLog("Values inside ad.expectedPattern must be arrays")
+                        YouboraLog("Values inside ad.expectedPattern must be arrays", "InfoManager")
                     end if
                 endif
                 if m.options["ad.expectedPattern"]["post"] <> invalid
                     if type(m.options["ad.expectedPattern"]["post"]) = "roArray"
                         length = length + m.options["ad.expectedPattern"]["post"].Count()
                     else
-                        YouboraLog("Values inside ad.expectedPattern must be arrays")
+                        YouboraLog("Values inside ad.expectedPattern must be arrays", "InfoManager")
                     end if
                 endif
                 outParams["expectedBreaks"] = length
