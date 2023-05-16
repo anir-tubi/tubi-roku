@@ -2,6 +2,9 @@ Function init()
   m.constants = m.global.constants
   theme = getThemeFromGlobal()
   m.passwordMode = true
+  m.focusDelayTimer = m.top.findNode("focusDelayTimer")
+  m.focusDelayTimer.observeFieldScoped("fire", "onFocusDelayTimerFired")
+
   m.back = m.top.findNode("back")
   m.back.text = getTranslation("linearVideoPlayer_buttonBack")
   m.back.observeFieldScoped("selected", "onButtonSelected")
@@ -54,22 +57,68 @@ Function init()
 End Function
 
 
+Function onButtonSelected(evt)
+  buttonSelected = evt.getRoSGNode()
+  if buttonSelected.id = "showHidePassword"
+      if m.passwordMode = true
+          m.showHidePassword.text = getTranslation("screenSettings_parentalPassword_button_hide")
+          m.passwordMode = false
+        else
+          m.showHidePassword.text = getTranslation("screenSettings_parentalPassword_button_show")
+          m.passwordMode = true
+        end if
+  end if
+
+  m.top.buttonSelected = buttonSelected.id
+End Function
+
+
+Function onTextEditBoxFocusedChildChange()
+  ' Don't allow textEditBox to take focus since we're not showing it
+  if m.keyboard.textEditBox.hasFocus() = true
+    m.keyboard.keyGrid.setFocus(true)
+  end if
+End Function
+
+
+Function onScreenFocusChange()
+  if m.top.hasFocus() = true
+    m.keyboard.keyGrid.setFocus(true)
+  end if
+End Function
+
+
+Function onVoiceEnabledChange(msg)
+  m.keyboard.textEditBox.voiceEnabled = msg.getData()
+End Function
+
+
+'//When the timer is called, it means the user pressed the DOWN button. There should be slight delay in determining which 
+'// button to go to next since there the keyboard has a slight delay in determining the key focus.
+Function onFocusDelayTimerFired()
+  if m.keyboard.isInFocusChain() = true
+    sPreviouslyFocusedKey = m.keyboard.focusedChild.keyFocused
+    if sPreviouslyFocusedKey <> invalid AND m.aLeftLowerKeys[sPreviouslyFocusedKey] = true
+      '//if the key focus is on the lower left of the keyboard, then set focus on the back button
+      m.back.setFocus(true)
+    else if sPreviouslyFocusedKey <> invalid AND m.aRightLowerKeys[sPreviouslyFocusedKey] = true
+      '//if the key focus is on the lower right of the keyboard, then set focus on the showHidePassword button
+      m.showHidePassword.setFocus(true)
+    else
+      m.continue.setFocus(true)
+    end if
+  end if
+End Function
+
+
 Function onKeyEvent(key As String, press As Boolean) as Boolean
   handled = true
   if press
+    m.focusDelayTimer.control = "stop"  '//whenever the key is pressed, then cancel the timer
 
     if key = "down"
       if m.keyboard.isInFocusChain() = true
-        sPreviouslyFocusedKey = m.keyboard.focusedChild.keyFocused
-        if sPreviouslyFocusedKey <> invalid AND m.aLeftLowerKeys[sPreviouslyFocusedKey] = true
-          '//if the key focus is on the lower left of the keyboard, then set focus on the back button
-          m.back.setFocus(true)
-        else if sPreviouslyFocusedKey <> invalid AND m.aRightLowerKeys[sPreviouslyFocusedKey] = true
-          '//if the key focus is on the lower right of the keyboard, then set focus on the showHidePassword button
-          m.showHidePassword.setFocus(true)
-        else
-          m.continue.setFocus(true)
-        end if
+        m.focusDelayTimer.control = "start"  '//cause a slight delay to determine where to go next since there is a slight delay for the keyboard to know which keyboard button is in focus
       end if
 
     else if key = "up"
@@ -105,41 +154,4 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
     return handled
   end if
   return false
-End Function
-
-
-Function onButtonSelected(evt)
-
-    buttonSelected = evt.getRoSGNode()
-    if buttonSelected.id = "showHidePassword"
-        if m.passwordMode = true
-            m.showHidePassword.text = getTranslation("screenSettings_parentalPassword_button_hide")
-            m.passwordMode = false
-          else
-            m.showHidePassword.text = getTranslation("screenSettings_parentalPassword_button_show")
-            m.passwordMode = true
-          end if
-    end if
-    m.top.buttonSelected = buttonSelected.id
-
-End Function
-
-
-Function onTextEditBoxFocusedChildChange()
-  ' Don't allow textEditBox to take focus since we're not showing it
-  if m.keyboard.textEditBox.hasFocus() = true
-    m.keyboard.keyGrid.setFocus(true)
-  end if
-End Function
-
-
-Function onScreenFocusChange()
-  if m.top.hasFocus()
-    m.keyboard.keyGrid.setFocus(true)
-  end if
-End Function
-
-
-Function onVoiceEnabledChange(msg)
-  m.keyboard.textEditBox.voiceEnabled = msg.getData()
 End Function
