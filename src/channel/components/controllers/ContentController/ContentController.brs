@@ -1370,10 +1370,10 @@ Function sendcomponentInteractionInfo(componentInteractionInfo)
 End Function
 
 
-Function homeScreenBackgroundUpdated(msg)
-  tubiLog("ContentController.homeScreenBackgroundUpdated")
-  homeScreen = msg.getRoSGNode()
-  setHomeScreenBackground(homeScreen)
+Function onVideoContentScreenBackgroundUpdated(msg)
+  tubiLog("ContentController.onVideoContentScreenBackgroundUpdated")
+  screen = msg.getRoSGNode() 
+  setVideoContentScreenBackground(screen)
 End Function
 
 
@@ -1391,11 +1391,12 @@ Function isCurrentScreenEPGScreen()
 End Function
 
 
-Function setHomeScreenBackground(homeScreen)
-  if homeScreen <> invalid AND isCurrentScreenHomeScreen() = true
+Function setVideoContentScreenBackground(screen)
+  currentScreen = getCurrentScreen()
+  if screen <> invalid AND currentScreen <> invalid AND screen.id = currentScreen.id
     contentType = invalid
-    if homeScreen.contentFocused <> invalid
-      contentType = homeScreen.contentFocused.type
+    if screen.contentFocused <> invalid
+      contentType = screen.contentFocused.type
     end if
     videoPreviewState = getVideoPreviewState()
     if videoPreviewState = "playing" OR videoPreviewState = "paused"
@@ -1406,8 +1407,8 @@ Function setHomeScreenBackground(homeScreen)
       }
     else
       m.backgroundGroup.backgroundInfo = {
-        type: getBackgroundType(homeScreen.backgroundUriList, contentType)
-        uriList: homeScreen.backgroundUriList
+        type: getBackgroundType(screen.backgroundUriList, contentType)
+        uriList: screen.backgroundUriList
       }
     end if
   end if

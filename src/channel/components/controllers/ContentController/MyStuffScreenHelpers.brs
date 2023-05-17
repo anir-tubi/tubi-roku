@@ -20,14 +20,17 @@ Function showMyStuffScreen()
     screen = CreateObject("roSGNode", "MyStuffScreen")
     screen.trackingLoadStartTime = UpTime(0)
     screen.observeFieldScoped("contentSelected", "onMyStuffContentSelected")
+    screen.observeFieldScoped("contentFocused", "onMyStuffScreenContentFocused")
     screen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     screen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     screen.observeFieldScoped("contentToPlay", "onContentToPlay")
-    screen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
+    screen.observeFieldScoped("backgroundUriList", "onVideoContentScreenBackgroundUpdated")
     screen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelectedOnMyStuffScreen")
     screen.observeFieldScoped("homeButtonSelected", "onHomeButtonSelectedOnMyStuffScreen")
     screen.observeFieldScoped("refreshContent", "onRefreshContentSignalForMyStuffScreen")
     screen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
+    screen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
+    screen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
 
     if bLoggedInUser = true
       screen.isLoading = true
@@ -241,4 +244,12 @@ Function onMyStuffContentSelected(msg)
     }
     showDetailScreen(content, true, invalid, invalid, playbackSource)
   end if
+End Function
+
+
+' The event hander function for when a content item gains focus on the my stuff screen
+Function onMyStuffScreenContentFocused(msg)
+  tubiLog("MyStuffScreenHelpers.onMyStuffScreenContentFocused")
+  focusedContent = msg.getData()
+  setVideoPreviewAfterFocus(focusedContent, "for_you_page")
 End Function

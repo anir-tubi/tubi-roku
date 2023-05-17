@@ -21,10 +21,10 @@ Function TubiExperiments(constants) as Object
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
 
     defaultResources: {
-      '// When enabled=true, the user will see the side nav option "my list" replaced with "my stuff". My Stuff will point to a new kind of page specific to the user
-      ' roku_my_stuff: {
-      '   roku_my_stuff_v3: {"enabled": true}
-      ' }
+      '// When enabled=true, the user will see live video previews on the My Stuff screen.
+      roku_my_stuff: {
+        roku_my_stuff_v3: {"enabled": false}
+      }
 
       roku_in_pod_stitching: {
         roku_in_pod_stitching_v2: {"enabled": false}

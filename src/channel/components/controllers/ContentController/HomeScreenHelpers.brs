@@ -43,7 +43,7 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     showHideSpinner(true)
     homeScreen = CreateObject("roSGNode", "HomeScreen")
     homeScreen.shouldFocusWhenPushed = m.top.fadeInContentController
-    homeScreen.observeFieldScoped("backgroundUriList", "homeScreenBackgroundUpdated")
+    homeScreen.observeFieldScoped("backgroundUriList", "onVideoContentScreenBackgroundUpdated")
     homeScreen.observeFieldScoped("sponsorshipBackground", "onSponsorshipBackgroundChanged")
     homeScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     homeScreen.observeFieldScoped("loadAllCategories", "onLoadAllCategories")
@@ -378,7 +378,7 @@ Function setHomeScreenLoading(homeScreen)
   homeScreen.isLoading = true
   '//checking screen for invalid, to show the loading spinner when user sign outs
   '//Display default background and spinner only if the home screen is the current screen while it is loading
-  if screen = invalid or screen.id = homeScreen.id
+  if screen = invalid OR screen.id = homeScreen.id
     showHideSpinner(true)
     displayDefaultBackground()
   end if
@@ -753,32 +753,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
       end if
     end if
 
-    if focusedContent.type <> invalid AND m.SideNav.opened <> true then
-      if isVideoPreviewEnabled() = true then
-        previewState = getVideoPreviewStateForThisContent(focusedContent)
-        if previewState = "buffering" or previewState = "playing"
-          videoPreview = m.videoPreviewPlayer
-          if videoPreview <> invalid
-            setPageTypeForVideoPreview("home_page")
-          end if
-          m.backgroundGroup.posterVisible = false
-        else if previewState = "paused"
-          resumeVideoPreview()
-        else
-          ' this block is needed if user focuses to different content,
-          ' it stops the preview of current content & starts the preview of new content
-          stopVideoPreview()
-
-          if isLinearPlayerPlayingThisContent(focusedContent) = false
-            m.backgroundGroup.posterVisible = true
-          end if
-
-          if focusedContent.videoPreviewUrl <> ""
-            startVideoPreview(focusedContent, "home_page")
-          end if
-        end if
-      end if
-    end if
+    setVideoPreviewAfterFocus(focusedContent, "home_page")
 
     if bStopCountdownTimer = true
       stopCountdownTimer()

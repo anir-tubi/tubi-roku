@@ -117,27 +117,27 @@ Function onVideoPreviewStateChanged(msg)
 
       ' Don't want to continue playback if the user has their tv turned off
       if isHdmiStatusOk = true then
-        if currentScreen.subType() = "HomeScreen"
-          playbackSource = {
-            "srcForAnalytic": "previews"
-            "srcForAds": m.constants.player.playbackOrigin.container
-            "playbackContainer": currentScreen.currCategoryId
-          }
-
-          showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen, invalid, playbackSource)
-        else if currentScreen.subType() = "DetailScreen"
+        if currentScreen.subType() = "DetailScreen"
 
           playbackSource = {
             "srcForAnalytic": "previews"
             "srcForAds": currentScreen.playbackSource.srcForAds
             "playbackContainer": currentScreen.playbackSource.playbackContainer
           }
-
           if currentScreen.resumePoint > 0
             resumeVideoDetailScreen(currentScreen, playbackSource)
           else
             playVideoDetailScreen(currentScreen, playbackSource)
           end if
+        else
+          '//by default open the detail screen
+
+          playbackSource = {
+            "srcForAnalytic": "previews"
+            "srcForAds": m.constants.player.playbackOrigin.container
+            "playbackContainer": currentScreen.currCategoryId
+          }
+          showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen, invalid, playbackSource)
         end if
       end if
     end if
@@ -148,7 +148,7 @@ End Function
 
 ' starts the video preview
 ' @content : TubiContentNode, it has all the required information to start the video preview
-' @pageType : string, the type(video_page, series_detail_page, home_page) of page which is used in analytics event
+' @pageType : string, the type(video_page, series_detail_page, for_you_page, home_page) of page which is used in analytics event
 Function startVideoPreview(content, pageType = "home_page")
   tubiLog("VideoPreviewHelpers.startVideoPreview")
   if content <> invalid AND isVideoPreviewOn() = true
@@ -190,4 +190,46 @@ Function setPageTypeForVideoPreview(pageType)
     videoPreview.pageTypeForAnalytics = pageType
   end if
 
+End Function
+
+
+' setVideoPreviewAfterFocus sets the proper state of the video preview video player when a video content has gained focus
+' @param focusedContent, roSGNode - The TubiContentNode of the focused content
+' @pageType : string, the type of page which is used in analytics event: i.e. (video_page, series_detail_page, for_you_page, home_page)
+Function setVideoPreviewAfterFocus(focusedContent, pageType)
+  if focusedContent <> invalid AND focusedContent.type <> invalid AND m.SideNav.opened <> true
+    if isVideoPreviewEnabled() = true
+      previewState = getVideoPreviewStateForThisContent(focusedContent)
+      if previewState = "buffering" OR previewState = "playing"
+        videoPreview = m.videoPreviewPlayer
+        if videoPreview <> invalid AND pageType <> invalid
+          setPageTypeForVideoPreview(pageType)
+        end if
+        m.backgroundGroup.posterVisible = false
+      else if previewState = "paused"
+        resumeVideoPreview()
+      else
+        ' this block is needed if user focuses to different content,
+        ' it stops the preview of current content & starts the preview of new content
+        stopVideoPreview()
+
+        if isLinearPlayerPlayingThisContent(focusedContent) = false
+          m.backgroundGroup.posterVisible = true
+        end if
+
+        if focusedContent.videoPreviewUrl <> ""
+
+          isVideoPreviewAutoStartEnabledWithPageType = true
+          if pageType = "for_you_page"
+            '//if the page type is a myScreen, then check if the roku_my_stuff_v3 is enabled. Otherwise, assume this variable is true
+            isVideoPreviewAutoStartEnabledWithPageType = (getExperimentResource("roku_my_stuff", "roku_my_stuff_v3", true).enabled = true)
+          end if
+
+          if isVideoPreviewAutoStartEnabledWithPageType = true
+            startVideoPreview(focusedContent, pageType)
+          end if
+        end if
+      end if
+    end if
+  end if
 End Function

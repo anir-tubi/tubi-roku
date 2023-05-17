@@ -272,7 +272,8 @@ Function onRowItemFocused(msg) as Boolean
     m.oldCursorPosition = m.top.cursorPosition
     m.top.cursorPosition = newCursorPosition
     oldFocusedContent = m.top.contentFocused
-    m.top.contentFocused = getAbbreviatedContent(newCursorPosition)
+
+    m.top.contentFocused = resolveAbbreviatedContent(newCursorPosition)
 
     category = m.RowList.content.getChild(newCursorPosition[0])
     if category <> invalid
@@ -576,6 +577,10 @@ End Function
 ' returns true if action was taken based on the "play" input and false if no action taken
 Function handlePlayInput()
   if m.top.isLoading <> true AND m.top.signedIn = true
+    if isVideoPreviewEnabled() = true
+      m.top.stopVideoPreview = true
+    end if
+
     itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
     positionFocused = m.top.cursorPosition
     category = m.RowList.content.getChild(positionFocused[0])
@@ -692,9 +697,17 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       '//ensure this keypress is captured so the default Roku positive audio sound is played.
       return true
     else if key = "play" AND m.RowList.isInFocusChain() = true
+      
       if handlePlayInput() = true
         return true
       end if
+
+    else if key = "left" OR key = "back"
+
+      if isVideoPreviewEnabled() = true
+        m.top.pauseVideoPreview = true
+      end if
+
     end if
   end if
   return false

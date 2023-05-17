@@ -70,6 +70,12 @@
       <!-- tells ContentController/Helpers that the content metadata is
             out of the cache window and should be updated -->
       <field id="refreshContent" type="boolean" alwaysNotify="true" />
+
+      <!-- Communicates to the parent that the video preview should be stopped -->
+      <field id="stopVideoPreview" type="boolean" alwaysNotify="true"/>
+
+      <!-- Communicates to the parent that the video preview should be paused -->
+      <field id="pauseVideoPreview" type="boolean" alwaysNotify="true"/>
   </interface>
 
   <children>
@@ -261,6 +267,7 @@
       maxTitleLines="2"/>
     <MaskGroup
       id="ContentArea"
+      maskUri="pkg:/images/poster-mask.png"
       maskSize="[0,0]"
       maskOffset="[0,317]"
       translation="[192,493]">
