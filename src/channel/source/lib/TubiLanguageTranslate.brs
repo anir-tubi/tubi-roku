@@ -1762,7 +1762,7 @@ Function getTranslation_es_MX()
     },
     "screenHome_showAllNotification": {
       "description": "The text to display on floating education of show all",
-      "message": "Para ver todo {containerTitle}, seleccione "
+      "message": "Para ver todo {containerTitle}, elige "
     },
     "screenHome_item_seeAll": {
       "description": "The text to display on See All movies / shows",
@@ -2484,6 +2484,10 @@ Function getTranslation_es_MX()
       "description": "Label of button to allow users to play the current video title",
       "message": "Ver"
     },
+    "screenDetails_button_startOver": {
+      "description": "Label of button to allow users to start over and play the current video title",
+      "message": "Ver desde el principio"
+    },
     "screenDetails_button_like_instructions": {
       "description": "text to be place AFTER the text that indicates that the user 'liked' or 'disliked' the current video title. This appears once the button gains focus",
       "message": " - Borrar Calificación"
@@ -2527,6 +2531,10 @@ Function getTranslation_es_MX()
     "screenDetails_button_resume": {
       "description": "Label of button to allow users to resume the current video title",
       "message": "Reanudar"
+    },
+    "screenDetails_button_resume_playing": {
+      "description": "Label of button to allow users to resume the current video title",
+      "message": "Seguir viendo"
     },
     "screenAgeVerification_network_issue": {
       "description": "An error message shown to users when they submit their birthdate, but there is an unexpected server or network error",
@@ -3077,6 +3085,14 @@ Function getTranslation_es_MX()
     "info_panel_reminder_is_set": {
       "description": "Hint in the content metadata area informing the user that the reminder is set for this content",
       "message": "Recordatorio programado"
+    },
+    "cc_audio_overlay_subtitles": {
+      "description": "Available closed caption tracks section header label.",
+      "message": "Subtítulos"
+    },
+    "cc_audio_overlay_audio": {
+      "description": "Available audio tracks section header label.",
+      "message": "Audio"
     }
   }
 End Function
