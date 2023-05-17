@@ -30,6 +30,11 @@ Function TubiExperiments(constants) as Object
         roku_in_pod_stitching_v2: {"enabled": false}
       }
 
+      '// When enabled=true, then the resume and play buttons will display differently
+      roku_title_series_button: {
+        roku_title_series_button_v1: {"enabled": false}
+      }
+
       ' roku_enhanced_onboarding_v2_roku_path - have new user use the Roku modal to start the sign in process
       ' roku_enhanced_onboarding_v2_registration_path - show on-boarding screens only for new users (guest)
       roku_regist_enhanced_onboarding: {

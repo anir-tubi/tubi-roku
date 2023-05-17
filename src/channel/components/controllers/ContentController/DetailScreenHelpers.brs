@@ -165,7 +165,7 @@ Function isDetailScreen(screen)
 End Function
 
 
-Function setDetailStrings(screen,content)
+Function setDetailStrings(screen, content)
   airDateTime = content.airDateTime
   hasVideoResources = content.hasVideoResources
   screen.stringQueueButton = getTranslation("screenDetails_button_queue")
@@ -191,7 +191,12 @@ Function setDetailStrings(screen,content)
     screen.stringPlayButton = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
   else '// KEEP BELOW CODE ONCE FIFA WORLD CUP IS DONE
     screen.stringSignUpButton = getTranslation("registration_signup_button") + ";" + getTranslation("registration_signup_button_free")
-    screen.stringPlayButton = getTranslation("screenDetails_button_play")
+    history = getHistory(content.id)
+    if history = invalid OR getExperimentResource("roku_title_series_button", "roku_title_series_button_v1", false).enabled = false
+      screen.stringPlayButton = getTranslation("screenDetails_button_play")
+    else
+      screen.stringPlayButton = getTranslation("screenDetails_button_startOver")
+    end if
   end if
 End Function
 

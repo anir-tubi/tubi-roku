@@ -80,6 +80,10 @@ Function init()
   setInitialMenuItems()
   setInitialSecondaryMenuItems()
 
+
+  if getExperimentResource("roku_title_series_button", "roku_title_series_button_v1", false).enabled = true
+    m.ResumeMenuItem.iconUrl = "pkg:/images/icon-play.webp"
+  end if
   setDetailStrings()
   m.focusAnimationDuration = 0.4
 
@@ -132,11 +136,7 @@ End Function
 
 
 Function setDetailStrings()
-  if isLoggedInUser() = false
-    m.PlayMenuItem.title = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
-  else
-    m.PlayMenuItem.title = getTranslation("screenDetails_button_play")
-  end if
+  m.PlayMenuItem.title = getTranslation("screenDetails_button_play")
   m.PlayMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.PlayMenuItem.id]
 
   m.LikeMenuItem.title = getTranslation("screenDetails_button_like")
@@ -145,7 +145,12 @@ Function setDetailStrings()
   m.DislikeMenuItem.title = getTranslation("screenDetails_button_dislike")
   m.DislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.DislikeMenuItem.id]
 
-  m.ResumeMenuItem.title = getTranslation("screenDetails_button_resume")
+
+  if getExperimentResource("roku_title_series_button", "roku_title_series_button_v1", false).enabled <> true
+    m.ResumeMenuItem.title = getTranslation("screenDetails_button_resume")
+  else
+    m.ResumeMenuItem.title = getTranslation("screenDetails_button_resume_playing")
+  end if
   m.ResumeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.ResumeMenuItem.id]
 
   m.EpisodesMenuItem.title = getTranslation("screenDetails_button_episodes")
@@ -429,13 +434,26 @@ Function onIsHistory()
   tubiLog("DetailScreen.onIsHistory")
   'if removing from history, remove the resume button
   resumeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.ResumeMenuItem.id)
-  if not m.top.isHistory
-    addRemoveMenuItem(m.top.isHistory, resumeIndex)
+  
+  bHasHistory = m.top.isHistory
+  if bHasHistory = false
+    addRemoveMenuItem(bHasHistory, resumeIndex)
+  else
+    '//send exposure event for the roku_title_series_button_v1 experiment only when there is history
+    getExperimentResource("roku_title_series_button", "roku_title_series_button_v1", true)
+  end if
+
+  if getExperimentResource("roku_title_series_button", "roku_title_series_button_v1", false).enabled = true
+    if bHasHistory = false
+      m.PlayMenuItem.iconUrl = "pkg:/images/icon-play.webp"
+    else
+      m.PlayMenuItem.iconUrl = "pkg:/images/icon-resume.webp"
+    end if
   end if
 
   removeHistoryIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.RemoveHistoryMenuItem.id)
   previousItems = [m.AddQueueMenuItem, m.RemoveQueueMenuItem]
-  addRemoveMenuItem(m.top.isHistory, removeHistoryIndex, m.RemoveHistoryMenuItem, previousItems)
+  addRemoveMenuItem(bHasHistory, removeHistoryIndex, m.RemoveHistoryMenuItem, previousItems)
 End Function
 
 

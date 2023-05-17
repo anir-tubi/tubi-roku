@@ -1042,6 +1042,10 @@ Function getTranslation_en_US()
       "description": "Label of button to allow users to play the current video title",
       "message": "Play"
     },
+    "screenDetails_button_startOver": {
+      "description": "Label of button to allow users to start over and play the current video title",
+      "message": "Play from Beginning"
+    },
     "screenDetails_button_like_instructions": {
       "description": "text to be place AFTER the text that indicates that the user 'liked' or 'disliked' the current video title. This appears once the button gains focus",
       "message": " - Remove Rating"
@@ -1085,6 +1089,10 @@ Function getTranslation_en_US()
     "screenDetails_button_resume": {
       "description": "Label of button to allow users to resume the current video title",
       "message": "Resume"
+    },
+    "screenDetails_button_resume_playing": {
+      "description": "Label of button to allow users to resume the current video title",
+      "message": "Resume Playing"
     },
     "screenAgeVerification_network_issue": {
       "description": "An error message shown to users when they submit their birthdate, but there is an unexpected server or network error",
