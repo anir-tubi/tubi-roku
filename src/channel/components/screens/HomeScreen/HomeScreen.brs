@@ -189,6 +189,7 @@ Function onRefreshTopNav()
   m.topNav.content = generateTopNavContentItems(includeLinearTV)
   m.topNav.contentUpdated = true
   m.TopNav.uiState = "unfocusedNear"
+  m.TopNav.jumpToID = m.TopNav.selectedId   '//when refreshing the top nav, ensure the nav is back on previous selected button
 End Function
 
 

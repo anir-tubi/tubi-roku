@@ -827,7 +827,7 @@ Function onRegistrationProcessCompletedOnMyStuffScreen()
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
 
-  if currentScreen <> invalid and currentScreen.getSubtype() = "MyStuffScreen"
+  if currentScreen <> invalid AND currentScreen.getSubtype() = "MyStuffScreen"
     currentScreen.signedIn = true
     currentScreen.setfocus(true)
     refreshContentSignalForMyStuffScreen(currentScreen)
