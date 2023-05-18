@@ -181,6 +181,17 @@ Function handleInputDeeplink(inputInfo) as void
   resetSideNav(false)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
   stopVideoContent(videoPlayer) 'sets m.enteredFromDeeplink = false AND m.deeplinkContent = invalid
+
+  if videoPlayer <> invalid
+    videoContent = videoPlayer.content
+    historyPosition = round(videoPlayer.position)
+
+    if historyPosition > m.constants.player.historyFrequency1Min
+      updateHistoryLocally(videoContent, historyPosition)
+      updateHistoryAndHandleResponse(videoContent, historyPosition)
+    end if
+  end if
+
   stopCountdownTimer() 'stop previous counter
   stopAndHideLinearVideoPlayer()
   if isVideoPreviewEnabled() = true

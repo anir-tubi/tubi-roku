@@ -91,7 +91,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
   if m.constants.deviceInfo.lowVram = true AND getExperimentResource("roku_empty_cache_on_low_memory_devices", "roku_empty_cache_on_low_memory_devices_v1", true).enabled = true
     updateScreenCacheOnPlayback(m.constants.ui.screenIds.VideoPlayerScreen)
   end if
-  
+
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
   if videoPlayer = invalid
@@ -237,10 +237,10 @@ End Function
 '
 ' Update the resume position
 ' This function triggers when the video stops as well as when videoPlayer.historyPosition is updated
-Function onEpisodePosition()
+Function onEpisodePosition(msg)
   tubiLog("VideoHelpers.onEpisodePosition")
+  videoPlayer = msg.getRoSGNode()
 
-  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
   if videoPlayer <> invalid
     videoContent = videoPlayer.content
     nowPos = videoPlayer.historyPosition
@@ -259,8 +259,7 @@ End Function
 '                            false to handle the history response (only needed when exiting playback)
 Function updateHistory(content, nowPos, isFireAndForget = true)
   ' Don't send history updates to the server if the user hasn't watched at least a certain amount of video
-  if nowPos >= m.constants.player.historyFrequency AND isLoggedInUser() = true AND (content["type"] = m.constants.ui.contentTypes.video OR content["type"] = m.constants.ui.contentTypes.sportsEvent)
-
+  if nowPos >= m.constants.player.historyFrequency1Min AND isLoggedInUser() = true AND (content["type"] = m.constants.ui.contentTypes.video OR content["type"] = m.constants.ui.contentTypes.sportsEvent)
     postUserHistory = m.userDeviceApi.getAddHistoryRequestInfo(content, nowPos)
 
     if postUserHistory <> invalid
@@ -303,9 +302,13 @@ End Function
 ' triggers once the API responds for history API
 Function onHistorySuccess(content)
   tubiLog("VideoHelpers.onHistorySuccess")
+
   if content <> invalid
     m.Bookmarks.addHistoryLocally(content, content.nowPos, m.global)
   end if
+
+  ' reload history
+  handleHistoryChange()
 End Function
 
 
@@ -313,9 +316,7 @@ End Function
 '
 ' updates the history locally for signedIn user & guest user
 Function updateHistoryLocally(content as object, position as integer)
-  if position >= m.constants.player.historyFrequency
-    m.Bookmarks.addHistoryLocally(content, position, m.global)
-  end if
+  m.Bookmarks.addHistoryLocally(content, position, m.global)
 End Function
 
 
@@ -326,10 +327,18 @@ Function onGoToNext(msg)
     m.receivedGoToNextPressed = true
     videoPlayer = msg.getRoSGNode()
     if videoPlayer <> invalid
+
+      oldContent = videoPlayer.content
+      historyPosition = round(videoPlayer.position)
+
+      if historyPosition > m.constants.player.historyFrequency1Min
+        updateHistoryLocally(oldContent, historyPosition)
+        updateHistoryAndHandleResponse(oldContent, historyPosition)
+      end if
+
       ' if there is already valid up next content, play it
       if videoPlayer.upNextContent <> invalid
         nextContent = videoPlayer.upNextContent.getChild(0)
-        oldContent = videoPlayer.content
 
         nextContent = addSeriesTitle(nextContent, oldContent)
         if nextContent <> invalid
@@ -471,6 +480,14 @@ Function onVideoPlayerState(msg)
       stopVideoContent(videoPlayer)
       videoPlayer.errorMsg = ""
 
+      videoContent = videoPlayer.content
+      historyPosition = round(videoPlayer.position)
+
+      if historyPosition > m.constants.player.historyFrequency1Min
+        updateHistoryLocally(videoContent, historyPosition)
+        updateHistoryAndHandleResponse(videoContent, historyPosition)
+      end if
+
       currentScreen = getCurrentScreen()
       if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
         popScreen(true, true)
@@ -574,7 +591,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true)
     ' number then there is still a screen redraw issue: i.e. user watches only 2 seconds of a video.
     ' The local number is 2 seconds and displays the resume button, but the backend determines that 2
     ' seconds is not enough to warrant a resume button and returns 0 as the resume point.
-    if detailScreenResumePosition < m.constants.player.historyFrequency or (isEndReached = true AND detailContent <> invalid AND detailContent.type <> m.constants.ui.contentTypes.series)
+    if detailScreenResumePosition < m.constants.player.historyFrequency1Min or (isEndReached = true AND detailContent <> invalid AND detailContent.type <> m.constants.ui.contentTypes.series)
       '//If the video is either at the very beginning or at the very end, then it should pass the local resume point as 0.
       ' if content type is series, we do not need to reset the resumepoint to 0 because it will lose the watch history. But in case of movies,
       ' if user watches till the end, we need to reset the resumepoint to 0.
@@ -600,7 +617,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true)
         ' Still in the same series - possibly autoplayed, or possibly same episode
 
         'updating the history if user has watched more than historyFrequency or postlude reached
-        if historyPosition > 0 or isEndReached = true
+        if historyPosition > m.constants.player.historyFrequency1Min or isEndReached = true
           ' For SignedIn/guest user, update resume point to global variable
           updateHistoryLocally(videoContent, historyPosition)
 
@@ -662,7 +679,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true)
         ' Returning to the detail screen for the same movie as was started, no autoplay
         ' Just repopulate the detail screen with the same content
         'updating the history if user has watched more than historyFrequency or postlude reached
-        if historyPosition > 0 or isEndReached = true
+        if historyPosition > m.constants.player.historyFrequency1Min or isEndReached = true
           ' For SignedIn/guest user, update resume point to global variable.
           updateHistoryLocally(videoContent, historyPosition)
 
@@ -721,8 +738,6 @@ Function stopVideoContent(videoPlayer)
 
     videoPlayer.control = "stop"
 
-    ' reload history
-    handleHistoryChange()
   end if
 End Function
 

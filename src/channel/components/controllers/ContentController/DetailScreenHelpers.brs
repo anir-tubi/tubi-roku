@@ -421,12 +421,12 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       nResumePoint = history.nowPos
     end if
 
-    if nResumePoint < m.constants.player.historyFrequency
+    if nResumePoint < m.constants.player.historyFrequency1Min
       '//make sure the resume point is at least the client side constant minimum
       nResumePoint = 0
     end if
 
-    if nSavedPosition >= m.constants.player.historyFrequency AND isSignedInUser = true
+    if nSavedPosition >= m.constants.player.historyFrequency1Min AND isSignedInUser = true
       '//nSavedPosition is only used for signed in users and ignored for guest users.
       '//If the saved position is passed as greater than the constant historyFrequency, then use that number instead.
       '//This parameter was put in place to display the updated resume point before having to wait to backend to confirm that the resume point is correct

@@ -225,9 +225,8 @@ Function init()
 
   ' this variable helps to identify whether the play progress exposure event was fired or not.
   m.wasExposureEventForPlayProgressFired = false
-
   m.analyticsInterval = m.constants.player.pingFrequency
-  m.historyInterval = m.constants.player.historyFrequency
+  m.historyInterval1Min = m.constants.player.historyFrequency1Min 'historyInterval1Min is used for sending exposure event
 
   ' set to the end position of replay if caption mode is temporarily turned on during a replay
   m.replayCaptionEnd = 0
@@ -469,14 +468,14 @@ Function playContent()
         getExperimentResource("roku_dash", "roku_dash_v2", true)
       end if
       m.Video.control = "play"
-      
+
       ' Calling the set initial audio track in the start of video playback.
       ' The reason we are calling it here is to cover a use case where if we play the same video or the next video as the same value.
       ' For ex: Between different video with audio tracks the available tracks value is exactly the same value.
       ' It has 2 elements with Eng as language and track as dash/a~AAC~en~description~~2 and dash/a~AAC~en~main~~2.
       ' Which results in the observer for available audio track not being fired.
       ' With the below approach we are setting the value again using existing data from the previous content
-      ' that was played by the video player, which covers the case if the previous and current content have the 
+      ' that was played by the video player, which covers the case if the previous and current content have the
       ' same audio track. In the case where the previous and current content have different audio tracks,
       ' setInitialAudioTrack() may attempt to set a track that the current content does not contain in which
       ' case Roku's video player logic will choose an audio track
@@ -758,17 +757,31 @@ Function onVideoPositionChange(msg)
   end if
 
   adState = m.top.adState
+  content = m.top.content
 
   ' User history
   ' NOTE: historyPosition should not be set near an ad break due to race condition where RAF being
   ' invoked will cause the AuthTask thread to get stuck, never completing and staying in a "run"
   ' state perpetually.
-  if (m.playerPosition > m.lastsavedPosition + m.historyInterval or m.playerPosition < m.lastsavedPosition - m.historyInterval) AND adState <> "adsPending" then
-    historyPosition(m.playerPosition)
+  if (m.playerPosition > m.lastsavedPosition + m.historyInterval1Min or m.playerPosition < m.lastsavedPosition - m.historyInterval1Min) AND adState <> "adsPending"
+
+    if m.top.isTrailer = false AND isLoggedInUser() = true AND (content.type = m.constants.ui.contentTypes.video OR content.type = m.constants.ui.contentTypes.sportsEvent)
+
+      'fire roku_update_history_frequency_v1 exposure when user is loggedIn & reached interval of 1 min
+      if getExperimentResource("roku_update_history_frequency", "roku_update_history_frequency_v1", true).enabled
+        historyInterval = m.constants.player.historyFrequency3Mins
+      else
+        historyInterval = m.constants.player.historyFrequency1Min
+      end if
+
+      ' update history when interval reaches 3 minutes for treatment group OR 1 minute for control group
+      if m.playerPosition > m.lastsavedPosition + historyInterval
+        historyPosition(m.playerPosition)
+      end if
+    end if
   end if
 
   ' Credits Cuepoint / Up Next (Autoplay)
-  content = m.top.content
   if content <> invalid AND content.creditCuePoints <> invalid AND content.creditCuePoints.postlude <> invalid AND content.creditCuePoints.postlude > 0
     if m.playerPosition >= content.creditCuePoints.postlude AND m.shouldShowUpNext = true
       ' Always fire history here to fix a race condition where the user has
@@ -1175,7 +1188,6 @@ Function historyPosition(position)
     ' resumes playback, the ad call sends the position as 1 second less than the midroll cuepoint, and
     ' no ads are returned, when they should be returned.
     position = round(position)
-
     m.top.historyPosition = position
     m.lastSavedPosition = position
   end if
