@@ -8,7 +8,6 @@
     <field id="parentTitle" type="string" />
     <field id="parentId" type="string" />
     <field id="parentHistoryId" type="string" />
-    <field id="longdescription" type="string" />
     <field id="landscape" type="string" />
     <field id="portrait" type="string" />
     <field id="genres" type="stringarray" />
@@ -31,12 +30,14 @@
     <field id="deeplinkType" type="string" />
     <field id="videoPreviewUrl" type="string" />
      <field id="releaseDate" type="string" />
-    <field id="roundGroupInfo" type="string" />
+     <!--This is sportsEvent data and so  added dynamically
+    <field id="roundGroupInfo" type="string" />-->
     <field id="highestRendition" type="string" />
 
     <field id="needsLogin" type="boolean"  value="false"/>
     <field id="hasVideoResources" type="boolean" />
-    <field id="isFIFAContent" type="boolean" value="false"/>
+    <!--remove this field when fifa contents are no more avialable and also added dynamically
+    <field id="isFIFAContent" type="boolean" value="false"/> -->
 
     <!-- If the content is coming from a titan endpoint, then a titan_version will be set to this field.
     Or if any experiment is running on client side related to video stream formats, then experiment and treatment names will be set to this field
@@ -57,13 +58,6 @@
 
     <!-- these will come in for paginated responses -->
     <field id="totalCount" type="int" value="-1"/>
-    <field id="more" type="boolean" />
-    <field id="offset" type="int" />
-
-    <!-- these are not from the service but used internally for Scene Graph components -->
-    <field id="episode_title" type="string" />
-
-    <field id="liveTVChannelType" type="string" value=""/>
 
     <!-- used to deliver focus indices to EpisodeScreen RowList row item counter -->
     <field id="focusIndex" type="integer" value="-1"/>
@@ -101,9 +95,6 @@
 
     <!-- the hdcp_version as returned by cms/content API. example: "hdcp_v1" -->
     <field id="hdcpVersion" type="string"/>
-
-    <!-- availability_starts: eg. "2019-03-01T00:00:00Z" -->
-    <field id="availabilityStarts" type="string"/>
 
     <!-- availability_ends: eg. "2019-03-31T00:00:00Z" -->
     <field id="availabilityEnds" type="string"/>

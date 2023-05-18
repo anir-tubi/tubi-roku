@@ -271,13 +271,13 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.currentEpisodeId <> invalid then translatedContent.currentEpisodeId = contentFromServer.currentEpisodeId
   if contentFromServer.nowPos <> invalid then translatedContent.nowPos = contentFromServer.nowPos
   if contentFromServer.series_id <> invalid then translatedContent.seriesId = "0" + contentFromServer.series_id
-  if contentFromServer.liveTvChannelType <> invalid then translatedContent.liveTvChannelType = contentFromServer.liveTvChannelType
 
   if contentFromServer.needs_login = true and isSignedInUser = false
     translatedContent.needsLogin = true
   end if
 
   if contentFromServer.type = "se" OR (contentFromServer.type = "l" AND contentFromServer.epg_feed <> invalid AND contentFromServer.epg_feed["callsign"]= "FIFA") OR (contentFromServer.type = "n" AND contentFromServer.id = m.constants.ui.contentIds.showAllGames)
+    translatedContent.addField("isFIFAContent", "boolean", false)
     translatedContent.isFIFAContent = true
   end if
 
@@ -288,7 +288,6 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   if contentFromServer.description <> invalid
     translatedContent.description = contentFromServer.description
-    translatedContent.longDescription = contentFromServer.description
 
     #if suitestjs
       ' QA - display content ids UI tests
@@ -313,7 +312,11 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
       end if
     end if
   end if
-  translatedContent.roundGroupInfo = roundGroupInfo
+
+  if contentFromServer.type = "se"
+    translatedContent.addField("roundGroupInfo", "string", false)
+    translatedContent.roundGroupInfo = roundGroupInfo
+  end if
 
   creditCuePoints = {}
   postlude = 0
@@ -508,15 +511,12 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   'if this content is actually just a paginated response, set pagination data
   if contentFromServer.total_count <> invalid then translatedContent.totalCount = contentFromServer.total_count
 
-  if contentFromServer.more <> invalid then translatedContent.more = contentFromServer.more
-
   ' Channels
   if contentFromServer.channel_id <> invalid then translatedContent.channelId = contentFromServer.channel_id
   if contentFromServer.channel_logo <> invalid then translatedContent.inlineLogoUri = contentFromServer.channel_logo
   if contentFromServer.channel_name <> invalid then translatedContent.channelName = contentFromServer.channel_name
 
   if contentFromServer.is_recurring <> invalid then translatedContent.isRecurring = contentFromServer.is_recurring
-  if contentFromServer.availability_starts <> invalid then translatedContent.availabilityStarts = contentFromServer.availability_starts
   if contentFromServer.availability_ends <> invalid then translatedContent.availabilityEnds = contentFromServer.availability_ends
   if contentFromServer.air_datetime <> invalid then translatedContent.airDateTime = contentFromServer.air_datetime
 
