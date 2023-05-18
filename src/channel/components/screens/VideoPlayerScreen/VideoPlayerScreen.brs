@@ -1288,6 +1288,9 @@ Function resetVideoPlayerState(content = invalid)
   m.cuePointsHistory = {}
   ' Set the icon for audio/subtitle track based on the closed caption display status.
   setAudioSubtitleTransportBarIcon(m.Video.globalCaptionMode)
+  ' Hiding the closed caption and audio overlay on every playback start if in case it is open.
+  m.isClosedCaptionAudioOverlayShowing = false
+  m.closedCaptionAndAudioSelectionOverlayGroup.opacity = 0
 End Function
 
 
