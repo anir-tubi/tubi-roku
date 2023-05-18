@@ -485,10 +485,15 @@
       id="UpNext"
       opacity="0.0" />
 
-    <ClosedCaptionAndAudioSelectionOverlay
-      id="closedCaptionAndAudioSelectionOverlay"
+    <Rectangle
+      id="closedCaptionAndAudioSelectionOverlayGroup"
       opacity="0"
-      translation="[1230, 60]" />
+      width="1920"
+      height="1080">
+      <ClosedCaptionAndAudioSelectionOverlay
+        translation="[1230, 60]"
+        id="closedCaptionAndAudioSelectionOverlay" />
+    </Rectangle>
 
     <!-- RAF needs a parent group with no other elements, otherwise it will use
       - the Group dimensions set by the other children and not scale appropriately.

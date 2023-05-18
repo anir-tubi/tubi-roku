@@ -184,6 +184,7 @@ Function init()
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("wasBackButtonSelected", "onWasBackButtonSelectedChange")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("trackingEventInfo", "onTrackingEventInfoChange")
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("audioTrack", "onAudioTrackChange")
+  m.closedCaptionAndAudioSelectionOverlayGroup = m.top.findNode("closedCaptionAndAudioSelectionOverlayGroup")
 
   m.buttonUris = m.constants.player.transportButtons
   m.focusedButtonIndex = 0
@@ -504,6 +505,7 @@ Function onThemeChange(msg = invalid)
     m.LoadingProgressBar.trackColor = theme.neutralColor2
     m.ProgressBar.trackColor = theme.neutralColor2
     m.SkipCuepointsButton.color = theme.backgroundColorLight2
+    m.closedCaptionAndAudioSelectionOverlayGroup.color = theme.shadeColor
 
     if theme.id = m.constants.ui.themeIDs.kidsMode
       m.logo.visible = false
