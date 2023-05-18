@@ -962,6 +962,7 @@ Function fetchUpNextContent(videoPlayer)
   if videoPlayer <> invalid AND videoPlayer.content <> invalid AND videoPlayer.content.id.Len() > 0
     options = {
       params: {
+        "content_id": videoPlayer.content.id
         "isKidsMode": shouldKidsModeBeSentToServer()
         "container_id": m.autoplayContext
         "mode": "nap"
@@ -976,7 +977,7 @@ Function fetchUpNextContent(videoPlayer)
       options.params.delete("container_id")
     end if
 
-    upNextReqInfo = m.cmsApi.createUpNextContentReqInfo(videoPlayer.content.id, options)
+    upNextReqInfo = m.cmsApi.createUpNextContentReqInfo(options)
 
     return m.makeRequest({
       requestType: m.constants.reqNames.getUpNextContent

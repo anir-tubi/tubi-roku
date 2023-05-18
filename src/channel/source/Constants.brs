@@ -440,9 +440,18 @@ Function getConstants()
       end if
       constants.urls.cms.singleContent = constants.urls.cms.urlBase + "/content"
       constants.urls.cms.categories = constants.urls.cms.urlBase + "/categories"
-      constants.urls.cms.upNextContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/next"
       constants.urls.cms.relatedContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/related"
       constants.urls.cms.thumbnails = constants.urls.cms.urlBase + "/content" ' + content_id + "/thumbnail_sprites"
+
+      'autopilot url
+    constants.urls.autopilot = {}
+      constants.urls.autopilot.urlBase = "https://autopilot.production-public.tubi.io/api/v2"
+
+      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
+        constants.urls.autopilot.urlBase = "https://autopilot.staging-public.tubi.io/api/v2"
+      end if
+
+      constants.urls.autopilot.upNextContent = constants.urls.autopilot.urlBase + "/autoplay"
 
 
     'search url

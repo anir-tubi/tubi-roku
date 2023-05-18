@@ -1,4 +1,4 @@
-' Thin wrapper for CMS API and Search API requests.  Collected here to facilitate easy
+' Thin wrapper for CMS API, Autopilot API and Search API requests.  Collected here to facilitate easy
 ' integration tests
 Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
 
@@ -63,13 +63,11 @@ End Function
 
 
 ' @passedOptions: assocArray, options to be added to the request object as created by Request().createAsync()
-Function cmsApi_createUpNextContentReqInfo(contentId, passedOptions)
-  url = m.constants.urls.cms.upNextContent + "/" + contentId + "/next"
+Function cmsApi_createUpNextContentReqInfo(passedOptions)
+  url = m.constants.urls.autopilot.upNextContent
   options = m.getCommonOptions()
   params = options.params
   headers = options.headers
-  'adding accept-version=6.0.0 in header will include series recommendations at the end of a movie
-  headers["accept-version"] = "6.0.0"
   params["video_resources"] = m.getVideoResources()
   params["limit_resolutions"] = m.constants.player.limitResolutions
 

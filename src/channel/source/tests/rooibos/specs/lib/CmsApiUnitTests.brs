@@ -82,7 +82,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
 End Function
 
 
-'@Test unit tests getcreateUpNextContentReqInfo
+'@Test unit tests createUpNextContentReqInfo
 Function cmsApi_createUpNextContentReqInfo_test()
   infoKeys = [
     "url"
@@ -94,9 +94,10 @@ Function cmsApi_createUpNextContentReqInfo_test()
     "platform"
     "device_id"
     "custom_param"
+    "content_id"
   ]
 
-  upNextUrl = m.cmsApi.constants.urls.cms.upNextContent + "/123456/next"
+  upNextUrl = m.cmsApi.constants.urls.autopilot.upNextContent
   upNextOptions = {
     params: {
       "app_id": m.cmsApi.constants.settings.shortAppName
@@ -104,15 +105,17 @@ Function cmsApi_createUpNextContentReqInfo_test()
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
       "video_resources": m.cmsApi.constants.player.drmOrder
       "custom_param": 42
+      "content_id": "123456"
     }
   }
 
   passedOptions = {
     params: {
       "custom_param": 42
+      "content_id": "123456"
     }
   }
-  upNextInfo = m.cmsApi.createUpNextContentReqInfo("123456", passedOptions)
+  upNextInfo = m.cmsApi.createUpNextContentReqInfo(passedOptions)
 
   m.assertEqual(upNextInfo.count(), 2)
   m.assertAAHasKeys(upNextInfo, infoKeys)
@@ -123,6 +126,7 @@ Function cmsApi_createUpNextContentReqInfo_test()
   m.assertEqual(upNextInfo.options.params["device_id"], upNextOptions.params["device_id"])
   m.assertEqual(upNextInfo.options.params["video_resources"], upNextOptions.params["video_resources"])
   m.assertEqual(upNextInfo.options.params["custom_param"], upNextOptions.params["custom_param"])
+  m.assertEqual(upNextInfo.options.params["content_id"], upNextOptions.params["content_id"])
 End Function
 
 

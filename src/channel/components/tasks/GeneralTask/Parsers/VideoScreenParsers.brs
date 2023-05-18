@@ -34,10 +34,12 @@ Function parseVideoScreenUpNextSuccess(fullResponse, reqInfo)
     isSignedInUser = reqInfo.isSignedInUser
   end if
 
-  for each content in parsedResponse
-    upNextItem = upNextContent.createChild("TubiContentNode")
-    m.metadataTranslate.upNextTranslateRecursiveWrapper(content, upNextItem, isSignedInUser)
-  end for
+  if parsedResponse.contents <> invalid
+    for each content in parsedResponse.contents
+      upNextItem = upNextContent.createChild("TubiContentNode")
+      m.metadataTranslate.upNextTranslateRecursiveWrapper(content, upNextItem, isSignedInUser)
+    end for
+  end if
   return upNextContent
 End Function
 
