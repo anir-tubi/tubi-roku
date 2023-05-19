@@ -1013,6 +1013,9 @@ Function onAdStateChange(msg)
         getExperimentResource("roku_dash", "roku_dash_v2", true)
       end if
       m.Video.control = "play"
+      ' Adding the initial audio track here to cover use case where pre-roll ads are requested.
+      ' Refer playContent for the reasoning behind why we are calling setInitialAudioTrack.
+      setInitialAudioTrack(m.Video.availableAudioTracks)
       m.mostRecentCompletedCuepoint = m.playerPosition
       trackEvent({
         type: "resume_after_break"
