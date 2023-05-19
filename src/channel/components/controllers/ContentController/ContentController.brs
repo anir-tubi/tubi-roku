@@ -38,6 +38,7 @@ Function init()
   m.cmsApi = CmsApi(m.constants, m.Request, Auth, apiUtilsLib, experiments)
   m.userDeviceApi = UserDeviceApi(m.constants, apiUtilsLib)
   m.tensorapi = TensorApi(m.constants, m.Request, Auth)
+  m.rainmakerApi = RainmakerApi(m.constants)
 
   m.background = m.top.findNode("ContentBackground")
   m.SponsorBground = m.top.findNode("SponsorshipBackgroundGroup")
@@ -1641,6 +1642,7 @@ Function onCustomSuspend(msg)
     ' if the current screen is videoplayer, return to detail screen so that it will update historyPosition AND remove video screen from stack AND show previous screen from stack
     if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
       ' don't send analytics event when user presses "home" button during playback, so sending param as false
+      currentScreen.sendPendingPauseAdPixel = true
       returnToDetailScreenFromVideo(false)
     else if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.categoryDetailsScreen
       ' if current screen is categoryDetailsScreen, instant resume action is to start the channel from the homescreen (not a full channel restart).

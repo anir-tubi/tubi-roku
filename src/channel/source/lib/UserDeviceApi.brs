@@ -400,7 +400,7 @@ Function userDeviceApi_createPatchUserSettingsReqInfo(body)
 
   return {
     url: m.constants.urls.account.userSettings
-    options: options 
+    options: options
   }
 End Function
 
@@ -416,6 +416,6 @@ Function userDeviceApi_createPatchDeviceSettingsReqInfo(body)
 
   return {
     url: m.constants.urls.account.deviceSettings
-    options: options 
+    options: options
   }
 End Function

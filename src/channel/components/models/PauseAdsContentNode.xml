@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<component name = "PauseAdsContentNode" extends="ContentNode">
+  <interface>
+    <field id="requestId" type="string" />
+    <field id="startPixel" type="string" />
+    <field id="endPixel" type="string" />
+    <field id="notUsedPixel" type="string" />
+    <field id="width" type="string" value="1450"/>
+    <field id="height" type="string" value="816"/>
+    <field id="mediaUrl" type="string" />
+    <field id="impTrackingPixel" type="string" />
+    <field id="errorPixel" type="string" />
+  </interface>
+</component>

@@ -71,6 +71,22 @@ Function init()
   m.top.observeField("adProgress", "onAdProgressChange")
   m.top.observeField("displayAdLoadingMessage", "onDisplayAdLoadingMessage")
 
+  'isPauseAdReqInProgress is the state of pauseAd requests in flight.
+  'If pause ad request is in flight, we do not send another pause ad request
+  m.isPauseAdReqInProgress = false
+
+  'isPixelFiredForCurrentPauseAd helps to find whether any ad pixel fired for current pause ad.
+  'Based on this field we request pause ad or reuse the previous pause ad response
+  'If any pixel event is missing for current pause ad, we do not make new pause ad request
+  m.isPixelFiredForCurrentPauseAd = true
+
+  m.top.observeFieldScoped("sendPendingPauseAdPixel", "onSendPendingPauseAdPixel")
+  m.top.observeFieldScoped("pauseAdResponse", "onPauseAdResponse")
+  m.pauseAdOverlayTimer = m.top.findNode("PauseAdOverlayTimer")
+  m.pauseAdOverlayTimer.observeFieldScoped("fire", "onPauseAdOverlayTimer")
+  m.pauseAdOverlay = m.top.findNode("PauseAdOverlay")
+  m.pauseAdOverlay.observeFieldScoped("close", "onClosePauseAdOverlay")
+
   m.logo = m.top.findNode("tubiLogo")
   m.logoKids = m.top.findNode("tubiKidsLogo")
   if m.constants.deviceInfo.language = "es"
@@ -1231,6 +1247,8 @@ End Function
 Function prepareToStartVideo(content, videoResourceIndex = [0,0])
 
   resetVideoPlayerState(content)
+  resetPauseAd()
+  resetPauseAdTimers()
   m.Video.observeFieldScoped("globalCaptionMode", "onCaptionModeChange")
 
   videoResources = content.videoResources
@@ -1267,6 +1285,7 @@ Function resetVideoPlayerState(content = invalid)
   m.AdHeadsUp.visible = false
   m.top.adPosition = 0
 
+  m.pauseAdOverlay.opacity = 0
   m.ratingOverlay.opacity = 0
   m.showRatings = true
   m.ratingInterval = 0
@@ -1275,6 +1294,9 @@ Function resetVideoPlayerState(content = invalid)
     m.top.adPosition = content.nowPos
     updateVideoPlayerState(content)
   end if
+
+  m.isPauseAdReqInProgress = false
+  m.isPixelFiredForCurrentPauseAd = true
 
   m.top.adState = "init"
   m.top.upNextContentToAutoplay = invalid

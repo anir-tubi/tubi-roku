@@ -138,3 +138,68 @@ Function parseHistorySuccess(fullResponse, reqInfo)
 
   return content
 End Function
+
+
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @_reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parsePauseAdSuccess(fullResponse, _reqInfo)
+  parsedResponse = fullResponse.data
+  content = invalid
+
+  if parsedResponse <> invalid
+    content = createObject("roSGNode", "PauseAdsContentNode")
+
+    if parsedResponse.metadata <> invalid then
+      content.requestId = parsedResponse.metadata.request_id
+    end if
+
+    creatives = parsedResponse.creatives
+
+    if creatives <> invalid AND creatives.Count() > 0
+      firstCreative = creatives[0]
+
+      if firstCreative <> invalid AND firstCreative.creative <> invalid
+        trackingEvents = firstCreative.creative.tracking_events
+
+        if trackingEvents <> invalid
+
+          if trackingEvents.start <> invalid AND trackingEvents.start.Count() > 0
+            content.startPixel = trackingEvents.start[0]
+          end if
+
+          if trackingEvents.end <> invalid AND trackingEvents.end.Count() > 0
+            content.endPixel = trackingEvents.end[0]
+          end if
+
+          if trackingEvents.not_used <> invalid AND trackingEvents.not_used.Count() > 0
+            content.notUsedPixel = trackingEvents.not_used[0]
+          end if
+        end if
+      end if
+
+      if firstCreative <> invalid AND firstCreative.creative <> invalid
+
+        media = firstCreative.creative.media
+
+        if media <> invalid
+          content.mediaUrl = media.url
+          content.width = media.width
+          content.height = media.height
+        end if
+
+        if firstCreative.imp_tracking <> invalid AND firstCreative.imp_tracking.Count() > 0
+          content.impTrackingPixel = firstCreative.imp_tracking[0]
+        end if
+
+        if firstCreative.error <> invalid AND firstCreative.error.Count() > 0
+          content.errorPixel = firstCreative.error[0]
+        end if
+      end if
+
+    end if
+
+  end if
+
+  return content
+End Function

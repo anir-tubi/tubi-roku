@@ -4,8 +4,10 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   if press
     m.lastButtonPressPos = m.playerPosition
     if isButtonPressAllowed(key, m.VideoState, m.Video)
+      hidePauseAdOverlay() ' added for extra safety
+
       if key = "OK"
-        handleOk()
+          handleOk()
 
       else if key = "play" then
         if m.PlayPauseButton.enabled then
@@ -134,7 +136,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
             resetTransportButtons()
           end if
         else if m.VideoState = "pause"
-          resumeFromPause(true)
+            resumeFromPause(true)
         else if m.VideoState = "rew" or m.VideoState = "ffw"
           setFocusedButton(m.PlayPauseButton)
           endScrub(true)
@@ -281,6 +283,29 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
         video_player: "DEFAULT"
       }
     })
+  end if
+
+  m.top.videoPositionForPauseAdRequest = m.playerPosition 'this position is used in pauseAd request
+
+  if m.top.isTrailer = false
+
+    if getExperimentResource("roku_pause_ads", "roku_pause_ads_v1", false).enabled = true
+
+      if m.isPauseAdReqInProgress = false AND m.isPixelFiredForCurrentPauseAd = true
+        resetPauseAd()
+        resetPauseAdTimers()
+        m.isPauseAdReqInProgress = true
+        m.pauseAdOverlayTimer.observeFieldScoped("fire", "onPauseAdOverlayTimer")
+        m.pauseAdOverlayTimer.control = "start"
+        m.top.getPauseAd = true
+      end if
+
+    else
+      resetPauseAdTimers()
+      m.pauseAdOverlayTimer.observeFieldScoped("fire", "onPauseAdOverlayTimer")
+      m.pauseAdOverlayTimer.control = "start"
+    end if
+
   end if
 End Function
 
@@ -1081,4 +1106,190 @@ Function isActiveVideoState(videoState, videoNode)
   end if
 
   return isActive
+End Function
+
+
+Function onPauseAdResponse(msg)
+  pauseAdResponse = msg.GetData()
+
+  if pauseAdResponse <> invalid
+    m.isPauseAdReqInProgress = false
+
+    if pauseAdResponse.mediaUrl <> ""
+      m.isPixelFiredForCurrentPauseAd = false
+    end if
+
+    if m.top.hasFocus()
+      m.pauseAdOverlay.posterWidth = pauseAdResponse.width
+      m.pauseAdOverlay.posterHeight = pauseAdResponse.height
+      m.pauseAdOverlay.posterUri = pauseAdResponse.mediaUrl
+    else
+      sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
+    end if
+
+  end if
+End Function
+
+
+' onClosePauseAdOverlay triggers when user presses back/rew/fwd/play/replay/options
+Function onClosePauseAdOverlay()
+  m.pauseAdOverlay.setFocus(false)
+  m.top.setFocus(true)
+  sendPauseAdPixel(m.constants.pauseAd.endPixel)
+  resetPauseAdTimers()
+  resetPauseAd()
+
+  if m.HUD.opacity < 1.0
+    showTransport()
+  end if
+End Function
+
+
+'onPauseAdOverlayTimer triggers 3.5 seconds after the user pauses the video
+Function onPauseAdOverlayTimer()
+  m.pauseAdOverlay.unobserveFieldScoped("posterLoadStatus")
+
+  ' roku_pause_ads_v1 exposure event will be fired after 3.5 seconds for both treatment & control
+  if m.videoState = "pause" AND getExperimentResource("roku_pause_ads", "roku_pause_ads_v1", true).enabled = true
+    loadStatus = m.pauseAdOverlay.posterLoadStatus
+
+    if loadStatus = "ready"
+      animateTransport("out")
+      fade(m.pauseAdOverlay, "in", 0.6, 0.4)
+      sendPauseAdPixel(m.constants.pauseAd.startPixel)
+      startImpTrackingTimer()
+      m.pauseAdOverlay.setFocus(true)
+    else if loadStatus = "failed"
+      sendPauseAdPixel(m.constants.pauseAd.errorPixel)
+    else if loadStatus = "loading"
+      m.pauseAdOverlay.observeFieldScoped("posterLoadStatus", "onPauseAdPosterLoadStatus")
+    end if
+
+  else if getExperimentResource("roku_pause_ads", "roku_pause_ads_v1", false).enabled = true
+    sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
+  end if
+End Function
+
+
+'callback for pauseAdPoster loadStatus attribute
+Function onPauseAdPosterLoadStatus(msg)
+  loadStatus = msg.GetData()
+
+  if m.videoState = "pause"
+
+    if loadStatus = "ready"
+      m.pauseAdOverlay.unobserveFieldScoped("posterLoadStatus")
+      animateTransport("out")
+      fade(m.pauseAdOverlay, "in", 0.6, 0.4)
+      sendPauseAdPixel(m.constants.pauseAd.startPixel)
+      startImpTrackingTimer()
+      m.pauseAdOverlay.setFocus(true)
+    else if loadStatus = "failed"
+      m.pauseAdOverlay.unobserveFieldScoped("posterLoadStatus")
+      sendPauseAdPixel(m.constants.pauseAd.errorPixel)
+    end if
+
+  else
+    m.pauseAdOverlay.unobserveFieldScoped("posterLoadStatus")
+    sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
+  end if
+End Function
+
+
+Function startImpTrackingTimer()
+  if m.impTrackingTimer = invalid
+    m.impTrackingTimer = m.top.createChild("Timer")
+  end if
+  m.impTrackingTimer.unObserveFieldScoped("fire")
+  m.impTrackingTimer.control = "stop"
+  m.impTrackingTimer.observeFieldScoped("fire", "impTrackingTimerFired")
+  m.impTrackingTimer.control = "start"
+End Function
+
+
+'impTrackingTimerFired fires 1 second after the pauseAd is displayed on video screen
+Function impTrackingTimerFired()
+  if m.videoState = "pause"
+    sendPauseAdPixel(m.constants.pauseAd.impTrackingPixel)
+  end if
+End Function
+
+
+'resetPauseAd resets the posters in pauseAdOverlay and invalidate the pauseAdResponse
+Function resetPauseAd()
+  if m.pauseAdOverlay <> invalid
+    m.pauseAdOverlay.posterUri = ""
+    m.pauseAdOverlay.posterWidth = 0
+    m.pauseAdOverlay.posterHeight = 0
+    m.pauseAdOverlay.opacity = 0.0
+  end if
+  m.top.pauseAdResponse = invalid
+End Function
+
+
+'resetPauseAdTimers resets the pauseAd related timers
+Function resetPauseAdTimers()
+  if m.pauseAdOverlayTimer <> invalid
+    m.pauseAdOverlayTimer.unObserveFieldScoped("fire")
+    m.pauseAdOverlayTimer.control = "stop"
+  end if
+
+  if m.impTrackingTimer <> invalid
+    m.impTrackingTimer.control = "stop"
+    m.impTrackingTimer.unObserveFieldScoped("fire")
+  end if
+End Function
+
+
+'this function triggers the pauseAdPixel interface to send pause ad related pixels
+'@pixelType: String, possible values are from m.constants.pauseAd
+Function sendPauseAdPixel(pixelType = "")
+  pauseAdResponse = m.top.pauseAdResponse
+  pixelUrl = ""
+
+  if pauseAdResponse <> invalid
+    if pixelType = m.constants.pauseAd.startPixel
+      pixelUrl = pauseAdResponse.startPixel
+    else if pixelType = m.constants.pauseAd.impTrackingPixel
+      pixelUrl = pauseAdResponse.impTrackingPixel
+    else if pixelType = m.constants.pauseAd.endPixel
+      pixelUrl = pauseAdResponse.endPixel
+    else if pixelType = m.constants.pauseAd.notUsedPixel
+      pixelUrl = pauseAdResponse.notUsedPixel
+    else if pixelType = m.constants.pauseAd.errorPixel
+      pixelUrl = pauseAdResponse.errorPixel
+    end if
+  end if
+
+  if isNonEmptyString(pixelUrl) AND getExperimentResource("roku_pause_ads", "roku_pause_ads_v1", false).enabled = true
+    m.isPixelFiredForCurrentPauseAd = true
+    m.top.sendPauseAdPixel = pixelUrl
+  end if
+End Function
+
+
+' onSendPendingPauseAdPixel will be triggered when user presses Home key on remote when video player is visible.
+' This function does below
+' - resets the pause ad related timers
+' - sends missed pixels for pause ad
+' - resets the previous pause ad response & poster
+Function onSendPendingPauseAdPixel()
+  resetPauseAdTimers()
+
+  if m.pauseAdOverlay.posterLoadStatus = "ready"
+    if m.pauseAdOverlay.opacity > 0
+      sendPauseAdPixel(m.constants.pauseAd.endPixel)
+    else
+      sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
+    end if
+  else if m.pauseAdOverlay.posterLoadStatus = "failed"
+    sendPauseAdPixel(m.constants.pauseAd.errorPixel)
+  end if
+
+  resetPauseAd()
+End Function
+
+
+Function hidePauseAdOverlay()
+  fade(m.pauseAdOverlay, "out", 0.1)
 End Function

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="PauseAdOverlay" extends="Group" >
+  <script type="text/brightscript" uri="PauseAdOverlay.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+
+  <interface>
+    <field id="posterWidth" type="integer" alias="PauseAdPoster.width"/>
+    <field id="posterHeight" type="integer" alias="PauseAdPoster.height"/>
+    <field id="posterUri" type="string" alias="PauseAdPoster.uri"/>
+    <field id="posterLoadStatus" type="string" alias="PauseAdPoster.loadStatus"/>
+    <field id="close" type="boolean" alwaysNotify="true"/>
+  </interface>
+
+  <children>
+    <Rectangle
+      id="RectangleGradient"
+      width="1920"
+      height="1080"
+      translation="[0,0]"/>
+    <Poster
+      uri="pkg:/images/back.png"
+      width="29"
+      height="47"
+      translation="[831,57]"/>
+    <Label
+      id="PauseAdBackLabel"
+      translation="[870,60]"
+      height="47"
+      vertAlign="center">
+      <Font
+        id="Vaud22px"
+        role="font"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf"
+        size="22" />
+    </Label>
+    <Poster
+      id="PauseAdPoster"
+      translation="[235,164]"
+      width="1450"
+      height="816"
+      loadWidth="1450"
+      loadHeight="816"/>
+  </children>
+</component>

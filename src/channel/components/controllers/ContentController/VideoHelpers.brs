@@ -100,6 +100,8 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     ' onVideoPlayerVisibleChange exists in ContentController
     videoPlayer.observeFieldScoped("visible", "onVideoPlayerVisibleChange")
     videoPlayer.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
+    videoPlayer.observeFieldScoped("getPauseAd", "onGetPauseAd")
+    videoPlayer.observeFieldScoped("sendPauseAdPixel", "onSendPauseAdPixel")
     videoPlayer.observeFieldScoped("audioTrackSettings", "onAudioTrackSettingsChange")
     initVideoTracking(videoPlayer) 'initializeYoubora
     setInScreenCache(videoPlayer)
@@ -539,6 +541,43 @@ Function onVideoPlayerState(msg)
         ' there was no autoplay content, so return to details screen
         returnToDetailScreenFromVideo()
       end if
+    end if
+  end if
+End Function
+
+
+Function onGetPauseAd(msg)
+  videoPlayer = msg.getRoSGNode()
+
+  if videoPlayer <> invalid
+    content = videoPlayer.content
+    nowPos = videoPlayer.videoPositionForPauseAdRequest
+    appMode = videoPlayer.appMode
+    pauseAdsRequestInfo = m.rainmakerApi.pauseAdsRequestInfo(content, nowPos, appMode)
+
+    if pauseAdsRequestInfo <> invalid
+      m.makeRequest({
+        url: pauseAdsRequestInfo.url
+        requestType: m.constants.reqNames.getPauseAd
+        options: pauseAdsRequestInfo.options
+        successCallback: onPauseAdResponse
+        silenceCallbackWarnings: true
+        responseType: "node"
+      })
+    end if
+  end if
+End Function
+
+
+Function onPauseAdResponse(response)
+  if response <> invalid
+    videoPlayerScreen = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+
+    if videoPlayerScreen <> invalid
+      videoPlayerScreen.pauseAdResponse = response
+    else
+      notUsedPixelUrl = response.notUsedPixel
+      sendPauseAdPixel(notUsedPixelUrl)
     end if
   end if
 End Function
@@ -1125,6 +1164,27 @@ Function onAudioTrackSettingsChange(msg)
   if (currentAudioTrack.language <> selectedAudioTrack.language) OR (currentAudioTrack.role <> selectedAudioTrack.role)
     savePreferences({
       "audioTrack": selectedAudioTrack
+    })
+  end if
+End Function
+
+
+Function onSendPauseAdPixel(msg)
+  pixelUrl = msg.getData()
+  sendPauseAdPixel(pixelUrl)
+End Function
+
+
+' fires the Pause Ad pixels
+Function sendPauseAdPixel(pixelUrl)
+  tubiLog("VideoHelpers.sendPauseAdPixel")
+
+  if isNonEmptyString(pixelUrl)
+    m.makeRequest({
+      url: pixelUrl
+      requestType: m.constants.reqNames.postPauseAdPixel
+      responseType: "string"
+      silenceCallbackWarnings: true
     })
   end if
 End Function

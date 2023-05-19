@@ -206,6 +206,11 @@ Function registerParsingCallbacks()
     parseSuccess: parseGetPreferences
     parseError: parseGenericError
   }
+
+  ' pauseAds
+  m.requestTypes[m.constants.reqNames.getPauseAd] = {
+    parseSuccess: parsePauseAdSuccess
+  }
 End Function
 
 

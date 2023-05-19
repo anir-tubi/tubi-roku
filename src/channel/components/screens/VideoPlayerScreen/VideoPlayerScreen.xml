@@ -90,10 +90,16 @@
 
       <!-- isTrailer will be set true for trailers, otherwise false -->
       <field id="isTrailer" type="boolean" value="false"/>
-      
+
       <!-- preferredAudioTrack will hold user previously selected track obtained from either device/user settings endpoint.  -->
       <!-- Sample: {"language": "en","role": "main"} -->
       <field id="preferredAudioTrack" type="assocarray" value="{}" />
+
+      <!-- pauseAd response node will be set to this field -->
+      <field id="pauseAdResponse" type="node" alwaysNotify="true"/>
+
+       <!-- sendPendingPauseAdPixel will be set when user press home key from remote -->
+      <field id="sendPendingPauseAdPixel" type="boolean" alwaysNotify="true"/>
 
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
@@ -156,6 +162,16 @@
       <field id="closedCaptionTrack" type="string" alias="VideoNode.subtitleTrack, closedCaptionAndAudioSelectionOverlay.closedCaptionTrack" />
       <!-- Timestamp of the last time we finished playing back video with this player. If -1 then we are currently playing back. -->
       <field id="timestampOfLastVideoPlayback" type="integer" value="0" />
+
+      <!-- current player position will be set as integer to videoPositionForPauseAdRequest when user pauses the video
+           this is used in pause Ad request -->
+      <field id="videoPositionForPauseAdRequest" type="integer" />
+
+      <!-- this field is triggered when the user pauses the video. This will let the helper know to get the pauseAd overlay info.-->
+      <field id="getPauseAd" type="boolean" alwaysNotify="true"/>
+
+      <!-- pixelUrl to fire during pause ad -->
+      <field id="sendPauseAdPixel" type="string" alwaysNotify="true"/>
       <field id="audioTrackSettings" type="assocarray" value="{}" alias="closedCaptionAndAudioSelectionOverlay.audioTrackSettings" />
   </interface>
 
@@ -294,6 +310,10 @@
       </Label>
     </Group>
 
+    <PauseAdOverlay
+      id="PauseAdOverlay"
+      opacity="0.0"/>
+
     <SimpleButton
       id="SkipCuepointsButton"
       visible="false"/>
@@ -404,7 +424,7 @@
             height="50"
             uri="pkg:/images/transport/sgplayer/icon-subtitles.webp"
             translation="[1697,958]"
-            visible="false" />  
+            visible="false" />
         </Group>
       </Group>  <!-- Transport -->
     </Group>  <!-- HUD -->
@@ -518,6 +538,10 @@
       id="screenTime"
       duration="5"
       repeat="true" />
+
+    <Timer
+      id="PauseAdOverlayTimer"
+      duration="3.5"/>
 
   </children>
 </component>

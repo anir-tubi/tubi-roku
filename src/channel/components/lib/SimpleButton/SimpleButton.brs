@@ -23,7 +23,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.theme = theme
     m.label.color = theme.primaryTextColor

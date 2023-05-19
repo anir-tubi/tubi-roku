@@ -21,7 +21,6 @@ Function getConstants()
     di = CreateObject("roDeviceInfo")
 
     firmware = di.GetOSVersion() '{build: "4195", major: "10", minor: "0", revision: "0"}' roAssociativeArray
-
     if di.GetDisplayType() = "HDTV"
       definition = "hd"
     else
@@ -293,6 +292,8 @@ Function getConstants()
     constants.reqNames.getExternalConfigs = "getExternalConfigs"
     constants.reqNames.getPreferences = "getPreferences"
     constants.reqNames.patchPreferences = "patchPreferences"
+    constants.reqNames.getPauseAd = "getPauseAd"
+    constants.reqNames.postPauseAdPixel = "postPauseAdPixel"
 
     ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
@@ -430,6 +431,12 @@ Function getConstants()
     constants.urls.adsBaseUrlRainmaker = "https://rainmaker.staging-public.tubi.io/api/v2/rev/vod/"
     if constants.settings.mode = "production" or constants.settings.mode = "staging"
       constants.urls.adsBaseUrlRainmaker = "https://rainmaker.production-public.tubi.io/api/v2/rev/vod/"
+    end if
+
+    'pause ad server url
+    constants.urls.pauseAdsUrl = "https://ads.production-public.tubi.io/pause/v1/roku"
+    if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
+      constants.urls.pauseAdsUrl = "https://ads.staging-public.tubi.io/pause/v1/roku"
     end if
 
     'contents url
@@ -943,6 +950,14 @@ Function getConstants()
     constants.errors.codes.blockedEmailDomain = "BLOCKED_EMAIL_DOMAIN"
     constants.errors.codes.emailExists = "EMAIL_USER_EXISTS"
     constants.errors.codes.invalidToken = "INVALID_TOKEN"
+
+  ' pixel fires when static Ad is shown on video player during pause
+  constants.pauseAd = {}
+    constants.pauseAd.startPixel = "startPixel"
+    constants.pauseAd.impTrackingPixel = "impTrackingPixel"
+    constants.pauseAd.endPixel = "endPixel"
+    constants.pauseAd.notUsedPixel = "notUsedPixel"
+    constants.pauseAd.errorPixel = "errorPixel"
 
   'UI properties that should be passed into the scene graph
   constants.ui = {}

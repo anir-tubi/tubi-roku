@@ -1644,6 +1644,10 @@ Function getTranslation_en_US()
       "description": "Hint in the content metadata area informing the user that the reminder is set for this content",
       "message": "Reminder set"
     },
+    "goBack_videoPlayer_ad": {
+      "description": "Navigational instructions to users when pause Ad is displayed on video screen",
+      "message": "Press Back to close the ad"
+    },
     "cc_audio_overlay_subtitles": {
       "description": "Available closed caption tracks section header label.",
       "message": "Subtitles"
