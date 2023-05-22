@@ -72,7 +72,7 @@ Function TubiExperiments(constants) as Object
 
       roku_category_detailscreen_lazy_load: {
         roku_category_detailscreen_lazy_load_v1: {
-          "enabled": false
+          "enabled": true
         }
       }
 
