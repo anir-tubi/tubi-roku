@@ -317,13 +317,15 @@ Function onRowItemFocused(msg) as Boolean
 
         myStuffComponentInfo = {}
         myStuffComponentInfo["category_slug"] = m.oldCategoryId
-        'row is hardcoded to 1 in the line below because the row represents the row within the mystuff_component, not within the grid
+        'row is hardcoded to 1 in the line below because the row represents the row within the category_component, not within the grid
         'and the current design only has one row per category
         tile = m.Tracking.getAnalyticsTile(oldFocusedContent, oldAnalyticsCol, 1)
         myStuffComponentInfo["content_tile"] = tile
+        myStuffComponentInfo["category_row"] = oldAnalyticsRow
+        myStuffComponentInfo["category_col"] = oldAnalyticsCol
         m.top.navigateWithinPageInfo = {
           pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
-          componentOneof: m.Tracking.getAnalyticsComponent("mystuff_component", myStuffComponentInfo)
+          componentOneof: m.Tracking.getAnalyticsComponent("category_component", myStuffComponentInfo)
           means_of_navigation: "BUTTON" 'MeansOfNavigation enum
           vertical_location: newAnalyticsRow
           horizontal_location: newAnalyticsCol
@@ -488,10 +490,12 @@ Function getTrackingComponentInfoOfRowList(gridItem, itemPosition)
     componentValues["category_slug"] = m.currCategoryId
     tile = m.Tracking.getAnalyticsTile(gridItem, itemPosition[1] + 1)
     componentValues["content_tile"] = tile
+    componentValues["category_row"] = itemPosition[0] + 1 'all analytics are 1 based
+    componentValues["category_col"] = itemPosition[1] + 1 'all analytics are 1 based
 
     ' Set the tracking component of the gridItem that was passed so it can be accessed as part of the navigateToPage event
     trackingComponentInfo = {
-      componentType: "mystuff_component"
+      componentType: "category_component"
       componentValues: componentValues
     }
   end if

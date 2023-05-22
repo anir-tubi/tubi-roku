@@ -1009,11 +1009,6 @@ Function tubiTracking_getOneOfs()
       series_id: -1
       video_id: -1
     }
-
-    mystuff_component: {
-      category_slug: ""
-      content_tile: {}
-    }
   }
 
   selectorOneOf = {
