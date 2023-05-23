@@ -46,8 +46,6 @@ Function showMyStuffScreen()
     pageValues: {}
   }
 
-  screen.signedIn = bLoggedInUser '//display the guest or signed-in user profile experience
-
   ' make queue API request only if bLoadData is set to true
   if bLoadData = true
     fetchMyStuffCategoryDetails(screen)
@@ -64,6 +62,8 @@ Function showMyStuffScreen()
 
   ' don't send page load tracking until screen details content is returned from the API
   pushScreen(screen, true, false)
+
+  screen.signedIn = bLoggedInUser '//display the guest or signed-in user profile experience. Do this AFTER pushScreen to ensure focus is properly set 1st.
 End Function
 
 

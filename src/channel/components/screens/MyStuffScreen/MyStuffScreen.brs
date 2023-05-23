@@ -135,9 +135,11 @@ End Function
 
 
 Function onScreenFocusChange()
+  tubiLog("MyStuffScreen.onScreenFocusChange")
   if m.top.hasFocus() = true
     if m.top.signedIn = false
       m.GuestMenu.setFocus(true)
+      m.top.backgroundUriList = [m.defaultBackgroundUri]
     else if m.top.content <> invalid
       if m.top.content.getChildCount() > 0
         oldFocusedRowItem = m.top.cursorPosition
