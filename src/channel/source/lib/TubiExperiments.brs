@@ -88,10 +88,6 @@ Function TubiExperiments(constants) as Object
         roku_ads_configuration_roku_google_pal_integration_v1: {"enabled": false}
       }
 
-      roku_empty_cache_on_low_memory_devices: {
-        roku_empty_cache_on_low_memory_devices_v1 : {"enabled": false}
-      }
-
       roku_update_history_frequency: {
         roku_update_history_frequency_v1 : {"enabled": false}
       }

@@ -2135,7 +2135,6 @@ Function onLowMemoryEventInfoChange(msg)
     "upTime": data.upTime
     "type": m.constants.errors.type.lowMemoryWarning
     "name": m.constants.errors.message.lowMemoryWarning
-    "isRokuEmptyCacheExperimentEnabled": (getExperimentResource("roku_empty_cache_on_low_memory_devices", "roku_empty_cache_on_low_memory_devices_v1", false).enabled = true)
   }
 
   ' Setting the samplePercent to 1 so that we send it always since we anyways send it only once per user.

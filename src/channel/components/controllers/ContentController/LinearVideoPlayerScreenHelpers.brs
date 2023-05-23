@@ -27,7 +27,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
       end if
     else 'Content is not locked so just play the content
       ' Limit to devices with 512Mb RAM as those are the most likely to crash from exceeding the memory limit during playback.
-      if m.constants.deviceInfo.lowVram = true AND getExperimentResource("roku_empty_cache_on_low_memory_devices", "roku_empty_cache_on_low_memory_devices_v1", true).enabled = true
+      if m.constants.deviceInfo.lowVram = true
         updateScreenCacheOnPlayback(m.constants.ui.screenIds.linearVideoPlayerScreen)
       end if
       videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
