@@ -3090,6 +3090,10 @@ Function getTranslation_es_MX()
       "description": "Hint in the content metadata area informing the user that the reminder is set for this content",
       "message": "Recordatorio programado"
     },
+    "goBack_videoPlayer_ad": {
+      "description": "Navigational instructions to users when pause Ad is displayed on video screen",
+      "message": "Presiona Atrás para cerrar el anuncio"
+    },
     "cc_audio_overlay_subtitles": {
       "description": "Available closed caption tracks section header label.",
       "message": "Subtítulos"
