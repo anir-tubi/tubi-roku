@@ -6,6 +6,11 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
     if isButtonPressAllowed(key, m.VideoState, m.Video)
       hidePauseAdOverlay() ' added for extra safety
 
+      ' Resetting the timer when there is any user interaction during pause
+      if m.pauseAdOverlayTimer.control = "start"
+        restartPauseAdTimer(5)
+      end if
+
       if key = "OK"
           handleOk()
 
@@ -32,6 +37,10 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       else if key = "options"
         if m.ignoreOptionsKey = false then
           showTransport()
+          stopPauseAdTimer()
+          if m.isPixelFiredForCurrentPauseAd = false
+            sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
+          end if
           showClosedCaptionAudioTrackOverlay()
         end if
 
@@ -190,6 +199,8 @@ Function handleTransportVoiceEvent()
   tubiLog("VideoTransportHandling.handleTransportVoiceEvent " + command)
 
   response = "unhandled"
+  hidePauseAdOverlay()
+  resetPauseAdOverlay()
 
   if m.top.visible = true AND m.UpNext.opacity = 0
     response = "success"
@@ -295,15 +306,15 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
         resetPauseAd()
         resetPauseAdTimers()
         m.isPauseAdReqInProgress = true
-        m.pauseAdOverlayTimer.observeFieldScoped("fire", "onPauseAdOverlayTimer")
-        m.pauseAdOverlayTimer.control = "start"
+        m.pauseAdOverlayTimer.duration = 3.5
+        startPauseAdTimer()
         m.top.getPauseAd = true
       end if
 
     else
       resetPauseAdTimers()
-      m.pauseAdOverlayTimer.observeFieldScoped("fire", "onPauseAdOverlayTimer")
-      m.pauseAdOverlayTimer.control = "start"
+      m.pauseAdOverlayTimer.duration = 3.5
+      startPauseAdTimer()
     end if
 
   end if
@@ -458,6 +469,10 @@ Function handleOk()
     else if focusButtonId = m.EndButton.id
       goToNext()
     else if focusButtonId = m.closedCaptionAudioButton.id
+      stopPauseAdTimer()
+      if m.isPixelFiredForCurrentPauseAd = false
+        sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
+      end if
       showClosedCaptionAudioTrackOverlay()
     end if
   end if
@@ -977,7 +992,12 @@ End Function
 Function showTransport()
   ' update transport thumbnails before showing the transport UI
   updateTransport()
-  m.PlayPauseButton.uri = m.buttonUris.pause
+
+  if m.videoState = "pause"
+    m.PlayPauseButton.uri = m.buttonUris.play
+  else
+    m.PlayPauseButton.uri = m.buttonUris.pause
+  end if
 
   creditCuePoints = getCreditCuepointsFromContent(m.top.content)
   if m.top.hasFocus() = true AND isSkipIntroCuePointsReached(creditCuePoints) = false
@@ -1133,9 +1153,22 @@ End Function
 
 ' onClosePauseAdOverlay triggers when user presses back/rew/fwd/play/replay/options
 Function onClosePauseAdOverlay()
-  m.pauseAdOverlay.setFocus(false)
-  m.top.setFocus(true)
-  sendPauseAdPixel(m.constants.pauseAd.endPixel)
+  resetPauseAdOverlay()
+End Function
+
+
+Function resetPauseAdOverlay()
+  if m.pauseAdOverlay.hasFocus() = true
+    m.pauseAdOverlay.setFocus(false)
+    m.top.setFocus(true)
+  end if
+
+  if m.isPixelFiredForCurrentPauseAd = true
+    sendPauseAdPixel(m.constants.pauseAd.endPixel)
+  else
+    sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
+  end if
+
   resetPauseAdTimers()
   resetPauseAd()
 
@@ -1154,11 +1187,7 @@ Function onPauseAdOverlayTimer()
     loadStatus = m.pauseAdOverlay.posterLoadStatus
 
     if loadStatus = "ready"
-      animateTransport("out")
-      fade(m.pauseAdOverlay, "in", 0.6, 0.4)
-      sendPauseAdPixel(m.constants.pauseAd.startPixel)
-      startImpTrackingTimer()
-      m.pauseAdOverlay.setFocus(true)
+      showPauseAd()
     else if loadStatus = "failed"
       sendPauseAdPixel(m.constants.pauseAd.errorPixel)
     else if loadStatus = "loading"
@@ -1179,11 +1208,7 @@ Function onPauseAdPosterLoadStatus(msg)
 
     if loadStatus = "ready"
       m.pauseAdOverlay.unobserveFieldScoped("posterLoadStatus")
-      animateTransport("out")
-      fade(m.pauseAdOverlay, "in", 0.6, 0.4)
-      sendPauseAdPixel(m.constants.pauseAd.startPixel)
-      startImpTrackingTimer()
-      m.pauseAdOverlay.setFocus(true)
+      showPauseAd()
     else if loadStatus = "failed"
       m.pauseAdOverlay.unobserveFieldScoped("posterLoadStatus")
       sendPauseAdPixel(m.constants.pauseAd.errorPixel)
@@ -1196,12 +1221,27 @@ Function onPauseAdPosterLoadStatus(msg)
 End Function
 
 
+'showPauseAd does below
+' - animates out the transport ui
+' - amimates in pause ad overlay
+' - send pause ad start pixel
+' - starts imp tracking timer for pause ad
+' - sets the focus to pause ad overlay
+Function showPauseAd()
+  animateTransport("out")
+  m.pauseAdAnimation = fade(m.pauseAdOverlay, "in", 0.6, 0.4)
+  sendPauseAdPixel(m.constants.pauseAd.startPixel)
+  startImpTrackingTimer()
+  m.pauseAdOverlay.setFocus(true)
+End Function
+
+
+'startImpTrackingTimer starts the imp tracking timer which will send pixel event 1 min after ad is shown
 Function startImpTrackingTimer()
   if m.impTrackingTimer = invalid
     m.impTrackingTimer = m.top.createChild("Timer")
   end if
-  m.impTrackingTimer.unObserveFieldScoped("fire")
-  m.impTrackingTimer.control = "stop"
+  stopImpTrackingTimer()
   m.impTrackingTimer.observeFieldScoped("fire", "impTrackingTimerFired")
   m.impTrackingTimer.control = "start"
 End Function
@@ -1221,6 +1261,11 @@ Function resetPauseAd()
     m.pauseAdOverlay.posterUri = ""
     m.pauseAdOverlay.posterWidth = 0
     m.pauseAdOverlay.posterHeight = 0
+
+    if m.pauseAdAnimation <> invalid
+      stopAnimation(m.pauseAdAnimation)
+    end if
+
     m.pauseAdOverlay.opacity = 0.0
   end if
   m.top.pauseAdResponse = invalid
@@ -1229,14 +1274,44 @@ End Function
 
 'resetPauseAdTimers resets the pauseAd related timers
 Function resetPauseAdTimers()
+  stopPauseAdTimer()
+  stopImpTrackingTimer()
+End Function
+
+
+'restartPauseAdTimer restarts the pause ad timer
+'@duration : float, default is 3.5 seconds
+Function restartPauseAdTimer(duration = 3.5)
+  if m.pauseAdOverlayTimer <> invalid
+    stopPauseAdTimer()
+    m.pauseAdOverlayTimer.duration = duration
+    startPauseAdTimer()
+  end if
+End Function
+
+
+'stopPauseAdTimer stops the pause ad timer
+Function stopPauseAdTimer()
   if m.pauseAdOverlayTimer <> invalid
     m.pauseAdOverlayTimer.unObserveFieldScoped("fire")
     m.pauseAdOverlayTimer.control = "stop"
   end if
+End Function
 
+
+'stopImpTrackingTimer stops the imp tracking timer for pause ad
+Function stopImpTrackingTimer()
   if m.impTrackingTimer <> invalid
     m.impTrackingTimer.control = "stop"
     m.impTrackingTimer.unObserveFieldScoped("fire")
+  end if
+End Function
+
+'startPauseAdTimer stops the pause ad timer
+Function startPauseAdTimer()
+  if m.pauseAdOverlayTimer <> invalid
+    m.pauseAdOverlayTimer.observeFieldScoped("fire", "onPauseAdOverlayTimer")
+    m.pauseAdOverlayTimer.control = "start"
   end if
 End Function
 
@@ -1291,5 +1366,9 @@ End Function
 
 
 Function hidePauseAdOverlay()
+  if m.pauseAdAnimation <> invalid
+    stopAnimation(m.pauseAdAnimation)
+  end if
+
   fade(m.pauseAdOverlay, "out", 0.1)
 End Function

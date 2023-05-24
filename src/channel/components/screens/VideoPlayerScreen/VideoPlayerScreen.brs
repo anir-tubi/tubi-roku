@@ -80,6 +80,9 @@ Function init()
   'If any pixel event is missing for current pause ad, we do not make new pause ad request
   m.isPixelFiredForCurrentPauseAd = true
 
+  'pauseAdAnimation helps for stopping the pasue ad animation
+  m.pauseAdAnimation = invalid
+
   m.top.observeFieldScoped("sendPendingPauseAdPixel", "onSendPendingPauseAdPixel")
   m.top.observeFieldScoped("pauseAdResponse", "onPauseAdResponse")
   m.pauseAdOverlayTimer = m.top.findNode("PauseAdOverlayTimer")
