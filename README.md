@@ -541,13 +541,12 @@ Staging experiments are stored on the `roku_popper_staging` branch. Before addin
 
 For each experiment that needs to be added to the roku popper staging environment, do the following:
 1. Create a separate local branch off of master.
-2. Merge your experiment branch into the `roku_popper_staging` branch
-3. Make a PR to `master` from your local experiment branch when appropriate.
+2. Merge your experiment branch into the `roku_popper_staging` branch.
 
 Once all experiment branches for the release have been merged into the `roku_popper_staging` branch, then:
 
 1. Go to https://github.com/adRise/popper-config/actions/workflows/deploy.yml. Click the `Run workflow` dropdown on the right and make sure the branch is `roku_popper_staging` and Target Popper Environment is `roku_staging`. Once confirmed, click the `Run workflow` button.
-2. This should make a new Deploy workflow. Click into it. It will take some to complete but once it gets to the Create Git Tag step look at that steps output. It should look something like:
+2. This should make a new Deploy workflow. Click into it. It will take some time to complete. Once it gets to the "Create Git Tag" step, look at that step's output. It should look something like:
 `* [new tag]           20220525.205906Z_ea68a278 -> 20220525.205906Z_ea68a278`
 In this case `20220525.205906Z_ea68a278` is our build id.
 
@@ -555,7 +554,7 @@ In this case `20220525.205906Z_ea68a278` is our build id.
 4. Go to [Argo CD](https://argo.main-staging-custom.staging.k8s.tubi.io/applications/argocd/popper-engine-roku?view=network&resource=)
 5.  Press the buttons "SYNC"> "SYNCHRONIZE"
 
-If all was successful you should be able to login to https://popper.tubi.io/ and see the experiment show up under the `roku-staging` environment.
+If all was successful, you should be able to login to https://popper.tubi.io/ and see the experiment display under the `staging-roku` environment.
 
 ## Setting up the experiment within the Roku Code:
 
