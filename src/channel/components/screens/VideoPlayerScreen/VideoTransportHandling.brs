@@ -298,7 +298,7 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
 
   m.top.videoPositionForPauseAdRequest = m.playerPosition 'this position is used in pauseAd request
 
-  if m.top.isTrailer = false
+  if m.top.isTrailer = false and m.top.hasFocus() = true
 
     if getExperimentResource("roku_pause_ads", "roku_pause_ads_v1", false).enabled = true
 
@@ -1306,6 +1306,7 @@ Function stopImpTrackingTimer()
     m.impTrackingTimer.unObserveFieldScoped("fire")
   end if
 End Function
+
 
 'startPauseAdTimer stops the pause ad timer
 Function startPauseAdTimer()
