@@ -204,6 +204,9 @@ Function setVideoPreviewAfterFocus(focusedContent, pageType)
         videoPreview = m.videoPreviewPlayer
         if videoPreview <> invalid AND pageType <> invalid
           setPageTypeForVideoPreview(pageType)
+          if previewState = "buffering"
+            resumeVideoPreview()
+          end if
         end if
         m.backgroundGroup.posterVisible = false
       else if previewState = "paused"
