@@ -55,7 +55,6 @@ Function TubiExperiments(constants) as Object
         roku_screensaver_v2 : {"enabled": false}
       }
 
-
       roku_hlsv6: {
         roku_hlsv6_v1 : {"enabled": false}
       }
@@ -68,6 +67,10 @@ Function TubiExperiments(constants) as Object
 
       roku_dash: {
         roku_dash_v2 : {"enabled": false}
+      }
+
+      roku_video_preview_search_screen: {
+        roku_video_preview_search_screen_v1 : {"enabled": false}
       }
 
       roku_category_detailscreen_lazy_load: {

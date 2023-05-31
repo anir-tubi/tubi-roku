@@ -3,6 +3,10 @@ Function showSearchScreen()
   tubiLog("SearchScreenHelpers.onSearchSelected")
   searchScreen = CreateObject("roSGNode", "SearchScreen")
   searchScreen.observeFieldScoped("contentSelected", "onSearchContentSelected")
+  if getExperimentResource("roku_video_preview_search_screen", "roku_video_preview_search_screen_v1", false).enabled = true
+    searchScreen.observeFieldScoped("contentFocused", "onSearchContentFocused")
+    searchScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
+  end if
   searchScreen.observeFieldScoped("backgroundUriList", "onSearchBackgroundChange")
   searchScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   searchScreen.observeFieldScoped("searchText", "onSearchTextChanged")
@@ -42,9 +46,20 @@ Function onSearchContentSelected(msg)
 End Function
 
 
+Function onSearchContentFocused(msg)
+  tubiLog("SearchScreenHelpers.onSearchContentFocused")
+  focusedContent = msg.getData()
+  setVideoPreviewAfterFocus(focusedContent, "search_page")
+End Function
+
+
 Function onSearchContentToPlay(msg)
   searchScreen = msg.getRoSGNode()
   content = msg.getData()
+
+  if isVideoPreviewOn() = true
+    m.top.stopVideoPreview = true
+  end if
 
   playbackSource = {
     "srcForAnalytic": m.constants.player.playbackSource.unknown
