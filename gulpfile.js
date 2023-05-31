@@ -693,8 +693,12 @@ function setAutomatedTestsConfig(done) {
     options.config = 'qa';
     options.overrides = {
       settings: {
-        suitest: true,
-        injectRtaOnDeviceComponent: true
+        injectRtaOnDeviceComponent: true,
+        noAds: true,
+        printReqAndResInfo: false,
+        bs_const: {
+          consoleLoggingEnabled: false
+        }
       }
     };
     done();
@@ -705,7 +709,7 @@ function setAutomatedTestsConfig(done) {
 
 function runAutomatedTests() {
   return src(['js/automated-tests/tests/*.ts'], { read: false })
-    .pipe(mocha({}));
+    .pipe(mocha()); // Use {bail: true} if you want to stop after first one fails
 }
 
 

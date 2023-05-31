@@ -1,4 +1,8 @@
 {
+  "contentController": {
+    "description": "Central controller of the application",
+    "keyPath": "#ContentController"
+  },
   "homeScreenRowList": {
     "description": "Component on the Home Screen that we can pull content for the Grid from",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList"
@@ -6,10 +10,6 @@
   "movieScreenRowList": {
     "description": "Component on the Movie Screen that we can pull content for the Grid from",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#ContentArea.#CategoryGridList.#RowList"
-  },
-  "detailScreenTitle": {
-    "description": "Content title on the detail screen",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#Title"
   },
   "backgroundGroup": {
     "description": "Component that controls background image display",
@@ -20,15 +20,58 @@
     "description": "Component contains main menu items. Useful for seeing which page is showing or to switch page is showing",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems"
   },
+  "previewVideoPlayer": {
+    "description": "Component for video preview playback. Useful for checking that video preview is playing the correct file",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#VideoPreviewGroup.#VideoPreviewPlayer.#VideoNode"
+  },
+  "settingsScreen": {
+    "description": "Settings Screen",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen"
+  },
+  "confirmPasswordScreen": {
+    "description": "Confirm Password Screen",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2"
+  },
+  "enterPasswordMessage": {
+    "description": "Enter Password Message",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.0.#Message"
+  },
+  "passwordEntryBox": {
+    "description": "Password Entry Box",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.0.#password"
+  },
+  "parentalControlsSettingsOlderKids": {
+    "description" : "Dialog box text for PC Settings Change for Older Kids",
+    "keyPath": "#ContentController.2.#DialogBox.#ContentArea.#MessageGroup.#Message"
+  },
+  "settingsScreenMenu": {
+    "description": "Settings Screen menu",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu"
+  },
+  "exitKidsGrayedOut": {
+    "description" : "Exit Kids Menu item in Kids more is grayed out",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#VideoPreviewGroup"
+  },
+  "signOutButtonKidsMode": {
+    "description" : "Sign Out button on Settings Page while in Kids mode",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.6.#DetailsMenuText"
+  },
+  "signOutVerificationModalMessage": {
+    "description" : "Sign out verification modal",
+    "keyPath": "#ContentController.#DialogBox.#ContentArea.#MessageGroup.#Message"
+  },
+  "detailScreen": {
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen"
+  },
+  "detailScreenTitle": {
+    "description": "Content title on the detail screen",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#Title"
+  },
   "detailScreenYearAndDuration": {
     "description": "Component containing year and duration of the current content",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Line1"
   },
   "detailScreenMenu": {
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu"
-  },
-  "previewVideoPlayer": {
-    "description": "Component for video preview playback. Useful for checking that video preview is playing the correct file",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#VideoPreviewGroup.#VideoPreviewPlayer.#VideoNode"
   }
 }

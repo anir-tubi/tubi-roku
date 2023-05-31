@@ -1145,6 +1145,7 @@ Function refreshAllDetailScreens()
         setDetailStrings(screen, content)
       end if
 
+      screen.isWaitingForServerResponse = false
     end if
   end for
 End Function

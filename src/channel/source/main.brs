@@ -5,6 +5,8 @@ Function Main(startupArgs)
   ' constants will be reset in remote components for scene graph
   m.appStartTime = UpTime(0)
   m.startupArgs = startupArgs
+  handleRegistryOperations(startupArgs)
+
 
   constants = getConstants()
   port = CreateObject("roMessagePort")
@@ -430,5 +432,38 @@ Function logCrashesOnStartup(args, log, constants)
       type: constants.errors.type.crashOnPreviousRun
     }
     log.exception(messageInfo, "warn", m.queue, 1)
+  end if
+End Function
+
+
+Function handleRegistryOperations(startupArgs)
+  if startupArgs.clearRegistry = "true" OR startupArgs.setRegistry <> invalid then
+    isDev = (createObject("roAppInfo").IsDev() = true)
+    expectedPassword = "499zsaHvENIYuEiVPMMa3S5w"
+    hasCorrectPassword = (startupArgs.password = expectedPassword)
+
+    if isDev = true OR hasCorrectPassword = true then
+      registry = createObject("roRegistry")
+
+      if startupArgs.clearRegistry = "true" then
+        sections = registry.getSectionList()
+        for each section in sections
+          registry.delete(section)
+        end for
+        print "REGISTRY CLEARED"
+      end if
+
+      if startupArgs.setRegistry <> invalid then
+        json = startupArgs.setRegistry
+        sections = parseJson(json)
+        for each section in sections
+          registrySection = createObject("roRegistrySection", section)
+          registrySection.writeMulti(sections[section])
+        end for
+        print "REGISTRY SET"
+      end if
+
+      registry.flush()
+    end if
   end if
 End Function

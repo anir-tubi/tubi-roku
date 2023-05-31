@@ -11,8 +11,6 @@ before(async () => {
       '**/*'
     ]
   });
-
-  await testUtils.waitForApplicationStartup();
 });
 
 after(async function () {

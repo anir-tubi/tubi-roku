@@ -1,6 +1,9 @@
+import { createHash, createHmac } from 'crypto';
 import { expect } from 'chai';
 import type { MediaPlayerResponse, NodeRepresentation } from 'roku-test-automation';
 import { ecp, odc, utils, device, BaseType } from 'roku-test-automation';
+import * as needle from 'needle';
+import * as querystring from 'needle/lib/querystring';
 
 class TestUtils {
   private convertedElementKeyPaths: {
@@ -10,6 +13,8 @@ class TestUtils {
   private elementKeyPaths: {
     [key: string]: KeyPathElement
   };
+
+  private userAgent = 'Roku/DVP-11.5 (11.5.0.4312-46)';
 
 
   // You can use this get the key path for the given element
@@ -61,7 +66,7 @@ class TestUtils {
     await odc.onFieldChangeOnce({
       keyPath: '#ContentController.removeStartUpScreens',
       match: true
-    });
+    }, {timeout: 20000});
   }
 
 
@@ -81,6 +86,8 @@ class TestUtils {
 
   // Helper to fully shutdown the application
   public async exitApplication() {
+    // wait for content controller to get added. This is needed in the case that the application is still launching and then the next test tries to close the application again. Without this the setValue would fail because ContentController does not exist yet.
+    await this.getNodeForElement('contentController');
     try {
       await odc.setValue({
         base: 'scene',
@@ -105,113 +112,103 @@ class TestUtils {
   }
 
 
-  public async restartApplication(launchArgs: Parameters<typeof ecp.sendLaunchChannel>[0] = undefined) {
-    // Leaving commented out for now to see if it is needed
-    // const randomString = utils.randomStringGenerator();
-    // We set a field on scene so we know the scene has been rebuilt
-    // await odc.setValue({
-    //   keyPath: 'checkSceneReset',
-    //   value: randomString
-    // });
+  public async sendNetworkRequest(requestOptions: needle.NeedleOptions & {
+    url: string;
+    method: needle.NeedleHttpVerbs;
+    params?: {[key: string]: any};
+    body?: string}) {
+    requestOptions.proxy = '127.0.0.1:8888'; // useful for debugging
 
-    if (!launchArgs) {
-      launchArgs = {
-        launchParameters: {
-          willNotRestartWithout: 1
-        }
-      };
+    requestOptions.headers['user-agent'] = this.userAgent;
+
+    const params = requestOptions.params;
+    let url = requestOptions.url;
+    if (params && Object.keys(params).length) {
+      url = url.replace(/\?.*|$/, '?' + querystring.build(params));
     }
 
-    await this.exitApplication();
+    if (requestOptions.body) {
+      const response = await needle(requestOptions.method, url, requestOptions.body, requestOptions);
+      return response.body;
+    }
 
-    await ecp.sendLaunchChannel(launchArgs);
-
-    // Leaving commented out for now to see if it is needed
-    // Don't proceed until the scene has reset
-    // await this.untilTrue(async () => {
-    //   const {found} = await odc.getValue({
-    //     keyPath: 'checkSceneReset'
-    //   });
-    //   return !found;
-    // });
+    const response = await needle(requestOptions.method, url, requestOptions);
+    return response.body;
   }
 
 
-  // Helper to sign in to an account in the application using the testing shortcut method
-  public async signIntoAccount() {
-    // Check if we're already signed in
-    if (await this.isUserSignedIn()) {
-      // If we're already signed in then we're done now
-      return;
-    }
-
-    // Make sure we're signed in
-    const authInfoPromise = odc.onFieldChangeOnce({
-      base: 'global',
-      keyPath: 'authInfo'
-    });
-
-    // Selecting login item to automatically log us in
-    await this.selectMenuItem('mainMenu', 'Sign In');
-
-    const {value: authInfo} = await authInfoPromise;
-    expect(authInfo.userid, 'User was not signed in properly').to.not.be.empty;
-  }
-
-
-  private async isUserSignedIn() {
-    const {value: authInfo} = await odc.getValue({
-      base: 'global',
-      keyPath: 'authInfo'
-    });
-
-    // Check both our global state and the registry to confirm we're signed in
-    if (authInfo && authInfo.userid) {
-      const userId = await odc.readRegistry({values: {
-        'auth': 'userid'
-      }});
-      if (userId) {
-        return true;
-      }
-    }
-    return false;
+  public async createTestUser() {
+    const credentials = {
+      birthday: '2000-01-01',
+      email: `build_roku_${Math.floor(Date.now() / 1000)}@tubi.tv`,
+      email_type: 'manual',
+      first_name: 'Automation',
+      gender: '',
+      last_name: '',
+      password: '111111',
+      temporary_name: true
+    };
+    const user = await auth.userSignup(credentials);
+    return user;
   }
 
 
   // Starts the application at the specified page.
   // If asSignedInUser is true we will log them in else we will log them out
-  public async startApplicationAtPage(page: DeeplinkPage | 'home', asSignedInUser = false) {
+  public async startApplicationAtPage(page: DeeplinkPage, asSignedInUser = false) {
+    const deeplink = {
+      page: page
+    };
+
+    await this.startApplicationWithDeeplink(deeplink, asSignedInUser);
+  }
+
+
+  // Starts the application at the specified page.
+  // If asSignedInUser is true we will log them in else we will log them out
+  // deeplink: this is an object with the list of starting params sent to the application. Common fields include contentId, mediaType and page but other values may be passed as needed.
+  public async startApplicationWithDeeplink(deeplink = {}, asSignedInUser = false) {
+    deeplink['clearRegistry'] = true;
     if (asSignedInUser) {
-      await this.waitForApplicationStartup();
-      await this.signIntoAccount();
-    } else {
-      await odc.deleteEntireRegistry();
+      const user = await this.createTestUser();
+      deeplink['setRegistry'] = JSON.stringify({
+        auth: {
+          refreshtoken: user.refresh_token,
+          userid: `${user.user_id}`,
+          expiretime: '0'
+        }
+      });
     }
 
-    let launchParameters;
-    // Home is default and there is no deeplink to it so we just don't pass a page
-    if (page !== 'home') {
-      launchParameters = {
-        page: page
-      };
-    }
+
     await this.restartApplication({
-      launchParameters: launchParameters
+      params: deeplink
     });
 
     await this.waitForApplicationStartup();
   }
 
 
+  public async restartApplication(args: Parameters<typeof ecp.sendLaunchChannel>[0] = undefined) {
+    await this.exitApplication();
+    await ecp.sendLaunchChannel(args);
+  }
+
+
   // Helper for going to a different page in the application
-  public async goToPage(page: DeeplinkPage | 'search') {
+  public async goToPage(page: DeeplinkPage | 'search' | 'settings') {
     if (page === 'search') {
       // We don't have a deeplink for these so we access it on the mainmenu instead
-      await this.selectMenuItem('mainMenu', 'Search');
+      await this.selectMenuItem('mainMenu', 'Search', undefined);
+    } else if (page === 'settings') {
+      // We don't have a deeplink for these so we access it on the mainmenu instead
+      await this.selectMenuItem('mainMenu', 'Settings', undefined);
     } else {
-      await device.sendECP('input', {
-        page: page
-      }, '');
+      await ecp.sendInput({
+        params: {
+          page: page
+        }
+      });
     }
   }
 
@@ -222,6 +219,24 @@ class TestUtils {
       const player = await ecp.getMediaPlayer();
       expect(player.state).to.equal(state);
     }, timeout);
+  }
+
+
+   // Helper to get the current position of the video player
+  public async getPlayerPosition() {
+    const player = await ecp.getMediaPlayer();
+    return player.position.number;
+  }
+
+
+  // Temporary helper to wait until ads are done playing to proceed until we hook in proxy to override ads
+  public async waitForAdsToFinish() {
+    const maxExpectedAdBreakDuration = 180 * 1000;
+    const maxExpectedIndividualAdDuration = 120 * 1000;
+    await this.untilTrue(async () => {
+      const player = await ecp.getMediaPlayer();
+      return player.state === 'play' && player.duration.number > maxExpectedIndividualAdDuration;
+    }, 'Timed out while waiting for ads to finish playing', maxExpectedAdBreakDuration);
   }
 
 
@@ -269,6 +284,7 @@ class TestUtils {
     }, timeout);
   }
 
+
   // Used to jump to a row with the title provided
   // elementName is the key that was used when defining in the element-keypaths file
   public async jumpToRowWithTitle(elementName: string, title: string, timeout = 10000) {
@@ -281,14 +297,105 @@ class TestUtils {
   }
 
 
+  // Used to select an item in detail page menu and verify that the action has been completed successfully
+  public async selectAndVerifyDetailPageMenuItem(item: 'play' | 'resume' | 'addToMyList' | 'removeFromMyList' | 'removeFromHistory', timeout = 10000) {
+    // If a network request is still happening then we need to wait for it to complete before proceeding
+    const args = this.getElementKeyPath('detailScreen');
+    args.keyPath += '.isWaitingForServerResponse';
+    args['match'] = false;
+    await odc.onFieldChangeOnce(args);
+
+    const elementName = 'detailScreenMenu';
+    switch (item) {
+      case 'play':
+        await this.selectMenuItem(elementName, 'Play', timeout);
+        await this.waitForElementToNotBeInFocusChain('detailScreen');
+        break;
+      case 'resume':
+        await this.selectMenuItem(elementName, 'Resume', timeout);
+        await this.waitForElementToNotBeInFocusChain('detailScreen');
+        break;
+      case 'addToMyList':
+        await this.selectMenuItem(elementName, 'Add to My List', timeout);
+        // We know we're good once the remove item shows up
+        await this.findRowIndexWithTitle(elementName, 'Remove from My List', timeout);
+        break;
+      case 'removeFromMyList':
+        await this.selectMenuItem(elementName, 'Remove from My List', timeout);
+        // We know we're good once the add item shows up
+        await this.findRowIndexWithTitle(elementName, 'Add to My List', timeout);
+        break;
+      case 'removeFromHistory':
+        await this.selectMenuItem(elementName, 'Remove from history', timeout);
+        // We know we're good once the Resume item goes away
+        await this.untilTrue(async () => {
+          try {
+            await this.findRowIndexWithTitle(elementName, 'Remove from history', 0);
+            return false;
+          } catch(e) {
+            return true;
+          }
+        }, 'Could not verify that Remove from history was removed');
+        break;
+      }
+  }
+
+
   // Used to select the item in the provided elementName that matches title provided.
   // elementName is the key that was used when defining in the element-keypaths file
-  public async selectMenuItem(elementName: string, title: string) {
-    const index = await this.findRowIndexWithTitle(elementName, title);
+  public async selectMenuItem(elementName: string, title: string, timeout = 10000) {
+    const index = await this.jumpToRowWithTitle(elementName, title, timeout);
+
     await odc.setValue(this.getElementKeyPath(elementName, {
       field: 'itemSelected',
       value: index
-    }));
+    }), {timeout: timeout});
+  }
+
+
+  // returns true if this element or one of its children currently has focus
+  public elementIsInFocusChain(elementName: string) {
+    return odc.isInFocusChain(this.getElementKeyPath(elementName));
+  }
+
+
+  // returns true if this element has focus
+  public elementHasFocus(elementName: string) {
+    return odc.hasFocus(this.getElementKeyPath(elementName));
+  }
+
+
+  // tries to wait until this element has focus
+  public waitForElementToHaveFocus(elementName: string, errorMessage?: string, timeout = 10000) {
+    return this.untilTrue(() => {
+      return this.elementHasFocus(elementName);
+    }, errorMessage, timeout);
+  }
+
+
+  // tries to wait until this element does not have focus
+  public waitForElementToNotHaveFocus(elementName: string, errorMessage?: string, timeout = 10000) {
+    return this.untilTrue(async () => {
+      const result = await this.elementHasFocus(elementName);
+      return !result;
+    }, errorMessage, timeout);
+  }
+
+
+  // tries to wait until this element or one of its children has focus
+  public waitForElementToBeInFocusChain(elementName: string, errorMessage?: string, timeout = 10000) {
+    return this.untilTrue(() => {
+      return this.elementIsInFocusChain(elementName);
+    }, errorMessage, timeout);
+  }
+
+
+  // tries to wait until this element and none of its children has focus
+  public waitForElementToNotBeInFocusChain(elementName: string, errorMessage?: string, timeout = 10000) {
+    return this.untilTrue(async () => {
+      const result = await this.elementIsInFocusChain(elementName);
+      return !result;
+    }, errorMessage, timeout);
   }
 
 
@@ -299,7 +406,7 @@ class TestUtils {
   public async retryWithTimeOut<T>(func: () => Promise<T>, timeout = 10000) {
     const start = Date.now();
     let lastError;
-    while (timeout > Date.now() - start) {
+    while (timeout >= Date.now() - start) {
       try {
         return await func();
       } catch (e) {
@@ -329,15 +436,274 @@ class TestUtils {
     throw new Error(errorMessage);
   }
 
+
   // Helper to both print out the result from an async function and return its contents
-  public async printAsyncResponse<T>(promise: Promise<T>) {
+  public async printAsyncResponse<T>(promise: Promise<T>, message?: string) {
     const result = await promise;
-    console.log(result);
+    if (message) {
+      console.log(message, result);
+    } else {
+      console.log(result);
+    }
+
     return result as T;
   }
 }
 
+
+class Auth {
+  private baseAccountUrl = 'https://account.production-public.tubi.io';
+  private platform = 'roku';
+  private applicationVersion = '2.20.19';
+  private deviceId: string;
+  private anonymousTokenInfo: {
+    access_token: string;
+    expires_in: number;
+    refresh_token: string;
+    signingKey: {
+      id: string;
+      key: string;
+      verifier: string;
+    }
+  };
+
+
+  private getHeaders(additionalHeaders = {}) {
+    return {
+      'accept-language': 'en-US',
+      'content-type': 'application/json',
+      'x-client-platform': this.platform,
+      'x-client-version': this.applicationVersion,
+      ...additionalHeaders
+    };
+  }
+
+
+  private async getDeviceId() {
+    if (this.deviceId) {
+      return this.deviceId;
+    }
+
+    const {values} = await odc.readRegistry({
+      values: {
+        deviceinfo: 'deviceId'
+      }
+    });
+
+    const deviceId = values.deviceinfo.deviceId;
+    if (!deviceId) {
+      throw new Error('Could not retrieve deviceId. Can not proceed.');
+    }
+    this.deviceId = deviceId;
+    return deviceId;
+  }
+
+
+  public async getSigningKey() {
+    const verifier = utils.randomStringGenerator(36);
+    const challenge = createHash('sha256').update(verifier).digest('base64').replace('+', '-').replace('/', '_');
+
+    const body = JSON.stringify({
+      challenge: challenge,
+      device_id: await this.getDeviceId(),
+      platform: this.platform,
+      version: this.applicationVersion
+    });
+
+    const response = await testUtils.sendNetworkRequest({
+      method: 'post',
+      url: this.baseAccountUrl + '/device/anonymous/signing_key',
+      body: body,
+      headers: this.getHeaders()
+    });
+    response.verifier = verifier;
+
+    return response as {
+      id: string;
+      key: string;
+      verifier: string;
+    };
+  }
+
+
+  public async getAnonymousToken() {
+    if (this.anonymousTokenInfo) {
+      return this.anonymousTokenInfo;
+    }
+
+    const signingKey = await this.getSigningKey();
+
+    const body = JSON.stringify({
+      device_id: await this.getDeviceId(),
+      id: signingKey.id,
+      platform: this.platform,
+      verifier: signingKey.verifier,
+    });
+
+    const response = await this.sendSignedTubiNetworkRequest({
+      method: 'post',
+      url: this.baseAccountUrl + '/device/anonymous/token',
+      body: body,
+      headers: this.getHeaders(),
+      signingKey: signingKey
+    });
+
+    response.signingKey = signingKey;
+
+    this.anonymousTokenInfo = response;
+
+    return this.anonymousTokenInfo;
+  }
+
+
+  public async userSignup(credentials: {
+      birthday: string;
+      email: string;
+      email_type: string;
+      first_name: string;
+      gender: string;
+      last_name: string;
+      password: string;
+      temporary_name: boolean;
+    }) {
+    const anonymousToken = await this.getAnonymousToken();
+    const body = JSON.stringify({
+      device_id: await this.getDeviceId(),
+      platform: this.platform,
+      credentials: credentials
+    });
+
+    const headers = this.getHeaders({
+      authorization: 'Bearer ' + anonymousToken.access_token
+    });
+
+    const user = await testUtils.sendNetworkRequest({
+      method: 'post',
+      url: this.baseAccountUrl + '/user/signup',
+      headers: headers,
+      body: body
+    });
+
+    user.signingKey = anonymousToken.signingKey;
+
+    return user as {
+      access_token: string;
+      birthday: string;
+      email: string;
+      enable_video_preview: boolean;
+      enabled: boolean;
+      expires_in: number;
+      first_name: string;
+      has_age: boolean;
+      has_password: boolean;
+      is_confirmed: boolean;
+      last_name?: string;
+      name: string;
+      parental_rating: number;
+      profile_pic: string;
+      refresh_token: string;
+      user_id: number;
+      signingKey: {
+        id: string;
+        key: string;
+        verifier: string;
+      }
+    };
+  }
+
+
+  // Returns a semicolon concatted string required for signing
+  private constructSignedHeaders(requestOptions: Parameters<typeof this.sendSignedTubiNetworkRequest>[0]) {
+    const headerKeys = Object.keys(requestOptions.headers);
+    return headerKeys.join(';');
+  }
+
+
+  private async sendSignedTubiNetworkRequest(requestOptions: Parameters<typeof testUtils.sendNetworkRequest>[0] & {
+    signingKey: {
+      id: string;
+      key: string;
+    }
+  }) {
+    requestOptions = this.appendSignatureInfo(requestOptions);
+    return testUtils.sendNetworkRequest(requestOptions);
+  }
+
+
+  private calculateSignature(stringToSign, secretKey, dateTime) {
+    const date = dateTime.split('T')[0];
+
+    const secret1 = Buffer.concat([Buffer.from('TUBI', 'utf-8'), Buffer.from(secretKey, 'base64')]);
+    const secret2 = this.hmac(date, secret1);
+    const secret3 = this.hmac('tubi_request', secret2);
+    const signature = this.hmac(stringToSign, secret3);
+    return signature;
+  }
+
+
+  private appendSignatureInfo(requestOptions: Parameters<typeof this.sendSignedTubiNetworkRequest>[0]) {
+    const canonicalRequest = this.constructCanonicalRequest(requestOptions);
+    const hashedCanonicalRequest = createHash('sha256').update(canonicalRequest).digest('hex');
+
+    const dateTime = new Date().toISOString().split('.').shift() + 'Z';
+    const dateTimeFormatted = dateTime.replace(/-/g,'').replace(/:/g,'');
+
+    const algorithm = 'TUBI-HMAC-SHA256';
+
+    const stringToSign = [
+      algorithm,
+      dateTimeFormatted,
+      hashedCanonicalRequest,
+    ].join('\n');
+
+    const secretKey = requestOptions.signingKey.key;
+    const signature = this.calculateSignature(stringToSign, secretKey, dateTimeFormatted).toString('hex');
+
+    requestOptions.params = {
+      'X-Tubi-Signature': signature,
+      'X-Tubi-Expires': 60,
+      'X-Tubi-Date': dateTimeFormatted,
+      'X-Tubi-SignedHeaders': this.constructSignedHeaders(requestOptions),
+      'X-Tubi-Algorithm': algorithm
+    };
+    return requestOptions;
+  }
+
+
+  private constructCanonicalRequest(requestOptions: Parameters<typeof this.sendSignedTubiNetworkRequest>[0]) {
+    const hashedPayload = createHash('sha256').update(requestOptions.body).digest('hex');
+
+    const headersArray = [];
+    const headers = {...requestOptions.headers};
+
+    for (const key in headers) {
+      const headerValue = headers[key] as string;
+      headersArray.push(`${key.toLowerCase()}:${headerValue}`);
+    }
+
+    const canonicalRequest = [
+      requestOptions.method.toUpperCase(),
+      new URL(requestOptions.url).pathname,
+      '', // Query string not building out for now
+      headersArray.join('\n'), // canonicalHeader
+      '', // Note must have extra new line here
+      this.constructSignedHeaders(requestOptions), //signedHeader
+      hashedPayload
+    ].join('\n');
+
+
+    return canonicalRequest;
+  }
+
+
+  private hmac(contents, secret) {
+    const result = createHmac('SHA256', secret).update(contents).digest();
+    return result;
+  }
+}
+
 const testUtils = new TestUtils();
+const auth = new Auth();
 
 export {
   testUtils
@@ -350,4 +716,4 @@ type KeyPathElement = {
   keyPath: string;
 };
 
-type DeeplinkPage = 'movies' | 'livefeed' | 'genre' | 'network' | 'tv' | 'espanol' | 'kids'
+type DeeplinkPage = 'movies' | 'livefeed' | 'genre' | 'network' | 'tv' | 'espanol' | 'kids' | 'home'

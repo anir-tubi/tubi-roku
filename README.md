@@ -514,6 +514,10 @@ Then run:
 
 `$ gulp install --qa`
 
+# Automated Testing
+
+In addition to Suitest tests we are now adding our own internal tests as well. Getting started with these is covered in this [wiki](https://tubitv.atlassian.net/wiki/spaces/QA/pages/2827419649/Roku+RTA+tests+environment+setup+and+getting+started+writing+tests)
+
 # Experiments
 
 We may want to see how a new feature will affect the app's metrics from a small group of our users before rolling out the feature to everyone on a given  platform. To do this, we will need to use the popper experiment system to let the app know when an experimental feature should be seen. Below are the details of this process.

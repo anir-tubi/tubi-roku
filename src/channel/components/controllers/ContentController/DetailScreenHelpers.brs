@@ -1504,7 +1504,6 @@ Function onHistoryRemovedSuccess(_response) As Void
   tubiLog("DetailScreenHelpers.onHistoryRemoved")
   detailScreen = getTopDetailScreenFromStack()
   if detailScreen <> invalid
-    detailScreen.isWaitingForServerResponse = false
     setIsHistory(detailScreen, false)
     sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_CONTINUE_WATCHING", m.Tracking, m.trackingLoggingTask, m.constants)
     handleHistoryChange()
@@ -2151,7 +2150,6 @@ Function removeFromQueueSuccessResponse(_response)
   tubiLog("DetailScreenHelpers.removeFromQueueSuccessResponse")
   detailScreen = getTopDetailScreenFromStack()
   if detailScreen <> invalid
-    detailScreen.isWaitingForServerResponse = false
     sendBookmarkAnalytics(detailScreen.content, "REMOVE_FROM_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
   end if
 
@@ -2205,16 +2203,10 @@ Function addToQueueSuccessResponse(response)
   detailScreen = getTopDetailScreenFromStack()
 
   if detailScreen <> invalid
-    detailScreen.isWaitingForServerResponse = false
-
     if response <> invalid
       bookmarkId = response.id
 
       if bookmarkId <> invalid
-        if response <> invalid AND detailScreen.content.id.toInt() = response.content_id
-          setIsBookmark(detailScreen, true)
-        end if
-
         sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
         handleQueueChange()
       end if
