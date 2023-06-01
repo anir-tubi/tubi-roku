@@ -66,7 +66,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_dash: {
-        roku_dash_v2 : {"enabled": false}
+        roku_dash_v2 : {"enabled": true}
       }
 
       roku_video_preview_search_screen: {
