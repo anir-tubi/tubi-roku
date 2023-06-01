@@ -21,9 +21,11 @@
       <!-- only set a width for fixed width buttons. -->
       <field id="width" type="integer" />
 
-      <field id="height" alias="buttonBG.height"/>
-      <field id="uri" alias="buttonBG.uri"/>
+      <field id="height" alias="focus9Patch.height"/>
+      <field id="uri" alias="focus9Patch.uri"/>
+      <field id="notFilledBackgroundColor" alias="notFilledBackground.color"/>
       <field id="fontSize" alias="labelFont.size"/>
+      <field id="isFilled" type="boolean" value="true" />
       <field id="text" type="String" />
       <field id="unfocusedBackgroundOpacity" type="float" value="0.17"/>
 
@@ -33,11 +35,16 @@
   </interface>
 
   <children>
+    <Rectangle
+      id="notFilledBackground"
+      height="80"
+      translation="[0,0]"
+      visible="false" />
     <Poster
-      id="buttonBG"
+      id="focus9Patch"
       height="80"
       uri="pkg:/images/menu-focus-$$RES$$.9.png"
-      translation="[0,0]"/>
+      translation="[0,0]" />
     <Label
       id="label"
       opacity="1.0"

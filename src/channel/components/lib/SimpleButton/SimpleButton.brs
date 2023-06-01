@@ -1,8 +1,17 @@
 Function init()
-  m.buttonBG = m.top.findNode("buttonBG")
+  m.focus9Patch = m.top.findNode("focus9Patch")
   m.label = m.top.findNode("label")
+  'This is used to add a background when the button is not filled so that text
+  'can be seen if the button is placed over an image with a light background.
+  'The skipIntro button is an example of how this is used.
+  m.notFilledBackground = m.top.findNode("notFilledBackground")
+
+  if m.top.isFilled = false
+    m.notFilledBackground.visible = true
+  end if
+
   m.originalColor = ""  '//the default color based on the theme if no color is passed into the component via the m.top.color field
-  m.buttonBG.opacity = m.top.unfocusedBackgroundOpacity
+  m.focus9Patch.opacity = m.top.unfocusedBackgroundOpacity
 
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
   m.top.observeFieldScoped("unfocusedBackgroundOpacity", "onOpacityChanged")
@@ -33,11 +42,12 @@ End Function
 
 
 Function onWidthChanged(msg)
-  ' not using an alias so updates to label.width and buttonBG.width don't feed back to overwrite m.top.width
+  ' not using an alias so updates to label.width and focus9Patch.width don't feed back to overwrite m.top.width
   ' which is used in onTextChanged() to determine if the button should be auto resized or not
   width = msg.getData()
   m.label.width = width
-  m.buttonBG.width = width
+  m.focus9Patch.width = width
+  m.notFilledBackground.width = width
 End Function
 
 
@@ -49,7 +59,8 @@ Function onTextChanged()
     m.label.width = 0
     m.label.text = m.top.text
     width = m.label.boundingRect().width + 60
-    m.buttonBG.width = width
+    m.focus9Patch.width = width
+    m.notFilledBackground.width = width
     m.label.width = width
   else
     m.label.text = m.top.text
@@ -57,11 +68,13 @@ Function onTextChanged()
 
   if m.top.height = 0
     height = m.label.boundingRect().height + 60
-    m.buttonBG.height = height
+    m.focus9Patch.height = height
+    m.notFilledBackground.height = height
     m.label.height = height
   else
     m.label.height = m.top.height
-    m.buttonBG.height = m.top.height
+    m.focus9Patch.height = m.top.height
+    m.notFilledBackground.height = m.top.height
   end if
 End Function
 
@@ -71,23 +84,27 @@ Function onScreenFocusChange()
 
   if m.top.hasFocus() then
     if m.theme <> invalid
-      m.buttonBG.blendColor = m.theme.focusedColor
+      m.focus9Patch.blendColor = m.theme.focusedColor
       m.label.color = m.theme.focusedTextColor
     end if
-    m.buttonBG.opacity = 1.0
+    m.focus9Patch.opacity = 1.0
   else
     if isNonEmptyString(m.top.color) = true
       '//if the color was set from the outside then use that color
-      m.buttonBG.blendColor = m.top.color
+      m.focus9Patch.blendColor = m.top.color
     else
-      m.buttonBG.blendColor = m.originalColor
+      m.focus9Patch.blendColor = m.originalColor
     end if
 
     if m.theme <> invalid
       m.label.color = m.theme.primaryTextColor
     end if
 
-    m.buttonBG.opacity = m.top.unfocusedBackgroundOpacity
+    if m.top.isFilled = false
+      m.focus9Patch.opacity = 1.0
+    else
+      m.focus9Patch.opacity = m.top.unfocusedBackgroundOpacity
+    end if
   end if
 
 End Function
@@ -95,8 +112,10 @@ End Function
 
 Function onOpacityChanged()
 
-  if m.top.hasFocus() = false
-    m.buttonBG.opacity = m.top.unfocusedBackgroundOpacity
+  if m.top.isFilled = false
+    m.focus9Patch.opacity = 1.0
+  else if m.top.hasFocus() = false
+    m.focus9Patch.opacity = m.top.unfocusedBackgroundOpacity
   end if
 
 End Function

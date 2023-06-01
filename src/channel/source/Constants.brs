@@ -1348,6 +1348,7 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
     defaultDarkPrimaryAccent = "THEME_defaultDarkPrimaryAccent_THEME"
     defaultDarkPrimaryBackground = "THEME_defaultDarkPrimaryBackground_THEME"
     defaultDarkPrimaryForeground = "THEME_defaultDarkPrimaryForeground_THEME"
+    defaultDarkTransparentBackground50 = "THEME_defaultDarkTransparentBackground50_THEME"
     defaultDarkTransparentBackground75 = "THEME_defaultDarkTransparentBackground75_THEME"
     ' defaultDarkTransparentForeground0 = "THEME_defaultDarktransparentforeground0_THEME"    '//::NOTE::  not currently being used
     defaultDarkTransparentForeground5 = "THEME_defaultDarkTransparentForeground5_THEME"
@@ -1371,6 +1372,7 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
     kidsDarkPrimaryAccent = "THEME_kidsDarkPrimaryAccent_THEME"
     kidsDarkPrimaryBackground = "THEME_kidsDarkPrimaryBackground_THEME"
     kidsDarkPrimaryForeground = "THEME_kidsDarkPrimaryForeground_THEME"
+    kidsDarkTransparentBackground50 = "THEME_kidsDarkTransparentBackground50_THEME"
     kidsDarkTransparentBackground75 = "THEME_kidsDarkTransparentBackground75_THEME"
     ' kidsDarkTransparentForeground0 = "THEME_kidsDarktransparentforeground0_THEME"   '//::NOTE:: not currently being used
     kidsDarkTransparentForeground5 = "THEME_kidsDarkTransparentForeground5_THEME"
@@ -1394,6 +1396,7 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
     holidaysDarkPrimaryAccent = "THEME_holidaysDarkPrimaryAccent_THEME"
     holidaysDarkPrimaryBackground = "THEME_holidaysDarkPrimaryBackground_THEME"
     holidaysDarkPrimaryForeground = "THEME_holidaysDarkPrimaryForeground_THEME"
+    holidaysDarkTransparentBackground50 = "THEME_holidaysDarkTransparentBackground50_THEME"
     holidaysDarkTransparentBackground75 = "THEME_holidaysDarkTransparentBackground75_THEME"
     ' holidaysDarkTransparentForeground0 = "THEME_holidaysDarktransparentforeground0_THEME"   '//::NOTE:: not currently being used
     holidaysDarkTransparentForeground5 = "THEME_holidaysDarkTransparentForeground5_THEME"
@@ -1445,6 +1448,7 @@ constants.ui.themes = {}
         backgroundColorLight: defaultDarkPrimaryForeground
         backgroundColorLight2: defaultDarkTransparentForeground75
         shadeColor: defaultDarkTransparentBackground75
+        shadeColor2: defaultDarkTransparentBackground50
         focused2Color: defaultDarkStatusAlert
         unfocusedColor: defaultDarkPrimaryForeground
         selectedListItemColor: defaultDarkTransparentForeground5
@@ -1479,6 +1483,7 @@ constants.ui.themes = {}
         backgroundColorLight: kidsDarkPrimaryForeground
         backgroundColorLight2: kidsDarkTransparentForeground75
         shadeColor: kidsDarkTransparentBackground75
+        shadeColor2: kidsDarkTransparentBackground50
         focused2Color: kidsDarkStatusAlert
         unfocusedColor: kidsDarkPrimaryForeground
         selectedListItemColor: kidsDarkTransparentForeground5
@@ -1513,6 +1518,7 @@ constants.ui.themes = {}
         backgroundColorLight: holidaysDarkPrimaryForeground
         backgroundColorLight2: holidaysDarkTransparentForeground75
         shadeColor: holidaysDarkTransparentBackground75
+        shadeColor2: holidaysDarkTransparentBackground50
         focused2Color: holidaysDarkStatusAlert
         unfocusedColor: holidaysDarkPrimaryForeground
         selectedListItemColor: holidaysDarkTransparentForeground5

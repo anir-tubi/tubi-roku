@@ -316,6 +316,7 @@
 
     <SimpleButton
       id="SkipCuepointsButton"
+      isFilled="false"
       visible="false"/>
 
     <Group

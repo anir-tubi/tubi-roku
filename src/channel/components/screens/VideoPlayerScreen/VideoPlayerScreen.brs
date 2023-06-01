@@ -524,6 +524,7 @@ Function onThemeChange(msg = invalid)
     m.LoadingProgressBar.trackColor = theme.neutralColor2
     m.ProgressBar.trackColor = theme.neutralColor2
     m.SkipCuepointsButton.color = theme.backgroundColorLight2
+    m.skipCuepointsButton.notFilledBackgroundColor = theme.shadeColor2
     m.closedCaptionAndAudioSelectionOverlayGroup.color = theme.shadeColor
 
     if theme.id = m.constants.ui.themeIDs.kidsMode
