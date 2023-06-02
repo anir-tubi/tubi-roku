@@ -39,12 +39,12 @@ Function VideoErrorsSetup()
 
   'mock a video node's error code and message for error -3
   mockedInfo.errorCode3 = -3
-  mockedInfo.errorMsg3 = "An unexpected problem (but not server timeout or HTTP error) has been detected."
-  mockedInfo.alteredErrorMsg3 = "Server did not respond with hls segment. Potential 504 or 404. Following segment likely has issue."
+  mockedInfo.errorStr3 = "An unexpected problem (but not server timeout or HTTP error) has been detected."
+  mockedInfo.alteredErrorStr3 = "Server did not respond with hls segment. Potential 504 or 404. Following segment likely has issue."
 
   'mock a video node's error code and message for error -5
   mockedInfo.errorCode5 = -5
-  mockedInfo.errorMsg5 = "malformed data"
+  mockedInfo.errorStr5 = "malformed data"
 
   'mock a content node
   mockedInfo.content = CreateObject("roSGNode", "ContentNode")
@@ -74,9 +74,9 @@ Function videoHelpers_getPlaybackErrorInfo_test()
     segment_sequence: mi.streamingSegment.segSequence
     segment_bitrate: mi.streamingSegment.segBitrateBps
     error_code: mi.errorCode5
-    error_message: mi.errorMsg5
+    error_message: mi.errorStr5
   }
-  errorInfo = getPlaybackErrorInfo(437, mi.downloadedSegment, mi.streamingSegment, mi.streamInfo, mi.errorCode5, mi.errorMsg5, mi.content)
+  errorInfo = getPlaybackErrorInfo(437, mi.downloadedSegment, mi.streamingSegment, mi.streamInfo, mi.errorCode5, mi.errorStr5, mi.content)
   m.AssertEqual(errorInfo, correctErrorInfo)
 End Function
 
@@ -88,9 +88,9 @@ Function videoHelpers_getPlaybackErrorInfo_Position0()
     video_id: mi.content.id
     video_url: removeExcessUrl(mi.content.url)
     error_code: mi.errorCode5
-    error_message: mi.errorMsg5
+    error_message: mi.errorStr5
   }
-  errorInfo = getPlaybackErrorInfo(0, mi.downloadedSegment, mi.streamingSegment, mi.streamInfo, mi.errorCode5, mi.errorMsg5, mi.content)
+  errorInfo = getPlaybackErrorInfo(0, mi.downloadedSegment, mi.streamingSegment, mi.streamInfo, mi.errorCode5, mi.errorStr5, mi.content)
   m.AssertEqual(errorInfo, correctErrorInfo)
 End Function
 
@@ -105,9 +105,9 @@ Function videoHelpers_getPlaybackErrorInfo_Error3()
     segment_sequence: mi.downloadedSegment.segSequence
     segment_bitrate: mi.downloadedSegment.bitrateBps
     error_code: mi.errorCode3
-    error_message: mi.alteredErrorMsg3
+    error_message: mi.alteredErrorStr3
   }
-  errorInfo = getPlaybackErrorInfo(437, mi.downloadedSegment, mi.streamingSegment, mi.streamInfo, mi.errorCode3, mi.errorMsg3, mi.content)
+  errorInfo = getPlaybackErrorInfo(437, mi.downloadedSegment, mi.streamingSegment, mi.streamInfo, mi.errorCode3, mi.errorStr3, mi.content)
   m.AssertEqual(errorInfo, correctErrorInfo)
 End Function
 
@@ -119,9 +119,9 @@ Function videoHelpers_getPlaybackErrorInfo_Error3_Position0()
     video_id: mi.content.id
     video_url: removeExcessUrl(mi.content.url)
     error_code: mi.errorCode3
-    error_message: mi.alteredErrorMsg3
+    error_message: mi.alteredErrorStr3
   }
-  errorInfo = getPlaybackErrorInfo(0, mi.downloadedSegment, mi.streamingSegment, mi.streamInfo, mi.errorCode3, mi.errorMsg3, mi.content)
+  errorInfo = getPlaybackErrorInfo(0, mi.downloadedSegment, mi.streamingSegment, mi.streamInfo, mi.errorCode3, mi.errorStr3, mi.content)
   m.AssertEqual(errorInfo, correctErrorInfo)
 End Function
 

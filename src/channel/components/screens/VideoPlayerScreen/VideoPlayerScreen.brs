@@ -640,7 +640,7 @@ Function onVideoStateChange(msg)
     end if
   else if state = "error"
     content = m.Video.content
-    errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo,m.Video.errorCode, m.Video.errorMsg, content)
+    errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo,m.Video.errorCode, m.Video.errorStr, content)
     jsonErrorInfo = FormatJSON(errorInfo)
     ' sending the logs to uapi
     tubiLog(jsonErrorInfo, "error", "videoPlayback", "video-playback", 0.1)
@@ -1177,7 +1177,7 @@ Function onBufferingTimerFired()
   m.bufferingTimer.control = "stop"
 
   content = m.Video.content
-  errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo, m.Video.errorCode, m.Video.errorMsg, content)
+  errorInfo = getPlaybackErrorInfo(m.Video.position, m.Video.downloadedSegment, m.Video.streamingSegment, m.Video.streamingInfo, m.Video.errorCode, m.Video.errorStr, content)
 
   if m.startUpBuffering = true
     tubiLog(FormatJSON(errorInfo), "warn", "videoBuffer", "video-buffer-startup", 0.1)
@@ -1596,7 +1596,7 @@ Function setDrmOnContent(contentNode, resource, videoResourceIndex)
 End Function
 
 
-Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, streamInfo, errorCode, errorMsg, content)
+Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, streamInfo, errorCode, errorStr, content)
   errorInfo = {
     video_id: ""
     video_url: ""
@@ -1613,14 +1613,8 @@ Function getPlaybackErrorInfo(position, downloadedSegment, streamingSegment, str
       errorInfo.segment_url = removeExcessUrl(downloadedSegment.SegUrl)
       errorInfo.segment_bitrate = downloadedSegment.BitrateBps
     end if
-  else if errorMsg <> invalid
-    if errorCode = 0
-      ' original network error message is to long:
-      ' "Network error.  This could be caused by any of the following problems: (1) The server is down or unresponsive. (2) The server is unreachable. (3) There is a network setup issue on the client."
-      errorInfo.error_message = "Network error"
-    else
-      errorInfo.error_message = errorMsg
-    end if
+  else if errorStr <> invalid
+    errorInfo.error_message = errorStr
     if position > 0 AND streamingSegment <> invalid
       ' streamingSegment can be invalid when the server returns a 504, 404, etc.
       errorInfo.segment_url = removeExcessUrl(streamingSegment.segUrl)
