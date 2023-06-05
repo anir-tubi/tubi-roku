@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<component name="EpisodesScreen" extends="BaseScreen" initialFocus="Menu" >
+<component name="EpisodesScreen" extends="BaseScreen">
 
   <script type="text/brightscript" uri="EpisodesScreen.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />

@@ -591,6 +591,7 @@ End Function
 
 ' Stop the video player and refresh detail screen with the relevant content
 ' @sendAnalyticsEvent: boolean, based on this parameter the pageload/navigate event will be fired during popScreen
+' @shouldUpdateEpisodeScreenContent: boolean, based on this parameter we will decide if we need to refresh the episode list screen or not.
 '
 ' Use cases:                                                Actions:
 '   - Exit video player movie                                 : 1 - redraw detail screen with existing detail content to update resume position; preserve related items
@@ -603,7 +604,7 @@ End Function
 '   - Deep link: exit video player movie after autoplay       : 2 - redraw detail screen with autoplayed content from video player; fetch new related items
 '   - Deep link: Exit video player series                     : 3 - redraw detail screen with existing detail content to updated resume positions; preserve related items
 '   - Deep link: Exit video player series after autoplay      : 4 - redraw detail screen with autoplayed episode metadata, but maintain series content; preserve related items
-Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true)
+Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEpisodeScreenContent = true)
   tubiLog("VideoHelpers.returnToDetailScreenFromVideo")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
@@ -683,7 +684,9 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true)
           updateNowPosForEpisode(detailContent, itemFocused, historyPosition)
 
           episodesScreen.content = detailContent
-          episodesScreen.updateContent = true
+          if shouldUpdateEpisodeScreenContent = true
+            episodesScreen.updateContent = true
+          end if
           'if end reached for an episode, then place focus on next episode.
           'if upnextContent is not present, then videoplayer will backout to previous screen.
           if isEndReached = true

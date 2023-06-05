@@ -1642,9 +1642,9 @@ Function onCustomSuspend(msg)
     currentScreen = getCurrentScreen()
     ' if the current screen is videoplayer, return to detail screen so that it will update historyPosition AND remove video screen from stack AND show previous screen from stack
     if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
-      ' don't send analytics event when user presses "home" button during playback, so sending param as false
       currentScreen.sendPendingPauseAdPixel = true
-      returnToDetailScreenFromVideo(false)
+      ' don't send analytics event when user presses "home" button during playback, so sending param as false.
+      returnToDetailScreenFromVideo(false, false)
     else if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.categoryDetailsScreen
       ' if current screen is categoryDetailsScreen, instant resume action is to start the channel from the homescreen (not a full channel restart).
       ' Remove the parent screen from the cache so that it is reloaded if a user navigates back to it in order to prevent a UX bug such that the cached screen
@@ -1786,6 +1786,10 @@ Function onCustomResume(msg)
     restartAppFromInstantResume()
   else if bStartChannel = true
     startChannelFromInstantResume()
+  else
+    if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.episodeScreen
+      currentScreen.updateContent = true
+    end if
   end if
 End Function
 
