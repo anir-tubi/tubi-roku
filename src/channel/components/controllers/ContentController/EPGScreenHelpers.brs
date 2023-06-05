@@ -476,6 +476,7 @@ Function onEPGScreenOKPressed()
         playbackSource = {
           "srcForAnalytic": m.constants.player.playbackSource.unknown
           "srcForAds": m.constants.player.playbackOrigin.epg
+          "playbackContainer": contentToPlay.parentId
           }
         playLinearVideoContent(contentToPlay, false, currentScreen.id, false, playbackSource)
       else
@@ -550,6 +551,7 @@ Function refreshEPGScreenVideoPlay(refreshVideoPlay, epgScreen)
         playbackSource = {
           "srcForAnalytic": m.constants.player.playbackSource.unknown
           "srcForAds": m.constants.player.playbackOrigin.epg
+          "playbackContainer": contentToPlay.parentId
         }
         playLinearVideoContent(contentToPlay, true, currentScreen.id, false, playbackSource)
       end if

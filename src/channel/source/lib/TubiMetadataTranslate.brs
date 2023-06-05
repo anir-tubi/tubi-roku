@@ -1935,6 +1935,10 @@ Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, reques
             channelContentNode.parentTitle = container.name
           end if
 
+          if container.container_id <> invalid
+            channelContentNode.parentId = container.container_id
+          end if
+
           channelContentNode.title = channelFromServer.title
           channelContentNode.type = m.contentTypes.linear
           channelContentNode.channelName = channelFromServer.title

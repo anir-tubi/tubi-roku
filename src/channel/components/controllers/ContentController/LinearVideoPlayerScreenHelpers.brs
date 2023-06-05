@@ -780,6 +780,7 @@ Function onLinearChannelSelectedFromGuide(msg)
         playbackSource = {
           "srcForAnalytic": m.constants.player.playbackSource.unknown
           "srcForAds": m.constants.player.playbackOrigin.epg
+          "playbackContainer": channel.parentId
         }
         playLinearVideoContent(channel, false, videoPlayer.associatedScreenID, videoPlayer.allowTransportToAppear, playbackSource)
         newTrackingPageInfo = videoPlayer.trackingPageInfo
@@ -820,6 +821,7 @@ Function onRetryLinearPlayerError()
     playbackSource = {
       "srcForAnalytic": m.constants.player.playbackSource.unknown
       "srcForAds": m.constants.player.playbackOrigin.epg
+      "playbackContainer": content.parentId
     }
     playLinearVideoContent(content, false, videoPlayer.associatedScreenID, videoPlayer.allowTransportToAppear, playbackSource)
   end if
