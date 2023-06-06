@@ -87,10 +87,6 @@ Function TubiExperiments(constants) as Object
         roku_pause_ads_v1 : {"enabled": false}
       }
 
-      ads_configuration_roku_google_pal_integration:{
-        roku_ads_configuration_roku_google_pal_integration_v1: {"enabled": false}
-      }
-
       roku_update_history_frequency: {
         roku_update_history_frequency_v1 : {"enabled": false}
       }
