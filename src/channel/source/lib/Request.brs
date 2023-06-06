@@ -262,65 +262,60 @@ Function tubi_handleHttpEvent(message As Object) As Object
   ' handle retries
   if type(message) = "roUrlEvent" then
     if message.GetSourceIdentity() = m.urltransfer.GetIdentity() then
-      if message.GetInt() = 1 then
-        ' 1. Check success or failure?
-        code = message.GetResponseCode()
+      code = message.GetResponseCode()
 
-        'server said our auth token was not valid
-        if m.authInfo <> invalid AND m.authInfo.userId <> invalid AND code = 403 AND m.retries > 0
-          newAuthInfo = m.refreshAuthToken(m.authInfo, 100)
-          if newAuthInfo <> invalid
-            'replace any necessary new auth info in the headers and try again
-            authHeaders = m.getAuthHeaders(newAuthInfo.accessToken)
+      'server said our auth token was not valid
+      if m.authInfo <> invalid AND m.authInfo.userId <> invalid AND code = 403 AND m.retries > 0
+        newAuthInfo = m.refreshAuthToken(m.authInfo, 100)
+        if newAuthInfo <> invalid
+          'replace any necessary new auth info in the headers and try again
+          authHeaders = m.getAuthHeaders(newAuthInfo.accessToken)
 
-            if authHeaders <> invalid
-              for each header in authHeaders
-                m.headers[header] = authHeaders[header]
-              end for
+          if authHeaders <> invalid
+            for each header in authHeaders
+              m.headers[header] = authHeaders[header]
+            end for
 
-              m.retries = m.retries - 1
-              m.start(m.urltransfer)
-            end if
-
-          else  ' refreshing the auth token failed so just attach the response info and finish
-            m.response = {
-              headers: message.GetResponseHeaders()
-              code: code
-              data: message.GetString()
-              failReason: message.GetFailureReason()
-            }
-            m.urltransfer = invalid ' release reference in case this will be reused
-            return m
+            m.retries = m.retries - 1
+            m.start(m.urltransfer)
           end if
 
-        else if code < 0 AND m.retries > 0 then
-          m.retries = m.retries - 1
-          m.start(m.urltransfer) ' fire off the request again
-        else
-          ' Here on success or on retry limit
+        else  ' refreshing the auth token failed so just attach the response info and finish
           m.response = {
             headers: message.GetResponseHeaders()
             code: code
             data: message.GetString()
             failReason: message.GetFailureReason()
-            name: m.name
           }
-
-          ' print response info for debugging
-          if m.printReqAndResInfo = true
-            if Left(m.name, 5) = "track"
-              print ""
-              print "received "; code; " for "; m.name
-              print m.response.data
-              print ""
-            end if
-          end if
-
           m.urltransfer = invalid ' release reference in case this will be reused
           return m
         end if
+
+      else if code < 0 AND m.retries > 0 then
+        m.retries = m.retries - 1
+        m.start(m.urltransfer) ' fire off the request again
       else
-        ' only 1 is valid?  Here for future-proofing
+        ' Here on success or on retry limit
+        m.response = {
+          headers: message.GetResponseHeaders()
+          code: code
+          data: message.GetString()
+          failReason: message.GetFailureReason()
+          name: m.name
+        }
+
+        ' print response info for debugging
+        if m.printReqAndResInfo = true
+          if Left(m.name, 5) = "track"
+            print ""
+            print "received "; code; " for "; m.name
+            print m.response.data
+            print ""
+          end if
+        end if
+
+        m.urltransfer = invalid ' release reference in case this will be reused
+        return m
       end if
     else
       ' some other request is served by the same message port?  Ignore it
@@ -475,33 +470,45 @@ Function tubi_handleHttpEventV2(message As Object) As Object
 
   if type(message) = "roUrlEvent" then
     if message.GetSourceIdentity() = m.urltransfer.GetIdentity() then
-      if message.GetInt() = 1 then
-        ' 1. Check success or failure?
-        code = message.GetResponseCode()
+      code = message.GetResponseCode()
 
-        m.response = {
-          headers: message.GetResponseHeaders()
-          code: code
-          data: message.GetString()
-          failReason: message.GetFailureReason()
-          name: m.name
-        }
+      response = {
+        headers: message.GetResponseHeaders()
+        code: code
+        data: message.GetString()
+        failReason: message.GetFailureReason()
+        name: m.name
+      }
 
-        ' print response info for debugging
-        if m.printReqAndResInfo = true
-          if Left(m.name, 5) = "track"
-            print ""
-            print "received "; code; " for "; m.name
-            print m.response.data
-            print ""
+      if code < 0 then
+        dnsInfo = {}
+        response["targetIpAddress"] = message.getTargetIpAddress()
+        di = createObject("roDeviceInfo")
+        connection = di.getConnectionInfo()
+        for i = 0 to 5
+          keyName = "dns." + i.toStr()
+          currentDns = connection[keyName]
+          if currentDns <> invalid then
+            dnsInfo[keyName] = currentDns
           end if
-        end if
-
-        m.urltransfer = invalid ' release reference in case this will be reused
-        return m
-      else
-        ' only 1 is valid?  Here for future-proofing
+        end for
+        response["dnsInfo"] = dnsInfo
       end if
+
+      m.response = response
+
+      ' print response info for debugging
+      if m.printReqAndResInfo = true
+        if Left(m.name, 5) = "track"
+          print ""
+          print "received "; code; " for "; m.name
+          print m.response.data
+          print ""
+        end if
+      end if
+
+      m.urltransfer = invalid ' release reference in case this will be reused
+      return m
     else
       ' some other request is served by the same message port?  Ignore it
     end if

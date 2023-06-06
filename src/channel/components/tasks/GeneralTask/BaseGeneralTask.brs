@@ -108,7 +108,7 @@ Function makeApiRequest(reqInfo, batchInfo = invalid) as Boolean
       if m.authInfo = invalid OR m.authInfo.accessToken = invalid
         m.authInfo = m.auth.fetchAndSaveAnonymousAuthInfo()
       end if
-      
+
       if m.authInfo <> invalid AND m.authInfo.accessToken <> invalid
         headers = m.auth.getAuthHeaders(m.authInfo.accessToken)
         if headers <> invalid
@@ -504,6 +504,8 @@ Function sendApiErrorLog(result)
     url: result.url
   }
 
+  errorInfo = appendDnsInfo(responseFromServer, errorInfo)
+
   jsonErrorInfo = FormatJSON(errorInfo)
   ' sending error logs to uapi
   tubiLog(jsonErrorInfo, "error", "apiError", responseFromServer.name, 0.1)
@@ -514,7 +516,15 @@ Function sendApiErrorLog(result)
   errorInfo.headers = result.headers
   ' sending error logs to sentry sdk
   tubiException(errorInfo, "error", 0.1)
+End Function
 
+
+Function appendDnsInfo(responseFromServer, errorInfo)
+  if responseFromServer.dnsInfo <> invalid then
+    errorInfo.append(responseFromServer.dnsInfo)
+  end if
+
+  return errorInfo
 End Function
 
 
