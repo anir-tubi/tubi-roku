@@ -6,10 +6,6 @@ Function init()
   'The skipIntro button is an example of how this is used.
   m.notFilledBackground = m.top.findNode("notFilledBackground")
 
-  if m.top.isFilled = false
-    m.notFilledBackground.visible = true
-  end if
-
   m.originalColor = ""  '//the default color based on the theme if no color is passed into the component via the m.top.color field
   m.focus9Patch.opacity = m.top.unfocusedBackgroundOpacity
 
@@ -18,6 +14,7 @@ Function init()
 
   m.top.observeFieldScoped("width", "onWidthChanged")
   m.top.observeFieldScoped("text", "onTextChanged")
+  m.top.observeFieldScoped("isFilled", "onIsFilledChange")
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -75,6 +72,17 @@ Function onTextChanged()
     m.label.height = m.top.height
     m.focus9Patch.height = m.top.height
     m.notFilledBackground.height = m.top.height
+  end if
+End Function
+
+
+Function onIsFilledChange(msg)
+  isFilled = msg.getData()
+
+  if isFilled = false
+    m.notFilledBackground.visible = true
+  else
+    m.notFilledBackground.visible = false
   end if
 End Function
 
