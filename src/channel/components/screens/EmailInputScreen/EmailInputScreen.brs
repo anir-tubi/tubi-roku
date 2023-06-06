@@ -17,7 +17,8 @@ Function init()
 
   m.keyboard = m.top.findNode("Keyboard")
   m.keyboard.textEditBox.opacity = 0.00001
-  m.Keyboard.textEditBox.maxTextLength = 100
+  m.keyboard.textEditBox.maxTextLength = 100
+  m.keyboard.keyGrid.observeFieldScoped("keyFocused", "onKeyGridKeyFocusedChange")
 
   'This will save the last focused key of the keyboard used to enable the roku default audioguide after screen components read.
   m.keyFocused = ""
@@ -57,18 +58,16 @@ Function init()
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
-  onThemeChange()
+
+  m.theme = getThemeFromGlobal()
 End Function
 
 
 Function onThemeChange(msg = invalid)
-  if msg <> invalid
-    theme = msg.getData()
-  else
-    theme = getThemeFromGlobal()
-  end if
+  theme = msg.getData()
 
   if theme <> invalid
+    m.theme = theme
     m.back.color = theme.backgroundColorLight
     m.continue.color = theme.backgroundColorLight
     m.emailValidationMsg.color = theme.cautionColor
@@ -88,6 +87,7 @@ Function onScreenFocusChange()
     m.top.backgroundUriList = m.backgroundUriList
 
     m.Keyboard.textEditBox.voiceEnabled = true
+    m.keyboard.domain = "email"
     m.keyboard.keyGrid.setFocus(true)
   end if
 
@@ -97,6 +97,23 @@ Function onScreenFocusChange()
     m.Keyboard.textEditBox.voiceEnabled = false
   end if
 
+End Function
+
+
+Function onKeyGridKeyFocusedChange(msg)
+  theme = m.theme
+  if theme <> invalid then
+    keyFocused = msg.getData()
+    paletteColors = m.keyboard.palette.colors
+    if keyFocused = "@" then
+      paletteColors.FocusColor = theme.keyboardFocusedTextColor
+      paletteColors.FocusItemColor = theme.focusedColor
+    else
+      paletteColors.FocusColor = theme.focusedColor
+      paletteColors.FocusItemColor = theme.keyboardFocusedTextColor
+    end if
+    m.keyboard.palette.colors = paletteColors
+  end if
 End Function
 
 
