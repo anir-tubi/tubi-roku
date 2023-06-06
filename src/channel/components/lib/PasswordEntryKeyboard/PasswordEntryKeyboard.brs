@@ -22,6 +22,11 @@ Function init()
   m.keyboard.textEditBox.opacity = 0.00001
   m.keyboard.palette = handleKeyboardColors()
 
+  m.keyboard.observeFieldScoped("keyGrid", "onKeyGridChange")
+
+  'This will save the last focused key of the keyboard used to enable the roku default audioguide after screen components read.
+  m.keyFocused = ""
+
   '//Keep a record of keys that are on the lower line of the left side of the keyboard
   m.aLeftLowerKeys = {}
   m.aLeftLowerKeys["left"] =  true
@@ -100,12 +105,12 @@ Function onFocusDelayTimerFired()
     sPreviouslyFocusedKey = m.keyboard.focusedChild.keyFocused
     if sPreviouslyFocusedKey <> invalid AND m.aLeftLowerKeys[sPreviouslyFocusedKey] = true
       '//if the key focus is on the lower left of the keyboard, then set focus on the back button
-      m.back.setFocus(true)
+      setFocusToComponent(m.back)
     else if sPreviouslyFocusedKey <> invalid AND m.aRightLowerKeys[sPreviouslyFocusedKey] = true
       '//if the key focus is on the lower right of the keyboard, then set focus on the showHidePassword button
-      m.showHidePassword.setFocus(true)
+      setFocusToComponent(m.showHidePassword)
     else
-      m.continue.setFocus(true)
+      setFocusToComponent(m.continue)
     end if
   end if
 End Function
@@ -123,11 +128,11 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
     else if key = "up"
       if m.continue.hasFocus() = true
-        m.keyboard.setFocus(true)
+        setFocusToComponent(m.keyboard)
       else if m.showHidePassword.hasFocus() = true
-        m.keyboard.setFocus(true)
+        setFocusToComponent(m.keyboard)
       else if m.back.hasFocus() = true
-        m.keyboard.setFocus(true)
+        setFocusToComponent(m.keyboard)
       else if m.top.isInFocusChain() = true
         m.top.buttonSelected = "up"
       end if
@@ -135,17 +140,17 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
     else if key = "right"
 
       if m.back.hasFocus() = true
-        m.continue.setFocus(true)
+        setFocusToComponent(m.continue)
       else if m.continue.hasFocus() = true
-        m.showHidePassword.setFocus(true)
+        setFocusToComponent(m.showHidePassword)
       end if
 
     else if key = "left"
 
       if m.continue.hasFocus() = true
-        m.back.setFocus(true)
+        setFocusToComponent(m.back)
       else if m.showHidePassword.hasFocus() = true
-        m.continue.setFocus(true)
+        setFocusToComponent(m.continue)
       end if
     else if key = "back"
         handled = false
@@ -154,4 +159,48 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
     return handled
   end if
   return false
+End Function
+
+
+Function setFocusToComponent(focusTarget)
+  if focusTarget <> invalid
+
+    if focusTarget.id = m.keyboard.id
+      'This will enable the default roku screen reader to read the focused keys in keyboard.
+      m.keyboard.muteAudioGuide = false
+      m.top.audioGuideText = ""
+    else
+      'This will disable the default roku screen reader to read the components which are not read by roku default screen reader.
+      m.keyboard.muteAudioGuide = true
+      m.top.audioGuideText = focusTarget.text
+    end if
+    
+    focusTarget.setFocus(true)
+  end if
+End Function
+
+
+'This function is to read the first focused keys in the keyboard as we disable the default screen reader for keyboard initially
+'to read the screen components and later we enable roku default screen reader for keyboard.
+'NOTE: hardcoded values are to match the default keyboard.
+Function onKeyGridChange(msg)
+  keyGrid = msg.getData()
+  if isNonEmptyString(m.keyFocused) = true AND m.keyboard.muteAudioGuide = true
+    audioGuideText = ""
+    if keyGrid.keyFocused = "a"
+      audioGuideText = keyGrid.keyFocused + " " + "alpha"
+    else
+      audioGuideText = keyGrid.keyFocused +  " " + m.constants.audioGuideHints.buttonHint
+    end if
+
+    m.top.audioGuideText = audioGuideText
+
+    'This is to read the screen text and suspend the kepboard default audio guide until focus moved to next key.
+    if m.keyFocused <> keyGrid.keyFocused
+      m.keyboard.muteAudioGuide = false
+      m.keyboard.unObserveFieldScoped("keyGrid")
+    end if
+  end if
+
+  m.keyFocused = keyGrid.keyFocused
 End Function

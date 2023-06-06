@@ -39,6 +39,7 @@ Function init()
 
   m.top.observeField("focusedChild", "onComponentFocusChanged")
   m.NumberPad.observeField("text", "onNumberPadTextChanged")
+  m.NumberPad.observeField("audioGuideText", "onAudioGuideTextChanged")
   m.top.observeFieldScoped("ageSubmitted", "onAgeSubmittedChanged")
 
   if m.global <> invalid
@@ -75,6 +76,8 @@ End Function
 Function onComponentFocusChanged()
   if m.top.hasFocus()
     ' force a background update
+    audioGuideText = m.Header.text + m.SubHeader.text
+    readAudioGuideText(audioGuideText)
     m.top.backgroundUriList = m.backgroundUriList
     m.NumberPad.setFocus(true)
   end if
@@ -95,18 +98,22 @@ Function onNumberPadTextChanged(msg)
     ' don't allow centuries that are not 19xx if millennium is 1xxx
     m.Prompt.visible = true
     m.NumberPad.text = date.left(1)
+    readAudioGuideText(m.NumberPad.text)
   else if dateLength = 2 AND millennium = 2 AND checkValidCentury(millennium, century) = false
     ' don't allow centuries greater than the current century if millennium is 2xxx
     m.Prompt.visible = true
     m.NumberPad.text = date.left(1)
+    readAudioGuideText(m.NumberPad.text)
   else if dateLength = 3 AND millennium = 2 AND checkValidDecade(century, decade) = false
     ' don't allow decades greater than the current decade if millennium is 2xxx
     m.Prompt.visible = true
     m.NumberPad.text = date.left(2)
+    readAudioGuideText(m.NumberPad.text)
   else if dateLength = 4 AND checkValidYear(date) = false
     ' don't allow future years/month/dates
     m.Prompt.visible = true
     m.NumberPad.text = date.left(3)
+    readAudioGuideText(m.NumberPad.text)
   else
     m.Prompt.visible = false
     if dateLength = 4
@@ -116,13 +123,16 @@ Function onNumberPadTextChanged(msg)
       currentYear = createObject("roDateTime").getYear()
       if isUserToddler(date, currentYear) = true AND m.warningDisplayedCount = 0
         m.Prompt.text = getTranslation("screenAgeVerification_warning_prompt")
+        readAudioGuideText(m.Prompt.text)
         m.Prompt.visible = true
         m.warningDisplayedCount += 1
       else if isUserNewBorn(date, currentYear) = true or isUserTooOld(date, currentYear) = true
         m.Prompt.text = getTranslation("screenAgeVerification_error_prompt")
+        readAudioGuideText(m.Prompt.text)
         m.Prompt.visible = true
       else
         m.StartButton.setFocus(true)
+        readAudioGuideText(m.StartButton.text)
       end if
 
     end if
@@ -234,6 +244,7 @@ Function onKeyEvent(key, press) as Boolean
       if key = "down"
         if m.NumberPad.text.len() = 4 AND m.NumberPad.isInFocusChain() = true AND m.Prompt.visible = false
           m.StartButton.setFocus(true)
+          readAudioGuideText(m.StartButton.text)
         end if
       else if key = "up"
         if m.StartButton.isInFocusChain() = true
@@ -312,4 +323,12 @@ Function checkValidYear(submittedYear)
     return true
   end if
 
+End Function
+
+
+Function onAudioGuideTextChanged(msg)
+  audioGuideText = msg.getData()
+  if isNonEmptyString(audioGuideText) = true
+    readAudioGuideText(audioGuideText)
+  end if
 End Function

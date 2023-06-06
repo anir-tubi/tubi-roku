@@ -5,8 +5,12 @@ Function init()
   m.password.hint = getTranslation("signIn_password_hint")
 
   m.top.observeField("focusedChild", "onScreenFocusChange")
+
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
   m.keyboard.observeFieldScoped("buttonSelected", "onButtonSelected")
+
+  m.top.muteAudioGuide = true
+  m.keyboard.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
 
   'set initial tracking values
   m.top.trackingPageInfo = {
@@ -56,6 +60,15 @@ Function onScreenFocusChange()
     ' force a background update
     m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
     m.top.backgroundUriList = m.backgroundUriList
+    message = getTranslation("screenSettings_parentalPassword_title")
+    subMessage = getTranslation("screenSettings_parentalPassword_subtitle")
+    setUp = getTranslation("screenSettings_parentalPassword_setup_new_password") + ","
+    visit = getTranslation("screenSettings_parentalPassword_visit_link")
+
+    audioGuideText = message + "" + subMessage + " " + setUp + " " + visit
+    readAudioGuideText(audioGuideText)
+
+
     m.keyboard.setFocus(true)
     m.keyboard.voiceEnabled = true
     if m.constants.settings.mode <> "production" and m.constants.settings.password <> invalid
@@ -99,11 +112,19 @@ Function onKeyEvent(key As String, press As Boolean) As Boolean
     m.top.backPressed = true
   end if
   return press
- End Function
+End Function
 
 
- Function onKeyboardTextChanged()
+Function onKeyboardTextChanged()
   tubiLog("ConfirmPasswordScreen.onKeyboardTextChanged")
   m.password.text = m.keyboard.text
   setPasswordColor()
- End Function
+End Function
+
+
+Function onAudioGuideTextChanged(msg)
+  audioGuideText = msg.getData()
+  if isNonEmptyString(audioGuideText) = true
+    readAudioGuideText(audioGuideText, false)
+  end if
+End Function

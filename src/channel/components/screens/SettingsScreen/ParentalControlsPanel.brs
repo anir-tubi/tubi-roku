@@ -10,6 +10,9 @@ Function init()
   m.ContentGroup = m.top.findNode("ContentGroup")
   m.Menu = m.top.findNode("ParentalControlsMenu")
   m.Menu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
+
+  m.Menu.observeFieldScoped("itemFocused", "onItemFocusChanged")
+
   theme = getThemeFromGlobal()
   if theme <> invalid
     m.Menu.focusBitmapBlendColor = theme.focusedColor
@@ -91,4 +94,11 @@ Function checkItemHelper(newIndex)
   end for
   m.Menu.content = newContent
   m.Menu.jumpToItem = newIndex
+End Function
+
+
+Function onItemFocusChanged(msg)
+  focusIndex = msg.getData()
+  focusedContent = m.Menu.content.getChild(focusIndex)
+  m.top.audioGuideText = focusedContent.title
 End Function

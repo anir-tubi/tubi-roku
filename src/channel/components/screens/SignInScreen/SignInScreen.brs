@@ -38,6 +38,7 @@ Function init()
 
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
   m.voiceKeyboard = m.keyboard.findNode("Keyboard")
+  m.keyboard.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
   m.keyboard.observeFieldScoped("buttonSelected", "onButtonSelected")
 
   m.buttonsGroup = m.top.findNode("buttonsGroup")
@@ -107,12 +108,13 @@ Function onScreenFocusChange()
     m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
     m.keyboard.voiceEnabled = true
     if m.email.text = "" 'if email field is empty when screen gains focus, then setting focus to email field
-      m.email.setFocus(true)
+      setFocusToComponent(m.email)
       m.emailHasFocus = true
     else
-      m.password.setFocus(true)
+      setFocusToComponent(m.password)
       m.emailHasFocus = false
     end if
+
   end if
 
   if m.top.isInFocusChain() = false
@@ -127,6 +129,34 @@ Function onScreenFocusChange()
     m.emailHasFocus = false
   end if
 
+End Function
+
+
+Function setFocusToComponent(focusTarget)
+  if focusTarget <> invalid
+    topHasFocus = m.top.hasFocus()
+    focusTarget.setFocus(true)
+    audioGuideText = ""
+
+    if isRokuAudioGuideEnabled() = true
+      if topHasFocus = true
+        audioGuideText = m.pageHeading.text + " " + m.pageSubHeading.text
+        if m.email.text = ""
+          audioGuideText = audioGuideText + " " + m.constants.audioGuideHints.emailOkHint
+        else
+          audioGuideText = audioGuideText + " " + m.passwordValidationMsg.text
+        end if
+
+        audioGuideText = audioGuideText + " " + m.newPasswordLabel.text + m.newPasswordLink.text
+      else if focusTarget.id = "password" AND isNonEmptyString(focusTarget.text) = false
+        audioGuideText = m.passwordValidationMsg.text
+      else
+        audioGuideText = focusTarget.text
+      end if
+
+      readAudioGuideText(audioGuideText)
+    end if
+  end if
 End Function
 
 
@@ -188,7 +218,7 @@ Function onPasswordButtonSelected(evt)
     resetPasswordValidation()
     hideButtons()
     showKeyboard()
-    m.keyboard.setFocus(true)
+    setFocusToComponent(m.keyboard)
   end if
 
 End Function
@@ -202,7 +232,7 @@ Function onResetFocus(evt)
     resetPasswordValidation()
     hideButtons()
     showKeyboard()
-    m.keyboard.setFocus(true)
+    setFocusToComponent(m.keyboard)
   end if
 
 End Function
@@ -256,7 +286,6 @@ End Function
 
 
 Function hideButtons()
-
   fade(m.buttonsGroup, "out", 0.6)
 
 End Function
@@ -290,7 +319,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         updatePasswordValidation()
         hideKeyboard()
         showButtons()
-        m.password.setFocus(true)
+        setFocusToComponent(m.password)
         m.emailHasFocus = false
       else
         m.trackingLoggingTask.trackEvent = {
@@ -308,50 +337,50 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
     else if key = "down"
 
       if m.email.hasFocus() = true
-        m.password.setFocus(true)
+        setFocusToComponent(m.password)
         m.emailHasFocus = false
       else if m.password.hasFocus() = true
-        m.continueBtn.setFocus(true)
+        setFocusToComponent(m.continueBtn)
       else if m.continueBtn.hasFocus() = true
-        m.termsBtn.setFocus(true)
+        setFocusToComponent(m.termsBtn)
       end if
 
     else if key = "up"
 
       if m.password.hasFocus() = true
-        m.email.setFocus(true)
+        setFocusToComponent(m.email)
         m.emailHasFocus = true
       else if m.continueBtn.hasFocus() = true
-        m.password.setFocus(true)
+        setFocusToComponent(m.password)
         m.emailHasFocus = false
       else if m.termsBtn.hasFocus() = true
-        m.continueBtn.setFocus(true)
+        setFocusToComponent( m.continueBtn)
       else if m.ppBtn.hasFocus() = true
-        m.continueBtn.setFocus(true)
+        setFocusToComponent(m.continueBtn)
       else if m.yourPrivacyChoicesBtn.hasFocus() = true
-        m.continueBtn.setFocus(true)
+        setFocusToComponent(m.continueBtn)
       else if m.keyboard.isInFocusChain() = true
         updatePasswordValidation()
         hideKeyboard()
         showButtons()
-        m.password.setFocus(true)
+        setFocusToComponent(m.password)
         m.emailHasFocus = false
       end if
 
     else if key = "right"
 
       if m.termsBtn.hasFocus() = true
-        m.ppBtn.setFocus(true)
+        setFocusToComponent(m.ppBtn)
       else if m.ppBtn.hasFocus() = true
-        m.yourPrivacyChoicesBtn.setFocus(true)
+        setFocusToComponent(m.yourPrivacyChoicesBtn)
       end if
 
     else if key = "left"
 
       if m.yourPrivacyChoicesBtn.hasFocus() = true
-        m.ppBtn.setFocus(true)
+        setFocusToComponent(m.ppBtn)
       else if m.ppBtn.hasFocus() = true
-        m.termsBtn.setFocus(true)
+        setFocusToComponent(m.termsBtn)
       end if
 
     end if
@@ -377,7 +406,7 @@ Function onButtonSelected(evt)
     updatePasswordValidation()
     hideKeyboard()
     showButtons()
-    m.password.setFocus(true)
+    setFocusToComponent(m.password)
     m.emailHasFocus = false
   end if
 
@@ -404,5 +433,13 @@ Function onKeyboardTextChanged()
   else if m.emailHasFocus = true
     m.keyboard.voiceEnabled = false
     m.top.emailSelected = true
+  end if
+ End Function
+
+
+ Function onAudioGuideTextChanged(msg)
+  audioGuideText = msg.getData()
+  if isNonEmptyString(audioGuideText) = true
+    readAudioGuideText(audioGuideText)
   end if
  End Function

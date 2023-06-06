@@ -7,6 +7,8 @@
 
   <script type="text/brightscript" uri="NumberPad.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
 
   <interface>
 
@@ -16,6 +18,7 @@
 
     <!-- OUTPUT -->
       <field id="text" type="string" alias="keyboard.text" />
+      <field id="audioGuideText" type="string"/>
   </interface>
 
   <children>

@@ -16,6 +16,10 @@ Function getConstants()
   mode = constants.settings.mode
   if mode = invalid then mode = "dev"
 
+  constants.audioGuideHints = {}
+    constants.audioGuideHints.emailOkHint = "Press ok to enter your email"
+    constants.audioGuideHints.buttonHint = "Button"
+
   ' Device info
   constants.deviceInfo = {}
     di = CreateObject("roDeviceInfo")

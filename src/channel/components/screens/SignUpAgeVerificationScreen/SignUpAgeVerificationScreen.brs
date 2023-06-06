@@ -38,6 +38,7 @@ Function init()
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocusChanged")
   m.NumberPad.observeFieldScoped("text", "onNumberPadTextChanged")
+  m.NumberPad.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
   m.StartButton.observeFieldScoped("selected", "onStartButtonSelected")
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -71,6 +72,8 @@ End Function
 Function onComponentFocusChanged()
   if m.top.hasFocus()
     ' force a background update
+    audioGuideText = m.Header.text + " " + m.SubHeader.text + " " + m.infoLabel.text
+    readAudioGuideText(audioGuideText)
     m.top.backgroundUriList = m.backgroundUriList
     m.NumberPad.setFocus(true)
   end if
@@ -93,6 +96,7 @@ Function onNumberPadTextChanged(msg)
 ' Have to also set the numberpad to prevent getting out of sync
   m.NumberPad.text = text
   m.AgeEntry.text = text
+  readAudioGuideText(text)
 End Function
 
 ' @year: String - year we are saying the user was born in
@@ -145,6 +149,7 @@ Function onKeyEvent(key, press) as Boolean
       if key = "down"
         if m.NumberPad.text.isEmpty() = false then
           m.StartButton.setFocus(true)
+          readAudioGuideText(m.StartButton.text)
         end if
       else if key = "up"
         if m.StartButton.isInFocusChain() = true
@@ -155,4 +160,12 @@ Function onKeyEvent(key, press) as Boolean
   end if
 
   return true
+End Function
+
+
+Function onAudioGuideTextChanged(msg)
+  audioGuideText = msg.getData()
+  if isNonEmptyString(audioGuideText) = true
+    readAudioGuideText(audioGuideText)
+  end if
 End Function

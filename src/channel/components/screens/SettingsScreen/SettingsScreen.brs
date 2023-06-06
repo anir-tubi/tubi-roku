@@ -192,7 +192,8 @@ End Function
 Function createParentalControlsPanel(existingPanel = invalid)
   if existingPanel = invalid
     pcPanel = CreateObject("roSGNode", "ParentalControlsPanel")
-    pcPanel.observeField("itemSelected", "onParentalControlsItemSelected")
+    pcPanel.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
+    pcPanel.observeFieldScoped("itemSelected", "onParentalControlsItemSelected")
   else
     pcPanel = existingPanel
   end if
@@ -460,6 +461,13 @@ End Function
 Function onParentalControlsItemSelected(msg)
   tubiLog("SettingsScreen.onParentalControlsItemSelected")
   m.top.parentalSettingSelected = msg.GetData()
+End Function
+
+
+Function onAudioGuideTextChanged(msg)
+  tubiLog("SettingsScreen.onAudioGuideTextChanged")
+  parentalSettingFocused = msg.getData()
+  readAudioGuideText(parentalSettingFocused)
 End Function
 
 

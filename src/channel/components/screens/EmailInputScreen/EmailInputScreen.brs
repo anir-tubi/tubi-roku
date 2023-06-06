@@ -13,9 +13,18 @@ Function init()
   m.emailValidationMsg = m.top.findNode("emailValidationMsg")
   m.emailValidationMsg.text = getTranslation("invalid_email_title")
 
+  readAudioGuideText(m.pageHeading.text)
+
   m.keyboard = m.top.findNode("Keyboard")
   m.keyboard.textEditBox.opacity = 0.00001
   m.Keyboard.textEditBox.maxTextLength = 100
+
+  'This will save the last focused key of the keyboard used to enable the roku default audioguide after screen components read.
+  m.keyFocused = ""
+
+  'This will disable the default roku screen reader for customKeyboard to read screen heading which are not read by roku default screen reader.
+  m.keyboard.muteAudioGuide = true
+  m.keyboard.observeFieldScoped("keyGrid", "onKeyGridChange")
 
   m.keyboard.palette = handleKeyboardColors()
 
@@ -91,6 +100,32 @@ Function onScreenFocusChange()
 End Function
 
 
+'This function is to read the first focused keys in the keyboard as we disable the default screen reader for keyboard initially
+'to read the screen components and later we enable roku default screen reader for keyboard.
+'NOTE: hardcoded values are to match the default keyboard.
+Function onKeyGridChange(msg)
+  keyGrid = msg.getData()
+  if isNonEmptyString(m.keyFocused) = true AND m.keyboard.muteAudioGuide = true
+
+    if keyGrid.keyFocused = "a"
+      audioGuideText = keyGrid.keyFocused + " " + "alpha"
+    else
+      audioGuideText = keyGrid.keyFocused + " " + m.constants.audioGuideHints.buttonHint
+    end if
+
+    readAudioGuideText(audioGuideText, false)
+
+    'This is to read the screen text and suspend the kepboard default audio guide until focus moved to next key.
+    if m.keyFocused <> keyGrid.keyFocused
+      m.keyboard.muteAudioGuide = false
+      m.keyboard.unObserveFieldScoped("keyGrid")
+    end if
+  end if
+
+  m.keyFocused = keyGrid.keyFocused
+End Function
+
+
 Function onKeyboardTextEditBoxFocusedChildChange()
   tubiLog("EmailInputScreen.onKeyboardTextEditBoxFocusedChildChange")
   ' Don't allow textEditBox to take focus since we're not showing it
@@ -157,9 +192,9 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       m.top.backButtonSelected = true
 
     else if key = "down"
-
       if m.keyboard.isInFocusChain() = true
         m.continue.setFocus(true)
+        readAudioGuideText(m.continue.text)
       end if
 
     else if key = "up"
@@ -174,12 +209,13 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
       if m.back.hasFocus() = true
         m.continue.setFocus(true)
+        readAudioGuideText(m.continue.text)
       end if
 
     else if key = "left"
-
       if m.continue.hasFocus() = true
         m.back.setFocus(true)
+        readAudioGuideText(m.back.text)
       end if
 
     end if
