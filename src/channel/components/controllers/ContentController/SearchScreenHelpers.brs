@@ -3,8 +3,8 @@ Function showSearchScreen()
   tubiLog("SearchScreenHelpers.onSearchSelected")
   searchScreen = CreateObject("roSGNode", "SearchScreen")
   searchScreen.observeFieldScoped("contentSelected", "onSearchContentSelected")
+  searchScreen.observeFieldScoped("contentFocused", "onSearchContentFocused")
   if getExperimentResource("roku_video_preview_search_screen", "roku_video_preview_search_screen_v1", false).enabled = true
-    searchScreen.observeFieldScoped("contentFocused", "onSearchContentFocused")
     searchScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
   end if
   searchScreen.observeFieldScoped("backgroundUriList", "onSearchBackgroundChange")
