@@ -1699,8 +1699,8 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
   ' has4kHevcStream helps to decide whether 4k/HEVC stream is available for the selected content.
   has4kHevcStream = false
 
-  ' hasOnlyNonDrm helps to decide whether video resources has only non-drm manifests by checking type hlsv3 or dash
-  ' //REMOVE hasOnlyNonDrm once we graduate roku_dash_v2 experiment.
+  ' hasOnlyNonDrm helps to decide whether video resources has only non-drm manifests by checking type hlsv6 or dash
+  ' //REMOVE hasOnlyNonDrm once we graduate roku_dash_hlsv6_v1 experiment.
   hasOnlyNonDrm = true
 
   codecToVideoResourcesIndexMap = {}
@@ -1711,7 +1711,7 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
     ' Adding isNonDrmContent, if the videoResources has only dash or hlsv3 stream formats
     for each video in resources
 
-      if video.type <> m.constants.player.drmTypes.dash AND video.type <> m.constants.player.drmTypes.hlsv3
+      if video.type <> m.constants.player.drmTypes.dash AND video.type <> m.constants.player.drmTypes.hlsv6
         hasOnlyNonDrm = false
         exit for
       end if
@@ -1720,13 +1720,13 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
 
     if contentFromServer.type <> m.constants.ui.categoryTypes.linear AND contentFromServer.type <> "l" AND hasOnlyNonDrm = true
 
-      ' //REMOVE 'isNonDrmContent' field and its references once we graduate roku_dash_v2 experiment.
+      ' //REMOVE 'isNonDrmContent' field and its references once we graduate roku_dash_hlsv6_v1 experiment.
       ' isNonDrmContent interface is added to TubiContentNode in order to identify whether video resource has only dash or hlsv3 content
       contentNode.addField("isNonDrmContent", "boolean", false)
       contentNode.isNonDrmContent = true
 
       if m.experiments <> invalid
-        experimentResult = m.experiments.getExperimentResult("roku_dash", "roku_dash_v2")
+        experimentResult = m.experiments.getExperimentResult("roku_dash_hlsv6", "roku_dash_hlsv6_v1")
 
         if experimentResult <> invalid AND experimentResult.experiment_name <> invalid AND experimentResult.treatment <> invalid
           titanVersionOrExperimentVersion = "exp=" + experimentResult.experiment_name + "." + experimentResult.treatment
@@ -1828,6 +1828,9 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
         else if video.type = m.constants.player.drmTypes.dash
           resource.type = m.constants.player.drmTypes.dash
           resource.streamFormat = "dash"
+        else if video.type = m.constants.player.drmTypes.hlsv6
+          resource.type = m.constants.player.drmTypes.hlsv6
+          resource.streamFormat = "hls"
         else if video.type = m.constants.player.drmTypes.hlsv3
           resource.type = m.constants.player.drmTypes.hlsv3
           resource.streamFormat = "hls"

@@ -485,7 +485,7 @@ Function playContent()
 
       if m.Video.content.isNonDrmContent = true
         ' fire exposure event for video playback if manifest had only dash or hlsv3 content for treatment & control
-        getExperimentResource("roku_dash", "roku_dash_v2", true)
+        getExperimentResource("roku_dash_hlsv6", "roku_dash_hlsv6_v1", true)
       end if
       m.Video.control = "play"
 
@@ -1014,7 +1014,7 @@ Function onAdStateChange(msg)
       end if
       if m.Video.content.isNonDrmContent = true
         ' fire exposure event for video playback if manifest had only dash or hlsv3 content for treatment & control
-        getExperimentResource("roku_dash", "roku_dash_v2", true)
+        getExperimentResource("roku_dash_hlsv6", "roku_dash_hlsv6_v1", true)
       end if
       m.Video.control = "play"
       ' Adding the initial audio track here to cover use case where pre-roll ads are requested.

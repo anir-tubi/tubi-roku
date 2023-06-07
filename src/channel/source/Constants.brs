@@ -815,17 +815,18 @@ Function getConstants()
       constants.player.drmTypes.dashWidevine = "dash_widevine_psshv0"
       constants.player.drmTypes.dashPlayready = "dash_playready_psshv0"
       constants.player.drmTypes.dash = "dash"
+      constants.player.drmTypes.hlsv6 = "hlsv6"
       constants.player.drmTypes.hlsv3 = "hlsv3"
 
       ' Supported schemes, in order of preference
-      constants.player.drmOrder = [
+      constants.player.drmOrderHlsv6 = [
         constants.player.drmTypes.dashWidevine
         constants.player.drmTypes.dashPlayready
-        constants.player.drmTypes.hlsv3
+        constants.player.drmTypes.hlsv6
       ]
 
       ' Supported schemes, in order of preference
-      constants.player.drmOrderDash = [
+      constants.player.drmOrder = [
         constants.player.drmTypes.dashWidevine
         constants.player.drmTypes.dashPlayready
         constants.player.drmTypes.dash
