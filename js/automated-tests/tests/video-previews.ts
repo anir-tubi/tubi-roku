@@ -37,20 +37,10 @@ describe('Video Preview', function () {
     await ecp.sendKeyPress(ecp.Key.Ok);
 
     // Add the item to the user's queue
-    await testUtils.selectMenuItem('detailScreenMenu', 'Add to My List');
-
-    // Wait until menu item switches so we know it was added to their my list
-    await testUtils.untilTrue(async () => {
-      const index = await testUtils.findRowIndexWithTitle('detailScreenMenu', 'Remove from My List');
-      return index >= 0;
-    }, 'Failed adding item to my list');
+    await testUtils.selectAndVerifyDetailPageMenuItem('addToMyList');
 
     // Navigate back to the home screen
-    await ecp.sendKeyPress(ecp.Key.Back);
-    await ecp.sendKeyPress(ecp.Key.Back);
-    await ecp.sendKeyPress(ecp.Key.Back);
-    await ecp.sendKeyPress(ecp.Key.Down);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await testUtils.goToPage('home');
 
     // Now find where the My List Row is and jump to it
     const myListIndex = await testUtils.jumpToRowWithTitle('homeScreenRowList', 'My List');
@@ -69,7 +59,7 @@ describe('Video Preview', function () {
       const args = testUtils.getElementKeyPath('previewVideoPlayer');
       args.keyPath += `.content`;
       const {value: content} = await odc.getValue(args);
-      expect(content.URL).to.equal(videoPreviewUrl);
+      expect(content?.URL).to.equal(videoPreviewUrl);
     });
 
     // Verify that video is playing

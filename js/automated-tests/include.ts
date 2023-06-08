@@ -5,8 +5,14 @@ import { testUtils } from './test-utils';
 
 before(async () => {
   console.log('deploying app');
+
+  let buildFolder = 'build/local';
+  if (process.env.buildFolder) {
+    buildFolder = process.env.buildFolder;
+  }
+
   await device.deploy({
-    rootDir: 'build/local',
+    rootDir: buildFolder,
     files: [
       '**/*'
     ]

@@ -279,6 +279,57 @@
       }
     }
   },
+  "02da2c4d-7b36-4b5b-a3cf-7d08fe53a083": {
+    "status": "unchanged",
+    "tests": [
+      "de393b56-e611-40dd-9314-6436fdbf9b4a"
+    ],
+    "name": "kidsModeExitKids",
+    "apiId": "kidsModeExitKids",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Label",
+          "top": 207,
+          "left": 142,
+          "text": "Exit Kids",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 133,
+          "height": 72,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[2]/LayoutGroup/Group/Label",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "02f17f46-ea63-4211-b5e1-085bdd1036b4": {
     "status": "unchanged",
     "tests": [],
@@ -686,7 +737,9 @@
   },
   "0683cddd-3020-4c6f-bc1e-104f97b433c4": {
     "status": "unchanged",
-    "tests": [],
+    "tests": [
+      "36a6d051-01d1-401f-8e78-8030534d3d32"
+    ],
     "name": "exitKidsButtonText",
     "apiId": "exitKidsButtonText",
     "platforms": {
@@ -2825,10 +2878,113 @@
       }
     }
   },
+  "15242184-98ec-4fef-8a4f-e22342f479f2": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "CategoryName (4)",
+    "apiId": "CategoryName (4)",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "CategoryName",
+          "top": 573,
+          "left": 192,
+          "text": "Movie Night!",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 1000,
+          "height": 36,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "invisible"
+        },
+        "selectors": {
+          "text": {
+            "val": "Movie Night!",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
+  "1539b44d-452f-4e02-849e-4ad22d336544": {
+    "status": "unchanged",
+    "tests": [
+      "1163c456-9a39-446c-9496-652215c7eafb"
+    ],
+    "name": "DetailsMenuTextFocused",
+    "apiId": "DetailsMenuTextFocused",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "DetailsMenuTextFocused",
+          "top": 818,
+          "left": 239,
+          "text": "Remove from history",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 325,
+          "height": 80,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid/DetailMenuItem[6]/Group[2]/Label[2]",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "153dc02d-e7de-403a-a31c-d7e909540e29": {
     "status": "unchanged",
     "tests": [
       "06f9889e-0ce3-4d7a-85a1-a4601015a21d",
+      "358d556c-adf7-4825-8357-f378c5728d92",
       "5b713da3-2c66-4db5-97c7-677f2533491f",
       "686a67ec-1ad6-4d4a-b17e-69d939a663ef",
       "69b9c8fb-67b3-4be5-abe7-043099a9b0a3",
@@ -2889,15 +3045,7 @@
   },
   "154276eb-4878-4b79-b8a8-f4ed2aeb5775": {
     "status": "unchanged",
-    "tests": [
-      "0e1bfe0a-ac5e-4006-bf19-d66b7ca61c7e",
-      "188381b7-fc68-40fc-bc01-29060f69222a",
-      "46ec1db6-8104-450e-87ea-279265aa910c",
-      "54c81c7a-587d-4534-ae43-369c7ac3460f",
-      "793384e7-de1a-43d7-b925-2437dd27b7ce",
-      "7ccde47b-f712-4833-9279-f3ce7c02d081",
-      "a7b6870e-090a-4477-8239-44a4bbd1ddf9"
-    ],
+    "tests": [],
     "name": "playBackVideoPlayer",
     "apiId": "playBackVideoPlayer",
     "platforms": {
@@ -2927,7 +3075,6 @@
           "fontSize",
           "fontURI",
           "height",
-          "id",
           "image",
           "isFocused",
           "itemFocused",
@@ -2938,7 +3085,6 @@
           "top",
           "videoLength",
           "videoPos",
-          "videoState",
           "videoUrl",
           "visibility",
           "width"
@@ -3038,13 +3184,17 @@
   "16ad5b32-eb6a-4bde-96d4-53fbf74c0e1d": {
     "status": "unchanged",
     "tests": [
+      "0256da59-7a94-48df-a863-c2e333babf3c",
       "04cfcf07-3d2f-4867-a0e7-c9f98b940e25",
+      "1163c456-9a39-446c-9496-652215c7eafb",
       "354d62b3-2eb2-4148-ba39-78962a7ead29",
+      "397d5ca1-4915-4162-b185-be1e8ed477df",
       "3f682579-5456-4453-a625-1fc5000cad4a",
       "560f51f7-2a1d-4686-9263-443620d70424",
       "562dd49e-edfe-4205-a9f8-91341484e51e",
       "5c985aeb-c7c9-43d8-a02f-459e7c3ae5ab",
       "8cbfd46e-d218-4b01-ba0a-a65c67702bab",
+      "99a1de22-32ba-433f-9a0f-1d5fd5fa60c2",
       "b804fc41-1d41-4174-a491-a9ff36a4996c",
       "c1335214-46f1-4352-ba4d-56d0f3d63da0",
       "c82eaa03-3970-4553-b729-0fd8d983cf10",
@@ -3060,8 +3210,8 @@
         "info": {
           "id": "Title",
           "top": 133,
-          "left": 217,
-          "text": "Terminator 3: Rise of the Machines",
+          "left": 192,
+          "text": "The Sin Seer",
           "color": "rgba(255, 255, 255, 1)",
           "width": 960,
           "height": 44,
@@ -3071,7 +3221,7 @@
         },
         "selectors": {
           "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup/Label",
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Label",
             "active": true
           }
         },
@@ -3098,6 +3248,61 @@
           }
         },
         "excludedProperties": []
+      }
+    }
+  },
+  "16f21783-abd7-4f67-86b5-2ed6fbcde64a": {
+    "status": "unchanged",
+    "tests": [
+      "16d104f8-99e0-489a-8725-506393c2ebf3"
+    ],
+    "name": "passwordSignInDialogBox",
+    "apiId": "passwordSignInDialogBox",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Message",
+          "top": 495,
+          "left": 544,
+          "text": "Thank you for signing in. To update the parental controls to your desired setting, please enter your password.",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 822,
+          "height": 62,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "text": {
+            "val": "Thank you for signing in. To update the parental controls to your desired setting, please enter your password.",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
       }
     }
   },
@@ -3296,9 +3501,11 @@
     "status": "unchanged",
     "tests": [
       "0c54cca0-b6a1-41d1-957c-e99dcb65f82a",
+      "12d7bd5d-8ed5-4efe-baf5-c399ce6f59d4",
       "1e924aec-9ae1-47d1-a592-a4fb9088a072",
       "2abdd3c5-d6cf-4b6f-bf76-9b4349b888fc",
       "58cfd143-d7b1-44ce-a493-b30844107a9b",
+      "5c6b6ced-7565-421e-93b4-c5e5b452568f",
       "7cf9e572-5770-42de-936c-b2a7f3cf06e8",
       "8b9ea244-6d79-4241-b6a8-5ede0730b1c1",
       "9807a99e-15b1-43d7-93b2-55224761eb66",
@@ -3440,10 +3647,7 @@
   "1877616e-d328-49de-aec5-617e06d9b744": {
     "status": "unchanged",
     "tests": [
-      "0f112261-3c62-4b2a-a79d-894106bd557e",
-      "36a6d051-01d1-401f-8e78-8030534d3d32",
-      "da0b77b6-8fa9-4746-bb2f-8f336377da78",
-      "de393b56-e611-40dd-9314-6436fdbf9b4a"
+      "da0b77b6-8fa9-4746-bb2f-8f336377da78"
     ],
     "name": "exitKidsOption",
     "apiId": "exitKidsOption",
@@ -3638,10 +3842,10 @@
     "status": "unchanged",
     "tests": [
       "13922c9f-97b9-4cb2-8173-3bf54b68ee25",
-      "73e8a3b5-6df2-43f6-9ee2-4af3a806d054",
       "cbfcbac3-665d-4c07-9dc0-34646c0f2166",
       "ed099dae-d0a4-4a94-8974-e0964de2f35c",
-      "f515cebb-bad2-4d77-bf69-4ac4929b3ba2"
+      "f515cebb-bad2-4d77-bf69-4ac4929b3ba2",
+      "ff657463-307c-4c0f-86f3-2aaafb33c23a"
     ],
     "name": "detailsPagePlay",
     "apiId": "detailsPagePlay",
@@ -3649,13 +3853,14 @@
       "roku": {
         "info": {
           "id": "DetailsMenuText",
-          "top": 437,
-          "left": 88,
+          "top": 642,
+          "left": 239,
           "text": "Play",
           "color": "rgba(255, 255, 255, 1)",
-          "width": 44,
-          "height": 53,
+          "width": 66,
+          "height": 80,
           "opacity": 1,
+          "isFocused": false,
           "visibility": "visible"
         },
         "selectors": {
@@ -4041,6 +4246,56 @@
           }
         },
         "excludedProperties": []
+      }
+    }
+  },
+  "1c232c2f-d369-4126-bada-2eccabe67dd2": {
+    "status": "unchanged",
+    "tests": [
+      "214179f2-d76b-43ea-8b04-debfe01b5615"
+    ],
+    "name": "teensCheckutton",
+    "apiId": "teensCheckutton",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Check",
+          "top": 770,
+          "left": 781,
+          "image": "pkg:/images/check.png",
+          "width": 20,
+          "height": 16,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/ParentalControlsPanel/Group/Group/MarkupList/CheckButton[3]/LayoutGroup/Group/Poster",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
       }
     }
   },
@@ -5008,6 +5263,59 @@
       }
     }
   },
+  "23700f18-0875-4848-8a7f-1101a9359088": {
+    "status": "unchanged",
+    "tests": [
+      "0256da59-7a94-48df-a863-c2e333babf3c",
+      "1163c456-9a39-446c-9496-652215c7eafb",
+      "143b7533-be0f-4907-a551-671d4336ea21",
+      "397d5ca1-4915-4162-b185-be1e8ed477df",
+      "99a1de22-32ba-433f-9a0f-1d5fd5fa60c2"
+    ],
+    "name": "gradientPoster",
+    "apiId": "gradientPoster",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "gradientPoster",
+          "top": 622,
+          "left": 192,
+          "image": "pkg:/images/categoryGridPosterInnerGradient.webp",
+          "width": 384,
+          "height": 216,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/MyStuffScreen/MaskGroup/RowList/RowListItem/MarkupGrid/CategoryGridPoster/LayoutGroup/Poster/Poster",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "23969545-3865-4e8b-85e7-ae8e1f04fb36": {
     "status": "unchanged",
     "tests": [],
@@ -5177,6 +5485,54 @@
           "left",
           "opacity",
           "color",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
+  "2432ecf8-213c-4c6e-81e1-254b58ac4d28": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "myListEmptyIcon",
+    "apiId": "myListEmptyIcon",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Icon",
+          "top": 662,
+          "left": 936,
+          "image": "pkg:/images/screenMyStuffMyListIcon.webp",
+          "width": 84,
+          "height": 84,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/MyStuffScreen/MaskGroup/RowList/RowListItem[2]/MarkupGrid/CategoryGridPoster/MyStuffEmptyCategoryGridPoster/Group/LayoutGroup/Poster",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
           "top",
           "videoLength",
           "videoPos",
@@ -5940,6 +6296,57 @@
           "videoPos",
           "videoState",
           "videoUrl",
+          "width"
+        ]
+      }
+    }
+  },
+  "28e7772b-dbed-410c-b359-efbd62f9b559": {
+    "status": "unchanged",
+    "tests": [
+      "beac4c77-424d-4c21-8063-07589f2fa937"
+    ],
+    "name": "homeScreenDuration",
+    "apiId": "homeScreenDuration",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Line1",
+          "top": 254,
+          "left": 192,
+          "text": "1 h 44 min ",
+          "color": "rgba(221, 221, 221, 1)",
+          "width": 138,
+          "height": 25,
+          "opacity": 0.5,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen[2]/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup/LayoutGroup/Label",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
           "width"
         ]
       }
@@ -6743,6 +7150,57 @@
       }
     }
   },
+  "2d89b603-cd54-478b-892e-2dacd53d8097": {
+    "status": "unchanged",
+    "tests": [
+      "879e6b99-ca58-47ff-be38-8729e37b0629"
+    ],
+    "name": "kidsCategoriesHorsesAnd PoniesTile",
+    "apiId": "kidsCategoriesHorsesAnd PoniesTile",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Title",
+          "top": 770,
+          "left": 211,
+          "text": "Horses and Ponies",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 346,
+          "height": 76,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/ChannelGridScreen/MarkupGrid/ChannelCategoryGridPoster[9]/Label",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "2dd0da93-d75b-4dba-958b-66af6f0dd158": {
     "status": "unchanged",
     "tests": [],
@@ -7221,6 +7679,60 @@
       }
     }
   },
+  "32a577f3-0d46-43ad-ae08-7225c11b2b97": {
+    "status": "unchanged",
+    "tests": [
+      "05ee1923-083e-469c-ae32-3228de11bb14",
+      "2a45f963-dd19-4ff4-baa5-26475cfa2fb6",
+      "99a1de22-32ba-433f-9a0f-1d5fd5fa60c2",
+      "b8b0535c-7ebc-471a-8936-0fb56ebf5f2b",
+      "bc81b836-114b-4634-80f1-ebdc6081c758",
+      "d01e03b6-5877-4fbc-9ac1-7e019ca6d94e",
+      "e8eb68d1-5b0e-4b34-ad46-56d040b31711"
+    ],
+    "name": "myStuffMyListPoster",
+    "apiId": "myStuffMyListPoster",
+    "platforms": {
+      "roku": {
+        "info": {
+          "top": 622,
+          "left": 192,
+          "width": 186,
+          "height": 267,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/MyStuffScreen/MaskGroup/RowList/RowListItem[2]/MarkupGrid/CategoryGridPoster",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "32a5842e-e1c8-4f6d-848f-f7106d18f3b6": {
     "status": "unchanged",
     "tests": [],
@@ -7249,6 +7761,58 @@
           "fontSize",
           "fontURI",
           "height",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
+  "33a004bc-9c22-4df0-a5d0-9124fbb058ff": {
+    "status": "unchanged",
+    "tests": [
+      "05ee1923-083e-469c-ae32-3228de11bb14",
+      "143b7533-be0f-4907-a551-671d4336ea21"
+    ],
+    "name": "kidsHomeScreenRatingsLabel",
+    "apiId": "kidsHomeScreenRatingsLabel",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "RatingLabel",
+          "top": 204,
+          "left": 491,
+          "text": "PG",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 54,
+          "height": 36,
+          "opacity": 0.8,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup/LayoutGroup/Group/Label",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
           "itemFocused",
           "left",
           "opacity",
@@ -7896,6 +8460,60 @@
       }
     }
   },
+  "37d3610e-40e9-4d20-a12b-d5f57e0923f8": {
+    "status": "unchanged",
+    "tests": [
+      "1d2fad53-bfe0-4a4e-865c-6eb06f4fbca1",
+      "9d172c16-b686-495c-be10-6f17731e7177",
+      "b29f314a-7427-46c1-a20d-e332c9a02ff1",
+      "d01e03b6-5877-4fbc-9ac1-7e019ca6d94e",
+      "d0270260-9a9a-4f4f-a23c-4663c22eecfb"
+    ],
+    "name": "goToHomeButtonMyStuff",
+    "apiId": "goToHomeButtonMyStuff",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "DetailsMenuTextFocused",
+          "top": 656,
+          "left": 875,
+          "text": "Go to Home",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 186,
+          "height": 80,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/MyStuffScreen/LayoutGroup[2]/MarkupGrid/DetailMenuItem/Group[2]/Label[2]",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "3843f70f-62a4-4a36-b8da-46052c975a33": {
     "status": "unchanged",
     "tests": [],
@@ -8379,6 +8997,55 @@
       }
     }
   },
+  "3adf5915-9feb-4abc-9315-5edb2a3c8748": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "kidsModeMyStuffEmpty",
+    "apiId": "kidsModeMyStuffEmpty",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "DetailsMenuTextFocused",
+          "top": 656,
+          "left": 875,
+          "text": "Go to Home",
+          "color": "rgba(0, 47, 138, 1)",
+          "width": 186,
+          "height": 80,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/MyStuffScreen/LayoutGroup[2]/MarkupGrid/DetailMenuItem/Group[2]/Label[2]",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "3b0c94c0-83d2-4bd1-8be9-451e6964c569": {
     "status": "unchanged",
     "tests": [],
@@ -8451,6 +9118,56 @@
           }
         },
         "excludedProperties": []
+      }
+    }
+  },
+  "3b812b5c-a0f9-40dd-9acf-a6961b6ae4c1": {
+    "status": "unchanged",
+    "tests": [
+      "09227227-6ee6-49e0-9671-b77cce70df45"
+    ],
+    "name": "homeScreenRecommendedChannels",
+    "apiId": "homeScreenRecommendedChannels",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "CategoryName",
+          "top": 688,
+          "left": 530,
+          "text": "Recommended Channels",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 1000,
+          "height": 36,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "invisible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList/RowListItem[3]/Group/CategoryGridRowLabel/Label",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
       }
     }
   },
@@ -8763,6 +9480,57 @@
       }
     }
   },
+  "3cc8e765-1cff-4e25-8603-d4156a497dd9": {
+    "status": "unchanged",
+    "tests": [
+      "0f112261-3c62-4b2a-a79d-894106bd557e"
+    ],
+    "name": "kidsOption",
+    "apiId": "kidsOption",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Label",
+          "top": 207,
+          "left": 142,
+          "text": "Kids",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 66,
+          "height": 72,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[2]/LayoutGroup/Group/Label",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "3cd1dd12-7514-46f0-bfea-7d12a04ffb04": {
     "status": "unchanged",
     "tests": [
@@ -8776,19 +9544,24 @@
     "platforms": {
       "roku": {
         "info": {
-          "id": "Icon",
-          "top": 749,
-          "left": 191,
-          "image": "pkg:/images/icon-like.webp",
-          "width": 36,
-          "height": 36,
+          "id": "DetailsMenuText",
+          "top": 730,
+          "left": 239,
+          "text": "Like or Dislike",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 218,
+          "height": 80,
           "opacity": 1,
           "isFocused": false,
           "visibility": "visible"
         },
         "selectors": {
-          "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid/DetailMenuItem[2]/Poster[2]",
+          "text": {
+            "val": "Like or Dislike",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
             "active": true
           }
         },
@@ -9112,12 +9885,11 @@
   "3f2a10f8-6da8-480c-ae84-a82dc70cd248": {
     "status": "unchanged",
     "tests": [
-      "3584ecdd-0954-4452-8409-f53d9885a686",
       "35bdf8c8-e42c-4422-887c-8e5a8d8cd292",
-      "562dd49e-edfe-4205-a9f8-91341484e51e",
       "69f71484-cf0b-4c08-acb3-6dbbe4e59fdb",
       "a63e316f-f632-4fd1-ad91-bf3f85475408",
-      "b45e7d9f-cde3-433f-b39d-af1bdd64cfc9"
+      "b45e7d9f-cde3-433f-b39d-af1bdd64cfc9",
+      "b6a620a2-c908-434e-8331-8bfc719c0bf6"
     ],
     "name": "detailsPageAddtoMyList",
     "apiId": "detailsPageAddtoMyList",
@@ -9374,6 +10146,55 @@
       }
     }
   },
+  "41797ec1-1b01-49af-ada6-991a6f165b18": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "focusedHomeLabel",
+    "apiId": "focusedHomeLabel",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "focusedLabel",
+          "top": 375,
+          "left": 142,
+          "text": "Home",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 86,
+          "height": 72,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[4]/LayoutGroup/Group/Label[2]",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "41912c49-7831-4487-9a17-40ff770bd66d": {
     "status": "unchanged",
     "tests": [
@@ -9502,9 +10323,9 @@
     "platforms": {
       "roku": {
         "info": {
-          "id": "Text",
+          "id": "TextFocused",
           "top": 461,
-          "left": 826,
+          "left": 841,
           "text": "On",
           "color": "rgba(255, 255, 255, 1)",
           "width": 465,
@@ -9515,7 +10336,7 @@
         },
         "selectors": {
           "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/AutoplayPreviewPanel/Group/Group/MarkupList/CheckButton/LayoutGroup/Label",
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/AutoplayPreviewPanel/Group/Group/MarkupList/CheckButton/LayoutGroup/Group[2]/Label[2]",
             "active": true
           }
         },
@@ -10143,18 +10964,18 @@
         "info": {
           "id": "Label",
           "top": 123,
-          "left": 162,
-          "text": "Hi Automation",
+          "left": 142,
+          "text": "Sign In",
           "color": "rgba(255, 255, 255, 1)",
-          "width": 213,
-          "height": 60,
+          "width": 101,
+          "height": 72,
           "opacity": 1,
           "isFocused": false,
           "visibility": "visible"
         },
         "selectors": {
           "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent/LayoutGroup/Label",
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent/LayoutGroup/Group/Label",
             "active": true
           }
         },
@@ -10341,7 +11162,12 @@
     "tests": [
       "19dc2453-acc3-45db-8c86-bbfa5baa6aaa",
       "2829ffc2-1272-4060-a3fa-7e0f5cff75c5",
+      "6e219504-e926-45e2-aa29-49f6c2dc675d",
+      "82b43294-ac99-4d21-b2f3-7bab7ecb2094",
       "b312d2db-5b38-46a6-8b77-d02dab0edf67",
+      "df140c56-bb87-483d-a584-9a8355d52e93",
+      "e551967d-4036-48bb-80f1-805782e69aeb",
+      "f39fb0c7-633c-4042-96fd-3c348b7a54c2",
       "f6250d57-fee4-4e06-85db-375397ee0207"
     ],
     "name": "homeScreenContinueWatchingCategory",
@@ -10606,9 +11432,9 @@
       "1e924aec-9ae1-47d1-a592-a4fb9088a072",
       "79d36e96-7a3c-402d-b6c4-bc71eef1e067",
       "9807a99e-15b1-43d7-93b2-55224761eb66",
-      "98b08c09-ad12-49e5-bec8-5a8560cc4d04",
       "b1a0c73f-78c8-45b7-8075-8ae32a4796d0",
       "cde4177a-b3fa-4c69-aa42-22b9a259b02d",
+      "cffc5061-46a2-4794-b3d5-0338f7b92749",
       "e270e35f-87d7-4829-8059-ad23284a1551",
       "f81ab98f-0329-4295-861c-da65841330c0"
     ],
@@ -11450,9 +12276,9 @@
       "roku": {
         "info": {
           "id": "Icon",
-          "top": 384,
-          "left": 82,
-          "image": "pkg:/images/sideNavHome.png",
+          "top": 390,
+          "left": 94,
+          "image": "pkg:/images/sideNavHome.webp",
           "width": 36,
           "height": 36,
           "opacity": 1,
@@ -11461,7 +12287,7 @@
         },
         "selectors": {
           "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[4]/Poster",
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[4]/Group/Poster",
             "active": true
           }
         },
@@ -11522,11 +12348,11 @@
       "roku": {
         "info": {
           "id": "Line1",
-          "top": 265,
-          "left": 217,
-          "text": "1998 · 48 min · 6 Seasons ",
+          "top": 254,
+          "left": 192,
+          "text": "2023 · 1 h 24 min ",
           "color": "rgba(221, 221, 221, 1)",
-          "width": 330,
+          "width": 223,
           "height": 25,
           "opacity": 0.5,
           "isFocused": false,
@@ -11534,7 +12360,7 @@
         },
         "selectors": {
           "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup[2]/LayoutGroup/Label",
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen[2]/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup/LayoutGroup/Label",
             "active": true
           }
         },
@@ -11916,6 +12742,7 @@
   "5396409c-eda8-4f57-9ef1-e57cb05784be": {
     "status": "unchanged",
     "tests": [
+      "0b6e16f2-d65c-4613-81a3-17f8afe0e47e",
       "16015747-8406-432c-a7e4-d10fc81be48f",
       "199df7e7-90b1-45ae-aeda-2518c2fece70",
       "2fd74169-7fc7-4569-8ac0-784fcee5f468",
@@ -12100,6 +12927,59 @@
           "height",
           "id",
           "image",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
+  "54ddf963-3a36-4832-beb6-563734e56336": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "parentalControlsTeenDialog",
+    "apiId": "parentalControlsTeenDialog",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Message",
+          "top": 495,
+          "left": 544,
+          "text": "Parental controls setting has changed to Teens. Parental controls will be password protected after 5 minutes.",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 822,
+          "height": 62,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "text": {
+            "val": "Parental controls setting has changed to Teens. Parental controls will be password protected after 5 minutes.",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
           "itemFocused",
           "left",
           "opacity",
@@ -12415,9 +13295,9 @@
     "platforms": {
       "roku": {
         "info": {
-          "id": "Text",
+          "id": "TextFocused",
           "top": 541,
-          "left": 826,
+          "left": 841,
           "text": "Off",
           "color": "rgba(255, 255, 255, 1)",
           "width": 465,
@@ -12428,7 +13308,7 @@
         },
         "selectors": {
           "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/AutoplayPreviewPanel/Group/Group/MarkupList/CheckButton[2]/LayoutGroup/Label",
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/AutoplayPreviewPanel/Group/Group/MarkupList/CheckButton[2]/LayoutGroup/Group[2]/Label[2]",
             "active": true
           }
         },
@@ -12465,23 +13345,19 @@
       "roku": {
         "info": {
           "id": "CategoryName",
-          "top": 561,
+          "top": 573,
           "left": 192,
           "text": "Movie Night!",
           "color": "rgba(255, 255, 255, 1)",
           "width": 1000,
-          "height": 60,
+          "height": 36,
           "opacity": 1,
           "isFocused": false,
-          "visibility": "visible"
+          "visibility": "invisible"
         },
         "selectors": {
-          "text": {
-            "val": "Movie Night!",
-            "active": true
-          },
-          "ifMultipleFoundReturn": {
-            "val": 1,
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList/RowListItem[25]/Group/CategoryGridRowLabel/Label",
             "active": true
           }
         },
@@ -12757,7 +13633,6 @@
       "13922c9f-97b9-4cb2-8173-3bf54b68ee25",
       "3233da09-e2c5-4d16-8625-f5a991cd0a83",
       "3584ecdd-0954-4452-8409-f53d9885a686",
-      "3bd8323c-b4e0-4ecf-b75f-849fdfe23f53",
       "560f51f7-2a1d-4686-9263-443620d70424",
       "562dd49e-edfe-4205-a9f8-91341484e51e",
       "5c985aeb-c7c9-43d8-a02f-459e7c3ae5ab",
@@ -12765,6 +13640,7 @@
       "7d132130-5a0a-4903-9ead-234891483a8a",
       "8065ea88-584b-4302-bc80-500eaa898b07",
       "96736772-7044-4218-bc51-8fff1ab4cd0f",
+      "9d172c16-b686-495c-be10-6f17731e7177",
       "9d5df9cc-1b3e-4a91-a682-89c4c26964c4",
       "c405c12c-4853-4c4b-acb0-b9be992e4ea6",
       "c668646c-4118-40ae-af42-7e4a6ae2469c",
@@ -12890,6 +13766,53 @@
           }
         },
         "excludedProperties": []
+      }
+    }
+  },
+  "5ae31912-f400-4142-bced-40ad5dd28261": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "myStuffSignInButton",
+    "apiId": "myStuffSignInButton",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "DetailsMenuTextFocused",
+          "top": 576,
+          "left": 916,
+          "text": "Sign In",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 105,
+          "height": 80,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/MyStuffScreen/LayoutGroup/MarkupGrid/DetailMenuItem/Group[2]/Label[2]",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
       }
     }
   },
@@ -14245,6 +15168,56 @@
       }
     }
   },
+  "632521df-0a30-40f0-b912-2e29ea04e61d": {
+    "status": "unchanged",
+    "tests": [
+      "35521bd6-f8ca-451c-9d73-8bb2f1cb744a",
+      "f39fb0c7-633c-4042-96fd-3c348b7a54c2"
+    ],
+    "name": "leftNavOpen",
+    "apiId": "leftNavOpen",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "sideNavBackground",
+          "top": 0,
+          "left": 0,
+          "image": "pkg:/images/sideNavBackground_kidsmode.webp",
+          "width": 475,
+          "height": 1080,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/Poster",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "width"
+        ]
+      }
+    }
+  },
   "63365475-e2d5-4ff0-8dcf-3396d5225529": {
     "status": "unchanged",
     "tests": [
@@ -14572,6 +15545,57 @@
       }
     }
   },
+  "654c1260-84e9-4f3e-9a7d-46c5f22f811e": {
+    "status": "unchanged",
+    "tests": [
+      "2a45f963-dd19-4ff4-baa5-26475cfa2fb6"
+    ],
+    "name": "myStuffNewLeftNav",
+    "apiId": "myStuffNewLeftNav",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "textLabel",
+          "top": 486,
+          "left": 298,
+          "text": "NEW",
+          "color": "rgba(0, 0, 0, 1)",
+          "width": 41,
+          "height": 18,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[5]/LayoutGroup/TextIcon/SimpleLabel",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "655ed39b-c76c-422c-9950-5d222ce7ea36": {
     "status": "unchanged",
     "tests": [
@@ -14589,19 +15613,19 @@
       "roku": {
         "info": {
           "id": "Title",
-          "top": 133,
-          "left": 217,
-          "text": "The Thorn Birds",
+          "top": 180,
+          "left": 192,
+          "text": "Mrs. Columbo",
           "color": "rgba(255, 255, 255, 1)",
           "width": 960,
           "height": 44,
-          "opacity": 1,
+          "opacity": 0.4,
           "isFocused": false,
           "visibility": "visible"
         },
         "selectors": {
           "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup/Label",
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen[2]/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/Label",
             "active": true
           }
         },
@@ -15107,6 +16131,59 @@
           "left",
           "opacity",
           "color",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
+  "6ac05863-db7a-430d-8453-ea613201111a": {
+    "status": "unchanged",
+    "tests": [
+      "12d7bd5d-8ed5-4efe-baf5-c399ce6f59d4",
+      "4f3bd3c1-bca1-41cf-ba73-946b6e6fef28",
+      "5c6b6ced-7565-421e-93b4-c5e5b452568f",
+      "f045a2a2-4fa1-46d0-9f80-7940c348b76f",
+      "f43dc01c-735e-4a0a-bb81-e4ff37466f4a"
+    ],
+    "name": "ageGateScreen",
+    "apiId": "ageGateScreen",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "gradient_1",
+          "top": 0,
+          "left": 0,
+          "width": 1920,
+          "height": 1080,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/BackgroundGroup/Group[2]/MultipleGradientGroup/Group/BackgroundGradientGroup[2]",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
           "top",
           "videoLength",
           "videoPos",
@@ -16579,20 +17656,24 @@
     "platforms": {
       "roku": {
         "info": {
-          "id": "buttonText",
-          "top": 533,
+          "id": "Title",
+          "top": 376,
           "left": 544,
-          "text": "Sign In",
+          "text": "Please Sign In",
           "color": "rgba(255, 255, 255, 1)",
-          "width": 475,
-          "height": 79,
+          "width": 763,
+          "height": 41,
           "opacity": 1,
           "isFocused": false,
           "visibility": "visible"
         },
         "selectors": {
-          "xpath": {
-            "val": "/TubiScene/ContentController/ModalDialogScreen/Rectangle[2]/LayoutGroup/FilledButtonMarkupGrid/ModalListItem/Label",
+          "text": {
+            "val": "Sign In",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
             "active": true
           }
         },
@@ -16935,9 +18016,60 @@
       }
     }
   },
+  "78047a76-fe57-48a9-9439-199ed2117ac5": {
+    "status": "unchanged",
+    "tests": [
+      "c7303a26-46d8-40b2-a7dd-adb4e8dc2784"
+    ],
+    "name": "olderKidsCheckButton",
+    "apiId": "olderKidsCheckButton",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Check",
+          "top": 682,
+          "left": 766,
+          "image": "pkg:/images/check.png",
+          "width": 20,
+          "height": 16,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/ParentalControlsPanel/Group/Group/MarkupList/CheckButton[2]/LayoutGroup/Poster",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "78172c3c-7647-47ee-8e32-35e0a0d05a86": {
     "status": "unchanged",
     "tests": [
+      "840381ef-26d8-4c23-882a-b004631bcf76",
       "d841cff2-a8e3-4982-9d77-f283234c2a33"
     ],
     "name": "featuredRow",
@@ -17165,6 +18297,55 @@
       }
     }
   },
+  "79a897d6-31bf-4201-a8a6-a764cdf58d37": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "pressBackforMenu",
+    "apiId": "pressBackforMenu",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "callToAction",
+          "top": 62,
+          "left": 230,
+          "text": "PRESS BACK FOR MENU",
+          "color": "rgba(221, 221, 221, 1)",
+          "width": 254,
+          "height": 47,
+          "opacity": 0.5,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group/LayoutGroup/Label",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "79ee9d94-5b9e-4cdb-86c3-946751fb8455": {
     "status": "unchanged",
     "tests": [],
@@ -17345,6 +18526,69 @@
           }
         },
         "excludedProperties": []
+      }
+    }
+  },
+  "7aaacb2c-d4c3-4e1e-8abf-9920e4e0273b": {
+    "status": "unchanged",
+    "tests": [
+      "0256da59-7a94-48df-a863-c2e333babf3c",
+      "1163c456-9a39-446c-9496-652215c7eafb",
+      "143b7533-be0f-4907-a551-671d4336ea21",
+      "397d5ca1-4915-4162-b185-be1e8ed477df",
+      "99a1de22-32ba-433f-9a0f-1d5fd5fa60c2",
+      "b8b0535c-7ebc-471a-8936-0fb56ebf5f2b",
+      "bc81b836-114b-4634-80f1-ebdc6081c758",
+      "d01e03b6-5877-4fbc-9ac1-7e019ca6d94e",
+      "e8eb68d1-5b0e-4b34-ad46-56d040b31711"
+    ],
+    "name": "myStuffContinueWathingRow",
+    "apiId": "myStuffContinueWathingRow",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "CategoryName",
+          "top": 580,
+          "left": 192,
+          "text": "Continue Watching",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 1000,
+          "height": 36,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "text": {
+            "val": "Continue Watching",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
       }
     }
   },
@@ -17948,18 +19192,24 @@
     "status": "unchanged",
     "tests": [
       "1cb32b02-5184-4496-b73e-fe2f10b038fa",
+      "268f2199-e386-4a50-a6dc-b2fd279e00db",
+      "2829ffc2-1272-4060-a3fa-7e0f5cff75c5",
       "29894021-2bba-4cea-b347-0fa8040c3a53",
       "30d388b1-e002-42d0-b046-26c0280069bc",
       "344c353b-6272-4a41-9fbe-18cfd9a91ed4",
       "5c985aeb-c7c9-43d8-a02f-459e7c3ae5ab",
       "60ee3137-5664-48fc-921f-ef13f9f94c22",
+      "7367dc10-82de-4034-91a5-327922499a11",
       "7619aabe-e3cc-4876-b453-0acc3f998279",
       "95eb2efc-5a04-41a2-81a4-71bae5474d6a",
       "bcbe44fc-30bf-4c07-acf8-7b265c97ad12",
       "c07ba154-1cc6-4907-a96f-2c83d08b92a0",
       "c835be2e-7b23-4943-8cb5-313fa4402655",
+      "ccaed3ba-507e-4c8c-8f17-2a467f1ebb82",
       "ced55b68-b949-4e4e-9246-311335ead3dc",
       "d7effac4-2b05-4a10-b15c-44326ac373a3",
+      "eb6d9441-3d62-429d-8832-4354aac725dd",
+      "ed099dae-d0a4-4a94-8974-e0964de2f35c",
       "f95f4a3a-4342-40e7-9715-83a8677388a7"
     ],
     "name": "videoPlayerActual",
@@ -18025,14 +19275,15 @@
     "platforms": {
       "roku": {
         "info": {
-          "id": "Title",
-          "top": 362,
-          "left": 544,
+          "id": "Label",
+          "top": 207,
+          "left": 162,
           "text": "Exit Kids",
-          "color": "rgba(255, 255, 255, 1)",
-          "width": 763,
-          "height": 40,
-          "opacity": 1,
+          "color": "rgba(0, 47, 138, 1)",
+          "width": 133,
+          "height": 60,
+          "opacity": 0.31,
+          "isFocused": false,
           "visibility": "visible"
         },
         "selectors": {
@@ -18055,8 +19306,6 @@
           "itemFocused",
           "left",
           "opacity",
-          "color",
-          "text",
           "top",
           "videoLength",
           "videoPos",
@@ -18079,7 +19328,6 @@
       "6e59bd0c-eec1-46dc-9257-15f733bc2a5c",
       "77e39168-cc62-4b60-8720-8b5988ba60e6",
       "7e1c3212-0855-4d27-9e9a-c1a102519112",
-      "840381ef-26d8-4c23-882a-b004631bcf76",
       "86edaf8f-7937-4cf4-a258-152beb4cc4a0",
       "88954424-d3ed-457d-a0db-71dcc7bedd23",
       "8cbfd46e-d218-4b01-ba0a-a65c67702bab",
@@ -18098,17 +19346,20 @@
     "platforms": {
       "roku": {
         "info": {
-          "id": "TitleGroup",
-          "top": 191,
-          "left": 85,
-          "width": 1175,
-          "height": 222,
+          "id": "Title",
+          "top": 133,
+          "left": 192,
+          "text": "Carnifex",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 960,
+          "height": 45,
           "opacity": 1,
+          "isFocused": false,
           "visibility": "visible"
         },
         "selectors": {
           "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup",
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Label",
             "active": true
           }
         },
@@ -18289,7 +19540,13 @@
   },
   "806e05dd-d483-4d7a-afe7-5a8d0389373e": {
     "status": "unchanged",
-    "tests": [],
+    "tests": [
+      "2a45f963-dd19-4ff4-baa5-26475cfa2fb6",
+      "478b2805-1098-4b49-a73a-e50add299c87",
+      "99a1de22-32ba-433f-9a0f-1d5fd5fa60c2",
+      "b8b0535c-7ebc-471a-8936-0fb56ebf5f2b",
+      "d01e03b6-5877-4fbc-9ac1-7e019ca6d94e"
+    ],
     "name": "addToMyListSelected2",
     "apiId": "addToMyListSelected2",
     "platforms": {
@@ -18307,6 +19564,62 @@
         "selectors": {
           "xpath": {
             "val": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid/DetailMenuItem[4]",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
+  "80734d7a-2825-43da-b394-9f58f2c95e52": {
+    "status": "unchanged",
+    "tests": [
+      "12d7bd5d-8ed5-4efe-baf5-c399ce6f59d4",
+      "5c6b6ced-7565-421e-93b4-c5e5b452568f"
+    ],
+    "name": "cannotExitKidsDialog",
+    "apiId": "cannotExitKidsDialog",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Title",
+          "top": 405,
+          "left": 544,
+          "text": "Cannot Exit Kids Mode",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 763,
+          "height": 40,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "text": {
+            "val": "Cannot Exit Kids Mode",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
             "active": true
           }
         },
@@ -18412,9 +19725,7 @@
   },
   "80f8b95a-acd9-411b-a6c3-4edf4b778f7d": {
     "status": "unchanged",
-    "tests": [
-      "09227227-6ee6-49e0-9671-b77cce70df45"
-    ],
+    "tests": [],
     "name": "homeScreenecommendedChannels",
     "apiId": "homeScreenecommendedChannels",
     "platforms": {
@@ -19035,9 +20346,7 @@
   },
   "83f663a3-cf0c-454b-936d-1e3ac1f8fcb3": {
     "status": "unchanged",
-    "tests": [
-      "beac4c77-424d-4c21-8063-07589f2fa937"
-    ],
+    "tests": [],
     "name": "homeScreenReleaseYr",
     "apiId": "homeScreenReleaseYr",
     "platforms": {
@@ -19046,17 +20355,21 @@
           "id": "Line1",
           "top": 254,
           "left": 192,
-          "text": "2022 · 1 h 29 min ",
+          "text": "1996 · Series ",
           "color": "rgba(221, 221, 221, 1)",
-          "width": 223,
+          "width": 172,
           "height": 25,
-          "opacity": 0.2,
+          "opacity": 0.5,
           "isFocused": false,
           "visibility": "visible"
         },
         "selectors": {
-          "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen[2]/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup/LayoutGroup/Label",
+          "text": {
+            "val": "1996",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
             "active": true
           }
         },
@@ -19086,7 +20399,9 @@
   },
   "842b9c05-3404-489f-9e0d-1110f1a426ef": {
     "status": "unchanged",
-    "tests": [],
+    "tests": [
+      "cb2235e8-33e7-4afd-8202-fbaddade79c6"
+    ],
     "name": "addToMyListFocusedRoku",
     "apiId": "addToMyListFocusedRoku",
     "platforms": {
@@ -21380,6 +22695,57 @@
       }
     }
   },
+  "93c45f87-5588-4ec6-b4cc-3919fd539bb7": {
+    "status": "unchanged",
+    "tests": [
+      "0ed23f5d-b50d-4354-a2f2-5374be471c29",
+      "b29f314a-7427-46c1-a20d-e332c9a02ff1"
+    ],
+    "name": "unlockScreen",
+    "apiId": "unlockScreen",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "BackgroundGradient",
+          "top": 0,
+          "left": 0,
+          "image": "pkg:/images/bottomGradient.webp",
+          "width": 1920,
+          "height": 1080,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/BackgroundGroup/Group[2]/MultipleGradientGroup/Group/BackgroundGradientGroup[2]/Poster",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "93d8b556-4c94-40a0-8880-10415c4e6251": {
     "status": "unchanged",
     "tests": [],
@@ -21669,9 +23035,9 @@
       "5b713da3-2c66-4db5-97c7-677f2533491f",
       "686a67ec-1ad6-4d4a-b17e-69d939a663ef",
       "7e3a1e2f-9c24-45cf-b619-5cdb2d7e0462",
-      "98b08c09-ad12-49e5-bec8-5a8560cc4d04",
       "bfd57b3c-d9b9-4176-8e46-6a1165147078",
-      "cde4177a-b3fa-4c69-aa42-22b9a259b02d"
+      "cde4177a-b3fa-4c69-aa42-22b9a259b02d",
+      "d84db765-6c00-4026-9763-1b50ffa09f52"
     ],
     "name": "parentalControlCheckButton",
     "apiId": "parentalControlCheckButton",
@@ -21680,16 +23046,17 @@
         "info": {
           "id": "Check",
           "top": 858,
-          "left": 800,
+          "left": 781,
           "image": "pkg:/images/check.png",
           "width": 20,
           "height": 16,
           "opacity": 1,
+          "isFocused": false,
           "visibility": "visible"
         },
         "selectors": {
           "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/ParentalControlsPanel/Group/Group/MarkupList/CheckButton[4]/LayoutGroup/Poster",
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/ParentalControlsPanel/Group/Group/MarkupList/CheckButton[4]/LayoutGroup/Group/Poster",
             "active": true
           }
         },
@@ -22162,7 +23529,11 @@
   "99883bec-7db7-4f4b-a4e1-5f3b78b6e883": {
     "status": "unchanged",
     "tests": [
-      "61b87815-df1d-46f9-82c1-d8214ff71552"
+      "2e00ecef-d820-4929-9fc3-506ff4842b32",
+      "35521bd6-f8ca-451c-9d73-8bb2f1cb744a",
+      "61b87815-df1d-46f9-82c1-d8214ff71552",
+      "fca7e87d-16b3-4ac8-a899-2f21a62a5774",
+      "ff36edb9-887e-40ff-b1e0-65fd1a59de22"
     ],
     "name": "homeScreenMyListRow",
     "apiId": "homeScreenMyListRow",
@@ -22582,6 +23953,59 @@
       }
     }
   },
+  "9dc4e46d-c93e-4bdf-b0fa-f2bae3dc2a00": {
+    "status": "unchanged",
+    "tests": [
+      "1d2fad53-bfe0-4a4e-865c-6eb06f4fbca1",
+      "d0270260-9a9a-4f4f-a23c-4663c22eecfb",
+      "e3037428-8494-470a-b9f5-7a2dc084559a"
+    ],
+    "name": "kidsModeMyStuffUnlockScreen",
+    "apiId": "kidsModeMyStuffUnlockScreen",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "DetailsMenuTextFocused",
+          "top": 576,
+          "left": 916,
+          "text": "Sign In",
+          "color": "rgba(0, 47, 138, 1)",
+          "width": 105,
+          "height": 80,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/MyStuffScreen/LayoutGroup/MarkupGrid/DetailMenuItem/Group[2]/Label[2]",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "9dd460f1-e486-4376-809c-6e34d92a10a1": {
     "status": "unchanged",
     "tests": [],
@@ -22617,6 +24041,58 @@
           "left",
           "opacity",
           "color",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
+  "9e335df7-2abe-46e0-a040-5190d9dd7574": {
+    "status": "unchanged",
+    "tests": [
+      "1163c456-9a39-446c-9496-652215c7eafb",
+      "b29f314a-7427-46c1-a20d-e332c9a02ff1",
+      "d01e03b6-5877-4fbc-9ac1-7e019ca6d94e"
+    ],
+    "name": "myStuffEmptyScreen",
+    "apiId": "myStuffEmptyScreen",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "BackgroundGradient",
+          "top": 0,
+          "left": 0,
+          "image": "pkg:/images/bottomGradient.webp",
+          "width": 1920,
+          "height": 1080,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/BackgroundGroup/Group[2]/MultipleGradientGroup/Group/BackgroundGradientGroup[2]/Poster",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
           "top",
           "videoLength",
           "videoPos",
@@ -22951,7 +24427,6 @@
       "29894021-2bba-4cea-b347-0fa8040c3a53",
       "2af235b0-9af1-41cc-a94f-8da6dee53f3d",
       "30d388b1-e002-42d0-b046-26c0280069bc",
-      "36579ff2-8757-42ae-80b0-56c76c2777c6",
       "4a3da3bb-63a7-48b0-8127-ea6fe1708823",
       "5a0ff85b-bd6b-4112-8882-f026835b186b",
       "5c985aeb-c7c9-43d8-a02f-459e7c3ae5ab",
@@ -23176,13 +24651,15 @@
     "status": "unchanged",
     "tests": [
       "023f0e72-819f-4ea1-a56b-ed2f2721bc34",
+      "079d4dfc-3943-45fc-9592-7ca324a3d86b",
       "0c54cca0-b6a1-41d1-957c-e99dcb65f82a",
       "194e0815-118a-428b-a367-9434db335a3a",
       "519e3541-691c-4891-a3a3-c78c8f5bea8a",
       "58cfd143-d7b1-44ce-a493-b30844107a9b",
       "5fbd8cad-3c55-4e70-8066-1feba43f64f8",
       "8b9ea244-6d79-4241-b6a8-5ede0730b1c1",
-      "bfd57b3c-d9b9-4176-8e46-6a1165147078"
+      "bfd57b3c-d9b9-4176-8e46-6a1165147078",
+      "d84db765-6c00-4026-9763-1b50ffa09f52"
     ],
     "name": "parentalControlLittleKidsDialog",
     "apiId": "parentalControlLittleKidsDialog",
@@ -23230,6 +24707,7 @@
   "a1ae2047-224e-4063-a312-7025de3a8877": {
     "status": "unchanged",
     "tests": [
+      "037c5263-54d8-4abd-bba6-48ce3ad85fcb",
       "054ea9e2-3178-497b-8735-110b2a4e9d70",
       "2bd55ea4-5c2f-4717-b2c2-2348fb17ed3a",
       "e728a7fa-cefb-448c-aa89-d139c417be6e"
@@ -23388,6 +24866,58 @@
           "left",
           "opacity",
           "color",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
+  "a24ef7a3-dd70-4d39-b5b3-6a8ccd2cfd9f": {
+    "status": "unchanged",
+    "tests": [
+      "2e00ecef-d820-4929-9fc3-506ff4842b32",
+      "b6a620a2-c908-434e-8331-8bfc719c0bf6"
+    ],
+    "name": "detailsPageRating",
+    "apiId": "detailsPageRating",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "RatingLabel",
+          "top": 251,
+          "left": 491,
+          "text": "PG",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 54,
+          "height": 36,
+          "opacity": 0.8,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen[2]/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup/LayoutGroup/Group/Label",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
           "top",
           "videoLength",
           "videoPos",
@@ -24074,6 +25604,58 @@
       }
     }
   },
+  "a7ffb2df-3840-488d-9354-b2de6290948b": {
+    "status": "unchanged",
+    "tests": [
+      "0256da59-7a94-48df-a863-c2e333babf3c",
+      "143b7533-be0f-4907-a551-671d4336ea21"
+    ],
+    "name": "yourListIsEmptyText",
+    "apiId": "yourListIsEmptyText",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Title",
+          "top": 764,
+          "left": 814,
+          "text": "Your list is empty",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 329,
+          "height": 39,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/MyStuffScreen/MaskGroup/RowList/RowListItem[2]/MarkupGrid/CategoryGridPoster/MyStuffEmptyCategoryGridPoster/Group/LayoutGroup/Label",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "a8548b59-194e-4f58-b886-98ad2586221f": {
     "status": "unchanged",
     "tests": [],
@@ -24268,6 +25850,60 @@
       }
     }
   },
+  "a9f49428-516b-4f5a-98ed-048a1788aa85": {
+    "status": "unchanged",
+    "tests": [
+      "35521bd6-f8ca-451c-9d73-8bb2f1cb744a",
+      "bc81b836-114b-4634-80f1-ebdc6081c758",
+      "fca7e87d-16b3-4ac8-a899-2f21a62a5774",
+      "ff36edb9-887e-40ff-b1e0-65fd1a59de22"
+    ],
+    "name": "kidsDetailsPageRating",
+    "apiId": "kidsDetailsPageRating",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "RatingLabel",
+          "top": 204,
+          "left": 374,
+          "text": "TV-Y",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 75,
+          "height": 36,
+          "opacity": 0.8,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup/LayoutGroup/Group/Label",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "ab606358-228e-425b-b612-87fec900fbee": {
     "status": "unchanged",
     "tests": [],
@@ -24345,8 +25981,10 @@
   "aba8177e-7f39-4c55-bdb7-205b01b9d25e": {
     "status": "unchanged",
     "tests": [
+      "2a45f963-dd19-4ff4-baa5-26475cfa2fb6",
       "a63e316f-f632-4fd1-ad91-bf3f85475408",
-      "b45e7d9f-cde3-433f-b39d-af1bdd64cfc9"
+      "b45e7d9f-cde3-433f-b39d-af1bdd64cfc9",
+      "d01e03b6-5877-4fbc-9ac1-7e019ca6d94e"
     ],
     "name": "removeFromMyList",
     "apiId": "removeFromMyList",
@@ -24354,18 +25992,23 @@
       "roku": {
         "info": {
           "id": "DetailsMenuText",
-          "top": 832,
-          "left": 132,
+          "top": 818,
+          "left": 239,
           "text": "Remove from My List",
           "color": "rgba(255, 255, 255, 1)",
           "width": 330,
           "height": 80,
           "opacity": 1,
+          "isFocused": false,
           "visibility": "visible"
         },
         "selectors": {
-          "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid/DetailMenuItem[3]/Label",
+          "text": {
+            "val": "Remove from My List",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
             "active": true
           }
         },
@@ -24659,6 +26302,55 @@
           }
         },
         "excludedProperties": []
+      }
+    }
+  },
+  "ad6434d8-61ee-432b-8e9a-d02e3ae5dd7f": {
+    "status": "unchanged",
+    "tests": [
+      "0ed23f5d-b50d-4354-a2f2-5374be471c29",
+      "5f223307-4496-49f5-a9bf-11fd1b200f22"
+    ],
+    "name": "myStuffLeftNav",
+    "apiId": "myStuffLeftNav",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Label",
+          "top": 459,
+          "left": 142,
+          "text": "My Stuff",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 132,
+          "height": 72,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[5]/LayoutGroup/Group/Label",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
       }
     }
   },
@@ -25160,6 +26852,55 @@
           "left",
           "opacity",
           "color",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
+  "b0cead15-d918-4fc2-a1c0-e9a76bb16352": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "registeredKidsModeExitButton",
+    "apiId": "registeredKidsModeExitButton",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Label",
+          "top": 207,
+          "left": 142,
+          "text": "Exit Kids",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 133,
+          "height": 72,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[2]/LayoutGroup/Label",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
           "top",
           "videoLength",
           "videoPos",
@@ -26732,6 +28473,52 @@
       }
     }
   },
+  "b9421282-9526-4c59-ba36-81a91cc7ab81": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "Group",
+    "apiId": "Group",
+    "platforms": {
+      "roku": {
+        "info": {
+          "top": 770,
+          "left": 781,
+          "width": 801,
+          "height": 786,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/ParentalControlsPanel/Group/Group/MarkupList/CheckButton[3]/LayoutGroup/Group",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "b96132d7-49a5-4b95-8ce7-29412dafc498": {
     "status": "unchanged",
     "tests": [],
@@ -27426,29 +29213,28 @@
   },
   "bbd95582-5ee1-4e45-9a1b-9e8b9dc25be8": {
     "status": "unchanged",
-    "tests": [],
+    "tests": [
+      "879e6b99-ca58-47ff-be38-8729e37b0629"
+    ],
     "name": "categoriesBlackCinemaTile",
     "apiId": "categoriesBlackCinemaTile",
     "platforms": {
       "roku": {
         "info": {
           "id": "Title",
-          "top": 375,
-          "left": 71,
+          "top": 278,
+          "left": 1039,
           "text": "Black Cinema",
           "color": "rgba(255, 255, 255, 1)",
-          "width": 258,
-          "height": 51,
+          "width": 346,
+          "height": 76,
           "opacity": 1,
+          "isFocused": false,
           "visibility": "visible"
         },
         "selectors": {
-          "text": {
-            "val": "Black Cinema",
-            "active": true
-          },
-          "ifMultipleFoundReturn": {
-            "val": 1,
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/ChannelGridScreen/MarkupGrid/ChannelCategoryGridPoster[11]/Label",
             "active": true
           }
         },
@@ -27477,6 +29263,52 @@
           }
         },
         "excludedProperties": []
+      }
+    }
+  },
+  "bbf3f19b-228c-4642-bdc5-53cf543583b4": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "CheckButton",
+    "apiId": "CheckButton",
+    "platforms": {
+      "roku": {
+        "info": {
+          "top": 826,
+          "left": 751,
+          "width": 280,
+          "height": 80,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/ParentalControlsPanel/Group/Group/MarkupList/CheckButton[4]",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
       }
     }
   },
@@ -28384,6 +30216,58 @@
       }
     }
   },
+  "c0cc84d5-d27d-4830-9e71-e2d4eca2eba1": {
+    "status": "unchanged",
+    "tests": [
+      "05ee1923-083e-469c-ae32-3228de11bb14",
+      "b8b0535c-7ebc-471a-8936-0fb56ebf5f2b",
+      "d01e03b6-5877-4fbc-9ac1-7e019ca6d94e"
+    ],
+    "name": "continueWatchingIcon",
+    "apiId": "continueWatchingIcon",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Icon",
+          "top": 662,
+          "left": 936,
+          "image": "pkg:/images/screenMyStuffContinueWatchingIcon.webp",
+          "width": 84,
+          "height": 84,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/MyStuffScreen/MaskGroup/RowList/RowListItem/MarkupGrid/CategoryGridPoster/MyStuffEmptyCategoryGridPoster/Group/LayoutGroup/Poster",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "c0f9b3b0-8fc7-4e60-81b3-744d0ff8b15a": {
     "status": "unchanged",
     "tests": [],
@@ -28944,6 +30828,56 @@
       }
     }
   },
+  "c4d5cedf-71ff-4c15-b071-2e38ed7c67d0": {
+    "status": "unchanged",
+    "tests": [
+      "9d172c16-b686-495c-be10-6f17731e7177"
+    ],
+    "name": "homeIconLeftNav",
+    "apiId": "homeIconLeftNav",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Icon",
+          "top": 390,
+          "left": 94,
+          "image": "pkg:/images/sideNavHome.webp",
+          "width": 36,
+          "height": 36,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[4]/Group/Poster",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "c4e3b8a5-1cf4-4045-b314-4194df8fc660": {
     "status": "unchanged",
     "tests": [],
@@ -29253,6 +31187,62 @@
         "selectors": {
           "text": {
             "val": "My List",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
+  "c5cd7fb1-f1e9-4fff-8bf4-093f008ce45f": {
+    "status": "unchanged",
+    "tests": [
+      "98b08c09-ad12-49e5-bec8-5a8560cc4d04",
+      "c7303a26-46d8-40b2-a7dd-adb4e8dc2784"
+    ],
+    "name": "pcAdultsText",
+    "apiId": "pcAdultsText",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Message",
+          "top": 495,
+          "left": 544,
+          "text": "Parental controls setting has changed to Adults. Parental controls will be password protected after 5 minutes.",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 822,
+          "height": 62,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "text": {
+            "val": "Adults",
             "active": true
           },
           "ifMultipleFoundReturn": {
@@ -30185,6 +32175,65 @@
       }
     }
   },
+  "cab22ecf-8ae0-462d-8fc6-16347f6e7f28": {
+    "status": "unchanged",
+    "tests": [
+      "268f2199-e386-4a50-a6dc-b2fd279e00db",
+      "7367dc10-82de-4034-91a5-327922499a11",
+      "b6a620a2-c908-434e-8331-8bfc719c0bf6",
+      "ccaed3ba-507e-4c8c-8f17-2a467f1ebb82",
+      "eb6d9441-3d62-429d-8832-4354aac725dd"
+    ],
+    "name": "homeScreenMovieNightRow",
+    "apiId": "homeScreenMovieNightRow",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "CategoryName",
+          "top": 573,
+          "left": 192,
+          "text": "Movie Night!",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 1000,
+          "height": 36,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "invisible"
+        },
+        "selectors": {
+          "text": {
+            "val": "Movie Night!",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "cac972cd-31b3-466f-ad38-8f22a57e2ee5": {
     "status": "unchanged",
     "tests": [],
@@ -30920,6 +32969,63 @@
       }
     }
   },
+  "cedbe53d-d80d-431c-9122-31f2a7af38e2": {
+    "status": "unchanged",
+    "tests": [
+      "079d4dfc-3943-45fc-9592-7ca324a3d86b",
+      "358d556c-adf7-4825-8357-f378c5728d92",
+      "cffc5061-46a2-4794-b3d5-0338f7b92749"
+    ],
+    "name": "kidsNotAllowed",
+    "apiId": "kidsNotAllowed",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Message",
+          "top": 513,
+          "left": 544,
+          "text": "Could not retrieve content information from server.",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 822,
+          "height": 25,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "text": {
+            "val": "Could not retrieve content information from server",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "cf8326e2-fec8-4302-8aa0-1a63c448aa78": {
     "status": "unchanged",
     "tests": [],
@@ -31069,6 +33175,7 @@
   "d0249603-6515-4675-82b4-386ae7676f75": {
     "status": "unchanged",
     "tests": [
+      "879e6b99-ca58-47ff-be38-8729e37b0629",
       "f0d4ea5d-af77-4333-bb03-5ff611722b45"
     ],
     "name": "categoriesActionTile",
@@ -31076,23 +33183,19 @@
     "platforms": {
       "roku": {
         "info": {
-          "id": "Title",
-          "top": 291,
-          "left": 1427,
-          "text": "Action",
-          "color": "rgba(255, 255, 255, 1)",
-          "width": 387,
-          "height": 76,
+          "id": "Logo",
+          "top": 276,
+          "left": 698,
+          "image": "",
+          "width": 200,
+          "height": 80,
           "opacity": 1,
+          "isFocused": false,
           "visibility": "visible"
         },
         "selectors": {
-          "text": {
-            "val": "Action",
-            "active": true
-          },
           "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/ChannelGridScreen/MarkupGrid/ChannelCategoryGridPoster[4]/Label",
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/ChannelGridScreen/MarkupGrid/ChannelCategoryGridPoster[2]/Poster[2]",
             "active": true
           }
         },
@@ -31365,6 +33468,62 @@
           }
         },
         "excludedProperties": []
+      }
+    }
+  },
+  "d1eb3689-16a1-4217-8b8e-fba4e10aafad": {
+    "status": "unchanged",
+    "tests": [
+      "12d7bd5d-8ed5-4efe-baf5-c399ce6f59d4",
+      "5c6b6ced-7565-421e-93b4-c5e5b452568f"
+    ],
+    "name": "ageConfirmDialog",
+    "apiId": "ageConfirmDialog",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Title",
+          "top": 380,
+          "left": 544,
+          "text": "Were you born in 2014?",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 763,
+          "height": 40,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "text": {
+            "val": "2014",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
       }
     }
   },
@@ -31811,7 +33970,8 @@
   "d300f3cf-40f5-4387-aff4-c854195e8131": {
     "status": "unchanged",
     "tests": [
-      "0b07a6df-9e8b-4c26-aa48-c15069000749"
+      "0b07a6df-9e8b-4c26-aa48-c15069000749",
+      "5a0ff85b-bd6b-4112-8882-f026835b186b"
     ],
     "name": "seriesSignUpToSaveProgressButton",
     "apiId": "seriesSignUpToSaveProgressButton",
@@ -31832,6 +33992,61 @@
         "selectors": {
           "text": {
             "val": "Sign Up to Save Progress",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
+  "d34bd956-dde9-46a4-85c0-fc582bdccc18": {
+    "status": "unchanged",
+    "tests": [
+      "f045a2a2-4fa1-46d0-9f80-7940c348b76f"
+    ],
+    "name": "validYearVerificationErrorPrompt",
+    "apiId": "validYearVerificationErrorPrompt",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "AgeVerificationErrorPrompt",
+          "top": 804,
+          "left": 626,
+          "text": "Please enter a valid year of birth",
+          "color": "rgba(235, 156, 0, 1)",
+          "width": 1000,
+          "height": 25,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "text": {
+            "val": "Please enter a valid year of birth",
             "active": true
           },
           "ifMultipleFoundReturn": {
@@ -32172,29 +34387,30 @@
       }
     }
   },
-  "d51d0498-32f1-4971-a5b5-4bd3232eadf1": {
+  "d5051831-8ff5-4d0e-8293-d301645912f4": {
     "status": "unchanged",
     "tests": [
-      "15fcce4d-95a6-470e-b75e-0ab94b15d4c9",
-      "9046414c-4000-49c1-8307-cc0c630f544c"
+      "eb6d9441-3d62-429d-8832-4354aac725dd"
     ],
-    "name": "homescreenRowList",
-    "apiId": "homescreenRowList",
+    "name": "homeScreenRatingsLabel",
+    "apiId": "homeScreenRatingsLabel",
     "platforms": {
       "roku": {
         "info": {
-          "id": "RowList",
-          "top": 350,
-          "left": 57,
-          "width": 1229,
-          "height": 528,
-          "opacity": 1,
-          "visibility": "visible",
-          "itemFocused": 0
+          "id": "RatingLabel",
+          "top": 251,
+          "left": 491,
+          "text": "PG-13",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 89,
+          "height": 36,
+          "opacity": 0.8,
+          "isFocused": false,
+          "visibility": "visible"
         },
         "selectors": {
           "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList",
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen[2]/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup/LayoutGroup/Group/Label",
             "active": true
           }
         },
@@ -32205,6 +34421,7 @@
           "height",
           "id",
           "image",
+          "isFocused",
           "itemFocused",
           "left",
           "opacity",
@@ -32217,6 +34434,55 @@
           "videoUrl",
           "visibility",
           "width"
+        ]
+      }
+    }
+  },
+  "d51d0498-32f1-4971-a5b5-4bd3232eadf1": {
+    "status": "unchanged",
+    "tests": [
+      "15fcce4d-95a6-470e-b75e-0ab94b15d4c9",
+      "9046414c-4000-49c1-8307-cc0c630f544c",
+      "aaa21cdc-6f47-47fa-93cc-97548186237e"
+    ],
+    "name": "homescreenRowLists1",
+    "apiId": "homescreenRowLists1",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "RowList",
+          "top": 350,
+          "left": 57,
+          "width": 1229,
+          "height": 528,
+          "opacity": 1,
+          "visibility": "visible",
+          "itemFocused": 1
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "image",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width",
+          "isFocused",
+          "height"
         ]
       }
     }
@@ -32258,6 +34524,58 @@
           "left",
           "opacity",
           "color",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
+  "d555e60a-e8a6-4de7-ba1e-7d6622e63c81": {
+    "status": "unchanged",
+    "tests": [
+      "214179f2-d76b-43ea-8b04-debfe01b5615",
+      "50a7714c-d87e-426e-9116-431f34f67119",
+      "98b08c09-ad12-49e5-bec8-5a8560cc4d04"
+    ],
+    "name": "adultsCheckButton",
+    "apiId": "adultsCheckButton",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Check",
+          "top": 858,
+          "left": 781,
+          "image": "pkg:/images/check.png",
+          "width": 20,
+          "height": 16,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/ParentalControlsPanel/Group/Group/MarkupList/CheckButton[4]/LayoutGroup/Group/Poster",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
           "top",
           "videoLength",
           "videoPos",
@@ -32487,6 +34805,55 @@
       }
     }
   },
+  "d8bb56c2-e121-445d-a698-2e64c63a9620": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "epgSubtitles",
+    "apiId": "epgSubtitles",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "btnCC_label",
+          "top": 810,
+          "left": 132,
+          "text": "Subtitles",
+          "color": "rgba(255, 255, 255, 1)",
+          "width": 106,
+          "height": 36,
+          "opacity": 0.5,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/LinearVideoPlayerScreen/LinearVideoPlayerScreenOverlay/Group/Group/LinearOverlaySideNav/ButtonGroup/Button/Label[2]",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "d9107468-972c-4a36-831e-331c1b38d646": {
     "status": "unchanged",
     "tests": [],
@@ -32571,10 +34938,12 @@
   "d9693b75-b7c4-435d-8c95-a1c6a0eec0b7": {
     "status": "unchanged",
     "tests": [
+      "16d104f8-99e0-489a-8725-506393c2ebf3",
       "519e3541-691c-4891-a3a3-c78c8f5bea8a",
       "5b713da3-2c66-4db5-97c7-677f2533491f",
       "686a67ec-1ad6-4d4a-b17e-69d939a663ef",
-      "7530a69e-7818-4d21-8df1-b09c98a33f42"
+      "7530a69e-7818-4d21-8df1-b09c98a33f42",
+      "d84db765-6c00-4026-9763-1b50ffa09f52"
     ],
     "name": "enterPasswordToUpdate",
     "apiId": "enterPasswordToUpdate",
@@ -33065,9 +35434,9 @@
     "platforms": {
       "roku": {
         "info": {
-          "id": "Text",
+          "id": "TextFocused",
           "top": 541,
-          "left": 826,
+          "left": 841,
           "text": "Off",
           "color": "rgba(255, 255, 255, 1)",
           "width": 465,
@@ -33078,7 +35447,7 @@
         },
         "selectors": {
           "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/AutoplayPreviewPanel/Group/Group/MarkupList/CheckButton[2]/LayoutGroup/Label",
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/AutoplayPreviewPanel/Group/Group/MarkupList/CheckButton[2]/LayoutGroup/Group[2]/Label[2]",
             "active": true
           }
         },
@@ -33411,8 +35780,10 @@
   "de072bcf-c62f-4722-b0c7-88e998ebc08f": {
     "status": "unchanged",
     "tests": [
+      "8459c7a6-813c-4310-be83-9dd6b2390bde",
       "9d384f94-e144-4f4b-95a9-0830bad1db62",
       "c0dea0d2-b47c-427a-b287-e04ba88e2992",
+      "c59e0f11-84d2-4610-88be-2108a0e4dff3",
       "e1266ca5-6916-4f32-b5c9-1d3069966d36",
       "e4c0c5d8-8f0b-40e7-8d0e-408001fde99e"
     ],
@@ -33603,6 +35974,59 @@
       }
     }
   },
+  "deb4aa1d-e8de-42cf-9e5c-a0366cb74ef2": {
+    "status": "unchanged",
+    "tests": [
+      "1d2fad53-bfe0-4a4e-865c-6eb06f4fbca1",
+      "d0270260-9a9a-4f4f-a23c-4663c22eecfb",
+      "e3037428-8494-470a-b9f5-7a2dc084559a"
+    ],
+    "name": "kidsHomeMenuItem",
+    "apiId": "kidsHomeMenuItem",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "focusedLabel",
+          "top": 375,
+          "left": 142,
+          "text": "Home",
+          "color": "rgba(0, 47, 138, 1)",
+          "width": 86,
+          "height": 72,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[4]/LayoutGroup/Group/Label[2]",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "df533961-858b-4e6c-a836-43361365e7b2": {
     "status": "unchanged",
     "tests": [
@@ -33733,6 +36157,53 @@
       }
     }
   },
+  "dff8f9f0-f302-446b-b39a-e1b19362ce91": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "kidModeEmptyMyStuffPage",
+    "apiId": "kidModeEmptyMyStuffPage",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "gradient_1",
+          "top": 0,
+          "left": 0,
+          "width": 1920,
+          "height": 1080,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/BackgroundGroup/Group[2]/MultipleGradientGroup/Group/BackgroundGradientGroup[2]",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "e0539eb6-ca9e-4d2d-8886-85a5e1f55cd2": {
     "status": "unchanged",
     "tests": [
@@ -33833,19 +36304,27 @@
   "e19ad9ec-b013-4c29-be58-dbdcf4f2cf39": {
     "status": "unchanged",
     "tests": [
-      "e37bbef2-15d5-42fa-867a-720f12330bac"
+      "268f2199-e386-4a50-a6dc-b2fd279e00db",
+      "6e219504-e926-45e2-aa29-49f6c2dc675d",
+      "7367dc10-82de-4034-91a5-327922499a11",
+      "82b43294-ac99-4d21-b2f3-7bab7ecb2094",
+      "ccaed3ba-507e-4c8c-8f17-2a467f1ebb82",
+      "df140c56-bb87-483d-a584-9a8355d52e93",
+      "e37bbef2-15d5-42fa-867a-720f12330bac",
+      "e551967d-4036-48bb-80f1-805782e69aeb",
+      "f39fb0c7-633c-4042-96fd-3c348b7a54c2"
     ],
-    "name": "homeScreenRatingLabel",
-    "apiId": "homeScreenRatingLabel",
+    "name": "homeScreenRatingLabelCW",
+    "apiId": "homeScreenRatingLabelCW",
     "platforms": {
       "roku": {
         "info": {
           "id": "RatingLabel",
-          "top": 204,
+          "top": 251,
           "left": 491,
-          "text": "PG",
+          "text": "TV-MA",
           "color": "rgba(255, 255, 255, 1)",
-          "width": 54,
+          "width": 96,
           "height": 36,
           "opacity": 0.8,
           "isFocused": false,
@@ -33867,7 +36346,6 @@
           "left",
           "opacity",
           "color",
-          "text",
           "top",
           "videoLength",
           "videoPos",
@@ -34245,8 +36723,10 @@
     "status": "unchanged",
     "tests": [
       "3d313789-f0fc-4c80-8f9f-ce027382c302",
+      "4f3bd3c1-bca1-41cf-ba73-946b6e6fef28",
       "6f784e6b-fa91-4c55-b246-1a0bbc7e23fb",
-      "cfaf9971-c1a5-4213-a7aa-9ceb1600cab0"
+      "cfaf9971-c1a5-4213-a7aa-9ceb1600cab0",
+      "d0270260-9a9a-4f4f-a23c-4663c22eecfb"
     ],
     "name": "homeScreenFeaturedCategory",
     "apiId": "homeScreenFeaturedCategory",
@@ -34402,7 +36882,7 @@
       "roku": {
         "info": {
           "id": "DetailsMenuText",
-          "top": 732,
+          "top": 746,
           "left": 785,
           "text": "Sign Up to Save Progress - FREE",
           "color": "rgba(255, 255, 255, 1)",
@@ -34414,7 +36894,7 @@
         },
         "selectors": {
           "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList/RowListItem[6]/MarkupGrid/CategoryGridPoster/ContinueWatchingCategoryGridPoster/Group/LayoutGroup/Group/DetailMenuItem/Label",
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList/RowListItem[6]/MarkupGrid/CategoryGridPoster/ContinueWatchingCategoryGridPoster/Group/LayoutGroup/Group/DetailMenuItem/Group[2]/Label",
             "active": true
           }
         },
@@ -35176,6 +37656,111 @@
       }
     }
   },
+  "e969cdd1-c2a6-42ab-ad43-cbe39b385520": {
+    "status": "unchanged",
+    "tests": [
+      "f045a2a2-4fa1-46d0-9f80-7940c348b76f"
+    ],
+    "name": "ageVerificationErrorPrompt",
+    "apiId": "ageVerificationErrorPrompt",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "AgeVerificationErrorPrompt",
+          "top": 804,
+          "left": 626,
+          "text": "Please be sure the information you entered is correct",
+          "color": "rgba(235, 156, 0, 1)",
+          "width": 1000,
+          "height": 25,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "text": {
+            "val": "Please be sure the information you entered is correct",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
+  "e997acc4-abea-480f-a939-d40c1c13cb66": {
+    "status": "unchanged",
+    "tests": [
+      "e551967d-4036-48bb-80f1-805782e69aeb"
+    ],
+    "name": "leftNavOpenTeens",
+    "apiId": "leftNavOpenTeens",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "mainItemsSelected",
+          "top": 108,
+          "left": 58,
+          "width": 438,
+          "height": 1020,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible",
+          "itemFocused": -1
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "e99c1098-8956-487f-bccb-b44ed8152df8": {
     "status": "unchanged",
     "tests": [],
@@ -35384,24 +37969,17 @@
     "platforms": {
       "roku": {
         "info": {
-          "id": "CategoryName",
-          "top": 540,
-          "left": 192,
-          "text": "My List",
-          "color": "rgba(255, 255, 255, 1)",
-          "width": 1000,
-          "height": 36,
+          "top": 543,
+          "left": 142,
+          "width": 302,
+          "height": 615,
           "opacity": 1,
           "isFocused": false,
           "visibility": "visible"
         },
         "selectors": {
-          "text": {
-            "val": "My List",
-            "active": true
-          },
-          "ifMultipleFoundReturn": {
-            "val": 1,
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[6]/LayoutGroup/Group",
             "active": true
           }
         },
@@ -35529,6 +38107,51 @@
           }
         },
         "excludedProperties": []
+      }
+    }
+  },
+  "ec759bdd-08d1-4f9e-b5e6-592034d3bff8": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "sideNavIconComponentVisible",
+    "apiId": "sideNavIconComponentVisible",
+    "platforms": {
+      "roku": {
+        "info": {
+          "top": 372,
+          "left": 58,
+          "width": 438,
+          "height": 72,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[4]",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "width"
+        ]
       }
     }
   },
@@ -36091,6 +38714,54 @@
       }
     }
   },
+  "f1520a04-6072-46eb-ac52-191ab29c226d": {
+    "status": "unchanged",
+    "tests": [
+      "2a45f963-dd19-4ff4-baa5-26475cfa2fb6"
+    ],
+    "name": "myStuffMyListRow",
+    "apiId": "myStuffMyListRow",
+    "platforms": {
+      "roku": {
+        "info": {
+          "top": 543,
+          "left": 142,
+          "width": 302,
+          "height": 615,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[6]/LayoutGroup/Group",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "f1d5e1a8-42b2-4a98-96ca-5d6906896959": {
     "status": "unchanged",
     "tests": [
@@ -36405,6 +39076,56 @@
       }
     }
   },
+  "f3a1e737-9034-4008-8e04-ae34c7b27c39": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "startWatchingButtonFocused",
+    "apiId": "startWatchingButtonFocused",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "AgeVerificationStartButton",
+          "top": 809,
+          "left": 126,
+          "text": "Start Watching",
+          "width": 489,
+          "height": 80,
+          "opacity": 1,
+          "isFocused": true,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "text": {
+            "val": "Start Watching",
+            "active": true
+          },
+          "ifMultipleFoundReturn": {
+            "val": 1,
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
   "f3ff055c-5cf9-4aed-b911-b047c2663b23": {
     "status": "unchanged",
     "tests": [],
@@ -36443,6 +39164,53 @@
           "left",
           "opacity",
           "color",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
+  "f40fcb34-3aaf-4dae-a6e3-43fb880eacc2": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "DirectorPrefix (1)",
+    "apiId": "DirectorPrefix (1)",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "DirectorPrefix",
+          "top": 498,
+          "left": 192,
+          "width": 723,
+          "height": 989,
+          "opacity": 1,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup[3]/LayoutGroup",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
           "top",
           "videoLength",
           "videoPos",
@@ -37048,7 +39816,8 @@
   "f8216817-8d19-430a-974d-a32e1923a350": {
     "status": "unchanged",
     "tests": [
-      "972f1510-fa97-44ac-a90e-39d01fd5bd86"
+      "972f1510-fa97-44ac-a90e-39d01fd5bd86",
+      "9fcc7ab2-1873-4101-bcfc-e1c75a42bae7"
     ],
     "name": "detailsPageSignUpToSaveProgressButton",
     "apiId": "detailsPageSignUpToSaveProgressButton",
@@ -37521,18 +40290,18 @@
         "info": {
           "id": "Label",
           "top": 207,
-          "left": 162,
+          "left": 142,
           "text": "Exit Kids",
           "color": "rgba(255, 255, 255, 1)",
           "width": 133,
-          "height": 60,
+          "height": 72,
           "opacity": 0.31,
           "isFocused": false,
           "visibility": "visible"
         },
         "selectors": {
           "xpath": {
-            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[2]/LayoutGroup/Label",
+            "val": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[2]/LayoutGroup/Group/Label",
             "active": true
           }
         },
@@ -38286,6 +41055,55 @@
         "selectors": {
           "xpath": {
             "val": "/TubiScene/ContentController/Group/Group/ScreenStack/EPGHomeScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Group/Label",
+            "active": true
+          }
+        },
+        "excludedProperties": [
+          "backgroundColor",
+          "fontSize",
+          "fontURI",
+          "height",
+          "id",
+          "image",
+          "isFocused",
+          "itemFocused",
+          "left",
+          "opacity",
+          "color",
+          "text",
+          "top",
+          "videoLength",
+          "videoPos",
+          "videoState",
+          "videoUrl",
+          "visibility",
+          "width"
+        ]
+      }
+    }
+  },
+  "fff7eec3-3983-4b4b-b1c8-c07a66315d77": {
+    "status": "unchanged",
+    "tests": [],
+    "name": "passwordField",
+    "apiId": "passwordField",
+    "platforms": {
+      "roku": {
+        "info": {
+          "id": "Text",
+          "top": 417,
+          "left": 669,
+          "text": "password",
+          "color": "rgba(255, 255, 255, 0.1)",
+          "width": 122,
+          "height": 80,
+          "opacity": 0.7,
+          "isFocused": false,
+          "visibility": "visible"
+        },
+        "selectors": {
+          "xpath": {
+            "val": "/TubiScene/ContentController/Group/Group/ScreenStack/SignInScreen[2]/LayoutGroup/TextEntryBox[2]/Label",
             "active": true
           }
         },

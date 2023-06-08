@@ -870,6 +870,7 @@ exports.runSuitestTests = series(setAutomatedTestsConfig, clean, buildInstalled,
 exports.convertXpathsToKeyPaths = series(setAutomatedTestsConfig, clean, buildInstalled, convertXpathsToKeyPaths);
 exports.convertSuitestTest = convertSuitestTest;
 
+
 // Automated test related
 exports.buildAutomatedTests = series(setAutomatedTestsConfig, buildInstalled);
 exports.runAutomatedTests = series(setAutomatedTestsConfig, buildInstalled, runAutomatedTests);

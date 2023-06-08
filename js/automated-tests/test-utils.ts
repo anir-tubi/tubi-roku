@@ -155,12 +155,19 @@ class TestUtils {
 
   // Starts the application at the specified page.
   // If asSignedInUser is true we will log them in else we will log them out
-  public async startApplicationAtPage(page: DeeplinkPage, asSignedInUser = false) {
-    const deeplink = {
-      page: page
-    };
+  public async startApplicationAtPage(page: DeeplinkPage | 'search', asSignedInUser = false) {
+    let deeplink;
+    if (page !== 'search') {
+      deeplink = {
+        page: page
+      };
+    }
 
     await this.startApplicationWithDeeplink(deeplink, asSignedInUser);
+
+    if (page === 'search') {
+      await this.goToPage('search');
+    }
   }
 
 

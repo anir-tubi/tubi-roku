@@ -5,12 +5,6 @@
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList/RowListItem/Group/CategoryGridRowLabel/Label",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName"
   },
-  "playBackVideoPlayer": {
-    "elementId": "154276eb-4878-4b79-b8a8-f4ed2aeb5775",
-    "name": "playBackVideoPlayer",
-    "xpath": "/TubiScene/ContentController/Group/Group/Group/VideoPreviewPlayer/Video",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#VideoPreviewGroup.#VideoPreviewPlayer.#VideoNode"
-  },
   "tubiKidsLogo": {
     "elementId": "184ceefc-8e08-47b1-834b-6351016857a8",
     "name": "tubiKidsLogo",
@@ -29,17 +23,23 @@
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList/RowListItem[11]/Group/CategoryGridRowLabel/LayoutGroup/Label",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#SponsoredBy.#SponsoredByText"
   },
+  "kidsHomeScreenRatingsLabel": {
+    "elementId": "33a004bc-9c22-4df0-a5d0-9124fbb058ff",
+    "name": "kidsHomeScreenRatingsLabel",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup/LayoutGroup/Group/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Rating.#RatingLabel"
+  },
+  "homeScreenRecommendedChannels": {
+    "elementId": "3b812b5c-a0f9-40dd-9acf-a6961b6ae4c1",
+    "name": "homeScreenRecommendedChannels",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList/RowListItem[3]/Group/CategoryGridRowLabel/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName"
+  },
   "sideNavItems": {
     "elementId": "41912c49-7831-4487-9a17-40ff770bd66d",
     "name": "sideNavItems",
     "xpath": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[4]/Label",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#subTxt"
-  },
-  "sideNavSignedInLabel": {
-    "elementId": "48cfca48-22a5-46f2-a2d8-9778b9be7183",
-    "name": "sideNavSignedInLabel",
-    "xpath": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent/LayoutGroup/Label",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.0.#LabelParent.#Label"
   },
   "homeRowList": {
     "elementId": "498b58d7-600d-4e92-a859-ccc2970a3fe1",
@@ -59,12 +59,6 @@
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/TopNav/MarkupGrid/TopNavItem",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.0"
   },
-  "sideNavHomeIcon": {
-    "elementId": "5153e919-9e7b-4c4f-bfbc-059b3d52b306",
-    "name": "sideNavHomeIcon",
-    "xpath": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[4]/Poster",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#Icon"
-  },
   "loadingPoster": {
     "elementId": "56a4d7bf-19cf-4111-a7b4-1fc0cd11c4cc",
     "name": "loadingPoster",
@@ -76,6 +70,18 @@
     "name": "topNavForYouLabel",
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/TopNav/MarkupGrid/TopNavItem/Label[2]",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.0.#TopLabel"
+  },
+  "leftNavOpen": {
+    "elementId": "632521df-0a30-40f0-b912-2e29ea04e61d",
+    "name": "leftNavOpen",
+    "xpath": "/TubiScene/ContentController/Group/Group/SideNav/Poster",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#sideNavBackground"
+  },
+  "ageGateScreen": {
+    "elementId": "6ac05863-db7a-430d-8453-ea613201111a",
+    "name": "ageGateScreen",
+    "xpath": "/TubiScene/ContentController/Group/Group/BackgroundGroup/Group[2]/MultipleGradientGroup/Group/BackgroundGradientGroup[2]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#GradientGroup.#LeftBottomGradient.#gradientGroup.#gradient_1"
   },
   "BackgroundGradient": {
     "elementId": "752a329d-adff-42c4-89ee-0a87af32bb12",
@@ -89,6 +95,12 @@
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/Label",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#Title"
   },
+  "unlockScreen": {
+    "elementId": "93c45f87-5588-4ec6-b4cc-3919fd539bb7",
+    "name": "unlockScreen",
+    "xpath": "/TubiScene/ContentController/Group/Group/BackgroundGroup/Group[2]/MultipleGradientGroup/Group/BackgroundGradientGroup[2]/Poster",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#GradientGroup.#LeftBottomGradient.#gradientGroup.#gradient_1.#BackgroundGradient"
+  },
   "homeScreenMyListRow": {
     "elementId": "99883bec-7db7-4f4b-a4e1-5f3b78b6e883",
     "name": "homeScreenMyListRow",
@@ -100,6 +112,18 @@
     "name": "homeInfoPanel",
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset"
+  },
+  "myStuffEmptyScreen": {
+    "elementId": "9e335df7-2abe-46e0-a040-5190d9dd7574",
+    "name": "myStuffEmptyScreen",
+    "xpath": "/TubiScene/ContentController/Group/Group/BackgroundGroup/Group[2]/MultipleGradientGroup/Group/BackgroundGradientGroup[2]/Poster",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#GradientGroup.#LeftBottomGradient.#gradientGroup.#gradient_1.#BackgroundGradient"
+  },
+  "kidsDetailsPageRating": {
+    "elementId": "a9f49428-516b-4f5a-98ed-048a1788aa85",
+    "name": "kidsDetailsPageRating",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup/LayoutGroup/Group/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Rating.#RatingLabel"
   },
   "liveNewsHomeLinearPlayer": {
     "elementId": "bb6bcd21-cd9b-4287-996c-bd2d814c238d",
@@ -113,23 +137,23 @@
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset"
   },
-  "homescreenRowList": {
+  "homescreenRowLists1": {
     "elementId": "d51d0498-32f1-4971-a5b5-4bd3232eadf1",
-    "name": "homescreenRowList",
+    "name": "homescreenRowLists1",
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList"
   },
-  "homeScreenRatingLabel": {
+  "homeScreenRatingLabelCW": {
     "elementId": "e19ad9ec-b013-4c29-be58-dbdcf4f2cf39",
-    "name": "homeScreenRatingLabel",
+    "name": "homeScreenRatingLabelCW",
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup/LayoutGroup/Group/Label",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Rating.#RatingLabel"
   },
-  "exitKidsGrayedOut": {
-    "elementId": "fbf2c422-9335-46e9-966b-b9fc37506916",
-    "name": "exitKidsGrayedOut",
-    "xpath": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid[2]/SideNavIconComponent[2]/LayoutGroup/Label",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.1.#LabelParent.#Label"
+  "leftNavOpenTeens": {
+    "elementId": "e997acc4-abea-480f-a939-d40c1c13cb66",
+    "name": "leftNavOpenTeens",
+    "xpath": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected"
   },
   "topNavNewsLabel": {
     "elementId": "fd42554d-40c6-4f53-8080-3e1493f32ccb",
@@ -143,17 +167,17 @@
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/TopNav",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home"
   },
+  "titleMovieDetailsTitle": {
+    "elementId": "16ad5b32-eb6a-4bde-96d4-53fbf74c0e1d",
+    "name": "titleMovieDetailsTitle",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#Title"
+  },
   "detailsPageMenu": {
     "elementId": "2fcefcb8-7828-4d11-8c4f-8f5a7ea56fd0",
     "name": "detailsPageMenu",
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu"
-  },
-  "reactionsButton": {
-    "elementId": "3cd1dd12-7514-46f0-bfea-7d12a04ffb04",
-    "name": "reactionsButton",
-    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid/DetailMenuItem[2]/Poster[2]",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.1.#Icon"
   },
   "secondaryMenuactive": {
     "elementId": "4bf3dfd7-ce5d-44f9-b386-78f92d5e049b",
@@ -161,17 +185,17 @@
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid[2]",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#SecondaryMenu"
   },
-  "titleRuntimeYear": {
-    "elementId": "51570323-c2b8-4e90-826e-2de079bb0654",
-    "name": "titleRuntimeYear",
-    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup[2]/LayoutGroup/Label",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#StarringGroup.#StarringPrefix.#StarringTag"
-  },
   "titleInfoPanel": {
     "elementId": "7e3cb7c4-fdde-4198-904f-5b6a5db269d6",
     "name": "titleInfoPanel",
-    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset"
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#Title"
+  },
+  "addToMyListSelected2": {
+    "elementId": "806e05dd-d483-4d7a-afe7-5a8d0389373e",
+    "name": "addToMyListSelected2",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid/DetailMenuItem[4]",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.3"
   },
   "addToMyListSelected3": {
     "elementId": "9af7daa2-c21b-4cd2-afed-58ae89f284e3",
@@ -184,12 +208,6 @@
     "name": "playButton",
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid/DetailMenuItem",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.0"
-  },
-  "removeFromMyList": {
-    "elementId": "aba8177e-7f39-4c55-bdb7-205b01b9d25e",
-    "name": "removeFromMyList",
-    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/FilledButtonMarkupGrid/DetailMenuItem[3]/Label",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.2.#DetailsMenuText"
   },
   "secondaryMenu": {
     "elementId": "b1b1a3fe-eca8-43b8-8c41-30fcecaf6bde",
@@ -311,11 +329,11 @@
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[2]",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#RewindButton"
   },
-  "parentalControlCheckButton": {
-    "elementId": "95d31b2f-5b81-4695-958c-bca5fef32608",
-    "name": "parentalControlCheckButton",
-    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/ParentalControlsPanel/Group/Group/MarkupList/CheckButton[4]/LayoutGroup/Poster",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#ParentalControlsMenu.3.#BtnLayout.#Check"
+  "olderKidsCheckButton": {
+    "elementId": "78047a76-fe57-48a9-9439-199ed2117ac5",
+    "name": "olderKidsCheckButton",
+    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/SettingsScreen/PanelSet/ParentalControlsPanel/Group/Group/MarkupList/CheckButton[2]/LayoutGroup/Poster",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#ParentalControlsMenu.1.#BtnLayout.#Check"
   },
   "settingsScreen": {
     "elementId": "de072bcf-c62f-4722-b0c7-88e998ebc08f",

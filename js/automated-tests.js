@@ -47,6 +47,7 @@ async function runAutomatedTestsCli (done) {
 
   const config = utils.getConfigFromConfigFile();
   const envs = env.set({
+    buildFolder: `${applicationFolder}/build/local`,
     rtaConfig: JSON.stringify(config)
   });
 
