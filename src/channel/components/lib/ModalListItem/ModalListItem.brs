@@ -1,4 +1,5 @@
 Function init()
+  m.buttonTextParent = m.top.findNode("buttonTextParent")
   m.buttonText = m.top.findNode("buttonText")
   m.buttonTextFocused = m.top.findNode("buttonTextFocused")
   m.buttonTextFocused.opacity = 0
@@ -39,6 +40,6 @@ Function onItemContentChange()
     m.buttonTextFocused.width = nBoundingTextWidth 
      ' Adjust the width of the menu if the text is too long for the default width
      ' Adding the left and right margin along with text width 
-    m.top.calculatedWidth = nBoundingTextWidth + 2 * m.buttonText.translation[0]
+    m.top.calculatedWidth = nBoundingTextWidth + (2 * m.buttonTextParent.translation[0])
   end if
 End Function
