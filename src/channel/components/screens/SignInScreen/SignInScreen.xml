@@ -155,6 +155,7 @@
 
     <PasswordEntryKeyboard
       id="passwordEntryKeyboard"
+      shouldMuteAudioGuideWhenFocused="true"
       translation="[0,1080]"/>
 
   </children>

@@ -9,7 +9,9 @@ Function init()
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
   m.keyboard.observeFieldScoped("buttonSelected", "onButtonSelected")
 
-  m.top.muteAudioGuide = true
+  'This field is used to know whether screen componenets are read or not before the focused keyboard keys started announcing.
+  m.isScreenAudioGuideRead = false
+
   m.keyboard.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
 
   'set initial tracking values
@@ -60,14 +62,6 @@ Function onScreenFocusChange()
     ' force a background update
     m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
     m.top.backgroundUriList = m.backgroundUriList
-    message = getTranslation("screenSettings_parentalPassword_title")
-    subMessage = getTranslation("screenSettings_parentalPassword_subtitle")
-    setUp = getTranslation("screenSettings_parentalPassword_setup_new_password") + ","
-    visit = getTranslation("screenSettings_parentalPassword_visit_link")
-
-    audioGuideText = message + "" + subMessage + " " + setUp + " " + visit
-    readAudioGuideText(audioGuideText)
-
 
     m.keyboard.setFocus(true)
     m.keyboard.voiceEnabled = true
@@ -125,6 +119,18 @@ End Function
 Function onAudioGuideTextChanged(msg)
   audioGuideText = msg.getData()
   if isNonEmptyString(audioGuideText) = true
-    readAudioGuideText(audioGuideText, false)
+
+    if m.isScreenAudioGuideRead = false
+      message = getTranslation("screenSettings_parentalPassword_title")
+      subMessage = getTranslation("screenSettings_parentalPassword_subtitle")
+      setUp = getTranslation("screenSettings_parentalPassword_setup_new_password") + ","
+      visit = getTranslation("screenSettings_parentalPassword_visit_link")
+
+      screenAudioGuideText = message + "" + subMessage + " " + setUp + " " + visit
+      audioGuideText = screenAudioGuideText + audioGuideText
+      m.isScreenAudioGuideRead = true
+    end if
+
+    readAudioGuideText(audioGuideText)
   end if
 End Function

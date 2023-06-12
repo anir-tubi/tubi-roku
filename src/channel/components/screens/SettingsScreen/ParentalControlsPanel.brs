@@ -13,6 +13,9 @@ Function init()
 
   m.Menu.observeFieldScoped("itemFocused", "onItemFocusChanged")
 
+  'm.instructionsText is used to store the title and description of parental controls for screen reader when screen loaded.
+  m.instructionsText = ""
+
   theme = getThemeFromGlobal()
   if theme <> invalid
     m.Menu.focusBitmapBlendColor = theme.focusedColor
@@ -31,6 +34,8 @@ Function setParentalControlStrings()
   Title.text = getTranslation("screenSettings_menu_parentalControls")
   Instructions = m.top.findNode("Instructions")
   Instructions.text = getTranslation("screenSettings_parentalControls_instructions")
+
+  m.instructionsText = Title.text + " " + Instructions.text
 
   nWidestWidth = 0
   newContent = m.Menu.content.clone(true)
@@ -100,5 +105,14 @@ End Function
 Function onItemFocusChanged(msg)
   focusIndex = msg.getData()
   focusedContent = m.Menu.content.getChild(focusIndex)
-  m.top.audioGuideText = focusedContent.title
+  m.top.audioGuideText = m.instructionsText + " " + focusedContent.title
+
+  'When parental controls loaded, we are reading the title and description along with the focused menu item.
+  'After setting the audio guide text, we are resetting back to empty string as we don't need to read the title/description everytime.
+  if isNonEmptyString(m.instructionsText) = true
+    m.top.audioGuideText = m.instructionsText + " " + focusedContent.title
+    m.instructionsText = ""
+  else
+    m.top.audioGuideText = focusedContent.title
+  end if
 End Function

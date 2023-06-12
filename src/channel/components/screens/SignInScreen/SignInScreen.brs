@@ -138,7 +138,8 @@ Function setFocusToComponent(focusTarget)
     focusTarget.setFocus(true)
     audioGuideText = ""
 
-    if isRokuAudioGuideEnabled() = true
+    'Avoid screen reader for keyboard as we already handling in passwordentrykeyboard.
+    if isRokuAudioGuideEnabled() = true AND focusTarget.id <> "passwordEntryKeyboard"
       if topHasFocus = true
         audioGuideText = m.pageHeading.text + " " + m.pageSubHeading.text
         if m.email.text = ""

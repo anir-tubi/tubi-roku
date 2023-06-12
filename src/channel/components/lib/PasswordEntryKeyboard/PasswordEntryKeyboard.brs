@@ -72,6 +72,8 @@ Function onButtonSelected(evt)
           m.showHidePassword.text = getTranslation("screenSettings_parentalPassword_button_show")
           m.passwordMode = true
         end if
+
+        m.top.audioGuideText = m.showHidePassword.text
   end if
 
   m.top.buttonSelected = buttonSelected.id
@@ -88,6 +90,15 @@ End Function
 
 Function onScreenFocusChange()
   if m.top.hasFocus() = true
+
+    'We are enabling and disabling the ROKU default audio guide for keyboard based on whether the
+    'keyboard is focused when the screen gains focus.
+    if m.top.shouldMuteAudioGuideWhenFocused = true
+      m.keyboard.muteAudioGuide = false
+    else
+      m.keyboard.muteAudioGuide = true
+    end if
+
     m.keyboard.keyGrid.setFocus(true)
   end if
 End Function
@@ -181,11 +192,12 @@ End Function
 
 
 'This function is to read the first focused keys in the keyboard as we disable the default screen reader for keyboard initially
-'to read the screen components and later we enable roku default screen reader for keyboard.
-'NOTE: hardcoded values are to match the default keyboard.
+'to read the screen components and later we enable roku default screen reader for keyboard and this is not required for some screens
+'as keyboard gains focus only when we press ok on password field.
 Function onKeyGridChange(msg)
   keyGrid = msg.getData()
-  if isNonEmptyString(m.keyFocused) = true AND m.keyboard.muteAudioGuide = true
+
+  if isNonEmptyString(m.keyFocused) = true AND m.top.shouldMuteAudioGuideWhenFocused = false
     audioGuideText = ""
     if keyGrid.keyFocused = "a"
       audioGuideText = keyGrid.keyFocused + " " + "alpha"
