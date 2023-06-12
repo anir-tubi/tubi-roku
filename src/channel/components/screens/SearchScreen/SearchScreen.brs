@@ -519,6 +519,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
       m.ResultGrid.jumpToItem = nJumpTo
       handleInfoPanelVisibilityForLeftPress()
       m.Keyboard.setFocus(true)
+      m.top.stopVideoPreview = true
       m.gridHasFocus = false
       m.bResultsInFocus = false
       return true
