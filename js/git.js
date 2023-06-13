@@ -543,8 +543,8 @@ ${qaChangesText.join('\n\n<hr>\n\n')}`;
 }
 
 
-function getPullRequestCommitsForBranch(done, branch, oneLine = false) {
-  let command = `git log ${branch} -200`;
+function getPullRequestCommitsForBranch(done, branch, commitCount, oneLine = false) {
+  let command = `git log ${branch} -${commitCount}`;
   if (oneLine) {
     command += ' --oneline';
   }
@@ -567,8 +567,9 @@ function getPullRequestCommitsForBranch(done, branch, oneLine = false) {
 // Compares the commits on branchA against the commits on branchB, based on their pull request numbers, and returns an array of commit messages for the commits that exist on branchA but do not exist on branchB.
 // @branchA: string, the branch name we are comparing to branchA
 // @branchB: string, the branch name we are comparing to branchB
+// @commitCount: number, the number of maximum number of commits you want to compare between the branches
 // @returns: string[], the PR ID like '1234'
-async function findPullRequestCommitDifferences(done, branchA, branchB) {
+async function findPullRequestCommitDifferences(done, branchA, branchB, commitCount = 200) {
   // verify clean working directory
   verifyGit(done);
 
@@ -585,11 +586,11 @@ async function findPullRequestCommitDifferences(done, branchA, branchB) {
 
   // process/store pull requests on branchA branch
   await pullOrFetchBranch(done, branchA);
-  const branchACommits = getPullRequestCommitsForBranch(done, branchA, true);
+  const branchACommits = getPullRequestCommitsForBranch(done, branchA, commitCount, true);
 
   // process/store pull requests on branchB branch
   await pullOrFetchBranch(done, branchB);
-  const branchBCommits = getPullRequestCommitsForBranch(done, branchB); // Note we need to use oneLine output to include pull requests that may have been squash merged in.
+  const branchBCommits = getPullRequestCommitsForBranch(done, branchB, commitCount * 2); // Note we need to not use oneLine output to include pull requests that may have been squash merged in.
 
   const pullRequestCommitsNotInBranchB = [];
   // filter down to pullRequests from master that aren't on compareBranch
