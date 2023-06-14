@@ -689,11 +689,7 @@ Function onHomeScreenContentFocused(msg)
   focusedContent = msg.getData()
   homeScreen = msg.getRoSGNode()
 
-  if focusedContent <> invalid AND focusedContent.isFIFAContent = true
-    showHideLogo(m.constants.logoType.tubiFifa)
-  else
-    showHideLogoBasedOnUiMode()
-  end if
+  showHideLogoBasedOnUiMode()
 
   setHomeScreenAfterFocus(focusedContent, homeScreen)
 End Function

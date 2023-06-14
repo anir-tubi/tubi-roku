@@ -276,11 +276,6 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.needsLogin = true
   end if
 
-  if contentFromServer.type = "se" OR (contentFromServer.type = "l" AND contentFromServer.epg_feed <> invalid AND contentFromServer.epg_feed["callsign"]= "FIFA") OR (contentFromServer.type = "n" AND contentFromServer.id = m.constants.ui.contentIds.showAllGames)
-    translatedContent.addField("isFIFAContent", "boolean", false)
-    translatedContent.isFIFAContent = true
-  end if
-
   ' in case isCdc was already set from the parent above, don't overwrite
   if translatedContent.isCdc <> true AND contentFromServer.is_cdc <> invalid
     translatedContent.isCdc = contentFromServer.is_cdc

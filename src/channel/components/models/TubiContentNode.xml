@@ -36,8 +36,6 @@
 
     <field id="needsLogin" type="boolean"  value="false"/>
     <field id="hasVideoResources" type="boolean" />
-    <!--remove this field when fifa contents are no more avialable and also added dynamically
-    <field id="isFIFAContent" type="boolean" value="false"/> -->
 
     <!-- If the content is coming from a titan endpoint, then a titan_version will be set to this field.
     Or if any experiment is running on client side related to video stream formats, then experiment and treatment names will be set to this field
