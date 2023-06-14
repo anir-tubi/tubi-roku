@@ -298,9 +298,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     availabilityType = info.availabilityType
     detailScreen.availabilityType = availabilityType
 
-    if content.hasTrailer = true
-      detailScreen.hasTrailer = true
-    end if
+    detailScreen.hasTrailer = (content.hasTrailer = true)
 
     bookmark = getBookmark(content.id)
     history = getHistory(content.id)
