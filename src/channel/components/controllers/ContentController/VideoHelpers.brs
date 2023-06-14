@@ -221,6 +221,15 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     end if
 
     content.nowPos = position
+    
+    ' Adding logging if the program does not have title. 
+    ' Below logging is a approach to capture more logs to see if we have content title missing for any programs.
+    if isNonEmptyString(content.title) = false
+      videoInfo = {}
+      videoInfo.callSource = videoPlayer.playbackSource
+      videoInfo.contentId = content.id
+      tubiLog(FormatJSON(videoInfo), "info", "videoInfo", "video-title-undefined")
+    end if
 
     videoPlayer.content = content
     videoPlayer.updateContent = true
