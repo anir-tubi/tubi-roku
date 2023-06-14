@@ -419,7 +419,7 @@ Function logCrashesOnStartup(args, log, constants)
     "EXIT_DIAL_DELETE": true
     "EXIT_IDLE_AUTO_EXIT": true
     "EXIT_AM_LOWRESOURCE": true ' exited in the background because foreground application needed more memory
-    "EXIT_SETTINGS_UPDATE ": true ' User changed setting like their resolution which caused application to close
+    "EXIT_SETTINGS_UPDATE": true ' User changed setting like their resolution which caused application to close
     "EXIT_USER_NAV": true ' User pressed home button to exit application
   }
 
