@@ -88,7 +88,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_update_history_frequency: {
-        roku_update_history_frequency_v1 : {"enabled": false}
+        roku_update_history_frequency_v1 : {"enabled": true}
       }
     }
 
