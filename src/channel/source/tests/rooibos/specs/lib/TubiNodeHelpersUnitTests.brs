@@ -342,6 +342,12 @@ Function tubiNodeHelpers_removeChildAtIndex_test()
 
   m.nodeHelpers.removeChildAtIndex(m.parent, 0)
   m.assertEqual(m.parent.getChildCount(), 0)
+
+  ' Testing to make sure if we pass a index that does not exit it does not have any effect on the parent node.
+  childCount = m.parent.getChildCount()
+  m.nodeHelpers.removeChildAtIndex(m.parent, 100)
+  newChildCount = m.parent.getChildCount()
+  m.assertEqual(childCount, newChildCount)
 End Function
 
 '@Test removeChildAnimationNodes unit tests

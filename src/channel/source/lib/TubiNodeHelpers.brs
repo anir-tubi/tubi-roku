@@ -229,12 +229,15 @@ End Function
 ' @animationContext: assocarray, Contains a associative array with a parent field key of which value is node where the animation child is present ex: {parent: parentNode}.
 Function tubiNodeHelpers_removeChildAtIndex(parent, index, animationContext = invalid)
   child = parent.getChild(index)
-  parent.removeChild(child)
-
-  if animationContext <> invalid AND animationContext.parent <> invalid
-    m.removeChildAnimationNodes(animationContext.parent, child.id)
-  else
-    m.removeChildAnimationNodes(parent, child.id)
+  
+  ' Adding check to make sure if we do not proceed when the parent does not have any children.
+  if child <> invalid
+    parent.removeChild(child)
+    if animationContext <> invalid AND animationContext.parent <> invalid
+      m.removeChildAnimationNodes(animationContext.parent, child.id)
+    else
+      m.removeChildAnimationNodes(parent, child.id)
+    end if
   end if
 End Function
 
