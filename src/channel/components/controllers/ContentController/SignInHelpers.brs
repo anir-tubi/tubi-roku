@@ -23,7 +23,6 @@ End Function
 ' showRFIScreen is used to display the Request For Information modal
 Function showRFIScreen()
   tubiLog("SignInHelpers.showRFIScreen")
-
   suitest = m.constants.settings.suitest
   automaticActivation = m.constants.settings.automaticActivation
   settingsEmail = m.constants.settings.email

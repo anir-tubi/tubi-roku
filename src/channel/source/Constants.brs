@@ -401,6 +401,17 @@ Function getConstants()
     constants.instantResumeActions.restartApp = "restartApp"
     constants.instantResumeActions.resumeChannel = "resumeChannel"
 
+  'Types of modal dialogs
+  constants.modalDialogTypes = {}
+    constants.modalDialogTypes.simple = "simpleModal"
+    constants.modalDialogTypes.multiStyle = "multiStyle"
+
+
+  'Styles of modal Dialogs
+  constants.modalDialogStyles = {}
+    constants.modalDialogStyles.multiMessageGroup = "multiMessageGroup"
+    constants.modalDialogStyles.imageAsBody = "imageAsBody"
+
   'previously found in settings as "shortAppName"
   constants.appName = "tubitv"
 
@@ -1421,6 +1432,8 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
     holidaysLightPrimaryForeground = "THEME_holidaysLightPrimaryForeground_THEME"
     holidaysLightTransparentForeground75 = "THEME_holidaysLightTransparentForeground75_THEME"
 
+'//Extended Theme Constants
+    extendedDarkPrimaryBrandPurple = "THEME_extendedDarkPrimaryBrandPurple_THEME"
 
 constants.ui.colors = {}
     constants.ui.colors.transparent = "0x00000000"
@@ -1430,6 +1443,7 @@ constants.ui.themeIDs = {}
 constants.ui.themeIDs.default = "default"
 constants.ui.themeIDs.kidsMode = "kidsMode"
 constants.ui.themeIDs.holidays = "holidays"
+constants.ui.themeIDs.extended = "extended"
 
 
 'available themes that can be used for the app
@@ -1537,6 +1551,12 @@ constants.ui.themes = {}
         inverseBackgroundColor: holidaysLightPrimaryBackground
         inversePrimaryTextColor: holidaysLightPrimaryForeground
         inverseSecondaryTextColor: holidaysLightTransparentForeground75
+    }
+    '//extended is not actually a theme.
+    '//values under extended are used as constant values and these are not expected to change with theme.
+    constants.ui.themes.extended = {
+      id: constants.ui.themeIDs.extended
+      brandPurple: extendedDarkPrimaryBrandPurple
     }
 
 

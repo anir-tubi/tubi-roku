@@ -7,7 +7,10 @@
 '              {
 '                 title: <string>                   - The title to be displayed on the modal
 '                 message: <string>                 - The message to be displayed on the modal
+'                 modalDialogTypes: <string>        - This can be present or absent. If it is present, it needs to be enum value from constants.brs - modalDialogTypes-> "simpleModal"
+'                 modalDialogStyles = <string>      - In case of simple modal, This value can indicate if the message is scrollable of not.  -modalDialogStyles -> "scrollableMessage"
 '                 scrollable: <boolean>             - Is the modal vertically scrollable
+
 '                 openTrackEvent: <assocArray>      - The analytics tracking info that was sent when the modal was shown,
 '                                                     will be re-purposed for sending the dismiss dialog tracking event.
 '                                                     Should contain "type" and "values" keys.
@@ -27,42 +30,20 @@
 Function showModal(modalInfo, buttonInfo)
   ' Don't create the modal if a modal already exists, or there is not enough info to create it
   if m.tempModal = invalid AND modalInfo <> invalid AND buttonInfo <> invalid
-    modal = CreateObject("roSGNode", "ModalDialogScreen")
 
-    ' We need a unique id for our modals due to the animation but we need it to to be consistent across runs so we can test nodes within the dialog as part of our automation so we use a hash of the title and message to give a consistent id
-    title = modalInfo.title
-    message = modalInfo.message
-
-    ba = createObject("roByteArray")
-    ba.fromAsciiString(title + message)
-
-    digest = createObject("roEVPDigest")
-    digest.setup("md5")
-
-    modal.id = digest.process(ba).left(7)
-
-    modal.title = title
-    modal.message = message
-    modal.scrollable = modalInfo.scrollable
-    modal.instantResumeAction = modalInfo.instantResumeAction
+    modal = getSimpleModal(modalInfo)
 
     m.tempModal = {
       buttonInfo: buttonInfo
       modalInfo: modalInfo
     }
 
-    buttons = []
-    for i=0 to buttonInfo.count()-1
-      button = buttonInfo[i]
-      buttons.push(button.text)
-    end for
+    addButtonsToModal(modal, buttonInfo)
 
-    modal.buttons = buttons
-    modal.observeFieldScoped("buttonSelected", "onModalButtonSelected")
-    modal.observeFieldScoped("exitButton", "onModalButtonSelected")
     m.top.appendChild(modal)
     modal.visible = true
     modal.setFocus(true)
+
     ' send the show dialog track event
     if modalInfo.openTrackEvent <> invalid AND modalInfo.trackingTask <> invalid
       modalInfo.trackingTask.trackEvent = modalInfo.openTrackEvent
@@ -70,7 +51,136 @@ Function showModal(modalInfo, buttonInfo)
 
     return modal
   end if
+
   return invalid
+
+End Function
+
+
+' @modalInfo: assocArray, contains info necessary to show/dismiss MulitStyle modal. Has the following format:
+'
+'
+'              {
+'                 title: <string>                   - The title to be displayed on the modal
+'                 subHeader: <string>                 - The message to be displayed underneath the title
+'                 modalDialogTypes: <string>        - This value should be equal to - modalDialogTypes -> "multiStyle" to speicy that multistyle dialog to be used.
+'                 modalDialogStyles = <string>      - Enum values are defined in constants.brs -
+'                                                                                             "multiMessageGroup"
+'                                                                                             "imageAsBody"
+'
+'                 openTrackEvent: <assocArray>      - The analytics tracking info that was sent when the modal was shown,
+'                                                     will be re-purposed for sending the dismiss dialog tracking event.
+'                                                     Should contain "type" and "values" keys.
+'                 trackingTask: <roSGNode>          - The tracking task that can be used to send the dismiss dialog tracking event
+'                 backButtonCallback: <roFunction>  - A function called if a user attempts "back out" of the modal.
+'                 multiStyleMessage: <array>        - A array of <assocArray>s formated :
+'                    {
+'                       header: <string>            - message header or message main item
+'                       subHeader: <string>         - message sub header or message sub item
+'                       iconUri: <string>           - uri for the icon to be displayed left side of the message
+'                    }
+'                 multiStyleImageUrl: <string>.........- Instead of the multiStyleMessage, only an image can be displayed as message body
+'              }
+'
+' @buttonInfo: array, each index contains an assocArray with the following format:
+'               {
+'                 text: <string>                - The text on the button
+'                 type: <string>                - "accept" or "dismiss", describes the action the user is taking,
+'                                                  in relation to the modal. Used in dialog analytics
+'                 callback: <roFunction>        - A function that will be called if the button is selected
+'                 callbackParams: <array>       - An array which will be passed to the callback as a single paramater
+'                 shouldFocusParentBeforeCallback <boolean>   -In some cases we can not set focus back to currentScreen. Example case is where we show registration welcome modal to new users and when user selects
+'                                                              signIn button and then focus is set back to currentScreen, which will start playing live channel or video preview before RFI modal shows. This videopreviw/livechannel will keep playing in the background.
+'                                                              To avoid such scenarios set shouldFocusParentBeforeCallback to 'false' and handle the focus in call back function.
+'               }
+'
+Function showMultiStyleModal(modalInfo, buttonInfo)
+
+  ' Don't create the modal if a modal already exists, or there is not enough info to create it
+  if m.tempModal = invalid AND modalInfo <> invalid AND buttonInfo <> invalid
+    modal = getMultiStyleModal(modalInfo)
+
+    m.tempModal = {
+      buttonInfo: buttonInfo
+      modalInfo: modalInfo
+    }
+
+    addButtonsToModal(modal, buttonInfo)
+
+    if modalInfo.openTrackEvent <> invalid AND modalInfo.trackingTask <> invalid
+      modalInfo.trackingTask.trackEvent = modalInfo.openTrackEvent
+    end if
+
+    m.top.appendChild(modal)
+    modal.visible = true
+    modal.setFocus(true)
+
+    ' send the show dialog track event
+    if modalInfo.openTrackEvent <> invalid AND modalInfo.trackingTask <> invalid
+      modalInfo.trackingTask.trackEvent = modalInfo.openTrackEvent
+    end if
+
+    return modal
+  end if
+
+  return invalid
+
+End Function
+
+
+Function addButtonsToModal(modal, buttonInfo)
+  buttons = []
+  for i = 0 to buttonInfo.count() - 1
+    button = buttonInfo[i]
+    buttons.push(button.text)
+  end for
+
+  modal.buttons = buttons
+  modal.observeFieldScoped("buttonSelected", "onModalButtonSelected")
+  modal.observeFieldScoped("exitButton", "onModalButtonSelected")
+End Function
+
+Function getMultiStyleModal(modalInfo)
+
+  modal = CreateObject("roSgNode", "MultiStyleDialogScreen")
+  header = modalInfo.title
+  subHeader = modalInfo.subHeader
+  modal.id = getUniqueModalId(header, subHeader)
+  modal.multiStyleMessage = modalInfo.multiStyleMessage
+  modal.multiStyleImageUrl = modalInfo.multiStyleImageUrl
+  modal.header = header
+  modal.subHeader = subHeader
+  modal.instantResumeAction = modalInfo.instantResumeAction
+  return modal
+End Function
+
+
+Function getSimpleModal(modalInfo)
+  modal = CreateObject("roSGNode", "ModalDialogScreen")
+  title = modalInfo.title
+  message = modalInfo.message
+  modal.id = getUniqueModalId(title, message)
+  modal.title = title
+  modal.message = message
+  modal.scrollable = modalInfo.scollable
+  modal.instantResumeAction = modalInfo.instantResumeAction
+  return modal
+
+End Function
+
+
+' We need a unique id for our modals due to the animation but we need it to to be consistent across runs so we can test nodes within the dialog as part of our automation so we use a hash of the title and message to give a consistent id
+' @title: string, title on the dialog
+' @message: string, body of the dialog
+Function getUniqueModalId(title, message)
+
+  ba = createObject("roByteArray")
+  ba.fromAsciiString(title + message)
+
+  digest = createObject("roEVPDigest")
+  digest.setup("md5")
+  modalId = digest.process(ba).left(7)
+  return modalId
 End Function
 
 
@@ -130,33 +240,51 @@ Function closeModal(modal, buttonSelected = invalid)
   modal.unobserveFieldScoped("buttonSelected")
   modal.unobserveFieldScoped("exitButton")
   m.top.removeChild(modal)
-  m.top.setFocus(true)
-
+  waitForCallBackResponse = false
   'run the callback associated with the selected button
   callback = invalid
   callbackParams = invalid
+
   if type(buttonSelected) = "String" or type(buttonSelected) = "roString"
     if buttonSelected = "back"
+
       if backButtonCallback <> invalid
         callback = backButtonCallback
+
         if backButtonCallbackParams <> invalid
           callbackParams = backButtonCallbackParams
         end if
+
       end if
+
     end if
   else if buttonInfo <> invalid AND buttonSelected <> invalid AND buttonInfo[buttonSelected] <> invalid
     callback = buttonInfo[buttonSelected].callback
+
     if callback <> invalid
       callbackParams = buttonInfo[buttonSelected].callbackParams
     end if
+
+    '//SPECIAL CASE FOR REGISTRATION MODAL DIALOG. WE CAN NOT SET FOCUS ON HOMESCREEN WHILE WAITING FOR RFI MODAL TO SHOW UP THROUGH CALLBACK,
+    '//BECAUSE HOMESCREEN WILL START PLAYING VIDEO PREVIEW OR LIENAR CONTENT
+    if buttonInfo[buttonSelected].shouldFocusParentBeforeCallback = false
+      waitForCallBackResponse = true
+    end if
+
+  end if
+
+  if waitForCallBackResponse = false
+    m.top.setFocus(true)
   end if
 
   if callback <> invalid
+
     if callbackParams = invalid
       callback()
     else
       callback(callbackParams)
     end if
+
   end if
 End Function
 

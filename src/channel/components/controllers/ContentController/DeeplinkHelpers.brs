@@ -224,7 +224,7 @@ Function handleInputDeeplink(inputInfo) as void
   ' close any opened modal/pop-up when deeplinking via roInput
   for i = 0 to m.top.getChildCount() - 1
     screen = m.top.getChild(i)
-    if screen <> invalid AND screen.subType() = "ModalDialogScreen"
+    if screen <> invalid AND (screen.subType() = "ModalDialogScreen" OR screen.subType() = "MultiStyleDialogScreen")
       closeModal(screen, "back")
     end if
   end for

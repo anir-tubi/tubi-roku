@@ -1,0 +1,3 @@
+Function init()
+
+End Function

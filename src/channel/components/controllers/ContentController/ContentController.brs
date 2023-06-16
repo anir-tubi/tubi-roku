@@ -158,7 +158,7 @@ Function init()
 
   ' QA TESTING PURPOSE: below block can be removed during onboarding graduation.
   ' By clearing registry, QA can turn 'showOnboardingAlways' back to false in .yml and make sure onboarding screen is shown for next launch.
-  if m.constants.settings.showOnboardingAlways = true
+  if m.constants.settings.showOnboardingAlways = true OR m.constants.settings.showRegistrationModalAlways = true
     m.global.isNewUser = true
     Auth.clearFirstVisit()
   end if
@@ -215,18 +215,21 @@ Function onFadeInContentController()
     m.linearScreenAfterFn = invalid
   else if currentScreen <> invalid AND currentScreen.isInFocusChain() = false
 
-    ' isUpgradeModalOpened will be true if constants.showUpgradeAlert is true
+    ' isDialogOpenAtStartup will be true if top screen is one of the dialogScreens.
     ' focus currentScreen only if the upgradeModal is closed or disabled
 
-    isUpgradeModalOpened = false
+    isDialogOpenAtStartup = false
     for i = 0 to m.top.getChildCount() - 1
       screen = m.top.getChild(i)
-      if screen.subType() = "ModalDialogScreen"
-        isUpgradeModalOpened = true
+
+      if screen.subType() = "ModalDialogScreen" OR screen.subType() = "MultiStyleDialogScreen"
+        isDialogOpenAtStartup = true
         exit for
       end if
+
     end for
-    if isUpgradeModalOpened = false
+
+    if isDialogOpenAtStartup = false
       currentScreen.setFocus(true)
     end if
 
@@ -234,7 +237,9 @@ Function onFadeInContentController()
       m.detailScreenAfterFn(currentScreen)
       m.detailScreenAfterFn = invalid
     end if
+
   end if
+
   End Function
 
 
@@ -1374,7 +1379,7 @@ End Function
 
 Function onVideoContentScreenBackgroundUpdated(msg)
   tubiLog("ContentController.onVideoContentScreenBackgroundUpdated")
-  screen = msg.getRoSGNode() 
+  screen = msg.getRoSGNode()
   setVideoContentScreenBackground(screen)
 End Function
 

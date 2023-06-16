@@ -27,7 +27,7 @@ Function playVideoContent(content, playbackSource = {"srcForAnalytic": "unknown"
       ' if the user has been age gated during the deeplink process, a modal will be shown.
       ' We need to remove the modal so it is not overlaying the video.
       modal = getTopModal()
-      if modal <> invalid AND modal.isSubtype("ModalDialogScreen") AND modal.isInFocusChain() = true
+      if modal <> invalid AND (modal.isSubtype("ModalDialogScreen") OR modal.subType() = "MultiStyleDialogScreen") AND modal.isInFocusChain() = true
         closeModal(modal)
       end if
 

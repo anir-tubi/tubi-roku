@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <!--
  - ModalListItem
  -
@@ -17,28 +17,26 @@
     <field id="height" type="float" value="80.0" />
     <field id="calculatedWidth" type="float"/>
   </interface>
-  
+
   <children>
     <Group
       id="buttonTextParent"
       translation="[44,1]">
-      <Label 
-        id="buttonText" 
+      <Label
+        id="buttonText"
         horizAlign="left"
         vertAlign="center"
-        height="79"
-        opacity="1.0">
+        height="79">
         <Font
           role="font"
           size="33"
           uri="pkg:/fonts/Vaud-SemiBold.ttf" />
       </Label>
-      <Label 
-        id="buttonTextFocused" 
+      <Label
+        id="buttonTextFocused"
         horizAlign="left"
         vertAlign="center"
-        height="79"
-        opacity="1.0">
+        height="79">
         <Font
           role="font"
           size="33"

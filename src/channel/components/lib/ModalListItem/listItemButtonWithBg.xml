@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - ModalListItem
+ -
+ - Items used in a MarkupGrid (like FilledButtonMarkupGrid) or RowList for showing modal buttons.
+ -
+ -->
+<component name="ListItemButtonWithBg" extends="Group" >
+  <script type="text/brightscript" uri="ListItemButtonWithBg.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="fontSize" alias="buttonTextFont.size"/>
+    <field id="gridHasFocus" type="boolean"/>
+    <field id="focusPercent" type="float"/>
+    <field id="width" type="float" alias="buttonText.width" />
+    <field id="height" type="float" alias="buttonText.height" />
+    <field id="calculatedWidth" type="float"/>
+  </interface>
+
+  <children>
+    <Poster
+      id="buttonBg"
+      uri="pkg:/images/menu-focus-$$RES$$.9.png"
+      opacity="1.0"
+      height="72"
+      width="285"/>
+
+    <Group
+      id="buttonTextParent"
+      translation="[33,3]">
+
+      <Label
+        id="buttonText"
+        horizAlign="left"
+        vertAlign="center"
+        height="78"
+        opacity="1.0">
+        <Font
+          id="buttonTextFont"
+          role="font"
+          size="24"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf" />
+      </Label>
+    </Group>
+  </children>
+</component>

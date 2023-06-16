@@ -930,12 +930,19 @@ Function onHomescreenContentReady(msg)
 
     if currentScreen <> invalid AND currentScreen.isSubType("HomeScreen") = true
       screenTrackingLoad(homeScreen.trackingPageInfo, loadTime)
+
+      'show registration welcome Screen only to new user over homescreen.
+      'we need to check if user already signed up in detail Screen if they have entered through deeplink.
+      if isNewUser() = true AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND isLoggedInUser() = false AND getExperimentResource("roku_registration_component_over_homegrid", "roku_registration_component_over_homegrid_v1", true).enabled = true
+        showRegistrationWelcomeModal()
+      end if
     end if
 
     ' show fifa intro modal only for non-kids ui and adult pc
     if isFIFAIntroModalShown() = false AND isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
       showFIFAIntroModal()
     end if
+
 
   end if
 End Function
@@ -1018,6 +1025,84 @@ Function isFIFAIntroModalShown()
   isModalShown = true
 
   return isModalShown
+End Function
+
+
+
+' This function build the custom modal as per the design
+Function showRegistrationWelcomeModal()
+  tubiLog("HomeScreenHelpers.showRegistrationWelcomeModal")
+
+  showHideSpinner(false)
+
+  title = getTranslation("reg_intro_title")
+  subHeader = getTranslation("reg_intro_sub_header")
+
+  multiMessage = []
+  multiMessage[0] = {
+    header: getTranslation("onBoarding_landingScreen_addListLabel")
+    subHeader: getTranslation("reg_first_line_sub_item")
+    iconUri: "pkg:/images/icon-plus.webp"
+  }
+
+  multiMessage[1] = {
+    header: getTranslation("onBoarding_landingScreen_saveProgressLabel")
+    subHeader: getTranslation("onBoarding_landingScreen_saveProgressBody")
+    iconUri: "pkg:/images/icon-play.webp"
+  }
+
+  multiMessage[2] = {
+    header: getTranslation("reg_third_line_item")
+    subHeader: getTranslation("reg_third_line_sub_item")
+    iconUri: "pkg:/images/icon-profile-large.png"
+  }
+
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "INFORMATION"
+      pageOneof: m.Tracking.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
+      dialog_action: "SHOW"
+      dialog_sub_type: "reg_intro"
+    }
+  }
+
+
+  modalInfo = {
+    title: title
+    subHeader: subHeader
+    message: ""               'message is not used in case of multistyle dialog
+    modalDialogTypes: m.constants.modalDialogTypes.multiStyle
+    modalDialogStyles: m.constants.modalDialogStyles.multiMessageGroup
+    multiStyleMessage: multiMessage
+    multiStyleImageUrl: invalid
+    openTrackEvent: dialogEvent
+    trackingTask: m.trackingLoggingTask
+    backButtonCallback: invalid
+    instantResumeAction: m.constants.instantResumeActions.closeDialog
+  }
+
+  buttonInfo = []
+
+  buttonOne = {
+    text: getTranslation("reg_sign_in_button_title")
+    type: "accept"
+    callback: startSignIn
+    callbackParams: invalid
+    shouldFocusParentBeforeCallback: false 'special case for signIn button. If parent gets focus when dialog closes, video preview or linear will start playing in backgroud of RFI modal.
+  }
+  buttonInfo.push(buttonOne)
+
+  buttonTwo = {
+    text: getTranslation("reg_continue_as_guest_button_title")
+    type: "dismiss"
+    callback: invalid
+    callbackParams: invalid
+  }
+  buttonInfo.push(buttonTwo)
+
+  showMultiStyleModal(modalInfo, buttonInfo)
+
 End Function
 
 

@@ -1410,6 +1410,34 @@
     "description": "description displayed on fifa intro modal",
     "message": "Tubi has full replays of all 64 World Cup matches available for free. Sign up to stream every match on your favorite device. No subscription or credit card required."
   },
+  "reg_intro_title": {
+    "description": "title displayed on registration welcome modal",
+    "message": "Tubi is better when you sign up"
+  },
+  "reg_intro_sub_header":{
+    "description": "sub header displayed on registraton welcome modal",
+    "message": "No credit card. Free forever."
+  },
+  "reg_first_line_sub_item": {
+    "description": "first sub item to be displayed under reg_first_line_item to explain user about benifit of registration",
+    "message": "Save now to watch later"
+  },
+  "reg_third_line_item":{
+    "description": "third item to let know user about the benifit of registration",
+    "message": "Unlock Picks Just for You"
+  },
+  "reg_third_line_sub_item":{
+    "description": "third sub item to be displayed under reg_third_line_item to explain user about benifit of registration",
+    "message": "Get better recommendations"
+  },
+  "reg_sign_in_button_title": {
+    "description": "Button text to be displayed on first button of registration welcome modal",
+    "message": "Continue to Sign In"
+  },
+  "reg_continue_as_guest_button_title": {
+    "description": "Button text to be displayed on second button of registration welcome modal",
+    "message": "Continue as Guest"
+  },
   "replay": {
     "description": "This label used for badge to indicate the content availability",
     "message": "Replay"
