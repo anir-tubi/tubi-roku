@@ -26,6 +26,7 @@
            which will be responsible for sending component_interaction events.
       -->
       <field id="componentInteractionInfo" type="assocarray"/>
+      <field id="audioGuideText" type="string" alwaysNotify="true"/>
   </interface>
 
   <children>

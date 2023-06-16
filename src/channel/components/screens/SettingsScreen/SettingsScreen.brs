@@ -240,6 +240,7 @@ End Function
 Function createAutoPreviewPanel()
   videoPreviewPanel = CreateObject("roSGNode", "AutoplayPreviewPanel")
   videoPreviewPanel.observeFieldScoped("itemSelected", "onAutoplayPreviewPanelItemSelected")
+  videoPreviewPanel.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
   videoPreviewPanel.observeFieldScoped("componentInteractionInfo", "onAutoPlayPreviewComponentInteractionInfo")
   videoPreviewPanel.width = m.rightPanelWidth
   videoPreviewPanel.focusable = true
@@ -466,8 +467,8 @@ End Function
 
 Function onAudioGuideTextChanged(msg)
   tubiLog("SettingsScreen.onAudioGuideTextChanged")
-  parentalSettingFocused = msg.getData()
-  readAudioGuideText(parentalSettingFocused)
+  focusedItemTitle = msg.getData()
+  readAudioGuideText(focusedItemTitle)
 End Function
 
 

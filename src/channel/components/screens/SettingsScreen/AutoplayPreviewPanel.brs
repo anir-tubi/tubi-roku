@@ -19,6 +19,11 @@ Function init()
   ' We do not want to show unfocused background as per designs.
   m.Menu.focusFootprintBitmapUri = "pkg:/images/transparent.png"
 
+  m.Menu.observeFieldScoped("itemFocused", "onItemFocusChanged")
+
+  'm.instructionsText is used to store the title and description of autoplay previews  for screen reader when screen loaded.
+  m.instructionsText = ""
+
   setAutoplayPreviewChoices()
   m.Spinner = m.top.findNode("Spinner")
   checkItemHelper(m.top.selectItem)
@@ -30,6 +35,8 @@ Function setAutoplayPreviewChoices()
   Title.text = getTranslation("screenSettings_menu_autoplayPreview")
   Instructions = m.top.findNode("Instructions")
   Instructions.text = getTranslation("screenSettings_autoplayPreview_instructions")
+
+  m.instructionsText = Title.text + " " + Instructions.text
 
   newContent = m.Menu.content.clone(true)
   for i = 0 to newContent.getChildCount() - 1
@@ -111,4 +118,20 @@ Function sendComponentInteractionEventForAutoplayPreview()
   }
 
   m.top.componentInteractionInfo = componentInteractionInfo
+End Function
+
+
+Function onItemFocusChanged(msg)
+  focusIndex = msg.getData()
+  focusedContent = m.Menu.content.getChild(focusIndex)
+  m.top.audioGuideText = m.instructionsText + " " + focusedContent.title
+
+  'When Autoplay loaded, we are reading the title and description along with the focused menu item.
+  'After setting the audio guide text, we are resetting instructionsText back to empty string as we don't need to read the title/description everytime.
+  if isNonEmptyString(m.instructionsText) = true
+    m.top.audioGuideText = m.instructionsText + " " + focusedContent.title
+    m.instructionsText = ""
+  else
+    m.top.audioGuideText = focusedContent.title
+  end if
 End Function
