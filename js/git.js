@@ -432,14 +432,11 @@ async function buildReleaseNotes(done) {
       pull_number: +prId
     });
 
-    const prReleaseNotesMatch = response.data.body.match(/## Release Notes.*?---(.*)## QA What Changed/s);
-    if (!prReleaseNotesMatch) {
+    const prReleaseNotes = extractReleaseNotesFromPullRequestBody(response.data.body);
+    if (prReleaseNotes === undefined) {
       console.log(`Could not retrieve release notes for pull request #${prId}`);
-    } else {
-      const prReleaseNotes = prReleaseNotesMatch[1].trim();
-      if (prReleaseNotes) {
-        releaseNotes.push(prReleaseNotes);
-      }
+    } else if (prReleaseNotes) {
+      releaseNotes.push(prReleaseNotes);
     }
   }
   return releaseNotes;
@@ -470,19 +467,15 @@ async function buildQaChanges(done) {
       pull_number: +prId
     });
 
-    const qaInfoMatch = pullRequest.body?.match(/## QA What Changed.*?---(.*)## QA Testing Steps.*?---(.*)/s);
-
-    if (!qaInfoMatch) {
+    const qaInfo = extractQaChangesFromPullRequestBody( pullRequest.body);
+    if (!qaInfo) {
       console.log(`Could not retrieve qa info for pull request #${prId}`);
       continue;
     }
 
-    const whatChanged = qaInfoMatch[1].trim();
-    if (!whatChanged) {
+    if (!qaInfo.whatChanged) {
       continue;
     }
-
-    const testingSteps = qaInfoMatch[2].trim();
 
     let ticketUrl = '';
     const {data: prComments} = await octokit.issues.listComments({...octokitRequestSharedParams, issue_number: +prId});
@@ -498,8 +491,8 @@ async function buildQaChanges(done) {
     const qaChange = {
         pullNumber: prId,
         commit: commitHash,
-        whatChanged: whatChanged,
-        testingSteps: testingSteps,
+        whatChanged: qaInfo.whatChanged,
+        testingSteps: qaInfo.testingSteps,
         pointDeveloper: githubDeveloperInfo[userLogin],
         ticketUrl: ticketUrl
     };
@@ -540,6 +533,31 @@ ${qaChangesText.join('\n\n<hr>\n\n')}`;
     changes: qaChangesData,
     text: qaChangesTextOutput
   };
+}
+
+
+function extractQaChangesFromPullRequestBody(body) {
+  if (body) {
+    const match = body.match(/## QA What Changed.*?---(.*)## QA Testing Steps.*?---(.*)/s);
+    if (match) {
+      const whatChanged = match[1].trim();
+      const testingSteps = match[2].trim();
+      return {
+        whatChanged: whatChanged,
+        testingSteps: testingSteps
+      };
+    }
+  }
+}
+
+
+function extractReleaseNotesFromPullRequestBody(body) {
+  if (body) {
+    const match = body.match(/## Release Notes.*?---(.*)## QA What Changed/s);
+    if (match) {
+      return match[1].trim();
+    }
+  }
 }
 
 
@@ -749,5 +767,7 @@ module.exports = {
   addMissingImagesToRemoteLibrary,
   pushBranch,
   buildReleaseNotes,
-  buildQaChanges
+  buildQaChanges,
+  extractQaChangesFromPullRequestBody,
+  extractReleaseNotesFromPullRequestBody
 };
