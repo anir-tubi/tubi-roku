@@ -61,7 +61,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
             for i=m.focusedButtonIndex-1 to 0 step -1
               button = m.TransportButtons.getChild(i)
               if button.enabled then
-                setFocusedButton(button)
+                setFocusedButton(button, true)
                 exit for
               end if
             end for
@@ -85,7 +85,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
             for i=m.focusedButtonIndex+1 to m.TransportButtons.getChildCount()-1
               button = m.TransportButtons.getChild(i)
               if button.enabled then
-                setFocusedButton(button)
+                setFocusedButton(button, true)
                 exit for
               end if
             end for
@@ -108,7 +108,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         if m.Overlay.opacity = 0
           showTransport()
         else if m.progressBarFocused = true
-          setFocusedButton(m.PlayPauseButton)
+          setFocusedButton(m.PlayPauseButton, true)
         else if m.skipCuepointsButton.hasFocus() = true
           setFocusedButton(m.ProgressBar)
         else
@@ -953,7 +953,8 @@ End Function
 'Finds the 'index' of the passed in transport button node and sets it on m.focusedButtonIndex
 'Additionally updates the image of the button to the focused version and all other buttons to the unfocused version
 ' @transportButton: roSGNode, a node of type TransportButton or TubiProgressBar
-Function setFocusedButton(transportButton)
+' @sayAudioText: boolean, true if we want to announce the audio guide.
+Function setFocusedButton(transportButton, sayAudioText = false)
   shouldSetFocusOnTop = false
 
   if transportButton.isSameNode(m.ProgressBar) = true
@@ -985,6 +986,51 @@ Function setFocusedButton(transportButton)
       button.focusState = false
     end if
   end for
+
+  ' Use case when we will pass true are as below. Following general standards based on testing of other competitor apps.
+  ' When we focus on the skip cuepoints button.
+  ' When the user navigates within the transport bar.
+  ' When the user moves focus into the transport control icon from the progress bar. 
+  if sayAudioText = true
+    sayFocusedButtonAudioGuide(transportButton.id)
+  end if
+End Function
+
+
+Function sayFocusedButtonAudioGuide(focusButtonId)
+  audioGuideText = ""
+  audioGuideHints = m.constants.audioGuideHints.transportBarIcons
+
+  if focusButtonId = m.SkipTrailerButton.id
+    audioGuideText = audioGuideHints.skipTrailerButtonHint
+  else if focusButtonId = m.StartButton.id
+    audioGuideText = audioGuideHints.playFromBeginningButtonHint
+  else if focusButtonId = m.RewindButton.id
+    audioGuideText = audioGuideHints.rewindButtonHint
+  else if focusButtonId = m.HopBackButton.id
+    audioGuideText = audioGuideHints.hopBackButtonHint + " 30 seconds " + m.constants.audioGuideHints.buttonHint
+  else if focusButtonId = m.PlayPauseButton.id
+
+    ' Based on video state using play or pause text.
+    if m.VideoState = "play" then
+      audioGuideText = audioGuideHints.pauseButtonHint
+    else
+      audioGuideText = audioGuideHints.playButtonHint
+    end if
+
+  else if focusButtonId = m.HopForwardButton.id
+    audioGuideText = audioGuideHints.hopForwardButtonHint + " 30 seconds " + m.constants.audioGuideHints.buttonHint
+  else if focusButtonId = m.FastForwardButton.id
+    audioGuideText = audioGuideHints.fastForwardButtonHint
+  else if focusButtonId = m.EndButton.id
+    audioGuideText = audioGuideHints.goToNextVideoButtonHint
+  else if focusButtonId = m.closedCaptionAudioButton.id
+    audioGuideText = audioGuideHints.closedCaptionAudioButtonHint
+  end if
+
+  if isNonEmptyString(audioGuideText)
+    readAudioGuideText(audioGuideText)
+  end if
 End Function
 
 

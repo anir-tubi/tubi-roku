@@ -19,6 +19,18 @@ Function getConstants()
   constants.audioGuideHints = {}
     constants.audioGuideHints.emailOkHint = "Press ok to enter your email"
     constants.audioGuideHints.buttonHint = "Button"
+    constants.audioGuideHints.transportBarIcons = {}
+      constants.audioGuideHints.transportBarIcons.skipTrailerButtonHint = "Skip Trailer Button"
+      constants.audioGuideHints.transportBarIcons.playFromBeginningButtonHint = "Play from Beginning Button"
+      constants.audioGuideHints.transportBarIcons.goToNextVideoButtonHint = "Go to next video Button"
+      constants.audioGuideHints.transportBarIcons.rewindButtonHint = "Rewind Button"
+      constants.audioGuideHints.transportBarIcons.playButtonHint = "Play Button"
+      constants.audioGuideHints.transportBarIcons.pauseButtonHint = "Pause Button"
+      constants.audioGuideHints.transportBarIcons.hopForwardButtonHint = "Fast Forward"
+      constants.audioGuideHints.transportBarIcons.hopBackButtonHint = "Rewind"
+      constants.audioGuideHints.transportBarIcons.fastForwardButtonHint = "Fast Forward Button"
+      constants.audioGuideHints.transportBarIcons.closedCaptionAudioButtonHint = "Closed Caption And Audio Track Selection Button"
+      
 
   ' Device info
   constants.deviceInfo = {}

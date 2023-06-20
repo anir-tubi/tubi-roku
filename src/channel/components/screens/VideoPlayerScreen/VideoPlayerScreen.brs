@@ -321,10 +321,10 @@ Function showSkipCuepointsButton()
   if m.HUD.opacity = 1
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonUpTranslation]
   else if m.HUD.opacity > 0
-    setFocusedButton(m.skipCuepointsButton)
+    setFocusedButton(m.skipCuepointsButton, true)
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonUpTranslation]
   else
-    setFocusedButton(m.skipCuepointsButton)
+    setFocusedButton(m.skipCuepointsButton, true)
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonDownTranslation]
   end if
 
