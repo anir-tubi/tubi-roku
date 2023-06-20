@@ -2025,21 +2025,6 @@ Function showHideLogo(logoType)
 End Function
 
 
-Function isHdmiPlaybackExperimentEnabled(sendEvent = false)
-  ' 11.5 now properly returns the roCECStatus events while run_as_process=1
-  ' We want to target only 11.5 plus for this experiment because of this
-  firmware = createObject("roDeviceInfo").getOSVersion()
-  isFirmwareOk = (firmware.major.toInt() >= 11 AND firmware.minor.toInt() >= 5)
-
-  experiment = getExperimentResource("ads_configuration_roku_hdmi_playback", "roku_hdmi_playback_v3", sendEvent)
-
-  if isFirmwareOk = true AND experiment.enabled = true then
-    return true
-  end if
-  return false
-End Function
-
-
 Function onIsHdmiStatusOkChange(msg)
   isHdmiStatusOk = msg.getData()
 
@@ -2061,12 +2046,9 @@ Function onIsHdmiStatusOkChange(msg)
     else if currentScreenId = screenIds.videoPlayerScreen then
       state = currentScreen.state
       if state <> "finished" AND state <> "error" AND isHdmiStatusOk = false then
-        ' Send exposure event for experiment and stop playback if enabled
-        if isHdmiPlaybackExperimentEnabled(true) = true then
-          returnToDetailScreenFromVideo(false)
-          currentScreen = getCurrentScreen()
-          currentScreen.shouldResumePlayback = true
-        end if
+        returnToDetailScreenFromVideo(false)
+        currentScreen = getCurrentScreen()
+        currentScreen.shouldResumePlayback = true
       end if
     else
       linearVideoPlayerScreen = getFromScreenCache(screenIds.linearVideoPlayerScreen)
@@ -2080,11 +2062,8 @@ Function onIsHdmiStatusOkChange(msg)
         else
           state = currentScreen.state
           if state <> "finished" AND state <> "error" then
-            ' Send exposure event for experiment and stop playback if enabled
-            if isHdmiPlaybackExperimentEnabled(true) = true then
-              closeLinearVideoPlayerTransport()
-              linearVideoPlayerScreen.control = "stop"
-            end if
+            closeLinearVideoPlayerTransport()
+            linearVideoPlayerScreen.control = "stop"
           end if
         end if
       end if

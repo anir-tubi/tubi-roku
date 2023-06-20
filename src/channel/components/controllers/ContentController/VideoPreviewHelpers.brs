@@ -107,16 +107,8 @@ Function onVideoPreviewStateChanged(msg)
 
   if videoPreviewState = "finished"
     if currentScreen <> invalid
-      isHdmiStatusOk = m.maintask.isHdmiStatusOk
-
-      ' Only send exposure event if hdmi status was not ok and the user would have been effected
-      sendEvent = (isHdmiStatusOk = false)
-      if isHdmiPlaybackExperimentEnabled(sendEvent) = false then
-        isHdmiStatusOk = true
-      end if
-
       ' Don't want to continue playback if the user has their tv turned off
-      if isHdmiStatusOk = true then
+      if m.maintask.isHdmiStatusOk = true then
         if currentScreen.subType() = "DetailScreen"
 
           playbackSource = {

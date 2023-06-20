@@ -42,11 +42,6 @@ Function TubiExperiments(constants) as Object
         roku_enhanced_onboarding_v2_registration_path: {"enabled": false}
       }
 
-      ' ads_configuration_ prefix is used to specify additional primary metrics.
-      ads_configuration_roku_hdmi_playback: {
-        roku_hdmi_playback_v3: {"enabled": true}
-      }
-
       roku_hevc_drm_4k: {
         roku_hevc_drm_4k_v1 : {"enabled": true}
       }
