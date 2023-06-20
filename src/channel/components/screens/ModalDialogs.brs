@@ -115,11 +115,6 @@ Function showMultiStyleModal(modalInfo, buttonInfo)
     modal.visible = true
     modal.setFocus(true)
 
-    ' send the show dialog track event
-    if modalInfo.openTrackEvent <> invalid AND modalInfo.trackingTask <> invalid
-      modalInfo.trackingTask.trackEvent = modalInfo.openTrackEvent
-    end if
-
     return modal
   end if
 
