@@ -26,10 +26,6 @@ Function TubiExperiments(constants) as Object
         roku_my_stuff_v3: {"enabled": false}
       }
 
-      roku_in_pod_stitching: {
-        roku_in_pod_stitching_v2: {"enabled": false}
-      }
-
       '// When enabled=true, then the resume and play buttons will display differently
       roku_title_series_button: {
         roku_title_series_button_v1: {"enabled": false}

@@ -5,9 +5,6 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
   'set the preferences for the Roku Advertising Framework so we never use their ad server if our server returns no ads
   'set to 0 retries - 1 max request, even if there are no ads returned from our server
   roAdFramework.setAdPrefs(false, 1)
-  if m.enableInPodStitching = true then
-    roAdFramework.enableInPodStitching(true)
-  end if
 
   'turn on Nielsen DAR API for the Roku Advertising Framework
   'this is mutually exclusive with Roku's own Global Audience Measurement API,
@@ -629,7 +626,7 @@ End Function
 ' ----------------------------------------------
 ' adBufferingCallback
 '
-' callback during RAF buffering. Will not be called if enableInPodStitching(true)
+' callback during RAF buffering
 Function tubiAds_adBufferingCallback(eventType, ctx)
   ' We need to hide the raf container while we're buffering and show it again when buffering ends
   if eventType = "BufferingStart" AND ctx.adIndex > 1 then
@@ -691,16 +688,9 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
     ' We have do the second check for start event because for Innovid interactive ads our Impression code block won't get called because m.adPlaybackPos is already 1. In other words, the position callback where ctx.time = 1 occurs prior to the Impression event for Innovid interactive ads.
 
     if (eventType = "Impression" AND m.isInteracting <> true AND m.adPlaybackPos = 0) OR (eventType = "Start" AND lCase(m.roAdFramework.getInteractiveAdFormat(ctx.ad).toStr()) = "iroll") then
-      if getGlobalAA().enableInPodStitching = true then
-        ' Storing ad context to work around RAF stitched ads bug that causes complete event to have data for next ad or invalid if it is the last ad
-        if ctx.duration <> invalid AND ctx.ad <> invalid then
-          m._lastContextWithValidDurationAndAdInfo = ctx
-        end if
-      else
-        ' Without setting RAF container back to visible here interactive ads will not show because tubiAds_adBufferingCallback never gets called
-        ' Not needed when stitched ads are enabled as AdStateChange properly gets called in that case
-        m.containerNode.visible = true
-      end if
+      ' Without setting RAF container back to visible here interactive ads will not show because tubiAds_adBufferingCallback never gets called
+      ' Not needed when stitched ads are enabled as AdStateChange properly gets called in that case
+      m.containerNode.visible = true
 
       'Impression events fire when ads start, but also when a user begins interacting with an interactive ad
       startAdEvent = {
@@ -737,33 +727,8 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       else
         endPosition = invalid
         if eventType = "Complete"
-          if getGlobalAA().enableInPodStitching = true then
-            replacementCtx = m._lastContextWithValidDurationAndAdInfo
-            m.delete("_lastContextWithValidDurationAndAdInfo")
-
-            ' TODO When enableInPodStitching(true) is set the ad index is off which causes the wrong information or no information to be passed in ctx. We can pull these from the last position update for now until Roku fixes RAF to correctly return this. This was last tested in RAF version 3.0026. We can retest in the future once the next version comes out
-
-
-            ' Do some basic verification to make sure this is for the same ad and pod
-            if replacementCtx <> invalid AND ctx.adServer = replacementCtx.adServer AND ctx.adCount = replacementCtx.adCount then
-              ' Replace the information trying to match the expected ctx exactly as it normally would be
-              ctxType = ctx.type
-              ctx = replacementCtx
-              ctx.delete("time")
-              ctx.type = ctxType
-            end if
-          end if
 
           endPosition = ctx.duration
-          ' Send exposure after first ad finishes in a multi ad break
-          ' NOTE the complete event for the first ad actually has adIndex as 2 #roku :|
-          'bs:disable-next-line 1001 LINT1001
-          if isFunction(getExperimentResource)
-            if ctx.adCount <> invalid AND ctx.adCount > 1 AND ctx.adIndex <> invalid AND ctx.adIndex = 2 then
-              'bs:disable-next-line 1001 LINT1001
-              getExperimentResource("roku_in_pod_stitching", "roku_in_pod_stitching_v2", true)
-            end if
-          end if
         else if eventType = "Close"
           endPosition = m.adPlaybackPos
         end if
@@ -793,13 +758,6 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       }
       m.trackUserEvent("ad_click", clickAdEvent, m.requestQueue)
       m.isInteracting = true
-    else if eventType = "AdStateChange" then
-      ' enableInPodStitching(true) makes this get called and tubiAds_adBufferingCallback not get called
-      if ctx.state = "playing" then
-        m.containerNode.visible = true '//Display ad
-      else if ctx.state = "buffering" then
-        m.containerNode.visible = false ' Hide ad while buffering
-      end if
     else if eventType = "Error" AND ctx <> invalid AND ctx.adIndex <> invalid then
       ' Clear out notUsed pixel for the current ad since RAF will fire the error pixel for this ad
       m.notUsedAdPodPixels.delete(ctx.adIndex.toStr())
@@ -813,10 +771,6 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
       ' eventType is invalid when an event fires signaling that one second of ad playback has ocurred
       if ctx.time <> invalid then
         m.adPlaybackPos = ctx.time
-      end if
-
-      if ctx.duration <> invalid AND ctx.ad <> invalid then
-        m._lastContextWithValidDurationAndAdInfo = ctx
       end if
     end if
   end if
