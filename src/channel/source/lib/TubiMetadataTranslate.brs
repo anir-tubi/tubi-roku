@@ -247,8 +247,9 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
       end if
       movieAndTVShowCount += contentFromServer.tvShowCount.tostr() + " " + getTranslation("menu_tv")
     end if
-
-    translatedContent.addField("movieAndTVShowCount", "string", false)
+    if type(translatedContent) = "roSGNode"
+      translatedContent.addField("movieAndTVShowCount", "string", false)
+    end if
     translatedContent.movieAndTVShowCount = movieAndTVShowCount
   end if
 
@@ -309,7 +310,9 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   end if
 
   if contentFromServer.type = "se"
-    translatedContent.addField("roundGroupInfo", "string", false)
+    if type(translatedContent) = "roSGNode"
+      translatedContent.addField("roundGroupInfo", "string", false)
+    end if
     translatedContent.roundGroupInfo = roundGroupInfo
   end if
 
