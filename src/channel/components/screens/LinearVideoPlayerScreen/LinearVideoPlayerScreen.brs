@@ -37,6 +37,7 @@ Function init()
   m.top.observeField("control", "onControlChange")
   m.top.observeField("pollUrl", "onPollUrlChange")
   m.top.observeField("closeTransport", "hideOverlay")
+  m.top.observeFieldScoped("displayVideoplayerBg", "onDisplayVideoplayerBg")
 
   m.logo = m.top.findNode("tubiLogo")
   m.backgroundImage = m.top.findNode("backgroundImage")
@@ -941,6 +942,15 @@ Function onOKPressed()
   if m.top.channelSelected <> invalid AND  m.top.channelSelected.needsLogin = true
     m.top.ChannelSelectedUpdated = true
   end if
+End Function
+
+Function onDisplayVideoplayerBg(msg)
+
+  if msg <> invalid
+    displayBg = msg.getData()
+    setVideoplayerLoadingScreenBackGround(displayBg)
+  end if
+
 End Function
 
 

@@ -74,6 +74,8 @@
       <!-- The id of the screen associated with this screen. Used to keep a record of the previous (home) screen with which has a close association: i.e. the linear screen is displayed as a minimized version on the previous screen. In the future, th previous screen may be other screens like the search screen, which may not necessarily have a close association with this linear screen -->
       <field id="associatedScreenID" type="string" value="" />
 
+      <field id="displayVideoplayerBg" type="boolean" alwaysNotify="true" />
+
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
@@ -126,6 +128,8 @@
 
       <!-- Timestamp of the last time we finished playing back video with this player. If -1 then we are currently playing back. -->
       <field id="timestampOfLastVideoPlayback" type="integer" value="0" />
+
+      <field id="isDisplayingOverlay" alias="VideoOverlay.isDisplaying" />
   </interface>
 
   <children>
