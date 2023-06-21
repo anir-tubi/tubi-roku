@@ -101,6 +101,8 @@ Function formatDialog()
     dialogBoxTranslationX = 1920 - m.dialogBox.width - 51
     m.dialogBox.translation = [dialogBoxTranslationX, m.dialogBox.translation[1]]
     m.mask.width = m.dialogBox.width
+    m.subHeader.width = m.dialogBox.width - 96
+    m.header.width = m.dialogBox.width - 96
   end if
 
   if m.top.multiStyleMessage <> invalid AND m.top.multiStyleMessage.Count() > 0 AND m.multiStyleLayout.getChildCount() = 0
