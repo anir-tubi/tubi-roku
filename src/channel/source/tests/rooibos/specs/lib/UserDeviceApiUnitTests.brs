@@ -604,6 +604,24 @@ Function userDeviceApi_addHistoryReqEpisodeParentIdAsInteger_test()
 End Function
 
 
+'@Test createUserAndDeviceSettingsReqInfo unit tests
+Function userDeviceApi_createUserAndDeviceSettingsReqInfo_test()
+  req = m.userDeviceApi.createUserAndDeviceSettingsReqInfo()
+
+  userRequest = req[0]
+  m.assertEqual(m.constants.urls.account.userSettings, userRequest.url)
+  options = userRequest.options
+  m.assertNotInvalid(options)
+  m.assertEqual(options.params.platform, m.platform)
+
+  deviceRequest = req[1]
+  m.assertEqual(m.constants.urls.account.deviceSettings, deviceRequest.url)
+  options = deviceRequest.options
+  m.assertNotInvalid(options)
+  m.assertEqual(options.params.platform, m.platform)
+End Function
+
+
 '@Test createUserSettingsReqInfo unit tests
 Function userDeviceApi_createUserSettingsReqInfo_test()
   req = m.userDeviceApi.createUserSettingsReqInfo()

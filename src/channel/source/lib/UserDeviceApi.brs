@@ -26,6 +26,7 @@ Function UserDeviceApi(constants, apiUtils)
     ' preference related methods.
     createUserSettingsReqInfo: userDeviceApi_createUserSettingsReqInfo
     createDeviceSettingsReqInfo: userDeviceApi_createDeviceSettingsReqInfo
+    createUserAndDeviceSettingsReqInfo: userDeviceApi_createUserAndDeviceSettingsReqInfo
     createPatchUserSettingsReqInfo: userDeviceApi_createPatchUserSettingsReqInfo
     createPatchDeviceSettingsReqInfo: userDeviceApi_createPatchDeviceSettingsReqInfo
   }
@@ -358,6 +359,25 @@ Function userDeviceApi_getAddHistoryRequestInfo(content as Object, nowPos as Int
     url: url
     options: options
   }
+End Function
+
+
+Function userDeviceApi_createUserAndDeviceSettingsReqInfo()
+  requests = []
+
+  userSettingsReqInfo = m.createUserSettingsReqInfo()
+  userSettingsReqInfo.id = "userSettingsReqInfo"
+  userSettingsReqInfo.requestType = m.constants.reqNames.getPreferences
+  userSettingsReqInfo.responseType = "assocarray"
+  requests.push(userSettingsReqInfo)
+
+  deviceSettingsReqInfo = m.createDeviceSettingsReqInfo()
+  deviceSettingsReqInfo.id = "deviceSettingsReqInfo"
+  deviceSettingsReqInfo.requestType = m.constants.reqNames.getPreferences
+  deviceSettingsReqInfo.responseType = "assocarray"
+  requests.push(deviceSettingsReqInfo)
+
+  return requests
 End Function
 
 

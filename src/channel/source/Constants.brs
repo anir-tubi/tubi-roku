@@ -306,6 +306,7 @@ Function getConstants()
     constants.reqNames.getScreenSaverHomeScreenContainerIds = "getScreenSaverHomeScreenContainerIds"
     constants.reqNames.getNamespaces = "getNamespaces"
     constants.reqNames.getExternalConfigs = "getExternalConfigs"
+    constants.reqNames.getBatchPreferences = "getBatchPreferences"
     constants.reqNames.getPreferences = "getPreferences"
     constants.reqNames.patchPreferences = "patchPreferences"
     constants.reqNames.getPauseAd = "getPauseAd"
