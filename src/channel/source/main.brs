@@ -26,9 +26,6 @@ Function Main(startupArgs)
   permaScreen.CreateScene("BackgroundScene")
   permaScreen.show()
 
-  if constants.settings.injectRtaOnDeviceComponent = true then
-    m.odc = createObject("roSGNode", "RTA_OnDeviceComponent") 'bs:disable-line 1128
-  end if
 
   while runChannel(constants, log, request) = true
   end while
@@ -70,6 +67,10 @@ Function runChannel(constants, log, request)
   sgGlobal.setField("theme", constants.ui.themes.default)
 
   screen.show()
+
+  if constants.settings.injectRtaOnDeviceComponent = true then
+    m.odc = createObject("roSGNode", "RTA_OnDeviceComponent") 'bs:disable-line 1128
+  end if
 
   'add RALE for dev builds - children can not be added to tubiScene until after screen.show has run
   if constants <> invalid AND constants.settings <> invalid AND constants.settings.mode = "dev" AND constants.settings.raleEnabled = true
