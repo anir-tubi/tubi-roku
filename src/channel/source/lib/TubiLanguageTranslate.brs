@@ -1632,12 +1632,12 @@ Function getTranslation_en_US()
       "description": "title displayed on registration welcome modal",
       "message": "Tubi is better when you sign in"
     },
-    "reg_intro_sub_header": {
+    "reg_intro_sub_header":{
       "description": "sub header displayed on registraton welcome modal",
       "message": "No credit card. Free forever."
     },
     "reg_first_line_sub_item": {
-      "description": "first sub item to be displayed under reg first line item to explain user about benifit of registration",
+      "description": "first sub item to be displayed under reg_first_line_item to explain user about benifit of registration",
       "message": "Save now to watch later"
     },
     "reg_third_line_item":{
@@ -1645,7 +1645,7 @@ Function getTranslation_en_US()
       "message": "Unlock Picks Just for You"
     },
     "reg_third_line_sub_item":{
-      "description": "third sub item to be displayed under reg third line item to explain user about benifit of registration",
+      "description": "third sub item to be displayed under reg_third_line_item to explain user about benifit of registration",
       "message": "Get better recommendations"
     },
     "reg_sign_in_button_title": {
@@ -3101,6 +3101,34 @@ Function getTranslation_es_MX()
     "explore_fifa_description": {
       "description": "description displayed on fifa intro modal",
       "message": "Tubi tiene repeticiones completas de los 64 partidos de la Copa Mundial disponibles de forma gratuita. Regístrate para ver todos los partidos en tu dispositivo favorito."
+    },
+    "reg_intro_title": {
+      "description": "title displayed on registration welcome modal",
+      "message": "Tubi es mejor cuando Inicias Sesión"
+    },
+    "reg_intro_sub_header": {
+      "description": "sub header displayed on registraton welcome modal",
+      "message": "No se requiere tarjeta de crédito • Gratis siempre."
+    },
+    "reg_first_line_sub_item": {
+      "description": "first sub item to be displayed under reg_first_line_item to explain user about benifit of registration",
+      "message": "Guardar Ahora, Ver Más Tarde"
+    },
+    "reg_third_line_item": {
+      "description": "third item to let know user about the benifit of registration",
+      "message": "Desbloquea títulos Solo para Ti"
+    },
+    "reg_third_line_sub_item": {
+      "description": "third sub item to be displayed under reg_third_line_item to explain user about benifit of registration",
+      "message": "Obtén mejores recomendaciones"
+    },
+    "reg_sign_in_button_title": {
+      "description": "Button text to be displayed on first button of registration welcome modal",
+      "message": "Continuar para Iniciar Sesión"
+    },
+    "reg_continue_as_guest_button_title": {
+      "description": "Button text to be displayed on second button of registration welcome modal",
+      "message": "Continuar como Invitado"
     },
     "replay": {
       "description": "This label used for badge to indicate the content availability",
