@@ -170,6 +170,10 @@
       <!-- this field is triggered when the user pauses the video. This will let the helper know to get the pauseAd overlay info.-->
       <field id="getPauseAd" type="boolean" alwaysNotify="true"/>
 
+      <!-- pauseAdDisplayed helps to find out whether pauseAd is displayed or not. Based on this, the pauseAdDeviceCap is stored -->
+      <!-- isPauseAdDisplayed can be removed once experiment is graduated -->
+      <field id="isPauseAdDisplayed" type="boolean" alwaysNotify="true"/>
+
       <!-- pixelUrl to fire during pause ad -->
       <field id="sendPauseAdPixel" type="string" alwaysNotify="true"/>
       <field id="audioTrackSettings" type="assocarray" value="{}" alias="closedCaptionAndAudioSelectionOverlay.audioTrackSettings" />
@@ -542,7 +546,7 @@
 
     <Timer
       id="PauseAdOverlayTimer"
-      duration="3.5"/>
+      duration="5"/>
 
   </children>
 </component>

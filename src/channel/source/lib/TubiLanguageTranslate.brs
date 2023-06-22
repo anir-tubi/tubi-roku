@@ -1674,7 +1674,7 @@ Function getTranslation_en_US()
     },
     "goBack_videoPlayer_ad": {
       "description": "Navigational instructions to users when pause Ad is displayed on video screen",
-      "message": "Press Back to close the ad"
+      "message": "Press any button to close the ad"
     },
     "cc_audio_overlay_subtitles": {
       "description": "Available closed caption tracks section header label.",

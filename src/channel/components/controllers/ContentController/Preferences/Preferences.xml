@@ -3,8 +3,11 @@
   <interface>
     <!-- Holds the value of user preferred audio track. Sample Format: { "language": "en","role": "description" }. Where role can hold values description,main depending on if the track as audio description. -->
     <field id="audioTrack" type="assocarray" value="{}" />
-    
+
     <!-- Holds the value if video preview is allowed or not. -->
     <field id="isVideoPreviewOn" type="boolean" value="true" />
+
+    <!-- Holds the value of pauseAdDeviceCap, based on it PauseAd will be displayed for VOD -->
+    <field id="pauseAdDeviceCap" type="integer" />
   </interface>
 </component>

@@ -1693,10 +1693,15 @@ constants.ui.themes = {}
       constants.time.superbowlRabbitHoleCampaignStartDate = "2023-02-09T20:00:00Z"
       constants.time.superbowlRabbitHoleCampaignEndDate = "2023-03-30T20:00:00Z"
 
+      constants.pauseAdExp = {}
+      constants.pauseAdExp.startDate = "2023-07-06T07:00:00Z"
+      constants.pauseAdExp.endDate = "2023-07-07T07:00:00Z"
+
       ' Creating Backend/Frontend mapping for preference keys.
       constants.preferenceKeys = {}
       constants.preferenceKeys.isVideoPreviewOn = "enable_video_preview"
       constants.preferenceKeys.audioTrack = "audio_track"
+      constants.preferenceKeys.pauseAdDeviceCap = "pause_ad_device_cap"
 
   return constants
 end Function

@@ -102,6 +102,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     videoPlayer.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     videoPlayer.observeFieldScoped("getPauseAd", "onGetPauseAd")
     videoPlayer.observeFieldScoped("sendPauseAdPixel", "onSendPauseAdPixel")
+    videoPlayer.observeFieldScoped("isPauseAdDisplayed", "onPauseAdDisplayed")
     videoPlayer.observeFieldScoped("audioTrackSettings", "onAudioTrackSettingsChange")
     initVideoTracking(videoPlayer) 'initializeYoubora
     setInScreenCache(videoPlayer)
@@ -221,8 +222,8 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     end if
 
     content.nowPos = position
-    
-    ' Adding logging if the program does not have title. 
+
+    ' Adding logging if the program does not have title.
     ' Below logging is a approach to capture more logs to see if we have content title missing for any programs.
     if isNonEmptyString(content.title) = false
       videoInfo = {}
@@ -579,15 +580,44 @@ End Function
 
 
 Function onPauseAdResponse(response)
-  if response <> invalid
-    videoPlayerScreen = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+  currentUTCTimeInSecs = getCurrentUTCTime()
+  pauseAdStartDate = m.constants.pauseAdExp.startDate
+  pauseAdEndDate = m.constants.pauseAdExp.endDate
+
+  ' //BELOW BLOCK IS ADDED FOR QA TESTING. QA can change the dates on <env>.yml file for testing pauseAd experiment
+  if m.constants.settings.mode <> "production"
+    if isNonEmptyString(m.constants.settings.pauseAdStartDate)
+      pauseAdStartDate = m.constants.settings.pauseAdStartDate
+    end if
+    if isNonEmptyString(m.constants.settings.pauseAdEndDate)
+      pauseAdEndDate = m.constants.settings.pauseAdEndDate
+    end if
+  end if
+
+  pauseAdExpStartDate = CreateObject("roDateTime")
+  pauseAdExpStartDate.FromISO8601String(pauseAdStartDate)
+  pauseAdExpEndDate = CreateObject("roDateTime")
+  pauseAdExpEndDate.FromISO8601String(pauseAdEndDate)
+
+  videoPlayerScreen = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+
+  'setting the pauseAdResponse as invalid if the pauseAdDeviceCap reached 5 and if current day didn't match with one day sponsorshop experiment
+  if m.preferences.pauseAdDeviceCap < 5 AND currentUTCTimeInSecs >= pauseAdExpStartDate.asSeconds() AND currentUTCTimeInSecs <= pauseAdExpEndDate.asSeconds()
+
+    if response <> invalid
+      if videoPlayerScreen <> invalid
+        videoPlayerScreen.pauseAdResponse = response
+      else if isNonEmptyString(response.notUsedPixel) = true
+        sendPauseAdPixel(response.notUsedPixel)
+      end if
+    end if
+
+  else
 
     if videoPlayerScreen <> invalid
-      videoPlayerScreen.pauseAdResponse = response
-    else
-      notUsedPixelUrl = response.notUsedPixel
-      sendPauseAdPixel(notUsedPixelUrl)
+      videoPlayerScreen.pauseAdResponse = invalid
     end if
+
   end if
 End Function
 
@@ -1177,6 +1207,18 @@ Function onAudioTrackSettingsChange(msg)
     savePreferences({
       "audioTrack": selectedAudioTrack
     })
+  end if
+End Function
+
+
+Function onPauseAdDisplayed(msg)
+  isPauseAdDisplayed = msg.getData()
+
+  if isPauseAdDisplayed = true
+    currentPauseAdDeviceCap = m.preferences.pauseAdDeviceCap
+    savePreferences({
+      "pauseAdDeviceCap": currentPauseAdDeviceCap + 1
+    }, "device")
   end if
 End Function
 

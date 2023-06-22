@@ -300,20 +300,20 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
 
   if m.top.isTrailer = false and m.top.hasFocus() = true
 
-    if getExperimentResource("roku_pause_ads", "roku_pause_ads_v1", false).enabled = true
+    if getExperimentResource("roku_pause_ads", "roku_pause_ads_v2", false).enabled = true
 
       if m.isPauseAdReqInProgress = false AND m.isPixelFiredForCurrentPauseAd = true
         resetPauseAd()
         resetPauseAdTimers()
         m.isPauseAdReqInProgress = true
-        m.pauseAdOverlayTimer.duration = 3.5
+        m.pauseAdOverlayTimer.duration = 5
         startPauseAdTimer()
         m.top.getPauseAd = true
       end if
 
     else
       resetPauseAdTimers()
-      m.pauseAdOverlayTimer.duration = 3.5
+      m.pauseAdOverlayTimer.duration = 5
       startPauseAdTimer()
     end if
 
@@ -990,7 +990,7 @@ Function setFocusedButton(transportButton, sayAudioText = false)
   ' Use case when we will pass true are as below. Following general standards based on testing of other competitor apps.
   ' When we focus on the skip cuepoints button.
   ' When the user navigates within the transport bar.
-  ' When the user moves focus into the transport control icon from the progress bar. 
+  ' When the user moves focus into the transport control icon from the progress bar.
   if sayAudioText = true
     sayFocusedButtonAudioGuide(transportButton.id)
   end if
@@ -1177,9 +1177,9 @@ End Function
 
 Function onPauseAdResponse(msg)
   pauseAdResponse = msg.GetData()
+  m.isPauseAdReqInProgress = false
 
   if pauseAdResponse <> invalid
-    m.isPauseAdReqInProgress = false
 
     if pauseAdResponse.mediaUrl <> ""
       m.isPixelFiredForCurrentPauseAd = false
@@ -1224,12 +1224,33 @@ Function resetPauseAdOverlay()
 End Function
 
 
-'onPauseAdOverlayTimer triggers 3.5 seconds after the user pauses the video
+'onPauseAdOverlayTimer triggers 5 seconds after the user pauses the video
 Function onPauseAdOverlayTimer()
   m.pauseAdOverlay.unobserveFieldScoped("posterLoadStatus")
 
-  ' roku_pause_ads_v1 exposure event will be fired after 3.5 seconds for both treatment & control
-  if m.videoState = "pause" AND getExperimentResource("roku_pause_ads", "roku_pause_ads_v1", true).enabled = true
+  currentUTCTimeInSecs = getCurrentUTCTime()
+  pauseAdStartDate = m.constants.pauseAdExp.startDate
+  pauseAdEndDate = m.constants.pauseAdExp.endDate
+
+  ' //BELOW BLOCK IS ADDED FOR QA TESTING. QA can change the dates on <env>.yml file for testing pauseAd experiment
+  if m.constants.settings.mode <> "production"
+    if isNonEmptyString(m.constants.settings.pauseAdStartDate)
+      pauseAdStartDate = m.constants.settings.pauseAdStartDate
+    end if
+    if isNonEmptyString(m.constants.settings.pauseAdEndDate)
+      pauseAdEndDate = m.constants.settings.pauseAdEndDate
+    end if
+  end if
+
+  pauseAdExpStartDate = CreateObject("roDateTime")
+  pauseAdExpStartDate.FromISO8601String(pauseAdStartDate)
+  pauseAdExpEndDate = CreateObject("roDateTime")
+  pauseAdExpEndDate.FromISO8601String(pauseAdEndDate)
+
+  if m.videoState = "pause" AND currentUTCTimeInSecs >= pauseAdExpStartDate.asSeconds() AND currentUTCTimeInSecs <= pauseAdExpEndDate.asSeconds()
+    'roku_pause_ads_v2 exposure event will be fired after 5 seconds for both treatment & control only first day of experiment
+    getExperimentResource("roku_pause_ads", "roku_pause_ads_v2", true).enabled = true
+
     loadStatus = m.pauseAdOverlay.posterLoadStatus
 
     if loadStatus = "ready"
@@ -1240,9 +1261,10 @@ Function onPauseAdOverlayTimer()
       m.pauseAdOverlay.observeFieldScoped("posterLoadStatus", "onPauseAdPosterLoadStatus")
     end if
 
-  else if getExperimentResource("roku_pause_ads", "roku_pause_ads_v1", false).enabled = true
+  else if getExperimentResource("roku_pause_ads", "roku_pause_ads_v2", false).enabled = true
     sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
   end if
+
 End Function
 
 
@@ -1276,6 +1298,7 @@ End Function
 Function showPauseAd()
   animateTransport("out")
   m.pauseAdAnimation = fade(m.pauseAdOverlay, "in", 0.6, 0.4)
+  m.top.isPauseAdDisplayed = true
   sendPauseAdPixel(m.constants.pauseAd.startPixel)
   startImpTrackingTimer()
   m.pauseAdOverlay.setFocus(true)
@@ -1326,8 +1349,8 @@ End Function
 
 
 'restartPauseAdTimer restarts the pause ad timer
-'@duration : float, default is 3.5 seconds
-Function restartPauseAdTimer(duration = 3.5)
+'@duration : float, default is 5 seconds
+Function restartPauseAdTimer(duration = 5)
   if m.pauseAdOverlayTimer <> invalid
     stopPauseAdTimer()
     m.pauseAdOverlayTimer.duration = duration
@@ -1383,7 +1406,7 @@ Function sendPauseAdPixel(pixelType = "")
     end if
   end if
 
-  if isNonEmptyString(pixelUrl) AND getExperimentResource("roku_pause_ads", "roku_pause_ads_v1", false).enabled = true
+  if isNonEmptyString(pixelUrl) AND getExperimentResource("roku_pause_ads", "roku_pause_ads_v2", false).enabled = true
     m.isPixelFiredForCurrentPauseAd = true
     m.top.sendPauseAdPixel = pixelUrl
   end if

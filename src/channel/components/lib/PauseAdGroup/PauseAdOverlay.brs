@@ -12,7 +12,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
   handled = false
 
   if press
-    if key = "back"
+    if key = "back" OR key = "OK" OR key = "up" OR key = "down" OR key = "left" OR key = "right"
       fade(m.top, "out", 0.1)
       m.top.close = true
       handled = true
@@ -20,8 +20,6 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       fade(m.top, "out", 0.1)
       m.top.close = true
       handled = false
-    else if key = "OK" OR key = "up" OR key = "down" OR key = "left" OR key = "right"
-      handled = true
     end if
   end if
 
