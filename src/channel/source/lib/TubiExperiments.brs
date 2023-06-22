@@ -64,12 +64,6 @@ Function TubiExperiments(constants) as Object
         roku_video_preview_search_screen_v1 : {"enabled": false}
       }
 
-      roku_category_detailscreen_lazy_load: {
-        roku_category_detailscreen_lazy_load_v1: {
-          "enabled": true
-        }
-      }
-
       roku_large_play_progress: {
         roku_large_play_progress_v1 : {"enabled": true}
       }

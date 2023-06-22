@@ -13,7 +13,6 @@ Function init()
 
   itemsInRowCount = 8
 
-  ' roku_category_detailscreen_lazy_load_v1 related variables.
   m.upperRowIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize / itemsInRowCount ' items per row = 8 * 6 = 48
   m.lowerRowIndex = 0
   m.numRowsInBatch = m.constants.performance.categoryGridList.lazyLoadBatchSize / itemsInRowCount
@@ -235,11 +234,9 @@ Function onItemFocused(msg)
         rowForNextCall = (m.lowerRowIndex + m.upperRowIndex) / 2
 
         if row > rowForNextCall
-          if getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", true).enabled = true
-            m.top.categoryBatchIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize + m.top.categoryBatchIndex
-            m.lowerRowIndex = m.upperRowIndex + 1
-            m.upperRowIndex = m.upperRowIndex + m.numRowsInBatch
-          end if
+          m.top.categoryBatchIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize + m.top.categoryBatchIndex
+          m.lowerRowIndex = m.upperRowIndex + 1
+          m.upperRowIndex = m.upperRowIndex + m.numRowsInBatch
         end if
 
       else

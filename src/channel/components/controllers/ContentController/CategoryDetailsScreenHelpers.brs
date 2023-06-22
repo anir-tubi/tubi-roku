@@ -9,7 +9,7 @@
 ' @itemFocused: integer, the index of the content item that will be focused once the screen has loaded content.
 Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoadEvents = true, contentMode = "", itemFocused = -1)
   tubiLog("CategoryDetailsScreenHelpers.showCategoryDetailsScreen")
-  
+
   categoryDetailsScreen = CreateObject("roSGNode", "CategoryDetailsScreen")
   categoryDetailsScreen.callingPage = sPageSource
   categoryDetailsScreen.trackingLoadStartTime = UpTime(0)
@@ -136,7 +136,7 @@ Function onCategoryBatchIndexChange(msg)
   ' Is used to determine when to send the PageLoad analytics event (don't send on refresh)
   m.refreshingCategoryDetailsCache = true
 
-  if index <> 0 AND getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", false).enabled = true
+  if index <> 0
 
     'fetch the content if screen is not fully loaded or a total refresh has been requested.
     if categoryDetailsScreen.isFullyLoaded <> true
@@ -177,7 +177,7 @@ Function fetchCategoryDetails(content, index = 0, contentMode = "")
       params["content_mode"] = contentMode
     end if
 
-    if index <> 0 AND getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", false).enabled = true
+    if index <> 0
       params["cursor"] = index
       params["contents_limit"] =  m.constants.performance.categoryGridList.lazyLoadBatchSize
       params["expanded"] = true
@@ -204,7 +204,6 @@ End Function
 Function onCategoryDetailResponse(categoryContent)
   tubiLog("CategoryDetailsScreenHelpers.onCategoryDetailResponse")
   screen = getCurrentScreen()
-  lazyloadingExp = (getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", false).enabled = true)
 
   if screen.id = m.constants.ui.screenIds.categoryDetailsScreen
     ' the category details screen is still the top screen after receiving the response
@@ -222,29 +221,24 @@ Function onCategoryDetailResponse(categoryContent)
         sendSponsorPixels(sponsorPixels)
       end if
 
-      if lazyloadingExp = true
-
-        if screen.content = invalid 'first time
-          screen.content = categoryContent
-          screen.shouldLoadContent = true
-        else
-          responseChildren = categoryContent.getChildren(-1, 0)
-          screen.content.appendChildren(responseChildren)
-        end if
-
-        'Total received content is less than batchsize that means we have reached the maximum available
-        'Number of contents on the screen + next batchsize is more than maximum limit
-        if responseItemsCount <  m.constants.performance.categoryGridList.lazyLoadBatchSize OR (screen.content.getChildCount() +  m.constants.performance.categoryGridList.lazyLoadBatchSize > m.constants.performance.categoryGridList.finalLazyLoadSize)
-          screen.isFullyLoaded = true
-        else
-          screen.isFullyLoaded =  false
-        end if
-      else
+      if screen.content = invalid 'first time
         screen.content = categoryContent
         screen.shouldLoadContent = true
+      else
+        responseChildren = categoryContent.getChildren(-1, 0)
+        screen.content.appendChildren(responseChildren)
       end if
 
-    else if lazyloadingExp = true AND categoryContent <> invalid AND responseItemsCount = 0 AND screen.content <> invalid AND  screen.isLoading = false
+      'Total received content is less than batchsize that means we have reached the maximum available
+      'Number of contents on the screen + next batchsize is more than maximum limit
+      if responseItemsCount <  m.constants.performance.categoryGridList.lazyLoadBatchSize OR (screen.content.getChildCount() +  m.constants.performance.categoryGridList.lazyLoadBatchSize > m.constants.performance.categoryGridList.finalLazyLoadSize)
+        screen.isFullyLoaded = true
+      else
+        screen.isFullyLoaded =  false
+      end if
+
+
+    else if categoryContent <> invalid AND responseItemsCount = 0 AND screen.content <> invalid AND  screen.isLoading = false
       screen.isFullyLoaded =  true
     else
       screen.isLoading = true
@@ -324,8 +318,6 @@ Function showCategoryDetailError(error, bContentEmptyError = false)
   topScreen = getCurrentScreen()
 
   categoryDetailsScreen = invalid
-  lazyLoadingExp =  (getExperimentResource("roku_category_detailscreen_lazy_load", "roku_category_detailscreen_lazy_load_v1", false).enabled = true)
-
   ' If topScreen.id does not = the ID of a categoryDetailsScreen, another screen (like the sign in screen)
   ' has been pushed on top of the categoryDetailsScreen. Hold off on removing the screen and
   ' displaying an error. When the user traverses back through the navigation stack, the
@@ -336,8 +328,8 @@ Function showCategoryDetailError(error, bContentEmptyError = false)
     categoryDetailsScreen = topScreen
 
     doShowError = true
-    'in case of lazy loading, if some batch fails donot show the error dialog.
-    if lazyLoadingExp = true AND (categoryDetailsScreen.content <> invalid AND categoryDetailsScreen.content.getChildCount() > 0)
+
+    if categoryDetailsScreen.content <> invalid AND categoryDetailsScreen.content.getChildCount() > 0
       doShowError = false
     end if
 
@@ -377,7 +369,7 @@ Function showCategoryDetailError(error, bContentEmptyError = false)
       }
 
       showErrorModal(modalInfo, invalid, invalid, removeTopScreen)
-    else if lazyLoadingExp = true
+    else 'lazy loading so make the isFullyLoaded = true
       categoryDetailsScreen.isFullyLoaded = true
     end if
 
@@ -386,17 +378,11 @@ Function showCategoryDetailError(error, bContentEmptyError = false)
   end if
 
 
-  if lazyLoadingExp = false
-    if categoryDetailsScreen <> invalid
-      loadTime = Int((Uptime(0) - categoryDetailsScreen.trackingLoadStartTime) * 1000) 'in ms
-      screenTrackingLoad(categoryDetailsScreen.trackingPageInfo, loadTime, false)
-    end If
-  else 'if categorydetailScreen is lazy loading then send the tracking event only for first batch
+  'if categorydetailScreen is lazy loading then send the tracking event only for first batch
     if categoryDetailsScreen <> invalid AND categoryDetailsScreen.categoryBatchIndex = 0 'first batch has failed, so send page load event
       loadTime = Int((Uptime(0) - categoryDetailsScreen.trackingLoadStartTime) * 1000) 'in ms
       screenTrackingLoad(categoryDetailsScreen.trackingPageInfo, loadTime, false)
     end If
-  end if
 
 End Function
 

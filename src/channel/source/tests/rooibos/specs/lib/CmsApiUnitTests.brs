@@ -542,7 +542,6 @@ Function cmsApi_createCategoryReqInfo_test()
 
 
   ' categorydetailPage lazy loading
-  ' //TODO delete or change this part based on experiment result : roku_category_detailscreen_lazy_load
   ' lazy loading starting at 10 to next 48 contents
   lazyCategoryOptions = {
     params: {

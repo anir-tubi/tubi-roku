@@ -12,7 +12,6 @@ Function init()
 
   m.top.observeFieldScoped("content", "onContentChange")
   m.top.observeFieldScoped("currentIndex", "onIndexChange")
-  'delete this observer in case of roku_category_detailscreen_lazy_load_v1 experiment does not graduate
   m.top.observeFieldScoped("isFullyLoaded", "onIsFullyLoaded")
 
   m.originalTranslation_CategoryName = m.CategoryName.translation
