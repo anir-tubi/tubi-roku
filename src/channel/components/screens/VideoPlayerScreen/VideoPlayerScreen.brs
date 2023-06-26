@@ -429,6 +429,10 @@ Function playContent()
         resourceType = "VIDEO_RESOURCE_TYPE_DASH_WIDEVINE"
       else if m.Video.content.drmType = m.constants.player.drmTypes.dashPlayready
         resourceType = "VIDEO_RESOURCE_TYPE_DASH_PLAYREADY"
+      else if m.Video.content.drmType = m.constants.player.drmTypes.dash
+        resourceType = "VIDEO_RESOURCE_TYPE_DASH"
+      else if m.Video.content.drmType = m.constants.player.drmTypes.hlsv6
+        resourceType = "VIDEO_RESOURCE_TYPE_HLSV6"
       else if m.Video.content.drmType = m.constants.player.drmTypes.hlsv3
         resourceType = "VIDEO_RESOURCE_TYPE_HLSV3"
       end if
