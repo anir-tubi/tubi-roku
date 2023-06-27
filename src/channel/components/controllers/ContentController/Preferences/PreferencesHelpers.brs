@@ -3,7 +3,7 @@ Function getPreferences(onGetPreferencesCompletionCallback = invalid)
   isUserSigedIn = isLoggedInUser()
 
   if isUserSigedIn = true
-    batchRequests = m.userDeviceApi.createUserAndDeviceSettingsReqInfo()
+    batchRequests = m.userDeviceApi.createUserAndDeviceSettingsBatchRequests()
     ' Makes a network request to both user and device settings if user loggedIn
     m.makeBatchRequest({
       requests: batchRequests
