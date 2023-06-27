@@ -604,18 +604,24 @@ Function userDeviceApi_addHistoryReqEpisodeParentIdAsInteger_test()
 End Function
 
 
-'@Test createUserAndDeviceSettingsReqInfo unit tests
-Function userDeviceApi_createUserAndDeviceSettingsReqInfo_test()
-  req = m.userDeviceApi.createUserAndDeviceSettingsReqInfo()
+'@Test createUserAndDeviceSettingsBatchRequests unit tests
+Function userDeviceApi_createUserAndDeviceSettingsBatchRequests_test()
+  req = m.userDeviceApi.createUserAndDeviceSettingsBatchRequests()
 
   userRequest = req[0]
   m.assertEqual(m.constants.urls.account.userSettings, userRequest.url)
+  m.assertEqual(userRequest.id, "userSettingsReqInfo")
+  m.assertEqual(userRequest.requestType, "getPreferences")
+  m.assertEqual(userRequest.responseType, "assocarray")
   options = userRequest.options
   m.assertNotInvalid(options)
   m.assertEqual(options.params.platform, m.platform)
 
   deviceRequest = req[1]
   m.assertEqual(m.constants.urls.account.deviceSettings, deviceRequest.url)
+  m.assertEqual(deviceRequest.id, "deviceSettingsReqInfo")
+  m.assertEqual(deviceRequest.requestType, "getPreferences")
+  m.assertEqual(deviceRequest.responseType, "assocarray")
   options = deviceRequest.options
   m.assertNotInvalid(options)
   m.assertEqual(options.params.platform, m.platform)

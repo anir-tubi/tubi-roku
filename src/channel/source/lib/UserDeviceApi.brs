@@ -26,7 +26,7 @@ Function UserDeviceApi(constants, apiUtils)
     ' preference related methods.
     createUserSettingsReqInfo: userDeviceApi_createUserSettingsReqInfo
     createDeviceSettingsReqInfo: userDeviceApi_createDeviceSettingsReqInfo
-    createUserAndDeviceSettingsReqInfo: userDeviceApi_createUserAndDeviceSettingsReqInfo
+    createUserAndDeviceSettingsBatchRequests: userDeviceApi_createUserAndDeviceSettingsBatchRequests
     createPatchUserSettingsReqInfo: userDeviceApi_createPatchUserSettingsReqInfo
     createPatchDeviceSettingsReqInfo: userDeviceApi_createPatchDeviceSettingsReqInfo
   }
@@ -362,7 +362,7 @@ Function userDeviceApi_getAddHistoryRequestInfo(content as Object, nowPos as Int
 End Function
 
 
-Function userDeviceApi_createUserAndDeviceSettingsReqInfo()
+Function userDeviceApi_createUserAndDeviceSettingsBatchRequests()
   requests = []
 
   userSettingsReqInfo = m.createUserSettingsReqInfo()

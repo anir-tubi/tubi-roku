@@ -31,25 +31,25 @@ Function onGetBatchPreferencesComplete(preferences)
   ' Updates the node with the data from the parser.
   m.preferences.update(preferences.deviceSettingsReqInfo)
   m.preferences.update(preferences.userSettingsReqInfo)
-  markRequestCompleteAndExecuteCallback()
+  markUserDeviceSettingsRequestCompleteAndExecuteCallback()
 End Function
 
 
 Function onGetPreferencesComplete(preferences)
   ' Updates the node with the data from the parser.
   m.preferences.update(preferences)
-  markRequestCompleteAndExecuteCallback()
+  markUserDeviceSettingsRequestCompleteAndExecuteCallback()
 End Function
 
 
 ' Callback triggered if the get preferences errors out.
 Function onGetPreferencesError(_msg)
   ' In case of error we will continue using default or existing values incase it is a refresh request.
-  markRequestCompleteAndExecuteCallback()
+  markUserDeviceSettingsRequestCompleteAndExecuteCallback()
 End Function
 
 
-Function markRequestCompleteAndExecuteCallback()
+Function markUserDeviceSettingsRequestCompleteAndExecuteCallback()
   ' Marks the request was complete so that we can inform content controller that it is good to go.
   m.getPreferencesComplete = true
   if m.onGetPreferencesCompletionCallback <> invalid
@@ -59,9 +59,9 @@ Function markRequestCompleteAndExecuteCallback()
 End Function
 
 
-' preferences will be a assocarray. Ex: {"audioTrack": "", "isVideoPreviewOn": false}
-' saveInto will be string (optional) field, possible values are device, user. default is invalid.
-Function savePreferences(preferences, saveInto = invalid)
+' @preferences: assocArray, settings/preferences that will be stored on the device/settings API. Ex: {"audioTrack": "", "isVideoPreviewOn": false}
+' @saveInto: string, optional, determines if the device settings are stored at the device level or user level on the backend. Possible values are "device", "user".
+Function savePreferences(preferences, saveInto = "")
   ' Creating backend to front end key mapping so that we can use camelcase fields.
   preferenceKeys = m.constants.preferenceKeys
 
