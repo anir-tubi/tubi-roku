@@ -23,7 +23,7 @@ Function TubiExperiments(constants) as Object
     defaultResources: {
       '// When enabled=true, the user will see live video previews on the My Stuff screen.
       roku_my_stuff: {
-        roku_my_stuff_v3: {"enabled": false}
+        roku_my_stuff_v3: {"enabled": true}
       }
 
       '// When enabled=true, then the resume and play buttons will display differently
