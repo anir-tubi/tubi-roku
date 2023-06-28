@@ -1257,7 +1257,7 @@ Function onPauseAdOverlayTimer()
 
   if m.videoState = "pause" AND m.pauseAdDeviceCap < 5 AND currentUTCTimeInSecs >= pauseAdExpStartDate.asSeconds() AND currentUTCTimeInSecs <= pauseAdExpEndDate.asSeconds()
     'roku_pause_ads_v2 exposure event will be fired after 5 seconds for both treatment & control only first day of experiment
-    getExperimentResource("roku_pause_ads", "roku_pause_ads_v2", true).enabled = true
+    getExperimentResource("roku_pause_ads", "roku_pause_ads_v2", true)
     loadStatus = m.pauseAdOverlay.posterLoadStatus
 
     if loadStatus = "ready"
