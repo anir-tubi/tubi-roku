@@ -1684,6 +1684,13 @@ Function onCustomSuspend(msg)
         end if
       end if
     end if
+    
+    ' When resuming from suspending the app, Roku force restores the currFocus row back to the state that existed at the time of suspending the app.
+    ' This force restore happens after we set the focus appropriately using jumpToItem which rendering our jumpToItem action useless.
+    ' To work around this firmware behavior, we set the focus to the home menu item at the time of suspend so that when the app resumes, the Roku behavior will focus the correct side nav menu item. (Refreshing of home screen content will happen during resume that is inside onCustomResume method.)
+    if currentScreen <> invalid AND currentScreen.instantResumeAction = m.constants.instantResumeActions.startChannel
+      focusSideNavOption(m.constants.ui.sideNavIds.home)
+    end if
   end if
 End Function
 
@@ -1760,9 +1767,6 @@ Function onCustomResume(msg)
         else if currentScreen <> invalid
           if currentScreen.instantResumeAction = m.constants.instantResumeActions.restartApp
             bRestartApp = true
-          else if (lastAppSuspendInSecs >= 1200 AND currentScreen.id = m.constants.ui.screenIds.settingsScreen)
-            'user is on the settings page and returns to the app after 20 or more minutes then return to the homescreen
-            bStartChannel = true
           else if currentScreen.instantResumeAction = m.constants.instantResumeActions.startChannel
             'calling startChannel() instead of restartChannel() since restartChannel() can land a user on the ICTS screen, but we only want users to land on the home screen
             bStartChannel = true

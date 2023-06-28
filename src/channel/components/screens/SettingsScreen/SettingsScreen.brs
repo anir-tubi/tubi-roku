@@ -50,7 +50,7 @@ Function init()
 
   m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
   m.top.screenLevel = m.constants.ui.screenLevels.settingsScreen
-
+  m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
 End Function
 
 
