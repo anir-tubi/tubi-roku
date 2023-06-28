@@ -306,6 +306,7 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
         resetPauseAd()
         resetPauseAdTimers()
         m.isPauseAdReqInProgress = true
+        ' // REMOVE duration which are added dynamically as we have default value in VideoPlayerScreen.xml, when we graduate roku_pause_ads_v2
         m.pauseAdOverlayTimer.duration = 5
         startPauseAdTimer()
         m.top.getPauseAd = true
@@ -1191,6 +1192,8 @@ Function onPauseAdResponse(msg)
       m.pauseAdOverlay.posterUri = pauseAdResponse.mediaUrl
     else
       sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
+      'If the video player does not have focus, resetting timer here to avoid notUsed Pixel being fired again in PauseAdTimers observer.
+      resetPauseAdTimers()
     end if
 
   end if
@@ -1247,10 +1250,14 @@ Function onPauseAdOverlayTimer()
   pauseAdExpEndDate = CreateObject("roDateTime")
   pauseAdExpEndDate.FromISO8601String(pauseAdEndDate)
 
-  if m.videoState = "pause" AND currentUTCTimeInSecs >= pauseAdExpStartDate.asSeconds() AND currentUTCTimeInSecs <= pauseAdExpEndDate.asSeconds()
+  m.pauseAdDeviceCap = 0
+  if m.top.pauseAdDeviceCap <> invalid
+    m.pauseAdDeviceCap = m.top.pauseAdDeviceCap
+  end if
+
+  if m.videoState = "pause" AND m.pauseAdDeviceCap < 5 AND currentUTCTimeInSecs >= pauseAdExpStartDate.asSeconds() AND currentUTCTimeInSecs <= pauseAdExpEndDate.asSeconds()
     'roku_pause_ads_v2 exposure event will be fired after 5 seconds for both treatment & control only first day of experiment
     getExperimentResource("roku_pause_ads", "roku_pause_ads_v2", true).enabled = true
-
     loadStatus = m.pauseAdOverlay.posterLoadStatus
 
     if loadStatus = "ready"

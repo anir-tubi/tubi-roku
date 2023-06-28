@@ -101,6 +101,9 @@
        <!-- sendPendingPauseAdPixel will be set when user press home key from remote -->
       <field id="sendPendingPauseAdPixel" type="boolean" alwaysNotify="true"/>
 
+      <!-- Holds the preferences->pauseAdDeviceCap value obtained from backend. either user or device level.  -->
+      <field id="pauseAdDeviceCap" type="integer" />
+
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />

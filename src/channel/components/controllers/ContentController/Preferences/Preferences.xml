@@ -7,6 +7,7 @@
     <!-- Holds the value if video preview is allowed or not. -->
     <field id="isVideoPreviewOn" type="boolean" value="true" />
 
+    <!-- //REMOVE pauseAdDeviceCap when we graduate roku_pause_ads_v2 experiment -->
     <!-- Holds the value of pauseAdDeviceCap, based on it PauseAd will be displayed for VOD -->
     <field id="pauseAdDeviceCap" type="integer" />
   </interface>
