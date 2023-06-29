@@ -72,13 +72,9 @@ Function TubiExperiments(constants) as Object
         roku_pause_ads_v1 : {"enabled": false}
       }
 
-      roku_update_history_frequency: {
-        roku_update_history_frequency_v1 : {"enabled": true}
-      }
-
       roku_pause_ads: {
         roku_pause_ads_v2 : {"enabled": false}
-      }  
+      }
 
       roku_registration_component_over_homegrid: {
         roku_registration_component_over_homegrid_v1: {"enabled": false}

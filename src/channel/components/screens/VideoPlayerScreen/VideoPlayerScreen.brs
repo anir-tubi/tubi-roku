@@ -792,15 +792,8 @@ Function onVideoPositionChange(msg)
 
     if m.top.isTrailer = false AND isLoggedInUser() = true AND (content.type = m.constants.ui.contentTypes.video OR content.type = m.constants.ui.contentTypes.sportsEvent)
 
-      'fire roku_update_history_frequency_v1 exposure when user is loggedIn & reached interval of 1 min
-      if getExperimentResource("roku_update_history_frequency", "roku_update_history_frequency_v1", true).enabled
-        historyInterval = m.constants.player.historyFrequency3Mins
-      else
-        historyInterval = m.constants.player.historyFrequency1Min
-      end if
-
       ' update history when interval reaches 3 minutes for treatment group OR 1 minute for control group
-      if m.playerPosition > m.lastsavedPosition + historyInterval
+      if m.playerPosition > m.lastsavedPosition + m.constants.player.historyFrequency3Mins
         historyPosition(m.playerPosition)
       end if
     end if
