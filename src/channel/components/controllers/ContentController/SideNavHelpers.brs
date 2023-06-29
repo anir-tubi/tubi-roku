@@ -363,6 +363,10 @@ Function disableKidsModeFromSideNav()
   showDefaultHomeScreen()
   homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
   focusSideNavOption(homeSideNavID)
+
+  ' Since we are queuing braze in app messages when the application is in kids mode when the user exits kids mode
+  ' We are going to process any queued messages.
+  processQueuedInAppMessage()
 End Function
 
 

@@ -61,8 +61,8 @@ End Function
 '
 '
 '              {
-'                 title: <string>                   - The title to be displayed on the modal
-'                 subHeader: <string>                 - The message to be displayed underneath the title
+'                 header: <string>                   - The header to be displayed on the modal
+'                 subHeader: <string>                 - The message to be displayed underneath the header
 '                 modalDialogTypes: <string>        - This value should be equal to - modalDialogTypes -> "multiStyle" to speicy that multistyle dialog to be used.
 '                 modalDialogStyles = <string>      - Enum values are defined in constants.brs -
 '                                                                                             "multiMessageGroup"
@@ -79,7 +79,7 @@ End Function
 '                       subHeader: <string>         - message sub header or message sub item
 '                       iconUri: <string>           - uri for the icon to be displayed left side of the message
 '                    }
-'                 multiStyleImageUrl: <string>.........- Instead of the multiStyleMessage, only an image can be displayed as message body
+'                 imageUrls: <array>.........- Instead of the multiStyleMessage, displaying a single or multiple images.
 '              }
 '
 ' @buttonInfo: array, each index contains an assocArray with the following format:
@@ -136,13 +136,12 @@ Function addButtonsToModal(modal, buttonInfo)
 End Function
 
 Function getMultiStyleModal(modalInfo)
-
   modal = CreateObject("roSgNode", "MultiStyleDialogScreen")
-  header = modalInfo.title
+  header = modalInfo.header
   subHeader = modalInfo.subHeader
   modal.id = getUniqueModalId(header, subHeader)
   modal.multiStyleMessage = modalInfo.multiStyleMessage
-  modal.multiStyleImageUrl = modalInfo.multiStyleImageUrl
+  modal.imageUrls = modalInfo.imageUrls
   modal.header = header
   modal.subHeader = subHeader
   modal.instantResumeAction = modalInfo.instantResumeAction
@@ -157,10 +156,9 @@ Function getSimpleModal(modalInfo)
   modal.id = getUniqueModalId(title, message)
   modal.title = title
   modal.message = message
-  modal.scrollable = modalInfo.scollable
+  modal.scrollable = modalInfo.scrollable
   modal.instantResumeAction = modalInfo.instantResumeAction
   return modal
-
 End Function
 
 
@@ -558,10 +556,67 @@ Function getTopModal()
 
   for i = m.top.getChildCount()-1 to 0 Step -1
     child = m.top.getChild(i)
-    if child.isSubtype("ModalDialogScreen")
+    if child.isSubtype("BaseDialogScreen") = true
       return child
     end if
   end for
+
+  return invalid
+End Function
+
+
+' @modalInfo: assocArray, contains info necessary to show/dismiss ToastStyle modal. Has the following format:
+'
+'
+'              {
+'                 header: <string>                   - The header to be displayed on the modal
+'                 subheader: <string>                 - The subheader to be displayed underneath the header
+'                 openTrackEvent: <assocArray>      - The analytics tracking info that was sent when the modal was shown,
+'                                                     will be re-purposed for sending the dismiss dialog tracking event.
+'                                                     Should contain "type" and "values" keys.
+'                 trackingTask: <roSGNode>          - The tracking task that can be used to send the dismiss dialog tracking event
+'                 backButtonCallback: <roFunction>  - A function called if a user attempts "back out" of the modal.'
+' @buttonInfo: array, each index contains an assocArray with the following format:
+'               {
+'                 text: <string>                - The text on the button
+'                 type: <string>                - "accept" or "dismiss", describes the action the user is taking,
+'                                                  in relation to the modal. Used in dialog analytics
+'                 callback: <roFunction>        - A function that will be called if the button is selected
+'                 callbackParams: <array>       - An array which will be passed to the callback as a single paramater
+'                 shouldFocusParentBeforeCallback <boolean>   -In some cases we can not set focus back to currentScreen. Example case is where we show registration welcome modal to new users and when user selects
+'                                                              signIn button and then focus is set back to currentScreen, which will start playing live channel or video preview before RFI modal shows. This videopreviw/livechannel will keep playing in the background.
+'                                                              To avoid such scenarios set shouldFocusParentBeforeCallback to 'false' and handle the focus in call back function.
+'               }
+'
+Function showToastStyleModal(modalInfo, buttonInfo)
+  ' Don't create the modal if a modal already exists, or there is not enough info to create it
+  if m.tempModal = invalid AND modalInfo <> invalid AND buttonInfo <> invalid
+    modal = CreateObject("roSgNode", "ToastStyleDialogScreen")
+    modal.update({
+      header: modalInfo.header
+      subheader: modalInfo.subheader
+      instantResumeAction: modalInfo.instantResumeAction
+    })
+    modal.id = getUniqueModalId(modalInfo.header, modalInfo.subheader)
+
+    m.tempModal = {
+      buttonInfo: buttonInfo
+      modalInfo: modalInfo
+    }
+
+    addButtonsToModal(modal, buttonInfo)
+
+    m.top.appendChild(modal)
+    modal.visible = true
+    modal.setFocus(true)
+
+    ' send the show dialog track event
+    if modalInfo.openTrackEvent <> invalid AND modalInfo.trackingTask <> invalid
+      modalInfo.trackingTask.trackEvent = modalInfo.openTrackEvent
+    end if
+
+    return modal
+  end if
 
   return invalid
 End Function

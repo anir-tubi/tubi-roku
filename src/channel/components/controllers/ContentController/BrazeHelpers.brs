@@ -1,0 +1,259 @@
+Function configureBrazeSdk()
+  config = {}
+  configFields = BrazeConstants().BRAZE_CONFIG_FIELDS
+  brazeSettings = m.constants.thirdParty.braze
+  config[configFields.API_KEY] = brazeSettings.apiKey
+  config[configFields.ENDPOINT] = brazeSettings.endpoint
+  config[configFields.HEARTBEAT_FREQ_IN_SECONDS] = brazeSettings.refreshFrequency
+
+  m.global.addFields({ brazeConfig: config })
+End Function
+
+
+Function setBrazeUserData(authInfo)
+  if getExperimentResource("roku_braze", "roku_braze_v1", false).enabled = true
+    m.braze.setCustomAttribute("preferred_device_id", m.constants.deviceInfo.deviceId)
+    if authInfo <> invalid AND authInfo.userId <> invalid
+      m.braze.setUserId(authInfo.userId)
+      if authInfo.email <> invalid
+        m.braze.setEmail(authInfo.email)
+      end if
+    else
+      ' Setting device id as the unique id.
+      m.braze.setUserId(m.constants.deviceInfo.deviceId)
+    end if
+    ' Doing it as per recommendation from the braze sdk documentation.
+    m.brazeTask.BrazeInAppMessage = invalid
+  end if
+End Function
+
+
+Function onInAppMessageTriggered(msg)
+  message = msg.getData()
+  ' Due to legal requirement ignoring all messages in kids mode or parental rating is below teen then queuing the message.
+  if isKidsUIOn() = true
+    ' Queueing the message to be displayed whenever user exits kids mode.
+    ' For now we will support only one message queue. If at all we need to more flexible will add in future.
+    m.queuedInAppMessage = message
+  else
+    currentScreen = getCurrentScreen()
+    ' If the screen loading is in progress not displaying the modal.
+    ' Delaying it until the screen loading is complete.
+    if currentScreen <> invalid AND currentScreen.isLoading = true
+      currentScreen.observeFieldScoped("isLoading", "onScreenLoadingChange")
+      m.queuedInAppMessage = message
+    else
+      processInAppMessage(message)
+    end if
+  end if
+End Function
+
+
+Function onScreenLoadingChange(msg)
+  isLoading = msg.getData()
+
+  if isLoading = false
+    processInAppMessage(m.queuedInAppMessage)
+    currentScreen = msg.getRoSGNode()
+    currentScreen.unobserveFieldScoped("isLoading")
+  end if
+End Function
+
+
+Function processQueuedInAppMessage()
+  ' Only processing if we are in adult or teen mode.
+  if isKidsUIOn() = false
+    processInAppMessage(m.queuedInAppMessage)
+  end if
+End Function
+
+
+Function processInAppMessage(message)
+  if message <> invalid
+    ' Stopping any preview that is in progress.
+    stopVideoPreview()
+    extras = message.extras
+    ' Checking to make sure we have a template config key before proceeding.
+    if extras <> invalid AND extras.template <> invalid
+      
+      data = getBrazeModalData(message)
+      if extras.template = "toast"
+        showToastStyleModal(data.modalInfo, data.buttonList)
+      else
+        showMultiStyleModal(data.modalInfo, data.buttonList)
+      end if
+    end if
+
+    ' Calling the braze method to track the impression.
+    LogInAppMessageImpression(message.id, m.brazeTask)
+  end if
+End Function
+
+
+Function getBrazeModalData(message)
+  modalInfo = {
+    header: message.header
+    subheader: message.message
+    instantResumeAction: m.constants.instantResumeActions.closeDialog
+  }
+
+  ' Will contain a comma seperated string of urls.
+  imageUrl = message.image_url
+
+  if imageUrl <> invalid
+    images = imageUrl.split(",")
+    modalInfo.imageUrls = images
+  end if
+
+  buttons = message.buttons
+  buttonList = []
+  for each button in buttons
+    buttonType = "accept"
+    if button.click_action = "NONE"
+      buttonType = "dismiss"
+    end if
+
+    buttonInfo = {
+      text: button.text
+      type: buttonType
+      callback: onBrazeInAppMessageButtonSelected
+      callbackParams: {
+        "uri": button.uri
+        "messageId": message.id,
+        "buttonId": button.id
+      }
+      shouldFocusParentBeforeCallback: false
+    }
+    buttonList.push(buttonInfo)
+  end for
+
+  return {
+    "modalInfo": modalInfo,
+    "buttonList": buttonList
+  }
+End Function
+
+
+Function onBrazeInAppMessageButtonSelected(parameters)
+  input = parameters
+
+  ' Sample uri value "action=navigate&page=movies"
+  if input <> invalid
+    ' Tracking button click.
+    if input.messageId <> invalid AND input.buttonId <> invalid
+      LogInAppMessageButtonClick(input.messageId, input.buttonId, m.brazeTask)
+    end if
+
+    ' Processing the uri if it is not empty or else focusing back to the screen.
+    if isNonEmptyString(input.uri) = true
+      ' Converting the uri string to key value pairs.
+      queryKeyValuePairs = input.uri.split("&")
+      uriParameters = {}
+      for each queryPair in queryKeyValuePairs
+        keyValues = queryPair.split("=")
+        
+        ' Making sure the we have a validate syntax. ex: "action=navigate".
+        if isNonEmptyArray(keyValues) = true AND keyValues.count() = 2
+          uriParameters[keyValues[0]] = keyValues[1]
+        end if
+
+      end for
+
+      processUriClickAction(uriParameters)
+    else
+      ' Focusing back to the screen.
+      m.top.setFocus(true)
+    end if
+
+  end if
+End Function
+
+
+Function processUriClickAction(uriParameters)
+  if isAA(uriParameters) = true AND uriParameters.action <> invalid
+    action = uriParameters.action
+    ' Since the action values are not used else where in the application not moving to constants so that we avoid constants access.
+    if action = "navigate"
+      ' Sample uri: "action=navigate&page=movies"
+      processNavigateAction(uriParameters)
+    else if action = "play"
+      ' Sample uri: "action=play&contentId=539270&mediaType=movie"
+      processPlayAction(uriParameters)
+    end if
+  end if
+End Function
+
+
+Function processNavigateAction(uriParameters)
+  page = uriParameters.page
+  ' Since the page values are not used else where in the application not moving to constants so that we avoid constants access.
+  if page <> invalid
+    if page = "movies"
+      showMoviesScreen()
+    else if page = "myList"
+      isUserSigedIn = isLoggedInUser()
+      if isUserSigedIn = true
+        showMyStuffScreen()
+        focusSideNavOption(m.constants.ui.sideNavIds.myList)
+      end if
+    else if page = "espanol"
+      showEspanolScreen()
+      focusSideNavOption(m.constants.ui.sideNavIds.espanol)
+    else if page = "tvShows"
+      showTVScreen()
+    else if page = "liveTv"
+      showDefaultEPGScreen()
+    else if page = "categories"
+      showCategoryListScreen(m.constants, m.constants.ui.terms.menu)
+      focusSideNavOption(m.constants.ui.sideNavIds.categories)
+    else if page = "channels"
+      showChannelListScreen(m.constants, m.constants.ui.terms.menu)
+      focusSideNavOption(m.constants.ui.sideNavIds.channels)
+    else if page = "signin" OR page = "signup"
+      isUserSigedIn = isLoggedInUser()
+      if isUserSigedIn = false
+        startSignIn()
+      end if
+    else if page = "category" AND isNonEmptyString(uriParameters["category"]) = true
+      navigateToCategoryDetailsScreen(uriParameters["category"])
+      focusSideNavOption(m.constants.ui.sideNavIds.categories)
+    else if page = "network" AND isNonEmptyString(uriParameters["network"]) = true
+      navigateToNetworkDetailsScreen(uriParameters["network"])
+      focusSideNavOption(m.constants.ui.sideNavIds.channels)
+    end if
+
+    ' Setting proper mode based on the page.
+    if page = "espanol"
+      setUiMode(m.constants.ui.modes.latino)
+    else
+      setUiMode(m.constants.ui.modes.standard)
+    end if 
+  end if
+End Function
+
+
+Function processPlayAction(uriParameters)
+  contentId = uriParameters.contentId
+  mediaType = uriParameters.mediaType
+  ' Since the page values are not used else where in the application not moving to constants so that we avoid constants access.
+  if contentId <> invalid
+    if mediaType = "series"
+      contentType = "series"
+      
+      ' Appending zero to series id if one is not appended when configured.
+      if contentId.startsWith("0") = false
+        contentId = "0" + contentId
+      end if
+
+    else
+      contentType = "video"
+    end if
+    content = CreateObject("roSGNode", "ContentNode")
+    content.update({
+      "id": contentId
+      "type": contentType
+    }, true)
+
+    showDetailScreen(content, false, skipDetailScreen)
+  end if
+End Function

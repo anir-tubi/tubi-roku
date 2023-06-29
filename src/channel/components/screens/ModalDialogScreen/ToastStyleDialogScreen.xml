@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ToastStyleDialogScreen" extends="BaseDialogScreen">
+  <script type="text/brightscript" uri="ToastStyleDialogScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+
+  <interface>
+      <field id="header" alias="header.text"/>
+      <field id="subheader" alias="subheader.text" />
+      <field id="buttons" type="stringarray" value="[]" alwaysNotify="true"/>
+  </interface>
+
+  <children>
+    <Poster
+      id="dialogBox"
+      width="576"
+      height="320"
+      uri="pkg:/images/menu-focus-$$RES$$.9.png"
+      translation="[1280, 48]">
+
+      <LayoutGroup
+        id="contentArea"
+        translation="[32,48]"
+        itemSpacings="[12, 21]">
+
+        <Label
+          id="header"
+          maxLines="2"
+          wrap="true"
+          width="480">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="27" />
+        </Label>
+
+        <Label
+          id="subheader"
+          wrap="true"
+          maxLines="3"
+          width="460">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="24" />
+        </Label>
+
+        <FilledButtonMarkupGrid
+          id="buttonList"
+          itemSize="[234,72]"
+          itemComponentName="ListItemButtonWithBg"
+          itemSpacing="[12,0]"
+          numRows="1"
+          numColumns="2"/>
+      </LayoutGroup>
+    </Poster>
+
+  </children>
+</component>

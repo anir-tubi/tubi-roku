@@ -377,6 +377,13 @@ Function getConstants()
 
     constants.thirdParty.sentry = {}
       constants.thirdParty.sentry.dsn = "https://f8edcfe8baf140b4b91b46dfb8af9a19:acdf43f7c38a47f1ab85583035ff1798@sentry.io/1377102"
+    
+    constants.thirdParty.braze = {}
+      constants.thirdParty.braze.apiKey = "be27ec5f-5d30-4014-94cd-009a0a0d1c48"
+      constants.thirdParty.braze.endpoint = "https://sdk.iad-01.braze.com/"
+      ' Configurable starting with 1 hour will adjust based on feedback.
+      ' We have to be conservative with this time since every time refresh happens their is registry read/write.
+      constants.thirdParty.braze.refreshFrequency = 3600
 
     constants.thirdParty.suiteTest = {}
 
@@ -1156,7 +1163,6 @@ Function getConstants()
       constants.ui.screenLevels.freeForeverScreen = 110
       constants.ui.screenLevels.availableDeviceScreen = 111
       constants.ui.screenLevels.landingScreen = 112
-      constants.ui.screenLevels.modalDialogScreen = 1000
       constants.ui.screenLevels.screensaverScreen = 1100
 
     constants.ui.screenIds = {}
@@ -1395,6 +1401,7 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
     defaultLightPrimaryBackground = "THEME_defaultLightPrimaryBackground_THEME"
     defaultLightPrimaryForeground = "THEME_defaultLightPrimaryForeground_THEME"
     defaultLightTransparentForeground75 = "THEME_defaultLightTransparentForeground75_THEME"
+    defaultLightTransparentForeground10 = "THEME_defaultLightTransparentForeground10_THEME"
 
 
 '//kids theme constants
@@ -1494,6 +1501,7 @@ constants.ui.themes = {}
         inverseBackgroundColor: defaultLightPrimaryBackground
         inversePrimaryTextColor: defaultLightPrimaryForeground
         inverseSecondaryTextColor: defaultLightTransparentForeground75
+        inverseNeutralColor2: defaultLightTransparentForeground10
     }
 
     constants.ui.themes.kidsMode = {

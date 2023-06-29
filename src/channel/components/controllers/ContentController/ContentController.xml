@@ -73,6 +73,9 @@
   <script type="text/brightscript" uri="pkg:/components/lib/FIFAMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/VideoPreviewMixin.brs" />
   <script type="text/brightscript" uri="Preferences/PreferencesHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/components/tasks/BrazeTask/BrazeSDK.brs"/>
+  <script type="text/brightscript" uri="BrazeHelpers.brs"/>
+  <script type="text/brightscript" uri="ScreenNavigationHelpers.brs" />
 
   <interface>
 

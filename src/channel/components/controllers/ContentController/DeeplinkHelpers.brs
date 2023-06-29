@@ -224,7 +224,7 @@ Function handleInputDeeplink(inputInfo) as void
   ' close any opened modal/pop-up when deeplinking via roInput
   for i = 0 to m.top.getChildCount() - 1
     screen = m.top.getChild(i)
-    if screen <> invalid AND (screen.subType() = "ModalDialogScreen" OR screen.subType() = "MultiStyleDialogScreen")
+    if screen <> invalid AND screen.isSubtype("BaseDialogScreen") = true
       closeModal(screen, "back")
     end if
   end for
@@ -568,14 +568,7 @@ Function handleCategoryDeeplinkContent()
     if m.enteredFromDeepLink = true
       sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.categoryDetail, m.Tracking, m.trackingLoggingTask, m.constants)
     end if
-    showCategoryListScreen(m.constants, m.constants.ui.terms.menu, false)
-    contentNode = CreateObject("roSGNode", "CategoryContentNode")
-    contentNode.id = m.deeplinkContent.id
-    showCategoryDetailsScreen(contentNode, m.constants.ui.terms.categories, false)
-    categoryListScreen = getFromScreenCache(m.constants.ui.screenIds.categoryListScreen)
-    if categoryListScreen <> invalid
-      categoryListScreen.jumpToItemById = m.deeplinkContent.id
-    end if
+    navigateToCategoryDetailsScreen(m.deeplinkContent.id)
   else
     if m.enteredFromDeepLink = true
       sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.category, m.Tracking, m.trackingLoggingTask, m.constants)
@@ -606,14 +599,7 @@ Function handleNetworkDeeplinkContent()
       if m.enteredFromDeepLink = true
         sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.categoryDetail, m.Tracking, m.trackingLoggingTask, m.constants)
       end if
-      showChannelListScreen(m.constants, m.constants.ui.terms.menu, false)
-      contentNode = CreateObject("roSGNode", "CategoryContentNode")
-      contentNode.id = m.deeplinkContent.id
-      showCategoryDetailsScreen(contentNode, m.constants.ui.terms.channels, false)
-      channelListScreen = getFromScreenCache(m.constants.ui.screenIds.channelListScreen)
-      if channelListScreen <> invalid
-        channelListScreen.jumpToItemById = m.deeplinkContent.id
-      end if
+      navigateToNetworkDetailsScreen(m.deeplinkContent.id)
     else
       if m.enteredFromDeepLink = true
         sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.channel, m.Tracking, m.trackingLoggingTask, m.constants)

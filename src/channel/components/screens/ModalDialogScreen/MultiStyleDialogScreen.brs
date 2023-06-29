@@ -2,9 +2,10 @@ Function init()
   m.buttonList = m.top.findNode("ButtonList")
   m.dialogBox = m.top.findNode("DialogBox")
   m.shade = m.top.findNode("Shade") ' background rectangle to dim the currentScreen
-  m.Header = m.top.findNode("Header")
-  m.subHeader = m.top.findNode("subHeader")
+  m.header = m.top.findNode("header")
+  m.subheader = m.top.findNode("subheader")
   m.multiStyleLayout = m.top.findNode("multiStyleLayout")
+  m.imagesSection = m.top.findNode("imagesSection")
   m.mask = m.top.findNode("mask")
 
   m.top.observeFieldScoped("buttons", "formatDialog")
@@ -13,8 +14,6 @@ Function init()
   m.top.observeFieldScoped("focusedChild", "onFocusedChildChange")
 
   m.constants = getConstantsFromGlobal()
-  m.top.screenLevel = m.constants.ui.screenLevels.modalDialogScreen
-
 
   '//::TODO::colors - Design will eventually add this black color to all themes but until then, hardcode this with the default shadeColor regardless of theme.
   '//   when Design adds the color to all themes, then set this color within the onThemeChange() observer using the new theme specific color
@@ -37,23 +36,9 @@ Function onThemeChange(msg = invalid)
   end if
 
   if m.theme <> invalid
-    m.Header.color = m.theme.primaryTextColor
-    m.subHeader.color = m.theme.secondaryTextColor
+    m.header.color = m.theme.primaryTextColor
+    m.subheader.color = m.theme.secondaryTextColor
     m.dialogBox.color = m.constants.ui.themes.extended.brandPurple
-  end if
-
-End Function
-
-
-Function onFocusedChildChange()
-  ' If we do not set focus 4670X was forcing device reboot :|
-  if m.top.hasFocus() = true then
-    m.buttonList.setFocus(true)
-  end if
-
-  'if modal loses focus (mainly because videoplayer gains focus or homescreen gains focus), Just close the modal
-  if m.top.isInFocusChain() = false
-    m.top.exitButton = "back"
   end if
 
 End Function
@@ -97,7 +82,7 @@ Function formatDialog()
     numButtons = m.top.buttons.Count()
     m.buttonList.numColumns = numButtons
     m.buttonList.content = newContent
-    m.dialogBox.width = (nWidestWidth * numButtons) + (32 * (numButtons - 1)) + 96 'space between buttons = 32;  right padding = 48 ; left padding = 48
+    m.dialogBox.width = getHorizontalButtonListWidth(m.buttonList.itemSize[0], numButtons, 30, 48) 'space between buttons = 30;  left/right padding = 48
     dialogBoxTranslationX = 1920 - m.dialogBox.width - 51
     m.dialogBox.translation = [dialogBoxTranslationX, m.dialogBox.translation[1]]
     m.mask.width = m.dialogBox.width
@@ -123,36 +108,63 @@ Function formatDialog()
 
       m.multiStyleLayout.appendChild(multiStyleMsgGroup)
     end for
-  else if isNonEmptyString(m.top.multiStyleImageUrl) = true AND m.multiStyleLayout.getChildCount() = 0
-    m.multiStyleLayout.visible = true
-    posterImg = CreateObject("roSGNode", "Poster")
-    posterImg.id = "posterImg"
-    posterImg.uri = m.top.multiStyleImageUrl
-    posterImg.height = 352
-    posterImg.width = 582
-    posterImg.loadHeight = 352
-    posterImg.loadwidth = 582
-    posterImg.loadDisplayMode = "scaleToFit"
+  else if isNonEmptyArray(m.top.imageUrls) = true AND m.multiStyleLayout.getChildCount() = 0
+    imageUrls = m.top.imageUrls
 
-    m.multiStyleLayout.appendChild(posterImg)
-  end if
+    ' Since we need to support multiple images. 
+    ' Setting image dimensions based on number of images returned.
+    ' Idea behind having 2 variable is to provide flexiblity in future to have as many as image layouts as possible.
+    ' So that we do not have to create if else logic across the file. We will create the imageDimensions and imageTranslations
+    ' Which will control where in the modal the images will be placed and the dimensions of them.
+    ' We will use absolute positioning for simplicity.
+    imageDimensions = []
+    imageTranslations = []
+    if imageUrls.count() = 1
+      imageWidth = 342
+      ' Center aligning the image if only one present.
+      translationX = (m.dialogBox.width / 2) - (imageWidth/2)
+      m.imagesSection.translation = [translationX, 0]
+      imageDimensions = [[imageWidth, 483]]
+      imageTranslations = [[0, 0]]
+      ' Adjusting the height of the modal to account for images.
+      m.mask.height = 1008
+    else
+      ' For now since we only support 1 or 3 images layout.
+      ' Once we have other variations we will add conditions and settings based on a new layout.
+      ' For ex: imageUrls.count() > 3.
 
-End Function
-
-
-Function onKeyEvent(key As string, press As boolean) As boolean
-  if press
-    ' removed alias from xml and setting buttonSelected interface value here, to play default Roku positive audio sound when user press "OK" on any dialog modal button
-    if key = "OK" AND m.buttonList.hasFocus() = true
-      m.top.buttonSelected = m.buttonList.itemSelected
+      imageDimensions = [[216, 309], [282, 405], [216, 309]]
+      imageTranslations = [[0, 48], [87, 0], [243, 48]]
+      ' Adjusting image section translation to have left side gutter width.
+      m.imagesSection.translation = [112, 0]
+      ' Adjusting the height of the modal to account for images.
+      m.mask.height = 951
     end if
 
-    if key = "back" OR key = "options" then
-      m.top.exitButton = key
-    end if
-
-    return true
+    index = 0
+    imageList = []
+    for each imageUrl in imageUrls
+      ' Adding a check to  make sure we do not crash if in case we get more images than supported.
+      ' If we gracefully ignoring anything more than what is supported.For now it is 3.
+      if imageDimensions[index] <> invalid
+        imageWidth = imageDimensions[index][0]
+        imageHeight = imageDimensions[index][1]
+        imageList.push({
+          subtype: "Poster"
+          uri: imageUrl
+          height: imageHeight
+          width: imageWidth
+          translation: imageTranslations[index]
+          loadDisplayMode: "scaleToFit"
+        })
+      end if
+      index++
+    end for
+    
+    ' Sorting the images by width so that largest is rendered at the end so that it is always on top.
+    imageList.sortBy("width")
+    m.imagesSection.update(imageList, true)
+    m.imagesSection.visible = true
   end if
 
-  return false
 End Function

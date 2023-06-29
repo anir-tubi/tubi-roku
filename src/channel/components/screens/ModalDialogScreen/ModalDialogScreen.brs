@@ -9,14 +9,12 @@ Function init()
   m.DialogBox = m.top.findNode("DialogBox")
   m.Message = m.top.findNode("Message")
   m.MessageGroup = m.top.findNode("MessageGroup")
-  m.ScrollableMessage = m.top.findNode("ScrollableMessage")
   m.ScrollableBackground = m.top.findNode("ScrollableBackground")
   m.Shade = m.top.findNode("Shade")
   m.Title = m.top.findNode("Title")
 
 
   m.constants = getConstantsFromGlobal()
-  m.top.screenLevel = m.constants.ui.screenLevels.modalDialogScreen
 
   '//::TODO::colors - Design will eventually add this black color to all themes but until then, hardcode this with the default shadeColor regardless of theme.
   '//   when Design adds the color to all themes, then set this color within the onThemeChange() observer using the new theme specific color
@@ -39,19 +37,6 @@ Function onThemeChange(msg = invalid)
     m.Message.color = theme.primaryTextColor
     m.Title.color = theme.primaryTextColor
     m.DialogBox.color = theme.neutralSolidColor
-  end if
-End Function
-
-
-Function onFocusedChildChange()
-  ' If we do not set focus 4670X was forcing device reboot :|
-  if m.top.hasFocus() = true then
-    m.ButtonList.setFocus(true)
-  end if
-
-  'if modal loses focus and we are not currently hidden (mainly because videoplayer gains focus or homescreen gains focus), Just close the modal
-  if m.top.hidden = false AND m.top.isInFocusChain() = false
-    m.top.exitButton = "back"
   end if
 End Function
 
@@ -112,31 +97,4 @@ Function formatDialog()
   m.DialogBox.height = contentRect.height + 65 + 24  ' 65 is from top to title, 24 is from button to bottom of dialog
   newY = (1080 - m.DialogBox.height) / 2.0
   m.DialogBox.translation = [m.DialogBox.translation[0], newY]
-End Function
-
-Function onKeyEvent(key As String, press As Boolean) As Boolean
-  if press
-    if m.top.scrollable then
-      if key = "up" AND m.ButtonList.hasFocus() then
-        m.ScrollableMessage.scrollbarThumbBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
-        m.ScrollableMessage.setFocus(true)
-        return true
-      else if (key = "down" or key = "left" or key = "right" or key = "OK") AND m.ScrollableMessage.hasFocus() then
-        m.ScrollableMessage.scrollbarThumbBitmapUri = "pkg:/images/menu-disabled-focus-$$RES$$.9.png"
-        m.ButtonList.setFocus(true)
-        return true
-      end if
-    end if
-
-    ' removed alias from xml and setting buttonSelected interface value here, to play default Roku positive audio sound when user press "OK" on any dialog modal button
-    if key = "OK" AND m.ButtonList.hasFocus() = true
-      m.top.buttonSelected = m.ButtonList.itemSelected
-    end if
-
-    if key = "back" or key = "options" then
-      m.top.exitButton = key
-    end if
-    return true
-  end if
-  return false
 End Function

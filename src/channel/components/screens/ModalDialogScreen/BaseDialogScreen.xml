@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="BaseDialogScreen" extends="Group">
+  <script type="text/brightscript" uri="BaseDialogScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+
+  <interface>    
+    <!-- OUTPUT -->
+    <!-- Set to the index of the button which was selected from the button list. -->
+    <field id="buttonSelected" type="integer" alwaysNotify="true"/>
+    <!-- set to "options" or "back" if either of those keys are pressed -->
+    <field id="exitButton" type="string" alwaysNotify="true"/>
+    <!-- Holds the information about what action should take when modal shown while resume after suspending -->
+    <field id="instantResumeAction" type="string" />
+  </interface>
+</component>

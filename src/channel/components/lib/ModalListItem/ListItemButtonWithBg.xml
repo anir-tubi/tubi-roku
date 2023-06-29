@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
- - ModalListItem
+ - ListItemButtonWithBg
  -
  - Items used in a MarkupGrid (like FilledButtonMarkupGrid) or RowList for showing modal buttons.
  -
@@ -11,17 +11,18 @@
 
   <interface>
     <field id="itemContent" type="node" />
-    <field id="fontSize" alias="buttonTextFont.size"/>
+    <field id="fontSize" alias="labelFont.size,labelFocusedFont.size"/>
+    <field id="itemHasFocus" type="boolean" />
     <field id="gridHasFocus" type="boolean"/>
     <field id="focusPercent" type="float"/>
-    <field id="width" type="float" alias="buttonText.width" />
-    <field id="height" type="float" alias="buttonText.height" />
+    <field id="width" type="float" alias="label.width,labelFocused.width" />
+    <field id="height" type="float" alias="label.height,labelFocused.height" />
     <field id="calculatedWidth" type="float"/>
   </interface>
 
   <children>
     <Poster
-      id="buttonBg"
+      id="background"
       uri="pkg:/images/menu-focus-$$RES$$.9.png"
       opacity="1.0"
       height="72"
@@ -29,19 +30,29 @@
 
     <Group
       id="buttonTextParent"
-      translation="[33,3]">
-
+      translation="[0,3]">
       <Label
-        id="buttonText"
-        horizAlign="left"
+        id="label"
+        horizAlign="center"
         vertAlign="center"
-        height="78"
-        opacity="1.0">
+        height="78">
         <Font
-          id="buttonTextFont"
+          id="labelFont"
           role="font"
-          size="24"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf" />
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="24" />
+      </Label>
+      <Label
+        id="labelFocused"
+        horizAlign="center"
+        vertAlign="center"
+        opacity="0"
+        height="78">
+        <Font
+          id="labelFocusedFont"
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="24" />
       </Label>
     </Group>
   </children>

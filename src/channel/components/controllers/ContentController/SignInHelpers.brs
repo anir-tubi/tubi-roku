@@ -618,6 +618,8 @@ Function onPostSignInAuthInfoUpdated()
     ' this should not happen but start the channel in case it somehow does
     startChannel()
   end if
+
+  setBrazeUserData(authInfo)
 End Function
 
 
@@ -697,6 +699,7 @@ Function onPostSignOutPreferencesRefresh()
   'clear the linearVideoplayer so that locked content will not get played.
   stopAndHideLinearVideoPlayer()
   startChannel()
+  setBrazeUserData(authInfo)
 End Function
 
 

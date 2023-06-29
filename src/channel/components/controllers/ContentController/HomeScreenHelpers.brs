@@ -1035,7 +1035,7 @@ Function showRegistrationWelcomeModal()
 
   showHideSpinner(false)
 
-  title = getTranslation("reg_intro_title")
+  header = getTranslation("reg_intro_title")
   subHeader = getTranslation("reg_intro_sub_header")
 
   multiMessage = []
@@ -1069,13 +1069,12 @@ Function showRegistrationWelcomeModal()
 
 
   modalInfo = {
-    title: title
+    header: header
     subHeader: subHeader
     message: ""               'message is not used in case of multistyle dialog
     modalDialogTypes: m.constants.modalDialogTypes.multiStyle
     modalDialogStyles: m.constants.modalDialogStyles.multiMessageGroup
     multiStyleMessage: multiMessage
-    multiStyleImageUrl: invalid
     openTrackEvent: dialogEvent
     trackingTask: m.trackingLoggingTask
     backButtonCallback: invalid

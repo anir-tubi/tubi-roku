@@ -195,6 +195,19 @@ Function init()
 
   ' Holds the value for user/device level settings. For ex: isVideoPreviewOn  or Selected Audio track.
   m.preferences = createObject("roSGNode", "Preferences")
+
+  if getExperimentResource("roku_braze", "roku_braze_v1", true).enabled = true
+    ' Configuring the braze sdk.
+    configureBrazeSdk()
+    ' Starting the braze task.
+    m.brazeTask = CreateObject("roSGNode", "BrazeTask")
+    m.braze = getBrazeInstance(m.brazeTask)
+    m.brazeTask.observeFieldScoped("BrazeInAppMessage", "onInAppMessageTriggered")
+  end if
+  ' For now we will support only one message queue. If at all we need to more flexible will add in future.
+  ' For now we are queuing message if the user is in parental controls / kids mode or if there is screen in process of loading.
+  ' Used for braze integration.
+  m.queuedInAppMessage = invalid
 End Function
 
 
@@ -222,7 +235,7 @@ Function onFadeInContentController()
     for i = 0 to m.top.getChildCount() - 1
       screen = m.top.getChild(i)
 
-      if screen.subType() = "ModalDialogScreen" OR screen.subType() = "MultiStyleDialogScreen"
+      if screen.isSubtype("BaseDialogScreen") = true
         isDialogOpenAtStartup = true
         exit for
       end if
@@ -615,7 +628,9 @@ Function startUserExperience()
     else
       startChannelFromAppLoad()
     end if
-
+    
+    authInfo = getFieldFromGlobal("authInfo")
+    setBrazeUserData(authInfo)
   end if
 End Function
 

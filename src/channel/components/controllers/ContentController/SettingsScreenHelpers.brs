@@ -326,6 +326,11 @@ Function refreshScreenAfterParentalChanges()
       refreshGridScreen(screen)
     end if
   end if
+
+  ' Since we are queuing braze in app messages when the application is in parental control mode less than teen
+  ' when the user updates parental rating trying to re-process messages.
+  ' We are going to process any queued messages.
+  processQueuedInAppMessage()
 End Function
 
 
