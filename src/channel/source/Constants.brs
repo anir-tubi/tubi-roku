@@ -379,7 +379,11 @@ Function getConstants()
       constants.thirdParty.sentry.dsn = "https://f8edcfe8baf140b4b91b46dfb8af9a19:acdf43f7c38a47f1ab85583035ff1798@sentry.io/1377102"
     
     constants.thirdParty.braze = {}
-      constants.thirdParty.braze.apiKey = "be27ec5f-5d30-4014-94cd-009a0a0d1c48"
+      constants.thirdParty.braze.apiKey = "a97de018-d2c3-47a4-ada4-7b12dc579255"
+      ' All non production environments will use staging api key.
+      if constants.settings.mode <> "production"
+        constants.thirdParty.braze.apiKey = "be27ec5f-5d30-4014-94cd-009a0a0d1c48"
+      end if
       constants.thirdParty.braze.endpoint = "https://sdk.iad-01.braze.com/"
       ' Configurable starting with 1 hour will adjust based on feedback.
       ' We have to be conservative with this time since every time refresh happens their is registry read/write.
