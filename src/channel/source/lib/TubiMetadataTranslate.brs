@@ -1688,50 +1688,48 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
   '   ]
   videoResources = []
   titanVersionOrExperimentVersion = ""
-  hevc4kExpEnabled = false
+  hevcNon4kExpEnabled = false
 
   if m.experiments <> invalid
-    hevc4kExpEnabled = m.experiments.getExperimentResource("roku_hevc_drm_4k", "roku_hevc_drm_4k_v1").enabled
+    hevcNon4kExpEnabled = m.experiments.getExperimentResource("roku_hevc_non4k", "roku_hevc_non4k_v1").enabled
   end if
 
-  ' has4kHevcStream helps to decide whether 4k/HEVC stream is available for the selected content.
-  has4kHevcStream = false
+  ' hasHEVC4KStream helps to decide whether video resources has any hevc 4k manifests by checking codec & resolution fields
+  ' //REMOVE hasHEVC4KStream once we graduate roku_hevc_non4k_v1 experiment.
+  hasHEVC4KStream = false
 
-  ' hasOnlyNonDrm helps to decide whether video resources has only non-drm manifests by checking type hlsv6 or dash
-  ' //REMOVE hasOnlyNonDrm once we graduate roku_dash_hlsv6_v1 experiment.
-  hasOnlyNonDrm = true
+  ' hasHEVCStream helps to decide whether video resources has any hevc manifests by checking codec field
+  ' //REMOVE hasHEVCStream once we graduate roku_hevc_non4k_v1 experiment.
+  hasHEVCStream = false
 
   codecToVideoResourcesIndexMap = {}
   resources = contentFromServer.video_resources
 
   if type(resources) = "roArray" AND resources.count() > 0
 
-    ' Adding isNonDrmContent, if the videoResources has only dash or hlsv3 stream formats
     for each video in resources
 
-      if video.type <> m.constants.player.drmTypes.dash AND video.type <> m.constants.player.drmTypes.hlsv6
-        hasOnlyNonDrm = false
-        exit for
-      end if
+      if contentFromServer.type <> m.constants.ui.contentTypes.linear AND contentFromServer.type <> "l"
 
-    end for
+        if getCodecFromVideoResource(video) = m.constants.hevcCodec
+          hasHEVCStream = true
 
-    if contentFromServer.type <> m.constants.ui.categoryTypes.linear AND contentFromServer.type <> "l" AND hasOnlyNonDrm = true
+          if getResolutionFromVideoResource(video) = "2160P"
+            hasHEVC4KStream = true
+          end if
 
-      ' //REMOVE 'isNonDrmContent' field and its references once we graduate roku_dash_hlsv6_v1 experiment.
-      ' isNonDrmContent interface is added to TubiContentNode in order to identify whether video resource has only dash or hlsv3 content
-      contentNode.addField("isNonDrmContent", "boolean", false)
-      contentNode.isNonDrmContent = true
-
-      if m.experiments <> invalid
-        experimentResult = m.experiments.getExperimentResult("roku_dash_hlsv6", "roku_dash_hlsv6_v1")
-
-        if experimentResult <> invalid AND experimentResult.experiment_name <> invalid AND experimentResult.treatment <> invalid
-          titanVersionOrExperimentVersion = "exp=" + experimentResult.experiment_name + "." + experimentResult.treatment
         end if
 
       end if
 
+    end for
+
+    ' //REMOVE 'hasHevcWithout4k' field and its references once we graduate roku_hevc_non4k_v1 experiment.
+    ' hasHevcWithout4k interface is added to TubiContentNode in order to expose the device or not for roku_hevc_non4k_v1 experiment
+    ' Add only if the content has no hevc 4k streams
+    if hasHEVCStream = true AND hasHEVC4KStream = false
+      contentNode.addField("hasHevcWithout4k", "boolean", false)
+      contentNode.hasHevcWithout4k = true
     end if
 
     ' Create a "stub" ContentNode with just the DRM-oriented fields populated. This
@@ -1767,28 +1765,26 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
 
       codec = ""
       if video.codec <> invalid
-        codec = video.codec.replace("VIDEO_CODEC_","")
+        codec = getCodecFromVideoResource(video)
         resource.codec = codec
       end if
 
       resolution = ""
       if video.resolution <> invalid
-        resolution = video.resolution.replace("VIDEO_RESOLUTION_","")
+        resolution = getResolutionFromVideoResource(video)
         resource.resolution = resolution
-      end if
-
-      if codec = m.constants.hevcCodec AND resolution = "2160P"
-        has4kHevcStream = true
-        ' //REMOVE 'has4kHevcStream' field and its references once we graduate roku_hevc_drm_4k_v1 experiment.
-        ' has4kHevcStream interface is added to TubiContentNode in order to identify whether video resource has hevc4k content
-        contentNode.addField("has4kHevcStream", "boolean", false)
-        contentNode.has4kHevcStream = true
       end if
 
       validResource = false
 
-      if (codec = m.constants.hevcCodec AND has4kHevcStream = true AND hevc4kExpEnabled = true AND hasOnlyNonDrm = false) OR codec = m.constants.avcCodec OR contentFromServer.type = "l"
+      if contentFromServer.type = "l" OR contentFromServer.type = m.constants.ui.contentTypes.linear OR codec = m.constants.avcCodec
         validResource = true
+      else if codec = m.constants.hevcCodec
+        ' if the content has 4k hevc manifests, then consider as valid resource and don't expose the device for experiment
+        ' if the content has no 4k hevc manifests, then consider as valid resource only if the hevcNon4kExpEnabled is enabled
+        if hasHEVC4KStream = true OR (hasHEVCStream = true AND hevcNon4kExpEnabled = true)
+          validResource = true
+        end if
       end if
 
       if validResource = true
@@ -1864,6 +1860,24 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
   end if
 
   return videoResources
+End Function
+
+
+' @resource: assocArray, video resource that content api responds
+'
+' returns codec as string without prefix "VIDEO_CODEC_"
+' eg. H265
+Function getCodecFromVideoResource(resource as Object)
+  return resource.codec.replace("VIDEO_CODEC_","")
+End Function
+
+
+' @resource: assocArray, video resource that content api responds
+'
+' returns resolution as string without prefix "VIDEO_RESOLUTION_"
+' eg. 1080P
+Function getResolutionFromVideoResource(resource as Object)
+  return resource.resolution.replace("VIDEO_RESOLUTION_","")
 End Function
 
 
