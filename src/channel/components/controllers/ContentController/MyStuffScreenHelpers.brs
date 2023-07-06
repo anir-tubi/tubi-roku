@@ -49,7 +49,7 @@ Function showMyStuffScreen()
   ' make queue API request only if bLoadData is set to true
   if bLoadData = true
     fetchMyStuffCategoryDetails(screen)
-  else
+  else if bLoggedInUser = true
     jumpToPreviousFocusedItem(screen)
     showHideSpinner(false)
   end if
@@ -211,8 +211,9 @@ End function
 'myStuff screen has told us that the content is out of cache window, so refresh
 Function onRefreshContentSignalForMyStuffScreen(msg)
   tubiLog("MyStuffScreenHelpers.onRefreshContentSignalForMyStuffScreen")
+  bLoggedInUser = isLoggedInUser()
   screen = msg.getRoSGNode()
-  if screen.isLoading = false
+  if screen.isLoading = false AND bLoggedInUser = true
     refreshContentSignalForMyStuffScreen(screen)
   end if
 End Function

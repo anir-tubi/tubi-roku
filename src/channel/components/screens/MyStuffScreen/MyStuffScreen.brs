@@ -168,6 +168,7 @@ Function onLoadingChange(msg)
   isLoading = msg.getData()
 
   if isLoading = true
+    m.SignedOutUI.visible = false
     m.RowList.visible = false
     m.InfoPanel.visible = false
     m.RowList.content = invalid 'When not fully loaded, then the rowlist should not show any content
@@ -608,6 +609,7 @@ End Function
 ' users
 Function onSignedInChange()
   tubiLog("MyStuffScreen.onSignedInChange")
+
   if m.top.signedIn = false
     m.ContentArea.visible = false
     m.SignedOutUI.visible = true
@@ -619,6 +621,7 @@ Function onSignedInChange()
   else
     m.ContentArea.visible = true
     m.SignedOutUI.visible = false
+    m.AllEmptyUI.visible = false
   end if
 End Function
 
