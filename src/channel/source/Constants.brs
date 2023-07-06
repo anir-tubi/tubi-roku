@@ -659,8 +659,8 @@ Function getConstants()
      constants.urls.fifaShowAllPoster = "https://cdn.adrise.tv/image/roku_support_images/fifa-showall-poster.png"
      constants.urls.fifaShowAllBackground = "https://cdn.adrise.tv/image/roku_support_images/fifa-showall-background.webp"
 
-     constants.urls.seeAllPoster = "https://cdn.adrise.tv/image/roku_support_images/see-all-poster.webp"
-     constants.urls.seeAllBackground = "https://cdn.adrise.tv/image/roku_support_images/see-all-background.webp"
+     constants.urls.seeAllPoster = "pkg:/images/see-all-tile.webp"
+     constants.urls.seeAllBackground = "pkg:/images/see-all-gradient.webp"
 
     ' url for pinging Nielsen
     constants.urls.nielsenPing = "https://audit.imrworldwide.com/cgi-bin/gn"

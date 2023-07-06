@@ -31,7 +31,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     setSponsorshipInfo: tubiMetadataTranslate_setSponsorshipInfo
     getContentsJson: tubiMetadataTranslate_getContentsJson
     buildCategoryAA: tubiMetadataTranslate_buildCategoryAA
-    buildCategoryAAWithPrepend: tubiMetadataTranslate_buildCategoryAAWithPrepend
+    buildCategoryAAWithInsert: tubiMetadataTranslate_buildCategoryAAWithInsert
     buildCategoryParentInfo: tubiMetadataTranslate_buildCategoryParentInfo
     buildCategoryChildrenInfo: tubiMetadataTranslate_buildCategoryChildrenInfo
     buildEmptyMyStuffCategoryAA: tubiMetadataTranslate_buildEmptyMyStuffCategoryAA
@@ -233,24 +233,14 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     end if
   end if
 
-  ' To display the Movies count and TVShows count on InfoPanel when SeeAll tile is focused
-  if contentFromServer.movieCount <> invalid OR contentFromServer.tvShowCount <> invalid
-    movieAndTVShowCount = ""
+  ' To display the totalCount on InfoPanel when SeeAll tile is focused
+  if contentFromServer.movieAndTVShowCount <> invalid
 
-    if contentFromServer.movieCount <> invalid AND contentFromServer.movieCount > 0
-      movieAndTVShowCount = contentFromServer.movieCount.tostr() + " " + getTranslation("menu_movies") + " "
-    end if
-
-    if contentFromServer.tvShowCount <> invalid AND contentFromServer.tvShowCount > 0
-      if movieAndTVShowCount <> ""
-        movieAndTVShowCount += Chr(&hb7) + " "
-      end if
-      movieAndTVShowCount += contentFromServer.tvShowCount.tostr() + " " + getTranslation("menu_tv")
-    end if
     if type(translatedContent) = "roSGNode"
       translatedContent.addField("movieAndTVShowCount", "string", false)
     end if
-    translatedContent.movieAndTVShowCount = movieAndTVShowCount
+
+    translatedContent.movieAndTVShowCount = contentFromServer.movieAndTVShowCount
   end if
 
   'translate all the stuff from the server
@@ -778,7 +768,7 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
         ' then ensure row is empty except for 1 item that will entice users to sign in
         categoryAA = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
       else
-        categoryAA = m.buildCategoryAAWithPrepend(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode)
+        categoryAA = m.buildCategoryAAWithInsert(container, contents, "", "", false, contentMode, screenId, isSignedInUser, uiMode)
       end if
 
       if categoryAA <> invalid
@@ -954,7 +944,7 @@ Function tubiMetadataTranslate_translateContainer(contentToTranslate, fullJson, 
     ' then ensure row is empty except for 1 item that will entice users to sign in
     categoryMetadata = m.buildContinueWatchingSignedOutUserCategoryAA(container, isKidsMode)
   else
-    categoryMetadata = m.buildCategoryAAWithPrepend(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode)
+    categoryMetadata = m.buildCategoryAAWithInsert(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode)
   end if
 
   if categoryMetadata = invalid  'happens if a container has no valid content in it (ie. all content is out of window)
@@ -1071,7 +1061,7 @@ End Function
 
 
 ''''''''''''''''''''''
-' buildCategoryAAWithPrepend
+' buildCategoryAAWithInsert
 '
 ' It is wrapper function of buildCategoryAA.
 ' It prepends the content to the given container based on container ID OR container type if necessary
@@ -1087,20 +1077,25 @@ End Function
 ' @uiMode: string, one of the allowed values from constants.ui.modes
 '
 ' returns an associative array that can be passed to ContentNode.update() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false, uiMode = "standard")
+Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode="homeScreen", screenId="", isSignedInUser = false, uiMode = "standard")
   categoryAA = invalid
 
-  m.seeAllContainerFirst = false
-  m.seeAllContainerSeventeen = false
-  if m.experiments <> invalid
-    m.seeAllContainerFirst = m.experiments.getExperimentResource("roku_see_all_container", "roku_see_all_container_first_v1").enabled
-    m.seeAllContainerSeventeen = m.experiments.getExperimentResource("roku_see_all_container", "roku_see_all_container_seventeen_v1").enabled
-  end if
-
   if container <> invalid AND container.children <> invalid
-    prependContent = invalid
+    insertContent = invalid
 
     childrenCount = container.children.count()
+
+    seeAllFeatureWithPositionAA = isSeeAllFeatureShownWithPosition(childrenCount, m.experiments)
+    insertPosition = seeAllFeatureWithPositionAA.insertPosition
+
+    if seeAllFeatureWithPositionAA.isSeeAllFeatureShown = true AND insertPosition = 56
+      children = container.children
+      while(children.count() > 56)
+        children.pop()
+      end while
+      
+      container.children = children
+    end if
 
     if childrenCount > 0 then
 
@@ -1108,7 +1103,7 @@ Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, c
         isTournamentTime = tournamentTimeFrame()   'bs:disable-line 1001 LINT1001
         if (isTournamentTime = "duringTournament" OR isTournamentTime = "preTournament")
           ' create and add a showAll content to the contents which hold the container metadata
-          prependContent = {
+          insertContent = {
             id: m.constants.ui.contentIds.showAllGames
             title: "FIFA World Cup 2022" + chr(8482)
             showAllText: getTranslation("screenHome_item_showAllGames")
@@ -1117,57 +1112,41 @@ Function tubiMetadataTranslate_buildCategoryAAWithPrepend(container, contents, c
             description: container.description
             backgrounds: [m.constants.urls.fifaShowAllBackground]
           }
+          insertPosition = 0
         end if
       else if container.type = m.contentTypes.channel
         ' create and add a new content to the contents which hold the container metadata
-        prependContent = {}
-        prependContent.append(container)
-        prependContent.delete("children")  ' need to make sure there isn't a recursion later when getContentFromCategoryJson is called
-        prependContent.posterarts = [m.generateChannelPosterUrl(container.id)]
-      else if (uiMode = m.constants.ui.modes.standard OR uiMode = m.constants.ui.modes.latino) AND (m.seeAllContainerFirst = true OR m.seeAllContainerSeventeen = true) AND container.type <> m.constants.ui.categoryTypes.linear AND childrenCount >= 24
+        insertContent = {}
+        insertContent.append(container)
+        insertContent.delete("children")  ' need to make sure there isn't a recursion later when getContentFromCategoryJson is called
+        insertContent.posterarts = [m.generateChannelPosterUrl(container.id)]
+        insertPosition = 0
+      else if (uiMode = m.constants.ui.modes.standard OR uiMode = m.constants.ui.modes.latino) AND (seeAllFeatureWithPositionAA.isSeeAllFeatureShown = true and insertPosition > 0)AND container.type <> m.constants.ui.categoryTypes.linear
+        movieAndTVShowCount = 0
 
-        movieCount = 0
-        tvShowCount = 0
-
-        for each child in container.children
-          if contents[child] <> invalid
-            if contents[child].type = "v"
-              movieCount++
-            else if contents[child].type = "s"
-              tvShowCount++
-            end if
-          end if
-        end for
+        if container.children.count() > 0
+          movieAndTVShowCount = childrenCount.tostr()
+        end if
 
         ' create and add a showAll content to the contents which hold the container metadata
-        prependContent = {
+        insertContent = {
           id: m.constants.ui.contentIds.seeAll
           title: getTranslation("screenHome_item_seeAll", {"containerTitle": container.title})
           showAllText: getTranslation("screenHome_item_seeAll", {"containerTitle": ""})
           type: "seeAll"
           thumbnails: [m.constants.urls.seeAllPoster]
-          description: container.description
           backgrounds: [m.constants.urls.seeAllBackground]
-          movieCount: movieCount
-          tvShowCount: tvShowCount
+          movieAndTVShowCount: getTranslation("screenHome_item_seeAll_description", {"totalCount": movieAndTVShowCount})
         }
       end if
     end if
 
-    if prependContent <> invalid AND prependContent.id <> invalid
-      'add the content to the beginning of the category
-      if prependContent.id = m.constants.ui.contentIds.seeAll
-        if m.seeAllContainerFirst = true
-          container.children.Unshift(prependContent.id)
-        else if m.seeAllContainerSeventeen = true
-          children = insertItemIntoArray(container.children, prependContent.id, 16)
-          container.children = children
-        end if
-      else
-        container.children.Unshift(prependContent.id)
-      end if
+    if insertContent <> invalid AND insertContent.id <> invalid
+      children = insertItemIntoArray(container.children, insertContent.id, insertPosition)
+      container.children = children
+
       contentsWithPrepend = {}
-      contentsWithPrepend[prependContent.id] = prependContent
+      contentsWithPrepend[insertContent.id] = insertContent
       contentsWithPrepend.append(contents)
       ' force contentsJson to be regenerated with the prepended content in buildCategoryAA()
       contentsJson = invalid
@@ -2422,4 +2401,36 @@ Function tubiMetadataTranslate_setDescriptorCodeAndDescription(content, descript
 
   end if
 
+End Function
+
+
+Function isSeeAllFeatureShownWithPosition(childrenCount, experiments)
+
+  seeAllFeatureWithPositionAA = {}
+  isSeeAllFeatureShown = false
+  insertPosition = 0
+
+  if experiments <> invalid
+    seeAllThirtyThree = experiments.getExperimentResource("roku_see_all_container", "roku_show_all_container_thirty_three_v1").enabled
+    seeAllFortyNine = experiments.getExperimentResource("roku_see_all_container", "roku_show_all_container_forty_nine_v1").enabled
+    seeAllFiftySeven = experiments.getExperimentResource("roku_see_all_container", "roku_show_all_container_fifty_seven_v1").enabled
+
+    if seeAllThirtyThree = true AND childrenCount >= 57
+      isSeeAllFeatureShown = true
+      insertPosition = 32
+    else if seeAllFortyNine = true AND childrenCount >= 64
+      'We are showing see all at 49th position only when we have 16 or greater rows when see all is selected.
+      isSeeAllFeatureShown = true
+      insertPosition = 48
+    else if seeAllFiftySeven = true AND childrenCount >= 72
+      isSeeAllFeatureShown = true
+      insertPosition = 56
+    end if
+
+  end if
+
+  seeAllFeatureWithPositionAA.isSeeAllFeatureShown = isSeeAllFeatureShown
+  seeAllFeatureWithPositionAA.insertPosition = insertPosition
+
+  return seeAllFeatureWithPositionAA
 End Function

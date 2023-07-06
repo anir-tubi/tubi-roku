@@ -217,7 +217,7 @@ End Function
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
 '                 see request.brs for more info
 ' @imageParamTypes: Array, What image types/sizes should be requested from the backend. If none are passed, then a default set of types will be used.
-Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptions = {}, imageParamTypes = invalid)
+Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptions = {}, imageParamTypes = invalid, contentLimit = 0)
   options = m.getCommonOptions()
   params = options.params
 
@@ -227,7 +227,12 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   params["include_channels"] = true
   params["cursor"] = 0
   params["include_sponsorships"] = true
-  params["contents_limit"] = m.constants.performance.categoryGridList.finalBlockSize
+  if contentLimit > 0
+    params["contents_limit"] = contentLimit
+  else
+    params["contents_limit"] = m.constants.performance.categoryGridList.finalBlockSize
+  end if
+
   params["content_mode"] = ""
 
   utmCampaignConfig = m.utmCampaignConfig
@@ -392,7 +397,12 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
             }
 
             options.params.append(contentModeParam)
-            categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options)
+            contentLimit = 0
+            if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_see_all_container", "roku_show_all_container_fifty_seven_v1").enabled = true
+              contentLimit = 72
+            end if
+
+            categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, invalid, contentLimit)
             categoryReqInfo.requestType = reqName
             categoryReqInfo.responseType = "node"
             categoryReqInfo.isSignedInUser = isSignedInUser
@@ -448,6 +458,7 @@ Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSi
             "poster"
             "landscape"
           ]
+
           categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, imageParamTypes)
           categoryReqInfo.requestType = reqName
           categoryReqInfo.responseType = "node"
@@ -551,7 +562,13 @@ Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, cont
         }
 
         options.params.append(contentModeParam)
-        categoryReqInfo = m.createCategoryReqInfo(containerId, bKidsMode, options)
+
+        contentLimit = 0
+        if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_see_all_container", "roku_show_all_container_fifty_seven_v1").enabled = true
+          contentLimit = 72
+        end if
+        
+        categoryReqInfo = m.createCategoryReqInfo(containerId, bKidsMode, options, invalid, contentLimit)
         categoryReqInfo.requestType = reqName
         categoryReqInfo.responseType = "node"
         categoryReqInfo.isSignedInUser = isSignedInUser

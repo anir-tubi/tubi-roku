@@ -831,7 +831,7 @@ End Function
 
 
 Function startCountdownTimer()
-  tubiLog("HomeScreenHelpers.stopCountdownTimer")
+  tubiLog("HomeScreenHelpers.startCountdownTimer")
   screen = getCurrentScreen()
 
   if screen <> invalid AND (screen.id = m.constants.ui.screenIds.homeScreen OR isAnEpgScreen(screen) = true OR isTournamentScreen(screen) = true)

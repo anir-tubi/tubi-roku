@@ -234,11 +234,6 @@
         id="CategoryGridList"/>
     </MaskGroup>
 
-    <NotificationGroup
-      id="seeAllNotificationGroup"
-      visible="false" />
-
-
     <!-- For viewers that watch a REALLY long time, or just never close the app, force a refresh -->
     <Timer
       id="CategoryRefreshTimer"

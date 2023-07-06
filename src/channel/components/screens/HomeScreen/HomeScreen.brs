@@ -15,33 +15,28 @@ Function init()
   fades = m.top.findNode("Fades")
   m.HintGroupFade = fades.findNode("HintGroupFade")
 
-  if getExperimentResource("roku_see_all_container", "roku_show_all_floating_education_v1", false).enabled = true
-    m.seeAllNotificationGroup = m.top.findNode("seeAllNotificationGroup")
-  end if
-
   m.experimentName = ""
-  experimentResult = getExperimentResult("roku_see_all_container", "roku_see_all_container_first_v1")
+  experimentResult = getExperimentResult("roku_see_all_container", "roku_show_all_container_thirty_three_v1")
   if experimentResult <> invalid
     m.experimentName = experimentResult.experiment_name
   end if
 
-  experimentResult = getExperimentResult("roku_see_all_container", "roku_see_all_container_seventeen_v1")
+  experimentResult = getExperimentResult("roku_see_all_container", "roku_show_all_container_forty_nine_v1")
   if experimentResult <> invalid
     m.experimentName = experimentResult.experiment_name
   end if
 
-  experimentResult = getExperimentResult("roku_see_all_container", "roku_show_all_floating_education_v1")
+
+  experimentResult = getExperimentResult("roku_see_all_container", "roku_show_all_container_fifty_seven_v1")
   if experimentResult <> invalid
     m.experimentName = experimentResult.experiment_name
   end if
 
   if m.global <> invalid
-    m.global.observeFieldScoped("theme", "onThemeChange")
     '//REMOVE uiMode observer once the roku_see_all_container experiment is graduated
     m.global.observeFieldScoped("uiMode", "onUIMode")
   end if
 
-  onThemeChange()
   '//REMOVE onUIMode() once the roku_see_all_container experiment is graduated
   onUIMode()
 
@@ -126,20 +121,6 @@ Function init()
 
   if authInfo <> invalid AND authInfo.parentalrating <> invalid
     m.top.parentalRating = authInfo.parentalrating
-  end if
-End Function
-
-
-Function onThemeChange(msg = invalid)
-  if msg <> invalid
-    theme = msg.getData()
-  else
-    theme = getThemeFromGlobal()
-  end if
-
-  if theme <> invalid AND m.seeAllNotificationGroup <> invalid
-    m.seeAllNotificationGroup.blendColor = theme.neutralSolidColor2
-    m.seeAllNotificationGroup.textColor = theme.backgroundColorLight
   end if
 End Function
 
@@ -389,29 +370,12 @@ Function isCurrentRowHasSeeAll(currentFocusRow)
     'TODO:Create a gridItemType for channels and check against m.constants.ui.gridItemTypes.channel.
     'categoryTypes are values passed by the backend, we should be checking against values that we set within the app.
     'checking gridItemType to handle linear rows and row type to handle channel rows.
-    if (m.uiMode = m.constants.ui.modes.standard OR m.uiMode = m.constants.ui.modes.latino) AND rowCount >= 24 AND row.gridItemType <> m.constants.ui.gridItemTypes.linear AND row.type <> m.constants.ui.categoryTypes.channel
+    if (m.uiMode = m.constants.ui.modes.standard OR m.uiMode = m.constants.ui.modes.latino) AND rowCount >= 57 AND row.gridItemType <> m.constants.ui.gridItemTypes.linear AND row.type <> m.constants.ui.categoryTypes.channel
       result = true
     end if
   end if
 
   return result
-End Function
-
-
-' @currentFocusRow: roSGNode, a CategoryContentNode
-Function updateFloatingSeeAll(currentFocusRow)
-  row = currentFocusRow
-
-  if row <> invalid
-    if m.seeAllNotificationGroup <> invalid AND m.constants.deviceInfo.showFirmwareCcWhenVideoNotFullScreen = false
-      if isCurrentRowHasSeeAll(row) = true
-        m.seeAllNotificationGroup.text = getTranslation("screenHome_showAllNotification", {"containerTitle": row.title})
-        m.seeAllNotificationGroup.visible = true
-      else
-        m.seeAllNotificationGroup.visible = false
-      end if
-    end if
-  end if
 End Function
 
 
@@ -534,7 +498,6 @@ Function onCurrFocusRowChange()
   if categoryEnteringFocus <> invalid
     if isNonEmptyString(m.experimentName) = true AND getExperimentResource("roku_see_all_container", m.experimentName, false).enabled = true
       updateRowFocusedForSeeAll(categoryEnteringFocus)
-      updateFloatingSeeAll(categoryEnteringFocus)
     end if
 
     sSponsorBackgroundURL = ""
@@ -671,26 +634,22 @@ Function fireExposureEventForSeeAll(categoryGridList = invalid)
 
     if rowIndex <> invalid AND colIndex <> invalid
 
-      if doesContentHaveChild(content, rowIndex, colIndex) = true AND content.getChild(rowIndex).getChildCount() >= 24 AND isContentMovieOrSeriesOrSeeAll(content.getChild(rowIndex).getChild(colIndex)) = true
-        if m.experimentName = "roku_see_all_container_first_v1" OR m.experimentName = "qa.roku_see_all_container_first_v1"
-          getExperimentResource("roku_see_all_container", m.experimentName, true)
-          m.wasExposureEventForSeeAllFired = true
-        else if m.experimentName = "roku_show_all_floating_education_v1" OR m.experimentName = "qa.roku_show_all_floating_education_v1"
-          getExperimentResource("roku_see_all_container", m.experimentName, true)
-          m.wasExposureEventForSeeAllFired = true
-        else if m.experimentName = "roku_see_all_container_seventeen_v1" OR m.experimentName = "qa.roku_see_all_container_seventeen_v1"
-          if colIndex >= 15 ' at this point the SeeAll tile will be visible to user, so firing exposure event
+      if doesContentHaveChild(content, rowIndex, colIndex) = true AND content.getChild(rowIndex).getChildCount() >= 57 AND isContentMovieOrSeriesOrSeeAll(content.getChild(rowIndex).getChild(colIndex)) = true
+        if m.experimentName = "roku_show_all_container_thirty_three_v1" OR m.experimentName = "qa.roku_show_all_container_thirty_three_v1"
+          if colIndex >= 31 ' at this point the SeeAll tile will be visible to user, so firing exposure event
             getExperimentResource("roku_see_all_container", m.experimentName, true)
             m.wasExposureEventForSeeAllFired = true
           end if
-        end if
-
-      end if
-
-      if m.wasExposureEventForSeeAllFired = false AND doesContentHaveChild(content, rowIndex + 1, 0) = true AND content.getChild(rowIndex + 1).getChildCount() >= 24 AND isContentMovieOrSeriesOrSeeAll(content.getChild(rowIndex + 1).getChild(0)) = true
-        if m.experimentName = "roku_see_all_container_first_v1" OR m.experimentName = "qa.roku_see_all_container_first_v1"
-          getExperimentResource("roku_see_all_container", m.experimentName, true)
-          m.wasExposureEventForSeeAllFired = true
+        else if m.experimentName = "roku_show_all_container_forty_nine_v1" OR m.experimentName = "qa.roku_show_all_container_forty_nine_v1"
+            if colIndex >= 47 ' at this point the SeeAll tile will be visible to user, so firing exposure event
+              getExperimentResource("roku_see_all_container", m.experimentName, true)
+              m.wasExposureEventForSeeAllFired = true
+            end if
+        else if m.experimentName = "roku_show_all_container_fifty_seven_v1" OR m.experimentName = "qa.roku_show_all_container_fifty_seven_v1"
+            if colIndex >= 55 ' at this point the SeeAll tile will be visible to user, so firing exposure event
+              getExperimentResource("roku_see_all_container", m.experimentName, true)
+              m.wasExposureEventForSeeAllFired = true
+            end if
         end if
       end if
 
@@ -747,7 +706,6 @@ Function onGridFocusChange() as void
 
   if isNonEmptyString(m.experimentName) = true AND getExperimentResource("roku_see_all_container", m.experimentName, false).enabled = true
     updateRowFocusedForSeeAll(m.CategoryGridList.rowFocused)
-    updateFloatingSeeAll(m.CategoryGridList.rowFocused)
   end if
 
   '//if the screen is loading or if the grid is not in focus or the topnav is not in focus, then exit out of this function
@@ -870,7 +828,6 @@ Function onItemToBeFocusedChange()
 
   if isNonEmptyString(m.experimentName) = true AND getExperimentResource("roku_see_all_container", m.experimentName, false).enabled = true
     updateRowFocusedForSeeAll(m.CategoryGridList.rowFocused)
-    updateFloatingSeeAll(m.CategoryGridList.rowFocused)
   end if
 
   populateInfoPanelByContent(m.CategoryGridList.reloadedItemToBeFocused)
@@ -958,11 +915,6 @@ Function setFocusOntoTopNav(isToggle)
   ' setting rowFocusedForSeeAll as invalid, we have to disable "options" when focus is on topNav
   m.top.rowFocusedForSeeAll = invalid
 
-  if m.seeAllNotificationGroup <> invalid
-    'hide floating education modal when we press back to topNav
-    m.seeAllNotificationGroup.visible = false
-  end if
-
   if isToggle = true
     ' only send top nav toggle event if the top nav is gaining focus from the category grid list.
     ' Do not set top nav toggle event if the top nav is gaining focus from another page.
@@ -1027,11 +979,6 @@ Function setFocusOnCategoryGrid()
 
   fadeInContentArea()
   m.CategoryGridList.setFocus(true)
-  if m.seeAllNotificationGroup <> invalid
-    'Showing floating education modal when we back to category from topNav or sideNav
-    updateRowFocusedForSeeAll(m.CategoryGridList.rowFocused)
-    updateFloatingSeeAll(m.CategoryGridList.rowFocused)
-  end if
 End Function
 
 
@@ -1110,11 +1057,6 @@ Function onKeyEvent(key, press) as boolean
         ' setting rowFocusedForSeeAll as invalid, we have to disable "options" when focus is on topNav
         m.top.rowFocusedForSeeAll = invalid
 
-        if m.seeAllNotificationGroup <> invalid
-          'hide floating education modal when we back focus to side nav
-          m.seeAllNotificationGroup.visible = false
-        end if
-
         if isVideoPreviewEnabled() = true
           m.top.pauseVideoPreview = true
         end if
@@ -1145,14 +1087,6 @@ Function onKeyEvent(key, press) as boolean
 
     if key = "play" AND m.CategoryGridList.isInFocusChain() = true
       handlePlayInput()
-      return true
-    end if
-
-    if key = "options" AND m.seeAllNotificationGroup <> invalid AND m.top.rowFocusedForSeeAll <> invalid
-      itemFocused = m.CategoryGridList.itemFocused
-      positionFocused = m.top.cursorPosition
-      m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(itemFocused, positionFocused)
-      m.top.isSeeAllSelected = true
       return true
     end if
 

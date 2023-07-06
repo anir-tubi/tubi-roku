@@ -18,4 +18,19 @@ Function arrayUtils_insertItemIntoArray_test()
   newArray = insertItemIntoArray(array, "3", 2)
   m.assertEqual(expectedResult, newArray)
 
+  expectedResult = ["0","1","2","3","4","5"]
+  array = ["1","2","3","4","5"]
+  newArray = insertItemIntoArray(array, "0", 0)
+  m.assertEqual(expectedResult, newArray)
+
+  expectedResult = ["1","2","3","4","5", "6"]
+  array = ["1","2","3","4","5"]
+  newArray = insertItemIntoArray(array, "6", 5)
+  m.assertEqual(expectedResult, newArray)
+
+  expectedResult = ["1","2","3","4","5", "6"]
+  array = ["1","2","3","4","5"]
+  newArray = insertItemIntoArray(array, "6", 13)
+  m.assertEqual(expectedResult, newArray)
+
 End Function
