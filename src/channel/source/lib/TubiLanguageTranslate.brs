@@ -1852,6 +1852,10 @@ Function getTranslation_es_MX()
       "description": "The text to display on See All movies / shows",
       "message": "Ver Todo {containerTitle}"
     },
+    "screenHome_item_seeAll_description": {
+      "description": "The text to display total count on See All movies / shows",
+      "message": "{totalCount}+ títulos, actualizados semanalmente."
+    },
     "loadingIndicator": {
       "description": "When something is loading, this text appears so the user knows something is loading.",
       "message": "Cargando..."
