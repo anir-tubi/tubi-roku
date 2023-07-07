@@ -328,7 +328,7 @@ Function getTranslation_en_US()
     },
     "screenHome_item_seeAll_description": {
       "description": "The text to display total count on See All movies / shows",
-      "message": "{totalCount}+ tiles, updated weekly."
+      "message": "{totalCount}+ titles, updated weekly."
     },
     "loadingIndicator": {
       "description": "When something is loading, this text appears so the user knows something is loading.",
