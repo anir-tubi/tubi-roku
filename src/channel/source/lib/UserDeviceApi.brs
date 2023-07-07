@@ -14,6 +14,7 @@ Function UserDeviceApi(constants, apiUtils)
     patchSettingsInfo: userDeviceApi_patchSettingsInfo
     setContentRating: userDeviceApi_setContentRating
     magicLink: userDeviceApi_magicLink
+    resetPassword: userDeviceApi_resetPassword
     deleteHistory: userDeviceApi_deleteHistory
     queryStatusOfMagicLink: userDeviceApi_queryStatusOfMagicLink
     updateParentalRatingReqInfo: userDeviceApi_updateParentalRatingReqInfo
@@ -178,6 +179,19 @@ End Function
 ' @email : string,  (either taken from roku account or user entered email)
 Function userDeviceApi_magicLink(email)
   url = m.constants.urls.account.magicLink
+  options = m.getCommonOptions()
+  options.params["email"] = email
+  options["method"] = m.constants.reqTypes.post
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
+' @email : string,  (either taken from roku account or user entered email)
+Function userDeviceApi_resetPassword(email)
+  url = m.constants.urls.userDevice.resetPassword
   options = m.getCommonOptions()
   options.params["email"] = email
   options["method"] = m.constants.reqTypes.post

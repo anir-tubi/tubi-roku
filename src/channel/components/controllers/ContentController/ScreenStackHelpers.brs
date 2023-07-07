@@ -34,6 +34,21 @@ Function focusCurrentScreen()
 End Function
 
 
+' Remove a screen with a particular ID IF there is more than 1 screen in the stack.
+' @param id: string, the id of the screens which should be removed from the stack. If there are multiple screens in the stack with the ID, then the top most screen will be removed
+Function removeTopMostScreenWithIDFromStack(id)
+  if m.screenStack.getChildCount() > 1
+    '//check if the top most screen has the passed ID, and then use the pop function
+    current = m.screenStack.current
+    if current <> invalid AND current.id = id
+      popScreen(false, false)
+    else
+      m.screenStack.idToRemoveScreenFromStack = id
+    end if
+  end if
+End Function
+
+
 ' Wrapper around the m.screenStack push interface to handle analytics events
 ' Remove the top-most screen of the stack, making the previous screen visible
 '

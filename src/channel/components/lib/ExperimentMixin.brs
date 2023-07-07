@@ -54,7 +54,7 @@ End Function
 Function getExperimentResult(namespaceName as string, experimentName as string) as Object
 
   if m.constants = invalid
-    m.constants = m.global.constants
+    m.constants = getConstantsFromGlobal()
   end if
 
   experiments = TubiExperiments(m.constants)

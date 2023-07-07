@@ -1,5 +1,5 @@
 Function init()
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
   theme = getThemeFromGlobal()
   m.passwordMode = true
   m.focusDelayTimer = m.top.findNode("focusDelayTimer")

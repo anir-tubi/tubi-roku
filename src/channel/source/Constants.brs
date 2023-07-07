@@ -295,6 +295,7 @@ Function getConstants()
     constants.reqNames.transferToken = "transferToken"
     constants.reqNames.generic = "generic"
     constants.reqNames.magicLink = "magicLink"
+    constants.reqNames.resetPassword = "resetPassword"
     constants.reqNames.queryStatusOfMagicLink = "queryStatusOfMagicLink"
     constants.reqNames.setContentRating = "setContentRating"
     constants.reqNames.updateParentalRating = "updateParentalRating"
@@ -540,6 +541,7 @@ Function getConstants()
       constants.urls.userDevice.refreshToken = constants.urls.userDevice.urlBase + "/login/refresh"
       constants.urls.userDevice.transferToken = constants.urls.userDevice.urlBase + "/login/transfer"
       constants.urls.userDevice.config = constants.urls.userDevice.urlBase + "/config/" + constants.platform
+      constants.urls.userDevice.resetPassword = constants.urls.userDevice.urlBase + "/password/reset"
 
     'use queue urls
     constants.urls.userQueues = {}
@@ -942,6 +944,8 @@ Function getConstants()
   constants.errors.context.epgScreen = "12"
   constants.errors.context.emailVerificationScreen = "13"
   constants.errors.context.tournament = "14"
+  '//::TODO::roku_signin_password_reset_v1 - if the experiment does not graduate, then remove this reference here and here -> https://tubitv.atlassian.net/wiki/spaces/EC/pages/798359880/User+Facing+Error+Codes
+  constants.errors.context.forgotPasswordProcessingScreen = "15" '//are we getting rid of emailVerificationScreen? If so, then maybe we keep 13 for the forgetPassword Screen
 
   '//What is the actual error?
   constants.errors.subtypes = {}
@@ -1163,6 +1167,7 @@ Function getConstants()
       constants.ui.screenLevels.signInScreen = 90
       constants.ui.screenLevels.ageGateScreen = 90
       constants.ui.screenLevels.emailVerificationScreen = 90
+      constants.ui.screenLevels.forgotPasswordProcessingScreen = 90
       constants.ui.screenLevels.welcomeScreen = 99
       constants.ui.screenLevels.freeForeverScreen = 110
       constants.ui.screenLevels.availableDeviceScreen = 111
@@ -1190,6 +1195,7 @@ Function getConstants()
       constants.ui.screenIds.linearVideoPlayerScreen = "linearVideoPlayerScreen"
       constants.ui.screenIds.epgScreen = "epgScreen"
       constants.ui.screenIds.emailVerificationScreen = "emailVerificationScreen"
+      constants.ui.screenIds.forgotPasswordProcessingScreen = "forgotPasswordProcessingScreen"
       constants.ui.screenIds.welcomeScreen = "welcomeScreen"
       constants.ui.screenIds.freeForeverScreen = "freeForeverScreen"
       constants.ui.screenIds.availableDeviceScreen = "availableDeviceScreen"

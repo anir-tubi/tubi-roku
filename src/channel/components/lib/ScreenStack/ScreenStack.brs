@@ -3,6 +3,7 @@ Function init()
   m.top.observeField("pop", "onPop")
   m.top.observeField("push", "onPush")
   m.top.observeField("shrinkStack", "onShrinkStack")
+  m.top.observeField("idToRemoveScreenFromStack", "onIdToRemoveScreenFromStack")
   m.top.observeField("clearStack", "onClearStack")
   m.top.observeField("focusCurrent", "onSetCurrentFocusCommand")
 End Function
@@ -103,6 +104,31 @@ Function onShrinkStack(msg)
   removeAmt = stackCount - keepAmt
   if keepAmt < stackCount
     stack.removeChildrenIndex(removeAmt, 0)
+  end if
+End Function
+
+
+Function onIdToRemoveScreenFromStack(msg)
+  stack = msg.getRoSGNode()
+  stackCount = stack.getChildCount()
+
+  if stackCount > 1
+    '//omly proceed to remove a screen if there are more than 1 screen in the stack.
+    sRemoveID = msg.getData()
+
+    nStartDepth = stackCount - 1
+
+    '//go through the stack and find the top most screen with the given ID
+    i = nStartDepth
+    while i > 0
+      screen = stack.getChild(i)
+      if screen.id = sRemoveID
+        stack.removeChildIndex(i)
+        exit while
+      end if
+      i = i - 1
+    end while
+
   end if
 End Function
 

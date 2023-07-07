@@ -33,6 +33,9 @@
       <!-- keep the top x screens in the stack, removing all other screens from underneath them -->
       <field id="shrinkStack" type="integer" alwaysNotify="true" />
 
+      <!-- remove the top most screen that has the the ID set to this field; Only do this if there are more than 1 screens in the stack. -->
+      <field id="idToRemoveScreenFromStack" type="string" alwaysNotify="true" />
+
       <!-- remove all screens from the stack -->
       <field id="clearStack" type="boolean" alwaysNotify="true" />
 

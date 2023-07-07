@@ -40,7 +40,7 @@
       itemSpacings="[20, 17, 17, 30]">
       <Poster
         id="emailNotificationPoster"
-        uri="pkg:/images/email_notification.png"
+        uri="pkg:/images/email_notification.webp"
         translation="[580,0]"
         width="100"
         height="100"/>

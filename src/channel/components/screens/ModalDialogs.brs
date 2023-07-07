@@ -209,7 +209,6 @@ Function closeModal(modal, buttonSelected = invalid)
   'send the dismiss dialog analytic event
   if trackEvent <> invalid AND trackEvent.values <> invalid AND trackingTask <> invalid
     trackEvent.values.dialog_action = "DISMISS_AUTO"
-
     if buttonSelected = invalid
       trackEvent.values.dialog_action = "ACCEPT_AUTO"
     else if type(buttonSelected) = "String" or type(buttonSelected) = "roString"
@@ -238,7 +237,7 @@ Function closeModal(modal, buttonSelected = invalid)
   callback = invalid
   callbackParams = invalid
 
-  if type(buttonSelected) = "String" or type(buttonSelected) = "roString"
+  if type(buttonSelected) = "String" OR type(buttonSelected) = "roString"
     if buttonSelected = "back"
 
       if backButtonCallback <> invalid
@@ -486,9 +485,9 @@ Function showSimpleModal(title, message, buttons, dialogEvent, trackingTask, cal
 End Function
 
 
-'Wrapper function to simplemodal with customization of instantResumeAction = "closeDialog"
+'Wrapper function to showSimpleModal() with customization of instantResumeAction = "closeDialog"
 
-'use this modal when we are trying to pass "closeDialog" as parameter and this is used when modals are not instant resumable.
+'Use this modal when we are trying to pass "closeDialog" as the instantResumeAction parameter. This method is used when modals are not instant resumable.
 
 '@title: string, the title of the dialog, displayed in larger font
 ' @message: string, the main message of the dialog to be displayed to the user

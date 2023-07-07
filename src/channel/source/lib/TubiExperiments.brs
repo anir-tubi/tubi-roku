@@ -25,6 +25,12 @@ Function TubiExperiments(constants) as Object
       roku_my_stuff: {
         roku_my_stuff_v3: {"enabled": true}
       }
+      '// When enabled=false, the user will see the previous signin screen - the one that does not have a "forget password" button
+      '// When enabled=true & instant=true, then the user will be able to instantly sign in w/o a password by clicking the "forget password" button
+      '// When enabled=true & instant=false, then the user will be able to change their forgotten password by clicking the "forget password" button
+      roku_signin_password_reset: {
+        roku_signin_password_reset_v1: {"enabled": false, "instant": true}
+      }
 
       '// When enabled=true, then the resume and play buttons will display differently
       roku_title_series_button: {

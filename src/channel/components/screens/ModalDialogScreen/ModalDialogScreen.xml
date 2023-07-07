@@ -47,6 +47,7 @@
         <Label
           id="Title"
           width="763"
+          wrap="true"
           translation="[44,0]">
           <Font
             role="font"

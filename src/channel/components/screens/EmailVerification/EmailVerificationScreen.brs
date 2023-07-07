@@ -94,7 +94,7 @@ Function onResendVerificationLinkSelected()
   tubiLog("EmailVerificationScreen.onResendVerificationLinkSelected")
   m.resendVerificationEmailCount = m.resendVerificationEmailCount + 1
   if m.resendVerificationEmailCount = 3
-    m.resendVerificationEmailCount  = 0
+    m.resendVerificationEmailCount = 0
     dialogEvent = {
       type: "dialog"
       values: {

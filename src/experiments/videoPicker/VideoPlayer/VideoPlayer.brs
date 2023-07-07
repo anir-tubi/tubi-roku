@@ -34,7 +34,7 @@ Function init()
   tubiLog("VideoPlayer.init")
   m._ = rodash()
   m.NodeHelpers = TubiNodeHelpers()
-  m.constants = m.global.constants
+  m.constants = getConstantsFromGlobal()
   Request = TubiRequest()
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)

@@ -17,8 +17,11 @@
       <!-- roku account's email address  -->
       <field id="username" type="string" alias="email.text"/>
 
-      <!-- resetFocus will be triggered when user selects back/re-enter password from Invalid Password modal  -->
-      <field id="resetFocus" type="boolean" alwaysNotify="true"/>
+      <!-- set focus on keyboard; setFocusToPassword will be triggered when user selects back/re-enter password from Invalid Password modal -->
+      <field id="setFocusToKeyboard" type="boolean" alwaysNotify="true"/>
+
+      <!-- et focus back on password textfield  -->
+      <field id="setFocusToPassword" type="boolean" alwaysNotify="true"/>
 
       <!-- A record of the user's signin info: i.e. email, firstname, gender, etc. -->
       <field id="signInInfo" type="assocarray"/>
@@ -34,17 +37,20 @@
       <!-- emailSelected is triggered when user selects email text box, which redirects to EmailEntry screen to enter different email -->
       <field id="emailSelected" type="boolean" alias="email.selected"/>
 
+      <!-- forgotPasswordSelected is triggered when user selects the ForgotPassword button. -->
+      <field id="forgotPasswordSelected" type="boolean" alwaysNotify="true"/>
+
   </interface>
 
   <children>
 
     <LayoutGroup
       id="signUpLayout"
-      translation="[0, 140]"
+      translation="[960, 117]"
       layoutDirection="vert"
       vertAlignment="custom"
-      horizAlignment="custom"
-      itemSpacings="[20, 45, 17, 17, 20]">
+      horizAlignment="center"
+      itemSpacings="[21, 45, 18, 18, 33]">
       <Label
         id="pageHeading"
         horizAlign="center"
@@ -62,25 +68,22 @@
         <Font
           role="font"
           uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="30" />
+          size="30"/>
       </Label>
 
       <TextEntryBox
         id="email"
         boxWidth="600"
-        boxHeight="84"
-        translation="[643,0]"/>
+        boxHeight="84"/>
 
       <TextEntryBox
         id="password"
         boxWidth="600"
         boxHeight="84"
-        translation="[643,0]"
         passwordMode="true"/>
 
       <Label
         id="passwordValidationMsg"
-        translation="[670,0]"
         width="600">
         <Font
           role="font"
@@ -93,20 +96,18 @@
         id="buttonsGroup"
         layoutDirection="vert"
         vertAlignment="custom"
-        horizAlignment="custom"
+        horizAlignment="center"
         itemSpacings="[90, 130]">
 
         <SimpleButton
-          translation="[756,0]"
           id="continueBtn"
           width="408"/>
 
         <LayoutGroup
-          id="existingAccLayout"
+          id="newPasswordLayout"
           layoutDirection="horiz"
           horizAlignment="center"
           vertAlignment="center"
-          translation="[960,0]"
           itemSpacings="[12]">
 
           <Label
@@ -131,7 +132,6 @@
           id="staticPageLinkGroup"
           layoutDirection="horiz"
           horizAlignment="center"
-          translation="[960,0]"
           vertAlignment="custom"
           itemSpacings="[96]">
 

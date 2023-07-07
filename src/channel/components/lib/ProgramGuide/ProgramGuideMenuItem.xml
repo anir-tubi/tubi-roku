@@ -69,7 +69,7 @@
           id="titleFont"
           role="font"
           uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="30" />
+          size="30"/>
       </Label>
     </LayoutGroup>
   </children>

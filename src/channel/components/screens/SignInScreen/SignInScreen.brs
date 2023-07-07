@@ -1,8 +1,9 @@
 Function init()
-  m.trackingLoggingTask = m.global.trackingLoggingTask
-  m.constants = m.global.constants
+  m.trackingLoggingTask = getFieldFromGlobal("trackingLoggingTask")
+  m.constants = getConstantsFromGlobal()
 
-  m.top.observeFieldScoped("resetFocus", "onResetFocus")
+  m.top.observeFieldScoped("setFocusToKeyboard", "onSetFocusToKeyboard")
+  m.top.observeFieldScoped("setFocusToPassword", "onSetFocusToPassword")
   m.top.observeField("focusedChild", "onScreenFocusChange")
 
   m.pageHeading = m.top.findNode("pageHeading")
@@ -14,15 +15,32 @@ Function init()
   m.passwordValidationMsg = m.top.findNode("passwordValidationMsg")
   m.passwordValidationMsg.text = getTranslation("signIn_screen_enter_password")
 
+  m.buttonsGroup = m.top.findNode("buttonsGroup")
+
   m.continueBtn = m.top.findNode("continueBtn")
   m.continueBtn.text = getTranslation("dialog_button_continue")
   m.continueBtn.observeFieldScoped("selected", "onContinueButtonSelected")
 
+  m.newPasswordLayout = m.top.findNode("newPasswordLayout")
   m.newPasswordLabel = m.top.findNode("newPasswordLabel")
   m.newPasswordLabel.text = getTranslation("new_password_text")
 
   m.newPasswordLink = m.top.findNode("newPasswordLink")
   m.newPasswordLink.text = getTranslation("new_password_link")
+
+  bDisplayForgotPasswordButton = (getExperimentResource("roku_signin_password_reset", "roku_signin_password_reset_v1", true).enabled = true)
+  
+  m.forgotPasswordBtn = invalid  
+  if bDisplayForgotPasswordButton = true
+    '//::TODO::roku_signin_password_reset_v1 - if experiment is graduated, then set the button in the XML and remove everything related to newPasswordLayout
+    m.forgotPasswordBtn = CreateObject("roSGNode", "SimpleButton")
+    m.forgotPasswordBtn.id = "forgotPasswordBtn"
+    m.forgotPasswordBtn.text = getTranslation("dialog_button_forgot_password")
+
+    m.buttonsGroup.insertChild(m.forgotPasswordBtn, 1)
+    m.forgotPasswordBtn.observeFieldScoped("selected", "onForgotPasswordButtonSelected")
+    m.buttonsGroup.removeChild(m.newPasswordLayout)
+  end if
 
   m.termsBtn = m.top.findNode("termsBtn")
   m.termsBtn.text = getTranslation("screenSettings_menu_tos")
@@ -40,8 +58,6 @@ Function init()
   m.voiceKeyboard = m.keyboard.findNode("Keyboard")
   m.keyboard.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
   m.keyboard.observeFieldScoped("buttonSelected", "onButtonSelected")
-
-  m.buttonsGroup = m.top.findNode("buttonsGroup")
 
   m.password = m.top.findNode("password")
   m.password.hint = getTranslation("signIn_password_hint")
@@ -92,6 +108,9 @@ Function onThemeChange(msg = invalid)
     m.newPasswordLink.color = theme.primaryTextColor
     m.passwordValidationMsg.color = theme.cautionColor
     m.continueBtn.color = theme.backgroundColorLight2
+    if m.forgotPasswordBtn <> invalid
+      m.forgotPasswordBtn.color = theme.backgroundColorLight2
+    end if
     m.termsBtn.color = theme.backgroundColor
     m.ppBtn.color = theme.backgroundColor
     m.yourPrivacyChoicesBtn.color = theme.backgroundColor
@@ -182,6 +201,12 @@ Function onContinueButtonSelected(evt)
 End Function
 
 
+Function onForgotPasswordButtonSelected(evt)
+  tubiLog("SignInScreen.onForgotPasswordButtonSelected")
+  m.top.forgotPasswordSelected = true
+End Function
+
+
 Function onTermsButtonSelected(evt)
 
   isButtonSelected = evt.getData()
@@ -225,15 +250,30 @@ Function onPasswordButtonSelected(evt)
 End Function
 
 
-Function onResetFocus(evt)
+Function onSetFocusToKeyboard(evt)
 
-  resetFocus = evt.getData()
-  if resetFocus = true
+  bSetFocusToKeyboard = evt.getData()
+  if bSetFocusToKeyboard = true
     clearPassword()
     resetPasswordValidation()
     hideButtons()
     showKeyboard()
     setFocusToComponent(m.keyboard)
+  end if
+
+End Function
+
+
+Function onSetFocusToPassword(evt)
+
+  bSetFocusToPassword = evt.getData()
+  if bSetFocusToPassword = true
+    clearPassword()
+    updatePasswordValidation()
+    hideKeyboard()
+    showButtons()
+    setFocusToComponent(m.password)
+    m.emailHasFocus = false 
   end if
 
 End Function
@@ -306,92 +346,6 @@ Function showButtons()
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean) as Boolean
-
-  if key = "OK"
-    m.password.text = m.keyboard.text
-  end if
-
-  handled = true
-  if press
-    if key = "back"
-
-      if m.keyboard.isInFocusChain() = true
-        updatePasswordValidation()
-        hideKeyboard()
-        showButtons()
-        setFocusToComponent(m.password)
-        m.emailHasFocus = false
-      else
-        m.trackingLoggingTask.trackEvent = {
-          type: "account"
-          values: {
-            manip: "SIGNIN"
-            current: "EMAIL"
-            status: "FAIL"
-            message: "user-cancel"
-          }
-        }
-        handled = false
-      end if
-
-    else if key = "down"
-
-      if m.email.hasFocus() = true
-        setFocusToComponent(m.password)
-        m.emailHasFocus = false
-      else if m.password.hasFocus() = true
-        setFocusToComponent(m.continueBtn)
-      else if m.continueBtn.hasFocus() = true
-        setFocusToComponent(m.termsBtn)
-      end if
-
-    else if key = "up"
-
-      if m.password.hasFocus() = true
-        setFocusToComponent(m.email)
-        m.emailHasFocus = true
-      else if m.continueBtn.hasFocus() = true
-        setFocusToComponent(m.password)
-        m.emailHasFocus = false
-      else if m.termsBtn.hasFocus() = true
-        setFocusToComponent( m.continueBtn)
-      else if m.ppBtn.hasFocus() = true
-        setFocusToComponent(m.continueBtn)
-      else if m.yourPrivacyChoicesBtn.hasFocus() = true
-        setFocusToComponent(m.continueBtn)
-      else if m.keyboard.isInFocusChain() = true
-        updatePasswordValidation()
-        hideKeyboard()
-        showButtons()
-        setFocusToComponent(m.password)
-        m.emailHasFocus = false
-      end if
-
-    else if key = "right"
-
-      if m.termsBtn.hasFocus() = true
-        setFocusToComponent(m.ppBtn)
-      else if m.ppBtn.hasFocus() = true
-        setFocusToComponent(m.yourPrivacyChoicesBtn)
-      end if
-
-    else if key = "left"
-
-      if m.yourPrivacyChoicesBtn.hasFocus() = true
-        setFocusToComponent(m.ppBtn)
-      else if m.ppBtn.hasFocus() = true
-        setFocusToComponent(m.termsBtn)
-      end if
-
-    end if
-
-    return handled
-  end if
-  return false
-End Function
-
-
 'Observer for button selected option(back, continue and showHidePassword)
 Function onButtonSelected(evt)
   buttonSelected = evt.getData()
@@ -444,3 +398,110 @@ Function onKeyboardTextChanged()
     readAudioGuideText(audioGuideText)
   end if
  End Function
+
+
+ Function onKeyEvent(key As String, press As Boolean) as Boolean
+ if key = "OK"
+   m.password.text = m.keyboard.text
+ end if
+
+ bDisplayForgotPasswordButton = (getExperimentResource("roku_signin_password_reset", "roku_signin_password_reset_v1", false).enabled = true)
+         
+ handled = true
+ if press
+   if key = "back"
+
+     if m.keyboard.isInFocusChain() = true 
+       updatePasswordValidation()
+       hideKeyboard()
+       showButtons()
+       setFocusToComponent(m.password)
+       m.emailHasFocus = false
+     else
+       m.trackingLoggingTask.trackEvent = {
+         type: "account"
+         values: {
+           manip: "SIGNIN"
+           current: "EMAIL"
+           status: "FAIL"
+           message: "user-cancel"
+         }
+       }
+       handled = false
+     end if
+
+   else if key = "down"
+
+     if m.email.hasFocus() = true
+       setFocusToComponent(m.password)
+       m.emailHasFocus = false
+     else if m.password.hasFocus() = true
+       setFocusToComponent(m.continueBtn)
+     else if m.continueBtn.hasFocus() = true
+       if bDisplayForgotPasswordButton = false
+         setFocusToComponent(m.ppBtn)
+       else
+         setFocusToComponent(m.forgotPasswordBtn)
+       end if
+     else if m.forgotPasswordBtn.hasFocus() = true
+       setFocusToComponent(m.ppBtn)
+     end if
+
+   else if key = "up"
+
+     if m.password.hasFocus() = true
+       setFocusToComponent(m.email)
+       m.emailHasFocus = true
+     else if m.continueBtn.hasFocus() = true
+       setFocusToComponent(m.password)
+       m.emailHasFocus = false
+     else if m.forgotPasswordBtn.hasFocus() = true
+       setFocusToComponent(m.continueBtn)
+     else if m.termsBtn.hasFocus() = true
+       if bDisplayForgotPasswordButton = false
+         setFocusToComponent(m.continueBtn)
+       else
+         setFocusToComponent(m.forgotPasswordBtn)
+       end if
+     else if m.ppBtn.hasFocus() = true
+       if bDisplayForgotPasswordButton = false
+         setFocusToComponent(m.continueBtn)
+       else
+         setFocusToComponent(m.forgotPasswordBtn)
+       end if
+     else if m.yourPrivacyChoicesBtn.hasFocus() = true
+       if bDisplayForgotPasswordButton = false
+         setFocusToComponent(m.continueBtn)
+       else
+         setFocusToComponent(m.forgotPasswordBtn)
+       end if
+     else if m.keyboard.isInFocusChain() = true
+       updatePasswordValidation()
+       hideKeyboard()
+       showButtons()
+       setFocusToComponent(m.password)
+       m.emailHasFocus = false
+     end if
+
+   else if key = "right"
+
+     if m.termsBtn.hasFocus() = true
+       setFocusToComponent(m.ppBtn)
+     else if m.ppBtn.hasFocus() = true
+       setFocusToComponent(m.yourPrivacyChoicesBtn)
+     end if
+
+   else if key = "left"
+
+     if m.yourPrivacyChoicesBtn.hasFocus() = true
+       setFocusToComponent(m.ppBtn)
+     else if m.ppBtn.hasFocus() = true
+       setFocusToComponent(m.termsBtn)
+     end if
+
+   end if
+
+   return handled
+ end if
+ return false
+End Function

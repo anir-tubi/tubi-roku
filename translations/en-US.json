@@ -160,6 +160,10 @@
     "description": "Label of a dialog button to continue to the next step that the dialog is saying",
     "message": "Continue"
   },
+  "dialog_button_forgot_password": {
+    "description": "Label of a dialog button to take the user to the steps in case he/she has forgotten the account password. ",
+    "message": "Forgot Password"
+  },
   "dialog_button_submit": {
     "description": "Label of the dialog button to submit what the window is asking it to do.",
     "message": "Submit"
@@ -1194,13 +1198,25 @@
     "description": "invalid password title on modal",
     "message": "Invalid Password"
   },
+  "invalid_oops_password_title": {
+    "description": "invalid password title on modal",
+    "message": "Oops, wrong Password"
+  },
   "enter_password_dialog_description": {
     "description": "enter password dialog description",
     "message": "Please enter your Tubi password for the account"
   },
+  "invalid_oops_password_description": {
+    "description": "enter password dialog description",
+    "message": "Let's try again or enter a different password for this account:"
+  },
   "re-enter_password_button": {
     "description": "re-enter password button text on modal",
     "message": "Re-enter Password"
+  },
+  "retry": {
+    "description": "retry button text on modal",
+    "message": "Retry"
   },
   "could_not_verify_email": {
     "description": "could not verify your email modal description",
@@ -1261,6 +1277,38 @@
   "signIn_screen_subheading": {
     "description": "Sub title on the signIn screen",
     "message": "Your email is already linked to an existing Tubi account"
+  },
+  "forgotPassword_screen_heading": {
+    "description": "Title on the forgot password screen",
+    "message": "Help is on the way!"
+  },
+  "forgotPassword_screen_instant_subheading": {
+    "description": "Sub title on the forgot password screen - instant version",
+    "message": "Go to this email inbox and click the instant sign-in link:"
+  },
+  "forgotPassword_screen_noInstant_subheading": {
+    "description": "Sub title on the forgot password screen - no instant version",
+    "message": "Go to this email inbox and click the password reset link:"
+  },
+  "forgotPassword_screen_instant_subheading2": {
+    "description": "2nd Sub title on the forgot password screen - instant version",
+    "message": "This screen will refresh once you have clicked the link in your email."
+  },
+  "forgotPassword_screen_noInstant_subheading2": {
+    "description": "2nd Sub title on the forgot password screen - noInstant version",
+    "message": "After your password is reset, click below to try signing in."
+  },
+  "forgotPassword_screen_btn_resend": {
+    "description": "The button on the forgot password screen that corresponds to the action 'Resend Sign-in link",
+    "message": "Resend Sign-In Link"
+  },
+  "forgotPassword_screen_btn_different_email": {
+    "description": "The button on the forgot password screen that corresponds to the action 'Use Different Email",
+    "message": "Use Different Email"
+  },
+  "forgotPassword_screen_btn_return": {
+    "description": "The button on the forgot password screen that corresponds to the action 'Return to Sign In",
+    "message": "Return to Sign In"
   },
   "search_hint": {
     "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
