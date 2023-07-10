@@ -90,13 +90,8 @@ Function onInstantChange(msg)
     m.resendBtn.text = getTranslation("forgotPassword_screen_btn_resend")
     m.resendBtn.observeFieldScoped("selected", "onResendInstantLinkSelected")
 
-    m.changeEmailBtn = CreateObject("roSGNode", "SimpleButton")
-    m.changeEmailBtn.id = "changeEmailBtn"
-    m.changeEmailBtn.text = getTranslation("forgotPassword_screen_btn_different_email")
-    m.changeEmailBtn.observeFieldScoped("selected", "onChangeEmailSelected")
 
     m.buttonGroup.appendChild(m.resendBtn)
-    m.buttonGroup.appendChild(m.changeEmailBtn)
 
   else
     m.pageSubHeading.text = getTranslation("forgotPassword_screen_noInstant_subheading")
@@ -110,6 +105,12 @@ Function onInstantChange(msg)
     m.buttonGroup.appendChild(m.returnBtn)
 
   end if
+
+  m.changeEmailBtn = CreateObject("roSGNode", "SimpleButton")
+  m.changeEmailBtn.id = "changeEmailBtn"
+  m.changeEmailBtn.text = getTranslation("forgotPassword_screen_btn_different_email")
+  m.changeEmailBtn.observeFieldScoped("selected", "onChangeEmailSelected")
+  m.buttonGroup.appendChild(m.changeEmailBtn)
 
   m.buttonGroup.getChild(0).setFocus(true)
 
