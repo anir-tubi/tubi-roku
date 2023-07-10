@@ -653,7 +653,15 @@ Function handleSingleContentError(error, onRetrySuccessCallback, onRetryErrorCal
       detailScreen
     ]
 
-    showErrorModal(modalInfo, getSingleContentFromServerRetry, getSingleContentRetryParams)
+    ' Adding a check to see if backend returned 404, which means that the content id is invalid and backend could not find
+    ' a matching entry. In which case showing retry button in modal will not be of any use, since retrying again will end up in the same error modal.
+    ' Which will result in a endless loop of app showing user with retry again modal.
+    ' Since if the content id is invalid is there no way user to recover with retry.
+    if error <> invalid AND isInteger(error.code) = true AND error.code = 404
+      showErrorModal(modalInfo, invalid, invalid, onCloseErrorModal)
+    else
+      showErrorModal(modalInfo, getSingleContentFromServerRetry, getSingleContentRetryParams)
+    end if
     detailScreen.isLoading = false
 
     sendDetailScreenErrorAnalytics(detailScreen)

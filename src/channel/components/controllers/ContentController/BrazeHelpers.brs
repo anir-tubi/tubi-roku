@@ -220,6 +220,11 @@ Function processNavigateAction(uriParameters)
     else if page = "network" AND isNonEmptyString(uriParameters["network"]) = true
       navigateToNetworkDetailsScreen(uriParameters["network"])
       focusSideNavOption(m.constants.ui.sideNavIds.channels)
+    else if page = "detail" AND isNonEmptyString(uriParameters["contentId"]) = true
+      processPlayAndDetailsScreenAction(uriParameters)
+    else
+      ' Focusing back to the screen as a fallback if wrong uri was configured.
+      m.top.setFocus(true)
     end if
 
     ' Setting proper mode based on the page.
@@ -233,8 +238,14 @@ End Function
 
 
 Function processPlayAction(uriParameters)
+  processPlayAndDetailsScreenAction(uriParameters)
+End Function
+
+
+Function processPlayAndDetailsScreenAction(uriParameters)
   contentId = uriParameters.contentId
   mediaType = uriParameters.mediaType
+  action = uriParameters.action
   ' Since the page values are not used else where in the application not moving to constants so that we avoid constants access.
   if contentId <> invalid
     if mediaType = "series"
@@ -254,6 +265,10 @@ Function processPlayAction(uriParameters)
       "type": contentType
     }, true)
 
-    showDetailScreen(content, false, skipDetailScreen)
+    if action = "play"
+      showDetailScreen(content, false, skipDetailScreen)
+    else
+      showDetailScreen(content)
+    end if
   end if
 End Function
