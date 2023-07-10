@@ -212,7 +212,7 @@ Function onAdChange(msg)
   isPlayingAds = msg.getData()
   if isPlayingAds = true
     ' Send a play_progress event before we show ads to be most accurate in case the user exits during ad playback
-    playProgressEvent = getPlayProgressEvent()
+    playProgressEvent = getPlayProgressEvent(m.top.fullscreen)
     if playProgressEvent <> invalid
       trackEvent(playProgressEvent)
 
@@ -283,7 +283,7 @@ Function onVideoStateChange(msg)
       ' the video reached the end
       if m.Video.content <> invalid
         ' the video has been stopped, send a final playProgressEvent
-        playProgressEvent = getPlayProgressEvent()
+        playProgressEvent = getPlayProgressEvent(m.top.fullscreen)
         if playProgressEvent <> invalid
           trackEvent(playProgressEvent)
         end if
@@ -322,7 +322,7 @@ Function onVideoStateChange(msg)
     ' player has stopped (not due to an ad break)
     if m.Video.content <> invalid
       ' the video has been stopped, send a final playProgressEvent
-      playProgressEvent = getPlayProgressEvent()
+      playProgressEvent = getPlayProgressEvent(m.top.fullscreen)
       if playProgressEvent <> invalid
         trackEvent(playProgressEvent)
       end if
@@ -380,7 +380,7 @@ Function onVideoPositionChange()
 
   ' Analytics
   if m.playerPosition >= m.lastPingTime + m.analyticsInterval
-    playProgressEvent = getPlayProgressEvent()
+    playProgressEvent = getPlayProgressEvent(m.top.fullscreen)
     if playProgressEvent <> invalid
       m.lastPingTime = m.playerPosition
       trackEvent(playProgressEvent)
@@ -398,7 +398,16 @@ End Function
 
 
 Function onFullScreenChange()
-  if m.top.fullscreen = true
+  ' When the linear video player changes sizes, we want to send a play progress event for the previous size.
+  isFullScreenForPlayProgreeEvent = (m.top.fullScreen <> true)
+  playProgressEvent = getPlayProgressEvent(isFullScreenForPlayProgreeEvent)
+
+  if playProgressEvent <> invalid
+    m.lastPingTime = m.playerPosition
+    trackEvent(playProgressEvent)
+  end if
+
+  if m.top.fullScreen = true
     m.Video.observeFieldScoped("globalCaptionMode", "onCaptionModeChange")
 
     if m.top.state = "playing"
@@ -411,7 +420,7 @@ Function onFullScreenChange()
     m.Video.unobserveFieldScoped("globalCaptionMode")
   end if
 
-  trackFullScreen(m.top.fullscreen)
+  trackFullScreen(m.top.fullScreen)
 End Function
 
 
@@ -846,11 +855,11 @@ End Function
 ' Play progress events should occur at the following instances
 ' a user watches for 10s
 ' an ad break starts
-Function getPlayProgressEvent()
+Function getPlayProgressEvent(isFullScreen = true)
   playProgressEvent = invalid
   if m.playerPosition > m.lastPingTime
     videoPlayerType = "DEFAULT"
-    if m.top.fullscreen = false
+    if isFullScreen = false
       videoPlayerType = "BANNER"
     end if
 

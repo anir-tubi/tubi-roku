@@ -487,7 +487,6 @@ Function repositionLinearVideoPlayerToMaxState(bAnimate)
   tubiLog("LinearVideoPlayerScreenHelpers.repositionLinearVideoPlayerToMaxState")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
-    videoPlayer.fullscreen = true
     nDuration = 0
     if bAnimate = true
       nDuration = .6
@@ -495,6 +494,7 @@ Function repositionLinearVideoPlayerToMaxState(bAnimate)
 
     clearMinimizedLinearPlayerAnimation()
     resizeToLocation(videoPlayer, 1920, 1080, [0, 0], nDuration)
+    videoPlayer.fullscreen = true
   end if
 End Function
 
