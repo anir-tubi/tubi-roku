@@ -192,7 +192,7 @@ Function setDetailStrings(screen, content)
   else '// KEEP BELOW CODE ONCE FIFA WORLD CUP IS DONE
     screen.stringSignUpButton = getTranslation("registration_signup_button") + ";" + getTranslation("registration_signup_button_free")
     history = getHistory(content.id)
-    if history = invalid OR getExperimentResource("roku_title_series_button", "roku_title_series_button_v1", false).enabled = false
+    if history = invalid
       screen.stringPlayButton = getTranslation("screenDetails_button_play")
     else
       screen.stringPlayButton = getTranslation("screenDetails_button_startOver")

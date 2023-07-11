@@ -1094,10 +1094,6 @@ Function getTranslation_en_US()
       "description": "Label of button to indicate the users that reminder is set on the current video title",
       "message": "Remove Reminder"
     },
-    "screenDetails_button_resume": {
-      "description": "Label of button to allow users to resume the current video title",
-      "message": "Resume"
-    },
     "screenDetails_button_resume_playing": {
       "description": "Label of button to allow users to resume the current video title",
       "message": "Resume Playing"
@@ -2615,10 +2611,6 @@ Function getTranslation_es_MX()
     "screenDetails_button_remove_reminder": {
       "description": "Label of button to indicate the users that reminder is set on the current video title",
       "message": "Eliminar Recordatorio"
-    },
-    "screenDetails_button_resume": {
-      "description": "Label of button to allow users to resume the current video title",
-      "message": "Reanudar"
     },
     "screenDetails_button_resume_playing": {
       "description": "Label of button to allow users to resume the current video title",

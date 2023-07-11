@@ -80,10 +80,6 @@ Function init()
   setInitialMenuItems()
   setInitialSecondaryMenuItems()
 
-
-  if getExperimentResource("roku_title_series_button", "roku_title_series_button_v1", false).enabled = true
-    m.ResumeMenuItem.iconUrl = "pkg:/images/icon-play.webp"
-  end if
   setDetailStrings()
   m.focusAnimationDuration = 0.4
 
@@ -145,12 +141,7 @@ Function setDetailStrings()
   m.DislikeMenuItem.title = getTranslation("screenDetails_button_dislike")
   m.DislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.DislikeMenuItem.id]
 
-
-  if getExperimentResource("roku_title_series_button", "roku_title_series_button_v1", false).enabled <> true
-    m.ResumeMenuItem.title = getTranslation("screenDetails_button_resume")
-  else
-    m.ResumeMenuItem.title = getTranslation("screenDetails_button_resume_playing")
-  end if
+  m.ResumeMenuItem.title = getTranslation("screenDetails_button_resume_playing")
   m.ResumeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.ResumeMenuItem.id]
 
   m.EpisodesMenuItem.title = getTranslation("screenDetails_button_episodes")
@@ -438,17 +429,12 @@ Function onIsHistory()
   bHasHistory = m.top.isHistory
   if bHasHistory = false
     addRemoveMenuItem(bHasHistory, resumeIndex)
-  else
-    '//send exposure event for the roku_title_series_button_v1 experiment only when there is history
-    getExperimentResource("roku_title_series_button", "roku_title_series_button_v1", true)
   end if
 
-  if getExperimentResource("roku_title_series_button", "roku_title_series_button_v1", false).enabled = true
-    if bHasHistory = false
-      m.PlayMenuItem.iconUrl = "pkg:/images/icon-play.webp"
-    else
-      m.PlayMenuItem.iconUrl = "pkg:/images/icon-resume.webp"
-    end if
+  if bHasHistory = false
+    m.PlayMenuItem.iconUrl = "pkg:/images/icon-play.webp"
+  else
+    m.PlayMenuItem.iconUrl = "pkg:/images/icon-resume.webp"
   end if
 
   removeHistoryIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.RemoveHistoryMenuItem.id)

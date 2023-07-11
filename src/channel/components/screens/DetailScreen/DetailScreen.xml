@@ -216,7 +216,7 @@
     <!-- All the potential menu items, will be dynamically added or removed based on 'content' -->
     <DetailMenuItemContentNode
       id="ResumeMenuItem"
-      iconUrl="pkg:/images/icon-resume.webp"/>
+      iconUrl="pkg:/images/icon-play.webp"/>
     <DetailMenuItemContentNode
       id="PlayMenuItem"
       iconUrl="pkg:/images/icon-play.webp"/>
