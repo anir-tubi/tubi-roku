@@ -196,14 +196,10 @@ Function init()
   ' Holds the value for user/device level settings. For ex: isVideoPreviewOn  or Selected Audio track.
   m.preferences = createObject("roSGNode", "Preferences")
 
-  if getExperimentResource("roku_braze", "roku_braze_v1", true).enabled = true
-    ' Configuring the braze sdk.
-    configureBrazeSdk()
-    ' Starting the braze task.
-    m.brazeTask = CreateObject("roSGNode", "BrazeTask")
-    m.braze = getBrazeInstance(m.brazeTask)
-    m.brazeTask.observeFieldScoped("BrazeInAppMessage", "onInAppMessageTriggered")
-  end if
+  ' Braze Task and Braze helper instance.
+  m.brazeTask = invalid
+  m.braze = invalid
+
   ' For now we will support only one message queue. If at all we need to more flexible will add in future.
   ' For now we are queuing message if the user is in parental controls / kids mode or if there is screen in process of loading.
   ' Used for braze integration.
@@ -629,6 +625,20 @@ Function startUserExperience()
       startChannelFromAppLoad()
     end if
     
+    ' Since braze starts sending request immediately as soon we create the task and we need to inform braze about logged in status.
+    ' Delaying it until we complete the auth check. Also this prevents us from showing braze pop up on top of splash screen etc.
+    ' We noticed that if braze respondes quickly and our endpoints take time we ended up showing the braze modal before even home screen loaded. 
+    ' Moving it here allows the application to load required endpoints and also menu etc before we start braze.
+    if getExperimentResource("roku_braze", "roku_braze_v1", true).enabled = true
+      ' Configuring the braze sdk.
+      configureBrazeSdk()
+      ' Starting the braze task.
+      m.brazeTask = CreateObject("roSGNode", "BrazeTask")
+      ' Stopping the braze task until we know the user logged in status so that we can present non logged in user modal for logged in user.
+      m.braze = getBrazeInstance(m.brazeTask)
+      m.brazeTask.unobserveFieldScoped("BrazeInAppMessage")
+      m.brazeTask.observeFieldScoped("BrazeInAppMessage", "onInAppMessageTriggered")
+    end if
     authInfo = getFieldFromGlobal("authInfo")
     setBrazeUserData(authInfo)
   end if
