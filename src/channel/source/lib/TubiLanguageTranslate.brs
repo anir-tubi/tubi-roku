@@ -270,6 +270,18 @@ Function getTranslation_en_US()
       "description": "Program time Title when user selects a future program on EPG.",
       "message": "Starts at"
     },
+    "epg_favorites_toast_message": {
+      "description": "Message to be displayed on Toast-message when user favorites a lienar channel",
+      "message": "Find favorites at the top of program guide."
+    },
+    "epg_favorites_toast_header": {
+      "description": "header text to be displayed on Toast-message when user favorites a linear channel",
+      "message": "Added to Favorites"
+    },
+    "epg_unfavorites_toast_header": {
+      "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
+      "message": "Removed from Favorites"
+    },
     "menu_home": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
       "message": "Home"

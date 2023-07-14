@@ -45,6 +45,8 @@
 
     <field id="jumpToRowItemByID" alias="programGuide.jumpToLinearChannelID" />
 
+    <field id="jumpToChannelItem" alias="programGuide.jumpToChannelItem" />
+
     <!-- Used to control which component gains focus when the focusedChild callback runs.
            Accepted values are in constants.ui.homescreen.focusItems -->
     <field id="componentToFocus" type="string" />
@@ -101,6 +103,8 @@
 
     <!-- Pass through Program Guide component events to EpgScreen helper -->
     <field id="programGuidecomponentInteractionInfo" alias="programGuide.componentInteractionInfo" />
+
+    <field id="channelLikeDislikeInfo" alias="programGuide.channelLikeDislikeInfo" />
 
   </interface>
 

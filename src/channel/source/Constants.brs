@@ -30,7 +30,7 @@ Function getConstants()
       constants.audioGuideHints.transportBarIcons.hopBackButtonHint = "Rewind"
       constants.audioGuideHints.transportBarIcons.fastForwardButtonHint = "Fast Forward Button"
       constants.audioGuideHints.transportBarIcons.closedCaptionAudioButtonHint = "Closed Caption And Audio Track Selection Button"
-      
+
 
   ' Device info
   constants.deviceInfo = {}
@@ -378,7 +378,7 @@ Function getConstants()
 
     constants.thirdParty.sentry = {}
       constants.thirdParty.sentry.dsn = "https://f8edcfe8baf140b4b91b46dfb8af9a19:acdf43f7c38a47f1ab85583035ff1798@sentry.io/1377102"
-    
+
     constants.thirdParty.braze = {}
       constants.thirdParty.braze.apiKey = "a97de018-d2c3-47a4-ada4-7b12dc579255"
       ' All non production environments will use staging api key.
@@ -1052,6 +1052,7 @@ Function getConstants()
       constants.ui.categoryIds.mostPopular = "most_popular"
       constants.ui.categoryIds.movieNight = "movie_night"
       constants.ui.categoryIds.seriesSpotlight = "series_spotlight"
+      constants.ui.categoryIds.favorites = "temp_linear_favorites"
 
     constants.ui.categoryTypes = {}
       'these map to tensor api container types

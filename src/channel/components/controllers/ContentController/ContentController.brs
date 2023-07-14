@@ -141,6 +141,9 @@ Function init()
   m.global.historyIds = CreateObject("roSGNode", "HistoryContentNode")
   m.global.addField("likeIds", "node", false)
   m.global.likeIds = CreateObject("roSGNode", "LikeContentNode")
+  m.global.addField("linearLikeIds", "node", false)
+  m.global.linearLikeIds = CreateObject("roSGNode", "LikeContentNode")
+
 
   m.global.addField("authInfo", "assocarray", false)
   m.global.authInfo = invalid ' indicates not logged in
@@ -1325,7 +1328,7 @@ Function setContentToRefresh(sID)
     if screen.content <> invalid AND screen.content.validUntil <> invalid
       screen.content.validUntil = 0
       return true
-    else if  isAnEpgScreen(screen) = true AND screen.timeGridContent <> invalid AND screen.timeGridContent.getChild(0).validUntil <> invalid
+    else if  (isAnEpgScreen(screen) = true OR screen.id = m.constants.ui.screenIds.linearVideoPlayerScreen) AND screen.timeGridContent <> invalid AND screen.timeGridContent.getChild(0).validUntil <> invalid
       screen.timeGridContent.getChild(0).validUntil = 0
       return true
     end if
@@ -1363,6 +1366,11 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   if searchScreen <> invalid
     ' calling updateSearchContentNode to removes the Lock icon from search result posters once user sign-in.
     updateSearchContentNode(searchScreen)
+  end if
+
+  timeGridContent = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
+  if timeGridContent <> invalid AND timeGridContent.getChild(0) <> invalid AND timeGridContent.getChild(0).validUntil <> invalid
+    timeGridContent.getChild(0).validUntil = 0
   end if
 
 End Function

@@ -87,6 +87,9 @@
         -->
         <field id="likes" type="node" />
 
+        <!-- Linear like just like likes above but for linear channels -->
+        <field id="linearLikes" type="node" />
+
         <!-- addBookmarkResult:
         -        Result of request as:
         -        {

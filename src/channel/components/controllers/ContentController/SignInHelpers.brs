@@ -645,7 +645,7 @@ Function onSignInError(errorResponse)
     invalidPasswordDesc = getTranslation("enter_password_dialog_description")
     forgotPasswordDesc = getTranslation("forgot_password_text") + " " + getTranslation("forgot_password_link")
     message = invalidPasswordDesc + chr(10) + requestInput.email + chr(10) +  chr(10) + forgotPasswordDesc
-    buttons = [getTranslation("re-enter_password_button")] 
+    buttons = [getTranslation("re-enter_password_button")]
     showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onReEnterPasswordSelected, onReEnterPasswordSelected)
 
   end if
@@ -837,6 +837,7 @@ Function handleUpdatedAuth()
   m.global.bookmarkIds = m.authTask.bookmarks
   m.global.historyIds = m.authTask.history
   m.global.likeIds = m.authTask.likes
+  m.global.linearLikeIds = m.authTask.linearLikes
   m.authInfoReceived = true
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
@@ -1071,7 +1072,7 @@ Function onMagicLinkResponse(response)
       m.emailVerificationTimer = m.top.createChild("Timer")
       m.emailVerificationTimer.repeat = false
       m.emailVerificationTimer.duration = 2
-      m.emailVerificationTimer.observeFieldScoped("fire", "onEmailVerificationTimerFired") 
+      m.emailVerificationTimer.observeFieldScoped("fire", "onEmailVerificationTimerFired")
       m.emailVerificationTimer.control = "start"
     end if
   end if
@@ -1081,7 +1082,7 @@ End Function
 Function onMagicLinkError(errorResponse)
   tubiLog("SignInHelpers.onMagicLinkError")
 
-  
+
   currentScreen = getCurrentScreen()
   contextCode = m.constants.errors.context.forgotPasswordProcessingScreen
   if currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen
@@ -1308,5 +1309,18 @@ Function AfterSignInPlayLockedContentWhileSkippingDetailScreen(params)
   refreshAllDetailScreens()
   setContentToRefreshAllPersonalizedScreens(true)
   showHideSpinner(false)
+
+End Function
+
+
+Function afterSignInLikeDislikeLinear(channelInfo)
+
+  if channelInfo <> invalid
+    setContentToRefreshAllPersonalizedScreens()
+    popScreenAfterSignInProcess()
+    showHideSpinner(false)
+    showHideLogo(m.constants.logoType.hide) ' for epgScreen or linearVideoplayerscreen do not show any logo
+    updateLikeDislikeLinear(channelInfo)
+  end if
 
 End Function

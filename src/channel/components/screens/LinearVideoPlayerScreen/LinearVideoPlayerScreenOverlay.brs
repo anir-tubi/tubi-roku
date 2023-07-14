@@ -316,7 +316,14 @@ Function jumpEPGToCurrentPlayingVideo(shouldSendComponentInteractionEvent = fals
     if shouldSendComponentInteractionEvent = true
       m.EPG.shouldSendComponentInteractionEventOnJumpToLinearChannelId = true
     end if
-    m.EPG.jumpToLinearChannelID = [m.top.currentLinearVideoContent.id, ""]
+
+    if m.top.getPArent().associatedScreenId = m.constants.ui.screenIds.homeScreen
+      jumpToEPGCategory = ""
+    else
+      jumpToEPGCategory = m.top.currentLinearVideoContent.parentId
+    end if
+
+    m.EPG.jumpToLinearChannelID = [m.top.currentLinearVideoContent.id, jumpToEPGCategory]
   end if
 End Function
 

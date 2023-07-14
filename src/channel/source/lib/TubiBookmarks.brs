@@ -10,6 +10,8 @@ Function TubiBookmarksForAuthTask(request as Object, auth as Object, constants a
     'public methods
     addHistoryLocally: tubiBookmarks_addHistoryLocally
     updateLikesLocally: tubiBookmarks_updateLikesLocally
+    addLinearLikeLocally: tubiBookmarks_addLinearLikeLocally
+    removeLinearLikeLocally: tubiBookmarks_removeLinearLikeLocally
     getInitialBookmarksReq: tubiBookmarks_getInitialBookmarksReq
     getInitialHistoryReq: tubiBookmarks_getInitialHistoryReq
     getInitialLikeReq: tubiBookmarks_getInitialLikeReq
@@ -41,6 +43,8 @@ Function TubiBookmarks(constants)
     translateHistoryIds: tubiBookmarks_translateHistoryIds
     addHistoryLocally: tubiBookmarks_addHistoryLocally
     updateLikesLocally: tubiBookmarks_updateLikesLocally
+    addLinearLikeLocally: tubiBookmarks_addLinearLikeLocally
+    removeLinearLikeLocally: tubiBookmarks_removeLinearLikeLocally
   }
 End Function
 
@@ -134,6 +138,44 @@ Function tubiBookmarks_updateLikesLocally(contentId as String, sRatingAction as 
 End Function
 
 
+' @param contentId, String: Liked Channel's ID
+' @global: The global object is passed here to avoid rendezvous
+Function tubiBookmarks_addLinearLikeLocally(contentId as string, global = invalid)
+
+  if contentId <> invalid AND global <> invalid AND global.linearLikeIds <> invalid
+
+    linearLikeNode = getLinearLike(contentId) 'bs:disable-line 1001 LINT1001
+
+    '// save the linearChannel been liked
+    if linearLikeNode = invalid
+      linearLikeNode = global.linearLikeIds.createChild("LikeContentNode")
+      linearLikeNode.id = contentId
+    end if
+
+    linearLikeNode.state = m.constants.ui.likeDislikeStates.liked
+
+  end if
+
+End Function
+
+
+' @param contentId, String: Disliked Channel's ID.
+' @global: The global object is passed here to avoid rendezvous
+Function tubiBookmarks_removeLinearLikeLocally(contentId as string, global = invalid)
+  if contentId <> invalid AND global <> invalid AND global.linearLikeIds <> invalid
+
+    linearLikeNode = getLinearLike(contentId) 'bs:disable-line 1001 LINT1001
+
+    '//remove if linearChannel been disliked
+    if linearLikeNode <> invalid
+      global.linearLikeIds.removeChild(linearLikeNode)
+    end if
+  end if
+
+End Function
+
+
+
 '@localId: string, a string used to identify req when a response is received
 Function tubiBookmarks_getInitialBookmarksReq(localId) as Object
   authInfo = m.auth.getAuthInfo()  'from registry
@@ -199,7 +241,8 @@ End Function
 '@param localId: string, a string used to identify req when a response is received
 '@param bLiked: Boolean, Is this a "like" request? If not, it is a "dislike" request
 '@param nextPageId: string, the paginated ID of the next page of likes/dislikes
-Function tubiBookmarks_getInitialLikeReq(localId, bLiked = true, nextPageId = "") as Object
+'@param target: string "target" for VODs and "lienar" for linear contents
+Function tubiBookmarks_getInitialLikeReq(localId, bLiked = true, nextPageId = "", target = "title") as Object
   authInfo = m.auth.getAuthInfo()  'from registry
 
   'if the user is not logged in (aka doesn't have an accessToken in local memory),
@@ -218,7 +261,7 @@ Function tubiBookmarks_getInitialLikeReq(localId, bLiked = true, nextPageId = ""
     method: m.constants.reqTypes.get
     params: {
       "page_enabled": false
-      target: "title"
+      target: target
       limit: 100
       type: sLikeType
       platform: m.constants.platform

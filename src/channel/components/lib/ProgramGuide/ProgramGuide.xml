@@ -13,6 +13,10 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+
   <interface>
     <!-- INPUTS -->
 
@@ -39,6 +43,8 @@
     <field id="EPGFullMode" type="boolean" value="true"/>
 
     <field id="jumpToRowItem" alias="ProgramGrid.jumpToRowItem" />
+
+    <field id="jumpToChannelItem"  type="integer" alwaysNotify="true" />
 
     <field id="setFocusedToPlay"  type="boolean" alwaysNotify="true" />
 
@@ -72,7 +78,8 @@
     <field id="okPressed" type="boolean" alwaysNotify="true"/>
 
     <!--this field will be used for long presses to dismiss the timer-->
-    <field id="scrollingStatus" type="boolean" alias="ProgramGrid.scrollingStatus" />
+    <field id="scrollingStatus" type="boolean"/>
+
 
     <field id="rowItemfocused" alias="ProgramGrid.rowItemFocused" />
 
@@ -87,6 +94,15 @@
            which will be responsible for sending navigate_within_page events.
       -->
     <field id="navigateWithinPageInfo" type="assocarray"/>
+
+    <!-- Holds the information about the channel that has been just liked or disliked
+                "contentId": channel_Id of the liked or disliked channel
+                "action": like / dislike
+                "containerId": channel container/parent Id.
+  }
+    -->
+    <field id="channelLikeDislikeInfo" type="assocarray" />
+
   </interface>
 
   <children>
@@ -105,8 +121,8 @@
 
       <Poster
         id="leftIcon"
-        width="20"
-        height="20"
+        width="21"
+        height="21"
         uri="pkg:/images/left-arrow.png"/>
 
       <Label
@@ -146,14 +162,17 @@
         size="36" />
     </Label>
 
-    <MarkupList
+    <CommunicatingMarkupGrid
       id="channelsGrid"
       translation="[0, 96]"
       numRows="4"
-      focusFootprintBitmapUri="pkg:/images/ratingBackground.9.png"
       itemSize="[186,108]"
       itemSpacing="[0,12]"
-      drawFocusFeedbackOnTop="false"
+      focusFootprintBitmapUri="pkg:/images/ratingBackground.9.png"
+      focusBitmapUri="pkg:/images/epg-selector-fhd.9.png"
+      drawFocusFeedbackOnTop="true"
+      fadeFocusFeedbackWhenAutoScrolling="true"
+      scrollSpeed="3"
       itemComponentName="ProgramGuideChannelItem"
       vertFocusAnimationStyle="fixedFocus"/>
 
@@ -169,6 +188,7 @@
       rowItemSpacing="[[12,0]]"
       showRowCounter="[false]"
       rowFocusAnimationStyle="fixedFocus"
+      focusFootprintBitmapUri="pkg:/images/ratingBackground.9.png"
       focusBitmapUri="pkg:/images/epg-selector-fhd.9.png"
       itemComponentName="ProgramGuideMenuItem"
       variableWidthItems="[true]"

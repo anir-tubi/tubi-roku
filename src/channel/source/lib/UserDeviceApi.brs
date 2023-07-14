@@ -221,12 +221,13 @@ End Function
 '         dislike - associate title with a dislike (constants.ui.likeDislikeActions.dislike)
 '         remove-like - disassociate title with a like (constants.ui.likeDislikeActions.removeLike)
 '         remove-dislike - disassociate title with a dislike (constants.ui.likeDislikeActions.removeDislike)
-Function userDeviceApi_setContentRating(sContentID, sRatingAction)
+' @param target: string, title - for VOD, linear - for linear contents.
+Function userDeviceApi_setContentRating(sContentID, sRatingAction, target = "title")
   url = m.constants.urls.account.contentRating
   options = {}
   body = {
     action: sRatingAction,
-    target: "title",
+    target: target,
     data: [sContentID]
   }
 

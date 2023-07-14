@@ -78,6 +78,10 @@
       -->
       <field id="programGuidecomponentInteractionInfo" alias="EPG.componentInteractionInfo" />
 
+      <field id="channelLikeDislikeInfo" alias="EPG.channelLikeDislikeInfo" />
+
+      <field id="jumpToChannelItem" alias="EPG.jumpToChannelItem" />
+
   </interface>
 
   <children>

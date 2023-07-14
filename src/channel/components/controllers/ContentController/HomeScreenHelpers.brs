@@ -842,20 +842,6 @@ Function startCountdownTimer()
 End Function
 
 
-' Display a countdown timer over the minimized linear video player to show how many seconds are left before the player goes fullscreen
-' @param nFullscreenCountdown, Integer - The number of seconds left in the countdown timer. If less than 0, then the timer is hidden.
-Function setPlayerCountDownChange(nFullscreenCountdown)
-  tubiLog("HomeScreenHelpers.setPlayerCountDownChange")
-  m.fullscreenCountdown = nFullscreenCountdown
-  if nFullscreenCountdown >= 0
-    m.LinearCountdownTimer.display = true
-    m.LinearCountdownTimer.seconds = nFullscreenCountdown
-  else
-    m.LinearCountdownTimer.display = false
-  end if
-End Function
-
-
 Function onScrollingStatusChange(msg)
   '//if in the middle of scrolling, then stop the linear video player (if it is playing)
   homeScreen = msg.getRoSGNode()

@@ -258,8 +258,15 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0, isSeekPastCuepoint = 
       origin = content.adParam.srcForAds
     end if
 
-    if isNonEmptyString(content.adParam.playbackContainer)
-      params["container_id"] = content.adParam.playbackContainer
+    playbackContainer = content.adParam.playbackContainer
+
+    'Note for graduation: if we still create favorites manually, please keep this logic since sending container_id that does not exist on backend creates data quality issues on rainmaker side.
+    if content.adParam.playbackContainer = m.constants.ui.categoryIds.favorites AND getExperimentResource("roku_linear_favorites", "roku_linear_favorites_v1", false).enabled = true 'bs:disable-line 1001 LINT1001
+      playbackContainer = ""
+    end if
+
+    if isNonEmptyString(playbackContainer)
+      params["container_id"] = playbackContainer
     end if
   end if
 

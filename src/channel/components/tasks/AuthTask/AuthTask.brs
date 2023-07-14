@@ -46,6 +46,7 @@ Function execInitializeUserData()
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
   m.top.likes = userCats.newLikes
+  m.top.linearLikes = userCats.newLinearLikes
 
   m.top.authInfo = authInfo  ' set last so that it can be used as a trigger
 End Function
@@ -87,6 +88,7 @@ Function execSignOut()
   m.top.bookmarks = userCats.newBookmarks
   m.top.history = userCats.newHistory
   m.top.likes = userCats.newLikes
+  m.top.linearLikes = userCats.newLinearLikes
   m.top.guestUserHasAgeInfo = invalid
   m.top.authInfo = Auth.getAuthInfo()
 End Function
@@ -103,10 +105,13 @@ Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false
   newBookmarks = CreateObject("roSGNode", "BookmarkContentNode")
   newHistory = CreateObject("roSGNode", "HistoryContentNode")
   newLikes = CreateObject("roSGNode", "LikeContentNode")
+  newLinearLikes = CreateObject("roSGNode", "LikeContentNode")
+
   userCategories = {
     newBookmarks: newBookmarks
     newHistory: newHistory
     newLikes: newLikes
+    newLinearLikes: newLinearLikes
   }
 
   if getUserInfo = true
@@ -132,13 +137,20 @@ Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false
   end if
 
   if getLikes = true
+
     initialLikeReq = Bookmarks.getInitialLikeReq(localLikeReqId, true)
     if initialLikeReq <> invalid then
       queue.pushRequest(initialLikeReq)
     end if
+
     initialDislikeReq = Bookmarks.getInitialLikeReq(localDislikeReqId, false)
     if initialDislikeReq <> invalid then
       queue.pushRequest(initialDislikeReq)
+    end if
+
+    initialLinearLikeReq = Bookmarks.getInitialLikeReq(localLikeReqId, true, "", "linear")
+    if initialLikeReq <> invalid then
+      queue.pushRequest(initialLinearLikeReq)
     end if
   end if
 
@@ -158,18 +170,34 @@ Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false
           bLiked = (handledReq.localId = "like")
           userLikes = Bookmarks.handleInitialLikes(handledReq.response.data, bLiked)
 
-          if type(userCategories.newLikes) = "roSGNode" AND userCategories.newLikes.getChildCount() > 0
-            '//If newLikes already exists, then combine the other (like or disliked) array into one
-            if type(userLikes.content) = "roSGNode" AND userLikes.content.getChildCount() > 0
-              userCategories.newLikes.appendChildren(userLikes.content.getChildren(-1,0))
+          if handledReq.params <> invalid AND handledReq.params.target = "linear"
+
+            if type(userCategories.newLinearLikes) = "roSGNode" AND userCategories.newLinearLikes.getChildCount() > 0
+
+              if type(userLikes.content) = "roSGNode" AND userLikes.content.getChildCount() > 0
+                userCategories.newLinearLikes.appendChildren(userLikes.content.getChildren(-1,0))
+              end if
+
+            else
+                userCategories.newLinearLikes = userLikes.content
             end if
+
           else
-            userCategories.newLikes = userLikes.content
+
+            if type(userCategories.newLikes) = "roSGNode" AND userCategories.newLikes.getChildCount() > 0
+              '//If newLikes already exists, then combine the other (like or disliked) array into one
+
+              if type(userLikes.content) = "roSGNode" AND userLikes.content.getChildCount() > 0
+                userCategories.newLikes.appendChildren(userLikes.content.getChildren(-1, 0))
+              end if
+            else
+                userCategories.newLikes = userLikes.content
+            end if
           end if
 
           '//Handle pagination
           if isNonEmptyString(userLikes.nextPageId) = true
-            paginationLikeReq = Bookmarks.getInitialLikeReq(handledReq.localId, bLiked, userLikes.nextPageId)
+            paginationLikeReq = Bookmarks.getInitialLikeReq(handledReq.localId, bLiked, userLikes.nextPageId, handledReq.params.target)
             if paginationLikeReq <> invalid
               queue.pushRequest(paginationLikeReq)
             end if

@@ -13,9 +13,10 @@ Function init()
   m.programGrid = m.top.findNode("programGrid")
   m.leftIcon = m.top.findNode("leftIcon")
   m.playOnFocusMode = true
-  m.lastFocused = -1
+  ' focusedComponent will keep track of which component (programGrid or channels Grid) had last focus. This will help in handling focus back from topnav/sidenav/lienarvideoplayer.
+  m.focusedComponent = "programGrid"
 
-  m.programGrid.observeFieldScoped("currFocusRow", "onRowFocused")
+  m.programGrid.observeFieldScoped("rowScrollFocused", "onProgramGridRowFocused")
   m.top.observeFieldScoped("jumpToLinearChannelID", "onJumpToLinearChannelID")
   m.top.observeFieldScoped("EPGFullMode", "onDisplayModeChange")
   m.programGrid.observeFieldScoped("rowItemSelected", "onProgramGridContentSelected")
@@ -26,12 +27,23 @@ Function init()
   m.top.observeField("setFocusedToPlay", "onSetFocusedToPlay")
   m.updateMinsLeftTimer = m.top.findNode("updateMinsLeftTimer")
   m.updateMinsLeftTimer.observeField("fire", "onUpdateMinsLeftTimer")
-  m.programGrid.observeFieldScoped("okPressed", "onOkPressed")
+  m.programGrid.observeFieldScoped("okPressed", "onProgramGridOkPressed")
+
+  m.channelsGrid.observeFieldScoped("rowScrollFocused", "onChannelsGridRowFocused")
+  m.channelsGrid.observeFieldScoped("itemSelected", "onChannelsGridItemSelected")
+  m.channelsGrid.observeFieldScoped("itemFocused", "onChannelsGridContentFocused")
+  m.top.observeFieldScoped("jumpToChannelItem", "onJumpToChannelItem")
+
+  m.channelsGrid.observeFieldScoped("scrollingStatus", "onScrollingStatus")
+  m.programGrid.observeFieldScoped("scrollingStatus", "onScrollingStatus")
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
   onThemeChange()
+
+  m.favoritesExp = (getExperimentResource("roku_linear_favorites", "roku_linear_favorites_v1", false).enabled = true)
+
 End Function
 
 
@@ -66,75 +78,47 @@ Function onProgramGridContentFocused(msg)
   tubiLog("programGrid.onProgramGridContentFocused")
   channelItem = msg.getRoSGNode()
   itemPosition = msg.getData()
+  programGridContentFocused(channelItem, itemPosition)
+End Function
 
-  rowItemFocused = m.programGrid.rowItemFocused
-  if Type(rowItemFocused) = "roArray" AND doesSendEvent(m.lastItemFocused, rowItemFocused) = true
-    previousItemFocused = invalid
-    if m.programGrid.content.getChild(m.lastItemFocused[0]) <> invalid
-      previousItemFocused = m.programGrid.content.getChild(m.lastItemFocused[0]).getchild(m.lastItemFocused[1])
-    end if
 
-    lastItemFocusedCol = m.lastItemFocused[1] + 1
-    lastItemFocusedRow = m.lastItemFocused[0] + 1
-    contentTile = m.Tracking.getAnalyticsTile(previousItemFocused, lastItemFocusedCol, lastItemFocusedRow)
+Function programGridContentFocused(channelItem, itemPosition)
 
-    if rowItemFocused[0] >= 0
-      row = rowItemFocused[0] + 1
-    else
-      row = 1 'default row is first row.
-    end if
-
-    if rowItemFocused[1] >= 0
-      col = rowItemFocused[1] + 1
-    else
-      col = 1
-    end if
-
-    m.lastItemFocused = rowItemFocused
-
-    pageType = ""
-    if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pagetype <> invalid
-      pageType = m.top.trackingPageInfo.pagetype
-    end if
-
-    pageValues = {}
-    if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pageValues <> invalid
-      pageValues = m.top.trackingPageInfo.pageValues
-    end if
-
-    navigateWithinPageInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
-      componentOneof: m.Tracking.getAnalyticsComponent("epg_component", {content_tile: contentTile})
-      means_of_navigation: "BUTTON"
-      vertical_location: row
-      horizontal_location: col
-    }
-    m.top.navigateWithinPageInfo = navigateWithinPageInfo
-
-  end if
 
   if itemPosition <> invalid AND itemPosition.count() = 2
     channel = channelItem.content.getChild(itemPosition[0])
 
     if m.playOnFocusMode = true OR m.top.linearChannelToPlay = invalid 'anytime linearChannelToPlay is invalid, assign focused channel to play?
+
       if channel <> invalid AND channel.videoResources <> invalid
         m.top.linearChannelToPlay = channel
         m.top.linearChannelToPlayUpdated = true
       end if
+
     end if
 
     if channel <> invalid AND channel.getChildCount() > 0
       program = channel.getChild(itemPosition[1])
       m.top.linearChannelFocused = program
       m.top.linearChannelFocusedUpdated = true
+
       if m.playOnFocusMode <> true
+
         if isProgramLive(program) = true OR program.startTime = 0 OR program.endTime = 0
           fade(m.backToLive, "out", 0.1, 0, 0)
         else
           fade(m.backToLive, "in", 0.1, 0, 1)
         end if
+
       end if
+
     end if
+
+    ' send NavigationwithinPageEvent when user focuses on tiles on programGrid
+    col = itemPosition[1] + 1 ' channelGrid column always = 0, programGrid column starts with = 1
+    naviPosition = [itemPosition[0], col]
+    sendNavigationWithinPageEvent(naviPosition)
+
   end if
 End Function
 
@@ -181,8 +165,15 @@ End Function
 
 Function onTimeGridFocusChange()
   tubiLog("ProgramGrid.onTimeGridFocusChange")
-  if m.top.isInFocusChain() = true
-    m.ProgramGrid.setFocus(true)
+
+  if m.top.hasFocus() = true
+    getExperimentResource("roku_linear_favorites", "roku_linear_favorites_v1", true)
+    if m.focusedComponent = "programGrid"
+      m.ProgramGrid.setFocus(true)
+    else
+      m.channelsGrid.setFocus(true)
+    end if
+
     if m.updateMinsLeftTimer.control <> "start"
       m.updateMinsLeftTimer.control = "start"
       if m.programGrid.content <> invalid
@@ -191,26 +182,39 @@ Function onTimeGridFocusChange()
         onUpdateMinsLeftTimer()
       end if
     end if
-  else
+
+  else if m.top.isInFocusChain() = false
     m.updateMinsLeftTimer.control = "stop"
   end if
 End Function
 
 
-Function onRowFocused(msg)
-  tubiLog("ProgramGrid.onRowFocused")
-  focusPos = msg.getData()
-  newFocus = Int(focusPos)
-  if focusPos > m.programGrid.itemUnfocused
-    if newFocus < focusPos
-      newFocus += 1
+Function onProgramGridRowFocused(msg)
+  newFocus = m.programGrid.rowScrollFocused
+
+  if m.channelsGrid.preItemFocused <> newFocus
+    tubiLog("ProgramGrid.onMenuScrollFocused")
+    m.channelsGrid.jumpToItem = newFocus
+    if m.channelsGrid.content.getchild(newFocus) <> invalid
+      m.headerText.text = m.channelsGrid.content.getchild(newFocus).parentTitle
     end if
   end if
-  if newFocus <> m.lastFocused
-    m.channelsGrid.jumpToItem = newFocus
-    m.lastFocused = newFocus
-    m.headerText.text = m.channelsGrid.content.getchild(newFocus).parentTitle
+
+End Function
+
+
+Function onChannelsGridRowFocused(msg)
+
+  newFocus = m.channelsGrid.rowScrollFocused
+
+  if m.programGrid.preItemFocused <> newFocus
+    tubiLog("ProgramGrid.onChannelsGridRowFocused")
+    m.programGrid.jumpToItem = newFocus
+    if m.channelsGrid.content.getchild(newFocus) <> invalid
+      m.headerText.text = m.channelsGrid.content.getchild(newFocus).parentTitle
+    end if
   end if
+
 End Function
 
 
@@ -220,9 +224,11 @@ Function onJumpToLinearChannelID()
   if m.programGrid.content <> invalid AND m.top.jumpToLinearChannelID <> invalid AND m.top.jumpToLinearChannelID.count() = 2
     for i = 0 to m.programGrid.content.getchildCount() - 1
       item = m.programGrid.content.getchild(i)
-      if item.id = m.top.jumpToLinearChannelID[0]
+      containerId = m.top.jumpToLinearChannelID[1]
+      if item.id = m.top.jumpToLinearChannelID[0] AND (containerId = "" OR containerId = item.parentId)
         m.programGrid.jumpToRowItem = [i, 0]
         m.programGrid.itemFocused = i
+        m.channelsGrid.jumpToItem = i
         if item <> invalid AND item.getChildCount() > 0
           program = item.getChild(0)
           m.top.linearChannelFocused = program
@@ -290,8 +296,8 @@ Function onUpdateMinsLeftTimer()
 End Function
 
 
-Function onOkPressed()
-  tubiLog("ProgramGrid.onOkPressed")
+Function onProgramGridOkPressed()
+  tubiLog("ProgramGrid.onProgramGridOkPressed")
   if m.top.linearChannelFocused <> invalid AND isProgramLive(m.top.linearChannelFocused)
     itemPosition = m.programGrid.rowItemFocused
     m.top.linearChannelToPlay = m.top.linearChannelFocused.getParent()
@@ -368,4 +374,149 @@ Function doesSendEvent(lastItemFocused, rowItemFocused)
     end if
   end if
   return isEqual
+End Function
+
+
+Function onKeyEvent(key As string, press As boolean) As boolean
+
+  if press
+    if m.favoritesExp = true
+      if key = "left" AND m.programGrid.isInFocusChain() = true AND m.channelsGrid.content <> invalid
+        m.channelsGrid.setFocus(true)
+        m.focusedComponent = "channelsGrid"
+        return true
+      else if key = "right" AND m.channelsGrid.hasFocus() = true AND m.programGrid.content <> invalid
+        m.programGrid.setFocus(true)
+        m.focusedComponent = "programGrid"
+        return true
+      end if
+    end if
+
+  end if
+
+  return false
+End Function
+
+
+Function onScrollingStatus(msg)
+  m.top.scrollingStatus = msg.getData()
+End Function
+
+
+Function onChannelsGridContentFocused(msg)
+  tubilog("programGrid.onChannelsGridContentFocused")
+
+  itemPosition = msg.getData()
+
+  if itemPosition <> invalid
+    channel = m.programGrid.content.getChild(itemPosition)
+
+    if m.playOnFocusMode = true OR m.top.linearChannelToPlay = invalid  'even when user is on channel logo, play the channel because otherwise whats playing does not match whats on EPG Overlay
+      if channel <> invalid AND channel.videoResources <> invalid
+        m.top.linearChannelToPlay = channel
+        m.top.linearChannelToPlayUpdated = true
+      end if
+    end if
+
+    if channel <> invalid AND channel.getChildCount() > 0
+      program = channel.getChild(0)
+      m.top.linearChannelFocused = program
+      m.top.linearChannelFocusedUpdated = true
+      fade(m.backToLive, "out", 0.1, 0, 0)
+    end if
+
+    ' send NavigationwithinPageEvent when user focuses on tiles on ChannelGrid
+    navPosition = [itemPosition, 0]
+    sendNavigationWithinPageEvent(navPosition)
+  end if
+
+End Function
+
+
+Function onChannelsGridItemSelected(msg)
+  tubilog("programGrid.onChannelsGridItemSelected")
+
+  itemSelected = msg.getData()
+
+  channelItem = m.channelsGrid.content.getChild(itemSelected)
+
+  if channelItem.selected = true
+    favAction = m.constants.ui.likeDislikeActions.dislike
+    channelItem.selected = false
+  else
+    favAction = m.constants.ui.likeDislikeActions.like
+    channelItem.selected = true
+  end if
+
+  'channel has been wrapped using AA to avoid channelLikeDislikeInfo interface getting triggered when
+  'channel get updated.
+  favActionAA = {
+    "channelNode": channelItem
+    "action": favAction
+  }
+
+  m.top.channelLikeDislikeInfo = favActionAA
+End Function
+
+
+' when we jump to a channelItem, the EPG screen does not refresh the metadata and header text.
+' This function handles refreshing metadata and header text in case of like/dislike a channel
+Function onJumpToChannelItem(msg)
+  row = msg.getData()
+  m.channelsGrid.jumpToItem = row
+  if m.channelsGrid.content.getchild(row) <> invalid
+    m.headerText.text = m.channelsGrid.content.getchild(row).parentTitle
+  end if
+End function
+
+
+Function sendNavigationWithinPageEvent(rowItemFocused)
+
+  if doesSendEvent(m.lastItemFocused, rowItemFocused) = true
+
+    previousItemFocused = invalid
+
+    if m.programGrid.content.getChild(m.lastItemFocused[0]) <> invalid
+      previousItemFocused = m.programGrid.content.getChild(m.lastItemFocused[0]).getchild(m.lastItemFocused[1])
+    end if
+
+    lastItemFocusedCol = m.lastItemFocused[1] + 1
+    lastItemFocusedRow = m.lastItemFocused[0] + 1
+    contentTile = m.Tracking.getAnalyticsTile(previousItemFocused, lastItemFocusedCol, lastItemFocusedRow)
+
+    if rowItemFocused[0] >= 0
+      row = rowItemFocused[0] + 1
+    else
+      row = 1 'default row is first row.
+    end if
+
+    if rowItemFocused[1] >= 0
+      col = rowItemFocused[1] + 1
+    else
+      col = 1
+    end if
+
+    m.lastItemFocused = rowItemFocused
+
+    pageType = ""
+    if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pagetype <> invalid
+      pageType = m.top.trackingPageInfo.pagetype
+    end if
+
+    pageValues = {}
+    if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pageValues <> invalid
+      pageValues = m.top.trackingPageInfo.pageValues
+    end if
+
+    navigateWithinPageInfo = {
+      pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
+      componentOneof: m.Tracking.getAnalyticsComponent("epg_component", {content_tile: contentTile})
+      means_of_navigation: "BUTTON"
+      vertical_location: row
+      horizontal_location: col
+    }
+    m.top.navigateWithinPageInfo = navigateWithinPageInfo
+
+  end if
+
 End Function

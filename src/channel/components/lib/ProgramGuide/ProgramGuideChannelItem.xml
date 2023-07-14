@@ -6,17 +6,37 @@
   <script type="text/brightscript" uri="ProgramGuideChannelItem.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="../ExperimentMixin.brs" />
 
   <interface>
     <field id="itemContent" type="node" />
 
     <field id="focusPercent" type="float" />
 
-    <field id="rowFocusPercent" type="float" />
+    <field id="itemHasFocus" type="boolean" />
+
 
   </interface>
 
   <children>
+    <Poster
+      id="emptyStar"
+      translation="[15,15]"
+      height="21"
+      width="21"
+      visible="false"
+      uri="pkg:/images/icon-empty-star.webp"/>
+    <Poster
+      id="filledStar"
+      translation="[15,15]"
+      height="21"
+      width="21"
+      visible="false"
+      uri="pkg:/images/icon-filled-star.webp"/>
+
+
     <Poster
       id="channelPosterBG"
       height="108"

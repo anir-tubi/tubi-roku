@@ -76,6 +76,11 @@
 
       <field id="displayVideoplayerBg" type="boolean" alwaysNotify="true" />
 
+      <!-- This field is used to communicate to the video player to start back playing the video after signIn from EPG overlay -->
+      <field id="waitingForRFI" type="boolean" value="false" />
+
+      <field id="jumpToChannelItem" alias="VideoOverlay.jumpToChannelItem" />
+
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
@@ -129,7 +134,10 @@
       <!-- Timestamp of the last time we finished playing back video with this player. If -1 then we are currently playing back. -->
       <field id="timestampOfLastVideoPlayback" type="integer" value="0" />
 
+      <field id="channelLikeDislikeInfo" alias="VideoOverlay.channelLikeDislikeInfo" />
+
       <field id="isDisplayingOverlay" alias="VideoOverlay.isDisplaying" />
+
   </interface>
 
   <children>

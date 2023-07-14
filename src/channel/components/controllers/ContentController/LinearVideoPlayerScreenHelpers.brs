@@ -44,6 +44,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         videoPlayer.observeFieldScoped("linearOverlayNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
         videoPlayer.observeFieldScoped("linearOverlayComponentInteractionInfo", "onComponentInteractionInfoChange")
         videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+        videoPlayer.observeFieldScoped("channelLikeDislikeInfo", "onChannelLikeDislikeInfo")
 
         initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
         setInScreenCache(videoPlayer)
@@ -582,6 +583,10 @@ Function onLinearVideoPlayerVisibleFullscreenChange(msg)
     m.SideNav.visible = false
     m.logoGroup.visible = false
     m.clock.visible = false
+    if videoPlayer.waitingForRFI = true
+      videoPlayer.waitingForRFI = false
+      onRetryLinearPlayer()
+    end if
   end if
 End Function
 
@@ -740,9 +745,9 @@ Function reactToLinearVideoPlayerErrorState(error_message = "", errorCode = inva
       'in case of error retrieving the player content, then stop the countdown timer and stop the video player. That way, focus on stay on the current content but not automatically try to play the error content.
       if isAnEPGScreenID(videoPlayer.associatedScreenID) = true
 
-        showErrorModal(modalInfo, onRetryLinearPlayerError, invalid, resetEPGScreenContent, invalid)
+        showErrorModal(modalInfo, onRetryLinearPlayer, invalid, resetEPGScreenContent, invalid)
       else
-        showErrorModal(modalInfo, onRetryLinearPlayerError, invalid)
+        showErrorModal(modalInfo, onRetryLinearPlayer, invalid)
       end if
       stopLinearVideoContent() '//In case the video is still playing
     else
@@ -823,7 +828,7 @@ Function closeLinearVideoPlayerTransport()
 End Function
 
 
-Function onRetryLinearPlayerError()
+Function onRetryLinearPlayer()
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
     content = videoPlayer.content
@@ -840,34 +845,7 @@ End Function
 
 Function handleBackToEPGScreen(content, screenId)
   if content <> invalid
-    contentId = content.id
-    isContentPresent = doesEpgScreenHaveContent(contentId, screenId)
-    'if Content is not present in sports, news, or entertainment screen, then go back to 'all epg' screen.
-    if isContentPresent = false
-      jumpToParentScreenContentByID(contentId, "", m.constants.ui.screenIds.EPGScreen)
-      showDefaultEPGScreen()
-    else
-      ' if content is present, then go back to sports/news/entertainment screen
-      jumpToParentScreenContentByID(contentId, "", screenId)
-      popScreen(true, true)
-    end if
+    jumpToParentScreenContentByID(content.id, content.parentId, screenId)
+    popScreen(true, true)
   end if
-End Function
-
-
-'searches the contentId in timegrid content of screen with screenId.
-'@param contentId: string content Id to search
-'@param screenId: string Id of the screen to be searched for timeGridContent
-Function doesEpgScreenHaveContent(contentId, screenId) as boolean
-  screen = getFromScreenCache(screenId)
-  isContentPresent = false
-  if isAnEPGScreen(screen) = true AND screen.timeGridContent <> invalid
-    for i = 0 to screen.timeGridContent.getChildCount() - 1
-      if screen.timeGridContent.getChild(i).id = contentId
-        isContentPresent = true
-        exit for
-      end if
-    end for
-  end if
-  return isContentPresent
 End Function
