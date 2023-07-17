@@ -443,7 +443,7 @@ Function onKeyboardTextChanged()
        else
          setFocusToComponent(m.forgotPasswordBtn)
        end if
-     else if m.forgotPasswordBtn.hasFocus() = true
+     else if m.forgotPasswordBtn <> invalid AND m.forgotPasswordBtn.hasFocus() = true
        setFocusToComponent(m.ppBtn)
      end if
 
@@ -455,7 +455,7 @@ Function onKeyboardTextChanged()
      else if m.continueBtn.hasFocus() = true
        setFocusToComponent(m.password)
        m.emailHasFocus = false
-     else if m.forgotPasswordBtn.hasFocus() = true
+     else if m.forgotPasswordBtn <> invalid AND m.forgotPasswordBtn.hasFocus() = true
        setFocusToComponent(m.continueBtn)
      else if m.termsBtn.hasFocus() = true
        if bDisplayForgotPasswordButton = false
