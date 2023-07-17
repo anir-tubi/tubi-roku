@@ -1,7 +1,5 @@
 Function init()
   m.top.observeFieldScoped("focusedChild", "onFocusedChildChange")
-  m.buttonList = m.top.findNode("ButtonList")
-  m.scrollableMessage = m.top.findNode("ScrollableMessage")
 End Function
 
 
