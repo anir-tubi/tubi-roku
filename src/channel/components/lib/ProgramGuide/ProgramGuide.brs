@@ -16,6 +16,11 @@ Function init()
   ' focusedComponent will keep track of which component (programGrid or channels Grid) had last focus. This will help in handling focus back from topnav/sidenav/lienarvideoplayer.
   m.focusedComponent = "programGrid"
 
+  ' canChannelBeFocused will indicate whether linearChannelFocused should get refreshed.
+  ' when a channel is added or removed, the rowlist automatically refocuses to a neighboring channel of the previously focused content. We will also be setting a value on the .jumpToItem field to force focus on the channel we want to be focused. We do not want to set m.top.linearChannelToPlay on the default focus update, only the focus update that we force. m.canChannelBeFocused keeps state such that we don't react to the default focus updates.
+  '                                   actions and hence linearChannelFocused should not get refreshed.
+  m.canChannelBeFocused = true
+
   m.programGrid.observeFieldScoped("rowScrollFocused", "onProgramGridRowFocused")
   m.top.observeFieldScoped("jumpToLinearChannelID", "onJumpToLinearChannelID")
   m.top.observeFieldScoped("EPGFullMode", "onDisplayModeChange")
@@ -412,10 +417,12 @@ Function onChannelsGridContentFocused(msg)
     channel = m.programGrid.content.getChild(itemPosition)
 
     if m.playOnFocusMode = true OR m.top.linearChannelToPlay = invalid  'even when user is on channel logo, play the channel because otherwise whats playing does not match whats on EPG Overlay
-      if channel <> invalid AND channel.videoResources <> invalid
+      if channel <> invalid AND channel.videoResources <> invalid AND m.canChannelBeFocused = true
         m.top.linearChannelToPlay = channel
         m.top.linearChannelToPlayUpdated = true
       end if
+
+      m.canChannelBeFocused = true
     end if
 
     if channel <> invalid AND channel.getChildCount() > 0
@@ -439,6 +446,8 @@ Function onChannelsGridItemSelected(msg)
   itemSelected = msg.getData()
 
   channelItem = m.channelsGrid.content.getChild(itemSelected)
+
+  m.canChannelBeFocused = false
 
   if channelItem.selected = true
     favAction = m.constants.ui.likeDislikeActions.dislike

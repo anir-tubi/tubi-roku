@@ -525,7 +525,7 @@ Function refreshEPGScreenVideoPlay(refreshVideoPlay, epgScreen)
 
 
     if linearVideoPlayer <> invalid AND linearVideoPlayer.state = "playing"
-      if epgScreen.timeGridContent = invalid
+      if epgScreen.timeGridContent = invalid AND epgScreen.timeGridContentLoading = false
         'Anytime Video is playing and epgScreen is empty, then refresh the epgScreen.  This situation might happen when
         'when we play content directly from deeplink and epgScreen still does not have content if user presses backbutton.
         refreshEPGScreen(epgScreen)
@@ -852,10 +852,9 @@ Function removeFavoriteChannelFromEPGContent(epgContent, favChannelInfo)
       if item.id = channelId AND item.parentId = m.constants.ui.categoryIds.favorites
         epgContent.removeChild(item)
 
-        currentScreen = getcurrentScreen()
-
-        if currentScreen <> invalid AND (isAnEPGScreen(currentScreen) OR currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen)
-          currentScreen.jumpToChannelItem = i
+        'if Channel removed is from favorites category, Jump to the next channel to refresh metadata and header text.
+        if channel.parentId = m.constants.ui.categoryIds.favorites
+          jumpToEPGChannelRow(i)
         end if
 
         exit for
@@ -926,11 +925,7 @@ Function updateAllChannelsForFavorites(epgContent, favChannelInfo, isSelected)
       if item.parentId = containerId
 
         if isSelected = true OR containerId <> m.constants.ui.categoryIds.favorites
-          currentScreen = getcurrentScreen()
-
-          if currentScreen <> invalid AND (isAnEPGScreen(currentScreen) OR currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen)
-            currentScreen.jumpToChannelItem = i
-          end if
+          jumpToEPGChannelRow(i)
 
         end if
 
@@ -979,5 +974,16 @@ Function sendLinearBookmarkAnalytics(contentId, operation)
     type: "bookmark"
     values: bookmarkAnalyticsEvent
   }
+
+End Function
+
+
+Function jumpToEPGChannelRow(row)
+
+  currentScreen = getcurrentScreen()
+
+  if currentScreen <> invalid AND (isAnEPGScreen(currentScreen) OR currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen)
+    currentScreen.jumpToChannelItem = row
+  end if
 
 End Function

@@ -627,10 +627,10 @@ Function startUserExperience()
     else
       startChannelFromAppLoad()
     end if
-    
+
     ' Since braze starts sending request immediately as soon we create the task and we need to inform braze about logged in status.
     ' Delaying it until we complete the auth check. Also this prevents us from showing braze pop up on top of splash screen etc.
-    ' We noticed that if braze respondes quickly and our endpoints take time we ended up showing the braze modal before even home screen loaded. 
+    ' We noticed that if braze respondes quickly and our endpoints take time we ended up showing the braze modal before even home screen loaded.
     ' Moving it here allows the application to load required endpoints and also menu etc before we start braze.
     if getExperimentResource("roku_braze", "roku_braze_v1", true).enabled = true
       ' Configuring the braze sdk.
@@ -1359,6 +1359,7 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
+  setContentToRefresh(m.constants.ui.screenIds.linearVideoPlayerScreen)
   setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
   setContentToRefresh(m.constants.ui.screenIds.tournamentScreen)
 
@@ -1717,7 +1718,7 @@ Function onCustomSuspend(msg)
         end if
       end if
     end if
-    
+
     ' When resuming from suspending the app, Roku force restores the currFocus row back to the state that existed at the time of suspending the app.
     ' This force restore happens after we set the focus appropriately using jumpToItem which rendering our jumpToItem action useless.
     ' To work around this firmware behavior, we set the focus to the home menu item at the time of suspend so that when the app resumes, the Roku behavior will focus the correct side nav menu item. (Refreshing of home screen content will happen during resume that is inside onCustomResume method.)
