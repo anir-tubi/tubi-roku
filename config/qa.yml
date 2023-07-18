@@ -33,7 +33,7 @@ settings:
 
   # enabling showRegistrationModalAlways will show registration Intro modal every time the app is launched as non-production mode for new users.
   # This field is added for testing purpose Only
-  showRegistrationModalAlways: true
+  showRegistrationModalAlways: false
 
   #FIFA worldcup tournament start date/end date for testing purposes. Please follow the format
   tournamentStartDate: "2022-11-20T00:00:00Z"
