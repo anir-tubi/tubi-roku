@@ -4,7 +4,7 @@
    <!-- Holds the key press information -->
     <field id="kepPressed" type="string" />
     <field id="okPressed" type="boolean" alwaysNotify="true"/>
-    <field id="rowScrollFocused" type="int" alwaysNotify="true"/>
+    <field id="rowScrollFocused" type="int" value="-1"/>
   </interface>
   <script type="text/brightscript" uri="CustomEPGRowList.brs"/>
 </component>

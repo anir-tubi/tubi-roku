@@ -1804,6 +1804,18 @@ Function getTranslation_es_MX()
       "description": "Program time Title when user selects a future program on EPG.",
       "message": "Comienza en"
     },
+    "epg_favorites_toast_message": {
+      "description": "Message to be displayed on Toast-message when user favorites a lienar channel",
+      "message": "Busca favoritos en la parte superior de la guía de canales."
+    },
+    "epg_favorites_toast_header": {
+      "description": "header text to be displayed on Toast-message when user favorites a linear channel",
+      "message": "Añadido a Favoritos"
+    },
+    "epg_unfavorites_toast_header": {
+      "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
+      "message": "Eliminado de Favoritos"
+    },
     "menu_home": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
       "message": "Inicio"
@@ -1911,6 +1923,10 @@ Function getTranslation_es_MX()
     "dialog_button_continue": {
       "description": "Label of a dialog button to continue to the next step that the dialog is saying",
       "message": "Continuar"
+    },
+    "dialog_button_forgot_password": {
+      "description": "Label of a dialog button to take the user to the steps in case he/she has forgotten the account password. ",
+      "message": "Olvidé Contraseña"
     },
     "dialog_button_submit": {
       "description": "Label of the dialog button to submit what the window is asking it to do.",
@@ -2942,13 +2958,25 @@ Function getTranslation_es_MX()
       "description": "invalid password title on modal",
       "message": "Contraseña inválida"
     },
+    "invalid_oops_password_title": {
+      "description": "invalid password title on modal",
+      "message": "Uyy, contraseña incorrecta"
+    },
     "enter_password_dialog_description": {
       "description": "enter password dialog description",
       "message": "Por favor, ingresa la contraseña para tu cuenta de Tubi"
     },
+    "invalid_oops_password_description": {
+      "description": "enter password dialog description",
+      "message": "Intentémoslo de nuevo o ingrese una contraseña diferente para esta cuenta:"
+    },
     "re-enter_password_button": {
       "description": "re-enter password button text on modal",
       "message": "Ingresa tu contraseña"
+    },
+    "retry": {
+      "description": "retry button text on modal",
+      "message": "Reintentar"
     },
     "could_not_verify_email": {
       "description": "could not verify your email modal description",
@@ -3009,6 +3037,38 @@ Function getTranslation_es_MX()
     "signIn_screen_subheading": {
       "description": "Sub title on the signIn screen",
       "message": "Tu correo electrónico ya está vinculado a una cuenta de Tubi"
+    },
+    "forgotPassword_screen_heading": {
+      "description": "Title on the forgot password screen",
+      "message": "¡Ayuda está en camino!"
+    },
+    "forgotPassword_screen_instant_subheading": {
+      "description": "Sub title on the forgot password screen - instant version",
+      "message": "Ve a tu correo electrónico y haz clic en el enlace de inicio de sesión instantáneo:"
+    },
+    "forgotPassword_screen_noInstant_subheading": {
+      "description": "Sub title on the forgot password screen - no instant version",
+      "message": "Ve a tu correo electrónico y haz clic en el enlace de restablecimiento de contraseña:"
+    },
+    "forgotPassword_screen_instant_subheading2": {
+      "description": "2nd Sub title on the forgot password screen - instant version",
+      "message": "Esta pantalla se actualizará una vez que hagas clic en el enlace de tu correo electrónico."
+    },
+    "forgotPassword_screen_noInstant_subheading2": {
+      "description": "2nd Sub title on the forgot password screen - noInstant version",
+      "message": "Después de restablecer tu contraseña, haz clic aquí para intentar iniciar sesión."
+    },
+    "forgotPassword_screen_btn_resend": {
+      "description": "The button on the forgot password screen that corresponds to the action 'Resend Sign-in link",
+      "message": "Reenviar Enlace de Inicio de Sesión"
+    },
+    "forgotPassword_screen_btn_different_email": {
+      "description": "The button on the forgot password screen that corresponds to the action 'Use Different Email",
+      "message": "Usa correo electrónico diferente"
+    },
+    "forgotPassword_screen_btn_return": {
+      "description": "The button on the forgot password screen that corresponds to the action 'Return to Sign In",
+      "message": "Volver a Iniciar Sesión"
     },
     "search_hint": {
       "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
@@ -3189,6 +3249,18 @@ Function getTranslation_es_MX()
     "reg_continue_as_guest_button_title": {
       "description": "Button text to be displayed on second button of registration welcome modal",
       "message": "Continuar como Invitado"
+    },
+    "linear_educational_header": {
+      "description": "Header on the modal displayed to educate user about live TV feature",
+      "message": "Introduciéndo TV En Vivo"
+    },
+    "linear_education_sub_header": {
+      "description": "Sub Header on the modal displayed to educate user about live TV feature",
+      "message": "Nunca Pierdas el Ritmo con Noticias, Deportes, Reality y Más las 24/7. Justo a Tu Alcance."
+    },
+    "linear_education_button": {
+      "description": "Button title on the modal displayed to educate user about live TV feature",
+      "message": "Ver TV en vivo"
     },
     "replay": {
       "description": "This label used for badge to indicate the content availability",
