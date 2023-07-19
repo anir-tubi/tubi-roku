@@ -84,6 +84,9 @@ Function init()
   ' Keep track of when a user starts a path to watch a video that is contained in a sponsored container. This ID will be passed to rainmaker for an ad request and be used to play a sponsored preroll ad
   m.videoSponsorExposureId = ""
 
+  'This is will bind EPG channel api call with all related EPG program calls. Any program calls returned because of previous epg channel list will be discarded.
+  m.epgFetchUniqueId = 0
+
   ' Set up global services
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
   m.global.addField("metadataFetchTask", "node", false)

@@ -3,7 +3,7 @@
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
 Function parseEPGChannelIdsSuccess(fullResponse, reqInfo)
   parsedResponse = fullResponse.data
-  epgChannelIdsResponse = m.metadataTranslate.translateEPGChannelIds(parsedResponse, reqInfo.requestorID, reqInfo.isSignedInUser)
+  epgChannelIdsResponse = m.metadataTranslate.translateEPGChannelIds(parsedResponse, reqInfo.requestorID, reqInfo.isSignedInUser, reqInfo.id)
   return epgChannelIdsResponse
 End Function
 
@@ -15,6 +15,7 @@ Function parseEPGChannelIdsError(fullResponse, reqInfo)
   return {
     code: getErrorCodeFromResponse(fullResponse)
     requestorID: reqInfo.requestorID
+    fetchId: reqInfo.fetchId
   }
 End Function
 
@@ -30,7 +31,7 @@ Function parseEPGProgramsSuccess(fullResponse, reqInfo)
     isSignedInUser = reqInfo.isSignedInUser
   end if
 
-  epgProgramsResponse = m.metadataTranslate.translateEPGPrograms(parsedResponse, reqInfo.requestorID, isSignedInUser)
+  epgProgramsResponse = m.metadataTranslate.translateEPGPrograms(parsedResponse, reqInfo.requestorID, isSignedInUser, reqInfo.fetchId)
   return epgProgramsResponse
 End Function
 

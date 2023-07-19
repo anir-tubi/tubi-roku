@@ -1320,6 +1320,13 @@ Function afterSignInLikeDislikeLinear(channelInfo)
     popScreenAfterSignInProcess()
     showHideSpinner(false)
     showHideLogo(m.constants.logoType.hide) ' for epgScreen or linearVideoplayerscreen do not show any logo
+    ' if user signIn on linearVideoplayer overlay then we need to pull fresh data because
+    ' EPG overlay data is pulled only when videoplayer maximizes.
+    currentScreen = getCurrentScreen()
+    if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.linearVideoPlayerScreen
+      getDataForVideoPlayerTimeGrid()
+    end if
+
     updateLikeDislikeLinear(channelInfo)
   end if
 

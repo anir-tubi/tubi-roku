@@ -1093,7 +1093,7 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, co
       while(children.count() > 56)
         children.pop()
       end while
-      
+
       container.children = children
     end if
 
@@ -1904,12 +1904,14 @@ End Function
 '
 '
 ' @contentToTranslate: AA, json parsed response from the epgChannelIds endpoint
-Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, requestorID, isUserSignedIn = false) As Object
+Function tubiMetadataTranslate_translateEPGChannelIds(contentToTranslate, requestorID, isUserSignedIn = false, fetchId = 0) As Object
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateEPGChannelIds")
 
   translated = CreateObject("roSGNode", "ContentNode")
   translated.addField("requestorID", "string", false)
   translated.requestorID = requestorID
+  translated.addField("fetchId", "string", false)
+  translated.fetchId = fetchId
   translated.id = m.constants.ui.contentIds.timeGridContent
 
   if contentToTranslate <> invalid AND contentToTranslate.contents <> invalid AND contentToTranslate.containers <> invalid
@@ -2027,12 +2029,13 @@ End Function
 
 
 ' @contentToTranslate: AA, json parsed response from the epgProgramming endpoint
-Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requestorID, isUserSignedIn = false )
+Function tubiMetadataTranslate_translateEPGPrograms(contentToTranslate, requestorID, isUserSignedIn = false, fetchId = 0 )
   tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateEPGPrograms()")
   contentNode = CreateObject("roSGNode", "ContentNode")
   channelArray= []
   updateAA = {
     "requestorID": requestorID
+    "fetchId": fetchId
     "children": channelArray
   }
 

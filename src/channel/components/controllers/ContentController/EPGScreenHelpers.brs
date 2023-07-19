@@ -121,7 +121,8 @@ Function fetchEPGChannels(screen, mode = "tubitv_us_linear")
   screen.timeGridContentLoading = true
   screen.timeGridContent = invalid 'a fresh start
   isSignedIn = isLoggedInUser()
-  m.makeRequest({
+
+  channelRequest = m.makeRequest({
     url : epgContainerInfo.url
     requestType : m.constants.reqNames.getEPGChannelIds
     options : epgContainerInfo.options
@@ -131,6 +132,11 @@ Function fetchEPGChannels(screen, mode = "tubitv_us_linear")
     requestorID : screen.ID
     isSignedInUser: isSignedIn
   })
+
+  ' Store the unique ID associated with channel request to identify the program requests created using response from above api call.
+  ' If there any EPG program calls returned which does not belong to current epgFetchUniqueId, will be discarded.
+  m.epgFetchUniqueId = channelRequest.id
+
 End Function
 
 
@@ -205,7 +211,7 @@ Function onEpgChannelListResponse(response)
       screen = getCurrentScreen()
     end if
 
-    if screen.id = response.requestorID
+    if screen.id = response.requestorID AND m.epgFetchUniqueId = response.fetchId
       if getExperimentResource("roku_linear_favorites", "roku_linear_favorites_v1", false).enabled = true
         response = addFavoritesToEPGResponse(response)
       end if
@@ -313,6 +319,7 @@ Function makeEPGProgramCalls(requestorID, nFetchInBatch = 10)
       errorCallback : onEpgProgramError
       responseType : "node"
       requestorID : requestorID
+      fetchId: m.epgFetchUniqueId
       isSignedInUser: isSignedIn
     })
   end if
@@ -330,7 +337,8 @@ Function onEPGProgramSuccess(response)
     screen = getCurrentScreen()
   end if
 
-  if response.requestorID = screen.id
+  'Discard the response if it is intended for different screen And also if there any EPG program calls returned which does not belong to current epgFetchUniqueId, will be discarded.
+  if response.requestorID = screen.id AND m.epgFetchUniqueId = response.fetchId
     appendOrAddTimeGridNewContents(response, screen)
 
     if screen.timeGridContentLoading = true
@@ -355,7 +363,7 @@ Function onEpgProgramError(response)
   tubiLog("EPGScreenHelpers.onEpgProgramError ")
   screen = getCurrentScreen()
   'Check if the screen which requested the program info is the current Screen and user not moved away from this Screen. (especially in case of request timeout or slow internet cases)
-  if screen <> invalid AND response <> invalid AND screen.id = response.requestorID AND response.contentId <> invalid AND screen.timeGridContent <> invalid
+  if screen <> invalid AND response <> invalid AND screen.id = response.requestorID AND m.epgFetchUniqueId = response.fetchId AND response.contentId <> invalid AND screen.timeGridContent <> invalid
     if screen.timeGridContent.getChildCount() > 0
       'Since a batch of programs errored out, set the validUntil to 0 so that next time, content will refetch.
       screen.timeGridContent.getChild(0).validUntil = 0
