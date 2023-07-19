@@ -28,11 +28,11 @@ Function init()
   m.newPasswordLink = m.top.findNode("newPasswordLink")
   m.newPasswordLink.text = getTranslation("new_password_link")
 
-  bDisplayForgotPasswordButton = (getExperimentResource("roku_signin_password_reset", "roku_signin_password_reset_v1", true).enabled = true)
+  bDisplayForgotPasswordButton = (getExperimentResource("roku_registration_signin_password_reset", "roku_registration_signin_password_reset_v2", true).enabled = true)
   
   m.forgotPasswordBtn = invalid  
   if bDisplayForgotPasswordButton = true
-    '//::TODO::roku_signin_password_reset_v1 - if experiment is graduated, then set the button in the XML and remove everything related to newPasswordLayout
+    '//::TODO::roku_registration_signin_password_reset_v2 - if experiment is graduated, then set the button in the XML and remove everything related to newPasswordLayout
     m.forgotPasswordBtn = CreateObject("roSGNode", "SimpleButton")
     m.forgotPasswordBtn.id = "forgotPasswordBtn"
     m.forgotPasswordBtn.text = getTranslation("dialog_button_forgot_password")
@@ -405,7 +405,7 @@ Function onKeyboardTextChanged()
    m.password.text = m.keyboard.text
  end if
 
- bDisplayForgotPasswordButton = (getExperimentResource("roku_signin_password_reset", "roku_signin_password_reset_v1", false).enabled = true)
+ bDisplayForgotPasswordButton = (getExperimentResource("roku_registration_signin_password_reset", "roku_registration_signin_password_reset_v2", false).enabled = true)
          
  handled = true
  if press

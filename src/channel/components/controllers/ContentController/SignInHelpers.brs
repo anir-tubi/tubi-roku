@@ -167,14 +167,14 @@ End Function
 Function displayForgotPasswordProcessingScreen()
   TubiLog("SignInHelpers.displayForgotPasswordProcessingScreen")
 
-  '//::TODO::roku_signin_password_reset_v1 if the experiment is graduated, then create a ForgotPassword Helper
+  '//::TODO::roku_registration_signin_password_reset_v2 if the experiment is graduated, then create a ForgotPassword Helper
   currentScreen = getCurrentScreen()
   if currentScreen <> invalid AND currentScreen.getSubtype() =  "SignInScreen"
     '//in case we go back to this screen via the screen stack, reset focus so it has the focus on the password textfield
     currentScreen.setFocusToPassword = true
   end if
 
-  bForgotPasswordButtonInstant = (getExperimentResource("roku_signin_password_reset", "roku_signin_password_reset_v1", false).instant = true)
+  bForgotPasswordButtonInstant = (getExperimentResource("roku_registration_signin_password_reset", "roku_registration_signin_password_reset_v2", false).instant = true)
 
   forgotPasswordProcessingScreen = CreateObject("roSGNode", "ForgotPasswordProcessingScreen")
   forgotPasswordProcessingScreen.id = m.constants.ui.screenIds.forgotPasswordProcessingScreen
@@ -627,7 +627,7 @@ Function onSignInError(errorResponse)
   }
 
 
-  bSignInExperiment = (getExperimentResource("roku_signin_password_reset", "roku_signin_password_reset_v1", false).enabled = true)
+  bSignInExperiment = (getExperimentResource("roku_registration_signin_password_reset", "roku_registration_signin_password_reset_v2", false).enabled = true)
 
   if bSignInExperiment = true
 

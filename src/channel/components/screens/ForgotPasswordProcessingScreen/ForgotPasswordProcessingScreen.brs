@@ -120,14 +120,14 @@ End Function
 
 ' The changeEmail button was clicked, let the helper know about this.
 Function onChangeEmailSelected()
-  '//::TODO::roku_signin_password_reset_v1 - this can be changed to an alias if the experiment is graduated.
+  '//::TODO::roku_registration_signin_password_reset_v2 - this can be changed to an alias if the experiment is graduated.
   m.top.selectedDifferentEmail = true
 End Function 
 
 
 ' The returnToSignIn button was clicked, let the helper know about this.
 Function onReturnSignInSelected()
-  '//::TODO::roku_signin_password_reset_v1 - this can be changed to an alias if the experiment is graduated.
+  '//::TODO::roku_registration_signin_password_reset_v2 - this can be changed to an alias if the experiment is graduated.
   m.top.signInSelected = true
 End Function 
 
