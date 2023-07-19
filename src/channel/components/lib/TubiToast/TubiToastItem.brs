@@ -87,6 +87,8 @@ Function onShow(msg)
     if inputArgs.messageColor <> invalid AND inputArgs.messageColor <> ""
       m.infoPaneText.color = inputArgs.messageColor
     end if
+  else
+    m.infoPaneMsgArea.removeChild(m.infoPaneText)
   end if
 
   'Calculations of various required fields

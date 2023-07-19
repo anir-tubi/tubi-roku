@@ -746,8 +746,8 @@ Function onChannelLikeChangedSuccess(requestBody)
       headerText = getTranslation("epg_favorites_toast_header")
       showToast({"message": message, "selfDestructTimer": 5, "imageUri": "pkg:/images/icon-black-star.webp", "headerText": headerText})
     else
-      message = getTranslation("epg_unfavorites_toast_header")
-      showToast({ "selfDestructTimer": 5, "imageUri": "pkg:/images/icon-black-star.webp", "message": message})
+      headerText = getTranslation("epg_unfavorites_toast_header")
+      showToast({ "selfDestructTimer": 5, "imageUri": "pkg:/images/icon-black-star.webp", "headerText": headerText})
     end if
   end if
 
