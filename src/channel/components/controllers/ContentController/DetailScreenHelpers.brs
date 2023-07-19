@@ -191,12 +191,9 @@ Function setDetailStrings(screen, content)
     screen.stringPlayButton = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
   else '// KEEP BELOW CODE ONCE FIFA WORLD CUP IS DONE
     screen.stringSignUpButton = getTranslation("registration_signup_button") + ";" + getTranslation("registration_signup_button_free")
+    
     history = getHistory(content.id)
-    if history = invalid
-      screen.stringPlayButton = getTranslation("screenDetails_button_play")
-    else
-      screen.stringPlayButton = getTranslation("screenDetails_button_startOver")
-    end if
+    setIsHistory(screen, history)
   end if
 End Function
 
@@ -1179,6 +1176,13 @@ End Function
 Function setIsHistory(detailScreen, isHistory)
   'reset the value in the case that remove from history button was pressed and title is currently "Removing..."
   detailScreen.stringNoHistoryButton = getTranslation("screenDetails_button_noHistory")
+
+  if isHistory = true
+    detailScreen.stringPlayButton = getTranslation("screenDetails_button_startOver")
+  else
+    detailScreen.stringPlayButton = getTranslation("screenDetails_button_play")
+  end if
+
   detailScreen.isHistory = isHistory
 End Function
 
