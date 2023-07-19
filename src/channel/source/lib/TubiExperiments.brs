@@ -86,7 +86,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_hevc_non4k: {
-        roku_hevc_non4k_v1: {"enabled": false}
+        roku_hevc_non4k_v1: {"enabled": true}
       }
 
       roku_linear_favorites: {
