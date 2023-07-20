@@ -29,23 +29,8 @@ End Function
 
 
 Function onInAppMessageTriggered(msg)
-  message = msg.getData()
-  ' Due to legal requirement ignoring all messages in kids mode or parental rating is below teen then queuing the message.
-  if isKidsUIOn() = true
-    ' Queueing the message to be displayed whenever user exits kids mode.
-    ' For now we will support only one message queue. If at all we need to more flexible will add in future.
-    m.queuedInAppMessage = message
-  else
-    currentScreen = getCurrentScreen()
-    ' If the screen loading is in progress not displaying the modal.
-    ' Delaying it until the screen loading is complete.
-    if currentScreen <> invalid AND currentScreen.isLoading = true
-      currentScreen.observeFieldScoped("isLoading", "onScreenLoadingChange")
-      m.queuedInAppMessage = message
-    else
-      processInAppMessage(message)
-    end if
-  end if
+  m.queuedInAppMessage = msg.getData()
+  processQueuedInAppMessage()
 End Function
 
 
@@ -53,17 +38,28 @@ Function onScreenLoadingChange(msg)
   isLoading = msg.getData()
 
   if isLoading = false
-    processInAppMessage(m.queuedInAppMessage)
     currentScreen = msg.getRoSGNode()
     currentScreen.unobserveFieldScoped("isLoading")
+    processQueuedInAppMessage()
   end if
 End Function
 
 
 Function processQueuedInAppMessage()
+  currentScreen = getCurrentScreen()
   ' Only processing if we are in adult or teen mode.
-  if isKidsUIOn() = false
-    processInAppMessage(m.queuedInAppMessage)
+  ' Restricting the display to only whitelisted screens.
+  ' If the screen loading is in progress not displaying the modal.
+  ' Delaying it until the screen loading is complete.
+  whitelistedScreenIds = {}
+  whitelistedScreenIds[m.constants.ui.screenIds.homeScreen] = true
+  if m.queuedInAppMessage <> invalid AND isKidsUIOn() = false AND currentScreen <> invalid AND whitelistedScreenIds.DoesExist(currentScreen.id) = true
+    if currentScreen.isLoading = true
+      currentScreen.observeFieldScoped("isLoading", "onScreenLoadingChange")
+    else
+      processInAppMessage(m.queuedInAppMessage)
+      m.queuedInAppMessage = invalid
+    end if
   end if
 End Function
 

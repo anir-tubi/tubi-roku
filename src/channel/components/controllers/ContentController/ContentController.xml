@@ -76,6 +76,7 @@
   <script type="text/brightscript" uri="pkg:/components/tasks/BrazeTask/BrazeSDK.brs"/>
   <script type="text/brightscript" uri="BrazeHelpers.brs"/>
   <script type="text/brightscript" uri="ScreenNavigationHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/ArrayUtils.brs" />
 
   <interface>
 

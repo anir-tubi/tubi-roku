@@ -231,6 +231,8 @@ Function onScreenChange()
     bSideNavVisible = (m.constants.ui.sideNavOpenIds[currentScreen.id] = true)
     m.sideNav.visible = bSideNavVisible
   end if
+  ' Processing any queued braze messaging if they are queued due to being in non whitelisted screens.
+  processQueuedInAppMessage()
 End Function
 
 

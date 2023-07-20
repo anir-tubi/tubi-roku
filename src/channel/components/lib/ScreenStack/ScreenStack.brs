@@ -27,12 +27,15 @@ Function onPop()
   newCurrent = getCurrent()
   if newCurrent <> invalid
     m.top.current = newCurrent
-    m.top.currentUpdated = true
     newCurrent.setFocus(true)
     newCurrent.visible = true
     if newCurrent.hasField("enabled") = true
       newCurrent.enabled = true
     end if
+    ' Setting the currentUpdated field to true after the new screen is setfocus.
+    ' If we do not do it after the new screen recieves focus.
+    ' Because if we set it before the newCurrent.setFocus(true) than if we use the currentUpdated and display a modal for example will result in modal loosing focus because we re-setting focus to screen.
+    m.top.currentUpdated = true
   else
     m.top.isEmpty = true
   end if
