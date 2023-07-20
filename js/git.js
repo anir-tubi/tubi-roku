@@ -447,7 +447,8 @@ async function buildQaChanges(done) {
   const prodBranch = getProductionBranchName();
   const currentBranch = getCurrentBranch(done);
 
-  const pullRequestCommits = await findPullRequestCommitDifferences(done, currentBranch, prodBranch);
+  let pullRequestCommits = await findPullRequestCommitDifferences(done, currentBranch, prodBranch);
+  pullRequestCommits = pullRequestCommits.reverse();
 
   const qaChangesData = [];
   const qaChangesText = [];
