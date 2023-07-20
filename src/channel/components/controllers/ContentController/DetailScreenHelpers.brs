@@ -193,7 +193,8 @@ Function setDetailStrings(screen, content)
     screen.stringSignUpButton = getTranslation("registration_signup_button") + ";" + getTranslation("registration_signup_button_free")
     
     history = getHistory(content.id)
-    setIsHistory(screen, history)
+    isHistory = (history <> invalid)
+    setIsHistory(screen, isHistory)
   end if
 End Function
 
