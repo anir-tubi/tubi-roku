@@ -78,7 +78,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_registration_component_over_homegrid: {
-        roku_registration_component_over_homegrid_v1: {"enabled": false}
+        roku_registration_component_over_homegrid_v1: {"enabled": true}
       }
 
       roku_braze: {
