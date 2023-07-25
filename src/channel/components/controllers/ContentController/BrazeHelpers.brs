@@ -11,20 +11,18 @@ End Function
 
 
 Function setBrazeUserData(authInfo)
-  if getExperimentResource("roku_braze", "roku_braze_v1", false).enabled = true
-    m.braze.setCustomAttribute("preferred_device_id", m.constants.deviceInfo.deviceId)
-    if authInfo <> invalid AND authInfo.userId <> invalid
-      m.braze.setUserId(authInfo.userId)
-      if authInfo.email <> invalid
-        m.braze.setEmail(authInfo.email)
-      end if
-    else
-      ' Setting device id as the unique id.
-      m.braze.setUserId(m.constants.deviceInfo.deviceId)
+  m.braze.setCustomAttribute("preferred_device_id", m.constants.deviceInfo.deviceId)
+  if authInfo <> invalid AND authInfo.userId <> invalid
+    m.braze.setUserId(authInfo.userId)
+    if authInfo.email <> invalid
+      m.braze.setEmail(authInfo.email)
     end if
-    ' Doing it as per recommendation from the braze sdk documentation.
-    m.brazeTask.BrazeInAppMessage = invalid
+  else
+    ' Setting device id as the unique id.
+    m.braze.setUserId(m.constants.deviceInfo.deviceId)
   end if
+  ' Doing it as per recommendation from the braze sdk documentation.
+  m.brazeTask.BrazeInAppMessage = invalid
 End Function
 
 
