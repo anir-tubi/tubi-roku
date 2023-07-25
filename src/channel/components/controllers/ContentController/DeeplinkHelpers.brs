@@ -15,7 +15,7 @@
 ' Deep link args:
 '   contentId    - string identifier
 '   entry        - 'banner' or omitted for search source
-'   mediaType    - "season", "series", "episode", "movie", "shortform", and "livefeed"
+'   mediaType    - "season", "series", "episode", "movie", "shortform", "tvspecial" and "livefeed"
 '   entry        - string, custom parameter, used for tracking the source of deeplinks, passed to referred analytics events
 '   deviceId     - string, custom paramater, the device id of the device sending the deeplink (used when mobile "casts" to roku)
 '   resumeTime   - integer, custom paramater, the position from which a deeplink should resume (used when mobile "casts" to roku)
@@ -84,7 +84,7 @@ Function createDeeplinkContentFromStartupArgs(args)
     else if args.mediaType = "season"
       content.type = "series"
       content.deeplinkType = "season"
-    else if args.mediaType = "movie"
+    else if args.mediaType = "movie" OR args.mediaType = "tvspecial"
       content.type = "video"
       content.deeplinkType = "movie"
     else if args.mediaType = "episode"
@@ -281,7 +281,7 @@ Function handleDeeplinkContentByType()
         getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeasonContentSuccess, handleSingleContentDeeplinkError)
       end if
 
-    else if m.deepLinkContent.deeplinktype = "movie"
+    else if m.deepLinkContent.deeplinktype = "movie" OR m.deepLinkContent.deeplinktype = "tvspecial"
       playbackSource = getPlaybackSourceForDeeplinkType()
       showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource)
 
@@ -899,7 +899,7 @@ Function handleSingleContentDeeplinkError(error)
   if m.enteredFromDeepLink = false AND m.deepLinkContent <> invalid
     'only in case of the movie, we have already sneaked the showdetail screen, so we need to
     'bring the user to previous screen.
-    if m.deepLinkContent.deeplinktype = "movie" OR m.deepLinkContent.deeplinktype = "sports"
+    if m.deepLinkContent.deeplinktype = "movie" OR m.deepLinkContent.deeplinktype = "sports" OR m.deepLinkContent.deeplinktype = "tvspecial"
       detailScreen = getTopDetailScreenFromStack()
       if detailScreen <> invalid AND detailScreen.content.id = m.deepLinkContent.id
         'Simply popping the screen is resulting in issues, so calling onDetailBackPressed function.
