@@ -44,6 +44,8 @@ Function onItemFocused(msg)
   else if buttonFocused = 2
     currExperiments = getCurrentExperiments()
     m.infoArea.text = "Experiments enabled:" + chr(10) + chr(10) + currExperiments
+  else if buttonFocused = 3
+    m.infoArea.text = "It will overlay all the screens with safe zone guidelines."
   end if
 
 End Function
@@ -72,7 +74,20 @@ Function onTestingAidPanelItemSelected(msg)
     clearRegistry()
   else if item.id = "showEnabledExp"
     showCurrentExperiments()
+  else if item.id = "safeZone"
+
+    safeZone = getSafeZone()
+
+    if safeZone = invalid
+      item.title = "Hide Safe Zone Image"
+      showSafeZoneImage(safeZone)
+    else
+      item.title = "Show Safe Zone Image"
+      hideSafeZoneImage(safeZone)
+    end if
+
   end if
+
 End Function
 
 
@@ -154,4 +169,52 @@ Function clearRegistry()
   registry.Flush()
   'after registry been deleted restart the app.
   m.top.appRestartRequested = true
+End Function
+
+
+'this function will return the safeZone node if it is already present as a child to the Scene.
+'else it will return invalid.
+Function getSafeZone()
+  safeZone = invalid
+
+  for each child in m.top.getScene().getChildren(-1, 0)
+    if child.id = "safeZoneImage"
+      safeZone = child
+      exit for
+    end if
+  end for
+
+  return safeZone
+End Function
+
+
+Function showSafeZoneImage(safeZone)
+
+  if safeZone = invalid
+    safeZone = createObject("roSGNode", "Poster")
+
+    'CDN image has HD/FHD - all caps and $$RES$$ resolves to 'hd/fhd' - all small.
+    'so use ScaleUi Constant value to determine the correct images.
+    if m.constants.deviceInfo.scaledUi = true
+      res = "HD"
+    else
+      res="FHD"
+    end if
+
+    safeZone.uri = "https://cdn.adrise.tv/image/roku_support_images/Outline-Roku-Safe-Zones-" + res + ".png"
+    safeZone.translation = "[0,0]"
+    safeZone.id = "safeZoneImage"
+  end if
+
+  m.top.getScene().appendChild(safeZone)
+
+End Function
+
+
+Function hideSafeZoneImage(safeZone)
+
+  if safeZone <> invalid
+    m.top.getScene().removeChild(safeZone)
+  end if
+
 End Function

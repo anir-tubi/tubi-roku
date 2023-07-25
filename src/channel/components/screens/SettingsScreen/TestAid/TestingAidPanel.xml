@@ -57,6 +57,9 @@
             <CheckButtonContentNode
               id="showEnabledExp"
               title="Show Current Experiments"/>
+            <CheckButtonContentNode
+              id="safeZone"
+              title="Show/Hide Safe Zone Image"/>
           </ContentNode>
         </MarkupList>
 
