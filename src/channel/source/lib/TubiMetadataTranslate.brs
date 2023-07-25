@@ -1085,7 +1085,15 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, co
 
     childrenCount = container.children.count()
 
-    seeAllFeatureWithPositionAA = isSeeAllFeatureShownWithPosition(childrenCount, m.experiments)
+    if screenId = m.constants.ui.screenIds.myStuffScreen
+      seeAllFeatureWithPositionAA = {
+        isSeeAllFeatureShown: false
+        insertPosition: -1
+      }
+    else
+      seeAllFeatureWithPositionAA = isSeeAllFeatureShownWithPosition(childrenCount, m.experiments)
+    end if
+
     insertPosition = seeAllFeatureWithPositionAA.insertPosition
 
     if seeAllFeatureWithPositionAA.isSeeAllFeatureShown = true AND insertPosition = 56 AND (uiMode = m.constants.ui.modes.standard OR uiMode = m.constants.ui.modes.latino)
