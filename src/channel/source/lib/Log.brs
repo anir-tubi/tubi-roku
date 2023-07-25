@@ -118,6 +118,13 @@ End Function
 Function tubiLog_exception(message = "" as Dynamic, level = "exception" as String, queue = invalid as Object, samplePercent = 1.0 as Float) as void
   m.printLogInfo(level, "", message)
 
+  '// REMOVE below block when we do next submission release(higher than 2.21), since it is handled already in main.brs
+  if type(message) = "roAssociativeArray"
+    if message.name = "EXIT_SETTINGS_UPDATE"
+      return
+    end if
+  end if
+
   if isSampled(samplePercent) = true AND m.sentry <> invalid
     tubiToSentry = {}
     tubiToSentry[m.logConsts.error.name] = "error"
