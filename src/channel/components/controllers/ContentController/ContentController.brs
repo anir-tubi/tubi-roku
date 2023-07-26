@@ -164,7 +164,7 @@ Function init()
 
   ' QA TESTING PURPOSE: below block can be removed during onboarding graduation.
   ' By clearing registry, QA can turn 'showOnboardingAlways' back to false in .yml and make sure onboarding screen is shown for next launch.
-  if m.constants.settings.showOnboardingAlways = true OR m.constants.settings.showRegistrationModalAlways = true
+  if m.constants.settings.hideStartupModals <> true AND (m.constants.settings.showRegistrationModalForNewUser = true OR m.constants.settings.showOnboardingAlways = true)
     m.global.isNewUser = true
     Auth.clearFirstVisit()
   end if

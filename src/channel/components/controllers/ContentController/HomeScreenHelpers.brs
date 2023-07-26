@@ -917,9 +917,17 @@ Function onHomescreenContentReady(msg)
     if currentScreen <> invalid AND currentScreen.isSubType("HomeScreen") = true
       screenTrackingLoad(homeScreen.trackingPageInfo, loadTime)
 
+      if m.constants.settings.mode = "qa"
+        ' This is only to support QA for suit test.
+        if m.constants.settings.hideStartupModals <> true
+          if m.constants.settings.showRegistrationModalForNewUser = true AND isNewUser() = true AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND isLoggedInUser() = false
+            showRegistrationWelcomeModal()
+          end if
+        end if
+
       'show registration welcome Screen only to new user over homescreen.
       'we need to check if user already signed up in detail Screen if they have entered through deeplink.
-      if isNewUser() = true AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND isLoggedInUser() = false AND getExperimentResource("roku_registration_component_over_homegrid", "roku_registration_component_over_homegrid_v1", true).enabled = true
+      else if isNewUser() = true AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND isLoggedInUser() = false AND getExperimentResource("roku_registration_component_over_homegrid", "roku_registration_component_over_homegrid_v1", true).enabled = true
         showRegistrationWelcomeModal()
       end if
     end if

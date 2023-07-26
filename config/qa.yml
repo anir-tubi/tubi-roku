@@ -31,9 +31,18 @@ settings:
   # This field is added for testing purpose
   showFIFAIntroModalAlways: false
 
-  # enabling showRegistrationModalAlways will show registration Intro modal every time the app is launched as non-production mode for new users.
+  # enabling showRegistrationModalForNewUser will show registration Intro modal every time the app is launched as non-production mode for new users.
   # This field is added for testing purpose Only
-  showRegistrationModalAlways: false
+  showRegistrationModalForNewUser: false
+
+
+  # disabling hideStartupModals will let other showmodal flags to work as set. For example,
+  # if hideStartupModals=false and showRegistrationModalForNewUser=true ===> registration modal will be shown for new user
+  # if hideStartupModals=false and showFIFAIntroModalAlways=true ====> FIFA modal will be shown
+  # if hideStartupModals=true ==> no startup modals are shown irrespective off individual state
+  hideStartupModals: true
+
+
 
   #FIFA worldcup tournament start date/end date for testing purposes. Please follow the format
   tournamentStartDate: "2022-11-20T00:00:00Z"
