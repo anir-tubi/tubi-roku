@@ -161,6 +161,7 @@ Function playContent()
       video_codec_type: codeType
       video_resolution: resolution
       is_fullscreen: isFullScreen
+      input_device: "UNKNOWN_DEVICE" 'InputDevice enum
     }
   })
 

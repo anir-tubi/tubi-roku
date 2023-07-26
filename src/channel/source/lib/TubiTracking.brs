@@ -368,6 +368,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       video_codec_type: "" ' The codec type of video resource
       video_resolution: "" 'The resolution of video resource
       is_fullscreen: true 'the video player is being played in full screen format
+      input_device: ""  'InputDevice enum
     }
 
     live_play_progress: {
