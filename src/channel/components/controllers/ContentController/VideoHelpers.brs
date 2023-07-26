@@ -102,7 +102,6 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     videoPlayer.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     videoPlayer.observeFieldScoped("getPauseAd", "onGetPauseAd")
     videoPlayer.observeFieldScoped("sendPauseAdPixel", "onSendPauseAdPixel")
-    videoPlayer.observeFieldScoped("isPauseAdDisplayed", "onPauseAdDisplayed")
     videoPlayer.observeFieldScoped("audioTrackSettings", "onAudioTrackSettingsChange")
     initVideoTracking(videoPlayer) 'initializeYoubora
     setInScreenCache(videoPlayer)
@@ -116,7 +115,6 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
   ' Moving it out so that we always pass the updated value even when screen is obtained from cache.
   if m.serverPersistentData <> invalid
     videoPlayer.preferredAudioTrack = m.serverPersistentData.audioTrack
-    videoPlayer.pauseAdDeviceCap = m.serverPersistentData.pauseAdDeviceCap
   end if
 
   stopVideoPreviewIfPlaying() 'stop videopreview just in case it is playing
@@ -1179,23 +1177,6 @@ Function onAudioTrackSettingsChange(msg)
     saveServerPersistentData({
       "audioTrack": selectedAudioTrack
     })
-  end if
-End Function
-
-
-Function onPauseAdDisplayed(msg)
-  videoPlayer = msg.getRoSGNode()
-  isPauseAdDisplayed = msg.getData()
-
-  if isPauseAdDisplayed = true
-    currentPauseAdDeviceCap = m.serverPersistentData.pauseAdDeviceCap
-    saveServerPersistentData({
-      "pauseAdDeviceCap": currentPauseAdDeviceCap + 1
-    }, "device")
-
-    if videoPlayer <> invalid
-      videoPlayer.pauseAdDeviceCap = m.serverPersistentData.pauseAdDeviceCap
-    end if
   end if
 End Function
 

@@ -39,10 +39,6 @@ settings:
   tournamentStartDate: "2022-11-20T00:00:00Z"
   tournamentEndDate: "2022-12-18T00:00:00Z"
 
-  #pauseAdStartDate, pauseAdEndDate is added for QA testing purpose. format eg. 2023-06-20T07:00:00Z
-  pauseAdStartDate: ""
-  pauseAdEndDate: ""
-
   # A date which will be used as the current date within the app. Use this to simulate a date in the past or future. If a date is provided this gets converted to a time offset in seconds to allow testing of features only available at a particular time
   # testingTimeOffset: "2023-02-12T20:00:00Z"
 

@@ -101,9 +101,6 @@
        <!-- sendPendingPauseAdPixel will be set when user press home key from remote -->
       <field id="sendPendingPauseAdPixel" type="boolean" alwaysNotify="true"/>
 
-      <!-- Holds the preferences->pauseAdDeviceCap value obtained from backend. either user or device level.  -->
-      <field id="pauseAdDeviceCap" type="integer" />
-
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
@@ -172,10 +169,6 @@
 
       <!-- this field is triggered when the user pauses the video. This will let the helper know to get the pauseAd overlay info.-->
       <field id="getPauseAd" type="boolean" alwaysNotify="true"/>
-
-      <!-- pauseAdDisplayed helps to find out whether pauseAd is displayed or not. Based on this, the pauseAdDeviceCap is stored -->
-      <!-- isPauseAdDisplayed can be removed once experiment is graduated -->
-      <field id="isPauseAdDisplayed" type="boolean" alwaysNotify="true"/>
 
       <!-- pixelUrl to fire during pause ad -->
       <field id="sendPauseAdPixel" type="string" alwaysNotify="true"/>

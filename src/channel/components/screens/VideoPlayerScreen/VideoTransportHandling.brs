@@ -8,7 +8,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
       ' Resetting the timer when there is any user interaction during pause
       if m.pauseAdOverlayTimer.control = "start"
-        restartPauseAdTimer(5)
+        restartPauseAdTimer()
       end if
 
       if key = "OK"
@@ -300,22 +300,12 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
 
   if m.top.isTrailer = false and m.top.hasFocus() = true
 
-    if getExperimentResource("roku_pause_ads", "roku_pause_ads_v2", false).enabled = true
-
-      if m.isPauseAdReqInProgress = false AND m.isPixelFiredForCurrentPauseAd = true
-        resetPauseAd()
-        resetPauseAdTimers()
-        m.isPauseAdReqInProgress = true
-        ' // REMOVE duration which are added dynamically as we have default value in VideoPlayerScreen.xml, when we graduate roku_pause_ads_v2
-        m.pauseAdOverlayTimer.duration = 5
-        startPauseAdTimer()
-        m.top.getPauseAd = true
-      end if
-
-    else
+    if m.isPauseAdReqInProgress = false AND m.isPixelFiredForCurrentPauseAd = true
+      resetPauseAd()
       resetPauseAdTimers()
-      m.pauseAdOverlayTimer.duration = 5
+      m.isPauseAdReqInProgress = true
       startPauseAdTimer()
+      m.top.getPauseAd = true
     end if
 
   end if
@@ -1231,33 +1221,7 @@ End Function
 Function onPauseAdOverlayTimer()
   m.pauseAdOverlay.unobserveFieldScoped("posterLoadStatus")
 
-  currentUTCTimeInSecs = getCurrentUTCTime()
-  pauseAdStartDate = m.constants.pauseAdExp.startDate
-  pauseAdEndDate = m.constants.pauseAdExp.endDate
-
-  ' //BELOW BLOCK IS ADDED FOR QA TESTING. QA can change the dates on <env>.yml file for testing pauseAd experiment
-  if m.constants.settings.mode <> "production"
-    if isNonEmptyString(m.constants.settings.pauseAdStartDate)
-      pauseAdStartDate = m.constants.settings.pauseAdStartDate
-    end if
-    if isNonEmptyString(m.constants.settings.pauseAdEndDate)
-      pauseAdEndDate = m.constants.settings.pauseAdEndDate
-    end if
-  end if
-
-  pauseAdExpStartDate = CreateObject("roDateTime")
-  pauseAdExpStartDate.FromISO8601String(pauseAdStartDate)
-  pauseAdExpEndDate = CreateObject("roDateTime")
-  pauseAdExpEndDate.FromISO8601String(pauseAdEndDate)
-
-  m.pauseAdDeviceCap = 0
-  if m.top.pauseAdDeviceCap <> invalid
-    m.pauseAdDeviceCap = m.top.pauseAdDeviceCap
-  end if
-
-  if m.videoState = "pause" AND m.pauseAdDeviceCap < 5 AND currentUTCTimeInSecs >= pauseAdExpStartDate.asSeconds() AND currentUTCTimeInSecs <= pauseAdExpEndDate.asSeconds()
-    'roku_pause_ads_v2 exposure event will be fired after 5 seconds for both treatment & control only first day of experiment
-    getExperimentResource("roku_pause_ads", "roku_pause_ads_v2", true)
+  if m.videoState = "pause"
     loadStatus = m.pauseAdOverlay.posterLoadStatus
 
     if loadStatus = "ready"
@@ -1268,7 +1232,7 @@ Function onPauseAdOverlayTimer()
       m.pauseAdOverlay.observeFieldScoped("posterLoadStatus", "onPauseAdPosterLoadStatus")
     end if
 
-  else if getExperimentResource("roku_pause_ads", "roku_pause_ads_v2", false).enabled = true
+  else
     sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
   end if
 
@@ -1305,7 +1269,6 @@ End Function
 Function showPauseAd()
   animateTransport("out")
   m.pauseAdAnimation = fade(m.pauseAdOverlay, "in", 0.6, 0.4)
-  m.top.isPauseAdDisplayed = true
   sendPauseAdPixel(m.constants.pauseAd.startPixel)
   startImpTrackingTimer()
   m.pauseAdOverlay.setFocus(true)
@@ -1356,11 +1319,9 @@ End Function
 
 
 'restartPauseAdTimer restarts the pause ad timer
-'@duration : float, default is 5 seconds
-Function restartPauseAdTimer(duration = 5)
+Function restartPauseAdTimer()
   if m.pauseAdOverlayTimer <> invalid
     stopPauseAdTimer()
-    m.pauseAdOverlayTimer.duration = duration
     startPauseAdTimer()
   end if
 End Function
@@ -1413,7 +1374,7 @@ Function sendPauseAdPixel(pixelType = "")
     end if
   end if
 
-  if isNonEmptyString(pixelUrl) AND getExperimentResource("roku_pause_ads", "roku_pause_ads_v2", false).enabled = true
+  if isNonEmptyString(pixelUrl)
     m.isPixelFiredForCurrentPauseAd = true
     m.top.sendPauseAdPixel = pixelUrl
   end if
