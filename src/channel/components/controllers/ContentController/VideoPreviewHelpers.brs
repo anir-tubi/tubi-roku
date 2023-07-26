@@ -213,17 +213,9 @@ Function setVideoPreviewAfterFocus(focusedContent, pageType)
         end if
 
         if focusedContent.videoPreviewUrl <> ""
-
-          isVideoPreviewAutoStartEnabledWithPageType = true
-          if pageType = "search_page"
-            '//if the page type is a search, then check if the roku_video_preview_search_screen_v1 is enabled. Otherwise, assume this variable is true
-            isVideoPreviewAutoStartEnabledWithPageType = (getExperimentResource("roku_video_preview_search_screen", "roku_video_preview_search_screen_v1", true).enabled = true)
-          end if
-
-          if isVideoPreviewAutoStartEnabledWithPageType = true
-            startVideoPreview(focusedContent, pageType)
-          end if
+          startVideoPreview(focusedContent, pageType)
         end if
+        
       end if
     end if
   end if

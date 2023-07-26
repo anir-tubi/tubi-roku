@@ -350,8 +350,6 @@ Function onItemFocused()
     m.top.backgroundUriList = determineBackgroundImage(focusedContent)
     m.searchScreenInfoPanel.visible = true
 
-    m.top.contentFocused = focusedContent
-
     if m.microphone <> invalid
       m.microphone.visible = false
     end if
@@ -501,7 +499,6 @@ Function onKeyEvent(key As string, press As boolean) As boolean
     else if key = "left" AND m.ResultGrid.isInFocusChain() then
       handleInfoPanelVisibilityForLeftPress()
       m.Keyboard.setFocus(true)
-      m.top.stopVideoPreview = true
       m.gridHasFocus = false
       m.bResultsInFocus = false
       handleKeyboardVoiceInput(m.bResultsInFocus)
@@ -519,7 +516,6 @@ Function onKeyEvent(key As string, press As boolean) As boolean
       m.ResultGrid.jumpToItem = nJumpTo
       handleInfoPanelVisibilityForLeftPress()
       m.Keyboard.setFocus(true)
-      m.top.stopVideoPreview = true
       m.gridHasFocus = false
       m.bResultsInFocus = false
       return true

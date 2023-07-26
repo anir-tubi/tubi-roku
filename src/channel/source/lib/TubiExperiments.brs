@@ -61,10 +61,6 @@ Function TubiExperiments(constants) as Object
         roku_dash_hlsv6_v1 : {"enabled": true}
       }
 
-      roku_video_preview_search_screen: {
-        roku_video_preview_search_screen_v1 : {"enabled": false}
-      }
-
       roku_large_play_progress: {
         roku_large_play_progress_v1 : {"enabled": true}
       }
