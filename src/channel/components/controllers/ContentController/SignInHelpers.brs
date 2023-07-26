@@ -678,7 +678,7 @@ Function onActivationSuccess()
   end if
 
   m.authTask = CreateObject("roSGNode", "AuthTask")
-  m.authTask.observeFieldScoped("authInfo", "refreshPreferencesAfterSignIn")
+  m.authTask.observeFieldScoped("authInfo", "refreshServerPersistentDataAfterSignIn")
   m.authTask.functionName = "execInitializeUserData"
   m.authTask.control = "RUN"
   m.spinner.visible = true
@@ -688,14 +688,14 @@ Function onActivationSuccess()
 End Function
 
 
-Function handleUpdatedAuthAndGetPreferences(callback)
+Function handleUpdatedAuthAndGetServerPersistentData(callback)
   handleUpdatedAuth()
-  getPreferences(callback)
+  getServerPersistentData(callback)
 End Function
 
 
-Function refreshPreferencesAfterSignIn()
-  handleUpdatedAuthAndGetPreferences(onPostSignInAuthInfoUpdated)
+Function refreshServerPersistentDataAfterSignIn()
+  handleUpdatedAuthAndGetServerPersistentData(onPostSignInAuthInfoUpdated)
 End Function
 
 
@@ -797,11 +797,11 @@ Function onSignOutCompleted()
     }
   }
 
-  handleUpdatedAuthAndGetPreferences(onPostSignOutPreferencesRefresh)
+  handleUpdatedAuthAndGetServerPersistentData(onPostSignOutServerPersistentDataRefresh)
 End Function
 
 
-Function onPostSignOutPreferencesRefresh()
+Function onPostSignOutServerPersistentDataRefresh()
   authInfo = getFieldFromGlobal("authInfo")
   ' set the mode before any changes are done to the UI
   setUiMode(m.constants.ui.modes.standard)

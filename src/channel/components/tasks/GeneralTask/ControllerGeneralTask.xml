@@ -22,7 +22,7 @@
     <script type="text/brightscript" uri="Parsers/TournamentScreenParsers.brs" />
     <script type="text/brightscript" uri="Parsers/ScreenSaverParsers.brs" />
     <script type="text/brightscript" uri="Parsers/UncategorizedParsers.brs" />
-    <script type="text/brightscript" uri="Parsers/PreferencesParser.brs" />
+    <script type="text/brightscript" uri="Parsers/ServerPersistentDataParser.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/CmsApi.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/ApiUtils.brs" />

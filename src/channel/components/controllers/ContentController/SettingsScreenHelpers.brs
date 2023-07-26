@@ -7,8 +7,8 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.id = m.constants.ui.screenIds.settingsScreen
   m.settingsScreen.callingPage = sPageSource
   m.settingsScreen.uiMode = m.uiMode
-  ' Passing in the saved preferences.
-  m.settingsScreen.preferences = m.preferences
+  ' Passing in the saved isVideoPreviewOn.
+  m.settingsScreen.isVideoPreviewOn = m.serverPersistentData.isVideoPreviewOn
   setSettingsScreenSignInInfo()
   m.settingsScreen.actionAfterActivation = ""
   m.settingsScreen.observeFieldScoped("signOutSelected", "onSettingsSignOutSelected")
@@ -138,7 +138,7 @@ Function onAutoPreviewSettingSelected()
       userInteraction = "TOGGLE_OFF"
     end if
 
-    savePreferences({
+    saveServerPersistentData({
       "isVideoPreviewOn": choice
     })
 

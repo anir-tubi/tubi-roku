@@ -114,9 +114,9 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
 
   ' Passing current user selected track.
   ' Moving it out so that we always pass the updated value even when screen is obtained from cache.
-  if m.preferences <> invalid
-    videoPlayer.preferredAudioTrack = m.preferences.audioTrack
-    videoPlayer.pauseAdDeviceCap = m.preferences.pauseAdDeviceCap
+  if m.serverPersistentData <> invalid
+    videoPlayer.preferredAudioTrack = m.serverPersistentData.audioTrack
+    videoPlayer.pauseAdDeviceCap = m.serverPersistentData.pauseAdDeviceCap
   end if
 
   stopVideoPreviewIfPlaying() 'stop videopreview just in case it is playing
@@ -1174,9 +1174,9 @@ End Function
 Function onAudioTrackSettingsChange(msg)
   selectedAudioTrack = msg.getData()
   ' Making sure we only call update when necessary.
-  currentAudioTrack = m.preferences.audioTrack
+  currentAudioTrack = m.serverPersistentData.audioTrack
   if (currentAudioTrack.language <> selectedAudioTrack.language) OR (currentAudioTrack.role <> selectedAudioTrack.role)
-    savePreferences({
+    saveServerPersistentData({
       "audioTrack": selectedAudioTrack
     })
   end if
@@ -1188,13 +1188,13 @@ Function onPauseAdDisplayed(msg)
   isPauseAdDisplayed = msg.getData()
 
   if isPauseAdDisplayed = true
-    currentPauseAdDeviceCap = m.preferences.pauseAdDeviceCap
-    savePreferences({
+    currentPauseAdDeviceCap = m.serverPersistentData.pauseAdDeviceCap
+    saveServerPersistentData({
       "pauseAdDeviceCap": currentPauseAdDeviceCap + 1
     }, "device")
 
     if videoPlayer <> invalid
-      videoPlayer.pauseAdDeviceCap = m.preferences.pauseAdDeviceCap
+      videoPlayer.pauseAdDeviceCap = m.serverPersistentData.pauseAdDeviceCap
     end if
   end if
 End Function

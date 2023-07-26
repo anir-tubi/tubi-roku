@@ -201,9 +201,9 @@ Function registerParsingCallbacks()
     parseError: parseAddToQueueError
   }
 
-  ' gets the list of user/device preferences
-  m.requestTypes[m.constants.reqNames.getPreferences] = {
-    parseSuccess: parseGetPreferences
+  ' gets the list of user/device level server persistent data.
+  m.requestTypes[m.constants.reqNames.getServerPersistentData] = {
+    parseSuccess: parseGetServerPersistentData
     parseError: parseGenericError
   }
 

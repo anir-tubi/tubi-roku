@@ -36,8 +36,8 @@
       <!-- Allowed values are those in constants.ui.modes -->
       <field id="uiMode" type="string"/>
 
-      <!-- Holds the preferences value obtained from backend. either user or device level.  -->
-      <field id="preferences" type="node" />
+      <!-- Holds the isVideoPreviewOn value obtained from ServerPersistentData.isVideoPreviewOn. either user or device level value obtained from backend settings endpoint.  -->
+      <field id="isVideoPreviewOn" type="boolean" value="true" />
 
     <!-- OUTPUTS -->
       <!-- triggers for upstream controller -->

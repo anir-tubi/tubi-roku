@@ -307,9 +307,9 @@ Function getConstants()
     constants.reqNames.getScreenSaverHomeScreenContainerIds = "getScreenSaverHomeScreenContainerIds"
     constants.reqNames.getNamespaces = "getNamespaces"
     constants.reqNames.getExternalConfigs = "getExternalConfigs"
-    constants.reqNames.getBatchPreferences = "getBatchPreferences"
-    constants.reqNames.getPreferences = "getPreferences"
-    constants.reqNames.patchPreferences = "patchPreferences"
+    constants.reqNames.getBatchServerPersistentData = "getBatchServerPersistentData"
+    constants.reqNames.getServerPersistentData = "getServerPersistentData"
+    constants.reqNames.patchServerPersistentData = "patchServerPersistentData"
     constants.reqNames.getPauseAd = "getPauseAd"
     constants.reqNames.postPauseAdPixel = "postPauseAdPixel"
 
@@ -347,8 +347,8 @@ Function getConstants()
 
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverContainer] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverHomeScreenContainerIds] = true
-      constants.reqNames.acceptsTubiAuth[constants.reqNames.getPreferences] = true
-      constants.reqNames.acceptsTubiAuth[constants.reqNames.patchPreferences] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getServerPersistentData] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.patchServerPersistentData] = true
 
 
   constants.anonymous = {}
@@ -1717,10 +1717,10 @@ constants.ui.themes = {}
       constants.pauseAdExp.endDate = "2023-07-07T07:00:00Z"
 
       ' Creating Backend/Frontend mapping for preference keys.
-      constants.preferenceKeys = {}
-      constants.preferenceKeys.isVideoPreviewOn = "enable_video_preview"
-      constants.preferenceKeys.audioTrack = "audio_track"
-      constants.preferenceKeys.pauseAdDeviceCap = "pause_ad_device_cap"
+      constants.serverPersistentDataKeys = {}
+      constants.serverPersistentDataKeys.isVideoPreviewOn = "enable_video_preview"
+      constants.serverPersistentDataKeys.audioTrack = "audio_track"
+      constants.serverPersistentDataKeys.pauseAdDeviceCap = "pause_ad_device_cap"
 
   return constants
 end Function

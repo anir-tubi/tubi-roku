@@ -610,8 +610,8 @@ Function userDeviceApi_createUserAndDeviceSettingsBatchRequests_test()
 
   userRequest = req[0]
   m.assertEqual(m.constants.urls.account.userSettings, userRequest.url)
-  m.assertEqual(userRequest.id, "userSettingsReqInfo")
-  m.assertEqual(userRequest.requestType, "getPreferences")
+  m.assertEqual(userRequest.id, "userSettings")
+  m.assertEqual(userRequest.requestType, "getServerPersistentData")
   m.assertEqual(userRequest.responseType, "assocarray")
   options = userRequest.options
   m.assertNotInvalid(options)
@@ -619,8 +619,8 @@ Function userDeviceApi_createUserAndDeviceSettingsBatchRequests_test()
 
   deviceRequest = req[1]
   m.assertEqual(m.constants.urls.account.deviceSettings, deviceRequest.url)
-  m.assertEqual(deviceRequest.id, "deviceSettingsReqInfo")
-  m.assertEqual(deviceRequest.requestType, "getPreferences")
+  m.assertEqual(deviceRequest.id, "deviceSettings")
+  m.assertEqual(deviceRequest.requestType, "getServerPersistentData")
   m.assertEqual(deviceRequest.responseType, "assocarray")
   options = deviceRequest.options
   m.assertNotInvalid(options)

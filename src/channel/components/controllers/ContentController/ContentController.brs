@@ -172,7 +172,7 @@ Function init()
   m.authInfoReceived = false 'is the auth info returned from the registry
   m.authInfoRefreshed = true 'is the auth info refreshed after receiving a deeplink with a refresh token
   m.ageVerificationComplete = false 'has the user verified their age?
-  m.getPreferencesComplete = false 'did we finish fetching preferences. either user/device based on user logged in status.
+  m.getServerPersistentDataComplete = false 'did we finish fetching serverPersistentData. either user/device based on user logged in status.
   m.authTask = CreateObject("roSGNode", "AuthTask")
   m.authTask.observeFieldScoped("authInfo", "onStartupAuthInfoReceived")
   m.authTask.functionName = "execInitializeUserData"
@@ -200,7 +200,7 @@ Function init()
   }
 
   ' Holds the value for user/device level settings. For ex: isVideoPreviewOn  or Selected Audio track.
-  m.preferences = createObject("roSGNode", "Preferences")
+  m.serverPersistentData = createObject("roSGNode", "ServerPersistentData")
 
   ' Braze Task and Braze helper instance.
   m.brazeTask = invalid
@@ -552,8 +552,8 @@ Function startUserExperience()
       ' which is necessary to proceed past this step if m.authInfoRefreshed was set to false, but the user was already signed in.
       onAuthInfoRefreshed()
     end if
-  else if m.getPreferencesComplete <> true
-    getPreferences(startUserExperience)
+  else if m.getServerPersistentDataComplete <> true
+    getServerPersistentData(startUserExperience)
   else if shouldShowAgeGate() = true AND m.ageVerificationComplete <> true
     ' check if we have age information for the user
     if isLoggedInUser() = true
@@ -2171,8 +2171,8 @@ End Function
 
 
 Function isVideoPreviewOn()
-  if m.preferences <> invalid
-    return (isVideoPreviewEnabled() = true AND m.preferences.isVideoPreviewOn = true)
+  if m.serverPersistentData <> invalid
+    return (isVideoPreviewEnabled() = true AND m.serverPersistentData.isVideoPreviewOn = true)
   end if
 
   return false

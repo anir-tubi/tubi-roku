@@ -24,7 +24,7 @@ Function UserDeviceApi(constants, apiUtils)
     getHistoryReqInfo: userDeviceApi_getHistoryReqInfo
     getAddHistoryRequestInfo: userDeviceApi_getAddHistoryRequestInfo
 
-    ' preference related methods.
+    ' serverPersistentData related methods.
     createUserSettingsReqInfo: userDeviceApi_createUserSettingsReqInfo
     createDeviceSettingsReqInfo: userDeviceApi_createDeviceSettingsReqInfo
     createUserAndDeviceSettingsBatchRequests: userDeviceApi_createUserAndDeviceSettingsBatchRequests
@@ -381,14 +381,14 @@ Function userDeviceApi_createUserAndDeviceSettingsBatchRequests()
   requests = []
 
   userSettingsReqInfo = m.createUserSettingsReqInfo()
-  userSettingsReqInfo.id = "userSettingsReqInfo"
-  userSettingsReqInfo.requestType = m.constants.reqNames.getPreferences
+  userSettingsReqInfo.id = "userSettings"
+  userSettingsReqInfo.requestType = m.constants.reqNames.getServerPersistentData
   userSettingsReqInfo.responseType = "assocarray"
   requests.push(userSettingsReqInfo)
 
   deviceSettingsReqInfo = m.createDeviceSettingsReqInfo()
-  deviceSettingsReqInfo.id = "deviceSettingsReqInfo"
-  deviceSettingsReqInfo.requestType = m.constants.reqNames.getPreferences
+  deviceSettingsReqInfo.id = "deviceSettings"
+  deviceSettingsReqInfo.requestType = m.constants.reqNames.getServerPersistentData
   deviceSettingsReqInfo.responseType = "assocarray"
   requests.push(deviceSettingsReqInfo)
 

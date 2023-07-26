@@ -248,8 +248,8 @@ Function createAutoPreviewPanel()
   videoPreviewPanel.leftOnly = false
   videoPreviewPanel.selectButtonMovesPanelForward = false
   videoPreviewPanel.offset = m.rightPanelOffset
-  preferences = m.top.preferences
-  if preferences <> invalid AND preferences.isVideoPreviewOn = true    
+
+  if m.top.isVideoPreviewOn = true    
     videoPreviewPanel.selectItem = 0
   else
     videoPreviewPanel.selectItem = 1
