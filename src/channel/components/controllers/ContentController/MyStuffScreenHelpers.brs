@@ -110,7 +110,7 @@ Function onMyStuffBatchResponse(response)
       response.addField("validUntil", "integer", false)
       response.validUntil = nValidUntil
     end if
-
+    
     screen.isLoading = false
     screen.content = response
     screen.contentUpdated = true
@@ -226,6 +226,7 @@ Function refreshContentSignalForMyStuffScreen(screen)
   showHideSpinner(true)
   screen.content = invalid
   screen.contentUpdated = true
+  stopVideoPreview()  '//In case a video preview is playing, stop it until the new content has loaded.
   fetchMyStuffCategoryDetails(screen)
 End Function
 
