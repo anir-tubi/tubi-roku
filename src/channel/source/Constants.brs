@@ -1716,6 +1716,7 @@ constants.ui.themes = {}
       constants.serverPersistentDataKeys = {}
       constants.serverPersistentDataKeys.isVideoPreviewOn = "enable_video_preview"
       constants.serverPersistentDataKeys.audioTrack = "audio_track"
+      constants.serverPersistentDataKeys.secondSessionLinearNotWatched = "second_session_linear_not_watched"
 
   return constants
 end Function

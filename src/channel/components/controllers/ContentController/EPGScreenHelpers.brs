@@ -63,6 +63,14 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     else
       epgScreen.componentToFocus = m.constants.ui.epgScreen.focusItems.epgTimeGrid
     end if
+
+    'if preference exists and its true means user has not seen the linear before.
+    if m.serverPersistentData.secondSessionLinearNotWatched = true AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", false).enabled = true
+      saveServerPersistentData({
+        "secondSessionLinearNotWatched": false
+      })
+    end if
+
   end if
 
   shouldSendPageLoadEvent = true

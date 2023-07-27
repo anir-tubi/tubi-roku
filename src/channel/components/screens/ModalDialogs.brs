@@ -98,14 +98,16 @@ Function showMultiStyleModal(modalInfo, buttonInfo)
 
   ' Don't create the modal if a modal already exists, or there is not enough info to create it
   if m.tempModal = invalid AND modalInfo <> invalid AND buttonInfo <> invalid
+
     modal = getMultiStyleModal(modalInfo)
+    addButtonsToModal(modal, buttonInfo)
 
     m.tempModal = {
       buttonInfo: buttonInfo
       modalInfo: modalInfo
     }
 
-    addButtonsToModal(modal, buttonInfo)
+
 
     if modalInfo.openTrackEvent <> invalid AND modalInfo.trackingTask <> invalid
       modalInfo.trackingTask.trackEvent = modalInfo.openTrackEvent
@@ -141,6 +143,7 @@ Function getMultiStyleModal(modalInfo)
   subHeader = modalInfo.subHeader
   modal.id = getUniqueModalId(header, subHeader)
   modal.multiStyleMessage = modalInfo.multiStyleMessage
+  modal.imageDimensions = modalInfo.imageDimensions
   modal.imageUrls = modalInfo.imageUrls
   modal.header = header
   modal.subHeader = subHeader

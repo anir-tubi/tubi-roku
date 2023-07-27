@@ -25,10 +25,10 @@ Function onThemeChange(msg = invalid)
       m.labelFocused.color = theme.primaryTextColor
       ' If the mode is light then using inverse or light mode colors.
       if itemContent.mode = "light"
-        m.label.color = theme.inversePrimaryTextColor   
+        m.label.color = theme.inversePrimaryTextColor
         m.background.blendColor = theme.inverseNeutralColor2
       else
-        m.label.color = theme.primaryTextColor   
+        m.label.color = theme.primaryTextColor
         m.background.blendColor = theme.neutralColor2
       end if
     end if
@@ -60,7 +60,7 @@ End Function
 Function onFocusPercentChange(msg)
   focusPercent = msg.getData()
   m.background.opacity = 1 - focusPercent
-  
+
   if m.top.gridHasFocus = true
     m.labelFocused.opacity = focusPercent
   else

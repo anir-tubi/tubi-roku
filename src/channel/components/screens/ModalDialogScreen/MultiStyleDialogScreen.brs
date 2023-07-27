@@ -111,7 +111,7 @@ Function formatDialog()
   else if isNonEmptyArray(m.top.imageUrls) = true AND m.multiStyleLayout.getChildCount() = 0
     imageUrls = m.top.imageUrls
 
-    ' Since we need to support multiple images. 
+    ' Since we need to support multiple images.
     ' Setting image dimensions based on number of images returned.
     ' Idea behind having 2 variable is to provide flexiblity in future to have as many as image layouts as possible.
     ' So that we do not have to create if else logic across the file. We will create the imageDimensions and imageTranslations
@@ -119,12 +119,23 @@ Function formatDialog()
     ' We will use absolute positioning for simplicity.
     imageDimensions = []
     imageTranslations = []
+
     if imageUrls.count() = 1
-      imageWidth = 342
+
+      ' set imageDimensions if provided otherwise use the default Braze's dimensions
+      if isNonEmptyArray(m.top.imageDimensions) = true AND isNonEmptyArray(m.top.imageDimensions[0]) = true
+        imageWidth = m.top.imageDimensions[0][0]
+        imageDimensions = m.top.imageDimensions
+      else
+        imageWidth = 342
+        imageDimensions = [[imageWidth, 483]]
+      end if
+
+
       ' Center aligning the image if only one present.
       translationX = (m.dialogBox.width / 2) - (imageWidth/2)
       m.imagesSection.translation = [translationX, 0]
-      imageDimensions = [[imageWidth, 483]]
+
       imageTranslations = [[0, 0]]
       ' Adjusting the height of the modal to account for images.
       m.mask.height = 1008
@@ -133,7 +144,12 @@ Function formatDialog()
       ' Once we have other variations we will add conditions and settings based on a new layout.
       ' For ex: imageUrls.count() > 3.
 
-      imageDimensions = [[216, 309], [282, 405], [216, 309]]
+      if isNonEmptyArray(m.top.imageDimensions) = true AND isNonEmptyArray(m.top.imageDimensions[0]) = true
+        imageDimensions = m.top.imageDimensions
+      else
+        imageDimensions = [[216, 309], [282, 405], [216, 309]]
+      end if
+
       imageTranslations = [[0, 48], [87, 0], [243, 48]]
       ' Adjusting image section translation to have left side gutter width.
       m.imagesSection.translation = [112, 0]
@@ -160,7 +176,7 @@ Function formatDialog()
       end if
       index++
     end for
-    
+
     ' Sorting the images by width so that largest is rendered at the end so that it is always on top.
     imageList.sortBy("width")
     m.imagesSection.update(imageList, true)

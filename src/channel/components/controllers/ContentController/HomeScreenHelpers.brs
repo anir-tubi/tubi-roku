@@ -930,6 +930,21 @@ Function onHomescreenContentReady(msg)
       else if isNewUser() = true AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND isLoggedInUser() = false AND getExperimentResource("roku_registration_component_over_homegrid", "roku_registration_component_over_homegrid_v1", true).enabled = true
         showRegistrationWelcomeModal()
       end if
+
+      if isNewUSer() = false AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", false).enabled = true AND currentScreen.id = m.constants.ui.screenIds.homeScreen
+        'show liveTV education modal over homescreen
+        if m.serverPersistentData.secondSessionLinearNotWatched = true
+
+          showLiveTVEducationModal()
+          saveServerPersistentData({
+            "secondSessionLinearNotWatched": false
+          })
+
+        else if m.constants.settings.showLiveTVEducationModalAlways = true AND m.constants.settings.hideStartupModals <> true
+          'QA testing purpose only and will be deleted during graduaction.
+          showLiveTVEducationModal()
+        end if
+      end if
     end if
 
     ' show fifa intro modal only for non-kids ui and adult pc
@@ -1192,4 +1207,61 @@ Function handleSeeAllSelected(homeScreen)
   if focusedContainer <> invalid
     showCategoryDetailsScreen(focusedContainer, m.constants.ui.terms.home, true, homeScreen.contentMode, homeScreen.columnFocused)
   end if
+End Function
+
+
+Function showLiveTVEducationModal()
+  tubiLog("HomeScreenHelpers.showRegistrationWelcomeModal")
+
+  showHideSpinner(false)
+
+  header = getTranslation("linear_educational_header")
+  subHeader = getTranslation("linear_education_sub_header")
+
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "INFORMATION"
+      pageOneof: m.Tracking.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
+      dialog_action: "SHOW"
+      dialog_sub_type: "linear_education"
+    }
+  }
+
+  modalInfo = {
+    header: header
+    subHeader: subHeader
+    message: "" 'message is not used in case of multistyle dialog
+    modalDialogTypes: m.constants.modalDialogTypes.multiStyle
+    modalDialogStyles: m.constants.modalDialogStyles.multiMessageGroup
+    multiStyleMessage: []
+    imageUrls: ["pkg:/images/live-news-group.png"]
+    imageDimensions: [[582, 537]]
+    openTrackEvent: dialogEvent
+    trackingTask: m.trackingLoggingTask
+    backButtonCallback: invalid
+    instantResumeAction: m.constants.instantResumeActions.closeDialog
+  }
+
+  buttonInfo = []
+
+  buttonOne = {
+    text: getTranslation("linear_education_button")
+    type: "accept"
+    callback: showDefaultEPGScreen
+    callbackParams: invalid
+    shouldFocusParentBeforeCallback: false 'special case for signIn button. If parent gets focus when dialog closes, video preview or linear will start playing in backgroud of RFI modal.
+  }
+  buttonInfo.push(buttonOne)
+
+  buttonTwo = {
+    text: getTranslation("dialog_got_it")
+    type: "dismiss"
+    callback: invalid
+    callbackParams: invalid
+  }
+  buttonInfo.push(buttonTwo)
+
+  showMultiStyleModal(modalInfo, buttonInfo)
+
 End Function

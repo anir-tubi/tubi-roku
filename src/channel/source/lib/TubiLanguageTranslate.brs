@@ -1716,6 +1716,18 @@ Function getTranslation_en_US()
       "description": "Button text to be displayed on second button of registration welcome modal",
       "message": "Continue as Guest"
     },
+    "linear_educational_header": {
+      "description": "Header on the modal displayed to educate user about live TV feature",
+      "message": "Introducing Live TV"
+    },
+    "linear_education_sub_header":{
+      "description": "Sub Header on the modal displayed to educate user about live TV feature",
+      "message": "Never Miss a Beat with 24/7 News, Sports, Reality and More. Right at Your Fingertips."
+    },
+    "linear_education_button": {
+      "description": "Button title on the modal displayed to educate user about live TV feature",
+      "message": "Watch LiveTV"
+    },
     "replay": {
       "description": "This label used for badge to indicate the content availability",
       "message": "Replay"

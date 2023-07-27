@@ -35,6 +35,10 @@
       <!--instead of a multistyle message body, horizontally placed images will be shown-->
       <field id="imageUrls" type="stringarray" value="[]" />
 
+      <!-- dimensions of the multistyle images. Please specify height and width for each imageUrl provided.
+            imageDimensions = [[340, 450] [600, 233]...]-->
+      <field id="imageDimensions" type="vector2darray" value="[]" />
+
       <!-- The text of buttons.  The button list will grow to the size of this array -->
       <field id="buttons" type="stringarray" value="[]" alwaysNotify="true"/>
   </interface>
@@ -100,7 +104,7 @@
           visible="false"
           translation="[48,0]"
           itemSpacings="[68]" />
-        
+
         <Group
           id="imagesSection"
           visible="false" />

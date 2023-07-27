@@ -160,6 +160,7 @@ Function init()
   if Auth.getFirstVisit() = -1
     m.global.isNewUser = true
     Auth.setFirstVisit()
+
   end if
 
   ' QA TESTING PURPOSE: below block can be removed during onboarding graduation.
@@ -205,6 +206,13 @@ Function init()
   ' Braze Task and Braze helper instance.
   m.brazeTask = invalid
   m.braze = invalid
+
+
+  if isNewUser() = true AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", true).enabled = true
+    saveServerPersistentData({
+      "secondSessionLinearNotWatched": true
+    })
+  end if
 
   ' For now we will support only one message queue. If at all we need to more flexible will add in future.
   ' For now we are queuing message if the user is in parental controls / kids mode or if there is screen in process of loading.

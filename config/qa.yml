@@ -44,6 +44,10 @@ settings:
 
 
 
+  # enabling showLiveTVEducationModalAlways will show live TV education modal every time the app is launched as non-production mode.
+  # This field is added for testing purpose Only
+  showLiveTVEducationModalAlways: false
+
   #FIFA worldcup tournament start date/end date for testing purposes. Please follow the format
   tournamentStartDate: "2022-11-20T00:00:00Z"
   tournamentEndDate: "2022-12-18T00:00:00Z"
