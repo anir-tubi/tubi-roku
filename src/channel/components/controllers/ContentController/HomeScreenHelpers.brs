@@ -938,7 +938,7 @@ Function onHomescreenContentReady(msg)
           showLiveTVEducationModal()
           saveServerPersistentData({
             "secondSessionLinearNotWatched": false
-          })
+          }, "device")
 
         else if m.constants.settings.showLiveTVEducationModalAlways = true AND m.constants.settings.hideStartupModals <> true
           'QA testing purpose only and will be deleted during graduaction.

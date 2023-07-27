@@ -211,7 +211,7 @@ Function init()
   if isNewUser() = true AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", true).enabled = true
     saveServerPersistentData({
       "secondSessionLinearNotWatched": true
-    })
+    }, "device")
   end if
 
   ' For now we will support only one message queue. If at all we need to more flexible will add in future.
