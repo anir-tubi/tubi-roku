@@ -10,7 +10,7 @@ Function onFocusedChildChange()
   end if
 
   'if modal loses focus and we are not currently hidden (mainly because videoplayer gains focus or homescreen gains focus), Just close the modal
-  if m.top.hidden = false AND m.top.isInFocusChain() = false
+  if m.top.isHidden = false AND m.top.isInFocusChain() = false
     m.top.exitButton = "back"
   end if
 End Function

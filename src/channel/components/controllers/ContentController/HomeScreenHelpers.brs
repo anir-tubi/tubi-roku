@@ -917,25 +917,19 @@ Function onHomescreenContentReady(msg)
     if currentScreen <> invalid AND currentScreen.isSubType("HomeScreen") = true
       screenTrackingLoad(homeScreen.trackingPageInfo, loadTime)
 
-      if m.constants.settings.mode = "qa"
-        ' This is only to support QA for suit test.
-        if m.constants.settings.hideStartupModals <> true
-          if m.constants.settings.showRegistrationModalForNewUser = true AND isNewUser() = true AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND isLoggedInUser() = false
-            showRegistrationWelcomeModal()
-          end if
-        end if
-
       'show registration welcome Screen only to new user over homescreen.
       'we need to check if user already signed up in detail Screen if they have entered through deeplink.
-      else if isNewUser() = true AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND isLoggedInUser() = false AND getExperimentResource("roku_registration_component_over_homegrid", "roku_registration_component_over_homegrid_v1", true).enabled = true
+      if hasRegModalBeenShown() = false
         showRegistrationWelcomeModal()
       end if
 
+      'show liveTV education modal over homescreen
       if isNewUSer() = false AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", false).enabled = true AND currentScreen.id = m.constants.ui.screenIds.homeScreen
-        'show liveTV education modal over homescreen
+
         if m.serverPersistentData.secondSessionLinearNotWatched = true
 
           showLiveTVEducationModal()
+
           saveServerPersistentData({
             "secondSessionLinearNotWatched": false
           }, "device")
@@ -1263,5 +1257,33 @@ Function showLiveTVEducationModal()
   buttonInfo.push(buttonTwo)
 
   showMultiStyleModal(modalInfo, buttonInfo)
+
+End Function
+
+
+'This function handles the logic to determine whether to show the registration modal over homegrid with the following main requirements
+' show registration modal only to new user
+' within the new user session, show only once when app launches
+' do not show if the user is already logged in during deeplink
+Function hasRegModalBeenShown()
+
+  currentScreen = getCurrentScreen()
+  if m.constants.settings.mode = "qa"
+    ' This is only to support QA for suit test/automation test
+    if m.constants.settings.hideStartupModals <> true
+      if m.constants.settings.showRegistrationModalForNewUser = true AND currentScreen.id = m.constants.ui.screenIds.homeScreen
+        return false
+      end if
+    end if
+
+  else if isNewUser() = true AND m.hasRegModalBeenShownWithinNewUserSession = false
+    if currentScreen.id = m.constants.ui.screenIds.homeScreen AND isLoggedInUser() = false AND getExperimentResource("roku_registration_component_over_homegrid", "roku_registration_component_over_homegrid_v1", true).enabled = true
+      m.hasRegModalBeenShownWithinNewUserSession = true
+      return false
+    end if
+
+  end if
+
+  return true
 
 End Function

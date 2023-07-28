@@ -22,8 +22,6 @@
 
       <field id="scrollable" type="boolean" value="false"/>
 
-      <!-- Used by `hideModal()` to explicitly specify that this modal is hidden not just visible=false -->
-      <field id="isHidden" type="boolean" value="false"/>
   </interface>
 
   <children>

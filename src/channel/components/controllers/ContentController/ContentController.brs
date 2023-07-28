@@ -87,6 +87,9 @@ Function init()
   'This is will bind EPG channel api call with all related EPG program calls. Any program calls returned because of previous epg channel list will be discarded.
   m.epgFetchUniqueId = 0
 
+  'This is used only within the very first session to keep track if user has already seen the welcome registration modal, so that welcome reg modal is not shown multiple times.
+  m.hasRegModalBeenShownWithinNewUserSession = false
+
   ' Set up global services
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
   m.global.addField("metadataFetchTask", "node", false)
@@ -160,12 +163,11 @@ Function init()
   if Auth.getFirstVisit() = -1
     m.global.isNewUser = true
     Auth.setFirstVisit()
-
   end if
 
   ' QA TESTING PURPOSE: below block can be removed during onboarding graduation.
   ' By clearing registry, QA can turn 'showOnboardingAlways' back to false in .yml and make sure onboarding screen is shown for next launch.
-  if m.constants.settings.hideStartupModals <> true AND (m.constants.settings.showRegistrationModalForNewUser = true OR m.constants.settings.showOnboardingAlways = true)
+  if m.constants.settings.mode = "qa" AND m.constants.settings.hideStartupModals <> true AND (m.constants.settings.showRegistrationModalForNewUser = true OR m.constants.settings.showOnboardingAlways = true)
     m.global.isNewUser = true
     Auth.clearFirstVisit()
   end if

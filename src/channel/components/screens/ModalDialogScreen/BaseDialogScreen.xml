@@ -3,7 +3,7 @@
   <script type="text/brightscript" uri="BaseDialogScreen.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
 
-  <interface>    
+  <interface>
     <!-- OUTPUT -->
     <!-- Set to the index of the button which was selected from the button list. -->
     <field id="buttonSelected" type="integer" alwaysNotify="true"/>
@@ -11,5 +11,8 @@
     <field id="exitButton" type="string" alwaysNotify="true"/>
     <!-- Holds the information about what action should take when modal shown while resume after suspending -->
     <field id="instantResumeAction" type="string" />
+
+     <!-- Used by `hideModal()` to explicitly specify that this modal is hidden not just visible=false -->
+      <field id="isHidden" type="boolean" value="false"/>
   </interface>
 </component>
