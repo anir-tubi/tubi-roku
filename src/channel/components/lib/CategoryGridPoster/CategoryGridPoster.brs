@@ -3,7 +3,6 @@ Function init()
   m.InnerTitle = m.top.findNode("InnerTitle")
   m.InnerLayout = m.top.findNode("InnerLayout")
   m.TimeRemaining = m.top.findNode("TimeRemaining")
-  m.LinearPoster = m.top.findNode("LinearPoster")
 
   m.badgeGroup = m.top.findNode("badgeGroup")
   m.resumeProgressBar = m.top.findNode("ResumeProgressBar")
@@ -11,8 +10,6 @@ Function init()
   m.top.observeField("itemContent", "onContentChange")
   m.resumeMargin = 4  'inset of resume bar
   m.title = m.top.findNode("Title")
-  m.LinearTitle = m.top.findNode("LinearTitle")
-  m.LinearSubTitle = m.top.findNode("LinearSubTitle")
   m.posterFadeTime = 0.5
 
   '//recreate the contentTypes from constants so as not to access m.global.constants for every item on the home screen as they are created
@@ -64,8 +61,6 @@ Function onThemeChange()
     m.TimeRemaining.color = theme.primaryTextColor
     m.DurationBar.color = theme.primaryTextColor
     m.Title.color = theme.primaryTextColor
-    m.LinearSubTitle.color = theme.primaryTextColor
-    m.LinearTitle.color = theme.primaryTextColor
     if m.showAllLabel <> invalid
       m.showAllLabel.color = theme.primaryTextColor
     end if
@@ -91,12 +86,9 @@ End Function
 Function onContentChange(msg)
   itemContent = msg.getData()
   ' set some defaults
-  m.LinearPoster.visible = false
   m.title.visible = false
   m.InnerTitle.visible = false
   m.TimeRemaining.visible = false
-  m.LinearTitle.visible = false
-  m.LinearSubTitle.visible = false
   m.resumeMargin = 6
 
   gradientPoster =  m.poster.findNode("gradientPoster")
@@ -300,42 +292,6 @@ Function onFocusPercentChange()
     handleLocalFocusChange(false)
   else if m.top.focusPercent = 1.0 AND m.localFocus = false AND m.top.rowListHasFocus = true
     handleLocalFocusChange(true)
-  end if
-End Function
-
-
-
-Function setUpLinear()
-  m.top.unobserveField("itemHasFocus")
-  m.top.observeField("itemHasFocus", "onItemFocus")
-  m.top.observeField("rowListHasFocus", "onRowListHasFocus")
-  m.top.unobserveField("focusPercent")
-  m.top.observeField("focusPercent", "onFocusPercentChange")
-
-  ' local focus state; becomes true when focusPercent = 1.0 or itemHasFocus = true
-  ' becomes false when focusPercent < 1.0 or itemFocus = false
-  if m.localFocus = invalid
-    m.localFocus = false
-  end if
-
-  m.LinearPoster.visible = true
-  m.LinearPoster.uri = m.top.itemContent.inlineLogoUri
-  m.LinearPoster.width = 216
-  m.LinearPoster.height = 216
-
-  m.LinearTitle.visible = true
-  m.LinearTitle.width = m.top.width
-  nLinearTitlePlacement = m.top.height - m.LinearTitle.height - 36
-  m.LinearTitle.translation = [0,nLinearTitlePlacement]
-
-  m.poster.uri = "pkg:/images/gradientBground-linearItem-vertical.webp"
-  m.LinearTitle.text = m.top.itemContent.title
-  m.LinearPoster.translation = [381,198]
-
-  ' It is possible when fast scrolling to the row, that the item can gain focus before setUpLinear() runs.
-  ' since itemHasFocus is true in this case, the callback onItemFocus won't get triggered. so manually calling handleLocalFocusChange
-  if m.top.itemHasFocus = true
-    handleLocalFocusChange(m.top.itemHasFocus)
   end if
 End Function
 

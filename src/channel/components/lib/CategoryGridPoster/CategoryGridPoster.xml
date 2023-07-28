@@ -90,41 +90,7 @@
           size="24" />
       </Label>
     </LayoutGroup>
-
-  <Poster
-    id="LinearPosterBground"
-    visible="false"
-    uri="pkg:/images/gradientBground-linearItem-vertical.webp"/>
-    <Poster
-      id="LinearPoster"
-      visible="false"
-      loadingBitmapUri="pkg:/images/placeholder.jpg"
-      failedBitmapUri="pkg:/images/placeholder.jpg" />
-    <Label
-      id="LinearSubTitle"
-      width="380"
-      height="36"
-      horizAlign="center"
-      vertAlign="center"
-      translation="[0,366]"
-      visible="false">
-      <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-Bold.ttf"
-        size="36" />
-    </Label>
-    <Label
-      id="LinearTitle"
-      width="380"
-      height="36"
-      horizAlign="center"
-      vertAlign="center"
-      visible="false">
-      <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-Medium.ttf"
-        size="30"/>
-    </Label>
+    
     <Group id="badgeGroup"/>
   </children>
 </component>
