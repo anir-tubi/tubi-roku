@@ -27,8 +27,10 @@ End Function
 
 
 Function onInAppMessageTriggered(msg)
-  m.queuedInAppMessage = msg.getData()
-  processQueuedInAppMessage()
+  if m.constants.settings.mode <> "qa" OR m.constants.settings.hideStartupModals <> true
+    m.queuedInAppMessage = msg.getData()
+    processQueuedInAppMessage()
+  end if
 End Function
 
 
