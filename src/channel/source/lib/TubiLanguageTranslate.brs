@@ -1086,9 +1086,17 @@ Function getTranslation_en_US()
       "description": "Label of button to indicate to users that the current video title has been disliked",
       "message": "Disliked"
     },
+    "screenDetails_button_notForMe": {
+      "description": "Label of button to allow users to ignore the current video title",
+      "message": "Not for Me"
+    },
     "screenDetails_button_likeDislike": {
       "description": "Label of unfocused button to allow users to like or dislike the current video title",
       "message": "Like or Dislike"
+    },
+    "screenDetails_button_rateThisTitle": {
+      "description": "Label of unfocused button to allow users to rate the current video title",
+      "message": "Rate this Title"
     },
     "screenDetails_button_see_all_games": {
       "description": "Label of button to allow users to a new page where they can see all the games related to the current sports title",
