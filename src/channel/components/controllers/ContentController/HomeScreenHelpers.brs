@@ -1218,7 +1218,7 @@ Function showLiveTVEducationModal()
       dialog_type: "INFORMATION"
       pageOneof: m.Tracking.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
       dialog_action: "SHOW"
-      dialog_sub_type: "linear_education"
+      dialog_sub_type: "live_tv_feature"
     }
   }
 
