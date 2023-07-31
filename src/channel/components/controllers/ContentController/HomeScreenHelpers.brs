@@ -924,7 +924,7 @@ Function onHomescreenContentReady(msg)
       end if
 
       'show liveTV education modal over homescreen
-      if isNewUSer() = false AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", false).enabled = true AND currentScreen.id = m.constants.ui.screenIds.homeScreen
+      if isNewUSer() = false AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", false).enabled = true AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false
 
         if m.serverPersistentData.secondSessionLinearNotWatched = true
 
@@ -1275,8 +1275,9 @@ Function hasRegModalBeenShown()
         return false
       end if
     end if
+  end if
 
-  else if isNewUser() = true AND m.hasRegModalBeenShownWithinNewUserSession = false
+  if isNewUser() = true AND m.hasRegModalBeenShownWithinNewUserSession = false
     if currentScreen.id = m.constants.ui.screenIds.homeScreen AND isLoggedInUser() = false AND getExperimentResource("roku_registration_component_over_homegrid", "roku_registration_component_over_homegrid_v1", true).enabled = true
       m.hasRegModalBeenShownWithinNewUserSession = true
       return false
