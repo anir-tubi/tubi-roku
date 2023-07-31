@@ -71,7 +71,6 @@ Function createMainContent(item)
     contentNode.iconUrl = "pkg:/images/sideNavEspanol.png"
   else if item = m.constants.ui.sideNavIds.myList
     contentNode.title = getTranslation("menu_mystuff")
-    contentNode.shortDescriptionLine2 = getTranslation("text_new")
     contentNode.iconUrl = "pkg:/images/icon-add-to-queue.webp"
   else if item = m.constants.ui.sideNavIds.categories
     contentNode.title = getTranslation("menu_categories")
