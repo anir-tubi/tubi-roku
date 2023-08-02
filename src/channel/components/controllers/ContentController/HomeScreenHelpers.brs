@@ -904,6 +904,7 @@ End Function
 Function onHomescreenContentReady(msg)
   tubiLog("HomescreenHelpers.onHomescreenContentReady")
   homeScreen = msg.getRoSGNode()
+
   if homeScreen.contentReady = true
     fireAppLoadBeacon()
     homeScreen.unobserveFieldScoped("contentReady")
@@ -923,21 +924,15 @@ Function onHomescreenContentReady(msg)
         showRegistrationWelcomeModal()
       end if
 
-      'show liveTV education modal over homescreen
-      if isNewUSer() = false AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", false).enabled = true AND currentScreen.id = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false
+      if hasLiveTVEducationModalBeenShown(currentScreen.id) = false
 
-        if m.serverPersistentData.secondSessionLinearNotWatched = true
+        showLiveTVEducationModal()
 
-          showLiveTVEducationModal()
+        m.shouldShowLinearEducationModal = false
 
-          saveServerPersistentData({
-            "secondSessionLinearNotWatched": false
-          }, "device")
-
-        else if m.constants.settings.showLiveTVEducationModalAlways = true AND m.constants.settings.hideStartupModals <> true
-          'QA testing purpose only and will be deleted during graduaction.
-          showLiveTVEducationModal()
-        end if
+        saveServerPersistentData({
+          "secondSessionLinearNotWatched": false
+        }, "device")
       end if
     end if
 
@@ -945,8 +940,6 @@ Function onHomescreenContentReady(msg)
     if isFIFAIntroModalShown() = false AND isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
       showFIFAIntroModal()
     end if
-
-
   end if
 End Function
 
@@ -991,6 +984,7 @@ Function onLoadCategoriesIndex(msg)
       successCallback: batchResponseHandler
     })
   end if
+
   return true
 End Function
 
@@ -1283,6 +1277,37 @@ Function hasRegModalBeenShown()
       return false
     end if
 
+  end if
+
+  return true
+
+End Function
+
+
+Function hasLiveTVEducationModalBeenShown(currentScreenId)
+
+  if m.constants.settings.mode = "qa"
+    ' This is only to support QA for suit test/automation test.
+    ' TODO:  remove showLiveTVEducationModalAlways flag and only keep hideStartupModals to control the startup modals.
+    if m.constants.settings.hideStartupModals <> true
+      if m.constants.settings.showLiveTVEducationModalAlways = true AND currentScreenId = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false
+        return false
+      end if
+
+    end if
+  end if
+
+  ' conditions to show liveTV education modal are:
+  ' user is not a new user
+  ' user is in experiment roku_linear_epg_education_modal_over_homegrid_v1 (for now)
+  ' show the modal only on homescreen, not in kids mode/espanol mode or any other homescreens.
+  ' User should not see the welcome registation modal and liveTV education modal within the same session(this happens when new-user signsIn)
+  ' do not show the modal if user has already seen the liveTV on their first session
+
+  if m.shouldShowLinearEducationModal = true
+    if getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", true).enabled = true AND currentScreenId = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false
+      return false
+    end if
   end if
 
   return true

@@ -90,6 +90,9 @@ Function init()
   'This is used only within the very first session to keep track if user has already seen the welcome registration modal, so that welcome reg modal is not shown multiple times.
   m.hasRegModalBeenShownWithinNewUserSession = false
 
+  'This variable will keep track of whether user has seen the LiveTV modal within the session
+  m.shouldShowLinearEducationModal = false 'remove this variable if roku_linear_epg_education_modal_over_homegrid does not get graduated.
+
   ' Set up global services
   m.metadataFetchTask = m.top.findNode("MetadataFetchTask")
   m.global.addField("metadataFetchTask", "node", false)
@@ -208,13 +211,6 @@ Function init()
   ' Braze Task and Braze helper instance.
   m.brazeTask = invalid
   m.braze = invalid
-
-
-  if isNewUser() = true AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", true).enabled = true
-    saveServerPersistentData({
-      "secondSessionLinearNotWatched": true
-    }, "device")
-  end if
 
   ' For now we will support only one message queue. If at all we need to more flexible will add in future.
   ' For now we are queuing message if the user is in parental controls / kids mode or if there is screen in process of loading.
@@ -620,6 +616,17 @@ Function startUserExperience()
     sendDeviceLog()
 
     setUiModeFromState()
+
+    ' If new user, save the preference secondSessionLinearNotWatched as true to indicate they have not watched the liveTV yet.
+    if getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", false).enabled = true
+      if isNewUser() = true
+        saveServerPersistentData({
+          "secondSessionLinearNotWatched": true
+        }, "device")
+      else if m.serverPersistentData.secondSessionLinearNotWatched = true
+        m.shouldShowLinearEducationModal = true
+      end if
+    end if
 
     if m.enteredFromDeepLink = true
       tubiLog("ContentController detected deep link request")
