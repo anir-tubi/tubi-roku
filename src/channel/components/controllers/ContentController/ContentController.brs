@@ -618,14 +618,12 @@ Function startUserExperience()
     setUiModeFromState()
 
     ' If new user, save the preference secondSessionLinearNotWatched as true to indicate they have not watched the liveTV yet.
-    if getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", false).enabled = true
-      if isNewUser() = true
-        saveServerPersistentData({
-          "secondSessionLinearNotWatched": true
-        }, "device")
-      else if m.serverPersistentData.secondSessionLinearNotWatched = true
-        m.shouldShowLinearEducationModal = true
-      end if
+    if isNewUser() = true
+      saveServerPersistentData({
+        "secondSessionLinearNotWatched": true
+      }, "device")
+    else if m.serverPersistentData.secondSessionLinearNotWatched = true
+      m.shouldShowLinearEducationModal = true
     end if
 
     if m.enteredFromDeepLink = true

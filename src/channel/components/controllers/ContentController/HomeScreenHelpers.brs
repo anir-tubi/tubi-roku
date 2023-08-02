@@ -1251,7 +1251,6 @@ Function showLiveTVEducationModal()
   buttonInfo.push(buttonTwo)
 
   showMultiStyleModal(modalInfo, buttonInfo)
-
 End Function
 
 
@@ -1260,7 +1259,6 @@ End Function
 ' within the new user session, show only once when app launches
 ' do not show if the user is already logged in during deeplink
 Function hasRegModalBeenShown()
-
   currentScreen = getCurrentScreen()
   if m.constants.settings.mode = "qa"
     ' This is only to support QA for suit test/automation test
@@ -1276,16 +1274,13 @@ Function hasRegModalBeenShown()
       m.hasRegModalBeenShownWithinNewUserSession = true
       return false
     end if
-
   end if
 
   return true
-
 End Function
 
 
 Function hasLiveTVEducationModalBeenShown(currentScreenId)
-
   if m.constants.settings.mode = "qa"
     ' This is only to support QA for suit test/automation test.
     ' TODO:  remove showLiveTVEducationModalAlways flag and only keep hideStartupModals to control the startup modals.
@@ -1293,7 +1288,6 @@ Function hasLiveTVEducationModalBeenShown(currentScreenId)
       if m.constants.settings.showLiveTVEducationModalAlways = true AND currentScreenId = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false
         return false
       end if
-
     end if
   end if
 
@@ -1305,11 +1299,10 @@ Function hasLiveTVEducationModalBeenShown(currentScreenId)
   ' do not show the modal if user has already seen the liveTV on their first session
 
   if m.shouldShowLinearEducationModal = true
-    if getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", true).enabled = true AND currentScreenId = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false
+    if currentScreenId = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", true).enabled = true
       return false
     end if
   end if
 
   return true
-
 End Function
