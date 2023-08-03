@@ -1299,7 +1299,7 @@ Function hasLiveTVEducationModalBeenShown(currentScreenId)
   ' do not show the modal if user has already seen the liveTV on their first session
 
   if m.shouldShowLinearEducationModal = true
-    if currentScreenId = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", true).enabled = true
+    if currentScreenId = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false AND isParentalControlsAdultLevel() = true AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", true).enabled = true
       return false
     end if
   end if
