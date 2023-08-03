@@ -1,13 +1,12 @@
 'The Main function serves to run any remote config and experiment API calls and then choose the appropriate UI
 Function Main(startupArgs)
-  ' this version of constants will be the constants that are part of the submitted build (or the side loaded build)
-  ' and only exist in the main brightscript thread.
-  ' constants will be reset in remote components for scene graph
   m.appStartTime = UpTime(0)
   m.startupArgs = startupArgs
   handleRegistryOperations(startupArgs)
 
-
+  ' this version of constants will be the constants that are part of the submitted build (or the side loaded build)
+  ' and only exist in the main brightscript thread.
+  ' constants will be reset in remote components for scene graph
   constants = getConstants()
   port = CreateObject("roMessagePort")
   m.queue = TubiRequestQueue().create(port)
