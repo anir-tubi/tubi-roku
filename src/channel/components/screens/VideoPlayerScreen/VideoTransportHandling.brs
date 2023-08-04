@@ -1177,8 +1177,6 @@ Function onPauseAdResponse(msg)
     end if
 
     if m.top.hasFocus()
-      m.pauseAdOverlay.posterWidth = pauseAdResponse.width
-      m.pauseAdOverlay.posterHeight = pauseAdResponse.height
       m.pauseAdOverlay.posterUri = pauseAdResponse.mediaUrl
     else
       sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
@@ -1298,8 +1296,6 @@ End Function
 Function resetPauseAd()
   if m.pauseAdOverlay <> invalid
     m.pauseAdOverlay.posterUri = ""
-    m.pauseAdOverlay.posterWidth = 0
-    m.pauseAdOverlay.posterHeight = 0
 
     if m.pauseAdAnimation <> invalid
       stopAnimation(m.pauseAdAnimation)

@@ -7,8 +7,6 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
 
   <interface>
-    <field id="posterWidth" type="integer" alias="PauseAdPoster.width"/>
-    <field id="posterHeight" type="integer" alias="PauseAdPoster.height"/>
     <field id="posterUri" type="string" alias="PauseAdPoster.uri"/>
     <field id="posterLoadStatus" type="string" alias="PauseAdPoster.loadStatus"/>
     <field id="close" type="boolean" alwaysNotify="true"/>

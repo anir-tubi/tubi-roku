@@ -474,9 +474,9 @@ Function getConstants()
     end if
 
     'pause ad server url
-    constants.urls.pauseAdsUrl = "https://ads.production-public.tubi.io/pause/v1/roku"
+    constants.urls.pauseAdsUrl = "https://ads.production-public.tubi.io/pause/v1/" + constants.analyticsPlatform
     if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-      constants.urls.pauseAdsUrl = "https://ads.staging-public.tubi.io/pause/v1/roku"
+      constants.urls.pauseAdsUrl = "https://ads.staging-public.tubi.io/pause/v1/" + constants.analyticsPlatform
     end if
 
     'contents url

@@ -179,13 +179,16 @@ Function parsePauseAdSuccess(fullResponse, _reqInfo)
       end if
 
       if firstCreative <> invalid AND firstCreative.creative <> invalid
-
         media = firstCreative.creative.media
 
+        'cdn will return image with nearest possible dimension
+        width = "1450"
+        if m.constants.deviceInfo.scaledUi = true then
+          width = "966"
+        end if
+
         if media <> invalid
-          content.mediaUrl = media.url
-          content.width = media.width
-          content.height = media.height
+          content.mediaUrl = media.url + "?w=" + width
         end if
 
         if firstCreative.imp_tracking <> invalid AND firstCreative.imp_tracking.Count() > 0

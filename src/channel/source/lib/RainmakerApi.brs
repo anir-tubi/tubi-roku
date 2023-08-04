@@ -19,13 +19,11 @@ Function rainmakerApi_pauseAdsRequestInfo(content as Object, nowPos as Integer, 
   url = m.constants.urls.pauseAdsUrl
   options = {}
   options.method = m.constants.reqTypes.get
-  resolution = m.constants.deviceInfo.displayHeight
 
   params = {
     content_id: content.id
     pub_id: content.pubId
     device_id: m.constants.deviceInfo.deviceId
-    resolution: resolution
     now_pos: nowPos
     app_id: m.constants.settings.shortAppName
     app_mode: appMode
