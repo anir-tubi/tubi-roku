@@ -22,35 +22,11 @@ settings:
   #the number of seconds before the video overlay autohides in Live TV after last button pressed.
   videoOverlayAutoHideTime: 5
 
-
-  # enabling showOnBoardingAlways will show OnBoarding Screen every time the app is launched as non-production mode for guest users.
-  # This field is added for testing purpose
-  showOnBoardingAlways: false
-
- # enabling showFIFAIntroModalAlways will show FIFA Intro modal every time the app is launched as non-production mode for guest users.
-  # This field is added for testing purpose
-  showFIFAIntroModalAlways: false
-
-  # enabling showRegistrationModalForNewUser will show registration Intro modal every time the app is launched as non-production mode for new users.
-  # This field is added for testing purpose Only
-  showRegistrationModalForNewUser: false
+  # hideStartupModals=true  ==> no startup modals are shown
+  # hideStartupModals=false ==> Normal prod behaviour
+  hideStartupModals: false
 
 
-  # disabling hideStartupModals will let other showmodal flags to work as set. For example,
-  # if hideStartupModals=false and showRegistrationModalForNewUser=true ===> registration modal will be shown for new user
-  # if hideStartupModals=false and showFIFAIntroModalAlways=true ====> FIFA modal will be shown
-  # if hideStartupModals=true ==> no startup modals are shown irrespective off individual state
-  hideStartupModals: true
-
-
-
-  # enabling showLiveTVEducationModalAlways will show live TV education modal every time the app is launched as non-production mode.
-  # This field is added for testing purpose Only
-  showLiveTVEducationModalAlways: false
-
-  #FIFA worldcup tournament start date/end date for testing purposes. Please follow the format
-  tournamentStartDate: "2022-11-20T00:00:00Z"
-  tournamentEndDate: "2022-12-18T00:00:00Z"
 
   # A date which will be used as the current date within the app. Use this to simulate a date in the past or future. If a date is provided this gets converted to a time offset in seconds to allow testing of features only available at a particular time
   # testingTimeOffset: "2023-02-12T20:00:00Z"

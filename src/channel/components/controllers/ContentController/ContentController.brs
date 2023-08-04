@@ -168,13 +168,6 @@ Function init()
     Auth.setFirstVisit()
   end if
 
-  ' QA TESTING PURPOSE: below block can be removed during onboarding graduation.
-  ' By clearing registry, QA can turn 'showOnboardingAlways' back to false in .yml and make sure onboarding screen is shown for next launch.
-  if m.constants.settings.mode = "qa" AND m.constants.settings.hideStartupModals <> true AND (m.constants.settings.showRegistrationModalForNewUser = true OR m.constants.settings.showOnboardingAlways = true)
-    m.global.isNewUser = true
-    Auth.clearFirstVisit()
-  end if
-
   m.authInfoReceived = false 'is the auth info returned from the registry
   m.authInfoRefreshed = true 'is the auth info refreshed after receiving a deeplink with a refresh token
   m.ageVerificationComplete = false 'has the user verified their age?

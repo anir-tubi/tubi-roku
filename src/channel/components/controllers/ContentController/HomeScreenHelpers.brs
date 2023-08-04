@@ -1002,12 +1002,6 @@ Function isFIFAIntroModalShown()
     isModalShown = auth.getEducationalModalEntry("fifaIntro")
   end if
 
-  ' QA TESTING PURPOSE: below block can be removed during FIFA graduation.
-  if m.constants.settings.mode <> "production" AND m.constants.settings.showFIFAIntroModalAlways = true
-    auth.clearEducationalModalEntry("fifaIntro") ' clearing the registry when showFIFAIntroModalAlways = true
-    isModalShown = false
-  end if
-
   '// This code is to clear the fifaIntro from registry after tournament ends
   clearFIFARelatedRegDate = CreateObject("roDateTime")
   clearFIFARelatedRegDate.FromISO8601String(m.constants.tournament.clearRegistryDate)
@@ -1260,13 +1254,8 @@ End Function
 ' do not show if the user is already logged in during deeplink
 Function hasRegModalBeenShown()
   currentScreen = getCurrentScreen()
-  if m.constants.settings.mode = "qa"
-    ' This is only to support QA for suit test/automation test
-    if m.constants.settings.hideStartupModals <> true
-      if m.constants.settings.showRegistrationModalForNewUser = true AND currentScreen.id = m.constants.ui.screenIds.homeScreen
-        return false
-      end if
-    end if
+  if m.constants.settings.mode = "qa" AND m.constants.settings.hideStartupModals = true
+      return true
   end if
 
   if isNewUser() = true AND m.hasRegModalBeenShownWithinNewUserSession = false
@@ -1281,14 +1270,8 @@ End Function
 
 
 Function hasLiveTVEducationModalBeenShown(currentScreenId)
-  if m.constants.settings.mode = "qa"
-    ' This is only to support QA for suit test/automation test.
-    ' TODO:  remove showLiveTVEducationModalAlways flag and only keep hideStartupModals to control the startup modals.
-    if m.constants.settings.hideStartupModals <> true
-      if m.constants.settings.showLiveTVEducationModalAlways = true AND currentScreenId = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false
-        return false
-      end if
-    end if
+  if m.constants.settings.mode = "qa" AND m.constants.settings.hideStartupModals = true
+    return true
   end if
 
   ' conditions to show liveTV education modal are:
