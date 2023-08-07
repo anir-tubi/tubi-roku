@@ -2640,9 +2640,17 @@ Function getTranslation_es_MX()
       "description": "Label of button to indicate to users that the current video title has been disliked",
       "message": "No Te Gustó"
     },
+    "screenDetails_button_notForMe": {
+      "description": "Label of button to allow users to ignore the current video title",
+      "message": "No para mí"
+    },
     "screenDetails_button_likeDislike": {
       "description": "Label of unfocused button to allow users to like or dislike the current video title",
       "message": "Me Gusta o No Me Gusta"
+    },
+    "screenDetails_button_rateThisTitle": {
+      "description": "Label of unfocused button to allow users to rate the current video title",
+      "message": "Califica este Título"
     },
     "screenDetails_button_see_all_games": {
       "description": "Label of button to allow users to a new page where they can see all the games related to the current sports title",
