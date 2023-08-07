@@ -694,6 +694,7 @@ function setAutomatedTestsConfig(done) {
     options.overrides = {
       settings: {
         injectRtaOnDeviceComponent: true,
+        hideStartupModals: true,
         noAds: true,
         printReqAndResInfo: false,
         bs_const: {
