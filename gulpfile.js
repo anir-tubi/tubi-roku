@@ -21,7 +21,7 @@ const clipboardy = require('clipboardy');
 //Importing old build functions
 const {load, getBuildTag, incrementBuildNumber, incrementRevisionNumber} = require('./js/config');
 const {createManifest, createSettings} = require('./js/build');
-const {keypress, deeplink, uploadPkg, signPkg, convertToSquashfs} = require('./js/network');
+const {keypress, deeplink, uploadPkg, signPkg, installWithSquashfs} = require('./js/network');
 
 //Functions to upload and download static string translations
 const {downloadTranslations, updateLocalTranslations, uploadTranslations} = require('./js/translate');
@@ -437,7 +437,6 @@ function buildRemote() {
 }
 
 
-
 // upload - upload the zip package file to a roku device
 // returns a promise
 // @zipPath: the relative path to the zip file that will be uploaded to the roku
@@ -453,6 +452,7 @@ function upload(zipPath) {
     log(`Uploaded ${zipPath} to ${address} successfully.`);
   });
 }
+
 
 function serverMiddleware(req, res, next) {
   // If we receive a request to this endpoint then we know our unit test have finished so we should stop the process.
@@ -525,11 +525,7 @@ function packageLocal(done) {
   let buildTag = getBuildTag('revision');
   let zipPath = `build/tubi_${buildTag}.zip`;
   let appName = `tubi_${buildTag}`;
-  return upload(zipPath)
-    .then(() => {
-      log(`Converting zip to squashfs file for ${zipPath}`);
-      return convertToSquashfs(zipPath, options.target, options.devPass);
-    })
+  return installWithSquashfs(zipPath, options.target, options.devPass)
     .then(() => {
       log(`Signing ${zipPath}`);
       return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build');
@@ -551,11 +547,7 @@ function packageStarter(done) {
   let minorBuildTag = getBuildTag('minor');
   var appName = `tubi_starter_components_${minorBuildTag}`;
   var zipPath = `build/tubi_starter_components_${minorBuildTag}.zip`;
-  return upload(zipPath)
-    .then(() => {
-      log(`Converting zip to squashfs file for ${zipPath}`);
-      return convertToSquashfs(zipPath, options.target, options.devPass);
-    })
+  return installWithSquashfs(zipPath, options.target, options.devPass)
     .then(() => {
       log(`Signing ${zipPath}`);
       return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build');
@@ -577,11 +569,7 @@ function packageRemote(done) {
   let buildTag = getBuildTag('revision');
   let zipPath = `build/tubi_remote_components_${buildTag}.zip`;
   let appName = `tubi_remote_components_${buildTag}`;
-  return upload(zipPath)
-    .then(() => {
-      log(`Converting zip to squashfs file for ${zipPath}`);
-      return convertToSquashfs(zipPath, options.target, options.devPass);
-    })
+  return installWithSquashfs(zipPath, options.target, options.devPass)
     .then(() => {
       log(`Signing ${zipPath}`);
       return signPkg(options.target, options.devPass, options.pkgPass, appName, 'build');

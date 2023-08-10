@@ -63,6 +63,7 @@ exports.uploadPkg = function(zipPath, deviceIp, password) {
 
     request.post(options, (err, response, body) => {
       const success = !!body ? body.match(/<font color="red">Install Success.<\/font>/) : null
+
       if (err) {
         rej(err);
       }
@@ -95,7 +96,7 @@ exports.uploadPkg = function(zipPath, deviceIp, password) {
 // @zipPath: string, local path to the zip file that will be converted
 // @deviceIp: string, the ip of the roku device
 // @password: string, the dev password for the roku device
-exports.convertToSquashfs = function(zipPath, deviceIp, password) {
+exports.installWithSquashfs = function(zipPath, deviceIp, password) {
   return new Promise((res, rej) => {
     const url = `http://${deviceIp}/plugin_install`;
 
@@ -106,7 +107,7 @@ exports.convertToSquashfs = function(zipPath, deviceIp, password) {
     };
 
     const formData = {
-      mysubmit: 'Convert to squashfs',
+      mysubmit: 'Install with squashfs',
       archive: fs.createReadStream(zipPath)
     };
     const options = {
@@ -116,7 +117,14 @@ exports.convertToSquashfs = function(zipPath, deviceIp, password) {
     };
 
     request.post(options, (err, response, body) => {
-      const success = !!body ? (body.match(/<font color="red">Install Success.<\/font>/) && body.match(/<font color="red">Conversion succeeded/)) : null
+      let success = null;
+      if (!!body) {
+        success = body.match(/<font color="red">Install Success.<\/font>/);
+        if (success === null) {
+          success = body.match(/<font color="red">Uninstall Success.<\/font>/);
+        }
+      }
+
       if (err) {
         rej(err);
       }
