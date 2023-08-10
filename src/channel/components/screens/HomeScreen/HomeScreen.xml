@@ -220,16 +220,13 @@
       <InfoPanel
         id="InfoPanel"
         translation="[192,168]"
-        maxHeight="354"
         maxTitleLines="2"/>
     </Group>
 
     <MaskGroup
       id="ContentArea"
       maskUri="pkg:/images/poster-mask.png"
-      maskSize="[0,0]"
-      maskOffset="[0,317]"
-      translation="[192,561]">
+      maskSize="[0,0]">
       <CategoryGridList
         id="CategoryGridList"/>
     </MaskGroup>

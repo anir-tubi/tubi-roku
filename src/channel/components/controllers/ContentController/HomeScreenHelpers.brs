@@ -906,6 +906,10 @@ Function onHomescreenContentReady(msg)
   homeScreen = msg.getRoSGNode()
 
   if homeScreen.contentReady = true
+
+    'Send the exposure event for large poster experiment on home screen loading
+    getExperimentResource("roku_large_poster", "roku_large_poster_v1")
+
     fireAppLoadBeacon()
     homeScreen.unobserveFieldScoped("contentReady")
     homeScreen.isLoading = false

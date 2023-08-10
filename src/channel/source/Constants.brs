@@ -645,6 +645,10 @@ Function getConstants()
     constants.urls.continueWatchingItemBackground = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingNonRegisteredItemBground.png"
     constants.urls.continueWatchingItemBackground_kidsMode = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingNonRegisteredItemBground_kidsMode.png"
 
+    ' The background large images on the continue watching container row when the user is signed out
+    constants.urls.continueWatchingItemBackground_largePoster = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingItemBackground_largePoster.webp"
+    constants.urls.continueWatchingItemBackground_largePoster_kidsMode = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingItemBackground_largePoster_kids.webp"
+
     constants.urls.onBoardingBackground = "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-welcome-fhd.webp"
     constants.urls.landingBackgroundUriList = [
       "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-1.webp"
@@ -1247,11 +1251,17 @@ Function getConstants()
       'Sizes of poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.poster = [186, 267]
 
+      'Sizes of large poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
+      constants.ui.imageSizes.largePoster = [243, 351]
+
       'Size of the thumbnail/background of the single element representing an empty container that we wish to show: i.e. on the MyStuff Screen
       constants.ui.imageSizes.emptyContainer = [1572, 267]
 
       'Sizes of landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.landscape = [384, 216]
+
+      'Sizes of large landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
+      constants.ui.imageSizes.largeLandscape = [504, 282]
 
       'Sizes of linear to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.linear = [384, 144]

@@ -247,3 +247,9 @@ Function getScreenIdsFromStack()
 
   return screenIds
 End Function
+
+
+' Returns all the screens in the screen stack in an array
+Function getScreensInStack()
+  return m.screenStack.getChildren(-1, 0)
+End Function

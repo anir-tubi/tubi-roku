@@ -59,6 +59,23 @@ Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoad
 End Function
 
 
+'@categoryId: string, categoryId(continue_watching, queue) of the category detail screen
+Function isCategoryDetailScreenInStack(categoryId)
+  screensInStack = getScreensInStack()
+
+  for each screen in screensInStack
+    if screen.id = m.constants.ui.screenIds.categoryDetailsScreen
+      if screen.categoryId = categoryId
+        return true
+        exit for
+      end if
+    end if
+  end for
+
+  return false
+End Function
+
+
 Function onSignInRequired(msg)
   tubiLog("CategoryDetailsScreenHelpers.onSignInRequired")
   screen = msg.getRoSGNode()

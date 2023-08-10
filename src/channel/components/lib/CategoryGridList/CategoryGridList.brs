@@ -17,6 +17,14 @@ Function init()
   m.AnimateToCategoryDebounce = m.top.findNode("AnimateToCategoryDebounce")
   m.AnimateToCategoryDebounce.observeField("fire", "onAnimateToCategoryDebounce")
 
+  if getExperimentResource("roku_large_poster", "roku_large_poster_v1", false).enabled = true
+    m.RowList.itemSpacing = [0,12]
+    m.RowList.rowSpacings = 12
+  else
+    m.RowList.itemSpacing = [0,36]
+    m.RowList.rowSpacings = 36
+  end if
+
   ' Parameters for the metadata block cache. Window size is number of items to fetch, page delimiter
   ' is what focus thresholds trigger a fetch.
   m.initialBlockSize = m.constants.performance.categoryGridList.initialBlockSize
@@ -226,12 +234,19 @@ Function onRepopulateContent()
 End Function
 
 
-
 Function setRowHeights()
   'determine the height of each row in the RowList so we can set it on RowList.rowItemSize
   rowItemSize = []
   rowHeights = []
   numRows = 2
+
+  posterSize = m.constants.ui.imageSizes.poster
+  landscapeSize = m.constants.ui.imageSizes.landscape
+  if (getExperimentResource("roku_large_poster", "roku_large_poster_v1", false).enabled = true)
+    posterSize = m.constants.ui.imageSizes.largePoster
+    landscapeSize = m.constants.ui.imageSizes.largeLandscape
+  end if
+
   for i=0 to m.top.content.getChildCount()-1
     category = m.top.content.getChild(i)
     rowHeight = 0
@@ -240,12 +255,12 @@ Function setRowHeights()
     gridItemTypes = m.constants.ui.gridItemTypes
     if gridItemType = gridItemTypes.historySignedOutUser
       rowHeightAdjustment = 80
-      posterHeight = m.constants.ui.imageSizes.poster[1]
+      posterHeight = posterSize[1]
       rowItemSize.push([1693, posterHeight])
       rowHeight = posterHeight
     else if gridItemType = gridItemTypes.portrait
-      posterWidth = m.constants.ui.imageSizes.poster[0]
-      posterHeight = m.constants.ui.imageSizes.poster[1]
+      posterWidth = posterSize[0]
+      posterHeight = posterSize[1]
       rowHeightAdjustment = 80
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
@@ -254,8 +269,8 @@ Function setRowHeights()
       rowHeight = m.constants.ui.imageSizes.linear[1]
       rowHeightAdjustment = 86
     else if gridItemType = gridItemTypes.landscape OR gridItemType = gridItemTypes.landscapeNoTitle
-      posterWidth = m.constants.ui.imageSizes.landscape[0]
-      posterHeight = m.constants.ui.imageSizes.landscape[1]
+      posterWidth = landscapeSize[0]
+      posterHeight = landscapeSize[1]
       rowHeightAdjustment = 122
       if gridItemType = gridItemTypes.landscapeNoTitle then
         rowHeightAdjustment = 100

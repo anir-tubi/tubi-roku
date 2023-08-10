@@ -182,7 +182,7 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
       "poster"
       "landscape"
     ]
-    params = m.setImageParams(imageParamTypes, options.params)
+    params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.homeScreen)
   end if
 
   utmCampaignConfig = m.utmCampaignConfig
@@ -217,7 +217,8 @@ End Function
 ' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
 '                 see request.brs for more info
 ' @imageParamTypes: Array, What image types/sizes should be requested from the backend. If none are passed, then a default set of types will be used.
-Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptions = {}, imageParamTypes = invalid)
+' @screenId: String, id of the screen to which is requesting to get large poster sizes from Tupian.
+Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptions = {}, imageParamTypes = invalid, screenId = "")
   options = m.getCommonOptions()
   params = options.params
 
@@ -243,7 +244,7 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
     ]
   end if
 
-  params = m.setImageParams(imageParamTypes, params)
+  params = m.setImageParams(imageParamTypes, params, screenId)
 
   headers = options.headers
   headers["Accept-Version"] = "6.0.0"
@@ -304,9 +305,16 @@ End Function
 ' @imageTypes, array - an array of strings corresponding to which types of images to request from Tupian
 '                      Accepted values are "poster", "landscape"
 ' @existingParams: assocArray, any parameters that have already been defined that need to be added to
-Function cmsApi_setImageParams(imageTypes, existingParams = {})
+Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "")
   posterSize = m.constants.ui.imageSizes.poster
   landscapeSize = m.constants.ui.imageSizes.landscape
+
+  isLargePosteExperimentEnabled = m.experiments <> invalid AND m.experiments.getExperimentResource("roku_large_poster", "roku_large_poster_v1").enabled
+
+  if isLargePosteExperimentEnabled = true AND (isNonEmptyString(screenId) AND screenId = m.constants.ui.screenIds.homeScreen)
+    posterSize = m.constants.ui.imageSizes.largePoster
+    landscapeSize = m.constants.ui.imageSizes.largeLandscape
+  end if
 
   for each imageType in imageTypes
     if imageType = "poster"
@@ -393,7 +401,7 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
 
             options.params.append(contentModeParam)
 
-            categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, invalid)
+            categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, invalid, m.constants.ui.screenIds.homeScreen)
             categoryReqInfo.requestType = reqName
             categoryReqInfo.responseType = "node"
             categoryReqInfo.isSignedInUser = isSignedInUser
@@ -554,7 +562,7 @@ Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, cont
 
         options.params.append(contentModeParam)
 
-        categoryReqInfo = m.createCategoryReqInfo(containerId, bKidsMode, options, invalid)
+        categoryReqInfo = m.createCategoryReqInfo(containerId, bKidsMode, options, invalid, screenId)
         categoryReqInfo.requestType = reqName
         categoryReqInfo.responseType = "node"
         categoryReqInfo.isSignedInUser = isSignedInUser

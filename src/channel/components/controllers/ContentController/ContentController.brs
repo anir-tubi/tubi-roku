@@ -838,7 +838,7 @@ Function setDirtyUserCategories(categoryId)
     ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
     params["content_mode"] = ""
     options.params = params
-    categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, options)
+    categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, options, invalid, m.constants.ui.screenIds.homeScreen)
 
     m.makeRequest({
       url: categoryReqInfo.url
@@ -860,7 +860,7 @@ Function setDirtyUserCategories(categoryId)
       movieParams["content_mode"] = m.constants.ui.contentMode.movie
       optionMovie.params = movieParams
 
-      categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, optionMovie)
+      categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, optionMovie, invalid, m.constants.ui.screenIds.homeScreen)
 
       m.makeRequest({
         url: categoryReqInfo.url
@@ -882,7 +882,7 @@ Function setDirtyUserCategories(categoryId)
       tvParams["content_mode"] = m.constants.ui.contentMode.tv
       optionTV.params = tvParams
 
-      categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, optionTV)
+      categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, optionTV, invalid, m.constants.ui.screenIds.homeScreen)
 
       m.makeRequest({
         url: categoryReqInfo.url
@@ -905,7 +905,7 @@ Function setDirtyUserCategories(categoryId)
       esParams["content_mode"] = m.constants.ui.contentMode.latino
       optionEspanol.params = esParams
 
-      categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, optionEspanol)
+      categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, optionEspanol, m.constants.ui.screenIds.homeScreen)
 
       m.makeRequest({
         url: categoryReqInfo.url
@@ -917,6 +917,31 @@ Function setDirtyUserCategories(categoryId)
         id: categoryId
         isSignedInUser: isLoggedInUser()
         screenId: m.constants.ui.screenIds.espanolScreen
+        uiMode: m.uiMode
+      })
+    end if
+
+    ' needed in case the image sizes on the homescreen are different than the image sizes
+    ' on the categoryDetailsScreen. We don't want to add large homescreen images sizes to the
+    ' content on the categoryDetailsScreen.
+    if isCategoryDetailScreenInStack(categoryId) = true
+      optionCategoryDetail = {
+        params: {
+          content_mode: ""
+        }
+      }
+      categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, optionCategoryDetail)
+
+      m.makeRequest({
+        url: categoryReqInfo.url
+        requestType: reqName
+        options: categoryReqInfo.options
+        successCallback: onReloadUserCategoriesResponseInCategoryDetailScreen
+        errorCallback: onErrorReloadUserCategoriesInCategoryDetailScreen
+        responseType: "node"
+        id: categoryId
+        isSignedInUser: isLoggedInUser()
+        screenId: m.constants.ui.screenIds.categoryDetailsScreen
         uiMode: m.uiMode
       })
     end if
@@ -936,10 +961,22 @@ Function onReloadUserCategoriesResponse(handledRequest)
     categoryListScreen.reloadUserCategoriesResponse = handledRequest
   end if
 
+End Function
+
+
+Function onReloadUserCategoriesResponseInCategoryDetailScreen(handledRequest)
+  tubiLog("ContentController.onReloadUserCategoriesResponseInCategoryDetailScreen")
+
   ' inform the category details screen for the specific user category of the update user category content
   if handledRequest <> invalid
     refreshStackedUserScreenWithChangedCategory(handledRequest.id)
   end if
+End Function
+
+
+Function onErrorReloadUserCategoriesInCategoryDetailScreen(response)
+  tubiLog("ContentController.onErrorReloadUserCategoriesInCategoryDetailScreen")
+  onReloadUserCategoriesInHomeScreen(response, m.constants.ui.screenIds.categoryDetailsScreen)
 End Function
 
 
