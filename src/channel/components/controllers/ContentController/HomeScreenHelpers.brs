@@ -1276,13 +1276,12 @@ Function hasLiveTVEducationModalBeenShown(currentScreenId)
 
   ' conditions to show liveTV education modal are:
   ' user is not a new user
-  ' user is in experiment roku_linear_epg_education_modal_over_homegrid_v1 (for now)
+  ' user is in experiment roku_linear_epg_education_modal_over_homegrid_v2 (for now)
   ' show the modal only on homescreen, not in kids mode/espanol mode or any other homescreens.
   ' User should not see the welcome registation modal and liveTV education modal within the same session(this happens when new-user signsIn)
   ' do not show the modal if user has already seen the liveTV on their first session
-
   if m.shouldShowLinearEducationModal = true
-    if currentScreenId = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false AND isParentalControlsAdultLevel() = true AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", true).enabled = true
+    if currentScreenId = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false AND isParentalControlsAdultLevel() = true AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v2", true).enabled = true
       return false
     end if
   end if

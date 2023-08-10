@@ -65,7 +65,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     end if
 
     'if preference exists and its true means user has not seen the linear before.
-    if m.serverPersistentData.secondSessionLinearNotWatched = true AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v1", false).enabled = true
+    if m.serverPersistentData.secondSessionLinearNotWatched = true AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v2", false).enabled = true
       saveServerPersistentData({
         "secondSessionLinearNotWatched": false
       }, "device")
