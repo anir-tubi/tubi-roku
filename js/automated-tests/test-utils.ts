@@ -5,6 +5,31 @@ import { ecp, odc, utils, device, BaseType } from 'roku-test-automation';
 import * as needle from 'needle';
 import * as querystring from 'needle/lib/querystring';
 
+const clientVersion = '2.21.0';
+
+
+const platform = 'roku';
+
+
+enum ContentTypes {
+  'series' = 'series',
+  'movie' = 'movie',
+  'linear' = 'linear',
+  'category' = 'category',
+  'channel' = 'channel',
+  'sports_event' = 'sports_event'
+}
+
+const abbreviatedContentTypeConversion = {
+  c: ContentTypes.category,
+  v: ContentTypes.movie,
+  s: ContentTypes.series,
+  channel: ContentTypes.channel,
+  l: ContentTypes.linear,
+  se: ContentTypes.sports_event
+} as {[key: string]: ContentTypes};
+
+
 class TestUtils {
   private convertedElementKeyPaths: {
     [key: string]: KeyPathElement
@@ -50,7 +75,7 @@ class TestUtils {
 
   // This gives an easy way to get a node for the given element
   // elementName is the key that was used when defining in the element-keypaths file
-  public async getNodeForElement(elementName: string, timeout = 10000) {
+  public async getNodeForElement(elementName: string, timeout = 15000) {
     let result;
     await testUtils.untilTrue(async () => {
       result = await odc.getValue(this.getElementKeyPath(elementName));
@@ -87,7 +112,7 @@ class TestUtils {
   // Helper to fully shutdown the application
   public async exitApplication() {
     // wait for content controller to get added. This is needed in the case that the application is still launching and then the next test tries to close the application again. Without this the setValue would fail because ContentController does not exist yet.
-    await this.getNodeForElement('contentController');
+    await this.getNodeForElement('contentControllerId');
     try {
       await odc.setValue({
         base: 'scene',
@@ -116,9 +141,10 @@ class TestUtils {
     url: string;
     method: needle.NeedleHttpVerbs;
     params?: {[key: string]: any};
-    body?: string}) {
-    requestOptions.proxy = '127.0.0.1:8888'; // useful for debugging
+    body?: any}) {
+    // requestOptions.proxy = '127.0.0.1:8888'; // useful for debugging
 
+    requestOptions.headers = requestOptions.headers ?? {};
     requestOptions.headers['user-agent'] = this.userAgent;
 
     const params = requestOptions.params;
@@ -127,35 +153,28 @@ class TestUtils {
       url = url.replace(/\?.*|$/, '?' + querystring.build(params));
     }
 
+    let response: Awaited<ReturnType<typeof needle>>;
     if (requestOptions.body) {
-      const response = await needle(requestOptions.method, url, requestOptions.body, requestOptions);
-      return response.body;
+      if (typeof requestOptions.body !== 'string') {
+        requestOptions.body = JSON.stringify(requestOptions.body);
+        requestOptions.headers['content-type'] = 'application/json';
+      }
+      response = await needle(requestOptions.method, url, requestOptions.body, requestOptions);
+    } else {
+      response = await needle(requestOptions.method, url, requestOptions);
     }
 
-    const response = await needle(requestOptions.method, url, requestOptions);
+    if (response.statusCode >= 400) {
+      throw new Error(`Received invalid response code ${response.statusCode} for url ${url}: ${response.body}`);
+    }
+
     return response.body;
   }
 
 
-  public async createTestUser() {
-    const credentials = {
-      birthday: '2000-01-01',
-      email: `build_roku_${Math.floor(Date.now() / 1000)}@tubi.tv`,
-      email_type: 'manual',
-      first_name: 'Automation',
-      gender: '',
-      last_name: '',
-      password: '111111',
-      temporary_name: true
-    };
-    const user = await auth.userSignup(credentials);
-    return user;
-  }
-
-
   // Starts the application at the specified page.
-  // If asSignedInUser is true we will log them in else we will log them out
-  public async startApplicationAtPage(page: DeeplinkPage | 'search', asSignedInUser = false) {
+  // args: options to modify starting application state such as wether a user is logged in or not
+  public async startApplicationAtPage(page: DeeplinkPage | 'search', args: StartApplicationArgs = {}) {
     let deeplink;
     if (page !== 'search') {
       deeplink = {
@@ -163,7 +182,7 @@ class TestUtils {
       };
     }
 
-    await this.startApplicationWithDeeplink(deeplink, asSignedInUser);
+    await this.startApplicationWithDeeplink(deeplink, args);
 
     if (page === 'search') {
       await this.goToPage('search');
@@ -174,25 +193,50 @@ class TestUtils {
   // Starts the application at the specified page.
   // If asSignedInUser is true we will log them in else we will log them out
   // deeplink: this is an object with the list of starting params sent to the application. Common fields include contentId, mediaType and page but other values may be passed as needed.
-  public async startApplicationWithDeeplink(deeplink = {}, asSignedInUser = false) {
-    deeplink['clearRegistry'] = true;
-    if (asSignedInUser) {
-      const user = await this.createTestUser();
-      deeplink['setRegistry'] = JSON.stringify({
-        auth: {
-          refreshtoken: user.refresh_token,
-          userid: `${user.user_id}`,
-          expiretime: '0'
-        }
-      });
+  // args: options to modify starting application state such as wether a user is logged in or not
+  public async startApplicationWithDeeplink(deeplink = {}, args: StartApplicationArgs = {}) {
+    if (args.clearRegistry !== false) {
+      deeplink['clearRegistry'] = true;
     }
 
+    let user = args.user;
+    if (args.shouldCreateNewUser === true) {
+      user = await this.createRegisteredUser();
+    }
+
+    if (user) {
+      deeplink['setRegistry'] = JSON.stringify(user.getRegistryAuthValues());
+    }
 
     await this.restartApplication({
       params: deeplink
     });
 
     await this.waitForApplicationStartup();
+  }
+
+
+  public async createRegisteredUser() {
+    const user = new RegisteredUser();
+    const credentials = {
+      birthday: '2000-01-01',
+      email: `build_roku_${Math.floor(Date.now() / 1000)}@tubi.tv`,
+      email_type: 'manual',
+      first_name: 'Automation',
+      gender: '',
+      last_name: '',
+      password: '111111',
+      temporary_name: true
+    };
+    await user.create(credentials);
+    return user;
+  }
+
+
+  public async createAnonymousUser() {
+    const user = new AnonymousUser();
+    await user.create();
+    return user;
   }
 
 
@@ -222,9 +266,10 @@ class TestUtils {
 
   // Helper to check player state eventually equals the specified state
   public async expectPlayerStateToEventuallyEqual(state: MediaPlayerResponse['state'], timeout = 5000) {
-    await testUtils.retryWithTimeOut(async () => {
+    return await testUtils.retryWithTimeOut(async () => {
       const player = await ecp.getMediaPlayer();
       expect(player.state).to.equal(state);
+      return player;
     }, timeout);
   }
 
@@ -304,8 +349,167 @@ class TestUtils {
   }
 
 
+  /**
+   * Used to retrieve all content in row specified by `rowIndex` from the specified RowList element
+   * elementName is the key that was used when defining in the element-keypaths file. Should have `RowList` in its name
+   */
+  public async getRowListRowItemsContent(elementName: string, rowIndex: number, timeout = 10000) {
+    const element = this.getElementKeyPath(elementName);
+
+    const baseKeyPath = `${element.keyPath}.content.${rowIndex}`;
+
+    const node = await testUtils.retryWithTimeOut(async () => {
+      const {value, found} = await odc.getValue({
+          keyPath: baseKeyPath,
+          responseMaxChildDepth: 1
+      });
+
+      if(!found) {
+        throw new Error(`Could not retrieve item content for rowIndex ${rowIndex}`);
+      }
+
+      return value;
+    }, timeout);
+
+    const rowItemsContent = [];
+
+    if (node.json) {
+      const json = JSON.parse(node.json);
+      for (const child of node.children) {
+        rowItemsContent.push(json[child.id]);
+      }
+    } else {
+      for (const child of node.children) {
+        rowItemsContent.push(child);
+      }
+    }
+    return rowItemsContent;
+  }
+
+
+  /**
+   * Used to retrieve all content in the currently focused row from the specified RowList element
+   * elementName is the key that was used when defining in the element-keypaths file. Should have `RowList` in its name
+   */
+  public async getCurrentlyFocusedRowListRowItemsContent(elementName: string, timeout = 10000) {
+    const grid = await this.getNodeForElement(elementName, timeout);
+    if (!grid.rowItemFocused) {
+      throw new Error('This function should only be used on RowList elements');
+    }
+
+    const index = grid.rowItemFocused[0];
+    return await this.getRowListRowItemsContent(elementName, index, timeout);
+  }
+
+
+  /**
+   * Used to retrieve all content in the specified RowList element
+   * elementName is the key that was used when defining in the element-keypaths file. Should have `RowList` in its name
+   */
+  public async getAllRowListItemsContent(elementName: string, timeout = 10000) {
+    const element = this.getElementKeyPath(elementName);
+    let baseKeyPath = `content`;
+    if (element.keyPath) {
+      baseKeyPath = element.keyPath + '.' + baseKeyPath;
+    }
+
+    const rowCount = await this.retryWithTimeOut(async () => {
+      const {found, value: rowCount} = await odc.getValue({
+        base: element.base,
+        keyPath: `${baseKeyPath}.getChildCount()`
+      });
+      if (!found) {
+        throw new Error(`Can't find row count`);
+      }
+      return rowCount;
+    });
+
+    const gridItemsContent = [];
+    for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+      const rowItemsContent = await this.getRowListRowItemsContent(elementName, rowIndex, timeout);
+      for (const itemContent of rowItemsContent) {
+        gridItemsContent.push(itemContent);
+      }
+    }
+    return gridItemsContent;
+  }
+
+
+  // Used to retrieve grid item content for the item specified by the index
+  // elementName is the key that was used when defining in the element-keypaths file
+  public async getGridItemContent(elementName: string, index: number | number[], timeout = 10000) {
+    const element = this.getElementKeyPath(elementName);
+    if (!Array.isArray(index)) {
+      index = [index];
+    }
+
+    // Required to ensure index is typed as array in retryWithTimeOut
+    const arrayIndex = index;
+
+    const baseKeyPath = `${element.keyPath}.content.${index[0]}`;
+
+    if (index.length > 1) {
+      // If we have a row and column index we need to check if we have a json object that we will reference instead
+      const results = await testUtils.retryWithTimeOut(async () => {
+        const requests = {
+          requests: {
+            rowJson: {
+              keyPath: `${baseKeyPath}.json`
+            },
+            itemContent: {
+              keyPath: `${baseKeyPath}.${index[1]}`
+            }
+          }
+        };
+        const {results} = await odc.getValues(requests);
+
+        if(!results.itemContent.found) {
+          throw new Error(`Could not retrieve item content for index ${arrayIndex.join(':')}`);
+        }
+
+        return results;
+      }, timeout);
+
+      if (results.rowJson.found) {
+        const json = JSON.parse(results.rowJson.value);
+        const content = json[results.itemContent.value.id];
+        return content;
+      } else {
+        return results.itemContent.value;
+      }
+    } else {
+      return await testUtils.retryWithTimeOut(async () => {
+        const {value, found} = await odc.getValue({
+            keyPath: baseKeyPath
+        });
+
+        if(!found) {
+          throw new Error(`Could not retrieve item content for index ${arrayIndex[0]}`);
+        }
+
+        return value;
+      }, timeout);
+    }
+  }
+
+
+  // Used to get the grid item content for the currently focused grid item
+  // elementName is the key that was used when defining in the element-keypaths file
+  public async getCurrentlyFocusedGridItemContent(elementName: string, timeout = 10000) {
+    const grid = await this.getNodeForElement(elementName, timeout);
+    let index;
+    if (grid.rowItemFocused) {
+      index = grid.rowItemFocused;
+    } else {
+      index = grid.itemFocused;
+    }
+
+    return await this.getGridItemContent(elementName, index, timeout);
+  }
+
+
   // Used to select an item in detail page menu and verify that the action has been completed successfully
-  public async selectAndVerifyDetailPageMenuItem(item: 'play' | 'resume' | 'addToMyList' | 'removeFromMyList' | 'removeFromHistory', timeout = 10000) {
+  public async selectAndVerifyDetailPageMenuItem(item: DetailPageMenuItemType, timeout = 10000) {
     // If a network request is still happening then we need to wait for it to complete before proceeding
     const args = this.getElementKeyPath('detailScreen');
     args.keyPath += '.isWaitingForServerResponse';
@@ -343,6 +547,10 @@ class TestUtils {
             return true;
           }
         }, 'Could not verify that Remove from history was removed');
+        break;
+      case 'episodesList':
+        await this.selectMenuItem(elementName, 'Episodes list', timeout);
+        await this.waitForElementToBeInFocusChain('episodesScreen');
         break;
       }
   }
@@ -428,7 +636,7 @@ class TestUtils {
   // Useful to avoid need for sleep in tests
   // Since this does not need to create or throw an error on each iteration, unlike retryWithTimeOut,
   // it is more performant and may be better to use in some cases
-  public async untilTrue(func: () => boolean | Promise<boolean>, errorMessage?: string, timeout = 10000) {
+  public async untilTrue(func: () => boolean | Promise<boolean>, errorMessage?: string, timeout = 15000) {
     const start = Date.now();
     while (timeout > Date.now() - start) {
       if(await func()) {
@@ -460,8 +668,6 @@ class TestUtils {
 
 class Auth {
   private baseAccountUrl = 'https://account.production-public.tubi.io';
-  private platform = 'roku';
-  private applicationVersion = '2.20.19';
   private deviceId: string;
   private anonymousTokenInfo: {
     access_token: string;
@@ -479,14 +685,14 @@ class Auth {
     return {
       'accept-language': 'en-US',
       'content-type': 'application/json',
-      'x-client-platform': this.platform,
-      'x-client-version': this.applicationVersion,
+      'x-client-platform': platform,
+      'x-client-version': clientVersion,
       ...additionalHeaders
     };
   }
 
 
-  private async getDeviceId() {
+  public async getDeviceId() {
     if (this.deviceId) {
       return this.deviceId;
     }
@@ -508,14 +714,15 @@ class Auth {
 
   public async getSigningKey() {
     const verifier = utils.randomStringGenerator(36);
-    const challenge = createHash('sha256').update(verifier).digest('base64').replace('+', '-').replace('/', '_');
+    const challenge = createHash('sha256').update(verifier).digest('base64').replace(/\+/g, '-').replace(/\//g, '_');
 
-    const body = JSON.stringify({
+    const body = {
       challenge: challenge,
       device_id: await this.getDeviceId(),
-      platform: this.platform,
-      version: this.applicationVersion
-    });
+      platform: platform,
+      version: clientVersion,
+      verifier: verifier
+    };
 
     const response = await testUtils.sendNetworkRequest({
       method: 'post',
@@ -533,8 +740,9 @@ class Auth {
   }
 
 
-  public async getAnonymousToken() {
-    if (this.anonymousTokenInfo) {
+  // Used to get an anonymous token for use on API calls. If force = true then we will get a fresh token every time even if we have already retrieved one previously
+  public async getAnonymousToken(force = false) {
+    if (this.anonymousTokenInfo && !force) {
       return this.anonymousTokenInfo;
     }
 
@@ -543,7 +751,7 @@ class Auth {
     const body = JSON.stringify({
       device_id: await this.getDeviceId(),
       id: signingKey.id,
-      platform: this.platform,
+      platform: platform,
       verifier: signingKey.verifier,
     });
 
@@ -573,10 +781,10 @@ class Auth {
       password: string;
       temporary_name: boolean;
     }) {
-    const anonymousToken = await this.getAnonymousToken();
+    const anonymousToken = await this.getAnonymousToken(true);
     const body = JSON.stringify({
       device_id: await this.getDeviceId(),
-      platform: this.platform,
+      platform: platform,
       credentials: credentials
     });
 
@@ -590,32 +798,9 @@ class Auth {
       headers: headers,
       body: body
     });
-
     user.signingKey = anonymousToken.signingKey;
 
-    return user as {
-      access_token: string;
-      birthday: string;
-      email: string;
-      enable_video_preview: boolean;
-      enabled: boolean;
-      expires_in: number;
-      first_name: string;
-      has_age: boolean;
-      has_password: boolean;
-      is_confirmed: boolean;
-      last_name?: string;
-      name: string;
-      parental_rating: number;
-      profile_pic: string;
-      refresh_token: string;
-      user_id: number;
-      signingKey: {
-        id: string;
-        key: string;
-        verifier: string;
-      }
-    };
+    return user as UserSignUpResponse;
   }
 
 
@@ -630,7 +815,8 @@ class Auth {
     signingKey: {
       id: string;
       key: string;
-    }
+    };
+    body: string;
   }) {
     requestOptions = this.appendSignatureInfo(requestOptions);
     return testUtils.sendNetworkRequest(requestOptions);
@@ -648,7 +834,9 @@ class Auth {
   }
 
 
-  private appendSignatureInfo(requestOptions: Parameters<typeof this.sendSignedTubiNetworkRequest>[0]) {
+  private appendSignatureInfo(requestOptions: Parameters<typeof this.sendSignedTubiNetworkRequest>[0] & {
+    body: string;
+  }) {
     const canonicalRequest = this.constructCanonicalRequest(requestOptions);
     const hashedCanonicalRequest = createHash('sha256').update(canonicalRequest).digest('hex');
 
@@ -677,7 +865,9 @@ class Auth {
   }
 
 
-  private constructCanonicalRequest(requestOptions: Parameters<typeof this.sendSignedTubiNetworkRequest>[0]) {
+  private constructCanonicalRequest(requestOptions: Parameters<typeof this.sendSignedTubiNetworkRequest>[0] & {
+    body: string;
+  }) {
     const hashedPayload = createHash('sha256').update(requestOptions.body).digest('hex');
 
     const headersArray = [];
@@ -709,12 +899,398 @@ class Auth {
   }
 }
 
-const testUtils = new TestUtils();
-const auth = new Auth();
 
-export {
-  testUtils
-};
+abstract class User {
+  protected accessToken = '';
+
+
+  // Used to create user of the class type
+  abstract create(credentials);
+
+
+  // Returns the contents that need to be set for this type of user in the registry
+  abstract getRegistryAuthValues();
+
+
+  // Send a network request requiring tubi authentication
+  public async sendTubiAuthNetworkRequest(requestOptions: Parameters<typeof testUtils.sendNetworkRequest>[0]) {
+    requestOptions.headers = requestOptions.headers ?? {};
+    requestOptions.headers.authorization = 'Bearer ' + this.accessToken;
+
+    return await testUtils.sendNetworkRequest(requestOptions);
+  }
+
+
+  public getContent() {
+    return new FilterContent(this);
+  }
+}
+
+
+class AnonymousUser extends User {
+  public async create() {
+    const result = await auth.getAnonymousToken();
+    this.accessToken = result.access_token;
+  }
+
+
+  getRegistryAuthValues() {
+    console.warn('Not implemented yet');
+  }
+}
+
+
+class RegisteredUser extends User {
+  private userInfo: UserSignUpResponse;
+
+
+  public async create(credentials) {
+    this.userInfo = await auth.userSignup(credentials);
+    this.accessToken = this.userInfo.access_token;
+  }
+
+
+  getRegistryAuthValues() {
+    return {
+      auth: {
+        refreshtoken: this.userInfo.refresh_token,
+        userid: `${this.userInfo.user_id}`,
+        expiretime: '0'
+      }
+    };
+  }
+
+
+  // contents: array of contents as returned by a call to getContents()
+  public async addContentToWatchList(contents: {type: string; id: string}[] | {type: string; id: string}) {
+    if (!Array.isArray(contents)) {
+      contents = [contents];
+    }
+
+    const promises = [];
+    for (const content of contents) {
+      const contentType = abbreviatedContentTypeConversion[content.type];
+      let contentId = content.id;
+      if (contentType == ContentTypes.series) {
+        // Have to add leading zero for series
+        contentId = `0${contentId}`;
+      } else if (contentType !== ContentTypes.movie && contentType !== ContentTypes.sports_event) {
+        console.warn('Tried to add unsupported type to watchlist. Skipping...');
+        continue;
+      }
+
+      const body = {
+        content_id: contentId,
+        content_type: contentType,
+        type: 'watch_later'
+      };
+
+      const promise = this.sendTubiAuthNetworkRequest({
+        method: 'post',
+        url: 'https://user-queue.production-public.tubi.io/api/v2/queues',
+        body: body
+      });
+      promises.push(promise);
+    }
+    return Promise.all(promises);
+  }
+
+
+  public async getWatchListContent() {
+    const {queues} = await this.sendTubiAuthNetworkRequest({
+      method: 'get',
+      url: 'https://user-queue.production-public.tubi.io/api/v2/queues'
+    });
+    return queues as {
+      content_id: number;
+      content_type: ContentTypes;
+    }[];
+  }
+
+
+  // contents: array of contents as returned by a call to getContents()
+  public async removeContentFromWatchList(contents: {type: string; id: string}[] | {type: string; id: string}) {
+    if (!Array.isArray(contents)) {
+      contents = [contents];
+    }
+
+    const promises = [];
+    for (const content of contents) {
+      const body = {
+        content_id: content.id,
+        content_type: abbreviatedContentTypeConversion[content.type]
+      };
+
+      const promise = await this.sendTubiAuthNetworkRequest({
+        method: 'delete',
+        url: 'https://user-queue.production-public.tubi.io/api/v2/queues',
+        body: body
+      });
+      promises.push(promise);
+    }
+    await Promise.all(promises);
+  }
+
+
+  // contents: array of contents returned from a call to getContents
+  // positions: number or array of where in the content to mark the user's play history. If less values are provided than in contents then the last positions value is used
+  public async addContentToViewHistory(contents: {type: string; id: string}[] | {type: string; id: string}, positions: number | number[]) {
+    if (!Array.isArray(contents)) {
+      contents = [contents];
+    }
+
+    if (Array.isArray(positions) && positions.length === 0) {
+      throw new Error('Empty array passed for positions. Please supply at least one valid position value');
+    } else if (typeof positions === 'number') {
+      positions = [positions];
+    }
+
+    const promises = [];
+
+    for (const [index, content] of contents.entries()) {
+      const contentType = abbreviatedContentTypeConversion[content.type];
+      const contentId = content.id;
+      if (contentType !== ContentTypes.movie && contentType !== ContentTypes.series && contentType !== ContentTypes.sports_event) {
+        console.warn('Tried to add unsupported type to view history. Skipping...');
+        continue;
+      }
+
+      const body = {
+        content_id: contentId,
+        content_type: contentType as string,
+        parent_id: null,
+        position: positions[index] ?? positions.at(-1)
+      };
+
+      // For series we have to do an additional call to get the episodes for this series since the episodes are what have the progress
+      if (contentType === ContentTypes.series) {
+        // Have to add leading zero since it's a series
+        const fullSeriesContent = await this.getContentById('0' + contentId);
+
+        // For now we just always get the first episode
+        const firstEpisode = fullSeriesContent.children[0].children[0];
+        if (firstEpisode) {
+          body.content_type = 'episode';
+          body.content_id = firstEpisode.id;
+          body.parent_id = contentId;
+        } else {
+          console.warn('Could not retrieve series episode. Skipping...');
+          continue;
+        }
+      }
+
+      const promise = await this.sendTubiAuthNetworkRequest({
+        method: 'post',
+        url: 'https://lishi.production-public.tubi.io/api/v2/view_history',
+        body: body
+      });
+      promises.push(promise);
+    }
+
+    return await Promise.all(promises);
+  }
+
+
+  public async getViewHistoryContent() {
+    const {items} = await this.sendTubiAuthNetworkRequest({
+      method: 'get',
+      url: 'https://lishi.production-public.tubi.io/api/v2/view_history'
+    });
+
+    return items as {
+      content_id: number;
+      content_length: number;
+      content_type: ContentTypes;
+      created_at: string;
+      id: string;
+      position: number;
+      state: string;
+      updated_at: string;
+      user_id: number;
+    }[];
+  }
+
+
+  // contents: array of contents returned from a call to getContents
+  public async removeContentFromViewHistory(contents: {type: string; id: string}[] | {type: string; id: string}) {
+    if (!Array.isArray(contents)) {
+      contents = [contents];
+    }
+
+    // We have to get the user's view history as we can not remove content from the view history without knowing its history id
+    const currentViewHistoryContent = await this.getViewHistoryContent();
+
+    for (const content of contents) {
+      // We have to search for a matching content id
+      let id = '';
+      for (const item of currentViewHistoryContent) {
+        if (item.content_id === +content.id && item.content_type === content.type) {
+          id = item.id;
+          break;
+        }
+      }
+
+      if (id) {
+        await this.sendTubiAuthNetworkRequest({
+          method: 'delete',
+          url: `https://lishi.production-public.tubi.io/api/v2/view_history/${id}`,
+          body: {}
+        });
+      } else {
+        console.warn(`Could not find view history id for content with id ${content.id}. Skipping...`);
+      }
+    }
+  }
+
+
+  public async getContentById(contentId) {
+    const params = {
+      content_id: contentId,
+      platform: platform,
+      device_id: await auth.getDeviceId()
+    };
+
+    return await this.sendTubiAuthNetworkRequest({
+      method: 'get',
+      url: 'https://uapi.adrise.tv/cms/content',
+      params: params
+    });
+  }
+}
+
+
+class FilterContent {
+  private user: User;
+
+
+  private cachedContents: {
+    [key: string]: {
+      id: string;
+      title: string;
+      video_preview_url: string;
+      type: string;
+      ratings: {
+        value: string;
+      }
+    }
+  };
+
+
+  constructor(user) {
+    this.user = user;
+  }
+
+
+  private filters = [] as {
+    type: ContentFilterType;
+    value: any;
+  }[];
+
+
+  public withRating(ratings: ContentRatings | ContentRatings[]) {
+    if (typeof ratings === 'string') {
+      ratings = [ratings];
+    }
+
+    this.filters.push({
+      type: ContentFilterType.rating,
+      value: ratings
+    });
+    return this;
+  }
+
+
+  public hasVideoPreview(value = true) {
+    this.filters.push({
+      type: ContentFilterType.videoPreview,
+      value: value
+    });
+    return this;
+  }
+
+
+  public ofContentType(contentTypes: ContentTypes | ContentTypes[]) {
+    if (typeof contentTypes === 'string') {
+      contentTypes = [contentTypes];
+    }
+
+    // Go ahead and convert our content type over to make it simpler later to do our search
+    for (let i = 0; i < contentTypes.length; i++) {
+      for (const key in abbreviatedContentTypeConversion) {
+        if (abbreviatedContentTypeConversion[key] === contentTypes[i]) {
+          contentTypes[i] = key as any;
+          break;
+        }
+      }
+    }
+
+    this.filters.push({
+      type: ContentFilterType.contentType,
+      value: contentTypes
+    });
+    return this;
+  }
+
+
+  // limit: how many items we want to retrieve
+  public async retrieve({
+      limit = 1,
+      force = false,
+      contentsLimit = 10
+  } = {}) {
+    if (!this.cachedContents || force) {
+      const result = await this.user.sendTubiAuthNetworkRequest({
+        method: 'get',
+        url: 'https://tensor.production-public.tubi.io/api/v3/homescreen',
+        params: {
+          contents_limit: contentsLimit,
+          include_channels: true,
+          platform: platform
+        }
+      });
+
+      this.cachedContents = result.contents;
+    }
+
+    const contents = {...this.cachedContents};
+
+    for (const filter of this.filters) {
+      switch (filter.type) {
+        case ContentFilterType.videoPreview:
+          for(const key in contents) {
+            if (!!contents[key].video_preview_url !== filter.value) {
+              delete contents[key];
+            }
+          }
+          break;
+        case ContentFilterType.rating:
+          for(const key in contents) {
+            if (!filter.value.includes(contents[key].ratings[0].value)) {
+              delete contents[key];
+            }
+          }
+          break;
+        case ContentFilterType.contentType:
+          for(const key in contents) {
+            if (!filter.value.includes(contents[key].type)) {
+              delete contents[key];
+            }
+          }
+          break;
+      }
+    }
+
+    return Object.values(contents).slice(0, limit);
+  }
+}
+
+
+enum ContentFilterType {
+  rating,
+  videoPreview,
+  contentType
+}
+
 
 type KeyPathElement = {
   description?: string;
@@ -723,4 +1299,57 @@ type KeyPathElement = {
   keyPath: string;
 };
 
-type DeeplinkPage = 'movies' | 'livefeed' | 'genre' | 'network' | 'tv' | 'espanol' | 'kids' | 'home'
+
+type DetailPageMenuItemType = 'play' | 'resume' | 'addToMyList' | 'removeFromMyList' | 'removeFromHistory' | 'episodesList';
+
+
+type UserSignUpResponse = {
+  access_token: string;
+  birthday: string;
+  email: string;
+  enable_video_preview: boolean;
+  enabled: boolean;
+  expires_in: number;
+  first_name: string;
+  has_age: boolean;
+  has_password: boolean;
+  is_confirmed: boolean;
+  last_name?: string;
+  name: string;
+  parental_rating: number;
+  profile_pic: string;
+  refresh_token: string;
+  user_id: number;
+  signingKey: {
+    id: string;
+    key: string;
+    verifier: string;
+  }
+};
+
+
+type DeeplinkPage = 'movies' | 'livefeed' | 'genre' | 'network' | 'tv' | 'espanol' | 'kids' | 'home';
+
+
+type ContentRatings = 'G' | 'PG' | 'PG-13' | 'R' | 'TV-Y' | 'TV-Y7_FV' | 'TV-Y7' | 'TV-G' | 'TV-PG'| 'TV-14' | 'TV-MA' | 'NR';
+
+
+type StartApplicationArgs = {
+  /** If true then we will create a new user account and start the application signed in as that user. */
+  shouldCreateNewUser?: boolean;
+
+  /** If we need to set user state (watchlist/history/etc) for the application then we can pass in a User after setting that state */
+  user?: User;
+
+  /** Clears out all of the saved registry making the application behave as if someone was opening it for the first time. If not explicitly false then the registry will be cleared */
+  clearRegistry?: boolean;
+}
+
+
+const testUtils = new TestUtils();
+const auth = new Auth();
+
+
+export {
+  testUtils
+};

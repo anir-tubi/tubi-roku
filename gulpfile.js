@@ -8,6 +8,7 @@ const { server, serverClose } = require('gulp-connect');
 const filter = require('gulp-filter');
 const zip = require('gulp-zip');
 const mocha = require('gulp-mocha');
+const env = require('gulp-env');
 const log = require('fancy-log');
 const mkdirp = require('mkdirp');
 const prompts = require('prompts');
@@ -675,6 +676,7 @@ function setStaging(done) {
   }
 }
 
+
 // force qa on options, so we ensure our build is using the qa config and set other automated test config settings
 function setAutomatedTestsConfig(done) {
   if(options) {
@@ -695,6 +697,15 @@ function setAutomatedTestsConfig(done) {
     done(new Error('setAutomatedTestsConfig: options not found.'));
   }
 }
+
+
+function setRerunAutomatedTestsEnvironment(done) {
+  env.set({
+    isAlreadyDeployed: 'true'
+  });
+  done();
+}
+
 
 function runAutomatedTests() {
   return src(['js/automated-tests/tests/*.ts'], { read: false })
@@ -723,6 +734,12 @@ function setPerformanceTestsConfig(done) {
 
 function runPerformanceTests() {
   return src(['js/automated-tests/performance-tests/*.ts'], { read: false })
+    .pipe(mocha({}));
+}
+
+
+function runToolingTests() {
+  return src(['js/automated-tests/tooling-tests.ts'], { read: false })
     .pipe(mocha({}));
 }
 
@@ -863,8 +880,10 @@ exports.convertSuitestTest = convertSuitestTest;
 // Automated test related
 exports.buildAutomatedTests = series(setAutomatedTestsConfig, buildInstalled);
 exports.runAutomatedTests = series(setAutomatedTestsConfig, buildInstalled, runAutomatedTests);
-exports.rerunAutomatedTests = runAutomatedTests;
+exports.rerunAutomatedTests = series(setRerunAutomatedTestsEnvironment, runAutomatedTests);
 exports.runAutomatedTestsCli = runAutomatedTestsCli;
+
+exports.runToolingTests = series(setAutomatedTestsConfig, buildInstalled, runToolingTests);
 
 exports.buildReleaseNotes = buildReleaseNotesOutput;
 exports.buildQaChanges = buildQaChangesOutput;

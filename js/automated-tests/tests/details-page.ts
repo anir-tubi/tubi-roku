@@ -8,7 +8,7 @@ describe('Details Page', function() {
     let itemData;
 
     before(async () => {
-      await testUtils.startApplicationAtPage('movies', true);
+      await testUtils.startApplicationAtPage('movies', {shouldCreateNewUser: true});
 
       // TODO make this into a helper
       // Wait until RowList is in focus so we know we're good to proceed
@@ -65,7 +65,7 @@ describe('Details Page', function() {
 
 
     it('C4151 - Movie - No History - When title is added to queue then Add to Queue changed to Remove from Queue @registered_user,@smoke,@mdp_1', async () => {
-      await testUtils.startApplicationAtPage('movies', true);
+      await testUtils.startApplicationAtPage('movies', {shouldCreateNewUser: true});
       await ecp.sendKeyPress(ecp.Key.Ok);
       const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
       expect(detailScreenTitle.visible).to.equal(true);
@@ -235,7 +235,7 @@ describe('Details Page', function() {
 
     it('C5919 - Details Page Displays History Progress Bar @mdp_1,@registered_user', async () => {
       // Launch to Home> Movies page with registered user
-      await testUtils.startApplicationAtPage('movies', true);
+      await testUtils.startApplicationAtPage('movies', {shouldCreateNewUser: true});
 
       // On Movies page?
       const onMoviesPageButton = await testUtils.getNodeForElement('onMoviesPageButton');
@@ -266,7 +266,7 @@ describe('Details Page', function() {
     it('C48643 - Movie - No History - When title is removed from queue then Remove from Queue changed to Add to Queue @mdp_1,@registered_user', async () => {
 
       // Launch to Home> Movies page with registered user
-      await testUtils.startApplicationAtPage('movies', true);
+      await testUtils.startApplicationAtPage('movies', {shouldCreateNewUser: true});
 
       // On Movies page?
       const onMoviesPageButton = await testUtils.getNodeForElement('onMoviesPageButton');
@@ -289,7 +289,7 @@ describe('Details Page', function() {
     it('C76705 - Movie Details - When Movie Details page is opened then runtime is displayed @mdp_1,@registered_user', async () => {
 
       // Launch to Home> Movies page with registered user
-      await testUtils.startApplicationAtPage('movies', true);
+      await testUtils.startApplicationAtPage('movies', {shouldCreateNewUser: true});
 
       // On Movies page?
       const onMoviesPageButton = await testUtils.getNodeForElement('onMoviesPageButton');
@@ -308,7 +308,7 @@ describe('Details Page', function() {
 
     it('C141195 Selecting YMAL video on Details page after viewing should work - Movies @registered_user,@smoke,@mdp_1', async () => {
       //Go to a movie detail page and click play.
-      await testUtils.startApplicationAtPage('movies', true);
+      await testUtils.startApplicationAtPage('movies', {shouldCreateNewUser: true});
 
       // On Movies page?
       const onMoviesPageButton = await testUtils.getNodeForElement('onMoviesPageButton');
@@ -342,7 +342,7 @@ describe('Details Page', function() {
 
     it('C307688 Registered User - Details page has Play button selected by Default @registered_user,@smoke,@mdp_1', async () => {
       // Start Application at Movies page with logged in user
-      await testUtils.startApplicationAtPage('movies', true);
+      await testUtils.startApplicationAtPage('movies', {shouldCreateNewUser: true});
 
       // Select title
       await ecp.sendKeyPress(ecp.Key.Ok);
@@ -354,7 +354,7 @@ describe('Details Page', function() {
 
     it('C4154 - Movie Details - No History present - Guest - Resume Playback from beginning @guest_user,@smoke,@mdp_1', async () => {
       // Start Application at Movies page with Guest user
-      await testUtils.startApplicationAtPage('movies', false);
+      await testUtils.startApplicationAtPage('movies', {shouldCreateNewUser: true});
 
       // Select a title
       await ecp.sendKeyPress(ecp.Key.Ok);
@@ -377,7 +377,7 @@ describe('Details Page', function() {
       await ecp.sendKeyPress(ecp.Key.Ok);
 
       //Relaunch app as guest
-      await testUtils.startApplicationAtPage('movies', false);
+      await testUtils.startApplicationAtPage('movies', {shouldCreateNewUser: true});
       await utils.sleep(7000);
       //Check that Play button is selected, no Resume button
       expect(playButtonSelected.visible).to.equal(true);
@@ -390,7 +390,7 @@ describe('Details Page', function() {
     let itemData;
 
     before(async () => {
-      await testUtils.startApplicationAtPage('tv', true);
+      await testUtils.startApplicationAtPage('tv', {shouldCreateNewUser: true});
 
       // TODO make this into a helper
       // Wait until RowList is in focus so we know we're good to proceed
@@ -422,7 +422,7 @@ describe('Details Page', function() {
       await ecp.sendKeyPress(ecp.Key.Ok);
     });
 
-    it('C6519 - Series - When series details page is opened then background poster should be displayed, @registered_user,@sdp_2, @smoke', async () => {
+    it('C6519 - Series - When series details page is opened then background poster should be displayed, @registered_user,@sdp_2,@smoke', async () => {
 
       // Verify we are on the details page
       let detailScreenTitle;
@@ -462,33 +462,26 @@ describe('Details Page', function() {
       await ecp.sendKeyPress(ecp.Key.Down);
       await ecp.sendKeyPress(ecp.Key.Ok);
       await utils.sleep(2000);
-      
 
       // Check we are on the My Stuff page
       await testUtils.retryWithTimeOut(async () => {
         const myStuffCallToAction = await testUtils.getNodeForElement('myStuffCallToAction');
         expect(myStuffCallToAction).to.exist;
       });
-      await ecp.sendKeyPress(ecp.Key.Down);
 
-      // Check we are on the My List row
-
-
-      // Find My Stuff Grid
-      const index = await testUtils.findRowIndexWithTitle('myStuffGrid', 'My List');
-      const myStuffGrid = await odc.getValue(testUtils.getElementKeyPath('myStuffGrid', {responseMaxChildDepth:3}));
+      // Jump to the My List row
+      await testUtils.jumpToRowWithTitle('myStuffGrid', 'My List');
 
       // Find the title of the video that was added to My List
-      const myListItem = myStuffGrid.value.content.children[index].children[0];
+      const content = await testUtils.getCurrentlyFocusedGridItemContent('myStuffGrid');
 
       // Verify that the title that was added to My List is present on the My Stuff page
-      expect (myListItem.TITLE).to.equal((detailScreenTitle.text));
-
+      expect (content.title).to.equal(detailScreenTitle.text);
     });
 
 
     it('C4193 Series - No History - When title is removed from queue then Remove From Queue changed to Add To Queue @sdp_1,@regression,@registered_user', async () => {
-      await testUtils.startApplicationAtPage('tv', true);
+      await testUtils.startApplicationAtPage('tv', {shouldCreateNewUser: true});
       await ecp.sendKeyPress(ecp.Key.Ok);
       const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
       expect(detailScreenTitle.visible).to.equal(true);

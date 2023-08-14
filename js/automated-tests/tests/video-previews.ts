@@ -5,7 +5,7 @@ import { testUtils } from '../test-utils';
 
 describe('Video Preview', function () {
   it('C257895 - Verify that High TVT Evergreen titles will have Video Preview clips @videopreview', async () => {
-    await testUtils.startApplicationAtPage('home', true);
+    await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
 
     // Navigate to search screen
     await testUtils.goToPage('search');

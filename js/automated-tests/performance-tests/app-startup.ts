@@ -102,7 +102,7 @@ describe('app-startup', function () {
 
     // Now we want to restart the application
     await ecp.sendLaunchChannel({
-      launchParameters: {
+      params: {
         page: '' // Using page param to force a restart
       }
     });

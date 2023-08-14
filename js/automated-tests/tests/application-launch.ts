@@ -4,7 +4,7 @@ import { testUtils } from '../test-utils';
 
 describe('Application Launch', function () {
     before(async () => {
-      await testUtils.startApplicationAtPage('home', true);
+      await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
     });
 
 

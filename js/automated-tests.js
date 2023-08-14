@@ -30,6 +30,16 @@ async function runAutomatedTestsCli (done) {
     choices: choices,
   });
 
+  if (tags === undefined) {
+    // User hit control-c to exit so don't continue
+    done();
+    return;
+  } else if (tags.length === 0) {
+    console.log('No tags selected. Exiting.');
+    done();
+    return;
+  }
+
   const {branch} = await prompts({
     type: 'text',
     name: 'branch',
@@ -37,7 +47,11 @@ async function runAutomatedTestsCli (done) {
   });
 
   let applicationFolder = './';
-  if (branch) {
+  if (branch === undefined) {
+    // User hit control-c to exit so don't continue
+    done();
+    return;
+  } else if (branch) {
     applicationFolder = './out/automated_tests_branch';
     execShellCommand(done, `rm -rf ${applicationFolder}`);
     execShellCommand(done, `git clone --branch ${branch} --depth 1 git@github.com:adRise/project-total-recall.git ${applicationFolder}`);

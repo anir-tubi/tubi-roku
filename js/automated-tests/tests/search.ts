@@ -6,7 +6,7 @@ import { testUtils } from '../test-utils';
 describe('Search', function () {
   describe('Linear Search', function () {
     it('C244256 When a user searches for a channel, the channel is shown in the search results @linearsearch', async () => {
-      await testUtils.startApplicationAtPage('search',true);
+      await testUtils.startApplicationAtPage('search', {shouldCreateNewUser: true});
       await ecp.sendText('abc');
 
       // Navigate right until the grid is in focus
