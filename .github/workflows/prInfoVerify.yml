@@ -7,6 +7,8 @@ on:
       - reopened
       - synchronize
       - edited
+    branches:
+      - 'master'
 
 permissions:
   contents: read
