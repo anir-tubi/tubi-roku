@@ -19,7 +19,6 @@ Function init()
 
   m.continueBtn = m.top.findNode("continueBtn")
   m.continueBtn.text = getTranslation("dialog_button_continue")
-  m.continueBtn.observeFieldScoped("selected", "onContinueButtonSelected")
 
   m.newPasswordLayout = m.top.findNode("newPasswordLayout")
   m.newPasswordLabel = m.top.findNode("newPasswordLabel")
@@ -124,6 +123,11 @@ Function onScreenFocusChange()
   ' force a background update
   m.top.backgroundUriList = m.backgroundUriList
   if m.top.hasFocus() then
+    ' To avoid sending out multiple requests when continue button is clicked multiple times.
+    ' We will unobserving the click after sending request. To handle cases where error happens and screen is refocused.
+    ' unobserving it as a pre-caution to avoid multiple observers being attached.
+    m.continueBtn.unobserveFieldScoped("selected")
+    m.continueBtn.observeFieldScoped("selected", "onContinueButtonSelected")
     m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
     m.keyboard.voiceEnabled = true
     if m.email.text = "" 'if email field is empty when screen gains focus, then setting focus to email field
@@ -376,6 +380,7 @@ Function proceedPasswordValidation()
         password : m.password.text
         email : m.email.text
       }
+      m.continueBtn.unobserveFieldScoped("selected")
     end if
 End Function
 
