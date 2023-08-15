@@ -2,7 +2,7 @@
 
 ---
 
-<<Replace this with a non technical description of what should be provided for this PR in the release notes. If no release notes are needed, remove this line.>>
+<<Replace this with a non technical description of what should be provided for this PR in the release notes. Prefix your release notes with 'Experiment', 'Graduation', 'Feature', 'BugFix', 'Enhancement' if applicable. If no release notes are needed, remove this line. >>
 
 ## QA What Changed
 
