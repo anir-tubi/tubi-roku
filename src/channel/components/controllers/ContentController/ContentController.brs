@@ -2170,20 +2170,30 @@ End Function
 '   max height = 176
 '   min height = 112
 '
-' @message: string,  message to be displayed
-' @headerText : string, title
-' @imageUri: string, image to be displayed left side of message
-' @selfDestructTimer: integer, number of seconds toast should be displayed
-' @headerColor: colorstring for HeaderText
-' @messageColor: colorString for message
-' @backGroundColor : toast background color
-' @imageWidth: interger, width of the image if imageUri is provided.
-' @imageHeight: interger, height of the image if imageUri is provided.
-Function showToast(toastMsg)
+'@toastMsg: assocArray, it contains below
+  '{
+    ' @message: string,  message to be displayed
+    ' @headerText : string, title
+    ' @imageUri: string, image to be displayed left side of message
+    ' @selfDestructTimer: integer, number of seconds toast should be displayed
+    ' @headerColor: colorstring for HeaderText
+    ' @messageColor: colorString for message
+    ' @backGroundColor : toast background color
+    ' @imageWidth: interger, width of the image if imageUri is provided.
+    ' @imageHeight: interger, height of the image if imageUri is provided.
+  '}
+' @shouldSendTracking: boolean, true if we are sending an event for toast message, otherwise false
+' @dialogEventInfo: assocArray, contains the info necessary to send a dialog analytics event, has keys: "type" and "values"
+Function showToast(toastMsg, shouldSendTracking = false, dialogEventInfo = {})
     m.tubiToast = m.top.findNode("tubiToast")
     if isAA(toastMsg) = true
       m.tubiToast.showToastMessage = toastMsg
       m.tubiToast.show = true
+
+      if shouldSendTracking = true AND dialogEventInfo.count() > 0
+        m.trackingLoggingTask.trackEvent = dialogEventInfo
+      end if
+
     end if
 
 End Function'

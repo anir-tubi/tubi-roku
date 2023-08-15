@@ -1727,6 +1727,8 @@ constants.ui.themes = {}
       constants.serverPersistentDataKeys.isVideoPreviewOn = "enable_video_preview"
       constants.serverPersistentDataKeys.audioTrack = "audio_track"
       constants.serverPersistentDataKeys.secondSessionLinearNotWatched = "second_session_linear_not_watched"
+      constants.serverPersistentDataKeys.isLikeToastNotificationShown = "enable_like_toast_notification"
+      constants.serverPersistentDataKeys.isDisLikeToastNotificationShown = "enable_dislike_toast_notification"
 
   return constants
 end Function

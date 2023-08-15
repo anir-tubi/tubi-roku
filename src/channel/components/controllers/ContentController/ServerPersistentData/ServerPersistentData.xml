@@ -7,6 +7,12 @@
     <!-- Holds the value if video preview is allowed or not. -->
     <field id="isVideoPreviewOn" type="boolean" value="true" />
 
+    <!-- Holds the value if user liked a title. -->
+    <field id="isLikeToastNotificationShown" type="boolean" value="false" />
+
+    <!-- Holds the value if user disliked a title. -->
+    <field id="isDisLikeToastNotificationShown" type="boolean" value="false" />
+
     <!-- Holds true if user is accessing Tubi for second time and have not seen linear in their first session-->
     <field id="secondSessionLinearNotWatched" type="boolean" value="false" />
 

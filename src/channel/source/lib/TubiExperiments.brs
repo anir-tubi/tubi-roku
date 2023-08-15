@@ -90,6 +90,10 @@ Function TubiExperiments(constants) as Object
         roku_notforme_dislike_v1: {"enabled": false}
       }
 
+      roku_like_toast: {
+        roku_like_toast_v1: {"enabled": false}
+      }
+
     }
 
     'public methods

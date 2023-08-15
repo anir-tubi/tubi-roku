@@ -1395,6 +1395,72 @@ End Function
 ' @param sLikeAction: String, the like action constant for the user of the current title: like, dislike, or "". The like/dislike states are defined in constants.ui.likeDislikeActions
 Function setDetailScreenLikeDislikeStateFromLikeAction(detailScreen, sLikeAction)
   sLikedState = translateLikeActionToLikeState(sLikeAction)
+
+  canShowLikeDisLikeToast = (UCase(m.constants.deviceInfo.countryCode) = "US" AND isKidsUIOn() = false)
+  if  getExperimentResource("roku_like_toast", "roku_like_toast_v1", false).enabled = true AND isNonEmptyString(sLikedState) = true AND canShowLikeDisLikeToast = true
+    dialogSubType = sLikedState + "_title"
+    if sLikedState = m.constants.ui.likeDislikeStates.liked AND m.serverPersistentData.isLikeToastNotificationShown = false
+
+      getExperimentResource("roku_like_toast", "roku_like_toast_v1")
+      saveServerPersistentData({
+        "isLikeToastNotificationShown": true
+      }, "device")
+
+      message = getTranslation("detail_screen_like_toast_message")
+      headerText = getTranslation("detail_screen_like_disLike_toast_header")
+
+      toastInfo = {
+        message: message
+        selfDestructTimer: 5
+        imageUri: "pkg:/images/icon_like_toast.webp"
+        headerText: headerText
+      }
+
+      dialogEventInfo = {
+        type: "dialog"
+        values: {
+          dialog_type: "TOAST"
+          pageOneof: m.Tracking.getAnalyticsPage(detailScreen.trackingPageInfo.pageType, detailScreen.trackingPageInfo.pageValues)
+          dialog_action: "SHOW"
+          dialog_sub_type: dialogSubType
+        }
+      }
+
+      showToast(toastInfo, true, dialogEventInfo)
+
+    else if sLikedState = m.constants.ui.likeDislikeStates.disliked AND m.serverPersistentData.isDisLikeToastNotificationShown = false
+
+      getExperimentResource("roku_like_toast", "roku_like_toast_v1")
+      saveServerPersistentData({
+        "isDisLikeToastNotificationShown": true
+      }, "device")
+
+      message = getTranslation("detail_screen_disLike_toast_message")
+      headerText = getTranslation("detail_screen_like_disLike_toast_header")
+
+      toastInfo = {
+        message: message
+        selfDestructTimer: 5
+        imageUri: "pkg:/images/icon_dislike_toast.webp"
+        headerText: headerText
+      }
+
+      dialogEventInfo = {
+        type: "dialog"
+        values: {
+          dialog_type: "TOAST"
+          pageOneof: m.Tracking.getAnalyticsPage(detailScreen.trackingPageInfo.pageType, detailScreen.trackingPageInfo.pageValues)
+          dialog_action: "SHOW"
+          dialog_sub_type: dialogSubType
+        }
+      }
+
+      showToast(toastInfo, true, dialogEventInfo)
+
+    end if
+
+  end if
+
   detailScreen.likeDislikeState = sLikedState
 End Function
 
