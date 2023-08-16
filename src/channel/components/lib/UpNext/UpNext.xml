@@ -34,6 +34,9 @@
       <!-- unfocus the focused components -->
       <field id="unfocus" type="boolean" alwaysNotify="true"/>
 
+      <!-- Indicates if we need enable the auto play or not depending on the mode and region -->
+      <field id="isAutoPlayOff" type="boolean" value="false" />
+
       <!-- allowed values are "play", "ok" -->
       <field id="command" type="string" alwaysNotify="true"/>
 

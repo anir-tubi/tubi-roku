@@ -22,7 +22,6 @@ Function init()
   m.Timer = m.top.findNode("UpNextCountdownTimer")
   m.CountdownMovie = m.top.findNode("CountdownLabelMovie")
   m.CountdownSeries = m.top.findNode("CountdownLabelSeries")
-  m.Timer.observeField("fire", "onCountdownTimer")
   m.MovieGroup = m.top.findNode("UpNextMovieGroup")
   m.SeriesGroup = m.top.findNode("UpNextSeriesGroup")
   m.GridMovie = m.top.findNode("GridMovie")
@@ -105,6 +104,11 @@ End Function
 
 
 Function onComponentFocus()
+
+  if m.top.isAutoPlayOff = false
+    m.Timer.observeField("fire", "onCountdownTimer")
+  end if
+
   if m.top.hasFocus()
     if m.MovieGroup.visible
       m.GridMovie.setFocus(true)
@@ -281,38 +285,42 @@ End Function
 Function onCountdownTimer()
   tubiLog("UpNext.onCountdownTimer")
   m.timeRemaining = m.timeRemaining - 1
-  if m.timeRemaining = 0
-    m.top.autoplayMode = "automatic"
-    if m.MovieGroup.visible
-      if m.GridMovie.content <> invalid
-        m.top.contentSelected = m.GridMovie.content.getChild(m.GridMovie.itemFocused)
+  if m.top.isAutoPlayOff = false
+    if m.timeRemaining = 0
+      m.top.autoplayMode = "automatic"
+      if m.MovieGroup.visible
+        if m.GridMovie.content <> invalid
+          m.top.contentSelected = m.GridMovie.content.getChild(m.GridMovie.itemFocused)
+        else
+          ' if contentSelected is invalid, it is handled by the callback in VideoHelpers
+          ' via VideoPlayerScreen.onUpNextContentSelected
+          m.top.contentSelected = invalid
+        end if
       else
-        ' if contentSelected is invalid, it is handled by the callback in VideoHelpers
-        ' via VideoPlayerScreen.onUpNextContentSelected
-        m.top.contentSelected = invalid
+        if m.GridSeries.content <> invalid
+          m.top.contentSelected = m.GridSeries.content.getChild(0)
+        else
+          ' if contentSelected is invalid, it is handled by the callback in VideoHelpers
+          ' via VideoPlayerScreen.onUpNextContentSelected
+          m.top.contentSelected = invalid
+        end if
       end if
+      stopTimer()
     else
-      if m.GridSeries.content <> invalid
-        m.top.contentSelected = m.GridSeries.content.getChild(0)
+      if m.MovieGroup.visible
+        drawCountdown(m.CountdownMovie, m.timeRemaining)
       else
-        ' if contentSelected is invalid, it is handled by the callback in VideoHelpers
-        ' via VideoPlayerScreen.onUpNextContentSelected
-        m.top.contentSelected = invalid
+        drawCountdown(m.CountdownSeries, m.timeRemaining)
       end if
-    end if
-    stopTimer()
-  else
-    if m.MovieGroup.visible
-      drawCountdown(m.CountdownMovie, m.timeRemaining)
-    else
-      drawCountdown(m.CountdownSeries, m.timeRemaining)
     end if
   end if
 End Function
 
 
 Function drawCountdown(labelNode, time)
-  labelNode.text = getTranslation("screenEndCard_startingIn", {seconds: stri(time)})
+  if m.top.isAutoPlayOff = false
+    labelNode.text = getTranslation("screenEndCard_startingIn", {seconds: stri(time)})
+  end if
 End Function
 
 
@@ -367,7 +375,10 @@ Function onShow()
 
   fade(m.UpNextGradient, "in", 1.0)
   slideFade(m.UpNextUI, "right", "in", 1.0)
-  m.Timer.control = "start"
+
+  if m.top.isAutoPlayOff = false
+    m.Timer.control = "start"
+  end if
 End Function
 
 

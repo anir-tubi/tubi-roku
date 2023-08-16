@@ -118,23 +118,27 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       else if key = "back"
         if m.UpNext.isInFocusChain()
           m.UpNext.hide = true
-          trackEvent({
-            type: "auto_play"
-            values: {
-              video_id: m.top.content.id.toInt()
-              auto_play_action: "DISMISS" 'AutoPlayAction enum
-            }
-          })
+          if m.UpNext.isAutoPlayOff = true AND m.VideoState = "stop"
+            backButtonExit()
+          else
+            trackEvent({
+              type: "auto_play"
+              values: {
+                video_id: m.top.content.id.toInt()
+                auto_play_action: "DISMISS" 'AutoPlayAction enum
+              }
+            })
 
-          ' if the next video plays after this point it will be considered automatic since the user
-          ' will not be interacting with the autoplay UI again.
-          setAutoplayMode("automatic")
+            ' if the next video plays after this point it will be considered automatic since the user
+            ' will not be interacting with the autoplay UI again.
+            setAutoplayMode("automatic")
 
-          if m.VideoState = "stop" AND m.UpNext.contentFocused <> invalid
-            m.top.upNextContentToAutoplay = m.UpNext.contentFocused
+            if m.VideoState = "stop" AND m.UpNext.contentFocused <> invalid
+              m.top.upNextContentToAutoplay = m.UpNext.contentFocused
+            end if
+
+            removeFocusFromUpNext()
           end if
-
-          removeFocusFromUpNext()
         else if m.VideoState = "play"
           if m.HUD.opacity = 0
             clearSkipCuepointsButtonAndTimer()

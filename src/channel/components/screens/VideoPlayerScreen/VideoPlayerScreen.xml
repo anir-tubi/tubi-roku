@@ -29,6 +29,7 @@
       <field id="sprites" type="node"/>
       <field id="upNextContent" alias="UpNext.content"/>
       <field id="upNextUpdateContent" alias="UpNext.updateContent"/>
+      <field id="isAutoPlayOff" alias="UpNext.isAutoPlayOff"/>
 
       <!-- Valid values "play", "pause", "resume", "stop" -->
       <field id="control" type="string" value="none" alwaysNotify="true"/>

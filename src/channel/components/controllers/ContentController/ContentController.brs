@@ -2227,7 +2227,8 @@ End Function
 
 Function isVideoPreviewOn()
   if m.serverPersistentData <> invalid
-    return (isVideoPreviewEnabled() = true AND m.serverPersistentData.isVideoPreviewOn = true)
+    isVideoPreviewOnForKidsModeInUk = (UCase(m.constants.deviceInfo.countryCode) = "UK" AND isKidsUIOn() = true)
+    return (isVideoPreviewEnabled() = true AND m.serverPersistentData.isVideoPreviewOn = true AND isVideoPreviewOnForKidsModeInUk = false)
   end if
 
   return false
