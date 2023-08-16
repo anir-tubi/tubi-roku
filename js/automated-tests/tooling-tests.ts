@@ -1,10 +1,66 @@
 // This file provides a spot to write tests to verify tooling helpers in test-utils.ts and other spots are functioning as anticipated before they get used in automated tests
 
 import { expect } from 'chai';
-import { ecp, utils } from 'roku-test-automation';
+import { ecp, odc, utils } from 'roku-test-automation';
 import { testUtils } from './test-utils';
 
 describe('test-utils', function () {
+  describe('TestUtils', function () {
+    describe('startApplicationWithDeeplink', function () {
+      it('should be able to override current device language', async () => {
+        await testUtils.startApplicationWithDeeplink(undefined, {
+          language: 'spanish'
+        });
+
+        const {value: deviceInfo} = await odc.getValue({
+          base: 'global',
+          keyPath: 'constants.deviceInfo'
+        });
+
+        expect(deviceInfo.locale).to.equal('es_ES');
+        expect(deviceInfo.language).to.equal('es');
+      });
+    });
+  });
+
+
+  describe('AnonymousUser', function () {
+    let user: Awaited<ReturnType<typeof testUtils.createAnonymousUser>>;
+    beforeEach(async () => {
+      user = await testUtils.createAnonymousUser();
+    });
+
+    describe('setIsNewUser', function () {
+      it('Should be able to start application as a new user', async () => {
+        user.setIsNewUser(true);
+        await testUtils.startApplicationWithDeeplink(undefined, {
+          user: user
+        });
+
+        const {value: isNewUser} = await odc.getValue({
+          base: 'global',
+          keyPath: 'isNewUser'
+        });
+
+        expect(isNewUser).to.true;
+      });
+
+      it('Should be able to start application as a returning user', async () => {
+        user.setIsNewUser(false);
+        await testUtils.startApplicationWithDeeplink(undefined, {
+          user: user
+        });
+
+        const {value: isNewUser} = await odc.getValue({
+          base: 'global',
+          keyPath: 'isNewUser'
+        });
+
+        expect(isNewUser).to.false;
+      });
+    });
+  });
+
   describe('RegisteredUser', function () {
     const movieContent = {
       type: 'v',
@@ -16,6 +72,36 @@ describe('test-utils', function () {
     let user: Awaited<ReturnType<typeof testUtils.createRegisteredUser>>;
     beforeEach(async () => {
       user = await testUtils.createRegisteredUser();
+    });
+
+    describe('setIsNewUser', function () {
+      it('Should be able to start application as a new user', async () => {
+        user.setIsNewUser(true);
+        await testUtils.startApplicationWithDeeplink(undefined, {
+          user: user
+        });
+
+        const {value: isNewUser} = await odc.getValue({
+          base: 'global',
+          keyPath: 'isNewUser'
+        });
+
+        expect(isNewUser).to.true;
+      });
+
+      it('Should be able to start application as a returning user', async () => {
+        user.setIsNewUser(false);
+        await testUtils.startApplicationWithDeeplink(undefined, {
+          user: user
+        });
+
+        const {value: isNewUser} = await odc.getValue({
+          base: 'global',
+          keyPath: 'isNewUser'
+        });
+
+        expect(isNewUser).to.false;
+      });
     });
 
     describe('watchList', function () {

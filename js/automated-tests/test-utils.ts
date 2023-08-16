@@ -208,6 +208,23 @@ class TestUtils {
       deeplink['setRegistry'] = JSON.stringify(user.getRegistryAuthValues());
     }
 
+    if (args.language) {
+      let locale: string;
+      switch (args.language) {
+        case 'english':
+          locale = 'en_US';
+          break;
+        case 'spanish':
+          locale = 'es_ES';
+          break;
+      }
+      const language = locale.slice(0, 2);
+      deeplink['constantsUpdates'] = JSON.stringify({
+        'deviceInfo.locale': locale,
+        'deviceInfo.language': language
+      });
+    }
+
     await this.restartApplication({
       params: deeplink
     });
@@ -902,6 +919,7 @@ class Auth {
 
 abstract class User {
   protected accessToken = '';
+  protected isNewUser?: boolean;
 
 
   // Used to create user of the class type
@@ -910,6 +928,19 @@ abstract class User {
 
   // Returns the contents that need to be set for this type of user in the registry
   abstract getRegistryAuthValues();
+
+
+  // Used to specify if this is a new user or returning user when we launch the application
+  public setIsNewUser(value: boolean) {
+    this.isNewUser = value;
+  }
+
+
+  protected generateFirstVisitValue(date: Date) {
+    const unixTimeStamp = date.getTime();
+    const daysSinceEpoch = Math.floor(unixTimeStamp / 24 / 3600);
+    return daysSinceEpoch;
+  }
 
 
   // Send a network request requiring tubi authentication
@@ -935,7 +966,16 @@ class AnonymousUser extends User {
 
 
   getRegistryAuthValues() {
-    console.warn('Not implemented yet');
+    let firstVisit = -1;
+    if (!this.isNewUser) {
+      firstVisit = this.generateFirstVisitValue(new Date);
+    }
+
+    return {
+      visit: {
+        firstVisit: `${firstVisit}`
+      }
+    };
   }
 }
 
@@ -951,11 +991,19 @@ class RegisteredUser extends User {
 
 
   getRegistryAuthValues() {
+    let firstVisit = -1;
+    if (!this.isNewUser) {
+      firstVisit = this.generateFirstVisitValue(new Date);
+    }
+
     return {
       auth: {
         refreshtoken: this.userInfo.refresh_token,
         userid: `${this.userInfo.user_id}`,
         expiretime: '0'
+      },
+      visit: {
+        firstVisit: `${firstVisit}`
       }
     };
   }
@@ -1343,6 +1391,8 @@ type StartApplicationArgs = {
 
   /** Clears out all of the saved registry making the application behave as if someone was opening it for the first time. If not explicitly false then the registry will be cleared */
   clearRegistry?: boolean;
+
+  language?: 'english' | 'spanish'
 }
 
 
