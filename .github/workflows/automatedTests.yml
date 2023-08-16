@@ -1,0 +1,26 @@
+name: Automated UI Tests
+
+# Controls when the action will run.
+on:
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # name helps to check the status of github action
+    name: Run Automated UI Tests
+    # The type of runner that the job will run. self hosted machine is our own machine setup in SF office and it has dedicated connected roku device.
+    runs-on: [self-hosted, automated-tests-runner, enabled]
+    # timeouts after 10 minutes, if the execution/unit test got stuck/crash
+    timeout-minutes: 10
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # npm command install all required packages
+      - name: npm install
+        run: |
+          npm install
