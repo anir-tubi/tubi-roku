@@ -29,7 +29,7 @@ Function TubiExperiments(constants) as Object
       '// When enabled=true & instant=true, then the user will be able to instantly sign in w/o a password by clicking the "forget password" button
       '// When enabled=true & instant=false, then the user will be able to change their forgotten password by clicking the "forget password" button
       roku_registration_signin_password_reset: {
-        roku_registration_signin_password_reset_v2: {"enabled": false, "instant": true}
+        roku_registration_signin_password_reset_v2: {"enabled": true, "instant": true}
       }
 
       ' roku_enhanced_onboarding_v2_roku_path - have new user use the Roku modal to start the sign in process
