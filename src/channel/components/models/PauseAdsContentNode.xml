@@ -3,11 +3,11 @@
 <component name = "PauseAdsContentNode" extends="ContentNode">
   <interface>
     <field id="requestId" type="string" />
-    <field id="startPixel" type="string" />
-    <field id="endPixel" type="string" />
-    <field id="notUsedPixel" type="string" />
     <field id="mediaUrl" type="string" />
-    <field id="impTrackingPixel" type="string" />
-    <field id="errorPixel" type="string" />
+    <field id="startPixels" type="stringarray" />
+    <field id="impTrackingPixels" type="stringarray" />
+    <field id="endPixels" type="stringarray" />
+    <field id="notUsedPixels" type="stringarray" />
+    <field id="errorPixels" type="stringarray" />
   </interface>
 </component>

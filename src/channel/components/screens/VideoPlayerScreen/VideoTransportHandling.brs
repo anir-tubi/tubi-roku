@@ -39,7 +39,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           showTransport()
           stopPauseAdTimer()
           if m.isPixelFiredForCurrentPauseAd = false
-            sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
+            sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel)
           end if
           showClosedCaptionAudioTrackOverlay()
         end if
@@ -466,7 +466,7 @@ Function handleOk()
     else if focusButtonId = m.closedCaptionAudioButton.id
       stopPauseAdTimer()
       if m.isPixelFiredForCurrentPauseAd = false
-        sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
+        sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel)
       end if
       showClosedCaptionAudioTrackOverlay()
     end if
@@ -1183,7 +1183,7 @@ Function onPauseAdResponse(msg)
     if m.top.hasFocus()
       m.pauseAdOverlay.posterUri = pauseAdResponse.mediaUrl
     else
-      sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
+      sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel)
       'If the video player does not have focus, resetting timer here to avoid notUsed Pixel being fired again in PauseAdTimers observer.
       resetPauseAdTimers()
     end if
@@ -1205,9 +1205,9 @@ Function resetPauseAdOverlay()
   end if
 
   if m.isPixelFiredForCurrentPauseAd = true
-    sendPauseAdPixel(m.constants.pauseAd.endPixel)
+    sendPauseAdPixel(m.constants.pauseAd.pixelTypes.endPixel)
   else
-    sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
+    sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel)
   end if
 
   resetPauseAdTimers()
@@ -1229,13 +1229,13 @@ Function onPauseAdOverlayTimer()
     if loadStatus = "ready"
       showPauseAd()
     else if loadStatus = "failed"
-      sendPauseAdPixel(m.constants.pauseAd.errorPixel)
+      sendPauseAdPixel(m.constants.pauseAd.pixelTypes.errorPixel)
     else if loadStatus = "loading"
       m.pauseAdOverlay.observeFieldScoped("posterLoadStatus", "onPauseAdPosterLoadStatus")
     end if
 
   else
-    sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
+    sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel)
   end if
 
 End Function
@@ -1252,12 +1252,12 @@ Function onPauseAdPosterLoadStatus(msg)
       showPauseAd()
     else if loadStatus = "failed"
       m.pauseAdOverlay.unobserveFieldScoped("posterLoadStatus")
-      sendPauseAdPixel(m.constants.pauseAd.errorPixel)
+      sendPauseAdPixel(m.constants.pauseAd.pixelTypes.errorPixel)
     end if
 
   else
     m.pauseAdOverlay.unobserveFieldScoped("posterLoadStatus")
-    sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
+    sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel)
   end if
 End Function
 
@@ -1271,7 +1271,7 @@ End Function
 Function showPauseAd()
   animateTransport("out")
   m.pauseAdAnimation = fade(m.pauseAdOverlay, "in", 0.6, 0.4)
-  sendPauseAdPixel(m.constants.pauseAd.startPixel)
+  sendPauseAdPixel(m.constants.pauseAd.pixelTypes.startPixel)
   startImpTrackingTimer()
   m.pauseAdOverlay.setFocus(true)
 End Function
@@ -1291,7 +1291,7 @@ End Function
 'impTrackingTimerFired fires 1 second after the pauseAd is displayed on video screen
 Function impTrackingTimerFired()
   if m.videoState = "pause"
-    sendPauseAdPixel(m.constants.pauseAd.impTrackingPixel)
+    sendPauseAdPixel(m.constants.pauseAd.pixelTypes.impTrackingPixel)
   end if
 End Function
 
@@ -1358,26 +1358,28 @@ End Function
 '@pixelType: String, possible values are from m.constants.pauseAd
 Function sendPauseAdPixel(pixelType = "")
   pauseAdResponse = m.top.pauseAdResponse
-  pixelUrl = ""
+  pixelUrls = []
 
   if pauseAdResponse <> invalid
-    if pixelType = m.constants.pauseAd.startPixel
-      pixelUrl = pauseAdResponse.startPixel
-    else if pixelType = m.constants.pauseAd.impTrackingPixel
-      pixelUrl = pauseAdResponse.impTrackingPixel
-    else if pixelType = m.constants.pauseAd.endPixel
-      pixelUrl = pauseAdResponse.endPixel
-    else if pixelType = m.constants.pauseAd.notUsedPixel
-      pixelUrl = pauseAdResponse.notUsedPixel
-    else if pixelType = m.constants.pauseAd.errorPixel
-      pixelUrl = pauseAdResponse.errorPixel
+    if pixelType = m.constants.pauseAd.pixelTypes.startPixel
+      pixelUrls = pauseAdResponse.startPixels
+    else if pixelType = m.constants.pauseAd.pixelTypes.impTrackingPixel
+      pixelUrls = pauseAdResponse.impTrackingPixels
+    else if pixelType = m.constants.pauseAd.pixelTypes.endPixel
+      pixelUrls = pauseAdResponse.endPixels
+    else if pixelType = m.constants.pauseAd.pixelTypes.notUsedPixel
+      pixelUrls = pauseAdResponse.notUsedPixels
+    else if pixelType = m.constants.pauseAd.pixelTypes.errorPixel
+      pixelUrls = pauseAdResponse.errorPixels
     end if
   end if
 
-  if isNonEmptyString(pixelUrl)
-    m.isPixelFiredForCurrentPauseAd = true
-    m.top.sendPauseAdPixel = pixelUrl
-  end if
+  for each pixelUrl in pixelUrls
+    if isNonEmptyString(pixelUrl)
+      m.isPixelFiredForCurrentPauseAd = true
+      m.top.sendPauseAdPixel = pixelUrl
+    end if
+  end for
 End Function
 
 
@@ -1391,12 +1393,12 @@ Function onSendPendingPauseAdPixel()
 
   if m.pauseAdOverlay.posterLoadStatus = "ready"
     if m.pauseAdOverlay.opacity > 0
-      sendPauseAdPixel(m.constants.pauseAd.endPixel)
+      sendPauseAdPixel(m.constants.pauseAd.pixelTypes.endPixel)
     else
-      sendPauseAdPixel(m.constants.pauseAd.notUsedPixel)
+      sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel)
     end if
   else if m.pauseAdOverlay.posterLoadStatus = "failed"
-    sendPauseAdPixel(m.constants.pauseAd.errorPixel)
+    sendPauseAdPixel(m.constants.pauseAd.pixelTypes.errorPixel)
   end if
 
   resetPauseAd()

@@ -1001,11 +1001,12 @@ Function getConstants()
 
   ' pixel fires when static Ad is shown on video player during pause
   constants.pauseAd = {}
-    constants.pauseAd.startPixel = "startPixel"
-    constants.pauseAd.impTrackingPixel = "impTrackingPixel"
-    constants.pauseAd.endPixel = "endPixel"
-    constants.pauseAd.notUsedPixel = "notUsedPixel"
-    constants.pauseAd.errorPixel = "errorPixel"
+    constants.pauseAd.pixelTypes = {}
+    constants.pauseAd.pixelTypes.startPixel = "startPixel"
+    constants.pauseAd.pixelTypes.impTrackingPixel = "impTrackingPixel"
+    constants.pauseAd.pixelTypes.endPixel = "endPixel"
+    constants.pauseAd.pixelTypes.notUsedPixel = "notUsedPixel"
+    constants.pauseAd.pixelTypes.errorPixel = "errorPixel"
 
   'UI properties that should be passed into the scene graph
   constants.ui = {}

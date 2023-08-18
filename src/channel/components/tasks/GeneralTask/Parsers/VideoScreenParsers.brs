@@ -165,15 +165,15 @@ Function parsePauseAdSuccess(fullResponse, _reqInfo)
         if trackingEvents <> invalid
 
           if trackingEvents.start <> invalid AND trackingEvents.start.Count() > 0
-            content.startPixel = trackingEvents.start[0]
+            content.startPixels = trackingEvents.start
           end if
 
           if trackingEvents.end <> invalid AND trackingEvents.end.Count() > 0
-            content.endPixel = trackingEvents.end[0]
+            content.endPixels = trackingEvents.end
           end if
 
           if trackingEvents.not_used <> invalid AND trackingEvents.not_used.Count() > 0
-            content.notUsedPixel = trackingEvents.not_used[0]
+            content.notUsedPixels = trackingEvents.not_used
           end if
         end if
       end if
@@ -192,11 +192,11 @@ Function parsePauseAdSuccess(fullResponse, _reqInfo)
         end if
 
         if firstCreative.imp_tracking <> invalid AND firstCreative.imp_tracking.Count() > 0
-          content.impTrackingPixel = firstCreative.imp_tracking[0]
+          content.impTrackingPixels = firstCreative.imp_tracking
         end if
 
         if firstCreative.error <> invalid AND firstCreative.error.Count() > 0
-          content.errorPixel = firstCreative.error[0]
+          content.errorPixels = firstCreative.error
         end if
       end if
 
