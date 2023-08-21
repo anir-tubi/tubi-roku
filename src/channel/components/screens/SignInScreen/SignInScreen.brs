@@ -56,7 +56,6 @@ Function init()
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
   m.voiceKeyboard = m.keyboard.findNode("Keyboard")
   m.keyboard.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
-  m.keyboard.observeFieldScoped("buttonSelected", "onButtonSelected")
 
   m.password = m.top.findNode("password")
   m.password.hint = getTranslation("signIn_password_hint")
@@ -129,6 +128,8 @@ Function onScreenFocusChange()
     m.continueBtn.unobserveFieldScoped("selected")
     m.continueBtn.observeFieldScoped("selected", "onContinueButtonSelected")
     m.keyboard.observeFieldScoped("text", "onKeyboardTextChanged")
+    m.keyboard.unobserveFieldScoped("buttonSelected")
+    m.keyboard.observeFieldScoped("buttonSelected", "onButtonSelected")
     m.keyboard.voiceEnabled = true
     if m.email.text = "" 'if email field is empty when screen gains focus, then setting focus to email field
       setFocusToComponent(m.email)
@@ -360,6 +361,7 @@ Function onButtonSelected(evt)
       m.password.passwordMode = true
     end if
   else if buttonSelected = "continue"
+    m.keyboard.unobserveFieldScoped("buttonSelected")
     proceedPasswordValidation()
   else if buttonSelected = "back" or buttonSelected = "up"
     updatePasswordValidation()
