@@ -1848,6 +1848,18 @@ Function getTranslation_es_MX()
       "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
       "message": "Eliminado de Favoritos"
     },
+    "detail_screen_like_disLike_toast_header": {
+      "description": "header text to be displayed on Toast-message when user like/dislike a title",
+      "message": "Gracias por tus comentarios!"
+    },
+    "detail_screen_like_toast_message": {
+      "description": "Message to be displayed on Toast-message when user liked a title",
+      "message": "Sugeriremos más títulos como este en futuras recomendaciones."
+    },
+    "detail_screen_disLike_toast_message": {
+      "description": "Message to be displayed on Toast-message when user disliked a title",
+      "message": "Sugeriremos menos títulos como este en futuras recomendaciones."
+    },
     "menu_home": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
       "message": "Inicio"
