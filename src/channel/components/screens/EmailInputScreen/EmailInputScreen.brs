@@ -19,6 +19,7 @@ Function init()
   m.keyboard.textEditBox.opacity = 0.00001
   m.keyboard.textEditBox.maxTextLength = 100
   m.keyboard.keyGrid.observeFieldScoped("keyFocused", "onKeyGridKeyFocusedChange")
+  m.keyboard.domain = "email"
 
   'This will save the last focused key of the keyboard used to enable the roku default audioguide after screen components read.
   m.keyFocused = ""
@@ -87,7 +88,6 @@ Function onScreenFocusChange()
     m.top.backgroundUriList = m.backgroundUriList
 
     m.Keyboard.textEditBox.voiceEnabled = true
-    m.keyboard.domain = "email"
     m.keyboard.keyGrid.setFocus(true)
   end if
 
