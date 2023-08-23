@@ -50,6 +50,7 @@
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+   <script type="text/brightscript" uri="../../../source/lib/TubiPubSub.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiBookmarks.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />

@@ -32,6 +32,9 @@
       <!-- set to true if the user is signed in and we want to change the experience based on that. -->
       <field id="signedIn" type="boolean" value="true"/>
 
+      <!-- Indicated whether to play/pause/stop video preview -->
+      <field id="isVideoPreviewOn" type="boolean" value="true" />
+
       <!-- If the screen is not enabled, then user should not be able to select anything -->
       <field id="enabled" type="boolean" alwaysNotify="true"/>
 

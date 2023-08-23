@@ -194,7 +194,7 @@ Function handleInputDeeplink(inputInfo) as void
 
   stopCountdownTimer() 'stop previous counter
   stopAndHideLinearVideoPlayer()
-  if isVideoPreviewEnabled() = true
+  if isVideoPreviewOn() = true
     stopVideoPreview()
   end if
 

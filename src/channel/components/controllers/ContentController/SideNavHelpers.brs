@@ -117,7 +117,7 @@ Function onSideNavItemSelected()
     '// If a new screen is to be called, then collapse the side nav and remember which side nav button was last clicked
     bNewScreenCalledSuccess = false
 
-    if isVideoPreviewEnabled() = true
+    if isVideoPreviewOn() = true
       ' stop the video preview when user selects any item from sidenav
       stopVideoPreview()
     end if

@@ -320,7 +320,7 @@ Function setFocusOntoTopNav(isToggle)
     m.TopNav.handlingFocusFromOtherTopNavBackButton = true
   end if
 
-  if isVideoPreviewEnabled() = true
+  if m.top.isVideoPreviewOn = true
     m.top.stopVideoPreview = true
   end if
 

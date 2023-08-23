@@ -26,6 +26,9 @@
       <!-- Indicated whether to show/hide the signIn hint -->
       <field id="needsLoginHint" type="boolean" alias="DetailInfoPanel.needsLogin" />
 
+      <!-- Indicated whether to play/pause/stop video preview -->
+      <field id="isVideoPreviewOn" type="boolean" value="true" />
+
       <!-- Indicated whether to show/hide the signIn hint -->
       <field id="reminderIsSet" type="boolean" alias="DetailInfoPanel.reminderIsSet" />
 

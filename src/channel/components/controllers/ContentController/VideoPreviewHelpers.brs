@@ -190,7 +190,7 @@ End Function
 ' @pageType : string, the type of page which is used in analytics event: i.e. (video_page, series_detail_page, for_you_page, home_page)
 Function setVideoPreviewAfterFocus(focusedContent, pageType)
   if focusedContent <> invalid AND focusedContent.type <> invalid AND m.SideNav.opened <> true
-    if isVideoPreviewEnabled() = true
+    if isVideoPreviewOn() = true
       previewState = getVideoPreviewStateForThisContent(focusedContent)
       if previewState = "buffering" OR previewState = "playing"
         videoPreview = m.videoPreviewPlayer

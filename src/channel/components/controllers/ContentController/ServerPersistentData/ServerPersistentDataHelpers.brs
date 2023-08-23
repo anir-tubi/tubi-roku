@@ -29,15 +29,18 @@ End Function
 
 Function onGetBatchServerPersistentDataComplete(serverPersistentData)
   ' Updates the node with the data from the parser.
-  m.serverPersistentData.update(serverPersistentData.deviceSettings)
-  m.serverPersistentData.update(serverPersistentData.userSettings)
+  updates = [
+    serverPersistentData.deviceSettings
+    serverPersistentData.userSettings
+  ]
+  saveLocalServerPresistantData(updates)
   markUserDeviceSettingsRequestCompleteAndExecuteCallback()
 End Function
 
 
 Function onGetServerPersistentDataComplete(serverPersistentData)
   ' Updates the node with the data from the parser.
-  m.serverPersistentData.update(serverPersistentData)
+  saveLocalServerPresistantData([serverPersistentData])
   markUserDeviceSettingsRequestCompleteAndExecuteCallback()
 End Function
 
@@ -95,6 +98,38 @@ Function saveServerPersistentData(serverPersistentData, saveInto = "")
     })
 
     ' Updating the local copy with the new value.
-    m.serverPersistentData.update(serverPersistentData)
+    saveLocalServerPresistantData([serverPersistentData])
   end if
+End Function
+
+
+'@newServerPersistantData: array, structured as an array of assocarrays to update the local copy with new value.
+  ' If array has 2 items
+  ' [
+  '    {
+  '     isdisliketoastnotificationshown: true
+  '     isliketoastnotificationshown: true
+  '     secondsessionlinearnotwatched: true
+  '   }
+
+  '   {
+  '     isvideopreviewon: false
+  '   }
+  ' ]
+
+  'If array has only 1 item
+
+  ' [
+  '   {
+  '     isvideopreviewon: false
+  '   }
+  ' ]
+Function saveLocalServerPresistantData(newServerPersistantData)
+
+  for i = 0 to newServerPersistantData.count() - 1
+    m.pub_serverPersistentData.update(newServerPersistantData[i])
+  end for
+
+  m.pubSub.publish("pub_serverPersistentData", m.pub_serverPersistentData)
+
 End Function

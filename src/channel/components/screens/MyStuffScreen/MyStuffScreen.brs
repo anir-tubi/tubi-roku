@@ -584,7 +584,7 @@ End Function
 ' returns true if action was taken based on the "play" input and false if no action taken
 Function handlePlayInput()
   if m.top.isLoading <> true AND m.top.signedIn = true
-    if isVideoPreviewEnabled() = true
+    if m.top.isVideoPreviewOn = true
       m.top.stopVideoPreview = true
     end if
 
@@ -713,7 +713,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
     else if key = "left" OR key = "back"
 
-      if isVideoPreviewEnabled() = true
+      if m.top.isVideoPreviewOn = true
         m.top.pauseVideoPreview = true
       end if
 

@@ -48,7 +48,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     detailScreen.observeFieldScoped("seeAllGamesSelected", "onSeeAllGamesSelected")
 
-    if isVideoPreviewEnabled() = true
+    if isVideoPreviewOn() = true
       previewState = getVideoPreviewStateForThisContent(content)
       if previewState = "buffering" or previewState = "playing"
         pageType = "video_page"
@@ -81,6 +81,9 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
 
     ' Update tracking info - have to set the whole AA, can't update only a portion on the AA field
     detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
+
+    detailScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
+    m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", detailScreen, "isVideoPreviewOn")
 
     setDetailStrings(detailScreen, content)
 
@@ -204,7 +207,7 @@ Function onDetailBackgroundChange(msg)
   detailScreen = msg.getRoSGNode()
   if detailScreen.isInFocusChain()
 
-    if isVideoPreviewEnabled() = true
+    if isVideoPreviewOn() = true
       previewState = getVideoPreviewState()
       if previewState <> "playing"
         m.backgroundGroup.backgroundInfo = {
@@ -1399,7 +1402,7 @@ Function setDetailScreenLikeDislikeStateFromLikeAction(detailScreen, sLikeAction
   canShowLikeDisLikeToast = (UCase(m.constants.deviceInfo.countryCode) = "US" AND isKidsUIOn() = false)
   if  getExperimentResource("roku_like_toast", "roku_like_toast_v1", false).enabled = true AND isNonEmptyString(sLikedState) = true AND canShowLikeDisLikeToast = true
     dialogSubType = sLikedState + "_title"
-    if sLikedState = m.constants.ui.likeDislikeStates.liked AND m.serverPersistentData.isLikeToastNotificationShown = false
+    if sLikedState = m.constants.ui.likeDislikeStates.liked AND m.pub_serverPersistentData.isLikeToastNotificationShown = false
 
       getExperimentResource("roku_like_toast", "roku_like_toast_v1")
       saveServerPersistentData({
@@ -1428,7 +1431,7 @@ Function setDetailScreenLikeDislikeStateFromLikeAction(detailScreen, sLikeAction
 
       showToast(toastInfo, true, dialogEventInfo)
 
-    else if sLikedState = m.constants.ui.likeDislikeStates.disliked AND m.serverPersistentData.isDisLikeToastNotificationShown = false
+    else if sLikedState = m.constants.ui.likeDislikeStates.disliked AND m.pub_serverPersistentData.isDisLikeToastNotificationShown = false
 
       getExperimentResource("roku_like_toast", "roku_like_toast_v1")
       saveServerPersistentData({

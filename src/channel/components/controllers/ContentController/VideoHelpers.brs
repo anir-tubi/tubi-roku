@@ -113,8 +113,8 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
 
   ' Passing current user selected track.
   ' Moving it out so that we always pass the updated value even when screen is obtained from cache.
-  if m.serverPersistentData <> invalid
-    videoPlayer.preferredAudioTrack = m.serverPersistentData.audioTrack
+  if m.pub_serverPersistentData <> invalid
+    videoPlayer.preferredAudioTrack = m.pub_serverPersistentData.audioTrack
   end if
 
   stopVideoPreviewIfPlaying() 'stop videopreview just in case it is playing
@@ -1174,7 +1174,7 @@ End Function
 Function onAudioTrackSettingsChange(msg)
   selectedAudioTrack = msg.getData()
   ' Making sure we only call update when necessary.
-  currentAudioTrack = m.serverPersistentData.audioTrack
+  currentAudioTrack = m.pub_serverPersistentData.audioTrack
   if (currentAudioTrack.language <> selectedAudioTrack.language) OR (currentAudioTrack.role <> selectedAudioTrack.role)
     saveServerPersistentData({
       "audioTrack": selectedAudioTrack

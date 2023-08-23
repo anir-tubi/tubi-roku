@@ -39,6 +39,7 @@ Function init()
   m.userDeviceApi = UserDeviceApi(m.constants, apiUtilsLib)
   m.tensorapi = TensorApi(m.constants, m.Request, Auth)
   m.rainmakerApi = RainmakerApi(m.constants)
+  m.pubSub = TubiPubSub(m)
 
   m.background = m.top.findNode("ContentBackground")
   m.SponsorBground = m.top.findNode("SponsorshipBackgroundGroup")
@@ -199,7 +200,7 @@ Function init()
   }
 
   ' Holds the value for user/device level settings. For ex: isVideoPreviewOn  or Selected Audio track.
-  m.serverPersistentData = createObject("roSGNode", "ServerPersistentData")
+  m.pub_serverPersistentData = createObject("roSGNode", "ServerPersistentData")
 
   ' Braze Task and Braze helper instance.
   m.brazeTask = invalid
@@ -615,7 +616,7 @@ Function startUserExperience()
       saveServerPersistentData({
         "secondSessionLinearNotWatched": true
       }, "device")
-    else if m.serverPersistentData.secondSessionLinearNotWatched = true
+    else if m.pub_serverPersistentData.secondSessionLinearNotWatched = true
       m.shouldShowLinearEducationModal = true
     end if
 
@@ -2226,9 +2227,9 @@ End Function
 
 
 Function isVideoPreviewOn()
-  if m.serverPersistentData <> invalid
-    isVideoPreviewOnForKidsModeInUk = (UCase(m.constants.deviceInfo.countryCode) = "UK" AND isKidsUIOn() = true)
-    return (isVideoPreviewEnabled() = true AND m.serverPersistentData.isVideoPreviewOn = true AND isVideoPreviewOnForKidsModeInUk = false)
+  if m.pub_serverPersistentData <> invalid
+    isUserInKidsModeUK = (UCase(m.constants.deviceInfo.countryCode) = "UK" AND isKidsUIOn() = true)
+    return (isVideoPreviewEnabled() = true AND m.pub_serverPersistentData.isVideoPreviewOn = true AND isUserInKidsModeUK = false)
   end if
 
   return false

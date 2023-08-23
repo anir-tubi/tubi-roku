@@ -40,6 +40,9 @@ Function showMyStuffScreen()
     end if
   end if
 
+  screen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
+  m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", screen, "isVideoPreviewOn")
+
   setInScreenCache(screen)
   screen.trackingPageInfo = {
     pageType: "for_you_page"

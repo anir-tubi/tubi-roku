@@ -162,7 +162,7 @@ Function onTopNavSelection()
   tubiLog("HomeScreen.onTopNavSelection")
 
   ' stop the video preview when user selects any item from topnav
-  if isVideoPreviewEnabled() = true
+  if m.top.isVideoPreviewOn = true
     m.top.stopVideoPreview = true
   end if
 
@@ -944,7 +944,7 @@ Function setFocusOntoTopNav(isToggle)
   end if
 
   m.top.stopLinearVideoPlayer = true
-  if isVideoPreviewEnabled() = true
+  if m.top.isVideoPreviewOn = true
     m.top.pauseVideoPreview = true
   end if
 
@@ -1072,7 +1072,7 @@ Function onKeyEvent(key, press) as boolean
         ' setting rowFocusedForSeeAll as invalid, we have to disable "options" when focus is on topNav
         m.top.rowFocusedForSeeAll = invalid
 
-        if isVideoPreviewEnabled() = true
+        if m.top.isVideoPreviewOn = true
           m.top.pauseVideoPreview = true
         end if
 
@@ -1091,7 +1091,7 @@ Function onKeyEvent(key, press) as boolean
       if key = "left" OR key = "back"
         ' This is required because the homescreens without topNav will keep playing video Preview when focus is out of
         ' screen
-        if isVideoPreviewEnabled() = true
+        if m.top.isVideoPreviewOn = true
           m.top.pauseVideoPreview = true
         end if
 
@@ -1142,7 +1142,7 @@ Function handlePlayInput()
     positionFocused = m.top.cursorPosition
     m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(itemFocused, positionFocused)
 
-    if isVideoPreviewEnabled() = true
+    if m.top.isVideoPreviewOn = true
       m.top.stopVideoPreview = true
     end if
 

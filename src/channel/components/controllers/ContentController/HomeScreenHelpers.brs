@@ -30,6 +30,9 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
 
     homeScreen.signedIn = isLoggedInUser(authInfo)
 
+    homeScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
+    m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", homeScreen, "isVideoPreviewOn")
+
     refreshHomescreenTopNav(homeScreen)
     ' set which component to focus on once the screen gains focus
     if componentToFocus = m.constants.ui.homescreen.focusItems.topNav
@@ -85,6 +88,8 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     homeScreen.shouldKidsModeBeSentToServer = shouldKidsModeBeSentToServer()
 
     homeScreen.signedIn = isLoggedInUser(authInfo)
+    homeScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
+    m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", homeScreen, "isVideoPreviewOn")
     homeScreen.kidsModeFeatureOn = m.kidsModeFeatureOn
     homeScreen.canLoadCategories = true
     homeScreen.id = screenID

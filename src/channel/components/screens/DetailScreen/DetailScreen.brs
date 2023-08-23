@@ -949,7 +949,7 @@ End Function
 Function handleMenuItemSelected(itemSelected)
   if itemSelected <> invalid then
     tubiLog("DetailScreen.handleMenuItemSelected" + itemSelected.title)
-    if isVideoPreviewEnabled() = true
+    if m.top.isVideoPreviewOn = true
       m.top.stopVideoPreview = true
     end if
 
@@ -1062,7 +1062,7 @@ End Function
 Function onRelatedItemFocused()
   tubiLog("DetailScreen.onRelatedItemFocused")
   if m.RelatedGrid.content <> invalid
-    if isVideoPreviewEnabled() = true
+    if m.top.isVideoPreviewOn = true
       m.top.stopVideoPreview = true
       ' force a background update
       m.top.backgroundUriList = m.top.backgroundUriList
@@ -1187,7 +1187,7 @@ End Function
 
 Function handlePlayInput()
   itemFocused = m.Menu.content.getChild(m.Menu.itemFocused)
-  if isVideoPreviewEnabled() = true
+  if m.top.isVideoPreviewOn = true
     m.top.stopVideoPreview = true
   end if
 

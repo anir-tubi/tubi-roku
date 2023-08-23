@@ -53,6 +53,9 @@
       <!-- set to true if the user is signed in and we want to change the experience based on that -->
       <field id="signedIn" alias="CategoryGridList.signedIn" />
 
+      <!-- Indicated whether to play/pause/stop video preview -->
+      <field id="isVideoPreviewOn" type="boolean" value="true" />
+
       <!-- show/hide the category menu -->
       <field id="categoryMenuVisible" type="boolean"/>
 

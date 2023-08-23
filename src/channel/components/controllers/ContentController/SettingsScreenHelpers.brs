@@ -8,7 +8,7 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.callingPage = sPageSource
   m.settingsScreen.uiMode = m.uiMode
   ' Passing in the saved isVideoPreviewOn.
-  m.settingsScreen.isVideoPreviewOn = m.serverPersistentData.isVideoPreviewOn
+  m.settingsScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
   setSettingsScreenSignInInfo()
   m.settingsScreen.actionAfterActivation = ""
   m.settingsScreen.observeFieldScoped("signOutSelected", "onSettingsSignOutSelected")

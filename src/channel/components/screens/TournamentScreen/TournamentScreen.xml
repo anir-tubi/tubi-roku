@@ -39,6 +39,9 @@
       <!-- set to true if the user is signed in and we want to change the experience based on that -->
       <field id="signedIn" alias="CategoryGridList.signedIn" />
 
+      <!-- Indicated whether to play/pause/stop video preview -->
+      <field id="isVideoPreviewOn" type="boolean" value="true" />
+
       <!-- should the topNav refresh? -->
       <field id="refreshTopNav" type="boolean" alwaysNotify="true" />
 

@@ -86,7 +86,11 @@ Function showTournamentScreen(constants, componentToFocus = "")
     pushScreen(tournamentScreen, true, false)
 
     tournamentScreen.topNavSelectedId = m.constants.ui.sideNavIds.tournament
+
   end if
+
+  tournamentScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
+  m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", tournamentScreen, "isVideoPreviewOn")
 
 End Function
 
