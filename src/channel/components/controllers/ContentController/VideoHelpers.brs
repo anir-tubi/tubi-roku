@@ -1085,7 +1085,7 @@ Function onUpNextResponse(upNextContent)
         end if
       else if upNextContent.getChildCount() > 0
         videoPlayer.upNextContent = upNextContent
-        isAutoPlayOff = (UCase(m.constants.deviceInfo.countryCode) = "UK" AND isKidsUIOn() = true)
+        isAutoPlayOff = (isGDPR() = true AND (isKidsUIOn() = true OR isParentalControlsTeensLevel() = true))
         videoPlayer.isAutoPlayOff = isAutoPlayOff
         videoPlayer.upNextUpdateContent = true
       else 'worst case there are no contents under upNextContent

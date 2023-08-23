@@ -2228,8 +2228,7 @@ End Function
 
 Function isVideoPreviewOn()
   if m.pub_serverPersistentData <> invalid
-    isUserInKidsModeUK = (UCase(m.constants.deviceInfo.countryCode) = "UK" AND isKidsUIOn() = true)
-    return (isVideoPreviewEnabled() = true AND m.pub_serverPersistentData.isVideoPreviewOn = true AND isUserInKidsModeUK = false)
+    return (isVideoPreviewEnabled() = true AND m.pub_serverPersistentData.isVideoPreviewOn = true)
   end if
 
   return false
@@ -2260,4 +2259,14 @@ Function updateScreenCacheOnPlayback(currentVideoScreenID)
       end if
     end if
   end for
+End Function
+
+
+Function isGDPR()
+  gdprCountries = {
+    "uk": true
+    "nz": true
+  }
+  lowerCountryCode = LCase(m.constants.deviceInfo.countryCode)
+  return (gdprCountries[lowerCountryCode] <> invalid)
 End Function
