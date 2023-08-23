@@ -94,6 +94,10 @@ Function TubiExperiments(constants) as Object
         roku_like_toast_v1: {"enabled": false}
       }
 
+      roku_tensor_cdn_domain: {
+        roku_tensor_cdn_domain_v1: {"enabled": false}
+      }
+
     }
 
     'public methods

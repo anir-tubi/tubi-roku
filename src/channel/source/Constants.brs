@@ -507,17 +507,6 @@ Function getConstants()
       constants.urls.search = "https://search.staging-public.tubi.io/api/v1/search"
     end if
 
-
-    'matrix url
-    constants.urls.matrix = {}
-      constants.urls.matrix.urlBase = "https://uapi.adrise.tv/matrix"
-      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-        constants.urls.matrix.urlBase = "https://uapi.staging-public.tubi.io/matrix"
-      end if
-      constants.urls.matrix.homescreen = constants.urls.matrix.urlBase + "/homescreen"
-      constants.urls.matrix.container = constants.urls.matrix.urlBase + "/containers"
-      constants.urls.matrix.channel = constants.urls.matrix.urlBase + "/containers" ' + "/:container_id"
-
     'tensor url
     constants.urls.tensor = {}
       constants.urls.tensor.urlBase = "https://tensor.production-public.tubi.io/api"
@@ -526,9 +515,19 @@ Function getConstants()
       end if
       constants.urls.tensor.homescreen = constants.urls.tensor.urlBase + "/v3/homescreen"
       constants.urls.tensor.container = constants.urls.tensor.urlBase + "/v3/containers"
-      constants.urls.tensor.channel = constants.urls.tensor.urlBase + "/v3/containers"
       constants.urls.tensor.epgChannelIds = constants.urls.tensor.urlBase + "/v2/epg"
       constants.urls.tensor.tournamentscreen = constants.urls.tensor.urlBase + "/v1/wc_tournament"
+
+      ' tensor cdn url
+      constants.urls.tensor.cdn = {}
+        constants.urls.tensor.cdn.urlBase = "https://tensor-cdn.production-public.tubi.io/api"
+        if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
+          constants.urls.tensor.cdn.urlBase = "tensor-cdn.staging-public.tubi.io/api"
+        end if
+        constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v3/homescreen"
+        constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v3/containers"
+        constants.urls.tensor.cdn.epgChannelIds = constants.urls.tensor.cdn.urlBase + "/v2/epg"
+        constants.urls.tensor.cdn.tournamentscreen = constants.urls.tensor.cdn.urlBase + "/v1/wc_tournament"
 
     'user devices url
     constants.urls.userDevice = {}
@@ -616,10 +615,6 @@ Function getConstants()
 
       constants.urls.analytics.event = constants.urls.analytics.urlBase + "/v2/event"
       constants.urls.analytics.singleEvent = constants.urls.analytics.urlBase + "/v2/single-event" 'preferred by back end team
-
-    'live tv urls
-    constants.urls.liveTv = {}
-      constants.urls.liveTv.getAll = constants.urls.matrix.urlBase + "/livetv"
 
     'cuepoints url
     constants.urls.cuepointsBaseUrl = "https://ads.adrise.tv/cue-points/"

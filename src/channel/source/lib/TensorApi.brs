@@ -41,7 +41,12 @@ End Function
 'epgChannelIds request
 '
 Function tensorApi_getEPGChannelIdsReqInfo(mode = "")
-  url = m.constants.urls.tensor.epgChannelIds
+
+  if getExperimentResource("roku_tensor_cdn_domain", "roku_tensor_cdn_domain_v1").enabled = true 'bs:disable-line 1001 LINT1001
+    url = m.constants.urls.tensor.cdn.epgChannelIds
+  else
+    url = m.constants.urls.tensor.epgChannelIds
+  end if
 
   options = m.commonOptions()
   if mode <> invalid AND mode <> ""
@@ -80,7 +85,12 @@ End Function
 
 'tournamentPage content request
 Function tensorApi_getTournamentReqInfo()
-  url = m.constants.urls.tensor.tournamentscreen
+
+  if getExperimentResource("roku_tensor_cdn_domain", "roku_tensor_cdn_domain_v1").enabled = true 'bs:disable-line 1001 LINT1001
+    url = m.constants.urls.tensor.cdn.tournamentscreen
+  else
+    url = m.constants.urls.tensor.tournamentscreen
+  end if
 
   options = m.commonOptions()
   ' hardcode value 70 to cover all the FIFA matches in the FIFA container instead of using "constants.performance.categoryGridList.finalBlockSize"
