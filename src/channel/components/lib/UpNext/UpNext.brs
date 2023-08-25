@@ -104,12 +104,14 @@ End Function
 
 
 Function onComponentFocus()
-
-  if m.top.isAutoPlayOff = false
-    m.Timer.observeField("fire", "onCountdownTimer")
-  end if
-
   if m.top.hasFocus()
+
+    'If the autoPlay is off, we don't need to show the count down timer.
+    if m.top.isAutoPlayOff = false
+      m.Timer.unobserveFieldScoped("fire")
+      m.Timer.observeFieldScoped("fire", "onCountdownTimer")
+    end if
+
     if m.MovieGroup.visible
       m.GridMovie.setFocus(true)
     else if m.SeriesGroup.visible
