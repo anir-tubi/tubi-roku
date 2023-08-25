@@ -283,3 +283,14 @@ Function tubiAds_getNielsenStreamId_test()
   nielsenStreamId = m.adsLimited.getNielsenStreamId(m.ads.constants, content)
   m.assertEqual(nielsenStreamId.len(), 0)
 End Function
+
+
+'@Test tubiAds_replaceMacro unit tests
+Function tubiAds_replaceMacro_test()
+  adUrl = "https://ads.staging-public.tubi.io/pixel/v3/pause/notUsed/ROKU?pos=1&id=YVmgBRQPXTADsAkZ6pkk&data=dTehrqeUCuaEqfAbqA9y-9CIo8PbikNRI46_zzkOBAJFzaceiXXAkgEC2FFOkrFie8fgXEbPzFOBOewd88vaSEPtZnB_vJj16HzYE1pGNMR2fBpQ4b4jOfz7OVQfP8LUCFy4GL1hLJW4oq90HOksvV543C13pmb_ZtS6wBSYbxuIinemL1VH75rbFEZ0Ko1PzD0NS7OUHopu8sGU-Z_0KoeOAdJhxvqeXgA7FhYzvb2qo5_0Mp4tu9RvbQS9LR4Co1HazvwzTptZdXq62cHyzdDlbnJisbUYSHT2zlkv41PNxvED&action=%5BTUBI:NOT_USED_ACTION%5D"
+  newAdUrl = m.adsLimited.replaceMacro(adUrl, "[TUBI:NOT_USED_ACTION]", "exit_pre_pod")
+  expectedAdUrl = "https://ads.staging-public.tubi.io/pixel/v3/pause/notUsed/ROKU?pos=1&id=YVmgBRQPXTADsAkZ6pkk&data=dTehrqeUCuaEqfAbqA9y-9CIo8PbikNRI46_zzkOBAJFzaceiXXAkgEC2FFOkrFie8fgXEbPzFOBOewd88vaSEPtZnB_vJj16HzYE1pGNMR2fBpQ4b4jOfz7OVQfP8LUCFy4GL1hLJW4oq90HOksvV543C13pmb_ZtS6wBSYbxuIinemL1VH75rbFEZ0Ko1PzD0NS7OUHopu8sGU-Z_0KoeOAdJhxvqeXgA7FhYzvb2qo5_0Mp4tu9RvbQS9LR4Co1HazvwzTptZdXq62cHyzdDlbnJisbUYSHT2zlkv41PNxvED&action=exit_pre_pod"
+
+  m.assertNotInvalid(newAdUrl)
+  m.assertEqual(newAdUrl, expectedAdUrl)
+End Function

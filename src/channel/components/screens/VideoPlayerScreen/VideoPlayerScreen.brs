@@ -46,6 +46,7 @@ Function init()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.adsLimited = TubiAdsLimited(m.constants, Auth)
   m.Loading = m.top.findNode("Loading")
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
   m.LoadingMessage = m.top.findNode("LoadingMessage")
@@ -79,6 +80,9 @@ Function init()
   'Based on this field we request pause ad or reuse the previous pause ad response
   'If any pixel event is missing for current pause ad, we do not make new pause ad request
   m.isPixelFiredForCurrentPauseAd = true
+
+  'this field holds the last fired pixel type which helps to fire the appropriate pixels in order
+  m.lastFiredPixelType = ""
 
   'pauseAdAnimation helps for stopping the pasue ad animation
   m.pauseAdAnimation = invalid
@@ -1291,6 +1295,7 @@ Function resetVideoPlayerState(content = invalid)
 
   m.isPauseAdReqInProgress = false
   m.isPixelFiredForCurrentPauseAd = true
+  m.lastFiredPixelType = ""
 
   m.top.adState = "init"
   m.top.upNextContentToAutoplay = invalid

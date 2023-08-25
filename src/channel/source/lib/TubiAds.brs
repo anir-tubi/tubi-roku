@@ -68,6 +68,7 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     getMd5Hash: tubiAds_getMd5Hash
     sendNotUsedAdPodPixels: tubiAds_sendNotUsedAdPodPixels
     retrieveAds: tubiAds_retrieveAds
+    replaceMacro: tubiAds_replaceMacro
     appMode: "DEFAULT_MODE"
     notUsedAdPodPixels: {} ' List of pixels for the current ad pod that should be sent if playback is stopped before we get an impression for that ad
   }
@@ -89,6 +90,7 @@ Function TubiAdsLimited(constants, auth)
     getNielsenSessionId: tubiAds_getNielsenSessionId
     getNielsenStreamId: tubiAds_getNielsenStreamId
     getMd5Hash: tubiAds_getMd5Hash
+    replaceMacro: tubiAds_replaceMacro
   }
 End Function
 
@@ -591,7 +593,7 @@ End Function
 ' SIDE EFFECT: resets m.notUsedAdPodPixels after sending current pixels
 Function tubiAds_sendNotUsedAdPodPixels(notUsedAction)
   for each adId in m.notUsedAdPodPixels
-    notUsedPixelUrl = m.notUsedAdPodPixels[adId].replace("[TUBI:NOT_USED_ACTION]", notUsedAction)
+    notUsedPixelUrl = m.replaceMacro(m.notUsedAdPodPixels[adId], "[TUBI:NOT_USED_ACTION]", notUsedAction)
     notUsedPixelReq = m.request.createAsync(notUsedPixelUrl)
     m.requestQueue.pushRequest(notUsedPixelReq)
   end for
@@ -921,4 +923,15 @@ Function tubiAds_getMd5Hash(strToHash)
   digest = CreateObject("roEVPDigest")
   digest.Setup("md5")
   return digest.Process(ba1)
+End Function
+
+
+' @adUrl: string, the url for Ad
+' @macro: string, macro string which needs to be replaced
+' @newValue: string, the new value which will be used in the place of macro
+'
+' return: string, updated AdUrl
+Function tubiAds_replaceMacro(adUrl, macro, newValue)
+  newAdUrl = adUrl.trim().unescape().replace(macro, newValue)
+  return newAdUrl
 End Function

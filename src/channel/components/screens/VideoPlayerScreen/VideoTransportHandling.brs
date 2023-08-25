@@ -39,7 +39,13 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           showTransport()
           stopPauseAdTimer()
           if m.isPixelFiredForCurrentPauseAd = false
-            sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel)
+
+            if m.lastFiredPixelType = m.constants.pauseAd.pixelTypes.startPixel
+              action = "exit_mid_pod" 'this happens if the notUsed pixel triggers after start but before imp pixel
+            else
+              action = "exit_pre_pod" 'this happens if the notUsed pixel triggers before start pixel
+            end if
+            sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel, action)
           end if
           showClosedCaptionAudioTrackOverlay()
         end if
@@ -466,7 +472,7 @@ Function handleOk()
     else if focusButtonId = m.closedCaptionAudioButton.id
       stopPauseAdTimer()
       if m.isPixelFiredForCurrentPauseAd = false
-        sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel)
+        sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel, "exit_pre_pod")
       end if
       showClosedCaptionAudioTrackOverlay()
     end if
@@ -1183,7 +1189,12 @@ Function onPauseAdResponse(msg)
     if m.top.hasFocus()
       m.pauseAdOverlay.posterUri = pauseAdResponse.mediaUrl
     else
-      sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel)
+      if m.lastFiredPixelType = m.constants.pauseAd.pixelTypes.startPixel
+        action = "exit_mid_pod" 'this happens if the notUsed pixel triggers after start but before imp pixel
+      else
+        action = "exit_pre_pod" 'this happens if the notUsed pixel triggers before start pixel
+      end if
+      sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel, action)
       'If the video player does not have focus, resetting timer here to avoid notUsed Pixel being fired again in PauseAdTimers observer.
       resetPauseAdTimers()
     end if
@@ -1205,9 +1216,13 @@ Function resetPauseAdOverlay()
   end if
 
   if m.isPixelFiredForCurrentPauseAd = true
+    if m.lastFiredPixelType = m.constants.pauseAd.pixelTypes.startPixel
+      'this happens if the notUsed pixel triggers after start but before imp pixel
+      sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel, "exit_mid_pod")
+    end if
     sendPauseAdPixel(m.constants.pauseAd.pixelTypes.endPixel)
   else
-    sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel)
+    sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel, "exit_pre_pod")
   end if
 
   resetPauseAdTimers()
@@ -1235,7 +1250,7 @@ Function onPauseAdOverlayTimer()
     end if
 
   else
-    sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel)
+    sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel, "exit_pre_pod")
   end if
 
 End Function
@@ -1257,7 +1272,7 @@ Function onPauseAdPosterLoadStatus(msg)
 
   else
     m.pauseAdOverlay.unobserveFieldScoped("posterLoadStatus")
-    sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel)
+    sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel, "exit_pre_pod")
   end if
 End Function
 
@@ -1356,7 +1371,8 @@ End Function
 
 'this function triggers the pauseAdPixel interface to send pause ad related pixels
 '@pixelType: String, possible values are from m.constants.pauseAd
-Function sendPauseAdPixel(pixelType = "")
+'@action: String, (optional) only used for "notUsedPixel". Possible values are "exit_pre_pod" / "exit_mid_pod".
+Function sendPauseAdPixel(pixelType = "", action = "")
   pauseAdResponse = m.top.pauseAdResponse
   pixelUrls = []
 
@@ -1377,9 +1393,18 @@ Function sendPauseAdPixel(pixelType = "")
   for each pixelUrl in pixelUrls
     if isNonEmptyString(pixelUrl)
       m.isPixelFiredForCurrentPauseAd = true
+
+      if pixelType = m.constants.pauseAd.pixelTypes.notUsedPixel AND isNonEmptyString(action) = true
+        pixelUrl = m.adsLimited.replaceMacro(pixelUrl, "[TUBI:NOT_USED_ACTION]", action)
+      else if pixelType = m.constants.pauseAd.pixelTypes.errorPixel
+        pixelUrl = m.adsLimited.replaceMacro(pixelUrl, "[ERRORCODE]", "401")
+      end if
+
       m.top.sendPauseAdPixel = pixelUrl
     end if
   end for
+
+  m.lastFiredPixelType = pixelType
 End Function
 
 
@@ -1392,11 +1417,16 @@ Function onSendPendingPauseAdPixel()
   resetPauseAdTimers()
 
   if m.pauseAdOverlay.posterLoadStatus = "ready"
-    if m.pauseAdOverlay.opacity > 0
+
+    if m.lastFiredPixelType = m.constants.pauseAd.pixelTypes.startPixel
+      sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel, "exit_mid_pod")
+      sendPauseAdPixel(m.constants.pauseAd.pixelTypes.endPixel)
+    else if m.lastFiredPixelType = m.constants.pauseAd.pixelTypes.impTrackingPixel
       sendPauseAdPixel(m.constants.pauseAd.pixelTypes.endPixel)
     else
-      sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel)
+      sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel, "exit_pre_pod")
     end if
+
   else if m.pauseAdOverlay.posterLoadStatus = "failed"
     sendPauseAdPixel(m.constants.pauseAd.pixelTypes.errorPixel)
   end if
