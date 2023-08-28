@@ -78,7 +78,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_large_poster: {
-        roku_large_poster_v1: {"enabled": false}
+        roku_large_poster_v1: {"enabled": true}
       }
 
       roku_linear_epg_education_modal_over_homegrid: {
