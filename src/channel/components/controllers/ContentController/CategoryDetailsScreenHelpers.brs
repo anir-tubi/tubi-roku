@@ -135,7 +135,7 @@ Function onCategoryContentSelected(msg)
     "playbackContainer": categoryContent.id
   }
 
-  showDetailScreen(categoryDetailsScreen.contentSelected, true, invalid, invalid, playbackSource)
+  showDetailScreen(categoryDetailsScreen.contentSelected, true, invalid, invalid, playbackSource, m.constants.ui.screenIds.categoryDetailsScreen)
 End Function
 
 

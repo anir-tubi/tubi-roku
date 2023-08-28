@@ -35,6 +35,10 @@
       <!-- Indicated whether to show/hide the signIn hint -->
       <field id="infoPanelVisible" type="boolean" alias="DetailInfoPanel.visible" />
 
+      <!-- To know where the detail screen is launched/ skipped -->
+      <!--  TODO:: Remove pageOrigin once we fixed sending invalid component interaction events- added this for debugging purpose -->
+      <field id="pageOrigin" type="string" />
+
       <!-- The following are the strings associated with this UI element -->
       <field id="stringQueueButton" type="string"/>
       <field id="stringNoQueueButton" type="string"/>

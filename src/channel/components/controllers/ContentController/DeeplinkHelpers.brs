@@ -265,7 +265,7 @@ Function handleDeeplinkContentByType()
     else if m.deepLinkContent.deeplinktype = "series"
       if Left(m.deepLinkContent.id, 1) = "0"
         playbackSource = getPlaybackSourceForDeeplinkType()
-        showDetailScreen(m.deepLinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource)
+        showDetailScreen(m.deepLinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource, m.constants.player.playbackOrigin.deeplink)
       else
         getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeriesContentSuccess, handleSingleContentDeeplinkError)
       end if
@@ -276,18 +276,18 @@ Function handleDeeplinkContentByType()
     else if m.deepLinkContent.deeplinktype = "season"
       if Left(m.deepLinkContent.id, 1) = "0"
         playbackSource = getPlaybackSourceForDeeplinkType()
-        showDetailScreen(m.deepLinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource)
+        showDetailScreen(m.deepLinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource, m.constants.player.playbackOrigin.deeplink)
       else
         getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeasonContentSuccess, handleSingleContentDeeplinkError)
       end if
 
     else if m.deepLinkContent.deeplinktype = "movie" OR m.deepLinkContent.deeplinktype = "tvspecial"
       playbackSource = getPlaybackSourceForDeeplinkType()
-      showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource)
+      showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource, m.constants.player.playbackOrigin.deeplink)
 
     else if m.deepLinkContent.deeplinktype = "sports"
       playbackSource = getPlaybackSourceForDeeplinkType()
-      showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource)
+      showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource, m.constants.player.playbackOrigin.deeplink)
       'Set the sideNav id to be "home" because tournament Screen's left button should focus on sideNav->home menu item.
       sideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
       focusSideNavOption(sideNavID)
@@ -780,7 +780,7 @@ Function handleDeeplinkVideoSuccessResponse(refreshedContent, successCb = invali
   emptySeriesNode.type = m.constants.ui.contentTypes.series
   emptySeriesNode.id = refreshedContent.seriesId
   playbackSource = getPlaybackSourceForDeeplinkType()
-  showDetailScreen(emptySeriesNode, false, successCb, errorCb, playbackSource)
+  showDetailScreen(emptySeriesNode, false, successCb, errorCb, playbackSource, m.constants.player.playbackOrigin.deeplink)
 End Function
 
 

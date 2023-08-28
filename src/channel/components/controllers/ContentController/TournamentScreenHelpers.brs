@@ -327,7 +327,7 @@ Function onTournamentScreenVodContentToPlay(msg)
   itemSelected = msg.getData()
 
   if itemSelected <> invalid
-    showDetailScreen(itemSelected, true)
+    showDetailScreen(itemSelected, true, invalid, invalid, {}, m.constants.ui.screenIds.tournamentScreen)
   end if
 End Function
 

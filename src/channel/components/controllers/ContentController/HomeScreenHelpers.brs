@@ -880,7 +880,7 @@ Function onContentSelected(msg)
       "srcForAds": m.constants.player.playbackOrigin.container
       "playbackContainer": homeScreen.currCategoryId
     }
-    showDetailScreen(content, true, invalid, invalid, playbackSource )
+    showDetailScreen(content, true, invalid, invalid, playbackSource, m.constants.ui.screenIds.homeScreen)
   end if
 End Function
 
@@ -902,7 +902,7 @@ Function onContentToPlay(msg)
     "srcForAds":m.constants.player.playbackOrigin.container
     "playbackContainer": containerId
   }
-  showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
+  showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource, m.constants.ui.screenIds.homeScreen)
 End Function
 
 

@@ -13,7 +13,9 @@
 '                                                    valid values are "deeplink" , "ap_auto", "ap_select", "container", "ymal", "search", "epg", "unknown"
 
 '                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
-Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = invalid, errorCb = invalid, playbackSource = {"srcForAnalytic":"unknown","srcForAds":"unknown"})
+'@pageOrigin: From which screen we landed on the detail screen
+''//::TODO:: Remove pageOrigin once we fixed sending invalid component interaction events- added this for debugging purpose
+Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = invalid, errorCb = invalid, playbackSource = {"srcForAnalytic":"unknown","srcForAds":"unknown"}, pageOrigin = "")
   tubiLog("DetailScreenHelpers.showDetailScreen")
   if content <> invalid
     detailScreen = CreateObject("roSGNode", "DetailScreen")
@@ -91,6 +93,8 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     ' so that it may be used for analytics in the case of failing to fetch the full info from the server.
     ' We expect to overwrite this in populateDetailScreen() which occurs after the full info has been fetched from the /content API
     detailScreen.content = content
+
+    detailScreen.pageOrigin = pageOrigin
 
     ' waiting to populate the details screen for series until after we fetch episode data
     if m.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video AND content.seriesId <> invalid AND content.seriesId <> "")
@@ -273,7 +277,9 @@ End Function
 '@content: tubiContentNode, the content of the screen
 '@shouldResetButtonIndex: boolean, helps to reset the focus index of menu items
 '@nSavedPosition: integer, The number representing the resume point of the video
-Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = false, nSavedPosition = -1)
+'@pageOrigin: From which screen we populate on the detail screen
+''//::TODO:: Remove pageOrigin once we fixed sending invalid component interaction events- added this for debugging purpose
+Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = false, nSavedPosition = -1, pageOrigin = "")
   tubiLog("DetailScreenHelpers.populateDetailScreen")
   'initialize default background - will be overwritten later in most cases
   backgroundUriList = [m.defaultBackgroundUri]
@@ -298,6 +304,10 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     badgeText = info.badgeText
     availabilityType = info.availabilityType
     detailScreen.availabilityType = availabilityType
+
+    if isNonEmptyString(pageOrigin) = true
+      detailScreen.pageOrigin = pageOrigin
+    end if
 
     detailScreen.hasTrailer = (content.hasTrailer = true)
 
@@ -1636,7 +1646,7 @@ Function onRelatedContentSelected(msg)
       "srcForAds": m.constants.player.playbackOrigin.ymal
     }
 
-    showDetailScreen(content, true, invalid, invalid, playbackSource)
+    showDetailScreen(content, true, invalid, invalid, playbackSource, m.constants.player.playbackOrigin.ymal)
   end if
 End Function
 
@@ -2344,5 +2354,5 @@ Function onRelatedContentToPlay(msg)
     "srcForAds":m.constants.player.playbackOrigin.ymal
     }
 
-  showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
+  showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource, m.constants.player.playbackOrigin.ymal)
 End Function

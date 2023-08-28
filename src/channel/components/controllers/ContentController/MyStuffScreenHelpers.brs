@@ -247,7 +247,7 @@ Function onMyStuffContentSelected(msg)
       "srcForAds":m.constants.player.playbackOrigin.container
       "playbackContainer": content.parentId
     }
-    showDetailScreen(content, true, invalid, invalid, playbackSource)
+    showDetailScreen(content, true, invalid, invalid, playbackSource, m.constants.ui.screenIds.myStuffScreen)
   end if
 End Function
 
