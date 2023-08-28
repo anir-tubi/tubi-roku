@@ -41,6 +41,9 @@ const {retrieveSuitestTests, runSuitestTests, convertXpathsToKeyPaths, convertSu
 // Importing functions related to Automated Tests
 const {runAutomatedTestsCli} = require('./js/automated-tests');
 
+// Importing functions related to Github action runners
+const {setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner} = require('./js/action-runner');
+
 /* Allow some environment variables to drive which config we're building.
    Environment variables are set on options, along with any parameters passed in
    to the gulp command line call.
@@ -882,12 +885,18 @@ exports.buildAutomatedTests = series(setAutomatedTestsConfig, buildInstalled);
 exports.runAutomatedTests = series(setAutomatedTestsConfig, buildInstalled, runAutomatedTests);
 exports.rerunAutomatedTests = series(setRerunAutomatedTestsEnvironment, runAutomatedTests);
 exports.runAutomatedTestsCli = runAutomatedTestsCli;
+exports.autotest = runAutomatedTestsCli;
 
 exports.runToolingTests = series(setAutomatedTestsConfig, buildInstalled, runToolingTests);
 
 exports.buildReleaseNotes = buildReleaseNotesOutput;
 exports.buildQaChanges = buildQaChangesOutput;
 exports.runPerformanceTests = series(setPerformanceTestsConfig, clean, buildInstalled, runPerformanceTests);
+
+// Github action runner related
+exports.setupAutomatedTestsRunner = setupAutomatedTestsGithubActionRunner;
+exports.startAutomatedTestsRunner = startAutomatedTestsGithubActionRunner;
+exports.removeAutomatedTestsRunner = removeAutomatedTestsGithubActionRunner;
 
 //command lines related to the crowdin language translations
 exports.update_local_translations = updateLocalTranslations;

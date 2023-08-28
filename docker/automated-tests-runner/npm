@@ -1,0 +1,3 @@
+#!/usr/bin/env node
+require('/home/runner/externals/node16/lib/node_modules/npm/lib/cli.js')(process)
+// we use our own hard coded file as the npm entry point as the one supplied with the github runner has a bug https://github.com/nodejs/node/issues/45329

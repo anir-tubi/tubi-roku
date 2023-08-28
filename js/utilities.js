@@ -1,5 +1,6 @@
 'use strict';
 const log = require('fancy-log');
+const { spawn } = require('child_process');
 const shell = require('shelljs');
 shell.config.silent = true;
 
@@ -12,15 +13,14 @@ class NoStackError extends Error {
   }
 }
 
+// @done: function, the 'done' function from gulp.
 // @command: string, a command to be executed, for example "git pull origin master"
 // @defaultErrorMessage: string, an error message explaining which command was not able to be completed
-// @done: function, the 'done' function from gulp.
 function execShellCommand(done, command, defaultErrorMsg) {
   log(`Performing: ${command}`);
   const commandRes = shell.exec(command);
 
   if (commandRes.code) {
-    log(defaultErrorMsg);
     const errorMsg = commandRes.stderr ? commandRes.stderr : defaultErrorMsg;
     done(new NoStackError(errorMsg));
   } else {
@@ -28,7 +28,29 @@ function execShellCommand(done, command, defaultErrorMsg) {
   }
 }
 
+
+// Provides means to run a shell command and provide realtime feedback. Does not return any
+// @done: function, the 'done' function from gulp.
+// @command: string, a command to be executed, for example "git pull origin master"
+// @allowNonzeroExitCode: boolean, if true we won't consider the command to have failed if a nonzero exit code is returned on close
+function spawnShellCommand(done, command, allowNonzeroExitCode = false) {
+  log(`Performing: ${command}`);
+  return new Promise((resolve) => {
+    const process = spawn(command, {stdio: 'inherit', shell: true});
+    process.on('close', (code) => {
+      if (code === 0 || allowNonzeroExitCode) {
+        resolve();
+      } else {
+        done(new NoStackError(`failed with code ${code}: ${command}`));
+      }
+    });
+  });
+}
+
+
+
 module.exports = {
   NoStackError,
-  execShellCommand
+  execShellCommand,
+  spawnShellCommand
 };

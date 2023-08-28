@@ -45,7 +45,11 @@ async function runAutomatedTestsCli (done) {
     name: 'branch',
     message: 'Enter the branch name you would like to run against. If you would like to use the current checked out version then just hit enter'
   });
+  runAutomatedTests(done, branch, tags);
+}
 
+
+function runAutomatedTests(done, branch = '', tags = []) {
   let applicationFolder = './';
   if (branch === undefined) {
     // User hit control-c to exit so don't continue
@@ -65,11 +69,14 @@ async function runAutomatedTestsCli (done) {
     rtaConfig: JSON.stringify(config)
   });
 
+  const mochaOptions = {};
+  if (tags) {
+    mochaOptions.grep = tags.join('|');
+  }
+
   src(['js/automated-tests/tests/*.ts'], { read: false })
     .pipe(envs)
-    .pipe(mocha({
-      grep: tags.join('|')
-    }));
+    .pipe(mocha(mochaOptions));
 }
 
 
