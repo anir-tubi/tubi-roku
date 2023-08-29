@@ -191,7 +191,6 @@ class TestUtils {
 
 
   // Starts the application at the specified page.
-  // If asSignedInUser is true we will log them in else we will log them out
   // deeplink: this is an object with the list of starting params sent to the application. Common fields include contentId, mediaType and page but other values may be passed as needed.
   // args: options to modify starting application state such as wether a user is logged in or not
   public async startApplicationWithDeeplink(deeplink = {}, args: StartApplicationArgs = {}) {
@@ -539,8 +538,12 @@ class TestUtils {
         await this.selectMenuItem(elementName, 'Play', timeout);
         await this.waitForElementToNotBeInFocusChain('detailScreen');
         break;
+      case 'playFromBeginning':
+        await this.selectMenuItem(elementName, 'Play from Beginning', timeout);
+        await this.waitForElementToNotBeInFocusChain('detailScreen');
+        break;
       case 'resume':
-        await this.selectMenuItem(elementName, 'Resume', timeout);
+        await this.selectMenuItem(elementName, 'Resume Playing', timeout);
         await this.waitForElementToNotBeInFocusChain('detailScreen');
         break;
       case 'addToMyList':
@@ -1257,7 +1260,7 @@ class FilterContent {
   }
 
 
-  public ofContentType(contentTypes: ContentTypes | ContentTypes[]) {
+  public ofContentType(contentTypes: ContentTypes | ContentTypes[] | keyof typeof ContentTypes | (keyof typeof ContentTypes)[]) {
     if (typeof contentTypes === 'string') {
       contentTypes = [contentTypes];
     }
@@ -1348,7 +1351,7 @@ type KeyPathElement = {
 };
 
 
-type DetailPageMenuItemType = 'play' | 'resume' | 'addToMyList' | 'removeFromMyList' | 'removeFromHistory' | 'episodesList';
+type DetailPageMenuItemType = 'play' | 'playFromBeginning' | 'resume' | 'addToMyList' | 'removeFromMyList' | 'removeFromHistory' | 'episodesList';
 
 
 type UserSignUpResponse = {
@@ -1401,5 +1404,8 @@ const auth = new Auth();
 
 
 export {
-  testUtils
+  testUtils,
+  User,
+  RegisteredUser,
+  AnonymousUser
 };

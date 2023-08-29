@@ -32,10 +32,6 @@
     "description": "Settings Screen",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen"
   },
-  "confirmPasswordScreen": {
-    "description": "Confirm Password Screen",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2"
-  },
   "enterPasswordMessage": {
     "description": "Enter Password Message",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.0.#Message"
@@ -77,10 +73,6 @@
   },
   "detailScreenMenu": {
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu"
-  },
-  "resumeButton": {
-    "description": "Resume Button",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.0"
   },
   "addToMyListButton" : {
     "description": "Add to My List Button",
@@ -327,14 +319,12 @@
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Group/Label",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
   },
-  "rewindButton1x": {
-    "name": "rewindButton1x",
-    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[2]",
+  "rewindButton": {
+    "description": "rewind button icon",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#RewindButton"
   },
-  "fastForwardButton1x": {
-    "name": "fastForwardButton1x",
-    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[6]",
+  "fastForwardButton": {
+    "description" : "FF button not pressed",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#FastForwardButton"
   },
   "rewindButton3xPS4b": {
@@ -407,8 +397,8 @@
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/InfoPanel/LayoutGroup/LayoutGroup/Label",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#Title"
   },
-  "searchResultsABC": {
-    "name": "searchResultsABC",
+  "linearSearchResultsText": {
+    "name": "linearSearchResultsText",
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/InfoPanel/LayoutGroup/LayoutGroup/Label",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#Title"
   },
@@ -452,6 +442,11 @@
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/LinearVideoPlayerScreen",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen"
   },
+  "videoPlayerScreen": {
+    "description": "video player screen",
+    "name": "Full screen player",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen"
+  },
   "linearEPGFoxSportsEnEspanolDescription": {
     "name": "linearEPGFoxSportsEnEspanolDescription",
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/EPGHomeScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Group/Label",
@@ -485,7 +480,7 @@
   },
   "leftNavHomeButton": {
     "description" : "Left Nav Home Button",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.3"
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#LabelParent.0.#Label"
   },
   "continueWatchingRow": {
     "description" : "Continue Watching Row on My Stuff page",
@@ -494,6 +489,320 @@
   "myStuffCallToAction": {
     "description" : "Call to action button on My Stuff page (Press back for menu)",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#nav.#ScreenNavigationHint.#callToAction"
-  }
+  },
+  "searchResultsDesc": {
+    "description" : "Linear Search Results Description",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
+  },
+   "playPauseButton": {
+    "description" : "Play/Pause button",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#PlayPauseButton"
+  },
+   "forward30Button": {
+    "description" : "Forward 30 Button highlighted",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#HopForwardButton"
+  },
+  "rewind30Button": {
+    "description" : "rewind 30 Button highlighted",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#HopBackButton"
+  },
+  "episodesScreen": {
+    "description" : "The actual Episodes page. Can be used to see if something on the episodes screen has focus",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#episodeScreen"
+  },
+  "episodesScreenPoster": {
+    "description" : "Marker to determine if we are on the Episodes page",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#episodeScreen.#RowList.0.items.0.#FeaturePoster.#Background"
+  },
+  "dialogBoxSignInButton": {
+    "description" : "dialog box sign in button",
+    "keyPath": "#ContentController.#3206c4d.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText"
+  },
+  "signInScreenPasswordBox": {
+    "description" : "Sign in screen password box",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#signInScreen.#signUpLayout.#password.#rectBG"
+  },
+  "kidSignInScreenPasswordBox": {
+    "description" : "Kids Sign in screen password box",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.0.#password.#rectBG"
+  },
+  "enterPasswordDialogMessage": {
+    "description" : "Enter your password meesage on dialog box",
+    "keyPath": "#ContentController.#390640d.#DialogBox.#ContentArea.#Title"
+  },
+  "passwordKeyboard": {
+    "description" : "Password screen keyboard",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#signInScreen.#passwordEntryKeyboard.0.#Keyboard.0"
+  },
+  "exitPrompt": {
+    "description" : "exit Prompt",
+    "keyPath": "#ContentController.#2694d4e.#DialogBox.#ContentArea.#Title"
+  },
+  "playerControls": {
+    "description" : "Player controls element",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons"
+  },
+  "parentalControlsSettingsLittleKids": {
+    "description" : "Dialog box text for PC Settings Change for Little Kids",
+    "keyPath": "#ContentController.#08fb5e0.#DialogBox.#ContentArea.#MessageGroup.#Message"
 
+  },
+  "parentalControlsSettingsTeens": {
+    "description" : "Dialog box text for PC Settings Change for Little Kids",
+    "keyPath": "#ContentController.#c25f262.#DialogBox.#ContentArea.#MessageGroup.#Message"
+  },
+  "passwordText": {
+    "description" : "Sign in password",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.0.#password.#Text"
+  },
+  "parentalControlsSettingsOlderKidsMessage": {
+    "description" : "Dialog box text for PC Settings Change for Older Kids",
+    "keyPath": "#ContentController.#d15a38c.#DialogBox.#ContentArea.#MessageGroup.#Message"
+  },
+  "adultControlSelected": {
+    "description" : "Adult control in PC is selected",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#ParentalControlsMenu.3"
+  },
+  "liveIcon": {
+    "description": "Live Icon",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#TopHeaderImage"
+  },
+  "autoplayPreviewOff": {
+    "description": "Preview off button",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#AutoplayPreviewMenu.1.#BtnLayout"
+  },
+  "autoPlaySignInDialogMessage": {
+    "description": "Autoplay sign in dialog Message",
+    "keyPath": "#ContentController.#4ec6117.#DialogBox.#ContentArea.#MessageGroup.#Message"
+  },
+  "signInButton": {
+    "description": "Sign in Button",
+    "keyPath": "#ContentController.#4ec6117.#DialogBox.#ContentArea.#ButtonList.0"
+  },
+  "tvShowsSeriesLabel": {
+    "description": "TV Shows Series text",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#tvScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Line1"
+
+  },
+  "detailsPageSeriesLabel" : {
+    "description" : "Details page Series Label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Line1"
+  },
+  "tvContinueWatchingRow": {
+    "description" : "Continue Watching Row on TV Screen",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#tvScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName"
+  },
+  "emailAddressBox": {
+    "description" : "email address box for creating account",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#emailLayout.1.#emailTextEditBox.1"
+  },
+  "ageGateYearsBox": {
+    "description" : "age gate year box",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.2.#AgeVerificationAgeBg.#AgeVerificationAgeEntry"
+  },
+  "ageGateInvalidAge": {
+    "description" :"age gate invalid age",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeErrorPrompt"
+  },
+  "cannotExitKidsMode": {
+    "description" : "Cannot exit kids mode modal",
+    "keyPath": "#ContentController.#c4796af.#DialogBox.#ContentArea"
+  },
+  "buttonTextClose" : {
+    "description" : "Button Close text",
+    "keyPath": "#ContentController.#c4796af.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText"
+  },
+  "ageGateVerificationErrorPrompt":{
+    "description" : "age gate error prompt",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.1.#AgeVerificationErrorPrompt"
+  },
+  "detailsMoviesPageLabel" :{
+    "description" : "movies details page label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Line1"
+  },
+
+  "moviesLabel" :{
+    "description" : "movies label",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Line1"
+  },
+  "resumePlayingButton" :{
+    "description" :"resume playing button",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.0.#DetailsMenuTextParent.#DetailsMenuText"
+},
+  "playFromBeginning" :{
+    "description" :"Play button",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuText"
+},
+  "signUpToSaveProgressDescription" :{
+    "description" :"Sign up to save Progress description",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
+  },
+  "homeScreenPoster" : {
+    "description" : "poster present",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.items.0.#poster"
+  },
+  "settingsScreenHeader" : {
+    "description": "settings screen header",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#TitleOne"
+  },
+  "termsScreenHeader" : {
+    "description": "terms screen header",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#Title"
+  },
+  "fullDeviceID" : {
+    "description": "full device ID modal",
+    "keyPath": "#ContentController.#2f12a2f.#DialogBox.#ContentArea.#Title"
+  },
+  "aboutMenuItem" : {
+    "description": "About menu item",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.2"
+  },
+  "fullDeviceMessage" : {
+    "description": "Full Device message",
+    "keyPath": "#ContentController.#2f12a2f.#DialogBox.#ContentArea.#MessageGroup.#Message"
+  },
+  "helpPageText" : {
+    "description" : "help page text",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#TextTwo"
+  },
+  "privacyPolicyHeader" : {
+    "description" : "Policy Page Header",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#Title"
+  },
+  "privacyPageScroller" : {
+    "description" : "Privacy Page scroller",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#Text.2"
+  },
+  "emptyMyStuffPage" : {
+    "description" : "empty My Stuff page",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#ContentArea"
+    },
+  "categoryPageCategory" : {
+    "description" : "category on category page",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.0.#Logo"
+  },
+  "recommendedCategoryPage" : {
+    "description" : "recommended tile on Categories page",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.0.#Title"
+  },
+  "recommendedScreenCallToAction" : {
+    "description" : "Call to Action text on Recommended screen",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#nav.#ScreenNavigationHint.#callToAction"
+  },
+  "channelPoster" : {
+    "description" : "channel page",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#ChannelCategoryGrid.6.#PosterRect"
+  },
+  "invalidDeepLinkDialog" : {
+    "description" : " Invalid deep link dialog",
+    "keyPath": "#ContentController.#0e63aed.#DialogBox.#ContentArea.#MessageGroup.#Message"
+  },
+  "horsesAndPoniesTile" : {
+    "description" : "Horses and Ponies, Little Kids Tile in Categories",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.9.#Title"
+  },
+  "kidFriendlyClassics" : {
+    "description" : "Kid Friendly Classics, Older Kids Tile in Categories",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.9.#Title"
+  },
+  "artHouseFilms" : {
+    "description" : "Art-House Films for Teens Description",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.5.#Title"
+  },
+  "kidsLeftNavOption" : {
+    "description" : "Kids left nav option",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.1.#LabelParent.0.#Label"
+  },
+  "parentalControlsMenuTextFocused" : {
+    "description"  : "Parental Controls Menu item focused",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused"
+  },
+  "searchGrid" : {
+    "description" : "Search grid",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#searchGroup.#SearchKeyboard.0"
+  },
+  "noResultsMessage" :{
+  "description" : "No results message",
+  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#ResultArea.#NoResultsMessage"
+  },
+  "countDownText" :{
+    "description" : "counter text for live preview",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#PlayerCountdownGroup.#CountdownText"
+  },
+  "closedCaptionAudioButton" : {
+    "description" : "closed caption audio button",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#closedCaptionAudioButton"
+  },
+  "audioTracksSection" : {
+    "description" : "Audio tracks section",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#audioTracksSection"
+  },
+  "closedCaptionSection" : {
+    "description" : "CC section",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#closedCaptionSection"
+  },
+  "audioTracksSectionHeader" : {
+  "description" : "Audio label",
+  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#audioTracksSection.#audioTracksSectionHeaderLabel"
+  },
+  "audioDescriptionText" : {
+    "description" : "Audio Description text check",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#audioTracksSection.#audioTrackSelector.1.#BtnLayout.#Text"
+  },
+  "signOutButtonSelected" : {
+    "description" : "sign out button selected",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.6.#DetailsMenuTextParent.#DetailsMenuText"
+  },
+  "audioDescriptionEnabled" : {
+    "description" : "audio desc enabled",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#audioTracksSection.#audioTrackSelector.1"
+  },
+  "subtitleOff" : {
+    "description" : "subtitle OFF",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#closedCaptionSection.#closedCaptionSelector.0"
+  },
+  "subTitleEnabled" : {
+    "description" : "subtitle enabled",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#closedCaptionSection.#closedCaptionSelector.1"
+  },
+  "audioEnabled" :{
+    "description" : "audio enabled",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#audioTracksSection.#audioTrackSelector.0"
+  },
+  "audioDescriptionEnabledCheck" : {
+    "description" : "audio desc enabled check",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#audioTracksSection.#audioTrackSelector.1.#container.0.#checkIcon"
+  },
+  "countDownMovieAutoPlay" : {
+    "description" : "autoplay countdown movies",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextMovieGroup.#CountdownLabelMovie"
+  },
+  "remainingLabel" :{
+    "description" : "remaining time in player timer",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#RemainingLabel"
+  },
+  "autoPlayYearAndDuration" : {
+    "description" : "autoplay option year and duration info",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextMovieGroup.#InfoMovie.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Line1"
+  },
+  "autoplayUpNextUI" : {
+    "description" : "autoplay UI",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextMovieGroup"
+  },
+  "transportButtons" : {
+    "description" : "transport buttons UI",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons"
+  },
+  "settingsMenuItem" :{
+    "description" : "Settings menu item",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.8"
+},
+"dialogBoxContentAreaDeviceID" : {
+  "description" : "Dialog box for Device ID",
+  "keyPath": "#ContentController.#2f12a2f.#DialogBox.#ContentArea"
+},
+"myStuffLeftNav" : {
+  "description" : "My Stuff Left Nav option",
+  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.4.#LabelParent.0.#Label"
+}
 }

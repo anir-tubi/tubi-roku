@@ -1,11 +1,14 @@
 import { expect } from 'chai';
 import { ecp, odc, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
+import { shared } from '../shared';
 
 
 describe('Video Preview', function () {
+
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/257895
   it('C257895 - Verify that High TVT Evergreen titles will have Video Preview clips @videopreview', async () => {
-    await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Navigate to search screen
     await testUtils.goToPage('search');
@@ -15,7 +18,7 @@ describe('Video Preview', function () {
     // Navigate right until the grid is in focus
     await testUtils.untilTrue(async () => {
       await ecp.sendKeyPress(ecp.Key.Right);
-      const {value: id} = await odc.getValue({
+      const { value: id } = await odc.getValue({
         base: 'focusedNode',
         keyPath: 'id'
       });
@@ -51,14 +54,14 @@ describe('Video Preview', function () {
     });
 
     args.keyPath += `.content.${myListIndex}`;
-    const {value: row} = await odc.getValue(args);
+    const { value: row } = await odc.getValue(args);
     const json = JSON.parse(row.json);
     const videoPreviewUrl = json[row.children[0].id].video_preview_url;
 
     await testUtils.retryWithTimeOut(async () => {
       const args = testUtils.getElementKeyPath('previewVideoPlayer');
       args.keyPath += `.content`;
-      const {value: content} = await odc.getValue(args);
+      const { value: content } = await odc.getValue(args);
       expect(content?.URL).to.equal(videoPreviewUrl);
     });
 
@@ -71,4 +74,226 @@ describe('Video Preview', function () {
     // Verify that video is still playing
     await testUtils.expectPlayerStateToEventuallyEqual('play');
   });
+
+  // https://tubi.testrail.io/index.php?/cases/view/257900
+  it('C257900 - Ensure background image of the title transition automatically into a Video Preview clip immediately upon hovering over a Preview @videopreview', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Verify that video is playing
+    await testUtils.expectPlayerStateToEventuallyEqual('play');
+
+  });
+
+  // https://tubi.testrail.io/index.php?/cases/view/257901
+  it('C257901 - Verify that if the user access details page during Video Preview we continue to show this clip. @videopreview', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Verify that video is playing
+    await testUtils.expectPlayerStateToEventuallyEqual('play');
+
+    // Go to details page and verify that video preview continues
+    await ecp.sendKeyPress(ecp.Key.Ok);
+  
+    // Verify we are on the details page
+    const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
+    expect(detailScreenTitle.text).to.not.be.empty;
+
+
+    // Verify that video is still playing
+    await testUtils.expectPlayerStateToEventuallyEqual('play');
+
+  });
+
+  // https://tubi.testrail.io/index.php?/cases/view/257902
+  it('C257902 - Verify when user transitions from Video Preview > Details > HomeGrid the preview continue to play if clip did not end. @videopreview', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Verify that video is playing
+    await testUtils.expectPlayerStateToEventuallyEqual('play');
+
+    // Go to details page and verify that video preview continues
+    await ecp.sendKeyPress(ecp.Key.Ok);
+
+    // Verify that video is still playing
+    await testUtils.expectPlayerStateToEventuallyEqual('play');
+
+    // Back to home screen
+    await ecp.sendKeyPress(ecp.Key.Back);
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Verify that video is still playing
+    await testUtils.expectPlayerStateToEventuallyEqual('play');
+
+  });
+
+  // https://tubi.testrail.io/index.php?/cases/view/264595
+  it('C264595 - Ensure Registered users have access to turn off Video preview feature from settings @videopreview', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    
+    //Open left nav
+    await ecp.sendKeyPress(ecp.Key.Left);
+
+    // Open settings
+    await shared.openSettings();
+
+    // Turn off video previews
+    await ecp.sendKeyPress(ecp.Key.Down);
+    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeyPress(ecp.Key.Down);
+    await ecp.sendKeyPress(ecp.Key.Ok);
+   
+
+
+    // Go back to home page and verify that autoplay is off
+    await ecp.sendKeyPress(ecp.Key.Back, { count: 2 });
+
+    // Verify that video preview is not playing
+    const player = await ecp.getMediaPlayer();
+    expect(player.state).to.not.equal('play');
+    expect(player.state).to.not.equal('pause');
+    expect(player.state).to.not.equal('buffer');
+
+
+  });
+
+  // https://tubi.testrail.io/index.php?/cases/view/345985
+  it('C345985 - When the video preview ends the user should autoplay directly into the movie with prompt. @videopreview', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Verify that video is playing
+    await testUtils.expectPlayerStateToEventuallyEqual('play');
+
+    // Let the preview end
+    await utils.sleep(100000); // IMPROVEMENT with helper (See to End)
+
+    // Verify that video is playing
+    await testUtils.expectPlayerStateToEventuallyEqual('play');
+
+  });
+
+  // https://tubi.testrail.io/index.php?/cases/view/264838
+  it('C264838 - Access Kids Mode and ensure the behavior of the Video Preview mirrors that of the non-kids mode @videopreview', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Open Kids Mode
+    await openKidsMode();
+
+    // Navigate right to home page focus
+    await ecp.sendKeyPress(ecp.Key.Right);
+
+    // Verify that video is playing
+    await testUtils.expectPlayerStateToEventuallyEqual('play');
+
+    // Let the preview end
+    await utils.sleep(100000);
+
+    // Verify that video is playing
+    await testUtils.expectPlayerStateToEventuallyEqual('play');
+
+  });
+
+  // https://tubi.testrail.io/index.php?/cases/view/275042
+  it('C275042 - Roku: Guest Users should be prompted to sign in if they choose to turn off autoplay preview in Settings @videopreview', async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Open settings
+    await ecp.sendKeyPress(ecp.Key.Left);
+    await shared.openSettings();
+
+    // Are we on Settings page?
+    const settingsScreen = testUtils.getNodeForElement('settingsScreen');
+    expect((await settingsScreen).visible).to.equal(true);
+
+    // Turn off video previews
+    await ecp.sendKeyPress(ecp.Key.Down);
+    await ecp.sendKeyPress(ecp.Key.Ok);
+    await utils.sleep(2000); // Improvement
+    await ecp.sendKeyPress(ecp.Key.Down);
+    await utils.sleep(2000); // Improvement
+    await ecp.sendKeyPress(ecp.Key.Ok);
+    await utils.sleep(2000); // Improvement
+    // const autoplayPreviewOff = await testUtils.getNodeForElement('autoplayPreviewOff');
+    // expect(autoplayPreviewOff.visible).to.be.true;
+
+    // Expect Sign In dialog box
+    const autoPlaySignInDialogMessage = await testUtils.getNodeForElement('autoPlaySignInDialogMessage');
+    expect(autoPlaySignInDialogMessage.visible).to.be.true;
+    const signInButton = await testUtils.getNodeForElement('signInButton');
+    expect(signInButton.visible).to.be.true;
+
+
+
+  });
+
+  // https://tubi.testrail.io/index.php?/cases/view/494418
+  it('C494418 - Video Preview should not play after last title in Continue Watching is removed from My Stuff. @videopreview', async () => {
+
+    // Create a user with one title with history
+    const user = await testUtils.createRegisteredUser();
+    const movieContent = await user.getContent().ofContentType('movie').retrieve({ limit: 2 });
+    await user.addContentToViewHistory(movieContent, 500);
+    await testUtils.startApplicationAtPage('home', { user: user });
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    // Navigate to My Stuff
+    await ecp.sendKeyPress(ecp.Key.Left);
+    // Check for left nav home button
+    const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
+    await testUtils.elementHasFocus('leftNavHomeButton');
+    await ecp.sendKeyPress(ecp.Key.Down);
+    const myStuffLeftNav = await testUtils.getNodeForElement('myStuffLeftNav');
+    await utils.sleep(2000);
+    expect(myStuffLeftNav);
+    await ecp.sendKeyPress(ecp.Key.Ok);
+
+   
+
+    // Let's check for My Stuff page, CW row here
+    const continueWatchingRow = testUtils.getNodeForElement('continueWatchingRow');
+    expect(continueWatchingRow);
+    await ecp.sendKeyPress(ecp.Key.Ok);
+
+
+    // Verify that video is playing
+    await testUtils.expectPlayerStateToEventuallyEqual('play');
+
+    // Enter Details page and remove history
+    await ecp.sendKeyPress(ecp.Key.Ok);
+    await testUtils.selectAndVerifyDetailPageMenuItem('removeFromHistory');
+    await utils.sleep(1000);
+    await ecp.sendKeyPress(ecp.Key.Back);
+
+    // 2nd movie
+    await utils.sleep(2000);
+    expect(continueWatchingRow);
+    await ecp.sendKeyPress(ecp.Key.Ok);
+    await testUtils.selectAndVerifyDetailPageMenuItem('removeFromHistory');
+    await utils.sleep(1000);
+    await ecp.sendKeyPress(ecp.Key.Back);
+
+    const emptyMyStuffPage = await testUtils.getNodeForElement('emptyMyStuffPage');
+    expect(emptyMyStuffPage.visible).to.be.true;
+
+    // Check for presence of Video Player
+    const previewVideoPlayer = await testUtils.getNodeForElement('previewVideoPlayer');
+    expect(previewVideoPlayer.visible).to.be.false;
+  });
+
+  async function openKidsMode() {
+
+    await ecp.sendKeyPress(ecp.Key.Left);
+    await ecp.sendKeyPress(ecp.Key.Up);
+    await utils.sleep(3000); // Adding sleeps temporary // Improvement - try to work around sleeps
+    await ecp.sendKeyPress(ecp.Key.Up);
+    await ecp.sendKeyPress(ecp.Key.Ok);
+    const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
+    expect(exitKidsOption.visible).to.be.true;
+  }
 });

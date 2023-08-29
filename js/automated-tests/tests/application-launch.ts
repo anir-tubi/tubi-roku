@@ -1,76 +1,79 @@
 import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
+import { shared } from '../shared';
 
 describe('Application Launch', function () {
-    before(async () => {
-      await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
-    });
-
-
-    it('C4146 User Signed in - Homescreen Display @registered_user,@smoke,@application_launch @application_launch', async () => {
-      await testUtils.retryWithTimeOut(async () => {
-        const sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
-      expect(sideNavSignedInLabel.text).to.contain('Hi');
-      });
-
-    });
-
-
-    it('C5769 - Application Launch - When user opens the application after registering as a new user then the home screen is displayed @application_launch', async () => {
-      const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
-      await testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured');
-    });
-
-
-    it('C21197 - Application Launch - Registered User - When user tries to play a title after user has registered device then the title should play on tubi @application_launch', async () => {
-      await ecp.sendKeyPress(ecp.Key.Ok);
-      await ecp.sendKeyPress(ecp.Key.Play);
-      await testUtils.expectPlayerStateToEventuallyEqual('play', 20000);
-    });
-
-
-    it('C70718 - Sign out after setting Parental Controls @application_launch', async () => {
-      // Go to Settings page and select Older Kids
-      await testUtils.goToPage('settings');
-      await ecp.sendKeyPress(ecp.Key.Right);
-      await utils.sleep(2000);
-      await ecp.sendKeyPress(ecp.Key.Up, {count:2});
-      await ecp.sendKeyPress(ecp.Key.Ok);
-
-      // Validate Enter Password Page and message
-      const enterPasswordMessage = await testUtils.getNodeForElement('enterPasswordMessage');
-      expect(enterPasswordMessage.text).to.equal('Enter Password to update');
-
-      // Send password and click Continue
-      await ecp.sendText('111111');
-      await ecp.sendKeyPress(ecp.Key.Down, {count:4});
-      await utils.sleep(100); // Only goes over to the right if we sleep here for some reason
-      await ecp.sendKeyPress(ecp.Key.Ok);
-
-      // Validate Older Kids modal message, back out to Left Nav and Check Exit Kids menu item is grayed out
-      const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
-      expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
-      await ecp.sendKeyPress(ecp.Key.Ok);
-      await ecp.sendKeyPress(ecp.Key.Back);
-      await ecp.sendKeyPress(ecp.Key.Back);
-      const exitKidsGrayedOut = await testUtils.getNodeForElement('exitKidsGrayedOut');
-      expect(exitKidsGrayedOut.visible).to.equal(true);
-
-      // Sign out to check that we are not in Kids mode
-      await ecp.sendKeyPress(ecp.Key.Up, {count:3});
-      await ecp.sendKeyPress(ecp.Key.Ok);
-      const signOutButtonKidsMode = await testUtils.getNodeForElement('signOutButtonKidsMode');
-      expect(signOutButtonKidsMode.text).to.equal('Sign Out');
-      await ecp.sendKeyPress(ecp.Key.Ok);
-      const signOutVerificationModalMessage = await testUtils.getNodeForElement('signOutVerificationModalMessage');
-      expect(signOutVerificationModalMessage.text).to.equal('You are about to sign out of your Tubi account.');
-      await ecp.sendKeyPress(ecp.Key.Ok);
-      const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
-      await testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured');
+  before(async () => {
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
   });
 
-    it('C116528_1 - Resume Watching - Guest User - Movie - User plays back content, exits and selects content again @new_test,@application_launch', async () => {
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4146
+  it('C4146 User Signed in - Homescreen Display @registered_user,@smoke,@application_launch @application_launch', async () => {
+    await testUtils.retryWithTimeOut(async () => {
+      const sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
+      expect(sideNavSignedInLabel.text).to.contain('Hi');
+    });
+
+  });
+
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/5769
+  it('C5769 - Application Launch - When user opens the application after registering as a new user then the home screen is displayed @application_launch', async () => {
+    const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
+    await testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured');
+  });
+
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/21197
+  it('C21197 - Application Launch - Registered User - When user tries to play a title after user has registered device then the title should play on tubi @application_launch', async () => {
+    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeyPress(ecp.Key.Play);
+    await testUtils.expectPlayerStateToEventuallyEqual('play', 20000);
+  });
+
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/70718
+  it('C70718 - Sign out after setting Parental Controls @application_launch', async () => {
+    // Go to Settings page and select Older Kids
+    await testUtils.goToPage('settings');
+    await ecp.sendKeyPress(ecp.Key.Right);
+    await utils.sleep(2000);
+    await ecp.sendKeyPress(ecp.Key.Up, { count: 2 });
+    await ecp.sendKeyPress(ecp.Key.Ok);
+
+    // Validate Enter Password Page and message
+    const enterPasswordMessage = await testUtils.getNodeForElement('enterPasswordMessage');
+    expect(enterPasswordMessage.text).to.equal('Enter Password to update');
+
+    // Send password and click Continue
+    await ecp.sendText('111111');
+    await ecp.sendKeyPress(ecp.Key.Down, { count: 4 });
+    await utils.sleep(100); // Only goes over to the right if we sleep here for some reason
+    await ecp.sendKeyPress(ecp.Key.Ok);
+
+    // Validate Older Kids modal message, back out to Left Nav and Check Exit Kids menu item is grayed out
+    const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
+    expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
+    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeyPress(ecp.Key.Back);
+    await ecp.sendKeyPress(ecp.Key.Back);
+    const exitKidsGrayedOut = await testUtils.getNodeForElement('exitKidsGrayedOut');
+    expect(exitKidsGrayedOut.visible).to.equal(true);
+
+    // Sign out to check that we are not in Kids mode
+    await ecp.sendKeyPress(ecp.Key.Up, { count: 3 });
+    await ecp.sendKeyPress(ecp.Key.Ok);
+    const signOutButtonKidsMode = await testUtils.getNodeForElement('signOutButtonKidsMode');
+    expect(signOutButtonKidsMode.text).to.equal('Sign Out');
+    await ecp.sendKeyPress(ecp.Key.Ok);
+    const signOutVerificationModalMessage = await testUtils.getNodeForElement('signOutVerificationModalMessage');
+    expect(signOutVerificationModalMessage.text).to.equal('You are about to sign out of your Tubi account.');
+    await ecp.sendKeyPress(ecp.Key.Ok);
+    const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
+    await testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured');
+  });
+
+
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/116528
+  it('C116528_1 - Resume Watching - Guest User - Movie - User plays back content, exits and selects content again @new_test,@application_launch', async () => {
     // Start Open Movies
     await testUtils.startApplicationAtPage('movies');
 
@@ -83,8 +86,9 @@ describe('Application Launch', function () {
     await ecp.sendKeyPress(ecp.Key.Ok);
     await ecp.sendKeyPress(ecp.Key.Play);
     await createHistory();
-    const resumeButton = await testUtils.getNodeForElement('resumeButton');
-    expect(resumeButton.visible).to.equal(true);
+    await ecp.sendKeyPress(ecp.Key.Back);
+    const resumePlayingButton = await testUtils.getNodeForElement('resumePlayingButton');
+    expect(resumePlayingButton.visible).to.equal(true);
 
     // Exit app and restart
     await testUtils.restartApplication();
@@ -95,13 +99,52 @@ describe('Application Launch', function () {
 
     // Test for resume button (Roku retains resume button for 24 hours)
     await ecp.sendKeyPress(ecp.Key.Ok);
-    expect(resumeButton.visible).to.equal(true);
+    expect(resumePlayingButton.visible).to.equal(true);
+  });
+
+  // https://tubi.testrail.io/index.php?/cases/view/114199
+  it('C114199 - Registration Prompt in Continue Watching Container - Homescreen - Navigate to Continue Watching Container @guest_user @application_launch', async () => {
+    // Launch as guest
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+
+    // Jump To Continue Watching Row
+    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
+    const signUpToSaveProgressDescription = await testUtils.getNodeForElement('signUpToSaveProgressDescription');
+    expect(signUpToSaveProgressDescription.visible).to.be.true;
+  });
+
+
+  // https://tubi.testrail.io/index.php?/cases/view/129714
+  it('C129714 - Logged in user should not see Registration Prompt Container in Movies filter @application_launch @registered_user', async () => {
+
+    // Launch app
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForAppLaunchBeaconToFire();
+
+    // Play title
+    await ecp.sendKeyPress(ecp.Key.Play);
+
+    // Create CW row
+    await createHistory();
+
+    // Back out to Details page
+    await ecp.sendKeyPress(ecp.Key.Back, { count: 2 });
+
+    // Jump To Continue Watching Row
+    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
+    const homeScreenPoster = await testUtils.getNodeForElement('homeScreenPoster');
+    expect(homeScreenPoster.visible).to.be.true;
   });
 });
+
 // Create history
-async function createHistory(){
-  await testUtils.expectPlayerStateToEventuallyEqual('play',15000);
-  await ecp.sendKeyPress(ecp.Key.Forward, {count:3});
+async function createHistory() {
+  const node = await testUtils.getNodeForElement('videoPlayerScreen');
+  expect(node.visible).to.be.true;
+  await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
+  await ecp.sendKeyPress(ecp.Key.Forward);
+  await ecp.sendKeyPress(ecp.Key.Forward);
+  await ecp.sendKeyPress(ecp.Key.Forward);
   await utils.sleep(3000);
   await ecp.sendKeyPress(ecp.Key.Play);
   await utils.sleep(2000);

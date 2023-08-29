@@ -712,7 +712,7 @@ function setRerunAutomatedTestsEnvironment(done) {
 
 function runAutomatedTests() {
   return src(['js/automated-tests/tests/*.ts'], { read: false })
-    .pipe(mocha()); // Use {bail: true} if you want to stop after first one fails
+    .pipe(mocha({bail: true})); // Use {bail: true} if you want to stop after
 }
 
 
