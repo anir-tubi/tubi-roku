@@ -833,12 +833,17 @@ Function onRetryLinearPlayer()
   if videoPlayer <> invalid
     content = videoPlayer.content
     stopLinearVideoContent()
-    playbackSource = {
-      "srcForAnalytic": m.constants.player.playbackSource.unknown
-      "srcForAds": m.constants.player.playbackOrigin.epg
-      "playbackContainer": content.parentId
-    }
-    playLinearVideoContent(content, false, videoPlayer.associatedScreenID, videoPlayer.allowTransportToAppear, playbackSource)
+
+    if content <> invalid
+
+      playbackSource = {
+        "srcForAnalytic": m.constants.player.playbackSource.unknown
+        "srcForAds": m.constants.player.playbackOrigin.epg
+        "playbackContainer": content.parentId
+      }
+      playLinearVideoContent(content, false, videoPlayer.associatedScreenID, videoPlayer.allowTransportToAppear, playbackSource)
+    end if
+
   end if
 End Function
 
