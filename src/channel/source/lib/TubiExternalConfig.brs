@@ -80,7 +80,7 @@ Function tubiExternalConfig_getConfigsRequestInfo(constants)
   options.headers.append(constants.headers.commonUapi)
 
   return {
-    url: constants.urls.userDevice.config
+    url: constants.urls.configHub.config
     requestType: constants.reqNames.getExternalConfigs
     responseType: "assocarray"
     options: options

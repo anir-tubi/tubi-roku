@@ -539,8 +539,18 @@ Function getConstants()
       constants.urls.userDevice.registerCode = constants.urls.userDevice.urlBase + "/code/register"
       constants.urls.userDevice.refreshToken = constants.urls.userDevice.urlBase + "/login/refresh"
       constants.urls.userDevice.transferToken = constants.urls.userDevice.urlBase + "/login/transfer"
-      constants.urls.userDevice.config = constants.urls.userDevice.urlBase + "/config/" + constants.platform
       constants.urls.userDevice.resetPassword = constants.urls.userDevice.urlBase + "/password/reset"
+
+    'remote Config hub url
+    constants.urls.configHub = {}
+      constants.urls.configHub.urlBase = "http://config-hub.production-public.tubi.io"
+
+      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
+        constants.urls.configHub.urlBase = "http://config-hub.staging-public.tubi.io"
+      end if
+
+      constants.urls.configHub.config = constants.urls.configHub.urlBase + "/api/v1/remote_config/" + constants.platform
+
 
     'use queue urls
     constants.urls.userQueues = {}
