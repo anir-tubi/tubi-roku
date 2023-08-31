@@ -15,6 +15,7 @@ const ghInfo = {
   owner: 'adRise',
   rokuRepo: 'project-total-recall',
   cdnRepo: 'adrise_cdn',
+  rcdnRepo: 'rcdn',
 };
 
 const remoteRelease = 'Remote Release';
@@ -54,7 +55,7 @@ function verifyGit(done, directory = '') {
 }
 
 
-// All the steps necessary to push starter and remote components to the CDN and make a PR to the CDN.
+// Calls function createCdnPrUrl to push and create PR to rcdn repo and adrise_cdn repo
 // Additionally make a PR against the production release branch on project-total-recall and copy the
 // urls to the local clipboard.
 async function makeReleasePrs(done) {
@@ -63,7 +64,78 @@ async function makeReleasePrs(done) {
 
   const minorBuildTag = getBuildTag('minor');
   const fullBuildTag = getBuildTag('revision');
-  const cdnPath = process.env.CDN_GIT_DIRECTORY;
+
+  // rename the local branch name so it looks like "release_2_14_34"
+  const releaseBranchName = `release_${fullBuildTag}`;
+  log(`...Renaming the local branch to ${releaseBranchName}`);
+  const gitRename = `git branch -m ${releaseBranchName}`;
+  const gitRenameErrorMsg = `Could not rename the local branch to ${releaseBranchName}`;
+  execShellCommand(done, gitRename, gitRenameErrorMsg);
+
+  //create PR against rcdn repository
+  const rcdnPrUrl = await createCdnPrUrl(done, "rcdn");
+
+  // create PR in adrise_cdn repository
+  const cdnPrUrl = await createCdnPrUrl(done, "cdn");
+
+  // push the release branch to the project-total-recall repo
+  log(`...Pushing the local ${releaseBranchName} branch to the remote ${ghInfo.rokuRepo} repo`);
+  const gitPushReleaseBranch = `git push origin ${releaseBranchName}`;
+  const gitPushReleaseBranchErrorMsg = `Could not push ${releaseBranchName} to ${ghInfo.rokuRepo} origin (Github)`;
+  execShellCommand(done, gitPushReleaseBranch, gitPushReleaseBranchErrorMsg);
+
+  // make a PR against the production branch on the project-total-recall repo at Github
+  const prodRokuBranchName = `${minorBuildTag}_branch`;
+  log(`...Making a PR from the remote ${releaseBranchName} on ${ghInfo.rokuRepo} against the ${prodRokuBranchName} branch`);
+  let releasePrUrl = '';
+  try {
+    const releasePrRes = await octokit.pulls.create({
+      owner: ghInfo.owner,
+      repo: ghInfo.rokuRepo,
+      title: `Release ${fullBuildTag}`,
+      body: 'Verify: The last commit in this PR is a build bump. If the last commit in this PR is not a build bump, the release needs to be run again. Any other commit that is not a build bump, including a merge, indicates a commit has been included that was not included in the package that was built and sent to the CDN.',
+      head: releaseBranchName,
+      base: prodRokuBranchName
+    });
+
+    releasePrUrl = releasePrRes.data.html_url;
+  } catch (err) {
+    console.log(err);
+    done(new NoStackError(err));
+  }
+
+  // copy the PR urls to the clipboard
+  if (releasePrUrl && cdnPrUrl && rcdnPrUrl) {
+    // multi line string
+    const prUrlsForPasting = `${releasePrUrl}
+${cdnPrUrl}
+${rcdnPrUrl}`;
+
+    clipboardy.writeSync(prUrlsForPasting);
+    log(`The release PR url and the CDN PR url have been placed on your clipboard. Please share with the team!`);
+  } else {
+    const errorMsg = 'The urls for the release PR and the CDN PR are not available. Please share manually.';
+    done(new NoStackError(errorMsg));
+  }
+}
+
+//All the steps necessary to push starter and remote components to the CDNs and make a PR to the CDNs
+// returns the URL string of created PR.
+// @cdn: string,  ="cdn" to push starter and remote components to adrise_cdn repo and create PR against master
+//                ="rcdn" to push starter and remote components to rcdn repo and create PR against master
+async function createCdnPrUrl(done, cdn = "cdn") {
+
+  const minorBuildTag = getBuildTag('minor');
+  const fullBuildTag = getBuildTag('revision');
+
+  let cdnPath = process.env.CDN_GIT_DIRECTORY;
+  let ghInfoCDNRepo = `${ghInfo.cdnRepo}`;
+
+  if (cdn === `rcdn`) {
+    cdnPath = process.env.RCDN_GIT_DIRECTORY;
+    ghInfoCDNRepo = `${ghInfo.rcdnRepo}`;
+  }
+
 
   // check if the environment variable for the path to the CDN repo has been set
   if (!cdnPath) {
@@ -74,21 +146,15 @@ async function makeReleasePrs(done) {
   // check that the CDN repo is clean - verifyGit() handles any error messages as necessary
   verifyGit(done, cdnPath);
 
-  // rename the local branch name so it looks like "release_2_14_34"
-  const releaseBranchName = `release_${fullBuildTag}`;
-  log(`...Renaming the local branch to ${releaseBranchName}`);
-  const gitRename = `git branch -m ${releaseBranchName}`;
-  const gitRenameErrorMsg = `Could not rename the local branch to ${releaseBranchName}`;
-  execShellCommand(done, gitRename, gitRenameErrorMsg);
 
   // attempt to checkout master in the CDN repo
-  log(`...Checking out master on the local ${ghInfo.cdnRepo} repo`);
+  log(`...Checking out master on the local ${ghInfoCDNRepo} repo`);
   const gitCheckoutMasterCDN = `git -C ${cdnPath} checkout master`;
   const gitCheckoutMasterCDNErrorMsg = `Could not checkout master on the ${cdnPath}`;
   execShellCommand(done, gitCheckoutMasterCDN, gitCheckoutMasterCDNErrorMsg);
 
   // attempt to pull origin master for the CDN repo
-  log(`...Pulling remote master to the local ${ghInfo.cdnRepo} repo`);
+  log(`...Pulling remote master to the local ${ghInfoCDNRepo} repo`);
   const gitPullMasterCDN = `git -C ${cdnPath} pull origin master`;
   const gitPullMasterCDNErrorMsg = `Could not pull master from origin at ${cdnPath}`;
   execShellCommand(done, gitPullMasterCDN, gitPullMasterCDNErrorMsg);
@@ -110,7 +176,7 @@ async function makeReleasePrs(done) {
     execShellCommand(done, gitDeleteCDNBranch, gitDeleteCDNBranchErrorMsg);
   }
 
-  log(`...Creating a new ${cdnBranchName} branch on the local ${ghInfo.cdnRepo} repo`);
+  log(`...Creating a new ${cdnBranchName} branch on the local ${ghInfoCDNRepo} repo`);
   const gitCheckoutNewCDNBranch = `git -C ${cdnPath} checkout -b ${cdnBranchName}`;
   const gitCheckoutNewCDNBranchErrorMsg = `Could not checkout a new branch "${cdnBranchName}" at ${cdnPath}`;
   execShellCommand(done, gitCheckoutNewCDNBranch, gitCheckoutNewCDNBranchErrorMsg);
@@ -118,14 +184,19 @@ async function makeReleasePrs(done) {
   const starterComponentsFileName = `tubi_starter_components_${minorBuildTag}.pkg`;
   const remoteComponentsFileName = `tubi_remote_components_${fullBuildTag}.pkg`;
 
-  const cdnStarterComponentsPath = `${cdnPath}/hotpatches/roku/starter-components/${starterComponentsFileName}`;
-  const cdnRemoteComponentsPath = `${cdnPath}/hotpatches/roku/components/${remoteComponentsFileName}`;
+  let cdnStarterComponentsPath = `${cdnPath}/hotpatches/roku/starter-components/${starterComponentsFileName}`;
+  let cdnRemoteComponentsPath = `${cdnPath}/hotpatches/roku/components/${remoteComponentsFileName}`;
+
+  if (cdn === 'rcdn') {
+    cdnStarterComponentsPath = `${cdnPath}/starter-components/${starterComponentsFileName}`;
+    cdnRemoteComponentsPath = `${cdnPath}/components/${remoteComponentsFileName}`;
+  }
 
   const localStarterComponentsPath = `build/tubi_starter_components_${minorBuildTag}.pkg`;
   const localRemoteComponentsPath = `build/tubi_remote_components_${fullBuildTag}.pkg`;
 
   // copy the starter components from the /build directory to the CDN repo directory
-  log(`...Copying the starter components to the local ${ghInfo.cdnRepo} repo`);
+  log(`...Copying the starter components to the local ${ghInfoCDNRepo} repo`);
   const moveStarterComponentsResult = shell.cp(localStarterComponentsPath, cdnStarterComponentsPath);
   if (moveStarterComponentsResult.stderr) {
     const errorMsg = `There was an error moving the starter components. You will need to manually copy the starter components and remote components and manually make a PR.
@@ -134,7 +205,7 @@ async function makeReleasePrs(done) {
   }
 
   // copy the remote components from the /build directory to the CDN repo directory
-  log(`...Copying the remote components to the local ${ghInfo.cdnRepo} repo`);
+  log(`...Copying the remote components to the local ${ghInfoCDNRepo} repo`);
   const moveRemoteComponentsRes = shell.cp(localRemoteComponentsPath, cdnRemoteComponentsPath);
   if (moveRemoteComponentsRes.stderr) {
     const errorMsg = `There was an error moving the remote components. You will need to manually copy the remote components and manually make a PR.
@@ -143,77 +214,45 @@ async function makeReleasePrs(done) {
   }
 
   // add the updates so they are staged for commit
-  log(`...Staging changes for commit on the local ${ghInfo.cdnRepo} repo`);
+  log(`...Staging changes for commit on the local ${ghInfoCDNRepo} repo`);
   const gitAddCDNBranch = `git -C ${cdnPath} add . `;
   const gitAddCDNBranchErrorMsg = `Could not run "git add . " on ${cdnPath}`;
   execShellCommand(done, gitAddCDNBranch, gitAddCDNBranchErrorMsg);
 
   // commit the updates to the branch
-  log(`...Committing the staged changes on the local ${ghInfo.cdnRepo} repo`);
+  log(`...Committing the staged changes on the local ${ghInfoCDNRepo} repo`);
   const gitCommitCDNBranch = `git -C ${cdnPath} commit -m 'Updating the starter and remote components for ${cdnBranchName}'`;
   const gitCommitCDNBranchErrorMsg = `"git commit" failed on ${cdnPath}`;
   execShellCommand(done, gitCommitCDNBranch, gitCommitCDNBranchErrorMsg);
 
   // push the branch to Github
-  log(`...Pushing the local ${cdnBranchName} branch to the remote ${ghInfo.rokuRepo} repo`);
+  log(`...Pushing the local ${cdnBranchName} branch to the remote ${ghInfoCDNRepo} repo`);
   const gitPushCDNBranch = `git -C ${cdnPath} push origin ${cdnBranchName}`;
   const gitPushCDNBranchErrorMsg = `Could not push ${cdnBranchName} to origin (Github) at ${cdnPath}`;
   execShellCommand(done, gitPushCDNBranch, gitPushCDNBranchErrorMsg);
 
   // make a PR against master on the CDN repo at Github
-  log(`...Making a PR on ${ghInfo.cdnRepo} against the remote master branch`);
+  log(`...Making a PR on ${ghInfoCDNRepo} against the remote master branch`);
   let cdnPrUrl = '';
+  let errMsg = `Failed to create CDN PRs. Please create manually.`;
   try {
     const cdnPrRes = await octokit.pulls.create({
       owner: ghInfo.owner,
-      repo: ghInfo.cdnRepo,
+      repo: `${ghInfoCDNRepo}`,
       title: `Updating starter and remote components for roku ${fullBuildTag}`,
       head: cdnBranchName,
       base: 'master'
     });
     cdnPrUrl = cdnPrRes.data.html_url;
-  } catch(err) {
-    console.log(err);
-    done(new NoStackError(err));
+  } catch (err) {
+    errMsg = err
   }
 
-  // push the release branch to the project-total-recall repo
-  log(`...Pushing the local ${releaseBranchName} branch to the remote ${ghInfo.rokuRepo} repo`);
-  const gitPushReleaseBranch = `git push origin ${releaseBranchName}`;
-  const gitPushReleaseBranchErrorMsg = `Could not push ${releaseBranchName} to ${ghInfo.rokuRepo} origin (Github)`;
-  execShellCommand(done, gitPushReleaseBranch, gitPushReleaseBranchErrorMsg);
-
-  // make a PR against the production branch on the project-total-recall repo at Github
-  const prodRokuBranchName = `${minorBuildTag}_branch`;
-  log(`...Making a PR from the remote ${releaseBranchName} on ${ghInfo.rokuRepo} against the ${prodRokuBranchName} branch`);
-  let releasePrUrl = '';
-  try {
-    const releasePrRes = await octokit.pulls.create({
-      owner: ghInfo.owner,
-      repo: ghInfo.rokuRepo,
-      title: `Release ${fullBuildTag}`,
-      body: 'Verify: The last commit in this PR is a build bump. If the last commit in this PR is not a build bump, the release needs to be run again. Any other commit that is not a build bump, including a merge, indicates a commit has been included that was not included in the package that was built and sent to the CDN.',
-      head: releaseBranchName,
-      base: prodRokuBranchName
-    });
-    releasePrUrl = releasePrRes.data.html_url;
-  } catch(err) {
-    console.log(err);
-    done(new NoStackError(err));
-  }
-
-  // copy the PR urls to the clipboard
-  if (releasePrUrl && cdnPrUrl) {
-
-    // multi line string
-    const prUrlsForPasting = `${releasePrUrl}
-${cdnPrUrl}`;
-
-    clipboardy.writeSync(prUrlsForPasting);
-    log(`The release PR url and the CDN PR url have been placed on your clipboard. Please share with the team!`);
+  // failed to make PR on CDN/RCDN repo at Github due to git process steps. In this event stop execution of the script.
+  if (!cdnPrUrl) {
+    return done(new NoStackError(errMsg));
   } else {
-    const errorMsg = 'The urls for the release PR and the CDN PR are not available. Please share manually.';
-    done(new NoStackError(errorMsg));
+    return cdnPrUrl;
   }
 }
 

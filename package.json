@@ -1,21 +1,21 @@
 {
-  "name": "adrise_roku",
+  "name": "project-total-recall",
   "version": "1.0.0",
-  "description": "adrise_roku ===========",
-  "main": "index.js",
+  "description": "project-total-recall ===========",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/adRise/adrise_roku.git"
+    "url": "git+https://github.com/adRise/project-total-recall.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/adRise/adrise_roku/issues"
+    "url": "https://github.com/adRise/project-total-recall/issues"
   },
-  "homepage": "https://github.com/adRise/adrise_roku#readme",
+  "homepage": "https://github.com/adRise/project-total-recall#readme",
+
   "devDependencies": {
     "@octokit/rest": "^18.0.9",
     "@rokucommunity/bslint": "0.7.6",
