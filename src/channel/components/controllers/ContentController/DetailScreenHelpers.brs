@@ -1471,6 +1471,18 @@ Function setDetailScreenLikeDislikeStateFromLikeAction(detailScreen, sLikeAction
       showToast(toastInfo, true, dialogEventInfo)
 
     end if
+  else if isNonEmptyString(sLikedState) = true AND canShowLikeDisLikeToast = true
+    if sLikedState = m.constants.ui.likeDislikeStates.liked AND m.pub_serverPersistentData.isLikeToastNotificationShown = false
+      getExperimentResource("roku_like_toast", "roku_like_toast_v1")
+      saveServerPersistentData({
+        "isLikeToastNotificationShown": true
+      }, "device")
+    else if sLikedState = m.constants.ui.likeDislikeStates.disliked AND m.pub_serverPersistentData.isDisLikeToastNotificationShown = false
+      getExperimentResource("roku_like_toast", "roku_like_toast_v1")
+      saveServerPersistentData({
+        "isDisLikeToastNotificationShown": true
+      }, "device")
+    end if
 
   end if
 
