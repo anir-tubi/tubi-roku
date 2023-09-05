@@ -145,7 +145,7 @@ Function onLinearVideoPlayerRequestingTVGuide()
       end if
 
       '//Focus side nav to EPG option
-      sEPGSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.epgScreen]
+      sEPGSideNavID = m.constants.ui.screenIdToTopNavId[m.constants.ui.screenIds.epgScreen]
       focusSideNavOption(sEPGSideNavID)
 
       '//Set EPGScreen background to ensure the epgScreen appears properly: i.e. background gradient is displayed, proper bground is displayed upon sideNav focus

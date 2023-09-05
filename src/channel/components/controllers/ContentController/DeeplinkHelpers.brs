@@ -343,7 +343,7 @@ Function onSingleChannelFetchForDeeplinkSuccess(successResponse, storeInCache = 
         playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.epgScreen, false, playbackSource)
       end if
 
-      sEPGSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.epgScreen]
+      sEPGSideNavID = m.constants.ui.screenIdToTopNavId[m.constants.ui.screenIds.epgScreen]
       focusSideNavOption(sEPGSideNavID)
     end if
   else

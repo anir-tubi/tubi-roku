@@ -85,7 +85,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
   pushScreen(epgScreen, true, shouldSendPageLoadEvent)
 
   if screenID = m.constants.ui.screenIds.epgScreen
-    epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.linearEPG
+    epgScreen.topNavSelectedId = m.constants.ui.homeScreenTopNavIds.linearEPG
   end if
 
 End Function
@@ -95,7 +95,7 @@ End Function
 Function refreshEPGScreen(epgScreen)
   tubiLog("EPGScreenHelpers.refreshEPGscreen")
   mode = m.constants.ui.contentMode.epgScreen
-  epgScreen.topNavSelectedId = m.constants.ui.sideNavIds.linearEPG
+  epgScreen.topNavSelectedId = m.constants.ui.homeScreenTopNavIds.linearEPG
   epgScreen.signedIn = isLoggedInUser()
   epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
 

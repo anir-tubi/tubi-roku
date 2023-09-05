@@ -85,7 +85,7 @@ Function showTournamentScreen(constants, componentToFocus = "")
     end if
     pushScreen(tournamentScreen, true, false)
 
-    tournamentScreen.topNavSelectedId = m.constants.ui.sideNavIds.tournament
+    tournamentScreen.topNavSelectedId = m.constants.ui.homeScreenTopNavIds.tournament
 
   end if
 

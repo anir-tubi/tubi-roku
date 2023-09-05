@@ -62,12 +62,12 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
       end if
     end if
 
-    if m.constants.ui.screenIdToSideNavId[screen.id] <> topNavItem.id
-      if topNavItem.id = m.constants.ui.sideNavIds.movies
+    if m.constants.ui.screenIdToTopNavId[screen.id] <> topNavItem.id
+      if topNavItem.id = m.constants.ui.homeScreenTopNavIds.movies
         ' Fixes logo not showing up after returning from EPG
         showHideLogoBasedOnUiMode()
         showMoviesScreen(componentToFocus)
-      else if topNavItem.id = m.constants.ui.sideNavIds.tv
+      else if topNavItem.id = m.constants.ui.homeScreenTopNavIds.tv
         ' Fixes logo not showing up after returning from EPG
         showHideLogoBasedOnUiMode()
         showTVScreen(componentToFocus)
@@ -83,9 +83,9 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
         showCategoryListScreen(m.constants, m.constants.ui.terms.menu)
       else if topNavItem.id = m.constants.ui.sideNavIds.search
         showSearchScreen()
-      else if topNavItem.id = m.constants.ui.sideNavIds.linearEPG
+      else if topNavItem.id = m.constants.ui.homeScreenTopNavIds.linearEPG
         showDefaultEPGScreen(componentToFocus)
-      else if topNavItem.id = m.constants.ui.sideNavIds.tournament
+      else if topNavItem.id = m.constants.ui.homeScreenTopNavIds.tournament
         showTournamentScreen(m.constants, componentToFocus)
       end if
     else
@@ -137,7 +137,7 @@ Function onScreenTopNavToggled(msg)
     user_interaction = "TOGGLE_OFF"
   end if
 
-  focusedNavId = m.constants.ui.screenIdToSideNavId[screen.id]
+  focusedNavId = m.constants.ui.screenIdToTopNavId[screen.id]
   navComponent = {
     top_nav_section: m.Tracking.sideNavPageMap[focusedNavId]
   }
@@ -170,7 +170,7 @@ End Function
 
 Function sendTopNavToSideNavNavigationEvent(screen, sideNav)
   if screen <> invalid AND sideNav <> invalid
-    focusedNavId = m.constants.ui.screenIdToSideNavId[screen.id]
+    focusedNavId = m.constants.ui.screenIdToTopNavId[screen.id]
     buttonID = m.Tracking.sideNavPageMap[focusedNavId]
 
     '//Both the side and top navs should have the same HOME button ID

@@ -14,7 +14,7 @@ Function init()
 
   'topNav
   m.TopNav = m.top.findNode("TopNav")
-  m.topNav.selectedId = m.constants.ui.sideNavIds.tournament
+  m.topNav.selectedId = m.constants.ui.homeScreenTopNavIds.tournament
   m.TopNav.observeFieldScoped("selected", "onTopNavSelection")
   m.TopNav.observeFieldScoped("backItemSelected", "onTopNavBackItemSelected")
   m.TopNav.observeFieldScoped("navigateWithinPageInfo", "onTopNavNavigateWithinPageInfoChange")
@@ -140,18 +140,18 @@ Function generateTopNavContentItems(includeLinearTV = false)
 
   if includeLinearTV = true
     menuItemIds = [
-      m.constants.ui.sideNavIds.home
-      m.constants.ui.sideNavIds.movies
-      m.constants.ui.sideNavIds.tv
-      m.constants.ui.sideNavIds.linearEPG
-      m.constants.ui.sideNavIds.tournament
+      m.constants.ui.homeScreenTopNavIds.home
+      m.constants.ui.homeScreenTopNavIds.movies
+      m.constants.ui.homeScreenTopNavIds.tv
+      m.constants.ui.homeScreenTopNavIds.linearEPG
+      m.constants.ui.homeScreenTopNavIds.tournament
     ]
   else
     menuItemIds = [
-      m.constants.ui.sideNavIds.home
-      m.constants.ui.sideNavIds.movies
-      m.constants.ui.sideNavIds.tv
-      m.constants.ui.sideNavIds.tournament
+      m.constants.ui.homeScreenTopNavIds.home
+      m.constants.ui.homeScreenTopNavIds.movies
+      m.constants.ui.homeScreenTopNavIds.tv
+      m.constants.ui.homeScreenTopNavIds.tournament
     ]
   end if
 
@@ -160,17 +160,17 @@ Function generateTopNavContentItems(includeLinearTV = false)
     item = parent.createChild("TopNavContentNode")
     item.id = id
 
-    if id = m.constants.ui.sideNavIds.home
+    if id = m.constants.ui.homeScreenTopNavIds.home
       item.title = getTranslation("menu_foryou")
-    else if id = m.constants.ui.sideNavIds.movies
+    else if id = m.constants.ui.homeScreenTopNavIds.movies
       item.title = getTranslation("menu_movies")
-    else if id = m.constants.ui.sideNavIds.tv
+    else if id = m.constants.ui.homeScreenTopNavIds.tv
       item.title = getTranslation("menu_tv")
-    else if id = m.constants.ui.sideNavIds.linearTV
+    else if id = m.constants.ui.homeScreenTopNavIds.linearTV
       item.title = getTranslation("menu_livetv")
-    else if id = m.constants.ui.sideNavIds.linearEPG
+    else if id = m.constants.ui.homeScreenTopNavIds.linearEPG
       item.title = getTranslation("menu_livetv")
-    else if id = m.constants.ui.sideNavIds.tournament
+    else if id = m.constants.ui.homeScreenTopNavIds.tournament
       item.title = "FIFA World Cup 2022" + chr(8482)
       item.subText = getTranslation("text_new")
     end if

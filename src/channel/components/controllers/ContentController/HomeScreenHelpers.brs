@@ -76,10 +76,10 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
       homeScreen.topNavSelectedId = constants.ui.sideNavIds.home
     else if screenID = constants.ui.screenIds.movieScreen
       sContentMode = constants.ui.contentMode.movie
-      homeScreen.topNavSelectedId = constants.ui.sideNavIds.movies
+      homeScreen.topNavSelectedId = constants.ui.homeScreenTopNavIds.movies
     else if screenID = constants.ui.screenIds.tvScreen
       sContentMode = constants.ui.contentMode.tv
-      homeScreen.topNavSelectedId = constants.ui.sideNavIds.tv
+      homeScreen.topNavSelectedId = constants.ui.homeScreenTopNavIds.tv
     else if screenID = constants.ui.screenIds.espanolScreen
       sContentMode = constants.ui.contentMode.latino
     end if

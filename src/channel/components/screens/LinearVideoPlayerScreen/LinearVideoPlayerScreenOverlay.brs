@@ -113,11 +113,11 @@ Function onSideNavSelectChange()
   userInteraction = "CONFIRM"
   selectedLinearSideNavId = ""
   if m.sideNav.selectedButtonID = m.constants.ui.linearSideNavIds.cc
-    selectedLinearSideNavId = m.constants.ui.sideNavIds.subtitles
+    selectedLinearSideNavId = m.constants.ui.linearSideNavIds.subtitles
     setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, selectedLinearSideNavId)
     displayClosedCaptioningMenu()
   else if m.sideNav.selectedButtonID = m.constants.ui.linearSideNavIds.epg
-    selectedLinearSideNavId = m.constants.ui.sideNavIds.back
+    selectedLinearSideNavId = m.constants.ui.linearSideNavIds.back
     setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, selectedLinearSideNavId)
     hideOverlay()
     m.top.navigateToEPGScreen = true
@@ -472,9 +472,9 @@ End Function
 Function getAnalyticsIdFromFocusedSideNavItem()
   selectedLinearSideNavId = ""
   if m.sideNav.focusedButtonID = m.constants.ui.linearSideNavIds.cc
-    selectedLinearSideNavId = m.constants.ui.sideNavIds.subtitles
+    selectedLinearSideNavId = m.constants.ui.linearSideNavIds.subtitles
   else if m.sideNav.focusedButtonID = m.constants.ui.linearSideNavIds.epg
-    selectedLinearSideNavId = m.constants.ui.sideNavIds.back
+    selectedLinearSideNavId = m.constants.ui.linearSideNavIds.back
   end if
   return selectedLinearSideNavId
 End Function

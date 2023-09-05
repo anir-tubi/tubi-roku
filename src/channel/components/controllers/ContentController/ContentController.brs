@@ -378,7 +378,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
               setUiMode(m.constants.ui.modes.latino)
             end if
 
-            sideNavId = m.constants.ui.screenIdToSideNavId[newTopScreen.id]
+            sideNavId = m.constants.ui.screenIdToTopNavId[newTopScreen.id]
             if sideNavId <> invalid
               focusSideNavOption(sideNavId)
             end if

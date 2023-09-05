@@ -14,7 +14,7 @@ Function init()
 
   'topNav
   m.topNav = m.top.FindNode("topNav")
-  m.topNav.selectedId = m.constants.ui.sideNavIds.linearEPG
+  m.topNav.selectedId = m.constants.ui.homeScreenTopNavIds.linearEPG
   m.topNav.observeField("selected", "onTopNavSelection")
   m.topNav.observeField("backItemSelected", "onTopNavBackItemSelected")
   m.topNav.observeField("navigateWithinPageInfo", "onTopNavNavigateWithinPageInfoChange")
@@ -380,16 +380,16 @@ End Function
 
 Function generateTopNavContentItems()
   menuItemIds = [
-    m.constants.ui.sideNavIds.home
-    m.constants.ui.sideNavIds.movies
-    m.constants.ui.sideNavIds.tv
-    m.constants.ui.sideNavIds.linearEPG
+    m.constants.ui.homeScreenTopNavIds.home
+    m.constants.ui.homeScreenTopNavIds.movies
+    m.constants.ui.homeScreenTopNavIds.tv
+    m.constants.ui.homeScreenTopNavIds.linearEPG
     ]
 
   isTournamentTime = tournamentTimeFrame()
 
   if isTournamentTime = "duringTournament" OR isTournamentTime = "preTournament"
-    menuItemIds.push(m.constants.ui.sideNavIds.tournament)
+    menuItemIds.push(m.constants.ui.homeScreenTopNavIds.tournament)
   end if
 
 
@@ -398,15 +398,15 @@ Function generateTopNavContentItems()
     item = parent.createChild("TopNavContentNode")
     item.id = id
 
-    if id = m.constants.ui.sideNavIds.home
+    if id = m.constants.ui.homeScreenTopNavIds.home
       item.title = getTranslation("menu_foryou")
-    else if id = m.constants.ui.sideNavIds.movies
+    else if id = m.constants.ui.homeScreenTopNavIds.movies
       item.title = getTranslation("menu_movies")
-    else if id = m.constants.ui.sideNavIds.tv
+    else if id = m.constants.ui.homeScreenTopNavIds.tv
       item.title = getTranslation("menu_tv")
-    else if id = m.constants.ui.sideNavIds.linearEPG
+    else if id = m.constants.ui.homeScreenTopNavIds.linearEPG
       item.title = getTranslation("menu_livetv")
-    else if id = m.constants.ui.sideNavIds.tournament
+    else if id = m.constants.ui.homeScreenTopNavIds.tournament
       item.title = "FIFA World Cup 2022" + chr(8482)
       item.subText = getTranslation("text_new")
     end if

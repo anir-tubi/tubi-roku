@@ -1312,17 +1312,21 @@ Function getConstants()
       constants.ui.sideNavIds.tv = "tv"
       constants.ui.sideNavIds.settings = "settings"
       constants.ui.sideNavIds.exit = "exit"
-      constants.ui.sideNavIds.linearEPG = "linearEPG"
       constants.ui.sideNavIds.profile = "profile"
       constants.ui.sideNavIds.kidsMode = "kidsMode"
       constants.ui.sideNavIds.myList = "myList"
-      constants.ui.sideNavIds.subtitles = "subtitles"
-      constants.ui.sideNavIds.back = "back"
-      constants.ui.sideNavIds.tournament = "tournament"
+
+    constants.ui.homeScreenTopNavIds = {}
+      constants.ui.homeScreenTopNavIds.home = "home"
+      constants.ui.homeScreenTopNavIds.movies = "movies"
+      constants.ui.homeScreenTopNavIds.tv = "tv"
+      constants.ui.homeScreenTopNavIds.linearEPG = "linearEPG"
+      constants.ui.homeScreenTopNavIds.tournament = "tournament"
 
     constants.ui.linearSideNavIds = {}
-      constants.ui.linearSideNavIds.cc = "cc"
       constants.ui.linearSideNavIds.epg = "epg"
+      constants.ui.linearSideNavIds.subtitles = "subtitles"
+      constants.ui.linearSideNavIds.back = "back"
 
     'a map of screenIds to corresponding sideNavIds
     constants.ui.screenIdToSideNavId = {}
@@ -1331,12 +1335,18 @@ Function getConstants()
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.channelListScreen] = constants.ui.sideNavIds.channels
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.categoryListScreen] = constants.ui.sideNavIds.categories
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.espanolScreen] = constants.ui.sideNavIds.espanol
-      constants.ui.screenIdToSideNavId[constants.ui.screenIds.epgscreen] = constants.ui.sideNavIds.linearEPG
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.movieScreen] = constants.ui.sideNavIds.movies
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.myStuffScreen] = constants.ui.sideNavIds.myList
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.tvScreen] = constants.ui.sideNavIds.tv
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.settingsScreen] = constants.ui.sideNavIds.settings
-      constants.ui.screenIdToSideNavId[constants.ui.screenIds.tournamentScreen] = constants.ui.sideNavIds.tournament
+
+    'a map of screenIds to corresponding topNavIds
+    constants.ui.screenIdToTopNavId = {}
+      constants.ui.screenIdToTopNavId[constants.ui.screenIds.homeScreen] = constants.ui.homeScreenTopNavIds.home
+      constants.ui.screenIdToTopNavId[constants.ui.screenIds.tvScreen] = constants.ui.homeScreenTopNavIds.tv
+      constants.ui.screenIdToTopNavId[constants.ui.screenIds.movieScreen] = constants.ui.homeScreenTopNavIds.movies
+      constants.ui.screenIdToTopNavId[constants.ui.screenIds.epgscreen] = constants.ui.homeScreenTopNavIds.linearEPG
+      constants.ui.screenIdToTopNavId[constants.ui.screenIds.tournamentScreen] = constants.ui.homeScreenTopNavIds.tournament
 
     constants.ui.detailScreenMenuItemIds = {}
       constants.ui.detailScreenMenuItemIds.playMenuItem = "PlayMenuItem"
