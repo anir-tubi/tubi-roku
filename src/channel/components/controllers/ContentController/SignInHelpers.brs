@@ -529,6 +529,9 @@ Function signUserIn(email, password)
   }
 
   requestInfo = m.userDeviceApi.signInReqInfo(options)
+
+  processTokenToGenerateTokenDebugInfo()
+
   m.makeRequest({
     url: requestInfo.url
     requestType: m.constants.reqNames.signIn
@@ -600,7 +603,26 @@ End Function
 ' onSignInError callback is triggered when the sign In is failed
 ' @errorResponse : assocarray, the error response of signIn API in the form of AA
 Function onSignInError(errorResponse)
+  ' Checking if the reason for error is invalid token and the error message is Token type does not match.
+  ' Reason we are checking the message because we get same error code for all token related errors.
+  ' Sample error response: {"code":"INVALID_TOKEN","message":"Token type does not match"}
+  if errorResponse.error <> invalid AND errorResponse.error.message = "Token type does not match"
+    screenIds = getScreenIdsFromStack()
+    
+    eventInfo = {
 
+      ' Active BreadCrumb. Useful to figure from where is the user trying to login. Side Menu / Details screen.
+      screensInStack: screenIds.join(",")
+
+      ' Trying to figure out how long the session was running. Trying to figure new session or an active session.
+      appStartTime: m.top.appStartTime
+
+      ' Token debug info.
+      tokenDebugInfo: m.tokenDebugInfo
+    }
+
+    tubiLog(FormatJSON(eventInfo), "error", "apiError", "token-mismatch-error")
+  end if
   requestInput = errorResponse.requestInput
 
   accountEvent = {
@@ -1330,4 +1352,60 @@ Function afterSignInLikeDislikeLinear(channelInfo)
     updateLikeDislikeLinear(channelInfo)
   end if
 
+End Function
+
+
+' processTokenToGenerateTokenDebugInfo method process the auth token and parses the JWT token to obtain debug information and store the debug info
+' in a m scope variable m.tokenDebugInfo. m.tokenDebugInfo will be pass along in the debug logging request whenever we recieve token mismatch error.
+Function processTokenToGenerateTokenDebugInfo()
+  ' Processing the token before sending request. So that we can use this info if it fails.
+  authInfo = getFieldFromGlobal("authInfo")
+  if authInfo <> invalid AND authInfo.accessToken <> invalid
+    ' Contains 3 parts. 
+    ' First part contains type of encrption
+    ' Second part is where we will get the token info.
+    jwtTokenSplit = authInfo.accessToken.split(".")
+    ' Checking the token is valid before proceeding.
+    if jwtTokenSplit.count() = 3
+      jwtBody = CreateObject("roByteArray")
+      jwtBody.FromBase64String(base64UrlToBase64(jwtTokenSplit[1]))
+      body = parseJSON(jwtBody.ToAsciiString())
+      m.tokenDebugInfo = {
+        
+        'expiretime
+        expiretime: body.exp
+
+        ' type: will provide us information about the type of token.
+        type: body.type
+
+        ' is UUID present. Since uuid is present avoiding sending it to backend.
+        wasValidUserIdPresentInToken: isNonEmptyString(body.uuid)
+
+        ' sending platform just in case to rule out if the token was passed from ios.
+        platform: body.platform
+
+        ' is userid present in the authinfo. This helps us check if for some reason we are missing user id in registry / global auth info.
+        wasValidUserIdPresentInAuthInfo: authInfo.userId <> invalid
+      }
+    end if
+  end if
+End Function
+
+
+' TODO: Remove the below method when we remove debug logging for token mismatch error.
+' Converts base64Url to base64.
+'
+' @param base64Url: string, base64Url to convert to base64
+Function base64UrlToBase64(base64Url)
+  base64 = base64Url.replace("-", "+").replace("_","/")
+  length = base64.len() mod 4
+
+  ' Add required padding, optional in base64url
+  if length < 3 then
+    base64 = base64 + "=="
+  else if length < 4 then
+    base64 = base64 + "="
+  end if
+
+  return base64
 End Function

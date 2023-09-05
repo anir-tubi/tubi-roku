@@ -67,6 +67,7 @@ Function parseSignInError(fullResponse, reqInfo)
   return {
     requestInput: reqInfo
     code: fullResponse.code
+    error: fullResponse.data
   }
 End Function
 
