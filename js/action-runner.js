@@ -102,7 +102,7 @@ async function startAutomatedTestsGithubActionRunner(done) {
     done(new NoStackError('Runner has not been setup yet. Please run:\ngulp setupAutomatedTestsGithubActionRunner'));
   }
 
-  const command = `podman run  --name ${runnerImageName} --rm -ti ${runnerImageName}`;
+  const command = `podman run --name ${runnerImageName} --rm -ti ${runnerImageName}`;
   await spawnShellCommand(done, command, true);
 }
 

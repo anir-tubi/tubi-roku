@@ -1,8 +1,57 @@
+# This workflow executes the Automated UI Tests when triggered from the Github UI
+# This will be executed on a self-hosted runner tagged with automated-tests-runner
 name: Automated UI Tests
+
+env:
+  runName: ${{ format('{0}; {1}', github.ref_name, inputs.tag) }}${{ inputs.tag == 'Custom String' && format('{0} "{1}"', ':', inputs.customString) || ''}}
+
+# We are giving a name for the run to make it easier to see what was run. Not the prettiest for conditional strings but do not see another solution. Colon with a space after is a problem as well that we have to work around.concurrency:
+# As an example if the branch name is qa_2_21_20 and we're running the @leftnav tag then the run name would: qa_2_21_20; @leftnav.
+# For a custom string of "C4153" it would be: qa_2_21_20; Custom String: "C4153"
+run-name: ${{ format('{0}; {1}', github.ref_name, inputs.tag) }}${{ inputs.tag == 'Custom String' && format('{0} "{1}"', ':', inputs.customString) || ''}}
 
 # Controls when the action will run.
 on:
+  # We only run manually currently
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Used to run tests with a specific tag. Use "Run All Tests" to run all tests. Use "Custom String" to provide an alternative string input below.'
+        default: 'Run All Tests'
+        options:
+          - 'Run All Tests'
+          - 'Custom String'
+          # The remaining options are generated using gulp outputAvailableAutomatedTestTags
+          - '@age_gate'
+          - '@application_launch'
+          - '@autoplay'
+          - '@guest_user'
+          - '@homescreen'
+          - '@kidsmode_guest'
+          - '@kidsmode_registered'
+          - '@leftnav'
+          - '@linearsearch'
+          - '@live'
+          - '@mdp_1'
+          - '@multiple_audio'
+          - '@new_test'
+          - '@parental_controls'
+          - '@playback_1'
+          - '@registered_user'
+          - '@regression'
+          - '@sdp_1'
+          - '@sdp_2'
+          - '@settings'
+          - '@smoke'
+          - '@videopreview'
+        type: choice
+      customString:
+        description: 'Use to provide a custom string of which test to run. You can use the the pipe symbol "|" to provide more than one one string. For example "C4151|C4153" would run both the C4151 test and C4153 test. This input is ignored unless "Custom String" is set above.'
+        type: string
+      bail:
+        description: 'Stop running on first test failure'
+        default: false
+        type: boolean
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -12,11 +61,19 @@ jobs:
     name: Run Automated UI Tests
     # The type of runner that the job will run. self hosted machine is our own machine setup in SF office and it has dedicated connected roku device.
     runs-on: [self-hosted, automated-tests-runner, enabled]
-    # timeouts after 10 minutes, if the execution/unit test got stuck/crash
-    timeout-minutes: 10
+    # timeouts after 60 minutes, if the execution/automated tests got stuck/crash
+    timeout-minutes: 60
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      # print out passed in job params for reference
+      - name: Job Params
+        run: |
+          echo branch: "${{ github.ref_name }}"
+          echo tag: "${{ inputs.tag }}"
+          echo customString: "${{ inputs.customString }}"
+          echo bail: "${{ inputs.bail }}"
+
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
@@ -24,3 +81,26 @@ jobs:
       - name: npm install
         run: |
           npm install
+
+      - name: gulp runAutomatedTests
+        env:
+          runId: ${{ github.run_id }}
+          branch: ${{ github.ref_name }}
+          tag: ${{ inputs.tag }}
+          customString: ${{ inputs.customString }}
+          bail: ${{ inputs.bail }}
+        run: |
+          cp ~/rta-config.json ./rta-config.json
+          npx gulp runAutomatedTests
+
+      - name: Upload JSON Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: JSON Report
+          path: out/ui-tests-output/report.json
+
+      - name: Upload HTML Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: HTML Report
+          path: out/ui-tests-output/html

@@ -39,7 +39,7 @@ const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOn
 const {retrieveSuitestTests, runSuitestTests, convertXpathsToKeyPaths, convertSuitestTest} = require('./js/suitest');
 
 // Importing functions related to Automated Tests
-const {runAutomatedTestsCli} = require('./js/automated-tests');
+const {runAutomatedTests, runAutomatedTestsCli, outputAvailableAutomatedTestTags} = require('./js/automated-tests');
 
 // Importing functions related to Github action runners
 const {setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner} = require('./js/action-runner');
@@ -710,12 +710,6 @@ function setRerunAutomatedTestsEnvironment(done) {
 }
 
 
-function runAutomatedTests() {
-  return src(['js/automated-tests/tests/*.ts'], { read: false })
-    .pipe(mocha({bail: true})); // Use {bail: true} if you want to stop after
-}
-
-
 // force qa on options, so we ensure our build is using the qa config and set other automated test config settings
 function setPerformanceTestsConfig(done) {
   if(options) {
@@ -885,6 +879,7 @@ exports.buildAutomatedTests = series(setAutomatedTestsConfig, buildInstalled);
 exports.runAutomatedTests = series(setAutomatedTestsConfig, buildInstalled, runAutomatedTests);
 exports.rerunAutomatedTests = series(setRerunAutomatedTestsEnvironment, runAutomatedTests);
 exports.runAutomatedTestsCli = runAutomatedTestsCli;
+exports.outputAvailableAutomatedTestTags = outputAvailableAutomatedTestTags;
 exports.autotest = runAutomatedTestsCli;
 
 exports.runToolingTests = series(setAutomatedTestsConfig, buildInstalled, runToolingTests);
