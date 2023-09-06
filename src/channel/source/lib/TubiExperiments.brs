@@ -91,7 +91,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_like_toast: {
-        roku_like_toast_v1: {"enabled": false}
+        roku_like_toast_v2: {"enabled": false}
       }
 
       roku_tensor_cdn_domain: {
