@@ -30,6 +30,10 @@ Function UserDeviceApi(constants, apiUtils)
     createUserAndDeviceSettingsBatchRequests: userDeviceApi_createUserAndDeviceSettingsBatchRequests
     createPatchUserSettingsReqInfo: userDeviceApi_createPatchUserSettingsReqInfo
     createPatchDeviceSettingsReqInfo: userDeviceApi_createPatchDeviceSettingsReqInfo
+
+    ' Consent Related Methods.
+    createGetConsentReqInfo: userDeviceApi_createGetConsentReqInfo
+    createPatchConsentReqInfo: userDeviceApi_createPatchConsentReqInfo
   }
 
   userDeviceApi = {}
@@ -451,6 +455,28 @@ Function userDeviceApi_createPatchDeviceSettingsReqInfo(body)
 
   return {
     url: m.constants.urls.account.deviceSettings
+    options: options
+  }
+End Function
+
+
+Function userDeviceApi_createGetConsentReqInfo()
+  return {
+    url: m.constants.urls.account.consent
+  }
+End Function
+
+
+' @body: assocarray, contains a key value pair for ex: {"behavioral_advertising": opted_in, "essential_functionality": "required"}.
+Function userDeviceApi_createPatchConsentReqInfo(body)
+  headers = m.getCommonOptions().headers
+  options = {
+    method: m.constants.reqTypes.patch
+    body: FormatJson(body)
+    headers: headers
+  }
+  return {
+    url: m.constants.urls.account.consent
     options: options
   }
 End Function

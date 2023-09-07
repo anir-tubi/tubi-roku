@@ -81,6 +81,12 @@
 
       <field id="jumpToChannelItem" alias="VideoOverlay.jumpToChannelItem" />
 
+      <!-- indicates whether user opted out of tracking either through initial consent or settings screen. -->
+      <field id="didUserOptOutOfTracking" type="boolean" value="false" alias="PlayerAdsSSAITask.didUserOptOutOfTracking" />
+
+      <!-- indicates whether user opted out of Personalized Advertising either through initial consent or settings screen. -->
+      <field id="didUserOptOutOfPersonalizedAdvertising" type="boolean" value="false" alias="PlayerAdsSSAITask.didUserOptOutOfPersonalizedAdvertising" />
+
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />

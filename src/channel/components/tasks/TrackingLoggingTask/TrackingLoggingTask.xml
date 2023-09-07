@@ -61,5 +61,8 @@
 
       <!-- indicates the mode of the app and will be passed to all analytics events, ie. KIDS_MODE -->
       <field id="analyticsAppMode" type="string" value="DEFAULT_MODE"/>
+
+      <!-- indicates whether user opted out of tracking either through initial consent or settings screen. -->
+      <field id="didUserOptOutOfTracking" type="boolean" value="false"/>
   </interface>
 </component>

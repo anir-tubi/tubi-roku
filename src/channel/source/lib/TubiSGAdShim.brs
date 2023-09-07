@@ -39,6 +39,9 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
   end if
   port = CreateObject("roMessagePort")
   m.videoPlayerNode.observeField("adControl", port)
+  m.videoPlayerNode.observeFieldScoped("didUserOptOutOfTracking", port)
+  m.videoPlayerNode.observeFieldScoped("didUserOptOutOfPersonalizedAdvertising", port)
+  m.ads.roAdFramework.setLimitAdTracking(m.videoPlayerNode.didUserOptOutOfPersonalizedAdvertising)
 
   ' Let SceneGraph know that ad shim is ready
   m.videoPlayerNode.adState = "ready"
@@ -67,6 +70,10 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
         else
           m.videoPlayerNode.adState = "noAds"  ' if video player content was changed before we got here, return no ads
         end if
+      else if msg.GetField() = "didUserOptOutOfTracking"
+        m.ads.tracking.didUserOptOutOfTracking = msg.getData()
+      else if msg.GetField() = "didUserOptOutOfPersonalizedAdvertising"
+        m.ads.roAdFramework.setLimitAdTracking(msg.getData())
       end if
     end if
   end while

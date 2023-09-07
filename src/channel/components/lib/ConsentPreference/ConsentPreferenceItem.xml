@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ConsentPreferenceItem" extends="Group">
+  <script type="text/brightscript" uri="ConsentPreferenceItem.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <interface>
+    <!-- INPUTS -->
+    <field id="itemContent" type="node" />
+    <field id="height" type="float" />
+  </interface>
+
+  <children>
+      <LayoutGroup
+        id="contentSection"
+        itemSpacings="[9]"
+        translation="[30,0]">
+        <!-- Removing the vertical translation and using dummy rectangle to provide top and bottom padding since bounding rect array grid calculation is not in sync when translation is used. -->
+        <!-- This way we can follow one approach for both top and bottom padding, rather than using translation for top and rectangle for bottom padding. -->
+        <Rectangle
+          visible="false"
+          id="topPadding"
+          width="1"
+          height="12"/>
+        <Label
+          id="title">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Bold.ttf"
+            size="28" />
+        </Label>
+        <LayoutGroup
+          layoutDirection="horiz">
+          <Label
+            id="subTitle"
+            wrap="true">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Medium.ttf"
+              size="24" />
+          </Label>
+          <Label
+            id="toggleText"
+            horizAlign="right">
+            <Font
+              role="font"
+              uri="pkg:/fonts/Vaud-Bold.ttf"
+              size="24" />
+          </Label>
+        </LayoutGroup>
+        <Rectangle
+          visible="false"
+          id="bottomPadding"
+          width="1"
+          height="12"/>
+      </LayoutGroup>
+  </children>
+</component>

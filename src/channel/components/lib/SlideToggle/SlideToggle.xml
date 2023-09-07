@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - SlideToggle
+ -
+ - This component is used in draw a toggle slider for turning ON/OFF.
+ -
+ -->
+<component name="SlideToggle" extends="Group" >
+  <script type="text/brightscript" uri="SlideToggle.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="isToggleOn" type="boolean"/>
+  </interface>
+
+  <children>
+    <Poster
+      id="toggleRail"
+      width="80"
+      height="60"
+      uri="pkg:/images/toggle-rail-off.png"
+      translation="[60,0]" />
+    <Poster
+      id="selector"
+      width="60"
+      height="60"
+      uri="pkg:/images/toggle-nipple.png"
+      translation="[57,0]" />
+  </children>
+</component>

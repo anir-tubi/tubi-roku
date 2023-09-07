@@ -47,6 +47,12 @@
          -->
         <field id="manifestAttempts" type="integer" value="0" />
 
+        <!-- indicates whether user opted out of tracking either through initial consent or settings screen. -->
+        <field id="didUserOptOutOfTracking" type="boolean" value="false"/>
+
+        <!-- indicates whether user opted out of Personalized Advertising either through initial consent or settings screen. -->
+        <field id="didUserOptOutOfPersonalizedAdvertising" type="boolean" value="false"/>
+
       <!-- OUTPUT -->
         <!-- updated video resources with urls that include ad params needed by yospace to fetch ads from
              rainmaker.

@@ -1,4 +1,4 @@
-Function TubiTracking(constants, request, auth)
+Function TubiTracking(constants, request, auth, didUserOptOutOfTracking = false)
   return {
     constants: constants
     request: request
@@ -37,6 +37,9 @@ Function TubiTracking(constants, request, auth)
 
     ' an AA map of Menu items in the details screen to their corresponding enum values for the LeftSideNavComponent Section
     detailScreenMenuItemMap: tubiTracking_getDetailScreenMenuPageMap(constants)
+
+    ' Holds a boolean value indicating whether user has opted out of tracking.
+    didUserOptOutOfTracking: didUserOptOutOfTracking
   }
 End Function
 
@@ -89,10 +92,13 @@ End Function
 ' @requestQueue: assocArray, a request queue as returned by TubiRequestQueue().create()
 Function tubiTracking_trackUserEvent(eventType = "", eventValues = invalid, requestQueue = invalid)
   if eventType <> ""
-    trackData = m.getClientEvent(eventType, eventValues)
-    userRequest = m.getUserTrackingRequest(eventType, trackData)
-    if userRequest <> invalid AND requestQueue <> invalid
-      requestQueue.pushRequest(userRequest)
+    blockedAnalyticsEvents = m.constants.externalConfig.info.blocked_analytics_events
+    if m.didUserOptOutOfTracking = false OR isAA(blockedAnalyticsEvents) = false OR blockedAnalyticsEvents.doesExist(eventType) = false
+      trackData = m.getClientEvent(eventType, eventValues)
+      userRequest = m.getUserTrackingRequest(eventType, trackData)
+      if userRequest <> invalid AND requestQueue <> invalid
+        requestQueue.pushRequest(userRequest)
+      end if
     end if
   end if
 End Function
@@ -843,6 +849,10 @@ Function tubiTracking_getOneOfs()
     video_id: -1
   }
 
+  your_privacy_page = {}
+
+  privacy_preferences_page = {}
+
   section_leftNav = {
     left_nav_section: "" ' Section enum
   }
@@ -900,6 +910,8 @@ Function tubiTracking_getOneOfs()
     age_gate_page: age_gate_page
     worldcup_browse_page: worldcup_browse_page
     upcoming_content_page: upcoming_content_page
+    your_privacy_page: your_privacy_page
+    privacy_preferences_page: privacy_preferences_page
     ' splash_page: splash_page
     ' forget_page: forget_page
   }
@@ -909,7 +921,6 @@ Function tubiTracking_getOneOfs()
     dest_static_page: static_page
     dest_home_page: home_page
     dest_for_you_page: for_you_page
-    dest_category_page: category_page
     dest_category_page: category_page
     dest_sub_category_page: sub_category_page
     dest_category_list_page: category_list_page
@@ -933,6 +944,8 @@ Function tubiTracking_getOneOfs()
     dest_age_gate_page: age_gate_page
     dest_worldcup_browse_page: worldcup_browse_page
     dest_upcoming_content_page: upcoming_content_page
+    dest_your_privacy_page: your_privacy_page
+    dest_privacy_preferences_page: privacy_preferences_page
     ' dest_splash_page: splash_page
     ' dest_forget_page: forget_page
   }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ManagePreferencesScreen" extends="BaseScreen">
+  <script type="text/brightscript" uri="ManagePreferencesScreen.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+    <field id="consents" type="array" alias="ManagePreferences.consents"/>
+
+    <!-- OUTPUTS -->
+    <field id="selectedConsents" type="assocarray"/>
+    
+    <!-- Will be set to when user clicks toggles the perference item. sample value: {"key": "behavioral_advertising", "value": "opt_in"} -->
+    <field id="selectedPreferenceInfo" type="assocarray"/>
+  </interface>
+
+  <children>
+    <Poster
+      id="background"
+      width="1920"
+      height="1080"
+      translation="[0,0]"/>
+    <Group
+      translation="[192, 126]">
+      <Label
+        id="heading">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="72" />
+      </Label>
+      <ManagePreferences
+        id="managePreferences"/>
+      <SimpleButton
+        id="saveAndContinueBtn"
+        width="369"
+        fontSize="24"/>
+    </Group>
+  </children>
+</component>

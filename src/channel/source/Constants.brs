@@ -312,6 +312,8 @@ Function getConstants()
     constants.reqNames.patchServerPersistentData = "patchServerPersistentData"
     constants.reqNames.getPauseAd = "getPauseAd"
     constants.reqNames.postPauseAdPixel = "postPauseAdPixel"
+    constants.reqNames.getConsent = "getConsent"
+    constants.reqNames.patchConsent = "patchConsent"
 
     ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
@@ -349,6 +351,8 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverHomeScreenContainerIds] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getServerPersistentData] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.patchServerPersistentData] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getConsent] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.patchConsent] = true
 
 
   constants.anonymous = {}
@@ -577,6 +581,7 @@ Function getConstants()
       constants.urls.account.magicLink = constants.urls.account.urlBase + "/device/magic_link"
       constants.urls.account.signup = constants.urls.account.urlBase + "/user/signup"
       constants.urls.account.deviceSettings = constants.urls.account.urlBase + "/device/settings"
+      constants.urls.account.consent = constants.urls.account.urlBase + "/consent"
 
       constants.urls.account.anonymous = {}
       constants.urls.account.anonymous.signingKey = constants.urls.account.urlBase + "/device/anonymous/signing_key"
@@ -1183,6 +1188,8 @@ Function getConstants()
       constants.ui.screenLevels.freeForeverScreen = 110
       constants.ui.screenLevels.availableDeviceScreen = 111
       constants.ui.screenLevels.landingScreen = 112
+      constants.ui.screenLevels.consentScreen = 120
+      constants.ui.screenLevels.managePreferencesScreen = 130
       constants.ui.screenLevels.screensaverScreen = 1100
 
     constants.ui.screenIds = {}
@@ -1214,6 +1221,8 @@ Function getConstants()
       constants.ui.screenIds.baseScreen = "baseScreen"
       constants.ui.screenIds.tournamentScreen = "tournamentScreen"
       constants.ui.screenIds.screensaverScreen = "screensaverScreen"
+      constants.ui.screenIds.consentScreen = "consentScreen"
+      constants.ui.screenIds.managePreferencesScreen = "managePreferencesScreen"
 
     ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,
     ' because currently we support only portrait style in category detail screen
@@ -1400,6 +1409,16 @@ Function getConstants()
       constants.ui.uris.myStuffMyListIcon = "pkg:/images/screenMyStuffMyListIcon.webp"
       constants.ui.uris.myStuffContinueWatchingIcon = "pkg:/images/screenMyStuffContinueWatchingIcon.webp"
 
+    constants.ui.consentActionButtonIds = {}
+      constants.ui.consentActionButtonIds.manage = "manage"
+      constants.ui.consentActionButtonIds.accept = "accept"
+      constants.ui.consentActionButtonIds.reject = "reject"
+
+  constants.consentKeys = {}
+    constants.consentKeys.analytics = "analytics"
+    constants.consentKeys.personalization = "personalization"
+    constants.consentKeys.marketing = "marketing_"
+
 'THEME/COLOR START///////////////////////
 '//::TODO::colors - the following constants should be moved to themes. The app should not call these constants
 constants.ui.uris.defaultBackground = "pkg:/images/art-blur-background.webp"
@@ -1430,7 +1449,7 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
     defaultDarkTransparentForeground75 = "THEME_defaultDarkTransparentForeground75_THEME"
     defaultDarkSolidSurface10 = "THEME_defaultDarkSolidSurface10_THEME"
     defaultDarkSolidSurface20 = "THEME_defaultDarkSolidSurface20_THEME"
-    ' defaultDarkStatusSuccess = "THEME_defaultDarkStatusSuccess_THEME"   '//::NOTE:: not currently being used
+    defaultDarkStatusSuccess = "THEME_defaultDarkStatusSuccess_THEME"
     defaultDarkStatusCaution = "THEME_defaultDarkStatusCaution_THEME"
     defaultDarkStatusAlert = "THEME_defaultDarkStatusAlert_THEME"
 
@@ -1455,7 +1474,7 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
     kidsDarkTransparentForeground75 = "THEME_kidsDarkTransparentForeground75_THEME"
     kidsDarkSolidSurface10 = "THEME_kidsDarkSolidSurface10_THEME"
     kidsDarkSolidSurface20 = "THEME_kidsDarkSolidSurface20_THEME"
-    ' kidsDarkStatusSuccess = "THEME_kidsDarkStatusSuccess_THEME"   '//::NOTE:: not currently being used
+    'kidsDarkStatusSuccess = "THEME_kidsDarkStatusSuccess_THEME"   '//::NOTE:: not currently being used
     kidsDarkStatusCaution = "THEME_kidsDarkStatusCaution_THEME"
     kidsDarkStatusAlert = "THEME_kidsDarkStatusAlert_THEME"
 
@@ -1479,7 +1498,7 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
     holidaysDarkTransparentForeground75 = "THEME_holidaysDarkTransparentForeground75_THEME"
     holidaysDarkSolidSurface10 = "THEME_holidaysDarkSolidSurface10_THEME"
     holidaysDarkSolidSurface20 = "THEME_holidaysDarkSolidSurface20_THEME"
-    ' holidaysDarkStatusSuccess = "THEME_holidaysDarkStatusSuccess_THEME"   '//::NOTE:: not currently being used
+    'holidaysDarkStatusSuccess = "THEME_holidaysDarkStatusSuccess_THEME"   '//::NOTE:: not currently being used
     holidaysDarkStatusCaution = "THEME_holidaysDarkStatusCaution_THEME"
     holidaysDarkStatusAlert = "THEME_holidaysDarkStatusAlert_THEME"
 
@@ -1514,6 +1533,7 @@ constants.ui.themes = {}
         scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground.9.png"
         gradientBlendColor: defaultDarkPrimaryBackground
 
+        successColor: defaultDarkStatusSuccess
         cautionColor: defaultDarkStatusCaution
         backgroundColor: defaultDarkPrimaryBackground
         neutralColor: defaultDarkTransparentForeground20

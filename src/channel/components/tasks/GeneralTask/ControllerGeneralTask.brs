@@ -211,6 +211,16 @@ Function registerParsingCallbacks()
   m.requestTypes[m.constants.reqNames.getPauseAd] = {
     parseSuccess: parsePauseAdSuccess
   }
+
+  ' Get Consent.
+  m.requestTypes[m.constants.reqNames.getConsent] = {
+    parseSuccess: parseGetConsent
+  }
+
+  ' Patch Consent.
+  m.requestTypes[m.constants.reqNames.patchConsent] = {
+    parseSuccess: parseGenericSuccess
+  }
 End Function
 
 

@@ -105,7 +105,7 @@ Function init()
 
   ' initialize states needed for various parts of kids mode
   m.kidsModeFeatureOn = false 'Should the kids Mode feature be made available for the user to interact with
-  if m.constants.deviceInfo.countryCode <> invalid AND (UCase(m.constants.deviceInfo.countryCode) = "US" OR UCase(m.constants.deviceInfo.countryCode) = "CA")
+  if m.constants.deviceInfo.countryCode <> invalid AND isKidsModeAvailableByCountry() = true
     m.kidsModeFeatureOn = true
   end if
 
@@ -210,6 +210,12 @@ Function init()
   ' For now we are queuing message if the user is in parental controls / kids mode or if there is screen in process of loading.
   ' Used for braze integration.
   m.queuedInAppMessage = invalid
+
+  ' Status of user consent check will be used for GDPR. If user consent is required and not given then we will present the user with consent screen.
+  m.isConsentCheckComplete = false
+  ' Holds information related to individual consents and also other GDPR related values like privacy center flags.
+  ' Sample data. {"consentRequired": true, [{"key": "behavioral_advertising","subtitle": "Tubi may use your information to make inferences and predict your potential areas of interest.","title": "Targeted Advertising","value": "required", "isRequired": true}]}
+  m.consentSettings = {}
 End Function
 
 
@@ -355,7 +361,12 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
         m.enteredFromDeepLink = false
       end if
 
-      if m.SideNav.opened = false
+      ' Adding a check to see if the user has completed consent flow.
+      ' if not then showing exit dialog since we have not loaded any screens since it is pre-requiste for loading home screen.
+      currentScreen = getCurrentScreen()
+      if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.consentScreen
+        displayExitModal(currentScreen.trackingPageInfo)
+      else if m.SideNav.opened = false
         if m.SideNav.visible = true
           openSideNavFromButton() '//"BUTTON_BACK"
         else if m.screenStack.getChildCount() > 1
@@ -554,6 +565,8 @@ Function startUserExperience()
     end if
   else if m.getServerPersistentDataComplete <> true
     getServerPersistentData(startUserExperience)
+  else if m.isConsentCheckComplete <> true
+    getConsent(onInitialGetConsentRequestComplete)
   else if shouldShowAgeGate() = true AND m.ageVerificationComplete <> true
     ' check if we have age information for the user
     if isLoggedInUser() = true
@@ -594,18 +607,8 @@ Function startUserExperience()
     ' initSideNav also relies on m.global.authInfo being set in order to run isParentalControlsAdultLevel
     initSideNav()
 
-    showContentGroup()
+    showContentGroupAndHideSpinner()
 
-    ' Since we're ready to start the channel, make sure the loading spinner is hidden
-    root = m.top.getScene()
-    if root <> invalid
-      sceneSpinner = root.findNode("LoadingSpinner")
-      if sceneSpinner <> invalid then
-        sceneSpinner.visible = false 'the spinner in the scene component
-      end if
-    end if
-
-    m.spinner.visible = false ' the spinner in the contentController component
     sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
     sendDeviceLog()
 
@@ -640,20 +643,9 @@ Function startUserExperience()
       startChannelFromAppLoad()
     end if
 
-    ' Since braze starts sending request immediately as soon we create the task and we need to inform braze about logged in status.
-    ' Delaying it until we complete the auth check. Also this prevents us from showing braze pop up on top of splash screen etc.
-    ' We noticed that if braze respondes quickly and our endpoints take time we ended up showing the braze modal before even home screen loaded.
-    ' Moving it here allows the application to load required endpoints and also menu etc before we start braze.
-    ' Configuring the braze sdk.
-    configureBrazeSdk()
-    ' Starting the braze task.
-    m.brazeTask = CreateObject("roSGNode", "BrazeTask")
-    ' Stopping the braze task until we know the user logged in status so that we can present non logged in user modal for logged in user.
-    m.braze = getBrazeInstance(m.brazeTask)
-    m.brazeTask.unobserveFieldScoped("BrazeInAppMessage")
-    m.brazeTask.observeFieldScoped("BrazeInAppMessage", "onInAppMessageTriggered")
-    authInfo = getFieldFromGlobal("authInfo")
-    setBrazeUserData(authInfo)
+    if getConsentOptOutStatusByKey(m.constants.consentKeys.marketing) = false
+      configureBrazeAndInitializeTask()
+    end if
   end if
 End Function
 
@@ -1696,6 +1688,17 @@ Function isDeviceInUSorCA()
 End Function
 
 
+Function isKidsModeAvailableByCountry()
+  countryCode = UCase(m.constants.deviceInfo.countryCode)
+  availableCountries = {
+    "US": true
+    "CA": true
+    "NZ": true
+  }
+  return (availableCountries.doesExist(countryCode) = true)
+End Function
+
+
 Function isDeviceInUS()
   return UCase(m.constants.deviceInfo.countryCode) = "US"
 End Function
@@ -2262,11 +2265,92 @@ Function updateScreenCacheOnPlayback(currentVideoScreenID)
 End Function
 
 
-Function isGDPR()
-  gdprCountries = {
-    "uk": true
-    "nz": true
-  }
-  lowerCountryCode = LCase(m.constants.deviceInfo.countryCode)
-  return (gdprCountries[lowerCountryCode] <> invalid)
+Function showContentGroupAndHideSpinner()
+  showContentGroup()
+
+  ' Since we're ready to start the channel, make sure the loading spinner is hidden
+  root = m.top.getScene()
+  if root <> invalid
+    sceneSpinner = root.findNode("LoadingSpinner")
+    if sceneSpinner <> invalid then
+      sceneSpinner.visible = false 'the spinner in the scene component
+    end if
+  end if
+
+  m.spinner.visible = false ' the spinner in the contentController component
+End Function
+
+
+' isUserInAdultsMode Returns true/false based on if the user is in adults mode based on parental controls and age info.
+Function isUserInAdultsMode()
+  tubiLog("ContentController.setUiModeFromState")
+  isUserInAdultsMode = true
+
+  ' Checking gf the parental control is not in adults level.
+  if isParentalControlsAdultLevel() = false
+    isUserInAdultsMode = false
+  else if shouldShowAgeGate() = true then
+    if m.guestUserHasAgeInfo = invalid then
+      m.guestUserHasAgeInfo = TubiAuth(m.constants, m.Request).getGuestUserHasAgeInfo()
+    end if
+
+    ' Have to make sure we check expired as well as default state will always have hasAge = false
+    if m.guestUserHasAgeInfo.hasAge = false AND m.guestUserHasAgeInfo.expired = false then
+      isUserInAdultsMode = false
+    end if
+  end if
+
+  return isUserInAdultsMode
+End Function
+
+' @key: string, key of the consent preference item. For ex: essential_functionality.
+Function showRequiredPreferenceToast(key)
+  consents = m.consentSettings.consents
+
+  ' Finding matching preference key title.
+  for each consent in consents
+    if consent.key = key
+      replacements = {
+        preference: consent.title
+      }
+      message = getTranslation("required_preference_selected_toast_message", replacements)
+      showToast({
+        "selfDestructTimer": 5
+        "headerText": getTranslation("required_preference_selected_toast_heading")
+        "message": message
+        "imageUri": "pkg:/images/consent-toast-icon.webp"
+      })
+      exit for
+    end if
+  end for
+End Function
+
+
+' Configures the braze sdk and initializes the braze task and stores the instance of braze sdk and braze task in m scope.
+Function configureBrazeAndInitializeTask()
+  ' Since braze starts sending request immediately as soon we create the task and we need to inform braze about logged in status.
+  ' Delaying it until we complete the auth check. Also this prevents us from showing braze pop up on top of splash screen etc.
+  ' We noticed that if braze respondes quickly and our endpoints take time we ended up showing the braze modal before even home screen loaded.
+  ' Moving it here allows the application to load required endpoints and also menu etc before we start braze.
+  ' Configuring the braze sdk.
+  configureBrazeSdk()
+  ' Starting the braze task.
+  m.brazeTask = CreateObject("roSGNode", "BrazeTask")
+  ' Stopping the braze task until we know the user logged in status so that we can present non logged in user modal for logged in user.
+  m.braze = getBrazeInstance(m.brazeTask)
+  m.brazeTask.unobserveFieldScoped("BrazeInAppMessage")
+  m.brazeTask.observeFieldScoped("BrazeInAppMessage", "onInAppMessageTriggered")
+  authInfo = getFieldFromGlobal("authInfo")
+  setBrazeUserData(authInfo)
+End Function
+
+
+' Stops the braze task and invalidates all braze variable in m scope.
+Function stopBrazeTask()
+  if m.brazeTask <> invalid
+    m.brazeTask.unobserveFieldScoped("BrazeInAppMessage")
+    m.brazeTask.control = "STOP"
+    m.brazeTask = invalid
+    m.braze = invalid
+  end if
 End Function

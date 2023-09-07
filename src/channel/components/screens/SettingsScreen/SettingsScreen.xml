@@ -7,6 +7,7 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -39,6 +40,12 @@
       <!-- Holds the isVideoPreviewOn value obtained from ServerPersistentData.isVideoPreviewOn. either user or device level value obtained from backend settings endpoint.  -->
       <field id="isVideoPreviewOn" type="boolean" value="true" />
 
+      <!-- Holds the consent preferences value obtained from backend. either user or device level.  -->
+      <field id="consentSettings" type="assocarray" />
+
+    <!-- Holds the true/false based on if the user is in adults mode and not in kids mode, and not in teens parental controls.  -->
+      <field id="isAllowedToManageConsent" type="boolean" value="false" />
+
     <!-- OUTPUTS -->
       <!-- triggers for upstream controller -->
       <field id="showDeviceModal" type="boolean" alwaysNotify="true" />
@@ -48,6 +55,8 @@
       <field id="signInSelected" type="boolean" alwaysNotify="true"/>
       <field id="parentalSettingSelected" type="integer" alwaysNotify="true"/>
       <field id="autoPreviewSettingSelected" type="integer" alwaysNotify="true" />
+      <field id="newConsentPreferences" type="assocarray" />
+      <field id="selectedQrCodeSectionInfo" type="assocarray" alwaysNotify="true" />
   </interface>
 
   <children>

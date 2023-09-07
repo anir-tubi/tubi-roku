@@ -692,3 +692,32 @@ Function userDeviceApi_createPatchDeviceSettingsReqInfo_test()
   requestBody = ParseJson(options.body)
   m.assertEqual(true, requestBody.enable_video_preview)
 End Function
+
+
+'@Test createGetConsentReqInfo unit tests
+Function userDeviceApi_createGetConsentReqInfo_test()
+  req = m.userDeviceApi.createGetConsentReqInfo()
+
+  m.assertNotInvalid(req)
+  ' Since the request only requires token and no other parameters there is no options to verify.
+  m.assertEqual(m.constants.urls.account.consent, req.url)
+End Function
+
+
+'@Test createPatchConsentReqInfo unit tests
+Function userDeviceApi_createPatchConsentReqInfo_test()
+  body = {"behavioral_advertising": "opted_in", "essential_functionality": "required"}
+  req = m.userDeviceApi.createPatchConsentReqInfo(body)
+
+  m.assertNotInvalid(req)
+  ' Since the request only requires token and no other parameters there is no options to verify.
+  m.assertEqual(m.constants.urls.account.consent, req.url)
+
+  options = req.options
+  m.assertNotInvalid(options)
+  m.assertNotEmpty(options.body)
+
+  requestBody = ParseJson(options.body)
+  m.assertEqual("opted_in", requestBody.behavioral_advertising)
+  m.assertEqual("required", requestBody.essential_functionality)
+End Function

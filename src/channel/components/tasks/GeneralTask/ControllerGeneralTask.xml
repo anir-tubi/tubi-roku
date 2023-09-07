@@ -23,6 +23,7 @@
     <script type="text/brightscript" uri="Parsers/ScreenSaverParsers.brs" />
     <script type="text/brightscript" uri="Parsers/UncategorizedParsers.brs" />
     <script type="text/brightscript" uri="Parsers/ServerPersistentDataParser.brs" />
+    <script type="text/brightscript" uri="Parsers/ConsentScreenParsers.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiBookmarks.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/CmsApi.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/ApiUtils.brs" />
@@ -33,4 +34,5 @@
     <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
     <script type="text/brightscript" uri="pkg:/components/lib/FIFAMixin.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
 </component>

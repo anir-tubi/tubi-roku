@@ -9,6 +9,8 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.uiMode = m.uiMode
   ' Passing in the saved isVideoPreviewOn.
   m.settingsScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
+  m.settingsScreen.isAllowedToManageConsent = isUserInAdultsMode() = true AND isKidsUIOn() = false
+  m.settingsScreen.consentSettings = m.consentSettings
   setSettingsScreenSignInInfo()
   m.settingsScreen.actionAfterActivation = ""
   m.settingsScreen.observeFieldScoped("signOutSelected", "onSettingsSignOutSelected")
@@ -20,6 +22,8 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.observeFieldScoped("showDeviceModal", "onShowDeviceModal")
   m.settingsScreen.observeFieldScoped("backButtonPressed", "onSettingsBackPressed")
   m.settingsScreen.observeFieldScoped("autoPreviewSettingSelected", "onAutoPreviewSettingSelected")
+  m.settingsScreen.observeFieldScoped("newConsentPreferences", "onNewConsentPreferences")
+  m.settingsScreen.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
   if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" 'this is for extra protection not to restart the app
     m.settingsScreen.observeFieldScoped("appRestartRequested", "onAppRestartRequested")
   end if
@@ -324,6 +328,9 @@ Function refreshScreenAfterParentalChanges()
       screen.signedIn = true
     else if screen.id = m.constants.ui.screenIds.channelListScreen or screen.id = m.constants.ui.screenIds.categoryListScreen
       refreshGridScreen(screen)
+    else if screen.id = m.constants.ui.screenIds.settingsScreen
+      ' Updating the value after parentalControls had been changed.
+      m.settingsScreen.isAllowedToManageConsent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
     end if
   end if
 
@@ -361,7 +368,12 @@ Function updateParentalSettingsSuccessResponse(response)
       end if
     end if
 
-    refreshScreenAfterParentalChanges()
+    ' If the parental controls was changed to adults.
+    if isUserInAdultsMode() = true AND isKidsUIOn() = false
+      getConsent(onConsentRefreshAfterParentalControlsChange)
+    else
+      refreshScreenAfterParentalChanges()
+    end if
 
     dialogEvent = {
       type: "dialog"
@@ -386,6 +398,23 @@ Function updateParentalSettingsSuccessResponse(response)
     message = getTranslation(sMessageID)
     showSimpleInstantResumableModal(title, message, [], dialogEvent, m.trackingLoggingTask)
   end if
+End Function
+
+
+Function onConsentRefreshAfterParentalControlsChange()
+  ' If user has already provided consent then skipping the show consent screen and updating the settings screen.
+  if m.consentSettings <> invalid AND m.consentSettings.consentRequired = true
+    showConsentScreen(refreshScreenAfterConsentAndParentalChange)
+  else
+    refreshScreenAfterParentalChanges()
+  end if
+End Function
+
+
+Function refreshScreenAfterConsentAndParentalChange()
+  ' Removing the consent screen from stack and refreshing the settings screen.
+  popScreen(true, true)
+  refreshScreenAfterParentalChanges()
 End Function
 
 
@@ -474,4 +503,70 @@ Function onAppRestartRequested()
   if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" 'this is for extra protection not to restart the app
     restartApp()
   end if
+End Function
+
+
+Function onNewConsentPreferences(msg)
+  selectedConsents = msg.getData()
+  keys = selectedConsents.Keys()
+  ' we expect only single key/value pair in selectedConsents. so accessing the 0th item as it has only one item.
+  key = keys[0]
+  value = selectedConsents[key]
+  if value <> "required"
+    userInteractionValue = "TOGGLE_ON"
+    if value = "opted_out"
+      userInteractionValue = "TOGGLE_OFF"
+    end if
+    for i = 0 to m.consentSettings.consents.Count()-1
+      if m.consentSettings.consents[i].key = key
+        m.consentSettings.consents[i].value = value
+      end if
+    end for
+
+    m.settingsScreen.consentSettings = m.consentSettings
+    setConsent(selectedConsents)
+
+    componentValues = {
+      button_type: "TOGGLE"
+      button_value: key
+    }
+    pageValues = {
+      account_page_type: "PRIVACY_PREFERENCES"
+    }
+    pageOneof = m.Tracking.getAnalyticsPage("account_page", pageValues)
+    componentOneof = m.Tracking.getAnalyticsComponent("button_component", componentValues)
+
+    componentInteractionEvent =  {
+      pageOneof: pageOneof
+      componentOneof: componentOneof
+      user_interaction: userInteractionValue
+    }
+    m.trackingLoggingTask.trackEvent = {
+      type: "component_interaction"
+      values: componentInteractionEvent
+    }
+  else
+    showRequiredPreferenceToast(key)
+  end if
+End Function
+
+
+Function onSelectedQrCodeSectionInfoChanged(msg)
+  data = msg.getData()
+  message = getTranslation("privacy_preferences_qrcode_modal_subheading")
+  buttons = [getTranslation("dialog_got_it")]
+
+  ' TODO: Will add the analytics specs once finalized.
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: ""
+      pageOneof: {}
+      dialog_action: "SHOW"
+      dialog_sub_type: ""
+    }
+  }
+  
+  simpleModalInfo = getSimpleModalInfo(data.heading, message, buttons, dialogEvent, m.trackingLoggingTask)
+  showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
 End Function

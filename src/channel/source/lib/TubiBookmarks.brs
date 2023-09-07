@@ -403,7 +403,18 @@ Function tubiBookmarks_handleUserInfo(userInfo)
     if parsed.is_confirmed <> invalid then    result.isConfirmed = parsed.is_confirmed
     if parsed.enabled <> invalid then         result.enabled = parsed.enabled
     if parsed.has_password <> invalid then    result.hasPassword = parsed.has_password
-    if parsed.parental_rating <> invalid then result.parentalRating = parsed.parental_rating
+
+    if parsed.parental_rating <> invalid
+      result.parentalRating = parsed.parental_rating
+
+      if isGDPR() = true 'bs:disable-line 1001 LINT1001
+
+        'Setting Parental Control option to Older Kids for nz & uk region, if the parental option was selected as Teens from other region
+        if parsed.parental_rating = 2
+          result.parentalRating = 1
+        end if
+      end if
+    end if
 
     result.email = ""
     if parsed.email <> invalid

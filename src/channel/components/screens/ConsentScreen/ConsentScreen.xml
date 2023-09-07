@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ConsentScreen" extends="BaseScreen">
+  <script type="text/brightscript" uri="ConsentScreen.brs" />
+
+  <interface>
+    <!-- INPUT -->
+    <!-- Holds the value of initial consent screen description. -->
+    <field id="description" alias="description.text"/>
+
+    <!-- OUTPUT -->
+    <!-- Contains id of the selected button. Possible values manage,accept,reject. -->
+    <field id="buttonSelected" type="string" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <Poster
+      id="background"
+      width="1920"
+      height="1080"
+      translation="[0,0]"/>
+    <LayoutGroup
+      translation="[192, 126]"
+      itemSpacings="[15, 48, 147]" >
+      <Label
+        id="heading">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-SemiBold.ttf"
+          size="72" />
+      </Label>
+      <Label
+        id="subheading">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="33" />
+      </Label>
+      <Label
+        id="description"
+        width="1320"
+        maxLines="9"
+        wrap="true">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="27" />
+      </Label>
+    </LayoutGroup>
+    <FilledButtonMarkupGrid
+      id="buttonList"
+      itemSize="[384, 72]"
+      itemComponentName="ListItemButtonWithBg"
+      itemSpacing="[0, 12]"
+      translation="[192, 702]"
+      numRows="3"
+      numColumns="1"
+      vertFocusAnimationStyle="floatingFocus"/>
+  </children>
+</component>

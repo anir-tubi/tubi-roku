@@ -221,7 +221,7 @@ Function setVideoPreviewAfterFocus(focusedContent, pageType)
         if focusedContent.videoPreviewUrl <> ""
           startVideoPreview(focusedContent, pageType)
         end if
-        
+
       end if
     end if
   end if

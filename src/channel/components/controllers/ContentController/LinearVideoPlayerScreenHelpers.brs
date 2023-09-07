@@ -62,12 +62,15 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
       unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
       videoPlayer.associatedScreenID = sAssociatedScreenID
       videoPlayer.allowTransportToAppear = bAllowTransportToAppear
-
       ' set general observers for all content
       videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
       if videoPlayer.visible = false
         videoPlayer.visible = true
       end if
+      
+      videoPlayer.didUserOptOutOfTracking = getConsentOptOutStatusByKey(m.constants.consentKeys.analytics)
+      videoPlayer.didUserOptOutOfPersonalizedAdvertising = getConsentOptOutStatusByKey(m.constants.consentKeys.personalization)
+
       ' it's necessary to push the screen after the content has been set on the videoPlayer component,
       ' so NavigateToPage and PageLoad events contain the necessary content id information
 

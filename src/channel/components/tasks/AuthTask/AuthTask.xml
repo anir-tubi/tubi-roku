@@ -21,6 +21,7 @@
     <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TimeUtils.brs" />
     <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
 
     <interface>
       <!-- INPUT -->

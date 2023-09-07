@@ -16,10 +16,6 @@ Function init()
 
   setSettingsMenuStringsAndIcons()
 
-  if UCase(m.constants.deviceInfo.countryCode) <> "US"
-    removeYourPrivacyChoicesButton()
-  end if
-
   resetSettingsMenuVerticalPosition()
 
   if m.global <> invalid
@@ -47,12 +43,8 @@ Function setSettingsMenuStringsAndIcons()
     ParentalControlsButton.title = getTranslation("screenSettings_menu_parentalControls")
     AboutButton =  m.top.findNode("AboutButton")
     AboutButton.title = getTranslation("screenSettings_menu_about")
-    PrivacyPolicyButton =  m.top.findNode("PrivacyPolicyButton")
-    PrivacyPolicyButton.title = getTranslation("screenSettings_menu_privacyPolicy")
-    TermsOfServiceButton =  m.top.findNode("TermsOfServiceButton")
-    TermsOfServiceButton.title = getTranslation("screenSettings_menu_tos")
-    YourPrivacyChoicesButton = m.top.findNode("YourPrivacyChoicesButton")
-    YourPrivacyChoicesButton.title = getTranslation("screenSettings_menu_yourPrivacyChoices")
+    PrivacyCenter = m.top.findNode("PrivacyCenterButton")
+    PrivacyCenter.title = getTranslation("screenSettings_menu_PrivacyCenter")
 
     if isVideoPreviewEnabled() = true then
       AutoplayPreviewButton = CreateObject("roSGNode", "DetailMenuItemContentNode")
@@ -116,12 +108,6 @@ End Function
 Function removeSignInButton()
   signInOutButton = m.top.findNode("SignInOutButton")
   removeButton(signInOutButton)
-End Function
-
-
-Function removeYourPrivacyChoicesButton()
-  yourPrivacyChoicesButton = m.top.findNode("YourPrivacyChoicesButton")
-  removeButton(yourPrivacyChoicesButton)
 End Function
 
 

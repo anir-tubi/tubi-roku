@@ -33,7 +33,7 @@ Function onThemeChange(msg = invalid)
   if theme <> invalid
     m.theme = theme
     m.label.color = theme.primaryTextColor
-    m.originalColor = theme.neutralColor
+    m.originalColor = theme.unfocusedColor
   end if
 End Function
 

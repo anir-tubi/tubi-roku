@@ -9,8 +9,13 @@ Function init()
   m.top.observeField("isLoading", "onIsLoading")
   m.ContentGroup = m.top.findNode("ContentGroup")
   m.Menu = m.top.findNode("ParentalControlsMenu")
-  m.Menu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
 
+  'hide Teens option for nz & uk region
+  if isGDPR() = true
+    removeTeensOption()
+  end if
+
+  m.Menu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
   m.Menu.observeFieldScoped("itemFocused", "onItemFocusChanged")
 
   'm.instructionsText is used to store the title and description of parental controls for screen reader when screen loaded.
@@ -41,7 +46,7 @@ Function setParentalControlStrings()
   newContent = m.Menu.content.clone(true)
   for i=0 to newContent.getChildCount()-1
     child = newContent.getChild(i)
-    sText = getTranslation("screenSettings_parentalControls_group" + i.toStr())
+    sText = getTranslation("screenSettings_parentalControls_group_" + child.id)
     child.title = sText
 
     '//Temporarily create checkbuttons for each button text to find the largest width necessary for the set of buttons,
@@ -61,6 +66,11 @@ Function setParentalControlStrings()
 
 End Function
 
+
+Function removeTeensOption()
+  teensGroup = m.top.findNode("Teens")
+  m.Menu.content.removeChild(teensGroup)
+End Function
 
 
 Function onComponentFocus()
@@ -89,6 +99,12 @@ End Function
 
 Function checkItemHelper(newIndex)
   newContent = m.Menu.content.clone(true)
+
+  'default focus to Adult
+  if newIndex >= newContent.getChildCount()
+    newIndex = newContent.getChildCount()-1
+  end if
+
   for i=0 to newContent.getChildCount()-1
     child = newContent.getChild(i)
     if i = newIndex

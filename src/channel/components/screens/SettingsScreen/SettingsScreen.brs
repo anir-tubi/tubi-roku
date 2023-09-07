@@ -51,6 +51,10 @@ Function init()
   m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
   m.top.screenLevel = m.constants.ui.screenLevels.settingsScreen
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
+
+  request = TubiRequest(m.constants.settings)
+  auth = TubiAuth(m.constants, request)
+  m.Tracking = TubiTracking(m.constants, request, auth)
 End Function
 
 
@@ -159,10 +163,8 @@ Function createNextPanel(buttonContent)
       nextPanel = createOrUpdateAutoPlayPreviewPanel()
     else if buttonContent.id = "AboutButton"
       nextPanel = createAboutPanel()
-    else if buttonContent.id = "PrivacyPolicyButton"
-      nextPanel = createLegalPanel(buttonContent.title, m.constants.urls.privacyUrl)
-    else if buttonContent.id = "TermsOfServiceButton"
-      nextPanel = createLegalPanel(buttonContent.title, m.constants.urls.termsOfUseUrl)
+    else if buttonContent.id = "PrivacyCenterButton"
+      nextPanel = createPrivacyCenterPanel(buttonContent.title)
     else if buttonContent.id = "TestingAidButton"
       nextPanel = createTestingAidPanel()
     else if buttonContent.id = "YourPrivacyChoicesButton"
@@ -249,7 +251,7 @@ Function createAutoPreviewPanel()
   videoPreviewPanel.selectButtonMovesPanelForward = false
   videoPreviewPanel.offset = m.rightPanelOffset
 
-  if m.top.isVideoPreviewOn = true    
+  if m.top.isVideoPreviewOn = true
     videoPreviewPanel.selectItem = 0
   else
     videoPreviewPanel.selectItem = 1
@@ -348,6 +350,60 @@ Function createLegalPanel(title, uri)
   requestTask.observeField("state", "onLegalState")
   textPanel.appendChild(requestTask)
   return textPanel
+End Function
+
+
+Function createPrivacyCenterPanel(title)
+  privacyCenterPanel = CreateObject("roSGNode", "PrivacyCenterPanel")
+  privacyCenterPanel.title = title
+  consentSettings = m.top.consentSettings
+  focusable = false
+  privacyCenterSettings = consentSettings.privacyCenterSettings
+  privacyCenterPanel.isAllowedToManageConsent = m.top.isAllowedToManageConsent
+  privacyCenterPanel.consentSettings = consentSettings
+  if privacyCenterSettings.showConsentPreferences = true AND consentSettings.consents.Count() > 0
+    for i = 0 to consentSettings.consents.Count()-1
+      if consentSettings.consents[i].value <> "required"
+        focusable = true
+        exit for
+      end if
+    end for
+  end if
+
+  if privacyCenterSettings.showTermsOfUse = true OR privacyCenterSettings.showPrivacyPolicy = true OR privacyCenterSettings.showDsar = true
+    focusable = true
+  end if
+
+  privacyCenterPanel.focusable = focusable
+  privacyCenterPanel.offset = [36,-201]
+  privacyCenterPanel.observeFieldScoped("newConsentPreferences", "onNewConsentPreferences")
+  privacyCenterPanel.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
+
+  pageValues = {
+    account_page_type: "PRIVACY_PREFERENCES"
+  }
+
+  ' TODO: This is a temporary event and a more thorough approach to analytics on the Settings page will be implemented in the near future.
+  m.top.navigateWithinPageInfo = {
+    pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, pageValues)
+    means_of_navigation: "SCROLL"
+    vertical_location: m.SettingsMenuPanel.list.currFocusRow + 1 ' Since focused index starts from zero.
+    horizontal_location: 1
+  }
+
+  return privacyCenterPanel
+End Function
+
+
+Function onNewConsentPreferences(msg)
+  selectedConsents = msg.getData()
+  m.top.newConsentPreferences = selectedConsents
+End Function
+
+
+Function onSelectedQrCodeSectionInfoChanged(msg)
+  data = msg.getData()
+  m.top.selectedQrCodeSectionInfo = data
 End Function
 
 

@@ -7,6 +7,7 @@ Function init()
   m.top.observeField("logMsg", m.port)
   m.top.observeField("logException", m.port)
   m.top.observeField("analyticsAppMode", m.port)
+  m.top.observeField("didUserOptOutOfTracking", m.port)
 
   m.constants = getConstantsFromGlobal()
 
@@ -27,7 +28,7 @@ Function watchLoop()
   m.auth = TubiAuth(m.constants, m.request)
   sentryInfo = Sentry(m.constants, m.auth)
   m.logger = TubiLogger(m.constants, m.request, m.auth, sentryInfo)
-  m.tracking = TubiTracking(m.constants, m.request, m.auth)
+  m.tracking = TubiTracking(m.constants, m.request, m.auth, m.top.didUserOptOutOfTracking)
   m.analyticsAppMode = "DEFAULT_MODE"
 
   'when the trackEvent field for the metadata task field is updated, the event is heard in this loop
@@ -35,14 +36,18 @@ Function watchLoop()
   while true
     msg = wait(0, m.port)
     if type(msg) = "roSGNodeEvent" then
-      if msg.GetField() = "trackEvent" then
-        trackSceneGraphEvent(msg.GetData(), m.analyticsAppMode)
-      else if msg.GetField() = "logMsg" then
-        sendSceneGraphLog(msg.GetData())
-      else if msg.GetField() = "logException" then
-        sendSceneGraphException(msg.GetData())
-      else if msg.GetField() = "analyticsAppMode"
-        m.analyticsAppMode = msg.GetData()
+      field = msg.GetField()
+      data = msg.GetData()
+      if field = "trackEvent" then
+        trackSceneGraphEvent(data, m.analyticsAppMode)
+      else if field = "logMsg" then
+        sendSceneGraphLog(data)
+      else if field = "logException" then
+        sendSceneGraphException(data)
+      else if field = "analyticsAppMode"
+        m.analyticsAppMode = data
+      else if field = "didUserOptOutOfTracking"
+        m.tracking.didUserOptOutOfTracking = data
       end if
     else if type(msg) = "roUrlEvent" then
       m.queue.handleEvent(msg)

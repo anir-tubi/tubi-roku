@@ -23,10 +23,11 @@ Function execAdsSSAITask()
   m.requestQueue = requestQueueLib.create(m.ssaiPort)
 
   auth = TubiAuth(m.constants, m.request)
-  m.tracking = TubiTracking(m.constants, m.request, auth)
+  m.tracking = TubiTracking(m.constants, m.request, auth, m.top.didUserOptOutOfTracking)
 
   m.adLib = TubiAds(m.constants, m.request, requestQueueLib, auth, m.tracking, "mp4")
   m.raf = m.adLib.roAdFramework
+  m.raf.setLimitAdTracking(m.top.didUserOptOutOfPersonalizedAdvertising)
 
   ' used to determine when to poll for ads
   m.timeSpan = CreateObject("roTimespan")
@@ -81,6 +82,8 @@ Function runSSAILoop(ssaiPort)
   m.top.observeField("id3Tags", ssaiPort)
   m.top.observeField("contentUpdated", ssaiPort)
   m.top.observeField("playbackStopped", ssaiPort)
+  m.top.observeFieldScoped("didUserOptOutOfTracking", ssaiPort)
+  m.top.observeFieldScoped("didUserOptOutOfPersonalizedAdvertising", ssaiPort)
   m.top.observeField("exit", ssaiPort)
 
   while true
@@ -96,6 +99,10 @@ Function runSSAILoop(ssaiPort)
         onTags(msg)
       else if messageField = "videoIsFullscreen"
         m.videoIsFullscreen = msg.getData()
+      else if messageField = "didUserOptOutOfTracking"
+        m.tracking.didUserOptOutOfTracking = msg.getData()
+      else if messageField = "didUserOptOutOfPersonalizedAdvertising"
+        m.raf.setLimitAdTracking(msg.getData())
       else if messageField = "playbackStopped"
         if isArray(m.adPod.ads) = true then
           notUsedAction = "exit_mid_pod"

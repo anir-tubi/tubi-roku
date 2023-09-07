@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="QRCodeSection" extends="Group">
+  <script type="text/brightscript" uri="QRCodeSection.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+
+  <interface>
+    <!-- INPUT -->
+    <!-- Holds the qr code section heading. -->
+    <field id="heading" alias="heading.text"/>
+
+    <!-- Holds the qr code section subheading. -->
+    <field id="subheading" alias="subheading.text"/>
+
+    <!-- Holds the qr code poster url. -->
+    <field id="qrCodePosterUrl" alias="qrCodePoster.uri"/>
+
+    <!-- Holds the width of the overall component. -->
+    <field id="width" alias="heading.width,subheading.width" value="900" />
+
+    <!-- Holds the size of the QR poster. Since QR codes are always square in size, using a single field for both height and width. -->
+    <field id="qrCodeSize" type="integer" />
+
+    <!-- OUTPUT -->
+    <!-- Sets to true whenever qr code is selected using ok button. -->
+    <field id="qrCodeSelected" type="boolean" value="false" alwaysNotify="true" />
+  </interface>
+
+  <children>
+    <LayoutGroup
+      itemSpacings="[6, 24]">
+      <Label
+        id="heading">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Bold.ttf"
+          size="36" />
+      </Label>
+      <Label
+        id="subheading"
+        wrap="true">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="27" />
+      </Label>
+      <Rectangle 
+        id="qrCodeHolder"
+        width="321"
+        height="321">
+        <Poster
+          id="qrCodePosterFocusRing"
+          visible="false"
+          width="321"
+          height="321"
+          uri="pkg:/images/selector-$$RES$$.9.png"
+          loadDisplayMode="scaleToFit" />
+        <Poster
+          id="qrCodePoster"
+          width="300"
+          height="300"
+          translation="[12, 12]"
+          loadDisplayMode="scaleToFit" />
+      </Rectangle>
+    </LayoutGroup>
+  </children>
+</component>

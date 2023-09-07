@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - ManagePreferences
+ -
+ - This component displays the list of consents which can be editable / non-editable based on backend settings
+ -
+ -->
+<component name="ManagePreferences" extends="Group">
+  <script type="text/brightscript" uri="ManagePreferences.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib//AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+
+    <!-- this field holds the consents in below format eg.
+      [
+        {
+          isrequired: false
+          key: "behavioral_advertising"
+          subtitle: "To provide you with the most relevant content, Tubi may use your information to make inferences and predict your potential areas of interest."
+          title: "Targeted Advertising"
+          value: "opted_out"
+        }, ...
+      ]
+    -->
+    <field id="consents" type="array"/>
+    <field id="itemSize" type="intarray" alias="preferenceMenu.itemSize"/>
+    <field id="rowHeights" type="intarray" />
+
+    <!-- subHeaderWidth field is used to set width for subHeader within item component -->
+    <field id="subHeaderWidth" type="integer"/>
+
+    <!-- totalWidth field is the total width of the item component -->
+    <field id="totalWidth" type="integer"/>
+
+    <field id="topGradientUri" type="string" alias="topGradient.uri" value="pkg:/images/list_overflow_gradient.webp" />
+    <field id="bottomGradientUri" type="string" alias="bottomGradient.uri" value="pkg:/images/list_overflow_bottom_gradient.webp" />
+
+    <!-- OUTPUTS -->
+    <field id="selectedConsent" type="assocarray" alwaysNotify="true"/>
+  </interface>
+
+  <children>
+    <FilledButtonMarkupGrid
+      id="preferenceMenu"
+      itemComponentName="ConsentPreferenceItem"
+      numRows="4"
+      numColumns="1"
+      vertFocusAnimationStyle="floatingFocus"/>
+    <Poster
+      id="topGradient"
+      height="72"
+      opacity="0"/>
+    <Poster
+      id="bottomGradient"
+      height="72"
+      opacity="0"/>
+  </children>
+</component>

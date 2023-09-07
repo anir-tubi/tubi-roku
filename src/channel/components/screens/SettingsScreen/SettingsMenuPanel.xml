@@ -47,14 +47,8 @@
             id="AboutButton"
             iconUrl="pkg:/images/icon-about.webp" />
           <DetailMenuItemContentNode
-            id="PrivacyPolicyButton"
+            id="PrivacyCenterButton"
             iconUrl="pkg:/images/icon-privacy.webp" />
-          <DetailMenuItemContentNode
-            id="TermsOfServiceButton"
-            iconUrl="pkg:/images/icon-terms.webp" />
-          <DetailMenuItemContentNode
-            id="YourPrivacyChoicesButton"
-            iconUrl="pkg:/images/icon-dns.webp" />
           <DetailMenuItemContentNode
             id="SignInOutButton"
             iconUrl="pkg:/images/icon-sign-in.webp" />

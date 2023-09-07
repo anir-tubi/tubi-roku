@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Extend the ContentNode so we can add some custom fields -->
+<component name = "ConsentPreferenceItemContentNode" extends="ContentNode">
+  <interface>
+
+    <!-- this field holds the subtitle of consent which will be displayed on preference screen -->
+    <field id="subtitle" type="string"/>
+
+    <!-- key field is used to identify the selected consents, possible values are behavioral_advertising, essential_functionality, personalization, analytics -->
+    <field id="key" type="string"/>
+
+    <!-- this field holds the value against each consents key - possible values are opted_in, opted_out, required -->
+    <field id="value" type="string"/>
+
+    <!-- isRequired field helps to identify whether any particular consent is editable or not -->
+    <field id="isRequired" type="boolean"/>
+
+    <!-- subHeaderWidth field is used to set width for subHeader within item component -->
+    <field id="subHeaderWidth" type="integer"/>
+
+    <!-- totalWidth field is the total width of the item component -->
+    <field id="totalWidth" type="integer"/>
+
+  </interface>
+</component>

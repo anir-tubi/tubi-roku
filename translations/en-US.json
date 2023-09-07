@@ -580,25 +580,25 @@
     "description": "The label for the autoplay preview",
     "message": "Autoplay Previews"
   },
-  "screenSettings_parentalControls_group0": {
-    "description": "Group 0 of the parental controls",
+  "screenSettings_parentalControls_group_LittleKids": {
+    "description": "Little Kids of the parental controls",
     "message": "Little Kids",
-    "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
+    "note": "This translation is used as screenSettings_parentalControls_group_LittleKids, please double check that it is not needed before deleting"
   },
-  "screenSettings_parentalControls_group1": {
-    "description": "Group 1 of the parental controls",
+  "screenSettings_parentalControls_group_OlderKids": {
+    "description": "Older Kids of the parental controls",
     "message": "Older Kids",
-    "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
+    "note": "This translation is used as screenSettings_parentalControls_group_OlderKids, please double check that it is not needed before deleting"
   },
-  "screenSettings_parentalControls_group2": {
-    "description": "Group 2 of the parental controls",
+  "screenSettings_parentalControls_group_Teens": {
+    "description": "Teens of the parental controls",
     "message": "Teens",
-    "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
+    "note": "This translation is used as screenSettings_parentalControls_group_Teens, please double check that it is not needed before deleting"
   },
-  "screenSettings_parentalControls_group3": {
-    "description": "Group 3 of the parental controls",
+  "screenSettings_parentalControls_group_Adults": {
+    "description": "Adults of the parental controls",
     "message": "Adults",
-    "note": "This translation is used as screenSettings_parentalControls_group[variable], please double check that it is not needed before deleting"
+    "note": "This translation is used as screenSettings_parentalControls_group_Adults, please double check that it is not needed before deleting"
   },
   "screenSettings_parentalControls_instructions": {
     "description": "Description of the parental controls screen",
@@ -623,6 +623,10 @@
   "screenSettings_menu_yourPrivacyChoices": {
     "description": "A menu Item for the Settings screen",
     "message": "Your Privacy Choices"
+  },
+  "screenSettings_menu_PrivacyCenter": {
+    "description": "A menu Item for the Settings screen",
+    "message": "Privacy Center"
   },
   "screenSettings_menu_signOut": {
     "description": "A menu Item for the Settings screen",
@@ -1557,5 +1561,85 @@
   "cc_audio_overlay_audio": {
     "description": "Available audio tracks section header label.",
     "message": "Audio"
+  },
+  "consent_screen_heading": {
+    "description": "Consent screen heading.",
+    "message": "Your Privacy"
+  },
+  "consent_screen_subheading": {
+    "description": "Consent screen sub heading.",
+    "message": "Please take a moment to confirm your data privacy preferences"
+  },
+  "manage_preferences_button_label": {
+    "description": "Manage preferences button label.",
+    "message": "Manage Preferences"
+  },
+  "accept_button_label": {
+    "description": "Accept button label.",
+    "message": "Accept"
+  },
+  "reject_button_label": {
+    "description": "Reject button label.",
+    "message": "Reject"
+  },
+  "privacy_preferences_label": {
+    "description": "privacy preferences screen title.",
+    "message": "Privacy Settings"
+  },
+  "privacy_preferences_save_continue_button": {
+    "description": "Save and Continue button on Consent Manage preferences",
+    "message": "Save and Continue"
+  },
+  "privacy_preferences_privacy_section_heading": {
+    "description": "Privacy section heading.",
+    "message": "Privacy Policy"
+  },
+  "privacy_preferences_privacy_section_subheading": {
+    "description": "Privacy section subheading.",
+    "message": "To view Tubi's Privacy Policy, scan the QR code below with your mobile device or visit "
+  },
+  "privacy_preferences_dsar_section_heading": {
+    "description": "DSAR section heading.",
+    "message": "Data Subject Rights"
+  },
+  "privacy_preferences_dsar_section_subheading": {
+    "description": "DSAR section subheading.",
+    "message": "To view your Data Rights and complete a request, scan the QR code below with your mobile device or visit "
+  },
+  "privacy_preferences_tos_section_heading": {
+    "description": "Terms of service section heading.",
+    "message": "Terms of Use"
+  },
+  "privacy_preferences_tos_section_subheading": {
+    "description": "Terms of service section subheading.",
+    "message": "To view Tubi's Terms of Use, scan the QR code below with your mobile device or visit "
+  },
+  "privacy_preferences_qrcode_modal_subheading": {
+    "description": "QR Code Selected Modal subheading.",
+    "message": "Scan the QR Code on the previous screen with your mobile device to view the link."
+  },
+  "privacy_preferences_on": {
+    "description": "Privacy preferences toggle text on",
+    "message": "On"
+  },
+  "privacy_preferences_off": {
+    "description": "Privacy preferences toggle text off",
+    "message": "Off"
+  },
+  "privacy_preferences_required": {
+    "description": "Privacy preferences required text",
+    "message": "Required"
+  },
+  "required_preference_selected_toast_heading": {
+    "description": "Toast header when required preference item is selected.",
+    "message": "Setting Required"
+  },
+  "required_preference_selected_toast_message": {
+    "description": "Toast message when required preference item is selected.",
+    "message": "{preference} Functionality is necessary to continue."
+  },
+  "privacy_center_not_editable_mode_warning": {
+    "description": "Warning label that will be displayed in privacy center whenever user is in kids mode or any parental controls mode.",
+    "message": "Privacy preferences can only be edited outside of Tubi Kids. Only Essential Data will be collected and used."    
   }
 }

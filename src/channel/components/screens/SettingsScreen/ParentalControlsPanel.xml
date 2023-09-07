@@ -6,6 +6,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -61,13 +62,13 @@
           id="SettingsMenuContent"
           role="content">
           <CheckButtonContentNode
-            id="LittleKidsGroup0"/>
+            id="LittleKids"/>
           <CheckButtonContentNode
-            id="OlderKidsGroup1"/>
+            id="OlderKids"/>
           <CheckButtonContentNode
-            id="TeensGroup2"/>
+            id="Teens"/>
           <CheckButtonContentNode
-            id="AdultsGroup3"/>
+            id="Adults"/>
         </ContentNode>
       </MarkupList>
     </Group>

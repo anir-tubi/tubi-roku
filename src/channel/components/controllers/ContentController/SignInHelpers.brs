@@ -398,7 +398,6 @@ Function showSignInScreen(userInput)
   signInScreen.observeFieldScoped("signInSelected", "onSignInSelected")
   signInScreen.observeFieldScoped("forgotPasswordSelected", "onForgotPasswordButtonSelected")
   signInScreen.observeFieldScoped("emailSelected", "onSignInScreenEmailSelected")
-  signInScreen.observeFieldScoped("staticPageSelected", "onStaticPageSelected")
   signInScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
   pushScreen(signInScreen, true, true)
 End Function
@@ -470,21 +469,6 @@ Function onBackgroundScreenUpdated(msg)
       uriList: screen.backgroundUriList
     }
   end if
-End Function
-
-
-' onStaticPageSelected callback is triggered when user selects static links on signUp/signIn screens
-Function onStaticPageSelected(evt)
-
-  staticPageSelected = evt.getData()
-  ' sending static page name(ToS/PP/YourPrivacyChoices) & screen level
-  currentScreen = getCurrentScreen()
-  pageSource = ""
-  if currentScreen <> invalid AND currentScreen.getSubtype() = "SignInScreen"
-    pageSource = m.constants.ui.screenIds.signInScreen
-  end if
-  showSettingsScreen(staticPageSelected, 150, pageSource)
-
 End Function
 
 
@@ -700,7 +684,7 @@ Function onActivationSuccess()
   end if
 
   m.authTask = CreateObject("roSGNode", "AuthTask")
-  m.authTask.observeFieldScoped("authInfo", "refreshServerPersistentDataAfterSignIn")
+  m.authTask.observeFieldScoped("authInfo", "refreshConsent")
   m.authTask.functionName = "execInitializeUserData"
   m.authTask.control = "RUN"
   m.spinner.visible = true
@@ -714,6 +698,20 @@ Function handleUpdatedAuthAndGetServerPersistentData(callback)
   handleUpdatedAuth()
   getServerPersistentData(callback)
 End Function
+
+
+Function refreshConsent()
+  getConsent(showConsentScreenOrRefreshServerPersistentData)
+End Function
+
+
+Function showConsentScreenOrRefreshServerPersistentData()
+  if m.consentSettings <> invalid AND m.consentSettings.consentRequired = true
+    showConsentScreen(refreshServerPersistentDataAfterSignIn)
+  else
+    refreshServerPersistentDataAfterSignIn()
+  end if
+end function
 
 
 Function refreshServerPersistentDataAfterSignIn()
@@ -819,8 +817,22 @@ Function onSignOutCompleted()
     }
   }
 
-  handleUpdatedAuthAndGetServerPersistentData(onPostSignOutServerPersistentDataRefresh)
+  handleUpdatedAuthAndGetServerPersistentData(getConsentAfterSignOut)
 End Function
+
+
+Function getConsentAfterSignOut()
+  getConsent(showConsentScreenOrRefreshServerPersistentDataAfterSignOut)
+End Function
+
+
+Function showConsentScreenOrRefreshServerPersistentDataAfterSignOut()
+  if m.consentSettings <> invalid AND m.consentSettings.consentRequired = true
+    showConsentScreen(onPostSignOutServerPersistentDataRefresh)
+  else
+    onPostSignOutServerPersistentDataRefresh()
+  end if
+end function
 
 
 Function onPostSignOutServerPersistentDataRefresh()
@@ -1053,6 +1065,8 @@ Function popScreenAfterSignInProcess()
     "SignUpAgeVerificationScreen": true
     "EmailVerificationScreen": true
     "ForgotPasswordProcessingScreen": true
+    "ConsentScreen": true
+    "ManagePreferencesScreen": true
   }
 
   count = m.screenStack.getChildCount()-1

@@ -41,18 +41,6 @@ Function init()
     m.buttonsGroup.removeChild(m.newPasswordLayout)
   end if
 
-  m.termsBtn = m.top.findNode("termsBtn")
-  m.termsBtn.text = getTranslation("screenSettings_menu_tos")
-  m.termsBtn.observeFieldScoped("selected", "onTermsButtonSelected")
-
-  m.ppBtn = m.top.findNode("ppBtn")
-  m.ppBtn.text = getTranslation("screenSettings_menu_privacyPolicy")
-  m.ppBtn.observeFieldScoped("selected", "onPrivacyPolicyButtonSelected")
-
-  m.yourPrivacyChoicesBtn = m.top.findNode("YourPrivacyChoicesButton")
-  m.yourPrivacyChoicesBtn.text = getTranslation("screenSettings_menu_yourPrivacyChoices")
-  m.yourPrivacyChoicesBtn.observeFieldScoped("selected", "onYourPrvacyChoicesButtonSelected")
-
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
   m.voiceKeyboard = m.keyboard.findNode("Keyboard")
   m.keyboard.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
@@ -109,9 +97,6 @@ Function onThemeChange(msg = invalid)
     if m.forgotPasswordBtn <> invalid
       m.forgotPasswordBtn.color = theme.backgroundColorLight2
     end if
-    m.termsBtn.color = theme.backgroundColor
-    m.ppBtn.color = theme.backgroundColor
-    m.yourPrivacyChoicesBtn.color = theme.backgroundColor
   end if
 End Function
 
@@ -209,36 +194,6 @@ End Function
 Function onForgotPasswordButtonSelected(evt)
   tubiLog("SignInScreen.onForgotPasswordButtonSelected")
   m.top.forgotPasswordSelected = true
-End Function
-
-
-Function onTermsButtonSelected(evt)
-
-  isButtonSelected = evt.getData()
-  if isButtonSelected = true
-    m.top.staticPageSelected = "TermsOfServiceButton"
-  end if
-
-End Function
-
-
-Function onPrivacyPolicyButtonSelected(evt)
-
-  isButtonSelected = evt.getData()
-  if isButtonSelected = true
-    m.top.staticPageSelected = "PrivacyPolicyButton"
-  end if
-
-End Function
-
-
-Function onYourPrvacyChoicesButtonSelected(evt)
-
-  isButtonSelected = evt.getData()
-  if isButtonSelected = true
-    m.top.staticPageSelected = "YourPrivacyChoicesButton"
-  end if
-
 End Function
 
 
@@ -445,13 +400,9 @@ Function onKeyboardTextChanged()
      else if m.password.hasFocus() = true
        setFocusToComponent(m.continueBtn)
      else if m.continueBtn.hasFocus() = true
-       if bDisplayForgotPasswordButton = false
-         setFocusToComponent(m.ppBtn)
-       else
+       if bDisplayForgotPasswordButton = true
          setFocusToComponent(m.forgotPasswordBtn)
        end if
-     else if m.forgotPasswordBtn <> invalid AND m.forgotPasswordBtn.hasFocus() = true
-       setFocusToComponent(m.ppBtn)
      end if
 
    else if key = "up"
@@ -464,24 +415,6 @@ Function onKeyboardTextChanged()
        m.emailHasFocus = false
      else if m.forgotPasswordBtn <> invalid AND m.forgotPasswordBtn.hasFocus() = true
        setFocusToComponent(m.continueBtn)
-     else if m.termsBtn.hasFocus() = true
-       if bDisplayForgotPasswordButton = false
-         setFocusToComponent(m.continueBtn)
-       else
-         setFocusToComponent(m.forgotPasswordBtn)
-       end if
-     else if m.ppBtn.hasFocus() = true
-       if bDisplayForgotPasswordButton = false
-         setFocusToComponent(m.continueBtn)
-       else
-         setFocusToComponent(m.forgotPasswordBtn)
-       end if
-     else if m.yourPrivacyChoicesBtn.hasFocus() = true
-       if bDisplayForgotPasswordButton = false
-         setFocusToComponent(m.continueBtn)
-       else
-         setFocusToComponent(m.forgotPasswordBtn)
-       end if
      else if m.keyboard.isInFocusChain() = true
        updatePasswordValidation()
        hideKeyboard()
@@ -489,23 +422,6 @@ Function onKeyboardTextChanged()
        setFocusToComponent(m.password)
        m.emailHasFocus = false
      end if
-
-   else if key = "right"
-
-     if m.termsBtn.hasFocus() = true
-       setFocusToComponent(m.ppBtn)
-     else if m.ppBtn.hasFocus() = true
-       setFocusToComponent(m.yourPrivacyChoicesBtn)
-     end if
-
-   else if key = "left"
-
-     if m.yourPrivacyChoicesBtn.hasFocus() = true
-       setFocusToComponent(m.ppBtn)
-     else if m.ppBtn.hasFocus() = true
-       setFocusToComponent(m.termsBtn)
-     end if
-
    end if
 
    return handled
