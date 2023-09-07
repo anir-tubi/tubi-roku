@@ -130,16 +130,18 @@ async function createCdnPrUrl(done, cdn = "cdn") {
 
   let cdnPath = process.env.CDN_GIT_DIRECTORY;
   let ghInfoCDNRepo = `${ghInfo.cdnRepo}`;
+  let cdnDirVariable = `CDN_GIT_DIRECTORY`
 
   if (cdn === `rcdn`) {
     cdnPath = process.env.RCDN_GIT_DIRECTORY;
     ghInfoCDNRepo = `${ghInfo.rcdnRepo}`;
+    cdnDirVariable = `RCDN_GIT_DIRECTORY`
   }
 
 
   // check if the environment variable for the path to the CDN repo has been set
   if (!cdnPath) {
-    const errorMsg = `You did not set a CDN_GIT_DIRECTORY environment variable in your .bash_profile or .bashrc file.`;
+    const errorMsg = `You did not set a ${cdnDirVariable} variable in your .bash_profile or .bashrc or .zsh_profile file.`;
     done(new NoStackError(errorMsg));
   }
 

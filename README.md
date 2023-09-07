@@ -83,6 +83,7 @@ export ROKU_DEV_TARGET="<your-roku-ip>""
 export DEV_PASSWORD="<dev password set up on Roku device>"
 export PKG_PASSWORD="<password from the GENKEY utility used for signing packages>"
 export CDN_GIT_DIRECTORY="<path to the adrise_cdn repo directory ex: ~/dev/adrise_cdn>"
+export RCDN_GIT_DIRECTORY="<path to the rcdn repo directory ex: ~/dev/rcdn>"
 export GITHUB_PAT="<github personal access token>"
 export ROKU_DEV_TELNET="sametab" (optional)
 export AWS_PROFILE=main-roku-dev
@@ -315,13 +316,13 @@ TBD
 
     __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Submission Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#submission-release)
 
-10\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#roku_dev slack channel`. The PR URLs can also be found on the project-total-recall and adrise_cdn repos respectively), and wait for approval.
+10\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#roku_dev slack channel`. The PR URLs can also be found on the project-total-recall, adrise_cdn and rcdn repos respectively), and wait for approval.
 
-11\. Merge the new PR in the adrise_cdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
+11\. Merge the new PR in the adrise_cdn repo and rcdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
 
 12\. check if you need to tun multifactor authentication for AWS. Typically this means running `$ vauth`. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
 
-- __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THE PR FOR THE adRise_cdn REPO AND THE PR FOR THE project-total-recall REPO ARE APPROVED AND MERGED.__
+- __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THE PR FOR THE adRise_cdn REPO, rcdn REPO AND THE PR FOR THE project-total-recall REPO ARE APPROVED AND MERGED.__
 
 13\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
 
@@ -449,7 +450,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 12\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#rokudev slack channel`. The PR URLs can also be found on the project-total-recall and adrise_cdn repos respectively), and wait for approval.
 
-13\. Merge the new PR in the adrise_cdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
+13\. Merge the new PRs in the adrise_cdn repo and rcdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
 
 14\. check if you need to tun multifactor authentication for AWS. Typically this means running `$ vauth`. You ran this in a previous step, but some time may has passed and you may have to run it again. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
 
