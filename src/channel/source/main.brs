@@ -234,6 +234,30 @@ Function runChannel(constants, log, request)
             pause = pause * backoffFactor
             sleep(pause)
             resetComponentLibrary(componentLibrary, tubiScene, port)
+          else if retries = maxRetries
+
+            if initSubmittedChannel(request, constants, screen, tubiScene, port, startupArgs) = true
+
+              message = libraryBeingFetched.id + " failed to load due to API error. Loading packed components"
+
+              messageInfo = {
+                message: message
+                model: constants.deviceInfo.model
+                name: libraryBeingFetched.id
+                type: constants.errors.type.loadFailed
+              }
+
+              'send error info to sentry
+              log.exception(messageInfo, "warn", m.queue, 0.1)
+
+              'send error info to client logs
+              log.error(FormatJSON(messageInfo), "apiError", "RO-1-300", m.queue, 1.0)
+
+              componentsLoaded = true
+              componentTimer = invalid
+            else
+              return showComponentsFailedToLoadError(msg, log, screen, constants)
+            end if
           else
             return showComponentsFailedToLoadError(msg, log, screen, constants)
           end if
@@ -303,6 +327,26 @@ Function runChannel(constants, log, request)
         pause = pause * backoffFactor
         sleep(pause)
         resetComponentLibrary(libraryBeingFetched, tubiScene, port)
+      else if retries = maxRetries
+        if initSubmittedChannel(request, constants, screen, tubiScene, port, startupArgs) = true
+          message = libraryBeingFetched.id + " failed to load due to timeout. Loading Packed Components"
+          messageInfo = {
+            message: message
+            model: constants.deviceInfo.model
+            name: libraryBeingFetched.id
+            type: constants.errors.type.loadFailed
+          }
+          'Send error info to sentry
+          log.exception(messageInfo, "warn", m.queue, 0.1)
+
+          'Send error info to clientLog
+          log.warn(FormatJSON(messageInfo), "apiTimeout", "RO-1-300", m.queue, 1)
+
+          componentsLoaded = true 'bs:disable-line 1001 LINT1005
+          componentTimer = invalid 'bs:disable-line 1001 LINT1005
+        else
+          return showComponentsTimedOutError(libraryBeingFetched, log, screen, constants)
+        end if
       else
         return showComponentsTimedOutError(libraryBeingFetched, log, screen, constants)
       end if
@@ -328,10 +372,13 @@ End Function
 'removes the componentLibrary from the scene, and creates a new componentLibrary with the same id and same url
 'as the removed componentLibrary. This will kick off a new request to the url for the remote library.
 Function resetComponentLibrary(componentLibrary, scene, port)
-  componentLibrary.unobserveField("loadStatus")
   componentId = componentLibrary.id
   componentUri = componentLibrary.uri
-  scene.removeChild(componentLibrary)
+
+  nodeHelpers = TubiNodeHelpers()
+  componentLibraryTubiScene = nodeHelpers.getChildById(scene, componentId)
+  componentLibraryTubiScene.unobserveField("loadStatus")
+  scene.removeChild(componentLibraryTubiScene)
 
   newComponentLibrary = scene.createChild("ComponentLibrary")
   newComponentLibrary.observeField("loadStatus", port)
@@ -497,4 +544,76 @@ Function addConstantsFromStartupArgs(startupArgs, constants)
   end for
 
   return constants
+End Function
+
+
+
+' @request: assocArray, an instance of the request module as returned by TubiRequest()
+' @constants: assocArray, constants as returned by getConstants(), this version of constants will be the constants that are part of the submitted build.
+' @screen: node, app base screen
+' @tubiScene: node, home scene node
+' @port: port, used to create content controller
+' startupArgs: assocArray, start up app arguments, used to create content controller
+'
+' returns: boolean, true if the app successfully loaded submitted version of the app, false if app can not fallback on submitted version
+Function initSubmittedChannel(request,constants, screen, tubiScene, port, startupArgs)
+  print "loading the packed components"
+
+  externalConfig = TubiExternalConfig(request, constants)
+  externalConfig.init() 'sets external config values from server on constants
+  experiments = TubiExperiments(constants)
+  experiments.init(request) 'sets experiment values from server on constants
+
+  sgGlobal = screen.getGlobalNode()
+  sgGlobal.setField("constants", constants)
+  sgGlobal.setField("theme", constants.ui.themes.default)
+
+  canFallback = true
+
+  if constants <> invalid
+    submittedAppVersion = "0.0.0"
+
+    if constants.deviceInfo <> invalid
+      submittedAppVersion =  constants.deviceInfo.clientversion
+    end if
+
+    ' Sometimes submitted version of the app might have bugs, legal issues or api changes which makes them not worthy of fallback.
+    ' constants.externalConfig.info.fallback_blocked_versions will contain a list of submitted app versions that we should not fallback on.
+    if constants.externalConfig <> invalid AND constants.externalConfig.info <> invalid AND constants.externalConfig.info.fallback_blocked_versions <> invalid
+      for each version in constants.externalConfig.info.fallback_blocked_versions
+        if version = submittedAppVersion
+          canFallback = false
+          exit for
+        end if
+      end for
+    else if constants.externalConfig = invalid OR constants.externalConfig.info = invalid OR constants.externalConfig.info.fallback_blocked_versions = invalid  'externalConfig is missing. In this case, do not take risk of loading submitted version. Just show error modal.
+      canFallback = false
+    end if
+
+  end if
+
+  if canFallback = true
+    nodeHelpers = TubiNodeHelpers()
+    starterLibrary = nodeHelpers.getChildById(tubiScene, "starterLibrary")
+
+    if starterLibrary <> invalid
+      starterLibrary.unobserveField("loadStatus")
+      tubiScene.removeChild(starterLibrary)
+    end if
+
+    remoteLibrary = nodeHelpers.getChildById(tubiScene, "TubiRemoteLibrary")
+
+    if remoteLibrary <> invalid
+      remoteLibrary.unobserveField("loadStatus")
+      tubiScene.removeChild(remoteLibrary)
+    end if
+
+    controller = loadPackagedComponents(tubiScene, port, startupArgs)
+    controller.fadeInContentController = true
+    controller.isComponentLibFailedToLoad = true
+    return true 'successully fallback
+  else
+    return false 'can not fallback on the current version as explicitly specified by external config.
+  end if
+
 End Function

@@ -110,6 +110,8 @@
       -->
       <field id="navigateWithinPageInfo" type="assocarray"/>
 
+      <field id="isComponentLibFailedToLoad" type="boolean" value="false"/>
+
     <!-- OUTPUT -->
       <!-- Main thread listens for this and will exit the app if set to true-->
       <field id="exitApp" type="boolean" value="false"/>

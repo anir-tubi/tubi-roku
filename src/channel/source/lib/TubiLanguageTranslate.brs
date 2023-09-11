@@ -266,6 +266,10 @@ Function getTranslation_en_US()
       "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Entertainment EPG screen.",
       "message": "Entertainment"
     },
+    "component_library_failed":{
+      "description": "Latest Version of Tubi app failed to load due to some error",
+      "message": "{errCode}The Tubi channel failed to load fully. Some functionality may be missing."
+    },
     "epg_starts_at": {
       "description": "Program time Title when user selects a future program on EPG.",
       "message": "Starts at"

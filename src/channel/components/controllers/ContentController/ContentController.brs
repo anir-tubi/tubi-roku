@@ -1628,6 +1628,30 @@ Function showUpgradeModal(shouldAlert, trackingLib, trackingTask)
   end if
 End Function
 
+' show modal to inform the user that app is not latest version due to error in downloading starter or remote components
+Function showPackedVersionLoadedModal(trackingLib, trackingTask)
+  buttons = [getTranslation("dialog_button_ok")]
+
+  userErrorCode = getUserFacingErrorCode("1", "300","" )
+
+  title = getTranslation("dialog_defaultError_title")
+
+  template = {"errCode":  userErrorCode + chr(10)}
+  message = getTranslation("component_library_failed", template)
+
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "NETWORK_ERROR" 'DialogType enum
+      pageOneof: trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
+      dialog_action: "SHOW"
+      dialog_sub_type: "component-lib-failed"
+    }
+  }
+  showSimpleModal(title, message, buttons, dialogEvent, trackingTask)
+
+End Function
+
 
 ' fires a beacon which roku uses to determine the app load time only once per session. See:
 ' https://developer.roku.com/en-gb/docs/developer-program/performance-guide/measuring-channel-performance.md
@@ -1825,6 +1849,8 @@ Function onCustomResume(msg)
       else if isLoggedInUser() = true AND (lastAppRestartInDays >= 4)
         ' For loggedIn users, every 4 days once the app will be restarted as it needs to fetch starter/remote components
         bRestartApp = true
+      else if m.top.isComponentLibFailedToLoad = true
+        bRestartApp = true
       else
         'Removes the RFIScreen
         if m.billing <> invalid
@@ -1890,6 +1916,11 @@ End Function
 ' This is the fail safe startChannel function to be called if the previously played linear video could not be played
 Function startChannelFromAppLoad(response = invalid)
   startChannel()
+
+  if m.top.isComponentLibFailedToLoad = true
+    showPackedVersionLoadedModal(m.Tracking, m.trackingLoggingTask)
+  end if
+
   showUpgradeModal(m.constants.showUpgradeAlert, m.Tracking, m.trackingLoggingTask) 'show as necessary
 End Function
 
