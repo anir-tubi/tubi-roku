@@ -70,41 +70,43 @@ Function tubiPubSub_publish(contextKey, value)
     ' update any subscribers
     publication = m.publications[contextKey]
 
-    for each path in publication ' path might be "uiMode" or "deviceSettings.fonts.colors"
-      publishValue = invalid
-      
-      ' check if path exists on context's m.
-      pathParts = path.split(".")
-      pathTester = m.context
+    if publication <> invalid
+      for each path in publication ' path might be "uiMode" or "deviceSettings.fonts.colors"
+        publishValue = invalid
+        
+        ' check if path exists on context's m.
+        pathParts = path.split(".")
+        pathTester = m.context
 
-      for i = 0 to pathParts.count() - 1
-        pathTester = pathTester[pathParts[i]]
+        for i = 0 to pathParts.count() - 1
+          pathTester = pathTester[pathParts[i]]
 
-        if pathTester = invalid
-          exit for
-        end if
-      end for
-
-      publishValue = pathTester
-
-      ' set the value on each subscriber component's field
-      if publishValue <> invalid
-        for each subscriberId in publication[path]
-          fieldName = publication[path][subscriberId]
-          subscriber = m.context.top.findNode(subscriberId)
-
-          if subscriber <> invalid
-            if subscriber.hasField(fieldName) = true
-              subscriber[fieldName] = publishValue
-            end if
-          else
-            ' subscriber component cannot be found, so remove from all publications to prevent
-            ' memory use from getting too large unnecessarily.
-            m.unsubscribeFromAllViaId(subscriberId)
+          if pathTester = invalid
+            exit for
           end if
         end for
-      end if
-    end for
+
+        publishValue = pathTester
+
+        ' set the value on each subscriber component's field
+        if publishValue <> invalid
+          for each subscriberId in publication[path]
+            fieldName = publication[path][subscriberId]
+            subscriber = m.context.top.findNode(subscriberId)
+
+            if subscriber <> invalid
+              if subscriber.hasField(fieldName) = true
+                subscriber[fieldName] = publishValue
+              end if
+            else
+              ' subscriber component cannot be found, so remove from all publications to prevent
+              ' memory use from getting too large unnecessarily.
+              m.unsubscribeFromAllViaId(subscriberId)
+            end if
+          end for
+        end if
+      end for
+    end if
   end if
 End Function
 
