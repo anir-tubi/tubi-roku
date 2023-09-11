@@ -95,16 +95,19 @@ Function onConsentSettingsChange(msg)
     })
   end if
 
-  ' Since if we place an array grid inside a layout group, it causes a jumping UI glitch when the grid is focused.
-  ' To Avoid the UI issue we can manually adjust the position of the items based on the predecessor instead of using the LayoutGroup.
-  boundingRect = m.managePreferences.boundingRect()
-  translation = m.managePreferences.translation
+  if privacyCenterSettings.showConsentPreferences = true AND m.top.isAllowedToManageConsent = false
+    m.qrCodeSections.translation = [0, 177]
+    m.nonEditableModeWarningMessage.visible = true
+  else
+    m.nonEditableModeWarningMessage.visible = false
+    ' Since if we place an array grid inside a layout group, it causes a jumping UI glitch when the grid is focused.
+    ' To Avoid the UI issue we can manually adjust the position of the items based on the predecessor instead of using the LayoutGroup.
+    boundingRect = m.managePreferences.boundingRect()
+    translation = m.managePreferences.translation
 
-  ' Getting the total height of array grid and adding the y translation to place the qr codes.
-  m.qrCodeSections.translation = [0, boundingRect.height + translation[1]]
-
-  ' showing the message if we are not allowed to manage consent.
-  m.nonEditableModeWarningMessage.visible = (m.top.isAllowedToManageConsent = false)
+    ' Getting the total height of array grid and adding the y translation to place the qr codes.
+    m.qrCodeSections.translation = [0, boundingRect.height + translation[1]]
+  end if
 End Function
 
 
