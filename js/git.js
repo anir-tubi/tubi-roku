@@ -88,12 +88,13 @@ async function makeReleasePrs(done) {
   const prodRokuBranchName = `${minorBuildTag}_branch`;
   log(`...Making a PR from the remote ${releaseBranchName} on ${ghInfo.rokuRepo} against the ${prodRokuBranchName} branch`);
   let releasePrUrl = '';
+  let bodyText = 'Verify: The last commit in this PR is a build bump. If the last commit in this PR is not a build bump, the release needs to be run again. Any other commit that is not a build bump, including a merge, indicates a commit has been included that was not included in the package that was built and sent to the CDN.\n\nPlease verify README item #18 in the Remote Release section (ie. do any changes in this remote release disallow falling back to the submitted version)'
   try {
     const releasePrRes = await octokit.pulls.create({
       owner: ghInfo.owner,
       repo: ghInfo.rokuRepo,
       title: `Release ${fullBuildTag}`,
-      body: 'Verify: The last commit in this PR is a build bump. If the last commit in this PR is not a build bump, the release needs to be run again. Any other commit that is not a build bump, including a merge, indicates a commit has been included that was not included in the package that was built and sent to the CDN.',
+      body: bodyText,
       head: releaseBranchName,
       base: prodRokuBranchName
     });

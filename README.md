@@ -490,6 +490,12 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 - Select "Publish Release"
 
+18\. Currently, if starter component/remote component fails to load, app fallsback on to the submitted version of the app.  But if submitted version of the app coantians any critical issues or the legal issues or API-deprecated /discontinued related issues then we might not want to fallback on submitted version of the app.
+
+- Please check the release notes to determine if any of the released items are critical fixes or the legal updates/fixes or API-deprecated /discontinued related updates to the submitted version of the app.  If you find any such items because of which we do not want the users to fallback on submitted version of the app then we need to add the submitted-app-version-number to `external config->fallback_blocked_versions[]`. (eg: "fallback_blocked_versions": ["2.21.0", "2.24.0"])
+
+- Please follow the https://github.com/adRise/remote_config Readme to create the PR to update external config and get it approved by ccs team.
+
 # Informal QA
 
 Sometimes a feature is given to the QA team before an official staging build is ready for them to test. This allows the QA team to get an early start on testing the feature and create tickets for the Roku dev team in a quicker manner. In order to create an informal QA build, use the `qa` config:
