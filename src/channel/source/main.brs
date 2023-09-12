@@ -27,7 +27,6 @@ Function Main(startupArgs)
   permaScreen.CreateScene("BackgroundScene")
   permaScreen.show()
 
-
   while runChannel(constants, log, request) = true
   end while
 End Function
@@ -39,7 +38,6 @@ End Function
 '
 ' returns: boolean, true if the app should be restarted, false if the app should be closed
 Function runChannel(constants, log, request)
-
   startupArgs = {}
   startupArgs.append(m.startupArgs)
   m.startupArgs = invalid
@@ -122,10 +120,7 @@ Function runChannel(constants, log, request)
   else
     'only expect this else block to happen when side loading/testing
     'setting experiment values and external config will normally happen in StarterController when using starter components
-    externalConfig = TubiExternalConfig(request, constants)
-    externalConfig.init() 'sets external config values from server on constants
-    experiments = TubiExperiments(constants)
-    experiments.init(request) 'sets experiment values from server on constants
+    constants = setRemoteConfigAndExperimentsOnConstants(request, constants)
 
     sgGlobal.setField("constants", constants)
     sgGlobal.setField("theme", constants.ui.themes.default)
@@ -549,20 +544,19 @@ End Function
 
 
 ' @request: assocArray, an instance of the request module as returned by TubiRequest()
-' @constants: assocArray, constants as returned by getConstants(), this version of constants will be the constants that are part of the submitted build.
+' @constants: assocArray, constants as returned by getConstants(), this version of constants
+'                         will be the constants that are part of the submitted build.
 ' @screen: node, app base screen
 ' @tubiScene: node, home scene node
 ' @port: port, used to create content controller
 ' startupArgs: assocArray, start up app arguments, used to create content controller
 '
-' returns: boolean, true if the app successfully loaded submitted version of the app, false if app can not fallback on submitted version
-Function initSubmittedChannel(request,constants, screen, tubiScene, port, startupArgs)
+' returns: boolean, true if the app successfully loaded submitted version of the app,
+'                   false if app can not fallback on submitted version
+Function initSubmittedChannel(request, constants, screen, tubiScene, port, startupArgs)
   print "loading the packed components"
 
-  externalConfig = TubiExternalConfig(request, constants)
-  externalConfig.init() 'sets external config values from server on constants
-  experiments = TubiExperiments(constants)
-  experiments.init(request) 'sets experiment values from server on constants
+  constants = setRemoteConfigAndExperimentsOnConstants(request, constants)
 
   sgGlobal = screen.getGlobalNode()
   sgGlobal.setField("constants", constants)
@@ -589,7 +583,6 @@ Function initSubmittedChannel(request,constants, screen, tubiScene, port, startu
     else if constants.externalConfig = invalid OR constants.externalConfig.info = invalid OR constants.externalConfig.info.fallback_blocked_versions = invalid  'externalConfig is missing. In this case, do not take risk of loading submitted version. Just show error modal.
       canFallback = false
     end if
-
   end if
 
   if canFallback = true
@@ -615,5 +608,21 @@ Function initSubmittedChannel(request,constants, screen, tubiScene, port, startu
   else
     return false 'can not fallback on the current version as explicitly specified by external config.
   end if
+End Function
 
+
+' Makes requests for popper experiments and remote config and places the values on the constants
+' As would happen in the starter controller.
+'
+' @request: assocArray, an instance of the request module as returned by TubiRequest()
+' @constants: assocArray, constants as returned by getConstants(), this version of constants
+'                         will be the constants that are part of the submitted build.
+' @return: assocArray, passed in constants AA that has been updated with remote config and
+'                      experiment values.
+Function setRemoteConfigAndExperimentsOnConstants(request, constants)
+  externalConfig = TubiExternalConfig(request, constants)
+  externalConfig.init() 'sets external config values from server on constants
+  experiments = TubiExperiments(constants)
+  experiments.init(request) 'sets experiment values from server on constants
+  return constants
 End Function

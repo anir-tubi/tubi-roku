@@ -55,8 +55,17 @@ End Function
 
 
 ' @configs: assocArray, configs as sent from the UAPI and json parsed
+' @constants: assocArray, constants
+' @sideEffect: updates the constants AA that is passed into the function by adding an AA on
+'              constants.externalConfig.info and updating the value at constants.deviceInfo.countryCode
+'              with the value from remote configs (as determined by Maxmind on the backend)
 Function tubiExternalConfig_storeConfigs_(configs, constants)
   constants.externalConfig.info = configs
+
+  if constants.deviceInfo <> invalid AND configs <> invalid AND configs.country <> invalid
+    constants.deviceInfo.countryCode = UCase(configs.country)
+  end if
+
   return constants
 End Function
 
