@@ -57,7 +57,7 @@ Function init()
   m.UpNext.observeField("autoplayMode", "onUpNextAutolayModeChange")
 
   m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
-  m.Video.observeField("position", "onVideoPositionChange")
+  m.Video.observeFieldScoped("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
   m.Video.observeField("streamingSegment", "onStreamingSegmentChange")
@@ -169,6 +169,11 @@ Function init()
   ' playProgressEvent bug, and should be removed after a fix is in place.
   m.previousPlayerPosition = 0
   m.previousPlayProgressCallSource = ""
+
+  ' m.positionArr is used to help diagnose the large playProgressEvent bug, and should be removed after a fix is in place,
+  ' m.positionArr is temperory variable which is used to find whether any position callback event is missing or not.
+  ' It will be attached with view-time-exceeds logging and cleared
+  m.positionArr = []
 
   ' ratingInterval is time in seconds which helps to show tv ratings/descriptors on player
   m.ratingInterval = 0
@@ -741,6 +746,8 @@ End Function
 Function onVideoPositionChange(msg)
   position = msg.getData()
 
+  m.positionArr.push(position)
+
   positionLog = ""
   if position <> invalid
     positionLog = position.toStr()
@@ -1027,6 +1034,12 @@ Function onAdStateChange(msg)
       end if
 
       m.Video.control = "play"
+
+      ' sometimes position callback not getting triggered for longtime after playing Ads.
+      ' so unobserving and observing it, it may trigger the position callback properly.
+      m.Video.unobserveFieldScoped("position")
+      m.Video.observeFieldScoped("position", "onVideoPositionChange")
+
       ' Adding the initial audio track here to cover use case where pre-roll ads are requested.
       ' Refer playContent for the reasoning behind why we are calling setInitialAudioTrack.
       setInitialAudioTrack(m.Video.availableAudioTracks)
@@ -1679,8 +1692,12 @@ Function getPlayProgressEvent(callSource = "")
       videoInfo.previousPlayerPosition = m.previousPlayerPosition
       videoInfo.callSource = callSource
       videoInfo.previousCallSource = m.previousPlayProgressCallSource
+      videoInfo.positionArr = m.positionArr
       tubiLog(FormatJSON(videoInfo), "info", "videoInfo", "view-time-exceeds")
     end if
+
+    ' resetting m.positionArr everytime play progress event gets fires
+    m.positionArr = []
 
     if m.top.isTrailer = true
       playProgressEvent.type = "trailer_play_progress"
