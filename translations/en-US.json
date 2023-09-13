@@ -1648,6 +1648,6 @@
   },
   "privacy_center_not_editable_mode_warning": {
     "description": "Warning label that will be displayed in privacy center whenever user is in kids mode or any parental controls mode.",
-    "message": "Privacy preferences can only be edited outside of Tubi Kids. Only Essential Data will be collected and used."  
+    "message": "Privacy settings can only be changed outside Tubi Kids. Only essential data is used within Tubi Kids."  
   }
 }
