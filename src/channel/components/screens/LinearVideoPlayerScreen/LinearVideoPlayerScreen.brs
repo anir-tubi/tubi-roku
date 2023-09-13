@@ -333,6 +333,14 @@ Function onVideoStateChange(msg)
     ' reset the last ping time to the position at which video playback is starting or re-starting (after a seek)
     ' in order to avoid race conditions in which the video position might update while the handle logic is being completed.
     m.lastPingTime = m.Video.position
+  else if state = "buffering"
+    ' sends the live play progress event when video buffers, and resets the lastPingTime to the current video position.
+    ' This avoids higher viewTime live play progress events
+    playProgressEvent = getPlayProgressEvent(m.top.fullscreen)
+    if playProgressEvent <> invalid
+      trackEvent(playProgressEvent)
+    end if
+    m.lastPingTime = m.Video.position
   end if
 
   ' Loading page visibility
