@@ -1320,7 +1320,6 @@ Function resetPauseAd()
       stopAnimation(m.pauseAdAnimation)
     end if
 
-    m.pauseAdOverlay.opacity = 0.0
   end if
   m.top.pauseAdResponse = invalid
 End Function

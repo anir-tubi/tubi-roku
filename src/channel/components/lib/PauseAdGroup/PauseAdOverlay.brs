@@ -13,11 +13,11 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
   if press
     if key = "back" OR key = "OK" OR key = "up" OR key = "down" OR key = "left" OR key = "right"
-      fade(m.top, "out", 0.1)
+      fade(m.top, "out", 0.4)
       m.top.close = true
       handled = true
     else if key = "fastforward" OR key = "rewind" OR key = "play" OR key = "replay" OR key = "options"
-      fade(m.top, "out", 0.1)
+      fade(m.top, "out", 0.4)
       m.top.close = true
       handled = false
     end if
