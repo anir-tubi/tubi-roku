@@ -138,11 +138,7 @@ Function setDetailStrings()
   m.LikeMenuItem.title = getTranslation("screenDetails_button_like")
   m.LikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.LikeMenuItem.id]
 
-  if getExperimentResource("roku_notforme_dislike", "roku_notforme_dislike_v1", true).enabled = true
-    m.DislikeMenuItem.title = getTranslation("screenDetails_button_notForMe")
-  else
-    m.DislikeMenuItem.title = getTranslation("screenDetails_button_dislike")
-  end if
+  m.DislikeMenuItem.title = getTranslation("screenDetails_button_dislike")
 
   m.DislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.DislikeMenuItem.id]
 
@@ -396,24 +392,17 @@ Function changeLikeDislikeButtonText()
         sIconUrl = "pkg:/images/icon-liked.webp"
       else
         '//The Like State is "disliked", so display disliked state
-        if getExperimentResource("roku_notforme_dislike", "roku_notforme_dislike_v1", false).enabled = true
-          sButtonText = getTranslation("screenDetails_button_notForMe")
-        else
-          sButtonText = getTranslation("screenDetails_button_disliked")
-        end if
+        sButtonText = getTranslation("screenDetails_button_disliked")
 
         m.LikeDislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.dislikeRemoveRatingMenuItem]
         sIconUrl = "pkg:/images/icon-disliked.webp"
       end if
 
       if m.Menu.content <> invalid AND m.Menu.itemFocused >= 0
+
         focusedMenuItem = m.Menu.content.getChild(m.Menu.itemFocused)
         if m.Menu.isInFocusChain() = true AND focusedMenuItem <> invalid AND focusedMenuItem.id = "LikeDislikeMenuItem"
-
-          if getExperimentResource("roku_notforme_dislike", "roku_notforme_dislike_v1", false).enabled = false
-            sButtonText = sButtonText + getTranslation("screenDetails_button_like_instructions")
-          end if
-
+          sButtonText = sButtonText + getTranslation("screenDetails_button_like_instructions")
         end if
 
       end if
@@ -425,8 +414,12 @@ Function changeLikeDislikeButtonText()
       '//The Like State is nothing so display default state
       sButtonText = ""
 
-      if getExperimentResource("roku_notforme_dislike", "roku_notforme_dislike_v1", false).enabled = true
+      like_dilike_button_title_type = getExperimentResource("roku_notforme_dislike", "roku_notforme_dislike_v2", true).like_dilike_button_title_type
+
+      if like_dilike_button_title_type = "rate_this_title"
         sButtonText = getTranslation("screenDetails_button_rateThisTitle")
+      else if like_dilike_button_title_type = "tell_us_what_you_think"
+        sButtonText = getTranslation("screenDetails_button_tellUsWhatYouThink")
       else
         sButtonText = getTranslation("screenDetails_button_likeDislike")
       end if

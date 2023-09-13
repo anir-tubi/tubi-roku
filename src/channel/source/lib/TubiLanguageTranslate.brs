@@ -1118,6 +1118,10 @@ Function getTranslation_en_US()
       "description": "Label of unfocused button to allow users to rate the current video title",
       "message": "Rate this Title"
     },
+    "screenDetails_button_tellUsWhatYouThink": {
+      "description": "Label of unfocused button to allow users to rate the current video title",
+      "message": "Tell Us What You Think"
+    },
     "screenDetails_button_see_all_games": {
       "description": "Label of button to allow users to a new page where they can see all the games related to the current sports title",
       "message": "See All Matches"
@@ -1862,7 +1866,7 @@ Function getTranslation_en_US()
     },
     "privacy_center_not_editable_mode_warning": {
       "description": "Warning label that will be displayed in privacy center whenever user is in kids mode or any parental controls mode.",
-      "message": "Privacy preferences can only be edited outside of Tubi Kids. Only Essential Data will be collected and used."    
+      "message": "Privacy preferences can only be edited outside of Tubi Kids. Only Essential Data will be collected and used."
     }
   }
 End Function

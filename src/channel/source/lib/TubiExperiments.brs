@@ -87,7 +87,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_notforme_dislike: {
-        roku_notforme_dislike_v1: {"enabled": false}
+        roku_notforme_dislike_v2: {"like_dilike_button_title_type": "none"} 'valid values are : "none", "rate_this_title", "tell_us_what_you_think"
       }
 
       roku_like_toast: {
