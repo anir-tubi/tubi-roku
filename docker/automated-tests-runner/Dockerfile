@@ -33,13 +33,6 @@ USER runner
 
 # Start our own content
 
-# Link existing node and npx in runner as the one supplied with ubuntu is very old
-RUN sudo ln -s /home/runner/externals/node16/bin/node /usr/bin/node
-RUN sudo ln -s /home/runner/externals/node16/bin/npx /usr/bin/npx
-
-# We use our own npm entry point to work around bug
-COPY npm /usr/bin/npm
-
 # Setup runner config
 
 ARG url

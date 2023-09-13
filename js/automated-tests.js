@@ -232,5 +232,6 @@ function outputAvailableAutomatedTestTags(done) {
 module.exports = {
   runAutomatedTestsCli,
   runAutomatedTests,
-  outputAvailableAutomatedTestTags
+  outputAvailableAutomatedTestTags,
+  jsonReportOutputPath
 };

@@ -21,7 +21,7 @@ async function setupAutomatedTestsGithubActionRunner(done) {
   // First see if we've already setup the runner
   const inspectResult = shell.exec(`podman inspect ${runnerImageName}`);
   if (inspectResult.code === 0) {
-    log('Automated tests Github action runner already setup.\nTo remove it run: gulp removeAutomatedTestsGithubActionRunner\nTo start the runner run: gulp startAutomatedTestsGithubActionRunner');
+    log('Automated tests Github action runner already setup.\nTo remove it run: gulp removeAutomatedTestsGithubActionRunner\nTo start the runner run: gulp startAutomatedTestsRunner');
     // If code is zero we're good to go and can exit
     return;
   }

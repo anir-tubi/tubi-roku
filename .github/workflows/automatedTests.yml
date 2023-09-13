@@ -5,7 +5,7 @@ name: Automated UI Tests
 env:
   runName: ${{ format('{0}; {1}', github.ref_name, inputs.tag) }}${{ inputs.tag == 'Custom String' && format('{0} "{1}"', ':', inputs.customString) || ''}}
 
-# We are giving a name for the run to make it easier to see what was run. Not the prettiest for conditional strings but do not see another solution. Colon with a space after is a problem as well that we have to work around.concurrency:
+# We are giving a name for the run to make it easier to see what was run. Not the prettiest for conditional strings but do not see another solution. Colon with a space after is a problem as well that we have to work around.
 # As an example if the branch name is qa_2_21_20 and we're running the @leftnav tag then the run name would: qa_2_21_20; @leftnav.
 # For a custom string of "C4153" it would be: qa_2_21_20; Custom String: "C4153"
 run-name: ${{ format('{0}; {1}', github.ref_name, inputs.tag) }}${{ inputs.tag == 'Custom String' && format('{0} "{1}"', ':', inputs.customString) || ''}}
@@ -77,6 +77,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - uses: actions/setup-node@master
+        with:
+          node-version: "18.12.1"
+
       # npm command install all required packages
       - name: npm install
         run: |
@@ -104,3 +108,7 @@ jobs:
         with:
           name: HTML Report
           path: out/ui-tests-output/html
+
+      - name: Send Slack Notification
+        run: |
+          npx ts-node ./js/workflows/sendSlackAutomatedTestsResultNotification.ts
