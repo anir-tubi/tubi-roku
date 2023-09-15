@@ -191,8 +191,8 @@ async function createCdnPrUrl(done, cdn = "cdn") {
   let cdnRemoteComponentsPath = `${cdnPath}/hotpatches/roku/components/${remoteComponentsFileName}`;
 
   if (cdn === 'rcdn') {
-    cdnStarterComponentsPath = `${cdnPath}/starter-components/${starterComponentsFileName}`;
-    cdnRemoteComponentsPath = `${cdnPath}/components/${remoteComponentsFileName}`;
+    cdnStarterComponentsPath = `${cdnPath}/appFiles/starter-components/${starterComponentsFileName}`;
+    cdnRemoteComponentsPath = `${cdnPath}/appFiles/components/${remoteComponentsFileName}`;
   }
 
   const localStarterComponentsPath = `build/tubi_starter_components_${minorBuildTag}.pkg`;
