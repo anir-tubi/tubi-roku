@@ -1,20 +1,26 @@
 'use strict';
 // This file provides some functions for running our own automated tests.
 
+// We're using TypeScript code here so have to include this
+require('ts-node/register');
+
 const prompts = require('prompts');
 const mocha = require('gulp-mocha');
 const {src} = require('gulp');
 const env = require('gulp-env');
 const {device, utils} = require('roku-test-automation');
 const fs = require('fs');
+const log = require('fancy-log');
 
 const {execShellCommand, spawnShellCommand} = require('./utilities');
+
+const { testUtils, auth, ContentTypes, ContentRatings } = require('./automated-tests/test-utils');
 
 const testsOutputFolder = `out/ui-tests-output`;
 const jsonReportOutputPath = `${testsOutputFolder}/report.json`;
 
 // Tries to convert the supplied suitest test over to our own test format
-async function runAutomatedTestsCli (done) {
+async function runAutomatedTestsCli(done) {
   const availableTags = getAvailableTags();
 
   const choices = [];
@@ -55,6 +61,148 @@ async function runAutomatedTestsCli (done) {
     return;
   }
   await runAutomatedTests(done, branch, tags);
+  done();
+}
+
+
+async function buildTestAccountCli(done) {
+  // We don't want to have to hit a Roku device for this helper so we just make up a fake device id
+  auth['deviceId'] = utils.randomStringGenerator(36);
+
+  const userChoices = [
+    'Create new user',
+    'Use existing user'
+  ];
+
+  const {userChoiceIndex} = await prompts({
+    type: 'select',
+    name: 'userChoiceIndex',
+    message: 'What user would would like to use?',
+    choices: userChoices
+  });
+  if (userChoiceIndex === undefined) {
+    // User hit control-c to exit so don't continue
+    done();
+    return;
+  }
+
+  // create new user
+  let user;
+  if (userChoiceIndex == 0) {
+    user = await testUtils.createRegisteredUser();
+  } else {
+    // use existing user
+    const emailPrompt = {
+      type: 'text',
+      name: 'email',
+      message: 'Please provide the user\'s email'
+    };
+
+    const emailPassword = {
+      type: 'text',
+      name: 'password',
+      message: 'Please provide the user\'s password'
+    };
+    const credentials = await prompts([emailPrompt, emailPassword]);
+    if (credentials.password === undefined) {
+      // User hit control-c to exit so don't continue
+      done();
+      return;
+    }
+
+    user = await testUtils.loginAsUser(credentials);
+  }
+
+  let shouldContinue = true;
+  while (shouldContinue) {
+    const content = user.getContent();
+
+    const contentTypeChoices = Object.keys(ContentTypes);
+    const {contentTypeIndex} = await prompts({
+      type: 'select',
+      name: 'contentTypeIndex',
+      message: 'What type of content would you like to add?',
+      choices: Object.keys(ContentTypes)
+    });
+    if (contentTypeIndex === undefined) {
+      // User hit control-c to exit so don't continue
+      done();
+      return;
+    }
+    const contentType = contentTypeChoices[contentTypeIndex];
+    content.ofContentType(contentType);
+
+    const ratingChoices = Object.keys(ContentRatings);
+    const {ratingIndexes} = await prompts({
+      type: 'multiselect',
+      name: 'ratingIndexes',
+      message: 'What ratings would like to allow?',
+      choices: ratingChoices
+    });
+    if (ratingIndexes === undefined) {
+      // User hit control-c to exit so don't continue
+      done();
+      return;
+    }
+    const ratings = ratingIndexes.map(index => ratingChoices[index]);
+    content.withRating(ratings);
+
+    const {limit} = await prompts({
+      type: 'number',
+      name: 'limit',
+      message: 'How many would you like to add?',
+      min: 1
+    });
+    if (limit === undefined) {
+      // User hit control-c to exit so don't continue
+      done();
+      return;
+    }
+
+    let contentsLimit = Math.floor(limit / 5);
+    if (contentsLimit < 10) {
+      contentsLimit = 10;
+    }
+
+    const retrievedContents = await content.retrieve({
+      limit: limit,
+      contentsLimit: contentsLimit
+    });
+
+    log(`Retrieved ${retrievedContents.length} matching ${contentType}`);
+    if (retrievedContents.length) {
+      const whereToAddChoices = ['Continue Watching', 'Watch List'];
+      const {whereToAddChoiceIndex} = await prompts({
+        type: 'select',
+        name: 'whereToAddChoiceIndex',
+        message: 'Where would you like to add this content?',
+        choices: whereToAddChoices
+      });
+      if (whereToAddChoiceIndex === undefined) {
+        // User hit control-c to exit so don't continue
+        done();
+        return;
+      }
+
+      // Continue Watching
+      if (whereToAddChoiceIndex === 0) {
+        await user.addContentToViewHistory(retrievedContents, 500);
+      } else {
+        await user.addContentToWatchList(retrievedContents);
+      }
+    }
+
+    const continuePrompt = {
+      type: 'confirm',
+      name: 'shouldContinue',
+      message: 'Would you like to add more content?'
+    };
+    ({shouldContinue} = await prompts(continuePrompt));
+  }
+
+  log(`Generated user info:
+  email: ${user['userInfo'].email}
+  password: ${user['userInfo'].password}`);
   done();
 }
 
@@ -231,6 +379,7 @@ function outputAvailableAutomatedTestTags(done) {
 
 module.exports = {
   runAutomatedTestsCli,
+  buildTestAccountCli,
   runAutomatedTests,
   outputAvailableAutomatedTestTags,
   jsonReportOutputPath

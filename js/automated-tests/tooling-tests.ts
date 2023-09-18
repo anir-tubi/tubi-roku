@@ -2,9 +2,15 @@
 
 import { expect } from 'chai';
 import { ecp, odc, utils } from 'roku-test-automation';
-import { testUtils } from './test-utils';
+import type { RegisteredUser } from './test-utils';
+import { auth, testUtils } from './test-utils';
 
 describe('test-utils', function () {
+  let existingUser: RegisteredUser;
+  before(async () => {
+    existingUser = await testUtils.createRegisteredUser();
+  });
+
   describe('TestUtils', function () {
     describe('startApplicationWithDeeplink', function () {
       it('should be able to override current device language', async () => {
@@ -19,6 +25,16 @@ describe('test-utils', function () {
 
         expect(deviceInfo.locale).to.equal('es_ES');
         expect(deviceInfo.language).to.equal('es');
+      });
+    });
+
+
+    describe('loginAsUser', function () {
+      it('should be able to login to an existing user account', async () => {
+        const user = await testUtils.loginAsUser({email: existingUser['userInfo'].email, password: existingUser['userInfo'].password});
+        expect(user['accessToken']).to.not.be.empty;
+        expect(user['userInfo'].password).to.not.be.empty;
+        expect(user['userInfo'].user_id).to.be.greaterThan(0);
       });
     });
   });
@@ -181,6 +197,20 @@ describe('test-utils', function () {
             expect(result.length).to.be.equal(0);
           });
         });
+      });
+    });
+  });
+
+
+  describe('Auth', function () {
+    describe('userLogin', function () {
+      it('Should be able to start application as a new user', async () => {
+        const result = await auth.userLogin({
+          email: existingUser['userInfo'].email,
+          password: existingUser['userInfo'].password
+        });
+        expect(result.access_token).to.not.be.empty;
+        expect(result.user_id).to.be.greaterThan(0);
       });
     });
   });

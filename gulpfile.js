@@ -39,7 +39,7 @@ const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOn
 const {retrieveSuitestTests, runSuitestTests, convertXpathsToKeyPaths, convertSuitestTest} = require('./js/suitest');
 
 // Importing functions related to Automated Tests
-const {runAutomatedTests, runAutomatedTestsCli, outputAvailableAutomatedTestTags} = require('./js/automated-tests');
+const {runAutomatedTests, runAutomatedTestsCli, outputAvailableAutomatedTestTags, buildTestAccountCli} = require('./js/automated-tests');
 
 // Importing functions related to Github action runners
 const {setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner} = require('./js/action-runner');
@@ -881,6 +881,7 @@ exports.rerunAutomatedTests = series(setRerunAutomatedTestsEnvironment, runAutom
 exports.runAutomatedTestsCli = runAutomatedTestsCli;
 exports.outputAvailableAutomatedTestTags = outputAvailableAutomatedTestTags;
 exports.autotest = runAutomatedTestsCli;
+exports.buildTestAccount = buildTestAccountCli;
 
 exports.runToolingTests = series(setAutomatedTestsConfig, buildInstalled, runToolingTests);
 

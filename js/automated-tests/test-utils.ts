@@ -20,6 +20,7 @@ enum ContentTypes {
   'sports_event' = 'sports_event'
 }
 
+
 const abbreviatedContentTypeConversion = {
   c: ContentTypes.category,
   v: ContentTypes.movie,
@@ -245,6 +246,13 @@ class TestUtils {
       temporary_name: true
     };
     await user.create(credentials);
+    return user;
+  }
+
+
+  public async loginAsUser(credentials: {email: string, password: string}) {
+    const user = new RegisteredUser();
+    await user.login(credentials);
     return user;
   }
 
@@ -809,7 +817,7 @@ class Auth {
     });
 
     const headers = this.getHeaders({
-      authorization: 'Bearer ' + anonymousToken.access_token
+      authorization: `Bearer ${anonymousToken.access_token}`
     });
 
     const user = await testUtils.sendNetworkRequest({
@@ -820,7 +828,35 @@ class Auth {
     });
     user.signingKey = anonymousToken.signingKey;
 
-    return user as UserSignUpResponse;
+    return user as UserInfoResponse;
+  }
+
+
+  public async userLogin(credentials: {
+    email: string;
+    password: string;
+  }) {
+    const anonymousToken = await this.getAnonymousToken(true);
+    const body = JSON.stringify({
+      device_id: await this.getDeviceId(),
+      platform: platform,
+      type: 'email',
+      credentials: credentials
+    });
+
+    const headers = this.getHeaders({
+      authorization: 'Bearer ' + anonymousToken.access_token
+    });
+
+    const user = await testUtils.sendNetworkRequest({
+      method: 'post',
+      url: this.baseAccountUrl + '/user/login',
+      headers: headers,
+      body: body
+    });
+    user.signingKey = anonymousToken.signingKey;
+
+    return user as UserInfoResponse;
   }
 
 
@@ -984,11 +1020,19 @@ class AnonymousUser extends User {
 
 
 class RegisteredUser extends User {
-  private userInfo: UserSignUpResponse;
+  private userInfo: UserInfoResponse;
 
 
   public async create(credentials) {
     this.userInfo = await auth.userSignup(credentials);
+    this.userInfo.password = credentials.password;
+    this.accessToken = this.userInfo.access_token;
+  }
+
+
+  public async login(credentials: {email: string, password: string}) {
+    this.userInfo = await auth.userLogin(credentials);
+    this.userInfo.password = credentials.password;
     this.accessToken = this.userInfo.access_token;
   }
 
@@ -1072,7 +1116,7 @@ class RegisteredUser extends User {
         content_type: abbreviatedContentTypeConversion[content.type]
       };
 
-      const promise = await this.sendTubiAuthNetworkRequest({
+      const promise = this.sendTubiAuthNetworkRequest({
         method: 'delete',
         url: 'https://user-queue.production-public.tubi.io/api/v2/queues',
         body: body
@@ -1113,28 +1157,38 @@ class RegisteredUser extends User {
         position: positions[index] ?? positions.at(-1)
       };
 
+      let promise;
       // For series we have to do an additional call to get the episodes for this series since the episodes are what have the progress
       if (contentType === ContentTypes.series) {
-        // Have to add leading zero since it's a series
-        const fullSeriesContent = await this.getContentById('0' + contentId);
+        // Using anonymous function here to allow running multiple requests in parallel
+        promise = (async () => {
+          // Have to add leading zero since it's a series
+          const fullSeriesContent = await this.getContentById('0' + contentId);
 
-        // For now we just always get the first episode
-        const firstEpisode = fullSeriesContent.children[0].children[0];
-        if (firstEpisode) {
-          body.content_type = 'episode';
-          body.content_id = firstEpisode.id;
-          body.parent_id = contentId;
-        } else {
-          console.warn('Could not retrieve series episode. Skipping...');
-          continue;
-        }
+          // For now we just always get the first episode
+          const firstEpisode = fullSeriesContent.children[0].children[0];
+          if (firstEpisode) {
+            body.content_type = 'episode';
+            body.content_id = firstEpisode.id;
+            body.parent_id = contentId;
+          } else {
+            console.warn('Could not retrieve series episode. Skipping...');
+            return;
+          }
+
+          await this.sendTubiAuthNetworkRequest({
+            method: 'post',
+            url: 'https://lishi.production-public.tubi.io/api/v2/view_history',
+            body: body
+          });
+        })();
+      } else {
+        promise = this.sendTubiAuthNetworkRequest({
+          method: 'post',
+          url: 'https://lishi.production-public.tubi.io/api/v2/view_history',
+          body: body
+        });
       }
-
-      const promise = await this.sendTubiAuthNetworkRequest({
-        method: 'post',
-        url: 'https://lishi.production-public.tubi.io/api/v2/view_history',
-        body: body
-      });
       promises.push(promise);
     }
 
@@ -1354,7 +1408,7 @@ type KeyPathElement = {
 type DetailPageMenuItemType = 'play' | 'playFromBeginning' | 'resume' | 'addToMyList' | 'removeFromMyList' | 'removeFromHistory' | 'episodesList';
 
 
-type UserSignUpResponse = {
+type UserInfoResponse = {
   access_token: string;
   birthday: string;
   email: string;
@@ -1376,13 +1430,27 @@ type UserSignUpResponse = {
     key: string;
     verifier: string;
   }
+  password: string | undefined;
 };
 
 
 type DeeplinkPage = 'movies' | 'livefeed' | 'genre' | 'network' | 'tv' | 'espanol' | 'kids' | 'home';
 
 
-type ContentRatings = 'G' | 'PG' | 'PG-13' | 'R' | 'TV-Y' | 'TV-Y7_FV' | 'TV-Y7' | 'TV-G' | 'TV-PG'| 'TV-14' | 'TV-MA' | 'NR';
+enum ContentRatings {
+  'G' = 'G',
+  'PG' = 'PG',
+  'PG-13' = 'PG-13',
+  'R' = 'R',
+  'TV-Y' = 'TV-Y',
+  'TV-Y7_FV' = 'TV-Y7_FV',
+  'TV-Y7' = 'TV-Y7',
+  'TV-G' = 'TV-G',
+  'TV-PG' = 'TV-PG',
+  'TV-14' = 'TV-14',
+  'TV-MA' = 'TV-MA',
+  'NR' = 'NR'
+}
 
 
 type StartApplicationArgs = {
@@ -1405,7 +1473,10 @@ const auth = new Auth();
 
 export {
   testUtils,
+  auth,
   User,
   RegisteredUser,
-  AnonymousUser
+  AnonymousUser,
+  ContentTypes,
+  ContentRatings
 };
