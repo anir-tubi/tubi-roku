@@ -16,6 +16,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
+        type: choice
         description: 'Used to run tests with a specific tag. Use "Run All Tests" to run all tests. Use "Custom String" to provide an alternative string input below.'
         default: 'Run All Tests'
         options:
@@ -44,7 +45,6 @@ on:
           - '@settings'
           - '@smoke'
           - '@videopreview'
-        type: choice
       customString:
         description: 'Use to provide a custom string of which test to run. You can use the the pipe symbol "|" to provide more than one one string. For example "C4151|C4153" would run both the C4151 test and C4153 test. This input is ignored unless "Custom String" is set above.'
         type: string
@@ -52,6 +52,12 @@ on:
         description: 'Stop running on first test failure'
         default: false
         type: boolean
+      runOn:
+        description: 'Whose runner would you like to run on?'
+        type: choice
+        options:
+          - 'Brian Leighty'
+          - 'Paul Knowles'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -59,8 +65,8 @@ jobs:
   build:
     # name helps to check the status of github action
     name: Run Automated UI Tests
-    # The type of runner that the job will run. self hosted machine is our own machine setup in SF office and it has dedicated connected roku device.
-    runs-on: [self-hosted, automated-tests-runner, enabled]
+    # The type of runner that the job will run
+    runs-on: [self-hosted, automated-tests-runner, enabled, '${{inputs.runOn}}']
     # timeouts after 60 minutes, if the execution/automated tests got stuck/crash
     timeout-minutes: 60
 
@@ -73,6 +79,7 @@ jobs:
           echo tag: "${{ inputs.tag }}"
           echo customString: "${{ inputs.customString }}"
           echo bail: "${{ inputs.bail }}"
+          echo runOn: "${{ inputs.runOn }}"
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
