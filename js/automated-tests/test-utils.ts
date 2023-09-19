@@ -17,7 +17,13 @@ enum ContentTypes {
   'linear' = 'linear',
   'category' = 'category',
   'channel' = 'channel',
-  'sports_event' = 'sports_event'
+  'sports_event' = 'sports_event',
+  // Include short versions as well
+  'c' = 'category',
+  'v' = 'movie',
+  's' = 'series',
+  'l' = 'linear',
+  'se' = 'sports_event'
 }
 
 
@@ -994,6 +1000,16 @@ abstract class User {
   public getContent() {
     return new FilterContent(this);
   }
+
+
+  protected convertAbbreviatedContentType(inputContentType) {
+    // First check if the content type has already been resolved
+    if (Object.values(abbreviatedContentTypeConversion).includes(inputContentType)) {
+      return inputContentType;
+    }
+
+    return abbreviatedContentTypeConversion[inputContentType];
+  }
 }
 
 
@@ -1057,14 +1073,14 @@ class RegisteredUser extends User {
 
 
   // contents: array of contents as returned by a call to getContents()
-  public async addContentToWatchList(contents: {type: string; id: string}[] | {type: string; id: string}) {
+  public async addContentToWatchList(contents: {type: keyof typeof ContentTypes; id: string}[] | {type: keyof typeof ContentTypes; id: string}) {
     if (!Array.isArray(contents)) {
       contents = [contents];
     }
 
     const promises = [];
     for (const content of contents) {
-      const contentType = abbreviatedContentTypeConversion[content.type];
+      const contentType = this.convertAbbreviatedContentType(content.type);
       let contentId = content.id;
       if (contentType == ContentTypes.series) {
         // Have to add leading zero for series
@@ -1104,7 +1120,7 @@ class RegisteredUser extends User {
 
 
   // contents: array of contents as returned by a call to getContents()
-  public async removeContentFromWatchList(contents: {type: string; id: string}[] | {type: string; id: string}) {
+  public async removeContentFromWatchList(contents: {type: keyof typeof ContentTypes; id: string}[] | {type: keyof typeof ContentTypes; id: string}) {
     if (!Array.isArray(contents)) {
       contents = [contents];
     }
@@ -1113,7 +1129,7 @@ class RegisteredUser extends User {
     for (const content of contents) {
       const body = {
         content_id: content.id,
-        content_type: abbreviatedContentTypeConversion[content.type]
+        content_type: this.convertAbbreviatedContentType(content.type)
       };
 
       const promise = this.sendTubiAuthNetworkRequest({
@@ -1129,7 +1145,7 @@ class RegisteredUser extends User {
 
   // contents: array of contents returned from a call to getContents
   // positions: number or array of where in the content to mark the user's play history. If less values are provided than in contents then the last positions value is used
-  public async addContentToViewHistory(contents: {type: string; id: string}[] | {type: string; id: string}, positions: number | number[]) {
+  public async addContentToViewHistory(contents: {type: keyof typeof ContentTypes; id: string}[] | {type: keyof typeof ContentTypes; id: string}, positions: number | number[]) {
     if (!Array.isArray(contents)) {
       contents = [contents];
     }
@@ -1143,7 +1159,7 @@ class RegisteredUser extends User {
     const promises = [];
 
     for (const [index, content] of contents.entries()) {
-      const contentType = abbreviatedContentTypeConversion[content.type];
+      const contentType = this.convertAbbreviatedContentType(content.type);
       const contentId = content.id;
       if (contentType !== ContentTypes.movie && contentType !== ContentTypes.series && contentType !== ContentTypes.sports_event) {
         console.warn('Tried to add unsupported type to view history. Skipping...');
@@ -1217,7 +1233,7 @@ class RegisteredUser extends User {
 
 
   // contents: array of contents returned from a call to getContents
-  public async removeContentFromViewHistory(contents: {type: string; id: string}[] | {type: string; id: string}) {
+  public async removeContentFromViewHistory(contents: {type: keyof typeof ContentTypes; id: string}[] | {type: keyof typeof ContentTypes; id: string}) {
     if (!Array.isArray(contents)) {
       contents = [contents];
     }
@@ -1273,7 +1289,7 @@ class FilterContent {
       id: string;
       title: string;
       video_preview_url: string;
-      type: string;
+      type: ContentTypes;
       ratings: {
         value: string;
       }

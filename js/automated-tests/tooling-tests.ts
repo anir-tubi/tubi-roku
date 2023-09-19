@@ -79,7 +79,7 @@ describe('test-utils', function () {
 
   describe('RegisteredUser', function () {
     const movieContent = {
-      type: 'v',
+      type: 'v' as const,
       id: '613766'
     };
 

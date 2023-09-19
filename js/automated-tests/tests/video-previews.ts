@@ -5,45 +5,14 @@ import { shared } from '../shared';
 
 
 describe('Video Preview', function () {
-
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/257895
   it('C257895 - Verify that High TVT Evergreen titles will have Video Preview clips @videopreview', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-
-    // Navigate to search screen
-    await testUtils.goToPage('search');
-
-    await ecp.sendText('zapped');
-
-    // Navigate right until the grid is in focus
-    await testUtils.untilTrue(async () => {
-      await ecp.sendKeyPress(ecp.Key.Right);
-      const { value: id } = await odc.getValue({
-        base: 'focusedNode',
-        keyPath: 'id'
-      });
-      return id === 'ResultGrid';
-    }, 'ResultGrid never obtained focus');
-
-    // Wait until our content is loaded
-    await odc.onFieldChangeOnce({
-      base: 'focusedNode',
-      keyPath: 'content',
-      match: {
-        base: 'focusedNode',
-        keyPath: 'content.0.title',
-        value: 'Zapped'
-      }
+    const user = await testUtils.createRegisteredUser();
+    await user.addContentToWatchList({
+      id: '342067',
+      type: 'movie'
     });
-
-    // Go to the detail page
-    await ecp.sendKeyPress(ecp.Key.Ok);
-
-    // Add the item to the user's queue
-    await testUtils.selectAndVerifyDetailPageMenuItem('addToMyList');
-
-    // Navigate back to the home screen
-    await testUtils.goToPage('home');
+    await testUtils.startApplicationAtPage('home', { user: user });
 
     // Now find where the My List Row is and jump to it
     const myListIndex = await testUtils.jumpToRowWithTitle('homeScreenRowList', 'My List');
@@ -95,7 +64,7 @@ describe('Video Preview', function () {
 
     // Go to details page and verify that video preview continues
     await ecp.sendKeyPress(ecp.Key.Ok);
-  
+
     // Verify we are on the details page
     const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
     expect(detailScreenTitle.text).to.not.be.empty;
@@ -133,7 +102,7 @@ describe('Video Preview', function () {
   it('C264595 - Ensure Registered users have access to turn off Video preview feature from settings @videopreview', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-    
+
     //Open left nav
     await ecp.sendKeyPress(ecp.Key.Left);
 
@@ -145,7 +114,7 @@ describe('Video Preview', function () {
     await ecp.sendKeyPress(ecp.Key.Ok);
     await ecp.sendKeyPress(ecp.Key.Down);
     await ecp.sendKeyPress(ecp.Key.Ok);
-   
+
 
 
     // Go back to home page and verify that autoplay is off
@@ -253,7 +222,7 @@ describe('Video Preview', function () {
     expect(myStuffLeftNav);
     await ecp.sendKeyPress(ecp.Key.Ok);
 
-   
+
 
     // Let's check for My Stuff page, CW row here
     const continueWatchingRow = testUtils.getNodeForElement('continueWatchingRow');
