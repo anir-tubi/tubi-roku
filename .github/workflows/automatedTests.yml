@@ -75,7 +75,7 @@ jobs:
           echo bail: "${{ inputs.bail }}"
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: actions/setup-node@master
         with:
@@ -98,17 +98,20 @@ jobs:
           npx gulp runAutomatedTests
 
       - name: Upload JSON Report
+        if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
           name: JSON Report
           path: out/ui-tests-output/report.json
 
       - name: Upload HTML Report
+        if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
           name: HTML Report
           path: out/ui-tests-output/html
 
       - name: Send Slack Notification
+        if: success() || failure()
         run: |
           npx ts-node ./js/workflows/sendSlackAutomatedTestsResultNotification.ts
