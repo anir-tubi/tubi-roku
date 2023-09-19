@@ -268,7 +268,7 @@ Function getTranslation_en_US()
     },
     "component_library_failed":{
       "description": "Latest Version of Tubi app failed to load due to some error",
-      "message": "{errCode}The Tubi channel failed to load fully. Some functionality may be missing."
+      "message": "{errCode}\nThe Tubi channel failed to load fully. Some functionality may be missing."
     },
     "epg_starts_at": {
       "description": "Program time Title when user selects a future program on EPG.",
@@ -1924,6 +1924,10 @@ Function getTranslation_es_MX()
       "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Entertainment EPG screen.",
       "message": "Entretenimiento"
     },
+    "component_library_failed": {
+      "description": "Latest Version of Tubi app failed to load due to some error",
+      "message": "{errCode}\nEl canal de Tubi no se cargó completamente. Es posible que falte alguna funcionalidad."
+    },
     "epg_starts_at": {
       "description": "Program time Title when user selects a future program on EPG.",
       "message": "Comienza en"
@@ -2458,12 +2462,12 @@ Function getTranslation_es_MX()
     },
     "screenSettings_parentalControls_group_LittleKids": {
       "description": "Little Kids of the parental controls",
-      "message": "Niños pequeños",
+      "message": "Niños Pequeños",
       "note": "This translation is used as screenSettings_parentalControls_group_LittleKids, please double check that it is not needed before deleting"
     },
     "screenSettings_parentalControls_group_OlderKids": {
       "description": "Older Kids of the parental controls",
-      "message": "Niños mayores",
+      "message": "Niños Mayores",
       "note": "This translation is used as screenSettings_parentalControls_group_OlderKids, please double check that it is not needed before deleting"
     },
     "screenSettings_parentalControls_group_Teens": {
@@ -2499,6 +2503,10 @@ Function getTranslation_es_MX()
     "screenSettings_menu_yourPrivacyChoices": {
       "description": "A menu Item for the Settings screen",
       "message": "Sus Opciones de Privacidad"
+    },
+    "screenSettings_menu_PrivacyCenter": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Centro de Privacidad"
     },
     "screenSettings_menu_signOut": {
       "description": "A menu Item for the Settings screen",
@@ -2767,6 +2775,10 @@ Function getTranslation_es_MX()
     "screenDetails_button_rateThisTitle": {
       "description": "Label of unfocused button to allow users to rate the current video title",
       "message": "Califica este Título"
+    },
+    "screenDetails_button_tellUsWhatYouThink": {
+      "description": "Label of unfocused button to allow users to rate the current video title",
+      "message": "Dinos Lo Que Piensas"
     },
     "screenDetails_button_see_all_games": {
       "description": "Label of button to allow users to a new page where they can see all the games related to the current sports title",
@@ -3436,23 +3448,83 @@ Function getTranslation_es_MX()
     },
     "consent_screen_heading": {
       "description": "Consent screen heading.",
-      "message": "Your Privacy"
+      "message": "Tu Privacidad"
     },
     "consent_screen_subheading": {
       "description": "Consent screen sub heading.",
-      "message": "Please take a moment to confirm your data privacy preferences"
+      "message": "Tóma un momento para confirmar tus preferencias de privacidad de datos"
     },
     "manage_preferences_button_label": {
       "description": "Manage preferences button label.",
-      "message": "Manage Preferences"
+      "message": "Administra Preferencias"
     },
     "accept_button_label": {
       "description": "Accept button label.",
-      "message": "Accept"
+      "message": "Aceptar"
     },
     "reject_button_label": {
       "description": "Reject button label.",
-      "message": "Reject"
+      "message": "Rechazar"
+    },
+    "privacy_preferences_label": {
+      "description": "privacy preferences screen title.",
+      "message": "Configuración de Privacidad"
+    },
+    "privacy_preferences_save_continue_button": {
+      "description": "Save and Continue button on Consent Manage preferences",
+      "message": "Guardar y Continuar"
+    },
+    "privacy_preferences_privacy_section_heading": {
+      "description": "Privacy section heading.",
+      "message": "Política de Privacidad"
+    },
+    "privacy_preferences_privacy_section_subheading": {
+      "description": "Privacy section subheading.",
+      "message": "Para ver la Política de privacidad de Tubi, escanee el código QR a continuación con tu dispositivo móvil o visita "
+    },
+    "privacy_preferences_dsar_section_heading": {
+      "description": "DSAR section heading.",
+      "message": "Derechos de Interes de Datos"
+    },
+    "privacy_preferences_dsar_section_subheading": {
+      "description": "DSAR section subheading.",
+      "message": "Para ver tus Derechos de datos y completar una solicitud, escanee el código QR a continuación con tu dispositivo móvil o visita "
+    },
+    "privacy_preferences_tos_section_heading": {
+      "description": "Terms of service section heading.",
+      "message": "Términos de Uso"
+    },
+    "privacy_preferences_tos_section_subheading": {
+      "description": "Terms of service section subheading.",
+      "message": "Para ver los Términos de uso de Tubi, escanee el código QR a continuación con tu dispositivo móvil o visita "
+    },
+    "privacy_preferences_qrcode_modal_subheading": {
+      "description": "QR Code Selected Modal subheading.",
+      "message": "Escanee el código QR en la pantalla con tu dispositivo móvil para ver el enlace."
+    },
+    "privacy_preferences_on": {
+      "description": "Privacy preferences toggle text on",
+      "message": "Encender"
+    },
+    "privacy_preferences_off": {
+      "description": "Privacy preferences toggle text off",
+      "message": "Apagar"
+    },
+    "privacy_preferences_required": {
+      "description": "Privacy preferences required text",
+      "message": "Requerido"
+    },
+    "required_preference_selected_toast_heading": {
+      "description": "Toast header when required preference item is selected.",
+      "message": "Ajuste Requerido"
+    },
+    "required_preference_selected_toast_message": {
+      "description": "Toast message when required preference item is selected.",
+      "message": "{preference} funcionalidad es necesaria para continuar."
+    },
+    "privacy_center_not_editable_mode_warning": {
+      "description": "Warning label that will be displayed in privacy center whenever user is in kids mode or any parental controls mode.",
+      "message": "Configuración de privacidad solo se puede cambiar fuera de Tubi Kids. Solo se utilizan datos esenciales dentro de Tubi Kids."
     }
   }
 End Function

@@ -49,7 +49,7 @@
   },
   "component_library_failed":{
     "description": "Latest Version of Tubi app failed to load due to some error",
-    "message": "{errCode}The Tubi channel failed to load fully. Some functionality may be missing."
+    "message": "{errCode}\nThe Tubi channel failed to load fully. Some functionality may be missing."
   },
   "epg_starts_at": {
     "description": "Program time Title when user selects a future program on EPG.",
@@ -1648,6 +1648,6 @@
   },
   "privacy_center_not_editable_mode_warning": {
     "description": "Warning label that will be displayed in privacy center whenever user is in kids mode or any parental controls mode.",
-    "message": "Privacy settings can only be changed outside Tubi Kids. Only essential data is used within Tubi Kids."  
+    "message": "Privacy settings can only be changed outside Tubi Kids. Only essential data is used within Tubi Kids."
   }
 }

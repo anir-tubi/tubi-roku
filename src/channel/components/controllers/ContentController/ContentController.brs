@@ -1636,7 +1636,7 @@ Function showPackedVersionLoadedModal(trackingLib, trackingTask)
 
   title = getTranslation("dialog_defaultError_title")
 
-  template = {"errCode":  userErrorCode + chr(10)}
+  template = {"errCode":  userErrorCode}
   message = getTranslation("component_library_failed", template)
 
   dialogEvent = {
