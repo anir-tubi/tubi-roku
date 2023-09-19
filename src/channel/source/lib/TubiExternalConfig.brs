@@ -102,13 +102,18 @@ Function tubiExternalConfig_parseConfigs(responseData)
   configs = invalid
   if responseData <> invalid
     configs = ParseJson(responseData)
-    ' Converting to blocked_analytics_events from ["start_ad", "ad_click"] to {"start_ad": true, "ad_click": true}. 
-    blockedAnalyticsEvents = configs.blocked_analytics_events
-    blockedAnalyticsEventsAA = {}
-    for each event in blockedAnalyticsEvents
-      blockedAnalyticsEventsAA[event] = true
-    end for
-    configs.blocked_analytics_events = blockedAnalyticsEventsAA
+    if type(configs) = "roAssociativeArray"
+      ' Converting to blocked_analytics_events from ["start_ad", "ad_click"] to {"start_ad": true, "ad_click": true}.
+      blockedAnalyticsEvents = configs.blocked_analytics_events
+      blockedAnalyticsEventsAA = {}
+
+      for each event in blockedAnalyticsEvents
+        blockedAnalyticsEventsAA[event] = true
+      end for
+
+      configs.blocked_analytics_events = blockedAnalyticsEventsAA
+    end if
+
   end if
 
   return configs

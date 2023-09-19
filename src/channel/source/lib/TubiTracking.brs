@@ -91,7 +91,7 @@ End Function
 ' @eventValues: assocArray, keys/values that correspond to the fields within the event type specified in @eventType
 ' @requestQueue: assocArray, a request queue as returned by TubiRequestQueue().create()
 Function tubiTracking_trackUserEvent(eventType = "", eventValues = invalid, requestQueue = invalid)
-  if eventType <> ""
+  if eventType <> "" AND m.constants.externalConfig.info <> invalid
     blockedAnalyticsEvents = m.constants.externalConfig.info.blocked_analytics_events
     if m.didUserOptOutOfTracking = false OR isAA(blockedAnalyticsEvents) = false OR blockedAnalyticsEvents.doesExist(eventType) = false
       trackData = m.getClientEvent(eventType, eventValues)
