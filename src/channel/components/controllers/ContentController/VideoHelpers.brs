@@ -17,7 +17,6 @@ Function playVideoContent(content, playbackSource = {"srcForAnalytic": "unknown"
     callbackAfterSignInParams = {"content": content, "playbackSource": playbackSource, "position": position}
     startSignIn(AfterSignInPlayLockedContent, callbackAfterSignInParams)
   else
-
   videoPlayer = setupVideoPlayer(content, playbackSource, position)
 
   currentScreen = getCurrentScreen()
@@ -40,6 +39,7 @@ Function playVideoContent(content, playbackSource = {"srcForAnalytic": "unknown"
   '//send a copy of the videoSponsorExposureId to the videoPlayer
   videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
   videoPlayer.control = "play"
+  updateRokuContinueWatchingInfo(content, position)
 end if
 End Function
 
@@ -73,6 +73,7 @@ Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrack
     '//send a copy of the videoSponsorExposureId to the videoPlayer
     videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
     videoPlayer.control = "play"
+    updateRokuContinueWatchingInfo(content, nowPos)
   end if
 End Function
 
@@ -679,6 +680,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
           ' avoid race conditions where the user could see the details screen before the history
           ' request resolves.
           updateHistoryAndHandleResponse(videoContent, historyPosition)
+          updateRokuContinueWatchingInfo(videoContent, historyPosition)
         end if
 
         ' update some info in the detail screen content and repopulate with that content
@@ -743,6 +745,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
           ' avoid race conditions where the user could see the details screen before the history
           ' request resolves.
           updateHistoryAndHandleResponse(videoContent, historyPosition)
+          updateRokuContinueWatchingInfo(videoContent, historyPosition)
         end if
 
         populateDetailScreen(detailScreen, detailContent, false, detailScreenResumePosition, m.constants.ui.screenIds.videoPlayerScreen)
@@ -1203,4 +1206,98 @@ Function sendPauseAdPixel(pixelUrl)
       silenceCallbackWarnings: true
     })
   end if
+End Function
+
+
+' @content: tubiContentNode, a content node representing a movie or episode or sports event.
+' @position: integer, Playback position.
+Function updateRokuContinueWatchingInfo(content, position)
+  ' Only perform the operation if user is logged in and not opted out of the continueWatching consent.
+  if isLoggedInUser() = true AND getConsentOptOutStatusByKey(m.constants.consentKeys.continueWatching) = false then
+    didReachEndOfVideo = false
+    if position >= content.creditCuePoints.postlude
+      didReachEndOfVideo = true
+    end if
+
+    ' Checking if we reached end of the program.
+    if didReachEndOfVideo = true
+      
+      ' Checking if it is a series or else if it is movie then removing from continue watching.
+      if content.parentType <> "series"
+        deleteFromRokuContinueWatching(content)
+      else
+        detailScreen = getTopDetailScreenFromStack()
+        if detailScreen <> invalid
+          detailContent = detailScreen.content
+
+          if detailContent.id = content.parentId
+            currentEpisode2DIndex = findEpisode2dIndex(content.id, detailContent)
+            nextEpisode2DIndex = findNextEpisode2dIndex(currentEpisode2DIndex, detailContent)
+
+            ' Checking to make sure we are not at the end of the available episodes.
+            if nextEpisode2DIndex[0] > 0 OR nextEpisode2DIndex[1] > 0
+              ' Adding the next episode to the continue watching.
+              nextEpisode = detailContent.getChild(nextEpisode2DIndex[0]).getChild(nextEpisode2DIndex[1])
+              addOrUpdateRokuContinueWatchingInfo(nextEpisode, 0)
+            else
+              deleteFromRokuContinueWatching(content)
+            end if
+          else
+            deleteFromRokuContinueWatching(content)
+          end if
+
+        end if
+      end if
+    else
+      addOrUpdateRokuContinueWatchingInfo(content, position)
+    end if
+  end if
+End Function
+
+
+' @content: tubiContentNode, a content node representing a movie or episode or sports event.
+' @position: integer, Playback position.
+Function addOrUpdateRokuContinueWatchingInfo(content, position)
+  item = {
+    "contentId": content.id,
+    "lastInteractionTime": createObject("roDateTime").asSeconds(),
+    "position": position,
+    "duration": content.length
+  }
+  if content.parentType = "series"
+    item.contentId = content.seriesId
+    item.episodeId = content.id
+  end if
+  body = {
+    "items": [item]
+  }
+  requestInfo = m.rokuContinueWatchingApi.createUpdateContinueWatchingReqInfo(body)
+  m.makeRequest({
+    url: requestInfo.url
+    options: requestInfo.options
+    requestType: m.constants.reqNames.postRokuContinueWatching
+    silenceCallbackWarnings: true
+  })
+End Function
+
+
+' @content: tubiContentNode, a content node representing a movie or episode or sports event.
+Function deleteFromRokuContinueWatching(content)
+  item = {
+    "contentId": content.id
+  }
+  if content.parentType = "series"
+    item.contentId = content.seriesId
+    item.episodeId = content.id
+  end if
+  body = {
+    "items": [item]
+  }
+  requestInfo = m.rokuContinueWatchingApi.createDeleteContinueWatchingReqInfo(body)
+  m.makeRequest({
+    url: requestInfo.url
+    options: requestInfo.options
+    requestType: m.constants.reqNames.deleteRokuContinueWatching
+    silenceCallbackWarnings: true
+  })
 End Function

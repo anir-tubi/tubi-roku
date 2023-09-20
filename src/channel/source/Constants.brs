@@ -13,6 +13,9 @@ Function getConstants()
   constants.registrySectionIDs = {}
     constants.registrySectionIDs.deviceInfoSectionId = "deviceinfo"
 
+  ' Roku's channel/app id for the production Tubi app. It is used with the continue watching feature to enable testing the feature in sideloaded/beta channels.
+  constants.productionApplicationId = "41468"
+
   mode = constants.settings.mode
   if mode = invalid then mode = "dev"
 
@@ -314,6 +317,8 @@ Function getConstants()
     constants.reqNames.postPauseAdPixel = "postPauseAdPixel"
     constants.reqNames.getConsent = "getConsent"
     constants.reqNames.patchConsent = "patchConsent"
+    constants.reqNames.postRokuContinueWatching = "postRokuContinueWatching"
+    constants.reqNames.deleteRokuContinueWatching = "deleteRokuContinueWatching"
 
     ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
@@ -688,6 +693,8 @@ Function getConstants()
         constants.urls.content.epgProgramContentUrlBase = "https://content.staging-public.tubi.io"
       end if
       constants.urls.content.epgProgramContent = constants.urls.content.epgProgramContentUrlBase + "/epg/programming"
+
+    constants.urls.rokuContinueWatchingEndpoint = "https://userdata.sr.roku.com/user-data/v1/content/continueWatching"
 
   'http request types
   constants.reqTypes = {}
@@ -1418,6 +1425,7 @@ Function getConstants()
     constants.consentKeys.analytics = "analytics"
     constants.consentKeys.personalization = "personalization"
     constants.consentKeys.marketing = "marketing_"
+    constants.consentKeys.continueWatching = "continue_watching"
 
 'THEME/COLOR START///////////////////////
 '//::TODO::colors - the following constants should be moved to themes. The app should not call these constants
@@ -1722,6 +1730,7 @@ constants.ui.themes = {}
 
       constants.deeplinks = {}
       constants.deeplinks["homescreen"] = "homescreen"
+      constants.deeplinks["homescreen-menu"] = "continue-watching"
       constants.deeplinks["hs-search"] = "search"
       constants.deeplinks["ad"] = "ad"
       constants.deeplinks["my-feed"] = "my-feed"

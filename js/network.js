@@ -62,7 +62,7 @@ exports.uploadPkg = function(zipPath, deviceIp, password) {
     };
 
     request.post(options, (err, response, body) => {
-      const success = !!body ? body.match(/<font color="red">Install Success.<\/font>/) : null
+      const success = !!body ? body.match(/<font color="red">.*Install Success.<\/font>/) : null
 
       if (err) {
         rej(err);

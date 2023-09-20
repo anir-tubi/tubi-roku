@@ -75,7 +75,13 @@ Function onConsentList(msg)
   m.bottomGradient.translation = [-5, visibleItemsHeight - 72]
 
   m.topGradient.opacity = 0
-  m.bottomGradient.opacity = 1
+  
+  ' Display gradient only if we have more than 4 items.
+  if consentList.count() > 4
+    m.bottomGradient.opacity = 1
+  else
+    m.bottomGradient.opacity = 0
+  end if
 End Function
 
 

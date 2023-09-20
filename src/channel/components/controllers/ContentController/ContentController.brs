@@ -216,6 +216,8 @@ Function init()
   ' Holds information related to individual consents and also other GDPR related values like privacy center flags.
   ' Sample data. {"consentRequired": true, [{"key": "behavioral_advertising","subtitle": "Tubi may use your information to make inferences and predict your potential areas of interest.","title": "Targeted Advertising","value": "required", "isRequired": true}]}
   m.consentSettings = {}
+
+  m.rokuContinueWatchingApi = RokuContinueWatchingApi(m.constants)
 End Function
 
 
