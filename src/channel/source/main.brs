@@ -190,7 +190,6 @@ Function runChannel(constants, log, request)
               starterController.observeField("fadeOutCustomSplash", port)
               starterController.observeField("fadeInRemoteComponent", port)
               starterController.setField("getUrl", true)
-              retries = 0
               pause = initialBackoff
             else
               return showComponentsFailedToLoadError(msg, log, screen, constants)
@@ -288,6 +287,7 @@ Function runChannel(constants, log, request)
         remoteLibrary = tubiScene.findNode("TubiRemoteLibrary")
         libraryBeingFetched = remoteLibrary
         componentTimer.mark()
+        retries = 0
         remoteLibrary.observeField("loadStatus", port)
         remoteLibrary.uri = msg.getData()
       else if msg.GetField() = "fadeOutCustomSplash"
