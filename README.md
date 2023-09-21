@@ -332,7 +332,11 @@ TBD
   `$ pyenv`
 
 - If you still need to setup Infra, then in terminal, navigate to your adrise_infrastructure repo and run the setup instructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure#setup)
-- Deploy to the CDN by running the Infra script which is detailed on the [CDN README file](https://github.com/adRise/adrise_cdn/#deploy-to-aws-s3).
+
+- Deploy to the Roku CDN and CDN by running the Infra Script which is detailed in the [RCDN README file](https://github.com/adRise/rcdn#readme).
+  After deployment make sure you can download the components you just uploaded to the CDN using the urls associated with `starterComponentsUrl`, `remoteComponentsUrl` and `rcdnStarterComponentsUrl`, `rcdnRemoteComponentsUrl` in default.yml
+
+
 
 14\. Submit build to Roku
 
@@ -464,7 +468,9 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
   `$ pyenv`
 
 - If you still need to setup Infra, then in terminal, navigate to your adrise_infrastructure repo and run the setup instructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure#setup)
-- Deploy to the CDN by running the Infra script which is detailed on the [CDN README file](https://github.com/adRise/adrise_cdn/#deploy-to-aws-s3).
+
+- Deploy to the Roku CDN and CDN by running the Infra Script which is detailed in the [RCDN README file](https://github.com/adRise/rcdn#readme).
+  After deployment make sure you can download the components you just uploaded to CDN using the urls associated with `starterComponentsUrl`, `remoteComponentsUrl` and `rcdnStarterComponentsUrl`, `rcdnRemoteComponentsUrl` in default.yml
 
 16\. Verify the release
 
