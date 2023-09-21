@@ -123,13 +123,21 @@ Function runChannel(constants, log, request, auth)
     if constants.experiments <> invalid AND constants.experiments.info <> invalid
       experiments = TubiExperiments(constants)
 
-      if experiments.getExperimentResource("roku_new_cdn", "roku_new_cdn_v1").enabled = true
+      if experiments <> invalid AND experiments.getExperimentResource("roku_new_cdn", "roku_new_cdn_v1").enabled = true
         starterLibUrl = constants.settings.rcdnStarterComponentsUrl
       end if
 
       cdnExposureEventInfo = experiments.getExperimentTracking("roku_new_cdn", "roku_new_cdn_v1")
-      trackingLib = TubiTracking(constants, request, auth)
-      trackingLib.trackUserEvent(cdnExposureEventInfo.type, cdnExposureEventInfo.values, m.queue)
+
+      if cdnExposureEventInfo <> invalid
+        trackingLib = TubiTracking(constants, request, auth)
+
+        if trackingLib <> invalid  'trackingLib may not be invalid, but just in case.
+          trackingLib.trackUserEvent(cdnExposureEventInfo.type, cdnExposureEventInfo.values, m.queue)
+        end if
+
+      end if
+
     end if
 
     print "attempting to load TubiStarterLibrary "; starterLibUrl
