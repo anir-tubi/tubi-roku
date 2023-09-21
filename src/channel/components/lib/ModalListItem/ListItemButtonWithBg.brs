@@ -5,6 +5,7 @@ Function init()
   m.background = topRef.findNode("background")
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
   topRef.observeFieldScoped("focusPercent", "onFocusPercentChange")
+  topRef.observeFieldScoped("gridHasFocus", "onGridHasFocusChange")
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -65,5 +66,15 @@ Function onFocusPercentChange(msg)
     m.labelFocused.opacity = focusPercent
   else
     m.labelFocused.opacity = 0
+  end if
+End Function
+
+
+Function onGridHasFocusChange(msg)
+  gridHasFocus = msg.getData()
+  if gridHasFocus = false
+    m.background.opacity = 1
+  else if m.top.itemHasFocus = true
+    m.background.opacity = 0
   end if
 End Function

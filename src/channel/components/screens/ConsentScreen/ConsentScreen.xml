@@ -35,25 +35,37 @@
           uri="pkg:/fonts/Vaud-Medium.ttf"
           size="33" />
       </Label>
-      <Label
+    </LayoutGroup>
+    <Group
+      id="focusableSection"
+      translation="[192, 309]">
+      
+      <FilledButtonMarkupGrid
+        id="buttonList"
+        itemSize="[384, 72]"
+        itemComponentName="ListItemButtonWithBg"
+        itemSpacing="[0, 12]"
+        numRows="3"
+        numColumns="1"
+        vertFocusAnimationStyle="floatingFocus"/>
+      <Poster
+        id="descriptionBackground"
+        uri="pkg:/images/menu-focus-$$RES$$.9.png"
+        width="1053"
+        height="672"
+        translation="[483, 0]" />
+      <ScrollableText
+        translation="[519, 24]"
         id="description"
-        width="1320"
-        maxLines="9"
-        wrap="true">
+        scrollbarThumbBitmapUri="pkg:/images/scrollbar-unfocused-$$RES$$.9.png"
+        scrollbarTrackBitmapUri="pkg:/images/transparent.png"
+        width="954"
+        height="621">
         <Font
           role="font"
           uri="pkg:/fonts/Vaud-Medium.ttf"
           size="27" />
-      </Label>
-    </LayoutGroup>
-    <FilledButtonMarkupGrid
-      id="buttonList"
-      itemSize="[384, 72]"
-      itemComponentName="ListItemButtonWithBg"
-      itemSpacing="[0, 12]"
-      translation="[192, 702]"
-      numRows="3"
-      numColumns="1"
-      vertFocusAnimationStyle="floatingFocus"/>
+      </ScrollableText>
+    </Group>
   </children>
 </component>
