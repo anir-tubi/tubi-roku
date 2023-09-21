@@ -27,7 +27,7 @@ Function Main(startupArgs)
   permaScreen.CreateScene("BackgroundScene")
   permaScreen.show()
 
-  while runChannel(constants, log, request) = true
+  while runChannel(constants, log, request, auth) = true
   end while
 End Function
 
@@ -35,9 +35,10 @@ End Function
 ' @constants: assocArray, constants as returned by getConstants()
 ' @log: assocArray, an instance of the log module as returned by TubiLog()
 ' @request: assocArray, an instance of the request module as returned by TubiRequest()
+' @auth: assocArray, an instance of the Auth module as returned by TubiAuth()
 '
 ' returns: boolean, true if the app should be restarted, false if the app should be closed
-Function runChannel(constants, log, request)
+Function runChannel(constants, log, request, auth)
   startupArgs = {}
   startupArgs.append(m.startupArgs)
   m.startupArgs = invalid
@@ -110,12 +111,30 @@ Function runChannel(constants, log, request)
 
   'this is the packaged constants - the submitted constants
   if constants.settings.useStarterComponents <> false
-    print "attempting to load TubiStarterLibrary "; constants.settings.starterComponentsUrl
+    '//TODO remove setRemoteConfigAndExperimentsOnConstants from here after exp : roku_new_cdn. Starter component will load the config and experiment tasks.
+    constants = setRemoteConfigAndExperimentsOnConstants(request, constants)
     starterLibrary = tubiScene.findNode("TubiStarterLibrary")
     starterLibrary.observeField("loadStatus", port)
     libraryBeingFetched = starterLibrary
     componentsLoaded = false
-    starterLibrary.uri = constants.settings.starterComponentsUrl ' kicks off fetch of starter components
+
+    starterLibUrl = constants.settings.starterComponentsUrl
+
+    if constants.experiments <> invalid AND constants.experiments.info <> invalid
+      experiments = TubiExperiments(constants)
+
+      if experiments.getExperimentResource("roku_new_cdn", "roku_new_cdn_v1").enabled = true
+        starterLibUrl = constants.settings.rcdnStarterComponentsUrl
+      end if
+
+      cdnExposureEventInfo = experiments.getExperimentTracking("roku_new_cdn", "roku_new_cdn_v1")
+      trackingLib = TubiTracking(constants, request, auth)
+      trackingLib.trackUserEvent(cdnExposureEventInfo.type, cdnExposureEventInfo.values, m.queue)
+    end if
+
+    print "attempting to load TubiStarterLibrary "; starterLibUrl
+
+    starterLibrary.uri =  starterLibUrl ' kicks off fetch of starter components
     componentTimer = CreateObject("roTimespan")
   else
     'only expect this else block to happen when side loading/testing
@@ -624,5 +643,6 @@ Function setRemoteConfigAndExperimentsOnConstants(request, constants)
   externalConfig.init() 'sets external config values from server on constants
   experiments = TubiExperiments(constants)
   experiments.init(request) 'sets experiment values from server on constants
+
   return constants
 End Function

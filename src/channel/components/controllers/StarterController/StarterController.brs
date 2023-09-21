@@ -9,13 +9,22 @@ Function init()
     processAnimationLogo()
   end if
 
-  m.isExperimentConfigReady = false
-  m.isExternalConfigReady = false
+  '//TODO : after the experiment roku_new_cdn set both m.isExperimentConfigReady and m.isExternalConfigReady to false to start with.
+
+  m.isExperimentConfigReady = (m.constants <> invalid AND m.constants.experiments <> invalid AND m.constants.experiments.info <> invalid)
+  m.isExternalConfigReady = (m.constants <> invalid AND m.constants.externalConfig <> invalid AND m.constants.externalConfig.info <> invalid)
+
   m.top.observeFieldScoped("getUrl", "onUrlRequest")
 
   starterTask = createObject("roSGNode", "StarterGeneralTask") ' initiate StarterTask
   GeneralTaskModule(m, starterTask)
-  sendRequestForExperimentsAndConfig()
+
+  if m.isExperimentConfigReady = true AND m.isExternalConfigReady = true
+    checkIfExperimentAndRemoteConfigReadyAndProceed()
+  else
+    sendRequestForExperimentsAndConfig()
+  end if
+
 End Function
 
 
@@ -40,7 +49,6 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
     if m.constants.settings.useRemoteComponents = false
       m.top.useRemoteComponents = m.constants.settings.useRemoteComponents
     else
-      remoteComponentsUrl = m.constants.settings.remoteComponentsUrl
 
       ' if an experiment or remote config needs to update the remoteComponentsUrl, do it here.
       ' (experiment tracking should not happen here. It should happen when the user encounters the experiment!)
@@ -60,6 +68,15 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
 
 
       '-------------------------------------------------------------------------------------'
+      experiments = TubiExperiments(m.constants)
+
+      if experiments <> invalid AND experiments.getExperimentResource("roku_new_cdn", "roku_new_cdn_v1").enabled = true
+        remoteComponentsUrl =  m.constants.settings.rcdnRemoteComponentsUrl
+      else
+        remoteComponentsUrl = m.constants.settings.remoteComponentsUrl
+      end if
+
+
       print "remoteComponentsUrl "; remoteComponentsUrl
       m.top.remoteComponentsUrl = remoteComponentsUrl
     end if
