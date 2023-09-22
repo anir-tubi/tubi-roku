@@ -53,6 +53,7 @@ Function init()
   m.overlayAutoHideTime = m.constants.settings.videoOverlayAutoHideTime
   m.bufferingInfo = invalid
 
+  'm.lastPingTime helps to prevent extra live play progress event and also helps to send live play progress event in proper interval.
   m.lastPingTime = 0
 
   m.analyticsInterval = m.constants.player.pingFrequency
@@ -332,15 +333,22 @@ Function onVideoStateChange(msg)
   else if state = "playing" AND m.VideoState <> "pause"
     ' reset the last ping time to the position at which video playback is starting or re-starting (after a seek)
     ' in order to avoid race conditions in which the video position might update while the handle logic is being completed.
-    m.lastPingTime = m.Video.position
+    ' when video starts playing after buffering, m.lastPingTime will not get updated and remain -1, because
+    ' the video.position returned from videoNode here is not accurate, so we will update lastPingTime on videoPositionChange function where we get accurate video.position
+    if m.lastPingTime > -1
+      m.lastPingTime = m.Video.position
+    end if
   else if state = "buffering"
-    ' sends the live play progress event when video buffers, and resets the lastPingTime to the current video position.
+    ' sends the live play progress event when video buffers, this way we are not missing any viewtime
     ' This avoids higher viewTime live play progress events
     playProgressEvent = getPlayProgressEvent(m.top.fullscreen)
     if playProgressEvent <> invalid
       trackEvent(playProgressEvent)
     end if
-    m.lastPingTime = m.Video.position
+    ' setting m.lastPingTime to -1 for mid buffering, so that next time when videoPositionChange callback triggers the large live play progress event will not be sent
+    if m.lastPingTime > 0
+      m.lastPingTime = -1
+    end if
   end if
 
   ' Loading page visibility
@@ -388,12 +396,16 @@ Function onVideoPositionChange()
   end if
 
   ' Analytics
-  if m.playerPosition >= m.lastPingTime + m.analyticsInterval
+  if m.lastPingTime > -1 AND m.playerPosition >= m.lastPingTime + m.analyticsInterval
     playProgressEvent = getPlayProgressEvent(m.top.fullscreen)
     if playProgressEvent <> invalid
       m.lastPingTime = m.playerPosition
       trackEvent(playProgressEvent)
     end if
+  else if m.lastPingTime = -1
+    ' updating m.lastPingTime to m.playerPosition(video.position), when the m.lastPingTime is -1
+    ' This happens when video starts playing right after buffering
+    m.lastPingTime = m.playerPosition
   end if
 
 End Function
@@ -867,6 +879,7 @@ End Function
 ' an ad break starts
 Function getPlayProgressEvent(isFullScreen = true)
   playProgressEvent = invalid
+
   if m.playerPosition > m.lastPingTime
     videoPlayerType = "DEFAULT"
     if isFullScreen = false
