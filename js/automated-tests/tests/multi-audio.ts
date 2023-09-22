@@ -23,8 +23,8 @@ describe('Multiple Audio', function () {
     await navigateRightToGrid();
 
     await testUtils.retryWithTimeOut(async () => {
-      const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-      expect(linearSearchResultsText.text).to.contain('Fifth Plane');
+      const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+      expect(searchResultsText.text).to.contain('Fifth Plane');
     });
 
     // Select item and Play button
@@ -50,8 +50,8 @@ describe('Multiple Audio', function () {
     await navigateRightToGrid();
 
     await testUtils.retryWithTimeOut(async () => {
-      const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-      expect(linearSearchResultsText.text).to.contain('Fifth Plane');
+      const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+      expect(searchResultsText.text).to.contain('Fifth Plane');
     });
 
     // Select item and Play button
@@ -93,8 +93,8 @@ describe('Multiple Audio', function () {
     await navigateRightToGrid();
 
     await testUtils.retryWithTimeOut(async () => {
-      const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-      expect(linearSearchResultsText.text).to.contain('Fifth Plane');
+      const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+      expect(searchResultsText.text).to.contain('Fifth Plane');
     });
 
     // Select item and Play button
@@ -132,8 +132,8 @@ describe('Multiple Audio', function () {
     // Call function to navigate right to search results grid
     await navigateRightToGrid();
     await testUtils.retryWithTimeOut(async () => {
-      const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-      expect(linearSearchResultsText.text).to.contain('Fletch');
+      const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+      expect(searchResultsText.text).to.contain('Fletch');
     });
 
     // Verify AD is still enabled.
@@ -154,7 +154,7 @@ describe('Multiple Audio', function () {
     expect(audioTracksSectionHeader.visible).to.be.true;
     await ecp.sendKeyPress(ecp.Key.Right, { count: 4 });
     await ecp.sendKeyPress(ecp.Key.Ok);
-    expect(audioTracksSectionHeader.visible).to.be.true;
+    expect(audioTracksSectionHeader.text).to.include('Audio');
 
     // Verify that AD is still enabled
     await utils.sleep(3000);
@@ -172,8 +172,8 @@ describe('Multiple Audio', function () {
     await navigateRightToGrid();
 
     await testUtils.retryWithTimeOut(async () => {
-      const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-      expect(linearSearchResultsText.text).to.contain('Fifth Plane');
+      const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+      expect(searchResultsText.text).to.contain('Fifth Plane');
     });
 
     // Select item and Play button

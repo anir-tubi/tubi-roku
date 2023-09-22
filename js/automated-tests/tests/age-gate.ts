@@ -59,11 +59,12 @@ describe('Age Gate', function () {
     await ecp.sendKeyPress(ecp.Key.Down, { count: 4 });
     await utils.sleep(500);
     await ecp.sendKeyPress(ecp.Key.Ok);
+    await utils.sleep(500);
 
     // Verify Age Gate Screen
-    const ageGateYearsBox = await testUtils.getNodeForElement('ageGateYearsBox');
-    expect(ageGateYearsBox.visible).to.equal(true);
-    await utils.sleep(2000);
+    const ageVerificationPad = await testUtils.getNodeForElement('ageVerificationPad');
+    expect(ageVerificationPad.visible).to.equal(true);
+    await testUtils.waitForElementToHaveFocus('ageVerificationPad');
 
     // Enter invalid Age >  125
     await ecp.sendText('126');

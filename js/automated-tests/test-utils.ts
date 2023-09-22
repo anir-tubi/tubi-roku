@@ -1086,7 +1086,7 @@ class RegisteredUser extends User {
         // Have to add leading zero for series
         contentId = `0${contentId}`;
       } else if (contentType !== ContentTypes.movie && contentType !== ContentTypes.sports_event) {
-        console.warn('Tried to add unsupported type to watchlist. Skipping...');
+        console.warn(`Tried to add unsupported type '${contentType}' to watchlist. Skipping...`);
         continue;
       }
 

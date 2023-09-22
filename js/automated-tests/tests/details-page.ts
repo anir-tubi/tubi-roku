@@ -164,6 +164,7 @@ describe('Details Page', function () {
       expect(detailScreenTitle.visible).to.equal(true);
 
       // Verify and select the Play button
+
       await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
       // Create history
@@ -449,7 +450,6 @@ describe('Details Page', function () {
 
       // Create history
       await ecp.sendKeyPress(ecp.Key.Play);
-
       await createHistory();
 
       // Back to Details page

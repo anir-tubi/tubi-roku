@@ -44,17 +44,13 @@
     "description" : "Dialog box text for PC Settings Change for Older Kids",
     "keyPath": "#ContentController.2.#DialogBox.#ContentArea.#MessageGroup.#Message"
   },
-  "settingsScreenMenu": {
-    "description": "Settings Screen menu",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu"
-  },
   "exitKidsGrayedOut": {
     "description" : "Exit Kids Menu item in Kids more is grayed out",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.1.#LabelParent.0.#Label"
   },
   "signOutButtonKidsMode": {
     "description" : "Sign Out button on Settings Page while in Kids mode",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.6.#DetailsMenuText"
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.4.#DetailsMenuTextParent.#DetailsMenuText"
   },
   "signOutVerificationModalMessage": {
     "description" : "Sign out verification modal",
@@ -134,8 +130,8 @@
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList/RowListItem[11]/Group/CategoryGridRowLabel/LayoutGroup/Label",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#SponsoredBy.#SponsoredByText"
   },
-  "kidsHomeScreenRatingsLabel": {
-    "name": "kidsHomeScreenRatingsLabel",
+  "homeScreenRatingsLabel": {
+    "name": "homeScreenRatingsLabel",
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup/LayoutGroup/Group/Label",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Rating.#RatingLabel"
   },
@@ -367,11 +363,6 @@
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/UpNext/Group/Group[3]/InfoPanel/LayoutGroup/LayoutGroup/Label",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextSeriesGroup.#InfoSeries.#infoPanelGroup.#Offset.#Title"
   },
-  "fastForwardButton2x": {
-    "name": "fastForwardButton2x",
-    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[6]",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#FastForwardButton"
-  },
   "autoplayLastTitleFocus": {
     "name": "autoplayLastTitleFocus",
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/UpNext/Group/Group[2]/Poster",
@@ -397,7 +388,7 @@
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/InfoPanel/LayoutGroup/LayoutGroup/Label",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#Title"
   },
-  "linearSearchResultsText": {
+  "searchResultsText": {
     "name": "linearSearchResultsText",
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/InfoPanel/LayoutGroup/LayoutGroup/Label",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#Title"
@@ -755,7 +746,7 @@
   },
   "audioDescriptionEnabled" : {
     "description" : "audio desc enabled",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#audioTracksSection.#audioTrackSelector.1"
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#audioTracksSection.#audioTrackSelector.1.#container.0.#checkIcon"
   },
   "subtitleOff" : {
     "description" : "subtitle OFF",
@@ -771,7 +762,7 @@
   },
   "audioDescriptionEnabledCheck" : {
     "description" : "audio desc enabled check",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#audioTracksSection.#audioTrackSelector.1.#container.0.#checkIcon"
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#audioTracksSection.#audioTrackSelector.1.#container"
   },
   "countDownMovieAutoPlay" : {
     "description" : "autoplay countdown movies",
@@ -804,5 +795,27 @@
 "myStuffLeftNav" : {
   "description" : "My Stuff Left Nav option",
   "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.4.#LabelParent.0.#Label"
+},
+"parentalControlsHeader" : {
+  "description" : "Parental Controls header",
+  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#Title"
+},
+"featuredRow" : {
+  "description" : "Featured Row",
+  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.1.title.#CategoryName"
+},
+"featuredRowPoster" : {
+  "description" : "Featured row poster",
+  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.items.0.#poster"
+},
+"homeScreenContentDescription" :{
+  "description" : "description of title in CW row",
+  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
+}, 
+"ageVerificationPad" : {
+  "description": "age gate number page",
+  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0"
 }
+
 }
+

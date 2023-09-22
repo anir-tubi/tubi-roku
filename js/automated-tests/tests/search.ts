@@ -13,8 +13,8 @@ describe('Search', function () {
       await navigateRightToGrid();
 
       await testUtils.retryWithTimeOut(async () => {
-        const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-        expect(linearSearchResultsText.text).to.equal('ABC News Live');
+        const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+        expect(searchResultsText.text).to.equal('ABC News Live');
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
@@ -29,8 +29,8 @@ describe('Search', function () {
       await navigateRightToGrid();
 
       await testUtils.retryWithTimeOut(async () => {
-        const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-        expect(linearSearchResultsText.text).to.equal('ABC News Live');
+        const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+        expect(searchResultsText.text).to.equal('ABC News Live');
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
@@ -49,8 +49,8 @@ describe('Search', function () {
       await navigateRightToGrid();
 
       await testUtils.retryWithTimeOut(async () => {
-        const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-        expect(linearSearchResultsText.text).to.equal('ABC News Live');
+        const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+        expect(searchResultsText.text).to.equal('ABC News Live');
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
@@ -63,8 +63,8 @@ describe('Search', function () {
       // Press the back button and verify that the user is redirected back to the Search result page
       await ecp.sendKeyPress(ecp.Key.Back);
       await testUtils.retryWithTimeOut(async () => {
-        const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-        expect(linearSearchResultsText.text).to.equal('ABC News Live');
+        const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+        expect(searchResultsText.text).to.equal('ABC News Live');
       });
     });
 
@@ -76,8 +76,8 @@ describe('Search', function () {
       await navigateRightToGrid();
 
       await testUtils.retryWithTimeOut(async () => {
-        const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-        expect(linearSearchResultsText.text).to.equal('ABC News Live');
+        const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+        expect(searchResultsText.text).to.equal('ABC News Live');
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
@@ -101,6 +101,7 @@ describe('Search', function () {
       });
     });
 
+    // https://tubi.testrail.io/index.php?/cases/view/244261
     it('C244261  When a user searches for a linear channel, the channel matching to the search term should show up in the search results as primary results @linearsearch', async () => {
       await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
       await ecp.sendText('nfl');
@@ -110,8 +111,8 @@ describe('Search', function () {
 
       // Verify search results and live icon
       await testUtils.retryWithTimeOut(async () => {
-        const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-        expect(linearSearchResultsText.text).to.equal('NFL Channel');
+        const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+        expect(searchResultsText.text).to.equal('NFL Channel');
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
@@ -128,8 +129,8 @@ describe('Search', function () {
       //Verify that correct search results are present, live icon is present, and that the Linear Search Results Description exists
 
       await testUtils.retryWithTimeOut(async () => {
-        const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-        expect(linearSearchResultsText.text).to.equal('NFL Channel');
+        const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+        expect(searchResultsText.text).to.equal('NFL Channel');
       });
 
       await testUtils.retryWithTimeOut(async () => {
@@ -151,8 +152,8 @@ describe('Search', function () {
       await navigateRightToGrid();
 
       await testUtils.retryWithTimeOut(async () => {
-        const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-        expect(linearSearchResultsText.text).to.equal('ABC News Live');
+        const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+        expect(searchResultsText.text).to.equal('ABC News Live');
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
@@ -165,8 +166,8 @@ describe('Search', function () {
       // Press the back button and verify that the user is redirected back to the Search result page
       await ecp.sendKeyPress(ecp.Key.Back);
       await testUtils.retryWithTimeOut(async () => {
-        const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-        expect(linearSearchResultsText.text).to.equal('ABC News Live');
+        const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+        expect(searchResultsText.text).to.equal('ABC News Live');
       });
     });
   });

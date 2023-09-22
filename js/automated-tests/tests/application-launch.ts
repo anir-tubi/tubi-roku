@@ -3,9 +3,12 @@ import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
 import { shared } from '../shared';
 
+
 describe('Application Launch', function () {
   before(async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
+    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4146
@@ -50,6 +53,10 @@ describe('Application Launch', function () {
     await ecp.sendKeyPress(ecp.Key.Ok);
 
     // Validate Older Kids modal message, back out to Left Nav and Check Exit Kids menu item is grayed out
+    await testUtils.retryWithTimeOut(async () => {
+      const settingsScreen = await testUtils.getNodeForElement('settingsScreen');
+      expect(settingsScreen.visible).to.be.true;
+    });
     const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
     expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
     await ecp.sendKeyPress(ecp.Key.Ok);
@@ -61,6 +68,10 @@ describe('Application Launch', function () {
     // Sign out to check that we are not in Kids mode
     await ecp.sendKeyPress(ecp.Key.Up, { count: 3 });
     await ecp.sendKeyPress(ecp.Key.Ok);
+    await testUtils.retryWithTimeOut(async () => {
+      const settingsScreen = await testUtils.getNodeForElement('settingsScreen');
+      expect(settingsScreen.visible).to.be.true;
+    });
     const signOutButtonKidsMode = await testUtils.getNodeForElement('signOutButtonKidsMode');
     expect(signOutButtonKidsMode.text).to.equal('Sign Out');
     await ecp.sendKeyPress(ecp.Key.Ok);
@@ -102,23 +113,13 @@ describe('Application Launch', function () {
     expect(resumePlayingButton.visible).to.equal(true);
   });
 
-  // https://tubi.testrail.io/index.php?/cases/view/114199
-  it('C114199 - Registration Prompt in Continue Watching Container - Homescreen - Navigate to Continue Watching Container @guest_user @application_launch', async () => {
-    // Launch as guest
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-
-    // Jump To Continue Watching Row
-    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
-    const signUpToSaveProgressDescription = await testUtils.getNodeForElement('signUpToSaveProgressDescription');
-    expect(signUpToSaveProgressDescription.visible).to.be.true;
-  });
 
 
   // https://tubi.testrail.io/index.php?/cases/view/129714
   it('C129714 - Logged in user should not see Registration Prompt Container in Movies filter @application_launch @registered_user', async () => {
 
     // Launch app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
     await testUtils.waitForAppLaunchBeaconToFire();
 
     // Play title
@@ -131,13 +132,54 @@ describe('Application Launch', function () {
     await ecp.sendKeyPress(ecp.Key.Back, { count: 2 });
 
     // Jump To Continue Watching Row
-    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
+    await testUtils.jumpToRowWithTitle('movieScreenRowList', 'Continue Watching');
     const homeScreenPoster = await testUtils.getNodeForElement('homeScreenPoster');
     expect(homeScreenPoster.visible).to.be.true;
   });
+
+  // https://tubi.testrail.io/index.php?/cases/view/114199
+  it('C114199 - Registration Prompt in Continue Watching Container - Homescreen - Navigate to Continue Watching Container @guest_user @application_launch', async () => {
+    // Launch as guest
+    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+
+    // Jump To Continue Watching Row
+    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
+    const signUpToSaveProgressDescription = await testUtils.getNodeForElement('signUpToSaveProgressDescription');
+    expect(signUpToSaveProgressDescription.visible).to.be.true;
+
+    // Check CW row title
+    
+    const continueWatchingRowContent = await testUtils.getCurrentlyFocusedGridItemContent('homeScreenRowList');
+    expect(continueWatchingRowContent.title).to.equal('Sign Up to Save Your Progress');
+
+    
+  });
+
+  // https://tubi.testrail.io/index.php?/cases/view/129714
+  it('C129714 - Logged in user should not see Registration Prompt Container in Movies filter @application_launch @registered_user', async () => {
+
+    // Create user with history
+    const user = await testUtils.createRegisteredUser();
+    const movieContent = await user.getContent().ofContentType('movie').retrieve({ limit: 5});
+    await user.addContentToViewHistory(movieContent, 500);
+
+    // Launch app with created user
+    await testUtils.startApplicationAtPage('home', {user: user});
+    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    
+    // Jump To Continue Watching Row (verify it is present)
+    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
+    await utils.sleep(2000);
+    const continueWatchingRowContent = await testUtils.getCurrentlyFocusedGridItemContent('homeScreenRowList');
+    expect(continueWatchingRowContent.title).to.not.equal('Sign Up to Save Your Progress');
+  });
+
+
+
 });
 
-// Create history
+
 async function createHistory() {
   const node = await testUtils.getNodeForElement('videoPlayerScreen');
   expect(node.visible).to.be.true;

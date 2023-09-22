@@ -232,8 +232,8 @@ describe('Autoplay Movies', function () {
         await shared.navigateRightToGrid();
 
         await testUtils.retryWithTimeOut(async () => {
-            const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-            expect(linearSearchResultsText.text).to.equal('Zapped');
+            const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+            expect(searchResultsText.text).to.equal('Zapped');
         });
 
         //Play title, pause to open player, move right to FF button and press, verify state

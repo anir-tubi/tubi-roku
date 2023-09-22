@@ -118,14 +118,14 @@ describe('Autoplay TV', function () {
 
         // Search for a Series title
         await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-        await ecp.sendText('the masked dancer');
+        await ecp.sendText('lego masters uk');
 
         // Call function to navigate right to search results grid
         await shared.navigateRightToGrid();
 
         await testUtils.retryWithTimeOut(async () => {
-            const linearSearchResultsText = await testUtils.getNodeForElement('linearSearchResultsText');
-            expect(linearSearchResultsText.text).to.equal('The Masked Dancer');
+            const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+            expect(searchResultsText.text).to.equal('Lego Masters UK');
         });
 
         //Play title, trigger autoplay
@@ -142,6 +142,7 @@ async function triggerSeriesAutoplay() {
     //Play title, pause to open player, move right to FF button and press, verify state
     await utils.sleep(2000);
     await ecp.sendKeyPress(ecp.Key.Play);
+    await utils.sleep(2000);
     const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
     expect(videoPlayerActual.visible).to.equal(true);
     await testUtils.expectPlayerStateToEventuallyEqual('play');

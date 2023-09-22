@@ -26,7 +26,6 @@ class Shared {
         // Press Play and check playback
         await testUtils.selectAndVerifyDetailPageMenuItem('play');
         await testUtils.expectPlayerStateToEventuallyEqual('play', 5000);
-
         // Verify Movie title playback starts from beginning
         const position = await testUtils.getPlayerPosition();
         expect(position).to.be.greaterThanOrEqual(0);
@@ -54,7 +53,6 @@ class Shared {
         const max = 5000;
         expect(difference).greaterThanOrEqual(min);
         expect(difference).lessThanOrEqual(max);
-
   }
     // Sign in from Home screen
 

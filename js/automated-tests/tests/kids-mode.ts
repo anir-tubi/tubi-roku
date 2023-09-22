@@ -169,8 +169,8 @@ describe('Kids Mode', function () {
     await openKidsMode();
     await ecp.sendKeyPress(ecp.Key.Right);
 
-    // Check Ratings label in Kids mode
-    const kidsHomeScreenRatingsLabel = await testUtils.getNodeForElement('kidsHomeScreenRatingsLabel');
+    // Check Ratings label 
+    const homeScreenRatingsLabel = await testUtils.getNodeForElement('homeScreenRatingsLabel');
     const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('homeScreenRowList');
 
 
@@ -292,7 +292,7 @@ describe('Kids Mode', function () {
   });
 
   it('C66347 - Kids Mode does not persist - Registered user, @kidsmode_registered', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openKidsMode();
@@ -309,14 +309,16 @@ describe('Kids Mode', function () {
     await ecp.sendKeyPress(ecp.Key.Ok);
 
 
-    // Relaunch app
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    // Relaunch app 
+    await testUtils.restartApplication();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Check that we are no longer in Kids mode
     await ecp.sendKeyPress(ecp.Key.Left);
-    const leftNavHomeButton = await testUtils.getNodeForElement('LeftNavHomeButton');
-    expect(leftNavHomeButton.visible).to.be.true;
+    await utils.sleep(2000); // IMPROVEMENT
+    const kidsLeftNavOption = await testUtils.getNodeForElement('kidsLeftNavOption');
+    expect(kidsLeftNavOption.visible).to.be.true;
+    expect(kidsLeftNavOption.text).to.be.equal('Kids');
 
   });
 

@@ -213,16 +213,16 @@ describe('Video Preview', function () {
 
     // Navigate to My Stuff
     await ecp.sendKeyPress(ecp.Key.Left);
+
     // Check for left nav home button
     const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
-    await testUtils.elementHasFocus('leftNavHomeButton');
+    expect(leftNavHomeButton.text).to.be.equal('Home');
+
     await ecp.sendKeyPress(ecp.Key.Down);
     const myStuffLeftNav = await testUtils.getNodeForElement('myStuffLeftNav');
     await utils.sleep(2000);
     expect(myStuffLeftNav);
     await ecp.sendKeyPress(ecp.Key.Ok);
-
-
 
     // Let's check for My Stuff page, CW row here
     const continueWatchingRow = testUtils.getNodeForElement('continueWatchingRow');
