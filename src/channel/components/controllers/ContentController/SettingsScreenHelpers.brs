@@ -526,9 +526,15 @@ Function onNewConsentPreferences(msg)
     m.settingsScreen.consentSettings = m.consentSettings
     setConsent(selectedConsents)
 
+    ' As a safety check if we have a mapping value for the consent key if not falling back to backend key.
+    buttonValue = key
+    if m.constants.consentAnalyticsButtonValues[key] <> invalid
+      buttonValue = m.constants.consentAnalyticsButtonValues[key]
+    end if
+
     componentValues = {
       button_type: "TOGGLE"
-      button_value: key
+      button_value: buttonValue
     }
     pageValues = {
       account_page_type: "PRIVACY_PREFERENCES"

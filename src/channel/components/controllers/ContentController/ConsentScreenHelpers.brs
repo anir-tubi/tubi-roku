@@ -157,10 +157,16 @@ Function onSelectedPreferenceInfoChange(msg)
     end if
 
     if userInteractionValue <> invalid
+      consentKey = keys[0]
+      ' As a safety check if we have a mapping value for the consent key if not falling back to backend key.
+      buttonValue = consentKey
+      if m.constants.consentAnalyticsButtonValues[consentKey] <> invalid
+        buttonValue = m.constants.consentAnalyticsButtonValues[consentKey]
+      end if
+      
       componentValues = {
         button_type: "TOGGLE"
-        ' TODO: Will be changed based on data analytics team feedback.
-        button_value: keys[0]
+        button_value: buttonValue
       }
       pageValues = screen.trackingPageInfo.pageValues
       pageOneof = m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, pageValues)
@@ -242,7 +248,9 @@ End Function
 ' @key: string, contains a key for the consent item. ex: behavioral_advertising|analytics etc.
 Function getConsentOptOutStatusByKey(key)
   didOptOut = false
-  if m.consentSettings <> invalid
+  ' Please do not remove the isUserInAdultsMode check since we are legally bound to not use parental consent when the user is not in adults mode.
+  ' Irrespective of whether user as opted in or opted out when we are in non adult mode we should treat has if user opted out.
+  if m.consentSettings <> invalid AND isUserInAdultsMode() = true
     for each consent in m.consentSettings.consents
       if consent.key = key
         didOptOut = (consent.value = "opted_out")

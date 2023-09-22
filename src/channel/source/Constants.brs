@@ -1425,7 +1425,13 @@ Function getConstants()
     constants.consentKeys.analytics = "analytics"
     constants.consentKeys.personalization = "personalization"
     constants.consentKeys.marketing = "marketing_"
-    constants.consentKeys.continueWatching = "continue_watching"
+    constants.consentKeys.continueWatching = "data_sharing"
+  
+  ' TODO: Will include other values once they are finalized.
+  constants.consentAnalyticsButtonValues = {}
+    constants.consentAnalyticsButtonValues.data_sharing = "DATA_SHARING"
+
+  
 
 'THEME/COLOR START///////////////////////
 '//::TODO::colors - the following constants should be moved to themes. The app should not call these constants

@@ -45,7 +45,7 @@
           id="nonEditableModeWarningMessage"
           width="1176"
           wrap="true"
-          translation="[0, 96]">
+          translation="[0, 75]">
           <Font
             role="font"
             uri="pkg:/fonts/Vaud-Medium.ttf"
