@@ -647,25 +647,28 @@ Function onJumpToRowItemChange(msg)
 
     if isNonEmptyString(sItemID) = true
       focusRow = m.RowList.content.getChild(row)
-      nColumnCount = focusRow.getChildCount() - 1
+      if focusRow <> invalid
+        nColumnCount = focusRow.getChildCount() - 1
 
-      '//Try to find the content within the provided row
-      bFindByID = false
-      for i = 0 to nColumnCount
-        item = focusRow.getChild(i)
-        if item.id = sItemID
-          bFindByID = true
-          column = i
-          exit for
-        end if
-      end for
+        '//Try to find the content within the provided row
+        bFindByID = false
+        for i = 0 to nColumnCount
+          item = focusRow.getChild(i)
+          if item.id = sItemID
+            bFindByID = true
+            column = i
+            exit for
+          end if
+        end for
 
-      '//If the content cannot be located, (it may have been removed from the container), then use the provided column or the closest column available within that row if that column no longer exists.
-      if bFindByID = false
-        if column > nColumnCount
-          column = nColumnCount
+        '//If the content cannot be located, (it may have been removed from the container), then use the provided column or the closest column available within that row if that column no longer exists.
+        if bFindByID = false
+          if column > nColumnCount
+            column = nColumnCount
+          end if
         end if
       end if
+
     end if
 
     m.RowList.jumpToRowItem = [row, column]
