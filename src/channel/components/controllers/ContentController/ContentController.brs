@@ -1369,9 +1369,15 @@ Function setContentToRefresh(sID)
     if screen.content <> invalid AND screen.content.validUntil <> invalid
       screen.content.validUntil = 0
       return true
-    else if  (isAnEpgScreen(screen) = true OR screen.id = m.constants.ui.screenIds.linearVideoPlayerScreen) AND screen.timeGridContent <> invalid AND screen.timeGridContent.getChild(0).validUntil <> invalid
-      screen.timeGridContent.getChild(0).validUntil = 0
-      return true
+    else if (isAnEpgScreen(screen) = true OR screen.id = m.constants.ui.screenIds.linearVideoPlayerScreen)
+      timeGridContent = screen.timeGridContent
+      if timeGridContent <> invalid
+        timeGridContentChild = timeGridContent.getChild(0)
+        if timeGridContentChild <> invalid AND timeGridContentChild.validUntil <> invalid
+          screen.timeGridContent.getChild(0).validUntil = 0
+          return true
+        end if
+      end if
     end if
   end if
   return false
