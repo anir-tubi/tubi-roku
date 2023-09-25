@@ -248,9 +248,11 @@ End Function
 ' @key: string, contains a key for the consent item. ex: behavioral_advertising|analytics etc.
 Function getConsentOptOutStatusByKey(key)
   didOptOut = false
+
   ' Please do not remove the isUserInAdultsMode check since we are legally bound to not use parental consent when the user is not in adults mode.
   ' Irrespective of whether user as opted in or opted out when we are in non adult mode we should treat has if user opted out.
-  if m.consentSettings <> invalid AND isUserInAdultsMode() = true
+  isUserAllowedToManageConsent = isUserAllowedToManageConsent()
+  if m.consentSettings <> invalid AND isUserAllowedToManageConsent = true
     for each consent in m.consentSettings.consents
       if consent.key = key
         didOptOut = (consent.value = "opted_out")
@@ -263,4 +265,22 @@ Function getConsentOptOutStatusByKey(key)
   end if
 
   return didOptOut
+End Function
+
+
+Function isUserAllowedToManageConsent()
+  ' Since we have country specific Kids age. For ex: In GDPR countries less than 18 is kids. 
+  ' Since outside of GDPR countries it is less than 13 is considered as kids mode. We will not create seperate mapping.
+  isUserAllowedToManageConsent = (isUserInAdultsMode() = true OR isParentalControlsTeensLevel() = true)
+
+  if isGDPR() = true
+    isUserAllowedToManageConsent = (isUserInAdultsMode() = true)
+  end if
+
+  ' If the kids mode UI is on than user is not allowed to manage consent.
+  if isKidsUIOn() = true
+    isUserAllowedToManageConsent = false
+  end if
+
+  return isUserAllowedToManageConsent
 End Function

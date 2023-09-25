@@ -9,7 +9,7 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.uiMode = m.uiMode
   ' Passing in the saved isVideoPreviewOn.
   m.settingsScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
-  m.settingsScreen.isAllowedToManageConsent = isUserInAdultsMode() = true AND isKidsUIOn() = false
+  m.settingsScreen.isAllowedToManageConsent = isUserAllowedToManageConsent()
   m.settingsScreen.consentSettings = m.consentSettings
   setSettingsScreenSignInInfo()
   m.settingsScreen.actionAfterActivation = ""
@@ -330,7 +330,7 @@ Function refreshScreenAfterParentalChanges()
       refreshGridScreen(screen)
     else if screen.id = m.constants.ui.screenIds.settingsScreen
       ' Updating the value after parentalControls had been changed.
-      m.settingsScreen.isAllowedToManageConsent = (isUserInAdultsMode() = true AND isKidsUIOn() = false)
+      m.settingsScreen.isAllowedToManageConsent = isUserAllowedToManageConsent()
     end if
   end if
 
