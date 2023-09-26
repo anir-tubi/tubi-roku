@@ -6,6 +6,9 @@ Function init()
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("itemHasFocus", "onItemHasFocus")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.label, typographyConstants.ids.bodyMedium_Strong)
+
   '//Make sure the colors are set properly, so call the onItemHasFocus() function
   onItemHasFocus()
 End Function

@@ -29,6 +29,9 @@ Function init()
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmall_strong)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

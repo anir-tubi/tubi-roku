@@ -40,6 +40,10 @@ Function setParentalControlStrings()
   Instructions = m.top.findNode("Instructions")
   Instructions.text = getTranslation("screenSettings_parentalControls_instructions")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(Title, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(Instructions, typographyConstants.ids.bodyMedium)
+
   m.instructionsText = Title.text + " " + Instructions.text
 
   nWidestWidth = 0

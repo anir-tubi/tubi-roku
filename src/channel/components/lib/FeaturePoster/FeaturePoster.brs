@@ -4,6 +4,9 @@ Function init()
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("width", "onWidthChange")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.Title, typographyConstants.ids.bodyMedium)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

@@ -1,6 +1,12 @@
 Function init()
   m.constants = getConstantsFromGlobal()
 
+
+  m.Message = m.top.findNode("Message")
+  m.subMessage = m.top.findNode("subMessage")
+  m.setUp = m.top.findNode("setUp")
+  m.visit = m.top.findNode("visit")
+
   m.password = m.top.findNode("password")
   m.password.hint = getTranslation("signIn_password_hint")
 
@@ -21,6 +27,12 @@ Function init()
       auth_action: "PASSWORD_CONFIRMATION"
     }
   }
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.Message, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.subMessage, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.setUp, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.visit, typographyConstants.ids.bodySmall)
 
   m.top.screenLevel = m.constants.ui.screenLevels.confirmPasswordScreen
   if m.global <> invalid

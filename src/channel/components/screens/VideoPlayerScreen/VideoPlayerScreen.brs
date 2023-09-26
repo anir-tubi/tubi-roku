@@ -286,6 +286,25 @@ Function init()
   ' Creating internal state to track when the overlay is visible to users.
   m.isClosedCaptionAudioOverlayShowing = false
 
+
+  title = m.Overlay.findNode("VideoOverlayTitle")
+  episodeTitle = m.Overlay.findNode("VideoOverlayEpisodeTitle")
+  SkipTrailerButtonLabel = m.Overlay.findNode("SkipTrailerButtonLabel")
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmall_Strong)
+  setTypographyOfLabel(title, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(episodeTitle, typographyConstants.ids.subheaderSmall)
+  setTypographyOfLabel(m.AdHeadsUpText, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.ratedLabel, typographyConstants.ids.bodyMedium_Strong)
+  setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodySmall_Strong)
+  setTypographyOfLabel(SkipTrailerButtonLabel, typographyConstants.ids.bodyLarge_Strong)
+  setTypographyOfLabel(m.ElapsedLabel, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.LoadingMessage, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.RemainingLabel, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.descriptorCode, typographyConstants.ids.bodyMedium_Strong)
+  setTypographyOfLabel(m.descriptorDesc, typographyConstants.ids.bodySmall)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

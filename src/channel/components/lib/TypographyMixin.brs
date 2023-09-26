@@ -1,0 +1,117 @@
+'//TypographyMixin.brs
+'//This file depends on the following files. They need to be imported by all files that make reference to any functions within this file:
+'//<script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+'//<script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+'//::TODO::typography - the following files need to be imported only when the typography feature is part of an experiment
+'//<script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+'//<script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+
+Function getTypographyConstants()
+  constants = {}
+  
+  '//The gulp install command will look thru the JSON file (typography.tokens.json),
+  '//and generate associative arrays to replace the following string values.
+  headerLarge = "TYPOGRAPHY_headerLarge_TYPOGRAPHY"
+  headerMedium = "TYPOGRAPHY_headerMedium_TYPOGRAPHY"
+  headerSmall = "TYPOGRAPHY_headerSmall_TYPOGRAPHY"
+  subheaderLarge = "TYPOGRAPHY_subheaderLarge_TYPOGRAPHY"
+  subheaderMedium = "TYPOGRAPHY_subheaderMedium_TYPOGRAPHY"
+  subheaderSmall = "TYPOGRAPHY_subheaderSmall_TYPOGRAPHY"
+  bodyLarge_Strong = "TYPOGRAPHY_bodyLarge_Strong_TYPOGRAPHY"
+  bodyLarge = "TYPOGRAPHY_bodyLarge_TYPOGRAPHY"
+  bodyMedium_Strong = "TYPOGRAPHY_bodyMedium_Strong_TYPOGRAPHY"
+  bodyMedium = "TYPOGRAPHY_bodyMedium_TYPOGRAPHY"
+  bodySmall = "TYPOGRAPHY_bodySmall_TYPOGRAPHY"
+  bodySmall_Strong = "TYPOGRAPHY_bodySmall_Strong_TYPOGRAPHY"
+  bodyExtraSmall = "TYPOGRAPHY_bodyExtraSmall_TYPOGRAPHY"
+  bodyExtraSmall_Strong = "TYPOGRAPHY_bodyExtraSmall_Strong_TYPOGRAPHY"
+
+  constants.ids = {}
+  constants.ids.headerLarge = "headerLarge"
+  constants.ids.headerMedium = "headerMedium"
+  constants.ids.headerSmall = "headerSmall"
+  constants.ids.subheaderLarge = "subheaderLarge"
+  constants.ids.subheaderMedium = "subheaderMedium"
+  constants.ids.subheaderSmall = "subheaderSmall"
+  constants.ids.bodyLarge_Strong = "bodyLarge_Strong"
+  constants.ids.bodyLarge = "bodyLarge"
+  constants.ids.bodyMedium_Strong = "bodyMedium_Strong"
+  constants.ids.bodyMedium = "bodyMedium"
+  constants.ids.bodySmall = "bodySmall"
+  constants.ids.bodySmall_Strong = "bodySmall_Strong"
+  constants.ids.bodyExtraSmall = "bodyExtraSmall"
+  constants.ids.bodyExtraSmall_Strong = "bodyExtraSmall_Strong"
+
+  constants.typographyAA = {}
+  constants.typographyAA[constants.ids.headerLarge] = headerLarge
+  constants.typographyAA[constants.ids.headerMedium] = headerMedium
+  constants.typographyAA[constants.ids.headerSmall] = headerSmall
+  constants.typographyAA[constants.ids.subheaderLarge] = subheaderLarge
+  constants.typographyAA[constants.ids.subheaderMedium] = subheaderMedium
+  constants.typographyAA[constants.ids.subheaderSmall] = subheaderSmall
+  constants.typographyAA[constants.ids.bodyLarge_Strong] = bodyLarge_Strong
+  constants.typographyAA[constants.ids.bodyLarge] = bodyLarge
+  constants.typographyAA[constants.ids.bodyMedium_Strong] = bodyMedium_Strong
+  constants.typographyAA[constants.ids.bodyMedium] = bodyMedium
+  constants.typographyAA[constants.ids.bodySmall] = bodySmall
+  constants.typographyAA[constants.ids.bodySmall_Strong] = bodySmall_Strong
+  constants.typographyAA[constants.ids.bodyExtraSmall] = bodyExtraSmall
+  constants.typographyAA[constants.ids.bodyExtraSmall_Strong] = bodyExtraSmall_Strong
+
+  return constants
+End Function
+
+
+'Set the typography (font size, font file, etc) of the passed label node
+'@param labelNode, Node: The Label Node that its properties will be set based on the ID passed
+'@param typographyId, String: The ID that will determine the properties of the label node. 
+'     The value of this ID should be one of the IDs available in this file: i.e. getTypographyConstants().ids.headerLarge
+Function setTypographyOfLabel(labelNode, typographyId)
+  constants = getTypographyConstants()
+
+  bExperimentEnabled = false
+  if getExperimentResource("roku_typography", "roku_typography_v1", true).enabled = true
+    bExperimentEnabled = true
+  end if
+
+  if bExperimentEnabled = true AND typographyId <> invalid AND labelNode <> invalid
+    aaTypography = constants.typographyAA[typographyId]
+    if aaTypography <> invalid
+      sFontFile = "pkg:/fonts/Vaud-Medium.ttf"
+      if aaTypography.fontWeight = 900
+        sFontFile = "pkg:/fonts/Vaud-Black.ttf"
+      end if
+
+      nFontSize = 16
+      if aaTypography.fontSize <> invalid AND aaTypography.fontSize > 0
+        nFontSize = aaTypography.fontSize
+      end if
+
+      nLineSpacing = 0
+      if aaTypography.lineHeight <> invalid AND aaTypography.lineHeight > 0
+        nLineSpacing = aaTypography.lineHeight - nFontSize
+      end if
+
+      '//set properties depending on the label mode type
+      if labelNode.subType() = "Label" OR labelNode.subType() = "ScrollableText"
+        if nLineSpacing >= 0
+          labelNode.lineSpacing = nLineSpacing
+        end if
+
+        fontNode = labelNode.font
+        if fontNode <> invalid AND fontNode.subType() = "Font"
+          fontNode.uri = sFontFile
+          fontNode.size = nFontSize
+        end if
+      else if labelNode.subType() = "TextIcon"
+        labelNode.fontUri = sFontFile
+        labelNode.fontSize = nFontSize
+      end if
+
+    else
+      tubilog("TypographyMixin, setTypographyOfLabel(): WARNING: Associative array associated with passed Typography string ID does not exist")
+    end if
+  else
+    tubilog("TypographyMixin, setTypographyOfLabel(): WARNING: passed typographyId or label does not exist")
+  end if
+End Function

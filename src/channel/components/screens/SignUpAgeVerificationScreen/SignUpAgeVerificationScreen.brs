@@ -40,6 +40,16 @@ Function init()
   m.NumberPad.observeFieldScoped("text", "onNumberPadTextChanged")
   m.NumberPad.observeFieldScoped("audioGuideText", "onAudioGuideTextChanged")
   m.StartButton.observeFieldScoped("selected", "onStartButtonSelected")
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.Header, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.SubHeader, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.AgePrefixLabel, typographyConstants.ids.headerLarge)
+  setTypographyOfLabel(m.AgeEntry, typographyConstants.ids.headerLarge)
+  setTypographyOfLabel(m.AgePostfixLabel, typographyConstants.ids.headerLarge)
+  setTypographyOfLabel(m.ErrorPrompt, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.infoLabel, typographyConstants.ids.bodySmall)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

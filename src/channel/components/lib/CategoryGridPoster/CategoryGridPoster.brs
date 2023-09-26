@@ -49,6 +49,11 @@ Function init()
   m.top.observeFieldScoped("focusPercent", "onItemFocusPercentChange")
   m.top.observeFieldScoped("itemHasFocus", "onRowItemHasFocus")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.InnerTitle, typographyConstants.ids.bodySmall_strong)
+  setTypographyOfLabel(m.Title, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.TimeRemaining, typographyConstants.ids.bodyExtraSmall)
+  
   onThemeChange()
 End Function
 

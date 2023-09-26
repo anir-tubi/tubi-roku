@@ -88,6 +88,14 @@ Function init()
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
   end if
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmall_strong)
+  setTypographyOfLabel(m.searchMenuText, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.searchHintText, typographyConstants.ids.bodyMedium_strong)
+  setTypographyOfLabel(m.KidsModeMessage, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.SearchText, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.NoResultsMessage, typographyConstants.ids.bodyMedium)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -148,6 +156,9 @@ Function setTextForVoiceHint()
   m.voiceHint.width = 400
   m.voiceHintfont.size = 21
   m.voiceHint.font = m.voiceHintfont
+  
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.voiceHint, typographyConstants.ids.bodySmall)
 End Function
 
 

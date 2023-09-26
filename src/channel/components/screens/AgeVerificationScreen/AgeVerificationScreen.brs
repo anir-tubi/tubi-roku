@@ -42,6 +42,16 @@ Function init()
   m.NumberPad.observeField("audioGuideText", "onAudioGuideTextChanged")
   m.top.observeFieldScoped("ageSubmitted", "onAgeSubmittedChanged")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.Header, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.SubHeader, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.bornYear, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.YearEntryBack, typographyConstants.ids.headerLarge)
+  setTypographyOfLabel(m.YearEntryFront, typographyConstants.ids.headerLarge)
+  setTypographyOfLabel(m.YearLabel, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Prompt, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.infoLabel, typographyConstants.ids.bodySmall)
+  
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

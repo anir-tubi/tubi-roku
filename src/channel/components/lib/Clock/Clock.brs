@@ -6,6 +6,9 @@ Function init()
   m.top.observeFieldScoped("renderTracking", "onRenderTrackingChange")
   m.top.observeFieldScoped("control", "onControlChange")
   m.clockTimer.observeFieldScoped("fire", "onTimerFire")
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.time, typographyConstants.ids.bodyExtraSmall_Strong)
 End Function
 
 

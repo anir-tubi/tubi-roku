@@ -56,6 +56,10 @@ Function init()
 
   m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.emailValidationMsg, typographyConstants.ids.bodySmall_Strong)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

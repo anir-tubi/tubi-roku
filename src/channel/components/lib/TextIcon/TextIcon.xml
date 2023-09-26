@@ -21,6 +21,7 @@
       id="textBackground" />
     <SimpleLabel
       id="textLabel"
-      vertOrigin="baseline" />
+      horizOrigin="center"
+      vertOrigin="center" />
   </children>
 </component>

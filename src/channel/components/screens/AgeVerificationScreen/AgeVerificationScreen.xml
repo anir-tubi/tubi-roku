@@ -11,6 +11,7 @@
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
 
@@ -98,17 +99,17 @@
     </Group>
     <Group
       id="AgeVerificationDateInfo"
-      translation="[890,496]">
+      translation="[790,496]">
       <LayoutGroup
         id="AgeVerificationUserDate"
         layoutDirection="horiz"
-        itemSpacings="[12]">
+        itemSpacings="[22]">
 
           <Label
             id="AgeVerificationYearText"
-            width="426"
+            width="526"
             height="144"
-            horizAlign="center"
+            horizAlign="right"
             vertAlign="center"
             opacity="0.4"
             translation="[0,9]">

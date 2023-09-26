@@ -10,6 +10,10 @@ Function init()
 
   m.constants = getConstantsFromGlobal()
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.header, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.subheader, typographyConstants.ids.bodySmall)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -44,7 +48,6 @@ Function onButtonListChange(msg)
       title: buttonText
       id: buttonText
       mode: "light" ' Since the button could displayed in light vs dark background.
-      fontSize: 24
     }, true)
     ' Creating the button nodes to find out the longest text width due to limitation of arraygrid to dynamically adjust the width.
     listItem = CreateObject("roSGNode", "ListItemButtonWithBg")

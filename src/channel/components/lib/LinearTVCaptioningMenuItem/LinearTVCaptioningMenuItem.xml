@@ -3,6 +3,9 @@
   <script type="text/brightscript" uri="LinearTVCaptioningMenuItem.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
     <!-- INPUTS -->
@@ -30,8 +33,8 @@
 
     <Label
      id="MenuText"
-     translation="[36,30]"
-     vertAlign="top"
+     translation="[36,0]"
+     vertAlign="center"
      horizAlign="left"
      ellipsizeOnBoundary="true"
      width="135"

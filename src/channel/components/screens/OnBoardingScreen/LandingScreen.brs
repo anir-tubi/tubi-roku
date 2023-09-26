@@ -45,6 +45,16 @@ Function init()
   m.pageHeading.text = getTranslation("onBoarding_landingScreen_heading")
   m.pageDescription.text = getTranslation("onBoarding_landingScreen_description")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerLarge)
+  setTypographyOfLabel(m.pageDescription, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.addtoYourListLabel, typographyConstants.ids.bodyMedium_Strong)
+  setTypographyOfLabel(m.addtoYourListBody, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.saveYourProgressLabel, typographyConstants.ids.bodyMedium_Strong)
+  setTypographyOfLabel(m.saveYourProgressBody, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.madeForYouLabel, typographyConstants.ids.bodyMedium_Strong)
+  setTypographyOfLabel(m.madeForYouBody, typographyConstants.ids.bodySmall)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

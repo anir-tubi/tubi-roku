@@ -16,6 +16,9 @@ Function init()
   m.top.observeFieldScoped("text", "onTextChanged")
   m.top.observeFieldScoped("isFilled", "onIsFilledChange")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.label, typographyConstants.ids.bodySmall_Strong)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

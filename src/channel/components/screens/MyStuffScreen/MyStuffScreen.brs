@@ -95,6 +95,15 @@ Function init()
   m.top.observeFieldScoped("jumpToRowItemByIdAndIndex", "onJumpToRowItemChange")
   m.top.observeFieldScoped("reset", "onResetChange")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmall_strong)
+  setTypographyOfLabel(m.SignedOutUITitle, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.SignedOutUISubtitle, typographyConstants.ids.bodyLarge)
+  setTypographyOfLabel(m.SignedOutUIBlurb, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.AllEmptyUITitle, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.AllEmptyUISubtitle, typographyConstants.ids.bodyLarge)
+  setTypographyOfLabel(m.AllEmptyUISubtitle2, typographyConstants.ids.bodyLarge)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

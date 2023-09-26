@@ -8,6 +8,10 @@ Function init()
   m.top.observeField("focusPercent", "onFocusPercentChange")
   m.top.observeField("itemContent", "onContentChange")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.timeString, typographyConstants.ids.bodySmall_Strong)
+  setTypographyOfLabel(m.programString, typographyConstants.ids.bodyMedium_Strong)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

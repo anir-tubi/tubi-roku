@@ -109,6 +109,10 @@ Function init()
   m.top.isStackable = true
   m.top.handlesTransportVoiceRequests = true
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.RelatedTitle, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.RelatedTitle, typographyConstants.ids.bodyMedium)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

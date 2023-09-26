@@ -124,6 +124,9 @@ Function init()
   if authInfo <> invalid AND authInfo.parentalrating <> invalid
     m.top.parentalRating = authInfo.parentalrating
   end if
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmall_strong)
 End Function
 
 

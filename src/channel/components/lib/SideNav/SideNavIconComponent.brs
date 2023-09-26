@@ -17,6 +17,11 @@ Function init()
   m.top.observeFieldScoped("gridHasFocus", "onGridHasFocusChange")
   m.sideIconLabel = invalid
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.subTxt, typographyConstants.ids.bodyExtraSmall_strong)
+  setTypographyOfLabel(m.Label, typographyConstants.ids.bodyMedium_strong)
+  setTypographyOfLabel(m.focusedLabel, typographyConstants.ids.bodyMedium_strong)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -85,6 +90,9 @@ Function onContentChange(data)
             m.sideIconLabel.uri = "pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
             m.sideIconLabel.opacity = 0
             m.sideIconLabel.translation = [0, 15]
+            
+            typographyConstants = getTypographyConstants()
+            setTypographyOfLabel(m.sideIconLabel, typographyConstants.ids.bodyExtraSmall_strong)
           end if
         else if item.shortDescriptionLine2 = "" AND m.sideIconLabel <> invalid
           m.labelParent.removeChild(m.sideIconLabel)
@@ -96,16 +104,17 @@ Function onContentChange(data)
       end if
     end if
 
-    m.font.size = item.fontSize
-    m.focusedFont.size = item.fontSize
-    fontURI = "pkg:/fonts/Vaud-SemiBold.ttf"
-    if item.bold = false
-        fontURI = "pkg:/fonts/Vaud-Medium.ttf"
+    if getExperimentResource("roku_typography", "roku_typography_v1", true).enabled = false
+      m.font.size = item.fontSize
+      m.focusedFont.size = item.fontSize
+      fontURI = "pkg:/fonts/Vaud-SemiBold.ttf"
+      if item.bold = false
+          fontURI = "pkg:/fonts/Vaud-Medium.ttf"
+      end if
+
+      m.font.uri = fontURI
+      m.focusedFont.uri = fontURI
     end if
-
-    m.font.uri = fontURI
-    m.focusedFont.uri = fontURI
-
 
     onActiveChange()
   end if

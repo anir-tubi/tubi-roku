@@ -18,6 +18,10 @@ Function init()
   topRef.observeFieldScoped("itemHasFocus", "onItemHasFocus")
   topRef.observeFieldScoped("focusPercent", "onFocusPercentChange")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.label, typographyConstants.ids.bodySmall_Strong)
+  setTypographyOfLabel(m.labelFocused, typographyConstants.ids.bodySmall_Strong)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

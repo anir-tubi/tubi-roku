@@ -32,6 +32,12 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.signInScreen
   m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.pageSubHeading, typographyConstants.ids.bodyLarge)
+  setTypographyOfLabel(m.email, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.pageSubHeading2, typographyConstants.ids.bodyMedium)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

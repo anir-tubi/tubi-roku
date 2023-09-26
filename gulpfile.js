@@ -28,6 +28,7 @@ const {keypress, deeplink, uploadPkg, signPkg, installWithSquashfs} = require('.
 const {downloadTranslations, updateLocalTranslations, uploadTranslations} = require('./js/translate');
 const {listUnusedImages,listUnusedTranslations} = require('./js/codeclean.js');
 const {replaceColorConstants} = require('./js/colorreplace.js');
+const {replaceTypographyConstants} = require('./js/typography.js');
 
 // Importing functions with Git functionality
 const {NoStackError} = require('./js/utilities');
@@ -197,6 +198,7 @@ function buildInstalled() {
   return build
     .then(() => {
       replaceColorConstants('build/local');
+      replaceTypographyConstants('build/local');
       createSettings(options, 'build/local/source/Settings.brs');
       createManifest(options, 'build/local/manifest', 'manifest');
       return zipAsPromise('build/local/**/*', `tubi_${buildTag}.zip`, 'build/');
@@ -331,6 +333,7 @@ function buildStarter() {
   return Promise.all(promises)
     .then(() => {
       replaceColorConstants('build/starter');
+      replaceTypographyConstants('build/starter');
       createSettings(options, 'build/starter/source/Settings.brs');
       createManifest(options, 'build/starter/manifest', 'starter_library_manifest');
       return zipAsPromise('build/starter/**/*', `tubi_starter_components_${minorBuildTag}.zip`, 'build/');
@@ -435,6 +438,7 @@ function buildRemote() {
   return build
   .then(() => {
     replaceColorConstants('build/remote');
+    replaceTypographyConstants('build/remote');
     createManifest(options, 'build/remote/manifest', 'component_library_manifest');
     return zipAsPromise('build/remote/**/*', `tubi_remote_components_${buildTag}.zip`, 'build/');
   });

@@ -1,0 +1,880 @@
+{
+	"typography": {
+		"$type": "typography",
+		"ott": {
+			"header": {
+				"large": {
+					"$description": "86/84 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 86
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 84
+					}
+				},
+				"medium": {
+					"$description": "72/80 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 72
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -2
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 80
+					}
+				},
+				"small": {
+					"$description": "48/56 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 48
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -0.5
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 56
+					}
+				}
+			},
+			"subheader": {
+				"large": {
+					"$description": "48/56 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 48
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -0.5
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 56
+					}
+				},
+				"medium": {
+					"$description": "36/40 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 36
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -0.5
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 40
+					}
+				},
+				"small": {
+					"$description": "28/40 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 28
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -0.5
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 40
+					}
+				}
+			},
+			"body": {
+				"large_strong": {
+					"$description": "34/40 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 34
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -0.2
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 40
+					}
+				},
+				"large": {
+					"$description": "34/40 - Medium",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 34
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 500
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -0.2
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 40
+					}
+				},
+				"medium_strong": {
+					"$description": "28/40 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 28
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -0.5
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 40
+					}
+				},
+				"medium": {
+					"$description": "28/40 - Medium",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 28
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 500
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -0.5
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 40
+					}
+				},
+				"small_strong": {
+					"$description": "24/32 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 24
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -0.5
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 32
+					}
+				},
+				"small": {
+					"$description": "24/32 - Medium",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 24
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 500
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -0.5
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 32
+					}
+				},
+				"extraSmall_strong": {
+					"$description": "18/28 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 18
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 28
+					}
+				},
+				"extraSmall": {
+					"$description": "18/28 - Medium",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 18
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 500
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 28
+					}
+				}
+			}
+		},
+		"web": {
+			"header": {
+				"large": {
+					"$description": "56/64 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 56
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -0.75
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 64
+					}
+				},
+				"medium": {
+					"$description": "48/56 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 48
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -0.5
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 56
+					}
+				},
+				"small": {
+					"$description": "36/40 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 36
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -0.5
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 40
+					}
+				}
+			},
+			"subheader": {
+				"medium": {
+					"$description": "24/32 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 24
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 32
+					}
+				},
+				"small": {
+					"$description": "20/24 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 20
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 24
+					}
+				}
+			},
+			"body": {
+				"medium_strong": {
+					"$description": "16/24 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 16
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 24
+					}
+				},
+				"medium": {
+					"$description": "16/24 - Medium",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 16
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 500
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 24
+					}
+				},
+				"small_strong": {
+					"$description": "14/20 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 14
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 20
+					}
+				},
+				"small": {
+					"$description": "14/20 - Medium",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 14
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 500
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 20
+					}
+				},
+				"extraSmall_strong": {
+					"$description": "11/16 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 11
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 16
+					}
+				},
+				"extraSmall": {
+					"$description": "11/16 - Medium",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 11
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 500
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 16
+					}
+				}
+			}
+		},
+		"mobile": {
+			"header": {
+				"extraLarge": {
+					"$description": "28/34 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 28
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -0.5
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 34
+					}
+				},
+				"large": {
+					"$description": "24/32 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 24
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 32
+					}
+				},
+				"medium": {
+					"$description": "20/28 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 20
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 28
+					}
+				}
+			},
+			"subheader": {
+				"medium": {
+					"$description": "16/20 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 16
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 20
+					}
+				}
+			},
+			"body": {
+				"large_strong": {
+					"$description": "16/20 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 16
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 20
+					}
+				},
+				"large": {
+					"$description": "16/20 - Medium",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 16
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 500
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 20
+					}
+				},
+				"medium_strong": {
+					"$description": "14/20 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 14
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 20
+					}
+				},
+				"medium": {
+					"$description": "14/20 - Medium",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 14
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 500
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 20
+					}
+				},
+				"small_strong": {
+					"$description": "12/16 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 12
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 16
+					}
+				},
+				"small": {
+					"$description": "12/16 - Medium",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 12
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 500
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 16
+					}
+				},
+				"extraSmall_strong": {
+					"$description": "11/16 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 11
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 16
+					}
+				},
+				"extraSmall": {
+					"$description": "11/16 - Medium",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 11
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "VaudTubi"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 500
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 16
+					}
+				}
+			}
+		}
+	}
+}

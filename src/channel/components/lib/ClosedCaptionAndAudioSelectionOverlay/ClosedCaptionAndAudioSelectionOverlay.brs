@@ -1,6 +1,6 @@
 Function init()
   topRef = m.top
-  overlayBackground = topRef.findNode("overlayBackground")
+  m.overlayBackground = topRef.findNode("overlayBackground")
   m.closedCaptionSection = topRef.findNode("closedCaptionSection")
   m.closedCaptionSelector = topRef.findNode("closedCaptionSelector")
   m.audioTrackSelector = topRef.findNode("audioTrackSelector")
@@ -17,13 +17,6 @@ Function init()
   audioTracksSectionHeaderLabel = topRef.findNode("audioTracksSectionHeaderLabel")
   audioTracksSectionHeaderLabel.text = getTranslation("cc_audio_overlay_audio")
 
-  theme = getThemeFromGlobal()
-  if theme <> invalid
-    m.closedCaptionSelector.focusBitmapBlendColor = theme.focusedColor
-    m.audioTrackSelector.focusBitmapBlendColor = theme.focusedColor
-    overlayBackground.blendColor = theme.neutralSolidColor
-  end if
-
   m.constants = getConstantsFromGlobal()
   m.globalCaptionMode = "Off"
 
@@ -31,6 +24,31 @@ Function init()
 
   m.currentAudioTrack = ""
   m.top.observeFieldScoped("currentAudioTrack", "onCurrentAudioTrackChange")
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.closedCaptionSection, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.audioTracksSectionHeaderLabel, typographyConstants.ids.subheaderMedium)
+
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+  
+  if theme <> invalid
+    m.closedCaptionSelector.focusBitmapBlendColor = theme.focusedColor
+    m.audioTrackSelector.focusBitmapBlendColor = theme.focusedColor
+    m.overlayBackground.blendColor = theme.neutralSolidColor
+  end if
 End Function
 
 

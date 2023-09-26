@@ -21,6 +21,11 @@ Function init()
   m.badgeLabel.fontSize = 18
   m.badgeLabel.padding = [12, 9]
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.DetailsMenuText, typographyConstants.ids.bodyMedium_strong)
+  setTypographyOfLabel(m.DetailsMenuTextFocused, typographyConstants.ids.bodyMedium_strong)
+  setTypographyOfLabel(m.badgeLabel, typographyConstants.ids.bodyExtraSmall_strong)
+
   m.constants = getConstantsFromGlobal()
   if m.constants <> invalid
     m.top.color = m.constants.ui.colors.transparent

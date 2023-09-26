@@ -19,6 +19,10 @@ Function init()
   '//   when Design adds the color to all themes, then set this color within the onThemeChange() observer using the new theme specific color
   m.shade.color = m.constants.ui.themes.default.shadeColor
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.header, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.subheader, typographyConstants.ids.bodySmall_Strong)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -57,7 +61,6 @@ Function formatDialog()
       buttonContent.update({
         title: btnText
         id: btnText
-        fontSize: 24
       }, true)
       '//   Temporarily create ModalListItem for each button text to find the largest width necessary for the set of buttons,
       '//   in order to determine how wide m.buttonList should be.

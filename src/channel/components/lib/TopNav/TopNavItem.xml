@@ -7,6 +7,7 @@
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
     <field id="itemHasFocus" type="boolean" />
@@ -23,7 +24,6 @@
       id="BottomLabel"
       translation="[36, 23]"
       opacity="0"
-      height="36"
       width="150">
       <Font
           id="Font"
@@ -34,7 +34,6 @@
     <Label
       id="TopLabel"
       translation="[36, 23]"
-      height="36"
       width="150">
       <Font
           role="font"

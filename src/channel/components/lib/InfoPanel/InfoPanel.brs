@@ -98,6 +98,26 @@ Function init()
   DirectorRect.width = nMatchDirectorWidth + spacerWidth
   StarringRect.width = nMatchStarringWidth + spacerWidth
 
+  typographyConstants = getTypographyConstants()
+  '//::TODO::typography - headerSmall is too big and causes the text to fall on 2 lines in many cases. We need to look into widening the info panel text area.
+  '//   This should be done in a seaprate SC ticket
+  ' setTypographyOfLabel(m.title, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.episode, typographyConstants.ids.subheaderSmall)
+  setTypographyOfLabel(m.Line1, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Line1Bold, typographyConstants.ids.subheaderSmall)
+  setTypographyOfLabel(m.DescriptorCode, typographyConstants.ids.bodyExtraSmall_strong)
+  setTypographyOfLabel(m.RatingLabel, typographyConstants.ids.bodyExtraSmall_strong)
+  setTypographyOfLabel(m.ExpireWarning, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Line2, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Description, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.SignInText, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.ReminderTitle, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.DirectorTag, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Director, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.StarringTag, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Starring, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.CountdownText, typographyConstants.ids.bodyMedium)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

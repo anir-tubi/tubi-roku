@@ -16,6 +16,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
     <!-- INPUTS -->

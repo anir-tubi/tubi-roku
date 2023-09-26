@@ -36,10 +36,7 @@ Function init()
   m.top.trackingPageInfo = createTrackingPageInfo(invalid)
   m.oldCategoryComponent = invalid
 
-
-
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
-
 
   BackLabel = m.top.findNode("callToAction")
   if m.constants.deviceInfo.uiResolution <> "FHD"
@@ -51,6 +48,9 @@ Function init()
   m.top.handlesTransportVoiceRequests = true
 
   m.VideoGrid.itemSize = posterSize
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmall_strong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")

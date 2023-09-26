@@ -12,6 +12,11 @@ Function init()
   m.top.observeField("itemContent", "onItemContentChange")
   m.top.observeField("focusPercent", "onFocusPercentChange")
   m.top.observeField("gridHasFocus", "onGridHasFocusChange")
+  m.top.observeField("height", "onHeightChange")
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.TopLabel, typographyConstants.ids.bodySmall_strong)
+  setTypographyOfLabel(m.BottomLabel, typographyConstants.ids.bodySmall_strong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -204,4 +209,16 @@ Function onItemContentChange()
     ' setting the selectedItemColor is expected to occur every time the selectedItemColor is updated
     setItemUI(itemContent)
   end if
+End Function
+
+
+Function onHeightChange()
+  height = m.top.height
+  nLabelY = (height - m.TopLabel.boundingRect().height)/2
+  nUnderlineY = nLabelY + m.TopLabel.boundingRect().height
+
+  '//vertically center the labels 
+  m.TopLabel.translation = [m.TopLabel.translation[0], nLabelY]
+  m.BottomLabel.translation = [m.BottomLabel.translation[0], nLabelY]
+  m.Underline.translation = [m.Underline.translation[0], nUnderlineY]
 End Function

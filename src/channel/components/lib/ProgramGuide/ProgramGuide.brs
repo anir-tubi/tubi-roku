@@ -42,6 +42,10 @@ Function init()
   m.channelsGrid.observeFieldScoped("scrollingStatus", "onScrollingStatus")
   m.programGrid.observeFieldScoped("scrollingStatus", "onScrollingStatus")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.backToLiveText, typographyConstants.ids.bodySmall_Strong)
+  setTypographyOfLabel(m.headerText, typographyConstants.ids.subheaderSmall)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

@@ -24,6 +24,9 @@ Function init()
   m.buttonBG = m.top.findNode("buttonBg")
   setButtonWidthAndAlignment()
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.title, typographyConstants.ids.bodyMedium)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

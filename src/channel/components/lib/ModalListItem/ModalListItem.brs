@@ -5,6 +5,10 @@ Function init()
   m.buttonTextFocused.opacity = 0
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.buttonText, typographyConstants.ids.bodyMedium_strong)
+  setTypographyOfLabel(m.buttonTextFocused, typographyConstants.ids.bodyMedium_strong)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

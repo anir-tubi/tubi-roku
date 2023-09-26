@@ -3,6 +3,7 @@ Function init()
   m.top.observeFieldScoped("isLoading", "onIsLoading")
   m.ContentGroup = m.top.findNode("ContentGroup")
   m.Spinner = m.top.findNode("Spinner")
+  m.Title = m.top.findNode("Title")
   m.Text = m.top.findNode("Text")
 
   theme = getThemeFromGlobal()
@@ -23,6 +24,11 @@ Function init()
     m.focusFootprintUri = "pkg:/images/transport/sgplayer/fhd/unfocused-progress-foreground.9.png"
   end if
    m.Text.scrollbarThumbBitmapUri = m.focusFootprintUri
+
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.Title, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.Text, typographyConstants.ids.bodyMedium)
 End Function
 
 Function onComponentFocus()

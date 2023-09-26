@@ -26,6 +26,13 @@ Function init()
   m.Menu.observeFieldScoped("itemFocused", "onItemFocused")
 
   m.Spinner = m.top.findNode("Spinner")
+
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(title, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.infoArea, typographyConstants.ids.bodyMedium_Strong)
+
+
 End Function
 
 Function onComponentFocus()

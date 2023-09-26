@@ -50,6 +50,9 @@ Function setAutoplayPreviewChoices()
 
   m.Menu.content = newContent
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(Title, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(Instructions, typographyConstants.ids.bodyMedium)
 End Function
 
 

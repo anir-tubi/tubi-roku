@@ -100,6 +100,12 @@ Function init()
   ' Used to determine if navigate_within_page events should be sent. Only send when the Up Next content row already
   ' has focus, not when it gains focus.
   m.isUpNextFocused = false
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmall_Strong)
+  setTypographyOfLabel(m.CountdownMovie, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.CountdownSeries, typographyConstants.ids.subheaderMedium)
+
 End Function
 
 

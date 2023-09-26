@@ -7,6 +7,10 @@ Function init()
   topRef.observeFieldScoped("focusPercent", "onFocusPercentChange")
   topRef.observeFieldScoped("gridHasFocus", "onGridHasFocusChange")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.label, typographyConstants.ids.bodySmall_Strong)
+  setTypographyOfLabel(m.labelFocused, typographyConstants.ids.bodySmall_Strong)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

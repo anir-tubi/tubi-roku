@@ -15,6 +15,9 @@ Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("passwordMode", "onPasswordModeChange")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.Text, typographyConstants.ids.bodyMedium)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

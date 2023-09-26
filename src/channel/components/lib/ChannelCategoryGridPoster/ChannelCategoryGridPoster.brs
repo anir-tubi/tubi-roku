@@ -15,6 +15,10 @@ Function init()
   ' scrolling between tiles.
   m.gridIsFocused = false
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.title, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.SponsoredByText, typographyConstants.ids.bodySmall)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

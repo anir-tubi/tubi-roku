@@ -17,6 +17,13 @@ Function init()
   m.originalTranslation_CategoryName = m.CategoryName.translation
   m.originalTranslation_CategoryCount = m.CategoryCount.translation
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.subText, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.FocusIndex, typographyConstants.ids.subheaderSmall)
+  setTypographyOfLabel(m.ItemCount, typographyConstants.ids.subheaderSmall)
+  setTypographyOfLabel(m.SponsoredByText, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.CategoryName, typographyConstants.ids.subheaderMedium)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

@@ -17,6 +17,10 @@ Function init()
 
   m.constants = getConstantsFromGlobal()
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.Title, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.Message, typographyConstants.ids.bodyMedium)
+
   '//::TODO::colors - Design will eventually add this black color to all themes but until then, hardcode this with the default shadeColor regardless of theme.
   '//   when Design adds the color to all themes, then set this color within the onThemeChange() observer using the new theme specific color
   m.Shade.color = m.constants.ui.themes.default.shadeColor

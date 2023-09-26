@@ -17,6 +17,10 @@ Function init()
   m.top.observeFieldScoped("setOpenState", "onOpenStateChanged")
   m.top.observeFieldScoped("buttonToFocusID", "onSideNavToFocusChange")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.btnCC_label, typographyConstants.ids.bodySmall_Strong)
+  setTypographyOfLabel(m.btnBack_label, typographyConstants.ids.bodySmall_Strong)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

@@ -4,6 +4,9 @@ Function init()
   m.MenuText = m.top.findNode("MenuText")
   m.Bground = m.top.findNode("Bground")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.MenuText, typographyConstants.ids.bodySmall_Strong)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
