@@ -52,9 +52,8 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_see_all_container: {
-        roku_show_all_container_thirty_three_v1 : {"enabled": false}
-        roku_show_all_container_forty_nine_v1: {"enabled" : false}
-        roku_show_all_container_fifty_seven_v1 : {"enabled": false}
+        roku_view_more_one_hundred_v1 : {"enabled": false}
+        roku_view_more_last_v1: {"enabled" : false}
       }
 
       roku_dash_hlsv6: {

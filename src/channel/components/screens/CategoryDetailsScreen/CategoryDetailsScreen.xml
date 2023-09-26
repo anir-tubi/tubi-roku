@@ -38,7 +38,7 @@
       <!-- hides or shows the loading spinner -->
       <field id="isLoading" type="boolean" alias="ChannelDetailSpinner.visible" />
 
-       <!-- tells which item should focus on categoryDetail screen if it's selected from see all -->
+       <!-- tells which item should focus on categoryDetail screen if it's selected from view more -->
       <field id="jumpToItemFocused" type="integer" value="-1" />
 
       <!-- What is the previous page so it can be indicated on the call to action that is located on the top nav.

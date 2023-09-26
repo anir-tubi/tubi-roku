@@ -854,7 +854,7 @@ Function onModeChange()
     m.secondLineGroup.appendChild(m.line2)
 
     m.offset.itemSpacings = [15]
-  else if m.top.mode = m.constants.ui.infoPanelModes.seeAll 'this block is for seeAll tile
+  else if m.top.mode = m.constants.ui.infoPanelModes.viewMore 'this block is for viewMore tile
     m.infoPanelGroup.appendChild(m.offset)
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.twoLineInfo)

@@ -28,7 +28,7 @@ Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoad
   categoryDetailsScreen.isLoading = true
 
   if itemFocused >= 0
-    ' This block will be executed when we select the see all tile/see all floating education
+    ' This block will be executed when we select the view more tile
     ' to focus on the correct item in categoryDetails screen.
     categoryDetailsScreen.jumpToItemFocused = itemFocused
   end if

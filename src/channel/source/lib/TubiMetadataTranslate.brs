@@ -131,8 +131,8 @@ Function tubiMetadataTranslate_translateBackendTypeToClientSideType(sBackendType
     sReturn = m.contentTypes.linear
   else if sBackendType = "se"
     sReturn = m.contentTypes.sportsEvent
-  else if sBackendType = "seeAll"
-    sReturn = m.contentTypes.seeAll
+  else if sBackendType = "viewMore"
+    sReturn = m.contentTypes.viewMore
   else if sBackendType = "n"
     sReturn = m.contentTypes.navigate
   end if
@@ -233,7 +233,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     end if
   end if
 
-  ' To display the totalCount on InfoPanel when SeeAll tile is focused
+  ' To display the totalCount on InfoPanel when View More tile is focused
   if contentFromServer.movieAndTVShowCount <> invalid
 
     if type(translatedContent) = "roSGNode"
@@ -1086,19 +1086,19 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, co
     childrenCount = container.children.count()
 
     if screenId = m.constants.ui.screenIds.myStuffScreen
-      seeAllFeatureWithPositionAA = {
-        isSeeAllFeatureShown: false
+      viewMoreFeatureWithPositionAA = {
+        isViewMoreFeatureShown: false
         insertPosition: -1
       }
     else
-      seeAllFeatureWithPositionAA = isSeeAllFeatureShownWithPosition(childrenCount, m.experiments)
+      viewMoreFeatureWithPositionAA = isViewMoreFeatureShownWithPosition(childrenCount, m.experiments)
     end if
 
-    insertPosition = seeAllFeatureWithPositionAA.insertPosition
+    insertPosition = viewMoreFeatureWithPositionAA.insertPosition
 
-    if seeAllFeatureWithPositionAA.isSeeAllFeatureShown = true AND insertPosition = 56 AND (uiMode = m.constants.ui.modes.standard OR uiMode = m.constants.ui.modes.latino)
+    if viewMoreFeatureWithPositionAA.isViewMoreFeatureShown = true AND insertPosition = 104 AND (uiMode = m.constants.ui.modes.standard OR uiMode = m.constants.ui.modes.latino)
       children = container.children
-      while(children.count() > 56)
+      while(children.count() > 104)
         children.pop()
       end while
 
@@ -1129,7 +1129,7 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, co
         insertContent.delete("children")  ' need to make sure there isn't a recursion later when getContentFromCategoryJson is called
         insertContent.posterarts = [m.generateChannelPosterUrl(container.id)]
         insertPosition = 0
-      else if (uiMode = m.constants.ui.modes.standard OR uiMode = m.constants.ui.modes.latino) AND (seeAllFeatureWithPositionAA.isSeeAllFeatureShown = true and insertPosition > 0)AND container.type <> m.constants.ui.categoryTypes.linear
+      else if (uiMode = m.constants.ui.modes.standard OR uiMode = m.constants.ui.modes.latino) AND (viewMoreFeatureWithPositionAA.isViewMoreFeatureShown = true AND insertPosition > 0) AND container.type <> m.constants.ui.categoryTypes.linear
         movieAndTVShowCount = 0
 
         if container.children.count() > 0
@@ -1138,13 +1138,13 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, co
 
         ' create and add a showAll content to the contents which hold the container metadata
         insertContent = {
-          id: m.constants.ui.contentIds.seeAll
-          title: getTranslation("screenHome_item_seeAll", {"containerTitle": container.title})
-          showAllText: getTranslation("screenHome_item_seeAll", {"containerTitle": ""})
-          type: "seeAll"
-          thumbnails: [m.constants.urls.seeAllPoster]
-          backgrounds: [m.constants.urls.seeAllBackground]
-          movieAndTVShowCount: getTranslation("screenHome_item_seeAll_description", {"totalCount": movieAndTVShowCount})
+          id: m.constants.ui.contentIds.viewMore
+          title: getTranslation("screenHome_item_viewMore", {"containerTitle": container.title})
+          showAllText: getTranslation("screenHome_item_viewMore", {"containerTitle": ""})
+          type: "viewMore"
+          thumbnails: [m.constants.urls.viewMorePoster]
+          backgrounds: [m.constants.urls.viewMoreBackground]
+          movieAndTVShowCount: getTranslation("screenHome_item_viewMore_description", {"totalCount": movieAndTVShowCount})
         }
       end if
     end if
@@ -2431,33 +2431,29 @@ Function tubiMetadataTranslate_setDescriptorCodeAndDescription(content, descript
 End Function
 
 
-Function isSeeAllFeatureShownWithPosition(childrenCount, experiments)
+Function isViewMoreFeatureShownWithPosition(childrenCount, experiments)
 
-  seeAllFeatureWithPositionAA = {}
-  isSeeAllFeatureShown = false
+  viewMoreFeatureWithPositionAA = {}
+  isViewMoreFeatureShown = false
   insertPosition = 0
 
   if experiments <> invalid
-    seeAllThirtyThree = experiments.getExperimentResource("roku_see_all_container", "roku_show_all_container_thirty_three_v1").enabled
-    seeAllFortyNine = experiments.getExperimentResource("roku_see_all_container", "roku_show_all_container_forty_nine_v1").enabled
-    seeAllFiftySeven = experiments.getExperimentResource("roku_see_all_container", "roku_show_all_container_fifty_seven_v1").enabled
+    viewMoreHundred = experiments.getExperimentResource("roku_see_all_container", "roku_view_more_one_hundred_v1").enabled
+    viewMoreLast = experiments.getExperimentResource("roku_see_all_container", "roku_view_more_last_v1").enabled
 
-    if seeAllThirtyThree = true AND childrenCount >= 57
-      isSeeAllFeatureShown = true
-      insertPosition = 32
-    else if seeAllFortyNine = true AND childrenCount >= 64
-      'We are showing see all at 49th position only when we have 16 or greater rows when see all is selected.
-      isSeeAllFeatureShown = true
-      insertPosition = 48
-    else if seeAllFiftySeven = true AND childrenCount >= 72
-      isSeeAllFeatureShown = true
-      insertPosition = 56
+    if viewMoreHundred = true AND childrenCount >= 120
+      'We are showing view more at 105th position only when we have 16 or greater rows when View More is selected.
+      isViewMoreFeatureShown = true
+      insertPosition = 104
+    else if viewMoreLast = true AND childrenCount >= 200
+      isViewMoreFeatureShown = true
+      insertPosition = 200
     end if
 
   end if
 
-  seeAllFeatureWithPositionAA.isSeeAllFeatureShown = isSeeAllFeatureShown
-  seeAllFeatureWithPositionAA.insertPosition = insertPosition
+  viewMoreFeatureWithPositionAA.isViewMoreFeatureShown = isViewMoreFeatureShown
+  viewMoreFeatureWithPositionAA.insertPosition = insertPosition
 
-  return seeAllFeatureWithPositionAA
+  return viewMoreFeatureWithPositionAA
 End Function

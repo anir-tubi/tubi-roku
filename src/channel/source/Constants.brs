@@ -680,8 +680,8 @@ Function getConstants()
      constants.urls.fifaShowAllPoster = "https://cdn.adrise.tv/image/roku_support_images/fifa-showall-poster.png"
      constants.urls.fifaShowAllBackground = "https://cdn.adrise.tv/image/roku_support_images/fifa-showall-background.webp"
 
-     constants.urls.seeAllPoster = "pkg:/images/see-all-tile.webp"
-     constants.urls.seeAllBackground = "pkg:/images/see-all-gradient.webp"
+     constants.urls.viewMorePoster = "pkg:/images/see-all-tile.webp"
+     constants.urls.viewMoreBackground = "pkg:/images/see-all-gradient.webp"
 
     ' url for pinging Nielsen
     constants.urls.nielsenPing = "https://audit.imrworldwide.com/cgi-bin/gn"
@@ -1110,7 +1110,7 @@ Function getConstants()
       constants.ui.infoPanelModes.epg = "epg"
       constants.ui.infoPanelModes.linearSearch = "linearSearch"
       constants.ui.infoPanelModes.programHomescreen = "programHomescreen"
-      constants.ui.infoPanelModes.seeAll = "seeAll"
+      constants.ui.infoPanelModes.viewMore = "viewMore"
       '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
       constants.ui.infoPanelModes.linearTournament = "linearTournament"
       constants.ui.infoPanelModes.sportsEvent = "sportsEvent"
@@ -1138,7 +1138,7 @@ Function getConstants()
       constants.ui.contentTypes.emptyContainer = "emptyContainer"
       constants.ui.contentTypes.epg = "epg"
       constants.ui.contentTypes.live = "live"
-      constants.ui.contentTypes.seeAll = "seeAll"
+      constants.ui.contentTypes.viewMore = "viewMore"
       '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
       constants.ui.contentTypes.sportsEvent = "sports_event"
       constants.ui.contentTypes.navigate = "navigate"
@@ -1262,7 +1262,7 @@ Function getConstants()
       constants.ui.contentIds.channelList = "channelsList"
       constants.ui.contentIds.timeGridContent = "timeGridContent"
       constants.ui.contentIds.showAllGames = "showAllGames"
-      constants.ui.contentIds.seeAll = "seeAll"
+      constants.ui.contentIds.viewMore = "viewMore"
 
     ' content ids of contents that should not be removed from the content cache
     constants.ui.permanentlyCachedContentIds = {}

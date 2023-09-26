@@ -26,7 +26,7 @@ Function init()
     live: "live"
     sportsEvent: "sports_event"
     navigate: "navigate"
-    seeAll: "seeAll"
+    viewMore: "viewMore"
   }
 
   '//recreate the contentTimings from constants so as not to access m.global.constants for every item on the home screen as they are created
@@ -137,7 +137,7 @@ Function onContentChange(msg)
       setReplayOrUpcomingBadge(badgeText)
     end if
 
-    if itemContent.type <> invalid AND (itemContent.type = m.contentTypes.navigate OR itemContent.type = m.contentTypes.seeAll) AND itemContent.showAllText <> invalid
+    if itemContent.type <> invalid AND (itemContent.type = m.contentTypes.navigate OR itemContent.type = m.contentTypes.viewMore) AND itemContent.showAllText <> invalid
 
       griditemtype = itemContent.griditemtype
       if griditemtype = invalid
@@ -401,7 +401,7 @@ End Function
 ' setShowAllLabel is to set text/label inside poster. Currently this feature is available only for landscape & portrait gridTypes.
 ' if we need to support any other gridTypes, then add the width & height to support those inside this function.
 '
-'@text: String, a text to be displayed inside SeeAll/ShowAll poster
+'@text: String, a text to be displayed inside viewMore poster
 '@gridType: String, default is portrait. possible values are constants.ui.gridItemTypes
 Function setShowAllLabel(text, gridType = "portrait")
   tubiLog("CategoryGridPoster.setShowAllLabel")
