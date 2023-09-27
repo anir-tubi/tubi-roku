@@ -17,6 +17,7 @@ Function init()
 
   m.Menu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
   m.Menu.observeFieldScoped("itemFocused", "onItemFocusChanged")
+  m.Menu.observeFieldScoped("itemSelected", "onItemSelectedChanged")
 
   'm.instructionsText is used to store the title and description of parental controls for screen reader when screen loaded.
   m.instructionsText = ""
@@ -134,5 +135,22 @@ Function onItemFocusChanged(msg)
     m.instructionsText = ""
   else
     m.top.audioGuideText = focusedContent.title
+  end if
+End Function
+
+
+Function onItemSelectedChanged(msg)
+  selectedIndex = msg.getData()
+
+  ' Creating a mapping for parental rating id has key.
+  parentalRatingMapping = {
+    LittleKids: 0
+    OlderKids: 1
+    Teens: 2
+    Adults: 3
+  }
+  selectedContent = m.Menu.content.getChild(selectedIndex)
+  if selectedContent <> invalid
+    m.top.itemSelected = parentalRatingMapping[selectedContent.id]
   end if
 End Function

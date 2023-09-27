@@ -21,7 +21,7 @@
 
 
     <!-- OUTPUTS -->
-      <field id="itemSelected" alias="ParentalControlsMenu.itemSelected" alwaysNotify="true"/>
+      <field id="itemSelected" type="integer" alwaysNotify="true"/>
       <field id="audioGuideText" type="string" alwaysNotify="true"/>
   </interface>
 
