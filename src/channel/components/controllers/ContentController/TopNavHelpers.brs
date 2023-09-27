@@ -2,7 +2,7 @@
 Function isTopNavHomeScreenEnabled()
   bReturn = false
 
-  if m.constants.deviceInfo.countryCode <> invalid AND UCase(m.constants.deviceInfo.countryCode) = "US"
+  if m.constants.deviceInfo.countryCode <> invalid AND (UCase(m.constants.deviceInfo.countryCode) = "US" OR UCase(m.constants.deviceInfo.countryCode) = "CA")
     if isKidsUIOn() = false
       bReturn = true
     end if
