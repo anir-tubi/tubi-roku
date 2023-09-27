@@ -232,6 +232,7 @@ Function runChannel(constants, log, request, auth)
               controller.observeField("transportVoiceResponse", port)
               controller.observeField("removeStartUpScreens", port)
               controller.observeField("disableInstantResume", port)
+              controller.observeField("rokuContinueWatchingRequestInfo", port)
               controller.appStartTime = m.appStartTime
               controller.startupArgs = startupArgs
 
@@ -339,6 +340,9 @@ Function runChannel(constants, log, request, auth)
         if starterController <> invalid
           starterController.removeStartUpScreens = true
         end if
+      else if msg.getField() = "rokuContinueWatchingRequestInfo"
+        info = msg.getData()
+        updateRokuContinueWatchingInfo(request, info)
       end if
     end if
 
@@ -384,6 +388,7 @@ Function loadPackagedComponents(scene, port, startupArgs)
   controller = scene.createChild("ContentController")
   controller.id = "ContentController"
   controller.observeField("exitApp", port)
+  controller.observeField("rokuContinueWatchingRequestInfo", port)
   controller.observeField("transportVoiceResponse", port)
   controller.observeField("removeStartUpScreens", port)
   controller.observeField("disableInstantResume", port)
@@ -655,4 +660,14 @@ Function setRemoteConfigAndExperimentsOnConstants(request, constants)
   experiments.init(request) 'sets experiment values from server on constants
 
   return constants
+End Function
+
+
+' Makes a request to update or delete roku continue watching info.
+'
+' @tubiRequest: assocArray, an instance of the request module as returned by TubiRequest()
+' @requestInfo: assocArray, information related to the request like url,method and post body.
+Function updateRokuContinueWatchingInfo(tubiRequest, requestInfo)
+  tubiRequest = tubiRequest.createAsync(requestInfo.url, requestInfo.requestType, requestInfo.options)
+  m.queue.pushRequest(tubiRequest)
 End Function

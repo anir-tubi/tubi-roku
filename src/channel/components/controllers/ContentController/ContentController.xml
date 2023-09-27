@@ -125,6 +125,21 @@
       <!-- disableInstantResume will be set to true when guest user tries to relaunch the app after 24hours after app got suspended by pressing home or by opening channel on remote -->
       <field id="disableInstantResume" type="boolean" value="false" alwaysNotify="true"/>
 
+      <!-- Main thread listens for this and will make a call to roku continue watching endpoint. Below field will contain information related to the update or delete request. 
+           Below field is necessary due to a roku limitation that we need to make the api request from main thread due to a fact that they cannot retrieve channel token properly if it is made in component library.
+           Sample value:
+           {
+            url: m.constants.urls.rokuContinueWatchingEndpoint
+            options: {
+              method: m.constants.reqTypes.post
+              body: {} // Sample body - {"items":[{"contentId":"abc123","episodeId":"def123","lastInteractionTime":123456,"position":854,"duration":1678,"waitForNextEpisodeAvailability":true}]}
+              headers: {}
+            }
+            requestType: "" string representing a unique value for the request. ex: postRokuContinueWatching
+          }
+      -->
+      <field id="rokuContinueWatchingRequestInfo" type="assocarray" value="{}" alwaysNotify="true" />
+
   </interface>
 
     <children>

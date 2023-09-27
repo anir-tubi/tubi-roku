@@ -1272,12 +1272,8 @@ Function addOrUpdateRokuContinueWatchingInfo(content, position)
     "items": [item]
   }
   requestInfo = m.rokuContinueWatchingApi.createUpdateContinueWatchingReqInfo(body)
-  m.makeRequest({
-    url: requestInfo.url
-    options: requestInfo.options
-    requestType: m.constants.reqNames.postRokuContinueWatching
-    silenceCallbackWarnings: true
-  })
+  requestInfo.requestType = m.constants.reqNames.postRokuContinueWatching
+  m.top.rokuContinueWatchingRequestInfo = requestInfo
 End Function
 
 
@@ -1294,10 +1290,6 @@ Function deleteFromRokuContinueWatching(content)
     "items": [item]
   }
   requestInfo = m.rokuContinueWatchingApi.createDeleteContinueWatchingReqInfo(body)
-  m.makeRequest({
-    url: requestInfo.url
-    options: requestInfo.options
-    requestType: m.constants.reqNames.deleteRokuContinueWatching
-    silenceCallbackWarnings: true
-  })
+  requestInfo.requestType = m.constants.reqNames.deleteRokuContinueWatching
+  m.top.rokuContinueWatchingRequestInfo = requestInfo
 End Function
