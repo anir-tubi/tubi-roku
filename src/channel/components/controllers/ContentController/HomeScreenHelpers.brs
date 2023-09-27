@@ -862,7 +862,7 @@ Function onContentSelected(msg)
   homeScreen = msg.getRoSGNode()
   m.autoplayContext = homeScreen.currCategoryId
 
-  if content.type = "channel"
+  if content.type = m.constants.uapiContentTypes.channel
     showCategoryDetailsScreen(content, m.constants.ui.terms.home)
   else if content.type = m.constants.ui.contentTypes.historySignedOutUser
     '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen

@@ -405,7 +405,7 @@ Function changeLikeDislikeButtonText()
       if m.Menu.content <> invalid AND m.Menu.itemFocused >= 0
 
         focusedMenuItem = m.Menu.content.getChild(m.Menu.itemFocused)
-        if m.Menu.isInFocusChain() = true AND focusedMenuItem <> invalid AND focusedMenuItem.id = "LikeDislikeMenuItem"
+        if m.Menu.isInFocusChain() = true AND focusedMenuItem <> invalid AND focusedMenuItem.id = m.constants.ui.detailScreenMenuItemIds.likeDislikeMenuItem
           sButtonText = sButtonText + getTranslation("screenDetails_button_like_instructions")
         end if
 
@@ -905,7 +905,7 @@ End Function
 Function setVisibilityOfSecondaryMenu()
   result = false
   itemFocused = m.Menu.content.getChild(m.Menu.itemFocused)
-  if m.SecondaryMenu.isInFocusChain() = true OR (m.Menu.isInFocusChain() = true AND itemFocused <> invalid AND itemFocused.id = "LikeDislikeMenuItem" AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing)
+  if m.SecondaryMenu.isInFocusChain() = true OR (m.Menu.isInFocusChain() = true AND itemFocused <> invalid AND itemFocused.id = m.constants.ui.detailScreenMenuItemIds.likeDislikeMenuItem AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing)
     alignSecondaryMenuWithMenu()
 
     m.SecondaryMenu.visible = true
@@ -950,13 +950,13 @@ Function handleMenuItemSelected(itemSelected)
       m.top.stopVideoPreview = true
     end if
 
-    if itemSelected.id = "ResumeMenuItem"
+    if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.resumeMenuItem
       m.top.resumeSelected = true
       m.Menu.jumpToItem = 0 '//reset menu back to the top after a video is requested to play
-    else if itemSelected.id = "PlayMenuItem"
+    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.playMenuItem
       m.top.playSelected = true
       m.Menu.jumpToItem = 0 '//reset menu back to the top after a video is requested to play
-    else if itemSelected.id = "LikeDislikeMenuItem"
+    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.likeDislikeMenuItem
       if m.LikeDislikeMenuItem.title = getTranslation("screenDetails_button_changingRating")
         '//If it is still trying to change the rating then do nothing if this button is clicked again
       else if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked
@@ -972,38 +972,38 @@ Function handleMenuItemSelected(itemSelected)
         focusSecondaryMenu()
       end if
 
-    else if itemSelected.id = "LikeMenuItem"
+    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.likeMenuItem
       m.top.likeSelected = true
       if isLoggedInUser() = true
         '//if the user is logged in, then focus back onto the main menu
         focusMenu()
       end if
 
-    else if itemSelected.id = "DislikeMenuItem"
+    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.dislikeMenuItem
       m.top.dislikeSelected = true
       if isLoggedInUser() = true
         '//if the user is logged in, then focus back onto the main menu
         focusMenu()
       end if
 
-    else if itemSelected.id = "WatchTrailerMenuItem"
+    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.watchTrailerMenuItem
       m.top.watchTrailerSelected = true
-    else if itemSelected.id = "EpisodesMenuItem"
+    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.episodesMenuItem
       m.top.episodeListSelected = true
-    else if itemSelected.id = "AddQueueMenuItem"
+    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.addQueueMenuItem
       m.top.addToQueueSelected = true
-    else if itemSelected.id = "RemoveQueueMenuItem"
+    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.removeQueueMenuItem
       m.top.removeFromQueueSelected = true
-    else if itemSelected.id = "RemoveHistoryMenuItem"
+    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.removeHistoryMenuItem
       m.top.removeFromHistorySelected = true
-    else if itemSelected.id = "ChannelMenuItem"
+    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.channelMenuItem
       'on selecting this menu, it is removing the detailScreen from screen stack, so roku negative audio sound is played,
       'To play Roku positive audio sound, channelMenuSelected is handled in onKeyEvent.
       m.isChannelMenuSelected = true
-    else if itemSelected.id = "signUpMenuItem"
+    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.signUpMenuItem
       m.top.signUpButtonSelected = true
     ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-    else if itemSelected.id = "SeeAllGamesMenuItem"
+    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.seeAllGamesMenuItem
       m.top.seeAllGamesSelected = true
     end if
   end if
@@ -1188,10 +1188,10 @@ Function handlePlayInput()
     m.top.stopVideoPreview = true
   end if
 
-  if m.Menu.isInFocusChain() = true AND itemFocused.id = "PlayMenuItem"
+  if m.Menu.isInFocusChain() = true AND itemFocused.id = m.constants.ui.detailScreenMenuItemIds.playMenuItem
     m.top.playSelected = true
     m.Menu.jumpToItem = 0 '//reset menu back to the top after a video is requested to play
-  else if m.Menu.isInFocusChain() = true AND itemFocused.id = "WatchTrailerMenuItem"
+  else if m.Menu.isInFocusChain() = true AND itemFocused.id = m.constants.ui.detailScreenMenuItemIds.watchTrailerMenuItem
     m.top.watchTrailerSelected = true
   else if m.RelatedGrid.isInFocusChain() = true
     selectedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemFocused)
@@ -1246,7 +1246,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
     else if key = "play"
       handlePlayInput()
       return true
-    else if key = "right" AND m.Menu.isInFocusChain() = true AND m.Menu.content.getChild(m.Menu.itemFocused).id = "LikeDislikeMenuItem" AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked
+    else if key = "right" AND m.Menu.isInFocusChain() = true AND m.Menu.content.getChild(m.Menu.itemFocused).id = m.constants.ui.detailScreenMenuItemIds.likeDislikeMenuItem AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.changing AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.liked AND m.top.likeDislikeState <> m.constants.ui.likeDislikeStates.disliked
       'This is to send component_interaction with toggle_off when user Liked and then removed the rating and then set focus to secondary menu.
       focusSecondaryMenu()
       return true

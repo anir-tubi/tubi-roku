@@ -40,11 +40,6 @@ Function getConstants()
     di = CreateObject("roDeviceInfo")
 
     firmware = di.GetOSVersion() '{build: "4195", major: "10", minor: "0", revision: "0"}' roAssociativeArray
-    if di.GetDisplayType() = "HDTV"
-      definition = "hd"
-    else
-      definition = "sd"
-    end if
 
     ' 256MB models, needed to reduce the number of contents per category
     ' Find details at https://en.wikipedia.org/wiki/Roku#Feature_comparison
@@ -123,14 +118,6 @@ Function getConstants()
       "4230X": true  ' 3 (2015)
     }
 
-    'models that are showing Roku default closed caption dialog when user selected options with video preview on.
-    showFirmwareCcWhenVideoNotFullScreenModels = {
-      "4800X": true  ' Roku Ultra
-      "3820X": true  ' Stick 4K+
-      "3960X": true  ' Roku Express
-      "3941X": true  ' Roku Express 4k+
-    }
-
     ' List all devices with analog output that we support still
     devicesWithAnalogOutput = {
       "2700X": true
@@ -179,12 +166,6 @@ Function getConstants()
       firmwareCaptionMenu = true
     end if
 
-    if showFirmwareCcWhenVideoNotFullScreenModels[deviceModel] <> invalid
-      showFirmwareCcWhenVideoNotFullScreen = true
-    else
-      showFirmwareCcWhenVideoNotFullScreen = false
-    end if
-
     ' There is a bug with 9-patch handling when FHD is the only ui_resolution entry and display is 720p
     if di.GetDisplaySize().w <> 1920
       scaledUi = true
@@ -224,18 +205,11 @@ Function getConstants()
     end if
 
     constants.deviceInfo.uiResolution = UCase(di.GetUiResolution().name)
-    constants.deviceInfo.ipAddresses = di.GetIPAddrs() 'array of network interface ip addresses (normally will only contain 1 element)
     constants.deviceInfo.firmwareVersion = firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build
-    constants.deviceInfo.firmwareBuild = firmware.build
     constants.deviceInfo.userAgent = "Roku/DVP-" + firmware.major + "." + firmware.minor + " (" + firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build + ")"
     constants.deviceInfo.userAgentModel = "Roku/DVP-" + firmware.major + "." + firmware.minor + " (" + firmware.major + "." + firmware.minor + "." + firmware.revision + "." + firmware.build + ") " + deviceModel
     constants.deviceInfo.model = deviceModel
     constants.deviceInfo.vendorName = di.GetModelDetails().VendorName
-    constants.deviceInfo.definition = definition
-    constants.deviceInfo.displayType = di.GetDisplayType()
-    constants.deviceInfo.displayMode = di.GetDisplayMode()
-    constants.deviceInfo.aspectRatio = di.GetDisplayAspectRatio()
-    constants.deviceInfo.displaySize = di.GetDisplaySize()
     constants.deviceInfo.displayWidth = di.GetDisplaySize().w
     constants.deviceInfo.displayHeight = di.GetDisplaySize().h
     constants.deviceInfo.rokuCountryCode = di.GetUserCountryCode()
@@ -251,7 +225,6 @@ Function getConstants()
     constants.deviceInfo.lowMemory = lowMemory
     constants.deviceInfo.fastCpu = fastCpu
     constants.deviceInfo.lowVram = lowVram
-    constants.deviceInfo.showFirmwareCcWhenVideoNotFullScreen = showFirmwareCcWhenVideoNotFullScreen
     constants.deviceInfo.firmwareCaptionMenu = firmwareCaptionMenu
     constants.deviceInfo.limitedUi = limitedUi
     constants.deviceInfo.isAnalogOutputDevice = isAnalogOutputDevice
@@ -279,8 +252,6 @@ Function getConstants()
     constants.reqNames.getUpNextContent = "getUpNextContent"
     constants.reqNames.getRelatedContent = "getRelatedContent"
     constants.reqNames.getThumbnails = "getThumbnails"
-    constants.reqNames.getChannel = "getChannel"
-    constants.reqNames.getSSAIAds = "getSSAIAds"
     constants.reqNames.getLiveManifest = "getLiveManifest"
     constants.reqNames.emailExists = "emailExists"
     constants.reqNames.signUp = "signUp"
@@ -294,8 +265,6 @@ Function getConstants()
     constants.reqNames.postUserHistory = "postUserHistory"
     constants.reqNames.getQueue = "getQueue"
     constants.reqNames.getHistory = "getHistory"
-    constants.reqNames.refreshToken = "refreshToken"
-    constants.reqNames.transferToken = "transferToken"
     constants.reqNames.generic = "generic"
     constants.reqNames.magicLink = "magicLink"
     constants.reqNames.resetPassword = "resetPassword"
@@ -310,7 +279,6 @@ Function getConstants()
     constants.reqNames.getScreenSaverHomeScreenContainerIds = "getScreenSaverHomeScreenContainerIds"
     constants.reqNames.getNamespaces = "getNamespaces"
     constants.reqNames.getExternalConfigs = "getExternalConfigs"
-    constants.reqNames.getBatchServerPersistentData = "getBatchServerPersistentData"
     constants.reqNames.getServerPersistentData = "getServerPersistentData"
     constants.reqNames.patchServerPersistentData = "patchServerPersistentData"
     constants.reqNames.getPauseAd = "getPauseAd"
@@ -337,7 +305,6 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getUpNextContent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getRelatedContent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getThumbnails] = true
-      constants.reqNames.acceptsTubiAuth[constants.reqNames.getChannel] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getLiveManifest] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.emailExists] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postUserHistory] = true
@@ -428,12 +395,10 @@ Function getConstants()
   ' "restartApp" - will clear screen stack and restarts the app from beginning.
   ' "closeDialog" - user attention modal(signout modal, app exit modal etc), we are closing the modal and resume the app
   ' "startChannel" - will bring the user to the default homescreen
-  ' "resumeChannel" -  will bring the user to where they left off
   constants.instantResumeActions = {}
     constants.instantResumeActions.closeDialog = "closeDialog"
     constants.instantResumeActions.startChannel = "startChannel"
     constants.instantResumeActions.restartApp = "restartApp"
-    constants.instantResumeActions.resumeChannel = "resumeChannel"
 
   'Types of modal dialogs
   constants.modalDialogTypes = {}
@@ -495,7 +460,6 @@ Function getConstants()
         constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
       end if
       constants.urls.cms.singleContent = constants.urls.cms.urlBase + "/content"
-      constants.urls.cms.categories = constants.urls.cms.urlBase + "/categories"
       constants.urls.cms.relatedContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/related"
       constants.urls.cms.thumbnails = constants.urls.cms.urlBase + "/content" ' + content_id + "/thumbnail_sprites"
 
@@ -545,7 +509,6 @@ Function getConstants()
         constants.urls.userDevice.urlBase = "https://uapi.staging-public.tubi.io/user_device"
       end if
 
-      constants.urls.userDevice.registerCode = constants.urls.userDevice.urlBase + "/code/register"
       constants.urls.userDevice.refreshToken = constants.urls.userDevice.urlBase + "/login/refresh"
       constants.urls.userDevice.transferToken = constants.urls.userDevice.urlBase + "/login/transfer"
       constants.urls.userDevice.resetPassword = constants.urls.userDevice.urlBase + "/password/reset"
@@ -633,7 +596,6 @@ Function getConstants()
         #end if
       end if
 
-      constants.urls.analytics.event = constants.urls.analytics.urlBase + "/v2/event"
       constants.urls.analytics.singleEvent = constants.urls.analytics.urlBase + "/v2/single-event" 'preferred by back end team
 
     'cuepoints url
@@ -726,15 +688,8 @@ Function getConstants()
     constants.uapiContentTypes.movie = "movie"
     constants.uapiContentTypes.series = "series"
     constants.uapiContentTypes.episode = "episode"
-    constants.uapiContentTypes.container = "container"
     constants.uapiContentTypes.channel = "channel"
-    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     constants.uapiContentTypes.sportsEvent = "sports_event"
-
-  'uapi actions - add or delete from user categories
-  constants.uapiActions = {}
-    constants.uapiActions.add = "add"
-    constants.uapiActions.remove = "remove"
 
   constants.serverValues = {}
     constants.serverValues.tensorVideoRenditions = {}
@@ -754,9 +709,6 @@ Function getConstants()
     if constants.settings.mode <> "production" AND constants.settings.coppaHasAgeDuration <> invalid
       constants.timers.coppaFailTimeout = constants.settings.coppaHasAgeDuration
     end if
-
-    ' How long each slide stays on screen for the screen saver
-    constants.timers.screenSaverSlideDuration = 10 ' In seconds
 
   'constants needed for the video player
   constants.player = {}
@@ -814,53 +766,25 @@ Function getConstants()
     constants.player.playerResults = {}
       constants.player.playerResults.completed = "COMPLETED"
       constants.player.playerResults.closed = "CLOSED"
-      constants.player.playerResults.failed = "FAILED"
-      'used internal to the player, should never be returned
-      constants.player.playerResults.commercial = "STOPFORCOMMERCIAL"
-      constants.player.playerResults.ignore = "IGNORE"
-      constants.player.playerResults.resumePlay = "RESUMEPLAY"
 
     'urls for the images that are required for the transport
     constants.player.transportButtons = {}
       constants.player.transportButtons.fastForward = "pkg:/images/transport/sgplayer/icon-ffw.png"
-      constants.player.transportButtons.fastForwardFocus = "pkg:/images/transport/sgplayer/icon-ffw-focus.png"
       constants.player.transportButtons.fastForwardLevels = [
         "pkg:/images/transport/sgplayer/icon-ffw-1.png",
         "pkg:/images/transport/sgplayer/icon-ffw-2.png",
         "pkg:/images/transport/sgplayer/icon-ffw-3.png"
       ]
-      constants.player.transportButtons.fastForwardLevelsFocus = [
-        "pkg:/images/transport/sgplayer/icon-ffw-1-focus.png",
-        "pkg:/images/transport/sgplayer/icon-ffw-2-focus.png",
-        "pkg:/images/transport/sgplayer/icon-ffw-3-focus.png"
-      ]
 
       constants.player.transportButtons.rewind = "pkg:/images/transport/sgplayer/icon-rew.png"
-      constants.player.transportButtons.rewindFocus = "pkg:/images/transport/sgplayer/icon-rew-focus.png"
       constants.player.transportButtons.rewindLevels = [
         "pkg:/images/transport/sgplayer/icon-rew-1.png",
         "pkg:/images/transport/sgplayer/icon-rew-2.png",
         "pkg:/images/transport/sgplayer/icon-rew-3.png"
       ]
-      constants.player.transportButtons.rewindLevelsFocus = [
-        "pkg:/images/transport/sgplayer/icon-rew-1-focus.png",
-        "pkg:/images/transport/sgplayer/icon-rew-2-focus.png",
-        "pkg:/images/transport/sgplayer/icon-rew-3-focus.png"
-      ]
 
       constants.player.transportButtons.pause = "pkg:/images/transport/sgplayer/icon-pause.png"
-      constants.player.transportButtons.pauseFocus = "pkg:/images/transport/sgplayer/icon-pause-focus.png"
       constants.player.transportButtons.play = "pkg:/images/transport/sgplayer/icon-play.png"
-      constants.player.transportButtons.playFocus = "pkg:/images/transport/sgplayer/icon-play-focus.png"
-      constants.player.transportButtons.toEnd = "pkg:/images/transport/sgplayer/icon-to-end.png"
-      constants.player.transportButtons.toEndFocus = "pkg:/images/transport/sgplayer/icon-to-end-focus.png"
-      constants.player.transportButtons.toStart = "pkg:/images/transport/sgplayer/icon-to-start.png"
-      constants.player.transportButtons.toStartFocus = "pkg:/images/transport/sgplayer/icon-to-start-focus.png"
-      constants.player.transportButtons.hopForward = "pkg:/images/transport/sgplayer/icon-fwd-30s.png"
-      constants.player.transportButtons.hopBack = "pkg:/images/transport/sgplayer/icon-rew-30s.png"
-      constants.player.transportButtons.closedCaption = "pkg:/images/transport/sgplayer/cc-icon.png"
-      constants.player.transportButtons.closedCaptionFocus = "pkg:/images/transport/sgplayer/cc-icon-focus.png"
-      constants.player.transportButtons.closedCaptionDisabled = "pkg:/images/transport/sgplayer/cc-icon-disabled.png"
 
       ' "ids" for the different skip button texts
       constants.player.skipCuepointsButtonTypes = {}
@@ -1069,7 +993,6 @@ Function getConstants()
       constants.ui.categoryIds.fifawc = "fifa_world_cup_2022_matches"
       constants.ui.categoryIds.upcomings = "fifa_world_cup_upcoming_matches"
       constants.ui.categoryIds.replays = "fifa_world_cup_match_replays"
-      constants.ui.categoryIds.noteWorthyfifa = "fifa_world_cup"
 
       constants.ui.categoryIds.mostPopular = "most_popular"
       constants.ui.categoryIds.movieNight = "movie_night"
@@ -1115,7 +1038,6 @@ Function getConstants()
       constants.ui.infoPanelModes.linearTournament = "linearTournament"
       constants.ui.infoPanelModes.sportsEvent = "sportsEvent"
       constants.ui.infoPanelModes.navigateSports = "navigateSports"
-      constants.ui.infoPanelModes.noteworthy = "noteworthy"
 
     constants.ui.contentMode = {}
       ' these are also used for the content experience choices but are the value that is sent to the back end in our api requests
@@ -1129,7 +1051,6 @@ Function getConstants()
     constants.ui.contentTypes = {}
       constants.ui.contentTypes.series = "series"
       constants.ui.contentTypes.video = "video"
-      constants.ui.contentTypes.episode = "episode"
       constants.ui.contentTypes.season = "season"
       constants.ui.contentTypes.category = "category"
       constants.ui.contentTypes.channel = "channel"
@@ -1137,7 +1058,6 @@ Function getConstants()
       constants.ui.contentTypes.historySignedOutUser = "continue_watching_signed_out_user"
       constants.ui.contentTypes.emptyContainer = "emptyContainer"
       constants.ui.contentTypes.epg = "epg"
-      constants.ui.contentTypes.live = "live"
       constants.ui.contentTypes.viewMore = "viewMore"
       '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
       constants.ui.contentTypes.sportsEvent = "sports_event"
@@ -1151,7 +1071,6 @@ Function getConstants()
     constants.ui.backgroundTypes = {}
       constants.ui.backgroundTypes.fullScreen = "fullscreen"
       constants.ui.backgroundTypes.topRight = "topright"
-      constants.ui.backgroundTypes.feature = "feature"
       constants.ui.backgroundTypes.epg = "epg"
       constants.ui.backgroundTypes.marketingScreen = "marketingScreen"
       constants.ui.backgroundTypes.rightScreen = "rightScreen"
@@ -1190,7 +1109,6 @@ Function getConstants()
       constants.ui.screenLevels.signInScreen = 90
       constants.ui.screenLevels.ageGateScreen = 90
       constants.ui.screenLevels.emailVerificationScreen = 90
-      constants.ui.screenLevels.forgotPasswordProcessingScreen = 90
       constants.ui.screenLevels.welcomeScreen = 99
       constants.ui.screenLevels.freeForeverScreen = 110
       constants.ui.screenLevels.availableDeviceScreen = 111
@@ -1203,7 +1121,6 @@ Function getConstants()
       constants.ui.screenIds.homeScreen = "homeScreen"
       constants.ui.screenIds.searchScreen = "searchScreen"
       constants.ui.screenIds.settingsScreen = "settingsScreen"
-      constants.ui.screenIds.confirmPasswordScreen = "confirmPasswordScreen"
       constants.ui.screenIds.categoryDetailsScreen = "categoryDetailsScreen"
       constants.ui.screenIds.channelListScreen = "channelListScreen"
       constants.ui.screenIds.categoryListScreen = "categoryListScreen"
@@ -1215,7 +1132,6 @@ Function getConstants()
       constants.ui.screenIds.episodeScreen = "episodeScreen"
       constants.ui.screenIds.emailInputScreen = "emailInputScreen"
       constants.ui.screenIds.signInScreen = "signInScreen"
-      constants.ui.screenIds.modalDialogScreen = "modalDialogScreen"
       constants.ui.screenIds.videoPlayerScreen = "videoPlayerScreen"
       constants.ui.screenIds.linearVideoPlayerScreen = "linearVideoPlayerScreen"
       constants.ui.screenIds.epgScreen = "epgScreen"
@@ -1302,9 +1218,7 @@ Function getConstants()
       constants.ui.sideNavOpenIds[constants.ui.screenIds.categoryListScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.espanolScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.epgScreen] = true
-      constants.ui.sideNavOpenIds[constants.ui.screenIds.movieScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.myStuffScreen] = true
-      constants.ui.sideNavOpenIds[constants.ui.screenIds.tvScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.searchScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.tournamentScreen] = true
 
@@ -1314,9 +1228,6 @@ Function getConstants()
         constants.ui.onBoarding.pageSequence.freeForeverScreen = 1
         constants.ui.onBoarding.pageSequence.availableDeviceScreen = 2
         constants.ui.onBoarding.pageSequence.landingScreen = 3
-
-    constants.ui.keyIds = {}
-      constants.ui.keyIds.back = "back"
 
     constants.ui.sideNavIds = {}
       constants.ui.sideNavIds.home = "home"
@@ -1352,9 +1263,7 @@ Function getConstants()
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.channelListScreen] = constants.ui.sideNavIds.channels
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.categoryListScreen] = constants.ui.sideNavIds.categories
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.espanolScreen] = constants.ui.sideNavIds.espanol
-      constants.ui.screenIdToSideNavId[constants.ui.screenIds.movieScreen] = constants.ui.sideNavIds.movies
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.myStuffScreen] = constants.ui.sideNavIds.myList
-      constants.ui.screenIdToSideNavId[constants.ui.screenIds.tvScreen] = constants.ui.sideNavIds.tv
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.settingsScreen] = constants.ui.sideNavIds.settings
 
     'a map of screenIds to corresponding topNavIds
@@ -1395,12 +1304,6 @@ Function getConstants()
       constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
 
     constants.ui.uris = {}
-      'background gradient urls
-      constants.ui.uris.detailBackgroundGradient = "pkg:/images/detail-gradient-25.webp"
-
-      ' portrait format default image
-      constants.ui.uris.portraitPlaceholder = "pkg:/images/placeholder.jpg"
-
       'info panel images not populated from content backend
       constants.ui.uris.infoPanelEpgLiveIcon = "pkg:/images/icon-live.webp"
       constants.ui.uris.infoPanelWorldCupLogo = "pkg:/images/fifa-world-cup-icon.webp"
@@ -1729,11 +1632,6 @@ constants.ui.themes = {}
         constants.performance.categoryGridList.categoryWindowSize = 10
         constants.performance.categoryGridList.eagerLoad = true
       end if
-
-      constants.timeInUnits = {}
-      constants.timeInUnits["hour"] = "HOUR(S)"
-      constants.timeInUnits["minute"] = "MIN(S)"
-      constants.timeInUnits["second"] = "SEC(S)"
 
       constants.deeplinks = {}
       constants.deeplinks["homescreen"] = "homescreen"
