@@ -1340,6 +1340,7 @@ Function getConstants()
       constants.ui.homeScreenTopNavIds.tournament = "tournament"
 
     constants.ui.linearSideNavIds = {}
+      constants.ui.linearSideNavIds.cc = "cc"
       constants.ui.linearSideNavIds.epg = "epg"
       constants.ui.linearSideNavIds.subtitles = "subtitles"
       constants.ui.linearSideNavIds.back = "back"
@@ -1426,12 +1427,12 @@ Function getConstants()
     constants.consentKeys.personalization = "personalization"
     constants.consentKeys.marketing = "marketing_"
     constants.consentKeys.continueWatching = "data_sharing"
-  
+
   ' TODO: Will include other values once they are finalized.
   constants.consentAnalyticsButtonValues = {}
     constants.consentAnalyticsButtonValues.data_sharing = "DATA_SHARING"
 
-  
+
 
 'THEME/COLOR START///////////////////////
 '//::TODO::colors - the following constants should be moved to themes. The app should not call these constants
