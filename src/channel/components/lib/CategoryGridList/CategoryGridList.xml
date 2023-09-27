@@ -135,7 +135,7 @@
       rowTitleComponentName="CategoryGridRowLabel"
       itemSize="[1776,364]"
       numRows="2"
-      rowItemSpacing="[[12,0]]"
+      rowItemSpacing="[[16,0]]"
       showRowCounter="[false]"
       fadeFocusFeedbackWhenAutoScrolling="true"
       focusBitmapUri="pkg:/images/selector-$$RES$$.9.png"
