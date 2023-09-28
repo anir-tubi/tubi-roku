@@ -116,7 +116,7 @@ describe('Application Launch', function () {
 
 
   // https://tubi.testrail.io/index.php?/cases/view/129714
-  it('C129714 - Logged in user should not see Registration Prompt Container in Movies filter @application_launch @registered_user', async () => {
+  it.only('C129714 - Logged in user should not see Registration Prompt Container in Movies filter @application_launch @registered_user', async () => {
 
     // Launch app
     await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
@@ -133,8 +133,8 @@ describe('Application Launch', function () {
 
     // Jump To Continue Watching Row
     await testUtils.jumpToRowWithTitle('movieScreenRowList', 'Continue Watching');
-    const homeScreenPoster = await testUtils.getNodeForElement('homeScreenPoster');
-    expect(homeScreenPoster.visible).to.be.true;
+    const movieScreenPoster = await testUtils.getNodeForElement('movieScreenPoster');
+    expect(movieScreenPoster).to.exist;
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/114199

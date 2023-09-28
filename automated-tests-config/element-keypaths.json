@@ -628,9 +628,9 @@
     "description" :"Sign up to save Progress description",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
   },
-  "homeScreenPoster" : {
+  "movieScreenPoster" : {
     "description" : "poster present",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.items.0.#poster"
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#ContentArea.#CategoryGridList.#RowList.5.items.0.#poster"
   },
   "settingsScreenHeader" : {
     "description": "settings screen header",
@@ -658,7 +658,7 @@
   },
   "privacyPolicyHeader" : {
     "description" : "Policy Page Header",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#Title"
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#panelContentSection.#heading"
   },
   "privacyPageScroller" : {
     "description" : "Privacy Page scroller",

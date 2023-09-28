@@ -30,9 +30,7 @@ describe('Homescreen Navigation - Movies Filter', function () {
   // https://tubi.testrail.io/index.php?/cases/view/76723
   it('C76723 - Movies Filter - When title is selected then corresponding details page displayed, @homescreen, @movies', async () => {
 
-    await testUtils.waitForAppLaunchBeaconToFire();
-
-
+     await testUtils.waitForAppLaunchBeaconToFire();
 
     // Check if Featured row contains all Movie titles ("v") titles
     const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('movieScreenRowList');
@@ -55,8 +53,6 @@ describe('Homescreen Navigation - Movies Filter', function () {
   // https://tubi.testrail.io/index.php?/cases/view/76730
   it('C76730 - Movies Filter - When continue watching displayed then all titles are movies, @homescreen, @movies', async () => {
 
-    await testUtils.waitForAppLaunchBeaconToFire();
-
     // Scroll down to Continue Watching
     await testUtils.jumpToRowWithTitle('movieScreenRowList', 'Continue Watching');
 
@@ -73,8 +69,6 @@ describe('Homescreen Navigation - Movies Filter', function () {
 
   // https://tubi.testrail.io/index.php?/cases/view/76731
   it('C76731 - Movies Filter - When My List category displayed then all titles are movies, @homescreen, @movies', async () => {
-
-    await testUtils.waitForAppLaunchBeaconToFire();
 
     // Scroll down to Continue Watching
     await testUtils.jumpToRowWithTitle('movieScreenRowList', 'My List');

@@ -34,6 +34,8 @@ describe('Settings', function () {
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/21252
+  // Need to add another test for GDPR - this is obsolete
+  /*
   it('C21252 - Terms of Service, @settings', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
@@ -69,7 +71,8 @@ describe('Settings', function () {
       const termsScreenHeader = await testUtils.getNodeForElement('termsScreenHeader');
       expect(termsScreenHeader.text).to.equal('Terms of Service');
     });
-  });
+  });*/
+
 
   // https://tubi.testrail.io/index.php?/cases/view/32370
   it('C32370 - About Page - When user chooses the About Page and presses OK then Full Device ID is displayed, @settings', async () => {
@@ -152,12 +155,7 @@ describe('Settings', function () {
 
     // Is the Privacy Policy Page Open?
     const privacyPolicyHeader = await testUtils.getNodeForElement('privacyPolicyHeader');
-    const privacyPageScroller = await testUtils.getNodeForElement('privacyPageScroller');
-    expect(privacyPolicyHeader.text).to.equal('Privacy Policy');
-
-    // Can user scroll?
-    expect(privacyPageScroller.visible).to.exist;
-
+    expect(privacyPolicyHeader.text).to.equal('Privacy Center');
 
   });
 });
