@@ -39,7 +39,7 @@ function spawnShellCommand(done, command, allowNonzeroExitCode = false) {
     const process = spawn(command, {stdio: 'inherit', shell: true});
     process.on('close', (code) => {
       if (code === 0 || allowNonzeroExitCode) {
-        resolve();
+        resolve(code);
       } else {
         done(new NoStackError(`failed with code ${code}: ${command}`));
       }

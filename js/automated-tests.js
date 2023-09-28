@@ -250,9 +250,14 @@ async function runAutomatedTests(done, branch = '', tags = [], bail = false) {
     rtaConfig: JSON.stringify(config)
   });
 
-  await spawnShellCommand(done, `npx mocha ${mochaOptions.join(' ')} js/automated-tests/tests/*.ts`);
+  // Even if our tests fail we still want to append the extra data to the json report
+  const code = await spawnShellCommand(done, `npx mocha ${mochaOptions.join(' ')} js/automated-tests/tests/*.ts`, true);
   await appendDataToJsonReport(branch);
-  done();
+  if (code !== 0) {
+    done(new Error('Tests failed'));
+  } else {
+    done();
+  }
 }
 
 
