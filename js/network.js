@@ -119,7 +119,7 @@ exports.installWithSquashfs = function(zipPath, deviceIp, password) {
     request.post(options, (err, response, body) => {
       let success = null;
       if (!!body) {
-        success = body.match(/<font color="red">Install Success.<\/font>/);
+        success = body.match(/<font color="red">.*Install Success.<\/font>/);
         if (success === null) {
           success = body.match(/<font color="red">Uninstall Success.<\/font>/);
         }
