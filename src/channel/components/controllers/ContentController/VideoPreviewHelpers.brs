@@ -109,7 +109,7 @@ Function onVideoPreviewStateChanged(msg)
     if currentScreen <> invalid
 
       'Don't want to continue to full player from video preview if the user is in kidsmode, teen level for UK and NZ region as per GDPR guidelines.
-      isFullPlayerBlockedForUser = (isGDPR() = true AND (isKidsUIOn() = true OR isParentalControlsTeensLevel() = true))
+      isFullPlayerBlockedForUser = (isGDPR() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false))
 
       ' Don't want to continue playback if the user has their tv turned off
       if m.maintask.isHdmiStatusOk = true AND isFullPlayerBlockedForUser = false

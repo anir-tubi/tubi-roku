@@ -514,6 +514,7 @@ Function onVideoPlayerState(msg)
       end if
       showPlayerError(errorMessage, videoPlayer.videoErrorCode)
     else if state = "finished"
+      isAutoPlayOff = (isGDPR() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false))
       finishedContent = videoPlayer.content
       if finishedContent.isTrailer
         returnToDetailScreenFromVideo()
@@ -531,7 +532,7 @@ Function onVideoPlayerState(msg)
         }
 
         playUpNextContent(videoPlayer.upNextContentToAutoplay, playbackSource)
-      else if videoPlayer.upNextContent <> invalid
+      else if videoPlayer.upNextContent <> invalid AND isAutoPlayOff = false
         ' the video ended after the autoplay UI was dismissed, so autoplay the first content in
         ' the autoplay "container"
         autoplayContent = videoPlayer.upNextContent.getChild(0)
@@ -1090,7 +1091,7 @@ Function onUpNextResponse(upNextContent)
         end if
       else if upNextContent.getChildCount() > 0
         videoPlayer.upNextContent = upNextContent
-        isAutoPlayOff = (isGDPR() = true AND (isKidsUIOn() = true OR isParentalControlsTeensLevel() = true))
+        isAutoPlayOff = (isGDPR() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false))
         videoPlayer.isAutoPlayOff = isAutoPlayOff
         videoPlayer.upNextUpdateContent = true
       else 'worst case there are no contents under upNextContent
