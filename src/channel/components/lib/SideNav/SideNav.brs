@@ -7,7 +7,6 @@ Function init()
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("stringSignIn", "onSignInChange")
   m.top.observeFieldScoped("displayEspanol", "onEspanolDisplayChanged")
-  m.top.observeFieldScoped("displayMoviesTV", "onMovieTVDisplayChanged")
   m.top.observeFieldScoped("displayChannels", "onChannelsDisplayChanged")
   m.top.observeFieldScoped("displaySignIn", "onSignInDisplayChanged")
   m.top.observeFieldScoped("displayKids", "onKidsDisplayChanged")
@@ -60,12 +59,6 @@ Function createMainContent(item)
   else if item = m.constants.ui.sideNavIds.home
     contentNode.title = getTranslation("menu_home")
     contentNode.iconUrl = "pkg:/images/sideNavHome.webp"
-  else if item = m.constants.ui.sideNavIds.movies
-    contentNode.title = getTranslation("menu_movies")
-    contentNode.iconUrl = "pkg:/images/sideNavMovies.png"
-  else if item = m.constants.ui.sideNavIds.tv
-    contentNode.title = getTranslation("menu_tv")
-    contentNode.iconUrl = "pkg:/images/sideNavTV.png"
   else if item = m.constants.ui.sideNavIds.espanol
     contentNode.title = "Español"
     contentNode.iconUrl = "pkg:/images/sideNavEspanol.png"
@@ -123,8 +116,6 @@ Function onCreateMenuItems()
     m.constants.ui.sideNavIds.kidsMode
     m.constants.ui.sideNavIds.search
     m.constants.ui.sideNavIds.home
-    m.constants.ui.sideNavIds.movies
-    m.constants.ui.sideNavIds.tv
     m.constants.ui.sideNavIds.myList
     m.constants.ui.sideNavIds.categories
     m.constants.ui.sideNavIds.channels
@@ -149,7 +140,7 @@ Function onCreateMenuItems()
   m.mainItems.itemSize = m.mainItemsOriginalItemSize
   m.mainItemsSelected.itemSize = m.mainItemsOriginalItemSize
 
-  m.itemGroups.translation = [57, 40]
+  m.itemGroups.translation = [57, 120]
   m.mainItems.wrapDividerBitmapUri = ""
   m.mainItemsSelected.wrapDividerBitmapUri = ""
   m.mainItems.wrapDividerHeight = 0
@@ -242,21 +233,6 @@ Function onEspanolDisplayChanged()
   else
     ' Display the menu item if it should be displayed
     insertMenuItemInMenuLists(m.constants.ui.sideNavIds.espanol)
-  end if
-End Function
-
-
-' Hide the movies/tv items if this is called
-Function onMovieTVDisplayChanged()
-  if m.top.displayMoviesTV = false
-    ' Remove movies/tv if those items should be hidden.
-    removeMovies()
-    removeTv()
-    verticallyCenterSideNav()
-  else
-    ' Display the menu items if they should be displayed
-    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.movies)
-    insertMenuItemInMenuLists(m.constants.ui.sideNavIds.tv)
   end if
 End Function
 

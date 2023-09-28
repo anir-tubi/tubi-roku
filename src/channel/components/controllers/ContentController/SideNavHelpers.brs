@@ -12,8 +12,6 @@ Function initSideNav()
   if m.constants.deviceInfo.countryCode <> "US"
     '//Tell the sideNav to stop displaying the Espanol menu item
     m.SideNav.displayEspanol = false
-    '//Tell the sideNav to stop displaying the movies/TV menu items
-    m.SideNav.displayMoviesTV = false
     '//Tell the sideNav to stop displaying the channel menu item
     m.SideNav.displayChannels = false
   end if
@@ -29,11 +27,6 @@ Function initSideNav()
 
   if isParentalControlsAdultLevel() <> true
     m.SideNav.espanolItemTurnedOn = false
-  end if
-
-  ' stop displaying some side nav items if the top nav is being displayed
-  if isTopNavHomeScreenEnabled() = true
-    m.SideNav.displayMoviesTV = false
   end if
 
   'set the initial value for the sign in item string
@@ -229,24 +222,6 @@ Function onSideNavItemSelected()
 
       showCategoryListScreen(m.constants, m.constants.ui.terms.menu)
       bNewScreenCalledSuccess = true
-    else if itemSelectedId = m.constants.ui.sideNavIds.movies
-      if isKidsUIOn() = true
-        bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.sideNavIds.movies)
-      else
-        setUiMode(m.constants.ui.modes.standard)
-        showMoviesScreen()
-        bNewScreenCalledSuccess = true
-      end if
-    else if itemSelectedId = m.constants.ui.sideNavIds.tv
-      if isKidsUIOn() = true
-        bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.sideNavIds.tv)
-      else
-        setUiMode(m.constants.ui.modes.standard)
-        showTVScreen()
-        bNewScreenCalledSuccess = true
-      end if
     else if itemSelectedId = m.constants.ui.sideNavIds.espanol
       if isKidsUIOn() = true
         bNewScreenCalledSuccess = false
@@ -312,12 +287,6 @@ Function displayMenuItemDisabled(sMenuItemID, parental = "")
     sDialogSubTypeValue = "kids-mode-channels"
     '//::TODO:: Because movies, tv shows, espanol, and live TV are displayed in the top nav, then no need to have code to show a dialog window for these options
     '//         Get rid of this code and any supporting code in this file once it has been determined that top nav is here to stay. Once it has been decided to have the topNav on FireTV
-  else if sMenuItemID = m.constants.ui.sideNavIds.movies
-    sTitle = getTranslation("dialog_moviesDisabled_title")
-    sDialogSubTypeValue = "kids-mode-movies"
-  else if sMenuItemID = m.constants.ui.sideNavIds.tv
-    sTitle = getTranslation("dialog_tvDisabled_title")
-    sDialogSubTypeValue = "kids-mode-tv"
   else if sMenuItemID = m.constants.ui.sideNavIds.espanol
     sTitle = getTranslation("dialog_espanolDisabled_title")
     sDialogSubTypeValue = "kids-mode-espanol"

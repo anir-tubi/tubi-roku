@@ -36,9 +36,6 @@
       <!-- Should the sideNav display the Espanol menu item? -->
       <field id="displayEspanol" value="true" type="boolean"/>
 
-      <!-- Should the sideNav display the movies/TV menu items? -->
-      <field id="displayMoviesTV" value="true" type="boolean"/>
-
       <!-- Should the sideNav display the channels menu item? -->
       <field id="displayChannels" value="true" type="boolean"/>
 

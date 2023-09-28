@@ -1235,8 +1235,6 @@ Function getConstants()
       constants.ui.sideNavIds.channels = "channels"
       constants.ui.sideNavIds.categories = "categories"
       constants.ui.sideNavIds.espanol = "espanol"
-      constants.ui.sideNavIds.movies = "movies"
-      constants.ui.sideNavIds.tv = "tv"
       constants.ui.sideNavIds.settings = "settings"
       constants.ui.sideNavIds.exit = "exit"
       constants.ui.sideNavIds.profile = "profile"
