@@ -14,6 +14,9 @@
         <!-- Youbora options containing all media related info -->
         <field id = "options" type = "assocarray" />
 
+        <!-- Field to update player object -->
+        <field id = "updateplayer" type = "assocarray" />
+
         <!-- Logging flag. Set to true to view Youbora logs -->
         <field id = "logging" type = "boolean" value = "false" />
 

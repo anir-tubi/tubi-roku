@@ -11,6 +11,7 @@ sub init()
     m.top.ObserveField("imaadevent", m.port)
     m.top.observeField("options", m.port)
     m.top.observeField("session", m.port)
+    m.top.observeField("updateplayer", m.port)
 
     'Public methods
     m._requestData = requestData
@@ -22,6 +23,7 @@ sub init()
     m.getResource = getResource
     m.getParsedResource = getParsedResource
     m.getPlayhead = getPlayhead
+    m.updateLastPlayhead = updateLastPlayhead
     m.getMediaDuration = getMediaDuration
     m.getTitle = getTitle
     m.getIsLive = getIsLive
@@ -44,9 +46,6 @@ sub init()
     m.getAdDuration = getAdDuration
 
     'Sessions
-
-
-
     m.sessionStarted = false
 
     m.lastAdPlayhead = 0
@@ -56,10 +55,12 @@ sub init()
     m.isAdBreakStarted = false
 
     m.adNumber = 0
+    m.adLastPosition = invalid
     m.adNumberInBreak = 0
     m.adPosition = "unknown"
     m.adTitle = invalid
     m.adBreakNumber = 0
+    m.adBreakLastPosition = invalid
 
     m.eventHandler = eventHandler
 
@@ -73,7 +74,7 @@ sub _run()
     YouboraLog("YBPluginGeneric.brs - run", "YBPluginGeneric")
 
     m.pluginName = "Generic"
-    m.pluginVersion = "6.6.1-" + m.pluginName
+    m.pluginVersion = "6.6.10-" + m.pluginName
 
     m.infoManager = InfoManager(m)
     setOptions(m.top.options)
@@ -101,62 +102,66 @@ sub _run()
     'Endless loop to listen for events
     while true
 
-        msg = wait(0, m.port)
+        try
+            msg = wait(0, m.port)
 
-        'Delegate call to the specific plugin.
-        'The plugin will have to override this method in order
-        'to get the events from the player.
-        processMessage(msg, m.port)
+            'Delegate call to the specific plugin.
+            'The plugin will have to override this method in order
+            'to get the events from the player.
+            processMessage(msg, m.port)
 
-        mt = type(msg)
+            mt = type(msg)
 
-        if mt = "roSGNodeEvent"
-            if msg.getField() = "event" 'Process event from outside
-                data = msg.getData()
-                if data.handler = "close"
-                    m.viewManager.com.close = true
-                    exit while
-                else
-                    invokeHandler(msg.getData())
-                end if
-            else if msg.getField() = "fire" 'Timer callback
-                'm.viewManager.pingCallback()
-                if m.pingTimer.control = "stop" or m.pingTimer.control = "none"
-                    m.viewManager.beatCallback()
-                else
-                    m.viewManager.pingCallback()
-                    if (m.totalPingTimer = 30 or m.totalPingTimer > 25)
-                        m.viewManager.beatCallback()
-                        m.totalPingTimer = 0
+            if mt = "roSGNodeEvent"
+                if msg.getField() = "event" 'Process event from outside
+                    data = msg.getData()
+                    if data.handler = "close"
+                        m.viewManager.com.close = true
+                        exit while
                     else
-                        m.totalPingTimer = m.totalPingTimer + 5
+                        invokeHandler(msg.getData())
                     end if
+                else if msg.getField() = "fire" 'Timer callback
+                    'm.viewManager.pingCallback()
+                    if m.pingTimer.control = "stop" or m.pingTimer.control = "none"
+                        m.viewManager.beatCallback()
+                    else
+                        m.viewManager.pingCallback()
+                        if (m.totalPingTimer = 30 or m.totalPingTimer > 25)
+                            m.viewManager.beatCallback()
+                            m.totalPingTimer = 0
+                        else
+                            m.totalPingTimer = m.totalPingTimer + 5
+                        end if
+                    end if
+                else if msg.getField() = "options"
+                    opt = msg.getData()
+                    setOptions(opt)
+                else if msg.getField() = "logging"
+                    logEnabled = msg.getData()
+                    GetGlobalAA().YouboraLogActive = logEnabled
+                else if msg.getField() = "adevent"
+                    invokeAdHandler(msg.getData())
+                else if msg.getField() = "imaadevent"
+                    invokeImaAdHandler(msg.getData())
+                else if msg.getField() = "session"
+                    onSessionEvent(msg.getData())
                 end if
-            else if msg.getField() = "options"
-                opt = msg.getData()
-                setOptions(opt)
-            else if msg.getField() = "logging"
-                logEnabled = msg.getData()
-                GetGlobalAA().YouboraLogActive = logEnabled
-            else if msg.getField() = "adevent"
-                invokeAdHandler(msg.getData())
-            else if msg.getField() = "imaadevent"
-                invokeImaAdHandler(msg.getData())
-            else if msg.getField() = "session"
-                onSessionEvent(msg.getData())
+            else if (mt = "roUrlEvent") '/data response
+                code = msg.GetResponseCode()
+                if (code = 200)
+                    response = msg.GetString()
+                    receiveData(response)
+                    m.dataRequest = invalid
+                else
+                    YouboraLog("Invalid data response, code: " + code.ToStr() + ", reason: " + msg.GetFailureReason(), "YBPluginGeneric")
+                    'Communicate to Communication an invalid FastData response
+                    m.viewManager.com.invalidFastDataResponse = true
+                end if
             end if
-        else if (mt = "roUrlEvent") '/data response
-            code = msg.GetResponseCode()
-            if (code = 200)
-                response = msg.GetString()
-                receiveData(response)
-                m.dataRequest = invalid
-            else
-                YouboraLog("Invalid data response, code: " + code.ToStr() + ", reason: " + msg.GetFailureReason(), "YBPluginGeneric")
-                'Communicate to Communication an invalid FastData response
-                m.viewManager.com.invalidFastDataResponse = true
-            end if
-        end if
+        catch e
+            YouboraLog("Exception listening event: " + e.message, "YBPluginGeneric")
+        end try
 
     end while
 
@@ -168,7 +173,7 @@ sub _stop()
 
 end sub
 
-sub setNewPlayer(taskFields)
+sub setNewPlayer()
 
 end sub
 
@@ -198,6 +203,9 @@ end function
 function getPlayhead()
     return 0
 end function
+
+sub updateLastPlayhead()
+end sub
 
 function getTitle()
     return invalid
@@ -312,10 +320,15 @@ sub eventHandler(event as string, params = invalid)
     else if event = "stop"
         m.isStarted = false
         m.isAdStarted = false
+        m.adBreakNumber = 0
         m.viewManager.sendRequest("stop", params)
     else if event = "error"
         'Brightscript transforms the keys of params to lowercase
         'This is bad for the error, as the code should be sent as errorCode
+        if params = invalid or type(params) <> "roAssociativeArray"
+            params = {}
+        end if
+
         params2 = {}
         if params.DoesExist("msg")
             params2["msg"] = params["msg"]
@@ -409,6 +422,8 @@ sub eventHandler(event as string, params = invalid)
         m.sessionStarted = false
     else if event = "sessionEvent" and m.sessionStarted = true
         m.viewManager.sendRequest("sessionEvent", params)
+    else if event = "sessionError" and m.sessionStarted = true
+        m.viewManager.sendRequest("sessionError", params)
     else if event = "videoEvent"
         m.viewManager.sendRequest("videoEvent", params)
     end if
@@ -416,14 +431,17 @@ sub eventHandler(event as string, params = invalid)
 end sub
 
 sub invokeHandler(data as object)
-    if type(data) = "roAssociativeArray"
-        handler = data.handler
-        params = data.params
-        if type(handler) = "roString"
-            m.eventHandler(handler, params)
+    try
+        if type(data) = "roAssociativeArray"
+            handler = data.handler
+            params = data.params
+            if type(handler) = "roString"
+                m.eventHandler(handler, params)
+            end if
         end if
-    end if
-
+    catch e
+        YouboraLog("Exception on invokeHandler: " + e.message, "YBPluginGeneric")
+    end try
 end sub
 
 sub invokeImaAdHandler(data as object)
@@ -485,10 +503,17 @@ sub invokeAdHandler(data as object)
     if data.type = "PodStart" or data.type = "PodComplete"
         if data.rendersequence <> invalid then adBreakParams["position"] = adPositions[data.rendersequence]
         if data.adcount <> invalid then adBreakParams["givenAds"] = data.adcount
+        try
+            if data.type = "PodStart" and adBreakParams["position"] <> invalid and adBreakParams["position"] <> "" and adBreakParams["position"] <> "unknown"
+                m.adPosition = adBreakParams["position"]
+            else if data.type = "PodComplete"
+                m.adPosition = "unknown"
+            end if
+        catch e
+            YouboraLog("Exception storing PodStart position: " + e.message, "YBPluginGeneric")
+        end try
     else
-        if data.adindex <> invalid = true
-            adParams["adNumber"] = data.adindex
-        end if
+        adParams["adNumber"] = m.adNumber
         if data.ad <> invalid = true and data.ad.adtitle <> invalid = true
             adParams["adTitle"] = data.ad.adtitle
         end if
@@ -506,15 +531,23 @@ sub invokeAdHandler(data as object)
         end if
 
         if data.rendersequence = invalid
-            if (m.viewManager.isStartSent = true or m.viewManager.isInitiated = true) and m.viewManager.isJoinSent = false
-                adParams["position"] = "pre"
-            else if m.viewManager.isJoinSent = true
-                if m.viewManager.isFinished = true
-                    adParams["position"] = "post"
+            try
+                if m.adPosition <> invalid and m.adPosition <> "unknown" and m.adPosition <> ""
+                    adParams["position"] = m.adPosition
                 else
-                    adParams["position"] = "mid"
+                    if (m.viewManager.isStartSent = true or m.viewManager.isInitiated = true) and m.viewManager.isJoinSent = false
+                        adParams["position"] = "pre"
+                    else if m.viewManager.isJoinSent = true
+                        if m.viewManager.isFinished = true
+                            adParams["position"] = "post"
+                        else
+                            adParams["position"] = "mid"
+                        end if
+                    end if
                 end if
-            end if
+            catch e
+                YouboraLog("Exception getting adPosition: " + e.message, "YBPluginGeneric")
+            end try
         else
             adParams["position"] = adPositions[data.rendersequence]
         end if
@@ -527,6 +560,15 @@ sub invokeAdHandler(data as object)
 
     if type(data) = "roAssociativeArray"
         if data.type = "PodStart"
+            m.adNumberInBreak = 0
+            try
+                if m.adBreakLastPosition = invalid or m.adBreakLastPosition <> adBreakParams["position"]
+                    m.adBreakLastPosition = adBreakParams["position"]
+                    m.adBreakNumber = 0
+                end if
+            catch e
+                YouboraLog("Exception checking adBreakNumber: " + e.message, "YBPluginGeneric")
+            end try
             m.adBreakNumber = m.adBreakNumber + 1
             adBreakParams["breakNumber"] = m.adBreakNumber
             if m.viewManager.isStartSent = false
@@ -544,6 +586,18 @@ sub invokeAdHandler(data as object)
             end if
         else if data.type = "Impression"
             m.lastAdPlayhead = 0
+            m.adNumberInBreak = m.adNumberInBreak + 1
+            try
+                if m.adLastPosition = invalid or m.adLastPosition <> adParams["position"]
+                    m.adLastPosition = adParams["position"]
+                    m.adNumber = 0
+                end if
+            catch e
+                YouboraLog("Exception checking adNumber: " + e.message, "YBPluginGeneric")
+            end try
+            'Increment adNumber and override the adParams
+            m.adNumber = m.adNumber + 1
+            adParams["adNumber"] = m.adNumber
             eventHandler("seeked")
             eventHandler("buffered")
             invokeHandler({ handler: "adPlay", params: adParams })
@@ -698,23 +752,76 @@ function isExtraMetadataReady()
     return true
 end function
 
-sub onSessionEvent(sessionEvent as object)
-    if type(sessionEvent) = "roAssociativeArray"
-        event = sessionEvent.ev
-        params = {}
-        if type(event) = "roString"
-            if event = "start"
-                event = "sessionStart"
-                params = { screeName: sessionEvent.sc, dimensions: sessionEvent.dim }
-            else if event = "stop"
-                event = "sessionStop"
-            else if event = "event"
-                event = "sessionEvent"
-                displayName = sessionEvent.displayName
-                if displayName = invalid then displayName = "event"
-                params = { dimensions: sessionEvent.dim, values: sessionEvent.vals, name: displayName }
-            end if
-            m.eventHandler(event, params)
+function isPlayheadJumpEnabled()
+    try
+        options = m.infoManager.options
+
+        if options["playheadJumpEnabled"] <> invalid and type(options["playheadJumpEnabled"]) = "roString" then
+            return LCase(options["playheadJumpEnabled"]) = true
+        else if options["playheadJumpEnabled"] <> invalid
+            return options["playheadJumpEnabled"]
         end if
-    end if
+    catch e
+        YouboraLog("Exception on isPlayheadJumpEnabled function: " + e.message, "YBPluginGeneric")
+    end try
+
+    return true
+end function
+
+function isSeekEventEnabled()
+    try
+        options = m.infoManager.options
+
+        if options["seekEventEnabled"] <> invalid and type(options["seekEventEnabled"]) = "roString" then
+            return LCase(options["seekEventEnabled"]) = true
+        else if options["seekEventEnabled"] <> invalid
+            return options["seekEventEnabled"]
+        end if
+    catch e
+        YouboraLog("Exception on isSeekEventEnabled function: " + e.message, "YBPluginGeneric")
+    end try
+
+    return true
+end function
+
+sub onSessionEvent(sessionEvent as object)
+    try
+        if type(sessionEvent) = "roAssociativeArray"
+            event = sessionEvent.ev
+            params = {}
+            if type(event) = "roString"
+                if event = "start"
+                    event = "sessionStart"
+                    params = { screeName: sessionEvent.sc, dimensions: sessionEvent.dim }
+                else if event = "stop"
+                    event = "sessionStop"
+                else if event = "error"
+                    event = "sessionError"
+                    if sessionEvent.doesExist("code")
+                        params["errorCode"] = sessionEvent.code
+                    end if
+                    if sessionEvent.doesExist("msg")
+                        params["errorMsg"] = sessionEvent.msg
+                    end if
+                    if sessionEvent.doesExist("mt")
+                        params["errorMetadata"] = sessionEvent.mt
+                    end if
+                    if sessionEvent.doesExist("typ")
+                        params["errorType"] = sessionEvent.typ
+                    end if
+                    if sessionEvent.doesExist("cat")
+                        params["errorCategory"] = sessionEvent.cat
+                    end if
+                else if event = "event"
+                    event = "sessionEvent"
+                    displayName = sessionEvent.displayName
+                    if displayName = invalid then displayName = "event"
+                    params = { dimensions: sessionEvent.dim, values: sessionEvent.vals, name: displayName }
+                end if
+                m.eventHandler(event, params)
+            end if
+        end if
+    catch e
+        YouboraLog("Exception on onSessionEvent: " + e.message, "YBPluginGeneric")
+    end try
 end sub

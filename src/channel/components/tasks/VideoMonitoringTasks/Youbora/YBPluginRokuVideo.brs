@@ -9,7 +9,7 @@ end sub
 sub startMonitoring()
 
     m.pluginName = "RokuVideo"
-    m.pluginVersion = "6.6.1-" + m.pluginName
+    m.pluginVersion = "6.6.10-" + m.pluginName
 
     ' Let's cache the segment used on the bitrate to access less to it
     m.bitrateSegment = invalid
@@ -19,6 +19,10 @@ sub startMonitoring()
     m.totalBytes = 0
     ' Last chunk's position, mainly to avoid adding a repeated chunk
     m.lastChunkSeqNum = -1
+    ' Last playhead value
+    m.lastPlayhead = 0
+    m.lastPlayheadReported = 0
+
     if m.top.videoplayer <> invalid
         m.top.videoplayer.observeFieldScoped("state", m.port)
         m.top.videoplayer.observeFieldScoped("bufferingStatus", m.port)
@@ -66,6 +70,35 @@ sub onStopVideo()
   eventHandler("stop")
 end sub
 
+sub updatePlayer (player as object, unobserveGlobalScope as boolean)
+    try
+        if m.top.videoplayer <> invalid
+            if unobserveGlobalScope = true
+                m.top.videoplayer.unobserveField("state")
+                m.top.videoplayer.unobserveField("bufferingStatus")
+                m.top.videoplayer.unobserveField("downloadedSegment")
+            else
+                m.top.videoplayer.unobserveFieldScoped("state")
+                m.top.videoplayer.unobserveFieldScoped("bufferingStatus")
+                m.top.videoplayer.unobserveFieldScoped("downloadedSegment")
+            end if
+            m.top.videoplayer = invalid
+        end if
+        
+        if player <> invalid
+            m.top.videoplayer = player
+            m.needsPlayer = false
+            m.top.unobserveFieldScoped("videoplayer")
+            setNewPlayer()
+        else
+            m.top.observeFieldScoped("videoplayer", m.port)
+            m.needsPlayer = false
+        end if
+    catch e
+        YouboraLog("Exception updating new player: " + e.message, "YBPluginRokuVideo")
+    end try
+end sub
+
 function onBufferingStatusChanged(bufferStatus) as void
 
     if bufferStatus <> invalid
@@ -101,9 +134,34 @@ sub processPlayerState(newState as string)
             if m.viewManager.isStartSent = false
                 eventHandler("play")
             else
-                if m.viewManager.isPaused = true
-                    eventHandler("resume")
-                    eventHandler("seeking")
+                if isSeekEventEnabled() then
+                    if m.viewManager.isPaused = true
+                        eventHandler("resume")
+                        eventHandler("seeking")
+                    else 
+                        isSeekByPlayhead = false
+
+                        try
+                            if isPlayheadJumpEnabled() and m.lastPlayheadReported <> invalid and m.lastPlayheadReported > 0 and m.lastPlayhead <> invalid and m.lastPlayhead > 0
+                                time = CreateObject("roDateTime")
+                                currentTime = time.AsSeconds()
+                                diffTimes = Abs(currentTime - m.lastPlayheadReported)
+                                diffPlayhead = Abs(getPlayhead() - m.lastPlayhead)
+                                if diffPlayhead > maxVal(5, (diffTimes * 2))
+                                    isSeekByPlayhead = true
+                                end if
+                            end if
+                        catch e
+                            YouboraLog("Exception detecting seek event by playhead jump: " + e.message, "YBPluginRokuVideo")
+                        end try
+
+                        if isSeekByPlayhead
+                            YouboraLog("Seek detected by playhead jump", "YBPluginRokuVideo")
+                            eventHandler("seeking")
+                        else
+                            eventHandler("buffering")
+                        end if
+                    end if
                 else
                     eventHandler("buffering")
                 end if
@@ -151,6 +209,14 @@ sub processPlayerState(newState as string)
     end try
 end sub
 
+function maxVal(a as dynamic, b as dynamic) as dynamic
+    if a > b
+        return a
+    else
+        return b
+    end if
+end function
+
 'Overriden parent method
 sub processMessage(msg, port)
 
@@ -165,7 +231,22 @@ sub processMessage(msg, port)
         else if msg.getField() = "videoplayer" AND m.needsPlayer = true
             m.needsPlayer = false
             m.top.unobserveFieldScoped("videoplayer")
-            setNewPlayer(["state", "bufferingStatus"])
+            setNewPlayer()
+        else if msg.getField() = "updateplayer"
+            try
+                msg = msg.getData()
+                unobserveGlobalScope = false
+                if msg <> invalid and msg.DoesExist("unobserveGlobalScope") 
+                    unobserveGlobalScope = msg["unobserveGlobalScope"]
+                end if
+                if msg <> invalid and msg.DoesExist("player")
+                    updatePlayer(msg["player"], unobserveGlobalScope)
+                else
+                    updatePlayer(invalid, unobserveGlobalScope)
+                end if
+            catch e
+                YouboraLog("Exception updating player object: " + e.message, "YBPluginRokuVideo")
+            end try
         else if msg.getField() = "downloadedSegment"
             if m.viewManager.isJoinSent = false and m.viewManager.isshowingads = false and m.top.videoplayer.state = "playing"
                 eventHandler("join")
@@ -183,13 +264,16 @@ sub processMessage(msg, port)
 
 end sub
 
-sub setNewPlayer(taskFields)
-    m.top.videoplayer.observeFieldScoped("state", m.port)
-    m.top.videoplayer.observeFieldScoped("bufferingStatus", m.port)
-    m.top.videoplayer.observeFieldScoped("downloadedSegment", m.port)
-    ' for each field in taskFields
-    '     m.top.videoplayer.observeFieldScoped(field, m.port)
-    ' end for
+sub setNewPlayer()
+    try
+        if m.top.videoplayer <> invalid 
+            m.top.videoplayer.observeFieldScoped("state", m.port)
+            m.top.videoplayer.observeFieldScoped("bufferingStatus", m.port)
+            m.top.videoplayer.observeFieldScoped("downloadedSegment", m.port)
+        end if
+    catch e
+        YouboraLog("Exception adding player observers: " + e.message, "YBPluginRokuVideo")
+    end try
 end sub
 
 'Info methods
@@ -197,16 +281,20 @@ function getResource()
 
     resource = "unknown"
 
-    if m.contentUrl = invalid
-        'Get it from the informed url by the client
-        content = m.top.videoplayer.content
-        if content <> invalid
-            resource = content.URL
-            m.contentUrl = resource
+    try
+        if m.contentUrl = invalid
+            'Get it from the informed url by the client
+            content = m.top.videoplayer.content
+            if content <> invalid
+                resource = content.URL
+                m.contentUrl = resource
+            end if
+        else
+            resource = m.contentUrl
         end if
-    else
-        resource = m.contentUrl
-    end if
+    catch e
+        YouboraLog("Exception on getResource method: " + e.message, "YBPluginRokuVideo")
+    end try
 
     return resource
 
@@ -216,42 +304,74 @@ function getParsedResource()
 
     resource = invalid
 
-    'This is only for segmented video transports (dash, hls)
-    ssegment = m.top.videoplayer.streamingSegment
-    if ssegment <> invalid
-        resource = ssegment.segUrl
-    endif
+    try
+        'This is only for segmented video transports (dash, hls)
+        ssegment = m.top.videoplayer.streamingSegment
+        if ssegment <> invalid
+            resource = ssegment.segUrl
+        endif
+    catch e
+        YouboraLog("Exception on getParsedResource method: " + e.message, "YBPluginRokuVideo")
+    end try
 
     return resource
 
 end function
 
 function getMediaDuration()
-    duration = m.top.videoplayer.duration
+    duration = 0
 
-    if duration = invalid
-        duration = 0
-    end if
+    try
+        duration = m.top.videoplayer.duration
+
+        if duration = invalid
+            duration = 0
+        end if
+    catch e
+        YouboraLog("Exception on getMediaDuration method: " + e.message, "YBPluginRokuVideo")
+    end try
 
     return duration
 end function
 
+sub updateLastPlayhead()
+    try
+        time = CreateObject("roDateTime")
+        m.lastPlayhead = getPlayhead()
+        m.lastPlayheadReported = time.AsSeconds()
+    catch e
+        YouboraLog("Exception setting last playhead value: " + e.message, "YBPluginRokuVideo")
+    end try
+end sub   
+
 function getPlayhead()
-    if m.viewManager.isJoinSent = true
-        return m.top.videoplayer.position
-    else
-        return 0
-    end if
+    try
+        if m.viewManager.isJoinSent = true
+            return m.top.videoplayer.position
+        else
+            return 0
+        end if
+    catch e
+        YouboraLog("Exception on getTitle method: " + e.message, "YBPluginRokuVideo")
+    end try
+
+    return 0
 end function
 
 function getTitle()
-    content = m.top.videoplayer.content
+    title = invalid
 
-    if content <> invalid
-        title = content.TITLE
-    else
-        title = invalid
-    end if
+    try
+        content = m.top.videoplayer.content
+
+        if content <> invalid
+            title = content.TITLE
+        else
+            title = invalid
+        end if    
+    catch e
+        YouboraLog("Exception on getTitle method: " + e.message, "YBPluginRokuVideo")
+    end try
 
     return title
 
@@ -272,49 +392,75 @@ function getIsLive()
 end function
 
 function getThroughput()
-    'This is only for roku >= 7.2
-    m.streamInfo = m.top.videoplayer.streamInfo
-    if m.streamInfo <> invalid
-        throughput = m.streamInfo.measuredBitrate
-    else
-        throughput = invalid
-    end if
+    throughput = invalid
+
+    try
+        'This is only for roku >= 7.2
+        m.streamInfo = m.top.videoplayer.streamInfo
+        if m.streamInfo <> invalid
+            throughput = m.streamInfo.measuredBitrate
+        else
+            throughput = invalid
+        end if
+    catch e
+        YouboraLog("Exception on getThroughput method: " + e.message, "YBPluginRokuVideo")
+    end try
+
     return throughput
 end function
 
 function getBitrate()
     'This is only for HLS and DASH
-    m.bitrateSegment = m.top.videoplayer.streamingSegment
-    if m.bitrateSegment <> invalid and m.bitrateSegment.segType <> 1 and m.bitrateSegment.segType <> 3 'not audio or captions
-        br = m.bitrateSegment.segBitrateBps
-    else
-        br = -1
-    end if
+    br = -1
+
+    try
+        currentSegment = m.top.videoplayer.streamingSegment
+        if currentSegment <> invalid and currentSegment.segType <> 1 and currentSegment.segType <> 3 'not audio or captions
+            m.bitrateSegment = currentSegment
+            br = m.bitrateSegment.segBitrateBps
+        else if m.bitrateSegment <> invalid and m.bitrateSegment.segType <> 1 and m.bitrateSegment.segType <> 3 'not audio or captions
+            'Get it from last cached bitrateSegment
+            br = m.bitrateSegment.segBitrateBps
+        else
+            br = -1
+        end if
+    catch e
+        YouboraLog("Exception on getBitrate method: " + e.message, "YBPluginRokuVideo")
+    end try
+
     return br
 end function
 
 function getRendition()
     'This is only for HLS and DASH
-    m.bitrateSegment = m.top.videoplayer.streamingSegment
-    if m.bitrateSegment <> invalid AND m.bitrateSegment.segType <> 1 'not audio
-        rendition = m.bitrateSegment.segBitrateBps
-        if rendition < 1000
-            rendition = rendition.ToStr() + "bps"
-        else if rendition < 1000000
-            rendition = (rendition / 1000).ToStr() + "Kbps"
+    rendition = invalid
+
+    try
+        currentSegment = m.top.videoplayer.streamingSegment
+        if currentSegment <> invalid AND currentSegment.segType <> 1 and currentSegment.segType <> 3 'not audio or captions
+            m.bitrateSegment = currentSegment
+            rendition = m.bitrateSegment.segBitrateBps
+            if rendition < 1000
+                rendition = rendition.ToStr() + "bps"
+            else if rendition < 1000000
+                rendition = (rendition / 1000).ToStr() + "Kbps"
+            else
+                rendAux = rendition / 1000000.0 'Divide by mega
+                rendAux = Cint(rendAux * 100) / 100.0
+                rendition = rendAux.ToStr() + "Mbps"
+            end if
+            width = m.bitrateSegment.width
+            height = m.bitrateSegment.height
+            if width <> invalid AND height <> invalid AND width <> 0 AND height <> 0
+                rendition = width.ToStr() + "x" + height.ToStr() + "@" + rendition
+            endif
         else
-            rendAux = rendition / 1000000.0 'Divide by mega
-            rendAux = Cint(rendAux * 100) / 100.0
-            rendition = rendAux.ToStr() + "Mbps"
+            rendition = invalid
         end if
-        width = m.bitrateSegment.width
-        height = m.bitrateSegment.height
-        if width <> invalid AND height <> invalid AND width <> 0 AND height <> 0
-            rendition = width.ToStr() + "x" + height.ToStr() + "@" + rendition
-        endif
-    else
-        rendition = invalid
-    end if
+    catch e
+        YouboraLog("Exception on getRendition method: " + e.message, "YBPluginRokuVideo")
+    end try
+
     return rendition
 end function
 
@@ -330,10 +476,17 @@ function getTotalBytes()
 end function
 
 function getPlayrate()
-    ret = m.top.videoplayer.playbackSpeed
-    if m.viewManager.isPaused
-        ret = 0
-    end if
+    ret = 1
+
+    try
+        ret = m.top.videoplayer.playbackSpeed
+        if m.viewManager.isPaused
+            ret = 0
+        end if
+    catch e
+        YouboraLog("Exception on getPlayrate method: " + e.message, "YBPluginRokuVideo")
+    end try
+
     return ret
 end function
 
@@ -343,12 +496,6 @@ end function
 
 sub _taskListener(taskState)
     if taskState = "stop"
-        m.top.videoplayer.unobserveFieldScoped("state")
-        m.top.videoplayer.unobserveFieldScoped("bufferingStatus")
-        m.top.videoplayer.unobserveFieldScoped("downloadedSegment")
-        'm.top.videoplayer = invalid
-        m.needsPlayer = true
-        m.top.observeFieldScoped("videoplayer", m.port)
         m.contentUrl = invalid
         m.top.monitoring = false
         m.viewManager.isFinished = false

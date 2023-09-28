@@ -69,6 +69,9 @@ function InfoManager(plugin, options = invalid)
 
         if playhead = invalid
             playhead = 0.0
+        else
+            'Update Last Playhead value if is not invalid
+            m.plugin.updateLastPlayhead()
         end if
 
         return playhead
@@ -376,6 +379,54 @@ function InfoManager(plugin, options = invalid)
         return m.options["content.metrics"]
     end function
 
+    this.getMemoryKPI = function()
+        ret = invalid
+        try
+            appMemoryMonitor = CreateObject("roAppMemoryMonitor")
+            ret = appMemoryMonitor.GetMemoryLimitPercent()
+        catch e
+            YouboraLog("Exception getting memory KPI value: " + e.message, "InfoManager")
+        end try
+        return ret
+    end function
+
+    this.getExtraDeviceDimensions = function()
+        extraDimensions = {}
+        try
+            deviceInfo = CreateObject("roDeviceInfo")
+            hdmiStatus = CreateObject("roHdmiStatus")
+            if deviceInfo <> invalid and hdmiStatus <> invalid
+                if hdmiStatus.IsConnected() <> invalid 
+                    hdmiConnected = hdmiStatus.IsConnected()
+                    if hdmiConnected <> invalid
+                        if hdmiConnected = true
+                            extraDimensions["hdmiConnected"] = "HDMI connected"
+                        else
+                            extraDimensions["hdmiConnected"] = "HDMI not detected"
+                        end if
+                    end if
+                end if
+                if deviceInfo.GetConnectionType() <> invalid 
+                    connectionTypeValue = deviceInfo.GetConnectionType()
+                    if connectionTypeValue = "WiFiConnection" 
+                        extraDimensions["connectionType"] = "WiFi"
+                    else if connectionTypeValue = "WiredConnection" 
+                        extraDimensions["connectionType"] = "Cable/DSL"
+                    end if
+                end if
+                if deviceInfo.GetDisplayType() <> invalid
+                    extraDimensions["displayType"] = deviceInfo.GetDisplayType()
+                end if
+                if deviceInfo.GetVideoMode() <> invalid 
+                    extraDimensions["videoMode"] = deviceInfo.GetVideoMode()
+                end if
+            end if
+        catch e
+            YouboraLog("Exception getting extra dimensions: " + e.message, "InfoManager")
+        end try
+        return extraDimensions
+    end function
+
     'Fields
     this.plugin = plugin
 
@@ -386,8 +437,6 @@ function InfoManager(plugin, options = invalid)
     end if
 
     return this
-
-
 
 end function
 
@@ -400,6 +449,21 @@ function InfoManager_getEntities() as object
         "subtitles": m.getSubtitles(),
         "contentLanguage": m.options["content.language"]
     }
+end function
+
+function MergeAssociativeArrays(array1 as Object, array2 as Object) as Object
+    mergedArray = createObject("roAssociativeArray")
+    try
+        for each key in array1.keys()
+            mergedArray[key] = array1[key]
+        end for
+        for each key in array2.keys()
+            mergedArray[key] = array2[key]
+        end for
+    catch e
+        YouboraLog("MergeAssociativeArrays exception: " + e.message, "InfoManager")
+    end try
+    return mergedArray
 end function
 
 function InfoManager_getRequestParams(requestName = "" as string, params = invalid)
@@ -516,6 +580,27 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
             index = index + 1
         end while
 
+        'Show device extra dimensions
+        try
+            deviceDimensions = m.getExtraDeviceDimensions()
+            if deviceDimensions <> invalid and deviceDimensions.isEmpty() = false
+                
+                if outParams.DoesExist("connectionType") = false or outParams["connectionType"] = invalid 
+                    if deviceDimensions.DoesExist("connectionType") then outParams["connectionType"] = deviceDimensions["connectionType"]
+                end if
+
+                if deviceDimensions.DoesExist("connectionType") then deviceDimensions.Delete("connectionType")
+
+                if outParams.DoesExist("dimensions") = false or outParams["dimensions"] = invalid or outParams["dimensions"].isEmpty()
+                    outParams["dimensions"] = deviceDimensions
+                else
+                    outParams["dimensions"] = MergeAssociativeArrays(deviceDimensions, outParams["dimensions"])
+                end if
+            end if
+        catch e
+            YouboraLog("Exception adding device extra dimensions: " + e.message, "InfoManager")
+        end try
+
         'Error-specific params
         if requestName = "error"
             if outParams.DoesExist("msg") = false then outParams["msg"] = "Unknown error"
@@ -538,6 +623,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("totalBytes") = false then outParams["totalBytes"] = m.getTotalBytes()
         if outParams.DoesExist("playrate") = false then outParams["playrate"] = m.getPlayrate()
         if outParams.DoesExist("metrics") = false then outParams["metrics"] = m.getVideoMetrics()
+        if outParams.DoesExist("mem") = false then outParams["mem"] = m.getMemoryKPI()
     else if requestName = "bufferEnd"
         if outParams.DoesExist("playhead") = false then outParams["playhead"] = m.getPlayhead()
         'Avoid sending a playhead of 0
@@ -559,7 +645,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("adPlayhead") = false then outParams["adPlayhead"] = m.getAdPlayhead()
         if outParams.DoesExist("adNumber") = false then outParams["adNumber"] = m.getAdNumber()
         if outParams.DoesExist("adNumberInBreak") = false then outParams["adNumberInBreak"] = m.getAdNumberInBreak()
-        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.6.1 Roku Adnalyzer"
+        if outParams.DoesExist("adnalyzerVersion") = false then outParams["adnalyzerVersion"] = "6.6.10 Roku Adnalyzer"
         'Extra params
         nextraparams = 10
         index = 1
@@ -705,62 +791,7 @@ function InfoManager_getRequestParams(requestName = "" as string, params = inval
         if outParams.DoesExist("navContext") = false then outParams["navContext"] = "RokuPlugin"
         if outParams.DoesExist("route") = false then outParams["route"] = "Roku"
     else if requestName = "sessionBeat"
-        ' ──────█▀▄─▄▀▄─▀█▀─█─█─▀─█▀▄─▄▀▀▀─────
-        ' ──────█─█─█─█──█──█▀█─█─█─█─█─▀█─────
-        ' ──────▀─▀──▀───▀──▀─▀─▀─▀─▀──▀▀──────
-        ' ─────────────────────────────────────
-        ' ───────────────▀█▀─▄▀▄───────────────
-        ' ────────────────█──█─█───────────────
-        ' ────────────────▀───▀────────────────
-        ' ─────────────────────────────────────
-        ' ─────█▀▀▄─█▀▀█───█──█─█▀▀─█▀▀█─█▀▀───
-        ' ─────█──█─█──█───█▀▀█─█▀▀─█▄▄▀─█▀▀───
-        ' ─────▀▀▀──▀▀▀▀───▀──▀─▀▀▀─▀─▀▀─▀▀▀───
-        ' ─────────────────────────────────────
-        ' ─────────▄███████████▄▄──────────────
-        ' ──────▄██▀──────────▀▀██▄────────────
-        ' ────▄█▀────────────────▀██───────────
-        ' ──▄█▀────────────────────▀█▄─────────
-        ' ─█▀──██──────────────██───▀██────────
-        ' █▀──────────────────────────██───────
-        ' █──███████████████████───────█───────
-        ' █────────────────────────────█───────
-        ' █────────────────────────────█───────
-        ' █────────────────────────────█───────
-        ' █────────────────────────────█───────
-        ' █────────────────────────────█───────
-        ' █▄───────────────────────────█───────
-        ' ▀█▄─────────────────────────██───────
-        ' ─▀█▄───────────────────────██────────
-        ' ──▀█▄────────────────────▄█▀─────────
-        ' ───▀█▄──────────────────██───────────
-        ' ─────▀█▄──────────────▄█▀────────────
-        ' ───────▀█▄▄▄──────▄▄▄███████▄▄───────
-        ' ────────███████████████───▀██████▄───
-        ' ─────▄███▀▀────────▀███▄──────█─███──
-        ' ───▄███▄─────▄▄▄▄────███────▄▄████▀──
-        ' ─▄███▓▓█─────█▓▓█───████████████▀────
-        ' ─▀▀██▀▀▀▀▀▀▀▀▀▀███████████────█──────
-        ' ────█─▄▄▄▄▄▄▄▄█▀█▓▓─────██────█──────
-        ' ────█─█───────█─█─▓▓────██────█──────
-        ' ────█▄█───────█▄█──▓▓▓▓▓███▄▄▄█──────
-        ' ────────────────────────██──────────
-        ' ────────────────────────██───▄███▄───
-        ' ────────────────────────██─▄██▓▓▓██──
-        ' ───────────────▄██████████─█▓▓▓█▓▓██▄
-        ' ─────────────▄██▀───▀▀███──█▓▓▓██▓▓▓█
-        ' ─▄███████▄──███───▄▄████───██▓▓████▓█
-        ' ▄██▀──▀▀█████████████▀▀─────██▓▓▓▓███
-        ' ██▀─────────██──────────────██▓██▓███
-        ' ██──────────███──────────────█████─██
-        ' ██───────────███──────────────█─██──█
-        ' ██────────────██─────────────────█───
-        ' ██─────────────██────────────────────
-        ' ██─────────────███───────────────────
-        ' ██──────────────███▄▄────────────────
-        ' ███──────────────▀▀███───────────────
-        ' ─███─────────────────────────────────
-        ' ──███────────────────────────────────
+        if outParams.DoesExist("mem") = false then outParams["mem"] = m.getMemoryKPI()
     end if
 
     return outParams
