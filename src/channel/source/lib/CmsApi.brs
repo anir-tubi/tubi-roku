@@ -86,6 +86,8 @@ Function cmsApi_createUpNextContentReqInfo(passedOptions)
   end if
 
   options.params = params
+  options.params = m.setTupianPosterParam(options.params)
+  options.params = m.setTupianLandscapeParam(options.params)
 
   return {
     url: url
@@ -311,7 +313,7 @@ End Function
 ' https://docs.google.com/document/d/1T9qL5otwgjIAEW4pPwvKiq0PxIYEK-ExKrFBYRkx6BY
 '
 ' @imageTypes, array - an array of strings corresponding to which types of images to request from Tupian
-'                      Accepted values are "poster", "landscape"
+'                      Accepted values are "poster", "landscape", "hero"
 ' @existingParams: assocArray, any parameters that have already been defined that need to be added to
 Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "")
   posterSize = m.constants.ui.imageSizes.poster
@@ -330,6 +332,8 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "")
       existingParams["images[poster_tb]"] = "w" + posterSize[0].ToStr() + "h" + posterSize[1].ToStr() + "_poster"
     else if imageType = "landscape"
       existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_landscape"
+    else if imageType = "hero"
+      existingParams["images[hero_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_hero"
     end if
   end for
 
@@ -461,9 +465,15 @@ Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSi
           options = {
             params: {}
           }
+
+          '// Request both portrait and hero (lanscape) image types.
+          '//   For the landscape image, request the hero type instead of the regular landscape type, because
+          '//   the regular landscape image most likely has the title embedded in the image, and the hero most likely does not. 
+          '//   The video titles within the Continue watching container have titles overlaid on top of the thumbnail, so using 
+          '//   a thumbnail w/o a tile would look better in this case.
           imageParamTypes = [
             "poster"
-            "landscape"
+            "hero"
           ]
 
           categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, imageParamTypes)

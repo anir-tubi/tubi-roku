@@ -8,6 +8,8 @@
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="../ExperimentMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" /> 
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
@@ -31,7 +33,7 @@
     <Poster
       id="Background"
       loadingBitmapUri="pkg:/images/placeholder-featured.jpg"
-      failedBitmapUri="pkg:/images/placeholder.jpg"
+      failedBitmapUri="pkg:/images/placeholder-featured.jpg"
       width="430"
       height="242"
       translation="[0,0]" />

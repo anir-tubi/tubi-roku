@@ -135,16 +135,19 @@ Function stringUtils_replaceURLParameter_test()
   convertedURL_good1 = replaceURLParameter(goodUrl1, "cb", "XYZ")
   convertedURL_good2 = replaceURLParameter(goodUrl2, "cb", "XYZ")
   convertedURL_good3 = replaceURLParameter(goodUrl3, "cb", "XYZ")
+  convertedURL_good3_add = replaceURLParameter(goodUrl3, "cb", "XYZ", true)
   convertedURL_bad1 = replaceURLParameter(badUrl1, "cb", "XYZ")
   convertedURL_bad2 = replaceURLParameter(badUrl2, "cb", "XYZ")
   convertedURL_bad3 = replaceURLParameter(badUrl3, "cb", "XYZ")
 
   m.assertNotInvalid(convertedURL_good1)
   m.assertNotInvalid(convertedURL_good2)
+  m.assertNotInvalid(convertedURL_good3_add)
 
   '//double check that the good URLs contain the new value for the 'cb' param
   m.assertTrue(convertedURL_good1.Instr("cb=XYZ") >= 0)
   m.assertTrue(convertedURL_good2.Instr("cb=XYZ") >= 0)
+  m.assertTrue(convertedURL_good3_add.Instr("cb=XYZ") >= 0)
 
 
   '//the following URLs do not have the "cb" param so it is expected to return the same "URL" as what was put in

@@ -41,6 +41,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     getGridItemType: tubiMetadataTranslate_getGridItemType
     getThumbnailImage: tubiMetadataTranslate_getThumbnailImage
     composeVideoResources: tubiMetadataTranslate_composeVideoResources
+    getRoundedCornersURL: tubiMetadataTranslate_getRoundedCornersURL
   }
 End Function
 
@@ -85,11 +86,9 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
   else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata
-    if gridType = gridItemTypes.landscapeInnerMetadata AND isNonEmptyArray(contentFromServer.hero_images) = true
-      '//If a landscapde inner metadata image, then try to get a different thumbnail.
-      '//   The regular image most likely has the title embedded in the image, and
-      '//   the landscapde inner metadata image has a title overlaid on top of the thumbnail.
-      sThumbnailURL = contentFromServer.hero_images[0]
+    if canvasImages <> invalid AND type(canvasImages.hero_tb) = "roArray" AND isNonEmptyString(canvasImages.hero_tb[0])
+      '//A custom hero size was requested, use this image instead of the default image
+      sThumbnailURL = canvasImages.hero_tb[0]
     else if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
       '//A custom landscape size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.landscape_tb[0]
@@ -105,6 +104,10 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
       sThumbnailURL = contentFromServer.landscape_images[0]
     end if
   end if
+ 
+  '//Ensure thumbnails have rounded corners - will only work with Tupian URLs
+  sThumbnailURL = m.getRoundedCornersURL(sThumbnailURL)
+
   return sThumbnailURL
 End Function
 
@@ -138,6 +141,21 @@ Function tubiMetadataTranslate_translateBackendTypeToClientSideType(sBackendType
   end if
 
   return sReturn
+End Function
+
+
+' Convert the URL to that of a URL with rounded corners
+Function tubiMetadataTranslate_getRoundedCornersURL(sPosterURL)
+
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1").enabled = true
+    sPosterURL = replaceURLParameter(sPosterURL, "border_radius", "default", true)
+    '//::TODO::roku_rounded_corners_v1 - linear thumbnails with a border_radius=8 are cached in the CDN with square corners.
+    '// So we are setting the border_radius param to "normal" (which is the same thing as "8") to ensure we display rounded corners and not worry about the cached version of the border_radius=9 URL
+    '//   When linear thumnails come from Tupian (sometime in October 2023), then we can set the border radius back to "8" instead of "default", and then we should see the rounded corners. 
+    ' sPosterURL = replaceURLParameter(sPosterURL, "border_radius", "8", true)
+  end if
+  
+  return sPosterURL
 End Function
 
 
@@ -382,7 +400,9 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   creditCuePoints.AddReplace("postlude", postlude)
   translatedContent.creditCuePoints = creditCuePoints
 
-  translatedContent.landscape = m.getThumbnailImage(contentFromServer, m.constants.ui.gridItemTypes.landscape)
+  sLandscapeURL = m.getThumbnailImage(contentFromServer, m.constants.ui.gridItemTypes.landscape)
+  translatedContent.landscape = sLandscapeURL
+
   sPortraitURL = m.getThumbnailImage(contentFromServer)
   if sPortraitURL <> ""
     translatedContent.portrait = sPortraitURL
@@ -391,7 +411,8 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   if (translatedContent.HDGRIDPOSTERURL = invalid or translatedContent.HDGRIDPOSTERURL = "") AND contentFromServer.HDGRIDPOSTERURL <> invalid
     '//If the contentFromServer already set HDGRIDPOSTERURL then use that value.
-    translatedContent.HDGRIDPOSTERURL = contentFromServer.HDGRIDPOSTERURL
+    sHDGridPosterURL = m.getRoundedCornersURL(contentFromServer.HDGRIDPOSTERURL)
+    translatedContent.HDGRIDPOSTERURL = sHDGridPosterURL
   end if
 
   if contentFromServer.backgrounds <> invalid AND type(contentFromServer.backgrounds) = "roArray" AND contentFromServer.backgrounds.count() > 0
@@ -1335,7 +1356,9 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             childAA.gridItemType = gridType
           end if
 
-          childAA.hdgridposterurl = m.getThumbnailImage(fullChild, gridType)
+          sHDGridPosterURL = m.getThumbnailImage(fullChild, gridType)
+          childAA.hdgridposterurl = sHDGridPosterURL
+
 
           if parentGridItemType = gridItemTypes.linear AND fullChild.thumbnails <> invalid
             childAA.inlineLogoUri = fullChild.thumbnails[0]
@@ -2198,24 +2221,31 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
     endTime = GetAMPMTimeString(datetimeObjEnd, false)
   end if
 
+  sFDPosterURL = ""
+  sHDGridPosterURL = ""
   if programFromServer.images <> invalid
     if isNonEmptyArray(programFromServer.images.poster)
-      translatedProgram.FHDPosterUrl = programFromServer.images.poster[0]
+      sFDPosterURL = programFromServer.images.poster[0]
     end if
 
     if isNonEmptyArray(programFromServer.images.landscape)
-      translatedProgram.hdgridposterurl  = programFromServer.images.landscape[0]
+      sHDGridPosterURL = programFromServer.images.landscape[0]
     end if
 
   else if channelFromServer.images <> invalid 'if program images are not available, consider channel images for substitute.
     if isNonEmptyArray(channelFromServer.images.poster)
-      translatedProgram.FHDPosterUrl = channelFromServer.images.poster[0]
+      sFDPosterURL = channelFromServer.images.poster[0]
     end if
 
     if isNonEmptyArray(channelFromServer.landscape_image)
-      translatedProgram.hdgridposterurl  = channelFromServer.landscape_images[0]
+      sHDGridPosterURL = channelFromServer.landscape_images[0]
     end if
   end if
+
+  sFDPosterURL = m.getRoundedCornersURL(sFDPosterURL)
+  sHDGridPosterURL = m.getRoundedCornersURL(sHDGridPosterURL)
+  translatedProgram.FHDPosterUrl  = sFDPosterURL
+  translatedProgram.hdgridposterurl  = sHDGridPosterURL
 
   if programFromServer.has_subtitle <> invalid
     translatedProgram.hasSubtitles = programFromServer.has_subtitle

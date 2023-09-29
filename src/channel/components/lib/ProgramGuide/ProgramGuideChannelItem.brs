@@ -7,7 +7,6 @@ Function init()
   m.emptyStar = m.top.findNode("emptyStar")
   m.filledStar = m.top.findNode("filledStar")
 
-
   theme = getThemeFromGlobal()
   if theme <> invalid
     m.posterBg.blendColor = theme.backgroundColor

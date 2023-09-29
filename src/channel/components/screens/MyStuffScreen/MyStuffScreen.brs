@@ -52,7 +52,11 @@ Function init()
   'Content area
   m.RowList = m.top.findNode("RowList")
   m.GuestMenu = m.top.findNode("GuestMenu")
-  m.RowList.focusBitmapUri = "pkg:/images/selector-$$RES$$.9.png"
+  if getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", false).enabled = true
+    m.RowList.focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+  else
+    m.RowList.focusBitmapUri = "pkg:/images/selector-$$RES$$.9.png"
+  end if
   m.GuestMenu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
   m.GuestMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-$$RES$$.9.png"
   m.AllEmptyUIMenu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"

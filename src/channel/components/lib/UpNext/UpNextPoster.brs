@@ -14,10 +14,15 @@ Function onContentChange()
   tubiLog("UpNextPoster.onContentChange")
   if m.top.itemContent <> invalid then
     ' If series content, we show a 16:9 poster, otherwise a DVD-aspect poster
+    sURI = ""
     if m.top.itemContent.seriesId <> invalid and m.top.itemContent.seriesId <> ""
-      m.Poster.uri = m.top.itemContent.landscape
+      sURI = m.top.itemContent.landscape
     else
-      m.Poster.uri = m.top.itemContent.hdgridposterurl
+      sURI = m.top.itemContent.hdgridposterurl
     end if
+
+    getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true)
+    m.poster.uri = sURI
+
   end if
 End Function

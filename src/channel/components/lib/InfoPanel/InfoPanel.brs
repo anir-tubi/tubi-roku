@@ -8,6 +8,11 @@ Function init()
   m.topHeaderImage = m.top.findNode("TopHeaderImage")
   m.leftHeaderImage = m.top.findNode("LeftHeaderImage")
 
+  if getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", false).enabled = true
+    m.leftHeaderImage.loadingBitmapUri="pkg:/images/placeholder.webp"
+    m.leftHeaderImage.failedBitmapUri="pkg:/images/placeholder.webp"
+  end if
+
   m.title = m.top.findNode("Title")
   m.episode = m.top.findNode("Episode")
   m.twoLineInfo = m.top.findNode("TwoLineInfo")
@@ -202,14 +207,16 @@ End Function
 ' Needed in case the mode doesn't change but the leftHeaderImageUri does
 Function onLeftHeaderImageUriChange(msg)
   tubiLog("InfoPanel.onLeftHeaderImageUriChange")
-  leftHeaderUri = msg.getData()
+  sPosterURL = msg.getData()
   leftHeaderIsPresent = (m.leftHeaderImage.getParent() <> invalid)
-  if isNonEmptyString(leftHeaderUri) = true
+  if isNonEmptyString(sPosterURL) = true
     if leftHeaderIsPresent = false
       m.infoPanelGroup.insertChild(m.leftHeaderImage, 0)
     end if
 
-    m.leftHeaderImage.uri = m.top.leftHeaderImageUri
+    getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true)
+    m.leftHeaderImage.uri = sPosterURL
+    
   else if leftHeaderIsPresent = true
     m.infoPanelGroup.removeChild(m.leftHeaderImage)
   end if

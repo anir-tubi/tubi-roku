@@ -138,7 +138,8 @@ End Function
 ' @url: string, The URL to change
 ' @paramToReplace: string, The query param name that its value should be changed
 ' @replacementValue: string, The value that should be the new value of the provided param
-Function replaceURLParameter(url, paramToReplace, replacementValue)
+' @addIfDoesNotExist: boolean, Set this to true if you wish to not only replace a param, but to add the param if the param does not exist in the URL's query string
+Function replaceURLParameter(url, paramToReplace, replacementValue, addIfDoesNotExist = false)
   sReplacementURL = url
   if isString(url) = true AND isString(paramToReplace) = true AND isString(replacementValue) = true
     re = CreateObject("roRegex", "[\\?&]" + paramToReplace + "=([^&#]*)", "i")
@@ -149,9 +150,15 @@ Function replaceURLParameter(url, paramToReplace, replacementValue)
       sDelimiter = match.mid(0, 1)
       sNewParamValuePair = sDelimiter + paramToReplace + "=" + replacementValue
       sReplacementURL = url.replace(match, sNewParamValuePair)
-    else
-      '// The paramToReplace is not in the URL, do nothing.
-      '// In the future, we could append the param to the URL. But for right now, it is unnecessary.
+    else if addIfDoesNotExist = true
+      '// The paramToReplace is not in the URL, check the value of addIfDoesNotExist to see if we should still add it to the query list
+      sConnector = "&"
+      if Instr(1, url, "?") <= 0
+        '//if the URL does not contain a "?", then use the "?" instead of the "&" to add the param/value pair to the URL
+        sConnector = "?"
+      end if
+
+      sReplacementURL = url + sConnector + paramToReplace + "=" + replacementValue
     end if
   end if
 

@@ -31,6 +31,10 @@ Function init()
   m.finalBlockSize = m.constants.performance.categoryGridList.finalBlockSize
   m.eagerLoad = m.constants.performance.categoryGridList.eagerLoad
 
+  if getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", false).enabled = true
+    m.RowList.focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+  end if
+
   ' If eager loading, we don't need to listen for row changes
   if not m.eagerLoad
     m.RowList.observeField("itemFocused", "onItemFocused")

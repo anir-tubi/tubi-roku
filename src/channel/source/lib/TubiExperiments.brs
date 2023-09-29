@@ -43,6 +43,11 @@ Function TubiExperiments(constants) as Object
         roku_hevc_drm_4k_v1 : {"enabled": true}
       }
 
+      '// When enabled=true, the user will see thumbnails with rounded corners
+      roku_rounded_corners: {
+        roku_rounded_corners_v1 : {"enabled": false}
+      }
+
       roku_screensaver: {
         roku_screensaver_v2 : {"enabled": false}
       }

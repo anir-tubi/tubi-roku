@@ -4,6 +4,11 @@ Function init()
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("width", "onWidthChange")
 
+  if getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true).enabled = true
+    m.Background.loadingBitmapUri="pkg:/images/placeholder-featured.webp"
+    m.Background.failedBitmapUri="pkg:/images/placeholder-featured.webp"
+  end if
+  
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.Title, typographyConstants.ids.bodyMedium)
 
@@ -35,11 +40,17 @@ End Function
 Function onContentChange()
   tubiLog("FeaturePoster.onContentChange")
   if m.top.itemContent <> invalid then
+    ' If series content, we show a 16:9 poster, otherwise a DVD-aspect poster
+    sURI = ""
     if m.top.itemContent.landscape <> invalid then
-      m.Background.uri = m.top.itemContent.landscape
+      sURI = m.top.itemContent.landscape
     else
-      m.Background.uri = m.top.itemContent.hdgridposterurl
+      sURI = m.top.itemContent.hdgridposterurl
     end if
+
+    getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true)
+    m.Background.uri = sURI
+
     m.Title.text = m.top.itemContent.title
   end if
 End Function

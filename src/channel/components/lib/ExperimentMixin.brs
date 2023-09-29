@@ -2,7 +2,7 @@
 '
 ' Get more info about the experiment
 ' Note: the component calling getExperimentResource using the ExperimentMixin, must also
-' have pkg:/source/lib/Request.brs and pkg:/source/lib/TubiExperiments.brs added as scripts
+' have pkg:/source/lib/Request.brs, pkg:/source/lib/GlobalMixin.brs, and pkg:/source/lib/TubiExperiments.brs added as scripts
 Function getExperimentResource(namespaceName as string, experimentName as string, sendEvent=true as Boolean)
   if m.constants = invalid
     m.constants = getConstantsFromGlobal()

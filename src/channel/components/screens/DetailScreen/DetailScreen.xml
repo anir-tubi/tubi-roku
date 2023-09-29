@@ -323,13 +323,11 @@
               id="RelatedRowLabelContent"
               role="content"/>
           </CategoryGridRowLabel>
-          <PosterGrid
+          <MarkupGrid
             id="RelatedGrid"
-            loadingBitmapUri="pkg:/images/placeholder.jpg"
-            failedBitmapUri="pkg:/images/placeholder.jpg"
-            itemSize="[1920,267]"
+            itemComponentName="StarterGridItem"
             numRows="1"
-            basePosterSize="[186,267]"
+            itemSize="[186,267]"
             itemSpacing="[12,12]"
             fadeFocusFeedbackWhenAutoScrolling="true"
             horizFocusAnimationStyle="fixedFocus"

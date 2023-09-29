@@ -12,6 +12,11 @@ Function init()
   m.title = m.top.findNode("Title")
   m.posterFadeTime = 0.5
 
+  if getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true).enabled = true
+    m.poster.loadingBitmapUri="pkg:/images/placeholder.webp"
+    m.poster.failedBitmapUri="pkg:/images/placeholder.webp"
+  end if
+
   '//recreate the contentTypes from constants so as not to access m.global.constants for every item on the home screen as they are created
   m.contentTypes = {
     series: "series"
@@ -131,8 +136,10 @@ Function onContentChange(msg)
   removeLockIcon()
   removeShowALlLabel()
 
+  sPosterURL = ""
   if itemContent <> invalid then
 
+    sPosterURL = itemContent.hdgridposterurl
     hasVideoresources = itemContent.hasVideoresources
     airDatetime = itemContent.airDatetime
 
@@ -159,7 +166,6 @@ Function onContentChange(msg)
     categoryContent = itemContent.getParent()
 
     if categoryContent <> invalid AND itemContent.gridItemType <> invalid then
-      m.poster.uri = itemContent.hdgridposterurl
       ' do not show title below the poster for featured row & show All poster
       if itemContent.gridItemType = m.gridItemTypes.landscape AND itemContent.type <> m.contentTypes.navigate
         m.title.visible = true
@@ -183,8 +189,8 @@ Function onContentChange(msg)
         if (categoryContent.gridItemType = m.gridItemTypes.landscape OR categoryContent.gridItemType = m.gridItemTypes.landscapeNoTitle) 'linear content on landscape row
           currentProgram = getCurrentLiveProgram(itemContent)
 
-          if currentProgram <> invalid AND isNonEmptyString(currentProgram.hdgridposterurl)
-            m.poster.uri = currentProgram.hdgridposterurl
+          if currentProgram <> invalid AND isNonEmptyString(currentProgram.hdgridposterurl) = true
+            sPosterURL = currentProgram.hdgridposterurl
           end if
 
           setLiveBadge()
@@ -194,10 +200,11 @@ Function onContentChange(msg)
           setLiveBadge()
         end if
       end if
-    else
-      m.poster.uri = itemContent.hdgridposterurl
     end if
   end if
+
+  getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true)
+  m.poster.uri = sPosterURL
 End Function
 
 

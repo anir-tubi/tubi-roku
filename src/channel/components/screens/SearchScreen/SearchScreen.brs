@@ -45,6 +45,9 @@ Function init()
   m.KidsModeMessageSpacer = m.top.findNode("KidsModeMessageSpacer")
 
   m.ResultGrid = m.top.findNode("ResultGrid")
+  if getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", false).enabled = true
+    m.ResultGrid.focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+  end if
 
   m.keyboard.observeField("text", "onKeyboardTextChanged")
   m.keyboard.textEditBox.observeField("focusedChild", "onTextEditBoxFocused")
