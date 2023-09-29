@@ -10,4 +10,7 @@
     "sourceMap": true,
     "declaration": true
   },
+  "ts-node": {
+      "transpileOnly": true
+  }
 }

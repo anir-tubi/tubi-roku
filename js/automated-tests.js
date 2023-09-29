@@ -117,6 +117,8 @@ async function buildTestAccountCli(done) {
   while (shouldContinue) {
     const content = user.getContent();
 
+    // We are using this file from TypeScript and so have to prevent the compile error by typing more loosely
+    /** @type any[] */
     const contentTypeChoices = Object.keys(ContentTypes);
     const {contentTypeIndex} = await prompts({
       type: 'select',

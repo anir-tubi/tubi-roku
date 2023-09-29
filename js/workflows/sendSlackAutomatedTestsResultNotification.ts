@@ -1,6 +1,5 @@
 const fs = require('fs');
 const {jsonReportOutputPath} = require('../automated-tests');
-const https = require('https');
 import {testUtils} from '../automated-tests/test-utils';
 
 const report = JSON.parse(fs.readFileSync(jsonReportOutputPath, 'utf8'));

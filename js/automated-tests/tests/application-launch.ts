@@ -116,7 +116,7 @@ describe('Application Launch', function () {
 
 
   // https://tubi.testrail.io/index.php?/cases/view/129714
-  it.only('C129714 - Logged in user should not see Registration Prompt Container in Movies filter @application_launch @registered_user', async () => {
+  it('C129714 - Logged in user should not see Registration Prompt Container in Movies filter @application_launch @registered_user', async () => {
 
     // Launch app
     await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
@@ -148,11 +148,11 @@ describe('Application Launch', function () {
     expect(signUpToSaveProgressDescription.visible).to.be.true;
 
     // Check CW row title
-    
+
     const continueWatchingRowContent = await testUtils.getCurrentlyFocusedGridItemContent('homeScreenRowList');
     expect(continueWatchingRowContent.title).to.equal('Sign Up to Save Your Progress');
 
-    
+
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/129714
@@ -167,7 +167,7 @@ describe('Application Launch', function () {
     await testUtils.startApplicationAtPage('home', {user: user});
     await testUtils.waitForAppLaunchBeaconToFire();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-    
+
     // Jump To Continue Watching Row (verify it is present)
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
     await utils.sleep(2000);
