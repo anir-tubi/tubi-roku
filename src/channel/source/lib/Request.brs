@@ -74,7 +74,7 @@ Function createAsyncHTTPRequest(url as String, name = "" as String, options={} a
     if o = "headers"
       if mergedOptions[o].DoesExist("Content-Type") = false
         if options.method <> invalid
-          if UCase(options.method) = "POST" or UCase(options.method) = "PUT" or UCase(options.method) = "PATCH"
+          if UCase(options.method) = "POST" or UCase(options.method) = "PUT" or UCase(options.method) = "PATCH" OR (UCase(options.method) = "DELETE" AND options.body <> "")
             mergedOptions[o].Append({"Content-Type": "application/json"})
           end if
         end if
