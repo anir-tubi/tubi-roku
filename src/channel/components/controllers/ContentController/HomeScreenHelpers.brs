@@ -1271,7 +1271,7 @@ Function hasRegModalBeenShown()
   end if
 
   if isNewUser() = true AND m.hasRegModalBeenShownWithinNewUserSession = false
-    if currentScreen.id = m.constants.ui.screenIds.homeScreen AND isLoggedInUser() = false AND getExperimentResource("roku_registration_component_over_homegrid", "roku_registration_component_over_homegrid_v1", true).enabled = true
+    if currentScreen.id = m.constants.ui.screenIds.homeScreen AND isLoggedInUser() = false
       m.hasRegModalBeenShownWithinNewUserSession = true
       return false
     end if

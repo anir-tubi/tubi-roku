@@ -73,10 +73,6 @@ Function TubiExperiments(constants) as Object
         roku_large_play_progress_v1 : {"enabled": true}
       }
 
-      roku_registration_component_over_homegrid: {
-        roku_registration_component_over_homegrid_v1: {"enabled": true}
-      }
-
       roku_hevc_non4k: {
         roku_hevc_non4k_v1: {"enabled": true}
       }
