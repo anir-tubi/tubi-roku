@@ -655,7 +655,13 @@ After some time of features being added/removed, some translations may no longer
   gulp codeClean
   ```
 
-# Restart Github Action Runner
+# Self-hosted Github Action Runners
+
+**Enable/Disable Self-hosted Github Action Runner**
+
+If you need to temporarily disable a runner then an easy way to do this is by going to [Github.com > Settings > Actions > Runners](https://github.com/adRise/project-total-recall/settings/actions/runners). Click on the runner you would like to enable or disable. Click the gear icon to the right and then uncheck `enabled` to disable the runner or check it reenable it.
+
+**Restart Office Self-hosted Github Action Runner**
 
 A linux machine has been dedicated in the San Francisco office to be used for GitHub PR unit testing. A Github Actions runner is running on this linux machine.  A roku device is connected to the linux machine.
 
