@@ -131,6 +131,11 @@ Function onExternalConfigRequestSuccess(config)
     if config.country <> invalid AND config.country <> ""
       m.constants.deviceInfo.countryCode = UCase(config.country)
     end if
+
+    if isAA(config.blocked_analytics_events) = true
+      ' Storing the value of blocked analytics event to registry as a fallback in future if the external config call fails.
+      RegWrite("blocked_analytics_events", FormatJson(config.blocked_analytics_events), m.constants.registrySectionIDs.fallbacks)
+    end if
     
     m.constants.externalConfig.info = config
   end if
@@ -142,6 +147,17 @@ End Function
 
 ' Callback triggered once the config request is fails.
 Function onExternalConfigRequestFailure(_error)
+  ' Reading the fallback data if present from the registry and setting it to constants.
+  blockedEventsList = RegRead("blocked_analytics_events", m.constants.registrySectionIDs.fallbacks)
+  if blockedEventsList <> invalid
+    blockedEventsList = ParseJson(blockedEventsList)
+    if isAA(blockedEventsList) = true
+      m.constants.externalConfig.info = {
+        "blocked_analytics_events": blockedEventsList
+      }
+    end if
+  end if
+
   m.isExternalConfigReady = true
   checkIfExperimentAndRemoteConfigReadyAndProceed()
 End Function

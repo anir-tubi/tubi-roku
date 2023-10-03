@@ -12,6 +12,8 @@ Function getConstants()
   'Registry Section IDs used to store things in a particular section of the registry
   constants.registrySectionIDs = {}
     constants.registrySectionIDs.deviceInfoSectionId = "deviceinfo"
+    ' Creating a section to store all fallbacks in future to start with we are using for blocked analytics events.
+    constants.registrySectionIDs.fallbacks = "fallbacks"
 
   ' Roku's channel/app id for the production Tubi app. It is used with the continue watching feature to enable testing the feature in sideloaded/beta channels.
   constants.productionApplicationId = "41468"
