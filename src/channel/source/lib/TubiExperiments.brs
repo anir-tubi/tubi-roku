@@ -21,22 +21,11 @@ Function TubiExperiments(constants) as Object
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
 
     defaultResources: {
-      '// When enabled=true, the user will see live video previews on the My Stuff screen.
-      roku_my_stuff: {
-        roku_my_stuff_v3: {"enabled": true}
-      }
       '// When enabled=false, the user will see the previous signin screen - the one that does not have a "forget password" button
       '// When enabled=true & instant=true, then the user will be able to instantly sign in w/o a password by clicking the "forget password" button
       '// When enabled=true & instant=false, then the user will be able to change their forgotten password by clicking the "forget password" button
       roku_registration_signin_password_reset: {
         roku_registration_signin_password_reset_v2: {"enabled": true, "instant": true}
-      }
-
-      ' roku_enhanced_onboarding_v2_roku_path - have new user use the Roku modal to start the sign in process
-      ' roku_enhanced_onboarding_v2_registration_path - show on-boarding screens only for new users (guest)
-      roku_regist_enhanced_onboarding: {
-        roku_enhanced_onboarding_v2_roku_path: {"enabled": false}
-        roku_enhanced_onboarding_v2_registration_path: {"enabled": false}
       }
 
       roku_hevc_drm_4k: {
