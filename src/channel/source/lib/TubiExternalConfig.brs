@@ -13,6 +13,7 @@ Function TubiExternalConfig(request as Object, constants as Object) as Object
     getConfigsRequest: tubiExternalConfig_getConfigsRequest
     parseConfigs: tubiExternalConfig_parseConfigs
     getConfigsRequestInfo: tubiExternalConfig_getConfigsRequestInfo
+    parseBlockedAnaylticsEvents: tubiExternalConfig_parseBlockedAnaylticsEvents
 
     ' private methods
     getConfigs: tubiExternalConfig_getConfigs_
@@ -103,18 +104,25 @@ Function tubiExternalConfig_parseConfigs(responseData)
   if responseData <> invalid
     configs = ParseJson(responseData)
     if type(configs) = "roAssociativeArray"
-      ' Converting to blocked_analytics_events from ["start_ad", "ad_click"] to {"start_ad": true, "ad_click": true}.
-      blockedAnalyticsEvents = configs.blocked_analytics_events
-      blockedAnalyticsEventsAA = {}
-
-      for each event in blockedAnalyticsEvents
-        blockedAnalyticsEventsAA[event] = true
-      end for
-
-      configs.blocked_analytics_events = blockedAnalyticsEventsAA
+      configs.blocked_analytics_events = m.parseBlockedAnaylticsEvents(configs.blocked_analytics_events)
     end if
-
   end if
 
   return configs
+End Function
+
+
+' @blockedAnalyticsEvents: assocarray, {"essential": ["active"], "analytics": ["auto_play"]}
+Function tubiExternalConfig_parseBlockedAnaylticsEvents(blockedAnalyticsEvents)
+  ' Converting to blocked_analytics_events from {"essential": ["active"], "analytics": ["auto_play"]} to {"active": "essential", "ad_click": "analytics"}.
+  blockedAnalyticsEventsAA = {}
+  if type(blockedAnalyticsEvents) = "roAssociativeArray"
+    for each consentKey in blockedAnalyticsEvents
+      for each event in blockedAnalyticsEvents[consentKey]
+        blockedAnalyticsEventsAA[event] = consentKey
+      end for
+    end for
+  end if
+
+  return blockedAnalyticsEventsAA
 End Function

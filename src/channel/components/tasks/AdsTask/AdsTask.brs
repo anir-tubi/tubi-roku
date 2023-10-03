@@ -11,7 +11,7 @@ Function execAdsTask()
   request = TubiRequest(constants.settings)
   requestQueue = TubiRequestQueue()
   auth = TubiAuth(constants, request)
-  tracking = TubiTracking(constants, request, auth, videoPlayerNode.didUserOptOutOfTracking)
+  tracking = TubiTracking(constants, request, auth, videoPlayerNode.userConsentsOptOutStatus)
 
   m.tubiAds = TubiAds(constants, request, requestQueue, auth, tracking, m.top.adContentType)
   adShim = TubiSGAdShim(constants, m.tubiAds)

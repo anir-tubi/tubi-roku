@@ -105,8 +105,8 @@
        <!-- sendPendingPauseAdPixel will be set when user press home key from remote -->
       <field id="sendPendingPauseAdPixel" type="boolean" alwaysNotify="true"/>
 
-      <!-- indicates whether user opted out of tracking either through initial consent or settings screen. -->
-      <field id="didUserOptOutOfTracking" type="boolean" value="false" />
+      <!-- Holds the consent opt out status for all individual preferences like marketing,analytics etc. -->
+      <field id="userConsentsOptOutStatus" type="assocarray" value="{}" />
 
       <!-- indicates whether user opted out of Personalized Advertising either through initial consent or settings screen. -->
       <field id="didUserOptOutOfPersonalizedAdvertising" type="boolean" value="false" />

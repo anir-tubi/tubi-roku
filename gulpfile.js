@@ -229,6 +229,7 @@ function buildStarter() {
     'src/channel/components/tasks/GeneralTask/StarterGeneralTask.xml',
     'src/channel/components/tasks/GeneralTask/StarterGeneralTask.brs',
     'src/channel/components/tasks/GeneralTask/Parsers/TubiExperimentParsers.brs',
+    'src/channel/components/tasks/GeneralTask/Parsers/ExternalConfigParsers.brs',
     'src/channel/components/tasks/GeneralTask/Parsers/UncategorizedParsers.brs',
   ];
   let generalTaskSrcOptions = {
@@ -369,7 +370,8 @@ function buildRemote() {
       '!src/channel/source/tests/**',
       '!src/channel/source/Settings.brs',
       '!src/channel/components/controllers/TubiScene/TrackerTask.xml',
-      '!src/channel/components/tasks/GeneralTask/Parsers/TubiExperimentParsers.brs'
+      '!src/channel/components/tasks/GeneralTask/Parsers/TubiExperimentParsers.brs',
+      '!src/channel/components/tasks/GeneralTask/Parsers/ExternalConfigParsers.brs'
     ];
 
     // don't include TestAid files if config is production

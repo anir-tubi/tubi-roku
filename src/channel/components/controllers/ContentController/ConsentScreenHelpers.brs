@@ -76,7 +76,7 @@ End Function
 
 Function onGetConsentSuccess(response)
   m.consentSettings = response
-  m.trackingLoggingTask.didUserOptOutOfTracking = getConsentOptOutStatusByKey(m.constants.consentKeys.analytics)
+  m.trackingLoggingTask.userConsentsOptOutStatus = getConsentsOptOutStatus()
   if m.onGetConsentCompletionCallback <> invalid
     getConsentCompletionCallback = m.onGetConsentCompletionCallback
     m.onGetConsentCompletionCallback = invalid
@@ -112,11 +112,8 @@ Function setConsent(body, onSetConsentCompletionCallback = invalid)
   ' Updating back consents into the m scope variable defined in content controller.
   m.consentSettings.consents = consents
 
-  ' Updating the consent if analytics consent was changed from initial value.
-  if isNonEmptyString(body["analytics"]) = true
-    ' Updating the consent status.
-    m.trackingLoggingTask.didUserOptOutOfTracking = getConsentOptOutStatusByKey(m.constants.consentKeys.analytics)
-  end if
+  ' Updating the consent status.
+  m.trackingLoggingTask.userConsentsOptOutStatus = getConsentsOptOutStatus()
 
   ' Checking if the marketing consent preference was changed.
   marketingConsentKey = m.constants.consentKeys.marketing
@@ -159,11 +156,8 @@ Function onSelectedPreferenceInfoChange(msg)
     if userInteractionValue <> invalid
       consentKey = keys[0]
       ' As a safety check if we have a mapping value for the consent key if not falling back to backend key.
-      buttonValue = consentKey
-      if m.constants.consentAnalyticsButtonValues[consentKey] <> invalid
-        buttonValue = m.constants.consentAnalyticsButtonValues[consentKey]
-      end if
-      
+      buttonValue = m.Tracking.getConsentAnalyticValue(consentKey)
+            
       componentValues = {
         button_type: "TOGGLE"
         button_value: buttonValue
@@ -283,4 +277,19 @@ Function isUserAllowedToManageConsent()
   end if
 
   return isUserAllowedToManageConsent
+End Function
+
+
+' Returns a assocarray with key as the consent key returned from backend and a boolean value which indicates the consent status for the key. ex: {"analytics": true, "marketing": false}
+Function getConsentsOptOutStatus()
+  consentsStatus = {}
+
+  isUserAllowedToManageConsent = isUserAllowedToManageConsent()
+  if m.consentSettings <> invalid AND isUserAllowedToManageConsent = true
+    for each consent in m.consentSettings.consents
+      consentsStatus[consent.key] = (consent.value = "opted_out")
+    end for
+  end if
+
+  return consentsStatus
 End Function

@@ -1326,14 +1326,9 @@ Function getConstants()
 
   constants.consentKeys = {}
     constants.consentKeys.analytics = "analytics"
-    constants.consentKeys.personalization = "personalization"
-    constants.consentKeys.marketing = "marketing_"
+    constants.consentKeys.personalization = "personalized_advertising"
+    constants.consentKeys.marketing = "marketing"
     constants.consentKeys.continueWatching = "data_sharing"
-
-  ' TODO: Will include other values once they are finalized.
-  constants.consentAnalyticsButtonValues = {}
-    constants.consentAnalyticsButtonValues.data_sharing = "DATA_SHARING"
-
 
 
 'THEME/COLOR START///////////////////////

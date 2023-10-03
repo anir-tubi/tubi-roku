@@ -7,7 +7,7 @@ Function init()
   m.top.observeField("logMsg", m.port)
   m.top.observeField("logException", m.port)
   m.top.observeField("analyticsAppMode", m.port)
-  m.top.observeField("didUserOptOutOfTracking", m.port)
+  m.top.observeField("userConsentsOptOutStatus", m.port)
 
   m.constants = getConstantsFromGlobal()
 
@@ -28,7 +28,7 @@ Function watchLoop()
   m.auth = TubiAuth(m.constants, m.request)
   sentryInfo = Sentry(m.constants, m.auth)
   m.logger = TubiLogger(m.constants, m.request, m.auth, sentryInfo)
-  m.tracking = TubiTracking(m.constants, m.request, m.auth, m.top.didUserOptOutOfTracking)
+  m.tracking = TubiTracking(m.constants, m.request, m.auth, m.top.userConsentsOptOutStatus)
   m.analyticsAppMode = "DEFAULT_MODE"
 
   'when the trackEvent field for the metadata task field is updated, the event is heard in this loop
@@ -46,8 +46,8 @@ Function watchLoop()
         sendSceneGraphException(data)
       else if field = "analyticsAppMode"
         m.analyticsAppMode = data
-      else if field = "didUserOptOutOfTracking"
-        m.tracking.didUserOptOutOfTracking = data
+      else if field = "userConsentsOptOutStatus"
+        m.tracking.userConsentsOptOutStatus = data
       end if
     else if type(msg) = "roUrlEvent" then
       m.queue.handleEvent(msg)

@@ -527,10 +527,7 @@ Function onNewConsentPreferences(msg)
     setConsent(selectedConsents)
 
     ' As a safety check if we have a mapping value for the consent key if not falling back to backend key.
-    buttonValue = key
-    if m.constants.consentAnalyticsButtonValues[key] <> invalid
-      buttonValue = m.constants.consentAnalyticsButtonValues[key]
-    end if
+    buttonValue = m.Tracking.getConsentAnalyticValue(key)
 
     componentValues = {
       button_type: "TOGGLE"

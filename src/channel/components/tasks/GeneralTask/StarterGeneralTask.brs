@@ -1,7 +1,7 @@
 Function registerParsingCallbacks()
     ' generic requests
     m.requestTypes[m.constants.reqNames.getExternalConfigs] = {
-        parseSuccess: parseGenericSuccess
+        parseSuccess: parseGetExternalConfigSuccess
         parseError: parseGenericError
     }
 

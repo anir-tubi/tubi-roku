@@ -1,4 +1,4 @@
-Function TubiTracking(constants, request, auth, didUserOptOutOfTracking = false)
+Function TubiTracking(constants, request, auth, userConsentsOptOutStatus = {})
   return {
     constants: constants
     request: request
@@ -22,6 +22,7 @@ Function TubiTracking(constants, request, auth, didUserOptOutOfTracking = false)
     getAnalyticsAd: tubiTracking_getAnalyticsAd
     getAnalyticsHomePageContentMode: tubiTracking_getAnalyticsHomePageContentMode
     getLanguageCode: tubiTracking_getLanguageCode
+    getConsentAnalyticValue: tubiTracking_getConsentAnalyticValue
 
     populateMessage: tubiTracking_populateMessage
     isEmptyValue: tubiTracking_isEmptyValue
@@ -38,8 +39,8 @@ Function TubiTracking(constants, request, auth, didUserOptOutOfTracking = false)
     ' an AA map of Menu items in the details screen to their corresponding enum values for the LeftSideNavComponent Section
     detailScreenMenuItemMap: tubiTracking_getDetailScreenMenuPageMap(constants)
 
-    ' Holds a boolean value indicating whether user has opted out of tracking.
-    didUserOptOutOfTracking: didUserOptOutOfTracking
+    ' Holds an assoc array indicating whether user has opted out of individual consent like analytics, marketing, etc.
+    userConsentsOptOutStatus: userConsentsOptOutStatus
   }
 End Function
 
@@ -93,7 +94,20 @@ End Function
 Function tubiTracking_trackUserEvent(eventType = "", eventValues = invalid, requestQueue = invalid)
   if eventType <> "" AND m.constants.externalConfig.info <> invalid
     blockedAnalyticsEvents = m.constants.externalConfig.info.blocked_analytics_events
-    if m.didUserOptOutOfTracking = false OR isAA(blockedAnalyticsEvents) = false OR blockedAnalyticsEvents.doesExist(eventType) = false
+    userConsentsOptOutStatus = {}
+    if isAA(m.userConsentsOptOutStatus) = true
+      userConsentsOptOutStatus = m.userConsentsOptOutStatus
+    end if
+
+    ' Holds the value of consent key if any configured for it in blockedAnalyticsEvents
+    eventConsentKey = invalid
+    if isAA(blockedAnalyticsEvents) = true AND blockedAnalyticsEvents.doesExist(eventType) = true
+      eventConsentKey = blockedAnalyticsEvents[eventType]
+    end if
+
+    ' If the event name is not present in the blocked event list, we will proceed with sending the tracking request.
+    ' If there is mapping than making sure we only proceed if a mapping is present in the userConsentsOptOutStatus and it is false.
+    if eventConsentKey = invalid OR userConsentsOptOutStatus[eventConsentKey] = false
       trackData = m.getClientEvent(eventType, eventValues)
       userRequest = m.getUserTrackingRequest(eventType, trackData)
       if userRequest <> invalid AND requestQueue <> invalid
@@ -1157,4 +1171,23 @@ Function tubiTracking_getLanguageCode(language)
   end if
 
   return languageCode
+End Function
+
+
+' Returns consent analytics value based on the consent key returned from backend.
+' @consetKey: string, contains the consent key returned from backend.
+Function tubiTracking_getConsentAnalyticValue(consentKey)
+  mapping = {
+    essential: "ESSENTIAL"
+    functional: "FUNCTIONAL"
+    marketing: "MARKETING"
+    personalized_advertising: "PERSONALIZED_ADVERTISING"
+    data_sharing: "DATA_SHARING"
+  }
+  
+  if mapping.doesExist(consentKey) = true
+    return mapping[consentKey]
+  else
+    return consentKey
+  end if
 End Function

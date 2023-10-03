@@ -232,7 +232,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
       tubiLog(FormatJSON(videoInfo), "info", "videoInfo", "video-title-undefined")
     end if
 
-    videoPlayer.didUserOptOutOfTracking = getConsentOptOutStatusByKey(m.constants.consentKeys.analytics)
+    videoPlayer.userConsentsOptOutStatus = getConsentsOptOutStatus()
     videoPlayer.didUserOptOutOfPersonalizedAdvertising = getConsentOptOutStatusByKey(m.constants.consentKeys.personalization)
     videoPlayer.content = content
     videoPlayer.updateContent = true

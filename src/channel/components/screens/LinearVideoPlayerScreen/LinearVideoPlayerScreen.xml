@@ -81,8 +81,8 @@
 
       <field id="jumpToChannelItem" alias="VideoOverlay.jumpToChannelItem" />
 
-      <!-- indicates whether user opted out of tracking either through initial consent or settings screen. -->
-      <field id="didUserOptOutOfTracking" type="boolean" value="false" alias="PlayerAdsSSAITask.didUserOptOutOfTracking" />
+      <!-- Holds the consent opt out status for all individual preferences like marketing,analytics etc. -->
+      <field id="userConsentsOptOutStatus" type="assocarray" value="{}" alias="PlayerAdsSSAITask.userConsentsOptOutStatus" />
 
       <!-- indicates whether user opted out of Personalized Advertising either through initial consent or settings screen. -->
       <field id="didUserOptOutOfPersonalizedAdvertising" type="boolean" value="false" alias="PlayerAdsSSAITask.didUserOptOutOfPersonalizedAdvertising" />

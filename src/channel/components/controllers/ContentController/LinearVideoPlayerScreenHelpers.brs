@@ -68,7 +68,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         videoPlayer.visible = true
       end if
       
-      videoPlayer.didUserOptOutOfTracking = getConsentOptOutStatusByKey(m.constants.consentKeys.analytics)
+      videoPlayer.userConsentsOptOutStatus = getConsentsOptOutStatus()
       videoPlayer.didUserOptOutOfPersonalizedAdvertising = getConsentOptOutStatusByKey(m.constants.consentKeys.personalization)
 
       ' it's necessary to push the screen after the content has been set on the videoPlayer component,

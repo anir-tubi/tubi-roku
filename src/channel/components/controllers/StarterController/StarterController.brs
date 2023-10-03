@@ -131,6 +131,7 @@ Function onExternalConfigRequestSuccess(config)
     if config.country <> invalid AND config.country <> ""
       m.constants.deviceInfo.countryCode = UCase(config.country)
     end if
+    
     m.constants.externalConfig.info = config
   end if
 

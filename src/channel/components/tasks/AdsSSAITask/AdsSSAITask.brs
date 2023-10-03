@@ -23,7 +23,7 @@ Function execAdsSSAITask()
   m.requestQueue = requestQueueLib.create(m.ssaiPort)
 
   auth = TubiAuth(m.constants, m.request)
-  m.tracking = TubiTracking(m.constants, m.request, auth, m.top.didUserOptOutOfTracking)
+  m.tracking = TubiTracking(m.constants, m.request, auth, m.top.userConsentsOptOutStatus)
 
   m.adLib = TubiAds(m.constants, m.request, requestQueueLib, auth, m.tracking, "mp4")
   m.raf = m.adLib.roAdFramework
@@ -82,7 +82,7 @@ Function runSSAILoop(ssaiPort)
   m.top.observeField("id3Tags", ssaiPort)
   m.top.observeField("contentUpdated", ssaiPort)
   m.top.observeField("playbackStopped", ssaiPort)
-  m.top.observeFieldScoped("didUserOptOutOfTracking", ssaiPort)
+  m.top.observeFieldScoped("userConsentsOptOutStatus", ssaiPort)
   m.top.observeFieldScoped("didUserOptOutOfPersonalizedAdvertising", ssaiPort)
   m.top.observeField("exit", ssaiPort)
 
@@ -99,8 +99,8 @@ Function runSSAILoop(ssaiPort)
         onTags(msg)
       else if messageField = "videoIsFullscreen"
         m.videoIsFullscreen = msg.getData()
-      else if messageField = "didUserOptOutOfTracking"
-        m.tracking.didUserOptOutOfTracking = msg.getData()
+      else if messageField = "userConsentsOptOutStatus"
+        m.tracking.userConsentsOptOutStatus = msg.getData()
       else if messageField = "didUserOptOutOfPersonalizedAdvertising"
         m.raf.setLimitAdTracking(msg.getData())
       else if messageField = "playbackStopped"
