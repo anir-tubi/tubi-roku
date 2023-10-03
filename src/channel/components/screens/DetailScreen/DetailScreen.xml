@@ -258,7 +258,7 @@
       id="WatchTrailerMenuItem"
       iconUrl="pkg:/images/icon-trailer.webp"/>
     <DetailMenuItemContentNode
-      id="signUpMenuItem"/>
+      id="SignUpMenuItem"/>
     <!-- REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE -->
     <DetailMenuItemContentNode
       id="SeeAllGamesMenuItem"
