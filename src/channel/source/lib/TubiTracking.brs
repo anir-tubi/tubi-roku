@@ -518,13 +518,13 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       video_id: -1
       is_fullscreen: false
       video_player: "BANNER"
-      page_type: "" 'current screen
+      pageOneof: {} 'current screen
     }
 
     finish_preview: {
       video_id: -1
       end_position: -1 'ms
-      page_type: "" 'current screen
+      pageOneof: {} 'current screen
       has_completed: false
     }
 
@@ -533,7 +533,7 @@ Function tubiTracking_getAnalyticsEvent(eventType, eventValues = {})
       position: -1  'ms
       view_time: -1 'ms
       video_player: "BANNER"
-      page_type: "" 'current screen
+      pageOneof: {} 'current screen
     }
 
   }

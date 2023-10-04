@@ -256,5 +256,6 @@ End Function
 Function onMyStuffScreenContentFocused(msg)
   tubiLog("MyStuffScreenHelpers.onMyStuffScreenContentFocused")
   focusedContent = msg.getData()
-  setVideoPreviewAfterFocus(focusedContent, "for_you_page")
+  screen = msg.getRoSGNode()
+  setVideoPreviewAfterFocus(focusedContent, screen.trackingPageInfo)
 End Function

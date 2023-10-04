@@ -753,8 +753,8 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
         stopAndHideLinearVideoPlayer()
       end if
     end if
-
-    setVideoPreviewAfterFocus(focusedContent, "home_page")
+    
+    setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo)
 
     if bStopCountdownTimer = true
       stopCountdownTimer()

@@ -13,6 +13,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
 
   <interface>
 
@@ -25,8 +26,8 @@
       <field id="content" type="node"/>
       <field id="updateContent" type="boolean" alwaysNotify="true"/>
 
-      <!-- pageTypeForAnalytics is the pageType of VideoPreview's parent screen -->
-      <field id="pageTypeForAnalytics" type="string" value="" />
+      <!-- pageInfoForAnalytics is the pageInfo of VideoPreview's parent screen -->
+      <field id="pageInfoForAnalytics" type="assocarray" value="{}" />
 
       <!-- supports "play", "stop", "pause" -->
       <field id="control" type="string" value="none"/>

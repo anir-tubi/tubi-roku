@@ -49,16 +49,13 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
     ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     detailScreen.observeFieldScoped("seeAllGamesSelected", "onSeeAllGamesSelected")
+    ' Update tracking info - have to set the whole AA, can't update only a portion on the AA field
+    detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
 
     if isVideoPreviewOn() = true
       previewState = getVideoPreviewStateForThisContent(content)
       if previewState = "buffering" or previewState = "playing"
-        pageType = "video_page"
-        if content.type = m.constants.ui.contentTypes.series
-          pageType = "series_detail_page"
-        end if
-
-        setPageTypeForVideoPreview(pageType) ' this will help to trigger analytics
+        setPageInfoForVideoPreview(detailScreen.trackingPageInfo) ' this will help to trigger analytics
       else
         previewState = getVideoPreviewState()
         if previewState <> "stopped" AND previewState <> "finished" ' this means video not stopped/finished for previous content, so we need to stop it
@@ -80,9 +77,6 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
 
     ' m.isScreenLoaded will be changed to true once the metadata is populated
     m.isScreenLoaded = false
-
-    ' Update tracking info - have to set the whole AA, can't update only a portion on the AA field
-    detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
 
     detailScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
     m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", detailScreen, "isVideoPreviewOn")

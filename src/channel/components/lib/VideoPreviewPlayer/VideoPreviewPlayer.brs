@@ -3,6 +3,8 @@ Function init()
 
   m.constants = getConstantsFromGlobal()
 
+  m.tubiTrackingInfo = TubiTrackingInfo(m.constants)
+
   m.playerPosition = 0
   m.lastPingTime = 0
 
@@ -10,14 +12,14 @@ Function init()
 
   ' The analytics event needs to be tracked during transition between home screen & detail screen,
   ' so maintaining pageTypes for previous screen & current screen
-  m.previousPageType= "home_page"
-  m.currentPageType= "home_page"
+  m.previousPageInfo = { pagetype: "home_page" }
+  m.currentPageInfo = { pagetype: "home_page" }
 
   m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
 
-  m.top.observeField("pageTypeForAnalytics", "onPageTypeUpdatedForAnalytics")
+  m.top.observeField("pageInfoForAnalytics", "onPageInfoUpdatedForAnalytics")
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("control", "onControlChange")
   ' Creating a local variable to hold the video playback state so that we can avoid rare conditions where video node state
@@ -27,20 +29,20 @@ Function init()
 End Function
 
 
-Function onPageTypeUpdatedForAnalytics(msg)
+Function onPageInfoUpdatedForAnalytics(msg)
+  pageInfo = msg.GetData()
+  if pageInfo <> invalid
+    m.previousPageInfo = m.currentPageInfo
+    m.currentPageInfo = pageInfo
 
-  pageType = msg.GetData()
-  m.previousPageType = m.currentPageType
-  m.currentPageType = pageType
-
-  if m.previousPageType <> m.currentPageType
-    previewProgressEvent = getPreviewProgressEvent(m.previousPageType)
-    if previewProgressEvent <> invalid
-      trackEvent(previewProgressEvent)
-      m.lastPingTime = m.playerPosition
+    if m.previousPageInfo.pagetype <> m.currentPageInfo.pagetype
+      previewProgressEvent = getPreviewProgressEvent(m.previousPageInfo)
+      if previewProgressEvent <> invalid
+        trackEvent(previewProgressEvent)
+        m.lastPingTime = m.playerPosition
+      end if
     end if
   end if
-
 End Function
 
 
@@ -58,7 +60,7 @@ Function playContent()
         video_id: m.Video.content.id.toInt()
         is_fullscreen: false
         video_player: "BANNER"
-        page_type: m.currentPageType
+        pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
       }
     }
     trackEvent(startPreviewEvent)
@@ -76,7 +78,6 @@ End Function
 
 
 Function onControlChange()
-
   if m.video.content <> invalid
     if m.top.control = "play"
       playContent()
@@ -132,7 +133,7 @@ Function onVideoPositionChange(msg)
 
   ' Analytics
   if m.playerPosition >= m.lastPingTime + m.analyticsInterval
-    previewProgressEvent = getPreviewProgressEvent(m.currentPageType)
+    previewProgressEvent = getPreviewProgressEvent(m.currentPageInfo)
     if previewProgressEvent <> invalid
       trackEvent(previewProgressEvent)
       m.lastPingTime = m.playerPosition
@@ -199,8 +200,8 @@ Function trackEvent(event as object)
 End Function
 
 
-' @pageType: string, value can be home_page/video_page/series_detail_page
-Function getPreviewProgressEvent(pageType)
+' @pageInfo: assocarray, value can be { pagetype: "home_page", pagevalues: {}}
+Function getPreviewProgressEvent(pageInfo)
 
   previewProgressEvent = invalid
   if m.playerPosition > m.lastPingTime AND m.videoState = "play"
@@ -214,7 +215,7 @@ Function getPreviewProgressEvent(pageType)
         position: Int(m.playerPosition * 1000) 'ms
         view_time: viewTime
         video_player: "BANNER"
-        page_type: pageType
+        pageOneof: m.tubiTrackingInfo.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
       }
     }
 
@@ -233,7 +234,7 @@ Function getFinishPreviewEvent(hasCompleted = false)
     values: {
       video_id: m.Video.content.id.toInt()
       end_position: Int(m.playerPosition * 1000) 'ms
-      page_type: m.currentPageType
+      pageOneof: m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
       has_completed: hasCompleted
     }
   }

@@ -146,15 +146,15 @@ End Function
 
 ' starts the video preview
 ' @content : TubiContentNode, it has all the required information to start the video preview
-' @pageType : string, the type(video_page, series_detail_page, for_you_page, home_page) of page which is used in analytics event
-Function startVideoPreview(content, pageType = "home_page")
+' @pageInfo: assocarray, value can be { pagetype: "home_page", pagevalues: {}}
+Function startVideoPreview(content, pageInfo = {})
   tubiLog("VideoPreviewHelpers.startVideoPreview")
   if content <> invalid AND isVideoPreviewOn() = true
     videoPreview = m.videoPreviewPlayer
     ' unobserve field just in case previous state was errorsstart observing a fresh status.
     videoPreview.unobserveFieldScoped("state")
     videoPreview.observeFieldScoped("state", "onVideoPreviewStateChanged")
-    videoPreview.pageTypeForAnalytics = pageType
+    setPageInfoForVideoPreview(pageInfo)
 
     videoContent = createObject("RoSGNode", "ContentNode")
     videoContent.url = content.videoPreviewUrl
@@ -179,13 +179,13 @@ Function resumeVideoPreview()
 End Function
 
 
-' setPageTypeForVideoPreview sets the pageType in video preview screen for analytics
-' @pageType : string, the type(video_page, series_detail_page, home_page) of page which is used in analytics event
-Function setPageTypeForVideoPreview(pageType)
+' setPageInfoForVideoPreview sets the pageType in video preview screen for analytics
+' @pageInfo: assocarray, value can be { pagetype: "home_page", pagevalues: {}}
+Function setPageInfoForVideoPreview(pageInfo = {})
   tubiLog("VideoPreviewHelpers.setPageTypeForVideoPreview")
   videoPreview = m.videoPreviewPlayer
   if videoPreview <> invalid
-    videoPreview.pageTypeForAnalytics = pageType
+    videoPreview.pageInfoForAnalytics = pageInfo
   end if
 
 End Function
@@ -193,15 +193,15 @@ End Function
 
 ' setVideoPreviewAfterFocus sets the proper state of the video preview video player when a video content has gained focus
 ' @param focusedContent, roSGNode - The TubiContentNode of the focused content
-' @pageType : string, the type of page which is used in analytics event: i.e. (video_page, series_detail_page, for_you_page, home_page)
-Function setVideoPreviewAfterFocus(focusedContent, pageType)
+' @pageInfo: assocarray, value can be { pagetype: "home_page", pagevalues: {}}
+Function setVideoPreviewAfterFocus(focusedContent, pageInfo = {})
   if focusedContent <> invalid AND focusedContent.type <> invalid AND m.SideNav.opened <> true
     if isVideoPreviewOn() = true
       previewState = getVideoPreviewStateForThisContent(focusedContent)
       if previewState = "buffering" OR previewState = "playing"
         videoPreview = m.videoPreviewPlayer
-        if videoPreview <> invalid AND pageType <> invalid
-          setPageTypeForVideoPreview(pageType)
+        if videoPreview <> invalid
+          setPageInfoForVideoPreview(pageInfo)
           if previewState = "buffering"
             resumeVideoPreview()
           end if
@@ -219,7 +219,7 @@ Function setVideoPreviewAfterFocus(focusedContent, pageType)
         end if
 
         if focusedContent.videoPreviewUrl <> ""
-          startVideoPreview(focusedContent, pageType)
+          startVideoPreview(focusedContent, pageInfo)
         end if
 
       end if
