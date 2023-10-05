@@ -8,7 +8,7 @@ WORKDIR /home/runner
 ARG RUNNER_VERSION="2.307.1"
 ARG RUNNER_ARCH
 
-RUN apt update -y && apt install curl unzip -y
+RUN apt update -y && apt upgrade -y && apt install curl unzip -y
 
 RUN curl -f -L -o runner.tar.gz https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-${RUNNER_ARCH}-${RUNNER_VERSION}.tar.gz \
     && tar xzf ./runner.tar.gz \

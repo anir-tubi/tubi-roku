@@ -66,7 +66,7 @@ async function setupAutomatedTestsGithubActionRunner(done) {
   const {configLine} = await prompts({
     type: 'text',
     name: 'configLine',
-    message: 'It does not look like you have setup this action-runner before. Please go to:\nhttps://github.com/adRise/project-total-recall/settings/actions/runners/new.\nYou will see a line like:\n"./config.sh --url https://github.com/adRise/project-total-recall --token XXXXXXXXXXX"\nCopy and paste it here.'
+    message: 'To get your runner setup please go to:\nhttps://github.com/adRise/project-total-recall/settings/actions/runners/new.\nYou will see a line like:\n"./config.sh --url https://github.com/adRise/project-total-recall --token XXXXXXXXXXX"\nCopy and paste it here. If you do not have access to this page, please ask a developer such as Brian Leighty to provide the required token for you to paste here.'
   });
 
   const configMatch = configLine?.match(/--url (\S*) --token (\S*)/);
@@ -90,7 +90,7 @@ async function setupAutomatedTestsGithubActionRunner(done) {
   const command = `podman build --build-arg url=${url} --build-arg token=${token} --build-arg "name=${runnerName}" --tag ${runnerImageName} --build-arg RUNNER_ARCH=${runnerArch} ${basePath}`;
   await spawnShellCommand(done, command);
 
-  log('Runner setup successfully. To start it run:\ngulp startAutomatedTestsGithubActionRunner');
+  log('Runner setup successfully. To start it run:\ngulp startAutomatedTestsRunner');
 }
 
 
