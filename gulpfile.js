@@ -779,20 +779,43 @@ async function preprocessTests() {
 function pushStaging(done) {
   const buildTag = getBuildTag('revision');
   const minorBuildTag = getBuildTag('minor');
+ //TODO: once the experiment roku_new_cdn_v1 concludes remove adrise-bryan-playground
   const localRemoteComponentsPath = `build/tubi_remote_components_${buildTag}.pkg`;
   const s3RemoteComponentsPath = `s3://adrise-bryan-playground/roku-staging/components/tubi_remote_components_${buildTag}.pkg`;
-  const localStarterComponentsPath = `build/tubi_starter_components_${minorBuildTag}.pkg`;
-  const s3starterComponentsPath = `s3://adrise-bryan-playground/roku-staging/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
+  const rcdnS3RemoteComponentsPath = `s3://tubi-rokucdn-source-staging/roku-staging/components/tubi_remote_components_${buildTag}.pkg`
+
+  const localStarterComponentsPath  = `build/tubi_starter_components_${minorBuildTag}.pkg`;
+  const s3starterComponentsPath     = `s3://adrise-bryan-playground/roku-staging/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
+  const rcdnS3starterComponentsPath = `s3://tubi-rokucdn-source-staging/roku-staging/starter-components/tubi_starter_components_${minorBuildTag}.pkg`
+  // distribution ID of roku staging CDN pointing to s3 bucket tubi-rokucdn-source-staging
+  const stagingCdnDistributionID = `E1TFU8FZM49RLM`
+
+  // aws region where staging s3 bucket is hosted.
+  const awsRegion = `us-east-2`
 
   let pushResult = shell.exec(`aws s3 cp ${localRemoteComponentsPath} ${s3RemoteComponentsPath}`);
+
   if (!pushResult.stderr) {
     pushResult = shell.exec(`aws s3 cp ${localStarterComponentsPath} ${s3starterComponentsPath}`);
   }
 
   if (!pushResult.stderr) {
+    pushResult = shell.exec(`aws s3 cp ${localRemoteComponentsPath} ${rcdnS3RemoteComponentsPath} --profile $AWS_PROFILE --region ${awsRegion}`);
+  }
+
+  if (!pushResult.stderr) {
+    pushResult = shell.exec(`aws s3 cp ${localStarterComponentsPath} ${rcdnS3starterComponentsPath} --profile $AWS_PROFILE --region ${awsRegion}`);
+  }
+
+   // invalidate the cloudfront so that new starter component can get replaced.
+  if (!pushResult.stderr) {
+    pushResult = shell.exec(`aws cloudfront create-invalidation --distribution-id ${stagingCdnDistributionID} --paths "/*" --profile $AWS_PROFILE --region ${awsRegion}`);
+  }
+
+  if (!pushResult.stderr) {
     done();
   } else {
-    done(new NoStackError(`AWS S3 error: Hint - check valet auth.`));
+    done(new NoStackError(`AWS S3 error: Hint - check valet auth. And also make sure AWS_PROFILE env variable set to main-roku-dev`));
   }
 }
 
