@@ -367,7 +367,7 @@ Remote releases are releases that are not sent to Roku, and updates are made whe
 
 1\. Set up the environment variables (listed in the [build step](#build)) if not done already, as some of the following steps are dependent on these variables.
 
-2\. Checkout the most recent `x_y_branch` branch. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number.
+2\. Checkout the most recent `x_y_branch` branch. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number. Check the build.yml file to know which the new build number should be. Usually, the patch number should be one more than the "build_version" listed in the build.yml file.
 
 3\. Run `$ gulp compareProd`. This will do the following:
 
@@ -376,6 +376,8 @@ Remote releases are releases that are not sent to Roku, and updates are made whe
   - Compare the last 200 commits on local `master` with the last 200 commits on the local `x_y_branch`, and print out a list of commits that exist on local `master` but have not yet been cherry picked to the local `x_y_branch`.
 
 __NOTE__ you can also use the new `gulp compareCheckedOut` after the initial qa branch for a release has been made to see a list of PRs that have not been cherry picked into the current qa branch.
+
+__NOTE__ The compareProd command will list commits in reverse order - the last commit will be listed first. When cherry picking the commits to the new QA build, you will need to start from the bottom of the list - which are earlier commits.
 
 4\. Cherry pick any commits from local `master` that are to be included in the next release onto the qa branch `qa_x_y_z`.
 (See [this page](https://www.previousnext.com.au/blog/intro-cherry-picking-git) for more info info on the cherry pick git command.)
