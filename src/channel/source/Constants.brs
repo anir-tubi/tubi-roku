@@ -254,6 +254,7 @@ Function getConstants()
     constants.reqNames.getUpNextContent = "getUpNextContent"
     constants.reqNames.getRelatedContent = "getRelatedContent"
     constants.reqNames.getThumbnails = "getThumbnails"
+    constants.reqNames.getChannel = "getChannel"
     constants.reqNames.getLiveManifest = "getLiveManifest"
     constants.reqNames.emailExists = "emailExists"
     constants.reqNames.signUp = "signUp"
@@ -307,6 +308,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getUpNextContent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getRelatedContent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getThumbnails] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getChannel] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getLiveManifest] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.emailExists] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postUserHistory] = true
@@ -401,6 +403,7 @@ Function getConstants()
     constants.instantResumeActions.closeDialog = "closeDialog"
     constants.instantResumeActions.startChannel = "startChannel"
     constants.instantResumeActions.restartApp = "restartApp"
+    constants.instantResumeActions.resumeChannel = "resumeChannel"
 
   'Types of modal dialogs
   constants.modalDialogTypes = {}
@@ -692,6 +695,7 @@ Function getConstants()
     constants.uapiContentTypes.episode = "episode"
     constants.uapiContentTypes.channel = "channel"
     constants.uapiContentTypes.sportsEvent = "sports_event"
+    constants.uapiContentTypes.container = "container"
 
   constants.serverValues = {}
     constants.serverValues.tensorVideoRenditions = {}
@@ -768,6 +772,11 @@ Function getConstants()
     constants.player.playerResults = {}
       constants.player.playerResults.completed = "COMPLETED"
       constants.player.playerResults.closed = "CLOSED"
+      constants.player.playerResults.failed = "FAILED"
+      'used internal to the player, should never be returned
+      constants.player.playerResults.commercial = "STOPFORCOMMERCIAL"
+      constants.player.playerResults.ignore = "IGNORE"
+      constants.player.playerResults.resumePlay = "RESUMEPLAY"
 
     'urls for the images that are required for the transport
     constants.player.transportButtons = {}
@@ -1061,6 +1070,8 @@ Function getConstants()
       constants.ui.contentTypes.emptyContainer = "emptyContainer"
       constants.ui.contentTypes.epg = "epg"
       constants.ui.contentTypes.viewMore = "viewMore"
+      constants.ui.contentTypes.episode = "episode"
+      constants.ui.contentTypes.live = "live"
       '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
       constants.ui.contentTypes.sportsEvent = "sports_event"
       constants.ui.contentTypes.navigate = "navigate"
@@ -1220,6 +1231,8 @@ Function getConstants()
       constants.ui.sideNavOpenIds[constants.ui.screenIds.categoryListScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.espanolScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.epgScreen] = true
+      constants.ui.sideNavOpenIds[constants.ui.screenIds.tvScreen] = true
+      constants.ui.sideNavOpenIds[constants.ui.screenIds.movieScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.myStuffScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.searchScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.tournamentScreen] = true
@@ -1264,6 +1277,8 @@ Function getConstants()
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.categoryListScreen] = constants.ui.sideNavIds.categories
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.espanolScreen] = constants.ui.sideNavIds.espanol
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.myStuffScreen] = constants.ui.sideNavIds.myList
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.tvScreen] = constants.ui.sideNavIds.tv
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.movieScreen] = constants.ui.sideNavIds.movies
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.settingsScreen] = constants.ui.sideNavIds.settings
 
     'a map of screenIds to corresponding topNavIds
