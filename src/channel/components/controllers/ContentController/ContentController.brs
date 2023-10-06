@@ -2382,3 +2382,10 @@ Function stopBrazeTask()
     m.braze = invalid
   end if
 End Function
+
+
+' Delete all items from roku continue watching row.
+Function clearRokuContinueWatching()
+  requestInfo = m.rokuContinueWatchingApi.createClearContinueWatchingReqInfo()
+  m.top.rokuContinueWatchingRequestInfo = requestInfo
+End Function

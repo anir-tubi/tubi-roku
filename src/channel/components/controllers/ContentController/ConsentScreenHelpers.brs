@@ -122,6 +122,14 @@ Function setConsent(body, onSetConsentCompletionCallback = invalid)
       stopBrazeTask()
     end if
   end if
+
+  ' Checking if the continueWatching consent preference was changed.
+  continueWatchingConsentKey = m.constants.consentKeys.continueWatching
+  if isNonEmptyString(body[continueWatchingConsentKey]) = true
+    if getConsentOptOutStatusByKey(continueWatchingConsentKey) = true
+      clearRokuContinueWatching()
+    end if
+  end if
 End Function
 
 

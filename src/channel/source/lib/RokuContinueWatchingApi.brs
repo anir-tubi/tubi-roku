@@ -15,6 +15,7 @@ Function RokuContinueWatchingApi(constants)
     ' public
     createUpdateContinueWatchingReqInfo: rokuContinueWatchingApi_createUpdateContinueWatchingReqInfo
     createDeleteContinueWatchingReqInfo: rokuContinueWatchingApi_createDeleteContinueWatchingReqInfo
+    createClearContinueWatchingReqInfo: rokuContinueWatchingApi_createClearContinueWatchingReqInfo
   }
 End Function
 
@@ -43,5 +44,19 @@ Function rokuContinueWatchingApi_createDeleteContinueWatchingReqInfo(body)
   return {
     url: m.constants.urls.rokuContinueWatchingEndpoint
     options: options
+  }
+End Function
+
+
+Function rokuContinueWatchingApi_createClearContinueWatchingReqInfo()
+  options = {
+    method: m.constants.reqTypes.put
+    body: FormatJson({"items": []})
+    headers: m.rokuReservedHeaders
+  }
+  return {
+    url: m.constants.urls.rokuContinueWatchingEndpoint
+    options: options
+    requestType: m.constants.reqNames.clearRokuContinueWatching
   }
 End Function
