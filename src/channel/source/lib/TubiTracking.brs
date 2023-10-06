@@ -1177,17 +1177,5 @@ End Function
 ' Returns consent analytics value based on the consent key returned from backend.
 ' @consetKey: string, contains the consent key returned from backend.
 Function tubiTracking_getConsentAnalyticValue(consentKey)
-  mapping = {
-    essential: "ESSENTIAL"
-    functional: "FUNCTIONAL"
-    marketing: "MARKETING"
-    personalized_advertising: "PERSONALIZED_ADVERTISING"
-    data_sharing: "DATA_SHARING"
-  }
-  
-  if mapping.doesExist(consentKey) = true
-    return mapping[consentKey]
-  else
-    return consentKey
-  end if
+  return UCase(consentKey)
 End Function
