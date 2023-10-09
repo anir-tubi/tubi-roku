@@ -1,6 +1,6 @@
 # Tubi Roku Channel
 
-[![Build Status](https://travis-ci.com/adRise/project-total-recall.svg?token=qNG1ev4HcXszAoNpcy3a&branch=master)](https://travis-ci.com/adRise/project-total-recall)
+[![Build Status](https://github.com/adRise/project-total-recall/tree/master)](https://github.com/adRise/project-total-recall/actions/workflows/executeUnitTests.yml)
 
 ## Production Channel
 
