@@ -515,11 +515,6 @@ Function playContent()
         getExperimentResource("roku_hevc_non4k", "roku_hevc_non4k_v1", true)
       end if
 
-      if m.Video.content.isNonDrmContent = true
-        ' fire exposure event for video playback if manifest had only dash or hlsv3 content for treatment & control
-        getExperimentResource("roku_dash_hlsv6", "roku_dash_hlsv6_v1", true)
-      end if
-
       m.Video.control = "play"
 
       ' Calling the set initial audio track in the start of video playback.
@@ -1045,11 +1040,6 @@ Function onAdStateChange(msg)
       if m.Video.content.has4kHevcStream = true
         ' fire exposure event for video playback if manifest had HEVC/4k content for treatment & control
         getExperimentResource("roku_hevc_drm_4k", "roku_hevc_drm_4k_v1", true)
-      end if
-
-      if m.Video.content.isNonDrmContent = true
-        ' fire exposure event for video playback if manifest had only dash or hlsv3 content for treatment & control
-        getExperimentResource("roku_dash_hlsv6", "roku_dash_hlsv6_v1", true)
       end if
 
       m.Video.control = "play"

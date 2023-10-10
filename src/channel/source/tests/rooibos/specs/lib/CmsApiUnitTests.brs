@@ -1,3 +1,4 @@
+
 '@TestSuite [CmsApi] CmsApi.brs
 
 '@Setup
@@ -34,7 +35,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
   kidsRelatedReqOptions = {
     params: {
       "isKidsMode": true,
-      "video_resources": m.cmsApi.constants.player.drmOrder
+      "video_resources": m.cmsApi.constants.player.drmOrderHlsv6
       "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
       "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
@@ -59,7 +60,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
   relatedReqOptions = {
     params: {
       "isKidsMode": false,
-      "video_resources": m.cmsApi.constants.player.drmOrder
+      "video_resources": m.cmsApi.constants.player.drmOrderHlsv6
       "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
       "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
@@ -103,7 +104,7 @@ Function cmsApi_createUpNextContentReqInfo_test()
       "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
-      "video_resources": m.cmsApi.constants.player.drmOrder
+      "video_resources": m.cmsApi.constants.player.drmOrderHlsv6
       "custom_param": 42
       "content_id": "123456"
     }
@@ -157,7 +158,7 @@ Function cmsApi_createSingleContentReqInfo_test()
       "content_id": "123456"
       "isKidsMode": false
       "includeChannels": true
-      "video_resources": m.cmsApi.constants.player.drmOrder
+      "video_resources": m.cmsApi.constants.player.drmOrderHlsv6
       "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_landscape"
     }
   }
