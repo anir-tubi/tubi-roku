@@ -88,7 +88,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_tensor_cdn_domain: {
-        roku_tensor_cdn_domain_v1: {"enabled": false}
+        roku_tensor_cdn_domain_v2: {"enabled": false}
       }
 
       roku_new_cdn: {

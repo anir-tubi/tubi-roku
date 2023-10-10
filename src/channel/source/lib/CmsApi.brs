@@ -161,7 +161,7 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   headers = options.headers
   headers["Accept-Version"] = "6.0.0"
 
-  if getExperimentResource("roku_tensor_cdn_domain", "roku_tensor_cdn_domain_v1").enabled = true 'bs:disable-line 1001 LINT1001
+  if getExperimentResource("roku_tensor_cdn_domain", "roku_tensor_cdn_domain_v2").enabled = true 'bs:disable-line 1001 LINT1001
     url = m.constants.urls.tensor.cdn.homescreen
   else
     url = m.constants.urls.tensor.homescreen
@@ -228,7 +228,7 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   options = m.getCommonOptions()
   params = options.params
 
-  if getExperimentResource("roku_tensor_cdn_domain", "roku_tensor_cdn_domain_v1").enabled = true 'bs:disable-line 1001 LINT1001
+  if getExperimentResource("roku_tensor_cdn_domain", "roku_tensor_cdn_domain_v2").enabled = true 'bs:disable-line 1001 LINT1001
     url = m.constants.urls.tensor.cdn.container + "/" + categoryId
   else
     url = m.constants.urls.tensor.container + "/" + categoryId
@@ -468,8 +468,8 @@ Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSi
 
           '// Request both portrait and hero (lanscape) image types.
           '//   For the landscape image, request the hero type instead of the regular landscape type, because
-          '//   the regular landscape image most likely has the title embedded in the image, and the hero most likely does not. 
-          '//   The video titles within the Continue watching container have titles overlaid on top of the thumbnail, so using 
+          '//   the regular landscape image most likely has the title embedded in the image, and the hero most likely does not.
+          '//   The video titles within the Continue watching container have titles overlaid on top of the thumbnail, so using
           '//   a thumbnail w/o a tile would look better in this case.
           imageParamTypes = [
             "poster"

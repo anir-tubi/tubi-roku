@@ -42,7 +42,7 @@ End Function
 '
 Function tensorApi_getEPGChannelIdsReqInfo(mode = "")
 
-  if getExperimentResource("roku_tensor_cdn_domain", "roku_tensor_cdn_domain_v1").enabled = true 'bs:disable-line 1001 LINT1001
+  if getExperimentResource("roku_tensor_cdn_domain", "roku_tensor_cdn_domain_v2").enabled = true 'bs:disable-line 1001 LINT1001
     url = m.constants.urls.tensor.cdn.epgChannelIds
   else
     url = m.constants.urls.tensor.epgChannelIds
@@ -86,7 +86,7 @@ End Function
 'tournamentPage content request
 Function tensorApi_getTournamentReqInfo()
 
-  if getExperimentResource("roku_tensor_cdn_domain", "roku_tensor_cdn_domain_v1").enabled = true 'bs:disable-line 1001 LINT1001
+  if getExperimentResource("roku_tensor_cdn_domain", "roku_tensor_cdn_domain_v2").enabled = true 'bs:disable-line 1001 LINT1001
     url = m.constants.urls.tensor.cdn.tournamentscreen
   else
     url = m.constants.urls.tensor.tournamentscreen
