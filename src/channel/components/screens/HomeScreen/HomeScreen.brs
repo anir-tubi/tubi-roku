@@ -378,7 +378,7 @@ Function isCurrentRowHasViewMore(currentFocusRow)
     if (m.uiMode = m.constants.ui.modes.standard OR m.uiMode = m.constants.ui.modes.latino) AND row.gridItemType <> m.constants.ui.gridItemTypes.linear AND row.type <> m.constants.ui.categoryTypes.channel
       if getExperimentResource("roku_see_all_container", "roku_view_more_one_hundred_v1", false).enabled  = true AND rowCount >= 104
         result = true
-      else getExperimentResource("roku_see_all_container", "roku_view_more_last_v1", false).enabled = true AND rowCount >= 200
+      else if getExperimentResource("roku_see_all_container", "roku_view_more_last_v1", false).enabled = true AND rowCount >= 200
         result = true
       end if
     end if
