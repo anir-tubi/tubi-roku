@@ -447,7 +447,7 @@ Function onIsHistory()
   tubiLog("DetailScreen.onIsHistory")
   'if removing from history, remove the resume button
   resumeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.ResumeMenuItem.id)
-  
+
   bHasHistory = m.top.isHistory
   if bHasHistory = false
     addRemoveMenuItem(bHasHistory, resumeIndex)
@@ -659,7 +659,10 @@ Function setInitialMenuItems() As Void
   menuItems.appendChild(m.PlayMenuItem)
 
   if isLoggedInUser() = false AND isNewUser() = false
-    menuItems.appendChild(m.signUpMenuItem)
+    ' do not append the signup menu if content is locked for guest user because this feature is already combined to make 'play' item as 'Signin to Play'
+    if m.top.content <> invalid AND m.top.content.needsLogin <> true
+      menuItems.appendChild(m.signUpMenuItem)
+    end if
   end if
 
   if m.top.selectedContentType <> m.constants.ui.contentTypes.sportsEvent

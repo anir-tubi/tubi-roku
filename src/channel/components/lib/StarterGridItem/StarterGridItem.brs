@@ -5,7 +5,7 @@ Function init()
     m.poster.loadingBitmapUri="pkg:/images/placeholder.webp"
     m.poster.failedBitmapUri="pkg:/images/placeholder.webp"
   end if
-  
+
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
 
   ' List of fields that will only be observed if we have a child grid item component with that field
@@ -36,6 +36,8 @@ Function onItemContentChange(msg)
     if row <> invalid AND row.gridItemType = "landscapeNoTitle" OR row.gridItemType = "landscape" then
       childGridItemComponent = "CategoryGridPoster"
     end if
+  else if itemContent.needsLogin = true AND isLoggedInUser() = false
+    childGridItemComponent = "CategoryGridPoster"
   else
     row = itemContent.getParent()
     if row.id = "continue_watching" then

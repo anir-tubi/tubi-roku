@@ -849,6 +849,11 @@ Function populateInfoPanel(mode, contentNode)
     end if
 
     if mode = m.constants.ui.infoPanelModes.item
+
+      if Ucase(contentNode.rating) = "R"
+        getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1")
+      end if
+
       populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel)
     else if mode = m.constants.ui.infoPanelModes.linearHomeScreen
       m.InfoPanel.mode = mode

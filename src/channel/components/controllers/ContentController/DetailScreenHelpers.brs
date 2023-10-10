@@ -192,7 +192,7 @@ Function setDetailStrings(screen, content)
     screen.stringPlayButton = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
   else '// KEEP BELOW CODE ONCE FIFA WORLD CUP IS DONE
     screen.stringSignUpButton = getTranslation("registration_signup_button") + ";" + getTranslation("registration_signup_button_free")
-    
+
     history = getHistory(content.id)
     isHistory = (history <> invalid)
     setIsHistory(screen, isHistory)
@@ -372,6 +372,10 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
 
     lineOneData.length = stateSource.length
     lineOneData.rating = stateSource.rating
+
+    if Ucase(stateSource.rating) = "R"
+      getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1")
+    end if
     lineOneData.releaseDate = content.releaseDate
     lineOneData.descriptorCode = content.descriptorCode
     lineOneData.partnerLogoUri = content.inlineLogoUri
@@ -1185,7 +1189,10 @@ Function setIsHistory(detailScreen, isHistory)
   'reset the value in the case that remove from history button was pressed and title is currently "Removing..."
   detailScreen.stringNoHistoryButton = getTranslation("screenDetails_button_noHistory")
 
-  if isHistory = true
+
+  if detailScreen.content <> invalid AND detailScreen.content.needsLogin = true AND isLoggedInUser() = false
+    detailScreen.stringPlayButton = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
+  else if isHistory = true
     detailScreen.stringPlayButton = getTranslation("screenDetails_button_startOver")
   else
     detailScreen.stringPlayButton = getTranslation("screenDetails_button_play")

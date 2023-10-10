@@ -216,7 +216,7 @@ Function onLeftHeaderImageUriChange(msg)
 
     getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true)
     m.leftHeaderImage.uri = sPosterURL
-    
+
   else if leftHeaderIsPresent = true
     m.infoPanelGroup.removeChild(m.leftHeaderImage)
   end if
@@ -250,6 +250,7 @@ Function onNeedsLoginChange(msg)
   modesWithTimerAtBottom = {}
   modesWithTimerAtBottom[m.constants.ui.infoPanelModes.linearTournament] = true
   modesWithTimerAtBottom[m.constants.ui.infoPanelModes.linearHomeScreen] = true
+
 
 
   if needsLogin = false AND signInGroupIsPresent = true

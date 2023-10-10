@@ -104,7 +104,7 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
       sThumbnailURL = contentFromServer.landscape_images[0]
     end if
   end if
- 
+
   '//Ensure thumbnails have rounded corners - will only work with Tupian URLs
   sThumbnailURL = m.getRoundedCornersURL(sThumbnailURL)
 
@@ -151,10 +151,10 @@ Function tubiMetadataTranslate_getRoundedCornersURL(sPosterURL)
     sPosterURL = replaceURLParameter(sPosterURL, "border_radius", "default", true)
     '//::TODO::roku_rounded_corners_v1 - linear thumbnails with a border_radius=8 are cached in the CDN with square corners.
     '// So we are setting the border_radius param to "normal" (which is the same thing as "8") to ensure we display rounded corners and not worry about the cached version of the border_radius=9 URL
-    '//   When linear thumnails come from Tupian (sometime in October 2023), then we can set the border radius back to "8" instead of "default", and then we should see the rounded corners. 
+    '//   When linear thumnails come from Tupian (sometime in October 2023), then we can set the border radius back to "8" instead of "default", and then we should see the rounded corners.
     ' sPosterURL = replaceURLParameter(sPosterURL, "border_radius", "8", true)
   end if
-  
+
   return sPosterURL
 End Function
 
@@ -421,6 +421,11 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
 
   if contentFromServer.ratings <> invalid AND contentFromServer.ratings[0] <> invalid AND contentFromServer.ratings[0].value <> invalid
     translatedContent.rating = contentFromServer.ratings[0].value
+
+    if UCase(translatedContent.rating)  = "R" AND isSignedInUser = false AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1").enabled = true
+      translatedContent.needsLogin = true
+    end if
+
     if contentFromServer.ratings[0].descriptors <> invalid AND contentFromServer.ratings[0].descriptors.Count() > 0
       m.setDescriptorCodeAndDescription(translatedContent, contentFromServer.ratings[0].descriptors)
     end if
@@ -1320,6 +1325,12 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           if fullChild.showAllText <> invalid
             childAA.append({showAllText: fullChild.showAllText})
+          end if
+          '//TODO: REMOVE AFTER EXPERIMENT roku_registration_vs_tvt_lock_rated_content
+          if fullChild.ratings <> invalid AND fullChild.ratings[0] <> invalid AND fullChild.ratings[0].value <> invalid
+            if UCase(fullChild.ratings[0].value) = "R" AND isSignedInUser = false AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1").enabled = true
+              childAA.needsLogin = true
+            end if
           end if
 
           if fullChild.needs_login = true AND isSignedInUser = false

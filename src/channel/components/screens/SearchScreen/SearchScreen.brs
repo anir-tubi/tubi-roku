@@ -159,7 +159,7 @@ Function setTextForVoiceHint()
   m.voiceHint.width = 400
   m.voiceHintfont.size = 21
   m.voiceHint.font = m.voiceHintfont
-  
+
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.voiceHint, typographyConstants.ids.bodySmall)
 End Function
@@ -418,6 +418,10 @@ Function onItemFocused()
       lineTwoData = {
         genres: focusedContent.genres
       }
+
+      if Ucase(focusedContent.rating) = "R"
+        getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1")
+      end if
 
       m.searchScreenInfoPanel.needsLogin = (focusedContent.needsLogin AND m.top.signedIn <> true)
     end if

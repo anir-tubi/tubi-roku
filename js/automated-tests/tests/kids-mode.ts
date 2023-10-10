@@ -169,13 +169,13 @@ describe('Kids Mode', function () {
     await openKidsMode();
     await ecp.sendKeyPress(ecp.Key.Right);
 
-    // Check Ratings label 
+    // Check Ratings label
     const homeScreenRatingsLabel = await testUtils.getNodeForElement('homeScreenRatingsLabel');
     const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('homeScreenRowList');
 
 
     for (const itemContent of rowItemsContent) {
-      const rating = itemContent.ratings[0].code;
+      const rating = itemContent.ratings[0].value;
       expect(rating).to.not.equal('R');
       expect(rating).to.not.equal('MA');
       expect(rating).to.not.equal('PG-13');
@@ -292,7 +292,7 @@ describe('Kids Mode', function () {
   });
 
   it('C66347 - Kids Mode does not persist - Registered user, @kidsmode_registered', async () => {
-    
+
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await openKidsMode();
@@ -309,7 +309,7 @@ describe('Kids Mode', function () {
     await ecp.sendKeyPress(ecp.Key.Ok);
 
 
-    // Relaunch app 
+    // Relaunch app
     await testUtils.restartApplication();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 

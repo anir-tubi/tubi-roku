@@ -437,7 +437,7 @@ describe('Parental Controls', function () {
       // Is the left Nav open?
       const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
       await testUtils.elementHasFocus('leftNavHomeButton');
-      
+
 
       // Select Search
       await ecp.sendKeyPress(ecp.Key.Up);
@@ -461,7 +461,7 @@ describe('Parental Controls', function () {
       // Create a user with mix of little kids and non-little kid rated titles with history
       const user = await testUtils.createRegisteredUser();
       await createHistory(user);
-     
+
       // Start app, wait for home screen to load
       await testUtils.startApplicationAtPage('home', { user: user });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -488,12 +488,12 @@ describe('Parental Controls', function () {
 
       // Jump to CW row
       await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
-      
-   
-    // To Do : revisit once back end issue is addressed. 
+
+
+    // To Do : revisit once back end issue is addressed.
       const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('homeScreenRowList');
 
-    // Add this for loop for all checks on Ratings. 
+    // Add this for loop for all checks on Ratings.
     // IMPROVEMENT - Make sure we have All of the ratings in each check as listed in this for loop
       for (const itemContent of rowItemsContent) {
         expect(['PG','R','NR','PG-13', 'TV-14', 'TV-MA', 'MA'].includes(itemContent.type)).to.be.false;
@@ -528,15 +528,15 @@ describe('Parental Controls', function () {
       // Jump to CW row
       await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
       const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('homeScreenRowList');
-   
+
      // Check Ratings label  - Improvement use array to check.
-    
+
      for (const itemContent of rowItemsContent) {
-       const rating = itemContent.ratings[0].code;
-       expect((rating).includes('R') || (rating).includes('PG') || (rating).includes('PG-13') || (rating).includes('TV-G')|| (rating).includes('TV-MA')); 
-    
+       const rating = itemContent.ratings[0].value;
+       expect((rating).includes('R') || (rating).includes('PG') || (rating).includes('PG-13') || (rating).includes('TV-G')|| (rating).includes('TV-MA'));
+
      }
-   
+
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/21232
@@ -545,7 +545,7 @@ describe('Parental Controls', function () {
       // Create a user with mix of Older and non-little kid rated titles with history
       const user = await testUtils.createRegisteredUser();
       await createHistory(user);
-     
+
 
       await testUtils.startApplicationAtPage('home', { user: user });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -575,8 +575,8 @@ describe('Parental Controls', function () {
 
       // Check ratings
       expect('homeScreenRatingsLabel').does.not.contain(['R','MA','TV-MA', 'PG-13']);
-      
-     
+
+
       const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('homeScreenRowList');
       for (const itemContent of rowItemsContent) {
         expect(['R','MA','TV-MA', 'PG-13'].includes(itemContent.type)).to.be.false;
@@ -590,8 +590,8 @@ describe('Parental Controls', function () {
       // Create a user with mix of little kids and non-little kid rated titles with history
       const user = await testUtils.createRegisteredUser();
       await createWatchList(user);
-    
-      
+
+
       await testUtils.startApplicationAtPage('home', { user: user });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
@@ -621,8 +621,8 @@ describe('Parental Controls', function () {
 
     // Check ratings
       expect('homeScreenRatingsLabel').does.not.contain(['R','PG', 'PG-13', 'MA','TV-MA']);
-    
-  
+
+
       const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('homeScreenRowList');
       for (const itemContent of rowItemsContent) {
         expect(['R','PG', 'PG-13', 'MA','TV-MA'].includes(itemContent.type)).to.be.false;
@@ -637,7 +637,7 @@ describe('Parental Controls', function () {
     // Create a user with mix of Older and non-little kid rated titles with history
     const user = await testUtils.createRegisteredUser();
     await createWatchList(user);
-   
+
     // Launch app
 
     await testUtils.startApplicationAtPage('home', { user: user });
@@ -667,7 +667,7 @@ describe('Parental Controls', function () {
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'My List');
 
     // Check ratings
-    
+
     const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('homeScreenRowList');
     for (const itemContent of rowItemsContent) {
       expect(['R','MA','TV-MA', 'PG-13'].includes(itemContent.type)).to.be.false;
@@ -682,7 +682,7 @@ describe('Parental Controls', function () {
     // Create a user with mix of Older and non-little kid rated titles with history
     const user = await testUtils.createRegisteredUser();
     await createWatchList(user);
-   
+
 
     await testUtils.startApplicationAtPage('home', { user: user });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -712,11 +712,11 @@ describe('Parental Controls', function () {
 
     // Check ratings
     expect('homeScreenRatingsLabel').does.not.contain(['R','MA','TV-MA', 'NR']);
-    
+
     const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('homeScreenRowList');
     for (const itemContent of rowItemsContent) {
       expect(['R','MA','TV-MA', 'NR'].includes(itemContent.type)).to.be.false;
-      
+
     }
 
 
@@ -727,7 +727,7 @@ describe('Parental Controls', function () {
     async function createHistory(user) {
 
        // Create a user with mix of little kids and non-little kid rated titles with history
-      
+
        const ContentG = await user.getContent().withRating('G').ofContentType('movie').retrieve({ limit: 10});
        await user.addContentToViewHistory(ContentG, 600);
        const ContentTVY7 = await user.getContent().withRating('TV-Y7').ofContentType('series').retrieve({ limit: 3});
@@ -750,7 +750,7 @@ describe('Parental Controls', function () {
     async function createWatchList(user) {
 
       // Create a user with mix of little kids and non-little kid rated titles with history
-     
+
       const ContentTVG = await user.getContent().ofContentType(['series']).withRating('TV-G').retrieve({ limit: 6});
       await user.addContentToWatchList(ContentTVG);
       const ContentG = await user.getContent().ofContentType(['movie']).withRating('G').retrieve({ limit: 6});
@@ -772,13 +772,13 @@ describe('Parental Controls', function () {
 
    }
 
-   
 
 
 
 
 
-    
+
+
 
     async function selectOlderKidsFromParentalSettings() {
         await ecp.sendKeyPress(ecp.Key.Right);
