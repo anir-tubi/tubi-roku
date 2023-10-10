@@ -54,6 +54,7 @@ Function listen()
   m.requestModule = Request(m.constants.settings)
   m.auth = TubiAuth(m.constants, m.requestModule)
   m.authInfo = invalid
+  nTimeout = 0  'We do not need to execute timeout processing logic every time while loop is executed (200ms). This counter is used to control the timeout logic execution to every third time.
 
   while (true)
     msg = wait(200, m.port)
@@ -84,8 +85,60 @@ Function listen()
         m.backedOffJobs.delete(requestId)
       end if
     end for
+
+    nTimeout = nTimeout + 1
+    if nTimeout >= 3
+      nTimeout = 0 'bs:disable-line 1001 Lint1005
+      for each requestId in m.jobStore
+        job = m.jobStore[requestId]
+
+        if job.startTime.totalMilliseconds() > job.reqInfo.timeoutInMilliSec
+          retries = job.reqInfo.retries
+          m.jobStore.delete(requestId)
+
+          if job.tubiReq <> invalid
+            job.tubiReq.cancel() ' To avoid the danger of api showing up later than timeout
+          end if
+
+          if retries > 0
+            job.reqInfo.retries = retries - 1
+            makeApiRequest(job.reqInfo, job.batchInfo) 'make api request because they have already waited for timeout
+          else
+            processTimeoutError(job)
+          end if
+        end if
+      end for
+    end if
+
   end while
 End Function
+
+
+'processTimeoutError, mimmics when api timeouts
+' @job : assocarray, it has reqInfo, tubiReq, batchInfo(invalid for single request, valid for batch request)
+'
+Function processTimeoutError(job)
+
+  if job.reqInfo <> invalid
+    requestType = job.reqInfo.requestType
+    callbackTypes = m.requestTypes[requestType]
+
+    ' there might be some issue with internet access
+    errCode = -1236
+
+    result = {
+      response: {
+        "code": errCode
+        "name": requestType
+        "failReason": "Timeout.Response unknown"
+        "url": job.reqInfo.url
+      }
+    }
+
+    processErrorResponse(result, callbackTypes, job )
+  end if
+
+End function
 
 
 ' makeApiRequest
@@ -97,6 +150,7 @@ Function makeApiRequest(reqInfo, batchInfo = invalid) as Boolean
   if reqInfo <> invalid
     requestType = reqInfo.requestType
     url = reqInfo.url
+
 
     options = reqInfo.options
     if options = invalid
@@ -134,6 +188,7 @@ Function makeApiRequest(reqInfo, batchInfo = invalid) as Boolean
       id = urlTransfer.getIdentity().toStr()
 
       m.jobStore[id] = {
+        startTime: createObject("roTimespan")
         reqInfo: reqInfo
         tubiReq: tubiReq
         batchInfo: batchInfo

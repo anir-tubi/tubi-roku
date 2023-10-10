@@ -96,6 +96,7 @@ Function sendRequestForExperimentsAndConfig()
   if experimentsRequest <> invalid
     experimentsRequest.successCallback = onExperimentsRequestSuccess
     experimentsRequest.errorCallback = onExperimentsRequestFailure
+    experimentsRequest.timeoutInMilliSec = 5000
     m.makeRequest(experimentsRequest)
   else
     ' If there are no namespaces then skip the request.
@@ -105,6 +106,7 @@ Function sendRequestForExperimentsAndConfig()
   externalConfigRequestInfo = externalConfig.getConfigsRequestInfo(constants)
   externalConfigRequestInfo.successCallback = onExternalConfigRequestSuccess
   externalConfigRequestInfo.errorCallback = onExternalConfigRequestFailure
+  externalConfigRequestInfo.timeoutInMilliSec = 5000
   m.makeRequest(externalConfigRequestInfo)
 End Function
 
