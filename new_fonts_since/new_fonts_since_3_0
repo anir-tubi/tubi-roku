@@ -1,0 +1,8 @@
+# These are fonts that have been added since the last formal Roku published version of the channel.
+# These are the only fonts that will be included inside the remote components bundle.
+#
+# Generated with (and manually filtered for new or changed fonts):
+#   git diff --stat 2_7_1:src/channel/fonts HEAD:src/channel/fonts/
+
+# Add images below here like:
+#   fonts/New-Font.ttf

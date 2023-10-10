@@ -382,7 +382,29 @@ function buildRemote() {
     let srcOptions = {
       base: 'src/channel'
     };
+    /* Filtering for fonts. Fonts files are large so in order to keep the remote
+     * components bundle as small as possible we only deliver the fonts which were added since
+     * the most recent submitted build.
+     */
 
+    /* Replace the fonts urls of those fonts that are part of the remote components package,
+     * ie. those fonts that are in the new_fonts_since file, so that the fonts are pulled from
+     * the remote component package instead of the installed package.
+     */
+    const newFontsFile = `new_fonts_since/new_fonts_since_${minorBuildTag}`;
+    const newFonts = fs.readFileSync(newFontsFile, 'utf8').split('\n').filter(function(e) {
+      e = e.trim();
+      return (!e.startsWith('#') && (e.endsWith('ttf')));
+    });
+    log(`Found ${newFonts.length} lines in ${newFontsFile}`);
+    const fontPathRegex = /pkg:\/[0-9a-zA-Z./\-_]*/g;
+
+    // prepare a map of new image file paths to make filtering quicker
+    let newFontsMap = {};
+    newFonts.forEach(filePath => {
+      newFontsMap[filePath] = true;
+    });
+    
     /* Filtering for images.  Image files are large so in order to keep the remote
      * components bundle as small as possible we only deliver the images which were added since
      * the most recent submitted build.
@@ -407,7 +429,21 @@ function buildRemote() {
     });
 
     let stream = collect(sources, srcOptions)
-      // do the actual uri string replacement
+
+      // do the actual uri string replacement for fonts
+      .pipe(replace(fontPathRegex, function(match) {
+        let replacement = match;
+        newFonts.forEach(function(newFont) {
+          if (match.indexOf(newFont) !== -1) {
+            log(`Redirecting ${newFont} to remote components`);
+            replacement = match.replace('pkg:','libpkg:');
+          }
+        });
+        return replacement;
+      }))
+      .pipe(dest('build/remote'))
+
+      // do the actual uri string replacement for images
       .pipe(replace(imagePathRegex, function(match) {
         let replacement = match;
         newImages.forEach(function(newImage) {
@@ -419,6 +455,19 @@ function buildRemote() {
         return replacement;
       }))
       .pipe(dest('build/remote'))
+      
+      // filter all font files so that only those fonts in new_fonts_since file
+      // are included in the remote components pkg
+      .pipe(src('src/channel/fonts/**/*', srcOptions))
+      .pipe(filter(file => {
+          if (newFontsMap[file.relative]) {
+            log(`Filtering ${file.relative}`);
+            return true;
+          } else {
+            return false;
+          }
+      }))
+      .pipe(dest('build/remote'))
 
       // filter all image files so that only those images in new_images_since file
       // are included in the remote components pkg
@@ -426,8 +475,10 @@ function buildRemote() {
       .pipe(filter(file => {
           if (newImagesMap[file.relative]) {
             log(`Filtering ${file.relative}`);
+            return true;
+          } else {
+            return false;
           }
-          return newImagesMap[file.relative] ? true : false;
       }))
       .pipe(dest('build/remote'));
 
