@@ -1200,8 +1200,9 @@ Function sendPauseAdPixel(pixelUrl)
   tubiLog("VideoHelpers.sendPauseAdPixel")
 
   if isNonEmptyString(pixelUrl)
+    encodedUrl = pixelUrl.EncodeUri()
     m.makeRequest({
-      url: pixelUrl
+      url: encodedUrl
       requestType: m.constants.reqNames.postPauseAdPixel
       responseType: "string"
       silenceCallbackWarnings: true
@@ -1222,7 +1223,7 @@ Function updateRokuContinueWatchingInfo(content, position)
 
     ' Checking if we reached end of the program.
     if didReachEndOfVideo = true
-      
+
       ' Checking if it is a series or else if it is movie then removing from continue watching.
       if content.parentType <> "series"
         deleteFromRokuContinueWatching(content)
