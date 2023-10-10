@@ -415,18 +415,28 @@ function buildRemote() {
      * the remote component package instead of the installed package.
      */
     const newImagesFile = `new_images_since/new_images_since_${minorBuildTag}`;
-    const newImages = fs.readFileSync(newImagesFile, 'utf8').split('\n').filter(function(e) {
+    let newImages = fs.readFileSync(newImagesFile, 'utf8').split('\n').filter(function(e) {
       e = e.trim();
       return (!e.startsWith('#') && (e.endsWith('png') || e.endsWith('jpg') || e.endsWith('webp')));
     });
     log(`Found ${newImages.length} lines in ${newImagesFile}`);
-    const imagePathRegex = /pkg:\/[0-9a-zA-Z./\-_]*/g;
+    const imagePathRegex = /pkg:\/[0-9a-zA-Z.\/\-_\$]*/g;
 
     // prepare a map of new image file paths to make filtering quicker
     let newImagesMap = {};
-    newImages.forEach(filePath => {
+    let updatedNewImages = [];
+    newImages.forEach((filePath) => {
+      // Since the images in the new images file are for ex: images/selectorRoundedCorners-fhd.9.png but in the xml or brs files 
+      // we will have paths as pkg:/images/selectorRoundedCorners-$$RES$$.9.png for ex: m.RowList.focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png", so adding an additional match criteria along with checking for images/selectorRoundedCorners-fhd.9.png | images/selectorRoundedCorners-hd.9.png it also checks for images/selectorRoundedCorners-$$RES$$.9.png references in our xml and brs files.
+      let resFilePath = filePath.replace(/fhd|hd/, "$$$RES$$$");
       newImagesMap[filePath] = true;
+      // Adding a check to make sure we do not add it again, since we might have images/selectorRoundedCorners-fhd.9.png and images/selectorRoundedCorners-hd.9.png in the file but it will be converted to images/selectorRoundedCorners--$$RES$$.9.png
+      updatedNewImages.push(filePath)
+      if (updatedNewImages.includes(resFilePath) == false) {
+        updatedNewImages.push(resFilePath)
+      }
     });
+    newImages = updatedNewImages
 
     let stream = collect(sources, srcOptions)
 
