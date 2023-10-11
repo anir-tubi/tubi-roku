@@ -194,7 +194,6 @@
       enableUI="false"
       cgms = "3"
       enableTrickPlay="false"
-      notificationInterval="1"
       visible="true" />
 
 

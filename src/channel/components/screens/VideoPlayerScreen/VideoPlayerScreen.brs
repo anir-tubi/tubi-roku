@@ -223,6 +223,8 @@ Function init()
   m.adHeadsUpTime = 10 ' adHeadsUpTime helps to decide how long we need to show the AdHeadsup
   m.midrolls = {} ' midrolls holds all cuepoints from API response
   m.mostRecentCompletedCuepoint = -1 'used to prevent multiple resume_after_break events from firing
+  m.notificationInterval = 0.999 ' The interval that we are targeting for player position updates. We specify a value lower than a second in order to get a float value
+  m.Video.notificationInterval = m.notificationInterval
 
   ' m.isSeeking is used keep track of the time from when m.Video.control = "seek" is set until the
   ' onVideoPositionChange() callback is fired which indicates the video player has concluded the seek.
@@ -758,7 +760,15 @@ End Function
 ' The notificationInterval and analyticsInterval are not necessarily equal or evenly divisible
 ' so we check the time passage before we send playProgress events
 Function onVideoPositionChange(msg)
-  position = msg.getData()
+  floatPosition = msg.getData()
+  ' position is a float so we have to convert it to an integer for our key based lookups to work correctly
+  position = int(floatPosition)
+  positionDecimalPart = floatPosition - position
+  if positionDecimalPart > .5 then
+    m.video.notificationInterval = 1 - positionDecimalPart
+  else
+    m.video.notificationInterval = m.notificationInterval
+  end if
 
   m.positionArr.push(position)
 
