@@ -11,18 +11,22 @@ End Function
 
 
 Function setBrazeUserData(authInfo)
-  m.braze.setCustomAttribute("preferred_device_id", m.constants.deviceInfo.deviceId)
-  if authInfo <> invalid AND authInfo.userId <> invalid
-    m.braze.setUserId(authInfo.userId)
-    if authInfo.email <> invalid
-      m.braze.setEmail(authInfo.email)
+  ' Adding a check to make sure we only call braze method if the user has given consent.
+  ' setBrazeUserData is called when user sign in/out.
+  if getConsentOptOutStatusByKey(m.constants.consentKeys.marketing) = false AND m.braze <> invalid
+    m.braze.setCustomAttribute("preferred_device_id", m.constants.deviceInfo.deviceId)
+    if authInfo <> invalid AND authInfo.userId <> invalid
+      m.braze.setUserId(authInfo.userId)
+      if authInfo.email <> invalid
+        m.braze.setEmail(authInfo.email)
+      end if
+    else
+      ' Setting device id as the unique id.
+      m.braze.setUserId(m.constants.deviceInfo.deviceId)
     end if
-  else
-    ' Setting device id as the unique id.
-    m.braze.setUserId(m.constants.deviceInfo.deviceId)
+    ' Doing it as per recommendation from the braze sdk documentation.
+    m.brazeTask.BrazeInAppMessage = invalid
   end if
-  ' Doing it as per recommendation from the braze sdk documentation.
-  m.brazeTask.BrazeInAppMessage = invalid
 End Function
 
 
