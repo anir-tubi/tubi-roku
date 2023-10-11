@@ -14,9 +14,25 @@ if (qaChanges === undefined) {
 }
 
 const releaseNotes = extractReleaseNotesFromPullRequestBody(event.pull_request.body);
+
 if (releaseNotes === undefined) {
   console.error('Could not find release notes section');
   success = false;
+} else if (releaseNotes.length > 0) {
+  let releaseNotesValidPrefixes = [
+    'Experiment',
+    'Graduation',
+    'Feature',
+    'BugFix',
+    'Enhancement'
+  ]
+  let result = releaseNotesValidPrefixes.filter(s => releaseNotes.startsWith(`${s}:`));
+
+  if (result.length === 0) {
+    const releaseNotesValidPrefixesString = releaseNotesValidPrefixes.join(", ")
+    console.error(`Prefix your release notes with ${releaseNotesValidPrefixesString}`);
+    success = false;
+  }
 }
 
 if (success) {
