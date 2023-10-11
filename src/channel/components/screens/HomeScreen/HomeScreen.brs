@@ -15,13 +15,8 @@ Function init()
   fades = m.top.findNode("Fades")
   m.HintGroupFade = fades.findNode("HintGroupFade")
 
-  if getExperimentResource("roku_large_poster", "roku_large_poster_v1", false).enabled = true
-    m.ContentArea.translation = [192,518]
-    m.ContentArea.maskOffset = [0,273]
-  else
-    m.ContentArea.maskOffset = [0,317]
-    m.ContentArea.translation = [192,561]
-  end if
+  m.ContentArea.translation = [192,518]
+  m.ContentArea.maskOffset = [0,273]
 
   m.experimentName = ""
   experimentResult = getExperimentResult("roku_see_all_container", "roku_view_more_one_hundred_v1")
@@ -842,7 +837,7 @@ End Function
 Function populateInfoPanel(mode, contentNode)
   if contentNode <> invalid
 
-    if getExperimentResource("roku_large_poster", "roku_large_poster_v1", false).enabled = true AND mode <> m.constants.ui.infoPanelModes.linearHomeScreen
+    if mode <> m.constants.ui.infoPanelModes.linearHomeScreen
       m.InfoPanel.maxHeight = 318
     else
       m.InfoPanel.maxHeight = 354

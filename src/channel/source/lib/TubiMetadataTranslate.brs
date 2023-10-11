@@ -1545,26 +1545,12 @@ Function tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA(cont
       gridItemType: m.constants.ui.gridItemTypes.historySignedOutUser
     }
 
-    if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_large_poster", "roku_large_poster_v1").enabled = true
-
-      if bKidsMode = true
-        '//If kids mode is on, then images should be kidsMode large poster versions
-        childAA.hdgridposterurl = m.constants.urls.continueWatchingItemBackground_largePoster_kidsMode
-      else
-        '//Otherwise images should be default large poster versions
-        childAA.hdgridposterurl = m.constants.urls.continueWatchingItemBackground_largePoster
-      end if
-
+    if bKidsMode = true
+      '//If kids mode is on, then images should be kidsMode large poster versions
+      childAA.hdgridposterurl = m.constants.urls.continueWatchingItemBackground_largePoster_kidsMode
     else
-
-      if bKidsMode = true
-        '//If kids mode is on, then images should be kidsMode versions
-        childAA.hdgridposterurl = m.constants.urls.continueWatchingItemBackground_kidsMode
-      else
-        '//Otherwise images should be default versions
-        childAA.hdgridposterurl = m.constants.urls.continueWatchingItemBackground
-      end if
-
+      '//Otherwise images should be default large poster versions
+      childAA.hdgridposterurl = m.constants.urls.continueWatchingItemBackground_largePoster
     end if
 
     validCount += 1

@@ -621,10 +621,6 @@ Function getConstants()
     constants.urls.animationLogo = "http://cdn.adrise.tv/video/roku/animation_logo_2.mp4"
     constants.urls.superbowlRabbitHoleCampaignAnimationLogo = "https://cdn.adrise.tv/video/roku/rabbit_hole_animation_logo.mp4"
 
-    ' The background images on the continue watching container row when the user is signed out
-    constants.urls.continueWatchingItemBackground = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingNonRegisteredItemBground.png"
-    constants.urls.continueWatchingItemBackground_kidsMode = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingNonRegisteredItemBground_kidsMode.png"
-
     ' The background large images on the continue watching container row when the user is signed out
     constants.urls.continueWatchingItemBackground_largePoster = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingItemBackground_largePoster.webp"
     constants.urls.continueWatchingItemBackground_largePoster_kidsMode = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingItemBackground_largePoster_kids.webp"

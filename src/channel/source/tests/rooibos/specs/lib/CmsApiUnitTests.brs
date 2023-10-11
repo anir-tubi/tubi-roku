@@ -289,8 +289,8 @@ Function cmsApi_createHomeScreenReqInfo_test()
       "include_empty_history": true
       "include_empty_queue": true
       "is_kids_mode": false
-      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
-      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_landscape"
+      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largePoster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largePoster[1].ToStr() + "_poster"
+      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeLandscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeLandscape[1].ToStr() + "_landscape"
       "contentMode": m.cmsApi.constants.ui.contentMode.homescreen
       "customParam": "custom_param_value"
     }

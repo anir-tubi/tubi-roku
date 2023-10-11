@@ -911,10 +911,6 @@ Function onHomescreenContentReady(msg)
   homeScreen = msg.getRoSGNode()
 
   if homeScreen.contentReady = true
-
-    'Send the exposure event for large poster experiment on home screen loading
-    getExperimentResource("roku_large_poster", "roku_large_poster_v1")
-
     '//Assume images are going to be displayed when the homescreen is displayed - and send exposure event
     getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true)
 

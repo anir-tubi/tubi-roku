@@ -17,13 +17,8 @@ Function init()
   m.AnimateToCategoryDebounce = m.top.findNode("AnimateToCategoryDebounce")
   m.AnimateToCategoryDebounce.observeField("fire", "onAnimateToCategoryDebounce")
 
-  if getExperimentResource("roku_large_poster", "roku_large_poster_v1", false).enabled = true
-    m.RowList.itemSpacing = [0,12]
-    m.RowList.rowSpacings = 12
-  else
-    m.RowList.itemSpacing = [0,36]
-    m.RowList.rowSpacings = 36
-  end if
+  m.RowList.itemSpacing = [0,12]
+  m.RowList.rowSpacings = 12
 
   ' Parameters for the metadata block cache. Window size is number of items to fetch, page delimiter
   ' is what focus thresholds trigger a fetch.
@@ -244,13 +239,8 @@ Function setRowHeights()
   rowItemSize = []
   rowHeights = []
   numRows = 2
-
-  posterSize = m.constants.ui.imageSizes.poster
-  landscapeSize = m.constants.ui.imageSizes.landscape
-  if (getExperimentResource("roku_large_poster", "roku_large_poster_v1", false).enabled = true)
-    posterSize = m.constants.ui.imageSizes.largePoster
-    landscapeSize = m.constants.ui.imageSizes.largeLandscape
-  end if
+  posterSize = m.constants.ui.imageSizes.largePoster
+  landscapeSize = m.constants.ui.imageSizes.largeLandscape
 
   for i=0 to m.top.content.getChildCount()-1
     category = m.top.content.getChild(i)
