@@ -404,7 +404,7 @@ function buildRemote() {
     newFonts.forEach(filePath => {
       newFontsMap[filePath] = true;
     });
-    
+
     /* Filtering for images.  Image files are large so in order to keep the remote
      * components bundle as small as possible we only deliver the images which were added since
      * the most recent submitted build.
@@ -426,7 +426,7 @@ function buildRemote() {
     let newImagesMap = {};
     let updatedNewImages = [];
     newImages.forEach((filePath) => {
-      // Since the images in the new images file are for ex: images/selectorRoundedCorners-fhd.9.png but in the xml or brs files 
+      // Since the images in the new images file are for ex: images/selectorRoundedCorners-fhd.9.png but in the xml or brs files
       // we will have paths as pkg:/images/selectorRoundedCorners-$$RES$$.9.png for ex: m.RowList.focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png", so adding an additional match criteria along with checking for images/selectorRoundedCorners-fhd.9.png | images/selectorRoundedCorners-hd.9.png it also checks for images/selectorRoundedCorners-$$RES$$.9.png references in our xml and brs files.
       let resFilePath = filePath.replace(/fhd|hd/, "$$$RES$$$");
       newImagesMap[filePath] = true;
@@ -465,7 +465,7 @@ function buildRemote() {
         return replacement;
       }))
       .pipe(dest('build/remote'))
-      
+
       // filter all font files so that only those fonts in new_fonts_since file
       // are included in the remote components pkg
       .pipe(src('src/channel/fonts/**/*', srcOptions))
@@ -843,16 +843,13 @@ function pushStaging(done) {
  //TODO: once the experiment roku_new_cdn_v1 concludes remove adrise-bryan-playground
   const localRemoteComponentsPath = `build/tubi_remote_components_${buildTag}.pkg`;
   const s3RemoteComponentsPath = `s3://adrise-bryan-playground/roku-staging/components/tubi_remote_components_${buildTag}.pkg`;
-  const rcdnS3RemoteComponentsPath = `s3://tubi-rokucdn-source-staging/roku-staging/components/tubi_remote_components_${buildTag}.pkg`
+  const rcdnS3RemoteComponentsPath = `s3://tubi-rokucdn-source-staging/appFiles/components/tubi_remote_components_${buildTag}.pkg`
 
   const localStarterComponentsPath  = `build/tubi_starter_components_${minorBuildTag}.pkg`;
   const s3starterComponentsPath     = `s3://adrise-bryan-playground/roku-staging/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
-  const rcdnS3starterComponentsPath = `s3://tubi-rokucdn-source-staging/roku-staging/starter-components/tubi_starter_components_${minorBuildTag}.pkg`
+  const rcdnS3starterComponentsPath = `s3://tubi-rokucdn-source-staging/appFiles/starter-components/tubi_starter_components_${minorBuildTag}.pkg`
   // distribution ID of roku staging CDN pointing to s3 bucket tubi-rokucdn-source-staging
   const stagingCdnDistributionID = `E1TFU8FZM49RLM`
-
-  // aws region where staging s3 bucket is hosted.
-  const awsRegion = `us-east-2`
 
   let pushResult = shell.exec(`aws s3 cp ${localRemoteComponentsPath} ${s3RemoteComponentsPath}`);
 
@@ -861,16 +858,16 @@ function pushStaging(done) {
   }
 
   if (!pushResult.stderr) {
-    pushResult = shell.exec(`aws s3 cp ${localRemoteComponentsPath} ${rcdnS3RemoteComponentsPath} --profile $AWS_PROFILE --region ${awsRegion}`);
+    pushResult = shell.exec(`aws s3 cp ${localRemoteComponentsPath} ${rcdnS3RemoteComponentsPath} --profile $AWS_PROFILE`);
   }
 
   if (!pushResult.stderr) {
-    pushResult = shell.exec(`aws s3 cp ${localStarterComponentsPath} ${rcdnS3starterComponentsPath} --profile $AWS_PROFILE --region ${awsRegion}`);
+    pushResult = shell.exec(`aws s3 cp ${localStarterComponentsPath} ${rcdnS3starterComponentsPath} --profile $AWS_PROFILE`);
   }
 
    // invalidate the cloudfront so that new starter component can get replaced.
   if (!pushResult.stderr) {
-    pushResult = shell.exec(`aws cloudfront create-invalidation --distribution-id ${stagingCdnDistributionID} --paths "/*" --profile $AWS_PROFILE --region ${awsRegion}`);
+    pushResult = shell.exec(`aws cloudfront create-invalidation --distribution-id ${stagingCdnDistributionID} --paths "/*" --profile $AWS_PROFILE`);
   }
 
   if (!pushResult.stderr) {
