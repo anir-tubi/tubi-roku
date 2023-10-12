@@ -290,6 +290,7 @@ Function getConstants()
     constants.reqNames.postRokuContinueWatching = "postRokuContinueWatching"
     constants.reqNames.deleteRokuContinueWatching = "deleteRokuContinueWatching"
     constants.reqNames.clearRokuContinueWatching = "clearRokuContinueWatching"
+    constants.reqNames.getUserSettings = "getUserSettings"
 
     ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
@@ -328,6 +329,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.patchServerPersistentData] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getConsent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.patchConsent] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getUserSettings] = true
 
 
   constants.anonymous = {}

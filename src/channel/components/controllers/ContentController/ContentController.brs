@@ -742,7 +742,7 @@ Function onAuthInfoRefreshed()
     m.authTask = invalid
   end if
   m.authInfoRefreshed = true
-  startUserExperience()
+  refreshUserInfoAndStartUserExperience()
 End Function
 
 
@@ -2388,4 +2388,45 @@ End Function
 Function clearRokuContinueWatching()
   requestInfo = m.rokuContinueWatchingApi.createClearContinueWatchingReqInfo()
   m.top.rokuContinueWatchingRequestInfo = requestInfo
+End Function
+
+
+Function refreshUserInfoAndStartUserExperience()
+  getUserInfoRequest = m.userDeviceApi.createUserSettingsReqInfo()
+  m.makeRequest({
+    url: getUserInfoRequest.url
+    requestType: m.constants.reqNames.getUserSettings
+    options: getUserInfoRequest.options
+    successCallback: onGetUserInfoSuccess
+    errorCallback: startUserExperience
+    responseType: "assocarray"
+  })
+End Function
+
+
+Function onGetUserInfoSuccess(userInfo)
+  if userInfo <> invalid
+    Auth = TubiAuth(m.constants, m.Request)
+    if userInfo.first_name <> invalid
+      Auth.setAuthInfo("firstname", userInfo.first_name)
+    end if
+
+    if userInfo.last_name <> invalid
+      Auth.setAuthInfo("lastname", userInfo.last_name)
+    end if
+
+    if userInfo.name <> invalid
+      Auth.setAuthInfo("name", userInfo.name)
+    end if
+
+    if userInfo.gender <> invalid
+      Auth.setAuthInfo("gender", userInfo.gender)
+    end if
+
+    if userInfo.has_age <> invalid
+      Auth.setAuthInfo("hasAge", userInfo.has_age)
+    end if
+
+  end if
+  startUserExperience()
 End Function

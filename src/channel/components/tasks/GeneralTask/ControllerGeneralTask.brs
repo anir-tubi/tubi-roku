@@ -221,6 +221,12 @@ Function registerParsingCallbacks()
   m.requestTypes[m.constants.reqNames.patchConsent] = {
     parseSuccess: parseGenericSuccess
   }
+
+  ' gets the list of user/device level server persistent data.
+  m.requestTypes[m.constants.reqNames.getUserSettings] = {
+    parseSuccess: parseGenericSuccess
+    parseError: parseGenericError
+  }
 End Function
 
 
