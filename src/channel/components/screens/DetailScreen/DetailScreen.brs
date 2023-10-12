@@ -11,9 +11,9 @@ Function init()
   m.defaultSecondaryMenuY = m.SecondaryMenu.translation[1]
   m.ResumeMenuItem = m.top.findNode("ResumeMenuItem")
   m.PlayMenuItem = m.top.findNode("PlayMenuItem")
-  m.LikeMenuItem = m.top.findNode("LikeMenuItem")
   ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
   m.SeeAllGamesMenuItem = m.top.findNode("SeeAllGamesMenuItem")
+  m.LikeMenuItem = m.top.findNode("LikeMenuItem")
   m.DislikeMenuItem = m.top.findNode("DislikeMenuItem")
   m.LikeDislikeMenuItem = m.top.findNode("LikeDislikeMenuItem")
   m.EpisodesMenuItem = m.top.findNode("EpisodesMenuItem")
@@ -422,7 +422,7 @@ Function changeLikeDislikeButtonText()
       '//The Like State is nothing so display default state
       sButtonText = ""
 
-      like_dilike_button_title_type = getExperimentResource("roku_notforme_dislike", "roku_notforme_dislike_v2", true).like_dilike_button_title_type
+      like_dilike_button_title_type = getExperimentResource("roku_notforme_dislike", "roku_notforme_dislike_v2", false).like_dilike_button_title_type
 
       if like_dilike_button_title_type = "rate_this_title"
         sButtonText = getTranslation("screenDetails_button_rateThisTitle")
@@ -568,18 +568,18 @@ Function onRemoveSignupButton()
 End Function
 
 
-Function onIsInKidsMode()
+Function onIsInKidsMode(msg)
+  isInKidsMode = msg.getData()
   if isLoggedInUser() = false AND isNewUser() = false
     signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
-    if m.top.isInKidsMode = true AND signUpIndex > -1
+    if isInKidsMode = true AND signUpIndex > -1
       addRemoveMenuItem(false, signUpIndex)
-    else if m.top.isInKidsMode = false AND signUpIndex = -1
+    else if isInKidsMode = false AND signUpIndex = -1
       addRemoveMenuItem(true, signUpIndex, m.signUpMenuItem, [m.PlayMenuItem])
     end if
-
   end if
 
-  if m.top.isInKidsMode = true
+  if isInKidsMode = true
     '//remove like/dislike button
     likeDislikeButtonIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
     addRemoveMenuItem(false, likeDislikeButtonIndex)
@@ -589,6 +589,9 @@ Function onIsInKidsMode()
     if nLikeIndex = -1
       addRemoveMenuItem(true, nLikeIndex, m.LikeDislikeMenuItem, [m.PlayMenuItem])
     end if
+
+    ' send the exposure event only if not in kids, since the like/dislike button is not shown in kids
+    getExperimentResource("roku_notforme_dislike", "roku_notforme_dislike_v2")
   end if
 End Function
 
@@ -1266,7 +1269,6 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         return true
       end if
     end if
-
   end if
 
   return false
@@ -1291,7 +1293,6 @@ Function setComponentInteractionEventForMenu(componentInteractionValue, menuItem
     else
       middleNavSection = m.Tracking.detailScreenMenuItemMap[menuItemId]
     end if
-
   end if
 
   if isNonEmptyString(middleNavSection) = true
@@ -1339,5 +1340,20 @@ Function setComponentInteractionEventForMenu(componentInteractionValue, menuItem
       user_interaction: componentInteractionValue
     }
   end if
+End Function
 
+
+' Items can be added and removed from the details screen menu dynamically.
+' This function will let you know if a specific menu item is currently in the menu.
+'
+' @item: roSGNode, one of the item nodes, like m.PlayMenuItem
+' @returns: boolean, true if the item is in the menu, false if not
+Function isItemInMenu(item)
+  if m.Menu <> invalid
+    if m.NodeHelpers.getChildIndex(m.Menu.content, item) >= 0
+      return true
+    end if
+  end if
+
+  return false
 End Function
