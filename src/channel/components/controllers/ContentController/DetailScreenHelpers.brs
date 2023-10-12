@@ -362,6 +362,9 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       detailScreen.isInKidsMode = true
     else
       detailScreen.isInKidsMode = false
+
+      ' send the exposure event only if not in kids, since the like/dislike button is not shown in kids
+      getExperimentResource("roku_notforme_dislike", "roku_notforme_dislike_v2")
     end if
 
     if episode <> invalid
@@ -1411,7 +1414,7 @@ Function setDetailScreenLikeDislikeStateFromLikeAction(detailScreen, sLikeAction
   sLikedState = translateLikeActionToLikeState(sLikeAction)
 
   canShowLikeDisLikeToast = (UCase(m.constants.deviceInfo.countryCode) = "US" AND isKidsUIOn() = false)
-  if  getExperimentResource("roku_like_toast", "roku_like_toast_v2", false).enabled = true AND isNonEmptyString(sLikedState) = true AND canShowLikeDisLikeToast = true
+  if getExperimentResource("roku_like_toast", "roku_like_toast_v2", false).enabled = true AND isNonEmptyString(sLikedState) = true AND canShowLikeDisLikeToast = true
     dialogSubType = sLikedState + "_title"
     if sLikedState = m.constants.ui.likeDislikeStates.liked AND m.pub_serverPersistentData.isLikeToastNotificationShown = false
 

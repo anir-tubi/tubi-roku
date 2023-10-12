@@ -70,7 +70,6 @@ Function init()
   m.top.observeFieldScoped("stringLikeDislikeButton", "onStringChange")
   m.top.observeFieldScoped("stringPlayButton", "onStringChange")
 
-
   m.Menu.observeFieldScoped("itemSelected", "onMenuItemSelected")
   m.Menu.observeFieldScoped("itemFocused", "onMenuItemFocused")
   m.SecondaryMenu.observeFieldScoped("itemSelected", "onSecondaryMenuItemSelected")
@@ -589,9 +588,6 @@ Function onIsInKidsMode(msg)
     if nLikeIndex = -1
       addRemoveMenuItem(true, nLikeIndex, m.LikeDislikeMenuItem, [m.PlayMenuItem])
     end if
-
-    ' send the exposure event only if not in kids, since the like/dislike button is not shown in kids
-    getExperimentResource("roku_notforme_dislike", "roku_notforme_dislike_v2")
   end if
 End Function
 
