@@ -669,7 +669,7 @@ async function findPullRequestCommitDifferences(done, branchA, branchB, commitCo
 // @compareBranch: string, the branch name we are comparing to master
 async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
   const commitsFromMasterNotOnCompareBranch = await findPullRequestCommitDifferences(done, 'master', compareBranch);
-
+  commitsFromMasterNotOnCompareBranch.reverse()
   console.log('');
   console.log(`COMMITS THAT HAVE NOT BEEN CHERRY PICKED FROM master TO ${compareBranch}`);
   console.log('-----------------------------------------------------------------------');
