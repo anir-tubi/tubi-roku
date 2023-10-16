@@ -187,7 +187,7 @@ Function onItemFocused()
   tubiLog("TopNav.onItemFocused")
   itemFocused = m.Menu.itemFocused
   item = m.Menu.content.getChild(m.Menu.itemFocused)
-  focusedID = m.Tracking.sideNavPageMap[item.id]
+  focusedID = m.Tracking.topNavPageMap[item.id]
 
   newTopNavFocusedButton = {
     top_nav_section: focusedID

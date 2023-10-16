@@ -36,6 +36,9 @@ Function TubiTracking(constants, request, auth, userConsentsOptOutStatus = {})
     ' an AA map of page ids to their corresponding enum values for the LeftSideNavComponent Section
     sideNavPageMap: tubiTracking_getSideNavPageMap(constants)
 
+    ' an AA map of page ids to their corresponding enum values for the TopNavComponent Section
+    topNavPageMap: tubiTracking_getTopNavPageMap(constants)
+
     ' an AA map of Menu items in the details screen to their corresponding enum values for the LeftSideNavComponent Section
     detailScreenMenuItemMap: tubiTracking_getDetailScreenMenuPageMap(constants)
 
@@ -1085,6 +1088,20 @@ Function tubiTracking_getSideNavPageMap(constants)
     if sideNavIds.subtitles <> invalid then map[sideNavIds.subtitles] = "SUBTITLES"
     if sideNavIds.back <> invalid then map[sideNavIds.back] = "BACK"
     if sideNavIds.tournament <> invalid then map[sideNavIds.tournament] = "SPORTS"
+  end if
+  return map
+End Function
+
+
+Function tubiTracking_getTopNavPageMap(constants)
+  map = {}
+  if constants <> invalid AND constants.ui <> invalid AND constants.ui.homeScreenTopNavIds <> invalid
+    homeScreenTopNavIds = constants.ui.homeScreenTopNavIds
+    if homeScreenTopNavIds.home <> invalid then map[homeScreenTopNavIds.home] = "HOME"
+    if homeScreenTopNavIds.movies <> invalid then map[homeScreenTopNavIds.movies] = "MOVIES"
+    if homeScreenTopNavIds.tv <> invalid then map[homeScreenTopNavIds.tv] = "SERIES"
+    if homeScreenTopNavIds.linearEPG <> invalid then map[homeScreenTopNavIds.linearEPG] = "LINEAR"
+    if homeScreenTopNavIds.tournament <> invalid then map[homeScreenTopNavIds.tournament] = "SPORTS"
   end if
   return map
 End Function
