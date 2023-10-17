@@ -464,21 +464,6 @@ Function trackFullScreen(bFullScreen)
 End Function
 
 
-Function onResumePointChange()
-  tubiLog("DetailScreen.onResumePointChange")
-  menuItems = m.Menu.content
-  resumeIndex = m.NodeHelpers.getChildIndexById(menuItems, m.ResumeMenuItem.id)
-
-  m.ResumeMenuItem.playstart = m.top.resumePoint
-  if resumeIndex = -1 AND m.top.resumePoint > 0
-    menuItems.insertChild(m.ResumeMenuItem, 0)
-  else if resumeIndex > -1 AND m.top.resumePoint = 0
-    menuItems.removeChildIndex(resumeIndex)
-  end if
-  m.Menu.content = menuItems
-End Function
-
-
 Function onCaptionModeChange()
   tubiLog("LinearVideoPlayerScreen.onCaptionModeChange")
 

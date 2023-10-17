@@ -1935,37 +1935,6 @@ Function restartAppFromInstantResume(response = invalid)
 End Function
 
 
-' When the app loads or instantly resumes, then sometimes it will try to launch a previously played linear video. This function is used
-' when the call to get the linear channel info is a success.
-' @param successResponse, The response from the server
-' @param _storeInCache, This secondary param is not used but it is required for a calback of fetchEPGChannel()
-Function onSingleChannelFetchForLinearRelaunchSuccess(successResponse, _storeInCache = false)
-  linearContent = invalid
-  if successResponse <> invalid AND successResponse.getChildCount() > 0
-    linearContent = successResponse.getChild(0)
-    linearContent.deeplinktype = "linear"
-  end if
-
-  if linearContent <> invalid
-    '//deeplink to the EPG SCreen, then launch the linear video player, and ensure the side nav displays the proper focus
-    showDefaultEPGScreen()
-    hideNavMenu(false) '//ensure the side nav is closed.
-    playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.epgScreen, true)
-
-    '//Change the background to regular fullscreen so there isn't the normal corner linear video background for a moment
-    m.backgroundGroup.backgroundInfo = {
-      type : m.constants.ui.backgroundTypes.fullscreen
-      uriList : []
-    }
-
-    focusSideNavOption(m.constants.ui.sideNavIds.home)
-  else
-    startChannelFromAppLoad()
-  end if
-End Function
-
-
-
 ' restarts the app from beginning of the line in order to retrieve starter/remote components
 Function restartApp()
   tubiLog("ContentController.restartApp")
