@@ -17,6 +17,11 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
   lineOneData.length = content.length
   lineOneData.hasCC = (content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false)
   lineOneData.rating = content.rating
+
+  if Ucase(content.rating) = "R"
+    getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1")
+  end if
+
   lineOneData.partnerLogoUri = content.inlineLogoUri
 
   if content.type = m.constants.ui.contentTypes.series

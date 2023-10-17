@@ -77,7 +77,7 @@ Function init()
   m.closedCaptions.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.resolutionPoster.observeFieldScoped("loadStatus", "onPosterLoadStatus")
 
-  m.signInText.text = getTranslation("registration_signIn_to_play_hint")
+  m.signInText.text = getTranslation("registration_signIn_to_play_R_rated")
   m.reminderTitle.text = getTranslation("info_panel_reminder_is_set")
 
   onWidthChange()
