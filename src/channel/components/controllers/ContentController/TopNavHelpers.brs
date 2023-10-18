@@ -37,7 +37,7 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
     if screen.trackingPageInfo <> invalid
       '//Dispatch a selection component_interaction analytic event when a top nav item is selected
       navComponent = {
-        top_nav_section: m.Tracking.sideNavPageMap[topNavItem.id]
+        top_nav_section: m.Tracking.topNavPageMap[topNavItem.id]
       }
       pageOneof = m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pagetype, screen.trackingPageInfo.pageValues)
       event = {

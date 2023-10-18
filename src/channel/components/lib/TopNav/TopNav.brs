@@ -166,7 +166,7 @@ Function onItemSelected()
 
     ' when the screen stacker changes the page, it will use trackingComponentInfo to dispatch
     ' a 'NavigateToPageEvent'
-    selectedSection = m.Tracking.sideNavPageMap[menuItem.id]
+    selectedSection = m.Tracking.topNavPageMap[menuItem.id]
     values = {
       top_nav_section: selectedSection
     }
