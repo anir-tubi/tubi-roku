@@ -202,7 +202,7 @@ Function fetchCategoryDetails(content, index = 0, contentMode = "")
 
     options.params = params
 
-    categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, options)
+    categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, options, invalid, m.constants.ui.screenIds.categoryDetailsScreen)
 
     m.makeRequest({
       url: categoryReqInfo.url
@@ -237,6 +237,9 @@ Function onCategoryDetailResponse(categoryContent)
         sponsorPixels = categoryContent.sponsorImages.pixels["container_details"]
         sendSponsorPixels(sponsorPixels)
       end if
+
+      '//Assume images are going to be displayed when the category detail screen is displayed - and send exposure event
+      getExperimentResource("roku_large_poster", "roku_large_poster_categories", true)
 
       if screen.content = invalid 'first time
         screen.content = categoryContent

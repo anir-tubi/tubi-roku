@@ -28,6 +28,11 @@ Function TubiExperiments(constants) as Object
         roku_registration_signin_password_reset_v2: {"enabled": true, "instant": true}
       }
 
+      '//V1 enabled large posters on the home screen. The categories experiment (V2) will enable large posters on the category detail screens
+      roku_large_poster: {
+        roku_large_poster_categories: {"enabled": false}
+      }
+
       roku_hevc_drm_4k: {
         roku_hevc_drm_4k_v1 : {"enabled": true}
       }

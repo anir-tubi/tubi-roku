@@ -17,12 +17,17 @@ Function init()
   m.lowerRowIndex = 0
   m.numRowsInBatch = m.constants.performance.categoryGridList.lazyLoadBatchSize / itemsInRowCount
 
-
   m.InfoPanel = m.top.findNode("ChannelsInfoPanel")
   m.PageTitleAndCounter = m.top.findNode("pageTitleAndCounter")
   m.VideoGrid = m.top.findNode("ChannelsVideoGrid")
   m.NavSection = m.top.findNode("nav")
   posterSize = m.constants.ui.imageSizes.poster
+  if (getExperimentResource("roku_large_poster", "roku_large_poster_categories", false).enabled = true)
+    '//::TODO:: roku_large_poster_categories - when graduating, remove the hardcoded properties in the XML associated with the following lines
+    posterSize = m.constants.ui.imageSizes.largePoster
+    m.VideoGrid.itemSpacing = [16,16]
+    m.VideoGrid.numColumns = 6
+  end if
   m.top.observeField("callingPage", "onSetCallOfAction")
   m.top.observeField("shouldLoadContent", "onLoadContent")
   m.top.observeField("isLoading", "onIsLoading")

@@ -319,7 +319,9 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "")
   posterSize = m.constants.ui.imageSizes.poster
   landscapeSize = m.constants.ui.imageSizes.landscape
 
-  if isNonEmptyString(screenId)  = true AND screenId = m.constants.ui.screenIds.homeScreen
+  isLargePosteExperimentEnabled = (m.experiments <> invalid AND m.experiments.getExperimentResource("roku_large_poster", "roku_large_poster_categories").enabled = true AND isNonEmptyString(screenId) = true AND screenId = m.constants.ui.screenIds.categoryDetailsScreen)
+
+  if isLargePosteExperimentEnabled = true OR (isNonEmptyString(screenId) = true AND screenId = m.constants.ui.screenIds.homeScreen)
     posterSize = m.constants.ui.imageSizes.largePoster
     landscapeSize = m.constants.ui.imageSizes.largeLandscape
   end if
