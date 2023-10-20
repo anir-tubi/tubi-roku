@@ -1419,11 +1419,10 @@ Function setDetailScreenLikeDislikeStateFromLikeAction(detailScreen, sLikeAction
   sLikedState = translateLikeActionToLikeState(sLikeAction)
 
   canShowLikeDisLikeToast = (UCase(m.constants.deviceInfo.countryCode) = "US" AND isKidsUIOn() = false)
-  if getExperimentResource("roku_like_toast", "roku_like_toast_v2", false).enabled = true AND isNonEmptyString(sLikedState) = true AND canShowLikeDisLikeToast = true
+  if isNonEmptyString(sLikedState) = true AND canShowLikeDisLikeToast = true
     dialogSubType = sLikedState + "_title"
     if sLikedState = m.constants.ui.likeDislikeStates.liked AND m.pub_serverPersistentData.isLikeToastNotificationShown = false
 
-      getExperimentResource("roku_like_toast", "roku_like_toast_v2")
       saveServerPersistentData({
         "isLikeToastNotificationShown": true
       }, "device")
@@ -1452,7 +1451,6 @@ Function setDetailScreenLikeDislikeStateFromLikeAction(detailScreen, sLikeAction
 
     else if sLikedState = m.constants.ui.likeDislikeStates.disliked AND m.pub_serverPersistentData.isDisLikeToastNotificationShown = false
 
-      getExperimentResource("roku_like_toast", "roku_like_toast_v2")
       saveServerPersistentData({
         "isDisLikeToastNotificationShown": true
       }, "device")
@@ -1480,19 +1478,6 @@ Function setDetailScreenLikeDislikeStateFromLikeAction(detailScreen, sLikeAction
       showToast(toastInfo, true, dialogEventInfo)
 
     end if
-  else if isNonEmptyString(sLikedState) = true AND canShowLikeDisLikeToast = true
-    if sLikedState = m.constants.ui.likeDislikeStates.liked AND m.pub_serverPersistentData.isLikeToastNotificationShown = false
-      getExperimentResource("roku_like_toast", "roku_like_toast_v2")
-      saveServerPersistentData({
-        "isLikeToastNotificationShown": true
-      }, "device")
-    else if sLikedState = m.constants.ui.likeDislikeStates.disliked AND m.pub_serverPersistentData.isDisLikeToastNotificationShown = false
-      getExperimentResource("roku_like_toast", "roku_like_toast_v2")
-      saveServerPersistentData({
-        "isDisLikeToastNotificationShown": true
-      }, "device")
-    end if
-
   end if
 
   detailScreen.likeDislikeState = sLikedState

@@ -68,10 +68,6 @@ Function TubiExperiments(constants) as Object
         roku_notforme_dislike_v2: {"like_dilike_button_title_type": "none"} 'valid values are : "none", "rate_this_title", "tell_us_what_you_think"
       }
 
-      roku_like_toast: {
-        roku_like_toast_v2: {"enabled": true}
-      }
-
       roku_tensor_cdn_domain: {
         roku_tensor_cdn_domain_v2: {"enabled": false}
       }
