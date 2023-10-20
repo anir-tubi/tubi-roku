@@ -84,6 +84,10 @@ Function TubiExperiments(constants) as Object
         roku_tensor_cdn_domain_v2: {"enabled": false}
       }
 
+      roku_browse_while_watching_ymal: {
+        roku_browse_while_watching_ymal_v1: {"enabled": false}
+      }
+
       roku_new_cdn: {
         roku_new_cdn_v1: {"enabled": false}
       }

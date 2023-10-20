@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Also referred to as Autoplay UI -->
+<component name="Related" extends="Group">
+  <script type="text/brightscript" uri="Related.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+
+  <interface>
+    <!-- INPUTS -->
+      <field id="content" type="node"/>
+      <field id="updateContent" type="boolean" alwaysNotify="true"/>
+      <!-- show or hide the Info panel component -->
+      <field id="showInfoPanel" type="boolean" alwaysNotify="true"/>
+      <!-- unfocus the focused components -->
+      <field id="unfocus" type="boolean" alwaysNotify="true"/>
+
+    <!-- OUTPUTS -->
+      <field id="isRelatedContentFocused" type="boolean" alwaysNotify="true"/>
+      <field id="selectedRelatedContentItem" type="node"/>
+      <field id="keyPress" alias="RelatedGrid.keyPress"/>
+      <field id="itemFocused" alias="RelatedGrid.itemFocused"/>
+
+      <!-- Holds the information needed to populate a navigate_within_page event. This will
+           be observed by the contentController via videoHelpers
+           which will be responsible for sending navigate_within_page events.
+      -->
+      <field id="navigateWithinPageInfo" type="assocarray"/>
+  </interface>
+
+  <children>
+
+    <Group id="ymal">
+
+      <InfoPanel
+        id="Info"
+        mode="item"
+        width="992"
+        maxHeight="312"
+        maxTitleLines="3"
+        opacity="0.0"
+        translation="[0,0]"/>
+
+      <Group
+        id="YMALOverlayGroup"
+        opacity="0.2">
+
+        <CategoryGridRowLabel
+          id="RelatedRowLabel"
+          translation="[0, 384]">
+          <TubiContentNode
+            id="RelatedRowLabelContent"
+            role="content"/>
+        </CategoryGridRowLabel>
+
+        <CustomMarkupGrid
+          id="RelatedGrid"
+          itemComponentName="StarterGridItem"
+          numRows="1"
+          itemSpacing="[12,12]"
+          itemSize="[186,267]"
+          fadeFocusFeedbackWhenAutoScrolling="true"
+          horizFocusAnimationStyle="fixedFocus"
+          focusBitmapUri="pkg:/images/selector-$$RES$$.9.png"
+          translation="[0,450]"/>
+
+      </Group>
+
+    </Group>
+
+  </children>
+</component>

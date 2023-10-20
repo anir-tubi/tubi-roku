@@ -51,6 +51,10 @@ Function init()
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
   m.LoadingMessage = m.top.findNode("LoadingMessage")
   m.Transport = m.top.findNode("Transport")
+  m.Related = m.top.findNode("Related")
+  m.Related.observeFieldScoped("isRelatedContentFocused", "onRelatedItemFocused")
+  m.Related.observeFieldScoped("selectedRelatedContentItem", "onRelatedItemSelected")
+  m.Related.observeFieldScoped("keyPress", "onKeyPressWhenYMALHasFocus")
   m.UpNext = m.top.findNode("UpNext")
   m.UpNext.observeField("contentSelected", "onUpNextContentSelected")
   m.UpNext.observeField("opacity", "onUpNextOpacityChange")
@@ -115,7 +119,8 @@ Function init()
   m.ElapsedLabel = m.top.findNode("ElapsedLabel")
   m.RemainingLabel = m.top.findNode("RemainingLabel")
   m.ProgressBar = m.top.findNode("ProgressBar")
-  m.Overlay = m.top.findNode("VideoOverlay")
+  m.TopOverlay = m.top.findNode("TopOverlay")
+  m.TopHint = m.top.findNode("TopHint")
   m.ScrubTimer = m.top.findNode("ScrubTimer")
   m.HUD = m.top.findNode("HUD")
   m.TransportGradient = m.top.findNode("TransportGradient")
@@ -123,10 +128,11 @@ Function init()
   m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
   m.Thumbnail = m.top.findNode("Thumbnail")
 
+  m.VideoOverlay = m.top.findNode("VideoOverlay")
+  m.YMALGradient = m.top.findNode("YMALGradient")
+
   m.skipCuepointsButton = m.top.findNode("SkipCuepointsButton")
   m.skipCuepointsButton.observeFieldScoped("selected", "onSkipCuepointsButtonSelected")
-  m.skipCuepointsButtonUpTranslation = 740
-  m.skipCuepointsButtonDownTranslation = 840
   m.top.playbackSource = {
     "srcForAnalytic": m.constants.player.playbackSource.unknown
     "srcForAds": m.constants.player.playbackOrigin.unknown
@@ -186,9 +192,13 @@ Function init()
 
   m.lastButtonPressPos = 0
   m.transportAutoHideTime = m.constants.player.transportAutoHideTime
+  m.ymalAutoHideTime = m.constants.player.ymalAutoHideTime
   m.ignoreOptionsKey = m.constants.deviceInfo.firmwareCaptionMenu
   m.bufferingInfo = invalid
+
   m.progressBarFocused = false
+  m.playbackControlFocused = false
+  m.relatedRowFocused = false
 
   m.bufferingTimer = m.top.createChild("Timer")
   m.bufferingTimer.duration = 10
@@ -263,7 +273,6 @@ Function init()
 
   m.thumbnailMinXOffset = 238 ' based on zeplin designs
   m.thumbnailMaxXOffset = 1920 - 238 - m.Thumbnail.width
-  m.thumbnailMaxYOffset = 889
 
   isScaledUI = m.constants.deviceInfo.scaledUi
   if isScaledUI = true then
@@ -288,10 +297,25 @@ Function init()
   ' Creating internal state to track when the overlay is visible to users.
   m.isClosedCaptionAudioOverlayShowing = false
 
+  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1", false).enabled = true
+    m.TransportGradient.opacity = 0.0
+    m.YMALGradient.opacity = 1.0
+    m.SkipTrailerButton.translation = [84,870]
+    m.skipCuepointsButtonUpTranslation = 681
+    m.skipCuepointsButtonDownTranslation = 780
+    m.thumbnailMaxYOffset = 825
+  else
+    m.YMALGradient.opacity = 0.0
+    m.TransportGradient.opacity = 1.0
+    m.SkipTrailerButton.translation = [84,948]
+    m.skipCuepointsButtonUpTranslation = 741
+    m.skipCuepointsButtonDownTranslation = 840
+    m.thumbnailMaxYOffset = 888
+  end if
 
-  title = m.Overlay.findNode("VideoOverlayTitle")
-  episodeTitle = m.Overlay.findNode("VideoOverlayEpisodeTitle")
-  SkipTrailerButtonLabel = m.Overlay.findNode("SkipTrailerButtonLabel")
+  title = m.TopOverlay.findNode("VideoOverlayTitle")
+  episodeTitle = m.TopOverlay.findNode("VideoOverlayEpisodeTitle")
+  SkipTrailerButtonLabel = m.TopOverlay.findNode("SkipTrailerButtonLabel")
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmall_Strong)
@@ -337,7 +361,6 @@ Function setSkipCuepointsButtonTextAndTimer(skipCuepointsTitle as string) As Voi
   m.skipCuepointsButtonTimer.observeFieldScoped("fire", "autoHideSkipCuepointsButton")
   m.skipCuepointsButtonTimer.control = "start"
   m.skipCuepointsButton.text = skipCuepointsTitle
-  showSkipCuepointsButton()
 End Function
 
 
@@ -357,7 +380,10 @@ Function showSkipCuepointsButton()
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonDownTranslation]
   end if
 
-  m.skipCuepointsButton.visible = true
+  if m.relatedRowFocused = false
+    m.skipCuepointsButton.visible = true
+  end if
+
 End Function
 
 
@@ -600,6 +626,7 @@ Function onControlChange()
     clearSkipCuepointsButtonAndTimer()
     stopVideo()
     animateTransport("out")
+    hideYMAL()
     m.UpNext.stopAutoPlayTimer = true
     m.UpNext.hide = true
 
@@ -795,9 +822,16 @@ Function onVideoPositionChange(msg)
     m.isSeeking = false
   end if
 
-  ' Auto hide transport
-  if m.VideoState = "play" AND m.HUD.opacity = 1 AND m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime AND m.isClosedCaptionAudioOverlayShowing = false
-    animateTransport("out")
+  if m.relatedRowFocused = true
+    if m.playerPosition > m.lastButtonPressPos + m.ymalAutoHideTime AND m.isClosedCaptionAudioOverlayShowing = false
+      animateTransport("out")
+      hideYMAL()
+    end if
+  else
+    if m.VideoState = "play" AND m.HUD.opacity = 1 AND m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime AND m.isClosedCaptionAudioOverlayShowing = false
+      animateTransport("out")
+      hideYMAL()
+    end if
   end if
 
   ' Cancel temporary captions
@@ -846,6 +880,7 @@ Function onVideoPositionChange(msg)
 
       if m.UpNext.content <> invalid
         animateTransport("out")
+        hideYMAL()
         clearSkipCuepointsButtonAndTimer()
         m.UpNext.show = true
         m.UpNext.setFocus(true)
@@ -913,7 +948,7 @@ Function onVideoPositionChange(msg)
     ' show the ads countdown if appropriate (show if ads are available and within adHeadsUpTime)
     adPosition = m.top.adPosition
     if adState = "adsPending" AND isInWindow(m.playerPosition, adPosition, m.adHeadsUpTime) = true
-      if m.Overlay.opacity = 0
+      if m.TopOverlay.opacity = 0
         ' Don't show the ad heads up when the transport/overlay is showing, since it crowds the space of the title on the overlay
         m.ratingOverlay.opacity = 0
         showAdHeadUpText(adPosition)
@@ -1438,9 +1473,9 @@ Function updateVideoPlayerState(content) as Void
   m.descriptorDesc.text = sDescriptorDescText
 
   ' add the title and episode title to the overlay
-  title = m.Overlay.findNode("VideoOverlayTitle")
+  title = m.TopOverlay.findNode("VideoOverlayTitle")
   'This field is also used to display the gameInfo for Replay sports
-  episodeTitle = m.Overlay.findNode("VideoOverlayEpisodeTitle")
+  episodeTitle = m.TopOverlay.findNode("VideoOverlayEpisodeTitle")
   if content.parentType = "series"
     title.text = content.parentTitle
     episodeTitle.text = content.title
@@ -1819,7 +1854,7 @@ Function showRatingOverlay()
   content = m.Video.content
   if content <> invalid AND isNonEmptyString(content.rating) = true
     fade(m.ratingOverlay, "in", 0.6)
-    if m.Overlay.opacity > 0.0
+    if m.TopOverlay.opacity > 0.0
       m.ratingOverlay.translation = [0,250]
     else
       m.ratingOverlay.translation = [0,0]
@@ -2005,4 +2040,49 @@ End Function
 Function onAudioTrackChange(msg)
   audioTrack = msg.getData()
   m.Video.audioTrack = audioTrack
+End Function
+
+
+Function onRelatedItemFocused()
+  m.lastButtonPressPos = m.playerPosition
+  ' Do not show the PauseAd if the user interacting the YMAL row.
+  ' Resetting the timer when there is any user interaction during pause
+  if m.pauseAdOverlayTimer.control = "start"
+    restartPauseAdTimer()
+  end if
+End Function
+
+
+Function onRelatedItemSelected(msg)
+  selectedContent = msg.getData()
+
+  m.top.trackingComponentInfo = {
+    componentType: "related_component"
+    componentValues: {
+      content_tile: m.Tracking.getAnalyticsTile(selectedContent, m.Related.itemFocused + 1, 1)
+    }
+  }
+
+  animateTransport("out")
+  hideYMAL()
+  m.top.relatedContentToPlay = selectedContent
+  resetTransportButtons()
+End Function
+
+
+Function onKeyPressWhenYMALHasFocus(msg)
+  keyPress = msg.getData()
+
+  if keyPress = "fastforward"
+    if m.FastForwardButton.enabled = true then
+      animateTransportAndYMAL("out")
+      handleFastForward()
+    end if
+  else if keyPress = "rewind"
+    if m.RewindButton.enabled = true then
+      animateTransportAndYMAL("out")
+      handleRewind()
+    end if
+  end if
+
 End Function

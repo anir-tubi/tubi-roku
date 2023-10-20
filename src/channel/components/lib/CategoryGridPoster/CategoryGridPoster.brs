@@ -58,7 +58,7 @@ Function init()
   setTypographyOfLabel(m.InnerTitle, typographyConstants.ids.bodySmall_strong)
   setTypographyOfLabel(m.Title, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.TimeRemaining, typographyConstants.ids.bodyExtraSmall)
-  
+
   onThemeChange()
 End Function
 

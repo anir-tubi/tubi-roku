@@ -688,7 +688,7 @@ Function handleSingleContentError(error, onRetrySuccessCallback, onRetryErrorCal
 End Function
 
 
-Function getRelatedContent(content)
+Function getRelatedContent(content, callback = handleRelatedResponse)
   ' get related (You May Also Like) content along with metadata for the content
   ' (but not if in any of the kids modes, since it won't be displayed)
   if content <> invalid AND isKidsUIOn() = false
@@ -697,7 +697,7 @@ Function getRelatedContent(content)
       url: relatedRequestInfo.url
       requestType: m.constants.reqNames.getRelatedContent
       options: relatedRequestInfo.options
-      successCallback: handleRelatedResponse
+      successCallback: callback
       responseType: "node"
       silenceCallbackWarnings: true
       contentId: content.id

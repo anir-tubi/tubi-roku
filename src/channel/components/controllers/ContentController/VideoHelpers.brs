@@ -104,6 +104,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     videoPlayer.observeFieldScoped("getPauseAd", "onGetPauseAd")
     videoPlayer.observeFieldScoped("sendPauseAdPixel", "onSendPauseAdPixel")
     videoPlayer.observeFieldScoped("audioTrackSettings", "onAudioTrackSettingsChange")
+    videoPlayer.observeFieldScoped("relatedContentToPlay", "onPlayerRelatedContentToPlay")
     initVideoTracking(videoPlayer) 'initializeYoubora
     setInScreenCache(videoPlayer)
 
@@ -117,6 +118,8 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
   if m.pub_serverPersistentData <> invalid
     videoPlayer.preferredAudioTrack = m.pub_serverPersistentData.audioTrack
   end if
+
+  videoPlayer.relatedContent = invalid
 
   stopVideoPreviewIfPlaying() 'stop videopreview just in case it is playing
 
@@ -192,6 +195,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
       videoPlayer.observeFieldScoped("upNextCuepointReached", "onUpNextCuepointReached")
       videoPlayer.observeFieldScoped("upNextContentToAutoplay", "onUpNextContentToAutoplay")
       videoPlayer.observeFieldScoped("upNextNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+      videoPlayer.observeFieldScoped("relatedNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
       videoPlayer.observeFieldScoped("segInfo", "onSegInfoChange")
 
       videoPlayer.enableAds = true
@@ -200,6 +204,10 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
       end if
 
       sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.streamStart, content)
+
+      if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1", false).enabled = true
+        getRelatedContent(content, handleRelatedResponseInVideoPlayer)
+      end if
     end if
 
     ' by default setting sprites to invalid
@@ -748,7 +756,6 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
           updateHistoryAndHandleResponse(videoContent, historyPosition)
           updateRokuContinueWatchingInfo(videoContent, historyPosition)
         end if
-
         populateDetailScreen(detailScreen, detailContent, false, detailScreenResumePosition, m.constants.ui.screenIds.videoPlayerScreen)
       end if
     end if
@@ -788,6 +795,7 @@ Function stopVideoContent(videoPlayer)
     videoPlayer.unobserveFieldScoped("upNextCuepointReached")
     videoPlayer.unobserveFieldScoped("upNextContentToAutoplay")
     videoPlayer.unobserveFieldScoped("upNextNavigateWithinPageInfo")
+    videoPlayer.unobserveFieldScoped("relatedNavigateWithinPageInfo")
     videoPlayer.unobserveFieldScoped("segInfo")
 
     ' reset the deep link state since we've handled it already at this point
@@ -1211,6 +1219,16 @@ Function sendPauseAdPixel(pixelUrl)
 End Function
 
 
+' @relatedContent: roSGNode, TubiContentNode
+Function handleRelatedResponseInVideoPlayer(relatedContent)
+  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+  if videoPlayer <> invalid
+    videoPlayer.relatedContent = relatedContent
+    videoPlayer.updateRelatedContent = true
+  end if
+End Function
+
+
 ' @content: tubiContentNode, a content node representing a movie or episode or sports event.
 ' @position: integer, Playback position.
 Function updateRokuContinueWatchingInfo(content, position)
@@ -1294,4 +1312,14 @@ Function deleteFromRokuContinueWatching(content)
   requestInfo = m.rokuContinueWatchingApi.createDeleteContinueWatchingReqInfo(body)
   requestInfo.requestType = m.constants.reqNames.deleteRokuContinueWatching
   m.top.rokuContinueWatchingRequestInfo = requestInfo
+End Function
+
+
+Function onPlayerRelatedContentToPlay(msg)
+  content = msg.getData()
+  playbackSource = {
+    "srcForAnalytic": m.constants.player.playbackSource.unknown
+    "srcForAds": m.constants.player.playbackOrigin.ymal
+  }
+  playUpNextContent(content, playbackSource)
 End Function

@@ -154,7 +154,7 @@ End Function
 ' animateItemSize
 '
 ' animate the itemSize property of the target
-' @param target: Object, the target element that is being animated 
+' @param target: Object, the target element that is being animated
 ' @param itemSize: vector2d array, the itemSize property of the target that will be animated
 ' @param duration: float, the duration of the animation
 ' @param delay: float, the delay (if any) of the animation

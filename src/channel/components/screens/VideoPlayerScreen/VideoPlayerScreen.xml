@@ -111,6 +111,12 @@
       <!-- indicates whether user opted out of Personalized Advertising either through initial consent or settings screen. -->
       <field id="didUserOptOutOfPersonalizedAdvertising" type="boolean" value="false" />
 
+      <!-- YMAL content to be displayed on YMAL Row inside player -->
+      <field id="relatedContent" type="node" alias="Related.content" />
+
+      <!-- boolean field which tells the YMAL content is updated -->
+      <field id="updateRelatedContent" alias="Related.updateContent"/>
+
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
@@ -145,6 +151,9 @@
       <!-- Pass through Up Next component events to video helper -->
       <field id="upNextNavigateWithinPageInfo" alias="UpNext.navigateWithinPageInfo" />
 
+      <!-- Pass through Related component events to video helper -->
+      <field id="relatedNavigateWithinPageInfo" alias="Related.navigateWithinPageInfo" />
+
       <!-- Used to set the autoplay_deliberate and autoplay_automatic analytics values
            for PlayProgressEvents and StartVideoEvents. Allowed values are "automatic", "deliberate" and "unknown"
            -->
@@ -152,6 +161,11 @@
 
       <!-- Autoplay this content when this field is set -->
       <field id="upNextContentToAutoplay" type="node" />
+
+      <!-- set to the contentNode of the RelatedGrid item which was focused when
+           the ok button is pressed
+      -->
+      <field id="relatedContentToPlay" type="node" alwaysNotify="true"/>
 
       <!-- streamingSegment will be set when streamingSegment of videoNode value changes -->
       <field id="segInfo" type="assocarray"/>
@@ -268,13 +282,28 @@
     <Group
       id="VideoOverlay"
       opacity="0.0">
+
+      <Poster
+        id="YMALGradient"
+        width="1920"
+        height="1080"
+        translation="[0,0]"
+        opacity="0.0"
+        uri="pkg:/images/playback-gradient-overlay.png"/>
+
       <Poster
         id="TransportGradient"
         width="1920"
         height="1080"
-        translation="[0,0]"
-        opacity="1.0"
+
+        opacity="0.0"
         uri="pkg:/images/playback-gradient-$$RES$$.9.png"/>
+
+    </Group>
+
+    <Group
+      id="TopHint"
+      opacity="0.0">
       <Poster
         uri="pkg:/images/back.png"
         width="29"
@@ -291,6 +320,12 @@
           uri="pkg:/fonts/Vaud-SemiBold.ttf"
           size="22" />
       </Label>
+    </Group>
+
+    <Group
+      id="TopOverlay"
+      opacity="0.0">
+
       <Label
         id="VideoOverlayTitle"
         translation="[84,147]"
@@ -317,6 +352,7 @@
           uri="pkg:/fonts/Vaud-SemiBold.ttf"
           size="36" />
       </Label>
+
     </Group>
 
     <PauseAdOverlay
@@ -338,7 +374,7 @@
         width="342"
         height="192"
         spriteDirection="horiz"
-        translation="[238,633]"/>
+        translation="[237, 567]"/>
       <Group
         id="Transport"
         opacity="1.0">
@@ -346,14 +382,14 @@
         <TubiProgressBar
           id="ProgressBar"
           width="1752"
-          translation="[85,896]"/>
+          translation="[84, 831]"/>
 
         <!-- Time -->
         <Label
           id="ElapsedLabel"
           text="00:00:00"
           width="500"
-          translation="[74,848]" >
+          translation="[75, 783]" >
           <Font
             id="Vaud34px"
             role="font"
@@ -365,7 +401,7 @@
           font="dictionary:Vaud34px"
           text="-00:00:00"
           width="500"
-          translation="[1696,848]" />
+          translation="[1695, 783]" />
 
         <!-- Transport buttons - Transport buttons must be in the order they appear on the screen (from left to right) -->
         <Group
@@ -374,8 +410,7 @@
             id="SkipTrailerButton"
             width="260"
             height="80"
-            uri=""
-            translation="[85,949]" >
+            uri="">
             <Label
               id="SkipTrailerButtonLabel"
               text="Watch Movie"
@@ -390,50 +425,50 @@
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-to-start.png"
-            translation="[540,958]" />
+            translation="[540,873]" />
           <TransportButton
             id="RewindButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-rew.png"
-            translation="[670,958]" />
+            translation="[672,873]" />
           <TransportButton
             id="HopBackButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-rew-30s.png"
-            translation="[800,958]" />
+            translation="[800,873]" />
           <!-- play/pause uri will update based on playing state of video -->
           <TransportButton
             id="PlayPauseButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-play.png"
-            translation="[930,958]" />
+            translation="[930,873]" />
           <TransportButton
             id="HopForwardButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-fwd-30s.png"
-            translation="[1060,958]" />
+            translation="[1060,873]" />
           <TransportButton
             id="FastForwardButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-ffw.png"
-            translation="[1190,958]" />
+            translation="[1190,873]" />
           <TransportButton
             id="EndButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-to-end.png"
-            translation="[1320,958]" />
+            translation="[1320,873]" />
           <TransportButton
             id="closedCaptionAudioButton"
             width="60"
             height="50"
             uri="pkg:/images/transport/sgplayer/icon-subtitles.webp"
-            translation="[1697,958]"
+            translation="[1698,873]"
             visible="false" />
         </Group>
       </Group>  <!-- Transport -->
@@ -513,6 +548,11 @@
 
     <UpNext
       id="UpNext"
+      opacity="0.0" />
+
+    <Related
+      id="Related"
+      translation="[84, 550]"
       opacity="0.0" />
 
     <Rectangle

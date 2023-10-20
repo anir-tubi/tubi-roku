@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="CustomMarkupGrid" extends="MarkupGrid">
+  <script type="text/brightscript" uri="CustomMarkupGrid.brs"/>
+  <interface>
+    <field id="keyPress" type="string" alwaysNotify="true"/>
+  </interface>
+</component>

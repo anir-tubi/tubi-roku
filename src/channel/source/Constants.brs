@@ -747,6 +747,7 @@ Function getConstants()
     'the number of seconds before the video player transport autohides during playback
     constants.player.transportAutoHideTime = 5
     constants.player.thumbnailFrequency = 5
+    constants.player.ymalAutoHideTime = 12
 
     constants.player.playbackSource = {}
     constants.player.playbackSource.autoplayDeliberate = "AUTOPLAY_DELIBERATE"
