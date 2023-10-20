@@ -12,17 +12,48 @@ End Function
 
 Function onContentChange()
   tubiLog("UpNextPoster.onContentChange")
-  if m.top.itemContent <> invalid then
+  item = m.top.itemContent
+  if item <> invalid then
     ' If series content, we show a 16:9 poster, otherwise a DVD-aspect poster
     sURI = ""
-    if m.top.itemContent.seriesId <> invalid and m.top.itemContent.seriesId <> ""
-      sURI = m.top.itemContent.landscape
+    if item.seriesId <> invalid and item.seriesId <> ""
+      sURI = item.landscape
     else
-      sURI = m.top.itemContent.hdgridposterurl
+      sURI = item.hdgridposterurl
     end if
 
     getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true)
     m.poster.uri = sURI
 
+    removeLockIcon()
+    if item.needsLogin = true
+      setLockIcon()
+    end if
+
+  end if
+End Function
+
+Function setLockIcon()
+  tubiLog("UpNextPoster.setLockIcon")
+  m.lockIcon = m.top.createChild("Poster")
+  m.lockIcon.opacity = 0.0
+  m.lockIcon.width = 21
+  m.lockIcon.height = 24
+  m.lockIcon.uri = "pkg:/images/icon-lock.webp"
+  m.lockIcon.translation = [174, 14]
+  m.top.observeFieldscoped("focusPercent", "onFocusPercent")
+End Function
+
+
+Function removeLockIcon()
+  tubiLog("UpNextPoster.removeLockIcon")
+  m.top.removeChild(m.lockIcon)
+  m.top.unObserveFieldscoped("focusPercent")
+End Function
+
+
+Function onFocusPercent(msg)
+  if  m.lockIcon <> invalid
+    m.lockIcon.opacity = msg.getData()
   end if
 End Function

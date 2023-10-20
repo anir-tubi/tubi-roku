@@ -110,7 +110,13 @@ Function onVideoPreviewStateChanged(msg)
 
       'Don't want to continue to full player from video preview if the user is in kidsmode, teen level for UK and NZ region as per GDPR guidelines.
       'Also dont auto start locked contents.
-      isFullPlayerBlockedForUser = (isGDPR() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR (currentScreen.contentFocused <> invalid AND currentScreen.contentFocused.needsLogin = true AND isloggedInUser() = false)
+      item = currentScreen.contentFocused
+
+      if currentScreen.subType() = "DetailScreen"
+        item = currentScreen.content
+      end if
+
+      isFullPlayerBlockedForUser = (isGDPR() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR ( item <> invalid AND item.needsLogin = true AND isloggedInUser() = false)
 
       ' Don't want to continue playback if the user has their tv turned off
       if m.maintask.isHdmiStatusOk = true AND isFullPlayerBlockedForUser = false

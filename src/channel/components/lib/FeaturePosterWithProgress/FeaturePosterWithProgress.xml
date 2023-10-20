@@ -5,8 +5,13 @@
 <component name="FeaturePosterWithProgress" extends="Group">
 
   <script type="text/brightscript" uri="FeaturePosterWithProgress.brs" />
-  <script type="text/brightscript" uri="../GlobalMixin.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib//GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+
 
   <interface>
     <field id="itemContent" alias="FeaturePoster.itemContent"/>
@@ -14,6 +19,8 @@
     <field id="width" alias="FeaturePoster.width"/>
     <field id="height" alias="FeaturePoster.height"/>
     <field id="loadStatus" alias="FeaturePoster.loadStatus"/>
+    <field id="focusPercent" type="float"/>
+
   </interface>
 
   <children>

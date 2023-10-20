@@ -465,7 +465,24 @@ Function playUpNextContent(nextContent, playbackSource = {"srcForAnalytic": "unk
       end if
     end if
 
-    playVideoContent(content, playbackSource)
+    if nextContent.needsLogin = true AND isLoggedInUser() = false
+      '//TODO : This code ensures that just in case a locked content present in upnext UI.
+      ' There should not be any locked content under upnext UI which will affect the Autoplay TVT, so keep a client log.
+
+      errorInfo = {
+        video_id: content.id
+        video_url: content.url
+        error_message: "Locked content cannot be played"
+        error_code: -1   ' is it even needed?
+      }
+
+      tubiLog(formatJson(errorInfo), "warn", "videoLoad", "r-rated-upnext", 0.1)
+
+      returnToDetailScreenFromVideo()
+    else
+      playVideoContent(content, playbackSource)
+    end if
+
   end if
 End Function
 

@@ -592,7 +592,7 @@ Function onSignInError(errorResponse)
   ' Sample error response: {"code":"INVALID_TOKEN","message":"Token type does not match"}
   if errorResponse.error <> invalid AND errorResponse.error.message = "Token type does not match"
     screenIds = getScreenIdsFromStack()
-    
+
     eventInfo = {
 
       ' Active BreadCrumb. Useful to figure from where is the user trying to login. Side Menu / Details screen.
@@ -1375,7 +1375,7 @@ Function processTokenToGenerateTokenDebugInfo()
   ' Processing the token before sending request. So that we can use this info if it fails.
   authInfo = getFieldFromGlobal("authInfo")
   if authInfo <> invalid AND authInfo.accessToken <> invalid
-    ' Contains 3 parts. 
+    ' Contains 3 parts.
     ' First part contains type of encrption
     ' Second part is where we will get the token info.
     jwtTokenSplit = authInfo.accessToken.split(".")
@@ -1385,7 +1385,7 @@ Function processTokenToGenerateTokenDebugInfo()
       jwtBody.FromBase64String(base64UrlToBase64(jwtTokenSplit[1]))
       body = parseJSON(jwtBody.ToAsciiString())
       m.tokenDebugInfo = {
-        
+
         'expiretime
         expiretime: body.exp
 

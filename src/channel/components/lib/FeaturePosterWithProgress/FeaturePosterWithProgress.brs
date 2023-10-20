@@ -22,6 +22,11 @@ Function onContentChange()
   tubiLog("FeaturePosterWithProgress.onContentChange")
   if m.top.itemContent <> invalid then
     drawProgressBar()
+
+    removeLockIcon()
+    if m.top.itemContent.needsLogin = true
+      setLockIcon()
+    end if
   end if
 End Function
 
@@ -42,5 +47,29 @@ Function drawProgressBar()
     m.progressBar.visible = true
   else
     m.progressBar.visible = false
+  end if
+End Function
+
+
+Function setLockIcon()
+  m.lockIcon = m.top.createChild("Poster")
+  m.lockIcon.opacity = 0.0
+  m.lockIcon.width = 21
+  m.lockIcon.height = 24
+  m.lockIcon.uri = "pkg:/images/icon-lock.webp"
+  m.lockIcon.translation = [m.top.width-36, 15]
+  m.top.observeFieldscoped("focusPercent", "onFocusPercent")
+End Function
+
+
+Function removeLockIcon()
+  m.top.removeChild(m.lockIcon)
+  m.top.unObserveFieldscoped("focusPercent")
+End Function
+
+
+Function onFocusPercent(msg)
+  if  m.lockIcon <> invalid
+    m.lockIcon.opacity = msg.getData()
   end if
 End Function

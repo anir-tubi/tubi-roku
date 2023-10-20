@@ -18,7 +18,8 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
   lineOneData.hasCC = (content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false)
   lineOneData.rating = content.rating
 
-  if Ucase(content.rating) = "R"
+  rating = UCase(content.rating)
+  if (rating = "R" OR rating = "TV-MA" OR rating = "TV-14" OR rating = "NC-17" OR rating = "NR") AND m.constants.deviceinfo.countrycode = "US"
     getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1")
   end if
 

@@ -400,7 +400,7 @@ Function setLockIcon()
   m.lockIcon.width = 21
   m.lockIcon.height = 24
   m.lockIcon.uri = "pkg:/images/icon-lock.webp"
-  m.lockIcon.translation = [m.top.width-36, 14]
+  m.lockIcon.translation = [m.top.width-36, 15]
 End Function
 
 

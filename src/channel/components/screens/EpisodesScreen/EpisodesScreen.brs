@@ -123,7 +123,8 @@ Function onEpisodeFocused()
       m.Info.lineTwoData = {
         genres: episode.genres
       }
-      m.Info.needsLogin = episode.needsLogin
+      'TODO: use pubsub or someother way of communication if user is signed In or not.  isLoggedInUser uses global node.
+      m.Info.needsLogin = (episode.needsLogin = true AND isLoggedInUser() = false)
       m.Info.width = 1140
       m.Info.calculateHeight = true
     end if
@@ -135,6 +136,8 @@ Function onEpisodeFocused()
 
     ' trigger navigate_within_page events in ContentController
     rowItem = m.RowList.rowItemFocused
+
+
     if m.gridIsFocused = true AND (rowItem[0] <> m.oldRowItemFocused[0] OR rowItem[1] <> m.oldRowItemFocused[1])
       row = m.RowList.rowItemFocused[0] + 1
       col = m.RowList.rowItemFocused[1] + 1

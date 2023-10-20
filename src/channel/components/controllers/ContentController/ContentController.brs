@@ -1200,15 +1200,21 @@ Function refreshAllDetailScreens()
     screen = m.screenStack.getChild(i)
 
     if screen.subType() = "DetailScreen"
-      content = screen.content 'No need to re fetch the content, just re populate the screen content
-      populateDetailScreen(screen, content)
+      if getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1", false).enabled = true
+        refreshDetailScreenContent(screen)
+        screen.refreshRelatedContent = true
+      else ' TODO: check is refreshing Screen is more better than keep the old content.
+        content = screen.content 'No need to re fetch the content, just re populate the screen content
+        populateDetailScreen(screen, content)
 
-      if isUserSigedIn = true
-        screen.removeSignupButton = true
-        setDetailStrings(screen, content)
-      end if
+        if isUserSigedIn = true
+          screen.removeSignupButton = true
+          setDetailStrings(screen, content)
+        end if
 
-      screen.isWaitingForServerResponse = false
+        screen.isWaitingForServerResponse = false
+    end if
+
     end if
   end for
 End Function

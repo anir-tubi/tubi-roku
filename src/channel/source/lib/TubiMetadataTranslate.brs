@@ -422,7 +422,8 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.ratings <> invalid AND contentFromServer.ratings[0] <> invalid AND contentFromServer.ratings[0].value <> invalid
     translatedContent.rating = contentFromServer.ratings[0].value
 
-    if UCase(translatedContent.rating)  = "R" AND isSignedInUser = false AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1").enabled = true
+    rating = translatedContent.rating
+    if (rating = "R" OR rating = "TV-MA" OR rating = "TV-14" OR rating = "NC-17" OR rating = "NR") AND m.constants.deviceinfo.countrycode = "US" AND isSignedInUser = false AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1").enabled = true
       translatedContent.needsLogin = true
     end if
 
@@ -1328,7 +1329,8 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           end if
           '//TODO: REMOVE AFTER EXPERIMENT roku_registration_vs_tvt_lock_rated_content
           if fullChild.ratings <> invalid AND fullChild.ratings[0] <> invalid AND fullChild.ratings[0].value <> invalid
-            if UCase(fullChild.ratings[0].value) = "R" AND isSignedInUser = false AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1").enabled = true
+            rating = UCase(fullChild.ratings[0].value)
+            if (rating = "R" OR rating = "TV-MA" OR rating = "TV-14" OR rating = "NC-17" OR rating = "NR") AND m.constants.deviceinfo.countrycode = "US" AND isSignedInUser = false AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1").enabled = true
               childAA.needsLogin = true
             end if
           end if
