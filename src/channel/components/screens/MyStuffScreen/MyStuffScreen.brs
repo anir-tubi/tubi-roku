@@ -304,6 +304,8 @@ Function onRowItemFocused(msg) as Boolean
     itemFocused = resolveAbbreviatedContent(m.RowList.rowItemFocused)
     m.top.backgroundUriList = determineBackgroundImage(itemFocused)
 
+    m.top.trackingComponentInfo = getTrackingComponentInfoOfRowList(itemFocused, newCursorPosition)
+
     mode = m.constants.ui.infoPanelModes.item
     if category.gridItemType = m.constants.ui.gridItemTypes.emptyContainer
       emptyContentNode = CreateObject("roSGNode", "TubiContentNode")

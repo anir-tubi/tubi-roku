@@ -721,6 +721,7 @@ Function onGridFocusChange() as void
         m.top.stopLinearVideoPlayer = true
       end if
 
+      m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(focusedContent, m.CategoryGridList.focusedPosition)
       m.top.contentFocused = focusedContent
     end if
 

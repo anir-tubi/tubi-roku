@@ -51,7 +51,7 @@ End Function
 ' @content: roSGNode, the content node of the content to be played
 ' @nowPos: integer, the position from which the video playback should be resumed
 ' @currentTrackingPageInfo: assocArray, trackingPageInfo of the screen being navigated from
-' @trackingComponentInfo: assocArray, trackingPageInfo of the screen being navigated from
+' @trackingComponentInfo: assocArray, trackingComponentInfo of the component being navigated from
 Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrackingPageInfo, trackingComponentInfo = invalid, playbackSource = {"srcForAnalytic": "unknown", "srcForAds": "unknown"})
   if content <> invalid and content.needsLogin = true
     callbackAfterSignInParams = {"content": content, "nowPos": nowPos, "currentTrackingPageInfo": currentTrackingPageInfo, "trackingComponentInfo": trackingComponentInfo, "playbackSource": playbackSource}
