@@ -538,11 +538,6 @@ Function playContent()
       m.top.adControl = "preroll"
     else
 
-      if m.Video.content.hasHevcWithout4k = true
-        ' fire exposure event for video playback if content had only non-4k hevc manifests for treatment & control
-        getExperimentResource("roku_hevc_non4k", "roku_hevc_non4k_v1", true)
-      end if
-
       m.Video.control = "play"
 
       ' Calling the set initial audio track in the start of video playback.
@@ -1076,16 +1071,6 @@ Function onAdStateChange(msg)
 
       updateVideoState("play")
       updateLastPingTime(m.playerPosition) ' updating lastPingtime for extra safety
-
-      if m.Video.content.hasHevcWithout4k = true
-        ' fire exposure event for video playback if content had only non-4k hevc manifests for treatment & control
-        getExperimentResource("roku_hevc_non4k", "roku_hevc_non4k_v1", true)
-      end if
-
-      if m.Video.content.has4kHevcStream = true
-        ' fire exposure event for video playback if manifest had HEVC/4k content for treatment & control
-        getExperimentResource("roku_hevc_drm_4k", "roku_hevc_drm_4k_v1", true)
-      end if
 
       m.Video.control = "play"
 

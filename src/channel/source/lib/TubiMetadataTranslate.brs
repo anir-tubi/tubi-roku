@@ -1713,49 +1713,11 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
   '   ]
   videoResources = []
   titanVersionOrExperimentVersion = ""
-  hevcNon4kExpEnabled = false
-
-  if m.experiments <> invalid
-    hevcNon4kExpEnabled = m.experiments.getExperimentResource("roku_hevc_non4k", "roku_hevc_non4k_v1").enabled
-  end if
-
-  ' hasHEVC4KStream helps to decide whether video resources has any hevc 4k manifests by checking codec & resolution fields
-  ' //REMOVE hasHEVC4KStream once we graduate roku_hevc_non4k_v1 experiment.
-  hasHEVC4KStream = false
-
-  ' hasHEVCStream helps to decide whether video resources has any hevc manifests by checking codec field
-  ' //REMOVE hasHEVCStream once we graduate roku_hevc_non4k_v1 experiment.
-  hasHEVCStream = false
 
   codecToVideoResourcesIndexMap = {}
   resources = contentFromServer.video_resources
 
   if type(resources) = "roArray" AND resources.count() > 0
-
-    for each video in resources
-
-      if contentFromServer.type <> m.constants.ui.contentTypes.linear AND contentFromServer.type <> "l"
-
-        if getCodecFromVideoResource(video) = m.constants.hevcCodec
-          hasHEVCStream = true
-
-          if getResolutionFromVideoResource(video) = "2160P"
-            hasHEVC4KStream = true
-          end if
-
-        end if
-
-      end if
-
-    end for
-
-    ' //REMOVE 'hasHevcWithout4k' field and its references once we graduate roku_hevc_non4k_v1 experiment.
-    ' hasHevcWithout4k interface is added to TubiContentNode in order to expose the device or not for roku_hevc_non4k_v1 experiment
-    ' Add only if the content has no hevc 4k streams
-    if hasHEVCStream = true AND hasHEVC4KStream = false
-      contentNode.addField("hasHevcWithout4k", "boolean", false)
-      contentNode.hasHevcWithout4k = true
-    end if
 
     ' Create a "stub" ContentNode with just the DRM-oriented fields populated. This
     ' will make it easy to merge metadata plus drm info into one actionable
@@ -1802,14 +1764,8 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
 
       validResource = false
 
-      if contentFromServer.type = "l" OR contentFromServer.type = m.constants.ui.contentTypes.linear OR codec = m.constants.avcCodec
+      if contentFromServer.type = "l" OR contentFromServer.type = m.constants.ui.contentTypes.linear OR codec = m.constants.avcCodec OR codec = m.constants.hevcCodec
         validResource = true
-      else if codec = m.constants.hevcCodec
-        ' if the content has 4k hevc manifests, then consider as valid resource and don't expose the device for experiment
-        ' if the content has no 4k hevc manifests, then consider as valid resource only if the hevcNon4kExpEnabled is enabled
-        if hasHEVC4KStream = true OR (hasHEVCStream = true AND hevcNon4kExpEnabled = true)
-          validResource = true
-        end if
       end if
 
       if validResource = true

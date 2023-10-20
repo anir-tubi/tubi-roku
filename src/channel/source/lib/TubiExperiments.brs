@@ -33,10 +33,6 @@ Function TubiExperiments(constants) as Object
         roku_large_poster_categories: {"enabled": false}
       }
 
-      roku_hevc_drm_4k: {
-        roku_hevc_drm_4k_v1 : {"enabled": true}
-      }
-
       '// When enabled=true, the user will see thumbnails with rounded corners
       roku_rounded_corners: {
         roku_rounded_corners_v1 : {"enabled": false}
@@ -57,10 +53,6 @@ Function TubiExperiments(constants) as Object
 
       roku_large_play_progress: {
         roku_large_play_progress_v1 : {"enabled": true}
-      }
-
-      roku_hevc_non4k: {
-        roku_hevc_non4k_v1: {"enabled": true}
       }
 
       roku_linear_favorites: {
