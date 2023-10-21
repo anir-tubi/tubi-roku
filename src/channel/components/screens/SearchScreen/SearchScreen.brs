@@ -287,10 +287,11 @@ End Function
 Function onSearchContentChange()
   displayLoading(false)
   m.ResultGrid.content = invalid '//reset content everytime so in case the new results = previous results, then the contemt can refresh. Without refreshing content, then the content may appear blank
-  m.ResultGrid.content = m.top.content
+  content = m.top.content
+  m.ResultGrid.content = content
 
-  if m.top.content <> invalid AND m.top.content.getChildCount() > 0 then
-    if m.top.content.isDefaultSearchResults = true
+  if content <> invalid AND content.getChildCount() > 0 then
+    if content.isDefaultSearchResults = true
       '//display special text when the default search is displaying
       setDefaultText()
       if m.microphone <> invalid

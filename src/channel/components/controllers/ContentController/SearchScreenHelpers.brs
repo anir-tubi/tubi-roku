@@ -98,8 +98,28 @@ Function onSearchTextChanged(msg)
       }
     }
   else
+    categoryId = m.constants.ui.categoryIds.featured
+    requestOptions = {}
 
-    categoryReqInfo = m.CmsApi.createCategoryReqInfo(m.constants.ui.categoryIds.featured, kidsMode)
+    if isUserInAdultsMode() = true AND isDeviceInUS() = true
+      searchExperimentInfo = getExperimentResource("roku_trending_search", "roku_trending_search_v1", true)
+
+      if searchExperimentInfo.enabled = true
+        categoryId = m.constants.ui.categoryIds.topSearched
+
+        ' If limit is been passed from the experiment using it.
+        if searchExperimentInfo.limit <> invalid
+          requestOptions = {
+            params: {
+              contents_limit: searchExperimentInfo.limit
+            }
+          }
+        end if
+        
+      end if
+    end if
+
+    categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, kidsMode, requestOptions)
     m.currentSearchScreenRequestInfo = m.makeRequest({
       url: categoryReqInfo.url
       requestType: m.constants.reqNames.getSearchDefault

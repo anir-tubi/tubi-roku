@@ -994,6 +994,7 @@ Function getConstants()
       constants.ui.categoryIds.movieNight = "movie_night"
       constants.ui.categoryIds.seriesSpotlight = "series_spotlight"
       constants.ui.categoryIds.favorites = "temp_linear_favorites"
+      constants.ui.categoryIds.topSearched = "top_searched"
 
     constants.ui.categoryTypes = {}
       'these map to tensor api container types
