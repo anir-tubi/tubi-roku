@@ -39,7 +39,7 @@ Function onThemeChange(msg = invalid)
   end if
   
   if theme <> invalid
-    m.PosterRect.color = theme.neutralColor2
+    m.posterRect.blendColor = theme.neutralColor2
     m.Title.color = theme.primaryTextColor
     m.SponsoredByText.color = theme.backgroundColorLight2
   end if
@@ -77,8 +77,6 @@ Function onContentChange(data)
       m.posterRect.visible = false
       m.poster.uri = thumbnail
     else
-      m.posterRect.width = m.top.width
-      m.posterRect.height = m.top.height
       m.posterRect.visible = true
       m.poster.visible = false
     end if

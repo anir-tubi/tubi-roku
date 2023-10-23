@@ -13,16 +13,18 @@
 
   <interface>
     <field id="itemContent" type="node" />
-    <field id="width" alias="Poster.width" />
-    <field id="height" alias="Poster.height" />
+    <field id="width" alias="Poster.width, PosterRect.width" />
+    <field id="height" alias="Poster.height, PosterRect.height" />
     <field id="focusPercent" type="float" />
     <field id="gridHasFocus" type="boolean" />
     <field id="itemHasFocus" type="boolean" />
   </interface>
 
   <children>
-    <Rectangle
-      id="PosterRect"/>
+    <Poster
+      id="PosterRect"
+      visible="false"
+      uri = "pkg:/images/poster-bg.9.png"/>
     <Poster
       opacity=".64"
       id="Poster"
