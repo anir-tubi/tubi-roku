@@ -123,19 +123,22 @@ Function processTimeoutError(job)
     requestType = job.reqInfo.requestType
     callbackTypes = m.requestTypes[requestType]
 
-    ' there might be some issue with internet access
-    errCode = -1236
+    if callbackTypes <> invalid
 
-    result = {
-      response: {
-        "code": errCode
-        "name": requestType
-        "failReason": "Timeout.Response unknown"
-        "url": job.reqInfo.url
+      ' there might be some issue with internet access
+      errCode = -1236
+
+      result = {
+        response: {
+          "code": errCode
+          "name": requestType
+          "failReason": "Timeout.Response unknown"
+          "url": job.reqInfo.url
+        }
       }
-    }
 
-    processErrorResponse(result, callbackTypes, job )
+      processErrorResponse(result, callbackTypes, job )
+    end if
   end if
 
 End function
@@ -482,7 +485,11 @@ Function processErrorResponse(result, callbackTypes, job)
     responseFromServer.data = parseJson(result.response.data)
   end if
 
-  parserCallback = callbackTypes.parseError
+  parserCallback = invalid
+
+  if callbackTypes <> invalid
+    parserCallback = callbackTypes.parseError
+  end if
 
   sendApiErrorLog(result)
 
