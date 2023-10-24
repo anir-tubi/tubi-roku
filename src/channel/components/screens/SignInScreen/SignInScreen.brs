@@ -28,8 +28,8 @@ Function init()
   m.newPasswordLink.text = getTranslation("new_password_link")
 
   bDisplayForgotPasswordButton = (getExperimentResource("roku_registration_signin_password_reset", "roku_registration_signin_password_reset_v2", true).enabled = true)
-  
-  m.forgotPasswordBtn = invalid  
+
+  m.forgotPasswordBtn = invalid
   if bDisplayForgotPasswordButton = true
     '//::TODO::roku_registration_signin_password_reset_v2 - if experiment is graduated, then set the button in the XML and remove everything related to newPasswordLayout
     m.forgotPasswordBtn = CreateObject("roSGNode", "SimpleButton")
@@ -239,7 +239,7 @@ Function onSetFocusToPassword(evt)
     hideKeyboard()
     showButtons()
     setFocusToComponent(m.password)
-    m.emailHasFocus = false 
+    m.emailHasFocus = false
   end if
 
 End Function
@@ -340,8 +340,9 @@ Function proceedPasswordValidation()
     updatePasswordValidation()
     if isPasswordValid() = true
       m.top.signInSelected = {
-        password : m.password.text
-        email : m.email.text
+        password: m.password.text
+        email: m.email.text
+        rfiSignInInfo: m.top.signInInfo
       }
       m.continueBtn.unobserveFieldScoped("selected")
     end if
@@ -374,12 +375,12 @@ Function onKeyboardTextChanged()
  end if
 
  bDisplayForgotPasswordButton = (getExperimentResource("roku_registration_signin_password_reset", "roku_registration_signin_password_reset_v2", false).enabled = true)
-         
+
  handled = true
  if press
    if key = "back"
 
-     if m.keyboard.isInFocusChain() = true 
+     if m.keyboard.isInFocusChain() = true
        updatePasswordValidation()
        hideKeyboard()
        showButtons()

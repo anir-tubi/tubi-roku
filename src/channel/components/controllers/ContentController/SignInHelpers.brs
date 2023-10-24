@@ -496,11 +496,16 @@ Function onSignInSelected(evt)
   signInSelected = evt.getData()
   email = signInSelected.email
   password = signInSelected.password
-  signUserIn(email, password)
+  signUserIn(email, password, signInSelected.rfiSignInInfo)
 End Function
 
 
-Function signUserIn(email, password)
+' @rfiSignInInfo: AssociativeArray - A record of the Roku account's signin info: i.e. email, firstname, gender, etc.
+Function signUserIn(email, password, rfiSignInInfo = invalid)
+  if isAA(rfiSignInInfo) = false then
+    rfiSignInInfo = {}
+  end if
+
   options = {}
   options.body = {
     platform: m.constants.platform
@@ -524,15 +529,14 @@ Function signUserIn(email, password)
     errorCallback: onSignInError
     responseType: "assocarray"
     email: email
-    emailType : password
+    rfiSignInInfo: rfiSignInInfo
   })
 End Function
 
 
 ' onSignInResponse callback is triggered when the sign In is success
-' @_response: assocarray, the response of signIn API in the form of AA
-Function onSignInResponse(_response)
-
+' @response: assocarray, the response of signIn API in the form of AA
+Function onSignInResponse(response)
   m.trackingLoggingTask.trackEvent = {
     type: "account"
     values: {
@@ -541,6 +545,46 @@ Function onSignInResponse(_response)
       status: "SUCCESS"
     }
   }
+
+  requestInput = response.requestInput
+  rfiSignInInfo = requestInput.rfiSignInInfo
+
+  ' If email address used to sign in matches the Roku email address then go ahead and backfill their name and gender info
+  if rfiSignInInfo.email = requestInput.email then
+    fieldsToUpdate = {}
+    gender = rfiSignInInfo.gender
+    if isNonEmptyString(gender) = true then
+      gender = UCase(gender)
+      if gender <> "MALE" AND gender <> "FEMALE"
+        gender = "OTHER"
+      end if
+      fieldsToUpdate["gender"] = gender
+    end if
+
+    if isNonEmptyString(rfiSignInInfo.firstName) = true then
+      fieldsToUpdate["first_name"] = rfiSignInInfo.firstName
+      fieldsToUpdate["temporary_name"] = false
+    end if
+
+    if isNonEmptyString(rfiSignInInfo.lastName) = true then
+      fieldsToUpdate["last_name"] = rfiSignInInfo.lastName
+    end if
+
+    if fieldsToUpdate.count() > 0 then
+      patchSettingsInfo = m.userDeviceApi.patchSettingsInfo({
+        body: fieldsToUpdate
+      })
+
+      m.makeRequest({
+        url: patchSettingsInfo.url
+        requestType: m.constants.reqNames.patchUserSettings
+        options: patchSettingsInfo.options
+        responseType: "assocarray"
+        silenceCallbackWarnings: true
+      })
+    end if
+  end if
+
   '//::TODO::roku_registration_gender_data - once the user is signed in, then call an API to ensure
   '//   the Roku saved info (i.e. gender, first name, etc) are saved using the following API
   '//   https://docs.tubi.io/api_docs/account#operations-User-patch-user-settings,

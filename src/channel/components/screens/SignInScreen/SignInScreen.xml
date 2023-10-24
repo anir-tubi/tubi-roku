@@ -24,7 +24,7 @@
       <!-- et focus back on password textfield  -->
       <field id="setFocusToPassword" type="boolean" alwaysNotify="true"/>
 
-      <!-- A record of the user's signin info: i.e. email, firstname, gender, etc. -->
+      <!-- A record of the Roku account's signin info: i.e. email, firstname, gender, etc. -->
       <field id="signInInfo" type="assocarray"/>
 
     <!-- OUTPUT -->
