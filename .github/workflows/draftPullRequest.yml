@@ -30,7 +30,7 @@ jobs:
 
     - name: Install Dependencies
       if: steps.node-cache.outputs.cache-hit != 'true'
-      run: npm install --only=prod
+      run: npm install
 
     - name: Run Workflow Code
       run: node ./js/workflows/draftPullRequest.js
