@@ -373,8 +373,8 @@
         id="Thumbnail"
         width="342"
         height="192"
-        spriteDirection="horiz"
-        translation="[237, 567]"/>
+        spriteDirection="horiz"/>
+
       <Group
         id="Transport"
         opacity="1.0">
@@ -382,14 +382,14 @@
         <TubiProgressBar
           id="ProgressBar"
           width="1752"
-          translation="[84, 831]"/>
+          translation="[84, 48]"/>
 
         <!-- Time -->
         <Label
           id="ElapsedLabel"
           text="00:00:00"
           width="500"
-          translation="[75, 783]" >
+          translation="[75, 0]">
           <Font
             id="Vaud34px"
             role="font"
@@ -398,10 +398,15 @@
         </Label>
         <Label
           id="RemainingLabel"
-          font="dictionary:Vaud34px"
           text="-00:00:00"
           width="500"
-          translation="[1695, 783]" />
+          translation="[1695, 0]">
+          <Font
+            id="Vaud34px"
+            role="font"
+            uri="pkg:/fonts/Vaud-Medium.ttf"
+            size="34" />
+        </Label>
 
         <!-- Transport buttons - Transport buttons must be in the order they appear on the screen (from left to right) -->
         <Group
@@ -425,50 +430,50 @@
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-to-start.png"
-            translation="[540,873]" />
+            translation="[540,110]" />
           <TransportButton
             id="RewindButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-rew.png"
-            translation="[672,873]" />
+            translation="[672,110]" />
           <TransportButton
             id="HopBackButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-rew-30s.png"
-            translation="[800,873]" />
+            translation="[800,110]" />
           <!-- play/pause uri will update based on playing state of video -->
           <TransportButton
             id="PlayPauseButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-play.png"
-            translation="[930,873]" />
+            translation="[930,110]" />
           <TransportButton
             id="HopForwardButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-fwd-30s.png"
-            translation="[1060,873]" />
+            translation="[1060,110]" />
           <TransportButton
             id="FastForwardButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-ffw.png"
-            translation="[1190,873]" />
+            translation="[1190,110]" />
           <TransportButton
             id="EndButton"
             width="60"
             height="60"
             uri="pkg:/images/transport/sgplayer/icon-to-end.png"
-            translation="[1320,873]" />
+            translation="[1320,110]" />
           <TransportButton
             id="closedCaptionAudioButton"
             width="60"
             height="50"
             uri="pkg:/images/transport/sgplayer/icon-subtitles.webp"
-            translation="[1698,873]"
+            translation="[1698,110]"
             visible="false" />
         </Group>
       </Group>  <!-- Transport -->

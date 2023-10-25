@@ -304,6 +304,7 @@ Function init()
     m.skipCuepointsButtonUpTranslation = 681
     m.skipCuepointsButtonDownTranslation = 780
     m.thumbnailMaxYOffset = 825
+    m.Transport.translation = [0,783]
   else
     m.YMALGradient.opacity = 0.0
     m.TransportGradient.opacity = 1.0
@@ -311,6 +312,7 @@ Function init()
     m.skipCuepointsButtonUpTranslation = 741
     m.skipCuepointsButtonDownTranslation = 840
     m.thumbnailMaxYOffset = 888
+    m.Transport.translation = [0,849]
   end if
 
   title = m.TopOverlay.findNode("VideoOverlayTitle")
@@ -361,6 +363,7 @@ Function setSkipCuepointsButtonTextAndTimer(skipCuepointsTitle as string) As Voi
   m.skipCuepointsButtonTimer.observeFieldScoped("fire", "autoHideSkipCuepointsButton")
   m.skipCuepointsButtonTimer.control = "start"
   m.skipCuepointsButton.text = skipCuepointsTitle
+  showSkipCuepointsButton()
 End Function
 
 
