@@ -1205,7 +1205,11 @@ Function refreshAllDetailScreens()
         screen.refreshRelatedContent = true
       else ' TODO: check is refreshing Screen is more better than keep the old content.
         content = screen.content 'No need to re fetch the content, just re populate the screen content
-        populateDetailScreen(screen, content)
+        pageOriginDetails = {
+          "pageOrigin": screen
+          "functionName": "refreshAllDetailScreens"
+        }
+        populateDetailScreen(screen, content, false, -1, pageOriginDetails)
 
         if isUserSigedIn = true
           screen.removeSignupButton = true

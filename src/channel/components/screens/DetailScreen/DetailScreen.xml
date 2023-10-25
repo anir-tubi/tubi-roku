@@ -38,7 +38,7 @@
 
       <!-- To know where the detail screen is launched/ skipped -->
       <!--  TODO:: Remove pageOrigin once we fixed sending invalid component interaction events- added this for debugging purpose -->
-      <field id="pageOrigin" type="string" />
+      <field id="pageOriginDetails" type="assocarray" />
 
       <!-- The following are the strings associated with this UI element -->
       <field id="stringQueueButton" type="string"/>

@@ -139,7 +139,11 @@ Function onVideoPreviewStateChanged(msg)
             "srcForAds": m.constants.player.playbackOrigin.container
             "playbackContainer": currentScreen.currCategoryId
           }
-          showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen, invalid, playbackSource, "previews")
+          pageOriginDetails = {
+            "pageOrigin": "previews"
+            "functionName": "onVideoPreviewStateChanged"
+          }
+          showDetailScreen(currentScreen.contentFocused, false, skipDetailScreen, invalid, playbackSource, pageOriginDetails)
         end if
       else if isFullPlayerBlockedForUser = true
         'Updating backgroundUriList once video preview finished to show the background images instead of black backgroud.

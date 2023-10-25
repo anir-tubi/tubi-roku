@@ -247,7 +247,13 @@ Function onMyStuffContentSelected(msg)
       "srcForAds":m.constants.player.playbackOrigin.container
       "playbackContainer": content.parentId
     }
-    showDetailScreen(content, true, invalid, invalid, playbackSource, m.constants.ui.screenIds.myStuffScreen)
+
+    pageOriginDetails = {
+      "pageOrigin": m.constants.ui.screenIds.myStuffScreen
+      "functionName": "onMyStuffContentSelected"
+    }
+
+    showDetailScreen(content, true, invalid, invalid, playbackSource, pageOriginDetails)
   end if
 End Function
 

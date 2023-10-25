@@ -1312,14 +1312,16 @@ Function setComponentInteractionEventForMenu(componentInteractionValue, menuItem
   ''//::TODO:: Remove below block once we fixed sending invalid component interaction events- added this for debugging purpose
   if isAA(pageValues) = true AND pageValues.count() > 0 AND pageValues.series_id = 0
     pageValuesInfo = {}
-    pageValuesInfo.sourceOrigin = m.top.pageOrigin
+    pageValuesInfo.sourceOrigin = m.top.pageOriginDetails.pageOrigin
+    pageValuesInfo.functionName = m.top.pageOriginDetails.functionName
     pageValuesInfo.isSeries = m.top.isSeries
     pageValuesInfo.seriesId = pageValues.series_id
     pageValuesInfo.contentIsInvalid = (m.top.content = invalid)
     tubiLog(FormatJSON(pageValuesInfo), "info", "videoInfo", "series-id-invalid")
   else if m.top.content <> invalid
     pageValuesInfo = {}
-    pageValuesInfo.sourceOrigin = m.top.pageOrigin
+    pageValuesInfo.sourceOrigin = m.top.pageOriginDetails.pageOrigin
+    pageValuesInfo.functionName = m.top.pageOriginDetails.functionName
     pageValuesInfo.isSeries = m.top.isSeries
     pageValuesInfo.seriesId = m.top.content.id.toInt()
     pageValuesInfo.contentIsInvalid = false

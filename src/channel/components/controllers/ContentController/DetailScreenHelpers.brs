@@ -13,9 +13,12 @@
 '                                                    valid values are "deeplink" , "ap_auto", "ap_select", "container", "ymal", "search", "epg", "unknown"
 
 '                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
-'@pageOrigin: From which screen we landed on the detail screen
+'@pageOriginDetails: associative Array, format: pageOrigin - from which screen we landed on the detail screen
+'                                                            any valid screen id is accepted
+'                                               functionName - from which function we landed on the detail screen
+'                                                              any valid function is accepted
 ''//::TODO:: Remove pageOrigin once we fixed sending invalid component interaction events- added this for debugging purpose
-Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = invalid, errorCb = invalid, playbackSource = {"srcForAnalytic":"unknown","srcForAds":"unknown"}, pageOrigin = "")
+Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = invalid, errorCb = invalid, playbackSource = {"srcForAnalytic":"unknown","srcForAds":"unknown"}, pageOriginDetails = {})
   tubiLog("DetailScreenHelpers.showDetailScreen")
   if content <> invalid
     detailScreen = CreateObject("roSGNode", "DetailScreen")
@@ -88,7 +91,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     ' We expect to overwrite this in populateDetailScreen() which occurs after the full info has been fetched from the /content API
     detailScreen.content = content
 
-    detailScreen.pageOrigin = pageOrigin
+    detailScreen.pageOriginDetails = pageOriginDetails
 
     ' waiting to populate the details screen for series until after we fetch episode data
     if m.deepLinkContent <> invalid or content.type = m.constants.ui.contentTypes.series or (content.type = m.constants.ui.contentTypes.video AND content.seriesId <> invalid AND content.seriesId <> "")
@@ -274,9 +277,9 @@ End Function
 '@content: tubiContentNode, the content of the screen
 '@shouldResetButtonIndex: boolean, helps to reset the focus index of menu items
 '@nSavedPosition: integer, The number representing the resume point of the video
-'@pageOrigin: From which screen we populate on the detail screen
+'@pageOriginDetails: AssocArray, From which screen and which function we populate on the detail screen
 ''//::TODO:: Remove pageOrigin once we fixed sending invalid component interaction events- added this for debugging purpose
-Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = false, nSavedPosition = -1, pageOrigin = "")
+Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = false, nSavedPosition = -1, pageOriginDetails = {})
   tubiLog("DetailScreenHelpers.populateDetailScreen")
   'initialize default background - will be overwritten later in most cases
   backgroundUriList = [m.defaultBackgroundUri]
@@ -302,9 +305,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     availabilityType = info.availabilityType
     detailScreen.availabilityType = availabilityType
 
-    if isNonEmptyString(pageOrigin) = true
-      detailScreen.pageOrigin = pageOrigin
-    end if
+    detailScreen.pageOriginDetails = pageOriginDetails
 
     detailScreen.hasTrailer = (content.hasTrailer = true)
 
@@ -576,7 +577,11 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
       return
     end if
 
-    populateDetailScreen(detailScreen, refreshedContent)
+    pageOriginDetails = {
+      "pageOrigin": m.constants.ui.screenIds.detailScreen
+      "functionName": "handleSingleContentResponse"
+    }
+    populateDetailScreen(detailScreen, refreshedContent, false, -1, pageOriginDetails)
 
     sendDetailScreenPageLoadEvent(detailScreen, refreshedContent, sendTracking)
 
@@ -647,7 +652,11 @@ Function handleSingleContentError(error, onRetrySuccessCallback, onRetryErrorCal
   message = ""
 
   if detailScreen <> invalid AND m.isScreenLoaded = false
-    populateDetailScreen(detailScreen, detailScreen.content)
+    pageOriginDetails = {
+      "pageOrigin": m.constants.ui.screenIds.detailScreen
+      "functionName": "handleSingleContentError"
+    }
+    populateDetailScreen(detailScreen, detailScreen.content, false, -1, pageOriginDetails)
   end if
 
   if detailScreen <> invalid AND detailScreen.isInFocusChain() = true
@@ -1149,7 +1158,11 @@ Function onResumeAllowedTimerFired()
 
           if isGreaterThanGuestResumePeriod(history) = true
             '//Call populateDetailScreen() which will remove the resume button for any guest users that have content that has history over a day old
-            populateDetailScreen(detailScreen, detailScreen.content)
+            pageOriginDetails = {
+              "pageOrigin": m.constants.ui.screenIds.detailScreen
+              "functionName": "onResumeAllowedTimerFired"
+            }
+            populateDetailScreen(detailScreen, detailScreen.content, false, -1, pageOriginDetails)
           end if
 
         end if
@@ -1652,7 +1665,12 @@ Function onRelatedContentSelected(msg)
       "srcForAds": m.constants.player.playbackOrigin.ymal
     }
 
-    showDetailScreen(content, true, invalid, invalid, playbackSource, m.constants.player.playbackOrigin.ymal)
+    pageOriginDetails = {
+      "pageOrigin": m.constants.player.playbackOrigin.ymal
+      "functionName": "onRelatedContentSelected"
+    }
+
+    showDetailScreen(content, true, invalid, invalid, playbackSource, pageOriginDetails)
   end if
 End Function
 
@@ -2022,7 +2040,11 @@ Function skipDetailScreen(refreshedContent)
 
   detailScreen = getTopDetailScreenFromStack()
   if detailScreen <> invalid
-    populateDetailScreen(detailScreen, refreshedContent)
+    pageOriginDetails = {
+      "pageOrigin": m.constants.ui.screenIds.detailScreen
+      "functionName": "skipDetailScreen"
+    }
+    populateDetailScreen(detailScreen, refreshedContent, false, -1, pageOriginDetails)
 
     if refreshedContent.needsLogin = false AND detailScreen.availabilityType <> m.constants.ui.contentTimings.upcoming
       if refreshedContent.type = m.constants.ui.contentTypes.series AND refreshedContent.currentEpisodeId = "" AND refreshedContent.isRecurring = false
@@ -2236,7 +2258,11 @@ End Function
 Function onAutoplaySingleContentResponse(refreshedContent)
   detailScreen = getTopDetailScreenFromStack()
   if refreshedContent <> invalid
-    populateDetailScreen(detailScreen, refreshedContent)
+    pageOriginDetails = {
+      "pageOrigin": m.constants.ui.screenIds.detailScreen
+      "functionName": "onAutoplaySingleContentResponse"
+    }
+    populateDetailScreen(detailScreen, refreshedContent, false, -1, pageOriginDetails)
     getRelatedContent(refreshedContent)
   end if
 End Function
@@ -2358,7 +2384,11 @@ Function onRelatedContentToPlay(msg)
   playbackSource = {
     "srcForAnalytic": m.constants.player.playbackSource.unknown
     "srcForAds":m.constants.player.playbackOrigin.ymal
-    }
+  }
 
-  showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource, m.constants.player.playbackOrigin.ymal)
+  pageOriginDetails = {
+    "pageOrigin": m.constants.player.playbackOrigin.ymal
+    "functionName": "onRelatedContentToPlay"
+  }
+  showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource, pageOriginDetails)
 End Function

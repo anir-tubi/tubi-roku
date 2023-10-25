@@ -238,6 +238,10 @@ End Function
 Function handleDeeplinkContentByType()
   tubilog("deeplinkHelpers.handleDeeplinkContentByType")
   if m.deepLinkContent <> invalid
+    pageOriginDetails = {
+      "pageOrigin": m.constants.player.playbackOrigin.deeplink
+      "functionName": "handleDeeplinkContentByType"
+    }
     if m.deepLinkContent.deeplinkType = "linear" OR m.deepLinkContent.deeplinkType = "liveTV"
       'if fadeInContentController is still playing, then linear content can not play.
       'in that case, consider handling the linear deeplink content after fade in animation is over in onFadeInContentController
@@ -265,7 +269,7 @@ Function handleDeeplinkContentByType()
     else if m.deepLinkContent.deeplinktype = "series"
       if Left(m.deepLinkContent.id, 1) = "0"
         playbackSource = getPlaybackSourceForDeeplinkType()
-        showDetailScreen(m.deepLinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource, m.constants.player.playbackOrigin.deeplink)
+        showDetailScreen(m.deepLinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource, pageOriginDetails)
       else
         getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeriesContentSuccess, handleSingleContentDeeplinkError)
       end if
@@ -276,18 +280,18 @@ Function handleDeeplinkContentByType()
     else if m.deepLinkContent.deeplinktype = "season"
       if Left(m.deepLinkContent.id, 1) = "0"
         playbackSource = getPlaybackSourceForDeeplinkType()
-        showDetailScreen(m.deepLinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource, m.constants.player.playbackOrigin.deeplink)
+        showDetailScreen(m.deepLinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource, pageOriginDetails)
       else
         getSingleContentFromServer(m.deeplinkContent, onDeeplinkSeasonContentSuccess, handleSingleContentDeeplinkError)
       end if
 
     else if m.deepLinkContent.deeplinktype = "movie" OR m.deepLinkContent.deeplinktype = "tvspecial"
       playbackSource = getPlaybackSourceForDeeplinkType()
-      showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource, m.constants.player.playbackOrigin.deeplink)
+      showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource, pageOriginDetails)
 
     else if m.deepLinkContent.deeplinktype = "sports"
       playbackSource = getPlaybackSourceForDeeplinkType()
-      showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource, m.constants.player.playbackOrigin.deeplink)
+      showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource, pageOriginDetails)
       'Set the sideNav id to be "home" because tournament Screen's left button should focus on sideNav->home menu item.
       sideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
       focusSideNavOption(sideNavID)
@@ -751,7 +755,11 @@ Function handleDeeplinkSeriesSuccessResponse(refreshedContent)
 
     if detailScreen <> invalid
       detailScreen.contentFetchError = false
-      populateDetailScreen(detailScreen, refreshedContent)
+      pageOriginDetails = {
+        "pageOrigin": m.constants.player.playbackOrigin.deeplink
+        "functionName": "handleDeeplinkSeriesSuccessResponse"
+      }
+      populateDetailScreen(detailScreen, refreshedContent, false, -1, pageOriginDetails)
 
       if refreshedContent.needsLogin = false
         ' only if content is not locked, then move past detail screen
@@ -780,7 +788,11 @@ Function handleDeeplinkVideoSuccessResponse(refreshedContent, successCb = invali
   emptySeriesNode.type = m.constants.ui.contentTypes.series
   emptySeriesNode.id = refreshedContent.seriesId
   playbackSource = getPlaybackSourceForDeeplinkType()
-  showDetailScreen(emptySeriesNode, false, successCb, errorCb, playbackSource, m.constants.player.playbackOrigin.deeplink)
+  pageOriginDetails = {
+    "pageOrigin": m.constants.player.playbackOrigin.deeplink
+    "functionName": "handleDeeplinkVideoSuccessResponse"
+  }
+  showDetailScreen(emptySeriesNode, false, successCb, errorCb, playbackSource, pageOriginDetails)
 End Function
 
 
@@ -805,7 +817,11 @@ Function handleDeeplinkSeasonSuccessResponse(refreshedContent)
     detailScreen = getTopDetailScreenFromStack()
     if detailScreen <> invalid
       detailScreen.contentFetchError = false
-      populateDetailScreen(detailScreen, refreshedContent)
+      pageOriginDetails = {
+        "pageOrigin": m.constants.player.playbackOrigin.deeplink
+        "functionName": "handleDeeplinkSeasonSuccessResponse"
+      }
+      populateDetailScreen(detailScreen, refreshedContent, false, -1, pageOriginDetails)
       handleDetailScreenAfterFn(detailScreen, afterFn)
     end if
   else
@@ -845,7 +861,11 @@ Function handleDeeplinkEpisodeSuccessResponse(refreshedContent)
 
     if detailScreen <> invalid
       detailScreen.contentFetchError = false
-      populateDetailScreen(detailScreen, refreshedContent)
+      pageOriginDetails = {
+        "pageOrigin": m.constants.player.playbackOrigin.deeplink
+        "functionName": "handleDeeplinkEpisodeSuccessResponse"
+      }
+      populateDetailScreen(detailScreen, refreshedContent, false, -1, pageOriginDetails)
 
       if refreshedContent.needsLogin = false
         ' only if content is not locked, then move past detail screen
