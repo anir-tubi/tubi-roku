@@ -154,7 +154,8 @@ Function getTranslationSetByLocale(locale)
     'es_MX and es_ES
     translationSet = getTranslation_es_MX()
   else if locale = "en_gb"
-  else if locale = "fr_ca"
+  else if Left(locale, 2) = "fr"
+    translationSet = getTranslation_fr_CA()
   else if locale = "de_de"
   else if locale = "it_it"
   else if locale = "pt_br"
@@ -3525,6 +3526,1663 @@ Function getTranslation_es_MX()
     "privacy_center_not_editable_mode_warning": {
       "description": "Warning label that will be displayed in privacy center whenever user is in kids mode or any parental controls mode.",
       "message": "Configuración de privacidad solo se puede cambiar fuera de Tubi Kids. Solo se utilizan datos esenciales dentro de Tubi Kids."
+    }
+  }
+End Function
+
+
+
+Function getTranslation_fr_CA()
+  return {
+    "menu_signIn": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to sign into app.",
+      "message": "Connexion"
+    },
+    "menu_goHome": {
+      "description": "Menu option on the app's myStuff screen, Allows the user to  navigate to the home screen.",
+      "message": "Aller à l'accueil"
+    },
+    "menu_signedIn": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Shows that the user is signed in.",
+      "message": "Bonjour {name}"
+    },
+    "menu_kids": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to sign into kids mode.",
+      "message": "Enfants"
+    },
+    "menu_exitKids": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to exit kids mode.",
+      "message": "Quitter la section Enfants"
+    },
+    "menu_search": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the search screen.",
+      "message": "Recherche"
+    },
+    "menu_foryou": {
+      "description": "Menu option on the app's top nav for pillshaped, (length of text should not be too long). Allows the user to display the home screen.",
+      "message": "Pour vous"
+    },
+    "menu_recommended": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
+      "message": "Recommandés"
+    },
+    "menu_epg_all": {
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the all EPG screen.",
+      "message": "Tout"
+    },
+    "menu_epg_sports": {
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Sports EPG screen.",
+      "message": "Sports"
+    },
+    "menu_epg_news": {
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the News EPG screen.",
+      "message": "Informations"
+    },
+    "menu_epg_entertainment": {
+      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Entertainment EPG screen.",
+      "message": "Divertissements"
+    },
+    "component_library_failed": {
+      "description": "Latest Version of Tubi app failed to load due to some error",
+      "message": "{errCode}\nCanal du tubi n'a pas réussi à se charger complètement. Certaines fonctionnalités peuvent être manquantes."
+    },
+    "epg_starts_at": {
+      "description": "Program time Title when user selects a future program on EPG.",
+      "message": "Commence à"
+    },
+    "epg_favorites_toast_message": {
+      "description": "Message to be displayed on Toast-message when user favorites a lienar channel",
+      "message": "Retrouvez les favoris en haut du guide des programmes."
+    },
+    "epg_favorites_toast_header": {
+      "description": "header text to be displayed on Toast-message when user favorites a linear channel",
+      "message": "Ajouté aux favoris"
+    },
+    "epg_unfavorites_toast_header": {
+      "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
+      "message": "Retiré des favoris"
+    },
+    "detail_screen_like_disLike_toast_header": {
+      "description": "header text to be displayed on Toast-message when user like/dislike a title",
+      "message": "Merci pour vos commentaires!"
+    },
+    "detail_screen_like_toast_message": {
+      "description": "Message to be displayed on Toast-message when user liked a title",
+      "message": "Nous proposerons plus de titres comme celui-ci dans les futures recommandations."
+    },
+    "detail_screen_disLike_toast_message": {
+      "description": "Message to be displayed on Toast-message when user disliked a title",
+      "message": "Nous vous proposerons moins de titres de ce type dans nos prochaines recommandations."
+    },
+    "menu_home": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
+      "message": "Accueil"
+    },
+    "menu_categories": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the categories screen.",
+      "message": "Catégories"
+    },
+    "menu_channels": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the channels screen.",
+      "message": "Chaînes"
+    },
+    "menu_movies": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the movies screen.",
+      "message": "Films"
+    },
+    "menu_tv": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the tv shows screen.",
+      "message": "ProgrammesTV"
+    },
+    "menu_livetv": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the live TV screen.",
+      "message": "TV en direct"
+    },
+    "menu_movies_and_tv": {
+      "description": "Menu option on the app's navigation, (length of text should not be too long). Allows the user to display the home screen.",
+      "message": "Films et TV"
+    },
+    "menu_mylist": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the mylist/queue screen.",
+      "message": "Ma liste"
+    },
+    "menu_mystuff": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the my stuff screen.",
+      "message": "Mes contenus"
+    },
+    "menu_settings": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the settings screen.",
+      "message": "Paramètres"
+    },
+    "menu_exit": {
+      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to exit the app.",
+      "message": "Quitter"
+    },
+    "screenHome_item_showAllGames": {
+      "description": "The text to display on Show All Games tile",
+      "message": "Montrer tout"
+    },
+    "screenHome_showAllNotification": {
+      "description": "The text to display on floating education of show all",
+      "message": "Pour voir l'ensemble de {containerTitle}, appuyez sur "
+    },
+    "screenHome_item_seeAll": {
+      "description": "The text to display on See All movies / shows",
+      "message": "Tout voir {containerTitle}"
+    },
+    "screenHome_item_seeAll_description": {
+      "description": "The text to display total count on See All movies / shows",
+      "message": "{totalCount}+ titres, mis à jour chaque semaine."
+    },
+    "loadingIndicator": {
+      "description": "When something is loading, this text appears so the user knows something is loading.",
+      "message": "Chargement..."
+    },
+    "dialog_errorPrefix": {
+      "description": "When the user is displayed an error, this is the prefix of the error ID that is presented to them: i.e. Error 101",
+      "message": "Erreur :"
+    },
+    "dialog_defaultError_title": {
+      "description": "The default title of a popup error dialog",
+      "message": "Un problème est survenu"
+    },
+    "dialog_uidExpiraionError_title": {
+      "description": "The title of a popup error dialog when link has been expired during signup process",
+      "message": "Le lien de vérification a expiré"
+    },
+    "dialog_defaultError_description": {
+      "description": "The default message of a popup error dialog",
+      "message": "Nous sommes désolés pour ce désagrément. Pour toute assistance, veuillez contacter support@tubi.tv"
+    },
+    "dialog_magicLink_error_description": {
+      "description": "The message of a popup error dialog when user magicLink API fails and user doesn't get verification link to their emial",
+      "message": "Nous avons des difficultés à traiter cette demande. Veuillez vérifier votre connexion Internet ou réessayer de cliquer sur " + Chr(34) + "Renvoyer le lien de vérification" + Chr(34) + "."
+    },
+    "dialog_uidExpiraionError_description": {
+      "description": "The description of a popup error dialog when link has been expired during signup process",
+      "message": "Pour obtenir un nouveau lien de vérification, veuillez cliquer à nouveau sur " + Chr(34) + "Renvoyer le lien de vérification" + Chr(34) + "."
+    },
+    "dialog_errorMessageContact": {
+      "description": "The contact info displayed in an error dialog",
+      "message": "Veuillez envoyer un e-mail à support@tubi.tv si ce problème persiste."
+    },
+    "dialog_button_exit": {
+      "description": "In a popup dialog that asks if the user if they wish to exit the app. This is the button that will confirm their exit.",
+      "message": "Quitter"
+    },
+    "dialog_button_signIn": {
+      "description": "The label of the button in a dialog window that allows the user to sign into the app.",
+      "message": "Connexion"
+    },
+    "dialog_button_cancel": {
+      "description": "Label of a dialog button to cancel out of the dialog",
+      "message": "Annuler"
+    },
+    "dialog_button_continue": {
+      "description": "Label of a dialog button to continue to the next step that the dialog is saying",
+      "message": "Continuer"
+    },
+    "dialog_button_forgot_password": {
+      "description": "Label of a dialog button to take the user to the steps in case he/she has forgotten the account password. ",
+      "message": "Mot de passe oublié"
+    },
+    "dialog_button_submit": {
+      "description": "Label of the dialog button to submit what the window is asking it to do.",
+      "message": "Envoyer"
+    },
+    "dialog_button_tryAgain": {
+      "description": "Label of the dialog button to try again what the app had attempted to do.",
+      "message": "Réessayer"
+    },
+    "dialog_button_close": {
+      "description": "Label of the dialog button to close the dialog window",
+      "message": "Fermer"
+    },
+    "dialog_button_skip": {
+      "description": "Label of the dialog button to skip what is being asked",
+      "message": "Passer"
+    },
+    "dialog_button_ok": {
+      "description": "Label of the dialog button to confirm the action the dialog is asking",
+      "message": "OK"
+    },
+    "dialog_button_off": {
+      "description": "Label of the dialog button to turn something off: i.e. turn off closed captions",
+      "message": "Désactiver"
+    },
+    "dialog_button_on": {
+      "description": "Label of the dialog button to turn something on: i.e. turn on autoplay preview",
+      "message": "Activer"
+    },
+    "dialog_button_settings": {
+      "description": "Label of the dialog button to cause the app to go to the settings screen.",
+      "message": "Allez dans les " + Chr(34) + "Paramètres" + Chr(34) + "."
+    },
+    "dialog_email_verification_email_already_sent": {
+      "description": "The first line of the email verification description dialog",
+      "message": "Un e-mail de vérification a déjà été envoyé à"
+    },
+    "dialog_email_verification_check_spam": {
+      "description": "The second line of the email verification description dialog",
+      "message": "N'oubliez pas de vérifier votre dossier spam"
+    },
+    "dialog_button_resend_verification_link": {
+      "description": "Label of the dialog button to resend the email verification link",
+      "message": "Oui, renvoyer un e-mail de vérification"
+    },
+    "dialog_button_attempts_title": {
+      "description": "Title of the dialog after user selects resend verification link more than 3 times",
+      "message": "Trop de tentatives"
+    },
+    "dialog_button_multiple_emails_sent": {
+      "description": "The first line of the too many attempts dialog",
+      "message": "Plusieurs e-mails de vérification ont déjà été envoyés à"
+    },
+    "dialog_errorOops_title": {
+      "description": "A general error title for an error dialog window",
+      "message": "Oups !"
+    },
+    "dialog_channelsDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav channels menu item but the item has been disabled",
+      "message": "Chaînes désactivées"
+    },
+    "dialog_espanolDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav espanol menu item but the item has been disabled",
+      "message": "Espagnol désactivé"
+    },
+    "dialog_moviesDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
+      "message": "Films désactivés"
+    },
+    "dialog_tvDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav TV menu item but the item has been disabled",
+      "message": "TV désactivée"
+    },
+    "dialog_sideNavItemDisabled_description": {
+      "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled",
+      "message": "Veuillez quitter " + Chr(34) + "Tubi Enfants" + Chr(34) + " pour utiliser cette fonctionnalité."
+    },
+    "dialog_sideNavItemDisabled_Parental_description": {
+      "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled due to parental set to Teens",
+      "message": "Veuillez désactiver le contrôle parental pour utiliser cette fonctionnalité."
+    },
+    "dialog_contentNotAvailable_Parental_description": {
+      "description": "Message of a Dialog Window that is shown when a deeplink content can not played because of user's parental control setting",
+      "message": "Veuillez désactiver le contrôle parental pour regarder ce contenu."
+    },
+    "error_connection_title": {
+      "description": "title of error window when there is a connection error",
+      "message": "Erreur de connexion"
+    },
+    "error_connection_description": {
+      "description": "description of error window when there is a connection error",
+      "message": "Il peut y avoir un problème avec votre connexion réseau ou avec le serveur de Tubi. Veuillez vérifier votre connexion réseau et réessayer. "
+    },
+    "dialog_updateVersion_title": {
+      "description": "title of a dialog window that is shown when the user has an older version of the app",
+      "message": "Veuillez mettre à jour le chaîne Tubi"
+    },
+    "dialog_updateVersion_description": {
+      "description": "message of a dialog window that is shown when the user has an older version of the app",
+      "message": "Cette version de Tubi n'est plus prise en charge. Pour la mettre à jour, veuillez quitter l'application Tubi et aller dans :\n\nParamètres > Système > Mise à jour du système > Vérifier maintenant"
+    },
+    "dialog_fullSynopsis_title": {
+      "description": "title of a dialog window that shows the full description of a video item",
+      "message": "Synopsis complet"
+    },
+    "dialog_parentalPassword_title": {
+      "description": "title of the dialog window when guest user signs in and still needs to enter his/her password to change the parental controls",
+      "message": "Entrez votre mot de passe"
+    },
+    "dialog_parentalPassword_description": {
+      "description": "description of the dialog window when guest user signs in and still needs to enter his/her password to change the parental controls",
+      "message": "Merci de vous être connecté(e). Pour mettre à jour le contrôle parental selon les paramètres que vous souhaitez, veuillez saisir votre mot de passe."
+    },
+    "dialog_signIn_title": {
+      "description": "title of a dialog window when it asks the user to sign in",
+      "message": "Veuillez vous connecter"
+    },
+    "dialog_confirmCorrectAge_title": {
+      "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
+      "message": "Êtes-vous né(e) en {birthYear} ?"
+    },
+    "dialog_confirmCorrectAge_title_age": {
+      "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct age",
+      "message": "Avez-vous {age} ans ?"
+    },
+    "dialog_confirmCorrectAge_description": {
+      "description": "title of a dialog window when the user is attempting to set their age but are less than 13 years old so we want to confirm they set the correct year",
+      "message": "Veuillez confirmer pour continuer"
+    },
+    "dialog_confirmCorrectAge_confirm": {
+      "description": "label of a dialog window button that will confirm app user's age is correct",
+      "message": "Oui"
+    },
+    "dialog_confirmCorrectAge_edit": {
+      "description": "label of a dialog window button that will let user edit their age again",
+      "message": "Modifier"
+    },
+    "dialog_kidsExit_title": {
+      "description": "title of a dialog window when the user is attempting to exit kids Mode",
+      "message": "Quitter la section Enfants"
+    },
+    "dialog_kidsExit_button_ok": {
+      "description": "label of a dialog window button that will confirm app should exit kids mode",
+      "message": "Quitter la section Enfants"
+    },
+    "dialog_kidsExitLimited_description": {
+      "description": "description of a dialog window that describes what the user should do to exit kids mode",
+      "message": "Pour quitter la section Enfants, veuillez mettre à jour votre contrôle parental dans les paramètres du compte."
+    },
+    "dialog_kidsWelcome_title": {
+      "description": "A message welcoming the user to Tubi Kids",
+      "message": "Bienvenue sur Tubi Enfants"
+    },
+    "dialog_kidsWelcomeAgeGate_description": {
+      "description": "A description informing users they cannot exit Tubi Kids for the next 24 hours",
+      "message": "Vous ne pouvez pas quitter Tubi Enfants pour le moment. Veuillez réessayer dans 24 heures. Vous avez des questions ? Écrivez-nous à www.tubi.tv/support"
+    },
+    "dialog_cannotExitKidsMode_title": {
+      "description": "Title for dialog telling the user they can not exit kids mode",
+      "message": "Impossible de quitter le mode Enfants"
+    },
+    "dialog_cannotExitKidsMode_description": {
+      "description": "Description for dialog telling the user they can not exit kids mode",
+      "message": "Veuillez réessayer dans 24 heures.\nVous avez des questions ? Envoyez-nous un e-mail à support@tubi.tv"
+    },
+    "dialog_exitApp_title": {
+      "description": "Title of the dialog window that asks the user if they want to exit the app",
+      "message": "Êtes-vous sûr(e) ?"
+    },
+    "dialog_exitApp_description": {
+      "description": "description of the dialog window that asks the user if they want to exit the app",
+      "message": "Voulez-vous vraiment quitter Tubi ?"
+    },
+    "error_noGetChannels_description": {
+      "description": "description of the error dialog when channel content could not get received from the server.",
+      "message": "Impossible de récupérer le contenu de la chaîne."
+    },
+    "error_noGetChannelGuide_description": {
+      "description": "description of the error dialog when channel guide content could not get received from the server.",
+      "message": "Impossible de récupérer le guide de la chaîne."
+    },
+    "error_noContent_description": {
+      "description": "description of the error dialog when there was no content to be gathered from the server.",
+      "message": "Cette page ne contient actuellement aucun contenu."
+    },
+    "error_mustBeSignedIn_description": {
+      "description": "Description of the warning dialog when user needs to be signed in to view a video.",
+      "message": "Pour regarder cette vidéo gratuitement, veuillez vous connecter ou vous inscrire."
+    },
+    "error_matureContent_title": {
+      "description": "Title of the dialog window when user attempts to play mature content but they need to be signed in first",
+      "message": "Contenu pour adultes"
+    },
+    "dialog_signOut_title": {
+      "description": "Title of the dialog window that asks the user if they want to sign out of the app",
+      "message": "Êtes-vous sûr(e) ?"
+    },
+    "dialog_signOut_description": {
+      "description": "description of the dialog window that asks the user if they want to sign out of the app",
+      "message": "Vous êtes sur le point de vous déconnecter de votre compte Tubi."
+    },
+    "dialog_signOut_button_ok": {
+      "description": "label of the confirmation button of the dialog window that asks the user if they want to sign out of the app",
+      "message": "Déconnexion"
+    },
+    "error_check_birthdate_description": {
+      "description": "message letting the user know that they were not able to be signed in",
+      "message": "Un problème est survenu lors de la tentative de connexion. Veuillez entrer dans la chaîne et vous connecter à nouveau."
+    },
+    "screenSearch_defaultSearch": {
+      "description": "Directions on the search page",
+      "message": "Rechercher des films, des programmes TV et des personnes"
+    },
+    "screenSearch_defaultLinearSearch": {
+      "description": "Directions on the search page",
+      "message": "Rechercher des films, TV, des programmes TV, du direct et des personnes"
+    },
+    "screenSearch_trendingSearch": {
+      "description": "A header message that shows on top of default search results in search screen",
+      "message": "Recherches populaires"
+    },
+    "screenSearch_kidsWarning": {
+      "description": "More directions on the search screen to suggest switching to kids mode.  Should be limited to be around 40 characters or fewer.",
+      "message": "Passer à Enfants pour des résultats sûrs"
+    },
+    "screenSearch_loading": {
+      "description": "The label of the loading indictor on the search screen",
+      "message": "Actualisation de vos résultats..."
+    },
+    "screenSearch_noResults": {
+      "description": "onscreen message when there are no search results.",
+      "message": "Nous n'avons pas trouvé de résultats pour '{term}'.\nVeuillez réessayer"
+    },
+    "screenSearch_results": {
+      "description": "message after loading search results.",
+      "message": "Résultats"
+    },
+    "screenSearch_matchingTitles": {
+      "description": "text after number of search results for searchedString",
+      "message": "titres correspondants"
+    },
+    "screenSearch_liveText": {
+      "description": "The label on the search results poster next to the live streaming icon",
+      "message": "Direct"
+    },
+    "screenDetails_button_queue": {
+      "description": "label of the button that will add the video title to the user's list",
+      "message": "Ajouter à ma liste"
+    },
+    "screenDetails_button_noQueue": {
+      "description": "label of the button that will remove the video title from the user's list",
+      "message": "Retirer de Ma liste"
+    },
+    "screenDetails_button_noHistory": {
+      "description": "label of the button that will remove the video title from the user's viewing history",
+      "message": "Retirer de l'historique"
+    },
+    "screenDetails_button_changingRating": {
+      "description": "label of the button when the user has clicked the button and the like/dislike state of the video title is changing",
+      "message": "Changement de notation..."
+    },
+    "screenDetails_button_queueNow": {
+      "description": "label of the button when the user has clicked the button and the video title is being added to the user's list",
+      "message": "Ajout en cours..."
+    },
+    "screenDetails_button_removing": {
+      "description": "label of the button when the user has clicked the button and the video title is being removed from the user's list or viewing history",
+      "message": "Retrait en cours..."
+    },
+    "screenDetails_button_gotoChannel": {
+      "description": "Label of the button that will take the user to the channel associated with the current video title",
+      "message": "Aller à {channel}"
+    },
+    "screenDetails_error_addQueue_title": {
+      "description": "Title of the warning dialog when user is attempting to add an item to their list but are not signed in",
+      "message": "Compte requis"
+    },
+    "screenDetails_error_addQueueMovie_description": {
+      "description": "Description of the warning dialog when user is attempting to add a movie to their list but are not signed in",
+      "message": "Se connecter ou s'inscrire à Tubi pour ajouter ce film à votre liste."
+    },
+    "screenDetails_error_addQueueSeries_description": {
+      "description": "Description of the warning dialog when user is attempting to add a TV show/series to their list but are not signed in",
+      "message": "Se connecter ou s'inscrire à Tubi pour ajouter ce programme TV à votre liste."
+    },
+    "screenDetails_error_setReminderSports_description": {
+      "description": "Description of the warning dialog when user is attempting to set reminder but are not signed in",
+      "message": "Se connecter ou s'inscrire à Tubi pour programmer un rappel."
+    },
+    "screenDetails_error_addQueueSports_description": {
+      "description": "Description of the warning dialog when user is attempting to add a game to their list but are not signed in",
+      "message": "Se connecter ou s'inscrire à Tubi pour ajouter ce jeu à votre Liste."
+    },
+    "screenDetails_error_getContent_description": {
+      "description": "Description of error when app is not able to get content.",
+      "message": "Impossible de récupérer les informations de contenu du serveur."
+    },
+    "error_deeplink_content": {
+      "description": "Error message when the app can not retrieve the deeplink content.",
+      "message": "Le titre que vous essayez de regarder n'est pas disponible actuellement."
+    },
+    "error_deeplink_page": {
+      "description": "Error message when the app can not retrieve the page requested through deeplink",
+      "message": "La page que vous recherchez n'est pas disponible actuellement."
+    },
+    "error_tryAgain_title": {
+      "description": "Error message when the user has the option to try the operation again.",
+      "message": "Réessayer"
+    },
+    "screenDetails_queue_content_added_to_list_description": {
+      "description": "Message when a content is added to the user's list after sign in.",
+      "message": "Contenu"
+    },
+    "screenDetails_queue_added_to_list_description": {
+      "description": "Message when a movie/series/replay game is added to the user's list after sign in.",
+      "message": "{contentTitle} a été ajouté à la liste."
+    },
+    "screenDetails_queue_added_to_reminder_list_description": {
+      "description": "Message when a upcoming game is added to the user's reminder list after sign in.",
+      "message": "{upcomingTitle} a été associé aux rappels."
+    },
+    "screenDetails_error_queueMovie_description": {
+      "description": "Error message when a movie is not added to the user's list.",
+      "message": "Nous ignorons ce qui s'est passé, mais un problème est survenu en essayant d'ajouter ce film à votre Liste."
+    },
+    "screenDetails_error_queueSeries_description": {
+      "description": "Error message when a tv show/series is not added to the user's list.",
+      "message": "Nous ignorons ce qui s'est passé, mais un problème est survenu en essayant d'ajouter ce programme TV à votre Liste."
+    },
+    "screenDetails_error_noQueueMovie_description": {
+      "description": "Error message when a movie is not removed from the user's list.",
+      "message": "Nous ignorons ce qui s'est passé, mais un problème est survenu en essayant de retirer ce film de votre Liste."
+    },
+    "screenDetails_error_noQueueSeries_description": {
+      "description": "Error message when a tv show/series is not removed from the user's list.",
+      "message": "Nous ignorons ce qui s'est passé, mais un problème est survenu en essayant de retirer ce programme TV de votre Liste."
+    },
+    "screenDetails_error_noQueueUpcoming_description": {
+      "description": "Error message when a upcoming game is not removed from the user's reminders list.",
+      "message": "Nous ignorons ce qui s'est passé, mais un problème est survenu en essayant de supprimer ce rappel."
+    },
+    "screenDetails_error_noQueueReplay_description": {
+      "description": "Error message when a replay game is not removed from the user's list.",
+      "message": "Nous ignorons ce qui s'est passé, mais un problème est survenu en essayant de retirer cet événement sportif de votre Liste."
+    },
+    "screenDetails_error_likeDislike_description": {
+      "description": "Error message when a video title's like/dislike rating is not changed.",
+      "message": "Nous ignorons ce qui s'est passé, mais un problème est survenu en essayant de changer la notation."
+    },
+    "screenDetails_error_noHistory_description": {
+      "description": "Error message when video is not removed from the user's viewing history.",
+      "message": "Un problème est survenu en retirant le contenu de votre Historique."
+    },
+    "screenSettings_signIn_description": {
+      "description": "Directions for the signin page",
+      "message": "Connectez-vous à votre compte Tubi sur votre ordinateur ou votre téléphone pour voir vos programmes TV et vos films sauvegardés dans Ma liste, pour continuer à regarder là où vous vous êtes arrêté et obtenir des recommandations personnelles synchronisées sur votre téléphone, votre TV, votre tablette ou votre ordinateur."
+    },
+    "screenSettings_signOut_description": {
+      "description": "Description on SignIn page when user is signed in",
+      "message": "Vous êtes connecté(e) en tant que {nom}"
+    },
+    "screenSettings_signOut_description2": {
+      "description": "More details on the SignIn page when user is signed in",
+      "message": "Email : {email}"
+    },
+    "screenSettings_fullDeviceID": {
+      "description": "Text proceeding the full device ID",
+      "message": "Numéro d'identification complet de l'appareil"
+    },
+    "screenSettings_about_title": {
+      "description": "The title of the about screen",
+      "message": "À propos de Tubi"
+    },
+    "screenSettings_about_description": {
+      "description": "The description on the about screen",
+      "message": "Tubi est l'application leader de streaming vidéo gratuite et premium. Nous disposons d'une collection de contenu vaste et diversifiée avec plusieurs milliers de titres et 3 fois moins de publicités que sur le câble TV."
+    },
+    "screenSettings_about_title2": {
+      "description": "The subtitle on the about screen",
+      "message": "Besoin d'assistance ?"
+    },
+    "screenSettings_about_description2": {
+      "description": "The 2nd description on the about screen",
+      "message": "Visitez {help_url} \n \n Envoyez un e-mail à notre équipe d'assistance support@tubi.tv \n \nContactez-nous sur Facebook, Instagram, Twitter et sur notre site Internet à : \n {support_url} \n \n Version {version} \n Numéro d'identification abrégé : {id} (appuyez sur OK pour voir le numéro complet de l'appareil) \n \n © {year} Tubi, Inc. tous droits réservés."
+    },
+    "screenSettings_menu_parentalControls": {
+      "description": "The label for the parental controls",
+      "message": "Contrôle parental"
+    },
+    "screenSettings_menu_autoplayPreview": {
+      "description": "The label for the autoplay preview",
+      "message": "Prévisualisations en lecture automatique"
+    },
+    "screenSettings_parentalControls_group_LittleKids": {
+      "description": "Little Kids of the parental controls",
+      "message": "Jeunes enfants",
+      "note": "This translation is used as screenSettings_parentalControls_group_LittleKids, please double check that it is not needed before deleting"
+    },
+    "screenSettings_parentalControls_group_OlderKids": {
+      "description": "Older Kids of the parental controls",
+      "message": "Enfants plus âgés",
+      "note": "This translation is used as screenSettings_parentalControls_group_OlderKids, please double check that it is not needed before deleting"
+    },
+    "screenSettings_parentalControls_group_Teens": {
+      "description": "Teens of the parental controls",
+      "message": "Adolescents",
+      "note": "This translation is used as screenSettings_parentalControls_group_Teens, please double check that it is not needed before deleting"
+    },
+    "screenSettings_parentalControls_group_Adults": {
+      "description": "Adults of the parental controls",
+      "message": "Adultes",
+      "note": "This translation is used as screenSettings_parentalControls_group_Adults, please double check that it is not needed before deleting"
+    },
+    "screenSettings_parentalControls_instructions": {
+      "description": "Description of the parental controls screen",
+      "message": "Veuillez sélectionner l'âge approprié pour regarder Tubi TV. Votre sélection déterminera les classifications de films et d'émissions que vous pourrez consulter dans l'application. Si vous modifiez cette sélection, vous devrez entrer le mot de passe de votre compte."
+    },
+    "screenSettings_autoplayPreview_instructions": {
+      "description": "Description of the autoplay preview user choice screen",
+      "message": "Vous pouvez activer ou désactiver la fonction de lecture automatique qui vous permet de prévisualiser la vidéo pendant la navigation."
+    },
+    "screenSettings_menu_about": {
+      "description": "A menu Item for the Settings screen",
+      "message": "À propos de"
+    },
+    "screenSettings_menu_privacyPolicy": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Politique de confidentialité"
+    },
+    "screenSettings_menu_tos": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Conditions d'utilisation"
+    },
+    "screenSettings_menu_yourPrivacyChoices": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Vos choix en matière de confidentialité"
+    },
+    "screenSettings_menu_PrivacyCenter": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Centre de Confidentialité"
+    },
+    "screenSettings_menu_signOut": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Déconnexion"
+    },
+    "screenSettings_signInPanel_title": {
+      "description": "The title of the Sign In Panel of the Settings screen",
+      "message": "Vous n'êtes pas encore connecté(e)"
+    },
+    "screenSettings_parentalPassword_title": {
+      "description": "Directions for signed out users who attempt to change the parental controls",
+      "message": "Entrez le mot de passe pour mettre à jour"
+    },
+    "screenSettings_parentalPassword_subtitle": {
+      "description": "Directions 2nd line for signed out users who attempt to change the parental controls",
+      "message": "Contrôle parental"
+    },
+    "screenSettings_parentalPassword_button_hide": {
+      "description": "Label of button on the password entry screen to hide the password",
+      "message": "Cacher le mot de passe"
+    },
+    "screenSettings_parentalPassword_button_show": {
+      "description": "Label of button on the password entry screen to display the password",
+      "message": "Montrer le mot de passe"
+    },
+    "screenSettings_error_parentalFailedChange_title": {
+      "description": "title of error screen when parental controls failed to update",
+      "message": "Échec de la mise à jour"
+    },
+    "screenSettings_error_parentalFailedChange_description": {
+      "description": "description of error screen when parental controls failed to update",
+      "message": "La mise à jour des paramètres du contrôle parental a échoué. Veuillez essayer de saisir à nouveau votre mot de passe."
+    },
+    "screenSettings_error_parentalChanges": {
+      "description": "title of dialog message when parental controls has changed",
+      "message": "Changement des paramètres du contrôle parental"
+    },
+    "screenSettings_error_parentalChanges_description_default": {
+      "description": "description of dialog message when parental controls has changed",
+      "message": "Les paramètres du contrôle parental ont été modifiés. Le contrôle parental sera protégé par un mot de passe après 5 minutes."
+    },
+    "screenSettings_error_parentalChanges_description_group0": {
+      "description": "Success message when parental controls has changed to group 0",
+      "message": "Les paramètres du contrôle parental pour les " + Chr(34) + "Jeunes enfants" + Chr(34) + " ont été modifiés. Le contrôle parental sera protégé par un mot de passe après 5 minutes.",
+      "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
+    },
+    "screenSettings_error_parentalChanges_description_group1": {
+      "description": "Success message when parental controls has changed to group 1",
+      "message": "Les paramètres du contrôle parental pour les " + Chr(34) + "Enfants plus âgés" + Chr(34) + " ont été modifiés. Le contrôle parental sera protégé par un mot de passe après 5 minutes.",
+      "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
+    },
+    "screenSettings_error_parentalChanges_description_group2": {
+      "description": "Success message when parental controls has changed to group 2",
+      "message": "Les paramètres du contrôle parental pour les " + Chr(34) + "Adolescents" + Chr(34) + " ont été modifiés. Le contrôle parental sera protégé par un mot de passe après 5 minutes.",
+      "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
+    },
+    "screenSettings_error_parentalChanges_description_group3": {
+      "description": "Success message when parental controls has changed to group 3",
+      "message": "Les paramètres du contrôle parental pour les " + Chr(34) + "Adultes" + Chr(34) + " ont été modifiés. Le contrôle parental sera protégé par un mot de passe après 5 minutes.",
+      "note": "This translation is used as screenSettings_error_parentalChanges_description_group[variable], please double check that it is not needed before deleting"
+    },
+    "screenSettings_error_signInParental_description": {
+      "description": "Description of message to let users know that they must be signed in to adjust the parental controls.",
+      "message": "Vous devez être connecté(e) pour configurer le contrôle parental"
+    },
+    "screenSettings_error_signInAutoplayPreview_description": {
+      "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
+      "message": "Vous devez être connecté(e) pour modifier les préférences de lecture automatique."
+    },
+    "screenChannels_error_retrieve_message": {
+      "description": "Onscreen message to indicate channel content could not be gathered",
+      "message": "Impossible de récupérer le contenu des chaînes."
+    },
+    "screenCategories_error_retrieve_message": {
+      "description": "Onscreen message to indicate categories content could not be gathered",
+      "message": "Impossible de récupérer le contenu des catégories."
+    },
+    "screenHome_error_fetchCategories_description": {
+      "description": "Onscreen message to indicate categories content could not be loaded",
+      "message": "Impossible de charger certaines catégories."
+    },
+    "screenHome_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate home content could not be loaded",
+      "message": "Impossible de charger l'écran d'accueil Tubi."
+    },
+    "screenEspanol_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate espanol content could not be loaded",
+      "message": "Impossible de charger l'écran espagnol Tubi."
+    },
+    "screenMovies_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate movies content could not be loaded",
+      "message": "Impossible de charger l'écran de films Tubi."
+    },
+    "screenKids_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate kids home content could not be loaded",
+      "message": "Impossible de charger l'écran Enfants Tubi."
+    },
+    "screenTv_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate TV content could not be loaded",
+      "message": "Impossible de charger l'écran des programmes TV Tubi."
+    },
+    "screenTournament_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate Tournament content could not be loaded",
+      "message": "Impossible de charger l'écran des tournois Tubi."
+    },
+    "epg_minutes_left": {
+      "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
+      "message": "plus que {minutes} min"
+    },
+    "today": {
+      "description": "Today",
+      "message": "AUJOURD'HUI"
+    },
+    "tomorrow": {
+      "description": "Tomorrow",
+      "message": "DEMAIN"
+    },
+    "day_1": {
+      "description": "shortened version Monday, formatted with , and a space",
+      "message": "Lun "
+    },
+    "day_2": {
+      "description": "shortened version Tuesday, formatted with , and a space",
+      "message": "Mar "
+    },
+    "day_3": {
+      "description": "shortened version Wednessday, formatted with , and a space",
+      "message": "Mer "
+    },
+    "day_4": {
+      "description": "shortened version Thursday, formatted with , and a space",
+      "message": "Jeu "
+    },
+    "day_5": {
+      "description": "shortened version Friday, formatted with , and a space",
+      "message": "Ven "
+    },
+    "day_6": {
+      "description": "shortened version Saturday, formatted with , and a space",
+      "message": "Sam "
+    },
+    "day_7": {
+      "description": "shortened version Sunday, formatted with , and a space",
+      "message": "Dim "
+    },
+    "short_version_date_format_1": {
+      "description": "Shortened version of date format for the month of January",
+      "message": "{day} jan {year}"
+    },
+    "short_version_date_format_2": {
+      "description": "Shortened version of date format for the month of February",
+      "message": "{day} fév {year}"
+    },
+    "short_version_date_format_3": {
+      "description": "Shortened version of date format for the month of March",
+      "message": "{day} mar {year}"
+    },
+    "short_version_date_format_4": {
+      "description": "Shortened version of date format for the month of April",
+      "message": "{day} avr {year}"
+    },
+    "short_version_date_format_5": {
+      "description": "Shortened version of date format for the month of May",
+      "message": "{day} mai {year}"
+    },
+    "short_version_date_format_6": {
+      "description": "Shortened version of date format for the month of June",
+      "message": "{day} jui {year}"
+    },
+    "short_version_date_format_7": {
+      "description": "Shortened version of date format for the month of July",
+      "message": "{day} juil {year}"
+    },
+    "short_version_date_format_8": {
+      "description": "Shortened version of date format for the month of August",
+      "message": "{day} août {year}"
+    },
+    "short_version_date_format_9": {
+      "description": "Shortened version of date format for the month of September",
+      "message": "{day} sep {year}"
+    },
+    "short_version_date_format_10": {
+      "description": "Shortened version of date format for the month of October",
+      "message": "{day} oct {year}"
+    },
+    "short_version_date_format_11": {
+      "description": "Shortened version of date format for the month of November",
+      "message": "{day} nov {year}"
+    },
+    "short_version_date_format_12": {
+      "description": "Shortened version of date format for the month of December",
+      "message": "{day} déc {year}"
+    },
+    "channelGuide_error_fetchContent_description": {
+      "description": "Onscreen message to indicate channel Guide content could not be loaded",
+      "message": "Impossible de charger le guide des chaînes."
+    },
+    "screenMyStuff_signedOutUITitle": {
+      "description": "The title of the MyStuff Screen for the guest user.",
+      "message": "Profitez de Tubi, c'est gratuit"
+    },
+    "screenMyStuff_signedOutUISubtitle": {
+      "description": "The subtitle of the MyStuff Screen for the guest user.",
+      "message": "Sauvegardez tous vos favoris, reprenez là où vous en étiez, le tout en un seul endroit"
+    },
+    "screenMyStuff_signedOutUIBlurb": {
+      "description": "The blurb of the MyStuff Screen for the guest user.",
+      "message": "Aucune carte de crédit requise • Gratuit pour toujours"
+    },
+    "screenMyStuff_allEmptyUITitle": {
+      "description": "The title of the MyStuff Screen for the guest user.",
+      "message": "Mes Envies sont vides"
+    },
+    "screenMyStuff_allEmptyUISubtitle": {
+      "description": "The subtitle of the MyStuff Screen for the guest user.",
+      "message": "Pour ajouter un titre à votre liste, utilisez l'icône marque-page"
+    },
+    "screenDetails_button_trailer": {
+      "description": "Label of button to allow users to watch a preview of the current video title",
+      "message": "Regarder la bande-annonce"
+    },
+    "screenDetails_button_episodes": {
+      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title",
+      "message": "Liste des épisodes"
+    },
+    "screenDetails_relatedTitles": {
+      "description": "Label of button to allow users to view other video titles related to the current video title",
+      "message": "Vous pourriez aussi aimer"
+    },
+    "screenDetails_button_play": {
+      "description": "Label of button to allow users to play the current video title",
+      "message": "Lecture"
+    },
+    "screenDetails_button_startOver": {
+      "description": "Label of button to allow users to start over and play the current video title",
+      "message": "Lire depuis le début"
+    },
+    "screenDetails_button_like_instructions": {
+      "description": "text to be place AFTER the text that indicates that the user 'liked' or 'disliked' the current video title. This appears once the button gains focus",
+      "message": " - Supprimer la notation"
+    },
+    "screenDetails_button_like": {
+      "description": "Label of button to allow users to like the current video title",
+      "message": "J'aime"
+    },
+    "screenDetails_button_liked": {
+      "description": "Label of button to indicate to users that the current video title has been liked",
+      "message": "Vous aimez"
+    },
+    "screenDetails_button_dislike": {
+      "description": "Label of button to allow users to dislike the current video title",
+      "message": "Je n'aime pas"
+    },
+    "screenDetails_button_disliked": {
+      "description": "Label of button to indicate to users that the current video title has been disliked",
+      "message": "Vous n'aimez pas"
+    },
+    "screenDetails_button_notForMe": {
+      "description": "Label of button to allow users to ignore the current video title",
+      "message": "Pas pour moi"
+    },
+    "screenDetails_button_likeDislike": {
+      "description": "Label of unfocused button to allow users to like or dislike the current video title",
+      "message": "J'aime ou Je n'aime pas"
+    },
+    "screenDetails_button_rateThisTitle": {
+      "description": "Label of unfocused button to allow users to rate the current video title",
+      "message": "Noter ce Titre"
+    },
+    "screenDetails_button_tellUsWhatYouThink": {
+      "description": "Label of unfocused button to allow users to rate the current video title",
+      "message": "Dites-Nous Ce Que Vous En Pensez"
+    },
+    "screenDetails_button_see_all_games": {
+      "description": "Label of button to allow users to a new page where they can see all the games related to the current sports title",
+      "message": "Voir tous les matchs"
+    },
+    "screenDetails_button_sign_in_to_set_reminder": {
+      "description": "Label of button to allow users to set the reminder to the current video title when the user is not signed in.",
+      "message": "Connectez-vous pour programmer un rappel"
+    },
+    "screenDetails_button_set_reminder": {
+      "description": "Label of button to allow users to set the reminder to the current video title when the user is signed in.",
+      "message": "Programmer un rappel"
+    },
+    "screenDetails_button_remove_reminder": {
+      "description": "Label of button to indicate the users that reminder is set on the current video title",
+      "message": "Supprimer le rappel"
+    },
+    "screenDetails_button_resume_playing": {
+      "description": "Label of button to allow users to resume the current video title",
+      "message": "Reprendre la lecture"
+    },
+    "screenAgeVerification_network_issue": {
+      "description": "An error message shown to users when they submit their birthdate, but there is an unexpected server or network error",
+      "message": "L'envoi de votre date de naissance à nos serveurs n'a pas abouti."
+    },
+    "screenSignUpAgeVerification_sub_header_age": {
+      "description": "A sub header message to direct users to enter their age",
+      "message": "Pour continuer, veuillez vérifier votre âge"
+    },
+    "screenSignUpAgeVerification_request_age_prefix": {
+      "description": "Label to ask user to enter their age. This part precedes the age provided",
+      "message": "J'ai"
+    },
+    "screenSignUpAgeVerification_request_age_postfix": {
+      "description": "Label to ask user to enter their age. This part comes after the age provided",
+      "message": "ans"
+    },
+    "screenSignUpAgeVerification_error_prompt_age": {
+      "description": "A message informing the user that they entered an age that is not acceptable",
+      "message": "Veuillez entrer un âge valide"
+    },
+    "screenAgeVerification_header": {
+      "description": "A header message on the Age required screen asking them to confirm their age",
+      "message": "Confirmez votre âge*"
+    },
+    "screenAgeVerification_sub_header": {
+      "description": "A sub header message to direct users to enter their birth date",
+      "message": "Pour continuer, veuillez vérifier votre année de naissance"
+    },
+    "screenAgeVerification_keypad_button": {
+      "description": "A message on the button below the birth date keypad that users should select once done inserting their birth date",
+      "message": "Commencer à regarder"
+    },
+    "screenAgeVerification_year": {
+      "description": "A label explaining that the 4 digits above the label signify the year that was input by the user",
+      "message": "Année de naissance"
+    },
+    "screenAgeVerification_yyyy": {
+      "description": "A label showing that the user should enter four digits for their birthdate year",
+      "message": "AAAA"
+    },
+    "screenAgeVerification_warning_prompt": {
+      "description": "A message informing the user that they entered a date that is not valid",
+      "message": "Veuillez vérifier que les informations saisies sont correctes"
+    },
+    "screenAgeVerification_error_prompt": {
+      "description": "A message informing the user that they entered a date that is not acceptable",
+      "message": "Veuillez entrer une année de naissance valide"
+    },
+    "metadata_fullscreen_countdown_plural": {
+      "description": "label to indicate how many seconds it will take before the video player will automatically go fullscreen. This is the plural version but an attempt should be made to ensure the string is neither plural or singular by using a shorten form of seconds.",
+      "message": "Plein écran dans {seconds} sec"
+    },
+    "metadata_expiresIn_plural": {
+      "description": "label to indicate how long the user have to watch a video",
+      "message": "Expire dans {days} jours"
+    },
+    "metadata_expiresIn_singular": {
+      "description": "label to indicate the user has exactly 1 day to watch a video",
+      "message": "Expire dans 1 jour"
+    },
+    "metadata_myStuff_empty_myList_title": {
+      "description": "For an empty MyList container, this is the title that is displayed in the empty container",
+      "message": "Votre liste est vide"
+    },
+    "metadata_myStuff_empty_myList_description": {
+      "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
+      "message": "Les films et émissions de télévision ajoutés à votre liste apparaissent ici"
+    },
+    "metadata_myStuff_empty_continueWatching_title": {
+      "description": "For an empty continueWatching container, this is the title that is display in the empty container",
+      "message": "Vous êtes à jour"
+    },
+    "metadata_myStuff_empty_continueWatching_description": {
+      "description": "For an empty continueWatching container, this is the description/subtitle that is display in the empty container",
+      "message": "Les films et émissions de télévision que vous n'avez pas fini de regarder apparaissent ici"
+    },
+    "metadata_myStuff_empty_continueWatchingInfoPanel_title": {
+      "description": "For an empty continueWatching container, this is the title that is display in the InfoPanel when the empty container is in focus",
+      "message": "Continuer à regarder"
+    },
+    "metadata_myStuff_empty_myListInfoPanel_description": {
+      "description": "For an empty myList container, this is the description/subtitle that is display in the InfoPanel when the empty container is in focus",
+      "message": "Regardez ce que vous aviez sauvegardé"
+    },
+    "metadata_myStuff_empty_myListInfoPanel_title": {
+      "description": "For an empty myList container, this is the title that is display in the InfoPanel when the empty container is in focus",
+      "message": "Ma liste"
+    },
+    "metadata_myStuff_empty_continueWatchingInfoPanel_description": {
+      "description": "For an empty continueWatching container, this is the description/subtitle that is display in the InfoPanel when the empty container is in focus",
+      "message": "Reprendre là où vous en étiez"
+    },
+    "metadata_continueWatching_notSignedIn_title": {
+      "description": "tells non registered user what they need to do to see the continue watching container",
+      "message": "Inscrivez-vous pour sauvegarder votre progression"
+    },
+    "metadata_continueWatching_notSignedIn_description": {
+      "description": "tells non registered user what they need to do to see the continue watching container",
+      "message": "Reprenez là où vous vous êtes arrêté la prochaine fois que vous regarderez une série TV ou un film. Disponible après vous être inscrit(e)."
+    },
+    "metadata_continueWatching_notSignedIn_container_description": {
+      "description": "tells non registered user what they need to do to see the continue watching container",
+      "message": "Pas d'abonnement  •  Pas de carte de crédit  •  Gratuit pour toujours"
+    },
+    "metadata_continueWatching_notSignedIn_container_button": {
+      "description": "button text for when a non registered user focuses on the continue watching container",
+      "message": "Inscrivez-vous pour sauvegarder votre progression - GRATUIT"
+    },
+    "metadata_directed": {
+      "description": "metadata label to indicate the directors of the current video title",
+      "message": "Réalisé par"
+    },
+    "metadata_starring": {
+      "description": "metadata label to indicate the actors of the current video title",
+      "message": "Avec"
+    },
+    "metadata_hoursAndMinutes": {
+      "description": "a duration listed in hours and minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "{hours} h {minutes} min"
+    },
+    "metadata_hours": {
+      "description": "a duration listed in hours (abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "{hours} h"
+    },
+    "metadata_minutes": {
+      "description": "a duration listed in minutes (abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "{minutes} min"
+    },
+    "metadata_seconds": {
+      "description": "a duration listed in seconds (abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "{seconds} sec"
+    },
+    "metadata_seasons_plural": {
+      "description": "Label of how many seasons of the current TV title",
+      "message": "{seasons} saisons"
+    },
+    "metadata_seasons_singular": {
+      "description": "Label for when the current TV title has exactly one season",
+      "message": "1 saison"
+    },
+    "metadata_series": {
+      "description": "Label to indicate a title is a TV series",
+      "message": "Série"
+    },
+    "sponsor_brought_by": {
+      "description": "When content is sponsored by an advertizer, then this text proceeds the image of the sponsor. The text and the image should make a complete sentence.",
+      "message": "Proposé par"
+    },
+    "registration_signIn_recommended": {
+      "description": "text appended to recommended row label to subtly remind users that they are signed out so that they understand that they need to sign-in to use Tubi at its fullest",
+      "message": "Connectez-vous pour une expérience plus personnalisée"
+    },
+    "screenEndCard_startingIn": {
+      "description": "indicator for how many seconds until next video will start playing (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "Commence dans {seconds} sec."
+    },
+    "videoPlayer_trailerTitle": {
+      "description": "Label for the video preview associated with the current video title",
+      "message": "Bande-annonce ({title})"
+    },
+    "videoPlayer_adLoadingMessage": {
+      "description": "Message to indicate ads will play before playing video content",
+      "message": "Votre programme va commencer après ces messages..."
+    },
+    "videoPlayer_error_failed_description": {
+      "description": "label for error messages to indicate 'failed'",
+      "message": "ÉCHEC"
+    },
+    "videoPlayer_error_invalidURL_description": {
+      "description": "Error message to indicate that the video URL is invalid.",
+      "message": "L'URL de la vidéo n'est pas valide."
+    },
+    "videoPlayer_error_playback_description": {
+      "description": "Error message when video could not play",
+      "message": "Il y a eu un problème avec la lecture de la vidéo."
+    },
+    "videoPlayer_adHeadsUp": {
+      "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "La pause pub commence dans {seconds} sec."
+    },
+    "linearVideoPlayer_buttonBack": {
+      "description": "Label of a Button to go back",
+      "message": "Retour"
+    },
+    "linearVideoPlayer_buttonCaptions": {
+      "description": "Label of a Button to display the closed captions",
+      "message": "Sous-titres"
+    },
+    "linearVideoPlayer_buttonCaptions2": {
+      "description": "Label of a Button to display the closed captions",
+      "message": "Sous-titres"
+    },
+    "linearVideoPlayer_buttonGuide": {
+      "description": "Label of a Button to view the channel guide",
+      "message": "Guide"
+    },
+    "linearVideoPlayer_buttonGuide2": {
+      "description": "Label of a Button to view the channel guide",
+      "message": "Guide TV complet"
+    },
+    "linearVideoPlayer_channelGuideTitle": {
+      "description": "The title displayed above a list of live TV channels",
+      "message": "Guide des chaînes"
+    },
+    "goBack_categories": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "APPUYER SUR RETOUR POUR LES CATÉGORIES"
+    },
+    "goBack_channels": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "APPUYER SUR RETOUR POUR LES CHAÎNES"
+    },
+    "goBack_default": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "APPUYER SUR RETOUR POUR REVENIR EN ARRIÈRE"
+    },
+    "goBack_videoPlayer_upNext": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "RETOUR POUR REJETER"
+    },
+    "goBack_videoPlayer_controls": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "APPUYER SUR RETOUR POUR CACHER"
+    },
+    "goBack_menu": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "APPUYER SUR RETOUR POUR ALLER AU MENU"
+    },
+    "goBack_home": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "APPUYER SUR RETOUR POUR ALLER À ACCUEIL"
+    },
+    "channel_name": {
+      "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
+      "message": "Tubi - Films et TV gratuits"
+    },
+    "channel_description": {
+      "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
+      "message": "Profitez de la plus grande collection de films et de programmes TV populaires. Tout est gratuit !",
+      "note": "This translation is used for channelStore, please double check that it is not needed before deleting"
+    },
+    "channel_webDescription": {
+      "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
+      "message": "Regardez gratuitement des milliers de films et de séries TV à succès. Tubi est un service de streaming illimité 100% légal, sans carte de crédit et sans abonnement. Choisissez ce que vous voulez regarder, quand vous voulez et avec moins de publicités que la TV ordinaire. Tubi est le plus grand service de streaming gratuit qui propose des films et des séries TV primés. Il y en a pour tous les goûts : des comédies aux drames, des films pour enfants aux classiques, en passant par les favoris de contenus ciblés comme les drames coréens, les animations et les séries britanniques. Téléchargez dès maintenant et commencez à regarder du divertissement en streaming gratuitement, dès aujourd'hui !",
+      "note": "This translation is used for channelStore, please double check that it is not needed before deleting"
+    },
+    "dialog_whoops_title": {
+      "description": "A general whoops title for an dialog window",
+      "message": "Oups !"
+    },
+    "dialog_mylist_signIn_description": {
+      "description": "Dialog description to say the user to signIn to view the My List",
+      "message": "Vous devez être connecté(e) pour voir votre Liste."
+    },
+    "dialog_mylist_empty_title": {
+      "description": "A general empty My list title for an dialog window",
+      "message": "Oh non ! Votre liste est vide."
+    },
+    "dialog_mylist_empty_description": {
+      "description": "Dialog description to say My List is empty",
+      "message": "Retrouvez ici tout ce que vous voulez ajouter à Ma liste. Pour commencer, sélectionnez un programme TV ou un film et cliquez sur le bouton Ajouter à ma Liste."
+    },
+    "dialog_button_register_signIn": {
+      "description": "The label of the button in a dialog window that allows the user to register or signIn",
+      "message": "Se connecter ou S'inscrire"
+    },
+    "why_ask_age_description": {
+      "description": "The main message which explains why Tubi is asking for the users year of birth",
+      "message": "*Nous utilisons ces informations pour confirmer que vous répondez aux critères d'âge définis dans nos conditions d'utilisation et pour personnaliser votre expérience. Lisez les conditions d'utilisation à l'adresse : www.tubitv.com/terms Des questions ? Faites-nous en part à : support@tubi.tv"
+    },
+    "signIn_screen_heading": {
+      "description": "Title on the signIn screen",
+      "message": "Connectez-vous à votre compte"
+    },
+    "signIn_screen_enter_password": {
+      "description": "enter password text",
+      "message": "Entrez votre mot de passe Tubi"
+    },
+    "forgot_password_text": {
+      "description": "forgot password text",
+      "message": "Vous avez oublié votre mot de passe ?"
+    },
+    "forgot_password_link": {
+      "description": "forgot password link",
+      "message": "Allez sur tubi.tv/forgot pour réinitialiser"
+    },
+    "signIn_password_hint": {
+      "description": "hint shown on signIn password textbox",
+      "message": "mot de passe"
+    },
+    "signUp_password_hint": {
+      "description": "hint shown on signUp password textbox",
+      "message": "définir un mot de passe"
+    },
+    "signUp_screen_heading": {
+      "description": "Title on the signUp screen",
+      "message": "Créez un nouveau compte"
+    },
+    "signUp_screen_password_validation": {
+      "description": "sign up screen password validation text",
+      "message": "Appuyez sur OK sur votre télécommande et définissez un nouveau mot de passe."
+    },
+    "already_having_account_text": {
+      "description": "already having account text",
+      "message": "Vous avez déjà un compte ?"
+    },
+    "password_length_validation": {
+      "description": "password length validation",
+      "message": "Le mot de passe doit comporter de 6 à 30 caractères"
+    },
+    "invalid_password_title": {
+      "description": "invalid password title on modal",
+      "message": "Mot de passe invalide"
+    },
+    "invalid_oops_password_title": {
+      "description": "invalid password title on modal",
+      "message": "Oups, mauvais mot de passe"
+    },
+    "enter_password_dialog_description": {
+      "description": "enter password dialog description",
+      "message": "Veuillez entrer votre mot de passe Tubi pour ce compte"
+    },
+    "invalid_oops_password_description": {
+      "description": "enter password dialog description",
+      "message": "Réessayons ou saisissons un autre mot de passe pour ce compte:"
+    },
+    "re-enter_password_button": {
+      "description": "re-enter password button text on modal",
+      "message": "Saisissez à nouveau le mot de passe"
+    },
+    "retry": {
+      "description": "retry button text on modal",
+      "message": "Réessayer"
+    },
+    "could_not_verify_email": {
+      "description": "could not verify your email modal description",
+      "message": "Votre adresse e-mail n'a pas pu être vérifiée"
+    },
+    "check_email_inbox": {
+      "description": "Title on the email verification screen",
+      "message": "Vérifiez vos e-mails"
+    },
+    "click_on_verification_link": {
+      "description": "Message shown on the email verification screen about the verification link sent to email",
+      "message": "Veuillez cliquer sur le lien de vérification envoyé à votre adresse e-mail :"
+    },
+    "screen_refresh_after_email_verification": {
+      "description": "Message shown on the email verification to let the user know screen will refresh after the email verification",
+      "message": "Cet écran s'actualisera une fois que vous aurez vérifié votre e-mail."
+    },
+    "goBack_signIn": {
+      "description": "Navigational instructions to users on what the back button does on the current page",
+      "message": "APPUYER SUR RETOUR POUR VOUS CONNECTER"
+    },
+    "rated_Label": {
+      "description": "Label shown on video player when tv rating/descriptor is shown",
+      "message": "CLASSÉ"
+    },
+    "skipIntro_Player": {
+      "description": "Navigational instructions to users to skip the introduction section of the title. Usually the song or the beginning credits",
+      "message": "Passer l'intro"
+    },
+    "skipRecap_Player": {
+      "description": "Navigational instructions to users to skip the section where the previous part of the show is recapped",
+      "message": "Passer le résumé"
+    },
+    "skipEarlyCredits_Player": {
+      "description": "Navigational instructions to users to skip when the Credits are followed by a scene",
+      "message": "Passer le générique"
+    },
+    "invalid_email_title": {
+      "description": "Asking to enter a valid email on Email screen",
+      "message": "Veuillez entrer une adresse e-mail valide"
+    },
+    "email_screen_heading": {
+      "description": "Asking to enter a email on Email screen",
+      "message": "Entrez votre adresse e-mail"
+    },
+    "screenAgeVerification_born_year": {
+      "description": "Label to ask user to enter their year of birth",
+      "message": "Je suis né en"
+    },
+    "new_password_text": {
+      "description": "new password text",
+      "message": "Pour créer un nouveau mot de passe,"
+    },
+    "new_password_link": {
+      "description": "forgot password link",
+      "message": "visitez tubi.tv/password"
+    },
+    "signIn_screen_subheading": {
+      "description": "Sub title on the signIn screen",
+      "message": "Votre adresse e-mail est déjà associée à un compte Tubi existant."
+    },
+    "forgotPassword_screen_heading": {
+      "description": "Title on the forgot password screen",
+      "message": "Une aide est en route!"
+    },
+    "forgotPassword_screen_instant_subheading": {
+      "description": "Sub title on the forgot password screen - instant version",
+      "message": "Allez dans cette boîte aux lettres électronique et cliquez sur le lien de connexion instantanée:"
+    },
+    "forgotPassword_screen_noInstant_subheading": {
+      "description": "Sub title on the forgot password screen - no instant version",
+      "message": "Allez dans cette boîte aux lettres électronique et cliquez sur le lien de réinitialisation du mot de passe:"
+    },
+    "forgotPassword_screen_instant_subheading2": {
+      "description": "2nd Sub title on the forgot password screen - instant version",
+      "message": "Cet écran s'actualisera une fois que vous aurez cliqué sur le lien figurant dans votre courrier électronique."
+    },
+    "forgotPassword_screen_noInstant_subheading2": {
+      "description": "2nd Sub title on the forgot password screen - noInstant version",
+      "message": "Une fois votre mot de passe réinitialisé, cliquez ci-dessous pour essayer de vous connecter."
+    },
+    "forgotPassword_screen_btn_resend": {
+      "description": "The button on the forgot password screen that corresponds to the action 'Resend Sign-in link",
+      "message": "Renvoyer le lien de connexion"
+    },
+    "forgotPassword_screen_btn_different_email": {
+      "description": "The button on the forgot password screen that corresponds to the action 'Use Different Email",
+      "message": "Utiliser un courriel différent"
+    },
+    "forgotPassword_screen_btn_return": {
+      "description": "The button on the forgot password screen that corresponds to the action 'Return to Sign In",
+      "message": "Retour à la connexion"
+    },
+    "search_hint": {
+      "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
+      "message": "Pour utiliser votre télécommande vocale, appuyez et maintenez"
+    },
+    "search_voice_hint": {
+      "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed at the beginning of the sentence.",
+      "message": "Pour utiliser votre télécommande vocale, appuyez sur le bouton du micro et maintenez-le."
+    },
+    "dialog_button_signUp": {
+      "description": "The label of the button in a dialog window that allows the user to sign up into the app.",
+      "message": "S'inscrire"
+    },
+    "screenSettings_parentalPassword_setup_new_password": {
+      "description": "Directions for users who attempt to change the parental controls",
+      "message": "Pour créer un nouveau mot de passe"
+    },
+    "screenSettings_parentalPassword_visit_link": {
+      "description": "Directions for users to setup the new password",
+      "message": "visitez tubi.tv/password"
+    },
+    "screenSettings_parentalPassword_visit_webBrowser": {
+      "description": "Directions for users to setup the new password on browser",
+      "message": "1. Veuillez visiter tubi.tv/passwordsur un navigateur web"
+    },
+    "screenSettings_parentalPassword_email": {
+      "description": "Directions to the user to enter his/her email to setup new password",
+      "message": "2. Entrez votre email"
+    },
+    "screenSettings_parentalPassword_set_new_Password": {
+      "description": "Directions to the user about email notification to setup new password",
+      "message": "3. Nous vous enverrons les instructions pour créer un nouveau mot de passe."
+    },
+    "screenSettings_parentalPassword_know_my_Password": {
+      "description": "Directions to the user to enter his/her password if they know their password",
+      "message": "Je connais mon mot de passe. Allons-y."
+    },
+    "registration_signup_button": {
+      "description": "button text for when a non registered user focuses on details screen",
+      "message": "Inscrivez-vous pour sauvegarder votre progression"
+    },
+    "registration_signup_button_free": {
+      "description": "button text on top of background image next to sign up text for when a non registered user focuses on details screen",
+      "message": "GRATUIT"
+    },
+    "registration_signIn_to_play_button": {
+      "description": "button text for when a non registered user focuses on details screen for sportsEvent",
+      "message": "Connectez-vous pour jouer"
+    },
+    "registration_signIn_to_play_hint": {
+      "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
+      "message": "Connectez-vous pour regarder gratuitement. Aucun abonnement ou carte de crédit requis."
+    },
+    "text_new": {
+      "description": "simple text to use anywhere to indicate item is new",
+      "message": "NOUVEAU"
+    },
+    "screenEmailVerification_resend_verification_link": {
+      "description": "Label of button to allow users to resend the email verification link for sign in",
+      "message": "Renvoyer le lien de vérification"
+    },
+    "screenEmailVerification_use_different_email": {
+      "description": "Label of button to allow users to use different email address for sign in",
+      "message": "Utiliser une autre adresse e-mail"
+    },
+    "next_button": {
+      "description": "Button text displayed on onBoarding screens to proceed to next screens",
+      "message": "Prochain"
+    },
+    "skip_button": {
+      "description": "Button text displayed on onBoarding screens to skip the onboarding flow",
+      "message": "Passer"
+    },
+    "getStarted_button": {
+      "description": "Button text displayed on onBoarding screens, takes to landing screen",
+      "message": "Commencer"
+    },
+    "registerOrSignIn_button": {
+      "description": "Button text displayed on onBoarding screens takes to Roku Request for Information modal",
+      "message": "Continuer avec Roku"
+    },
+    "continueAsGuest_button": {
+      "description": "Button text displayed on onBoarding screens takes to Initial Content Type Selector Screen or Home Screen",
+      "message": "Continuer en tant qu'invité"
+    },
+    "onBoarding_welcomeScreen_heading": {
+      "description": "Label displayed on onBoarding welcome screen",
+      "message": "Bienvenue à la collection de films illimités,\nde programmes TV et d'émissions en direct"
+    },
+    "onBoarding_welcomeScreen_description": {
+      "description": "Description displayed on onBoarding welcome screen",
+      "message": "Pour toutes vos envies de divertissement, d'infos et de sport.\nToujours gratuit. Pas d'abonnement. 100% légal."
+    },
+    "onBoarding_freeForeverScreen_heading": {
+      "description": "Label displayed on onBoarding Free Forever screen",
+      "message": "GRATUIT pour toujours avec moins\nde publicités que sur le câble"
+    },
+    "onBoarding_freeForeverScreen_description": {
+      "description": "Description displayed on onBoarding Free Forever screen",
+      "message": "3 fois plus de contenu et 3 fois moins de pubs. Aucun frais. 0 EUR/mois.\nPas de verrou d'accès payant, pas de forfait."
+    },
+    "onBoarding_availableDeviceScreen_heading": {
+      "description": "Label displayed on onBoarding Available Device screen",
+      "message": "Disponible sur tous\nvos appareils"
+    },
+    "onBoarding_availableDeviceScreen_description": {
+      "description": "Description displayed on onBoarding Available Device screen",
+      "message": "Regardez sur votre téléphone, votre TV, votre tablette\nou votre ordinateur."
+    },
+    "onBoarding_landingScreen_heading": {
+      "description": "Label displayed on onBoarding Landing screen",
+      "message": "Tubi est plus performant\nsi vous vous inscrivez"
+    },
+    "onBoarding_landingScreen_description": {
+      "description": "Description displayed on onBoarding Landing screen",
+      "message": "Aucune carte de crédit requise • Gratuit pour toujours"
+    },
+    "onBoarding_landingScreen_addListLabel": {
+      "description": "Label displayed on onBoarding Landing screen informing add to your list",
+      "message": "Ajouter à votre Liste"
+    },
+    "onBoarding_landingScreen_addListBody": {
+      "description": "Body displayed on onBoarding Landing screen informing save now and watch later",
+      "message": "Sauvegardez maintenant, regardez plus tard"
+    },
+    "onBoarding_landingScreen_saveProgressLabel": {
+      "description": "Label displayed on onBoarding Landing screen informing save your progress",
+      "message": "Sauvegardez votre progression"
+    },
+    "onBoarding_landingScreen_saveProgressBody": {
+      "description": "Body displayed on onBoarding Landing screen informing pickup where you left off",
+      "message": "Reprenez là où vous vous êtes arrêté"
+    },
+    "onBoarding_landingScreen_madeForYouLabel": {
+      "description": "Label displayed on onBoarding Landing screen informing made for you",
+      "message": "Fait pour vous"
+    },
+    "onBoarding_landingScreen_madeForYouBody": {
+      "description": "Body displayed on onBoarding Landing screen informing better recommendations",
+      "message": "Proposer de meilleures recommandations"
+    },
+    "dialog_got_it": {
+      "description": "button display on fifa intro modal",
+      "message": "J'ai compris"
+    },
+    "dialog_explore_fifa": {
+      "description": "button display on fifa intro modal",
+      "message": "Explorez la FIFA 2022"
+    },
+    "explore_fifa_description": {
+      "description": "description displayed on fifa intro modal",
+      "message": "Tubi propose gratuitement les rediffusions complètes des 64 matchs de la Coupe du monde. Inscrivez-vous pour regarder chaque match sur votre appareil préféré. Aucun abonnement ou carte de crédit requis."
+    },
+    "reg_intro_title": {
+      "description": "title displayed on registration welcome modal",
+      "message": "Tubi, c'est mieux quand vous vous connectez"
+    },
+    "reg_intro_sub_header": {
+      "description": "sub header displayed on registraton welcome modal",
+      "message": "Pas de carte de crédit. Gratuit pour toujours."
+    },
+    "reg_first_line_sub_item": {
+      "description": "first sub item to be displayed under reg_first_line_item to explain user about benifit of registration",
+      "message": "Enregistrez maintenant, regardez plus tard"
+    },
+    "reg_third_line_item": {
+      "description": "third item to let know user about the benifit of registration",
+      "message": "Débloquez des sélections rien que pour vous"
+    },
+    "reg_third_line_sub_item": {
+      "description": "third sub item to be displayed under reg_third_line_item to explain user about benifit of registration",
+      "message": "Obtenir de meilleures recommandations"
+    },
+    "reg_sign_in_button_title": {
+      "description": "Button text to be displayed on first button of registration welcome modal",
+      "message": "Continuer à s'identifier"
+    },
+    "reg_continue_as_guest_button_title": {
+      "description": "Button text to be displayed on second button of registration welcome modal",
+      "message": "Continuer en tant qu'invité"
+    },
+    "linear_educational_header": {
+      "description": "Header on the modal displayed to educate user about live TV feature",
+      "message": "Présentation de la télévision en direct"
+    },
+    "linear_education_sub_header": {
+      "description": "Sub Header on the modal displayed to educate user about live TV feature",
+      "message": "Ne manquez plus rien avec les informations 24 heures sur 24 et 7 jours sur 7, le sport, la télé-réalité et plus encore. Juste au bout des doigts."
+    },
+    "linear_education_button": {
+      "description": "Button title on the modal displayed to educate user about live TV feature",
+      "message": "Regarder la TV en direct"
+    },
+    "replay": {
+      "description": "This label used for badge to indicate the content availability",
+      "message": "Rediffusion"
+    },
+    "show_all_games_gameInfo": {
+      "description": "Text displayed on Fifa World Cup 2022 infopanel second line when Show all games is focused",
+      "message": "20 nov 2022 - 18 déc 2022"
+    },
+    "show_all_games_description": {
+      "description": "Description displayed on Fifa World Cup 2022 infopanel when Show all games is focused",
+      "message": "La Coupe du monde masculine de la FIFA, qui a lieu tous les quatre ans, voit 32 nations s'affronter pour remporter la coupe."
+    },
+    "info_panel_reminder_is_set": {
+      "description": "Hint in the content metadata area informing the user that the reminder is set for this content",
+      "message": "Rappel programmé"
+    },
+    "goBack_videoPlayer_ad": {
+      "description": "Navigational instructions to users when pause Ad is displayed on video screen",
+      "message": "Appuyez sur n'importe quel bouton pour fermer l'annonce"
+    },
+    "cc_audio_overlay_subtitles": {
+      "description": "Available closed caption tracks section header label.",
+      "message": "Sous-titres"
+    },
+    "cc_audio_overlay_audio": {
+      "description": "Available audio tracks section header label.",
+      "message": "Audio"
+    },
+    "consent_screen_heading": {
+      "description": "Consent screen heading.",
+      "message": "Votre Vie Privée"
+    },
+    "consent_screen_subheading": {
+      "description": "Consent screen sub heading.",
+      "message": "Veuillez prendre un moment pour confirmer vos préférences en matière de confidentialité des données"
+    },
+    "manage_preferences_button_label": {
+      "description": "Manage preferences button label.",
+      "message": "Gérer les Préférences"
+    },
+    "accept_button_label": {
+      "description": "Accept button label.",
+      "message": "Accepter"
+    },
+    "reject_button_label": {
+      "description": "Reject button label.",
+      "message": "Rejeter"
+    },
+    "privacy_preferences_label": {
+      "description": "privacy preferences screen title.",
+      "message": "Paramètres de Confidentialité"
+    },
+    "privacy_preferences_save_continue_button": {
+      "description": "Save and Continue button on Consent Manage preferences",
+      "message": "Enregistrer et Continuer"
+    },
+    "privacy_preferences_privacy_section_heading": {
+      "description": "Privacy section heading.",
+      "message": "Politique de confidentialité"
+    },
+    "privacy_preferences_privacy_section_subheading": {
+      "description": "Privacy section subheading.",
+      "message": "Pour consulter la politique de confidentialité de Tubi, scannez le code QR ci-dessous avec votre appareil mobile ou visitez "
+    },
+    "privacy_preferences_dsar_section_heading": {
+      "description": "DSAR section heading.",
+      "message": "Droits des Personnes Concernées"
+    },
+    "privacy_preferences_dsar_section_subheading": {
+      "description": "DSAR section subheading.",
+      "message": "Pour consulter vos droits en matière de données et compléter une demande, scannez le code QR ci-dessous avec votre appareil mobile ou visitez "
+    },
+    "privacy_preferences_tos_section_heading": {
+      "description": "Terms of service section heading.",
+      "message": "Conditions d'utilisation"
+    },
+    "privacy_preferences_tos_section_subheading": {
+      "description": "Terms of service section subheading.",
+      "message": "Pour consulter les conditions d'utilisation de Tubi, scannez le code QR ci-dessous avec votre appareil mobile ou visitez "
+    },
+    "privacy_preferences_qrcode_modal_subheading": {
+      "description": "QR Code Selected Modal subheading.",
+      "message": "Scannez le code QR sur l'écran précédent avec votre appareil mobile pour afficher le lien."
+    },
+    "privacy_preferences_on": {
+      "description": "Privacy preferences toggle text on",
+      "message": "Activer"
+    },
+    "privacy_preferences_off": {
+      "description": "Privacy preferences toggle text off",
+      "message": "Arrêt"
+    },
+    "privacy_preferences_required": {
+      "description": "Privacy preferences required text",
+      "message": "Obligatoire"
+    },
+    "required_preference_selected_toast_heading": {
+      "description": "Toast header when required preference item is selected.",
+      "message": "Réglage Requis"
+    },
+    "required_preference_selected_toast_message": {
+      "description": "Toast message when required preference item is selected.",
+      "message": "{preference} La fonctionnalité est nécessaire pour continuer."
+    },
+    "privacy_center_not_editable_mode_warning": {
+      "description": "Warning label that will be displayed in privacy center whenever user is in kids mode or any parental controls mode.",
+      "message": "Paramètres de confidentialité ne peuvent être modifiés qu'en dehors de Tubi Kids. Seules les données essentielles sont utilisées dans Tubi Enfants."
     }
   }
 End Function
