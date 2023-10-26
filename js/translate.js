@@ -84,15 +84,15 @@ async function processTranslationFiles(directory) {
       // expect the file path looks like 'es-MX/roku/translations/es-MX.json'
       if (unZippedFilePath.indexOf(crowdinConfig.crowdinBaseDirectory) >= 0 && unZippedFilePath.indexOf('.json') >= 0) {
         const nDestinationPathIndex = unZippedFilePath.indexOf(crowdinConfig.crowdinBaseDirectory) + crowdinConfig.crowdinBaseDirectory.length + 1
-        destinationPath = unZippedFilePath.substring(nDestinationPathIndex);
+        let destinationPath = unZippedFilePath.substring(nDestinationPathIndex);
         destinationPath = path.resolve(destinationPath);
 
         //Remove '.json' from the file path to get the locale ID
-        sLocale = unZippedFilePath.slice(unZippedFilePath.lastIndexOf('/') + 1, -5);
+        let sLocale = unZippedFilePath.slice(unZippedFilePath.lastIndexOf('/') + 1, -5);
 
         log('Attempting to write downloaded crowdin translation to: ', destinationPath);
         fs.accessSync(destinationPath.substring(0, destinationPath.lastIndexOf('/')), fs.constants.F_OK);
-        fileBuffer = await file.buffer();
+        let fileBuffer = await file.buffer();
 
         // temporarily write the translation json to file
         await writeToFile(destinationPath, fileBuffer);
@@ -121,14 +121,14 @@ async function processTranslationFiles(directory) {
 
 async function writeToFile(path, bufferOrString) {
   return new Promise((resolve, reject) => {
-    writeStream = fs.createWriteStream(destinationPath);
+    let writeStream = fs.createWriteStream(path);
     writeStream.write(bufferOrString);
     writeStream.on('finish', () => {
-      log(destinationPath, 'successfully written to.');
+      log(path, 'successfully written to.');
       resolve();
     });
     writeStream.on('error', (err) => {
-      log('Could not write to: ', destinationPath);
+      log('Could not write to: ', path);
       reject(err);
     });
     writeStream.end('');
@@ -146,10 +146,17 @@ function escapeRegExp(stringToGoIntoTheRegex) {
 function writeLocaleDataToBRS_sync(sLocale, localeData) {
   if(localeData !== undefined && localeData !== "") {
     var fileTranslationCode = 'src/channel/source/lib/TubiLanguageTranslate.brs';
-
     // add appropriate indentation to localeData and remove any empty lines
     const localeDataLines = localeData.split('\n');
     const localDataLinesIndented = localeDataLines.reduce((acc, line, index) => {
+
+      // Checking the line has \" in it.
+      if (line.includes('\\"')) {
+        // If present replace \"  with Chr(34)
+        // for ex: "les \"Adolescents\" ont" will be convert to "les " + Chr(34) + "Adolescents" + Chr(34) + " ont"
+        line = line.replace(/\\"/g, `" + Chr(34) + "`)
+      }
+
       if (index === 0) {
         acc.push(line);
         return acc;
@@ -240,7 +247,7 @@ function makeGetRequest(options) {
         const url = `${resp.socket.servername}${resp.req.path}`
         const method = resp.socket["_httpMessage"].method
         const errorMessage = `Received ${resp.statusCode} while attempting a ${method} request to ${url}`
-        err = new Error(errorMessage);
+        const err = new Error(errorMessage);
         reject(err);
       } else {
         let data = [];
@@ -249,7 +256,7 @@ function makeGetRequest(options) {
         });
 
         resp.on('end', () => {
-          buff = Buffer.concat(data)
+          const buff = Buffer.concat(data)
           resolve(buff);
         });
       }
