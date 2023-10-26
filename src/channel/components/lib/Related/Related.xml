@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- Also referred to as Autoplay UI -->
+<!-- Also referred to as YMAL UI -->
 <component name="Related" extends="Group">
   <script type="text/brightscript" uri="Related.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
@@ -14,17 +14,22 @@
     <!-- INPUTS -->
       <field id="content" type="node"/>
       <field id="updateContent" type="boolean" alwaysNotify="true"/>
-      <!-- show or hide the Info panel component -->
-      <field id="showInfoPanel" type="boolean" alwaysNotify="true"/>
       <!-- unfocus the focused components -->
       <field id="unfocus" type="boolean" alwaysNotify="true"/>
+      <!-- shows the YMAL patially -->
+      <field id="show" type="boolean" alwaysNotify="true"/>
+      <!-- hides the YMAL -->
+      <field id="hide" type="boolean" alwaysNotify="true"/>
+      <!-- opens the YMAL in full screen -->
+      <field id="open" type="boolean" alwaysNotify="true"/>
+      <!-- closes the YMAL so it is only shown as a peek -->
+      <field id="close" type="boolean" alwaysNotify="true"/>
 
     <!-- OUTPUTS -->
       <field id="isRelatedContentFocused" type="boolean" alwaysNotify="true"/>
       <field id="selectedRelatedContentItem" type="node"/>
       <field id="keyPress" alias="RelatedGrid.keyPress"/>
       <field id="itemFocused" alias="RelatedGrid.itemFocused"/>
-
       <!-- Holds the information needed to populate a navigate_within_page event. This will
            be observed by the contentController via videoHelpers
            which will be responsible for sending navigate_within_page events.
@@ -34,7 +39,10 @@
 
   <children>
 
-    <Group id="ymal">
+    <Group
+      id="YmalGroup"
+      opacity="0.0"
+      translation="[0,0]">
 
       <InfoPanel
         id="Info"
@@ -42,16 +50,15 @@
         width="992"
         maxHeight="312"
         maxTitleLines="3"
-        opacity="0.0"
-        translation="[0,0]"/>
+        opacity="0.0"/>
 
       <Group
-        id="YMALOverlayGroup"
+        id="YmalRow"
         opacity="0.2">
 
         <CategoryGridRowLabel
           id="RelatedRowLabel"
-          translation="[0, 384]">
+          translation="[0,384]">
           <TubiContentNode
             id="RelatedRowLabelContent"
             role="content"/>

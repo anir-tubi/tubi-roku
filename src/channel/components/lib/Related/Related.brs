@@ -1,19 +1,26 @@
 Function init()
   m.constants = getConstantsFromGlobal()
+  m.Tracking = TubiTrackingInfo(m.constants)
   m._ = rodash()
   m.Info = m.top.findNode("Info")
-  m.YMALOverlayGroup = m.top.findNode("YMALOverlayGroup")
+  m.YmalGroup = m.top.findNode("YmalGroup")
+  m.YmalRow = m.top.findNode("YmalRow")
   m.RelatedGrid = m.top.findNode("RelatedGrid")
   m.RelatedGrid.observeFieldScoped("itemFocused", "onItemFocused")
   m.RelatedGrid.observeFieldScoped("itemSelected", "onItemSelected")
   m.RelatedGrid.observeFieldScoped("keyPress", "onKeyPress")
   m.top.observeFieldScoped("updateContent", "onContentChange")
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
-  m.top.observeFieldScoped("showInfoPanel", "onShowInfoPanel")
   m.top.observeFieldScoped("unfocus", "onUnfocus")
+  m.top.observeFieldScoped("show", "onShowRelated")
+  m.top.observeFieldScoped("hide", "onHideRelated")
+  m.top.observeFieldScoped("open", "onOpenRelated")
+  m.top.observeFieldScoped("close", "onCloseRelated")
   RelatedRowLabelContent = m.top.findNode("RelatedRowLabelContent")
   RelatedRowLabelContent.title = getTranslation("screenDetails_relatedTitles")
-  m.Tracking = TubiTrackingInfo(m.constants)
+
+  m.ymalXYPositionWhenHidden = [0,0]
+  m.ymalXYPositionWhenOpen = [0,-235]
 
   ' Used to determine if navigate_within_page events should be sent. Only send when the Related content row already
   ' has focus, not when it gains focus.
@@ -148,21 +155,51 @@ Function updateInfoPanel(infoNode, content)
 End Function
 
 
-Function onShowInfoPanel(msg)
-  showInfoPanel = msg.getData()
-
-  if showInfoPanel = true
-    if m.ymalOverlayGroup.opacity < 1.0
-      fade(m.YMALOverlayGroup, "in", 0.2, 0, 1.0)
-    end if
-
-    if m.Info.opacity = 0
-      fade(m.Info, "in", 0.4)
-    end if
-  else
-    fade(m.YMALOverlayGroup, "out", 0.2, 0, 0.2)
-    if m.Info.opacity > 0
-      fade(m.Info, "out", 0.4)
-    end if
+Function showInfoPanel()
+  if m.Info.opacity = 0
+    fade(m.Info, "in", 0.4)
   end if
+End Function
+
+
+Function hideInfoPanel()
+  if m.Info.opacity > 0
+    fade(m.Info, "out", 0.2)
+  end if
+End Function
+
+
+Function onShowRelated(msg)
+  if m.YmalGroup.opacity < 1.0
+    slideFade(m.YmalGroup, "below", "in", 0.6)
+  end if
+End Function
+
+
+Function onHideRelated(msg)
+  if m.YmalGroup.opacity > 0
+    hideInfoPanel()
+    fade(m.YmalRow, "out", 0.2, 0, 0.2)
+    slideFade(m.YmalGroup, "below", "out", 0.6)
+  end if
+End Function
+
+
+Function onOpenRelated(msg)
+  if m.YmalRow.opacity < 1.0
+    fade(m.YmalRow, "in", 0.2, 0, 1.0)
+  end if
+
+  showInfoPanel()
+  slideTo(m.YmalGroup, m.ymalXYPositionWhenOpen, 0.6)
+End Function
+
+
+Function onCloseRelated(msg)
+  if m.YmalRow.opacity = 1.0
+    fade(m.YmalRow, "out", 0.2, 0, 0.2)
+  end if
+
+  hideInfoPanel()
+  slideTo(m.YmalGroup, m.ymalXYPositionWhenHidden, 0.6)
 End Function

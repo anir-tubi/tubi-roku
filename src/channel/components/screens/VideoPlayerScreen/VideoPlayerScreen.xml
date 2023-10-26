@@ -560,8 +560,7 @@
 
     <Related
       id="Related"
-      translation="[84, 550]"
-      opacity="0.0" />
+      translation="[84, 550]"/>
 
     <Rectangle
       id="closedCaptionAndAudioSelectionOverlayGroup"
