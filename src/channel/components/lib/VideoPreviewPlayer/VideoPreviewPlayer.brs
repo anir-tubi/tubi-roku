@@ -15,13 +15,14 @@ Function init()
   m.previousPageInfo = { pagetype: "home_page" }
   m.currentPageInfo = { pagetype: "home_page" }
 
-  m.Video = m.top.findNode("VideoNode")  ' reference in case we change from extending Video to extending Group
+  m.Video = m.top.findNode("VideoNode") ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
 
   m.top.observeField("pageInfoForAnalytics", "onPageInfoUpdatedForAnalytics")
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("control", "onControlChange")
+  m.top.observeField("seekTo", "onSeekToChange")
   ' Creating a local variable to hold the video playback state so that we can avoid rare conditions where video node state
   ' does not update on time.
   ' Allowed values are "stop", "play", "pause", "prebuffer"
@@ -69,7 +70,7 @@ Function playContent()
 End Function
 
 
-Function onContentChange() As Void
+Function onContentChange() as Void
   m.top.state = ""
   if m.top.content <> invalid
     prepareToStartVideo(m.top.content)
@@ -192,7 +193,7 @@ End Function
 
 ' Helper function for sending analytics event
 ' @event: assocarray, it contains type & values for the event
-Function trackEvent(event as object)
+Function trackEvent(event as Object)
   trackingLoggingTask = getFieldFromGlobal("trackingLoggingTask")
   if trackingLoggingTask <> invalid
     trackingLoggingTask.trackEvent = event
@@ -281,7 +282,7 @@ End Function
 'Helper function that removes all characters after the ? in the url
 Function removeExcessUrl(url)
   cutUrl = ""
-  if type(url) = "roString" or type(url) = "String"
+  if type(url) = "roString" OR type(url) = "String"
     position = url.Instr(Chr(63)) 'checks for the position of the "?" in the url string
     if position > -1
       cutUrl = url.Left(position)
@@ -290,4 +291,32 @@ Function removeExcessUrl(url)
     end if
   end if
   return cutUrl
+End Function
+
+
+' Currently only used for automated testing but could be used in the future for other uses
+Function jumpToPosition(position)
+  'Don't let position be out of bounds of the duration of the video
+  if position > (m.Video.duration - 5)
+    position = m.Video.duration - 5
+  else if position < 0
+    position = 0
+  end if
+
+  previewProgressEvent = getPreviewProgressEvent(m.currentPageInfo)
+  if previewProgressEvent <> invalid
+    trackEvent(previewProgressEvent)
+  end if
+
+  m.Video.seek = position
+
+  m.lastPingTime = position
+
+  return position
+End Function
+
+
+Function onSeekToChange(msg)
+  position = msg.getData()
+  jumpToPosition(position)
 End Function

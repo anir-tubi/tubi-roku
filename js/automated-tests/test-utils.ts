@@ -304,10 +304,93 @@ class TestUtils {
   }
 
 
-   // Helper to get the current position of the video player
-  public async getPlayerPosition() {
-    const player = await ecp.getMediaPlayer();
-    return player.position.number;
+  /**
+   * Helper to wait for the position of the specified video player to be within before continuing
+   * @param videoPlayerElementName - element for the video player node we want to use for this helper
+   * @param position - the position in milliseconds that we want to wait for the player to be within before continuing
+   * @param precision - how close in milliseconds the current player position has to be to `position` in order to be considered valid
+   * @param timeout - how long we will wait for this operation before considering it to have failed
+   */
+  public async expectPlayerPositionToEventuallyEqual(videoPlayerElementName: VideoPlayerElementName, position: number, precision = 10000, timeout = 5000) {
+    return await testUtils.retryWithTimeOut(async () => {
+      const actualPlayerPosition = await testUtils.getPlayerPosition(videoPlayerElementName);
+      expect(actualPlayerPosition).to.be.greaterThanOrEqual(position - precision).and.lessThanOrEqual(position + precision);
+    }, timeout);
+  }
+
+
+  /**
+   * Helper to get the current position of the video player. If elementName is supplied we pull the position for that specific element vs using the ECP query/media-player endpoint
+   * @param videoPlayerElementName - element for the video player node we want to use for this helper
+   * @returns current position in milliseconds
+   */
+  public async getPlayerPosition(videoPlayerElementName?: VideoPlayerElementName) {
+    if (videoPlayerElementName) {
+      const element = this.getElementKeyPath(videoPlayerElementName);
+      const {value} = await odc.getValue({
+        base: element.base,
+        keyPath: `${element.keyPath}.#VideoNode.position`
+      });
+      // position is in seconds but we want to convert to milliseconds to match ECP units
+      return value * 1000;
+    } else {
+      const player = await ecp.getMediaPlayer();
+      return player.position.number;
+    }
+  }
+
+
+  /**
+   * Gets the duration of the current content for the specified video player element
+   * @param videoPlayerElementName - element for the video player node we want to use for this helper
+   * @returns content duration in milliseconds
+   */
+  public async getPlayerDuration(videoPlayerElementName: VideoPlayerElementName) {
+    const element = this.getElementKeyPath(videoPlayerElementName);
+    const {value} = await odc.getValue({
+      base: element.base,
+      keyPath: `${element.keyPath}.#VideoNode.duration`
+    });
+    return value * 1000;
+  }
+
+
+  /**
+   * Seeks the specified video player to the absolute position specified and checks to make sure it was set correctly
+   * @param videoPlayerElementName - element for the video player node we want to use for this helper
+   * @param absolutePosition - the absolute position where we want to seek to in milliseconds
+   * @param precision - how close in milliseconds the current player position has to be to `position` in order to be considered valid
+   * @param timeout - how long we will wait for this operation before considering it to have failed
+   */
+  public async seekPlayerToAbsolutePosition(videoPlayerElementName: VideoPlayerElementName, absolutePosition: number, precision = 10000, timeout = 5000) {
+    const element = this.getElementKeyPath(videoPlayerElementName);
+    // Improvement we might eventually want to investigate using seekMode=accurate to allow for tighter tolerances
+    await odc.setValue({
+      base: element.base,
+      keyPath: `${element.keyPath}.seekTo`,
+      value: [absolutePosition / 1000]
+    });
+    await this.expectPlayerPositionToEventuallyEqual(videoPlayerElementName, absolutePosition, precision, timeout);
+  }
+
+
+  /**
+   * Seeks the specified video player to the relative position specified and checks to make sure it was set correctly
+   * @param videoPlayerElementName - element for the video player node we want to use for this helper
+   * @param relativePosition - the relative position where we want to seek to in milliseconds
+   * @param relativeTo - what `relativePosition` is relative to. Currently either from the end of the content based off its duration or from the current video player position
+   * @param precision - how close in milliseconds the current player position has to be to `position` in order to be considered valid
+   * @param timeout - how long we will wait for this operation before considering it to have failed
+   */
+  public async seekPlayerToRelativePosition(videoPlayerElementName: VideoPlayerElementName, relativePosition: number, relativeTo: 'end' | 'current', precision = 10000, timeout = 5000) {
+    let absolutePosition: number;
+    if (relativeTo === 'current') {
+      absolutePosition = await this.getPlayerPosition(videoPlayerElementName) + relativePosition;
+    } else if (relativeTo === 'end') {
+      absolutePosition = await this.getPlayerDuration(videoPlayerElementName) + relativePosition;
+    }
+
+    await this.seekPlayerToAbsolutePosition(videoPlayerElementName, absolutePosition, precision, timeout);
   }
 
 
@@ -1245,7 +1328,8 @@ class RegisteredUser extends User {
       // We have to search for a matching content id
       let id = '';
       for (const item of currentViewHistoryContent) {
-        if (item.content_id === +content.id && item.content_type === content.type) {
+        const contentType = this.convertAbbreviatedContentType(content.type);
+        if (item.content_id === +content.id && item.content_type === contentType) {
           id = item.id;
           break;
         }
@@ -1451,6 +1535,12 @@ type UserInfoResponse = {
 
 
 type DeeplinkPage = 'movies' | 'livefeed' | 'genre' | 'network' | 'tv' | 'espanol' | 'kids' | 'home';
+
+
+/**
+ * List of elements that can be used with our video player helpers
+ */
+type VideoPlayerElementName = 'videoPlayerScreen' | 'previewVideoPlayer';
 
 
 enum ContentRatings {

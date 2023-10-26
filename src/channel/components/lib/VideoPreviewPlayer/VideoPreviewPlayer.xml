@@ -32,6 +32,9 @@
       <!-- supports "play", "stop", "pause" -->
       <field id="control" type="string" value="none"/>
 
+      <!-- Used to allow seeking the video player while still maintaining proper state tracking. Sets video player seek field to appropriate value and updates necessary state. `seek` field is time/double based and value specified should be in seconds -->
+      <field id="seekTo" type="time" />
+
     <!-- OUTPUT -->
 
       <!-- Observing state interface helps to show/hide static poster background -->

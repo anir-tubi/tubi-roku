@@ -37,6 +37,56 @@ describe('test-utils', function () {
         expect(user['userInfo'].user_id).to.be.greaterThan(0);
       });
     });
+
+
+    describe('video helpers', function () {
+      const videoNodeElement = 'videoPlayerScreen';
+      beforeEach(async () => {
+        await testUtils.startApplicationWithDeeplink({
+          mediaType: 'movie',
+          contentID: '100007133'
+        });
+        await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
+      });
+
+
+      describe('getPlayerDuration', function () {
+        it('Should return the correct duration for a known piece of content', async () => {
+          const duration = await testUtils.getPlayerDuration(videoNodeElement);
+          expect(duration).to.equal(5233000);
+        });
+      });
+
+
+      describe('seekPlayerToAbsolutePosition', function () {
+        it('Should not throw an error seeking to the requested absolute position', async () => {
+          await testUtils.seekPlayerToAbsolutePosition(videoNodeElement, 300000);
+        });
+
+        it('Should work for previewVideoPlayer as well', async () => {
+          // Since we don't use the preview video player seek functionality anywhere except automated tests, we should should check that as well
+          await testUtils.startApplicationAtPage('home');
+          await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
+          await testUtils.seekPlayerToAbsolutePosition('previewVideoPlayer', 40000);
+        });
+      });
+
+
+      describe('seekPlayerToRelativePosition', function () {
+        it('should seek to the correct position when relative to the current player position', async () => {
+          // We're purposely seeking twice in order to easily test that position is relative to current player position vs just being from position 0
+          await testUtils.seekPlayerToRelativePosition(videoNodeElement, 60000, 'current');
+          await testUtils.seekPlayerToRelativePosition(videoNodeElement, 60000, 'current');
+          const position = await testUtils.getPlayerPosition(videoNodeElement);
+          expect(position).to.be.greaterThan(110000).and.lessThan(130000);
+        });
+
+
+        it('should not throw an error when seeking relative to the end player position', async () => {
+          await testUtils.seekPlayerToRelativePosition(videoNodeElement, -60000, 'end');
+        });
+      });
+    });
   });
 
 
@@ -171,31 +221,31 @@ describe('test-utils', function () {
           expect(item.content_type).to.equal(expectedMovieContentType);
           expect(item.position).to.equal(position);
         });
+      });
 
 
-        describe('getViewHistoryContent', function () {
-          it('should properly retrieve the user\'s watch list', async () => {
-            const position = 500;
-            await user.addContentToViewHistory(movieContent, position);
-            const result = await user.getViewHistoryContent();
-            expect(Array.isArray(result)).to.be.true;
-            expect(result.length).to.be.greaterThan(0);
-            const item = result[0];
-            expect(item.content_id).to.equal(+movieContent.id);
-            expect(item.content_type).to.equal(expectedMovieContentType);
-            expect(item.position).to.equal(position);
-          });
+      describe('getViewHistoryContent', function () {
+        it('should properly retrieve the user\'s watch list', async () => {
+          const position = 500;
+          await user.addContentToViewHistory(movieContent, position);
+          const result = await user.getViewHistoryContent();
+          expect(Array.isArray(result)).to.be.true;
+          expect(result.length).to.be.greaterThan(0);
+          const item = result[0];
+          expect(item.content_id).to.equal(+movieContent.id);
+          expect(item.content_type).to.equal(expectedMovieContentType);
+          expect(item.position).to.equal(position);
         });
+      });
 
 
-        describe('removeContentFromViewHistory', function () {
-          it('should properly remove content from view history', async () => {
-            await user.addContentToViewHistory(movieContent, 500);
-            await user.removeContentFromViewHistory(movieContent);
-            const result = await user.getViewHistoryContent();
-            expect(Array.isArray(result)).to.be.true;
-            expect(result.length).to.be.equal(0);
-          });
+      describe('removeContentFromViewHistory', function () {
+        it('should properly remove content from view history', async () => {
+          await user.addContentToViewHistory(movieContent, 500);
+          await user.removeContentFromViewHistory(movieContent);
+          const result = await user.getViewHistoryContent();
+          expect(Array.isArray(result)).to.be.true;
+          expect(result.length).to.be.equal(0);
         });
       });
     });

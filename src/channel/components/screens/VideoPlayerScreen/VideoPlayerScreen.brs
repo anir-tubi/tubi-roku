@@ -75,6 +75,7 @@ Function init()
   m.top.observeField("adState", "onAdStateChange")
   m.top.observeField("adProgress", "onAdProgressChange")
   m.top.observeField("displayAdLoadingMessage", "onDisplayAdLoadingMessage")
+  m.top.observeField("seekTo", "onSeekToChange")
 
   'isPauseAdReqInProgress is the state of pauseAd requests in flight.
   'If pause ad request is in flight, we do not send another pause ad request
@@ -2073,4 +2074,10 @@ Function onKeyPressWhenYMALHasFocus(msg)
     end if
   end if
 
+End Function
+
+
+Function onSeekToChange(msg)
+  position = msg.getData()
+  jumpToPosition(position)
 End Function
