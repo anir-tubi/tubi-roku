@@ -137,7 +137,6 @@ Function onThemeChange(msg = invalid)
 End Function
 
 
-
 Function setDetailStrings()
   m.PlayMenuItem.title = getTranslation("screenDetails_button_play")
   m.PlayMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.PlayMenuItem.id]
@@ -146,7 +145,6 @@ Function setDetailStrings()
   m.LikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.LikeMenuItem.id]
 
   m.DislikeMenuItem.title = getTranslation("screenDetails_button_dislike")
-
   m.DislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.DislikeMenuItem.id]
 
   m.ResumeMenuItem.title = getTranslation("screenDetails_button_resume_playing")
@@ -157,6 +155,15 @@ Function setDetailStrings()
 
   m.WatchTrailerMenuItem.title = getTranslation("screenDetails_button_trailer")
   m.WatchTrailerMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.WatchTrailerMenuItem.id]
+
+  m.AddQueueMenuItem.title = getTranslation("screenDetails_button_queue")
+  m.AddQueueMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.AddQueueMenuItem.id]
+
+  m.RemoveQueueMenuItem.title = getTranslation("screenDetails_button_noQueue")
+  m.RemoveQueueMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.RemoveQueueMenuItem.id]
+
+  m.RemoveHistoryMenuItem.title = getTranslation("screenDetails_button_noHistory")
+  m.RemoveHistoryMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.RemoveHistoryMenuItem.id]
 
   RelatedRowLabelContent = m.top.findNode("RelatedRowLabelContent")
   RelatedRowLabelContent.title = getTranslation("screenDetails_relatedTitles")
@@ -658,10 +665,7 @@ Function setInitialMenuItems() As Void
   menuItems.appendChild(m.PlayMenuItem)
 
   if isLoggedInUser() = false AND isNewUser() = false
-    ' do not append the signup menu if content is locked for guest user because this feature is already combined to make 'play' item as 'Signin to Play'
-    if m.top.content <> invalid AND m.top.content.needsLogin <> true
-      menuItems.appendChild(m.signUpMenuItem)
-    end if
+    menuItems.appendChild(m.signUpMenuItem)
   end if
 
   if m.top.selectedContentType <> m.constants.ui.contentTypes.sportsEvent

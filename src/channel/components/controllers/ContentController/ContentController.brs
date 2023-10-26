@@ -1193,32 +1193,32 @@ End Function
 
 
 Function refreshAllDetailScreens()
-  ' Refresh all detail screens so they have proper history that's been loaded or unloaded
-  isUserSigedIn = isLoggedInUser()
+  'Save exp result to avoid accessing funtion within for loop
+  isRokuRegTVTExpOn = (getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1", false).enabled = true)
 
   for i = 0 to m.screenStack.getChildCount() - 1
     screen = m.screenStack.getChild(i)
 
     if screen.subType() = "DetailScreen"
-      if getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1", false).enabled = true
-        refreshDetailScreenContent(screen)
-        screen.refreshRelatedContent = true
-      else ' TODO: check is refreshing Screen is more better than keep the old content.
-        content = screen.content 'No need to re fetch the content, just re populate the screen content
-        pageOriginDetails = {
-          "pageOrigin": screen
-          "functionName": "refreshAllDetailScreens"
-        }
-        populateDetailScreen(screen, content, false, -1, pageOriginDetails)
-
-        if isUserSigedIn = true
-          screen.removeSignupButton = true
-          setDetailStrings(screen, content)
-        end if
-
-        screen.isWaitingForServerResponse = false
-    end if
-
+      content = screen.content 'No need to re fetch the content, just re populate the screen content
+      pageOriginDetails = {
+        "pageOrigin": screen
+        "functionName": "refreshAllDetailScreens"
+      }
+      populateDetailScreen(screen, content, false, -1, pageOriginDetails)
+      resetRelatedContent(screen)
+      screen.isWaitingForServerResponse = false
+    else if screen.subType() = "EpisodesScreen"
+      ' if user signs-In on episode screen, then to refresh the episode screen, We need to refresh the associated detail screen.
+      ' refreshing the detail screen will ensure both detailscreen and episode screen gets refreshed to remove all registration gated related designs
+      ' like lock icon on episodes, message on infopanel and sign-in-to-play button etc
+      screen = getTopDetailScreenFromStack()
+      refreshDetailScreenContent(screen)
+      resetRelatedContent(screen)
+    else if screen.subType() = "CategoryDetailsScreen"
+      if isRokuRegTVTExpOn = true AND screen.content <> invalid AND screen.content.validUntil <> invalid
+        screen.content.validUntil = 0
+      end if
     end if
   end for
 End Function

@@ -11,11 +11,11 @@ Function init()
   m.experiments = TubiExperiments(m.constants)
   m.metadataTranslate = TubiMetadataTranslate(m.constants, m.experiments)
 
-  itemsInRowCount = 8
+  m.itemsInRowCount = 8
 
-  m.upperRowIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize / itemsInRowCount ' items per row = 8 * 6 = 48
+  m.upperRowIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize / m.itemsInRowCount ' items per row = 8 * 6 = 48
   m.lowerRowIndex = 0
-  m.numRowsInBatch = m.constants.performance.categoryGridList.lazyLoadBatchSize / itemsInRowCount
+  m.numRowsInBatch = m.constants.performance.categoryGridList.lazyLoadBatchSize / m.itemsInRowCount
 
   m.InfoPanel = m.top.findNode("ChannelsInfoPanel")
   m.PageTitleAndCounter = m.top.findNode("pageTitleAndCounter")
@@ -122,6 +122,11 @@ Function onScreenFocusChange()
       if shouldRefresh(m.top.content) = true 'cacheValidationMixin
         '//indicate that when the content is refreshed, it should attempt to focus close to where it was previously focused on.
         m.top.jumpToItemFocused = m.VideoGrid.itemFocused
+          ' CategoryDetailPage lazy loads more than 200+ titles.  If user revisits categoryDetailPage from title detail page and content needs to be refreshed, then
+          ' reset the lazy loading logic along with refreshed conent so that user can use lazy loading feature.
+          ' TODO: Implement the logic to focus nJumpToItemFocused exactly.
+          m.upperRowIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize / m.itemsInRowCount ' items per row = 8 * 6 = 48
+          m.lowerRowIndex = 0
         m.top.categoryBatchIndex = 0
       end if
     end if

@@ -84,8 +84,6 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
     m.pubSub.subscribe("pub_serverPersistentData.isVideoPreviewOn", detailScreen, "isVideoPreviewOn")
 
-    setDetailStrings(detailScreen, content)
-
     ' Setting the content on the detail screen here prior to getting a response back from server with full info,
     ' so that it may be used for analytics in the case of failing to fetch the full info from the server.
     ' We expect to overwrite this in populateDetailScreen() which occurs after the full info has been fetched from the /content API
@@ -172,45 +170,10 @@ Function isDetailScreen(screen)
 End Function
 
 
-Function setDetailStrings(screen, content)
-  airDateTime = content.airDateTime
-  hasVideoResources = content.hasVideoResources
-  screen.stringQueueButton = getTranslation("screenDetails_button_queue")
-  screen.stringNoQueueButton = getTranslation("screenDetails_button_NoQueue")
-  screen.stringNoHistoryButton = getTranslation("screenDetails_button_noHistory")
-
-  info = getAvailabilityTypeBadgeAndMatchTimeValues(airDateTime, hasVideoResources)
-  availabilityType = info.availabilityType
-
-  ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-  if isNonEmptyString(availabilityType) = true AND availabilityType = m.constants.ui.contentTimings.upcoming
-
-    if isLoggedInUser() = false
-      screen.stringQueueButton = getTranslation("screenDetails_button_sign_in_to_set_reminder")
-    else
-      screen.stringQueueButton = getTranslation("screenDetails_button_set_reminder")
-    end if
-
-    screen.stringNoQueueButton = getTranslation("screenDetails_button_remove_reminder")
-  end if
-
-  if content.needsLogin = true AND isLoggedInUser() = false  'check user signedIn status because we might use same content without passing through parser
-    screen.stringPlayButton = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
-  else '// KEEP BELOW CODE ONCE FIFA WORLD CUP IS DONE
-    screen.stringSignUpButton = getTranslation("registration_signup_button") + ";" + getTranslation("registration_signup_button_free")
-
-    history = getHistory(content.id)
-    isHistory = (history <> invalid)
-    setIsHistory(screen, isHistory)
-  end if
-End Function
-
-
 Function onDetailBackgroundChange(msg)
   tubiLog("DetailScreenHelpers.onDetailBackgroundChange")
   detailScreen = msg.getRoSGNode()
   if detailScreen.isInFocusChain()
-
     if isVideoPreviewOn() = true
       previewState = getVideoPreviewState()
       if previewState <> "playing"
@@ -219,14 +182,12 @@ Function onDetailBackgroundChange(msg)
           uriList: detailScreen.backgroundUriList
         }
       end if
-
     else
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.topright
         uriList: detailScreen.backgroundUriList
       }
     end if
-
   end if
 End Function
 
@@ -283,6 +244,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
   tubiLog("DetailScreenHelpers.populateDetailScreen")
   'initialize default background - will be overwritten later in most cases
   backgroundUriList = [m.defaultBackgroundUri]
+
   if isDetailScreen(detailScreen) = true AND type(content) = "roSGNode"
     'hide the spinner
     detailScreen.isLoading = false
@@ -311,6 +273,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
 
     bookmark = getBookmark(content.id)
     history = getHistory(content.id)
+    isHistory = (history <> invalid)
     like = getLike(content.id)
     isSignedInUser = isLoggedInUser()
 
@@ -449,7 +412,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       nResumePoint = nSavedPosition
     end if
 
-    setIsHistory(detailScreen, history <> invalid)
+    setIsHistory(detailScreen, isHistory)
 
     detailScreen.resumePoint = nResumePoint
 
@@ -468,18 +431,36 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
 
     detailScreen.backgroundUriList = backgroundUriList
 
+    ' update button strings based on various state, ie. if user is logged in, content is locked, etc.
+    if isNonEmptyString(availabilityType) = true AND availabilityType = m.constants.ui.contentTimings.upcoming
+      if isSignedInUser = false
+        detailScreen.stringQueueButton = getTranslation("screenDetails_button_sign_in_to_set_reminder")
+      else
+        detailScreen.stringQueueButton = getTranslation("screenDetails_button_set_reminder")
+      end if
+
+      detailScreen.stringNoQueueButton = getTranslation("screenDetails_button_remove_reminder")
+    end if
+
+    if isSignedInUser = false
+      if content.needsLogin = true
+        detailScreen.stringPlayButton = getTranslation("registration_signIn_to_play_button") + ";" + getTranslation("registration_signup_button_free")
+        detailScreen.removeSignupButton = true 'No need to have signIn to Play button and signUp to save button together.
+      else
+        detailScreen.stringSignUpButton = getTranslation("registration_signup_button") + ";" + getTranslation("registration_signup_button_free")
+      end if
+    end if
+
     'update tracking info - have to set the whole AA, can't update only a portion on the AA field.
     'it is necessary to update trackingPageInfo here so that the correct pageInfo is stored in the case where a deeplink has an
     'episode content id, but the detail screen content will ultimately be a series content node. Updating here occurs when the
     'full content has been returned from the /contents API.
-
     detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
     detailScreen.content = content
 
     if shouldResetButtonIndex = true
       detailScreen.jumpToItem = 0
     end if
-
   end if
 
   m.isScreenLoaded = true
@@ -722,15 +703,18 @@ End Function
 
 
 Function handleRelatedResponse(relatedContent)
-  detailScreen = getTopDetailScreenFromStack()
-  if detailScreen <> invalid AND relatedContent <> invalid
-    if detailScreen.content.id = relatedContent.id
-      'After AutoPlay or refresh required and when pressing back from Player to detail screen
-      'related content(YMAL) thumbnails are not loading. Resetting relatedContent node fixes the issue.
-      detailScreen.relatedContent = invalid
-      detailScreen.relatedContent = relatedContent
-    end if
 
+  if relatedContent <> invalid
+    for i = 0 to m.screenStack.getChildCount() - 1
+      screen = m.screenStack.getChild(i)
+      if screen.subType() = "DetailScreen" AND screen.content <> invalid AND screen.content.id = relatedContent.id
+
+        'After AutoPlay or refresh required and when pressing back from Player to detail screen
+        'related content(YMAL) thumbnails are not loading. Resetting relatedContent node fixes the issue.
+        screen.relatedContent = invalid
+        screen.relatedContent = relatedContent
+      end if
+    end for
   end if
 End Function
 
@@ -2053,7 +2037,6 @@ Function skipDetailScreen(refreshedContent)
         if history <> invalid
           refreshedContent.currentEpisodeId = history.currentEpisodeId
         end if
-
       end if
 
       episode = getEpisodeContent(refreshedContent)
@@ -2068,18 +2051,14 @@ Function skipDetailScreen(refreshedContent)
           if nowPos >= 0
             playVideoContentWhileSkippingDetailScreen(episode, nowPos, trackingPageInfo, trackingComponentInfo, detailScreen.playbackSource)
           end if
-
         else
           if nowPos > 0
             m.detailScreenAfterFn = detailScreenResumeHelper
           else
             m.detailScreenAfterFn = playHelper
           end if
-
         end if
       end if
-    else
-      setDetailStrings(detailScreen, refreshedContent)  'if deeplink content is locked, refresh the initial buttons to reflect content and user status.
     end if
   end if
 End Function
@@ -2391,4 +2370,24 @@ Function onRelatedContentToPlay(msg)
     "functionName": "onRelatedContentToPlay"
   }
   showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource, pageOriginDetails)
+End Function
+
+
+' Resets the related content on a details screen such that UX updates itself.
+' Does not re-fetch related content, merely reparents the related content into a
+' new category node to cause the UI refresh.
+' Necessary after sign in/sign out, especially in the case of content being registration gated
+'
+' @detailScreen: roSGNode, an instance of a details screen
+Function resetRelatedContent(detailScreen)
+  if isNode(detailScreen) = true AND detailScreen.isSubtype("DetailScreen")
+    relatedContent = detailScreen.relatedContent
+
+    if isNode(relatedContent) = true
+      relatedContentChildren = relatedContent.getChildren(-1, 0)
+      refreshedRelatedContent = CreateObject("roSGNode", "CategoryContentNode")
+      refreshedRelatedContent.appendChildren(relatedContentChildren)
+      detailScreen.relatedContent = refreshedRelatedContent
+    end if
+  end if
 End Function
