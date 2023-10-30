@@ -1619,7 +1619,7 @@ Function getTranslation_en_US()
     },
     "registration_signIn_to_play_R_rated": {
       "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
-      "message": "This title requires sign in to protect younger audiences. No credit card required."
+      "message": "This title requires sign in to protect younger audiences."
     },
     "text_new":{
       "description": "simple text to use anywhere to indicate item is new",
