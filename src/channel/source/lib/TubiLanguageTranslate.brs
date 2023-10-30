@@ -2005,16 +2005,12 @@ Function getTranslation_es_MX()
       "description": "The text to display on Show All Games tile",
       "message": "Mostrar Todo"
     },
-    "screenHome_showAllNotification": {
-      "description": "The text to display on floating education of show all",
-      "message": "Para ver todo {containerTitle}, elige "
+    "screenHome_item_viewMore": {
+      "description": "The text to display on View More movies / shows",
+      "message": "Ver Más {containerTitle}"
     },
-    "screenHome_item_seeAll": {
-      "description": "The text to display on See All movies / shows",
-      "message": "Ver Todo {containerTitle}"
-    },
-    "screenHome_item_seeAll_description": {
-      "description": "The text to display total count on See All movies / shows",
+    "screenHome_item_viewMore_description": {
+      "description": "The text to display total count on View More movies / shows",
       "message": "{totalCount}+ títulos, actualizados semanalmente."
     },
     "loadingIndicator": {
@@ -3279,6 +3275,10 @@ Function getTranslation_es_MX()
       "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
       "message": "Inicia sesión para ver gratis. No se requiere tarjeta de crédito."
     },
+    "registration_signIn_to_play_R_rated": {
+      "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
+      "message": "Este título requiere iniciar sesión para proteger la audiencia mas joven."
+    },
     "text_new": {
       "description": "simple text to use anywhere to indicate item is new",
       "message": "NUEVO"
@@ -3662,17 +3662,13 @@ Function getTranslation_fr_CA()
       "description": "The text to display on Show All Games tile",
       "message": "Montrer tout"
     },
-    "screenHome_showAllNotification": {
-      "description": "The text to display on floating education of show all",
-      "message": "Pour voir l'ensemble de {containerTitle}, appuyez sur "
+    "screenHome_item_viewMore": {
+      "description": "The text to display on View More movies / shows",
+      "message": "View More {containerTitle}"
     },
-    "screenHome_item_seeAll": {
-      "description": "The text to display on See All movies / shows",
-      "message": "Tout voir {containerTitle}"
-    },
-    "screenHome_item_seeAll_description": {
-      "description": "The text to display total count on See All movies / shows",
-      "message": "{totalCount}+ titres, mis à jour chaque semaine."
+    "screenHome_item_viewMore_description": {
+      "description": "The text to display total count on View More movies / shows",
+      "message": "{totalCount}+ titles, updated weekly."
     },
     "loadingIndicator": {
       "description": "When something is loading, this text appears so the user knows something is loading.",
@@ -4935,6 +4931,10 @@ Function getTranslation_fr_CA()
     "registration_signIn_to_play_hint": {
       "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
       "message": "Connectez-vous pour regarder gratuitement. Aucun abonnement ou carte de crédit requis."
+    },
+    "registration_signIn_to_play_R_rated": {
+      "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
+      "message": "This title requires sign in to protect younger audiences."
     },
     "text_new": {
       "description": "simple text to use anywhere to indicate item is new",
