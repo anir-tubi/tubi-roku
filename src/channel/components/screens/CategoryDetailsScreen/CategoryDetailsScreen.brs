@@ -13,9 +13,9 @@ Function init()
 
   m.itemsInRowCount = 8
 
-  m.upperRowIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize / m.itemsInRowCount ' items per row = 8 * 6 = 48
+  m.upperRowIndex = Int(m.constants.performance.categoryGridList.lazyLoadBatchSize / m.itemsInRowCount) ' items per row = 8 * 6 = 48
   m.lowerRowIndex = 0
-  m.numRowsInBatch = m.constants.performance.categoryGridList.lazyLoadBatchSize / m.itemsInRowCount
+  m.numRowsInBatch = Int(m.constants.performance.categoryGridList.lazyLoadBatchSize / m.itemsInRowCount)
 
   m.InfoPanel = m.top.findNode("ChannelsInfoPanel")
   m.PageTitleAndCounter = m.top.findNode("pageTitleAndCounter")
@@ -125,7 +125,7 @@ Function onScreenFocusChange()
           ' CategoryDetailPage lazy loads more than 200+ titles.  If user revisits categoryDetailPage from title detail page and content needs to be refreshed, then
           ' reset the lazy loading logic along with refreshed conent so that user can use lazy loading feature.
           ' TODO: Implement the logic to focus nJumpToItemFocused exactly.
-          m.upperRowIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize / m.itemsInRowCount ' items per row = 8 * 6 = 48
+          m.upperRowIndex = Int(m.constants.performance.categoryGridList.lazyLoadBatchSize / m.itemsInRowCount) ' items per row = 8 * 6 = 48
           m.lowerRowIndex = 0
         m.top.categoryBatchIndex = 0
       end if
@@ -245,7 +245,7 @@ Function onItemFocused(msg)
         '
         ' when user scrolls down to midway (say third row out of total 6 rows) , request next batch
 
-        rowForNextCall = (m.lowerRowIndex + m.upperRowIndex) / 2
+        rowForNextCall = Int((m.lowerRowIndex + m.upperRowIndex) / 2)
 
         if row > rowForNextCall
           m.top.categoryBatchIndex = m.constants.performance.categoryGridList.lazyLoadBatchSize + m.top.categoryBatchIndex
