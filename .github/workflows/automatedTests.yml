@@ -84,11 +84,22 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
+      - name: Install pip
+        run: |
+          curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+          sudo python3 get-pip.py
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install -r requirements.txt
+
       - uses: actions/setup-node@master
         with:
           node-version: "18.12.1"
 
       # npm command install all required packages
+
       - name: npm install
         run: |
           npm install
@@ -110,6 +121,11 @@ jobs:
         with:
           name: JSON Report
           path: out/ui-tests-output/report.json
+
+      - name: Sync to TestRail
+        if: success() || failure()
+        run: python3 testRail/sync_to_testrail.py
+        continue-on-error: true
 
       - name: Upload HTML Report
         if: success() || failure()

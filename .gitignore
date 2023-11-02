@@ -8,3 +8,4 @@ src/channel/source/rooibosFunctionMap.brs
 out/
 .markdownlint.jsonc
 rta-config.json
+.idea
