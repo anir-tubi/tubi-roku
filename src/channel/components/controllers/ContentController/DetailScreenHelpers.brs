@@ -449,6 +449,9 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       else
         detailScreen.stringSignUpButton = getTranslation("registration_signup_button") + ";" + getTranslation("registration_signup_button_free")
       end if
+    else
+      ' Making sure we remove the sign up button if the user is already logged in.
+      detailScreen.removeSignupButton = true
     end if
 
     'update tracking info - have to set the whole AA, can't update only a portion on the AA field.

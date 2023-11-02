@@ -556,7 +556,8 @@ End Function
 
 Function onRemoveSignupButton()
   signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
-  if signUpIndex <> invalid
+  ' -1 is been returned when we are not able to find the button.
+  if signUpIndex <> -1
     addRemoveMenuItem(false, signUpIndex)
 
     if m.top.isInKidsMode = false AND m.top.selectedContentType <> m.constants.ui.contentTypes.sportsEvent
