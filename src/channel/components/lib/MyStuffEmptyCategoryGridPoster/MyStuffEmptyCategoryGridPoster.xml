@@ -46,7 +46,6 @@
         ellipsizeOnBoundary="true"
         width="900"
         numLines="1"
-        height="27"
         vertAlign="center"
         horizAlign="center">
         <Font
