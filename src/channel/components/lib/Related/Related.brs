@@ -16,6 +16,7 @@ Function init()
   m.top.observeFieldScoped("hide", "onHideRelated")
   m.top.observeFieldScoped("open", "onOpenRelated")
   m.top.observeFieldScoped("close", "onCloseRelated")
+  m.top.observeFieldScoped("showInFullScreen", "onShowRelatedInFullScreen")
   RelatedRowLabelContent = m.top.findNode("RelatedRowLabelContent")
   RelatedRowLabelContent.title = getTranslation("screenDetails_relatedTitles")
 
@@ -202,4 +203,12 @@ Function onCloseRelated(msg)
 
   hideInfoPanel()
   slideTo(m.YmalGroup, m.ymalXYPositionWhenHidden, 0.6)
+End Function
+
+
+Function onShowRelatedInFullScreen(msg)
+  m.YmalGroup.translation = m.ymalXYPositionWhenOpen
+  fade(m.YmalGroup, "in", 0.6)
+  fade(m.YmalRow, "in", 0.2, 0, 1.0)
+  showInfoPanel()
 End Function

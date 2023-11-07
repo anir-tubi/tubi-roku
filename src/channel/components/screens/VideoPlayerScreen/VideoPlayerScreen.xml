@@ -120,6 +120,9 @@
       <!-- Used to allow seeking the video player while still maintaining proper state tracking. Sets video player seek field to appropriate value and updates necessary state. `seek` field is time/double based and value specified should be in seconds -->
       <field id="seekTo" type="time" />
 
+      <!-- boolean field which can be set to true for showing the YMAL in full screen and set focus to YMAL -->
+      <field id="showYMALInFullScreen" type="boolean" alwaysNotify="true"/>
+
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />

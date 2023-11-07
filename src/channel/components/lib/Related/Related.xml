@@ -24,10 +24,12 @@
       <field id="open" type="boolean" alwaysNotify="true"/>
       <!-- closes the YMAL so it is only shown as a peek -->
       <field id="close" type="boolean" alwaysNotify="true"/>
+      <!-- show the YMAL in full screen -->
+      <field id="showInFullScreen" type="boolean" alwaysNotify="true"/>
 
     <!-- OUTPUTS -->
       <field id="isRelatedContentFocused" type="boolean" alwaysNotify="true"/>
-      <field id="selectedRelatedContentItem" type="node"/>
+      <field id="selectedRelatedContentItem" type="node" alwaysNotify="true"/>
       <field id="keyPress" alias="RelatedGrid.keyPress"/>
       <field id="itemFocused" alias="RelatedGrid.itemFocused"/>
       <!-- Holds the information needed to populate a navigate_within_page event. This will

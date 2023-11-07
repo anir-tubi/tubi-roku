@@ -1617,3 +1617,13 @@ Function hideTopOverlayAndHint()
   fade(m.TopOverlay, "out", 0.6)
   fade(m.TopHint, "out", 0.6)
 End Function
+
+
+Function onShowYMALInFullScreen(msg)
+  fade(m.VideoOverlay, "in", 0.4)
+  m.HUD.translation = [0, -621]
+  fade(m.HUD, "in", 0.6)
+  m.Related.showInFullScreen = true
+  m.relatedRowFocused = true
+  m.Related.setFocus(true)
+End Function

@@ -76,6 +76,7 @@ Function init()
   m.top.observeField("adProgress", "onAdProgressChange")
   m.top.observeField("displayAdLoadingMessage", "onDisplayAdLoadingMessage")
   m.top.observeField("seekTo", "onSeekToChange")
+  m.top.observeFieldScoped("showYMALInFullScreen", "onShowYMALInFullScreen")
 
   'isPauseAdReqInProgress is the state of pauseAd requests in flight.
   'If pause ad request is in flight, we do not send another pause ad request

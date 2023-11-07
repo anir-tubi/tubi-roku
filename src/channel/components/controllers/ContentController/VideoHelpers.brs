@@ -1339,9 +1339,60 @@ End Function
 
 Function onPlayerRelatedContentToPlay(msg)
   content = msg.getData()
+
+  ' The episode information is not available for the selected series, so refetch required for series content type
+  if content.type = m.constants.ui.contentTypes.series
+    emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
+    emptySeriesNode.type = m.constants.ui.contentTypes.series
+    emptySeriesNode.id = content.id
+    getSingleContentFromServer(emptySeriesNode, handleYMALSeriesContentSuccessResponse, handleYMALSeriesContentErrorResponse)
+  else
+    playbackSource = {
+      "srcForAnalytic": m.constants.player.playbackSource.unknown
+      "srcForAds": m.constants.player.playbackOrigin.ymal
+    }
+    playUpNextContent(content, playbackSource)
+  end if
+End Function
+
+
+Function handleYMALSeriesContentSuccessResponse(content)
   playbackSource = {
     "srcForAnalytic": m.constants.player.playbackSource.unknown
     "srcForAds": m.constants.player.playbackOrigin.ymal
   }
   playUpNextContent(content, playbackSource)
+End Function
+
+
+Function handleYMALSeriesContentErrorResponse(error)
+  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+  content = invalid
+
+  if videoPlayer <> invalid
+    content = videoPlayer.relatedContentToPlay
+  end if
+
+  ' set up the error modal dialog
+  errorCode = getUserFacingErrorCode(m.constants.errors.context.videoDetailScreen, m.constants.errors.subtypes.fetchError, error.code)
+  dialogEvent = getDetailScreenDialogAnalyticEvent(content, "NETWORK_ERROR", errorCode, m.constants)
+
+  message = ""
+  modalInfo = {
+    message: getErrorMessage(message, errorCode)
+    openTrackEvent: dialogEvent
+    trackingTask: m.trackingLoggingTask
+  }
+
+  showErrorModal(modalInfo, invalid, invalid, onCloseYMALContentFetchErrorModal)
+End Function
+
+
+Function onCloseYMALContentFetchErrorModal()
+
+  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+  if videoPlayer <> invalid
+    videoPlayer.showYMALInFullScreen = true
+  end if
+
 End Function
