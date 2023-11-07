@@ -106,7 +106,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     seriesContent = invalid
     if content.type = m.constants.ui.contentTypes.series
       'if roku_registration_vs_tvt_lock_rated_content exp is true then do not use the cached content because needsLogin info might not be accurate.
-      if FALSE AND getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1", false).enabled <> true
+      if getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1", false).enabled <> true
         seriesContent = getFromContentCache(content.id)
       end if
     end if
@@ -344,7 +344,7 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
     lineOneData.rating = stateSource.rating
 
     rating = UCase(stateSource.rating)
-    if FALSE AND (rating = "R" OR rating = "TV-MA" OR rating = "TV-14" OR rating = "NC-17" OR rating = "NR") AND m.constants.deviceinfo.countrycode = "US"
+    if (rating = "R" OR rating = "TV-MA" OR rating = "TV-14" OR rating = "NC-17" OR rating = "NR") AND m.constants.deviceinfo.countrycode = "US"
       getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1")
     end if
 

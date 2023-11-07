@@ -423,7 +423,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.rating = contentFromServer.ratings[0].value
 
     rating = translatedContent.rating
-    if FALSE AND (rating = "R" OR rating = "TV-MA" OR rating = "TV-14" OR rating = "NC-17" OR rating = "NR") AND m.constants.deviceinfo.countrycode = "US" AND translatedContent[typeVar] <> m.contentTypes.linear AND isSignedInUser = false AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1").enabled = true
+    if (rating = "R" OR rating = "TV-MA" OR rating = "TV-14" OR rating = "NC-17" OR rating = "NR") AND m.constants.deviceinfo.countrycode = "US" AND translatedContent[typeVar] <> m.contentTypes.linear AND isSignedInUser = false AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1").enabled = true
       translatedContent.needsLogin = true
     end if
 
@@ -1330,7 +1330,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           '//TODO: REMOVE AFTER EXPERIMENT roku_registration_vs_tvt_lock_rated_content
           if fullChild.ratings <> invalid AND fullChild.ratings[0] <> invalid AND fullChild.ratings[0].value <> invalid
             rating = UCase(fullChild.ratings[0].value)
-            if FALSE AND (rating = "R" OR rating = "TV-MA" OR rating = "TV-14" OR rating = "NC-17" OR rating = "NR") AND m.constants.deviceinfo.countrycode = "US" AND fullChild.type <> "l" AND isSignedInUser = false AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1").enabled = true
+            if (rating = "R" OR rating = "TV-MA" OR rating = "TV-14" OR rating = "NC-17" OR rating = "NR") AND m.constants.deviceinfo.countrycode = "US" AND fullChild.type <> "l" AND isSignedInUser = false AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1").enabled = true
               childAA.needsLogin = true
             end if
           end if
