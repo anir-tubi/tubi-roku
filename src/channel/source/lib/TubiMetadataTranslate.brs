@@ -1112,7 +1112,7 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, co
 
     childrenCount = container.children.count()
 
-    if screenId = m.constants.ui.screenIds.myStuffScreen
+    if screenId = m.constants.ui.screenIds.myStuffScreen OR screenId = m.constants.ui.screenIds.searchScreen
       viewMoreFeatureWithPositionAA = {
         isViewMoreFeatureShown: false
         insertPosition: -1
