@@ -12,9 +12,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs" />
-  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
@@ -117,7 +115,7 @@
           translation="[0,688]"/>
         <Poster
           id="FocusBox"
-          uri="pkg:/images/selector-$$RES$$.9.png"/>
+          uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
         <Label
           id="CountdownLabelMovie"
           translation="[354,638]"
@@ -143,7 +141,7 @@
           id="GridSeries"
           itemComponentName="UpNextPoster"
           itemSize="[430,242]"
-          focusBitmapUri="pkg:/images/selector-$$RES$$.9.png"
+          focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
           numColumns="1"
           numRows="1"
           translation="[85,688]" />

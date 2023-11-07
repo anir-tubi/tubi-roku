@@ -9,11 +9,6 @@ Function init()
   m.SponsoredByText = m.top.findNode("SponsoredByText")
   m.SponsoredByPoster = m.top.findNode("SponsoredByPoster")
 
-  if getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true).enabled = true
-    m.poster.loadingBitmapUri="pkg:/images/placeholder-featured.webp"
-    m.poster.failedBitmapUri="pkg:/images/placeholder-featured.webp"
-  end if
-
   m.top.observeField("itemContent", "onContentChange")
   m.logo.observeField("loadStatus", "onLogoLoad")
   ' used to keep track of if the grid has focus or not, onGridFocusChange fires every time any focus changes including

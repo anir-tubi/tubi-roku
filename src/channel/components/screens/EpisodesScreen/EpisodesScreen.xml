@@ -77,7 +77,7 @@
       fadeFocusFeedbackWhenAutoScrolling="true"
       rowFocusAnimationStyle="floatingFocus"
       vertFocusAnimationStyle="fixedFocus"
-      focusBitmapUri="pkg:/images/selector-$$RES$$.9.png"/>
+      focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
 
   </children>
 </component>

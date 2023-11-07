@@ -3,11 +3,6 @@ Function init()
   m.Title = m.top.findNode("Title")
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("width", "onWidthChange")
-
-  if getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true).enabled = true
-    m.Background.loadingBitmapUri="pkg:/images/placeholder-featured.webp"
-    m.Background.failedBitmapUri="pkg:/images/placeholder-featured.webp"
-  end if
   
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.Title, typographyConstants.ids.bodyMedium)
@@ -48,7 +43,6 @@ Function onContentChange()
       sURI = m.top.itemContent.hdgridposterurl
     end if
 
-    getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true)
     m.Background.uri = sURI
 
     m.Title.text = m.top.itemContent.title

@@ -1,11 +1,6 @@
 Function init()
   m.poster = m.top.findNode("poster")
 
-  if getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", false).enabled = true
-    m.poster.loadingBitmapUri="pkg:/images/placeholder.webp"
-    m.poster.failedBitmapUri="pkg:/images/placeholder.webp"
-  end if
-
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
 
   ' List of fields that will only be observed if we have a child grid item component with that field

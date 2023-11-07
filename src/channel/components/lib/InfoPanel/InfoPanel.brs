@@ -8,11 +8,6 @@ Function init()
   m.topHeaderImage = m.top.findNode("TopHeaderImage")
   m.leftHeaderImage = m.top.findNode("LeftHeaderImage")
 
-  if getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", false).enabled = true
-    m.leftHeaderImage.loadingBitmapUri="pkg:/images/placeholder.webp"
-    m.leftHeaderImage.failedBitmapUri="pkg:/images/placeholder.webp"
-  end if
-
   m.title = m.top.findNode("Title")
   m.episode = m.top.findNode("Episode")
   m.twoLineInfo = m.top.findNode("TwoLineInfo")
@@ -214,7 +209,6 @@ Function onLeftHeaderImageUriChange(msg)
       m.infoPanelGroup.insertChild(m.leftHeaderImage, 0)
     end if
 
-    getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true)
     m.leftHeaderImage.uri = sPosterURL
 
   else if leftHeaderIsPresent = true

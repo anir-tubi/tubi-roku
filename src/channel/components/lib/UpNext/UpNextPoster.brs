@@ -22,7 +22,6 @@ Function onContentChange()
       sURI = item.hdgridposterurl
     end if
 
-    getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true)
     m.poster.uri = sURI
 
     removeLockIcon()

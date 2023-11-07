@@ -138,7 +138,7 @@
       rowItemSpacing="[[16,0]]"
       showRowCounter="[false]"
       fadeFocusFeedbackWhenAutoScrolling="true"
-      focusBitmapUri="pkg:/images/selector-$$RES$$.9.png"
+      focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
       rowFocusAnimationStyle="floatingFocus"
       vertFocusAnimationStyle="fixedFocus"/>
     <Timer

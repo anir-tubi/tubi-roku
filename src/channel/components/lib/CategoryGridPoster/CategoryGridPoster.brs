@@ -12,11 +12,6 @@ Function init()
   m.title = m.top.findNode("Title")
   m.posterFadeTime = 0.5
 
-  if getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true).enabled = true
-    m.poster.loadingBitmapUri="pkg:/images/placeholder.webp"
-    m.poster.failedBitmapUri="pkg:/images/placeholder.webp"
-  end if
-
   '//recreate the contentTypes from constants so as not to access m.global.constants for every item on the home screen as they are created
   m.contentTypes = {
     series: "series"
@@ -203,7 +198,6 @@ Function onContentChange(msg)
     end if
   end if
 
-  getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true)
   m.poster.uri = sPosterURL
 End Function
 

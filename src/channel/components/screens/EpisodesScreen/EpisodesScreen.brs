@@ -17,10 +17,6 @@ Function init()
   m.Menu.observeField("rowScrollFocused", "onMenuScrollFocused")
   m.defaultHeroUri = "pkg:/images/art-blur-background.webp"
 
-  if getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", false).enabled = true
-    m.RowList.focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
-  end if
-
   theme = getThemeFromGlobal()
   if theme <> invalid
     m.RowList.focusBitmapBlendColor = theme.focusedColor

@@ -44,11 +44,6 @@ Function init()
     focusBoxMargin = 6
   end if
 
-  if getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", false).enabled = true
-    focusBox.uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
-    m.GridSeries.focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
-  end if
-
   theme = getThemeFromGlobal()
   if theme <> invalid
     focusBox.blendColor = theme.focusedColor

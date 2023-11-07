@@ -920,9 +920,6 @@ Function onHomescreenContentReady(msg)
   homeScreen = msg.getRoSGNode()
 
   if homeScreen.contentReady = true
-    '//Assume images are going to be displayed when the homescreen is displayed - and send exposure event
-    getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", true)
-
     fireAppLoadBeacon()
     homeScreen.unobserveFieldScoped("contentReady")
     homeScreen.isLoading = false

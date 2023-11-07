@@ -37,10 +37,6 @@ Function init()
   m.VideoGrid.observeField("itemFocused", "onItemFocused")
   m.VideoGrid.observeField("itemSelected", "onItemSelected")
 
-  if getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", false).enabled = true
-    m.VideoGrid.focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
-  end if
-
   ' set initial tracking values
   m.top.trackingPageInfo = createTrackingPageInfo(invalid)
   m.oldCategoryComponent = invalid

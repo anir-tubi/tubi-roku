@@ -32,10 +32,6 @@ Function init()
   m.signUpMenuItem = m.top.findNode("signUpMenuItem")
   m.signUpMenuItem.iconUrl = "pkg:/images/icon-sign-in.webp"
 
-  if getExperimentResource("roku_rounded_corners", "roku_rounded_corners_v1", false).enabled = true
-    m.RelatedGrid.focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
-  end if
-
   m.menuFocused = false
   m.secondaryMenuFocused = false
 

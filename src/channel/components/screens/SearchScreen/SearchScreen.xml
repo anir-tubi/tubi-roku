@@ -150,7 +150,7 @@
         numColumns="5"
         fadeFocusFeedbackWhenAutoScrolling="true"
         vertFocusAnimationStyle="fixedFocus"
-        focusBitmapUri="pkg:/images/selector-$$RES$$.9.png"/>
+        focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
       <Spinner
         id="spinner"
         visible="false"
