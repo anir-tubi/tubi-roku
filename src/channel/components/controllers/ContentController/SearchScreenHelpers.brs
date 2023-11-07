@@ -110,7 +110,7 @@ Function onSearchTextChanged(msg)
     categoryId = m.constants.ui.categoryIds.featured
     requestOptions = {}
 
-    if isUserInAdultsMode() = true AND isDeviceInUS() = true
+    if isUserInAdultsMode() = true AND isDeviceInUS() = true AND isKidsUIOn() = false
       searchExperimentInfo = getExperimentResource("roku_trending_search", "roku_trending_search_v1", true)
 
       if searchExperimentInfo.enabled = true
