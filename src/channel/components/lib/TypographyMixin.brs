@@ -69,12 +69,7 @@ End Function
 Function setTypographyOfLabel(labelNode, typographyId)
   constants = getTypographyConstants()
 
-  bExperimentEnabled = false
-  if getExperimentResource("roku_typography", "roku_typography_v1", true).enabled = true
-    bExperimentEnabled = true
-  end if
-
-  if bExperimentEnabled = true AND typographyId <> invalid AND labelNode <> invalid
+  if typographyId <> invalid AND labelNode <> invalid
     aaTypography = constants.typographyAA[typographyId]
     if aaTypography <> invalid
       sFontFile = "pkg:/fonts/Vaud-Medium.ttf"

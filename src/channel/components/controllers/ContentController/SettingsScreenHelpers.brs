@@ -479,8 +479,8 @@ End Function
 
 Function showConfirmPasswordScreen()
   m.confirmPasswordScreen = CreateObject("roSGNode", "ConfirmPasswordScreen")
-  m.confirmPasswordScreen.message = getTranslation("screenSettings_parentalPassword_title")
-  m.confirmPasswordScreen.subMessage = getTranslation("screenSettings_parentalPassword_subtitle")
+  '//::TODO::roku_typography_v1 - once the commit with screenSettings_parentalPassword_title2 has been merged and uploaded to crowdin, then make another change to change it back to "screenSettings_parentalPassword_title" and delete _title2 and _subtitle strings within Crowdin 
+  m.confirmPasswordScreen.message = getTranslation("screenSettings_parentalPassword_title2")
   m.confirmPasswordScreen.setUp = getTranslation("screenSettings_parentalPassword_setup_new_password") + ","
   m.confirmPasswordScreen.visit = getTranslation("screenSettings_parentalPassword_visit_link")
   m.confirmPasswordScreen.isLoading = false

@@ -2,7 +2,6 @@ Function init()
   m.constants = getConstantsFromGlobal()
 
   m.Message = m.top.findNode("Message")
-  m.subMessage = m.top.findNode("subMessage")
   m.setUp = m.top.findNode("setUp")
   m.visit = m.top.findNode("visit")
 
@@ -10,8 +9,6 @@ Function init()
   m.password.hint = getTranslation("signIn_password_hint")
 
   m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.top.observeField("message", "onMessageChanged")
-  m.top.observeField("subMessage", "onSubMessageChanged")
 
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
   m.keyboard.observeFieldScoped("buttonSelected", "onButtonSelected")
@@ -31,15 +28,8 @@ Function init()
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.Message, typographyConstants.ids.headerMedium)
-  setTypographyOfLabel(m.subMessage, typographyConstants.ids.headerMedium)
   setTypographyOfLabel(m.setUp, typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.visit, typographyConstants.ids.bodySmall)
-
-  if getExperimentResource("roku_typography", "roku_typography_v1", true).enabled = true
-    '//::TODO::roku_typography_v1 - get rid of subMessage node in the XML, and combine 2 line header text in crowdin if the experiment is graduated
-    ContentGroup = m.top.findNode("contentGroup")
-    ContentGroup.removeChild(m.subMessage)
-  end if
 
   m.top.screenLevel = m.constants.ui.screenLevels.confirmPasswordScreen
   if m.global <> invalid
@@ -97,30 +87,6 @@ Function onScreenFocusChange()
 End Function
 
 
-Function onMessageChanged()
-  if getExperimentResource("roku_typography", "roku_typography_v1", true).enabled = true
-    setHeader()
-  else
-    m.Message.text = m.top.message
-  end if
-End Function
-
-
-Function onSubMessageChanged()
-  if getExperimentResource("roku_typography", "roku_typography_v1", true).enabled = true
-    setHeader()
-  else
-    m.subMessage.text = m.top.subMessage
-  end if
-End Function
-
-
-Function setHeader()
-  '//::TODO::roku_typography_v1 - this function can be remove once the experiment is graduated. Combine the header crowdin text and then use an alias to set the header text instead of using event handlers/observers.
-  m.Message.text = m.top.message + " " + m.top.subMessage
-End Function
-
-
 'Observer for button selected option(back, continue and showHidePassword)
 Function onButtonSelected(evt)
   buttonSelected = evt.getData()
@@ -164,12 +130,11 @@ Function onAudioGuideTextChanged(msg)
   if isNonEmptyString(audioGuideText) = true
 
     if m.isScreenAudioGuideRead = false
-      message = getTranslation("screenSettings_parentalPassword_title")
-      subMessage = getTranslation("screenSettings_parentalPassword_subtitle")
+      message = getTranslation("screenSettings_parentalPassword_title2")
       setUp = getTranslation("screenSettings_parentalPassword_setup_new_password") + ","
       visit = getTranslation("screenSettings_parentalPassword_visit_link")
 
-      screenAudioGuideText = message + "" + subMessage + " " + setUp + " " + visit
+      screenAudioGuideText = message + " " + setUp + " " + visit
       audioGuideText = screenAudioGuideText + audioGuideText
       m.isScreenAudioGuideRead = true
     end if

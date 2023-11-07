@@ -636,12 +636,12 @@
     "description": "The title of the Sign In Panel of the Settings screen",
     "message": "You’re not signed in yet"
   },
-  "screenSettings_parentalPassword_title": {
+  "screenSettings_parentalPassword_title2": {
     "description": "Directions for signed out users who attempt to change the parental controls",
-    "message": "Enter Password to update"
+    "message": "Enter Password to update parental controls"
   },
   "screenSettings_parentalPassword_subtitle": {
-    "description": "Directions 2nd line for signed out users who attempt to change the parental controls",
+    "description": "DELETE THIS",
     "message": "parental controls"
   },
   "screenSettings_parentalPassword_button_hide": {

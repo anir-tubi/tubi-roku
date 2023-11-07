@@ -104,18 +104,6 @@ Function onContentChange(data)
       end if
     end if
 
-    if getExperimentResource("roku_typography", "roku_typography_v1", true).enabled = false
-      m.font.size = item.fontSize
-      m.focusedFont.size = item.fontSize
-      fontURI = "pkg:/fonts/Vaud-SemiBold.ttf"
-      if item.bold = false
-          fontURI = "pkg:/fonts/Vaud-Medium.ttf"
-      end if
-
-      m.font.uri = fontURI
-      m.focusedFont.uri = fontURI
-    end if
-
     onActiveChange()
   end if
 End Function
