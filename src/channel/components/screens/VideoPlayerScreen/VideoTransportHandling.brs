@@ -1556,10 +1556,9 @@ End Function
 
 ' show YMAL row on bottom of the screen and fire exposure event
 Function showYMAL()
-  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1", false).enabled = true AND m.top.relatedContent <> invalid
+  'fire exposure event when YMAL row is displayed at bottom area of the screen
+  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1").enabled = true AND m.top.relatedContent <> invalid
     m.Related.show = true
-    'fire exposure event when YMAL row is displayed at bottom area of the screen
-    getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1", true)
   end if
 End Function
 
