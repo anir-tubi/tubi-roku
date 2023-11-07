@@ -130,7 +130,7 @@ Function onAudioGuideTextChanged(msg)
   if isNonEmptyString(audioGuideText) = true
 
     if m.isScreenAudioGuideRead = false
-      message = getTranslation("screenSettings_parentalPassword_title2")
+      message = getTranslation("screenSettings_parentalPassword_title")
       setUp = getTranslation("screenSettings_parentalPassword_setup_new_password") + ","
       visit = getTranslation("screenSettings_parentalPassword_visit_link")
 

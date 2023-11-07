@@ -855,13 +855,9 @@ Function getTranslation_en_US()
       "description": "The title of the Sign In Panel of the Settings screen",
       "message": "You’re not signed in yet"
     },
-    "screenSettings_parentalPassword_title2": {
+    "screenSettings_parentalPassword_title": {
       "description": "Directions for signed out users who attempt to change the parental controls",
       "message": "Enter Password to update parental controls"
-    },
-    "screenSettings_parentalPassword_subtitle": {
-      "description": "DELETE THIS",
-      "message": "parental controls"
     },
     "screenSettings_parentalPassword_button_hide": {
       "description": "Label of button on the password entry screen to hide the password",
@@ -2513,13 +2509,9 @@ Function getTranslation_es_MX()
       "description": "The title of the Sign In Panel of the Settings screen",
       "message": "No has iniciado sesión"
     },
-    "screenSettings_parentalPassword_title2": {
+    "screenSettings_parentalPassword_title": {
       "description": "Directions for signed out users who attempt to change the parental controls",
       "message": "Ingresa tu contraseña controles parentales"
-    },
-    "screenSettings_parentalPassword_subtitle": {
-      "description": "DELETE THIS",
-      "message": "controles parentales"
     },
     "screenSettings_parentalPassword_button_hide": {
       "description": "Label of button on the password entry screen to hide the password",
@@ -4170,13 +4162,9 @@ Function getTranslation_fr_CA()
       "description": "The title of the Sign In Panel of the Settings screen",
       "message": "Vous n'êtes pas encore connecté(e)"
     },
-    "screenSettings_parentalPassword_title2": {
+    "screenSettings_parentalPassword_title": {
       "description": "Directions for signed out users who attempt to change the parental controls",
       "message": "Entrez le mot de passe pour mettre à jour Contrôle parental"
-    },
-    "screenSettings_parentalPassword_subtitle": {
-      "description": "DELETE THIS",
-      "message": "Contrôle parental"
     },
     "screenSettings_parentalPassword_button_hide": {
       "description": "Label of button on the password entry screen to hide the password",
