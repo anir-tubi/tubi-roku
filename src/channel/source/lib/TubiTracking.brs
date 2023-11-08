@@ -1024,6 +1024,7 @@ Function tubiTracking_getOneOfs()
 
     epg_component: {
       content_tile: {} ' ContentTile message
+      category_slug: ""
     }
 
     button_component: {

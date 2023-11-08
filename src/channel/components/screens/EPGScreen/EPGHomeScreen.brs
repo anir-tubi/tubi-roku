@@ -182,6 +182,7 @@ Function onLinearChannelToPlay(msg)
         componentType : "epg_component"
         componentValues : {
           content_tile : m.Tracking.getAnalyticsTile(linearChannelToPlay, col, row)
+          category_slug: linearChannelToPlay.parentId
         }
       }
 

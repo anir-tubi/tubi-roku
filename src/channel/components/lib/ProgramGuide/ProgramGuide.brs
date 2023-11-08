@@ -149,12 +149,12 @@ Function onProgramGridContentSelected(msg)
         if isProgramLive(programItem) = true
           if m.playOnFocusMode = false 'playItemOnSelect mode.
             m.top.linearChannelToPlay = channelItem
-            setComponentInteractionEventForLiveAndFuturePrograms(programItem, row, col)
+            setComponentInteractionEventForLiveAndFuturePrograms(programItem, row, col, channelItem.parentId)
             m.top.linearChannelToPlayUpdated = true
           end if
         else ' setting selected field to true, will change display to indicate that the selected program is future program (orange color font and appended with "Starts at")
           programItem.selected = true
-          setComponentInteractionEventForLiveAndFuturePrograms(programItem, row, col)
+          setComponentInteractionEventForLiveAndFuturePrograms(programItem, row, col, channelItem.parentId)
         end if
       end if
     end if
@@ -248,7 +248,7 @@ Function onJumpToLinearChannelID()
             m.top.shouldSendComponentInteractionEventOnJumpToLinearChannelId = false
             rowNum = i + 1
             colNum = 1
-            setComponentInteractionEventForLiveAndFuturePrograms(program, rowNum, colNum)
+            setComponentInteractionEventForLiveAndFuturePrograms(program, rowNum, colNum, item.parentId)
           end if
         end if
         if m.playOnFocusMode = false AND m.top.linearChannelToPlay <> invalid AND m.top.linearChannelToPlay.id <> item.id
@@ -317,7 +317,7 @@ Function onProgramGridOkPressed()
       programItem = channelItem.getChild(itemPosition[1])
       row = itemPosition[0] + 1
       col = itemPosition[1] + 1
-      setComponentInteractionEventForLiveAndFuturePrograms(programItem, row, col)
+      setComponentInteractionEventForLiveAndFuturePrograms(programItem, row, col, channelItem.parentId)
     end if
   end if
 End Function
@@ -344,10 +344,16 @@ End Function
 '@content: Node, currently playing/future program
 '@rowNum: Integer, horizontal position of the currentProgram with 1 based Index as opposed to 0 based Index
 '@colNum, Integer, vertical position of the currentProgram with 1 based Index as opposed to 0 based Index
-Function setComponentInteractionEventForLiveAndFuturePrograms(content, rowNum, colNum)
+'@categorySlug, String, id/slug of the category to which the linear channel belongs to.
+Function setComponentInteractionEventForLiveAndFuturePrograms(content, rowNum, colNum, categorySlug)
   componentValues = {
     content_tile: m.Tracking.getAnalyticsTile(content, colNum, rowNum)
   }
+
+  if isNonEmptyString(categorySlug) = true
+    componentValues.category_slug = categorySlug
+  end if
+
   pageType = ""
   if m.top.trackingPageInfo <> invalid AND m.top.trackingPageInfo.pagetype <> invalid
     pageType = m.top.trackingPageInfo.pagetype
@@ -489,12 +495,16 @@ Function sendNavigationWithinPageEvent(rowItemFocused)
 
     previousItemFocused = invalid
 
-    if m.programGrid.content.getChild(m.lastItemFocused[0]) <> invalid
-      previousItemFocused = m.programGrid.content.getChild(m.lastItemFocused[0]).getchild(m.lastItemFocused[1])
+    categorySlug = ""
+    channelNode = m.programGrid.content.getChild(m.lastItemFocused[0])
+    if channelNode <> invalid
+      previousItemFocused = channelNode.getchild(m.lastItemFocused[1])
+      categorySlug = channelNode.parentId
     end if
 
     lastItemFocusedCol = m.lastItemFocused[1] + 1
     lastItemFocusedRow = m.lastItemFocused[0] + 1
+
     contentTile = m.Tracking.getAnalyticsTile(previousItemFocused, lastItemFocusedCol, lastItemFocusedRow)
 
     if rowItemFocused[0] >= 0
@@ -521,9 +531,14 @@ Function sendNavigationWithinPageEvent(rowItemFocused)
       pageValues = m.top.trackingPageInfo.pageValues
     end if
 
+    componentValues = {
+      content_tile: contentTile
+      category_slug: categorySlug
+    }
+
     navigateWithinPageInfo = {
       pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
-      componentOneof: m.Tracking.getAnalyticsComponent("epg_component", {content_tile: contentTile})
+      componentOneof: m.Tracking.getAnalyticsComponent("epg_component", componentValues)
       means_of_navigation: "BUTTON"
       vertical_location: row
       horizontal_location: col
