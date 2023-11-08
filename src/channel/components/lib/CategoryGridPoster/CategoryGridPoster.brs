@@ -74,13 +74,16 @@ End Function
 
 
 Function onRowItemHasFocus()
+  setLockIconOpacity()
+End Function
 
+
+Function setLockIconOpacity()
   if m.top.itemHasFocus = false
     if m.lockIcon <> invalid then m.lockIcon.opacity = 0.0
   else
     if m.lockIcon <> invalid then m.lockIcon.opacity = 1.0
   end if
-
 End Function
 
 
@@ -395,6 +398,7 @@ Function setLockIcon()
   m.lockIcon.height = 24
   m.lockIcon.uri = "pkg:/images/icon-lock.webp"
   m.lockIcon.translation = [m.top.width-36, 15]
+  setLockIconOpacity()
 End Function
 
 
