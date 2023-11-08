@@ -139,7 +139,7 @@ Function onScreenTopNavToggled(msg)
 
   focusedNavId = m.constants.ui.screenIdToTopNavId[screen.id]
   navComponent = {
-    top_nav_section: m.Tracking.sideNavPageMap[focusedNavId]
+    top_nav_section: m.Tracking.topNavPageMap[focusedNavId]
   }
 
   event = {
@@ -171,7 +171,7 @@ End Function
 Function sendTopNavToSideNavNavigationEvent(screen, sideNav)
   if screen <> invalid AND sideNav <> invalid
     focusedNavId = m.constants.ui.screenIdToTopNavId[screen.id]
-    buttonID = m.Tracking.sideNavPageMap[focusedNavId]
+    buttonID = m.Tracking.topNavPageMap[focusedNavId]
 
     '//Both the side and top navs should have the same HOME button ID
     destComponent = {
