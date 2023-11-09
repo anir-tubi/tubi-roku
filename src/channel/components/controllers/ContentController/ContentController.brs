@@ -1917,6 +1917,11 @@ Function onCustomResume(msg)
       currentScreen.updateContent = true
     end if
   end if
+
+  if bRestartApp = false
+    ' We want to consider instant resume as a new braze session. So we are restarting braze session.
+    restartBrazeSession()
+  end if
 End Function
 
 

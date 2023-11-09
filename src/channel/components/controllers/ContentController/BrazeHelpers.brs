@@ -277,3 +277,12 @@ Function processPlayAndDetailsScreenAction(uriParameters)
     end if
   end if
 End Function
+
+
+' Restart braze session.
+Function restartBrazeSession()
+  if getConsentOptOutStatusByKey(m.constants.consentKeys.marketing) = false AND m.braze <> invalid
+    stopBrazeTask()
+    configureBrazeAndInitializeTask()
+  end if
+End Function
