@@ -174,7 +174,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.id <> invalid then translatedContent.id = contentFromServer.id
   typeVar = "type"
 
-  if m.experiments.getExperimentResource("roku_series_season_order", "roku_series_season_order_v1").enabled = true
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_series_season_order", "roku_series_season_order_v1").enabled = true
     if contentFromServer.type = "s" AND  contentFromServer.is_recurring = false AND isNonEmptyArray(contentFromServer.tags) = true
         for each tag in contentFromServer.tags
           if contentFromServer.children <> invalid AND (tag = "Reality" OR tag = "Lifestyle")
