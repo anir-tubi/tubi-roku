@@ -42,6 +42,9 @@ Function showEpisodeScreen(content, shouldSendNavigationAnalytics, playbackSourc
 
   episodesScreen.episodeToFocus = findEpisode2dIndex(content.currentEpisodeId, content)
   pushScreen(episodesScreen, shouldSendNavigationAnalytics, true)
+
+  ' send the exposure event when user landed on episodes detail screen
+  getExperimentResource("roku_series_season_order", "roku_series_season_order_v1")
 End Function
 
 
