@@ -6,6 +6,12 @@ on:
       - opened
       - converted_to_draft
       - ready_for_review
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
 env:
   TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
