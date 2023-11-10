@@ -42,6 +42,10 @@ Function TubiExperiments(constants) as Object
         roku_view_more_last_v1: {"enabled" : false}
       }
 
+      roku_cw_featured_recommended_placement: {
+        roku_cw_featured_recommended_placement_v1: {"roku_cw_featured_recommended_placement_type": "none"} 'valid values are : "none", "roku_cw_in_featured", "roku_cw_in_recommended"
+      }
+      
       roku_series_season_order: {
         roku_series_season_order_v1: {"enabled": false}
       }

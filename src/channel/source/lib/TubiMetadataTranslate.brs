@@ -1190,6 +1190,22 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, co
       end if
     end if
 
+    continueWatchingPlacementType = m.experiments.getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v1").roku_cw_featured_recommended_placement_type
+    shouldInsertSeriesInFeaturedRecommeded = (continueWatchingPlacementType = "roku_cw_in_featured" AND container.id = m.constants.ui.categoryIds.featured) OR (continueWatchingPlacementType = "roku_cw_in_recommended" AND container.id = m.constants.ui.categoryIds.recommendedForYou)
+
+    if shouldInsertSeriesInFeaturedRecommeded = true
+      insertPosition = 0
+      insertContent = m.seriesChildInsert
+    end if
+
+    if m.shouldSendExposureEventForCWInFeaturedRecommended = true
+      if m.seriesChildInsert <> invalid AND shouldInsertSeriesInFeaturedRecommeded = true
+        container.shouldSendExposureEventForCWInFeaturedRecommended = true
+      else if continueWatchingPlacementType = "none" AND (container.id = m.constants.ui.categoryIds.featured OR container.id = m.constants.ui.categoryIds.recommendedForYou)
+        container.shouldSendExposureEventForCWInFeaturedRecommended = true
+      end if
+    end if
+
     if insertContent <> invalid AND insertContent.id <> invalid
       children = insertItemIntoArray(container.children, insertContent.id, insertPosition)
       container.children = children
@@ -1228,6 +1244,7 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, contentMode = 
       slug: container.slug
       title: sTitle
       description: container.description
+      shouldSendExposureEventForCWInFeaturedRecommended: container.shouldSendExposureEventForCWInFeaturedRecommended
       totalCount: 0
       offset: m.constants.performance.categoryGridList.initialBlockSize
       validUntil: 0
@@ -1308,6 +1325,8 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
     if type(contents) = "roAssociativeArray"
 
+      isCWSeriesFoundForPlacement = false
+      index = 0
       for each child in container.children
         ' contents[child].valid is "true" or "false" for user categories and is invalid for all other categories.
         ' For all other categories, assume all contents are valid. Valid in this case means, the content is "in window"
@@ -1315,6 +1334,24 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
         if contents[child] <> invalid AND contents[child].valid <> false
           childIsPushable = true
           fullChild = contents[child]
+
+          if container.id = "continue_watching" AND fullChild.type = "s"
+            m.shouldSendExposureEventForCWInFeaturedRecommended = true
+          end if
+
+          rokuContinueWatchingPlacementType =  m.experiments.getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v1").roku_cw_featured_recommended_placement_type
+
+          'For roku_cw_featured_recommended_placement experiment, we will check 12 items of continue_watching row from the homescreen response.
+          'If we find a series, we will insert that child into featured/recommended based on the treatment. But for low spec devices
+          'we don't fetch 12 items in each row when making the initial homescreen request.We fetch 0 contents in each row, it's breaking the logic.
+          'So we are exclude the low spec devices for this experiement.
+          if m.constants.deviceInfo.limitedUi = false AND rokuContinueWatchingPlacementType <> "none"
+            if container.id = "continue_watching" AND fullChild.type = "s" AND m.seriesChildInsert = invalid AND isCWSeriesFoundForPlacement = false
+              m.seriesChildInsert = fullChild
+              isCWSeriesFoundForPlacement = true
+            end if
+          end if
+
           sType = "ContentNode"
           if bFullData = true OR parentGridItemType = m.constants.ui.gridItemTypes.linear
             '//if true then set children to TubiContentNode type so more data is passed to the children
@@ -1407,7 +1444,20 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             jsonAA[childAA.id] = fullChild
           end if
 
-          childrenReturn.push(childAA)
+          'If we are not in roku_cw_featured_recommended_placement experiement or not found series in continue_Watching we will add all the children.
+          'If we are in roku_cw_featured_recommended_placement experiement and series is found in the continue_Watching row, we will add that series
+          'in featured/recommended row firt position and If same series present in those rows, we will not add that original occurance.
+          if m.constants.deviceInfo.limitedUi = false AND (rokuContinueWatchingPlacementType = "roku_cw_in_featured" OR rokuContinueWatchingPlacementType = "roku_cw_in_recommended")
+            if m.seriesChildInsert = invalid
+              childrenReturn.push(childAA)
+            else if (m.seriesChildInsert <> invalid AND m.seriesChildInsert.id <> fullChild.id) OR (m.seriesChildInsert <> invalid AND index = 0)
+              childrenReturn.push(childAA)
+            end if
+          else
+            childrenReturn.push(childAA)
+          end if
+
+          index ++
         end if
       end for
     end if

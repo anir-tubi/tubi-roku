@@ -112,6 +112,14 @@ End Function
 
 
 Function homeBatchResponse(response)
+ 'Will send the exposure event when home screen loaded and continue watching has a series to pin at first position of featured/Recommended row.
+  for i = 0 to response.getChildCount() - 1
+    category = response.getChild(i)
+    if (category.id = m.constants.ui.categoryIds.featured OR category.id = m.constants.ui.categoryIds.recommendedForYou) AND category.shouldSendExposureEventForCWInFeaturedRecommended = true
+      getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v1", true)
+      exit for
+    end if
+  end for
 
   screenID = m.constants.ui.screenIds.homeScreen
   homeScreen = getFromScreenCache(screenID)
