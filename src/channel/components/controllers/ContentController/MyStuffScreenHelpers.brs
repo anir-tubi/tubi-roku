@@ -78,7 +78,7 @@ Function fetchMyStuffCategoryDetails(screen)
   isKidsMode = shouldKidsModeBeSentToServer()
 
   '//Set the categories of the screen. This is static so can be hardcoded
-  content = CreateObject("roSGNode", "CategoryContentNode")
+  content = CreateObject("roSGNode", "ContentNode")
 
   '//Add the Continue Watching container
   contentNode = CreateObject("roSGNode", "CategoryContentNode")
@@ -89,6 +89,19 @@ Function fetchMyStuffCategoryDetails(screen)
   contentNode = CreateObject("roSGNode", "CategoryContentNode")
   contentNode.id = m.constants.ui.categoryIds.queue
   content.appendChild(contentNode)
+
+  if isKidsMode = false
+    '//roku_mylikes_mystuff_v1 - for the duration of the experiment, get a container of liked videos.
+    likeIds = getArrayOfLikedIds()
+    if likeIds.Count() > 0
+      '//Add the Liked IDs as a container
+      contentNode = CreateObject("roSGNode", "ContentNode")
+      contentNode.id = m.constants.ui.categoryIds.myLikes
+      contentNode.categories = likeIds
+      content.appendChild(contentNode)
+    end if
+  end if
+
   isSignedInUser = isLoggedInUser()
 
   batchRequests = m.cmsApi.createMyStuffScreenBatchReqInfo(content, isKidsMode, isSignedInUser)
@@ -109,6 +122,21 @@ Function onMyStuffBatchResponse(response)
   screen = getFromScreenCache(screenID)
   if screen <> invalid
     if response <> invalid
+
+      if response.getChildCount() > 0
+        for i = 0 to response.getChildCount() - 1
+          container = response.getChild(i)
+          if container.id = m.constants.ui.categoryIds.myLikes
+            if getExperimentResource("roku_mylikes_mystuff", "roku_mylikes_mystuff_v1", true).enabled = false
+              '//send exposure event here regardless if enabled/disabled
+              '//remove liked content if disabled. Do it here since there is no way to know if liked video IDs are valid/current before requesting them.
+              response.removeChildIndex(i)
+            end if
+            exit for
+          end if
+        end for
+      end if
+
       nValidUntil = determineValidUntilDurationBasedOnChildren(response)
       response.addField("validUntil", "integer", false)
       response.validUntil = nValidUntil

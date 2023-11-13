@@ -14,6 +14,7 @@ Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
     createRelatedContentReqInfo: cmsApi_createRelatedContentReqInfo
     createUpNextContentReqInfo: cmsApi_createUpNextContentReqInfo
     createSingleContentReqInfo: cmsApi_createSingleContentReqInfo
+    createMultipleContentReqInfo: cmsApi_createMultipleContentReqInfo
     createThumbnailsReqInfo: cmsApi_createThumbnailsReqInfo
     createCategoriesListReqInfo: cmsApi_createCategoriesListReqInfo
     createHomeScreenReqInfo: cmsApi_createHomeScreenReqInfo
@@ -112,6 +113,40 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels=false, bKi
     url: m.constants.urls.cms.singleContent
     options: options
   }
+End Function
+
+
+'''''''''''''''''''''
+' cmsApi_createMultipleContentReqInfo() - Get the Request Info Associated Array that will be used to get the video metadata associated with an array of video IDs
+' @aContentIds, array, An array of video IDs
+' @includeChannels: boolean Should the channel fields be returned as part of the results
+' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
+' @imageParamTypes: Array, An array of strings representing the image type: i.e. ["poster","landscape"]. What image types/sizes should be requested from the backend. If none are passed, then a default set of types will be used.
+Function cmsApi_createMultipleContentReqInfo(aContentIds, includeChannels=false, bKidsMode = false, imageParamTypes = invalid)
+  if aContentIds <> invalid and aContentIds.Count() > 0
+    options = m.getCommonOptions()
+
+    contentIds = aContentIds.join(",")
+    options.params["content_ids"] = contentIds
+    options.params["isKidsMode"] = bKidsMode
+    options.params["includeChannels"] = includeChannels
+    options.params["video_resources"] = m.getVideoResources()
+
+    if imageParamTypes = invalid
+      options.params = m.setTupianLandscapeParam(options.params)
+    else
+      options.params = m.setImageParams(imageParamTypes, options.params)
+    end if
+    capability = formatJson({"content_types" :["se"]})
+    options.headers.append({"x-capability": capability})
+
+    return {
+      url: m.constants.urls.cms.multipleContent
+      options: options
+    }
+  else
+    return invalid
+  end if
 End Function
 
 
@@ -454,36 +489,57 @@ Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSi
   for i = 0 to content.getChildCount() - 1
     category = content.getChild(i)
     if category <> invalid
-      categoryReqInfo = invalid
 
-      if category.state = "partial" OR category.state = "none"
-        categoryId = m.getFullCategoryId(category)
+      if category.id = m.constants.ui.categoryIds.myLikes
+        ' ::TODO::roku_mylikes_mystuff_v1 - this condition may not be necessary after the experiment: i.e. the experiment is not graduated or the backend provides an myLikes endpoint that makes this function unnecessary
+        categoryReqInfo = invalid
+        imageParamTypes = [
+          "poster"
+        ]
+        categoryReqInfo = m.createMultipleContentReqInfo(category.categories, true, bKidsMode, imageParamTypes)
 
-        if isNonEmptyString(categoryId) = true
-          options = {
-            params: {}
-          }
 
-          '// Request both portrait and hero (lanscape) image types.
-          '//   For the landscape image, request the hero type instead of the regular landscape type, because
-          '//   the regular landscape image most likely has the title embedded in the image, and the hero most likely does not.
-          '//   The video titles within the Continue watching container have titles overlaid on top of the thumbnail, so using
-          '//   a thumbnail w/o a tile would look better in this case.
-          imageParamTypes = [
-            "poster"
-            "hero"
-          ]
-
-          categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, imageParamTypes)
-          categoryReqInfo.requestType = reqName
+        if categoryReqInfo <> invalid then
+          categoryReqInfo.categoryId = category.id
+          categoryReqInfo.requestType = m.constants.reqNames.getMultipleContent
           categoryReqInfo.responseType = "node"
-          categoryReqInfo.isSignedInUser = isSignedInUser
-        end if
-      end if
+          categoryReqInfo.isSignedInUser = isSignedInUser          
 
-      if categoryReqInfo <> invalid then
-        requests.push(categoryReqInfo)
-        category.state = "loading"
+          requests.push(categoryReqInfo)
+        end if
+
+      else
+        categoryReqInfo = invalid
+
+        if category.state = "partial" OR category.state = "none"
+          categoryId = m.getFullCategoryId(category)
+
+          if isNonEmptyString(categoryId) = true
+            options = {
+              params: {}
+            }
+
+            '// Request both portrait and hero (landscape) image types.
+            '//   For the landscape image, request the hero type instead of the regular landscape type, because
+            '//   the regular landscape image most likely has the title embedded in the image, and the hero most likely does not.
+            '//   The video titles within the Continue watching container have titles overlaid on top of the thumbnail, so using
+            '//   a thumbnail w/o a tile would look better in this case.
+            imageParamTypes = [
+              "poster"
+              "hero"
+            ]
+
+            categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, imageParamTypes)
+            categoryReqInfo.requestType = reqName
+            categoryReqInfo.responseType = "node"
+            categoryReqInfo.isSignedInUser = isSignedInUser
+          end if
+        end if
+
+        if categoryReqInfo <> invalid then
+          requests.push(categoryReqInfo)
+          category.state = "loading"
+        end if
       end if
     end if
   end for

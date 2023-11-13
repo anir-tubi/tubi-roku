@@ -251,6 +251,7 @@ Function getConstants()
     constants.reqNames.getCategory = "getCategory"
     constants.reqNames.getMyStuffContainers = "getMyStuffContainers"
     constants.reqNames.getSingleContent = "getSingleContent"
+    constants.reqNames.getMultipleContent = "getMultipleContent"
     constants.reqNames.getUpNextContent = "getUpNextContent"
     constants.reqNames.getRelatedContent = "getRelatedContent"
     constants.reqNames.getThumbnails = "getThumbnails"
@@ -464,6 +465,7 @@ Function getConstants()
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
         constants.urls.cms.urlBase = "https://uapi.staging-public.tubi.io/cms"
       end if
+      constants.urls.cms.multipleContent = constants.urls.cms.urlBase + "/contents"
       constants.urls.cms.singleContent = constants.urls.cms.urlBase + "/content"
       constants.urls.cms.relatedContent = constants.urls.cms.urlBase + "/content" ' + content_id + "/related"
       constants.urls.cms.thumbnails = constants.urls.cms.urlBase + "/content" ' + content_id + "/thumbnail_sprites"
@@ -985,6 +987,7 @@ Function getConstants()
       constants.ui.categoryIds.history = "continue_watching"
       constants.ui.categoryIds.queue = "queue"
       constants.ui.categoryIds.featured = "featured"
+      constants.ui.categoryIds.myLikes = "my_likes"
       constants.ui.categoryIds.recommendedForYou = "recommended_for_you"
       constants.ui.categoryIds.fifawc = "fifa_world_cup_2022_matches"
       constants.ui.categoryIds.upcomings = "fifa_world_cup_upcoming_matches"

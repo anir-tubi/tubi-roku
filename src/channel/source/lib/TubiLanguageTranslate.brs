@@ -1215,6 +1215,10 @@ Function getTranslation_en_US()
       "description": "For an empty continueWatching container, this is the title that is display in the InfoPanel when the empty container is in focus",
       "message": "Continue Watching"
     },
+    "metadata_myStuff_myLikes_title": {
+      "description": "The title of the My Likes container.",
+      "message": "My Likes"
+    },
     "metadata_myStuff_empty_myListInfoPanel_description": {
       "description": "For an empty myList container, this is the description/subtitle that is display in the InfoPanel when the empty container is in focus",
       "message": "Watch what you saved for later"

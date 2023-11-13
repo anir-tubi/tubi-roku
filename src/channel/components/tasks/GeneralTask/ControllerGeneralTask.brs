@@ -85,6 +85,13 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
   }
 
+  ' multiple content
+  m.requestTypes[m.constants.reqNames.getMultipleContent] = {
+    parseSuccess: parseMultipleContentSuccess
+    parseError: parseGenericError
+  }
+
+
   ' related content
   m.requestTypes[m.constants.reqNames.getRelatedContent] = {
     parseSuccess: parseDetailScreenRelatedContentSuccess

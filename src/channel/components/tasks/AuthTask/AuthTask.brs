@@ -191,7 +191,7 @@ Function getInitialUserCategories(Bookmarks, getHistory=true, getBookmarks=false
                 userCategories.newLikes.appendChildren(userLikes.content.getChildren(-1, 0))
               end if
             else
-                userCategories.newLikes = userLikes.content
+              userCategories.newLikes = userLikes.content
             end if
           end if
 

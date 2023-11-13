@@ -197,13 +197,31 @@ Function onContentUpdateChange(msg) As Void
     nContainers = content.getChildCount()
     if nContainers > 0
       m.isAllContentEmpty = true
+      nMyLikesContainerIndex = -1
       for i = 0 to nContainers - 1
         container = content.getChild(i)
         if container.gridItemType <> m.constants.ui.gridItemTypes.emptyContainer
-          m.isAllContentEmpty = false
-          exit for
+          if container.id = m.constants.ui.categoryIds.myLikes
+            if container.getChildCount() > 0
+              '//::TODO::roku_mylikes_mystuff_v1 - for the experiment, we are using a multiple content ID endpoint request. Post experiment, it would be nice to have the backend provide a container for liked videos so we can make the same endpoint request as the other 2 containers.
+              
+              container.title = getTranslation("metadata_myStuff_myLikes_title")
+              m.isAllContentEmpty = false
+            else
+              '//My Likes container is empty
+              nMyLikesContainerIndex = i
+            end if
+          else
+            m.isAllContentEmpty = false
+          end if
+          ' exit for
         end if
       end for
+
+      if nMyLikesContainerIndex >= 0
+        '//Remove the MyLikes Container if no video titles are in the container
+        m.top.content.removeChild(nMyLikesContainerIndex)
+      end if
 
       if m.isAllContentEmpty = false
         m.AllEmptyUI.visible = false
@@ -242,16 +260,16 @@ Function setRowHeights()
       rowHeightAdjustment = m.constants.ui.imageSizes.emptyContainer[1] - m.constants.ui.imageSizes.landscape[1]
       rowItemSize.push(m.constants.ui.imageSizes.emptyContainer)
       rowHeight = m.constants.ui.imageSizes.emptyContainer[1]
-    else if gridItemType = gridItemTypes.portrait
-      posterWidth = m.constants.ui.imageSizes.poster[0]
-      posterHeight = m.constants.ui.imageSizes.poster[1]
-      rowHeightAdjustment = 80
-      rowItemSize.push([posterWidth, posterHeight])
-      rowHeight = posterHeight
     else if gridItemType = gridItemTypes.landscapeInnerMetadata
       posterWidth = m.constants.ui.imageSizes.landscape[0]
       posterHeight = m.constants.ui.imageSizes.landscape[1]
       rowHeightAdjustment = 50
+      rowItemSize.push([posterWidth, posterHeight])
+      rowHeight = posterHeight
+    else
+      posterWidth = m.constants.ui.imageSizes.poster[0]
+      posterHeight = m.constants.ui.imageSizes.poster[1]
+      rowHeightAdjustment = 80
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
     end if
