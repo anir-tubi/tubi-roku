@@ -1935,7 +1935,9 @@ End Function
 
 
 Function setCCAudioTransportBarVisibility()
-  m.closedCaptionAudioButton.visible = m.Video.availableAudioTracks.Count() > 1 OR m.Video.availableSubtitleTracks.Count() > 0
+  isCCOrAudioAvailable = m.Video.availableAudioTracks.Count() > 1 OR m.Video.availableSubtitleTracks.Count() > 0
+  m.closedCaptionAudioButton.visible = (isCCOrAudioAvailable = true)
+  m.closedCaptionAudioButton.enabled = (isCCOrAudioAvailable = true)
 End Function
 
 

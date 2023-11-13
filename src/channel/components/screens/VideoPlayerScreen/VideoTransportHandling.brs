@@ -48,7 +48,9 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
             end if
             sendPauseAdPixel(m.constants.pauseAd.pixelTypes.notUsedPixel, action)
           end if
-          showClosedCaptionAudioTrackOverlay()
+          if m.Video.availableAudioTracks.Count() > 1 OR m.Video.availableSubtitleTracks.Count() > 0
+            showClosedCaptionAudioTrackOverlay()
+          end if
         end if
 
       else if key = "left" AND m.relatedRowFocused = false
