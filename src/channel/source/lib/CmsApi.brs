@@ -277,7 +277,6 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   options.headers = headers
 
   return {
-    id: categoryId
     url: url
     options: options
   }
@@ -432,7 +431,6 @@ Function cmsApi_createHomeScreenBatchRequestInfo(homeScreen, index, bKidsMode = 
   end if
 
   return requests
-
 End Function
 
 

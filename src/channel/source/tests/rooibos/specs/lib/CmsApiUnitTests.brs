@@ -477,7 +477,7 @@ Function cmsApi_createCategoryReqInfo_test()
   }
   categoryInfo = m.cmsApi.createCategoryReqInfo("my_category", false, passedOptions)
 
-  m.assertEqual(categoryInfo.count(), 3)
+  m.assertEqual(categoryInfo.count(), 2)
   m.assertAAHasKeys(categoryInfo, infoKeys)
   m.assertEqual(categoryInfo.url, categoryUrl)
   m.assertAAHasKeys(categoryInfo.options.params, params)
@@ -499,7 +499,7 @@ Function cmsApi_createCategoryReqInfo_test()
   categoryOptions.params["is_kids_mode"] = true
   categoryInfo = m.cmsApi.createCategoryReqInfo("my_category", true, passedOptions)
 
-  m.assertEqual(categoryInfo.count(), 3)
+  m.assertEqual(categoryInfo.count(), 2)
   m.assertAAHasKeys(categoryInfo, infoKeys)
   m.assertEqual(categoryInfo.url, categoryUrl)
   m.assertAAHasKeys(categoryInfo.options.params, params)
@@ -523,7 +523,7 @@ Function cmsApi_createCategoryReqInfo_test()
   passedOptions.params.contentMode = m.cmsApi.constants.ui.contentMode.latino
   categoryInfo = m.cmsApi.createCategoryReqInfo("my_category", false, passedOptions)
 
-  m.assertEqual(categoryInfo.count(), 3)
+  m.assertEqual(categoryInfo.count(), 2)
   m.assertAAHasKeys(categoryInfo, infoKeys)
   m.assertEqual(categoryInfo.url, categoryUrl)
   m.assertAAHasKeys(categoryInfo.options.params, params)
@@ -574,7 +574,7 @@ Function cmsApi_createCategoryReqInfo_test()
 
   categoryInfo = m.cmsApi.createCategoryReqInfo("my_category", false, passedOptions)
 
-  m.assertEqual(categoryInfo.count(), 3)
+  m.assertEqual(categoryInfo.count(), 2)
   m.assertAAHasKeys(categoryInfo, infoKeys)
   m.assertEqual(categoryInfo.url, categoryUrl)
   m.assertEqual(categoryInfo.options.params["app_id"], lazyCategoryOptions.params["app_id"])

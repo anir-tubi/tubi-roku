@@ -223,7 +223,9 @@ End Function
 '   responseType: String, type of the response data, corresponds to a valid roSGNode field type (eg. "node"/"assocarray"/"string"/"boolean" etc)
 '   silenceCallbackWarnings: boolean, if no callbacks are provided, prevents warning logs to the console
 '                            Use for 'fire and forget' requests like analytics, etc.
-'   requests: Array of requests to be made. For list of fields expected look at generalTask_makeRequest @reqInfo documentation
+'   requests: Array of requests to be made. For list of fields expected look at generalTask_makeRequest @reqInfo documentation.
+'             If the responseType for the batch is AA. "id" keys should be added to each request, as
+'             each key in the batch response AA will be the request id, and the associated value will be the request's response.
 '
 ' returns the final submitted batchInfo or invalid if something went wrong
 Function generalTask_makeBatchRequest(batchInfo = {})
@@ -241,21 +243,27 @@ Function generalTask_makeBatchRequest(batchInfo = {})
     return invalid
   end if
 
+  deviceInfo = createObject("roDeviceInfo")
+
   ' Going in reverse order to avoid index getting off if we have to remove a request
   for i = requests.count() - 1 to 0 step -1
     request = requests[i]
     request.silenceCallbackWarnings = true
 
     ' If verification fails go ahead and kick it out
-    if m.verifyRequestInfo(requests[i]) = false then
+    if m.verifyRequestInfo(request) = false then
       requests.delete(i)
     else
       ' Else add in the default values
-      requests[i] = m.addDefaultRequestValues(requests[i])
+      if request.id = invalid
+        request.id = deviceInfo.getRandomUUID()
+      end if
+
+      requests[i] = m.addDefaultRequestValues(request)
     end if
   end for
 
-  batchInfo.id = createObject("roDeviceInfo").getRandomUUID()
+  batchInfo.id = deviceInfo.getRandomUUID()
 
   callbackNode = m.constructBatchCallbackNode(batchInfo)
   batchInfo.callbackNode = callbackNode
