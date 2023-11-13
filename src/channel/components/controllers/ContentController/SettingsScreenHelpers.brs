@@ -55,7 +55,7 @@ Function setSettingsScreenSignInInfo()
     if authInfo <> invalid
       aaSignIn.signedIn = true
       aaSignIn.email = authInfo.email
-      if authInfo.firstName <> "" AND authInfo.lastName <> ""
+      if isNonEmptyString(authInfo.firstName) = true AND isNonEmptyString(authInfo.lastName) = true
         sName = authInfo.firstName + " " + authInfo.lastName
       else
         sName = authInfo.name

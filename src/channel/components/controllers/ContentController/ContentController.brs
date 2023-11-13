@@ -2422,6 +2422,14 @@ Function onGetUserInfoSuccess(userInfo)
       Auth.setAuthInfo("hasAge", userInfo.has_age)
     end if
 
+    ' Email value is missing in the authinfo updating the value.
+    ' Since when we exchange token the response does not contain email it just contains token and user id where as in regular sign in we do have email.
+    ' Below logic updates the global auth info to add email.
+    authInfo = m.global.authInfo
+    if isNonEmptyString(authInfo.email) = false AND userInfo.email <> invalid
+      authInfo.email = userInfo.email
+      m.global.authInfo = authInfo
+    end if
   end if
   startUserExperience()
 End Function
