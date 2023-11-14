@@ -112,18 +112,27 @@ End Function
 
 
 Function homeBatchResponse(response)
- 'Will send the exposure event when home screen loaded and continue watching has a series to pin at first position of featured/Recommended row.
-  for i = 0 to response.getChildCount() - 1
-    category = response.getChild(i)
-    if (category.id = m.constants.ui.categoryIds.featured OR category.id = m.constants.ui.categoryIds.recommendedForYou) AND category.shouldSendExposureEventForCWInFeaturedRecommended = true
-      getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v1", true)
-      exit for
-    end if
-  end for
+ screenID = m.constants.ui.screenIds.homeScreen
+ homeScreen = getFromScreenCache(screenID)
+ continueWatchingPlacementType = getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v1", false).roku_cw_featured_recommended_placement_type
 
-  screenID = m.constants.ui.screenIds.homeScreen
-  homeScreen = getFromScreenCache(screenID)
-  if homeScreen <> invalid
+ if homeScreen <> invalid
+    for i = 0 to response.getChildCount() - 1
+      category = response.getChild(i)
+      if (continueWatchingPlacementType = "roku_cw_in_featured" AND category.id = m.constants.ui.categoryIds.featured) OR (continueWatchingPlacementType = "roku_cw_in_recommended" AND category.id = m.constants.ui.categoryIds.recommendedForYou)
+        m.featuredOrRecommendedContainerReceived = true
+        focusedContent = homeScreen.contentFocused
+        setVideoPreviewAfterFocus(focusedContent, homeScreen.trackingPageInfo)
+      end if
+
+      'Will send the exposure event when home screen loaded and continue watching has a series to pin at first position of featured/Recommended row.
+      if (category.id = m.constants.ui.categoryIds.featured OR category.id = m.constants.ui.categoryIds.recommendedForYou) AND category.shouldSendExposureEventForCWInFeaturedRecommended = true
+        getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v1", true)
+        exit for
+      end if
+
+    end for
+
     homeScreen.batchResponse = response
   end if
 
@@ -762,7 +771,11 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
       end if
     end if
     
-    setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo)
+    continueWatchingPlacementType = getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v1", false).roku_cw_featured_recommended_placement_type
+
+    if continueWatchingPlacementType = "none" OR m.featuredOrRecommendedContainerReceived = true
+      setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo)
+    end if
 
     if bStopCountdownTimer = true
       stopCountdownTimer()

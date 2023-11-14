@@ -829,6 +829,10 @@ Function onItemToBeFocusedChange()
     updateRowFocusedForViewMore(m.CategoryGridList.rowFocused)
   end if
 
+  'We are updating the infopanel for updated focused content, but not updating the contentFocused.
+  'Here we are updating the contentFocused, so it will play correct video preview when the content is updated.
+  m.top.contentFocused = m.CategoryGridList.reloadedItemToBeFocused
+
   populateInfoPanelByContent(m.CategoryGridList.reloadedItemToBeFocused)
 End Function
 
