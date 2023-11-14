@@ -1072,7 +1072,7 @@ Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson
   categoryParent = m.buildCategoryParentInfo(container, contentMode, sOrientation)
 
   gridItemType = m.getGridItemType(container, sOrientation, m.constants)
-  categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData, isSignedInUser)
+  categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData, isSignedInUser, contentMode)
 
   categoryParent.children = categoryChildrenInfo.children
   categoryParent.json = categoryChildrenInfo.contentsJson
@@ -1188,6 +1188,11 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, co
           movieAndTVShowCount: getTranslation("screenHome_item_viewMore_description", {"totalCount": movieAndTVShowCount})
         }
       end if
+    end if
+
+    'This is to avoid pin the series in CW to the featured/recommended row for movies/tv tab.
+    if m.seriesChildInsert <> invalid AND isNonEmptyString(contentMode) = true AND (contentMode = m.constants.ui.contentMode.movie OR contentMode = m.constants.ui.contentMode.tv)
+      m.seriesChildInsert = invalid
     end if
 
     continueWatchingPlacementType = m.experiments.getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v1").roku_cw_featured_recommended_placement_type
@@ -1310,7 +1315,8 @@ End Function
 ' @returns: assocArray, an AA with keys:
 '                       "children", as an array of AAs containing content metadata
 '                       "contentsJson", a JSON formatted string of contents belonging to the container/category
-Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, contentsJson, parentGridItemType, bFullData, isSignedInUser = false)
+' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode and will be removed after the experiment graduates.
+Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, contentsJson, parentGridItemType, bFullData, isSignedInUser = false, contentMode = "homeScreen")
   childrenReturn = CreateObject("roArray", 0, false)
 
   if type(container) = "roAssociativeArray" AND type(container.children) = "roArray"
@@ -1345,7 +1351,7 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           'If we find a series, we will insert that child into featured/recommended based on the treatment. But for low spec devices
           'we don't fetch 12 items in each row when making the initial homescreen request.We fetch 0 contents in each row, it's breaking the logic.
           'So we are exclude the low spec devices for this experiement.
-          if m.constants.deviceInfo.limitedUi = false AND rokuContinueWatchingPlacementType <> "none"
+          if m.constants.deviceInfo.limitedUi = false AND rokuContinueWatchingPlacementType <> "none" AND (contentMode <> m.constants.ui.contentMode.movie AND contentMode <> m.constants.ui.contentMode.tv)
             if container.id = "continue_watching" AND fullChild.type = "s" AND m.seriesChildInsert = invalid AND isCWSeriesFoundForPlacement = false
               m.seriesChildInsert = fullChild
               isCWSeriesFoundForPlacement = true
