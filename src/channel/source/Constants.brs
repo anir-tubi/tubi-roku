@@ -1251,10 +1251,8 @@ Function getConstants()
       constants.ui.homeScreenTopNavIds.tournament = "tournament"
 
     constants.ui.linearSideNavIds = {}
-      constants.ui.linearSideNavIds.cc = "cc"
       constants.ui.linearSideNavIds.epg = "epg"
       constants.ui.linearSideNavIds.subtitles = "subtitles"
-      constants.ui.linearSideNavIds.back = "back"
 
     'a map of screenIds to corresponding sideNavIds
     constants.ui.screenIdToSideNavId = {}

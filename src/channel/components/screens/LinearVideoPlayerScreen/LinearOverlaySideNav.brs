@@ -47,7 +47,7 @@ Function onSideNavFocusChange()
     '//Closed Caption button in focus
     focusSideNavButton(m.btnCC.id)
     unFocusSideNavButton(m.btnBack.id)
-    m.top.focusedButtonID = m.constants.ui.linearSideNavIds.cc
+    m.top.focusedButtonID = m.constants.ui.linearSideNavIds.subtitles
   else if m.sideNav.buttonFocused = 1
     '//Back to Guide button in focus
     unFocusSideNavButton(m.btnCC.id)
@@ -59,7 +59,7 @@ End Function
 
 ' The outside tells this component which side nav item to focus
 Function onSideNavToFocusChange()
-  if m.top.buttonToFocusID = m.constants.ui.linearSideNavIds.cc
+  if m.top.buttonToFocusID = m.constants.ui.linearSideNavIds.subtitles
     m.sideNav.focusButton = 0
   else if m.top.buttonToFocusID = m.constants.ui.linearSideNavIds.epg
     m.sideNav.focusButton = 1
@@ -69,7 +69,7 @@ End Function
 
 Function onSideNavSelectChange()
   if m.sideNav.buttonFocused = 0
-    m.top.selectedButtonID = m.constants.ui.linearSideNavIds.cc
+    m.top.selectedButtonID = m.constants.ui.linearSideNavIds.subtitles
   else if m.sideNav.buttonFocused = 1
     m.top.selectedButtonID = m.constants.ui.linearSideNavIds.epg
   end if

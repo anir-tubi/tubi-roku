@@ -112,12 +112,12 @@ Function onSideNavSelectChange()
   tubilog("LinearVideoPlayerScreenOverlay.onSideNavSelectChange")
   userInteraction = "CONFIRM"
   selectedLinearSideNavId = ""
-  if m.sideNav.selectedButtonID = m.constants.ui.linearSideNavIds.cc
+  if m.sideNav.selectedButtonID = m.constants.ui.linearSideNavIds.subtitles
     selectedLinearSideNavId = m.constants.ui.linearSideNavIds.subtitles
     setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, selectedLinearSideNavId)
     displayClosedCaptioningMenu()
   else if m.sideNav.selectedButtonID = m.constants.ui.linearSideNavIds.epg
-    selectedLinearSideNavId = m.constants.ui.linearSideNavIds.back
+    selectedLinearSideNavId = m.constants.ui.linearSideNavIds.epg
     setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, selectedLinearSideNavId)
     hideOverlay()
     m.top.navigateToEPGScreen = true
@@ -403,12 +403,11 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         m.sideNav.setOpenState = "openedAndInFocus"
         m.sideNav.buttonToFocusID = m.constants.ui.linearSideNavIds.epg
         userInteraction = "TOGGLE_ON"
-        selectedLinearSideNavId = getAnalyticsIdFromFocusedSideNavItem()
-        setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, selectedLinearSideNavId)
+        setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, m.sideNav.focusedButtonID)
         bKeyReacted = true
       else if m.closedCaptioningGroup.isInFocusChain() = true
         m.sideNav.setOpenState = "openedAndInFocus"
-        m.sideNav.buttonToFocusID = m.constants.ui.linearSideNavIds.cc
+        m.sideNav.buttonToFocusID = m.constants.ui.linearSideNavIds.subtitles
         hideClosedCaptioningMenu() '//Hide the CC menu and display EPG again
         slideTo(m.EPGHorizontalSlide, m.slideOutEPGTranslation, m.top.animationDuration)
         bKeyReacted = true
@@ -416,8 +415,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
     else if key = "right"
       if m.bEPGVisible = true AND m.EPG.isInFocusChain() = false
         userInteraction = "TOGGLE_OFF"
-        selectedLinearSideNavId = getAnalyticsIdFromFocusedSideNavItem()
-        setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, selectedLinearSideNavId)
+        setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, m.sideNav.focusedButtonID)
         goBackToEPGFromSideNav()
         bKeyReacted = true
       else if m.bEPGVisible = false AND m.closedCaptioningGroup.isInFocusChain() = false
@@ -428,7 +426,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
     else if key = "back"
       if m.closedCaptioningGroup.isInFocusChain() = true
         m.sideNav.setOpenState = "openedAndInFocus"
-        m.sideNav.buttonToFocusID = m.constants.ui.linearSideNavIds.cc
+        m.sideNav.buttonToFocusID = m.constants.ui.linearSideNavIds.subtitles
         hideClosedCaptioningMenu() '//Hide the CC menu and display EPG again
         bKeyReacted = true
       else if m.EPG.isInFocusChain() = false
@@ -454,7 +452,7 @@ Function setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, 
   componentValues = {}
   if sideNavItemId <> invalid
     componentValues = {
-        left_nav_section: m.Tracking.sideNavPageMap[sideNavItemId]
+        left_nav_section: m.Tracking.linearSideNavPageMap[sideNavItemId]
       }
   end if
   pageValues =  {video_id: m.top.currentLinearVideoContent.id.toInt()}
@@ -468,13 +466,3 @@ Function setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, 
   m.EPG.componentInteractionInfo = componentInteractionInfo
 End Function
 
-
-Function getAnalyticsIdFromFocusedSideNavItem()
-  selectedLinearSideNavId = ""
-  if m.sideNav.focusedButtonID = m.constants.ui.linearSideNavIds.cc
-    selectedLinearSideNavId = m.constants.ui.linearSideNavIds.subtitles
-  else if m.sideNav.focusedButtonID = m.constants.ui.linearSideNavIds.epg
-    selectedLinearSideNavId = m.constants.ui.linearSideNavIds.back
-  end if
-  return selectedLinearSideNavId
-End Function

@@ -36,6 +36,9 @@ Function TubiTracking(constants, request, auth, userConsentsOptOutStatus = {})
     ' an AA map of page ids to their corresponding enum values for the LeftSideNavComponent Section
     sideNavPageMap: tubiTracking_getSideNavPageMap(constants)
 
+    ' an AA map of tab ids to their corresponding enum values for the Linear LeftSideNavComponent Section
+    linearSideNavPageMap: tubiTracking_getLinearSideNavPageMap(constants)
+
     ' an AA map of page ids to their corresponding enum values for the TopNavComponent Section
     topNavPageMap: tubiTracking_getTopNavPageMap(constants)
 
@@ -78,6 +81,9 @@ Function TubiTrackingInfo(constants)
 
     ' an AA map of page ids to their corresponding enum values for the LeftSideNavComponent Section
     sideNavPageMap: tubiTracking_getSideNavPageMap(constants)
+
+    ' an AA map of tab ids to their corresponding enum values for the Linear LeftSideNavComponent Section
+    linearSideNavPageMap: tubiTracking_getLinearSideNavPageMap(constants)
 
     ' an AA map of Menu items in the details screen to their corresponding enum values for the LeftSideNavComponent Section
     detailScreenMenuItemMap: tubiTracking_getDetailScreenMenuPageMap(constants)
@@ -1085,10 +1091,18 @@ Function tubiTracking_getSideNavPageMap(constants)
     if sideNavIds.exit <> invalid then map[sideNavIds.exit] = "EXIT"
     if sideNavIds.kidsMode <> invalid then map[sideNavIds.kidsMode] = "KIDS"
     if sideNavIds.profile <> invalid then map[sideNavIds.profile] = "ACCOUNT"
-    if sideNavIds.linearEPG <> invalid then map[sideNavIds.linearEPG] = "LINEAR"
-    if sideNavIds.subtitles <> invalid then map[sideNavIds.subtitles] = "SUBTITLES"
-    if sideNavIds.back <> invalid then map[sideNavIds.back] = "BACK"
     if sideNavIds.tournament <> invalid then map[sideNavIds.tournament] = "SPORTS"
+  end if
+  return map
+End Function
+
+
+Function tubiTracking_getLinearSideNavPageMap(constants)
+  map = {}
+  if constants <> invalid AND constants.ui <> invalid AND constants.ui.sideNavIds <> invalid
+    sideNavIds = constants.ui.linearSideNavIds
+    if sideNavIds.subtitles <> invalid then map[sideNavIds.subtitles] = "SUBTITLES"
+    if sideNavIds.epg <> invalid then map[sideNavIds.epg] = "BACK"
   end if
   return map
 End Function
