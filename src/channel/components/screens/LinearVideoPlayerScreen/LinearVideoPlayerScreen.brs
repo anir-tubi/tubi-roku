@@ -85,6 +85,7 @@ Function setupOverlay()
   m.VideoOverlay.observeField("isDisplaying", "onVideoOverlayIsDisplayingChanged")
   m.VideoOverlay.observeField("linearChannelToPlayUpdated", "onChannelSelectedToPlayChanged")
   m.VideoOverlay.observeField("okPressed", "onOKPressed")
+  m.VideoOverlay.observeField("epgTrackingComponentInfo", "oneEPGTrackingComponentInfoChange")
 End Function
 
 
@@ -984,4 +985,9 @@ Function setVideoplayerLoadingScreenBackGround(set = true)
     m.backgroundImage.animationControl = "stop"
   end if
 
+End Function
+
+
+Function oneEPGTrackingComponentInfoChange(msg)
+  m.top.trackingComponentInfo = msg.getData()
 End Function

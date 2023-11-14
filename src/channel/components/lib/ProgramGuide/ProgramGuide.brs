@@ -100,6 +100,11 @@ Function programGridContentFocused(channelItem, itemPosition)
     if m.playOnFocusMode = true OR m.top.linearChannelToPlay = invalid 'anytime linearChannelToPlay is invalid, assign focused channel to play?
 
       if channel <> invalid AND channel.videoResources <> invalid
+        epgTrackingComponentInfo = getEPGTrackingComponentInfo(itemPosition)
+        m.top.epgTrackingComponentInfo = {
+          componentType : "epg_component"
+          componentValues : epgTrackingComponentInfo
+        }
         m.top.linearChannelToPlay = channel
         m.top.linearChannelToPlayUpdated = true
       end if
@@ -428,6 +433,11 @@ Function onChannelsGridContentFocused(msg)
 
     if m.playOnFocusMode = true OR m.top.linearChannelToPlay = invalid  'even when user is on channel logo, play the channel because otherwise whats playing does not match whats on EPG Overlay
       if channel <> invalid AND channel.videoResources <> invalid AND m.canChannelBeFocused = true
+        epgTrackingComponentInfo = getEPGTrackingComponentInfo(itemPosition)
+        m.top.epgTrackingComponentInfo = {
+          componentType : "epg_component"
+          componentValues : epgTrackingComponentInfo
+        }
         m.top.linearChannelToPlay = channel
         m.top.linearChannelToPlayUpdated = true
       end if
@@ -493,19 +503,7 @@ Function sendNavigationWithinPageEvent(rowItemFocused)
 
   if doesSendEvent(m.lastItemFocused, rowItemFocused) = true
 
-    previousItemFocused = invalid
-
-    categorySlug = ""
-    channelNode = m.programGrid.content.getChild(m.lastItemFocused[0])
-    if channelNode <> invalid
-      previousItemFocused = channelNode.getchild(m.lastItemFocused[1])
-      categorySlug = channelNode.parentId
-    end if
-
-    lastItemFocusedCol = m.lastItemFocused[1] + 1
-    lastItemFocusedRow = m.lastItemFocused[0] + 1
-
-    contentTile = m.Tracking.getAnalyticsTile(previousItemFocused, lastItemFocusedCol, lastItemFocusedRow)
+    componentValues = getEPGTrackingComponentInfo(m.lastItemFocused)
 
     if rowItemFocused[0] >= 0
       row = rowItemFocused[0] + 1
@@ -531,11 +529,6 @@ Function sendNavigationWithinPageEvent(rowItemFocused)
       pageValues = m.top.trackingPageInfo.pageValues
     end if
 
-    componentValues = {
-      content_tile: contentTile
-      category_slug: categorySlug
-    }
-
     navigateWithinPageInfo = {
       pageOneof: m.Tracking.getAnalyticsPage(pageType, pageValues)
       componentOneof: m.Tracking.getAnalyticsComponent("epg_component", componentValues)
@@ -547,4 +540,32 @@ Function sendNavigationWithinPageEvent(rowItemFocused)
 
   end if
 
+End Function
+
+
+Function getEPGTrackingComponentInfo(itemFocused)
+  componentValues = {}
+
+  if m.programGrid.content <> invalid AND itemFocused.count() = 2
+    categorySlug = ""
+    program = invalid
+
+    channelNode = m.programGrid.content.getChild(itemFocused[0])
+    if channelNode <> invalid
+      program = channelNode.getchild(itemFocused[1])
+      categorySlug = channelNode.parentId
+    end if
+
+    itemFocusedCol = itemFocused[1] + 1
+    itemFocusedRow = itemFocused[0] + 1
+
+    contentTile = m.Tracking.getAnalyticsTile(program, itemFocusedCol, itemFocusedRow)
+
+    componentValues = {
+      content_tile: contentTile
+      category_slug: categorySlug
+    }
+  end if
+
+  return componentValues
 End Function

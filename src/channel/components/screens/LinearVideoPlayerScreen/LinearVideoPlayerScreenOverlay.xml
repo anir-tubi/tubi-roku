@@ -82,6 +82,23 @@
 
       <field id="jumpToChannelItem" alias="EPG.jumpToChannelItem" />
 
+      <!-- Keeps the information used for user tracking - structure looks like:
+      {
+        "componentType": "epg_component"
+        "componentValues": {
+          "epg_component": {
+            "category_slug": "recently_added_channels",
+            "content_tile": {
+              "col": 2,
+              "row": 8,
+              "video_id": 400000026
+            }
+          }
+        }
+      }
+      -->
+      <field id="epgTrackingComponentInfo" alias="EPG.epgTrackingComponentInfo" />
+
   </interface>
 
   <children>
