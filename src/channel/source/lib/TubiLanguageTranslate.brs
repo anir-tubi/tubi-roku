@@ -3660,11 +3660,11 @@ Function getTranslation_fr_CA()
     },
     "screenHome_item_viewMore": {
       "description": "The text to display on View More movies / shows",
-      "message": "View More {containerTitle}"
+      "message": "Tout voir {containerTitle}"
     },
     "screenHome_item_viewMore_description": {
       "description": "The text to display total count on View More movies / shows",
-      "message": "{totalCount}+ titles, updated weekly."
+      "message": "{totalCount}+ titres, mis à jour chaque semaine."
     },
     "loadingIndicator": {
       "description": "When something is loading, this text appears so the user knows something is loading.",
@@ -4108,7 +4108,7 @@ Function getTranslation_fr_CA()
     },
     "screenSettings_menu_autoplayPreview": {
       "description": "The label for the autoplay preview",
-      "message": "Prévisualisations en lecture automatique"
+      "message": "Aperçus automatiques"
     },
     "screenSettings_parentalControls_group_LittleKids": {
       "description": "Little Kids of the parental controls",
@@ -4926,7 +4926,7 @@ Function getTranslation_fr_CA()
     },
     "registration_signIn_to_play_R_rated": {
       "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
-      "message": "This title requires sign in to protect younger audiences."
+      "message": "Ce titre nécessite vous connecter pour protéger un public plus jeune. Aucune carte de crédit requise."
     },
     "text_new": {
       "description": "simple text to use anywhere to indicate item is new",
