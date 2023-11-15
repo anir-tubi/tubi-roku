@@ -129,7 +129,12 @@ Function programGridContentFocused(channelItem, itemPosition)
     end if
 
     ' send NavigationwithinPageEvent when user focuses on tiles on programGrid
-    col = itemPosition[1] + 1 ' channelGrid column always = 0, programGrid column starts with = 1
+    if m.favoritesExp = true
+      col = itemPosition[1] + 1 ' channelGrid column always = 0, programGrid column starts with = 1
+    else
+      col = itemPosition[1]
+    end if
+
     naviPosition = [itemPosition[0], col]
     sendNavigationWithinPageEvent(naviPosition)
 
