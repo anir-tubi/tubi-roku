@@ -214,7 +214,7 @@
                 opacity="0.8"
                 numLines="1"
                 wrap="false"
-                translation="[0,3]"
+                translation="[0,1]"
                 horizAlign="center"
                 vertAlign="center">
                 <Font
