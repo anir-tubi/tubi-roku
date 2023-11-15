@@ -114,6 +114,8 @@ End Function
 Function homeBatchResponse(response)
  screenID = m.constants.ui.screenIds.homeScreen
  homeScreen = getFromScreenCache(screenID)
+ currentScreen = getCurrentScreen()
+
  continueWatchingPlacementType = getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v1", false).roku_cw_featured_recommended_placement_type
 
  if homeScreen <> invalid
@@ -121,8 +123,10 @@ Function homeBatchResponse(response)
       category = response.getChild(i)
       if (continueWatchingPlacementType = "roku_cw_in_featured" AND category.id = m.constants.ui.categoryIds.featured) OR (continueWatchingPlacementType = "roku_cw_in_recommended" AND category.id = m.constants.ui.categoryIds.recommendedForYou)
         m.featuredOrRecommendedContainerReceived = true
-        focusedContent = homeScreen.contentFocused
-        setVideoPreviewAfterFocus(focusedContent, homeScreen.trackingPageInfo)
+        if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
+          focusedContent = homeScreen.contentFocused
+          setVideoPreviewAfterFocus(focusedContent, homeScreen.trackingPageInfo)
+        end if
       end if
 
       'Will send the exposure event when home screen loaded and continue watching has a series to pin at first position of featured/Recommended row.

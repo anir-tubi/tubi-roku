@@ -779,6 +779,11 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     children: []    'categories
   }
 
+  'This is to avoid pin the series in CW to the featured/recommended row when we switch modes and screens.
+  if m.seriesChildInsert <> invalid
+    m.seriesChildInsert = invalid
+  end if
+
   if contentToTranslate <> invalid
     if contentToTranslate.valid_duration <> invalid
       homescreenAA.validUntil = Uptime(0) + contentToTranslate.valid_duration
@@ -1067,12 +1072,13 @@ End Function
 ' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
 ' @isSignedInUser: boolean, value based on user logged In or not
 ' returns an associative array that can be passed to ContentNode.update() to populate the ContentNode and it's children
-Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId="", isSignedInUser = false)
+' @uiMode: string, one of the allowed values from constants.ui.modes and will be removed after the roku_cw_featured_recommended_placement_v1 experiment graduates.
+Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId="", isSignedInUser = false, uiMode = "standard")
 
   categoryParent = m.buildCategoryParentInfo(container, contentMode, sOrientation)
 
   gridItemType = m.getGridItemType(container, sOrientation, m.constants)
-  categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData, isSignedInUser, contentMode)
+  categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData, isSignedInUser, contentMode, uiMode)
 
   categoryParent.children = categoryChildrenInfo.children
   categoryParent.json = categoryChildrenInfo.contentsJson
@@ -1190,8 +1196,8 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, co
       end if
     end if
 
-    'This is to avoid pin the series in CW to the featured/recommended row for movies/tv tab.
-    if m.seriesChildInsert <> invalid AND isNonEmptyString(contentMode) = true AND (contentMode = m.constants.ui.contentMode.movie OR contentMode = m.constants.ui.contentMode.tv)
+    'This is to avoid pin the series in CW to the featured/recommended row for movies/tv tab and espanol screen.
+    if m.seriesChildInsert <> invalid AND isNonEmptyString(contentMode) = true AND (contentMode = m.constants.ui.contentMode.movie OR contentMode = m.constants.ui.contentMode.tv) OR uiMode = m.constants.ui.modes.latino
       m.seriesChildInsert = invalid
     end if
 
@@ -1220,9 +1226,9 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, co
       contentsWithPrepend.append(contents)
       ' force contentsJson to be regenerated with the prepended content in buildCategoryAA()
       contentsJson = invalid
-      categoryAA = m.buildCategoryAA(container, contentsWithPrepend, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
+      categoryAA = m.buildCategoryAA(container, contentsWithPrepend, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode)
     else
-      categoryAA = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser)
+      categoryAA = m.buildCategoryAA(container, contents, contentsJson, sOrientation, bFullData, contentMode, screenId, isSignedInUser, uiMode)
     end if
 
   end if
@@ -1316,7 +1322,8 @@ End Function
 '                       "children", as an array of AAs containing content metadata
 '                       "contentsJson", a JSON formatted string of contents belonging to the container/category
 ' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode and will be removed after the experiment graduates.
-Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, contentsJson, parentGridItemType, bFullData, isSignedInUser = false, contentMode = "homeScreen")
+' @uiMode: string, one of the allowed values from constants.ui.modes and will be removed after the roku_cw_featured_recommended_placement_v1 experiment graduates.
+Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, contentsJson, parentGridItemType, bFullData, isSignedInUser = false, contentMode = "homeScreen", uiMode = "standard")
   childrenReturn = CreateObject("roArray", 0, false)
 
   if type(container) = "roAssociativeArray" AND type(container.children) = "roArray"
@@ -1347,11 +1354,15 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
 
           rokuContinueWatchingPlacementType =  m.experiments.getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v1").roku_cw_featured_recommended_placement_type
 
+          'ContentMode is same for kids/standard mode, so we are relying on uiMode and assigning child to the m.seriesChildInsert to pin it to the feature/recommended row in kids mode.
+          isInKidsMode = (uiMode = m.constants.ui.modes.kids OR uiMode = m.constants.ui.modes.kidsParental OR uiMode = m.constants.ui.modes.kidsAgeGate)
+          canSeriesBePinned = (contentMode <> invalid AND contentMode <> m.constants.ui.contentMode.movie AND contentMode <> m.constants.ui.contentMode.tv AND uiMode <> m.constants.ui.modes.latino) OR isInKidsMode = true
+
           'For roku_cw_featured_recommended_placement experiment, we will check 12 items of continue_watching row from the homescreen response.
           'If we find a series, we will insert that child into featured/recommended based on the treatment. But for low spec devices
           'we don't fetch 12 items in each row when making the initial homescreen request.We fetch 0 contents in each row, it's breaking the logic.
           'So we are exclude the low spec devices for this experiement.
-          if m.constants.deviceInfo.limitedUi = false AND rokuContinueWatchingPlacementType <> "none" AND (contentMode <> m.constants.ui.contentMode.movie AND contentMode <> m.constants.ui.contentMode.tv)
+          if m.constants.deviceInfo.limitedUi = false AND rokuContinueWatchingPlacementType <> "none" AND canSeriesBePinned = true
             if container.id = "continue_watching" AND fullChild.type = "s" AND m.seriesChildInsert = invalid AND isCWSeriesFoundForPlacement = false
               m.seriesChildInsert = fullChild
               isCWSeriesFoundForPlacement = true
