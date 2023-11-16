@@ -124,8 +124,11 @@ Function homeBatchResponse(response)
       if (continueWatchingPlacementType = "roku_cw_in_featured" AND category.id = m.constants.ui.categoryIds.featured) OR (continueWatchingPlacementType = "roku_cw_in_recommended" AND category.id = m.constants.ui.categoryIds.recommendedForYou)
         m.featuredOrRecommendedContainerReceived = true
         if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
-          focusedContent = homeScreen.contentFocused
-          setVideoPreviewAfterFocus(focusedContent, homeScreen.trackingPageInfo)
+          gridList = homeScreen.findNode("CategoryGridList") 'I'm ashamed of this hack :(
+          if gridList <> invalid AND gridList.isInFocusChain() = true
+            focusedContent = homeScreen.contentFocused
+            setVideoPreviewAfterFocus(focusedContent, homeScreen.trackingPageInfo)
+          end if
         end if
       end if
 
@@ -778,15 +781,20 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
     continueWatchingPlacementType = getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v1", false).roku_cw_featured_recommended_placement_type
 
     if continueWatchingPlacementType = "none" OR m.featuredOrRecommendedContainerReceived = true
-      setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo)
+      if homeScreen <> invalid AND currentScreen.isSameNode(homeScreen) = true
+        gridList = homeScreen.findNode("CategoryGridList")
+        if gridList <> invalid and gridList.isInFocusChain() = true
+          ' remove all the if blocks when removing roku_cw_featured_recommended_placement
+          ' just leave the call to setVideoPreviewAfterFocus()
+          setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo)
+        end if
+      end if
     end if
 
     if bStopCountdownTimer = true
       stopCountdownTimer()
     end if
-
   end if
-
 End Function
 
 
