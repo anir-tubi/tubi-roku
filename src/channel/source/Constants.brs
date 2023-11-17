@@ -1141,7 +1141,6 @@ Function getConstants()
       constants.ui.screenIds.freeForeverScreen = "freeForeverScreen"
       constants.ui.screenIds.availableDeviceScreen = "availableDeviceScreen"
       constants.ui.screenIds.landingScreen = "landingScreen"
-      constants.ui.screenIds.baseScreen = "baseScreen"
       constants.ui.screenIds.tournamentScreen = "tournamentScreen"
       constants.ui.screenIds.screensaverScreen = "screensaverScreen"
       constants.ui.screenIds.consentScreen = "consentScreen"

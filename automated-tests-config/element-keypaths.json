@@ -1,4 +1,8 @@
 {
+  "scene": {
+    "description": "The top level scene for the entire application",
+    "keyPath": ""
+  },
   "contentController": {
     "description": "Central controller of the application",
     "keyPath": "#ContentController"
@@ -20,8 +24,8 @@
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup",
     "base": "scene"
   },
-  "mainMenu": {
-    "description": "Component contains main menu items. Useful for seeing which page is showing or to switch page is showing",
+  "sideNavMenu": {
+    "description": "Component contains side nav menu items. Useful for seeing which page is showing or to switch page is showing",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems"
   },
   "previewVideoPlayer": {
@@ -234,11 +238,6 @@
     "name": "homeScreenRatingLabelCW",
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup/LayoutGroup/Group/Label",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Rating.#RatingLabel"
-  },
-  "leftNavOpenTeens": {
-    "name": "leftNavOpenTeens",
-    "xpath": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected"
   },
   "topNavNewsLabel": {
     "name": "topNavNewsLabel",
@@ -667,7 +666,11 @@
   "emptyMyStuffPage" : {
     "description" : "empty My Stuff page",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#ContentArea"
-    },
+  },
+  "channelCategoryGrid" : {
+    "description" : "category on category page",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid"
+  },
   "categoryPageCategory" : {
     "description" : "category on category page",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.0.#Logo"
@@ -815,7 +818,7 @@
 "homeScreenContentDescription" :{
   "description" : "description of title in CW row",
   "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
-}, 
+},
 "ageVerificationPad" : {
   "description": "age gate number page",
   "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0"

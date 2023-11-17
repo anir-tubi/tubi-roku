@@ -1,9 +1,13 @@
 import { createHash, createHmac } from 'crypto';
 import { expect } from 'chai';
 import type { MediaPlayerResponse, NodeRepresentation } from 'roku-test-automation';
-import { ecp, odc, utils, device, BaseType } from 'roku-test-automation';
+import { ecp, odc, utils, device } from 'roku-test-automation';
 import * as needle from 'needle';
 import * as querystring from 'needle/lib/querystring';
+
+import type { ElementOrElementId, Element } from '../../automated-tests-config/elements';
+import { elements } from '../../automated-tests-config/elements';
+
 
 const clientVersion = '2.21.0';
 
@@ -27,6 +31,52 @@ enum ContentTypes {
 }
 
 
+enum SideNavMenuItems {
+  'profile' = 'profile',
+  'kidsMode' = 'kidsMode',
+  'search' = 'search',
+  'home' = 'home',
+  'myList' = 'myList',
+  'categories' = 'categories',
+  'channels' = 'channels',
+  'espanol' = 'espanol',
+  'settings' = 'settings',
+  'exit' = 'exit'
+}
+
+
+enum ScreenIds {
+  'homeScreen' = 'homeScreen',
+  'searchScreen' = 'searchScreen',
+  'settingsScreen' = 'settingsScreen',
+  'categoryDetailsScreen' = 'categoryDetailsScreen',
+  'channelListScreen' = 'channelListScreen',
+  'categoryListScreen' = 'categoryListScreen',
+  'espanolScreen' = 'espanolScreen',
+  'movieScreen' = 'movieScreen',
+  'myStuffScreen' = 'myStuffScreen',
+  'tvScreen' = 'tvScreen',
+  'detailScreen' = 'detailScreen',
+  'episodeScreen' = 'episodeScreen',
+  'emailInputScreen' = 'emailInputScreen',
+  'signInScreen' = 'signInScreen',
+  'videoPlayerScreen' = 'videoPlayerScreen',
+  'linearVideoPlayerScreen' = 'linearVideoPlayerScreen',
+  'epgScreen' = 'epgScreen',
+  'emailVerificationScreen' = 'emailVerificationScreen',
+  'forgotPasswordProcessingScreen' = 'forgotPasswordProcessingScreen',
+  'welcomeScreen' = 'welcomeScreen',
+  'freeForeverScreen' = 'freeForeverScreen',
+  'availableDeviceScreen' = 'availableDeviceScreen',
+  'landingScreen' = 'landingScreen',
+  'consentScreen' = 'consentScreen',
+  'managePreferencesScreen' = 'managePreferencesScreen'
+}
+
+
+type VideoPlayerStates = 'none' | 'buffering' | 'playing' | 'paused' | 'stopped' | 'finished' | 'error'
+
+
 const abbreviatedContentTypeConversion = {
   c: ContentTypes.category,
   v: ContentTypes.movie,
@@ -38,58 +88,66 @@ const abbreviatedContentTypeConversion = {
 
 
 class TestUtils {
-  private convertedElementKeyPaths: {
-    [key: string]: KeyPathElement
-  };
-
-  private elementKeyPaths: {
-    [key: string]: KeyPathElement
-  };
-
   private userAgent = 'Roku/DVP-11.5 (11.5.0.4312-46)';
 
 
-  // You can use this get the key path for the given element
-  // elementName is the key that was used when defining in the element-keypaths file.
-  // Example 'homeScreenRowList' would provide the key path to the HomeScreen RowList component.
-  // baseArgs allows you pass in additional arguments if you are passing it directly to another rta function
-  public getElementKeyPath<T>(elementName: string, baseArgs?: T) {
-    if (!this.elementKeyPaths) {
-      this.elementKeyPaths = require('../../automated-tests-config/element-keypaths.json');
-    }
+  /**
+   * You can use this to get an element for the key the provided. Can also take an element to allow easier usage
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param baseArgs - allows you pass in additional arguments if you are passing it directly to another rta function
+   */
+  public getElementKeyPath<T>(elementOrElementId: ElementOrElementId, baseArgs?: T) {
+    if (typeof elementOrElementId === 'string') {
+      const elementId = elementOrElementId;
+      // If an id was passed in then we need to get the element for it
+      elementOrElementId = elements[elementId];
+      if (!elementOrElementId) {
+        throw new Error(`Could not find element named ${elementId}`);
+      }
 
-    if (!this.convertedElementKeyPaths) {
-      this.convertedElementKeyPaths = require('../../automated-tests-config/converted-element-keypaths');
-    }
-
-    let element: KeyPathElement;
-    element = this.elementKeyPaths[elementName];
-    if (!element) {
-      element = this.convertedElementKeyPaths[elementName];
-    }
-
-    if (!element) {
-      throw new Error(`Could not find element named ${elementName}`);
+      elementOrElementId.id = elementId;
     }
 
     return {
       ...baseArgs,
-      base: BaseType.scene,
-      keyPath: element.keyPath
+      ...elementOrElementId
     };
   }
 
 
-  // This gives an easy way to get a node for the given element
-  // elementName is the key that was used when defining in the element-keypaths file
-  public async getNodeForElement(elementName: string, timeout = 15000) {
+
+  /**
+   * This gives an easy way to get a node for the given element
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async getNodeForElement(elementOrElementId: ElementOrElementId, timeout = 15000) {
+    const element = this.getElementKeyPath(elementOrElementId) as Element;
     let result;
     await testUtils.untilTrue(async () => {
-      result = await odc.getValue(this.getElementKeyPath(elementName));
+      result = await odc.getValue(element);
       return result.found;
-    }, `Could not get node for element '${elementName}'`, timeout);
+    }, `Could not get node for element '${element.id}'`, timeout);
 
     return result.value as NodeRepresentation;
+  }
+
+
+  /**
+   * This gives an easy way to get a node field for the given element. This is more efficient than getNodeForElement if all we care about is one field. It can also be used to use the element key path as a base that you can add on to as well.
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async getNodeFieldForElement(elementOrElementId: ElementOrElementId, field: string, timeout = 15000) {
+    const element = this.getElementKeyPath(elementOrElementId) as Element;
+    element.keyPath += '.' + field;
+    let result;
+    await testUtils.untilTrue(async () => {
+      result = await odc.getValue(element);
+      return result.found;
+    }, `Could not get node for element '${element.id}'`, timeout);
+
+    return result.value;
   }
 
 
@@ -279,11 +337,11 @@ class TestUtils {
   // Helper for going to a different page in the application
   public async goToPage(page: DeeplinkPage | 'search' | 'settings') {
     if (page === 'search') {
-      // We don't have a deeplink for these so we access it on the mainmenu instead
-      await this.selectMenuItem('mainMenu', 'Search', undefined);
+      // We don't have a deeplink for these so we access it on the side nav menu instead
+      await this.selectMenuItem('sideNavMenu', 'Search', undefined);
     } else if (page === 'settings') {
-      // We don't have a deeplink for these so we access it on the mainmenu instead
-      await this.selectMenuItem('mainMenu', 'Settings', undefined);
+      // We don't have a deeplink for these so we access it on the side nav menu instead
+      await this.selectMenuItem('sideNavMenu', 'Settings', undefined);
     } else {
       await ecp.sendInput({
         params: {
@@ -294,8 +352,12 @@ class TestUtils {
   }
 
 
-  // Helper to check player state eventually equals the specified state
+  /**
+   * This function is deprecated. Use waitForPlayerStateToEqual instead
+   */
   public async expectPlayerStateToEventuallyEqual(state: MediaPlayerResponse['state'], timeout = 5000) {
+    console.log('This function is deprecated. Use waitForPlayerStateToEqual instead');
+    await utils.sleep(5000);
     return await testUtils.retryWithTimeOut(async () => {
       const player = await ecp.getMediaPlayer();
       expect(player.state).to.equal(state);
@@ -304,31 +366,46 @@ class TestUtils {
   }
 
 
+
+  /**
+   * Helper to check player state eventually equals the specified state
+   * @param videoPlayerElementId - Element id for the video player node we want to use for this helper
+   * @param expectedState - The state we are waiting for
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async waitForPlayerStateToEqual(videoPlayerElementId: VideoPlayerElementId, expectedState: VideoPlayerStates, timeout = 5000) {
+    const element = this.getElementKeyPath(videoPlayerElementId);
+    return await testUtils.retryWithTimeOut(async () => {
+      const state = await this.getNodeFieldForElement(videoPlayerElementId, 'state');
+      expect(state).to.equal(expectedState);
+    }, timeout);
+  }
+
+
   /**
    * Helper to wait for the position of the specified video player to be within before continuing
-   * @param videoPlayerElementName - element for the video player node we want to use for this helper
-   * @param position - the position in milliseconds that we want to wait for the player to be within before continuing
-   * @param precision - how close in milliseconds the current player position has to be to `position` in order to be considered valid
-   * @param timeout - how long we will wait for this operation before considering it to have failed
+   * @param videoPlayerElementId - Element id for the video player node we want to use for this helper
+   * @param position - The position in milliseconds that we want to wait for the player to be within before continuing
+   * @param precision - How close in milliseconds the current player position has to be to `position` in order to be considered valid
+   * @param timeout - How long we will wait for this operation before considering it to have failed
    */
-  public async expectPlayerPositionToEventuallyEqual(videoPlayerElementName: VideoPlayerElementName, position: number, precision = 10000, timeout = 5000) {
+  public async waitForPlayerPositionToEqual(videoPlayerElementId: VideoPlayerElementId, position: number, precision = 10000, timeout = 5000) {
     return await testUtils.retryWithTimeOut(async () => {
-      const actualPlayerPosition = await testUtils.getPlayerPosition(videoPlayerElementName);
+      const actualPlayerPosition = await testUtils.getPlayerPosition(videoPlayerElementId);
       expect(actualPlayerPosition).to.be.greaterThanOrEqual(position - precision).and.lessThanOrEqual(position + precision);
     }, timeout);
   }
 
 
   /**
-   * Helper to get the current position of the video player. If elementName is supplied we pull the position for that specific element vs using the ECP query/media-player endpoint
-   * @param videoPlayerElementName - element for the video player node we want to use for this helper
+   * Helper to get the current position of the video player. If videoPlayerElementId is supplied we pull the position for that specific element vs using the ECP query/media-player endpoint
+   * @param videoPlayerElementId - Element id for the video player node we want to use for this helper
    * @returns current position in milliseconds
    */
-  public async getPlayerPosition(videoPlayerElementName?: VideoPlayerElementName) {
-    if (videoPlayerElementName) {
-      const element = this.getElementKeyPath(videoPlayerElementName);
+  public async getPlayerPosition(videoPlayerElementId?: VideoPlayerElementId) {
+    if (videoPlayerElementId) {
+      const element = this.getElementKeyPath(videoPlayerElementId);
       const {value} = await odc.getValue({
-        base: element.base,
         keyPath: `${element.keyPath}.#VideoNode.position`
       });
       // position is in seconds but we want to convert to milliseconds to match ECP units
@@ -342,13 +419,12 @@ class TestUtils {
 
   /**
    * Gets the duration of the current content for the specified video player element
-   * @param videoPlayerElementName - element for the video player node we want to use for this helper
+   * @param videoPlayerElementId - Element id for the video player node we want to use for this helper
    * @returns content duration in milliseconds
    */
-  public async getPlayerDuration(videoPlayerElementName: VideoPlayerElementName) {
-    const element = this.getElementKeyPath(videoPlayerElementName);
+  public async getPlayerDuration(videoPlayerElementId: VideoPlayerElementId) {
+    const element = this.getElementKeyPath(videoPlayerElementId);
     const {value} = await odc.getValue({
-      base: element.base,
       keyPath: `${element.keyPath}.#VideoNode.duration`
     });
     return value * 1000;
@@ -356,41 +432,69 @@ class TestUtils {
 
 
   /**
-   * Seeks the specified video player to the absolute position specified and checks to make sure it was set correctly
-   * @param videoPlayerElementName - element for the video player node we want to use for this helper
-   * @param absolutePosition - the absolute position where we want to seek to in milliseconds
-   * @param precision - how close in milliseconds the current player position has to be to `position` in order to be considered valid
-   * @param timeout - how long we will wait for this operation before considering it to have failed
+   * Helper to get the current content for the specified player
+   * @param videoPlayerElementId - Element id for the video player node we want to use for this helper
+   * @param timeout - How long we will wait for this operation before considering it to have failed
    */
-  public async seekPlayerToAbsolutePosition(videoPlayerElementName: VideoPlayerElementName, absolutePosition: number, precision = 10000, timeout = 5000) {
-    const element = this.getElementKeyPath(videoPlayerElementName);
+  public async getPlayerContent(videoPlayerElementId: VideoPlayerElementId, timeout = 10000) {
+    return await this.getNodeFieldForElement(videoPlayerElementId, 'content', timeout) as NodeRepresentation & {
+      ACTORS: string[];
+      CATEGORIES: string[];
+      DESCRIPTION: string;
+      DIRECTORS: string[];
+      LENGTH: string;
+      RATING: string;
+      TITLE: string;
+      URL: string;
+      availabilityEnds: string;
+      codec: string;
+      country: string;
+      creditCuePoints: {[key: string]: number};
+      cuepoints: number[];
+      drmType: string;
+      genres: string[];
+      language: string;
+      needsLogin: string;
+      releaseDate: string;
+    };
+  }
+
+
+  /**
+   * Seeks the specified video player to the absolute position specified and checks to make sure it was set correctly
+   * @param videoPlayerElementId - Element id for the video player node we want to use for this helper
+   * @param absolutePosition - the absolute position where we want to seek to in milliseconds
+   * @param precision - How close in milliseconds the current player position has to be to `position` in order to be considered valid
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async seekPlayerToAbsolutePosition(videoPlayerElementId: VideoPlayerElementId, absolutePosition: number, precision = 10000, timeout = 5000) {
+    const element = this.getElementKeyPath(videoPlayerElementId);
     // Improvement we might eventually want to investigate using seekMode=accurate to allow for tighter tolerances
     await odc.setValue({
-      base: element.base,
       keyPath: `${element.keyPath}.seekTo`,
       value: [absolutePosition / 1000]
     });
-    await this.expectPlayerPositionToEventuallyEqual(videoPlayerElementName, absolutePosition, precision, timeout);
+    await this.waitForPlayerPositionToEqual(videoPlayerElementId, absolutePosition, precision, timeout);
   }
 
 
   /**
    * Seeks the specified video player to the relative position specified and checks to make sure it was set correctly
-   * @param videoPlayerElementName - element for the video player node we want to use for this helper
+   * @param videoPlayerElementId - Element id for the video player node we want to use for this helper
    * @param relativePosition - the relative position where we want to seek to in milliseconds
-   * @param relativeTo - what `relativePosition` is relative to. Currently either from the end of the content based off its duration or from the current video player position
-   * @param precision - how close in milliseconds the current player position has to be to `position` in order to be considered valid
-   * @param timeout - how long we will wait for this operation before considering it to have failed
+   * @param relativeTo - What `relativePosition` is relative to. Currently either from the end of the content based off its duration or from the current video player position
+   * @param precision - How close in milliseconds the current player position has to be to `position` in order to be considered valid
+   * @param timeout - How long we will wait for this operation before considering it to have failed
    */
-  public async seekPlayerToRelativePosition(videoPlayerElementName: VideoPlayerElementName, relativePosition: number, relativeTo: 'end' | 'current', precision = 10000, timeout = 5000) {
+  public async seekPlayerToRelativePosition(videoPlayerElementId: VideoPlayerElementId, relativePosition: number, relativeTo: 'end' | 'current', precision = 10000, timeout = 5000) {
     let absolutePosition: number;
     if (relativeTo === 'current') {
-      absolutePosition = await this.getPlayerPosition(videoPlayerElementName) + relativePosition;
+      absolutePosition = await this.getPlayerPosition(videoPlayerElementId) + relativePosition;
     } else if (relativeTo === 'end') {
-      absolutePosition = await this.getPlayerDuration(videoPlayerElementName) + relativePosition;
+      absolutePosition = await this.getPlayerDuration(videoPlayerElementId) + relativePosition;
     }
 
-    await this.seekPlayerToAbsolutePosition(videoPlayerElementName, absolutePosition, precision, timeout);
+    await this.seekPlayerToAbsolutePosition(videoPlayerElementId, absolutePosition, precision, timeout);
   }
 
 
@@ -407,10 +511,12 @@ class TestUtils {
 
   /**
    * Because we store the json object at the row level, trying to access RowList content the normal way with RTA can result in huge responses (21 MB). This helps work around that
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param title - The title we are searching for
+   * @param timeout - How long we will wait for this operation before considering it to have failed
    */
-  // elementName is the key that was used when defining in the element-keypaths file
-  public async findRowIndexWithTitle(elementName: string, title: string, timeout = 10000): Promise<number> {
-    const element = this.getElementKeyPath(elementName);
+  public async findRowIndexWithTitle(elementOrElementId: ElementOrElementId, title: string, timeout = 10000): Promise<number> {
+    const element = this.getElementKeyPath(elementOrElementId);
     let baseKeyPath = `content`;
     if (element.keyPath) {
       baseKeyPath = element.keyPath + '.' + baseKeyPath;
@@ -450,11 +556,15 @@ class TestUtils {
   }
 
 
-  // Used to jump to a row with the title provided
-  // elementName is the key that was used when defining in the element-keypaths file
-  public async jumpToRowWithTitle(elementName: string, title: string, timeout = 10000) {
-    const index = await this.findRowIndexWithTitle(elementName, title, timeout);
-    await odc.setValue(this.getElementKeyPath(elementName, {
+  /**
+   * Used to jump to a row with the title provided
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param title - The title we are searching for
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async jumpToRowWithTitle(elementOrElementId: ElementOrElementId, title: string, timeout = 10000) {
+    const index = await this.findRowIndexWithTitle(elementOrElementId, title, timeout);
+    await odc.setValue(this.getElementKeyPath(elementOrElementId, {
       field: 'jumpToItem',
       value: index
     }));
@@ -464,10 +574,12 @@ class TestUtils {
 
   /**
    * Used to retrieve all content in row specified by `rowIndex` from the specified RowList element
-   * elementName is the key that was used when defining in the element-keypaths file. Should have `RowList` in its name
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param rowIndex - The row index we want to get the content for
+   * @param timeout - How long we will wait for this operation before considering it to have failed
    */
-  public async getRowListRowItemsContent(elementName: string, rowIndex: number, timeout = 10000) {
-    const element = this.getElementKeyPath(elementName);
+  public async getRowListRowItemsContent(elementOrElementId: ElementOrElementId, rowIndex: number, timeout = 10000) {
+    const element = this.getElementKeyPath(elementOrElementId);
 
     const baseKeyPath = `${element.keyPath}.content.${rowIndex}`;
 
@@ -502,25 +614,27 @@ class TestUtils {
 
   /**
    * Used to retrieve all content in the currently focused row from the specified RowList element
-   * elementName is the key that was used when defining in the element-keypaths file. Should have `RowList` in its name
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param timeout - How long we will wait for this operation before considering it to have failed
    */
-  public async getCurrentlyFocusedRowListRowItemsContent(elementName: string, timeout = 10000) {
-    const grid = await this.getNodeForElement(elementName, timeout);
+  public async getCurrentlyFocusedRowListRowItemsContent(elementOrElementId: ElementOrElementId, timeout = 10000) {
+    const grid = await this.getNodeForElement(elementOrElementId, timeout);
     if (!grid.rowItemFocused) {
       throw new Error('This function should only be used on RowList elements');
     }
 
     const index = grid.rowItemFocused[0];
-    return await this.getRowListRowItemsContent(elementName, index, timeout);
+    return await this.getRowListRowItemsContent(elementOrElementId, index, timeout);
   }
 
 
   /**
    * Used to retrieve all content in the specified RowList element
-   * elementName is the key that was used when defining in the element-keypaths file. Should have `RowList` in its name
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param timeout - How long we will wait for this operation before considering it to have failed
    */
-  public async getAllRowListItemsContent(elementName: string, timeout = 10000) {
-    const element = this.getElementKeyPath(elementName);
+  public async getAllRowListItemsContent(elementOrElementId: ElementOrElementId, timeout = 10000) {
+    const element = this.getElementKeyPath(elementOrElementId);
     let baseKeyPath = `content`;
     if (element.keyPath) {
       baseKeyPath = element.keyPath + '.' + baseKeyPath;
@@ -528,7 +642,6 @@ class TestUtils {
 
     const rowCount = await this.retryWithTimeOut(async () => {
       const {found, value: rowCount} = await odc.getValue({
-        base: element.base,
         keyPath: `${baseKeyPath}.getChildCount()`
       });
       if (!found) {
@@ -539,7 +652,7 @@ class TestUtils {
 
     const gridItemsContent = [];
     for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-      const rowItemsContent = await this.getRowListRowItemsContent(elementName, rowIndex, timeout);
+      const rowItemsContent = await this.getRowListRowItemsContent(elementOrElementId, rowIndex, timeout);
       for (const itemContent of rowItemsContent) {
         gridItemsContent.push(itemContent);
       }
@@ -548,10 +661,42 @@ class TestUtils {
   }
 
 
-  // Used to retrieve grid item content for the item specified by the index
-  // elementName is the key that was used when defining in the element-keypaths file
-  public async getGridItemContent(elementName: string, index: number | number[], timeout = 10000) {
-    const element = this.getElementKeyPath(elementName);
+  /**
+   * Used to retrieve all content in the specified grid element. getAllRowListItemsContent should be used instead if this is a RowList
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   * @returns array of NodeRepresentation with each item representing its respective position in the grid contents
+   */
+  public getAllGridItemsContent(elementOrElementId: ElementOrElementId, timeout = 10000) {
+    const element = this.getElementKeyPath(elementOrElementId);
+    let baseKeyPath = `content`;
+    if (element.keyPath) {
+      baseKeyPath = element.keyPath + '.' + baseKeyPath;
+    }
+
+    return this.retryWithTimeOut(async () => {
+      const {found, value} = await odc.getValue({
+        base: element.base,
+        keyPath: `${element.keyPath}.content`,
+        responseMaxChildDepth: 1
+      }, {timeout: timeout});
+
+      if (!found) {
+        throw new Error(`Can't retrieve grid content`);
+      }
+      return value.children as NodeRepresentation[];
+    }, timeout);
+  }
+
+
+  /**
+   * Used to retrieve grid item content for the item specified by the index
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param index - array or number of which item we are getting the content for. For RowLists this should a 2 item array and for Grids a single item array or number
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async getGridItemContent(elementOrElementId: ElementOrElementId, index: number | number[], timeout = 10000) {
+    const element = this.getElementKeyPath(elementOrElementId);
     if (!Array.isArray(index)) {
       index = [index];
     }
@@ -606,10 +751,13 @@ class TestUtils {
   }
 
 
-  // Used to get the grid item content for the currently focused grid item
-  // elementName is the key that was used when defining in the element-keypaths file
-  public async getCurrentlyFocusedGridItemContent(elementName: string, timeout = 10000) {
-    const grid = await this.getNodeForElement(elementName, timeout);
+  /**
+   * Used to get the grid item content for the currently focused grid item
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async getCurrentlyFocusedGridItemContent(elementOrElementId: ElementOrElementId, timeout = 10000) {
+    const grid = await this.getNodeForElement(elementOrElementId, timeout);
     let index;
     if (grid.rowItemFocused) {
       index = grid.rowItemFocused;
@@ -617,7 +765,7 @@ class TestUtils {
       index = grid.itemFocused;
     }
 
-    return await this.getGridItemContent(elementName, index, timeout);
+    return await this.getGridItemContent(elementOrElementId, index, timeout);
   }
 
 
@@ -629,36 +777,36 @@ class TestUtils {
     args['match'] = false;
     await odc.onFieldChangeOnce(args);
 
-    const elementName = 'detailScreenMenu';
+    const elementId = 'detailScreenMenu';
     switch (item) {
       case 'play':
-        await this.selectMenuItem(elementName, 'Play', timeout);
+        await this.selectMenuItem(elementId, 'Play', timeout);
         await this.waitForElementToNotBeInFocusChain('detailScreen');
         break;
       case 'playFromBeginning':
-        await this.selectMenuItem(elementName, 'Play from Beginning', timeout);
+        await this.selectMenuItem(elementId, 'Play from Beginning', timeout);
         await this.waitForElementToNotBeInFocusChain('detailScreen');
         break;
       case 'resume':
-        await this.selectMenuItem(elementName, 'Resume Playing', timeout);
+        await this.selectMenuItem(elementId, 'Resume Playing', timeout);
         await this.waitForElementToNotBeInFocusChain('detailScreen');
         break;
       case 'addToMyList':
-        await this.selectMenuItem(elementName, 'Add to My List', timeout);
+        await this.selectMenuItem(elementId, 'Add to My List', timeout);
         // We know we're good once the remove item shows up
-        await this.findRowIndexWithTitle(elementName, 'Remove from My List', timeout);
+        await this.findRowIndexWithTitle(elementId, 'Remove from My List', timeout);
         break;
       case 'removeFromMyList':
-        await this.selectMenuItem(elementName, 'Remove from My List', timeout);
+        await this.selectMenuItem(elementId, 'Remove from My List', timeout);
         // We know we're good once the add item shows up
-        await this.findRowIndexWithTitle(elementName, 'Add to My List', timeout);
+        await this.findRowIndexWithTitle(elementId, 'Add to My List', timeout);
         break;
       case 'removeFromHistory':
-        await this.selectMenuItem(elementName, 'Remove from history', timeout);
+        await this.selectMenuItem(elementId, 'Remove from history', timeout);
         // We know we're good once the Resume item goes away
         await this.untilTrue(async () => {
           try {
-            await this.findRowIndexWithTitle(elementName, 'Remove from history', 0);
+            await this.findRowIndexWithTitle(elementId, 'Remove from history', 0);
             return false;
           } catch(e) {
             return true;
@@ -666,68 +814,279 @@ class TestUtils {
         }, 'Could not verify that Remove from history was removed');
         break;
       case 'episodesList':
-        await this.selectMenuItem(elementName, 'Episodes list', timeout);
+        await this.selectMenuItem(elementId, 'Episodes list', timeout);
         await this.waitForElementToBeInFocusChain('episodesScreen');
         break;
       }
   }
 
 
-  // Used to select the item in the provided elementName that matches title provided.
-  // elementName is the key that was used when defining in the element-keypaths file
-  public async selectMenuItem(elementName: string, title: string, timeout = 10000) {
-    const index = await this.jumpToRowWithTitle(elementName, title, timeout);
+  /**
+   * Used to select the item in the provided elementOrElementId that matches title provided.
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param title - Title of the menu item we want to select
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async selectMenuItem(elementOrElementId: ElementOrElementId, title: string, timeout = 10000) {
+    const index = await this.jumpToRowWithTitle(elementOrElementId, title, timeout);
 
-    await odc.setValue(this.getElementKeyPath(elementName, {
+    await odc.setValue(this.getElementKeyPath(elementOrElementId, {
       field: 'itemSelected',
       value: index
     }), {timeout: timeout});
   }
 
 
-  // returns true if this element or one of its children currently has focus
-  public elementIsInFocusChain(elementName: string) {
-    return odc.isInFocusChain(this.getElementKeyPath(elementName));
+  /**
+   * Verifies that `expectedItem` equals the focused item for the side nav menu
+   * @param expectedItem - the item we are expecting it equal
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async verifyFocusedSideNavMenuItemEquals(expectedItem: SideNavMenuItems | keyof typeof SideNavMenuItems, timeout = 10000) {
+    const mainMenuElement = this.getElementKeyPath('sideNavMenu');
+    const requestOptions = {timeout: timeout};
+    const {value: currFocusRow} = await odc.getValue({
+      keyPath: `${mainMenuElement.keyPath}.currFocusRow`
+    }, requestOptions);
+
+    const {value} = await odc.getValue({
+      keyPath: `${mainMenuElement.keyPath}.content.${currFocusRow}.id`
+    }, requestOptions);
+
+    const itemId = value.replace('-select', '');
+    if (expectedItem !== itemId) {
+      throw new Error(`Current side nav menu item was expected to be ${expectedItem} but was actually ${itemId}`);
+    }
   }
 
 
-  // returns true if this element has focus
-  public elementHasFocus(elementName: string) {
-    return odc.hasFocus(this.getElementKeyPath(elementName));
+    /**
+   * Wrapper around waitForFocusedMainMenuItemToEqual that will wait for the value to match or fail
+   * @param expectedItem - the item we are expecting it equal
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public waitForFocusedSideNavMenuItemToEqual(expectedItem: SideNavMenuItems | keyof typeof SideNavMenuItems, timeout = 10000) {
+    return this.retryWithTimeOut(async () => {
+      await this.verifyFocusedSideNavMenuItemEquals(expectedItem);
+    }, timeout);
   }
 
 
-  // tries to wait until this element has focus
-  public waitForElementToHaveFocus(elementName: string, errorMessage?: string, timeout = 10000) {
-    return this.untilTrue(() => {
-      return this.elementHasFocus(elementName);
+  /**
+   * Checks if element isInFocusChain
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param failIfNot - If not undefined then the result of this function will be checked and fail if not equal to the value specified
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   * @returns true if this element or one of its children has focus or false otherwise
+   */
+  public async elementIsInFocusChain(elementOrElementId: ElementOrElementId, failIfNot?: boolean, timeout = 10000) {
+    const element = this.getElementKeyPath(elementOrElementId);
+    const result = await odc.isInFocusChain(element, {timeout: timeout});
+    if (failIfNot !== undefined) {
+      if (failIfNot !== result) {
+        throw new Error(`'${element.id}'isInFocusChain equaled ${result} when ${failIfNot} was expected`);
+      }
+    }
+    return result;
+  }
+
+
+  /**
+   * Checks if element has focus
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param failIfNot - If not undefined then the result of this function will be checked and fail if not equal to the value specified
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   * @returns true if this element has focus or false otherwise
+   */
+  public async elementHasFocus(elementOrElementId: ElementOrElementId, failIfNot?: boolean, timeout = 10000) {
+    const element = this.getElementKeyPath(elementOrElementId);
+    const result = await odc.hasFocus(element, {timeout: timeout});
+    if (failIfNot !== undefined) {
+      if (failIfNot !== result) {
+        throw new Error(`'${element.id}' hasFocus equaled ${result} when ${failIfNot} was expected`);
+      }
+    }
+    return result;
+  }
+
+
+  /**
+   * Waits for element to have focus within timeout period
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param failIfNot - If not undefined then the result of this function will be checked and fail if not equal to the value specified
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async waitForElementToHaveFocus(elementOrElementId: ElementOrElementId, errorMessage?: string, timeout = 10000) {
+    await this.untilTrue(() => {
+      return this.elementHasFocus(elementOrElementId);
     }, errorMessage, timeout);
   }
 
 
-  // tries to wait until this element does not have focus
-  public waitForElementToNotHaveFocus(elementName: string, errorMessage?: string, timeout = 10000) {
-    return this.untilTrue(async () => {
-      const result = await this.elementHasFocus(elementName);
+  /**
+  * Waits for element to not have focus within timeout period
+  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+  * @param errorMessage - A custom string to use for the error message
+  * @param timeout - How long we will wait for this operation before considering it to have failed
+  */
+  public async waitForElementToNotHaveFocus(elementOrElementId: ElementOrElementId, errorMessage?: string, timeout = 10000) {
+    await this.untilTrue(async () => {
+      const result = await this.elementHasFocus(elementOrElementId);
       return !result;
     }, errorMessage, timeout);
   }
 
 
-  // tries to wait until this element or one of its children has focus
-  public waitForElementToBeInFocusChain(elementName: string, errorMessage?: string, timeout = 10000) {
-    return this.untilTrue(() => {
-      return this.elementIsInFocusChain(elementName);
+  /**
+  * Waits for element to be in the focus chain within timeout period
+  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+  * @param errorMessage - A custom string to use for the error message
+  * @param timeout - How long we will wait for this operation before considering it to have failed
+  */
+  public async waitForElementToBeInFocusChain(elementOrElementId: ElementOrElementId, errorMessage?: string, timeout = 10000) {
+    await this.untilTrue(() => {
+      return this.elementIsInFocusChain(elementOrElementId);
     }, errorMessage, timeout);
   }
 
 
-  // tries to wait until this element and none of its children has focus
-  public waitForElementToNotBeInFocusChain(elementName: string, errorMessage?: string, timeout = 10000) {
-    return this.untilTrue(async () => {
-      const result = await this.elementIsInFocusChain(elementName);
+  /**
+  * Waits for element to not be in the focus chain within timeout period
+  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+  * @param errorMessage - A custom string to use for the error message
+  * @param timeout - How long we will wait for this operation before considering it to have failed
+  */
+  public async waitForElementToNotBeInFocusChain(elementOrElementId: ElementOrElementId, errorMessage?: string, timeout = 10000) {
+    await this.untilTrue(async () => {
+      const result = await this.elementIsInFocusChain(elementOrElementId);
       return !result;
     }, errorMessage, timeout);
+  }
+
+
+  /**
+   * Allows getting the dimensions of a regular node. Use getGridElementSize for grid children items
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async getElementSize(elementOrElementId: ElementOrElementId, timeout = 10000) {
+    const element = this.getElementKeyPath(elementOrElementId);
+    const {found, value} = await odc.getValue({
+      keyPath: element.keyPath + '.sceneBoundingRect()'
+    }, {timeout: timeout});
+
+    if (!found) {
+      throw new Error(`Could not retrieve size for element '${element.id}'`);
+    }
+
+    return value as {
+      width: number;
+      height: number;
+      x: number;
+      y: number;
+    };
+  }
+
+
+    /**
+   * Allows getting the dimensions of a grid item node
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file. This should be for the grid or RowList not the grid element itself
+   * @param index - array or number of which item we are getting the size of. For RowLists this should a 2 item array and for Grids a single item array or number
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+    public async getGridElementSize(elementOrElementId: ElementOrElementId, index: number | number[], timeout = 10000) {
+      if (!Array.isArray(index)) {
+        index = [index];
+      }
+
+      const element = this.getElementKeyPath(elementOrElementId);
+      let item = `item${index[0]}`;
+      if (index.length > 1) {
+        item += `_${index[1]}`;
+      }
+      const {found, value} = await odc.getValue({
+        keyPath: element.keyPath + `.sceneSubBoundingRect(${item})`
+      }, {timeout: timeout});
+
+      if (!found) {
+        throw new Error(`Could not retrieve size for element '${element.id}'`);
+      }
+
+      return value as {
+        width: number;
+        height: number;
+        x: number;
+        y: number;
+      };
+    }
+
+
+  /**
+   * Simple helper to wait for the side nav menu to be expanded
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public waitForSideNavMenuToBeExpanded(timeout = 10000) {
+    return this.waitForElementToHaveFocus('sideNavMenu', `Side nav menu was not expanded within ${timeout}ms`, timeout);
+  }
+
+
+  /**
+   * Simple helper to wait for the side nav menu to not be expanded
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public waitForSideNavMenuToNotBeExpanded(timeout = 10000) {
+    return this.waitForElementToNotHaveFocus('sideNavMenu', `Side nav menu was still expanded after ${timeout}ms`, timeout);
+  }
+
+
+  private async getCurrentScreen(timeout = 10000) {
+    const lastScreen = await this.getNodeFieldForElement('screenStack', '-1');
+    return lastScreen as NodeRepresentation;
+  }
+
+
+  public async waitForCurrentScreenToEqual(screenId: ScreenIds | keyof typeof ScreenIds, timeout = 10000) {
+    await this.untilTrue(async () => {
+      const screen = await this.getCurrentScreen(timeout);
+      return screen.id === screenId;
+    }, `Screen did not equal '${screenId}' after ${timeout}ms`, timeout);
+  }
+
+
+  /**
+   * Roku stores colors as integers which are difficult to work with. This helper returns a more usable hex version
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param colorFieldName - The field on the node that we are interested in converting from an integer to a hex representation
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async getElementColorField(elementOrElementId: ElementOrElementId, colorFieldName = 'color', timeout = 10000) {
+    const element = this.getElementKeyPath(elementOrElementId);
+    const {value, found} = await odc.getValue({
+      keyPath: `${element.keyPath}.${colorFieldName}`
+    }, {timeout: timeout});
+
+    if (!found || typeof value !== 'number') {
+      throw new Error(`Could not retrieve valid color for element '${element.id}' with color field '${colorFieldName}'`);
+    }
+
+    // Have to convert from signed to unsigned and then convert to binary representation
+    const unsignedInteger = value >>> 0;
+    const binary = unsignedInteger.toString(2).padStart(32, '0');
+
+    // Slice out each 8 bits for each rgba part value
+    const rgb = {
+        red: parseInt(binary.slice(0, 8), 2),
+        green: parseInt(binary.slice(8, 16), 2),
+        blue: parseInt(binary.slice(16, 24), 2),
+        alpha: parseInt(binary.slice(24, 32), 2)
+    };
+
+    return `#${this.convertByteToHex(rgb.red)}${this.convertByteToHex(rgb.green)}${this.convertByteToHex(rgb.blue)}${this.convertByteToHex(rgb.alpha)}`;
+  }
+
+
+  private convertByteToHex(byte: number) {
+    return byte.toString(16).padStart(2, '0').toUpperCase();
   }
 
 
@@ -1538,9 +1897,9 @@ type DeeplinkPage = 'movies' | 'livefeed' | 'genre' | 'network' | 'tv' | 'espano
 
 
 /**
- * List of elements that can be used with our video player helpers
+ * List of element ids that can be used with our video player helpers
  */
-type VideoPlayerElementName = 'videoPlayerScreen' | 'previewVideoPlayer';
+type VideoPlayerElementId = 'videoPlayerScreen' | 'previewVideoPlayer';
 
 
 enum ContentRatings {

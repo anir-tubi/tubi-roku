@@ -29,6 +29,79 @@ describe('test-utils', function () {
     });
 
 
+    describe('getAllGridItemsContent', function () {
+      it('show be able to return correct grid item contents for a known value', async () => {
+        await testUtils.startApplicationAtPage('genre');
+        const content = await testUtils.getAllGridItemsContent('channelCategoryGrid');
+        expect(content[0].id).to.equal('recommended_for_you');
+      });
+    });
+
+
+    describe('verifyFocusedMainMenuItemEquals', function () {
+      it('should not throw an error since we are currently on the homescreen', async () => {
+        await testUtils.startApplicationAtPage('home');
+        await testUtils.verifyFocusedSideNavMenuItemEquals('home');
+      });
+
+      it('should throw an error since we are not on the settings screen', async () => {
+        try {
+          await testUtils.verifyFocusedSideNavMenuItemEquals('settings');
+        } catch (e) {
+          // Failed as expected
+          return;
+        }
+        throw new Error('Did not throw an error when it should have');
+      });
+    });
+
+
+    describe('waitForSelectedMainMenuItemToEqual', function () {
+      it('should wait for the the correct item to be focused and not throw an error after we focus the correct menu item', async () => {
+        await testUtils.startApplicationAtPage('home');
+        let promise = testUtils.verifyFocusedSideNavMenuItemEquals('search', 200);
+        let threwError = false;
+        try {
+          await promise;
+        } catch(e) {
+          threwError = true;
+        }
+
+        // It should throw an error here since we didn't focus it yet
+        expect(threwError).to.be.true;
+
+        await ecp.sendKeyPress(ecp.Key.Left);
+        await ecp.sendKeyPress(ecp.Key.Up);
+
+        promise = testUtils.verifyFocusedSideNavMenuItemEquals('search', 1000);
+        await ecp.sendKeyPress(ecp.Key.Ok);
+        // Should not throw an error this time
+        await promise;
+      });
+    });
+
+
+    describe('verifyCurrentScreenEquals', function () {
+      before(async () => {
+        await testUtils.startApplicationAtPage('home');
+      });
+
+      it('should not throw an error since we are already on the home screen', async () => {
+        await testUtils.waitForCurrentScreenToEqual('homeScreen', 1000);
+      });
+
+      it('should wait for us to go to the search screen', async () => {
+        await testUtils.waitForElementToHaveFocus('homeRowList');
+        const promise = testUtils.waitForCurrentScreenToEqual('searchScreen', 2000);
+        await ecp.sendKeyPress(ecp.Key.Left);
+        await utils.sleep(800); // There is a bug in our menu that requires us to wait until after animation to proceed up
+        await ecp.sendKeyPress(ecp.Key.Up);
+        await ecp.sendKeyPress(ecp.Key.Ok);
+        await promise;
+      });
+    });
+
+
     describe('loginAsUser', function () {
       it('should be able to login to an existing user account', async () => {
         const user = await testUtils.loginAsUser({email: existingUser['userInfo'].email, password: existingUser['userInfo'].password});
@@ -46,7 +119,7 @@ describe('test-utils', function () {
           mediaType: 'movie',
           contentID: '100007133'
         });
-        await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
       });
 
 
@@ -66,7 +139,7 @@ describe('test-utils', function () {
         it('Should work for previewVideoPlayer as well', async () => {
           // Since we don't use the preview video player seek functionality anywhere except automated tests, we should should check that as well
           await testUtils.startApplicationAtPage('home');
-          await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
+          await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 15000);
           await testUtils.seekPlayerToAbsolutePosition('previewVideoPlayer', 40000);
         });
       });
@@ -85,6 +158,105 @@ describe('test-utils', function () {
         it('should not throw an error when seeking relative to the end player position', async () => {
           await testUtils.seekPlayerToRelativePosition(videoNodeElement, -60000, 'end');
         });
+      });
+
+
+      describe('getPlayerContent', function () {
+        it('should seek to the correct position when relative to the current player position', async () => {
+          // We're purposely seeking twice in order to easily test that position is relative to current player position vs just being from position 0
+          const content = await testUtils.getPlayerContent(videoNodeElement);
+
+          expect(content.id).to.equal('100007133');
+          expect(content.LENGTH).to.equal(5234);
+          expect(content.RATING).to.equal('R');
+        });
+      });
+    });
+
+
+    describe('getElementSize', function () {
+      it('should be able to retrieve the size of a known element', async () => {
+        const size = await testUtils.getElementSize('backgroundGroup');
+        expect(size.width).to.equal(1920);
+        expect(size.height).to.equal(1080);
+        expect(size.x).to.equal(0);
+        expect(size.y).to.equal(0);
+      });
+
+      it('should throw an error if the element does not currently exist in the nodetree', async () => {
+        try {
+          await testUtils.getElementSize('privacyPageScroller');
+        } catch (e) {
+          // Failed as expected
+          return;
+        }
+        throw new Error('Did not throw an error when element did not exist');
+      });
+    });
+
+
+    describe('getGridElementSize', function () {
+      it('should be able to retrieve the size of a known grid child element', async () => {
+        await utils.sleep(3000);
+        const size = await testUtils.getGridElementSize('homeRowList', [0, 3]);
+        expect(size.width).to.equal(504);
+        expect(size.height).to.equal(282);
+        expect(size.x).to.equal(1752);
+        expect(size.y).to.equal(572);
+      });
+    });
+
+
+    describe('waitForSideNavMenuToBeExpanded', function () {
+      beforeEach(async () => {
+        await testUtils.startApplicationAtPage('home');
+        await testUtils.waitForElementToHaveFocus('homeRowList');
+      });
+
+      it('should not throw an Error if the main menu is expanded', async () => {
+        await ecp.sendKeyPress(ecp.Key.Left);
+        await testUtils.waitForSideNavMenuToBeExpanded();
+      });
+
+      it('should throw an error if the main menu is not expanded', async () => {
+        try {
+          await testUtils.waitForSideNavMenuToBeExpanded(500);
+        } catch (e) {
+          // Failed as expected
+          return;
+        }
+        throw new Error('Did not throw an error when it should have');
+      });
+    });
+
+
+    describe('waitForSideNavMenuToNotBeExpanded', function () {
+      beforeEach(async () => {
+        await testUtils.startApplicationAtPage('home');
+        await testUtils.waitForElementToHaveFocus('homeRowList');
+      });
+
+      it('should not throw an Error if the main menu is not expanded', async () => {
+        await testUtils.waitForSideNavMenuToNotBeExpanded();
+      });
+
+      it('should throw an error if the main menu is expanded', async () => {
+        try {
+          await ecp.sendKeyPress(ecp.Key.Left);
+          await testUtils.waitForSideNavMenuToNotBeExpanded(500);
+        } catch (e) {
+          // Failed as expected
+          return;
+        }
+        throw new Error('Did not throw an error when it should have');
+      });
+    });
+
+
+    describe('getElementColorField', function () {
+      it('should be able to retrieve the specified element color field in the correct hex format', async () => {
+        const color = await testUtils.getElementColorField('scene', 'backgroundColor');
+        expect(color).to.equal('#232323FF');
       });
     });
   });
