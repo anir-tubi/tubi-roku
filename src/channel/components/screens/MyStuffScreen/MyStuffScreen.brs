@@ -220,7 +220,7 @@ Function onContentUpdateChange(msg) As Void
 
       if nMyLikesContainerIndex >= 0
         '//Remove the MyLikes Container if no video titles are in the container
-        m.top.content.removeChild(nMyLikesContainerIndex)
+        m.top.content.removeChildIndex(nMyLikesContainerIndex)
       end if
 
       if m.isAllContentEmpty = false
