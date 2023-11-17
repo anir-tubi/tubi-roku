@@ -40,7 +40,7 @@ const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOn
 const {retrieveSuitestTests, runSuitestTests, convertXpathsToKeyPaths, convertSuitestTest} = require('./js/suitest');
 
 // Importing functions related to Automated Tests
-const {runAutomatedTests, runAutomatedTestsCli, outputAvailableAutomatedTestTags, buildTestAccountCli} = require('./js/automated-tests');
+const {runAutomatedTests, runAutomatedTestsCli, runAutomatedAnalyticsTestsCli, outputAvailableAutomatedTestTags, buildTestAccountCli} = require('./js/automated-tests');
 
 // Importing functions related to Github action runners
 const {setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner} = require('./js/action-runner');
@@ -750,6 +750,11 @@ function setStaging(done) {
 // force qa on options, so we ensure our build is using the qa config and set other automated test config settings
 function setAutomatedTestsConfig(done) {
   if(options) {
+    let useQaAnalyticsProxy = false;
+    if (process.env.analyticAutomatedTests === 'true') {
+      // This turns on the analytic proxy needed for analytic testing
+      useQaAnalyticsProxy = true;
+    }
     options.config = 'qa';
     options.overrides = {
       settings: {
@@ -758,7 +763,8 @@ function setAutomatedTestsConfig(done) {
         noAds: true,
         printReqAndResInfo: false,
         bs_const: {
-          consoleLoggingEnabled: false
+          consoleLoggingEnabled: false,
+          useQaAnalyticsProxy: useQaAnalyticsProxy
         }
       }
     };
@@ -969,6 +975,7 @@ exports.runAutomatedTestsCli = runAutomatedTestsCli;
 exports.outputAvailableAutomatedTestTags = outputAvailableAutomatedTestTags;
 exports.autotest = runAutomatedTestsCli;
 exports.buildTestAccount = buildTestAccountCli;
+exports.runAutomatedAnalyticsTestsCli = runAutomatedAnalyticsTestsCli;
 
 exports.runToolingTests = series(setAutomatedTestsConfig, buildInstalled, runToolingTests);
 

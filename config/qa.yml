@@ -61,7 +61,7 @@ settings:
     #To enable console debug logs, set consoleLoggingEnabled to true
     consoleLoggingEnabled: true
     #setting to true will use analytics proxy server and display category slugs and content id in UI
-    suitestjs: false
+    useQaAnalyticsProxy: false
     # Setting to true will route linear playback manifest request through qa proxy.
     linearQaProxyEnabled: false
 

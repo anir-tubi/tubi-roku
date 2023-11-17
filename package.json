@@ -15,7 +15,7 @@
     "url": "https://github.com/adRise/project-total-recall/issues"
   },
   "homepage": "https://github.com/adRise/project-total-recall#readme",
-
+  
   "devDependencies": {
     "@octokit/rest": "^18.0.9",
     "@rokucommunity/bslint": "0.7.6",

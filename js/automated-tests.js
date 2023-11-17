@@ -20,8 +20,14 @@ const testsOutputFolder = `out/ui-tests-output`;
 const jsonReportOutputPath = `${testsOutputFolder}/report.json`;
 
 // Tries to convert the supplied suitest test over to our own test format
-async function runAutomatedTestsCli(done) {
-  const availableTags = getAvailableTags();
+async function runAutomatedTestsCli(done, analytics=false) {
+  let availableTags;
+  if(analytics){
+    availableTags = getAvailableTags('js/automated-tests/analytics/tests');
+  } else {
+    availableTags = getAvailableTags();
+  }
+  
 
   const choices = [];
 
@@ -60,7 +66,12 @@ async function runAutomatedTestsCli(done) {
     done();
     return;
   }
-  await runAutomatedTests(done, branch, tags);
+  await runAutomatedTests(done, branch, tags, analytics);
+  done();
+}
+
+async function runAutomatedAnalyticsTestsCli(done) {
+  await runAutomatedTestsCli(done, true);
   done();
 }
 
@@ -209,7 +220,7 @@ async function buildTestAccountCli(done) {
 }
 
 
-async function runAutomatedTests(done, branch = '', tags = [], bail = false) {
+async function runAutomatedTests(done, branch = '', tags = [], analytics = false) {
   const mochaOptions = [
     '--reporter js/automated-tests/mocha-reporter.ts', // Tell mocha to use our custom reporter
     `--reporter-option output=${jsonReportOutputPath}`, // output path for json reporter
@@ -244,6 +255,12 @@ async function runAutomatedTests(done, branch = '', tags = [], bail = false) {
     execShellCommand(done, `git clone --branch ${branch} --depth 1 git@github.com:adRise/project-total-recall.git ${applicationFolder}`);
   }
 
+  if (analytics) {
+    env.set({
+      analyticAutomatedTests: 'true'
+    });
+  }
+
   execShellCommand(done, `gulp --cwd ${applicationFolder} buildAutomatedTests`);
 
   const config = utils.getConfigFromConfigFile();
@@ -253,7 +270,13 @@ async function runAutomatedTests(done, branch = '', tags = [], bail = false) {
   });
 
   // Even if our tests fail we still want to append the extra data to the json report
-  const code = await spawnShellCommand(done, `npx mocha ${mochaOptions.join(' ')} js/automated-tests/tests/*.ts`, true);
+  let testsPath;
+  if(analytics){
+    testsPath = 'js/automated-tests/analytics/tests/*.ts';
+  } else {
+    testsPath = 'js/automated-tests/tests/*.ts';
+  }
+  const code = await spawnShellCommand(done, `npx mocha ${mochaOptions.join(' ')} ${testsPath}`, true);
   await appendDataToJsonReport(branch);
   if (code !== 0) {
     done(new Error('Tests failed'));
@@ -353,7 +376,7 @@ function getAvailableTags(folder = 'js/automated-tests/tests') {
   const files = fs.readdirSync(folder);
   const pattern = /it\([^@]*([@a-zA-Z_0-9,]*)/g;
   for (const file of files) {
-    if (file.split('.').pop() !== 'ts') {
+    if (!folder.includes('analytics') && file.split('.').pop() !== 'ts') {
       continue;
     }
 
@@ -372,7 +395,6 @@ function getAvailableTags(folder = 'js/automated-tests/tests') {
   return Object.keys(tags).sort();
 }
 
-
 // Used to output an updated list of tags for use in .github/workflows/automatedTests.yml file
 function outputAvailableAutomatedTestTags(done) {
   const tags = getAvailableTags();
@@ -386,6 +408,7 @@ function outputAvailableAutomatedTestTags(done) {
 
 module.exports = {
   runAutomatedTestsCli,
+  runAutomatedAnalyticsTestsCli,
   buildTestAccountCli,
   runAutomatedTests,
   outputAvailableAutomatedTestTags,

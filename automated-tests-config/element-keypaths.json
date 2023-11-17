@@ -772,6 +772,10 @@
     "description" : "remaining time in player timer",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#RemainingLabel"
   },
+  "currentTimePlayed" :{
+    "description" : "current time in player timer",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#ElapsedLabel"
+  },
   "autoPlayYearAndDuration" : {
     "description" : "autoplay option year and duration info",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextMovieGroup.#InfoMovie.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Line1"
@@ -818,4 +822,3 @@
 }
 
 }
-

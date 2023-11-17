@@ -598,7 +598,7 @@ Function getConstants()
       if mode = "production"
         constants.urls.analytics.urlBase = "https://analytics-ingestion.production-public.tubi.io/analytics-ingestion"
       else if mode = "qa"
-        #if suitestjs
+        #if useQaAnalyticsProxy
           constants.urls.analytics.urlBase = constants.urls.qaProxy.analytics
         #end if
       end if

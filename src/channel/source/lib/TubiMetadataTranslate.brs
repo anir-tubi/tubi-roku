@@ -307,7 +307,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.description <> invalid
     translatedContent.description = contentFromServer.description
 
-    #if suitestjs
+    #if useQaAnalyticsProxy
       ' QA - display content ids UI tests
       if m.constants.settings.mode = "qa"
         translatedContent.description = translatedContent.id + " " + contentFromServer.description
@@ -655,7 +655,7 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId, i
 
 
       ' QA - inject the category slug into the content description for automated UI testing
-      #if suitestjs
+      #if useQaAnalyticsProxy
         if m.constants.settings.mode = "qa"
           translated.description = category.id + " " + translated.description
         end if
@@ -1287,7 +1287,7 @@ Function tubiMetadataTranslate_buildCategoryParentInfo(container, contentMode = 
     updateMetadata.logoUri = container.logo
 
     ' QA - display category slug on channel/categories list pages for automated UI tests
-    #if suitestjs
+    #if useQaAnalyticsProxy
       if m.constants.settings.mode = "qa"
         updateMetadata.title = container.slug
         updateMetadata.logoUri = ""
