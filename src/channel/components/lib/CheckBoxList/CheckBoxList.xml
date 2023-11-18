@@ -3,6 +3,7 @@
   <script type="text/brightscript" uri="CheckBoxList.brs" />
 
    <interface>
-    <field id="defaultCheckedItemIndex" type="int" />
+   <!-- Setting always notify so that m scope value of defaultCheckedItemIndex is always synced up with this value on re-open. -->
+    <field id="defaultCheckedItemIndex" type="int" alwaysNotify="true" />
   </interface>
 </component>
