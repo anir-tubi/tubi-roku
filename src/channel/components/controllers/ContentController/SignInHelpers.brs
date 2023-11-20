@@ -535,7 +535,7 @@ End Function
 
 
 ' onSignInResponse callback is triggered when the sign In is success
-' @response: assocarray, the response of signIn API in the form of AA
+' @response: assocarray or invalid, the response of signIn API in the form of AA or invalid if called from onQueryStatusOfMagicLinkResponse
 Function onSignInResponse(response)
   m.trackingLoggingTask.trackEvent = {
     type: "account"
@@ -546,11 +546,16 @@ Function onSignInResponse(response)
     }
   }
 
-  requestInput = response.requestInput
-  rfiSignInInfo = requestInput.rfiSignInInfo
+  rfiSignInInfo = invalid
+  requestInput = invalid
+
+  if response <> invalid then
+    requestInput = response.requestInput
+    rfiSignInInfo = requestInput.rfiSignInInfo
+  end if
 
   ' If email address used to sign in matches the Roku email address then go ahead and backfill their name and gender info
-  if rfiSignInInfo.email = requestInput.email then
+  if isAA(rfiSignInInfo) = true AND isAA(requestInput) = true AND rfiSignInInfo.email = requestInput.email then
     fieldsToUpdate = {}
     gender = rfiSignInInfo.gender
     if isNonEmptyString(gender) = true then
