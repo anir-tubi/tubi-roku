@@ -291,9 +291,9 @@ Function processResponse(msg)
           end if
         end if
 
-        m.jobStore.delete(id) ' delete the job from assocarray after the response is sent to avoid memory leak
-
       end if
+
+      m.jobStore.delete(id) ' delete the job from assocarray after the response is sent to avoid memory leak
     end if
 
   end if
