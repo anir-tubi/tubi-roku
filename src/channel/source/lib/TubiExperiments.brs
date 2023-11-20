@@ -32,16 +32,16 @@ Function TubiExperiments(constants) as Object
       roku_large_poster: {
         roku_large_poster_categories: {"enabled": false}
       }
-      
+
       '//Experiment to display a user's liked video titles on the MyStuff screen
       roku_mylikes_mystuff: {
         roku_mylikes_mystuff_v1: {"enabled": false}
       }
-      
+
       roku_screensaver: {
         roku_screensaver_v2 : {"enabled": false}
       }
-      
+
       roku_see_all_container: {
         roku_view_more_one_hundred_v1 : {"enabled": false}
         roku_view_more_last_v1: {"enabled" : false}
@@ -50,7 +50,7 @@ Function TubiExperiments(constants) as Object
       roku_cw_featured_recommended_placement: {
         roku_cw_featured_recommended_placement_v1: {"roku_cw_featured_recommended_placement_type": "none"} 'valid values are : "none", "roku_cw_in_featured", "roku_cw_in_recommended"
       }
-      
+
       roku_series_season_order: {
         roku_series_season_order_v1: {"enabled": false}
       }
@@ -90,6 +90,10 @@ Function TubiExperiments(constants) as Object
 
       roku_trending_search: {
         roku_trending_search_v1: {"enabled": false}
+      }
+
+      roku_preview_player_alternative_stop_method: {
+        roku_preview_player_alternative_stop_method_v1: {"enabled": false}
       }
 
     }

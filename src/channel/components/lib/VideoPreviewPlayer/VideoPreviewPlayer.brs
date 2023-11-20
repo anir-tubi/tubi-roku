@@ -49,6 +49,7 @@ End Function
 
 ' plays the video
 Function playContent()
+  m.Video.visible = true
   m.videoState = "play"
   m.Video.control = "play"
   m.lastPingTime = 0
@@ -172,7 +173,14 @@ Function pauseContent()
     m.Video.control = "pause"
   else if m.videoState <> "stop" ' added this check to avoid playing content once the buffering is completed when focus is on sidenav/topnav
     m.videoState = "stop"
-    m.Video.control = "stop"
+    if getExperimentResource("roku_preview_player_alternative_stop_method", "roku_preview_player_alternative_stop_method_v1", true).enabled = true then
+      m.Video.content = invalid
+      m.top.timestampOfLastVideoPlayback = createObject("roDateTime").asSeconds()
+      m.top.state = "stopped"
+    else
+      ' We only want to call stop on the control of the experiment
+      m.Video.control = "stop"
+    end if
   end if
 End Function
 
@@ -184,7 +192,16 @@ Function stopContent()
       finishPreviewEvent = getFinishPreviewEvent()
       trackEvent(finishPreviewEvent)
     end if
-    m.Video.control = "stop"
+
+    if getExperimentResource("roku_preview_player_alternative_stop_method", "roku_preview_player_alternative_stop_method_v1", true).enabled = true then
+      m.Video.content = invalid
+      m.top.timestampOfLastVideoPlayback = createObject("roDateTime").asSeconds()
+      m.top.state = "stopped"
+      m.Video.visible = false
+    else
+      ' We only want to call stop on the control of the experiment
+      m.Video.control = "stop"
+    end if
     m.videoState = "stop"
   end if
   m.top.content = invalid
