@@ -91,7 +91,7 @@ Function fetchMyStuffCategoryDetails(screen)
   content.appendChild(contentNode)
 
   if isKidsMode = false
-    '//roku_mylikes_mystuff_v1 - for the duration of the experiment, get a container of liked videos.
+    '//roku_mylikes_mystuff_v2 - for the duration of the experiment, get a container of liked videos.
     likeIds = getArrayOfLikedIds()
     if likeIds.Count() > 0
       '//Add the Liked IDs as a container
@@ -127,7 +127,7 @@ Function onMyStuffBatchResponse(response)
         for i = 0 to response.getChildCount() - 1
           container = response.getChild(i)
           if container.id = m.constants.ui.categoryIds.myLikes
-            if getExperimentResource("roku_mylikes_mystuff", "roku_mylikes_mystuff_v1", true).enabled = false
+            if getExperimentResource("roku_mylikes_mystuff", "roku_mylikes_mystuff_v2", true).enabled = false
               '//send exposure event here regardless if enabled/disabled
               '//remove liked content if disabled. Do it here since there is no way to know if liked video IDs are valid/current before requesting them.
               response.removeChildIndex(i)

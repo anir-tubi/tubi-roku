@@ -35,7 +35,7 @@ Function TubiExperiments(constants) as Object
 
       '//Experiment to display a user's liked video titles on the MyStuff screen
       roku_mylikes_mystuff: {
-        roku_mylikes_mystuff_v1: {"enabled": false}
+        roku_mylikes_mystuff_v2: {"enabled": false}
       }
 
       roku_screensaver: {

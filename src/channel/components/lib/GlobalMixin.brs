@@ -87,7 +87,7 @@ End Function
 
 
 ' returns an array of contentIds that the user has liked.
-' ::TODO::roku_mylikes_mystuff_v1 - this function may not be necessary after the experiment: i.e. the experiment is not graduated or the backend provides an myLikes endpoint that makes this function unnecessary
+' ::TODO::roku_mylikes_mystuff_v2 - this function may not be necessary after the experiment: i.e. the experiment is not graduated or the backend provides an myLikes endpoint that makes this function unnecessary
 Function getArrayOfLikedIds()
   likeIds = getFieldFromGlobal("likeIds")
   constants = getConstantsFromGlobal()

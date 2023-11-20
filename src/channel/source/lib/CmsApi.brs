@@ -491,7 +491,7 @@ Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSi
     if category <> invalid
 
       if category.id = m.constants.ui.categoryIds.myLikes
-        ' ::TODO::roku_mylikes_mystuff_v1 - this condition may not be necessary after the experiment: i.e. the experiment is not graduated or the backend provides an myLikes endpoint that makes this function unnecessary
+        ' ::TODO::roku_mylikes_mystuff_v2 - this condition may not be necessary after the experiment: i.e. the experiment is not graduated or the backend provides an myLikes endpoint that makes this function unnecessary
         categoryReqInfo = invalid
         imageParamTypes = [
           "poster"
