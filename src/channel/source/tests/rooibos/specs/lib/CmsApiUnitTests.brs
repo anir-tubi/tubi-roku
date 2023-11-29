@@ -363,6 +363,7 @@ Function cmsApi_createHomeScreenReqInfo_test()
     "images[landscape_tb]"
     "images[poster_tb]"
     "customParam"
+    "idfa"
   ]
   headers = [
     "x-custom-header"
@@ -383,6 +384,7 @@ Function cmsApi_createHomeScreenReqInfo_test()
       "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeLandscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeLandscape[1].ToStr() + "_landscape"
       "contentMode": m.cmsApi.constants.ui.contentMode.homescreen
       "customParam": "custom_param_value"
+      "idfa": m.cmsApi.constants.deviceInfo.deviceAdId
     }
     headers: {
       "x-custom-header": "custom_header_value"
@@ -418,6 +420,7 @@ Function cmsApi_createHomeScreenReqInfo_test()
   m.assertEqual(homeInfo.options.params["images[poster_tb]"], homeOptions.params["images[poster_tb]"])
   m.assertEqual(homeInfo.options.params["images[landscape_tb]"], homeOptions.params["images[landscape_tb]"])
   m.assertEqual(homeInfo.options.params["contentMode"], homeOptions.params["contentMode"])
+  m.assertEqual(homeInfo.options.params["idfa"], homeOptions.params["idfa"])
   m.assertEqual(homeInfo.options.params["customParam"], homeOptions.params["customParam"])
   m.assertEqual(homeInfo.options.headers["x-custom-header"], homeOptions.headers["x-custom-header"])
   m.assertEqual(homeInfo.options.headers["x-client-platform"], homeOptions.headers["x-client-platform"])

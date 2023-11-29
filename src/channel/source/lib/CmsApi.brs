@@ -210,6 +210,9 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
   params["content_mode"] = "" ' default contentMode
 
+  'passing device advertiser id to homescreen request for home screen personalization
+  params["idfa"] = m.constants.deviceInfo.deviceAdId
+
   if passedOptions.params <> invalid AND passedOptions.params["content_mode"] <> invalid AND passedOptions.params["content_mode"] <> ""
     ' This will be overwritten by the same value later in this function
     ' when we append the passedOptions.params to params. We add it here so the default value
