@@ -52,7 +52,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_series_season_order: {
-        roku_series_season_order_v1: {"enabled": false}
+        roku_series_season_order_v2: {"enabled": false}
       }
 
       roku_large_play_progress: {

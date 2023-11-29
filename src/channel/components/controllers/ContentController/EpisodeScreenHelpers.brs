@@ -43,8 +43,15 @@ Function showEpisodeScreen(content, shouldSendNavigationAnalytics, playbackSourc
   episodesScreen.episodeToFocus = findEpisode2dIndex(content.currentEpisodeId, content)
   pushScreen(episodesScreen, shouldSendNavigationAnalytics, true)
 
-  ' send the exposure event when user landed on episodes detail screen
-  getExperimentResource("roku_series_season_order", "roku_series_season_order_v1")
+  ' send the exposure event when user landed on episodes detail screen and see the season reverse order for the reality or lifestyle genres.
+  if content.isRecurring = false AND isNonEmptyArray(content.genres) = true
+    for each genre in content.genres
+      if genre = "Reality" OR genre = "Lifestyle"
+        getExperimentResource("roku_series_season_order", "roku_series_season_order_v2")
+        exit for
+      end if
+    end for
+  end if
 End Function
 
 

@@ -174,11 +174,11 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   if contentFromServer.id <> invalid then translatedContent.id = contentFromServer.id
   typeVar = "type"
 
-  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_series_season_order", "roku_series_season_order_v1").enabled = true
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_series_season_order", "roku_series_season_order_v2").enabled = true
     if contentFromServer.type = "s" AND  contentFromServer.is_recurring = false AND isNonEmptyArray(contentFromServer.tags) = true
         for each tag in contentFromServer.tags
           if contentFromServer.children <> invalid AND (tag = "Reality" OR tag = "Lifestyle")
-          'In roku_series_season_order_v1 experiment, if the content comes under Reality/Life Style Genre and
+          'In roku_series_season_order_v2 experiment, if the content comes under Reality/Life Style Genre and
           'seasons are ascending order, then we will reverse the order to show the latest season on the top.
 
           'is_recurring field tells whether the seasons are ascending/Descending order. If is_recurring = true means they are in
