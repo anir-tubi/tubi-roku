@@ -40,7 +40,6 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     updateYouboraOptions: tubiAds_updateYouboraOptions
     parseOutNotUsedAdPodPixels: tubiAds_parseOutNotUsedAdPodPixels
     requestQueue: requestQueue.create(adLoggingPort)
-    roAdFramework: roAdFramework
     allAdUnitsList: []
     totalAdBreakAds: 0
     commercialDuration : 0
@@ -51,6 +50,7 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     breakPos: 0
 
     ' public
+    roAdFramework: roAdFramework
     reset: tubiAds_reset
     getAdsListViaRoku: tubiAds_getAdsListViaRoku
     hasAds: tubiAds_hasAds
@@ -69,6 +69,7 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     sendNotUsedAdPodPixels: tubiAds_sendNotUsedAdPodPixels
     retrieveAds: tubiAds_retrieveAds
     replaceMacro: tubiAds_replaceMacro
+    setLimitAdTracking: tubiAds_setLimitAdTracking
     appMode: "DEFAULT_MODE"
     notUsedAdPodPixels: {} ' List of pixels for the current ad pod that should be sent if playback is stopped before we get an impression for that ad
   }
@@ -934,4 +935,13 @@ End Function
 Function tubiAds_replaceMacro(adUrl, macro, newValue)
   newAdUrl = adUrl.trim().unescape().replace(macro, newValue)
   return newAdUrl
+End Function
+
+
+' Wrapper around RAF's setLimitAdTracking to only call if it exists for the version of RAF running on the device
+' @enabled: boolean, Sets the ROKU_ADS_LIMIT_TRACKING URL parameter macro to be passed into beacons and ad requests to either 1 (true; ad targeting is disabled for the customer) or 0 (false; ad targeting is disabled for the customer).
+Function tubiAds_setLimitAdTracking(enabled)
+  if isFunction(m.roAdFramework.setLimitAdTracking) = true then
+    m.roAdFramework.setLimitAdTracking(enabled)
+  end if
 End Function

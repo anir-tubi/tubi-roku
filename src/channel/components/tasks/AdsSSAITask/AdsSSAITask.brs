@@ -27,7 +27,7 @@ Function execAdsSSAITask()
 
   m.adLib = TubiAds(m.constants, m.request, requestQueueLib, auth, m.tracking, "mp4")
   m.raf = m.adLib.roAdFramework
-  m.raf.setLimitAdTracking(m.top.didUserOptOutOfPersonalizedAdvertising)
+  m.adLib.setLimitAdTracking(m.top.didUserOptOutOfPersonalizedAdvertising)
 
   ' used to determine when to poll for ads
   m.timeSpan = CreateObject("roTimespan")
@@ -102,7 +102,7 @@ Function runSSAILoop(ssaiPort)
       else if messageField = "userConsentsOptOutStatus"
         m.tracking.userConsentsOptOutStatus = msg.getData()
       else if messageField = "didUserOptOutOfPersonalizedAdvertising"
-        m.raf.setLimitAdTracking(msg.getData())
+        m.adLib.setLimitAdTracking(msg.getData())
       else if messageField = "playbackStopped"
         if isArray(m.adPod.ads) = true then
           notUsedAction = "exit_mid_pod"

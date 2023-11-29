@@ -41,7 +41,7 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
   m.videoPlayerNode.observeField("adControl", port)
   m.videoPlayerNode.observeFieldScoped("userConsentsOptOutStatus", port)
   m.videoPlayerNode.observeFieldScoped("didUserOptOutOfPersonalizedAdvertising", port)
-  m.ads.roAdFramework.setLimitAdTracking(m.videoPlayerNode.didUserOptOutOfPersonalizedAdvertising)
+  m.ads.setLimitAdTracking(m.videoPlayerNode.didUserOptOutOfPersonalizedAdvertising)
 
   ' Let SceneGraph know that ad shim is ready
   m.videoPlayerNode.adState = "ready"
@@ -73,7 +73,7 @@ Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
       else if msg.GetField() = "userConsentsOptOutStatus"
         m.ads.tracking.userConsentsOptOutStatus = msg.getData()
       else if msg.GetField() = "didUserOptOutOfPersonalizedAdvertising"
-        m.ads.roAdFramework.setLimitAdTracking(msg.getData())
+        m.ads.setLimitAdTracking(msg.getData())
       end if
     end if
   end while
