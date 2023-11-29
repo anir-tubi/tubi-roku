@@ -86,7 +86,7 @@
       id="CategoryCount"
       layoutDirection="horiz"
       horizAlignment="right"
-      translation="[1572,12]">
+      translation="[1535,12]">
       <Label
         id="FocusIndex"
         text=""

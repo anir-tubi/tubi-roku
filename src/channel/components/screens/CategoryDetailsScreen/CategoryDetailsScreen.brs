@@ -19,15 +19,10 @@ Function init()
 
   m.InfoPanel = m.top.findNode("ChannelsInfoPanel")
   m.PageTitleAndCounter = m.top.findNode("pageTitleAndCounter")
-  m.VideoGrid = m.top.findNode("ChannelsVideoGrid")
   m.NavSection = m.top.findNode("nav")
-  posterSize = m.constants.ui.imageSizes.poster
-  if (getExperimentResource("roku_large_poster", "roku_large_poster_categories", false).enabled = true)
-    '//::TODO:: roku_large_poster_categories - when graduating, remove the hardcoded properties in the XML associated with the following lines
-    posterSize = m.constants.ui.imageSizes.largePoster
-    m.VideoGrid.itemSpacing = [16,16]
-    m.VideoGrid.numColumns = 6
-  end if
+  m.VideoGrid = m.top.findNode("ChannelsVideoGrid")
+  m.VideoGrid.itemSize = m.constants.ui.imageSizes.largePoster
+
   m.top.observeField("callingPage", "onSetCallOfAction")
   m.top.observeField("shouldLoadContent", "onLoadContent")
   m.top.observeField("isLoading", "onIsLoading")
@@ -52,7 +47,6 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.categoryDetailsScreen
   m.top.handlesTransportVoiceRequests = true
 
-  m.VideoGrid.itemSize = posterSize
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmall_strong)

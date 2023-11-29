@@ -14,6 +14,7 @@ Function init()
   m.top.observeFieldScoped("currentIndex", "onIndexChange")
   m.top.observeFieldScoped("isFullyLoaded", "onIsFullyLoaded")
 
+  '//Keep a record of what the original transitions are for certain elements in case they need to be adjusted during sponsorships and then returned back to the original transition when the component does not have a sponsorship
   m.originalTranslation_CategoryName = m.CategoryName.translation
   m.originalTranslation_CategoryCount = m.CategoryCount.translation
 
@@ -62,44 +63,10 @@ Function onSponsorPosterLoadStatusChanged(msg)
 End Function
 
 
-Function getParentScreen(child)
-  '//::TODO::roku_large_poster_categories - once all screens that use this component have been set to display large posters, 
-  '//   then we won't need this function too know which screen the component is within. 
-  parentReturn = invalid
-  if child.getParent() <> invalid
-    parent = child.getParent()
-    if parent.isSubType("BaseScreen") = false
-      grandparent = getParentScreen(parent)
-      if grandparent <> invalid AND grandparent.isSubType("BaseScreen") = true
-        parentReturn = grandparent
-      end if
-    else
-      parentReturn = parent
-    end if
-  end if
-
-  return parentReturn
-End Function
-
-
 Function onContentChange()
   tubiLog("CategoryGridRowLabel.onContentChange")
   item = m.top.content
   if item <> invalid
-
-    itemTopParent = getParentScreen(m.top)
-    '//::TODO::roku_large_poster_categories - once all screens that use this component have been set to display large posters, then set this as the default value in the XML and get rid of this condition and the getParentScreen() function
-    if itemTopParent <> invalid
-      if itemTopParent.id = "homeScreen" OR (getExperimentResource("roku_large_poster", "roku_large_poster_categories", false).enabled = true AND itemTopParent.id = "categoryDetailsScreen")
-        '//If this component is being used on the homescreen or in the roku_large_poster_categories experiment while on the categoryDetailsScreen, then set the default translation of the item counter
-        m.originalTranslation_CategoryCount = [1535, m.originalTranslation_CategoryCount[1]]
-      else if itemTopParent.id = "categoryDetailsScreen"
-        '// this is the control value on the categoryDetailsScreen
-        '//::NOTE::roku_large_poster_categories this fixed a bug in the original code in that the "categories" version of the categoryDetailsScreen was NOT positioning the counter at the right location,
-        '//   but the "channels" version of the categoryDetailsScreen WAS positioning the counter correctly. Once the experiment gets graduated, then this bug fix is no longer needed.
-        m.originalTranslation_CategoryCount = [1630, m.originalTranslation_CategoryCount[1]]
-      end if
-    end if
 
     m.CategoryName.text = item.title
 

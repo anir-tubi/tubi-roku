@@ -243,9 +243,6 @@ Function onCategoryDetailResponse(categoryContent)
         sendSponsorPixels(sponsorPixels)
       end if
 
-      '//Assume images are going to be displayed when the category detail screen is displayed - and send exposure event
-      getExperimentResource("roku_large_poster", "roku_large_poster_categories", true)
-
       if screen.content = invalid 'first time
         screen.content = categoryContent
         screen.shouldLoadContent = true

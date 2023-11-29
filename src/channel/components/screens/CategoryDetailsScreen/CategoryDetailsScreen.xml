@@ -131,12 +131,11 @@
       id="pageTitleAndCounter"/>
     <MarkupGrid
       id="ChannelsVideoGrid"
+      itemSpacing="[16,16]"
       translation="[192,600]"
       itemComponentName="StarterGridItem"
-      itemSize="[198,282]"
-      itemSpacing="[20,12]"
       numRows="2"
-      numColumns="8"
+      numColumns="6"
       fadeFocusFeedbackWhenAutoScrolling="true"
       vertFocusAnimationStyle="fixedFocus"
       focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
