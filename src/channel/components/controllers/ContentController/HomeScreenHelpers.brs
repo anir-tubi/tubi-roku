@@ -116,12 +116,10 @@ Function homeBatchResponse(response)
  homeScreen = getFromScreenCache(screenID)
  currentScreen = getCurrentScreen()
 
- continueWatchingPlacementType = getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v1", false).roku_cw_featured_recommended_placement_type
-
  if homeScreen <> invalid
     for i = 0 to response.getChildCount() - 1
       category = response.getChild(i)
-      if (continueWatchingPlacementType = "roku_cw_in_featured" AND category.id = m.constants.ui.categoryIds.featured) OR (continueWatchingPlacementType = "roku_cw_in_recommended" AND category.id = m.constants.ui.categoryIds.recommendedForYou)
+      if category.id = m.constants.ui.categoryIds.featured
         m.featuredOrRecommendedContainerReceived = true
         if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
           gridList = homeScreen.findNode("CategoryGridList") 'I'm ashamed of this hack :(
@@ -132,9 +130,9 @@ Function homeBatchResponse(response)
         end if
       end if
 
-      'Will send the exposure event when home screen loaded and continue watching has a series to pin at first position of featured/Recommended row.
-      if (category.id = m.constants.ui.categoryIds.featured OR category.id = m.constants.ui.categoryIds.recommendedForYou) AND category.shouldSendExposureEventForCWInFeaturedRecommended = true
-        getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v1", true)
+      'Will send the exposure event when home screen loaded and continue watching has a series to pin at first position of featured row.
+      if category.id = m.constants.ui.categoryIds.featured AND category.shouldSendExposureEventForCWInFeatured = true
+        getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v2", true)
         exit for
       end if
 
@@ -778,9 +776,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
       end if
     end if
     
-    continueWatchingPlacementType = getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v1", false).roku_cw_featured_recommended_placement_type
-
-    if continueWatchingPlacementType = "none" OR m.featuredOrRecommendedContainerReceived = true
+    if m.featuredOrRecommendedContainerReceived = true
       if homeScreen <> invalid AND currentScreen.isSameNode(homeScreen) = true
         gridList = homeScreen.findNode("CategoryGridList")
         if gridList <> invalid and gridList.isInFocusChain() = true
