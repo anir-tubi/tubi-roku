@@ -63,9 +63,14 @@ End Function
 ' and parentHistoryId (if original content was an episode), or invalid if response JSON does not
 ' contain the expected keys.
 Function parseHistorySuccess(fullResponse, reqInfo)
+
+  if fullResponse.code <> 200
+    return invalid
+  end if
+
   response = fullResponse.data
 
-  if response.content_id = invalid or response.id = invalid or response.content_type = invalid then
+  if response = invalid OR response.content_id = invalid OR response.id = invalid OR response.content_type = invalid then
     return invalid
   end if
 
