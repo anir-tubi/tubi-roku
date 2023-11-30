@@ -198,10 +198,6 @@ Function init()
   m.ignoreOptionsKey = m.constants.deviceInfo.firmwareCaptionMenu
   m.bufferingInfo = invalid
 
-  m.progressBarFocused = false
-  m.playbackControlFocused = false
-  m.relatedRowFocused = false
-
   m.bufferingTimer = m.top.createChild("Timer")
   m.bufferingTimer.duration = 10
   m.bufferingTimer.repeat = false
@@ -225,9 +221,12 @@ Function init()
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("audioTrack", "onAudioTrackChange")
   m.closedCaptionAndAudioSelectionOverlayGroup = m.top.findNode("closedCaptionAndAudioSelectionOverlayGroup")
 
+  'm.focusedNode holds the node/component which helps setting/unsetting focus to component/m.top on video player screen
+  m.focusedNode = m.PlayPauseButton
+
   m.buttonUris = m.constants.player.transportButtons
   m.focusedButtonIndex = 0
-  setFocusedButton(m.PlayPauseButton)
+  setFocusToComponent(m.PlayPauseButton)
 
   m.lastPingTime = 0
   m.lastSavedPosition = 0
@@ -302,7 +301,6 @@ Function init()
   if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1", false).enabled = true
     m.TransportGradient.opacity = 0.0
     m.YMALGradient.opacity = 1.0
-    m.SkipTrailerButton.translation = [84,870]
     m.skipCuepointsButtonUpTranslation = 681
     m.skipCuepointsButtonDownTranslation = 780
     m.thumbnailMaxYOffset = 825
@@ -310,7 +308,6 @@ Function init()
   else
     m.YMALGradient.opacity = 0.0
     m.TransportGradient.opacity = 1.0
-    m.SkipTrailerButton.translation = [84,948]
     m.skipCuepointsButtonUpTranslation = 741
     m.skipCuepointsButtonDownTranslation = 840
     m.thumbnailMaxYOffset = 888
@@ -378,14 +375,14 @@ Function showSkipCuepointsButton()
   if m.HUD.opacity = 1
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonUpTranslation]
   else if m.HUD.opacity > 0
-    setFocusedButton(m.skipCuepointsButton, true)
+    setFocusToComponent(m.skipCuepointsButton, true)
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonUpTranslation]
   else
-    setFocusedButton(m.skipCuepointsButton, true)
+    setFocusToComponent(m.skipCuepointsButton, true)
     m.skipCuepointsButton.translation = [xPosition, m.skipCuepointsButtonDownTranslation]
   end if
 
-  if m.relatedRowFocused = false
+  if m.focusedNode.isSameNode(m.Related) = false
     m.skipCuepointsButton.visible = true
   end if
 
@@ -627,6 +624,7 @@ Function onControlChange()
     stopVideo()
     animateTransport("out")
     hideYMAL()
+    setFocusToPlaybackControl()
     m.UpNext.stopAutoPlayTimer = true
     m.UpNext.hide = true
 
@@ -822,15 +820,17 @@ Function onVideoPositionChange(msg)
     m.isSeeking = false
   end if
 
-  if m.relatedRowFocused = true
+  if m.focusedNode.isSameNode(m.Related) = true
     if m.playerPosition > m.lastButtonPressPos + m.ymalAutoHideTime AND m.isClosedCaptionAudioOverlayShowing = false
       animateTransport("out")
       hideYMAL()
+      setFocusToPlaybackControl()
     end if
   else
     if m.VideoState = "play" AND m.HUD.opacity = 1 AND m.playerPosition > m.lastButtonPressPos + m.transportAutoHideTime AND m.isClosedCaptionAudioOverlayShowing = false
       animateTransport("out")
       hideYMAL()
+      setFocusToPlaybackControl()
     end if
   end if
 
@@ -881,6 +881,7 @@ Function onVideoPositionChange(msg)
       if m.UpNext.content <> invalid
         animateTransport("out")
         hideYMAL()
+        setFocusToPlaybackControl()
         clearSkipCuepointsButtonAndTimer()
         m.UpNext.show = true
         m.UpNext.setFocus(true)
@@ -1178,7 +1179,7 @@ Function onUpNextContentSelected(msg)
 
   ' if contentSelected is invalid, it is handled by the callback in VideoHelpers
   m.top.upNextContentToAutoplay = contentSelected
-  removeFocusFromUpNext()
+  setFocusToPlaybackControl()
 End Function
 
 
@@ -1495,12 +1496,6 @@ Function updateVideoPlayerState(content) as Void
   else if m.NodeHelpers.getChildIndex(m.TransportButtons, m.SkipTrailerButton) < 0
     m.TransportButtons.insertChild(m.SkipTrailerButton, 0)
   end if
-End Function
-
-
-Function removeFocusFromUpNext()
-  m.UpNext.unfocus = true
-  m.top.setFocus(true)
 End Function
 
 
@@ -2057,6 +2052,7 @@ Function onRelatedItemSelected(msg)
 
   animateTransport("out")
   hideYMAL()
+  setFocusToPlaybackControl()
   m.top.relatedContentToPlay = selectedContent
   resetTransportButtons()
 End Function

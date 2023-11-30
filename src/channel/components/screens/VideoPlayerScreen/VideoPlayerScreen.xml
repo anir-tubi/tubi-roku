@@ -421,6 +421,7 @@
             id="SkipTrailerButton"
             width="260"
             height="80"
+            translation="[85,96]"
             uri="">
             <Label
               id="SkipTrailerButtonLabel"

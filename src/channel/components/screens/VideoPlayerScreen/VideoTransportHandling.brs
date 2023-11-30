@@ -53,14 +53,14 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           end if
         end if
 
-      else if key = "left" AND m.relatedRowFocused = false
+      else if key = "left" AND m.focusedNode.isSameNode(m.Related) = false
         'video is in playback mode and user wants to skip back
-        if m.HUD.opacity = 0 AND m.progressBarFocused = false AND isActiveVideoState(m.VideoState, m.Video)
-          handleSkipVideo(-10, m.progressBarFocused)
+        if m.HUD.opacity = 0 AND m.focusedNode.isSameNode(m.progressBar) = false AND isActiveVideoState(m.VideoState, m.Video)
+          handleSkipVideo(-10)
 
         'user is in skip ahead mode (the progress bar is focused) and wants to skip back.
-        else if m.progressBarFocused = true AND isActiveVideoState(m.VideoState, m.Video)
-          handleSkipVideo(-10, m.progressBarFocused)
+        else if m.focusedNode.isSameNode(m.progressBar) = true AND isActiveVideoState(m.VideoState, m.Video)
+          handleSkipVideo(-10)
 
         else
           'navigate the transport buttons, skipping disabled ones
@@ -70,7 +70,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
             for i=m.focusedButtonIndex-1 to 0 step -1
               button = m.TransportButtons.getChild(i)
               if button.enabled then
-                setFocusedButton(button, true)
+                setFocusToComponent(button, true)
                 exit for
               end if
             end for
@@ -79,14 +79,14 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
 
       else if key = "right"
         'video is in playback mode and user wants to skip ahead
-        if m.relatedRowFocused = false AND m.HUD.opacity = 0 AND m.progressBarFocused = false AND isActiveVideoState(m.VideoState, m.Video)
-          handleSkipVideo(10, m.progressBarFocused)
+        if m.focusedNode.isSameNode(m.Related) = false AND m.HUD.opacity = 0 AND m.focusedNode.isSameNode(m.progressBar) = false AND isActiveVideoState(m.VideoState, m.Video)
+          handleSkipVideo(10)
 
         'user is in skip ahead mode (the progress bar is focused) and wants to skip ahead.
-        else if m.relatedRowFocused = false AND m.progressBarFocused = true AND isActiveVideoState(m.VideoState, m.Video)
-          handleSkipVideo(10, m.progressBarFocused)
+        else if m.focusedNode.isSameNode(m.Related) = false AND m.focusedNode.isSameNode(m.progressBar) = true AND isActiveVideoState(m.VideoState, m.Video)
+          handleSkipVideo(10)
 
-        else if m.relatedRowFocused = false
+        else if m.focusedNode.isSameNode(m.Related) = false
           if m.focusedButtonIndex = m.TransportButtons.getChildCount()-1
             return false
           else
@@ -94,7 +94,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
             for i=m.focusedButtonIndex+1 to m.TransportButtons.getChildCount()-1
               button = m.TransportButtons.getChild(i)
               if button.enabled then
-                setFocusedButton(button, true)
+                setFocusToComponent(button, true)
                 exit for
               end if
             end for
@@ -102,34 +102,32 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         end if
 
       else if key = "up"
-        if m.relatedRowFocused = true
-          setFocusedButton(m.PlayPauseButton, true)
+        if m.focusedNode.isSameNode(m.Related) = true
           animateTransportAndYMAL("out")
-        else if m.TopOverlay.opacity = 0 AND m.relatedRowFocused = false
+          setFocusToPlaybackControl()
+        else if m.TopOverlay.opacity = 0 AND m.focusedNode.isSameNode(m.Related) = false
           showTransport()
           showYMAL()
-        else if m.progressBarFocused = false AND m.skipCuepointsButton.hasFocus() = false
-          setFocusedButton(m.ProgressBar)
-        else if m.progressBarFocused = true AND m.skipCuepointsButton <> invalid AND m.skipCuepointsButton.visible = true
-          m.progressBarFocused = false
-          m.skipCuepointsButton.setFocus(true)
+        else if m.focusedNode.isSameNode(m.progressBar) = false AND m.skipCuepointsButton.hasFocus() = false
+          setFocusToComponent(m.ProgressBar)
+        else if m.focusedNode.isSameNode(m.progressBar) = true AND m.skipCuepointsButton <> invalid AND m.skipCuepointsButton.visible = true
+          setFocusToComponent(m.skipCuepointsButton)
         else
           return false
         end if
 
       else if key = "down"
-        if m.TopOverlay.opacity = 0 AND m.relatedRowFocused = false
+        if m.TopOverlay.opacity = 0 AND m.focusedNode.isSameNode(m.Related) = false
           showTransport()
           showYMAL()
-        else if m.progressBarFocused = true
-          setFocusedButton(m.PlayPauseButton, true)
+        else if m.focusedNode.isSameNode(m.progressBar) = true
+          setFocusToComponent(m.PlayPauseButton, true)
         else if m.skipCuepointsButton.hasFocus() = true
-          setFocusedButton(m.ProgressBar)
-        else if m.playbackControlFocused = true AND m.TopOverlay.opacity = 1
+          setFocusToComponent(m.ProgressBar)
+        else if isFocusOnPlayerControl() = true AND m.TopOverlay.opacity = 1
 
           if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1", false).enabled = true AND m.top.relatedContent <> invalid
-            m.relatedRowFocused = true
-            m.Related.setFocus(true)
+            setFocusToComponent(m.Related)
             animateTransportAndYMAL("in")
           else
             return false
@@ -161,10 +159,11 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
               m.top.upNextContentToAutoplay = m.UpNext.contentFocused
             end if
 
-            removeFocusFromUpNext()
+            setFocusToPlaybackControl()
           end if
         else if m.VideoState = "play"
           hideYMAL()
+          setFocusToPlaybackControl()
 
           if m.HUD.opacity = 0
             clearSkipCuepointsButtonAndTimer()
@@ -177,7 +176,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         else if m.VideoState = "pause"
             resumeFromPause(true)
         else if m.VideoState = "rew" or m.VideoState = "ffw"
-          setFocusedButton(m.PlayPauseButton)
+          setFocusToComponent(m.PlayPauseButton)
           endScrub(true)
         else if m.VideoState = "skip"
           resumeFromSkip()
@@ -314,12 +313,13 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
     showYMAL()
   end if
 
-  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1", false).enabled = true AND m.relatedRowFocused = true
+  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1", false).enabled = true AND m.focusedNode.isSameNode(m.Related) = true
     animateTransportAndYMAL("out")
+    setFocusToPlaybackControl()
   end if
 
   m.PlayPauseButton.uri = m.buttonUris.play
-  setFocusedButton(m.PlayPauseButton)
+  setFocusToComponent(m.PlayPauseButton)
 
   if shouldSendAnalytics = true
     trackEvent({
@@ -380,7 +380,7 @@ Function resumeFromPause(shouldSendAnalytics)
   end if
 
   m.PlayPauseButton.uri = m.buttonUris.pause
-  setFocusedButton(m.PlayPauseButton)
+  setFocusToComponent(m.PlayPauseButton)
 End Function
 
 
@@ -404,7 +404,7 @@ Function resumeFromSkip()
     updateVideoState("play")
   end if
   m.PlayPauseButton.uri = m.buttonUris.pause
-  setFocusedButton(m.PlayPauseButton)
+  setFocusToComponent(m.PlayPauseButton)
 End Function
 
 
@@ -422,7 +422,7 @@ Function handleSkipTrailer()
   animateTransport("out")
   hideYMAL()
   resetTransportButtons()
-  setFocusedButton(m.PlayPauseButton)
+  setFocusToComponent(m.PlayPauseButton)
 End Function
 
 
@@ -436,7 +436,7 @@ Function goToStart()
 
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(false)
-    setFocusedButton(m.StartButton)
+    setFocusToComponent(m.StartButton)
   else if m.VideoState <> "skip"
     playProgressEvent = getPlayProgressEvent("goToStart")
     if playProgressEvent <> invalid
@@ -448,6 +448,7 @@ Function goToStart()
   if m.HUD.opacity > 0.0
     animateTransport("out")
     hideYMAL()
+    setFocusToPlaybackControl()
   end if
   'Only hide the button, don't clear the button so that the button will be shown again
   'if the transport is shown during playback between the intro or other skippable cuepoints'
@@ -474,6 +475,7 @@ Function goToNext()
 
   animateTransport("out")
   hideYMAL()
+  setFocusToPlaybackControl()
   resetTransportButtons()
 End Function
 
@@ -528,7 +530,7 @@ Function handlePlayPause()
   else if m.VideoState = "skip"
     resumeFromSkip()
   end if
-  setFocusedButton(m.PlayPauseButton)
+  setFocusToComponent(m.PlayPauseButton)
 End Function
 
 
@@ -565,7 +567,7 @@ Function handleFastForward()
     m.PlayPauseButton.uri = m.buttonUris.play
   end if
 
-  setFocusedButton(m.FastForwardButton)
+  setFocusToComponent(m.FastForwardButton)
 End Function
 
 
@@ -601,7 +603,7 @@ Function handleRewind()
     m.PlayPauseButton.uri = m.buttonUris.play
   end if
 
-  setFocusedButton(m.RewindButton)
+  setFocusToComponent(m.RewindButton)
 End Function
 
 
@@ -609,7 +611,7 @@ End Function
 Function handleHopForward(duration)
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(false)
-    setFocusedButton(m.HopForwardButton)
+    setFocusToComponent(m.HopForwardButton)
   else if m.VideoState <> "skip"
     playProgressEvent = getPlayProgressEvent("handleHopForward")
     if playProgressEvent <> invalid
@@ -622,6 +624,7 @@ Function handleHopForward(duration)
   if m.HUD.opacity > 0.0
     animateTransport("out")
     hideYMAL()
+    setFocusToPlaybackControl()
   end if
   'Only hide the button, don't clear the button so that the button will be shown again
   'if the transport is shown during playback between the intro or other skippable cuepoints'
@@ -637,7 +640,7 @@ End Function
 ' remoteReplayButton - true/false (true - if replay button on remote is pressed/voice input, false - if replay icon is pressed or seek voice input)
 ' duration is seek/skip/replay in seconds.
 Function handleHopBack(remoteReplayButton, duration)
-  setFocusedButton(m.HopBackButton)  'necessary because there is a dedicated hop back button on certain roku remotes
+  setFocusToComponent(m.HopBackButton) 'necessary because there is a dedicated hop back button on certain roku remotes
 
   if m.VideoState = "ffw" or m.VideoState = "rew"
     endScrub(false)
@@ -651,11 +654,10 @@ Function handleHopBack(remoteReplayButton, duration)
     m.positionAtJumpStart = m.playerPosition   'used for seek event analytics
   end if
 
-  setFocusedButton(m.HopBackButton)
-
   if m.HUD.opacity > 0.0
     animateTransport("out")
     hideYMAL()
+    setFocusToPlaybackControl()
   end if
   'Only hide the button, don't clear the button so that the button will be shown again
   'if the transport is shown during playback between the intro or other skippable cuepoints'
@@ -679,7 +681,7 @@ End Function
 
 'handles the functionality for Roku's requirement to skip the video forward or backward while pausing the video.
 'functionality is: pause video, jump 10s forward or back, show the transport
-Function handleSkipVideo(amt, isProgressBarFocused)
+Function handleSkipVideo(amt)
   'handle the first skip press
   if m.VideoState <> "skip"
     m.Video.control = "pause"
@@ -711,8 +713,8 @@ Function handleSkipVideo(amt, isProgressBarFocused)
   showYMAL()
   m.PlayPauseButton.uri = m.buttonUris.play
 
-  if isProgressBarFocused <> true
-    setFocusedButton(m.ProgressBar)
+  if m.focusedNode.isSameNode(m.ProgressBar) = false
+    setFocusToComponent(m.ProgressBar)
   end if
   showThumbnail()
 
@@ -726,7 +728,7 @@ Function showClosedCaptionAudioTrackOverlay()
   m.closedCaptionAndAudioSelectionOverlay.availableClosedCaptionTracks = m.video.availableSubtitleTracks
   m.closedCaptionAndAudioSelectionOverlay.availableAudioTracks = m.video.availableAudioTracks
   m.closedCaptionAndAudioSelectionOverlay.setFocus(true)
-  setFocusedButton(m.closedCaptionAudioButton)
+  setFocusToComponent(m.closedCaptionAudioButton)
   fade(m.closedCaptionAndAudioSelectionOverlayGroup, "in", 0.6)
   m.isClosedCaptionAudioOverlayShowing = true
   trackingPageInfo = m.top.trackingPageInfo
@@ -760,6 +762,7 @@ Function onSkipCuepointsButtonSelected()
   if m.HUD.opacity > 0.0
     animateTransport("out")
     hideYMAL()
+    setFocusToPlaybackControl()
   end if
 
   creditCuePoints = getCreditCuepointsFromContent(m.top.content)
@@ -827,7 +830,7 @@ Function endScrub(shouldJump = false)
   hideYMAL()
   resetTransportButtons()
   m.PlayPauseButton.uri = m.buttonUris.pause
-  setFocusedButton(m.PlayPauseButton)
+  setFocusToComponent(m.PlayPauseButton)
 
   if shouldJump = true
     jumpToPosition(m.playerPosition)
@@ -994,43 +997,34 @@ Function resetTransportButtons()
 End Function
 
 
-'Finds the 'index' of the passed in transport button node and sets it on m.focusedButtonIndex
-'Additionally updates the image of the button to the focused version and all other buttons to the unfocused version
-' @transportButton: roSGNode, a node of type TransportButton or TubiProgressBar
-' @sayAudioText: boolean, true if we want to announce the audio guide.
-Function setFocusedButton(transportButton, sayAudioText = false)
-  shouldSetFocusOnTop = false
+'@sayAudioText: boolean, true if we want to announce the audio guide.
+Function setFocusToPlaybackControl(sayAudioText = false)
 
-  if m.relatedRowFocused = true
-    m.relatedRowFocused = false
-    m.Related.unfocus = true
-  end if
-
-  if transportButton.isSameNode(m.ProgressBar) = true
-    m.progressBarFocused = true
-    m.ProgressBar.setFocus(true)
+  if m.VideoState = "ffw"
+    setFocusToComponent(m.FastForwardButton, sayAudioText)
+  else if m.VideoState = "rew"
+    setFocusToComponent(m.RewindButton, sayAudioText)
   else
-    m.ProgressBar.setFocus(false)
-    m.progressBarFocused = false
-    shouldSetFocusOnTop = true
+    setFocusToComponent(m.PlayPauseButton, sayAudioText)
   end if
 
-  if transportButton.isSameNode(m.skipCuepointsButton) = true
-    m.skipCuepointsButton.setFocus(true)
-  else
-    shouldSetFocusOnTop = true
-  end if
+End Function
 
-  if shouldSetFocusOnTop = true
-    m.top.setFocus(true)
-  end if
 
-  m.playbackControlFocused = false
-  ' set focused/unfocused UI on each button in the transport bar as necessary
+'If the passed component is focusable, then it sets the focus to component or else it sets focus to m.top
+'
+'@component: roSGNode, child node of videoplayerscreen
+'@sayAudioText: boolean, true if we want to announce the audio guide.
+'
+'side effects... updates the m.focusedNode with passed component
+'side effects... if the passed component is button, then it updates the m.focusedButtonIndex with button index
+Function setFocusToComponent(component, sayAudioText = false)
+  m.focusedNode = component
+
+  'set focused/unfocused UI on each button in the transport bar as necessary
   for i=0 to m.TransportButtons.getChildCount()-1
     button = m.TransportButtons.getChild(i)
-    if transportButton.id = button.id
-      m.playbackControlFocused = true
+    if component.id = button.id
       m.focusedButtonIndex = i
       button.focusState = true
     else
@@ -1038,13 +1032,86 @@ Function setFocusedButton(transportButton, sayAudioText = false)
     end if
   end for
 
+  if isFocusable(component) = true
+    m.focusedNode.setFocus(true)
+  else
+    ' remove all child focus & set the focus to screen
+    removeFocusForAllChildComponents()
+    setFocusOnTop()
+  end if
+
   ' Use case when we will pass true are as below. Following general standards based on testing of other competitor apps.
   ' When we focus on the skip cuepoints button.
   ' When the user navigates within the transport bar.
   ' When the user moves focus into the transport control icon from the progress bar.
   if sayAudioText = true
-    sayFocusedButtonAudioGuide(transportButton.id)
+    sayFocusedButtonAudioGuide(component.id)
   end if
+
+End Function
+
+
+'@component: roSGNode, child node of videoplayerscreen
+Function isFocusable(component)
+  focusable = false
+
+  if component.isSameNode(m.skipCuepointsButton) = true
+    focusable = true
+  else if component.isSameNode(m.Related) = true
+    focusable = true
+  else if component.isSameNode(m.UpNext) = true
+    focusable = true
+  else if component.isSameNode(m.pauseAdOverlay) = true
+    focusable = true
+  else if component.isSameNode(m.progressBar) = true
+    focusable = true
+  end if
+
+  return focusable
+End Function
+
+
+Function setFocusOnTop()
+  m.top.setFocus(true)
+End Function
+
+
+Function removeFocusForAllChildComponents()
+  'setting all child component's focus to false
+  if m.skipCuepointsButton.isInFocusChain() = true
+    m.skipCuepointsButton.setFocus(false)
+  end if
+
+  if m.Related.isInFocusChain() = true
+    m.Related.setFocus(false)
+  end if
+
+  if m.UpNext.isInFocusChain() = true
+    m.UpNext.setFocus(false)
+  end if
+
+  if m.pauseAdOverlay.isInFocusChain() = true
+    m.pauseAdOverlay.setFocus(false)
+  end if
+
+  if m.progressBar.isInFocusChain() = true
+    m.progressBar.setFocus(false)
+  end if
+End Function
+
+
+Function isFocusOnPlayerControl()
+
+  for i=0 to m.TransportButtons.getChildCount()-1
+    transportButton = m.TransportButtons.getChild(i)
+
+    if m.focusedNode.isSameNode(transportButton)
+      return true
+    end if
+
+  end for
+
+  return false
 End Function
 
 
@@ -1100,7 +1167,7 @@ Function showTransport()
   if m.top.hasFocus() = true AND isSkipIntroCuePointsReached(creditCuePoints) = false
     ' Only set focus on the play/pause button if the video player has focus (as opposed to some other UI)
     ' and the skip cuepoints button should not be focused (ie. nowPos is not within intro)
-    setFocusedButton(m.PlayPauseButton)
+    setFocusToComponent(m.PlayPauseButton)
   end if
 
   animateTransport("in")
@@ -1154,7 +1221,7 @@ Function handleSkipCuepointsButtonOnAnimateTransport(direction)
       slideTo(m.skipCuepointsButton,[skipCuepointsButtonTransLation[0], m.skipCuepointsButtonUpTranslation], 0.6)
     end if
   else if direction = "out"
-    if m.relatedRowFocused = true
+    if m.focusedNode.isSameNode(m.Related) = true
       hideSkipCuepointsButton()
     else if m.skipCuepointsButton.visible = true AND m.skipCuepointsButtonTimer <> invalid
       slideTo(m.skipCuepointsButton,[skipCuepointsButtonTransLation[0], m.skipCuepointsButtonDownTranslation], 0.6)
@@ -1350,6 +1417,7 @@ End Function
 Function showPauseAd()
   animateTransport("out")
   hideYMAL()
+  setFocusToPlaybackControl()
   m.pauseAdAnimation = fade(m.pauseAdOverlay, "in", 0.6, 0.4)
   sendPauseAdPixel(m.constants.pauseAd.pixelTypes.startPixel)
   startImpTrackingTimer()
@@ -1576,24 +1644,22 @@ Function hideYMAL()
 
   if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1", false).enabled = true
     m.relatedRowFocused = false
-    removeFocusFromRelated()
     m.Related.hide = true
 
-    if m.ratingOverlay.opacity = 1.0
-      showRatingGradient()
-    end if
+    if m.Related.opacity > 0
+      m.Related.showInfoPanel = false
+      m.Related.setFocus(false)
 
-    if m.skipCuepointsButtonTimer <> invalid
-      showSkipCuepointsButton()
+      if m.ratingOverlay.opacity = 1.0
+        showRatingGradient()
+      end if
+
+      if m.skipCuepointsButtonTimer <> invalid
+        showSkipCuepointsButton()
+      end if
     end if
 
   end if
-End Function
-
-
-Function removeFocusFromRelated()
-  m.Related.unfocus = true
-  m.top.setFocus(true)
 End Function
 
 

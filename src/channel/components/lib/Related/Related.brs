@@ -11,6 +11,7 @@ Function init()
   m.RelatedGrid.observeFieldScoped("keyPress", "onKeyPress")
   m.top.observeFieldScoped("updateContent", "onContentChange")
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
+  m.top.observeFieldScoped("showInfoPanel", "onShowInfoPanel")
   m.top.observeFieldScoped("unfocus", "onUnfocus")
   m.top.observeFieldScoped("show", "onShowRelated")
   m.top.observeFieldScoped("hide", "onHideRelated")
@@ -55,6 +56,7 @@ Function onComponentFocus()
     end if
   else if m.top.isInFocusChain() <> true
     m.isRelatedFocused = false
+    m.RelatedGrid.setFocus(false)
   end if
 End Function
 
@@ -65,15 +67,6 @@ Function onContentChange()
     m.RelatedGrid.content = content
     m.RelatedGrid.numColumns = content.getChildCount()
   end if
-End Function
-
-
-' typically setting focus to false is not a good pattern, but it seems to be necessary
-' in order to remove the focus from these components when the Related component is a child
-' of the video player.
-Function onUnfocus()
-  m.RelatedGrid.setFocus(false)
-  m.isRelatedFocused = false
 End Function
 
 

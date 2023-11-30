@@ -11,7 +11,6 @@ Function init()
   m.top.observeField("hide", "onHide")
   m.top.observeField("stopAutoPlayTimer", "onStopAutoPlayTimer")
   m.top.observeField("resetContent", "onResetContent")
-  m.top.observeField("unfocus", "onUnfocus")
   m.top.observeField("command", "onCommand")
 
   m.UpNextUI = m.top.findNode("UpNextUI")
@@ -125,6 +124,8 @@ Function onComponentFocus()
     end if
   else if m.top.isInFocusChain() <> true
     m.isUpNextFocused = false
+    m.GridMovie.setFocus(false)
+    m.GridSeries.setFocus(false)
   end if
 End Function
 
@@ -397,16 +398,6 @@ Function onHide()
   fade(m.UpNextUI, "out", 0.75)
   m.isUpNextFocused = false
   m.GridMovie.jumpToItem = 0
-End Function
-
-
-' typically setting focus to false is not a good pattern, but it seems to be necessary
-' in order to remove the focus from these components when the UpNext component is a child
-' of the video player.
-Function onUnfocus()
-  tubiLog("UpNext.onUnfocus")
-  m.GridMovie.setFocus(false)
-  m.GridSeries.setFocus(false)
 End Function
 
 

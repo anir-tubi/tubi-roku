@@ -14,6 +14,8 @@
     <!-- INPUTS -->
       <field id="content" type="node"/>
       <field id="updateContent" type="boolean" alwaysNotify="true"/>
+      <!-- show or hide the Info panel component -->
+      <field id="showInfoPanel" type="boolean" alwaysNotify="true"/>
       <!-- unfocus the focused components -->
       <field id="unfocus" type="boolean" alwaysNotify="true"/>
       <!-- shows the YMAL patially -->
