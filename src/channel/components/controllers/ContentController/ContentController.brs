@@ -222,6 +222,14 @@ Function init()
   m.consentSettings = {}
 
   m.rokuContinueWatchingApi = RokuContinueWatchingApi(m.constants)
+
+  ' Below boolean flag is used in registration flow, which indicates whether we need to display the roku continue watching consent screen.
+  ' will be set to true if the user is in US and is in the experiment control group.
+  m.shouldShowRokuCWConsentScreen = false
+
+  ' During registration flow if the user is eligble to be shown the roku continue watching consent screen.
+  ' Below variable will hold the method that needs to be called after user either accepts or reject continue watching consent.
+  m.callbackAfterRokuCWConsent = invalid
 End Function
 
 

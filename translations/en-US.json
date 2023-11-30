@@ -1649,5 +1649,21 @@
   "privacy_center_not_editable_mode_warning": {
     "description": "Warning label that will be displayed in privacy center whenever user is in kids mode or any parental controls mode.",
     "message": "Privacy settings can only be changed outside Tubi Kids. Only essential data is used within Tubi Kids."
+  },
+  "accept_now_button_label": {
+    "description": "Button Label that will be used in consent screen accept button.",
+    "message": "Accept Now"
+  },
+  "maybe_later_button_label": {
+    "description": "Button Label that will be used in consent screen Maybe later button.",
+    "message": "Maybe Later"
+  },
+  "roku_cw_consent_screen_heading": {
+    "description": "Roku Continue Watching screen heading.",
+    "message": "Get Back to What You Love Faster"
+  },
+  "roku_cw_consent_screen_sub_heading": {
+    "description": "Roku Continue Watching screen sub heading.",
+    "message": "Make it easier to jump back into what you were watching and get better recommendations on what to stream next.\n\nSelect “Accept Now” to give Tubi permission to share your video watch history with Roku.\n\nYou can change this any time in Settings."
   }
 }

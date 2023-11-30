@@ -484,8 +484,18 @@ Function onSignUpResponse(_response)
       status: "SUCCESS"
     }
   }
-  onActivationSuccess()
 
+  ' Conditions to be met.
+  ' Is the user in US.
+  ' Is the experiment enabled.
+  ' Is the user allowed to manage consent that is teen and above.
+  if isDeviceInUS() = true AND isUserAllowedToManageConsent() = true AND (getExperimentResource("roku_cw_consent", "roku_cw_consent_after_signup_short_term_v1", true).enabled = true OR getExperimentResource("roku_cw_consent", "roku_cw_consent_after_signup_long_term_v1", true).enabled = true)
+    m.shouldShowRokuCWConsentScreen = true
+  else
+    m.shouldShowRokuCWConsentScreen = false
+  end if
+
+  onActivationSuccess()
 End Function
 
 
@@ -782,25 +792,35 @@ Function onPostSignInAuthInfoUpdated()
       signInInfo.gender = authInfo.gender
     end if
     showAgeVerificationScreenAtSignIn(signInInfo)
-
-  else if m.callbackAfterSignIn <> invalid
-    callbackAfterSignIn = m.callbackAfterSignIn
-    m.callbackAfterSignIn = invalid ' setting to invalid to avoid future callbacks
-
-    if m.callbackAfterSignInParams <> invalid
-      callbackAfterSignInParams = m.callbackAfterSignInParams
-      m.callbackAfterSignInParams = invalid
-      callbackAfterSignIn(callbackAfterSignInParams)
+  else if m.shouldShowRokuCWConsentScreen = true
+    m.shouldShowRokuCWConsentScreen = false
+    if m.callbackAfterSignIn <> invalid
+      showRokuCWConsentScreen(executeCallbackAfterSignIn)
     else
-      callbackAfterSignIn()
+      showRokuCWConsentScreen(startChannel)
     end if
-
+  else if m.callbackAfterSignIn <> invalid
+    executeCallbackAfterSignIn()
   else
     ' this should not happen but start the channel in case it somehow does
     startChannel()
   end if
 
   setBrazeUserData(authInfo)
+End Function
+
+
+Function executeCallbackAfterSignIn()
+  callbackAfterSignIn = m.callbackAfterSignIn
+  m.callbackAfterSignIn = invalid ' setting to invalid to avoid future callbacks
+
+  if m.callbackAfterSignInParams <> invalid
+    callbackAfterSignInParams = m.callbackAfterSignInParams
+    m.callbackAfterSignInParams = invalid
+    callbackAfterSignIn(callbackAfterSignInParams)
+  else
+    callbackAfterSignIn()
+  end if
 End Function
 
 
@@ -1116,6 +1136,7 @@ Function popScreenAfterSignInProcess()
     "ForgotPasswordProcessingScreen": true
     "ConsentScreen": true
     "ManagePreferencesScreen": true
+    "RokuCWConsentScreen": true
   }
 
   count = m.screenStack.getChildCount()-1

@@ -1114,6 +1114,7 @@ Function getConstants()
       constants.ui.screenLevels.availableDeviceScreen = 111
       constants.ui.screenLevels.landingScreen = 112
       constants.ui.screenLevels.consentScreen = 120
+      constants.ui.screenLevels.rokuContinueWatchingConsentScreen = 120
       constants.ui.screenLevels.managePreferencesScreen = 130
       constants.ui.screenLevels.screensaverScreen = 1100
 
@@ -1145,6 +1146,7 @@ Function getConstants()
       constants.ui.screenIds.screensaverScreen = "screensaverScreen"
       constants.ui.screenIds.consentScreen = "consentScreen"
       constants.ui.screenIds.managePreferencesScreen = "managePreferencesScreen"
+      constants.ui.screenIds.rokuContinueWatchingConsentScreen = "rokuContinueWatchingConsentScreen"
 
     ' notAllowedContainerIds are the containers which are not allowed to be displayed on category screen,
     ' because currently we support only portrait style in category detail screen
@@ -1322,6 +1324,10 @@ Function getConstants()
       constants.ui.consentActionButtonIds.manage = "manage"
       constants.ui.consentActionButtonIds.accept = "accept"
       constants.ui.consentActionButtonIds.reject = "reject"
+
+    constants.ui.rokuCWConsentActionButtonIds = {}
+      constants.ui.rokuCWConsentActionButtonIds.accept = "accept"
+      constants.ui.rokuCWConsentActionButtonIds.reject = "reject"
 
   constants.consentKeys = {}
     constants.consentKeys.analytics = "analytics"
