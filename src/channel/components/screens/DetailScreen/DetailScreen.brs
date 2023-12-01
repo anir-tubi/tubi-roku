@@ -424,15 +424,7 @@ Function changeLikeDislikeButtonText()
       '//The Like State is nothing so display default state
       sButtonText = ""
 
-      like_dilike_button_title_type = getExperimentResource("roku_notforme_dislike", "roku_notforme_dislike_v2", false).like_dilike_button_title_type
-
-      if like_dilike_button_title_type = "rate_this_title"
-        sButtonText = getTranslation("screenDetails_button_rateThisTitle")
-      else if like_dilike_button_title_type = "tell_us_what_you_think"
-        sButtonText = getTranslation("screenDetails_button_tellUsWhatYouThink")
-      else
-        sButtonText = getTranslation("screenDetails_button_likeDislike")
-      end if
+      sButtonText = getTranslation("screenDetails_button_likeDislike")
 
       m.LikeDislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.LikeDislikeMenuItem.id]
       sIconUrl = "pkg:/images/icon-like.webp"

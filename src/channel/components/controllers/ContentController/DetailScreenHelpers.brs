@@ -329,9 +329,6 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       detailScreen.isInKidsMode = true
     else
       detailScreen.isInKidsMode = false
-
-      ' send the exposure event only if not in kids, since the like/dislike button is not shown in kids
-      getExperimentResource("roku_notforme_dislike", "roku_notforme_dislike_v2")
     end if
 
     if episode <> invalid
