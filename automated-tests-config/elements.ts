@@ -68,6 +68,12 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems',
   },
 
+  /** This is the main menu grid that is used for knowing what is the selected menu item */
+  mainMenuSelected: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected',
+    xpath: '/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid',
+  },
+
   /** Component for video preview playback. Useful for checking that video preview is playing the correct file */
   previewVideoPlayer: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#videoPreviewPlayer',
@@ -551,6 +557,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#nav.#ScreenNavigationHint.#callToAction',
   },
 
+  /** Call to action button on Categories page */
+  categoriesCallToAction: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#nav.#ScreenNavigationHint.#callToAction',
+  },
+
   /** Linear Search Results Description */
   searchResultsDesc: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
@@ -916,6 +927,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#RemainingLabel',
   },
 
+  /** current time in player timer */
+  currentTimePlayed: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#ElapsedLabel',
+  },
+
   /** autoplay option year and duration info */
   autoPlayYearAndDuration: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextMovieGroup.#InfoMovie.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Line1',
@@ -953,12 +969,7 @@ const elements = typeCheckElements({
 
   /** Featured Row */
   featuredRow: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.1.title.#CategoryName',
-  },
-
-  /** Featured row poster */
-  featuredRowPoster: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.items.0.#poster',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.items.0.getParent()',
   },
 
   /** description of title in CW row */
@@ -971,7 +982,117 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0',
   },
 
+  /** left nav search button */
+  leftNavSearchButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2',
+  },
+
+  /** parental controls button */
+  parentalControlsButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.0',
+  },
+
+  /** search menu text */
+  searchMenuText: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#leftSide.#searchMenuText',
+  },
+
+  /** Search text */
+  searchText: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchText',
+  },
+
+  /** side nav element component */
+  sideNavComponent: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected',
+  },
+
+  /** recommended poster */
+  recommendedPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.0.#Title',
+  },
+
+  /** categories left nav */
+  categoriesLeftNavButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.5',
+  },
+
+  /** categories label highlighted */
+  categoriesLabel: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.5.#LabelParent.0.#Label',
+  },
+
+  /** categories  screen */
+  categoriesListScreen: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid',
+  },
+
+  /** channels left nav button highlighted */
+  channelsLeftNavButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.6',
+  },
+
+  /** channels list screen */
+  channelsListScreen: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#ChannelCategoryGrid.6.#PosterRect',
+  },
+
+  /** settings left nav button highlighted */
+  settingsLeftNavButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.8',
+  },
+
+  /** categories video grid */
+  categoriesVideoGrid: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#ChannelsVideoGrid',
+  },
+
+  /** settings left nav button highlighted */
+  exitLeftNavButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.9.#LabelParent.0.#Label',
+  },
+
+  /** age verification number pad */
+  ageVerificationNumberPad: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.1.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0',
+  },
+
+  /** age verification years page */
+  yearsVerificationEntry: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeVerificationPageText.#AgeVerificationPageHeader',
+  },
+
+  /** CW tile on Categories page */
+  categoriesContinueWatchingTile: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.1.#Title',
+  },
+
+  /** Search menu highlighted */
+  searchMenuItemSelected: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2',
+  },
+
+  /** Search keypad */
+  searchKeyPad: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#searchGroup.#SearchKeyboard.0',
+  },
+
+  /** label child in left nav */
+  leftNavHomeLabel: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.3.#LabelParent.0.#Label',
+  },
+
+  /** search label in left nav */
+  leftNavSearchLabel: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2.#LabelParent.0.#Label',
+  },
+
 // END ELEMENTS INJECT
+
+  /** categories label highlighted */
+  channelsLabel: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.6.#LabelParent.0.#Label',
+  },
 });
 
 export {

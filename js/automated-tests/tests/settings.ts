@@ -57,20 +57,18 @@ describe('Settings', function () {
     await ecp.sendKeyPress(ecp.Key.Ok);
     await utils.sleep(3000); // Improvement
 
-    // Select Terms of Service
+    // Select Privacy Center
     await testUtils.retryWithTimeOut(async () => {
       const settingsScreen = await testUtils.getNodeForElement('settingsScreen');
       expect(settingsScreen.visible).to.be.true;
     });
 
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 4 });
+    await ecp.sendKeyPress(ecp.Key.Down, { count: 3 });
 
 
-    // Is the Terms page Open?
-    await testUtils.retryWithTimeOut(async () => {
-      const termsScreenHeader = await testUtils.getNodeForElement('termsScreenHeader');
-      expect(termsScreenHeader.text).to.equal('Terms of Service');
-    });
+    // Is the Privacy page Open?
+    // Check if we are on Privacy page
+    await waitForCurrentScreenToEqual()
   });*/
 
 
@@ -96,14 +94,14 @@ describe('Settings', function () {
     await ecp.sendKeyPress(ecp.Key.Ok);
 
     // Full Device ID modal present?
-
+    await utils.sleep(3000);
     const dialogBoxContentAreaDeviceID = testUtils.getNodeForElement('dialogBoxContentAreaDeviceID');
     await dialogBoxContentAreaDeviceID;
     const fullDeviceID = await testUtils.getNodeForElement('fullDeviceID');
     const fullDeviceMessage = await testUtils.getNodeForElement('fullDeviceMessage');
     await testUtils.elementHasFocus('fullDeviceID');
     expect(fullDeviceID.text).to.equal('Full Device ID');
-    expect(fullDeviceMessage.visible).to.exist;
+    expect(fullDeviceMessage.visible).to.equal(true);
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/32371
@@ -155,7 +153,7 @@ describe('Settings', function () {
 
     // Is the Privacy Policy Page Open?
     const privacyPolicyHeader = await testUtils.getNodeForElement('privacyPolicyHeader');
-    expect(privacyPolicyHeader.text).to.equal('Privacy Center');
+    expect(await privacyPolicyHeader.text).to.equal('Privacy Center');
 
   });
 });

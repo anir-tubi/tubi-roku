@@ -206,7 +206,7 @@ describe('Autoplay Movies', function () {
         await ecp.sendKeyPress(ecp.Key.Ok, { count: 3 });
 
         // FF until cue point
-        await utils.sleep(60000);
+        await utils.sleep(100000);
 
         // Play to trigger autoplay
         await ecp.sendKeyPress(ecp.Key.Play);
@@ -226,7 +226,7 @@ describe('Autoplay Movies', function () {
 
         // Search for a Movie title
         await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-        await ecp.sendText('zapped');
+        await ecp.sendText('zapp');
 
         // Call function to navigate right to search results grid
         await shared.navigateRightToGrid();

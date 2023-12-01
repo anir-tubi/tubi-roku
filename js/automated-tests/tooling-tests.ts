@@ -259,6 +259,81 @@ describe('test-utils', function () {
         expect(color).to.equal('#232323FF');
       });
     });
+
+
+    describe('getElementSize', function () {
+      it('should be able to retrieve the size of a known element', async () => {
+        const size = await testUtils.getElementSize('backgroundGroup');
+        expect(size.width).to.equal(1920);
+        expect(size.height).to.equal(1080);
+        expect(size.x).to.equal(0);
+        expect(size.y).to.equal(0);
+      });
+
+      it('should throw an error if the element does not currently exist in the nodetree', async () => {
+        try {
+          await testUtils.getElementSize('privacyPageScroller');
+        } catch (e) {
+          // Failed as expected
+          return;
+        }
+        throw new Error('Did not throw an error when element did not exist');
+      });
+    });
+
+
+    describe('waitForMainMenuToBeExpanded', function () {
+      beforeEach(async () => {
+        await testUtils.startApplicationAtPage('home');
+        await testUtils.waitForElementToHaveFocus('homeRowList');
+      });
+
+      it('should not throw an Error if the main menu is expanded', async () => {
+        await ecp.sendKeyPress(ecp.Key.Left);
+        await testUtils.waitForMainMenuToBeExpanded();
+      });
+
+      it('should throw an error if the main menu is not expanded', async () => {
+        try {
+          await testUtils.waitForMainMenuToBeExpanded(500);
+        } catch (e) {
+          // Failed as expected
+          return;
+        }
+        throw new Error('Did not throw an error when it should have');
+      });
+    });
+
+
+    describe('waitForMainMenuToNotBeExpanded', function () {
+      beforeEach(async () => {
+        await testUtils.startApplicationAtPage('home');
+        await testUtils.waitForElementToHaveFocus('homeRowList');
+      });
+
+      it('should not throw an Error if the main menu is not expanded', async () => {
+        await testUtils.waitForMainMenuToNotBeExpanded();
+      });
+
+      it('should throw an error if the main menu is expanded', async () => {
+        try {
+          await ecp.sendKeyPress(ecp.Key.Left);
+          await testUtils.waitForMainMenuToNotBeExpanded(500);
+        } catch (e) {
+          // Failed as expected
+          return;
+        }
+        throw new Error('Did not throw an error when it should have');
+      });
+    });
+
+
+    describe('getElementColorField', function () {
+      it('should be able to retrieve the specified element color field in the correct hex format', async () => {
+        const color = await testUtils.getElementColorField('scene', 'backgroundColor');
+        expect(color).to.equal('#232323FF');
+      });
+    });
   });
 
 

@@ -21,9 +21,8 @@ describe('Age Gate', function () {
     await ecp.sendKeyPress(ecp.Key.Up, { count: 2 });
     await ecp.sendKeyPress(ecp.Key.Ok);
 
-    // Verify Age Gate Screen
-    const ageGateScreen = await testUtils.getNodeForElement('ageGateScreen');
-    expect(ageGateScreen.visible).to.equal(true);
+    // Verify Age Gate screen
+    await verifyAgeGateScreen();
 
   });
 
@@ -42,7 +41,7 @@ describe('Age Gate', function () {
 
     // Land on Sign In to Your Account page
     const signInScreenPasswordBox = await testUtils.getNodeForElement('signInScreenPasswordBox');
-    expect(signInScreenPasswordBox.visible).to.exist;
+    expect(signInScreenPasswordBox.visible).to.be.true;
 
     // Create Account
     await ecp.sendKeyPress(ecp.Key.Up);
@@ -62,9 +61,8 @@ describe('Age Gate', function () {
     await utils.sleep(500);
 
     // Verify Age Gate Screen
-    const ageVerificationPad = await testUtils.getNodeForElement('ageVerificationPad');
-    expect(ageVerificationPad.visible).to.equal(true);
-    await testUtils.waitForElementToHaveFocus('ageVerificationPad');
+    await utils.sleep(2000);
+    await yearsVerificationEntry();
 
     // Enter invalid Age >  125
     await ecp.sendText('126');
@@ -90,7 +88,7 @@ describe('Age Gate', function () {
 
     // Land on Sign In to Your Account page
     const signInScreenPasswordBox = await testUtils.getNodeForElement('signInScreenPasswordBox');
-    expect(signInScreenPasswordBox.visible).to.exist;
+    expect(signInScreenPasswordBox.visible).to.be.true;
 
     // Create Account
     await ecp.sendKeyPress(ecp.Key.Up);
@@ -109,9 +107,7 @@ describe('Age Gate', function () {
     await ecp.sendKeyPress(ecp.Key.Ok);
 
     // Verify Age Gate Screen
-    const ageGateYearsBox = await testUtils.getNodeForElement('ageGateYearsBox');
-    expect(ageGateYearsBox.visible).to.equal(true);
-    await utils.sleep(2000);
+    await yearsVerificationEntry();
 
     // Enter invalid Age of 0
     await ecp.sendKeyPress(ecp.Key.Down, { count: 3 });
@@ -124,7 +120,7 @@ describe('Age Gate', function () {
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/242820
-  it('C242820 - COPPA V3 - Guest User enters in age greater than 12 they are directed to the Tubi Homepage (non-kids), @age_gate', async () => {
+  it('C242820 - COPPA V3 - Guest User enters in age greater than 12 they are directed to the Tubi Homepage (non-kids), @age_gate, @smoke', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
 
     // Open Kids Mode
@@ -135,8 +131,7 @@ describe('Age Gate', function () {
     await ecp.sendKeyPress(ecp.Key.Ok);
 
     // Verify Age Gate Screen
-    const ageGateScreen = await testUtils.getNodeForElement('ageGateScreen');
-    expect(ageGateScreen.visible).to.equal(true);
+    await verifyAgeGateScreen();
 
     // Enter age > 12
     await ecp.sendText('2009');
@@ -156,7 +151,8 @@ describe('Age Gate', function () {
 
   });
 
-  it('C242819 - COPPA V3 - Guest User enters in age lower than 13 they are locked into kids mode, @age_gate', async () => {
+  // https://tubi.testrail.io/index.php?/cases/view/242819
+  it('C242819 - COPPA V3 - Guest User enters in age lower than 13 they are locked into kids mode, @age_gate, @smoke', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
 
     // Open Kids Mode
@@ -167,8 +163,7 @@ describe('Age Gate', function () {
     await ecp.sendKeyPress(ecp.Key.Ok);
 
     // Verify Age Gate Screen
-    const ageGateScreen = await testUtils.getNodeForElement('ageGateScreen');
-    expect(ageGateScreen.visible).to.equal(true);
+    await verifyAgeGateScreen();
 
     // Enter age > 12
     await ecp.sendText('2010');
@@ -177,6 +172,7 @@ describe('Age Gate', function () {
 
     // Check if we are in the non-kids mode since user passed age gate
     // Verify on home screen
+
     const homeScreenRowList = testUtils.getNodeForElement('homeScreenRowList');
     const cannotExitKidsMode = testUtils.getNodeForElement('cannotExitKidsMode');
     const exitKidsOption = testUtils.getNodeForElement('exitKidsOption');
@@ -210,8 +206,7 @@ describe('Age Gate', function () {
     await ecp.sendKeyPress(ecp.Key.Ok);
 
     // Verify Age Gate Screen
-    const ageGateScreen = await testUtils.getNodeForElement('ageGateScreen');
-    expect(ageGateScreen.visible).to.equal(true);
+    await verifyAgeGateScreen();
 
     // Enter age between 2020
     await ecp.sendKeyPress(ecp.Key.Right);
@@ -290,7 +285,7 @@ describe('Age Gate', function () {
     expect(ageGateVerificationErrorPrompt.text).to.equal('Please be sure the information you entered is correct');
 
   });
-
+});
 
 
 
@@ -312,4 +307,20 @@ describe('Age Gate', function () {
     await ecp.sendKeyPress(ecp.Key.Ok);
   }
 
-});
+  async function verifyAgeGateScreen() {
+    const ageVerificationNumberPad = await testUtils.getNodeForElement('ageVerificationNumberPad');
+    const hasFocus = await testUtils.elementHasFocus('ageVerificationNumberPad');
+    expect(hasFocus).to.be.true;
+  }
+
+  async function yearsVerificationEntry() {
+    await utils.sleep(2000);
+    const yearsVerificationEntry = await testUtils.getNodeForElement('yearsVerificationEntry');
+    expect(yearsVerificationEntry).to.exist;
+  }
+
+
+  
+
+
+

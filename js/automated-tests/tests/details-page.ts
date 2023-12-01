@@ -33,15 +33,15 @@ describe('Details Page', function () {
       await ecp.sendKeyPress(ecp.Key.Ok);
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/5829
-    it('C5829 - Movie Details - When Movie Details page is opened then Title Text is displayed @registered_user,@smoke,@mdp_1', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537369
+    it('C537369 - Movie Details - When Movie Details page is opened then Title Text is displayed @registered_user,@smoke,@mdp_1', async () => {
       const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
       expect(detailScreenTitle.visible).to.equal(true);
       expect(detailScreenTitle.text).to.equal(itemData.title);
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/5830
-    it('C5830 - Movie Details - When Movie Details page is opened then background image is seen @registered_user,@smoke,@mdp_1', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535838
+    it('C535838 - Movie Details - When Movie Details page is opened then background image is seen @registered_user,@smoke,@mdp_1', async () => {
       const backgroundGroup = await testUtils.getNodeForElement('backgroundGroup');
       expect(backgroundGroup.posterVisible).to.equal(true);
 
@@ -50,16 +50,16 @@ describe('Details Page', function () {
       }
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/5831
-    it('C5831 - Movie Details - When Movie Details page is opened then runtime and year is displayed @registered_user,@smoke,@mdp_1', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537370
+    it('C537370 - Movie Details - When Movie Details page is opened then runtime and year is displayed @registered_user,@smoke,@mdp_1', async () => {
       const detailScreenYearAndDuration = await testUtils.getNodeForElement('detailScreenYearAndDuration');
       expect(detailScreenYearAndDuration.visible).to.equal(true);
       expect(detailScreenYearAndDuration.text).to.contain(itemData.year);
       // Improvement we could add check here to make sure the duration is also correct as well but this could get pretty complicated to cover all cases
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4151
-    it('C4151 - Movie - No History - When title is added to queue then Add to Queue changed to Remove from Queue @registered_user,@smoke,@mdp_1', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535808
+    it('C5358081 - Movie - No History - When title is added to queue then Add to Queue changed to Remove from Queue @registered_user,@smoke,@mdp_1', async () => {
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
       await ecp.sendKeyPress(ecp.Key.Ok);
       await utils.sleep(2000); // Improvement
@@ -69,8 +69,9 @@ describe('Details Page', function () {
       await testUtils.selectAndVerifyDetailPageMenuItem('removeFromMyList');
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4153
-    it('C4153 - Movie Details - No History - When backing out of playback then buttons change to reflect movie with history @mdp_1', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535809
+    it('C535809 - Movie Details - No History - When backing out of playback then buttons change to reflect movie with history @mdp_1', async () => {
+      
       const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
       expect(detailScreenTitle.visible).to.equal(true);
       await ecp.sendKeyPress(ecp.Key.Play);
@@ -97,8 +98,8 @@ describe('Details Page', function () {
       }
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4156
-    it('C4156 - Movie Details - With History - When title is added to queue then "Add to My List" is changed to "Remove from My List" @mdp_1,@registered_user', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535810
+    it('C535810 - Movie Details - With History - When title is added to queue then "Add to My List" is changed to "Remove from My List" @mdp_1,@registered_user', async () => {
       // Press Add to My List Button
       await testUtils.selectAndVerifyDetailPageMenuItem('addToMyList');
 
@@ -106,8 +107,8 @@ describe('Details Page', function () {
       await testUtils.selectAndVerifyDetailPageMenuItem('removeFromMyList');
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4158
-    it('4158 - Movie Details - With History - When "Play From Beginning" selected then movie playback starts from beginning @mdp_1,@registered_user', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535812
+    it('C535812- Movie Details - With History - When "Play From Beginning" selected then movie playback starts from beginning @mdp_1,@registered_user', async () => {
 
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
       await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -152,8 +153,8 @@ describe('Details Page', function () {
     });
 
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4159
-    it('C4159 - Movie Details - With History - When "Resume Playing" is selected then movie playback resumes from history @mdp_1', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535813
+    it('C535813 - Movie Details - With History - When "Resume Playing" is selected then movie playback resumes from history @mdp_1', async () => {
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
       await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
       
@@ -207,7 +208,8 @@ describe('Details Page', function () {
       await ecp.sendKeyPress(ecp.Key.Back, { count: 1 });
     });
 
-    it('C4160 - Movie Details - Given movie has history, when "Remove From History" is selected then buttons change to reflect a movie with no history @mdp_1', async () => {
+    // https://tubi.testrail.io/index.php?/cases/view/535870
+    it('C535870 - Movie Details - Given movie has history, when "Remove From History" is selected then buttons change to reflect a movie with no history @mdp_1', async () => {
 
       // Back to Movies Screen
       await ecp.sendKeyPress(ecp.Key.Back, { count: 1 });
@@ -270,8 +272,8 @@ describe('Details Page', function () {
       expect(currentposition).lessThanOrEqual(5000);
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/5919
-    it('C5919 - Details Page Displays History Progress Bar @mdp_1,@registered_user', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537688
+    it('C537688 - Movies - Details Page Displays History Progress Bar @mdp_1,@registered_user', async () => {
       // Launch to Home> Movies page with registered user
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
@@ -397,8 +399,8 @@ describe('Details Page', function () {
       expect(playButtonSelected.visible).to.equal(true);
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4154
-    it('C4154 - Movie Details - No History present - Guest - Resume Playback from beginning @guest_user,@smoke,@mdp_1', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/https://tubi.testrail.io/index.php?/cases/view/537368
+    it('C537368 - Movie Details - No History present - Guest - Resume Playback from beginning @guest_user,@smoke,@mdp_1', async () => {
       // Start Application at Movies page with Guest user
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
@@ -440,9 +442,8 @@ describe('Details Page', function () {
       expect(playButtonSelected.visible).to.equal(true);
     });
 
-
-    it('C448066 - Registered User - Check Resume and Play icon and text from Details screen @mdp_1', async () => {
-
+    // https://tubi.testrail.io/index.php?/cases/view/521094
+    it('C521094 - Registered User - Check Resume and Play icon and text from Details screen @mdp_1', async () => {
 
       // On Movies page?
       const onMoviesPageButton = await testUtils.getNodeForElement('onMoviesPageButton');
@@ -498,8 +499,8 @@ describe('Details Page', function () {
       await ecp.sendKeyPress(ecp.Key.Ok);
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/6519
-    it('C6519 - Series - When series details page is opened then background poster should be displayed, @registered_user,@sdp_2,@smoke', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537454
+    it('C537454 - Series - When series details page is opened then background poster should be displayed, @registered_user,@sdp_2,@smoke', async () => {
 
       // Verify we are on the details page
       let detailScreenTitle;
@@ -511,13 +512,13 @@ describe('Details Page', function () {
       // Verify background poster is displayed
       await testUtils.retryWithTimeOut(async () => {
         const titleSeriesBackgroundPoster = await testUtils.getNodeForElement('titleSeriesBackgroundPoster');
-        expect(titleSeriesBackgroundPoster).to.exist;
+        expect(titleSeriesBackgroundPoster.visible).to.equal(true);
       });
     });
 
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4192
-    it('C4192 - Series - No History - When "Add to My List" selected then series is added to queue,@registered_user,@sdp_1', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537454
+    it('C537454 - Series - No History - When "Add to My List" selected then series is added to queue,@registered_user,@sdp_1', async () => {
 
       await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
 
@@ -563,8 +564,8 @@ describe('Details Page', function () {
       expect(content.title).to.equal(detailScreenTitle.text);
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4193
-    it('C4193 Series - No History - When title is removed from queue then Remove From Queue changed to Add To Queue @sdp_1,@regression,@registered_user', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535820
+    it('C535820 Series - No History - When title is removed from queue then Remove From Queue changed to Add To Queue @sdp_1,@regression,@registered_user', async () => {
       await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
       await ecp.sendKeyPress(ecp.Key.Ok);
       const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
@@ -578,17 +579,17 @@ describe('Details Page', function () {
     });
 
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4194
-    it('C4194 - Series - No History - When episode is chosen then playback should triggered from the beginning @sdp_1,@smoke,@regression,@registered_user', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535821
+    it('C535821 - Series - No History - When episode is chosen then playback should triggered from the beginning @sdp_1,@smoke,@regression,@registered_user', async () => {
       // While on Series Details page, lets play and check playback starts from the beginning
       await ecp.sendKeyPress(ecp.Key.Ok);
-      await shared.verifyPlayFromBeginning();
+      await shared.verifyPlayFromBeginning();  
       await ecp.sendKeyPress(ecp.Key.Back); // Back to Details page
     });
 
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4200
-    it('C4200 - Series - With History - When episode is played back from bookmark then playback will resume from saved history @registered_user,@sdp_1,@regression', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/536524
+    it('C536524 - Series - With History - When episode is played back from bookmark then playback will resume from saved history @registered_user,@sdp_1,@regression', async () => {
       await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
       await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
       await ecp.sendKeyPress(ecp.Key.Ok);
@@ -737,6 +738,7 @@ async function verifyResumeWithinRange() {
   await createHistory(); // Create history function
   const currentposition = await testUtils.getPlayerPosition();
   //console.log(currentposition);
+  await utils.sleep(2000);
   await ecp.sendKeyPress(ecp.Key.Back);
 
   // Verify we are on the details page

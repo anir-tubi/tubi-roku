@@ -15,7 +15,7 @@ describe('Homescreen Navigation - TV Shows Filter', function () {
     await testUtils.startApplicationAtPage('tv', { user: user });
   });
 
-  //
+  //https://tubi.testrail.io/index.php?/cases/view/63513
   it('C63513 - TV Shows Filter - When tv show filter is triggered then only Series Titles are present, @homescreen, @tvshows', async () => {
 
 
@@ -29,6 +29,7 @@ describe('Homescreen Navigation - TV Shows Filter', function () {
     }
   });
 
+  // https://tubi.testrail.io/index.php?/cases/view/76733
   it('C76733 - TV Shows Filter - When history category displayed then all titles are series, @homescreen, @tvshows', async () => {
 
     await testUtils.waitForAppLaunchBeaconToFire();
@@ -47,8 +48,8 @@ describe('Homescreen Navigation - TV Shows Filter', function () {
     }
   });
 
-
-  it('C482352 - Series Filter - When My List category displayed then all titles are series, @homescreen, @tvshows', async () => {
+  // https://tubi.testrail.io/index.php?/cases/view/538328
+  it('C538328 - Series Filter - When My List category displayed then all titles are series, @homescreen, @tvshows', async () => {
 
 
     // await testUtils.waitForAppLaunchBeaconToFire();
@@ -67,8 +68,8 @@ describe('Homescreen Navigation - TV Shows Filter', function () {
     }
 
   });
-
-  it('C76734 - TV Shows Filter - When title is selected then corresponding details page displayed, @homescreen, @tvshows', async () => {
+  // https://tubi.testrail.io/index.php?/cases/view/538329
+  it('538329 - TV Shows Filter - When title is selected then corresponding details page displayed, @homescreen, @tvshows', async () => {
 
     await testUtils.waitForAppLaunchBeaconToFire();
 

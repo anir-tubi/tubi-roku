@@ -127,13 +127,13 @@ describe('Multiple Audio', function () {
     await testUtils.waitForAppLaunchBeaconToFire();
 
     // Nav to AD container and playback any title
-    await ecp.sendText('fletch');
+    await ecp.sendText('cosmo');
 
     // Call function to navigate right to search results grid
     await navigateRightToGrid();
     await testUtils.retryWithTimeOut(async () => {
       const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-      expect(searchResultsText.text).to.contain('Fletch');
+      expect(searchResultsText.text).to.contain('Cosmos');
     });
 
     // Verify AD is still enabled.

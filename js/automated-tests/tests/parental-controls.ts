@@ -14,8 +14,8 @@ describe('Parental Controls', function () {
 
     });
 
-    // https://tubi.testrail.io/index.php?/cases/view/5503
-    it('C5503 - Parental Settings - Little Kids - Deeplink Playback, @parental_controls', async () => {
+    // https://tubi.testrail.io/index.php?/cases/view/537376
+    it('C537376 - Parental Settings - Little Kids - Deeplink Playback, @parental_controls', async () => {
         await testUtils.goToPage('settings');
         await selectLittleKidsFromParentalSettings();
         await enterPasswordSettingsChange();
@@ -32,7 +32,7 @@ describe('Parental Controls', function () {
         await testUtils.restartApplication({
             params: {
               'mediaType': 'movie',
-              contentID: '580334'
+              contentID: '679437'
             }
           });
 
@@ -42,8 +42,8 @@ describe('Parental Controls', function () {
 
     });
 
-    // https://tubi.testrail.io/index.php?/cases/view/5504
-    it('C5504 - Parental Settings - Teens - Deeplink Playback, @parental_controls', async () => {
+    // https://tubi.testrail.io/index.php?/cases/view/537375
+    it('C537375 - Parental Settings - Teens - Deeplink Playback, @parental_controls', async () => {
 
         await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
         await testUtils.waitForAppLaunchBeaconToFire();
@@ -82,8 +82,8 @@ describe('Parental Controls', function () {
 
 
 
-    // https://tubi.testrail.io/index.php?/cases/view/5505
-    it('C5505 - Parental Settings - Older Kids - Deeplink Playback, @parental_controls', async () => {
+    // https://tubi.testrail.io/index.php?/cases/view/537405
+    it('C537405 - Parental Settings - Older Kids - Deeplink Playback, @parental_controls', async () => {
 
         await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
         await testUtils.waitForAppLaunchBeaconToFire();
@@ -116,8 +116,8 @@ describe('Parental Controls', function () {
 
     });
 
-    //https://tubi.testrail.io/index.php?/cases/view/5603
-    it('C5603 - Categories Page - When setting is changed from Adult to Little Kids then the categories only for Little Kids are listed, @parental_controls', async () => {
+    // https://tubi.testrail.io/index.php?/cases/view/535834
+    it('C535834 - Categories Page - When setting is changed from Adult to Little Kids then the categories only for Little Kids are listed, @parental_controls', async () => {
         await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
         await testUtils.waitForAppLaunchBeaconToFire();
         await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -158,8 +158,8 @@ describe('Parental Controls', function () {
         expect((await horsesAndPoniesTile).visible).to.be.true;
     });
 
-        //https://tubi.testrail.io/index.php?/cases/view/5604
-    it('C5604 - Categories Page - When settings is changed from Adult to Older Kids then categories for Older kids are listed, @parental_controls', async () => {
+        //https://tubi.testrail.io/index.php?/cases/view/535835
+    it('C535835- Categories Page - When settings is changed from Adult to Older Kids then categories for Older kids are listed, @parental_controls', async () => {
 
         await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
         await testUtils.waitForAppLaunchBeaconToFire();
@@ -202,8 +202,8 @@ describe('Parental Controls', function () {
         expect((await kidFriendlyClassics).visible).to.be.true;
     });
 
-    //https://tubi.testrail.io/index.php?/cases/view/5605
-    it('C5605 - Categories Page - When settings is changed from Adult to Teens then categories for Teens are listed, @parental_controls', async () => {
+    // https://tubi.testrail.io/index.php?/cases/view/535836
+    it('C535836 - Categories Page - When settings is changed from Adult to Teens then categories for Teens are listed, @parental_controls', async () => {
 
         await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
         await testUtils.waitForAppLaunchBeaconToFire();
@@ -247,8 +247,8 @@ describe('Parental Controls', function () {
     });
 
 
-    //https://tubi.testrail.io/index.php?/cases/view/6596
-    it('C6596 - Parental Controls - Little Kids - When user switches Parental Control to Little Kids then a modal is presented/Exit Kids is grayed out, @parental_controls', async () => {
+    // https://tubi.testrail.io/index.php?/cases/view/535864
+    it('C535864 - Parental Controls - Little Kids - When user switches Parental Control to Little Kids then a modal is presented/Exit Kids is grayed out, @parental_controls', async () => {
 
         await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
         await testUtils.waitForAppLaunchBeaconToFire();
@@ -313,8 +313,8 @@ describe('Parental Controls', function () {
         expect((await exitKidsGrayedOut).visible).to.be.true;
     });
 
-    //https://tubi.testrail.io/index.php?/cases/view/6598
-    it('C6598 - Parental Controls - Teens -  When user switches Parental Control to Teens then a modal is presented/Exit Kids is not present, @parental_controls', async () => {
+    // https://tubi.testrail.io/index.php?/cases/view/535866
+    it('C535866 - Parental Controls - Teens -  When user switches Parental Control to Teens then a modal is presented/Exit Kids is not present, @parental_controls', async () => {
 
       await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
       await testUtils.waitForAppLaunchBeaconToFire();
@@ -346,8 +346,8 @@ describe('Parental Controls', function () {
       expect((await kidsLeftNavOption).visible).to.be.true;
   });
 
-    //https://tubi.testrail.io/index.php?/cases/view/6599
-    it('C6599 - Parental Controls - Adults - When user switches Parental Control to Adults then a modal is presented/Exit Kids is not present, @parental_controls', async () => {
+    // https://tubi.testrail.io/index.php?/cases/view/535867
+    it('C535867 - Parental Controls - Adults - When user switches Parental Control to Adults then a modal is presented/Exit Kids is not present, @parental_controls', async () => {
 
       await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
       await testUtils.waitForAppLaunchBeaconToFire();
@@ -379,8 +379,8 @@ describe('Parental Controls', function () {
       expect((await kidsLeftNavOption).visible).to.be.true;
 });
 
-    //https://tubi.testrail.io/index.php?/cases/view/6666
-    it('C6666 - Parental Control - Change Before 5 minutes, @parental_controls', async () => {
+    // https://tubi.testrail.io/index.php?/cases/view/535868
+    it('C535868 - Parental Control - Change Before 5 minutes, @parental_controls', async () => {
 
       await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
       await testUtils.waitForAppLaunchBeaconToFire();
@@ -410,8 +410,8 @@ describe('Parental Controls', function () {
 
     });
 
-    //https://tubi.testrail.io/index.php?/cases/view/21246
-    it('C21246- Search - Adult to Older Kids - When titles above Older Kids is searched then no results should be displayed, @parental_controls', async () => {
+    // https://tubi.testrail.io/index.php?/cases/view/537901
+    it('C537901 - Search - Adult to Older Kids - When titles above Older Kids is searched then no results should be displayed, @parental_controls', async () => {
 
       await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
       await testUtils.waitForAppLaunchBeaconToFire();
@@ -455,8 +455,8 @@ describe('Parental Controls', function () {
 
   });
 
-  // https://tubi.testrail.io/index.php?/cases/view/4206
-  it('C4206 - Continue Watching - When setting is changed to Little Kids then Continue Watching row has no content above TV-G or G @parental_controls', async () => {
+  // https://tubi.testrail.io/index.php?/cases/view/535826
+  it('C535826 - Continue Watching - When setting is changed to Little Kids then Continue Watching row has no content above TV-G or G @parental_controls', async () => {
 
       // Create a user with mix of little kids and non-little kid rated titles with history
       const user = await testUtils.createRegisteredUser();
@@ -494,14 +494,14 @@ describe('Parental Controls', function () {
       const rowItemsContent = await testUtils.getCurrentlyFocusedRowListRowItemsContent('homeScreenRowList');
 
     // Add this for loop for all checks on Ratings.
-    // IMPROVEMENT - Make sure we have All of the ratings in each check as listed in this for loop
+    //
       for (const itemContent of rowItemsContent) {
         expect(['PG','R','NR','PG-13', 'TV-14', 'TV-MA', 'MA'].includes(itemContent.type)).to.be.false;
       }
   });
 
-  // https://tubi.testrail.io/index.php?/cases/view/4209
-  it('C4209 - Continue Watching - When setting is changed to Adults then Continue Watching row should show all rated contents @parental_controls', async () => {
+  // https://tubi.testrail.io/index.php?/cases/view/535827
+  it('C535827 - Continue Watching - When setting is changed to Adults then Continue Watching row should show all rated contents @parental_controls', async () => {
 
       // Create a user with mix of little kids and non-little kid rated titles with history
       const user = await testUtils.createRegisteredUser();
@@ -539,8 +539,8 @@ describe('Parental Controls', function () {
 
   });
 
-  // https://tubi.testrail.io/index.php?/cases/view/21232
-  it('C21232 - Continue Watching - When setting is changed to Older Kids then Continue Watching row has no content above  PG, TV-PG, TV-Y7 @parental_controls', async () => {
+  // https://tubi.testrail.io/index.php?/cases/view/535762
+  it('C535762 - Continue Watching - When setting is changed to Older Kids then Continue Watching row has no content above  PG, TV-PG, TV-Y7 @parental_controls', async () => {
 
       // Create a user with mix of Older and non-little kid rated titles with history
       const user = await testUtils.createRegisteredUser();
@@ -584,8 +584,8 @@ describe('Parental Controls', function () {
   });
 
 
-  // https://tubi.testrail.io/index.php?/cases/view/21239
-  it('C21239 - My List- When setting is changed to Little Kids then My List row has no content above TV-G or G @parental_controls', async () => {
+  // https://tubi.testrail.io/index.php?/cases/view/535764
+  it('C535764 - My List- When setting is changed to Little Kids then My List row has no content above TV-G or G @parental_controls', async () => {
 
       // Create a user with mix of little kids and non-little kid rated titles with history
       const user = await testUtils.createRegisteredUser();
@@ -631,8 +631,8 @@ describe('Parental Controls', function () {
 
   });
 
-  // https://tubi.testrail.io/index.php?/cases/view/21240
-  it('C21240 - My List - When setting is changed to Older Kids then My List row has no content above PG, TV-PG, TV-Y7 @parental_controls', async () => {
+  // https://tubi.testrail.io/index.php?/cases/view/535765
+  it('C535765 - My List - When setting is changed to Older Kids then My List row has no content above PG, TV-PG, TV-Y7 @parental_controls', async () => {
 
     // Create a user with mix of Older and non-little kid rated titles with history
     const user = await testUtils.createRegisteredUser();
@@ -676,8 +676,8 @@ describe('Parental Controls', function () {
 
 });
 
-  // https://tubi.testrail.io/index.php?/cases/view/21241
-  it('C21241 - My List - When setting is changed to Teens then My List row has no content above PG-13, TV-14 @parental_controls', async () => {
+  // https://tubi.testrail.io/index.php?/cases/view/535766
+  it('C535766 - My List - When setting is changed to Teens then My List row has no content above PG-13, TV-14 @parental_controls', async () => {
 
     // Create a user with mix of Older and non-little kid rated titles with history
     const user = await testUtils.createRegisteredUser();
@@ -771,13 +771,6 @@ describe('Parental Controls', function () {
       await user.addContentToWatchList(movieContentNR);
 
    }
-
-
-
-
-
-
-
 
 
     async function selectOlderKidsFromParentalSettings() {

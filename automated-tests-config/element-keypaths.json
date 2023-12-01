@@ -28,6 +28,11 @@
     "description": "Component contains side nav menu items. Useful for seeing which page is showing or to switch page is showing",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems"
   },
+  "mainMenuSelected": {
+    "description": "This is the main menu grid that is used for knowing what is the selected menu item",
+    "xpath": "/TubiScene/ContentController/Group/Group/SideNav/LayoutGroup/Group/MarkupGrid",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected"
+  },
   "previewVideoPlayer": {
     "description": "Component for video preview playback. Useful for checking that video preview is playing the correct file",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#videoPreviewPlayer"
@@ -480,6 +485,11 @@
     "description" : "Call to action button on My Stuff page (Press back for menu)",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#nav.#ScreenNavigationHint.#callToAction"
   },
+  "categoriesCallToAction" : {
+    "description" : "Call to action button on Categories page",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#nav.#ScreenNavigationHint.#callToAction"
+
+  },
   "searchResultsDesc": {
     "description" : "Linear Search Results Description",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
@@ -794,34 +804,113 @@
   "settingsMenuItem" :{
     "description" : "Settings menu item",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.8"
-},
-"dialogBoxContentAreaDeviceID" : {
-  "description" : "Dialog box for Device ID",
-  "keyPath": "#ContentController.#2f12a2f.#DialogBox.#ContentArea"
-},
-"myStuffLeftNav" : {
-  "description" : "My Stuff Left Nav option",
-  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.4.#LabelParent.0.#Label"
-},
-"parentalControlsHeader" : {
-  "description" : "Parental Controls header",
-  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#Title"
-},
-"featuredRow" : {
-  "description" : "Featured Row",
-  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.1.title.#CategoryName"
-},
-"featuredRowPoster" : {
-  "description" : "Featured row poster",
-  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.items.0.#poster"
-},
-"homeScreenContentDescription" :{
-  "description" : "description of title in CW row",
-  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
-},
-"ageVerificationPad" : {
-  "description": "age gate number page",
-  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0"
-}
-
+  },
+  "dialogBoxContentAreaDeviceID" : {
+    "description" : "Dialog box for Device ID",
+    "keyPath": "#ContentController.#2f12a2f.#DialogBox.#ContentArea"
+  },
+  "myStuffLeftNav" : {
+    "description" : "My Stuff Left Nav option",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.4.#LabelParent.0.#Label"
+  },
+  "parentalControlsHeader" : {
+    "description" : "Parental Controls header",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#Title"
+  },
+  "featuredRow" : {
+    "description" : "Featured Row",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.items.0.getParent()"
+  },
+  "homeScreenContentDescription" :{
+    "description" : "description of title in CW row",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
+  },
+  "ageVerificationPad" : {
+    "description": "age gate number page",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0"
+  },
+  "leftNavSearchButton" : {
+    "description" : "left nav search button",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2"
+  },
+  "parentalControlsButton" : {
+    "description" : "parental controls button",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.0"
+  },
+  "searchMenuText" : {
+    "description" : "search menu text",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#leftSide.#searchMenuText"
+  },
+  "searchText" : {
+    "description" : "Search text",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchText"
+  },
+  "sideNavComponent" : {
+    "description" : "side nav element component",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected"
+  },
+  "recommendedPoster" : {
+    "description" : "recommended poster",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.0.#Title"
+  },
+  "categoriesLeftNavButton" : {
+    "description" : "categories left nav",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.5"
+  },
+  "categoriesLabel" : {
+    "description" : "categories label highlighted",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.5.#LabelParent.0.#Label"
+  },
+  "categoriesListScreen" : {
+    "description" : "categories  screen",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid"
+  },
+  "channelsLeftNavButton" : {
+    "description" : "channels left nav button highlighted",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.6"
+  },
+  "channelsListScreen" : {
+    "description" : "channels list screen",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#ChannelCategoryGrid.6.#PosterRect"
+  },
+  "settingsLeftNavButton" : {
+    "description" : "settings left nav button highlighted",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.8"
+  },
+  "categoriesVideoGrid" : {
+    "description" : "categories video grid",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#ChannelsVideoGrid"
+  },
+  "exitLeftNavButton" : {
+    "description" : "settings left nav button highlighted",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.9.#LabelParent.0.#Label"
+  },
+  "ageVerificationNumberPad" : {
+    "description" : "age verification number pad",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.1.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0"
+  },
+  "yearsVerificationEntry" : {
+    "description" : "age verification years page",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeVerificationPageText.#AgeVerificationPageHeader"
+  },
+  "categoriesContinueWatchingTile" : {
+    "description" : "CW tile on Categories page",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.1.#Title"
+  },
+  "searchMenuItemSelected" : {
+    "description" : "Search menu highlighted",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2"
+  },
+  "searchKeyPad" : {
+    "description" : "Search keypad",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#searchGroup.#SearchKeyboard.0"
+  },
+  "leftNavHomeLabel" : {
+    "description" : "label child in left nav",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.3.#LabelParent.0.#Label"
+  },
+  "leftNavSearchLabel" : {
+    "description" : "search label in left nav",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2.#LabelParent.0.#Label"
+  }
 }

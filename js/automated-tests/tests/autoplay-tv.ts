@@ -24,8 +24,8 @@ describe('Autoplay TV', function () {
 
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/21205
-    it('C21205 - Autoplay - Series - When autoplay timer expires then next episode autoplays @autoplay,@smoke', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535750
+    it('C535750 - Autoplay - Series - When autoplay timer expires then next episode autoplays @autoplay,@smoke', async () => {
 
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
 
@@ -51,8 +51,8 @@ describe('Autoplay TV', function () {
 
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/6030
-    it('C6030 - Autoplay - Series - Next episode plays after multiple consecutive autoplays @autoplay,@smoke', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535854
+    it('C535854 - Autoplay - Series - Next episode plays after multiple consecutive autoplays @autoplay,@smoke', async () => {
 
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
 
@@ -87,8 +87,8 @@ describe('Autoplay TV', function () {
 
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/21201
-    it('C21201 - Autoplay - Series - When user presses the Back button then series autoplay UI is dismissed @autoplay,@smoke', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535749
+    it('C535749 - Autoplay - Series - When user presses the Back button then series autoplay UI is dismissed @autoplay,@smoke', async () => {
 
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
 
@@ -140,9 +140,9 @@ describe('Autoplay TV', function () {
 
 async function triggerSeriesAutoplay() {
     //Play title, pause to open player, move right to FF button and press, verify state
-    await utils.sleep(2000);
+    await utils.sleep(3000);
     await ecp.sendKeyPress(ecp.Key.Play);
-    await utils.sleep(2000);
+    await utils.sleep(3000);
     const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
     expect(videoPlayerActual.visible).to.equal(true);
     await testUtils.expectPlayerStateToEventuallyEqual('play');

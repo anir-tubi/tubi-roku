@@ -5,32 +5,32 @@ import { testUtils } from '../test-utils';
 
 describe('Search', function () {
   describe('Linear Search', function () {
-    it('C244256 When a user searches for a channel, the channel is shown in the search results @linearsearch', async () => {
+    it('C244256 When a user searches for a channel, the channel is shown in the search results', async () => {
       await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-      await ecp.sendText('abc');
+      await ecp.sendText('nbc');
 
       // Call function to navigate right to search results grid
       await navigateRightToGrid();
 
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-        expect(searchResultsText.text).to.equal('ABC News Live');
+        expect(searchResultsText.text).to.equal('NBC News NOW');
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
       expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon.webp');
     });
 
-    it('C244258 When a user clicks on the channel poster, the live channel should start playing @linearsearch', async () => {
+    it('C244258 When a user clicks on the channel poster, the live channel should start playing', async () => {
       await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-      await ecp.sendText('abc');
+      await ecp.sendText('nbc');
 
       // Call function to navigate right to search results grid
       await navigateRightToGrid();
 
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-        expect(searchResultsText.text).to.equal('ABC News Live');
+        expect(searchResultsText.text).to.equal('NBC News NOW');
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
@@ -41,16 +41,16 @@ describe('Search', function () {
       await testUtils.expectPlayerStateToEventuallyEqual('play', 10000);
     });
 
-    it('C244259 When a user presses the back button, the user is sent back to the search result page @linearsearch', async () => {
+    it('C244259 When a user presses the back button, the user is sent back to the search result page', async () => {
       await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-      await ecp.sendText('abc');
+      await ecp.sendText('nbc');
 
       // Call function to navigate right to search results grid
       await navigateRightToGrid();
 
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-        expect(searchResultsText.text).to.equal('ABC News Live');
+        expect(searchResultsText.text).to.equal('NBC News NOW');
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
@@ -64,20 +64,20 @@ describe('Search', function () {
       await ecp.sendKeyPress(ecp.Key.Back);
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-        expect(searchResultsText.text).to.equal('ABC News Live');
+        expect(searchResultsText.text).to.equal('NBC News NOW');
       });
     });
 
-    it('C244260 - The user should be able to access the channel guide and other player features from the player page of the selected channel @linearsearch', async () => {
+    it('C244260 - The user should be able to access the channel guide and other player features from the player page of the selected channe', async () => {
       await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-      await ecp.sendText('abc');
+      await ecp.sendText('nbc');
 
       // Call function to navigate right to search results grid
       await navigateRightToGrid();
 
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-        expect(searchResultsText.text).to.equal('ABC News Live');
+        expect(searchResultsText.text).to.equal('NBC News NOW');
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
@@ -102,9 +102,9 @@ describe('Search', function () {
     });
 
     // https://tubi.testrail.io/index.php?/cases/view/244261
-    it('C244261  When a user searches for a linear channel, the channel matching to the search term should show up in the search results as primary results @linearsearch', async () => {
+    it('C244261  When a user searches for a linear channel, the channel matching to the search term should show up in the search results as primary results', async () => {
       await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-      await ecp.sendText('nfl');
+      await ecp.sendText('nbc');
 
       // Call function to navigate right to search results grid
       await navigateRightToGrid();
@@ -112,16 +112,16 @@ describe('Search', function () {
       // Verify search results and live icon
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-        expect(searchResultsText.text).to.equal('NFL Channel');
+        expect(searchResultsText.text).to.equal('NBC News NOW');
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
       expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon.webp');
     });
 
-    it('C244271  Ensure that when the user hover over a channel search result the channel name and description is displayed on the top left corner @linearsearch', async () => {
+    it('C244271  Ensure that when the user hover over a channel search result the channel name and description is displayed on the top left corner', async () => {
       await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-      await ecp.sendText('nfl');
+      await ecp.sendText('nbc');
 
       // Call function to navigate right to search results grid
       await navigateRightToGrid();
@@ -130,7 +130,7 @@ describe('Search', function () {
 
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-        expect(searchResultsText.text).to.equal('NFL Channel');
+        expect(searchResultsText.text).to.equal('NBC News NOW');
       });
 
       await testUtils.retryWithTimeOut(async () => {
@@ -146,14 +146,14 @@ describe('Search', function () {
 
     it('C406434 When a user taps "Play" button on linear channel, backing out takes user back to search results @linearsearch', async () => {
       await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-      await ecp.sendText('abc');
+      await ecp.sendText('nbc');
 
       // Call function to navigate right to search results grid
       await navigateRightToGrid();
 
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-        expect(searchResultsText.text).to.equal('ABC News Live');
+        expect(searchResultsText.text).to.equal('NBC News NOW');
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
@@ -167,7 +167,7 @@ describe('Search', function () {
       await ecp.sendKeyPress(ecp.Key.Back);
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-        expect(searchResultsText.text).to.equal('ABC News Live');
+        expect(searchResultsText.text).to.equal('NBC News NOW');
       });
     });
   });

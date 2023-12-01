@@ -8,7 +8,8 @@ describe('Large Posters', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
   });
 
-  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4146
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4146 - Placeholder
+  /*
   it('C498789 -  On homegrid, user sees 3 images and a peek of the 4th in Featured row (For You tab), @large_poster', async () => {
     
     // On Home Page, see featured row, Check for large posters?
@@ -19,5 +20,5 @@ describe('Large Posters', function () {
    
     // Need helper here to verify peak https://app.shortcut.com/tubi/story/582832/need-a-helper-function-for-finding-the-poster-peak-on-multiple-screens
     });
-
+*/
   });

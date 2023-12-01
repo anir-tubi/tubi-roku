@@ -10,9 +10,9 @@ describe('Application Launch', function () {
     await testUtils.waitForAppLaunchBeaconToFire();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
   });
-
-  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4146
-  it('C4146 User Signed in - Homescreen Display @registered_user,@smoke,@application_launch @application_launch', async () => {
+  
+  // https://tubi.testrail.io/index.php?/cases/view/535807
+  it('C535807 User Signed in - Homescreen Display @registered_user,@smoke,@application_launch @application_launch', async () => {
     await testUtils.retryWithTimeOut(async () => {
       const sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
       expect(sideNavSignedInLabel.text).to.contain('Hi');
@@ -20,14 +20,14 @@ describe('Application Launch', function () {
 
   });
 
-  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/5769
-  it('C5769 - Application Launch - When user opens the application after registering as a new user then the home screen is displayed @application_launch', async () => {
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/edit/535837
+  it('C535837 - Application Launch - When user opens the application after registering as a new user then the home screen is displayed @application_launch', async () => {
     const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
     await testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured');
   });
 
-  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/21197
-  it('C21197 - Application Launch - Registered User - When user tries to play a title after user has registered device then the title should play on tubi @application_launch', async () => {
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535748
+  it('C535748 - Application Launch - Registered User - When user tries to play a title after user has registered device then the title should play on tubi @application_launch, @smoke', async () => {
     await ecp.sendKeyPress(ecp.Key.Ok);
     await ecp.sendKeyPress(ecp.Key.Play);
     await testUtils.expectPlayerStateToEventuallyEqual('play', 20000);
@@ -36,6 +36,7 @@ describe('Application Launch', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/70718
   it('C70718 - Sign out after setting Parental Controls @application_launch', async () => {
     // Go to Settings page and select Older Kids
+   // await testUtils.goToPage('settings');
     await testUtils.goToPage('settings');
     await ecp.sendKeyPress(ecp.Key.Right);
     await utils.sleep(2000);
@@ -44,7 +45,7 @@ describe('Application Launch', function () {
 
     // Validate Enter Password Page and message
     const enterPasswordMessage = await testUtils.getNodeForElement('enterPasswordMessage');
-    expect(enterPasswordMessage.text).to.equal('Enter Password to update');
+    expect(enterPasswordMessage.text).to.equal('Enter Password to update parental controls');
 
     // Send password and click Continue
     await ecp.sendText('111111');
@@ -84,7 +85,7 @@ describe('Application Launch', function () {
 
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/116528
-  it('C116528_1 - Resume Watching - Guest User - Movie - User plays back content, exits and selects content again @new_test,@application_launch', async () => {
+  it('C116528_1 - Resume Watching - Guest User - Movie - User plays back content, exits and selects content again, @application_launch', async () => {
     // Start Open Movies
     await testUtils.startApplicationAtPage('movies');
 

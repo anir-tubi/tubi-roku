@@ -12,8 +12,9 @@ describe('Playback', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
   });
 
-  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4163
-  it('C4163/C4162- Pause Playback @playback_1,@registered_user,@smoke', async () => {
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537377  - https://tubi.testrail.io/index.php?/cases/view/537380
+
+  it('C537377 537380 - Pause Playback @playback_1,@registered_user,@smoke', async () => {
     await ecp.sendKeyPress(ecp.Key.Play);
     await utils.sleep(3000);
     const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
@@ -25,8 +26,8 @@ describe('Playback', function () {
     await testUtils.expectPlayerStateToEventuallyEqual('pause');
   });
 
-  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4164
-  it('C4164- Forward Payback 30 seconds @playback_1,@guest_user,@smoke', async () => {
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/vie/537905
+  it('C537905 - Forward Playback 30 seconds @playback_1,@guest_user,@smoke', async () => {
 
     // Start at home page to select another title, different from previous test
     //await testUtils.startApplicationAtPage('home', false);
@@ -57,8 +58,8 @@ describe('Playback', function () {
 
   });
 
-  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4165
-  it('C4165- Rewind Payback 30 seconds @playback_1,@guest_user,@smoke', async () => {
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537378
+  it('C537378 - Rewind Payback 30 seconds @playback_1,@guest_user,@smoke', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     // Are we on the home page?
@@ -99,8 +100,8 @@ describe('Playback', function () {
 
   });
 
-  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4166
-  it('C4166 - Fast Forward 1x @playback_1,@registered_user,@smoke', async () => {
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535814
+  it('C535814- Fast Forward 1x @playback_1,@registered_user,@smoke', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
@@ -130,8 +131,8 @@ describe('Playback', function () {
 
   });
 
-  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4167
-  it('C4167 - Fast Forward 2x @playback_1,@registered_user,@smoke', async () => {
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535815
+  it('C535815 - Fast Forward 2x @playback_1,@registered_user,@smoke', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
@@ -161,8 +162,8 @@ describe('Playback', function () {
 
   });
 
-  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4168
-  it('C4168 - Fast Forward 3x @playback_1,@registered_user,@smoke', async () => {
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537379
+  it('C535816 - Fast Forward 3x @playback_1,@registered_user,@smoke', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
@@ -191,8 +192,9 @@ describe('Playback', function () {
 
   });
 
-  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/4169
-  it('C4169 - Fast Forward 4x @playback_1,@registered_user,@smoke', async () => {
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535816
+  it('C535816 - Fast Forward 4x @playback_1,@registered_user,@smoke', async () => {
+
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
@@ -223,8 +225,8 @@ describe('Playback', function () {
 
   });
 
-  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/5919
-  it('C5919 - Details Page Displays History Progress Bar @playback_1,@registered_user,@smoke', async () => {
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537688
+  it('C537688 - Details Page Displays History Progress Bar @playback_1,@registered_user,@smoke', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
@@ -275,8 +277,9 @@ describe('Playback', function () {
 
   });
 
-  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/6004
-  it('C6004 - Resume from series details page play @playback_1,@registered_user,@smoke,@regression', async () => {
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535850
+
+  it('C535850 - Resume from series details page play @playback_1,@registered_user,@smoke,@regression', async () => {
     await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
 
     // Are we on the series page?
@@ -291,8 +294,8 @@ describe('Playback', function () {
     await testUtils.selectAndVerifyDetailPageMenuItem('removeFromHistory');
   });
 
-  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/6005
-  it('C6005 - C6005 Resume from series details page episode play @playback_1,@registered_user,@smoke,@regression', async () => {
+  // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/536522
+  it('536522 -  Resume from series details page episode play @playback_1,@registered_user,@smoke,@regression', async () => {
     await testUtils.goToPage('tv');
 
 
@@ -345,7 +348,7 @@ describe('Playback', function () {
     await ecp.sendKeyPress(ecp.Key.Ok);
 
     // Verify Rewind button state is RW 1
-    const rewindButton1x = await testUtils.getNodeForElement('rewindButton1x');
+    const rewindButton1x = await testUtils.getNodeForElement('rewindButton');
     expect(rewindButton1x.uri).to.equal('pkg:/images/transport/sgplayer/icon-rew-1.png');
 
   });
@@ -397,7 +400,6 @@ describe('Playback', function () {
     await ecp.sendKeyPress(ecp.Key.Play);
     const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
     expect(playPauseButton.visible).to.equal(true);
-    //await testUtils.expectPlayerStateToEventuallyEqual('pause');
     await ecp.sendKeyPress(ecp.Key.Left, { count: 2 });
 
     // Rewind button highlighted
@@ -414,6 +416,7 @@ describe('Playback', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/25128
+  it
   it('C25128 - Rewind 4x @playback_1,@registered_user,@smoke', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
@@ -440,7 +443,7 @@ describe('Playback', function () {
     await ecp.sendKeyPress(ecp.Key.Ok, { count: 4 });
 
     // Verify Rewind button state is RW 1 again
-    const rewindButton1x = await testUtils.getNodeForElement('rewindButton1x');
+    const rewindButton1x = await testUtils.getNodeForElement('rewindButton');
     expect(rewindButton1x.uri).to.equal('pkg:/images/transport/sgplayer/icon-rew-1.png');
 
   });
