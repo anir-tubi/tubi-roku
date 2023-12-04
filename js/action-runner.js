@@ -21,7 +21,7 @@ async function setupAutomatedTestsGithubActionRunner(done) {
   // First see if we've already setup the runner
   const inspectResult = shell.exec(`podman inspect ${runnerImageName}`);
   if (inspectResult.code === 0) {
-    log('Automated tests Github action runner already setup.\nTo remove it run: gulp removeAutomatedTestsGithubActionRunner\nTo start the runner run: gulp startAutomatedTestsRunner');
+    log('Automated tests Github action runner already setup.\nTo remove it run: gulp removeAutomatedTestsRunner\nTo start the runner run: gulp startAutomatedTestsRunner');
     // If code is zero we're good to go and can exit
     return;
   }
@@ -99,16 +99,34 @@ async function startAutomatedTestsGithubActionRunner(done) {
 
   const inspectResult = shell.exec(`podman inspect ${runnerImageName}`);
   if (inspectResult.code !== 0) {
-    done(new NoStackError('Runner has not been setup yet. Please run:\ngulp setupAutomatedTestsGithubActionRunner'));
+    done(new NoStackError('Runner has not been setup yet. Please run:\ngulp setupAutomatedTestsRunner'));
   }
 
-  const command = `podman run --name ${runnerImageName} --rm -ti ${runnerImageName}`;
-  await spawnShellCommand(done, command, true);
+  // Checking for an existing container
+  const psResult = shell.exec(`podman ps -a | grep ${runnerImageName}`);
+  if (psResult.code === 0) {
+    // Container already exists so we just need to start it
+    const command = `podman start -ai ${runnerImageName}`;
+    await spawnShellCommand(done, command, true);
+  } else {
+    // Need to run the image to create the container
+    const command = `podman run --name ${runnerImageName} -ti ${runnerImageName}`;
+    await spawnShellCommand(done, command, true);
+  }
 }
 
 
 async function removeAutomatedTestsGithubActionRunner(done) {
   await verifyPodmanIsAvailable(done);
+
+  // Have to clean up existing container if it exists before we can remove the image
+  const containerId = await execShellCommand(done, `podman container list -aq --filter name=${runnerImageName}`);
+
+  // If we found a container then now remove it
+  if (containerId) {
+    const command = `podman container rm ${containerId}`;
+    await spawnShellCommand(done, command);
+  }
 
   const command = `podman image rm ${runnerImageName}`;
   await spawnShellCommand(done, command, true);
