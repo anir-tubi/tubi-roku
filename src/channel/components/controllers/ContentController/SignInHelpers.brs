@@ -649,7 +649,7 @@ Function onSignInError(errorResponse)
   ' Checking if the reason for error is invalid token and the error message is Token type does not match.
   ' Reason we are checking the message because we get same error code for all token related errors.
   ' Sample error response: {"code":"INVALID_TOKEN","message":"Token type does not match"}
-  if errorResponse.error <> invalid AND errorResponse.error.message = "Token type does not match"
+  if isAA(errorResponse.error) = true AND errorResponse.error.message = "Token type does not match"
     screenIds = getScreenIdsFromStack()
 
     eventInfo = {
