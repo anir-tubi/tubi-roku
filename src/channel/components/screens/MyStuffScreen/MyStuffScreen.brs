@@ -16,7 +16,6 @@ Function init()
   m.AllEmptyUITitle = m.top.findNode("AllEmptyUITitle")
   m.AllEmptyUISubtitle = m.top.findNode("AllEmptyUISubtitle")
   m.AllEmptyUISubtitle2 = m.top.findNode("AllEmptyUISubtitle2")
-  m.AllEmptyUISubtitle2Icon = m.top.findNode("AllEmptyUISubtitle2Icon")
 
   m.SignedOutUITitle.text = getTranslation("screenMyStuff_signedOutUITitle")
   m.SignedOutUISubtitle.text = getTranslation("screenMyStuff_signedOutUISubtitle")
@@ -60,7 +59,7 @@ Function init()
 
   defaultGuestMenuWidth = m.GuestMenu.itemSize[0]
   signInOutButton = m.top.findNode("SignInOutButton")
-  signInOutButton.title = getTranslation("menu_signIn")
+  signInOutButton.title = getTranslation("screenMyStuff_signedOutUIButton") 
 
   allEmptyUIButton = m.top.findNode("AllEmptyUIButton")
   allEmptyUIButton.title = getTranslation("menu_goHome")
@@ -99,7 +98,7 @@ Function init()
   setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmall_strong)
   setTypographyOfLabel(m.SignedOutUITitle, typographyConstants.ids.headerSmall)
   setTypographyOfLabel(m.SignedOutUISubtitle, typographyConstants.ids.bodyLarge)
-  setTypographyOfLabel(m.SignedOutUIBlurb, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.SignedOutUIBlurb, typographyConstants.ids.bodyLarge)
   setTypographyOfLabel(m.AllEmptyUITitle, typographyConstants.ids.headerSmall)
   setTypographyOfLabel(m.AllEmptyUISubtitle, typographyConstants.ids.bodyLarge)
   setTypographyOfLabel(m.AllEmptyUISubtitle2, typographyConstants.ids.bodyLarge)
@@ -127,7 +126,6 @@ Function onThemeChange(msg = invalid)
     m.AllEmptyUITitle.color = theme.primaryTextColor
     m.AllEmptyUISubtitle.color = theme.secondaryTextColor
     m.AllEmptyUISubtitle2.color = theme.secondaryTextColor
-    m.AllEmptyUISubtitle2Icon.blendColor = theme.secondaryTextColor
     m.GuestMenu.focusBitmapBlendColor = theme.focusedColor
     m.AllEmptyUIMenu.focusBitmapBlendColor = theme.focusedColor
     m.RowList.focusBitmapBlendColor = theme.focusedColor

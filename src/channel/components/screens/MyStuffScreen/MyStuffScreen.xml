@@ -150,23 +150,6 @@
           uri="pkg:/fonts/Vaud-Medium.ttf"
           size="34" />
       </Label>
-      <MarkupGrid
-        id="GuestMenu"
-        drawFocusFeedbackOnTop="false"
-        numRows="1"
-        itemSize="[211,80]"
-        itemSpacing="[0,8]"
-        numColumns="1"
-        itemComponentName="DetailMenuItem"
-        vertFocusAnimationStyle="floatingFocus">
-        <ContentNode
-          id="GuestMenuContent"
-          role="content">
-          <DetailMenuItemContentNode
-            id="SignInOutButton"
-            iconUrl="pkg:/images/icon-sign-in.webp"/>
-        </ContentNode>
-      </MarkupGrid>
       <Label
         id="SignedOutUIBlurb"
         width="1536"
@@ -178,6 +161,22 @@
           uri="pkg:/fonts/Vaud-Medium.ttf"
           size="34" />
       </Label>
+      <MarkupGrid
+        id="GuestMenu"
+        drawFocusFeedbackOnTop="false"
+        numRows="1"
+        itemSize="[211,80]"
+        itemSpacing="[0,8]"
+        numColumns="1"
+        itemComponentName="ListItemButtonWithBg"
+        vertFocusAnimationStyle="floatingFocus">
+        <ContentNode
+          id="GuestMenuContent"
+          role="content">
+          <DetailMenuItemContentNode
+            id="SignInOutButton"/>
+        </ContentNode>
+      </MarkupGrid>
     </LayoutGroup>
 
     <LayoutGroup id="AllEmptyUI"
@@ -223,28 +222,17 @@
           uri="pkg:/fonts/Vaud-Medium.ttf"
           size="34" />
       </Label>
-      <LayoutGroup
-        id="AllEmptyUISubtitle2Parent"
-        layoutDirection="horiz"
-        vertAlignment="custom"
-        horizAlignment="center"
-        itemSpacings="[15]">
-        <Label
-          id="AllEmptyUISubtitle2"
-          maxLines="1"
-          horizAlign="center"
-          vertAlign="bottom">
-          <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="34" />
-        </Label>
-        <Poster
-          id="AllEmptyUISubtitle2Icon"
-          width="24"
-          height="30"
-          uri="pkg:/images/icon-add-to-queue.webp"/>
-      </LayoutGroup>
+      <Label
+        id="AllEmptyUISubtitle2"
+        maxLines="2"
+        width="600"
+        horizAlign="center"
+        vertAlign="bottom">
+        <Font
+          role="font"
+          uri="pkg:/fonts/Vaud-Medium.ttf"
+          size="34" />
+      </Label>
       <MarkupGrid
         id="AllEmptyUIMenu"
         drawFocusFeedbackOnTop="false"
@@ -252,14 +240,13 @@
         itemSize="[211,80]"
         itemSpacing="[0,8]"
         numColumns="1"
-        itemComponentName="DetailMenuItem"
+        itemComponentName="ListItemButtonWithBg"
         vertFocusAnimationStyle="floatingFocus">
         <ContentNode
           id="AllEmptyUIMenuContent"
           role="content">
           <DetailMenuItemContentNode
-            id="AllEmptyUIButton"
-            iconUrl="pkg:/images/sideNavHome.webp"/>
+            id="AllEmptyUIButton"/>
         </ContentNode>
       </MarkupGrid>
     </LayoutGroup>
