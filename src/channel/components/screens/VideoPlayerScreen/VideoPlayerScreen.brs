@@ -52,6 +52,7 @@ Function init()
   m.LoadingMessage = m.top.findNode("LoadingMessage")
   m.Transport = m.top.findNode("Transport")
   m.Related = m.top.findNode("Related")
+  m.Related.associatedPageName = "video_player_page"
   m.Related.observeFieldScoped("isRelatedContentFocused", "onRelatedItemFocused")
   m.Related.observeFieldScoped("selectedRelatedContentItem", "onRelatedItemSelected")
   m.Related.observeFieldScoped("keyPress", "onKeyPressWhenYMALHasFocus")

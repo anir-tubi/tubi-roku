@@ -71,6 +71,7 @@ End Function
 
 
 Function onItemFocused(msg)
+
   itemFocused = msg.getData()
   content = m.RelatedGrid.content.getChild(itemFocused)
 
@@ -80,10 +81,11 @@ Function onItemFocused(msg)
 
   col = itemFocused + 1
   row = 1
+  pageName = m.top.associatedPageName
 
   if m.isRelatedFocused = true
     m.top.navigateWithinPageInfo = {
-      pageOneof: m.Tracking.getAnalyticsPage("video_page", {video_id: content.id.toInt()})
+      pageOneof: m.Tracking.getAnalyticsPage(pageName, {video_id: content.id.toInt()})
       componentOneof: m.Tracking.getAnalyticsComponent("related_component", m.oldYmalComponent)
       means_of_navigation: "BUTTON"
       vertical_location: row
