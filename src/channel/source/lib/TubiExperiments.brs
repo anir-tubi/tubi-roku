@@ -27,7 +27,7 @@ Function TubiExperiments(constants) as Object
       roku_registration_signin_password_reset: {
         roku_registration_signin_password_reset_v2: {"enabled": true, "instant": true}
       }
-      
+
       '//Experiment to display a user's liked video titles on the MyStuff screen
       roku_mylikes_mystuff: {
         roku_mylikes_mystuff_v2: {"enabled": false}
@@ -84,7 +84,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_preview_player_alternative_stop_method: {
-        roku_preview_player_alternative_stop_method_v1: {"enabled": false}
+        roku_preview_player_alternative_stop_method_v1: {"enabled": true}
       }
 
       roku_cw_consent: {
