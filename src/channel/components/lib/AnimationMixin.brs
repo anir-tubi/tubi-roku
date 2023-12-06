@@ -249,13 +249,11 @@ Function animate(target As Object, options as Object) As Object
     animationId = "GeneralAnimation-" + target.id
 
     bAnimate = true
-    ' if low-spec device, then instantly change to target option rather than using animation
-    '//TODO investigate using optional=true parameter on animation
-    if m.constants = invalid
-      m.constants = getConstantsFromGlobal()
-    end if
 
-    if m.constants <> invalid AND m.constants.deviceInfo.limitedUi = true
+    ' if low-spec device, then instantly change to target option rather than using animation
+    diModel = createObject("roDeviceInfo").GetModel()
+
+    if diModel = "3700X" OR diModel = "3710X" OR diModel = "5000X"
       ' hardcoding easeFunction=linear for better performance in lower-end even if allowOnLowSpecDevices=true
       options.easeFunction = "linear"
 
