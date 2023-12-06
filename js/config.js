@@ -40,7 +40,7 @@ function getBuildTag(includeTo, connector = '_') {
  * A simple function that returns the version number as defined in build param with version out to section specified by includeTo param
  * @build build object - build information including manifest object that we pull version info from
  * @includeTo string - 'minor' outputs "1.2", 'build' outputs "1.2.3", 'revision' outputs "1.2.3.4"
- * @connector string - string we join the version parts together with. Defaults to '_'. Use '.' to connect with dots. 
+ * @connector string - string we join the version parts together with. Defaults to '_'. Use '.' to connect with dots.
  * @returns string
  */
 function formatBuildTag(build, includeTo, connector = '_') {
@@ -102,10 +102,10 @@ function load(options) {
 }
 
 
-function incrementBuildNumber() {
+function incrementBuildNumber(incrementAmount = 1) {
   let build = parse(buildProfile, {});
 
-  build.manifest.build_version = build.manifest.build_version + 1
+  build.manifest.build_version = build.manifest.build_version + incrementAmount
   build.component_library_manifest.build_version = build.manifest.build_version
   build.starter_library_manifest.build_version = build.manifest.build_version
   build.manifest.revision_version = 0

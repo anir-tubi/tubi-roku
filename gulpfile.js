@@ -20,7 +20,7 @@ const clipboardy = require('clipboardy');
 // const requestDebug = require('request-debug')(request);
 
 //Importing old build functions
-const {load, getBuildTag, incrementBuildNumber, incrementRevisionNumber} = require('./js/config');
+const {load, getBuildTag} = require('./js/config');
 const {createManifest, createSettings} = require('./js/build');
 const {keypress, deeplink, uploadPkg, signPkg, installWithSquashfs} = require('./js/network');
 
@@ -34,7 +34,7 @@ const {replaceTypographyConstants} = require('./js/typography.js');
 const {NoStackError} = require('./js/utilities');
 
 // Importing functions with Git functionality
-const {verifyGit, makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges} = require('./js/git');
+const {makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild} = require('./js/git');
 
 // Importing functions related to Suitest
 const {retrieveSuitestTests, runSuitestTests, convertXpathsToKeyPaths, convertSuitestTest} = require('./js/suitest');
@@ -428,15 +428,15 @@ function buildRemote() {
     newImages.forEach((filePath) => {
       // Since the images in the new images file are for ex: images/selectorRoundedCorners-fhd.9.png but in the xml or brs files
       // we will have paths as pkg:/images/selectorRoundedCorners-$$RES$$.9.png for ex: m.RowList.focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png", so adding an additional match criteria along with checking for images/selectorRoundedCorners-fhd.9.png | images/selectorRoundedCorners-hd.9.png it also checks for images/selectorRoundedCorners-$$RES$$.9.png references in our xml and brs files.
-      let resFilePath = filePath.replace(/fhd|hd/, "$$$RES$$$");
+      let resFilePath = filePath.replace(/fhd|hd/, '$$$RES$$$');
       newImagesMap[filePath] = true;
       // Adding a check to make sure we do not add it again, since we might have images/selectorRoundedCorners-fhd.9.png and images/selectorRoundedCorners-hd.9.png in the file but it will be converted to images/selectorRoundedCorners--$$RES$$.9.png
-      updatedNewImages.push(filePath)
+      updatedNewImages.push(filePath);
       if (updatedNewImages.includes(resFilePath) == false) {
-        updatedNewImages.push(resFilePath)
+        updatedNewImages.push(resFilePath);
       }
     });
-    newImages = updatedNewImages
+    newImages = updatedNewImages;
 
     let stream = collect(sources, srcOptions)
 
@@ -683,43 +683,6 @@ function packageAll(done) {
 }
 
 
-// increase the build/patch numbers in config/build.yml
-function bumpBuild(done) {
-  if (verifyGit(done)) {
-    incrementBuildNumber();
-    const buildTag = getBuildTag('revision');
-    log(`Committing build bump to ${buildTag}`);
-    shell.exec(`git commit -m "incrementbuild: Bump build number to ${buildTag}" config/build.yml`, {silent: true});
-    done();
-  } else {
-    // errors should be handled in verifyGit()
-  }
-}
-
-
-// increase the revision number in config/build.yml
-function bumpRevision(done) {
-  if (verifyGit(done)) {
-    incrementRevisionNumber();
-    const buildTag = getBuildTag('revision');
-    log(`Committing build bump to ${buildTag}`);
-    shell.exec(`git commit -m "incrementbuild: Bump revision number to ${buildTag}" config/build.yml`, {silent: true});
-    done();
-  } else {
-    // errors should be handled in verifyGit()
-  }
-}
-
-
-// tag the build that will be released
-function tagBuild(done) {
-  const buildTag = getBuildTag('revision');
-  log(`Tagging ${buildTag}`);
-  shell.exec(`git tag ${buildTag}`);
-  done();
-}
-
-
 // force production on options, so we ensure our build is using the production config
 function setProduction(done) {
   if(options) {
@@ -849,13 +812,13 @@ function pushStaging(done) {
  //TODO: once the experiment roku_new_cdn_v1 concludes remove adrise-bryan-playground
   const localRemoteComponentsPath = `build/tubi_remote_components_${buildTag}.pkg`;
   const s3RemoteComponentsPath = `s3://adrise-bryan-playground/roku-staging/components/tubi_remote_components_${buildTag}.pkg`;
-  const rcdnS3RemoteComponentsPath = `s3://tubi-rokucdn-source-staging/appFiles/components/tubi_remote_components_${buildTag}.pkg`
+  const rcdnS3RemoteComponentsPath = `s3://tubi-rokucdn-source-staging/appFiles/components/tubi_remote_components_${buildTag}.pkg`;
 
   const localStarterComponentsPath  = `build/tubi_starter_components_${minorBuildTag}.pkg`;
   const s3starterComponentsPath     = `s3://adrise-bryan-playground/roku-staging/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
-  const rcdnS3starterComponentsPath = `s3://tubi-rokucdn-source-staging/appFiles/starter-components/tubi_starter_components_${minorBuildTag}.pkg`
+  const rcdnS3starterComponentsPath = `s3://tubi-rokucdn-source-staging/appFiles/starter-components/tubi_starter_components_${minorBuildTag}.pkg`;
   // distribution ID of roku staging CDN pointing to s3 bucket tubi-rokucdn-source-staging
-  const stagingCdnDistributionID = `E1TFU8FZM49RLM`
+  const stagingCdnDistributionID = `E1TFU8FZM49RLM`;
 
   let pushResult = shell.exec(`aws s3 cp ${localRemoteComponentsPath} ${s3RemoteComponentsPath}`);
 
@@ -947,11 +910,13 @@ exports.build = series(clean, buildInstalled, buildStarter, buildRemote);
 exports.sideload = sideLoad;
 exports['build-downloads'] = series(buildStarter, buildRemote, packageStarter, packageRemote);
 exports.bump = bumpBuild;
+exports.bumpTen = bumpBuildTen;
 exports.bumpQA = bumpRevision;
 exports.bumpqa = exports.bumpQA; //Create bumpQA command alias
 exports.bumpQa = exports.bumpQA; //Create bumpQA command alias
 exports.install = series(exports.build, conditionalPackage, sideLoad);
 exports.test = series(setTest, clean, preprocessTests, buildInstalled, sideLoad);
+exports.buildQaBranch = buildQaBranch;
 exports.stage = series(setStaging, bumpRevision, exports.build, packageAll, pushStaging, pushBranch);
 exports.releaseOnGithub = series(tagBuild, pushTag, createGithubRelease);
 exports.release = series(confirmRelease, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub);

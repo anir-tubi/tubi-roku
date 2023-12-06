@@ -5,7 +5,7 @@ const fs = require('fs');
 const shell = require('shelljs');
 shell.config.silent = true;
 
-const {getBuildTag} = require('./config');
+const {getBuildTag, incrementBuildNumber, incrementRevisionNumber} = require('./config');
 const {NoStackError, execShellCommand} = require('./utilities');
 
 const githubDeveloperInfo = require('./github-developer-info.json');
@@ -18,6 +18,7 @@ const ghInfo = {
   rcdnRepo: 'rcdn',
 };
 
+const hotfixRelease = 'Hotfix Release';
 const remoteRelease = 'Remote Release';
 const submissionRelease = 'Submission Release';
 
@@ -73,10 +74,10 @@ async function makeReleasePrs(done) {
   execShellCommand(done, gitRename, gitRenameErrorMsg);
 
   //create PR against rcdn repository
-  const rcdnPrUrl = await createCdnPrUrl(done, "rcdn");
+  const rcdnPrUrl = await createCdnPrUrl(done, 'rcdn');
 
   // create PR in adrise_cdn repository
-  const cdnPrUrl = await createCdnPrUrl(done, "cdn");
+  const cdnPrUrl = await createCdnPrUrl(done, 'cdn');
 
   // push the release branch to the project-total-recall repo
   log(`...Pushing the local ${releaseBranchName} branch to the remote ${ghInfo.rokuRepo} repo`);
@@ -88,7 +89,7 @@ async function makeReleasePrs(done) {
   const prodRokuBranchName = `${minorBuildTag}_branch`;
   log(`...Making a PR from the remote ${releaseBranchName} on ${ghInfo.rokuRepo} against the ${prodRokuBranchName} branch`);
   let releasePrUrl = '';
-  let bodyText = 'Verify: The last commit in this PR is a build bump. If the last commit in this PR is not a build bump, the release needs to be run again. Any other commit that is not a build bump, including a merge, indicates a commit has been included that was not included in the package that was built and sent to the CDN.\n\nPlease verify README item #18 in the Remote Release section (ie. do any changes in this remote release disallow falling back to the submitted version)'
+  let bodyText = 'Verify: The last commit in this PR is a build bump. If the last commit in this PR is not a build bump, the release needs to be run again. Any other commit that is not a build bump, including a merge, indicates a commit has been included that was not included in the package that was built and sent to the CDN.\n\nPlease verify README item #18 in the Remote Release section (ie. do any changes in this remote release disallow falling back to the submitted version)';
   try {
     const releasePrRes = await octokit.pulls.create({
       owner: ghInfo.owner,
@@ -124,19 +125,19 @@ ${rcdnPrUrl}`;
 // returns the URL string of created PR.
 // @cdn: string,  ="cdn" to push starter and remote components to adrise_cdn repo and create PR against master
 //                ="rcdn" to push starter and remote components to rcdn repo and create PR against master
-async function createCdnPrUrl(done, cdn = "cdn") {
+async function createCdnPrUrl(done, cdn = 'cdn') {
 
   const minorBuildTag = getBuildTag('minor');
   const fullBuildTag = getBuildTag('revision');
 
   let cdnPath = process.env.CDN_GIT_DIRECTORY;
   let ghInfoCDNRepo = `${ghInfo.cdnRepo}`;
-  let cdnDirVariable = `CDN_GIT_DIRECTORY`
+  let cdnDirVariable = `CDN_GIT_DIRECTORY`;
 
   if (cdn === `rcdn`) {
     cdnPath = process.env.RCDN_GIT_DIRECTORY;
     ghInfoCDNRepo = `${ghInfo.rcdnRepo}`;
-    cdnDirVariable = `RCDN_GIT_DIRECTORY`
+    cdnDirVariable = `RCDN_GIT_DIRECTORY`;
   }
 
 
@@ -248,7 +249,7 @@ async function createCdnPrUrl(done, cdn = "cdn") {
     });
     cdnPrUrl = cdnPrRes.data.html_url;
   } catch (err) {
-    errMsg = err
+    errMsg = err;
   }
 
   // failed to make PR on CDN/RCDN repo at Github due to git process steps. In this event stop execution of the script.
@@ -669,7 +670,7 @@ async function findPullRequestCommitDifferences(done, branchA, branchB, commitCo
 // @compareBranch: string, the branch name we are comparing to master
 async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
   const commitsFromMasterNotOnCompareBranch = await findPullRequestCommitDifferences(done, 'master', compareBranch);
-  commitsFromMasterNotOnCompareBranch.reverse()
+  commitsFromMasterNotOnCompareBranch.reverse();
   console.log('');
   console.log(`COMMITS THAT HAVE NOT BEEN CHERRY PICKED FROM master TO ${compareBranch}`);
   console.log('-----------------------------------------------------------------------');
@@ -685,6 +686,13 @@ function getProductionBranchName() {
   const minorVersionNumber = getBuildTag('minor');
   const prodBranch = `${minorVersionNumber}_branch`;
   return prodBranch;
+}
+
+
+// @version: string, what version is this qa branch
+function getQaBranchName(version) {
+  const qaBranch = `qa_${version}`;
+  return qaBranch;
 }
 
 
@@ -800,6 +808,137 @@ async function addMissingImagesToRemoteLibrary(done) {
   done();
 }
 
+
+
+// increase the build/patch numbers in config/build.yml
+function bumpBuild(done) {
+  if (verifyGit(done)) {
+    incrementBuildNumber();
+    const buildTag = getBuildTag('revision');
+    log(`Committing build bump to ${buildTag}`);
+    shell.exec(`git commit -m "incrementbuild: Bump build number to ${buildTag}" config/build.yml`, {silent: true});
+    done();
+  } else {
+    // errors should be handled in verifyGit()
+  }
+}
+
+
+// increase the build/patch numbers in config/build.yml by 10
+function bumpBuildTen(done) {
+  if (verifyGit(done)) {
+    incrementBuildNumber(10);
+    const buildTag = getBuildTag('revision');
+    log(`Committing build bump to ${buildTag}`);
+    shell.exec(`git commit -m "incrementbuild: Bump build number to ${buildTag}" config/build.yml`, {silent: true});
+    done();
+  } else {
+    // errors should be handled in verifyGit()
+  }
+}
+
+
+// increase the revision number in config/build.yml
+function bumpRevision(done) {
+  if (verifyGit(done)) {
+    incrementRevisionNumber();
+    const buildTag = getBuildTag('revision');
+    log(`Committing build bump to ${buildTag}`);
+    shell.exec(`git commit -m "incrementbuild: Bump revision number to ${buildTag}" config/build.yml`, {silent: true});
+    done();
+  } else {
+    // errors should be handled in verifyGit()
+  }
+}
+
+
+// tag the build that will be released
+function tagBuild(done) {
+  const buildTag = getBuildTag('revision');
+  log(`Tagging ${buildTag}`);
+  shell.exec(`git tag ${buildTag}`);
+  done();
+}
+
+
+async function buildQaBranch(done) {
+  // verify clean working directory
+  verifyGit(done);
+
+  const {releaseType} = await prompts({
+    type: 'select',
+    name: 'releaseType',
+    message: 'What type of release are you creating this QA branch for?',
+    initial: 1,
+    warn: `${submissionRelease} is not supported currently`,
+    choices: [
+      {
+        title: hotfixRelease,
+        value: hotfixRelease
+      },
+      {
+        title: remoteRelease,
+        value: remoteRelease
+      },
+      {
+        title: submissionRelease,
+        value: submissionRelease,
+        disabled: true
+      }
+    ]
+  });
+
+  if (releaseType === undefined) {
+    // User hit control-c to exit so don't continue
+    done();
+    return;
+  }
+
+  if ([remoteRelease, hotfixRelease].includes(releaseType)) {
+    const currentBranch = getCurrentBranch();
+    const productionBranchName = getProductionBranchName();
+
+    // Should currently always be called from production branch so make sure before we do anything else
+    if (currentBranch != productionBranchName) {
+      throw new NoStackError(`Current branch ${currentBranch} should not be used for making a ${releaseType} qa branch. Switch to ${productionBranchName} before rerunning`);
+    }
+
+    const connector = '_';
+    const buildParts = getBuildTag('build', connector).split(connector);
+
+    // split out the build part and increment by the correct amount
+    let buildVersion = +buildParts.pop();
+    if (releaseType === remoteRelease) {
+      buildVersion += 10;
+    } else {
+      buildVersion += 1;
+    }
+    buildParts.push(buildVersion.toString());
+
+    const version = buildParts.join('.');
+    const qaBranchName = getQaBranchName(buildParts.join(connector));
+
+    const {confirm} = await prompts({
+      type: 'confirm',
+      name: 'confirm',
+      message: `Confirm that you would like to make a qa branch named ${qaBranchName} and increment the version to ${version}`,
+    });
+
+    if (confirm) {
+      const gitCheckoutNewBranch = `git checkout -b ${qaBranchName}`;
+      execShellCommand(done, gitCheckoutNewBranch);
+
+      if (releaseType === remoteRelease) {
+        bumpBuildTen(done);
+      } else {
+        bumpBuild(done);
+      }
+    }
+  }
+
+  done();
+}
+
 module.exports = {
   verifyGit,
   makeReleasePrs,
@@ -812,5 +951,10 @@ module.exports = {
   buildReleaseNotes,
   buildQaChanges,
   extractQaChangesFromPullRequestBody,
-  extractReleaseNotesFromPullRequestBody
+  extractReleaseNotesFromPullRequestBody,
+  buildQaBranch,
+  bumpBuild,
+  bumpBuildTen,
+  bumpRevision,
+  tagBuild,
 };

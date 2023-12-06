@@ -367,7 +367,7 @@ Remote releases are releases that are not sent to Roku, and updates are made whe
 
 1\. Set up the environment variables (listed in the [build step](#build)) if not done already, as some of the following steps are dependent on these variables.
 
-2\. Checkout the most recent `x_y_branch` branch. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number. Check the build.yml file to know which the new build number should be. Usually, the patch number should be one more than the "build_version" listed in the build.yml file.
+2\. Checkout the most recent `x_y_branch` branch. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number. Check the build.yml file to know which the new build number should be. The patch number should be ten more than the "build_version" listed in the build.yml file. Alternatively you can use the new `gulp buildQaBranch` task instead to do this.
 
 3\. Run `$ gulp compareProd`. This will do the following:
 
@@ -503,6 +503,11 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 - Please check the release notes to determine if any of the released items are critical fixes or the legal updates/fixes or API-deprecated /discontinued related updates to the submitted version of the app.  If you find any such items because of which we do not want the users to fallback on submitted version of the app then we need to add the submitted-app-version-number to `external config->fallback_blocked_versions[]`. (eg: "fallback_blocked_versions": ["2.21.0", "2.24.0"])
 
 - Please follow the https://github.com/adRise/remote_config Readme to create the PR to update external config and get it approved by ccs team.
+
+
+# Hotfix Release
+
+A Hotfix Release is the same as a Remote Release but includes code deemed important enough to do a new release while an existing release is already being tested by QA. Follow the same steps as for a Remote Release but for step 2 only increment the build number by 1 unless you are using `gulp buildQaBranch` which will automatically do this for you.
 
 # Informal QA
 
