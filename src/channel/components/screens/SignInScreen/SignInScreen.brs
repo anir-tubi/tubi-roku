@@ -20,26 +20,9 @@ Function init()
   m.continueBtn = m.top.findNode("continueBtn")
   m.continueBtn.text = getTranslation("dialog_button_continue")
 
-  m.newPasswordLayout = m.top.findNode("newPasswordLayout")
-  m.newPasswordLabel = m.top.findNode("newPasswordLabel")
-  m.newPasswordLabel.text = getTranslation("new_password_text")
-
-  m.newPasswordLink = m.top.findNode("newPasswordLink")
-  m.newPasswordLink.text = getTranslation("new_password_link")
-
-  bDisplayForgotPasswordButton = (getExperimentResource("roku_registration_signin_password_reset", "roku_registration_signin_password_reset_v2", true).enabled = true)
-
-  m.forgotPasswordBtn = invalid
-  if bDisplayForgotPasswordButton = true
-    '//::TODO::roku_registration_signin_password_reset_v2 - if experiment is graduated, then set the button in the XML and remove everything related to newPasswordLayout
-    m.forgotPasswordBtn = CreateObject("roSGNode", "SimpleButton")
-    m.forgotPasswordBtn.id = "forgotPasswordBtn"
-    m.forgotPasswordBtn.text = getTranslation("dialog_button_forgot_password")
-
-    m.buttonsGroup.insertChild(m.forgotPasswordBtn, 1)
-    m.forgotPasswordBtn.observeFieldScoped("selected", "onForgotPasswordButtonSelected")
-    m.buttonsGroup.removeChild(m.newPasswordLayout)
-  end if
+  m.forgotPasswordBtn = m.top.findNode("forgotPasswordBtn")
+  m.forgotPasswordBtn.text = getTranslation("dialog_button_forgot_password")
+  m.forgotPasswordBtn.observeFieldScoped("selected", "onForgotPasswordButtonSelected")
 
   m.keyboard = m.top.findNode("passwordEntryKeyboard")
   m.voiceKeyboard = m.keyboard.findNode("Keyboard")
@@ -94,15 +77,11 @@ Function onThemeChange(msg = invalid)
   end if
 
   if theme <> invalid
-    m.newPasswordLabel.color = theme.primaryTextColor
     m.pageHeading.color = theme.primaryTextColor
     m.pageSubHeading.color = theme.primaryTextColor
-    m.newPasswordLink.color = theme.primaryTextColor
     m.passwordValidationMsg.color = theme.cautionColor
     m.continueBtn.color = theme.backgroundColorLight2
-    if m.forgotPasswordBtn <> invalid
-      m.forgotPasswordBtn.color = theme.backgroundColorLight2
-    end if
+    m.forgotPasswordBtn.color = theme.backgroundColorLight2
   end if
 End Function
 
@@ -163,7 +142,6 @@ Function setFocusToComponent(focusTarget)
           audioGuideText = audioGuideText + " " + m.passwordValidationMsg.text
         end if
 
-        audioGuideText = audioGuideText + " " + m.newPasswordLabel.text + m.newPasswordLink.text
       else if focusTarget.id = "password" AND isNonEmptyString(focusTarget.text) = false
         audioGuideText = m.passwordValidationMsg.text
       else
@@ -374,8 +352,6 @@ Function onKeyboardTextChanged()
    m.password.text = m.keyboard.text
  end if
 
- bDisplayForgotPasswordButton = (getExperimentResource("roku_registration_signin_password_reset", "roku_registration_signin_password_reset_v2", false).enabled = true)
-
  handled = true
  if press
    if key = "back"
@@ -407,9 +383,7 @@ Function onKeyboardTextChanged()
      else if m.password.hasFocus() = true
        setFocusToComponent(m.continueBtn)
      else if m.continueBtn.hasFocus() = true
-       if bDisplayForgotPasswordButton = true
-         setFocusToComponent(m.forgotPasswordBtn)
-       end if
+       setFocusToComponent(m.forgotPasswordBtn)
      end if
 
    else if key = "up"
@@ -420,7 +394,7 @@ Function onKeyboardTextChanged()
      else if m.continueBtn.hasFocus() = true
        setFocusToComponent(m.password)
        m.emailHasFocus = false
-     else if m.forgotPasswordBtn <> invalid AND m.forgotPasswordBtn.hasFocus() = true
+     else if m.forgotPasswordBtn.hasFocus() = true
        setFocusToComponent(m.continueBtn)
      else if m.keyboard.isInFocusChain() = true
        updatePasswordValidation()

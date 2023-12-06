@@ -1461,10 +1461,6 @@ Function getTranslation_en_US()
       "description": "enter password dialog description",
       "message": "Let's try again or enter a different password for this account:"
     },
-    "re-enter_password_button": {
-      "description": "re-enter password button text on modal",
-      "message": "Re-enter Password"
-    },
     "retry": {
       "description": "retry button text on modal",
       "message": "Retry"
@@ -1517,14 +1513,6 @@ Function getTranslation_en_US()
       "description": "Label to ask user to enter their year of birth",
       "message": "I was born in"
     },
-    "new_password_text": {
-      "description": "new password text",
-      "message": "To setup a new password,"
-    },
-    "new_password_link": {
-      "description": "forgot password link",
-      "message": "visit tubi.tv/password"
-    },
     "signIn_screen_subheading": {
       "description": "Sub title on the signIn screen",
       "message": "Your email is already linked to an existing Tubi account"
@@ -1556,10 +1544,6 @@ Function getTranslation_en_US()
     "forgotPassword_screen_btn_different_email": {
       "description": "The button on the forgot password screen that corresponds to the action 'Use Different Email",
       "message": "Use Different Email"
-    },
-    "forgotPassword_screen_btn_return": {
-      "description": "The button on the forgot password screen that corresponds to the action 'Return to Sign In",
-      "message": "Return to Sign In"
     },
     "search_hint": {
       "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
@@ -3131,10 +3115,6 @@ Function getTranslation_es_MX()
       "description": "enter password dialog description",
       "message": "Intentémoslo de nuevo o ingrese una contraseña diferente para esta cuenta:"
     },
-    "re-enter_password_button": {
-      "description": "re-enter password button text on modal",
-      "message": "Ingresa tu contraseña"
-    },
     "retry": {
       "description": "retry button text on modal",
       "message": "Reintentar"
@@ -3187,14 +3167,6 @@ Function getTranslation_es_MX()
       "description": "Label to ask user to enter their year of birth",
       "message": "Nací en"
     },
-    "new_password_text": {
-      "description": "new password text",
-      "message": "Para establecer una contraseña nueva,"
-    },
-    "new_password_link": {
-      "description": "forgot password link",
-      "message": "visita tubi.tv/password"
-    },
     "signIn_screen_subheading": {
       "description": "Sub title on the signIn screen",
       "message": "Tu correo electrónico ya está vinculado a una cuenta de Tubi"
@@ -3226,10 +3198,6 @@ Function getTranslation_es_MX()
     "forgotPassword_screen_btn_different_email": {
       "description": "The button on the forgot password screen that corresponds to the action 'Use Different Email",
       "message": "Usa correo electrónico diferente"
-    },
-    "forgotPassword_screen_btn_return": {
-      "description": "The button on the forgot password screen that corresponds to the action 'Return to Sign In",
-      "message": "Volver a Iniciar Sesión"
     },
     "search_hint": {
       "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",

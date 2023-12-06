@@ -145,7 +145,10 @@ End Function
 Function onForgotPasswordDialogCancelSelected()
   TubiLog("SignInHelpers.onForgotPasswordDialogCancelSelected")
 
-  onReEnterPasswordSelected()
+  currentScreen = getCurrentScreen()
+  if currentScreen <> invalid AND currentScreen.getSubtype() = "SignInScreen"
+    currentScreen.setFocusToKeyboard = true
+  end if
 End function
 
 
@@ -160,41 +163,6 @@ End Function
 ' When the user selects the "Forgot Password" button on the sign in screen
 Function onForgotPasswordButtonSelected()
   displayForgotPasswordProcessingScreen()
-End Function
-
-
-' Display the the Forgot Password Processing Screen.
-Function displayForgotPasswordProcessingScreen()
-  TubiLog("SignInHelpers.displayForgotPasswordProcessingScreen")
-
-  '//::TODO::roku_registration_signin_password_reset_v2 if the experiment is graduated, then create a ForgotPassword Helper
-  currentScreen = getCurrentScreen()
-  if currentScreen <> invalid AND currentScreen.getSubtype() =  "SignInScreen"
-    '//in case we go back to this screen via the screen stack, reset focus so it has the focus on the password textfield
-    currentScreen.setFocusToPassword = true
-  end if
-
-  bForgotPasswordButtonInstant = (getExperimentResource("roku_registration_signin_password_reset", "roku_registration_signin_password_reset_v2", false).instant = true)
-
-  forgotPasswordProcessingScreen = CreateObject("roSGNode", "ForgotPasswordProcessingScreen")
-  forgotPasswordProcessingScreen.id = m.constants.ui.screenIds.forgotPasswordProcessingScreen
-  forgotPasswordProcessingScreen.isInstantPassword = bForgotPasswordButtonInstant
-  forgotPasswordProcessingScreen.username = m.email
-  forgotPasswordProcessingScreen.observeFieldScoped("selectedDifferentEmail", "onForgotPasswordChangeEmailButtonSelected")
-  forgotPasswordProcessingScreen.observeFieldScoped("signInSelected", "onForgotPasswordSignInButtonSelected")
-  forgotPasswordProcessingScreen.observeFieldScoped("resendVerificationLink", "onResendVerificationLink")
-  forgotPasswordProcessingScreen.observeFieldScoped("backButtonSelected", "onForgotPasswordBackButtonSelected")
-
-
-  pushScreen(forgotPasswordProcessingScreen, true, true)
-
-  if bForgotPasswordButtonInstant = true
-    '//send magic link
-    createMagicLinkRequest(m.email)
-  else
-    '//send email to reset password
-    sendPasswordResetRequest(m.email)
-  end if
 End Function
 
 
@@ -400,43 +368,6 @@ Function showSignInScreen(userInput)
   signInScreen.observeFieldScoped("emailSelected", "onSignInScreenEmailSelected")
   signInScreen.observeFieldScoped("backgroundUriList", "onScreenBackgroundUpdated")
   pushScreen(signInScreen, true, true)
-End Function
-
-
-
-'//When user presses the back button from the forgot password screen
-Function onForgotPasswordBackButtonSelected()
-  m.trackingLoggingTask.trackEvent = {
-    type: "account"
-    values: {
-      manip: "CHANGEPW"
-      current: "EMAIL"
-      status: "FAIL"
-      message: "user-cancel"
-    }
-  }
-
-  onStopAndClearEmailVerificationTimer()
-  popScreen()
-End Function
-
-
-'//When user presses the sign in button from the forgot password screen
-Function onForgotPasswordSignInButtonSelected()
-  onStopAndClearEmailVerificationTimer()
-  popScreen()
-End Function
-
-
-'//When user presses the changeEmail button from the forgot password screen
-Function onForgotPasswordChangeEmailButtonSelected()
-  onStopAndClearEmailVerificationTimer()
-  showEmailScreen()
-
-  '//For analytics reasons, ensure the forgotPasswordScreen is not in the stack.
-  '//This is also to ensure the proper screen is loaded when the user presses BACK from the emailScreen
-  removeTopMostScreenWithIDFromStack(m.constants.ui.screenIds.forgotPasswordProcessingScreen)
-
 End Function
 
 
@@ -691,40 +622,14 @@ Function onSignInError(errorResponse)
     }
   }
 
+  dialogEvent.values.dialog_type = "FORGOT_PASSWORD"
+  dialogEvent.values.dialog_sub_type = "forgot-password"
 
-  bSignInExperiment = (getExperimentResource("roku_registration_signin_password_reset", "roku_registration_signin_password_reset_v2", false).enabled = true)
-
-  if bSignInExperiment = true
-
-    dialogEvent.values.dialog_type = "FORGOT_PASSWORD"
-    dialogEvent.values.dialog_sub_type = "forgot-password"
-
-    title =  getTranslation("invalid_oops_password_title")
-    invalidPasswordDesc = getTranslation("invalid_oops_password_description")
-    message = invalidPasswordDesc + chr(10) + requestInput.email
-    buttons = [getTranslation("dialog_button_forgot_password"), getTranslation("retry")]
-    showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onForgotPasswordDialogButtonSelected, onForgotPasswordDialogCancelSelected)
-  else
-
-    title =  getTranslation("invalid_password_title")
-    invalidPasswordDesc = getTranslation("enter_password_dialog_description")
-    forgotPasswordDesc = getTranslation("forgot_password_text") + " " + getTranslation("forgot_password_link")
-    message = invalidPasswordDesc + chr(10) + requestInput.email + chr(10) +  chr(10) + forgotPasswordDesc
-    buttons = [getTranslation("re-enter_password_button")]
-    showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onReEnterPasswordSelected, onReEnterPasswordSelected)
-
-  end if
-
-End Function
-
-
-' onReEnterPasswordSelected callback is triggered when user selects Re-Enter password button on invalid password modal
-Function onReEnterPasswordSelected()
-
-  currentScreen = getCurrentScreen()
-  if currentScreen <> invalid AND currentScreen.getSubtype() =  "SignInScreen"
-    currentScreen.setFocusToKeyboard = true
-  end if
+  title =  getTranslation("invalid_oops_password_title")
+  invalidPasswordDesc = getTranslation("invalid_oops_password_description")
+  message = invalidPasswordDesc + chr(10) + requestInput.email
+  buttons = [getTranslation("dialog_button_forgot_password"), getTranslation("retry")]
+  showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onForgotPasswordDialogButtonSelected, onForgotPasswordDialogCancelSelected)
 
 End Function
 
@@ -1334,18 +1239,6 @@ Function createMagicLinkRequest(email)
     options: requestInfo.options
     successCallback: onMagicLinkResponse
     errorCallback: onMagicLinkError
-    responseType: "assocarray"
-  })
-End Function
-
-
-Function sendPasswordResetRequest(email)
-  requestInfo = m.userDeviceApi.resetPassword(email)
-  m.makeRequest({
-    url: requestInfo.url
-    requestType: m.constants.reqNames.resetPassword
-    options: requestInfo.options
-    silenceCallbackWarnings: true
     responseType: "assocarray"
   })
 End Function

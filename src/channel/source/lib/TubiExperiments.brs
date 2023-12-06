@@ -21,13 +21,6 @@ Function TubiExperiments(constants) as Object
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
 
     defaultResources: {
-      '// When enabled=false, the user will see the previous signin screen - the one that does not have a "forget password" button
-      '// When enabled=true & instant=true, then the user will be able to instantly sign in w/o a password by clicking the "forget password" button
-      '// When enabled=true & instant=false, then the user will be able to change their forgotten password by clicking the "forget password" button
-      roku_registration_signin_password_reset: {
-        roku_registration_signin_password_reset_v2: {"enabled": true, "instant": true}
-      }
-
       '//Experiment to display a user's liked video titles on the MyStuff screen
       roku_mylikes_mystuff: {
         roku_mylikes_mystuff_v2: {"enabled": false}

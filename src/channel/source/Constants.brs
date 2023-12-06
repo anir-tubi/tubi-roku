@@ -887,7 +887,6 @@ Function getConstants()
   constants.errors.context.epgScreen = "12"
   constants.errors.context.emailVerificationScreen = "13"
   constants.errors.context.tournament = "14"
-  '//::TODO::roku_registration_signin_password_reset_v2 - if the experiment does not graduate, then remove this reference here and here -> https://tubitv.atlassian.net/wiki/spaces/EC/pages/798359880/User+Facing+Error+Codes
   constants.errors.context.forgotPasswordProcessingScreen = "15" '//are we getting rid of emailVerificationScreen? If so, then maybe we keep 13 for the forgetPassword Screen
 
   '//What is the actual error?

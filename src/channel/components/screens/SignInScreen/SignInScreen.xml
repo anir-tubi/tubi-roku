@@ -101,30 +101,8 @@
           id="continueBtn"
           width="408"/>
 
-        <LayoutGroup
-          id="newPasswordLayout"
-          layoutDirection="horiz"
-          horizAlignment="center"
-          vertAlignment="center"
-          itemSpacings="[12]">
-
-          <Label
-            id="newPasswordLabel">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="27" />
-          </Label>
-
-          <Label
-            id="newPasswordLink">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="27" />
-          </Label>
-
-        </LayoutGroup>
+        <SimpleButton
+          id="forgotPasswordBtn"/>
 
         <ButtonGroup
           id="staticPageLinkGroup"

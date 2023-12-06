@@ -9,7 +9,6 @@ Function init()
   m.resendVerificationEmailCount = 0
 
   m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.top.observeField("isInstantPassword", "onInstantChange")
 
   m.pageHeading = m.top.findNode("pageHeading")
   m.pageHeading.text = getTranslation("forgotPassword_screen_heading")
@@ -27,6 +26,21 @@ Function init()
       choice: "LINK"
     }
   }
+
+  m.pageSubHeading.text = getTranslation("forgotPassword_screen_instant_subheading")
+  m.pageSubHeading2.text = getTranslation("forgotPassword_screen_instant_subheading2")
+
+  m.resendBtn = CreateObject("roSGNode", "SimpleButton")
+  m.resendBtn.id = "resendBtn"
+  m.resendBtn.text = getTranslation("forgotPassword_screen_btn_resend")
+  m.resendBtn.observeFieldScoped("selected", "onResendInstantLinkSelected")
+  m.buttonGroup.appendChild(m.resendBtn)
+
+  m.changeEmailBtn = CreateObject("roSGNode", "SimpleButton")
+  m.changeEmailBtn.id = "changeEmailBtn"
+  m.changeEmailBtn.text = getTranslation("forgotPassword_screen_btn_different_email")
+  m.changeEmailBtn.observeFieldScoped("selected", "onChangeEmailSelected")
+  m.buttonGroup.appendChild(m.changeEmailBtn)
 
   m.top.isStackable = true
   m.top.screenLevel = m.constants.ui.screenLevels.signInScreen
@@ -57,90 +71,32 @@ Function onThemeChange(msg = invalid)
     m.pageSubHeading.color = theme.primaryTextColor
     m.pageSubHeading2.color = theme.primaryTextColor
     m.email.color = theme.focused2Color
-
-    if m.returnBtn <> invalid
-      m.returnBtn.color = theme.backgroundColorLight2
-    end if
-
-    if m.changeEmailBtn <> invalid
-      m.changeEmailBtn.color = theme.backgroundColorLight2
-    end if
-    
-    if m.resend <> invalid
-      m.resend.color = theme.backgroundColorLight2
-    end if
-
+    m.changeEmailBtn.color = theme.backgroundColorLight2
+    m.resendBtn.color = theme.backgroundColorLight2
   end if
 End Function
 
 
 Function onScreenFocusChange()
-
-  tubiLog("SignInScreen.onScreenFocusChange")
+  tubiLog("ForgotPasswordProcessingScreen.onScreenFocusChange")
   ' force a background update
   m.top.backgroundUriList = m.backgroundUriList
 
-End Function
-
-
-Function onInstantChange(msg)
-  TubiLog("ForgotPasswordProcessingScreen.onInstantChange")
-
-  isInstantPassword = msg.getData()
-  if isInstantPassword = true
-    m.pageSubHeading.text = getTranslation("forgotPassword_screen_instant_subheading")
-    m.pageSubHeading2.text = getTranslation("forgotPassword_screen_instant_subheading2")
-
-    m.resendBtn = CreateObject("roSGNode", "SimpleButton")
-    m.resendBtn.id = "resendBtn"
-    m.resendBtn.text = getTranslation("forgotPassword_screen_btn_resend")
-    m.resendBtn.observeFieldScoped("selected", "onResendInstantLinkSelected")
-
-
-    m.buttonGroup.appendChild(m.resendBtn)
-
-  else
-    m.pageSubHeading.text = getTranslation("forgotPassword_screen_noInstant_subheading")
-    m.pageSubHeading2.text = getTranslation("forgotPassword_screen_noInstant_subheading2")
-
-
-    m.returnBtn = CreateObject("roSGNode", "SimpleButton")
-    m.returnBtn.id = "returnBtn"
-    m.returnBtn.text = getTranslation("forgotPassword_screen_btn_return")
-    m.returnBtn.observeFieldScoped("selected", "onReturnSignInSelected")
-    m.buttonGroup.appendChild(m.returnBtn)
-
+  if m.top.hasFocus() = true
+    m.resendBtn.setFocus(true)
   end if
-
-  m.changeEmailBtn = CreateObject("roSGNode", "SimpleButton")
-  m.changeEmailBtn.id = "changeEmailBtn"
-  m.changeEmailBtn.text = getTranslation("forgotPassword_screen_btn_different_email")
-  m.changeEmailBtn.observeFieldScoped("selected", "onChangeEmailSelected")
-  m.buttonGroup.appendChild(m.changeEmailBtn)
-
-  m.buttonGroup.getChild(0).setFocus(true)
-
-  onThemeChange()
 End Function
 
 
 ' The changeEmail button was clicked, let the helper know about this.
 Function onChangeEmailSelected()
-  '//::TODO::roku_registration_signin_password_reset_v2 - this can be changed to an alias if the experiment is graduated.
   m.top.selectedDifferentEmail = true
-End Function 
-
-
-' The returnToSignIn button was clicked, let the helper know about this.
-Function onReturnSignInSelected()
-  '//::TODO::roku_registration_signin_password_reset_v2 - this can be changed to an alias if the experiment is graduated.
-  m.top.signInSelected = true
 End Function 
 
 
 ' The resendInstantLink button was clicked, let the helper know about this.
 Function onResendInstantLinkSelected()
-
+  tubiLog("ForgotPasswordProcessingScreen.onResendInstantLinkSelected")
   dialogEvent = {
     type: "dialog"
     values: {
