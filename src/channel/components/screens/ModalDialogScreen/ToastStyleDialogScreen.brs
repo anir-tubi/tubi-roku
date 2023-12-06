@@ -69,11 +69,15 @@ Function onButtonListChange(msg)
   totalButtons = m.top.buttons.Count()
   m.buttonList.numColumns = totalButtons
   m.buttonList.content = buttonListContentNode
-  m.dialogBox.width = getHorizontalButtonListWidth(m.buttonList.itemSize[0], totalButtons, 21, 48) 'space between buttons = 21;  left/right padding = 48
+  contentAreaBoundingRect = m.contentArea.boundingRect()
+  padding = 48
+  m.dialogBox.width = contentAreaBoundingRect.width + padding
   dialogBoxTranslationX = 1920 - m.dialogBox.width - 63 ' where 63 is the gutter padding on the right side.
   m.dialogBox.translation = [dialogBoxTranslationX, m.dialogBox.translation[1]]
-
   ' Adjusting the height of the dialog based on content area height.
-  contentAreaHeight = m.contentArea.boundingRect().height
-  m.dialogBox.height = contentAreaHeight + 48
+  contentAreaHeight = contentAreaBoundingRect.height
+  m.dialogBox.height = contentAreaHeight + padding
+
+  ' Center align the content.
+  m.contentArea.translation = [m.dialogBox.width / 2, m.contentArea.translation[1]]
 End Function

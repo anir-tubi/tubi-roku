@@ -24,6 +24,7 @@
 
       <LayoutGroup
         id="contentArea"
+        horizAlignment="center"
         translation="[32,48]"
         itemSpacings="[12, 21]">
 
@@ -42,7 +43,7 @@
           id="subheader"
           wrap="true"
           maxLines="3"
-          width="460">
+          width="480">
           <Font
             role="font"
             uri="pkg:/fonts/Vaud-SemiBold.ttf"
@@ -55,7 +56,8 @@
           itemComponentName="ListItemButtonWithBg"
           itemSpacing="[12,0]"
           numRows="1"
-          numColumns="2"/>
+          numColumns="2"
+          wrapDividerHeight="0" />
       </LayoutGroup>
     </Poster>
 

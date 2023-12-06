@@ -85,7 +85,20 @@ Function formatDialog()
     numButtons = m.top.buttons.Count()
     m.buttonList.numColumns = numButtons
     m.buttonList.content = newContent
-    m.dialogBox.width = getHorizontalButtonListWidth(m.buttonList.itemSize[0], numButtons, 30, 48) 'space between buttons = 30;  left/right padding = 48
+    buttonListWidth = getHorizontalButtonListWidth(m.buttonList.itemSize[0], numButtons, 30, 48) 'space between buttons = 30;  left/right padding = 48
+    ' If the button list width is less than current settings than not overriding it so that we don't have background cut-off.
+    ' This happens when we have only one button.
+    if buttonListWidth > m.dialogBox.width
+      m.dialogBox.width = buttonListWidth
+    end if
+
+    ' Center aligning the button if only one button present.
+    if numButtons = 1
+      padding = 48
+      buttonListTranslationX = (m.dialogBox.width - buttonListWidth) / 2 + padding
+      m.buttonList.translation = [buttonListTranslationX, m.buttonList.translation[1]]
+    end if
+
     dialogBoxTranslationX = 1920 - m.dialogBox.width - 51
     m.dialogBox.translation = [dialogBoxTranslationX, m.dialogBox.translation[1]]
     m.mask.width = m.dialogBox.width
