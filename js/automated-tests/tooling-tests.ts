@@ -253,6 +253,7 @@ describe('test-utils', function () {
     });
 
 
+
     describe('getElementColorField', function () {
       it('should be able to retrieve the specified element color field in the correct hex format', async () => {
         const color = await testUtils.getElementColorField('scene', 'backgroundColor');

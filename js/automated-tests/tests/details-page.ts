@@ -638,18 +638,22 @@ describe('Details Page', function () {
 
     });
 
-    /*  Hold off on this until Brian checks in "First time user setting"
+    
     // https://tubi.testrail.io/index.php?/cases/view/260843
     it('C260843 - Guest - When user clicks the "Sign Up to Save Progress" button on the Details page, the user is redirected to  the Registration/Sign In modal, @guest_user,@sdp_2,@smoke', async () => {
 
+      
       //Exit and restart
-      await testUtils.startApplicationAtPage('tv', false);
+      await testUtils.startApplicationAtPage('tv');
       await testUtils.waitForAppLaunchBeaconToFire();
-
+      
+      // Tried having this here and before Exit and restart
+      // Create user for test
+      const user = await testUtils.createRegisteredUser();
+      user.setIsNewUser(false);
 
       // Select a title
       await ecp.sendKeyPress(ecp.Key.Ok);
-
 
       // Verify we are on the details page
       let detailScreenTitle;
@@ -658,12 +662,11 @@ describe('Details Page', function () {
         expect(detailScreenTitle.text).to.not.be.empty;
       });
 
-      // Verify Sign Up to Save Progress button is present
-
+      
 
     });
 
-    */
+  
 
   }); //Close describe Series Details page
 

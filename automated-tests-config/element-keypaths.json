@@ -19,6 +19,22 @@
     "description": "Component on the Movie Screen that we can pull content for the Grid from",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#ContentArea.#CategoryGridList.#RowList"
   },
+  "movieScreenFirstRowName" : {
+    "description" : "Movie screen first row category name",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName"
+  },
+  "tvShowsScreenRowList" : {
+    "description" : "TV Shows screen row list",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#tvScreen.#ContentArea.#CategoryGridList.#RowList"
+  },
+  "tvShowsScreenFirstRowName" : {
+    "description" : "TV Shows screen first row category name",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#tvScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName"
+  },
+  "liveScreenHeader" : {
+    "description" : "Live Show screen row list",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#programGuide.#headerText"
+  },
   "backgroundGroup": {
     "description": "Component that controls background image display",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup",
@@ -249,9 +265,8 @@
     "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/TopNav/MarkupGrid/TopNavItem[4]/Label",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.3.#BottomLabel"
   },
-  "topNavMenu": {
-    "name": "topNavMenu",
-    "xpath": "/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/TopNav",
+  "topNavMenuHome": {
+    "description": "top Nav element on the home page",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home"
   },
   "titleMovieDetailsTitle": {
@@ -476,6 +491,10 @@
   "leftNavHomeButton": {
     "description" : "Left Nav Home Button",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#LabelParent.0.#Label"
+  },
+  "leftNavHomeFocused" : {
+    "description" : "Left Nav home icon highlighted",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.3.#IconParent.#focusedIcon"
   },
   "continueWatchingRow": {
     "description" : "Continue Watching Row on My Stuff page",
@@ -819,7 +838,11 @@
   },
   "featuredRow" : {
     "description" : "Featured Row",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.items.0.getParent()"
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.1.title.#CategoryName"
+  },
+  "featuredRowPoster" : {
+    "description" : "Featured row poster",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.items.0.#poster"
   },
   "homeScreenContentDescription" :{
     "description" : "description of title in CW row",
@@ -829,6 +852,34 @@
     "description": "age gate number page",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0"
   },
+  "selectedTopNavForYouItem" : {
+    "description" :  "top nav For You",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.0.#Underline"
+  },
+  "topNavMoviesItem" : {
+    "description" : "top nav Movies",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.1.#TopLabel"
+  },
+  "topNavTVShowsItem" : {
+    "description" : "top nav TV Shows",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.2.#TopLabel"
+  },
+  "topNavLiveItem" : {
+    "description" : "top nav Live TV",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.3.#TopLabel"
+  },
+  "selectedLiveTVItem" : {
+    "description" : " Live TV option is selected",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.3.#BottomLabel"
+  },
+  "programGuideHeaderText" : {
+    "description" : "Program Guide Header text on the Live TV tab",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#topNav-linearEPG-linearEPG-linearEPG.#TopNavMenu.3.#Underline"
+  },
+  "searchMenuText" : {
+    "description" : "text on Search page header",
+    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#leftSide.#searchMenuText"
+  },
   "leftNavSearchButton" : {
     "description" : "left nav search button",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2"
@@ -836,10 +887,6 @@
   "parentalControlsButton" : {
     "description" : "parental controls button",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.0"
-  },
-  "searchMenuText" : {
-    "description" : "search menu text",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#leftSide.#searchMenuText"
   },
   "searchText" : {
     "description" : "Search text",

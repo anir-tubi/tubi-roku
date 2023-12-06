@@ -159,8 +159,11 @@ async function triggerSeriesAutoplay() {
     await ecp.sendKeyPress(ecp.Key.Ok, { count: 3 });
 
     // FF until cue point
-    await utils.sleep(33000);
+    await utils.sleep(35000);
 
     // Play to trigger autoplay
     await ecp.sendKeyPress(ecp.Key.Play);
+    await utils.sleep(2000);
+ 
+
 }

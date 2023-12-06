@@ -147,7 +147,7 @@ describe('Multiple Audio', function () {
     await testUtils.expectPlayerStateToEventuallyEqual('play');
 
     // Open player controls
-    await ecp.sendKeyPress(ecp.Key.Play);
+    await ecp.sendKeyPress(ecp.Key.Up);
 
 
     // Navigate right to open Options

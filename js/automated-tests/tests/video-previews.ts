@@ -255,6 +255,8 @@ describe('Video Preview', function () {
     expect(previewVideoPlayer.visible).to.be.false;
   });
 
+  
+
   async function openKidsMode() {
 
     await ecp.sendKeyPress(ecp.Key.Left);

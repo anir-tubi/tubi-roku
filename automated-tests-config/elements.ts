@@ -30,6 +30,14 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack'
   },
 
+  topNavForYouLabelNotFocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.0.#TopLabel',
+  },
+
+  topNavForYouLabelFocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.0.#BottomLabel',
+  },
+
   // We're currently replacing the contents in this section from the existing json file. If you want to add additional elements put them outside this section of the file
 // START ELEMENTS INJECT
 
@@ -56,6 +64,26 @@ const elements = typeCheckElements({
   /** Component on the Movie Screen that we can pull content for the Grid from */
   movieScreenRowList: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#ContentArea.#CategoryGridList.#RowList',
+  },
+
+  /** Movie screen first row category name */
+  movieScreenFirstRowName: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName',
+  },
+
+  /** TV Shows screen row list */
+  tvShowsScreenRowList: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#tvScreen.#ContentArea.#CategoryGridList.#RowList',
+  },
+
+  /** TV Shows screen first row category name */
+  tvShowsScreenFirstRowName: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#tvScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName',
+  },
+
+  /** Live Show screen row list */
+  liveScreenHeader: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#programGuide.#headerText',
   },
 
   /** Component that controls background image display */
@@ -312,9 +340,9 @@ const elements = typeCheckElements({
     xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/TopNav/MarkupGrid/TopNavItem[4]/Label',
   },
 
-  topNavMenu: {
+  /** top Nav element on the home page */
+  topNavMenuHome: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home',
-    xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/TopNav',
   },
 
   titleMovieDetailsTitle: {
@@ -545,6 +573,11 @@ const elements = typeCheckElements({
   /** Left Nav Home Button */
   leftNavHomeButton: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#LabelParent.0.#Label',
+  },
+
+  /** Left Nav home icon highlighted */
+  leftNavHomeFocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.3.#IconParent.#focusedIcon',
   },
 
   /** Continue Watching Row on My Stuff page */
@@ -969,7 +1002,12 @@ const elements = typeCheckElements({
 
   /** Featured Row */
   featuredRow: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.items.0.getParent()',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.1.title.#CategoryName',
+  },
+
+  /** Featured row poster */
+  featuredRowPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.items.0.#poster',
   },
 
   /** description of title in CW row */
@@ -982,6 +1020,41 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0',
   },
 
+  /** top nav For You */
+  selectedTopNavForYouItem: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.0.#Underline',
+  },
+
+  /** top nav Movies */
+  topNavMoviesItem: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.1.#TopLabel',
+  },
+
+  /** top nav TV Shows */
+  topNavTVShowsItem: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.2.#TopLabel',
+  },
+
+  /** top nav Live TV */
+  topNavLiveItem: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.3.#TopLabel',
+  },
+
+  /**  Live TV option is selected */
+  selectedLiveTVItem: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.3.#BottomLabel',
+  },
+
+  /** Program Guide Header text on the Live TV tab */
+  programGuideHeaderText: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#topNav-linearEPG-linearEPG-linearEPG.#TopNavMenu.3.#Underline',
+  },
+
+  /** text on Search page header */
+  searchMenuText: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#leftSide.#searchMenuText',
+  },
+
   /** left nav search button */
   leftNavSearchButton: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2',
@@ -990,11 +1063,6 @@ const elements = typeCheckElements({
   /** parental controls button */
   parentalControlsButton: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.0',
-  },
-
-  /** search menu text */
-  searchMenuText: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#leftSide.#searchMenuText',
   },
 
   /** Search text */
@@ -1088,6 +1156,12 @@ const elements = typeCheckElements({
   },
 
 // END ELEMENTS INJECT
+
+  /** text on Exit Button */
+  exitButtonText: {
+    keyPath: '#ContentController.#2694d4e.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+
+  },
 
   /** categories label highlighted */
   channelsLabel: {

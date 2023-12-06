@@ -179,7 +179,7 @@ describe('Autoplay Movies', function () {
 
     });
     //Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/76115
-    //Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/76116
+   
     it('C76115 - Autoplay - Movie - When content focused then year and duration displayed @autoplay,@smoke', async () => {
 
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
