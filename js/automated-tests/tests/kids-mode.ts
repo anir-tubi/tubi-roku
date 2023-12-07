@@ -237,7 +237,7 @@ describe('Kids Mode', function () {
     await ecp.sendKeyPress(ecp.Key.Ok);
 
     // Parental Controls Settings Change
-    await utils.sleep(3000); // Improvement
+    await utils.sleep(4000); // Improvement
     const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids');
     expect(parentalControlsSettingsLittleKids.visible).to.be.true;
     await ecp.sendKeyPress(ecp.Key.Ok);

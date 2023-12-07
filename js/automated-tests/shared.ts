@@ -63,6 +63,56 @@ class Shared {
       await ecp.sendKeyPress(ecp.Key.Ok);
     }
 
+    public async openKidsMode() {
+
+      await ecp.sendKeyPress(ecp.Key.Left);
+      await ecp.sendKeyPress(ecp.Key.Up);
+      await utils.sleep(3000); // Adding sleeps temporary
+      await ecp.sendKeyPress(ecp.Key.Up);
+      await ecp.sendKeyPress(ecp.Key.Ok);
+      const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
+      expect(exitKidsOption.visible).to.be.true;
+    }
+
+
+    async selectLittleKidsFromParentalSettings() {
+      await ecp.sendKeyPress(ecp.Key.Right);
+      await utils.sleep(2000);
+      await ecp.sendKeyPress(ecp.Key.Up, {count:3});
+      await utils.sleep(2000);
+      await ecp.sendKeyPress(ecp.Key.Ok);
+    }
+
+
+    async selectOlderKidsFromParentalSettings() {
+      await ecp.sendKeyPress(ecp.Key.Right);
+      await utils.sleep(2000);
+      await ecp.sendKeyPress(ecp.Key.Up, {count:2});
+      await utils.sleep(2000);
+      await ecp.sendKeyPress(ecp.Key.Ok);
+    }
+
+    async selectTeensFromParentalSettings() {
+      await ecp.sendKeyPress(ecp.Key.Right);
+      await utils.sleep(2000);
+      await ecp.sendKeyPress(ecp.Key.Up, {count:1});
+      await utils.sleep(2000);
+      await ecp.sendKeyPress(ecp.Key.Ok);
+    }
+
+    async enterPasswordSettingsChange() {
+      // Enter Password for PC Settings Change
+      // const // need to expect and await the Sign In screen
+    
+      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendText('111111');
+      await ecp.sendKeyPress(ecp.Key.Down, {count:4});
+      await utils.sleep(4000);
+      await ecp.sendKeyPress(ecp.Key.Right);
+      await ecp.sendKeyPress(ecp.Key.Left);
+      await ecp.sendKeyPress(ecp.Key.Ok);
+  }
+
     // openSettings function
     public async  openSettings() {
       await testUtils.goToPage('settings');

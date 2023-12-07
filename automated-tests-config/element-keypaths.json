@@ -567,7 +567,7 @@
 
   },
   "parentalControlsSettingsTeens": {
-    "description" : "Dialog box text for PC Settings Change for Little Kids",
+    "description" : "Dialog box text for PC Settings Change for Teens",
     "keyPath": "#ContentController.#c25f262.#DialogBox.#ContentArea.#MessageGroup.#Message"
   },
   "passwordText": {
@@ -824,140 +824,37 @@
     "description" : "Settings menu item",
     "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.8"
   },
-  "dialogBoxContentAreaDeviceID" : {
-    "description" : "Dialog box for Device ID",
-    "keyPath": "#ContentController.#2f12a2f.#DialogBox.#ContentArea"
-  },
-  "myStuffLeftNav" : {
-    "description" : "My Stuff Left Nav option",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.4.#LabelParent.0.#Label"
-  },
-  "parentalControlsHeader" : {
-    "description" : "Parental Controls header",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#Title"
-  },
-  "featuredRow" : {
-    "description" : "Featured Row",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.1.title.#CategoryName"
-  },
-  "featuredRowPoster" : {
-    "description" : "Featured row poster",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.items.0.#poster"
-  },
-  "homeScreenContentDescription" :{
-    "description" : "description of title in CW row",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description"
-  },
-  "ageVerificationPad" : {
-    "description": "age gate number page",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0"
-  },
-  "selectedTopNavForYouItem" : {
-    "description" :  "top nav For You",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.0.#Underline"
-  },
-  "topNavMoviesItem" : {
-    "description" : "top nav Movies",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.1.#TopLabel"
-  },
-  "topNavTVShowsItem" : {
-    "description" : "top nav TV Shows",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.2.#TopLabel"
-  },
-  "topNavLiveItem" : {
-    "description" : "top nav Live TV",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.3.#TopLabel"
-  },
-  "selectedLiveTVItem" : {
-    "description" : " Live TV option is selected",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.3.#BottomLabel"
-  },
-  "programGuideHeaderText" : {
-    "description" : "Program Guide Header text on the Live TV tab",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#topNav-linearEPG-linearEPG-linearEPG.#TopNavMenu.3.#Underline"
-  },
-  "searchMenuText" : {
-    "description" : "text on Search page header",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#leftSide.#searchMenuText"
-  },
-  "leftNavSearchButton" : {
-    "description" : "left nav search button",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2"
-  },
-  "parentalControlsButton" : {
-    "description" : "parental controls button",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.0"
-  },
-  "searchText" : {
-    "description" : "Search text",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchText"
-  },
-  "sideNavComponent" : {
-    "description" : "side nav element component",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected"
-  },
-  "recommendedPoster" : {
-    "description" : "recommended poster",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.0.#Title"
-  },
-  "categoriesLeftNavButton" : {
-    "description" : "categories left nav",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.5"
-  },
-  "categoriesLabel" : {
-    "description" : "categories label highlighted",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.5.#LabelParent.0.#Label"
-  },
-  "categoriesListScreen" : {
-    "description" : "categories  screen",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid"
-  },
-  "channelsLeftNavButton" : {
-    "description" : "channels left nav button highlighted",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.6"
-  },
-  "channelsListScreen" : {
-    "description" : "channels list screen",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#ChannelCategoryGrid.6.#PosterRect"
-  },
-  "settingsLeftNavButton" : {
-    "description" : "settings left nav button highlighted",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.8"
-  },
-  "categoriesVideoGrid" : {
-    "description" : "categories video grid",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#ChannelsVideoGrid"
-  },
-  "exitLeftNavButton" : {
-    "description" : "settings left nav button highlighted",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.9.#LabelParent.0.#Label"
-  },
-  "ageVerificationNumberPad" : {
-    "description" : "age verification number pad",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.1.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0"
-  },
-  "yearsVerificationEntry" : {
-    "description" : "age verification years page",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeVerificationPageText.#AgeVerificationPageHeader"
-  },
-  "categoriesContinueWatchingTile" : {
-    "description" : "CW tile on Categories page",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.1.#Title"
-  },
-  "searchMenuItemSelected" : {
-    "description" : "Search menu highlighted",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2"
-  },
-  "searchKeyPad" : {
-    "description" : "Search keypad",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#searchGroup.#SearchKeyboard.0"
-  },
-  "leftNavHomeLabel" : {
-    "description" : "label child in left nav",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.3.#LabelParent.0.#Label"
-  },
-  "leftNavSearchLabel" : {
-    "description" : "search label in left nav",
-    "keyPath": "#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2.#LabelParent.0.#Label"
-  }
+"espanolDisabledTitle" : {
+  "description" : "title of Espanol Disabled dialog box",
+  "keyPath": "#ContentController.#c441913.#DialogBox.#ContentArea.#Title"
+},
+"espanolDisabledTitleTeens" : {
+  "description" : "title of Espanol Disabled dialog box",
+  "keyPath": "#ContentController.#dd0197e.#DialogBox.#ContentArea.#Title"
+},
+"espanolDisabledMessage" : {
+  "description" : "message in Espanol Disabled dialog box",
+  "keyPath": "#ContentController.#c441913.#DialogBox.#ContentArea.#MessageGroup.#Message"
+},
+"espanolDisabledMessageTeens" : {
+  "description" : "message in Espanol Disabled dialog box",
+  "keyPath": "#ContentController.#dd0197e.#DialogBox.#ContentArea.#MessageGroup.#Message"
+},
+"espanolDisabledButton" : {
+  "description" : "button in Espanol Dissbled dialog box",
+  "keyPath": "#ContentController.#c441913.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText"
+},
+"espanolDisabledButtonTeens" : {
+  "description" : "button in Espanol Dissbled dialog box",
+  "keyPath": "#ContentController.#dd0197e.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText"
+},
+"espanolLogo" : {
+  "description" : "tubi espanol logo",
+  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#logoGroup.#tubiEspanolLogo"
+},
+"espanolScreenRowList" : {
+  "description" : "espanol screen row list",
+  "keyPath": "#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#espanolScreen.#ContentArea.#CategoryGridList.#RowList"
+}
+
 }

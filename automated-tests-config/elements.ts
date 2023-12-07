@@ -1157,16 +1157,46 @@ const elements = typeCheckElements({
 
 // END ELEMENTS INJECT
 
-  /** text on Exit Button */
-  exitButtonText: {
-    keyPath: '#ContentController.#2694d4e.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+/** title of Espanol Disabled dialog box */
+espanolDisabledTitle: {
+  keyPath: '#ContentController.#c441913.#DialogBox.#ContentArea.#Title',
+},
 
-  },
+/** title of Espanol Disabled dialog box for teens */
+espanolDisabledTitleTeens: {
+  keyPath: '#ContentController.#dd0197e.#DialogBox.#ContentArea.#Title',
+},
 
-  /** categories label highlighted */
-  channelsLabel: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.6.#LabelParent.0.#Label',
-  },
+/** message in Espanol Disabled dialog box */
+espanolDisabledMessage: {
+  keyPath: '#ContentController.#c441913.#DialogBox.#ContentArea.#MessageGroup.#Message',
+},
+
+/** message in Espanol Disabled box for teens */
+espanolDisabledMessageTeens: {
+  keyPath: '#ContentController.#dd0197e.#DialogBox.#ContentArea.#MessageGroup.#Message',
+},
+
+/** button in Espanol Dissbled dialog box */
+espanolDisabledButton: {
+  keyPath: '#ContentController.#c441913.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+},
+
+/** button in Espanol Dissbled dialog box for Teens */
+espanolDisabledButtonTeens: {
+  keyPath: '#ContentController.#dd0197e.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+},
+
+/** tubi espanol logo */
+espanolLogo: {
+  keyPath: '#ContentController.#uiGroup.#ContentGroup.#logoGroup.#tubiEspanolLogo',
+},
+
+/** espanol screen row list  */
+espanolScreenRowList: {
+  keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#espanolScreen.#ContentArea.#CategoryGridList.#RowList',
+}
+
 });
 
 export {
