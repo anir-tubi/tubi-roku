@@ -371,7 +371,7 @@ Function cmsApi_createHomeScreenReqInfo_test()
     "x-client-version"
   ]
 
-  homeUrl = m.cmsApi.constants.urls.tensor.homescreen
+  homeUrl = m.cmsApi.constants.urls.tensor.cdn.homescreen
   homeOptions = {
     params: {
       "app_id": m.cmsApi.constants.settings.shortAppName
@@ -536,7 +536,7 @@ Function cmsApi_createCategoryReqInfo_test()
     "x-client-version"
   ]
 
-  categoryUrl = m.cmsApi.constants.urls.tensor.container + "/my_category"
+  categoryUrl = m.cmsApi.constants.urls.tensor.cdn.container + "/my_category"
   categoryOptions = {
     params: {
       "app_id": m.cmsApi.constants.settings.shortAppName
