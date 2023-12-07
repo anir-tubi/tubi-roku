@@ -1879,7 +1879,7 @@ Function getTranslation_es_MX()
     },
     "menu_goHome": {
       "description": "Menu option on the app's myStuff screen, Allows the user to  navigate to the home screen.",
-      "message": "Ir a página de inicio"
+      "message": "Ir a Inicio"
     },
     "menu_signedIn": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Shows that the user is signed in.",
@@ -2511,7 +2511,7 @@ Function getTranslation_es_MX()
     },
     "screenSettings_parentalPassword_title": {
       "description": "Directions for signed out users who attempt to change the parental controls",
-      "message": "Ingresa tu contraseña controles parentales"
+      "message": "Ingresa contraseña para actualizar controles parentales"
     },
     "screenSettings_parentalPassword_button_hide": {
       "description": "Label of button on the password entry screen to hide the password",
@@ -2695,23 +2695,27 @@ Function getTranslation_es_MX()
     },
     "screenMyStuff_signedOutUITitle": {
       "description": "The title of the MyStuff Screen for the guest user.",
-      "message": "Haz Tubi Tuyo, Es Gratis"
+      "message": "Haz Tubi Tuyo Gratis (Siempre)"
     },
     "screenMyStuff_signedOutUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Guarda todos tus favoritos, recoje donde lo dejaste -- todo en un solo lugar"
+      "message": "Guarda todos tus favoritos, recoje donde lo dejaste--todo en un solo lugar."
     },
     "screenMyStuff_signedOutUIBlurb": {
       "description": "The blurb of the MyStuff Screen for the guest user.",
-      "message": "No se requiere tarjeta de crédito • Gratis siempre"
+      "message": "Y siempre gratis."
+    },
+    "screenMyStuff_signedOutUIButton": {
+      "description": "The button of the MyStuff Screen for the guest user.",
+      "message": "Desbloquear ahora"
     },
     "screenMyStuff_allEmptyUITitle": {
       "description": "The title of the MyStuff Screen for the guest user.",
-      "message": "Mis cosas están vacías"
+      "message": "Mis Cosas esta Vacía"
     },
     "screenMyStuff_allEmptyUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Para añadir un título a tu lista, utilice el icono de marcador"
+      "message": "Para añadir un título a Mi lista, utilice el icono de marcador."
     },
     "screenDetails_button_trailer": {
       "description": "Label of button to allow users to watch a preview of the current video title",
@@ -2760,14 +2764,6 @@ Function getTranslation_es_MX()
     "screenDetails_button_likeDislike": {
       "description": "Label of unfocused button to allow users to like or dislike the current video title",
       "message": "Me Gusta o No Me Gusta"
-    },
-    "screenDetails_button_rateThisTitle": {
-      "description": "Label of unfocused button to allow users to rate the current video title",
-      "message": "Califica este Título"
-    },
-    "screenDetails_button_tellUsWhatYouThink": {
-      "description": "Label of unfocused button to allow users to rate the current video title",
-      "message": "Dinos Lo Que Piensas"
     },
     "screenDetails_button_see_all_games": {
       "description": "Label of button to allow users to a new page where they can see all the games related to the current sports title",
@@ -2855,23 +2851,27 @@ Function getTranslation_es_MX()
     },
     "metadata_myStuff_empty_myList_description": {
       "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
-      "message": "Películas y Series añadidos a tu lista aparecerán aquí"
+      "message": "Use el botón de marcador para guardar series y películas favoritas. Aparecerán aquí."
     },
     "metadata_myStuff_empty_continueWatching_title": {
       "description": "For an empty continueWatching container, this is the title that is display in the empty container",
-      "message": "Ya estas al día"
+      "message": "Ya estas al día!"
     },
     "metadata_myStuff_empty_continueWatching_description": {
       "description": "For an empty continueWatching container, this is the description/subtitle that is display in the empty container",
-      "message": "Películas y series que no hayas terminado de ver aparecerán aquí"
+      "message": "Películas y series que no hayas terminado de ver aparecerán aquí."
     },
     "metadata_myStuff_empty_continueWatchingInfoPanel_title": {
       "description": "For an empty continueWatching container, this is the title that is display in the InfoPanel when the empty container is in focus",
       "message": "Seguir Viendo"
     },
+    "metadata_myStuff_myLikes_title": {
+      "description": "The title of the My Likes container.",
+      "message": "Mis Gustos"
+    },
     "metadata_myStuff_empty_myListInfoPanel_description": {
       "description": "For an empty myList container, this is the description/subtitle that is display in the InfoPanel when the empty container is in focus",
-      "message": "Ver lo que guardaste para más tarde"
+      "message": "Ver lo que guardaste para más tarde."
     },
     "metadata_myStuff_empty_myListInfoPanel_title": {
       "description": "For an empty myList container, this is the title that is display in the InfoPanel when the empty container is in focus",
@@ -2879,7 +2879,7 @@ Function getTranslation_es_MX()
     },
     "metadata_myStuff_empty_continueWatchingInfoPanel_description": {
       "description": "For an empty continueWatching container, this is the description/subtitle that is display in the InfoPanel when the empty container is in focus",
-      "message": "Recoge donde dejaste de ver"
+      "message": "Recoge donde dejaste de ver."
     },
     "metadata_continueWatching_notSignedIn_title": {
       "description": "tells non registered user what they need to do to see the continue watching container",
@@ -3253,7 +3253,7 @@ Function getTranslation_es_MX()
     },
     "registration_signIn_to_play_R_rated": {
       "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
-      "message": "Este título requiere iniciar sesión para proteger la audiencia mas joven."
+      "message": "Este título requiere iniciar sesión para proteger la audiencia mas joven. No se requiere tarjeta de crédito."
     },
     "text_new": {
       "description": "simple text to use anywhere to indicate item is new",
@@ -3502,6 +3502,22 @@ Function getTranslation_es_MX()
     "privacy_center_not_editable_mode_warning": {
       "description": "Warning label that will be displayed in privacy center whenever user is in kids mode or any parental controls mode.",
       "message": "Configuración de privacidad solo se puede cambiar fuera de Tubi Kids. Solo se utilizan datos esenciales dentro de Tubi Kids."
+    },
+    "accept_now_button_label": {
+      "description": "Button Label that will be used in consent screen accept button.",
+      "message": "Aceptar Ahora"
+    },
+    "maybe_later_button_label": {
+      "description": "Button Label that will be used in consent screen Maybe later button.",
+      "message": "Quizás más tarde"
+    },
+    "roku_cw_consent_screen_heading": {
+      "description": "Roku Continue Watching screen heading.",
+      "message": "Regresa a Lo Que Amas Más Rápido"
+    },
+    "roku_cw_consent_screen_sub_heading": {
+      "description": "Roku Continue Watching screen sub heading.",
+      "message": "Facilite volver a lo que estabas viendo y obtén mejores recomendaciones para stream a continuación.\n\nElige " + Chr(34) + "Aceptar ahora" + Chr(34) + " para dar permiso a Tubi para compartir tu historial de visualización de videos con Roku.\n\nPuedes cambiar esto en cualquier momento en Configuración."
     }
   }
 End Function
@@ -4332,23 +4348,27 @@ Function getTranslation_fr_CA()
     },
     "screenMyStuff_signedOutUITitle": {
       "description": "The title of the MyStuff Screen for the guest user.",
-      "message": "Profitez de Tubi, c'est gratuit"
+      "message": "Faites de Tubi le Vôtre Gratuitement (pour toujours)"
     },
     "screenMyStuff_signedOutUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Sauvegardez tous vos favoris, reprenez là où vous en étiez, le tout en un seul endroit"
+      "message": "Sauvegardez tous vos favoris, reprenez là où vous en étiez, le tout en un seul endroit."
     },
     "screenMyStuff_signedOutUIBlurb": {
       "description": "The blurb of the MyStuff Screen for the guest user.",
-      "message": "Aucune carte de crédit requise • Gratuit pour toujours"
+      "message": "Et toujours gratuit."
+    },
+    "screenMyStuff_signedOutUIButton": {
+      "description": "The button of the MyStuff Screen for the guest user.",
+      "message": "Déverrouillez Maintenant"
     },
     "screenMyStuff_allEmptyUITitle": {
       "description": "The title of the MyStuff Screen for the guest user.",
-      "message": "Mes Envies sont vides"
+      "message": "Mes affaires sont vides"
     },
     "screenMyStuff_allEmptyUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Pour ajouter un titre à votre liste, utilisez l'icône marque-page"
+      "message": "Pour ajouter un titre à votre liste, utilisez l'icône marque-page."
     },
     "screenDetails_button_trailer": {
       "description": "Label of button to allow users to watch a preview of the current video title",
@@ -4397,14 +4417,6 @@ Function getTranslation_fr_CA()
     "screenDetails_button_likeDislike": {
       "description": "Label of unfocused button to allow users to like or dislike the current video title",
       "message": "J'aime ou Je n'aime pas"
-    },
-    "screenDetails_button_rateThisTitle": {
-      "description": "Label of unfocused button to allow users to rate the current video title",
-      "message": "Noter ce Titre"
-    },
-    "screenDetails_button_tellUsWhatYouThink": {
-      "description": "Label of unfocused button to allow users to rate the current video title",
-      "message": "Dites-Nous Ce Que Vous En Pensez"
     },
     "screenDetails_button_see_all_games": {
       "description": "Label of button to allow users to a new page where they can see all the games related to the current sports title",
@@ -4492,23 +4504,27 @@ Function getTranslation_fr_CA()
     },
     "metadata_myStuff_empty_myList_description": {
       "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
-      "message": "Les films et émissions de télévision ajoutés à votre liste apparaissent ici"
+      "message": "Les films et émissions de télévision ajoutés à votre liste apparaissent ici."
     },
     "metadata_myStuff_empty_continueWatching_title": {
       "description": "For an empty continueWatching container, this is the title that is display in the empty container",
-      "message": "Vous êtes à jour"
+      "message": "Vous êtes à jour!"
     },
     "metadata_myStuff_empty_continueWatching_description": {
       "description": "For an empty continueWatching container, this is the description/subtitle that is display in the empty container",
-      "message": "Les films et émissions de télévision que vous n'avez pas fini de regarder apparaissent ici"
+      "message": "Les films et series que vous n'avez pas fini de regarder apparaissent ici."
     },
     "metadata_myStuff_empty_continueWatchingInfoPanel_title": {
       "description": "For an empty continueWatching container, this is the title that is display in the InfoPanel when the empty container is in focus",
       "message": "Continuer à regarder"
     },
+    "metadata_myStuff_myLikes_title": {
+      "description": "The title of the My Likes container.",
+      "message": "Mes goûts"
+    },
     "metadata_myStuff_empty_myListInfoPanel_description": {
       "description": "For an empty myList container, this is the description/subtitle that is display in the InfoPanel when the empty container is in focus",
-      "message": "Regardez ce que vous aviez sauvegardé"
+      "message": "Regardez ce que vous avez économisé pour plus tard."
     },
     "metadata_myStuff_empty_myListInfoPanel_title": {
       "description": "For an empty myList container, this is the title that is display in the InfoPanel when the empty container is in focus",
@@ -4516,7 +4532,7 @@ Function getTranslation_fr_CA()
     },
     "metadata_myStuff_empty_continueWatchingInfoPanel_description": {
       "description": "For an empty continueWatching container, this is the description/subtitle that is display in the InfoPanel when the empty container is in focus",
-      "message": "Reprendre là où vous en étiez"
+      "message": "Reprendre là où vous en étiez."
     },
     "metadata_continueWatching_notSignedIn_title": {
       "description": "tells non registered user what they need to do to see the continue watching container",
@@ -4752,10 +4768,6 @@ Function getTranslation_fr_CA()
       "description": "enter password dialog description",
       "message": "Réessayons ou saisissons un autre mot de passe pour ce compte:"
     },
-    "re-enter_password_button": {
-      "description": "re-enter password button text on modal",
-      "message": "Saisissez à nouveau le mot de passe"
-    },
     "retry": {
       "description": "retry button text on modal",
       "message": "Réessayer"
@@ -4808,14 +4820,6 @@ Function getTranslation_fr_CA()
       "description": "Label to ask user to enter their year of birth",
       "message": "Je suis né en"
     },
-    "new_password_text": {
-      "description": "new password text",
-      "message": "Pour créer un nouveau mot de passe,"
-    },
-    "new_password_link": {
-      "description": "forgot password link",
-      "message": "visitez tubi.tv/password"
-    },
     "signIn_screen_subheading": {
       "description": "Sub title on the signIn screen",
       "message": "Votre adresse e-mail est déjà associée à un compte Tubi existant."
@@ -4847,10 +4851,6 @@ Function getTranslation_fr_CA()
     "forgotPassword_screen_btn_different_email": {
       "description": "The button on the forgot password screen that corresponds to the action 'Use Different Email",
       "message": "Utiliser un courriel différent"
-    },
-    "forgotPassword_screen_btn_return": {
-      "description": "The button on the forgot password screen that corresponds to the action 'Return to Sign In",
-      "message": "Retour à la connexion"
     },
     "search_hint": {
       "description": "Instructions to the user to use microphone icon on his/her remote to use voice enabled keyboard. Please note that a microphone icon will be placed immediately after the last word of this translation and the icon will be considered part of the sentence.",
@@ -5155,6 +5155,22 @@ Function getTranslation_fr_CA()
     "privacy_center_not_editable_mode_warning": {
       "description": "Warning label that will be displayed in privacy center whenever user is in kids mode or any parental controls mode.",
       "message": "Paramètres de confidentialité ne peuvent être modifiés qu'en dehors de Tubi Kids. Seules les données essentielles sont utilisées dans Tubi Enfants."
+    },
+    "accept_now_button_label": {
+      "description": "Button Label that will be used in consent screen accept button.",
+      "message": "Acceptez Maintenant"
+    },
+    "maybe_later_button_label": {
+      "description": "Button Label that will be used in consent screen Maybe later button.",
+      "message": "Peut-être plus tard"
+    },
+    "roku_cw_consent_screen_heading": {
+      "description": "Roku Continue Watching screen heading.",
+      "message": "Revenez Plus Vite à Ce Que Vous Aimez"
+    },
+    "roku_cw_consent_screen_sub_heading": {
+      "description": "Roku Continue Watching screen sub heading.",
+      "message": "Facilitez-vous la tâche pour revenir à ce que vous regardiez et obtenez de meilleures recommandations sur ce qu'il faut diffuser ensuite.\n\nChoisir " + Chr(34) + "Accepter maintenant" + Chr(34) + " pour autoriser Tubi à partager votre historique de visionnage de vidéos avec Roku.\n\nVous pouvez modifier cela à tout moment dans les paramètres."
     }
   }
 End Function
