@@ -86,10 +86,10 @@
           uri="pkg:/images/back.png"
           width="29"
           height="47"
-          translation="[81,576]"/>
+          translation="[87,621]"/>
         <Label
           id="BackLabel"
-          translation="[123,580]"
+          translation="[129,621]"
           height="47"
           vertAlign="center">
           <Font
@@ -109,13 +109,13 @@
           showTargetRects="false"
           advanceKey="right"
           reverseKey="left"
-          translation="[0,688]"/>
+          translation="[0,687]"/>
         <Poster
           id="FocusBox"
           uri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
         <Label
           id="CountdownLabelMovie"
-          translation="[354,638]"
+          translation="[354,618]"
           height="46">
           <Font
            role="font"
@@ -128,7 +128,7 @@
           width="992"
           maxHeight="313"
           maxTitleLines="3"
-          translation="[354,691]"/>
+          translation="[354,681]"/>
       </Group>
       <!-- Series shows a single poster for the next episode in the same series -->
       <Group
@@ -141,10 +141,10 @@
           focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
           numColumns="1"
           numRows="1"
-          translation="[85,688]" />
+          translation="[85,687]" />
         <Label
           id="CountdownLabelSeries"
-          translation="[573,598]"
+          translation="[573,618]"
           height="46">
           <Font
            role="font"
@@ -157,7 +157,7 @@
           width="875"
           maxHeight="397"
           maxTitleLines="2"
-          translation="[574,650]"/>
+          translation="[574,681]"/>
       </Group>
     </Group>
   </children>

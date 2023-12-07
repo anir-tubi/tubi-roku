@@ -1353,7 +1353,7 @@ Function getTranslation_en_US()
     },
     "goBack_videoPlayer_upNext": {
       "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "BACK TO DISMISS"
+      "message": "DISMISS"
     },
     "goBack_videoPlayer_controls": {
       "description": "Navigational instructions to users on what the back button does on the current page",

@@ -30,7 +30,7 @@ Function init()
   m.GridSeries.observeField("itemFocused", "onSeriesItemFocused")
   m.GridSeries.observeField("itemSelected", "onSeriesItemSelected")
   BackLabel = m.top.findNode("BackLabel")
-  BackLabel.text = getTranslation("goBack_videoPlayer_upNext")
+  BackLabel.text = Ucase(getTranslation("goBack_videoPlayer_upNext"))
   if m.constants.deviceInfo.uiResolution <> "FHD"
     '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
     BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
@@ -53,7 +53,7 @@ Function init()
 
   focusBox.width = 210 + focusBoxMargin * 2
   focusBox.height = 300 + focusBoxMargin * 2
-  focusBox.translation = [85 - focusBoxMargin, 688 - focusBoxMargin]
+  focusBox.translation = [85 - focusBoxMargin, 687 - focusBoxMargin]
 
 
   targetSet = CreateObject("roSGNode", "TargetSet")
