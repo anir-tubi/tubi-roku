@@ -87,6 +87,7 @@ Function TubiExperiments(constants) as Object
       roku_cw_consent: {
         roku_cw_consent_after_signup_short_term_v1: {"enabled": false}
         roku_cw_consent_after_signup_long_term_v1: {"enabled": false}
+        roku_cw_consent_existing_user_after_plyback_v1: {"enabled": false}
       }
 
       roku_linear_player_view: {

@@ -223,6 +223,10 @@ Function init()
 
   m.rokuContinueWatchingApi = RokuContinueWatchingApi(m.constants)
 
+  ' Holds a boolean if the user was shown continue watching consent dialog.
+  ' We are going to show once for the session. Currently we are not resetting it on instant resume.
+  m.wasUserShownContinueWatchingConsentDialog = false
+  
   ' Below boolean flag is used in registration flow, which indicates whether we need to display the roku continue watching consent screen.
   ' will be set to true if the user is in US and is in the experiment control group.
   m.shouldShowRokuCWConsentScreen = false

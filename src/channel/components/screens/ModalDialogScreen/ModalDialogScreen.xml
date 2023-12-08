@@ -64,7 +64,7 @@
             id="Message"
             width="822"
             wrap="true"
-            maxLines="6"
+            maxLines="8"
             translation="[0,0]">
             <Font
               role="font"
