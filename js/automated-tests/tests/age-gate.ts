@@ -18,8 +18,8 @@ describe('Age Gate', function () {
     await openKidsMode();
 
     // Exit Kids Mode
-    await ecp.sendKeyPress(ecp.Key.Up, { count: 2 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify Age Gate screen
     await verifyAgeGateScreen();
@@ -36,7 +36,7 @@ describe('Age Gate', function () {
 
     // wait for Let's Create Your Account Modal and Continue
     await utils.sleep(3000);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
 
     // Land on Sign In to Your Account page
@@ -44,8 +44,8 @@ describe('Age Gate', function () {
     expect(signInScreenPasswordBox.visible).to.be.true;
 
     // Create Account
-    await ecp.sendKeyPress(ecp.Key.Up);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up);
+    await ecp.sendKeypress(ecp.Key.Ok);
     const emailAddressBox = testUtils.getNodeForElement('emailAddressBox');
     expect(emailAddressBox).to.exist;
 
@@ -54,10 +54,10 @@ describe('Age Gate', function () {
 
     // Send email address
     await ecp.sendText(email);
-    await ecp.sendKeyPress(ecp.Key.Right);
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await utils.sleep(500);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await utils.sleep(500);
 
     // Verify Age Gate Screen
@@ -83,7 +83,7 @@ describe('Age Gate', function () {
 
     // wait for Let's Create Your Account Modal and Continue
     await utils.sleep(3000);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
 
     // Land on Sign In to Your Account page
@@ -91,8 +91,8 @@ describe('Age Gate', function () {
     expect(signInScreenPasswordBox.visible).to.be.true;
 
     // Create Account
-    await ecp.sendKeyPress(ecp.Key.Up);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up);
+    await ecp.sendKeypress(ecp.Key.Ok);
     const emailAddressBox = testUtils.getNodeForElement('emailAddressBox');
     expect(emailAddressBox).to.exist;
 
@@ -101,17 +101,17 @@ describe('Age Gate', function () {
 
     // Send email address
     await ecp.sendText(email);
-    await ecp.sendKeyPress(ecp.Key.Right);
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await utils.sleep(500);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify Age Gate Screen
     await yearsVerificationEntry();
 
     // Enter invalid Age of 0
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 3 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify error message
     const ageGateInvalidAge = await testUtils.getNodeForElement('ageGateInvalidAge');
@@ -127,16 +127,16 @@ describe('Age Gate', function () {
     await openKidsMode();
 
     // Exit Kids Mode
-    await ecp.sendKeyPress(ecp.Key.Up, { count: 2 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify Age Gate Screen
     await verifyAgeGateScreen();
 
     // Enter age > 12
     await ecp.sendText('2009');
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 4 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Check if we are in the non-kids mode since user passed age gate
     // Verify on home screen
@@ -145,7 +145,7 @@ describe('Age Gate', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open left nav and check for Kids left nav icon
-    await ecp.sendKeyPress(ecp.Key.Left);
+    await ecp.sendKeypress(ecp.Key.Left);
     expect((await leftNavHomeButton).visible).to.equal(true);
 
 
@@ -159,16 +159,16 @@ describe('Age Gate', function () {
     await openKidsMode();
 
     // Exit Kids Mode
-    await ecp.sendKeyPress(ecp.Key.Up, { count: 2 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify Age Gate Screen
     await verifyAgeGateScreen();
 
     // Enter age > 12
     await ecp.sendText('2010');
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 4 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Check if we are in the non-kids mode since user passed age gate
     // Verify on home screen
@@ -184,10 +184,10 @@ describe('Age Gate', function () {
     expect((await cannotExitKidsMode).visible).to.equal(true);
     expect((await buttonTextClose).visible).to.equal(true);
 
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
-    await ecp.sendKeyPress(ecp.Key.Left);
+    await ecp.sendKeypress(ecp.Key.Left);
     expect((await leftNavHomeButton).visible).to.equal(true);
 
   });
@@ -202,43 +202,43 @@ describe('Age Gate', function () {
     await openKidsMode();
 
     // Exit Kids Mode
-    await ecp.sendKeyPress(ecp.Key.Up, { count: 2 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify Age Gate Screen
     await verifyAgeGateScreen();
 
     // Enter age between 2020
-    await ecp.sendKeyPress(ecp.Key.Right);
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 3 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Up, { count: 3 });
-    await ecp.sendKeyPress(ecp.Key.Right);
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 3 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify error message
     const ageGateVerificationErrorPrompt = await testUtils.getNodeForElement('ageGateVerificationErrorPrompt');
     expect(ageGateVerificationErrorPrompt.text).to.equal('Please be sure the information you entered is correct');
 
     // Back to Exit Kids
-    await ecp.sendKeyPress(ecp.Key.Back, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
     await utils.sleep(2000);
-    await ecp.sendKeyPress(ecp.Key.Up, { count: 2 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Enter age between 2021
-    await ecp.sendKeyPress(ecp.Key.Right);
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 3 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Up, { count: 3 });
-    await ecp.sendKeyPress(ecp.Key.Right);
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Left);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Left);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
 
     // Verify error message
@@ -246,40 +246,40 @@ describe('Age Gate', function () {
 
 
     // Back to Exit Kids
-    await ecp.sendKeyPress(ecp.Key.Back, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
     await utils.sleep(2000);
-    await ecp.sendKeyPress(ecp.Key.Up, { count: 2 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Enter age between 2022
-    await ecp.sendKeyPress(ecp.Key.Right);
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 3 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Up, { count: 3 });
-    await ecp.sendKeyPress(ecp.Key.Right);
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify error message
     expect(ageGateVerificationErrorPrompt.text).to.equal('Please be sure the information you entered is correct');
 
     // Back to Exit Kids
-    await ecp.sendKeyPress(ecp.Key.Back, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
     await utils.sleep(2000);
-    await ecp.sendKeyPress(ecp.Key.Up, { count: 2 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Enter age between 2023
-    await ecp.sendKeyPress(ecp.Key.Right);
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 3 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Up, { count: 3 });
-    await ecp.sendKeyPress(ecp.Key.Right);
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Right);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify error message
     expect(ageGateVerificationErrorPrompt.text).to.equal('Please be sure the information you entered is correct');
@@ -291,20 +291,20 @@ describe('Age Gate', function () {
 
   async function openKidsMode() {
 
-    await ecp.sendKeyPress(ecp.Key.Left);
-    await ecp.sendKeyPress(ecp.Key.Up);
+    await ecp.sendKeypress(ecp.Key.Left);
+    await ecp.sendKeypress(ecp.Key.Up);
     await utils.sleep(3000); // Adding sleeps temporary
-    await ecp.sendKeyPress(ecp.Key.Up);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up);
+    await ecp.sendKeypress(ecp.Key.Ok);
     const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
     expect(exitKidsOption.visible).to.be.true;
   }
 
   async function selectSignInFromHomeScreen() {
     // Sign in
-    await ecp.sendKeyPress(ecp.Key.Left);
-    await ecp.sendKeyPress(ecp.Key.Up, { count: 3 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Left);
+    await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Ok);
   }
 
   async function verifyAgeGateScreen() {
@@ -318,9 +318,3 @@ describe('Age Gate', function () {
     const yearsVerificationEntry = await testUtils.getNodeForElement('yearsVerificationEntry');
     expect(yearsVerificationEntry).to.exist;
   }
-
-
-  
-
-
-

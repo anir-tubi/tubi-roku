@@ -35,7 +35,7 @@ describe('Search', function () {
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
       expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon.webp');
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify that the linear channel plays
       await testUtils.expectPlayerStateToEventuallyEqual('play', 10000);
@@ -55,13 +55,13 @@ describe('Search', function () {
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
       expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon.webp');
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify that the Linear channel plays
       await testUtils.expectPlayerStateToEventuallyEqual('play', 10000);
 
       // Press the back button and verify that the user is redirected back to the Search result page
-      await ecp.sendKeyPress(ecp.Key.Back);
+      await ecp.sendKeypress(ecp.Key.Back);
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
         expect(searchResultsText.text).to.equal('NBC News NOW');
@@ -82,13 +82,13 @@ describe('Search', function () {
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
       expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon.webp');
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify that the linear channel plays
       await testUtils.expectPlayerStateToEventuallyEqual('play', 10000);
 
       // Press left to access the EPG left nav and verify the closed captions button exists
-      await ecp.sendKeyPress(ecp.Key.Left, { count: 2 });
+      await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
       await testUtils.retryWithTimeOut(async () => {
         const btnCC_label = await testUtils.getNodeForElement('btnCC_label');
         expect(btnCC_label.text).to.equal('Subtitles');
@@ -158,13 +158,13 @@ describe('Search', function () {
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
       expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon.webp');
-      await ecp.sendKeyPress(ecp.Key.Play);
+      await ecp.sendKeypress(ecp.Key.Play);
 
       // Verify that the Linear channel plays
       await testUtils.expectPlayerStateToEventuallyEqual('play', 10000);
 
       // Press the back button and verify that the user is redirected back to the Search result page
-      await ecp.sendKeyPress(ecp.Key.Back);
+      await ecp.sendKeypress(ecp.Key.Back);
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
         expect(searchResultsText.text).to.equal('NBC News NOW');
@@ -177,7 +177,7 @@ describe('Search', function () {
 // Navigate right until the grid is in focus
 async function navigateRightToGrid() {
   await testUtils.untilTrue(async () => {
-    await ecp.sendKeyPress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Right);
     const { value: id } = await odc.getValue({
       base: 'focusedNode',
       keyPath: 'id'

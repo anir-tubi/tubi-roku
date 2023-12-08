@@ -20,7 +20,7 @@ describe('Live', function () {
 
 
         // Press left navigation to open the side navigation
-        await ecp.sendKeyPress(ecp.Key.Left);
+        await ecp.sendKeypress(ecp.Key.Left);
 
         // Is the left Nav open?
         const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
@@ -45,14 +45,14 @@ describe('Live', function () {
 
 
         // Start a live feed
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
         await utils.sleep(1000);
 
         // Verify that video is playing
         await testUtils.expectPlayerStateToEventuallyEqual('play');
 
         // Go back to preview?
-        await ecp.sendKeyPress(ecp.Key.Back);
+        await ecp.sendKeypress(ecp.Key.Back);
 
         // Verify that video preview is not playing
         const player = await ecp.getMediaPlayer();

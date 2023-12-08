@@ -20,7 +20,7 @@ describe('Top Navigation', function () {
         const homeScreenRowList = await testUtils.getNodeForElement('homeScreenRowList');
         expect(homeScreenRowList.rowItemFocused[0]).to.equal(0);
         expect(homeScreenRowList.rowItemFocused[1]).to.equal(0);
-        await testUtils.elementHasFocus('homeScreenRowList',true);  
+        await testUtils.elementHasFocus('homeScreenRowList',true);
 
       });
 
@@ -31,7 +31,7 @@ describe('Top Navigation', function () {
         const homeScreenRowList = await testUtils.getNodeForElement('homeScreenRowList');
         expect(homeScreenRowList.rowItemFocused[0]).to.equal(0);
         expect(homeScreenRowList.rowItemFocused[1]).to.equal(0);
-        await testUtils.elementHasFocus('homeScreenRowList',true); 
+        await testUtils.elementHasFocus('homeScreenRowList',true);
 
         // Home icon in present in the left nav
         const homeButtonContent = await testUtils.getGridItemContent('sideNavMenu', 3);
@@ -56,7 +56,7 @@ describe('Top Navigation', function () {
 
 
       // Press the Up button
-      await ecp.sendKeyPress(ecp.Key.Up);
+      await ecp.sendKeypress(ecp.Key.Up);
 
       // Top Nav "For You" is in focus and changes color
       await topNavForYouLabelFocused();
@@ -69,7 +69,7 @@ describe('Top Navigation', function () {
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       // Press back on the remote
-      await ecp.sendKeyPress(ecp.Key.Back);
+      await ecp.sendKeypress(ecp.Key.Back);
 
       // For You Top Nav option is focused
       await topNavForYouLabelFocused();
@@ -102,19 +102,19 @@ describe('Top Navigation', function () {
       expect(await topNavMoviesItem.text).to.equal('Movies');
 
       // Press the Up button
-      await ecp.sendKeyPress(ecp.Key.Up);
+      await ecp.sendKeypress(ecp.Key.Up);
 
       // Press right 4 times (try to scroll right beyond the Live TV top nav option)
-      await ecp.sendKeyPress(ecp.Key.Right,  {count: 4});
+      await ecp.sendKeypress(ecp.Key.Right,  {count: 4});
 
       // Press OK
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Are we on the Live TV page?
       await testUtils.waitForCurrentScreenToEqual('epgScreen');
 
       // Press Up to highlight Live TV option
-      await ecp.sendKeyPress(ecp.Key.Up);
+      await ecp.sendKeypress(ecp.Key.Up);
 
       // Live option is selected and in focus
       await topNavForYouLabelFocused();
@@ -127,20 +127,20 @@ describe('Top Navigation', function () {
 
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-      
+
 
       // Home icon is highlighed
-  
+
       await testUtils.waitForFocusedSideNavMenuItemToEqual('home');
 
       // Scroll down
-      await ecp.sendKeyPress(ecp.Key.Down, {count : 4});
+      await ecp.sendKeypress(ecp.Key.Down, {count : 4});
 
       // Home icon is highlighed
       await testUtils.waitForFocusedSideNavMenuItemToEqual('home');
 
       // Scroll right
-      await ecp.sendKeyPress(ecp.Key.Right, {count : 4});
+      await ecp.sendKeypress(ecp.Key.Right, {count : 4});
 
       // Home icon is highlighed
       await testUtils.waitForFocusedSideNavMenuItemToEqual('home');
@@ -151,19 +151,19 @@ describe('Top Navigation', function () {
      it('C150531 - Selecting Movies in Top Nav results in redirection to the Movies page, @topnav', async () => {
 
       // Focus should be on the first piece of content in the Featured Row
-            
+
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
 
       // Scroll up to top nav
-      await ecp.sendKeyPress(ecp.Key.Up);
+      await ecp.sendKeypress(ecp.Key.Up);
 
       // Scroll right to Movies tab
-      await ecp.sendKeyPress(ecp.Key.Right);
+      await ecp.sendKeypress(ecp.Key.Right);
 
       // Press OK
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Are we on Movie screen?
       await utils.sleep(2000);
@@ -179,21 +179,21 @@ describe('Top Navigation', function () {
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
       // Focus should be on the first piece of content in the Featured Row
-    
+
       const homeScreenRowList = await testUtils.getNodeForElement('homeScreenRowList');
       expect(homeScreenRowList.rowItemFocused[0]).to.equal(0);
       expect(homeScreenRowList.rowItemFocused[1]).to.equal(0);
-      await testUtils.elementHasFocus('homeScreenRowList',true); 
+      await testUtils.elementHasFocus('homeScreenRowList',true);
 
       // Scroll up to top nav
-      await ecp.sendKeyPress(ecp.Key.Up);
+      await ecp.sendKeypress(ecp.Key.Up);
       await topNavForYouLabelFocused();
 
       // Scroll right to TV Shows tab
-      await ecp.sendKeyPress(ecp.Key.Right, {count : 2});
+      await ecp.sendKeypress(ecp.Key.Right, {count : 2});
 
       // Press OK
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Are we on TV Shows screen?
       await testUtils.waitForElementToHaveFocus('tvShowsScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -212,14 +212,14 @@ describe('Top Navigation', function () {
       await topNavForYouLabelNotFocused();
 
       // Scroll up to top nav
-      await ecp.sendKeyPress(ecp.Key.Up);
+      await ecp.sendKeypress(ecp.Key.Up);
       await topNavForYouLabelFocused();
 
       // Scroll right to TV Shows tab
-      await ecp.sendKeyPress(ecp.Key.Right, {count : 3});
+      await ecp.sendKeypress(ecp.Key.Right, {count : 3});
 
       // Press OK
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Are we on Live screen?
       const liveTVTitle = await testUtils.getNodeForElement('liveTVTitle');
@@ -234,20 +234,20 @@ describe('Top Navigation', function () {
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       // Focus should be on the first piece of content in the Featured Row
-     
+
       const homeScreenRowList = await testUtils.getNodeForElement('homeScreenRowList');
       expect(homeScreenRowList.rowItemFocused[0]).to.equal(0);
       expect(homeScreenRowList.rowItemFocused[1]).to.equal(0);
-      await testUtils.elementHasFocus('homeScreenRowList',true); 
+      await testUtils.elementHasFocus('homeScreenRowList',true);
 
       // Scroll up to top nav
-      await ecp.sendKeyPress(ecp.Key.Up);
+      await ecp.sendKeypress(ecp.Key.Up);
 
       // Scroll right to Movies tab
-      await ecp.sendKeyPress(ecp.Key.Right);
+      await ecp.sendKeypress(ecp.Key.Right);
 
       // Press OK
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Are we on Movie screen?
       await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -255,10 +255,10 @@ describe('Top Navigation', function () {
       expect(movieScreenFirstRowName.text).to.equal('Featured');
 
       // Scroll up to top nav
-      await ecp.sendKeyPress(ecp.Key.Up);
+      await ecp.sendKeypress(ecp.Key.Up);
 
       // Press the Back button
-      await ecp.sendKeyPress(ecp.Key.Back);
+      await ecp.sendKeypress(ecp.Key.Back);
 
       // Is For You focused?
       await topNavForYouLabelFocused();
@@ -276,15 +276,15 @@ describe('Top Navigation', function () {
       const homeScreenRowList = await testUtils.getNodeForElement('homeScreenRowList');
       expect(homeScreenRowList.rowItemFocused[0]).to.equal(0);
       expect(homeScreenRowList.rowItemFocused[1]).to.equal(0);
-      await testUtils.elementHasFocus('homeScreenRowList',true); 
+      await testUtils.elementHasFocus('homeScreenRowList',true);
 
       // Scroll up to top nav
-      await ecp.sendKeyPress(ecp.Key.Up);
+      await ecp.sendKeypress(ecp.Key.Up);
       await topNavForYouLabelFocused();
 
 
       // Scroll Left to Open left Nav
-      await ecp.sendKeyPress(ecp.Key.Left);
+      await ecp.sendKeypress(ecp.Key.Left);
 
       // Home icon is highlighed - Need helper to verify it's highlighted
       const color = await testUtils.getElementColorField('leftNavHomeButton','color');
@@ -305,10 +305,10 @@ describe('Top Navigation', function () {
       await testUtils.elementHasFocus('homeScreenRowList',true);
 
       // Scroll down the page
-      await ecp.sendKeyPress(ecp.Key.Down, {count: 9});
+      await ecp.sendKeypress(ecp.Key.Down, {count: 9});
 
       // Scroll Left to Open left Nav
-      await ecp.sendKeyPress(ecp.Key.Left);
+      await ecp.sendKeypress(ecp.Key.Left);
 
       // Home icon is highlighed
       const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
@@ -328,10 +328,10 @@ describe('Top Navigation', function () {
       const homeScreenRowList = await testUtils.getNodeForElement('homeScreenRowList');
       expect(homeScreenRowList.rowItemFocused[0]).to.equal(0);
       expect(homeScreenRowList.rowItemFocused[1]).to.equal(0);
-      await testUtils.elementHasFocus('homeScreenRowList',true); 
+      await testUtils.elementHasFocus('homeScreenRowList',true);
 
       // Scroll up to top nav
-      await ecp.sendKeyPress(ecp.Key.Up);
+      await ecp.sendKeypress(ecp.Key.Up);
 
       // Check for Top Nav (should not be visible)
       const topNavMenuHome = await testUtils.getNodeForElement('topNavMenuHome');
@@ -339,7 +339,7 @@ describe('Top Navigation', function () {
 
 
     });
-  
+
 
        // https://tubi.testrail.io/index.php?/cases/view/150562
        it('C150579 -  When user navigates away from Home via side nav to another page, then returns home, For You is the default focusTop Nav is not present in Search page, @topnav', async () => {
@@ -352,7 +352,7 @@ describe('Top Navigation', function () {
         await testUtils.selectMenuItem('sideNavMenu','Search');
         await testUtils.waitForFocusedSideNavMenuItemToEqual('search');
         await testUtils.waitForCurrentScreenToEqual('searchScreen', 10000);
-        await ecp.sendKeyPress(ecp.Key.Left);
+        await ecp.sendKeypress(ecp.Key.Left);
         await testUtils.selectMenuItem('sideNavMenu','Home');
 
         // Verify we are on home screen again and top nav state
@@ -370,7 +370,7 @@ describe('Top Navigation', function () {
         const homeScreenRowList = await testUtils.getNodeForElement('homeScreenRowList');
         expect(homeScreenRowList.rowItemFocused[0]).to.equal(0);
         expect(homeScreenRowList.rowItemFocused[1]).to.equal(0);
-        await testUtils.elementHasFocus('homeScreenRowList',true); 
+        await testUtils.elementHasFocus('homeScreenRowList',true);
 
         // Open left Nav
         await openLeftNav();
@@ -383,7 +383,7 @@ describe('Top Navigation', function () {
         await testUtils.elementHasFocus('channelCategoryGrid',true);
 
         // Press the back button
-        await ecp.sendKeyPress(ecp.Key.Back);
+        await ecp.sendKeypress(ecp.Key.Back);
 
         // Is left Nav Open?
         await testUtils.waitForSideNavMenuToBeExpanded();
@@ -394,7 +394,7 @@ describe('Top Navigation', function () {
 
       it('C150582 - Pressing back a third time from non-home level 1 page, @topnav', async () => {
 
-        
+
         await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
         await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
@@ -409,7 +409,7 @@ describe('Top Navigation', function () {
         await testUtils.elementHasFocus('channelCategoryGrid',true);
 
         // Press the back button
-        await ecp.sendKeyPress(ecp.Key.Back, {count:3});
+        await ecp.sendKeypress(ecp.Key.Back, {count:3});
 
         // Verify that the Exit modal dialog is displayed
         const exitButtonText = testUtils.getNodeForElement('exitButtonText');
@@ -439,7 +439,7 @@ describe('Top Navigation', function () {
      async function openLeftNav() {
 
       // Press back twice
-      await ecp.sendKeyPress(ecp.Key.Back, {count:2});
+      await ecp.sendKeypress(ecp.Key.Back, {count:2});
 
       // Home icon is highlighed
       await testUtils.waitForSideNavMenuToBeExpanded(10000);

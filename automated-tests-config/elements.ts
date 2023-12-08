@@ -38,8 +38,9 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.0.#BottomLabel',
   },
 
-  // We're currently replacing the contents in this section from the existing json file. If you want to add additional elements put them outside this section of the file
+  // We're currently replacing the contents in this section from the existing json file. If you want to add additional elements put them outside this section of the file. Keeping for a little longer in case any lingering keypaths need to be moved over with the script
 // START ELEMENTS INJECT
+// END ELEMENTS INJECT
 
   /** The top level scene for the entire application */
   scene: {
@@ -665,7 +666,7 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#08fb5e0.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
-  /** Dialog box text for PC Settings Change for Little Kids */
+  /** Dialog box text for PC Settings Change for Teens */
   parentalControlsSettingsTeens: {
     keyPath: '#ContentController.#c25f262.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
@@ -1101,8 +1102,8 @@ const elements = typeCheckElements({
   },
 
   /** channels list screen */
-  channelsListScreen: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#ChannelCategoryGrid.6.#PosterRect',
+  channelsListScreenGrid: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#ChannelCategoryGrid',
   },
 
   /** settings left nav button highlighted */
@@ -1155,47 +1156,50 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2.#LabelParent.0.#Label',
   },
 
-// END ELEMENTS INJECT
+  /** title of Espanol Disabled dialog box */
+  espanolDisabledTitle: {
+    keyPath: '#ContentController.#c441913.#DialogBox.#ContentArea.#Title',
+  },
 
-/** title of Espanol Disabled dialog box */
-espanolDisabledTitle: {
-  keyPath: '#ContentController.#c441913.#DialogBox.#ContentArea.#Title',
-},
+  /** title of Espanol Disabled dialog box for teens */
+  espanolDisabledTitleTeens: {
+    keyPath: '#ContentController.#dd0197e.#DialogBox.#ContentArea.#Title',
+  },
 
-/** title of Espanol Disabled dialog box for teens */
-espanolDisabledTitleTeens: {
-  keyPath: '#ContentController.#dd0197e.#DialogBox.#ContentArea.#Title',
-},
+  /** message in Espanol Disabled dialog box */
+  espanolDisabledMessage: {
+    keyPath: '#ContentController.#c441913.#DialogBox.#ContentArea.#MessageGroup.#Message',
+  },
 
-/** message in Espanol Disabled dialog box */
-espanolDisabledMessage: {
-  keyPath: '#ContentController.#c441913.#DialogBox.#ContentArea.#MessageGroup.#Message',
-},
+  /** message in Espanol Disabled box for teens */
+  espanolDisabledMessageTeens: {
+    keyPath: '#ContentController.#dd0197e.#DialogBox.#ContentArea.#MessageGroup.#Message',
+  },
 
-/** message in Espanol Disabled box for teens */
-espanolDisabledMessageTeens: {
-  keyPath: '#ContentController.#dd0197e.#DialogBox.#ContentArea.#MessageGroup.#Message',
-},
+  /** button in Espanol Dissbled dialog box */
+  espanolDisabledButton: {
+    keyPath: '#ContentController.#c441913.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+  },
 
-/** button in Espanol Dissbled dialog box */
-espanolDisabledButton: {
-  keyPath: '#ContentController.#c441913.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
-},
+  /** button in Espanol Dissbled dialog box for Teens */
+  espanolDisabledButtonTeens: {
+    keyPath: '#ContentController.#dd0197e.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
+  },
 
-/** button in Espanol Dissbled dialog box for Teens */
-espanolDisabledButtonTeens: {
-  keyPath: '#ContentController.#dd0197e.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText',
-},
+  /** tubi espanol logo */
+  espanolLogo: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#logoGroup.#tubiEspanolLogo',
+  },
 
-/** tubi espanol logo */
-espanolLogo: {
-  keyPath: '#ContentController.#uiGroup.#ContentGroup.#logoGroup.#tubiEspanolLogo',
-},
+  /** espanol screen row list  */
+  espanolScreenRowList: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#espanolScreen.#ContentArea.#CategoryGridList.#RowList',
+  },
 
-/** espanol screen row list  */
-espanolScreenRowList: {
-  keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#espanolScreen.#ContentArea.#CategoryGridList.#RowList',
-}
+  /** espanol screen row list  */
+  sideNavChannelsLabel: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.6.#LabelParent.0.#Label',
+  }
 
 });
 

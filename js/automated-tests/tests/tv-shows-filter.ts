@@ -82,7 +82,7 @@ describe('Homescreen Navigation - TV Shows Filter', function () {
     }
 
     // Now select a title to redirect us on the detail page
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.retryWithTimeOut(async () => {
       await testUtils.findRowIndexWithTitle('detailScreenMenu', 'Episodes list');
     });

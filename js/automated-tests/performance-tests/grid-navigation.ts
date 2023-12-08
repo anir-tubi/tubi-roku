@@ -27,7 +27,7 @@ describe('grid-navigation', function () {
     });
     await odc.startResponsivenessTesting();
     const startTime = Date.now();
-    await ecp.sendKeyPress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Right);
     const chanperfPromise = ecp.getChanperf();
     await currFocusColumnObservePromise;
     const outputData = {} as any;
@@ -48,7 +48,7 @@ describe('grid-navigation', function () {
     });
     await odc.startResponsivenessTesting();
     const startTime = Date.now();
-    await ecp.sendKeyPress(ecp.Key.Down);
+    await ecp.sendKeypress(ecp.Key.Down);
     const chanperfPromise = ecp.getChanperf();
     await currFocusRowObservePromise;
     const outputData = {} as any;

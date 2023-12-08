@@ -15,18 +15,18 @@ describe('Settings', function () {
     await testUtils.waitForAppLaunchBeaconToFire();
 
     // Go to Settings Page
-    await ecp.sendKeyPress(ecp.Key.Back, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
 
     // Is left nav open?
     const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
     await testUtils.elementHasFocus('leftNavHomeButton');
 
     // Down to Settings
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 5 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 5 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Select About
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
 
     // Is the About Page Open?
     const settingsScreenHeader = await testUtils.getNodeForElement('settingsScreenHeader');
@@ -42,7 +42,7 @@ describe('Settings', function () {
     await testUtils.waitForAppLaunchBeaconToFire();
 
     // Go to Settings Page
-    await ecp.sendKeyPress(ecp.Key.Back, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
 
     // Is left nav open?
     await testUtils.retryWithTimeOut(async () => {
@@ -52,9 +52,9 @@ describe('Settings', function () {
 
 
     // Down to Settings
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 5 });
+    await ecp.sendKeypress(ecp.Key.Down, { count: 5 });
     await utils.sleep(2000);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await utils.sleep(3000); // Improvement
 
     // Select Privacy Center
@@ -63,7 +63,7 @@ describe('Settings', function () {
       expect(settingsScreen.visible).to.be.true;
     });
 
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
 
 
     // Is the Privacy page Open?
@@ -78,20 +78,20 @@ describe('Settings', function () {
     await testUtils.waitForAppLaunchBeaconToFire();
 
     // Go to Settings Page
-    await ecp.sendKeyPress(ecp.Key.Back, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
 
     // Is left nav open?
     const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
     await testUtils.elementHasFocus('leftNavHomeButton');
 
     // Down to Settings
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 5 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 5 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Select About
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
     await testUtils.elementHasFocus('aboutMenuItem');
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Full Device ID modal present?
     await utils.sleep(3000);
@@ -110,18 +110,18 @@ describe('Settings', function () {
     await testUtils.waitForAppLaunchBeaconToFire();
 
     // Go to Settings Page
-    await ecp.sendKeyPress(ecp.Key.Back, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
 
     // Is left nav open?
     const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
     await testUtils.elementHasFocus('leftNavHomeButton');
 
     // Down to Settings
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 5 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 5 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Select About
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
 
     // Is the About Page Open and does the help link exist?
     const settingsScreenHeader = await testUtils.getNodeForElement('settingsScreenHeader');
@@ -136,20 +136,20 @@ describe('Settings', function () {
     await testUtils.waitForAppLaunchBeaconToFire();
 
     // Go to Settings Page
-    await ecp.sendKeyPress(ecp.Key.Back, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
 
     // Is left nav open?
     const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
     await testUtils.elementHasFocus('leftNavHomeButton');
 
     // Down to Settings
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 5 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 5 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Select Privacy Policy
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
     await utils.sleep(1000);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Is the Privacy Policy Page Open?
     const privacyPolicyHeader = await testUtils.getNodeForElement('privacyPolicyHeader');

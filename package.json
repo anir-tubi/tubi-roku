@@ -15,7 +15,7 @@
     "url": "https://github.com/adRise/project-total-recall/issues"
   },
   "homepage": "https://github.com/adRise/project-total-recall#readme",
-  
+
   "devDependencies": {
     "@octokit/rest": "^18.0.9",
     "@rokucommunity/bslint": "0.7.6",
@@ -64,7 +64,7 @@
     "@actions/github": "^5.0.3",
     "gulp-mocha": "^8.0.0",
     "needle": "^3.2.0",
-    "roku-test-automation": "2.0.0-beta.19"
+    "roku-test-automation": "2.0.0"
   },
   "mocha": {
     "timeout": 120000,

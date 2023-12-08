@@ -28,7 +28,7 @@ describe('Multiple Audio', function () {
     });
 
     // Select item and Play button
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
     // Verify that video is playing
@@ -55,7 +55,7 @@ describe('Multiple Audio', function () {
     });
 
     // Select item and Play button
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
     // Verify that video is playing
@@ -66,8 +66,8 @@ describe('Multiple Audio', function () {
     expect(closedCaptionAudioButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-subtitles-enabled.webp');
 
     // Navigate right to open Options
-    await ecp.sendKeyPress(ecp.Key.Right, { count: 4 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Validate options
     // Audio tracks section
@@ -98,7 +98,7 @@ describe('Multiple Audio', function () {
     });
 
     // Select item and Play button
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
     // Verify that video is playing
@@ -109,8 +109,8 @@ describe('Multiple Audio', function () {
     expect(closedCaptionAudioButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-subtitles-enabled.webp');
 
     // Navigate right to open Options
-    await ecp.sendKeyPress(ecp.Key.Right, { count: 4 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Validate options
 
@@ -119,8 +119,8 @@ describe('Multiple Audio', function () {
     expect(audioTracksSectionHeader.visible).to.be.true;
 
     // Enable AD
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 3 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Start app with current user
     await testUtils.startApplicationAtPage('search', { user: user });
@@ -138,7 +138,7 @@ describe('Multiple Audio', function () {
 
     // Verify AD is still enabled.
     // Select item and Play button
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await utils.sleep(2000);
 
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
@@ -147,13 +147,13 @@ describe('Multiple Audio', function () {
     await testUtils.expectPlayerStateToEventuallyEqual('play');
 
     // Open player controls
-    await ecp.sendKeyPress(ecp.Key.Up);
+    await ecp.sendKeypress(ecp.Key.Up);
 
 
     // Navigate right to open Options
     expect(audioTracksSectionHeader.visible).to.be.true;
-    await ecp.sendKeyPress(ecp.Key.Right, { count: 4 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Ok);
     expect(audioTracksSectionHeader.text).to.include('Audio');
 
     // Verify that AD is still enabled
@@ -177,17 +177,17 @@ describe('Multiple Audio', function () {
     });
 
     // Select item and Play button
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
     // Verify that video is playing
     await testUtils.expectPlayerStateToEventuallyEqual('play');
-    await ecp.sendKeyPress(ecp.Key.Play);
+    await ecp.sendKeypress(ecp.Key.Play);
 
     // Navigate right to open Options
     await testUtils.expectPlayerStateToEventuallyEqual('pause');
-    await ecp.sendKeyPress(ecp.Key.Right, { count: 4 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Validate CC and MA options
 
@@ -196,8 +196,8 @@ describe('Multiple Audio', function () {
     expect(closedCaptionSection.visible).to.be.true;
 
     // Subtitles enabled?
-    await ecp.sendKeyPress(ecp.Key.Down); // navigate to Subtitle language
-    await ecp.sendKeyPress(ecp.Key.Ok); // Select
+    await ecp.sendKeypress(ecp.Key.Down); // navigate to Subtitle language
+    await ecp.sendKeypress(ecp.Key.Ok); // Select
 
     // Verify
     const subTitleEnabled = await testUtils.getNodeForElement('subTitleEnabled');
@@ -210,15 +210,15 @@ describe('Multiple Audio', function () {
 
 
     // Audio enabled?
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 1 }); // navigate to Audio language
-    await ecp.sendKeyPress(ecp.Key.Ok); // Select
+    await ecp.sendKeypress(ecp.Key.Down, { count: 1 }); // navigate to Audio language
+    await ecp.sendKeypress(ecp.Key.Ok); // Select
     await utils.sleep(3000);
     const audioEnabled = await testUtils.getNodeForElement('audioEnabled');
     expect(audioEnabled.visible).to.be.true;
 
     // Audio Description enabled?
-    await ecp.sendKeyPress(ecp.Key.Down); // navigate to Subtitle language
-    await ecp.sendKeyPress(ecp.Key.Ok); // Select
+    await ecp.sendKeypress(ecp.Key.Down); // navigate to Subtitle language
+    await ecp.sendKeypress(ecp.Key.Ok); // Select
     const audioDescriptionEnabled = await testUtils.getNodeForElement('audioDescriptionEnabled');
     expect(audioDescriptionEnabled.visible).to.be.true;
   });
@@ -228,7 +228,7 @@ describe('Multiple Audio', function () {
 // Navigate right until the grid is in focus
 async function navigateRightToGrid() {
   await testUtils.untilTrue(async () => {
-    await ecp.sendKeyPress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Right);
     const { value: id } = await odc.getValue({
       base: 'focusedNode',
       keyPath: 'id'

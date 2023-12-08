@@ -61,7 +61,7 @@ describe('Autoplay TV', function () {
         const tvScreenRowList = await testUtils.getNodeForElement('tvScreenRowList');
         expect(tvScreenRowList.visible).to.equal(true);
         await utils.sleep(2000);
-        await ecp.sendKeyPress(ecp.Key.Right);
+        await ecp.sendKeypress(ecp.Key.Right);
 
         // Trigger Series Autoplay
         await triggerSeriesAutoplay();
@@ -105,7 +105,7 @@ describe('Autoplay TV', function () {
         expect(autoplayUpNextUI.opacity).to.be.greaterThan(0);
 
         // Press Back
-        await ecp.sendKeyPress(ecp.Key.Back);
+        await ecp.sendKeypress(ecp.Key.Back);
 
         // Is Autoplay dismissed?
         autoplayUpNextUI = await testUtils.getNodeForElement('autoplayUpNextUI');
@@ -141,29 +141,29 @@ describe('Autoplay TV', function () {
 async function triggerSeriesAutoplay() {
     //Play title, pause to open player, move right to FF button and press, verify state
     await utils.sleep(3000);
-    await ecp.sendKeyPress(ecp.Key.Play);
+    await ecp.sendKeypress(ecp.Key.Play);
     await utils.sleep(3000);
     const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
     expect(videoPlayerActual.visible).to.equal(true);
     await testUtils.expectPlayerStateToEventuallyEqual('play');
-    await ecp.sendKeyPress(ecp.Key.Play);
+    await ecp.sendKeypress(ecp.Key.Play);
     const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
     expect(playPauseButton.visible).to.equal(true);
-    await ecp.sendKeyPress(ecp.Key.Right, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
 
     // FF button highlighted
     const fastForwardButton = await testUtils.getNodeForElement('fastForwardButton');
     expect(fastForwardButton.visible).to.equal(true);
 
     // Press FF button 3 times
-    await ecp.sendKeyPress(ecp.Key.Ok, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Ok, { count: 3 });
 
     // FF until cue point
     await utils.sleep(35000);
 
     // Play to trigger autoplay
-    await ecp.sendKeyPress(ecp.Key.Play);
+    await ecp.sendKeypress(ecp.Key.Play);
     await utils.sleep(2000);
- 
+
 
 }

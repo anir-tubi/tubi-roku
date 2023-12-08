@@ -15,9 +15,9 @@ class Shared {
     // Create history function
     public async createHistory() {
         await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
-        await ecp.sendKeyPress(ecp.Key.Forward, { count: 3 });
+        await ecp.sendKeypress(ecp.Key.Forward, { count: 3 });
         await utils.sleep(3000);
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
   }
 
     // Play from Beginning check function
@@ -33,11 +33,11 @@ class Shared {
   }
 
     public async  verifyResumeWithinRange() {
-        await ecp.sendKeyPress(ecp.Key.Play);// PLay to create history
+        await ecp.sendKeypress(ecp.Key.Play);// PLay to create history
         await this.createHistory(); // Create history function
         const currentposition = await testUtils.getPlayerPosition();
         await utils.sleep(2000);
-        await ecp.sendKeyPress(ecp.Key.Back);
+        await ecp.sendKeypress(ecp.Key.Back);
 
 
         // Select Resume and check for playback
@@ -58,59 +58,59 @@ class Shared {
 
     public async selectSignInFromHomeScreen() {
       // Sign in
-      await ecp.sendKeyPress(ecp.Key.Left);
-      await ecp.sendKeyPress(ecp.Key.Up, {count:3});
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Left);
+      await ecp.sendKeypress(ecp.Key.Up, {count:3});
+      await ecp.sendKeypress(ecp.Key.Ok);
     }
 
     public async openKidsMode() {
 
-      await ecp.sendKeyPress(ecp.Key.Left);
-      await ecp.sendKeyPress(ecp.Key.Up);
+      await ecp.sendKeypress(ecp.Key.Left);
+      await ecp.sendKeypress(ecp.Key.Up);
       await utils.sleep(3000); // Adding sleeps temporary
-      await ecp.sendKeyPress(ecp.Key.Up);
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Up);
+      await ecp.sendKeypress(ecp.Key.Ok);
       const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
       expect(exitKidsOption.visible).to.be.true;
     }
 
 
     async selectLittleKidsFromParentalSettings() {
-      await ecp.sendKeyPress(ecp.Key.Right);
+      await ecp.sendKeypress(ecp.Key.Right);
       await utils.sleep(2000);
-      await ecp.sendKeyPress(ecp.Key.Up, {count:3});
+      await ecp.sendKeypress(ecp.Key.Up, {count:3});
       await utils.sleep(2000);
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
     }
 
 
     async selectOlderKidsFromParentalSettings() {
-      await ecp.sendKeyPress(ecp.Key.Right);
+      await ecp.sendKeypress(ecp.Key.Right);
       await utils.sleep(2000);
-      await ecp.sendKeyPress(ecp.Key.Up, {count:2});
+      await ecp.sendKeypress(ecp.Key.Up, {count:2});
       await utils.sleep(2000);
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
     }
 
     async selectTeensFromParentalSettings() {
-      await ecp.sendKeyPress(ecp.Key.Right);
+      await ecp.sendKeypress(ecp.Key.Right);
       await utils.sleep(2000);
-      await ecp.sendKeyPress(ecp.Key.Up, {count:1});
+      await ecp.sendKeypress(ecp.Key.Up, {count:1});
       await utils.sleep(2000);
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
     }
 
     async enterPasswordSettingsChange() {
       // Enter Password for PC Settings Change
       // const // need to expect and await the Sign In screen
-    
-      await ecp.sendKeyPress(ecp.Key.Ok);
+
+      await ecp.sendKeypress(ecp.Key.Ok);
       await ecp.sendText('111111');
-      await ecp.sendKeyPress(ecp.Key.Down, {count:4});
+      await ecp.sendKeypress(ecp.Key.Down, {count:4});
       await utils.sleep(4000);
-      await ecp.sendKeyPress(ecp.Key.Right);
-      await ecp.sendKeyPress(ecp.Key.Left);
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Right);
+      await ecp.sendKeypress(ecp.Key.Left);
+      await ecp.sendKeypress(ecp.Key.Ok);
   }
 
     // openSettings function
@@ -124,7 +124,7 @@ class Shared {
     // This is specifice to the Search screen
     public async  navigateRightToGrid() {
         await testUtils.untilTrue(async () => {
-        await ecp.sendKeyPress(ecp.Key.Right);
+        await ecp.sendKeypress(ecp.Key.Right);
         const {value: id} = await odc.getValue({
             base: 'focusedNode',
             keyPath: 'id'

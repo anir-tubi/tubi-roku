@@ -23,10 +23,10 @@ describe('Parental Controls', function () {
         // Verify Little Kids PC Settings Change dialog
         const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids');
         expect(parentalControlsSettingsLittleKids.text).to.equal('Parental controls setting has changed to Little Kids. Parental controls will be password protected after 5 minutes.');
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
 
         // Back to home
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
 
         // Send deep link for Adult title
         await testUtils.restartApplication({
@@ -59,12 +59,12 @@ describe('Parental Controls', function () {
         await testUtils.retryWithTimeOut(async () => {
             const parentalControlsSettingsTeens = await testUtils.getNodeForElement('parentalControlsSettingsTeens');
             expect(parentalControlsSettingsTeens.text).to.equal('Parental controls setting has changed to Teens. Parental controls will be password protected after 5 minutes.');
-            await ecp.sendKeyPress(ecp.Key.Ok);
+            await ecp.sendKeypress(ecp.Key.Ok);
           });
 
 
         // Back to home
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
 
         // Send deep link for Adult title
         await testUtils.restartApplication({
@@ -96,10 +96,10 @@ describe('Parental Controls', function () {
         // Verify Little Kids PC Settings Change dialog
         const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
         expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
 
         // Back to home
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
 
         // Send deep link for Adult title
         await testUtils.restartApplication({
@@ -129,14 +129,14 @@ describe('Parental Controls', function () {
         // Verify Little Kids PC Settings Change dialog
         const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids');
         expect(parentalControlsSettingsLittleKids.text).to.equal('Parental controls setting has changed to Little Kids. Parental controls will be password protected after 5 minutes.');
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
 
         // Back to home
-        await ecp.sendKeyPress(ecp.Key.Back);
+        await ecp.sendKeypress(ecp.Key.Back);
         await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
         // Open left nav
-        await ecp.sendKeyPress(ecp.Key.Left);
+        await ecp.sendKeypress(ecp.Key.Left);
 
 
         // Is the left Nav open?
@@ -144,9 +144,9 @@ describe('Parental Controls', function () {
         await testUtils.elementHasFocus('leftNavHomeButton');
 
         // Select Categories
-        await ecp.sendKeyPress(ecp.Key.Down, {count:2});
+        await ecp.sendKeypress(ecp.Key.Down, {count:2});
         await utils.sleep(2000); // Improvement
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
 
         // Are we on Categories page?
         await utils.sleep(2000);
@@ -173,14 +173,14 @@ describe('Parental Controls', function () {
         const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
         expect(parentalControlsSettingsOlderKids.visible).to.be.true;
         expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
 
         // Back to home
-        await ecp.sendKeyPress(ecp.Key.Back);
+        await ecp.sendKeypress(ecp.Key.Back);
         await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
         // Open left nav
-        await ecp.sendKeyPress(ecp.Key.Left);
+        await ecp.sendKeypress(ecp.Key.Left);
 
 
         // Is the left Nav open?
@@ -188,9 +188,9 @@ describe('Parental Controls', function () {
         await testUtils.elementHasFocus('leftNavHomeButton');
 
         // Select Categories
-        await ecp.sendKeyPress(ecp.Key.Down, {count:2});
+        await ecp.sendKeypress(ecp.Key.Down, {count:2});
         await utils.sleep(2000); // Improvement
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
 
         // Are we on Categories page?
         await utils.sleep(2000);
@@ -217,14 +217,14 @@ describe('Parental Controls', function () {
         const parentalControlsSettingsTeens = await testUtils.getNodeForElement('parentalControlsSettingsTeens');
         expect(parentalControlsSettingsTeens.visible).to.be.true;
         expect(parentalControlsSettingsTeens.text).to.equal('Parental controls setting has changed to Teens. Parental controls will be password protected after 5 minutes.');
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
 
         // Back to home
-        await ecp.sendKeyPress(ecp.Key.Back);
+        await ecp.sendKeypress(ecp.Key.Back);
         await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
         // Open left nav
-        await ecp.sendKeyPress(ecp.Key.Left);
+        await ecp.sendKeypress(ecp.Key.Left);
 
 
         // Is the left Nav open?
@@ -232,9 +232,9 @@ describe('Parental Controls', function () {
         await testUtils.elementHasFocus('leftNavHomeButton');
 
         // Select Categories
-        await ecp.sendKeyPress(ecp.Key.Down, {count:2});
+        await ecp.sendKeypress(ecp.Key.Down, {count:2});
         await utils.sleep(2000); // Improvement
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
 
         // Are we on Categories page?
         await utils.sleep(2000);
@@ -261,14 +261,14 @@ describe('Parental Controls', function () {
         // Verify Little Kids PC Settings Change dialog
         const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids');
         expect(parentalControlsSettingsLittleKids.text).to.equal('Parental controls setting has changed to Little Kids. Parental controls will be password protected after 5 minutes.');
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
 
         // Back to home
-        await ecp.sendKeyPress(ecp.Key.Back);
+        await ecp.sendKeypress(ecp.Key.Back);
         await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
         // Open left nav
-        await ecp.sendKeyPress(ecp.Key.Left);
+        await ecp.sendKeypress(ecp.Key.Left);
 
 
         // Is the left Nav open?
@@ -294,14 +294,14 @@ describe('Parental Controls', function () {
         // Verify Older Kids PC Settings Change dialog
         const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
         expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
 
         // Back to home
-        await ecp.sendKeyPress(ecp.Key.Back);
+        await ecp.sendKeypress(ecp.Key.Back);
         await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
         // Open left nav
-        await ecp.sendKeyPress(ecp.Key.Left);
+        await ecp.sendKeypress(ecp.Key.Left);
 
 
         // Is the left Nav open?
@@ -327,14 +327,14 @@ describe('Parental Controls', function () {
       // Verify Teens PC Settings Change dialog
       const parentalControlsSettingsTeens = await testUtils.getNodeForElement('parentalControlsSettingsTeens');
       expect(parentalControlsSettingsTeens.text).to.equal('Parental controls setting has changed to Teens. Parental controls will be password protected after 5 minutes.');
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Back to home
-      await ecp.sendKeyPress(ecp.Key.Back);
+      await ecp.sendKeypress(ecp.Key.Back);
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       // Open left nav
-      await ecp.sendKeyPress(ecp.Key.Left);
+      await ecp.sendKeypress(ecp.Key.Left);
 
 
       // Is the left Nav open?
@@ -358,17 +358,17 @@ describe('Parental Controls', function () {
       await enterPasswordSettingsChange();
 
       // Back to home
-      await ecp.sendKeyPress(ecp.Key.Back, {count:4});
+      await ecp.sendKeypress(ecp.Key.Back, {count:4});
 
       // Is the left Nav open?
       const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
       await testUtils.elementHasFocus('leftNavHomeButton');
 
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
 
       // Open left nav
-      await ecp.sendKeyPress(ecp.Key.Left);
+      await ecp.sendKeypress(ecp.Key.Left);
 
 
       // Is the left Nav open?
@@ -394,14 +394,14 @@ describe('Parental Controls', function () {
       const parentalControlsSettingsTeens = await testUtils.getNodeForElement('parentalControlsSettingsTeens');
       expect(parentalControlsSettingsTeens.visible).to.be.true;
       expect(parentalControlsSettingsTeens.text).to.equal('Parental controls setting has changed to Teens. Parental controls will be password protected after 5 minutes.');
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Select another PC Setting
       const parentalControlsMenuTextFocused = testUtils.getNodeForElement('parentalControlsMenuTextFocused');
       await parentalControlsMenuTextFocused;
-      await ecp.sendKeyPress(ecp.Key.Right);
-      await ecp.sendKeyPress(ecp.Key.Up);
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Right);
+      await ecp.sendKeypress(ecp.Key.Up);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Expect dialog instead of Password Screen (Verify that no password is needed to be entered to change parental controls)
       const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
@@ -424,14 +424,14 @@ describe('Parental Controls', function () {
       // Verify Older Kids PC Settings Change dialog
       const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
       expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Back to home
-      await ecp.sendKeyPress(ecp.Key.Back);
+      await ecp.sendKeypress(ecp.Key.Back);
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       // Open left nav
-      await ecp.sendKeyPress(ecp.Key.Left);
+      await ecp.sendKeypress(ecp.Key.Left);
 
 
       // Is the left Nav open?
@@ -440,9 +440,9 @@ describe('Parental Controls', function () {
 
 
       // Select Search
-      await ecp.sendKeyPress(ecp.Key.Up);
+      await ecp.sendKeypress(ecp.Key.Up);
       await utils.sleep(2000);
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Send adult title text
       const searchGrid = testUtils.getNodeForElement('searchGrid');
@@ -480,7 +480,7 @@ describe('Parental Controls', function () {
       // Verify Little Kids PC Settings Change dialog
       const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids');
       expect(parentalControlsSettingsLittleKids.text).to.equal('Parental controls setting has changed to Little Kids. Parental controls will be password protected after 5 minutes.');
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Back to home
       await testUtils.goToPage('home');
@@ -522,7 +522,7 @@ describe('Parental Controls', function () {
       await selectAdultsFromParentalSettings();
 
       // Back to home
-      await ecp.sendKeyPress(ecp.Key.Back, {count:2});
+      await ecp.sendKeypress(ecp.Key.Back, {count:2});
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       // Jump to CW row
@@ -564,10 +564,10 @@ describe('Parental Controls', function () {
       // Verify Older Kids PC Settings Change dialog
       const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
       expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Back to home
-      await ecp.sendKeyPress(ecp.Key.Back);
+      await ecp.sendKeypress(ecp.Key.Back);
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       // Jump to CW row
@@ -609,7 +609,7 @@ describe('Parental Controls', function () {
       // Verify Little Kids PC Settings Change dialog
       const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids');
       expect(parentalControlsSettingsLittleKids.text).to.equal('Parental controls setting has changed to Little Kids. Parental controls will be password protected after 5 minutes.');
-      await ecp.sendKeyPress(ecp.Key.Ok);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Back to home
       await testUtils.goToPage('home');
@@ -657,10 +657,10 @@ describe('Parental Controls', function () {
     // Verify Older Kids PC Settings Change dialog
     const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
     expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Back to home
-    await ecp.sendKeyPress(ecp.Key.Back);
+    await ecp.sendKeypress(ecp.Key.Back);
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Jump to CW row
@@ -701,10 +701,10 @@ describe('Parental Controls', function () {
     // Verify Teens PC Settings Change dialog
     const parentalControlsSettingsTeens = await testUtils.getNodeForElement('parentalControlsSettingsTeens');
     expect(parentalControlsSettingsTeens.text).to.equal('Parental controls setting has changed to Teens. Parental controls will be password protected after 5 minutes.');
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Back to home
-    await ecp.sendKeyPress(ecp.Key.Back);
+    await ecp.sendKeypress(ecp.Key.Back);
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Jump to CW row
@@ -774,44 +774,44 @@ describe('Parental Controls', function () {
 
 
     async function selectOlderKidsFromParentalSettings() {
-        await ecp.sendKeyPress(ecp.Key.Right);
-        await ecp.sendKeyPress(ecp.Key.Up, {count:2});
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Right);
+        await ecp.sendKeypress(ecp.Key.Up, {count:2});
+        await ecp.sendKeypress(ecp.Key.Ok);
       }
 
       async function selectLittleKidsFromParentalSettings() {
-        await ecp.sendKeyPress(ecp.Key.Right);
+        await ecp.sendKeypress(ecp.Key.Right);
         await utils.sleep(2000);
-        await ecp.sendKeyPress(ecp.Key.Up, {count:3});
+        await ecp.sendKeypress(ecp.Key.Up, {count:3});
         await utils.sleep(2000);
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
       }
 
       async function selectTeensFromParentalSettings() {
-        await ecp.sendKeyPress(ecp.Key.Right);
-        await ecp.sendKeyPress(ecp.Key.Up, {count:1});
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Right);
+        await ecp.sendKeypress(ecp.Key.Up, {count:1});
+        await ecp.sendKeypress(ecp.Key.Ok);
       }
 
       async function selectAdultsFromParentalSettings() {
-        await ecp.sendKeyPress(ecp.Key.Right);
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Right);
+        await ecp.sendKeypress(ecp.Key.Ok);
       }
       async function enterPasswordSettingsChange() {
         // Enter Password for PC Settings Change
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
         await ecp.sendText('111111');
-        await ecp.sendKeyPress(ecp.Key.Down, {count:4});
+        await ecp.sendKeypress(ecp.Key.Down, {count:4});
         await utils.sleep(4000);
-        await ecp.sendKeyPress(ecp.Key.Right);
-        await ecp.sendKeyPress(ecp.Key.Left);
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Right);
+        await ecp.sendKeypress(ecp.Key.Left);
+        await ecp.sendKeypress(ecp.Key.Ok);
     }
 
     // Navigate right until the grid is in focus
     async function navigateRightToGrid() {
       await testUtils.untilTrue(async () => {
-        await ecp.sendKeyPress(ecp.Key.Right);
+        await ecp.sendKeypress(ecp.Key.Right);
         const {value: id} = await odc.getValue({
           base: 'focusedNode',
           keyPath: 'id'

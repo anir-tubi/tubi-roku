@@ -10,7 +10,7 @@ describe('Application Launch', function () {
     await testUtils.waitForAppLaunchBeaconToFire();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
   });
-  
+
   // https://tubi.testrail.io/index.php?/cases/view/535807
   it('C535807 User Signed in - Homescreen Display @registered_user,@smoke,@application_launch @application_launch', async () => {
     await testUtils.retryWithTimeOut(async () => {
@@ -28,8 +28,8 @@ describe('Application Launch', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535748
   it('C535748 - Application Launch - Registered User - When user tries to play a title after user has registered device then the title should play on tubi @application_launch, @smoke', async () => {
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Play);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.expectPlayerStateToEventuallyEqual('play', 20000);
   });
 
@@ -38,10 +38,10 @@ describe('Application Launch', function () {
     // Go to Settings page and select Older Kids
    // await testUtils.goToPage('settings');
     await testUtils.goToPage('settings');
-    await ecp.sendKeyPress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Right);
     await utils.sleep(2000);
-    await ecp.sendKeyPress(ecp.Key.Up, { count: 2 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Validate Enter Password Page and message
     const enterPasswordMessage = await testUtils.getNodeForElement('enterPasswordMessage');
@@ -49,9 +49,9 @@ describe('Application Launch', function () {
 
     // Send password and click Continue
     await ecp.sendText('111111');
-    await ecp.sendKeyPress(ecp.Key.Down, { count: 4 });
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await utils.sleep(100); // Only goes over to the right if we sleep here for some reason
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Validate Older Kids modal message, back out to Left Nav and Check Exit Kids menu item is grayed out
     await testUtils.retryWithTimeOut(async () => {
@@ -60,25 +60,25 @@ describe('Application Launch', function () {
     });
     const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
     expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Back);
-    await ecp.sendKeyPress(ecp.Key.Back);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Back);
+    await ecp.sendKeypress(ecp.Key.Back);
     const exitKidsGrayedOut = await testUtils.getNodeForElement('exitKidsGrayedOut');
     expect(exitKidsGrayedOut.visible).to.equal(true);
 
     // Sign out to check that we are not in Kids mode
-    await ecp.sendKeyPress(ecp.Key.Up, { count: 3 });
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.retryWithTimeOut(async () => {
       const settingsScreen = await testUtils.getNodeForElement('settingsScreen');
       expect(settingsScreen.visible).to.be.true;
     });
     const signOutButtonKidsMode = await testUtils.getNodeForElement('signOutButtonKidsMode');
     expect(signOutButtonKidsMode.text).to.equal('Sign Out');
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
     const signOutVerificationModalMessage = await testUtils.getNodeForElement('signOutVerificationModalMessage');
     expect(signOutVerificationModalMessage.text).to.equal('You are about to sign out of your Tubi account.');
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
     const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
     await testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured');
   });
@@ -94,23 +94,23 @@ describe('Application Launch', function () {
     // End Open Movies
 
     // Open and play a title, create history, then back to details page to check for "Resume" button
-    await ecp.sendKeyPress(ecp.Key.Right);
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Play);
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Play);
     await createHistory();
-    await ecp.sendKeyPress(ecp.Key.Back);
+    await ecp.sendKeypress(ecp.Key.Back);
     const resumePlayingButton = await testUtils.getNodeForElement('resumePlayingButton');
     expect(resumePlayingButton.visible).to.equal(true);
 
     // Exit app and restart
     await testUtils.restartApplication();
     await testUtils.waitForApplicationStartup();
-    await ecp.sendKeyPress(ecp.Key.Right);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Ok);
     expect(testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured'));
 
     // Test for resume button (Roku retains resume button for 24 hours)
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
     expect(resumePlayingButton.visible).to.equal(true);
   });
 
@@ -124,13 +124,13 @@ describe('Application Launch', function () {
     await testUtils.waitForAppLaunchBeaconToFire();
 
     // Play title
-    await ecp.sendKeyPress(ecp.Key.Play);
+    await ecp.sendKeypress(ecp.Key.Play);
 
     // Create CW row
     await createHistory();
 
     // Back out to Details page
-    await ecp.sendKeyPress(ecp.Key.Back, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
 
     // Jump To Continue Watching Row
     await testUtils.jumpToRowWithTitle('movieScreenRowList', 'Continue Watching');
@@ -185,10 +185,10 @@ async function createHistory() {
   const node = await testUtils.getNodeForElement('videoPlayerScreen');
   expect(node.visible).to.be.true;
   await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
-  await ecp.sendKeyPress(ecp.Key.Forward);
-  await ecp.sendKeyPress(ecp.Key.Forward);
-  await ecp.sendKeyPress(ecp.Key.Forward);
+  await ecp.sendKeypress(ecp.Key.Forward);
+  await ecp.sendKeypress(ecp.Key.Forward);
+  await ecp.sendKeypress(ecp.Key.Forward);
   await utils.sleep(3000);
-  await ecp.sendKeyPress(ecp.Key.Play);
+  await ecp.sendKeypress(ecp.Key.Play);
   await utils.sleep(2000);
 }

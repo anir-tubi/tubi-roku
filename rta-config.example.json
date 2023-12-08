@@ -1,4 +1,5 @@
 {
+    "$schema": "https://raw.githubusercontent.com/triwav/roku-test-automation/master/client/rta-config.schema.json",
     "RokuDevice": {
         "devices": [
             {
@@ -18,7 +19,7 @@
     },
     "ECP": {
         "default": {
-            "keyPressDelay": 0,
+            "keypressDelay": 0,
             "launchChannelId": "dev"
         }
     },

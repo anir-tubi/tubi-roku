@@ -218,50 +218,50 @@ exports.convertXpathsToKeyPaths = async function (done) {
 
   // Next one for the DetailScreen
   scenarios.push(async () => {
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
   });
 
   // Next one for the VideoScreen
   scenarios.push(async () => {
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
   });
 
   // Next one for the SettingsScreen
   scenarios.push(async () => {
-    await ecp.sendKeyPress(ecp.Key.Back);
-    await ecp.sendKeyPress(ecp.Key.Back);
-    await ecp.sendKeyPress(ecp.Key.Left);
-    await ecp.sendKeyPress(ecp.Key.Down, {count: 5});
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Back);
+    await ecp.sendKeypress(ecp.Key.Back);
+    await ecp.sendKeypress(ecp.Key.Left);
+    await ecp.sendKeypress(ecp.Key.Down, {count: 5});
+    await ecp.sendKeypress(ecp.Key.Ok);
   });
 
   // Next one for the SearchScreen
   scenarios.push(async () => {
-    await ecp.sendKeyPress(ecp.Key.Back);
-    await ecp.sendKeyPress(ecp.Key.Left);
-    await ecp.sendKeyPress(ecp.Key.Up);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Back);
+    await ecp.sendKeypress(ecp.Key.Left);
+    await ecp.sendKeypress(ecp.Key.Up);
+    await ecp.sendKeypress(ecp.Key.Ok);
   });
 
   // Next one for the LinearVideoPlayerScreen
   scenarios.push(async () => {
-    await ecp.sendKeyPress(ecp.Key.Back);
-    await ecp.sendKeyPress(ecp.Key.Down);
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Up);
-    await ecp.sendKeyPress(ecp.Key.Right, {count: 3});
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Back);
+    await ecp.sendKeypress(ecp.Key.Down);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up);
+    await ecp.sendKeypress(ecp.Key.Right, {count: 3});
+    await ecp.sendKeypress(ecp.Key.Ok);
     await utils.sleep(4000);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
   });
 
   // Next one for the Kids Mode
   scenarios.push(async () => {
-    await ecp.sendKeyPress(ecp.Key.Back);
-    await ecp.sendKeyPress(ecp.Key.Left);
-    await ecp.sendKeyPress(ecp.Key.Up);
-    await ecp.sendKeyPress(ecp.Key.Up);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Back);
+    await ecp.sendKeypress(ecp.Key.Left);
+    await ecp.sendKeypress(ecp.Key.Up);
+    await ecp.sendKeypress(ecp.Key.Up);
+    await ecp.sendKeypress(ecp.Key.Ok);
   });
 
   for (const scenario of scenarios) {
@@ -398,9 +398,9 @@ function convertSuitestTestLine(testLine, convertedTestLines) {
       for (const id of testLine.ids) {
         const key = buttonIdToKeyMap[id];
         if (testLine?.count > 1) {
-          convertedTestLines.push(`await ecp.sendKeyPress(${key}, {count: ${testLine.count}});`);
+          convertedTestLines.push(`await ecp.sendKeypress(${key}, {count: ${testLine.count}});`);
         } else {
-          convertedTestLines.push(`await ecp.sendKeyPress(${key});`);
+          convertedTestLines.push(`await ecp.sendKeypress(${key});`);
         }
       }
       break;

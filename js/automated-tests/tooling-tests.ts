@@ -70,11 +70,11 @@ describe('test-utils', function () {
         // It should throw an error here since we didn't focus it yet
         expect(threwError).to.be.true;
 
-        await ecp.sendKeyPress(ecp.Key.Left);
-        await ecp.sendKeyPress(ecp.Key.Up);
+        await ecp.sendKeypress(ecp.Key.Left);
+        await ecp.sendKeypress(ecp.Key.Up);
 
         promise = testUtils.verifyFocusedSideNavMenuItemEquals('search', 1000);
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
         // Should not throw an error this time
         await promise;
       });
@@ -93,10 +93,10 @@ describe('test-utils', function () {
       it('should wait for us to go to the search screen', async () => {
         await testUtils.waitForElementToHaveFocus('homeRowList');
         const promise = testUtils.waitForCurrentScreenToEqual('searchScreen', 2000);
-        await ecp.sendKeyPress(ecp.Key.Left);
+        await ecp.sendKeypress(ecp.Key.Left);
         await utils.sleep(800); // There is a bug in our menu that requires us to wait until after animation to proceed up
-        await ecp.sendKeyPress(ecp.Key.Up);
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Up);
+        await ecp.sendKeypress(ecp.Key.Ok);
         await promise;
       });
     });
@@ -214,7 +214,7 @@ describe('test-utils', function () {
       });
 
       it('should not throw an Error if the main menu is expanded', async () => {
-        await ecp.sendKeyPress(ecp.Key.Left);
+        await ecp.sendKeypress(ecp.Key.Left);
         await testUtils.waitForSideNavMenuToBeExpanded();
       });
 
@@ -242,7 +242,7 @@ describe('test-utils', function () {
 
       it('should throw an error if the main menu is expanded', async () => {
         try {
-          await ecp.sendKeyPress(ecp.Key.Left);
+          await ecp.sendKeypress(ecp.Key.Left);
           await testUtils.waitForSideNavMenuToNotBeExpanded(500);
         } catch (e) {
           // Failed as expected
@@ -290,7 +290,7 @@ describe('test-utils', function () {
       });
 
       it('should not throw an Error if the main menu is expanded', async () => {
-        await ecp.sendKeyPress(ecp.Key.Left);
+        await ecp.sendKeypress(ecp.Key.Left);
         await testUtils.waitForMainMenuToBeExpanded();
       });
 
@@ -318,7 +318,7 @@ describe('test-utils', function () {
 
       it('should throw an error if the main menu is expanded', async () => {
         try {
-          await ecp.sendKeyPress(ecp.Key.Left);
+          await ecp.sendKeypress(ecp.Key.Left);
           await testUtils.waitForMainMenuToNotBeExpanded(500);
         } catch (e) {
           // Failed as expected

@@ -17,27 +17,27 @@ describe('Autoplay Movies', function () {
         expect(movieScreenRowList.visible).to.equal(true);
 
         //Play title, pause to open player, move right to FF button and press, verify state
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
         const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
         expect(videoPlayerActual.visible).to.equal(true);
         await testUtils.expectPlayerStateToEventuallyEqual('play');
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
         const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
         expect(playPauseButton.visible).to.equal(true);
-        await ecp.sendKeyPress(ecp.Key.Right, { count: 2 });
+        await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
 
         // FF button highlighted
         const fastForwardButton = await testUtils.getNodeForElement('fastForwardButton');
         expect(fastForwardButton.visible).to.equal(true);
 
         // Press FF button 3 times
-        await ecp.sendKeyPress(ecp.Key.Ok, { count: 3 });
+        await ecp.sendKeypress(ecp.Key.Ok, { count: 3 });
 
         // FF until cue point
         await utils.sleep(60000);
 
         // Play to trigger autoplay
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
 
         // Autoplay triggered?
         const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay');
@@ -53,28 +53,28 @@ describe('Autoplay Movies', function () {
         expect(movieScreenRowList.visible).to.equal(true);
 
         //Play title, pause to open player, move right to FF button and press, verify state
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
         const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
         expect(videoPlayerActual.visible).to.equal(true);
         await utils.sleep(500); //Improvement
         await testUtils.expectPlayerStateToEventuallyEqual('play');
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
         const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
         expect(playPauseButton.visible).to.equal(true);
-        await ecp.sendKeyPress(ecp.Key.Right, { count: 2 });
+        await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
 
         // FF button highlighted
         const fastForwardButton = await testUtils.getNodeForElement('fastForwardButton');
         expect(fastForwardButton.visible).to.equal(true);
 
         // Press FF button 3 times
-        await ecp.sendKeyPress(ecp.Key.Ok, { count: 3 });
+        await ecp.sendKeypress(ecp.Key.Ok, { count: 3 });
 
         // FF until cue point
         await utils.sleep(60000);
 
         // Play to trigger autoplay
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
 
         // Autoplay triggered?
         const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay');
@@ -82,7 +82,7 @@ describe('Autoplay Movies', function () {
 
         // Scroll to next selection
         await utils.sleep(10000);
-        await ecp.sendKeyPress(ecp.Key.Right);
+        await ecp.sendKeypress(ecp.Key.Right);
 
         // Timer restarts?
         await utils.sleep(1000);
@@ -98,27 +98,27 @@ describe('Autoplay Movies', function () {
         expect(movieScreenRowList.visible).to.equal(true);
 
         //Play title, pause to open player, move right to FF button and press, verify state
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
         const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
         expect(videoPlayerActual.visible).to.equal(true);
         await testUtils.expectPlayerStateToEventuallyEqual('play');
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
         const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
         expect(playPauseButton.visible).to.equal(true);
-        await ecp.sendKeyPress(ecp.Key.Right, { count: 2 });
+        await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
 
         // FF button highlighted
         const fastForwardButton = await testUtils.getNodeForElement('fastForwardButton');
         expect(fastForwardButton.visible).to.equal(true);
 
         // Press FF button 3 times
-        await ecp.sendKeyPress(ecp.Key.Ok, { count: 3 });
+        await ecp.sendKeypress(ecp.Key.Ok, { count: 3 });
 
         // FF until cue point
         await utils.sleep(60000);
 
         // Play to trigger autoplay
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
         await utils.sleep(1000);
 
         // Autoplay triggered?
@@ -127,10 +127,10 @@ describe('Autoplay Movies', function () {
 
         // Scroll to last selection
         await utils.sleep(1000);
-        await ecp.sendKeyPress(ecp.Key.Right, { count: 10 });
+        await ecp.sendKeypress(ecp.Key.Right, { count: 10 });
 
         // Press OK, does movie start?
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
         expect(videoPlayerActual.visible).to.equal(true);
         await testUtils.expectPlayerStateToEventuallyEqual('play');
 
@@ -145,41 +145,41 @@ describe('Autoplay Movies', function () {
         expect(movieScreenRowList.visible).to.equal(true);
 
         //Play title, pause to open player, move right to FF button and press, verify state
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
         const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
         expect(videoPlayerActual.visible).to.equal(true);
         await testUtils.expectPlayerStateToEventuallyEqual('play');
         await utils.sleep(500);
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
         const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
         expect(playPauseButton.visible).to.equal(true);
-        await ecp.sendKeyPress(ecp.Key.Right, { count: 2 });
+        await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
 
         // FF button highlighted
         const fastForwardButton = await testUtils.getNodeForElement('fastForwardButton');
         expect(fastForwardButton.visible).to.equal(true);
 
         // Press FF button 3 times
-        await ecp.sendKeyPress(ecp.Key.Ok, { count: 3 });
+        await ecp.sendKeypress(ecp.Key.Ok, { count: 3 });
 
         // FF until cue point
         await utils.sleep(60000);
 
         // Play to trigger autoplay
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
 
         // Autoplay triggered?
         const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay');
         expect(countDownMovieAutoPlay.visible).to.equal(true);
 
         // Press OK for 1st movie title, does movie start?
-        await ecp.sendKeyPress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);
         expect(videoPlayerActual.visible).to.equal(true);
         await testUtils.expectPlayerStateToEventuallyEqual('play');
 
     });
     //Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/76115
-   
+
     it('C76115 - Autoplay - Movie - When content focused then year and duration displayed @autoplay,@smoke', async () => {
 
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
@@ -189,27 +189,27 @@ describe('Autoplay Movies', function () {
         expect(movieScreenRowList.visible).to.equal(true);
 
         //Play title, pause to open player, move right to FF button and press, verify state
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
         const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
         expect(videoPlayerActual.visible).to.equal(true);
         await testUtils.expectPlayerStateToEventuallyEqual('play');
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
         const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
         expect(playPauseButton.visible).to.equal(true);
-        await ecp.sendKeyPress(ecp.Key.Right, { count: 2 });
+        await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
 
         // FF button highlighted
         const fastForwardButton = await testUtils.getNodeForElement('fastForwardButton');
         expect(fastForwardButton.visible).to.equal(true);
 
         // Press FF button 3 times
-        await ecp.sendKeyPress(ecp.Key.Ok, { count: 3 });
+        await ecp.sendKeypress(ecp.Key.Ok, { count: 3 });
 
         // FF until cue point
         await utils.sleep(100000);
 
         // Play to trigger autoplay
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
 
         // Autoplay triggered?
         const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay');
@@ -237,27 +237,27 @@ describe('Autoplay Movies', function () {
         });
 
         //Play title, pause to open player, move right to FF button and press, verify state
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
         const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
         expect(videoPlayerActual.visible).to.equal(true);
         await testUtils.expectPlayerStateToEventuallyEqual('play');
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
         const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
         expect(playPauseButton.visible).to.equal(true);
-        await ecp.sendKeyPress(ecp.Key.Right, { count: 2 });
+        await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
 
         // FF button highlighted
         const fastForwardButton = await testUtils.getNodeForElement('fastForwardButton');
         expect(fastForwardButton.visible).to.equal(true);
 
         // Press FF button three times
-        await ecp.sendKeyPress(ecp.Key.Ok, { count: 3 });
+        await ecp.sendKeypress(ecp.Key.Ok, { count: 3 });
 
         // FF until cue point
         await utils.sleep(60000);
 
         // Play to trigger autoplay
-        await ecp.sendKeyPress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Play);
 
         // Autoplay triggered?
         const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay');

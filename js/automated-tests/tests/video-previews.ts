@@ -38,7 +38,7 @@ describe('Video Preview', function () {
     await testUtils.expectPlayerStateToEventuallyEqual('play');
 
     // Go to the detail screen
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify that video is still playing
     await testUtils.expectPlayerStateToEventuallyEqual('play');
@@ -63,7 +63,7 @@ describe('Video Preview', function () {
     await testUtils.expectPlayerStateToEventuallyEqual('play');
 
     // Go to details page and verify that video preview continues
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify we are on the details page
     const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
@@ -84,13 +84,13 @@ describe('Video Preview', function () {
     await testUtils.expectPlayerStateToEventuallyEqual('play');
 
     // Go to details page and verify that video preview continues
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify that video is still playing
     await testUtils.expectPlayerStateToEventuallyEqual('play');
 
     // Back to home screen
-    await ecp.sendKeyPress(ecp.Key.Back);
+    await ecp.sendKeypress(ecp.Key.Back);
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Verify that video is still playing
@@ -104,21 +104,21 @@ describe('Video Preview', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     //Open left nav
-    await ecp.sendKeyPress(ecp.Key.Left);
+    await ecp.sendKeypress(ecp.Key.Left);
 
     // Open settings
     await shared.openSettings();
 
     // Turn off video previews
-    await ecp.sendKeyPress(ecp.Key.Down);
-    await ecp.sendKeyPress(ecp.Key.Ok);
-    await ecp.sendKeyPress(ecp.Key.Down);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
 
 
     // Go back to home page and verify that autoplay is off
-    await ecp.sendKeyPress(ecp.Key.Back, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
 
     // Verify that video preview is not playing
     const player = await ecp.getMediaPlayer();
@@ -154,7 +154,7 @@ describe('Video Preview', function () {
     await openKidsMode();
 
     // Navigate right to home page focus
-    await ecp.sendKeyPress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Right);
 
     // Verify that video is playing
     await testUtils.expectPlayerStateToEventuallyEqual('play');
@@ -173,7 +173,7 @@ describe('Video Preview', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open settings
-    await ecp.sendKeyPress(ecp.Key.Left);
+    await ecp.sendKeypress(ecp.Key.Left);
     await shared.openSettings();
 
     // Are we on Settings page?
@@ -181,12 +181,12 @@ describe('Video Preview', function () {
     expect((await settingsScreen).visible).to.equal(true);
 
     // Turn off video previews
-    await ecp.sendKeyPress(ecp.Key.Down);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Down);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await utils.sleep(2000); // Improvement
-    await ecp.sendKeyPress(ecp.Key.Down);
+    await ecp.sendKeypress(ecp.Key.Down);
     await utils.sleep(2000); // Improvement
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await utils.sleep(2000); // Improvement
     // const autoplayPreviewOff = await testUtils.getNodeForElement('autoplayPreviewOff');
     // expect(autoplayPreviewOff.visible).to.be.true;
@@ -212,40 +212,40 @@ describe('Video Preview', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Navigate to My Stuff
-    await ecp.sendKeyPress(ecp.Key.Left);
+    await ecp.sendKeypress(ecp.Key.Left);
 
     // Check for left nav home button
     const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
     expect(leftNavHomeButton.text).to.be.equal('Home');
 
-    await ecp.sendKeyPress(ecp.Key.Down);
+    await ecp.sendKeypress(ecp.Key.Down);
     const myStuffLeftNav = await testUtils.getNodeForElement('myStuffLeftNav');
     await utils.sleep(2000);
     expect(myStuffLeftNav);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Let's check for My Stuff page, CW row here
     const continueWatchingRow = testUtils.getNodeForElement('continueWatchingRow');
     expect(continueWatchingRow);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
 
     // Verify that video is playing
     await testUtils.expectPlayerStateToEventuallyEqual('play');
 
     // Enter Details page and remove history
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.selectAndVerifyDetailPageMenuItem('removeFromHistory');
     await utils.sleep(1000);
-    await ecp.sendKeyPress(ecp.Key.Back);
+    await ecp.sendKeypress(ecp.Key.Back);
 
     // 2nd movie
     await utils.sleep(2000);
     expect(continueWatchingRow);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.selectAndVerifyDetailPageMenuItem('removeFromHistory');
     await utils.sleep(1000);
-    await ecp.sendKeyPress(ecp.Key.Back);
+    await ecp.sendKeypress(ecp.Key.Back);
 
     const emptyMyStuffPage = await testUtils.getNodeForElement('emptyMyStuffPage');
     expect(emptyMyStuffPage.visible).to.be.true;
@@ -255,15 +255,15 @@ describe('Video Preview', function () {
     expect(previewVideoPlayer.visible).to.be.false;
   });
 
-  
+
 
   async function openKidsMode() {
 
-    await ecp.sendKeyPress(ecp.Key.Left);
-    await ecp.sendKeyPress(ecp.Key.Up);
+    await ecp.sendKeypress(ecp.Key.Left);
+    await ecp.sendKeypress(ecp.Key.Up);
     await utils.sleep(3000); // Adding sleeps temporary // Improvement - try to work around sleeps
-    await ecp.sendKeyPress(ecp.Key.Up);
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Up);
+    await ecp.sendKeypress(ecp.Key.Ok);
     const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
     expect(exitKidsOption.visible).to.be.true;
   }

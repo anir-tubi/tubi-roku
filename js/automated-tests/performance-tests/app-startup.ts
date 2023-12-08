@@ -58,7 +58,7 @@ describe('app-startup', function () {
       }
     });
 
-    await ecp.sendKeyPress(ecp.Key.Home);
+    await ecp.sendKeypress(ecp.Key.Home);
 
     // Wait until the application has shutdown
     await testUtils.waitForApplicationShutdown();
@@ -93,7 +93,7 @@ describe('app-startup', function () {
     const {totalNodes: previousTotalNodes} = await odc.storeNodeReferences({includeNodeCountInfo: true});
     await odc.deleteNodeReferences();
 
-    await ecp.sendKeyPress(ecp.Key.Home);
+    await ecp.sendKeypress(ecp.Key.Home);
 
     // Wait until the application has shutdown
     await testUtils.waitForApplicationShutdown();
@@ -116,7 +116,7 @@ describe('app-startup', function () {
     await utils.sleep(4000);
 
     // Remove the open modal for better node increase measurement
-    await ecp.sendKeyPress(ecp.Key.Ok);
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Waiting for all initial nodes to load to get a better idea of true node count and memory usage
     const {totalNodes, nodeCountByType} = await performanceTestUtils.waitForNodeCountStability();
