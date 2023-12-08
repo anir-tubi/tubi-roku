@@ -3013,6 +3013,26 @@ Function getTranslation_es_MX()
       "description": "The title displayed above a list of live TV channels",
       "message": "Guía de Canales"
     },
+    "linearVideoPlayer_buttonTvGuide": {
+      "description": "Label of a Button to view the TV channel guide",
+      "message": "Guía TV"
+    },
+    "linearVideoPlayer_buttonLanguage": {
+      "description": "Label of a Button which is displayed on linear player screen to select language",
+      "message": "Idioma"
+    },
+    "linearVideoPlayer_comingUp": {
+      "description": "Label of a coming up program in linear video player",
+      "message": "Próximamente"
+    },
+    "linearVideoPlayer_comingUpAt": {
+      "description": "Label of a coming up program with time in linear video player",
+      "message": "Próximamente en {time}"
+    },
+    "linearVideoPlayer_timeLeft": {
+      "description": "Label to display time left in linear video player info panel",
+      "message": "{time} quedan"
+    },
     "goBack_categories": {
       "description": "Navigational instructions to users on what the back button does on the current page",
       "message": "PRESIONA ATRÁS PARA VOLVER A LAS CATEGORÍAS"
@@ -4665,6 +4685,26 @@ Function getTranslation_fr_CA()
     "linearVideoPlayer_channelGuideTitle": {
       "description": "The title displayed above a list of live TV channels",
       "message": "Guide des chaînes"
+    },
+    "linearVideoPlayer_buttonTvGuide": {
+      "description": "Label of a Button to view the TV channel guide",
+      "message": "Guide TV"
+    },
+    "linearVideoPlayer_buttonLanguage": {
+      "description": "Label of a Button which is displayed on linear player screen to select language",
+      "message": "Langue"
+    },
+    "linearVideoPlayer_comingUp": {
+      "description": "Label of a coming up program in linear video player",
+      "message": "À venir"
+    },
+    "linearVideoPlayer_comingUpAt": {
+      "description": "Label of a coming up program with time in linear video player",
+      "message": "À venir à {time}"
+    },
+    "linearVideoPlayer_timeLeft": {
+      "description": "Label to display time left in linear video player info panel",
+      "message": "{time} restantes"
     },
     "goBack_categories": {
       "description": "Navigational instructions to users on what the back button does on the current page",
