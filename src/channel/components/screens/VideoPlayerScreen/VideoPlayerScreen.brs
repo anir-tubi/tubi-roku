@@ -1287,7 +1287,7 @@ End Function
 ' Make sure the Video node is stopped and we have an accurate playback position before launching ads
 Function showAdBreak()
   ' leave m.VideoState = "play" because from the component's perspective video is still playing
-  m.Video.control = "stop"
+  m.Video.controlInput = "stop"
   hideClosedCaptionAudioTrackOverlay()  ' if dialog is showing, it's awkward to have it still show after ad break
 
   m.top.adPosition = m.playerPosition
@@ -1406,7 +1406,7 @@ Function stopVideo()
   ' add check so that onVideoStateChange doesn't get called
   ' if the video is already in a non playing state.
   if videoState <> "stop"
-    m.Video.control = "stop"
+    m.Video.controlInput = "stop"
   end if
 End Function
 

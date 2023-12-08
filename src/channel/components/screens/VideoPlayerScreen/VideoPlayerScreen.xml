@@ -206,7 +206,7 @@
   </interface>
 
   <children>
-    <Video
+    <TubiVideo
       id="VideoNode"
       width="1920"
       height="1080"

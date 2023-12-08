@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ - TubiVideo
+ -
+ - Our extension of the Roku Video node to allow working around issues like control=stop causing timeouts
+ -
+ -->
+<component name="TubiVideo" extends="Video" >
+  <script type="text/brightscript" uri="TubiVideo.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+
+  <interface>
+    <!-- INPUT -->
+      <!-- Since we extend Video, we need to use our own control input so that we can modify behavior in cases like calling stop-->
+      <field id="controlInput" type="string" />
+  </interface>
+</component>
