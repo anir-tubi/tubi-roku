@@ -3007,7 +3007,7 @@ Function getTranslation_es_MX()
     },
     "goBack_videoPlayer_upNext": {
       "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "ATRÁS PARA DESCARTAR"
+      "message": "DESCARTAR"
     },
     "goBack_videoPlayer_controls": {
       "description": "Navigational instructions to users on what the back button does on the current page",
@@ -4660,7 +4660,7 @@ Function getTranslation_fr_CA()
     },
     "goBack_videoPlayer_upNext": {
       "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "RETOUR POUR REJETER"
+      "message": "REJETER"
     },
     "goBack_videoPlayer_controls": {
       "description": "Navigational instructions to users on what the back button does on the current page",
