@@ -2278,6 +2278,7 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
   if programFromServer.has_subtitle <> invalid
     translatedProgram.hasSubtitles = programFromServer.has_subtitle
   end if
+
   if programFromServer.year <> invalid
     translatedProgram.releaseDate = programFromServer.year
   end if

@@ -30,7 +30,7 @@ Function init()
   m.Video.observeField("timedMetaData", "onId3")
 
   m.Video.timedMetaDataSelectionKeys = ["*"]
-
+  m.isClosedCaptionAudioOverlayShowing = false
 
   m.top.observeField("fullscreen", "onFullScreenChange")
   m.top.observeField("updateContent", "onContentChange")
@@ -51,6 +51,7 @@ Function init()
 
   m.lastButtonPressPos = 0
   m.overlayAutoHideTime = m.constants.settings.videoOverlayAutoHideTime
+  m.overlayLiteAutoHideTime = m.constants.settings.videoOverlayLiteAutoHideTime
   m.bufferingInfo = invalid
 
   'm.lastPingTime helps to prevent extra live play progress event and also helps to send live play progress event in proper interval.
@@ -79,13 +80,24 @@ End Function
 
 ' set up the video player's overlay controls
 Function setupOverlay()
-  m.VideoOverlay = m.top.findNode("VideoOverlay")
-  m.VideoOverlay.observeField("reactedToKeyPresss", "onOverlayReactedToKeyPress")
-  m.VideoOverlay.observeField("closedCaptioningSelectedLanguage", "onClosedCaptioningSelected")
-  m.VideoOverlay.observeField("isDisplaying", "onVideoOverlayIsDisplayingChanged")
-  m.VideoOverlay.observeField("linearChannelToPlayUpdated", "onChannelSelectedToPlayChanged")
-  m.VideoOverlay.observeField("okPressed", "onOKPressed")
-  m.VideoOverlay.observeField("epgTrackingComponentInfo", "oneEPGTrackingComponentInfoChange")
+  if getExperimentResource("roku_linear_player_view", "roku_linear_player_view_v1", false).enabled = true
+    m.VideoOverlay = m.top.findNode("VideoOverlayLite")
+    m.VideoOverlay.observeFieldScoped("isClosedCaptionAudioOverlayShowing", "OnClosedCaptionAudioOverlayShowing")
+  else
+    m.VideoOverlay = m.top.findNode("VideoOverlay")
+    m.VideoOverlay.observeFieldScoped("okPressed", "onOKPressed")
+    m.VideoOverlay.observeFieldScoped("closedCaptioningSelectedLanguage", "onClosedCaptioningSelected")
+    m.VideoOverlay.observeFieldScoped("epgTrackingComponentInfo", "oneEPGTrackingComponentInfoChange")
+  end if
+  m.VideoOverlay.observeFieldScoped("linearChannelToPlayUpdated", "onChannelSelectedToPlayChanged")
+  m.VideoOverlay.observeFieldScoped("isDisplaying", "onVideoOverlayIsDisplayingChanged")
+  m.VideoOverlay.observeFieldScoped("reactedToKeyPresss", "onOverlayReactedToKeyPress")
+  m.VideoOverlay.visible = true
+End Function
+
+
+Function onClosedCaptionAudioOverlayShowing(msg)
+  m.isClosedCaptionAudioOverlayShowing = msg.getData()
 End Function
 
 
@@ -391,9 +403,13 @@ Function onVideoPositionChange()
     m.AdsSSAITask.videoPosition = m.Video.position
   end if
 
-  if m.VideoState = "play" AND m.VideoOverlay <> invalid AND m.VideoOverlay.isDisplaying = true AND m.VideoOverlay.epgScrollingStatus = false AND m.playerPosition > m.lastButtonPressPos + m.overlayAutoHideTime
-    '//After some time has elapsed and the channel guide isn't currently visible and loading, then hide the overlay
-    hideOverlay()
+   '//After some time has elapsed and the channel guide isn't currently visible and loading, then hide the overlay
+  if m.VideoState = "play" AND m.VideoOverlay <> invalid AND m.VideoOverlay.isDisplaying = true
+    if m.VideoOverlay.subtype() = "LinearVideoPlayerScreenOverlayLite" AND m.isClosedCaptionAudioOverlayShowing = false AND m.playerPosition > m.lastButtonPressPos + m.overlayLiteAutoHideTime
+      hideOverlay()
+    else if m.VideoOverlay.epgScrollingStatus = false AND m.playerPosition > m.lastButtonPressPos + m.overlayAutoHideTime
+      hideOverlay()
+    end if
   end if
 
   ' Analytics
@@ -468,9 +484,15 @@ End Function
 Function onCaptionModeChange()
   tubiLog("LinearVideoPlayerScreen.onCaptionModeChange")
 
-  hideOverlay()
-  ' update the closed captions UI. It may look the same but the enabled icon may be different
-  createContentForClosedCaptioning()
+  if m.VideoOverlay <> invalid
+    if m.VideoOverlay.subtype() = "LinearVideoPlayerScreenOverlay"
+      hideOverlay()
+      ' update the closed captions UI. It may look the same but the enabled icon may be different
+      createContentForClosedCaptioning()
+    else if m.VideoOverlay.subtype() = "LinearVideoPlayerScreenOverlayLite"
+      m.VideoOverlay.videoNode = m.Video
+    end if
+  end if
 
   if m.Video.globalCaptionMode = "On"
     toggleState = "ON"
@@ -581,8 +603,16 @@ End Function
 'exit the video player due to back button while no transport displaying, or during ad break
 Function backButtonExit()
   m.top.backButtonPressed = true
-  m.VideoOverlay.animationDuration = 0
-  m.VideoOverlay.display = false
+
+  if m.VideoOverlay.hasField("animationDuration") = true
+    m.VideoOverlay.animationDuration = 0
+  end if
+
+  m.VideoOverlay.hideOverlay = true
+
+  if m.VideoOverlay.hasField("hideComingUpOverlay") = true
+    m.VideoOverlay.hideComingUpOverlay = true
+  end if
 End Function
 
 
@@ -651,8 +681,14 @@ Function updateVideoPlayerState(content) as void
   ' make the content available to the video node
   m.Video.content = content
 
-  ' Update the closed captioning
-  createContentForClosedCaptioning()
+  if m.VideoOverlay <> invalid
+    if m.VideoOverlay.subtype() = "LinearVideoPlayerScreenOverlayLite"
+      m.VideoOverlay.videoNode = m.Video
+    else if m.VideoOverlay.subtype() = "LinearVideoPlayerScreenOverlay"
+      'Update the closed captioning
+      createContentForClosedCaptioning()
+    end if
+  end if
 End Function
 
 
@@ -893,17 +929,56 @@ End Function
 
 
 'show the overlay
-Function showOverlay(bDelay = false)
+'
+'@bDelay: boolean, the epg overlay displayed after a delay. Default is false
+'@key: String, remote key press
+Function showOverlay(bDelay = false, key = "")
+  if getExperimentResource("roku_linear_player_view", "roku_linear_player_view_v1", true).enabled = true
+    showLiteOverlay(key)
+  else
+    showEPGOverlay(bDelay)
+  end if
+End Function
+
+
+'showEPGOverlay displays the EPG overlay
+'
+'@bDelay: boolean, the epg overlay displayed after a delay. Default is false
+Function showEPGOverlay(bDelay = false)
   m.lastButtonPressPos = m.playerPosition
   m.VideoOverlay.displayWithDelay = bDelay
   m.VideoOverlay.animationDuration = .15
-  m.VideoOverlay.display = true
+  m.VideoOverlay.showOverlay = true
+End Function
+
+
+'showLiteOverlay displays the lite overlay
+'
+'@key: string, remote key press
+Function showLiteOverlay(key = "")
+  m.lastButtonPressPos = m.playerPosition
+
+  if key = "up"
+    m.VideoOverlay.decreaseChannel = true
+  else if key = "down"
+    m.VideoOverlay.increaseChannel = true
+  else
+    m.VideoOverlay.showOverlay = true
+  end if
 End Function
 
 
 ' Hide the overlay
 Function hideOverlay()
-  m.VideoOverlay.display = false
+  m.VideoOverlay.hideOverlay = true
+
+  if m.VideoOverlay.hasField("hideComingUpOverlay") = true
+    m.VideoOverlay.hideComingUpOverlay = true
+  end if
+
+  if m.VideoOverlay.hasField("hideClosedCaptionAudioTrackOverlay") = true
+    m.VideoOverlay.hideClosedCaptionAudioTrackOverlay = true
+  end if
 End Function
 
 
@@ -934,10 +1009,10 @@ Function onKeyEvent(key as string, press as boolean) as boolean
         backButtonExit()
       else if m.top.state = "playing"
         '// Any button should wake the overlays as long as the video is playing
-        showOverlay()
+        showOverlay(false, key)
       else if m.top.state = "stopped" and m.top.channelSelected <> invalid and m.top.channelSelected.needsLogin = true and m.Loading.visible = true
         '// Any button should wake the overlay even when video is not playing and channel selected is locked
-        showOverlay()
+        showOverlay(false, key)
       end if
     end if
 

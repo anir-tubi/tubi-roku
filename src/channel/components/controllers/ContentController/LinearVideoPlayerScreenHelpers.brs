@@ -45,6 +45,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         videoPlayer.observeFieldScoped("linearOverlayComponentInteractionInfo", "onComponentInteractionInfoChange")
         videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
         videoPlayer.observeFieldScoped("channelLikeDislikeInfo", "onChannelLikeDislikeInfo")
+        videoPlayer.observeFieldScoped("linearOverlayLiteComponentInteractionInfo", "onComponentInteractionInfoChange")
 
         initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
         setInScreenCache(videoPlayer)
@@ -67,7 +68,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
       if videoPlayer.visible = false
         videoPlayer.visible = true
       end if
-      
+
       videoPlayer.userConsentsOptOutStatus = getConsentsOptOutStatus()
       videoPlayer.didUserOptOutOfPersonalizedAdvertising = getConsentOptOutStatusByKey(m.constants.consentKeys.personalization)
 

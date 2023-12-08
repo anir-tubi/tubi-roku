@@ -853,6 +853,14 @@ Function getConstants()
 
       constants.player.audioDescriptionTrackNamePrefix = "Audio Description"
 
+      'constants needed for the linear video player
+      constants.player.linear = {}
+
+        ' duration (in seconds) of coming up panel displayed within info panel
+        constants.player.linear.comingUpInsideInfoPanelDuration = 300
+        ' duration (in seconds) of coming up panel displayed outside info panel
+        constants.player.linear.comingUpOutsideInfoPanelDuration = 15
+
   ' constants used for EPG
   constants.EPGChannelPlayMode = {}
   constants.EPGChannelPlayMode.playItemOnSelect = "playItemOnSelect"
@@ -1030,6 +1038,7 @@ Function getConstants()
       constants.ui.infoPanelModes.episode = "episode"
       constants.ui.infoPanelModes.linearHomeScreen = "linearHomeScreen"
       constants.ui.infoPanelModes.epg = "epg"
+      constants.ui.infoPanelModes.simplifiedLinearPlayer = "simplifiedLinearPlayer"
       constants.ui.infoPanelModes.linearSearch = "linearSearch"
       constants.ui.infoPanelModes.programHomescreen = "programHomescreen"
       constants.ui.infoPanelModes.viewMore = "viewMore"

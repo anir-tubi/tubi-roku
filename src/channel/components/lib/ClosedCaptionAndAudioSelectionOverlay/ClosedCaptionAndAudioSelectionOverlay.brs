@@ -43,7 +43,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.closedCaptionSelector.focusBitmapBlendColor = theme.focusedColor
     m.audioTrackSelector.focusBitmapBlendColor = theme.focusedColor
@@ -76,7 +76,6 @@ End Function
 Function renderAvailableClosedCaptionTracks()
   availableClosedCaptionTracks = m.top.availableClosedCaptionTracks
   closedCaptionTrack = m.top.closedCaptionTrack
-
   trackNodes = []
   if availableClosedCaptionTracks.Count() > 0
     globalCaptionMode = m.globalCaptionMode
@@ -103,19 +102,19 @@ Function renderAvailableClosedCaptionTracks()
         defaultCheckedItemIndex = index
       end if
     end for
-    
+
     ' Setting the initial default checked item index.
     m.closedCaptionSelector.defaultCheckedItemIndex = defaultCheckedItemIndex
 
     node = CreateObject("roSGNode", "ContentNode")
     node.update(trackNodes, true)
-    
+
     m.closedCaptionSelector.content = node
   else
     ' Resetting the content.
     m.closedCaptionSelector.content = invalid
   end if
-  
+
   ' Hiding the closed caption section if there are no options available.
   ' Using scale so that layout adjust position accordingly.
   if trackNodes.Count() > 0
@@ -151,7 +150,7 @@ Function renderAudioTracks()
         })
 
         if checked = true
-          m.audioTrackSelector.defaultCheckedItemIndex = index 
+          m.audioTrackSelector.defaultCheckedItemIndex = index
         end if
         index = index + 1
       end if
@@ -195,7 +194,7 @@ Function onClosedCaptionSelectorItemSelectedChange(msg)
     m.top.globalCaptionTurnedOn = true
     m.globalCaptionMode = "On"
     selectedTrack = m.top.availableClosedCaptionTracks[itemSelected - 1]
-    
+
     if selectedTrack <> invalid
       m.top.trackingEventInfo = {
         type: "subtitles_toggle"
@@ -218,7 +217,7 @@ Function onAudioTrackSelectorItemSelectedChange(msg)
   if selectedTrack <> invalid
     m.top.audioTrack = selectedTrack.track
     m.currentAudioTrack = selectedTrack.track
-    
+
     hasAccessibilityDescription = false
     if selectedTrack.name.instr(m.constants.player.audioDescriptionTrackNamePrefix) > -1
       hasAccessibilityDescription = true
@@ -256,7 +255,7 @@ Function onKeyEvent(key as string, press as boolean) as boolean
   if press = false
     return false
   end if
-  
+
   if key = "down" AND m.closedCaptionSelector.isInFocusChain() = true AND m.audioTrackSelector.content <> invalid
     return m.audioTrackSelector.setFocus(true)
   else if key = "up" AND m.audioTrackSelector.isInFocusChain() = true AND m.closedCaptionSelector.content <> invalid

@@ -321,22 +321,33 @@ Function onLineOneDataChange(msg)
     ' handle text
     text = ""
 
+    if isNonEmptyString(data.timeLeft)
+      text = data.timeLeft + " "
+    end if
+
     ' expect that data.releaseDate and data.hoursOfAiring are mutually exclusive
     if isNonEmptyString(data.releaseDate)
-      text = data.releaseDate + " "
+      ' add 'dot' spacer only if we had a timeLeft & releaseDate
+      if text.len() > 0
+        text += Chr(&hb7) + " "
+      end if
+      text += data.releaseDate + " "
     else if isNonEmptyString(data.hoursOfAiring) = true
-      text = data.hoursOfAiring + " "
+      ' add 'dot' spacer only if we had a timeLeft & hoursOfAiring
+      if text.len() > 0
+        text += Chr(&hb7) + " "
+      end if
+      text += data.hoursOfAiring + " "
     end if
 
     if data.length <> invalid AND data.length <> 0
-      ' add 'dot' spacer only if we had a release date
+      ' add 'dot' spacer only if we had a timeLeft/releaseDate/hoursOfAiring
       if text.len() > 0
         text += Chr(&hb7) + " "
       end if
 
       text += formatLengthSelectedLocale(data.length) + " "
     end if
-
 
     if data.type <> invalid AND data.type = m.constants.ui.contentTypes.series
       ' add 'dot' spacer
@@ -817,6 +828,23 @@ Function onModeChange()
   else if m.top.mode = m.constants.ui.infoPanelModes.epg
     '//For when the linear player is on its own EPG screen
     m.infoPanelGroup.appendChild(m.leftHeaderImage)
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+    m.offset.appendChild(m.twoLineInfo)
+    m.offset.appendChild(m.descriptionGroup)
+
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.line1)
+    m.firstLineGroup.appendChild(m.resolutionPoster)
+    m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.rating)
+    m.firstLineGroup.appendChild(m.descriptorCode)
+
+    m.offset.itemSpacings = [15, 15]
+    m.top.appendChild(m.playerCountdownGroup)
+    m.playerCountdownGroup.translation = [1215, -78]
+  else if m.top.mode = m.constants.ui.infoPanelModes.simplifiedLinearPlayer
+    '//For when the linear player is on its own EPG screen
     m.infoPanelGroup.appendChild(m.offset)
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.twoLineInfo)

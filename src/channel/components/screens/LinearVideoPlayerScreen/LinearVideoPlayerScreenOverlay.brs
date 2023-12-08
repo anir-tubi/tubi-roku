@@ -3,7 +3,8 @@ Function init()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
-  m.top.observeFieldScoped("display", "onOverlayDisplayChange")
+  m.top.observeFieldScoped("showOverlay", "onShowOverlay")
+  m.top.observeFieldScoped("hideOverlay", "onHideOverlay")
   m.top.observeFieldScoped("closedCaptioningItems", "onClosedCaptionListUpdated")
 
   m.OverlayParent = m.top.findNode("OverlayParent")
@@ -126,17 +127,20 @@ Function onSideNavSelectChange()
 End Function
 
 
-Function onOverlayDisplayChange()
-  tubiLog("LinearVideoPlayerScreenOverlay.onOverlayDisplayChange")
-  if m.top.isDisplaying = false AND m.top.display = true
+Function onShowOverlay(msg)
+  if m.top.isDisplaying = false
     displayOverlay(m.top.displayWithDelay)
-  else if m.firstTimeEPGLaunched = true
-      'EPG is still loading, so keep the overlay with spinning  wheel
-  else if m.top.isDisplaying = true AND m.top.display = false
-    hideOverlay()
   end if
 End Function
 
+
+Function onHideOverlay(msg)
+  if m.firstTimeEPGLaunched = true
+    'EPG is still loading, so keep the overlay with spinning  wheel
+  else if m.top.isDisplaying = true
+    hideOverlay()
+  end if
+End Function
 
 
 Function onCCContentFocused()
@@ -144,7 +148,6 @@ Function onCCContentFocused()
   '//When the closed captioning layer is focused, make sure to update reactedToKeyPresss so the transport overlay does not automatically hide
   m.top.reactedToKeyPresss = true
 End Function
-
 
 
 Function onCCContentSelected(msg)
@@ -465,4 +468,3 @@ Function setComponentInteractionForSideNavInVideoPlayerOverLay(userInteraction, 
 
   m.EPG.componentInteractionInfo = componentInteractionInfo
 End Function
-

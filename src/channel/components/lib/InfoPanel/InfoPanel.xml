@@ -73,6 +73,7 @@
         badgeText: "Upcoming"  'Upcoming, Replay, Live
         has4k: true            'indicates if 4k is available
         hoursOfAiring: "9:00PM - 9:30PM"  'the time the program will be shown
+        timeleft: "20min left"  'the remaining time in the current program for linear content
       }
       Handling these at once is more efficient than handling them all individually
     -->

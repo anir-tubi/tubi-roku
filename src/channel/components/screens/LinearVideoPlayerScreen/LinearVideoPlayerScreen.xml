@@ -36,13 +36,13 @@
       <field id="originalContent" type="node"/>
 
       <!--Timegrid content updated in batches-->
-      <field id="timeGridContent" type="node" alias="VideoOverlay.timeGridContent"/>
+      <field id="timeGridContent" type="node" alias="VideoOverlay.timeGridContent, VideoOverlayLite.timeGridContent"/>
 
       <!-- Content might be loading in batch. So render only when timeGridContent is set -->
-      <field id="updateTimeGridContent" type="boolean" alwaysNotify="true" alias="VideoOverlay.updateTimeGridContent"/>
+      <field id="updateTimeGridContent" type="boolean" alwaysNotify="true" alias="VideoOverlay.updateTimeGridContent, VideoOverlayLite.updateTimeGridContent"/>
 
       <!-- Is the content of the EPG component loading? -->
-      <field id="timeGridContentLoading" type="boolean" alwaysNotify="true" alias="VideoOverlay.timeGridContentLoading"/>
+      <field id="timeGridContentLoading" type="boolean" alwaysNotify="true" alias="VideoOverlay.timeGridContentLoading, VideoOverlayLite.timeGridContentLoading"/>
 
       <!-- content that is used to display a channel guide overlaid the video player -->
       <field id="channelsContent" type="node"/>
@@ -79,7 +79,7 @@
       <!-- This field is used to communicate to the video player to start back playing the video after signIn from EPG overlay -->
       <field id="waitingForRFI" type="boolean" value="false" />
 
-      <field id="jumpToChannelItem" alias="VideoOverlay.jumpToChannelItem" />
+      <field id="jumpToChannelItem" alias="VideoOverlay.jumpToChannelItem, VideoOverlayLite.jumpToChannelItem" />
 
       <!-- Holds the consent opt out status for all individual preferences like marketing,analytics etc. -->
       <field id="userConsentsOptOutStatus" type="assocarray" value="{}" alias="PlayerAdsSSAITask.userConsentsOptOutStatus" />
@@ -92,7 +92,7 @@
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
 
       <!-- When this is called, then the helper should display the EPGScreen-->
-      <field id="navigateToEPGScreen" alias="VideoOverlay.navigateToEPGScreen"/>
+      <field id="navigateToEPGScreen" alias="VideoOverlay.navigateToEPGScreen, VideoOverlayLite.navigateToEPGScreen"/>
 
       <field id="state" type="string" />
 
@@ -139,11 +139,10 @@
 
       <!-- Timestamp of the last time we finished playing back video with this player. If -1 then we are currently playing back. -->
       <field id="timestampOfLastVideoPlayback" type="integer" value="0" />
-
-      <field id="channelLikeDislikeInfo" alias="VideoOverlay.channelLikeDislikeInfo" />
-
-      <field id="isDisplayingOverlay" alias="VideoOverlay.isDisplaying" />
-
+      <field id="channelLikeDislikeInfo" alias="VideoOverlay.channelLikeDislikeInfo, VideoOverlayLite.channelLikeDislikeInfo" />
+      <field id="isDisplayingOverlay" alias="VideoOverlay.isDisplaying, VideoOverlayLite.isDisplaying" />
+      <field id="linearOverlayLiteComponentInteractionInfo" alias="VideoOverlayLite.componentInteractionInfo" />
+      <field id="globalCaptionMode" alias="VideoOverlayLite.globalCaptionMode, VideoNode.globalCaptionMode" />
   </interface>
 
   <children>
@@ -202,8 +201,12 @@
     </Group>
 
     <LinearVideoPlayerScreenOverlay
-      id="VideoOverlay"/>
+      id="VideoOverlay"
+      visible="false"/>
 
+    <LinearVideoPlayerScreenOverlayLite
+      id="VideoOverlayLite"
+      visible="false"/>
 
     <AdsSSAITask
       id="PlayerAdsSSAITask" />

@@ -26,8 +26,11 @@
       <!-- Content might be loading in batch. So render only when timeGridContent is set -->
       <field id="updateTimeGridContent" type="boolean" alwaysNotify="true" />
 
-      <!-- Tells the overlay to display or hide -->
-      <field id="display" type="boolean" alwaysNotify="true"/>
+      <!-- Tells the overlay to show -->
+      <field id="showOverlay" type="boolean" alwaysNotify="true"/>
+
+      <!-- Tells the overlay to hide -->
+      <field id="hideOverlay" type="boolean" alwaysNotify="true"/>
 
       <!-- Tells if there should be a delay when displaying the overlay. Set this before setting the "display" field to true. A delay may be needed for example when the player is animating into fullscreen mode and we do not want to show the overlay until the animation is done and the user has had time to view the player w/o an overlay.  -->
       <field id="displayWithDelay" type="boolean"/>

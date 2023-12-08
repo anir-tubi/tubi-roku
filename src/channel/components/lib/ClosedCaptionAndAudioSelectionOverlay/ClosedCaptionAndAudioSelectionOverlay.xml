@@ -18,7 +18,7 @@
     <!-- Holds the value from video node availableSubtitleTracks. This field will contain the array of closed caption tracks.  -->
     <field id="availableClosedCaptionTracks" type="array" value="[]"/>
 
-    <!-- 
+    <!--
       - Holds the current audio track name that has been previously selected by the user either earlier during this session or during a previous playback session.
       - Please refer onAvailableAudioTracksChange inside videoplayerscreen.brs where we are looping through the available audio tracks and matching it against the user saved audio track preference.
       - This string value will be used to set the check mark on the audio track item within the overlay.
@@ -27,8 +27,8 @@
     -->
     <field id="currentAudioTrack" type="string" value="" />
 
-    <!-- Holds the value of the global captions mode.  -->
-    <field id="globalCaptionMode" type="string" />
+    <!-- Holds the value of the global captions mode. Possible values are "Instant replay", "When mute", "On", "Off"  -->
+    <field id="globalCaptionMode" type="string"/>
     <field id="videoId" type="integer" />
 
     <!-- OUTPUTS -->
@@ -36,7 +36,7 @@
     <!-- Will be set when the user selects a closed captioning track. This will be eventually be piped to videonode.  -->
     <field id="closedCaptionTrack" type="string" value="" />
 
-    <!-- 
+    <!--
       - Will be set when the user selects a audio track.
       - Sample availableAudioTracks=[{"language": "en", name: "English", "track": "dash/a-aac-main-2"}, {"language": "en", name: "English Audio Description", "track": "dash/a-aac-desc-2"}]
       - currentAudioTrack field will hold dash/a-aac-main-2 or dash/a-aac-desc-2
@@ -48,12 +48,12 @@
     <field id="globalCaptionTurnedOn" type="boolean" alwaysNotify="true" />
     <field id="globalCaptionTurnedOff" type="boolean" alwaysNotify="true" />
     <field id="trackingEventInfo" type="assocarray" alwaysNotify="true" />
-    
-    <!-- 
+
+    <!--
       - Will be set when the user selects an audio track. This will be used to update the user or device settings to store the selected audio track as the preferred audio track.
       - The AA set on the audioTrackSettings field contains 2 keys: "language" which is a 2 letter lanuguage code and "role". "role" can have the values "main" or "description".
     -->
-    
+
     <!-- Sample: {"language": "en","role": "main"} -->
     <field id="audioTrackSettings" type="assocarray" value="{}" />
   </interface>
@@ -65,10 +65,10 @@
       height="960"
       uri="pkg:/images/menu-focus-$$RES$$.9.png">
 
-      <LayoutGroup 
+      <LayoutGroup
         translation="[60, 60]">
 
-          <LayoutGroup 
+          <LayoutGroup
             id="closedCaptionSection">
             <Label
               id="closedCaptionSectionHeaderLabel"
@@ -84,11 +84,11 @@
               itemSize="[510,72]"
               numRows="3"
               itemSpacing="[0,8]" />
-              
-            <Rectangle width="0" height="36" />  
+
+            <Rectangle width="0" height="36" />
           </LayoutGroup>
 
-          <LayoutGroup 
+          <LayoutGroup
             id="audioTracksSection">
             <Label
               id="audioTracksSectionHeaderLabel"

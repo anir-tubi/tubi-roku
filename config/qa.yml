@@ -21,12 +21,15 @@ settings:
 
   #the number of seconds before the video overlay autohides in Live TV after last button pressed.
   videoOverlayAutoHideTime: 5
+  videoOverlayLiteAutoHideTime: 10
 
   # hideStartupModals=true  ==> no startup modals are shown
   # hideStartupModals=false ==> Normal prod behaviour
   hideStartupModals: false
 
-
+  # When should we show the ComingUp title/time in Linear Video Player both inside & outside info panel
+  comingUpInsideInfoPanelDuration: 300 # time in seconds - default value is 300 seconds in constants.brs
+  comingUpOutsideInfoPanelDuration: 15 # time in seconds - default value is 15 seconds in constants.brs
 
   # A date which will be used as the current date within the app. Use this to simulate a date in the past or future. If a date is provided this gets converted to a time offset in seconds to allow testing of features only available at a particular time
   # testingTimeOffset: "2023-02-12T20:00:00Z"

@@ -20,11 +20,11 @@ End Function
 Function onTextChangedWithIcon()
   m.label.text = m.top.text
   width = m.top.width
-  
+
   if m.top.width = 0
     width = m.label.boundingRect().width + (m.marginWidth * 2) + m.Icon.width + m.iconSpacing
   end if
-  
+
   m.buttonBG.width = width
   m.label.width = width - (m.marginWidth * 2) - m.icon.width - m.iconSpacing
 End Function

@@ -1339,6 +1339,26 @@ Function getTranslation_en_US()
       "description": "The title displayed above a list of live TV channels",
       "message": "Channel Guide"
     },
+    "linearVideoPlayer_buttonTvGuide": {
+      "description": "Label of a Button to view the TV channel guide",
+      "message": "TV Guide"
+    },
+    "linearVideoPlayer_buttonLanguage": {
+      "description": "Label of a Button which is displayed on linear player screen to select language",
+      "message": "Language"
+    },
+    "linearVideoPlayer_comingUp": {
+      "description": "Label of a coming up program in linear video player",
+      "message": "Coming up"
+    },
+    "linearVideoPlayer_comingUpAt": {
+      "description": "Label of a coming up program with time in linear video player",
+      "message": "Coming up at {time}"
+    },
+    "linearVideoPlayer_timeLeft": {
+      "description": "Label to display time left in linear video player info panel",
+      "message": "{time} left"
+    },
     "goBack_categories": {
       "description": "Navigational instructions to users on what the back button does on the current page",
       "message": "PRESS BACK FOR CATEGORIES"

@@ -93,7 +93,6 @@ End Function
 
 Function programGridContentFocused(channelItem, itemPosition)
 
-
   if itemPosition <> invalid AND itemPosition.count() = 2
     channel = channelItem.content.getChild(itemPosition[0])
 
