@@ -212,7 +212,7 @@ End Function
 ' @event: assocarray, it contains type & values for the event
 Function trackEvent(event as Object)
   trackingLoggingTask = getFieldFromGlobal("trackingLoggingTask")
-  if trackingLoggingTask <> invalid
+  if trackingLoggingTask <> invalid AND event <> invalid then
     trackingLoggingTask.trackEvent = event
   end if
 End Function
@@ -246,6 +246,30 @@ End Function
 
 'set hasCompleted to true when user watches the entire video preview, otherwise set it to false.
 Function getFinishPreviewEvent(hasCompleted = false)
+  if m.Video.content = invalid OR m.Video.content.id = invalid then
+    errorInfo = {}
+
+    if m.top.content <> invalid then
+      errorInfo["topContentId"] = m.top.content.id
+      errorInfo["topContentUrl"] = m.top.content.url
+    end if
+
+    if m.currentPageInfo <> invalid then
+      errorInfo["currentPage"] = m.currentPageInfo.pagetype
+    end if
+
+    if m.previousPageInfo <> invalid then
+      errorInfo["previousPage"] = m.previousPageInfo.pagetype
+    end if
+
+    errorInfo["videoState"] = m.videoState
+    errorInfo["playerPosition"] = m.playerPosition
+    errorInfo["videoErrorCode"] = m.Video.errorCode
+    errorInfo["videoErrorStr"] = m.Video.errorStr
+
+    tubiLog(FormatJSON(errorInfo), "info", "clientInfo", "device-info")
+    return invalid
+  end if
 
   finishPreviewEvent = {
     type: "finish_preview"
