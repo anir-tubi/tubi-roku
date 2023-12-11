@@ -19,8 +19,8 @@ Function init()
   m.top.observeFieldScoped("createMenuItems", "onCreateMenuItems")
   m.ItemGroups = m.top.findNode("itemGroups")
   m.MainContent = m.top.findNode("MainContent")
-  m.MainContentSelect = m.top.findNode("MainContent-select")
   m.sideNavBackground = m.top.findNode("sideNavBackground")
+  m.background = m.top.findNode("background")
 End Function
 
 
@@ -30,19 +30,8 @@ Function setMenuItems(menuItems)
 
   for i = 0 to menuItemCount - 1
     m.MainContent.appendChild(createMainContent(menuItems[i]))
-    m.MainContentSelect.appendChild(createMainContentSelect(menuItems[i]))
   end for
 
-End Function
-
-'@item: string id of the menu item
-Function createMainContentSelect(item)
-
-  contentNode = CreateObject("roSGNode", "SideNavContentNode")
-  contentNode.id = item + "-select"
-  m[item + "ContentSelect"] = contentNode
-
-  return contentNode
 End Function
 
 
@@ -109,7 +98,6 @@ End Function
 Function onCreateMenuItems()
 
   m.mainItems = m.top.findNode("mainItems")
-  m.mainItemsSelected = m.top.findNode("mainItemsSelected")
 
   menuItems = [
     m.constants.ui.sideNavIds.profile
@@ -132,19 +120,16 @@ Function onCreateMenuItems()
   m.itemSelectedRemembered = invalid
 
   m.mainItems.numRows = 12
-  m.mainItemsSelected.numRows = 12
   m.mainItems.itemSpacing = [0, 12]
-  m.mainItemsSelected.itemSpacing = [0, 12]
   'this is to accommodate spanish signIn text + free Icon
   m.mainItemsOriginalItemSize = [438, 72]
   m.mainItems.itemSize = m.mainItemsOriginalItemSize
-  m.mainItemsSelected.itemSize = m.mainItemsOriginalItemSize
+  m.background.width = m.mainItemsOriginalItemSize[0]
+  m.background.height = m.mainItemsOriginalItemSize[1]
 
   m.itemGroups.translation = [57, 120]
   m.mainItems.wrapDividerBitmapUri = ""
-  m.mainItemsSelected.wrapDividerBitmapUri = ""
   m.mainItems.wrapDividerHeight = 0
-  m.mainItemsSelected.wrapDividerHeight = 0
 
   initList(m.mainItems)
 
@@ -166,8 +151,7 @@ Function onThemeChange(msg = invalid)
   end if
 
   if theme <> invalid
-    m.mainItemsSelected.focusBitmapBlendColor = theme.neutralColor
-    m.mainItemsSelected.focusFootprintBlendColor = theme.neutralColor
+    m.background.blendColor = theme.neutralColor
   end if
 End Function
 
@@ -193,10 +177,8 @@ End Function
 ' Initialize the passed markupList
 Function initList(list)
   list.observeFieldScoped("itemSelected", "onItemSelect")
-  list.observeFieldScoped("focusedChild", "onListFocusChange")
   list.observeFieldScoped("itemFocused", "onItemFocused")
   setListFocusedBlendColor(list)
-  setDrawFocusFeedback(list)
 End Function
 
 
@@ -216,7 +198,7 @@ Function onFocusChange()
       '//set the focus on the last selected item
       if m.listItemSelected <> invalid
         list = m.top.findNode(m.listItemSelected.list)
-        list.jumpToItem = m.listItemSelected.index
+        jumpToListItem(list, m.listItemSelected.index)
         list.setFocus(true)
       end if
     end if
@@ -275,7 +257,7 @@ Function onKidsDisplayChanged()
 End Function
 
 
-' Insert the menu item associated with sMenuID into the m.MainContent and m.MainContentSelect menu lists in the order that the menu item belongs
+' Insert the menu item associated with sMenuID into the m.MainContent menu lists in the order that the menu item belongs
 ' @sMenuID string one of constants.ui.sideNavIds for which we want to add if it does not already exist
 Function insertMenuItemInMenuLists(sMenuID)
   nMenuItemOriginalIndex = getIndexOfMenuID(sMenuID)
@@ -310,18 +292,11 @@ Function insertMenuItemInMenuLists(sMenuID)
       menuItem = createMainContent(sMenuID)
     end if
 
-    menuItemSelect = m[sMenuID + "ContentSelect"]
-    if menuItemSelect = invalid
-      menuItemSelect = createMainContentSelect(sMenuID)
-    end if
-
     '//Ensure the menu items match the active state of the other menu items
     menuItem.active = m.top.opened
-    menuItemSelect.active = m.top.opened
 
     '//add the menu items at their proper locations
     m.MainContent.insertChild(menuItem, nIndex)
-    m.MainContentSelect.insertChild(menuItemSelect, nIndex)
     verticallyCenterSideNav()
   end if
 End Function
@@ -403,10 +378,6 @@ Function removeProfile()
     m.MainContent.removeChild(m.profileContent)
     m.profileContent = invalid
   end if
-  if m.profileContentSelect <> invalid
-    m.MainContentSelect.removeChild(m.profileContentSelect)
-    m.profileContentSelect = invalid
-  end if
 End Function
 
 
@@ -414,10 +385,6 @@ Function removeKids()
   if m.kidsModeContent <> invalid
     m.MainContent.removeChild(m.kidsModeContent)
     m.kidsModeContent = invalid
-  end if
-  if m.kidsModeContentSelect <> invalid
-    m.MainContentSelect.removeChild(m.kidsModeContentSelect)
-    m.kidsModeContentSelect = invalid
   end if
 End Function
 
@@ -427,10 +394,6 @@ Function removeMovies()
     m.MainContent.removeChild(m.moviesContent)
     m.moviesContent = invalid
   end if
-  if m.moviesContentSelect <> invalid
-    m.MainContentSelect.removeChild(m.moviesContentSelect)
-    m.moviesContentSelect = invalid
-  end if
 End Function
 
 
@@ -438,10 +401,6 @@ Function removeTv()
   if m.tvContent <> invalid
     m.MainContent.removeChild(m.tvContent)
     m.tvContent = invalid
-  end if
-  if m.tvContentSelect <> invalid
-    m.MainContentSelect.removeChild(m.tvContentSelect)
-    m.tvContentSelect = invalid
   end if
 End Function
 
@@ -451,10 +410,6 @@ Function removeChannels()
     m.MainContent.removeChild(m.channelsContent)
     m.channelsContent = invalid
   end if
-  if m.channelsContentSelect <> invalid
-    m.MainContentSelect.removeChild(m.channelsContentSelect)
-    m.channelsContentSelect = invalid
-  end if
 End Function
 
 
@@ -463,10 +418,6 @@ Function removeEspanol()
     m.MainContent.removeChild(m.espanolContent)
     m.espanolContent = invalid
   end if
-  if m.espanolContentSelect <> invalid
-    m.MainContentSelect.removeChild(m.espanolContentSelect)
-    m.espanolContentSelect = invalid
-  end if
 End Function
 
 
@@ -474,27 +425,6 @@ Function removeMyList()
   if m.myListContent <> invalid
     m.MainContent.removeChild(m.myListContent)
     m.myListContent = invalid
-  end if
-  if m.myListContentSelect <> invalid
-    m.MainContentSelect.removeChild(m.myListContentSelect)
-    m.myListContentSelect = invalid
-  end if
-End Function
-
-
-' When the list gains/loses focus, then hide or display the focus indicator
-Function onListFocusChange(msg)
-  list = msg.getRoSGNode()
-  setDrawFocusFeedback(list)
-End Function
-
-
-' Control whether the focus indicator is displayed or not based on if the list has focus
-Function setDrawFocusFeedback(list)
-  if list.isInFocusChain() = true
-    list.drawFocusFeedback = true
-  else
-    list.drawFocusFeedback = false
   end if
 End Function
 
@@ -519,26 +449,22 @@ Function onOpenedChanged()
     if m.itemSelectedRemembered <> invalid
       list = m.top.findNode(m.itemSelectedRemembered.list)
       index = getIndexByID(list, m.itemSelectedRemembered.id)
-      list.jumpToItem = index
+      jumpToListItem(list, index)
 
-      if list.id = m.mainItems.id
-        '//make sure the other mainItemsSelected matches with  mainItems
-        m.mainItemsSelected.jumpToItem = index
-      end if
       list.setFocus(true)
     end if
 
     fade(m.sideNavBackground, "in", 0.2)
 
     setContentActive(m.MainContent)
-    animateItemSize(m.mainItemsSelected, m.mainItemsOriginalItemSize, 0.2)
     animateItemSize(m.mainItems, m.mainItemsOriginalItemSize, 0.2)
+    resize(m.background, m.mainItemsOriginalItemSize[0], m.mainItemsOriginalItemSize[1], 0.2)
   else
     fade(m.sideNavBackground, "out", 0.2)
 
     setContentActive(m.MainContent, false)
-    animateItemSize(m.mainItemsSelected, [108, m.mainItemsSelected.itemSize[1]], 0.2)
     animateItemSize(m.mainItems, [108, m.mainItems.itemSize[1]], 0.2)
+    resize(m.background, 100, m.mainItems.itemSize[1], 0.2)
     m.listItemSelected = invalid
     m.oldSideNavFocusedButton = invalid
   end if
@@ -573,7 +499,7 @@ End Function
 
 Function onSelectedItemRequested()
   index = getIndexByID(m.mainItems, m.top.selectedItemRequested)
-  m.mainItemsSelected.jumpToItem = index
+  setSelectedItemBackgroundTranslation(index)
 End Function
 
 
@@ -610,11 +536,8 @@ End Function
 Function focusItemInList(list, sID)
   index = getIndexByID(list, sID)
   if index >= 0
-    list.jumpToItem = index
+    jumpToListItem(list, index)
     m.top.focusedPosition = index
-    if list.id = m.mainItems.id
-      m.mainItemsSelected.jumpToItem = index
-    end if
     m.listItemSelected = {
       list: list.id
       index: index
@@ -643,14 +566,11 @@ Function onItemSelect(msg)
   '//When an item is selected, then set a field so a Helper can perform the necessary action and close the menu if necessary
   index = list.itemSelected
   item = list.content.getChild(index)
+  setSelectedItemBackgroundTranslation(index)
   m.listItemSelected = {
     list: list.id
     index: index
   }
-
-  if list.id = m.mainItems.id
-    m.mainItemsSelected.jumpToItem = index
-  end if
 
   m.top.itemCurrentId = item.id
   if m.mainItems.id = list.id
@@ -665,6 +585,13 @@ Function onItemSelect(msg)
   'itemSelectedId will trigger callbacks that require itemSelected to be set already
   m.top.itemSelected = item
   m.top.itemSelectedId = item.id
+End Function
+
+
+' @index: Integer, index of the selected item in the list.
+Function setSelectedItemBackgroundTranslation(index)
+  selectedItemBoundingRect = m.mainItems.subBoundingRect("item"+index.toStr())
+  m.background.translation = [m.background.translation[0], selectedItemBoundingRect.y]
 End Function
 
 
@@ -708,4 +635,10 @@ Function verticallyCenterSideNav()
   translationX = m.ItemGroups.translation[0]
   translationY = (1080 - sideNavHeight) / 2
   m.ItemGroups.translation = [translationX, translationY]
+End Function
+
+
+Function jumpToListItem(list, index)
+  list.jumpToItem = index
+  setSelectedItemBackgroundTranslation(index)
 End Function

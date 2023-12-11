@@ -94,26 +94,16 @@
         itemSpacings="[1]">
 
       <Group>
-        <MarkupGrid
-          numRows="8"
-          numColumns="1"
-          id="mainItemsSelected"
-          itemSpacing="[0,17]"
-          vertFocusAnimationStyle="floatingFocus"
-          focusFootprintBitmapUri="pkg:/images/menu-focus-$$RES$$.9.png"
-          focusBitmapUri="pkg:/images/menu-focus-$$RES$$.9.png"
-          drawFocusFeedbackOnTop="false"
-          itemComponentName="SideNavIconComponent">
-          <ContentNode id="MainContent-select" role="content" >
-          </ContentNode>
-        </MarkupGrid>
+        <Poster
+          id="background"
+          uri="pkg:/images/menu-focus-$$RES$$.9.png" />
         <MarkupGrid
           numRows="8"
           numColumns="1"
           id="mainItems"
           itemSpacing="[0,17]"
           vertFocusAnimationStyle="floatingFocus"
-          focusFootprintBitmapUri="pkg:/images/menu-focus-$$RES$$.9.png"
+          focusFootprintBitmapUri="pkg:/images/transparent.png"
           focusBitmapUri="pkg:/images/menu-focus-$$RES$$.9.png"
           drawFocusFeedbackOnTop="false"
           itemComponentName="SideNavIconComponent">
