@@ -1045,7 +1045,7 @@ Function getTranslation_en_US()
     },
     "screenMyStuff_signedOutUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Find your favorites fast, pick up where you left off–all in one place."
+      "message": "Save all your favorites. Pick up where you left off. All in one place."
     },
     "screenMyStuff_signedOutUIBlurb": {
       "description": "The blurb of the MyStuff Screen for the guest user.",
