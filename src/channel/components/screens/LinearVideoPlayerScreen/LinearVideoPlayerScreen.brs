@@ -83,6 +83,7 @@ Function setupOverlay()
   if getExperimentResource("roku_linear_player_view", "roku_linear_player_view_v1", false).enabled = true
     m.VideoOverlay = m.top.findNode("VideoOverlayLite")
     m.VideoOverlay.observeFieldScoped("isClosedCaptionAudioOverlayShowing", "OnClosedCaptionAudioOverlayShowing")
+    m.VideoOverlay.observeFieldScoped("trackingComponentInfo", "onTrackingComponentInfo")
   else
     m.VideoOverlay = m.top.findNode("VideoOverlay")
     m.VideoOverlay.observeFieldScoped("okPressed", "onOKPressed")
@@ -93,6 +94,12 @@ Function setupOverlay()
   m.VideoOverlay.observeFieldScoped("isDisplaying", "onVideoOverlayIsDisplayingChanged")
   m.VideoOverlay.observeFieldScoped("reactedToKeyPresss", "onOverlayReactedToKeyPress")
   m.VideoOverlay.visible = true
+End Function
+
+
+Function onTrackingComponentInfo(msg)
+  trackingComponentInfo = msg.getData()
+  m.top.TrackingComponentInfo = trackingComponentInfo
 End Function
 
 

@@ -46,6 +46,7 @@
       <field id="globalCaptionMode" type="string" />
 
       <field id="componentInteractionInfo" type="assocarray" />
+      <field id="trackingComponentInfo" type="assocarray" />
   </interface>
 
   <children>

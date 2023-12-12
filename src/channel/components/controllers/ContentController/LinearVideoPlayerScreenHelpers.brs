@@ -237,6 +237,12 @@ Function maximizeLinearPlayer(content)
         uriList: []
       }
 
+      're-setting to default values for trackingComponentInfo
+      videoPlayer.trackingComponentInfo = {
+        componentType : ""
+        componentValues : {}
+      }
+
       videoPlayer.trackingPageContext = videoPlayer.trackingPageInfo
       m.backgroundGroup.posterVisible = true
       showHideLinearVideoPlayerSpinner(false)

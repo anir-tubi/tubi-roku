@@ -228,6 +228,13 @@ Function onButtonSelected(msg)
   if button <> invalid AND button.id = "TvGuideButton"
     hideOverlay()
     setComponentInteractionInfo("FULL_TV_GUIDE")
+    m.top.trackingComponentInfo = {
+      componentType : "button_component"
+      componentValues : {
+        button_type: "TEXT"
+        button_value: "FULL_TV_GUIDE"
+      }
+    }
     m.top.navigateToEPGScreen = true
   else if button <> invalid AND button.id = "LanguageButton"
     setComponentInteractionInfo("LANGUAGE")
