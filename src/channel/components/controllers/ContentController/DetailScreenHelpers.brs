@@ -122,6 +122,16 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
       pushScreen(detailScreen, false, false)
     end if
 
+    ' send the exposure event when user landed on series detail screen and see the latest season's Episode for the reality or lifestyle genres.
+    if content.isRecurring = false AND isNonEmptyArray(content.genres) = true
+      for each genre in content.genres
+        if genre = "Reality" OR genre = "Lifestyle"
+          getExperimentResource("roku_series_season_order", "roku_series_season_order_v2")
+          exit for
+        end if
+      end for
+    end if
+
     ' determine the appropriate fetch callbacks based on the passed in parameters
     successCallback = onSingleContentResponseWithTracking
     errorCallback = onSingleContentErrorWithTracking
