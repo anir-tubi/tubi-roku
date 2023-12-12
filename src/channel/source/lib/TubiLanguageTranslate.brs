@@ -2719,7 +2719,7 @@ Function getTranslation_es_MX()
     },
     "screenMyStuff_signedOutUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Guarda todos tus favoritos, recoje donde lo dejaste--todo en un solo lugar."
+      "message": "Guarda todos tus favoritos. Recoje donde lo dejaste. Todo en un solo lugar."
     },
     "screenMyStuff_signedOutUIBlurb": {
       "description": "The blurb of the MyStuff Screen for the guest user.",
@@ -4392,7 +4392,7 @@ Function getTranslation_fr_CA()
     },
     "screenMyStuff_signedOutUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Sauvegardez tous vos favoris, reprenez là où vous en étiez, le tout en un seul endroit."
+      "message": "Sauvegardez tous vos favoris. Reprenez là où vous en étiez. Tout en un seul endroit."
     },
     "screenMyStuff_signedOutUIBlurb": {
       "description": "The blurb of the MyStuff Screen for the guest user.",
