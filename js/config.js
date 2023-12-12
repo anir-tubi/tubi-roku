@@ -89,6 +89,7 @@ function load(options) {
     versionUnderscored: formatBuildTag(build, 'revision'),
     versionMinorUnderscored: formatBuildTag(build, 'minor'),
     versionMinorDotted: formatBuildTag(build, 'minor', '.'),
+    remoteComponentLibProvided: `TubiRemoteLib-${build.component_library_manifest.build_version}`,
     fileType: overWrittenDataPre.settings.remoteComponentsExtension,
     bsConst: getBsConstsFromSettings(overWrittenDataPre.settings),
   };

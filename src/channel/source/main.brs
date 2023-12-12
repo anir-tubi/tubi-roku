@@ -2,6 +2,8 @@
 Function Main(startupArgs)
   m.appStartTime = UpTime(0)
   m.startupArgs = startupArgs
+  ' The name of the component library lib provided by our remote component library. Will be updated by Starter Component Library
+  m.remoteComponentLibProvided = "TubiRemoteLibrary"
   handleRegistryOperations(startupArgs)
 
   ' this version of constants will be the constants that are part of the submitted build (or the side loaded build)
@@ -180,12 +182,13 @@ Function runChannel(constants, log, request, auth)
       ' and error testing suggests that the roSGScreenEvent never gets fired.
       ' do nothing for now - closing the screen does not necessarily mean we want to close the app.
     else if msgType = "roSGNodeEvent"
-      tubiLog("main() got roSGNodeEvent for " + msg.GetField())
-      if msg.GetField() = "exitApp"
+      field = msg.getField()
+      tubiLog("main() got roSGNodeEvent for " + field)
+      if field = "exitApp"
         if msg.GetData() = true
           return false
         end if
-      else if msg.GetField() = "disableInstantResume"
+      else if field = "disableInstantResume"
         if msg.GetData() = true
           contentController = tubiScene.findNode("ContentController")
           if contentController.customResume <> invalid
@@ -194,7 +197,7 @@ Function runChannel(constants, log, request, auth)
           screen.close() ' destroys the current scene as we need to relaunch the app from beginning
           return true
         end if
-      else if msg.GetField() = "transportVoiceResponse"
+      else if field = "transportVoiceResponse"
         result = msg.getData()
         response = result.response
         if response = invalid
@@ -203,7 +206,7 @@ Function runChannel(constants, log, request, auth)
         if result.id <> invalid
           input.EventResponse({id: result.id, status: response})
         end if
-      else if msg.GetField() = "loadStatus"
+      else if field = "loadStatus"
         'starter components or remote components load status update
         print "loadStatus = "; msg.getData()
         if msg.getData() = "ready"
@@ -215,7 +218,8 @@ Function runChannel(constants, log, request, auth)
             if starterController <> invalid
               starterController.id = "StarterController"
               starterController.observeField("useRemoteComponents", port)
-              starterController.observeField("remoteComponentsUrl", port)
+              starterController.observeField("remoteComponentsUrl", port, ["remoteComponentLibProvided"])
+              starterController.observeField("remoteComponentLibProvided", port)
               starterController.observeField("fadeOutCustomSplash", port)
               starterController.observeField("fadeInRemoteComponent", port)
               starterController.setField("getUrl", true)
@@ -225,7 +229,7 @@ Function runChannel(constants, log, request, auth)
             end if
           else if msg.GetRoSGNode().id = "TubiRemoteLibrary"
             componentsLoaded = true
-            controller = tubiScene.createChild("TubiRemoteLibrary:ContentController")
+            controller = tubiScene.createChild(m.remoteComponentLibProvided + ":ContentController")
             if controller <> invalid
               controller.id = "ContentController"
               controller.observeField("exitApp", port)
@@ -286,7 +290,7 @@ Function runChannel(constants, log, request, auth)
             return showComponentsFailedToLoadError(msg, log, screen, constants)
           end if
         end if
-      else if msg.GetField() = "useRemoteComponents"
+      else if field = "useRemoteComponents"
         'starter components may indicate not to use remote components
         if msg.getData() = false
           tubiLog("using packaged components")
@@ -302,8 +306,11 @@ Function runChannel(constants, log, request, auth)
           componentsLoaded = true
           controller = loadPackagedComponents(tubiScene, port, startupArgs)
         end if
-      else if msg.GetField() = "remoteComponentsUrl"
-        print "got the remoteComponentsUrl "; msg.getData()
+      else if field = "remoteComponentsUrl"
+        ' Will get used later once the component library has finished loading
+        m.remoteComponentLibProvided = msg.getInfo().remoteComponentLibProvided
+        print "m.remoteComponentLibProvided"; m.remoteComponentLibProvided
+
         'starter components have indicated the url to use for remote components
         starterController = msg.GetRoSGNode()
         starterController.unobserveField("remoteComponentsUrl")
@@ -320,11 +327,11 @@ Function runChannel(constants, log, request, auth)
         retries = 0
         remoteLibrary.observeField("loadStatus", port)
         remoteLibrary.uri = msg.getData()
-      else if msg.GetField() = "fadeOutCustomSplash"
+      else if field = "fadeOutCustomSplash"
         starterController = msg.GetRoSGNode()
         starterController.unobserveField("fadeOutCustomSplash")
         tubiScene.fadeOutCustomSplash = true
-      else if msg.GetField() = "fadeInRemoteComponent"
+      else if field = "fadeInRemoteComponent"
         starterController = msg.GetRoSGNode()
         contentController = tubiScene.findNode("ContentController")
         if contentController <> invalid AND contentController.fadeInContentController <> true
@@ -332,7 +339,7 @@ Function runChannel(constants, log, request, auth)
           tubiScene.fadeOutSpinner = true
           contentController.fadeInContentController = true
         end if
-      else if msg.GetField() = "removeStartUpScreens"
+      else if field = "removeStartUpScreens"
         contentController = msg.GetRoSGNode()
         contentController.unobserveField("removeStartUpScreens")
         starterController = tubiScene.findNode("StarterController")
@@ -340,7 +347,7 @@ Function runChannel(constants, log, request, auth)
         if starterController <> invalid
           starterController.removeStartUpScreens = true
         end if
-      else if msg.getField() = "rokuContinueWatchingRequestInfo"
+      else if field = "rokuContinueWatchingRequestInfo"
         info = msg.getData()
         updateRokuContinueWatchingInfo(request, info)
       end if
@@ -638,7 +645,7 @@ Function initSubmittedChannel(request, constants, screen, tubiScene, port, start
     controller = loadPackagedComponents(tubiScene, port, startupArgs)
     controller.fadeInContentController = true
     controller.isComponentLibFailedToLoad = true
-    return true 'successully fallback
+    return true 'successfully fallback
   else
     return false 'can not fallback on the current version as explicitly specified by external config.
   end if

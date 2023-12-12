@@ -35,7 +35,10 @@
 
     <!-- OUTPUTS -->
       <!-- the SceneGraph app will be built using the remote components pkg existing at this url -->
-      <field id="remoteComponentsUrl" type="string"  alwaysNotify="true"/>
+      <field id="remoteComponentsUrl" type="string" alwaysNotify="true"/>
+
+      <!-- the SceneGraph app will be built using the remote component providing a lib with this name. Used to allow us to know what version a crash is happening in  -->
+      <field id="remoteComponentLibProvided" type="string" alwaysNotify="true"/>
 
       <!-- should be set from constants.settings.useRemoteComponents - communicates to the main thread if we want to load remote components -->
       <field id="useRemoteComponents" type="boolean" value="true" alwaysNotify="true" />

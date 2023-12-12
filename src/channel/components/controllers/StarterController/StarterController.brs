@@ -76,6 +76,8 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
         remoteComponentsUrl = m.constants.settings.remoteComponentsUrl
       end if
 
+      ' This needs to be set before m.top.remoteComponentsUrl as we are getting m.top.remoteComponentLibProvided as part of that observer's additional fields
+      m.top.remoteComponentLibProvided = m.constants.settings.remoteComponentLibProvided
 
       print "remoteComponentsUrl "; remoteComponentsUrl
       m.top.remoteComponentsUrl = remoteComponentsUrl
@@ -138,7 +140,7 @@ Function onExternalConfigRequestSuccess(config)
       ' Storing the value of blocked analytics event to registry as a fallback in future if the external config call fails.
       RegWrite("blocked_analytics_events", FormatJson(config.blocked_analytics_events), m.constants.registrySectionIDs.fallbacks)
     end if
-    
+
     m.constants.externalConfig.info = config
   end if
 

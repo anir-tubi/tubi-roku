@@ -12,7 +12,7 @@ settings:
   rcdnStarterComponentsUrl: "https://rcdn-production.tubitv.com/appFiles/starter-components/tubi_starter_components_{{versionMinorUnderscored}}.pkg"
   rcdnRemoteComponentsUrl:  "https://rcdn-production.tubitv.com/appFiles/components/tubi_remote_component_{{versionUnderscored}}.pkg"
   remoteComponentsExtension: "pkg"
-  migrateToken: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0eXBlIjo0LCJwbGF0Zm9ybSI6InJva3UiLCJpYXQiOjE0NTgzMjkzNDd9.726iJo5B68VLn-HfWj4V5mwrn6vI5MQOfsQcs-gT5TA"
+  remoteComponentLibProvided: "{{remoteComponentLibProvided}}"
   suitest: false
   noAds: false
   # NEVER CHANGE THESE VALUES FOR PRODUCTION
@@ -76,7 +76,7 @@ manifest:
 
 component_library_manifest:
   title: "Tubi Component Library"
-  sg_component_libs_provided: "TubiRemoteLibrary"
+  sg_component_libs_provided: "{{remoteComponentLibProvided}}"
   bs_libs_required: "roku_ads_lib"
   requires_widevine_drm: 1
   requires_widevine_version: "1.0"
