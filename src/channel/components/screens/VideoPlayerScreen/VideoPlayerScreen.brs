@@ -2018,8 +2018,14 @@ Function setInitialAudioTrack(availableAudioTracks)
       m.Video.audioTrack = updatedAudioTrack.track
       ' Setting the current audio track into the closed caption overlay.
       m.closedCaptionAndAudioSelectionOverlay.currentAudioTrack = updatedAudioTrack.track
+    else if isNonEmptyString(m.video.currentAudioTrack) = true
+      ' Providing a fallback if in future we have multiple langauge tracks and the user preferred track is not available for the program.
+      m.closedCaptionAndAudioSelectionOverlay.currentAudioTrack = m.video.currentAudioTrack  
     end if
 
+  else if availableAudioTracks <> invalid AND availableAudioTracks.Count() > 1 AND isNonEmptyString(m.video.currentAudioTrack) = true
+    ' This else block will handle case where we do not have a preferred audio track saved for user.
+    m.closedCaptionAndAudioSelectionOverlay.currentAudioTrack = m.video.currentAudioTrack
   end if
   setCCAudioTransportBarVisibility()
 End Function
