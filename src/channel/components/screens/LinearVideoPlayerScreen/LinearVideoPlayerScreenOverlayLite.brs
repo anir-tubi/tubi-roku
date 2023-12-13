@@ -3,6 +3,7 @@ Function init()
   m.tubiTrackingInfo = TubiTrackingInfo(m.constants)
   topRef = m.top
 
+  topRef.observeFieldScoped("updateAndShowComingUpInfo", "onUpdateAndShowComingUpInfo")
   topRef.observeFieldScoped("showOverlay", "onShowOverlay")
   topRef.observeFieldScoped("hideOverlay", "onHideOverlay")
   topRef.observeFieldScoped("hideComingUpOverlay", "onHideComingUpOverlay")
@@ -167,6 +168,17 @@ Function onShowOverlay(msg)
 End Function
 
 
+Function onUpdateAndShowComingUpInfo(msg)
+  jumpChannelUiToCurrentPlayingVideo()
+  channelInfo = getChannelInfo(m.channelIndexFocused)
+
+  if channelInfo <> invalid
+    updateComingUpInfo(channelInfo)
+    updateChannelInfo(channelInfo)
+  end if
+End Function
+
+
 Function onHideOverlay(msg)
   if m.OverlayParent.opacity > 0
     hideOverlay()
@@ -226,6 +238,8 @@ Function onButtonSelected(msg)
   button = m.ButtonList.content.getChild(itemSelected)
 
   if button <> invalid AND button.id = "TvGuideButton"
+    m.shouldShowComingUpOverlay = false
+    hideComingUpOverlay()
     hideOverlay()
     setComponentInteractionInfo("FULL_TV_GUIDE")
     m.top.trackingComponentInfo = {
@@ -326,16 +340,13 @@ End Function
 Function onTimeGridContentLoadingChange()
   if m.top.timeGridContentLoading = true
     m.InfoPanel.visible = false
-    m.overlayComingUp.visible = false
     m.top.timeGridContent = invalid
     m.ChannelList.content = invalid
   else
     if m.top.timeGridContent <> invalid
       m.InfoPanel.visible = true
-      m.overlayComingUp.visible = true
     else
       m.InfoPanel.visible = false
-      m.overlayComingUp.visible = false
     end if
   end if
 End Function
@@ -431,6 +442,18 @@ Function updateInfoPanel(channelIndexFocused)
 End Function
 
 
+Function updateComingUpInfo(channelInfo)
+  if channelInfo <> invalid
+    nextProgram = channelInfo.getChild(1)
+
+    if nextProgram <> invalid
+      m.ComingUpTime.text = getTranslation("linearVideoPlayer_comingUp")
+      m.ComingUpTitle.text = nextProgram.title
+    end if
+  end if
+End Function
+
+
 '@channelInfo: TubiContentNode, node which holds the channel information
 Function updateProgressBar(channelInfo)
   dateTime = createObject("roDateTime")
@@ -475,7 +498,14 @@ Function updateChannelInfo(channelInfo)
 
         if timeDiff >= 0
           stopShowComingUpTimer()
-          m.showComingUpTimer.duration = timerStartTime
+
+          'if the timerStartTime value is negative, show the comingup ovelay in 1 second
+          if timerStartTime > 0
+            m.showComingUpTimer.duration = timerStartTime
+          else
+            m.showComingUpTimer.duration = 1
+          end if
+
           startShowComingUpTimer()
         else
           stopShowComingUpTimer()
@@ -573,9 +603,6 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
     else if key = "up" OR key = "down"
 
       if m.isClosedCaptionAudioOverlayShowing = false
-        m.shouldShowComingUpOverlay = false
-        hideComingUpOverlay()
-
         if key = "down"
           increaseChannel()
         else if key = "up"

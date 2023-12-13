@@ -375,9 +375,16 @@ Function onVideoStateChange(msg)
   if state = "playing" or state = "paused"
     m.Loading.visible = false
     m.top.state = state
+
     if m.top.state = "playing" AND (sPreviousState = "stopped" or sPreviousState = "") AND m.top.fullscreen = true
-      if m.VideoOverlay.timeGridContentLoading = false AND m.VideoOverlay.timeGridContent <> invalid AND m.top.allowTransportToAppear = true
-        showOverlay(true)
+      if m.VideoOverlay.timeGridContentLoading = false AND m.VideoOverlay.timeGridContent <> invalid
+        if m.top.allowTransportToAppear = true
+          showOverlay(true)
+        else
+          if m.VideoOverlay.hasField("updateAndShowComingUpInfo") = true
+            m.VideoOverlay.updateAndShowComingUpInfo = true
+          end if
+        end if
       end if
     end if
   else
@@ -978,10 +985,6 @@ End Function
 ' Hide the overlay
 Function hideOverlay()
   m.VideoOverlay.hideOverlay = true
-
-  if m.VideoOverlay.hasField("hideComingUpOverlay") = true
-    m.VideoOverlay.hideComingUpOverlay = true
-  end if
 
   if m.VideoOverlay.hasField("hideClosedCaptionAudioTrackOverlay") = true
     m.VideoOverlay.hideClosedCaptionAudioTrackOverlay = true
