@@ -82,7 +82,14 @@ Function popScreen(sendNavigateEvents = true, sendLoadingEvents = true)
   end if
 
   if sendNavigateEvents = true AND topHidden <> invalid AND toBePopped <> invalid
-    screenTrackingNavigate(toBePopped.trackingPageInfo, topHidden.trackingPageInfo)
+    'Attaching the trackingComponentInfo on NavigateToPage event when moving LinearVideoPlayerScreen to EPGHomeScreen
+    'Remove below check if we do not graduate roku_linear_player_view experiment. ie., we don't need to send trackingComponentInfo.
+    'TODO: Reset/Clear the trackingComponentInfo on various places of code, so that we can remove below check, and send the trackingComponentInfo always with empty/default value
+    if toBePopped.subtype() = "LinearVideoPlayerScreen" AND topHidden.subtype() = "EPGHomeScreen"
+      screenTrackingNavigate(toBePopped.trackingPageInfo, topHidden.trackingPageInfo, toBePopped.trackingComponentInfo)
+    else
+      screenTrackingNavigate(toBePopped.trackingPageInfo, topHidden.trackingPageInfo)
+    end if
   end if
 
   if sendLoadingEvents = true AND topHidden <> invalid
