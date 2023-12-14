@@ -27,6 +27,9 @@ Function init()
   ' does not update on time.
   ' Allowed values are "stop", "play", "pause", "prebuffer"
   m.videoState = "stop"
+
+  ' Temporary storage for trying to investigate finish event firing without content available
+  m.stateBeforeStop = {}
 End Function
 
 
@@ -194,6 +197,16 @@ Function stopContent()
     end if
 
     if getExperimentResource("roku_preview_player_alternative_stop_method", "roku_preview_player_alternative_stop_method_v1", true).enabled = true then
+      m.stateBeforeStop = {}
+      if m.Video.content <> invalid then
+        m.stateBeforeStop["beforeStopContentId"] = m.Video.content.id
+      end if
+
+      m.stateBeforeStop["beforeStopPlayerDuration"] = m.Video.duration
+      m.stateBeforeStop["beforeStopPlayerPosition"] = m.Video.position
+      m.stateBeforeStop["beforeStopPlayerState"] = m.Video.state
+      m.stateBeforeStop["beforeStopPlayerControl"] = m.Video.control
+
       m.Video.content = invalid
       m.top.timestampOfLastVideoPlayback = createObject("roDateTime").asSeconds()
       m.top.state = "stopped"
@@ -248,6 +261,7 @@ End Function
 Function getFinishPreviewEvent(hasCompleted = false)
   if m.Video.content = invalid OR m.Video.content.id = invalid then
     errorInfo = {}
+    errorInfo.append(m.stateBeforeStop)
 
     if m.top.content <> invalid then
       errorInfo["topContentId"] = m.top.content.id
@@ -264,8 +278,11 @@ Function getFinishPreviewEvent(hasCompleted = false)
 
     errorInfo["videoState"] = m.videoState
     errorInfo["playerPosition"] = m.playerPosition
-    errorInfo["videoErrorCode"] = m.Video.errorCode
-    errorInfo["videoErrorStr"] = m.Video.errorStr
+    errorInfo["playerErrorCode"] = m.Video.errorCode
+    errorInfo["playerErrorStr"] = m.Video.errorStr
+    errorInfo["playerState"] = m.Video.state
+    errorInfo["playerControl"] = m.Video.control
+    errorInfo["playerDuration"] = m.Video.duration
 
     tubiLog(FormatJSON(errorInfo), "info", "clientInfo", "device-info")
     return invalid
