@@ -355,11 +355,12 @@ End Function
 Function jumpChannelUiToCurrentPlayingVideo()
   if m.top.currentLinearVideoContent <> invalid
     jumpToLinearChannelID = m.top.currentLinearVideoContent.id
+    content = m.ChannelList.content
 
-    if jumpToLinearChannelID <> invalid
-      for i = 0 to m.ChannelList.content.getChildCount() - 1
-        item = m.ChannelList.content.getchild(i)
-        if item.id = jumpToLinearChannelID
+    if jumpToLinearChannelID <> invalid AND content <> invalid
+      for i = 0 to content.getChildCount() - 1
+        item = content.getchild(i)
+        if item <> invalid AND item.id = jumpToLinearChannelID
           m.channelIndexFocused = i
           m.ChannelList.jumpToItem = m.channelIndexFocused
           exit for
