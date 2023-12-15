@@ -61,8 +61,7 @@ describe('Autoplay TV', function () {
         const tvScreenRowList = await testUtils.getNodeForElement('tvScreenRowList');
         expect(tvScreenRowList.visible).to.equal(true);
         await utils.sleep(2000);
-        await ecp.sendKeypress(ecp.Key.Right);
-
+       
         // Trigger Series Autoplay
         await triggerSeriesAutoplay();
 
@@ -114,7 +113,7 @@ describe('Autoplay TV', function () {
     });
 
     //Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/148693
-    it('C148693 - Autoplay - Series- When user searches for a Series and initiates playback, Autoplay should work @autoplay,@smoke', async () => {
+    it('C148693 - Autoplay - Series- When user searches for a Series and initiates playback, Autoplay should work @autoplay', async () => {
 
         // Search for a Series title
         await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });

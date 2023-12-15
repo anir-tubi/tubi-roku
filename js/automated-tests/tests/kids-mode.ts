@@ -322,6 +322,7 @@ describe('Kids Mode', function () {
 
     // Relaunch app
     await testUtils.restartApplication();
+    await testUtils.waitForAppLaunchBeaconToFire();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Check that we are no longer in Kids mode

@@ -11,7 +11,7 @@ describe('Autoplay Movies', function () {
     });
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/105693
-    it('105693 - Autoplay - Movie - When movie reaches the credit cue point then autoplay triggers @autoplay,@smoke', async () => {
+    it('105693 - Autoplay - Movie - When movie reaches the credit cue point then autoplay triggers @autoplay', async () => {
         // Are we on the series page?
         const movieScreenRowList = await testUtils.getNodeForElement('movieScreenRowList');
         expect(movieScreenRowList.visible).to.equal(true);
@@ -45,7 +45,7 @@ describe('Autoplay Movies', function () {
 
     });
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/70395
-    it('C70395 - Autoplay - Movie - Timer resets as users navigates within the titles in autoplay UI @autoplay,@smoke', async () => {
+    it('C70395 - Autoplay - Movie - Timer resets as users navigates within the titles in autoplay UI @autoplay', async () => {
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
         // Are we on the movies page?
@@ -91,7 +91,7 @@ describe('Autoplay Movies', function () {
     });
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/25123
-    it('C25123 - Autoplay - Movie - When user chooses last title on the list then movie plays @autoplay,@smoke', async () => {
+    it('C25123 - Autoplay - Movie - When user chooses last title on the list then movie plays @autoplay', async () => {
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
         // Are we on the series page?
         const movieScreenRowList = await testUtils.getNodeForElement('movieScreenRowList');
@@ -137,7 +137,7 @@ describe('Autoplay Movies', function () {
 
     });
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/76105
-    it('C76105 - Autoplay - Movie - When user chooses first title on the list then movie plays @autoplay,@smoke', async () => {
+    it('C76105 - Autoplay - Movie - When user chooses first title on the list then movie plays @autoplay', async () => {
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
         // Are we on the series page?
@@ -180,7 +180,7 @@ describe('Autoplay Movies', function () {
     });
     //Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/76115
 
-    it('C76115 - Autoplay - Movie - When content focused then year and duration displayed @autoplay,@smoke', async () => {
+    it('C76115 - Autoplay - Movie - When content focused then year and duration displayed @autoplay', async () => {
 
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 

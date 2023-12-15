@@ -416,7 +416,6 @@ describe('Playback', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/25128
-  it
   it('C25128 - Rewind 4x @playback_1,@registered_user,@smoke', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 

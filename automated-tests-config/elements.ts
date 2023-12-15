@@ -1239,6 +1239,16 @@ const elements = typeCheckElements({
   /** espanol screen row list  */
   sideNavChannelsLabel: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.6.#LabelParent.0.#Label',
+  },
+
+  /** settings Screen Title */
+  settingsScreenTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#Title'  
+  },
+
+  /** Exit Button Text */
+  exitDialogButtonText: {
+    keyPath: '#ContentController.#2694d4e.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
   }
 
 });

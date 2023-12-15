@@ -20,17 +20,7 @@ class Shared {
         await ecp.sendKeypress(ecp.Key.Play);
   }
 
-    // Play from Beginning check function
-    public async verifyPlayFromBeginning() {
-
-        // Press Play and check playback
-        await testUtils.selectAndVerifyDetailPageMenuItem('play');
-        await testUtils.expectPlayerStateToEventuallyEqual('play', 5000);
-        // Verify Movie title playback starts from beginning
-        const position = await testUtils.getPlayerPosition();
-        expect(position).to.be.greaterThanOrEqual(0);
-        expect(position).to.be.lessThan(1000); //changed this value from original of 5000
-  }
+   
 
     public async  verifyResumeWithinRange() {
         await ecp.sendKeypress(ecp.Key.Play);// PLay to create history

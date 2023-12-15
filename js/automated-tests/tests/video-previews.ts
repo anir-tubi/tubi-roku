@@ -138,7 +138,7 @@ describe('Video Preview', function () {
     await testUtils.expectPlayerStateToEventuallyEqual('play');
 
     // Let the preview end
-    await utils.sleep(100000); // IMPROVEMENT with helper (See to End)
+    await utils.sleep(90000); // IMPROVEMENT with helper (See to End)
 
     // Verify that video is playing
     await testUtils.expectPlayerStateToEventuallyEqual('play');
@@ -147,6 +147,7 @@ describe('Video Preview', function () {
 
   // https://tubi.testrail.io/index.php?/cases/view/264838
   it('C264838 - Access Kids Mode and ensure the behavior of the Video Preview mirrors that of the non-kids mode @videopreview', async () => {
+    
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
@@ -160,7 +161,7 @@ describe('Video Preview', function () {
     await testUtils.expectPlayerStateToEventuallyEqual('play');
 
     // Let the preview end
-    await utils.sleep(100000);
+    await utils.sleep(90000);
 
     // Verify that video is playing
     await testUtils.expectPlayerStateToEventuallyEqual('play');

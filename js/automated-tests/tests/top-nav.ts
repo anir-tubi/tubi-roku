@@ -220,6 +220,7 @@ describe('Top Navigation', function () {
 
       // Press OK
       await ecp.sendKeypress(ecp.Key.Ok);
+      await utils.sleep(4000);
 
       // Are we on Live screen?
       const liveTVTitle = await testUtils.getNodeForElement('liveTVTitle');
@@ -412,8 +413,8 @@ describe('Top Navigation', function () {
         await ecp.sendKeypress(ecp.Key.Back, {count:3});
 
         // Verify that the Exit modal dialog is displayed
-        const exitButtonText = testUtils.getNodeForElement('exitButtonText');
-        await (exitButtonText);
+        const exitDialogButtonText = await testUtils.getNodeForElement('exitDialogButtonText');
+     
 
       });
 

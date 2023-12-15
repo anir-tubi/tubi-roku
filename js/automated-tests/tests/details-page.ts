@@ -10,7 +10,6 @@ describe('Details Page', function () {
 
     before(async () => {
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
-
       await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       // We now want to find a piece of content that doesn't have a video preview
@@ -550,8 +549,6 @@ describe('Details Page', function () {
       // Check we are on the My Stuff page
       const myStuffCallToAction = await testUtils.getNodeForElement('myStuffCallToAction');
       expect(myStuffCallToAction).to.exist;
-
-
       await ecp.sendKeypress(ecp.Key.Down);
 
       // Jump to the My List row
@@ -573,19 +570,20 @@ describe('Details Page', function () {
 
       // Select the Remove from my list button and verify that it changes to Add to My List
       await testUtils.selectAndVerifyDetailPageMenuItem('addToMyList');
-      await testUtils.retryWithTimeOut(async () => {
-        await testUtils.selectAndVerifyDetailPageMenuItem('removeFromMyList');
-      });
+      await testUtils.selectAndVerifyDetailPageMenuItem('removeFromMyList');
+      
     });
 
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535821
     it('C535821 - Series - No History - When episode is chosen then playback should triggered from the beginning @sdp_1,@smoke,@regression,@registered_user', async () => {
       // While on Series Details page, lets play and check playback starts from the beginning
+      await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
       await ecp.sendKeypress(ecp.Key.Ok);
-      await shared.verifyPlayFromBeginning();
+      await verifyPlayFromBeginning();
       await ecp.sendKeypress(ecp.Key.Back); // Back to Details page
     });
+ 
 
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/536524
@@ -667,7 +665,7 @@ describe('Details Page', function () {
     });
 
 
-
+ 
   }); //Close describe Series Details page
 
 });// Close describe Details page
@@ -726,10 +724,11 @@ async function verifyPlayFromBeginning() {
 
   // Press Play and check playback
   await testUtils.selectAndVerifyDetailPageMenuItem('play');
-  await testUtils.expectPlayerStateToEventuallyEqual('play', 5000);
+  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 5000);
+
 
   // Verify Movie title playback starts from beginning
-  const position = await testUtils.getPlayerPosition();
+  const position = await testUtils.getPlayerPosition('videoPlayerScreen');
   expect(position).to.be.greaterThanOrEqual(0);
   expect(position).to.be.lessThan(1000); //changed this value from original of 5000
 }
