@@ -205,7 +205,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
 
       sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.streamStart, content)
 
-      if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1", false).enabled = true
+      if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v2", false).enabled = true
         getRelatedContent(content, handleRelatedResponseInVideoPlayer)
       end if
     end if

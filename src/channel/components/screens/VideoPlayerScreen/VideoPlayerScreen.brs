@@ -126,13 +126,12 @@ Function init()
   m.TopHint = m.top.findNode("TopHint")
   m.ScrubTimer = m.top.findNode("ScrubTimer")
   m.HUD = m.top.findNode("HUD")
-  m.TransportGradient = m.top.findNode("TransportGradient")
   m.AdHeadsUp = m.top.findNode("AdHeadsUp")
   m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
   m.Thumbnail = m.top.findNode("Thumbnail")
 
   m.VideoOverlay = m.top.findNode("VideoOverlay")
-  m.YMALGradient = m.top.findNode("YMALGradient")
+  m.VideoYMALOverlay = m.top.findNode("VideoYMALOverlay")
 
   m.skipCuepointsButton = m.top.findNode("SkipCuepointsButton")
   m.skipCuepointsButton.observeFieldScoped("selected", "onSkipCuepointsButtonSelected")
@@ -299,16 +298,12 @@ Function init()
   ' Creating internal state to track when the overlay is visible to users.
   m.isClosedCaptionAudioOverlayShowing = false
 
-  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1", false).enabled = true
-    m.TransportGradient.opacity = 0.0
-    m.YMALGradient.opacity = 1.0
+  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v2", false).enabled = true
     m.skipCuepointsButtonUpTranslation = 681
     m.skipCuepointsButtonDownTranslation = 780
     m.thumbnailMaxYOffset = 825
     m.Transport.translation = [0,783]
   else
-    m.YMALGradient.opacity = 0.0
-    m.TransportGradient.opacity = 1.0
     m.skipCuepointsButtonUpTranslation = 741
     m.skipCuepointsButtonDownTranslation = 840
     m.thumbnailMaxYOffset = 888

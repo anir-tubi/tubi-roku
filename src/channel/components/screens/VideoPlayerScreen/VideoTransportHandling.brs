@@ -126,7 +126,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           setFocusToComponent(m.ProgressBar)
         else if isFocusOnPlayerControl() = true AND m.TopOverlay.opacity = 1
 
-          if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1", false).enabled = true AND m.top.relatedContent <> invalid
+          if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v2", false).enabled = true AND m.top.relatedContent <> invalid
             setFocusToComponent(m.Related)
             animateTransportAndYMAL("in")
           else
@@ -313,7 +313,7 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
     showYMAL()
   end if
 
-  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1", false).enabled = true AND m.focusedNode.isSameNode(m.Related) = true
+  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v2", false).enabled = true AND m.focusedNode.isSameNode(m.Related) = true
     animateTransportAndYMAL("out")
     setFocusToPlaybackControl()
   end if
@@ -484,7 +484,7 @@ Function handleOk()
   if m.HUD.opacity = 0 AND m.skipCuepointsButton.hasFocus() = false
     showTransport()
 
-    if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1", false).enabled = true
+    if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v2", false).enabled = true
       showYMAL()
     end if
 
@@ -1190,6 +1190,7 @@ Function animateTransport(direction)
     showRatingGradient()
   else
     fade(m.VideoOverlay, direction, 0.4)
+
     if direction = "in"
       showTopOverlayAndHint()
     else
@@ -1601,11 +1602,12 @@ Function animateTransportAndYMAL(direction)
     handleSkipCuepointsButtonOnAnimateTransport("out")
     fade(m.TopOverlay, "out", 0.4)
     fade(m.TransportButtons, "out", 0.4)
+    fade(m.VideoOverlay, "out", 0.4)
+    fade(m.VideoYMALOverlay, "in", 0.4)
     showRatingGradient()
     slideTo(m.HUD, [0, -621], 0.6)
     m.Related.open = true
   else
-
     if m.skipCuepointsButtonTimer <> invalid
       showSkipCuepointsButton()
     end if
@@ -1614,6 +1616,8 @@ Function animateTransportAndYMAL(direction)
       m.Thumbnail.visible = true
     end if
 
+    fade(m.VideoYMALOverlay, "out", 0.4)
+    fade(m.VideoOverlay, "in", 0.4)
     hideRatingGradient()
     fade(m.TopOverlay, "in", 0.6, 0.2)
     slideTo(m.HUD, [0, 0], 0.6)
@@ -1627,7 +1631,7 @@ End Function
 ' show YMAL row on bottom of the screen and fire exposure event
 Function showYMAL()
   'fire exposure event when YMAL row is displayed at bottom area of the screen
-  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1").enabled = true AND m.top.relatedContent <> invalid
+  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v2").enabled = true AND m.top.relatedContent <> invalid
     m.Related.show = true
   end if
 End Function
@@ -1642,8 +1646,8 @@ End Function
 '   - show skip cue point button if applicable
 Function hideYMAL()
 
-  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v1", false).enabled = true
-    m.relatedRowFocused = false
+  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v2", false).enabled = true
+    fade(m.VideoYMALOverlay, "out", 0.4)
     m.Related.hide = true
 
     if m.Related.opacity > 0
@@ -1688,10 +1692,9 @@ End Function
 
 
 Function onShowYMALInFullScreen(msg)
-  fade(m.VideoOverlay, "in", 0.4)
+  fade(m.VideoYMALOverlay, "in", 0.4)
   m.HUD.translation = [0, -621]
   fade(m.HUD, "in", 0.6)
   m.Related.showInFullScreen = true
-  m.relatedRowFocused = true
   m.Related.setFocus(true)
 End Function
