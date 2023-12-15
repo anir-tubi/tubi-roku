@@ -706,11 +706,6 @@ function BrazeInit(config as object, messagePort as object)
       if transformed_trigger.is_control = invalid
         transformed_trigger.is_control = false
       end if
-
-      ' ******* Please do not remove the below lines they were added by Tubi Roku team to support passing message id in our dialog events. ****
-      transformed_trigger.brazeMessageId = trigger.id
-      ' *** end of block which we forked ******
-      
       return transformed_trigger
     end function,
 

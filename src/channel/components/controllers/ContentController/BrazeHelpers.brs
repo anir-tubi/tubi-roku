@@ -91,24 +91,10 @@ End Function
 
 
 Function getBrazeModalData(message)
-  currentScreen = getCurrentScreen()
-  ' Truncating to 20 characters due to backend limitation.
-  brazeMessageId = message.brazeMessageId.left(20)
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "TOAST"
-      pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
-      dialog_action: "SHOW"
-      dialog_sub_type: brazeMessageId
-    }
-  }
   modalInfo = {
     header: message.header
     subheader: message.message
     instantResumeAction: m.constants.instantResumeActions.closeDialog
-    openTrackEvent: dialogEvent
-    trackingTask: m.trackingLoggingTask
   }
 
   ' Will contain a comma seperated string of urls.
