@@ -403,7 +403,6 @@ End Function
 
 Function onCategoryResponseInBatch(msg) As Void
   tubiLog("CategoryGridList.categoryResponseInBatch")
-  m.top.fireExposureEventViewMoreExp = true
 
   response = msg.getData()
   shouldInformHomeScreen = false

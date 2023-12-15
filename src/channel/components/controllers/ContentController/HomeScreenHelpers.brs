@@ -66,7 +66,6 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     homeScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
     homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
-    homeScreen.observeFieldScoped("isViewMoreSelected", "onIsViewMoreSelected")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
@@ -901,8 +900,6 @@ Function onContentSelected(msg)
   else if content.type = m.constants.ui.contentTypes.navigate
     stopVideoPreview()
     showTournamentScreen(m.constants)
-  else if content.type = m.constants.ui.contentTypes.viewMore
-    handleViewMoreSelected(homeScreen)
   else
     playbackSource = {
       "srcForAnalytic": m.constants.player.playbackSource.unknown
@@ -1213,25 +1210,6 @@ Function onLoadCategoryForIds(msg)
     })
   end if
   return true
-End Function
-
-
-Function onIsViewMoreSelected(msg)
-  isViewMoreSelected = msg.getData()
-
-  if isViewMoreSelected = true
-    homeScreen = msg.getRoSGNode()
-    handleViewMoreSelected(homeScreen)
-  end if
-End Function
-
-
-Function handleViewMoreSelected(homeScreen)
-  stopVideoPreview()
-  focusedContainer = homeScreen.rowFocusedForViewMore
-  if focusedContainer <> invalid
-    showCategoryDetailsScreen(focusedContainer, m.constants.ui.terms.home, true, homeScreen.contentMode, homeScreen.columnFocused)
-  end if
 End Function
 
 

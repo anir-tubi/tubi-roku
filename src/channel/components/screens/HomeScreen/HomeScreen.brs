@@ -18,30 +18,6 @@ Function init()
   m.ContentArea.translation = [192,518]
   m.ContentArea.maskOffset = [0,273]
 
-  m.experimentName = ""
-  experimentResult = getExperimentResult("roku_see_all_container", "roku_view_more_one_hundred_v1")
-  if experimentResult <> invalid
-    m.experimentName = experimentResult.experiment_name
-  end if
-
-  experimentResult = getExperimentResult("roku_see_all_container", "roku_view_more_last_v1")
-  if experimentResult <> invalid
-    m.experimentName = experimentResult.experiment_name
-  end if
-
-  if m.global <> invalid
-    '//REMOVE uiMode observer once the roku_see_all_container experiment is graduated
-    m.global.observeFieldScoped("uiMode", "onUIMode")
-  end if
-
-  '//REMOVE onUIMode() once the roku_see_all_container experiment is graduated
-  onUIMode()
-
-  ' this variable helps to identify whether the view more exposure event was fired or not.
-  ' the reason for maintaining this variable is the 'onFireExposureEvent' function will be trigerred many times,
-  ' but we don't want to fire exposure all times
-  m.wasExposureEventForViewMoreFired = false
-
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeFieldScoped("signedIn", "onSignedInChange")
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
@@ -71,8 +47,6 @@ Function init()
   m.CategoryGridList.observeField("currFocusRow", "onCurrFocusRowChange")
   m.CategoryGridList.observeField("currFocusColumn", "onCurrFocusColumnChange")
   m.CategoryGridList.observeField("rowFocused", "onRowFocused")
-  ' //REMOVE below observeField once the roku_see_all_container experiment is graduated
-  m.CategoryGridList.observeField("fireExposureEventViewMoreExp", "onFireExposureEvent")
 
   m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
 
@@ -122,16 +96,6 @@ Function init()
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmall_strong)
-End Function
-
-
-'//REMOVE onUIMode function once the roku_see_all_container experiment is graduated
-Function onUIMode(msg = invalid)
-  if msg <> invalid
-    m.uiMode = msg.getData()
-  else
-    m.uiMode = getFieldFromGlobal("uiMode")
-  end if
 End Function
 
 
@@ -350,38 +314,6 @@ Function onRowFocused(msg)
 End Function
 
 
-' @currentFocusRow: roSGNode, a CategoryContentNode
-Function updateRowFocusedForViewMore(currentFocusRow)
-  if isCurrentRowHasViewMore(currentFocusRow) = true
-    m.top.rowFocusedForViewMore = currentFocusRow
-  else
-    m.top.rowFocusedForViewMore = invalid
-  end if
-End Function
-
-
-' @currentFocusRow: roSGNode, a CategoryContentNode
-Function isCurrentRowHasViewMore(currentFocusRow)
-  result = false
-  row = currentFocusRow
-
-  if row <> invalid
-    rowCount = row.totalCount
-    'TODO:Create a gridItemType for channels and check against m.constants.ui.gridItemTypes.channel.
-    'categoryTypes are values passed by the backend, we should be checking against values that we set within the app.
-    'checking gridItemType to handle linear rows and row type to handle channel rows.
-    if (m.uiMode = m.constants.ui.modes.standard OR m.uiMode = m.constants.ui.modes.latino) AND row.gridItemType <> m.constants.ui.gridItemTypes.linear AND row.type <> m.constants.ui.categoryTypes.channel
-      if getExperimentResource("roku_see_all_container", "roku_view_more_one_hundred_v1", false).enabled  = true AND rowCount >= 104
-        result = true
-      else if getExperimentResource("roku_see_all_container", "roku_view_more_last_v1", false).enabled = true AND rowCount >= 200
-        result = true
-      end if
-    end if
-  end if
-  return result
-End Function
-
-
 ' @row: roSGNode, a CategoryContentNode
 Function isSponsoredRow(row)
   if row.sponsorImages <> invalid AND row.sponsorImages.pixels <> invalid AND row.sponsorImages.pixels["homescreen"] <> invalid
@@ -499,10 +431,6 @@ Function onCurrFocusRowChange()
   end if
 
   if categoryEnteringFocus <> invalid
-    if isNonEmptyString(m.experimentName) = true AND getExperimentResource("roku_see_all_container", m.experimentName, false).enabled = true
-      updateRowFocusedForViewMore(categoryEnteringFocus)
-    end if
-
     sSponsorBackgroundURL = ""
 
     if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
@@ -594,8 +522,6 @@ Function populateInfoPanelByContent(focusedContent)
       end if
     else if sType = m.constants.ui.contentTypes.historySignedOutUser
       populateInfoPanel(m.constants.ui.infoPanelModes.continueWatching, focusedContent)
-    else if sType = m.constants.ui.contentTypes.viewMore
-      populateInfoPanel(m.constants.ui.infoPanelModes.viewMore, focusedContent)
     '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     else if sType = m.constants.ui.contentTypes.navigate
       populateInfoPanel(m.constants.ui.infoPanelModes.navigateSports, focusedContent)
@@ -615,95 +541,14 @@ Function populateInfoPanelByContent(focusedContent)
 End Function
 
 
-' //REMOVE onFireExposureEvent function and its reference once the roku_see_all_container experiment is graduated
-' callback when viewMore tile or floating viewMore is shown to the user
-Function onFireExposureEvent(msg)
-  categoryGridList = msg.getRoSGNode()
-  fireExposureEventForViewMore(categoryGridList)
-End Function
-
-
-' //REMOVE fireExposureEventForViewMore function and its reference once the roku_see_all_container experiment is graduated
-' Fires exposure event only once per session
-'
-' @categoryGridList: roSGNode, CategoryGridList node
-Function fireExposureEventForViewMore(categoryGridList = invalid)
-
-  if m.wasExposureEventForViewMoreFired = false AND categoryGridList <> invalid AND categoryGridList.focusedPosition <> invalid AND categoryGridList.content <> invalid
-
-    rowIndex = categoryGridList.focusedPosition[0]
-    colIndex = categoryGridList.focusedPosition[1]
-    content = categoryGridList.content
-
-    if rowIndex <> invalid AND colIndex <> invalid
-
-      if doesContentHaveChild(content, rowIndex, colIndex) = true AND isContentMovieOrSeriesOrViewMore(content.getChild(rowIndex).getChild(colIndex)) = true
-        if m.experimentName = "roku_view_more_one_hundred_v1" OR m.experimentName = "qa.roku_view_more_one_hundred_v1"
-          if colIndex >= 103 ' at this point the View More tile will be visible to user, so firing exposure event
-            getExperimentResource("roku_see_all_container", m.experimentName, true)
-            m.wasExposureEventForViewMoreFired = true
-          end if
-        else if m.experimentName = "roku_view_more_last_v1" OR m.experimentName = "qa.roku_view_more_last_v1"
-            if colIndex >= 199 ' at this point the View More tile will be visible to user, so firing exposure event
-              getExperimentResource("roku_see_all_container", m.experimentName, true)
-              m.wasExposureEventForViewMoreFired = true
-            end if
-        end if
-      end if
-
-    end if
-
-  end if
-
-End Function
-
-
-' //REMOVE isContentMovieOrSeriesOrViewMore function and its reference once the roku_see_all_container experiment is graduated
-Function isContentMovieOrSeriesOrViewMore(content)
-  result = false
-  contentTypes = m.constants.ui.contentTypes
-
-  if content.type = contentTypes.video OR content.type = contentTypes.series OR content.type = contentTypes.viewMore
-    result = true
-  end if
-
-  return result
-End Function
-
-
-' //REMOVE doesContentHaveChild function and its reference once the roku_see_all_container experiment is graduated
-'
-' @content: roSGNode, CategoryContentNode for HomeScreen.
-' @rowIndex: integer, the index of row, 0 based index
-' @colIndex: integer, the index of column, 0 based index
-Function doesContentHaveChild(content, rowIndex, colIndex)
-  result = false
-
-  if content <> invalid AND rowIndex <> invalid AND colIndex <> invalid AND  content.getChild(rowIndex) <> invalid
-    if content.getChild(rowIndex).getChild(colIndex) <> invalid
-      result = true
-    end if
-  end if
-
-  return result
-End Function
-
-
 '''''''''''''''''''''
 ' onGridFocusChange
 '
 ' On grid focus change, update the info panel
 Function onGridFocusChange() as void
-  ' //REMOVE below block once the roku_see_all_container experiment is graduated
-  fireExposureEventForViewMore(m.CategoryGridList)
-
   tubiLog("HomeScreen.onGridFocusChange")
   if m.top.contentReady = false
     m.top.contentReady = true
-  end if
-
-  if isNonEmptyString(m.experimentName) = true AND getExperimentResource("roku_see_all_container", m.experimentName, false).enabled = true
-    updateRowFocusedForViewMore(m.CategoryGridList.rowFocused)
   end if
 
   '//if the screen is loading or if the grid is not in focus or the topnav is not in focus, then exit out of this function
@@ -825,10 +670,6 @@ Function onItemToBeFocusedChange()
     m.top.contentReady = true
   end if
 
-  if isNonEmptyString(m.experimentName) = true AND getExperimentResource("roku_see_all_container", m.experimentName, false).enabled = true
-    updateRowFocusedForViewMore(m.CategoryGridList.rowFocused)
-  end if
-
   'We are updating the infopanel for updated focused content, but not updating the contentFocused.
   'Here we are updating the contentFocused, so it will play correct video preview when the content is updated.
   m.top.contentFocused = m.CategoryGridList.reloadedItemToBeFocused
@@ -868,19 +709,6 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.width = 960
     else if mode = m.constants.ui.infoPanelModes.programHomescreen
       populateInfoPanelWithProgramHomescreenMode(contentNode, m.InfoPanel)
-    else if mode = m.constants.ui.infoPanelModes.viewMore
-      m.InfoPanel.mode = mode
-      m.InfoPanel.title = contentNode.title
-      'Fifa Worldcup description and dates are constant when show all games is focused, so hardcoding it
-      m.InfoPanel.description = contentNode.description
-      lineOneData = {}
-
-      if contentNode.movieAndTVShowCount <> invalid
-        lineOneData.movieAndTVShowCount = contentNode.movieAndTVShowCount
-      end if
-
-      m.InfoPanel.lineOneData = lineOneData
-      m.InfoPanel.width = 960
     '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     else if mode = m.constants.ui.infoPanelModes.navigateSports
       m.InfoPanel.mode = mode
@@ -922,9 +750,6 @@ End Function
 '                     while focused on the top nav of another page
 Function setFocusOntoTopNav(isToggle)
   tubiLog("Homescreen.setFocusOntoTopNav")
-
-  ' setting rowFocusedForViewMore as invalid, we have to disable "options" when focus is on topNav
-  m.top.rowFocusedForViewMore = invalid
 
   if isToggle = true
     ' only send top nav toggle event if the top nav is gaining focus from the category grid list.
@@ -1064,9 +889,6 @@ Function onKeyEvent(key, press) as boolean
       else if key = "left"
         ' navigating to the side nav
         m.top.stopLinearVideoPlayer = true
-
-        ' setting rowFocusedForViewMore as invalid, we have to disable "options" when focus is on topNav
-        m.top.rowFocusedForViewMore = invalid
 
         if m.top.isVideoPreviewOn = true
           m.top.pauseVideoPreview = true

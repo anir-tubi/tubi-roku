@@ -26,7 +26,6 @@ Function init()
     live: "live"
     sportsEvent: "sports_event"
     navigate: "navigate"
-    viewMore: "viewMore"
   }
 
   '//recreate the contentTimings from constants so as not to access m.global.constants for every item on the home screen as they are created
@@ -145,16 +144,6 @@ Function onContentChange(msg)
     badgeText = info.badgeText
     if isNonEmptyString(badgeText) = true
       setReplayOrUpcomingBadge(badgeText)
-    end if
-
-    if itemContent.type <> invalid AND (itemContent.type = m.contentTypes.navigate OR itemContent.type = m.contentTypes.viewMore) AND itemContent.showAllText <> invalid
-
-      griditemtype = itemContent.griditemtype
-      if griditemtype = invalid
-        gridItemType = "portrait"
-      end if
-
-      setShowAllLabel(itemContent.showAllText, gridItemType)
     end if
 
     if itemContent.needsLogin = true
@@ -405,38 +394,6 @@ End Function
 Function removeLockIcon()
   tubiLog("CategoryGridPoster.removeLockIcon")
   m.top.removeChild(m.lockIcon)
-End Function
-
-
-' setShowAllLabel is to set text/label inside poster. Currently this feature is available only for landscape & portrait gridTypes.
-' if we need to support any other gridTypes, then add the width & height to support those inside this function.
-'
-'@text: String, a text to be displayed inside viewMore poster
-'@gridType: String, default is portrait. possible values are constants.ui.gridItemTypes
-Function setShowAllLabel(text, gridType = "portrait")
-  tubiLog("CategoryGridPoster.setShowAllLabel")
-  theme = getThemeFromGlobal()
-  m.showAllLabel = m.top.createChild("Label")
-  m.showAllLabel.text = text
-
-  if theme <> invalid
-    m.showAllLabel.color = theme.primaryTextColor
-  end if
-
-  if gridType = "portrait"
-    m.showAllLabel.width = 186
-    m.showAllLabel.height = 267
-  else
-    m.showAllLabel.width = 380
-    m.showAllLabel.height = 216
-  end if
-
-  m.showAllLabel.horizAlign = "center"
-  m.showAllLabel.vertAlign = "center"
-  font = CreateObject("roSGNode", "Font")
-  font.uri = "pkg:/fonts/Vaud-Bold.ttf"
-  font.size = 27
-  m.showAllLabel.font = font
 End Function
 
 

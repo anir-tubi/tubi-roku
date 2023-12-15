@@ -123,9 +123,6 @@
 
       <field id="loadCategoriesIndex" type="integer" alwaysNotify="true" />
 
-      <!-- //REMOVE fireExposureEventViewMoreExp interface once the roku_view_more_one_hundred_v1/roku_view_more_last_v1 experiment is graduated -->
-      <field id="fireExposureEventViewMoreExp" type="boolean" alwaysNotify="true" />
-
   </interface>
 
   <children>

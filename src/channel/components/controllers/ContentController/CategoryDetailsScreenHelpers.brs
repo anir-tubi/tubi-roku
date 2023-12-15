@@ -6,8 +6,7 @@
 '                       to let the user know what page they will go to when they click the back button. Possible values are from constants.ui.terms
 ' @sendNavigationLoadEvents: boolean, when the page is loaded, do the navigation to page, pageload events needs to be sent
 ' @contentMode: string, the value from constants.ui.contentMode to be sent as param to the tensor request
-' @itemFocused: integer, the index of the content item that will be focused once the screen has loaded content.
-Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoadEvents = true, contentMode = "", itemFocused = -1)
+Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoadEvents = true, contentMode = "")
   tubiLog("CategoryDetailsScreenHelpers.showCategoryDetailsScreen")
 
   categoryDetailsScreen = CreateObject("roSGNode", "CategoryDetailsScreen")
@@ -26,12 +25,6 @@ Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoad
   categoryDetailsScreen.id = m.constants.ui.screenIds.categoryDetailsScreen
   categoryDetailsScreen.categoryId = content.id
   categoryDetailsScreen.isLoading = true
-
-  if itemFocused >= 0
-    ' This block will be executed when we select the view more tile
-    ' to focus on the correct item in categoryDetails screen.
-    categoryDetailsScreen.jumpToItemFocused = itemFocused
-  end if
 
   categoryDetailsScreen.trackingPageInfo = {
     pageType: "category_page"

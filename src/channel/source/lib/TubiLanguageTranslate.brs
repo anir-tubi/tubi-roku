@@ -347,14 +347,6 @@ Function getTranslation_en_US()
       "description": "The text to display on Show All Games tile",
       "message": "Show All"
     },
-    "screenHome_item_viewMore": {
-      "description": "The text to display on View More movies / shows",
-      "message": "View More {containerTitle}"
-    },
-    "screenHome_item_viewMore_description": {
-      "description": "The text to display total count on View More movies / shows",
-      "message": "{totalCount}+ titles, updated weekly."
-    },
     "loadingIndicator": {
       "description": "When something is loading, this text appears so the user knows something is loading.",
       "message": "Loading..."

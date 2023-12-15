@@ -364,10 +364,6 @@ Function onLineOneDataChange(msg)
       end if
     end if
 
-    if data.movieAndTVShowCount <> invalid
-      text += data.movieAndTVShowCount
-    end if
-
     line1IsPresent = (m.line1.getParent() <> invalid)
     line1BoldIsPresent = (m.line1Bold.getParent() <> invalid)
     textIsPresent = (line1IsPresent = true OR line1BoldIsPresent = true)
@@ -904,16 +900,6 @@ Function onModeChange()
     m.secondLineGroup.appendChild(m.line2)
 
     m.offset.itemSpacings = [15]
-  else if m.top.mode = m.constants.ui.infoPanelModes.viewMore 'this block is for viewMore tile
-    m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.twoLineInfo)
-    m.offset.appendChild(m.descriptionGroup)
-
-    m.twoLineInfo.appendChild(m.firstLineGroup)
-    m.firstLineGroup.appendChild(m.line1Bold)
-
-    m.offset.itemSpacings = [24, 9]
   '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
   else if m.top.mode = m.constants.ui.infoPanelModes.navigateSports
     m.infoPanelGroup.appendChild(m.offset)
