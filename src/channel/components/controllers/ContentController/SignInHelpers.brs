@@ -1337,35 +1337,92 @@ End Function
 Function processTokenToGenerateTokenDebugInfo()
   ' Processing the token before sending request. So that we can use this info if it fails.
   authInfo = getFieldFromGlobal("authInfo")
-  if authInfo <> invalid AND authInfo.accessToken <> invalid
-    ' Contains 3 parts.
-    ' First part contains type of encrption
-    ' Second part is where we will get the token info.
-    jwtTokenSplit = authInfo.accessToken.split(".")
-    ' Checking the token is valid before proceeding.
-    if jwtTokenSplit.count() = 3
-      jwtBody = CreateObject("roByteArray")
-      jwtBody.FromBase64String(base64UrlToBase64(jwtTokenSplit[1]))
-      body = parseJSON(jwtBody.ToAsciiString())
-      m.tokenDebugInfo = {
+  ' Creating assoc array so that we append object as and when we have it.
+  tokenDebugInfo = {}
+  if authInfo <> invalid
+    if authInfo.accessToken <> invalid
+      parsedToken = parseJWTToken(authInfo.accessToken)
 
-        'expiretime
-        expiretime: body.exp
+      if parsedToken <> invalid
+        wasTokenExpired = checkIfTokenExpired(parsedToken.exp)
+        tokenDebugInfo.append({
+          ' is token valid
+          wasGlobalAuthTokenExpired: (wasTokenExpired = true)
+  
+          ' the presence of user_id in the token indicates it is a auth token.
+          wasValidUserIdPresentInGlobalAuthToken: isNonEmptyString(parsedToken.user_id)
+        })
+      end if
 
-        ' type: will provide us information about the type of token.
-        type: body.type
-
-        ' is UUID present. Since uuid is present avoiding sending it to backend.
-        wasValidUserIdPresentInToken: isNonEmptyString(body.uuid)
-
-        ' sending platform just in case to rule out if the token was passed from ios.
-        platform: body.platform
-
-        ' is userid present in the authinfo. This helps us check if for some reason we are missing user id in registry / global auth info.
-        wasValidUserIdPresentInAuthInfo: authInfo.userId <> invalid
-      }
+      tokenDebugInfo.append({
+        ' is userid present in the authinfo. This helps us check if for some reason we are missing user id global auth info.
+        wasValidUserIdPresentInGlobalAuthInfo: (authInfo.userId <> invalid)
+      })
     end if
   end if
+
+  Auth = TubiAuth(m.constants, m.Request)
+  ' This reads token from registry not from global this will help us figure out if we are having difference in registry vs global.
+  authInfo = Auth.getAuthInfoNoUpdate()
+
+  if authInfo <> invalid
+    if authInfo.accessToken <> invalid
+      parsedToken = parseJWTToken(authInfo.accessToken)
+
+      if parsedToken <> invalid
+        wasTokenExpired = checkIfTokenExpired(parsedToken.exp)
+        tokenDebugInfo.append({
+          ' is token valid
+          wasTokenInRegistryExpired: (wasTokenExpired = true)
+  
+          ' the presence of user_id in the token indicates it is a auth token.
+          wasValidUserIdPresentInTokenInRegistry: isNonEmptyString(parsedToken.user_id)
+        })
+      end if
+
+      tokenDebugInfo.append({
+        ' is userid present in the authinfo. This helps us check if for some reason we are missing user id in registry.
+        wasValidUserIdPresentInRegistryAuthInfo: authInfo.userId <> invalid
+      })
+    end if
+  end if
+
+
+  m.tokenDebugInfo = tokenDebugInfo
+End Function
+
+
+' @expireTime: integer, Holds the timestamp when the token will expire.
+Function checkIfTokenExpired(expireTime)
+  isExpired = true
+
+  dateTime = CreateObject("roDateTime")
+  timeInSecs = dateTime.asSeconds()
+
+  if isInteger(expireTime) AND timeInSecs < expireTime
+    isExpired = false
+  end if
+
+  return isExpired
+End Function
+
+
+' @param token: string, jwt token.
+' @returns: assoc array, returns a assocarray which will contains info related to token ex: {"exp": 1701458827,"platform": "roku","type": 1,"user_id": 1}
+Function parseJWTToken(token)
+  parsedToken = invalid
+  ' Contains 3 parts.
+  ' First part contains type of encrption
+  ' Second part is where we will get the token info.
+  jwtTokenSplit = token.split(".")
+  ' Checking the token is valid before proceeding.
+  if jwtTokenSplit.count() = 3
+    jwtBody = CreateObject("roByteArray")
+    jwtBody.FromBase64String(base64UrlToBase64(jwtTokenSplit[1]))
+    parsedToken = parseJSON(jwtBody.ToAsciiString())
+  end if
+
+  return parsedToken
 End Function
 
 
