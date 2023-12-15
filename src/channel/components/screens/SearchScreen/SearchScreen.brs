@@ -293,6 +293,7 @@ Function onSearchContentChange()
       if m.microphone <> invalid
         m.microphone.visible = true
       end if
+      m.searchText.text = m.sDefaultSearchText
     else
       matchingText = getTranslation("screenSearch_matchingTitles")
       m.searchHintText.text = m.ResultGrid.content.getChildCount().toStr() + " " + matchingText + " " + Chr(34) + m.searchMenuText.text + Chr(34)
