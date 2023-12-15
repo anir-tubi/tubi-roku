@@ -1,0 +1,147 @@
+import { testUtils } from '../../test-utils';
+import HomePage from '../pages/homePage';
+import ChannelsPage from '../pages/channelsPage';
+import { createNewTestInProxy } from '../utils/network/qaProxy';
+import {
+	verifyC543668andC543669,
+	verifyC543671,
+	verifyC543672,
+	verifyC425239,
+	verifyC425249,
+	verifyC425250,
+	verifyC425240,
+	verifyC425241,
+	verifyC425244,
+	verifyC425251,
+	verifyC425235,
+	verifyC425236,
+	verifyC425233,
+} from '../verification/navigateWithinPageVerification';
+import { ecp, utils } from 'roku-test-automation';
+
+describe('Navigate Within Page', function () {
+	beforeEach(async () => {
+		await createNewTestInProxy();
+		await testUtils.startApplicationAtPage('movies', {
+			shouldCreateNewUser: false,
+		});
+	});
+
+	it('When HomePage vertical navigation C543668 and NavigateWithinPage - CategoryPage navigation C543669\
+	    and User Action - Scroll within sublists, such as categories or channel C3843 @analytics', async () => {
+		const homePage = HomePage();
+		const titleId = await homePage.getMovieTitleId();
+		await homePage.navigateDown(1);
+		await verifyC543668andC543669(titleId);
+	});
+	it('NavigateWithinPage - HomePage CategoryComponent horizontal navigation - every 3 seconds C543671 @analytics', async () => {
+		const homePage = HomePage();
+		const details = await homePage.getMovieTitleIdAndCategory();
+		await homePage.navigateDown(1);
+		await utils.sleep(500); //need this as quick navigation messing with events
+		await homePage.navigateRight(2);
+		await utils.sleep(500);
+		await homePage.navigateRight(1);
+		await verifyC543671(details);
+	});
+	it('NavigateWithinPage - autoplay navigation C543672 @analytics', async () => {
+		const homePage = HomePage();
+		const titleId = await homePage.getMovieTitleId();
+		const playback = await homePage.playMovieTitle();
+		await playback.seekToAutoplay();
+		await playback.selectNextTitleInAutoplay(1);
+		await playback.allowPlaybackToPlayForSeconds(4000);
+		await playback.pausePlayback();
+		await verifyC543672(titleId);
+	});
+	it('When user navigates between menu options - EPISODES_LIST C425239 @analytics', async () => {
+		await testUtils.startApplicationAtPage('tv', {
+			shouldCreateNewUser: false,
+		});
+		const homePage = HomePage();
+		const titleId = await homePage.getTVShowTitleId();
+		const detailsPage = await homePage.selectFocusedTitleTVShow();
+		await detailsPage.highlightEpisodeList();
+		await ecp.sendKeypress(ecp.Key.Down);
+		await verifyC425239(titleId);
+	});
+
+	it('When user makes a selection from details page menu - EPISODES_LIST C425249 @analytics', async () => {
+		await testUtils.startApplicationAtPage('tv', {
+			shouldCreateNewUser: false,
+		});
+		const homePage = HomePage();
+		const titleId = await homePage.getTVShowTitleId();
+		const detailsPage = await homePage.selectFocusedTitleTVShow();
+		await detailsPage.selectEpisodeList();
+		await ecp.sendKeypress(ecp.Key.Back);
+		await utils.sleep(400);
+		await ecp.sendKeypress(ecp.Key.Up, { wait: 500 });
+		await ecp.sendKeypress(ecp.Key.Ok);
+		await verifyC425249(titleId);
+		await verifyC425250(titleId); // check how to get sign up to save progress
+	});
+
+	it('When user navigates between menu options - SIGNUP_TO_SAVE_PROGRESS C425240 @analytics', async () => {
+		await testUtils.startApplicationAtPage('tv', {
+			shouldCreateNewUser: false,
+		});
+		const homePage = HomePage();
+		const titleId = await homePage.getTVShowTitleId();
+		const detailsPage = await homePage.selectFocusedTitleTVShow();
+		await detailsPage.highlightEpisodeList();
+		await ecp.sendKeypress(ecp.Key.Down);
+		await verifyC425240(titleId);
+	});
+
+	it('When user navigates between menu options - ADD_TO_MY_LIST C425241 @analytics', async () => {
+		const homePage = HomePage();
+		const movieDetailsPage = await homePage.selectMovieTitleWithNoTrailer();
+		const videoId = movieDetailsPage.getTitleId();
+		await movieDetailsPage.highlightLikeOrDislike();
+		await ecp.sendKeypress(ecp.Key.Down, { wait: 2000 });
+		await ecp.sendKeypress(ecp.Key.Down, { wait: 2000 });
+		await verifyC425241(videoId);
+	});
+	it('When user navigates between menu options - GO_TO_NETWORK C42524 \
+	    and C425251 When user makes a selection from details page menu - GO_TO_NETWORK @analytics', async () => {
+		await testUtils.startApplicationAtPage('home', {
+			shouldCreateNewUser: false,
+		});
+		await testUtils.waitForAppLaunchBeaconToFire();
+		await testUtils.goToPage('network');
+		const channelsPage = ChannelsPage();
+		await channelsPage.pageDidLoad();
+		const container = await channelsPage.selectChannelByName('cj_enm');
+		const titleDetailsPage = await container.selectFocusedTitle();
+		const videoId = titleDetailsPage.getTitleId();
+		await titleDetailsPage.highlightAddToMyList();
+		await ecp.sendKeypress(ecp.Key.Down);
+		await ecp.sendKeypress(ecp.Key.Ok);
+		await verifyC425244();
+		await verifyC425251(videoId);
+	});
+	it('When user navigates between menu options - LIKE C425235 \
+	    and C425236 When user navigates between menu options - DISLIKE @analytics', async () => {
+		const homePage = HomePage();
+		const movieDetailsPage = await homePage.selectMovieTitleWithNoTrailer();
+		const videoId = movieDetailsPage.getTitleId();
+		await movieDetailsPage.selectLikeOrDislike();
+		await ecp.sendKeypress(ecp.Key.Down);
+		await utils.sleep(500);
+		await ecp.sendKeypress(ecp.Key.Up);
+		await verifyC425235(videoId);
+		await verifyC425236(videoId);
+	});
+	it('When user navigates between menu options - WATCH_TRAILER C425233 @analytics', async () => {
+		const homePage = HomePage();
+		let movieDetailsPage = await homePage.selectMovieTitleWithTrailer();
+		const videoId = movieDetailsPage.getTitleId();
+		const video = await movieDetailsPage.selectPlay();
+		await video.allowPlaybackToPlayForSeconds(10000);
+		movieDetailsPage = await video.navigateBackToDetailsScreen();
+		await movieDetailsPage.highlightWatchTrailer(300);
+		await ecp.sendKeypress(ecp.Key.Down, { wait: 2000 });
+		await verifyC425233(videoId);
+	});
+});

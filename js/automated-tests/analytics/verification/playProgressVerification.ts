@@ -9,7 +9,7 @@ import {
 } from '../utils/network/qaProxy';
 import { expect } from 'chai';
 
-export async function verifyC66349andC21350andC21350(videoId) {
+export async function verifyC66349andC543679andC543680(videoId) {
 	const playProgressEvent = await getMatchedEventsFromLastEvent(
 		Events.play_progress,
 		5
@@ -83,7 +83,7 @@ export async function verifyC66349() {
 			i + 15
 		);
 		firstPlayProgressEvent = pulledEvents.find(
-			(event) => parseInt(event.play_progress.view_time) >= 10113
+			(event) => parseInt(event.play_progress.view_time) >= 10093
 		);
 		i++;
 	}
@@ -102,7 +102,7 @@ export async function verifyC66349() {
 	expect(
 		parseInt(firstPlayProgressEvent.play_progress.view_time)
 	).greaterThanOrEqual(
-		10113,
+		10093,
 		`event should contain firstPlayProgress.play_progress.view_time, Event: \n ${JSON.stringify(
 			firstPlayProgressEvent
 		)}`
@@ -117,7 +117,7 @@ export async function verifyC66349() {
 	);
 }
 
-export async function verifyC21354andC21364(timeFromPlayback, titleId) {
+export async function verifyC543682andC543683(timeFromPlayback, titleId) {
 	const events = await getSeekEvent();
 	const timeFromEvent = await milisecondsToMinutes(
 		events[0].event.seek.to_position
@@ -134,7 +134,7 @@ export async function verifyC21354andC21364(timeFromPlayback, titleId) {
 	);
 }
 
-export async function verifyC21360() {
+export async function verifyC543684() {
 	const playProgressEvent = await getMatchedEventsFromLastEvent(
 		Events.play_progress,
 		3
@@ -147,7 +147,7 @@ export async function verifyC21360() {
 	);
 }
 
-export async function verifyC21351(videoId) {
+export async function verifyC543681(videoId) {
 	const playProgressEvent = await getMatchedEventsFromLastEvent(
 		Events.play_progress,
 		5

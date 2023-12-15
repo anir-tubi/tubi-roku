@@ -18,7 +18,15 @@ const PlayBack = ({ content }) => {
 		playPauseButton: async () =>
 			await testUtils.getNodeForElement(PLAYER_NODES.PLAY_PAUSE_BUTTON),
 		countDownAutoplay: async () =>
-			await testUtils.getNodeForElement(AUTOPLAY_NODES.COUNT_DOWN_MOVIE), //TODO check if it's same for TVShows
+			await testUtils.getNodeForElement(AUTOPLAY_NODES.COUNT_DOWN_MOVIE),
+		countDownAutoplaySeries: async () =>
+			await testUtils.getNodeForElement(AUTOPLAY_NODES.COUNT_DOWN_SERIES),
+		subtitles: async () =>
+			await testUtils.getNodeForElement(PLAYER_NODES.SUBTITLES),
+		titleName: async () =>
+			await testUtils.getNodeForElement(PLAYER_NODES.TITLE_NAME_IN_PLAYBACK),
+		videoPlayer: async () =>
+			await testUtils.getNodeForElement(PLAYER_NODES.VIDEO_PLAYER),
 	};
 
 	const ui = {
@@ -35,6 +43,12 @@ const PlayBack = ({ content }) => {
 		await ecp.sendKeypress(ecp.Key.Play);
 		const playPauseButton = await elements.playPauseButton();
 		expect(playPauseButton.visible).to.equal(true);
+	}
+
+	async function getIdOfCurrentTitle() {
+		const videoPlayer = await elements.videoPlayer();
+		const searchedTitleId = videoPlayer.content.id;
+		return { id: searchedTitleId };
 	}
 
 	async function allowPlaybackToPlayForSeconds(time) {
@@ -152,19 +166,39 @@ const PlayBack = ({ content }) => {
 	async function getProgressPercent() {
 		const playerPlaingTime = await elements.playerPlaingTime();
 		const elTime = getTimeInSeconds(playerPlaingTime.text);
-		return elTime / ui.content.duration;
+		let duration;
+		if (content.mode === 'series') {
+			duration = ui.content.length;
+		} else {
+			duration = ui.content.duration;
+		}
+		return elTime / duration;
+	}
+
+	function areLastFortyValuesSame(arr: number[]): boolean {
+		if (arr.length < 40) {
+			return false;
+		}
+		const lastFive = arr.slice(-40);
+		return lastFive.every((value, index, array) => value === array[0]);
 	}
 
 	async function seekToAutoplay() {
 		await fastForwardNoWaitTime({ howFast: 3 });
+		const arr = new Array<number>();
+		let latestPorgress;
 		await testUtils.untilTrue(
 			async () => {
 				const progress = await getProgressPercent();
-				if (progress > 0.99) {
+				if (progress > 0.99 || areLastFortyValuesSame(arr)) {
 					await ecp.sendKeypress(ecp.Key.Play);
 					await waitForAutoplayVisible();
 					return true;
 				}
+				if (latestPorgress === progress) {
+					arr.push(latestPorgress);
+				}
+				latestPorgress = progress;
 			},
 			'Something wrong with scrolling to autoplay',
 			200000
@@ -173,15 +207,105 @@ const PlayBack = ({ content }) => {
 
 	async function waitForAutoplayVisible() {
 		await testUtils.retryWithTimeOut(async () => {
-			//TODO change this to autoplay general
-			const countDownMovieAutoPlay = await testUtils.getNodeForElement(
-				'countDownMovieAutoPlay'
-			);
-			expect(countDownMovieAutoPlay.visible).to.equal(true);
+			let countDownAutoPlay;
+			if (content.mode === 'series') {
+				countDownAutoPlay = await elements.countDownAutoplaySeries();
+			} else {
+				countDownAutoPlay = await elements.countDownAutoplay();
+			}
+			expect(countDownAutoPlay.visible).to.equal(true);
 		});
 	}
 
+	async function seekToTheEndAndDismissAutoplay() {
+		await seekToAutoplay();
+		await waitForCountDown();
+		await ecp.sendKeypress(ecp.Key.Back);
+		await fastForwardNoWaitTime();
+		await testUtils.untilTrue(
+			async () => {
+				const progress = await getProgressPercent();
+				console.log(`progress ${progress}`);
+				if (progress > 0.97) {
+					await ecp.sendKeypress(ecp.Key.Play);
+					await getCurrentPlaybackTimeInMinutes();
+					return true;
+				}
+			},
+			'Something wrong with scrolling to autoplay',
+			200000
+		);
+	}
+
+	async function waitForCountDown() {
+		await testUtils.untilTrue(
+			async () => {
+				let countDownAutoplay;
+				if (content.mode === 'series') {
+					countDownAutoplay = await elements.countDownAutoplaySeries();
+				} else {
+					countDownAutoplay = await elements.countDownAutoplay();
+				}
+				const [start, inn, space, seconds] = countDownAutoplay.text.split(' ');
+				if (content.mode === 'series') {
+					if (
+						parseInt(seconds) === 14 ||
+						parseInt(seconds) === 13 ||
+						parseInt(seconds) === 12
+					) {
+						return true;
+					}
+				} else {
+					if (
+						parseInt(seconds) === 29 ||
+						parseInt(seconds) === 28 ||
+						parseInt(seconds) === 27 ||
+						parseInt(seconds) === 26
+					) {
+						return true;
+					}
+				}
+			},
+			'Missed start of autoplay',
+			40000
+		);
+	}
+
+	async function selectNextTitleInAutoplay(times) {
+		await waitForCountDown();
+		await allowPlaybackToPlayForSeconds(1000);
+		await ecp.sendKeypress(ecp.Key.Right, { count: times });
+		await allowPlaybackToPlayForSeconds(1000);
+		await ecp.sendKeypress(ecp.Key.Ok);
+		await pageDidLoad();
+	}
+	async function selectSubtitles() {
+		await testUtils.retryWithTimeOut(async () => {
+			await ecp.sendKeypress(ecp.Key.Down);
+			const subtitles = await elements.subtitles();
+			expect(subtitles.visible).to.equal(true);
+		});
+		await ecp.sendKeypress(ecp.Key.Down);
+		await ecp.sendKeypress(ecp.Key.Down);
+		await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
+		await ecp.sendKeypress(ecp.Key.Ok);
+	}
+
+	async function selectSubtitlesOff() {
+		await selectSubtitles();
+		await ecp.sendKeypress(ecp.Key.Up);
+		await ecp.sendKeypress(ecp.Key.Up);
+		await ecp.sendKeypress(ecp.Key.Ok);
+	}
+
+	async function selectSubtitlesOn() {
+		await selectSubtitles();
+		await ecp.sendKeypress(ecp.Key.Down);
+		await ecp.sendKeypress(ecp.Key.Ok);
+	}
+
 	async function waitForAutoplayToDisappearByTimer() {
+		let passedHalf = false;
 		await testUtils.untilTrue(
 			async () => {
 				let countDownAutoplay;
@@ -190,7 +314,14 @@ const PlayBack = ({ content }) => {
 					expect(countDownAutoplay.visible).to.equal(true);
 				});
 				const [start, inn, space, seconds] = countDownAutoplay.text.split(' ');
-				if (parseInt(seconds) === 0) {
+				if (seconds < 15) {
+					passedHalf = true;
+				}
+				if (
+					parseInt(seconds) === 0 ||
+					(passedHalf && parseInt(seconds) === 30) ||
+					(passedHalf && parseInt(seconds) === 1)
+				) {
 					return true;
 				}
 			},
@@ -221,6 +352,11 @@ const PlayBack = ({ content }) => {
 		clickOnNextTitleInPlaybackControlls,
 		navigateBackToDetailsScreen,
 		thirtySkipBackOnPlaybackControlls,
+		selectNextTitleInAutoplay,
+		selectSubtitlesOff,
+		selectSubtitlesOn,
+		getIdOfCurrentTitle,
+		seekToTheEndAndDismissAutoplay,
 	};
 };
 

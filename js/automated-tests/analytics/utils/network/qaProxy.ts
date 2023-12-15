@@ -248,18 +248,32 @@ async function checkMandatoryElementsInEvents(events) {
 
 export const getAnalyticsEvents = async () => {
 	let bodyResponse;
-	const url = `${proxyServer}/roku/${DEVICE_ID_APP}`;
-	await request.get({ url: url }, (err, response, body) => {
-		if (err) {
-			log(err);
-		}
-		if (response.statusCode === 500 || response.statusCode === 502) {
-			throw response.statusCode;
-		}
-		bodyResponse = body;
-	});
-	await checkMandatoryElementsInEvents(bodyResponse.events);
-	return bodyResponse.events;
+	try {
+		await new Promise((res, rej) => {
+			const url = `${proxyServer}/roku/${process.env.DEVICE_ID_APP}`;
+			request.get({ url: url }, (err, response, body) => {
+				if (err) {
+					rej(err);
+					return;
+				}
+				if (response.statusCode === 500 || response.statusCode === 502) {
+					log(`QA proxy returns 500 or 502`);
+					rej(response.statusCode);
+					return;
+				}
+				bodyResponse = JSON.parse(body);
+				if (typeof bodyResponse.Error !== 'undefined') {
+					rej(response.statusCode);
+				}
+				res(bodyResponse);
+			});
+		});
+		await checkMandatoryElementsInEvents(bodyResponse.events);
+		return bodyResponse.events;
+	} catch (error) {
+		console.error('An error occurred:', error);
+		throw error;
+	}
 };
 
 export const getAnalyticsEventsMatchedFromLastEvent = async (
