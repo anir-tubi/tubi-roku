@@ -1282,7 +1282,7 @@ End Function
 ' Make sure the Video node is stopped and we have an accurate playback position before launching ads
 Function showAdBreak()
   ' leave m.VideoState = "play" because from the component's perspective video is still playing
-  m.Video.controlInput = "stop"
+  m.Video.control = "stop"
   hideClosedCaptionAudioTrackOverlay()  ' if dialog is showing, it's awkward to have it still show after ad break
 
   m.top.adPosition = m.playerPosition
@@ -1401,7 +1401,7 @@ Function stopVideo()
   ' add check so that onVideoStateChange doesn't get called
   ' if the video is already in a non playing state.
   if videoState <> "stop"
-    m.Video.controlInput = "stop"
+    m.Video.control = "stop"
   end if
 End Function
 
@@ -2015,7 +2015,7 @@ Function setInitialAudioTrack(availableAudioTracks)
       m.closedCaptionAndAudioSelectionOverlay.currentAudioTrack = updatedAudioTrack.track
     else if isNonEmptyString(m.video.currentAudioTrack) = true
       ' Providing a fallback if in future we have multiple langauge tracks and the user preferred track is not available for the program.
-      m.closedCaptionAndAudioSelectionOverlay.currentAudioTrack = m.video.currentAudioTrack  
+      m.closedCaptionAndAudioSelectionOverlay.currentAudioTrack = m.video.currentAudioTrack
     end if
 
   else if availableAudioTracks <> invalid AND availableAudioTracks.Count() > 1 AND isNonEmptyString(m.video.currentAudioTrack) = true
