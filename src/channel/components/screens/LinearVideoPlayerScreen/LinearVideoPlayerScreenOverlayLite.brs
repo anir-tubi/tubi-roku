@@ -146,7 +146,9 @@ End Function
 
 
 Function increaseChannel()
-  if m.channelIndexFocused < m.ChannelList.content.getchildCount() - 1
+  content = m.ChannelList.content
+
+  if content <> invalid AND m.channelIndexFocused < content.getchildCount() - 1
     m.channelIndexFocused = m.channelIndexFocused + 1
   end if
 
@@ -161,7 +163,8 @@ Function onShowOverlay(msg)
   if m.OverlayParent.opacity < 1
     jumpChannelUiToCurrentPlayingVideo()
     changeChannelUiByIndex(m.channelIndexFocused)
-    updateInfoPanel(m.channelIndexFocused)
+    channelInfo = getChannelInfo(m.channelIndexFocused)
+    updateInfoPanel(channelInfo)
     showInfoPanel()
     displayOverlay()
   end if
@@ -235,7 +238,12 @@ End Function
 
 Function onButtonSelected(msg)
   itemSelected = msg.getData()
-  button = m.ButtonList.content.getChild(itemSelected)
+  button = invalid
+  buttonContent = m.ButtonList.content
+
+  if buttonContent <> invalid
+    button = buttonContent.getChild(itemSelected)
+  end if
 
   if button <> invalid AND button.id = "TvGuideButton"
     m.shouldShowComingUpOverlay = false
@@ -263,15 +271,24 @@ Function setComponentInteractionInfo(buttonValue)
     button_type: "TEXT"
     button_value: buttonValue
   }
-  pageValues =  {video_id: m.top.currentLinearVideoContent.id.toInt()}
-  pageOneof = m.tubiTrackingInfo.getAnalyticsPage("video_player_page", pageValues)
-  componentOneof = m.tubiTrackingInfo.getAnalyticsComponent("button_component", componentValues)
 
-  m.top.componentInteractionInfo = {
-    pageOneof: pageOneof
-    componentOneof: componentOneof
-    user_interaction: "CONFIRM"
-  }
+  pageValues = {}
+  currentLinearVideoContent = m.top.currentLinearVideoContent
+
+  if currentLinearVideoContent <> invalid AND isNonEmptyString(currentLinearVideoContent.id) = true
+    pageValues =  {video_id: currentLinearVideoContent.id.toInt()}
+  end if
+
+  if pageValues.video_id <> invalid
+    pageOneof = m.tubiTrackingInfo.getAnalyticsPage("video_player_page", pageValues)
+    componentOneof = m.tubiTrackingInfo.getAnalyticsComponent("button_component", componentValues)
+
+    m.top.componentInteractionInfo = {
+      pageOneof: pageOneof
+      componentOneof: componentOneof
+      user_interaction: "CONFIRM"
+    }
+  end if
 End Function
 
 
@@ -371,9 +388,8 @@ Function jumpChannelUiToCurrentPlayingVideo()
 End Function
 
 
-'@channelIndexFocused: integer, the index of the focused channel within the list of channels.
-Function updateInfoPanel(channelIndexFocused)
-  channelInfo = m.ChannelList.content.getchild(channelIndexFocused)
+'@channelInfo: TubiContentNode, node which holds the channel information
+Function updateInfoPanel(channelInfo)
   programInfo = invalid
 
   if channelInfo <> invalid
@@ -535,7 +551,7 @@ End Function
 Function onShowComingUpTimerFired()
   m.shouldShowComingUpOverlay = true
   localTime = getCurrentLocalTime()
-  channelInfo = m.ChannelList.content.getchild(m.channelIndexFocused)
+  channelInfo = getChannelInfo(m.channelIndexFocused)
 
   if channelInfo <> invalid
     nextProgram = channelInfo.getChild(1)
@@ -696,7 +712,8 @@ Function onInfoPanelGroupChange(msg)
 
   if animationState = "stopped"
     infoPanelGroup.unobserveField("state")
-    updateInfoPanel(m.channelIndexFocused)
+    channelInfo = getChannelInfo(m.channelIndexFocused)
+    updateInfoPanel(channelInfo)
     showInfoPanel()
   end if
 End Function

@@ -80,7 +80,7 @@ End Function
 
 ' set up the video player's overlay controls
 Function setupOverlay()
-  if getExperimentResource("roku_linear_player_view", "roku_linear_player_view_v1", false).enabled = true
+  if getExperimentResource("roku_linear_player_view", "roku_linear_player_view_v2", false).enabled = true
     m.VideoOverlay = m.top.findNode("VideoOverlayLite")
     m.VideoOverlay.observeFieldScoped("isClosedCaptionAudioOverlayShowing", "OnClosedCaptionAudioOverlayShowing")
     m.VideoOverlay.observeFieldScoped("trackingComponentInfo", "onTrackingComponentInfo")
@@ -947,7 +947,7 @@ End Function
 '@bDelay: boolean, the epg overlay displayed after a delay. Default is false
 '@key: String, remote key press
 Function showOverlay(bDelay = false, key = "")
-  if getExperimentResource("roku_linear_player_view", "roku_linear_player_view_v1", true).enabled = true
+  if getExperimentResource("roku_linear_player_view", "roku_linear_player_view_v2", true).enabled = true
     showLiteOverlay(key)
   else
     showEPGOverlay(bDelay)

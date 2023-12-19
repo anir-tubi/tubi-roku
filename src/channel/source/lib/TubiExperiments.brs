@@ -83,7 +83,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_linear_player_view: {
-        roku_linear_player_view_v1: {"enabled": false}
+        roku_linear_player_view_v2: {"enabled": false}
       }
 
       roku_browse_while_watching_ymal: {
