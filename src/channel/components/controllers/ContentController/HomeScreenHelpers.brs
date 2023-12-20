@@ -263,16 +263,29 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
         'add new category
         'if new category is history, put it one before queue, or if queue doesn't exist put it in 2nd position
         'if new category is queue put it one after history, or if history doesn't exist, put it in 2nd position
-        if newCategory.id = m.constants.ui.categoryIds.history
-          clonedContent = homeScreen.content.clone(true)
-          homeScreen.rowAdded = m.constants.ui.categoryIds.history
-          clonedContent.insertChild(newCategory, homeScreen.content.continueWatchingIndex)
-          homeScreen.content = clonedContent
-        else if newCategory.id = m.constants.ui.categoryIds.queue
-          homeScreen.rowAdded = m.constants.ui.categoryIds.queue
-          clonedContent = homeScreen.content.clone(true)
-          clonedContent.insertChild(newCategory, homeScreen.content.queueIndex)
-          homeScreen.content = clonedContent
+        if newCategory.id = m.constants.ui.categoryIds.queue OR newCategory.id = m.constants.ui.categoryIds.history then
+          homeScreen.rowAdded = newCategory.id
+
+          content = homeScreen.content
+          if newCategory.id = m.constants.ui.categoryIds.queue then
+            insertIndex = content.queueIndex
+          else
+            insertIndex = content.continueWatchingIndex
+          end if
+
+          contentArray = [newCategory]
+
+          ' We can't use -1 for getting the node children since we aren't getting all the content so we have to calculate how many rows to retrieve
+          rowsToRetrieve = content.getChildCount() - insertIndex
+          existingRowsRetrieved = content.getChildren(rowsToRetrieve, insertIndex)
+          contentArray.append(existingRowsRetrieved)
+
+          ' Replace children is the fastest (1ms on Nemo) way to modify existing ArrayGrid row structure with clone being second fastest (434ms) and insertChild being the slowest (453ms)
+          content.replaceChildren(contentArray, insertIndex)
+
+          ' In order to insert a new row while using replaceChildren(), which is the fastest method, we need to replace the existing rows with the new row plus the existing rows minus the last row, and then append the last row.
+          ' See https://developer.roku.com/docs/references/brightscript/interfaces/ifsgnodechildren.md#replacechildrenchild_nodes-as-object-index-as-integer-as-boolean for more information
+          content.appendChild(contentArray.peek())
         end if
 
         homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
@@ -774,7 +787,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
         stopAndHideLinearVideoPlayer()
       end if
     end if
-    
+
     if m.featuredOrRecommendedContainerReceived = true
       if homeScreen <> invalid AND currentScreen.isSameNode(homeScreen) = true
         gridList = homeScreen.findNode("CategoryGridList")
