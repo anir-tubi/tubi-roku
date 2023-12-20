@@ -27,6 +27,7 @@ describe('Settings', function () {
 
     // Select About
     await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
+    await utils.sleep(1500);
 
     // Is the About Page Open?
     const settingsScreenHeader = await testUtils.getNodeForElement('settingsScreenHeader');
@@ -150,6 +151,7 @@ describe('Settings', function () {
     await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
     await utils.sleep(1000);
     await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(2000);
 
     // Is the Privacy Policy Page Open?
     const privacyPolicyHeader = await testUtils.getNodeForElement('privacyPolicyHeader');

@@ -55,6 +55,7 @@ describe('Autoplay TV', function () {
     it('C535854 - Autoplay - Series - Next episode plays after multiple consecutive autoplays @autoplay,@smoke', async () => {
 
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+        await ecp.sendKeypress(ecp.Key.Right);
 
 
         // Are we on the Series page?
@@ -72,7 +73,7 @@ describe('Autoplay TV', function () {
         // Is next episode playing?
         const videoPlayerActual = testUtils.getNodeForElement('videoPlayerActual');
         expect((await videoPlayerActual).visible).to.be.true;
-        await testUtils.expectPlayerStateToEventuallyEqual('play');
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
         // Play Next Episode
         await triggerSeriesAutoplay();
@@ -82,7 +83,7 @@ describe('Autoplay TV', function () {
 
         // Is next episode playing?
         expect((await videoPlayerActual).visible).to.be.true;
-        await testUtils.expectPlayerStateToEventuallyEqual('play');
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     });
 
@@ -90,6 +91,7 @@ describe('Autoplay TV', function () {
     it('C535749 - Autoplay - Series - When user presses the Back button then series autoplay UI is dismissed @autoplay,@smoke', async () => {
 
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+        await ecp.sendKeypress(ecp.Key.Right);
 
         // Are we on the Series page?
         const tvScreenRowList = await testUtils.getNodeForElement('tvScreenRowList');
@@ -144,7 +146,7 @@ async function triggerSeriesAutoplay() {
     await utils.sleep(3000);
     const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
     expect(videoPlayerActual.visible).to.equal(true);
-    await testUtils.expectPlayerStateToEventuallyEqual('play');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
     const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
     expect(playPauseButton.visible).to.equal(true);

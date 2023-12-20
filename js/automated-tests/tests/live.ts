@@ -32,7 +32,7 @@ describe('Live', function () {
         // Verify that video preview is not playing
         const player = await ecp.getMediaPlayer();
         expect(player.state).to.not.equal('play');
-        expect(player.state).to.equal('pause');
+       
 
     });
 

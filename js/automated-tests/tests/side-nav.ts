@@ -106,6 +106,7 @@ describe('Side Navigation', function () {
 
         // Back 3 times
         await ecp.sendKeypress(ecp.Key.Back, {count:3});
+        await utils.sleep(2000);
 
         //Verify that Side nav is expanded and Home button is  highlighted
         const leftNavHomeLabel = await testUtils.getNodeForElement('leftNavHomeLabel');

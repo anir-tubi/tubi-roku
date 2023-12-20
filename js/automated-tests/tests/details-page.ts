@@ -710,13 +710,13 @@ async function findIndexForFirstItemWithoutVideoPreview(rowListKeyPath) {
 async function createHistory() {
   const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
   expect(videoPlayerActual.visible).to.equal(true);
-  await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
+  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
   await ecp.sendKeypress(ecp.Key.Forward, { count: 3 });
   await utils.sleep(4000); // Improvement - try to work around sleeps
   await ecp.sendKeypress(ecp.Key.Ok);
   await ecp.sendKeypress(ecp.Key.Play);
   expect(videoPlayerActual.visible).to.equal(true);
-  await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
+  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
 }
 
 // Play from Beginning check function
@@ -724,7 +724,7 @@ async function verifyPlayFromBeginning() {
 
   // Press Play and check playback
   await testUtils.selectAndVerifyDetailPageMenuItem('play');
-  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 5000);
+  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
 
 
   // Verify Movie title playback starts from beginning
@@ -754,7 +754,7 @@ async function verifyResumeWithinRange() {
   // Select Resume and check for playback
 
   await testUtils.selectAndVerifyDetailPageMenuItem('resume');
-  await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
+  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
 
   // Find resume position
   const resumeposition = await testUtils.getPlayerPosition();

@@ -93,6 +93,7 @@ describe('Autoplay Movies', function () {
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/25123
     it('C25123 - Autoplay - Movie - When user chooses last title on the list then movie plays @autoplay', async () => {
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+        
         // Are we on the series page?
         const movieScreenRowList = await testUtils.getNodeForElement('movieScreenRowList');
         expect(movieScreenRowList.visible).to.equal(true);
@@ -175,7 +176,7 @@ describe('Autoplay Movies', function () {
         // Press OK for 1st movie title, does movie start?
         await ecp.sendKeypress(ecp.Key.Ok);
         expect(videoPlayerActual.visible).to.equal(true);
-        await testUtils.expectPlayerStateToEventuallyEqual('play');
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing');
 
     });
     //Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/76115

@@ -1188,12 +1188,12 @@ const elements = typeCheckElements({
 
   /** label child in left nav */
   leftNavHomeLabel: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.3.#LabelParent.0.#Label',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#LabelParent.0.#Label'
   },
 
   /** search label in left nav */
   leftNavSearchLabel: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2.#LabelParent.0.#Label',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.2.#LabelParent.0.#Label',
   },
 
   /** title of Espanol Disabled dialog box */
