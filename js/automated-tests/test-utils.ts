@@ -556,20 +556,45 @@ class TestUtils {
   }
 
 
-  /**
+ /**
    * Used to jump to a row with the title provided
    * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
    * @param title - The title we are searching for
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
-  public async jumpToRowWithTitle(elementOrElementId: ElementOrElementId, title: string, timeout = 10000) {
-    const index = await this.findRowIndexWithTitle(elementOrElementId, title, timeout);
-    await odc.setValue(this.getElementKeyPath(elementOrElementId, {
-      field: 'jumpToItem',
-      value: index
-    }));
-    return index;
-  }
+ public async jumpToRowWithTitle(elementOrElementId: ElementOrElementId, title: string, timeout = 10000) {
+  const rowIndex = await this.findRowIndexWithTitle(elementOrElementId, title, timeout);
+  await this.jumpToRowIndex(elementOrElementId, rowIndex, timeout);
+  return rowIndex;
+}
+
+
+/**
+ * Used to jump to a row with the rowIndex provided
+ * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+ * @param rowIndex - The row index we want to jump to
+ * @param timeout - How long we will wait for this operation before considering it to have failed
+ */
+public async jumpToRowIndex(elementOrElementId: ElementOrElementId, rowIndex: number, timeout = 10000) {
+  await odc.setValue(this.getElementKeyPath(elementOrElementId, {
+    field: 'jumpToItem',
+    value: rowIndex
+  }), {timeout: timeout});
+}
+
+
+/**
+ * Used to jump to a row item of the provided index
+ * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+ * @param index - The index we want to jump to consisting of row in index 0 and item in index 1
+ * @param timeout - How long we will wait for this operation before considering it to have failed
+ */
+public async jumpToRowItem(elementOrElementId: ElementOrElementId, index: number[], timeout = 10000) {
+  await odc.setValue(this.getElementKeyPath(elementOrElementId, {
+    field: 'jumpToRowItem',
+    value: index
+  }), {timeout: timeout});
+}
 
 
   /**

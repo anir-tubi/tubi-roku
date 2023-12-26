@@ -1249,6 +1249,10 @@ const elements = typeCheckElements({
   /** Exit Button Text */
   exitDialogButtonText: {
     keyPath: '#ContentController.#2694d4e.#DialogBox.#ContentArea.#ButtonList.0.#buttonTextParent.#buttonText'
+  },
+  /** Closed Caption ON */
+  closedCaptionOn: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#closedCaptionSection.#closedCaptionSelector.1'
   }
 
 });
