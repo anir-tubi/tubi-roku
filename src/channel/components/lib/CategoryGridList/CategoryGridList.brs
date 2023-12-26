@@ -94,30 +94,37 @@ End Function
 '
 Function onComponentFocusChange()
   tubiLog("CategoryGridList.onComponentFocusChange " + focusState(m.top))
-  if m.top.hasFocus() = true
 
-    rowItemFocused = m.RowList.rowItemFocused
-    if rowItemFocused.count() <> 2
-      '//The rowList has not gained focus yet so either use the default upperleft item
-      rowItemFocused = [0,0]
-    end if
+  itemToJumpTo = invalid
+  if m.itemToJumpTo <> invalid AND resolveAbbreviatedContent(m.itemToJumpTo) <> invalid then
+    itemToJumpTo = m.itemToJumpTo
+  end if
+  m.itemToJumpTo = invalid
 
-    fullFocusedContent = resolveAbbreviatedContent(rowItemFocused)
-    if fullFocusedContent <> invalid OR (m.itemToJumpTo <> invalid AND resolveAbbreviatedContent(m.itemToJumpTo) <> invalid)
-      if m.itemToJumpTo <> invalid
-        m.RowList.jumpToRowItem = m.itemToJumpTo
-        m.itemToJumpTo = invalid
+  ' If top has focus then we need to focus the RowList itself
+  if m.top.hasFocus() = true then
+    m.justGainedFocus = true
+    m.RowList.setFocus(true)
+    'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error.
+    '   This is especially true when the Rowlist does not have initial focus when the content has loaded.
+    m.RowList.setFocus(false)
+    m.RowList.setFocus(true)
+
+    ' Don't want to do any of this logic if we are already have an item we are going to jump to
+    if itemToJumpTo = invalid then
+      rowItemFocused = m.RowList.rowItemFocused
+      if rowItemFocused.count() = 2 AND resolveAbbreviatedContent(rowItemFocused) <> invalid then
+        '// If count does not equal 2 then the rowList has not gained focus yet so use the default first item in the else block
+        itemToJumpTo = rowItemFocused
+      else
+        itemToJumpTo = [0, 0]
       end if
-
-      m.justGainedFocus = true
-      m.RowList.setFocus(true)
-      'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error.
-      '   This is especially true when the Rowlist does not have initial focus when the content has loaded.
-      m.RowList.setFocus(false)
-      m.RowList.setFocus(true)
-    else if fullFocusedContent = invalid
-      m.RowList.jumpToRowItem = [0, 0]
     end if
+  end if
+
+  ' We used to only jump to if m.top had focus. In some cases we would not jump back to the correct item after we modified the RowList content which triggers a jump to the first position usually. Now if we have a m.itemToJumpTo we will always jump to it when we receive a focus change event
+  if itemToJumpTo <> invalid then
+    m.RowList.jumpToRowItem = itemToJumpTo
   end if
 End Function
 
