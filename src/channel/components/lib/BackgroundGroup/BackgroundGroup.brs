@@ -441,6 +441,7 @@ Function transitionGradients()
       '   the value without animating it is an attempt to reduce the processing needed to run the animations.
       if m.top.kidsMode = true
         m.fullScreenGradient.gradientOpacity = 1.0
+        m.leftBottomGradient.gradientOpacity = 0.0
       else
         m.leftBottomGradient.gradientOpacity = 1.0
         if m.fullScreenGradient.gradientOpacity > 0.0
