@@ -1216,7 +1216,7 @@ Function handleSkipCuepointsButtonOnAnimateTransport(direction)
 
   if direction = "in"
     if isNonEmptyString(currentCuepoint) = true
-      if canSkipCuepointsButtonBeShown(currentCuepoint, true) = true AND m.skipCuepointsButtonTimer = invalid
+      if canSkipCuepointsButtonBeShown(currentCuepoint, true) = true AND m.skipCuepointsButtonTimer = invalid AND isNonEmptyString(m.skipCuepointsButton.text) = true
         showSkipCuepointsButton()
       end if
       slideTo(m.skipCuepointsButton,[skipCuepointsButtonTransLation[0], m.skipCuepointsButtonUpTranslation], 0.6)
