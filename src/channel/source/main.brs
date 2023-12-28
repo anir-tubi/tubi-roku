@@ -323,10 +323,18 @@ Function runChannel(constants, log, request, auth)
 
         remoteLibrary = tubiScene.findNode("TubiRemoteLibrary")
         libraryBeingFetched = remoteLibrary
-        componentTimer.mark()
+
+        if componentTimer <> invalid
+          componentTimer.mark()
+        end if
+
         retries = 0
-        remoteLibrary.observeField("loadStatus", port)
-        remoteLibrary.uri = msg.getData()
+
+        if remoteLibrary <> invalid
+          remoteLibrary.observeField("loadStatus", port)
+          remoteLibrary.uri = msg.getData()
+        end if
+
       else if field = "fadeOutCustomSplash"
         starterController = msg.GetRoSGNode()
         starterController.unobserveField("fadeOutCustomSplash")
