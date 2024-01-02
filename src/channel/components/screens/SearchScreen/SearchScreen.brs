@@ -7,6 +7,17 @@ Function init()
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 
   m.ResultArea = m.top.findNode("ResultArea")
+
+  ' Since we have 2 different markup grid inside the result area. When the user scroll downs to trending searches grid from results grid,
+  ' we move the the container that holds the 2 grid upwards. We are adding clipping rect so that anything that is above the specified x and y everything else is clipped or hidden.
+  ' This causes the results grid to be hidden and gives a effects as if the grid scrolled below the container.
+  m.ResultArea.clippingRect = {
+    height: 1080
+    width: 1920
+    x: -20
+    y: 0
+  }
+  
   m.searchGroup = m.top.findNode("searchGroup")
 
   m.spinner = m.top.findNode("spinner")
@@ -14,6 +25,7 @@ Function init()
   m.KidsModeMessage = m.top.findNode("KidsModeMessage")
   m.leftSide = m.top.findNode("leftSide")
   m.SearchText = m.top.findNode("SearchText")
+  m.trendingSearchHeading = m.top.findNode("trendingSearchHeading")
   m.searchScreenInfoPanel = m.top.findNode("SearchScreenInfoPanel")
 
   m.voiceHintfont = CreateObject("roSGNode", "Font")
@@ -50,6 +62,19 @@ Function init()
 
   m.ResultGrid.observeField("itemSelected", "onResultSelected")
   m.ResultGrid.observeField("itemFocused", "onItemFocused")
+  m.ResultGrid.observeFieldScoped("currFocusRow", "onResultGridCurrFocusRowChange")
+
+  m.searchResultsMessageContainer = m.top.findNode("searchResultsMessageContainer")
+  m.noMatchingResultsMessage = m.top.findNode("noMatchingResultsMessage")
+  m.trendingResultsHint = m.top.findNode("trendingResultsHint")
+  m.trendingSearchResultGrid = m.top.findNode("trendingSearchResultGrid")
+  m.trendingSearchResultsContainer = m.top.findNode("trendingSearchResultsContainer")
+  m.trendingSearchResultGrid.observeFieldScoped("itemSelected", "onResultSelected")
+  m.trendingSearchResultGrid.observeFieldScoped("itemFocused", "onItemFocused")
+
+  m.trendingResultsHint.text = getTranslation("trending_search_results_hint")
+
+  m.gridContainer = m.top.findNode("gridContainer")
 
   m.keyboard.palette = handleKeyboardColors()
   m.NoResultsMessage = m.top.findNode("NoResultsMessage")
@@ -77,6 +102,13 @@ Function init()
   ' Used to know if the grid was in focus especially when user returns from the detailed screen and we know to set the focus back to the results
   m.bResultsInFocus = false
 
+  ' Holds the boolean true|false value which indicates if the trending search grid was in focus. 
+  ' This is used so that we can set focus back to it if the user moved away from it to keyboard or details screen.
+  m.isTrendingResultsGridInFocus = false
+
+  ' Boolean flag which indicates if a search api request is in progress this is done to avoid user navigating to results grid to avoid focus issues.
+  m.isSearchRequestInProgress = false
+
   m.top.screenLevel = m.constants.ui.screenLevels.searchScreen
   m.top.handlesTransportVoiceRequests = true
   loadSearchResults(true)'//load the default search results
@@ -93,7 +125,11 @@ Function init()
   setTypographyOfLabel(m.searchHintText, typographyConstants.ids.bodyMedium_strong)
   setTypographyOfLabel(m.KidsModeMessage, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.SearchText, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.trendingSearchHeading, typographyConstants.ids.subheaderMedium)
   setTypographyOfLabel(m.NoResultsMessage, typographyConstants.ids.bodyMedium)
+
+  setTypographyOfLabel(m.trendingResultsHint, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.noMatchingResultsMessage, typographyConstants.ids.bodyMedium)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -111,14 +147,18 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.SearchText.color = theme.primaryTextColor
+    m.trendingSearchHeading.color = theme.primaryTextColor
     m.KidsModeMessage.color = theme.secondaryTextColor
     m.searchMenuText.color = theme.primaryTextColor
     m.NoResultsMessage.color = theme.primaryTextColor
     m.ResultGrid.focusBitmapBlendColor = theme.focusedColor
+    m.trendingSearchResultGrid.focusBitmapBlendColor = theme.focusedColor
+
+    m.trendingResultsHint.color = theme.primaryTextColor
+    m.noMatchingResultsMessage.color = theme.cautionColor
 
     m.keyboard.palette = handleKeyboardColors()
     if theme.id = m.constants.ui.themeIDs.kidsMode
-      m.top.kidsModeEnabled = true
       m.KidsModeMessage.visible = false
       m.KidsModeMessageSpacer.width = 1
     else
@@ -169,7 +209,8 @@ Function setSearchStrings()
   m.searchTitleText = getTranslation("menu_search")
   m.searchHintToSearch = getTranslation("screenSearch_defaultLinearSearch")
   setDefaultText()
-  m.searchText.text = m.sDefaultSearchText
+  m.searchText.text = ""
+  m.trendingSearchHeading.text = m.sDefaultSearchText
   m.sDefaultKidsWarning = getTranslation("screenSearch_kidsWarning")
   m.KidsModeMessage.text = m.sDefaultKidsWarning
   m.spinner.text = getTranslation("screenSearch_loading")
@@ -181,6 +222,7 @@ End Function
 '
 ' Display the loading spinner and loading message based on search results loaded
 Function displayLoading(b = true)
+  m.isSearchRequestInProgress = (b = true)
   m.spinner.visible = b
 End Function
 
@@ -200,7 +242,11 @@ End Function
 Function onScreenFocusChange()
   if m.top.hasFocus() then
     if m.bResultsInFocus = true
-      m.ResultGrid.setFocus(true)
+      if m.isTrendingResultsGridInFocus = false AND m.ResultGrid.content <> invalid AND m.ResultGrid.content.getChildCount() > 0
+        m.ResultGrid.setFocus(true)
+      else
+        m.trendingSearchResultGrid.setFocus(true)
+      end if
       handleKeyboardVoiceInput(m.bResultsInFocus)
     else
       m.Keyboard.setFocus(true)
@@ -242,11 +288,16 @@ End Function
 ' onResultSelected
 '
 ' Handle content grid item selected
-Function onResultSelected()
+Function onResultSelected(msg)
+  gridNode = msg.getRoSGNode()
+  itemSelected = msg.getData()
+  content = gridNode.content
   tubiLog("SearchScreen.onResultSelected")
-  if m.ResultGrid.content <> invalid
-    selectedContent = m.ResultGrid.content.getChild(m.ResultGrid.itemSelected)
-    handleResultSelected(selectedContent, m.ResultGrid.itemSelected)
+  if content <> invalid
+    selectedContent = content.getChild(itemSelected)
+    if selectedContent <> invalid
+      handleResultSelected(selectedContent, itemSelected)
+    end if
   end if
 End Function
 
@@ -284,26 +335,85 @@ Function onSearchContentChange()
   displayLoading(false)
   m.ResultGrid.content = invalid '//reset content everytime so in case the new results = previous results, then the contemt can refresh. Without refreshing content, then the content may appear blank
   content = m.top.content
-  m.ResultGrid.content = content
 
+  if content <> invalid AND content.getChildCount() > 0
+    if content.isDefaultSearchResults <> true
+      m.ResultGrid.content = content
+    else
+      ' Setting it only if we received valid data from backend.
+      m.trendingSearchResultGrid.content = content
+    end if
+  end if
+
+  
   if content <> invalid AND content.getChildCount() > 0 then
+    ' Resetting the values to default on every new search term to clear out previous navigation/scroll history.
+    m.noMatchingResultsMessage.visible = false
+    m.trendingResultsHint.visible = false
+    m.trendingSearchResultsContainer.translation = [0, 0]
+    m.ResultGrid.jumpToItem = 0
+    m.trendingSearchResultGrid.jumpToItem = 0
+    m.gridContainer.translation = [0, 0]
+    m.isTrendingResultsGridInFocus = false
+
     if content.isDefaultSearchResults = true
       '//display special text when the default search is displaying
       setDefaultText()
       if m.microphone <> invalid
         m.microphone.visible = true
       end if
-      m.searchText.text = m.sDefaultSearchText
+      m.searchText.text = ""
+      m.trendingSearchResultsContainer.visible = true
+      m.ResultGrid.visible = false
     else
       matchingText = getTranslation("screenSearch_matchingTitles")
       m.searchHintText.text = m.ResultGrid.content.getChildCount().toStr() + " " + matchingText + " " + Chr(34) + m.searchMenuText.text + Chr(34)
       m.SearchText.text = getTranslation("screenSearch_results")
+      m.ResultGrid.visible = true
+
+      trendingSearchContent = m.trendingSearchResultGrid.content
+      ' Setting the visibility of trending searches if we have result.
+      if trendingSearchContent <> invalid AND trendingSearchContent.getChildCount() > 0
+        m.trendingResultsHint.visible = false
+        if m.top.isUserEligibleForTrendingSearchBelowExperiment = true AND getExperimentResource("roku_trending_search_below", "roku_trending_search_below_v1", true).enabled = true
+          m.trendingSearchResultsContainer.visible = true
+          m.trendingResultsHint.visible = true
+          if content.getChildCount() > 5
+            m.trendingSearchResultsContainer.translation = [0, 672]
+          else
+            ' If the result count is less than or equal to 5. We will show the trending searches.
+            m.trendingSearchResultsContainer.translation = [0, 372]
+          end if
+        else
+          m.trendingSearchResultsContainer.visible = false
+        end if
+      else
+        m.trendingSearchResultsContainer.visible = false
+      end if
+
     end if
 
-    m.ResultGrid.visible = true
     m.NoResultsMessage.visible = false
   else
-    displayNoResults()
+    ' If it is not kids mode and the user is in experiment display the trending search instead of no content message.
+    if m.top.isUserEligibleForTrendingSearchBelowExperiment = true AND getExperimentResource("roku_trending_search_below", "roku_trending_search_below_v1", false).enabled = true
+      m.ResultGrid.visible = false
+      trendingSearchContent = m.trendingSearchResultGrid.content
+      if trendingSearchContent <> invalid AND trendingSearchContent.getChildCount() > 0
+        m.trendingSearchResultsContainer.visible = true
+        m.trendingSearchResultsContainer.translation = [0, 0]
+        m.trendingSearchResultGrid.jumpToItem = 0
+        m.trendingResultsHint.visible = true
+        m.noMatchingResultsMessage.visible = true
+        if isNonEmptyString(m.Keyboard.text) = true
+          m.noMatchingResultsMessage.text = getTranslation("search_results_no_matching_results") + " " + m.Keyboard.text
+        end if
+      end if
+      m.searchHintText.text = ""
+      m.SearchText.text = ""
+    else
+      displayNoResults()
+    end if
   end if
 End Function
 
@@ -355,10 +465,13 @@ End Function
 ' onItemFocused
 '
 ' Update the info panel when a result item is focused
-Function onItemFocused()
+Function onItemFocused(msg)
   tubiLog("SearchScreen.onItemFocused")
-  if m.ResultGrid.content <> invalid
-    focusedContent = m.ResultGrid.content.getChild(m.ResultGrid.itemFocused)
+  gridNode = msg.getRoSGNode()
+  itemFocused = msg.getData()
+  gridContent = gridNode.content
+  if gridContent <> invalid
+    focusedContent = gridContent.getChild(itemFocused)
     m.top.backgroundUriList = determineBackgroundImage(focusedContent)
     m.searchScreenInfoPanel.visible = true
 
@@ -437,11 +550,11 @@ Function onItemFocused()
     ' Set up the info that the ContentController uses to send navigate_within_page events.
     ' Don't change m.top.navigateWithinPageInfo if the focused content hasn't changed
     ' (protects against re-setting when the focus is set upon returning to search page from details page)
-    if m.gridHasFocus = true AND m.ResultGrid.itemFocused <> invalid
+    if m.gridHasFocus = true AND itemFocused <> invalid
 
       searchComponent = invalid
-      if m.ResultGrid.numColumns <> invalid
-        searchComponent = getTrackingComponentInfo(m.ResultGrid.itemFocused, m.ResultGrid.numColumns, focusedContent, m.Tracking)
+      if gridNode.numColumns <> invalid
+        searchComponent = getTrackingComponentInfo(itemFocused, gridNode.numColumns, focusedContent, m.Tracking)
       end if
 
       if searchComponent <> invalid
@@ -459,13 +572,32 @@ Function onItemFocused()
         m.top.navigateWithinPageInfo = navigateWithinPageInfo
         m.oldSearchComponent = searchComponent
       end if
-    else if m.gridHasFocus = false AND m.ResultGrid.itemFocused <> invalid
+    else if m.gridHasFocus = false AND itemFocused <> invalid
       'the search grid is gaining focus, so we don't send navigate_within_page events at this time. Instead we just cache information
       'for the next time we send a navigate_within_page event (when the user navigates the search grid)
-      m.oldSearchComponent = getTrackingComponentInfo(m.ResultGrid.itemFocused, m.ResultGrid.numColumns, focusedContent, m.Tracking)
+      m.oldSearchComponent = getTrackingComponentInfo(itemFocused, gridNode.numColumns, focusedContent, m.Tracking)
     end if
     m.gridHasFocus = true
   end if
+End Function
+
+
+Function onResultGridCurrFocusRowChange(msg)
+  gridNode = msg.getRoSGNode()
+  currFocusRow = msg.getData()
+  gridContent = gridNode.content
+
+  totalItems = gridContent.getChildCount()
+  totalRows = totalItems \ 5
+  if totalItems MOD 5 <> 0
+    totalRows = totalRows + 1
+  end if
+
+  fraction = totalRows - 1 - currFocusRow
+  if fraction < 1 AND m.top.isUserEligibleForTrendingSearchBelowExperiment = true AND getExperimentResource("roku_trending_search_below", "roku_trending_search_below_v1", true).enabled = true
+    translationY = 672 - ((1 - fraction) * 298)
+    m.trendingSearchResultsContainer.translation = [0, translationY]
+  end if  
 End Function
 
 
@@ -507,13 +639,17 @@ Function onKeyEvent(key As string, press As boolean) As boolean
   tubiLog("SearchScreen.onKeyEvent")
   if press then
     ' Only focus on content grid if animation is not in process, and if there is actually content there
-    if key = "right" AND m.Keyboard.isInFocusChain() AND m.ResultGrid.content <> invalid AND m.ResultGrid.content.getChildCount() > 0 then
-      m.ResultGrid.setFocus(true)
+    if key = "right" AND m.Keyboard.isInFocusChain() AND m.isSearchRequestInProgress = false then
+      if m.ResultGrid.content <> invalid AND m.ResultGrid.content.getChildCount() > 0 AND m.isTrendingResultsGridInFocus = false
+        m.ResultGrid.setFocus(true)
+      else if m.trendingSearchResultGrid.content <> invalid AND m.trendingSearchResultGrid.content.getChildCount() > 0
+        m.trendingSearchResultGrid.setFocus(true)
+      end if
       m.gridHasFocus = true
       m.bResultsInFocus = true
       handleKeyboardVoiceInput(m.bResultsInFocus)
       return true
-    else if key = "left" AND m.ResultGrid.isInFocusChain() then
+    else if key = "left" AND (m.ResultGrid.isInFocusChain() = true OR m.trendingSearchResultGrid.isInFocusChain() = true) then
       handleInfoPanelVisibilityForLeftPress()
       m.Keyboard.setFocus(true)
       m.gridHasFocus = false
@@ -523,7 +659,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
     else if key = "play"
       handlePlayInput()
       return true
-    else if key = "back" AND m.ResultGrid.isInFocusChain() then
+    else if key = "back" AND (m.ResultGrid.isInFocusChain() = true OR m.trendingSearchResultGrid.isInFocusChain() = true) then
       '//when the user hits BACK, then set the keyboard to focus
       '//jump to left most visible thumbnail in the grid
       nFocused = m.ResultGrid.itemFocused
@@ -536,6 +672,14 @@ Function onKeyEvent(key As string, press As boolean) As boolean
       m.gridHasFocus = false
       m.bResultsInFocus = false
       return true
+    else if key = "down" AND m.trendingSearchResultsContainer.visible = true AND m.ResultGrid.isInFocusChain() = true AND m.trendingSearchResultGrid.content <> invalid AND m.trendingSearchResultGrid.content.getChildCount() > 0
+      m.trendingSearchResultGrid.setFocus(true)
+      m.isTrendingResultsGridInFocus = true
+      slideTo(m.gridContainer, [0, -375], 0.3)
+    else if key = "up" AND m.trendingSearchResultGrid.isInFocusChain() = true AND (m.ResultGrid.content <> invalid AND m.ResultGrid.content.getChildCount() > 0)
+      slideTo(m.gridContainer, [0, 0], 0.3)
+      m.ResultGrid.setFocus(true)
+      m.isTrendingResultsGridInFocus = false
     end if
   end if
   return false
@@ -606,6 +750,7 @@ Function setVisibilityForDefaultText(b = true)
   m.KidsModeMessage.visible = b
   m.searchMenuText.visible = b
   m.searchHintText.visible = b
+  m.searchResultsMessageContainer.visible = b
 End Function
 
 

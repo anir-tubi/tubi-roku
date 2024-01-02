@@ -1657,5 +1657,13 @@
   "roku_cw_consent_screen_sub_heading": {
     "description": "Roku Continue Watching screen sub heading.",
     "message": "Make it easier to jump back into what you were watching and get better recommendations on what to stream next.\n\nSelect “Accept Now” to give Tubi permission to share your video watch history with Roku.\n\nYou can change this any time in Settings."
+  },
+  "trending_search_results_hint": {
+    "description": "Trending Search Results hint which will be displayed in the search screen when we do not have enough search results.",
+    "message": "Here are other trending searches you may like"
+  },
+  "search_results_no_matching_results": {
+    "description": "No matching results message which will be displayed in search results screen.",
+    "message": "We couldn't find any results for"
   }
 }

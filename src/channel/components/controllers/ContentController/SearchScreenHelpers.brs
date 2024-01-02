@@ -9,6 +9,7 @@ Function showSearchScreen()
   searchScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
   searchScreen.observeFieldScoped("contentToPlay", "onSearchContentToPlay")
 
+  searchScreen.isUserEligibleForTrendingSearchBelowExperiment = (isUserInAdultsMode() = true AND isDeviceInUS() = true AND isKidsUIOn() = false)
   searchScreen.id = m.constants.ui.screenIds.searchScreen
   searchScreen.backgroundUriList = [m.defaultBackgroundUri]
   searchScreen.searchText = "" '//Set searchText to "" to initiate the search screen and load the default "search results"
@@ -106,26 +107,13 @@ Function onSearchTextChanged(msg)
         search_type: "PAGE" 'SearchType enum
       }
     }
+
   else
     categoryId = m.constants.ui.categoryIds.featured
     requestOptions = {}
 
     if isUserInAdultsMode() = true AND isDeviceInUS() = true AND isKidsUIOn() = false
-      searchExperimentInfo = getExperimentResource("roku_trending_search", "roku_trending_search_v1", true)
-
-      if searchExperimentInfo.enabled = true
-        categoryId = m.constants.ui.categoryIds.topSearched
-
-        ' If limit is been passed from the experiment using it.
-        if searchExperimentInfo.limit <> invalid
-          requestOptions = {
-            params: {
-              contents_limit: searchExperimentInfo.limit
-            }
-          }
-        end if
-        
-      end if
+      categoryId = m.constants.ui.categoryIds.topSearched
     end if
 
     categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, kidsMode, requestOptions)

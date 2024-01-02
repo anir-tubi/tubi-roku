@@ -12,6 +12,7 @@
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
 
   <interface>
     <!-- INPUT -->
@@ -25,6 +26,9 @@
 
       <!-- If the screen is not enabled, then user should not be able to select anything -->
       <field id="enabled" type="boolean" alwaysNotify="true"/>
+
+      <!-- If the user is eligible for trending search below experiment checks if the user is in us and parental controls is enabled and user is in the experiment. -->
+      <field id="isUserEligibleForTrendingSearchBelowExperiment" type="boolean" />
 
     <!-- OUTPUT -->
       <!-- set to the tubi content id of the item which was clicked on -->
@@ -64,66 +68,76 @@
         </Label>
       </LayoutGroup>
     </Group>
-    <LayoutGroup
+    <Group
       id="leftSide"
-      layoutDirection="vert"
-      itemSpacings="[24, 12]"
-      horizAlignment="left"
-      vertAlignment="top"
       translation="[192,120]">
-      <Label
-        id="searchMenuText"
-        vertAlign="bottom"
-        width="550">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="48"/>
-      </Label>
-      <Label
-        id="searchHintText"
-        vertAlign="bottom">
-        <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="27"/>
-      </Label>
       <LayoutGroup
-        id="kidsModeGroup"
-        layoutDirection="horiz">
-        <!--KidsModeMessageSpacer used to position the kids-mode text so it left aligns with the keyboard-->
-        <Rectangle
-          id="KidsModeMessageSpacer"
-          visible="false"
-          width="1"
-          height="1"/>
+        itemSpacings="[24, 12]"
+        horizAlignment="left"
+        vertAlignment="top">
         <Label
-          id="KidsModeMessage"
-          vertAlign="top"
-          width="550"
-          height="50">
-            <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-SemiBold.ttf"
-              size="27"/>
+          id="searchMenuText"
+          vertAlign="bottom"
+          width="552">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="48"/>
+        </Label>
+        <Label
+          id="searchHintText"
+          vertAlign="bottom">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-SemiBold.ttf"
+            size="27"/>
+        </Label>
+        <LayoutGroup
+          id="kidsModeGroup"
+          layoutDirection="horiz">
+          <!--KidsModeMessageSpacer used to position the kids-mode text so it left aligns with the keyboard-->
+          <Rectangle
+            id="KidsModeMessageSpacer"
+            visible="false"
+            width="1"
+            height="1"/>
+          <Label
+            id="KidsModeMessage"
+            vertAlign="top"
+            width="552"
+            height="51">
+              <Font
+                role="font"
+                uri="pkg:/fonts/Vaud-SemiBold.ttf"
+                size="27"/>
+          </Label>
+        </LayoutGroup>
+      </LayoutGroup>
+
+      <LayoutGroup
+        id="searchResultsMessageContainer"
+        itemSpacings="[12]"
+        translation="[0, 90]">
+        <Label
+          id="noMatchingResultsMessage"
+          visible="false">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Medium.ttf"
+            size="27"/>
+        </Label>
+        <Label
+          id="trendingResultsHint"
+          visible="false">
+          <Font
+            role="font"
+            uri="pkg:/fonts/Vaud-Medium.ttf"
+            size="27"/>
         </Label>
       </LayoutGroup>
-    </LayoutGroup>
+    </Group>
 
     <!-- Live text entry box with a non-blinking "cursor" -->
-    <Label
-      id="SearchText"
-      vertAlign="center"
-      translation="[786, 436]"
-      width="1114"
-      height="64">
-      <Font
-        id="SearchTextFont"
-        role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="36"/>
-    </Label>
-
     <InfoPanel
       id="SearchScreenInfoPanel"
       visible="false"
@@ -139,18 +153,74 @@
     <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus,
     the resultGrid is slightly too low and too far to the right. It has to do something to do with the custom focusBitmapUri.  -->
     <Group
-      translation="[786, 496]"
+      translation="[786, 435]"
       id="ResultArea">
-      <MarkupGrid
-        id="ResultGrid"
-        itemComponentName="StarterGridItem"
-        itemSize="[198,282]"
-        itemSpacing="[12,12]"
-        numRows="3"
-        numColumns="5"
-        fadeFocusFeedbackWhenAutoScrolling="true"
-        vertFocusAnimationStyle="fixedFocus"
-        focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
+
+      <Group
+        id="gridContainer">
+
+        <LayoutGroup
+          id="resultsContainer">
+
+          <Label
+            id="SearchText"
+            vertAlign="center"
+            width="1113"
+            height="63">
+            <Font
+              id="SearchTextFont"
+              role="font"
+              uri="pkg:/fonts/Vaud-SemiBold.ttf"
+              size="36"/>
+          </Label>
+
+          <MarkupGrid
+            id="ResultGrid"
+            itemComponentName="StarterGridItem"
+            itemSize="[198,282]"
+            itemSpacing="[12,12]"
+            numRows="2"
+            numColumns="5"
+            fadeFocusFeedbackWhenAutoScrolling="true"
+            vertFocusAnimationStyle="fixedFocus"
+            focusFootprintBlendColor="#FFFFFF00"
+            focusFootprintBitmapUri= "pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+            focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
+        </LayoutGroup>
+
+
+        <LayoutGroup
+          id="trendingSearchResultsContainer"
+          translation="[0, 640]">
+
+          <Label
+            id="trendingSearchHeading"
+            vertAlign="center"
+            width="1113"
+            height="63">
+            <Font
+              id="SearchTextFont"
+              role="font"
+              uri="pkg:/fonts/Vaud-SemiBold.ttf"
+              size="36"/>
+          </Label>
+
+          <MarkupGrid
+            id="trendingSearchResultGrid"
+            itemComponentName="StarterGridItem"
+            itemSize="[198,282]"
+            itemSpacing="[12,12]"
+            numRows="2"
+            numColumns="5"
+            fadeFocusFeedbackWhenAutoScrolling="true"
+            vertFocusAnimationStyle="fixedFocus"
+            focusFootprintBlendColor="#FFFFFF00"
+            focusFootprintBitmapUri= "pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+            focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
+        </LayoutGroup>
+  
+      </Group> 
+      
       <Spinner
         id="spinner"
         visible="false"
