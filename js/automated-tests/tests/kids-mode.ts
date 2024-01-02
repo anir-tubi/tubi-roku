@@ -29,9 +29,8 @@ describe('Kids Mode', function () {
     // Navigate to Left Nav
     await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
 
-    // Is the Exit Kids button grayed out?
-    const exitKidsGrayedOut = await testUtils.getNodeForElement('exitKidsGrayedOut');
-    expect(exitKidsGrayedOut.visible).to.be.true;
+     // Is the Exit Kids button grayed out?
+     await checkForKidsModeGrayed();
   });
 
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/537396
@@ -56,11 +55,8 @@ describe('Kids Mode', function () {
     // Navigate to Left Nav
     await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
 
-    // Is the Exit Kids button grayed out?
-    const exitKidsGrayedOut = await testUtils.getNodeForElement('exitKidsGrayedOut');
-    expect(exitKidsGrayedOut.visible).to.be.true;
-
-
+     // Is the Exit Kids button grayed out?
+     await checkForKidsModeGrayed();
   });
   // https://tubi.testrail.io/index.php?/cases/view/537398
   it('C537398 - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Little Kids Then Kids Mode icon is now grayed out, @kidsmode_guest', async () => {
@@ -86,9 +82,7 @@ describe('Kids Mode', function () {
     await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
 
     // Is the Exit Kids button grayed out?
-    const exitKidsGrayedOut = await testUtils.getNodeForElement('exitKidsGrayedOut');
-    expect(exitKidsGrayedOut.visible).to.be.true;
-
+    await checkForKidsModeGrayed();
 
   });
 
@@ -130,9 +124,8 @@ describe('Kids Mode', function () {
     // Navigate to Left Nav
     await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
 
-    // Is the Exit Kids button grayed out?
-    const exitKidsGrayedOut = await testUtils.getNodeForElement('exitKidsGrayedOut');
-    expect(exitKidsGrayedOut.visible).to.be.true;
+     // Is the Exit Kids button grayed out?
+     await checkForKidsModeGrayed();
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/537401
@@ -157,8 +150,7 @@ describe('Kids Mode', function () {
     await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
 
     // Is the Exit Kids button grayed out?
-    const exitKidsGrayedOut = await testUtils.getNodeForElement('exitKidsGrayedOut');
-    expect(exitKidsGrayedOut.visible).to.be.true;
+    await checkForKidsModeGrayed();
 
     // Is the Tubi Kid's logo present?
     const tubiKidsLogo = await testUtils.getNodeForElement('tubiKidsLogo');
@@ -190,7 +182,6 @@ describe('Kids Mode', function () {
 
   });
 
-  //
 
   // https://tubi.testrail.io/index.php?/cases/view/537689
   it('C537689 -  Registered User - Toggle ON - Home Screen - When User Switches Parental Control to Older Kids Then the App Stays in Kids Mode, @kidsmode_registered', async () => {
@@ -200,10 +191,14 @@ describe('Kids Mode', function () {
 
     await openKidsMode();
 
-    // Is the Exit Kids button grayed out?
-    const exitKidsGrayedOut = await testUtils.getNodeForElement('exitKidsGrayedOut');
-    expect(exitKidsGrayedOut.visible).to.be.true;
+    // Open Settings
+    await shared.openSettings();
 
+    // Choose PC Older Kids
+    await selectOlderKidsFromParentalSettings();
+
+    // Is the Exit Kids button grayed out?
+    await checkForKidsModeGrayed();
 
   });
   // https://tubi.testrail.io/index.php?/cases/view/537690
@@ -245,9 +240,8 @@ describe('Kids Mode', function () {
     // Navigate to Left Nav
     await ecp.sendKeypress(ecp.Key.Left, { count: 3 });
 
-    // Is the Exit Kids button grayed out?
-    const exitKidsGrayedOut = await testUtils.getNodeForElement('exitKidsGrayedOut');
-    expect(exitKidsGrayedOut.visible).to.be.true;
+     // Is the Exit Kids button grayed out?
+     await checkForKidsModeGrayed();
 
   });
   // https://tubi.testrail.io/index.php?/cases/view/537393
@@ -295,8 +289,7 @@ describe('Kids Mode', function () {
 
     // Verify that Kid's mode option in left nav is not grayed out and is accessible
     await ecp.sendKeypress(ecp.Key.Back, { count: 4 });
-    const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
-    expect(exitKidsOption.visible).to.be.true;
+    await checkForKidsModeAdult();
 
   });
   // https://tubi.testrail.io/index.php?/cases/view/66347
@@ -309,8 +302,7 @@ describe('Kids Mode', function () {
     await openKidsMode();
 
     // Is the Exit Kids button not grayed out?
-    const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
-    expect(exitKidsOption.visible).to.be.true;
+    await checkForKidsModeNotGrayed();
 
     // Exit app
     await ecp.sendKeypress(ecp.Key.Down, { count: 6 });
@@ -342,9 +334,7 @@ describe('Kids Mode', function () {
     await openKidsMode();
 
     // Is the Exit Kids button not grayed out?
-
-    const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
-    expect(exitKidsOption.visible).to.be.true;
+    await checkForKidsModeNotGrayed();
 
     // Sign out
     await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
@@ -468,3 +458,22 @@ async function selectLittleKidsFromParentalSettings() {
   await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
   await ecp.sendKeypress(ecp.Key.Ok);
 }
+
+async function checkForKidsModeGrayed() {
+  const exitKidsGrayedOut = await testUtils.getNodeForElement('exitKidsGrayedOut');
+  expect(exitKidsGrayedOut.text).to.equal('Exit Kids');
+  expect(exitKidsGrayedOut.opacity).to.be.lessThan(1);
+}
+
+async function checkForKidsModeNotGrayed(){
+  const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
+  expect(exitKidsOption.text).to.equal('Exit Kids');
+  expect(exitKidsOption.opacity).to.be.equal(1);
+}
+
+async function checkForKidsModeAdult(){
+  const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
+  expect(exitKidsOption.text).to.equal('Kids');  
+}
+
+
