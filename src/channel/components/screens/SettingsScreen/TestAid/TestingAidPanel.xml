@@ -10,6 +10,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/DevGridOverlay.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -62,6 +63,9 @@
             <CheckButtonContentNode
               id="safeZone"
               title="Show/Hide Safe Zone Image"/>
+            <CheckButtonContentNode
+              id="overlay"
+              title="Show/Hide Grid Overlay"/>
           </ContentNode>
         </MarkupList>
 

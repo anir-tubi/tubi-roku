@@ -53,6 +53,8 @@ Function onItemFocused(msg)
     m.infoArea.text = "Experiments enabled:" + chr(10) + chr(10) + currExperiments
   else if buttonFocused = 3
     m.infoArea.text = "It will overlay all the screens with safe zone guidelines."
+  else if buttonFocused = 4
+    m.infoArea.text = "It will overlay a Grid of 10 px over all of the screens. If you want better control, use devOverlay.brs"
   end if
 
 End Function
@@ -92,6 +94,18 @@ Function onTestingAidPanelItemSelected(msg)
       item.title = "Show Safe Zone Image"
       hideSafeZoneImage(safeZone)
     end if
+  else if item.id = "overlay"
+    overlay = getOverlay()
+
+    if overlay = invalid
+      item.title = "Hide Grid Overlay"
+      'create new grid over the scene and append as a child 'overlayGrid'
+      createGridOverlay(m.top.getScene())
+    else
+      item.title = "Show Grid Overlay"
+      hideDevOverlay(overlay)
+    end if
+
 
   end if
 
@@ -195,6 +209,22 @@ Function getSafeZone()
 End Function
 
 
+'this function will return the overlay node if it is already present as a child to the Scene.
+'else it will return invalid.
+Function getOverlay()
+  overlay = invalid
+
+  for each child in m.top.getScene().getChildren(-1, 0)
+    if child.id = "overlayGrid"
+      overlay = child
+      exit for
+    end if
+  end for
+
+  return overlay
+End Function
+
+
 Function showSafeZoneImage(safeZone)
 
   if safeZone = invalid
@@ -214,6 +244,16 @@ Function showSafeZoneImage(safeZone)
   end if
 
   m.top.getScene().appendChild(safeZone)
+
+End Function
+
+
+
+Function hideDevOverlay(overlay)
+  if overlay <> invalid
+    m.top.getScene().removeChild(overlay)
+    overlay = invalid
+  end if
 
 End Function
 
