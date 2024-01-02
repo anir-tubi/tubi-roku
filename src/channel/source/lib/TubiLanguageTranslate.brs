@@ -2021,14 +2021,6 @@ Function getTranslation_es_MX()
       "description": "The text to display on Show All Games tile",
       "message": "Mostrar Todo"
     },
-    "screenHome_item_viewMore": {
-      "description": "The text to display on View More movies / shows",
-      "message": "Ver Más {containerTitle}"
-    },
-    "screenHome_item_viewMore_description": {
-      "description": "The text to display total count on View More movies / shows",
-      "message": "{totalCount}+ títulos, actualizados semanalmente."
-    },
     "loadingIndicator": {
       "description": "When something is loading, this text appears so the user knows something is loading.",
       "message": "Cargando..."
@@ -2719,7 +2711,7 @@ Function getTranslation_es_MX()
     },
     "screenMyStuff_signedOutUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Guarda todos tus favoritos. Recoje donde lo dejaste. Todo en un solo lugar."
+      "message": "Encuentra tus favoritos. Recoja donde lo dejaste todo en un solo lugar."
     },
     "screenMyStuff_signedOutUIBlurb": {
       "description": "The blurb of the MyStuff Screen for the guest user.",
@@ -3694,14 +3686,6 @@ Function getTranslation_fr_CA()
       "description": "The text to display on Show All Games tile",
       "message": "Montrer tout"
     },
-    "screenHome_item_viewMore": {
-      "description": "The text to display on View More movies / shows",
-      "message": "Tout voir {containerTitle}"
-    },
-    "screenHome_item_viewMore_description": {
-      "description": "The text to display total count on View More movies / shows",
-      "message": "{totalCount}+ titres, mis à jour chaque semaine."
-    },
     "loadingIndicator": {
       "description": "When something is loading, this text appears so the user knows something is loading.",
       "message": "Chargement..."
@@ -4392,7 +4376,7 @@ Function getTranslation_fr_CA()
     },
     "screenMyStuff_signedOutUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Sauvegardez tous vos favoris. Reprenez là où vous en étiez. Tout en un seul endroit."
+      "message": "Trouvez vos favoris. Reprenez là où vous vous étiez arrêté–le tout au même endroit."
     },
     "screenMyStuff_signedOutUIBlurb": {
       "description": "The blurb of the MyStuff Screen for the guest user.",
