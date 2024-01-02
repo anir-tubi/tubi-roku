@@ -1,6 +1,7 @@
 Function init()
   m.constants = getConstants()
   m.global.constants = m.constants
+  m.request = TubiRequest(m.constants.settings)
   m._ = rodash()
 
   if m.constants.settings.mode = "dev" AND m.constants.settings.processAnimationLogo = false
@@ -90,8 +91,7 @@ End Function
 ' Performs network request to get experiments and external config.
 Function sendRequestForExperimentsAndConfig()
   constants = m.constants
-  request = TubiRequest(constants.settings)
-  externalConfig = TubiExternalConfig(request, constants)
+  externalConfig = TubiExternalConfig(m.request, constants)
   experiments = TubiExperiments(constants)
 
   experimentsRequest = experiments.getNamespaceRequestInfo(constants)
@@ -199,20 +199,7 @@ Function processAnimationLogo()
 
   videoContent = createObject("RoSGNode", "ContentNode")
 
-  dateTime = createObject("roDateTime")
-  dateTime.fromISO8601String(m.constants.time.superbowlRabbitHoleCampaignStartDate)
-  superbowlRabbitHoleCampaignStartDate = dateTime.asSeconds()
-
-  dateTime.fromISO8601String(m.constants.time.superbowlRabbitHoleCampaignEndDate)
-  superbowlRabbitHoleCampaignEndDate = dateTime.asSeconds()
-
-  currentUnixTime = getCurrentUTCTimeWithOffset(m.constants)
-
-  ' Want to show rabbit hole intro video during our campaign period
-  videoContent.url = m.constants.urls.animationLogo
-  if currentUnixTime >= superbowlRabbitHoleCampaignStartDate AND currentUnixTime <= superbowlRabbitHoleCampaignEndDate then
-    videoContent.url = m.constants.urls.superbowlRabbitHoleCampaignAnimationLogo
-  end if
+  videoContent.url = m.request.passThroughCharlesProxy(m.constants.urls.animationLogo)
 
   videoContent.title = "AnimationLogo"
   videoContent.streamformat = "mp4"

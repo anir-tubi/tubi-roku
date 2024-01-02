@@ -623,7 +623,6 @@ Function getConstants()
 
     ' animationLogo Url which plays during app launch
     constants.urls.animationLogo = "http://cdn.adrise.tv/video/roku/animation_logo_2.mp4"
-    constants.urls.superbowlRabbitHoleCampaignAnimationLogo = "https://cdn.adrise.tv/video/roku/rabbit_hole_animation_logo.mp4"
 
     ' The background large images on the continue watching container row when the user is signed out
     constants.urls.continueWatchingItemBackground_largePoster = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingItemBackground_largePoster.webp"
@@ -1670,8 +1669,6 @@ constants.ui.themes = {}
       constants.time = {}
       constants.time.magicLinkStartDate = "2022-11-14T20:00:00Z"
       constants.time.magicLinkEndDate = "2022-12-19T20:00:00Z"
-      constants.time.superbowlRabbitHoleCampaignStartDate = "2023-02-09T20:00:00Z"
-      constants.time.superbowlRabbitHoleCampaignEndDate = "2023-03-30T20:00:00Z"
 
       ' Creating Backend/Frontend mapping for preference keys.
       constants.serverPersistentDataKeys = {}
