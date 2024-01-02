@@ -60,7 +60,6 @@ Function isCategoryDetailScreenInStack(categoryId)
     if screen.id = m.constants.ui.screenIds.categoryDetailsScreen
       if screen.categoryId = categoryId
         return true
-        exit for
       end if
     end if
   end for
