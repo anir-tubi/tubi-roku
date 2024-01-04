@@ -57,6 +57,11 @@ Function init()
   'm.lastPingTime helps to prevent extra live play progress event and also helps to send live play progress event in proper interval.
   m.lastPingTime = 0
 
+  ' m.positionArr is used to help diagnose the large playProgressEvent bug, and should be removed after a fix is in place,
+  ' m.positionArr is temperory variable which is used to find whether any position callback event is missing or not.
+  ' It will be attached with live-view-time-exceeds logging and cleared
+  m.positionArr = []
+
   m.analyticsInterval = m.constants.player.pingFrequency
 
   updateColors()
@@ -361,10 +366,15 @@ Function onVideoStateChange(msg)
   else if state = "buffering"
     ' sends the live play progress event when video buffers, this way we are not missing any viewtime
     ' This avoids higher viewTime live play progress events
-    playProgressEvent = getPlayProgressEvent(m.top.fullscreen)
-    if playProgressEvent <> invalid
-      trackEvent(playProgressEvent)
+
+    'Send play progress event only for midbuffer (not prebuffer)
+    if m.playerPosition > 0
+      playProgressEvent = getPlayProgressEvent(m.top.fullscreen)
+      if playProgressEvent <> invalid
+        trackEvent(playProgressEvent)
+      end if
     end if
+
     ' setting m.lastPingTime to -1 for mid buffering, so that next time when videoPositionChange callback triggers the large live play progress event will not be sent
     if m.lastPingTime > 0
       m.lastPingTime = -1
@@ -411,10 +421,13 @@ End Function
 ' The notificationInterval and analyticsInterval are not necessarily equal or evenly divisible
 ' so we check the time passage before we send playProgress events
 Function onVideoPositionChange()
+  position = m.Video.position
+  m.positionArr.push(position)
+
   ' protects against video positions being updated after we've told the player to pause
   if m.VideoState = "play"
-    m.playerPosition = m.Video.position
-    m.AdsSSAITask.videoPosition = m.Video.position
+    m.playerPosition = position
+    m.AdsSSAITask.videoPosition = position
   end if
 
    '//After some time has elapsed and the channel guide isn't currently visible and loading, then hide the overlay
@@ -661,6 +674,9 @@ End Function
 Function resetVideoPlayerState(content = invalid)
   m.LoadingProgressBar.progress = 0
   m.LoadingMessage.text = ""
+  m.playerPosition = 0
+  m.lastPingTime = 0
+
   if content <> invalid
     updateVideoPlayerState(content)
   end if
@@ -927,15 +943,35 @@ Function getPlayProgressEvent(isFullScreen = true)
       pageType = m.top.trackingPageContext.pageType
     end if
 
+    viewTime = Int((m.playerPosition - m.lastPingTime) * 1000) 'ms
+
     playProgressEvent = {
       type: "live_play_progress"
       values: {
         video_id: m.Video.content.id.toInt()
-        view_time: Int((m.playerPosition - m.lastPingTime) * 1000) 'ms
+        view_time: viewTime
         video_player: videoPlayerType
         page_type: pageType
       }
     }
+
+    if viewTime >= 15000
+      videoInfo = {}
+      videoInfo.viewTime = viewTime.tostr()
+      videoInfo.videoState = m.VideoState
+      videoInfo.playerPosition = m.playerPosition
+      videoInfo.lastPingTime = m.lastPingTime
+      videoInfo.positionArr = m.positionArr
+      content = m.Video.content
+      if content <> invalid AND content.id <> invalid
+        videoInfo.video_id = content.id
+      end if
+      tubiLog(FormatJSON(videoInfo), "info", "videoInfo", "live-view-time-exceeds")
+    end if
+
+    ' resetting m.positionArr everytime play progress event gets fires
+    m.positionArr = []
+
   end if
 
   return playProgressEvent
