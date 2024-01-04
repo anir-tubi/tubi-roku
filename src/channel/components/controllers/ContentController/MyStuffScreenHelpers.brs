@@ -276,12 +276,7 @@ Function onMyStuffContentSelected(msg)
       "playbackContainer": content.parentId
     }
 
-    pageOriginDetails = {
-      "pageOrigin": m.constants.ui.screenIds.myStuffScreen
-      "functionName": "onMyStuffContentSelected"
-    }
-
-    showDetailScreen(content, true, invalid, invalid, playbackSource, pageOriginDetails)
+    showDetailScreen(content, true, invalid, invalid, playbackSource)
   end if
 End Function
 

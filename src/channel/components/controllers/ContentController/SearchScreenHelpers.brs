@@ -38,12 +38,7 @@ Function onSearchContentSelected(msg)
       "srcForAds":m.constants.player.playbackOrigin.search
     }
 
-    pageOriginDetails = {
-      "pageOrigin": m.constants.ui.screenIds.searchScreen
-      "functionName": "onSearchContentSelected"
-    }
-
-    showDetailScreen(searchScreen.contentSelected, true, invalid, invalid, playbackSource, pageOriginDetails)
+    showDetailScreen(searchScreen.contentSelected, true, invalid, invalid, playbackSource)
   end if
 End Function
 
@@ -60,11 +55,7 @@ Function onSearchContentToPlay(msg)
   if content <> invalid AND content.type = m.constants.ui.contentTypes.linear
     playLinearVideoContent(content, false, searchScreen.id, false, playbackSource)
   else
-    pageOriginDetails = {
-      "pageOrigin": m.constants.ui.screenIds.searchScreen
-      "functionName": "onSearchContentToPlay"
-    }
-    showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource, pageOriginDetails)
+    showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
   end if
 End Function
 

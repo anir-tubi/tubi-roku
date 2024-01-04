@@ -79,10 +79,13 @@ Function registerParsingCallbacks()
     parseError: parseAgeVerificationScreenCheckBirthdayError
   }
 
+  ' Remove parseDetailScreenSingleContentError and change back to parseGenericError once we figure out the root cause of series
+  ' invalid for component interaction events.
+  '
   ' single content
   m.requestTypes[m.constants.reqNames.getSingleContent] = {
     parseSuccess: parseDetailScreenSingleContentSuccess
-    parseError: parseGenericError
+    parseError: parseDetailScreenSingleContentError
   }
 
   ' multiple content

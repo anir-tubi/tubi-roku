@@ -919,11 +919,7 @@ Function onContentSelected(msg)
       "srcForAds": m.constants.player.playbackOrigin.container
       "playbackContainer": homeScreen.currCategoryId
     }
-    pageOriginDetails = {
-      "pageOrigin": m.constants.ui.screenIds.homeScreen
-      "functionName": "onContentSelected"
-    }
-    showDetailScreen(content, true, invalid, invalid, playbackSource, pageOriginDetails)
+    showDetailScreen(content, true, invalid, invalid, playbackSource)
   end if
 End Function
 
@@ -946,11 +942,7 @@ Function onContentToPlay(msg)
     "playbackContainer": containerId
   }
 
-  pageOriginDetails = {
-    "pageOrigin": m.constants.ui.screenIds.homeScreen
-    "functionName": "onContentToPlay"
-  }
-  showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource, pageOriginDetails)
+  showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
 End Function
 
 

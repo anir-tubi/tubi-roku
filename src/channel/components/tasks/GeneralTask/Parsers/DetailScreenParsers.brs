@@ -9,6 +9,24 @@ Function parseDetailScreenSingleContentSuccess(fullResponse, reqInfo)
 End Function
 
 
+' Remove once we figure out the root cause of series invalid for component interaction events.
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseDetailScreenSingleContentError(fullResponse, reqInfo)
+returnResponse = {}
+  if reqInfo <> invalid AND reqInfo.options <> invalid AND reqInfo.options.params <> invalid
+    returnResponse.contentId = reqInfo.options.params.content_id
+  end if
+
+  if fullResponse <> invalid AND fullResponse.code <> invalid
+    returnResponse.code = fullResponse.code
+  end if
+
+  return returnResponse
+End Function
+
+
 ' @fullResponse: assocArray, as returned by Request.handleEvent, but with
 '                            .data value converted from JSON to AA already
 ' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request

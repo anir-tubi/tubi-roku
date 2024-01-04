@@ -1303,21 +1303,25 @@ Function setComponentInteractionEventForMenu(componentInteractionValue, menuItem
   end if
 
   ''//::TODO:: Remove below block once we fixed sending invalid component interaction events- added this for debugging purpose
+  topReference = m.top
+  pageOriginDetails = topReference.pageOriginDetails
+
   if isAA(pageValues) = true AND pageValues.count() > 0 AND pageValues.series_id = 0
     pageValuesInfo = {}
-    pageValuesInfo.sourceOrigin = m.top.pageOriginDetails.pageOrigin
-    pageValuesInfo.functionName = m.top.pageOriginDetails.functionName
-    pageValuesInfo.isSeries = m.top.isSeries
+
+    if m.pageOriginDetails <> invalid
+      pageValuesInfo.sourceOrigin = pageOriginDetails.pageOrigin
+      pageValuesInfo.functionName = pageOriginDetails.functionName
+      pageValuesInfo.previousScreen =  pageOriginDetails.previousScreen
+      pageValuesInfo.errorResponseContentId = pageOriginDetails.errorResponseContentId
+      pageValuesInfo.errorCode = pageOriginDetails.errorCode
+    end if
+
+    pageValuesInfo.title = topReference.title
+    pageValuesInfo.episodeTitle = topReference.episodeTitle
+    pageValuesInfo.isSeries = topReference.isSeries
     pageValuesInfo.seriesId = pageValues.series_id
-    pageValuesInfo.contentIsInvalid = (m.top.content = invalid)
-    tubiLog(FormatJSON(pageValuesInfo), "info", "videoInfo", "series-id-invalid")
-  else if m.top.content <> invalid
-    pageValuesInfo = {}
-    pageValuesInfo.sourceOrigin = m.top.pageOriginDetails.pageOrigin
-    pageValuesInfo.functionName = m.top.pageOriginDetails.functionName
-    pageValuesInfo.isSeries = m.top.isSeries
-    pageValuesInfo.seriesId = m.top.content.id.toInt()
-    pageValuesInfo.contentIsInvalid = false
+    pageValuesInfo.contentIsInvalid = (topReference.content = invalid)
     tubiLog(FormatJSON(pageValuesInfo), "info", "videoInfo", "series-id-invalid")
   end if
 

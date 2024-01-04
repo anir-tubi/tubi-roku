@@ -265,15 +265,10 @@ Function processPlayAndDetailsScreenAction(uriParameters)
       "type": contentType
     }, true)
 
-    pageOriginDetails = {
-      "pageOrigin": "braze"
-      "functionName": "processPlayAndDetailsScreenAction"
-    }
-
     if action = "play"
-      showDetailScreen(content, false, skipDetailScreen, invalid, {}, pageOriginDetails)
+      showDetailScreen(content, false, skipDetailScreen, invalid, {})
     else
-      showDetailScreen(content, true, invalid, invalid, {}, pageOriginDetails)
+      showDetailScreen(content, true, invalid, invalid, {})
     end if
   end if
 End Function

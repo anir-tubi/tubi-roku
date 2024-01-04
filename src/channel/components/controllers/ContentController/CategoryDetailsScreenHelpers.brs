@@ -127,12 +127,7 @@ Function onCategoryContentSelected(msg)
     "playbackContainer": categoryContent.id
   }
 
-  pageOriginDetails = {
-    "pageOrigin": m.constants.ui.screenIds.categoryDetailsScreen
-    "functionName": "onCategoryContentSelected"
-  }
-
-  showDetailScreen(categoryDetailsScreen.contentSelected, true, invalid, invalid, playbackSource, pageOriginDetails)
+  showDetailScreen(categoryDetailsScreen.contentSelected, true, invalid, invalid, playbackSource)
 End Function
 
 

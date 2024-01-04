@@ -652,11 +652,6 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
   if videoPlayer <> invalid
     stopVideoContent(videoPlayer)
 
-    pageOriginDetails = {
-      "pageOrigin": m.constants.ui.screenIds.videoPlayerScreen
-      "functionName": "returnToDetailScreenFromVideo"
-    }
-
     ' get the top most detail screen
     detailScreen = getTopDetailScreenFromStack()
 
@@ -720,7 +715,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
 
         ' update some info in the detail screen content and repopulate with that content
         detailContent.currentEpisodeId = videoContent.id
-        populateDetailScreen(detailScreen, detailContent, false, detailScreenResumePosition, pageOriginDetails)
+        populateDetailScreen(detailScreen, detailContent, false, detailScreenResumePosition)
 
         ' Repopulate the episodes screen if it is the screen under the video player screen in the call stack
         hiddenScreen = getHiddenScreen(1)
@@ -759,7 +754,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
         ' related content. So, populate the detail screen for an immediate re-render, and then re-fetch
         ' the new content (including the related content). Detail screen will be updated a 2nd time when
         ' fetched content is returned
-        populateDetailScreen(detailScreen, videoContent, false, -1, pageOriginDetails)
+        populateDetailScreen(detailScreen, videoContent, false, -1)
         emptyMovieNode = CreateObject("roSGNode", "TubiContentNode")
         emptyMovieNode.type = m.constants.ui.contentTypes.video
         emptyMovieNode.id = videoContent.id
@@ -785,7 +780,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
             shouldShowContinueWatchingConsentDialog = (videoContent.isTrailer = false)
           end if
         end if
-        populateDetailScreen(detailScreen, detailContent, false, detailScreenResumePosition, pageOriginDetails)
+        populateDetailScreen(detailScreen, detailContent, false, detailScreenResumePosition)
       end if
     end if
   end if

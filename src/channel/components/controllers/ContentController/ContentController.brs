@@ -1230,11 +1230,7 @@ Function refreshAllDetailScreens()
 
     if screen.subType() = "DetailScreen"
       content = screen.content 'No need to re fetch the content, just re populate the screen content
-      pageOriginDetails = {
-        "pageOrigin": screen
-        "functionName": "refreshAllDetailScreens"
-      }
-      populateDetailScreen(screen, content, false, -1, pageOriginDetails)
+      populateDetailScreen(screen, content, false, -1)
       resetRelatedContent(screen)
       screen.isWaitingForServerResponse = false
     else if screen.subType() = "EpisodesScreen"
