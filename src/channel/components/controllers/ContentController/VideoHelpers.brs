@@ -17,30 +17,29 @@ Function playVideoContent(content, playbackSource = {"srcForAnalytic": "unknown"
     callbackAfterSignInParams = {"content": content, "playbackSource": playbackSource, "position": position}
     startSignIn(AfterSignInPlayLockedContent, callbackAfterSignInParams)
   else
-  videoPlayer = setupVideoPlayer(content, playbackSource, position)
+    videoPlayer = setupVideoPlayer(content, playbackSource, position)
+    currentScreen = getCurrentScreen()
 
-  currentScreen = getCurrentScreen()
+    if currentScreen = invalid OR currentScreen.id <> m.constants.ui.screenIds.videoPlayerScreen
+      if m.enteredFromDeepLink = true
+        ' if the user has been age gated during the deeplink process, a modal will be shown.
+        ' We need to remove the modal so it is not overlaying the video.
+        modal = getTopModal()
+        if modal <> invalid AND (modal.isSubtype("ModalDialogScreen") OR modal.subType() = "MultiStyleDialogScreen") AND modal.isInFocusChain() = true
+          closeModal(modal)
+        end if
 
-  if currentScreen = invalid or currentScreen.id <> m.constants.ui.screenIds.videoPlayerScreen
-    if m.enteredFromDeepLink = true
-      ' if the user has been age gated during the deeplink process, a modal will be shown.
-      ' We need to remove the modal so it is not overlaying the video.
-      modal = getTopModal()
-      if modal <> invalid AND (modal.isSubtype("ModalDialogScreen") OR modal.subType() = "MultiStyleDialogScreen") AND modal.isInFocusChain() = true
-        closeModal(modal)
+        pushScreen(videoPlayer, false, true)
+      else
+        pushScreen(videoPlayer, true, true)
       end if
-
-      pushScreen(videoPlayer, false, true)
-    else
-      pushScreen(videoPlayer, true, true)
     end if
-  end if
 
-  '//send a copy of the videoSponsorExposureId to the videoPlayer
-  videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
-  videoPlayer.control = "play"
-  updateRokuContinueWatchingInfo(content, position)
-end if
+    '//send a copy of the videoSponsorExposureId to the videoPlayer
+    videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
+    videoPlayer.control = "play"
+    updateRokuContinueWatchingInfo(content, position)
+  end if
 End Function
 
 

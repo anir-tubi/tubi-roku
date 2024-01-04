@@ -557,6 +557,8 @@ End Function
 ' they all set some state on m and call startUserExperience(). When all the information has arrived, as verified
 ' by the first checks in the function, then the function performs it's functionality to start the channel.
 '
+' IMPORTANT: this function should only be called as part of the initial start up process, it
+'            should not be called in an effort to "restart the app".
 Function startUserExperience()
   tubiLog("ContentController.startUserExperience")
   cleanRegistry()
@@ -1936,7 +1938,7 @@ Function onCustomResume(msg)
 
   '// If the resume app action is to restart the app or start the channel, then 1st see if the previously played linear video can be played (if one exists)
   if bRestartApp = true
-    restartAppFromInstantResume()
+    restartApp()
   else if bStartChannel = true
     startChannelFromInstantResume()
   else
@@ -1971,12 +1973,6 @@ Function startChannelFromInstantResume(response = invalid)
 End Function
 
 
-' This is the fail safe restartApp function to be called if the previously played linear video could not be played
-Function restartAppFromInstantResume(response = invalid)
-  restartApp()
-End Function
-
-
 ' restarts the app from beginning of the line in order to retrieve starter/remote components
 Function restartApp()
   tubiLog("ContentController.restartApp")
@@ -1990,7 +1986,6 @@ End Function
 
 ' resumes the app where the user left off.
 Function resumeApp()
-
   tubiLog("ContentController.resumeApp")
   m.deeplinkContent = invalid
 
@@ -2012,9 +2007,7 @@ Function resumeApp()
       refreshTournamentScreenVideoPlay(false, currentScreen)
       currentScreen.setForceRefreshCategoryContainers = true
     end if
-
   end if
-
 
   ' when channel resumes,
   ' send page load event here only if the channel is not launched via deeplink
@@ -2034,7 +2027,6 @@ Function resumeApp()
   ' send AppResumeComplete beacon when channel resumes
   myScene = m.top.getScene()
   myScene.signalBeacon("AppResumeComplete")
-
 End Function
 
 
