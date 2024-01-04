@@ -7,7 +7,7 @@ import { count, timeEnd } from 'console';
 
 
 
-describe.only('Closed Captions Checks', function () {
+describe('Closed Captions Checks', function () {
   before(async () => {
     await testUtils.startApplicationAtPage('home');
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');

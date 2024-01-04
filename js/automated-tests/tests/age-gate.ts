@@ -165,30 +165,29 @@ describe('Age Gate', function () {
     // Verify Age Gate Screen
     await verifyAgeGateScreen();
 
-    // Enter age > 12
-    await ecp.sendText('2010');
+    // Enter age < 13
+    const year = new Date().getFullYear() - 13;
+    await ecp.sendText(year.toString());
     await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
-
-    // Check if we are in the non-kids mode since user passed age gate
     // Verify on home screen
 
-    const homeScreenRowList = testUtils.getNodeForElement('homeScreenRowList');
-    const cannotExitKidsMode = testUtils.getNodeForElement('cannotExitKidsMode');
-    const exitKidsOption = testUtils.getNodeForElement('exitKidsOption');
-    const leftNavHomeButton = testUtils.getNodeForElement('leftNavHomeButton');
-    const buttonTextClose = testUtils.getNodeForElement('buttonTextClose');
+    const homeScreenRowList = await testUtils.getNodeForElement('homeScreenRowList');
+    const cannotExitKidsModeTitle = await testUtils.getNodeForElement('cannotExitKidsModeTitle');
+    const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
+    const leftNavHomeButtonLabel = await testUtils.getNodeForElement('leftNavHomeButtonLabel');
+    const buttonTextClose = await testUtils.getNodeForElement('buttonTextClose');
 
 
-    // Verify cannot exit Kids Mode modal
-    expect((await cannotExitKidsMode).visible).to.equal(true);
-    expect((await buttonTextClose).visible).to.equal(true);
+    // Verify cannot exit Kids Mode modal appears and can be closed
+    expect(cannotExitKidsModeTitle.text).to.equal('Cannot Exit Kids Mode');
+    expect(buttonTextClose.text).to.equal('Close');
 
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     await ecp.sendKeypress(ecp.Key.Left);
-    expect((await leftNavHomeButton).visible).to.equal(true);
+    expect(leftNavHomeButtonLabel.text).to.equal('Home');
 
   });
   /*  https://tubi.testrail.io/index.php?/cases/edit/242815
@@ -208,15 +207,10 @@ describe('Age Gate', function () {
     // Verify Age Gate Screen
     await verifyAgeGateScreen();
 
-    // Enter age between 2020
-    await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
-    await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
+    // Enter age between 0 and 4
+    const year = new Date().getFullYear() - 3;
+    await ecp.sendText(year.toString());
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify error message
@@ -229,15 +223,11 @@ describe('Age Gate', function () {
     await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Enter age between 2021
+    // Enter age between 0 and 4
     await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
-    await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendKeypress(ecp.Key.Left);
+    const year2 = new Date().getFullYear() - 2;
+    await ecp.sendText(year2.toString());
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
 
@@ -251,14 +241,11 @@ describe('Age Gate', function () {
     await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Enter age between 2022
+    // Enter age between 0 and 4
     await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
-    await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Ok);
+    const year3 = new Date().getFullYear() - 1;
+    await ecp.sendText(year3.toString());
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify error message
@@ -270,15 +257,11 @@ describe('Age Gate', function () {
     await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Enter age between 2023
+    // Enter age between
     await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
-    await ecp.sendKeypress(ecp.Key.Right);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await ecp.sendKeypress(ecp.Key.Right);
+    const year4 = new Date().getFullYear() - 0;
+    await ecp.sendText(year4.toString());
+    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify error message

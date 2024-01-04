@@ -591,6 +591,12 @@ const elements = typeCheckElements({
   leftNavHomeButton: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#LabelParent.0.#Label',
   },
+  
+  /** left home button label */
+  leftNavHomeButtonLabel: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.1.#LabelParent.0.#Label'
+    
+  },
 
   /** Left Nav home icon highlighted */
   leftNavHomeFocused: {
@@ -755,6 +761,11 @@ const elements = typeCheckElements({
   /** Cannot exit kids mode modal */
   cannotExitKidsMode: {
     keyPath: '#ContentController.#c4796af.#DialogBox.#ContentArea',
+  },
+
+  /** Cannot exit kids mode title */
+  cannotExitKidsModeTitle: {
+    keyPath: '#ContentController.#c4796af.#DialogBox.#ContentArea.#Title'
   },
 
   /** Button Close text */
