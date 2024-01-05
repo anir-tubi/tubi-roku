@@ -155,6 +155,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen',
   },
 
+  channelsDisabledMessage: {
+    keyPath: '#ContentController.#444e064.#DialogBox.#ContentArea.#Title',
+  },
+	
   /** Content title on the detail screen */
   detailScreenTitle: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#Title',
@@ -316,6 +320,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName',
     xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList/RowListItem[16]/Group/CategoryGridRowLabel/Label',
   },
+	
+  homeScreenPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#PosterGroup.#Poster2.#BackgroundPoster', 
+  },
 
   homeInfoPanel: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset',
@@ -407,6 +415,14 @@ const elements = typeCheckElements({
     xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/Group',
   },
 
+  raitingLabelInDetailsScreen: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Rating.#RatingLabel',
+  },
+	
+  kidsLogoHomeScreen: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#logoGroup.#tubiKidsLogo',
+  },
+	
   titleStarringLabel: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#DirectorGroup.#DirectorPrefix.#DirectorTag',
     xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/LayoutGroup[3]/LayoutGroup/Label',

@@ -3,6 +3,7 @@ export const NODES = {
 	TV_SHOW_SCREEN_ROW_LIST: 'tvScreenRowList',
 	TITLE_DESCRIPTION_MOVIE: 'titleDescriptionOnHomeScreen',
 	ESPANOL_SCREEN_ROW_LIST: 'espanolScreenRowList',
+	HOME_SCREEN_ROW_LIST: 'homeRowList',
 };
 
 export const LINEAR_NODES = {

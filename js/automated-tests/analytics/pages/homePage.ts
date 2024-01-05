@@ -16,6 +16,12 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 			await testUtils.getNodeForElement(NODES.ESPANOL_SCREEN_ROW_LIST),
 		movieDescription: async () =>
 			await testUtils.getNodeForElement(NODES.TITLE_DESCRIPTION_MOVIE),
+		homeScreenPoster: async () =>
+			await testUtils.getNodeForElement('homeScreenPoster'),
+		homeScreenKidsLogo: async () =>
+			await testUtils.getNodeForElement('kidsLogoHomeScreen'),
+		channelsDisabledMessage: async () =>
+			await testUtils.getNodeForElement('channelsDisabledMessage'),
 	};
 
 	// expect(tvScreenRowList.visible).to.equal(true);
@@ -26,6 +32,11 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 			NODES.MOVIE_SCREEN_ROW_LIST
 		);
 		return parseInt(content.id);
+	}
+
+	async function pageDidLoad() {
+		const homeScreenPoster = await elements.homeScreenPoster();
+		expect(homeScreenPoster.visible).to.equal(true);
 	}
 
 	async function getMovieTitleIdAndCategory() {
@@ -50,6 +61,27 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 			NODES.MOVIE_SCREEN_ROW_LIST
 		);
 		return await selectFocusedTitle(content);
+	}
+
+	async function selectFocusedTitleKidsMode() {
+		await testUtils.retryWithTimeOut(async () => {
+			const kidsLogo = await elements.homeScreenKidsLogo();
+			expect(kidsLogo.visible).to.equal(true);
+		});
+		await utils.sleep(2000);
+		const content = await testUtils.getCurrentlyFocusedGridItemContent(
+			NODES.HOME_SCREEN_ROW_LIST
+		);
+		return await selectFocusedTitle(content);
+	}
+
+	async function getPopupMessage() {
+		let channelsDisabledMessage;
+		await testUtils.retryWithTimeOut(async () => {
+			channelsDisabledMessage = await elements.channelsDisabledMessage();
+			expect(channelsDisabledMessage.text).to.not.be.empty;
+		});
+		return channelsDisabledMessage.text;
 	}
 
 	async function selectFocusedTitleEspanol() {
@@ -148,6 +180,10 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		return await selectFocusedTitle(content);
 	}
 
+	async function exitKidsMode() {
+		await SideNav().selectSideNavTabNoPageReturn(tabs.exitKids);
+	}
+
 	async function selectFocusedTitleTVShow() {
 		const content = await testUtils.getCurrentlyFocusedGridItemContent(
 			NODES.TV_SHOW_SCREEN_ROW_LIST
@@ -232,6 +268,10 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		playEspanolTitle,
 		selectFocusedTitleEspanol,
 		selectFocusedTvShowTitleEspanol,
+		exitKidsMode,
+		pageDidLoad,
+		selectFocusedTitleKidsMode,
+		getPopupMessage,
 		...SideNav(),
 	};
 };

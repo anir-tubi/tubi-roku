@@ -1,7 +1,9 @@
 import Home from '../pages/homePage';
 import Settings from '../pages/settingsPage';
+import Categories from '../pages/categories';
+import ChannelsPage from '../pages/channelsPage';
 import { moveToRow } from '../utils/helpers';
-import { ecp } from 'roku-test-automation';
+import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../../test-utils';
 import { expect } from 'chai';
 
@@ -27,9 +29,11 @@ export const tabs = {
 	},
 	categories: {
 		row: 6,
+		page: () => Categories(),
 	},
 	channels: {
 		row: 7,
+		page: () => ChannelsPage(),
 	},
 	espanol: {
 		row: 8,
@@ -53,12 +57,14 @@ const SideNav = () => {
 
 	async function selectTab(tab) {
 		await moveToRow(ui.row - tab.row);
+		await utils.sleep(800);
 		await ecp.sendKeypress(ecp.Key.Ok);
 		tab.row === 1 ? ui.row : (ui.row = tab.row);
 		const page = tab.page();
 		await page.pageDidLoad();
 		return page;
 	}
+
 	async function selectTabNoPageReturn(tab) {
 		await moveToRow(ui.row - tab.row);
 		await ecp.sendKeypress(ecp.Key.Ok);
@@ -69,6 +75,7 @@ const SideNav = () => {
 		ui.row = currentRow;
 		await ecp.sendKeypress(ecp.Key.Left);
 		await testUtils.waitForSideNavMenuToBeExpanded();
+		await utils.sleep(1000);
 		await selectTabNoPageReturn(tab);
 	}
 

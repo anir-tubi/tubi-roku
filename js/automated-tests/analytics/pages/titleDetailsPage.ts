@@ -34,6 +34,8 @@ const TitleDetailsPage = (titleDetails) => {
 			await testUtils.getNodeForElement(
 				TITLE_DETAILS_PAGE_NODES.DETAILS_PAGE_MENU
 			),
+		raitingLabel: async () =>
+			await testUtils.getNodeForElement('raitingLabelInDetailsScreen'),
 	};
 
 	async function pageDidLoad() {
@@ -62,6 +64,15 @@ const TitleDetailsPage = (titleDetails) => {
 			const [episodeId, description] = titleDetails.description.split(' ');
 			return parseInt(episodeId);
 		}
+	}
+
+	async function getRatingText() {
+		let ratingTogle;
+		await testUtils.retryWithTimeOut(async () => {
+			ratingTogle = await elements.raitingLabel();
+			expect(ratingTogle.text).to.not.be.empty;
+		});
+		return ratingTogle.text;
 	}
 
 	function getTitleId() {
@@ -166,6 +177,7 @@ const TitleDetailsPage = (titleDetails) => {
 		selectTitleFromYouMayAlsoLike,
 		highlightLikeOrDislike,
 		highlightWatchTrailer,
+		getRatingText,
 	};
 };
 
