@@ -363,11 +363,13 @@ TBD
 
 # Remote Release
 
-Remote releases are releases that are not sent to Roku, and updates are made when a device loads the Tubi channel, by downloading the starter component and remote component files, which are used to build the channel UI.
+Remote releases are releases that are not sent to Roku, and updates are made when a device loads the Tubi channel, by downloading the starter component and remote component files, which are used to build the channel UI. If creating a Hotfix Release (a type of remote release), please see the notes in the next section titled "__Hotfix Release__".
 
 1\. Set up the environment variables (listed in the [build step](#build)) if not done already, as some of the following steps are dependent on these variables.
 
-2\. Checkout the most recent `x_y_branch` branch. Create a new branch off of the `x_y_branch` called something like `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number. Check the build.yml file to know which the new build number should be. The patch number should be ten more than the "build_version" listed in the build.yml file. Alternatively you can use the new `gulp buildQaBranch` task instead to do this.
+2\. Checkout the most recent `x_y_branch` branch (ie. the production branch). Run `gulp buildQaBranch` to create a branch that will look like `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number of the next QA build.
+
+Alternatively if you choose not to run `gulp buildQaBranch`, create a new branch off of the production `x_y_branch` called `qa_x_y_z`, where x is the Major Release number, where y is the Minor Release number, and where "z" is the patch number of the build that will be given to QA. The patch number (`z`) should be 10 larger than the current production patch number which can be found in build.yml. You must also run `gulp bumpTen` to bump the patch number to the appropriate value.
 
 3\. Run `$ gulp compareProd`. This will do the following:
 
@@ -388,9 +390,8 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 6\. Make a new commit on the `qa_x_y_z` branch with the hotpatch and new images updates. Push `qa_x_y_z` branch to github.
 
-7\. Run `$ gulp bump` in order to increment the version number.
 
-8\. Deploy to staging
+7\. Deploy to staging
 
 - Before deploying to staging, ensure you have the AWS CLI tool installed. If you have not done that yet, then do that now, [https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 
@@ -418,7 +419,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   Note: This will also push the current qa branch to github.
 
-9\. Create a SC ticket with any changes that have been made and give the ticket to the QA team for manual testing.
+8\. Create a SC ticket with any changes that have been made and give the ticket to the QA team for manual testing.
   - Go to the [ShortCut tool](https://app.shortcut.com/tubi/team/61525f46-2903-4bfc-afa4-83f9d7fefbfb?stories_sort_by=priority&stories_group_by=workflow_state_id)
   - Create a QA ticket by navigating to the following menu items: Create Story in Team> Create Story> Product QA Team> Roku QA Template
   - Run the command `gulp buildQaChanges`, which will build most of the copy for this ticket and place it in your clipboard
@@ -426,13 +427,13 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
   - Make sure that no work is missing in the list and that the included info looks correct
   - Provide QA with a link to the ticket within the roku_qa slack channel
 
-10\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build. Use the following command to update the staging channel with the latest version of the QA branch.
+9\. Any bugs found by QA should be fixed, committed to master, and then cherry picked into this QA build. Use the following command to update the staging channel with the latest version of the QA branch.
 
   `$ gulp stage`
 
   Note: The revision number will only display as part of the version number under the About Settings Screen when the mode is set to "qa".
 
-11\. After QA Sign Off, run `$ gulp release`. This will:
+10\. After QA Sign Off, run `$ gulp release`. This will:
 
   - increment the version number once more (the QA build should not be the same version number as the production build)
   - install a new build using the "production" config, to create the .pkgs needed to update the production build.
@@ -454,15 +455,15 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   __Note:__ As an edge case, if you need to manually perform the release steps for the new build, follow the [Manual Remote Release Steps](https://github.com/adRise/project-total-recall/docs/manual_release.md#remote-release)
 
-12\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#rokudev slack channel`. The PR URLs can also be found on the project-total-recall and adrise_cdn repos respectively), and wait for approval.
+11\. Inform the team that the PRs are ready for review (you can paste the urls that were added to the clipboard when the last step completed, into the `#rokudev slack channel`. The PR URLs can also be found on the project-total-recall and adrise_cdn repos respectively), and wait for approval.
 
-13\. Merge the new PRs in the adrise_cdn repo and rcdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
+12\. Merge the new PRs in the adrise_cdn repo and rcdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
 
-14\. check if you need to tun multifactor authentication for AWS. Typically this means running `$ vauth`. You ran this in a previous step, but some time may has passed and you may have to run it again. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
+13\. check if you need to tun multifactor authentication for AWS. Typically this means running `$ vauth`. You ran this in a previous step, but some time may has passed and you may have to run it again. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
 
 - __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THIS PR AND THE PREVIOUS PRs ARE APPROVED__
 
-15\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
+14\. Use an infra script to move the updates from the CDN repo to the actual CDN servers.
 
 - Ensure you have the latest files. Update your local version of the [adrise_infrastructure repo](https://github.com/adRise/adrise_infrastructure)
 - You may find during this step, that you may not have the correct version of python. If that is the case, then you will need to update your version on python based on your system requirements. If you are on Mac, you may simply have to run the following command within your adrise_infrastructure repo:
@@ -474,7 +475,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 - Deploy to the Roku CDN and CDN by running the Infra Script which is detailed in the [RCDN README file](https://github.com/adRise/rcdn#readme).
   After deployment make sure you can download the components you just uploaded to CDN using the urls associated with `starterComponentsUrl`, `remoteComponentsUrl` and `rcdnStarterComponentsUrl`, `rcdnRemoteComponentsUrl` in default.yml
 
-16\. Verify the release
+15\. Verify the release
 
 - Run a smoke test on production checking at minimum:
     - The production channel loads
@@ -483,7 +484,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 - Monitor various metrics for signs of any issues:
   - [Ad impressions per second](https://app.datadoghq.com/dashboard/ckr-vrw-xh4/ad-server-business-metrics?from_ts=1563412592034&to_ts=1564017392034&live=true&tile_size=m&fullscreen_widget=80673160&fullscreen_section=overview)
 
-17\. Create a release on Github (only if you did not create a release in the CLI as part of step 9). As part of the release script, a tag was automatically created and pushed to Github.
+16\. Create a release on Github (only if you did not create a release in the CLI as part of step 9). As part of the release script, a tag was automatically created and pushed to Github.
 
 - From the following link, find the tag that was just pushed to Github, and click on the link for that tag.
   - [github.com/adRise/project-total-recall/tags](https://github.com/adRise/project-total-recall/tags)
@@ -498,7 +499,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 - Select "Publish Release"
 
-18\. Currently, if starter component/remote component fails to load, app fallsback on to the submitted version of the app.  But if submitted version of the app coantians any critical issues or the legal issues or API-deprecated /discontinued related issues then we might not want to fallback on submitted version of the app.
+17\. Currently, if starter component/remote component fails to load, app fallsback on to the submitted version of the app.  But if submitted version of the app coantians any critical issues or the legal issues or API-deprecated /discontinued related issues then we might not want to fallback on submitted version of the app.
 
 - Please check the release notes to determine if any of the released items are critical fixes or the legal updates/fixes or API-deprecated /discontinued related updates to the submitted version of the app.  If you find any such items because of which we do not want the users to fallback on submitted version of the app then we need to add the submitted-app-version-number to `external config->fallback_blocked_versions[]`. (eg: "fallback_blocked_versions": ["2.21.0", "2.24.0"])
 
@@ -507,7 +508,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 # Hotfix Release
 
-A Hotfix Release is the same as a Remote Release but includes code deemed important enough to do a new release while an existing release is already being tested by QA. Follow the same steps as for a Remote Release but for step 2 only increment the build number by 1 unless you are using `gulp buildQaBranch` which will automatically do this for you.
+A Hotfix Release is the same as a Remote Release but includes code deemed important enough to do a new release while an existing release is already being tested by QA. Follow the same steps as for a Remote Release but for step 2, if not running `gulp buildQaBranch`, after manually creating the `qa_x_y_z` branch off of the production `x_y_branch` branch, run `gulp bump` to only increment the build number by 1 instead of running `gulp bumpTen`.
 
 # Informal QA
 
