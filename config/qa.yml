@@ -67,6 +67,8 @@ settings:
     useQaAnalyticsProxy: false
     # Setting to true will route linear playback manifest request through qa proxy.
     linearQaProxyEnabled: false
+    # Setting to enable/disable braze logging.
+    brazeLoggingEnabled: true
 
   #setting to true will result in suitest being loaded
   suitest: false

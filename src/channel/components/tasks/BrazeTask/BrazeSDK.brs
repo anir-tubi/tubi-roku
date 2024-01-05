@@ -908,7 +908,10 @@ function BrazeInit(config as object, messagePort as object)
     end function,
 
     logMessage: function(tag as string, message as string) as void
-      print "Braze Roku SDK v" + BrazeConstants().SDK_DATA.SDK_VERSION + " - " + tag + " - " + message
+      ' *** Please do not remove the if condition for controlling logging when we make braze updates. ***
+      #if brazeLoggingEnabled
+        print "Braze Roku SDK v" + BrazeConstants().SDK_DATA.SDK_VERSION + " - " + tag + " - " + message
+      #end if
     end function
   }
 

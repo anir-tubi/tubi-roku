@@ -79,3 +79,5 @@ settings:
     consoleLoggingIncludeTimestamp: false # whether to include timestamp in log outputs
     # Setting to true will route linear playback manifest request through qa proxy.
     linearQaProxyEnabled: false
+    # Setting to enable/disable braze logging.
+    brazeLoggingEnabled: true
