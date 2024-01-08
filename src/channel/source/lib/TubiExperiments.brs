@@ -39,10 +39,6 @@ Function TubiExperiments(constants) as Object
         roku_cw_featured_recommended_placement_v2: {"roku_cw_featured_recommended_placement_type": "none"} 'valid values are : "none", "roku_cw_in_featured"
       }
 
-      roku_series_season_order: {
-        roku_series_season_order_v2: {"enabled": false}
-      }
-
       roku_large_play_progress: {
         roku_large_play_progress_v1 : {"enabled": true}
       }
