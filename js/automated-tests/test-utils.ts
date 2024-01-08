@@ -176,6 +176,13 @@ class TestUtils {
 
   // Helper to fully shutdown the application
   public async exitApplication() {
+    // Check if the application is already not running
+    const applicationIsRunning = await this.isApplicationRunning();
+    if (!applicationIsRunning) {
+      // If so then we can just exit here
+      return;
+    }
+
     // wait for content controller to get added. This is needed in the case that the application is still launching and then the next test tries to close the application again. Without this the setValue would fail because ContentController does not exist yet.
     await this.getNodeForElement('contentControllerId');
     try {
@@ -196,9 +203,15 @@ class TestUtils {
   // Waits for application to shutdown but does not take any steps to make it do so
   public async waitForApplicationShutdown() {
     await this.untilTrue(async () => {
-      const result = await ecp.getActiveApp();
-      return result.app.id !== 'dev';
+      const isApplicationRunning = await this.isApplicationRunning();
+      return !isApplicationRunning;
     }, 'Active app never switched from dev');
+  }
+
+
+  public async isApplicationRunning() {
+    const result = await ecp.getActiveApp();
+    return result.app.id === 'dev';
   }
 
 
@@ -556,45 +569,45 @@ class TestUtils {
   }
 
 
- /**
+  /**
    * Used to jump to a row with the title provided
    * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
    * @param title - The title we are searching for
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
- public async jumpToRowWithTitle(elementOrElementId: ElementOrElementId, title: string, timeout = 10000) {
-  const rowIndex = await this.findRowIndexWithTitle(elementOrElementId, title, timeout);
-  await this.jumpToRowIndex(elementOrElementId, rowIndex, timeout);
-  return rowIndex;
-}
+  public async jumpToRowWithTitle(elementOrElementId: ElementOrElementId, title: string, timeout = 10000) {
+    const rowIndex = await this.findRowIndexWithTitle(elementOrElementId, title, timeout);
+    await this.jumpToRowIndex(elementOrElementId, rowIndex, timeout);
+    return rowIndex;
+  }
 
 
-/**
- * Used to jump to a row with the rowIndex provided
- * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
- * @param rowIndex - The row index we want to jump to
- * @param timeout - How long we will wait for this operation before considering it to have failed
- */
-public async jumpToRowIndex(elementOrElementId: ElementOrElementId, rowIndex: number, timeout = 10000) {
-  await odc.setValue(this.getElementKeyPath(elementOrElementId, {
-    field: 'jumpToItem',
-    value: rowIndex
-  }), {timeout: timeout});
-}
+  /**
+   * Used to jump to a row with the rowIndex provided
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param rowIndex - The row index we want to jump to
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async jumpToRowIndex(elementOrElementId: ElementOrElementId, rowIndex: number, timeout = 10000) {
+    await odc.setValue(this.getElementKeyPath(elementOrElementId, {
+      field: 'jumpToItem',
+      value: rowIndex
+    }), {timeout: timeout});
+  }
 
 
-/**
- * Used to jump to a row item of the provided index
- * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
- * @param index - The index we want to jump to consisting of row in index 0 and item in index 1
- * @param timeout - How long we will wait for this operation before considering it to have failed
- */
-public async jumpToRowItem(elementOrElementId: ElementOrElementId, index: number[], timeout = 10000) {
-  await odc.setValue(this.getElementKeyPath(elementOrElementId, {
-    field: 'jumpToRowItem',
-    value: index
-  }), {timeout: timeout});
-}
+  /**
+   * Used to jump to a row item of the provided index
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param index - The index we want to jump to consisting of row in index 0 and item in index 1
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async jumpToRowItem(elementOrElementId: ElementOrElementId, index: number[], timeout = 10000) {
+    await odc.setValue(this.getElementKeyPath(elementOrElementId, {
+      field: 'jumpToRowItem',
+      value: index
+    }), {timeout: timeout});
+  }
 
 
   /**
@@ -942,8 +955,12 @@ public async jumpToRowItem(elementOrElementId: ElementOrElementId, index: number
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
   public async waitForElementToHaveFocus(elementOrElementId: ElementOrElementId, errorMessage?: string, timeout = 10000) {
-    await this.untilTrue(() => {
-      return this.elementHasFocus(elementOrElementId);
+    await this.untilTrue(async () => {
+      try {
+        return await this.elementHasFocus(elementOrElementId);
+      } catch(e) {
+        return false;
+      }
     }, errorMessage, timeout);
   }
 
@@ -956,8 +973,12 @@ public async jumpToRowItem(elementOrElementId: ElementOrElementId, index: number
   */
   public async waitForElementToNotHaveFocus(elementOrElementId: ElementOrElementId, errorMessage?: string, timeout = 10000) {
     await this.untilTrue(async () => {
-      const result = await this.elementHasFocus(elementOrElementId);
-      return !result;
+      try {
+        const result = await this.elementHasFocus(elementOrElementId);
+        return !result;
+      } catch(e) {
+        return false;
+      }
     }, errorMessage, timeout);
   }
 
@@ -969,8 +990,12 @@ public async jumpToRowItem(elementOrElementId: ElementOrElementId, index: number
   * @param timeout - How long we will wait for this operation before considering it to have failed
   */
   public async waitForElementToBeInFocusChain(elementOrElementId: ElementOrElementId, errorMessage?: string, timeout = 10000) {
-    await this.untilTrue(() => {
-      return this.elementIsInFocusChain(elementOrElementId);
+    await this.untilTrue(async () => {
+      try {
+        return await this.elementIsInFocusChain(elementOrElementId);
+      } catch(e) {
+        return false;
+      }
     }, errorMessage, timeout);
   }
 
@@ -983,8 +1008,12 @@ public async jumpToRowItem(elementOrElementId: ElementOrElementId, index: number
   */
   public async waitForElementToNotBeInFocusChain(elementOrElementId: ElementOrElementId, errorMessage?: string, timeout = 10000) {
     await this.untilTrue(async () => {
-      const result = await this.elementIsInFocusChain(elementOrElementId);
-      return !result;
+      try {
+        const result = await this.elementIsInFocusChain(elementOrElementId);
+        return !result;
+      } catch(e) {
+        return false;
+      }
     }, errorMessage, timeout);
   }
 

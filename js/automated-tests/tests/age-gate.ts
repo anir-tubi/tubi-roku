@@ -4,12 +4,6 @@ import { testUtils } from '../test-utils';
 import { shared } from '../shared';
 
 describe('Age Gate', function () {
-  before(async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-
-  });
-
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/242480
   it('C242480 - COPPA V3 - Guest User access Kids mode and selects exit kids option. User is presented with Age Gate, @age_gate', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
@@ -140,15 +134,12 @@ describe('Age Gate', function () {
 
     // Check if we are in the non-kids mode since user passed age gate
     // Verify on home screen
-    const homeScreenRowList = testUtils.getNodeForElement('homeScreenRowList');
-    const leftNavHomeButton = testUtils.getNodeForElement('leftNavHomeButton');
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Open left nav and check for Kids left nav icon
     await ecp.sendKeypress(ecp.Key.Left);
-    expect((await leftNavHomeButton).visible).to.equal(true);
-
-
+    const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
+    expect(leftNavHomeButton.visible).to.equal(true);
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/242819
@@ -170,6 +161,7 @@ describe('Age Gate', function () {
     await ecp.sendText(year.toString());
     await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
+
     // Verify on home screen
 
     const homeScreenRowList = await testUtils.getNodeForElement('homeScreenRowList');
@@ -188,8 +180,8 @@ describe('Age Gate', function () {
 
     await ecp.sendKeypress(ecp.Key.Left);
     expect(leftNavHomeButtonLabel.text).to.equal('Home');
-
   });
+
   /*  https://tubi.testrail.io/index.php?/cases/edit/242815
       https://tubi.testrail.io/index.php?/cases/view/242816
       https://tubi.testrail.io/index.php?/cases/view/242818
@@ -270,14 +262,12 @@ describe('Age Gate', function () {
   });
 });
 
-
-
   async function openKidsMode() {
-
     await ecp.sendKeypress(ecp.Key.Left);
     await ecp.sendKeypress(ecp.Key.Up);
-    await utils.sleep(3000); // Adding sleeps temporary
     await ecp.sendKeypress(ecp.Key.Up);
+    // IMPROVEMENT remove need for this by addressing the weird behavior when animation ends
+    await utils.sleep(500); // Adding sleeps temporary
     await ecp.sendKeypress(ecp.Key.Ok);
     const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
     expect(exitKidsOption.visible).to.be.true;
@@ -291,7 +281,6 @@ describe('Age Gate', function () {
   }
 
   async function verifyAgeGateScreen() {
-    const ageVerificationNumberPad = await testUtils.getNodeForElement('ageVerificationNumberPad');
     const hasFocus = await testUtils.elementHasFocus('ageVerificationNumberPad');
     expect(hasFocus).to.be.true;
   }

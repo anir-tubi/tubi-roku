@@ -5,7 +5,8 @@ import { shared } from '../shared';
 import { waitForDebugger } from 'inspector';
 
 describe('Autoplay Movies', function () {
-    before(async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/105693
+    it('105693 - Autoplay - Movie - When movie reaches the credit cue point then autoplay triggers @autoplay', async () => {
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
     });
@@ -93,7 +94,7 @@ describe('Autoplay Movies', function () {
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/25123
     it('C25123 - Autoplay - Movie - When user chooses last title on the list then movie plays @autoplay', async () => {
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
-        
+
         // Are we on the series page?
         const movieScreenRowList = await testUtils.getNodeForElement('movieScreenRowList');
         expect(movieScreenRowList.visible).to.equal(true);
@@ -219,12 +220,10 @@ describe('Autoplay Movies', function () {
         // Is the Year displayed on the autoplay option?
         const autoPlayYearAndDuration = testUtils.getNodeForElement('autoPlayYearAndDuration');
         expect((await autoPlayYearAndDuration).visible).to.be.true;
-
-
     });
+
     //Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/76116
     it('C148692 - Autoplay - Movie - When user searches for a movie and initiates playback, Autoplay should work @autoplay,@smoke', async () => {
-
         // Search for a Movie title
         await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
         await ecp.sendText('zapp');
@@ -241,33 +240,20 @@ describe('Autoplay Movies', function () {
         await ecp.sendKeypress(ecp.Key.Play);
         const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
         expect(videoPlayerActual.visible).to.equal(true);
-        await testUtils.expectPlayerStateToEventuallyEqual('play');
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
         await ecp.sendKeypress(ecp.Key.Play);
         const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
         expect(playPauseButton.visible).to.equal(true);
         await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
 
-        // FF button highlighted
-        const fastForwardButton = await testUtils.getNodeForElement('fastForwardButton');
-        expect(fastForwardButton.visible).to.equal(true);
-
-        // Press FF button three times
-        await ecp.sendKeypress(ecp.Key.Ok, { count: 3 });
-
-        // FF until cue point
-        await utils.sleep(60000);
-
-        // Play to trigger autoplay
-        await ecp.sendKeypress(ecp.Key.Play);
+        await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', 0, 'end');
 
         // Autoplay triggered?
         const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay');
         expect(countDownMovieAutoPlay.visible).to.equal(true);
 
         // Is the Year displayed on the autoplay option?
-        const autoPlayYearAndDuration = testUtils.getNodeForElement('autoPlayYearAndDuration');
-        expect((await autoPlayYearAndDuration).visible).to.be.true;
-
-
+        const autoPlayYearAndDuration = await testUtils.getNodeForElement('autoPlayYearAndDuration');
+        expect(autoPlayYearAndDuration.visible).to.be.true;
     });
 });

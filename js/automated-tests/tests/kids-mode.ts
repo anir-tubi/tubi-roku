@@ -4,14 +4,8 @@ import { testUtils } from '../test-utils';
 import { shared } from '../shared';
 
 describe('Kids Mode', function () {
-  before(async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-
-  });
-
   // Test Rail link: https://tubi.testrail.io/index.php?/cases/view/537398
-  it('C537398 - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Older Kids Then Exit Kids is still present, @kidsmode_guest', async () => {
+  it('C537398 - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Older Kids Then Exit Kids is still present, @kidsmode_guest, @smoke', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await openKidsMode();
 
@@ -58,6 +52,7 @@ describe('Kids Mode', function () {
      // Is the Exit Kids button grayed out?
      await checkForKidsModeGrayed();
   });
+
   // https://tubi.testrail.io/index.php?/cases/view/537398
   it('C537398 - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Little Kids Then Kids Mode icon is now grayed out, @kidsmode_guest', async () => {
 
@@ -201,6 +196,7 @@ describe('Kids Mode', function () {
     await checkForKidsModeGrayed();
 
   });
+
   // https://tubi.testrail.io/index.php?/cases/view/537690
   it('C537690 - Registered User - Toggle ON - Home Screen - When User Switches Parental Control to Little Kids Then the App Stays in Kids Mode, @kidsmode_registered', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
@@ -244,6 +240,7 @@ describe('Kids Mode', function () {
      await checkForKidsModeGrayed();
 
   });
+
   // https://tubi.testrail.io/index.php?/cases/view/537393
   it('C537393 Kids Mode - Registered User - Toggle ON - Parental Control ON - Older Kids- modal dialog, @kidsmode_registered', async () => {
 
@@ -271,6 +268,7 @@ describe('Kids Mode', function () {
 
 
   });
+
   // https://tubi.testrail.io/index.php?/cases/view/535858
   it('C535858 - Registered User - Toggle OFF - Parental Control OFF - When user opens the app then Kids Icon should be displayed, @kidsmode_registered', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
@@ -292,6 +290,7 @@ describe('Kids Mode', function () {
     await checkForKidsModeAdult();
 
   });
+
   // https://tubi.testrail.io/index.php?/cases/view/66347
   it('C66347 - Kids Mode does not persist - Registered user, @kidsmode_registered', async () => {
 
@@ -361,11 +360,11 @@ describe('Kids Mode', function () {
 });
 
 async function openKidsMode() {
-
   await ecp.sendKeypress(ecp.Key.Left);
   await ecp.sendKeypress(ecp.Key.Up);
-  await utils.sleep(3000); // Adding sleeps temporary
   await ecp.sendKeypress(ecp.Key.Up);
+  // IMPROVEMENT remove need for this by addressing the weird behavior when animation ends
+  await utils.sleep(500); // Adding sleeps temporary
   await ecp.sendKeypress(ecp.Key.Ok);
   const exitKidsOption = await testUtils.getNodeForElement('exitKidsOption');
   expect(exitKidsOption.visible).to.be.true;
@@ -388,13 +387,12 @@ async function guestSelectLittleKidsParentalControls() {
 
 async function signInUserFromParentalControls() {
   await ecp.sendKeypress(ecp.Key.Ok);
-  await utils.sleep(1000);
   const dialogBoxSignInButton = await testUtils.getNodeForElement('dialogBoxSignInButton');
   expect(dialogBoxSignInButton.visible).to.be.true;
 
   // Show request for info Roku overlay
   await ecp.sendKeypress(ecp.Key.Ok);
-  await utils.sleep(2000);
+  await utils.sleep(2000); // We can't get rid of this sleep since this is Roku's native panel and we have no way to observe when it is showing
   await ecp.sendKeypress(ecp.Key.Down);
   await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -406,7 +404,6 @@ async function signInUserFromParentalControls() {
 
   await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
   await ecp.sendKeypress(ecp.Key.Ok);
-  await utils.sleep(2000);
   const signInScreenPasswordBox = await testUtils.getNodeForElement('signInScreenPasswordBox');
   expect(signInScreenPasswordBox.visible).to.be.true;
   await ecp.sendKeypress(ecp.Key.Ok);

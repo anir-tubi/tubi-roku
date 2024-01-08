@@ -6,14 +6,6 @@ import { shared } from '../shared';
 import { count, timeEnd } from 'console';
 
 describe('Multiple Audio', function () {
-  let user: RegisteredUser;
-  before(async () => {
-    user = await testUtils.createRegisteredUser();
-    await testUtils.startApplicationAtPage('search', { user: user });
-    await testUtils.waitForAppLaunchBeaconToFire();
-
-  });
-
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/403409
   it('C403409 - Video Player - New Audio / subtitle icon @multiple_audio', async () => {
     await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
@@ -42,7 +34,7 @@ describe('Multiple Audio', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/403413
-  it('C403413 - Video Player - New Audio / subtitle menu selection @multiple_audio', async () => {
+  it('C403413 - Video Player - New Audio / subtitle menu selection @multiple_audio, @smoke', async () => {
     await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
     await ecp.sendText('fifth plane');
 
@@ -59,7 +51,7 @@ describe('Multiple Audio', function () {
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
     // Verify that video is playing
-    await testUtils.expectPlayerStateToEventuallyEqual('play');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Closed Caption audio button present?
     const closedCaptionAudioButton = await testUtils.getNodeForElement('closedCaptionAudioButton');
@@ -102,7 +94,7 @@ describe('Multiple Audio', function () {
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
     // Verify that video is playing
-    await testUtils.expectPlayerStateToEventuallyEqual('play');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Closed Caption audio button present?
     const closedCaptionAudioButton = await testUtils.getNodeForElement('closedCaptionAudioButton');
@@ -122,8 +114,8 @@ describe('Multiple Audio', function () {
     await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Start app with current user
-    await testUtils.startApplicationAtPage('search', { user: user });
+    // Start app with new user
+    await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
     await testUtils.waitForAppLaunchBeaconToFire();
 
     // Nav to AD container and playback any title

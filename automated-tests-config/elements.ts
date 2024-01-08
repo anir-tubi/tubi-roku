@@ -911,7 +911,7 @@ const elements = typeCheckElements({
   },
 
   linearNavigationPanel: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen.#VideoOverlay.#overlayParent.#overlayContentArea.#EPGHorizontalSlide.#EPG'  
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen.#VideoOverlay.#overlayParent.#overlayContentArea.#EPGHorizontalSlide.#EPG'
   },
 
   liveNewsSubtitlesPanel: {
@@ -1274,7 +1274,7 @@ const elements = typeCheckElements({
 
   /** settings Screen Title */
   settingsScreenTitle: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#Title'  
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#Title'
   },
 
   /** Exit Button Text */

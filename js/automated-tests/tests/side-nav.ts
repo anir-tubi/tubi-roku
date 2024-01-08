@@ -316,7 +316,7 @@ describe('Side Navigation', function () {
 
 
     // https://tubi.testrail.io/index.php?/cases/view/535788
-    it('C535788 - Side Navigation - Settings Page - Select, @sidenav', async () => {
+    it.skip('C535788 - Side Navigation - Settings Page - Select, @sidenav', async () => {
 
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');

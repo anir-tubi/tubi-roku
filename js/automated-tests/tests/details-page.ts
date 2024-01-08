@@ -50,7 +50,7 @@ describe('Details Page', function () {
     });
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537370
-    it('C537370 - Movie Details - When Movie Details page is opened then runtime and year is displayed @registered_user,@smoke,@mdp_1', async () => {
+    it('C537370 - Movie Details - When Movie Details page is opened then runtime and year is displayed @registered_user,@mdp_1', async () => {
       const detailScreenYearAndDuration = await testUtils.getNodeForElement('detailScreenYearAndDuration');
       expect(detailScreenYearAndDuration.visible).to.equal(true);
       expect(detailScreenYearAndDuration.text).to.contain(itemData.year);
@@ -59,9 +59,6 @@ describe('Details Page', function () {
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535808
     it('C5358081 - Movie - No History - When title is added to queue then Add to Queue changed to Remove from Queue @registered_user,@smoke,@mdp_1', async () => {
-      await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
-      await ecp.sendKeypress(ecp.Key.Ok);
-      await utils.sleep(2000); // Improvement
       const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
       expect(detailScreenTitle.visible).to.equal(true);
       await testUtils.selectAndVerifyDetailPageMenuItem('addToMyList');
@@ -364,7 +361,7 @@ describe('Details Page', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
       await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
-      // Create history, than back to details page-
+      // Create history, then back to details page-
       await createHistory();
 
       // Back out of the video player to land on Details page
@@ -394,8 +391,8 @@ describe('Details Page', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Make sure Play button is selected on opening Details page
-      const playButtonSelected = await testUtils.getNodeForElement('playButtonSelected');
-      expect(playButtonSelected.visible).to.equal(true);
+      const content = await testUtils.getCurrentlyFocusedGridItemContent('detailScreenMenu');
+      expect(content.id).to.equal('PlayMenuItem');
     });
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/https://tubi.testrail.io/index.php?/cases/view/537368
@@ -407,11 +404,14 @@ describe('Details Page', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       //Make sure Play button is selected when landing on details page
-      const playButtonSelected = await testUtils.getNodeForElement('playButtonSelected');
-      await testUtils.elementHasFocus('playButtonSelected');
+      let content = await testUtils.getCurrentlyFocusedGridItemContent('detailScreenMenu');
+      expect(content.id).to.equal('PlayMenuItem');
 
       // Select Play button
       await ecp.sendKeypress(ecp.Key.Ok);
+
+      // Capture the current item title so we can make sure we got the same item on the next launch
+      const firstScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
 
       // Call to createHistory function
       await createHistory();
@@ -419,26 +419,30 @@ describe('Details Page', function () {
       // Back out of the video player to land on Details page
       await ecp.sendKeypress(ecp.Key.Back);
 
+      // Back out to home screen
+      await ecp.sendKeypress(ecp.Key.Back);
+      await testUtils.waitForCurrentScreenToEqual('movieScreen');
+
       // Exit app
       await ecp.sendKeypress(ecp.Key.Back, { count: 4 });
       await ecp.sendKeypress(ecp.Key.Ok);
 
       //Relaunch app as guest
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: false, clearRegistry:false });
-      await utils.sleep(7000); // Improvement - try to work around sleeps
-      await ecp.sendKeypress(ecp.Key.Ok);
 
-      // On Movies page?
-      const onMoviesPageButton = await testUtils.getNodeForElement('onMoviesPageButton');
-      expect(onMoviesPageButton.visible).to.equal(true);
+      // Make sure we're on movies page
+      await testUtils.waitForCurrentScreenToEqual('movieScreen');
 
       //Select title
       await ecp.sendKeypress(ecp.Key.Ok);
-      await utils.sleep(2000); // Improvement - try to work around sleeps
-      await ecp.sendKeypress(ecp.Key.Ok);
 
-      //Check that Play button is selected, no Resume button
-      expect(playButtonSelected.visible).to.equal(true);
+      // Verify that we got the same item otherwise we aren't actually confirming if resume went away
+      const secondScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
+      expect(firstScreenTitle.text).to.equal(secondScreenTitle.text);
+
+      //Check that Play button is focused, not Resume button
+      content = await testUtils.getCurrentlyFocusedGridItemContent('detailScreenMenu');
+      expect(content.id).to.equal('PlayMenuItem');
     });
 
     // https://tubi.testrail.io/index.php?/cases/view/521094
@@ -571,7 +575,7 @@ describe('Details Page', function () {
       // Select the Remove from my list button and verify that it changes to Add to My List
       await testUtils.selectAndVerifyDetailPageMenuItem('addToMyList');
       await testUtils.selectAndVerifyDetailPageMenuItem('removeFromMyList');
-      
+
     });
 
 
@@ -583,7 +587,7 @@ describe('Details Page', function () {
       await verifyPlayFromBeginning();
       await ecp.sendKeypress(ecp.Key.Back); // Back to Details page
     });
- 
+
 
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/536524
@@ -665,7 +669,7 @@ describe('Details Page', function () {
     });
 
 
- 
+
   }); //Close describe Series Details page
 
 });// Close describe Details page
@@ -710,13 +714,9 @@ async function findIndexForFirstItemWithoutVideoPreview(rowListKeyPath) {
 async function createHistory() {
   const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
   expect(videoPlayerActual.visible).to.equal(true);
-  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
-  await ecp.sendKeypress(ecp.Key.Forward, { count: 3 });
-  await utils.sleep(4000); // Improvement - try to work around sleeps
-  await ecp.sendKeypress(ecp.Key.Ok);
-  await ecp.sendKeypress(ecp.Key.Play);
-  expect(videoPlayerActual.visible).to.equal(true);
-  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
+  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
+  await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', 120 * 1000, 'current');
+  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
 }
 
 // Play from Beginning check function

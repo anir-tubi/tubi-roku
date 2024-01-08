@@ -17,12 +17,10 @@ describe('Application Launch', function () {
       const sideNavSignedInLabel = await testUtils.getNodeForElement('sideNavSignedInLabel');
       expect(sideNavSignedInLabel.text).to.contain('Hi');
     });
-
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/edit/535837
   it('C535837 - Application Launch - When user opens the application after registering as a new user then the home screen is displayed @application_launch', async () => {
-    const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
     await testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured');
   });
 
@@ -30,7 +28,7 @@ describe('Application Launch', function () {
   it('C535748 - Application Launch - Registered User - When user tries to play a title after user has registered device then the title should play on tubi @application_launch, @smoke', async () => {
     await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendKeypress(ecp.Key.Play);
-    await testUtils.expectPlayerStateToEventuallyEqual('play', 20000);
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 20000);
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/70718
@@ -66,7 +64,7 @@ describe('Application Launch', function () {
     const exitKidsGrayedOut = await testUtils.getNodeForElement('exitKidsGrayedOut');
     expect(exitKidsGrayedOut.visible).to.equal(true);
 
-    // Sign out to check that we are not in Kids mode
+    // Sign out to check that we are not in Kids mode now
     await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
     await ecp.sendKeypress(ecp.Key.Ok);
     await testUtils.retryWithTimeOut(async () => {
