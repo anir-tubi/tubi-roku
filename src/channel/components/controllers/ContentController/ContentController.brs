@@ -28,10 +28,6 @@ Function init()
   ' DO NOT overwrite m variable methods/properties which belongs to GeneralTaskModule.
   GeneralTaskModule(m, generalTask)
 
-  'This field is used to check whether the featured container response received or not to start the video preview. Will remove this once
-  'roku_cw_featured_recommended_placement_v2 experiment is graduated.
-  m.featuredOrRecommendedContainerReceived = false
-
   m.Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, m.Request)
   m.NodeHelpers = TubiNodeHelpers()

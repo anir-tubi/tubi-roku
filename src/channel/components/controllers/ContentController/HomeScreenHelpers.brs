@@ -111,32 +111,10 @@ End Function
 
 
 Function homeBatchResponse(response)
- screenID = m.constants.ui.screenIds.homeScreen
- homeScreen = getFromScreenCache(screenID)
- currentScreen = getCurrentScreen()
+  screenID = m.constants.ui.screenIds.homeScreen
+  homeScreen = getFromScreenCache(screenID)
 
- if homeScreen <> invalid
-    for i = 0 to response.getChildCount() - 1
-      category = response.getChild(i)
-      if category.id = m.constants.ui.categoryIds.featured
-        m.featuredOrRecommendedContainerReceived = true
-        if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.homeScreen
-          gridList = homeScreen.findNode("CategoryGridList") 'I'm ashamed of this hack :(
-          if gridList <> invalid AND gridList.isInFocusChain() = true
-            focusedContent = homeScreen.contentFocused
-            setVideoPreviewAfterFocus(focusedContent, homeScreen.trackingPageInfo)
-          end if
-        end if
-      end if
-
-      'Will send the exposure event when home screen loaded and continue watching has a series to pin at first position of featured row.
-      if category.id = m.constants.ui.categoryIds.featured AND category.shouldSendExposureEventForCWInFeatured = true
-        getExperimentResource("roku_cw_featured_recommended_placement", "roku_cw_featured_recommended_placement_v2", true)
-        exit for
-      end if
-
-    end for
-
+  if homeScreen <> invalid
     homeScreen.batchResponse = response
   end if
 
@@ -788,16 +766,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
       end if
     end if
 
-    if m.featuredOrRecommendedContainerReceived = true
-      if homeScreen <> invalid AND currentScreen.isSameNode(homeScreen) = true
-        gridList = homeScreen.findNode("CategoryGridList")
-        if gridList <> invalid and gridList.isInFocusChain() = true
-          ' remove all the if blocks when removing roku_cw_featured_recommended_placement
-          ' just leave the call to setVideoPreviewAfterFocus()
-          setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo)
-        end if
-      end if
-    end if
+    setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo)
 
     if bStopCountdownTimer = true
       stopCountdownTimer()
