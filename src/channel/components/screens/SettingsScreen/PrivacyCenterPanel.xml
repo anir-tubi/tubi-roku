@@ -21,8 +21,11 @@
     <field id="isAllowedToManageConsent" type="boolean" value="false" />
 
     <!-- OUTPUTS -->
-    <field id="newConsentPreferences" type="assocarray"/>
+    <field id="newConsentPreferences" type="assocarray" alias="managePreferences.selectedConsent" />
     <field id="selectedQrCodeSectionInfo" type="assocarray" alwaysNotify="true" />
+
+    <!-- Holds the true/false based on if the user tried to navigate away from privacy center manage preferences.  -->
+    <field id="didUserSelectSaveAndRestart" alias="saveAndContinueButton.selected" alwaysNotify="true" />
   </interface>
 
   <children>
@@ -41,6 +44,11 @@
           id="managePreferences"
           bottomGradientUri="pkg:/images/list_overflow_bottom_gradient-settings.webp"
           translation="[0, 72]" />
+        <SimpleButton
+          visible="false"
+          id="saveAndContinueButton"
+          width="369"
+          fontSize="24"/>  
         <Label
           id="nonEditableModeWarningMessage"
           width="1176"

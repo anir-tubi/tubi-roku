@@ -423,7 +423,14 @@ Function onAgeNotVerifiedAtSignup(error)
     errorCodes = m.constants.errors.codes
     
     if httpCode = 422 OR httpCode = 451
-      handle_422_451_error(restartChannelAfterAgeVerification) ' happens when user enters age less than 13
+      
+      ' If the user is in GDPR countries then user is not allowed to use the application if they are not 18+.
+      if isGDPR() = true
+        showGDPRAgeGateErrorDialog()
+      else
+        handle_422_451_error(restartChannelAfterAgeVerification) ' happens when user enters age less than 13
+      end if
+
     else if httpCode = 400 AND errorCode <> invalid AND (errorCode = errorCodes.invalidParams OR errorCode = errorCodes.invalidEmailDomain OR errorCode = errorCodes.blockedEmailDomain OR errorCode = errorCodes.emailExists)
       handleInvalidEmailError() ' happens when user enters invalid email domain
     else
@@ -907,4 +914,15 @@ Function isAgeVerificationScreen(screen)
     return true
   end if
   return false
+End Function
+
+
+Function showGDPRAgeGateErrorDialog()
+  heading = getTranslation("gdpr_age_gate_error_dialog_heading")
+  message = getTranslation("gdpr_age_gate_error_dialog_sub_heading")
+  buttons = [getTranslation("gdpr_age_gate_error_dialog_exit_tubi"), getTranslation("linearVideoPlayer_buttonBack")]
+
+  ' TODO: Analytics requirement still not available.
+  simpleModalInfo = getSimpleModalInfo(heading, message, buttons, invalid, m.trackingLoggingTask, setExitApp)
+  showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
 End Function

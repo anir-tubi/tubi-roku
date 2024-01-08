@@ -10,7 +10,6 @@
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
   <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
 
-
   <interface>
     <!-- INPUTS -->
 
@@ -57,8 +56,13 @@
       <field id="signInSelected" type="boolean" alwaysNotify="true"/>
       <field id="parentalSettingSelected" type="integer" alwaysNotify="true"/>
       <field id="autoPreviewSettingSelected" type="integer" alwaysNotify="true" />
-      <field id="newConsentPreferences" type="assocarray" />
+      <!-- Holds all the draft or unsaved changes to consents. ex: {"essential_functionality": "opt_in"}.  -->
+      <field id="newConsentPreferences" type="assocarray" value="{}" />
       <field id="selectedQrCodeSectionInfo" type="assocarray" alwaysNotify="true" />
+
+      <!-- Holds the consent item that was selected. ex: {"essential_functionality": "required"}. This is used for showing required toast or for firing interaction event.  -->
+      <field id="selectedConsent" type="assocarray" alwaysNotify="true"/>
+      <field id="didUserSelectSaveAndRestart" type="boolean" value="false" alwaysNotify="true" />
   </interface>
 
   <children>

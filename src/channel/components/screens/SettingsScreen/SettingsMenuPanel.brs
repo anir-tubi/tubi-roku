@@ -1,20 +1,22 @@
 Function init()
   m.constants = getConstantsFromGlobal()
+  m.nodeHelpers = TubiNodeHelpers()
   m.SettingsMenu = m.top.findNode("SettingsMenu")
   m.SettingsMenuGroup = m.top.findNode("SettingsMenuGroup")
+  m.settingsMenuContent = m.top.findNode("SettingsMenuContent")
+
   m.top.list = m.SettingsMenu
 
   m.SettingsMenu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
 
   m.SettingsMenu.focusFootprintBitmapUri = "pkg:/images/menu-disabled-focus-$$RES$$.9.png"
 
-  m.SignInOutButtonContent = m.top.findNode("SignInOutButton")
   m.top.observeField("focusedChild", "onComponentFocus")
 
   m.top.observeFieldScoped("signInInfo", "onSignInInfoChange")
   m.top.observeFieldScoped("uiMode", "onUiModeChange")
 
-  setSettingsMenuStringsAndIcons()
+  setSettingsSidePanelMenuItems()
 
   resetSettingsMenuVerticalPosition()
 
@@ -38,42 +40,103 @@ Function onThemeChange(msg = invalid)
 End Function
 
 
-Function setSettingsMenuStringsAndIcons()
-    ParentalControlsButton =  m.top.findNode("ParentalControlsButton")
-    ParentalControlsButton.title = getTranslation("screenSettings_menu_parentalControls")
-    AboutButton =  m.top.findNode("AboutButton")
-    AboutButton.title = getTranslation("screenSettings_menu_about")
-    PrivacyCenter = m.top.findNode("PrivacyCenterButton")
-    PrivacyCenter.title = getTranslation("screenSettings_menu_PrivacyCenter")
+Function setSettingsSidePanelMenuItems()
+  ' Adding a display order field since roku does not maintain order in a associative array.
+  availablePanelItems = {
+    "parentalControls": {
+      subType: "DetailMenuItemContentNode"
+      id: "ParentalControlsButton"
+      title: getTranslation("screenSettings_menu_parentalControls")
+      iconUrl: "pkg:/images/icon-parental.webp"
+      displayOrder: 1
+    },
+    "autoplayPreview": {
+      subType: "DetailMenuItemContentNode"
+      id: "AutoplayPreviewButton"
+      title: getTranslation("screenSettings_menu_autoplayPreview")
+      iconUrl: "pkg:/images/icon-trailer.webp"
+      displayOrder: 2
+    },
+    "about": {
+      subType: "DetailMenuItemContentNode"
+      id: "AboutButton"
+      title: getTranslation("screenSettings_menu_about")
+      iconUrl: "pkg:/images/icon-about.webp"
+      displayOrder: 3
+    },
+    "privacyCenter": {
+      subType: "DetailMenuItemContentNode"
+      id: "PrivacyCenterButton"
+      title: getTranslation("screenSettings_menu_PrivacyCenter")
+      iconUrl: "pkg:/images/icon-privacy.webp"
+      displayOrder: 4
+    },
+    "signInOut": {
+      subType: "DetailMenuItemContentNode"
+      id: "SignInOutButton"
+      title: getTranslation("menu_signIn")
+      iconUrl: "pkg:/images/icon-sign-in.webp"
+      displayOrder: 5
+    },
+    "testAid": {
+      subType: "DetailMenuItemContentNode"
+      id: "testAid"
+      title: "TestAid"
+      displayOrder: 6
+    }
+  }
+  
+  ' removing the parental controls if in one of the GDPR countries or ui mode is kids age gate.
+  if isGDPR() = true OR m.top.uiMode = m.constants.ui.modes.kidsAgeGate
+    availablePanelItems.delete("parentalControls")
+  end if
 
-    if isVideoPreviewEnabled() = true then
-      AutoplayPreviewButton = CreateObject("roSGNode", "DetailMenuItemContentNode")
-      AutoplayPreviewButton.title = getTranslation("screenSettings_menu_autoplayPreview")
-      AutoplayPreviewButton.id="AutoplayPreviewButton"
-      AutoplayPreviewButton.iconUrl="pkg:/images/icon-trailer.webp"
-      settingContentNode = m.top.findNode("SettingsMenuContent")
-      settingContentNode.insertChild(AutoplayPreviewButton, 1)
-    end if
+  ' Removing video preview button if user is not eligible for preview button.
+  if isVideoPreviewEnabled() = false then
+    availablePanelItems.delete("autoplayPreview")
+  end if
 
-    if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" 'this is for extra protection not to restart the app
-      testingAidButton = createObject("roSGNode","DetailMenuItemContentNode" )
-      testingAidButton.title = "TestAid"
-      testingAidButton.id = "TestingAidButton"
-      m.SettingsMenu.content.appendChild(testingAidButton)
-    end if
+  if m.top.uiMode = m.constants.ui.modes.kidsAgeGate
+    availablePanelItems.delete("signInOut")
+  end if
 
+  ' Deleting the test aid if non qa or dev mode.
+  if m.constants.settings.mode <> "qa" AND  m.constants.settings.mode <> "dev" 'this is for extra protection not to restart the app
+    availablePanelItems.delete("testAid")
+  end if
+
+  menuItems = []
+
+  for each id in availablePanelItems
+    menuItems.push(availablePanelItems[id])
+  end for
+
+  menuItems.sortBy("displayOrder")
+
+  m.settingsMenuContent.update(menuItems, true)
 End Function
 
 
 Function onSignInInfoChange()
-  signInOutButton = m.top.findNode("SignInOutButton")
   sText = getTranslation("menu_signIn")
-  if m.top.signInInfo <> invalid
-    if m.top.signInInfo.signedIn = true
-      sText = getTranslation("screenSettings_menu_signOut")
-    end if
+  signInInfo = m.top.signInInfo
+  if signInInfo <> invalid AND signInInfo.signedIn = true
+    sText = getTranslation("screenSettings_menu_signOut")
   end if
-  signInOutButton.title = sText
+
+  signInButton = m.nodeHelpers.getChildById(m.settingsMenuContent, "SignInOutButton")
+  if signInButton <> invalid
+    signInButton.title = sText
+  end if
+End Function
+
+
+' @id: string, id of the button that needs to be removed.
+Function removeButton(id)
+  button = m.nodeHelpers.getChildById(m.settingsMenuContent, id)
+  if button <> invalid
+    m.settingsMenuContent.removeChild(button)
+  end if
 End Function
 
 
@@ -92,37 +155,20 @@ End Function
 Function onUiModeChange(msg)
   uiMode = msg.getData()
   if uiMode = m.constants.ui.modes.kidsAgeGate
-    removeParentalButton()
-    removeSignInButton()
+    removeButton("SignInOutButton")
+    removeButton("ParentalControlsButton")
     resetSettingsMenuVerticalPosition()
   end if
-End Function
-
-
-Function removeParentalButton()
-  parentalControlsButton = m.top.findNode("ParentalControlsButton")
-  removeButton(parentalControlsButton)
-End Function
-
-
-Function removeSignInButton()
-  signInOutButton = m.top.findNode("SignInOutButton")
-  removeButton(signInOutButton)
-End Function
-
-
-' @button: roSGNode, a DetailMenuItemContentNode used to create the buttons in the settings menu
-Function removeButton(button)
-  m.SettingsMenu.content.removeChild(button)
 End Function
 
 
 Function resetSettingsMenuVerticalPosition()
   ' the default translation is [0, 0] and the default positioning on the page is due to the
   ' translation in SettingsScreen.PanelSet.translation, which assumes 6 items in the settings menu.
-  ' We need to adjust the vertical translation if there are more or less than 6 items in the settings menu.
+  ' We need to adjust the vertical translation if there are more than 6 items in the settings menu.
   numButtons = m.SettingsMenu.content.getChildCount()
-  yTrans = (6 - numButtons) * (m.SettingsMenu.itemSize[1] + m.SettingsMenu.itemSpacing[1])
-  m.SettingsMenuGroup.translation = [0, yTrans]
-
+  if numButtons > 6
+    yTrans = (6 - numButtons) * (m.SettingsMenu.itemSize[1] + m.SettingsMenu.itemSpacing[1])
+    m.SettingsMenuGroup.translation = [0, yTrans]
+  end if
 End Function

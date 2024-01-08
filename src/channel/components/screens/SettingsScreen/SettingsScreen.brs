@@ -361,6 +361,7 @@ Function createPrivacyCenterPanel(title)
   privacyCenterPanel = CreateObject("roSGNode", "PrivacyCenterPanel")
   privacyCenterPanel.title = title
   consentSettings = m.top.consentSettings
+
   focusable = false
   privacyCenterSettings = consentSettings.privacyCenterSettings
   privacyCenterPanel.isAllowedToManageConsent = m.top.isAllowedToManageConsent
@@ -382,6 +383,7 @@ Function createPrivacyCenterPanel(title)
   privacyCenterPanel.offset = [36,-201]
   privacyCenterPanel.observeFieldScoped("newConsentPreferences", "onNewConsentPreferences")
   privacyCenterPanel.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
+  privacyCenterPanel.observeFieldScoped("didUserSelectSaveAndRestart", "onDidUserSelectSaveAndRestart")
 
   pageValues = {
     account_page_type: "PRIVACY_PREFERENCES"
@@ -400,8 +402,23 @@ End Function
 
 
 Function onNewConsentPreferences(msg)
-  selectedConsents = msg.getData()
-  m.top.newConsentPreferences = selectedConsents
+  selectedConsent = msg.getData()
+  keys = selectedConsent.Keys()
+  ' we expect only single key/value pair in selectedConsent. so accessing the 0th item as it has only one item.
+  key = keys[0]
+  value = selectedConsent[key]
+
+  if value <> "required"
+    newConsentPreferences = m.top.newConsentPreferences
+    if newConsentPreferences = invalid
+      newConsentPreferences = {}
+    end if
+
+    newConsentPreferences.append(selectedConsent)
+    m.top.newConsentPreferences = newConsentPreferences
+  end if
+
+  m.top.selectedConsent = selectedConsent
 End Function
 
 
@@ -569,4 +586,10 @@ Function onAppRestartRequested(msg)
   if m.top.appRestartRequested <> invalid
     m.top.appRestartRequested = msg.getData()
   end if
+End Function
+
+
+Function onDidUserSelectSaveAndRestart(msg)
+  ' since privacy center is dyanmically created we cannot use alias.
+  m.top.didUserSelectSaveAndRestart = true
 End Function

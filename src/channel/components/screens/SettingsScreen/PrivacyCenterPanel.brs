@@ -7,7 +7,6 @@ Function init()
   topRef.observeFieldScoped("consentSettings", "onConsentSettingsChange")
 
   m.managePreferences = topRef.findNode("ManagePreferences")
-  m.managePreferences.observeFieldScoped("selectedConsent", "onSelectedConsent")
   m.managePreferences.itemSize = [1140, 141]
   m.managePreferences.rowHeights = [141]
   m.managePreferences.subHeaderWidth = 882
@@ -21,13 +20,13 @@ Function init()
   m.nonEditableModeWarningMessage = topRef.findNode("nonEditableModeWarningMessage")
   m.nonEditableModeWarningMessage.text = getTranslation("privacy_center_not_editable_mode_warning")
 
+  m.saveAndContinueButton = topRef.findNode("saveAndContinueButton")
+  m.saveAndContinueButton.text = getTranslation("privacy_center_save_restart")
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
   onThemeChange()
-
-  ' assoc array to be passed to setConsent ex: {"behavioral_advertising": "opted_in", "essential_functionality": "required"}.
-  m.selectedConsents = {}
 End Function
 
 
@@ -40,12 +39,6 @@ Function onScreenFocusChange()
       m.qrCodeSections.setFocus(true)
     end if
   end if
-End Function
-
-
-Function onSelectedConsent(msg)
-  selectedConsents = msg.getData()
-  m.top.newConsentPreferences = selectedConsents
 End Function
 
 
@@ -98,6 +91,7 @@ Function onConsentSettingsChange(msg)
   if privacyCenterSettings.showConsentPreferences = true AND m.top.isAllowedToManageConsent = false
     m.qrCodeSections.translation = [0, 177]
     m.nonEditableModeWarningMessage.visible = true
+    m.saveAndContinueButton.visible = false
   else
     m.nonEditableModeWarningMessage.visible = false
     ' Since if we place an array grid inside a layout group, it causes a jumping UI glitch when the grid is focused.
@@ -105,8 +99,21 @@ Function onConsentSettingsChange(msg)
     boundingRect = m.managePreferences.boundingRect()
     translation = m.managePreferences.translation
 
+    buttonRect = m.saveAndContinueButton.boundingRect()
+    buttonTranslationY = boundingRect.height + translation[1]
+
+    ' By Default array grid adds some additional padded value when we call bounding rect. To account for that additional padded value we are subtracting 24.
+    saveAndContinueButtonTranslationY = buttonTranslationY - 24
+    ' Adjusting the position of save and continue button based on manage preferences section height.
+    m.saveAndContinueButton.translation = [0, saveAndContinueButtonTranslationY]
+
     ' Getting the total height of array grid and adding the y translation to place the qr codes.
-    m.qrCodeSections.translation = [0, boundingRect.height + translation[1]]
+    qrCodeSectionTranslationY = buttonTranslationY + buttonRect.height + 15
+    m.qrCodeSections.translation = [0, qrCodeSectionTranslationY]
+
+    if privacyCenterSettings.showConsentPreferences = true AND m.top.isAllowedToManageConsent = true
+      m.saveAndContinueButton.visible = true
+    end if
   end if
 End Function
 
@@ -149,12 +156,18 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press then
     if key = "up"
       if m.qrCodeSections.isInFocusChain() = true AND m.top.isAllowedToManageConsent = true AND isNonEmptyArray(m.top.consentSettings.consents) = true
-        m.managePreferences.setFocus(true)
+        m.saveAndContinueButton.setFocus(true)
         slideTo(m.panelContentSection, [0, -m.heading.translation[1]], 0.5)
+        handled = true
+      else if m.saveAndContinueButton.isInFocusChain() = true
+        m.managePreferences.setFocus(true)
         handled = true
       end if
     else if key = "down"
       if m.managePreferences.isInFocusChain() = true
+        m.saveAndContinueButton.setFocus(true)
+        handled = true
+      else if m.saveAndContinueButton.isInFocusChain() = true
         m.qrCodeSections.setFocus(true)
         slideTo(m.panelContentSection, [0, -m.qrCodeSections.translation[1]], 0.5)
         handled = true

@@ -22,7 +22,8 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.observeFieldScoped("showDeviceModal", "onShowDeviceModal")
   m.settingsScreen.observeFieldScoped("backButtonPressed", "onSettingsBackPressed")
   m.settingsScreen.observeFieldScoped("autoPreviewSettingSelected", "onAutoPreviewSettingSelected")
-  m.settingsScreen.observeFieldScoped("newConsentPreferences", "onNewConsentPreferences")
+  m.settingsScreen.observeFieldScoped("didUserSelectSaveAndRestart", "saveUpdatedConsentPreferences")
+  m.settingsScreen.observeFieldScoped("selectedConsent", "onSelectedConsentChange")
   m.settingsScreen.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
   if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" 'this is for extra protection not to restart the app
     m.settingsScreen.observeFieldScoped("appRestartRequested", "onAppRestartRequested")
@@ -505,25 +506,25 @@ Function onAppRestartRequested()
 End Function
 
 
-Function onNewConsentPreferences(msg)
-  selectedConsents = msg.getData()
-  keys = selectedConsents.Keys()
+Function saveUpdatedConsentPreferences()
+  selectedConsents = m.settingsScreen.newConsentPreferences
+
+  ' As per requirement we want to restart the application whenever user updates any consent so that it is taken into consideration immediately.
+  setConsent(selectedConsents, restartApp)
+End Function
+
+
+Function onSelectedConsentChange(msg)
+  selectedConsent = msg.getData()
+  keys = selectedConsent.Keys()
   ' we expect only single key/value pair in selectedConsents. so accessing the 0th item as it has only one item.
   key = keys[0]
-  value = selectedConsents[key]
+  value = selectedConsent[key]
   if value <> "required"
     userInteractionValue = "TOGGLE_ON"
     if value = "opted_out"
       userInteractionValue = "TOGGLE_OFF"
     end if
-    for i = 0 to m.consentSettings.consents.Count()-1
-      if m.consentSettings.consents[i].key = key
-        m.consentSettings.consents[i].value = value
-      end if
-    end for
-
-    m.settingsScreen.consentSettings = m.consentSettings
-    setConsent(selectedConsents)
 
     ' As a safety check if we have a mapping value for the consent key if not falling back to backend key.
     buttonValue = m.Tracking.getConsentAnalyticValue(key)
@@ -543,10 +544,8 @@ Function onNewConsentPreferences(msg)
       componentOneof: componentOneof
       user_interaction: userInteractionValue
     }
-    m.trackingLoggingTask.trackEvent = {
-      type: "component_interaction"
-      values: componentInteractionEvent
-    }
+
+    sendComponentInteractionInfo(componentInteractionEvent)
   else
     showRequiredPreferenceToast(key)
   end if

@@ -1884,6 +1884,22 @@ Function getTranslation_en_US()
     "search_results_no_matching_results": {
       "description": "No matching results message which will be displayed in search results screen.",
       "message": "We couldn't find any results for"
+    },
+    "privacy_center_save_restart": {
+      "description": "Settings screen privacy center save and restart consent button label.",
+      "message": "Save and Restart Tubi"
+    },
+    "gdpr_age_gate_error_dialog_heading": {
+      "description": "GDPR age gate error dialog heading.",
+      "message": "Sorry!"
+    },
+    "gdpr_age_gate_error_dialog_sub_heading": {
+      "description": "GDPR age gate error dialog sub heading.",
+      "message": "You must be 18 years or older to enter Tubi."
+    },
+    "gdpr_age_gate_error_dialog_exit_tubi": {
+      "description": "GDPR age gate error dialog exit tubi button label.",
+      "message": "Exit Tubi"
     }
   }
 End Function

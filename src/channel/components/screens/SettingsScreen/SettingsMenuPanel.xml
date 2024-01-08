@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="SettingsMenuPanel" extends="ListPanel" >
   <script type="text/brightscript" uri="SettingsMenuPanel.brs"/>
-  <script type="text/brightscript" uri="../../../source/lib/TubiExperiments.brs" />
-  <script type="text/brightscript" uri="../../lib/ExperimentMixin.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiExperiments.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ExperimentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Request.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/VideoPreviewMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiNodeHelpers.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -40,18 +42,6 @@
         <ContentNode
           id="SettingsMenuContent"
           role="content">
-          <DetailMenuItemContentNode
-            id="ParentalControlsButton"
-            iconUrl="pkg:/images/icon-parental.webp" />
-          <DetailMenuItemContentNode
-            id="AboutButton"
-            iconUrl="pkg:/images/icon-about.webp" />
-          <DetailMenuItemContentNode
-            id="PrivacyCenterButton"
-            iconUrl="pkg:/images/icon-privacy.webp" />
-          <DetailMenuItemContentNode
-            id="SignInOutButton"
-            iconUrl="pkg:/images/icon-sign-in.webp" />
         </ContentNode>
       </MarkupGrid>
     </Group>
