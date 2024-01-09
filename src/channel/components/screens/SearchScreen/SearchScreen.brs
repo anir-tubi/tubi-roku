@@ -524,6 +524,7 @@ Function onItemFocused(msg)
         length: focusedContent.length
         hasCC: (focusedContent.hasSubtitles = true OR m._.empty(focusedContent.subtitleTracks) = false)
         rating: focusedContent.rating
+        availabilityEnds: focusedContent.availabilityEnds
       }
 
       lineTwoData = {
