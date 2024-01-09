@@ -188,6 +188,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.1.#buttonBG',
   },
 
+  /** Play Button icon focused */
+  playButtonIconFocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.0.#IconParent.#IconFocused'
+  },
+
   /** On Movies Page Button */
   onMoviesPageButton: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#topNav-movies.#TopNavMenu.1.#TopLabel',
@@ -1290,6 +1295,34 @@ const elements = typeCheckElements({
   /** Subtitles Off */
   closedCaptionOff: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#closedCaptionSection.#closedCaptionSelector.0.#container.0.#checkIcon'
+  },
+
+  /** Sign Up to Save Progress Series detail menu item button text */
+  seriesSignUpToSaveProgressButtonText: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.0.#DetailsMenuTextParent.#DetailsMenuText'
+  },
+  /** Sign Up to Save Progress detail menu item badge text */
+  seriesSignUpBadgeLabelText: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.0.#badgeLabel.#textLabel'
+  },
+
+  /** Sign Up to Save Progress Series detail menu item button text */
+  moviesSignUpToSaveProgressButtonText: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuText'
+  },
+   /** Sign Up to Save Progress detail menu item badge text */
+   moviesSignUpBadgeLabelText: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.1.#badgeLabel.#textLabel'
+  },
+
+  /** Email input Screen Page Heading */
+  emailInputScreenHeader: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailInputScreen.#emailLayout.#pageHeading'
+  },
+
+  /** Sign In Screen page header */
+  signInScreenPageHeader: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#signInScreen.#signUpLayout.#pageHeading'
   }
 
 });

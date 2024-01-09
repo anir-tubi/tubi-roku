@@ -641,32 +641,7 @@ describe('Details Page', function () {
     });
 
 
-    // https://tubi.testrail.io/index.php?/cases/view/260843
-    it('C260843 - Guest - When user clicks the "Sign Up to Save Progress" button on the Details page, the user is redirected to  the Registration/Sign In modal, @guest_user,@sdp_2,@smoke', async () => {
 
-
-      //Exit and restart
-      await testUtils.startApplicationAtPage('tv');
-      await testUtils.waitForAppLaunchBeaconToFire();
-
-      // Tried having this here and before Exit and restart
-      // Create user for test
-      const user = await testUtils.createRegisteredUser();
-      user.setIsNewUser(false);
-
-      // Select a title
-      await ecp.sendKeypress(ecp.Key.Ok);
-
-      // Verify we are on the details page
-      let detailScreenTitle;
-      await testUtils.retryWithTimeOut(async () => {
-        detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-        expect(detailScreenTitle.text).to.not.be.empty;
-      });
-
-
-
-    });
 
 
 
