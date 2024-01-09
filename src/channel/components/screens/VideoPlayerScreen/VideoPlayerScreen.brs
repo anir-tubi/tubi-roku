@@ -68,6 +68,9 @@ Function init()
   m.Video.observeField("streamingSegment", "onStreamingSegmentChange")
   m.video.observeFieldScoped("availableSubtitleTracks", "setCCAudioTransportBarVisibility")
   m.video.observeFieldScoped("availableAudioTracks", "onAvailableAudioTracksChange")
+  if getExperimentResource("roku_async_stop", "roku_async_stop_v1", false).enabled = true then
+    m.video.asyncStopSemantics = true
+  end if
 
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("sprites", "onSpritesReceived")
@@ -91,7 +94,7 @@ Function init()
   'this field holds the last fired pixel type which helps to fire the appropriate pixels in order
   m.lastFiredPixelType = ""
 
-  'pauseAdAnimation helps for stopping the pasue ad animation
+  'pauseAdAnimation helps for stopping the pause ad animation
   m.pauseAdAnimation = invalid
 
   m.top.observeFieldScoped("sendPendingPauseAdPixel", "onSendPendingPauseAdPixel")
@@ -298,6 +301,9 @@ Function init()
   ' Creating internal state to track when the overlay is visible to users.
   m.isClosedCaptionAudioOverlayShowing = false
 
+  ' Now that we are using async stop we need to wait until we get stopped state on the Video node before starting the ad. This variable helps track if we have requested a stop and are waiting for it to complete.
+  m.isShowAdBreakPendingStop = false
+
   if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v2", false).enabled = true
     m.skipCuepointsButtonUpTranslation = 681
     m.skipCuepointsButtonDownTranslation = 780
@@ -429,7 +435,6 @@ Function playContent()
   tubilog("VideoPlayer.playContent")
 
   if m.Video.content <> invalid
-
     ' Always reset ad state when we first start playback.  Preroll fetch will populate midrolls list
     m.midrolls = {}
 
@@ -606,14 +611,15 @@ End Function
 
 
 Function onControlChange()
-  tubiLog("VideoPlayer.onControlChange " + m.top.control)
-  if m.top.control = "play"
+  control = m.top.control
+  tubiLog("VideoPlayer.onControlChange " + control)
+  if control = "play"
     if m.top.content <> invalid
       prepareToStartVideo(m.top.content)
       playContent()
     end if
 
-  else if m.top.control = "stop" then
+  else if control = "stop" then
     stopAdsPlayback()
     cancelReplayCaptions()
     clearSkipCuepointsButtonAndTimer()
@@ -626,9 +632,9 @@ Function onControlChange()
 
     'in the case where an ad break has started, but RAF does not yet have control, we want to break out of ads on back button pressed
     m.top.adControl = "stop"
-  else if m.top.control = "pause" then
+  else if control = "pause" then
     pauseVideo(false, false)
-  else if m.top.control = "resume" AND m.Video.state = "paused" then
+  else if control = "resume" AND m.Video.state = "paused" then
     resumeFromPause(false)
   end if
 End Function
@@ -719,27 +725,32 @@ Function onVideoStateChange(msg)
       m.top.errorMsg = getTranslation("videoPlayer_error_playback_description")  'is used in error modal
       m.top.state = state   'triggers error modal in ContentController
     end if
-  else if state = "stopped" AND m.VideoState = "stop"
-    ' player has stopped (not due to an ad break)
-    if m.top.adState = "noAds" or m.top.adState = "init"
-      if m.Video.content <> invalid
+  else if state = "stopped" then
+    if m.isShowAdBreakPendingStop = true then
+      showAdBreakStoppedCallback()
+    else if m.VideoState = "stop"  then
+      ' player has stopped (not due to an ad break)
+      if m.top.adState = "noAds" or m.top.adState = "init"
+        if m.Video.content <> invalid
 
-        ' the video has been stopped, send a final playProgressEvent
-        playProgressEvent = getPlayProgressEvent("onVideoStateChange:stopped")
-        if playProgressEvent <> invalid
-          trackEvent(playProgressEvent)
+          ' the video has been stopped, send a final playProgressEvent
+          playProgressEvent = getPlayProgressEvent("onVideoStateChange:stopped")
+          if playProgressEvent <> invalid
+            trackEvent(playProgressEvent)
+          end if
+
+          if m.top.isTrailer = true
+            trackEvent({
+              type: "finish_trailer"
+              values: {
+                end_position: Int(m.playerPosition * 1000)
+                video_id: m.Video.content.id.toInt()
+              }
+            })
+          end if
+
+          m.top.state = state
         end if
-
-        if m.top.isTrailer = true
-          trackEvent({
-            type: "finish_trailer"
-            values: {
-              end_position: Int(m.playerPosition * 1000)
-              video_id: m.Video.content.id.toInt()
-            }
-          })
-        end if
-
       end if
     end if
   end if
@@ -764,6 +775,11 @@ Function onVideoStateChange(msg)
     m.top.timestampOfLastVideoPlayback = createObject("roDateTime").asSeconds()
   else if state = "buffering" OR state = "playing" then
     m.top.timestampOfLastVideoPlayback = -1
+  end if
+
+  if state = "stopping" AND m.isShowAdBreakPendingStop = false then
+    ' Update external state as stopping as long as we aren't currently playing an ad since we already handle that internally
+    m.top.state = state
   end if
 End Function
 
@@ -1282,9 +1298,35 @@ End Function
 ' Make sure the Video node is stopped and we have an accurate playback position before launching ads
 Function showAdBreak()
   ' leave m.VideoState = "play" because from the component's perspective video is still playing
-  m.Video.control = "stop"
-  hideClosedCaptionAudioTrackOverlay()  ' if dialog is showing, it's awkward to have it still show after ad break
 
+  ' If Video node is already in stopped state then calling control = "stop" on it will not trigger onVideoStateChange (async will but will leave it stuck in state=stopping).
+  ' Because of this we don't want to call stop on the Video node and instead trigger the callback ourselves in this case
+  if m.Video.state = "stopped" then
+    showAdBreakStoppedCallback()
+  else
+    ' In order to try and change the behavior as little as possible we only want the async stop to rely on the onVideoStateChange callback and just trigger the callback right away here if in the control
+    immediatelyTriggerCallback = true
+    if getExperimentResource("roku_async_stop", "roku_async_stop_v1", true).enabled = true then
+      ' the ad break will be shown by showAdBreakStoppedCallback() which will be triggered by
+      ' onVideoStateChange() when the video node's state is updated to "stopped".
+      ' m.isShowAdBreakPendingStop keeps state to let us know if an break is waiting for the
+      ' stop process to complete before starting.
+      m.isShowAdBreakPendingStop = true
+      immediatelyTriggerCallback = false
+    end if
+
+    m.Video.control = "stop"
+    if immediatelyTriggerCallback = true then
+      showAdBreakStoppedCallback()
+    end if
+  end if
+End Function
+
+
+' Now that we are using async stop we need to wait until we get stopped state on the Video node before starting the ad
+Function showAdBreakStoppedCallback()
+  m.isShowAdBreakPendingStop = false
+  hideClosedCaptionAudioTrackOverlay()  ' if dialog is showing, it's awkward to have it still show after ad break
   m.top.adPosition = m.playerPosition
   m.top.adControl = "play"
 
@@ -1400,7 +1442,12 @@ Function stopVideo()
 
   ' add check so that onVideoStateChange doesn't get called
   ' if the video is already in a non playing state.
-  if videoState <> "stop"
+  ' We were just using videoState before but there are times videoState might be something besides stop but the Video node is actually still stopped.
+  ' Before this didn't matter but now if asyncStopSemantics=true and we call control=stop when player is already in stopped state
+  ' then state will switch to stopping and never switches to stopped.
+  ' After much effort I am still unable to reproduce this behavior in a simple test app but it happens in our app for some reason
+  if videoState <> "stop" AND m.Video.state <> "stopped" then
+    getExperimentResource("roku_async_stop", "roku_async_stop_v1", true)
     m.Video.control = "stop"
   end if
 End Function

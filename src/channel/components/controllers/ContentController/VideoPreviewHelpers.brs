@@ -44,7 +44,7 @@ Function stopVideoPreview(node = invalid)
   end if
 
   if node <> invalid AND node.subType() = "VideoPreviewPlayer"
-    node.control = "stop"
+    sendVideoPlayerCommand(node, "stop")
     node.visible = false
   end if
 End Function
@@ -59,7 +59,7 @@ Function stopVideoPreviewIfPlaying(node = invalid)
   end if
 
   if node <> invalid AND node.subType() = "VideoPreviewPlayer" AND (node.state = "buffering" OR node.state = "playing") 'this means video preview not stopped/finished for previous content, so we need to stop it
-    node.control = "stop"
+    sendVideoPlayerCommand(node, "stop")
     node.visible = false
   end if
 End Function
@@ -75,7 +75,7 @@ Function pauseVideoPreview()
   tubiLog("VideoPreviewHelpers.pauseVideoPreview")
   videoPreview = m.videoPreviewPlayer
   if videoPreview <> invalid
-    videoPreview.control = "pause"
+    sendVideoPlayerCommand(videoPreview, "pause")
   end if
 End Function
 
@@ -148,6 +148,7 @@ Function onVideoPreviewStateChanged(msg)
     end if
   end if
 
+  trackVideoPlayerStoppingState(videoPreviewState)
 End Function
 
 
@@ -170,7 +171,7 @@ Function startVideoPreview(content, pageInfo = {})
 
     videoPreview.content = videoContent
     videoPreview.updateContent = true
-    videoPreview.control = "play"
+    sendVideoPlayerCommand(videoPreview, "play")
   end if
 
 End Function
@@ -180,7 +181,7 @@ Function resumeVideoPreview()
   tubiLog("VideoPreviewHelpers.resumeVideoPreview")
   videoPreview = m.videoPreviewPlayer
   if videoPreview <> invalid
-    videoPreview.control = "resume"
+    sendVideoPlayerCommand(videoPreview, "resume")
   end if
 
 End Function

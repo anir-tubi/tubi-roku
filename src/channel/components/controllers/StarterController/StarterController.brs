@@ -71,10 +71,15 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
       '-------------------------------------------------------------------------------------'
       experiments = TubiExperiments(m.constants)
 
-      if experiments <> invalid AND experiments.getExperimentResource("roku_new_cdn", "roku_new_cdn_v1").enabled = true
-        remoteComponentsUrl =  m.constants.settings.rcdnRemoteComponentsUrl
-      else
-        remoteComponentsUrl = m.constants.settings.remoteComponentsUrl
+      remoteComponentsUrl = m.constants.settings.remoteComponentsUrl
+      if experiments <> invalid then
+        if experiments.getExperimentResource("roku_new_cdn", "roku_new_cdn_v1").enabled = true
+          remoteComponentsUrl = m.constants.settings.rcdnRemoteComponentsUrl
+        end if
+
+        if experiments.getExperimentResource("roku_async_stop", "roku_async_stop_v1").enabled = true then
+          m.animationLogo.asyncStopSemantics = true
+        end if
       end if
 
       ' This needs to be set before m.top.remoteComponentsUrl as we are getting m.top.remoteComponentLibProvided as part of that observer's additional fields

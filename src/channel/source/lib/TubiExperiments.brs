@@ -64,8 +64,8 @@ Function TubiExperiments(constants) as Object
         roku_trending_search_below_v1: {"enabled": false}
       }
 
-      roku_preview_player_alternative_stop_method: {
-        roku_preview_player_alternative_stop_method_v1: {"enabled": false}
+      roku_async_stop: {
+        roku_async_stop_v1: {"enabled": false}
       }
 
       roku_cw_consent: {

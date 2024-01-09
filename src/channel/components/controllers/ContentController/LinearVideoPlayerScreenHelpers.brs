@@ -60,7 +60,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         videoPlayer.trackingPageContext = screen.trackingPageInfo
       end if
 
-      unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
+      unobserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
       videoPlayer.associatedScreenID = sAssociatedScreenID
       videoPlayer.allowTransportToAppear = bAllowTransportToAppear
       ' set general observers for all content
@@ -403,7 +403,7 @@ Function onLiveStreamManifestResponse(response)
     videoPlayer.content = content
     videoPlayer.updateContent = true
     videoPlayer.pollUrl = pollUrl
-    videoPlayer.control = "play"
+    sendVideoPlayerCommand(videoPlayer, "play")
   end if
 End Function
 
@@ -477,15 +477,20 @@ Function stopAndHideLinearVideoPlayer()
     videoPlayer.loading = false
     m.backgroundGroup.posterVisible = true
     stopLinearVideoContent()
-    unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
+    unobserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
+
+    if getExperimentResource("roku_async_stop", "roku_async_stop_v1", false).enabled = true then
+      waitForVideoPlayerStoppedState(videoPlayer)
+    end if
+
     videoPlayer.visible = false
     videoPlayer.content = invalid
   end if
 End Function
 
 
-Function unObserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
-  tubiLog("LinearVideoPlayerScreenHelpers.unObserveAllStateDependentLinearVideoPlayerFields")
+Function unobserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
+  tubiLog("LinearVideoPlayerScreenHelpers.unobserveAllStateDependentLinearVideoPlayerFields")
   if videoPlayer <> invalid
     videoPlayer.unobserveFieldScoped("backButtonPressed")
     videoPlayer.unobserveFieldScoped("state")
@@ -571,6 +576,8 @@ Function onLinearVideoPlayerStateWhileInMinState(msg)
 
       m.backgroundGroup.posterVisible = false
     end if
+
+    trackVideoPlayerStoppingState(state)
   end if
 End Function
 
@@ -616,6 +623,8 @@ Function onLinearVideoPlayerState(msg)
       '//Assume a finished video stream is an error
       reactToLinearVideoPlayerErrorState()
     end if
+
+    trackVideoPlayerStoppingState(state)
   end if
 End Function
 
@@ -687,7 +696,7 @@ Function stopLinearVideoContent()
     videoPlayer.loading = false
     videoPlayer.unobserveFieldScoped("sendVideoTrackingStart")
     videoTrackingStop() 'stops youbora tracking
-    videoPlayer.control = "stop"
+    sendVideoPlayerCommand(videoPlayer, "stop")
     videoPlayer.visible = false
   end if
 

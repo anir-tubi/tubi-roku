@@ -18,6 +18,9 @@ Function init()
   m.Video = m.top.findNode("VideoNode") ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
+  if getExperimentResource("roku_async_stop", "roku_async_stop_v1", false).enabled = true then
+    m.Video.asyncStopSemantics = true
+  end if
 
   m.top.observeField("pageInfoForAnalytics", "onPageInfoUpdatedForAnalytics")
   m.top.observeField("updateContent", "onContentChange")
@@ -27,9 +30,6 @@ Function init()
   ' does not update on time.
   ' Allowed values are "stop", "play", "pause", "prebuffer"
   m.videoState = "stop"
-
-  ' Temporary storage for trying to investigate finish event firing without content available
-  m.stateBeforeStop = {}
 End Function
 
 
@@ -54,6 +54,7 @@ End Function
 Function playContent()
   m.Video.visible = true
   m.videoState = "play"
+  m.top.state = "playing" ' The player takes a little while to start playing. If we don't update the state here then setVideoPreviewAfterFocus will try to stop the video and then play it again even though it is the same content
   m.Video.control = "play"
   m.lastPingTime = 0
 
@@ -152,11 +153,7 @@ End Function
 ' @content: ContentNode, it contains videopreviewUrl, streamFormat & id for playback
 Function prepareToStartVideo(content)
   m.Video.content = invalid
-  if type(content) = "roSGNode"
-    m.Video.content = content
-    m.videoState = "prebuffer"
-    m.Video.control = "prebuffer"
-  end if
+  m.Video.content = content
 End Function
 
 
@@ -176,14 +173,8 @@ Function pauseContent()
     m.Video.control = "pause"
   else if m.videoState <> "stop" ' added this check to avoid playing content once the buffering is completed when focus is on sidenav/topnav
     m.videoState = "stop"
-    if getExperimentResource("roku_preview_player_alternative_stop_method", "roku_preview_player_alternative_stop_method_v1", true).enabled = true then
-      m.Video.content = invalid
-      m.top.timestampOfLastVideoPlayback = createObject("roDateTime").asSeconds()
-      m.top.state = "stopped"
-    else
-      ' We only want to call stop on the control of the experiment
-      m.Video.control = "stop"
-    end if
+    getExperimentResource("roku_async_stop", "roku_async_stop_v1", true)
+    m.Video.control = "stop"
   end if
 End Function
 
@@ -196,25 +187,8 @@ Function stopContent()
       trackEvent(finishPreviewEvent)
     end if
 
-    if getExperimentResource("roku_preview_player_alternative_stop_method", "roku_preview_player_alternative_stop_method_v1", true).enabled = true then
-      m.stateBeforeStop = {}
-      if m.Video.content <> invalid then
-        m.stateBeforeStop["beforeStopContentId"] = m.Video.content.id
-      end if
-
-      m.stateBeforeStop["beforeStopPlayerDuration"] = m.Video.duration
-      m.stateBeforeStop["beforeStopPlayerPosition"] = m.Video.position
-      m.stateBeforeStop["beforeStopPlayerState"] = m.Video.state
-      m.stateBeforeStop["beforeStopPlayerControl"] = m.Video.control
-
-      m.Video.content = invalid
-      m.top.timestampOfLastVideoPlayback = createObject("roDateTime").asSeconds()
-      m.top.state = "stopped"
-      m.Video.visible = false
-    else
-      ' We only want to call stop on the control of the experiment
-      m.Video.control = "stop"
-    end if
+    getExperimentResource("roku_async_stop", "roku_async_stop_v1", true)
+    m.Video.control = "stop"
     m.videoState = "stop"
   end if
   m.top.content = invalid
@@ -260,8 +234,8 @@ End Function
 'set hasCompleted to true when user watches the entire video preview, otherwise set it to false.
 Function getFinishPreviewEvent(hasCompleted = false)
   if m.Video.content = invalid OR m.Video.content.id = invalid then
+    ' TODO remove after roku_async_stop_v1 experiment concludes
     errorInfo = {}
-    errorInfo.append(m.stateBeforeStop)
 
     if m.top.content <> invalid then
       errorInfo["topContentId"] = m.top.content.id

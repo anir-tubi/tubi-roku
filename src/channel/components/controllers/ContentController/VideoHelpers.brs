@@ -37,7 +37,7 @@ Function playVideoContent(content, playbackSource = {"srcForAnalytic": "unknown"
 
     '//send a copy of the videoSponsorExposureId to the videoPlayer
     videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
-    videoPlayer.control = "play"
+    sendVideoPlayerCommand(videoPlayer, "play")
     updateRokuContinueWatchingInfo(content, position)
   end if
 End Function
@@ -71,7 +71,7 @@ Function playVideoContentWhileSkippingDetailScreen(content, nowPos, currentTrack
 
     '//send a copy of the videoSponsorExposureId to the videoPlayer
     videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
-    videoPlayer.control = "play"
+    sendVideoPlayerCommand(videoPlayer, "play")
     updateRokuContinueWatchingInfo(content, nowPos)
   end if
 End Function
@@ -579,6 +579,8 @@ Function onVideoPlayerState(msg)
         returnToDetailScreenFromVideo()
       end if
     end if
+
+    trackVideoPlayerStoppingState(state)
   end if
 End Function
 
@@ -797,7 +799,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
 
   ' If the user has not given consent then showing the consent dialog.
   if shouldShowContinueWatchingConsentDialog = true AND m.wasUserShownContinueWatchingConsentDialog = false AND isLoggedInUser() = true AND getConsentOptOutStatusByKey(m.constants.consentKeys.continueWatching) = true
-    
+
     ' Checking if the user is in US and allowed to manage consent(Adult or teen) and is in control group.
     if isDeviceInUS() = true AND isUserAllowedToManageConsent() = true AND getExperimentResource("roku_cw_consent_existing_user", "roku_cw_consent_existing_user_after_plyback_v1", true).enabled = true
       showRokuContinueConsentDialog()
@@ -832,11 +834,14 @@ Function stopVideoContent(videoPlayer)
     videoPlayer.unobserveFieldScoped("relatedNavigateWithinPageInfo")
     videoPlayer.unobserveFieldScoped("segInfo")
 
+    if getExperimentResource("roku_async_stop", "roku_async_stop_v1", false).enabled = true then
+      waitForVideoPlayerStoppedState(videoPlayer)
+    end if
+
     ' reset the deep link state since we've handled it already at this point
     resetDeeplinkValues()
 
-    videoPlayer.control = "stop"
-
+    sendVideoPlayerCommand(videoPlayer, "stop")
   end if
 End Function
 

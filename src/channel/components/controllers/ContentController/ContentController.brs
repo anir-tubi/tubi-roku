@@ -227,9 +227,16 @@ Function init()
   ' will be set to true if the user is in US and is in the experiment control group.
   m.shouldShowRokuCWConsentScreen = false
 
-  ' During registration flow if the user is eligble to be shown the roku continue watching consent screen.
+  ' During registration flow if the user is eligible to be shown the roku continue watching consent screen.
   ' Below variable will hold the method that needs to be called after user either accepts or reject continue watching consent.
   m.callbackAfterRokuCWConsent = invalid
+
+  ' Used to keep track of if a video player is currently in the "stopping" state and we thus need to queue commands to all video nodes
+  m.isVideoPlayerStopping = false
+
+  ' Used to store the currently queued Video node command. Contents should either be invalid or should be an AA containing both
+  ' "videoPlayerNode" which is the node for the video player and "command" which is the string we will pass to the control field of the videoPlayerNode node.
+  m.queuedVideoPlayerCommand = invalid
 End Function
 
 
@@ -2353,7 +2360,7 @@ End Function
 Function configureBrazeAndInitializeTask()
   ' Since braze starts sending request immediately as soon we create the task and we need to inform braze about logged in status.
   ' Delaying it until we complete the auth check. Also this prevents us from showing braze pop up on top of splash screen etc.
-  ' We noticed that if braze respondes quickly and our endpoints take time we ended up showing the braze modal before even home screen loaded.
+  ' We noticed that if braze responds quickly and our endpoints take time we ended up showing the braze modal before even home screen loaded.
   ' Moving it here allows the application to load required endpoints and also menu etc before we start braze.
   ' Configuring the braze sdk.
   configureBrazeSdk()
@@ -2432,4 +2439,64 @@ Function onGetUserInfoSuccess(userInfo)
     end if
   end if
   startUserExperience()
+End Function
+
+
+' We need to route commands to Video nodes through this function to allow us to queue them if one of our video nodes is currently stopping
+' @videoPlayerNode: string, the component containing the Video player node (ie. VideoPlayerScreen, LinearVideoPlayerScreen, etc.)
+' @command: string, the command being requested to be sent to the Video node's control field
+Function sendVideoPlayerCommand(videoPlayerNode, command)
+  if (command = "play" OR command = "prebuffer") AND m.isVideoPlayerStopping = true then
+    m.queuedVideoPlayerCommand = {
+      "videoPlayerNode": videoPlayerNode,
+      "command": command
+    }
+  else
+    videoPlayerNode.control = command
+  end if
+End Function
+
+
+
+' This function helps keep track of each video player's state so that we can know when we enter the new "stopping" state caused by using asyncStopSemantics=true.
+' If we receive certain commands during this time we will queue those. Once state changes to "stopped" we can then trigger the queued command if one exists
+' @videoPlayerState: string, state as returned by Roku Video node
+Function trackVideoPlayerStoppingState(videoPlayerState)
+  if videoPlayerState = "stopping" then
+    m.isVideoPlayerStopping = true
+  else if videoPlayerState = "stopped" then
+    m.isVideoPlayerStopping = false
+    if m.queuedVideoPlayerCommand <> invalid then
+      videoPlayerNode = m.queuedVideoPlayerCommand.videoPlayerNode
+      if videoPlayerNode <> invalid then
+        videoPlayerNode.control = m.queuedVideoPlayerCommand.command
+      end if
+
+      m.queuedVideoPlayerCommand = invalid
+    end if
+  end if
+End Function
+
+
+' During video player stop on both the linear and VOD players we unobserve the video player state. We need to continue observing state until we get state=stopped due to our new async stop behavior
+' @videoPlayer: node, Video node that we want to keep track of state on
+Function waitForVideoPlayerStoppedState(videoPlayer)
+  state = videoPlayer.state
+  if state <> "stopped" then
+    videoPlayer.observeFieldScoped("state", "waitForVideoPlayerStoppedStateCallback")
+  else
+    trackVideoPlayerStoppingState(state)
+  end if
+End Function
+
+
+' Callback for waitForVideoPlayerStoppedState when state changes on the video player.
+' Once state=stopped we will unobserve state.
+Function waitForVideoPlayerStoppedStateCallback(msg)
+  state = msg.getData()
+  videoPlayer = msg.getRoSGNode()
+  if state = "stopped" AND videoPlayer <> invalid then
+    videoPlayer.unobserveFieldScoped("state")
+  end if
+  trackVideoPlayerStoppingState(state)
 End Function
