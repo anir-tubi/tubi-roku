@@ -23,12 +23,18 @@ const remoteRelease = 'Remote Release';
 const submissionRelease = 'Submission Release';
 
 // Github API wrapper
-const { Octokit } = require('@octokit/rest');
-const octokit = new Octokit({
-  auth: process.env.GITHUB_PAT,
-  userAgent: 'project-total-recall-build-server',
-  baseUrl: 'https://api.github.com'
-});
+let _octokit;
+function octokit() {
+  if (!_octokit) {
+    const { Octokit } = require('@octokit/rest');
+    _octokit = new Octokit({
+      auth: process.env.GITHUB_PAT,
+      userAgent: 'project-total-recall-build-server',
+      baseUrl: 'https://api.github.com'
+    });
+  }
+  return _octokit;
+}
 
 
 // ensure git exists on the system and that the working directory is clean
@@ -91,7 +97,7 @@ async function makeReleasePrs(done) {
   let releasePrUrl = '';
   let bodyText = 'Verify: The last commit in this PR is a build bump. If the last commit in this PR is not a build bump, the release needs to be run again. Any other commit that is not a build bump, including a merge, indicates a commit has been included that was not included in the package that was built and sent to the CDN.\n\nPlease verify README item #18 in the Remote Release section (ie. do any changes in this remote release disallow falling back to the submitted version)';
   try {
-    const releasePrRes = await octokit.pulls.create({
+    const releasePrRes = await octokit().pulls.create({
       owner: ghInfo.owner,
       repo: ghInfo.rokuRepo,
       title: `Release ${fullBuildTag}`,
@@ -240,7 +246,7 @@ async function createCdnPrUrl(done, cdn = 'cdn') {
   let cdnPrUrl = '';
   let errMsg = `Failed to create CDN PRs. Please create manually.`;
   try {
-    const cdnPrRes = await octokit.pulls.create({
+    const cdnPrRes = await octokit().pulls.create({
       owner: ghInfo.owner,
       repo: `${ghInfoCDNRepo}`,
       title: `Updating starter and remote components for roku ${fullBuildTag}`,
@@ -322,7 +328,7 @@ async function createGithubRelease(done) {
 
   const tagSha = gitLocalTagShaRes.stdout.trim();
   try {
-    const topTags = await octokit.repos.listTags({
+    const topTags = await octokit().repos.listTags({
       owner: ghInfo.owner,
       repo: ghInfo.rokuRepo
     });
@@ -407,7 +413,7 @@ async function createGithubRelease(done) {
 
   log(`...Creating a release from the ${buildTag} tag on Github`);
   try {
-    await octokit.repos.createRelease({
+    await octokit().repos.createRelease({
       owner: ghInfo.owner,
       repo: ghInfo.rokuRepo,
       tag_name: buildTag,
@@ -469,7 +475,7 @@ async function buildReleaseNotes(done) {
   // filter down to pull requests from currentBranch that aren't on prodBranch
   for (const commit of pullRequestCommits) {
     const prId = commit.prId;
-    const response = await octokit.pulls.get({
+    const response = await octokit().pulls.get({
       owner: ghInfo.owner,
       repo: ghInfo.rokuRepo,
       pull_number: +prId
@@ -506,7 +512,7 @@ async function buildQaChanges(done) {
       owner: ghInfo.owner,
       repo: ghInfo.rokuRepo,
     };
-    const {data: pullRequest} = await octokit.pulls.get({
+    const {data: pullRequest} = await octokit().pulls.get({
       ...octokitRequestSharedParams,
       pull_number: +prId
     });
@@ -522,7 +528,7 @@ async function buildQaChanges(done) {
     }
 
     let ticketUrl = '';
-    const {data: prComments} = await octokit.issues.listComments({...octokitRequestSharedParams, issue_number: +prId});
+    const {data: prComments} = await octokit().issues.listComments({...octokitRequestSharedParams, issue_number: +prId});
     for (const prComment of prComments) {
       const commentShortcutLinkMatch = prComment.body.match(/\((https:\/\/app.shortcut.com\/tubi\/story\/[^)]+)\)/);
       if (commentShortcutLinkMatch) {
@@ -731,7 +737,7 @@ function extractPrIdFromCommitInfo(commitInfo) {
 
 async function addMissingImagesToRemoteLibrary(done) {
   // First we need to find our last submission release
-  const releases = await octokit.repos.listReleases({
+  const releases = await octokit().repos.listReleases({
     owner: ghInfo.owner,
     repo: ghInfo.rokuRepo
   });

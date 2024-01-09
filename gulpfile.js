@@ -1,18 +1,13 @@
 'use strict';
-const {series, src, dest} = require('gulp');
-const del = require('del');
+const {series, parallel, src, dest} = require('gulp');
 const fs = require('fs');
-const dedupe = require('gulp-dedupe');
 const replace = require('gulp-replace');
-const { server, serverClose } = require('gulp-connect');
 const filter = require('gulp-filter');
 const zip = require('gulp-zip');
-const mocha = require('gulp-mocha');
 const env = require('gulp-env');
 const log = require('fancy-log');
 const mkdirp = require('mkdirp');
 const prompts = require('prompts');
-const { RooibosProcessor, createProcessorConfig } = require('rooibos-cli');
 const shell = require('shelljs');
 shell.config.silent = true;
 const clipboardy = require('clipboardy');
@@ -37,10 +32,8 @@ const {NoStackError} = require('./js/utilities');
 const {makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild} = require('./js/git');
 
 // Importing functions related to Suitest
-const {retrieveSuitestTests, runSuitestTests, convertXpathsToKeyPaths, convertSuitestTest} = require('./js/suitest');
-
-// Importing functions related to Automated Tests
-const {runAutomatedTests, runAutomatedTestsCli, runAutomatedAnalyticsTestsCli, outputAvailableAutomatedTestTags, buildTestAccountCli} = require('./js/automated-tests');
+// Just commenting out for now. Will be removing in future PR
+// const {retrieveSuitestTests, runSuitestTests, convertXpathsToKeyPaths, convertSuitestTest} = require('./js/suitest');
 
 // Importing functions related to Github action runners
 const {setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner} = require('./js/action-runner');
@@ -107,7 +100,14 @@ log(`PROFILE = ${options.config}`);
 
 // deletes the contents of the build folder, all of which will be recreated.
 function clean(done) {
-  del.sync(['build/**/*']);
+  const buildFolder = 'build';
+  // Only need to do something if the build folder exists
+  if (fs.existsSync(buildFolder)) {
+    // It is quicker to just rename the folder synchronously and then let it delete the folder on its own time asynchronously
+    const pendingDeleteBuildFolder = '__pendingDeleteBuild';
+    fs.renameSync('build', pendingDeleteBuildFolder);
+    fs.rm(pendingDeleteBuildFolder, { recursive: true, force: true }, (e) => {});
+  }
   done();  //inform gulp that the task has completed.
 }
 
@@ -119,6 +119,7 @@ function collect(sources, srcOptions) {
   sources.map((source) => {
     log(`Adding ${source}`);
   });
+  const dedupe = require('gulp-dedupe');
   return src(sources, srcOptions)
         .pipe(dedupe());
         // uncomment the next line for more info on which files are being collected
@@ -420,7 +421,7 @@ function buildRemote() {
       return (!e.startsWith('#') && (e.endsWith('png') || e.endsWith('jpg') || e.endsWith('webp')));
     });
     log(`Found ${newImages.length} lines in ${newImagesFile}`);
-    const imagePathRegex = /pkg:\/[0-9a-zA-Z.\/\-_\$]*/g;
+    const imagePathRegex = /pkg:\/[0-9a-zA-Z./\-_$]*/g;
 
     // prepare a map of new image file paths to make filtering quicker
     let newImagesMap = {};
@@ -538,6 +539,7 @@ function serverMiddleware(req, res, next) {
 
 // Uploads the tubi_x_y_z.zip to the roku and launches a server to serve the starter and remote components
 function sideLoad(done) {
+  const { server, serverClose } = require('gulp-connect');
   const address = options.target;
   const buildTag = getBuildTag('revision');
   const zipPath = `build/tubi_${buildTag}.zip`;
@@ -766,12 +768,14 @@ function setPerformanceTestsConfig(done) {
 }
 
 function runPerformanceTests() {
+  const mocha = require('gulp-mocha');
   return src(['js/automated-tests/performance-tests/*.ts'], { read: false })
     .pipe(mocha({}));
 }
 
 
 function runToolingTests() {
+  const mocha = require('gulp-mocha');
   return src(['js/automated-tests/tooling-tests.ts'], { read: false })
     .pipe(mocha({}));
 }
@@ -799,6 +803,8 @@ async function preprocessTests() {
     ]
   };
 
+  // These take a decent amount of time so only requiring them here
+  const { RooibosProcessor, createProcessorConfig } = require('rooibos-cli');
   const config = createProcessorConfig(configSettings);
   const processor = new RooibosProcessor(config);
   await processor.processFiles();
@@ -906,7 +912,7 @@ function listTasks(done) {
 
 
 exports.codeClean = series(listUnusedImages, listUnusedTranslations);
-exports.build = series(clean, buildInstalled, buildStarter, buildRemote);
+exports.build = series(clean, parallel(buildInstalled, buildStarter, buildRemote));
 exports.sideload = sideLoad;
 exports['build-downloads'] = series(buildStarter, buildRemote, packageStarter, packageRemote);
 exports.bump = bumpBuild;
@@ -926,15 +932,50 @@ exports.addMissingImages = addMissingImagesToRemoteLibrary;
 exports.tasks = listTasks;
 
 // Suitest related
-exports.retrieveSuitestTests = retrieveSuitestTests;
-exports.runSuitestTests = series(setAutomatedTestsConfig, clean, buildInstalled, runSuitestTests);
-exports.convertXpathsToKeyPaths = series(setAutomatedTestsConfig, clean, buildInstalled, convertXpathsToKeyPaths);
-exports.convertSuitestTest = convertSuitestTest;
+// exports.retrieveSuitestTests = retrieveSuitestTests;
+// exports.runSuitestTests = series(setAutomatedTestsConfig, clean, buildInstalled, runSuitestTests);
+// exports.convertXpathsToKeyPaths = series(setAutomatedTestsConfig, clean, buildInstalled, convertXpathsToKeyPaths);
+// exports.convertSuitestTest = convertSuitestTest;
 
 
 // Automated test related
-exports.buildAutomatedTests = series(setAutomatedTestsConfig, buildInstalled);
-exports.runAutomatedTests = series(setAutomatedTestsConfig, buildInstalled, runAutomatedTests);
+// Because automated-tests has to call ts-node/register it takes over 300ms to load so we only want to load when necessary. We are adding wrappers for these functions here
+let _automatedTests;
+function automatedTests () {
+  if (!_automatedTests) {
+    _automatedTests = require('./js/automated-tests');
+  }
+  return _automatedTests;
+}
+
+
+function runAutomatedTests(done) {
+  return automatedTests().runAutomatedTests(done);
+}
+
+
+function runAutomatedTestsCli(done) {
+  return automatedTests().runAutomatedTestsCli(done);
+}
+
+
+function outputAvailableAutomatedTestTags(done) {
+  return automatedTests().outputAvailableAutomatedTestTags(done);
+}
+
+
+function buildTestAccountCli(done) {
+  return automatedTests().buildTestAccountCli(done);
+}
+
+
+function runAutomatedAnalyticsTestsCli(done) {
+  return automatedTests().runAutomatedAnalyticsTestsCli(done);
+}
+
+
+exports.buildAutomatedTests = series(setAutomatedTestsConfig, clean, buildInstalled);
+exports.runAutomatedTests = series(exports.buildAutomatedTests, runAutomatedTests);
 exports.rerunAutomatedTests = series(setRerunAutomatedTestsEnvironment, runAutomatedTests);
 exports.runAutomatedTestsCli = runAutomatedTestsCli;
 exports.outputAvailableAutomatedTestTags = outputAvailableAutomatedTestTags;
@@ -942,7 +983,7 @@ exports.autotest = runAutomatedTestsCli;
 exports.buildTestAccount = buildTestAccountCli;
 exports.runAutomatedAnalyticsTestsCli = runAutomatedAnalyticsTestsCli;
 
-exports.runToolingTests = series(setAutomatedTestsConfig, buildInstalled, runToolingTests);
+exports.runToolingTests = series(setAutomatedTestsConfig, clean, buildInstalled, runToolingTests);
 
 exports.buildReleaseNotes = buildReleaseNotesOutput;
 exports.buildQaChanges = buildQaChangesOutput;

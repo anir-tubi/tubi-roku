@@ -1,6 +1,4 @@
 const fs = require('fs');
-const FormData = require('form-data');
-const unzipper = require('unzipper');
 const path = require('path');
 const https = require('https');
 const log = require('fancy-log');
@@ -12,7 +10,7 @@ const crowdinConfig = {
   "crowdinKey": (process.env.ROKU_CROWDIN_KEY || ''),
   "crowdinBasePath": "/api/project/tubiapps",
   "crowdinApiBasePath": "api.crowdin.com",
-  "crowdinBaseDirectory": "roku"  
+  "crowdinBaseDirectory": "roku"
 }
 
 const _sLocalTranslationFilename = "translations/en-US.json";
@@ -107,7 +105,7 @@ async function processTranslationFiles(directory) {
 
           sLocale = sLocale.toLowerCase();
           if (sLocale !== 'en-us' && sLocale !== 'en_us'){
-            //Let's delete the translation JSON file that was just downloaded, but let's not 
+            //Let's delete the translation JSON file that was just downloaded, but let's not
             //delete the default US English translation if for some reason the US English is downloaded.
             //The US English file should not download from crowdin, but just in case, we should not delete it as we should keep the US English file in the project as the source file
             fs.unlinkSync(destinationPath);
@@ -201,6 +199,7 @@ async function updateFilesRequest(filePath, transformedPath) {
   const filePathKey = `files[${transformedPath}]`;
   const exportPatternsKey = `export_patterns[${transformedPath}]`;
 
+  const FormData = require('form-data');
   const formDataObj = new FormData();
   formDataObj.append(filePathKey, fs.createReadStream(filePath));
   formDataObj.append(exportPatternsKey, '%locale%.json');
@@ -211,7 +210,7 @@ async function updateFilesRequest(filePath, transformedPath) {
     path: crowdin_updateFilePath,
     headers: formDataObj.getHeaders(),
   };
-  
+
   const response = await makePostRequest(options, formDataObj);
   return response;
 }
@@ -277,7 +276,7 @@ exports.updateLocalTranslations = function(done) {
 
   log('');
   log('FINISHED UPDATING THE ENGLISH STRINGS IN THE BRS FILE WITH THE LOCAL ENGLISH TRANSLATION FILE');
-  
+
   done();  //inform gulp that the task has completed.
 }
 
@@ -305,6 +304,7 @@ exports.downloadTranslations = async function() {
     if (buildResponse.success) {
       const translationsFileBuffer = await getTranslationsZipFile();
 
+      const unzipper = require('unzipper');
       const unzippedDirectory = await unzipper.Open.buffer(translationsFileBuffer);
       await processTranslationFiles(unzippedDirectory);
     } else {

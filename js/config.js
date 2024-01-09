@@ -2,9 +2,14 @@
 const extend = require('node.extend');
 const fs = require('fs');
 const path = require('path');
-const yaml = require('js-yaml');
+let _yaml;
+function yaml() {
+  if (!_yaml) {
+    _yaml = require('js-yaml');
+  }
+  return _yaml;
+}
 const localIp = require('my-local-ip')();
-const templating = require('./templating');
 const cwd = path.join(process.cwd(), 'config');
 const defaultProfile = 'default';
 const buildProfile = 'build';
@@ -19,8 +24,9 @@ function parse(profile, templateValues={}) {
   const filename = path.join(cwd, `${profile}.yml`);
   if (!fs.existsSync(filename)) return {};
   let template = fs.readFileSync(filename, 'utf8');
+  const templating = require('./templating');
   let rendered = templating.renderTemplate(template, templateValues);
-  const yamlOutput = yaml.load(rendered);
+  const yamlOutput = yaml().load(rendered);
   return removeNullsFromObject(yamlOutput)
 }
 
@@ -113,7 +119,7 @@ function incrementBuildNumber(incrementAmount = 1) {
   build.component_library_manifest.revision_version = build.manifest.revision_version
   build.starter_library_manifest.revision_version = build.manifest.revision_version
   const buildPath = path.join(cwd, `${buildProfile}.yml`);
-  const data = yaml.dump(build);
+  const data = yaml().dump(build);
   fs.writeFileSync(buildPath, data);
   console.log('Incremented the build number to %d_%d_%d_%d', build.manifest.major_version, build.manifest.minor_version, build.manifest.build_version, build.manifest.revision_version);
 }
@@ -126,7 +132,7 @@ function incrementRevisionNumber() {
   build.component_library_manifest.revision_version = build.manifest.revision_version
   build.starter_library_manifest.revision_version = build.manifest.revision_version
   const buildPath = path.join(cwd, `${buildProfile}.yml`);
-  const data = yaml.dump(build);
+  const data = yaml().dump(build);
   fs.writeFileSync(buildPath, data);
   console.log('Incremented the build number to %d_%d_%d_%d', build.manifest.major_version, build.manifest.minor_version, build.manifest.build_version, build.manifest.revision_version);
 }

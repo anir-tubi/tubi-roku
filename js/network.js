@@ -1,10 +1,13 @@
 'use strict';
-const path = require('path');
-const http = require('http');
 const fs = require('fs');
-const request = require('request');
-const Rx = require('rx');
-const SSDPClient = require('node-ssdp').Client;
+let _request;
+function request() {
+  // Only want to load request when it is needed to speed up other gulp tasks
+  if (!_request) {
+    _request = require('request');
+  }
+  return _request;
+}
 const log = require('fancy-log');
 
 exports.keypress = function(key, address, password) {
@@ -12,7 +15,7 @@ exports.keypress = function(key, address, password) {
   return new Promise((res, rej) => {
     const url =`http://${address}:8060/keypress/${key}`;
     const data = {};
-    request.post({url: url, formData: data}, (err, response, body) => {
+    request().post({url: url, formData: data}, (err, response, body) => {
       if (err) {
         rej(err);
       }
@@ -28,7 +31,7 @@ exports.deeplink = function(rokuAppId, address) {
       url,
       data: {}
     };
-    request.post(options, (err, response, body) => {
+    request().post(options, (err, response, body) => {
       if (err) {
         rej(err);
       }
@@ -61,7 +64,7 @@ exports.uploadPkg = function(zipPath, deviceIp, password) {
       formData
     };
 
-    request.post(options, (err, response, body) => {
+    request().post(options, (err, response, body) => {
       const success = !!body ? body.match(/<font color="red">.*Install Success.<\/font>/) : null
 
       if (err) {
@@ -116,7 +119,7 @@ exports.installWithSquashfs = function(zipPath, deviceIp, password) {
       formData
     };
 
-    request.post(options, (err, response, body) => {
+    request().post(options, (err, response, body) => {
       let success = null;
       if (!!body) {
         success = body.match(/<font color="red">.*Install Success.<\/font>/);
@@ -194,7 +197,7 @@ exports.signPkg = function(address, devPassword, signPassword, appName, pkgPath)
           sendImmediately: false
         };
         var writePath = `${pkgPath}/${appName}.pkg`;
-        request.get({url: url, auth: auth}, (err, response, body) => {
+        request().get({url: url, auth: auth}, (err, response, body) => {
           if (err) {
             rej(err);
           }
@@ -209,6 +212,8 @@ exports.signPkg = function(address, devPassword, signPassword, appName, pkgPath)
  * Find roku devices
  */
 exports.autoDiscover = function() {
+  const Rx = require('rx');
+  const SSDPClient = require('node-ssdp').Client;
   return new Rx.Observable.create(observer => {
     const ssdp = new SSDPClient();
     ssdp.on('response', (headers, statusCode, rinfo) => {
@@ -218,5 +223,5 @@ exports.autoDiscover = function() {
       });
     });
     ssdp.search('roku:ecp');
-  });  
+  });
 };
