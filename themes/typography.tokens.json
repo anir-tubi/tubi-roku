@@ -145,7 +145,7 @@
 				}
 			},
 			"body": {
-				"large_strong": {
+				"large-strong": {
 					"$description": "34/40 - Black",
 					"fontSize": {
 						"$type": "dimension",
@@ -191,7 +191,7 @@
 						"$value": 40
 					}
 				},
-				"medium_strong": {
+				"medium-strong": {
 					"$description": "28/40 - Black",
 					"fontSize": {
 						"$type": "dimension",
@@ -237,7 +237,7 @@
 						"$value": 40
 					}
 				},
-				"small_strong": {
+				"small-strong": {
 					"$description": "24/32 - Black",
 					"fontSize": {
 						"$type": "dimension",
@@ -283,7 +283,7 @@
 						"$value": 32
 					}
 				},
-				"extraSmall_strong": {
+				"extra-small-strong": {
 					"$description": "18/28 - Black",
 					"fontSize": {
 						"$type": "dimension",
@@ -306,7 +306,7 @@
 						"$value": 28
 					}
 				},
-				"extraSmall": {
+				"extra-small": {
 					"$description": "18/28 - Medium",
 					"fontSize": {
 						"$type": "dimension",
@@ -452,7 +452,7 @@
 				}
 			},
 			"body": {
-				"medium_strong": {
+				"medium-strong": {
 					"$description": "16/24 - Black",
 					"fontSize": {
 						"$type": "dimension",
@@ -498,7 +498,7 @@
 						"$value": 24
 					}
 				},
-				"small_strong": {
+				"small-strong": {
 					"$description": "14/20 - Black",
 					"fontSize": {
 						"$type": "dimension",
@@ -544,7 +544,7 @@
 						"$value": 20
 					}
 				},
-				"extraSmall_strong": {
+				"extra-small-strong": {
 					"$description": "11/16 - Black",
 					"fontSize": {
 						"$type": "dimension",
@@ -567,7 +567,7 @@
 						"$value": 16
 					}
 				},
-				"extraSmall": {
+				"extra-small": {
 					"$description": "11/16 - Medium",
 					"fontSize": {
 						"$type": "dimension",
@@ -594,7 +594,7 @@
 		},
 		"mobile": {
 			"header": {
-				"extraLarge": {
+				"extra-Large": {
 					"$description": "28/34 - Black",
 					"fontSize": {
 						"$type": "dimension",
@@ -690,7 +690,7 @@
 				}
 			},
 			"body": {
-				"large_strong": {
+				"large-strong": {
 					"$description": "16/20 - Black",
 					"fontSize": {
 						"$type": "dimension",
@@ -736,7 +736,7 @@
 						"$value": 20
 					}
 				},
-				"medium_strong": {
+				"medium-strong": {
 					"$description": "14/20 - Black",
 					"fontSize": {
 						"$type": "dimension",
@@ -782,7 +782,7 @@
 						"$value": 20
 					}
 				},
-				"small_strong": {
+				"small-strong": {
 					"$description": "12/16 - Black",
 					"fontSize": {
 						"$type": "dimension",
@@ -828,7 +828,7 @@
 						"$value": 16
 					}
 				},
-				"extraSmall_strong": {
+				"extra-small-strong": {
 					"$description": "11/16 - Black",
 					"fontSize": {
 						"$type": "dimension",
@@ -851,7 +851,7 @@
 						"$value": 16
 					}
 				},
-				"extraSmall": {
+				"extra-small": {
 					"$description": "11/16 - Medium",
 					"fontSize": {
 						"$type": "dimension",

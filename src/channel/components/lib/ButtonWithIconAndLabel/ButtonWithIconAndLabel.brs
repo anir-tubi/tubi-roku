@@ -8,7 +8,7 @@ Function init()
   m.ButtonText = m.top.findNode("ButtonText")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.buttonText, typographyConstants.ids.bodyMedium_strong)
+  setTypographyOfLabel(m.buttonText, typographyConstants.ids.bodyMediumStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")

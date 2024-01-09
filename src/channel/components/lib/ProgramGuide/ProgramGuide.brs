@@ -43,7 +43,7 @@ Function init()
   m.programGrid.observeFieldScoped("scrollingStatus", "onScrollingStatus")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.backToLiveText, typographyConstants.ids.bodySmall_Strong)
+  setTypographyOfLabel(m.backToLiveText, typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.headerText, typographyConstants.ids.subheaderSmall)
 
   if m.global <> invalid

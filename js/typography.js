@@ -55,7 +55,10 @@ function getTypographyThemeKeyValue(sStyle, node, styleAA){
   const sStyleConstantSuffix = `_TYPOGRAPHY"`;
   Object.entries(node).forEach(([styleName, styleNode]) => {
     if (styleName[0] !== `$`) {
-      styleName = styleName.replace(/\-/gi, ""); //get rid of "-" as that cannot be used in a constant name in the Roku app
+
+      //get rid of "-" as that cannot be used in a constant name in the Roku app
+      sStyle = sStyle.replace(/\-/gi, "");
+      styleName = styleName.replace(/\-/gi, "");
       const sStyleNew = sStyle + styleName;
 
       if(styleNode.$value){

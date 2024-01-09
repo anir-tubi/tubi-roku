@@ -5,7 +5,7 @@ Function init()
   m.Bground = m.top.findNode("Bground")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.MenuText, typographyConstants.ids.bodySmall_Strong)
+  setTypographyOfLabel(m.MenuText, typographyConstants.ids.bodySmallStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")

@@ -8,23 +8,25 @@
 
 Function getTypographyConstants()
   constants = {}
-  
+
   '//The gulp install command will look thru the JSON file (typography.tokens.json),
   '//and generate associative arrays to replace the following string values.
+  '//::NOTE:: The local JSON is copied & pasted from the Design-authored JSON file loocated at:
+  '// https://github.com/adRise/design-tokens/blob/main/src/tokens/typography.tokens.json
   headerLarge = "TYPOGRAPHY_headerLarge_TYPOGRAPHY"
   headerMedium = "TYPOGRAPHY_headerMedium_TYPOGRAPHY"
   headerSmall = "TYPOGRAPHY_headerSmall_TYPOGRAPHY"
   subheaderLarge = "TYPOGRAPHY_subheaderLarge_TYPOGRAPHY"
   subheaderMedium = "TYPOGRAPHY_subheaderMedium_TYPOGRAPHY"
   subheaderSmall = "TYPOGRAPHY_subheaderSmall_TYPOGRAPHY"
-  bodyLarge_Strong = "TYPOGRAPHY_bodyLarge_Strong_TYPOGRAPHY"
+  bodyLargeStrong = "TYPOGRAPHY_bodyLargeStrong_TYPOGRAPHY"
   bodyLarge = "TYPOGRAPHY_bodyLarge_TYPOGRAPHY"
-  bodyMedium_Strong = "TYPOGRAPHY_bodyMedium_Strong_TYPOGRAPHY"
+  bodyMediumStrong = "TYPOGRAPHY_bodyMediumStrong_TYPOGRAPHY"
   bodyMedium = "TYPOGRAPHY_bodyMedium_TYPOGRAPHY"
   bodySmall = "TYPOGRAPHY_bodySmall_TYPOGRAPHY"
-  bodySmall_Strong = "TYPOGRAPHY_bodySmall_Strong_TYPOGRAPHY"
+  bodySmallStrong = "TYPOGRAPHY_bodySmallStrong_TYPOGRAPHY"
   bodyExtraSmall = "TYPOGRAPHY_bodyExtraSmall_TYPOGRAPHY"
-  bodyExtraSmall_Strong = "TYPOGRAPHY_bodyExtraSmall_Strong_TYPOGRAPHY"
+  bodyExtraSmallStrong = "TYPOGRAPHY_bodyExtraSmallStrong_TYPOGRAPHY"
 
   constants.ids = {}
   constants.ids.headerLarge = "headerLarge"
@@ -33,14 +35,14 @@ Function getTypographyConstants()
   constants.ids.subheaderLarge = "subheaderLarge"
   constants.ids.subheaderMedium = "subheaderMedium"
   constants.ids.subheaderSmall = "subheaderSmall"
-  constants.ids.bodyLarge_Strong = "bodyLarge_Strong"
+  constants.ids.bodyLargeStrong = "bodyLargeStrong"
   constants.ids.bodyLarge = "bodyLarge"
-  constants.ids.bodyMedium_Strong = "bodyMedium_Strong"
+  constants.ids.bodyMediumStrong = "bodyMediumStrong"
   constants.ids.bodyMedium = "bodyMedium"
   constants.ids.bodySmall = "bodySmall"
-  constants.ids.bodySmall_Strong = "bodySmall_Strong"
+  constants.ids.bodySmallStrong = "bodySmallStrong"
   constants.ids.bodyExtraSmall = "bodyExtraSmall"
-  constants.ids.bodyExtraSmall_Strong = "bodyExtraSmall_Strong"
+  constants.ids.bodyExtraSmallStrong = "bodyExtraSmallStrong"
 
   constants.typographyAA = {}
   constants.typographyAA[constants.ids.headerLarge] = headerLarge
@@ -49,15 +51,14 @@ Function getTypographyConstants()
   constants.typographyAA[constants.ids.subheaderLarge] = subheaderLarge
   constants.typographyAA[constants.ids.subheaderMedium] = subheaderMedium
   constants.typographyAA[constants.ids.subheaderSmall] = subheaderSmall
-  constants.typographyAA[constants.ids.bodyLarge_Strong] = bodyLarge_Strong
+  constants.typographyAA[constants.ids.bodyLargeStrong] = bodyLargeStrong
   constants.typographyAA[constants.ids.bodyLarge] = bodyLarge
-  constants.typographyAA[constants.ids.bodyMedium_Strong] = bodyMedium_Strong
+  constants.typographyAA[constants.ids.bodyMediumStrong] = bodyMediumStrong
   constants.typographyAA[constants.ids.bodyMedium] = bodyMedium
   constants.typographyAA[constants.ids.bodySmall] = bodySmall
-  constants.typographyAA[constants.ids.bodySmall_Strong] = bodySmall_Strong
+  constants.typographyAA[constants.ids.bodySmallStrong] = bodySmallStrong
   constants.typographyAA[constants.ids.bodyExtraSmall] = bodyExtraSmall
-  constants.typographyAA[constants.ids.bodyExtraSmall_Strong] = bodyExtraSmall_Strong
-
+  constants.typographyAA[constants.ids.bodyExtraSmallStrong] = bodyExtraSmallStrong
   return constants
 End Function
 

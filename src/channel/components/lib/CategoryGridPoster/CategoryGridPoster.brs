@@ -49,7 +49,7 @@ Function init()
   m.top.observeFieldScoped("itemHasFocus", "onRowItemHasFocus")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.InnerTitle, typographyConstants.ids.bodySmall_strong)
+  setTypographyOfLabel(m.InnerTitle, typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.Title, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.TimeRemaining, typographyConstants.ids.bodyExtraSmall)
 

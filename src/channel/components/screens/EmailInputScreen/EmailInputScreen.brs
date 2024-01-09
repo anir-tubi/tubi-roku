@@ -58,7 +58,7 @@ Function init()
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerMedium)
-  setTypographyOfLabel(m.emailValidationMsg, typographyConstants.ids.bodySmall_Strong)
+  setTypographyOfLabel(m.emailValidationMsg, typographyConstants.ids.bodySmallStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")

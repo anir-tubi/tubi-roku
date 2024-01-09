@@ -30,7 +30,7 @@ Function init()
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(title, typographyConstants.ids.headerSmall)
-  setTypographyOfLabel(m.infoArea, typographyConstants.ids.bodyMedium_Strong)
+  setTypographyOfLabel(m.infoArea, typographyConstants.ids.bodyMediumStrong)
 
 
 End Function

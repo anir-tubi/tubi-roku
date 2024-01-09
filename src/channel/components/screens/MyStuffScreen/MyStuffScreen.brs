@@ -95,7 +95,7 @@ Function init()
   m.top.observeFieldScoped("reset", "onResetChange")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmall_strong)
+  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.SignedOutUITitle, typographyConstants.ids.headerSmall)
   setTypographyOfLabel(m.SignedOutUISubtitle, typographyConstants.ids.bodyLarge)
   setTypographyOfLabel(m.SignedOutUIBlurb, typographyConstants.ids.bodyLarge)

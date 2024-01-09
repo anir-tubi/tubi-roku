@@ -22,9 +22,9 @@ Function init()
   m.badgeLabel.padding = [12, 9]
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.DetailsMenuText, typographyConstants.ids.bodyMedium_strong)
-  setTypographyOfLabel(m.DetailsMenuTextFocused, typographyConstants.ids.bodyMedium_strong)
-  setTypographyOfLabel(m.badgeLabel, typographyConstants.ids.bodyExtraSmall_strong)
+  setTypographyOfLabel(m.DetailsMenuText, typographyConstants.ids.bodyMediumStrong)
+  setTypographyOfLabel(m.DetailsMenuTextFocused, typographyConstants.ids.bodyMediumStrong)
+  setTypographyOfLabel(m.badgeLabel, typographyConstants.ids.bodyExtraSmallStrong)
 
   m.constants = getConstantsFromGlobal()
   if m.constants <> invalid

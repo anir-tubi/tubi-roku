@@ -9,8 +9,8 @@ Function init()
   m.top.observeField("rowListHasFocus", "onContainerHasFocus")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.categoryText, typographyConstants.ids.bodyMedium_Strong)
-  setTypographyOfLabel(m.categoryCountText, typographyConstants.ids.bodySmall_Strong)
+  setTypographyOfLabel(m.categoryText, typographyConstants.ids.bodyMediumStrong)
+  setTypographyOfLabel(m.categoryCountText, typographyConstants.ids.bodySmallStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")

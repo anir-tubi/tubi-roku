@@ -5,7 +5,7 @@ Function init()
   topRef.observeFieldScoped("itemContent", "onItemContentChange")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.label, typographyConstants.ids.bodySmall_Strong)
+  setTypographyOfLabel(m.label, typographyConstants.ids.bodySmallStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")

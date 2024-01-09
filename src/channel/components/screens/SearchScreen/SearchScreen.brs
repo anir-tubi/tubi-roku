@@ -120,9 +120,9 @@ Function init()
   end if
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmall_strong)
+  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.searchMenuText, typographyConstants.ids.headerSmall)
-  setTypographyOfLabel(m.searchHintText, typographyConstants.ids.bodyMedium_strong)
+  setTypographyOfLabel(m.searchHintText, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.KidsModeMessage, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.SearchText, typographyConstants.ids.subheaderMedium)
   setTypographyOfLabel(m.trendingSearchHeading, typographyConstants.ids.subheaderMedium)

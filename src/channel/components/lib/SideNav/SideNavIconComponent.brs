@@ -18,9 +18,9 @@ Function init()
   m.sideIconLabel = invalid
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.subTxt, typographyConstants.ids.bodyExtraSmall_strong)
-  setTypographyOfLabel(m.Label, typographyConstants.ids.bodyMedium_strong)
-  setTypographyOfLabel(m.focusedLabel, typographyConstants.ids.bodyMedium_strong)
+  setTypographyOfLabel(m.subTxt, typographyConstants.ids.bodyExtraSmallStrong)
+  setTypographyOfLabel(m.Label, typographyConstants.ids.bodyMediumStrong)
+  setTypographyOfLabel(m.focusedLabel, typographyConstants.ids.bodyMediumStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -92,7 +92,7 @@ Function onContentChange(data)
             m.sideIconLabel.translation = [0, 15]
             
             typographyConstants = getTypographyConstants()
-            setTypographyOfLabel(m.sideIconLabel, typographyConstants.ids.bodyExtraSmall_strong)
+            setTypographyOfLabel(m.sideIconLabel, typographyConstants.ids.bodyExtraSmallStrong)
           end if
         else if item.shortDescriptionLine2 = "" AND m.sideIconLabel <> invalid
           m.labelParent.removeChild(m.sideIconLabel)

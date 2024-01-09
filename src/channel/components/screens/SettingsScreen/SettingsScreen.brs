@@ -49,7 +49,7 @@ Function init()
   }
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.BackLabel, typographyConstants.ids.bodySmall_strong)
+  setTypographyOfLabel(m.BackLabel, typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.Title, typographyConstants.ids.headerMedium)
 
   m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]

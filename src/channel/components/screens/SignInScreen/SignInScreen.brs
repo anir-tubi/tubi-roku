@@ -59,7 +59,7 @@ Function init()
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerMedium)
   setTypographyOfLabel(m.pageSubHeading, typographyConstants.ids.bodyLarge)
-  setTypographyOfLabel(m.passwordValidationMsg, typographyConstants.ids.bodySmall_Strong)
+  setTypographyOfLabel(m.passwordValidationMsg, typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.newPasswordLink, typographyConstants.ids.bodySmall)
 
   if m.global <> invalid

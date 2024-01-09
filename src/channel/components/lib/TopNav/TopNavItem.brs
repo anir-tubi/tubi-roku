@@ -15,8 +15,8 @@ Function init()
   m.top.observeField("height", "onHeightChange")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.TopLabel, typographyConstants.ids.bodySmall_strong)
-  setTypographyOfLabel(m.BottomLabel, typographyConstants.ids.bodySmall_strong)
+  setTypographyOfLabel(m.TopLabel, typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(m.BottomLabel, typographyConstants.ids.bodySmallStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")

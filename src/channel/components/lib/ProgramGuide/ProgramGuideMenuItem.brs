@@ -9,8 +9,8 @@ Function init()
   m.top.observeField("itemContent", "onContentChange")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.timeString, typographyConstants.ids.bodySmall_Strong)
-  setTypographyOfLabel(m.programString, typographyConstants.ids.bodyMedium_Strong)
+  setTypographyOfLabel(m.timeString, typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(m.programString, typographyConstants.ids.bodyMediumStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")

@@ -6,8 +6,8 @@ Function init()
   m.top.observeFieldScoped("itemContent", "onItemContentChange")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.buttonText, typographyConstants.ids.bodyMedium_strong)
-  setTypographyOfLabel(m.buttonTextFocused, typographyConstants.ids.bodyMedium_strong)
+  setTypographyOfLabel(m.buttonText, typographyConstants.ids.bodyMediumStrong)
+  setTypographyOfLabel(m.buttonTextFocused, typographyConstants.ids.bodyMediumStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")

@@ -21,7 +21,7 @@ Function init()
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.header, typographyConstants.ids.headerSmall)
-  setTypographyOfLabel(m.subheader, typographyConstants.ids.bodySmall_Strong)
+  setTypographyOfLabel(m.subheader, typographyConstants.ids.bodySmallStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")

@@ -8,7 +8,7 @@ Function init()
   m.clockTimer.observeFieldScoped("fire", "onTimerFire")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.time, typographyConstants.ids.bodyExtraSmall_Strong)
+  setTypographyOfLabel(m.time, typographyConstants.ids.bodyExtraSmallStrong)
 End Function
 
 
