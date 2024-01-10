@@ -855,6 +855,25 @@ class TestUtils {
         await this.selectMenuItem(elementId, 'Episodes list', timeout);
         await this.waitForElementToBeInFocusChain('episodesScreen');
         break;
+      case 'signUp':
+        const observerPromise = odc.onFieldChangeOnce({
+          base: 'global',
+          'keyPath': 'trackingLoggingTask.trackEvent',
+          'match': {
+            base: 'global',
+            keyPath: 'trackingLoggingTask.trackEvent.values.dialog_sub_type',
+            value: 'email-prefill'
+          }
+        });
+
+        await this.selectMenuItem(elementId, 'Sign Up to Save Progress', timeout);
+
+        // Currently no way to verify the RFI prompt actually opens up since Roku doesn't expose that ability so the closest we can do is verify that the analytics call was made
+        const {value} = await observerPromise;
+        expect(value.type).to.equal('dialog');
+        expect(value.values.dialog_type).to.equal('REGISTRATION');
+        expect(value.values.dialog_action).to.equal('SHOW');
+        break;
       }
   }
 
@@ -1918,7 +1937,7 @@ type KeyPathElement = {
 };
 
 
-type DetailPageMenuItemType = 'play' | 'playFromBeginning' | 'resume' | 'addToMyList' | 'removeFromMyList' | 'removeFromHistory' | 'episodesList';
+type DetailPageMenuItemType = 'play' | 'playFromBeginning' | 'resume' | 'addToMyList' | 'removeFromMyList' | 'removeFromHistory' | 'episodesList' | 'signUp';
 
 
 type UserInfoResponse = {
