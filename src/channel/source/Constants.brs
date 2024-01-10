@@ -502,7 +502,7 @@ Function getConstants()
       constants.urls.tensor.cdn = {}
         constants.urls.tensor.cdn.urlBase = "https://tensor-cdn.production-public.tubi.io/api"
         if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-          constants.urls.tensor.cdn.urlBase = "tensor-cdn.staging-public.tubi.io/api"
+          constants.urls.tensor.cdn.urlBase = "https://tensor-cdn.staging-public.tubi.io/api"
         end if
         constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v3/homescreen"
         constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v3/containers"
