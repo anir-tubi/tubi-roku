@@ -5,6 +5,7 @@ import { expect } from 'chai';
 const elements = {
 	settingsScreen: async () =>
 		await testUtils.getNodeForElement(SETTINGS_NODES.SETTINGS_SCREEN),
+	kidsLogo: async () => await testUtils.getNodeForElement('kidsLogoHomeScreen'),
 };
 export const settingsTabs = {
 	parentalControls: {
@@ -27,12 +28,20 @@ const Settings = () => {
 		expect(settingsScreen.visible).to.equal(true);
 	}
 
+	async function checkIfKidsLogoPresent() {
+		await testUtils.retryWithTimeOut(async () => {
+			const kidsLogo = await elements.kidsLogo();
+			expect(kidsLogo.visible).to.equal(true);
+		});
+	}
+
 	const ui = {
 		row: 1,
 	};
 
 	return {
 		pageDidLoad,
+		checkIfKidsLogoPresent,
 		...SideNav(),
 	};
 };

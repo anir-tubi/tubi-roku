@@ -65,6 +65,16 @@ const PlayBack = ({ content }) => {
 		return Math.floor(elTime);
 	}
 
+	async function getCurrentPlaybackTimeInSeconds() {
+		let runTime;
+		await testUtils.retryWithTimeOut(async () => {
+			runTime = await elements.playerPlaingTime();
+			expect(runTime.visible).to.equal(true);
+		});
+		const elTime = getTimeInSeconds(runTime.text);
+		return elTime;
+	}
+
 	const getTimeInMinutes = (time) => {
 		const [h, m, s] = time.split(':');
 		return parseInt(h) * 60 + parseInt(m) + parseInt(s) / 60;
@@ -134,6 +144,26 @@ const PlayBack = ({ content }) => {
 		await ecp.sendKeypress(ecp.Key.Ok);
 	}
 
+	async function thirtySkipForward() {
+		await ecp.sendKeypress(ecp.Key.Down);
+		await testUtils.retryWithTimeOut(async () => {
+			const playPauseButton = await elements.playPauseButton();
+			expect(playPauseButton.visible).to.equal(true);
+		});
+		await utils.sleep(300);
+		await ecp.sendKeypress(ecp.Key.Right);
+		await ecp.sendKeypress(ecp.Key.Ok);
+		await utils.sleep(300);
+	}
+
+	async function thirtySkipBack() {
+		await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
+		await allowPlaybackToPlayForSeconds(300);
+		await ecp.sendKeypress(ecp.Key.Left);
+		await allowPlaybackToPlayForSeconds(300);
+		await ecp.sendKeypress(ecp.Key.Ok);
+		await allowPlaybackToPlayForSeconds(3500);
+	}
 	async function fastForwardNoWaitTime({ howFast = 1 } = {}) {
 		await ecp.sendKeypress(ecp.Key.Down, { count: 1 });
 		await testUtils.retryWithTimeOut(async () => {
@@ -154,8 +184,7 @@ const PlayBack = ({ content }) => {
 			const playPauseButton = await elements.playPauseButton();
 			expect(playPauseButton.visible).to.equal(true);
 		});
-		await ecp.sendKeypress(ecp.Key.Left);
-		await ecp.sendKeypress(ecp.Key.Left);
+		await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
 		await ecp.sendKeypress(ecp.Key.Ok, { count: howFast });
 		await allowPlaybackToPlayForSeconds(howLong);
 		await ecp.sendKeypress(ecp.Key.Play);
@@ -285,16 +314,14 @@ const PlayBack = ({ content }) => {
 			const subtitles = await elements.subtitles();
 			expect(subtitles.visible).to.equal(true);
 		});
-		await ecp.sendKeypress(ecp.Key.Down);
-		await ecp.sendKeypress(ecp.Key.Down);
+		await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
 		await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
 		await ecp.sendKeypress(ecp.Key.Ok);
 	}
 
 	async function selectSubtitlesOff() {
 		await selectSubtitles();
-		await ecp.sendKeypress(ecp.Key.Up);
-		await ecp.sendKeypress(ecp.Key.Up);
+		await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
 		await ecp.sendKeypress(ecp.Key.Ok);
 	}
 
@@ -357,6 +384,10 @@ const PlayBack = ({ content }) => {
 		selectSubtitlesOn,
 		getIdOfCurrentTitle,
 		seekToTheEndAndDismissAutoplay,
+		thirtySkipForward,
+		thirtySkipBack,
+		getCurrentPlaybackTimeInSeconds,
+		fastForwardNoWaitTime,
 	};
 };
 

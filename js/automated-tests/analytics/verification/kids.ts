@@ -80,3 +80,14 @@ ${JSON.stringify(dialogEvent)} \n`
 ${JSON.stringify(dialogEvent)} \n`
 	);
 }
+
+export async function verifyC130122andC130124andC130123() {
+	const fullEvents = await fullAnalyticEventOnSteps([12, 13, 14, 15, 16]);
+	fullEvents.forEach((event) => {
+		expect(event.app.app_mode).equal(
+			'KIDS_MODE',
+			`fullEventOne.app.app_mode==='KIDS_MODE', Event: \n
+			${JSON.stringify(event)} \n`
+		);
+	});
+}

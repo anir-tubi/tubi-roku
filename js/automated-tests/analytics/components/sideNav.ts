@@ -2,6 +2,7 @@ import Home from '../pages/homePage';
 import Settings from '../pages/settingsPage';
 import Categories from '../pages/categories';
 import ChannelsPage from '../pages/channelsPage';
+import SearchPage from '../pages/searchPage';
 import { moveToRow } from '../utils/helpers';
 import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../../test-utils';
@@ -19,6 +20,7 @@ export const tabs = {
 		row: 2,
 	},
 	search: {
+		page: () => SearchPage(),
 		row: 3,
 	},
 	home: {

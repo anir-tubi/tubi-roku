@@ -52,7 +52,11 @@ const TitleDetailsPage = (titleDetails) => {
 			const detailsPageMenu = await elements.detailsPageMenu();
 			expect(detailsPageMenu).to.exist;
 		});
-		expect(detailScreenTitle.text).to.equal(titleDetails.title);
+		if (titleDetails.title !== undefined) {
+			expect(detailScreenTitle.text).to.equal(titleDetails.title);
+		} else {
+			expect(detailScreenTitle.text).to.equal(titleDetails);
+		}
 		detailScreenTitle = await elements.detailsScreen();
 		if (detailScreenTitle != undefined) {
 			titleDetails = detailScreenTitle;

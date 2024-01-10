@@ -1,5 +1,7 @@
 import { testUtils } from '../../test-utils';
 import { expect } from 'chai';
+import { ecp } from 'roku-test-automation';
+import Container from './container';
 
 const Categories = () => {
 	const elements = {
@@ -14,7 +16,15 @@ const Categories = () => {
 		});
 	}
 
+	async function selectFocusedCategory() {
+		await ecp.sendKeypress(ecp.Key.Ok);
+		const container = Container();
+		await container.pageDidLoad();
+		return container;
+	}
+
 	return {
+		selectFocusedCategory,
 		pageDidLoad,
 	};
 };

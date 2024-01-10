@@ -205,6 +205,13 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		return content;
 	}
 
+	async function fetchKidsContent() {
+		const content = await testUtils.getCurrentlyFocusedGridItemContent(
+			NODES.HOME_SCREEN_ROW_LIST
+		);
+		return content;
+	}
+
 	async function fetchEspanolContent() {
 		const content = await testUtils.getCurrentlyFocusedGridItemContent(
 			NODES.ESPANOL_SCREEN_ROW_LIST
@@ -212,11 +219,13 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		return content;
 	}
 
-	async function playTitle(espanol = false) {
+	async function playTitle(espanol = false, kids = false) {
 		await ecp.sendKeypress(ecp.Key.Play);
 		let content;
 		if (espanol) {
 			content = await fetchEspanolContent();
+		} else if (kids) {
+			content = await fetchKidsContent();
 		} else {
 			content = await fetchContent();
 		}
@@ -229,6 +238,15 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		const movieScreenRowList = await elements.movieScreenRowList();
 		expect(movieScreenRowList.visible).to.equal(true);
 		return await playTitle();
+	}
+
+	async function playKidsTitle() {
+		await testUtils.retryWithTimeOut(async () => {
+			const kidsLogo = await elements.homeScreenKidsLogo();
+			expect(kidsLogo.visible).to.equal(true);
+		});
+		await utils.sleep(2000);
+		return await playTitle(false, true);
 	}
 
 	async function playEspanolTitle() {
@@ -272,6 +290,7 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		pageDidLoad,
 		selectFocusedTitleKidsMode,
 		getPopupMessage,
+		playKidsTitle,
 		...SideNav(),
 	};
 };
