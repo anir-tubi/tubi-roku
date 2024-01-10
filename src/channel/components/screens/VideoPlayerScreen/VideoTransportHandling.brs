@@ -483,11 +483,7 @@ End Function
 Function handleOk()
   if m.HUD.opacity = 0 AND m.skipCuepointsButton.hasFocus() = false
     showTransport()
-
-    if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v2", false).enabled = true
-      showYMAL()
-    end if
-
+    showYMAL()
   else
     'do action based on the current focused button
     focusButtonId = m.TransportButtons.getChild(m.focusedButtonIndex).id
