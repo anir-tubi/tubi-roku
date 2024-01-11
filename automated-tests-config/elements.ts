@@ -634,9 +634,15 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#nav.#ScreenNavigationHint.#callToAction',
   },
 
-  /** Call to action button on Categories page */
-  categoriesCallToAction: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#nav.#ScreenNavigationHint.#callToAction',
+  /** Categories page grid */
+  categoriesDetailsGrid: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#ChannelsVideoGrid',
+  },
+
+  /** Channels page grid */
+  channelsDetailsGrid: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#ChannelsVideoGrid'
+
   },
 
   /** Linear Search Results Description */

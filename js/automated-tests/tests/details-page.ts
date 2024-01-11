@@ -398,7 +398,7 @@ describe('Details Page', function () {
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/https://tubi.testrail.io/index.php?/cases/view/537368
     it('C537368 - Movie Details - No History present - Guest - Resume Playback from beginning @guest_user,@smoke,@mdp_1', async () => {
       // Start Application at Movies page with Guest user
-      await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+      await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: false });
 
       // Select a title
       await ecp.sendKeypress(ecp.Key.Ok);
@@ -502,8 +502,8 @@ describe('Details Page', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537454
-    it('C537454 - Series - When series details page is opened then background poster should be displayed, @registered_user,@sdp_2,@smoke', async () => {
+    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537453
+    it('C537453 - Series - When series details page is opened then background poster should be displayed, @registered_user,@sdp_2,@smoke', async () => {
 
       // Verify we are on the details page
       let detailScreenTitle;
@@ -546,9 +546,7 @@ describe('Details Page', function () {
 
       await ecp.sendKeypress(ecp.Key.Down);
       await ecp.sendKeypress(ecp.Key.Ok);
-      await utils.sleep(2000); // Improvement - try to work around sleeps
-
-
+      await utils.sleep(2500); // Improvement - try to work around sleeps
 
       // Check we are on the My Stuff page
       const myStuffCallToAction = await testUtils.getNodeForElement('myStuffCallToAction');
@@ -639,10 +637,6 @@ describe('Details Page', function () {
 
 
     });
-
-
-
-
 
 
   }); //Close describe Series Details page

@@ -66,6 +66,7 @@ describe('Video Preview', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify we are on the details page
+    await utils.sleep(1000); // Improve
     const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
     expect(detailScreenTitle.text).to.not.be.empty;
 

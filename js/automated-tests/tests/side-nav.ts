@@ -436,7 +436,7 @@ describe('Side Navigation', function () {
     });
 
     //https://tubi.testrail.io/index.php?/cases/view/538338
-    it('C538338- From Titles Detail Page > Categories Detail Page > Categories > Exit App @sidenav', async () => {
+    it('C538338 - From Titles Detail Page > Categories Detail Page > Categories > Exit App @sidenav', async () => {
 
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -459,8 +459,8 @@ describe('Side Navigation', function () {
 
       // Verify Category Details page
       await testUtils.retryWithTimeOut(async () => {
-          const recommendedScreenCallToAction = await testUtils.getNodeForElement('recommendedScreenCallToAction');
-          expect(recommendedScreenCallToAction.visible).to.be.true;
+          const categoriesDetailsGrid = await testUtils.getNodeForElement('categoriesDetailsGrid');
+          expect(categoriesDetailsGrid.visible).to.be.true;
       });
 
       // Select title
@@ -556,7 +556,7 @@ describe('Side Navigation', function () {
 
 
     // https://tubi.testrail.io/index.php?/cases/view/538343
-    it('C538343- From Titles Detail Page > Channel Detail Page > Channel > Side Nav > Exit App, @leftnav', async () => {
+    it('C538343 - From Titles Detail Page > Channel Detail Page > Channel > Side Nav > Exit App, @sidenav', async () => {
 
         await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
         await testUtils.waitForAppLaunchBeaconToFire();
@@ -584,8 +584,8 @@ describe('Side Navigation', function () {
 
         // Verify Channels Details page
         await testUtils.retryWithTimeOut(async () => {
-            const recommendedScreenCallToAction = await testUtils.getNodeForElement('recommendedScreenCallToAction');
-            expect(recommendedScreenCallToAction.visible).to.be.true;
+            const channelsDetailsGrid = await testUtils.getNodeForElement('channelsDetailsGrid');
+            expect(channelsDetailsGrid.visible).to.be.true;
         });
 
         // Select title

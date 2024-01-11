@@ -27,7 +27,6 @@ describe('Multiple Audio', function () {
     await testUtils.expectPlayerStateToEventuallyEqual('play');
 
     // Closed Caption audio button present?
-
     const closedCaptionAudioButton = await testUtils.getNodeForElement('closedCaptionAudioButton');
     expect(closedCaptionAudioButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-subtitles-enabled.webp');
 
@@ -54,6 +53,7 @@ describe('Multiple Audio', function () {
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Closed Caption audio button present?
+    await utils.sleep(800);
     const closedCaptionAudioButton = await testUtils.getNodeForElement('closedCaptionAudioButton');
     expect(closedCaptionAudioButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-subtitles-enabled.webp');
 

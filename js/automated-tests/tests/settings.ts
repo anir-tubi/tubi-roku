@@ -4,15 +4,16 @@ import { testUtils } from '../test-utils';
 import { shared } from '../shared';
 
 describe('Settings', function () {
-  before(async () => {
+  beforeEach(async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToHaveFocus('homeRowList','Timed out waiting for Rowlist to have focus');
 
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/21250
   it('C21250 - About Page - When user chooses the About Page then About page is open, @settings', async () => {
 
-    await testUtils.waitForAppLaunchBeaconToFire();
+    //await testUtils.waitForAppLaunchBeaconToFire();
 
     // Go to Settings Page
     await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
@@ -75,8 +76,7 @@ describe('Settings', function () {
 
   // https://tubi.testrail.io/index.php?/cases/view/32370
   it('C32370 - About Page - When user chooses the About Page and presses OK then Full Device ID is displayed, @settings', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+   
 
     // Go to Settings Page
     await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
@@ -88,6 +88,7 @@ describe('Settings', function () {
     // Down to Settings
     await ecp.sendKeypress(ecp.Key.Down, { count: 5 });
     await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(800);
 
     // Select About
     await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
@@ -107,8 +108,7 @@ describe('Settings', function () {
 
   // https://tubi.testrail.io/index.php?/cases/view/32371
   it('C32371 - About Page - When user chooses the About Page and checks Need Help label then Need Help should be present, @settings', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+    
 
     // Go to Settings Page
     await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
@@ -120,6 +120,7 @@ describe('Settings', function () {
     // Down to Settings
     await ecp.sendKeypress(ecp.Key.Down, { count: 5 });
     await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(800);
 
     // Select About
     await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
@@ -133,8 +134,7 @@ describe('Settings', function () {
 
   // https://tubi.testrail.io/index.php?/cases/view/32372
   it('C32372- Privacy Policy Page - When user chooses the Privacy Policy Page then Privacy Policy page should be displayed, @settings', async () => {
-    await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+
 
     // Go to Settings Page
     await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
