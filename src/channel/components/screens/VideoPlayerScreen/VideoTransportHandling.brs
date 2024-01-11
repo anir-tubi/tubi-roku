@@ -126,7 +126,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           setFocusToComponent(m.ProgressBar)
         else if isFocusOnPlayerControl() = true AND m.TopOverlay.opacity = 1
 
-          if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v2", false).enabled = true AND m.top.relatedContent <> invalid
+          if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v3", false).enabled = true AND m.top.relatedContent <> invalid
             setFocusToComponent(m.Related)
             animateTransportAndYMAL("in")
           else
@@ -313,7 +313,7 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
     showYMAL()
   end if
 
-  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v2", false).enabled = true AND m.focusedNode.isSameNode(m.Related) = true
+  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v3", false).enabled = true AND m.focusedNode.isSameNode(m.Related) = true
     animateTransportAndYMAL("out")
     setFocusToPlaybackControl()
   end if
@@ -1627,7 +1627,7 @@ End Function
 ' show YMAL row on bottom of the screen and fire exposure event
 Function showYMAL()
   'fire exposure event when YMAL row is displayed at bottom area of the screen
-  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v2").enabled = true AND m.top.relatedContent <> invalid
+  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v3").enabled = true AND m.top.relatedContent <> invalid
     m.Related.show = true
   end if
 End Function
@@ -1642,7 +1642,7 @@ End Function
 '   - show skip cue point button if applicable
 Function hideYMAL()
 
-  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v2", false).enabled = true
+  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v3", false).enabled = true
     fade(m.VideoYMALOverlay, "out", 0.4)
     m.Related.hide = true
 

@@ -304,7 +304,7 @@ Function init()
   ' Now that we are using async stop we need to wait until we get stopped state on the Video node before starting the ad. This variable helps track if we have requested a stop and are waiting for it to complete.
   m.isShowAdBreakPendingStop = false
 
-  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v2", false).enabled = true
+  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v3", false).enabled = true
     m.skipCuepointsButtonUpTranslation = 681
     m.skipCuepointsButtonDownTranslation = 780
     m.thumbnailMaxYOffset = 825
