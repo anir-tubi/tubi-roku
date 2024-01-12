@@ -1088,6 +1088,14 @@
     "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
     "message": "AD Break starts in {seconds} s"
   },
+  "videoPlayer_toast_message": {
+    "description": "Message to be displayed on Toast-message when user signed in.",
+    "message": "You are now successfully signed in"
+  },
+  "videoPlayer_toast_heading": {
+    "description": "Header text to be displayed on Toast-message when user signed in.",
+    "message": "Welcome to Tubi, {userName}"
+  },
   "linearVideoPlayer_buttonBack": {
     "description": "Label of a Button to go back",
     "message": "Back"
@@ -1657,6 +1665,18 @@
   "roku_cw_consent_screen_sub_heading": {
     "description": "Roku Continue Watching screen sub heading.",
     "message": "Make it easier to jump back into what you were watching and get better recommendations on what to stream next.\n\nSelect “Accept Now” to give Tubi permission to share your video watch history with Roku.\n\nYou can change this any time in Settings."
+  },
+  "player_exit_prompt_signup_heading": {
+    "description": "Video Player exit prompt signup header",
+    "message": "Wait, don’t lose your progress!"
+  },
+  "player_exit_prompt_signup_sub_heading": {
+    "description": "Video Player exit prompt signup sub header",
+    "message": "Sign up to save your progress to pick up where you left off. No credit card required."
+  },
+  "player_exit_prompt_signup_later_button": {
+    "description": "Video Player exit prompt signup later",
+    "message": "Sign Up Later"
   },
   "trending_search_results_hint": {
     "description": "Trending Search Results hint which will be displayed in the search screen when we do not have enough search results.",

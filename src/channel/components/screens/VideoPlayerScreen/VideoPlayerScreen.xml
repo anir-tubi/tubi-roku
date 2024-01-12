@@ -123,10 +123,15 @@
       <!-- boolean field which can be set to true for showing the YMAL in full screen and set focus to YMAL -->
       <field id="showYMALInFullScreen" type="boolean" alwaysNotify="true"/>
 
+      <!-- boolean field which can be set to true for signed in user. -->
+      <field id="isUserLoggedIn" type="boolean"/>
+
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->
       <field id="backButtonPressed" type="boolean" value="false" alwaysNotify="true" />
       <field id="upButtonPressed" type="boolean" value="false" alwaysNotify="true" />
+
+      <field id="showSignUpModal" type="boolean" alwaysNotify="true" />
 
       <!-- Set to true if the skip trailer button was pressed -->
       <field id="skipTrailer" type="boolean" value="false" alwaysNotify="true" />
@@ -203,6 +208,9 @@
       <!-- pixelUrl to fire during pause ad -->
       <field id="sendPauseAdPixel" type="string" alwaysNotify="true"/>
       <field id="audioTrackSettings" type="assocarray" value="{}" alias="closedCaptionAndAudioSelectionOverlay.audioTrackSettings" />
+
+      <!-- set to true when the user selects signUpSaveProgress button in the player -->
+      <field id="signUpSaveProgressButtonSelected" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>
@@ -464,6 +472,11 @@
             visible="false" />
         </Group>
       </Group>  <!-- Transport -->
+
+      <ButtonWithIconAndLabel
+        id="signUpSaveProgressButton"
+        visible="false"/>
+
     </Group>  <!-- HUD -->
 
     <Group

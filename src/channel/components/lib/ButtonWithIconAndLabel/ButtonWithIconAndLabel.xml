@@ -5,6 +5,8 @@
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -13,6 +15,7 @@
 
     <!-- OUTPUTS -->
     <field id="calculatedWidth" type="integer"/>
+    <field id="buttonSelected" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>
@@ -43,6 +46,11 @@
           role="font"/>
       </Label>
     </LayoutGroup>
+
+    <TextIcon
+      id="badgeLabel"
+      uri="pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
+      visible="false" />
 
   </children>
 </component>

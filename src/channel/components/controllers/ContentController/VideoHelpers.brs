@@ -107,6 +107,10 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     initVideoTracking(videoPlayer) 'initializeYoubora
     setInScreenCache(videoPlayer)
 
+    if getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_v1", false).enabled = true
+      videoPlayer.observeFieldScoped("signUpSaveProgressButtonSelected", "onSignUpSaveProgressButtonSelected")
+    end if
+
     if getExperimentResource("roku_screensaver", "roku_screensaver_v2", false).enabled = true then
       videoPlayer.disableScreensaver = true
     end if
@@ -118,6 +122,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     videoPlayer.preferredAudioTrack = m.pub_serverPersistentData.audioTrack
   end if
 
+  videoPlayer.isUserLoggedIn = isLoggedInUser()
   videoPlayer.relatedContent = invalid
 
   stopVideoPreviewIfPlaying() 'stop videopreview just in case it is playing
@@ -220,6 +225,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     ' set general observers for all content (including trailers)
     videoPlayer.observeFieldScoped("state", "onVideoPlayerState")
     videoPlayer.observeFieldScoped("backButtonPressed", "onVideoPlayerBackPressed")
+    videoPlayer.observeFieldScoped("showSignUpModal", "onShowSignUpModal")
     videoPlayer.observeFieldScoped("sendVideoTrackingStart", "onVideoTrackingStart")
 
     if (content.creditCuePoints <> invalid AND content.creditCuePoints.postlude <> invalid AND position >= content.creditCuePoints.postlude)
@@ -628,6 +634,46 @@ Function onVideoPlayerBackPressed()
 End Function
 
 
+Function onShowSignUpModal()
+  tubiLog("VideoHelpers.onShowSignUpModal")
+  showSignUpModal()
+End Function
+
+
+Function showSignUpModal()
+  heading = getTranslation("player_exit_prompt_signup_heading")
+  message = getTranslation("player_exit_prompt_signup_sub_heading")
+  signUpToSaveProgressButton = getTranslation("metadata_continueWatching_notSignedIn_container_button")
+  signUpLaterButton = getTranslation("player_exit_prompt_signup_later_button")
+
+  buttons = [signUpToSaveProgressButton, signUpLaterButton]
+  currentScreen = getCurrentScreen()
+
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "INFORMATION"
+      pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: "sign_up_to_save"
+    }
+  }
+  simpleModalInfo = getSimpleModalInfo(heading, message, buttons, dialogEvent, m.trackingLoggingTask, onSignUpToSaveProgressInPlayerExitModalSelected, onSignUpLaterInPlayerExitModalSelected)
+  showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
+End Function
+
+
+Function onSignUpToSaveProgressInPlayerExitModalSelected()
+  m.signUpToSaveProgressCancelledCallback = returnToDetailScreenFromVideo
+  startSignIn(onRegistrationProcessCompletedOnPlayerBackPress)
+End Function
+
+
+Function onSignUpLaterInPlayerExitModalSelected()
+  returnToDetailScreenFromVideo()
+End Function
+
+
 ' Stop the video player and refresh detail screen with the relevant content
 ' @sendAnalyticsEvent: boolean, based on this parameter the pageload/navigate event will be fired during popScreen
 ' @shouldUpdateEpisodeScreenContent: boolean, based on this parameter we will decide if we need to refresh the episode list screen or not.
@@ -822,6 +868,7 @@ Function stopVideoContent(videoPlayer)
     videoTrackingStop() 'stops youbora tracking
 
     videoPlayer.unobserveFieldScoped("backButtonPressed")
+    videoPlayer.unobserveFieldScoped("showSignUpModal")
     videoPlayer.unobserveFieldScoped("state")
     videoPlayer.unobserveFieldScoped("adTrackingObject")
     videoPlayer.unobserveFieldScoped("skipTrailer")
@@ -1440,4 +1487,26 @@ Function onRokuContinueWatchingConsentDialogAcceptSelected()
   body = {}
   body[m.constants.consentKeys.continueWatching] = "opted_in"
   setConsent(body)
+End Function
+
+
+Function onSignUpSaveProgressButtonSelected(msg)
+  tubiLog("VideoHelpers.onSignUpSaveProgressButtonSelected")
+
+  videoPlayer = msg.getRoSGNode()
+  if videoPlayer <> invalid
+    videoPlayerComponentInfo = videoPlayer.trackingComponentInfo
+
+    pageOneof = m.Tracking.getAnalyticsPage(videoPlayer.trackingPageInfo.pageType, videoPlayer.trackingPageInfo.pageValues)
+    componentOneof = m.Tracking.getAnalyticsComponent(videoPlayerComponentInfo.componentType, videoPlayerComponentInfo.componentValues)
+
+    componentInteractionInfo = {
+      pageOneof: pageOneof
+      componentOneof: componentOneof
+      user_interaction: "CONFIRM"
+    }
+    sendComponentInteractionInfo(componentInteractionInfo)
+
+    startSignIn(afterSignUpProcessCompletedFromPlayer)
+  end if
 End Function
