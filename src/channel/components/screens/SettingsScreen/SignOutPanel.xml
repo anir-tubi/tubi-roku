@@ -23,9 +23,7 @@
         height="73"
         vertAlign="bottom">
         <Font
-         role="font"
-         uri="pkg:/fonts/Vaud-SemiBold.ttf"
-         size="43" />
+         role="font"/>
       </Label>
 
       <LayoutGroup
@@ -36,9 +34,7 @@
           height="38"
           vertAlign="bottom">
           <Font
-           role="font"
-           uri="pkg:/fonts/Vaud-SemiBold.ttf"
-           size="38" />
+           role="font"/>
         </Label>
 
         <Label 
@@ -46,9 +42,7 @@
           height="27"
           vertAlign="bottom">
           <Font
-           role="font"
-           uri="pkg:/fonts/Vaud-SemiBold.ttf"
-           size="27" />
+           role="font"/>
         </Label>
       </LayoutGroup>
     </Group>

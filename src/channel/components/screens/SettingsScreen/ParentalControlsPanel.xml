@@ -37,9 +37,7 @@
         vertAlign="bottom"
         translation="[25,0]">
         <Font
-         role="font"
-         uri="pkg:/fonts/Vaud-SemiBold.ttf"
-         size="43" />
+         role="font"/>
       </Label>
 
       <Label
@@ -49,9 +47,7 @@
         vertAlign="bottom"
         translation="[25,143]">
         <Font
-         role="font"
-         uri="pkg:/fonts/Vaud-SemiBold.ttf"
-         size="27" />
+         role="font"/>
       </Label>
 
       <MarkupList

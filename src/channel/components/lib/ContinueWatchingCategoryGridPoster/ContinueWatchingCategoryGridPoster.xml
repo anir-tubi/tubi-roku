@@ -21,9 +21,7 @@
         height="36"
         vertAlign="center">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="27" />
+          role="font"/>
         </Label>
       <Group
         id="ButtonGroup">

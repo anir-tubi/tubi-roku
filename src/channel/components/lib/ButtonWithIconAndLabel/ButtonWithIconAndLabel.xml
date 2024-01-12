@@ -40,9 +40,7 @@
         height="72"
         vertAlign="center">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="24" />
+          role="font"/>
       </Label>
     </LayoutGroup>
 

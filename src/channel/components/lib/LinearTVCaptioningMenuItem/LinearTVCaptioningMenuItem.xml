@@ -38,9 +38,7 @@
      width="135"
      height="72">
       <Font
-       role="font"
-       uri="pkg:/fonts/Vaud-SemiBold.ttf"
-       size="22" />
+       role="font"/>
     </Label>
 
     <Poster

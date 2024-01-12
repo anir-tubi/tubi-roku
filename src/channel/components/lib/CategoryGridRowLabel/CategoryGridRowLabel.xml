@@ -39,9 +39,7 @@
       opacity="1.0">
       <Font
         role="font"
-        id="CategoryNameFont"
-        uri="pkg:/fonts/Vaud-Bold.ttf"
-        size="36" />
+        id="CategoryNameFont"/>
     </Label>
     <!--subText will be appended to the row label-->
     <Label
@@ -52,9 +50,7 @@
       visible="false">
       <Font
         role="font"
-        id="subTextFont"
-        uri="pkg:/fonts/Vaud-Medium.ttf"
-        size="24" />
+        id="subTextFont"/>
     </Label>
 
     <LayoutGroup
@@ -74,9 +70,7 @@
         opacity=".64">
         <Font
           id="SponsoredByTextFont"
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="24" />
+          role="font"/>
       </Label>
       <Poster
         id="SponsoredByPoster"
@@ -93,9 +87,7 @@
         height="30"
         horizAlign="right">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="27" />
+          role="font"/>
       </Label>
       <Label
         id="ItemCount"
@@ -103,9 +95,7 @@
         height="30"
         horizAlign="right">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="27" />
+          role="font"/>
       </Label>
     </LayoutGroup>
 

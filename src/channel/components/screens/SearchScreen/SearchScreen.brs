@@ -29,7 +29,6 @@ Function init()
   m.searchScreenInfoPanel = m.top.findNode("SearchScreenInfoPanel")
 
   m.voiceHintfont = CreateObject("roSGNode", "Font")
-  m.voiceHintfont.uri = "pkg:/fonts/Vaud-SemiBold.ttf"
 
   m.searchMenuText = m.top.findNode("searchMenuText")
   m.searchHintText = m.top.findNode("searchHintText")

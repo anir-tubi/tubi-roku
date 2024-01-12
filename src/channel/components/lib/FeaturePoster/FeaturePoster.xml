@@ -42,9 +42,7 @@
       vertAlign="top"
       translation="[0,237]">
       <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-Medium.ttf"
-        size="27" />
+        role="font"/>
     </Label>
   </children>
 

@@ -35,9 +35,7 @@
         numLines="2"
         width="1250">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="72" />
+          role="font"/>
       </Label>
 
       <Label
@@ -45,9 +43,7 @@
         horizAlign="left"
         width="900">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="36" />
+          role="font"/>
       </Label>
 
       <LayoutGroup
@@ -73,9 +69,7 @@
             horizAlign="left"
             width="700">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="24" />
+              role="font"/>
           </Label>
 
           <Label
@@ -83,9 +77,7 @@
             horizAlign="left"
             width="700">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="21" />
+              role="font"/>
           </Label>
 
         </LayoutGroup>
@@ -115,9 +107,7 @@
             horizAlign="left"
             width="700">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="24" />
+              role="font"/>
           </Label>
 
           <Label
@@ -125,9 +115,7 @@
             horizAlign="left"
             width="700">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="21" />
+              role="font"/>
           </Label>
 
         </LayoutGroup>
@@ -157,9 +145,7 @@
             horizAlign="left"
             width="700">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="24" />
+              role="font"/>
           </Label>
 
           <Label
@@ -167,9 +153,7 @@
             horizAlign="left"
             width="700">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="21" />
+              role="font"/>
           </Label>
 
         </LayoutGroup>

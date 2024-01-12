@@ -84,7 +84,6 @@ Function onContentChange(data)
               m.sideIconLabel.fontColor = theme.backgroundColor
             end if
 
-            m.sideIconLabel.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
             m.sideIconLabel.padding = [12, 9]
             m.sideIconLabel.text = item.shortDescriptionLine2
             m.sideIconLabel.uri = "pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"

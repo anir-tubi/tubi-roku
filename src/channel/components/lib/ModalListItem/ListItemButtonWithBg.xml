@@ -39,9 +39,7 @@
         height="78">
         <Font
           id="labelFont"
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="24" />
+          role="font"/>
       </Label>
       <Label
         id="labelFocused"
@@ -51,9 +49,7 @@
         height="78">
         <Font
           id="labelFocusedFont"
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="24" />
+          role="font"/>
       </Label>
     </Group>
   </children>

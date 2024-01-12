@@ -25,9 +25,7 @@
       width="150">
       <Font
           id="Font"
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="20" />
+          role="font"/>
     </Label>
     <Label
       id="TopLabel"
@@ -35,7 +33,6 @@
       width="150">
       <Font
           role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
           size="20" />
     </Label>
     <Rectangle

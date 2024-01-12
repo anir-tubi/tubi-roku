@@ -17,8 +17,6 @@ Function init()
   m.DetailsMenuTextFocused.opacity = 0
   m.IconFocused.opacity = 0
   m.badgeLabel = m.top.findNode("badgeLabel")
-  m.badgeLabel.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
-  m.badgeLabel.fontSize = 18
   m.badgeLabel.padding = [12, 9]
 
   typographyConstants = getTypographyConstants()

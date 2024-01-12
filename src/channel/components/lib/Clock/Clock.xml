@@ -32,9 +32,7 @@
       translation="[0,2]"
       color="0x000000FF">
       <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-Bold.ttf"
-        size="18"/>
+        role="font"/>
     </Label>
 
     <Timer

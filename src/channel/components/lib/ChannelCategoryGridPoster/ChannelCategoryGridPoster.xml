@@ -41,9 +41,7 @@
       horizAlign="center"
       visible="false">
       <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="34" />
+        role="font"/>
     </Label>
     <LayoutGroup
       id="SponsoredBy"
@@ -57,9 +55,7 @@
         width="0"
         height="18">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="18" />
+          role="font"/>
       </Label>
       <Poster
         id="SponsoredByPoster"

@@ -156,9 +156,7 @@
         ellipsizeOnBoundary="true">
         <Font
           id="backToLiveTextFont"
-          role="font"
-          uri="pkg:/fonts/Vaud-medium.ttf"
-          size="20" />
+          role="font"/>
       </Label>
     </LayoutGroup>
 
@@ -175,9 +173,7 @@
       ellipsizeOnBoundary="true">
       <Font
         id="headerTextFont"
-        role="font"
-        uri="pkg:/fonts/Vaud-Bold.ttf"
-        size="36" />
+        role="font"/>
     </Label>
 
     <CommunicatingMarkupGrid

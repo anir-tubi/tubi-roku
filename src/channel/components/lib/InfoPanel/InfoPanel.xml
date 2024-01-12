@@ -153,9 +153,7 @@
         <Label
           id="Episode">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="33" />
+            role="font"/>
         </Label>
 
         <LayoutGroup
@@ -176,18 +174,14 @@
               translation="[0,6]"
               opacity="0.5">
               <Font
-                role="font"
-                uri="pkg:/fonts/Vaud-Medium.ttf"
-                size="27" />
+                role="font" />
             </Label>
             <Label
               id="Line1Bold"
               translation="[0,9]"
               opacity="0.5">
               <Font
-                role="font"
-                uri="pkg:/fonts/Vaud-Bold.ttf"
-                size="27" />
+                role="font"/>
             </Label>
             <Poster
               id="ClosedCaptionPoster"
@@ -219,26 +213,20 @@
                 horizAlign="center"
                 vertAlign="center">
                 <Font
-                  role="font"
-                  uri="pkg:/fonts/Vaud-Bold.ttf"
-                  size="22" />
+                  role="font"/>
               </Label>
             </Group>
             <Label
               id="DescriptorCode"
               translation="[0, 9]">
               <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="22" />
+              role="font"/>
             </Label>
             <Label
               id="ExpireWarning"
               translation="[0, 9]">
               <Font
-                role="font"
-                uri="pkg:/fonts/Vaud-Medium.ttf"
-                size="27" />
+                role="font"/>
             </Label>
             <Poster
               id="PartnerLogo"
@@ -260,9 +248,7 @@
               width="1140"
               ellipsizeOnBoundary="true">
               <Font
-                role="font"
-                uri="pkg:/fonts/Vaud-Medium.ttf"
-                size="27" />
+                role="font"/>
             </Label>
           </LayoutGroup>
         </LayoutGroup>
@@ -286,9 +272,7 @@
             visible="false">
             <Font
               id="DescriptionFont"
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="27" />
+              role="font"/>
           </Label>
         </Group>
 
@@ -311,9 +295,7 @@
             translation="[0,3]">
             <Font
               id="SignInFont"
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="27" />
+              role="font"/>
           </Label>
         </LayoutGroup>
 
@@ -338,9 +320,7 @@
             translation="[0,6]">
             <Font
               id="ReminderFont"
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="27" />
+              role="font"/>
           </Label>
         </LayoutGroup>
 
@@ -359,9 +339,7 @@
               id="DirectorTag"
               opacity="0.5">
               <Font
-                role="font"
-                uri="pkg:/fonts/Vaud-Medium.ttf"
-                size="27" />
+                role="font"/>
             </Label>
             <!-- this layout group pushes the separator rectangle up 2 pixels -->
             <LayoutGroup
@@ -381,9 +359,7 @@
             ellipsizeOnBoundary="true"
             width="710">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="27" />
+              role="font"/>
           </Label>
         </LayoutGroup>
 
@@ -402,9 +378,7 @@
               id="StarringTag"
               opacity="0.5">
               <Font
-                role="font"
-                uri="pkg:/fonts/Vaud-Medium.ttf"
-                size="27" />
+                role="font"/>
             </Label>
             <LayoutGroup
               layoutDirection="vert">
@@ -424,9 +398,7 @@
             ellipsizeOnBoundary="true"
             width="710">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="27" />
+              role="font"/>
           </Label>
         </LayoutGroup>
       </LayoutGroup>
@@ -449,9 +421,7 @@
       <Label
         id="CountdownText">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="27" />
+          role="font"/>
       </Label>
     </LayoutGroup>
   </children>

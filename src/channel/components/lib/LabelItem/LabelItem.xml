@@ -21,9 +21,7 @@
     <Label
       id="label">
       <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="36"/>
+        role="font"/>
     </Label>
 
   </children>

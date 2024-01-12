@@ -74,9 +74,7 @@
               id="closedCaptionSectionHeaderLabel"
               height="48">
               <Font
-                role="font"
-                uri="pkg:/fonts/Vaud-SemiBold.ttf"
-                size="36" />
+                role="font"/>
             </Label>
 
             <CheckBoxList
@@ -94,9 +92,7 @@
               id="audioTracksSectionHeaderLabel"
               height="48">
               <Font
-                role="font"
-                uri="pkg:/fonts/Vaud-SemiBold.ttf"
-                size="36" />
+                role="font"/>
             </Label>
 
             <CheckBoxList

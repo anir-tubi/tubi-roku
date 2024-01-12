@@ -102,9 +102,7 @@
           height="47"
           translation="[0,2]">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="22" />
+            role="font"/>
         </Label>
       </LayoutGroup>
     </Group>
@@ -135,9 +133,7 @@
         horizAlign="center"
         vertAlign="bottom">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="48" />
+          role="font"/>
       </Label>
       <Label
         id="SignedOutUISubtitle"
@@ -146,9 +142,7 @@
         horizAlign="center"
         vertAlign="bottom">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="34" />
+          role="font"/>
       </Label>
       <Label
         id="SignedOutUIBlurb"
@@ -157,9 +151,7 @@
         horizAlign="center"
         vertAlign="bottom">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="34" />
+          role="font"/>
       </Label>
       <MarkupGrid
         id="GuestMenu"
@@ -207,9 +199,7 @@
         horizAlign="center"
         vertAlign="bottom">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="48" />
+          role="font"/>
       </Label>
       <Label
         id="AllEmptyUISubtitle"
@@ -218,9 +208,7 @@
         horizAlign="center"
         vertAlign="bottom">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="34" />
+          role="font"/>
       </Label>
       <Label
         id="AllEmptyUISubtitle2"
@@ -229,9 +217,7 @@
         horizAlign="center"
         vertAlign="bottom">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="34" />
+          role="font"/>
       </Label>
       <MarkupGrid
         id="AllEmptyUIMenu"

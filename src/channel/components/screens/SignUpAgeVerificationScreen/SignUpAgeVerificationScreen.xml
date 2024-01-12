@@ -50,9 +50,7 @@
         width="1668"
         translation="[126,204]">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="72" />
+          role="font"/>
       </Label>
       <Label
         id="AgeVerificationPageSubHeader"
@@ -60,9 +58,7 @@
         width="1668"
         translation="[126,300]">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="33" />
+          role="font"/>
       </Label>
     </Group>
     <Group
@@ -88,9 +84,7 @@
         vertAlign="center"
         opacity="0.4">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="70"/>
+          role="font"/>
       </Label>
 
       <Poster
@@ -107,9 +101,7 @@
           opacity="1.0"
           translation="[0,9]">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Bold.ttf"
-            size="84"/>
+            role="font"/>
         </Label>
       </Poster>
 
@@ -119,9 +111,7 @@
         vertAlign="center"
         opacity="0.4">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="70" />
+          role="font"/>
       </Label>
     </LayoutGroup>
 
@@ -132,9 +122,7 @@
       horizAlign="right"
       visible="false">
       <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-Medium.ttf"
-        size="27" />
+        role="font"/>
     </Label>
     <SimpleLabel
       id="AgeErrorPrompt"
@@ -158,9 +146,7 @@
       width="1710"
       vertAlign="center">
       <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-Medium.ttf"
-        size="25" />
+        role="font"/>
     </Label>
   </children>
 </component>

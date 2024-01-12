@@ -54,9 +54,7 @@
       vertAlign="center">
       <Font
         id="labelFont"
-        role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="33" />
+        role="font"/>
     </Label>
   </children>
 </component>

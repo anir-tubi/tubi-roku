@@ -54,9 +54,7 @@
         horizAlign="center"
         width="1920">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="72" />
+          role="font"/>
       </Label>
 
       <Label
@@ -64,9 +62,7 @@
         horizAlign="center"
         width="1920">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="30"/>
+          role="font"/>
       </Label>
 
       <TextEntryBox
@@ -84,9 +80,7 @@
         id="passwordValidationMsg"
         width="600">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="27" />
+          role="font"/>
       </Label>
 
 

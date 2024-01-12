@@ -34,9 +34,7 @@
           wrap="true"
           width="480">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="27" />
+            role="font"/>
         </Label>
 
         <Label
@@ -45,9 +43,7 @@
           maxLines="3"
           width="480">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="24" />
+            role="font"/>
         </Label>
 
         <FilledButtonMarkupGrid

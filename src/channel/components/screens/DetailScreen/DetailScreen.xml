@@ -340,9 +340,7 @@
             maxLines="1"
             translation="[0,366]">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="27" />
+              role="font"/>
           </Label>
         </Group>
       </Group>

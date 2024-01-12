@@ -46,9 +46,7 @@
       ellipsizeOnBoundary="true">
       <Font
         id="timeStringFont"
-        role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="24" />
+        role="font"/>
     </Label>
 
     <LayoutGroup
@@ -68,9 +66,7 @@
         vertAlign="center">
         <Font
           id="titleFont"
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="30"/>
+          role="font"/>
       </Label>
     </LayoutGroup>
   </children>

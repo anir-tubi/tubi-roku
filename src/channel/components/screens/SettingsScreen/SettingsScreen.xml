@@ -72,9 +72,7 @@
       height="73"
       translation="[192,200]">
       <Font
-       role="font"
-       uri="pkg:/fonts/Vaud-SemiBold.ttf"
-       size="67" />
+       role="font"/>
     </Label>
 
 
@@ -96,9 +94,7 @@
           height="47"
           translation="[0,2]">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="22" />
+            role="font"/>
         </Label>
       </LayoutGroup>
     </Group>

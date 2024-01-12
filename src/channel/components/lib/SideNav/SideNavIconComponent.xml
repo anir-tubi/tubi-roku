@@ -41,9 +41,7 @@
       horizAlign="left">
       <Font
         id="subtextFont"
-        role="font"
-        uri="pkg:/fonts/Vaud-Bold.ttf"
-        size="20" />
+        role="font"/>
     </Label>
     <LayoutGroup
       id="LabelParent"
@@ -58,9 +56,7 @@
           opacity="0">
           <Font
               id="Font"
-              role="font"
-              uri="pkg:/fonts/Vaud-SemiBold.ttf"
-              size="34" />
+              role="font"/>
         </Label>
         <Label
           id="focusedLabel"
@@ -69,9 +65,7 @@
           opacity="0">
           <Font
               id="focusedFont"
-              role="font"
-              uri="pkg:/fonts/Vaud-SemiBold.ttf"
-              size="34" />
+              role="font"/>
         </Label>
       </Group>
    </LayoutGroup>

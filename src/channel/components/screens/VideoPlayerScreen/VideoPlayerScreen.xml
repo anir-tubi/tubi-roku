@@ -251,9 +251,7 @@
         vertAlign="center"
         translation="[0,606]">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="32"/>
+          role="font"/>
       </Label>
       <TubiProgressBar
         id="LoadingProgressBar"
@@ -279,9 +277,7 @@
         horizAlign="center"
         vertAlign="center">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="34"/>
+          role="font"/>
       </Label>
     </Group>
 
@@ -316,9 +312,7 @@
         vertAlign="center">
         <Font
           id="Vaud22px"
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="22" />
+          role="font"/>
       </Label>
     </Group>
 
@@ -335,9 +329,7 @@
         vertAlign="center">
         <Font
           id="Vaud22px"
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="67" />
+          role="font"/>
       </Label>
       <Label
         id="VideoOverlayEpisodeTitle"
@@ -348,9 +340,7 @@
         vertAlign="center">
         <Font
           id="Vaud22px"
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="36" />
+          role="font"/>
       </Label>
 
     </Group>
@@ -392,9 +382,7 @@
           translation="[75, 0]">
           <Font
             id="Vaud34px"
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="34" />
+            role="font"/>
         </Label>
         <Label
           id="RemainingLabel"
@@ -403,9 +391,7 @@
           translation="[1695, 0]">
           <Font
             id="Vaud34px"
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="34" />
+            role="font"/>
         </Label>
 
         <!-- Transport buttons - Transport buttons must be in the order they appear on the screen (from left to right) -->
@@ -504,9 +490,7 @@
         <Label
           id="ratedLabel">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Bold.ttf"
-            size="22" />
+            role="font"/>
         </Label>
         <Group
           id="ratingGroup">
@@ -526,18 +510,14 @@
             horizAlign="center"
             vertAlign="center">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="22" />
+              role="font"/>
           </Label>
         </Group>
         <Label
           id="descriptorCode">
           <Font
             id="Vaud22px"
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="22" />
+            role="font"/>
         </Label>
       </LayoutGroup>
       <Label
@@ -546,9 +526,7 @@
         height="80">
         <Font
           id="Vaud22px"
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="22" />
+          role="font"/>
       </Label>
     </Group>
 

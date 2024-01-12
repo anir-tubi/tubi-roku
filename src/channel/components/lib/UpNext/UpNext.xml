@@ -94,9 +94,7 @@
           vertAlign="center">
           <Font
             id="Vaud22px"
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="22" />
+            role="font"/>
         </Label>
       </Group>
       <!-- Movies shows a navigable grid with a few suggestions -->
@@ -118,9 +116,7 @@
           translation="[354,618]"
           height="46">
           <Font
-           role="font"
-           uri="pkg:/fonts/Vaud-SemiBold.ttf"
-           size="34" />
+           role="font"/>
         </Label>
         <InfoPanel
           id="InfoMovie"
@@ -147,9 +143,7 @@
           translation="[573,618]"
           height="46">
           <Font
-           role="font"
-           uri="pkg:/fonts/Vaud-SemiBold.ttf"
-           size="34" />
+           role="font"/>
         </Label>
         <InfoPanel
           id="InfoSeries"

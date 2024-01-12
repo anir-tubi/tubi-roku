@@ -73,9 +73,7 @@
         height="80"
         opacity="1.0">
         <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="33" />
+        role="font"/>
       </Label>
       <Label
         id="DetailsMenuTextFocused"
@@ -84,9 +82,7 @@
         height="80"
         opacity="1.0">
         <Font
-        role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="33" />
+        role="font"/>
       </Label>
     </Group>
 

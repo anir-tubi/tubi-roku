@@ -30,9 +30,7 @@
         vertAlign="center"
         height="79">
         <Font
-          role="font"
-          size="33"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf" />
+          role="font"/>
       </Label>
       <Label
         id="buttonTextFocused"
@@ -40,9 +38,7 @@
         vertAlign="center"
         height="79">
         <Font
-          role="font"
-          size="33"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf" />
+          role="font"/>
       </Label>
     </Group>
   </children>

@@ -53,9 +53,7 @@
         horizAlign="center"
         width="1920">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="72" />
+          role="font"/>
       </Label>
 
       <Group
@@ -72,9 +70,7 @@
         opacity="0.0"
         width="600">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="27" />
+          role="font"/>
       </Label>
 
     </LayoutGroup>

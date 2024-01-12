@@ -2,6 +2,8 @@
 <component name="Badge" extends="Group">
   <script type="text/brightscript" uri="Badge.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
     <field id="backgroundUri" type="string" alias="BadgeBackground.uri"/>

@@ -25,9 +25,7 @@
           height="73"
           vertAlign="bottom">
           <Font
-           role="font"
-           uri="pkg:/fonts/Vaud-SemiBold.ttf"
-           size="43" />
+           role="font"/>
         </Label>
         <Label
           id="TextOne"
@@ -36,9 +34,7 @@
           wrap="true"
           translation="[0,120]">
           <Font
-           role="font"
-           uri="pkg:/fonts/Vaud-Medium.ttf"
-           size="27" />
+           role="font"/>
         </Label>
         <Label 
           id="TitleTwo"
@@ -46,9 +42,7 @@
           vertAlign="bottom"
           translation="[0,239]">
           <Font
-           role="font"
-           uri="pkg:/fonts/Vaud-SemiBold.ttf"
-           size="43" />
+           role="font"/>
         </Label>
         <Label
           id="TextTwo"
@@ -57,9 +51,7 @@
           wrap="true"
           translation="[0,354]">
           <Font
-           role="font"
-           uri="pkg:/fonts/Vaud-Medium.ttf"
-           size="27" />
+           role="font"/>
         </Label>
       </Group>
     </Group>

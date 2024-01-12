@@ -32,9 +32,7 @@
       translation="[19,1]"
       opacity="1.0">
       <Font
-      role="font"
-      size="33"
-      uri="pkg:/fonts/Vaud-SemiBold.ttf" />
+      role="font"/>
     </Label>
     <Group
       id="categoryCountGroup"
@@ -55,9 +53,7 @@
         height="48"
         translation="[0,0]">
         <Font
-        role="font"
-        size="22"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf" />
+        role="font"/>
       </Label>
     </Group>
   </children>

@@ -34,9 +34,7 @@
         height="39"
         vertAlign="center">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Bold.ttf"
-          size="39" />
+          role="font"/>
         </Label>
       <Label
         id="Subtitle"
@@ -47,9 +45,7 @@
         vertAlign="center"
         horizAlign="center">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="27" />
+          role="font"/>
         </Label>
     </LayoutGroup>
     </Group>
