@@ -1014,17 +1014,19 @@ End Function
 
 Function onRelatedContentChange()
   tubiLog("DetailScreen.onRelatedContentChange")
-  if m.top.relatedContent <> invalid AND m.top.relatedContent.getChildCount() > 0
-    m.RelatedContentGroup.visible = true
-    ' To force a single row in postergrid, set the columns
-    m.RelatedGrid.numColumns = m.top.relatedContent.getChildCount()
-    m.RelatedGrid.jumpToItem = m.RelatedGrid.itemFocused
-  else
-    m.RelatedContentGroup.visible = false
-    if m.RelatedContentGroup.isInFocusChain() = true
-      focusMenu()
+  relatedContent = m.top.relatedContent
+  if relatedContent <> invalid
+    if relatedContent.getChildCount() > 0
+      m.RelatedContentGroup.visible = true
+      ' To force a single row in postergrid, set the columns
+      m.RelatedGrid.numColumns = relatedContent.getChildCount()
+      m.RelatedGrid.jumpToItem = m.RelatedGrid.itemFocused
+    else
+      m.RelatedContentGroup.visible = false
+      if m.RelatedContentGroup.isInFocusChain() = true
+        focusMenu()
+      end if
     end if
-
   end if
 End Function
 

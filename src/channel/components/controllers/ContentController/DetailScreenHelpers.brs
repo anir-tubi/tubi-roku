@@ -2362,6 +2362,8 @@ Function resetRelatedContent(detailScreen)
       relatedContentChildren = relatedContent.getChildren(-1, 0)
       refreshedRelatedContent = CreateObject("roSGNode", "CategoryContentNode")
       refreshedRelatedContent.appendChildren(relatedContentChildren)
+      ' Using the existing valid until so that it does not make a new api call since the content is still valid.
+      refreshedRelatedContent.validUntil = relatedContent.validUntil
       detailScreen.relatedContent = refreshedRelatedContent
     end if
   end if
