@@ -2,6 +2,7 @@ import Home from '../pages/homePage';
 import Settings from '../pages/settingsPage';
 import Categories from '../pages/categories';
 import ChannelsPage from '../pages/channelsPage';
+import MyStuff from '../pages/myStuff';
 import SearchPage from '../pages/searchPage';
 import { moveToRow } from '../utils/helpers';
 import { ecp, utils } from 'roku-test-automation';
@@ -26,8 +27,9 @@ export const tabs = {
 	home: {
 		row: 4,
 	},
-	myList: {
+	myStuff: {
 		row: 5,
+		page: ({ isAuth }) => MyStuff({ isAuth }),
 	},
 	categories: {
 		row: 6,
@@ -57,12 +59,12 @@ const SideNav = () => {
 		row: 4,
 	};
 
-	async function selectTab(tab) {
+	async function selectTab(tab, { isAuth }) {
 		await moveToRow(ui.row - tab.row);
 		await utils.sleep(800);
 		await ecp.sendKeypress(ecp.Key.Ok);
 		tab.row === 1 ? ui.row : (ui.row = tab.row);
-		const page = tab.page();
+		const page = tab.page({ isAuth });
 		await page.pageDidLoad();
 		return page;
 	}
@@ -81,11 +83,11 @@ const SideNav = () => {
 		await selectTabNoPageReturn(tab);
 	}
 
-	async function selectSideNavTab(tab, currentRow = ui.row) {
+	async function selectSideNavTab(tab, currentRow = ui.row, isAuth = false) {
 		ui.row = currentRow;
 		await ecp.sendKeypress(ecp.Key.Left);
 		await testUtils.waitForSideNavMenuToBeExpanded();
-		const nextPage = await selectTab(tab);
+		const nextPage = await selectTab(tab, { isAuth });
 		return nextPage;
 	}
 

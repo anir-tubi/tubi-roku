@@ -17,7 +17,7 @@ const ChannelsPage = () => {
 	}
 
 	async function selectChannelByName(channelName) {
-		await testUtils.jumpToRowWithTitle('channelPosterGrid', channelName);
+		await testUtils.jumpToRowWithTitle('channelsListScreenGrid', channelName);
 		await ecp.sendKeypress(ecp.Key.Ok);
 		const container = Container();
 		await container.pageDidLoad();

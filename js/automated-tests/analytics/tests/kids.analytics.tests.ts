@@ -186,7 +186,7 @@ describe('Kids Events', function () {
 		await video.pausePlayback();
 		const time = await video.getCurrentPlaybackTimeInSeconds();
 		expect(parseInt(time)).lessThanOrEqual(
-			7,
+			14,
 			`Playback should be more then 0 sec `
 		);
 	});

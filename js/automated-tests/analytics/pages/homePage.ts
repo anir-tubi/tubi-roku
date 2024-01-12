@@ -6,6 +6,7 @@ import TitleDetailsPage from './titleDetailsPage';
 import LiveNews from '../pages/liveNews';
 import { NODES } from '../utils/constants';
 import SideNav, { tabs } from '../components/sideNav';
+import TopNavMenu from '../components/topNav';
 const HomePage = ({ isMovies, isTvShows } = {}) => {
 	const elements = {
 		movieScreenRowList: async () =>
@@ -22,12 +23,19 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 			await testUtils.getNodeForElement('kidsLogoHomeScreen'),
 		channelsDisabledMessage: async () =>
 			await testUtils.getNodeForElement('channelsDisabledMessage'),
+		tvShowsSeriesLabel: async () =>
+			await testUtils.getNodeForElement('tvShowsSeriesLabel'),
+		moviesLabel: async () => await testUtils.getNodeForElement('moviesLabel'),
 	};
 
 	// expect(tvScreenRowList.visible).to.equal(true);
 	async function getMovieTitleId() {
-		const movieScreenRowList = await elements.movieScreenRowList();
-		expect(movieScreenRowList.visible).to.equal(true);
+		await testUtils.retryWithTimeOut(async () => {
+			const movieScreenRowList = await elements.movieScreenRowList();
+			expect(movieScreenRowList.visible).to.equal(true);
+			const moviesLabel = await elements.moviesLabel();
+			expect(moviesLabel.visible).to.equal(true);
+		});
 		const content = await testUtils.getCurrentlyFocusedGridItemContent(
 			NODES.MOVIE_SCREEN_ROW_LIST
 		);
@@ -48,12 +56,24 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 	}
 
 	async function getTVShowTitleId() {
-		const tvShowScreenRowList = await elements.tvScreenRowList();
-		expect(tvShowScreenRowList.visible).to.equal(true);
-		const content = await testUtils.getCurrentlyFocusedGridItemContent(
-			NODES.TV_SHOW_SCREEN_ROW_LIST
-		);
+		let content;
+		await testUtils.retryWithTimeOut(async () => {
+			const tvShowScreenRowList = await elements.tvScreenRowList();
+			expect(tvShowScreenRowList.visible).to.equal(true);
+			const tvShowsSeriesLabel = await elements.tvShowsSeriesLabel();
+			expect(tvShowsSeriesLabel.visible).to.equal(true);
+		});
+		await testUtils.retryWithTimeOut(async () => {
+			content = await testUtils.getCurrentlyFocusedGridItemContent(
+				NODES.TV_SHOW_SCREEN_ROW_LIST
+			);
+		});
 		return parseInt(content.id);
+	}
+
+	async function getSerialTag() {
+		const tvShowsSeriesLabel = await elements.tvShowsSeriesLabel();
+		return tvShowsSeriesLabel.text;
 	}
 
 	async function selectFocusedTitleMovie() {
@@ -291,7 +311,9 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		selectFocusedTitleKidsMode,
 		getPopupMessage,
 		playKidsTitle,
+		getSerialTag,
 		...SideNav(),
+		...TopNavMenu(),
 	};
 };
 

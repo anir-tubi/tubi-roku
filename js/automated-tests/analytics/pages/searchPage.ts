@@ -38,6 +38,7 @@ const SearchPage = () => {
 	}
 
 	async function enterSearch(text) {
+		await utils.sleep(1000);
 		await ecp.sendText(text);
 		await testUtils.retryWithTimeOut(async () => {
 			const foundSearch = await elements.foundSearch();

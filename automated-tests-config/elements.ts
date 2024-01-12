@@ -1187,6 +1187,14 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.6',
   },
 
+  accountNeededErrorMessage: {
+    keyPath: '#ContentController.#6190234.#DialogBox.#ContentArea.#Title',
+  },
+
+  unlockNowForMyStuff: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#SignedOutUI.#GuestMenu.0.#buttonTextParent.#label',
+  },
+
   /** channels list screen */
   channelsListScreenGrid: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#ChannelCategoryGrid',

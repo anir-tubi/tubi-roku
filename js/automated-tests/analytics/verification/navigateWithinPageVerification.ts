@@ -12,6 +12,85 @@ import {
 } from '../utils/network/qaProxy';
 import { expect } from 'chai';
 
+export async function verifyC268957WithinPage() {
+	let navigateWithinPage;
+	let i = 1;
+	while (navigateWithinPage === undefined && i < 16) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_within_page,
+			25 + i
+		);
+		navigateWithinPage = pulletEvents.find(
+			(event) =>
+				event.navigate_within_page &&
+				event.navigate_within_page.home_page &&
+				event.navigate_within_page.home_page.content_mode &&
+				event.navigate_within_page.home_page.content_mode ===
+					EventsValues.conentModeUnknown &&
+				event.navigate_within_page.left_side_nav_component &&
+				event.navigate_within_page.left_side_nav_component.left_nav_section &&
+				event.navigate_within_page.left_side_nav_component.left_nav_section ===
+					'CHANNEL'
+		);
+		i++;
+	}
+	expect(navigateWithinPage.navigate_within_page.home_page.content_mode).equal(
+		EventsValues.conentModeUnknown
+	);
+	expect(
+		navigateWithinPage.navigate_within_page.left_side_nav_component
+			.left_nav_section
+	).equal('CHANNEL');
+	expect(navigateWithinPage.navigate_within_page.vertical_location).equal(8);
+	expect(navigateWithinPage.navigate_within_page.horizontal_location).equal(1);
+}
+
+export async function verifyC268959() {
+	let navigateWithinPage;
+	let i = 1;
+	while (navigateWithinPage === undefined && i < 16) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_within_page,
+			25 + i
+		);
+		navigateWithinPage = pulletEvents.find(
+			(event) =>
+				event.navigate_within_page &&
+				event.navigate_within_page.home_page &&
+				event.navigate_within_page.home_page.content_mode &&
+				event.navigate_within_page.home_page.content_mode ===
+					EventsValues.conentModeUnknown &&
+				event.navigate_within_page.means_of_navigation &&
+				event.navigate_within_page.means_of_navigation === 'SCROLL' &&
+				event.navigate_within_page.left_side_nav_component &&
+				event.navigate_within_page.left_side_nav_component.left_nav_section &&
+				event.navigate_within_page.left_side_nav_component.left_nav_section ===
+					'HOME'
+		);
+		i++;
+	}
+	expect(navigateWithinPage.navigate_within_page.home_page.content_mode).equal(
+		EventsValues.conentModeUnknown
+	);
+	expect(navigateWithinPage.navigate_within_page.means_of_navigation).equal(
+		'SCROLL'
+	);
+	expect(
+		navigateWithinPage.navigate_within_page.left_side_nav_component
+			.left_nav_section
+	).equal('HOME');
+	expect(navigateWithinPage.navigate_within_page.vertical_location).to.match(
+		/\d/,
+		`event should contain eventNavigateWithinPageFirst.navigate_within_page.vertical_location===, Event: \n
+${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.horizontal_location).to.match(
+		/\d/,
+		`event should contain eventNavigateWithinPageFirst.navigate_within_page.horizontal_location===, Event: \n
+${JSON.stringify(navigateWithinPage)} \n`
+	);
+}
+
 export async function verifyC543668andC543669(titleId) {
 	let eventNavigateToPage;
 	let i = 1;

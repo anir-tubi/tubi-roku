@@ -149,7 +149,7 @@ describe('Play progress', function () {
 		await verifyC66349();
 	});
 
-	it('Play Progress event is not fired when pressing "Home" during seek C424695 @analytics', async () => {
+	it('Play Progress event is not fired when pressing "Home" during seek C424695 @analytics,@analyticsPlayProgress', async () => {
 		const homePage = HomePage();
 		const playback = await homePage.playMovieTitle();
 		await playback.allowPlaybackToPlayForSeconds(10000);

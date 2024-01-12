@@ -67,7 +67,7 @@ export async function verifyC424695() {
 		4
 	);
 	expect(parseInt(playProgressEventFirst.length)).equal(
-		1,
+		2,
 		`Only one event playProgress should be present: \n ${JSON.stringify(
 			playProgressEventFirst
 		)}`

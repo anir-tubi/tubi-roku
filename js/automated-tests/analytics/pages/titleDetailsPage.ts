@@ -36,6 +36,8 @@ const TitleDetailsPage = (titleDetails) => {
 			),
 		raitingLabel: async () =>
 			await testUtils.getNodeForElement('raitingLabelInDetailsScreen'),
+		accountNeedErrorMessage: async () =>
+			await testUtils.getNodeForElement('accountNeededErrorMessage'),
 	};
 
 	async function pageDidLoad() {
@@ -102,7 +104,7 @@ const TitleDetailsPage = (titleDetails) => {
 	}
 
 	async function highlightAddToMyList(timeOut = 0) {
-		await moveToRow(TV_SHOW_DETAILS_PAGE_BUTONS.ADD_TO_MY_LIST, timeOut);
+		await moveToRow(TV_SHOW_DETAILS_PAGE_BUTONS.ADD_TO_MY_LIST);
 	}
 
 	async function highlightWatchTrailer(timeOut = 0) {
@@ -111,6 +113,22 @@ const TitleDetailsPage = (titleDetails) => {
 
 	async function highlightPlay() {
 		await moveToRow(TV_SHOW_DETAILS_PAGE_BUTONS.PLAY, 20000);
+	}
+
+	async function selectTitleAddToMyList() {
+		await highlightAddToMyList();
+		await ecp.sendKeypress(ecp.Key.Ok);
+	}
+
+	async function getPopUpMessage() {
+		let text;
+		await testUtils.retryWithTimeOut(async () => {
+			const accountNeededErrorMessage =
+				await elements.accountNeedErrorMessage();
+			expect(accountNeededErrorMessage.visible).to.equal(true);
+			text = accountNeededErrorMessage.text;
+		});
+		return text;
 	}
 
 	async function selectTitleFromYouMayAlsoLike(position) {
@@ -172,6 +190,7 @@ const TitleDetailsPage = (titleDetails) => {
 		highlightEpisodeList,
 		selectEpisodeList,
 		highlightAddToMyList,
+		selectTitleAddToMyList,
 		getTitleId,
 		selectGoToBackToChannel,
 		selectLikeOrDislike,
@@ -182,6 +201,7 @@ const TitleDetailsPage = (titleDetails) => {
 		highlightLikeOrDislike,
 		highlightWatchTrailer,
 		getRatingText,
+		getPopUpMessage,
 	};
 };
 

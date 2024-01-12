@@ -1,6 +1,7 @@
 import { testUtils } from '../../test-utils';
 import HomePage from '../pages/homePage';
 import ChannelsPage from '../pages/channelsPage';
+import SideNav, { tabs } from '../components/sideNav';
 import { createNewTestInProxy } from '../utils/network/qaProxy';
 import {
 	verifyC543668andC543669,
@@ -16,7 +17,13 @@ import {
 	verifyC425235,
 	verifyC425236,
 	verifyC425233,
+	verifyC268959,
+	verifyC268957WithinPage,
 } from '../verification/navigateWithinPageVerification';
+import {
+	verifyC268956ComponentInteraction,
+	verifyC268957,
+} from '../verification/componentInteraction';
 import { ecp, utils } from 'roku-test-automation';
 
 describe('Navigate Within Page', function () {
@@ -66,7 +73,7 @@ describe('Navigate Within Page', function () {
 		await verifyC425239(titleId);
 	});
 
-	it('When user makes a selection from details page menu - EPISODES_LIST C425249 @analytics', async () => {
+	it('When user makes a selection from details page menu - EPISODES_LIST C425249 @analytics,@analyticsNavigateWithinPage', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: false,
 		});
@@ -104,7 +111,7 @@ describe('Navigate Within Page', function () {
 		await verifyC425241(videoId);
 	});
 	it('When user navigates between menu options - GO_TO_NETWORK C42524 \
-	    and C425251 When user makes a selection from details page menu - GO_TO_NETWORK @analytics', async () => {
+	    and C425251 When user makes a selection from details page menu - GO_TO_NETWORK @analytics,@analyticsNavigateWithinPage', async () => {
 		await testUtils.startApplicationAtPage('home', {
 			shouldCreateNewUser: false,
 		});
@@ -122,7 +129,7 @@ describe('Navigate Within Page', function () {
 		await verifyC425251(videoId);
 	});
 	it('When user navigates between menu options - LIKE C425235 \
-	    and C425236 When user navigates between menu options - DISLIKE @analytics', async () => {
+	    and C425236 When user navigates between menu options - DISLIKE @analytics,@analyticsNavigateWithinPage', async () => {
 		const homePage = HomePage();
 		const movieDetailsPage = await homePage.selectMovieTitleWithNoTrailer();
 		const videoId = movieDetailsPage.getTitleId();
@@ -143,5 +150,18 @@ describe('Navigate Within Page', function () {
 		await movieDetailsPage.highlightWatchTrailer(300);
 		await ecp.sendKeypress(ecp.Key.Down, { wait: 2000 });
 		await verifyC425233(videoId);
+	});
+
+	it('When the user selects Espanol from Left Side Nav when they were on For You - Home Page: C268956 and C268957 and C268958 and C268959 @analytics,@analyticsNavigateWithinPage', async () => {
+		await testUtils.startApplicationAtPage('home', {
+			shouldCreateNewUser: false,
+		});
+		const homePage = HomePage();
+		await homePage.selectSideNavTab(tabs.espanol);
+		await ecp.sendKeypress(ecp.Key.Left);
+		await verifyC268956ComponentInteraction();
+		await verifyC268957();
+		await verifyC268959();
+		await verifyC268957WithinPage();
 	});
 });

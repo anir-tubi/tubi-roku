@@ -184,11 +184,11 @@ const PlayBack = ({ content }) => {
 			const playPauseButton = await elements.playPauseButton();
 			expect(playPauseButton.visible).to.equal(true);
 		});
-		await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
+		await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
 		await ecp.sendKeypress(ecp.Key.Ok, { count: howFast });
 		await allowPlaybackToPlayForSeconds(howLong);
 		await ecp.sendKeypress(ecp.Key.Play);
-		await testUtils.expectPlayerStateToEventuallyEqual('play');
+		await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 		await allowPlaybackToPlayForSeconds(1000);
 	}
 

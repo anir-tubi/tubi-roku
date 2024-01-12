@@ -14,6 +14,25 @@ export const LINEAR_NODES = {
 	COUNT_DOWN: 'countDownText',
 };
 
+export const LeftNavSection = {
+	queue: 'QUEUE',
+};
+
+export const UserInteraction = {
+	TOGGLE_ON: 'TOGGLE_ON',
+	TOGGLE_OFF: 'TOGGLE_OFF',
+	CONFIRM: 'CONFIRM',
+	LIKE: 'LIKE',
+	UNDO_LIKE: 'UNDO_LIKE',
+	UNDO_DISLIKE: 'UNDO_DISLIKE',
+	DISLIKE: 'DISLIKE',
+};
+
+export const FullEvent = {
+	kidsMode: 'KIDS_MODE',
+	defaultMode: 'DEFAULT_MODE',
+};
+
 export const LEFT_NAV_SECTIONS = {
 	SEARCH: 'SEARCH',
 	KIDS: 'KIDS',
