@@ -179,7 +179,7 @@ exports.signPkg = function(address, devPassword, signPassword, appName, pkgPath)
       passwd: signPassword,
       pkg_time: '',
     };
-    request.post({url: url, auth: auth, formData: data}, (err, response, body) => {
+    request().post({url: url, auth: auth, formData: data}, (err, response, body) => {
       var packages = body ? body.match(/pkgs\/\/([^\"]*)/) : '';
       if (err)
         rej(err);
