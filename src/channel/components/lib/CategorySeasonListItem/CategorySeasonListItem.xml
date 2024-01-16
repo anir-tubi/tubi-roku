@@ -9,6 +9,7 @@
   <script type="text/brightscript" uri="CategorySeasonListItem.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="../AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
@@ -17,23 +18,41 @@
     <field id="listHasFocus" type="boolean" value="false" />
     <field id="gridHasFocus" type="boolean" value="false" />
     <field id="rowListHasFocus" type="boolean" value="false" />
+    <field id="itemHasFocus" type="boolean" value="false" />
     <field id="width" type="float" value="425.0" />
     <field id="height" type="float" value="80.0" />
     <field id="totalCount" alias="categoryCountText.text" />
   </interface>
 
   <children>
-    <Label
-      id="categoryText"
-      horizAlign="left"
-      vertAlign="center"
-      width="322"
-      height="78"
-      translation="[19,1]"
-      opacity="1.0">
-      <Font
-      role="font"/>
-    </Label>
+    <Group>
+      <Label
+        id="categoryText"
+        horizAlign="left"
+        vertAlign="center"
+        width="322"
+        height="78"
+        translation="[19,1]"
+        opacity="1.0">
+        <Font
+        role="font"
+        size="33"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf" />
+      </Label>
+      <Label
+        id="focusedCategoryText"
+        horizAlign="left"
+        vertAlign="center"
+        width="322"
+        height="78"
+        translation="[19,1]"
+        opacity="0">
+        <Font
+        role="font"
+        size="33"
+        uri="pkg:/fonts/Vaud-SemiBold.ttf" />
+      </Label>
+    </Group>
     <Group
       id="categoryCountGroup"
       opacity="0.0"

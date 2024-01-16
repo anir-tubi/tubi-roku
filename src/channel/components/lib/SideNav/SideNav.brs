@@ -251,7 +251,7 @@ Function onKidsDisplayChanged()
     removeKids()
     verticallyCenterSideNav()
   else
-    ' Display the KidsMode menuy item if the item should be displayed
+    ' Display the KidsMode menu item if the item should be displayed
     insertMenuItemInMenuLists(m.constants.ui.sideNavIds.kidsMode)
   end if
 End Function

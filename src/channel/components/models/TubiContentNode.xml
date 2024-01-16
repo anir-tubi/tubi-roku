@@ -29,8 +29,8 @@
     <field id="trailerInfo" type="assocarray" />
     <field id="deeplinkType" type="string" />
     <field id="videoPreviewUrl" type="string" />
-     <field id="releaseDate" type="string" />
-     <!--This is sportsEvent data and so  added dynamically
+    <field id="releaseDate" type="string" />
+    <!--This is sportsEvent data and so  added dynamically
     <field id="roundGroupInfo" type="string" />-->
     <field id="highestRendition" type="string" />
 

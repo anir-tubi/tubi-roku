@@ -320,6 +320,7 @@ End Function
 Function focusMenu()
   m.Menu.animateToItem = m.RowList.currFocusRow
   m.Menu.setFocus(true)
+
   if m.constants.deviceInfo.limitedUi
     m.Menu.translation = [192, m.Menu.translation[1]]
     m.RowList.translation = [634, m.RowList.translation[1]]
