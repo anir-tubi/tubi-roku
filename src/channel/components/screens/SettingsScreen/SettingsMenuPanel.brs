@@ -80,7 +80,7 @@ Function setSettingsSidePanelMenuItems()
     },
     "testAid": {
       subType: "DetailMenuItemContentNode"
-      id: "testAid"
+      id: "TestingAidButton"
       title: "TestAid"
       displayOrder: 6
     }
