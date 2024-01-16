@@ -45,6 +45,9 @@ Function init()
   m.logo = m.top.findNode("tubiLogo")
   m.backgroundImage = m.top.findNode("backgroundImage")
 
+  ' indicates if the video is currently playing ads as indicated by yospace id3 tags
+  ' m.isPlayingAds value should only be updated in m.AdsSSAITask.isPlayingAds callback and nowhere else
+  m.isPlayingAds = false
 
   'm.VideoState is source of truth for the state of the video player for the UI
   'possible values are "play", "pause", "rew", "ffw", "stop", "refresh", "skip", "hop"
@@ -240,6 +243,8 @@ End Function
 Function onAdChange(msg)
   tubiLog("LinearVideoPlayerScreen.onAdChange")
   isPlayingAds = msg.getData()
+  m.isPlayingAds = isPlayingAds
+
   if isPlayingAds = true
     ' Send a play_progress event before we show ads to be most accurate in case the user exits during ad playback
     playProgressEvent = getPlayProgressEvent(m.top.fullscreen)
@@ -251,7 +256,9 @@ Function onAdChange(msg)
       m.lastPingTime = m.playerPosition
     end if
   end if
+
   m.Video.suppressCaptions = isPlayingAds
+
   if isPlayingAds = false
     trackEvent({
       type: "resume_after_break"
@@ -260,6 +267,9 @@ Function onAdChange(msg)
         position: Int(m.playerPosition * 1000) 'without Int(), can return scientific notation, causing API error
       }
     })
+    ' update m.lastPingTime with current video position when ad break completes.
+    ' so it will not add the viewtime of ad break in next playprogressEvent.
+    m.lastPingTime = m.playerPosition
   end if
 End Function
 
@@ -311,7 +321,7 @@ Function onVideoStateChange(msg)
       playContent()
     else
       ' the video reached the end
-      if m.Video.content <> invalid
+      if m.Video.content <> invalid AND m.isPlayingAds = false
         ' the video has been stopped, send a final playProgressEvent
         playProgressEvent = getPlayProgressEvent(m.top.fullscreen)
         if playProgressEvent <> invalid
@@ -350,7 +360,8 @@ Function onVideoStateChange(msg)
     end if
   else if state = "stopped" AND m.VideoState = "stop"
     ' player has stopped (not due to an ad break)
-    if m.Video.content <> invalid
+    ' we don't want to send playprogress when user change channel during ad break
+    if m.Video.content <> invalid AND m.isPlayingAds = false
       ' the video has been stopped, send a final playProgressEvent
       playProgressEvent = getPlayProgressEvent(m.top.fullscreen)
       if playProgressEvent <> invalid
@@ -371,7 +382,7 @@ Function onVideoStateChange(msg)
     ' This avoids higher viewTime live play progress events
 
     'Send play progress event only for midbuffer (not prebuffer)
-    if m.playerPosition > 0
+    if m.playerPosition > 0 AND m.isPlayingAds = false
       playProgressEvent = getPlayProgressEvent(m.top.fullscreen)
       if playProgressEvent <> invalid
         trackEvent(playProgressEvent)
@@ -447,7 +458,7 @@ Function onVideoPositionChange()
   end if
 
   ' Analytics
-  if m.lastPingTime > -1 AND m.playerPosition >= m.lastPingTime + m.analyticsInterval
+  if m.isPlayingAds = false AND m.lastPingTime > -1 AND m.playerPosition >= m.lastPingTime + m.analyticsInterval
     playProgressEvent = getPlayProgressEvent(m.top.fullscreen)
     if playProgressEvent <> invalid
       m.lastPingTime = m.playerPosition
@@ -471,12 +482,14 @@ End Function
 
 Function onFullScreenChange()
   ' When the linear video player changes sizes, we want to send a play progress event for the previous size.
-  isFullScreenForPlayProgreeEvent = (m.top.fullScreen <> true)
-  playProgressEvent = getPlayProgressEvent(isFullScreenForPlayProgreeEvent)
+  if m.isPlayingAds = false
+    isFullScreenForPlayProgressEvent = (m.top.fullScreen <> true)
+    playProgressEvent = getPlayProgressEvent(isFullScreenForPlayProgressEvent)
 
-  if playProgressEvent <> invalid
-    m.lastPingTime = m.playerPosition
-    trackEvent(playProgressEvent)
+    if playProgressEvent <> invalid
+      m.lastPingTime = m.playerPosition
+      trackEvent(playProgressEvent)
+    end if
   end if
 
   if m.top.fullScreen = true
