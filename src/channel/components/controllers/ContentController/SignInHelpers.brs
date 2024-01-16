@@ -259,24 +259,8 @@ Function onEmailExistsResponse(response)
           emailScreen.isEmailValid = true
         end if
 
-        '//user's email address exists in Tubi servers, so user can sign into their Tubi account
-        dateTime = createObject("roDateTime")
-        dateTime.fromISO8601String(m.constants.time.magicLinkStartDate)
-        magicLinkStartDate = dateTime.asSeconds()
-
-        dateTime.fromISO8601String(m.constants.time.magicLinkEndDate)
-        magicLinkEndDate = dateTime.asSeconds()
-
-        currentUnixTime = getCurrentUTCTimeWithOffset(m.constants)
-
         m.email = email
-        ' Can only use magic link when Roku allows us to
-        if currentUnixTime >= magicLinkStartDate AND currentUnixTime <= magicLinkEndDate then
-          showEmailVerificationScreen(email)
-          createMagicLinkRequest(email)
-        else
-          showSignInScreen(rawInput)
-        end if
+        showSignInScreen(rawInput)
       else
         if parsedResponse.code = "AVAILABLE"
           '//user's email address does not exist in Tubi servers, so sign user up with a new Tubi account
@@ -1052,7 +1036,6 @@ Function popScreenAfterSignInProcess()
     "EmailInputScreen": true
     "AgeVerificationScreen": true
     "SignUpAgeVerificationScreen": true
-    "EmailVerificationScreen": true
     "ForgotPasswordProcessingScreen": true
     "ConsentScreen": true
     "ManagePreferencesScreen": true
@@ -1093,7 +1076,7 @@ Function onMagicLinkResponse(response)
   tubiLog("SignInHelpers.onMagicLinkResponse")
   currentScreen = getCurrentScreen()
   if response <> invalid
-    if currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen OR currentScreen.id = m.constants.ui.screenIds.forgotPasswordProcessingScreen
+    if currentScreen.id = m.constants.ui.screenIds.forgotPasswordProcessingScreen
       currentScreen.uid = response.uid
       m.emailVerificationTimer = m.top.createChild("Timer")
       m.emailVerificationTimer.repeat = false
@@ -1107,14 +1090,7 @@ End Function
 
 Function onMagicLinkError(errorResponse)
   tubiLog("SignInHelpers.onMagicLinkError")
-
-
-  currentScreen = getCurrentScreen()
   contextCode = m.constants.errors.context.forgotPasswordProcessingScreen
-  if currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen
-    contextCode = m.constants.errors.context.emailVerificationScreen
-  end if
-
   errorCode = getUserFacingErrorCode(contextCode, m.constants.errors.subtypes.networkError, errorResponse)
   errorMessage = getTranslation("dialog_magicLink_error_description")
   dialogEvent = {
@@ -1138,31 +1114,12 @@ Function onMagicLinkError(errorResponse)
 End Function
 
 
-' showEmailVerificationScreen will send verification email to the roku account or
-' user entered email if user choose different email.
-' once user verified their email, it will redirect to the appropriate screen.
-' If the user doesn't receive verification link, they can select resend verification.
-
-' @email : string,  (either taken from roku account or user entered email)
-Function showEmailVerificationScreen(email)
-  tubiLog("SignInHelpers.showEmailVerificationScreen")
-  emailVerificationScreen = CreateObject("roSGNode", "EmailVerificationScreen")
-  emailVerificationScreen.id = m.constants.ui.screenIds.emailVerificationScreen
-  emailVerificationScreen.username = email
-  emailVerificationScreen.observeFieldScoped("selectedDifferentEmail", "showEmailScreen")
-  emailVerificationScreen.observeFieldScoped("backButtonSelected", "onStopAndClearEmailVerificationTimer")
-  emailVerificationScreen.observeFieldScoped("resendVerificationLink", "onResendVerificationLink")
-  pushScreen(emailVerificationScreen, true, true)
-  displayDefaultBackground()
-End Function
-
-
 Function onEmailVerificationTimerFired()
   tubiLog("SignInHelpers.onEmailVerificationTimerFired")
   'Make Request
   uid = ""
   currentScreen = getCurrentScreen()
-  if currentScreen <> invalid AND (currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen OR currentScreen.id = m.constants.ui.screenIds.forgotPasswordProcessingScreen)
+  if currentScreen.id = m.constants.ui.screenIds.forgotPasswordProcessingScreen
     uid = currentScreen.uid
     requestInfo = m.userDeviceApi.queryStatusOfMagicLink(uid)
     m.makeRequest({
@@ -1204,15 +1161,12 @@ End Function
 Function onQueryStatusOfMagicLinkError(errorResponse)
   tubiLog("SignInHelpers.onQueryStatusOfMagicLinkError")
   currentScreen = getCurrentScreen()
-  if currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen OR currentScreen.id = m.constants.ui.screenIds.forgotPasswordProcessingScreen
+  if currentScreen.id = m.constants.ui.screenIds.forgotPasswordProcessingScreen
     currentScreen.queryResponseError = currentScreen.queryResponseError + 1
     if currentScreen.queryResponseError > 3
       currentScreen.queryResponseError = 0
 
       contextCode = m.constants.errors.context.forgotPasswordProcessingScreen
-      if currentScreen.id = m.constants.ui.screenIds.emailVerificationScreen
-        contextCode = m.constants.errors.context.emailVerificationScreen
-      end if
 
       errorCode = getUserFacingErrorCode(contextCode, m.constants.errors.subtypes.expireError, errorResponse)
       errorMessage = getTranslation("dialog_uidExpiraionError_description")

@@ -888,11 +888,10 @@ Function getConstants()
   constants.errors.context.channelsScreen = "9"
   constants.errors.context.categoriesScreen = "10"
   constants.errors.context.linearPlayerScreen = "11"
-  constants.errors.context.epgScreen = "12"
   constants.errors.context.emailVerificationScreen = "13"
   constants.errors.context.tournament = "14"
-  constants.errors.context.forgotPasswordProcessingScreen = "15" '//are we getting rid of emailVerificationScreen? If so, then maybe we keep 13 for the forgetPassword Screen
-
+  constants.errors.context.forgotPasswordProcessingScreen = "15" 
+  
   '//What is the actual error?
   constants.errors.subtypes = {}
   '//Failed to fetch data from backend
@@ -1110,7 +1109,6 @@ Function getConstants()
       constants.ui.screenLevels.emailInputScreen = 90
       constants.ui.screenLevels.signInScreen = 90
       constants.ui.screenLevels.ageGateScreen = 90
-      constants.ui.screenLevels.emailVerificationScreen = 90
       constants.ui.screenLevels.welcomeScreen = 99
       constants.ui.screenLevels.freeForeverScreen = 110
       constants.ui.screenLevels.availableDeviceScreen = 111
@@ -1138,7 +1136,6 @@ Function getConstants()
       constants.ui.screenIds.videoPlayerScreen = "videoPlayerScreen"
       constants.ui.screenIds.linearVideoPlayerScreen = "linearVideoPlayerScreen"
       constants.ui.screenIds.epgScreen = "epgScreen"
-      constants.ui.screenIds.emailVerificationScreen = "emailVerificationScreen"
       constants.ui.screenIds.forgotPasswordProcessingScreen = "forgotPasswordProcessingScreen"
       constants.ui.screenIds.welcomeScreen = "welcomeScreen"
       constants.ui.screenIds.freeForeverScreen = "freeForeverScreen"
@@ -1665,10 +1662,6 @@ constants.ui.themes = {}
       constants.tournament.startDate = "2022-11-20T08:00:00Z"
       constants.tournament.endDate = "2022-12-21T07:59:00Z"
       constants.tournament.clearRegistryDate = "2023-01-04T20:00:00Z"
-
-      constants.time = {}
-      constants.time.magicLinkStartDate = "2022-11-14T20:00:00Z"
-      constants.time.magicLinkEndDate = "2022-12-19T20:00:00Z"
 
       ' Creating Backend/Frontend mapping for preference keys.
       constants.serverPersistentDataKeys = {}
