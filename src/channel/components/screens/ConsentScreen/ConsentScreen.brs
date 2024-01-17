@@ -2,6 +2,8 @@ Function init()
   topRef = m.top
   m.constants = getConstantsFromGlobal()
   topRef.observeFieldScoped("focusedChild", "onScreenFocusChange")
+  m.PageGroup = m.top.findNode("PageGroup")
+  m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.heading = topRef.findNode("heading")
   m.subheading = topRef.findNode("subheading")
   m.buttonList = topRef.findNode("buttonList")

@@ -60,7 +60,6 @@ Function showChannelGridScreen(constants, sPageSource, bChannel = true, screenLe
     gridScreen.screenLevel = screenLevel
   end if
   gridScreen.id = gridScreenId
-  gridScreen.callingPage = sPageSource
   gridScreen.displayChannels = bChannel
   gridScreen.trackingLoadStartTime = UpTime(0)
   gridScreen.observeFieldScoped("contentSelected", "onGridContentSelected")
@@ -88,14 +87,7 @@ End Function
 Function onGridContentSelected(msg)
   tubiLog("ChannelGridScreenHelpers.onGridContentSelected")
   gridScreen = msg.getRoSGNode()
-  sType = ""
-  if gridScreen.displayChannels = true
-    sType = m.constants.ui.terms.channels
-  else
-    sType = m.constants.ui.terms.categories
-  end if
-  sType = UCase(sType)
-  showCategoryDetailsScreen(gridScreen.contentSelected, sType)
+  showCategoryDetailsScreen(gridScreen.contentSelected)
 End Function
 
 

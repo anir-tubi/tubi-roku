@@ -13,8 +13,13 @@ Function init()
   m.top.observeField("resetContent", "onResetContent")
   m.top.observeField("command", "onCommand")
 
+  '//::NOTE:: the translation of m.UpNextUI is modifed by AnimationMixin, 
+  '// so the translation of the UpNextUI element should not be changed directly.
+  '// UpNextParent can be used if we need to change the translation of the up next component.
   m.UpNextUI = m.top.findNode("UpNextUI")
   m.UpNextUI.observeField("opacity", "onUpNextUIOpacityChange")
+  m.UpNextParent = m.top.findNode("UpNextParent")
+  m.UpNextParent.translation = [m.constants.ui.translations.marginX, m.UpNextParent.translation[1]]
   m.UpNextGradient = m.top.findNode("UpNextGradient")
   m.InfoMovie = m.top.findNode("InfoMovie")
   m.InfoSeries = m.top.findNode("InfoSeries")
@@ -27,14 +32,11 @@ Function init()
   m.GridMovie.observeField("itemFocused", "onMovieItemFocused")
   m.GridMovie.observeField("itemSelected", "onMovieItemSelected")
   m.GridSeries = m.top.findNode("GridSeries")
+  m.GridSeries.itemSize = m.constants.ui.imageSizes.largeLandscape
+  m.InfoSeries.maxHeight = m.constants.ui.imageSizes.largeLandscape[1]
+
   m.GridSeries.observeField("itemFocused", "onSeriesItemFocused")
   m.GridSeries.observeField("itemSelected", "onSeriesItemSelected")
-  BackLabel = m.top.findNode("BackLabel")
-  BackLabel.text = Ucase(getTranslation("goBack_videoPlayer_upNext"))
-  if m.constants.deviceInfo.uiResolution <> "FHD"
-    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
-    BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
-  end if
 
   focusBox = m.top.findNode("FocusBox")
   if m.constants.deviceInfo.scaledUi = true then
@@ -51,44 +53,37 @@ Function init()
     m.CountdownSeries.color = theme.highlightedTextColor
   end if
 
-  focusBox.width = 210 + focusBoxMargin * 2
-  focusBox.height = 300 + focusBoxMargin * 2
-  focusBox.translation = [85 - focusBoxMargin, 687 - focusBoxMargin]
+  focusBox.width = m.constants.ui.imageSizes.largePoster[0] + focusBoxMargin * 2 
+  focusBox.height = m.constants.ui.imageSizes.largePoster[1] + focusBoxMargin * 2
+  focusBox.translation = [- focusBoxMargin, - focusBoxMargin]
+  m.InfoMovie.maxHeight = m.constants.ui.imageSizes.largePoster[1]
 
 
   targetSet = CreateObject("roSGNode", "TargetSet")
-  targetSet.targetRects = [
-    {
-      x: -135
+  nSpacing = 16
+  nStartX = -m.constants.ui.imageSizes.largePoster[0] - nSpacing
+  nArrayElements = 5
+  aTargetRects = CreateObject("roArray", nArrayElements, true)
+  for i = 0 to nArrayElements-1
+    aaTargetRect = {
+      x: nStartX
       y: 0
-      width: 210
-      height: 300
-    },
-    {
-      x: 85
-      y: 0
-      width: 210
-      height: 300
-    },
-    {
-      x: 1405
-      y: 0
-      width: 210
-      height: 300
-    },
-    {
-      x: 1625
-      y: 0
-      width: 210
-      height: 300
-    },
-    {
-      x: 1845
-      y: 0
-      width: 210
-      height: 300
+      width: m.constants.ui.imageSizes.largePoster[0]
+      height: m.constants.ui.imageSizes.largePoster[1]
     }
-  ]
+
+    aTargetRects.push(aaTargetRect)
+
+    '//New start position of the next poster image
+    if i <> 1
+      nStartX = nStartX + m.constants.ui.imageSizes.largePoster[0] + nSpacing
+    else
+      '//Move the images AFTER the 2nd image to the right of the upNext UI
+      nStartX = 1071
+    end if
+  end for
+
+  targetSet.targetRects = aTargetRects
   targetSet.focusIndex = 1
   targetSet.color = "0x00202020AA"
   m.GridMovie.targetSet = targetSet
@@ -101,7 +96,6 @@ Function init()
   m.isUpNextFocused = false
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.CountdownMovie, typographyConstants.ids.subheaderMedium)
   setTypographyOfLabel(m.CountdownSeries, typographyConstants.ids.subheaderMedium)
 
@@ -119,7 +113,7 @@ Function onComponentFocus()
 
     if m.MovieGroup.visible
       m.GridMovie.setFocus(true)
-    else if m.SeriesGroup.visible
+    else if m.SeriesGroup.visible = true
       m.GridSeries.setFocus(true)
     end if
   else if m.top.isInFocusChain() <> true
@@ -144,6 +138,7 @@ Function onContentChange()
     firstContent = m.top.content.getChild(0)
     if firstContent.seriesId <> invalid AND firstContent.seriesId <> ""
       ' show the episode experience
+      m.UpNextParent.translation = [m.UpNextParent.translation[0], 608]
       m.MovieGroup.visible = false
       m.SeriesGroup.visible = true
       singleContent = CreateObject("roSGNode", "ContentNode")
@@ -154,6 +149,7 @@ Function onContentChange()
       updateInfoPanel(m.InfoSeries, m.GridSeries.content.getChild(0))
     else
       ' show the movie experience
+      m.UpNextParent.translation = [m.UpNextParent.translation[0], 540]
       m.MovieGroup.visible = true
       m.SeriesGroup.visible = false
       m.GridMovie.content = m.top.content

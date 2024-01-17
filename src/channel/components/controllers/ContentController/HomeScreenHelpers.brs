@@ -873,7 +873,7 @@ Function onContentSelected(msg)
   m.autoplayContext = homeScreen.currCategoryId
 
   if content.type = m.constants.uapiContentTypes.channel
-    showCategoryDetailsScreen(content, m.constants.ui.terms.home)
+    showCategoryDetailsScreen(content)
   else if content.type = m.constants.ui.contentTypes.historySignedOutUser
     '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
     startSignIn(onCWRowAfterSignIn)

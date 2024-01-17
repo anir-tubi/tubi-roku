@@ -1156,10 +1156,6 @@
     "description": "Navigational instructions to users on what the back button does on the current page",
     "message": "DISMISS"
   },
-  "goBack_videoPlayer_controls": {
-    "description": "Navigational instructions to users on what the back button does on the current page",
-    "message": "PRESS BACK TO HIDE"
-  },
   "goBack_menu": {
     "description": "Navigational instructions to users on what the back button does on the current page",
     "message": "PRESS BACK FOR MENU"

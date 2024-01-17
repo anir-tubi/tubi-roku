@@ -33,8 +33,8 @@
       opacity="0" />
     <Label
       id="CategoryName"
-      height="36"
       width="1000"
+      height="0"
       vertAlign="center"
       opacity="1.0">
       <Font
@@ -44,8 +44,8 @@
     <!--subText will be appended to the row label-->
     <Label
       id="subText"
-      height="36"
       width="800"
+      height="0"
       vertAlign="center"
       visible="false">
       <Font
@@ -80,11 +80,11 @@
       id="CategoryCount"
       layoutDirection="horiz"
       horizAlignment="right"
-      translation="[1535,12]">
+      translation="[1593,12]">
       <Label
         id="FocusIndex"
         text=""
-        height="30"
+        height="0"
         horizAlign="right">
         <Font
           role="font"/>
@@ -92,7 +92,7 @@
       <Label
         id="ItemCount"
         text=""
-        height="30"
+        height="0"
         horizAlign="right">
         <Font
           role="font"/>

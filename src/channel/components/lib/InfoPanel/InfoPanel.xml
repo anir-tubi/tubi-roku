@@ -186,7 +186,7 @@
             <Poster
               id="ClosedCaptionPoster"
               height="36"
-              width="56"
+              width="36"
               loadDisplayMode="scaleToFit"
               loadSync="true"/>
             <Poster
@@ -224,7 +224,7 @@
             </Label>
             <Label
               id="ExpireWarning"
-              translation="[0, 9]">
+              translation="[0, 6]">
               <Font
                 role="font"/>
             </Label>
@@ -404,25 +404,7 @@
       </LayoutGroup>
     </LayoutGroup>
 
-    <LayoutGroup
-      id="PlayerCountdownGroup"
-      layoutDirection="horiz"
-      vertAlignment="bottom"
-      itemSpacings="[15]"
-      opacity=".64"
-      visible="false" >
-      <Poster
-        id="FullscreenIcon"
-        uri="pkg:/images/icon-fullScreen.png"
-        width="30"
-        height="26"
-        loadDisplayMode="scaleToFit"
-        loadSync="true"/>
-      <Label
-        id="CountdownText">
-        <Font
-          role="font"/>
-      </Label>
-    </LayoutGroup>
+    <CountdownTimer
+      id="PlayerCountdownGroup"/>
   </children>
 </component>

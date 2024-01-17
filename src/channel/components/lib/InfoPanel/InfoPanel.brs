@@ -49,7 +49,6 @@ Function init()
   StarringRect = m.top.findNode("StarringRect")
 
   m.playerCountdownGroup = m.top.findNode("PlayerCountdownGroup")
-  m.countdownText = m.top.findNode("CountdownText")
 
   m.top.observeFieldScoped("mode", "onModeChange")
   m.top.observeFieldScoped("width", "onWidthChange")
@@ -100,7 +99,7 @@ Function init()
 
   typographyConstants = getTypographyConstants()
   '//::TODO::typography - headerSmall is too big and causes the text to fall on 2 lines in many cases. We need to look into widening the info panel text area.
-  '//   This should be done in a seaprate SC ticket
+  '//   This should be done in a separate SC ticket
   ' setTypographyOfLabel(m.title, typographyConstants.ids.headerSmall)
   setTypographyOfLabel(m.episode, typographyConstants.ids.subheaderSmall)
   setTypographyOfLabel(m.Line1, typographyConstants.ids.bodyMedium)
@@ -116,7 +115,6 @@ Function init()
   setTypographyOfLabel(m.Director, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.StarringTag, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.Starring, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.CountdownText, typographyConstants.ids.bodyMedium)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -142,7 +140,6 @@ Function onThemeChange(msg = invalid)
     m.Description.color = theme.primaryTextColor
     m.Director.color = theme.primaryTextColor
     m.Starring.color = theme.primaryTextColor
-    m.CountdownText.color = theme.primaryTextColor
   end if
 End Function
 
@@ -619,10 +616,10 @@ End Function
 Function onPlayerCountDownChange()
   tubiLog("InfoPanel.onPlayerCountDownChange")
   if m.top.fullscreenCountdown >= 0
-    m.playerCountdownGroup.visible = true
-    m.countdownText.text = getTranslation("metadata_fullscreen_countdown_plural", {seconds: m.top.fullscreenCountdown.toStr()})
+    m.playerCountdownGroup.display = true
+    m.playerCountdownGroup.seconds = m.top.fullscreenCountdown
   else
-    m.playerCountdownGroup.visible = false
+    m.playerCountdownGroup.display = false
   end if
 End Function
 
@@ -707,7 +704,6 @@ End Function
 Function onModeChange()
   tubiLog("InfoPanel.onModeChange")
   resetDefaultState()
-
   if m.top.mode = m.constants.ui.infoPanelModes.item
     ' used for movies and series on the homescreen and similar screens
     m.infoPanelGroup.appendChild(m.offset)

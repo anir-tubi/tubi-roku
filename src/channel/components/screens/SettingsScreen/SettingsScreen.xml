@@ -17,13 +17,6 @@
 
       <field id="autoPreviewItemUpdated" type="integer" alwaysNotify="true"/>
 
-      <!-- What is the previous page so it can be indicated on the call to action that is located on the top nav.
-      -->
-      <field id="callingPage" type="string"  alwaysNotify="true"/>
-
-      <!-- If the screen is not enabled, then user should not be able to select anything -->
-      <field id="enabled" type="boolean"  alwaysNotify="true"/>
-
       <!-- The outside can request an item to be selected. The ID of the button. -->
       <field id="itemRequested" type="string" alwaysNotify="true"/>
 
@@ -67,49 +60,21 @@
 
   <children>
 
-    <Label
-      id="Title"
-      height="73"
-      translation="[192,200]">
-      <Font
-       role="font"/>
-    </Label>
-
-
-    <Group id="nav">
-      <LayoutGroup
-        id="ScreenNavigationHint"
-        layoutDirection="horiz"
-        vertAlignment="custom"
-        opacity="0.5"
-        itemSpacings="[9]"
-        translation="[192,60]">
-        <Poster
-          uri="pkg:/images/back.png"
-          width="29"
-          height="47"/>
-        <Label
-          id="callToAction"
-          vertAlign="center"
-          height="47"
-          translation="[0,2]">
-          <Font
-            role="font"/>
-        </Label>
-      </LayoutGroup>
-    </Group>
-
-    <Poster
-      id="leftChevron"
-      uri="pkg:/images/left-chevron.png"
-      width="15"
-      height="27"
-      translation="[90,528]"/>
-
-    <PanelSet
+    <Group id="PageGroup">
+      <Label
+        id="Title"
+        height="73"
+        translation="[0,132]">
+        <Font
+        role="font"/>
+      </Label>
+    
+      <PanelSet
       id="PanelSet"
       width="1920"
       height="550"
-      translation="[160,414]"/>
+      translation="[-36,264]"/>
+    </Group>
+
   </children>
 </component>

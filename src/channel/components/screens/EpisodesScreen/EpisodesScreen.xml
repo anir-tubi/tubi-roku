@@ -37,47 +37,46 @@
   </interface>
 
   <children>
-    <InfoPanel
-      id="InfoPanel"
-      translation="[192,133]"
-      maxHeight="511"
-      mode="detail"
-      visible="true" />
-
     <Poster
       id="leftChevron"
       uri="pkg:/images/left-chevron.png"
       width="15"
       height="27"
-      translation="[90,528]"/>
+      translation="[75,528]"/>
 
-    <CommunicatingMarkupGrid
-      id="EpisodeMenu"
-      translation="[-425, 643]"
-      itemSize="[425,80]"
-      itemSpacing="[0,8]"
-      numRows="4"
-      numColumns="1"
-      vertFocusAnimationStyle="fixedFocus"
-      itemComponentName="CategorySeasonListItem" />
+    <Group id="PageGroup">
+      <InfoPanel
+        id="InfoPanel"
+        translation="[0,165]"
+        maxHeight="511"
+        mode="detail"
+        visible="true" />
 
-    <RowList
-      id="RowList"
-      translation="[192,570]"
-      itemComponentName="FeaturePosterWithProgress"
-      rowTitleComponentName="CategoryGridRowLabel"
-      itemSize="[1835,318]"
-      itemSpacing="[0,28]"
-      numRows="2"
-      rowSpacings="[28]"
-      rowItemSize="[[384,216]]"
-      rowItemSpacing="[[12,0]]"
-      showRowLabel="[true]"
-      showRowCounter="[false]"
-      fadeFocusFeedbackWhenAutoScrolling="true"
-      rowFocusAnimationStyle="floatingFocus"
-      vertFocusAnimationStyle="fixedFocus"
-      focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
+      <CommunicatingMarkupGrid
+        id="EpisodeMenu"
+        translation="[0, 643]"
+        itemSize="[425,80]"
+        itemSpacing="[0,8]"
+        numRows="4"
+        numColumns="1"
+        vertFocusAnimationStyle="fixedFocus"
+        itemComponentName="CategorySeasonListItem" />
 
+      <RowList
+        id="RowList"
+        translation="[0,594]"
+        itemComponentName="FeaturePosterWithProgress"
+        rowTitleComponentName="CategoryGridRowLabel"
+        itemSpacing="[0,32]"
+        numRows="2"
+        rowSpacings="[32]"
+        rowItemSpacing="[[16,0]]"
+        showRowLabel="[true]"
+        showRowCounter="[false]"
+        fadeFocusFeedbackWhenAutoScrolling="true"
+        rowFocusAnimationStyle="floatingFocus"
+        vertFocusAnimationStyle="fixedFocus"
+        focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
+    </Group>
   </children>
 </component>

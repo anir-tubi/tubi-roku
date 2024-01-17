@@ -169,7 +169,7 @@ Function onContentChange(msg)
           m.InnerTitle.visible = true
           setInnerGradient()
           m.TimeRemaining.text = ""
-          m.resumeMargin = 24
+          m.resumeMargin = 15
         end if
         drawHistoryProgressBar()
       else if itemContent.type = m.contentTypes.linear
@@ -195,7 +195,7 @@ End Function
 
 
 ' Make sure the assets within the inner part of the poster like the resume Progress bar
-' is located towards the bottom of the poster based on the current dimensions of the poster.
+' are located towards the bottom of the poster based on the current dimensions of the poster.
 Function moveInnerAssets()
   m.InnerLayout.translation = [m.resumeMargin, m.top.height - m.resumeProgressBar.height - m.resumeMargin - m.InnerTitle.height - m.TimeRemaining.height - (m.InnerLayout.itemSpacings[0] * 2) ]
 End Function

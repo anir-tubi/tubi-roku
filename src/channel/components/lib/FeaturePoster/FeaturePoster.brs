@@ -3,6 +3,7 @@ Function init()
   m.Title = m.top.findNode("Title")
   m.top.observeField("itemContent", "onContentChange")
   m.top.observeField("width", "onWidthChange")
+  m.top.observeField("height", "onHeightChange")
   
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.Title, typographyConstants.ids.bodyMedium)
@@ -52,4 +53,9 @@ End Function
 
 Function onWidthChange()
   m.Title.width = m.top.width - 20
+End Function
+
+
+Function onHeightChange()
+  m.Title.translation = [m.Title.translation[0], Int(m.top.height) + 15]
 End Function

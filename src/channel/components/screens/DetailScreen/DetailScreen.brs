@@ -4,6 +4,8 @@ Function init()
   m.Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, m.Auth)
   m.NodeHelpers = TubiNodeHelpers()
+  m.PageGroup = m.top.findNode("PageGroup")
+  m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.Info = m.top.findNode("DetailInfoPanel")
   m.Menu = m.top.findNode("Menu")
   m.SecondaryMenu = m.top.findNode("SecondaryMenu")
@@ -32,6 +34,8 @@ Function init()
   m.signUpMenuItem = m.top.findNode("signUpMenuItem")
   m.signUpMenuItem.iconUrl = "pkg:/images/icon-sign-in.webp"
 
+
+  m.RelatedGrid.itemSize = m.constants.ui.imageSizes.largePoster
   m.menuFocused = false
   m.secondaryMenuFocused = false
 

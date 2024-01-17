@@ -3,6 +3,8 @@ Function init()
   m.constants = getConstantsFromGlobal()
   topRef.observeFieldScoped("focusedChild", "onScreenFocusChange")
 
+  m.PageGroup = m.top.findNode("PageGroup")
+  m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.heading = topRef.findNode("heading")
   m.heading.text = getTranslation("privacy_preferences_label")
 

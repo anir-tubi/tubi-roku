@@ -54,8 +54,7 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
       ' if an experiment or remote config needs to update the remoteComponentsUrl, do it here.
       ' (experiment tracking should not happen here. It should happen when the user encounters the experiment!)
       '-------------------------------------------------------------------------------------'
-      ' experiment example:
-      ' request = TubiRequest(m.constants.settings)
+      ' EXPERIMENT EXAMPLE
       ' experiments = TubiExperiments(m.constants)
       ' sideNavEnabled = m.experiments.getExperimentResource("RokuNamespace", "roku_side_nav").enabled
       ' if sideNavEnabled = true
@@ -64,13 +63,12 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
       '   remoteComponentsUrl = "someOtherUrl"
       ' end if
       '
-      ' remote/external config example:
+      ' sendExposureEvent("RokuNamespace", "roku_side_nav", experiments)
+      '
+      ' REMOTE/EXTERNAL CONFIG EXAMPLE:
       ' remoteComponentsUrl = m.constants.externalConfig.sideNavRemoteComponentsUrl
-
-
       '-------------------------------------------------------------------------------------'
       experiments = TubiExperiments(m.constants)
-
       remoteComponentsUrl = m.constants.settings.remoteComponentsUrl
       if experiments <> invalid then
         if experiments.getExperimentResource("roku_new_cdn", "roku_new_cdn_v1").enabled = true
@@ -81,6 +79,8 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
           m.animationLogo.asyncStopSemantics = true
         end if
       end if
+      '-------------------------------------------------------------------------------------'
+      '-------------------------------------------------------------------------------------'
 
       ' This needs to be set before m.top.remoteComponentsUrl as we are getting m.top.remoteComponentLibProvided as part of that observer's additional fields
       m.top.remoteComponentLibProvided = m.constants.settings.remoteComponentLibProvided
@@ -88,7 +88,6 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
       print "remoteComponentsUrl "; remoteComponentsUrl
       m.top.remoteComponentsUrl = remoteComponentsUrl
     end if
-
   end if
 End Function
 
@@ -172,8 +171,26 @@ Function onExternalConfigRequestFailure(_error)
 End Function
 
 
-Function processAnimationLogo()
+Function sendExposureEvent(namespaceName as string, experimentName as string, experimentsLib)
+  exposureInfo = experimentsLib.getExperimentTracking(namespaceName, experimentName)
 
+  if exposureInfo <> invalid
+    Request = TubiRequest(m.constants.settings)
+    Auth = TubiAuth(m.constants, Request)
+    trackingLib = TubiTracking(m.constants, Request, Auth)
+    exposureEvent = trackingLib.getClientEvent(exposureInfo.type, exposureInfo.values)
+    reqInfo = trackingLib.createUserTrackingReqInfo(exposureEvent)
+    m.makeRequest({
+      url: reqInfo.url
+      options: reqInfo.options
+      requestType: m.constants.reqNames.postAnalytics
+      silenceCallbackWarnings: true
+    })
+  end if
+End Function
+
+
+Function processAnimationLogo()
   ' bufferingCompleted tells whether buffering reached 33% or more
   m.bufferingCompleted = false
 
@@ -215,7 +232,6 @@ Function processAnimationLogo()
   m.animationLogo.observeField("position", "onPositionChange")
   m.animationLogo.observeField("state", "onAnimationLogoChange")
   m.animationLogo.control = "prebuffer"
-
 End Function
 
 

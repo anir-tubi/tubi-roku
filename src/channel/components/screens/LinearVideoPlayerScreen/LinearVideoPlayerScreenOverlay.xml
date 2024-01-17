@@ -130,8 +130,7 @@
 
         <!-- EPGHorizontalSlide is used to slide the EPG left and right. The EPG component can be slide up and down directly. We need to distinguish between the 2 different slides because slideFade() cannot be used when a different than the origin direction is used.  -->
         <Group
-          id="EPGHorizontalSlide"
-          translation="[192,0]">
+          id="EPGHorizontalSlide">
 
           <InfoPanel
             id="infoPanel"

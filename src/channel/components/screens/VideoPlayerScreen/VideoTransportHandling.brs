@@ -1204,18 +1204,18 @@ Function animateTransport(direction)
   if direction = "in" AND m.ratingOverlay.opacity = 1.0
     hideRatingGradient()
     fade(m.VideoOverlay, direction, 0.4)
-    showTopOverlayAndHint()
+    showTopOverlay()
   else if direction = "out" AND m.ratingOverlay.opacity = 1.0
-    hideTopOverlayAndHint()
+    hideTopOverlay()
     fade(m.VideoOverlay, direction, 0.4)
     showRatingGradient()
   else
     fade(m.VideoOverlay, direction, 0.4)
 
     if direction = "in"
-      showTopOverlayAndHint()
+      showTopOverlay()
     else
-      hideTopOverlayAndHint()
+      hideTopOverlay()
     end if
   end if
 
@@ -1715,20 +1715,18 @@ End Function
 
 
 Function hideRatingGradient()
-  slideTo(m.ratingOverlay, [0,250], 0.6)
+  slideTo(m.ratingOverlay, [0,180], 0.6)
   fade(m.ratingGradient, "out", 0.2)
 End Function
 
 
-Function showTopOverlayAndHint()
+Function showTopOverlay()
   fade(m.TopOverlay, "in", 0.6, 0.2)
-  fade(m.TopHint, "in", 0.6, 0.2)
 End Function
 
 
-Function hideTopOverlayAndHint()
+Function hideTopOverlay()
   fade(m.TopOverlay, "out", 0.6)
-  fade(m.TopHint, "out", 0.6)
 End Function
 
 

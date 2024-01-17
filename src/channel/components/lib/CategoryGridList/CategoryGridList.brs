@@ -17,9 +17,6 @@ Function init()
   m.AnimateToCategoryDebounce = m.top.findNode("AnimateToCategoryDebounce")
   m.AnimateToCategoryDebounce.observeField("fire", "onAnimateToCategoryDebounce")
 
-  m.RowList.itemSpacing = [0,12]
-  m.RowList.rowSpacings = 12
-
   ' Parameters for the metadata block cache. Window size is number of items to fetch, page delimiter
   ' is what focus thresholds trigger a fetch.
   m.initialBlockSize = m.constants.performance.categoryGridList.initialBlockSize
@@ -248,30 +245,26 @@ Function setRowHeights()
   for i=0 to m.top.content.getChildCount()-1
     category = m.top.content.getChild(i)
     rowHeight = 0
-    rowHeightAdjustment = 0
+    rowHeightAdjustment = 57 '//The height of the row container heading and its vertical spacing
     gridItemType = category.gridItemType
     gridItemTypes = m.constants.ui.gridItemTypes
     if gridItemType = gridItemTypes.historySignedOutUser
-      rowHeightAdjustment = 80
       posterHeight = posterSize[1]
       rowItemSize.push([1693, posterHeight])
       rowHeight = posterHeight
     else if gridItemType = gridItemTypes.portrait
       posterWidth = posterSize[0]
       posterHeight = posterSize[1]
-      rowHeightAdjustment = 80
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
     else if gridItemType = gridItemTypes.linear
       rowItemSize.push(m.constants.ui.imageSizes.linear)
       rowHeight = m.constants.ui.imageSizes.linear[1]
-      rowHeightAdjustment = 86
     else if gridItemType = gridItemTypes.landscape OR gridItemType = gridItemTypes.landscapeNoTitle
       posterWidth = landscapeSize[0]
       posterHeight = landscapeSize[1]
-      rowHeightAdjustment = 122
-      if gridItemType = gridItemTypes.landscapeNoTitle then
-        rowHeightAdjustment = 100
+      if gridItemType = gridItemTypes.landscape then
+        rowHeightAdjustment = rowHeightAdjustment + 21
       end if
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
@@ -285,7 +278,8 @@ Function setRowHeights()
   end for
 
   '//setting the height of the m.RowList.itemSize is superceded by the rowHeight of each row
-  itemSize = [1752, 364]
+  '//However, just in case the height of a row is not defined, then it will default to the height defined by itemSize
+  itemSize = [1752, posterSize[1]] 
   m.Rowlist.update({
     "itemSize" : itemSize
     "rowItemSize": rowItemSize

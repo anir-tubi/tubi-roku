@@ -4,18 +4,28 @@ Function init()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.PageGroup = m.top.findNode("PageGroup")
+  m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.Info = m.top.findNode("InfoPanel")
   m.RowList = m.top.findNode("RowList")
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
 
+  m.RowList.rowItemSize = [m.constants.ui.imageSizes.landscape]
+  m.RowList.itemSize = [1835, m.constants.ui.imageSizes.landscape[1] + 96] '//the item size includes the height of the poster image and title. It also includes the spacing in between thr poster and title. 
+
   m.RowList.observeField("rowItemSelected", "onEpisodeSelected")
   m.RowList.observeField("rowItemFocused", "onEpisodeFocused")
+  m.PageGroup = m.top.findNode("pageGroup")
   m.Menu = m.top.findNode("EpisodeMenu")
   m.Menu.observeField("itemFocused", "onSeasonChangeMenu")
   m.Menu.observeField("rowScrollFocused", "onMenuScrollFocused")
   m.defaultHeroUri = "pkg:/images/art-blur-background.webp"
+
+  '//hide menu left of the screen 
+  m.MenuStartingXPos = -m.PageGroup.translation[1]-m.Menu.itemSize[0]
+  m.Menu.translation = [m.MenuStartingXPos, m.Menu.translation[1]]
 
   theme = getThemeFromGlobal()
   if theme <> invalid
@@ -305,11 +315,11 @@ Function focusGrid()
     m.RowList.setFocus(true)
   end if
   if m.constants.deviceInfo.limitedUi
-    m.RowList.translation = [192, m.RowList.translation[1]]
-    m.Menu.translation = [-450, m.Menu.translation[1]]
+    m.RowList.translation = [0, m.RowList.translation[1]]
+    m.Menu.translation = [m.MenuStartingXPos, m.Menu.translation[1]]
   else
-    slideTo(m.RowList, [192, m.RowList.translation[1]], 0.5)
-    slideTo(m.Menu, [-450, m.Menu.translation[1]], 0.5)
+    slideTo(m.RowList, [0, m.RowList.translation[1]], 0.5)
+    slideTo(m.Menu, [m.MenuStartingXPos, m.Menu.translation[1]], 0.5)
   end if
 End Function
 
@@ -322,11 +332,11 @@ Function focusMenu()
   m.Menu.setFocus(true)
 
   if m.constants.deviceInfo.limitedUi
-    m.Menu.translation = [192, m.Menu.translation[1]]
-    m.RowList.translation = [634, m.RowList.translation[1]]
+    m.Menu.translation = [0, m.Menu.translation[1]]
+    m.RowList.translation = [m.Menu.itemSize[0] + 8, m.RowList.translation[1]]
   else
-    slideTo(m.Menu, [192, m.Menu.translation[1]], 0.5)
-    slideTo(m.RowList, [634, m.RowList.translation[1]], 0.5)
+    slideTo(m.Menu, [0, m.Menu.translation[1]], 0.5)
+    slideTo(m.RowList, [m.Menu.itemSize[0] + 8, m.RowList.translation[1]], 0.5)
   end if
 
 End Function

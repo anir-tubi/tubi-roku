@@ -1,20 +1,16 @@
 Function init()
   m.constants = getConstantsFromGlobal()
 
-  m.leftPanelWidth = 470
-  m.rightPanelWidth = 1034
+  m.leftPanelWidth = 437
+  m.rightPanelWidth = 1146
   '//The offset sets the right panel to be placed at a different position than the settings menu list
-  m.rightPanelOffset = [36,-199]
+  m.rightPanelOffset = [36,-147]
 
+  m.PageGroup = m.top.findNode("PageGroup")
+  m.PageGroup.translation = [69, 0]
   m.PanelSet = m.top.findNode("PanelSet")
   m.Title = m.top.findNode("Title")
   m.Title.text = getTranslation("menu_settings")
-  m.NavSection = m.top.findNode("nav")
-  m.BackLabel = m.top.findNode("callToAction")
-  if m.constants.deviceInfo.uiResolution <> "FHD"
-    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
-    m.BackLabel.translation = [m.BackLabel.translation[0], m.BackLabel.translation[1] + 3]
-  end if
 
   ' Create the menu
   m.SettingsMenuPanel = createSettingsMenuPanel()
@@ -27,9 +23,7 @@ Function init()
   m.PanelSet.appendChild(m.SettingsMenuPanel)
   m.top.observeField("focusedChild", "onComponentFocusChange")
   m.top.observeField("parentalSettingUpdated", "onSignInInfoChange")
-  m.top.observeField("enabled", "onEnableChange")
   m.top.observeFieldScoped("itemRequested", "onItemRequested")
-  m.top.observeFieldScoped("callingPage", "onSetCallOfAction")
 
   m.top.observeFieldScoped("signInInfo", "onSignInInfoChange")
   m.top.observeFieldScoped("uiMode", "onUiModeChange")
@@ -49,8 +43,7 @@ Function init()
   }
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.BackLabel, typographyConstants.ids.bodySmallStrong)
-  setTypographyOfLabel(m.Title, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.Title, typographyConstants.ids.headerSmall)
 
   m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
   m.top.screenLevel = m.constants.ui.screenLevels.settingsScreen
@@ -59,22 +52,6 @@ Function init()
   request = TubiRequest(m.constants.settings)
   auth = TubiAuth(m.constants, request)
   m.Tracking = TubiTracking(m.constants, request, auth)
-End Function
-
-
-' callback sets the back label based on callingPage
-Function onSetCallOfAction()
-  sPreviousPage = m.top.callingPage
-  sCallToAction = ""
-  if sPreviousPage <> invalid AND Len(sPreviousPage) > 0
-    if UCase(sPreviousPage) = UCase(m.constants.ui.screenIds.signInScreen)
-      sCallToAction = getTranslation("goBack_signIn")
-    end if
-  end if
-  if sCallToAction = ""
-    sCallToAction = getTranslation("goBack_home")
-  end if
-  m.BackLabel.text = sCallToAction
 End Function
 
 
@@ -129,15 +106,6 @@ Function onComponentFocusChange()
     else
       m.Title.opacity = 0.3
     end if
-  end if
-End Function
-
-
-Function onEnableChange()
-  if m.top.enabled = true
-    fade(m.NavSection, "in", 0.3)
-  else
-    fade(m.NavSection, "out", 0.3)
   end if
 End Function
 
@@ -380,7 +348,7 @@ Function createPrivacyCenterPanel(title)
   end if
 
   privacyCenterPanel.focusable = focusable
-  privacyCenterPanel.offset = [36,-201]
+  privacyCenterPanel.offset = [m.rightPanelOffset[0],-141]
   privacyCenterPanel.observeFieldScoped("newConsentPreferences", "onNewConsentPreferences")
   privacyCenterPanel.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
   privacyCenterPanel.observeFieldScoped("didUserSelectSaveAndRestart", "onDidUserSelectSaveAndRestart")
@@ -573,7 +541,7 @@ End Function
 
 Function onKeyEvent(key, press) as Boolean
   if press = true
-    if key = "left" or key = "back"
+    if key = "back"
       m.top.backButtonPressed = true
       return true
     end if

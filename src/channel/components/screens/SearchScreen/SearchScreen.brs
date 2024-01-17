@@ -20,8 +20,9 @@ Function init()
   
   m.searchGroup = m.top.findNode("searchGroup")
 
+  m.PageGroup = m.top.findNode("PageGroup")
+  m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.spinner = m.top.findNode("spinner")
-  m.NavSection = m.top.findNode("nav")
   m.KidsModeMessage = m.top.findNode("KidsModeMessage")
   m.leftSide = m.top.findNode("leftSide")
   m.SearchText = m.top.findNode("SearchText")
@@ -81,7 +82,6 @@ Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("visible", "onVisible")
-  m.top.observeField("enabled", "onEnableChange")
   m.top.observeField("contentUpdated", "onSearchContentChange")
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
 
@@ -112,14 +112,7 @@ Function init()
   m.top.handlesTransportVoiceRequests = true
   loadSearchResults(true)'//load the default search results
 
-  BackLabel = m.top.findNode("callToAction")
-  if m.constants.deviceInfo.uiResolution <> "FHD"
-    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
-    BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
-  end if
-
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.searchMenuText, typographyConstants.ids.headerSmall)
   setTypographyOfLabel(m.searchHintText, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.KidsModeMessage, typographyConstants.ids.bodyMedium)
@@ -201,9 +194,6 @@ End Function
 
 
 Function setSearchStrings()
-  BackLabel = m.top.findNode("callToAction")
-  BackLabel.text = getTranslation("goBack_menu")
-
   m.sDefaultSearchText = getTranslation("screenSearch_trendingSearch")
   m.searchTitleText = getTranslation("menu_search")
   m.searchHintToSearch = getTranslation("screenSearch_defaultLinearSearch")
@@ -253,14 +243,6 @@ Function onScreenFocusChange()
     end if
   else if m.top.isInFocusChain() = false
     m.keyboard.textEditBox.voiceEnabled = false
-  end if
-End Function
-
-Function onEnableChange()
-  if m.top.enabled = true
-    fade(m.NavSection, "in", 0.3)
-  else
-    fade(m.NavSection, "out", 0.3)
   end if
 End Function
 

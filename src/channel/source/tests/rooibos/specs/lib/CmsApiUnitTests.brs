@@ -36,7 +36,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
     params: {
       "isKidsMode": true,
       "video_resources": m.cmsApi.constants.player.drmOrderHlsv6
-      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
+      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largePoster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largePoster[1].ToStr() + "_poster"
       "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
@@ -61,7 +61,7 @@ Function cmsApi_createRelatedContentReqInfo_test()
     params: {
       "isKidsMode": false,
       "video_resources": m.cmsApi.constants.player.drmOrderHlsv6
-      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
+      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largePoster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largePoster[1].ToStr() + "_poster"
       "app_id": m.cmsApi.constants.settings.shortAppName
       "platform": m.cmsApi.constants.platform
       "device_id": m.cmsApi.constants.deviceInfo.deviceId
@@ -159,7 +159,7 @@ Function cmsApi_createSingleContentReqInfo_test()
       "isKidsMode": false
       "includeChannels": true
       "video_resources": m.cmsApi.constants.player.drmOrderHlsv6
-      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_landscape"
+      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeLandscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeLandscape[1].ToStr() + "_landscape"
     }
   }
 
@@ -249,7 +249,7 @@ Function cmsApi_createMultipleContentReqInfo_test()
       "isKidsMode": false
       "includeChannels": true
       "video_resources": m.cmsApi.constants.player.drmOrderHlsv6
-      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_landscape"
+      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeLandscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeLandscape[1].ToStr() + "_landscape"
     }
   }
 
@@ -546,8 +546,8 @@ Function cmsApi_createCategoryReqInfo_test()
       "include_channels": true
       "cursor": 0
       "contents_limit": 19
-      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
-      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_landscape"
+      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largePoster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largePoster[1].ToStr() + "_poster"
+      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeLandscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeLandscape[1].ToStr() + "_landscape"
       "contentMode": m.cmsApi.constants.ui.contentMode.homescreen
       "customParam": "custom_param_value"
     }
@@ -646,8 +646,8 @@ Function cmsApi_createCategoryReqInfo_test()
       "include_channels": true
       "cursor": 10
       "contents_limit": m.cmsApi.constants.performance.categoryGridList.lazyLoadBatchSize
-      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.poster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.poster[1].ToStr() + "_poster"
-      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.landscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.landscape[1].ToStr() + "_landscape"
+      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largePoster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largePoster[1].ToStr() + "_poster"
+      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeLandscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeLandscape[1].ToStr() + "_landscape"
       "contentMode": ""
       "expanded":	true
     }
@@ -858,8 +858,8 @@ End Function
 
 '@Test unit tests setImageParams
 Function cmsApi_setImageParams_test()
-  posterParam = "w186h267_poster"
-  landscapeParam = "w384h216_landscape"
+  posterParam = "w252h360_poster"
+  landscapeParam = "w520h292_landscape"
 
   ' test add poster only
   existingParams = {
@@ -918,7 +918,7 @@ End Function
 
 '@Test unit tests setTupianPosterParam
 Function cmsApi_setTupianPosterParam_test()
-  posterParam = "w186h267_poster"
+  posterParam = "w252h360_poster"
 
   existingParams = {
     userid: "1234"
@@ -937,7 +937,7 @@ End Function
 
 '@Test unit tests setTupianLandscapeParam
 Function cmsApi_setTupianLandscapeParam_test()
-  landscapeParam = "w384h216_landscape"
+  landscapeParam = "w520h292_landscape"
 
   existingParams = {
     userid: "1234"

@@ -38,10 +38,10 @@
         <LayoutGroup
           id="InnerLayout"
           layoutDirection="vert"
-          itemSpacings="[0]">
+          itemSpacings="[9]">
             <Label
               id="InnerTitle"
-              width="342"
+              width="471"
               height="27"
               vertAlign="top"
               visible="false">
@@ -75,7 +75,7 @@
       <Label
         id="Title"
         width="380"
-        height="36"
+        height="0"
         vertAlign="center"
         visible="false">
         <Font

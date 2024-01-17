@@ -17,17 +17,16 @@ Function init()
   m.lowerRowIndex = 0
   m.numRowsInBatch = Int(m.constants.performance.categoryGridList.lazyLoadBatchSize / m.itemsInRowCount)
 
+  m.PageGroup = m.top.findNode("PageGroup")
+  m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.InfoPanel = m.top.findNode("ChannelsInfoPanel")
   m.PageTitleAndCounter = m.top.findNode("pageTitleAndCounter")
-  m.NavSection = m.top.findNode("nav")
   m.VideoGrid = m.top.findNode("ChannelsVideoGrid")
   m.VideoGrid.itemSize = m.constants.ui.imageSizes.largePoster
 
-  m.top.observeField("callingPage", "onSetCallOfAction")
   m.top.observeField("shouldLoadContent", "onLoadContent")
   m.top.observeField("isLoading", "onIsLoading")
   m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.top.observeField("enabled", "onEnableChange")
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
   m.VideoGrid.observeField("itemFocused", "onItemFocused")
   m.VideoGrid.observeField("itemSelected", "onItemSelected")
@@ -38,18 +37,8 @@ Function init()
 
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
 
-  BackLabel = m.top.findNode("callToAction")
-  if m.constants.deviceInfo.uiResolution <> "FHD"
-    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
-    BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
-  end if
-
   m.top.screenLevel = m.constants.ui.screenLevels.categoryDetailsScreen
   m.top.handlesTransportVoiceRequests = true
-
-
-  typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmallStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -66,38 +55,6 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.VideoGrid.focusBitmapBlendColor = theme.focusedColor
-  end if
-End Function
-
-
-Function onSetCallOfAction()
-  sPreviousPage = m.top.callingPage
-  sCallToAction = ""
-  if sPreviousPage <> invalid AND Len(sPreviousPage) > 0
-    if UCase(sPreviousPage) = UCase(m.constants.ui.terms.categories)
-      sCallToAction = getTranslation("goBack_categories")
-    else if UCase(sPreviousPage) = UCase(m.constants.ui.terms.channels)
-      sCallToAction = getTranslation("goBack_channels")
-    else if UCase(sPreviousPage) = UCase(m.constants.ui.terms.menu)
-      sCallToAction = getTranslation("goBack_menu")
-    else if UCase(sPreviousPage) = UCase(m.constants.ui.terms.home)
-      sCallToAction = getTranslation("goBack_home")
-    end if
-  end if
-  if sCallToAction = ""
-    sCallToAction = getTranslation("goBack_default")
-  end if
-
-  callToAction = m.top.findNode("callToAction")
-  callToAction.text = sCallToAction
-End Function
-
-
-Function onEnableChange()
-  if m.top.enabled = true
-    fade(m.NavSection, "in", 0.3)
-  else
-    fade(m.NavSection, "out", 0.3)
   end if
 End Function
 

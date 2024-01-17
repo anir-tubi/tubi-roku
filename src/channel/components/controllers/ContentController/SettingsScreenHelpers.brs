@@ -5,7 +5,6 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   tubiLog("SettingsScreenHelpers.showSettingsScreen")
   m.settingsScreen = CreateObject("roSGNode", "SettingsScreen")
   m.settingsScreen.id = m.constants.ui.screenIds.settingsScreen
-  m.settingsScreen.callingPage = sPageSource
   m.settingsScreen.uiMode = m.uiMode
   ' Passing in the saved isVideoPreviewOn.
   m.settingsScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn

@@ -2,15 +2,12 @@
 ' showCategoryDetailsScreen
 '
 ' @content: roSGNode, a content node for a single pieces of content, might be a video or top level series
-' @sPageSource: string, What page is calling this function? This string is what is displayed on the top of the page
-'                       to let the user know what page they will go to when they click the back button. Possible values are from constants.ui.terms
 ' @sendNavigationLoadEvents: boolean, when the page is loaded, do the navigation to page, pageload events needs to be sent
 ' @contentMode: string, the value from constants.ui.contentMode to be sent as param to the tensor request
-Function showCategoryDetailsScreen(content, sPageSource = "", sendNavigationLoadEvents = true, contentMode = "")
+Function showCategoryDetailsScreen(content, sendNavigationLoadEvents = true, contentMode = "")
   tubiLog("CategoryDetailsScreenHelpers.showCategoryDetailsScreen")
 
   categoryDetailsScreen = CreateObject("roSGNode", "CategoryDetailsScreen")
-  categoryDetailsScreen.callingPage = sPageSource
   categoryDetailsScreen.trackingLoadStartTime = UpTime(0)
   categoryDetailsScreen.observeFieldScoped("contentSelected", "onCategoryContentSelected")
   categoryDetailsScreen.observeFieldScoped("backgroundUriList", "onCategoryScreenBackgroundChange")
@@ -400,7 +397,7 @@ Function onCategoryDetailsScreenBackButtonPressed(msg)
   tubiLog("CategoryDetailsScreenHelpers.onCategoryDetailsScreenBackButtonPressed")
   screen = msg.getRoSGNode()
 
-  if screen <> invalid AND screen.callingPage <> invalid
+  if screen <> invalid
     previousScreen = getHiddenScreen(1)
     if previousScreen <> invalid AND previousScreen.subType() = "HomeScreen"
       jumpToParentScreenContentByID(screen.contentFocusedId, screen.categoryId, previousScreen.id)

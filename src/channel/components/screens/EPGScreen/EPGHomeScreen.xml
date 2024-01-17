@@ -110,23 +110,26 @@
 
   <children>
 
-    <TopNav
-      id="topNav"
-      translation="[192,48]"/>
+    <Group id="PageGroup">
+      <TopNav
+        id="topNav"
+        translation="[0,48]"/>
 
-    <Group
-      id="infoPanelParent">
-      <InfoPanel
-        id="infoPanel"
-        maxHeight="355"
-        translation="[192,180]"
-        maxTitleLines="2"
-        visible="false"/>
+      <Group
+        id="infoPanelParent">
+        <InfoPanel
+          id="infoPanel"
+          maxHeight="355"
+          translation="[0,180]"
+          maxTitleLines="2"
+          visible="false"/>
+      </Group>
+      <ProgramGuide
+        id="programGuide"
+        translation="[0,510]"/>
+
+
     </Group>
-
-    <ProgramGuide
-      id="programGuide"
-      translation="[192,510]"/>
 
     <Clock
       id="clock"
@@ -134,7 +137,6 @@
       height="36"
       visible="true"
       translation="[1729,72]"/>
-
     <!-- For viewers that watch a REALLY long time, or just never close the app, force a refresh -->
     <Timer
       id="channelRefreshTimer"

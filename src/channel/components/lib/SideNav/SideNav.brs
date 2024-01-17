@@ -127,7 +127,7 @@ Function onCreateMenuItems()
   m.background.width = m.mainItemsOriginalItemSize[0]
   m.background.height = m.mainItemsOriginalItemSize[1]
 
-  m.itemGroups.translation = [57, 120]
+  m.itemGroups.translation = [27, 120]
   m.mainItems.wrapDividerBitmapUri = ""
   m.mainItems.wrapDividerHeight = 0
 

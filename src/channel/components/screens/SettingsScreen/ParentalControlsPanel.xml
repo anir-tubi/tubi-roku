@@ -29,23 +29,23 @@
     <Group
       id="Offset">
 
-    <Group
-      id="ContentGroup">
+    <LayoutGroup
+      id="ContentGroup"
+      layoutDirection="vert"
+      itemSpacings="[45]">
       <Label
         id="Title"
         height="73"
-        vertAlign="bottom"
-        translation="[25,0]">
+        vertAlign="bottom">
         <Font
          role="font"/>
       </Label>
 
       <Label
         id="Instructions"
-        width="890"
+        width="1002"
         wrap="true"
-        vertAlign="bottom"
-        translation="[25,143]">
+        vertAlign="bottom">
         <Font
          role="font"/>
       </Label>
@@ -56,8 +56,7 @@
         itemSize="[560,80]"
         itemSpacing="[0,8]"
         itemComponentName="CheckButton"
-        vertFocusAnimationStyle="floatingFocus"
-        translation="[25,347]">
+        vertFocusAnimationStyle="floatingFocus">
         <ContentNode
           id="SettingsMenuContent"
           role="content">
@@ -71,7 +70,7 @@
             id="Adults"/>
         </ContentNode>
       </MarkupList>
-    </Group>
+    </LayoutGroup>
 
     <Spinner
       id="Spinner"

@@ -5,6 +5,9 @@ Function init()
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 
+  m.PageGroup = m.top.findNode("PageGroup")
+  m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
+
   'infoPanel
   m.infoPanelParent = m.top.findNode("InfoPanelParent")
   m.infoPanel = m.top.findNode("InfoPanel")

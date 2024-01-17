@@ -186,10 +186,6 @@
           <Group
             id="LinearPlayerGroupAboveScreenStack"/>
 
-          <CountdownTimerUI
-            id="LinearCountdownTimer"
-            translation="[946,240]"/>
-
           <SideNav
             id="SideNav"
             translation="[0,0]"
@@ -211,13 +207,13 @@
               width="103"
               uri="pkg:/images/logo-white-large.png"
               opacity="0.5"
-              translation="[1719,60]"/>
+              translation="[1731,60]"/>
             <Poster
               id="tubiKidsLogo"
               height="45"
               width="209"
               uri="pkg:/images/locale/en_US/logo-kids-white-large.png"
-              translation="[1614,60]"
+              translation="[1626,60]"
               opacity="1.0"
               visible="false"/>
             <Poster
@@ -225,7 +221,7 @@
               height="78"
               width="322"
               uri="pkg:/images/logo-espanol-white-large.png"
-              translation="[1503,60]"
+              translation="[1515,60]"
               opacity="1.0"
               visible="false"/>
             <Poster
@@ -233,7 +229,7 @@
               height="120"
               width="385"
               uri="pkg:/images/logo-tubi-FIFA.webp"
-              translation="[1450,60]"
+              translation="[1449,60]"
               opacity="1.0"
               visible="false"/>
           </Group>

@@ -8,6 +8,9 @@ Function init()
 
   m.mask = m.top.findNode("mask")
 
+  m.PageGroup = m.top.findNode("PageGroup")
+  m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
+  
   'infoPanel
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.InfoPanelParent = m.top.findNode("InfoPanelParent")
@@ -86,12 +89,12 @@ End Function
 Function onPreTournament()
   tubilog("TournamentScreen.onPreTournament")
   if m.top.isPreTournament = true
-    m.epgTimeGrid.translation = "[192,550]"
-    m.categoryGridList.translation = "[192,880]"
+    m.epgTimeGrid.translation = "[0,550]"
+    m.categoryGridList.translation = "[0,880]"
     m.top.focusedComponent = m.constants.ui.tournamentScreen.focusItems.epgTimeGrid
   else
-    m.epgTimeGrid.translation = "[192,938]"
-    m.categoryGridList.translation = "[192,550]"
+    m.epgTimeGrid.translation = "[0,938]"
+    m.categoryGridList.translation = "[0,550]"
     m.top.focusedComponent = m.constants.ui.tournamentScreen.focusItems.categoryGridList
   end if
 

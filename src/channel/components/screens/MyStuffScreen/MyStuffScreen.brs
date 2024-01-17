@@ -6,6 +6,8 @@ Function init()
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
   m.ContentArea = m.top.findNode("ContentArea")
+  m.PageGroup = m.top.findNode("PageGroup")
+  m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.SignedOutUI = m.top.findNode("SignedOutUI")
   m.SignedOutUITitle = m.top.findNode("SignedOutUITitle")
@@ -40,13 +42,6 @@ Function init()
   m.gridHasGainedInitialFocus = false
 
   m.metadataTranslate = TubiMetadataTranslate(m.constants)
-
-  BackLabel = m.top.findNode("callToAction")
-  BackLabel.text = getTranslation("goBack_menu")
-  if m.constants.deviceInfo.uiResolution <> "FHD"
-    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
-    BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
-  end if
 
   'Content area
   m.RowList = m.top.findNode("RowList")
@@ -95,7 +90,6 @@ Function init()
   m.top.observeFieldScoped("reset", "onResetChange")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.SignedOutUITitle, typographyConstants.ids.headerSmall)
   setTypographyOfLabel(m.SignedOutUISubtitle, typographyConstants.ids.bodyLarge)
   setTypographyOfLabel(m.SignedOutUIBlurb, typographyConstants.ids.bodyLarge)
@@ -251,31 +245,29 @@ Function setRowHeights()
   for i = 0 to m.top.content.getChildCount() - 1
     category = m.top.content.getChild(i)
     rowHeight = 0
-    rowHeightAdjustment = 0
+    rowHeightAdjustment = 56 '//The height of the row container heading and its vertical spacing
     gridItemType = category.gridItemType
     gridItemTypes = m.constants.ui.gridItemTypes
     if gridItemType = gridItemTypes.emptyContainer
-      rowHeightAdjustment = m.constants.ui.imageSizes.emptyContainer[1] - m.constants.ui.imageSizes.landscape[1]
       rowItemSize.push(m.constants.ui.imageSizes.emptyContainer)
       rowHeight = m.constants.ui.imageSizes.emptyContainer[1]
     else if gridItemType = gridItemTypes.landscapeInnerMetadata
-      posterWidth = m.constants.ui.imageSizes.landscape[0]
-      posterHeight = m.constants.ui.imageSizes.landscape[1]
-      rowHeightAdjustment = 50
+      posterWidth = m.constants.ui.imageSizes.largeLandscape[0]
+      posterHeight = m.constants.ui.imageSizes.largeLandscape[1]
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
     else
-      posterWidth = m.constants.ui.imageSizes.poster[0]
-      posterHeight = m.constants.ui.imageSizes.poster[1]
-      rowHeightAdjustment = 80
+      posterWidth = m.constants.ui.imageSizes.largePoster[0]
+      posterHeight = m.constants.ui.imageSizes.largePoster[1]
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
     end if
     rowHeights.push(rowHeight + rowHeightAdjustment)
   end for
 
-  '//setting the height of the m.RowList.itemSize is superceded by the rowHeight of each row
-  itemSize = [1752, 364]
+  '//setting the height of the m.RowList.itemSize is superceded by the rowHeight of each row.
+  '//However, just in case the height of a row is not defined, then it will default to the height defined by itemSize
+  itemSize = [1752, m.constants.ui.imageSizes.largePoster[1]] 
   m.Rowlist.update({
     "itemSize": itemSize
     "rowItemSize": rowItemSize

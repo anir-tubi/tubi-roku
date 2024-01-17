@@ -6,8 +6,9 @@ Function init()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
+  m.PageGroup = m.top.findNode("PageGroup")
+  m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.ContentArea = m.top.findNode("ContentArea")
-  m.NavSection = m.top.findNode("nav")
   m.TopNav = m.top.findNode("TopNav")
   m.InfoPanel = m.top.findNode("InfoPanel")
   m.InfoPanelParent = m.top.findNode("InfoPanelParent")
@@ -15,13 +16,12 @@ Function init()
   fades = m.top.findNode("Fades")
   m.HintGroupFade = fades.findNode("HintGroupFade")
 
-  m.ContentArea.translation = [192,518]
-  m.ContentArea.maskOffset = [0,273]
+  m.ContentArea.translation = [0, 516]
+  m.ContentArea.maskOffset = [-m.PageGroup.translation[0], 573]
 
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeFieldScoped("signedIn", "onSignedInChange")
   m.top.observeField("categoryMenuVisible", "onCategoryMenuVisible")
-  m.top.observeField("enabled", "onEnableChange")
   m.top.observeField("isLoading", "onLoadingChange")
   m.top.observeField("resetContentAreaValues", "onResetContentAreaValues")
   m.top.observeField("id", "onIDChange")
@@ -63,13 +63,6 @@ Function init()
 
   m.top.handlesTransportVoiceRequests = true
 
-  BackLabel = m.top.findNode("callToAction")
-  BackLabel.text = getTranslation("goBack_menu")
-  if m.constants.deviceInfo.uiResolution <> "FHD"
-    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
-    BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
-  end if
-
   m.top.screenLevel = m.constants.ui.screenLevels.homeScreen
 
   ' lastFocusPosition holds the state of currFocusRow the last time onCurrFocusRow() occurred.
@@ -80,9 +73,9 @@ Function init()
   m.currentColumn = -1
 
   m.sponsorSlideAmt = 29 'the amount the grid slides up to fit the sponsored header. This is the difference of the heights of the sponsored and normal row titles
-  m.sponsorMaskOffsetDiff = 29 'the diff in the amount the content area mask is offset in the up direction for sponsored rows. This is the difference of the heights of the sponsored and normal row titles
-  m.linearSlideAmt = -115 'the amount the grid slides up to fit the linear content item
-  m.linearMaskOffsetDiff = -99 'the diff in the amount the content area mask is offset in the up direction for the linear news container
+  m.sponsorMaskOffsetDiff = 119 'the diff in the amount the content area mask is offset in the up direction for sponsored rows. This is the difference of the heights of the sponsored and normal row titles
+  m.linearSlideAmt = 0 'the amount the grid slides up to fit the linear content item
+  m.linearMaskOffsetDiff = -199 'the diff in the amount the content area mask is offset in the up direction for the linear news container
 
   m.originalContentAreaTranslation = m.ContentArea.translation
   m.linearContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.linearSlideAmt]
@@ -94,20 +87,16 @@ Function init()
     m.top.parentalRating = authInfo.parentalrating
   end if
 
-  typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmallStrong)
 End Function
 
 
 Function onEnableTopNavChange()
   tubiLog("HomeScreen.onEnableTopNavChange")
   if m.top.enableTopNav = true
-    m.InfoPanel.translation = [m.InfoPanel.translation[0], 180]
-    m.NavSection.visible = false
+    m.InfoPanel.translation = [m.InfoPanel.translation[0], 165]
     m.TopNav.visible = true
   else
     m.InfoPanel.translation = [m.InfoPanel.translation[0], 133]
-    m.NavSection.visible = true
     m.TopNav.visible = false
   end if
 End Function
@@ -227,15 +216,6 @@ Function onLoadingChange()
     m.CategoryGridList.content = invalid ' should be all categories with initial amounts of content in them
   else
     m.CategoryGridList.content = m.top.content ' should be all categories with initial amounts of content in them
-  end if
-End Function
-
-
-Function onEnableChange()
-  if m.top.enabled = true
-    fade(m.NavSection, "in", 0.3)
-  else
-    fade(m.NavSection, "out", 0.3)
   end if
 End Function
 
@@ -682,15 +662,7 @@ End Function
 '@contentNode: content node
 Function populateInfoPanel(mode, contentNode)
   if contentNode <> invalid
-
-    if mode <> m.constants.ui.infoPanelModes.linearHomeScreen
-      m.InfoPanel.maxHeight = 318
-    else
-      m.InfoPanel.maxHeight = 354
-    end if
-
     if mode = m.constants.ui.infoPanelModes.item
-
       populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel)
     else if mode = m.constants.ui.infoPanelModes.linearHomeScreen
       m.InfoPanel.mode = mode
@@ -699,14 +671,12 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.needsLogin = contentNode.needsLogin AND (m.top.signedIn <> true)
       m.InfoPanel.reminderIsSet = false
-      m.InfoPanel.width = 650
     else if mode = m.constants.ui.infoPanelModes.continueWatching
       m.InfoPanel.mode = mode
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.needsLogin = contentNode.needsLogin AND (m.top.signedIn <> true)
       m.InfoPanel.reminderIsSet = false
-      m.InfoPanel.width = 960
     else if mode = m.constants.ui.infoPanelModes.programHomescreen
       populateInfoPanelWithProgramHomescreenMode(contentNode, m.InfoPanel)
     '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
@@ -724,7 +694,6 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.lineOneData = lineOneData
       m.InfoPanel.needsLogin = false
       m.InfoPanel.reminderIsSet = false
-      m.InfoPanel.width = 960
     else if mode = m.constants.ui.infoPanelModes.sportsEvent
       populateInfoPanelWithHomescreenStyleSportsMode(contentNode, m.InfoPanel)
     end if

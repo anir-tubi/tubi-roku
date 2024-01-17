@@ -1,15 +1,15 @@
 Function registerParsingCallbacks()
-    ' generic requests
-    m.requestTypes[m.constants.reqNames.getExternalConfigs] = {
-        parseSuccess: parseGetExternalConfigSuccess
-        parseError: parseGenericError
-    }
+  ' external config request
+  m.requestTypes[m.constants.reqNames.getExternalConfigs] = {
+    parseSuccess: parseGetExternalConfigSuccess
+    parseError: parseGenericError
+  }
 
-    'tubi experiments.
-    m.requestTypes[m.constants.reqNames.getNamespaces] = {
-        parseSuccess: parseTubiExperimentsNamespaceRequestSuccess
-        parseError: parseGenericError
-    }
+  'tubi experiments.
+  m.requestTypes[m.constants.reqNames.getNamespaces] = {
+    parseSuccess: parseTubiExperimentsNamespaceRequestSuccess
+    parseError: parseGenericError
+  }
 End Function
 
 

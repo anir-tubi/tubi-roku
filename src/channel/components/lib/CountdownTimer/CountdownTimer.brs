@@ -7,8 +7,11 @@ Function init()
   m.top.observeFieldScoped("seconds", "onSecondChange")
   m.top.observeFieldScoped("display", "onDisplayChange")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.CountdownText, typographyConstants.ids.bodyExtraSmall_strong)
+
   '//Use a 2 digit number to determine and set the max width of the background.
-  setSeconds(00)
+  setSeconds(55)
   m.PlayerCountdownBground.width = (m.TextAndIconLayoutGroup.translation[0] * 2) +  m.FullscreenIcon.width + m.TextAndIconLayoutGroup.itemSpacings[0] +  m.CountdownText.boundingRect().width
   m.top.width = m.PlayerCountdownBground.width
 
@@ -28,10 +31,9 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.CountdownText.color = theme.primaryTextColor
-    m.PlayerCountdownBground.blendColor = theme.backgroundColor
+    m.PlayerCountdownBground.blendColor = theme.neutralColor
   end if
 End Function
-
 
 
 Function onSecondChange()

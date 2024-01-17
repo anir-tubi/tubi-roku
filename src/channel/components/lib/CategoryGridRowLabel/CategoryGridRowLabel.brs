@@ -86,6 +86,8 @@ Function onContentChange()
         width = m.CategoryName.boundingRect().width + 25
         m.CategoryName.width = width
         m.subText.text = item.subtext
+        m.subText.height = m.CategoryName.boundingRect().height
+        m.subText.vertAlign = "center"
         m.subText.translation = [width, 5]
         m.subText.visible = true
       end if

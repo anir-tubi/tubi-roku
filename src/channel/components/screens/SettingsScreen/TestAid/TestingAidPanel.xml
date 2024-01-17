@@ -32,8 +32,7 @@
           id="Title"
           text="Testing Aid Config"
           height="73"
-          vertAlign="bottom"
-          translation="[25,0]">
+          vertAlign="bottom">
           <Font
             role="font"/>
         </Label>
@@ -45,7 +44,7 @@
           itemSpacing="[0,8]"
           itemComponentName="CheckButton"
           vertFocusAnimationStyle="floatingFocus"
-          translation="[25,347]">
+          translation="[0,141]">
           <ContentNode
             id="SettingsMenuContent"
             role="content">

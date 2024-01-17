@@ -292,6 +292,7 @@ Function getConstants()
     constants.reqNames.deleteRokuContinueWatching = "deleteRokuContinueWatching"
     constants.reqNames.clearRokuContinueWatching = "clearRokuContinueWatching"
     constants.reqNames.getUserSettings = "getUserSettings"
+    constants.reqNames.postAnalytics = "postAnalytics"
 
     ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
@@ -1183,22 +1184,29 @@ Function getConstants()
     constants.ui.permanentlyCachedContentIds = {}
       constants.ui.permanentlyCachedContentIds[constants.ui.contentIds.homegrid] = true
 
+    'X/Y placement of app-wide elements. Typically x/y placement should be done in XML, but when there is an element that spans many components/screens, then pixel placement can be set here.
+    constants.ui.translations = {}
+    constants.ui.translations.marginX = 165
+
     constants.ui.imageSizes = {}
 
       'Sizes of poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.poster = [186, 267]
 
       'Sizes of large poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.largePoster = [243, 351]
+      constants.ui.imageSizes.largePoster = [252, 360]
 
       'Size of the thumbnail/background of the single element representing an empty container that we wish to show: i.e. on the MyStuff Screen
       constants.ui.imageSizes.emptyContainer = [1572, 267]
 
       'Sizes of landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.landscape = [384, 216]
+      constants.ui.imageSizes.landscape = [386, 217]
+
+      'Sizes of landscape category tiles.
+      constants.ui.imageSizes.landscapeCategoryTile = [386, 224]
 
       'Sizes of large landscape thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
-      constants.ui.imageSizes.largeLandscape = [504, 282]
+      constants.ui.imageSizes.largeLandscape = [520, 292]
 
       'Sizes of linear to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.linear = [384, 144]

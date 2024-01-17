@@ -55,7 +55,6 @@ Function init()
 
   m.LinearPlayerGroup = m.top.findNode("LinearPlayerGroup")
   m.LinearPlayerGroupAboveScreenStack = m.top.findNode("LinearPlayerGroupAboveScreenStack")
-  m.LinearCountdownTimer = m.top.findNode("LinearCountdownTimer")
 
   m.backgroundGroup = m.top.findNode("BackgroundGroup")
   m.logoGroup = m.top.findNode("logoGroup")

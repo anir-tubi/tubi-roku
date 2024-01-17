@@ -9,28 +9,21 @@ Function init()
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
 
+  m.PageGroup = m.top.findNode("PageGroup")
+  m.PageGroup.translation = [m.constants.ui.translations.marginX, 0]
   m.ChannelCategoryGrid = m.top.findNode("ChannelCategoryGrid")
-  m.NavSection = m.top.findNode("nav")
   m.top.observeField("reloadUserCategoriesResponse", "onReloadUserCategoriesResponse")
-  m.top.observeField("callingPage", "onSetCallOfAction")
   m.top.observeField("shouldLoadContent", "onLoadContent")
   m.top.observeField("isLoading", "onIsLoading")
   m.top.observeField("focusedChild", "onScreenFocusChange")
-  m.top.observeField("enabled", "onEnableChange")
+
+
+  m.ChannelCategoryGrid.itemSize= m.constants.ui.imageSizes.landscapeCategoryTile
 
   m.ChannelCategoryGrid.observeField("itemFocused", "onItemFocused")
   m.ChannelCategoryGrid.observeField("itemSelected", "onItemSelected")
 
   m.top.screenLevel = m.constants.ui.screenLevels.channelCategoryGridScreen
-
-  BackLabel = m.top.findNode("callToAction")
-  if m.constants.deviceInfo.uiResolution <> "FHD"
-    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
-    BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
-  end if
-
-  typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmallStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -102,38 +95,6 @@ Function checkForContentAndRefresh(bContentEmpty, sCategoryID)
     if bRefresh = true
       m.top.content.validUntil = 0
     end if
-  end if
-End Function
-
-
-Function onSetCallOfAction()
-  tubiLog("ChannelGridScreen.onSetCallOfAction")
-  sPreviousPage = m.top.callingPage
-  sCallToAction = ""
-  if sPreviousPage <> invalid AND Len(sPreviousPage) > 0
-    if UCase(sPreviousPage) = UCase(m.constants.ui.terms.categories)
-      sCallToAction = getTranslation("goBack_categories")
-    else if UCase(sPreviousPage) = UCase(m.constants.ui.terms.channels)
-      sCallToAction = getTranslation("goBack_channels")
-    else if UCase(sPreviousPage) = UCase(m.constants.ui.terms.menu)
-      sCallToAction = getTranslation("goBack_menu")
-    end if
-  end if
-  if sCallToAction = ""
-    sCallToAction = getTranslation("goBack_default")
-  end if
-
-  callToAction = m.top.findNode("callToAction")
-  callToAction.text = sCallToAction
-End Function
-
-
-Function onEnableChange()
-  tubiLog("ChannelGridScreen.onEnableChange")
-  if m.top.enabled = true
-    fade(m.NavSection, "in", 0.3)
-  else
-    fade(m.NavSection, "out", 0.3)
   end if
 End Function
 

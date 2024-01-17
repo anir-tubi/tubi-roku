@@ -328,7 +328,10 @@ Function cmsApi_createSearchRequestInfo(searchText, bKidsMode = false)
   options = m.getCommonOptions()
   options.params["search"] = searchText
   options.params["is_kids_mode"] = bKidsMode
-  options.params = m.setTupianPosterParam(options.params)
+  imageParamTypes = [
+    "poster"
+  ]
+  options.params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.searchScreen)
 
   if bKidsMode = false
     'setting the include_linear param to true will enable the linear content available for search screen from backend
@@ -355,11 +358,11 @@ End Function
 Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "")
   posterSize = m.constants.ui.imageSizes.poster
   landscapeSize = m.constants.ui.imageSizes.landscape
+ 
+  '//For now, ensure the large posters do not show up on the search screen
+  isNonLargePostersScreen = (isNonEmptyString(screenId) = true AND screenId = m.constants.ui.screenIds.searchScreen)
 
-  '//::TODO:: roku_large_poster: Commenting the following line out instead of getting rid of it because there will be a new experiment soon that will need to use this logic again
-  ' isLargePosteExperimentEnabled = false '//(m.experiments <> invalid AND m.experiments.getExperimentResource("roku_large_poster", "roku_large_poster_categories").enabled = true AND isNonEmptyString(screenId) = true AND screenId = m.constants.ui.screenIds.categoryDetailsScreen)
-
-  if (isNonEmptyString(screenId) = true AND (screenId = m.constants.ui.screenIds.homeScreen OR screenId = m.constants.ui.screenIds.categoryDetailsScreen))
+  if isNonLargePostersScreen = false
     posterSize = m.constants.ui.imageSizes.largePoster
     landscapeSize = m.constants.ui.imageSizes.largeLandscape
   end if

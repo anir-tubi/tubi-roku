@@ -115,6 +115,7 @@ Function init()
   end if
 
   m.ratingOverlay = m.top.findNode("ratingOverlay")
+  m.ratingBarAndLabel = m.top.findNode("ratingBarAndLabel")
   m.ratingGradient = m.top.findNode("ratingGradient")
   m.ratingBar = m.top.findNode("ratingBar")
   m.ratedLabel = m.top.findNode("ratedLabel")
@@ -130,13 +131,11 @@ Function init()
   m.RemainingLabel = m.top.findNode("RemainingLabel")
   m.ProgressBar = m.top.findNode("ProgressBar")
   m.TopOverlay = m.top.findNode("TopOverlay")
-  m.TopHint = m.top.findNode("TopHint")
   m.ScrubTimer = m.top.findNode("ScrubTimer")
   m.HUD = m.top.findNode("HUD")
   m.AdHeadsUp = m.top.findNode("AdHeadsUp")
   m.AdHeadsUpText = m.top.findNode("AdHeadsUpText")
   m.Thumbnail = m.top.findNode("Thumbnail")
-
   m.VideoOverlay = m.top.findNode("VideoOverlay")
   m.VideoYMALOverlay = m.top.findNode("VideoYMALOverlay")
 
@@ -152,13 +151,6 @@ Function init()
   m.cuePointsHistory = {}
 
   m.skipCuepointsButton.uri = "pkg:/images/selector-$$RES$$.9.png"
-
-  BackLabel = m.top.findNode("BackLabel")
-  BackLabel.text = getTranslation("goBack_videoPlayer_controls")
-  if m.constants.deviceInfo.uiResolution <> "FHD"
-    '//if the display is not 1080, then adjust the BackLabel to ensure proper vertical alignment
-    BackLabel.translation = [BackLabel.translation[0], BackLabel.translation[1] + 3]
-  end if
 
   m.RAFAdContainer = m.top.findNode("RAFAdContainer")
 
@@ -343,9 +335,8 @@ Function init()
   SkipTrailerButtonLabel = m.TopOverlay.findNode("SkipTrailerButtonLabel")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(BackLabel, typographyConstants.ids.bodySmallStrong)
-  setTypographyOfLabel(title, typographyConstants.ids.headerMedium)
-  setTypographyOfLabel(episodeTitle, typographyConstants.ids.subheaderSmall)
+  setTypographyOfLabel(title, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(episodeTitle, typographyConstants.ids.bodyLarge)
   setTypographyOfLabel(m.AdHeadsUpText, typographyConstants.ids.subheaderMedium)
   setTypographyOfLabel(m.ratedLabel, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodySmallStrong)
@@ -355,6 +346,17 @@ Function init()
   setTypographyOfLabel(m.RemainingLabel, typographyConstants.ids.subheaderMedium)
   setTypographyOfLabel(m.descriptorCode, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.descriptorDesc, typographyConstants.ids.bodySmall)
+
+  '//Position elements based on the margin set in constants
+  m.SkipTrailerButton.translation = [m.constants.ui.translations.marginX, m.SkipTrailerButton.translation[1]]
+  m.AdHeadsUpText.translation = [m.constants.ui.translations.marginX, m.AdHeadsUpText.translation[1]]
+  m.ratingBarAndLabel.translation = [m.constants.ui.translations.marginX, m.ratingBarAndLabel.translation[1]]
+  m.descriptorDesc.translation = [m.constants.ui.translations.marginX + 27, m.descriptorDesc.translation[1]]
+  m.TopOverlay.translation = [m.constants.ui.translations.marginX, m.TopOverlay.translation[1]]
+  m.ElapsedLabel.translation = [m.constants.ui.translations.marginX, m.ElapsedLabel.translation[1]]
+  m.RemainingLabel.translation = [1920 - m.constants.ui.translations.marginX - m.RemainingLabel.boundingRect().width, m.RemainingLabel.translation[1]]
+  m.ProgressBar.translation = [m.constants.ui.translations.marginX, m.ProgressBar.translation[1]]
+  m.ProgressBar.width = 1920 -  (m.constants.ui.translations.marginX * 2)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -1963,7 +1965,7 @@ Function showRatingOverlay()
   if content <> invalid AND isNonEmptyString(content.rating) = true
     fade(m.ratingOverlay, "in", 0.6)
     if m.TopOverlay.opacity > 0.0
-      m.ratingOverlay.translation = [0,250]
+      m.ratingOverlay.translation = [0,180]
     else
       m.ratingOverlay.translation = [0,0]
     end if

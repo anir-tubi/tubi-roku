@@ -184,49 +184,30 @@
   </interface>
 
   <children>
-    <Group id="nav">
-      <LayoutGroup
-        id="ScreenNavigationHint"
-        layoutDirection="horiz"
-        vertAlignment="custom"
-        opacity="0.5"
-        itemSpacings="[9]"
-        translation="[192,60]">
-        <Poster
-          uri="pkg:/images/back.png"
-          width="29"
-          height="47"/>
-        <Label
-          id="callToAction"
-          vertAlign="center"
-          height="47"
-          translation="[0,2]">
-          <Font
-            role="font"/>
-        </Label>
-      </LayoutGroup>
+    <Group id="PageGroup">
+      <TopNav
+        id="topNav"
+        visible="false"
+        translation="[0,48]"/>
+
+      <Group
+        id="InfoPanelParent">
+        <InfoPanel
+          id="InfoPanel"
+          maxHeight="354"
+          width="960"
+          translation="[0,165]"
+          maxTitleLines="2"/>
+      </Group>
+
+      <MaskGroup
+        id="ContentArea"
+        maskUri="pkg:/images/poster-mask.png"
+        maskSize="[0,0]">
+        <CategoryGridList
+          id="CategoryGridList"/>
+      </MaskGroup>
     </Group>
-
-    <TopNav
-      id="topNav"
-      visible="false"
-      translation="[192,48]"/>
-
-    <Group
-      id="InfoPanelParent">
-      <InfoPanel
-        id="InfoPanel"
-        translation="[192,168]"
-        maxTitleLines="2"/>
-    </Group>
-
-    <MaskGroup
-      id="ContentArea"
-      maskUri="pkg:/images/poster-mask.png"
-      maskSize="[0,0]">
-      <CategoryGridList
-        id="CategoryGridList"/>
-    </MaskGroup>
 
     <!-- For viewers that watch a REALLY long time, or just never close the app, force a refresh -->
     <Timer

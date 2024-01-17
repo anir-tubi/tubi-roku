@@ -16,6 +16,7 @@ Function init()
   m.EPG.observeField("linearChannelFocusedUpdated", "onChannelFocused")
   m.EPG.observeField("linearChannelToPlayUpdated", "onLinearChannelToPlayChanged")
   m.EPGHorizontalSlide = m.top.findNode("EPGHorizontalSlide")
+  m.EPGHorizontalSlide.translation = [m.constants.ui.translations.marginX, 0]
   m.EPGSpinner = m.top.findNode("EPGSpinner")
   m.infoPanel = m.top.findNode("infoPanel")
   m.EPGError = m.top.findNode("EPGError")

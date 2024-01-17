@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!--
-  CountdownTimerUI
-  The CountdownTimer is the UI representation of the countdown timer. It will display how many seconds are left.
-  ::TODO:: EPG - when the EPG experiment gets graduated, consider placing the code/logic of the m.LinearCountdownTimer within this component so the ControlController has less code.
-      Also consider moving the CountdownTimer component from the ContentController XMPL to the Linear Video Player Screen.
-      During the experiment, the logic remains in the ContentController because the non-experiment has countdown logic at the ContentController level.
-      We should share the countdown timer code where it currently resides until the experiment is over. Rename to CountdownTimer when a timer is placed in this component
- -->
-<component name="CountdownTimerUI" extends="Group" >
-  <script type="text/brightscript" uri="CountdownTimerUI.brs" />
+<component name="CountdownTimer" extends="Group" >
+  <script type="text/brightscript" uri="CountdownTimer.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
     <!--INPUT-->
@@ -35,7 +28,6 @@
         id="PlayerCountdownBground"
         width="210"
         height="41"
-        opacity=".26"
         uri="pkg:/images/tab_short_component_alt_$$RES$$.9.png"/>
       <LayoutGroup
         id="TextAndIconLayoutGroup"

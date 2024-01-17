@@ -44,192 +44,170 @@
   </interface>
 
   <children>
-    <Group id="nav">
-      <LayoutGroup
-        id="ScreenNavigationHint"
-        layoutDirection="horiz"
-        vertAlignment="custom"
-        opacity="0.5"
-        itemSpacings="[9]"
-        translation="[192,60]">
-        <Poster
-          uri="pkg:/images/back.png"
-          width="29"
-          height="47"/>
-        <Label
-          id="callToAction"
-          vertAlign="center"
-          height="47"
-          translation="[0,2]">
-          <Font
-            role="font"/>
-        </Label>
-      </LayoutGroup>
-    </Group>
-    <Group
-      id="leftSide"
-      translation="[192,120]">
-      <LayoutGroup
-        itemSpacings="[24, 12]"
-        horizAlignment="left"
-        vertAlignment="top">
-        <Label
-          id="searchMenuText"
-          vertAlign="bottom"
-          width="552">
-          <Font
-            role="font"/>
-        </Label>
-        <Label
-          id="searchHintText"
-          vertAlign="bottom">
-          <Font
-            role="font"/>
-        </Label>
-        <LayoutGroup
-          id="kidsModeGroup"
-          layoutDirection="horiz">
-          <!--KidsModeMessageSpacer used to position the kids-mode text so it left aligns with the keyboard-->
-          <Rectangle
-            id="KidsModeMessageSpacer"
-            visible="false"
-            width="1"
-            height="1"/>
-          <Label
-            id="KidsModeMessage"
-            vertAlign="top"
-            width="552"
-            height="51">
-              <Font
-                role="font"/>
-          </Label>
-        </LayoutGroup>
-      </LayoutGroup>
-
-      <LayoutGroup
-        id="searchResultsMessageContainer"
-        itemSpacings="[12]"
-        translation="[0, 90]">
-        <Label
-          id="noMatchingResultsMessage"
-          visible="false">
-          <Font
-            role="font"/>
-        </Label>
-        <Label
-          id="trendingResultsHint"
-          visible="false">
-          <Font
-            role="font"/>
-        </Label>
-      </LayoutGroup>
-    </Group>
-
-    <!-- Live text entry box with a non-blinking "cursor" -->
-    <InfoPanel
-      id="SearchScreenInfoPanel"
-      visible="false"
-      translation="[192, 120]"/>
-    <Group
-      id="searchGroup"
-      translation="[192, 414]">
-      <DynamicCustomKeyboard
-        id="Keyboard"
-        translation="[0,-20]"/>
-   </Group>
-
-    <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus,
-    the resultGrid is slightly too low and too far to the right. It has to do something to do with the custom focusBitmapUri.  -->
-    <Group
-      translation="[786, 435]"
-      id="ResultArea">
-
+    <Group id="PageGroup">
       <Group
-        id="gridContainer">
-
+        id="leftSide"
+        translation="[0,120]">
         <LayoutGroup
-          id="resultsContainer">
-
+          itemSpacings="[24, 12]"
+          horizAlignment="left"
+          vertAlignment="top">
           <Label
-            id="SearchText"
-            vertAlign="center"
-            width="1113"
-            height="63">
+            id="searchMenuText"
+            vertAlign="bottom"
+            width="552">
             <Font
-              id="SearchTextFont"
               role="font"/>
           </Label>
-
-          <MarkupGrid
-            id="ResultGrid"
-            itemComponentName="StarterGridItem"
-            itemSize="[198,282]"
-            itemSpacing="[12,12]"
-            numRows="2"
-            numColumns="5"
-            fadeFocusFeedbackWhenAutoScrolling="true"
-            vertFocusAnimationStyle="fixedFocus"
-            focusFootprintBlendColor="#FFFFFF00"
-            focusFootprintBitmapUri= "pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
-            focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
-        </LayoutGroup>
-
-
-        <LayoutGroup
-          id="trendingSearchResultsContainer"
-          translation="[0, 640]">
-
           <Label
-            id="trendingSearchHeading"
-            vertAlign="center"
-            width="1113"
-            height="63">
+            id="searchHintText"
+            vertAlign="bottom">
             <Font
-              id="SearchTextFont"
               role="font"/>
           </Label>
-
-          <MarkupGrid
-            id="trendingSearchResultGrid"
-            itemComponentName="StarterGridItem"
-            itemSize="[198,282]"
-            itemSpacing="[12,12]"
-            numRows="2"
-            numColumns="5"
-            fadeFocusFeedbackWhenAutoScrolling="true"
-            vertFocusAnimationStyle="fixedFocus"
-            focusFootprintBlendColor="#FFFFFF00"
-            focusFootprintBitmapUri= "pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
-            focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
+          <LayoutGroup
+            id="kidsModeGroup"
+            layoutDirection="horiz">
+            <!--KidsModeMessageSpacer used to position the kids-mode text so it left aligns with the keyboard-->
+            <Rectangle
+              id="KidsModeMessageSpacer"
+              visible="false"
+              width="1"
+              height="1"/>
+            <Label
+              id="KidsModeMessage"
+              vertAlign="top"
+              width="552"
+              height="51">
+                <Font
+                  role="font"/>
+            </Label>
+          </LayoutGroup>
         </LayoutGroup>
-  
-      </Group> 
-      
-      <Spinner
-        id="spinner"
+
+        <LayoutGroup
+          id="searchResultsMessageContainer"
+          itemSpacings="[12]"
+          translation="[0, 90]">
+          <Label
+            id="noMatchingResultsMessage"
+            visible="false">
+            <Font
+              role="font"/>
+          </Label>
+          <Label
+            id="trendingResultsHint"
+            visible="false">
+            <Font
+              role="font"/>
+          </Label>
+        </LayoutGroup>
+      </Group>
+
+      <!-- Live text entry box with a non-blinking "cursor" -->
+      <InfoPanel
+        id="SearchScreenInfoPanel"
         visible="false"
-        showShade="false"
-        modal="true"
-        displayText="true"
-        width="1094"
-        height="575"/>
-      <Label
-        id="NoResultsMessage"
-        vertAlign="center"
-        horizAlign="center"
-        width="1094"
-        height="575"
-        lineSpacing="5"
-        numLines="2"
-        wrap="true"
-        opacity=".5"
-        visible="false">
-        <Font
-          role="font"/>
-      </Label>
+        translation="[0, 120]"/>
+      <Group
+        id="searchGroup"
+        translation="[0, 414]">
+        <DynamicCustomKeyboard
+          id="Keyboard"
+          translation="[0,-20]"/>
+     </Group>
+
+      <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus,
+      the resultGrid is slightly too low and too far to the right. It has to do something to do with the custom focusBitmapUri.  -->
+      <Group
+        translation="[594, 435]"
+        id="ResultArea">
+
+        <Group
+          id="gridContainer">
+
+          <LayoutGroup
+            id="resultsContainer">
+
+            <Label
+              id="SearchText"
+              vertAlign="center"
+              width="1113"
+              height="63">
+              <Font
+                id="SearchTextFont"
+                role="font"/>
+            </Label>
+
+            <MarkupGrid
+              id="ResultGrid"
+              itemComponentName="StarterGridItem"
+              itemSize="[198,282]"
+              itemSpacing="[12,12]"
+              numRows="2"
+              numColumns="5"
+              fadeFocusFeedbackWhenAutoScrolling="true"
+              vertFocusAnimationStyle="fixedFocus"
+              focusFootprintBlendColor="#FFFFFF00"
+              focusFootprintBitmapUri= "pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+              focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
+          </LayoutGroup>
+
+          <LayoutGroup
+            id="trendingSearchResultsContainer"
+            translation="[0, 640]">
+            <Label
+              id="trendingSearchHeading"
+              vertAlign="center"
+              width="1113"
+              height="63">
+              <Font
+                id="SearchTextFont"
+                role="font"/>
+            </Label>
+
+            <MarkupGrid
+              id="trendingSearchResultGrid"
+              itemComponentName="StarterGridItem"
+              itemSize="[198,282]"
+              itemSpacing="[12,12]"
+              numRows="2"
+              numColumns="5"
+              fadeFocusFeedbackWhenAutoScrolling="true"
+              vertFocusAnimationStyle="fixedFocus"
+              focusFootprintBlendColor="#FFFFFF00"
+              focusFootprintBitmapUri= "pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+              focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
+          </LayoutGroup>
+        </Group> 
+        
+        <Spinner
+          id="spinner"
+          visible="false"
+          showShade="false"
+          modal="true"
+          displayText="true"
+          width="1094"
+          height="575"/>
+        <Label
+          id="NoResultsMessage"
+          vertAlign="center"
+          horizAlign="center"
+          width="1094"
+          height="575"
+          lineSpacing="5"
+          numLines="2"
+          wrap="true"
+          opacity=".5"
+          visible="false">
+          <Font
+            role="font"/>
+        </Label>
+      </Group>
+
+      <Timer
+        id="searchDebounce"
+        duration="0.5"/>
     </Group>
-    <Timer
-      id="searchDebounce"
-      duration="0.5"/>
   </children>
 </component>

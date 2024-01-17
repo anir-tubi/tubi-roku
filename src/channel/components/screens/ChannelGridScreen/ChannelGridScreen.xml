@@ -42,10 +42,6 @@
       <!-- If the screen is not enabled, then user should not be able to select anything -->
       <field id="enabled" type="boolean"  alwaysNotify="true"/>
 
-      <!-- What is the previous page so it can be indicated on the call to action that is located on the top nav.
-      -->
-      <field id="callingPage" type="string" />
-
       <field id="reloadUserCategoriesResponse" type="node" alwaysNotify="true"/>
 
       <!--jumpToItemByID is used to jump to an item on channel/categoryScreen when content is played through deeplink after content has been loaded.-->
@@ -111,40 +107,19 @@
   </interface>
 
   <children>
-    <Group id="nav">
-      <LayoutGroup
-        id="ScreenNavigationHint"
-        layoutDirection="horiz"
-        vertAlignment="custom"
-        opacity="0.5"
-        itemSpacings="[9]"
-        translation="[192,60]">
-        <Poster
-          uri="pkg:/images/back.png"
-          width="29"
-          height="47"/>
-        <Label
-          id="callToAction"
-          vertAlign="center"
-          height="47"
-          translation="[0,2]">
-          <Font
-            role="font"/>
-        </Label>
-      </LayoutGroup>
-    </Group>
+    <Group id="PageGroup">
+      <MarkupGrid
+        id="ChannelCategoryGrid"
+        translation="[0,123]"
+        itemComponentName="ChannelCategoryGridPoster"
+        itemSpacing="[16,16]"
+        numRows="4"
+        numColumns="4"
+        fadeFocusFeedbackWhenAutoScrolling="true"
+        vertFocusAnimationStyle="fixedFocus"
+        focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
 
-    <MarkupGrid
-      id="ChannelCategoryGrid"
-      translation="[192,208]"
-      itemComponentName="ChannelCategoryGridPoster"
-      itemSize="[384,216]"
-      itemSpacing="[30,30]"
-      numRows="4"
-      numColumns="4"
-      fadeFocusFeedbackWhenAutoScrolling="true"
-      vertFocusAnimationStyle="fixedFocus"
-      focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
+    </Group>
 
     <Spinner
       id="spinner"

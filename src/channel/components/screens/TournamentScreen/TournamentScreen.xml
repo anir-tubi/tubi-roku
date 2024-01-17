@@ -160,31 +160,33 @@
   </interface>
 
   <children>
-    <TopNav
-      id="topNav"
-      translation="[192,48]"/>
+    <Group id="PageGroup">
+      <TopNav
+        id="topNav"
+        translation="[0,48]"/>
 
-    <Group
-      id="InfoPanelParent">
-      <InfoPanel
-        id="InfoPanel"
-        translation="[192,168]"
-        maxHeight="354"
-        maxTitleLines="2"
-        visible="false"/>
-    </Group>
+      <Group
+        id="InfoPanelParent">
+        <InfoPanel
+          id="InfoPanel"
+          translation="[0,165]"
+          maxHeight="354"
+          maxTitleLines="2"
+          visible="false"/>
+      </Group>
 
-    <CategoryGridList
-      id="categoryGridList"/>
+      <CategoryGridList
+        id="categoryGridList"/>
 
-    <ProgramGuide
-      id="programGuide"/>
-    <Rectangle
+      <ProgramGuide
+        id="programGuide"/>
+      <Rectangle
       id="mask"
       opacity="0.1"
       height="520"
       width="1740"
-      translation="[185,550]" />
+      translation="[-7,550]" />
+    </Group>
     <Timer
       id="TournamentRefreshTimer"
       repeat="true"/>

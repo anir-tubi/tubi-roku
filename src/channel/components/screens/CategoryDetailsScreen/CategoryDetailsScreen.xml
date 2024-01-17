@@ -87,57 +87,37 @@
   </interface>
 
   <children>
-    <Group id="nav">
-      <LayoutGroup
-        id="ScreenNavigationHint"
-        layoutDirection="horiz"
-        vertAlignment="custom"
-        opacity="0.5"
-        itemSpacings="[9]"
-        translation="[192,55]">
-        <Poster
-          uri="pkg:/images/back.png"
-          width="29"
-          height="47"/>
-        <Label
-          id="callToAction"
-          vertAlign="center"
-          height="47"
-          translation="[0,2]">
-          <Font
-            role="font"/>
-        </Label>
-      </LayoutGroup>
-    </Group>
 
     <Poster
       id="leftChevron"
       uri="pkg:/images/left-chevron.png"
       width="15"
       height="27"
-      translation="[90,528]"/>
+      translation="[75,528]"/>
 
-    <InfoPanel
-      id="ChannelsInfoPanel"
-      mode="item"
-      translation="[192,133]"
-      maxHeight="355"
-      maxTitleLines="2"
-      visible="true" />
-    <CategoryGridRowLabel
-      translation="[192,540]"
-      id="pageTitleAndCounter"/>
-    <MarkupGrid
-      id="ChannelsVideoGrid"
-      itemSpacing="[16,16]"
-      translation="[192,600]"
-      itemComponentName="StarterGridItem"
-      numRows="2"
-      numColumns="6"
-      fadeFocusFeedbackWhenAutoScrolling="true"
-      vertFocusAnimationStyle="fixedFocus"
-      focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
-
+    <Group id="PageGroup">
+      <InfoPanel
+        id="ChannelsInfoPanel"
+        mode="item"
+        translation="[0,165]"
+        maxHeight="355"
+        maxTitleLines="2"
+        visible="true" />
+      <CategoryGridRowLabel
+        translation="[0,540]"
+        id="pageTitleAndCounter"/>
+      <MarkupGrid
+        id="ChannelsVideoGrid"
+        itemSpacing="[16,16]"
+        translation="[0,600]"
+        itemComponentName="StarterGridItem"
+        numRows="2"
+        numColumns="6"
+        fadeFocusFeedbackWhenAutoScrolling="true"
+        vertFocusAnimationStyle="fixedFocus"
+        focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"/>
+    </Group>
+    
     <Spinner
       id="ChannelDetailSpinner"
       visible="false"

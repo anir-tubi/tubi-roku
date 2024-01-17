@@ -6,6 +6,7 @@ Function TubiTracking(constants, request, auth, userConsentsOptOutStatus = {})
     trackUserEvent: tubiTracking_trackUserEvent
     getClientEvent: tubiTracking_getClientEvent
     getUserTrackingRequest: tubiTracking_getUserTrackingRequest
+    createUserTrackingReqInfo: tubiTracking_createUserTrackingReqInfo
 
     getAnalyticsRequestIdempotency: tubiTracking_getAnalyticsRequestIdempotency
     getAnalyticsTimestamp: tubiTracking_getAnalyticsTimestamp
@@ -56,7 +57,6 @@ Function TubiTrackingInfo(constants)
 
     getAnalyticsRequestIdempotency: tubiTracking_getAnalyticsRequestIdempotency
     getAnalyticsTimestamp: tubiTracking_getAnalyticsTimestamp
-    getAnalyticsUser: tubiTracking_getAnalyticsUser
     getAnalyticsDevice: tubiTracking_getAnalyticsDevice
     getAnalyticsApp: tubiTracking_getAnalyticsApp
     getAnalyticsConnection: tubiTracking_getAnalyticsConnection
@@ -145,16 +145,27 @@ End Function
 '@eventType: string, the type of event we are sending, will be used as part of the request identifier
 '@trackData: assocArray, object returned from m.getTrackData()
 Function tubiTracking_getUserTrackingRequest(eventType, trackData) as Object
-  trackUrl = m.constants.urls.analytics.singleEvent
+  reqInfo = m.createUserTrackingReqInfo(trackData)
+  trackUrl = reqInfo.url
+  options = reqInfo.options
+  userRequest = m.request.createAsync(trackUrl, "track_" + eventType, options)
+  return userRequest
+End Function
 
+
+' @trackData: assocArray, object returned from m.getClientEvent()
+Function tubiTracking_createUserTrackingReqInfo(trackData)
   options = {
     method: m.constants.reqTypes.post
     body: FormatJson(trackData)
   }
 
-  userRequest = m.request.createAsync(trackUrl, "track_" + eventType, options)
+  reqInfo = {
+    url: m.constants.urls.analytics.singleEvent
+    options: options
+  }
 
-  return userRequest
+  return reqInfo
 End Function
 
 

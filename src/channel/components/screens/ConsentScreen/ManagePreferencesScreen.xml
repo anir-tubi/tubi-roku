@@ -19,8 +19,7 @@
       width="1920"
       height="1080"
       translation="[0,0]"/>
-    <Group
-      translation="[192, 126]">
+    <Group id="PageGroup">
       <Label
         id="heading">
         <Font

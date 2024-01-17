@@ -268,7 +268,7 @@
       uri="pkg:/images/left-chevron.png"
       width="15"
       height="27"
-      translation="[90,528]"/>
+      translation="[75,528]"/>
 
     <Spinner
       id="DetailSpinner"
@@ -277,71 +277,72 @@
       height="1080"
       translation="[0,0]"/>
 
-    <Group
-      id="AnimationGroup"
-      translation="[0,0]">
-      <InfoPanel
-        id="DetailInfoPanel"
-        mode="item"
-        translation="[192,133]"
-        maxHeight="433"
-        maxTitleLines="2"
-        visible="false" />
-
-      <FilledButtonMarkupGrid
-        id="Menu"
-        translation="[167,642]"
-        itemSize="[465,80]"
-        itemComponentName="DetailMenuItem"
-        itemSpacing="[0,8]"
-        numRows="3"
-        numColumns="1"
-        vertFocusAnimationStyle="floatingFocus"/>
-
-      <FilledButtonMarkupGrid
-        id="SecondaryMenu"
-        translation="[667,730]"
-        itemSize="[465,80]"
-        itemComponentName="DetailMenuItem"
-        itemSpacing="[0,8]"
-        numRows="3"
-        numColumns="1"
-        visible="false"
-        vertFocusAnimationStyle="floatingFocus"/>
-
+    <Group id="PageGroup">
       <Group
-        id="RelatedContentParentGroup">
-        <Group
-          id="RelatedContentGroup"
-          translation="[192,921]"
+        id="AnimationGroup"
+        translation="[0,0]">
+        <InfoPanel
+          id="DetailInfoPanel"
+          mode="item"
+          translation="[0,165]"
+          maxHeight="433"
+          maxTitleLines="2"
+          visible="false" />
+
+        <FilledButtonMarkupGrid
+          id="Menu"
+          translation="[0,642]"
+          itemSize="[465,80]"
+          itemComponentName="DetailMenuItem"
+          itemSpacing="[0,8]"
+          numRows="3"
+          numColumns="1"
+          vertFocusAnimationStyle="floatingFocus"/>
+
+        <FilledButtonMarkupGrid
+          id="SecondaryMenu"
+          translation="[500,730]"
+          itemSize="[465,80]"
+          itemComponentName="DetailMenuItem"
+          itemSpacing="[0,8]"
+          numRows="3"
+          numColumns="1"
           visible="false"
-          opacity="0.2">
-          <CategoryGridRowLabel
-            id="RelatedRowLabel"
-            translation="[0,0]">
-            <TubiContentNode
-              id="RelatedRowLabelContent"
-              role="content"/>
-          </CategoryGridRowLabel>
-          <MarkupGrid
-            id="RelatedGrid"
-            itemComponentName="StarterGridItem"
-            numRows="1"
-            itemSize="[186,267]"
-            itemSpacing="[12,12]"
-            fadeFocusFeedbackWhenAutoScrolling="true"
-            horizFocusAnimationStyle="fixedFocus"
-            focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
-            translation="[0,63]"/>
-          <Label
-            id="RelatedTitle"
-            width="875"
-            wrap="false"
-            maxLines="1"
-            translation="[0,366]">
-            <Font
-              role="font"/>
-          </Label>
+          vertFocusAnimationStyle="floatingFocus"/>
+
+        <Group
+          id="RelatedContentParentGroup">
+          <Group
+            id="RelatedContentGroup"
+            translation="[0,921]"
+            visible="false"
+            opacity="0.2">
+            <CategoryGridRowLabel
+              id="RelatedRowLabel"
+              translation="[0,0]">
+              <TubiContentNode
+                id="RelatedRowLabelContent"
+                role="content"/>
+            </CategoryGridRowLabel>
+            <MarkupGrid
+              id="RelatedGrid"
+              itemComponentName="StarterGridItem"
+              numRows="1"
+              itemSpacing="[16,16]"
+              fadeFocusFeedbackWhenAutoScrolling="true"
+              horizFocusAnimationStyle="fixedFocus"
+              focusBitmapUri="pkg:/images/selectorRoundedCorners-$$RES$$.9.png"
+              translation="[0,63]"/>
+            <Label
+              id="RelatedTitle"
+              width="875"
+              wrap="false"
+              maxLines="1"
+              translation="[0,438]">
+              <Font
+                role="font"/>
+            </Label>
+          </Group>
         </Group>
       </Group>
     </Group>

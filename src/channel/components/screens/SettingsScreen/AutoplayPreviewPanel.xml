@@ -41,8 +41,7 @@
       <Label
         id="Title"
         height="73"
-        vertAlign="bottom"
-        translation="[25,0]">
+        vertAlign="bottom">
         <Font
          role="font"/>
       </Label>
@@ -52,7 +51,7 @@
         width="890"
         wrap="true"
         vertAlign="bottom"
-        translation="[25,143]">
+        translation="[0,143]">
         <Font
          role="font"/>
       </Label>
@@ -64,7 +63,7 @@
         itemSpacing="[0,8]"
         itemComponentName="CheckButton"
         vertFocusAnimationStyle="floatingFocus"
-        translation="[25,246]">
+        translation="[0,246]">
         <ContentNode
           id="SettingsMenuContent"
           role="content">
