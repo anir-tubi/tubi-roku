@@ -145,7 +145,7 @@
             role="content">
             <DetailMenuItemContentNode
               id="SignInOutButton"
-              iconUrl="pkg:/images/icon-sign-in.webp"/>
+              align="center"/>
           </ContentNode>
         </MarkupGrid>
       </LayoutGroup>
@@ -203,11 +203,6 @@
             <Font
               role="font"/>
           </Label>
-          <Poster
-            id="AllEmptyUISubtitle2Icon"
-            width="24"
-            height="30"
-            uri="pkg:/images/icon-add-to-queue.webp"/>
         </LayoutGroup>
         <MarkupGrid
           id="AllEmptyUIMenu"
@@ -223,7 +218,7 @@
             role="content">
             <DetailMenuItemContentNode
               id="AllEmptyUIButton"
-              iconUrl="pkg:/images/sideNavHome.webp"/>
+              align="center"/>
           </ContentNode>
         </MarkupGrid>
       </LayoutGroup>

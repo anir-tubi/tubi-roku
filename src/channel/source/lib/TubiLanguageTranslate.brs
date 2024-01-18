@@ -1037,7 +1037,7 @@ Function getTranslation_en_US()
     },
     "screenMyStuff_signedOutUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Find your favorites. Pick up where you left off–all in one place."
+      "message": "Find your favorites fast, pick up where you left off–all in one place."
     },
     "screenMyStuff_signedOutUIBlurb": {
       "description": "The blurb of the MyStuff Screen for the guest user.",
@@ -2747,7 +2747,7 @@ Function getTranslation_es_MX()
     },
     "screenMyStuff_signedOutUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Encuentra tus favoritos. Recoja donde lo dejaste todo en un solo lugar."
+      "message": "Encuentre tus favoritos, continúa donde lo dejaste–todo en un solo lugar."
     },
     "screenMyStuff_signedOutUIBlurb": {
       "description": "The blurb of the MyStuff Screen for the guest user.",
@@ -4412,7 +4412,7 @@ Function getTranslation_fr_CA()
     },
     "screenMyStuff_signedOutUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Trouvez vos favoris. Reprenez là où vous vous étiez arrêté–le tout au même endroit."
+      "message": "Trouvez vos favoris, reprenez où vous étiez á-le tout au même endroit."
     },
     "screenMyStuff_signedOutUIBlurb": {
       "description": "The blurb of the MyStuff Screen for the guest user.",
