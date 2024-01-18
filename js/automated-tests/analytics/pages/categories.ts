@@ -23,7 +23,16 @@ const Categories = () => {
 		return container;
 	}
 
+	async function selectCategoryByName(categoryName) {
+		await testUtils.jumpToRowWithTitle('channelCategoryGrid', categoryName);
+		await ecp.sendKeypress(ecp.Key.Ok);
+		const container = Container();
+		await container.pageDidLoad();
+		return container;
+	}
+
 	return {
+		selectCategoryByName,
 		selectFocusedCategory,
 		pageDidLoad,
 	};

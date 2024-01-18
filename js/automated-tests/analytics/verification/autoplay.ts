@@ -2,6 +2,126 @@ import { Events, PlaybackSource, DialogAction } from '../utils/constants';
 import { getMatchedEventsFromLastEvent } from '../utils/network/qaProxy';
 import { expect } from 'chai';
 
+export async function verifyC285598(videoId) {
+	let playProgressEvent;
+	let i = 1;
+	while (playProgressEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.play_progress,
+			10 + i
+		);
+		playProgressEvent = pulletEvents.find(
+			(event) =>
+				event.play_progress.playback_source ===
+				PlaybackSource.UNKNOWN_PLAYBACK_SOURCE
+		);
+		i++;
+	}
+	expect(playProgressEvent.play_progress.playback_source).equal(
+		PlaybackSource.UNKNOWN_PLAYBACK_SOURCE,
+		`playProgressEvent.play_progress.playback_source===VIDEO_PREVIEWS, Event: \n
+			${JSON.stringify(playProgressEvent)} \n`
+	);
+	expect(playProgressEvent.play_progress.position).to.match(
+		/./,
+		`playProgressEvent.play_progress.position===someString: \n ${playProgressEvent}`
+	);
+	expect(playProgressEvent.play_progress.video_id).equal(
+		parseInt(videoId),
+		`playProgressEvent.play_progress.video_id===${videoId}, Event: \n
+			${JSON.stringify(playProgressEvent)} \n`
+	);
+	expect(playProgressEvent.play_progress.video_player).equal(
+		'DEFAULT',
+		`playProgressEvent.play_progress.video_player===DEFAULT, Event: \n
+			${JSON.stringify(playProgressEvent)} \n`
+	);
+	expect(playProgressEvent.play_progress.view_time).to.match(
+		/./,
+		`playProgressEvent.play_progress.view_time===someString: \n ${playProgressEvent}`
+	);
+}
+export async function verifyC285597(id) {
+	let eventStartVideo;
+	let i = 1;
+	while (eventStartVideo === undefined && i < 10) {
+		let pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.start_video,
+			10 + i
+		);
+		eventStartVideo = pulletEvents.find(
+			(event) =>
+				event.start_video.playback_source ===
+				PlaybackSource.UNKNOWN_PLAYBACK_SOURCE
+		);
+		i++;
+	}
+	expect(eventStartVideo.start_video.playback_source).equal(
+		PlaybackSource.UNKNOWN_PLAYBACK_SOURCE,
+		`eventStartVideo.start_video.playback_source===PlaybackSource.UNKNOWN_PLAYBACK_SOURCE, Event: \n
+			${JSON.stringify(eventStartVideo)} \n`
+	);
+	await checkEventStartVideo(eventStartVideo.start_video, { id: id });
+}
+
+export async function verifyC285596(videoId) {
+	let playProgressEvent;
+	let i = 1;
+	while (playProgressEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.play_progress,
+			10 + i
+		);
+		playProgressEvent = pulletEvents.find(
+			(event) =>
+				event.play_progress &&
+				event.play_progress.playback_source &&
+				event.play_progress.playback_source === PlaybackSource.VIDEO_PREVIEWS
+		);
+		i++;
+	}
+	expect(playProgressEvent.play_progress.playback_source).equal(
+		PlaybackSource.VIDEO_PREVIEWS,
+		`playProgressEvent.play_progress.playback_source===VIDEO_PREVIEWS, Event: \n
+			${JSON.stringify(playProgressEvent)} \n`
+	);
+	expect(playProgressEvent.play_progress.position).to.match(
+		/./,
+		`playProgressEvent.play_progress.position===someString: \n ${playProgressEvent}`
+	);
+	expect(playProgressEvent.play_progress.video_id).equal(
+		parseInt(videoId),
+		`playProgressEvent.play_progress.video_id===${videoId}, Event: \n
+			${JSON.stringify(playProgressEvent)} \n`
+	);
+	expect(playProgressEvent.play_progress.view_time).to.match(
+		/./,
+		`playProgressEvent.play_progress.view_time===someString: \n ${playProgressEvent}`
+	);
+}
+
+export async function verifyC285595(id) {
+	let eventStartVideo;
+	let i = 1;
+	while (eventStartVideo === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.start_video,
+			10 + i
+		);
+		eventStartVideo = pulletEvents.find(
+			(event) =>
+				event.start_video.playback_source === PlaybackSource.VIDEO_PREVIEWS
+		);
+		i++;
+	}
+	expect(eventStartVideo.start_video.playback_source).equal(
+		PlaybackSource.VIDEO_PREVIEWS,
+		`eventStartVideo.start_video.playback_source===PlaybackSource.VIDEO_PREVIEWS, Event: \n
+			${JSON.stringify(eventStartVideo)} \n`
+	);
+	await checkEventStartVideo(eventStartVideo.start_video, { id: id });
+}
+
 export async function verifyC130134(autoplayId) {
 	let eventStartVideo;
 	let i = 1;
@@ -65,36 +185,6 @@ export async function verifyC130136(autoplayId) {
 			eventPlayProgress.play_progress.video_id
 		}, Event: \n ${JSON.stringify(eventPlayProgress)}`
 	);
-}
-
-export async function verifyC285595(id) {
-	let eventStartVideo;
-	let i = 1;
-	while (eventStartVideo === undefined && i < 10) {
-		let pulletEvents = await getMatchedEventsFromLastEvent(
-			Events.start_video,
-			10 + i
-		);
-		eventStartVideo = pulletEvents.find(
-			(event) =>
-				event.start_video.playback_source === PlaybackSource.VIDEO_PREVIEWS
-		);
-		i++;
-	}
-	expect(eventStartVideo.start_video.playback_source).equal(
-		PlaybackSource.VIDEO_PREVIEWS,
-		`eventStartVideo.start_video.playback_source===PlaybackSource.VIDEO_PREVIEWS, Event: \n
-      ${JSON.stringify(eventStartVideo)} \n`
-	);
-	await checkEventStartVideo(eventStartVideo.start_video, { id: id });
-}
-export async function verifyC285597(eventStartVideo, id) {
-	expect(eventStartVideo.start_video.playback_source).equal(
-		PlaybackSource.UNKNOWN_PLAYBACK_SOURCE,
-		`eventStartVideo.start_video.playback_source===PlaybackSource.UNKNOWN_PLAYBACK_SOURCE, Event: \n
-      ${JSON.stringify(eventStartVideo)} \n`
-	);
-	await checkEventStartVideo(eventStartVideo.start_video, { id: id });
 }
 
 export async function verifyC130132NavigateToPage(idOfNextEpisode, episodeId) {

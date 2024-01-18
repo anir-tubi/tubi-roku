@@ -7,6 +7,8 @@ const ChannelsPage = () => {
 	const elements = {
 		channelPoster: async () =>
 			await testUtils.getNodeForElement(CHANNELS_PAGE_NODES.CHANNEL_POSTER),
+		firstChannelName: async () =>
+			await testUtils.getNodeForElement('firstChannelName'),
 	};
 
 	async function pageDidLoad() {
@@ -24,9 +26,20 @@ const ChannelsPage = () => {
 		return container;
 	}
 
+	async function getNameOfFirstChannel() {
+		let text = '';
+		await testUtils.retryWithTimeOut(async () => {
+			const channelPoster = await elements.firstChannelName();
+			expect(channelPoster.visible).to.equal(true);
+			text = channelPoster.text;
+		});
+		return text;
+	}
+
 	return {
 		pageDidLoad,
 		selectChannelByName,
+		getNameOfFirstChannel,
 	};
 };
 

@@ -4,7 +4,7 @@ import { ecp, utils } from 'roku-test-automation';
 import PlayBack from './playback';
 import TitleDetailsPage from './titleDetailsPage';
 import LiveNews from '../pages/liveNews';
-import { NODES } from '../utils/constants';
+import { NODES, PLAYER_NODES } from '../utils/constants';
 import SideNav, { tabs } from '../components/sideNav';
 import TopNavMenu from '../components/topNav';
 const HomePage = ({ isMovies, isTvShows } = {}) => {
@@ -40,6 +40,47 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 			NODES.MOVIE_SCREEN_ROW_LIST
 		);
 		return parseInt(content.id);
+	}
+
+	async function highlightTitleWithVideoPreview() {
+		await testUtils.retryWithTimeOut(async () => {
+			const movieScreenRowList = await elements.movieScreenRowList();
+			expect(movieScreenRowList.visible).to.equal(true);
+			const moviesLabel = await elements.moviesLabel();
+			expect(moviesLabel.visible).to.equal(true);
+		});
+		let content = await testUtils.getCurrentlyFocusedGridItemContent(
+			NODES.MOVIE_SCREEN_ROW_LIST
+		);
+
+		let i = 40;
+		while (
+			content.video_preview_url &&
+			content.video_preview_url.length === 0 &&
+			i > 0
+		) {
+			await ecp.sendKeypress(ecp.Key.Right);
+			content = await testUtils.getCurrentlyFocusedGridItemContent(
+				NODES.MOVIE_SCREEN_ROW_LIST
+			);
+			i--;
+		}
+		return parseInt(content.id);
+	}
+
+	async function waitForPlayBackToStartForMovie() {
+		const content = await testUtils.getCurrentlyFocusedGridItemContent(
+			NODES.MOVIE_SCREEN_ROW_LIST
+		);
+		await testUtils.retryWithTimeOut(async () => {
+			const player = await testUtils.getNodeForElement(
+				PLAYER_NODES.VIDEO_PLAYER_ACTUAL
+			);
+			expect(player.visible).to.equal(true);
+		}, 120000);
+		const playback = PlayBack({ content: content });
+		await playback.pageDidLoad();
+		return playback;
 	}
 
 	async function pageDidLoad() {
@@ -232,6 +273,13 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		return content;
 	}
 
+	async function fetchTVShowContent() {
+		const content = await testUtils.getCurrentlyFocusedGridItemContent(
+			NODES.TV_SHOW_SCREEN_ROW_LIST
+		);
+		return content;
+	}
+
 	async function fetchEspanolContent() {
 		const content = await testUtils.getCurrentlyFocusedGridItemContent(
 			NODES.ESPANOL_SCREEN_ROW_LIST
@@ -239,13 +287,15 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		return content;
 	}
 
-	async function playTitle(espanol = false, kids = false) {
+	async function playTitle(espanol = false, kids = false, tvShow = false) {
 		await ecp.sendKeypress(ecp.Key.Play);
 		let content;
 		if (espanol) {
 			content = await fetchEspanolContent();
 		} else if (kids) {
 			content = await fetchKidsContent();
+		} else if (tvShow) {
+			content = await fetchTVShowContent();
 		} else {
 			content = await fetchContent();
 		}
@@ -278,7 +328,7 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 	async function playTVShowTitle() {
 		const tvShowScreenRowList = await elements.tvScreenRowList();
 		expect(tvShowScreenRowList.visible).to.equal(true);
-		return await playTitle();
+		return await playTitle(false, false, true);
 	}
 
 	async function navigateDown(times) {
@@ -312,6 +362,8 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		getPopupMessage,
 		playKidsTitle,
 		getSerialTag,
+		highlightTitleWithVideoPreview,
+		waitForPlayBackToStartForMovie,
 		...SideNav(),
 		...TopNavMenu(),
 	};

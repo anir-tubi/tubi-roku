@@ -14,6 +14,41 @@ import {
 } from '../utils/network/qaProxy';
 import { expect } from 'chai';
 
+export async function verifyC112683() {
+	let navigateToPageEvent;
+	let i = 1;
+	while (navigateToPageEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_to_page,
+			40 + i
+		);
+		navigateToPageEvent = pulletEvents.find(
+			(event) =>
+				event.navigate_to_page &&
+				event.navigate_to_page.left_side_nav_component &&
+				event.navigate_to_page.left_side_nav_component.left_nav_section &&
+				event.navigate_to_page.left_side_nav_component.left_nav_section ===
+					LEFT_NAV_SECTIONS.CHANNEL
+		);
+		i++;
+	}
+	expect(
+		navigateToPageEvent.navigate_to_page.left_side_nav_component
+			.left_nav_section
+	).equal(
+		LEFT_NAV_SECTIONS.CHANNEL,
+		`event should contain     navigateToPageEvent.navigate_to_page.left_side_nav_component.left_nav_section=LEFT_NAV_SECTIONS.CATEGORIES Event: \n
+	${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(navigateToPageEvent.navigate_to_page.home_page.content_mode).equal(
+		EventsValues.conentModeMovie,
+		`event should contain     navigateToPageEvent.navigate_to_page.home_page.content_moden- EventsValues.conentModeUnknown Event: \n
+	${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(navigateToPageEvent.navigate_to_page.dest_channel_list_page).to.be
+		.empty;
+}
+
 export async function verifyC118158() {
 	let eventNavigateToPage;
 	let i = 1;
@@ -122,7 +157,29 @@ export async function verifyC21262(id) {
 export async function verifyC63513(tag) {
 	expect(tag.split(' ')[2]).equal('Series');
 }
-
+export async function verifyC76713(category) {
+	let eventNavigateToPage;
+	let i = 1;
+	while (eventNavigateToPage === undefined && i < 20) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_to_page,
+			8 + i
+		);
+		eventNavigateToPage = pulletEvents.find(
+			(event) =>
+				event.navigate_to_page && event.navigate_to_page.category_list_page
+		);
+		i++;
+	}
+	expect(eventNavigateToPage.navigate_to_page.category_list_page).to.be.empty;
+	expect(
+		eventNavigateToPage.navigate_to_page.dest_category_page.category_slug
+	).equal(
+		category,
+		`event should navigate_to_page.dest_category_page.category_slug===action, Event: \n
+	${JSON.stringify(eventNavigateToPage)}\n`
+	);
+}
 export async function verifyC21267(id) {
 	let eventNavigateToPage;
 	let i = 1;
@@ -440,4 +497,39 @@ export async function verifyC112684() {
 		`event should contain     navigateToPageEvent.navigate_to_page.dest_account_page.account_page_type= PARENTAL Event: \n
 	${JSON.stringify(navigateToPageEvent)} \n`
 	);
+}
+
+export async function verifyC112682() {
+	let navigateToPageEvent;
+	let i = 1;
+	while (navigateToPageEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_to_page,
+			40 + i
+		);
+		navigateToPageEvent = pulletEvents.find(
+			(event) =>
+				event.navigate_to_page &&
+				event.navigate_to_page.left_side_nav_component &&
+				event.navigate_to_page.left_side_nav_component.left_nav_section &&
+				event.navigate_to_page.left_side_nav_component.left_nav_section ===
+					LEFT_NAV_SECTIONS.CATEGORIES
+		);
+		i++;
+	}
+	expect(
+		navigateToPageEvent.navigate_to_page.left_side_nav_component
+			.left_nav_section
+	).equal(
+		LEFT_NAV_SECTIONS.CATEGORIES,
+		`event should contain     navigateToPageEvent.navigate_to_page.left_side_nav_component.left_nav_section=LEFT_NAV_SECTIONS.CATEGORIES Event: \n
+	${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(navigateToPageEvent.navigate_to_page.home_page.content_mode).equal(
+		EventsValues.conentModeMovie,
+		`event should contain     navigateToPageEvent.navigate_to_page.home_page.content_moden- EventsValues.conentModeUnknown Event: \n
+	${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(navigateToPageEvent.navigate_to_page.dest_category_list_page).to.be
+		.empty;
 }

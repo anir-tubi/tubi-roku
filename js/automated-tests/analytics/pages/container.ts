@@ -13,6 +13,8 @@ const Container = () => {
 			await testUtils.getNodeForElement(
 				CONTAINER_PAGE_NODES.TITLE_NAME_IN_CONTAINER
 			),
+		categoryNameInContainerView: async () =>
+			await testUtils.getNodeForElement('categoryNameInContainerView'),
 	};
 
 	async function pageDidLoad() {
@@ -30,9 +32,16 @@ const Container = () => {
 		return titleDetailsPage;
 	}
 
+	async function getCategoryName() {
+		const categoryNameInContainerView =
+			await elements.categoryNameInContainerView();
+		return categoryNameInContainerView.text;
+	}
+
 	return {
 		pageDidLoad,
 		selectFocusedTitle,
+		getCategoryName,
 	};
 };
 

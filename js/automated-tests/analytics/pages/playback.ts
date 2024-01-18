@@ -27,6 +27,7 @@ const PlayBack = ({ content }) => {
 			await testUtils.getNodeForElement(PLAYER_NODES.TITLE_NAME_IN_PLAYBACK),
 		videoPlayer: async () =>
 			await testUtils.getNodeForElement(PLAYER_NODES.VIDEO_PLAYER),
+		skipIntro: async () => await testUtils.getNodeForElement('skipIntro'),
 	};
 
 	const ui = {
@@ -43,6 +44,15 @@ const PlayBack = ({ content }) => {
 		await ecp.sendKeypress(ecp.Key.Play);
 		const playPauseButton = await elements.playPauseButton();
 		expect(playPauseButton.visible).to.equal(true);
+	}
+
+	async function clickOnSkipIntro() {
+		await testUtils.retryWithTimeOut(async () => {
+			const skipIntro = await elements.skipIntro();
+			expect(skipIntro.visible).to.equal(true);
+		});
+		await ecp.sendKeypress(ecp.Key.Up), { wait: 300 };
+		await ecp.sendKeypress(ecp.Key.Ok, { wait: 500, count: 2 });
 	}
 
 	async function getIdOfCurrentTitle() {
@@ -388,6 +398,7 @@ const PlayBack = ({ content }) => {
 		thirtySkipBack,
 		getCurrentPlaybackTimeInSeconds,
 		fastForwardNoWaitTime,
+		clickOnSkipIntro,
 	};
 };
 
