@@ -44,8 +44,11 @@ Function yoSpaceId3s_setTag(tag, value)
     if value = "E" then m.type = "end"
   else if tag = "YSEQ" AND (type(value) = "String" or type(value) = "roString")
     segs = value.split(":")
-    m.segment = segs[0].toInt()
-    m.totalSegmentAmt = segs[1].toInt()
+
+    if segs.count() > 1
+      m.segment = segs[0].toInt()
+      m.totalSegmentAmt = segs[1].toInt()
+    end if
   else if tag = "YDUR"
     m.position = value.toFloat()
   else if tag = "YMID"

@@ -181,7 +181,6 @@ Function tubiAds_getRainmakerParamsForLinear_test()
   m.assertEqual(params.opt_out, "true")
   m.assertInvalid(params.user_id)
   m.assertEqual(params.platform, m.constants.analyticsPlatform)
-  m.assertTrue(params["yo.ac"])
 End Function
 
 

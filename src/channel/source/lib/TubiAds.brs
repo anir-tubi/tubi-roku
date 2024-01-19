@@ -284,15 +284,14 @@ Function tubiAds_getRainmakerParamsForLinear(content)
   params.platform = m.constants.analyticsPlatform
   params.delete("nsid")
 
-  ' not needed for rainmaker, but the yo.ac=true parameter informs yospace
-  ' that we are doing client side ad pixel reporting and is necessary
-  params["yo.ac"] = true
   return params
 End Function
 
 
+' This function is used to retrieve ads for linear.
 ' @adsUrl: string, The url that is used to retrieve the ads. This url is already decorated with rainmaker params.
-Function tubiAds_retrieveAds(adsUrl)
+' @ssaiUsed: string, values are "yospace" or "apollo". currently yospace is default. But in future, apollo will replace the yospace.
+Function tubiAds_retrieveAds(adsUrl, ssaiUsed = "yospace")
   currentAdUnitsList = invalid
 
 
@@ -326,21 +325,26 @@ Function tubiAds_retrieveAds(adsUrl)
 
         deleteFile(localRafVastUrl)
       else
-        errorInfo = {
-          code: responseCode.tostr()
-          message: "RAF bad response"
-          raf_version: m.roAdFramework.getLibVersion()
-          ad_url: adsUrl
-          deviceId: m.constants.deviceInfo.deviceId
-        }
-        jsonErrorInfo = FormatJSON(errorInfo)
-        ' sending error logs to uapi
-        tubiLog(jsonErrorInfo, "warn", "adBadResponse", "ad-bad-response", 0.1)
+        code = responseCode.tostr()
+        if code = "404" AND ssaiUsed = "apollo"
+          ' apollo pollUrl sends 404 if there are no ads, hence its not an error that we want report.
+        else
+          errorInfo = {
+            code: code
+            message: "RAF bad response"
+            raf_version: m.roAdFramework.getLibVersion()
+            ad_url: adsUrl
+            deviceId: m.constants.deviceInfo.deviceId
+          }
+          jsonErrorInfo = FormatJSON(errorInfo)
+          ' sending error logs to uapi
+          tubiLog(jsonErrorInfo, "warn", "adBadResponse", "ad-bad-response", 0.1)
 
-        errorInfo.type = m.constants.errors.type.adError + " " + responseCode.tostr()
-        errorInfo.name = m.constants.errors.message.badResponse
-        ' sending error logs to sentry sdk
-        tubiException(errorInfo, "warn", 0.1)
+          errorInfo.type = m.constants.errors.type.adError + " " + responseCode.tostr()
+          errorInfo.name = m.constants.errors.message.badResponse
+          ' sending error logs to sentry sdk
+          tubiException(errorInfo, "warn", 0.1)
+        end if
       end if
     end if
   end if
@@ -605,30 +609,33 @@ End Function
 Function tubiAds_parseOutNotUsedAdPodPixels(adResponse)
   notUsedAdPodPixels = {}
   xml = ParseXML(adResponse)
-  for each ad in xml.ad
-    adSequence = ad@sequence
-    if isNonEmptyString(adSequence) = true then
-      for each inline in ad.inline
-        for each creatives in inline.creatives
-          for each creative in creatives.creative
-            for each linear in creative.linear
-              for each trackingEvents in linear.trackingEvents
-                for each tracking in trackingEvents.tracking
-                  event = tracking@event
-                  if event = "notUsed" then
-                    ' Need trim due to extra whitespace and unescape because of encoding returned from yospace
-                    url = tracking.getText().trim().unescape()
-                    notUsedAdPodPixels[adSequence] = url
-                    exit for
-                  end if
+  if xml <> invalid
+    for each ad in xml.ad
+      adSequence = ad@sequence
+      if isNonEmptyString(adSequence) = true then
+        for each inline in ad.inline
+          for each creatives in inline.creatives
+            for each creative in creatives.creative
+              for each linear in creative.linear
+                for each trackingEvents in linear.trackingEvents
+                  for each tracking in trackingEvents.tracking
+                    event = tracking@event
+                    if event = "notUsed" then
+                      ' Need trim due to extra whitespace and unescape because of encoding returned from yospace
+                      url = tracking.getText().trim().unescape()
+                      notUsedAdPodPixels[adSequence] = url
+                      exit for
+                    end if
+                  end for
                 end for
               end for
             end for
           end for
         end for
-      end for
-    end if
-  end for
+      end if
+    end for
+  end if
+
   return notUsedAdPodPixels
 End Function
 

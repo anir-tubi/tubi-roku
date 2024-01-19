@@ -4,6 +4,8 @@ Function init()
   m.top.functionName = "execAdsSSAITask"
   m.top.control = "RUN"
   m.pollUrl = ""
+  ' indicates whether yospace or apollo ssai been used.
+  m.ssaiUsed = "yospace"
   ' indicates if the current stream is displaying ads
   m.isPlayingAds = false
   ' Below field is currently not used anywhere outside the file so not exposing it as interface field.
@@ -37,7 +39,7 @@ Function execAdsSSAITask()
   m.videoIsFullscreen = false
 
   ' used to keep track of which ad in the ad break/pod is currently being played in the stream.
-  ' will contain an AA of as single ad as extracted from the parsed VAST response from yospace.
+  ' will contain an AA of as single ad as extracted from the parsed VAST response from yospace/apollo.
   m.currentAdInPod = invalid
 
   ' used to keep track of the playback position within each ad. This is needed because ads can
@@ -59,9 +61,9 @@ Function execAdsSSAITask()
 
   ' holds the state of which impressions have been sent for a given ad.
   ' Only one key is ever expected to be held in the AA at any given time.
-  ' The structure is as follows:
+  ' The yospace/apollo structure is as follows:
   ' {
-  '   <<yospaceAdId>>: {
+  '   <<ssaiAdId>>: {
   '                       "0percent": <<boolean>>
   '                       "25percent": <<boolean>>
   '                       "50percent": <<boolean>>
@@ -69,6 +71,8 @@ Function execAdsSSAITask()
   '                       "100percent": <<boolean>>
   '                    }
   ' }
+  '
+
   m.pixelRecordForAd = {}
 
   runSSAILoop(m.ssaiPort)
@@ -77,7 +81,7 @@ End Function
 
 Function runSSAILoop(ssaiPort)
   tubiLog("AdsSSAITask.runSSAILoop")
-  m.top.observeField("pollUrl", ssaiPort)
+  m.top.observeField("pollUrlAA", ssaiPort)
   m.top.observeField("videoPosition", ssaiPort)
   m.top.observeField("id3Tags", ssaiPort)
   m.top.observeField("contentUpdated", ssaiPort)
@@ -91,7 +95,7 @@ Function runSSAILoop(ssaiPort)
 
     if type(msg) = "roSGNodeEvent"
       messageField = msg.getField()
-      if messageField = "pollUrl"
+      if messageField = "pollUrlAA"
         onPollUrlChange(msg)
       else if messageField = "videoPosition"
         onVideoPosition(msg)
@@ -132,15 +136,20 @@ End Function
 ' occurs when a new linear channel has been selected by the user.
 Function onPollUrlChange(msg)
   tubiLog("AdsSSAITask.onPollUrlChange")
-  pollUrl = msg.getData()
-  m.pollUrl = pollUrl
-  ' old ad state may persist if a user changes channels in the middel of an ad, so reset ad state
-  ' once we get a new poll url (can be invalid for certain channels that do not have ads yet),
-  ' which indicates a new stream is starting.
-  resetAdState()
+  pollUrlAA = msg.getData()
 
-  if pollUrl <> invalid
-    pollForAds(pollUrl)
+  if isAA(pollUrlAA) = true
+    m.pollUrl = pollUrlAA.pollUrl
+    m.ssaiUsed = pollUrlAA.ssaiUsed
+
+    ' old ad state may persist if a user changes channels in the middle of an ad, so reset ad state
+    ' once we get a new poll url (can be invalid for certain channels that do not have ads yet),
+    ' which indicates a new stream is starting.
+    resetAdState()
+
+    if m.pollUrl <> invalid
+      pollForAds(m.pollUrl)
+    end if
   end if
 End Function
 
@@ -148,19 +157,24 @@ End Function
 Function pollForAds(url)
   if isNonEmptyString(url) = true AND m.isPlayingAds <> true AND m.isPlayingAdFiller <> true then
     ' Retrieves ads and also sets m.notUsedAdPodPixels
-    adPods = m.adLib.retrieveAds(url)
+    adPods = m.adLib.retrieveAds(url, m.ssaiUsed)
     if adPods <> invalid AND adPods.count() > 0
       if adPods[0].ads <> invalid
         m.adPod = adPods[0]
 
-        ' parse out the YoSpace ad video id
+        ' parse out the YoSpace/apollo ad video id
         for i = 0 to m.adPod.ads.count() - 1
           ad = m.adPod.ads[i]
-          adIdSplit = ad.adId.split("_YO_")
+
+          if m.ssaiUsed = "yospace"
+            adIdSplit = ad.adId.split("_YO_")
+          else
+            adIdSplit = ad.adId.split("_AP_")
+          end if
 
           if adIdSplit.count() > 1
             ad.adId = adIdSplit[0]
-            ad.yospaceId = adIdSplit[1]
+            ad.ssaiId = adIdSplit[1]
           end if
 
           ' add the sequence of the ad within the pod for future reference
@@ -196,6 +210,15 @@ End Function
 Function onTags(msg)
   tags = msg.getData()
 
+  if m.ssaiUsed = "apollo"
+    parseApolloId3(tags)
+  else
+    parseYoSpaceId3(tags)
+  end if
+End function
+
+
+Function parseYoSpaceId3(tags)
   ' decipher tags
   id3s = yoSpaceId3s()
   if (tags.Count() = 6) then
@@ -216,36 +239,34 @@ Function onTags(msg)
     m.positionAtLastId3 = m.videoPosition
   end if
 
-  yospaceIdFromTag = id3s.getId()
+  ssaiIdFromTag = id3s.getId()
 
-  if m.currentAdInPod = invalid or m.currentAdInPod.yospaceId <> yospaceIdFromTag
+  if m.currentAdInPod = invalid OR m.currentAdInPod.ssaiId <> ssaiIdFromTag
     ' the id3 tag is for a different ad than what we have stored currently,
     ' so update state for the new ad
-    m.currentAdInPod = getAdFromYospaceAdId(yospaceIdFromTag, m.adPod)
+    m.currentAdInPod = getAdFromSsaiAdId(ssaiIdFromTag, m.adPod)
     m.positionWithinAd = 0
   end if
 
   if id3s.currentSegment() = 1 AND id3s.getType() = "start"
     ' we are at the very beginning of an ad video
     if m.currentAdInPod <> invalid
-      setIsPlayingAds(true)
-      m.isPlayingAdFiller = false
-
+      updateNowPlaying("ad")
       ' send "Impression" ad pixels and StartAdEvent analytics
       handleStartAdTracking()
     else
-      m.isPlayingAdFiller = true
+      updateNowPlaying("filler")
+
     end if
   else if id3s.getType() = "start"
     ' we are at the start of a segment, but not the first segment an ad video
     if m.currentAdInPod <> invalid
-      setIsPlayingAds(true)
-      m.isPlayingAdFiller = false
+      updateNowPlaying("ad")
 
       ' handle mid quartile tracking - will also send unsent pixels for earlier points in the ad
       handleMidPixels(m.positionWithinAd)
     else
-      m.isPlayingAdFiller = true
+      updateNowPlaying("filler")
     end if
   else if id3s.getType() = "end" AND id3s.currentSegment() = id3s.totalSegments()
     ' we are at the very end of an ad
@@ -254,7 +275,7 @@ Function onTags(msg)
       ' send "Complete" ad pixels and FinishAdEvent analytics
       handleFinishAdTrackingOnComplete()
 
-      if isLastAdInPod(yospaceIdFromTag, m.adPod) = true
+      if isLastAdInPod(ssaiIdFromTag, m.adPod) = true
         ' we've reached the last segment in the last ad of the pod, so reset ad state
         resetAdState()
       end if
@@ -274,20 +295,91 @@ Function onTags(msg)
       ' video concludes. This means we need to set isPlayingAdFiller false after each filler segment ends
       ' as we don't know if the next segment will be filler video. We will set isPlayingAdFiller back to true
       ' at the start of the next segment, if it is a filler video segment.
-      m.isPlayingAdFiller = false
+        updateNowPlaying("content")
     end if
   else if id3s.getType() = "middle"
     ' At a middle point of a segment (there can be multiple middle points per segment).
     ' fire any quartile or midpoint pixels as necessary
     if m.currentAdInPod <> invalid
-      setIsPlayingAds(true)
-      m.isPlayingAdFiller = false
+      updateNowPlaying("ad")
       position = m.positionWithinAd + id3s.getPosition()
       handleMidPixels(position)
     else
-      m.isPlayingAdFiller = true
+      updateNowPlaying("filler")
     end if
   end if
+End Function
+
+
+Function parseApolloId3(tags)
+  tubiLog("AdsSSAITask.parseApolloId3")
+  id3s = apolloId3s()
+  ' tubi ID3 tags are coming in batch of 4 or 5 and tags will have 4 letters like TPOS, TSEQ etc
+  if (tags.Count() >= 4) then
+    for each tag in tags
+      if (len(tag) = 4) then
+        value = tags[tag]
+        id3s.setTag(tag, value)
+      end if
+    end for
+
+    m.positionAtLastId3 = m.videoPosition
+  end if
+
+  ssaiIdFromTag = id3s.getId()
+
+  if m.currentAdInPod = invalid OR m.currentAdInPod.ssaiId <> ssaiIdFromTag
+    ' the id3 tag is for a different ad than what we have stored currently,
+    ' so update state for the new ad
+    m.currentAdInPod = getAdFromSsaiAdId(ssaiIdFromTag, m.adPod)
+  end if
+
+  ' adPercent retrieved from AdInfo related ID3 tags. The valus represent ad completion in percentage - 0, 25, 50, 75 and 100
+  adPercent = id3s.getAdPercent()
+  adType = id3s.getAdType()
+
+  if id3s.currentSegment() > 0
+    if m.currentAdInPod <> invalid AND adType = "a"
+      updateNowPlaying("ad")
+    else if adType = "f"
+      updateNowPlaying("filler")
+    end if
+
+  else if adPercent = 0 = 0
+    if m.currentAdInPod <> invalid AND adType = "a"
+      'setting the playing ads and filler status because we are not sure if the position tag will come first or the segment tag.
+      updateNowPlaying("ad")
+
+      handleStartAdTracking()
+    else if adType = "f"
+      updateNowPlaying("filler")
+    end if
+
+  else if adPercent = 25 OR adPercent = 50 OR adPercent = 75
+    if m.currentAdInPod <> invalid AND adType = "a"
+      updateNowPlaying("ad")
+
+      handleMidApolloPixels(adPercent)
+    else if adType = "f"
+      updateNowPlaying("filler")
+    end if
+  else if adPercent = 100
+    ' we are at the very end of an ad
+    if m.currentAdInPod <> invalid AND adType = "a"
+      ' send "Complete" ad pixels and FinishAdEvent analytics
+      handleFinishAdTrackingOnComplete()
+
+      'we are end of an ad pod
+      if isLastAdInPod(ssaiIdFromTag, m.adPod) = true
+        resetAdState()
+      end if
+    else if adType = "f"
+      ' we've reached the end of an ad filler video
+      resetAdState()
+    end if
+
+  end if
+
 End Function
 
 
@@ -322,8 +414,7 @@ End Function
 Function resetAdState()
   ' reset task level values
   m.positionWithinAd = 0
-  setIsPlayingAds(false)
-  m.isPlayingAdFiller = false
+  updateNowPlaying("content")
   m.currentAdInPod = invalid 'will be populated with an ad AA taken from the ad pod parsed from the VAST response'
   m.adPod = {}
   m.positionAtLastId3 = -1
@@ -334,15 +425,17 @@ End Function
 ' @ad: assocArray, an ad as extracted from the ad pod AA created by RAF when parsing the VAST response
 Function handleStartAdTracking()
   if m.currentAdInPod <> invalid
-    yospaceAdId = m.currentAdInPod.yospaceId
 
-    if m.pixelRecordForAd[yospaceAdId] = invalid
+    ssaiAdId = m.currentAdInPod.ssaiId
+
+
+    if m.pixelRecordForAd[ssaiAdId] = invalid
       ' add the pixel record state for the new ad
       newPixelRecord = getNewPixelRecord()
-      m.pixelRecordForAd = formatPixelRecordForAd(yospaceAdId, newPixelRecord)
+      m.pixelRecordForAd = formatPixelRecordForAd(ssaiAdId, newPixelRecord)
     end if
 
-    pixelRecord = m.pixelRecordForAd[yospaceAdId]
+    pixelRecord = m.pixelRecordForAd[ssaiAdId]
 
     fireCurrentAndPreviousPixels(m.currentAdInPod, pixelRecord, 0)
 
@@ -363,22 +456,45 @@ Function handleStartAdTracking()
   end if
 End Function
 
+' @adPercent - ad percent completion. value are 0, 25, 50, 75 and 100
+Function handleMidApolloPixels(adPercent)
+  ad = m.currentAdInPod
+
+  if ad <> invalid
+    ssaiAdId = ad.ssaiId
+
+    if m.pixelRecordForAd[ssaiAdId] = invalid
+      ' it would be unexpected to reach a quartile playback point within an ad and
+      ' still not have the accurate pixel record, but could potentially happen if previous
+      ' pixels didn't get fired due to missing id3 tags
+      newPixelRecord = getNewPixelRecord()
+      m.pixelRecordForAd = formatPixelRecordForAd(ssaiAdId, newPixelRecord)
+    end if
+
+    pixelRecord = m.pixelRecordForAd[ssaiAdId]
+
+    quartile = adPercent / 100
+
+    fireCurrentAndPreviousPixels(ad, pixelRecord, quartile)
+  end if
+End Function
+
 
 Function handleMidPixels(position)
   ad = m.currentAdInPod
 
   if ad <> invalid
-    yospaceAdId = ad.yospaceId
+    ssaiAdId = ad.ssaiId
 
-    if m.pixelRecordForAd[yospaceAdId] = invalid
+    if m.pixelRecordForAd[ssaiAdId] = invalid
       ' it would be unexpected to reach a quartile playback point within an ad and
       ' still not have the accurate pixel record, but could potentially happen if previous
       ' pixels didn't get fired due to missing id3 tags
       newPixelRecord = getNewPixelRecord()
-      m.pixelRecordForAd = formatPixelRecordForAd(yospaceAdId, newPixelRecord)
+      m.pixelRecordForAd = formatPixelRecordForAd(ssaiAdId, newPixelRecord)
     end if
 
-    pixelRecord = m.pixelRecordForAd[yospaceAdId]
+    pixelRecord = m.pixelRecordForAd[ssaiAdId]
 
     quartile = 0
     if ad.duration <> invalid
@@ -399,17 +515,17 @@ End Function
 Function handleFinishAdTrackingOnComplete()
   if m.currentAdInPod <> invalid
 
-    yospaceAdId = m.currentAdInPod.yospaceId
+    ssaiAdId = m.currentAdInPod.ssaiId
 
-    if m.pixelRecordForAd[yospaceAdId] = invalid
+    if m.pixelRecordForAd[ssaiAdId] = invalid
       ' it would be unexpected to reach the end of an ad and still not have the accurate
       ' pixel record, but could potentially happen if previous pixels didn't get fired
       ' due to missing id3 tags
       newPixelRecord = getNewPixelRecord()
-      m.pixelRecordForAd = formatPixelRecordForAd(yospaceAdId, newPixelRecord)
+      m.pixelRecordForAd = formatPixelRecordForAd(ssaiAdId, newPixelRecord)
     end if
 
-    pixelRecord = m.pixelRecordForAd[yospaceAdId]
+    pixelRecord = m.pixelRecordForAd[ssaiAdId]
 
     ' send 4th quartile/completed ad pixels and any previous pixels from the ad that were not fired
     fireCurrentAndPreviousPixels(m.currentAdInPod, pixelRecord, 1.0)
@@ -484,9 +600,10 @@ Function firePixels(ad, pixelRecord, quartile)
 
     if ctx <> invalid
       ' update the sent pixel state so we don't attempt to resend pixels later
-      if ad.yospaceId <> invalid
+      if ad.ssaiId <> invalid
         pixelRecord = markPixelsAsSent(pixelRecord, quartile)
-        m.pixelRecordForAd = formatPixelRecordForAd(ad.yospaceId, pixelRecord)
+
+        m.pixelRecordForAd = formatPixelRecordForAd(ad.ssaiId, pixelRecord)
       end if
 
       m.raf.fireTrackingEvents(ad, ctx)
@@ -544,13 +661,13 @@ Function getAnalyticsCtx(ad, podCount)
 End Function
 
 
-' @yospaceAdId: string, a yospace ad id taken from the VAST response or id3 tag
+' @ssaiAdId: string, a yospace/apollo ad id taken from the VAST response or id3 tag
 ' @adPod: array, an array of ads AAs as parsed by VAST
-Function getAdFromYospaceAdId(yospaceAdId, adPod)
+Function getAdFromssaiAdId(ssaiAdId, adPod)
   if isAA(adPod) = true AND isArray(adPod.ads) = true
-    ' iterate over each ad in pod until yospaceAdId is found
+    ' iterate over each ad in pod until ssaiAdId is found
     for each ad in adPod.ads
-      if ad.yospaceId = yospaceAdId
+      if ad.ssaiId = ssaiAdId
         return ad
       end if
     end for
@@ -560,9 +677,9 @@ Function getAdFromYospaceAdId(yospaceAdId, adPod)
 End Function
 
 
-' @yospaceAdId: string, a yospace ad id taken from the VAST response or id3 tag
+' @ssaiAdId: string, a ssai ad id taken from the VAST response or id3 tag
 ' @adPod: array, an array of ads AAs as parsed by VAST
-Function isLastAdInPod(yospaceAdId, adPod)
+Function isLastAdInPod(ssaiAdId, adPod)
   if haveStoredAds(adPod) = true
     ads = adPod.ads
     lastAdIndex = ads.count() - 1
@@ -570,7 +687,7 @@ Function isLastAdInPod(yospaceAdId, adPod)
     if lastAdIndex >= 0
       lastAd = ads[lastAdIndex]
 
-      if lastAd.yospaceId = yospaceAdId
+      if lastAd.ssaiId = ssaiAdId
         return true
       end if
     end if
@@ -642,20 +759,32 @@ Function checkPixelRecord(pixelRecord, quartile)
 End Function
 
 
-' @yospaceAdId: string, a yospace ad id taken from the VAST response or id3 tag
+' @ssaiAdId: string, a yospace/apollo adId taken from the VAST response or id3 tag
 ' @pixelRecord: assocArray, an AA in the format returned by getNewPixelRecord()
-Function formatPixelRecordForAd(yospaceAdId, pixelRecord)
+Function formatPixelRecordForAd(ssaiAdId, pixelRecord)
   pixelRecordForAd = {}
 
-  if isAA(pixelRecord) = true AND isNonEmptyString(yospaceAdId) = true
-    pixelRecordForAd[yospaceAdId] = pixelRecord
+  if isAA(pixelRecord) = true AND isNonEmptyString(ssaiAdId) = true
+    pixelRecordForAd[ssaiAdId] = pixelRecord
   end if
 
   return pixelRecordForAd
 End Function
 
 
-Function setIsPlayingAds(isPlayingAds)
-  m.isPlayingAds = isPlayingAds
-  m.top.isPlayingAds = isPlayingAds
+'@nowPlaying - string, what is currently playing. Values are ad = ad playing, content = channel content playing, filler = no ad just filler playing
+Function updateNowPlaying(nowPlaying)
+  if nowPlaying = "ad"
+    m.isPlayingAds = true
+    m.isPlayingAdFiller = false
+  else if nowPlaying = "filler"
+    m.isPlayingAdFiller = true
+    m.isPlayingAds = false
+  else if nowPlaying = "content"
+    m.isPlayingAdFiller = false
+    m.isPlayingAds = false
+  end if
+
+  m.top.nowPlaying = nowPlaying
+
 End Function

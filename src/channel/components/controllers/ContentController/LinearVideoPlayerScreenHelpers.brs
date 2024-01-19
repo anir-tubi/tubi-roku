@@ -166,8 +166,8 @@ Function getUpdatedLinearVideoResources(content)
   auth = TubiAuth(m.constants, m.Request)
   adLib = TubiAdsLimited(m.constants, auth)
 
-  ' add the ad parameters for the content. Back end will forward these parameters to YoSpace
-  ' so that YoSpace can have them when YoSpace makes ad requests for SSAI
+  ' add the ad parameters for the content. Back end will forward these parameters to YoSpace/Apollo
+  ' so that YoSpace/Apollo can have them when YoSpace/Apollo makes ad requests for SSAI
   adParams = adLib.getRainmakerParamsForLinear(content)
 
   newVideoResources = []
@@ -180,6 +180,17 @@ Function getUpdatedLinearVideoResources(content)
           if resource.url <> invalid
             newResources = []
             newResource = resource
+
+            'not needed for rainmaker, but the ap.pt=1 parameter informs apollo that
+            ' we are doing client side ad pixel reporting and is necessary
+            if resource.ssaiVersion.InStr("apollo") > -1
+              adParams["ap.pt"] = 1
+            else
+              ' not needed for rainmaker, but the yo.ac=true parameter informs yospace
+              ' that we are doing client side ad pixel reporting and is necessary
+              adParams["yo.ac"] = true
+            end if
+
             newResource.url = m.request.addParamsToUrl(newResource.url, adParams)
             newResources.push(newResource)
             newVideoResources.push(newResources)
@@ -334,11 +345,25 @@ Function onLiveStreamManifestResponse(response)
     ' find the analytics url
     ' ("analytics url" is the YoSpace name for the url that will be polled for ad responses)
     pollUrl = invalid
+    ssaiUsed = "yospace"
+
     lines = response.res.split(chr(10))
     for each line in lines
       if line.Instr("#EXT-X-YOSPACE-ANALYTICS-URL") = 0
+        ssaiUsed = "yospace"
         ' Extract the value of the analytics URL
         pollUrl = right(line, len(line) - 29)
+
+        ' Strip surrounding quotes characters if present
+        if (left(pollUrl, 1) = chr(34))
+          pollUrl = mid(pollUrl, 2, len(pollUrl) - 2)
+        end if
+        exit for
+
+      else if line.Instr("#EXT-X-APOLLO-ANALYTICS-URL") = 0
+        ssaiUsed = "apollo"
+        ' Extract the value of the analytics URL
+          pollUrl = right(line, len(line) - 28)
 
         ' Strip surrounding quotes characters if present
         if (left(pollUrl, 1) = chr(34))
@@ -387,7 +412,13 @@ Function onLiveStreamManifestResponse(response)
               else
                 originalUrl = resource.url
               end if
-              modifiedUrl = constructModifiedLinearVideoUrl(originalUrl, pollUrl)
+
+              if ssaiUsed = "apollo"
+                modifiedUrl = originalUrl
+              else
+                modifiedUrl = constructModifiedLinearVideoUrl(originalUrl, pollUrl)
+              end if
+
               newResource.url = m.request.passThroughCharlesProxy(modifiedUrl)
             end if
           end if
@@ -402,7 +433,11 @@ Function onLiveStreamManifestResponse(response)
 
     videoPlayer.content = content
     videoPlayer.updateContent = true
-    videoPlayer.pollUrl = pollUrl
+    ' AA used here because sending these 2 information asynchronosly might create issue of using wrong ssai and not sending any pixels.
+    videoPlayer.pollUrlAA = {
+      "pollUrl": pollUrl
+      "ssaiUsed": ssaiUsed
+    }
     sendVideoPlayerCommand(videoPlayer, "play")
   end if
 End Function

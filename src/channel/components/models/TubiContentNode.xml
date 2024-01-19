@@ -85,6 +85,9 @@
     <!-- the current codec, it will be inserted in client logs when playback fails -->
     <field id="codec" type="string"/>
 
+    <!-- which ssai is used apollo or yospace at backend-->
+    <field id="ssaiVersion" type="string"/>
+
     <!-- the current resolution, it will be inserted in client logs when playback fails -->
     <field id="resolution" type="string"/>
 

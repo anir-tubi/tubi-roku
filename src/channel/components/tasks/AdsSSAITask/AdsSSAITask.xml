@@ -13,6 +13,7 @@
     <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiAds.brs" />
     <script type="text/brightscript" uri="../../../source/lib/YoSpaceId3s.brs" />
+    <script type="text/brightscript" uri="pkg:/source/lib/apolloId3s.brs" />
     <script type="text/brightscript" uri="../../../source/3rdparty/roku/generalUtils.brs" />
     <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
@@ -23,14 +24,17 @@
 
     <interface>
       <!-- INPUT -->
-        <!-- The url used to poll for ad metadata. This is provided in the hls manifest by yospace. -->
-        <field id="pollUrl" type="string" />
+        <!-- This AA contains:{
+            "pollUrl": url used to poll for ad metadata
+            "ssaiUsed": ssai name (values = "yospace" or "apollo")}
+        -->
+        <field id="pollUrlAA" type="assocarray" />
 
         <!-- The current position of the video as provided by the video player -->
         <field id="videoPosition" type="float" />
 
         <!-- id3 tags are metadata included in the stream itself about the current video segment that is playing.
-             These are used by yospace to indicate when ad content or ad filler video is playing.
+            These are used by yospace/apollo to indicate when ad content or ad filler video is playing.
         -->
         <field id="id3Tags" type="assocarray" />
 
@@ -54,12 +58,16 @@
         <field id="didUserOptOutOfPersonalizedAdvertising" type="boolean" value="false"/>
 
       <!-- OUTPUT -->
-        <!-- updated video resources with urls that include ad params needed by yospace to fetch ads from
+        <!-- updated video resources with urls that include ad params needed by yospace/apollo to fetch ads from
              rainmaker.
         -->
         <field id="videoResourcesWithAdParams" type="array" />
 
-        <!-- indicates if the video is currently playing ads as indicated by yospace id3 tags -->
-        <field id="isPlayingAds" type="boolean" value="false" />
+        <!-- indicates if the video is currently playing ads or fillers as indicated by yospace/apollo id3 tags
+              ad = ads playing
+              filler = filler playing
+              content = content playing
+        -->
+        <field id="nowPlaying" type="string" value="content" />
     </interface>
 </component>

@@ -48,7 +48,7 @@
       <field id="channelsContent" type="node"/>
 
       <!-- Fields to pass through to AdsSSAITask -->
-      <field id="pollUrl" alias="PlayerAdsSSAITask.pollUrl" />
+      <field id="pollUrlAA" alias="PlayerAdsSSAITask.pollUrlAA" />
 
       <!-- Indicator that the outside would like the overlay to appear (when it can) when the video starts to play or goes full screen -->
       <field id="allowTransportToAppear" value="false" type="boolean"/>

@@ -117,23 +117,23 @@ Function adsSSAITask_isLastAdInPod_test()
 End Function
 
 
-'@Test getAdFromYospaceAdId unit test
-Function adsSSAITask_getAdFromYospaceAdId_test()
+'@Test getAdFromSsaiAdId unit test
+Function adsSSAITask_getAdFromSsaiAdId_test()
   adPod = m.mockedAdBreak[0]
 
-  ad = getAdFromYospaceAdId("a12345", adPod)
+  ad = getAdFromSsaiAdId("a12345", adPod)
   m.assertNotInvalid(ad)
   m.assertEqual(ad.adId, "12345")
 
-  ad = getAdFromYospaceAdId("a23452", adPod)
+  ad = getAdFromSsaiAdId("a23452", adPod)
   m.assertNotInvalid(ad)
   m.assertEqual(ad.adId, "23452")
 
-  ad = getAdFromYospaceAdId("a89564", adPod)
+  ad = getAdFromSsaiAdId("a89564", adPod)
   m.assertNotInvalid(ad)
   m.assertEqual(ad.adId, "89564")
 
-  ad = getAdFromYospaceAdId("xxxxx", adPod)
+  ad = getAdFromSsaiAdId("xxxxx", adPod)
   m.assertInvalid(ad)
 End Function
 
@@ -144,19 +144,19 @@ Function buildMockedAdBreak()
       ads: [
         {
           adId: "12345"
-          yospaceId: "a12345"
+          ssaiId: "a12345"
           duration: 30
           tracking: []
         }
         {
           adId: "23452"
-          yospaceId: "a23452"
+          ssaiId: "a23452"
           duration: 15
           tracking: []
         }
         {
           adId: "89564"
-          yospaceId: "a89564"
+          ssaiId: "a89564"
           duration: 20
           tracking: []
         }

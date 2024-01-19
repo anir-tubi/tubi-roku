@@ -1708,6 +1708,11 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
         resource.codec = codec
       end if
 
+      'In future ssaiVersion might contain apollo versions like apollo_v15
+      if video.ssai_version <> invalid
+        resource.ssaiVersion = video.ssai_version
+      end if
+
       resolution = ""
       if video.resolution <> invalid
         resolution = getResolutionFromVideoResource(video)

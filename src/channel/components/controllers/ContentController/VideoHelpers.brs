@@ -1047,43 +1047,43 @@ Function onVideoTrackingStart(msg)
   tubiLog("VideoHelpers.onVideoTrackingStart")
   videoPlayer = msg.getRoSGNode()
   ' Youbora events
-  if m.constants.settings.youboraEnabled = true
+  if m.constants.settings.youboraEnabled = true AND videoPlayer <> invalid AND videoPlayer.content <> invalid
+    content = videoPlayer.content
     youboraConfig = m.constants.thirdParty.youbora.config
 
-    if videoPlayer <> invalid AND videoPlayer.content <> invalid
-      youboraConfig["extraparam.1"] = videoPlayer.content.id
-      youboraConfig["content.id"] = videoPlayer.content.id
+    youboraConfig["extraparam.1"] = content.id
+    youboraConfig["content.id"] = content.id
 
-      playbackType = videoPlayer.content.drmType
-      youboraConfig["content.playbackType"] = playbackType
+    playbackType = content.drmType
+    youboraConfig["content.playbackType"] = playbackType
 
-      if isString(playbackType)
-        playbackTypeArray = playbackType.split("_")
-        if playbackTypeArray[1] <> invalid
-          youboraConfig["content.drm"] = playbackTypeArray[1]
-        end if
+    if isString(playbackType)
+      playbackTypeArray = playbackType.split("_")
+      if playbackTypeArray[1] <> invalid
+        youboraConfig["content.drm"] = playbackTypeArray[1]
       end if
-
-      youboraConfig.tvShow = Mid(videoPlayer.content.parentId, 2)
     end if
+
+    youboraConfig.tvShow = Mid(content.parentId, 2)
 
     if isLoggedInUser() = true
       youboraConfig.username = m.global.authInfo.userId
     end if
 
-    if videoPlayer.content.type = m.constants.ui.contentTypes.linear
+    if content.type = m.constants.ui.contentTypes.linear
       youboraConfig["content.isLive"] = true
+      youboraConfig["content.customDimension.3"] = content.ssaiVersion
     else
       youboraConfig["content.isLive"] = false
     end if
-    if isNonEmptyString(videoPlayer.content.titanVersionOrExperimentVersion) = true
-      youboraConfig["content.customDimension.2"] = videoPlayer.content.titanVersionOrExperimentVersion
+    if isNonEmptyString(content.titanVersionOrExperimentVersion) = true
+      youboraConfig["content.customDimension.2"] = content.titanVersionOrExperimentVersion
     end if
-    youboraConfig["content.resource"] = videoPlayer.content.URL
+    youboraConfig["content.resource"] = content.URL
     youboraConfig["device.model"] = m.constants.deviceInfo.model
     youboraConfig["device.id"] = m.constants.deviceInfo.deviceId
     youboraConfig["app.releaseVersion"] = m.constants.deviceInfo.clientVersion
-    youboraConfig["content.encoding.videoCodec"] = videoPlayer.content.codec
+    youboraConfig["content.encoding.videoCodec"] = content.codec
 
     m.youboraTask.options = youboraConfig
     m.youboraTask.event = {handler: "play"}
