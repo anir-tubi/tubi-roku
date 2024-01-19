@@ -156,7 +156,6 @@ function buildInstalled() {
       '!src/channel/components/controllers/StarterController/**',
       '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.xml',
       '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.brs',
-      '!src/channel/components/tasks/AnalyticsTask/**',
     ];
 
     let testSources = [
@@ -367,7 +366,6 @@ function buildRemote() {
       '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.brs',
       '!src/channel/components/controllers/TubiScene/**',
       '!src/channel/components/controllers/BackgroundScene/**',
-      '!src/channel/components/tasks/AnalyticsTask/**',
       '!src/channel/source/tests/**',
       '!src/channel/source/Settings.brs',
       '!src/channel/components/controllers/TubiScene/TrackerTask.xml',
