@@ -34,6 +34,9 @@ Function init()
   end if
   onDimensionsChange() '//update the placement of spinners
   
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(loadingMessage, typographyConstants.ids.bodyMedium)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

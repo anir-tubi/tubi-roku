@@ -88,7 +88,7 @@ Function onContentChange(data)
             m.sideIconLabel.text = item.shortDescriptionLine2
             m.sideIconLabel.uri = "pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
             m.sideIconLabel.opacity = 0
-            m.sideIconLabel.translation = [0, 15]
+            m.sideIconLabel.translation = [0, 9]
             
             typographyConstants = getTypographyConstants()
             setTypographyOfLabel(m.sideIconLabel, typographyConstants.ids.bodyExtraSmallStrong)

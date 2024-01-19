@@ -45,6 +45,11 @@ Function init()
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.heading, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.subheading, typographyConstants.ids.bodyLarge)
+  setTypographyOfLabel(m.description, typographyConstants.ids.bodyMedium)
+
   onThemeChange()
   topRef.id = m.constants.ui.screenIds.consentScreen
   topRef.screenLevel = m.constants.ui.screenLevels.consentScreen

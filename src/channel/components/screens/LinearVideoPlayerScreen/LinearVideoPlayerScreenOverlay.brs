@@ -34,6 +34,9 @@ Function init()
   m.closedCaptioningButtonListBackground.observeFieldScoped("rowItemSelected", "onCCContentSelected")
   m.closedCaptioningButtonListBackground.observeFieldScoped("rowItemFocused", "onCCContentFocused")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.EPGError, typographyConstants.ids.bodyLargeStrong)
+
   theme = getThemeFromGlobal()
   if theme <> invalid
     m.closedCaptioningButtonListBackground.focusBitmapBlendColor = theme.focusedColor

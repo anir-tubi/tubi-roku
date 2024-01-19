@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="LinearVideoPlayerScreenOverlay" extends="Group" >
   <script type="text/brightscript" uri="LinearVideoPlayerScreenOverlay.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
@@ -10,6 +10,7 @@
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
 
@@ -151,9 +152,7 @@
             width="887"
             height="120">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-SemiBold.ttf"
-              size="33" />
+              role="font"/>
           </Label>
           <Spinner
             id="EPGSpinner"

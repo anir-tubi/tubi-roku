@@ -49,6 +49,8 @@ Function init()
   setTypographyOfLabel(m.AgePostfixLabel, typographyConstants.ids.headerLarge)
   setTypographyOfLabel(m.ErrorPrompt, typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.infoLabel, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.AgeErrorPrompt, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.AgeWarningPrompt, typographyConstants.ids.bodyMedium)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")

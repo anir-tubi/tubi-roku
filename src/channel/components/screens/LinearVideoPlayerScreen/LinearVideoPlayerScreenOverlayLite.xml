@@ -11,6 +11,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
     <!-- INPUT -->
@@ -128,18 +129,14 @@
             horizAlign="right"
             width="582">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-SemiBold.ttf"
-              size="28" />
+              role="font"/>
           </Label>
           <Label
             id="ComingUpTitleInInfoPanel"
             horizAlign="right"
             width="582">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-SemiBold.ttf"
-              size="36" />
+              role="font"/>
           </Label>
         </LayoutGroup>
 
@@ -185,18 +182,14 @@
           horizAlign="right"
           width="582">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="28" />
+            role="font"/>
         </Label>
         <Label
           id="ComingUpTitle"
           horizAlign="right"
           width="582">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="36" />
+            role="font"/>
         </Label>
       </LayoutGroup>
 

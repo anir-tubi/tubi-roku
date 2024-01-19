@@ -142,32 +142,31 @@ Function onItemContentChange()
       m.BottomLabel.text = itemContent.title
 
       if itemContent.subText <> ""
+        typographyConstants = getTypographyConstants()
         if m.topIconSubtext = invalid
           ' m.topIconSubtext fades out/in as the item gains/loses focus
           m.topIconSubtext = CreateObject("roSGNode","TextIcon")
           m.topIconSubtext.id = "topIconSubtext"
-          m.topIconSubtext.fontSize = 14
 
           if theme <> invalid
             m.topIconSubtext.fontColor = theme.primaryTextColor
           end if
 
-          m.topIconSubtext.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
-          m.topIconSubtext.padding = [12, 12]
+          m.topIconSubtext.padding = [2, 2]
           m.topIconSubtext.text = itemContent.subText
           m.topIconSubtext.uri = "pkg:/images/new-frame.webp"
           m.topIconSubtext.opacity = 0
+          setTypographyOfLabel(m.topIconSubtext, typographyConstants.ids.bodyExtraSmallStrong)
         end if
 
         if m.bottomIconSubtext = invalid
           ' m.bottomIconSubtext fades in/out as the item gains/loses focus
           m.bottomIconSubtext = CreateObject("roSGNode","TextIcon")
           m.bottomIconSubtext.id = "bottomIconSubtext"
-          m.bottomIconSubtext.fontSize = 14
-          m.bottomIconSubtext.fontUri = "pkg:/fonts/Vaud-Bold.ttf"
-          m.bottomIconSubtext.padding = [12, 12]
+          m.bottomIconSubtext.padding = [2, 2]
           m.bottomIconSubtext.text = itemContent.subText
           m.bottomIconSubtext.uri = "pkg:/images/new-frame.webp"
+          setTypographyOfLabel(m.bottomIconSubtext, typographyConstants.ids.bodyExtraSmallStrong)
 
           if theme <> invalid
             m.bottomIconSubtext.fontColor = theme.primaryTextColor

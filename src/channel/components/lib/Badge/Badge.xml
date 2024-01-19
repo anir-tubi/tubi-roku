@@ -33,9 +33,7 @@
       <Label
         id="BadgeText">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="18" />
+          role="font"/>
       </Label>
     </LayoutGroup>
   </children>

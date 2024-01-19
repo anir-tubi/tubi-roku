@@ -2,6 +2,7 @@
 <component name="RokuCWConsentScreen" extends="BaseScreen">
   <script type="text/brightscript" uri="RokuCWConsentScreen.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
     <!-- OUTPUT -->
@@ -24,18 +25,14 @@
       <Label
         id="heading">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-SemiBold.ttf"
-          size="72" />
+          role="font"/>
       </Label>
       <Label
         id="subheading"
         width="780"
         wrap="true">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="33" />
+          role="font"/>
       </Label>
       <FilledButtonMarkupGrid
         id="buttonList"

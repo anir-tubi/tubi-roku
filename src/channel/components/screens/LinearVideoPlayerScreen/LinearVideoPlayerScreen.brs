@@ -66,6 +66,9 @@ Function init()
 
   m.analyticsInterval = m.constants.player.pingFrequency
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.LoadingMessage, typographyConstants.ids.subheaderMedium)
+
   updateColors()
 
   if m.constants.deviceInfo.scaledUi = true then

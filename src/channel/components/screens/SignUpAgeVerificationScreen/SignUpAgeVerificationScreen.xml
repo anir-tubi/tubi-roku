@@ -126,15 +126,11 @@
     </Label>
     <SimpleLabel
       id="AgeErrorPrompt"
-      fontUri="pkg:/fonts/Vaud-Medium.ttf"
-      fontSize="27"
       horizOrigin="center"
       translation="[1107, 663]"
       visible="false" />
     <SimpleLabel
       id="AgeWarningPrompt"
-      fontUri="pkg:/fonts/Vaud-Medium.ttf"
-      fontSize="27"
       horizOrigin="center"
       translation="[1227, 663]"
       visible="false" />

@@ -11,6 +11,9 @@ Function init()
   m.top.opacity = 0
   m.infoPaneBg.uri = "pkg:/images/tab_short_component_alt_$$RES$$.9.png"
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.infoPaneText, typographyConstants.ids.bodySmall)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -176,10 +179,11 @@ Function createHeaderText(inputArgs)
     m.header.text = inputArgs.headerText
     m.header.wrap="false"
     font = CreateObject("roSGNode", "Font")
-    font.uri = "pkg:/fonts/Vaud-Bold.ttf"
-    font.size = 28
     m.header.font = font
     m.infoPaneMsgArea.insertChild(m.header, 0)
+
+    typographyConstants = getTypographyConstants()
+    setTypographyOfLabel(m.header, typographyConstants.ids.headerSmall)
   else
     m.header.text = inputArgs.headerText
   end if

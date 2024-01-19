@@ -89,7 +89,11 @@ Function setTypographyOfLabel(labelNode, typographyId)
       end if
 
       '//set properties depending on the label mode type
-      if labelNode.subType() = "Label" OR labelNode.subType() = "ScrollableText"
+      nodeType = type(labelNode)
+      if nodeType = "roAssociativeArray" OR labelNode.subType() = "TextIcon" OR labelNode.subType() = "SimpleLabel"
+        labelNode.fontUri = sFontFile
+        labelNode.fontSize = nFontSize
+      else if labelNode.subType() = "Label" OR labelNode.subType() = "ScrollableText"
         if nLineSpacing >= 0
           labelNode.lineSpacing = nLineSpacing
         end if
@@ -99,9 +103,6 @@ Function setTypographyOfLabel(labelNode, typographyId)
           fontNode.uri = sFontFile
           fontNode.size = nFontSize
         end if
-      else if labelNode.subType() = "TextIcon"
-        labelNode.fontUri = sFontFile
-        labelNode.fontSize = nFontSize
       end if
 
     else

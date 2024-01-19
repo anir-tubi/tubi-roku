@@ -144,9 +144,7 @@
             vertAlign="bottom">
             <Font
               id="TitleFont"
-              role="font"
-              uri="pkg:/fonts/Vaud-SemiBold.ttf"
-              size="47" />
+              role="font"/>
           </Label>
         </LayoutGroup>
 

@@ -8,8 +8,9 @@
 <component name="Spinner" extends="Group" >
   <script type="text/brightscript" uri="Spinner.brs" />
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
     <!-- INPUT -->
@@ -57,9 +58,7 @@
         width="66"
         horizAlign="center">
         <Font
-          role="font"
-          uri="pkg:/fonts/Vaud-Medium.ttf"
-          size="27" />
+          role="font"/>
       </Label>
     </Group>
 

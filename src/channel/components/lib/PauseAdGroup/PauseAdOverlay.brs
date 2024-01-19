@@ -4,6 +4,9 @@ Function init()
   pauseAdBackLabel.text = getTranslation("goBack_videoPlayer_ad")
   rectangleGradient = m.top.findNode("RectangleGradient")
   rectangleGradient.color = constants.ui.themes.default.shadeColor
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.pauseAdBackLabel, typographyConstants.ids.bodySmallStrong)
 End Function
 
 

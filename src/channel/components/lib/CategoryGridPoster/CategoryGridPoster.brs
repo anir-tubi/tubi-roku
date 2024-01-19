@@ -103,11 +103,6 @@ Function onContentChange(msg)
     m.poster.removeChild(gradientPoster)
   end if
 
-  liveIconGroup =  m.poster.findNode("liveIconGroup")
-  if liveIconGroup <> invalid
-    liveIconGroup.removeChild(liveIconGroup)
-  end if
-
   m.poster.opacity = 1
 
   ' next line shouldn't be necessary but is added in order to try and quell crashes as reported by roku crash logs
@@ -308,22 +303,6 @@ Function setUpEmptyContainer()
   m.myStuffEmptyLayout.subtitle = m.top.itemContent.description
   m.myStuffEmptyLayout.iconUri = m.top.itemContent.iconUrl
   m.myStuffEmptyLayout.visible = true
-End Function
-
-
-Function setLiveIconAndText()
-  tubiLog("CategoryGridPoster.setLiveIconAndText")
-  if m.poster <> invalid
-    gradientPoster = m.poster.createChild("Poster")
-    gradientPoster.width = m.poster.width
-    gradientPoster.height = m.poster.height
-    gradientPoster.uri = "pkg:/images/linear_search_gradient_overlay.png"
-    gradientPoster.id = "gradientPoster"
-    livePoster = gradientPoster.createChild("LiveIconGroup")
-    livePoster.id = "liveIconGroup"
-    livePoster.translation = [59, 225]
-    livePoster.shouldAnimate = false
-  end if
 End Function
 
 

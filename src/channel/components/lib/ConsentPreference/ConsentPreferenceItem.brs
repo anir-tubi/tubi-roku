@@ -7,6 +7,11 @@ Function init()
   m.toggleText = m.top.findNode("toggleText")
   m.contentSection = m.top.findNode("contentSection")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.title, typographyConstants.ids.subheaderSmall)
+  setTypographyOfLabel(m.subtitle, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.toggleText, typographyConstants.ids.subheaderSmall)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

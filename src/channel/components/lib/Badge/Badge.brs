@@ -5,6 +5,9 @@ Function init()
   m.badgeBackground = m.top.findNode("BadgeBackground")
   m.top.observeFieldScoped("iconUri", "onIconChanged")
   m.top.observeFieldScoped("text", "onTextChanged")
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.badgeText, typographyConstants.ids.bodyExtraSmall)
 End Function
 
 

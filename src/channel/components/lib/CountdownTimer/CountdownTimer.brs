@@ -15,6 +15,9 @@ Function init()
   m.PlayerCountdownBground.width = (m.TextAndIconLayoutGroup.translation[0] * 2) +  m.FullscreenIcon.width + m.TextAndIconLayoutGroup.itemSpacings[0] +  m.CountdownText.boundingRect().width
   m.top.width = m.PlayerCountdownBground.width
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.CountdownText, typographyConstants.ids.bodyMedium)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

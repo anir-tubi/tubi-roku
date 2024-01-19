@@ -98,6 +98,12 @@ Function init()
   m.closedCaptionAndAudioSelectionOverlay.observeFieldScoped("trackingEventInfo", "onTrackingEventInfoChange")
   m.closedCaptionAndAudioSelectionOverlayGroup = topRef.findNode("closedCaptionAndAudioSelectionOverlayGroup")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.ComingUpTimeInInfoPanel, typographyConstants.ids.bodyMediumStrong)
+  setTypographyOfLabel(m.ComingUpTitleInInfoPanel, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.ComingUpTime, typographyConstants.ids.subheaderSmall)
+  setTypographyOfLabel(m.ComingUpTitle, typographyConstants.ids.subheaderMedium)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

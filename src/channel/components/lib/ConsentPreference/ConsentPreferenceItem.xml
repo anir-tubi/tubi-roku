@@ -28,9 +28,7 @@
         <Label
           id="title">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Bold.ttf"
-            size="28" />
+            role="font"/>
         </Label>
         <LayoutGroup
           layoutDirection="horiz">
@@ -38,17 +36,13 @@
             id="subTitle"
             wrap="true">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Medium.ttf"
-              size="24" />
+              role="font"/>
           </Label>
           <Label
             id="toggleText"
             horizAlign="right">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="24" />
+              role="font"/>
           </Label>
         </LayoutGroup>
         <Rectangle

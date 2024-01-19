@@ -35,9 +35,7 @@
         translation="[19,1]"
         opacity="1.0">
         <Font
-        role="font"
-        size="33"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf" />
+        role="font"/>
       </Label>
       <Label
         id="focusedCategoryText"
@@ -48,9 +46,7 @@
         translation="[19,1]"
         opacity="0">
         <Font
-        role="font"
-        size="33"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf" />
+        role="font"/>
       </Label>
     </Group>
     <Group

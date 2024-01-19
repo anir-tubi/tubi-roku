@@ -5,21 +5,17 @@ Function init()
   m.buttonArea = m.top.findNode("buttonArea")
   textItem = m.top.findNode("textItem")
 
-  textItem.drawingStyles = {
-    "default": {
-      "fontSize": {fhd:33,hd:22}
-      "fontUri": "pkg:/fonts/Vaud-Medium.ttf"
-    }
-    "subTitle": {
-      "fontSize": {fhd:27,hd:18}
-      "fontUri": "pkg:/fonts/Vaud-Bold.ttf"
-    }
-    "header":{
-      "fontSize": {fhd:40,hd:27}
-      "fontUri": "pkg:/fonts/Vaud-Bold.ttf"
-    }
-
+  '//Set the color & font style values within the drawingStyles AA before assigning the AA to the textItem.drawingStyles property
+  drawingStyles = {
+    "default": {}
+    "subTitle": {}
+    "header":{}
   }
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(drawingStyles.default, typographyConstants.ids.bodyLarge)
+  setTypographyOfLabel(drawingStyles.header, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(drawingStyles.subTitle, typographyConstants.ids.subheaderSmall)
 
   palette = createObject("roSGNode", "RSGPalette")
 
@@ -30,10 +26,13 @@ Function init()
       "DialogFocusItemColor" : theme.primaryTextColor
       "DialogBackgroundColor" : theme.neutralSolidColor
     }
-    textItem.drawingStyles.default.color = theme.primaryTextColor
-    textItem.drawingStyles.header.color = theme.primaryTextColor
-    textItem.drawingStyles.subTitle.color = theme.primaryTextColor
+    drawingStyles.default.color = theme.primaryTextColor
+    drawingStyles.header.color = theme.primaryTextColor
+    drawingStyles.subTitle.color = theme.primaryTextColor
   end if
+
+  textItem.drawingStyles = drawingStyles
+
   m.top.palette = palette
 End Function
 

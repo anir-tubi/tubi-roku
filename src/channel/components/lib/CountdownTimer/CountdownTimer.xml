@@ -46,9 +46,7 @@
             id="CountdownText"
             width="0">
             <Font
-              role="font"
-              uri="pkg:/fonts/Vaud-Bold.ttf"
-              size="22" />
+              role="font"/>
           </Label>
         </LayoutGroup>
       </Group>

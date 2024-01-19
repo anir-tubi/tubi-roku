@@ -79,9 +79,7 @@
               scrollbarThumbBitmapUri="pkg:/images/menu-disabled-focus-$$RES$$.9.png"
               translation="[10,10]">
               <Font
-                role="font"
-                uri="pkg:/fonts/Vaud-Medium.ttf"
-                size="27" />
+                role="font"/>
             </ScrollableText>
           </Rectangle>
         </Group>

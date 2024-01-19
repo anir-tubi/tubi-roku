@@ -9,10 +9,13 @@ Function init()
   m.qrCodeHolder = topRef.findNode("qrCodeHolder")
   m.qrCodePoster = topRef.findNode("qrCodePoster")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.heading, typographyConstants.ids.subheaderMedium) 
+  setTypographyOfLabel(m.subheading, typographyConstants.ids.bodyMedium)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
-
   onThemeChange()
   m.top.focusable = true
 End Function

@@ -5,6 +5,7 @@
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
     <field id="posterUri" type="string" alias="PauseAdPoster.uri"/>
@@ -30,9 +31,7 @@
       vertAlign="center">
       <Font
         id="Vaud22px"
-        role="font"
-        uri="pkg:/fonts/Vaud-SemiBold.ttf"
-        size="22" />
+        role="font"/>
     </Label>
     <Poster
       id="PauseAdPoster"

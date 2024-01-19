@@ -98,9 +98,7 @@ Function init()
   StarringRect.width = nMatchStarringWidth + spacerWidth
 
   typographyConstants = getTypographyConstants()
-  '//::TODO::typography - headerSmall is too big and causes the text to fall on 2 lines in many cases. We need to look into widening the info panel text area.
-  '//   This should be done in a separate SC ticket
-  ' setTypographyOfLabel(m.title, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.title, typographyConstants.ids.headerSmall)
   setTypographyOfLabel(m.episode, typographyConstants.ids.subheaderSmall)
   setTypographyOfLabel(m.Line1, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.Line1Bold, typographyConstants.ids.subheaderSmall)

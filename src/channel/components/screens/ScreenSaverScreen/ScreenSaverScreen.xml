@@ -2,6 +2,7 @@
 <component name="ScreenSaverScreen" extends="BaseScreen">
   <script type="text/brightscript" uri="ScreenSaverScreen.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
     <!-- INPUTS -->
@@ -38,15 +39,9 @@
       opacity="0"
       translation="[126, 846]">
       <SimpleLabel
-        id="titleLabel"
-        color="#FFFFFFFF"
-        fontUri="pkg:/fonts/Vaud-Bold.ttf"
-        fontSize="42" />
-        <SimpleLabel
-          id="tagsLabel"
-          color="#FFFFFFBF"
-          fontUri="pkg:/fonts/Vaud-Medium.ttf"
-          fontSize="27" />
+        id="titleLabel"/>
+      <SimpleLabel
+        id="tagsLabel"/>
     </LayoutGroup>
 
     <!-- Can only have one animation for each item with animate() and in this case we need two due to the different durations -->

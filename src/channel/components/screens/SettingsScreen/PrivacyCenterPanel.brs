@@ -23,6 +23,10 @@ Function init()
   m.saveAndContinueButton = topRef.findNode("saveAndContinueButton")
   m.saveAndContinueButton.text = getTranslation("privacy_center_save_restart")
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.heading, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.nonEditableModeWarningMessage, typographyConstants.ids.bodyMedium)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

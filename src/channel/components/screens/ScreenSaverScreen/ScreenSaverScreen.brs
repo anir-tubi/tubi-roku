@@ -30,8 +30,30 @@ Function init()
 
   ' Used to track when we are ok to fade in the next image based off of preloadPoster loadStatus
   m.animationIsFinished = false
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.titleLabel, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.tagsLabel, typographyConstants.ids.bodyMedium)
+
+  if m.global <> invalid
+    m.global.observeFieldScoped("theme", "onThemeChange")
+  end if
+  onThemeChange()
 End Function
 
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+
+  if theme <> invalid
+    m.titleLabel.color = theme.primaryTextColor
+    m.tagsLabel.color = theme.backgroundColorLight2
+  end if
+End Function
 
 Function onContainerResponsesChange(msg)
   items = []

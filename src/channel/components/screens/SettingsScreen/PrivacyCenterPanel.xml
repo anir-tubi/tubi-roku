@@ -10,6 +10,7 @@
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
     <!-- INPUTS -->
@@ -36,9 +37,7 @@
         <Label
           id="heading">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Bold.ttf"
-            size="48" />
+            role="font"/>
         </Label>
         <ManagePreferences
           id="managePreferences"
@@ -55,9 +54,7 @@
           wrap="true"
           translation="[0, 75]">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="28" />
+            role="font"/>
         </Label>
         <FocusControlLayoutGroup
           id="qrCodeSections"

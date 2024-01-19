@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="ConsentScreen" extends="BaseScreen">
   <script type="text/brightscript" uri="ConsentScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
     <!-- INPUT -->
@@ -26,16 +27,12 @@
         <Label
           id="heading">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-SemiBold.ttf"
-            size="72" />
+            role="font"/>
         </Label>
         <Label
           id="subheading">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="33" />
+            role="font"/>
         </Label>
       </LayoutGroup>
       <Group
@@ -64,9 +61,7 @@
           width="954"
           height="621">
           <Font
-            role="font"
-            uri="pkg:/fonts/Vaud-Medium.ttf"
-            size="27" />
+            role="font"/>
         </ScrollableText>
       </Group>
     </Group>

@@ -22,6 +22,9 @@ Function init()
   background = topRef.findNode("background")
   background.uri = m.constants.ui.uris.marketingBackground
 
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.heading, typographyConstants.ids.headerMedium)
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
