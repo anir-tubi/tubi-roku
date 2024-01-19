@@ -38,7 +38,6 @@
   <script type="text/brightscript" uri="TopNavHelpers.brs" />
   <script type="text/brightscript" uri="DeeplinkHelpers.brs" />
   <script type="text/brightscript" uri="VideoPreviewHelpers.brs" />
-  <script type="text/brightscript" uri="OnBoardingHelpers.brs" />
   <script type="text/brightscript" uri="TournamentScreenHelpers.brs" />
   <script type="text/brightscript" uri="ScreensaverHelpers.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />

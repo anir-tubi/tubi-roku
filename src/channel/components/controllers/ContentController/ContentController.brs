@@ -1595,18 +1595,6 @@ Function onScreenBackgroundUpdated(msg)
 End Function
 
 
-Function onLandingScreenBackgroundChange(msg)
-  TubiLog("ContentController.onLandingScreenBackgroundChange")
-  landingScreen = msg.getRoSGNode()
-  if landingScreen <> invalid
-    m.backgroundGroup.backgroundInfo = {
-      type: m.constants.ui.backgroundTypes.rightScreen
-      uriList: landingScreen.backgroundUriList
-    }
-  end if
-End Function
-
-
 ' fireAppLoadTimeEvent
 '
 ' Fire off a log to a server so we can track how long it took since the app was started

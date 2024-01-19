@@ -65,10 +65,6 @@ enum ScreenIds {
   'epgScreen' = 'epgScreen',
   'emailVerificationScreen' = 'emailVerificationScreen',
   'forgotPasswordProcessingScreen' = 'forgotPasswordProcessingScreen',
-  'welcomeScreen' = 'welcomeScreen',
-  'freeForeverScreen' = 'freeForeverScreen',
-  'availableDeviceScreen' = 'availableDeviceScreen',
-  'landingScreen' = 'landingScreen',
   'consentScreen' = 'consentScreen',
   'managePreferencesScreen' = 'managePreferencesScreen'
 }

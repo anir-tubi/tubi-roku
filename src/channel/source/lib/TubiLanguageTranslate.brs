@@ -1653,14 +1653,6 @@ Function getTranslation_en_US()
       "description": "Button text displayed on onBoarding screens takes to Initial Content Type Selector Screen or Home Screen",
       "message": "Continue as Guest"
     },
-    "onBoarding_welcomeScreen_heading": {
-      "description": "Label displayed on onBoarding welcome screen",
-      "message": "Welcome to unlimited movies,\nTV shows and Live TV"
-    },
-    "onBoarding_welcomeScreen_description": {
-      "description": "Description displayed on onBoarding welcome screen",
-      "message": "For all your Entertainment, News, and Sports needs.\nAlways free. No subscription. 100% legal."
-    },
     "onBoarding_freeForeverScreen_heading": {
       "description": "Label displayed on onBoarding Free Forever screen",
       "message": "FREE Forever with Fewer\nAds than Cable"
@@ -3355,14 +3347,6 @@ Function getTranslation_es_MX()
       "description": "Button text displayed on onBoarding screens takes to Initial Content Type Selector Screen or Home Screen",
       "message": "Continuar como invitado"
     },
-    "onBoarding_welcomeScreen_heading": {
-      "description": "Label displayed on onBoarding welcome screen",
-      "message": "Bienvenido a películas ilimitadas,\nSeries y TV en Vivo"
-    },
-    "onBoarding_welcomeScreen_description": {
-      "description": "Description displayed on onBoarding welcome screen",
-      "message": "Para todas tus necesidades de entretenimiento, Noticias y Deportes.\nSiempre gratis. Sin suscripción. 100% legal."
-    },
     "onBoarding_freeForeverScreen_heading": {
       "description": "Label displayed on onBoarding Free Forever screen",
       "message": "Gratis Siempre con Menos\nAnuncios que el Cable"
@@ -5019,14 +5003,6 @@ Function getTranslation_fr_CA()
     "continueAsGuest_button": {
       "description": "Button text displayed on onBoarding screens takes to Initial Content Type Selector Screen or Home Screen",
       "message": "Continuer en tant qu'invité"
-    },
-    "onBoarding_welcomeScreen_heading": {
-      "description": "Label displayed on onBoarding welcome screen",
-      "message": "Bienvenue à la collection de films illimités,\nde programmes TV et d'émissions en direct"
-    },
-    "onBoarding_welcomeScreen_description": {
-      "description": "Description displayed on onBoarding welcome screen",
-      "message": "Pour toutes vos envies de divertissement, d'infos et de sport.\nToujours gratuit. Pas d'abonnement. 100% légal."
     },
     "onBoarding_freeForeverScreen_heading": {
       "description": "Label displayed on onBoarding Free Forever screen",

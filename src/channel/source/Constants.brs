@@ -1110,10 +1110,6 @@ Function getConstants()
       constants.ui.screenLevels.emailInputScreen = 90
       constants.ui.screenLevels.signInScreen = 90
       constants.ui.screenLevels.ageGateScreen = 90
-      constants.ui.screenLevels.welcomeScreen = 99
-      constants.ui.screenLevels.freeForeverScreen = 110
-      constants.ui.screenLevels.availableDeviceScreen = 111
-      constants.ui.screenLevels.landingScreen = 112
       constants.ui.screenLevels.consentScreen = 120
       constants.ui.screenLevels.rokuContinueWatchingConsentScreen = 120
       constants.ui.screenLevels.managePreferencesScreen = 130
@@ -1138,10 +1134,6 @@ Function getConstants()
       constants.ui.screenIds.linearVideoPlayerScreen = "linearVideoPlayerScreen"
       constants.ui.screenIds.epgScreen = "epgScreen"
       constants.ui.screenIds.forgotPasswordProcessingScreen = "forgotPasswordProcessingScreen"
-      constants.ui.screenIds.welcomeScreen = "welcomeScreen"
-      constants.ui.screenIds.freeForeverScreen = "freeForeverScreen"
-      constants.ui.screenIds.availableDeviceScreen = "availableDeviceScreen"
-      constants.ui.screenIds.landingScreen = "landingScreen"
       constants.ui.screenIds.tournamentScreen = "tournamentScreen"
       constants.ui.screenIds.screensaverScreen = "screensaverScreen"
       constants.ui.screenIds.consentScreen = "consentScreen"
@@ -1230,13 +1222,6 @@ Function getConstants()
       constants.ui.sideNavOpenIds[constants.ui.screenIds.myStuffScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.searchScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.tournamentScreen] = true
-
-    constants.ui.onBoarding = {}
-      constants.ui.onBoarding.pageSequence = {}
-        constants.ui.onBoarding.pageSequence.welcomeScreen = 0
-        constants.ui.onBoarding.pageSequence.freeForeverScreen = 1
-        constants.ui.onBoarding.pageSequence.availableDeviceScreen = 2
-        constants.ui.onBoarding.pageSequence.landingScreen = 3
 
     constants.ui.sideNavIds = {}
       constants.ui.sideNavIds.home = "home"

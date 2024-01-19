@@ -1430,38 +1430,6 @@
     "description": "Button text displayed on onBoarding screens takes to Initial Content Type Selector Screen or Home Screen",
     "message": "Continue as Guest"
   },
-  "onBoarding_welcomeScreen_heading": {
-    "description": "Label displayed on onBoarding welcome screen",
-    "message": "Welcome to unlimited movies,\nTV shows and Live TV"
-  },
-  "onBoarding_welcomeScreen_description": {
-    "description": "Description displayed on onBoarding welcome screen",
-    "message": "For all your Entertainment, News, and Sports needs.\nAlways free. No subscription. 100% legal."
-  },
-  "onBoarding_freeForeverScreen_heading": {
-    "description": "Label displayed on onBoarding Free Forever screen",
-    "message": "FREE Forever with Fewer\nAds than Cable"
-  },
-  "onBoarding_freeForeverScreen_description": {
-    "description": "Description displayed on onBoarding Free Forever screen",
-    "message": "3x more content and 3x less ads. None of the costs. $0/month.\nNo paywalls, no bundles."
-  },
-  "onBoarding_availableDeviceScreen_heading": {
-    "description": "Label displayed on onBoarding Available Device screen",
-    "message": "Available on all\nyour devices"
-  },
-  "onBoarding_availableDeviceScreen_description": {
-    "description": "Description displayed on onBoarding Available Device screen",
-    "message": "Watch on your phone, television, tablet\nor computer."
-  },
-  "onBoarding_landingScreen_heading": {
-    "description": "Label displayed on onBoarding Landing screen",
-    "message": "Tubi is better when\nyou sign up"
-  },
-  "onBoarding_landingScreen_description": {
-    "description": "Description displayed on onBoarding Landing screen",
-    "message": "No credit card required • Free Forever"
-  },
   "onBoarding_landingScreen_addListLabel": {
     "description": "Label displayed on onBoarding Landing screen informing add to your list",
     "message": "Add to Your List"
@@ -1477,14 +1445,6 @@
   "onBoarding_landingScreen_saveProgressBody": {
     "description": "Body displayed on onBoarding Landing screen informing pickup where you left off",
     "message": "Pickup where you left off"
-  },
-  "onBoarding_landingScreen_madeForYouLabel": {
-    "description": "Label displayed on onBoarding Landing screen informing made for you",
-    "message": "Made For You"
-  },
-  "onBoarding_landingScreen_madeForYouBody": {
-    "description": "Body displayed on onBoarding Landing screen informing better recommendations",
-    "message": "Unlock better recommendations"
   },
   "dialog_got_it": {
     "description": "button display on fifa intro modal",
