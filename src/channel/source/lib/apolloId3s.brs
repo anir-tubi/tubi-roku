@@ -8,7 +8,7 @@
 ' TDUR - The approximate offset of the tag within its segment (in seconds) - e.g. 3.603600 indicates a tag with an offset of 3.603600 seconds from the start of the segment.
 ' TSTS - the start time of segment with respect to total duration of the video in seconds. This is presented in a string form X:Y where X is the start time of the TS segment, and Y the total duration of the video (e.g. 20.086733:30.030000).
 ' TVER - the version of the current timed metadata structure.
-' TTYP - Indicates whether ad or filler is playing. f= filler, a = ad and "" = ad
+' TTYP - Indicates whether ad or filler is playing. f= filler, a = ad. If TTYP tag itself is missing that would mean, its an ad, so initializing it to "a"
 Function apolloId3s()
   return {
     setTag: apolloId3s_setTag
@@ -34,7 +34,7 @@ Function apolloId3s()
     adDuration: 0
     segStartTs: 0
     adTotalDur: 0
-    adType: ""
+    adType: "a"
   }
 End Function
 
@@ -64,11 +64,7 @@ Function apolloId3s_setTag(tag, value)
       m.adTotalDur = ts[1].toInt()
     end if
   else if tag="TTYP" OR tag = "ttyp"
-    if value = ""
-      m.adType = "a"
-    else
       m.adType = value
-    end if
   end if
 End Function
 
@@ -132,5 +128,5 @@ Function apolloId3s_clearTags()
   m.adDuration = 0
   m.segStartTs = 0
   m.adTotalDur = 0
-  m.adType = ""
+  m.adType = "a"
 End Function

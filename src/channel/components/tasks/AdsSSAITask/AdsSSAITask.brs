@@ -345,7 +345,7 @@ Function parseApolloId3(tags)
       updateNowPlaying("filler")
     end if
 
-  else if adPercent = 0 = 0
+  else if adPercent = 0
     if m.currentAdInPod <> invalid AND adType = "a"
       'setting the playing ads and filler status because we are not sure if the position tag will come first or the segment tag.
       updateNowPlaying("ad")
