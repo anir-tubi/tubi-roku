@@ -549,8 +549,8 @@ describe('Details Page', function () {
       await utils.sleep(2500); // Improvement - try to work around sleeps
 
       // Check we are on the My Stuff page
-      const myStuffCallToAction = await testUtils.getNodeForElement('myStuffCallToAction');
-      expect(myStuffCallToAction).to.exist;
+      const myStuffGrid = await testUtils.getNodeForElement('myStuffGrid');
+      expect(myStuffGrid).to.exist;
       await ecp.sendKeypress(ecp.Key.Down);
 
       // Jump to the My List row
@@ -707,7 +707,7 @@ async function verifyResumeWithinRange() {
   await ecp.sendKeypress(ecp.Key.Play);// PLay to create history
   await utils.sleep(2000);
   await createHistory(); // Create history function
-  const currentposition = await testUtils.getPlayerPosition();
+  const currentposition = await testUtils.getPlayerPosition('videoPlayerScreen');
   //console.log(currentposition);
   await utils.sleep(2000);
   await ecp.sendKeypress(ecp.Key.Back);

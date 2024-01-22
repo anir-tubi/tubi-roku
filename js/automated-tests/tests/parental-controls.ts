@@ -806,6 +806,7 @@ describe('Parental Controls', function () {
         await ecp.sendKeypress(ecp.Key.Right);
         await ecp.sendKeypress(ecp.Key.Left);
         await ecp.sendKeypress(ecp.Key.Ok);
+        await utils.sleep(800);
     }
 
     // Navigate right until the grid is in focus

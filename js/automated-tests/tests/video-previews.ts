@@ -64,11 +64,13 @@ describe('Video Preview', function () {
 
     // Go to details page and verify that video preview continues
     await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(2000); // Need sleep to see Screen title
 
     // Verify we are on the details page
-    await utils.sleep(1000); // Improve
-    const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-    expect(detailScreenTitle.text).to.not.be.empty;
+    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
+    const detailScreenPanel = await testUtils.getNodeForElement('detailScreenPanel');
+    expect(detailScreenPanel.opacity).to.be.equal(1);
+    
 
     // Verify that video is still playing
     await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing', 10000);

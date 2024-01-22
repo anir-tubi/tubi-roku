@@ -28,7 +28,10 @@ describe('Multiple Audio', function () {
 
     // Closed Caption audio button present?
     const closedCaptionAudioButton = await testUtils.getNodeForElement('closedCaptionAudioButton');
-    expect(closedCaptionAudioButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-subtitles-enabled.webp');
+    expect(closedCaptionAudioButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-subtitles.webp');
+
+    // Reset Audio Options
+    await resetAudioOptions();
 
   });
 
@@ -55,7 +58,7 @@ describe('Multiple Audio', function () {
     // Closed Caption audio button present?
     await utils.sleep(800);
     const closedCaptionAudioButton = await testUtils.getNodeForElement('closedCaptionAudioButton');
-    expect(closedCaptionAudioButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-subtitles-enabled.webp');
+    expect(closedCaptionAudioButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-subtitles.webp');
 
     // Navigate right to open Options
     await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
@@ -73,6 +76,9 @@ describe('Multiple Audio', function () {
     // Audio Section header
     const audioTracksSectionHeader = await testUtils.getNodeForElement('audioTracksSectionHeader');
     expect(audioTracksSectionHeader.visible).to.be.true;
+
+    // Reset AD controls to default
+    await resetAudioOptions();
 
   });
 
@@ -98,7 +104,7 @@ describe('Multiple Audio', function () {
 
     // Closed Caption audio button present?
     const closedCaptionAudioButton = await testUtils.getNodeForElement('closedCaptionAudioButton');
-    expect(closedCaptionAudioButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-subtitles-enabled.webp');
+    expect(closedCaptionAudioButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-subtitles.webp');
 
     // Navigate right to open Options
     await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
@@ -153,6 +159,10 @@ describe('Multiple Audio', function () {
     const audioDescriptionEnabledCheck = await testUtils.getNodeForElement('audioDescriptionEnabledCheck');
     expect(audioDescriptionEnabledCheck.visible).to.be.true;
 
+    // Reset AD controls to default
+    await resetAudioOptions();
+
+
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/426763
@@ -200,7 +210,6 @@ describe('Multiple Audio', function () {
     expect(audioTracksSection.visible).to.be.true;
     await utils.sleep(3000);
 
-
     // Audio enabled?
     await ecp.sendKeypress(ecp.Key.Down, { count: 1 }); // navigate to Audio language
     await ecp.sendKeypress(ecp.Key.Ok); // Select
@@ -213,8 +222,19 @@ describe('Multiple Audio', function () {
     await ecp.sendKeypress(ecp.Key.Ok); // Select
     const audioDescriptionEnabled = await testUtils.getNodeForElement('audioDescriptionEnabled');
     expect(audioDescriptionEnabled.visible).to.be.true;
+
+    // Reset AD controls to default
+    await resetAudioOptions();
+    
   });
 });
+
+async function resetAudioOptions() {
+  await ecp.sendKeypress(ecp.Key.Up);
+  await ecp.sendKeypress(ecp.Key.Ok);
+  await ecp.sendKeypress(ecp.Key.Up, {count: 2});
+  await ecp.sendKeypress(ecp.Key.Ok);
+}
 
 
 // Navigate right until the grid is in focus
@@ -228,3 +248,5 @@ async function navigateRightToGrid() {
     return id === 'ResultGrid';
   }, 'ResultGrid never obtained focus');
 }
+
+

@@ -161,8 +161,14 @@ const elements = typeCheckElements({
 	
   /** Content title on the detail screen */
   detailScreenTitle: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#Title',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#Title',
   },
+
+  /** Content title on the detail screen */
+  detailScreenPanel: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup',
+  },
+
 
   /** Component containing year and duration of the current content */
   detailScreenYearAndDuration: {
