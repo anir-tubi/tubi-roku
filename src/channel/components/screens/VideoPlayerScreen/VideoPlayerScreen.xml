@@ -470,65 +470,67 @@
         height="390"
         translation="[0,0]"
         uri="pkg:/images/rating_gradient.png"/>
-      
-      <LayoutGroup
-        id="ratingBarAndLabel"
-        vertAlignment="bottom"
-        layoutDirection="horiz"
-        translation="[126,142]"
-        itemSpacings="[24]">
-        <Rectangle
-          id="ratingBar"
-          width="3"
-          height="87"/>
         <LayoutGroup
-          id="ratingLayout"
+          id="ratingBarAndLabel"
+          vertAlignment="top"
           layoutDirection="horiz"
-          itemSpacings="[8]"
-          translation="[0,25]"
-          vertAlignment="center">
-          <Label
-            id="ratedLabel">
-            <Font
-              role="font"/>
-          </Label>
-          <Group
-            id="ratingGroup">
-            <Poster
-              id="RatingBackground"
-              height="36"
-              uri="pkg:/images/ratingBackground.9.png"
-              loadSync="true"/>
+          translation="[126,142]"
+          itemSpacings="[12]">
+          <Rectangle
+            id="ratingBar"
+            width="2"
+            height="87"/>
+          <LayoutGroup
+            id="ratingAndGenre"
+            layoutDirection="vert"
+            itemSpacings="[18]">
+            <LayoutGroup
+              id="ratingLayout"
+              layoutDirection="horiz"
+              itemSpacings="[8]"
+              vertAlignment="center">
+              <Label
+                height="42"
+                vertAlign="bottom"
+                id="ratedLabel">
+                <Font
+                  role="font"/>
+              </Label>
+              <Group
+                id="ratingGroup">
+                <Poster
+                  id="RatingBackground"
+                  height="36"
+                  uri="pkg:/images/ratingBackground.9.png"
+                  loadSync="true"/>
+                <Label
+                  id="ratingLabel"
+                  height="36"
+                  width="0"
+                  opacity="0.8"
+                  numLines="1"
+                  wrap="false"
+                  translation="[0,3]"
+                  horizAlign="center"
+                  vertAlign="center">
+                  <Font
+                    role="font"/>
+                </Label>
+              </Group>
+              <Label
+                id="descriptorCode">
+                <Font
+                  id="Vaud22px"
+                  role="font"/>
+              </Label>
+            </LayoutGroup>
             <Label
-              id="ratingLabel"
-              height="36"
-              width="0"
-              opacity="0.8"
-              numLines="1"
-              wrap="false"
-              translation="[0,3]"
-              horizAlign="center"
-              vertAlign="center">
+              id="descriptorDesc">
               <Font
                 role="font"/>
             </Label>
-          </Group>
-          <Label
-            id="descriptorCode">
-            <Font
-              id="Vaud22px"
-              role="font"/>
-          </Label>
-        </LayoutGroup>
+          </LayoutGroup>
       </LayoutGroup>
-      <Label
-        id="descriptorDesc"
-        translation="[153,110]"
-        height="80">
-        <Font
-          id="Vaud22px"
-          role="font"/>
-      </Label>
     </Group>
 
     <UpNext

@@ -114,6 +114,9 @@ Function init()
     m.logoKids.uri = "pkg:/images/locale/es_ES/logo-kids-white-xlarge.png"
   end if
 
+  '//Variable to keep track where the m.ratingOverlay UI element should animated when the down button is pressed.
+  m.ratingOverlayAnimatedPositionY = 144
+
   m.ratingOverlay = m.top.findNode("ratingOverlay")
   m.ratingBarAndLabel = m.top.findNode("ratingBarAndLabel")
   m.ratingGradient = m.top.findNode("ratingGradient")
@@ -1592,6 +1595,8 @@ Function updateVideoPlayerState(content) as Void
   title = m.TopOverlay.findNode("VideoOverlayTitle")
   'This field is also used to display the gameInfo for Replay sports
   episodeTitle = m.TopOverlay.findNode("VideoOverlayEpisodeTitle")
+  episodeTitle.text = ""
+
   if content.parentType = "series"
     title.text = content.parentTitle
     episodeTitle.text = content.title
@@ -1611,6 +1616,12 @@ Function updateVideoPlayerState(content) as Void
   else
     title.text = content.title
     episodeTitle.text = ""
+  end if
+
+  m.ratingOverlayAnimatedPositionY = 90
+  if episodeTitle.text <> ""
+    '//if the episode title has text, then move the rating y position down to fit the episode title.
+    m.ratingOverlayAnimatedPositionY = 144
   end if
 
   'if it's not a trailer, remove the skip trailer button
@@ -1965,7 +1976,7 @@ Function showRatingOverlay()
   if content <> invalid AND isNonEmptyString(content.rating) = true
     fade(m.ratingOverlay, "in", 0.6)
     if m.TopOverlay.opacity > 0.0
-      m.ratingOverlay.translation = [0,180]
+      m.ratingOverlay.translation = [0, m.ratingOverlayAnimatedPositionY]
     else
       m.ratingOverlay.translation = [0,0]
     end if

@@ -1715,7 +1715,7 @@ End Function
 
 
 Function hideRatingGradient()
-  slideTo(m.ratingOverlay, [0,180], 0.6)
+  slideTo(m.ratingOverlay, [0, m.ratingOverlayAnimatedPositionY], 0.6)
   fade(m.ratingGradient, "out", 0.2)
 End Function
 
