@@ -183,7 +183,7 @@ Function getUpdatedLinearVideoResources(content)
 
             'not needed for rainmaker, but the ap.pt=1 parameter informs apollo that
             ' we are doing client side ad pixel reporting and is necessary
-            if resource.ssaiVersion.InStr("apollo") > -1
+            if resource.ssaiVersion <> invalid AND resource.ssaiVersion.InStr("apollo") > -1
               adParams["ap.pt"] = 1
             else
               ' not needed for rainmaker, but the yo.ac=true parameter informs yospace
