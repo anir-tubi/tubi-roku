@@ -611,10 +611,16 @@ function extractReleaseNotesFromPullRequestBody(body) {
 }
 
 
-function getPullRequestCommitsForBranch(done, branch, commitCount, oneLine = false) {
-  let command = `git log ${branch} -${commitCount}`;
-  if (oneLine) {
-    command += ' --oneline';
+function getPullRequestCommitsForBranch(done, branch, commitCount, oneLine = false, includeAuthorName = false) {
+  let command;
+
+  if (includeAuthorName) {
+    command = `git log ${branch} -${commitCount} --pretty=format:"%h %s - %an"`;
+  } else {
+    command = `git log ${branch} -${commitCount}`;
+    if (oneLine) {
+      command += ' --oneline';
+    }
   }
   const gitLogs = execShellCommand(done, command, `Could not get git logs from ${branch} branch.`);
   const pullRequestCommits = [];
@@ -635,9 +641,10 @@ function getPullRequestCommitsForBranch(done, branch, commitCount, oneLine = fal
 // Compares the commits on branchA against the commits on branchB, based on their pull request numbers, and returns an array of commit messages for the commits that exist on branchA but do not exist on branchB.
 // @branchA: string, the branch name we are comparing to branchA
 // @branchB: string, the branch name we are comparing to branchB
+// @includeAuthorName: boolean, based this value the author name will be displayed along with commit message. Default - false
 // @commitCount: number, the number of maximum number of commits you want to compare between the branches
 // @returns: string[], the PR ID like '1234'
-async function findPullRequestCommitDifferences(done, branchA, branchB, commitCount = 200) {
+async function findPullRequestCommitDifferences(done, branchA, branchB, includeAuthorName = false, commitCount = 200) {
   // verify clean working directory
   verifyGit(done);
 
@@ -654,7 +661,7 @@ async function findPullRequestCommitDifferences(done, branchA, branchB, commitCo
 
   // process/store pull requests on branchA branch
   await pullOrFetchBranch(done, branchA);
-  const branchACommits = getPullRequestCommitsForBranch(done, branchA, commitCount, true);
+  const branchACommits = getPullRequestCommitsForBranch(done, branchA, commitCount, true, includeAuthorName);
 
   // process/store pull requests on branchB branch
   await pullOrFetchBranch(done, branchB);
@@ -675,7 +682,7 @@ async function findPullRequestCommitDifferences(done, branchA, branchB, commitCo
 
 // @compareBranch: string, the branch name we are comparing to master
 async function findCommitsOnMasterNotOnBranch(done, compareBranch) {
-  const commitsFromMasterNotOnCompareBranch = await findPullRequestCommitDifferences(done, 'master', compareBranch);
+  const commitsFromMasterNotOnCompareBranch = await findPullRequestCommitDifferences(done, 'master', compareBranch, true);
   commitsFromMasterNotOnCompareBranch.reverse();
   console.log('');
   console.log(`COMMITS THAT HAVE NOT BEEN CHERRY PICKED FROM master TO ${compareBranch}`);
@@ -730,7 +737,7 @@ function findCommitsNotOnCurrentBranch(done) {
 //
 // @returns: string, the PR ID like '1234'
 function extractPrIdFromCommitInfo(commitInfo) {
-  const match = commitInfo.match(/\(#(\d+)\)$/);
+  const match = commitInfo.match(/\(#(\d+)\)/);
   return match?.[1];
 }
 
