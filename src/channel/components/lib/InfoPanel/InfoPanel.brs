@@ -832,7 +832,7 @@ Function onModeChange()
 
     m.offset.itemSpacings = [15, 15]
     m.top.appendChild(m.playerCountdownGroup)
-    m.playerCountdownGroup.translation = [1215, -78]
+    m.playerCountdownGroup.translation = [1215, -111]
   else if m.top.mode = m.constants.ui.infoPanelModes.simplifiedLinearPlayer
     '//For when the linear player is on its own EPG screen
     m.infoPanelGroup.appendChild(m.offset)
