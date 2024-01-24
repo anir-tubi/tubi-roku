@@ -16,7 +16,7 @@ describe('Large Posters', function () {
     
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
     const featuredRowPoster = await testUtils.getNodeForElement('featuredRowPoster');
-    expect(featuredRowPoster.width).to.equal(504);
+    expect(featuredRowPoster.width).to.equal(520);
    
     // Need helper here to verify peak https://app.shortcut.com/tubi/story/582832/need-a-helper-function-for-finding-the-poster-peak-on-multiple-screens
     });

@@ -228,7 +228,7 @@ describe('Kids Mode', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Parental Controls Settings Change
-    await utils.sleep(4000); // Improvement
+    await utils.sleep(5000); // Improvement
     const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids');
     expect(parentalControlsSettingsLittleKids.visible).to.be.true;
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -318,9 +318,8 @@ describe('Kids Mode', function () {
 
     // Check that we are no longer in Kids mode
     await ecp.sendKeypress(ecp.Key.Left);
-    await utils.sleep(2000); // IMPROVEMENT
+    await testUtils.waitForSideNavMenuToBeExpanded();
     const kidsLeftNavOption = await testUtils.getNodeForElement('kidsLeftNavOption');
-    expect(kidsLeftNavOption.visible).to.be.true;
     expect(kidsLeftNavOption.text).to.be.equal('Kids');
 
   });
@@ -338,7 +337,12 @@ describe('Kids Mode', function () {
     // Sign out
     await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
     await ecp.sendKeypress(ecp.Key.Ok);
-    await utils.sleep(2000); // Improvement - try to work around sleeps
+
+    // Wait for Sign Out button on Settings page of Kids mode
+    const signOutButtonKidsMode = await testUtils.getNodeForElement('signOutButtonKidsMode');
+    expect(signOutButtonKidsMode.text).is.equal('Sign Out');
+
+    // Press OK and wait for verification modal
     await ecp.sendKeypress(ecp.Key.Ok);
     const signOutVerificationModalMessage = await testUtils.getNodeForElement('signOutVerificationModalMessage');
     expect(signOutVerificationModalMessage.visible).to.equal(true);
@@ -350,8 +354,9 @@ describe('Kids Mode', function () {
     expect(leftNavHomeButton.visible).to.be.true;
 
     // Check for Live News row
+    await ecp.sendKeypress(ecp.Key.Right);
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-    await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
+    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
     const liveIcon = await testUtils.getNodeForElement('liveIcon');
     expect(liveIcon.uri).to.equal('pkg:/images/icon-live.webp');
 

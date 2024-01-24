@@ -26,6 +26,9 @@ describe('Multiple Audio', function () {
     // Verify that video is playing
     await testUtils.expectPlayerStateToEventuallyEqual('play');
 
+    // Initialize Audio Options before tests
+    await resetAudioOptions();
+
     // Closed Caption audio button present?
     const closedCaptionAudioButton = await testUtils.getNodeForElement('closedCaptionAudioButton');
     expect(closedCaptionAudioButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-subtitles.webp');
