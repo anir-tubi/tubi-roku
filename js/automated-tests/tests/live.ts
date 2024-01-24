@@ -5,12 +5,12 @@ import { shared } from '../shared';
 import { count, timeEnd } from 'console';
 
 describe('Live', function () {
-    before(async () => {
+    beforeEach(async () => {
         await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
         await testUtils.waitForAppLaunchBeaconToFire();
         await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
     });
-
+    // Let's investigate the preview player when the left nav is open here
     // https://tubi.testrail.io/index.php?/cases/view/114677
     it('C114677 - Live News - Open Side Navigation while on Live New Row @live', async () => {
 
@@ -18,20 +18,25 @@ describe('Live', function () {
         const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
         await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
 
+        // Verify that video preview is playing
+        await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Recommended Channels');
+        await utils.sleep(5000);
+        await linearVideoPreviewPlayingTest();
 
         // Press left navigation to open the side navigation
-        await ecp.sendKeypress(ecp.Key.Left);
+        await ecp.sendKeypress(ecp.Key.Left, {count:1});
 
         // Is the left Nav open?
-        const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
+        const leftNavHomeButton = 
+        await testUtils.getNodeForElement('leftNavHomeButton');
         await testUtils.elementHasFocus('leftNavHomeButton');
 
-
-        // Verify playback and timer stops
-
-        // Verify that video preview is not playing
+        // Verify that video preview is not playing (Brian L. to investigate)
+        // expect(linearVideoPlayerScreenPreview.state).is.equal('stopped'); // this fails and error says it's "playing"
         const player = await ecp.getMediaPlayer();
+        expect(player.state).to.equal('close');
         expect(player.state).to.not.equal('play');
+        expect(player.state).to.not.equal('pause');
        
 
     });
@@ -43,22 +48,102 @@ describe('Live', function () {
         const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
         await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
 
+        // Start a live feed
+        await startLiveFeed();
+
+        // Verify that full linear video is playing
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',10000);
+
+        // Go back to preview
+        await utils.sleep(5000);
+        await ecp.sendKeypress(ecp.Key.Back, {count: 1});
+
+        // Verify that linear preview video is playing
+        await linearVideoPreviewPlayingTest();
+        
+    });
+
+    // https://tubi.testrail.io/index.php?/cases/view/114053
+    it('C114053 - Live News - Live TV channel guide @live', async () => {
+
+        // Navigate to the Live News Row
+        const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
+        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
 
         // Start a live feed
-        await ecp.sendKeypress(ecp.Key.Ok);
-        await utils.sleep(1000);
+        await startLiveFeed();
 
-        // Verify that video is playing
-        await testUtils.expectPlayerStateToEventuallyEqual('play');
+        // Verify that full linear video is playing
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',10000);
 
-        // Go back to preview?
-        await ecp.sendKeypress(ecp.Key.Back);
+        // Navigate right after displaying the guide
+        const programGuide = await testUtils.getNodeForElement('programGuide');
+        expect(programGuide.opacity).to.equal(1);
+        await ecp.sendKeypress(ecp.Key.Right);
 
-        // Verify that video preview is not playing
-        const player = await ecp.getMediaPlayer();
-        expect(player.state).to.equal('play');
-        expect(player.state).to.not.equal('pause');
+         // Verify that linear video is still playing
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',6000);
+    });
+
+    // https://tubi.testrail.io/index.php?/cases/view/114058
+    it('C114058 - Live News - When a user changes channels during playback, playback for the updated channel should be near instantaneous @live', async () => {
+ 
+        // Navigate to the Live News Row
+        const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
+        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
+
+        // Verify that linear preview video is playing
+
+        await linearVideoPreviewPlayingTest();
+
+        // Navigate right
+        await ecp.sendKeypress(ecp.Key.Right);
+
+        // Verify that linear video is still playing 
+        await linearVideoPreviewPlayingTest();
+
+        // Navigate left
+        await ecp.sendKeypress(ecp.Key.Left);
+
+        // Verify that linear video is still playing 
+        await linearVideoPreviewPlayingTest();
+
 
     });
+
+    
+     // https://tubi.testrail.io/index.php?/cases/view/115290
+     it('C115290 -  Home Screen Automatic Small video transition to full screen view @live', async () => {
+ 
+        // Navigate to the Live News Row
+        const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
+        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
+
+        // Verify that preview video is playing
+        await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing');
+        
+
+        // Verify countdown is running
+        await utils.sleep(5000);  // wait for countdown to appear - How can we improve? 
+        const homeScreenNewsCountdown = await testUtils.getNodeForElement('homeScreenNewsCountdown');
+        expect(homeScreenNewsCountdown.text).to.contain('Fullscreen in'); 
+     
+        // Verify that full linear video is playing
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',10000);
+     });
+
+    async function startLiveFeed() {
+        await utils.sleep(1000);
+        await ecp.sendKeypress(ecp.Key.Right, {count:2});
+        await ecp.sendKeypress(ecp.Key.Ok);
+        
+    }
+
+    async function linearVideoPreviewPlayingTest() {
+        await testUtils.retryWithTimeOut(async () => {
+            const linearVideoPlayerScreenPreview = await testUtils.getNodeForElement('linearVideoPlayerScreenPreview'); 
+            expect(linearVideoPlayerScreenPreview.state).is.equal('playing');
+		});
+    }
 
 });

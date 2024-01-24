@@ -579,6 +579,15 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen',
   },
 
+  /** linear video preview screen */
+  linearVideoPlayerScreenPreview: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#LinearPlayerGroup.#linearVideoPlayerScreen'
+  },
+  /** linear video screen */
+  linearVideoPlayerScreen: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen'
+  },
+
   linearEPGFoxSportsEnEspanolDescription: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#infoPanelParent.#infoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
     xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/EPGHomeScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Group/Label',
@@ -1151,6 +1160,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#topNav-linearEPG-linearEPG-linearEPG.#TopNavMenu.3.#Underline',
   },
 
+  programGuide: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen.#VideoOverlay.#overlayParent.#overlayContentArea.#EPGHorizontalSlide.#EPG'
+  },
+
   /** text on Search page header */
   searchMenuText: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#leftSide.#searchMenuText',
@@ -1363,6 +1376,21 @@ const elements = typeCheckElements({
   /** Sign In Screen page header */
   signInScreenPageHeader: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#signInScreen.#signUpLayout.#pageHeading'
+  },
+
+  /** EPG countdown text */
+  epgCountDownText: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#infoPanelParent.#infoPanel.#PlayerCountdownGroup.#CountdownText'
+  },
+
+  /** homescreen news countdown */
+  homeScreenNewsCountdown: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#PlayerCountdownGroup.#CountdownText'
+  },
+
+  /* linear Player Group */
+  linearPlayerGroup: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#LinearPlayerGroup.#linearVideoPlayerScreen.#VideoNode.1'
   }
 
 });
