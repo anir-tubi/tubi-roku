@@ -6,6 +6,7 @@ import {
 	MidleNavComponents,
 	CategorySlug,
 	LEFT_NAV_SECTIONS,
+	CAT_SLUG
 } from '../utils/constants';
 import {
 	getMatchedEventsFromLastEvent,
@@ -48,6 +49,253 @@ export async function verifyC112683() {
 	expect(navigateToPageEvent.navigate_to_page.dest_channel_list_page).to.be
 		.empty;
 }
+
+export async function verifyC439651NavigateToPageMovie(id) {
+	let navigateToPageEvent;
+	let i = 1;
+	while (navigateToPageEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_to_page,
+			40 + i
+		);
+		navigateToPageEvent = pulletEvents.find(
+			(event) =>
+					event.navigate_to_page.category_component &&
+					event.navigate_to_page.category_component.category_slug &&
+					event.navigate_to_page.category_component.category_slug ===
+							CAT_SLUG.queue
+	);
+		i++;
+	}
+	expect(
+			navigateToPageEvent.navigate_to_page.category_component.category_slug
+	).equal(
+			CAT_SLUG.queue,
+			`navigateToPageEvent.navigate_to_page.category_component.category_slug===CAT_SLUG.queue, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(
+					navigateToPageEvent.navigate_to_page.category_component.category_row
+			)
+	).equal(
+			2,
+			`navigateToPageEvent.navigate_to_page.category_component.category_row===1, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(
+					navigateToPageEvent.navigate_to_page.category_component.category_col
+			)
+	).equal(
+			1,
+			`navigateToPageEvent.navigate_to_page.category_component.category_col===1, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(
+					navigateToPageEvent.navigate_to_page.category_component.content_tile
+							.col
+			)
+	).equal(
+			1,
+			`navigateToPageEvent.navigate_to_page.category_component.content_tile.col===1, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(
+					navigateToPageEvent.navigate_to_page.category_component.content_tile
+							.row
+			)
+	).equal(
+			1,
+			`navigateToPageEvent.navigate_to_page.category_component.content_tile.row===1, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(
+					navigateToPageEvent.navigate_to_page.category_component.content_tile
+							.video_id
+			)
+	).equal(
+			id,
+			`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(navigateToPageEvent.navigate_to_page.dest_video_page.video_id)
+	).equal(
+			id,
+			`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(navigateToPageEvent.navigate_to_page.for_you_page).to.be.empty;
+}
+
+export async function verifyC439651NavigateToPage(id) {
+	let navigateToPageEvent;
+	let i = 1;
+	while (navigateToPageEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_to_page,
+			40 + i
+		);
+		navigateToPageEvent = pulletEvents.find(
+			(event) =>
+					event.navigate_to_page.category_component &&
+					event.navigate_to_page.category_component.category_slug &&
+					event.navigate_to_page.category_component.category_slug ===
+							CAT_SLUG.queue
+	);
+		i++;
+	}
+	expect(
+			navigateToPageEvent.navigate_to_page.category_component.category_slug
+	).equal(
+			CAT_SLUG.queue,
+			`navigateToPageEvent.navigate_to_page.category_component.category_slug===CAT_SLUG.queue, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(
+					navigateToPageEvent.navigate_to_page.category_component.category_row
+			)
+	).equal(
+			2,
+			`navigateToPageEvent.navigate_to_page.category_component.category_row===1, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(
+					navigateToPageEvent.navigate_to_page.category_component.category_col
+			)
+	).equal(
+			1,
+			`navigateToPageEvent.navigate_to_page.category_component.category_col===1, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(
+					navigateToPageEvent.navigate_to_page.category_component.content_tile
+							.col
+			)
+	).equal(
+			1,
+			`navigateToPageEvent.navigate_to_page.category_component.content_tile.col===1, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(
+					navigateToPageEvent.navigate_to_page.category_component.content_tile
+							.row
+			)
+	).equal(
+			1,
+			`navigateToPageEvent.navigate_to_page.category_component.content_tile.row===1, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(
+					navigateToPageEvent.navigate_to_page.category_component.content_tile
+							.series_id
+			)
+	).equal(
+			id,
+			`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(navigateToPageEvent.navigate_to_page.dest_series_detail_page.series_id)
+	).equal(
+			id,
+			`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(navigateToPageEvent.navigate_to_page.for_you_page).to.be.empty;
+}
+
+export async function verifyC439649NavigateToPage(id) {
+	let navigateToPageEvent;
+	let i = 1;
+	while (navigateToPageEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_to_page,
+			40 + i
+		);
+		navigateToPageEvent = pulletEvents.find(
+			(event) =>
+					event.navigate_to_page.category_component &&
+					event.navigate_to_page.category_component.category_slug &&
+					event.navigate_to_page.category_component.category_slug ===
+							CAT_SLUG.continueWatching
+	);
+		i++;
+	}
+	expect(
+			navigateToPageEvent.navigate_to_page.category_component.category_slug
+	).equal(
+			CAT_SLUG.continueWatching,
+			`navigateToPageEvent.navigate_to_page.category_component.category_slug===CAT_SLUG.continueWatching, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(
+					navigateToPageEvent.navigate_to_page.category_component.category_row
+			)
+	).equal(
+			1,
+			`navigateToPageEvent.navigate_to_page.category_component.category_row===1, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(
+					navigateToPageEvent.navigate_to_page.category_component.category_col
+			)
+	).equal(
+			1,
+			`navigateToPageEvent.navigate_to_page.category_component.category_col===1, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(
+					navigateToPageEvent.navigate_to_page.category_component.content_tile
+							.col
+			)
+	).equal(
+			1,
+			`navigateToPageEvent.navigate_to_page.category_component.content_tile.col===1, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(
+					navigateToPageEvent.navigate_to_page.category_component.content_tile
+							.row
+			)
+	).equal(
+			1,
+			`navigateToPageEvent.navigate_to_page.category_component.content_tile.row===1, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(
+					navigateToPageEvent.navigate_to_page.category_component.content_tile
+							.video_id
+			)
+	).equal(
+			id,
+			`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+			parseInt(navigateToPageEvent.navigate_to_page.dest_video_page.video_id)
+	).equal(
+			id,
+			`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(navigateToPageEvent.navigate_to_page.for_you_page).to.be.empty;
+}
+
 
 export async function verifyC118158() {
 	let eventNavigateToPage;

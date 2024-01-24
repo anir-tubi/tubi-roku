@@ -165,6 +165,14 @@ const TitleDetailsPage = (titleDetails) => {
 		await moveToRow(TV_SHOW_DETAILS_PAGE_BUTONS.LIKE_OR_DISLIKE, 700);
 	}
 
+	async function highlightRemoveFromHistory() {
+		await moveToRow(TV_SHOW_DETAILS_PAGE_BUTONS.REMOVE_FROM_HISTORY, 700);
+	}
+
+	async function highlightRemoveFromMyList() {
+		await moveToRow(TV_SHOW_DETAILS_PAGE_BUTONS.REMOVE_FROM_MY_LIST, 700);
+	}
+
 	async function selectLikeOrDislike() {
 		await highlightLikeOrDislike();
 		await ecp.sendKeypress(ecp.Key.Ok);
@@ -172,6 +180,16 @@ const TitleDetailsPage = (titleDetails) => {
 
 	async function selectGoToBackToChannel() {
 		await highlightGoBackToChannel();
+		await ecp.sendKeypress(ecp.Key.Ok);
+	}
+
+	async function selectRemoveFromHistory() {
+		await highlightRemoveFromHistory();
+		await ecp.sendKeypress(ecp.Key.Ok);
+	}
+
+	async function selectRemoveFromMyList() {
+		await highlightRemoveFromMyList();
 		await ecp.sendKeypress(ecp.Key.Ok);
 	}
 
@@ -202,6 +220,8 @@ const TitleDetailsPage = (titleDetails) => {
 		highlightWatchTrailer,
 		getRatingText,
 		getPopUpMessage,
+		selectRemoveFromHistory,
+		selectRemoveFromMyList
 	};
 };
 

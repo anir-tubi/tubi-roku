@@ -1,6 +1,28 @@
-import { Events, EventsValues } from '../utils/constants';
+import { Events, EventsValues, STATUS } from '../utils/constants';
 import { getMatchedEventsFromLastEvent } from '../utils/network/qaProxy';
 import { expect } from 'chai';
+
+export async function verifyC130131(idOfTitleFromAutoplay) {
+	let eventPageLoad;
+	let i = 1;
+	while (eventPageLoad === undefined && i < 30) {
+		let pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.page_load,
+			i + 4
+		);
+		eventPageLoad = pulletEvents.find(
+			(event) =>
+				event.page_load.status === STATUS.success &&
+				event.page_load.video_player_page
+		);
+		i++;
+		expect(eventPageLoad.page_load.video_player_page.video_id).equal(
+			parseInt(idOfTitleFromAutoplay.id),
+			`event.auto_play.video_id===${idOfTitleFromAutoplay.id}, Event: \n
+			${JSON.stringify(eventPageLoad)} \n`
+		);
+	}
+}
 
 export async function verifyC21253() {
 	let pageLoad;

@@ -33,6 +33,11 @@ export const FullEvent = {
 	defaultMode: 'DEFAULT_MODE',
 };
 
+export const CAT_SLUG = {
+	continueWatching: 'continue_watching',
+	queue: 'queue',
+};
+
 export const LEFT_NAV_SECTIONS = {
 	SEARCH: 'SEARCH',
 	KIDS: 'KIDS',
@@ -98,6 +103,8 @@ export const TV_SHOW_DETAILS_PAGE_BUTONS = {
 	ADD_TO_MY_LIST: 'Add to My List',
 	Go_TO: 'Go to',
 	WATCH_TRAILER: 'Watch Trailer',
+	REMOVE_FROM_HISTORY: 'Remove from history',
+	REMOVE_FROM_MY_LIST: 'Remove from My List',
 };
 
 export const Events = {
@@ -147,6 +154,10 @@ export const EventsValues = {
 	conentModeMovie: 'CONTENT_MODE_MOVIE',
 	conentModeLinear: 'CONTENT_MODE_LINEAR',
 	conentModeTv: 'CONTENT_MODE_TV',
+};
+
+export const STATUS = {
+	success: 'SUCCESS',
 };
 
 export const MidleNavComponents = {

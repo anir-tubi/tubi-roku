@@ -3,6 +3,27 @@ import { getMatchedEventsFromLastEvent } from '../utils/network/qaProxy';
 import { expect } from 'chai';
 import { utils } from 'roku-test-automation';
 
+export async function verifyC21386andC21388andC21379(episodeId) {
+	let subtitlesEvent;
+	let i = 1;
+	while (subtitlesEvent === undefined && i < 20) {
+		const pulledEvents = await getMatchedEventsFromLastEvent(
+			Events.subtitles_toggle,
+			i + 15
+		);
+		subtitlesEvent = pulledEvents.find((event) => event.subtitles_toggle);
+		i++;
+	}
+	expect(subtitlesEvent.subtitles_toggle.video_id).equal(parseInt(episodeId));
+	expect(subtitlesEvent.subtitles_toggle.language_code).equal('EN');
+	expect(subtitlesEvent.subtitles_toggle.toggle_state).to.match(
+		/ON/,
+		`event should event.subtitles_toggle.toggle_state===ON or OFF, Event: \n ${JSON.stringify(
+			subtitlesEvent
+		)} \n`
+	);
+}
+
 export async function verifyC66349(titleId) {
 	let subtitlesEvent;
 	let i = 1;

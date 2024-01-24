@@ -8,7 +8,7 @@ const ChannelsPage = () => {
 		channelPoster: async () =>
 			await testUtils.getNodeForElement(CHANNELS_PAGE_NODES.CHANNEL_POSTER),
 		firstChannelName: async () =>
-			await testUtils.getNodeForElement('firstChannelName'),
+			await testUtils.getNodeForElement('firstChannelNameInChannelPage'),
 	};
 
 	async function pageDidLoad() {

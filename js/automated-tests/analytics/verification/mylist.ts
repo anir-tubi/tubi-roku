@@ -448,3 +448,247 @@ export async function verifyC348168PageLoad() {
 	);
 	expect(pageLoadEvent.page_load.for_you_page).to.be.empty;
 }
+
+export async function verifyC439651Movie(titleId) {
+	let bookmarkEvent;
+	let i = 1;
+	while (bookmarkEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.bookmark,
+			i + 8
+		);
+		bookmarkEvent = pulletEvents.find(
+			(event) =>
+				event.bookmark && event.bookmark.op === 'REMOVE_FROM_QUEUE'
+		);
+		i++;
+	}
+	expect(bookmarkEvent.bookmark.op).equal(
+			'REMOVE_FROM_QUEUE',
+			`bookmark.bookmark.op===REMOVE_FROM_QUEUE, Event: \n
+${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(parseInt(bookmarkEvent.bookmark.video_id)).equal(
+			titleId,
+			`bookmark.bookmark.video_id===, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(parseInt(bookmarkEvent.bookmark.video_page.video_id)).equal(
+			parseInt(titleId),
+			`bookmark.bookmark.video_page.video_id===, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+}
+
+export async function verifyC439651(titleId) {
+	let bookmarkEvent;
+	let i = 1;
+	while (bookmarkEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.bookmark,
+			i + 8
+		);
+		bookmarkEvent = pulletEvents.find(
+			(event) =>
+				event.bookmark && event.bookmark.op === 'REMOVE_FROM_QUEUE'
+		);
+		i++;
+	}
+	expect(bookmarkEvent.bookmark.op).equal(
+			'REMOVE_FROM_QUEUE',
+			`bookmark.bookmark.op===REMOVE_FROM_QUEUE, Event: \n
+${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(parseInt(bookmarkEvent.bookmark.series_id)).equal(
+			titleId,
+			`bookmark.bookmark.video_id===, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(parseInt(bookmarkEvent.bookmark.series_detail_page.series_id)).equal(
+			parseInt(titleId),
+			`bookmark.bookmark.video_page.video_id===, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+}
+
+export async function verifyC439649(titleId) {
+	let bookmarkEvent;
+	let i = 1;
+	while (bookmarkEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.bookmark,
+			i + 8
+		);
+		bookmarkEvent = pulletEvents.find(
+			(event) =>
+				event.bookmark && event.bookmark.op === 'REMOVE_FROM_CONTINUE_WATCHING'
+		);
+		i++;
+	}
+	expect(bookmarkEvent.bookmark.op).equal(
+		'REMOVE_FROM_CONTINUE_WATCHING',
+		`bookmark.bookmark.op===REMOVE_FROM_CONTINUE_WATCHING, Event: \n
+${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(parseInt(bookmarkEvent.bookmark.video_page.video_id)).equal(
+		titleId,
+		`bookmark.bookmark.video_id===, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(parseInt(bookmarkEvent.bookmark.video_id)).equal(
+		parseInt(titleId),
+		`bookmark.bookmark.video_page.video_id===, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+}
+
+export async function verifyC5226(titleId) {
+	let bookmarkEvent;
+	let i = 1;
+	while (bookmarkEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.bookmark,
+			i + 8
+		);
+		bookmarkEvent = pulletEvents.find(
+			(event) =>
+				event.bookmark && event.bookmark.op === 'REMOVE_FROM_CONTINUE_WATCHING'
+		);
+		i++;
+	}
+	expect(bookmarkEvent.bookmark.op).equal(
+		'REMOVE_FROM_CONTINUE_WATCHING',
+		`bookmark.bookmark.op===REMOVE_FROM_CONTINUE_WATCHING, Event: \n
+${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(parseInt(bookmarkEvent.bookmark.series_detail_page.series_id)).equal(
+		titleId,
+		`bookmark.bookmark.video_id===, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(parseInt(bookmarkEvent.bookmark.series_id)).equal(
+		parseInt(titleId),
+		`bookmark.bookmark.video_page.video_id===, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+}
+
+export async function verifyC70582(id) {
+	let bookmarkEvent;
+	let i = 1;
+	while (bookmarkEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.bookmark,
+			i + 8
+		);
+		bookmarkEvent = pulletEvents.find(
+			(event) => event.bookmark && event.bookmark.op === 'REMOVE_FROM_QUEUE'
+		);
+		i++;
+	}
+	expect(bookmarkEvent.bookmark.op).equal(
+		'REMOVE_FROM_QUEUE',
+		`bookmarkEvent.bookmark.op===REMOVE_FROM_QUEUE, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(bookmarkEvent.bookmark.series_id).equal(
+		id,
+		`bookmarkEvent.bookmark.series_id===${id}, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(bookmarkEvent.bookmark.series_detail_page.series_id).equal(
+		id,
+		`bookmarkEvent.bookmark.video_page.video_id===${id}, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+}
+
+export async function verifyC5220(id) {
+	let bookmarkEvent;
+	let i = 1;
+	while (bookmarkEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.bookmark,
+			i + 8
+		);
+		bookmarkEvent = pulletEvents.find(
+			(event) => event.bookmark && event.bookmark.op === DialogTypes.addToQueue
+		);
+		i++;
+	}
+	expect(bookmarkEvent.bookmark.op).equal(
+		DialogTypes.addToQueue,
+		`bookmarkEvent.bookmark.op===ADD_TO_QUEUE, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(bookmarkEvent.bookmark.series_id).equal(
+		id,
+		`bookmarkEvent.bookmark.video_id===${id}, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(bookmarkEvent.bookmark.series_detail_page.series_id).equal(
+		id,
+		`bookmarkEvent.bookmark.video_page.video_id===${id}, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+}
+
+export async function verifyC543642(id) {
+	let bookmarkEvent;
+	let i = 1;
+	while (bookmarkEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.bookmark,
+			i + 8
+		);
+		bookmarkEvent = pulletEvents.find(
+			(event) => event.bookmark && event.bookmark.op === 'REMOVE_FROM_QUEUE'
+		);
+		i++;
+	}
+	expect(bookmarkEvent.bookmark.op).equal(
+		'REMOVE_FROM_QUEUE',
+		`bookmarkEvent.bookmark.op===REMOVE_FROM_QUEUE, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(bookmarkEvent.bookmark.video_id).equal(
+		id,
+		`bookmarkEvent.bookmark.video_id===${id}, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(bookmarkEvent.bookmark.video_page.video_id).equal(
+		id,
+		`bookmarkEvent.bookmark.video_page.video_id===${id}, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+}
+
+export async function verifyC543642AddToQueue(id) {
+	let bookmarkEvent;
+	let i = 1;
+	while (bookmarkEvent === undefined && i < 15) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.bookmark,
+			i + 15
+		);
+		bookmarkEvent = pulletEvents.find(
+			(event) => event.bookmark && event.bookmark.op === DialogTypes.addToQueue
+		);
+		i++;
+	}
+	expect(bookmarkEvent.bookmark.op).equal(
+		DialogTypes.addToQueue,
+		`bookmarkEvent.bookmark.op===ADD_TO_QUEUEs, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(bookmarkEvent.bookmark.video_id).equal(
+		id,
+		`bookmarkEvent.bookmark.video_id===${id}, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(bookmarkEvent.bookmark.video_page.video_id).equal(
+		id,
+		`bookmarkEvent.bookmark.video_page.video_id===${id}, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+}

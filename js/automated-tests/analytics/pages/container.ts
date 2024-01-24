@@ -13,8 +13,8 @@ const Container = () => {
 			await testUtils.getNodeForElement(
 				CONTAINER_PAGE_NODES.TITLE_NAME_IN_CONTAINER
 			),
-		categoryNameInContainerView: async () =>
-			await testUtils.getNodeForElement('categoryNameInContainerView'),
+			categoryNameInCategoryDetailsPage: async () =>
+			await testUtils.getNodeForElement('categoryNameInCategoryDetailsPage'),
 	};
 
 	async function pageDidLoad() {
@@ -33,9 +33,9 @@ const Container = () => {
 	}
 
 	async function getCategoryName() {
-		const categoryNameInContainerView =
-			await elements.categoryNameInContainerView();
-		return categoryNameInContainerView.text;
+		const categoryNameInCategoryDetailsPage =
+			await elements.categoryNameInCategoryDetailsPage();
+		return categoryNameInCategoryDetailsPage.text;
 	}
 
 	return {

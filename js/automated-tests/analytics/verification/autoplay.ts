@@ -2,6 +2,57 @@ import { Events, PlaybackSource, DialogAction } from '../utils/constants';
 import { getMatchedEventsFromLastEvent } from '../utils/network/qaProxy';
 import { expect } from 'chai';
 
+export async function verifyC21398andC130133(idOfTitleFromAutoplay) {
+	let eventStartVideo;
+	let i = 1;
+	while (eventStartVideo === undefined && i < 20) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.start_video,
+			i + 3
+		);
+		eventStartVideo = pulletEvents.find(
+			(event) =>
+				event.start_video.playback_source === PlaybackSource.AUTOPLAY_DELIBERATE
+		);
+		i++;
+	}
+	expect(eventStartVideo.start_video.playback_source).equal(
+		PlaybackSource.AUTOPLAY_DELIBERATE,
+		`eventStartVideo.start_video.playback_source===PlaybackSource.AUTOPLAY_DELIBERATE, Event: \n
+			${JSON.stringify(eventStartVideo)} \n`
+	);
+	await checkEventStartVideo(
+		eventStartVideo.start_video,
+		idOfTitleFromAutoplay
+	);
+}
+export async function verifyC21392(videoId) {
+	let autoplayEvent;
+	let i = 1;
+	while (autoplayEvent === undefined && i < 25) {
+		let pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.auto_play,
+			i + 20
+		);
+		autoplayEvent = pulletEvents.find(
+			(event) =>
+				event.auto_play.auto_play_action === DialogAction.show &&
+				event.auto_play.video_id === parseInt(videoId)
+		);
+		i++;
+	}
+	expect(autoplayEvent.auto_play.video_id).equal(
+		parseInt(videoId),
+		`event.auto_play.video_id===${videoId}, Event: \n
+			${JSON.stringify(autoplayEvent)} \n`
+	);
+	expect(autoplayEvent.auto_play.auto_play_action).equal(
+		'SHOW',
+		`event.auto_play.auto_play_action===SHOW, Event: \n
+	${JSON.stringify(autoplayEvent)} \n`
+	);
+}
+
 export async function verifyC285598(videoId) {
 	let playProgressEvent;
 	let i = 1;

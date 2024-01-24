@@ -635,6 +635,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#ContentArea.#RowList.1.title.#CategoryName',
   },
 
+  queueRowList: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#ContentArea.#RowList',
+  },
+
   /** Call to action button on My Stuff page (Press back for menu) */
   myStuffCallToAction: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#nav.#ScreenNavigationHint.#callToAction',
@@ -896,7 +900,7 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.0.#Logo',
   },
 
-  categoryNameInContainerView: {
+  categoryNameInCategoryDetailsPage: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#pageTitleAndCounter.#CategoryName'
   },
 
@@ -904,7 +908,7 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#SkipCuepointsButton'
   },
 
-  firstChannelName: {
+  firstChannelNameInChannelPage: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#ChannelCategoryGrid.0.#Title'
   },
 

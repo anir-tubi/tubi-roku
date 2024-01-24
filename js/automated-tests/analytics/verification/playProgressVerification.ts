@@ -9,6 +9,52 @@ import {
 } from '../utils/network/qaProxy';
 import { expect } from 'chai';
 
+export async function verifyC130135(autoplayId) {
+	let eventPlayProgress;
+	let i = 1;
+	while (eventPlayProgress === undefined && i < 20) {
+		let pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.play_progress,
+			i + 20
+		);
+		eventPlayProgress = pulletEvents.find(
+			(event) =>
+				event.play_progress &&
+				event.play_progress.playback_source ===
+					PlaybackSource.AUTOPLAY_DELIBERATE //present for FireTV
+		);
+		i++;
+	}
+	expect(eventPlayProgress.play_progress.playback_source).equal(
+		PlaybackSource.AUTOPLAY_DELIBERATE,
+		`event should contain eventPlayProgress.play_progress.playback_source==PlaybackSource.AUTOPLAY_DELIBERATE, Event: \n ${JSON.stringify(
+			eventPlayProgress
+		)}`
+	);
+	expect(
+		parseInt(eventPlayProgress.play_progress.view_time)
+	).greaterThanOrEqual(
+		500,
+		`event should contain firstPlayProgress.play_progress.view_time, Event: \n ${JSON.stringify(
+			eventPlayProgress
+		)}`
+	);
+	expect(parseInt(eventPlayProgress.play_progress.position)).greaterThanOrEqual(
+		500,
+		`event should contain eventPlayProgress.play_progress.position, Event: \n ${JSON.stringify(
+			eventPlayProgress
+		)}`
+	);
+	expect(eventPlayProgress.play_progress.video_id).equal(
+		parseInt(autoplayId.id),
+		`event should contain feventPlayProgress.play_progress.video_id==${
+			autoplayId.id
+		} but in event ${
+			eventPlayProgress.play_progress.video_id
+		}, Event: \n ${JSON.stringify(eventPlayProgress)}`
+	);
+}
+
 export async function verifyC66349andC543679andC543680(videoId) {
 	const playProgressEvent = await getMatchedEventsFromLastEvent(
 		Events.play_progress,
