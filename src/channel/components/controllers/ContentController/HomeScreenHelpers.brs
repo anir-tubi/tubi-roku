@@ -766,7 +766,9 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
       end if
     end if
 
-    setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo)
+      if currentScreen.isInFocusChain() = true 'if there are any modals over home screen or focus has been lost to side nav
+        setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo)
+      end if
 
     if bStopCountdownTimer = true
       stopCountdownTimer()
