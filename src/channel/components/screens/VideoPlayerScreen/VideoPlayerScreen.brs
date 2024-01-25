@@ -384,7 +384,7 @@ Function onScreenFocusChange()
       end if
 
       if m.stateForSignUpSaveProgress = "play"
-        m.video.control = "play"
+        resumeFromPause(false)
         updateVideoState("play")
       else
         m.video.control = "pause"
