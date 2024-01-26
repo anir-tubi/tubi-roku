@@ -1031,6 +1031,8 @@ End Function
 
 
 Function popScreenAfterSignInProcess()
+  firstPopScreenTrackingInfo = invalid
+
   poppableScreenSubtypes = {
     "SignInScreen": true
     "EmailInputScreen": true
@@ -1046,12 +1048,27 @@ Function popScreenAfterSignInProcess()
   for i = count to 0 step -1
     screen = m.screenStack.getChild(i)
     if screen <> invalid AND poppableScreenSubtypes[screen.getSubtype()] = true
+
+      'Taking the page info of first screen that is being popped to send the navigatePage info.
+      if firstPopScreenTrackingInfo = invalid
+        firstPopScreenTrackingInfo = screen.trackingPageInfo
+      end if
+
       popScreen(false, false)
     else
       exit for
     end if
   end for
+
   currentScreen = getCurrentScreen()
+
+  'Send page load and navigate to page events after sign in/ signup process completed
+  currentScreenPageInfo = currentScreen.trackingPageInfo
+  if firstPopScreenTrackingInfo <> invalid
+    screenTrackingNavigate(firstPopScreenTrackingInfo, currentScreenPageInfo)
+  end if
+  screenTrackingLoad(currentScreenPageInfo)
+
   return currentScreen
 End Function
 
