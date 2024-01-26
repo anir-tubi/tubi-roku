@@ -85,13 +85,15 @@ Function onContentChange(data)
             end if
 
             m.sideIconLabel.padding = [12, 9]
-            m.sideIconLabel.text = item.shortDescriptionLine2
             m.sideIconLabel.uri = "pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
             m.sideIconLabel.opacity = 0
-            m.sideIconLabel.translation = [0, 9]
-            
+            m.sideIconLabel.translation = [0, 15]
+
             typographyConstants = getTypographyConstants()
             setTypographyOfLabel(m.sideIconLabel, typographyConstants.ids.bodyExtraSmallStrong)
+
+            'Set the text after setting the Typography label so that it will not return the wrong width for label.
+            m.sideIconLabel.text = item.shortDescriptionLine2
           end if
         else if item.shortDescriptionLine2 = "" AND m.sideIconLabel <> invalid
           m.labelParent.removeChild(m.sideIconLabel)
