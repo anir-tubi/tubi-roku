@@ -132,6 +132,8 @@ Function onThemeChange(msg = invalid)
   if theme <> invalid
     m.RelatedGrid.focusBitmapBlendColor = theme.focusedColor
     m.RelatedTitle.color = theme.primaryTextColor
+    m.Menu.focusBitmapBlendColor = theme.focusedColor
+    m.SecondaryMenu.focusBitmapBlendColor = theme.focusedColor
   end if
 End Function
 

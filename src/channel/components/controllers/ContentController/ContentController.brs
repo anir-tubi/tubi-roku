@@ -1137,6 +1137,14 @@ Function setCommonKidsModeElements()
     m.backgroundGroup.kidsMode = true
     m.trackingLoggingTask.analyticsAppMode = "KIDS_MODE"
     tellScreensIfKidsModeBeSentToServer()
+
+    ' turn off top nav for any homescreen screens (like Espanol screen, or Movies, etc.)
+    for i = 0 to m.screenStack.getChildCount() - 1
+      screen = m.ScreenStack.getChild(i)
+      if screen.isSubType("HomeScreen") OR screen.isSubtype("EPGHomeScreen")
+        screen.enableTopNav = false
+      end if
+    end for
   end if
 End Function
 

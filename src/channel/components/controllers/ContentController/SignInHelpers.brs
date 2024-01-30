@@ -750,13 +750,12 @@ Function onSideNavSignInCompleted()
 
   ' this happens when a user signs out or user signs in from the side nav or from settings side nav
   startChannel()
-
 End Function
 
 
 Function onMatureContentWarningSignInCompleted()
   tubiLog("SignInHelpers.onMatureContentWarningSignInCompleted")
-
+  setUiModeFromState()
   setContentToRefreshAllPersonalizedScreens(false)
 
   currentScreen = popScreenAfterSignInProcess()
@@ -850,6 +849,7 @@ End Function
 ' onQueueAfterSignIn - occurs after activation success via Add to My List on Details page
 Function onQueueAfterSignIn()
   tubiLog("SignInHelpers.onQueueAfterSignIn")
+  setUiModeFromState()
 
   ' setContentToRefresh is not required for homescreen as we are fetching homescreen content
   ' right after adding into queue when onBookmarkedAfterSignIn() is called.
@@ -871,7 +871,7 @@ End Function
 ' onLikeAfterSignIn - occurs after activation success via Like Button on Details page
 Function onLikeAfterSignIn()
   tubiLog("SignInHelpers.onLikeAfterSignIn")
-
+  setUiModeFromState()
   setContentToRefreshAllPersonalizedScreens()
 
   currentScreen = popScreenAfterSignInProcess()
@@ -890,7 +890,7 @@ End Function
 ' onDislikeAfterSignIn - occurs after activation success via Dislike Button on Details page
 Function onDislikeAfterSignIn()
   tubiLog("SignInHelpers.onDislikeAfterSignIn")
-
+  setUiModeFromState()
   setContentToRefreshAllPersonalizedScreens()
 
   currentScreen = popScreenAfterSignInProcess()
@@ -920,6 +920,7 @@ End Function
 
 Function onRegistrationProcessCompletedOnDetailsScreen()
   tubiLog("SignInHelpers.onRegistrationProcessCompletedOnDetailsScreen")
+  setUiModeFromState()
   setContentToRefreshAllPersonalizedScreens(true)
 
   currentScreen = popScreenAfterSignInProcess()
@@ -950,6 +951,7 @@ End Function
 
 Function onRegistrationProcessCompletedOnPlayerBackPress()
   tubiLog("SignInHelpers.onRegistrationProcessCompletedOnPlayerScreen")
+  setUiModeFromState()
   setContentToRefreshAllPersonalizedScreens(true)
   popScreenAfterSignInProcess()
   m.spinner.visible = false
@@ -1017,6 +1019,7 @@ End Function
 Function onAutoplayPreviewAfterSignIn()
   tubiLog("SignInHelpers.onAutoplayPreviewAfterSignIn")
 
+  setUiModeFromState()
   currentScreen = popScreenAfterSignInProcess()
   m.spinner.visible = false
 
@@ -1026,7 +1029,6 @@ Function onAutoplayPreviewAfterSignIn()
   end if
 
   onAutoPreviewSettingSelected()
-
 End Function
 
 
@@ -1300,6 +1302,7 @@ End Function
 
 Function afterSignUpProcessCompletedFromPlayer()
   tubilog("SignInHelpers.afterSignUpProcessCompletedFromPlayer")
+  setUiModeFromState()
 
   '.popScreenAfterSignInProcess() will trigger the onScreenFocusChange() of videoPlayer screen and by that time
   'isUserLoggedIn is still false and not hiding.This is to remove the signup save progres button after user signedIn.
