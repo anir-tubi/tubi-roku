@@ -2469,7 +2469,9 @@ End Function
 ' @videoPlayer: node, Video node that we want to keep track of state on
 Function waitForVideoPlayerStoppedState(videoPlayer)
   state = videoPlayer.state
-  if state <> "stopped" then
+
+  ' Since in some cases we set state to an empty string we also want to consider this to be a stopped state
+  if state <> "stopped" AND state <> "" then
     videoPlayer.observeFieldScoped("state", "waitForVideoPlayerStoppedStateCallback")
   else
     trackVideoPlayerStoppingState(state)

@@ -881,7 +881,7 @@ Function stopVideoContent(videoPlayer)
     videoPlayer.unobserveFieldScoped("relatedNavigateWithinPageInfo")
     videoPlayer.unobserveFieldScoped("segInfo")
 
-    if getExperimentResource("roku_async_stop", "roku_async_stop_v1", false).enabled = true then
+    if getExperimentResource("roku_async_stop", "roku_async_stop_v2", false).enabled = true then
       waitForVideoPlayerStoppedState(videoPlayer)
     end if
 

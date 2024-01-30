@@ -511,12 +511,13 @@ Function stopAndHideLinearVideoPlayer()
     showHideLinearVideoPlayerSpinner(false)
     videoPlayer.loading = false
     m.backgroundGroup.posterVisible = true
-    stopLinearVideoContent()
-    unobserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
 
-    if getExperimentResource("roku_async_stop", "roku_async_stop_v1", false).enabled = true then
+    if getExperimentResource("roku_async_stop", "roku_async_stop_v2", false).enabled = true then
       waitForVideoPlayerStoppedState(videoPlayer)
     end if
+
+    stopLinearVideoContent()
+    unobserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
 
     videoPlayer.visible = false
     videoPlayer.content = invalid

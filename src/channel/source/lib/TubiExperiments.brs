@@ -65,7 +65,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_async_stop: {
-        roku_async_stop_v1: {"enabled": false}
+        roku_async_stop_v2: {"enabled": false}
       }
 
       roku_cw_consent: {

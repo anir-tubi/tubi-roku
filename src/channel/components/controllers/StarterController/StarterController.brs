@@ -75,7 +75,7 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
           remoteComponentsUrl = m.constants.settings.rcdnRemoteComponentsUrl
         end if
 
-        if experiments.getExperimentResource("roku_async_stop", "roku_async_stop_v1").enabled = true then
+        if experiments.getExperimentResource("roku_async_stop", "roku_async_stop_v2").enabled = true then
           m.animationLogo.asyncStopSemantics = true
         end if
       end if
