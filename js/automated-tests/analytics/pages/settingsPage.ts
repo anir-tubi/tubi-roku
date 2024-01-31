@@ -2,6 +2,8 @@ import SideNav, { tabs } from '../components/sideNav';
 import { SETTINGS_NODES } from '../utils/constants';
 import { testUtils } from '../../test-utils';
 import { expect } from 'chai';
+import { ecp, utils } from 'roku-test-automation';
+import { moveToRow } from '../utils/helpers';
 const elements = {
 	settingsScreen: async () =>
 		await testUtils.getNodeForElement(SETTINGS_NODES.SETTINGS_SCREEN),
@@ -35,6 +37,11 @@ const Settings = () => {
 		});
 	}
 
+	async function signOut() {
+		await moveToRow(ui.row - settingsTabs.signOut.row);
+		await ecp.sendKeypress(ecp.Key.Ok);
+	}
+
 	const ui = {
 		row: 1,
 	};
@@ -42,6 +49,7 @@ const Settings = () => {
 	return {
 		pageDidLoad,
 		checkIfKidsLogoPresent,
+		signOut,
 		...SideNav(),
 	};
 };

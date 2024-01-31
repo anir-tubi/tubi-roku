@@ -178,6 +178,22 @@ const TitleDetailsPage = (titleDetails) => {
 		await ecp.sendKeypress(ecp.Key.Ok);
 	}
 
+	async function selectLike() {
+		await selectLikeOrDislike();
+		await ecp.sendKeypress(ecp.Key.Ok);
+	}
+
+	async function focusButDontSelectDislike() {
+		await selectLikeOrDislike();
+		await ecp.sendKeypress(ecp.Key.Down);
+	}
+
+	async function selectDislike() {
+		await selectLikeOrDislike();
+		await ecp.sendKeypress(ecp.Key.Down, { wait: 700 });
+		await ecp.sendKeypress(ecp.Key.Ok);
+	}
+
 	async function selectGoToBackToChannel() {
 		await highlightGoBackToChannel();
 		await ecp.sendKeypress(ecp.Key.Ok);
@@ -212,6 +228,7 @@ const TitleDetailsPage = (titleDetails) => {
 		getTitleId,
 		selectGoToBackToChannel,
 		selectLikeOrDislike,
+		selectLike,
 		selectPlay,
 		verifySubtitlesToglePresent,
 		verifyRatingToglePresent,
@@ -221,7 +238,9 @@ const TitleDetailsPage = (titleDetails) => {
 		getRatingText,
 		getPopUpMessage,
 		selectRemoveFromHistory,
-		selectRemoveFromMyList
+		selectRemoveFromMyList,
+		selectDislike,
+		focusButDontSelectDislike,
 	};
 };
 

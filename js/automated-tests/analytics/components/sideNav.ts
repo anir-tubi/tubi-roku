@@ -4,6 +4,7 @@ import Categories from '../pages/categories';
 import ChannelsPage from '../pages/channelsPage';
 import MyStuff from '../pages/myStuff';
 import SearchPage from '../pages/searchPage';
+import ActivatePage from '../pages/activatePage';
 import { moveToRow } from '../utils/helpers';
 import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../../test-utils';
@@ -11,6 +12,7 @@ import { expect } from 'chai';
 
 export const tabs = {
 	signIn: {
+		page: () => ActivatePage(),
 		row: 1,
 	},
 	exitKids: {

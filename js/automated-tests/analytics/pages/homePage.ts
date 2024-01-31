@@ -315,7 +315,7 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 			const kidsLogo = await elements.homeScreenKidsLogo();
 			expect(kidsLogo.visible).to.equal(true);
 		});
-		await utils.sleep(2000);
+		await utils.sleep(3500);
 		return await playTitle(false, true);
 	}
 

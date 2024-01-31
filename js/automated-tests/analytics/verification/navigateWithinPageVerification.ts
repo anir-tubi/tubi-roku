@@ -5,6 +5,7 @@ import {
 	EventsValues,
 	MidleNavComponents,
 	CategorySlug,
+	ButtomValues,
 } from '../utils/constants';
 import {
 	getMatchedEventsFromLastEvent,
@@ -711,6 +712,264 @@ ${JSON.stringify(navigateWithinPage)} \n`
 		parseInt(titleId),
 		`event should contain navigateWithinPage.navigate_within_page.video_page===${titleId} \n
 ${JSON.stringify(navigateWithinPage)} \n`
+	);
+}
+
+export async function verifyC374781(id) {
+	let navigateWithinPage;
+	let i = 1;
+	while (navigateWithinPage === undefined && i < 16) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_within_page,
+			25 + i
+		);
+		navigateWithinPage = pulletEvents.find(
+			(event) =>
+				event.navigate_within_page.dest_middle_nav_component &&
+				event.navigate_within_page.dest_middle_nav_component
+					.middle_nav_section &&
+				event.navigate_within_page.dest_middle_nav_component
+					.middle_nav_section === ButtomValues.DISLIKE &&
+				event.navigate_within_page.means_of_navigation &&
+				event.navigate_within_page.means_of_navigation === 'SCROLL' &&
+				event.navigate_within_page.vertical_location
+		);
+		i++;
+	}
+	expect(
+		navigateWithinPage.navigate_within_page.dest_middle_nav_component
+			.middle_nav_section
+	).equal(
+		ButtomValues.DISLIKE,
+		`navigateWithinPage.navigate_within_page.dest_middle_nav_component.middle_nav_section===ButtomValues.DISLIKE, Event: \n
+			${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(
+		parseInt(navigateWithinPage.navigate_within_page.horizontal_location)
+	).equal(
+		1,
+		`navigateWithinPage.navigate_within_page.horizontal_location===1, Event: \n
+			${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.means_of_navigation).equal(
+		'SCROLL',
+		`navigateWithinPage.navigate_within_page.means_of_navigation===SCROLL, Event: \n
+			${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(
+		navigateWithinPage.navigate_within_page.middle_nav_component
+			.middle_nav_section
+	).equal(
+		ButtomValues.LIKE,
+		`avigateWithinPage.navigate_within_page.middle_nav_component.middle_nav_section===LIKE, Event: \n
+			${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(
+		parseInt(navigateWithinPage.navigate_within_page.vertical_location)
+	).equal(
+		2,
+		`navigateWithinPage.navigate_within_page.vertical_location===2, Event: \n
+			${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(
+		navigateWithinPage.navigate_within_page.series_detail_page.series_id
+	).equal(
+		parseInt(id),
+		`navigateWithinPage.navigate_within_page.video_page.video_id===${id}, Event: \n
+			${JSON.stringify(navigateWithinPage)} \n`
+	);
+}
+
+export async function verifyC374780(id) {
+	let navigateWithinPage;
+	let i = 1;
+	while (navigateWithinPage === undefined && i < 16) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_within_page,
+			25 + i
+		);
+		navigateWithinPage = pulletEvents.find(
+			(event) =>
+				event.navigate_within_page.dest_middle_nav_component &&
+				event.navigate_within_page.dest_middle_nav_component
+					.middle_nav_section &&
+				event.navigate_within_page.dest_middle_nav_component
+					.middle_nav_section === ButtomValues.DISLIKE &&
+				event.navigate_within_page.means_of_navigation &&
+				event.navigate_within_page.means_of_navigation === 'SCROLL' &&
+				event.navigate_within_page.vertical_location
+		);
+		i++;
+	}
+	expect(
+		navigateWithinPage.navigate_within_page.dest_middle_nav_component
+			.middle_nav_section
+	).equal(
+		ButtomValues.DISLIKE,
+		`navigateWithinPage.navigate_within_page.dest_middle_nav_component.middle_nav_section===ButtomValues.DISLIKE, Event: \n
+			${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(
+		parseInt(navigateWithinPage.navigate_within_page.horizontal_location)
+	).equal(
+		1,
+		`navigateWithinPage.navigate_within_page.horizontal_location===1, Event: \n
+			${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.means_of_navigation).equal(
+		'SCROLL',
+		`navigateWithinPage.navigate_within_page.means_of_navigation===SCROLL, Event: \n
+			${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(
+		navigateWithinPage.navigate_within_page.middle_nav_component
+			.middle_nav_section
+	).equal(
+		ButtomValues.LIKE,
+		`avigateWithinPage.navigate_within_page.middle_nav_component.middle_nav_section===LIKE, Event: \n
+			${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(
+		parseInt(navigateWithinPage.navigate_within_page.vertical_location)
+	).equal(
+		2,
+		`navigateWithinPage.navigate_within_page.vertical_location===2, Event: \n
+			${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.video_page.video_id).equal(
+		parseInt(id),
+		`navigateWithinPage.navigate_within_page.video_page.video_id===${id}, Event: \n
+			${JSON.stringify(navigateWithinPage)} \n`
+	);
+}
+
+export async function verifyC425243(titleId) {
+	let navigateWithinPage;
+	let i = 1;
+	while (navigateWithinPage === undefined && i < 16) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_within_page,
+			25 + i
+		);
+		navigateWithinPage = pulletEvents.find(
+			(event) =>
+				event.navigate_within_page.dest_middle_nav_component &&
+				event.navigate_within_page.dest_middle_nav_component
+					.middle_nav_section &&
+				event.navigate_within_page.dest_middle_nav_component
+					.middle_nav_section === MidleNavComponents.removeFromHistory
+		);
+		i++;
+	}
+
+	expect(
+		navigateWithinPage.navigate_within_page.dest_middle_nav_component
+			.middle_nav_section
+	).equal(
+		MidleNavComponents.removeFromHistory,
+		`event should contain navigateWithinPage.navigate_within_page.dest_middle_nav_component.middle_nav_sectionn===START_FROM_BEGINNING \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+
+	expect(navigateWithinPage.navigate_within_page.horizontal_location).equal(
+		1,
+		`event should contain navigateWithinPage.navigate_within_page.horizontal_location===1 \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.means_of_navigation).equal(
+		'SCROLL',
+		`event should contain navigateWithinPage.navigate_within_page.means_of_navigation===SCROLL \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(
+		navigateWithinPage.navigate_within_page.middle_nav_component
+			.middle_nav_section
+	).equal(
+		MidleNavComponents.addToMyList,
+		`event should contain navigateWithinPage.navigate_within_page.middle_nav_component.middle_nav_sectionn===LIKE_OR_DISLIKE \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.vertical_location).to.match(
+		/\d/,
+		`event should contain navigateWithinPage.navigate_within_page.vertical_location===2 \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.video_page.video_id).equal(
+		parseInt(titleId),
+		`event should contain navigateWithinPage.navigate_within_page.video_page===${titleId} \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+}
+
+export async function verifyC425242(titleId) {
+	let navigateWithinPage;
+	let i = 1;
+	while (navigateWithinPage === undefined && i < 16) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_within_page,
+			25 + i
+		);
+		navigateWithinPage = pulletEvents.find(
+			(event) =>
+				event.navigate_within_page.dest_middle_nav_component &&
+				event.navigate_within_page.dest_middle_nav_component
+					.middle_nav_section &&
+				event.navigate_within_page.dest_middle_nav_component
+					.middle_nav_section === MidleNavComponents.removeFromMyList &&
+				event.navigate_within_page.middle_nav_component.middle_nav_section ===
+					MidleNavComponents.addToMyList
+		);
+		i++;
+	}
+	if (
+		navigateWithinPage.navigate_within_page.dest_middle_nav_component // could be something else, add fix
+			.middle_nav_section === MidleNavComponents.watchTrailer
+	) {
+		expect(
+			navigateWithinPage.navigate_within_page.dest_middle_nav_component // could be something else, add fix
+				.middle_nav_section
+		).equal(
+			MidleNavComponents.watchTrailer,
+			`event should contain navigateWithinPage.navigate_within_page.dest_middle_nav_component.middle_nav_sectionn===START_FROM_BEGINNING \n
+	${JSON.stringify(navigateWithinPage)} \n`
+		);
+	} else {
+		expect(
+			navigateWithinPage.navigate_within_page.dest_middle_nav_component // could be something else, add fix
+				.middle_nav_section
+		).equal(
+			MidleNavComponents.removeFromMyList,
+			`event should contain navigateWithinPage.navigate_within_page.dest_middle_nav_component.middle_nav_sectionn===START_FROM_BEGINNING \n
+			${JSON.stringify(navigateWithinPage)} \n`
+		);
+	}
+	expect(navigateWithinPage.navigate_within_page.horizontal_location).equal(
+		1,
+		`event should contain navigateWithinPage.navigate_within_page.horizontal_location===1 \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.means_of_navigation).equal(
+		'SCROLL',
+		`event should contain navigateWithinPage.navigate_within_page.means_of_navigation===SCROLL \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(
+		navigateWithinPage.navigate_within_page.middle_nav_component
+			.middle_nav_section
+	).equal(
+		MidleNavComponents.addToMyList,
+		`event should contain navigateWithinPage.navigate_within_page.middle_nav_component.middle_nav_sectionn===LIKE_OR_DISLIKE \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.vertical_location).to.match(
+		/3|4/,
+		`event should contain navigateWithinPage.navigate_within_page.vertical_location===3 or 4 \n
+	${JSON.stringify(navigateWithinPage)} \n`
+	);
+	expect(navigateWithinPage.navigate_within_page.video_page.video_id).equal(
+		parseInt(titleId),
+		`event should contain navigateWithinPage.navigate_within_page.video_page===${titleId} \n
+	${JSON.stringify(navigateWithinPage)} \n`
 	);
 }
 

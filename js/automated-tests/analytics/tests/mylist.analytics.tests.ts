@@ -8,7 +8,7 @@ import {
 	addTheFreakBrothersTVShowToHistory,
 	addZappedTitleToHistory,
 	addZappedTitleToMyList,
-	addTheFreakBrothersTVShowToMyList
+	addTheFreakBrothersTVShowToMyList,
 } from '../utils/userManipulations';
 import { ecp, utils } from 'roku-test-automation';
 import {
@@ -32,10 +32,24 @@ import {
 	verifyC5226,
 	verifyC439649,
 	verifyC439651,
-	verifyC439651Movie
+	verifyC439651Movie,
+	verifyC5219,
 } from '../verification/mylist';
 
-import { verifyC439649NavigateToPage,verifyC439651NavigateToPage,verifyC439651NavigateToPageMovie } from '../verification/navigateToPage';
+import {
+	verifyC439649NavigateToPage,
+	verifyC439651NavigateToPage,
+	verifyC439651NavigateToPageMovie,
+	verifyC439648,
+	verifyC439647,
+} from '../verification/navigateToPage';
+
+import { verifyC439647PageLoad, verifyC5229 } from '../verification/pageLoad';
+
+import {
+	verifyC439648ComponentInteraction,
+	verifyC439647ComponentInteraction,
+} from '../verification/componentInteraction';
 
 describe('My List events', function () {
 	beforeEach(async () => {
@@ -69,7 +83,6 @@ describe('My List events', function () {
 	});
 
 	it('when toggle left side nav on My List page C150666 and C150672 and C150665 and C439643 and C439644 and C439645 @analytics,@analyticsMyList', async () => {
-		//await testUtils.startApplicationAtPage('home');
 		const homePage = HomePage();
 		const myStuff = await homePage.selectSideNavTab(tabs.myStuff);
 		const activate = await myStuff.selectUnlockNow();
@@ -81,7 +94,7 @@ describe('My List events', function () {
 		await verifyC439645();
 	});
 
-	it('Analytics: Guest User - How many users click “Cancel” on “Let’s create your Tubi account” modal? C439646 @analytics,@analyticsMyList', async () => {
+	it('Analytics: Guest User - How many users click “Cancel” on “Lets create your Tubi account” modal? C439646 @analytics,@analyticsMyList', async () => {
 		const homePage = HomePage();
 		const myStuff = await homePage.selectSideNavTab(tabs.myStuff);
 		const activate = await myStuff.selectUnlockNow();
@@ -151,7 +164,7 @@ describe('My List events', function () {
 		await verifyC439649NavigateToPage(342067);
 		await verifyC439649(342067);
 	});
-	
+
 	it('Analytics: Registered User - How many users select one TV Show title within My List and land on the titleâ€™s details page? C439651 @analytics,@analyticsMyList', async () => {
 		const user = await testUtils.createRegisteredUser();
 		await addTheFreakBrothersTVShowToMyList(user);
@@ -163,7 +176,7 @@ describe('My List events', function () {
 		await verifyC439651NavigateToPage(300007896);
 		await verifyC439651(300007896);
 	});
-	
+
 	it('Analytics: Registered User - How many users select one Movie title within My List and land on the titleâ€™s details page? C439651 @analytics,@analyticsMyList', async () => {
 		const user = await testUtils.createRegisteredUser();
 		await addZappedTitleToMyList(user);
@@ -174,5 +187,31 @@ describe('My List events', function () {
 		await detailsPage.selectRemoveFromMyList();
 		await verifyC439651NavigateToPageMovie(342067);
 		await verifyC439651Movie(342067);
-});
+	});
+
+	it('Analytics: Registered User - How many registered users landed on My Stuff page from Left Side Nav? C439647 @analytics,@analyticsMyList', async () => {
+		await testUtils.startApplicationAtPage('home', {
+			shouldCreateNewUser: true,
+		});
+		const homePage = HomePage();
+		const myStuff = await homePage.selectSideNavTab(tabs.myStuff);
+		await myStuff.selectGoHome();
+		await verifyC439648ComponentInteraction();
+		await verifyC439647ComponentInteraction();
+		await verifyC439648();
+		await verifyC439647();
+		await verifyC439647PageLoad();
+	});
+
+	it('When movie is added to the queue then "videoId" matches selected movie title C5219 and C5223 and C5229 @analytics,@analyticsMyList', async () => {
+		await testUtils.startApplicationAtPage('movies', {
+			shouldCreateNewUser: true,
+		});
+		const homePage = HomePage();
+		const titleId = await homePage.getMovieTitleId();
+		const movieDetailsPage = await homePage.selectFocusedTitleMovie();
+		await movieDetailsPage.selectTitleAddToMyList();
+		await verifyC5219(titleId);
+		await verifyC5229(titleId);
+	});
 });

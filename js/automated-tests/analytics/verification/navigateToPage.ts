@@ -6,7 +6,8 @@ import {
 	MidleNavComponents,
 	CategorySlug,
 	LEFT_NAV_SECTIONS,
-	CAT_SLUG
+	CAT_SLUG,
+	LeftNavSection,
 } from '../utils/constants';
 import {
 	getMatchedEventsFromLastEvent,
@@ -50,6 +51,152 @@ export async function verifyC112683() {
 		.empty;
 }
 
+export async function verifyC543694() {
+	let accountEvent;
+	let i = 1;
+	while (accountEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.account,
+			40 + i
+		);
+		accountEvent = pulletEvents.find(
+			(event) => event.account.current === 'EMAIL'
+		);
+		i++;
+	}
+	expect(accountEvent.account.current).equal(
+		'EMAIL',
+		`event.account.current === 'EMAIL', Event: \n
+${JSON.stringify(accountEvent)} \n`
+	);
+	expect(accountEvent.account.manip).equal(
+		'SIGNIN',
+		`event.account.manip === 'SIGNIN', Event: \n
+${JSON.stringify(accountEvent)} \n`
+	);
+	expect(accountEvent.account.status).equal(
+		'SUCCESS',
+		`event.account.status === 'SUCCESS', Event: \n
+${JSON.stringify(accountEvent)} \n`
+	);
+}
+
+export async function verifyC543693() {
+	let navigateToPageEvent;
+	let i = 1;
+	while (navigateToPageEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_to_page,
+			40 + i
+		);
+		navigateToPageEvent = pulletEvents.find(
+			(event) =>
+				event.navigate_to_page.dest_home_page &&
+				event.navigate_to_page.dest_home_page.content_mode &&
+				event.navigate_to_page.dest_home_page.content_mode ===
+					EventsValues.conentModeUnknown
+		);
+		i++;
+	}
+	expect(
+		navigateToPageEvent.navigate_to_page.dest_home_page.content_mode
+	).equal(
+		EventsValues.conentModeUnknown,
+		`navigateToPageEvent.navigate_to_page.dest_home_page.content_mode===CONTENT_MODE_UNKNOWN, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(navigateToPageEvent.navigate_to_page.login_page.choice).equal(
+		'EMAIL',
+		`navigateToPageEvent.navigate_to_page.login_page.choice===EMAIL, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+}
+
+export async function verifyC543693NavigateToPage() {
+	let navigateToPageEvent;
+	let i = 1;
+	while (navigateToPageEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_to_page,
+			40 + i
+		);
+		navigateToPageEvent = pulletEvents.find(
+			(event) => event.navigate_to_page.dest_login_page
+		);
+		i++;
+	}
+	expect(navigateToPageEvent.navigate_to_page.home_page.content_mode).equal(
+		EventsValues.conentModeUnknown,
+		`navigateToPageEvent.navigate_to_page.dest_home_page.content_mode===CONTENT_MODE_UNKNOWN, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+		navigateToPageEvent.navigate_to_page.left_side_nav_component
+			.left_nav_section
+	).equal(
+		EventsValues.account,
+		`navigateToPageEvent.navigate_to_page.dest_home_page.content_mode===ACCOUNT, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(navigateToPageEvent.navigate_to_page.dest_login_page.choice).equal(
+		'EMAIL',
+		`navigateToPageEvent.navigate_to_page.login_page.choice===EMAIL, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+}
+
+export async function verifyC439647() {
+	let navigateToPageEvent;
+	let i = 1;
+	while (navigateToPageEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_to_page,
+			40 + i
+		);
+		navigateToPageEvent = pulletEvents.find(
+			(event) => event.navigate_to_page.dest_for_you_page
+		);
+		i++;
+	}
+	expect(navigateToPageEvent.navigate_to_page.home_page.content_mode).equal(
+		EventsValues.conentModeUnknown,
+		`navigate_to_page.home_page.content_mode===CONTENT_MODE_UNKNOWN, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(
+		navigateToPageEvent.navigate_to_page.left_side_nav_component
+			.left_nav_section
+	).equal(
+		LeftNavSection.queue,
+		`navigate_to_page.left_side_nav_component.left_nav_section===QUEUE, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(navigateToPageEvent.navigate_to_page.dest_for_you_page).to.be.empty;
+}
+
+export async function verifyC439648() {
+	let navigateToPageEvent;
+	let i = 1;
+	while (navigateToPageEvent === undefined && i < 10) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.navigate_to_page,
+			40 + i
+		);
+		navigateToPageEvent = pulletEvents.find(
+			(event) => event.navigate_to_page.dest_home_page
+		);
+		i++;
+	}
+	expect(
+		navigateToPageEvent.navigate_to_page.dest_home_page.content_mode
+	).equal(
+		EventsValues.conentModeUnknown,
+		`navigateToPageEvent.navigate_to_page.dest_home_page.content_mode===CONTENT_MODE_UNKNOWN, Event: \n
+${JSON.stringify(navigateToPageEvent)} \n`
+	);
+	expect(navigateToPageEvent.navigate_to_page.for_you_page).to.be.empty;
+}
+
 export async function verifyC439651NavigateToPageMovie(id) {
 	let navigateToPageEvent;
 	let i = 1;
@@ -60,76 +207,73 @@ export async function verifyC439651NavigateToPageMovie(id) {
 		);
 		navigateToPageEvent = pulletEvents.find(
 			(event) =>
-					event.navigate_to_page.category_component &&
-					event.navigate_to_page.category_component.category_slug &&
-					event.navigate_to_page.category_component.category_slug ===
-							CAT_SLUG.queue
-	);
+				event.navigate_to_page.category_component &&
+				event.navigate_to_page.category_component.category_slug &&
+				event.navigate_to_page.category_component.category_slug ===
+					CAT_SLUG.queue
+		);
 		i++;
 	}
 	expect(
-			navigateToPageEvent.navigate_to_page.category_component.category_slug
+		navigateToPageEvent.navigate_to_page.category_component.category_slug
 	).equal(
-			CAT_SLUG.queue,
-			`navigateToPageEvent.navigate_to_page.category_component.category_slug===CAT_SLUG.queue, Event: \n
+		CAT_SLUG.queue,
+		`navigateToPageEvent.navigate_to_page.category_component.category_slug===CAT_SLUG.queue, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(
-					navigateToPageEvent.navigate_to_page.category_component.category_row
-			)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.category_component.category_row
+		)
 	).equal(
-			2,
-			`navigateToPageEvent.navigate_to_page.category_component.category_row===1, Event: \n
+		2,
+		`navigateToPageEvent.navigate_to_page.category_component.category_row===1, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(
-					navigateToPageEvent.navigate_to_page.category_component.category_col
-			)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.category_component.category_col
+		)
 	).equal(
-			1,
-			`navigateToPageEvent.navigate_to_page.category_component.category_col===1, Event: \n
+		1,
+		`navigateToPageEvent.navigate_to_page.category_component.category_col===1, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(
-					navigateToPageEvent.navigate_to_page.category_component.content_tile
-							.col
-			)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.category_component.content_tile.col
+		)
 	).equal(
-			1,
-			`navigateToPageEvent.navigate_to_page.category_component.content_tile.col===1, Event: \n
+		1,
+		`navigateToPageEvent.navigate_to_page.category_component.content_tile.col===1, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(
-					navigateToPageEvent.navigate_to_page.category_component.content_tile
-							.row
-			)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.category_component.content_tile.row
+		)
 	).equal(
-			1,
-			`navigateToPageEvent.navigate_to_page.category_component.content_tile.row===1, Event: \n
+		1,
+		`navigateToPageEvent.navigate_to_page.category_component.content_tile.row===1, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(
-					navigateToPageEvent.navigate_to_page.category_component.content_tile
-							.video_id
-			)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.category_component.content_tile
+				.video_id
+		)
 	).equal(
-			id,
-			`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
+		id,
+		`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(navigateToPageEvent.navigate_to_page.dest_video_page.video_id)
+		parseInt(navigateToPageEvent.navigate_to_page.dest_video_page.video_id)
 	).equal(
-			id,
-			`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
-${JSON.stringify(navigateToPageEvent)} \n`
+		id,
+		`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
+		${JSON.stringify(navigateToPageEvent)} \n`
 	);
-	expect(navigateToPageEvent.navigate_to_page.for_you_page).to.be.empty;
 }
 
 export async function verifyC439651NavigateToPage(id) {
@@ -142,76 +286,75 @@ export async function verifyC439651NavigateToPage(id) {
 		);
 		navigateToPageEvent = pulletEvents.find(
 			(event) =>
-					event.navigate_to_page.category_component &&
-					event.navigate_to_page.category_component.category_slug &&
-					event.navigate_to_page.category_component.category_slug ===
-							CAT_SLUG.queue
-	);
+				event.navigate_to_page.category_component &&
+				event.navigate_to_page.category_component.category_slug &&
+				event.navigate_to_page.category_component.category_slug ===
+					CAT_SLUG.queue
+		);
 		i++;
 	}
 	expect(
-			navigateToPageEvent.navigate_to_page.category_component.category_slug
+		navigateToPageEvent.navigate_to_page.category_component.category_slug
 	).equal(
-			CAT_SLUG.queue,
-			`navigateToPageEvent.navigate_to_page.category_component.category_slug===CAT_SLUG.queue, Event: \n
+		CAT_SLUG.queue,
+		`navigateToPageEvent.navigate_to_page.category_component.category_slug===CAT_SLUG.queue, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(
-					navigateToPageEvent.navigate_to_page.category_component.category_row
-			)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.category_component.category_row
+		)
 	).equal(
-			2,
-			`navigateToPageEvent.navigate_to_page.category_component.category_row===1, Event: \n
+		2,
+		`navigateToPageEvent.navigate_to_page.category_component.category_row===1, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(
-					navigateToPageEvent.navigate_to_page.category_component.category_col
-			)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.category_component.category_col
+		)
 	).equal(
-			1,
-			`navigateToPageEvent.navigate_to_page.category_component.category_col===1, Event: \n
+		1,
+		`navigateToPageEvent.navigate_to_page.category_component.category_col===1, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(
-					navigateToPageEvent.navigate_to_page.category_component.content_tile
-							.col
-			)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.category_component.content_tile.col
+		)
 	).equal(
-			1,
-			`navigateToPageEvent.navigate_to_page.category_component.content_tile.col===1, Event: \n
+		1,
+		`navigateToPageEvent.navigate_to_page.category_component.content_tile.col===1, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(
-					navigateToPageEvent.navigate_to_page.category_component.content_tile
-							.row
-			)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.category_component.content_tile.row
+		)
 	).equal(
-			1,
-			`navigateToPageEvent.navigate_to_page.category_component.content_tile.row===1, Event: \n
+		1,
+		`navigateToPageEvent.navigate_to_page.category_component.content_tile.row===1, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(
-					navigateToPageEvent.navigate_to_page.category_component.content_tile
-							.series_id
-			)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.category_component.content_tile
+				.series_id
+		)
 	).equal(
-			id,
-			`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
+		id,
+		`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(navigateToPageEvent.navigate_to_page.dest_series_detail_page.series_id)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.dest_series_detail_page.series_id
+		)
 	).equal(
-			id,
-			`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
-${JSON.stringify(navigateToPageEvent)} \n`
+		id,
+		`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
+		${JSON.stringify(navigateToPageEvent)} \n`
 	);
-	expect(navigateToPageEvent.navigate_to_page.for_you_page).to.be.empty;
 }
 
 export async function verifyC439649NavigateToPage(id) {
@@ -224,78 +367,74 @@ export async function verifyC439649NavigateToPage(id) {
 		);
 		navigateToPageEvent = pulletEvents.find(
 			(event) =>
-					event.navigate_to_page.category_component &&
-					event.navigate_to_page.category_component.category_slug &&
-					event.navigate_to_page.category_component.category_slug ===
-							CAT_SLUG.continueWatching
-	);
+				event.navigate_to_page.category_component &&
+				event.navigate_to_page.category_component.category_slug &&
+				event.navigate_to_page.category_component.category_slug ===
+					CAT_SLUG.continueWatching
+		);
 		i++;
 	}
 	expect(
-			navigateToPageEvent.navigate_to_page.category_component.category_slug
+		navigateToPageEvent.navigate_to_page.category_component.category_slug
 	).equal(
-			CAT_SLUG.continueWatching,
-			`navigateToPageEvent.navigate_to_page.category_component.category_slug===CAT_SLUG.continueWatching, Event: \n
+		CAT_SLUG.continueWatching,
+		`navigateToPageEvent.navigate_to_page.category_component.category_slug===CAT_SLUG.continueWatching, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(
-					navigateToPageEvent.navigate_to_page.category_component.category_row
-			)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.category_component.category_row
+		)
 	).equal(
-			1,
-			`navigateToPageEvent.navigate_to_page.category_component.category_row===1, Event: \n
+		1,
+		`navigateToPageEvent.navigate_to_page.category_component.category_row===1, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(
-					navigateToPageEvent.navigate_to_page.category_component.category_col
-			)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.category_component.category_col
+		)
 	).equal(
-			1,
-			`navigateToPageEvent.navigate_to_page.category_component.category_col===1, Event: \n
+		1,
+		`navigateToPageEvent.navigate_to_page.category_component.category_col===1, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(
-					navigateToPageEvent.navigate_to_page.category_component.content_tile
-							.col
-			)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.category_component.content_tile.col
+		)
 	).equal(
-			1,
-			`navigateToPageEvent.navigate_to_page.category_component.content_tile.col===1, Event: \n
+		1,
+		`navigateToPageEvent.navigate_to_page.category_component.content_tile.col===1, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(
-					navigateToPageEvent.navigate_to_page.category_component.content_tile
-							.row
-			)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.category_component.content_tile.row
+		)
 	).equal(
-			1,
-			`navigateToPageEvent.navigate_to_page.category_component.content_tile.row===1, Event: \n
+		1,
+		`navigateToPageEvent.navigate_to_page.category_component.content_tile.row===1, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(
-					navigateToPageEvent.navigate_to_page.category_component.content_tile
-							.video_id
-			)
+		parseInt(
+			navigateToPageEvent.navigate_to_page.category_component.content_tile
+				.video_id
+		)
 	).equal(
-			id,
-			`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
+		id,
+		`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
 ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 	expect(
-			parseInt(navigateToPageEvent.navigate_to_page.dest_video_page.video_id)
+		parseInt(navigateToPageEvent.navigate_to_page.dest_video_page.video_id)
 	).equal(
-			id,
-			`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
-${JSON.stringify(navigateToPageEvent)} \n`
+		id,
+		`navigateToPageEvent.navigate_to_page.category_component.content_tile.video_id===, Event: \n
+		${JSON.stringify(navigateToPageEvent)} \n`
 	);
-	expect(navigateToPageEvent.navigate_to_page.for_you_page).to.be.empty;
 }
-
 
 export async function verifyC118158() {
 	let eventNavigateToPage;

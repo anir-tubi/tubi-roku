@@ -223,7 +223,6 @@ export async function verifyC439644() {
 				event.dialog.dialog_action &&
 				event.dialog.dialog_action === DialogAction.show
 		);
-
 		i++;
 	}
 	expect(dialog.dialog.dialog_action).equal(
@@ -458,24 +457,33 @@ export async function verifyC439651Movie(titleId) {
 			i + 8
 		);
 		bookmarkEvent = pulletEvents.find(
-			(event) =>
-				event.bookmark && event.bookmark.op === 'REMOVE_FROM_QUEUE'
+			(event) => event.bookmark && event.bookmark.op === 'REMOVE_FROM_QUEUE'
 		);
 		i++;
 	}
 	expect(bookmarkEvent.bookmark.op).equal(
-			'REMOVE_FROM_QUEUE',
-			`bookmark.bookmark.op===REMOVE_FROM_QUEUE, Event: \n
+		'REMOVE_FROM_QUEUE',
+		`bookmark.bookmark.op===REMOVE_FROM_QUEUE, Event: \n
 ${JSON.stringify(bookmarkEvent)} \n`
 	);
 	expect(parseInt(bookmarkEvent.bookmark.video_id)).equal(
-			titleId,
-			`bookmark.bookmark.video_id===, Event: \n
+		titleId,
+		`bookmark.bookmark.video_id===, Event: \n
 	${JSON.stringify(bookmarkEvent)} \n`
 	);
 	expect(parseInt(bookmarkEvent.bookmark.video_page.video_id)).equal(
-			parseInt(titleId),
-			`bookmark.bookmark.video_page.video_id===, Event: \n
+		parseInt(titleId),
+		`bookmark.bookmark.op===REMOVE_FROM_QUEUE, Event: \n
+${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(parseInt(bookmarkEvent.bookmark.video_id)).equal(
+		titleId,
+		`bookmark.bookmark.video_id===, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(parseInt(bookmarkEvent.bookmark.video_page.video_id)).equal(
+		parseInt(titleId),
+		`bookmark.bookmark.video_page.video_id===, Event: \n
 	${JSON.stringify(bookmarkEvent)} \n`
 	);
 }
@@ -489,24 +497,33 @@ export async function verifyC439651(titleId) {
 			i + 8
 		);
 		bookmarkEvent = pulletEvents.find(
-			(event) =>
-				event.bookmark && event.bookmark.op === 'REMOVE_FROM_QUEUE'
+			(event) => event.bookmark && event.bookmark.op === 'REMOVE_FROM_QUEUE'
 		);
 		i++;
 	}
 	expect(bookmarkEvent.bookmark.op).equal(
-			'REMOVE_FROM_QUEUE',
-			`bookmark.bookmark.op===REMOVE_FROM_QUEUE, Event: \n
+		'REMOVE_FROM_QUEUE',
+		`bookmark.bookmark.op===REMOVE_FROM_QUEUE, Event: \n
 ${JSON.stringify(bookmarkEvent)} \n`
 	);
 	expect(parseInt(bookmarkEvent.bookmark.series_id)).equal(
-			titleId,
-			`bookmark.bookmark.video_id===, Event: \n
+		titleId,
+		`bookmark.bookmark.video_id===, Event: \n
 	${JSON.stringify(bookmarkEvent)} \n`
 	);
 	expect(parseInt(bookmarkEvent.bookmark.series_detail_page.series_id)).equal(
-			parseInt(titleId),
-			`bookmark.bookmark.video_page.video_id===, Event: \n
+		parseInt(titleId),
+		`bookmark.bookmark.op===REMOVE_FROM_QUEUE, Event: \n
+${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(parseInt(bookmarkEvent.bookmark.series_id)).equal(
+		titleId,
+		`bookmark.bookmark.video_id===, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(parseInt(bookmarkEvent.bookmark.series_detail_page.series_id)).equal(
+		parseInt(titleId),
+		`bookmark.bookmark.video_page.video_id===, Event: \n
 	${JSON.stringify(bookmarkEvent)} \n`
 	);
 }
@@ -629,6 +646,36 @@ export async function verifyC5220(id) {
 	expect(bookmarkEvent.bookmark.series_detail_page.series_id).equal(
 		id,
 		`bookmarkEvent.bookmark.video_page.video_id===${id}, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+}
+
+export async function verifyC5219(titleId) {
+	let bookmarkEvent;
+	let i = 1;
+	while (bookmarkEvent === undefined && i < 40) {
+		const pulletEvents = await getMatchedEventsFromLastEvent(
+			Events.bookmark,
+			i + 10
+		);
+		bookmarkEvent = pulletEvents.find(
+			(event) => event.bookmark && event.bookmark.op === 'ADD_TO_QUEUE'
+		);
+		i++;
+	}
+	expect(bookmarkEvent.bookmark.op).equal(
+		'ADD_TO_QUEUE',
+		`bookmark.bookmark.op===ADD_TO_QUEUE, Event: \n
+${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(parseInt(bookmarkEvent.bookmark.video_id)).equal(
+		parseInt(titleId),
+		`bookmark.bookmark.video_id===, Event: \n
+	${JSON.stringify(bookmarkEvent)} \n`
+	);
+	expect(parseInt(bookmarkEvent.bookmark.video_page.video_id)).equal(
+		parseInt(titleId),
+		`bookmark.bookmark.video_page.video_id===, Event: \n
 	${JSON.stringify(bookmarkEvent)} \n`
 	);
 }

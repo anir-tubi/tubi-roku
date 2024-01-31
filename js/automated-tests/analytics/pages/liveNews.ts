@@ -21,7 +21,9 @@ const LiveNews = () => {
 	};
 
 	async function checkIfVideoPlaying() {
-		await testUtils.expectPlayerStateToEventuallyEqual('play');
+		await testUtils.retryWithTimeOut(async () => {
+			await testUtils.expectPlayerStateToEventuallyEqual('play');
+		});
 	}
 
 	async function pageDidLoad() {

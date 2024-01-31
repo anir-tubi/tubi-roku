@@ -13,6 +13,8 @@ const MyStuff = ({ isAuth = false } = {}) => {
 			await testUtils.getNodeForElement('unlockNowForMyStuff'),
 		continueWatchingRowText: async () =>
 			await testUtils.getNodeForElement('continueWatchingRow'),
+		goHomeMyStuffButton: async () =>
+			await testUtils.getNodeForElement('goHomeMyStuffButton'),
 	};
 
 	async function pageDidLoad() {
@@ -25,6 +27,7 @@ const MyStuff = ({ isAuth = false } = {}) => {
 	}
 
 	async function selectUnlockNow() {
+		await utils.sleep(1500);
 		await testUtils.retryWithTimeOut(async () => {
 			const unlockNowForMyStuff = await elements.unlockNowForMyStuff();
 			expect(unlockNowForMyStuff.text).to.equal('Unlock Now');
@@ -33,6 +36,15 @@ const MyStuff = ({ isAuth = false } = {}) => {
 		const activatePage = ActivatePage();
 		await activatePage.pageDidLoad();
 		return activatePage;
+	}
+
+	async function selectGoHome() {
+		const goToHome = await elements.goHomeMyStuffButton(); //if user signed in text should be Go to Home
+		expect(goToHome.text).equal('Go Home');
+		await ecp.sendKeypress(ecp.Key.Ok);
+		const homePage = HomePage();
+		await homePage.pageDidLoad();
+		return homePage;
 	}
 
 	async function selectContinueWatchingIfOnlyone() {
@@ -69,7 +81,8 @@ const MyStuff = ({ isAuth = false } = {}) => {
 		selectContinueWatchingIfOnlyone,
 		pageDidLoad,
 		selectUnlockNow,
-		selectQueueIfOnlyone
+		selectQueueIfOnlyone,
+		selectGoHome,
 	};
 };
 

@@ -709,6 +709,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.0.#password.#rectBG',
   },
 
+  continueButtonSignInPage: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#signInScreen.#signUpLayout.#buttonsGroup.#continueBtn.#focus9Patch',
+  },
+
   /** Enter your password meesage on dialog box */
   enterPasswordDialogMessage: {
     keyPath: '#ContentController.#390640d.#DialogBox.#ContentArea.#Title',
@@ -792,6 +796,10 @@ const elements = typeCheckElements({
   /** email address box for creating account */
   emailAddressBox: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#emailLayout.1.#emailTextEditBox.1',
+  },
+
+  confirmYourAgeText: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.1.#AgeVerificationPageText.#AgeVerificationPageHeader',
   },
 
   /** age gate year box */
@@ -1227,7 +1235,11 @@ const elements = typeCheckElements({
   },
 
   unlockNowForMyStuff: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#SignedOutUI.#GuestMenu.0.#buttonTextParent.#label',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#SignedOutUI.#GuestMenu.0.#DetailsMenuTextParent.#DetailsMenuText',
+  },
+
+  goHomeMyStuffButton: {
+    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#AllEmptyUI.#AllEmptyUIMenu.0.#DetailsMenuTextParent.#DetailsMenuText'
   },
 
   /** channels list screen */

@@ -17,6 +17,7 @@ async function getDeviceId() {
 		keyPath: 'constants.deviceInfo.deviceId',
 	});
 	process.env.DEVICE_ID_APP = value;
+	process.env.SET_DEVICE_ID = 'true';
 }
 
 export const eventOnStep = async (number) => {
@@ -107,7 +108,9 @@ export const getMatchedFullEventsFromLastEvent = async (eventObj, fromLast) => {
 };
 
 export async function createNewTestInProxy() {
-	await getDeviceId();
+	if (process.env.SET_DEVICE_ID !== 'true') {
+		await getDeviceId();
+	}
 	const url = `${proxyServer}/roku/test`;
 	const data = { deviceId: process.env.DEVICE_ID_APP, testStarted: 'true' };
 	const response = await request.post({ url: url, json: data });

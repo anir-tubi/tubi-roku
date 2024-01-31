@@ -6,6 +6,14 @@ export const NODES = {
 	HOME_SCREEN_ROW_LIST: 'homeRowList',
 };
 
+export const ButtomValues = {
+	LIKE_OR_DISLIKE: 'LIKE_OR_DISLIKE',
+	LIKE: 'LIKE',
+	DISLIKE: 'DISLIKE',
+	TEXT: 'TEXT',
+	SIGNUP_TO_SAVE_PROGRESS: 'signup_to_save_progress',
+};
+
 export const LINEAR_NODES = {
 	LINEAR_NAVIGATION_PANEL: 'linearNavigationPanel',
 	LIVENEWS_SUBTITLES: 'btnCC_label',
@@ -134,6 +142,7 @@ export const Events = {
 	preview_play_progress: 'preview_play_progress',
 	finish_preview: 'finish_preview',
 	bookmark: 'bookmark',
+	request_for_info: 'request_for_info',
 };
 
 export const CategorySlug = {
