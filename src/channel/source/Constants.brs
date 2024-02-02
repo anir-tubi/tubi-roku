@@ -1074,7 +1074,6 @@ Function getConstants()
       constants.ui.backgroundTypes.fullScreen = "fullscreen"
       constants.ui.backgroundTypes.topRight = "topright"
       constants.ui.backgroundTypes.epg = "epg"
-      constants.ui.backgroundTypes.marketingScreen = "marketingScreen"
       constants.ui.backgroundTypes.rightScreen = "rightScreen"
 
     constants.ui.modes = {}
@@ -1329,14 +1328,7 @@ Function getConstants()
 
 'THEME/COLOR START///////////////////////
 '//::TODO::colors - the following constants should be moved to themes. The app should not call these constants
-constants.ui.uris.defaultBackground = "pkg:/images/art-blur-background.webp"
-constants.ui.uris.kidsModeBackground = "pkg:/images/art-blur-background_kids.webp"
-constants.ui.uris.marketingBackground = "pkg:/images/background_activation_default.webp"
-constants.ui.uris.marketingBackground_kids = "pkg:/images/background_activation_kids.webp"
-constants.ui.uris.backgroundFullScreenGradient = "pkg:/images/detail-gradient-25.webp"
-constants.ui.uris.backgroundFullScreenGradient_kidsMode = "pkg:/images/detail-gradient_kids.webp"
-constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_kidsmode.webp"
-
+constants.ui.uris.defaultContentBackgroundUri = "pkg:/images/background-masks/mask-layer-0.webp"
 '//The use of the "THEME_" constants will be replaced with hexidecimal color strings during the gulp install process.
 '//Source of JSON theme colors are located in /themes/theme.json which is sourced from:
 '//   https://github.com/adRise/design-tokens/blob/main/src/tokens/themes.tokens.json
@@ -1391,55 +1383,24 @@ constants.ui.uris.sideNavBackground_kidsMode = "pkg:/images/sideNavBackground_ki
     kidsLightPrimaryForeground = "THEME_kidsLightPrimaryForeground_THEME"
     kidsLightTransparentForeground75 = "THEME_kidsLightTransparentForeground75_THEME"
 
-
-'//holidays theme constants
-    holidaysDarkPrimaryAccent = "THEME_holidaysDarkPrimaryAccent_THEME"
-    holidaysDarkPrimaryBackground = "THEME_holidaysDarkPrimaryBackground_THEME"
-    holidaysDarkPrimaryForeground = "THEME_holidaysDarkPrimaryForeground_THEME"
-    holidaysDarkTransparentBackground50 = "THEME_holidaysDarkTransparentBackground50_THEME"
-    holidaysDarkTransparentBackground75 = "THEME_holidaysDarkTransparentBackground75_THEME"
-    ' holidaysDarkTransparentForeground0 = "THEME_holidaysDarktransparentforeground0_THEME"   '//::NOTE:: not currently being used
-    holidaysDarkTransparentForeground5 = "THEME_holidaysDarkTransparentForeground5_THEME"
-    holidaysDarkTransparentForeground10 = "THEME_holidaysDarkTransparentForeground10_THEME"
-    holidaysDarkTransparentForeground20 = "THEME_holidaysDarkTransparentForeground20_THEME"
-    holidaysDarkTransparentForeground50 = "THEME_holidaysDarkTransparentForeground50_THEME"
-    holidaysDarkTransparentForeground75 = "THEME_holidaysDarkTransparentForeground75_THEME"
-    holidaysDarkSolidSurface10 = "THEME_holidaysDarkSolidSurface10_THEME"
-    holidaysDarkSolidSurface20 = "THEME_holidaysDarkSolidSurface20_THEME"
-    'holidaysDarkStatusSuccess = "THEME_holidaysDarkStatusSuccess_THEME"   '//::NOTE:: not currently being used
-    holidaysDarkStatusCaution = "THEME_holidaysDarkStatusCaution_THEME"
-    holidaysDarkStatusAlert = "THEME_holidaysDarkStatusAlert_THEME"
-
-
-    '//holidays light sub theme
-    holidaysLightPrimaryBackground = "THEME_holidaysLightPrimaryBackground_THEME"
-    holidaysLightPrimaryForeground = "THEME_holidaysLightPrimaryForeground_THEME"
-    holidaysLightTransparentForeground75 = "THEME_holidaysLightTransparentForeground75_THEME"
-
-'//Extended Theme Constants
-    extendedDarkPrimaryBrandPurple = "THEME_extendedDarkPrimaryBrandPurple_THEME"
-
-constants.ui.colors = {}
+  constants.ui.colors = {}
     constants.ui.colors.transparent = "0x00000000"
 
-'The IDs of the available themes that can be used for the app
-constants.ui.themeIDs = {}
-constants.ui.themeIDs.default = "default"
-constants.ui.themeIDs.kidsMode = "kidsMode"
-constants.ui.themeIDs.holidays = "holidays"
-constants.ui.themeIDs.extended = "extended"
+  'The IDs of the available themes that can be used for the app
+  constants.ui.themeIDs = {}
+  constants.ui.themeIDs.default = "default"
+  constants.ui.themeIDs.kidsMode = "kidsMode"
 
-
-'available themes that can be used for the app
-constants.ui.themes = {}
+  'available themes that can be used for the app
+  constants.ui.themes = {}
     constants.ui.themes.default = {
-        id: constants.ui.themeIDs.default
-        focusedColor: defaultDarkPrimaryAccent
-        highlightedTextColor: defaultDarkPrimaryAccent
-        keyboard_focused_key: "pkg:/images/keyboard_search_focused_key.9.png"
-        scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground.9.png"
-        scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground.9.png"
-        gradientBlendColor: defaultDarkPrimaryBackground
+      id: constants.ui.themeIDs.default
+      focusedColor: defaultDarkPrimaryAccent
+      highlightedTextColor: defaultDarkPrimaryAccent
+      keyboard_focused_key: "pkg:/images/keyboard_search_focused_key.9.png"
+      scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground.9.png"
+      scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground.9.png"
+      gradientBlendColor: defaultDarkPrimaryBackground
 
         successColor: defaultDarkStatusSuccess
         cautionColor: defaultDarkStatusCaution
@@ -1460,91 +1421,49 @@ constants.ui.themes = {}
         textDarkColor: defaultDarkPrimaryBackground
         secondaryTextColor: defaultDarkTransparentForeground75
         tertiaryTextColor: defaultDarkTransparentForeground50
-        focusedTextColor: defaultDarkPrimaryForeground
-        keyboardFocusedTextColor: defaultDarkPrimaryForeground
+        focusedTextColor: defaultDarkPrimaryBackground
+        keyboardFocusedTextColor: defaultDarkPrimaryBackground
 
-        inverseBackgroundColor: defaultLightPrimaryBackground
-        inversePrimaryTextColor: defaultLightPrimaryForeground
-        inverseSecondaryTextColor: defaultLightTransparentForeground75
-        inverseNeutralColor2: defaultLightTransparentForeground10
+      inverseBackgroundColor: defaultLightPrimaryBackground
+      inversePrimaryTextColor: defaultLightPrimaryForeground
+      inverseSecondaryTextColor: defaultLightTransparentForeground75
+      inverseNeutralColor2: defaultLightTransparentForeground10
     }
 
     constants.ui.themes.kidsMode = {
-        id: constants.ui.themeIDs.kidsMode
-        focusedColor: kidsDarkPrimaryAccent
-        highlightedTextColor: kidsDarkPrimaryAccent
-        keyboard_focused_key: "pkg:/images/keyboard_search_focused_key_kidsMode.9.png"
-        scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground_kidsMode.9.png"
-        scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground_kidsMode.9.png"
-        gradientBlendColor: kidsDarkPrimaryBackground
+      id: constants.ui.themeIDs.kidsMode
+      focusedColor: kidsDarkPrimaryAccent
+      highlightedTextColor: kidsDarkPrimaryAccent
+      keyboard_focused_key: "pkg:/images/keyboard_search_focused_key_kidsMode.9.png"
+      scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground_kidsMode.9.png"
+      scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground_kidsMode.9.png"
+      gradientBlendColor: kidsDarkPrimaryBackground
 
-        cautionColor: kidsDarkStatusCaution
-        backgroundColor: kidsDarkPrimaryBackground
-        neutralColor: kidsDarkTransparentForeground20
-        neutralColor2: kidsDarkTransparentForeground10
-        neutralColor3: kidsDarkTransparentForeground5
-        neutralSolidColor: kidsDarkSolidSurface10
-        neutralSolidColor2: kidsDarkSolidSurface20
-        backgroundColorLight: kidsDarkPrimaryForeground
-        backgroundColorLight2: kidsDarkTransparentForeground75
-        shadeColor: kidsDarkTransparentBackground75
-        shadeColor2: kidsDarkTransparentBackground50
-        focused2Color: kidsDarkStatusAlert
-        unfocusedColor: kidsDarkPrimaryForeground
-        selectedListItemColor: kidsDarkTransparentForeground5
-        primaryTextColor: kidsDarkPrimaryForeground
-        textDarkColor: kidsDarkPrimaryBackground
-        secondaryTextColor: kidsDarkTransparentForeground75
-        tertiaryTextColor: kidsDarkTransparentForeground50
-        focusedTextColor: kidsDarkPrimaryBackground
-        keyboardFocusedTextColor: kidsDarkPrimaryBackground
+      cautionColor: kidsDarkStatusCaution
+      backgroundColor: kidsDarkPrimaryBackground
+      neutralColor: kidsDarkTransparentForeground20
+      neutralColor2: kidsDarkTransparentForeground10
+      neutralColor3: kidsDarkTransparentForeground5
+      neutralSolidColor: kidsDarkSolidSurface10
+      neutralSolidColor2: kidsDarkSolidSurface20
+      backgroundColorLight: kidsDarkPrimaryForeground
+      backgroundColorLight2: kidsDarkTransparentForeground75
+      shadeColor: kidsDarkTransparentBackground75
+      shadeColor2: kidsDarkTransparentBackground50
+      focused2Color: kidsDarkStatusAlert
+      unfocusedColor: kidsDarkPrimaryForeground
+      selectedListItemColor: kidsDarkTransparentForeground5
+      primaryTextColor: kidsDarkPrimaryForeground
+      textDarkColor: kidsDarkPrimaryBackground
+      secondaryTextColor: kidsDarkTransparentForeground75
+      tertiaryTextColor: kidsDarkTransparentForeground50
+      focusedTextColor: kidsDarkPrimaryBackground
+      keyboardFocusedTextColor: kidsDarkPrimaryBackground
 
-        inverseBackgroundColor: kidsLightPrimaryBackground
-        inversePrimaryTextColor: kidsLightPrimaryForeground
-        inverseSecondaryTextColor: kidsLightTransparentForeground75
+      inverseBackgroundColor: kidsLightPrimaryBackground
+      inversePrimaryTextColor: kidsLightPrimaryForeground
+      inverseSecondaryTextColor: kidsLightTransparentForeground75
     }
-
-    constants.ui.themes.holidays = {
-        id: constants.ui.themeIDs.holidays
-        focusedColor: holidaysDarkPrimaryAccent
-        highlightedTextColor: holidaysDarkPrimaryAccent
-        keyboard_focused_key: "pkg:/images/keyboard_search_focused_key.9.png"
-        scrollbarThumbBitmapUri_hd: "pkg:/images/transport/sgplayer/hd/focused-progress-foreground.9.png"
-        scrollbarThumbBitmapUri_fhd: "pkg:/images/transport/sgplayer/fhd/focused-progress-foreground.9.png"
-        gradientBlendColor: holidaysDarkPrimaryBackground
-
-        cautionColor: holidaysDarkStatusCaution
-        backgroundColor: holidaysDarkPrimaryBackground
-        neutralColor: holidaysDarkTransparentForeground20
-        neutralColor2: holidaysDarkTransparentForeground10
-        neutralColor3: holidaysDarkTransparentForeground5
-        neutralSolidColor: holidaysDarkSolidSurface10
-        neutralSolidColor2: holidaysDarkSolidSurface20
-        backgroundColorLight: holidaysDarkPrimaryForeground
-        backgroundColorLight2: holidaysDarkTransparentForeground75
-        shadeColor: holidaysDarkTransparentBackground75
-        shadeColor2: holidaysDarkTransparentBackground50
-        focused2Color: holidaysDarkStatusAlert
-        unfocusedColor: holidaysDarkPrimaryForeground
-        selectedListItemColor: holidaysDarkTransparentForeground5
-        primaryTextColor: holidaysDarkPrimaryForeground
-        textDarkColor: holidaysDarkPrimaryBackground
-        secondaryTextColor: holidaysDarkTransparentForeground75
-        tertiaryTextColor: holidaysDarkTransparentForeground50
-        focusedTextColor: holidaysDarkPrimaryForeground
-        keyboardFocusedTextColor: holidaysDarkPrimaryForeground
-
-        inverseBackgroundColor: holidaysLightPrimaryBackground
-        inversePrimaryTextColor: holidaysLightPrimaryForeground
-        inverseSecondaryTextColor: holidaysLightTransparentForeground75
-    }
-    '//extended is not actually a theme.
-    '//values under extended are used as constant values and these are not expected to change with theme.
-    constants.ui.themes.extended = {
-      id: constants.ui.themeIDs.extended
-      brandPurple: extendedDarkPrimaryBrandPurple
-    }
-
 
     '//::NOTE::HARDCODED:: there is a BUG in the built in roku keyboard component
     '// If the color is white, then it will make the focus color to a nearly-black gray.
@@ -1554,9 +1473,6 @@ constants.ui.themes = {}
     end if
     if UCase(constants.ui.themes.kidsMode.keyboardFocusedTextColor) = "0XFFFFFFFF"
     constants.ui.themes.kidsMode.keyboardFocusedTextColor  = "0xFFFFFFFE"
-    end if
-    if UCase(constants.ui.themes.holidays.keyboardFocusedTextColor) = "0XFFFFFFFF"
-    constants.ui.themes.holidays.keyboardFocusedTextColor  = "0xFFFFFFFE"
     end if
 
 

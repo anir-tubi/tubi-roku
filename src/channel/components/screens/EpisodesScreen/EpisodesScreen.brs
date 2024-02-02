@@ -21,7 +21,7 @@ Function init()
   m.Menu = m.top.findNode("EpisodeMenu")
   m.Menu.observeField("itemFocused", "onSeasonChangeMenu")
   m.Menu.observeField("rowScrollFocused", "onMenuScrollFocused")
-  m.defaultHeroUri = "pkg:/images/art-blur-background.webp"
+  m.defaultContentBackgroundUri = m.constants.ui.uris.defaultContentBackgroundUri
 
   '//hide menu left of the screen 
   m.MenuStartingXPos = -m.PageGroup.translation[1]-m.Menu.itemSize[0]
@@ -245,7 +245,7 @@ Function onContentChange()
   if m.top.content.backgrounds <> invalid AND m.top.content.backgrounds.count() > 0 then
     m.top.backgroundUriList = m.top.content.backgrounds
   else
-    m.top.backgroundUriList = [m.defaultHeroUri]
+    m.top.backgroundUriList = [m.defaultContentBackgroundUri]
   end if
 
   if m.top.isInFocusChain() then

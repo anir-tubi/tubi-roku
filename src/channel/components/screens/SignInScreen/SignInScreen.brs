@@ -54,7 +54,7 @@ Function init()
 
   m.top.isStackable = true
   m.top.screenLevel = m.constants.ui.screenLevels.signInScreen
-  m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
+  m.backgroundUriList = []
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerMedium)

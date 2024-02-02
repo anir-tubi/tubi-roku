@@ -3,6 +3,7 @@ Function init()
   m.top.observeFieldScoped("width", "onWidthChange")
   m.top.observeFieldScoped("height", "onHeightChange")
   m.top.observeFieldScoped("itemHasFocus", "onItemHasFocus")
+  m.top.observeFieldScoped("gridHasFocus", "onGridHasFocus")
   m.top.observeFieldScoped("focusPercent", "onFocusPercentChange")
   m.buttonBG = m.top.findNode("buttonBG")
 
@@ -18,11 +19,14 @@ Function init()
   m.IconFocused.opacity = 0
   m.badgeLabel = m.top.findNode("badgeLabel")
   m.badgeLabel.padding = [12, 9]
+  m.badgeLabelFocused = m.top.findNode("badgeLabelFocused")
+  m.badgeLabelFocused.padding = [12, 9]
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.DetailsMenuText, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.DetailsMenuTextFocused, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.badgeLabel, typographyConstants.ids.bodyExtraSmallStrong)
+  setTypographyOfLabel(m.badgeLabelFocused, typographyConstants.ids.bodyExtraSmallStrong)
 
   m.constants = getConstantsFromGlobal()
   if m.constants <> invalid
@@ -48,7 +52,10 @@ Function onThemeChange(msg = invalid)
     m.buttonBG.blendColor = theme.neutralColor2
     m.DetailsMenuText.color = theme.primaryTextColor
     m.DetailsMenuTextFocused.color = theme.focusedTextColor
-    m.badgeLabel.fontColor = theme.backgroundColor
+    m.badgeLabel.fontColor = theme.focusedTextColor
+    m.badgeLabel.blendColor = theme.primaryTextColor
+    m.badgeLabelFocused.fontColor = theme.primaryTextColor
+    m.badgeLabelFocused.blendColor = theme.focusedTextColor
     m.Icon.blendcolor = theme.primaryTextColor
     m.IconFocused.blendcolor = theme.focusedTextColor
   end if
@@ -106,8 +113,19 @@ Function onItemContentChange()
       m.badgeLabel.text = item.badgeText
       m.badgeLabel.visible = true
       m.badgeLabel.translation = [calculatedWidth + 20, 20]
+      m.badgeLabelFocused.text = item.badgeText
+      m.badgeLabelFocused.visible = true
+      m.badgeLabelFocused.translation = [calculatedWidth + 20, 20]
     else
       m.badgeLabel.visible = false
+      m.badgeLabelFocused.visible = false
+    end if
+
+    'This is for Continue Watching row in home screen. It has only one item and we can't focus inside the item, so making the
+    'focused text visible so that it looks like the item is focused.
+    if isNonEmptyString(item.contentItemType) = true AND item.contentItemType = "continueWatching"
+      m.DetailsMenuText.opacity = 0
+      m.DetailsMenuTextFocused.opacity = 1
     end if
 
     'Adjusting the DetailsMenuText text to center when there is no icoUrl and badge label text.
@@ -141,14 +159,44 @@ Function onItemHasFocus()
 End Function
 
 
-Function onFocusPercentChange()
-  focusPercent = m.top.focusPercent
-  if m.top.gridHasFocus = true
-    m.DetailsMenuTextFocused.opacity = focusPercent
-    m.IconFocused.opacity = focusPercent
+Function onGridHasFocus(msg)
+  gridHasFocus = msg.getData()
+
+  if gridHasFocus = true AND m.top.itemHasFocus = true
+    m.DetailsMenuTextFocused.opacity = 1.0
+    m.DetailsMenuText.opacity = 0
+    m.IconFocused.opacity = 1.0
+    m.Icon.opacity = 0
+    m.badgeLabelFocused.opacity = 1.0
+    m.badgeLabel.opacity = 0
   else
     m.DetailsMenuTextFocused.opacity = 0
+    m.DetailsMenuText.opacity = 1.0
     m.IconFocused.opacity = 0
+    m.Icon.opacity = 1.0
+    m.badgeLabelFocused.opacity = 0
+    m.badgeLabel.opacity = 1.0
   end if
+End Function
+
+
+Function onFocusPercentChange(msg)
+  focusPercent = msg.getData()
+  if m.top.gridHasFocus = true
+    m.DetailsMenuText.opacity = 1 - focusPercent
+    m.DetailsMenuTextFocused.opacity = focusPercent
+    m.Icon.opacity = 1 - focusPercent
+    m.IconFocused.opacity = focusPercent
+    m.badgeLabel.opacity = 1 - focusPercent
+    m.badgeLabelFocused.opacity = focusPercent
+  else
+    m.DetailsMenuTextFocused.opacity = 0
+    m.DetailsMenuText.opacity = 1.0
+    m.IconFocused.opacity = 0
+    m.Icon.opacity = 1.0
+    m.badgeLabelFocused.opacity = 0
+    m.badgeLabel.opacity = 1.0
+  end if
+
   m.Progress.opacity = focusPercent
 End Function

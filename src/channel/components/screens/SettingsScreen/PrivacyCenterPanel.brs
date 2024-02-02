@@ -30,6 +30,7 @@ Function init()
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
+
   onThemeChange()
 End Function
 

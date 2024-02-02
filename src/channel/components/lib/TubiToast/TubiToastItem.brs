@@ -28,8 +28,8 @@ Function onThemeChange(msg = invalid)
   end if
 
   if theme <> invalid
-    m.infoPaneBg.blendColor = theme.inverseBackgroundColor
-    m.infoPaneText.color = theme.inverseSecondaryTextColor
+    m.infoPaneBg.blendColor = theme.neutralSolidColor2
+    m.infoPaneText.color = theme.secondaryTextColor
   end if
 End Function
 
@@ -171,7 +171,7 @@ Function createHeaderText(inputArgs)
     m.header = createObject("roSGNode", "Label")
     m.header.id = "infoPaneHeader"
     if theme <> invalid
-      m.header.color = theme.inversePrimaryTextColor
+      m.header.color = theme.primaryTextColor
     end if
     m.header.maxLines = "1"
     m.header.numLines = "1"
@@ -183,7 +183,7 @@ Function createHeaderText(inputArgs)
     m.infoPaneMsgArea.insertChild(m.header, 0)
 
     typographyConstants = getTypographyConstants()
-    setTypographyOfLabel(m.header, typographyConstants.ids.headerSmall)
+    setTypographyOfLabel(m.header, typographyConstants.ids.subHeaderSmall)
   else
     m.header.text = inputArgs.headerText
   end if

@@ -9,11 +9,11 @@
 						"primary": {
 							"$description": "core theme colors",
 							"accent": {
-								"$value": "#E13100",
+								"$value": "#FFFF13",
 								"$description": "primary ctas, focus indicator"
 							},
 							"background": {
-								"$value": "#000000",
+								"$value": "#0B0019",
 								"$description": "background"
 							},
 							"foreground": {
@@ -23,16 +23,28 @@
 						},
 						"transparent": {
 							"$description": "transparent colors derived from the foreground and accent values",
+							"accent-20": {
+								"$value": "#FFFF1333",
+								"$description": "chat suggestion background"
+							},
+							"accent-0": {
+								"$value": "#FFFF1300",
+								"$description": "gradient transparency"
+							},
 							"background-75": {
-								"$value": "#000000BF",
+								"$value": "#0B0019BF",
 								"$description": ""
 							},
 							"background-50": {
-								"$value": "#00000080",
+								"$value": "#0B001980",
 								"$description": "button alt background"
 							},
+							"background-10": {
+								"$value": "#0B00191A",
+								"$description": "overlay gradient stop"
+							},
 							"background-0": {
-								"$value": "#00000000",
+								"$value": "#0B001900",
 								"$description": "gradient transparency"
 							},
 							"foreground-0": {
@@ -60,34 +72,70 @@
 								"$description": "secondary copy, input placeholder text, input strokes hover"
 							},
 							"scrim": {
-								"$value": "#000000BF",
+								"$value": "#0B001999",
 								"$description": "modal overlay"
 							}
 						},
 						"solid": {
 							"$description": "opaque combination of foreground layered on background colors",
 							"surface-10": {
-								"$value": "#1A1A1A",
+								"$value": "#161324",
 								"$description": "overlay background"
 							},
 							"surface-20": {
-								"$value": "#333333",
+								"$value": "#29253F",
 								"$description": "poster skeleton"
 							}
 						},
 						"status": {
 							"$description": "status colors",
 							"success": {
-								"$value": "#0DA335",
+								"$value": "#00955D",
 								"$description": "text, icons"
 							},
 							"caution": {
-								"$value": "#EB9C00",
+								"$value": "#FFFF13",
 								"$description": "text, icons"
 							},
 							"alert": {
-								"$value": "#F52D2D",
+								"$value": "#E80047",
 								"$description": "text, icons"
+							}
+						},
+						"gradient": {
+							"brand": {
+								"$type": "linear-gradient",
+								"$description": "Default background",
+								"$value": {
+									"angle": "0deg",
+									"stops": [
+										{
+											"color": "#0B0019",
+											"position": "0"
+										},
+										{
+											"color": "#53008B",
+											"position": "1"
+										}
+									]
+								}
+							},
+							"brand-vibrant": {
+								"$type": "linear-gradient",
+								"$description": "Marketing focused background",
+								"$value": {
+									"angle": "15deg",
+									"stops": [
+										{
+											"color": "#45009D",
+											"position": "0.2"
+										},
+										{
+											"color": "#8C00E5",
+											"position": "1"
+										}
+									]
+								}
 							}
 						}
 					},
@@ -124,7 +172,7 @@
 						"primary": {
 							"$description": "core theme colors",
 							"accent": {
-								"$value": "#E13100",
+								"$value": "#7408FF",
 								"$description": "primary ctas, focus indicator"
 							},
 							"background": {
@@ -132,12 +180,20 @@
 								"$description": "background"
 							},
 							"foreground": {
-								"$value": "#000000",
+								"$value": "#0B0019",
 								"$description": "text, icons"
 							}
 						},
 						"transparent": {
 							"$description": "transparent colors derived from the foreground and accent values",
+							"accent-20": {
+								"$value": "#7408FF33",
+								"$description": "chat suggestion background"
+							},
+							"accent-0": {
+								"$value": "#7408FF00",
+								"$description": "gradient transparency"
+							},
 							"background-75": {
 								"$value": "#FFFFFFBF",
 								"$description": ""
@@ -146,63 +202,103 @@
 								"$value": "#FFFFFF80",
 								"$description": "button alt background"
 							},
+							"background-10": {
+								"$value": "#FFFFFF1A",
+								"$description": "overlay gradient stop"
+							},
 							"background-0": {
 								"$value": "#FFFFFF00",
 								"$description": "gradient transparency"
 							},
 							"foreground-0": {
-								"$value": "#00000000",
+								"$value": "#0B001900",
 								"$description": "for use on gradients that fade to a transparent color stop"
 							},
 							"foreground-5": {
-								"$value": "#0000000D",
+								"$value": "#0B00190D",
 								"$description": "input background rest"
 							},
 							"foreground-10": {
-								"$value": "#0000001A",
+								"$value": "#0B00191A",
 								"$description": "input background hover, hr"
 							},
 							"foreground-20": {
-								"$value": "#00000033",
+								"$value": "#0B001933",
 								"$description": "input strokes rest, input disabled text, button background, label background"
 							},
 							"foreground-50": {
-								"$value": "#00000080",
+								"$value": "#0B001980",
 								"$description": "input placeholder text"
 							},
 							"foreground-75": {
-								"$value": "#000000BF",
+								"$value": "#0B0019BF",
 								"$description": "secondary copy, input placeholder text, input strokes hover"
 							},
 							"scrim": {
-								"$value": "#000000BF",
+								"$value": "#0B001999",
 								"$description": "modal overlay"
 							}
 						},
 						"solid": {
 							"$description": "opaque combination of foreground layered on background colors",
 							"surface-10": {
-								"$value": "#E5E5E5",
+								"$value": "#E4E3EC",
 								"$description": "overlay background"
 							},
 							"surface-20": {
-								"$value": "#CCCCCC",
+								"$value": "#CAC8DB",
 								"$description": "poster skeleton"
 							}
 						},
 						"status": {
 							"$description": "status colors",
 							"success": {
-								"$value": "#0B7F2A",
+								"$value": "#007A4B",
 								"$description": "text, icons"
 							},
 							"caution": {
-								"$value": "#966508",
+								"$value": "#FFFF13",
 								"$description": "text, icons"
 							},
 							"alert": {
-								"$value": "#DC1A1A",
+								"$value": "#BF0039",
 								"$description": "text, icons"
+							}
+						},
+						"gradient": {
+							"brand": {
+								"$type": "linear-gradient",
+								"$description": "Default background",
+								"$value": {
+									"angle": "0deg",
+									"stops": [
+										{
+											"color": "#0B0019",
+											"position": "0"
+										},
+										{
+											"color": "#53008B",
+											"position": "1"
+										}
+									]
+								}
+							},
+							"brand-vibrant": {
+								"$type": "linear-gradient",
+								"$description": "Marketing focused background",
+								"$value": {
+									"angle": "15deg",
+									"stops": [
+										{
+											"color": "#45009D",
+											"position": "0.2"
+										},
+										{
+											"color": "#8C00E5",
+											"position": "1"
+										}
+									]
+								}
 							}
 						}
 					},
@@ -241,11 +337,11 @@
 						"primary": {
 							"$description": "core theme colors",
 							"accent": {
-								"$value": "#F08600",
+								"$value": "#FFFF13",
 								"$description": "primary ctas, focus indicator"
 							},
 							"background": {
-								"$value": "#002F8A",
+								"$value": "#1D00F2",
 								"$description": "background"
 							},
 							"foreground": {
@@ -255,16 +351,28 @@
 						},
 						"transparent": {
 							"$description": "transparent colors derived from the foreground and accent values",
+							"accent-20": {
+								"$value": "#FFFF1333",
+								"$description": "chat suggestion background"
+							},
+							"accent-0": {
+								"$value": "#FFFF1300",
+								"$description": "gradient transparency"
+							},
 							"background-75": {
-								"$value": "#002F8ABF",
+								"$value": "#1D00F2BF",
 								"$description": ""
 							},
 							"background-50": {
-								"$value": "#002F8A80",
+								"$value": "#1D00F280",
 								"$description": "modal overlay"
 							},
+							"background-10": {
+								"$value": "#1D00F21A",
+								"$description": "overlay gradient stop"
+							},
 							"background-0": {
-								"$value": "#002F8A0",
+								"$value": "#1D00F200",
 								"$description": "gradient transparency"
 							},
 							"foreground-0": {
@@ -292,34 +400,70 @@
 								"$description": "secondary copy, input placeholder text, input strokes hover"
 							},
 							"scrim": {
-								"$value": "#000000BF",
+								"$value": "##0b001999",
 								"$description": "modal overlay"
 							}
 						},
 						"solid": {
 							"$description": "opaque combination of foreground layered on background colors",
 							"surface-10": {
-								"$value": "#194496",
+								"$value": "#2948FF",
 								"$description": "overlay background"
 							},
 							"surface-20": {
-								"$value": "#3359A1",
+								"$value": "#4771FF",
 								"$description": "poster skeleton"
 							}
 						},
 						"status": {
 							"$description": "status colors",
 							"success": {
-								"$value": "#FFB524",
+								"$value": "#00EC96",
 								"$description": "text, icons"
 							},
 							"caution": {
-								"$value": "#EB9C00",
+								"$value": "#FFFF13",
 								"$description": "text, icons"
 							},
 							"alert": {
-								"$value": "#FF7979",
+								"$value": "#8F7200",
 								"$description": "text, icons"
+							}
+						},
+						"gradient": {
+							"brand": {
+								"$type": "linear-gradient",
+								"$description": "Default background",
+								"$value": {
+									"angle": "0deg",
+									"stops": [
+										{
+											"color": "#1D00F2",
+											"position": "0"
+										},
+										{
+											"color": "#2948FF",
+											"position": "1"
+										}
+									]
+								}
+							},
+							"brand-vibrant": {
+								"$type": "linear-gradient",
+								"$description": "Marketing focused background",
+								"$value": {
+									"angle": "15deg",
+									"stops": [
+										{
+											"color": "#45009D",
+											"position": "0.2"
+										},
+										{
+											"color": "#8C00E5",
+											"position": "1"
+										}
+									]
+								}
 							}
 						}
 					},
@@ -344,144 +488,6 @@
 						"border-radius-999": {
 							"$value": "999",
 							"$description": "pill shaped elements"
-						}
-					}
-				}
-			}
-		},
-		"holidays": {
-			"dark": {
-				"$description": "design tokens for holydays dark theme",
-				"tokens": {
-					"colors": {
-						"$type": "color",
-						"primary": {
-							"$description": "core theme colors",
-							"accent": {
-								"$value": "#E13100",
-								"$description": "primary ctas, focus indicator"
-							},
-							"background": {
-								"$value": "#041F18",
-								"$description": "background"
-							},
-							"foreground": {
-								"$value": "#FFFFFF",
-								"$description": "text, icons"
-							}
-						},
-						"transparent": {
-							"$description": "transparent colors derived from the foreground and accent values",
-							"background-75": {
-								"$value": "#041F18BF",
-								"$description": ""
-							},
-							"background-50": {
-								"$value": "#041F1880",
-								"$description": "button alt background"
-							},
-							"background-0": {
-								"$value": "#041F1800",
-								"$description": "gradient transparency"
-							},
-							"foreground-0": {
-								"$value": "#FFFFFF00",
-								"$description": "for use on gradients that fade to a transparent color stop"
-							},
-							"foreground-5": {
-								"$value": "#FFFFFF0D",
-								"$description": "input background rest"
-							},
-							"foreground-10": {
-								"$value": "#FFFFFF1A",
-								"$description": "input background hover, hr"
-							},
-							"foreground-20": {
-								"$value": "#FFFFFF33",
-								"$description": "input strokes rest, input disabled text, button background, label background"
-							},
-							"foreground-50": {
-								"$value": "#FFFFFF80",
-								"$description": "input placeholder text"
-							},
-							"foreground-75": {
-								"$value": "#FFFFFFBF",
-								"$description": "secondary copy, input placeholder text, input strokes hover"
-							},
-							"scrim": {
-								"$value": "#000000BF",
-								"$description": "modal overlay"
-							}
-						},
-						"solid": {
-							"$description": "opaque combination of foreground layered on background colors",
-							"surface-10": {
-								"$value": "#1D352F",
-								"$description": "overlay background"
-							},
-							"surface-20": {
-								"$value": "#364C46",
-								"$description": "poster skeleton"
-							}
-						},
-						"status": {
-							"$description": "status colors",
-							"success": {
-								"$value": "#0DA335",
-								"$description": "text, icons"
-							},
-							"caution": {
-								"$value": "#EB9C00",
-								"$description": "text, icons"
-							},
-							"alert": {
-								"$value": "#F52D2D",
-								"$description": "text, icons"
-							}
-						}
-					},
-					"border-radius": {
-						"$type": "geometry",
-						"border-radius-4": {
-							"$value": "4",
-							"$description": "posters on mobile and web"
-						},
-						"border-radius-8": {
-							"$value": "8",
-							"$description": "posters on tv, buttons on mobile and web"
-						},
-						"border-radius-12": {
-							"$value": "12",
-							"$description": "buttons on tv"
-						},
-						"border-radius-24": {
-							"$value": "24",
-							"$description": "modals on tv"
-						},
-						"border-radius-999": {
-							"$value": "999",
-							"$description": "pill shaped elements"
-						}
-					}
-				}
-			}
-		},
-		"extended": {
-			"dark": {
-				"$description": "design tokens to support additional brand expression",
-				"tokens": {
-					"colors": {
-						"$type": "color",
-						"primary": {
-							"$description": "supplemental brand palette",
-							"brand-purple": {
-								"$value": "#AE1184",
-								"$description": "decorative elements for brand expression"
-							},
-							"brand-blue": {
-								"$value": "#3740B0",
-								"$description": "decorative elements for brand expression"
-							}
 						}
 					}
 				}

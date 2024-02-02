@@ -4,6 +4,8 @@
   <script type="text/brightscript" uri="../GlobalMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
 
   <interface>
     <!-- INPUTS -->
@@ -70,8 +72,7 @@
         id="DetailsMenuText"
         vertAlign="center"
         horizAlign="left"
-        height="80"
-        opacity="1.0">
+        height="80">
         <Font
         role="font"/>
       </Label>
@@ -79,8 +80,7 @@
         id="DetailsMenuTextFocused"
         vertAlign="center"
         horizAlign="left"
-        height="80"
-        opacity="1.0">
+        height="80">
         <Font
         role="font"/>
       </Label>
@@ -94,6 +94,10 @@
       visible="false" />
     <TextIcon
       id="badgeLabel"
+      uri="pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
+      visible="false" />
+    <TextIcon
+      id="badgeLabelFocused"
       uri="pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
       visible="false" />
   </children>

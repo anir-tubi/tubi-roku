@@ -7,4 +7,11 @@ Function init()
   setTypographyOfLabel(Title, typographyConstants.ids.headerSmall)
   setTypographyOfLabel(Name, typographyConstants.ids.subheaderMedium)
   setTypographyOfLabel(Email, typographyConstants.ids.bodyMedium)
+
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    Title.color = theme.primaryTextColor
+    Name.color = theme.primaryTextColor
+    Email.color = theme.primaryTextColor
+  end if
 End Function

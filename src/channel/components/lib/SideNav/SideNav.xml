@@ -84,10 +84,6 @@
   </interface>
 
   <children>
-    <Poster
-    id="sideNavBackground"
-    width="475"
-    height="1080"/>
     <LayoutGroup
         id="itemGroups"
         layoutDirection="vert"

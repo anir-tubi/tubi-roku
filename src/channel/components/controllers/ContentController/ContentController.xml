@@ -126,7 +126,7 @@
       <!-- disableInstantResume will be set to true when guest user tries to relaunch the app after 24hours after app got suspended by pressing home or by opening channel on remote -->
       <field id="disableInstantResume" type="boolean" value="false" alwaysNotify="true"/>
 
-      <!-- Main thread listens for this and will make a call to roku continue watching endpoint. Below field will contain information related to the update or delete request. 
+      <!-- Main thread listens for this and will make a call to roku continue watching endpoint. Below field will contain information related to the update or delete request.
            Below field is necessary due to a roku limitation that we need to make the api request from main thread due to a fact that they cannot retrieve channel token properly if it is made in component library.
            Sample value:
            {
@@ -202,25 +202,25 @@
             id="logoGroup">
             <Poster
               id="tubiLogo"
-              height="45"
-              width="103"
+              height="39"
+              width="138"
               uri="pkg:/images/logo-white-large.png"
-              opacity="0.5"
-              translation="[1731,60]"/>
+              opacity="1.0"
+              translation="[1698,60]"/>
             <Poster
               id="tubiKidsLogo"
-              height="45"
-              width="209"
+              height="39"
+              width="210"
               uri="pkg:/images/locale/en_US/logo-kids-white-large.png"
               translation="[1626,60]"
               opacity="1.0"
               visible="false"/>
             <Poster
               id="tubiEspanolLogo"
-              height="78"
-              width="322"
-              uri="pkg:/images/logo-espanol-white-large.png"
-              translation="[1515,60]"
+              height="39"
+              width="138"
+              uri="pkg:/images/logo-white-large.png"
+              translation="[1698,60]"
               opacity="1.0"
               visible="false"/>
             <Poster

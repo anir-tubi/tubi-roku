@@ -54,7 +54,7 @@ Function init()
   m.top.isStackable = true
   m.top.screenLevel = m.constants.ui.screenLevels.emailInputScreen
 
-  m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
+  m.backgroundUriList = []
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerMedium)
@@ -75,7 +75,7 @@ Function onThemeChange(msg = invalid)
     m.theme = theme
     m.back.color = theme.backgroundColorLight
     m.continue.color = theme.backgroundColorLight
-    m.emailValidationMsg.color = theme.cautionColor
+    m.emailValidationMsg.color = theme.focused2Color
     m.pageHeading.color = theme.primaryTextColor
   end if
 End Function

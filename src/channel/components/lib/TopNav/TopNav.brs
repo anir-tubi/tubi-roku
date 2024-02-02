@@ -24,7 +24,7 @@ Function init()
 
   m.top.observeFieldScoped("focusedChild", "onFocusChange")
   m.top.observeFieldScoped("jumpToID", "onJumpIDChange")
-  m.top.observeFieldScoped("uiState", "onUiStateChange")
+  m.top.observeFieldScoped("isFocused", "onIsFocused")
   m.top.observeFieldScoped("contentUpdated", "onContentUpdated")
   m.top.observeFieldScoped("selectedId", "onSelectedIdChange")
 
@@ -63,7 +63,7 @@ Function onThemeChange(msg = invalid)
     }
 
     m.MenuBground.blendColor = m.colors.lightGray
-    setUiState(m.top.uiState)
+    setTopNavFocusedState(m.top.isFocused)
   end if
 End Function
 
@@ -96,11 +96,9 @@ Function onContentUpdated()
     end if
 
     if m.colors <> invalid
-      if m.top.uiState = "unfocusedFar"
-        menuItem.selectedItemColor = m.colors.white
-      else if m.top.uiState = "unfocusedNear"
+      if m.top.isFocused = false
         menuItem.selectedItemColor = m.colors.darkGray
-      else if m.top.uiState = "focused"
+      else if m.top.isFocused = true
         menuItem.selectedItemColor = m.colors.orange
       end if
     end if
@@ -120,8 +118,9 @@ Function onContentUpdated()
     m.top.selectedIndex = 0
   end if
 
+  menuItemsCount = m.top.content.getChildCount()
   nBgroundWidth += aItemWidths[aItemWidths.Count() - 1] + nMenuOutsideSpacing - nButtonPadding 'No need of padding for last item and columnspacing
-  m.MenuBground.width = nBgroundWidth
+  m.MenuBground.width = nBgroundWidth +  (menuItemsCount - 1) * 16 ' item space for menu items.
 
   m.Menu.columnWidths = aItemWidths
   m.Menu.itemSize = [nBgroundWidth, m.Menu.itemSize[1]]
@@ -266,24 +265,20 @@ Function onFocusChange()
 End Function
 
 
-Function onUiStateChange(msg)
-  tubiLog("TopNav.onUiStateChange")
-  uiState = msg.getData()
+Function onIsFocused(msg)
+  tubiLog("TopNav.onIsFocused")
+  isFocused = msg.getData()
 
-  setUiState(uiState)
+  setTopNavFocusedState(isFocused)
 End Function
 
 
-Function setUiState(uiState)
-  tubiLog("TopNav.setUiState")
-  if isNonEmptyString(uiState)
-    if uiState = "focused"
-      setFocusedVisuals()
-    else if uiState = "unfocusedNear"
-      setUnfocusedNearVisuals()
-    else if uiState = "unfocusedFar"
-      setUnfocusedFarVisuals()
-    end if
+Function setTopNavFocusedState(isFocused)
+  tubiLog("TopNav.setTopNavFocusedState")
+  if isFocused = true
+    setFocusedVisuals()
+  else
+    setUnfocusedVisuals()
   end if
 
   selectedItemId = getSelectedItemId()
@@ -308,23 +303,8 @@ Function setFocusedVisuals()
 End Function
 
 
-Function setUnfocusedNearVisuals()
-  tubiLog("TopNav.setUnfocusedNearVisuals")
-  if m.colors <> invalid
-    m.Menu.focusFootprintBlendColor = m.colors.white
-    setSelectedItemColorOnMenuItems(m.colors.darkGray)
-  end if
-
-  ' account for any animations that may be in process on the menu
-  stopAnimation(m.menuFade)
-
-  'fade in the Menu back to fully opaque white labels.
-  m.menuFade = fade(m.Menu, "in", .4, 0.0, 1)
-End Function
-
-
-Function setUnfocusedFarVisuals()
-  tubiLog("TopNav.setUnfocusedFarVisuals")
+Function setUnfocusedVisuals()
+  tubiLog("TopNav.setUnfocusedVisuals")
   theme = getThemeFromGlobal()
   if theme <> invalid
     m.Menu.focusFootprintBlendColor = theme.neutralColor

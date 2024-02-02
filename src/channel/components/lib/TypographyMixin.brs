@@ -73,9 +73,11 @@ Function setTypographyOfLabel(labelNode, typographyId)
   if typographyId <> invalid AND labelNode <> invalid
     aaTypography = constants.typographyAA[typographyId]
     if aaTypography <> invalid
-      sFontFile = "pkg:/fonts/Vaud-Medium.ttf"
-      if aaTypography.fontWeight = 900
-        sFontFile = "pkg:/fonts/Vaud-Black.ttf"
+      sFontFile = "pkg:/fonts/Inter-Medium.ttf"
+      if aaTypography.fontFamily = "TubiStans"
+        sFontFile = "pkg:/fonts/TubiStans.ttf"
+      else if aaTypography.fontWeight = 700
+        sFontFile = "pkg:/fonts/Inter-Bold.ttf"
       end if
 
       nFontSize = 16

@@ -90,20 +90,7 @@
         horizAlignment="center"
         itemSpacings="[24]"
         visible="false"
-        translation="[768,343]">
-        <LayoutGroup
-          layoutDirection="horiz"
-          horizAlignment="center"
-          itemSpacings="[18]">
-          <Poster
-            width="84"
-            height="84"
-            uri="pkg:/images/screenMyStuffContinueWatchingIcon.webp"/>
-          <Poster
-            width="84"
-            height="84"
-            uri="pkg:/images/screenMyStuffMyListIcon.webp"/>
-        </LayoutGroup>
+        translation="[768,411]">
         <Label
           id="SignedOutUITitle"
           width="1536"
@@ -156,21 +143,6 @@
         itemSpacings="[30]"
         visible="false"
         translation="[768,343]">
-        <LayoutGroup
-          id="AllEmptyUISubtitle2Parent"
-          layoutDirection="horiz"
-          vertAlignment="custom"
-          horizAlignment="center"
-          itemSpacings="[18]">
-          <Poster
-            width="84"
-            height="84"
-            uri="pkg:/images/screenMyStuffContinueWatchingIcon.webp"/>
-          <Poster
-            width="84"
-            height="84"
-            uri="pkg:/images/screenMyStuffMyListIcon.webp"/>
-        </LayoutGroup>
         <Label
           id="AllEmptyUITitle"
           width="1536"
@@ -189,21 +161,14 @@
           <Font
             role="font"/>
         </Label>
-        <LayoutGroup
-          id="AllEmptyUISubtitle2Parent"
-          layoutDirection="horiz"
-          vertAlignment="custom"
-          horizAlignment="center"
-          itemSpacings="[15]">
-          <Label
-            id="AllEmptyUISubtitle2"
-            maxLines="1"
-            horizAlign="center"
-            vertAlign="bottom">
-            <Font
-              role="font"/>
-          </Label>
-        </LayoutGroup>
+        <Label
+          id="AllEmptyUISubtitle2"
+          maxLines="1"
+          horizAlign="center"
+          vertAlign="bottom">
+          <Font
+            role="font"/>
+        </Label>
         <MarkupGrid
           id="AllEmptyUIMenu"
           drawFocusFeedbackOnTop="false"
@@ -248,7 +213,6 @@
           rowFocusAnimationStyle="floatingFocus"
           vertFocusAnimationStyle="fixedFocus"/>
       </MaskGroup>
-
     </Group>
   </children>
 </component>

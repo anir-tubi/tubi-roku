@@ -9,16 +9,21 @@ Function init()
   m.top.observeField("selectItem", "onSelectItem")
   m.top.observeField("isLoading", "onIsLoading")
   m.ContentGroup = m.top.findNode("ContentGroup")
+  m.Title = m.top.findNode("Title")
+  m.Instructions = m.top.findNode("Instructions")
   m.Menu = m.top.findNode("AutoplayPreviewMenu")
   m.Menu.focusBitmapUri = "pkg:/images/menu-focus-$$RES$$.9.png"
+
   theme = getThemeFromGlobal()
   if theme <> invalid
     m.Menu.focusBitmapBlendColor = theme.focusedColor
+    m.Title.color = theme.primaryTextColor
+    m.Instructions.color = theme.primaryTextColor
   end if
+
   ' Adding a transparent 1px image since leaving it empty causes roku to use it's default.
   ' We do not want to show unfocused background as per designs.
   m.Menu.focusFootprintBitmapUri = "pkg:/images/transparent.png"
-
   m.Menu.observeFieldScoped("itemFocused", "onItemFocusChanged")
 
   'm.instructionsText is used to store the title and description of autoplay previews  for screen reader when screen loaded.
@@ -31,12 +36,10 @@ End Function
 
 
 Function setAutoplayPreviewChoices()
-  Title = m.top.findNode("Title")
-  Title.text = getTranslation("screenSettings_menu_autoplayPreview")
-  Instructions = m.top.findNode("Instructions")
-  Instructions.text = getTranslation("screenSettings_autoplayPreview_instructions")
+  m.Title.text = getTranslation("screenSettings_menu_autoplayPreview")
+  m.Instructions.text = getTranslation("screenSettings_autoplayPreview_instructions")
 
-  m.instructionsText = Title.text + " " + Instructions.text
+  m.instructionsText = m.Title.text + " " + m.Instructions.text
 
   newContent = m.Menu.content.clone(true)
   for i = 0 to newContent.getChildCount() - 1
@@ -49,10 +52,9 @@ Function setAutoplayPreviewChoices()
   end for
 
   m.Menu.content = newContent
-
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(Title, typographyConstants.ids.headerSmall)
-  setTypographyOfLabel(Instructions, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Title, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.Instructions, typographyConstants.ids.bodyMedium)
 End Function
 
 

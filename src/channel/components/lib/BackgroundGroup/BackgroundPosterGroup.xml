@@ -29,7 +29,7 @@
       id="BackgroundPoster"
       width="1920"
       height="1080"
-      uri="pkg:/images/art-blur-background.webp"
+      uri="pkg:/images/background-masks/mask-layer-0.webp"
       translation="[0,0]"
       opacity="0.0" />
     <Animation
@@ -39,17 +39,17 @@
       <Vector2DFieldInterpolator
         id="TranslationInterpolator"
         key="[0.0,1.0]"
-        keyValue="[[143, -91],[305,0]]"
+        keyValue="[[143, -91],[804,0]]"
         fieldToInterp="BackgroundPoster.translation" />
       <FloatFieldInterpolator
         id="ShrinkWidthInterpolator"
         key="[0.0,1.0]"
-        keyValue="[1938, 1615]"
+        keyValue="[1938, 1192]"
         fieldToInterp="BackgroundPoster.width" />
       <FloatFieldInterpolator
         id="ShrinkHeightInterpolator"
         key="[0.0,1.0]"
-        keyValue="[1091, 909]"
+        keyValue="[1091, 671]"
         fieldToInterp="BackgroundPoster.height" />
       <FloatFieldInterpolator
         id="FadeInterpolator"
@@ -69,12 +69,12 @@
       <FloatFieldInterpolator
         id="ShrinkWidthInterpolator"
         key="[0.0,1.0]"
-        keyValue="[1615, 1263]"
+        keyValue="[1192, 1263]"
         fieldToInterp="BackgroundPoster.width" />
       <FloatFieldInterpolator
         id="ShrinkHeightInterpolatonr"
         key="[0.0,1.0]"
-        keyValue="[909, 710]"
+        keyValue="[671, 710]"
         fieldToInterp="BackgroundPoster.height" />
       <FloatFieldInterpolator
         id="FadeInterpolator"

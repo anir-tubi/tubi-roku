@@ -48,8 +48,7 @@ Function init()
   m.top.observeFieldScoped("isPreTournament", "onPreTournament")
   m.top.observeFieldScoped("setForceRefreshCategoryContainers", "onForceRefreshCategoryContainers")
   m.top.screenLevel = m.constants.ui.screenLevels.tournamentScreen
-  m.defaultBackgroundUri = "pkg:/images/art-blur-background.webp"
-  m.top.backgroundUriList = [m.defaultBackgroundUri]
+  m.top.backgroundUriList = []
   m.top.handlesTransportVoiceRequests = true
   'set initial tracking values and change thevalues once the document is ready
   m.top.trackingPageInfo = {
@@ -118,7 +117,7 @@ Function onRefreshTopNav()
   includeLinearTV = m.top.isLinearTVAllowedInTopNav
   m.topNav.content = generateTopNavContentItems(includeLinearTV)
   m.topNav.contentUpdated = true
-  m.TopNav.uiState = "unfocusedNear"
+  m.TopNav.isFocused = false
 End Function
 
 
@@ -274,7 +273,7 @@ Function setTopNavFarAwayStatus(row)
   tubilog("TournamentScreen.setTopNavFarAwayStatus")
 
   if m.TopNav.visible = true AND (m.TopNav.hasFocus() = false AND m.TopNav.isInFocusChain() = false)
-    setTopNavUi(row)
+    m.topNav.isFocused = false
   end if
 End Function
 
@@ -315,9 +314,9 @@ Function setFocusOntoTopNav(isToggle)
     ' Do not set top nav toggle event if the top nav is gaining focus from another page.
     m.top.topNavToggled = true
   else
-    ' setting handlingFocusFromOtherTopNavBackButton to true before calling setTopNavUi() informs
+    ' setting handlingFocusFromOtherTopNavBackButton to true before setting isFocused to false informs
     ' the top nav not to send a NavigateWithinPageEvent when jumping focus. We immediately
-    ' reset the value back to false after setTopNavUi() is called so that the default value
+    ' reset the value back to false after isFocused to false so that the default value
     ' is in place as soon as possible, with the understanding that the top nav behavior will
     ' fully resolve before continuing on with further logic within this function.
     m.TopNav.handlingFocusFromOtherTopNavBackButton = true
@@ -327,9 +326,9 @@ Function setFocusOntoTopNav(isToggle)
     m.top.stopVideoPreview = true
   end if
 
-  ' is necessary to set the uiState before the focus, so the topNav itemContents
+  ' is necessary to set the isFocused before the focus, so the topNav itemContents
   ' can have the appropriate color values set once they react to the focus change
-  m.TopNav.uiState = "focused"
+  m.TopNav.isFocused = true
 
   m.TopNav.setFocus(true)
   m.TopNav.handlingFocusFromOtherTopNavBackButton = false
@@ -362,20 +361,6 @@ Function onLinearChannelToPlay(msg)
     end if
   end if
 
-End Function
-
-
-
-' This function does not check for focus. Any checks needed to determine if top nav has
-' focus or not should be done prior to calling this function.
-'
-' @focusRowIndex: integer, the 0 based index of the row that is focused
-Function setTopNavUi(focusRowIndex)
-  if focusRowIndex = 0
-    m.topNav.uiState = "unfocusedNear"
-  else
-    m.topNav.uiState = "unfocusedFar"
-  end if
 End Function
 
 
@@ -460,13 +445,9 @@ Function setFocusOnEpgTimeGrid()
     m.top.topNavToggled = false
   end if
 
-  ' is necessary to set the uiState before the focus, so the topNav itemContents
+  ' is necessary to set the isFocused before the focus, so the topNav itemContents
   ' can have the appropriate color values set once they react to the focus change
-  if m.top.isPreTournament = true
-    setTopNavUi(0)
-  else
-    setTopNavUi(1)
-  end if
+  m.topNav.isFocused = false
 
   fadeInContentArea()
   m.top.focusedComponent = m.constants.ui.tournamentScreen.focusItems.epgTimeGrid
@@ -508,10 +489,8 @@ Function setFocusOnCategoryGrid()
     fadeInContentArea()
   end if
 
-  if m.top.isPreTournament = true
-    setTopNavUi(1)
-  else
-    setTopNavUi(int(m.categoryGridList.currFocusRow))
+  m.topNav.isFocused = false
+  if m.top.isPreTournament = false
     m.topNav.losingFocusToComponentOnSamePage = false
   end if
 

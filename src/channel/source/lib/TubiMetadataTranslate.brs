@@ -622,7 +622,7 @@ Function tubiMetadataTranslate_getContentFromCategoryJson(category, contentId, i
       translated.parentTitle = category.title
 
       if category.gridItemType = m.constants.ui.gridItemTypes.historySignedOutUser
-        translated.backgrounds = [m.constants.ui.uris.defaultBackground]
+        translated.backgrounds = [m.constants.ui.uris.defaultContentBackgroundUri]
       end if
 
 

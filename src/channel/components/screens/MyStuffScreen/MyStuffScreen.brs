@@ -111,7 +111,6 @@ Function onThemeChange(msg = invalid)
     theme = getThemeFromGlobal()
   end if
 
-  bKidsTheme = false
 
   if theme <> invalid
     m.SignedOutUITitle.color = theme.primaryTextColor
@@ -124,14 +123,8 @@ Function onThemeChange(msg = invalid)
     m.AllEmptyUIMenu.focusBitmapBlendColor = theme.focusedColor
     m.RowList.focusBitmapBlendColor = theme.focusedColor
 
-    bKidsTheme = (theme.id = m.constants.ui.themeIDs.kidsMode)
   end if
 
-  if bKidsTheme = true
-    m.defaultBackgroundUri = "https://cdn.adrise.tv/image/roku_support_images/backgroundMyStuffDefault_kids.webp"
-  else
-    m.defaultBackgroundUri = "https://cdn.adrise.tv/image/roku_support_images/backgroundMyStuffDefault.webp"
-  end if
 End Function
 
 
@@ -140,13 +133,13 @@ Function onScreenFocusChange()
   if m.top.hasFocus() = true
     if m.top.signedIn = false
       m.GuestMenu.setFocus(true)
-      m.top.backgroundUriList = [m.defaultBackgroundUri]
+      m.top.backgroundUriList = []
     else if m.top.content <> invalid
       if m.top.content.getChildCount() > 0
         oldFocusedRowItem = m.top.cursorPosition
         if m.isAllContentEmpty = true
           m.AllEmptyUIMenu.setFocus(true)
-          m.top.backgroundUriList = [m.defaultBackgroundUri]
+          m.top.backgroundUriList = []
         else
           m.RowList.setFocus(true)
           if oldFocusedRowItem <> invalid
@@ -174,7 +167,7 @@ Function onLoadingChange(msg)
     m.InfoPanel.visible = false
     m.RowList.content = invalid 'When not fully loaded, then the rowlist should not show any content
     m.AllEmptyUI.visible = false
-    m.top.backgroundUriList = [m.defaultBackgroundUri]
+    m.top.backgroundUriList = []
   end if
 End Function
 
@@ -225,7 +218,7 @@ Function onContentUpdateChange(msg) As Void
         m.RowList.visible = false
         m.InfoPanel.visible = false
         m.AllEmptyUIMenu.setFocus(true)
-        m.top.backgroundUriList = [m.defaultBackgroundUri]
+        m.top.backgroundUriList = []
       end if
     end if
   else
@@ -636,7 +629,7 @@ Function onSignedInChange()
     m.AllEmptyUI.visible = false
     m.InfoPanel.visible = false
     m.isAllContentEmpty = false
-    m.top.backgroundUriList = [m.defaultBackgroundUri]
+    m.top.backgroundUriList = []
   else
     m.ContentArea.visible = true
     m.SignedOutUI.visible = false

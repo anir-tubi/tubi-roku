@@ -11,7 +11,7 @@ Function init()
   m.constants = getConstantsFromGlobal()
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.header, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.header, typographyConstants.ids.subHeaderSmall)
   setTypographyOfLabel(m.subheader, typographyConstants.ids.bodySmall)
 
   if m.global <> invalid
@@ -30,9 +30,9 @@ Function onThemeChange(msg = invalid)
   end if
 
   if m.theme <> invalid
-    m.header.color = m.theme.inversePrimaryTextColor
-    m.subheader.color = m.theme.inverseSecondaryTextColor
-    m.dialogBox.blendColor = m.theme.backgroundColorLight
+    m.header.color = m.theme.primaryTextColor
+    m.subheader.color = m.theme.secondaryTextColor
+    m.dialogBox.blendColor = m.theme.neutralSolidColor2
   end if
 End Function
 
@@ -47,7 +47,7 @@ Function onButtonListChange(msg)
     buttonContent.update({
       title: buttonText
       id: buttonText
-      mode: "light" ' Since the button could displayed in light vs dark background.
+      mode: "dark" ' Since the button could displayed in light vs dark background.
     }, true)
     ' Creating the button nodes to find out the longest text width due to limitation of arraygrid to dynamically adjust the width.
     listItem = CreateObject("roSGNode", "ListItemButtonWithBg")

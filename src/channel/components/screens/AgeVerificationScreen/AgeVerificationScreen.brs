@@ -35,8 +35,6 @@ Function init()
 
   m.top.screenLevel = m.constants.ui.screenLevels.ageGateScreen
 
-  m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
-
   m.top.observeField("focusedChild", "onComponentFocusChanged")
   m.NumberPad.observeField("text", "onNumberPadTextChanged")
   m.NumberPad.observeField("audioGuideText", "onAudioGuideTextChanged")
@@ -78,7 +76,7 @@ Function onThemeChange(msg = invalid)
     m.infoLabel.color = theme.primaryTextColor
     m.YearEntryFront.color = theme.textDarkColor
     m.YearEntryBack.color = theme.textDarkColor
-    m.Prompt.color = theme.cautionColor
+    m.Prompt.color = theme.focused2Color
   end if
 End Function
 
@@ -88,7 +86,7 @@ Function onComponentFocusChanged()
     ' force a background update
     audioGuideText = m.Header.text + m.SubHeader.text
     readAudioGuideText(audioGuideText)
-    m.top.backgroundUriList = m.backgroundUriList
+    m.top.backgroundUriList = []
     m.NumberPad.setFocus(true)
   end if
 End Function

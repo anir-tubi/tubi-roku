@@ -235,7 +235,7 @@ End Function
 Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = false, nSavedPosition = -1)
   tubiLog("DetailScreenHelpers.populateDetailScreen")
   'initialize default background - will be overwritten later in most cases
-  backgroundUriList = [m.defaultBackgroundUri]
+  backgroundUriList = []
 
   if isDetailScreen(detailScreen) = true AND type(content) = "roSGNode"
     'hide the spinner

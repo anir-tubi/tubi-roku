@@ -55,16 +55,22 @@
       opacity="0.9"
       translation="[0,0]"/>
 
+    <Poster
+      id="semiCircle"
+      width="160"
+      height="1080"
+      uri="pkg:/images/sidepanel-0.webp"/>
+
     <Rectangle
       id="dialogBox"
-      width="678"
-      height="474"
-      translation="[1191, 48]">
+      width="762"
+      height="1080"
+      translation="[1191, 0]">
 
       <Poster
         id="mask"
-        width="678"
-        height="894"
+        width="762"
+        height="1080"
         uri="pkg:/images/gradient-reg-modal.webp"
         translation="[0, 0]"/>
 
@@ -72,19 +78,19 @@
         id="contentArea"
         layoutDirection="vert"
         horizAlignment="custom"
-        translation="[0,48]"
-        itemSpacings="[96,0,96]">
+        translation="[0,100]"
+        itemSpacings="[48,0,80]">
 
         <LayoutGroup
           layoutDirection="vert"
-          translation="[48,48]"
-          itemSpacings="[21]">
+          translation="[48,0]"
+          itemSpacings="[12]">
 
           <Label
             id="header"
             maxLines="2"
             wrap="true"
-            width="582">
+            width="615">
             <Font
               role="font"/>
           </Label>
@@ -93,7 +99,7 @@
             id="subheader"
             wrap="true"
             maxLines="2"
-            width="582">
+            width="615">
             <Font
               role="font"/>
           </Label>
@@ -113,11 +119,11 @@
         <FilledButtonMarkupGrid
           id="buttonList"
           translation="[48,0]"
-          itemSize="[285,72]"
+          itemSize="[615,72]"
           itemComponentName="ListItemButtonWithBg"
-          itemSpacing="[12,0]"
-          numRows="1"
-          numColumns="2"
+          itemSpacing="[0,12]"
+          numRows="2"
+          numColumns="1"
           vertFocusAnimationStyle="floatingFocus"/>
       </LayoutGroup>
     </Rectangle>

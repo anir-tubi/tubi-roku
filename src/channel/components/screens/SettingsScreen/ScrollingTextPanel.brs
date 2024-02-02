@@ -25,6 +25,11 @@ Function init()
   end if
    m.Text.scrollbarThumbBitmapUri = m.focusFootprintUri
 
+   if theme <> invalid
+      m.Title.color = theme.primaryTextColor
+      m.Text.color = theme.secondaryTextColor
+   end if
+
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.Title, typographyConstants.ids.headerSmall)

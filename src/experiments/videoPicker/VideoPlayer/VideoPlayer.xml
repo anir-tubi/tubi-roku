@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <component name="VideoPlayer" extends="Group" >
   <script type="text/brightscript" uri="pkg:/components/lib/VideoPlayer/VideoPlayer.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/VideoPlayer/VideoPlaylist.brs" />
@@ -118,7 +118,7 @@
       <field id="errorMsg" type="string" />
 
       <!-- Error message as told by the video node  -->
-      <field id="videoErrorMsg" type="string" alias="VideoNode.errorMsg" />   
+      <field id="videoErrorMsg" type="string" alias="VideoNode.errorMsg" />
 
       <!-- Error code as told by the video node  -->
       <field id="videoErrorCode" type="integer" alias="VideoNode.errorCode" />
@@ -152,11 +152,11 @@
         width="1920"
         height="1080"/>
       <Poster
-        width="309"
+        width="462"
         height="135"
         uri="pkg:/images/logo-white-xlarge.png"
         loadSync="true"
-        translation="[810,382]"/>
+        translation="[734,382]"/>
       <Label
         id="LoadingMessage"
         height="64"
@@ -298,12 +298,12 @@
           size="36" />
       </Label>
     </Group>
-    
+
     <Group
       id="HUD"
       visible="true"
       opacity="0.0" >
-      
+
       <Group
         id="Picker"
         visible="true"
@@ -336,7 +336,7 @@
         height="192"
         spriteDirection="horiz"
         translation="[238,633]"/>
-      
+
       <Group
         id="Transport"
         opacity="1.0">
@@ -367,7 +367,7 @@
               size="22" />
           </Label>
         </Group>
-      
+
       <TubiProgressBar
         id="ProgressBar"
         width="1752"
@@ -505,7 +505,7 @@
 
       </Group>  <!-- Transport -->
     </Group>  <!-- HUD -->
-    
+
     <!-- RAF needs a parent group with no other elements, otherwise it will use
       - the Group dimensions set by the other children and not scale appropriately.
       -->

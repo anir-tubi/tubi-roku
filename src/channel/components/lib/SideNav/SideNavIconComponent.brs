@@ -16,6 +16,7 @@ Function init()
   m.top.observeFieldScoped("focusPercent", "onFocusPercentChange")
   m.top.observeFieldScoped("gridHasFocus", "onGridHasFocusChange")
   m.sideIconLabel = invalid
+  m.sideIconLabelFocused = invalid
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.subTxt, typographyConstants.ids.bodyExtraSmallStrong)
@@ -41,10 +42,11 @@ Function onThemeChange(msg = invalid)
     m.Label.color = theme.primaryTextColor
     m.Icon.blendColor = theme.primaryTextColor
     m.focusedLabel.color = theme.focusedTextColor
-    m.focusedIcon.blendColor = theme.focusedTextColor
+    m.focusedIcon.blendColor = theme.backgroundColor
 
-    if m.sideIconLabel <> invalid
+    if m.sideIconLabel <> invalid AND m.sideIconLabelFocused <> invalid
       m.sideIconLabel.fontColor = theme.backgroundColor
+      m.sideIconLabelFocused.fontColor = theme.primaryTextColor
     end if
   end if
 End Function
@@ -74,34 +76,20 @@ Function onContentChange(data)
       'add free icon next to Label when sideNav is open
       if item.shortDescriptionLine2 <> invalid
         if item.shortDescriptionLine2 <> ""
-          if m.sideIconLabel = invalid
-            theme = getThemeFromGlobal()
-            m.sideIconLabel = m.labelParent.createChild("TextIcon")
-            m.sideIconLabel.id = "SideIconLabel"
-            m.sideIconLabel.fontSize = 18
-
-            if theme <> invalid
-              m.sideIconLabel.fontColor = theme.backgroundColor
-            end if
-
-            m.sideIconLabel.padding = [12, 9]
-            m.sideIconLabel.uri = "pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
-            m.sideIconLabel.opacity = 0
-            m.sideIconLabel.translation = [0, 15]
-
-            typographyConstants = getTypographyConstants()
-            setTypographyOfLabel(m.sideIconLabel, typographyConstants.ids.bodyExtraSmallStrong)
-
-            'Set the text after setting the Typography label so that it will not return the wrong width for label.
-            m.sideIconLabel.text = item.shortDescriptionLine2
+          if m.sideIconLabel = invalid AND m.sideIconLabelFocused = invalid
+            createSideIconLabels(item.shortDescriptionLine2)
           end if
-        else if item.shortDescriptionLine2 = "" AND m.sideIconLabel <> invalid
+        else if item.shortDescriptionLine2 = "" AND m.sideIconLabel <> invalid AND m.sideIconLabelFocused <> invalid
           m.labelParent.removeChild(m.sideIconLabel)
           m.sideIconLabel = invalid
+          m.labelParent.removeChild(m.sideIconLabelFocused)
+          m.sideIconLabelFocused = invalid
         end if
-      else if m.sideIconLabel <> invalid
+      else if m.sideIconLabel <> invalid AND m.sideIconLabelFocused <> invalid
         m.labelParent.removeChild(m.sideIconLabel)
         m.sideIconLabel = invalid
+        m.labelParent.removeChild(m.sideIconLabelFocused)
+        m.sideIconLabelFocused = invalid
       end if
     end if
 
@@ -117,18 +105,47 @@ Function onGridHasFocusChange()
   if gridHasFocus = true
     '//if the list has gained focus, then reset the opacity as well.
     onFocusPercentChange()
+  else
+    if m.top.itemContent.selected = true
+      m.Icon.opacity = 1
+      m.Icon.uri = m.top.itemContent.filledIconUrl
+    end if
   end if
 End Function
 
 
 Function onFocusPercentChange()
+  itemContent = m.top.itemContent
   focusPercent = m.top.focusPercent
-  m.focusedIcon.opacity = focusPercent
   m.focusedLabel.opacity = focusPercent
+
+  if m.sideIconLabel <> invalid
+    m.sideIconLabelFocused.opacity = focusPercent
+    m.sideIconLabel.opacity = 1 - focusPercent
+  end if
+
+  if itemContent.selected = true
+    if m.top.gridHasFocus = true
+      m.Icon.opacity = 1 - focusPercent
+      m.focusedIcon.opacity = focusPercent
+      m.Icon.uri = m.top.itemContent.filledIconUrl
+      m.focusedIcon.uri = m.top.itemContent.filledIconUrl
+    else
+      m.focusedIcon.opacity = 1 - focusPercent
+      m.Icon.opacity = focusPercent
+      m.focusedIcon.uri = m.top.itemContent.iconUrl
+    end if
+  else
+    m.Icon.opacity = 1 - focusPercent
+    m.focusedIcon.opacity = focusPercent
+    m.Icon.uri = m.top.itemContent.iconUrl
+    m.focusedIcon.uri = m.top.itemContent.iconUrl
+  end if
 End Function
 
 
 Function onActiveChange()
+  theme = getThemeFromGlobal()
   if m.top.itemContent.active = true
     '//is the side nav open/active?
     if m.top.itemContent.turnedOn <> false
@@ -137,6 +154,10 @@ Function onActiveChange()
       m.Icon.opacity = 1
       fade(m.subTxt, "out", .3)
       if m.sideIconLabel <> invalid
+        if theme <> invalid
+          m.sideIconLabelFocused.fontColor = theme.primaryTextColor
+          m.sideIconLabelFocused.blendColor = theme.focusedTextColor
+        end if
         fade(m.sideIconLabel, "in", .3)
       end if
 
@@ -147,26 +168,44 @@ Function onActiveChange()
       m.Icon.opacity = .31
       fade(m.subTxt, "out", .3)
       if m.sideIconLabel <> invalid
+        if theme <> invalid
+          m.sideIconLabelFocused.fontColor = theme.primaryTextColor
+          m.sideIconLabelFocused.blendColor = theme.focusedTextColor
+        end if
         fade(m.sideIconLabel, "in", .3, 0, .31)
       end if
 
       fade(m.Label, "in", .3, 0, .31)
     end if
+
+    if m.top.itemContent.selected = true
+      if m.top.gridHasFocus = true
+        m.focusedIcon.uri = m.top.itemContent.filledIconUrl
+      else
+        m.Icon.uri = m.top.itemContent.filledIconUrl
+      end if
+    else
+      m.Icon.uri = m.top.itemContent.iconUrl
+      m.focusedIcon.opacity = m.top.itemContent.iconUrl
+    end if
+
   else
     '//when the side nav is minimized.
     fade(m.Label, "out", .3)
     m.focusedLabel.opacity = 0
     m.focusedIcon.opacity = 0
-
-
     m.Icon.opacity = 1
-    if m.sideIconLabel <> invalid
+
+    if m.sideIconLabel <> invalid AND m.sideIconLabelFocused <> invalid
       fade(m.sideIconLabel, "out", .3)
+      fade(m.sideIconLabelFocused, "out", .3)
     end if
-    
+
     if m.top.itemContent.selected = true
+      m.Icon.uri = m.top.itemContent.filledIconUrl
       fade(m.subTxt, "out", .3)
     else
+      m.Icon.uri = m.top.itemContent.iconUrl
       fade(m.subTxt, "in", .3)
     end if
   end if
@@ -180,4 +219,39 @@ Function onHeightChange()
   m.focusedIcon.translation = [m.Icon.translation[0], nIconY]
   m.Label.height = nHeight
   m.focusedLabel.height = nHeight
+End Function
+
+
+'@sideIconLabelText: String, this is the shortDescriptionLine2 text on the item.
+Function createSideIconLabels(sideIconLabelText)
+  theme = getThemeFromGlobal()
+  m.sideIconLabel = m.labelParent.createChild("TextIcon")
+  m.sideIconLabel.id = "SideIconLabel"
+
+  m.sideIconLabel.padding = [12, 9]
+  m.sideIconLabel.uri = "pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
+  m.sideIconLabel.opacity = 0
+  m.sideIconLabel.translation = [0, 15]
+
+  m.sideIconLabelFocused = m.labelParent.createChild("TextIcon")
+  m.sideIconLabelFocused.id = "SideIconLabel"
+
+  m.sideIconLabelFocused.padding = [12, 9]
+  m.sideIconLabelFocused.uri = "pkg:/images/tag-rounded-rectangle-background-pull-$$RES$$.9.png"
+  m.sideIconLabelFocused.opacity = 0
+  m.sideIconLabelFocused.translation = [0, 15]
+
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.sideIconLabel, typographyConstants.ids.bodyExtraSmallStrong)
+  setTypographyOfLabel(m.sideIconLabelFocused, typographyConstants.ids.bodyExtraSmallStrong)
+
+  'Set the text after setting the Typography label so that it will not return the wrong width for label.
+  m.sideIconLabel.text = sideIconLabelText
+  m.sideIconLabelFocused.text = sideIconLabelText
+
+  if theme <> invalid
+    m.sideIconLabel.fontColor = theme.backgroundColor
+    m.sideIconLabelFocused.fontColor = theme.primaryTextColor
+  end if
+
 End Function

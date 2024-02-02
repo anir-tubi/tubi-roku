@@ -7,6 +7,8 @@ Function init()
   m.top.observeField("focusedChild", "onComponentFocus")
   m.top.observeField("selectItem", "onSelectItem")
   m.top.observeField("isLoading", "onIsLoading")
+  m.Title = m.top.findNode("Title")
+  m.Instructions = m.top.findNode("Instructions")
   m.ContentGroup = m.top.findNode("ContentGroup")
   m.Menu = m.top.findNode("ParentalControlsMenu")
 
@@ -25,7 +27,10 @@ Function init()
   theme = getThemeFromGlobal()
   if theme <> invalid
     m.Menu.focusBitmapBlendColor = theme.focusedColor
+    m.Title.color = theme.primaryTextColor
+    m.Instructions.color = theme.primaryTextColor
   end if
+
   ' Adding a transparent 1px image since leaving it empty causes roku to use it's default.
   ' We do not want to show unfocused background as per designs.
   m.Menu.focusFootprintBitmapUri = "pkg:/images/transparent.png"
@@ -36,16 +41,14 @@ End Function
 
 
 Function setParentalControlStrings()
-  Title = m.top.findNode("Title")
-  Title.text = getTranslation("screenSettings_menu_parentalControls")
-  Instructions = m.top.findNode("Instructions")
-  Instructions.text = getTranslation("screenSettings_parentalControls_instructions")
+  m.Title.text = getTranslation("screenSettings_menu_parentalControls")
+  m.Instructions.text = getTranslation("screenSettings_parentalControls_instructions")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(Title, typographyConstants.ids.headerSmall)
-  setTypographyOfLabel(Instructions, typographyConstants.ids.bodyMedium)
+  setTypographyOfLabel(m.Title, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.Instructions, typographyConstants.ids.bodyMedium)
 
-  m.instructionsText = Title.text + " " + Instructions.text
+  m.instructionsText = m.Title.text + " " + m.Instructions.text
 
   nWidestWidth = 0
   newContent = m.Menu.content.clone(true)
@@ -68,7 +71,6 @@ Function setParentalControlStrings()
   m.Menu.itemSize = [nWidestWidth, m.Menu.itemSize[1]]
 
   m.Menu.content = newContent
-
 End Function
 
 
@@ -79,9 +81,9 @@ End Function
 
 
 Function onComponentFocus()
- if m.top.isInFocusChain() AND m.top.hasFocus()
-   m.Menu.setFocus(true)
- end if
+  if m.top.isInFocusChain() AND m.top.hasFocus()
+    m.Menu.setFocus(true)
+  end if
 End Function
 
 Function onSelectItem()

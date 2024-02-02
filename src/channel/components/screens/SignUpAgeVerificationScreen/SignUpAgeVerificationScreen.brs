@@ -34,7 +34,7 @@ Function init()
 
   m.top.screenLevel = m.constants.ui.screenLevels.ageGateScreen
 
-  m.backgroundUriList = [m.constants.ui.uris.marketingBackground]
+  m.backgroundUriList = []
 
   m.top.observeFieldScoped("focusedChild", "onComponentFocusChanged")
   m.NumberPad.observeFieldScoped("text", "onNumberPadTextChanged")
@@ -67,9 +67,9 @@ Function onThemeChange(msg = invalid)
   end if
   
   if theme <> invalid
-    m.ErrorPrompt.color = theme.cautionColor
-    m.AgeErrorPrompt.color = theme.cautionColor
-    m.AgeWarningPrompt.color = theme.cautionColor
+    m.ErrorPrompt.color = theme.focused2Color
+    m.AgeErrorPrompt.color = theme.focused2Color
+    m.AgeWarningPrompt.color = theme.focused2Color
     m.infoLabel.color = theme.primaryTextColor
     m.Header.color = theme.primaryTextColor
     m.AgePrefixLabel.color = theme.primaryTextColor

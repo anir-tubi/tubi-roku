@@ -39,38 +39,38 @@
           id="InnerLayout"
           layoutDirection="vert"
           itemSpacings="[9]">
-            <Label
-              id="InnerTitle"
-              width="471"
-              height="27"
-              vertAlign="top"
-              visible="false">
-              <Font
-                role="font"/>
-            </Label>
-            <Label
-              id="TimeRemaining"
-              width="381"
-              height="24"
-              vertAlign="top"
-              visible="false">
-              <Font
-                role="font"/>
-            </Label>
-            <Group>
-              <Rectangle
-                id="DurationBar"
-                opacity=".2"
-                height="6"
-                width="0"
-                visible="false"/>
-              <Rectangle
-                id="ResumeProgressBar"
-                height="6"
-                width="0"
-                visible="false"/>
-              </Group>
-          </LayoutGroup>
+          <Label
+            id="InnerTitle"
+            width="471"
+            height="27"
+            vertAlign="top"
+            visible="false">
+            <Font
+              role="font"/>
+          </Label>
+          <Label
+            id="TimeRemaining"
+            width="381"
+            height="24"
+            vertAlign="top"
+            visible="false">
+            <Font
+              role="font"/>
+          </Label>
+          <Group>
+            <Rectangle
+              id="DurationBar"
+              opacity=".2"
+              height="6"
+              width="0"
+              visible="false"/>
+            <Rectangle
+              id="ResumeProgressBar"
+              height="6"
+              width="0"
+              visible="false"/>
+          </Group>
+        </LayoutGroup>
       </Poster>
       <Label
         id="Title"

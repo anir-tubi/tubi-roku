@@ -11,7 +11,6 @@ Function showSearchScreen()
 
   searchScreen.isUserEligibleForTrendingSearchBelowExperiment = (isUserInAdultsMode() = true AND isDeviceInUS() = true AND isKidsUIOn() = false)
   searchScreen.id = m.constants.ui.screenIds.searchScreen
-  searchScreen.backgroundUriList = [m.defaultBackgroundUri]
   searchScreen.searchText = "" '//Set searchText to "" to initiate the search screen and load the default "search results"
 
   pushScreen(searchScreen, true, true)

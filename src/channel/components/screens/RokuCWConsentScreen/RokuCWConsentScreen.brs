@@ -49,13 +49,14 @@ Function init()
   end if
 
   onThemeChange()
-  
+
   topRef.trackingPageInfo = {
     pageType: "onboarding_page"
     pageValues: {
       name: "continue_watching_consent"
     }
   }
+  m.top.backgroundUriList = []
 End Function
 
 
@@ -115,7 +116,7 @@ Function onItemFocusedChange(msg)
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean) as Boolean 
+Function onKeyEvent(key As String, press As Boolean) as Boolean
   if press AND key = "back"
     m.top.backButtonSelected = true
     return true

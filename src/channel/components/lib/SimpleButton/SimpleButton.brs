@@ -96,7 +96,11 @@ Function onScreenFocusChange()
   if m.top.hasFocus() then
     if m.theme <> invalid
       m.focus9Patch.blendColor = m.theme.focusedColor
-      m.label.color = m.theme.focusedTextColor
+      if m.top.isFilled = false
+        m.label.color = m.theme.primaryTextColor
+      else
+        m.label.color = m.theme.focusedTextColor
+      end if
     end if
     m.focus9Patch.opacity = 1.0
   else

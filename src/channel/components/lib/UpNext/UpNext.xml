@@ -72,8 +72,8 @@
     <Poster
       id="UpNextGradient"
       width="1920"
-      height="1080"
-      translation="[0,0]"
+      height="688"
+      translation="[0,392]"
       opacity="0.0"
       uri="pkg:/images/up-next-gradient-$$RES$$.9.png"/>
     <Group

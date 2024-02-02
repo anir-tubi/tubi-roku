@@ -237,19 +237,19 @@
         id="logoGroup">
         <Poster
           id="tubiLogo"
-          width="309"
+          width="462"
           height="135"
           uri="pkg:/images/logo-white-xlarge.png"
           loadSync="true"
-          translation="[810,382]"/>
+          translation="[734,382]"/>
         <Poster
           id="tubiKidsLogo"
-          width="632"
+          width="726"
           height="135"
           uri="pkg:/images/locale/en_US/logo-kids-white-xlarge.png"
           loadSync="true"
           visible="false"
-          translation="[648,382]"/>
+          translation="[608,382]"/>
         </Group>
       <Label
         id="LoadingMessage"
@@ -342,7 +342,7 @@
     <SimpleButton
       id="SkipCuepointsButton"
       isFilled="false"
-      visible="false"/>
+      visible="false" />
 
     <Group
       id="HUD"
@@ -470,66 +470,66 @@
         height="390"
         translation="[0,0]"
         uri="pkg:/images/rating_gradient.png"/>
+      <LayoutGroup
+        id="ratingBarAndLabel"
+        vertAlignment="top"
+        layoutDirection="horiz"
+        translation="[126,142]"
+        itemSpacings="[12]">
+        <Rectangle
+          id="ratingBar"
+          width="2"
+          height="87"/>
         <LayoutGroup
-          id="ratingBarAndLabel"
-          vertAlignment="top"
-          layoutDirection="horiz"
-          translation="[126,142]"
-          itemSpacings="[12]">
-          <Rectangle
-            id="ratingBar"
-            width="2"
-            height="87"/>
+          id="ratingAndGenre"
+          layoutDirection="vert"
+          itemSpacings="[18]">
           <LayoutGroup
-            id="ratingAndGenre"
-            layoutDirection="vert"
-            itemSpacings="[18]">
-            <LayoutGroup
-              id="ratingLayout"
-              layoutDirection="horiz"
-              itemSpacings="[8]"
-              vertAlignment="center">
-              <Label
-                height="42"
-                vertAlign="bottom"
-                id="ratedLabel">
-                <Font
-                  role="font"/>
-              </Label>
-              <Group
-                id="ratingGroup">
-                <Poster
-                  id="RatingBackground"
-                  height="36"
-                  uri="pkg:/images/ratingBackground.9.png"
-                  loadSync="true"/>
-                <Label
-                  id="ratingLabel"
-                  height="36"
-                  width="0"
-                  opacity="0.8"
-                  numLines="1"
-                  wrap="false"
-                  translation="[0,3]"
-                  horizAlign="center"
-                  vertAlign="center">
-                  <Font
-                    role="font"/>
-                </Label>
-              </Group>
-              <Label
-                id="descriptorCode">
-                <Font
-                  id="Vaud22px"
-                  role="font"/>
-              </Label>
-            </LayoutGroup>
+            id="ratingLayout"
+            layoutDirection="horiz"
+            itemSpacings="[8]"
+            vertAlignment="center">
             <Label
-              id="descriptorDesc">
+              height="42"
+              vertAlign="bottom"
+              id="ratedLabel">
               <Font
                 role="font"/>
             </Label>
+            <Group
+              id="ratingGroup">
+              <Poster
+                id="RatingBackground"
+                height="36"
+                uri="pkg:/images/ratingBackground.9.png"
+                loadSync="true"/>
+              <Label
+                id="ratingLabel"
+                height="36"
+                width="0"
+                opacity="0.8"
+                numLines="1"
+                wrap="false"
+                translation="[0,3]"
+                horizAlign="center"
+                vertAlign="center">
+                <Font
+                  role="font"/>
+              </Label>
+            </Group>
+            <Label
+              id="descriptorCode">
+              <Font
+                id="Vaud22px"
+                role="font"/>
+            </Label>
           </LayoutGroup>
+          <Label
+            id="descriptorDesc">
+            <Font
+              role="font"/>
+          </Label>
+        </LayoutGroup>
       </LayoutGroup>
     </Group>
 

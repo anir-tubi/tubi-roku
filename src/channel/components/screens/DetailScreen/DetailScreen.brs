@@ -79,7 +79,6 @@ Function init()
   m.RelatedGrid.observeFieldScoped("itemFocused", "onRelatedItemFocused")
   m.Info.observeFieldScoped("descriptionSelected", "onDescriptionSelected")
 
-  m.defaultHeroUri = "pkg:/images/art-blur-background.webp"
   setInitialMenuItems()
   setInitialSecondaryMenuItems()
 

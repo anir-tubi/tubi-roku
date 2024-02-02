@@ -14,11 +14,6 @@
   </interface>
 
   <children>
-    <Poster
-      id="background"
-      width="1920"
-      height="1080"
-      translation="[0,0]"/>
     <LayoutGroup
       translation="[192, 126]"
       itemSpacings="[15, 48]" >

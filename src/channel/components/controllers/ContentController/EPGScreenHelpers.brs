@@ -48,7 +48,6 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
 
     epgScreen.shouldFocusWhenPushed = m.top.fadeInContentController
 
-    epgScreen.backgroundUriList = [m.defaultBackgroundUri]
 
     epgScreen.id = screenID
 

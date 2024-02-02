@@ -9,16 +9,17 @@
  -->
 <component name="BackgroundGroup" extends="Group">
   <script type="text/brightscript" uri="BackgroundGroup.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
-  <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
-  <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rodash/rodash.cat.brs" />
 
   <interface>
     <!-- INPUT -->
     <!-- backgroundInfo has the keys "type (string)" and "uriList (array)".
          type can be "topright", "fullscreen", "linear"
          uriList is an array of background image uris
+         uriList is only meant to be used as of now for Content background images (usually in the top right corner of the screen). Used in Content screen like home, mystuff and details screen.
          For simplicity shouldRotateBackgrounds is set back to true when backgroundInfo is set
     -->
     <field id="backgroundInfo" type="assocarray" />
@@ -31,38 +32,42 @@
 
   <children>
     <Poster
-      id="background"
+      id="defaultBackground"
       width="1920"
       height="1080"/>
+
     <Group
-      id="PosterGroup">
+      id="topRightContentPosterGroup">
       <BackgroundPosterGroup
-        id="Poster1"
+        id="poster1"
         posterOpacity="0.0" />
       <BackgroundPosterGroup
-        id="Poster2"
+        id="poster2"
         posterOpacity="1.0"/>
+      <Poster
+        id="posterGroupMask"
+        width="1122"
+        opacity="0"
+        translation="[801, 0]"
+        height="747"/>
     </Group>
+    
     <Group
-      id="GradientGroup">
-      <BackgroundGradientGroup
-        id="FullScreenGradient"
-        uri="pkg:/images/detail-gradient-25.webp"
-        gradientOpacity="1.0"/>
-      <MultipleGradientGroup
-        id="LeftBottomGradient"/>
-      <BackgroundGradientGroup
-        id="LinearGradient1"
-        uri="pkg:/images/horizGradientEPG.webp"
-        gradientOpacity="0.0"/>
-      <BackgroundGradientGroup
-        id="LinearGradient2"
-        uri="pkg:/images/vertGradientEPG.webp"
-        gradientOpacity="0.0"/>
-      <BackgroundGradientGroup
-        id="LeftGradient"
-        uri="pkg:/images/leftGradient.webp"
-        gradientOpacity="0.0"/>
+      id="circularMaskLayer"
+      opacity="0">
+      <Poster
+        id="maskLayer10"
+        width="822"
+        height="1080"/>
+      <Poster
+        id="maskLayer11"
+        translation="[822, 0]"
+        width="266"
+        height="1080"/>
+      <Poster
+        id="maskLayer2"
+        width="1920"
+        height="1080"/> 
     </Group>
   </children>
 </component>

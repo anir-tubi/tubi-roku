@@ -5,6 +5,7 @@
     <!-- INPUTS -->
     <field id="iconUrl" type="string" value=""/>
     <field id="badgeText" type="string" value=""/>
+    <field id="contentItemType" type="string" value=""/>
     <!-- Should the unfocused background be displayed? -->
     <field id="isUnfocusedFootprintEnabled" type="boolean" value="false"/>
 

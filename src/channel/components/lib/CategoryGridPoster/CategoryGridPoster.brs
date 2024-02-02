@@ -226,7 +226,7 @@ Function drawProgressBar(nowPos, duration)
 
   theme = getThemeFromGlobal()
   if theme <> invalid
-    m.resumeProgressBar.color = theme.focusedColor
+    m.resumeProgressBar.color = theme.primaryTextColor
   end if
 
   m.resumeProgressBar.visible = true
@@ -303,6 +303,7 @@ Function setUpEmptyContainer()
   m.myStuffEmptyLayout.subtitle = m.top.itemContent.description
   m.myStuffEmptyLayout.iconUri = m.top.itemContent.iconUrl
   m.myStuffEmptyLayout.visible = true
+  m.poster.opacity = 0
 End Function
 
 

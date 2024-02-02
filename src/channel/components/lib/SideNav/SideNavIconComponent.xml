@@ -47,7 +47,7 @@
       id="LabelParent"
       translation="[84, 3]"
       layoutDirection="horiz"
-      itemSpacings="[12]"
+      itemSpacings="[12, -72]"
       vertAlignment="custom">
       <Group>
         <Label

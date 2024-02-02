@@ -7,6 +7,7 @@ Function init()
   m.multiStyleLayout = m.top.findNode("multiStyleLayout")
   m.imagesSection = m.top.findNode("imagesSection")
   m.mask = m.top.findNode("mask")
+  m.semiCircle = m.top.findNode("semiCircle")
 
   m.top.observeFieldScoped("buttons", "formatDialog")
   m.top.observeFieldScoped("multiStyleMessage", "formatDialog")
@@ -20,8 +21,8 @@ Function init()
   m.shade.color = m.constants.ui.themes.default.shadeColor
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.header, typographyConstants.ids.headerSmall)
-  setTypographyOfLabel(m.subheader, typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(m.header, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.subheader, typographyConstants.ids.subheaderSmall)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -42,7 +43,6 @@ Function onThemeChange(msg = invalid)
   if m.theme <> invalid
     m.header.color = m.theme.primaryTextColor
     m.subheader.color = m.theme.secondaryTextColor
-    m.dialogBox.color = m.constants.ui.themes.extended.brandPurple
   end if
 
 End Function
@@ -83,27 +83,21 @@ Function formatDialog()
     end if
 
     numButtons = m.top.buttons.Count()
-    m.buttonList.numColumns = numButtons
+    m.buttonList.numRows = numButtons
     m.buttonList.content = newContent
-    buttonListWidth = getHorizontalButtonListWidth(m.buttonList.itemSize[0], numButtons, 30, 48) 'space between buttons = 30;  left/right padding = 48
+    buttonListWidth = m.buttonList.itemSize[0] + 92 '46 padding each side
     ' If the button list width is less than current settings than not overriding it so that we don't have background cut-off.
     ' This happens when we have only one button.
     if buttonListWidth > m.dialogBox.width
       m.dialogBox.width = buttonListWidth
     end if
 
-    ' Center aligning the button if only one button present.
-    if numButtons = 1
-      padding = 48
-      buttonListTranslationX = (m.dialogBox.width - buttonListWidth) / 2 + padding
-      m.buttonList.translation = [buttonListTranslationX, m.buttonList.translation[1]]
-    end if
-
-    dialogBoxTranslationX = 1920 - m.dialogBox.width - 51
-    m.dialogBox.translation = [dialogBoxTranslationX, m.dialogBox.translation[1]]
+    dialogBoxTranslationX = 1920 - m.dialogBox.width
+    m.semiCircle.translation = [dialogBoxTranslationX - 160 , 0 ]
+    m.dialogBox.translation = [dialogBoxTranslationX, 0]
     m.mask.width = m.dialogBox.width
-    m.subHeader.width = m.dialogBox.width - 96
-    m.header.width = m.dialogBox.width - 96
+    m.subHeader.width = m.dialogBox.width - 200
+    m.header.width = m.dialogBox.width - 200
   end if
 
   if m.top.multiStyleMessage <> invalid AND m.top.multiStyleMessage.Count() > 0 AND m.multiStyleLayout.getChildCount() = 0
@@ -120,7 +114,6 @@ Function formatDialog()
       end if
 
       multiStyleMsgGroup.sideIcon = multiMsg.iconUri
-      m.dialogBox.height = m.dialogBox.height + 140 'each group is 80 height + 60 gap between next item
 
       m.multiStyleLayout.appendChild(multiStyleMsgGroup)
     end for
@@ -153,8 +146,6 @@ Function formatDialog()
       m.imagesSection.translation = [translationX, 0]
 
       imageTranslations = [[0, 0]]
-      ' Adjusting the height of the modal to account for images.
-      m.mask.height = 1008
     else
       ' For now since we only support 1 or 3 images layout.
       ' Once we have other variations we will add conditions and settings based on a new layout.
@@ -169,8 +160,6 @@ Function formatDialog()
       imageTranslations = [[0, 48], [87, 0], [243, 48]]
       ' Adjusting image section translation to have left side gutter width.
       m.imagesSection.translation = [112, 0]
-      ' Adjusting the height of the modal to account for images.
-      m.mask.height = 951
     end if
 
     index = 0

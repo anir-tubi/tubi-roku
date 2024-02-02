@@ -140,9 +140,6 @@ Function init()
   'this variable is used to stop unnecessary execution of the entire showHideLogo function when content been focused.
   m.logoType = m.constants.logoType.tubi
 
-  m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
-  m.marketingBackgroundUri = m.constants.ui.uris.marketingBackground
-
   ' Global state
   m.global.addField("bookmarkIds", "node", false)
   m.global.bookmarkIds = CreateObject("roSGNode", "BookmarkContentNode")
@@ -1584,8 +1581,8 @@ End Function
 Function displayDefaultBackground()
   TubiLog("ContentController.displayDefaultBackground")
   m.backgroundGroup.backgroundInfo = {
-    type: getBackgroundType([m.defaultBackgroundUri])
-    uriList: [m.defaultBackgroundUri]
+    type: m.constants.ui.backgroundTypes.fullScreen
+    uriList: []
   }
 End Function
 
@@ -1622,15 +1619,13 @@ End Function
 ' @backgroundUriList, array of uris
 ' @contentType, String - depending on the focused on content, it will determine the background type
 Function getBackgroundType(backgroundUriList, contentType = "")
-
-  backgroundType = m.constants.ui.backgroundTypes.topRight
-  if backgroundUriList <> invalid
-    if backgroundUriList[0] = m.defaultBackgroundUri
-      backgroundType = m.constants.ui.backgroundTypes.fullScreen
-    else if backgroundUriList[0] = m.marketingBackgroundUri
-      backgroundType = m.constants.ui.backgroundTypes.marketingScreen
-    else if contentType = m.constants.ui.contentTypes.linear OR contentType = m.constants.ui.contentTypes.epg
+  backgroundType = m.constants.ui.backgroundTypes.fullScreen
+  ' backgroundUriList will only be empty when the background type is full screen, we do not expect it to be empty for topRight version of background.
+  if isNonEmptyArray(backgroundUriList) = true
+    if contentType = m.constants.ui.contentTypes.linear OR contentType = m.constants.ui.contentTypes.epg
       backgroundType = m.constants.ui.backgroundTypes.epg
+    else
+      backgroundType = m.constants.ui.backgroundTypes.topRight
     end if
   end if
   return backgroundType

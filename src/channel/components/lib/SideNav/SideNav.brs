@@ -19,7 +19,6 @@ Function init()
   m.top.observeFieldScoped("createMenuItems", "onCreateMenuItems")
   m.ItemGroups = m.top.findNode("itemGroups")
   m.MainContent = m.top.findNode("MainContent")
-  m.sideNavBackground = m.top.findNode("sideNavBackground")
   m.background = m.top.findNode("background")
 End Function
 
@@ -41,25 +40,32 @@ Function createMainContent(item)
   contentNode.id = item
   if item = m.constants.ui.sideNavIds.kidsMode
     contentNode.title = getTranslation("menu_kids")
-    contentNode.iconUrl = "pkg:/images/sideNavKids.png"
+    contentNode.iconUrl = "pkg:/images/sideNavKids.webp"
+    contentNode.filledIconUrl = "pkg:/images/sideNavKidsFilled.webp"
   else if item = m.constants.ui.sideNavIds.search
     contentNode.title = getTranslation("menu_search")
-    contentNode.iconUrl = "pkg:/images/sideNavSearch.png"
+    contentNode.iconUrl = "pkg:/images/sideNavSearch.webp"
+    contentNode.filledIconUrl = "pkg:/images/sideNavSearchFilled.webp"
   else if item = m.constants.ui.sideNavIds.home
     contentNode.title = getTranslation("menu_home")
     contentNode.iconUrl = "pkg:/images/sideNavHome.webp"
+    contentNode.filledIconUrl = "pkg:/images/sideNavHomeFilled.webp"
   else if item = m.constants.ui.sideNavIds.espanol
     contentNode.title = "Español"
-    contentNode.iconUrl = "pkg:/images/sideNavEspanol.png"
+    contentNode.iconUrl = "pkg:/images/sideNavEspanol.webp"
+    contentNode.filledIconUrl = "pkg:/images/sideNavEspanolFilled.webp"
   else if item = m.constants.ui.sideNavIds.myList
     contentNode.title = getTranslation("menu_mystuff")
-    contentNode.iconUrl = "pkg:/images/icon-add-to-queue.webp"
+    contentNode.iconUrl = "pkg:/images/sideNavMyStuff.webp"
+    contentNode.filledIconUrl = "pkg:/images/sideNavMyStuffFilled.webp"
   else if item = m.constants.ui.sideNavIds.categories
     contentNode.title = getTranslation("menu_categories")
     contentNode.iconUrl = "pkg:/images/sideNavCategories.webp"
+    contentNode.filledIconUrl = "pkg:/images/sideNavCategoriesFilled.webp"
   else if item = m.constants.ui.sideNavIds.channels
     contentNode.title = getTranslation("menu_channels")
     contentNode.iconUrl = "pkg:/images/sideNavChannels.webp"
+    contentNode.filledIconUrl = "pkg:/images/sideNavChannelsFilled.webp"
   else if item = m.constants.ui.sideNavIds.profile
     ' m.top.stringSignIn may have been set before SideNav.createMainContent() was called
     ' so use it if it exists
@@ -79,14 +85,16 @@ Function createMainContent(item)
       contentNode.ShortDescriptionLine2 = ""
     end if
 
-
-    contentNode.iconUrl = "pkg:/images/icon-sign-in.webp"
+    contentNode.iconUrl = "pkg:/images/sideNavAccount.webp"
+    contentNode.filledIconUrl = "pkg:/images/sideNavAccountFilled.webp"
   else if item = m.constants.ui.sideNavIds.settings
     contentNode.title = getTranslation("menu_settings")
     contentNode.iconUrl = "pkg:/images/sideNavSettings.webp"
+    contentNode.filledIconUrl = "pkg:/images/sideNavSettingsFilled.webp"
   else if item = m.constants.ui.sideNavIds.exit
     contentNode.title = getTranslation("menu_exit")
     contentNode.iconUrl = "pkg:/images/sideNavExit.png"
+    contentNode.filledIconUrl = "pkg:/images/sideNavExit.png"
   end if
   m[item + "Content"] = contentNode
 
@@ -336,7 +344,6 @@ Function onUiModeChanged()
     removeEspanol()
     removeMyList()
     verticallyCenterSideNav()
-    m.sideNavBackground.uri = m.constants.ui.uris.sideNavBackground_kidsMode
   else if m.top.uiMode = m.constants.ui.modes.latino
     ' latino - nothing should change
     if m.channelsContent <> invalid then m.channelsContent.turnedOn = true
@@ -344,7 +351,6 @@ Function onUiModeChanged()
     if m.tvContent <> invalid then m.tvContent.turnedOn = true
     if m.espanolContent <> invalid then m.espanolContent.turnedOn = true
     if m.kidsModeContent <> invalid then m.kidsModeContent.title = getTranslation("menu_kids")
-    m.sideNavBackground.uri = ""
   else if m.top.uiMode = m.constants.ui.modes.standard
     ' standard
     if m.channelsContent <> invalid then m.channelsContent.turnedOn = true
@@ -355,7 +361,6 @@ Function onUiModeChanged()
       m.kidsModeContent.turnedOn = true
       m.kidsModeContent.title = getTranslation("menu_kids")
     end if
-    m.sideNavBackground.uri = ""
   end if
 
   ' change the color of the focus indicator(s) as necessary
@@ -369,7 +374,6 @@ Function setCommonSideNavKidsValues()
   if m.tvContent <> invalid then m.tvContent.turnedOn = false
   if m.espanolContent <> invalid then m.espanolContent.turnedOn = false
   if m.kidsModeContent <> invalid then m.kidsModeContent.title = getTranslation("menu_exitKids")
-  m.sideNavBackground.uri = m.constants.ui.uris.sideNavBackground_kidsMode
 End Function
 
 
@@ -454,14 +458,10 @@ Function onOpenedChanged()
       list.setFocus(true)
     end if
 
-    fade(m.sideNavBackground, "in", 0.2)
-
     setContentActive(m.MainContent)
     animateItemSize(m.mainItems, m.mainItemsOriginalItemSize, 0.2)
     resize(m.background, m.mainItemsOriginalItemSize[0], m.mainItemsOriginalItemSize[1], 0.2)
   else
-    fade(m.sideNavBackground, "out", 0.2)
-
     setContentActive(m.MainContent, false)
     animateItemSize(m.mainItems, [108, m.mainItems.itemSize[1]], 0.2)
     resize(m.background, 100, m.mainItems.itemSize[1], 0.2)

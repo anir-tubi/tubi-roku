@@ -43,12 +43,8 @@
       <!-- Trigger to update the menu items -->
       <field id="contentUpdated" type="boolean" alwaysNotify="true" />
 
-      <!-- Used to decouple focus state from UI state since there are 3 ui states and only
-           2 focus states. Acceptable values are "focused", "unfocusedNear", "unfocusedFar", where
-           "unfocusedClose" indicates that the focus is near the top nav component (ie. 1st row of
-           the home grid) and "unfocusedFar" indicates that the focus is far from the top nav
-           component (ie. 2nd or greater row of the homegrid) -->
-      <field id="uiState" type="string" />
+      <!-- Used to know whether topNav is focused or not. -->
+      <field id="isFocused" type="boolean" alwaysNotify="true" />
 
       <!-- If the top nav has focus, and a back button press navigates to the default top nav item,
            then there should be no NavigateWithinPageEvent. This field indicates if we are currently
@@ -90,7 +86,7 @@
   <children>
     <Poster
       id="TopNavMenuBground"
-      width="900"
+      width="948"
       height="84"
       opacity="0.16"
       uri="pkg:/images/tab_component_alt_$$RES$$.9.png"/>
@@ -100,7 +96,7 @@
       translation="[12,12]"
       rowHeights="[60]"
       itemSize="[150, 60]"
-      itemSpacing="[0, 0]"
+      itemSpacing="[12, 0]"
       numColumns="5"
       numRows="1"
       focusBitmapUri="pkg:/images/pill_top_nav_$$RES$$.9.png"

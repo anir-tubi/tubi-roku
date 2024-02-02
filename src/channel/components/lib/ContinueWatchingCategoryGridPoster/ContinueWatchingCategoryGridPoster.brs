@@ -18,6 +18,7 @@ Function init()
   m.button = m.top.findNode("button")
   contentNode = CreateObject("roSGNode", "DetailMenuItemContentNode")
   contentNode.title = sButton
+  contentNode.contentItemType = "continueWatching"
   m.button.itemContent = contentNode
 
 

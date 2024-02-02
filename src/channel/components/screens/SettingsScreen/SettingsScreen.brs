@@ -45,13 +45,28 @@ Function init()
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.Title, typographyConstants.ids.headerSmall)
 
-  m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
+  m.top.backgroundUriList = []
   m.top.screenLevel = m.constants.ui.screenLevels.settingsScreen
   m.top.instantResumeAction = m.constants.instantResumeActions.startChannel
 
   request = TubiRequest(m.constants.settings)
   auth = TubiAuth(m.constants, request)
   m.Tracking = TubiTracking(m.constants, request, auth)
+
+  onThemeChange()
+End Function
+
+
+Function onThemeChange(msg = invalid)
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
+
+  if theme <> invalid
+    m.Title.color = theme.primaryTextColor
+  end if
 End Function
 
 
@@ -94,7 +109,7 @@ End Function
 Function onDetailScreenMenuItemFocused()
   tubiLog("SettingsScreen.onDetailScreenMenuItemFocused")
   m.Title.opacity = 1.0
-  m.top.backgroundUriList = [m.constants.ui.uris.defaultBackground]
+  m.top.backgroundUriList = []
 End Function
 
 
@@ -104,7 +119,7 @@ Function onComponentFocusChange()
     if m.top.hasFocus() = true
       m.SettingsMenuPanel.setFocus(true)
     else
-      m.Title.opacity = 0.3
+      m.Title.opacity = 0.7
     end if
   end if
 End Function

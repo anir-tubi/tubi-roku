@@ -3,8 +3,7 @@ Function init()
   '//This var is used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.contentLoadedAndFocused = false
   m.constants = getConstantsFromGlobal()
-  m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
-
+  
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
@@ -161,7 +160,7 @@ Function onItemFocused(msg)
       if type(content.backgrounds) = "roArray" AND content.backgrounds.count() > 0
         m.top.backgroundUriList = content.backgrounds
       else
-        m.top.backgroundUriList = [m.defaultBackgroundUri]
+        m.top.backgroundUriList = []
       end if
 
       numColumns = m.VideoGrid.numColumns

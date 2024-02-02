@@ -4,7 +4,6 @@ Function init()
   m.contentLoadedAndFocused = false
   m.constants = getConstantsFromGlobal()
 
-  m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
@@ -146,7 +145,7 @@ Function onItemFocused()
 
     numColumns = m.ChannelCategoryGrid.numColumns
     category = m.top.content.getChild(item)
-    m.top.backgroundUriList = [m.defaultBackgroundUri]
+    m.top.backgroundUriList = []
 
     if m.contentLoadedAndFocused = true
       ' Do not send out tracking when the grid is initially loaded. When an item 1st gain focus, this indicates that the grid was just loaded.

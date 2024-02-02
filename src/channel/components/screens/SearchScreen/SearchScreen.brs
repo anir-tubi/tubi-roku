@@ -81,13 +81,8 @@ Function init()
 
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("signedIn", "onSignedInChange")
-  m.top.observeField("visible", "onVisible")
   m.top.observeField("contentUpdated", "onSearchContentChange")
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
-
-  m.defaultHeroUri = "pkg:/images/art-blur-background.webp"
-
-  m.top.backgroundUriList = [m.defaultHeroUri]
 
   'set initial tracking values
   m.top.trackingPageInfo = {
@@ -126,6 +121,7 @@ Function init()
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
+
   onThemeChange()
 End Function
 
@@ -215,13 +211,6 @@ Function displayLoading(b = true)
   m.spinner.visible = b
 End Function
 
-Function onVisible()
-  if m.top.visible = true
-    if m.top.backgroundUriList.Count() = 0
-      m.top.backgroundUriList = [m.defaultHeroUri]
-    end if
-  end if
-End Function
 
 '''''''''''''''''''''''''
 ' onScreenFocusChange
@@ -230,6 +219,7 @@ End Function
 ' This is used when the search screen regains focus after coming back from the details page.
 Function onScreenFocusChange()
   if m.top.hasFocus() then
+    m.top.backgroundUriList = []
     if m.bResultsInFocus = true
       if m.isTrendingResultsGridInFocus = false AND m.ResultGrid.content <> invalid AND m.ResultGrid.content.getChildCount() > 0
         m.ResultGrid.setFocus(true)
@@ -737,7 +727,8 @@ End Function
 
 
 Function handleInfoPanelVisibilityForLeftPress()
-  m.top.backgroundUriList = [m.defaultHeroUri]
+  ' Setting background to empty so that we display full screen background.
+  m.top.backgroundUriList = []
   if m.searchMenuText.text <> "" AND m.searchMenuText.text <> m.searchTitleText
     m.searchScreenInfoPanel.visible = false
   else

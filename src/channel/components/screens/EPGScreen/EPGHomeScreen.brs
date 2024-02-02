@@ -38,7 +38,6 @@ Function init()
   m.firstTime = true
 
   'm.top
-  m.defaultBackgroundUri = "pkg:/images/art-blur-background.webp"
   m.top.screenLevel = m.constants.ui.screenLevels.epgScreen
   m.top.observeField("updateTimeGridContent", "onTimeContentChange")
   m.top.observeField("focusedChild", "onScreenFocusChange")
@@ -46,7 +45,7 @@ Function init()
   m.top.observeField("id", "onIDChange")
   m.top.observeField("refreshTopNav", "onRefreshTopNav")
   m.top.observeField("visible", "onVisibleChange")
-  m.top.backgroundUriList = [m.defaultBackgroundUri]
+  m.top.backgroundUriList = []
   m.top.handlesTransportVoiceRequests = true
   m.top.observeFieldScoped("signedIn", "onSignedInChange")
   m.top.trackingPageInfo = {
@@ -258,7 +257,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
           m.top.topNavToggled = false
           m.top.navigatedAwayFromTopNav = true
 
-          setTopNavUi(m.epgTimeGrid.currFocusRow)
+          m.topNav.isFocused = false
           fadeInContentArea()
 
           ' return false so contentController screen stack can use the back button press
@@ -285,7 +284,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
           m.top.topNavToggled = false
           m.top.navigatedAwayFromTopNav = true
 
-          setTopNavUi(m.epgTimeGrid.currFocusRow)
+          m.topNav.isFocused = false
           fadeInContentArea()
 
           return false
@@ -311,7 +310,7 @@ Function setFocusOntoTopNav(isToggle)
   end if
 
   m.top.refreshEPGScreenVideoPlay = true
-  m.topNav.uiState = "focused"
+  m.topNav.isFocused = true
   m.topNav.setFocus(true)
   fadeOutContentArea()
 End Function
@@ -325,9 +324,9 @@ Function setFocusOnEpgTimeGrid()
     m.top.topNavToggled = false
   end if
 
-  ' is necessary to set the uiState before the focus, so the topNav itemContents
+  ' is necessary to set the isFocused before the focus, so the topNav itemContents
   ' can have the appropriate color values set once they react to the focus change
-  setTopNavUi(m.epgTimeGrid.currFocusRow)
+  m.topNav.isFocused = false
   m.epgTimeGrid.setFocusedToPlay = true
 
   fadeInContentArea()
@@ -349,21 +348,7 @@ Function onRefreshTopNav()
   tubiLog("EPGHomeScreen.onRefreshTopNav")
   m.topNav.content = generateTopNavContentItems()
   m.topNav.contentUpdated = true
-  m.TopNav.uiState = "unfocusedNear"
-End Function
-
-
-' This function does not check for focus. Any checks needed to determine if top nav has
-' focus or not should be done prior to calling this function.
-'
-' @focusRowIndex: integer, the 0 based index of the row that is focused
-Function setTopNavUi(focusRowIndex)
-  tubilog("EPGHomeScreen.setTopNavUi")
-  if focusRowIndex = 0
-    m.topNav.uiState = "unfocusedNear"
-  else
-    m.topNav.uiState = "unfocusedFar"
-  end if
+  m.TopNav.isFocused = false
 End Function
 
 
@@ -424,7 +409,7 @@ End Function
 '@row: integer, the row of the epgTimeGrid that is gaining focus
 Function setTopNavFarAwayStatus(row)
   if m.TopNav.visible = true AND (m.TopNav.hasFocus() = false AND m.TopNav.isInFocusChain() = false)
-    setTopNavUi(row)
+    m.TopNav.isFocused = false
   end if
 End Function
 

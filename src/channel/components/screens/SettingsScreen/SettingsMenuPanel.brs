@@ -75,7 +75,7 @@ Function setSettingsSidePanelMenuItems()
       subType: "DetailMenuItemContentNode"
       id: "SignInOutButton"
       title: getTranslation("menu_signIn")
-      iconUrl: "pkg:/images/icon-sign-in.webp"
+      iconUrl: "pkg:/images/icon-sign-in-out.webp"
       displayOrder: 5
     },
     "testAid": {
@@ -147,7 +147,7 @@ Function onComponentFocus()
       m.SettingsMenu.setFocus(true)
     end if
   else
-    m.top.opacity = 0.3
+    m.top.opacity = 0.7
   end if
 End Function
 

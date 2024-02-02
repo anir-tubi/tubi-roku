@@ -48,8 +48,6 @@ Function init()
   m.CategoryGridList.observeField("currFocusColumn", "onCurrFocusColumnChange")
   m.CategoryGridList.observeField("rowFocused", "onRowFocused")
 
-  m.defaultBackgroundUri = m.constants.ui.uris.defaultBackground
-
   'used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.gridHasGainedInitialFocus = false
 
@@ -122,7 +120,7 @@ Function onRefreshTopNav()
   includeLinearTV = m.top.isLinearTVAllowedInTopNav
   m.topNav.content = generateTopNavContentItems(includeLinearTV)
   m.topNav.contentUpdated = true
-  m.TopNav.uiState = "unfocusedNear"
+  m.TopNav.isFocused = false
   m.TopNav.jumpToID = m.TopNav.selectedId   '//when refreshing the top nav, ensure the nav is back on previous selected button
 End Function
 
@@ -277,7 +275,7 @@ End Function
 '@row: integer, the row of the categoryGridList that is gaining focus
 Function setTopNavFarAwayStatus(row)
   if m.TopNav.visible = true AND (m.TopNav.hasFocus() = false AND m.TopNav.isInFocusChain() = false)
-    setTopNavUi(row)
+    m.topNav.isFocused = false
   end if
 End Function
 
@@ -725,9 +723,9 @@ Function setFocusOntoTopNav(isToggle)
     ' Do not set top nav toggle event if the top nav is gaining focus from another page.
     m.top.topNavToggled = true
   else
-    ' setting handlingFocusFromOtherTopNavBackButton to true before calling setTopNavUi() informs
+    ' setting handlingFocusFromOtherTopNavBackButton to true before setting isFocused to false informs
     ' the top nav not to send a NavigateWithinPageEvent when jumping focus. We immediately
-    ' reset the value back to false after setTopNavUi() is called so that the default value
+    ' reset the value back to false after we set isFocused to false so that the default value
     ' is in place as soon as possible, with the understanding that the top nav behavior will
     ' fully resolve before continuing on with further logic within this function.
     m.TopNav.handlingFocusFromOtherTopNavBackButton = true
@@ -738,27 +736,14 @@ Function setFocusOntoTopNav(isToggle)
     m.top.pauseVideoPreview = true
   end if
 
-  ' is necessary to set the uiState before the focus, so the topNav itemContents
+  ' is necessary to set the isFocused before the focus, so the topNav itemContents
   ' can have the appropriate color values set once they react to the focus change
-  m.TopNav.uiState = "focused"
+  m.TopNav.isFocused = true
 
   m.TopNav.setFocus(true)
   m.TopNav.handlingFocusFromOtherTopNavBackButton = false
 
   fadeOutContentArea()
-End Function
-
-
-' This function does not check for focus. Any checks needed to determine if top nav has
-' focus or not should be done prior to calling this function.
-'
-' @focusRowIndex: integer, the 0 based index of the row that is focused
-Function setTopNavUi(focusRowIndex)
-  if focusRowIndex = 0
-    m.topNav.uiState = "unfocusedNear"
-  else
-    m.topNav.uiState = "unfocusedFar"
-  end if
 End Function
 
 
@@ -768,18 +753,18 @@ Function setFocusOnCategoryGrid()
     ' only send top nav toggle event if the top nav is losing focus
     m.top.topNavToggled = false
 
-    ' setting losingFocusToComponentOnSamePage to true before calling setTopNavUi() informs
+    ' setting losingFocusToComponentOnSamePage to true before setting isFocused to false informs
     ' the top nav not to send a NavigateWithinPageEvent when jumping focus. We immediately
-    ' reset the value back to false after setTopNavUi() is called so that the default value
+    ' reset the value back to false after setting isFocused to false is called so that the default value
     ' is in place as soon as possible, with the understanding that the top nav behavior will
     ' fully resolve before continuing on with further logic within this function.
     m.topNav.losingFocusToComponentOnSamePage = true
   end if
 
 
-  ' is necessary to set the uiState before the focus, so the topNav itemContents
+  ' is necessary to set the isFocused before the focus, so the topNav itemContents
   ' can have the appropriate color values set once they react to the focus change
-  setTopNavUi(m.CategoryGridList.currFocusRow)
+  m.topNav.isFocused = false
   m.topNav.losingFocusToComponentOnSamePage = false
 
   fadeInContentArea()
@@ -834,7 +819,7 @@ Function onKeyEvent(key, press) as boolean
             ' is in place as soon as possible, with the understanding that the top nav behavior will
             ' fully resolve before continuing on with further logic within this function.
             m.topNav.losingFocusToExternalComponent = true
-            setTopNavUi(m.categoryGridList.currFocusRow)
+            m.TopNav.isFocused = false
 
             m.topNav.losingFocusToExternalComponent = false
 
@@ -868,7 +853,7 @@ Function onKeyEvent(key, press) as boolean
           m.top.topNavToggled = false
           m.top.navigatedAwayFromTopNav = true
 
-          setTopNavUi(m.categoryGridList.currFocusRow)
+          m.TopNav.isFocused = false
           fadeInContentArea()
 
           return false

@@ -8,8 +8,8 @@ Function init()
   topRef.observeFieldScoped("gridHasFocus", "onGridHasFocusChange")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.label, typographyConstants.ids.bodySmallStrong)
-  setTypographyOfLabel(m.labelFocused, typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(m.label, typographyConstants.ids.bodyMediumStrong)
+  setTypographyOfLabel(m.labelFocused, typographyConstants.ids.bodyMediumStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -27,7 +27,7 @@ Function onThemeChange(msg = invalid)
   if theme <> invalid
     itemContent = m.top.itemContent
     if itemContent <> invalid then
-      m.labelFocused.color = theme.primaryTextColor
+      m.labelFocused.color = theme.backgroundColor
       ' If the mode is light then using inverse or light mode colors.
       if itemContent.mode = "light"
         m.label.color = theme.inversePrimaryTextColor

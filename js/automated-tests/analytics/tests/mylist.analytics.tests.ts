@@ -8,7 +8,7 @@ import {
 	addTheFreakBrothersTVShowToHistory,
 	addZappedTitleToHistory,
 	addZappedTitleToMyList,
-	addTheFreakBrothersTVShowToMyList,
+	addTheFreakBrothersTVShowToMyList
 } from '../utils/userManipulations';
 import { ecp, utils } from 'roku-test-automation';
 import {
@@ -165,7 +165,7 @@ describe('My List events', function () {
 		await verifyC439649(342067);
 	});
 
-	it('Analytics: Registered User - How many users select one TV Show title within My List and land on the titleâ€™s details page? C439651 @analytics,@analyticsMyList', async () => {
+  it('Analytics: Registered User - How many users select one TV Show title within My List and land on the titleâ€™s details page? C439651 @analytics,@analyticsMyList', async () => {
 		const user = await testUtils.createRegisteredUser();
 		await addTheFreakBrothersTVShowToMyList(user);
 		await testUtils.startApplicationAtPage('home', { user: user });

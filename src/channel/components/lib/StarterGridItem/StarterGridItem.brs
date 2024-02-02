@@ -50,7 +50,6 @@ Function onItemContentChange(msg)
 
     sPosterURL = itemContent.HDGRIDPOSTERURL
     m.poster.uri = sPosterURL
-
     m.poster.visible = true
   else
     m.poster.visible = false
@@ -68,7 +67,7 @@ Function onItemContentChange(msg)
     end if
 
     if m.childGridItem <> invalid then
-      ' Go ahead and pass along the itemContent to the child
+      ' Pass along the itemContent to the child
       m.childGridItem.itemContent = itemContent
     end if
   end if

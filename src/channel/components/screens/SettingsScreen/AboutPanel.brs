@@ -9,4 +9,12 @@ Function init()
   setTypographyOfLabel(TextOne, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(TitleTwo, typographyConstants.ids.headerSmall)
   setTypographyOfLabel(TextTwo, typographyConstants.ids.bodyMedium)
+
+  theme = getThemeFromGlobal()
+  if theme <> invalid
+    TitleOne.color = theme.primaryTextColor
+    TextOne.color = theme.primaryTextColor
+    TitleTwo.color = theme.primaryTextColor
+    TextTwo.color = theme.primaryTextColor
+  end if
 End Function

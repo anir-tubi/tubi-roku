@@ -32,10 +32,10 @@ Function onThemeChange(msg = invalid)
   
   if theme <> invalid
     'TODO: Colors will be updated once the re-brand color updates done.
-    m.categoryCountText.color = theme.focusedColor
+    m.categoryCountText.color = theme.primaryTextColor
     m.categoryText.color = theme.primaryTextColor
     m.focusedCategoryText.color = theme.focusedTextColor
-    m.categoryCountBackground.blendColor = theme.focusedTextColor
+    m.categoryCountBackground.blendColor = theme.backgroundColor
   end if
 End Function
 

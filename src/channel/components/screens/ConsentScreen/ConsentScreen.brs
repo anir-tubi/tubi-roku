@@ -37,10 +37,6 @@ Function init()
 
   m.buttonList.content = buttonList
 
-  ' Setting background.
-  background = topRef.findNode("background")
-  background.uri = m.constants.ui.uris.marketingBackground
-
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

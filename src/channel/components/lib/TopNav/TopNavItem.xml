@@ -18,28 +18,25 @@
   </interface>
 
   <children>
-    <Label
-      id="BottomLabel"
-      translation="[36, 23]"
+    <Poster
+      id="selectedBackground"
+      height="60"
       opacity="0"
+      uri="pkg:/images/top-nav-selected-unfocused-$$RES$$.9.png"/>
+    <Label
+      id="unfocusedTopLabel"
+      translation="[36, 24]"
       width="150">
       <Font
-          id="Font"
-          role="font"/>
+          role="font" />
     </Label>
     <Label
-      id="TopLabel"
-      translation="[36, 23]"
-      width="150">
-      <Font
-          role="font"
-          size="20" />
-    </Label>
-    <Rectangle
-      id="Underline"
-      height="2"
+      id="focusedBottomLabel"
+      translation="[36, 24]"
       width="150"
-      translation="[36,40]"
-      opacity="0" />
+      opacity="0">
+      <Font
+          role="font" />
+    </Label>
   </children>
 </component>
