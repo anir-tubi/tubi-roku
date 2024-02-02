@@ -405,44 +405,44 @@
             id="StartButton"
             width="60"
             height="60"
-            uri="pkg:/images/transport/sgplayer/icon-to-start.png"
+            uri="pkg:/images/transport/sgplayer/icon-to-start.webp"
             translation="[540,110]" />
           <TransportButton
             id="RewindButton"
             width="60"
             height="60"
-            uri="pkg:/images/transport/sgplayer/icon-rew.png"
+            uri="pkg:/images/transport/sgplayer/icon-rew.webp"
             translation="[672,110]" />
           <TransportButton
             id="HopBackButton"
             width="60"
             height="60"
-            uri="pkg:/images/transport/sgplayer/icon-rew-30s.png"
+            uri="pkg:/images/transport/sgplayer/icon-rew-30s.webp"
             translation="[800,110]" />
           <!-- play/pause uri will update based on playing state of video -->
           <TransportButton
             id="PlayPauseButton"
             width="60"
             height="60"
-            uri="pkg:/images/transport/sgplayer/icon-play.png"
+            uri="pkg:/images/transport/sgplayer/icon-play.webp"
             translation="[930,110]" />
           <TransportButton
             id="HopForwardButton"
             width="60"
             height="60"
-            uri="pkg:/images/transport/sgplayer/icon-fwd-30s.png"
+            uri="pkg:/images/transport/sgplayer/icon-fwd-30s.webp"
             translation="[1060,110]" />
           <TransportButton
             id="FastForwardButton"
             width="60"
             height="60"
-            uri="pkg:/images/transport/sgplayer/icon-ffw.png"
+            uri="pkg:/images/transport/sgplayer/icon-ffw.webp"
             translation="[1190,110]" />
           <TransportButton
             id="EndButton"
             width="60"
             height="60"
-            uri="pkg:/images/transport/sgplayer/icon-to-end.png"
+            uri="pkg:/images/transport/sgplayer/icon-to-end.webp"
             translation="[1320,110]" />
           <TransportButton
             id="closedCaptionAudioButton"
