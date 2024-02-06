@@ -93,8 +93,8 @@ Function createMainContent(item)
     contentNode.filledIconUrl = "pkg:/images/sideNavSettingsFilled.webp"
   else if item = m.constants.ui.sideNavIds.exit
     contentNode.title = getTranslation("menu_exit")
-    contentNode.iconUrl = "pkg:/images/sideNavExit.png"
-    contentNode.filledIconUrl = "pkg:/images/sideNavExit.png"
+    contentNode.iconUrl = "pkg:/images/sideNavExit.webp"
+    contentNode.filledIconUrl = "pkg:/images/sideNavExit.webp"
   end if
   m[item + "Content"] = contentNode
 
