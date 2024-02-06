@@ -1049,7 +1049,7 @@ Function showRegistrationWelcomeModal()
   multiMessage[0] = {
     header: getTranslation("onBoarding_landingScreen_addListLabel")
     subHeader: getTranslation("reg_first_line_sub_item")
-    iconUri: "pkg:/images/icon-plus.webp"
+    iconUri: "pkg:/images/icon-add-to-queue.webp"
   }
 
   multiMessage[1] = {
@@ -1061,7 +1061,7 @@ Function showRegistrationWelcomeModal()
   multiMessage[2] = {
     header: getTranslation("reg_third_line_item")
     subHeader: getTranslation("reg_third_line_sub_item")
-    iconUri: "pkg:/images/icon-profile-large.png"
+    iconUri: "pkg:/images/icon-account.webp"
   }
 
   dialogEvent = {

@@ -85,7 +85,7 @@ Function createMainContent(item)
       contentNode.ShortDescriptionLine2 = ""
     end if
 
-    contentNode.iconUrl = "pkg:/images/sideNavAccount.webp"
+    contentNode.iconUrl = "pkg:/images/icon-account.webp"
     contentNode.filledIconUrl = "pkg:/images/sideNavAccountFilled.webp"
   else if item = m.constants.ui.sideNavIds.settings
     contentNode.title = getTranslation("menu_settings")

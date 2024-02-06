@@ -137,6 +137,7 @@ Function addButtonsToModal(modal, buttonInfo)
   modal.observeFieldScoped("exitButton", "onModalButtonSelected")
 End Function
 
+
 Function getMultiStyleModal(modalInfo)
   modal = CreateObject("roSgNode", "MultiStyleDialogScreen")
   header = modalInfo.header
