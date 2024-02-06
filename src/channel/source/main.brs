@@ -308,7 +308,11 @@ Function runChannel(constants, log, request, auth)
         end if
       else if field = "remoteComponentsUrl"
         ' Will get used later once the component library has finished loading
-        m.remoteComponentLibProvided = msg.getInfo().remoteComponentLibProvided
+        remoteComponentLibProvided = msg.getInfo().remoteComponentLibProvided
+        if remoteComponentLibProvided <> invalid then
+          m.remoteComponentLibProvided = remoteComponentLibProvided
+        end if
+
         print "m.remoteComponentLibProvided"; m.remoteComponentLibProvided
 
         'starter components have indicated the url to use for remote components
