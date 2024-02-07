@@ -126,17 +126,29 @@ Function onFocusPercentChange()
 
   if itemContent.selected = true
     if m.top.gridHasFocus = true
-      m.Icon.opacity = 1 - focusPercent
+      if itemContent.turnedOn = true
+        m.Icon.opacity = 1 - focusPercent
+      else
+        m.Icon.opacity = .31
+      end if
       m.focusedIcon.opacity = focusPercent
       m.Icon.uri = m.top.itemContent.filledIconUrl
       m.focusedIcon.uri = m.top.itemContent.filledIconUrl
     else
       m.focusedIcon.opacity = 1 - focusPercent
-      m.Icon.opacity = focusPercent
+      if itemContent.turnedOn = true
+        m.Icon.opacity = focusPercent
+      else
+        m.Icon.opacity = .31
+      end if
       m.focusedIcon.uri = m.top.itemContent.iconUrl
     end if
   else
-    m.Icon.opacity = 1 - focusPercent
+    if itemContent.turnedOn = true
+      m.Icon.opacity = 1 - focusPercent
+    else
+      m.Icon.opacity = .31
+    end if
     m.focusedIcon.opacity = focusPercent
     m.Icon.uri = m.top.itemContent.iconUrl
     m.focusedIcon.uri = m.top.itemContent.iconUrl
