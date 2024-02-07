@@ -52,9 +52,9 @@ manifest:
   title: "Tubi"
   mm_icon_focus_hd: "pkg:/locale/images/channel-icon-hd-290x218.png"
   mm_icon_focus_sd: "pkg:/locale/images/channel-icon-sd-246x140.png"
-  splash_screen_fhd: "pkg:/images/splash-fhd.jpg"
-  splash_screen_hd: "pkg:/images/splash-hd.jpg"
-  splash_screen_sd: "pkg:/images/splash-sd.jpg"
+  splash_screen_fhd: "pkg:/images/splash-fhd.webp"
+  splash_screen_hd: "pkg:/images/splash-hd.webp"
+  splash_screen_sd: "pkg:/images/splash-sd.webp"
   bs_libs_required: "roku_ads_lib"
   # We have a workaround for 9-patch handling when ui_resolutions is "fhd" and scaling down for non-4k devices.
   # If we ever add "sd" or "hd", the workaround will also need to be removed.
