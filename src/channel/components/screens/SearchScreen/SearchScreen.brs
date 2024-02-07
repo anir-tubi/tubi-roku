@@ -249,7 +249,7 @@ End Function
 
 
 Function displayNoResults()
-  m.ResultGrid.visible = false
+  m.gridContainer.visible = false
   m.NoResultsMessage.visible = true
   m.NoResultsMessage.text = getTranslation("screenSearch_noResults", {term: m.top.searchText})
 End Function
@@ -325,6 +325,7 @@ Function onSearchContentChange()
     m.ResultGrid.jumpToItem = 0
     m.trendingSearchResultGrid.jumpToItem = 0
     m.gridContainer.translation = [0, 0]
+    m.gridContainer.visible = true
     m.isTrendingResultsGridInFocus = false
 
     if content.isDefaultSearchResults = true
