@@ -17,7 +17,7 @@ Function init()
     x: -20
     y: 0
   }
-  
+
   m.searchGroup = m.top.findNode("searchGroup")
 
   m.PageGroup = m.top.findNode("PageGroup")
@@ -96,7 +96,7 @@ Function init()
   ' Used to know if the grid was in focus especially when user returns from the detailed screen and we know to set the focus back to the results
   m.bResultsInFocus = false
 
-  ' Holds the boolean true|false value which indicates if the trending search grid was in focus. 
+  ' Holds the boolean true|false value which indicates if the trending search grid was in focus.
   ' This is used so that we can set focus back to it if the user moved away from it to keyboard or details screen.
   m.isTrendingResultsGridInFocus = false
 
@@ -316,7 +316,7 @@ Function onSearchContentChange()
     end if
   end if
 
-  
+
   if content <> invalid AND content.getChildCount() > 0 then
     ' Resetting the values to default on every new search term to clear out previous navigation/scroll history.
     m.noMatchingResultsMessage.visible = false
@@ -346,7 +346,7 @@ Function onSearchContentChange()
       ' Setting the visibility of trending searches if we have result.
       if trendingSearchContent <> invalid AND trendingSearchContent.getChildCount() > 0
         m.trendingResultsHint.visible = false
-        if m.top.isUserEligibleForTrendingSearchBelowExperiment = true AND getExperimentResource("roku_trending_search_below", "roku_trending_search_below_v1", true).enabled = true
+        if m.top.isUserEligibleForTrendingSearchBelowExperiment = true AND getExperimentResource("roku_trending_search_below", "roku_trending_search_below_v1", false).enabled = true
           m.trendingSearchResultsContainer.visible = true
           m.trendingResultsHint.visible = true
           if content.getChildCount() > 5
@@ -367,7 +367,7 @@ Function onSearchContentChange()
     m.NoResultsMessage.visible = false
   else
     ' If it is not kids mode and the user is in experiment display the trending search instead of no content message.
-    if m.top.isUserEligibleForTrendingSearchBelowExperiment = true AND getExperimentResource("roku_trending_search_below", "roku_trending_search_below_v1", false).enabled = true
+    if m.top.isUserEligibleForTrendingSearchBelowExperiment = true AND getExperimentResource("roku_trending_search_below", "roku_trending_search_below_v1", true).enabled = true
       m.ResultGrid.visible = false
       trendingSearchContent = m.trendingSearchResultGrid.content
       if trendingSearchContent <> invalid AND trendingSearchContent.getChildCount() > 0
@@ -569,7 +569,7 @@ Function onResultGridCurrFocusRowChange(msg)
   if fraction < 1 AND m.top.isUserEligibleForTrendingSearchBelowExperiment = true AND getExperimentResource("roku_trending_search_below", "roku_trending_search_below_v1", true).enabled = true
     translationY = 672 - ((1 - fraction) * 298)
     m.trendingSearchResultsContainer.translation = [0, translationY]
-  end if  
+  end if
 End Function
 
 
