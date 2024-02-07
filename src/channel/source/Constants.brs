@@ -623,7 +623,7 @@ Function getConstants()
     constants.urls.channelLogoBrandedSuffix = "/logo_center.png"
 
     ' animationLogo Url which plays during app launch
-    constants.urls.animationLogo = "http://cdn.adrise.tv/video/roku/animation_logo_2.mp4"
+    constants.urls.animationLogo = "http://cdn.adrise.tv/video/roku/animation_logo_3.mp4"
 
     ' The background large images on the continue watching container row when the user is signed out
     constants.urls.continueWatchingItemBackground_largePoster = "https://cdn.adrise.tv/image/roku_support_images/continueWatchingItemBackground_largePoster.webp"
