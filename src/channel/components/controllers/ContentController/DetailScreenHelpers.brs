@@ -2281,16 +2281,15 @@ End Function
 Function addToQueueSuccessResponse(response)
   tubiLog("DetailScreenHelpers.addToQueueSuccessResponse")
   detailScreen = getTopDetailScreenFromStack()
+  if response <> invalid
+    bookmarkId = response.id
 
-  if detailScreen <> invalid
-    if response <> invalid
-      bookmarkId = response.id
+    if bookmarkId <> invalid
+      handleQueueChange()
 
-      if bookmarkId <> invalid
+      if detailScreen <> invalid
         sendBookmarkAnalytics(detailScreen.content, "ADD_TO_QUEUE", m.Tracking, m.trackingLoggingTask, m.constants)
-        handleQueueChange()
       end if
-
     end if
   end if
 End Function
