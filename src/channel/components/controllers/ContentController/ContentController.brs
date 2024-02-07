@@ -2450,7 +2450,7 @@ End Function
 
 ' This function helps keep track of each video player's state so that we can know when we enter the new "stopping" state caused by using asyncStopSemantics=true.
 ' If we receive certain commands during this time we will queue those. Once state changes to "stopped" we can then trigger the queued command if one exists
-' @videoPlayerState: string, state as returned by Roku Video node
+' @videoPlayerState: string, state output field from LinearVideoPlayerScreen, VideoPreviewPlayer or VideoPlayerScreen
 Function trackVideoPlayerStoppingState(videoPlayerState)
   if videoPlayerState = "stopping" then
     m.isVideoPlayerStopping = true
@@ -2475,7 +2475,8 @@ Function waitForVideoPlayerStoppedState(videoPlayer)
 
   ' Since in some cases we set state to an empty string we also want to consider this to be a stopped state
   if state <> "stopped" AND state <> "" then
-    videoPlayer.observeFieldScoped("state", "waitForVideoPlayerStoppedStateCallback")
+    ' We are intentionally using the nonscoped observer here to avoid having our observer be removed by other code executed by ContentController
+    videoPlayer.observeField("state", "waitForVideoPlayerStoppedStateCallback")
   else
     trackVideoPlayerStoppingState(state)
   end if
@@ -2488,7 +2489,8 @@ Function waitForVideoPlayerStoppedStateCallback(msg)
   state = msg.getData()
   videoPlayer = msg.getRoSGNode()
   if state = "stopped" AND videoPlayer <> invalid then
-    videoPlayer.unobserveFieldScoped("state")
+    ' We are intentionally using the nonscoped unobserve here to match our nonscoped observer in waitForVideoPlayerStoppedState
+    videoPlayer.unobserveField("state")
   end if
   trackVideoPlayerStoppingState(state)
 End Function
