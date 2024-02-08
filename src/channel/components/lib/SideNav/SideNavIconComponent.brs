@@ -198,7 +198,7 @@ Function onActiveChange()
       end if
     else
       m.Icon.uri = m.top.itemContent.iconUrl
-      m.focusedIcon.opacity = m.top.itemContent.iconUrl
+      m.focusedIcon.uri = m.top.itemContent.iconUrl
     end if
 
   else
