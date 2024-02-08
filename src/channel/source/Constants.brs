@@ -1295,7 +1295,6 @@ Function getConstants()
     constants.ui.uris = {}
 
       'info panel images not populated from content backend
-      constants.ui.uris.infoPanelEpgLiveIcon = "pkg:/images/icon-live.webp"
       constants.ui.uris.infoPanelWorldCupLogo = "pkg:/images/fifa-world-cup-icon.webp"
 
       'category background thumbnails

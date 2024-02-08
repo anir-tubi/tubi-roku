@@ -48,6 +48,10 @@
     <field id="title" alias="Title.text" />
     <field id="leftHeaderImageUri" type="string" />
     <field id="topHeaderImageUri" alias="TopHeaderImage.uri" />
+    <field id="liveBadgeHeaderUri" alias="liveBadgeHeader.iconUri" />
+    <field id="liveBadgeHeaderText" alias="liveBadgeHeader.text" />
+    <field id="liveBadgeHeaderTextColor" alias="liveBadgeHeader.textColor" />
+     <field id="liveBadgeHeaderBackgroundColor" alias="liveBadgeHeader.backgroundColor" />
     <field id="episodeTitle" type="string" />
     <field id="description" type="string" />
     <field id="descriptionMaxLines" alias="Description.maxLines" />
@@ -129,6 +133,8 @@
         <Poster
           id="TopHeaderImage"
           visible="true"/>
+        <Badge
+          id="liveBadgeHeader"/>
 
         <LayoutGroup
           id="TitleGroup"

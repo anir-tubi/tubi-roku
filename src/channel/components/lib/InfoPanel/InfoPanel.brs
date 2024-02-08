@@ -6,6 +6,7 @@ Function init()
   m.offset = m.top.findNode("Offset")
   m.infoPanelGroup = m.top.findNode("infoPanelGroup")
   m.topHeaderImage = m.top.findNode("TopHeaderImage")
+  m.liveBadgeHeader = m.top.findNode("liveBadgeHeader")
   m.leftHeaderImage = m.top.findNode("LeftHeaderImage")
 
   m.title = m.top.findNode("Title")
@@ -817,7 +818,7 @@ Function onModeChange()
   else if m.top.mode = m.constants.ui.infoPanelModes.linearHomeScreen
     '//For when the linear player is on the home screen
     m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.topHeaderImage)
+    m.offset.appendChild(m.liveBadgeHeader)
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.descriptionGroup)
     m.offset.appendChild(m.playerCountdownGroup)
