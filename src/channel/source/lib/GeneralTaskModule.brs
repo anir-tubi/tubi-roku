@@ -327,11 +327,11 @@ End Function
 ' returns callback method from m.generalTaskCallbacks array and deletes entry.
 Function generalTask_getSuccessCallback(callbackNode)
   callback = invalid
-  if m.generalTaskCallbacks[callbackNode.id] <> invalid
+  if callbackNode <> invalid AND m.generalTaskCallbacks[callbackNode.id] <> invalid
     callback = m.generalTaskCallbacks[callbackNode.id].successCallback
+    m.generalTaskCallbacks.delete(callbackNode.id)
   end if
 
-  m.generalTaskCallbacks.delete(callbackNode.id)
   return callback
 End Function
 
