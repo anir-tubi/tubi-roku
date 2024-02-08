@@ -359,6 +359,11 @@ Function onSearchContentChange()
         else
           m.trendingSearchResultsContainer.visible = false
         end if
+
+        if content.getChildCount() <= 5
+          ' send the exposure event because the trending search results become visible in the peek
+          getExperimentResource("roku_trending_search_below", "roku_trending_search_below_v1", true)
+        end if
       else
         m.trendingSearchResultsContainer.visible = false
       end if
