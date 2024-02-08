@@ -96,7 +96,7 @@ Function init()
   m.isUpNextFocused = false
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.CountdownMovie, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.CountdownMovie, typographyConstants.ids.subheaderSmall)
   setTypographyOfLabel(m.CountdownSeries, typographyConstants.ids.subheaderMedium)
 
 End Function
