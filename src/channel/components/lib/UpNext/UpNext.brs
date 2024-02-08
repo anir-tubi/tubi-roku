@@ -97,7 +97,7 @@ Function init()
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.CountdownMovie, typographyConstants.ids.subheaderSmall)
-  setTypographyOfLabel(m.CountdownSeries, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(m.CountdownSeries, typographyConstants.ids.subheaderSmall)
 
 End Function
 
