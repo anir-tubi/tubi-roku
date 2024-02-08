@@ -30,12 +30,19 @@ Function onThemeChange(msg = invalid)
     theme = getThemeFromGlobal()
   end if
 
+  m.focusedColor = invalid
+  m.neutralColor = invalid
+  m.backgroundColor = invalid
+  m.primaryTextColor = invalid
+
   if theme <> invalid
     m.ButtonBG.blendColor = theme.neutralColor
     m.focusedColor = theme.focusedColor
     m.neutralColor = theme.neutralColor
-    m.ButtonText.fontColor = theme.primaryTextColor
-    m.badgeLabel.fontColor = theme.backgroundColor
+    m.backgroundColor = theme.backgroundColor
+    m.primaryTextColor = theme.primaryTextColor
+    m.ButtonText.color = m.primaryTextColor
+    m.badgeLabel.fontColor = m.backgroundColor
   end if
 End Function
 
@@ -78,9 +85,19 @@ End Function
 
 Function onScreenFocusChange()
   if m.top.hasFocus() = true
+    if m.top.isInGrid = false
+      m.ButtonIcon.blendcolor = m.backgroundColor
+      m.ButtonText.color = m.backgroundColor
+      m.badgeLabel.fontColor = m.primaryTextColor
+      m.badgeLabel.blendColor = m.backgroundColor
+    end if
     m.ButtonBG.blendcolor = m.focusedColor
   else
     m.ButtonBG.blendcolor = m.neutralColor
+    m.ButtonIcon.blendcolor = m.primaryTextColor
+    m.ButtonText.color = m.primaryTextColor
+    m.badgeLabel.fontColor = m.backgroundColor
+    m.badgeLabel.blendColor = m.primaryTextColor
   end if
 End Function
 

@@ -12,6 +12,7 @@
     <!-- INPUTS -->
     <field id="itemContent" type="node" />
     <field id="itemHasFocus" type="boolean" />
+    <field id="isInGrid" type="boolean" />
 
     <!-- OUTPUTS -->
     <field id="calculatedWidth" type="integer"/>

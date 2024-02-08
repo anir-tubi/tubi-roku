@@ -456,6 +456,7 @@
 
       <ButtonWithIconAndLabel
         id="signUpSaveProgressButton"
+        isInGrid="false"
         visible="false"/>
 
     </Group>  <!-- HUD -->

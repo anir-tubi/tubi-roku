@@ -10,6 +10,7 @@
   <interface>
     <!-- INPUTS -->
     <field id="itemContent" type="node" />
+    <field id="itemHasFocus" type="boolean" />
     <field id="height" type="float" />
   </interface>
 

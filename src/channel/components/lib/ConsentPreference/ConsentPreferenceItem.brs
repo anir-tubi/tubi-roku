@@ -1,5 +1,6 @@
 Function init()
   m.top.observeField("itemContent", "onItemContentChange")
+  m.top.observeFieldScoped("itemHasFocus", "onItemHasFocus")
   m.constants = getConstantsFromGlobal()
 
   m.title = m.top.findNode("title")
@@ -19,6 +20,17 @@ Function init()
 End Function
 
 
+Function onItemHasFocus()
+  if m.top.itemHasFocus = true
+    m.title.color = m.focusedTextColor
+    m.subtitle.color = m.focusedTextColor
+  else
+    m.title.color = m.primaryTextColor
+    m.subtitle.color = m.secondaryTextColor
+  end if
+End Function
+
+
 Function onThemeChange(msg = invalid)
   if msg <> invalid
     theme = msg.getData()
@@ -28,12 +40,16 @@ Function onThemeChange(msg = invalid)
 
   m.focusedTextColor = invalid
   m.tertiaryTextColor = invalid
+  m.secondaryTextColor = invalid
+  m.primaryTextColor = invalid
 
   if theme <> invalid
     m.focusedTextColor = theme.focusedTextColor
     m.tertiaryTextColor = theme.tertiaryTextColor
-    m.title.color = theme.primaryTextColor
-    m.subtitle.color = theme.secondaryTextColor
+    m.secondaryTextColor = theme.secondaryTextColor
+    m.primaryTextColor = theme.primaryTextColor
+    m.title.color = m.primaryTextColor
+    m.subtitle.color = m.secondaryTextColor
   end if
 End Function
 
