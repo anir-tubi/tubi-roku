@@ -75,7 +75,7 @@ Function setSettingsSidePanelMenuItems()
       subType: "DetailMenuItemContentNode"
       id: "SignInOutButton"
       title: getTranslation("menu_signIn")
-      iconUrl: "pkg:/images/icon-sign-in-out.webp"
+      iconUrl: "pkg:/images/icon-account.webp"
       displayOrder: 5
     },
     "testAid": {
