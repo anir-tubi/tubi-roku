@@ -285,7 +285,7 @@
           id="DetailInfoPanel"
           mode="item"
           translation="[0,165]"
-          maxHeight="433"
+          maxHeight="445"
           maxTitleLines="2"
           visible="false" />
 

@@ -159,10 +159,17 @@ End Function
 
 Function onComponentFocus()
   tubiLog("InfoPanel.onComponentFocus")
+  theme = getThemeFromGlobal()
   if m.top.isInFocusChain() AND  m.top.description <> invalid AND m.top.description <> ""
     m.descriptionFocusButton.visible = true
+    if theme <> invalid
+      m.Description.color = theme.inversePrimaryTextColor
+    end if
   else
     m.descriptionFocusButton.visible = false
+    if theme <> invalid
+      m.Description.color = theme.primaryTextColor
+    end if
   end if
 End Function
 
