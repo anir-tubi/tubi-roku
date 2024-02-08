@@ -48,8 +48,7 @@
       <LayoutGroup
         id="titleSubtitleGroup"
         layoutDirection="vert"
-        vertAlignment="center"
-        itemSpacings="[12]">
+        vertAlignment="center">
 
         <Label
           id="title"
