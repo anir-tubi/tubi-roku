@@ -333,7 +333,7 @@ const elements = typeCheckElements({
   },
 	
   homeScreenPoster: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#PosterGroup.#Poster2.#BackgroundPoster', 
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#topRightContentPosterGroup.#poster2.#BackgroundPoster', 
   },
 
   homeInfoPanel: {
@@ -1140,7 +1140,7 @@ const elements = typeCheckElements({
 
   /** top nav For You */
   selectedTopNavForYouItem: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.0.#Underline',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#topNav-home.#TopNavMenu.0',
   },
 
   /** top nav Movies */

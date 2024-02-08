@@ -124,6 +124,31 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		return await selectFocusedTitle(content);
 	}
 
+	async function selectFocusedTitleMovieWithSubtitles() {
+		let content;
+		let i;
+		await testUtils.untilTrue(
+			async () => {
+				await utils.sleep(800);
+				content = await testUtils.getCurrentlyFocusedGridItemContent(
+					NODES.MOVIE_SCREEN_ROW_LIST
+				);
+				if (content.has_subtitle) {
+					return true;
+				}
+				if (i == 7) {
+					await ecp.sendKeypress(ecp.Key.Down); // need this to change row
+					i = 0;
+				}
+				await ecp.sendKeypress(ecp.Key.Right);
+				i++;
+			},
+			'Cant find title with subtitles',
+			200000
+		);
+		return await selectFocusedTitle(content);
+	}
+
 	async function selectFocusedTitleKidsMode() {
 		await testUtils.retryWithTimeOut(async () => {
 			const kidsLogo = await elements.homeScreenKidsLogo();
@@ -364,6 +389,7 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		getSerialTag,
 		highlightTitleWithVideoPreview,
 		waitForPlayBackToStartForMovie,
+		selectFocusedTitleMovieWithSubtitles,
 		...SideNav(),
 		...TopNavMenu(),
 	};

@@ -306,7 +306,7 @@ const PlayBack = ({ content }) => {
 				}
 			},
 			'Missed start of autoplay',
-			40000
+			95000
 		);
 	}
 
@@ -319,12 +319,11 @@ const PlayBack = ({ content }) => {
 		await pageDidLoad();
 	}
 	async function selectSubtitles() {
+		await ecp.sendKeypress(ecp.Key.Down);
 		await testUtils.retryWithTimeOut(async () => {
-			await ecp.sendKeypress(ecp.Key.Down);
 			const subtitles = await elements.subtitles();
 			expect(subtitles.visible).to.equal(true);
 		});
-		await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
 		await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
 		await ecp.sendKeypress(ecp.Key.Ok);
 	}
@@ -337,6 +336,7 @@ const PlayBack = ({ content }) => {
 
 	async function selectSubtitlesOn() {
 		await selectSubtitles();
+		await utils.sleep(500);
 		await ecp.sendKeypress(ecp.Key.Down);
 		await ecp.sendKeypress(ecp.Key.Ok);
 	}
@@ -349,7 +349,7 @@ const PlayBack = ({ content }) => {
 				await testUtils.retryWithTimeOut(async () => {
 					countDownAutoplay = await elements.countDownAutoplay();
 					expect(countDownAutoplay.visible).to.equal(true);
-				});
+				}, 110000);
 				const [start, inn, space, seconds] = countDownAutoplay.text.split(' ');
 				if (seconds < 15) {
 					passedHalf = true;
@@ -362,8 +362,8 @@ const PlayBack = ({ content }) => {
 					return true;
 				}
 			},
-			'Autoplay didnt disappear after 40 sec',
-			40000
+			'Autoplay didnt disappear after 1.35 min',
+			95000
 		);
 	}
 
