@@ -164,7 +164,7 @@ Function onComponentFocus()
   if m.top.isInFocusChain() AND  m.top.description <> invalid AND m.top.description <> ""
     m.descriptionFocusButton.visible = true
     if theme <> invalid
-      m.Description.color = theme.inversePrimaryTextColor
+      m.Description.color = theme.backgroundColor
     end if
   else
     m.descriptionFocusButton.visible = false
