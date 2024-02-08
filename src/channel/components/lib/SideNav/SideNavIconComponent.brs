@@ -9,7 +9,7 @@ Function init()
   m.focusedLabel.opacity = 0
   m.focusedIcon.opacity = 0
   m.subTxt = m.top.findNode("subTxt")
-  m.labelParent = m.top.findNode("LabelParent")
+  m.sideIconParent = m.top.findNode("sideIconParent")
   m.top.observeFieldScoped("itemContent", "onContentChange")
   m.top.observeFieldScoped("height", "onHeightChange")
   m.top.observeFieldScoped("active", "onActiveChange")
@@ -80,15 +80,15 @@ Function onContentChange(data)
             createSideIconLabels(item.shortDescriptionLine2)
           end if
         else if item.shortDescriptionLine2 = "" AND m.sideIconLabel <> invalid AND m.sideIconLabelFocused <> invalid
-          m.labelParent.removeChild(m.sideIconLabel)
+          m.sideIconParent.removeChild(m.sideIconLabel)
           m.sideIconLabel = invalid
-          m.labelParent.removeChild(m.sideIconLabelFocused)
+          m.sideIconParent.removeChild(m.sideIconLabelFocused)
           m.sideIconLabelFocused = invalid
         end if
       else if m.sideIconLabel <> invalid AND m.sideIconLabelFocused <> invalid
-        m.labelParent.removeChild(m.sideIconLabel)
+        m.sideIconParent.removeChild(m.sideIconLabel)
         m.sideIconLabel = invalid
-        m.labelParent.removeChild(m.sideIconLabelFocused)
+        m.sideIconParent.removeChild(m.sideIconLabelFocused)
         m.sideIconLabelFocused = invalid
       end if
     end if
@@ -237,7 +237,7 @@ End Function
 '@sideIconLabelText: String, this is the shortDescriptionLine2 text on the item.
 Function createSideIconLabels(sideIconLabelText)
   theme = getThemeFromGlobal()
-  m.sideIconLabel = m.labelParent.createChild("TextIcon")
+  m.sideIconLabel = m.sideIconParent.createChild("TextIcon")
   m.sideIconLabel.id = "SideIconLabel"
 
   m.sideIconLabel.padding = [12, 9]
@@ -245,7 +245,7 @@ Function createSideIconLabels(sideIconLabelText)
   m.sideIconLabel.opacity = 0
   m.sideIconLabel.translation = [0, 15]
 
-  m.sideIconLabelFocused = m.labelParent.createChild("TextIcon")
+  m.sideIconLabelFocused = m.sideIconParent.createChild("TextIcon")
   m.sideIconLabelFocused.id = "SideIconLabel"
 
   m.sideIconLabelFocused.padding = [12, 9]

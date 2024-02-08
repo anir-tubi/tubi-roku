@@ -55,8 +55,8 @@
           vertAlign="center"
           opacity="0">
           <Font
-              id="Font"
-              role="font"/>
+            id="Font"
+            role="font"/>
         </Label>
         <Label
           id="focusedLabel"
@@ -64,10 +64,12 @@
           visible="false"
           opacity="0">
           <Font
-              id="focusedFont"
-              role="font"/>
+            id="focusedFont"
+            role="font"/>
         </Label>
       </Group>
+      <Group
+        id="sideIconParent"/>
     </LayoutGroup>
   </children>
 </component>
