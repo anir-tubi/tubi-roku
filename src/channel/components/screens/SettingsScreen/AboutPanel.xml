@@ -32,7 +32,7 @@
           height="353"
           width="1026"
           wrap="true"
-          translation="[0,120]">
+          translation="[0,99]">
           <Font
            role="font"/>
         </Label>
@@ -40,16 +40,16 @@
           id="TitleTwo"
           height="73"
           vertAlign="bottom"
-          translation="[0,239]">
+          translation="[0,249]">
           <Font
            role="font"/>
         </Label>
         <Label
           id="TextTwo"
-          height="500"
+          height="600"
           width="1026"
           wrap="true"
-          translation="[0,354]">
+          translation="[0,351]">
           <Font
            role="font"/>
         </Label>
