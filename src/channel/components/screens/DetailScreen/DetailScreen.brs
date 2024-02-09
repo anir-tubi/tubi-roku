@@ -1315,7 +1315,7 @@ Function setComponentInteractionEventForMenu(componentInteractionValue, menuItem
   if isAA(pageValues) = true AND pageValues.count() > 0 AND pageValues.series_id = 0
     pageValuesInfo = {}
 
-    if m.pageOriginDetails <> invalid
+    if pageOriginDetails <> invalid
       pageValuesInfo.sourceOrigin = pageOriginDetails.pageOrigin
       pageValuesInfo.functionName = pageOriginDetails.functionName
       pageValuesInfo.previousScreen =  pageOriginDetails.previousScreen
