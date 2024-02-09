@@ -124,7 +124,7 @@ Function onFocusPercentChange()
     m.sideIconLabel.opacity = 1 - focusPercent
   end if
 
-  if itemContent.selected = true
+  if itemContent <> invalid AND itemContent.selected = true
     if m.top.gridHasFocus = true
       if itemContent.turnedOn = true
         m.Icon.opacity = 1 - focusPercent
