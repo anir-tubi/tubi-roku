@@ -70,7 +70,7 @@ Function onThemeChange(msg = invalid)
     m.pageHeading.color = theme.primaryTextColor
     m.pageSubHeading.color = theme.primaryTextColor
     m.pageSubHeading2.color = theme.primaryTextColor
-    m.email.color = theme.focused2Color
+    m.email.color = theme.primaryTextColor
     m.changeEmailBtn.color = theme.backgroundColorLight2
     m.resendBtn.color = theme.backgroundColorLight2
   end if
