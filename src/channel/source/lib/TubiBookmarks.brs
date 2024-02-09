@@ -407,7 +407,7 @@ Function tubiBookmarks_handleUserInfo(userInfo)
     if parsed.parental_rating <> invalid
       result.parentalRating = parsed.parental_rating
 
-      if isGDPR() = true 'bs:disable-line 1001 LINT1001
+      if isGDPR(m.constants) = true 'bs:disable-line 1001 LINT1001
 
         'Setting Parental Control option to Older Kids for nz & uk region, if the parental option was selected as Teens from other region
         if parsed.parental_rating = 2

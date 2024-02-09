@@ -441,7 +441,9 @@ Function hideNavMenu(shouldTrackComponentInteraction = true)
 
     topScreen = getCurrentScreen()
     if topScreen <> invalid
-      topScreen.enabled = true
+      if topScreen.hasField("enabled")
+        topScreen.enabled = true
+      end if
 
       if shouldTrackComponentInteraction = true
         interactionEvent = getSideNavInteractionEvent(topScreen, m.Tracking, "off")

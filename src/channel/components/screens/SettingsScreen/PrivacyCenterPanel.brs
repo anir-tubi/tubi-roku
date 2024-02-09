@@ -101,24 +101,24 @@ Function onConsentSettingsChange(msg)
     m.nonEditableModeWarningMessage.visible = false
     ' Since if we place an array grid inside a layout group, it causes a jumping UI glitch when the grid is focused.
     ' To Avoid the UI issue we can manually adjust the position of the items based on the predecessor instead of using the LayoutGroup.
-    boundingRect = m.managePreferences.boundingRect()
-    translation = m.managePreferences.translation
-
-    buttonRect = m.saveAndContinueButton.boundingRect()
-    buttonTranslationY = boundingRect.height + translation[1]
+    managePrefsRect = m.managePreferences.boundingRect()
+    managePrefsTranslation = m.managePreferences.translation
 
     ' By Default array grid adds some additional padded value when we call bounding rect. To account for that additional padded value we are subtracting 24.
-    saveAndContinueButtonTranslationY = buttonTranslationY - 24
-    ' Adjusting the position of save and continue button based on manage preferences section height.
-    m.saveAndContinueButton.translation = [0, saveAndContinueButtonTranslationY]
+    yTranslationOfItemAfterManagePrefs = managePrefsRect.height + managePrefsTranslation[1] - 24
+
+    buttonRectHeight = 0
+    if privacyCenterSettings.showConsentPreferences = true AND m.top.isAllowedToManageConsent = true AND isGdpr(m.constants) = true
+      m.saveAndContinueButton.visible = true
+      buttonRectHeight = m.saveAndContinueButton.boundingRect().height
+
+      ' Adjusting the position of save and continue button based on manage preferences section height.
+      m.saveAndContinueButton.translation = [0, yTranslationOfItemAfterManagePrefs]
+    end if
 
     ' Getting the total height of array grid and adding the y translation to place the qr codes.
-    qrCodeSectionTranslationY = buttonTranslationY + buttonRect.height + 15
+    qrCodeSectionTranslationY = yTranslationOfItemAfterManagePrefs + buttonRectHeight + 15
     m.qrCodeSections.translation = [0, qrCodeSectionTranslationY]
-
-    if privacyCenterSettings.showConsentPreferences = true AND m.top.isAllowedToManageConsent = true
-      m.saveAndContinueButton.visible = true
-    end if
   end if
 End Function
 
@@ -161,7 +161,12 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
   if press then
     if key = "up"
       if m.qrCodeSections.isInFocusChain() = true AND m.top.isAllowedToManageConsent = true AND isNonEmptyArray(m.top.consentSettings.consents) = true
-        m.saveAndContinueButton.setFocus(true)
+        if m.saveAndContinueButton.visible = true
+          m.saveAndContinueButton.setFocus(true)
+        else
+          m.managePreferences.setFocus(true)
+        end if
+
         slideTo(m.panelContentSection, [0, -m.heading.translation[1]], 0.5)
         handled = true
       else if m.saveAndContinueButton.isInFocusChain() = true
@@ -170,7 +175,13 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
       end if
     else if key = "down"
       if m.managePreferences.isInFocusChain() = true
-        m.saveAndContinueButton.setFocus(true)
+        if m.saveAndContinueButton.visible = true
+          m.saveAndContinueButton.setFocus(true)
+        else
+          m.qrCodeSections.setFocus(true)
+          slideTo(m.panelContentSection, [0, -m.qrCodeSections.translation[1]], 0.5)
+        end if
+
         handled = true
       else if m.saveAndContinueButton.isInFocusChain() = true
         m.qrCodeSections.setFocus(true)

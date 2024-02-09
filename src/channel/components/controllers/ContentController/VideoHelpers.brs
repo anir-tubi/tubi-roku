@@ -544,7 +544,7 @@ Function onVideoPlayerState(msg)
       end if
       showPlayerError(errorMessage, videoPlayer.videoErrorCode)
     else if state = "finished"
-      isAutoPlayOff = (isGDPR() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false))
+      isAutoPlayOff = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false))
       finishedContent = videoPlayer.content
       if finishedContent.isTrailer
         returnToDetailScreenFromVideo()
@@ -1185,7 +1185,7 @@ Function onUpNextResponse(upNextContent)
         end if
       else if upNextContent.getChildCount() > 0
         videoPlayer.upNextContent = upNextContent
-        isAutoPlayOff = (isGDPR() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false))
+        isAutoPlayOff = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false))
         videoPlayer.isAutoPlayOff = isAutoPlayOff
         videoPlayer.upNextUpdateContent = true
       else 'worst case there are no contents under upNextContent

@@ -11,6 +11,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+  <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs"/>
 
   <interface>
     <!-- INPUTS -->
@@ -44,8 +45,8 @@
           bottomGradientUri="pkg:/images/list_overflow_bottom_gradient-settings.webp"
           translation="[0, 72]" />
         <SimpleButton
-          visible="false"
           id="saveAndContinueButton"
+          visible="false"
           width="369"
           fontSize="24"/>  
         <Label

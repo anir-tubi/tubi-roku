@@ -425,7 +425,7 @@ Function onAgeNotVerifiedAtSignup(error)
     if httpCode = 422 OR httpCode = 451
       
       ' If the user is in GDPR countries then user is not allowed to use the application if they are not 18+.
-      if isGDPR() = true
+      if isGDPR(m.constants) = true
         showGDPRAgeGateErrorDialog()
       else
         handle_422_451_error(restartChannelAfterAgeVerification) ' happens when user enters age less than 13

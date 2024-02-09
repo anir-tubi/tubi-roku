@@ -116,7 +116,7 @@ Function onVideoPreviewStateChanged(msg)
         item = currentScreen.content
       end if
 
-      isFullPlayerBlockedForUser = (isGDPR() = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR ( item <> invalid AND item.needsLogin = true AND isloggedInUser() = false)
+      isFullPlayerBlockedForUser = (isGDPR(m.constants) = true AND (isKidsUIOn() = true OR isParentalControlsAdultLevel() = false)) OR ( item <> invalid AND item.needsLogin = true AND isloggedInUser() = false)
 
       ' Don't want to continue playback if the user has their tv turned off
       if m.maintask.isHdmiStatusOk = true AND isFullPlayerBlockedForUser = false

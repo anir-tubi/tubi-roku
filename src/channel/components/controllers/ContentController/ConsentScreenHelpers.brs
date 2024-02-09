@@ -275,7 +275,7 @@ Function isUserAllowedToManageConsent()
   ' Since outside of GDPR countries it is less than 13 is considered as kids mode. We will not create seperate mapping.
   isUserAllowedToManageConsent = (isUserInAdultsMode() = true OR isParentalControlsTeensLevel() = true)
 
-  if isGDPR() = true
+  if isGDPR(m.constants) = true
     isUserAllowedToManageConsent = (isUserInAdultsMode() = true)
   end if
 
