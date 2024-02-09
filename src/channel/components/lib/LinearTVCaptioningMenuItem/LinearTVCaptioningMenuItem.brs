@@ -22,8 +22,9 @@ Function onThemeChange(msg = invalid)
   end if
 
   if theme <> invalid
-    m.Bground.blendColor = theme.neutralColor
-    m.MenuText.color = theme.primaryTextColor
+    m.Bground.blendColor = theme.secondaryTextColor
+    m.MenuText.color = theme.focusedTextColor
+    m.EnabledIcon.blendColor = theme.focusedTextColor
   end if
 End Function
 
