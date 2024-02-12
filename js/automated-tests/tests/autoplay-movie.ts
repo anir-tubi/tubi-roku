@@ -145,13 +145,14 @@ describe('Autoplay Movies', function () {
         // Are we on the series page?
         const movieScreenRowList = await testUtils.getNodeForElement('movieScreenRowList');
         expect(movieScreenRowList.visible).to.equal(true);
+        
 
         //Play title, pause to open player, move right to FF button and press, verify state
         await ecp.sendKeypress(ecp.Key.Play);
         const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
         expect(videoPlayerActual.visible).to.equal(true);
         await testUtils.expectPlayerStateToEventuallyEqual('play');
-        await utils.sleep(500);
+        await utils.sleep(800);
         await ecp.sendKeypress(ecp.Key.Play);
         const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
         expect(playPauseButton.visible).to.equal(true);
@@ -169,6 +170,7 @@ describe('Autoplay Movies', function () {
 
         // Play to trigger autoplay
         await ecp.sendKeypress(ecp.Key.Play);
+        await ecp.sendKeypress(ecp.Key.Back);
 
         // Autoplay triggered?
         const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay');

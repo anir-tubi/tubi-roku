@@ -52,11 +52,13 @@ describe('Closed Captions Checks', function () {
     await testUtils.verifyFocusedSideNavMenuItemEquals('home');
 
     // If so, select Search
+    await utils.sleep(1000);
     await ecp.sendKeypress(ecp.Key.Up);
     await testUtils.getNodeForElement('leftNavSearchItem');
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Are we on the Search page?
+    await utils.sleep(2000); // Will not work without sleep here
     await testUtils.getNodeForElement('searchKeyPad');
 
     // If so, send search terms
@@ -105,7 +107,7 @@ describe('Closed Captions Checks', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
     
     // Verify that video is playing
-    await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
+    await testUtils.expectPlayerStateToEventuallyEqual('play', 10000);
 
     // Turn OFF Linear CC
     await ecp.sendKeypress(ecp.Key.Up);
@@ -134,6 +136,7 @@ describe('Closed Captions Checks', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Are we on the Search page?
+    await utils.sleep(2000);
     await testUtils.getNodeForElement('searchKeyPad');
 
     // If so, send search terms

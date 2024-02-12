@@ -6,6 +6,7 @@ import exp = require('constants');
 
 
 
+
 describe('Top Navigation', function () {
     before(async () => {
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
@@ -166,7 +167,6 @@ describe('Top Navigation', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Are we on Movie screen?
-      await utils.sleep(2000);
       await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
       const movieScreenFirstRowName = testUtils.getNodeForElement('movieScreenFirstRowName');
       expect((await movieScreenFirstRowName).text).to.equal('Featured');
@@ -197,7 +197,6 @@ describe('Top Navigation', function () {
 
       // Are we on TV Shows screen?
       await testUtils.waitForElementToHaveFocus('tvShowsScreenRowList', 'Timed out waiting for Rowlist to have focus');
-      await utils.sleep(4000);// IMPROVE
       const tvShowsScreenFirstRowName = testUtils.getNodeForElement('tvShowsScreenFirstRowName');
       expect((await tvShowsScreenFirstRowName).text).to.equal('Featured');
     });
@@ -220,11 +219,10 @@ describe('Top Navigation', function () {
 
       // Press OK
       await ecp.sendKeypress(ecp.Key.Ok);
-      await utils.sleep(4000);
 
       // Are we on Live screen?
-      const liveTVTitle = await testUtils.getNodeForElement('liveTVTitle');
-      const liveScreenHeader = await testUtils.getNodeForElement('liveScreenHeader');
+      await utils.sleep(5000); // timeout in getNodeForElement did not work here -- Brian
+      const liveScreenHeader = await testUtils.getNodeForElement('liveScreenHeader', 10000);
       expect(liveScreenHeader.text).to.equal('Featured');
     });
 
@@ -422,19 +420,17 @@ describe('Top Navigation', function () {
     });
 
     async function topNavForYouLabelNotFocused() {
-      await utils.sleep(1000);
-      const topNavForYouLabelNotFocused = await testUtils.getNodeForElement('topNavForYouLabelNotFocused');
+      const topNavForYouLabelNotFocused = await testUtils.getNodeForElement('topNavForYouLabelNotFocused', 5000);
       expect(topNavForYouLabelNotFocused.text).to.equal('For You');
       const colorForYouUnfocused = await testUtils.getElementColorField('topNavForYouLabelNotFocused','color');
-      expect(colorForYouUnfocused).to.equal('#000000FF');
+      expect(colorForYouUnfocused).to.equal('#FFFFFFFF');
      }
 
      async function topNavForYouLabelFocused() {
-      await utils.sleep(1000);
-      const topNavForYouLabelFocused = await testUtils.getNodeForElement('topNavForYouLabelFocused');
+      const topNavForYouLabelFocused = await testUtils.getNodeForElement('topNavForYouLabelFocused', 3000);
       expect(topNavForYouLabelFocused.text).to.equal('For You');
       const colorForYouFocused = await testUtils.getElementColorField('topNavForYouLabelFocused','color');
-      expect(colorForYouFocused).to.equal('#E13100FF');
+      expect(colorForYouFocused).to.equal('#0B0019FF');
      }
 
      async function openLeftNav() {

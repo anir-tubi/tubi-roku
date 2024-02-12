@@ -31,11 +31,11 @@ const elements = typeCheckElements({
   },
 
   topNavForYouLabelNotFocused: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.0.#TopLabel',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#topNav-home.#TopNavMenu.0.#unfocusedTopLabel',
   },
 
   topNavForYouLabelFocused: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.0.#BottomLabel',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#topNav-home.#TopNavMenu.0.#focusedBottomLabel',
   },
 
   // We're currently replacing the contents in this section from the existing json file. If you want to add additional elements put them outside this section of the file. Keeping for a little longer in case any lingering keypaths need to be moved over with the script
@@ -84,7 +84,7 @@ const elements = typeCheckElements({
 
   /** Live Show screen row list */
   liveScreenHeader: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#programGuide.#headerText',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#PageGroup.#programGuide.#headerText',
   },
 
   /** Component that controls background image display */
@@ -201,7 +201,7 @@ const elements = typeCheckElements({
 
   /** On Movies Page Button */
   onMoviesPageButton: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#topNav-movies.#TopNavMenu.1.#TopLabel',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#PageGroup.#topNav-movies.#TopNavMenu.1.#selectedBackground',
   },
 
   /** Remove from history button */
@@ -1145,17 +1145,17 @@ const elements = typeCheckElements({
 
   /** top nav Movies */
   topNavMoviesItem: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.1.#TopLabel',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#topNav-home.#TopNavMenu.1.#unfocusedTopLabel',
   },
 
   /** top nav TV Shows */
   topNavTVShowsItem: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.2.#TopLabel',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#topNav-home.#TopNavMenu.2.#unfocusedTopLabel',
   },
 
   /** top nav Live TV */
   topNavLiveItem: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.3.#TopLabel',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#topNav-home.#TopNavMenu.3.#unfocusedTopLabel',
   },
 
   /**  Live TV option is selected */

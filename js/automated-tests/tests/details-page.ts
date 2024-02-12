@@ -209,11 +209,13 @@ describe('Details Page', function () {
 
       // Back to Movies Screen
       await ecp.sendKeypress(ecp.Key.Back, { count: 1 });
-      await ecp.sendKeypress(ecp.Key.Down, { count: 7 });  //Move to fresh movie title
 
       // On Movies page?
       const onMoviesPageButton = await testUtils.getNodeForElement('onMoviesPageButton');
       expect(onMoviesPageButton.visible).to.equal(true);
+      await ecp.sendKeypress(ecp.Key.Down, { count: 7 });  //Move to fresh movie title
+
+      
 
       // Create history
       await ecp.sendKeypress(ecp.Key.Play);
