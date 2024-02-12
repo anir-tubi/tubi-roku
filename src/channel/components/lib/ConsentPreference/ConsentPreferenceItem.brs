@@ -75,9 +75,16 @@ Function onItemContentChange(msg)
       end if
       m.toggleText.text = getTranslation("privacy_preferences_required")
     else
-      if m.primaryTextColor <> invalid
-        m.toggleText.color = m.primaryTextColor
+      if m.top.itemHasFocus = true
+        if m.focusedTextColor <> invalid
+          m.toggleText.color = m.focusedTextColor
+        end if
+      else
+        if m.primaryTextColor <> invalid
+          m.toggleText.color = m.primaryTextColor
+        end if
       end if
+
       if item.value = "opted_in"
         m.toggleText.text = getTranslation("privacy_preferences_on")
       else
