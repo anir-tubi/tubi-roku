@@ -46,7 +46,7 @@
     <Poster
       id="ChannelPoster"
       loadingBitmapUri="pkg:/images/placeholder.jpg"
-      failedBitmapUri="pkg:/images/logo-white-large.png"
+      failedBitmapUri="pkg:/images/logo-large.webp"
       opacity="0.24"
       height="84"
       width="84"

@@ -200,26 +200,23 @@
             id="logoGroup">
             <Poster
               id="tubiLogo"
-              height="39"
-              width="138"
-              uri="pkg:/images/logo-white-large.png"
-              opacity="1.0"
-              translation="[1698,60]"/>
+              height="48"
+              width="134"
+              uri="pkg:/images/logo-large.webp"
+              translation="[1698,54]"/>
             <Poster
               id="tubiKidsLogo"
-              height="39"
-              width="210"
-              uri="pkg:/images/locale/en_US/logo-kids-white-large.png"
-              translation="[1626,60]"
-              opacity="1.0"
+              height="48"
+              width="256"
+              uri="pkg:/images/logo-kids-large.webp"
+              translation="[1575,54]"
               visible="false"/>
             <Poster
               id="tubiEspanolLogo"
-              height="39"
-              width="138"
-              uri="pkg:/images/logo-white-large.png"
-              translation="[1698,60]"
-              opacity="1.0"
+              height="93"
+              width="134"
+              uri="pkg:/images/logo-espanol-large.webp"
+              translation="[1698,54]"
               visible="false"/>
             <Poster
               id="tubiFIFALogo"

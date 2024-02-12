@@ -132,11 +132,6 @@ Function init()
   m.top.observeFieldScoped("customSuspend", "onCustomSuspend")
   m.top.observeFieldScoped("customResume", "onCustomResume")
 
-  if m.constants.deviceInfo.language = "es"
-    m.logoKids.uri = "pkg:/images/locale/es_ES/logo-kids-white-large.png"
-    m.logoKids.width = 259
-    m.logoKids.translation = [1566, m.logoKids.translation[1]]
-  end if
   'this variable is used to stop unnecessary execution of the entire showHideLogo function when content been focused.
   m.logoType = m.constants.logoType.tubi
 

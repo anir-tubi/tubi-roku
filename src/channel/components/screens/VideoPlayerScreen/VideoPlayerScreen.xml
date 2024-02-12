@@ -238,14 +238,14 @@
           id="tubiLogo"
           width="462"
           height="135"
-          uri="pkg:/images/logo-white-xlarge.png"
+          uri="pkg:/images/logo-xlarge.webp"
           loadSync="true"
           translation="[734,382]"/>
         <Poster
           id="tubiKidsLogo"
           width="726"
           height="135"
-          uri="pkg:/images/locale/en_US/logo-kids-white-xlarge.png"
+          uri="pkg:/images/logo-kids-xlarge.webp"
           loadSync="true"
           visible="false"
           translation="[608,382]"/>

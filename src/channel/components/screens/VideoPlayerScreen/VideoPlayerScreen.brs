@@ -110,9 +110,6 @@ Function init()
 
   m.logo = m.top.findNode("tubiLogo")
   m.logoKids = m.top.findNode("tubiKidsLogo")
-  if m.constants.deviceInfo.language = "es"
-    m.logoKids.uri = "pkg:/images/locale/es_ES/logo-kids-white-xlarge.png"
-  end if
 
   '//Variable to keep track where the m.ratingOverlay UI element should animated when the down button is pressed.
   m.ratingOverlayAnimatedPositionY = 144
