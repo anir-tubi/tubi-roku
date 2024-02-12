@@ -5,7 +5,6 @@
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/EPGMixin.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
-  <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />
   <script type="text/brightscript" uri="../../../source/3rdparty/rodash/rodash.cat.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiMetadataTranslate.brs" />

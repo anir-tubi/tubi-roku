@@ -112,6 +112,8 @@ Function onThemeChange(msg = invalid)
   end if
 
 
+  bIsKidsTheme = false
+  
   if theme <> invalid
     m.SignedOutUITitle.color = theme.primaryTextColor
     m.SignedOutUISubtitle.color = theme.secondaryTextColor
@@ -123,6 +125,13 @@ Function onThemeChange(msg = invalid)
     m.AllEmptyUIMenu.focusBitmapBlendColor = theme.focusedColor
     m.RowList.focusBitmapBlendColor = theme.focusedColor
 
+    bIsKidsTheme = (theme.id = m.constants.ui.themeIDs.kidsMode)
+  end if
+
+  if bIsKidsTheme = true
+    m.defaultBackgroundUri = "https://cdn.adrise.tv/image/roku_support_images/bgroundMyStuffDefault_kids.webp"
+  else
+    m.defaultBackgroundUri = "https://cdn.adrise.tv/image/roku_support_images/bgroundMyStuffDefault.webp"
   end if
 
 End Function
@@ -139,7 +148,7 @@ Function onScreenFocusChange()
         oldFocusedRowItem = m.top.cursorPosition
         if m.isAllContentEmpty = true
           m.AllEmptyUIMenu.setFocus(true)
-          m.top.backgroundUriList = []
+          m.top.backgroundUriList = [m.defaultBackgroundUri]
         else
           m.RowList.setFocus(true)
           if oldFocusedRowItem <> invalid
@@ -167,7 +176,7 @@ Function onLoadingChange(msg)
     m.InfoPanel.visible = false
     m.RowList.content = invalid 'When not fully loaded, then the rowlist should not show any content
     m.AllEmptyUI.visible = false
-    m.top.backgroundUriList = []
+    m.top.backgroundUriList = [m.defaultBackgroundUri]
   end if
 End Function
 
@@ -635,7 +644,7 @@ Function onSignedInChange()
     m.AllEmptyUI.visible = false
     m.InfoPanel.visible = false
     m.isAllContentEmpty = false
-    m.top.backgroundUriList = []
+    m.top.backgroundUriList = [m.defaultBackgroundUri]
   else
     m.ContentArea.visible = true
     m.SignedOutUI.visible = false

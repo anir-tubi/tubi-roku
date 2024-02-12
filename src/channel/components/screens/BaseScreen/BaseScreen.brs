@@ -1,5 +1,6 @@
 Function init()
   m.audioGuide = CreateObject("roAudioGuide")
+  m.defaultBackgroundUri = ""
 End Function
 
 
@@ -7,7 +8,11 @@ Function determineBackgroundImage(content)
   if isNode(content) = true AND isNonEmptyArray(content.backgrounds) = true then
     return content.backgrounds
   else
-    return []
+    if isNonEmptyString(m.defaultBackgroundUri) = true
+      return [m.defaultBackgroundUri]
+    else
+      return []
+    end if
   end if
 End Function
 
