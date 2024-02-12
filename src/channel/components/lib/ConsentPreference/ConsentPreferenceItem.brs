@@ -24,9 +24,11 @@ Function onItemHasFocus()
   if m.top.itemHasFocus = true
     m.title.color = m.focusedTextColor
     m.subtitle.color = m.focusedTextColor
+    m.toggleText.color = m.focusedTextColor
   else
     m.title.color = m.primaryTextColor
     m.subtitle.color = m.secondaryTextColor
+    m.toggleText.color = m.primaryTextColor
   end if
 End Function
 
@@ -50,6 +52,7 @@ Function onThemeChange(msg = invalid)
     m.primaryTextColor = theme.primaryTextColor
     m.title.color = m.primaryTextColor
     m.subtitle.color = m.secondaryTextColor
+    m.toggleText.color = m.primaryTextColor
   end if
 End Function
 
@@ -72,8 +75,8 @@ Function onItemContentChange(msg)
       end if
       m.toggleText.text = getTranslation("privacy_preferences_required")
     else
-      if m.focusedTextColor <> invalid
-        m.toggleText.color = m.focusedTextColor
+      if m.primaryTextColor <> invalid
+        m.toggleText.color = m.primaryTextColor
       end if
       if item.value = "opted_in"
         m.toggleText.text = getTranslation("privacy_preferences_on")
