@@ -446,7 +446,7 @@
           <TransportButton
             id="closedCaptionAudioButton"
             width="60"
-            height="50"
+            height="60"
             uri="pkg:/images/transport/sgplayer/icon-subtitles.webp"
             translation="[1695,110]"
             visible="false" />

@@ -70,7 +70,7 @@ Function init()
   languageNode =  CreateObject("roSGNode", "ContentNode")
   languageNode.id = "LanguageButton"
   languageNode.title = getTranslation("linearVideoPlayer_buttonLanguage")
-  languageNode.HDPosterUrl = "pkg:/images/transport/sgplayer/icon-subtitles.webp"
+  languageNode.HDPosterUrl = "pkg:/images/icon-subtitles.webp"
   languageButtonItem.itemContent = languageNode
   columnWidths.push(languageButtonItem.calculatedWidth)
 
