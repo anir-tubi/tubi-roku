@@ -44,13 +44,13 @@
       <BackgroundPosterGroup
         id="poster2"
         posterOpacity="1.0"/>
-      <Poster
+    </Group>
+    <Poster
         id="posterGroupMask"
         width="1122"
         opacity="0"
         translation="[801, 0]"
         height="747"/>
-    </Group>
     
     <Group
       id="circularMaskLayer"
