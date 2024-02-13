@@ -7,6 +7,7 @@ Function init()
   m.spinner = m.top.findNode("TubiSceneSpinner")
 
   m.customSplashPoster = m.top.findNode("customSplashPoster")
+  m.top.backgroundUri = "pkg:/images/background-masks/mask-layer-1-0.webp"
 
   m.top.observeField("fadeOutCustomSplash", "onFadeOutCustomSplash")
   m.top.observeField("fadeOutSpinner", "onFadeOutSpinner")
