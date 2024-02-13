@@ -61,7 +61,8 @@ exports.uploadPkg = function(zipPath, deviceIp, password) {
     const options = {
       url,
       auth,
-      formData
+      formData,
+      agentOptions: { 'keepAlive': false }
     };
 
     request().post(options, (err, response, body) => {
@@ -116,7 +117,8 @@ exports.installWithSquashfs = function(zipPath, deviceIp, password) {
     const options = {
       url,
       auth,
-      formData
+      formData,
+      agentOptions: { 'keepAlive': false }
     };
 
     request().post(options, (err, response, body) => {
