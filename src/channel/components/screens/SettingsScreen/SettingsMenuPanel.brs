@@ -36,6 +36,7 @@ Function onThemeChange(msg = invalid)
 
   if theme <> invalid
     m.SettingsMenu.focusBitmapBlendColor = theme.focusedColor
+    m.SettingsMenu.focusFootprintBlendColor = theme.neutralColor
   end if
 End Function
 
