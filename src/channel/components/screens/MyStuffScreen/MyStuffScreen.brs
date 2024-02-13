@@ -227,7 +227,7 @@ Function onContentUpdateChange(msg) As Void
         m.RowList.visible = false
         m.InfoPanel.visible = false
         m.AllEmptyUIMenu.setFocus(true)
-        m.top.backgroundUriList = []
+        m.top.backgroundUriList = [m.defaultBackgroundUri]
       end if
     end if
   else
