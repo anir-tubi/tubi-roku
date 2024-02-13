@@ -847,7 +847,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
   if shouldShowContinueWatchingConsentDialog = true AND m.wasUserShownContinueWatchingConsentDialog = false AND isLoggedInUser() = true AND getConsentOptOutStatusByKey(m.constants.consentKeys.continueWatching) = true
 
     ' Checking if the user is in US and allowed to manage consent(Adult or teen) and is in control group.
-    if isDeviceInUS() = true AND isUserAllowedToManageConsent() = true AND getExperimentResource("roku_cw_consent_existing_user", "roku_cw_consent_existing_user_after_plyback_v1", true).enabled = true
+    if isDeviceInUS() = true AND isUserAllowedToManageConsent() = true AND getExperimentResource("roku_cw_consent_existing_user", "roku_cw_consent_existing_user_after_plyback_v2", true).enabled = true
       showRokuContinueConsentDialog()
     end if
 
