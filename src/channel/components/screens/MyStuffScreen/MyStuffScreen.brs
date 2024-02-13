@@ -122,6 +122,7 @@ Function onThemeChange(msg = invalid)
     m.AllEmptyUISubtitle.color = theme.secondaryTextColor
     m.AllEmptyUISubtitle2.color = theme.secondaryTextColor
     m.GuestMenu.focusBitmapBlendColor = theme.focusedColor
+    m.GuestMenu.focusFootprintBlendColor = theme.neutralColor2
     m.AllEmptyUIMenu.focusBitmapBlendColor = theme.focusedColor
     m.RowList.focusBitmapBlendColor = theme.focusedColor
 
