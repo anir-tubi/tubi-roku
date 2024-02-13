@@ -2467,10 +2467,10 @@ End Function
 ' @videoPlayer: node, Video node that we want to keep track of state on
 Function waitForVideoPlayerStoppedState(videoPlayer)
   state = videoPlayer.state
-
-  ' Since in some cases we set state to an empty string we also want to consider this to be a stopped state
-  if state <> "stopped" AND state <> "" then
+  ' If state isn't stopped then we need to observe the videoPlayer state field
+  if state <> "stopped" then
     ' We are intentionally using the nonscoped observer here to avoid having our observer be removed by other code executed by ContentController
+    videoPlayer.unobserveField("state")
     videoPlayer.observeField("state", "waitForVideoPlayerStoppedStateCallback")
   else
     trackVideoPlayerStoppingState(state)

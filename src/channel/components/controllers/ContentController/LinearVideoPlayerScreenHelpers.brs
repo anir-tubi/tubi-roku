@@ -512,10 +512,6 @@ Function stopAndHideLinearVideoPlayer()
     videoPlayer.loading = false
     m.backgroundGroup.posterVisible = true
 
-    if getExperimentResource("roku_async_stop", "roku_async_stop_v2", false).enabled = true then
-      waitForVideoPlayerStoppedState(videoPlayer)
-    end if
-
     stopLinearVideoContent()
     unobserveAllStateDependentLinearVideoPlayerFields(videoPlayer)
 
@@ -732,6 +728,11 @@ Function stopLinearVideoContent()
     videoPlayer.loading = false
     videoPlayer.unobserveFieldScoped("sendVideoTrackingStart")
     videoTrackingStop() 'stops youbora tracking
+
+    if getExperimentResource("roku_async_stop", "roku_async_stop_v2", false).enabled = true then
+      waitForVideoPlayerStoppedState(videoPlayer)
+    end if
+
     sendVideoPlayerCommand(videoPlayer, "stop")
     videoPlayer.visible = false
   end if
