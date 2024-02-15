@@ -26,8 +26,8 @@ Function init()
   m.top.observeFieldScoped("currentAudioTrack", "onCurrentAudioTrackChange")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.closedCaptionSection, typographyConstants.ids.subheaderMedium)
-  setTypographyOfLabel(m.audioTracksSectionHeaderLabel, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(closedCaptionSectionHeaderLabel, typographyConstants.ids.subheaderMedium)
+  setTypographyOfLabel(audioTracksSectionHeaderLabel, typographyConstants.ids.subheaderMedium)
 
 
   if m.global <> invalid
