@@ -185,7 +185,7 @@ End Function
 ' See protos.analytics.events.protos -> ClientEvent
 Function tubiTracking_getAnalyticsTimestamp()
   time = CreateObject("roDateTime")
-  timestamp = time.ToISOString() 'see protos.google.protobuf.timestamp.protos -> Timestamp
+  timestamp = time.ToISOString("milliseconds") 'see protos.google.protobuf.timestamp.protos -> Timestamp
   return timestamp
 End Function
 

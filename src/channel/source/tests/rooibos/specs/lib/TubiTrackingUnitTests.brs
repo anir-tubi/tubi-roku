@@ -45,7 +45,7 @@ Function tubiTracking_getAnalyticsTimestamp_test()
   dateTime = CreateObject("roDateTime")
   Tracking = m.Tracking
   trackingTimestamp = Tracking.getAnalyticsTimestamp()
-  testTimestamp = dateTime.ToISOString()
+  testTimestamp = dateTime.ToISOString("milliseconds")
 
   m.assertEqual(trackingTimestamp, testTimestamp)
 End Function
