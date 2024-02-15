@@ -321,7 +321,7 @@ Function init()
   signUpSaveProgressContentNode.uri = "pkg:/images/selector-$$RES$$.9.png"
   signUpSaveProgressContentNode.title = getTranslation("registration_signup_button")
   signUpSaveProgressContentNode.badgeText = getTranslation("registration_signup_button_free")
-  signUpSaveProgressContentNode.HDPosterUrl = "pkg:/images/icon-sign-in.webp"
+  signUpSaveProgressContentNode.HDPosterUrl = "pkg:/images/icon-account.webp"
   signUpSaveProgressContentNode.isUnfocusedFootprintEnabled = true
   m.signUpSaveProgressButton.itemContent = signUpSaveProgressContentNode
   m.signUpSaveProgressButton.translation = [87, m.signUpSaveProgressButtonYTranslation]

@@ -32,7 +32,7 @@ Function init()
   m.RelatedRowLabel = m.top.findNode("RelatedRowLabel")
   m.AnimationGroup = m.top.findNode("AnimationGroup")
   m.signUpMenuItem = m.top.findNode("signUpMenuItem")
-  m.signUpMenuItem.iconUrl = "pkg:/images/icon-sign-in.webp"
+  m.signUpMenuItem.iconUrl = "pkg:/images/icon-account.webp"
 
 
   m.RelatedGrid.itemSize = m.constants.ui.imageSizes.largePoster
