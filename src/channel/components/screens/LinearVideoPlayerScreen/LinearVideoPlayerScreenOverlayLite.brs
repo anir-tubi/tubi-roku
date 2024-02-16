@@ -507,6 +507,7 @@ Function updateChannelInfo(channelInfo)
 
       if programInfo <> invalid AND endTime > 0 AND localTime >= endTime
         channelInfo.removeChildIndex(i)
+      else
         exit for
       end if
     end for
