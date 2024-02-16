@@ -154,7 +154,6 @@
       enableUI="false"
       cgms = "3"
       enableTrickPlay="false"
-      notificationInterval="0.5"
       visible="true" />
 
     <Group
