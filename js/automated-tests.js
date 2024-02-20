@@ -19,7 +19,6 @@ const { testUtils, auth, ContentTypes, ContentRatings } = require('./automated-t
 const testsOutputFolder = `out/ui-tests-output`;
 const jsonReportOutputPath = `${testsOutputFolder}/report.json`;
 
-// Tries to convert the supplied suitest test over to our own test format
 async function runAutomatedTestsCli(done, analytics=false) {
   let availableTags;
   if(analytics){
@@ -27,7 +26,7 @@ async function runAutomatedTestsCli(done, analytics=false) {
   } else {
     availableTags = getAvailableTags();
   }
-  
+
 
   const choices = [];
 

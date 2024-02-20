@@ -22,12 +22,5 @@
             "keypressDelay": 0,
             "launchChannelId": "dev"
         }
-    },
-    "Suitest": {
-        "applicationPath": "./build/local",
-        "tokenId": "kvxK4y1RNW",
-        "tokenPassword": "f81aef8f4122e3f415a635afdf2e6c6ec93ca252a90900c7085a7de92cc52d7d",
-        "appId": "214cab71-b41b-468d-bcbb-f42732b157c4",
-        "version": "a13dc775-921f-4893-8fd1-dfd9caad474e"
     }
 }

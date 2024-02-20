@@ -31,10 +31,6 @@ const {NoStackError} = require('./js/utilities');
 // Importing functions with Git functionality
 const {makeReleasePrs, pushTag, createGithubRelease, findCommitsNotOnProductionBranch, addMissingImagesToRemoteLibrary, findCommitsNotOnCurrentBranch, pushBranch, buildReleaseNotes, buildQaChanges, buildQaBranch, bumpBuild, bumpBuildTen, bumpRevision, tagBuild} = require('./js/git');
 
-// Importing functions related to Suitest
-// Just commenting out for now. Will be removing in future PR
-// const {retrieveSuitestTests, runSuitestTests, convertXpathsToKeyPaths, convertSuitestTest} = require('./js/suitest');
-
 // Importing functions related to Github action runners
 const {setupAutomatedTestsGithubActionRunner, startAutomatedTestsGithubActionRunner, removeAutomatedTestsGithubActionRunner} = require('./js/action-runner');
 
@@ -928,13 +924,6 @@ exports.compareProd = findCommitsNotOnProductionBranch;
 exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
 exports.addMissingImages = addMissingImagesToRemoteLibrary;
 exports.tasks = listTasks;
-
-// Suitest related
-// exports.retrieveSuitestTests = retrieveSuitestTests;
-// exports.runSuitestTests = series(setAutomatedTestsConfig, clean, buildInstalled, runSuitestTests);
-// exports.convertXpathsToKeyPaths = series(setAutomatedTestsConfig, clean, buildInstalled, convertXpathsToKeyPaths);
-// exports.convertSuitestTest = convertSuitestTest;
-
 
 // Automated test related
 // Because automated-tests has to call ts-node/register it takes over 300ms to load so we only want to load when necessary. We are adding wrappers for these functions here
