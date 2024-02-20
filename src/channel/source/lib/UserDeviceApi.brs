@@ -34,6 +34,9 @@ Function UserDeviceApi(constants, apiUtils)
     ' Consent Related Methods.
     createGetConsentReqInfo: userDeviceApi_createGetConsentReqInfo
     createPatchConsentReqInfo: userDeviceApi_createPatchConsentReqInfo
+
+    ' Privacy Center QR Code related methods.
+    createGetDsarQrCodeReqInfo: userDeviceApi_createGetDsarQrCodeReqInfo
   }
 
   userDeviceApi = {}
@@ -478,5 +481,13 @@ Function userDeviceApi_createPatchConsentReqInfo(body)
   return {
     url: m.constants.urls.account.consent
     options: options
+  }
+End Function
+
+
+Function userDeviceApi_createGetDsarQrCodeReqInfo()
+  return {
+    url: m.constants.urls.account.getDsarQrCode
+    requestType: m.constants.reqNames.getDsarQrCode
   }
 End Function

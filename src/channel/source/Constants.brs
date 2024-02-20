@@ -288,6 +288,7 @@ Function getConstants()
     constants.reqNames.postPauseAdPixel = "postPauseAdPixel"
     constants.reqNames.getConsent = "getConsent"
     constants.reqNames.patchConsent = "patchConsent"
+    constants.reqNames.getDsarQrCode = "getDsarQrCode"
     constants.reqNames.postRokuContinueWatching = "postRokuContinueWatching"
     constants.reqNames.deleteRokuContinueWatching = "deleteRokuContinueWatching"
     constants.reqNames.clearRokuContinueWatching = "clearRokuContinueWatching"
@@ -331,6 +332,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.patchServerPersistentData] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getConsent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.patchConsent] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getDsarQrCode] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getUserSettings] = true
 
 
@@ -558,6 +560,7 @@ Function getConstants()
       constants.urls.account.signup = constants.urls.account.urlBase + "/user/signup"
       constants.urls.account.deviceSettings = constants.urls.account.urlBase + "/device/settings"
       constants.urls.account.consent = constants.urls.account.urlBase + "/consent"
+      constants.urls.account.getDsarQrCode = constants.urls.account.urlBase + "/dsar/qr_code"
 
       constants.urls.account.anonymous = {}
       constants.urls.account.anonymous.signingKey = constants.urls.account.urlBase + "/device/anonymous/signing_key"

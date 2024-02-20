@@ -25,9 +25,6 @@ Function parseGetConsent(fullResponse, _reqInfo)
       ' QRCode url for the privacy policy is used for displaying in privacy center.
       privacyPolicyQrCodeUrl: ""
 
-      ' QRCode url for the do not sell data is used for displaying in privacy center.
-      dsarQrCodeUrl: ""
-
       ' whether we need to show terms of use QR code component.
       showTermsOfUse: false
 
@@ -70,7 +67,6 @@ Function parseGetConsent(fullResponse, _reqInfo)
         showPrivacyPolicy: privacyCenterSettings.privacy_policy
         showDsar: privacyCenterSettings.dsar
         privacyPolicyQrCodeUrl: privacyCenterSettings.privacy_policy_qr_code_url
-        dsarQrCodeUrl: privacyCenterSettings.dsar_qr_code_url
         showTermsOfUse: privacyCenterSettings.terms_of_use
         termsOfUseQrCodeUrl: privacyCenterSettings.terms_of_use_qr_code_url
         termsOfUseUrl: privacyCenterSettings.terms_of_use_url

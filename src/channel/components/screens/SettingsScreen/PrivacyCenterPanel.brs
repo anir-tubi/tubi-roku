@@ -5,6 +5,7 @@ Function init()
 
   m.heading = topRef.findNode("Heading")
   topRef.observeFieldScoped("consentSettings", "onConsentSettingsChange")
+  topRef.observeFieldScoped("dsarQrCodeUri", "onDsarQrCodeUriChange")
 
   m.managePreferences = topRef.findNode("ManagePreferences")
   m.managePreferences.itemSize = [1140, 141]
@@ -74,14 +75,6 @@ Function onConsentSettingsChange(msg)
       heading: getTranslation("privacy_preferences_privacy_section_heading")
       subheading: getTranslation("privacy_preferences_privacy_section_subheading") + privacyCenterSettings.privacyPolicyUrl
       qrCodePosterUrl: privacyCenterSettings.privacyPolicyQrCodeUrl
-    })
-  end if
-
-  if privacyCenterSettings.showDsar = true
-    renderQrCodeComponent({
-      heading: getTranslation("privacy_preferences_dsar_section_heading")
-      subheading: getTranslation("privacy_preferences_dsar_section_subheading") + privacyCenterSettings.dsarUrl
-      qrCodePosterUrl: privacyCenterSettings.dsarQrCodeUrl
     })
   end if
 
@@ -192,4 +185,15 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
   end if
 
   return handled
+End Function
+
+
+Function onDsarQrCodeUriChange(msg)
+  dsarQrCodeUrl = msg.getData()
+  privacyCenterSettings = m.top.consentSettings.privacyCenterSettings
+  renderQrCodeComponent({
+    heading: getTranslation("privacy_preferences_dsar_section_heading")
+    subheading: getTranslation("privacy_preferences_dsar_section_subheading") + privacyCenterSettings.dsarUrl
+    qrCodePosterUrl: dsarQrCodeUrl
+  })
 End Function

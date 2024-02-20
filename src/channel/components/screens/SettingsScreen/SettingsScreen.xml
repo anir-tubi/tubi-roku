@@ -36,8 +36,11 @@
       <!-- Holds the consent preferences value obtained from backend. either user or device level.  -->
       <field id="consentSettings" type="assocarray" />
 
-    <!-- Holds the true/false based on if the user is in adults mode and not in kids mode, and not in teens parental controls.  -->
+      <!-- Holds the true/false based on if the user is in adults mode and not in kids mode, and not in teens parental controls.  -->
       <field id="isAllowedToManageConsent" type="boolean" value="false" />
+      
+      <!-- Holds the value of qr code temp uri path.  -->
+      <field id="dsarQrCodeUri" type="string" value="" />
 
     <!-- OUTPUTS -->
       <!-- triggers for upstream controller -->
@@ -55,6 +58,9 @@
       <!-- Holds the consent item that was selected. ex: {"essential_functionality": "required"}. This is used for showing required toast or for firing interaction event.  -->
       <field id="selectedConsent" type="assocarray" alwaysNotify="true"/>
       <field id="didUserSelectSaveAndRestart" type="boolean" value="false" alwaysNotify="true" />
+
+      <!-- Holds true or false value based on if we need to make a network request to fetch dsar qr code.  -->
+      <field id="shouldRequestDsarQrCode" type="boolean" value="false" alwaysNotify="true" />
   </interface>
 
   <children>

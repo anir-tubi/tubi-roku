@@ -24,6 +24,7 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.observeFieldScoped("didUserSelectSaveAndRestart", "saveUpdatedConsentPreferences")
   m.settingsScreen.observeFieldScoped("selectedConsent", "onSelectedConsentChange")
   m.settingsScreen.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
+  m.settingsScreen.observeFieldScoped("shouldRequestDsarQrCode", "requestDsarQrCode")
   if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" 'this is for extra protection not to restart the app
     m.settingsScreen.observeFieldScoped("appRestartRequested", "onAppRestartRequested")
   end if
@@ -569,4 +570,29 @@ Function onSelectedQrCodeSectionInfoChanged(msg)
   
   simpleModalInfo = getSimpleModalInfo(data.heading, message, buttons, dialogEvent, m.trackingLoggingTask)
   showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
+End Function
+
+
+Function requestDsarQrCode()
+  m.settingsScreen.dsarQrCodeUri = ""
+  requestInfo = m.userDeviceApi.createGetDsarQrCodeReqInfo()
+  m.makeRequest({
+    url: requestInfo.url
+    requestType: requestInfo.requestType
+    successCallback: onGetDsarQrCodeRequestSuccess
+    responseType: "assocarray"
+    silenceCallbackWarnings: true
+  })
+End Function
+
+
+Function onGetDsarQrCodeRequestSuccess(response)
+  if response <> invalid AND response.image_in_base64 <> invalid
+    imageData = response.image_in_base64
+    uri = "tmp:/dsarQrCode.png"
+    ba = CreateObject("roByteArray")
+    ba.fromBase64String(imageData)
+    ba.writeFile(uri)
+    m.settingsScreen.dsarQrCodeUri = uri
+  end if
 End Function

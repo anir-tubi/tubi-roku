@@ -237,6 +237,11 @@ Function registerParsingCallbacks()
     parseSuccess: parseGenericSuccess
     parseError: parseGenericError
   }
+
+  ' gets the list of user/device level server persistent data.
+  m.requestTypes[m.constants.reqNames.getDsarQrCode] = {
+    parseSuccess: parseGenericSuccess
+  }
 End Function
 
 

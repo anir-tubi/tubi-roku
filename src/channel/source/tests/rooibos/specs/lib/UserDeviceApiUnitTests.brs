@@ -721,3 +721,14 @@ Function userDeviceApi_createPatchConsentReqInfo_test()
   m.assertEqual("opted_in", requestBody.behavioral_advertising)
   m.assertEqual("required", requestBody.essential_functionality)
 End Function
+
+
+'@Test createGetDsarQrCodeReqInfo unit tests
+Function userDeviceApi_createGetDsarQrCodeReqInfo_test()
+  req = m.userDeviceApi.createGetDsarQrCodeReqInfo()
+
+  m.assertNotInvalid(req)
+  ' Since the request only requires token and no other parameters there is no options to verify.
+  m.assertEqual(m.constants.urls.account.getDsarQrCode, req.url)
+  m.assertEqual(m.constants.reqNames.getDsarQrCode, req.requestType)
+End Function

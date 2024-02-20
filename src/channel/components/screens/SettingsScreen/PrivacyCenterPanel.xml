@@ -18,6 +18,9 @@
     <field id="consentSettings" type="assocarray"/>
     <field id="title" type="string" alias="heading.text"/>
     <field id="offset" alias="Offset.translation"/>
+
+    <!-- Holds the value of qr code temp uri path.  -->
+    <field id="dsarQrCodeUri" type="string" alwaysNotify="true" />
     
     <!-- Holds the true/false based on if the user is in adults mode and not in kids mode, and not in teens parental controls.  -->
     <field id="isAllowedToManageConsent" type="boolean" value="false" />

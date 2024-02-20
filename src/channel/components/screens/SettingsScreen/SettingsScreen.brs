@@ -29,6 +29,7 @@ Function init()
   m.top.observeFieldScoped("uiMode", "onUiModeChange")
 
   m.top.observeField("autoPreviewItemUpdated", "onSignInInfoChange")
+  m.top.observeFieldScoped("dsarQrCodeUri", "onDsarQrCodeUriChange")
 
   if m.constants.settings.mode <> "production"
     m.top.addField("appRestartRequested", "boolean", true)
@@ -342,6 +343,7 @@ End Function
 
 Function createPrivacyCenterPanel(title)
   privacyCenterPanel = CreateObject("roSGNode", "PrivacyCenterPanel")
+  privacyCenterPanel.id = "privacyCenterPanel"
   privacyCenterPanel.title = title
   consentSettings = m.top.consentSettings
 
@@ -367,6 +369,12 @@ Function createPrivacyCenterPanel(title)
   privacyCenterPanel.observeFieldScoped("newConsentPreferences", "onNewConsentPreferences")
   privacyCenterPanel.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
   privacyCenterPanel.observeFieldScoped("didUserSelectSaveAndRestart", "onDidUserSelectSaveAndRestart")
+  
+  ' Since dsar qr codes are dyanmically generated we need to make a network request to get the qr code.
+  if privacyCenterSettings <> invalid AND privacyCenterSettings.showDsar = true
+    m.top.shouldRequestDsarQrCode = true
+  end if
+  
 
   pageValues = {
     account_page_type: "PRIVACY_PREFERENCES"
@@ -575,4 +583,13 @@ End Function
 Function onDidUserSelectSaveAndRestart(msg)
   ' since privacy center is dyanmically created we cannot use alias.
   m.top.didUserSelectSaveAndRestart = true
+End Function
+
+
+Function onDsarQrCodeUriChange(msg)
+  dsarQrCodeUri = msg.getData()
+  nextPanel = m.SettingsMenuPanel.nextPanel
+  if nextPanel <> invalid AND nextPanel.id = "privacyCenterPanel" AND isNonEmptyString(dsarQrCodeUri) = true
+    nextPanel.dsarQrCodeUri = dsarQrCodeUri
+  end if
 End Function
