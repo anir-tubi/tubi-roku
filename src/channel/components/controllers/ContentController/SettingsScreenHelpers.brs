@@ -546,6 +546,15 @@ Function onSelectedConsentChange(msg)
     }
 
     sendComponentInteractionInfo(componentInteractionEvent)
+
+    if isGdpr(m.constants) = false
+      body = {}
+      body[key] = value
+      setConsent(body)
+      ' Updating the settings screen consent settings.
+      m.settingsScreen.consentSettings = m.consentSettings
+    end if
+
   else
     showRequiredPreferenceToast(key)
   end if
