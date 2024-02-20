@@ -767,7 +767,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
 
         ' Repopulate the episodes screen if it is the screen under the video player screen in the call stack
         hiddenScreen = getHiddenScreen(1)
-        if hiddenScreen.id = m.constants.ui.screenIds.episodeScreen
+        if hiddenScreen <> invalid AND hiddenScreen.id = m.constants.ui.screenIds.episodeScreen
           '//::TODO:: ensure signed in users see the episode screen progress bars when coming back from video player.
           episodesScreen = hiddenScreen
 
