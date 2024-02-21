@@ -36,10 +36,6 @@ Function init()
 
   m.buttonList.content = buttonList
 
-  ' Setting background.
-  background = topRef.findNode("background")
-  background.uri = m.constants.ui.uris.marketingBackground
-
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.heading, typographyConstants.ids.headerMedium)
   setTypographyOfLabel(m.subheading, typographyConstants.ids.bodyLargeStrong)
@@ -56,7 +52,6 @@ Function init()
       name: "continue_watching_consent"
     }
   }
-  m.top.backgroundUriList = []
 End Function
 
 

@@ -410,7 +410,7 @@ Function onSignUpResponse(_response)
   ' Is the user in US.
   ' Is the experiment enabled.
   ' Is the user allowed to manage consent that is teen and above.
-  if isDeviceInUS() = true AND isUserAllowedToManageConsent() = true AND (getExperimentResource("roku_cw_consent", "roku_cw_consent_after_signup_short_term_v1", true).enabled = true OR getExperimentResource("roku_cw_consent", "roku_cw_consent_after_signup_long_term_v1", true).enabled = true)
+  if isDeviceInUS() = true AND isUserAllowedToManageConsent() = true AND (getExperimentResource("roku_cw_consent", "roku_cw_consent_after_signup_short_term_v1", true).enabled = true OR getExperimentResource("roku_cw_consent", "roku_cw_consent_after_signup_long_term_v2", true).enabled = true)
     m.shouldShowRokuCWConsentScreen = true
   else
     m.shouldShowRokuCWConsentScreen = false
@@ -1380,7 +1380,7 @@ Function processTokenToGenerateTokenDebugInfo()
         tokenDebugInfo.append({
           ' is token valid
           wasGlobalAuthTokenExpired: (wasTokenExpired = true)
-  
+
           ' the presence of user_id in the token indicates it is a auth token.
           wasValidUserIdPresentInGlobalAuthToken: isNonEmptyString(parsedToken.user_id)
         })
@@ -1406,7 +1406,7 @@ Function processTokenToGenerateTokenDebugInfo()
         tokenDebugInfo.append({
           ' is token valid
           wasTokenInRegistryExpired: (wasTokenExpired = true)
-  
+
           ' the presence of user_id in the token indicates it is a auth token.
           wasValidUserIdPresentInTokenInRegistry: isNonEmptyString(parsedToken.user_id)
         })

@@ -1,6 +1,7 @@
 Function showRokuCWConsentScreen(callback)
   m.callbackAfterRokuCWConsent = callback
   showContentGroupAndHideSpinner()
+  displayDefaultBackground()
   screen = CreateObject("roSGNode", "RokuCWConsentScreen")
   pushScreen(screen, true, true)
   screen.observeFieldScoped("buttonSelected", "onRokuCWConsentActionButtonSelected")
