@@ -894,8 +894,8 @@ Function getConstants()
   constants.errors.context.linearPlayerScreen = "11"
   constants.errors.context.emailVerificationScreen = "13"
   constants.errors.context.tournament = "14"
-  constants.errors.context.forgotPasswordProcessingScreen = "15" 
-  
+  constants.errors.context.forgotPasswordProcessingScreen = "15"
+
   '//What is the actual error?
   constants.errors.subtypes = {}
   '//Failed to fetch data from backend
@@ -1578,7 +1578,6 @@ constants.ui.uris.defaultContentBackgroundUri = "pkg:/images/background-masks/ma
       constants.serverPersistentDataKeys = {}
       constants.serverPersistentDataKeys.isVideoPreviewOn = "enable_video_preview"
       constants.serverPersistentDataKeys.audioTrack = "audio_track"
-      constants.serverPersistentDataKeys.secondSessionLinearNotWatched = "second_session_linear_not_watched"
       constants.serverPersistentDataKeys.isLikeToastNotificationShown = "enable_like_toast_notification"
       constants.serverPersistentDataKeys.isDisLikeToastNotificationShown = "enable_dislike_toast_notification"
 

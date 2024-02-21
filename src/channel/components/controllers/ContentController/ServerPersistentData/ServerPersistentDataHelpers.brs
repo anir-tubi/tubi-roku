@@ -109,7 +109,6 @@ End Function
   '    {
   '     isdisliketoastnotificationshown: true
   '     isliketoastnotificationshown: true
-  '     secondsessionlinearnotwatched: true
   '   }
 
   '   {

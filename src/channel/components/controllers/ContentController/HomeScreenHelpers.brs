@@ -940,16 +940,6 @@ Function onHomescreenContentReady(msg)
         showRegistrationWelcomeModal()
       end if
 
-      if hasLiveTVEducationModalBeenShown(currentScreen.id) = false
-
-        showLiveTVEducationModal()
-
-        m.shouldShowLinearEducationModal = false
-
-        saveServerPersistentData({
-          "secondSessionLinearNotWatched": false
-        }, "device")
-      end if
     end if
 
     ' show fifa intro modal only for non-kids ui and adult pc
@@ -1189,62 +1179,6 @@ Function onLoadCategoryForIds(msg)
 End Function
 
 
-Function showLiveTVEducationModal()
-  tubiLog("HomeScreenHelpers.showRegistrationWelcomeModal")
-
-  showHideSpinner(false)
-
-  header = getTranslation("linear_educational_header")
-  subHeader = getTranslation("linear_education_sub_header")
-
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "INFORMATION"
-      pageOneof: m.Tracking.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
-      dialog_action: "SHOW"
-      dialog_sub_type: "live_tv_feature"
-    }
-  }
-
-  modalInfo = {
-    header: header
-    subHeader: subHeader
-    message: "" 'message is not used in case of multistyle dialog
-    modalDialogTypes: m.constants.modalDialogTypes.multiStyle
-    modalDialogStyles: m.constants.modalDialogStyles.multiMessageGroup
-    multiStyleMessage: []
-    imageUrls: ["pkg:/images/live-news-group.png"]
-    imageDimensions: [[582, 537]]
-    openTrackEvent: dialogEvent
-    trackingTask: m.trackingLoggingTask
-    backButtonCallback: invalid
-    instantResumeAction: m.constants.instantResumeActions.closeDialog
-  }
-
-  buttonInfo = []
-
-  buttonOne = {
-    text: getTranslation("linear_education_button")
-    type: "accept"
-    callback: showDefaultEPGScreen
-    callbackParams: invalid
-    shouldFocusParentBeforeCallback: false 'special case for signIn button. If parent gets focus when dialog closes, video preview or linear will start playing in backgroud of RFI modal.
-  }
-  buttonInfo.push(buttonOne)
-
-  buttonTwo = {
-    text: getTranslation("dialog_got_it")
-    type: "dismiss"
-    callback: invalid
-    callbackParams: invalid
-  }
-  buttonInfo.push(buttonTwo)
-
-  showMultiStyleModal(modalInfo, buttonInfo)
-End Function
-
-
 'This function handles the logic to determine whether to show the registration modal over homegrid with the following main requirements
 ' show registration modal only to new user
 ' within the new user session, show only once when app launches
@@ -1258,27 +1192,6 @@ Function hasRegModalBeenShown()
   if isNewUser() = true AND m.hasRegModalBeenShownWithinNewUserSession = false
     if currentScreen.id = m.constants.ui.screenIds.homeScreen AND isLoggedInUser() = false
       m.hasRegModalBeenShownWithinNewUserSession = true
-      return false
-    end if
-  end if
-
-  return true
-End Function
-
-
-Function hasLiveTVEducationModalBeenShown(currentScreenId)
-  if m.constants.settings.mode = "qa" AND m.constants.settings.hideStartupModals = true
-    return true
-  end if
-
-  ' conditions to show liveTV education modal are:
-  ' user is not a new user
-  ' user is in experiment roku_linear_epg_education_modal_over_homegrid_v2 (for now)
-  ' show the modal only on homescreen, not in kids mode/espanol mode or any other homescreens.
-  ' User should not see the welcome registation modal and liveTV education modal within the same session(this happens when new-user signsIn)
-  ' do not show the modal if user has already seen the liveTV on their first session
-  if m.shouldShowLinearEducationModal = true
-    if currentScreenId = m.constants.ui.screenIds.homeScreen AND isKidsUIOn() = false AND isParentalControlsAdultLevel() = true AND getExperimentResource("roku_linear_epg_education_modal_over_homegrid", "roku_linear_epg_education_modal_over_homegrid_v2", true).enabled = true
       return false
     end if
   end if

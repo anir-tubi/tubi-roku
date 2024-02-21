@@ -1741,18 +1741,6 @@ Function getTranslation_en_US()
       "description": "Button text to be displayed on second button of registration welcome modal",
       "message": "Continue as Guest"
     },
-    "linear_educational_header": {
-      "description": "Header on the modal displayed to educate user about live TV feature",
-      "message": "Introducing Live TV"
-    },
-    "linear_education_sub_header":{
-      "description": "Sub Header on the modal displayed to educate user about live TV feature",
-      "message": "Never Miss a Beat with 24/7 News, Sports, Reality and More. Right at Your Fingertips."
-    },
-    "linear_education_button": {
-      "description": "Button title on the modal displayed to educate user about live TV feature",
-      "message": "Watch LiveTV"
-    },
     "replay": {
       "description": "This label used for badge to indicate the content availability",
       "message": "Replay"
@@ -3435,18 +3423,6 @@ Function getTranslation_es_MX()
       "description": "Button text to be displayed on second button of registration welcome modal",
       "message": "Continuar como Invitado"
     },
-    "linear_educational_header": {
-      "description": "Header on the modal displayed to educate user about live TV feature",
-      "message": "Introduciéndo TV En Vivo"
-    },
-    "linear_education_sub_header": {
-      "description": "Sub Header on the modal displayed to educate user about live TV feature",
-      "message": "Nunca Pierdas el Ritmo con Noticias, Deportes, Reality y Más las 24/7. Justo a Tu Alcance."
-    },
-    "linear_education_button": {
-      "description": "Button title on the modal displayed to educate user about live TV feature",
-      "message": "Ver TV en vivo"
-    },
     "replay": {
       "description": "This label used for badge to indicate the content availability",
       "message": "Repetición"
@@ -5091,18 +5067,6 @@ Function getTranslation_fr_CA()
     "reg_continue_as_guest_button_title": {
       "description": "Button text to be displayed on second button of registration welcome modal",
       "message": "Continuer en tant qu'invité"
-    },
-    "linear_educational_header": {
-      "description": "Header on the modal displayed to educate user about live TV feature",
-      "message": "Présentation de la télévision en direct"
-    },
-    "linear_education_sub_header": {
-      "description": "Sub Header on the modal displayed to educate user about live TV feature",
-      "message": "Ne manquez plus rien avec les informations 24 heures sur 24 et 7 jours sur 7, le sport, la télé-réalité et plus encore. Juste au bout des doigts."
-    },
-    "linear_education_button": {
-      "description": "Button title on the modal displayed to educate user about live TV feature",
-      "message": "Regarder la TV en direct"
     },
     "replay": {
       "description": "This label used for badge to indicate the content availability",
