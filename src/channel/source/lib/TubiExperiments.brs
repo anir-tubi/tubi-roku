@@ -84,6 +84,10 @@ Function TubiExperiments(constants) as Object
         roku_registration_player_signup_save_progress_v1: {"enabled": false}
       }
 
+      roku_remove_playready: {
+        roku_remove_playready_v1: {"enabled": false}
+      }
+
     }
 
     'public methods

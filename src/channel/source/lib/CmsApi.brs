@@ -358,7 +358,7 @@ End Function
 Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "")
   posterSize = m.constants.ui.imageSizes.poster
   landscapeSize = m.constants.ui.imageSizes.landscape
- 
+
   '//For now, ensure the large posters do not show up on the search screen
   isNonLargePostersScreen = (isNonEmptyString(screenId) = true AND screenId = m.constants.ui.screenIds.searchScreen)
 
@@ -510,7 +510,7 @@ Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSi
           categoryReqInfo.categoryId = category.id
           categoryReqInfo.requestType = m.constants.reqNames.getMultipleContent
           categoryReqInfo.responseType = "node"
-          categoryReqInfo.isSignedInUser = isSignedInUser          
+          categoryReqInfo.isSignedInUser = isSignedInUser
 
           requests.push(categoryReqInfo)
         end if
@@ -661,7 +661,11 @@ End Function
 
 ' cmsApi_getVideoResources returns video resources order based on experiment response
 Function cmsApi_getVideoResources()
-  videoResources = m.constants.player.drmOrderHlsv6
+  if getExperimentResource("roku_remove_playready", "roku_remove_playready_v1", false).enabled = true 'bs:disable-line 1001 LINT1001
+    videoResources = m.constants.player.drmOrderWidevineHlsv6
+  else
+    videoResources = m.constants.player.drmOrderHlsv6
+  end if
   return videoResources
 End Function
 
