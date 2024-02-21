@@ -271,14 +271,6 @@ Function onResetContentAreaValues()
 End Function
 
 
-' Determine how far away the topNav is from the focus in the CategoryGridList
-'@row: integer, the row of the categoryGridList that is gaining focus
-Function setTopNavFarAwayStatus(row)
-  if m.TopNav.visible = true AND (m.TopNav.hasFocus() = false AND m.TopNav.isInFocusChain() = false)
-    m.topNav.isFocused = false
-  end if
-End Function
-
 
 ' A new row has been focused in the CategoryGridList
 Function onRowFocused(msg)
@@ -398,8 +390,6 @@ Function onCurrFocusRowChange()
     rowLosingFocus = lastFocusRow
     rowPercent = 1
   end if
-
-  setTopNavFarAwayStatus(rowEnteringFocus)
 
   categoryEnteringFocus = invalid
   categoryLosingFocus = invalid

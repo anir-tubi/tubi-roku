@@ -405,21 +405,6 @@ Function generateTopNavContentItems()
 End Function
 
 
-' Determine how far away the topNav is from the focus in the EPGGrid
-'@row: integer, the row of the epgTimeGrid that is gaining focus
-Function setTopNavFarAwayStatus(row)
-  if m.TopNav.visible = true AND (m.TopNav.hasFocus() = false AND m.TopNav.isInFocusChain() = false)
-    m.TopNav.isFocused = false
-  end if
-End Function
-
-
-Function onCurrFocusRowChange()
-  'set the faraway focus for top nav
-  setTopNavFarAwayStatus(m.epgTimeGrid.currFocusRow)
-End Function
-
-
 Function onTimeGridRefreshTimer()
   tubiLog("EPGHomeScreen.onTimeGridRefreshTimer")
   m.top.loadAllChannels = true
