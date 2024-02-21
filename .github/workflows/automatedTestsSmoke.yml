@@ -1,0 +1,52 @@
+# This workflow executes the Automated UI Tests when triggered from the Github UI
+# This will be executed on a self-hosted runner tagged with automated-tests-runner
+name: Automated UI Tests @smoke
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on pull request events but only for the master branch.
+  pull_request:
+    branches: [ master ]
+
+# We want to cancel the previously running job if a new commit gets pushed
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # name helps to check the status of github action
+    name: Run Automated UI Tests @smoke
+    # The type of runner that the job will run
+    runs-on: [self-hosted, automated-tests-runner, enabled, office]
+    # timeouts after 10 minutes, if the execution/automated tests got stuck/crash
+    timeout-minutes: 10
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: gulp runAutomatedTestsSmoke
+        run: |
+          cp ~/rta-config.json ./rta-config.json
+          npx gulp runAutomatedTestsSmoke
+
+      - name: Upload JSON Report
+        if: success() || failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: JSON Report
+          path: out/ui-tests-output/report.json
+
+      - name: Upload HTML Report
+        if: success() || failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: HTML Report
+          path: out/ui-tests-output/html

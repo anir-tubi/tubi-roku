@@ -961,6 +961,11 @@ function runAutomatedAnalyticsTestsCli(done) {
 }
 
 
+function runAutomatedTestsSmoke(done) {
+  return automatedTests().runAutomatedTestsSmoke(done);
+}
+
+
 exports.buildAutomatedTests = series(setAutomatedTestsConfig, clean, buildInstalled);
 exports.runAutomatedTests = series(exports.buildAutomatedTests, runAutomatedTests);
 exports.rerunAutomatedTests = series(setRerunAutomatedTestsEnvironment, runAutomatedTests);
@@ -969,6 +974,7 @@ exports.outputAvailableAutomatedTestTags = outputAvailableAutomatedTestTags;
 exports.autotest = runAutomatedTestsCli;
 exports.buildTestAccount = buildTestAccountCli;
 exports.runAutomatedAnalyticsTestsCli = runAutomatedAnalyticsTestsCli;
+exports.runAutomatedTestsSmoke = runAutomatedTestsSmoke;
 
 exports.runToolingTests = series(setAutomatedTestsConfig, clean, buildInstalled, runToolingTests);
 

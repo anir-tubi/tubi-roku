@@ -29,9 +29,13 @@ RUN adduser --disabled-password --gecos "" --uid 1001 runner \
     && echo "%sudo   ALL=(ALL:ALL) NOPASSWD:ALL" > /etc/sudoers \
     && echo "Defaults env_keep += \"DEBIAN_FRONTEND\"" >> /etc/sudoers
 
+# Start our own content
+
+# Install node
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
+
 USER runner
 
-# Start our own content
 
 # Setup runner config
 

@@ -219,6 +219,11 @@ async function buildTestAccountCli(done) {
 }
 
 
+function runAutomatedTestsSmoke(done) {
+  return runAutomatedTests(done, '', ['@smoke']);
+}
+
+
 async function runAutomatedTests(done, branch = '', tags = [], analytics = false) {
   const mochaOptions = [
     '--reporter js/automated-tests/mocha-reporter.ts', // Tell mocha to use our custom reporter
@@ -411,5 +416,6 @@ module.exports = {
   buildTestAccountCli,
   runAutomatedTests,
   outputAvailableAutomatedTestTags,
-  jsonReportOutputPath
+  jsonReportOutputPath,
+  runAutomatedTestsSmoke
 };

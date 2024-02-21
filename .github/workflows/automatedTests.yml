@@ -94,10 +94,6 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - uses: actions/setup-node@master
-        with:
-          node-version: "18.12.1"
-
       # npm command install all required packages
 
       - name: npm install
