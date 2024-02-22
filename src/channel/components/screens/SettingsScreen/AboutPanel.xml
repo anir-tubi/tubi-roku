@@ -11,49 +11,39 @@
     <field id="titleOne" alias="TitleOne.text"/>
     <field id="textOne"  alias="TextOne.text"/>
     <field id="titleTwo" alias="TitleTwo.text"/>
-    <field id="textTwo"  alias="TextTwo.text"/>
+    <field id="textTwoArray" type="array"/>
     <field id="offset" alias="Offset.translation"/>
   </interface>
 
   <children>
     <Group
       id="Offset">
-      <Group
-        id="ContentGroup">
+      <LayoutGroup
+        id="ContentGroup"
+        layoutDirection="vert"
+        itemSpacings="[15,80,15]">
         <Label 
-          id="TitleOne"
-          height="73"
-          vertAlign="bottom">
+          id="TitleOne">
           <Font
            role="font"/>
         </Label>
         <Label
           id="TextOne"
-          height="353"
           width="1026"
-          wrap="true"
-          translation="[0,99]">
+          wrap="true">
           <Font
            role="font"/>
         </Label>
         <Label 
-          id="TitleTwo"
-          height="73"
-          vertAlign="bottom"
-          translation="[0,249]">
+          id="TitleTwo">
           <Font
            role="font"/>
         </Label>
-        <Label
-          id="TextTwo"
-          height="600"
-          width="1026"
-          wrap="true"
-          translation="[0,351]">
-          <Font
-           role="font"/>
-        </Label>
-      </Group>
+        <LayoutGroup
+          id="TextTwoGroup"
+          layoutDirection="vert"
+          itemSpacings="[40]"/>
+      </LayoutGroup>
     </Group>
   </children>
 </component>

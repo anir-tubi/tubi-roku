@@ -297,9 +297,13 @@ Function createAboutPanel()
     support_url: "https://tubitv.com/support",
     year: sYear
   }
+  
+  sSectionTwoText = getTranslation("screenSettings_about_description2", dynamicText)
 
-  aboutPanel.textTwo = getTranslation("screenSettings_about_description2", dynamicText)
+  '//Go thru the sSectionTwoText and find the text within carriage returns and add it to the array
+  aSectionTwoText = sSectionTwoText.split(chr(10) + chr(10))
 
+  aboutPanel.textTwoArray = aSectionTwoText
   aboutPanel.focusable = false
   aboutPanel.offset = m.rightPanelOffset
   return aboutPanel
