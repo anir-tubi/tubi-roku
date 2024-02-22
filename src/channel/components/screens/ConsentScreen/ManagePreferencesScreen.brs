@@ -19,9 +19,6 @@ Function init()
   m.saveAndContinueBtn.text = getTranslation("privacy_preferences_save_continue_button")
   m.saveAndContinueBtn.observeFieldScoped("selected", "onSaveAndContinueBtnSelected")
 
-  background = topRef.findNode("background")
-  background.uri = m.constants.ui.uris.marketingBackground
-
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.heading, typographyConstants.ids.headerMedium)
 

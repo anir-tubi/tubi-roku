@@ -1,6 +1,7 @@
 Function showConsentScreen(callback = startUserExperience)
   m.callbackAfterConsent = callback
   showContentGroupAndHideSpinner()
+  displayDefaultBackground()
   screen = CreateObject("roSGNode", "ConsentScreen")
   screen.description = m.consentSettings.privacyDescription
   pushScreen(screen, true, true)
