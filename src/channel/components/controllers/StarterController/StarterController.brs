@@ -213,9 +213,10 @@ Function processAnimationLogo()
 
   m.top.observeField("removeStartUpScreens", "onRemoveStartUpScreens")
 
+  '//Used to ensure there is no black screen in between splash screen and animated logo
+  m.videoImageTransition = m.top.findNode("videoImageTransition") 
+  
   m.startupScreens = m.top.findNode("startupScreens")
-
-  m.animationLogo = m.top.findNode("animationLogo")
 
   m.customSplashTimer = m.top.findNode("customSplashTimer")
   m.customSplashTimer.ObserveField("fire","onCustomSplashTimerFired")
@@ -244,6 +245,10 @@ Function onPositionChange(msg)
   duration = m.animationLogo.duration
   ' fading the video once the animation part is completed in video [currently animation ends 1s before video ends]
   remaining = duration - position
+
+  if m.videoImageTransition.opacity = 1 AND position > .01
+    fade(m.videoImageTransition, "out", 0.5)
+  end if
 
   if remaining <= 0.5
     m.animationLogo.unobserveField("position")
@@ -274,8 +279,10 @@ Function onBufferingStatus(msg)
   buffering = msg.GetData()
   ' we are fadingIn startupScreens(VideoNode) only when the buffering percent is >= 99%
   ' this is to avoid black(videoNode) screen appearing before the video starts playing especially on slow internet connection
+  ' The image videoImageTransition is further insurance a black screen will not appear
   if buffering <> invalid AND buffering.percentage >= 99
     m.animationLogo.unobserveField("bufferingStatus")
+
     customFadeIn(m.startupScreens, 0.5, 0)
   ' starting the playback when the buffering percent is >= 33%
   else if buffering <> invalid AND buffering.percentage >= 33 AND m.bufferingCompleted = false
@@ -327,10 +334,14 @@ End Function
 
 ' onRemoveStartUpScreens is used to remove animationLogo node
 Function onRemoveStartUpScreens()
-
+  
   m.animationLogo.visible = false
   m.top.removeChild(m.animationLogo)
   m.animationLogo = invalid
+
+  m.videoImageTransition.visible = false
+  m.top.removeChild(m.videoImageTransition)
+  m.videoImageTransition = invalid
 
   m.startupScreens.visible = false
   m.top.removeChild(m.startupScreens)

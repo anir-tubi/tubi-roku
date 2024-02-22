@@ -73,6 +73,13 @@
         enableTrickPlay="false"
         visible="true" />
 
+      <!-- ' videoImageTransition is used to ensure there is no black screen in between splash screen and animated logo -->
+      <Poster
+        id="videoImageTransition"
+        width="1920"
+        height="1080"
+        uri = "pkg:/images/Tubi_Splash.webp" />
+
       <!-- customSplashTimer is used to show/hide the customSplashPoster -->
       <Timer
         id="customSplashTimer"
