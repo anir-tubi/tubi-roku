@@ -126,21 +126,21 @@ Function runChannel(constants, log, request, auth)
       experiments = TubiExperiments(constants)
 
       if experiments <> invalid
-        if experiments.getExperimentResource("roku_new_cdn", "roku_new_cdn_v1").enabled = true
-          starterLibUrl = constants.settings.rcdnStarterComponentsUrl
-        end if
-
-        cdnExposureEventInfo = experiments.getExperimentTracking("roku_new_cdn", "roku_new_cdn_v1")
-
-        if cdnExposureEventInfo <> invalid
-          trackingLib = TubiTracking(constants, request, auth)
-
-          if trackingLib <> invalid  'trackingLib may not be invalid, but just in case.
-            trackingLib.trackUserEvent(cdnExposureEventInfo.type, cdnExposureEventInfo.values, m.queue)
+        if constants.settings.mode <> "dev"
+          if experiments.getExperimentResource("roku_new_cdn", "roku_new_cdn_v1").enabled = true
+            starterLibUrl = constants.settings.rcdnStarterComponentsUrl
           end if
 
-        end if
+          cdnExposureEventInfo = experiments.getExperimentTracking("roku_new_cdn", "roku_new_cdn_v1")
 
+          if cdnExposureEventInfo <> invalid
+            trackingLib = TubiTracking(constants, request, auth)
+
+            if trackingLib <> invalid  'trackingLib may not be invalid, but just in case.
+              trackingLib.trackUserEvent(cdnExposureEventInfo.type, cdnExposureEventInfo.values, m.queue)
+            end if
+          end if
+        end if
       end if
     end if
 

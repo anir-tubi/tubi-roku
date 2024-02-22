@@ -71,8 +71,10 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
       experiments = TubiExperiments(m.constants)
       remoteComponentsUrl = m.constants.settings.remoteComponentsUrl
       if experiments <> invalid then
-        if experiments.getExperimentResource("roku_new_cdn", "roku_new_cdn_v1").enabled = true
-          remoteComponentsUrl = m.constants.settings.rcdnRemoteComponentsUrl
+        if m.constants.settings.mode <> "dev"
+          if experiments.getExperimentResource("roku_new_cdn", "roku_new_cdn_v1").enabled = true
+            remoteComponentsUrl = m.constants.settings.rcdnRemoteComponentsUrl
+          end if
         end if
 
         if experiments.getExperimentResource("roku_async_stop", "roku_async_stop_v2").enabled = true then
