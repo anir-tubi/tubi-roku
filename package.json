@@ -15,7 +15,6 @@
     "url": "https://github.com/adRise/project-total-recall/issues"
   },
   "homepage": "https://github.com/adRise/project-total-recall#readme",
-
   "devDependencies": {
     "@octokit/rest": "^18.0.9",
     "@rokucommunity/bslint": "0.7.6",
@@ -48,6 +47,7 @@
     "mochawesome": "^7.1.3",
     "my-local-ip": "^1.0.0",
     "needle": "^3.2.0",
+    "node-fetch": "^2.6.7",
     "node-ssdp": "^4.0.0",
     "node.extend": "^2.0.2",
     "prompts": "^2.4.0",

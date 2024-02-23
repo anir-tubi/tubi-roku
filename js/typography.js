@@ -2,6 +2,10 @@
 const fs = require('fs');
 const log = require('fancy-log');
 const glob = require('glob');
+const {fetchJSONFromGithub} = require('./network.js');
+const {writeJSONToFile} = require('./utilities.js');
+const {NoStackError} = require('./utilities');
+const sLocalRelativePath = 'themes/typography.tokens.json';
 
 
 //  Find and replace the typography style associative arrays with the param/value pairs contained in the passed AA in the provided list of files.
@@ -87,8 +91,7 @@ function getTypographyThemeKeyValue(sStyle, node, styleAA){
 // This function will replace populate these associative arrays with the styles within a JSON file.
 // @dest: String, The relative path/destination where the files are located.
 function replaceTypographyConstants(dest) {
-  const relativeTypographyPath = `themes/typography.tokens.json`;
-  const stylesTypography = require(`${process.cwd()}/${relativeTypographyPath}`);
+  const stylesTypography = require(`${process.cwd()}/${sLocalRelativePath}`);
   const files = glob.sync( `${dest}/components/lib/TypographyMixin.brs` );  //Only look at one file
   const styles = stylesTypography.typography.ott;
   let aaListOfStyles = {};
@@ -108,6 +111,26 @@ function replaceTypographyConstants(dest) {
 }
 
 
+//This will update the locally stored typography JSON file with the Design version stored on the web.
+//The Design-authored JSON is located at: https://github.com/adRise/design-tokens/blob/main/src/tokens/typography.tokens.json
+async function updateTypographyJSON(done) {
+  const sDesignURL = 'https://raw.githubusercontent.com/adRise/design-tokens/main/src/tokens/typography.tokens.json';
+
+  // Get the contents of the sDesignURL
+  try {
+    const designContent = await fetchJSONFromGithub(sDesignURL);
+    if (designContent) {
+      // Write the contents to the sLocalRelativePath
+      writeJSONToFile(designContent, sLocalRelativePath);
+      done();
+    }
+  } catch (error) {
+    done(new NoStackError(`updateTypographyJSON(): An error occurred while fetching or writing the JSON file: ${error}`));
+  }
+}
+
+
 module.exports = {
-  replaceTypographyConstants
+  replaceTypographyConstants,
+  updateTypographyJSON
 }

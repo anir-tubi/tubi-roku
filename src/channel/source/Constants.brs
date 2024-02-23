@@ -1338,8 +1338,8 @@ Function getConstants()
 '//::TODO::colors - the following constants should be moved to themes. The app should not call these constants
 constants.ui.uris.defaultContentBackgroundUri = "pkg:/images/background-masks/mask-layer-0.webp"
 '//The use of the "THEME_" constants will be replaced with hexidecimal color strings during the gulp install process.
-'//Source of JSON theme colors are located in /themes/theme.json which is sourced from:
-'//   https://github.com/adRise/design-tokens/blob/main/src/tokens/themes.tokens.json
+'//Source of JSON theme colors are located in /themes/theme.json which is sourced from a design JSON file.
+'//::NOTE:: See the ReadMe on how to update the JSON.
 
 
 '//default theme

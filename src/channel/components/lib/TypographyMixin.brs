@@ -11,8 +11,7 @@ Function getTypographyConstants()
 
   '//The gulp install command will look thru the JSON file (typography.tokens.json),
   '//and generate associative arrays to replace the following string values.
-  '//::NOTE:: The local JSON is copied & pasted from the Design-authored JSON file loocated at:
-  '// https://github.com/adRise/design-tokens/blob/main/src/tokens/typography.tokens.json
+  '//::NOTE:: See the ReadMe on how to update the JSON.
   headerLarge = "TYPOGRAPHY_headerLarge_TYPOGRAPHY"
   headerMedium = "TYPOGRAPHY_headerMedium_TYPOGRAPHY"
   headerSmall = "TYPOGRAPHY_headerSmall_TYPOGRAPHY"

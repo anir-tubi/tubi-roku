@@ -22,8 +22,8 @@ const {keypress, deeplink, uploadPkg, signPkg, installWithSquashfs} = require('.
 //Functions to upload and download static string translations
 const {downloadTranslations, updateLocalTranslations, uploadTranslations} = require('./js/translate');
 const {listUnusedImages,listUnusedTranslations} = require('./js/codeclean.js');
-const {replaceColorConstants} = require('./js/colorreplace.js');
-const {replaceTypographyConstants} = require('./js/typography.js');
+const {replaceColorConstants, updateColorJSON} = require('./js/colorreplace.js');
+const {replaceTypographyConstants, updateTypographyJSON} = require('./js/typography.js');
 
 // Importing functions with Git functionality
 const {NoStackError} = require('./js/utilities');
@@ -991,3 +991,6 @@ exports.removeAutomatedTestsRunner = removeAutomatedTestsGithubActionRunner;
 exports.update_local_translations = updateLocalTranslations;
 exports.upload_translations = series(updateLocalTranslations, uploadTranslations);
 exports.download_translations = downloadTranslations;
+
+exports.update_json_typography = updateTypographyJSON;
+exports.update_json_color = updateColorJSON;

@@ -1,4 +1,5 @@
 'use strict';
+const fs = require('fs');
 const log = require('fancy-log');
 const { spawn } = require('child_process');
 const shell = require('shelljs');
@@ -48,9 +49,28 @@ function spawnShellCommand(done, command, allowNonzeroExitCode = false) {
 }
 
 
+/*
+* Write JSON data to a local file
+ * @param data The JSON data that needs to be written to a local file.
+ * @param filePath The local path to the file that is to be written to.
+*/
+function writeJSONToFile(data, filePath) {
+  try {
+      // Stringify the JSON. Format it using tab to make it readable. Tab is used by the original Design JSON - which this function is used for.
+      const jsonData = JSON.stringify(data, null, '\t');
+
+      fs.writeFileSync(filePath, jsonData);
+      log(`JSON data successfully written to ${filePath}`);
+  } catch (error) {
+      log(`Error: An error occurred while writing the JSON data from the filepath:', ${filePath}`);
+      throw(error);
+  }
+}
+
 
 module.exports = {
   NoStackError,
   execShellCommand,
-  spawnShellCommand
+  spawnShellCommand,
+  writeJSONToFile
 };

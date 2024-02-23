@@ -620,6 +620,21 @@ For example:
 
 By updating the default resource in Popper Config, it is possible to update all devices to a specific experiment experience without changing any client code.
 
+# Updating Code from External Sources
+
+## Updating the Colors & Font Themes
+
+To ensure consistency and maintainability, it is essential to avoid any hard-coded references within the app to color, font size, or font type. Instead, the app should utilize color constants and typography constants. Typography constants are defined in the TypographyMixin.brs file, and color constants are defined in Constants. During the gulp install process, these constants will be assigned their respective hard-coded values.
+
+The source of these values are two JSON files stored locally within the app's codebase. These local files are maintained by the Design Department and are hosted on their GitHub repository. To keep the local JSON files up-to-date, periodically update them with the latest versions from the GitHub repository. After updating the file(s), you should check the app to ensure no bugs are introduced.
+
+To perform these updates, simply run the following two gulp commands:
+
+```shell
+gulp update_json_color
+gulp update_json_typography
+```
+
 ## Updating the static text (translations) in app
 
 The app stores all of its static text for various languages centrally. If you need to make a change, you should follow the below procedures.

@@ -2,6 +2,9 @@
 const fs = require('fs');
 const log = require('fancy-log');
 const glob = require('glob');
+const {fetchJSONFromGithub, writeJSONToFile} = require('./network.js');
+const {NoStackError} = require('./utilities');
+const sLocalRelativePath = 'themes/theme.json';
 
 
 //  Find and replace the color constants with the hexadecimal values contained in the passed AA in the provided list of files.
@@ -78,8 +81,7 @@ function getColorKeyValue(sColor, node, colorAA){
 // hexadecimal color codes using the color pallette file
 // @dest: String, The relative path/destination where the files are located.
 function replaceColorConstants(dest) {    
-  const themeFilename = `themes/theme.json`;
-  const themeColors = require(`${process.cwd()}/${themeFilename}`);
+  const themeColors = require(`${process.cwd()}/${sLocalRelativePath}`);
   const files = glob.sync( `${dest}/source/Constants.brs` );  //Only look at one file
   const themes = themeColors.themes;
   let aaListOfColors = {};
@@ -101,6 +103,26 @@ function replaceColorConstants(dest) {
 }
 
 
+//This will update the locally stored color JSON file with the Design version stored on the web.
+//The Design-authored JSON is located at: https://github.com/adRise/design-tokens/blob/main/src/tokens/themes.tokens.json
+async function updateColorJSON(done) {
+  const sDesignURL = 'https://raw.githubusercontent.com/adRise/design-tokens/main/src/tokens/themes.tokens.json';
+
+  // Get the contents of the sDesignURL
+  try {
+    const designContent = await fetchJSONFromGithub(sDesignURL);
+    if (designContent) {
+      // Write the contents to the sLocalRelativePath
+      writeJSONToFile(designContent, sLocalRelativePath);
+      done();
+    }
+  } catch (error) {
+    done(new NoStackError(`updateColorJSON(): An error occurred while fetching or writing the JSON file: ${error}`));
+  }
+}
+
+
 module.exports = {
-  replaceColorConstants
+  replaceColorConstants,
+  updateColorJSON
 }

@@ -618,6 +618,31 @@
 			}
 		},
 		"mobile": {
+			"display": {
+				"large": {
+					"$description": "42/42 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 42
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "TubiStans"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": 0
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 42
+					}
+				}
+			},
 			"header": {
 				"extra-large": {
 					"$description": "28/34 - Black",

@@ -1,5 +1,8 @@
 'use strict';
 const fs = require('fs');
+const fetch = require('node-fetch');
+const {NoStackError} = require('./utilities');
+
 let _request;
 function request() {
   // Only want to load request when it is needed to speed up other gulp tasks
@@ -227,3 +230,37 @@ exports.autoDiscover = function() {
     ssdp.search('roku:ecp');
   });
 };
+
+
+/*
+* Fetch JSON data from Github
+ * @param url The Github URL where to fetch the JSON
+*/
+async function fetchJSONFromGithub(url) {
+  const { GITHUB_PAT } = process.env;
+  const headers = GITHUB_PAT ? { Authorization: `token ${GITHUB_PAT}` } : {};
+
+  return fetchJSON(url, headers);
+}
+
+
+/*
+* Fetch JSON data from the file path
+ * @param url The URL where to fetch the JSON
+ * @param headers (optional) the associative array representing the header that should be added to the URL fetch.
+*/
+async function fetchJSON(url, headers) {
+  try {
+    const response = await fetch(url, { headers });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    log(`Error: An error occurred while reading the JSON file from the URL: ${url}`);
+    throw(error);
+    return null;
+  }
+}
+
+
+module.exports.fetchJSON =  fetchJSON;
+module.exports.fetchJSONFromGithub =  fetchJSONFromGithub;
