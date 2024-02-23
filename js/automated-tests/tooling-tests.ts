@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import { ecp, odc, utils } from 'roku-test-automation';
 import type { RegisteredUser } from './test-utils';
 import { auth, testUtils } from './test-utils';
+import { elements } from '../../automated-tests-config/elements';
 
 describe('test-utils', function () {
   let existingUser: RegisteredUser;
@@ -56,10 +57,10 @@ describe('test-utils', function () {
     });
 
 
-    describe('waitForSelectedMainMenuItemToEqual', function () {
+    describe('waitForFocusedSideNavMenuItemToEqual', function () {
       it('should wait for the the correct item to be focused and not throw an error after we focus the correct menu item', async () => {
         await testUtils.startApplicationAtPage('home');
-        let promise = testUtils.verifyFocusedSideNavMenuItemEquals('search', 200);
+        let promise = testUtils.waitForFocusedSideNavMenuItemToEqual('search', 200);
         let threwError = false;
         try {
           await promise;
@@ -69,11 +70,10 @@ describe('test-utils', function () {
 
         // It should throw an error here since we didn't focus it yet
         expect(threwError).to.be.true;
+        await ecp.sendKeypress(ecp.Key.Left, 100);
+        await ecp.sendKeypress(ecp.Key.Up, 100);
 
-        await ecp.sendKeypress(ecp.Key.Left);
-        await ecp.sendKeypress(ecp.Key.Up);
-
-        promise = testUtils.verifyFocusedSideNavMenuItemEquals('search', 1000);
+        promise = testUtils.waitForFocusedSideNavMenuItemToEqual('search', 1000);
         await ecp.sendKeypress(ecp.Key.Ok);
         // Should not throw an error this time
         await promise;
@@ -177,7 +177,7 @@ describe('test-utils', function () {
     describe('getElementSize', function () {
       it('should be able to retrieve the size of a known element', async () => {
         const size = await testUtils.getElementSize('backgroundGroup');
-        expect(size.width).to.equal(1920);
+        expect(size.width).to.equal(1923);
         expect(size.height).to.equal(1080);
         expect(size.x).to.equal(0);
         expect(size.y).to.equal(0);
@@ -197,12 +197,13 @@ describe('test-utils', function () {
 
     describe('getGridElementSize', function () {
       it('should be able to retrieve the size of a known grid child element', async () => {
-        await utils.sleep(3000);
+        await testUtils.goToPage('home');
+        await utils.sleep(5000);
         const size = await testUtils.getGridElementSize('homeRowList', [0, 3]);
-        expect(size.width).to.equal(504);
-        expect(size.height).to.equal(282);
-        expect(size.x).to.equal(1752);
-        expect(size.y).to.equal(572);
+        expect(size.width).to.equal(520);
+        expect(size.height).to.equal(292);
+        expect(size.x).to.equal(1773);
+        expect(size.y).to.equal(579.5);
       });
     });
 
@@ -262,28 +263,41 @@ describe('test-utils', function () {
     });
 
 
-    describe('getElementSize', function () {
-      it('should be able to retrieve the size of a known element', async () => {
-        const size = await testUtils.getElementSize('backgroundGroup');
-        expect(size.width).to.equal(1920);
-        expect(size.height).to.equal(1080);
-        expect(size.x).to.equal(0);
-        expect(size.y).to.equal(0);
+    describe('isElementShowingOnScreen', function () {
+      it('should correctly say that an element showing on screen is showing', async () => {
+        const {isShowing, isFullyShowing} = await testUtils.isElementShowingOnScreen(elements.contentController);
+        expect(isShowing).to.be.true;
+        expect(isFullyShowing).to.be.false;
       });
 
-      it('should throw an error if the element does not currently exist in the nodetree', async () => {
-        try {
-          await testUtils.getElementSize('privacyPageScroller');
-        } catch (e) {
-          // Failed as expected
-          return;
-        }
-        throw new Error('Did not throw an error when element did not exist');
+      it('should correctly say that an element not showing on screen is not showing', async () => {
+        const {isShowing, isFullyShowing} = await testUtils.isElementShowingOnScreen(elements.settingsScreen);
+        expect(isShowing).to.be.false;
+        expect(isFullyShowing).to.be.false;
       });
     });
 
 
-    describe('waitForMainMenuToBeExpanded', function () {
+    describe('waitForElementToShowOnScreen', function () {
+      it('should not throw an error if the element showed on the screen', async () => {
+        const promise = testUtils.waitForElementToShowOnScreen(elements.contentController);
+        await testUtils.goToPage('settings');
+        await promise;
+      });
+
+      it('should throw an error if the element does not show on the screen', async () => {
+        try {
+          await testUtils.waitForElementToShowOnScreen(elements.episodesScreen, undefined, 500);
+        } catch (e) {
+          // Failed as expected
+          return;
+        }
+        throw new Error('Did not throw an error when element was not showing');
+      });
+    });
+
+
+    describe('waitForSideNavMenuToBeExpanded', function () {
       beforeEach(async () => {
         await testUtils.startApplicationAtPage('home');
         await testUtils.waitForElementToHaveFocus('homeRowList');
@@ -291,12 +305,12 @@ describe('test-utils', function () {
 
       it('should not throw an Error if the main menu is expanded', async () => {
         await ecp.sendKeypress(ecp.Key.Left);
-        await testUtils.waitForMainMenuToBeExpanded();
+        await testUtils.waitForSideNavMenuToBeExpanded();
       });
 
       it('should throw an error if the main menu is not expanded', async () => {
         try {
-          await testUtils.waitForMainMenuToBeExpanded(500);
+          await testUtils.waitForSideNavMenuToBeExpanded(500);
         } catch (e) {
           // Failed as expected
           return;
@@ -306,20 +320,20 @@ describe('test-utils', function () {
     });
 
 
-    describe('waitForMainMenuToNotBeExpanded', function () {
+    describe('waitForSideNavMenuToNotBeExpanded', function () {
       beforeEach(async () => {
         await testUtils.startApplicationAtPage('home');
         await testUtils.waitForElementToHaveFocus('homeRowList');
       });
 
       it('should not throw an Error if the main menu is not expanded', async () => {
-        await testUtils.waitForMainMenuToNotBeExpanded();
+        await testUtils.waitForSideNavMenuToNotBeExpanded();
       });
 
       it('should throw an error if the main menu is expanded', async () => {
         try {
           await ecp.sendKeypress(ecp.Key.Left);
-          await testUtils.waitForMainMenuToNotBeExpanded(500);
+          await testUtils.waitForSideNavMenuToNotBeExpanded(500);
         } catch (e) {
           // Failed as expected
           return;

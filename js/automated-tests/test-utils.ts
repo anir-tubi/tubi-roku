@@ -134,7 +134,7 @@ class TestUtils {
    * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
-  public async getNodeFieldForElement(elementOrElementId: ElementOrElementId, field: string, timeout = 15000) {
+  public async getElementField(elementOrElementId: ElementOrElementId, field: string, timeout = 15000) {
     const element = this.getElementKeyPath(elementOrElementId) as Element;
     element.keyPath += '.' + field;
     let result;
@@ -144,6 +144,38 @@ class TestUtils {
     }, `Could not get node for element '${element.id}'`, timeout);
 
     return result.value;
+  }
+
+
+  /**
+   * Use this to wait for an element field to match a known value. If a simple known value isn't available you can use waitForElementFieldChange
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param toEqual - What we are expecting the value to equal
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async waitForElementFieldToEqual(elementOrElementId: ElementOrElementId, field: string, toEqual: odc.ComparableValueTypes, timeout = 15000) {
+    const element = this.getElementKeyPath(elementOrElementId) as Element;
+    return await odc.onFieldChangeOnce({
+      keyPath: element.keyPath + '.' + field,
+      match: toEqual
+    }, {
+      timeout: timeout
+    });
+  }
+
+
+  /**
+   * Use this to wait for an element field to change
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async waitForElementFieldChange(elementOrElementId: ElementOrElementId, field: string, timeout = 15000) {
+    const element = this.getElementKeyPath(elementOrElementId) as Element;
+    return await odc.onFieldChangeOnce({
+      keyPath: element.keyPath + '.' + field
+    }, {
+      timeout: timeout
+    });
   }
 
 
@@ -385,7 +417,7 @@ class TestUtils {
   public async waitForPlayerStateToEqual(videoPlayerElementId: VideoPlayerElementId, expectedState: VideoPlayerStates, timeout = 5000) {
     const element = this.getElementKeyPath(videoPlayerElementId);
     return await testUtils.retryWithTimeOut(async () => {
-      const state = await this.getNodeFieldForElement(videoPlayerElementId, 'state');
+      const state = await this.getElementField(videoPlayerElementId, 'state');
       expect(state).to.equal(expectedState);
     }, timeout);
   }
@@ -446,7 +478,7 @@ class TestUtils {
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
   public async getPlayerContent(videoPlayerElementId: VideoPlayerElementId, timeout = 10000) {
-    return await this.getNodeFieldForElement(videoPlayerElementId, 'content', timeout) as NodeRepresentation & {
+    return await this.getElementField(videoPlayerElementId, 'content', timeout) as NodeRepresentation & {
       ACTORS: string[];
       CATEGORIES: string[];
       DESCRIPTION: string;
@@ -1034,6 +1066,66 @@ class TestUtils {
 
 
   /**
+   * Allows knowing if an element is showing on screen (viewable by a user) as well as whether it is fully showing
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async isElementShowingOnScreen(elementOrElementId: ElementOrElementId, timeout = 10000) {
+    const element = this.getElementKeyPath(elementOrElementId);
+    try {
+      return await odc.isShowingOnScreen(element, {timeout: timeout});
+    } catch(e) {
+      return {
+        isShowing: false,
+        isFullyShowing: false
+      };
+    }
+  }
+
+
+  /**
+  * Waits for element to be at least partially showing on the screen (viewable by a user)
+  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+  * @param errorMessage - A custom string to use for the error message
+  * @param timeout - How long we will wait for this operation before considering it to have failed
+  */
+  public async waitForElementToShowOnScreen(elementOrElementId: ElementOrElementId, errorMessage?: string, timeout = 10000) {
+    await this.untilTrue(async () => {
+      const result = await this.isElementShowingOnScreen(elementOrElementId);
+      return result.isShowing;
+    }, errorMessage, timeout);
+  }
+
+
+  /**
+  * Waits for element to be fully showing on the screen (viewable by a user)
+  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+  * @param errorMessage - A custom string to use for the error message
+  * @param timeout - How long we will wait for this operation before considering it to have failed
+  */
+  public async waitForElementToFullyShowOnScreen(elementOrElementId: ElementOrElementId, errorMessage?: string, timeout = 10000) {
+    await this.untilTrue(async () => {
+      const result = await this.isElementShowingOnScreen(elementOrElementId);
+      return result.isFullyShowing;
+    }, errorMessage, timeout);
+  }
+
+
+  /**
+  * Waits for element to not be showing on the screen (viewable by a user)
+  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+  * @param errorMessage - A custom string to use for the error message
+  * @param timeout - How long we will wait for this operation before considering it to have failed
+  */
+  public async waitForElementToNotShowOnScreen(elementOrElementId: ElementOrElementId, errorMessage?: string, timeout = 10000) {
+    await this.untilTrue(async () => {
+      const result = await this.isElementShowingOnScreen(elementOrElementId);
+      return !result.isShowing;
+    }, errorMessage, timeout);
+  }
+
+
+  /**
    * Allows getting the dimensions of a regular node. Use getGridElementSize for grid children items
    * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
    * @param timeout - How long we will wait for this operation before considering it to have failed
@@ -1109,7 +1201,7 @@ class TestUtils {
 
 
   private async getCurrentScreen(timeout = 10000) {
-    const lastScreen = await this.getNodeFieldForElement('screenStack', '-1');
+    const lastScreen = await this.getElementField('screenStack', '-1', timeout);
     return lastScreen as NodeRepresentation;
   }
 
