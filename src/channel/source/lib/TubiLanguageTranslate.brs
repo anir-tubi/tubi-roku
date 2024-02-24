@@ -935,10 +935,6 @@ Function getTranslation_en_US()
       "description": "Onscreen message to indicate TV content could not be loaded",
       "message": "Unable to load the Tubi TV Shows screen."
     },
-    "screenTournament_error_fetchScreenContent_description": {
-      "description": "Onscreen message to indicate Tournament content could not be loaded",
-      "message": "Unable to load the Tubi Tournament screen."
-    },
     "epg_minutes_left": {
       "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
       "message": "{minutes}m left"
@@ -1102,10 +1098,6 @@ Function getTranslation_en_US()
     "screenDetails_button_likeDislike": {
       "description": "Label of unfocused button to allow users to like or dislike the current video title",
       "message": "Like or Dislike"
-    },
-    "screenDetails_button_see_all_games": {
-      "description": "Label of button to allow users to a new page where they can see all the games related to the current sports title",
-      "message": "See All Matches"
     },
     "screenDetails_button_sign_in_to_set_reminder": {
       "description": "Label of button to allow users to set the reminder to the current video title when the user is not signed in.",
@@ -1702,16 +1694,8 @@ Function getTranslation_en_US()
       "message": "Unlock better recommendations"
     },
     "dialog_got_it": {
-      "description": "button display on fifa intro modal",
+      "description": "simple text to use anywhere to indicate dismiss action",
       "message": "Got it"
-    },
-    "dialog_explore_fifa": {
-      "description": "button display on fifa intro modal",
-      "message": "Explore FIFA 2022"
-    },
-    "explore_fifa_description": {
-      "description": "description displayed on fifa intro modal",
-      "message": "Tubi has full replays of all 64 World Cup matches available for free. Sign up to stream every match on your favorite device. No subscription or credit card required."
     },
     "reg_intro_title": {
       "description": "title displayed on registration welcome modal",
@@ -1744,14 +1728,6 @@ Function getTranslation_en_US()
     "replay": {
       "description": "This label used for badge to indicate the content availability",
       "message": "Replay"
-    },
-    "show_all_games_gameInfo": {
-      "description": "Text displayed on Fifa World Cup 2022 infopanel second line when Show all games is focused",
-      "message": "Nov 20, 2022 - Dec 18, 2022"
-    },
-    "show_all_games_description": {
-      "description": "Description displayed on Fifa World Cup 2022 infopanel when Show all games is focused",
-      "message": "Taking place every four years, the FIFA Men's World Cup sees 32 nations compete against each other for the prize."
     },
     "info_panel_reminder_is_set": {
       "description": "Hint in the content metadata area informing the user that the reminder is set for this content",
@@ -2625,10 +2601,6 @@ Function getTranslation_es_MX()
       "description": "Onscreen message to indicate TV content could not be loaded",
       "message": "No se pudo cargar la pantalla de series de Tubi."
     },
-    "screenTournament_error_fetchScreenContent_description": {
-      "description": "Onscreen message to indicate Tournament content could not be loaded",
-      "message": "No se puede cargar la pantalla del Torneo en Tubi."
-    },
     "epg_minutes_left": {
       "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
       "message": "quedan {minutes} m"
@@ -2792,10 +2764,6 @@ Function getTranslation_es_MX()
     "screenDetails_button_likeDislike": {
       "description": "Label of unfocused button to allow users to like or dislike the current video title",
       "message": "Me Gusta o No Me Gusta"
-    },
-    "screenDetails_button_see_all_games": {
-      "description": "Label of button to allow users to a new page where they can see all the games related to the current sports title",
-      "message": "Ver Todos Los Partidos"
     },
     "screenDetails_button_sign_in_to_set_reminder": {
       "description": "Label of button to allow users to set the reminder to the current video title when the user is not signed in.",
@@ -3384,16 +3352,8 @@ Function getTranslation_es_MX()
       "message": "Desbloquea mejores recomendaciones"
     },
     "dialog_got_it": {
-      "description": "button display on fifa intro modal",
+      "description": "simple text to use anywhere to indicate dismiss action",
       "message": "Lo entiendo"
-    },
-    "dialog_explore_fifa": {
-      "description": "button display on fifa intro modal",
-      "message": "Descubre FIFA 2022"
-    },
-    "explore_fifa_description": {
-      "description": "description displayed on fifa intro modal",
-      "message": "Tubi tiene repeticiones completas de los 64 partidos de la Copa Mundial disponibles de forma gratuita. Regístrate para ver todos los partidos en tu dispositivo favorito."
     },
     "reg_intro_title": {
       "description": "title displayed on registration welcome modal",
@@ -3426,14 +3386,6 @@ Function getTranslation_es_MX()
     "replay": {
       "description": "This label used for badge to indicate the content availability",
       "message": "Repetición"
-    },
-    "show_all_games_gameInfo": {
-      "description": "Text displayed on Fifa World Cup 2022 infopanel second line when Show all games is focused",
-      "message": "20 de nov, de 2022 - 18 de dic, de 2022"
-    },
-    "show_all_games_description": {
-      "description": "Description displayed on Fifa World Cup 2022 infopanel when Show all games is focused",
-      "message": "La Copa Mundial de la FIFA, que se celebra cada cuatro años, cuenta con la participación de 32 naciones que compiten por el título."
     },
     "info_panel_reminder_is_set": {
       "description": "Hint in the content metadata area informing the user that the reminder is set for this content",
@@ -4270,10 +4222,6 @@ Function getTranslation_fr_CA()
       "description": "Onscreen message to indicate TV content could not be loaded",
       "message": "Impossible de charger l'écran des programmes TV Tubi."
     },
-    "screenTournament_error_fetchScreenContent_description": {
-      "description": "Onscreen message to indicate Tournament content could not be loaded",
-      "message": "Impossible de charger l'écran des tournois Tubi."
-    },
     "epg_minutes_left": {
       "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
       "message": "plus que {minutes} min"
@@ -4437,10 +4385,6 @@ Function getTranslation_fr_CA()
     "screenDetails_button_likeDislike": {
       "description": "Label of unfocused button to allow users to like or dislike the current video title",
       "message": "J'aime ou Je n'aime pas"
-    },
-    "screenDetails_button_see_all_games": {
-      "description": "Label of button to allow users to a new page where they can see all the games related to the current sports title",
-      "message": "Voir tous les matchs"
     },
     "screenDetails_button_sign_in_to_set_reminder": {
       "description": "Label of button to allow users to set the reminder to the current video title when the user is not signed in.",
@@ -5029,16 +4973,8 @@ Function getTranslation_fr_CA()
       "message": "Proposer de meilleures recommandations"
     },
     "dialog_got_it": {
-      "description": "button display on fifa intro modal",
+      "description": "simple text to use anywhere to indicate dismiss action",
       "message": "J'ai compris"
-    },
-    "dialog_explore_fifa": {
-      "description": "button display on fifa intro modal",
-      "message": "Explorez la FIFA 2022"
-    },
-    "explore_fifa_description": {
-      "description": "description displayed on fifa intro modal",
-      "message": "Tubi propose gratuitement les rediffusions complètes des 64 matchs de la Coupe du monde. Inscrivez-vous pour regarder chaque match sur votre appareil préféré. Aucun abonnement ou carte de crédit requis."
     },
     "reg_intro_title": {
       "description": "title displayed on registration welcome modal",
@@ -5071,14 +5007,6 @@ Function getTranslation_fr_CA()
     "replay": {
       "description": "This label used for badge to indicate the content availability",
       "message": "Rediffusion"
-    },
-    "show_all_games_gameInfo": {
-      "description": "Text displayed on Fifa World Cup 2022 infopanel second line when Show all games is focused",
-      "message": "20 nov 2022 - 18 déc 2022"
-    },
-    "show_all_games_description": {
-      "description": "Description displayed on Fifa World Cup 2022 infopanel when Show all games is focused",
-      "message": "La Coupe du monde masculine de la FIFA, qui a lieu tous les quatre ans, voit 32 nations s'affronter pour remporter la coupe."
     },
     "info_panel_reminder_is_set": {
       "description": "Hint in the content metadata area informing the user that the reminder is set for this content",

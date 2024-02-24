@@ -112,12 +112,6 @@ Function registerParsingCallbacks()
     parseError: parseEPGProgramsError
   }
 
-  'tournamentScreen
-  m.requestTypes[m.constants.reqNames.getTournamentScreen] = {
-    parseSuccess: parseTournamentSuccess
-    parseError: parseTournamentError
-  }
-
   ' post history
   m.requestTypes[m.constants.reqNames.postUserHistory] = {
     parseSuccess: parseHistorySuccess

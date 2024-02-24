@@ -31,7 +31,7 @@ Function parseHomeScreenContentSuccess(fullResponse, reqInfo)
     isSignedInUser = reqInfo.isSignedInUser
   end if
 
-  convertedMetadata = m.metadataTranslate.translateFIFAHomescreen(parsedResponse, contentMode, isKidsMode, uiMode, isSignedInUser)
+  convertedMetadata = m.metadataTranslate.translateHomescreen(parsedResponse, contentMode, isKidsMode, uiMode,"homeScreen", isSignedInUser)
 
   return convertedMetadata
 End Function

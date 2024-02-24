@@ -1606,7 +1606,6 @@ Function updateVideoPlayerState(content) as Void
   'TODO: check once the API data is ready and remove the hardcoded values
   else if content.parentType = m.constants.uapiContentTypes.sportsEvent
     title.text = content.title
-    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     episodeTitleText = ""
     if content.length <> invalid and content.length <> 0
       ' add 'dot' spacer only if we had a release date

@@ -277,7 +277,6 @@ Function getConstants()
     constants.reqNames.deleteFromQueue = "deleteFromQueue"
     constants.reqNames.postToQueue = "postToQueue"
     constants.reqNames.deleteHistory = "deleteHistory"
-    constants.reqNames.getTournamentScreen = "getTournamentScreen"
     constants.reqNames.getScreenSaverContainer = "getScreenSaverContainer"
     constants.reqNames.getScreenSaverHomeScreenContainerIds = "getScreenSaverHomeScreenContainerIds"
     constants.reqNames.getNamespaces = "getNamespaces"
@@ -323,7 +322,6 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postToQueue] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.deviceRegister] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.deleteHistory] = true
-      constants.reqNames.acceptsTubiAuth[constants.reqNames.getTournamentScreen] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getEPGChannelIds] = true
 
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getScreenSaverContainer] = true
@@ -427,7 +425,6 @@ Function getConstants()
     constants.logoType.tubi = "tubi"
     constants.logoType.tubiKids = "tubi_kids"
     constants.logoType.tubiEspanol = "tubi_espanol"
-    constants.logoType.tubiFifa = "tubi_fifa"
     constants.logoType.hide = "hide"
 
   'experiment information will be placed here
@@ -499,7 +496,6 @@ Function getConstants()
       constants.urls.tensor.homescreen = constants.urls.tensor.urlBase + "/v3/homescreen"
       constants.urls.tensor.container = constants.urls.tensor.urlBase + "/v3/containers"
       constants.urls.tensor.epgChannelIds = constants.urls.tensor.urlBase + "/v2/epg"
-      constants.urls.tensor.tournamentscreen = constants.urls.tensor.urlBase + "/v1/wc_tournament"
 
       ' tensor cdn url
       constants.urls.tensor.cdn = {}
@@ -510,7 +506,6 @@ Function getConstants()
         constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v3/homescreen"
         constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v3/containers"
         constants.urls.tensor.cdn.epgChannelIds = constants.urls.tensor.cdn.urlBase + "/v2/epg"
-        constants.urls.tensor.cdn.tournamentscreen = constants.urls.tensor.cdn.urlBase + "/v1/wc_tournament"
 
     'user devices url
     constants.urls.userDevice = {}
@@ -643,10 +638,6 @@ Function getConstants()
       "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-7.webp"
       "https://cdn.adrise.tv/image/roku_support_images/onboarding/onboarding-landing-fhd-8.webp"
      ]
-
-     ' // REMOVE fifa showAll images & it's references after fifa world cup is done.
-     constants.urls.fifaShowAllPoster = "https://cdn.adrise.tv/image/roku_support_images/fifa-showall-poster.png"
-     constants.urls.fifaShowAllBackground = "https://cdn.adrise.tv/image/roku_support_images/fifa-showall-background.webp"
 
     ' url for pinging Nielsen
     constants.urls.nielsenPing = "https://audit.imrworldwide.com/cgi-bin/gn"
@@ -899,7 +890,6 @@ Function getConstants()
   constants.errors.context.categoriesScreen = "10"
   constants.errors.context.linearPlayerScreen = "11"
   constants.errors.context.emailVerificationScreen = "13"
-  constants.errors.context.tournament = "14"
   constants.errors.context.forgotPasswordProcessingScreen = "15"
 
   '//What is the actual error?
@@ -1001,10 +991,6 @@ Function getConstants()
       constants.ui.categoryIds.featured = "featured"
       constants.ui.categoryIds.myLikes = "my_likes"
       constants.ui.categoryIds.recommendedForYou = "recommended_for_you"
-      constants.ui.categoryIds.fifawc = "fifa_world_cup_2022_matches"
-      constants.ui.categoryIds.upcomings = "fifa_world_cup_upcoming_matches"
-      constants.ui.categoryIds.replays = "fifa_world_cup_match_replays"
-
       constants.ui.categoryIds.mostPopular = "most_popular"
       constants.ui.categoryIds.movieNight = "movie_night"
       constants.ui.categoryIds.seriesSpotlight = "series_spotlight"
@@ -1046,10 +1032,7 @@ Function getConstants()
       constants.ui.infoPanelModes.simplifiedLinearPlayer = "simplifiedLinearPlayer"
       constants.ui.infoPanelModes.linearSearch = "linearSearch"
       constants.ui.infoPanelModes.programHomescreen = "programHomescreen"
-      '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-      constants.ui.infoPanelModes.linearTournament = "linearTournament"
       constants.ui.infoPanelModes.sportsEvent = "sportsEvent"
-      constants.ui.infoPanelModes.navigateSports = "navigateSports"
 
     constants.ui.contentMode = {}
       ' these are also used for the content experience choices but are the value that is sent to the back end in our api requests
@@ -1070,11 +1053,9 @@ Function getConstants()
       constants.ui.contentTypes.historySignedOutUser = "continue_watching_signed_out_user"
       constants.ui.contentTypes.emptyContainer = "emptyContainer"
       constants.ui.contentTypes.epg = "epg"
-      '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
       constants.ui.contentTypes.sportsEvent = "sports_event"
-      constants.ui.contentTypes.navigate = "navigate"
 
-    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+    '// Check if these are required for sports events
     constants.ui.contentTimings = {}
       constants.ui.contentTimings.upcoming = "upcoming"
       constants.ui.contentTimings.replay = "replay"
@@ -1108,7 +1089,6 @@ Function getConstants()
       constants.ui.screenLevels.searchScreen = 20
       constants.ui.screenLevels.myStuffScreen = 20
       constants.ui.screenLevels.settingsScreen = 20
-      constants.ui.screenLevels.tournamentScreen = 20
       constants.ui.screenLevels.confirmPasswordScreen = 40
       constants.ui.screenLevels.categoryDetailsScreen = 40
       constants.ui.screenLevels.detailScreen = 50
@@ -1142,7 +1122,6 @@ Function getConstants()
       constants.ui.screenIds.linearVideoPlayerScreen = "linearVideoPlayerScreen"
       constants.ui.screenIds.epgScreen = "epgScreen"
       constants.ui.screenIds.forgotPasswordProcessingScreen = "forgotPasswordProcessingScreen"
-      constants.ui.screenIds.tournamentScreen = "tournamentScreen"
       constants.ui.screenIds.screensaverScreen = "screensaverScreen"
       constants.ui.screenIds.consentScreen = "consentScreen"
       constants.ui.screenIds.managePreferencesScreen = "managePreferencesScreen"
@@ -1152,9 +1131,6 @@ Function getConstants()
     ' because currently we support only portrait style in category detail screen
     constants.ui.notAllowedContainerIds = {}
       constants.ui.notAllowedContainerIds[constants.ui.categoryIds.featured] = true
-      constants.ui.notAllowedContainerIds[constants.ui.categoryIds.fifawc] = true
-      constants.ui.notAllowedContainerIds[constants.ui.categoryIds.upcomings] = true
-      constants.ui.notAllowedContainerIds[constants.ui.categoryIds.replays] = true
 
     constants.ui.cacheableScreenIds = {}
       constants.ui.cacheableScreenIds[constants.ui.screenIds.homeScreen] = true
@@ -1170,7 +1146,6 @@ Function getConstants()
       constants.ui.cacheableScreenIds[constants.ui.screenIds.emailInputScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.signInScreen] = true
       constants.ui.cacheableScreenIds[constants.ui.screenIds.epgScreen] = true
-      constants.ui.cacheableScreenIds[constants.ui.screenIds.tournamentScreen] = true 'TODO check if we can implement client logic
 
       ' top level content ids for parent content nodes that don't have a content id from the backend
     constants.ui.contentIds = {}
@@ -1229,7 +1204,6 @@ Function getConstants()
       constants.ui.sideNavOpenIds[constants.ui.screenIds.movieScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.myStuffScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.searchScreen] = true
-      constants.ui.sideNavOpenIds[constants.ui.screenIds.tournamentScreen] = true
 
     constants.ui.sideNavIds = {}
       constants.ui.sideNavIds.home = "home"
@@ -1248,7 +1222,6 @@ Function getConstants()
       constants.ui.homeScreenTopNavIds.movies = "movies"
       constants.ui.homeScreenTopNavIds.tv = "tv"
       constants.ui.homeScreenTopNavIds.linearEPG = "linearEPG"
-      constants.ui.homeScreenTopNavIds.tournament = "tournament"
 
     constants.ui.linearSideNavIds = {}
       constants.ui.linearSideNavIds.epg = "epg"
@@ -1270,7 +1243,6 @@ Function getConstants()
       constants.ui.screenIdToTopNavId[constants.ui.screenIds.tvScreen] = constants.ui.homeScreenTopNavIds.tv
       constants.ui.screenIdToTopNavId[constants.ui.screenIds.movieScreen] = constants.ui.homeScreenTopNavIds.movies
       constants.ui.screenIdToTopNavId[constants.ui.screenIds.epgscreen] = constants.ui.homeScreenTopNavIds.linearEPG
-      constants.ui.screenIdToTopNavId[constants.ui.screenIds.tournamentScreen] = constants.ui.homeScreenTopNavIds.tournament
 
     constants.ui.detailScreenMenuItemIds = {}
       constants.ui.detailScreenMenuItemIds.playMenuItem = "PlayMenuItem"
@@ -1285,7 +1257,6 @@ Function getConstants()
       constants.ui.detailScreenMenuItemIds.removeHistoryMenuItem = "RemoveHistoryMenuItem"
       constants.ui.detailScreenMenuItemIds.signUpMenuItem = "SignUpMenuItem"
       constants.ui.detailScreenMenuItemIds.channelMenuItem = "ChannelMenuItem"
-      constants.ui.detailScreenMenuItemIds.seeAllGamesMenuItem = "SeeAllGamesMenuItem"
       constants.ui.detailScreenMenuItemIds.setReminderMenuItem  = "SetReminderMenuItem"
       constants.ui.detailScreenMenuItemIds.removeReminderMenuItem  = "RemoveReminderMenuItem"
       constants.ui.detailScreenMenuItemIds.likeRemoveRatingMenuItem  = "LikeRemoveRatingMenuItem"
@@ -1302,10 +1273,6 @@ Function getConstants()
       constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
 
     constants.ui.uris = {}
-
-      'info panel images not populated from content backend
-      constants.ui.uris.infoPanelWorldCupLogo = "pkg:/images/fifa-world-cup-icon.webp"
-
       'category background thumbnails
       constants.ui.uris.categoryBackgrounds = {}
       constants.ui.uris.categoryBackgrounds.urlBase = "https://cdn.adrise.tv/image/roku_support_images/category_"
@@ -1496,11 +1463,6 @@ constants.ui.uris.defaultContentBackgroundUri = "pkg:/images/background-masks/ma
         constants.ui.epgscreen.focusItems.topNav = "topNav"
         constants.ui.epgscreen.focusItems.epgTimeGrid = "epgTimeGrid"
 
-    constants.ui.tournamentscreen = {}
-      constants.ui.tournamentscreen.focusItems = {}
-        constants.ui.tournamentscreen.focusItems.topNav = "topNav"
-        constants.ui.tournamentScreen.focusItems.epgTimeGrid = "epgTimeGrid"
-        constants.ui.tournamentScreen.focusItems.categoryGridList = "categoryGridList"
 
     ' Set some performance parameters based on device profile
     constants.performance = {}
@@ -1573,12 +1535,6 @@ constants.ui.uris.defaultContentBackgroundUri = "pkg:/images/background-masks/ma
       constants.deeplinks.entrypoints.news = "news"
       constants.deeplinks.entrypoints.episodeList =  "episodeList"
       constants.deeplinks.entrypoints.video = "video"
-      constants.deeplinks.entrypoints.tournament = "tournament"
-
-      constants.tournament = {}
-      constants.tournament.startDate = "2022-11-20T08:00:00Z"
-      constants.tournament.endDate = "2022-12-21T07:59:00Z"
-      constants.tournament.clearRegistryDate = "2023-01-04T20:00:00Z"
 
       ' Creating Backend/Frontend mapping for preference keys.
       constants.serverPersistentDataKeys = {}

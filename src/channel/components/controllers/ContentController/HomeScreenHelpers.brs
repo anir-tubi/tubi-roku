@@ -838,11 +838,6 @@ Function stopCountdownTimer()
     epgScreen.fullscreenCountdown = -1
   end if
 
-  tournamentScreen = getFromScreenCache(m.constants.ui.screenIds.tournamentScreen)
-  if tournamentScreen <> invalid
-    tournamentScreen.fullscreenCountdown = -1
-  end if
-
   m.playerFullscreenCountdownTimer.control = "stop"
 End Function
 
@@ -851,7 +846,7 @@ Function startCountdownTimer()
   tubiLog("HomeScreenHelpers.startCountdownTimer")
   screen = getCurrentScreen()
 
-  if screen <> invalid AND (screen.id = m.constants.ui.screenIds.homeScreen OR isAnEpgScreen(screen) = true OR isTournamentScreen(screen) = true)
+  if screen <> invalid AND (screen.id = m.constants.ui.screenIds.homeScreen OR isAnEpgScreen(screen) = true)
     stopCountdownTimer()
     screen.fullscreenCountdown = m.constants.settings.linearFullscreenTimeout
     m.playerFullscreenCountdownTimer.control = "start"
@@ -881,9 +876,6 @@ Function onContentSelected(msg)
     startSignIn(onCWRowAfterSignIn)
   else if content.type = m.constants.ui.contentTypes.linear
     selectLinearContent(content)
-  else if content.type = m.constants.ui.contentTypes.navigate
-    stopVideoPreview()
-    showTournamentScreen(m.constants)
   else
     playbackSource = {
       "srcForAnalytic": m.constants.player.playbackSource.unknown
@@ -942,10 +934,6 @@ Function onHomescreenContentReady(msg)
 
     end if
 
-    ' show fifa intro modal only for non-kids ui and adult pc
-    if isFIFAIntroModalShown() = false AND isKidsUIOn() = false AND isParentalControlsAdultLevel() = true
-      showFIFAIntroModal()
-    end if
   end if
 End Function
 
@@ -993,37 +981,6 @@ Function onLoadCategoriesIndex(msg)
 
   return true
 End Function
-
-
-'// REMOVE FIFA Intro modal related code after 01-11-2023.
-' checks the "fifaIntro" in device registry
-' return boolean
-Function isFIFAIntroModalShown()
-  isModalShown = true
-
-  request = TubiRequest(m.constants.settings)
-  auth = TubiAuth(m.constants, request)
-
-  if tournamentTimeFrame() = "duringTournament"
-    isModalShown = auth.getEducationalModalEntry("fifaIntro")
-  end if
-
-  '// This code is to clear the fifaIntro from registry after tournament ends
-  clearFIFARelatedRegDate = CreateObject("roDateTime")
-  clearFIFARelatedRegDate.FromISO8601String(m.constants.tournament.clearRegistryDate)
-  clearFIFARelatedRegDate.ToLocalTime()
-  today = CreateObject("roDateTime")
-  today.ToLocalTime()
-  if today.asSeconds() >= clearFIFARelatedRegDate.asSeconds()
-    auth.clearEducationalModalEntry("fifaIntro")
-  end if
-
-  '// HARDCODING TO DISABLE FIFA Intro Modal as it loses focus on production. REMOVE below line once we have fix.
-  isModalShown = true
-
-  return isModalShown
-End Function
-
 
 
 ' This function build the custom modal as per the design
@@ -1100,42 +1057,6 @@ Function showRegistrationWelcomeModal()
   showMultiStyleModal(modalInfo, buttonInfo)
 
 End Function
-
-
-Function showFifaIntroModal()
-  tubiLog("HomeScreenHelpers.showFifaIntroModal")
-
-  showHideSpinner(false)
-
-  Auth = TubiAuth(m.constants, m.Request)
-  Auth.setEducationalModalEntry("fifaIntro", "true")
-
-  title = "FIFA World Cup 2022" + chr(8482)
-  message = getTranslation("explore_fifa_description")
-  buttons = [getTranslation("dialog_explore_fifa"), getTranslation("dialog_got_it")]
-
-  dialogEvent = {
-    type: "dialog"
-    values: {
-      dialog_type: "INFORMATION"
-      pageOneof: m.Tracking.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
-      dialog_action: "SHOW"
-      dialog_sub_type: "fifa_intro"
-    }
-  }
-  simpleModalInfo = getSimpleModalInfo(title, message, buttons, dialogEvent, m.trackingLoggingTask, showTournamentScreenWrapper, invalid)
-
-  if simpleModalInfo <> invalid AND simpleModalInfo.buttonInfo <> invalid
-    if simpleModalInfo.buttonInfo[0] <> invalid
-      simpleModalInfo.buttonInfo[0].callbackParams = {
-        constants : m.constants
-      }
-    end if
-  end if
-  showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
-
-End Function
-
 
 
 ' load category content

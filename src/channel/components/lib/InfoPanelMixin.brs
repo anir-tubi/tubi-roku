@@ -6,7 +6,7 @@
 '
 ' @sideEffects: updates fields on the passed in infoPanel node
 Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
-  ' used by homescreen, category details screen, tournament screen, etc.
+  ' used by homescreen, category details screen etc.
   ' IMPORTANT, still need to call infoPanel.calculateHeight after calling this function
   infoPanel.mode = m.constants.ui.infoPanelModes.item
   infoPanel.title = content.title

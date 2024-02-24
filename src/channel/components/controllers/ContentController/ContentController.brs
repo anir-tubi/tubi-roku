@@ -61,7 +61,6 @@ Function init()
   m.logo = m.logoGroup.findNode("tubiLogo")
   m.logoKids = m.logoGroup.findNode("tubiKidsLogo")
   m.logoEspanol = m.logoGroup.findNode("tubiEspanolLogo")
-  m.logoFIFA = m.logoGroup.findNode("tubiFIFALogo")
   m.clock = m.top.findNode("clock")
   m.spinner = m.top.findNode("ContentControllerSpinner")
   m.tubiToast = m.top.findNode("tubiToast")
@@ -1422,7 +1421,6 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
   setContentToRefresh(m.constants.ui.screenIds.linearVideoPlayerScreen)
   setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
-  setContentToRefresh(m.constants.ui.screenIds.tournamentScreen)
 
   searchScreen = getScreenFromStackById(m.constants.ui.screenIds.searchScreen)
   if searchScreen <> invalid
@@ -1974,10 +1972,6 @@ Function resumeApp()
       ' without content which will be a blank screen. To avoid it, stop the counter and refresh the EPGScreen videoplay
       stopCountdownTimer()
       refreshEPGScreenVideoPlay(false, currentScreen)
-    else if isTournamentScreen(currentScreen) = true
-      stopCountdownTimer()
-      refreshTournamentScreenVideoPlay(false, currentScreen)
-      currentScreen.setForceRefreshCategoryContainers = true
     end if
   end if
 
@@ -2007,7 +2001,7 @@ Function onFullscreenCountdown()
   screen = getCurrentScreen()
 
   if screen <> invalid
-    if screen.id = m.constants.ui.screenIds.homeScreen OR isAnEpgScreen(screen) = true OR isTournamentScreen(screen) = true
+    if screen.id = m.constants.ui.screenIds.homeScreen OR isAnEpgScreen(screen) = true
       if screen.id = m.constants.ui.screenIds.homeScreen
         contentToPlay = screen.contentFocused
       else
@@ -2073,7 +2067,6 @@ End Function
           ' "tubi" =  show tubi logo,
           ' "tubi_kids" = show tubi kids logo,
           ' "tubi_espanol" = show espanol logo,
-          ' "tubi_fifa" = show FIFA + tubi logo
           ' "hide" = hide all logos
 Function showHideLogo(logoType)
 
@@ -2084,28 +2077,19 @@ Function showHideLogo(logoType)
       m.logoEspanol.visible = false
       m.logoKids.visible = false
       m.logo.visible = false
-      m.logoFIFA.visible = false
     else
       if logoType = m.constants.logoType.tubiKids
         m.logoKids.visible = true
         m.logo.visible = false
         m.logoEspanol.visible = false
-        m.logoFIFA.visible = false
       else if logoType = m.constants.logoType.tubiEspanol
         m.logoEspanol.visible = true
         m.logoKids.visible = false
         m.logo.visible = false
-        m.logoFIFA.visible = false
-      else if logoType = m.constants.logoType.tubiFifa
-        m.logoEspanol.visible = false
-        m.logoKids.visible = false
-        m.logo.visible = false
-        m.logoFIFA.visible = true
       else 'default is tubi logo
         m.logo.visible = true
         m.logoEspanol.visible = false
         m.logoKids.visible = false
-        m.logoFIFA.visible = false
       end if
     end if
 

@@ -13,8 +13,6 @@ Function init()
   m.defaultSecondaryMenuY = m.SecondaryMenu.translation[1]
   m.ResumeMenuItem = m.top.findNode("ResumeMenuItem")
   m.PlayMenuItem = m.top.findNode("PlayMenuItem")
-  ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-  m.SeeAllGamesMenuItem = m.top.findNode("SeeAllGamesMenuItem")
   m.LikeMenuItem = m.top.findNode("LikeMenuItem")
   m.DislikeMenuItem = m.top.findNode("DislikeMenuItem")
   m.LikeDislikeMenuItem = m.top.findNode("LikeDislikeMenuItem")
@@ -50,10 +48,10 @@ Function init()
   m.top.observeFieldScoped("stringSignUpButton", "onStringChange")
   m.top.observeFieldScoped("length", "onLengthChange")
   m.top.observeFieldScoped("isSeries", "onIsSeries")
-  m.top.observeFieldScoped("availabilityType", "onAvailabilityTypeChange")
   m.top.observeFieldScoped("isInKidsMode", "onIsInKidsMode")
   m.top.observeFieldScoped("isBookmark", "onIsBookmark")
   m.top.observeFieldScoped("likeDislikeState", "onLikeDislikeStateChanged")
+  m.top.observeFieldScoped("availabilityType", "onAvailabilityTypeChange")
   m.top.observeFieldScoped("isHistory", "onIsHistory")
   m.top.observeFieldScoped("isChannelItem", "onIsChannel")
   m.top.observeFieldScoped("resumePoint", "onResumePointChange")
@@ -168,9 +166,6 @@ Function setDetailStrings()
   RelatedRowLabelContent = m.top.findNode("RelatedRowLabelContent")
   RelatedRowLabelContent.title = getTranslation("screenDetails_relatedTitles")
 
-  ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-  m.SeeAllGamesMenuItem.title = getTranslation("screenDetails_button_see_all_games")
-  m.SeeAllGamesMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.SeeAllGamesMenuItem.id]
 End Function
 
 
@@ -508,8 +503,6 @@ End Function
 Function onAvailabilityTypeChange()
   tubiLog("DetailScreen.onAvailabilityTypeChange")
   availabilityType = m.top.availabilityType
-  menuItems = []
-  isTournamentTime = tournamentTimeFrame()
   signUpIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.signUpMenuItem.id)
   likeDisLikeIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.LikeDislikeMenuItem.id)
 
@@ -520,11 +513,6 @@ Function onAvailabilityTypeChange()
 
     if signUpIndex <> invalid
       addRemoveMenuItem(false, signUpIndex)
-    end if
-
-    menuItems = [m.AddQueueMenuItem]
-    if isTournamentTime = "duringTournament" OR isTournamentTime = "preTournament"
-      addRemoveMenuItem(true, -1, m.SeeAllGamesMenuItem, menuItems)
     end if
   else if UCase(availabilityType) = UCase(m.constants.ui.contentTimings.upcoming)
     if likeDisLikeIndex <> invalid
@@ -537,10 +525,6 @@ Function onAvailabilityTypeChange()
 
     playIndex = m.NodeHelpers.getChildIndexById(m.Menu.content, m.PlayMenuItem.id)
     addRemoveMenuItem(false, playIndex)
-    menuItems = [m.AddQueueMenuItem]
-    if isTournamentTime = "duringTournament" OR isTournamentTime = "preTournament"
-      addRemoveMenuItem(true, -1, m.SeeAllGamesMenuItem, menuItems)
-    end if
   end if
 
 End Function
@@ -1005,9 +989,6 @@ Function handleMenuItemSelected(itemSelected)
       m.isChannelMenuSelected = true
     else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.signUpMenuItem
       m.top.signUpButtonSelected = true
-    ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-    else if itemSelected.id = m.constants.ui.detailScreenMenuItemIds.seeAllGamesMenuItem
-      m.top.seeAllGamesSelected = true
     end if
   end if
 

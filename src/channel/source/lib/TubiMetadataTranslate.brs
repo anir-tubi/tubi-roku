@@ -8,13 +8,11 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     translate: tubiMetadataTranslate_translate
     translateContainer: tubiMetadataTranslate_translateContainer
     translateCategoryDetails: tubiMetadataTranslate_translateCategoryDetails
-    translateFIFAHomescreen: tubiMetadataTranslate_translateFIFAHomescreen
     translateHomescreen: tubiMetadataTranslate_translateHomescreen
     translateCategoriesListScreen: tubiMetadataTranslate_translateCategoriesListScreen
     translateEPGChannelIds: tubiMetadataTranslate_translateEPGChannelIds
     translateEPGPrograms: tubiMetadataTranslate_translateEPGPrograms
     translateEmptyMyStuffContainer: tubiMetadataTranslate_translateEmptyMyStuffContainer
-    translateTournamentScreen: tubiMetadataTranslate_translateTournamentScreen
     upNextTranslateRecursiveWrapper: tubiMetadataTranslate_upNextTranslateRecursiveWrapper
     setDescriptorCodeAndDescription: tubiMetadataTranslate_setDescriptorCodeAndDescription
     translateProgram: tubiMetadataTranslate_translateProgram
@@ -673,18 +671,6 @@ Function tubiMetadataTranslate_translateRelatedContent(contentFromServer, isSign
 End Function
 
 
-' @contentToTranslate: AA, json parsed response from the matrix/homescreen endpoint
-' @contentMode: string, the value of the contentMode parameter as sent as part of the matrix/homescreen request
-' @isKidsMode: boolean, the value of the isKidsMode parameter as sent as part of the matrix/homescreen request
-' @uiMode: string, one of the allowed values from constants.ui.modes
-' @isSignedInUser: boolean, value based on user logged In or not
-Function tubiMetadataTranslate_translateFIFAHomescreen(contentToTranslate, contentMode="homescreen", isKidsMode=false, uiMode="standard", isSignedInUser = false) As Object
-  tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateFIFAHomescreen()")
-  translated = m.translateHomescreen(contentToTranslate, contentMode, isKidsMode, uiMode, "homeScreen", isSignedInUser)
-  return translated
-End Function
-
-
 ''''''''''''''''''''''
 ' translateHomescreen
 ' Translate the initial homescreen call to matrix api
@@ -1102,22 +1088,7 @@ Function tubiMetadataTranslate_buildCategoryAAWithInsert(container, contents, co
 
     if childrenCount > 0 then
 
-      if screenId = m.constants.ui.screenIds.homeScreen AND container.id = m.constants.ui.categoryIds.fifawc
-        isTournamentTime = tournamentTimeFrame()   'bs:disable-line 1001 LINT1001
-        if (isTournamentTime = "duringTournament" OR isTournamentTime = "preTournament")
-          ' create and add a showAll content to the contents which hold the container metadata
-          insertContent = {
-            id: m.constants.ui.contentIds.showAllGames
-            title: "FIFA World Cup 2022" + chr(8482)
-            showAllText: getTranslation("screenHome_item_showAllGames")
-            type: "n"
-            thumbnails: [m.constants.urls.fifaShowAllPoster]
-            description: container.description
-            backgrounds: [m.constants.urls.fifaShowAllBackground]
-          }
-          insertPosition = 0
-        end if
-      else if container.type = m.contentTypes.channel
+      if container.type = m.contentTypes.channel
         ' create and add a new content to the contents which hold the container metadata
         insertContent = {}
         insertContent.append(container)
@@ -1630,8 +1601,6 @@ Function tubiMetadataTranslate_getGridItemType(container, orientation, constants
 
   if container.type = constants.ui.categoryTypes.linear
     gridItemType = gridItemTypes.linear
-  else if (container.id = constants.ui.categoryIds.fifawc OR container.id = constants.ui.categoryIds.upcomings OR container.id = constants.ui.categoryIds.replays) AND orientation <> constants.ui.gridItemTypes.portrait
-    gridItemType = constants.ui.gridItemTypes.landscape
   else if container.id = constants.ui.categoryIds.featured AND orientation <> gridItemTypes.portrait
     ' `orientation <> gridItemTypes.portrait` is required as the search screen container.id is featured but uses portrait imagery
     gridItemType = gridItemTypes.landscapeNoTitle
@@ -2256,37 +2225,6 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
   translatedProgram.itemAttributes = itemAttributes
 
   End Function
-
-
-Function tubiMetadataTranslate_translateTournamentScreen(contentToTranslate, requestorID, isSignedInUser = false)
-  tubiLog("TubiMetadataTranslate.tubiMetadataTranslate_translateTournamentScreen")
-  contentNode = CreateObject("roSGNode", "TubiContentNode")
-  contentNode.addField("requestorID", "string", false)
-  contentNode.requestorID = requestorID
-  'store the validUntil in main contentNode Until Container specific validUntil is available
-
-  if contentToTranslate.valid_duration <> invalid
-    contentNode.validUntil = UpTime(0) + contentToTranslate.valid_duration
-  else
-    contentNode.validUntil = UpTime(0) + m.constants.cacheTimes.content
-  end if
-
-  if contentToTranslate <> invalid
-    epgRowToTranslate = {}
-    epgRowToTranslate.rows = []
-    epgRowToTranslate.rows[0] = contentToTranslate.epg_row
-    epgRowToTranslate.valid_duration = contentToTranslate.valid_duration
-    epgContentNode = m.translateEPGPrograms(epgRowToTranslate, requestorID, isSignedInUser)
-    contentNode.appendChild(epgContentNode)
-    contentToTranslate.epg_row = invalid
-    contentToTranslate.Delete("epg_row")
-  end if
-
-  categoryContent = m.translateHomescreen(contentToTranslate, "tournamentScreen", false, "standard", "tournamentScreen", isSignedInUser)
-  contentNode.appendChild(categoryContent)
-
-  return contentNode
-End Function
 
 
 ' @content: roAssocArray, series/movie content directly from the server

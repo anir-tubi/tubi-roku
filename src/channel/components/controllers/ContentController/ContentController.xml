@@ -38,7 +38,6 @@
   <script type="text/brightscript" uri="TopNavHelpers.brs" />
   <script type="text/brightscript" uri="DeeplinkHelpers.brs" />
   <script type="text/brightscript" uri="VideoPreviewHelpers.brs" />
-  <script type="text/brightscript" uri="TournamentScreenHelpers.brs" />
   <script type="text/brightscript" uri="ScreensaverHelpers.brs" />
   <script type="text/brightscript" uri="../../lib/AnimationMixin.brs" />
   <script type="text/brightscript" uri="../../lib/UserMixin.brs" />
@@ -73,7 +72,6 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TimeOffsetUtils.brs" />
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/FIFAMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/VideoPreviewMixin.brs" />
   <script type="text/brightscript" uri="ServerPersistentData/ServerPersistentDataHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/components/tasks/BrazeTask/BrazeSDK.brs"/>
@@ -217,14 +215,6 @@
               width="134"
               uri="pkg:/images/logo-espanol-large.webp"
               translation="[1698,54]"
-              visible="false"/>
-            <Poster
-              id="tubiFIFALogo"
-              height="120"
-              width="385"
-              uri="pkg:/images/logo-tubi-FIFA.webp"
-              translation="[1449,60]"
-              opacity="1.0"
               visible="false"/>
           </Group>
           <TubiToast

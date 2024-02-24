@@ -11,7 +11,6 @@ Function TensorApi(constants, request, auth)
     ' public
     getEPGChannelIdsReqInfo: tensorApi_getEPGChannelIdsReqInfo
     getEPGProgramReqInfo: tensorApi_getEPGProgramReqInfo
-    getTournamentReqInfo: tensorApi_getTournamentReqInfo
 
     ' private
     commonOptions: tensorApi_commonOptions
@@ -80,25 +79,4 @@ Function tensorApi_getEPGProgramReqInfo(contentIds)
     url: url
     options: options
   }
-End Function
-
-
-'tournamentPage content request
-Function tensorApi_getTournamentReqInfo()
-
-  if getExperimentResource("roku_tensor_cdn_domain", "roku_tensor_cdn_domain_v2").enabled = true 'bs:disable-line 1001 LINT1001
-    url = m.constants.urls.tensor.cdn.tournamentscreen
-  else
-    url = m.constants.urls.tensor.tournamentscreen
-  end if
-
-  options = m.commonOptions()
-  ' hardcode value 70 to cover all the FIFA matches in the FIFA container instead of using "constants.performance.categoryGridList.finalBlockSize"
-  ' which limits the count 50 on lower end devices
-  options.params["contents_limit"] = 70
-  return {
-    url: url
-    options: options
-  }
-
 End Function

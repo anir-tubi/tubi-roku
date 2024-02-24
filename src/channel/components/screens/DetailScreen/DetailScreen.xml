@@ -9,7 +9,6 @@
   <script type="text/brightscript" uri="../../../source/lib/Request.brs" />
   <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
-  <script type="text/brightscript" uri="pkg:/components/lib/FIFAMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
 
   <interface>
@@ -184,10 +183,6 @@
       <!-- set to true when the user wants to sign-up -->
       <field id="signUpButtonSelected" type="boolean" alwaysNotify="true" />
 
-      <!-- REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE -->
-      <!-- set to true when the user wants to see all game -->
-      <field id="seeAllGamesSelected" type="boolean" alwaysNotify="true" />
-
       <!-- mirrors RelatedGrid.itemSelected, but DetailScreen interjects before sending it to the ContentController -->
       <field id="relatedContentSelected" type="integer" alwaysNotify="true" />
 
@@ -258,10 +253,6 @@
       iconUrl="pkg:/images/icon-trailer.webp"/>
     <DetailMenuItemContentNode
       id="SignUpMenuItem"/>
-    <!-- REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE -->
-    <DetailMenuItemContentNode
-      id="SeeAllGamesMenuItem"
-      iconUrl="pkg:/images/icon-see-all-games.webp"/>
     <Poster
       id="leftChevron"
       uri="pkg:/images/left-chevron.png"

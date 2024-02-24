@@ -317,7 +317,6 @@ Function refreshScreenAfterParentalChanges()
   setContentToRefresh(m.constants.ui.screenIds.channelListScreen)
   setContentToRefresh(m.constants.ui.screenIds.categoryListScreen)
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
-  setContentToRefresh(m.constants.ui.screenIds.tournamentScreen)
   setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
 
   refreshAllHomeScreenTopNav()
@@ -576,7 +575,7 @@ Function onSelectedQrCodeSectionInfoChanged(msg)
       dialog_sub_type: ""
     }
   }
-  
+
   simpleModalInfo = getSimpleModalInfo(data.heading, message, buttons, dialogEvent, m.trackingLoggingTask)
   showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
 End Function

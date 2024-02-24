@@ -112,9 +112,6 @@ Function createDeeplinkContentFromStartupArgs(args)
       content.deeplinkType = "espanolPage"
     else if args.page = "kids"
       content.deeplinkType = "kids"
-    ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-    else if args.page = "tournament"
-      content.deeplinkType = "tournamentPage"
     else if args.page = "home"
       content.deeplinkType = "homePage"
     end if
@@ -256,8 +253,6 @@ Function handleDeeplinkContentByType()
       handleKidsPageDeeplinkContent()
     else if m.deepLinkContent.deeplinktype = "espanolPage"
       handleEspanolPageDeeplinkContent()
-    else if m.deepLinkContent.deeplinktype = "tournamentPage"
-      handleTournamentPageDeeplinkContent()
     else if m.deepLinkContent.deeplinktype = "homePage"
       handleHomePageDeeplinkContent()
     else if m.deepLinkContent.deeplinktype = "tvPage"
@@ -288,7 +283,6 @@ Function handleDeeplinkContentByType()
     else if m.deepLinkContent.deeplinktype = "sports"
       playbackSource = getPlaybackSourceForDeeplinkType()
       showDetailScreen(m.deeplinkContent, false, skipDetailScreenDeeplinkWrapper, handleSingleContentDeeplinkError, playbackSource)
-      'Set the sideNav id to be "home" because tournament Screen's left button should focus on sideNav->home menu item.
       sideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
       focusSideNavOption(sideNavID)
     else
@@ -462,8 +456,6 @@ Function sendDeeplinkAnalytics(deepLinkContent, refreshedContent, entryPoint, tr
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("home_page", {content_mode: "CONTENT_MODE_UNKNOWN"})
     else if entryPoint = m.constants.deeplinks.entryPoints.epg
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("linear_browse_page", {})
-    else if entryPoint = m.constants.deeplinks.entryPoints.tournament
-      referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("worldcup_browse_page", {})
     else if entryPoint = m.constants.deeplinks.entryPoints.category
       referredAnalyticsEvent.pageOneof = trackingLib.getAnalyticsPage("category_list_page", {})
     else if entryPoint = m.constants.deeplinks.entryPoints.channel
@@ -519,25 +511,6 @@ Function handleLinearDeeplinkContent()
     end if
     focusSideNavOption(sCatSideNavID)
   end if
-End Function
-
-
-Function handleTournamentPageDeeplinkContent()
-  tubilog("DeeplinkHelpers.handleTournamentPageDeeplinkContent")
-  if m.enteredFromDeepLink = true
-    sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.tournament, m.Tracking, m.trackingLoggingTask, m.constants)
-  end if
-  if isParentalControlsAdultLevel() = false OR m.uiMode = m.constants.ui.modes.kidsAgeGate
-    ' Display error message indicating to turn off the parental controls
-    message = getTranslation("dialog_sideNavItemDisabled_Parental_description")
-    showDeeplinkErrorModal(invalid, message)
-  else
-    setUiMode(m.constants.ui.modes.standard)
-    showTournamentScreen(m.constants)
-    focusSideNavOption(m.constants.ui.sideNavIds.home)
-  end if
-  resetDeeplinkValues()
-
 End Function
 
 

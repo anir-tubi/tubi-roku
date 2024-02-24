@@ -149,10 +149,6 @@ Function generateTopNavContentItems(includeLinearTV = false)
   ]
   if includeLinearTV = true
     menuItemIds.push(m.constants.ui.homeScreenTopNavIds.linearEPG)
-    isTournamentTime = tournamentTimeFrame()
-    if isTournamentTime = "duringTournament" OR isTournamentTime = "preTournament"
-      menuItemIds.push(m.constants.ui.homeScreenTopNavIds.tournament)
-    end if
   end if
 
   parent = CreateObject("roSGNode", "ContentNode")
@@ -168,9 +164,6 @@ Function generateTopNavContentItems(includeLinearTV = false)
       item.title = getTranslation("menu_tv")
     else if id = m.constants.ui.homeScreenTopNavIds.linearEPG
       item.title = getTranslation("menu_livetv")
-    else if id = m.constants.ui.homeScreenTopNavIds.tournament
-      item.title = "FIFA World Cup 2022" + chr(8482)
-      item.subText = getTranslation("text_new")
     end if
   end for
 
@@ -490,10 +483,6 @@ Function populateInfoPanelByContent(focusedContent)
       end if
     else if sType = m.constants.ui.contentTypes.historySignedOutUser
       populateInfoPanel(m.constants.ui.infoPanelModes.continueWatching, focusedContent)
-    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-    else if sType = m.constants.ui.contentTypes.navigate
-      populateInfoPanel(m.constants.ui.infoPanelModes.navigateSports, focusedContent)
-    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     else if sType = m.constants.ui.contentTypes.sportsEvent
       populateInfoPanel(m.constants.ui.infoPanelModes.sportsEvent, focusedContent)
     else
@@ -673,21 +662,6 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.reminderIsSet = false
     else if mode = m.constants.ui.infoPanelModes.programHomescreen
       populateInfoPanelWithProgramHomescreenMode(contentNode, m.InfoPanel)
-    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-    else if mode = m.constants.ui.infoPanelModes.navigateSports
-      m.InfoPanel.mode = mode
-      m.InfoPanel.topHeaderImageUri = m.constants.ui.uris.infoPanelWorldCupLogo
-      m.InfoPanel.title = contentNode.title
-      'Fifa Worldcup description and dates are constant when show all games is focused, so hardcoding it
-      m.InfoPanel.description = getTranslation("show_all_games_description")
-      lineOneData = {}
-      lineOneData.hoursOfAiring = getTranslation("show_all_games_gameInfo")
-      'Showing 4k badge by default for show all CTA Infopanel
-      lineOneData.has4k = true
-      lineOneData.hasCC = contentNode.hasSubtitles
-      m.InfoPanel.lineOneData = lineOneData
-      m.InfoPanel.needsLogin = false
-      m.InfoPanel.reminderIsSet = false
     else if mode = m.constants.ui.infoPanelModes.sportsEvent
       populateInfoPanelWithHomescreenStyleSportsMode(contentNode, m.InfoPanel)
     end if
@@ -915,7 +889,7 @@ Function handlePlayInput()
     end if
 
     ' Content controller observes contentSelected to populate/push the detail screen
-    if itemFocused <> invalid AND itemFocused.type <> m.constants.ui.contentTypes.linear AND itemFocused.type <> m.constants.ui.contentTypes.navigate
+    if itemFocused <> invalid AND itemFocused.type <> m.constants.ui.contentTypes.linear
       m.top.contentToPlay = itemFocused
       return true
     end if

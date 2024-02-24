@@ -375,13 +375,6 @@ Function generateTopNavContentItems()
     m.constants.ui.homeScreenTopNavIds.linearEPG
     ]
 
-  isTournamentTime = tournamentTimeFrame()
-
-  if isTournamentTime = "duringTournament" OR isTournamentTime = "preTournament"
-    menuItemIds.push(m.constants.ui.homeScreenTopNavIds.tournament)
-  end if
-
-
   parent = CreateObject("roSGNode", "ContentNode")
   for each id in menuItemIds
     item = parent.createChild("TopNavContentNode")
@@ -395,9 +388,6 @@ Function generateTopNavContentItems()
       item.title = getTranslation("menu_tv")
     else if id = m.constants.ui.homeScreenTopNavIds.linearEPG
       item.title = getTranslation("menu_livetv")
-    else if id = m.constants.ui.homeScreenTopNavIds.tournament
-      item.title = "FIFA World Cup 2022" + chr(8482)
-      item.subText = getTranslation("text_new")
     end if
   end for
 

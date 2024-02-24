@@ -54,7 +54,7 @@ Function init()
 
   defaultGuestMenuWidth = m.GuestMenu.itemSize[0]
   signInOutButton = m.top.findNode("SignInOutButton")
-  signInOutButton.title = getTranslation("screenMyStuff_signedOutUIButton") 
+  signInOutButton.title = getTranslation("screenMyStuff_signedOutUIButton")
 
   allEmptyUIButton = m.top.findNode("AllEmptyUIButton")
   allEmptyUIButton.title = getTranslation("menu_goHome")
@@ -113,7 +113,7 @@ Function onThemeChange(msg = invalid)
 
 
   bIsKidsTheme = false
-  
+
   if theme <> invalid
     m.SignedOutUITitle.color = theme.primaryTextColor
     m.SignedOutUISubtitle.color = theme.secondaryTextColor
@@ -199,7 +199,7 @@ Function onContentUpdateChange(msg) As Void
           if container.id = m.constants.ui.categoryIds.myLikes
             if container.getChildCount() > 0
               '//::TODO::roku_mylikes_mystuff_v2 - for the experiment, we are using a multiple content ID endpoint request. Post experiment, it would be nice to have the backend provide a container for liked videos so we can make the same endpoint request as the other 2 containers.
-              
+
               container.title = getTranslation("metadata_myStuff_myLikes_title")
               m.isAllContentEmpty = false
             else
@@ -270,7 +270,7 @@ Function setRowHeights()
 
   '//setting the height of the m.RowList.itemSize is superceded by the rowHeight of each row.
   '//However, just in case the height of a row is not defined, then it will default to the height defined by itemSize
-  itemSize = [1752, m.constants.ui.imageSizes.largePoster[1]] 
+  itemSize = [1752, m.constants.ui.imageSizes.largePoster[1]]
   m.Rowlist.update({
     "itemSize": itemSize
     "rowItemSize": rowItemSize
@@ -375,10 +375,6 @@ Function populateInfoPanelByContent(focusedContent)
       mode = m.constants.ui.infoPanelModes.continueWatching
     else if sType = m.constants.ui.categoryTypes.preview
       mode = m.constants.ui.infoPanelModes.vitg
-    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-    else if sType = m.constants.ui.contentTypes.navigate
-      mode = m.constants.ui.infoPanelModes.navigateSports
-    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
     else if sType = m.constants.ui.contentTypes.sportsEvent
       mode = m.constants.ui.infoPanelModes.sportsEvent
     end if
@@ -418,22 +414,6 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.width = 960
     else if mode = m.constants.ui.infoPanelModes.programHomescreen
       populateInfoPanelWithProgramHomescreenMode(contentNode, m.InfoPanel)
-    '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-    else if mode = m.constants.ui.infoPanelModes.navigateSports
-      m.InfoPanel.mode = mode
-      m.InfoPanel.topHeaderImageUri = m.constants.ui.uris.infoPanelWorldCupLogo
-      m.InfoPanel.title = contentNode.title
-      'Fifa Worldcup description and dates are constant when show all games is focused, so hardcoding it
-      m.InfoPanel.description = getTranslation("show_all_games_description")
-      lineOneData = {}
-      lineOneData.hoursOfAiring = getTranslation("show_all_games_gameInfo")
-      'Showing 4k badge by default for show all CTA Infopanel
-      lineOneData.has4k = true
-      lineOneData.hasCC = contentNode.hasSubtitles
-      m.InfoPanel.lineOneData = lineOneData
-      m.InfoPanel.needsLogin = false
-      m.InfoPanel.reminderIsSet = false
-      m.InfoPanel.width = 960
     else if mode = m.constants.ui.infoPanelModes.sportsEvent
       populateInfoPanelWithHomescreenStyleSportsMode(contentNode, m.InfoPanel)
     end if
@@ -737,7 +717,7 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       '//ensure this keypress is captured so the default Roku positive audio sound is played.
       return true
     else if key = "play" AND m.RowList.isInFocusChain() = true
-      
+
       if handlePlayInput() = true
         return true
       end if

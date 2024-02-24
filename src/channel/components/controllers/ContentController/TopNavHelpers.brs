@@ -55,8 +55,6 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
     if isFocusRetainedOnTopNav = true
       if isAnEpgScreen(screen) = true
         componentToFocus = m.constants.ui.EPGscreen.focusItems.topNav
-      else if isTournamentScreen(screen) = true
-        componentToFocus = m.constants.ui.tournamentScreen.focusItems.topNav
       else
         componentToFocus = m.constants.ui.homescreen.focusItems.topNav
       end if
@@ -85,8 +83,6 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
         showSearchScreen()
       else if topNavItem.id = m.constants.ui.homeScreenTopNavIds.linearEPG
         showDefaultEPGScreen(componentToFocus)
-      else if topNavItem.id = m.constants.ui.homeScreenTopNavIds.tournament
-        showTournamentScreen(m.constants, componentToFocus)
       end if
     else
       ' If the user selected a top nav item that is associated with the current screen,
@@ -102,14 +98,6 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
         screen.setFocus(true)
       else if isAnEpgScreen(screen) = true
         screen.componentToFocus = m.constants.ui.epgScreen.focusItems.epgTimeGrid
-        screen.setFocus(false)
-        screen.setFocus(true)
-      else if isTournamentScreen(screen) = true
-        if screen.isPreTournament = true
-          screen.componentToFocus = m.constants.ui.tournamentScreen.focusItems.epgTimeGrid
-        else
-          screen.componentToFocus = m.constants.ui.tournamentScreen.focusItems.categoryGridList
-        end if
         screen.setFocus(false)
         screen.setFocus(true)
       end if

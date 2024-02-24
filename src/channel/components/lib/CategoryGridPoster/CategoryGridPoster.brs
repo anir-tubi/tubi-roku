@@ -25,7 +25,6 @@ Function init()
     epg: "epg"
     live: "live"
     sportsEvent: "sports_event"
-    navigate: "navigate"
   }
 
   '//recreate the contentTimings from constants so as not to access m.global.constants for every item on the home screen as they are created

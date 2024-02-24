@@ -245,7 +245,6 @@ Function onNeedsLoginChange(msg)
   signInGroupIsPresent = (m.signInGroup.getParent() <> invalid)
 
   modesWithTimerAtBottom = {}
-  modesWithTimerAtBottom[m.constants.ui.infoPanelModes.linearTournament] = true
   modesWithTimerAtBottom[m.constants.ui.infoPanelModes.linearHomeScreen] = true
 
 
@@ -374,7 +373,7 @@ Function onLineOneDataChange(msg)
     if isNonEmptyString(text)
       if textIsPresent = false
         mode = m.top.mode
-        if mode = m.constants.ui.infoPanelModes.sportsEvent OR mode = m.constants.ui.infoPanelModes.navigateSports
+        if mode = m.constants.ui.infoPanelModes.sportsEvent
           firstLineGroup.insertChild(m.line1Bold, insertIndex)
         else
           firstLineGroup.insertChild(m.line1, insertIndex)
@@ -661,10 +660,6 @@ Function onCalculateHeight()
     m.descriptionFocusButton.height = updatedDescriptionBoundingHeight + topMargin + bottomMargin
   end if
 
-  if m.top.needsLogin = false AND m.top.mode = m.constants.ui.infoPanelModes.linearTournament
-    m.top.appendChild(m.playerCountdownGroup)
-    m.playerCountdownGroup.translation = [0, m.infoPanelGroup.boundingRect().height + 40]
-  end if
 End Function
 
 
@@ -870,24 +865,7 @@ Function onModeChange()
     m.secondLineGroup.appendChild(m.line2)
 
     m.offset.itemSpacings = [24, 15]
-  '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-  else if m.top.mode = m.constants.ui.infoPanelModes.linearTournament
-    ' when linear content is focused on the tournament screen
-    m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.twoLineInfo)
-    m.offset.appendChild(m.descriptionGroup)
-    m.offset.appendChild(m.playerCountdownGroup)
-
-    m.twoLineInfo.appendChild(m.firstLineGroup)
-    m.firstLineGroup.appendChild(m.line1)
-    m.firstLineGroup.appendChild(m.resolutionPoster)
-    m.firstLineGroup.appendChild(m.closedCaptionPoster)
-    m.firstLineGroup.appendChild(m.rating)
-
-    m.offset.itemSpacings = [15, 15]
   else if m.top.mode = m.constants.ui.infoPanelModes.sportsEvent
-    ' when sport event content is focused on the tournament screen
     m.infoPanelGroup.appendChild(m.offset)
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.twoLineInfo)
@@ -902,20 +880,6 @@ Function onModeChange()
     m.secondLineGroup.appendChild(m.line2)
 
     m.offset.itemSpacings = [15]
-  '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-  else if m.top.mode = m.constants.ui.infoPanelModes.navigateSports
-    m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.topHeaderImage)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.twoLineInfo)
-    m.offset.appendChild(m.descriptionGroup)
-
-    m.twoLineInfo.appendChild(m.firstLineGroup)
-    m.firstLineGroup.appendChild(m.line1Bold)
-    m.firstLineGroup.appendChild(m.resolutionPoster)
-    m.firstLineGroup.appendChild(m.closedCaptionPoster)
-
-    m.offset.itemSpacings = [15, 24, 24]
   else if m.top.mode = m.constants.ui.infoPanelModes.programHomescreen
     m.infoPanelGroup.appendChild(m.offset)
     m.offset.appendChild(m.topHeaderImage)

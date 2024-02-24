@@ -804,10 +804,6 @@ Function tubiTracking_getOneOfs()
     i: "i"  'filler because empty fields are removed
   }
 
-  worldcup_browse_page = {
-    i: "i" 'filler because empty fields are removed
-  }
-
   entertainment_browse_page = {
     i: "i"  'filler because empty fields are removed
   }
@@ -942,7 +938,6 @@ Function tubiTracking_getOneOfs()
     onboarding_page: onboarding_page
     landing_page: landing_page
     age_gate_page: age_gate_page
-    worldcup_browse_page: worldcup_browse_page
     upcoming_content_page: upcoming_content_page
     your_privacy_page: your_privacy_page
     privacy_preferences_page: privacy_preferences_page
@@ -976,7 +971,6 @@ Function tubiTracking_getOneOfs()
     dest_onboarding_page: onboarding_page
     dest_landing_page: landing_page
     dest_age_gate_page: age_gate_page
-    dest_worldcup_browse_page: worldcup_browse_page
     dest_upcoming_content_page: upcoming_content_page
     dest_your_privacy_page: your_privacy_page
     dest_privacy_preferences_page: privacy_preferences_page
@@ -1102,7 +1096,6 @@ Function tubiTracking_getSideNavPageMap(constants)
     if sideNavIds.exit <> invalid then map[sideNavIds.exit] = "EXIT"
     if sideNavIds.kidsMode <> invalid then map[sideNavIds.kidsMode] = "KIDS"
     if sideNavIds.profile <> invalid then map[sideNavIds.profile] = "ACCOUNT"
-    if sideNavIds.tournament <> invalid then map[sideNavIds.tournament] = "SPORTS"
   end if
   return map
 End Function
@@ -1127,7 +1120,6 @@ Function tubiTracking_getTopNavPageMap(constants)
     if homeScreenTopNavIds.movies <> invalid then map[homeScreenTopNavIds.movies] = "MOVIES"
     if homeScreenTopNavIds.tv <> invalid then map[homeScreenTopNavIds.tv] = "SERIES"
     if homeScreenTopNavIds.linearEPG <> invalid then map[homeScreenTopNavIds.linearEPG] = "LINEAR"
-    if homeScreenTopNavIds.tournament <> invalid then map[homeScreenTopNavIds.tournament] = "SPORTS"
   end if
   return map
 End Function
@@ -1155,7 +1147,6 @@ Function tubiTracking_getDetailScreenMenuPageMap(constants)
     if detailScreenMenuItemIds.setReminderMenuItem <> invalid then map[detailScreenMenuItemIds.setReminderMenuItem] = "SET_REMINDER"
     if detailScreenMenuItemIds.removeReminderMenuItem <> invalid then map[detailScreenMenuItemIds.removeReminderMenuItem] = "REMOVE_REMINDER"
     if detailScreenMenuItemIds.channelMenuItem <> invalid then map[detailScreenMenuItemIds.channelMenuItem] = "GO_TO_NETWORK"
-    if detailScreenMenuItemIds.seeAllGamesMenuItem <> invalid then map[detailScreenMenuItemIds.seeAllGamesMenuItem] = "SEE_ALL_GAMES"
   end if
   return map
 End Function

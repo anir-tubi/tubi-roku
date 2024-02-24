@@ -4,7 +4,7 @@
   <interface>
     <field id="selected" type="boolean" value="false"/>
     <field id="selectedItemColor" type="color"/>
-    <!--new text that can be appeneded to menu text. In case of FIFA, it is NEW badge-->
+    <!--new text that can be appended to menu text. like NEW badge-->
     <field id="subText" type="string" value="" />
   </interface>
 </component>

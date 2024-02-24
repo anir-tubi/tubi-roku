@@ -46,8 +46,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     detailScreen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelected")
     detailScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
-    ' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-    detailScreen.observeFieldScoped("seeAllGamesSelected", "onSeeAllGamesSelected")
+
     ' Update tracking info - have to set the whole AA, can't update only a portion on the AA field
     detailScreen.trackingPageInfo = getDetailScreenAnalyticsPageInfo(content, m.constants)
 
@@ -1679,12 +1678,6 @@ Function onSignUpButtonSelected(msg)
   startSignIn(onRegistrationProcessCompletedOnDetailsScreen)
 End function
 
-' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
-Function onSeeAllGamesSelected()
-  tubiLog("DetailScreenHelper.onSeeAllGamesSelected")
-  showTournamentScreen(m.constants)
-End Function
-
 
 Function onDescriptionSelected(msg)
   tubiLog("DetailScreenHelper.onDescriptionSelected")
@@ -2304,8 +2297,7 @@ Function addToQueueErrorResponse(error)
   end if
 End function
 
-
-' // REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
+' REMOVE BELOW CODE IF SET REMINDER FUNCTIONALITY OF SE CONTENT BEEN REMOVED.
 ' @screen: node - screen node
 ' @isReminderSet: boolean, true = "TOGGLE_ON" ; false = "TOGGLE_OFF"
 Function setComponentInteractionEventForReminder(screen, isReminderSet)
