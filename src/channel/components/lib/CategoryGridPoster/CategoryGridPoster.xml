@@ -82,7 +82,7 @@
           role="font"/>
       </Label>
     </LayoutGroup>
-    
+
     <Group id="badgeGroup"/>
   </children>
 </component>

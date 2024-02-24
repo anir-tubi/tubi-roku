@@ -939,6 +939,14 @@ Function getTranslation_en_US()
       "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
       "message": "{minutes}m left"
     },
+    "hour_mins_left":{
+      "description": "Indicates time left in the format 'x hour y mins left'",
+      "message": "{hour} hour {minutes} mins left"
+    },
+    "mins_left":{
+      "description": "Indicates time left in the format 'y mins left'",
+      "message": "{minutes} mins left"
+    },
     "today":{
       "description": "Today",
       "message": "TODAY"
@@ -1367,10 +1375,6 @@ Function getTranslation_en_US()
       "description": "Navigational instructions to users on what the back button does on the current page",
       "message": "DISMISS"
     },
-    "goBack_videoPlayer_controls": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESS BACK TO HIDE"
-    },
     "goBack_menu": {
       "description": "Navigational instructions to users on what the back button does on the current page",
       "message": "PRESS BACK FOR MENU"
@@ -1645,30 +1649,6 @@ Function getTranslation_en_US()
       "description": "Button text displayed on onBoarding screens takes to Initial Content Type Selector Screen or Home Screen",
       "message": "Continue as Guest"
     },
-    "onBoarding_freeForeverScreen_heading": {
-      "description": "Label displayed on onBoarding Free Forever screen",
-      "message": "FREE Forever with Fewer\nAds than Cable"
-    },
-    "onBoarding_freeForeverScreen_description": {
-      "description": "Description displayed on onBoarding Free Forever screen",
-      "message": "3x more content and 3x less ads. None of the costs. $0/month.\nNo paywalls, no bundles."
-    },
-    "onBoarding_availableDeviceScreen_heading": {
-      "description": "Label displayed on onBoarding Available Device screen",
-      "message": "Available on all\nyour devices"
-    },
-    "onBoarding_availableDeviceScreen_description": {
-      "description": "Description displayed on onBoarding Available Device screen",
-      "message": "Watch on your phone, television, tablet\nor computer."
-    },
-    "onBoarding_landingScreen_heading": {
-      "description": "Label displayed on onBoarding Landing screen",
-      "message": "Tubi is better when\nyou sign up"
-    },
-    "onBoarding_landingScreen_description": {
-      "description": "Description displayed on onBoarding Landing screen",
-      "message": "No credit card required • Free Forever"
-    },
     "onBoarding_landingScreen_addListLabel": {
       "description": "Label displayed on onBoarding Landing screen informing add to your list",
       "message": "Add to Your List"
@@ -1684,14 +1664,6 @@ Function getTranslation_en_US()
     "onBoarding_landingScreen_saveProgressBody": {
       "description": "Body displayed on onBoarding Landing screen informing pickup where you left off",
       "message": "Pickup where you left off"
-    },
-    "onBoarding_landingScreen_madeForYouLabel": {
-      "description": "Label displayed on onBoarding Landing screen informing made for you",
-      "message": "Made For You"
-    },
-    "onBoarding_landingScreen_madeForYouBody": {
-      "description": "Body displayed on onBoarding Landing screen informing better recommendations",
-      "message": "Unlock better recommendations"
     },
     "dialog_got_it": {
       "description": "simple text to use anywhere to indicate dismiss action",
@@ -1875,7 +1847,7 @@ Function getTranslation_en_US()
     },
     "gdpr_age_gate_error_dialog_exit_tubi": {
       "description": "GDPR age gate error dialog exit tubi button label.",
-      "message": "Exit Tubi"
+      "message": "Continue Without Saving"
     }
   }
 End Function

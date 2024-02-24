@@ -3,7 +3,7 @@ Function init()
   '//This var is used to know when to send tracking info. Do not send focus tracking info when the grid is 1st loaded
   m.contentLoadedAndFocused = false
   m.constants = getConstantsFromGlobal()
-  
+
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
@@ -267,7 +267,7 @@ End Function
 Function populateInfoPanel(infoPanel, content)
   if content.type = m.constants.ui.contentTypes.sportsEvent
     populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
-  else 'movies, series
+  else
     populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
   end if
 

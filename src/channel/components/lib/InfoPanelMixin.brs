@@ -50,6 +50,79 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
 End Function
 
 
+' Populates the info panel with the fields necessary for the "continue watching" mode which contains mainly progress bar and time left on movie or current episode.
+' Delete this Function if experiment roku_progress_bar_on_infopanel concludes
+'
+' @content: TubiContentNode, containing a movie or series
+' @infoPanel: InfoPanel node
+'
+' @sideEffects: updates fields on the passed in infoPanel node
+Function populateInfoPanelWithCWSignedInUserStyleItemMode(content, infoPanel)
+  infoPanel.mode = m.constants.ui.infoPanelModes.CWSignedInUser
+  infoPanel.title = content.title
+  infoPanel.description = content.description
+  infoPanel.needsLogin = content.needsLogin
+  infoPanel.reminderIsSet = false
+  duration = content.length
+  episodeTitle = ""
+
+  lineOneData = {}
+  history = getHistory(content.id)
+  if history <> invalid
+    nowPos = history.nowPos
+
+    if content.type = m.constants.ui.contentTypes.series
+
+      if history.currentEpisodeId <> invalid AND history.currentEpisodeId <> ""
+        episode = m.top.refreshInfoPanelWithEpisode
+        if episode <> invalid AND episode.seriesId = content.id
+          infoPanel.description = episode.description
+          duration = episode.length
+          episodeTitle = episode.title
+          episodeHistory = history.findNode(episode.id)
+
+          if episodeHistory <> invalid
+            nowPos = episodeHistory.nowPos
+          end if
+
+        end if
+      end if
+
+    end if
+
+  else
+    nowPos = 0
+  end if
+
+  if duration <= 0
+    percentage = 0
+  else
+    percentage = (nowPos / duration)
+
+  end if
+
+  if percentage > 1.0 then percentage = 1.0
+  if percentage < 0.0 then percentage = 0.0
+
+  progressPercent = percentage * 100
+
+  lineTwoData = {}
+  lineTwoData.progressPercent = progressPercent
+  lineTwoData.displayProgressBar = true
+
+  seconds = duration - nowPos
+
+  if episodeTitle <> ""
+    lineOneData.timeLeft = getDurationHoursString(seconds) + " " + Chr(&hb7) + " " + episodeTitle
+  else
+    lineOneData.timeLeft = getDurationHoursString(seconds)
+  end if
+
+  infoPanel.lineOneData = lineOneData
+  infoPanel.lineTwoData = lineTwoData
+End Function
+
+
 ' Populates the info panel with the fields necessary for the "sportsEvent" mode so that it looks
 ' like the info panel on the homescreen
 '
@@ -131,4 +204,25 @@ Function populateInfoPanelWithProgramHomescreenMode(content, infoPanel)
 
   infoPanel.needsLogin = (content.needsLogin AND m.top.signedIn <> true)
   infoPanel.width = 960
+End Function
+
+
+' //TODO: Delete this Function if experiment roku_progress_bar_on_infopanel does not graduate
+' helper function which returns the time left in the format 'x hour and y mins left' if timeleft is more than an hour
+' else it retuns 'y mins left'
+Function getDurationHoursString(seconds As Integer) As String
+  retVal = ""
+  if seconds <> invalid
+    hourValue = Int(seconds / 3600)
+
+    minValue = StrI(Int(seconds / 60) mod 60)
+
+    if hourValue > 0
+      retVal =  getTranslation("hour_mins_left", {"hour": StrI(hourValue), "minutes": minValue})
+    else
+      retVal = getTranslation("mins_left", {"minutes": minValue})
+    end if
+  end if
+
+  return retVal
 End Function

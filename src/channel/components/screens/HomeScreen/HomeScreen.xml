@@ -99,6 +99,9 @@
            type is node, so that it takes less time to send data from one file to another file when comparing to assocarray
        -->
       <field id="batchResponse" type="node" alias="CategoryGridList.categoryResponseInBatch" />
+      <!-- This field will inform the homescreen to update the infopanel after we fetch episode content
+           Delete this field after exp roku_progress_bar_on_infopanel -->
+      <field id="refreshInfoPanelWithEpisode" type="node"/>
 
     <!-- OUTPUTS -->
       <!-- Trigger the content to be loaded.  This field is used to delay
@@ -176,6 +179,10 @@
 
        <!--Communicates to the parent that some of the containers has expired and to be loaded-->
       <field id="loadCategoryForIds" type="array" alwaysNotify="true"/>
+
+      <!--Communicates to the parent that a series has been focused on continue watch row
+          Delete this field after exp roku_progress_bar_on_infopanel -->
+      <field id="CWFetchEpisodeContent" type="node" />
 
   </interface>
 

@@ -242,8 +242,7 @@
             id="SecondLineGroup"
             layoutDirection="horiz"
             vertAlignment="center"
-            itemSpacings="[10]"
-            addItemSpacingAfterChild="true">
+            itemSpacings="[10]">
             <Badge
               id="SecondLineAvailabilityBadge"/>
             <Label
@@ -254,6 +253,11 @@
               <Font
                 role="font"/>
             </Label>
+            <TubiProgressBar
+              id="ResumeProgressBar"
+              width="375"
+              height="8"/>
+
           </LayoutGroup>
         </LayoutGroup>
 

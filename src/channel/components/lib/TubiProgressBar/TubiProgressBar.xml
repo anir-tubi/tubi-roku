@@ -17,6 +17,7 @@
 
       <!-- The width of the progress bar -->
       <field id="width"         type="float" />
+      <field id="height"        alias="ProgressBarBackground.height, ProgressBarForeground.height"  />
 
       <!-- The percentage to fill the loading bar -->
       <field id="progress"      type="float" value="0.0" />

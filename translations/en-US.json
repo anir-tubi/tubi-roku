@@ -720,6 +720,14 @@
     "description": "Indicate the number of minutes left. Use an abbreviation for minutes to save space and so we don't have to worry about plural and singular forms of the word minutes.",
     "message": "{minutes}m left"
   },
+  "hour_mins_left":{
+    "description": "Indicates time left in the format 'x hour y mins left'",
+    "message": "{hour} hour {minutes} mins left"
+  },
+  "mins_left":{
+    "description": "Indicates time left in the format 'y mins left'",
+    "message": "{minutes} mins left"
+  },
   "today":{
     "description": "Today",
     "message": "TODAY"
