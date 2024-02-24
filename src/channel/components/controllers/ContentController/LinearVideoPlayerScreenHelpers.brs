@@ -298,26 +298,20 @@ Function isLinearPlayerPlayingThisContent(content)
 End Function
 
 
-Function isLinearPlayerPlaying()
-  bPlaying = false
+Function isLinearPlayerLoadingOrPlaying()
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
-  if videoPlayer <> invalid AND videoPlayer.state = "playing"
-    bPlaying = true
-  end if
 
-  return bPlaying
-End Function
-
-
-Function isLinearPlayerLoading()
-  bLoading = false
-  videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   if videoPlayer <> invalid
-    bLoading = videoPlayer.loading
+    if videoPlayer.loading = true
+      return true
+    else if videoPlayer.state = "playing"
+      return true
+    end if
   end if
 
-  return bLoading
+  return false
 End Function
+
 
 
 Function getLiveStreamManifest(streamUrl)

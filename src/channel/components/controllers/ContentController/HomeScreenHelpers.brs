@@ -56,13 +56,13 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     homeScreen.observeFieldScoped("topNavItemSelected", "onTopNavItemSelected")
     homeScreen.observeFieldScoped("topNavBackItemSelected", "onTopNavBackItemSelected")
     homeScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
-    homeScreen.observeFieldScoped("scrollingstatus", "onScrollingStatusChange")
     homeScreen.observeFieldScoped("loadCategoriesIndex", "onLoadCategoriesIndex")
     homeScreen.observeFieldScoped("topNavToggled", "onScreenTopNavToggled")
     homeScreen.observeFieldScoped("navigatedAwayFromTopNav", "onNavigatedFromTopNavToSideNav")
     homeScreen.observeFieldScoped("stopLinearVideoPlayer", "onStopLinearVideoPlayer")
     homeScreen.observeFieldScoped("sponsoredRowFocused", "onHomescreenSponsoredRowFocused")
     homeScreen.observeFieldScoped("columnFocused", "onColumnFocusChanged")
+    homeScreen.observeFieldScoped("currFocusRow", "onHomescreenRowFocusChanged")
     homeScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
     homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
@@ -706,9 +706,6 @@ Function onHomeScreenContentFocused(msg)
   tubiLog("HomeScreenHelpers.onHomeScreenContentFocused")
   focusedContent = msg.getData()
   homeScreen = msg.getRoSGNode()
-
-  showHideLogoBasedOnUiMode()
-
   setHomeScreenAfterFocus(focusedContent, homeScreen)
 End Function
 
@@ -746,10 +743,19 @@ End Function
 '//when a new column of the rowlist begins to gain partial focus during a horizontal scroll, then do something
 Function onColumnFocusChanged()
   tubiLog("HomeScreenHelpers.onColumnFocusChanged")
-  if isLinearPlayerLoading() = true or isLinearPlayerPlaying() = true
+  if isLinearPlayerLoadingOrPlaying() = true
     '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
     stopAndHideLinearVideoPlayer()
   end if
+End Function
+
+
+Function onHomescreenRowFocusChanged()
+  if isLinearPlayerLoadingORPlaying() = true
+    '//as the rowlist is scrolling, if the the linear video player is playing or loading, then make sure the linear video player has stopped
+    stopAndHideLinearVideoPlayer()
+  end if
+
 End Function
 
 
@@ -759,50 +765,51 @@ End Function
 ' @param focusedContent, roSGNode - The TubiContentNode of the focused content
 ' @param homeScreen, roSGNode - The HomeScreen component that contains the focused content
 Function setHomeScreenAfterFocus(focusedContent, homeScreen)
+  if focusedContent <> invalid
+    currentScreen = getCurrentScreen()
 
-  currentScreen = getCurrentScreen()
+    if currentScreen <> invalid AND currentScreen.id <> m.constants.ui.screenIds.linearVideoPlayerScreen
+      '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
+      '//we should stop the countdown timer
+      bStopCountdownTimer = true
+      if focusedContent.type = m.constants.ui.categoryTypes.linear AND m.SideNav.opened <> true
+        bPlayVideo = true
+        if isLinearPlayerPlayingThisContent(focusedContent) = true
+          '//No need to play the video. It already is playing the video
+          bPlayVideo = false
+        end if
 
-  if focusedContent <> invalid AND currentScreen <> invalid AND currentScreen.id <> m.constants.ui.screenIds.linearVideoPlayerScreen
-    '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
-    '//we should stop the countdown timer
-    bStopCountdownTimer = true
-    if focusedContent.type = m.constants.ui.categoryTypes.linear AND m.SideNav.opened <> true
-      bPlayVideo = true
-      if isLinearPlayerPlayingThisContent(focusedContent) = true
-        '//No need to play the video. It already is playing the video
-        bPlayVideo = false
-      end if
+        if bPlayVideo = true
+          '//If player is currently not playing the current content, then display background and
+          '//tell player to load and play the video associated with the focused item
+          m.backgroundGroup.posterVisible = true '//reset the background so it can be seen
+          stopLinearVideoContent()
 
-      if bPlayVideo = true
-        '//If player is currently not playing the current content, then display background and
-        '//tell player to load and play the video associated with the focused item
-        m.backgroundGroup.posterVisible = true '//reset the background so it can be seen
-        stopLinearVideoContent()
+          playbackSource = {
+            "srcForAnalytic": m.constants.player.playbackSource.unknown
+            "srcForAds": m.constants.player.playbackOrigin.container
+            "playbackContainer": currentScreen.currCategoryId
+          }
+          playLinearVideoContent(focusedContent, true, homeScreen.id, true, playbackSource)
+        else
+          bStopCountdownTimer = false
+          startCountdownTimer()
 
-        playbackSource = {
-          "srcForAnalytic": m.constants.player.playbackSource.unknown
-          "srcForAds": m.constants.player.playbackOrigin.container
-          "playbackContainer": currentScreen.currCategoryId
-        }
-        playLinearVideoContent(focusedContent, true, homeScreen.id, true, playbackSource)
+          m.backgroundGroup.posterVisible = false
+        end if
       else
-        bStopCountdownTimer = false
-        startCountdownTimer()
-
-        m.backgroundGroup.posterVisible = false
+        if isLinearPlayerLoadingORPlaying() = true
+          stopAndHideLinearVideoPlayer()
+        end if
       end if
-    else
-      if isLinearPlayerLoading() = true OR isLinearPlayerPlaying() = true
-        stopAndHideLinearVideoPlayer()
+
+      if currentScreen.isSameNode(homeScreen) = true AND currentScreen.isInFocusChain() = true  'if there are any modals over home screen or focus has been lost to side nav
+        setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo)
       end if
-    end if
 
-    if currentScreen.isSameNode(homeScreen) = true AND currentScreen.isInFocusChain() = true  'if there are any modals over home screen or focus has been lost to side nav
-      setVideoPreviewAfterFocus(focusedContent, currentScreen.trackingPageInfo)
-    end if
-
-    if bStopCountdownTimer = true
-      stopCountdownTimer()
+      if bStopCountdownTimer = true
+        stopCountdownTimer()
+      end if
     end if
   end if
 End Function
@@ -882,14 +889,6 @@ Function startCountdownTimer()
     screen.fullscreenCountdown = m.constants.settings.linearFullscreenTimeout
     m.playerFullscreenCountdownTimer.control = "start"
   end if
-End Function
-
-
-Function onScrollingStatusChange(msg)
-  '//if in the middle of scrolling, then stop the linear video player (if it is playing)
-  homeScreen = msg.getRoSGNode()
-  focusedContent = homeScreen.focusedChild
-  setHomeScreenAfterFocus(focusedContent, homeScreen)
 End Function
 
 

@@ -1,6 +1,7 @@
 Function init()
   tubiLog("CategoryGridList.init")
   m.constants = getConstantsFromGlobal()
+  m.lastFocused = 0
 
   m.top.observeField("categoryResponseInBatch", "onCategoryResponseInBatch")
   m.top.observeField("focusedChild", "onComponentFocusChange")
@@ -11,6 +12,8 @@ Function init()
   m.RowList = m.top.findNode("RowList")
   m.RowList.observeField("rowItemFocused", "onRowItemFocused")
   m.RowList.observeField("rowItemSelected", "onRowItemSelected")
+  m.RowList.observeFieldScoped("currFocusRow", "onCurrFocusRow")
+  m.RowList.observeFieldScoped("itemUnfocused", "onItemUnfocused")
 
   m.RowListItemDebounce = m.top.findNode("RowListitemDebounce")
   m.RowListItemDebounce.observeField("fire", "onRowListItemDebounce")
@@ -279,7 +282,7 @@ Function setRowHeights()
 
   '//setting the height of the m.RowList.itemSize is superceded by the rowHeight of each row
   '//However, just in case the height of a row is not defined, then it will default to the height defined by itemSize
-  itemSize = [1752, posterSize[1]] 
+  itemSize = [1752, posterSize[1]]
   m.Rowlist.update({
     "itemSize" : itemSize
     "rowItemSize": rowItemSize
@@ -555,4 +558,25 @@ Function setRowListFocus()
     m.top.rowFocused = m.RowList.content.getChild(reloadedItemIndex[0])
     m.top.reloadedItemToBeFocused = resolveAbbreviatedContent(reloadedItemIndex)
   end if
+End Function
+
+
+Function onItemUnfocused()
+  m.lastFocused = m.RowList.itemUnfocused
+End Function
+
+
+'In homescreen.brs -> onCurrFocusRowChange is executing multiple times.
+'To avoid that, this function exposes single currFocusRow as integer.
+Function onCurrFocusRow(msg)
+  focusPos = msg.getData()
+  newFocus = Int(focusPos)
+  if focusPos > m.lastFocused
+    if newFocus < focusPos
+      newFocus += 1
+    end if
+  end if
+
+  m.top.currFocusRow = newFocus
+
 End Function
