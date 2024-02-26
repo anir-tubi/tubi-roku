@@ -137,7 +137,7 @@ Function formatDialog()
         imageDimensions = m.top.imageDimensions
       else
         imageWidth = 342
-        imageDimensions = [[imageWidth, 483]]
+        imageDimensions = [[imageWidth, 405]]
       end if
 
 
