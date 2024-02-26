@@ -124,34 +124,36 @@ Function onFocusPercentChange()
     m.sideIconLabel.opacity = 1 - focusPercent
   end if
 
-  if itemContent <> invalid AND itemContent.selected = true
-    if m.top.gridHasFocus = true
+  if itemContent <> invalid
+    if itemContent.selected = true
+      if m.top.gridHasFocus = true
+        if itemContent.turnedOn = true
+          m.Icon.opacity = 1 - focusPercent
+        else
+          m.Icon.opacity = .31
+        end if
+        m.focusedIcon.opacity = focusPercent
+        m.Icon.uri = m.top.itemContent.filledIconUrl
+        m.focusedIcon.uri = m.top.itemContent.filledIconUrl
+      else
+        m.focusedIcon.opacity = 1 - focusPercent
+        if itemContent.turnedOn = true
+          m.Icon.opacity = focusPercent
+        else
+          m.Icon.opacity = .31
+        end if
+        m.focusedIcon.uri = m.top.itemContent.iconUrl
+      end if
+    else
       if itemContent.turnedOn = true
         m.Icon.opacity = 1 - focusPercent
       else
         m.Icon.opacity = .31
       end if
       m.focusedIcon.opacity = focusPercent
-      m.Icon.uri = m.top.itemContent.filledIconUrl
-      m.focusedIcon.uri = m.top.itemContent.filledIconUrl
-    else
-      m.focusedIcon.opacity = 1 - focusPercent
-      if itemContent.turnedOn = true
-        m.Icon.opacity = focusPercent
-      else
-        m.Icon.opacity = .31
-      end if
+      m.Icon.uri = m.top.itemContent.iconUrl
       m.focusedIcon.uri = m.top.itemContent.iconUrl
     end if
-  else
-    if itemContent.turnedOn = true
-      m.Icon.opacity = 1 - focusPercent
-    else
-      m.Icon.opacity = .31
-    end if
-    m.focusedIcon.opacity = focusPercent
-    m.Icon.uri = m.top.itemContent.iconUrl
-    m.focusedIcon.uri = m.top.itemContent.iconUrl
   end if
 End Function
 
