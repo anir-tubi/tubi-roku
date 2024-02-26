@@ -318,7 +318,6 @@ Function init()
 
   m.signUpSaveProgressButton = m.top.findNode("signUpSaveProgressButton")
   signUpSaveProgressContentNode = CreateObject("roSGNode", "DetailMenuItemContentNode")
-  signUpSaveProgressContentNode.uri = "pkg:/images/selector-$$RES$$.9.png"
   signUpSaveProgressContentNode.title = getTranslation("registration_signup_button")
   signUpSaveProgressContentNode.badgeText = getTranslation("registration_signup_button_free")
   signUpSaveProgressContentNode.HDPosterUrl = "pkg:/images/icon-account.webp"
