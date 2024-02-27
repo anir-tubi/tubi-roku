@@ -850,6 +850,7 @@ Function onLinearChannelSelectedFromGuide(msg)
         playLinearVideoContent(channel, false, videoPlayer.associatedScreenID, videoPlayer.allowTransportToAppear, playbackSource)
         newTrackingPageInfo = videoPlayer.trackingPageInfo
         screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, trackingComponentInfo)
+        videoPlayer.trackingComponentInfo = invalid
 
         if videoPlayer.associatedScreenID <> invalid AND videoPlayer.associatedScreenID <> ""
           '//Tell the homescreen to focus on the same channel so when the user backs out, the channel that is playing is the same one that is in focus

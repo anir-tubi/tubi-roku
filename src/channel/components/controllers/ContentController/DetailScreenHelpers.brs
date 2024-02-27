@@ -2127,6 +2127,7 @@ Function sendDetailScreenErrorAnalytics(detailScreen)
     oldScreen = getHiddenScreen(1) 'we already pushed the details screen, so the previous screen is 1 screen below the top screen/details screen
     if oldScreen <> invalid
       screenTrackingNavigate(oldScreen.trackingPageInfo, detailScreen.trackingPageInfo, oldScreen.trackingComponentInfo)
+      oldScreen.trackingComponentInfo = invalid
     end if
 
     loadTime = Int((Uptime(0) - detailScreen.trackingLoadStartTime) * 1000) 'in ms

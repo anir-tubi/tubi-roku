@@ -453,6 +453,7 @@ Function playUpNextContent(nextContent, playbackSource = {"srcForAnalytic": "unk
       video_id: analyticId
     }
     screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, videoPlayer.trackingComponentInfo)
+    videoPlayer.trackingComponentInfo = invalid
     screenTrackingLoad(newTrackingPageInfo)
 
     ' populate the detail screen with the new content while the video is showing so when the user
