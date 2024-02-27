@@ -12,6 +12,7 @@ Function UserDeviceApi(constants, apiUtils)
     deviceRegisterInfo: userDeviceApi_deviceRegisterInfo
     checkBirthdayInfo: userDeviceApi_checkBirthdayInfo
     patchSettingsInfo: userDeviceApi_patchSettingsInfo
+    getContentRating: userDeviceApi_getContentRating
     setContentRating: userDeviceApi_setContentRating
     magicLink: userDeviceApi_magicLink
     resetPassword: userDeviceApi_resetPassword
@@ -26,6 +27,7 @@ Function UserDeviceApi(constants, apiUtils)
 
     ' serverPersistentData related methods.
     createUserSettingsReqInfo: userDeviceApi_createUserSettingsReqInfo
+    createUserSettingsGeneralTaskReqInfo: userDeviceApi_createUserSettingsGeneralTaskReqInfo
     createDeviceSettingsReqInfo: userDeviceApi_createDeviceSettingsReqInfo
     createUserAndDeviceSettingsBatchRequests: userDeviceApi_createUserAndDeviceSettingsBatchRequests
     createPatchUserSettingsReqInfo: userDeviceApi_createPatchUserSettingsReqInfo
@@ -250,6 +252,28 @@ Function userDeviceApi_setContentRating(sContentID, sRatingAction, target = "tit
 End Function
 
 
+' Get ratings for a given target and type
+' @param target: string, title - for VOD, linear - for linear contents.
+' @param ratingType: string, liked | disliked
+' @param nextPageId: string, used for pagination. Should be pulled from previous call to getContentRating
+Function userDeviceApi_getContentRating(target, ratingType, nextPageId = "")
+  url = m.constants.urls.account.contentRating
+  options = m.getCommonOptions()
+  options.params["target"] = target
+  options.params["type"] = ratingType
+  options.params["limit"] = 100
+  if isNonEmptyString(nextPageId) = true then
+    options.params["start"] = nextPageId
+  end if
+
+  options["method"] = m.constants.reqTypes.get
+  return {
+    "url": url
+    "options": options
+  }
+End Function
+
+
 '@parentalRating: integer, selected parentalRating from the settings screen
 'password: string, user entered password
 Function userDeviceApi_updateParentalRatingReqInfo(parentalRating, password)
@@ -414,6 +438,22 @@ Function userDeviceApi_createUserSettingsReqInfo()
     url: m.constants.urls.account.userSettings
     options: options
   }
+End Function
+
+
+' Servers as a wrapper around createUserSettingsReqInfo to include all of the fields needed for use in GeneralTask
+' @param successCallback: function, callback that will be called if successful
+' @param errorCallback: function, callback that will be called if unsuccessful
+Function userDeviceApi_createUserSettingsGeneralTaskReqInfo(successCallback, errorCallback = invalid)
+  request = m.createUserSettingsReqInfo()
+  request.append({
+    requestType: m.constants.reqNames.getUserSettings
+    successCallback: successCallback
+    errorCallback: errorCallback
+    responseType: "assocarray"
+    isGDPR: isGDPR() 'bs:disable-line 1001 LINT1001
+  })
+  return request
 End Function
 
 

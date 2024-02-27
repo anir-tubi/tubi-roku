@@ -15,6 +15,7 @@ Function TubiNodeHelpers()
     countNodes: tubiNodeHelpers_countNodes
     removeChildAtIndex: tubiNodeHelpers_removeChildAtIndex
     removeChildAnimationNodes: tubiNodeHelpers_removeChildAnimationNodes
+    removeAllChildren: tubiNodeHelpers_removeAllChildren
   }
 End Function
 
@@ -229,7 +230,7 @@ End Function
 ' @animationContext: assocarray, Contains a associative array with a parent field key of which value is node where the animation child is present ex: {parent: parentNode}.
 Function tubiNodeHelpers_removeChildAtIndex(parent, index, animationContext = invalid)
   child = parent.getChild(index)
-  
+
   ' Adding check to make sure if we do not proceed when the parent does not have any children.
   if child <> invalid
     parent.removeChild(child)
@@ -250,4 +251,12 @@ Function tubiNodeHelpers_removeChildAnimationNodes(parent, id)
   if animationNode <> invalid
     parent.removeChild(animationNode)
   end if
+End Function
+
+
+' Used to remove all children from the provided node
+' @node: node, the node that we want to remove all the children from
+Function tubiNodeHelpers_removeAllChildren(node)
+  childCount = node.getChildCount()
+  node.removeChildrenIndex(childCount, 0)
 End Function

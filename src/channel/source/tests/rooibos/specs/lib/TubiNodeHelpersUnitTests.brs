@@ -384,3 +384,13 @@ Function tubiNodeHelpers_getChildById_test()
   m.AssertEqual(childNode.id, "child3")
   m.AssertTrue(childNode.isSameNode(child3))
 End Function
+
+
+'@Test removeAllChildren unit tests
+Function tubiNodeHelpers_removeAllChildren_test()
+  m.parent.createChild("ContentNode")
+  m.parent.createChild("ContentNode")
+  m.AssertEqual(m.parent.getChildCount(), 2)
+  m.nodeHelpers.removeAllChildren(m.parent)
+  m.AssertEqual(m.parent.getChildCount(), 0)
+End Function

@@ -61,6 +61,12 @@ Function registerParsingCallbacks()
     parseError: parsequeryStatusOfMagicLinkError
   }
 
+  'get Content Like/Dislike Rating
+  m.requestTypes[m.constants.reqNames.getContentRating] = {
+    parseSuccess: parseGetContentRatingSuccess
+    parseError: parseGenericError
+  }
+
   'set Content Like/Dislike Rating
   m.requestTypes[m.constants.reqNames.setContentRating] = {
     parseSuccess: parseContentRateSuccess
@@ -70,7 +76,7 @@ Function registerParsingCallbacks()
   'updateParentalRating
   m.requestTypes[m.constants.reqNames.updateParentalRating] = {
     parseSuccess: parseUpdateParentalRatingSuccess
-    parseError: parseUpdateParentalRatingError
+    parseError: parseGenericError
   }
 
   ' check birthday (check if birthday exists for logged in user)
@@ -228,7 +234,7 @@ Function registerParsingCallbacks()
 
   ' gets the list of user/device level server persistent data.
   m.requestTypes[m.constants.reqNames.getUserSettings] = {
-    parseSuccess: parseGenericSuccess
+    parseSuccess: parseGetUserSettingsSuccess
     parseError: parseGenericError
   }
 

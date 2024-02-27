@@ -272,6 +272,7 @@ Function getConstants()
     constants.reqNames.magicLink = "magicLink"
     constants.reqNames.resetPassword = "resetPassword"
     constants.reqNames.queryStatusOfMagicLink = "queryStatusOfMagicLink"
+    constants.reqNames.getContentRating = "getContentRating"
     constants.reqNames.setContentRating = "setContentRating"
     constants.reqNames.updateParentalRating = "updateParentalRating"
     constants.reqNames.deleteFromQueue = "deleteFromQueue"
@@ -316,6 +317,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postUserHistory] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.signup] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.signIn] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getContentRating] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.setContentRating] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.updateParentalRating] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.deleteFromQueue] = true

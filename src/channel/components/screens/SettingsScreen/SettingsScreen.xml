@@ -36,9 +36,12 @@
       <!-- Holds the consent preferences value obtained from backend. either user or device level.  -->
       <field id="consentSettings" type="assocarray" />
 
+      <!-- response received from call to urls.account.userSettings  -->
+      <field id="userSettings" type="assocarray" />
+
       <!-- Holds the true/false based on if the user is in adults mode and not in kids mode, and not in teens parental controls.  -->
       <field id="isAllowedToManageConsent" type="boolean" value="false" />
-      
+
       <!-- Holds the value of qr code temp uri path.  -->
       <field id="dsarQrCodeUri" type="string" value="" />
 
@@ -49,6 +52,8 @@
       <field id="backButtonPressed" type="boolean" alwaysNotify="true"/>
       <field id="signOutSelected" type="boolean" alwaysNotify="true"/>
       <field id="signInSelected" type="boolean" alwaysNotify="true"/>
+      <!-- Used to tell ContentController to update the userSettings field. Should only be triggered if logged in -->
+      <field id="fetchUserSettings" type="boolean" alwaysNotify="true"/>
       <field id="parentalSettingSelected" type="integer" alwaysNotify="true"/>
       <field id="autoPreviewSettingSelected" type="integer" alwaysNotify="true" />
       <!-- Holds all the draft or unsaved changes to consents. ex: {"essential_functionality": "opt_in"}.  -->
@@ -73,7 +78,7 @@
         <Font
         role="font"/>
       </Label>
-    
+
       <PanelSet
       id="PanelSet"
       width="1920"

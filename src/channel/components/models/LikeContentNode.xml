@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!-- Extend the ContentNode so we can add some custom fields -->
-<component name = "LikeContentNode" extends="ContentNode">
+<component name="LikeContentNode" extends="Node">
   <interface>
     <!-- The like/dislike state of the content item associated with this node. constants.ui.likeDislikeStates.disliked, constants.ui.likeDislikeStates.liked -->
     <field id="state" type="string" />

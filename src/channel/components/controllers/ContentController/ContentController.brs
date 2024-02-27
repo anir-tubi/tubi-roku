@@ -160,15 +160,18 @@ Function init()
   m.authInfoRefreshed = true 'is the auth info refreshed after receiving a deeplink with a refresh token
   m.ageVerificationComplete = false 'has the user verified their age?
   m.getServerPersistentDataComplete = false 'did we finish fetching serverPersistentData. either user/device based on user logged in status.
-  m.authTask = CreateObject("roSGNode", "AuthTask")
-  m.authTask.observeFieldScoped("authInfo", "onStartupAuthInfoReceived")
-  m.authTask.functionName = "execInitializeUserData"
-  m.authTask.control = "RUN"
 
-  ' For queue and history management from detail screen
-  m.userTask = CreateObject("roSGNode", "AuthTask")
+  ' The following fields are needed as a part of getUserInfo
+  m.userSettings = invalid ' Used to store the response from userSettings call until all other responses are received
+  m.getUserSettingsResponseReceived = false ' Have we received a response for user settings call (success or failure)
+  m.getHistoryIdsResponseReceived = false ' Have we received a response for history ids call (success or failure)
+  m.getQueueIdsResponseReceived = false ' Have we received a response for getQueueIds call (success or failure)
+  m.getUserPreferencesRateTitleLikedResponseReceived = false ' Have we received a response for getUserPreferencesRateTitleLiked call (success or failure)
+  m.getUserPreferencesRateTitleDislikedResponseReceived = false ' Have we received a response for getUserPreferencesRateTitleDisliked call (success or failure)
+  m.getUserPreferencesRateLinearLikedResponseReceived = false ' Have we received a response for getUserPreferencesRateLinearLiked call (success or failure)
+  m.getUserInfoCallback = invalid ' Callback that will be fired after all required calls from getUserInfo have been completed
 
-  m.logOutTask = m.top.findNode("LogOutTask")
+  getUserInfo(onStartupAuthInfoReceived)
 
   ' indicates if we are building the app in a deep link state
   ' is set to true when a deeplink occurs, and set back to false after the deeplink has been handled
@@ -786,26 +789,28 @@ Function handleLikesChange()
 End Function
 
 
-Function getQueueIds(successCallback = invalid)
+Function getQueueIds(successCallback, errorCallback = invalid)
   reqInfo = m.userDeviceApi.getQueueReqInfo()
   m.makeRequest({
     requestType: m.constants.reqNames.getQueue
     url: reqInfo.url
     options: reqInfo.options
     successCallback: successCallback
+    errorCallback: errorCallback
     responseType: "node"
     silenceCallbackWarnings: true
   })
 End Function
 
 
-Function getHistoryIds(successCallback = invalid)
+Function getHistoryIds(successCallback, errorCallback = invalid)
   reqInfo = m.userDeviceApi.getHistoryReqInfo()
   m.makeRequest({
     requestType: m.constants.reqNames.getHistory
     url: reqInfo.url
     options: reqInfo.options
     successCallback: successCallback
+    errorCallback: errorCallback
     responseType: "node"
     silenceCallbackWarnings: true
   })
@@ -2351,27 +2356,20 @@ End Function
 
 
 Function refreshUserInfoAndStartUserExperience()
-  getUserInfoRequest = m.userDeviceApi.createUserSettingsReqInfo()
-  m.makeRequest({
-    url: getUserInfoRequest.url
-    requestType: m.constants.reqNames.getUserSettings
-    options: getUserInfoRequest.options
-    successCallback: onGetUserInfoSuccess
-    errorCallback: startUserExperience
-    responseType: "assocarray"
-  })
+  getUserSettingsRequest = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onGetUserInfoSuccess, startUserExperience)
+  m.makeRequest(getUserSettingsRequest)
 End Function
 
 
 Function onGetUserInfoSuccess(userInfo)
   if userInfo <> invalid
     Auth = TubiAuth(m.constants, m.Request)
-    if userInfo.first_name <> invalid
-      Auth.setAuthInfo("firstname", userInfo.first_name)
+    if userInfo.firstName <> invalid
+      Auth.setAuthInfo("firstname", userInfo.firstName)
     end if
 
-    if userInfo.last_name <> invalid
-      Auth.setAuthInfo("lastname", userInfo.last_name)
+    if userInfo.lastName <> invalid
+      Auth.setAuthInfo("lastname", userInfo.lastName)
     end if
 
     if userInfo.name <> invalid
@@ -2382,13 +2380,11 @@ Function onGetUserInfoSuccess(userInfo)
       Auth.setAuthInfo("gender", userInfo.gender)
     end if
 
-    if userInfo.has_age <> invalid
-      Auth.setAuthInfo("hasAge", userInfo.has_age)
+    if userInfo.hasAge <> invalid
+      Auth.setAuthInfo("hasAge", userInfo.hasAge)
     end if
 
-    ' Email value is missing in the authinfo updating the value.
-    ' Since when we exchange token the response does not contain email it just contains token and user id where as in regular sign in we do have email.
-    ' Below logic updates the global auth info to add email.
+    ' Email value comes from userSettings and is missing in the authinfo so we have to add it.
     authInfo = m.global.authInfo
     if isNonEmptyString(authInfo.email) = false AND userInfo.email <> invalid
       authInfo.email = userInfo.email
@@ -2460,4 +2456,227 @@ Function waitForVideoPlayerStoppedStateCallback(msg)
     videoPlayer.unobserveField("state")
   end if
   trackVideoPlayerStoppingState(state)
+End Function
+
+
+' Used to get the current authInfo and update it with info from userSettings as well updating bookmarkIds, historyIds, likeIds and linearLikeIds on global
+' @callback: Function, callback that will be called after all information has been retrieved
+Function getUserInfo(callback)
+  ' Set our callback for when everything is complete
+  m.getUserInfoCallback = callback
+
+  ' Reset our state to nothing being received yet
+  m.getUserSettingsResponseReceived = false
+  m.getHistoryIdsResponseReceived = false
+  m.getQueueIdsResponseReceived = false
+  m.getUserPreferencesRateTitleLikedResponseReceived = false
+  m.getUserPreferencesRateTitleDislikedResponseReceived = false
+  m.getUserPreferencesRateLinearLikedResponseReceived = false
+
+  ' First have to get authentication
+  m.authTask = createObject("roSGNode", "AuthTask")
+  m.authTask.observeFieldScoped("authInfo", "onAuthInfoChange")
+  m.authTask.functionName = "execInitializeUserData"
+  m.authTask.control = "RUN"
+End function
+
+
+Function onAuthInfoChange(msg)
+' Have to unobserve since we update authInfo again. Potentially could use authInfoRefreshed but naming could get confusing
+  m.authTask.unobserveFieldScoped("authInfo")
+
+  ' Once we have authentication we can branch out and run multiple requests at once
+  authInfo = msg.getData()
+  if isLoggedInUser(authInfo) = true then
+    getUserSettingsRequest = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onGetUserSettingsSuccess, onGetUserSettingsError)
+    m.makeRequest(getUserSettingsRequest)
+
+    getHistoryIds(getHistoryIdsSuccess, getHistoryIdsError)
+    getQueueIds(getQueueIdsSuccess, getQueueIdsError)
+    getUserInfoGetContentRatingTitleLiked()
+    getUserInfoGetContentRatingTitleDisliked()
+    getUserInfoGetContentRatingLinearLiked()
+  else
+    m.getUserSettingsResponseReceived = true
+    m.getHistoryIdsResponseReceived = true
+    m.getQueueIdsResponseReceived = true
+    m.getUserPreferencesRateTitleLikedResponseReceived = true
+    m.getUserPreferencesRateTitleDislikedResponseReceived = true
+    m.getUserPreferencesRateLinearLikedResponseReceived = true
+    checkIfAllUserInfoReceived()
+  end if
+End Function
+
+
+Function onGetUserSettingsSuccess(userSettings)
+  m.userSettings = userSettings
+  m.getUserSettingsResponseReceived = true
+  checkIfAllUserInfoReceived()
+End Function
+
+
+Function onGetUserSettingsError(error)
+  m.userSettings = invalid
+  m.getUserSettingsResponseReceived = true
+  checkIfAllUserInfoReceived()
+End Function
+
+
+Function getHistoryIdsSuccess(historyIds)
+  m.getHistoryIdsResponseReceived = true
+  m.global.historyIds = historyIds
+  checkIfAllUserInfoReceived()
+End Function
+
+
+Function getHistoryIdsError(error)
+  m.getHistoryIdsResponseReceived = true
+  checkIfAllUserInfoReceived()
+End Function
+
+
+Function getQueueIdsSuccess(queueIds)
+  m.getQueueIdsResponseReceived = true
+  m.global.bookmarkIds = queueIds
+  checkIfAllUserInfoReceived()
+End Function
+
+
+Function getQueueIdsError(error)
+  m.getQueueIdsResponseReceived = true
+  checkIfAllUserInfoReceived()
+End Function
+
+
+Function getUserInfoGetContentRatingTitleLiked(nextPageId = invalid)
+  request = m.userDeviceApi.getContentRating("title", m.constants.ui.likeDislikeStates.liked, nextPageId)
+  request.append({
+    "requestType": m.constants.reqNames.getContentRating
+    "responseType": "assocarray"
+    "successCallback": onGetUserInfoGetUserPreferencesRateTitleLikedSuccess
+    "errorCallback": onGetUserInfoGetUserPreferencesRateTitleLikedError
+  })
+  m.makeRequest(request)
+End Function
+
+
+Function onGetUserInfoGetUserPreferencesRateTitleLikedSuccess(response)
+  m.global.likeIds.appendChildren(response.nodes)
+  if response.nextPageId <> invalid then
+    getUserInfoGetContentRatingTitleLiked(response.nextPageId)
+  else
+    m.getUserPreferencesRateTitleLikedResponseReceived = true
+    checkIfAllUserInfoReceived()
+  end if
+End Function
+
+
+Function onGetUserInfoGetUserPreferencesRateTitleLikedError(error)
+  m.getUserPreferencesRateTitleLikedResponseReceived = true
+  checkIfAllUserInfoReceived()
+End Function
+
+
+Function getUserInfoGetContentRatingTitleDisliked(nextPageId = invalid)
+  request = m.userDeviceApi.getContentRating("title", m.constants.ui.likeDislikeStates.disliked, nextPageId)
+  request.append({
+    "requestType": m.constants.reqNames.getContentRating
+    "responseType": "assocarray"
+    "successCallback": onGetUserInfoGetUserPreferencesRateTitleDislikedSuccess
+    "errorCallback": onGetUserInfoGetUserPreferencesRateTitleDislikedError
+  })
+  m.makeRequest(request)
+End Function
+
+
+Function onGetUserInfoGetUserPreferencesRateTitleDislikedSuccess(response)
+  m.global.likeIds.appendChildren(response.nodes)
+  if response.nextPageId <> invalid then
+    getUserInfoGetContentRatingTitleDisliked(response.nextPageId)
+  else
+    m.getUserPreferencesRateTitleDislikedResponseReceived = true
+    checkIfAllUserInfoReceived()
+  end if
+End Function
+
+
+Function onGetUserInfoGetUserPreferencesRateTitleDislikedError(error)
+  m.getUserPreferencesRateTitleDislikedResponseReceived = true
+  checkIfAllUserInfoReceived()
+End Function
+
+
+Function getUserInfoGetContentRatingLinearLiked(nextPageId = invalid)
+  request = m.userDeviceApi.getContentRating("linear", m.constants.ui.likeDislikeStates.liked, nextPageId)
+  request.append({
+    "requestType": m.constants.reqNames.getContentRating
+    "responseType": "assocarray"
+    "successCallback": onGetUserInfoGetContentRatingLinearLikedSuccess
+    "errorCallback": onGetUserInfoGetContentRatingLinearLikedError
+  })
+  m.makeRequest(request)
+End Function
+
+
+Function onGetUserInfoGetContentRatingLinearLikedSuccess(response)
+  m.global.likeIds.appendChildren(response.nodes)
+  if response.nextPageId <> invalid then
+    onGetUserInfoGetContentRatingLinearLikedSuccess(response.nextPageId)
+  else
+    m.getUserPreferencesRateLinearLikedResponseReceived = true
+    checkIfAllUserInfoReceived()
+  end if
+End Function
+
+
+Function onGetUserInfoGetContentRatingLinearLikedError(error)
+  m.getUserPreferencesRateLinearLikedResponseReceived = true
+  checkIfAllUserInfoReceived()
+End Function
+
+
+Function checkIfAllUserInfoReceived()
+  if m.getUserSettingsResponseReceived <> true then
+    return false
+  end if
+
+  if m.getHistoryIdsResponseReceived <> true then
+    return false
+  end if
+
+  if m.getQueueIdsResponseReceived <> true then
+    return false
+  end if
+
+  if m.getUserPreferencesRateTitleLikedResponseReceived <> true then
+    return false
+  end if
+
+  if m.getUserPreferencesRateTitleDislikedResponseReceived <> true then
+    return false
+  end if
+
+  if m.getUserPreferencesRateLinearLikedResponseReceived <> true then
+    return false
+  end if
+
+  ' We had everything we needed to consider this request complete so do some assigning and cleanup
+
+  if m.userSettings <> invalid then
+    ' Currently we continue the same behavior of combining user settings and authInfo together
+    ' To minimize changes and avoid possible issues we're modifying authInfo in place on the AuthTask
+    m.userSettings.append(m.authTask.authInfo)
+    m.authTask.authInfo = m.userSettings
+
+    m.userSettings = invalid
+  end if
+
+  ' Finally call our callback
+  getUserInfoCallback = m.getUserInfoCallback
+  if getUserInfoCallback <> invalid then
+    m.getUserInfoCallback = invalid
+    getUserInfoCallback()
+  end if
+
+  return true
 End Function

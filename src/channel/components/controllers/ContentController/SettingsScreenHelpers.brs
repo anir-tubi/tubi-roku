@@ -10,6 +10,9 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.isVideoPreviewOn = m.pub_serverPersistentData.isVideoPreviewOn
   m.settingsScreen.isAllowedToManageConsent = isUserAllowedToManageConsent()
   m.settingsScreen.consentSettings = m.consentSettings
+
+  ' This observer must be set before setSettingsScreenSignInInfo is called to trigger initial field change
+  m.settingsScreen.observeFieldScoped("fetchUserSettings", "onFetchUserSettingsChanged")
   setSettingsScreenSignInInfo()
   m.settingsScreen.actionAfterActivation = ""
   m.settingsScreen.observeFieldScoped("signOutSelected", "onSettingsSignOutSelected")
@@ -124,6 +127,11 @@ Function onSignOutModalSelected()
   m.authTask.observeFieldScoped("authInfo", "onSignOutCompleted")
   m.authTask.functionName = "execSignOut"
   m.authTask.control = "RUN"
+
+  m.NodeHelpers.removeAllChildren(m.global.bookmarkIds)
+  m.NodeHelpers.removeAllChildren(m.global.historyIds)
+  m.NodeHelpers.removeAllChildren(m.global.likeIds)
+  m.NodeHelpers.removeAllChildren(m.global.linearLikeIds)
 
   m.spinner.visible = true
   m.spinner.setFocus(true)
@@ -578,6 +586,22 @@ Function onSelectedQrCodeSectionInfoChanged(msg)
 
   simpleModalInfo = getSimpleModalInfo(data.heading, message, buttons, dialogEvent, m.trackingLoggingTask)
   showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
+End Function
+
+
+Function onFetchUserSettingsChanged()
+  getUserSettingsRequest = m.userDeviceApi.createUserSettingsGeneralTaskReqInfo(onSettingsScreenGetUserSettingsSuccess, onSettingsScreenGetUserSettingsError)
+  m.makeRequest(getUserSettingsRequest)
+End Function
+
+
+Function onSettingsScreenGetUserSettingsSuccess(userSettings)
+    m.settingsScreen.userSettings = userSettings
+End Function
+
+
+Function onSettingsScreenGetUserSettingsError(error)
+  ' IMPROVEMENT decide how to handle
 End Function
 
 

@@ -197,11 +197,9 @@ Function createParentalControlsPanel(existingPanel = invalid)
 
   if isSignedIn() = true
     pcPanel.isLoading = true
-    requestTask = CreateObject("roSGNode", "AuthTask")
-    requestTask.functionName = "execGetUserInfo"
-    requestTask.observeField("userInfo", "onParentalSettingsReceived")
-    requestTask.control = "RUN"
-    pcPanel.appendChild(requestTask)
+    m.top.unobserveFieldScoped("userSettings")
+    m.top.observeFieldScoped("userSettings", "onUserSettingsReceived")
+    m.top.fetchUserSettings = true
   else
     pcPanel.selectItem = 3 ' default if not signed in
   end if
@@ -254,17 +252,12 @@ Function onAutoPlayPreviewComponentInteractionInfo(msg)
 End Function
 
 
-Function onParentalSettingsReceived(msg)
-  task = msg.getRoSGNode()
-  if task <> invalid
-    panel = task.getParent()
-    if panel <> invalid AND panel.isLoading <> invalid
-      panel.isLoading = false
-      userInfo = msg.GetData()
-      if userInfo <> invalid
-        panel.selectItem = userInfo.parentalrating
-      end if
-    end if
+Function onUserSettingsReceived(msg)
+  parentalControlsPanel = getPanelBySubtype("ParentalControlsPanel")
+  if parentalControlsPanel <> invalid then
+    userSettings = msg.GetData()
+    parentalControlsPanel.selectItem = userSettings.parentalRating
+    parentalControlsPanel.isLoading = false
   end if
 End Function
 
@@ -373,12 +366,12 @@ Function createPrivacyCenterPanel(title)
   privacyCenterPanel.observeFieldScoped("newConsentPreferences", "onNewConsentPreferences")
   privacyCenterPanel.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
   privacyCenterPanel.observeFieldScoped("didUserSelectSaveAndRestart", "onDidUserSelectSaveAndRestart")
-  
+
   ' Since dsar qr codes are dyanmically generated we need to make a network request to get the qr code.
   if privacyCenterSettings <> invalid AND privacyCenterSettings.showDsar = true
     m.top.shouldRequestDsarQrCode = true
   end if
-  
+
 
   pageValues = {
     account_page_type: "PRIVACY_PREFERENCES"
@@ -587,6 +580,19 @@ End Function
 Function onDidUserSelectSaveAndRestart(msg)
   ' since privacy center is dyanmically created we cannot use alias.
   m.top.didUserSelectSaveAndRestart = true
+End Function
+
+
+' Get a panel based on its node subtype
+' @panelSubtype: string, subtype of the component we want to try to get for example "ParentalControlsPanel"
+Function getPanelBySubtype(panelSubtype)
+  for i = 0 to m.panelset.getChildCount() - 1
+    node = m.panelset.getChild(i)
+    if node.subtype() = panelSubtype then
+      return node
+    end if
+  end for
+  return invalid
 End Function
 
 

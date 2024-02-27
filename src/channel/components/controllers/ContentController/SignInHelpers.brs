@@ -637,10 +637,8 @@ Function onActivationSuccess()
     m.authTask.unobserveFieldScoped("authInfo")
   end if
 
-  m.authTask = CreateObject("roSGNode", "AuthTask")
-  m.authTask.observeFieldScoped("authInfo", "refreshConsent")
-  m.authTask.functionName = "execInitializeUserData"
-  m.authTask.control = "RUN"
+  getUserInfo(refreshConsent)
+
   m.spinner.visible = true
   m.spinner.setFocus(true)
 
@@ -821,7 +819,6 @@ End Function
 
 
 ' These are the basic actions taken after the user has signed in
-' returns the AuthInfo
 Function handleUpdatedAuth()
   ' AuthInfo may be invalid if authTask failed to log the user in
   authInfo = m.authTask.authInfo
@@ -831,17 +828,11 @@ Function handleUpdatedAuth()
   m.global.authInfo = authInfo
 
   ' These will be empty parent nodes (no children) if user is not authenticated
-  m.global.bookmarkIds = m.authTask.bookmarks
-  m.global.historyIds = m.authTask.history
-  m.global.likeIds = m.authTask.likes
-  m.global.linearLikeIds = m.authTask.linearLikes
   m.authInfoReceived = true
   m.authTask.unobserveFieldScoped("authInfo")
   m.authTask = invalid
 
   setSideNavSignedInItem(authInfo)
-
-  return authInfo
 End Function
 
 

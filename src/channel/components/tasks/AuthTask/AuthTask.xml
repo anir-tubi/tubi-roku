@@ -25,33 +25,7 @@
 
     <interface>
       <!-- INPUT -->
-        <!-- Content for queue and history changes with fields:
-        -
-        -    addToQueue:
-        -        content.id
-        -        content.type
-        -
-        -    removeFromQueue:
-        -        content.id
-        -        content.bookmarkId
-        -
-        -    updateHistory:
-        -        content.id
-        -        content.type
-        -        content.parentId (only necessary if content is episode in a series)
-        -->
-        <field id="content" type="node" />
-
-        <!-- updateHistory:
-         -       Seconds since start of content to store in history
-         -->
-        <field id="nowPos" type="integer" />
-
-        <field id="autoplayPreviewSetting" type="boolean" />
-
         <field id="externalAuthInfo" type="assocarray"/>
-
-        <field id="isKidsMode" type="boolean" />
 
       <!-- OUTPUT -->
         <!-- execInitializeUserData, execAuthRefresh, execSignOut, updateHistory:
@@ -64,59 +38,7 @@
         -->
         <field id="authInfoRefreshed" type="assocarray" alwaysNotify="true" />
 
-
-        <field id="userInfo" type="assocarray" alwaysNotify="true" />
-
-        <!-- number of days since the unix epoch when the device first opened Tubi -->
-        <field id="firstVisit" type="integer" />
-
         <!-- guestUserHasAgeInfo info as returned by Auth.getGuestUserHasAgeInfo -->
         <field id="guestUserHasAgeInfo" type="assocarray" />
-
-        <!-- execInitializeUserData, execSignOut:
-        -        BookmarkContentNode tree of bookmarks
-        -->
-        <field id="bookmarks" type="node" />
-
-        <!-- execInitializeUserData, execSignOut:
-        -        HistoryContentNode tree of history
-        -->
-        <field id="history" type="node" />
-
-        <!-- execInitializeUserData, execSignOut:
-        -        LikeContentNode tree of likes and dislikes
-        -->
-        <field id="likes" type="node" />
-
-        <!-- Linear like just like likes above but for linear channels -->
-        <field id="linearLikes" type="node" />
-
-        <!-- addBookmarkResult:
-        -        Result of request as:
-        -        {
-        -          code: <integer http response code>
-        -          bookmarkId: <bookmark id>
-        -          failReason: <string from roUrlEvent.GetFailureReason()>
-        -        }
-        -->
-        <field id="addBookmarkResult" type="assocarray" alwaysNotify="true" />
-
-        <!-- removeFromQueue:
-        -        Result of request as:
-        -        {
-        -          code: <integer http response code>
-        -          data: <http response body>
-        -        }
-        -->
-        <field id="result" type="assocarray" alwaysNotify="true" />
-
-        <!-- updateHistory:
-        -        History response with structure:
-        -        {
-        -          historyId: <id of the history entry>
-        -          parentHistoryId: <id of the series, only set if content episodic>
-        -        }
-        -->
-        <field id="historyResult" type="assocarray" alwaysNotify="true" />
     </interface>
 </component>
