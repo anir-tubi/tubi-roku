@@ -226,7 +226,7 @@ function buildStarter() {
     'src/channel/components/tasks/GeneralTask/StarterGeneralTask.brs',
     'src/channel/components/tasks/GeneralTask/Parsers/TubiExperimentParsers.brs',
     'src/channel/components/tasks/GeneralTask/Parsers/ExternalConfigParsers.brs',
-    'src/channel/components/tasks/GeneralTask/Parsers/UncategorizedParsers.brs',
+    'src/channel/components/tasks/GeneralTask/Parsers/UncategorizedParsers.brs'
   ];
   let generalTaskSrcOptions = {
     base: 'src/channel/components'
@@ -234,7 +234,8 @@ function buildStarter() {
 
   // include Constants in starter components
   let constantsSrc = [
-    'src/channel/source/Constants.brs'
+    'src/channel/source/Constants.brs',
+    'src/channel/images/Tubi_Splash.webp' //remove this line(Tubi_Splash.webp) for 3.2 release.
   ];
   let constantsSrcOptions = {
     base: 'src/channel'
