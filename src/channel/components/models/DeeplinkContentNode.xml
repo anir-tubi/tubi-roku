@@ -19,7 +19,7 @@
     <field id="type" type="string" />
 
     <!-- where the deeplink will resume from -->
-    <field id="nowPos" type="int" />
+    <field id="nowPos" type="int" value="-1"/>
 
     <!-- movie, episode, series, season as dictated by roku's deeplink api-->
     <field id="deeplinkType" type="string" />

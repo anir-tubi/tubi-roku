@@ -1969,7 +1969,7 @@ Function processResume(episode)
   else
     nowPos = 0
     ' using nowPos that was passed in with deeplink, when playback initiated via deeplink
-    if m.deeplinkContent <> invalid AND episode.nowPos > 0
+    if m.deeplinkContent <> invalid AND episode.nowPos >= 0
       nowPos = episode.nowPos
     else
       ' find the position in global history
@@ -2004,19 +2004,28 @@ Function skipDetailScreen(refreshedContent)
   detailScreen = getTopDetailScreenFromStack()
   if detailScreen <> invalid
     populateDetailScreen(detailScreen, refreshedContent, false, -1)
+    nowPos = 0
 
     if refreshedContent.needsLogin = false AND detailScreen.availabilityType <> m.constants.ui.contentTimings.upcoming
-      if refreshedContent.type = m.constants.ui.contentTypes.series AND refreshedContent.currentEpisodeId = "" AND refreshedContent.isRecurring = false
-        ' first see if there was a specific episode id we wanted
+      if m.enteredFromDeeplink = true AND m.deeplinkContent <> invalid AND m.deeplinkContent.nowPos >= 0
+        if refreshedContent.type = m.constants.ui.contentTypes.series AND refreshedContent.currentEpisodeId = ""
+          refreshedContent.currentEpisodeId = m.deeplinkContent.id
+        end if
+        nowPos = m.deeplinkContent.nowPos
+      else
         history = getHistory(refreshedContent.id)
         if history <> invalid
-          refreshedContent.currentEpisodeId = history.currentEpisodeId
+          if refreshedContent.type = m.constants.ui.contentTypes.series AND refreshedContent.currentEpisodeId = ""
+            refreshedContent.currentEpisodeId = history.currentEpisodeId
+          end if
+          nowPos = history.nowPos
         end if
       end if
 
       episode = getEpisodeContent(refreshedContent)
 
       if episode <> invalid
+        episode.nowPos = nowPos
         if m.enteredFromDeepLink = true AND m.deeplinkContent <> invalid
           sendDeeplinkAnalytics(m.deeplinkContent, episode, m.constants.deeplinks.entryPoints.video, m.Tracking, m.trackingLoggingTask, m.constants)
         end if
@@ -2036,6 +2045,7 @@ Function skipDetailScreen(refreshedContent)
       end if
     end if
   end if
+
 End Function
 
 

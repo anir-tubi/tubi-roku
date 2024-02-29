@@ -701,11 +701,20 @@ Function handleDeeplinkSeriesSuccessResponse(refreshedContent)
     ' to choose the most appropriate episode and automatically start playback.
     ' Here we use the history to choose an episode or just default to the first one.
     afterFn = playHelper
-    if history <> invalid
+    if m.enteredFromDeeplink = true AND m.deepLinkContent <> invalid AND m.deepLinkContent.nowPos >= 0
+      refreshedContent.currentEpisodeId = m.deepLinkContent.id
+      episode = getEpisodeContent(refreshedContent)
+      if episode <> invalid
+        episode.nowPos = m.deepLinkContent.nowPos
+      end if
+      afterFn = detailScreenResumeHelper
+    else if history <> invalid
       refreshedContent.currentEpisodeId = history.currentEpisodeId
       episode = getEpisodeContent(refreshedContent)
-
-      episodeHistory = getHistory(episode.id)
+      episodeHistory = invalid
+      if episode <> invalid
+        episodeHistory = getHistory(episode.id)
+      end if
 
       if episodeHistory <> invalid AND episodeHistory.nowPos > 0
         episode.nowPos = episodeHistory.nowPos
@@ -799,9 +808,19 @@ Function handleDeeplinkEpisodeSuccessResponse(refreshedContent)
     ' we now have the full series info for episode deeplinks
     refreshedContent.currentEpisodeId = m.deepLinkContent.id
     'determine if we need to resume or play from start the deeplinked episode
-    if history <> invalid
+    if m.enteredFromDeeplink = true AND m.deepLinkContent <> invalid AND m.deepLinkContent.nowPos >= 0
       episode = getEpisodeContent(refreshedContent)
-      episodeHistory = getHistory(episode.id)
+      if episode <> invalid
+        episode.nowPos = m.deepLinkContent.nowPos
+      end if
+
+      afterFn = detailScreenResumeHelper
+    else if history <> invalid
+      episode = getEpisodeContent(refreshedContent)
+      if episode <> invalid
+        episodeHistory = getHistory(episode.id)
+      end if
+
       if episodeHistory <> invalid AND episodeHistory.nowPos > 0
         episode.nowPos = episodeHistory.nowPos
       end if
