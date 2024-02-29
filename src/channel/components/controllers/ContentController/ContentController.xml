@@ -61,6 +61,7 @@
   <script type="text/brightscript" uri="../../../source/lib/UserDeviceApi.brs" />
   <script type="text/brightscript" uri="../../../source/lib/RainmakerApi.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/RokuContinueWatchingApi.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/ThirdPartyApi.brs" />
   <script type="text/brightscript" uri="../../../source/lib/StringUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/MathUtils.brs" />
   <script type="text/brightscript" uri="../../../source/lib/TubiNodeHelpers.brs" />

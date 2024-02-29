@@ -242,6 +242,12 @@ Function registerParsingCallbacks()
   m.requestTypes[m.constants.reqNames.getDsarQrCode] = {
     parseSuccess: parseGenericSuccess
   }
+
+  ' Patch Consent.
+  m.requestTypes[m.constants.reqNames.postBrazeMergeUsers] = {
+    parseSuccess: parseGenericSuccess
+    parseError: parseGenericError
+  }
 End Function
 
 

@@ -294,6 +294,7 @@ Function getConstants()
     constants.reqNames.clearRokuContinueWatching = "clearRokuContinueWatching"
     constants.reqNames.getUserSettings = "getUserSettings"
     constants.reqNames.postAnalytics = "postAnalytics"
+    constants.reqNames.postBrazeMergeUsers = "postBrazeMergeUsers"
 
     ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
@@ -366,9 +367,11 @@ Function getConstants()
 
     constants.thirdParty.braze = {}
       constants.thirdParty.braze.apiKey = "a97de018-d2c3-47a4-ada4-7b12dc579255"
+      constants.thirdParty.braze.restApiKey = "d2271dbb-5cc7-4e08-b5d1-f4effe673390"
       ' All non production environments will use staging api key.
       if constants.settings.mode <> "production"
         constants.thirdParty.braze.apiKey = "be27ec5f-5d30-4014-94cd-009a0a0d1c48"
+        constants.thirdParty.braze.restApiKey = "a57e485c-157a-4cca-8cb1-7dda9018c83d"
       end if
       constants.thirdParty.braze.endpoint = "https://sdk.iad-01.braze.com/"
       ' Configurable starting with 1 hour will adjust based on feedback.

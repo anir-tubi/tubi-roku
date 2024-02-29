@@ -30,6 +30,28 @@ Function setBrazeUserData(authInfo)
 End Function
 
 
+' @userId: string: user id of the logged in user.
+Function brazeMergeUsers(userId)
+  restApi = ThirdPartyApi(m.constants)
+  requestInfo = restApi.createBrazeMergeUsersReqInfo(m.constants.deviceInfo.deviceId, userId)
+  m.makeRequest({
+    url: requestInfo.url
+    options: requestInfo.options
+    requestType: m.constants.reqNames.postBrazeMergeUsers
+    responseType: "assocarray"
+    silenceCallbackWarnings: true
+    errorCallback: onBrazeMergeUsersError
+  })
+End Function
+
+
+' @error: assocarray: {code: 401} contains the status code.
+Function onBrazeMergeUsersError(error)
+  ' Logging braze error so that we can monitor if we are noticing any unexpected errors.
+  tubiLog(FormatJSON(error), "error", "apiError", "braze-merge-users-error")
+End Function
+
+
 Function onInAppMessageTriggered(msg)
   if m.constants.settings.mode <> "qa" OR m.constants.settings.hideStartupModals <> true
     m.queuedInAppMessage = msg.getData()
