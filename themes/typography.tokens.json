@@ -25,10 +25,8 @@
 						"$type": "dimension",
 						"$value": 206
 					}
-				}
-			},
-			"header": {
-				"large": {
+				},
+				"medium": {
 					"$description": "86/84 - Black",
 					"fontSize": {
 						"$type": "dimension",
@@ -50,8 +48,10 @@
 						"$type": "dimension",
 						"$value": 84
 					}
-				},
-				"medium": {
+				}
+			},
+			"header": {
+				"large": {
 					"$description": "72/80 - Black",
 					"fontSize": {
 						"$type": "dimension",
@@ -72,6 +72,29 @@
 					"lineHeight": {
 						"$type": "dimension",
 						"$value": 80
+					}
+				},
+				"medium": {
+					"$description": "60/72 - Black",
+					"fontSize": {
+						"$type": "dimension",
+						"$value": 60
+					},
+					"fontFamily": {
+						"$type": "string",
+						"$value": "TubiStans"
+					},
+					"fontWeight": {
+						"$type": "number",
+						"$value": 900
+					},
+					"letterSpacing": {
+						"$type": "dimension",
+						"$value": -2
+					},
+					"lineHeight": {
+						"$type": "dimension",
+						"$value": 72
 					}
 				},
 				"small": {

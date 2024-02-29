@@ -27,7 +27,7 @@ Function init()
   }
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.Message, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.Message, typographyConstants.ids.headerLarge)
   setTypographyOfLabel(m.setUp, typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.visit, typographyConstants.ids.bodySmall)
 
@@ -45,7 +45,7 @@ Function onThemeChange(msg = invalid)
   else
     m.theme  = getThemeFromGlobal()
   end if
-  
+
   setPasswordColor()
 End Function
 
@@ -79,7 +79,7 @@ Function onScreenFocusChange()
       m.password.text = m.constants.settings.password
     end if
   end if
-  
+
   if m.top.isInFocusChain() = false
     m.keyboard.voiceEnabled = false
     m.keyboard.unobserveFieldScoped("text")

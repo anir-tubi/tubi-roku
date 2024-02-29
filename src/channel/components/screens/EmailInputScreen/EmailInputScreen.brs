@@ -56,7 +56,7 @@ Function init()
   m.backgroundUriList = []
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerLarge)
   setTypographyOfLabel(m.emailValidationMsg, typographyConstants.ids.bodySmallStrong)
 
   if m.global <> invalid

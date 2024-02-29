@@ -20,7 +20,7 @@ Function init()
   m.saveAndContinueBtn.observeFieldScoped("selected", "onSaveAndContinueBtnSelected")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.heading, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.heading, typographyConstants.ids.headerLarge)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")

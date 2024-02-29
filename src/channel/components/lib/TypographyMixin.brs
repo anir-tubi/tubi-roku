@@ -12,6 +12,8 @@ Function getTypographyConstants()
   '//The gulp install command will look thru the JSON file (typography.tokens.json),
   '//and generate associative arrays to replace the following string values.
   '//::NOTE:: See the ReadMe on how to update the JSON.
+  displayLarge = "TYPOGRAPHY_displayLarge_TYPOGRAPHY"
+  displayMedium = "TYPOGRAPHY_displayMedium_TYPOGRAPHY"
   headerLarge = "TYPOGRAPHY_headerLarge_TYPOGRAPHY"
   headerMedium = "TYPOGRAPHY_headerMedium_TYPOGRAPHY"
   headerSmall = "TYPOGRAPHY_headerSmall_TYPOGRAPHY"
@@ -28,6 +30,8 @@ Function getTypographyConstants()
   bodyExtraSmallStrong = "TYPOGRAPHY_bodyExtraSmallStrong_TYPOGRAPHY"
 
   constants.ids = {}
+  constants.ids.displayLarge = "displayLarge"
+  constants.ids.displayMedium = "displayMedium"
   constants.ids.headerLarge = "headerLarge"
   constants.ids.headerMedium = "headerMedium"
   constants.ids.headerSmall = "headerSmall"
@@ -44,6 +48,8 @@ Function getTypographyConstants()
   constants.ids.bodyExtraSmallStrong = "bodyExtraSmallStrong"
 
   constants.typographyAA = {}
+  constants.typographyAA[constants.ids.displayLarge] = displayLarge
+  constants.typographyAA[constants.ids.displayMedium] = displayMedium
   constants.typographyAA[constants.ids.headerLarge] = headerLarge
   constants.typographyAA[constants.ids.headerMedium] = headerMedium
   constants.typographyAA[constants.ids.headerSmall] = headerSmall
@@ -64,7 +70,7 @@ End Function
 
 'Set the typography (font size, font file, etc) of the passed label node
 '@param labelNode, Node: The Label Node that its properties will be set based on the ID passed
-'@param typographyId, String: The ID that will determine the properties of the label node. 
+'@param typographyId, String: The ID that will determine the properties of the label node.
 '     The value of this ID should be one of the IDs available in this file: i.e. getTypographyConstants().ids.headerLarge
 Function setTypographyOfLabel(labelNode, typographyId)
   constants = getTypographyConstants()

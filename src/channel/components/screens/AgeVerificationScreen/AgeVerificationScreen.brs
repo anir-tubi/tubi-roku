@@ -41,15 +41,15 @@ Function init()
   m.top.observeFieldScoped("ageSubmitted", "onAgeSubmittedChanged")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.Header, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.Header, typographyConstants.ids.headerLarge)
   setTypographyOfLabel(m.SubHeader, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.bornYear, typographyConstants.ids.headerMedium)
-  setTypographyOfLabel(m.YearEntryBack, typographyConstants.ids.headerLarge)
-  setTypographyOfLabel(m.YearEntryFront, typographyConstants.ids.headerLarge)
+  setTypographyOfLabel(m.bornYear, typographyConstants.ids.headerLarge)
+  setTypographyOfLabel(m.YearEntryBack, typographyConstants.ids.displayMedium)
+  setTypographyOfLabel(m.YearEntryFront, typographyConstants.ids.displayMedium)
   setTypographyOfLabel(m.YearLabel, typographyConstants.ids.bodyMedium)
   setTypographyOfLabel(m.Prompt, typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.infoLabel, typographyConstants.ids.bodySmall)
-  
+
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
@@ -63,7 +63,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.SubHeader.color = theme.secondaryTextColor
     m.Header.color = theme.primaryTextColor
@@ -71,7 +71,6 @@ Function onThemeChange(msg = invalid)
     m.YearEntryBack.color = theme.secondaryTextColor
     m.StartButton.color = theme.backgroundColorLight2
     m.Header.color = theme.primaryTextColor
-    
     m.YearLabel.color = theme.primaryTextColor
     m.infoLabel.color = theme.primaryTextColor
     m.YearEntryFront.color = theme.textDarkColor

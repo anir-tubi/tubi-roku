@@ -96,8 +96,9 @@ Function formatDialog()
     m.semiCircle.translation = [dialogBoxTranslationX - 160 , 0 ]
     m.dialogBox.translation = [dialogBoxTranslationX, 0]
     m.mask.width = m.dialogBox.width
-    m.subHeader.width = m.dialogBox.width - 200
-    m.header.width = m.dialogBox.width - 200
+    m.subHeader.width = m.dialogBox.width - 180
+    m.header.width = m.dialogBox.width - 180
+    m.header.lineSpacing = -4 'default linespacing is 8. To bring the lines bit closer, assign a -ve number.
   end if
 
   if m.top.multiStyleMessage <> invalid AND m.top.multiStyleMessage.Count() > 0 AND m.multiStyleLayout.getChildCount() = 0

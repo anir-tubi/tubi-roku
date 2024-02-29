@@ -4,7 +4,7 @@ Function init()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
-  
+
   '//keep a count of how many times the user attempts to resend a verification email. After a few times, present a modal to the user that their spam folder should be checked. Hopefully this will limit how many times a verification email is sent
   m.resendVerificationEmailCount = 0
 
@@ -47,7 +47,7 @@ Function init()
   m.backgroundUriList = []
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerLarge)
   setTypographyOfLabel(m.pageSubHeading, typographyConstants.ids.bodyLarge)
   setTypographyOfLabel(m.email, typographyConstants.ids.subheaderMedium)
   setTypographyOfLabel(m.pageSubHeading2, typographyConstants.ids.bodyMedium)
@@ -91,7 +91,7 @@ End Function
 ' The changeEmail button was clicked, let the helper know about this.
 Function onChangeEmailSelected()
   m.top.selectedDifferentEmail = true
-End Function 
+End Function
 
 
 ' The resendInstantLink button was clicked, let the helper know about this.
@@ -110,8 +110,8 @@ Function onResendInstantLinkSelected()
   message = getTranslation("dialog_email_verification_email_already_sent") + Chr(10) + m.email.text + Chr(10) + getTranslation("dialog_email_verification_check_spam")
   buttons = [getTranslation("dialog_button_resend_verification_link"), getTranslation("dialog_button_cancel")]
   showSimpleInstantResumableModal(title, message, buttons, dialogEvent, m.trackingLoggingTask, onResendVerificationLinkSelected, onResendVerificationCancelSelected)
- 
-End Function 
+
+End Function
 
 
 Function onResendVerificationLinkSelected()
@@ -152,7 +152,7 @@ Function onTooManyAttemptsCallback()
 End Function
 
 
-Function onKeyEvent(key As String, press As Boolean) as Boolean 
+Function onKeyEvent(key As String, press As Boolean) as Boolean
   handled = false
   if press
     if key = "back"

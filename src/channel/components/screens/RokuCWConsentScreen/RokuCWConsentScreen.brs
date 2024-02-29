@@ -37,7 +37,7 @@ Function init()
   m.buttonList.content = buttonList
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.heading, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.heading, typographyConstants.ids.headerLarge)
   setTypographyOfLabel(m.subheading, typographyConstants.ids.bodyLargeStrong)
 
   if m.global <> invalid

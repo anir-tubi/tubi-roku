@@ -57,7 +57,7 @@ Function init()
   m.backgroundUriList = []
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerLarge)
   setTypographyOfLabel(m.pageSubHeading, typographyConstants.ids.bodyLarge)
   setTypographyOfLabel(m.passwordValidationMsg, typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.newPasswordLink, typographyConstants.ids.bodySmall)

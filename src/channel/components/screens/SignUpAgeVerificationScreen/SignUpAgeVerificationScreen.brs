@@ -42,11 +42,11 @@ Function init()
   m.StartButton.observeFieldScoped("selected", "onStartButtonSelected")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.Header, typographyConstants.ids.headerMedium)
+  setTypographyOfLabel(m.Header, typographyConstants.ids.headerLarge)
   setTypographyOfLabel(m.SubHeader, typographyConstants.ids.bodyMedium)
-  setTypographyOfLabel(m.AgePrefixLabel, typographyConstants.ids.headerLarge)
-  setTypographyOfLabel(m.AgeEntry, typographyConstants.ids.headerLarge)
-  setTypographyOfLabel(m.AgePostfixLabel, typographyConstants.ids.headerLarge)
+  setTypographyOfLabel(m.AgePrefixLabel, typographyConstants.ids.displayMedium)
+  setTypographyOfLabel(m.AgeEntry, typographyConstants.ids.displayMedium)
+  setTypographyOfLabel(m.AgePostfixLabel, typographyConstants.ids.displayMedium)
   setTypographyOfLabel(m.ErrorPrompt, typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.infoLabel, typographyConstants.ids.bodySmall)
   setTypographyOfLabel(m.AgeErrorPrompt, typographyConstants.ids.bodyMedium)
@@ -65,7 +65,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.ErrorPrompt.color = theme.focused2Color
     m.AgeErrorPrompt.color = theme.focused2Color
