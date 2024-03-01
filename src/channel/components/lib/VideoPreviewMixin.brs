@@ -1,11 +1,12 @@
 Function isVideoPreviewEnabled()
-  if m.constants = Invalid then
-    m.constants = getConstantsFromGlobal()
-  end if
+  return false
+  ' if m.constants = Invalid then
+  '   m.constants = getConstantsFromGlobal()
+  ' end if
 
-  if m.constants.deviceInfo.limitedUi = true then
-    return false
-  end if
+  ' if m.constants.deviceInfo.limitedUi = true then
+  '   return false
+  ' end if
 
-  return true
+  ' return true
 End Function
