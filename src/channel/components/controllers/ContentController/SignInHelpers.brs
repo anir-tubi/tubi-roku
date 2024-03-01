@@ -408,9 +408,8 @@ Function onSignUpResponse(_response)
 
   ' Conditions to be met.
   ' Is the user in US.
-  ' Is the experiment enabled.
   ' Is the user allowed to manage consent that is teen and above.
-  if isDeviceInUS() = true AND isUserAllowedToManageConsent() = true AND (getExperimentResource("roku_cw_consent", "roku_cw_consent_after_signup_short_term_v1", true).enabled = true OR getExperimentResource("roku_cw_consent", "roku_cw_consent_after_signup_long_term_v2", true).enabled = true)
+  if isDeviceInUS() = true AND isUserAllowedToManageConsent() = true
     m.shouldShowRokuCWConsentScreen = true
   else
     m.shouldShowRokuCWConsentScreen = false
