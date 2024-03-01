@@ -43,7 +43,10 @@
       <field id="stringSignIn" type="string"/>
 
       <!-- Setting to false grays out the espanol item making it unselectable -->
-      <field id="espanolItemTurnedOn" type="boolean"/>
+      <field id="espanolItemTurnedOn" type="boolean" value="true"/>
+
+      <!-- Setting to false grays out the live tv item making it unselectable -->
+      <field id="linearEPGItemTurnedOn" type="boolean" value="true"/>
 
       <!-- Setting to false grays out the kids item making it unselectable -->
       <field id="kidsItemTurnedOn" value="true" type="boolean"/>

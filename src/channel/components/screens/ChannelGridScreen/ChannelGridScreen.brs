@@ -22,8 +22,6 @@ Function init()
   m.ChannelCategoryGrid.observeField("itemFocused", "onItemFocused")
   m.ChannelCategoryGrid.observeField("itemSelected", "onItemSelected")
 
-  m.top.screenLevel = m.constants.ui.screenLevels.channelCategoryGridScreen
-
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if

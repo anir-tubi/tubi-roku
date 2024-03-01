@@ -13,7 +13,7 @@ Function showChannelListScreen(constants, sPageSource, sendNavigationLoadEvents 
       pushScreen(channelListScreen, true, true)
     end if
   else
-    showChannelGridScreen(constants, sPageSource, true, m.constants.ui.screenLevels.channelCategoryGridScreen , sendNavigationLoadEvents)
+    showChannelGridScreen(constants, sPageSource, true, m.constants.ui.screenLevels.channelListScreen, sendNavigationLoadEvents)
   end if
 End Function
 
@@ -32,7 +32,7 @@ Function showCategoryListScreen(constants, sPageSource, sendNavigationLoadEvents
       pushScreen(categoryListScreen, true, true)
     end if
   else
-    showChannelGridScreen(constants, sPageSource, false, m.constants.ui.screenLevels.channelCategoryGridScreen, sendNavigationLoadEvents)
+    showChannelGridScreen(constants, sPageSource, false, m.constants.ui.screenLevels.categoryListScreen, sendNavigationLoadEvents)
   end if
 End Function
 
@@ -87,7 +87,14 @@ End Function
 Function onGridContentSelected(msg)
   tubiLog("ChannelGridScreenHelpers.onGridContentSelected")
   gridScreen = msg.getRoSGNode()
-  showCategoryDetailsScreen(gridScreen.contentSelected)
+  selectedItem = msg.getData()
+
+  'If the user selects networks from CategoryList Screen we are showing the ChannelListScreen with list of channels.
+  if selectedItem.id = "networks"
+    showChannelListScreen(m.constants, m.constants.ui.terms.menu)
+  else
+    showCategoryDetailsScreen(gridScreen.contentSelected)
+  end if
 End Function
 
 

@@ -520,6 +520,25 @@ Function onMenuItemSelected()
     end if
   else if buttonContent.id = "AboutButton"
     m.top.showDeviceModal = true
+  else if buttonContent.id = "ExitButton"
+    m.top.showExitModal = true
+
+    ' TODO: This is a temporary event and a more thorough approach to analytics on the Settings page will be implemented in the near future.
+    pageValues = {
+      account_page_type: "ACCOUNT"
+    }
+
+    leftSideNavComponent = {
+      left_nav_section: "EXIT"
+    }
+
+    pageOneof = m.Tracking.getAnalyticsPage("account_page", pageValues)
+    componentOneof = m.Tracking.getAnalyticsComponent("left_side_nav_component", leftSideNavComponent)
+    m.top.componentInteractionInfo = {
+      pageOneof: pageOneof
+      componentOneof: componentOneof
+      user_interaction: "CONFIRM"
+    }
   end if
 End Function
 

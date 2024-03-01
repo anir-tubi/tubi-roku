@@ -49,6 +49,9 @@
       <!-- triggers for upstream controller -->
       <field id="showDeviceModal" type="boolean" alwaysNotify="true" />
 
+      <!-- Holds the true/false based on if the user selects Exit from the setting screen -->
+      <field id="showExitModal" type="boolean" alwaysNotify="true" />
+
       <field id="backButtonPressed" type="boolean" alwaysNotify="true"/>
       <field id="signOutSelected" type="boolean" alwaysNotify="true"/>
       <field id="signInSelected" type="boolean" alwaysNotify="true"/>

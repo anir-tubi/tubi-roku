@@ -103,7 +103,6 @@
            Used when showing a series/episode page
       -->
       <field id="trackingLoadStartTime" type="integer" />
-
   </interface>
 
   <children>

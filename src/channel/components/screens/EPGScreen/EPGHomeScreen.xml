@@ -39,6 +39,8 @@
 
     <field id="infoPanelVisible" alias="InfoPanel.visible" />
 
+    <field id="isTopNavVisible" alias="topNav.visible"/>
+
     <field id="jumpToRowItem" alias="programGuide.jumpToRowItem" />
 
     <field id="jumpToRowItemByID" alias="programGuide.jumpToLinearChannelID" />

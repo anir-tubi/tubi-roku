@@ -22,6 +22,7 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
   m.settingsScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
   m.settingsScreen.observeFieldScoped("backgroundUriList", "onSettingsBackgroundChange")
   m.settingsScreen.observeFieldScoped("showDeviceModal", "onShowDeviceModal")
+  m.settingsScreen.observeFieldScoped("showExitModal", "onShowExitModal")
   m.settingsScreen.observeFieldScoped("backButtonPressed", "onSettingsBackPressed")
   m.settingsScreen.observeFieldScoped("autoPreviewSettingSelected", "onAutoPreviewSettingSelected")
   m.settingsScreen.observeFieldScoped("didUserSelectSaveAndRestart", "saveUpdatedConsentPreferences")
@@ -329,6 +330,8 @@ Function refreshScreenAfterParentalChanges()
 
   refreshAllHomeScreenTopNav()
 
+  refreshHomeScreenSideNav()
+
   screen = getCurrentScreen()
   if screen <> invalid
     if screen.id = m.constants.ui.screenIds.searchScreen
@@ -460,7 +463,6 @@ End Function
 
 
 Function onShowDeviceModal()
-
   tubiLog("AboutScreen.showFullDeviceId")
 
   deviceId = m.constants.deviceInfo.deviceId
@@ -476,6 +478,13 @@ Function onShowDeviceModal()
   }
   showInfoModal(getTranslation("screenSettings_fullDeviceID"), deviceId, dialogEvent, m.trackingLoggingTask)
 
+End Function
+
+
+Function onShowExitModal()
+  tubiLog("SettingsScreenHelper.onShowExitModal")
+  topScreen = getCurrentScreen()
+  displayExitModal(topScreen.trackingPageInfo)
 End Function
 
 

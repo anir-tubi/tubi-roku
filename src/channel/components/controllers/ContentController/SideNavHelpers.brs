@@ -29,8 +29,30 @@ Function initSideNav()
     m.SideNav.espanolItemTurnedOn = false
   end if
 
+  if isParentalControlsAdultLevel() <> true
+    m.SideNav.linearEPGItemTurnedOn = false
+  end if
+
   'set the initial value for the sign in item string
   setSideNavSignedInItem(m.global.authInfo)
+End Function
+
+
+Function refreshHomeScreenSideNav()
+  isTopNavRemovalExperiementEnabled = getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled
+
+  ' Refresh side nav items so their side navs are properly being displayed
+  if isParentalControlsAdultLevel() <> true OR isKidsUIOn() = true
+    m.SideNav.espanolItemTurnedOn = false
+    if isTopNavRemovalExperiementEnabled = true
+      m.SideNav.linearEPGItemTurnedOn = false
+    end if
+  else
+    m.SideNav.espanolItemTurnedOn = true
+    if isTopNavRemovalExperiementEnabled = true
+      m.SideNav.linearEPGItemTurnedOn = true
+    end if
+  end if
 End Function
 
 
@@ -241,6 +263,39 @@ Function onSideNavItemSelected()
 
       showMyStuffScreen()
       bNewScreenCalledSuccess = true
+    else if itemSelectedId = m.constants.ui.homeScreenTopNavIds.movies
+      if isKidsUIOn() = true
+        bNewScreenCalledSuccess = false
+        displayMenuItemDisabled(m.constants.ui.homeScreenTopNavIds.movies)
+      else if isParentalControlsAdultLevel() = false
+        bNewScreenCalledSuccess = false
+        displayMenuItemDisabled(m.constants.ui.homeScreenTopNavIds.movies, "teens")
+      else
+        showMoviesScreen()
+        bNewScreenCalledSuccess = true
+      end if
+    else if itemSelectedId = m.constants.ui.homeScreenTopNavIds.tv
+      if isKidsUIOn() = true
+        bNewScreenCalledSuccess = false
+        displayMenuItemDisabled(m.constants.ui.homeScreenTopNavIds.tv)
+      else if isParentalControlsAdultLevel() = false
+        bNewScreenCalledSuccess = false
+        displayMenuItemDisabled(m.constants.ui.homeScreenTopNavIds.tv, "teens")
+      else
+        showTVScreen()
+        bNewScreenCalledSuccess = true
+      end if
+    else if itemSelectedId = m.constants.ui.homeScreenTopNavIds.linearEPG
+      if isKidsUIOn() = true
+        bNewScreenCalledSuccess = false
+        displayMenuItemDisabled(m.constants.ui.homeScreenTopNavIds.linearEPG)
+      else if isParentalControlsAdultLevel() = false
+        bNewScreenCalledSuccess = false
+        displayMenuItemDisabled(m.constants.ui.homeScreenTopNavIds.linearEPG, "teens")
+      else
+        showDefaultEPGScreen()
+        bNewScreenCalledSuccess = true
+      end if
     else if itemSelectedId = m.constants.ui.sideNavIds.settings
       if isKidsUIOn() <> true
         setUiMode(m.constants.ui.modes.standard)

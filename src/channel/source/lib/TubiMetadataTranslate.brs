@@ -881,13 +881,31 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
 
   homescreenAA.children.SortBy("title")
 
+  'Removed Channels from SideNav and adding it to the categories.
+  catNetworkChannels = invalid
+  if bDisplayChannels = false AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1").enabled = true
+    catNetworkChannels = {
+      id: "networks"
+      isSpecial: true
+      slug: "networks"
+      title: "Networks"
+      type: "channel"
+  }
+  end if
+
   '//Move the following items to the front of the list if they exist
+  if catNetworkChannels <> invalid
+    homescreenAA.children.Unshift(catNetworkChannels)
+  end if
+
   if catQueue <> invalid
     homescreenAA.children.Unshift(catQueue)
   end if
+
   if catContinueWatching <> invalid
     homescreenAA.children.Unshift(catContinueWatching)
   end if
+
   if catRecommend <> invalid
     homescreenAA.children.Unshift(catRecommend)
   end if

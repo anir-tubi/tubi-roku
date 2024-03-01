@@ -51,7 +51,15 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
 
     epgScreen.id = screenID
 
-    epgScreen.refreshTopNav = true
+    if epgScreen <> invalid and getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled = true
+      epgScreen.isTopNavVisible = false
+    end if
+
+    'Refreshing the topNav only when TopNav is enabled.
+    if  epgScreen.isTopNavVisible = true
+      epgScreen.refreshTopNav = true
+    end if
+
     refreshEPGScreen(epgScreen)
 
     setInScreenCache(epgScreen)

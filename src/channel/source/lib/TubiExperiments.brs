@@ -84,6 +84,10 @@ Function TubiExperiments(constants) as Object
         roku_registration_player_signup_save_progress_v1: {"enabled": false}
       }
 
+      roku_remove_top_nav: {
+        roku_remove_top_nav_v1: {"enabled": false}
+      }
+      
       roku_progress_bar_on_infopanel: {
         roku_progress_bar_on_infopanel_v1: {"enabled": false}
       }

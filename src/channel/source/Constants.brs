@@ -1091,10 +1091,11 @@ Function getConstants()
       constants.ui.screenLevels.epgScreen = 20
       constants.ui.screenLevels.movieScreen = 20
       constants.ui.screenLevels.tvScreen = 20
-      constants.ui.screenLevels.channelCategoryGridScreen = 20
       constants.ui.screenLevels.searchScreen = 20
       constants.ui.screenLevels.myStuffScreen = 20
       constants.ui.screenLevels.settingsScreen = 20
+      constants.ui.screenLevels.categoryListScreen = 20
+      constants.ui.screenLevels.channelListScreen = 30
       constants.ui.screenLevels.confirmPasswordScreen = 40
       constants.ui.screenLevels.categoryDetailsScreen = 40
       constants.ui.screenLevels.detailScreen = 50

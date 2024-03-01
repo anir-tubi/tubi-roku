@@ -374,13 +374,19 @@ Function setEnableTopNavOnHomescreen(homeScreen)
     end if
 
     ' //When the screen loads new content, make sure the topNav is displayed if it is supposed to. For example, if the user changes the parental settings from adults to older kids, then the app is in kidsMode and should not display the top nav. Changing the topNav status when reloading the content will ensure the top nav is displayed when it should be.
-    bTopNavAllowed = isTopNavHomeScreenEnabled()
+    isTopNavRemoveExperiementEnabled = getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled
+    bTopNavAllowed = (isTopNavHomeScreenEnabled() = true AND isTopNavRemoveExperiementEnabled = false)
+
     if homeScreen.id = m.constants.ui.screenIds.espanolScreen
       '//espanol is not in the topNav
       bTopNavAllowed = false
     end if
 
-    if homeScreen.enableTopNav <> bTopNavAllowed
+    'TopNav is not allowed if the user is in roku_remove_top_nav_v1 experiment.
+    'Set the enableTopNav to false always if the user is in roku_remove_top_nav_v1 experiment.
+    if isTopNavRemoveExperiementEnabled = true
+      homeScreen.enableTopNav = false
+    else if homeScreen.enableTopNav <> bTopNavAllowed
       homeScreen.enableTopNav = bTopNavAllowed
       refreshNeeded = true
     end if
@@ -955,6 +961,9 @@ Function onHomescreenContentReady(msg)
 
     if currentScreen <> invalid AND currentScreen.isSubType("HomeScreen") = true
       screenTrackingLoad(homeScreen.trackingPageInfo, loadTime)
+
+      'Fire the exposure event when homescreen is loaded.
+      getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1")
 
       'show registration welcome Screen only to new user over homescreen.
       'we need to check if user already signed up in detail Screen if they have entered through deeplink.

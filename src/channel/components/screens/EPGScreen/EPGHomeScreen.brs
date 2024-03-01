@@ -479,5 +479,8 @@ End Function
 
 Function onSignedInChange()
   tubiLog("EPGScreen.onSignedInChange")
-  onRefreshTopNav()
+  'We are not refreshing the TopNav if the users are in roku_remove_top_nav_v1 experiment.
+  if getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled = false
+    onRefreshTopNav()
+  end if
 End Function

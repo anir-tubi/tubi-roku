@@ -970,7 +970,7 @@ Function formatBadge(text, badgeComponent)
       ' LIVE badge
       badgeComponent.backgroundColor = theme.focused2Color
       badgeComponent.textColor = theme.primaryTextColor
-      badgeComponent.iconUri = "pkg:/images/live-icon.webp"
+      badgeComponent.iconUri = "pkg:/images/live-icon-filled.webp"
     else if UCase(text) = UCase(getTranslation("replay"))
       ' REPLAY badge
       badgeComponent.backgroundColor = theme.backgroundColorLight
