@@ -33,8 +33,8 @@
             "label": "0"
           },
           {
-            "icon": "pkg:/images/icon-delete.png",
-            "focusIcon": "pkg:/images/icon-delete.png",
+            "icon": "pkg:/images/icon-delete.webp",
+            "focusIcon": "pkg:/images/icon-delete-focused.webp",
             "autoRepeat": 1,
             "strOut": "backspace"
           }
