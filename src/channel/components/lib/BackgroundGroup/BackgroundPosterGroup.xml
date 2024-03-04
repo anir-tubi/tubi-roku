@@ -29,7 +29,6 @@
       id="BackgroundPoster"
       width="1920"
       height="1080"
-      uri="pkg:/images/background-masks/mask-layer-0.webp"
       translation="[0,0]"
       opacity="0.0" />
     <Animation
