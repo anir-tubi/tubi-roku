@@ -18,16 +18,18 @@ End Function
 '                                               playbackContainer - if srcForAds = container, then playbackContainer is set to the id of the container that was the source, otherwise not used.
 Function showEpisodeScreen(content, shouldSendNavigationAnalytics, playbackSource)
   episodesScreen = CreateObject("roSGNode", "EpisodesScreen")
-  episodesScreen.id = m.constants.ui.screenIds.episodeScreen
-  episodesScreen.shouldFocusWhenPushed = m.top.fadeInContentController
-  episodesScreen.content = content
-  episodesScreen.updateContent = true
-  episodesScreen.playbackSource = playbackSource
   episodesScreen.observeFieldScoped("episodeSelected", "onEpisodeSelected")
   episodesScreen.observeFieldScoped("backgroundUriList", "onEpisodeBackgroundChange")
   episodesScreen.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
   episodesScreen.observeFieldScoped("backButtonPressed", "onEpisodeBackPressed")
   episodesScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
+
+  episodesScreen.id = m.constants.ui.screenIds.episodeScreen
+  episodesScreen.shouldFocusWhenPushed = m.top.fadeInContentController
+  episodesScreen.content = content
+  episodesScreen.updateContent = true
+  episodesScreen.playbackSource = playbackSource
+
   if episodesScreen.content <> invalid AND episodesScreen.content.id <> invalid
     contentId = Mid(episodesScreen.content.id, 2)  ' trim leading "0" off series id
 

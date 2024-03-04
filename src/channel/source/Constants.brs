@@ -1284,11 +1284,11 @@ Function getConstants()
 
       'category background thumbnails
       constants.ui.uris.categoryBackgrounds = {}
-      constants.ui.uris.categoryBackgrounds.urlBase = "https://cdn.adrise.tv/image/roku_support_images/category_"
-      constants.ui.uris.categoryBackgrounds.urlEnding = "_thumbnail_1x242.png"
-      constants.ui.uris.categoryBackgrounds.recommended = constants.ui.uris.categoryBackgrounds.urlBase + "recommended" + constants.ui.uris.categoryBackgrounds.urlEnding
-      constants.ui.uris.categoryBackgrounds.continueWatching = constants.ui.uris.categoryBackgrounds.urlBase + "continuewatching" + constants.ui.uris.categoryBackgrounds.urlEnding
-      constants.ui.uris.categoryBackgrounds.queue = constants.ui.uris.categoryBackgrounds.urlBase + "queue" + constants.ui.uris.categoryBackgrounds.urlEnding
+        constants.ui.uris.categoryBackgrounds.urlBase = "https://cdn.adrise.tv/image/roku_support_images/category_"
+        constants.ui.uris.categoryBackgrounds.urlEnding = "_thumbnail_1x242.png"
+        constants.ui.uris.categoryBackgrounds.recommended = constants.ui.uris.categoryBackgrounds.urlBase + "recommended" + constants.ui.uris.categoryBackgrounds.urlEnding
+        constants.ui.uris.categoryBackgrounds.continueWatching = constants.ui.uris.categoryBackgrounds.urlBase + "continuewatching" + constants.ui.uris.categoryBackgrounds.urlEnding
+        constants.ui.uris.categoryBackgrounds.queue = constants.ui.uris.categoryBackgrounds.urlBase + "queue" + constants.ui.uris.categoryBackgrounds.urlEnding
 
       constants.ui.uris.emptyContainerMyStuffBackground = "pkg:/images/screenMyStuffEmptyContainer.9.png"
       constants.ui.uris.myStuffMyListIcon = "pkg:/images/screenMyStuffMyListIcon.webp"

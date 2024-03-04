@@ -111,19 +111,20 @@ Function newBackgroundSet()
 
   'can't rely on alwaysNotify for m.top.uriList, so run our own logic to determine if the field value has actually changed
   isSame = true
-  if type(m.lastBackgroundInfo.type) <> type(m.aCurrentBackgroundInfo.type) or m.lastBackgroundInfo.type <> m.aCurrentBackgroundInfo.type
+  if type(m.lastBackgroundInfo.type) <> type(m.aCurrentBackgroundInfo.type) OR m.lastBackgroundInfo.type <> m.aCurrentBackgroundInfo.type
     isSame = false
   else if m.lastBackgroundInfo.uriList.count() <> m.aCurrentBackgroundInfo.uriList.count()
     isSame = false
   else
     'types are the same and uriList counts are the same, so check if all elements in uriList are the same
     for i=0 to m.lastBackgroundInfo.uriList.count()-1
-      if type(m.lastBackgroundInfo.uriList[i]) <> type(m.aCurrentBackgroundInfo.uriList[i]) or m.lastBackgroundInfo.uriList[i] <> m.aCurrentBackgroundInfo.uriList[i]
+      if type(m.lastBackgroundInfo.uriList[i]) <> type(m.aCurrentBackgroundInfo.uriList[i]) OR m.lastBackgroundInfo.uriList[i] <> m.aCurrentBackgroundInfo.uriList[i]
         isSame = false
         exit for
       end if
     end for
   end if
+
   if isSame = false
     stopTimer()
     m.isRotation = false
@@ -138,7 +139,7 @@ End Function
 Function updateBackground(uriIndex)
   'unobserve newPoster loadStatus in case we begin a new transition before the
   'onBackgroundPosterReady callback has run for the previous transition
-  m.newPoster.unobserveField("loadStatus")
+  m.newPoster.unobserveFieldScoped("loadStatus")
 
   'stop any current transitions/fades
   completePosterAnimations()
@@ -170,7 +171,7 @@ Function completePosterAnimations()
   for each poster in posterGroups
     if poster.lastAnimationName <> invalid AND poster.lastAnimationName <> ""
       animation = poster.findNode(poster.lastAnimationName)
-      if animation.state = "running" or animation.state = "paused"
+      if animation.state = "running" OR animation.state = "paused"
         animation.control = "finish"
       end if
     end if
@@ -179,8 +180,6 @@ End Function
 
 
 'Set the poster values for height, width, translation depending on the type of poster
-'@posterGroup: a BackgroundPosterGroup node
-'@posterType: string, can be one of the background poster types as defined in constants ("fullscreen" or "topright")
 '@posterUri: string, image uri to use for the background poster
 Function setPosterValues(posterUri)
   if m.aCurrentBackgroundInfo.type = m.constants.ui.backgroundTypes.topRight
@@ -223,7 +222,7 @@ End Function
 'Do the appropriate transition for the poster. Take into account if the device should have a limited version of backgrounds
 Function transitionPosters()
   'don't transition if nothing has changed
-  if m.newPoster.uri <> m.oldPoster.uri or m.oldBackgroundType <> m.newBackgroundType
+  if m.newPoster.uri <> m.oldPoster.uri OR m.oldBackgroundType <> m.newBackgroundType
 
     'Determine if the animation should be skipped due to limitedUi
     if m.constants.deviceInfo.limitedUi = true
@@ -247,11 +246,11 @@ Function transitionPosters()
         if lastAnimationNode = invalid
           tubiLog("Node could not be found for lastAnimationName: " + m.newPoster.lastAnimationName, "warn")
         else
-          lastAnimationNode.observeField("state", "onTransitionComplete")
+          lastAnimationNode.observeFieldScoped("state", "onTransitionComplete")
         end if
       else
         'set observer/callback to select and start the transition animation if the poster is not yet ready
-        m.newPoster.observeField("loadStatus", "onBackgroundPosterReady")
+        m.newPoster.observeFieldScoped("loadStatus", "onBackgroundPosterReady")
       end if
     end if
   end if
@@ -261,13 +260,13 @@ End Function
 'The background image wasn't loaded when we wanted to start the transition, so we run this callback when it becomes ready
 Function onBackgroundPosterReady()
   if m.newPoster.loadStatus = "ready"
-    m.newPoster.unobserveField("loadStatus")
+    m.newPoster.unobserveFieldScoped("loadStatus")
     startTransitionIn()
 
     'once the transition is complete we will want to start the timer for rotating background images
     node = m.newPoster.findNode(m.newPoster.lastAnimationName)
     if node <> invalid
-      node.observeField("state", "onTransitionComplete")
+      node.observeFieldScoped("state", "onTransitionComplete")
     end if
   end if
 End Function
@@ -275,7 +274,7 @@ End Function
 
 'The transition animation has completed, so we use this callback to start the timer for rotating backgrounds.
 Function onTransitionComplete()
-  m.newPoster.findNode(m.newPoster.lastAnimationName).unobserveField("state")
+  m.newPoster.findNode(m.newPoster.lastAnimationName).unobserveFieldScoped("state")
 
   if m.aCurrentBackgroundInfo.uriList.count() > 1 AND m.top.shouldRotateBackgrounds = true then
     startTimer()

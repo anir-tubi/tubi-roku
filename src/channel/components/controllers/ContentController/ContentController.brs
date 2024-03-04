@@ -1606,6 +1606,7 @@ End Function
 ' @contentType, String - depending on the focused on content, it will determine the background type
 Function getBackgroundType(backgroundUriList, contentType = "")
   backgroundType = m.constants.ui.backgroundTypes.fullScreen
+
   ' backgroundUriList will only be empty when the background type is full screen, we do not expect it to be empty for topRight version of background.
   if isNonEmptyArray(backgroundUriList) = true
     if contentType = m.constants.ui.contentTypes.linear OR contentType = m.constants.ui.contentTypes.epg
@@ -1614,6 +1615,7 @@ Function getBackgroundType(backgroundUriList, contentType = "")
       backgroundType = m.constants.ui.backgroundTypes.topRight
     end if
   end if
+
   return backgroundType
 End Function
 
