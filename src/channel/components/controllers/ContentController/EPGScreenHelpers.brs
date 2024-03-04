@@ -51,7 +51,7 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
 
     epgScreen.id = screenID
 
-    if epgScreen <> invalid and getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled = true
+    if epgScreen <> invalid AND getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled = true
       epgScreen.isTopNavVisible = false
     end if
 

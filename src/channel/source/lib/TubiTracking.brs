@@ -1097,6 +1097,16 @@ Function tubiTracking_getSideNavPageMap(constants)
     if sideNavIds.kidsMode <> invalid then map[sideNavIds.kidsMode] = "KIDS"
     if sideNavIds.profile <> invalid then map[sideNavIds.profile] = "ACCOUNT"
   end if
+
+  'TODO:remove them if the roku_remove_top_nav_v1 experiment is not graduated. If the roku_remove_top_nav_v1 is graduated,
+  'we will remove tubiTracking_getTopNavPageMap() function and move those items to the sideNav items in constants.
+  if constants <> invalid AND constants.ui <> invalid AND constants.ui.homeScreenTopNavIds <> invalid
+    homeScreenTopNavIds = constants.ui.homeScreenTopNavIds
+    if homeScreenTopNavIds.movies <> invalid then map[homeScreenTopNavIds.movies] = "MOVIES"
+    if homeScreenTopNavIds.tv <> invalid then map[homeScreenTopNavIds.tv] = "SERIES"
+    if homeScreenTopNavIds.linearEPG <> invalid then map[homeScreenTopNavIds.linearEPG] = "LINEAR"
+  end if
+
   return map
 End Function
 
