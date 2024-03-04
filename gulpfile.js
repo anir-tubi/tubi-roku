@@ -234,8 +234,7 @@ function buildStarter() {
 
   // include Constants in starter components
   let constantsSrc = [
-    'src/channel/source/Constants.brs',
-    'src/channel/images/Tubi_Splash.webp' //remove this line(Tubi_Splash.webp) for 3.2 release.
+    'src/channel/source/Constants.brs'
   ];
   let constantsSrcOptions = {
     base: 'src/channel'
