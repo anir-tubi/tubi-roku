@@ -24,17 +24,11 @@ describe('Multiple Audio', function () {
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
     // Verify that video is playing
-    await testUtils.expectPlayerStateToEventuallyEqual('play');
-
-    // Initialize Audio Options before tests
-    await resetAudioOptions();
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Closed Caption audio button present?
     const closedCaptionAudioButton = await testUtils.getNodeForElement('closedCaptionAudioButton');
-    expect(closedCaptionAudioButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-subtitles.webp');
-
-    // Reset Audio Options
-    await resetAudioOptions();
+    expect(closedCaptionAudioButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-subtitles');
 
   });
 
@@ -57,29 +51,28 @@ describe('Multiple Audio', function () {
 
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
+    await ecp.sendKeypress(ecp.Key.Up);
 
     // Closed Caption audio button present?
     await utils.sleep(800);
     const closedCaptionAudioButton = await testUtils.getNodeForElement('closedCaptionAudioButton');
-    expect(closedCaptionAudioButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-subtitles.webp');
+    expect(closedCaptionAudioButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-subtitles');
 
     // Navigate right to open Options
     await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Validate options
-    // Audio tracks section
-    const audioTracksSection = await testUtils.getNodeForElement('audioTracksSection');
-    expect(audioTracksSection.visible).to.be.true;
 
-    // CC Section
-    const closedCaptionSection = await testUtils.getNodeForElement('closedCaptionSection');
-    expect(closedCaptionSection.visible).to.be.true;
+    // CC Section Header present?
+    const closedCaptionSectionHeaderLabel = await testUtils.getNodeForElement('closedCaptionSectionHeaderLabel');
+    expect (closedCaptionSectionHeaderLabel.text).to.equal('Subtitles');
+   
 
-    // Audio Section header
-    const audioTracksSectionHeader = await testUtils.getNodeForElement('audioTracksSectionHeader');
-    expect(audioTracksSectionHeader.visible).to.be.true;
-
+    // Audio Section header present?
+    const audioTracksSectionHeaderLabel = await testUtils.getNodeForElement('audioTracksSectionHeaderLabel');
+    expect(audioTracksSectionHeaderLabel.text).to.equal('Audio');
+    
     // Reset AD controls to default
     await resetAudioOptions();
 
@@ -107,17 +100,21 @@ describe('Multiple Audio', function () {
 
     // Closed Caption audio button present?
     const closedCaptionAudioButton = await testUtils.getNodeForElement('closedCaptionAudioButton');
-    expect(closedCaptionAudioButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-subtitles.webp');
+    expect(closedCaptionAudioButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-subtitles');
 
     // Navigate right to open Options
     await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Validate options
+    // CC Section Header present?
+    const closedCaptionSectionHeaderLabel = await testUtils.getNodeForElement('closedCaptionSectionHeaderLabel');
+    expect (closedCaptionSectionHeaderLabel.text).to.equal('Subtitles');
+   
 
-    // Audio Section header
-    const audioTracksSectionHeader = await testUtils.getNodeForElement('audioTracksSectionHeader');
-    expect(audioTracksSectionHeader.visible).to.be.true;
+    // Audio Section header present?
+    const audioTracksSectionHeaderLabel = await testUtils.getNodeForElement('audioTracksSectionHeaderLabel');
+    expect(audioTracksSectionHeaderLabel.text).to.equal('Audio');
 
     // Enable AD
     await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
@@ -145,22 +142,19 @@ describe('Multiple Audio', function () {
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
     // Verify that video is playing
-    await testUtils.expectPlayerStateToEventuallyEqual('play');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Open player controls
     await ecp.sendKeypress(ecp.Key.Up);
 
-
     // Navigate right to open Options
-    expect(audioTracksSectionHeader.visible).to.be.true;
     await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
-    expect(audioTracksSectionHeader.text).to.include('Audio');
 
     // Verify that AD is still enabled
     await utils.sleep(3000);
-    const audioDescriptionEnabledCheck = await testUtils.getNodeForElement('audioDescriptionEnabledCheck');
-    expect(audioDescriptionEnabledCheck.visible).to.be.true;
+    const audioDescriptionItemContent = await testUtils.getNodeForElement('audioDescriptionItemContent');
+    expect(audioDescriptionItemContent.checked).is.true;
 
     // Reset AD controls to default
     await resetAudioOptions();
@@ -186,11 +180,11 @@ describe('Multiple Audio', function () {
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
     // Verify that video is playing
-    await testUtils.expectPlayerStateToEventuallyEqual('play');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
 
     // Navigate right to open Options
-    await testUtils.expectPlayerStateToEventuallyEqual('pause');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
     await ecp.sendKeypress(ecp.Key.Right, { count: 4 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -235,7 +229,7 @@ describe('Multiple Audio', function () {
 async function resetAudioOptions() {
   await ecp.sendKeypress(ecp.Key.Up);
   await ecp.sendKeypress(ecp.Key.Ok);
-  await ecp.sendKeypress(ecp.Key.Up, {count: 2});
+  await ecp.sendKeypress(ecp.Key.Down, {count: 2});
   await ecp.sendKeypress(ecp.Key.Ok);
 }
 

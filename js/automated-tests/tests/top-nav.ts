@@ -214,7 +214,7 @@ describe('Top Navigation', function () {
       await ecp.sendKeypress(ecp.Key.Up);
       await topNavForYouLabelFocused();
 
-      // Scroll right to TV Shows tab
+      // Scroll right to Live tab
       await ecp.sendKeypress(ecp.Key.Right, {count : 3});
 
       // Press OK
