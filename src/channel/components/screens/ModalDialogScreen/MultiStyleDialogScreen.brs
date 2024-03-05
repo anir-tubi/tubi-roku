@@ -136,17 +136,18 @@ Function formatDialog()
       if isNonEmptyArray(m.top.imageDimensions) = true AND isNonEmptyArray(m.top.imageDimensions[0]) = true
         imageWidth = m.top.imageDimensions[0][0]
         imageDimensions = m.top.imageDimensions
+        ' Center aligning the image if dimensions are provided.
+        translationX = (m.dialogBox.width / 2) - (imageWidth / 2)
+        m.imagesSection.translation = [translationX, 0]
+
+        imageTranslations = [[0, 0]]
       else
-        imageWidth = 342
-        imageDimensions = [[imageWidth, 405]]
+        'braze modal
+        imageDimensions = [[282, 405]]
+        imageTranslations = [[97, 0]]
+        m.imagesSection.translation = [112, 0]
       end if
 
-
-      ' Center aligning the image if only one present.
-      translationX = (m.dialogBox.width / 2) - (imageWidth/2)
-      m.imagesSection.translation = [translationX, 0]
-
-      imageTranslations = [[0, 0]]
     else
       ' For now since we only support 1 or 3 images layout.
       ' Once we have other variations we will add conditions and settings based on a new layout.
