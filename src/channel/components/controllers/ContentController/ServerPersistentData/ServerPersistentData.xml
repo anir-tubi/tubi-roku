@@ -13,5 +13,8 @@
     <!-- Holds the value if user disliked a title. -->
     <field id="isDisLikeToastNotificationShown" type="boolean" value="false" />
 
+    <!-- Holds the value of when we showed the roku continue watching prompt to user. -->
+    <field id="lastRokuCwConsentPromptShownAt" type="integer" />
+
   </interface>
 </component>

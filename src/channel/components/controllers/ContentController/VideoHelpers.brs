@@ -848,8 +848,18 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
   if shouldShowContinueWatchingConsentDialog = true AND m.wasUserShownContinueWatchingConsentDialog = false AND isLoggedInUser() = true AND getConsentOptOutStatusByKey(m.constants.consentKeys.continueWatching) = true
 
     ' Checking if the user is in US and allowed to manage consent(Adult or teen) and is in control group.
-    if isDeviceInUS() = true AND isUserAllowedToManageConsent() = true AND getExperimentResource("roku_cw_consent_existing_user", "roku_cw_consent_existing_user_after_plyback_v2", true).enabled = true
-      showRokuContinueConsentDialog()
+    if isDeviceInUS() = true AND isUserAllowedToManageConsent() = true AND getExperimentResource("roku_cw_consent_existing_user", "roku_cw_consent_existing_user_after_plyback_v3", true).enabled = true
+      lastRokuCwConsentPromptShownAt = m.pub_serverPersistentData.lastRokuCwConsentPromptShownAt
+      nowDate = CreateObject("roDateTime")
+      secondsFromEpoch = nowDate.AsSeconds()
+      
+      ' Checking if the last shown cw consent was 30 days before.
+      if lastRokuCwConsentPromptShownAt = invalid OR (secondsFromEpoch - lastRokuCwConsentPromptShownAt) >= (86400 * 30)
+        showRokuContinueConsentDialog()
+        saveServerPersistentData({
+          "lastRokuCwConsentPromptShownAt": secondsFromEpoch
+        })
+      end if
     end if
 
   end if

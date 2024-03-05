@@ -1550,6 +1550,7 @@ Function getConstants()
       constants.serverPersistentDataKeys.audioTrack = "audio_track"
       constants.serverPersistentDataKeys.isLikeToastNotificationShown = "enable_like_toast_notification"
       constants.serverPersistentDataKeys.isDisLikeToastNotificationShown = "enable_dislike_toast_notification"
+      constants.serverPersistentDataKeys.lastRokuCwConsentPromptShownAt = "last_roku_cw_consent_prompt_shown_at"
 
   return constants
 end Function
