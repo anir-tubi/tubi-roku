@@ -269,14 +269,32 @@ Function onEmailExistsResponse(response)
           signUpCredentials.email = email
           signUpCredentials.emailType = emailType
           signUpCredentials.gender = gender
-          signUpCredentials.lastName = lastName
-          if isNonEmptyString(firstName) = true
-            signUpCredentials.firstName = firstName
-          else
+
+          if isNonEmptyString(firstName) = false
             '//if first name does not exist, (i.e. when the user manually enters their email address),
             '// then use the 1st part of the email address
-            signUpCredentials.firstName = Left(email.split("@")[0], 20) ' limiting by 20 characters for the firstname field
+            emailSplitArr = email.split("@")
+            emailSplitArrayCount = emailSplitArr.Count()
+
+            '// If user enters email as somename@domain.com, then it takes firstName as "somename"
+            if emailSplitArrayCount = 2
+              firstName = emailSplitArr[0]
+            '// If user enters email with multiple "@" symbol, eg. some@name@domain.com, so@me@name@domain.com etc
+            '// then also it takes firstName as "somename"
+            else if emailSplitArrayCount > 2
+              for i = 0 to emailSplitArrayCount - 2
+                firstName += emailSplitArr[i]
+              end for
+            end if
           end if
+
+          ' Removing below special characters from firstName/lastName fields as it is not accepted in backend.
+          regex = CreateObject("roRegex", "[<>&,`'!@$%()=+{}[\]\""]", "")
+          firstName = regex.replaceAll(firstName, "")
+          lastName = regex.replaceAll(lastName, "")
+
+          signUpCredentials.firstName = Left(firstName, 20) ' limiting by 20 characters for the firstname field
+          signUpCredentials.lastName = lastName
 
           if emailScreen <> invalid
             emailScreen.isEmailValid = true
@@ -699,7 +717,7 @@ Function onPostSignInAuthInfoUpdated()
   end if
 
   setBrazeUserData(authInfo)
-  
+
   if authInfo <> invalid AND authInfo.userId <> invalid
     brazeMergeUsers(authInfo.userId)
   end if
