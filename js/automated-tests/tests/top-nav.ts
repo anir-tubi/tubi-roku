@@ -55,7 +55,6 @@ describe('Top Navigation', function () {
       // For You Top Nav option is highlighted (not focused)
       await topNavForYouLabelNotFocused();
 
-
       // Press the Up button
       await ecp.sendKeypress(ecp.Key.Up);
 
@@ -412,7 +411,7 @@ describe('Top Navigation', function () {
 
         // Verify that the Exit modal dialog is displayed
         const exitDialogButtonText = await testUtils.getNodeForElement('exitDialogButtonText');
-     
+
 
       });
 
@@ -420,14 +419,16 @@ describe('Top Navigation', function () {
     });
 
     async function topNavForYouLabelNotFocused() {
-      const topNavForYouLabelNotFocused = await testUtils.getNodeForElement('topNavForYouLabelNotFocused', 5000);
+      await utils.sleep(2000); // improvement when we have the new helpers
+      const topNavForYouLabelNotFocused = await testUtils.getNodeForElement('topNavForYouLabelNotFocused');
       expect(topNavForYouLabelNotFocused.text).to.equal('For You');
       const colorForYouUnfocused = await testUtils.getElementColorField('topNavForYouLabelNotFocused','color');
       expect(colorForYouUnfocused).to.equal('#FFFFFFFF');
      }
 
      async function topNavForYouLabelFocused() {
-      const topNavForYouLabelFocused = await testUtils.getNodeForElement('topNavForYouLabelFocused', 3000);
+      await utils.sleep(2000); // Improvement when we have the new helpers
+      const topNavForYouLabelFocused = await testUtils.getNodeForElement('topNavForYouLabelFocused');
       expect(topNavForYouLabelFocused.text).to.equal('For You');
       const colorForYouFocused = await testUtils.getElementColorField('topNavForYouLabelFocused','color');
       expect(colorForYouFocused).to.equal('#0B0019FF');
