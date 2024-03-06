@@ -673,7 +673,7 @@ Function onTransportVoiceRequest(msg)
   end if
   tubiLog("SearchScreen.onTransportVoiceRequest " + command)
 
-  if m.ResultGrid.isInFocusChain() = true
+  if m.ResultGrid.isInFocusChain() = true OR m.trendingSearchResultGrid.isInFocusChain() = true
     if command = "play"
       handlePlayInput()
       response = "success"
@@ -690,9 +690,19 @@ End Function
 
 
 Function handlePlayInput()
+  selectedContent = invalid
+  itemFocused = 0
+
   if m.ResultGrid.isInFocusChain() = true
-    selectedContent = m.ResultGrid.content.getChild(m.ResultGrid.itemFocused)
-    updateTrackingInfo(selectedContent, m.ResultGrid.itemFocused)
+    itemFocused = m.ResultGrid.itemFocused
+    selectedContent = m.ResultGrid.content.getChild(itemFocused)
+  else if m.trendingSearchResultGrid.isInFocusChain() = true
+    itemFocused = m.trendingSearchResultGrid.itemFocused
+    selectedContent = m.trendingSearchResultGrid.content.getChild(itemFocused)
+  end if
+
+  if selectedContent <> invalid
+    updateTrackingInfo(selectedContent, itemFocused)
     m.top.contentToPlay = selectedContent
   end if
 End Function
