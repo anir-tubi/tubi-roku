@@ -21,6 +21,8 @@ Function init()
   RelatedRowLabelContent = m.top.findNode("RelatedRowLabelContent")
   RelatedRowLabelContent.title = getTranslation("screenDetails_relatedTitles")
 
+  m.YmalGroupShowAnimation = invalid
+
   m.ymalXYPositionWhenHidden = [0,0]
   m.ymalXYPositionWhenOpen = [0,-235]
 
@@ -167,12 +169,18 @@ End Function
 
 Function onShowRelated(msg)
   if m.YmalGroup.opacity < 1.0
-    slideFade(m.YmalGroup, "below", "in", 0.6)
+    m.YmalGroupShowAnimation = slideFade(m.YmalGroup, "below", "in", 0.6)
   end if
 End Function
 
 
 Function onHideRelated(msg)
+  ' we need to stop YmalGroupShowAnimation which shows YmalGroup, because YmalGroupShowAnimation duration is set as 0.6 and
+  ' ymalGroup may reappear even after we hide ymalGroup as the animation state is still be running
+  if m.YmalGroupShowAnimation <> invalid AND m.YmalGroupShowAnimation.state = "running"
+    m.YmalGroupShowAnimation.control = "stop"
+  end if
+
   if m.YmalGroup.opacity > 0
     hideInfoPanel()
     fade(m.YmalRow, "out", 0.2, 0, 0.2)

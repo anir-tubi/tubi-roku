@@ -132,7 +132,8 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
           setFocusToComponent(m.ProgressBar)
         else if isFocusOnPlayerControl() = true AND m.TopOverlay.opacity = 1
 
-          if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v3", false).enabled = true AND m.top.relatedContent <> invalid
+          relatedContent = m.top.relatedContent
+          if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v3", false).enabled = true AND relatedContent <> invalid AND relatedContent.getChildCount() > 0
             setFocusToComponent(m.Related)
             animateTransportAndYMAL("in")
           else
@@ -1667,8 +1668,9 @@ End Function
 
 ' show YMAL row on bottom of the screen and fire exposure event
 Function showYMAL()
+  relatedContent = m.top.relatedContent
   'fire exposure event when YMAL row is displayed at bottom area of the screen
-  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v3").enabled = true AND m.top.relatedContent <> invalid
+  if relatedContent <> invalid AND relatedContent.getChildCount() > 0 AND getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v3").enabled = true
     m.Related.show = true
   end if
 End Function

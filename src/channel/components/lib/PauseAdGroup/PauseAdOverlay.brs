@@ -6,7 +6,7 @@ Function init()
   rectangleGradient.color = constants.ui.themes.default.shadeColor
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.pauseAdBackLabel, typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(pauseAdBackLabel, typographyConstants.ids.bodySmallStrong)
 End Function
 
 
