@@ -83,7 +83,7 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     else if isNonEmptyArray(contentFromServer.thumbnails) = true
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
-  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata
+  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR (gridType = gridItemTypes.linear AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_large_linear_tiles", "roku_large_linear_tiles_v1").enabled = true)
     if canvasImages <> invalid AND type(canvasImages.hero_tb) = "roArray" AND isNonEmptyString(canvasImages.hero_tb[0])
       '//A custom hero size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.hero_tb[0]

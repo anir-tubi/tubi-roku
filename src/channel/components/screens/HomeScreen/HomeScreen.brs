@@ -89,6 +89,9 @@ Function init()
   m.progressBarOnInfoPanelExp = (getExperimentResource("roku_progress_bar_on_infopanel", "roku_progress_bar_on_infopanel_v1", false).enabled = true)
   m.isExpEvtSendForProgressbarExp = false
 
+  'This variable is used to avoid calling getExperimentResource everytime homescreen gets focus on linear content row.
+  ' Remove after roku_large_linear_tiles
+  m.hasSentLargeLinearTileExp = false
 End Function
 
 
@@ -397,6 +400,11 @@ Function onCurrFocusRowChange()
 
   if categoryEnteringFocus <> invalid
     sSponsorBackgroundURL = ""
+
+    if m.hasSentLargeLinearTileExp = false AND categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
+      getExperimentResource("roku_large_linear_tiles", "roku_large_linear_tiles_v1", true)
+      m.hasSentLargeLinearTileExp = true
+    end if
 
     if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
       ' update contentArea translation, only when linear gain focus

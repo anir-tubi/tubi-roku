@@ -96,6 +96,10 @@ Function TubiExperiments(constants) as Object
         roku_remove_playready_v1: {"enabled": false}
       }
 
+      roku_large_linear_tiles: {
+        roku_large_linear_tiles_v1 : {"enabled": false}
+      }
+
     }
 
     'public methods

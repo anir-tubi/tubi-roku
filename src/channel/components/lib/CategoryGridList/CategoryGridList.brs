@@ -36,6 +36,8 @@ Function init()
 
   m.RowList.drawFocusFeedbackOnTop = true
 
+  m.largeLinearTileExpEnabled = (getExperimentResource("roku_large_linear_tiles", "roku_large_linear_tiles_v1", false).enabled = true)
+
   ' suppress debounce if we have just gained focus
   m.justGainedFocus = false
 
@@ -260,10 +262,10 @@ Function setRowHeights()
       posterHeight = posterSize[1]
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
-    else if gridItemType = gridItemTypes.linear
+    else if gridItemType = gridItemTypes.linear AND m.largeLinearTileExpEnabled = false
       rowItemSize.push(m.constants.ui.imageSizes.linear)
       rowHeight = m.constants.ui.imageSizes.linear[1]
-    else if gridItemType = gridItemTypes.landscape OR gridItemType = gridItemTypes.landscapeNoTitle
+    else if gridItemType = gridItemTypes.landscape OR gridItemType = gridItemTypes.landscapeNoTitle OR (gridItemType = gridItemTypes.linear AND m.largeLinearTileExpEnabled = true)
       posterWidth = landscapeSize[0]
       posterHeight = landscapeSize[1]
       if gridItemType = gridItemTypes.landscape then
