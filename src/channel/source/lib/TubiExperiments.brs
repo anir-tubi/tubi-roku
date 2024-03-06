@@ -60,7 +60,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_async_stop: {
-        roku_async_stop_v2: {"enabled": false}
+        roku_async_stop_v3: {"enabled": false}
       }
 
       roku_cw_consent: {
@@ -87,7 +87,7 @@ Function TubiExperiments(constants) as Object
       roku_remove_top_nav: {
         roku_remove_top_nav_v1: {"enabled": false}
       }
-      
+
       roku_progress_bar_on_infopanel: {
         roku_progress_bar_on_infopanel_v1: {"enabled": false}
       }

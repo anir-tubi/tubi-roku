@@ -28,7 +28,7 @@ Function init()
   m.Video.observeField("state", "onVideoStateChange")
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
   m.Video.observeField("timedMetaData", "onId3")
-  if getExperimentResource("roku_async_stop", "roku_async_stop_v2", false).enabled = true then
+  if getExperimentResource("roku_async_stop", "roku_async_stop_v3", false).enabled = true then
     m.Video.asyncStopSemantics = true
   end if
 
@@ -745,7 +745,7 @@ Function stopVideo()
   ' if the video is already in a non playing state.
   videoNodeState = m.Video.state
   if videoNodeState <> "stopped" AND videoNodeState <> "finished" AND videoNodeState <> "none"
-    getExperimentResource("roku_async_stop", "roku_async_stop_v2", true)
+    getExperimentResource("roku_async_stop", "roku_async_stop_v3", true)
     m.Video.control = "stop"
   end if
 End Function

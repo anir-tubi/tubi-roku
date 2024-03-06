@@ -77,7 +77,7 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
           end if
         end if
 
-        if experiments.getExperimentResource("roku_async_stop", "roku_async_stop_v2").enabled = true then
+        if experiments.getExperimentResource("roku_async_stop", "roku_async_stop_v3").enabled = true then
           m.animationLogo.asyncStopSemantics = true
         end if
       end if
@@ -214,8 +214,8 @@ Function processAnimationLogo()
   m.top.observeField("removeStartUpScreens", "onRemoveStartUpScreens")
 
   '//Used to ensure there is no black screen in between splash screen and animated logo
-  m.videoImageTransition = m.top.findNode("videoImageTransition") 
-  
+  m.videoImageTransition = m.top.findNode("videoImageTransition")
+
   m.startupScreens = m.top.findNode("startupScreens")
 
   m.customSplashTimer = m.top.findNode("customSplashTimer")
@@ -334,7 +334,7 @@ End Function
 
 ' onRemoveStartUpScreens is used to remove animationLogo node
 Function onRemoveStartUpScreens()
-  
+
   m.animationLogo.visible = false
   m.top.removeChild(m.animationLogo)
   m.animationLogo = invalid

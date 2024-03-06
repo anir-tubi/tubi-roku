@@ -852,7 +852,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
       lastRokuCwConsentPromptShownAt = m.pub_serverPersistentData.lastRokuCwConsentPromptShownAt
       nowDate = CreateObject("roDateTime")
       secondsFromEpoch = nowDate.AsSeconds()
-      
+
       ' Checking if the last shown cw consent was 30 days before.
       if lastRokuCwConsentPromptShownAt = invalid OR (secondsFromEpoch - lastRokuCwConsentPromptShownAt) >= (86400 * 30)
         showRokuContinueConsentDialog()
@@ -892,7 +892,7 @@ Function stopVideoContent(videoPlayer)
     videoPlayer.unobserveFieldScoped("relatedNavigateWithinPageInfo")
     videoPlayer.unobserveFieldScoped("segInfo")
 
-    if getExperimentResource("roku_async_stop", "roku_async_stop_v2", false).enabled = true then
+    if getExperimentResource("roku_async_stop", "roku_async_stop_v3", false).enabled = true then
       waitForVideoPlayerStoppedState(videoPlayer)
     end if
 

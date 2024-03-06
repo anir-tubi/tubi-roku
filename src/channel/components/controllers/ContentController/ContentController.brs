@@ -1758,6 +1758,10 @@ Function onCustomSuspend(msg)
   tubiLog("ContentController.onCustomSuspend")
   customSuspendArgs = msg.getData()
 
+  ' Setting to false as a safety in case we have missed a spot where we needed to reset to false.
+  ' This way they just have to background the app instead of totally restarting it to get video playing again.
+  m.isVideoPlayerStopping = false
+
   if customSuspendArgs.lastSuspendOrResumeReason = "home"
     sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionEnd)
     m.trackingLoggingTask.trackEvent = {
