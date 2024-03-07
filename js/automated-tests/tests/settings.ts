@@ -129,7 +129,8 @@ describe('Settings', function () {
     const settingsScreenHeader = await testUtils.getNodeForElement('settingsScreenHeader');
     const helpPageText = await testUtils.getNodeForElement('helpPageText');
     expect(settingsScreenHeader.text).to.equal('About Tubi');
-    expect(helpPageText.text).to.contain('Visit http://help.tubitv.com');
+    const helpLink = await testUtils.getNodeForElement('helpLink');
+    expect(helpLink.text).to.equal('Visit http://help.tubitv.com');
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/32372

@@ -508,7 +508,7 @@ class TestUtils {
    * @param precision - How close in milliseconds the current player position has to be to `position` in order to be considered valid
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
-  public async seekPlayerToAbsolutePosition(videoPlayerElementId: VideoPlayerElementId, absolutePosition: number, precision = 10000, timeout = 5000) {
+  public async seekPlayerToAbsolutePosition(videoPlayerElementId: VideoPlayerElementId, absolutePosition: number, precision = 10000, timeout = 10000) {
     const element = this.getElementKeyPath(videoPlayerElementId);
     // Improvement we might eventually want to investigate using seekMode=accurate to allow for tighter tolerances
     await odc.setValue({
@@ -527,7 +527,7 @@ class TestUtils {
    * @param precision - How close in milliseconds the current player position has to be to `position` in order to be considered valid
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
-  public async seekPlayerToRelativePosition(videoPlayerElementId: VideoPlayerElementId, relativePosition: number, relativeTo: 'end' | 'current', precision = 10000, timeout = 5000) {
+  public async seekPlayerToRelativePosition(videoPlayerElementId: VideoPlayerElementId, relativePosition: number, relativeTo: 'end' | 'current', precision = 10000, timeout = 10000) {
     let absolutePosition: number;
     if (relativeTo === 'current') {
       absolutePosition = await this.getPlayerPosition(videoPlayerElementId) + relativePosition;

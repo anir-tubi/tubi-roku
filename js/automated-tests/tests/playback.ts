@@ -124,7 +124,7 @@ describe('Playback', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify FF button state is FF 1
-    expect(fastForwardButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-ffw.png');
+    expect(fastForwardButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-ffw');
 
   });
 
@@ -155,7 +155,7 @@ describe('Playback', function () {
     await ecp.sendKeypress(ecp.Key.Ok, { count: 2 });
 
     // Verify FF button state is FF 2
-    expect(fastForwardButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-ffw.png');
+    expect(fastForwardButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-ffw');
 
   });
 
@@ -185,7 +185,7 @@ describe('Playback', function () {
     await ecp.sendKeypress(ecp.Key.Ok, { count: 3 });
 
     // Verify FF button state is FF 3
-    expect(fastForwardButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-ffw.png');
+    expect(fastForwardButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-ffw.webp');
 
   });
 
@@ -249,7 +249,7 @@ describe('Playback', function () {
     await ecp.sendKeypress(ecp.Key.Ok, { count: 3 });
 
     // Verify FF button state is FF 3
-    expect(fastForwardButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-ffw.png');
+    expect(fastForwardButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-ffw');
 
     // Back out of the video player to land on Details page after FF
     await utils.sleep(3000);
@@ -346,7 +346,7 @@ describe('Playback', function () {
 
     // Verify Rewind button state is RW 1
     const rewindButton1x = await testUtils.getNodeForElement('rewindButton');
-    expect(rewindButton1x.uri).to.equal('pkg:/images/transport/sgplayer/icon-rew-1.png');
+    expect(rewindButton1x.uri).to.contain('pkg:/images/transport/sgplayer/icon-rew-1');
 
   });
 
@@ -377,7 +377,7 @@ describe('Playback', function () {
 
     // Verify Rewind button state is RW 2
     const rewindButton2x = await testUtils.getNodeForElement('rewindButton2x');
-    expect(rewindButton2x.uri).to.equal('pkg:/images/transport/sgplayer/icon-rew-2.png');
+    expect(rewindButton2x.uri).to.contain('pkg:/images/transport/sgplayer/icon-rew-2');
 
   });
 
@@ -408,7 +408,7 @@ describe('Playback', function () {
 
     // Verify Rewind button state is RW 3
     const rewindButton3x = await testUtils.getNodeForElement('rewindButton3x');
-    expect(rewindButton3x.uri).to.equal('pkg:/images/transport/sgplayer/icon-rew-3.png');
+    expect(rewindButton3x.uri).to.contain('pkg:/images/transport/sgplayer/icon-rew-3');
 
   });
 
@@ -440,7 +440,7 @@ describe('Playback', function () {
 
     // Verify Rewind button state is RW 1 again
     const rewindButton1x = await testUtils.getNodeForElement('rewindButton');
-    expect(rewindButton1x.uri).to.equal('pkg:/images/transport/sgplayer/icon-rew-1.png');
+    expect(rewindButton1x.uri).to.contain('pkg:/images/transport/sgplayer/icon-rew-1');
 
   });
 

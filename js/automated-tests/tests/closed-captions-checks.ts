@@ -31,7 +31,7 @@ describe('Closed Captions Checks', function () {
     await utils.sleep(1000);
 
     // Verify that video is playing
-    await testUtils.expectPlayerStateToEventuallyEqual('play');
+    await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing');
 
     // Turn on Linear CC
     await ecp.sendKeypress(ecp.Key.Up);
@@ -54,7 +54,8 @@ describe('Closed Captions Checks', function () {
     // If so, select Search
     await utils.sleep(1000);
     await ecp.sendKeypress(ecp.Key.Up);
-    await testUtils.getNodeForElement('leftNavSearchItem');
+    const leftNavSearchItem = await testUtils.getNodeForElement('leftNavSearchItem');
+    expect(leftNavSearchItem.text).to.equal('Search');
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Are we on the Search page?
@@ -94,6 +95,7 @@ describe('Closed Captions Checks', function () {
  it('C438466 - Closed Caption toggle = OFF is in sync between VOD and Linear @closed_captions', async () => {
 
     // Navigate to the Live News Row from Home screen
+    await testUtils.goToPage('home');
 
     // Checking the state of the top Nav Recommended to verify that we are on the home screen in proper state
     await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
@@ -103,11 +105,10 @@ describe('Closed Captions Checks', function () {
 
 
     // Start a live feed
-    await utils.sleep(1000);
     await ecp.sendKeypress(ecp.Key.Ok);
     
     // Verify that video is playing
-    await testUtils.expectPlayerStateToEventuallyEqual('play', 10000);
+    await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 20000);
 
     // Turn OFF Linear CC
     await ecp.sendKeypress(ecp.Key.Up);
@@ -155,7 +156,7 @@ describe('Closed Captions Checks', function () {
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
     // Verify that video is playing
-    await testUtils.expectPlayerStateToEventuallyEqual('play');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Check CC state for VOD title
     await ecp.sendKeypress(ecp.Key.Up);

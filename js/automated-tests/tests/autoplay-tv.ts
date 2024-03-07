@@ -52,7 +52,7 @@ describe('Autoplay TV', function () {
     it('C535854 - Autoplay - Series - Next episode plays after multiple consecutive autoplays @autoplay', async () => {
 
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-        await ecp.sendKeypress(ecp.Key.Right);
+        await ecp.sendKeypress(ecp.Key.Down);
 
 
         // Are we on the Series page?

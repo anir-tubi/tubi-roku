@@ -201,7 +201,7 @@ const elements = typeCheckElements({
 
   /** On Movies Page Button */
   onMoviesPageButton: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#PageGroup.#topNav-movies.#TopNavMenu.1.#selectedBackground',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#PageGroup.#topNav-movies.#TopNavMenu.1.#unfocusedTopLabel',
   },
 
   /** Remove from history button */
@@ -240,8 +240,7 @@ const elements = typeCheckElements({
   },
 
   tubiKidsLogo: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#GradientGroup.#LinearGradient1.#BackgroundGradient',
-    xpath: '/TubiScene/ContentController/Group/Group/BackgroundGroup/Group[2]/BackgroundGradientGroup[2]/Poster',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#logoGroup.#tubiKidsLogo'
   },
 
   exitKidsOption: {
@@ -758,9 +757,9 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#ParentalControlsMenu.3',
   },
 
-  /** Live Icon */
+  /** Live Icon  */
   liveIcon: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#liveBadgeHeader.#BadgeBackground',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#liveBadgeHeader.#BadgeInfoLayout.#BadgeIcon',
   },
 
   /** Preview off button */
@@ -889,7 +888,12 @@ const elements = typeCheckElements({
 
   /** help page text */
   helpPageText: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#TextTwo',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#TitleOne',
+  },
+
+  /** help link */
+  helpLink: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#TextTwoGroup.0'
   },
 
   /** Policy Page Header */
@@ -1198,7 +1202,7 @@ const elements = typeCheckElements({
   },
 
   leftNavSearchItem: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.2'
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.2.#LabelParent.0.#Label'
   },
 
   /** parental controls button */

@@ -358,7 +358,7 @@ describe('Kids Mode', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
     const liveIcon = await testUtils.getNodeForElement('liveIcon');
-    expect(liveIcon.uri).to.equal('pkg:/images/icon-live.webp');
+    expect(liveIcon.uri).to.equal('pkg:/images/live-icon-filled.webp');
 
   });
 

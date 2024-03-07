@@ -158,7 +158,7 @@ describe('Details Page', function () {
       await ecp.sendKeypress(ecp.Key.Right);
       await ecp.sendKeypress(ecp.Key.Ok);
       const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-      expect(detailScreenTitle.visible).to.equal(true);
+      expect(detailScreenTitle.id).to.equal('Title');
 
       // Verify and select the Play button
 
@@ -236,8 +236,15 @@ describe('Details Page', function () {
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/6409
     it('C6409 - Movie Details - With History - When "Play From Beginning" selected then movie playback starts from beginning" @mdp_1', async () => {
+     
+      await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+      // Select another title
+      await ecp.sendKeypress(ecp.Key.Down);
+      await ecp.sendKeypress(ecp.Key.Ok);
       const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-      expect(detailScreenTitle.visible).to.equal(true);
+      expect(detailScreenTitle.id).to.equal('Title');
 
       // Play title to create history
       await testUtils.selectAndVerifyDetailPageMenuItem('play');

@@ -55,7 +55,7 @@ describe('Live', function () {
         await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',10000);
 
         // Go back to preview
-        await utils.sleep(5000);
+        await utils.sleep(6000); // Waiting for full screen - improve
         await ecp.sendKeypress(ecp.Key.Back, {count: 1});
 
         // Verify that linear preview video is playing
