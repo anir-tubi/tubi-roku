@@ -42,7 +42,7 @@ End Function
 
 
 Function setSettingsSidePanelMenuItems()
-  isTopNavRemoveExperimentEnabled = getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled = true
+  isTopNavRemoveExperimentEnabled = getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled
   testAidDisplayOrder = 6
   if isTopNavRemoveExperimentEnabled = true
     testAidDisplayOrder = 7

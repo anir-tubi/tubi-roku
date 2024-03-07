@@ -519,18 +519,26 @@ Function getSideNavIdAssociatedWithScreen(screen)
   sideNavId = ""
 
   idsAssociatedWithHome = {}
-  idsAssociatedWithHome[m.constants.ui.screenIds.homeScreen] = true
-  idsAssociatedWithHome[m.constants.ui.screenIds.movieScreen] = true
-  idsAssociatedWithHome[m.constants.ui.screenIds.tvScreen] = true
+  isTopNavRemoveExperiementEnabled = getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled
 
-  '//if the new EPG live TV option is in the homescreen top nav, not side nav
-  idsAssociatedWithHome[m.constants.ui.screenIds.epgScreen] = true
+  if isTopNavRemoveExperiementEnabled = false
+    idsAssociatedWithHome[m.constants.ui.screenIds.homeScreen] = true
+    idsAssociatedWithHome[m.constants.ui.screenIds.movieScreen] = true
+    idsAssociatedWithHome[m.constants.ui.screenIds.tvScreen] = true
+
+    '//if the new EPG live TV option is in the homescreen top nav, not side nav
+    idsAssociatedWithHome[m.constants.ui.screenIds.epgScreen] = true
+  end if
 
   if screen.id <> invalid
     if idsAssociatedWithHome[screen.id] <> invalid
       sideNavId = m.constants.ui.sideNavIds.home
     else if m.constants.ui.screenIdToSideNavId[screen.id] <> invalid
       sideNavId = m.constants.ui.screenIdToSideNavId[screen.id]
+    else if isTopNavRemoveExperiementEnabled = true AND m.constants.ui.screenIdToTopNavId[screen.id] <> invalid
+      'We moved topNav items to the side nav as part of the roku_remove_top_nav_v1 experiement.
+      'So we are checking any topnav id's associated with the screen to make sure to load the correct screen.
+      sideNavId = m.constants.ui.screenIdToTopNavId[screen.id]
     end if
   end if
 

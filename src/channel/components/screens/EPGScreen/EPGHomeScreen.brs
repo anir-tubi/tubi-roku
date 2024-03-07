@@ -12,6 +12,8 @@ Function init()
   m.infoPanelParent = m.top.findNode("InfoPanelParent")
   m.infoPanel = m.top.findNode("InfoPanel")
 
+  m.isTopNavRemoveExperimentEnabled = getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled = true
+
   'clock
   m.clock = m.top.findNode("clock")
 
@@ -78,7 +80,7 @@ Function onScreenFocusChange()
       m.top.loadAllchannels = true
     end if
 
-    if m.top.componentToFocus = m.constants.ui.epgScreen.focusItems.topNav
+    if m.isTopNavRemoveExperimentEnabled = false AND m.top.componentToFocus = m.constants.ui.epgScreen.focusItems.topNav
       setFocusOntoTopNav(false)
       'set previously playing channel's background
       if m.top.linearChannelToPlay <> invalid
@@ -248,7 +250,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
   if press
     if m.top.enableTopNav = true
       if key = "back"
-        if  m.TopNav.isInFocusChain() = false
+        if m.isTopNavRemoveExperimentEnabled = false AND m.TopNav.isInFocusChain() = false
         setFocusOntoTopNav(true)
         return true
       else
@@ -271,7 +273,7 @@ Function onKeyEvent(key As string, press As boolean) As boolean
           return false
           end if
         end if
-      else if key = "up" AND m.TopNav.isInFocusChain() = false
+      else if key = "up" AND m.isTopNavRemoveExperimentEnabled = false AND m.TopNav.isInFocusChain()
         setFocusOntoTopNav(true)
         return true
       else if key = "down" AND m.TopNav.isInFocusChain() = true
@@ -480,7 +482,7 @@ End Function
 Function onSignedInChange()
   tubiLog("EPGScreen.onSignedInChange")
   'We are not refreshing the TopNav if the users are in roku_remove_top_nav_v1 experiment.
-  if getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled = false
+  if m.isTopNavRemoveExperimentEnabled = false
     onRefreshTopNav()
   end if
 End Function
