@@ -760,7 +760,7 @@ const elements = typeCheckElements({
 
   /** Live Icon */
   liveIcon: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#TopHeaderImage',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#liveBadgeHeader.#BadgeBackground',
   },
 
   /** Preview off button */

@@ -46,6 +46,16 @@ const PlayBack = ({ content }) => {
 		expect(playPauseButton.visible).to.equal(true);
 	}
 
+	async function clickOnSkipIntroIfPresent() {
+		let skipIntro;
+		await testUtils.retryWithTimeOut(async () => {
+			skipIntro = await elements.skipIntro();
+		});
+		if (skipIntro.visible) {
+			await clickOnSkipIntro();
+		}
+	}
+
 	async function clickOnSkipIntro() {
 		await testUtils.retryWithTimeOut(async () => {
 			const skipIntro = await elements.skipIntro();
@@ -206,7 +216,7 @@ const PlayBack = ({ content }) => {
 		const playerPlaingTime = await elements.playerPlaingTime();
 		const elTime = getTimeInSeconds(playerPlaingTime.text);
 		let duration;
-		if (content.mode === 'series') {
+		if (content.type === 's') {
 			duration = ui.content.length;
 		} else {
 			duration = ui.content.duration;
@@ -223,6 +233,7 @@ const PlayBack = ({ content }) => {
 	}
 
 	async function seekToAutoplay() {
+		await clickOnSkipIntroIfPresent();
 		await fastForwardNoWaitTime({ howFast: 3 });
 		const arr = new Array<number>();
 		let latestPorgress;

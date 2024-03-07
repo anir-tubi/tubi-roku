@@ -176,7 +176,7 @@ async function checkMandatoryElementsInEventsRoku(events) {
 	events.forEach((event) => {
 		const jsonObject = JSON.stringify(event);
 		expect(event.device.os).to.match(
-			/Roku|roku/,
+			/Roku|roku|Roku OS/,
 			`Each event has to contain device.os event: \n ${jsonObject}`
 		);
 		expect(event.app.platform).to.match(
@@ -184,7 +184,7 @@ async function checkMandatoryElementsInEventsRoku(events) {
 			`Each event has to contain device.os event: \n ${jsonObject}`
 		);
 		expect(event.sent_timestamp).to.match(
-			/2024-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/,
+			/2024-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/,
 			`Each event has to contain sent_timestamp event: \n ${jsonObject}`
 		);
 		expect(event.connection.network).to.match(
