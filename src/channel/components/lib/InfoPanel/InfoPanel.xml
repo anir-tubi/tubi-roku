@@ -194,6 +194,13 @@
               loadDisplayMode="scaleToFit"
               loadSync="true"/>
             <Poster
+              id="AudioDescriptionPoster"
+              uri="pkg:/images/icon-audio-description.webp"
+              height="36"
+              width="57"
+              loadDisplayMode="scaleToFit"
+              loadSync="true"/>
+            <Poster
               id="ResolutionPoster"
               translation="[0,6]"
               loadDisplayMode="scaleToFit"

@@ -422,6 +422,7 @@ Function updateInfoPanel(channelInfo)
     lineOneData.hoursOfAiring = programInfo.hoursOfAiring
     lineOneData.rating = programInfo.rating
     lineOneData.hasCC = programInfo.hasSubtitles
+    lineOneData.hasAudioDescription = programInfo.hasAudioDescription
 
     if programInfo.descriptors <> invalid AND programInfo.descriptors.Count() > 0
       lineOneData.descriptorCode = programInfo.descriptors.join(", ")

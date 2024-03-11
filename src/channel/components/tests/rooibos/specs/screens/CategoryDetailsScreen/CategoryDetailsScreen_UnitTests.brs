@@ -28,6 +28,7 @@ Function categoryDetailsScreenSetup()
     rating: "R"
     genres: ["Action", "Adventure", "Oscar"]
     hasSubtitles: true
+    hasAudioDescription: true
     inlineLogoUri: "http://images.adrise.tv/LeN4r8F_Jru-2mE_pq3IkGjpHxg=/180x60/img.adrise.tv/57d9cd58-db8c-4d0a-95d4-b18f52877ac5.png"
   }
   itemContent.update(itemContentData)
@@ -55,6 +56,7 @@ Function categoryDetailsScreen_populateInfoPanelItem_test()
   controlInfoPanel.calculateHeight = true
   controlInfoPanel.lineOneData = {
     hasCC: content.hasSubtitles
+    hasAudioDescription: content.hasAudioDescription
     length: content.length
     partnerLogoUri: content.inlineLogoUri
     rating: content.rating
@@ -64,7 +66,7 @@ Function categoryDetailsScreen_populateInfoPanelItem_test()
   controlInfoPanel.lineTwoData = {
     genres: content.genres
   }
-  
+
   emptyInfoPanel = CreateObject("roSGNode", "InfoPanel")
   populatedInfoPanel = populateInfoPanel(emptyInfoPanel, content)
 

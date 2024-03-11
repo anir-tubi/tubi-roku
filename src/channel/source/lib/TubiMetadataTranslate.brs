@@ -437,6 +437,10 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   'take care of any subtitles if they exist - should only happen on videos
   if contentFromServer.has_subtitle <> invalid then translatedContent.hasSubtitles = contentFromServer.has_subtitle
 
+  if contentFromServer.ad_languages <> invalid AND contentFromServer.ad_languages.Count() > 0
+    translatedContent.hasAudioDescription = true
+  end if
+
   ' compare list of renditions to device and environment capabilities to get the highest rendition
   if contentFromServer.video_renditions <> invalid
     ' for now, only worry about 4k
@@ -465,18 +469,54 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   else if contentFromServer.subtitles <> invalid AND type(contentFromServer.subtitles) = "roArray" AND contentFromServer.subtitles.count() > 0
     '//subtitles for non-linear video
     subtitleTracks = []
+
     for each subtitle in contentFromServer.subtitles
-      ' Firmware 8.0+ scene graph native CC dialog
-      subtitleTracks.push({
-        description: subtitle.lang
-        trackname: subtitle.url
-      })
+      'Including subtitle languages only mentioned in constants.player.subtitle.languageMap
+      validSubtitleLanguage = false
+      subtitleLanguage = subtitle.lang
+      languageMap = m.constants.player.subtitle.languageMap
+
+      for each language in languageMap
+
+        if subtitleLanguage.instr(language) >= 0
+          validSubtitleLanguage = true
+          exit for
+        end if
+
+      end for
+
+      if validSubtitleLanguage = true
+        ' Firmware 8.0+ scene graph native CC dialog
+        subtitleTrack = {
+          description: subtitle.lang
+          trackname: subtitle.url
+        }
+
+        'below block is needed to display the subtitle in order "English, Spanish, French, and remaining titles in any order"
+        if subtitle.lang = m.constants.player.subtitle.language.english
+          index = 0
+        else if subtitle.lang = m.constants.player.subtitle.language.spanish
+          index = 1
+        else if subtitle.lang = m.constants.player.subtitle.language.french
+          index = 2
+        else
+          index = 100 'assuming there won't be more than 100 subtitles for any title
+        end if
+
+        subtitleTracks = insertItemIntoArray(subtitleTracks, subtitleTrack, index)
+      end if
+
     end for
     translatedContent.subtitleTracks = subtitleTracks
-    ' This is needed to make subtitles work on Roku 3 (and other models... 3900, 3800, etc.)
-    translatedContent.subtitleConfig = {trackname: contentFromServer.subtitles[0].url}
-  end if
 
+    ' This is needed to make subtitles work on Roku 3 (and other models... 3900, 3800, etc.)
+    if subtitleTracks.Count() > 0
+      translatedContent.subtitleConfig = {trackname: subtitleTracks[0].trackname}
+    else
+      translatedContent.subtitleConfig = {trackname: contentFromServer.subtitles[0].url}
+    end if
+
+  end if
 
   if translatedContent[typeVar] = m.contentTypes.linear
     if contentFromServer.thumbnails <> invalid

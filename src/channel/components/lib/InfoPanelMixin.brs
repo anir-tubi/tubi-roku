@@ -16,6 +16,7 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
   lineOneData.releaseDate = content.releaseDate
   lineOneData.length = content.length
   lineOneData.hasCC = (content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false)
+  lineOneData.hasAudioDescription = content.hasAudioDescription
   lineOneData.rating = content.rating
 
   rating = UCase(content.rating)
@@ -146,6 +147,7 @@ Function populateInfoPanelWithHomescreenStyleSportsMode(content, infoPanel)
 
   lineOneData.badgeText = badgeText
   lineOneData.hasCC = content.hasSubtitles
+  lineOneData.hasAudioDescription = content.hasAudioDescription
   lineOneData.length = content.length
 
   if availabilityType <> m.constants.ui.contentTimings.upcoming
@@ -198,6 +200,7 @@ Function populateInfoPanelWithProgramHomescreenMode(content, infoPanel)
   lineOneData = {}
   lineOneData.badgeText = badgeText
   lineOneData.hasCC = content.hasSubtitles
+  lineOneData.hasAudioDescription = content.hasAudioDescription
   lineOneData.hoursOfAiring = programTime
 
   infoPanel.lineOneData = lineOneData

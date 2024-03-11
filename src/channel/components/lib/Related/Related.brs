@@ -124,6 +124,7 @@ Function updateInfoPanel(infoNode, content)
   lineOneData.releaseDate = content.releaseDate
   lineOneData.length = content.length
   lineOneData.hasCC = (content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false)
+  lineOneData.hasAudioDescription = content.hasAudioDescription
 
   if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
     lineOneData.has4k = true

@@ -342,12 +342,21 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       lineOneData.has4k = true
     end if
 
-    if episode <> invalid AND (episode.hasSubtitles = true OR m._.empty(episode.subtitleTracks) = false)
-      lineOneData.hasCC = true
-    else if content <> invalid AND (content.type = m.constants.ui.contentTypes.video OR content.type = m.constants.ui.contentTypes.sportsEvent) AND (content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false)
-      lineOneData.hasCC = true
-    else
-      lineOneData.hasCC = false
+    lineOneData.hasCC = false
+    lineOneData.hasAudioDescription = false
+
+    if episode <> invalid
+      if episode.hasSubtitles = true OR m._.empty(episode.subtitleTracks) = false
+        lineOneData.hasCC = true
+      end if
+
+      if episode.hasAudioDescription = true
+        lineOneData.hasAudioDescription = true
+      end if
+    else if content <> invalid AND (content.type = m.constants.ui.contentTypes.video OR content.type = m.constants.ui.contentTypes.sportsEvent)
+      if content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false
+        lineOneData.hasCC = true
+      end if
     end if
 
     if content.availabilityEnds <> invalid AND content.availabilityEnds <> ""

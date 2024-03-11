@@ -482,6 +482,7 @@ Function onItemFocused(msg)
         hoursOfAiring: matchTime
         hasCC: (focusedContent.hasSubtitles = true OR m._.empty(focusedContent.subtitleTracks) = false)
         length: focusedContent.length
+        hasAudioDescription: focusedContent.hasAudioDescription
       }
 
       if focusedContent.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
@@ -502,6 +503,7 @@ Function onItemFocused(msg)
         hasCC: (focusedContent.hasSubtitles = true OR m._.empty(focusedContent.subtitleTracks) = false)
         rating: focusedContent.rating
         availabilityEnds: focusedContent.availabilityEnds
+        hasAudioDescription: focusedContent.hasAudioDescription
       }
 
       lineTwoData = {

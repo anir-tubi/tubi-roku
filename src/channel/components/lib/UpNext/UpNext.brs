@@ -13,7 +13,7 @@ Function init()
   m.top.observeField("resetContent", "onResetContent")
   m.top.observeField("command", "onCommand")
 
-  '//::NOTE:: the translation of m.UpNextUI is modifed by AnimationMixin, 
+  '//::NOTE:: the translation of m.UpNextUI is modifed by AnimationMixin,
   '// so the translation of the UpNextUI element should not be changed directly.
   '// UpNextParent can be used if we need to change the translation of the up next component.
   m.UpNextUI = m.top.findNode("UpNextUI")
@@ -53,7 +53,7 @@ Function init()
     m.CountdownSeries.color = theme.highlightedTextColor
   end if
 
-  focusBox.width = m.constants.ui.imageSizes.largePoster[0] + focusBoxMargin * 2 
+  focusBox.width = m.constants.ui.imageSizes.largePoster[0] + focusBoxMargin * 2
   focusBox.height = m.constants.ui.imageSizes.largePoster[1] + focusBoxMargin * 2
   focusBox.translation = [- focusBoxMargin, - focusBoxMargin]
   m.InfoMovie.maxHeight = m.constants.ui.imageSizes.largePoster[1]
@@ -339,6 +339,7 @@ Function updateInfoPanel(infoNode, content)
   lineOneData.releaseDate = content.releaseDate
   lineOneData.length = content.length
   lineOneData.hasCC = (content.hasSubtitles = true OR m._.empty(content.subtitleTracks) = false)
+  lineOneData.hasAudioDescription = content.hasAudioDescription
 
   if content.highestRendition = m.constants.serverValues.tensorVideoRenditions.fourK
     lineOneData.has4k = true

@@ -763,6 +763,36 @@ Function getConstants()
     constants.player.playbackOrigin.unknown = "unknown"
     constants.player.playbackOrigin.epg = "epg"
 
+    constants.player.subtitle = {}
+
+      constants.player.subtitle.language = {}
+        constants.player.subtitle.language.english = "English"
+        constants.player.subtitle.language.spanish = "Spanish"
+        constants.player.subtitle.language.castilian = "Castilian"
+        constants.player.subtitle.language.french = "French"
+        constants.player.subtitle.language.portuguese = "Portuguese"
+        constants.player.subtitle.language.german = "German"
+        constants.player.subtitle.language.italian = "Italian"
+
+      constants.player.subtitle.languageMap = [
+        constants.player.subtitle.language.english
+        constants.player.subtitle.language.spanish
+        constants.player.subtitle.language.castilian
+        constants.player.subtitle.language.french
+        constants.player.subtitle.language.portuguese
+        constants.player.subtitle.language.german
+        constants.player.subtitle.language.italian
+      ]
+
+      constants.player.subtitle.localizedLanguage = {}
+        constants.player.subtitle.localizedLanguage.english = "English"
+        constants.player.subtitle.localizedLanguage.spanish = "Español"
+        constants.player.subtitle.localizedLanguage.castilian = "Español"
+        constants.player.subtitle.localizedLanguage.french = "Français"
+        constants.player.subtitle.localizedLanguage.portuguese = "Português"
+        constants.player.subtitle.localizedLanguage.german = "Deutsch"
+        constants.player.subtitle.localizedLanguage.italian = "Italiano"
+
     'video player returns one of the following
     constants.player.playerResults = {}
       constants.player.playerResults.completed = "COMPLETED"

@@ -91,7 +91,7 @@ End Function
 Function getArrayOfLikedIds()
   likeIds = getFieldFromGlobal("likeIds")
   constants = getConstantsFromGlobal()
-      
+
   aLikedIDs = []
   if constants <> invalid AND likeIds <> invalid
     for i = 0 to likeIds.getChildCount() - 1

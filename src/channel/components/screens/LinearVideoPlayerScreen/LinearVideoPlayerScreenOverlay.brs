@@ -75,6 +75,7 @@ Function populateInfoPanel(contentNode)
     lineOneData.hoursOfAiring = contentNode.hoursOfAiring
     lineOneData.rating = contentNode.rating
     lineOneData.hasCC = contentNode.hasSubtitles
+    lineOneData.hasAudioDescription = contentNode.hasAudioDescription
 
     if contentNode.descriptors <> invalid AND contentNode.descriptors.Count() > 0
       lineOneData.descriptorCode = contentNode.descriptors.join(", ") ' ::TODO:: When when we get real values into TAGS

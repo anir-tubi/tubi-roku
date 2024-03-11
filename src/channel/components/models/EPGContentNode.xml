@@ -14,6 +14,9 @@
     <!-- Field to tell whether program has subTitle or not-->
     <field id="hasSubtitles" type="boolean" />
 
+    <!-- Field to tell whether program has audio description or not-->
+    <field id="hasAudioDescription" type="boolean" />
+
     <!-- Field to tell whether program has 4k content, 1080p content, etc-->
     <field id="highestRendition" type="string" />
 

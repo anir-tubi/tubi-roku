@@ -60,8 +60,13 @@ End Function
 ' Callback triggered when the component receives focus.
 Function onComponentFocus()
   if m.top.hasFocus() = true
-    renderAvailableClosedCaptionTracks()
-    renderAudioTracks()
+
+    totalSubtitleCount = renderAvailableClosedCaptionTracks()
+    totalAudioTrackCount = renderAudioTracks()
+    numRows = getNumRowsForSubtitleAndAudioTrack(totalSubtitleCount, totalAudioTrackCount)
+    m.closedCaptionSelector.numRows = numRows.subtitle
+    m.audioTrackSelector.numRows = numRows.audioTrack
+
     ' Checking to make sure we have items in closed caption selector before setting focus.
     if m.closedCaptionSelector.content <> invalid
       m.closedCaptionSelector.setFocus(true)
@@ -77,6 +82,7 @@ Function renderAvailableClosedCaptionTracks()
   availableClosedCaptionTracks = m.top.availableClosedCaptionTracks
   closedCaptionTrack = m.top.closedCaptionTrack
   trackNodes = []
+
   if availableClosedCaptionTracks.Count() > 0
     globalCaptionMode = m.globalCaptionMode
     ' Creating a item to disable closed captioning.
@@ -93,14 +99,19 @@ Function renderAvailableClosedCaptionTracks()
       index = index + 1
       ' Checking if the caption is turned on or in instant replay mode and selected track matches the item.
       checked = (globalCaptionMode <> "Off" AND closedCaptionTrack = track.trackName)
-      trackNodes.push({
-        title: track.description
-        checked: checked
-      })
+      localizedTitle = getLocalizedSubtitleLanguage(track.description)
 
-      if checked = true
-        defaultCheckedItemIndex = index
+      if localizedTitle <> invalid
+        trackNodes.push({
+          title: localizedTitle
+          checked: checked
+        })
+
+        if checked = true
+          defaultCheckedItemIndex = index
+        end if
       end if
+
     end for
 
     ' Setting the initial default checked item index.
@@ -115,13 +126,16 @@ Function renderAvailableClosedCaptionTracks()
     m.closedCaptionSelector.content = invalid
   end if
 
+  trackNodeCount = trackNodes.Count()
   ' Hiding the closed caption section if there are no options available.
   ' Using scale so that layout adjust position accordingly.
-  if trackNodes.Count() > 0
+  if trackNodeCount > 0
     m.closedCaptionSection.scale = [1, 1]
   else
     m.closedCaptionSection.scale = [0, 0]
   end if
+
+  return trackNodeCount
 End Function
 
 
@@ -137,6 +151,7 @@ Function renderAudioTracks()
   ' Storing in availableAudioTracks in m scope since we sorting the array obtained from roku video node.
   m.availableAudioTracks = availableAudioTracks
 
+  trackNodeCount = 0
   trackNodes = []
   if availableAudioTracks.Count() > 1
     index = 0
@@ -156,7 +171,9 @@ Function renderAudioTracks()
       end if
     end for
 
-    if trackNodes.Count() > 1
+    trackNodeCount = trackNodes.Count()
+
+    if trackNodeCount > 1
       node = CreateObject("roSGNode", "ContentNode")
       node.update(trackNodes, true)
       m.audioTrackSelector.content = node
@@ -167,11 +184,83 @@ Function renderAudioTracks()
   end if
 
   ' Using scale so that layout adjust position accordingly.
-  if trackNodes.Count() > 1
+  if trackNodeCount > 1
     m.audioTracksSection.scale = [1, 1]
   else
     m.audioTracksSection.scale = [0, 0]
   end if
+
+  return trackNodeCount
+End Function
+
+
+' gets the numRows Count for Subtitle & AudioTrack
+' Maximum 8 items can be displayed on ClosedCaptionAndAudioSelectionOverlay at a time.
+' Few examples:
+' If there are 8 subtitles & 3 audio tracks, it displays 5 subtitles & 3 audio tracks.
+' If there are 5 subtitles & 5 audio tracks, it displays 4 subtitles & 4 audio tracks.
+' If there are 8 subtitles & 0 audio tracks, it displays 8 subtitles & no audio tracks.
+'
+' returns assocarray which has subtitle & audiotrack display count
+Function getNumRowsForSubtitleAndAudioTrack(totalSubtitleCount, totalAudioTrackCount)
+  ' Maximum Subtitles & Audio Track can be displayed on Screen
+  maxSubtitleAndAudioTrackOnScreen = 8
+  ' Maximum Subtitles can be displayed on Screen if there are 4 of more Audio Tracks
+  maxSubtitleOnScreen = 4
+  ' Maximum Audio Track can be displayed on Screen if there are 4 of more Subtitles
+  maxAudioTrackOnScreen = 4
+
+  closedCaptionNumRows = totalSubtitleCount
+  audioTrackNumRows = totalAudioTrackCount
+
+  if (totalSubtitleCount + totalAudioTrackCount) > maxSubtitleAndAudioTrackOnScreen
+    if (totalSubtitleCount > maxSubtitleOnScreen) AND (totalAudioTrackCount > maxAudioTrackOnScreen)
+      closedCaptionNumRows = maxSubtitleOnScreen
+      audioTrackNumRows = maxAudioTrackOnScreen
+    else
+      subtitleBalance = totalSubtitleCount - maxSubtitleOnScreen
+      audioTrackBalance = totalAudioTrackCount - maxAudioTrackOnScreen
+
+      if subtitleBalance > 0 AND audioTrackBalance > 0
+        closedCaptionNumRows = maxSubtitleOnScreen
+        audioTrackNumRows = maxAudioTrackOnScreen
+      else if subtitleBalance > 0 AND audioTrackBalance < 0
+        closedCaptionNumRows = maxSubtitleOnScreen - audioTrackBalance
+        audioTrackNumRows = totalAudioTrackCount
+      else if subtitleBalance < 0 AND audioTrackBalance > 0
+        closedCaptionNumRows = totalSubtitleCount
+        audioTrackNumRows = maxAudioTrackOnScreen - subtitleBalance
+      end if
+    end if
+  end if
+
+  numRows = {
+    subtitle: closedCaptionNumRows
+    audioTrack: audioTrackNumRows
+  }
+  return numRows
+
+End Function
+
+
+'getLocalizedSubtitleLanguage gets the localized subtitle language
+'
+'@subtitleLanguage: string, subtitle language returned from backend
+'returns localized Subtitle language as string or invalid
+Function getLocalizedSubtitleLanguage(subtitleLanguage)
+  localizedSubtitleLanguage = invalid
+  languageMap = m.constants.player.subtitle.languageMap
+
+  for each language in languageMap
+
+    if subtitleLanguage.instr(language) >= 0
+      localizedSubtitleLanguage = m.constants.player.subtitle.localizedLanguage[language]
+      exit for
+    end if
+
+  end for
+
+  return localizedSubtitleLanguage
 End Function
 
 

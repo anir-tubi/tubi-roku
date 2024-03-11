@@ -19,6 +19,7 @@ Function init()
   m.line1Bold = m.firstLineGroup.findNode("Line1Bold")
   m.resolutionPoster = m.firstLineGroup.findNode("ResolutionPoster")
   m.closedCaptions = m.firstLineGroup.findNode("ClosedCaptionPoster")
+  m.audioDescriptionPoster = m.firstLineGroup.findNode("AudioDescriptionPoster")
   m.rating = m.firstLineGroup.findNode("Rating")
   m.ratingBackground = m.rating.findNode("RatingBackground")
   m.ratingLabel = m.rating.findNode("RatingLabel")
@@ -71,6 +72,7 @@ Function init()
   m.partnerLogo.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.rating.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.closedCaptions.observeFieldScoped("loadStatus", "onPosterLoadStatus")
+  m.audioDescriptionPoster.observeFieldScoped("loadStatus", "onPosterLoadStatus")
   m.resolutionPoster.observeFieldScoped("loadStatus", "onPosterLoadStatus")
 
   m.signInText.text = getTranslation("registration_signIn_to_play_R_rated")
@@ -428,6 +430,20 @@ Function onLineOneDataChange(msg)
       end if
     end if
 
+    ' handle audio description
+    audioDescriptionIsPresent = (m.audioDescriptionPoster.getParent() <> invalid)
+    if data.hasAudioDescription = true
+      if audioDescriptionIsPresent = false
+        firstLineGroup.insertChild(m.audioDescriptionPoster, insertIndex)
+      end if
+
+      insertIndex++
+    else
+      if audioDescriptionIsPresent = true
+        firstLineGroup.removeChild(m.audioDescriptionPoster)
+      end if
+    end if
+
     ' handle rating
     ratingIsPresent = (m.rating.getParent() <> invalid)
     if isNonEmptyString(data.rating) = true AND m.top.mode <> m.constants.ui.infoPanelModes.sportsEvent
@@ -740,6 +756,7 @@ Function onModeChange()
     m.firstLineGroup.appendChild(m.line1)
     m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
     m.firstLineGroup.appendChild(m.rating)
     m.firstLineGroup.appendChild(m.descriptorCode)
     m.firstLineGroup.appendChild(m.expireWarning)
@@ -761,6 +778,7 @@ Function onModeChange()
     m.firstLineGroup.appendChild(m.line1)
     m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
     m.firstLineGroup.appendChild(m.rating)
     m.firstLineGroup.appendChild(m.descriptorCode)
     m.firstLineGroup.appendChild(m.expireWarning)
@@ -785,6 +803,7 @@ Function onModeChange()
     m.firstLineGroup.appendChild(m.line1)
     m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
     m.firstLineGroup.appendChild(m.rating)
     m.firstLineGroup.appendChild(m.descriptorCode)
     m.firstLineGroup.appendChild(m.expireWarning)
@@ -807,6 +826,7 @@ Function onModeChange()
     m.firstLineGroup.appendChild(m.line1)
     m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
     m.firstLineGroup.appendChild(m.rating)
     m.firstLineGroup.appendChild(m.descriptorCode)
     m.firstLineGroup.appendChild(m.expireWarning)
@@ -862,6 +882,7 @@ Function onModeChange()
     m.firstLineGroup.appendChild(m.line1)
     m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
     m.firstLineGroup.appendChild(m.rating)
     m.firstLineGroup.appendChild(m.descriptorCode)
 
@@ -879,6 +900,7 @@ Function onModeChange()
     m.firstLineGroup.appendChild(m.line1)
     m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
     m.firstLineGroup.appendChild(m.rating)
     m.firstLineGroup.appendChild(m.descriptorCode)
 
@@ -907,6 +929,7 @@ Function onModeChange()
     m.firstLineGroup.appendChild(m.line1Bold)
     m.firstLineGroup.appendChild(m.resolutionPoster)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
 
     m.twoLineInfo.appendChild(m.secondLineGroup)
     m.secondLineGroup.appendChild(m.line2)
@@ -928,6 +951,7 @@ Function onModeChange()
     m.twoLineInfo.appendChild(m.firstLineGroup)
     m.firstLineGroup.appendChild(m.line1Bold)
     m.firstLineGroup.appendChild(m.closedCaptionPoster)
+    m.firstLineGroup.appendChild(m.audioDescriptionPoster)
 
     m.offset.appendChild(m.descriptionGroup)
     m.offset.appendChild(m.playerCountdownGroup)

@@ -13,7 +13,7 @@ Function init()
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
 
   m.RowList.rowItemSize = [m.constants.ui.imageSizes.landscape]
-  m.RowList.itemSize = [1835, m.constants.ui.imageSizes.landscape[1] + 96] '//the item size includes the height of the poster image and title. It also includes the spacing in between thr poster and title. 
+  m.RowList.itemSize = [1835, m.constants.ui.imageSizes.landscape[1] + 96] '//the item size includes the height of the poster image and title. It also includes the spacing in between thr poster and title.
 
   m.RowList.observeField("rowItemSelected", "onEpisodeSelected")
   m.RowList.observeField("rowItemFocused", "onEpisodeFocused")
@@ -23,7 +23,7 @@ Function init()
   m.Menu.observeField("rowScrollFocused", "onMenuScrollFocused")
   m.defaultContentBackgroundUri = m.constants.ui.uris.defaultContentBackgroundUri
 
-  '//hide menu left of the screen 
+  '//hide menu left of the screen
   m.MenuStartingXPos = -m.PageGroup.translation[1]-m.Menu.itemSize[0]
   m.Menu.translation = [m.MenuStartingXPos, m.Menu.translation[1]]
 
@@ -114,6 +114,7 @@ Function onEpisodeFocused()
         lineOneData.hasCC = false
       end if
 
+      lineOneData.hasAudioDescription = episode.hasAudioDescription
       lineOneData.descriptorCode = episode.descriptorCode
 
       if content.availabilityEnds <> invalid AND content.availabilityEnds <> ""
