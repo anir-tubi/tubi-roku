@@ -34,6 +34,7 @@ enum ContentTypes {
 enum SideNavMenuItems {
   'profile' = 'profile',
   'kidsMode' = 'kidsMode',
+  'exitKids' = 'exitKids',
   'search' = 'search',
   'home' = 'home',
   'myList' = 'myList',
@@ -66,7 +67,7 @@ enum ScreenIds {
   'emailVerificationScreen' = 'emailVerificationScreen',
   'forgotPasswordProcessingScreen' = 'forgotPasswordProcessingScreen',
   'consentScreen' = 'consentScreen',
-  'managePreferencesScreen' = 'managePreferencesScreen'
+  'managePreferencesScreen' = 'managePreferencesScreen',
 }
 
 

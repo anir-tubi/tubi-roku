@@ -141,6 +141,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.1.#LabelParent.0.#Label',
   },
 
+  /** Exit Kids menu item focused */
+  exitKidsFocused:{
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.1.itemContent',
+  },
+
   /** Sign Out button on Settings Page while in Kids mode */
   signOutButtonKidsMode: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.4.#DetailsMenuTextParent.#DetailsMenuText',
@@ -399,6 +404,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#Title',
     xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Label',
   },
+
+  homeScreenTitle: {
+    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#Title'
+    },
+  
 
   addToMyListSelected2: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.3',
@@ -1157,6 +1167,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0',
   },
 
+  /** Sign In PW Back button focused */
+  pwContinueButtonFocused:{
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailInputScreen.#keyboardGrp.0.#buttonGroup.#continue.#focus9Patch'
+  },
+
   /** top nav For You */
   selectedTopNavForYouItem: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#topNav-home.#TopNavMenu.0',
@@ -1407,6 +1422,11 @@ const elements = typeCheckElements({
   /** Sign In Screen page header */
   signInScreenPageHeader: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#signInScreen.#signUpLayout.#pageHeading'
+  },
+
+  /** Age Gate Verification Page Head */
+  ageVerificationPageHeader: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.1.#AgeVerificationPageText.#AgeVerificationPageHeader'
   },
 
   /** EPG countdown text */

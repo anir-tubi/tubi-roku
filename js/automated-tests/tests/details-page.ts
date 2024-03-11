@@ -117,7 +117,7 @@ describe('Details Page', function () {
       await createHistory();
 
       // Back out of the video player to land on Details page
-      await utils.sleep(2000); // Improvement - try to work around sleeps
+      await testUtils.waitForCurrentScreenToEqual('detailScreen');
       await ecp.sendKeypress(ecp.Key.Ok);
       await utils.sleep(2000);
       await ecp.sendKeypress(ecp.Key.Back);
