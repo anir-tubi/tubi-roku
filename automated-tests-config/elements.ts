@@ -121,6 +121,12 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen',
   },
 
+  //** Adult check button */
+  adultOptionChecked: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#ParentalControlsMenu.3'
+
+  },
+
   /** Enter Password Message */
   enterPasswordMessage: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.0.#Message',
@@ -130,6 +136,12 @@ const elements = typeCheckElements({
   passwordEntryBox: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.0.#password',
   },
+
+  /** Password screen Back button */
+  passwordScreenBackButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#contentGroup.#passwordEntryKeyboard.0.#buttonGroup.#back.#focus9Patch'
+  },
+
 
   /** Dialog box text for PC Settings Change for Older Kids */
   parentalControlsSettingsOlderKids: {
@@ -721,6 +733,11 @@ const elements = typeCheckElements({
   continueButtonSignInPage: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#signInScreen.#signUpLayout.#buttonsGroup.#continueBtn.#focus9Patch',
   },
+  
+  continueButtonPasswordPage: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#contentGroup.#passwordEntryKeyboard.0.#buttonGroup.#continue.#focus9Patch'
+  },
+  
 
   /** Enter your password meesage on dialog box */
   enterPasswordDialogMessage: {

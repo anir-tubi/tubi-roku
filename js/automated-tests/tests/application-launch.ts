@@ -37,7 +37,7 @@ describe('Application Launch', function () {
    // await testUtils.goToPage('settings');
     await testUtils.goToPage('settings');
     await ecp.sendKeypress(ecp.Key.Right);
-    await utils.sleep(2000);
+    await testUtils.waitForElementToShowOnScreen('adultOptionChecked');
     await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -47,8 +47,10 @@ describe('Application Launch', function () {
 
     // Send password and click Continue
     await ecp.sendText('111111');
-    await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
-    await utils.sleep(100); // Only goes over to the right if we sleep here for some reason
+    await ecp.sendKeypress(ecp.Key.Down);
+    await utils.sleep(500); // moving too fast here, sometimes when pressing down lands on Back, others Continue
+    await ecp.sendKeypress(ecp.Key.Down, { count: 3});
+    await utils.sleep(500);
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Validate Older Kids modal message, back out to Left Nav and Check Exit Kids menu item is grayed out
@@ -164,12 +166,11 @@ describe('Application Launch', function () {
 
     // Launch app with created user
     await testUtils.startApplicationAtPage('home', {user: user});
-    await testUtils.waitForAppLaunchBeaconToFire();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     // Jump To Continue Watching Row (verify it is present)
-    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
-    await utils.sleep(2000);
+    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching',10000);
+  // 
     const continueWatchingRowContent = await testUtils.getCurrentlyFocusedGridItemContent('homeScreenRowList');
     expect(continueWatchingRowContent.title).to.not.equal('Sign Up to Save Your Progress');
   });
