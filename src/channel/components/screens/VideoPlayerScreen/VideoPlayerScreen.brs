@@ -172,6 +172,11 @@ Function init()
   m.positionAtJumpStart = -1
   m.playerPosition = 0
 
+  ' Variable that keeps track if the ad-countdown has started. This is used to plug a hack that allowed users to
+  ' skip an ad break by seeking after the app got the ad break info from the backend. If this variable is set to true
+  ' after the seek is done, then the ad break will start immediately.
+  m.didSeeAdCountdown = false
+
   ' m.previousPlayerPosition and m.previousPlayProgressCallSource are used to help diagnose the large
   ' playProgressEvent bug, and should be removed after a fix is in place.
   m.previousPlayerPosition = 0
@@ -945,7 +950,7 @@ Function onVideoPositionChange(msg)
   ' NOTE: historyPosition should not be set near an ad break due to race condition where RAF being
   ' invoked will cause the AuthTask thread to get stuck, never completing and staying in a "run"
   ' state perpetually.
-  if (m.playerPosition > m.lastsavedPosition + m.historyInterval1Min or m.playerPosition < m.lastsavedPosition - m.historyInterval1Min) AND adState <> "adsPending"
+  if (m.playerPosition > m.lastsavedPosition + m.historyInterval1Min OR m.playerPosition < m.lastsavedPosition - m.historyInterval1Min) AND adState <> "adsPending"
 
     if m.top.isTrailer = false AND isLoggedInUser() = true AND (content.type = m.constants.ui.contentTypes.video OR content.type = m.constants.ui.contentTypes.sportsEvent)
 
@@ -1022,7 +1027,6 @@ Function onVideoPositionChange(msg)
 
   'Advertisements
   if m.top.enableAds = true AND m.midrolls.count() > 0 then
-
     m.AdHeadsUp.visible = false  ' default to AdHeadsUp being off; this will catch ff, replay, rew during the countdown
 
     ' attempt to fetch midroll ads before actual cuepoint
@@ -1039,6 +1043,9 @@ Function onVideoPositionChange(msg)
       if m.TopOverlay.opacity = 0
         ' Don't show the ad heads up when the transport/overlay is showing, since it crowds the space of the title on the overlay
         m.ratingOverlay.opacity = 0
+
+        '//Ensure that we know a pending ad has been set to start
+        m.didSeeAdCountdown = true
         showAdHeadUpText(adPosition)
       end if
     end if
@@ -1384,6 +1391,8 @@ End Function
 
 ' Make sure the Video node is stopped and we have an accurate playback position before launching ads
 Function showAdBreak()
+  m.didSeeAdCountdown = false   'reset the variable
+
   ' leave m.VideoState = "play" because from the component's perspective video is still playing
 
   ' If Video node is already in stopped state then calling control = "stop" on it will not trigger onVideoStateChange (async will but will leave it stuck in state=stopping).
@@ -1464,6 +1473,7 @@ Function resetVideoPlayerState(content = invalid)
   m.LoadingMessage.text = ""
   cancelReplayCaptions()
   m.AdHeadsUp.visible = false
+  m.didSeeAdCountdown = false
   m.top.adPosition = 0
 
   m.pauseAdOverlay.opacity = 0

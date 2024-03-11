@@ -951,7 +951,11 @@ Function jumpToPosition(position)
     }
   })
 
-  if shouldAdBreak = true
+  if m.didSeeAdCountdown = true AND getExperimentResource("roku_adfix", "roku_adfix_v1", true).enabled = true
+    '//if the user saw the ad-countdown before seeking, then start playing the ad immediately after the seek is done.
+    showAdBreak()
+    m.showRatings = true
+  else if shouldAdBreak = true
     ' leave m.VideoState = "play" because from the component's perspective video is still playing
     m.Video.control = "stop"
     m.top.adPosition = adPosition

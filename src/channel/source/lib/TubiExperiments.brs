@@ -25,6 +25,11 @@ Function TubiExperiments(constants) as Object
       roku_mylikes_mystuff: {
         roku_mylikes_mystuff_v2: {"enabled": false}
       }
+    
+      '//Experiment to fix the bug that allows users to skip ads when they seek thru the video
+      roku_adfix: {
+        roku_adfix_v1 : {"enabled": false}
+      }
 
       roku_screensaver: {
         roku_screensaver_v2 : {"enabled": false}
