@@ -50,8 +50,7 @@
         <SimpleButton
           id="saveAndContinueButton"
           visible="false"
-          width="369"
-          fontSize="24"/>  
+          width="369" />  
         <Label
           id="nonEditableModeWarningMessage"
           width="1176"

@@ -68,8 +68,10 @@ Function onFocusPercentChange(msg)
 
   if m.top.gridHasFocus = true
     m.labelFocused.opacity = focusPercent
+    m.label.opacity = 1 - focusPercent
   else
     m.labelFocused.opacity = 0
+    m.label.opacity = 1
   end if
 End Function
 
@@ -78,7 +80,11 @@ Function onGridHasFocusChange(msg)
   gridHasFocus = msg.getData()
   if gridHasFocus = false
     m.background.opacity = 1
+    m.labelFocused.opacity = 0
+    m.label.opacity = 1
   else if m.top.itemHasFocus = true
     m.background.opacity = 0
+    m.labelFocused.opacity = 1
+    m.label.opacity = 0
   end if
 End Function
