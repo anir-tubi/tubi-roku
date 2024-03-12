@@ -1063,7 +1063,6 @@ End Function
 '                     fn: firstName(String)
 '                     ln: lastName(String)
 '                     name: name(String)
-'                     gender: gender(String)
 '                     authType: analyticsAuthType(String)
 '                     has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
 '                   }
@@ -1092,11 +1091,6 @@ Function tubiAuth_formatAuthInfoFromServer(serverAuthInfo)
   authInfo.name = ""
   if serverAuthInfo.name <> invalid
     authInfo.name = serverAuthInfo.name
-  end if
-
-  authInfo.gender = ""
-  if serverAuthInfo.gender <> invalid
-    authInfo.gender = serverAuthInfo.gender
   end if
 
   return authInfo

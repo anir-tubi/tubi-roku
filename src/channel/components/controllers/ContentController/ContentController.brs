@@ -2382,10 +2382,6 @@ Function onGetUserInfoSuccess(userInfo)
       Auth.setAuthInfo("name", userInfo.name)
     end if
 
-    if userInfo.gender <> invalid
-      Auth.setAuthInfo("gender", userInfo.gender)
-    end if
-
     if userInfo.hasAge <> invalid
       Auth.setAuthInfo("hasAge", userInfo.hasAge)
     end if

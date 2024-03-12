@@ -24,10 +24,6 @@ Function parseGetUserSettingsSuccess(fullResponse, reqInfo)
     result["profilePic"] = parsed.profile_pic
   end if
 
-  if parsed.gender <> invalid then
-    result.gender = parsed.gender
-  end if
-
   if parsed.birthday <> invalid then
     result.birthday = parsed.birthday
   end if
