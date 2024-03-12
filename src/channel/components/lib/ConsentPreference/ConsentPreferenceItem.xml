@@ -11,6 +11,8 @@
     <!-- INPUTS -->
     <field id="itemContent" type="node" />
     <field id="itemHasFocus" type="boolean" />
+    <field id="gridHasFocus" type="boolean" />
+    <field id="focusPercent" type="float" />
     <field id="height" type="float" />
   </interface>
 
@@ -26,25 +28,51 @@
           id="topPadding"
           width="1"
           height="12"/>
-        <Label
-          id="title">
-          <Font
-            role="font"/>
-        </Label>
+        <Group>
+          <Label
+            id="title">
+            <Font
+              role="font"/>
+          </Label>
+          <Label
+            opacity="0"
+            id="titleFocused">
+            <Font
+              role="font"/>
+          </Label>
+        </Group>
         <LayoutGroup
           layoutDirection="horiz">
-          <Label
-            id="subTitle"
-            wrap="true">
-            <Font
-              role="font"/>
-          </Label>
-          <Label
-            id="toggleText"
-            horizAlign="right">
-            <Font
-              role="font"/>
-          </Label>
+          <Group>
+            <Label
+              id="subTitle"
+              wrap="true">
+              <Font
+                role="font"/>
+            </Label>
+            <Label
+              opacity="0"
+              id="subTitleFocused"
+              wrap="true">
+              <Font
+                role="font"/>
+            </Label>
+          </Group>
+          <Group>
+            <Label
+              id="toggleText"
+              horizAlign="right">
+              <Font
+                role="font"/>
+            </Label>
+            <Label
+              opacity="0"
+              id="toggleTextFocused"
+              horizAlign="right">
+              <Font
+                role="font"/>
+            </Label>
+          </Group>
         </LayoutGroup>
         <Rectangle
           visible="false"
