@@ -33,9 +33,12 @@ Function getTranslation(sID as string, aDynamicStrings = {}) as String
   defaultLocale = getDefaultLocale()
 
   sTranslatedString = getTranslationBasedOnLocale(sID, locale)
-  if sTranslatedString = "" AND locale <> defaultLocale
-    '//If no translation was found, then use the default locale
-    sTranslatedString = getTranslationBasedOnLocale(sID, defaultLocale)
+  if sTranslatedString = ""
+    sTranslatedString = getTranslationBasedOnLanguage(sID, locale)
+    if sTranslatedString = "" AND locale <> defaultLocale
+      '//If no translation was found, then use the default locale
+      sTranslatedString = getTranslationBasedOnLocale(sID, defaultLocale)
+    end if
   end if
 
   for each param in aDynamicStrings
@@ -73,6 +76,49 @@ End Function
 Function getDefaultLocale()
   'setting en_US as the default/fall back option
   return "en_US"
+End Function
+
+
+'This function gets the default locale ID based on the passed language ID
+'
+'@param sLanguageID: The ID associated with the desired language.
+'@return String - Tthe default locale ID
+Function getDefaultLocaleIDBasedOnLanguage(sLanguageID as String) as String
+  sLocaleID = ""
+
+  if sLanguageID = "en"
+    sLocaleID = "en_US"
+  else if sLanguageID = "es"
+    sLocaleID = "es_MX"
+  else if sLanguageID = "fr"
+    sLocaleID = "fr_CA"
+  end if
+
+  return sLocaleID
+End Function
+
+
+'This function gets the translation based on passed language ID. If no general language
+'translation is available, then a default locale translation will be used.
+'
+'@param sStringID: The ID associated with the desired translation string
+'@param sLocaleID: The ID associated with the desired language. This ID includes both the country and langauge.
+'@return String - The translated string associated with the string ID. If unsuccessful, it will return an empty string.
+Function getTranslationBasedOnLanguage(sStringID as String, sLocaleID as String) as String
+  sTranslatedString = ""
+  sLanguageID = Left(sLocaleID, 2)
+  '//get the language ID based on the passed localeID
+
+  if sLanguageID <> ""
+    '//get the default locale ID based on a language ID: i.e. en > en_US
+    sDefaultLocaleID = getDefaultLocaleIDBasedOnLanguage(sLanguageID)
+    if sDefaultLocaleID <> ""
+      '//get the translation based on a default language file based on a language: i.e. english -> US English
+      sTranslatedString = getTranslationBasedOnLocale(sStringID, sDefaultLocaleID)
+    end if
+  end if
+
+  return sTranslatedString
 End Function
 
 
@@ -147,15 +193,19 @@ End Function
 
 Function getTranslationSetByLocale(locale)
   translationSet = invalid
+  locale = LCase(locale)
 
   if locale = "en_us"
     translationSet = getTranslation_en_US()
-  else if Left(locale, 2) = "es"
-    'es_MX and es_ES
+  else if locale = "es_mx"
     translationSet = getTranslation_es_MX()
+  else if locale = "es_es"
+    ' translationSet = getTranslation_es_ES()
   else if locale = "en_gb"
-  else if Left(locale, 2) = "fr"
+    ' translationSet = getTranslation_en_GB()
+  else if locale = "fr_ca"
     translationSet = getTranslation_fr_CA()
+  else if locale = "fr_fr"
   else if locale = "de_de"
   else if locale = "it_it"
   else if locale = "pt_br"
@@ -3473,7 +3523,6 @@ Function getTranslation_es_MX()
     }
   }
 End Function
-
 
 
 Function getTranslation_fr_CA()
