@@ -37,7 +37,7 @@ describe('Application Launch', function () {
    // await testUtils.goToPage('settings');
     await testUtils.goToPage('settings');
     await ecp.sendKeypress(ecp.Key.Right);
-    await testUtils.waitForElementToShowOnScreen('adultOptionChecked');
+    await testUtils.waitForElementToShowOnScreen('adultControlSelected');
     await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
     await ecp.sendKeypress(ecp.Key.Ok);
 

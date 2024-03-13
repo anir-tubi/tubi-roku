@@ -9,15 +9,14 @@ describe('Autoplay TV', function () {
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
 
         // Are we on the Series page?
-        const tvScreenRowList = await testUtils.getNodeForElement('tvScreenRowList');
-        expect(tvScreenRowList.visible).to.equal(true);
+        await testUtils.waitForCurrentScreenToEqual('tvScreen');
 
         // Trigger Series Autoplay
         await triggerSeriesAutoplay();
 
         // Autoplay triggered?
-        const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay');
-        expect(countDownMovieAutoPlay.visible).to.equal(true);
+        await checkForAutoPlayTrigger();
+        
 
     });
 
@@ -27,24 +26,16 @@ describe('Autoplay TV', function () {
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
 
         // Are we on the Series page?
-        const tvScreenRowList = await testUtils.getNodeForElement('tvScreenRowList');
-        expect(tvScreenRowList.visible).to.equal(true);
+        await testUtils.waitForCurrentScreenToEqual('tvScreen');
 
         // Trigger Series Autoplay
         await triggerSeriesAutoplay();
 
-
         // Autoplay triggered?
-        const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay');
-        expect(countDownMovieAutoPlay.visible).to.equal(true);
-
-        // Let it expire
-        await utils.sleep(16000);
+        await checkForAutoPlayTrigger();
 
         // Is next episode playing?
-        const videoPlayerActual = testUtils.getNodeForElement('videoPlayerActual');
-        expect((await videoPlayerActual).visible).to.be.true;
-        await testUtils.expectPlayerStateToEventuallyEqual('play');
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 16000);
 
     });
 
@@ -52,35 +43,30 @@ describe('Autoplay TV', function () {
     it('C535854 - Autoplay - Series - Next episode plays after multiple consecutive autoplays @autoplay', async () => {
 
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-        await ecp.sendKeypress(ecp.Key.Down);
-
 
         // Are we on the Series page?
-        const tvScreenRowList = await testUtils.getNodeForElement('tvScreenRowList');
-        expect(tvScreenRowList.visible).to.equal(true);
-        await utils.sleep(2000);
+        await testUtils.waitForCurrentScreenToEqual('tvScreen');
+      
 
         // Trigger Series Autoplay
         await triggerSeriesAutoplay();
 
         // Autoplay triggered?
-        const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay');
-        expect(countDownMovieAutoPlay.visible).to.equal(true);
+        await checkForAutoPlayTrigger();
 
         // Is next episode playing?
-        const videoPlayerActual = testUtils.getNodeForElement('videoPlayerActual');
-        expect((await videoPlayerActual).visible).to.be.true;
-        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 16000);
+        await ecp.sendKeypress(ecp.Key.Play);
 
         // Play Next Episode
         await triggerSeriesAutoplay();
 
         // Autoplay triggered?
-        expect(countDownMovieAutoPlay.visible).to.equal(true);
+        await checkForAutoPlayTrigger();
+        await ecp.sendKeypress(ecp.Key.Play);
 
         // Is next episode playing?
-        expect((await videoPlayerActual).visible).to.be.true;
-        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 20000);
 
     });
 
@@ -91,23 +77,20 @@ describe('Autoplay TV', function () {
         await ecp.sendKeypress(ecp.Key.Right);
 
         // Are we on the Series page?
-        const tvScreenRowList = await testUtils.getNodeForElement('tvScreenRowList');
-        expect(tvScreenRowList.visible).to.equal(true);
+        await testUtils.waitForCurrentScreenToEqual('tvScreen');
 
         // Trigger Series Autoplay
         await triggerSeriesAutoplay();
 
         // Autoplay triggered?
-        const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay');
-        let autoplayUpNextUI = await testUtils.getNodeForElement('autoplayUpNextUI');
-        expect(autoplayUpNextUI.opacity).to.be.greaterThan(0);
+        await checkForAutoPlayTrigger();
 
         // Press Back
         await ecp.sendKeypress(ecp.Key.Back);
 
         // Is Autoplay dismissed?
-        autoplayUpNextUI = await testUtils.getNodeForElement('autoplayUpNextUI');
-        expect(autoplayUpNextUI.opacity).to.be.greaterThan(0);
+        await testUtils.waitForElementToNotShowOnScreen('countDownSeriesAutoPlay');
+       
 
     });
 
@@ -130,20 +113,22 @@ describe('Autoplay TV', function () {
         await triggerSeriesAutoplay();
 
         // Autoplay triggered?
-        const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay');
-        expect(countDownMovieAutoPlay.visible).to.equal(true);
+        await checkForAutoPlayTrigger();
     });
 });
 
 async function triggerSeriesAutoplay() {
-    //Play title, pause to open player, move right to FF button and press, verify state
+    //Play title, seek to autoplay cue point
     await ecp.sendKeypress(ecp.Key.Play);
-    const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
-    expect(videoPlayerActual.visible).to.equal(true);
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing');
     await ecp.sendKeypress(ecp.Key.Play);
-    const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
-    expect(playPauseButton.visible).to.equal(true);
-
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','paused');
     await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', 0, 'end');
 }
+
+async function checkForAutoPlayTrigger() {
+    await testUtils.waitForElementToFullyShowOnScreen('countDownSeriesAutoPlay');
+    const countDownSeriesAutoPlay = await testUtils.getNodeForElement('countDownSeriesAutoPlay')
+    expect(countDownSeriesAutoPlay.text).to.contain('Starting');
+}
+

@@ -121,12 +121,6 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen',
   },
 
-  //** Adult check button */
-  adultOptionChecked: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#ParentalControlsMenu.3'
-
-  },
-
   /** Enter Password Message */
   enterPasswordMessage: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.0.#Message',
@@ -137,12 +131,6 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.0.#password',
   },
 
-  /** Password screen Back button */
-  passwordScreenBackButton: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#contentGroup.#passwordEntryKeyboard.0.#buttonGroup.#back.#focus9Patch'
-  },
-
-
   /** Dialog box text for PC Settings Change for Older Kids */
   parentalControlsSettingsOlderKids: {
     keyPath: '#ContentController.2.#DialogBox.#ContentArea.#MessageGroup.#Message',
@@ -151,11 +139,6 @@ const elements = typeCheckElements({
   /** Exit Kids Menu item in Kids more is grayed out */
   exitKidsGrayedOut: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.1.#LabelParent.0.#Label',
-  },
-
-  /** Exit Kids menu item focused */
-  exitKidsFocused:{
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.1.itemContent',
   },
 
   /** Sign Out button on Settings Page while in Kids mode */
@@ -218,7 +201,7 @@ const elements = typeCheckElements({
 
   /** On Movies Page Button */
   onMoviesPageButton: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#PageGroup.#topNav-movies.#TopNavMenu.1.#unfocusedTopLabel',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#PageGroup.#topNav-movies.#TopNavMenu.1.#selectedBackground',
   },
 
   /** Remove from history button */
@@ -257,7 +240,8 @@ const elements = typeCheckElements({
   },
 
   tubiKidsLogo: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#logoGroup.#tubiKidsLogo'
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#GradientGroup.#LinearGradient1.#BackgroundGradient',
+    xpath: '/TubiScene/ContentController/Group/Group/BackgroundGroup/Group[2]/BackgroundGradientGroup[2]/Poster',
   },
 
   exitKidsOption: {
@@ -290,9 +274,6 @@ const elements = typeCheckElements({
     xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/MaskGroup/CategoryGridList/RowList',
   },
 
-  countDownSeriesAutoPlay : {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextSeriesGroup.#CountdownLabelSeries',
-  },
 
   youMightAlsoLikeFirstPoster: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#RelatedContentParentGroup.#RelatedContentGroup.#RelatedGrid.0.#poster',
@@ -416,11 +397,6 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#Title',
     xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/InfoPanel/LayoutGroup/LayoutGroup/Label',
   },
-
-  homeScreenTitle: {
-    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#Title'
-    },
-  
 
   addToMyListSelected2: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.3',
@@ -733,11 +709,6 @@ const elements = typeCheckElements({
   continueButtonSignInPage: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#signInScreen.#signUpLayout.#buttonsGroup.#continueBtn.#focus9Patch',
   },
-  
-  continueButtonPasswordPage: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.2.#contentGroup.#passwordEntryKeyboard.0.#buttonGroup.#continue.#focus9Patch'
-  },
-  
 
   /** Enter your password meesage on dialog box */
   enterPasswordDialogMessage: {
@@ -784,9 +755,9 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#ParentalControlsMenu.3',
   },
 
-  /** Live Icon  */
+  /** Live Icon */
   liveIcon: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#liveBadgeHeader.#BadgeInfoLayout.#BadgeIcon',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#liveBadgeHeader.#BadgeBackground',
   },
 
   /** Preview off button */
@@ -915,12 +886,7 @@ const elements = typeCheckElements({
 
   /** help page text */
   helpPageText: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#TitleOne',
-  },
-
-  /** help link */
-  helpLink: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#TextTwoGroup.0'
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#TextTwo',
   },
 
   /** Policy Page Header */
@@ -1119,6 +1085,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextMovieGroup.#CountdownLabelMovie',
   },
 
+  countDownSeriesAutoPlay: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextParent.#UpNextSeriesGroup.#metadataSeries.#CountdownLabelSeries'
+  },
+
   /** remaining time in player timer */
   remainingLabel: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#RemainingLabel',
@@ -1184,11 +1154,6 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0',
   },
 
-  /** Sign In PW Back button focused */
-  pwContinueButtonFocused:{
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailInputScreen.#keyboardGrp.0.#buttonGroup.#continue.#focus9Patch'
-  },
-
   /** top nav For You */
   selectedTopNavForYouItem: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#topNav-home.#TopNavMenu.0',
@@ -1234,7 +1199,7 @@ const elements = typeCheckElements({
   },
 
   leftNavSearchItem: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.2.#LabelParent.0.#Label'
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.2'
   },
 
   /** parental controls button */
@@ -1439,11 +1404,6 @@ const elements = typeCheckElements({
   /** Sign In Screen page header */
   signInScreenPageHeader: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#signInScreen.#signUpLayout.#pageHeading'
-  },
-
-  /** Age Gate Verification Page Head */
-  ageVerificationPageHeader: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.1.#AgeVerificationPageText.#AgeVerificationPageHeader'
   },
 
   /** EPG countdown text */
