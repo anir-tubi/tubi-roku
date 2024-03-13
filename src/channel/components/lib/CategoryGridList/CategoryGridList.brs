@@ -105,13 +105,6 @@ Function onComponentFocusChange()
 
   ' If top has focus then we need to focus the RowList itself
   if m.top.hasFocus() = true then
-    m.justGainedFocus = true
-    m.RowList.setFocus(true)
-    'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error.
-    '   This is especially true when the Rowlist does not have initial focus when the content has loaded.
-    m.RowList.setFocus(false)
-    m.RowList.setFocus(true)
-
     ' Don't want to do any of this logic if we are already have an item we are going to jump to
     if itemToJumpTo = invalid then
       rowItemFocused = m.RowList.rowItemFocused
@@ -121,6 +114,15 @@ Function onComponentFocusChange()
       else
         itemToJumpTo = [0, 0]
       end if
+    end if
+
+    if resolveAbbreviatedContent(itemToJumpTo) <> invalid
+      m.justGainedFocus = true
+      m.RowList.setFocus(true)
+      'an extra set focus is necessary due to a bug in the roku Rowlist component that offsets the cursor in error.
+      '   This is especially true when the Rowlist does not have initial focus when the content has loaded.
+      m.RowList.setFocus(false)
+      m.RowList.setFocus(true)
     end if
   end if
 
