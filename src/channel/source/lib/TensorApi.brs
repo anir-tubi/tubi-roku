@@ -40,14 +40,9 @@ End Function
 'epgChannelIds request
 '
 Function tensorApi_getEPGChannelIdsReqInfo(mode = "")
-
-  if getExperimentResource("roku_tensor_cdn_domain", "roku_tensor_cdn_domain_v2").enabled = true 'bs:disable-line 1001 LINT1001
-    url = m.constants.urls.tensor.cdn.epgChannelIds
-  else
-    url = m.constants.urls.tensor.epgChannelIds
-  end if
-
+  url = m.constants.urls.tensor.cdn.epgChannelIds
   options = m.commonOptions()
+
   if mode <> invalid AND mode <> ""
     options.params["mode"] = mode
   end if

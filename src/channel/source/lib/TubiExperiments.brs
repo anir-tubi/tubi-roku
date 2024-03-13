@@ -25,7 +25,7 @@ Function TubiExperiments(constants) as Object
       roku_mylikes_mystuff: {
         roku_mylikes_mystuff_v2: {"enabled": false}
       }
-    
+
       '//Experiment to fix the bug that allows users to skip ads when they seek thru the video
       roku_adfix: {
         roku_adfix_v1 : {"enabled": false}
@@ -46,10 +46,6 @@ Function TubiExperiments(constants) as Object
 
       roku_linear_favorites: {
         roku_linear_favorites_v1: {"enabled": false}
-      }
-
-      roku_tensor_cdn_domain: {
-        roku_tensor_cdn_domain_v2: {"enabled": true}
       }
 
       roku_new_cdn: {

@@ -494,14 +494,6 @@ Function getConstants()
 
     'tensor url
     constants.urls.tensor = {}
-      constants.urls.tensor.urlBase = "https://tensor.production-public.tubi.io/api"
-      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-        constants.urls.tensor.urlBase = "https://tensor.staging-public.tubi.io/api"
-      end if
-      constants.urls.tensor.homescreen = constants.urls.tensor.urlBase + "/v3/homescreen"
-      constants.urls.tensor.container = constants.urls.tensor.urlBase + "/v3/containers"
-      constants.urls.tensor.epgChannelIds = constants.urls.tensor.urlBase + "/v2/epg"
-
       ' tensor cdn url
       constants.urls.tensor.cdn = {}
         constants.urls.tensor.cdn.urlBase = "https://tensor-cdn.production-public.tubi.io/api"
