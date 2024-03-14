@@ -24,7 +24,7 @@ Function init()
   m.AdsSSAITask.observeField("nowPlaying", "onAdChange")
 
   m.Video = m.top.findNode("VideoNode") ' reference in case we change from extending Video to extending Group
-  m.Video.observeFieldScoped("positionInfo", "onPositionInfoChange")
+  m.Video.observeFieldScoped("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
   m.Video.observeField("timedMetaData", "onId3")
@@ -461,10 +461,8 @@ End Function
 '
 ' The notificationInterval and analyticsInterval are not necessarily equal or evenly divisible
 ' so we check the time passage before we send playProgress events
-Function onPositionInfoChange(msg)
-  positionInfo = msg.getData()
-  'positionInfo is assocarray which holds keys audio, clip_id, epoch, video
-  floatPosition = positionInfo.video
+Function onVideoPositionChange(msg)
+  floatPosition = msg.getData()
 
   ' position is a float so we have to convert it to an integer for our key based lookups to work correctly
   position = int(floatPosition)
