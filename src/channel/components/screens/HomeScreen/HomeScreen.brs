@@ -948,7 +948,8 @@ End Function
 
 Function onRefreshInfoPanelWithEpisode(msg)
   episode = msg.getData()
-  if episode.seriesId = m.top.contentFocused.id
-    populateInfoPanelByContent(m.top.contentFocused)
+  contentFocused = m.top.contentFocused
+  if episode <> invalid AND contentFocused <> invalid AND episode.seriesId = contentFocused.id
+    populateInfoPanelByContent(contentFocused)
   end if
 End Function
