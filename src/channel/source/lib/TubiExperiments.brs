@@ -77,10 +77,6 @@ Function TubiExperiments(constants) as Object
         roku_linear_player_view_v2: {"enabled": false}
       }
 
-      roku_browse_while_watching_ymal: {
-        roku_browse_while_watching_ymal_v3: {"enabled": true}
-      }
-
       roku_registration_player_signup_save_progress: {
         roku_registration_player_signup_save_progress_v1: {"enabled": false}
       }

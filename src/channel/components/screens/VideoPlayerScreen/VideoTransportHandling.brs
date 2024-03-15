@@ -131,9 +131,9 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         else if m.signUpSaveProgressButton.hasFocus() = true
           setFocusToComponent(m.ProgressBar)
         else if isFocusOnPlayerControl() = true AND m.TopOverlay.opacity = 1
-
           relatedContent = m.top.relatedContent
-          if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v3", false).enabled = true AND relatedContent <> invalid AND relatedContent.getChildCount() > 0
+
+          if relatedContent <> invalid AND relatedContent.getChildCount() > 0
             setFocusToComponent(m.Related)
             animateTransportAndYMAL("in")
           else
@@ -320,7 +320,7 @@ Function pauseVideo(shouldShowTransport, shouldSendAnalytics = true)
     showYMAL()
   end if
 
-  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v3", false).enabled = true AND m.focusedNode.isSameNode(m.Related) = true
+  if m.focusedNode.isSameNode(m.Related) = true
     animateTransportAndYMAL("out")
     setFocusToPlaybackControl()
   end if
@@ -1674,7 +1674,7 @@ End Function
 Function showYMAL()
   relatedContent = m.top.relatedContent
   'fire exposure event when YMAL row is displayed at bottom area of the screen
-  if relatedContent <> invalid AND relatedContent.getChildCount() > 0 AND getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v3").enabled = true
+  if relatedContent <> invalid AND relatedContent.getChildCount() > 0
     m.Related.show = true
   end if
 End Function
@@ -1690,26 +1690,22 @@ End Function
 '   - show skipSignUp Save Progress button if applicable
 '@showSignUpButton: boolean, used to show the signup button and incase of ffw/rew/skip we will hide the signup button.
 Function hideYMAL(showSignUpButton = true)
+  fade(m.VideoYMALOverlay, "out", 0.4)
+  m.Related.hide = true
 
-  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v3", false).enabled = true
-    fade(m.VideoYMALOverlay, "out", 0.4)
-    m.Related.hide = true
+  if m.Related.opacity > 0
+    m.Related.showInfoPanel = false
+    m.Related.setFocus(false)
 
-    if m.Related.opacity > 0
-      m.Related.showInfoPanel = false
-      m.Related.setFocus(false)
-
-      if m.ratingOverlay.opacity = 1.0
-        showRatingGradient()
-      end if
-
-      if m.skipCuepointsButtonTimer <> invalid
-        showSkipCuepointsButton()
-      else if m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND showSignUpButton = true AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_v1").enabled = true
-        showSignUpSaveProgressButton()
-      end if
+    if m.ratingOverlay.opacity = 1.0
+      showRatingGradient()
     end if
 
+    if m.skipCuepointsButtonTimer <> invalid
+      showSkipCuepointsButton()
+    else if m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND showSignUpButton = true AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_v1").enabled = true
+      showSignUpSaveProgressButton()
+    end if
   end if
 End Function
 

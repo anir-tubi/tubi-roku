@@ -208,10 +208,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
       end if
 
       sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.streamStart, content)
-
-      if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v3", false).enabled = true
-        getRelatedContent(content, handleRelatedResponseInVideoPlayer)
-      end if
+      getRelatedContent(content, handleRelatedResponseInVideoPlayer)
     end if
 
     ' by default setting sprites to invalid
