@@ -490,6 +490,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
         subtitleTrack = {
           description: subtitle.lang
           trackname: subtitle.url
+          language: subtitle.lang_alpha3
         }
 
         'below block is needed to display the subtitle in order "English, Spanish, French, and remaining titles in any order"
