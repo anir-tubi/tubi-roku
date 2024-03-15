@@ -133,8 +133,8 @@ Function onFocusPercentChange()
           m.Icon.opacity = .31
         end if
         m.focusedIcon.opacity = focusPercent
-        m.Icon.uri = m.top.itemContent.filledIconUrl
-        m.focusedIcon.uri = m.top.itemContent.filledIconUrl
+        m.Icon.uri = itemContent.filledIconUrl
+        m.focusedIcon.uri = itemContent.filledIconUrl
       else
         m.focusedIcon.opacity = 1 - focusPercent
         if itemContent.turnedOn = true
@@ -142,7 +142,7 @@ Function onFocusPercentChange()
         else
           m.Icon.opacity = .31
         end if
-        m.focusedIcon.uri = m.top.itemContent.iconUrl
+        m.focusedIcon.uri = itemContent.iconUrl
       end if
     else
       if itemContent.turnedOn = true
@@ -151,8 +151,8 @@ Function onFocusPercentChange()
         m.Icon.opacity = .31
       end if
       m.focusedIcon.opacity = focusPercent
-      m.Icon.uri = m.top.itemContent.iconUrl
-      m.focusedIcon.uri = m.top.itemContent.iconUrl
+      m.Icon.uri = itemContent.iconUrl
+      m.focusedIcon.uri = itemContent.iconUrl
     end if
   end if
 End Function
@@ -178,7 +178,7 @@ Function onActiveChange()
       fade(m.Label, "in", .3)
     else
       '// if the item is not enabled/available, then still don't bring up the opacity
-      
+
       m.Icon.opacity = .31
       fade(m.subTxt, "out", .3)
       if m.sideIconLabel <> invalid
