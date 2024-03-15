@@ -216,7 +216,7 @@ const PlayBack = ({ content }) => {
 		const playerPlaingTime = await elements.playerPlaingTime();
 		const elTime = getTimeInSeconds(playerPlaingTime.text);
 		let duration;
-		if (content.type === 's') {
+		if (content.selectedContentType === 'series') {
 			duration = ui.content.length;
 		} else {
 			duration = ui.content.duration;
