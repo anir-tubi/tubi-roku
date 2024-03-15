@@ -20,8 +20,8 @@ Function populateInfoPanelWithHomescreenStyleItemMode(content, infoPanel)
   lineOneData.rating = content.rating
 
   rating = UCase(content.rating)
-  if (rating = "R" OR rating = "TV-MA" OR rating = "TV-14" OR rating = "NC-17" OR rating = "NR") AND m.constants.deviceinfo.countrycode = "US" AND isLoggedInUser() = false
-    getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1")
+  if (rating = "R" OR rating = "TV-MA" OR rating = "NC-17") AND m.constants.deviceinfo.countrycode = "US" AND isLoggedInUser() = false
+    getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v2")
   end if
 
   lineOneData.partnerLogoUri = content.inlineLogoUri

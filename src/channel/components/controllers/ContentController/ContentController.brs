@@ -1217,7 +1217,7 @@ End Function
 
 Function refreshAllDetailScreens()
   'Save exp result to avoid accessing funtion within for loop
-  isRokuRegTVTExpOn = getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1", false).enabled = true
+  isRokuRegTVTExpOn = getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v2", false).enabled = true
 
   for i = 0 to m.screenStack.getChildCount() - 1
     screen = m.screenStack.getChild(i)

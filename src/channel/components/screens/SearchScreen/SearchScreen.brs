@@ -511,8 +511,8 @@ Function onItemFocused(msg)
       }
 
       rating = UCase(focusedContent.rating)
-      if (rating = "R" OR rating = "TV-MA" OR rating = "TV-14" OR rating = "NC-17" OR rating = "NR") AND m.constants.deviceinfo.countrycode = "US"  AND isLoggedInUser() = false
-        getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v1")
+      if (rating = "R" OR rating = "TV-MA" OR rating = "NC-17") AND m.constants.deviceinfo.countrycode = "US"  AND isLoggedInUser() = false
+        getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v2")
       end if
 
       m.searchScreenInfoPanel.needsLogin = (focusedContent.needsLogin AND m.top.signedIn <> true)
