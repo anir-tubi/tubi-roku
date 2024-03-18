@@ -736,7 +736,9 @@ Function onCWEpisodeSuccess(content, storeInCache = true)
   end if
 
   homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  homeScreen.refreshInfoPanelWithEpisode = content
+  if homeScreen <> invalid
+    homeScreen.refreshInfoPanelWithEpisode = content
+  end if
 End Function
 
 
