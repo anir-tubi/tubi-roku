@@ -90,7 +90,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_remove_playready: {
-        roku_remove_playready_v1: {"enabled": false}
+        roku_remove_playready_v1: {"enabled": true}
       }
 
       roku_large_linear_tiles: {
