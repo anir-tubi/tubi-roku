@@ -21,11 +21,7 @@ Function TubiExperiments(constants) as Object
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
 
     defaultResources: {
-      '//Experiment to display a user's liked video titles on the MyStuff screen
-      roku_mylikes_mystuff: {
-        roku_mylikes_mystuff_v2: {"enabled": false}
-      }
-
+    
       '//Experiment to fix the bug that allows users to skip ads when they seek thru the video
       roku_adfix: {
         roku_adfix_v1 : {"enabled": false}

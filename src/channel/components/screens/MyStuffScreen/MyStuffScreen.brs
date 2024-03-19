@@ -196,20 +196,7 @@ Function onContentUpdateChange(msg) As Void
       for i = 0 to nContainers - 1
         container = content.getChild(i)
         if container.gridItemType <> m.constants.ui.gridItemTypes.emptyContainer
-          if container.id = m.constants.ui.categoryIds.myLikes
-            if container.getChildCount() > 0
-              '//::TODO::roku_mylikes_mystuff_v2 - for the experiment, we are using a multiple content ID endpoint request. Post experiment, it would be nice to have the backend provide a container for liked videos so we can make the same endpoint request as the other 2 containers.
-
-              container.title = getTranslation("metadata_myStuff_myLikes_title")
-              m.isAllContentEmpty = false
-            else
-              '//My Likes container is empty
-              nMyLikesContainerIndex = i
-            end if
-          else
             m.isAllContentEmpty = false
-          end if
-          ' exit for
         end if
       end for
 

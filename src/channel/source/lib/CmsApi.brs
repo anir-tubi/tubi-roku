@@ -484,57 +484,36 @@ Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSi
   for i = 0 to content.getChildCount() - 1
     category = content.getChild(i)
     if category <> invalid
+      categoryReqInfo = invalid
 
-      if category.id = m.constants.ui.categoryIds.myLikes
-        ' ::TODO::roku_mylikes_mystuff_v2 - this condition may not be necessary after the experiment: i.e. the experiment is not graduated or the backend provides an myLikes endpoint that makes this function unnecessary
-        categoryReqInfo = invalid
-        imageParamTypes = [
-          "poster"
-        ]
-        categoryReqInfo = m.createMultipleContentReqInfo(category.categories, true, bKidsMode, imageParamTypes)
+      if category.state = "partial" OR category.state = "none"
+        categoryId = m.getFullCategoryId(category)
 
+        if isNonEmptyString(categoryId) = true
+          options = {
+            params: {}
+          }
 
-        if categoryReqInfo <> invalid then
-          categoryReqInfo.categoryId = category.id
-          categoryReqInfo.requestType = m.constants.reqNames.getMultipleContent
+          '// Request both portrait and hero (landscape) image types.
+          '//   For the landscape image, request the hero type instead of the regular landscape type, because
+          '//   the regular landscape image most likely has the title embedded in the image, and the hero most likely does not.
+          '//   The video titles within the Continue watching container have titles overlaid on top of the thumbnail, so using
+          '//   a thumbnail w/o a tile would look better in this case.
+          imageParamTypes = [
+            "poster"
+            "hero"
+          ]
+
+          categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, imageParamTypes)
+          categoryReqInfo.requestType = reqName
           categoryReqInfo.responseType = "node"
           categoryReqInfo.isSignedInUser = isSignedInUser
-
-          requests.push(categoryReqInfo)
         end if
+      end if
 
-      else
-        categoryReqInfo = invalid
-
-        if category.state = "partial" OR category.state = "none"
-          categoryId = m.getFullCategoryId(category)
-
-          if isNonEmptyString(categoryId) = true
-            options = {
-              params: {}
-            }
-
-            '// Request both portrait and hero (landscape) image types.
-            '//   For the landscape image, request the hero type instead of the regular landscape type, because
-            '//   the regular landscape image most likely has the title embedded in the image, and the hero most likely does not.
-            '//   The video titles within the Continue watching container have titles overlaid on top of the thumbnail, so using
-            '//   a thumbnail w/o a tile would look better in this case.
-            imageParamTypes = [
-              "poster"
-              "hero"
-            ]
-
-            categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, imageParamTypes)
-            categoryReqInfo.requestType = reqName
-            categoryReqInfo.responseType = "node"
-            categoryReqInfo.isSignedInUser = isSignedInUser
-          end if
-        end if
-
-        if categoryReqInfo <> invalid then
-          requests.push(categoryReqInfo)
-          category.state = "loading"
-        end if
+      if categoryReqInfo <> invalid then
+        requests.push(categoryReqInfo)
+        category.state = "loading"
       end if
     end if
   end for

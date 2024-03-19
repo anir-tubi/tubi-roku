@@ -778,17 +778,6 @@ Function handleHistoryChange()
 End Function
 
 
-' called when a user's likes has updated
-Function handleLikesChange()
-  if isLoggedInUser() = true
-    if getExperimentResource("roku_mylikes_mystuff", "roku_mylikes_mystuff_v2", false).enabled = true
-      '//when likes change, then indicate that the myStuff screen should reload
-      setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
-    end if
-  end if
-End Function
-
-
 Function getQueueIds(successCallback, errorCallback = invalid)
   reqInfo = m.userDeviceApi.getQueueReqInfo()
   m.makeRequest({

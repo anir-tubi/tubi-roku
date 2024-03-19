@@ -86,26 +86,6 @@ Function getLike(contentId)
 End Function
 
 
-' returns an array of contentIds that the user has liked.
-' ::TODO::roku_mylikes_mystuff_v2 - this function may not be necessary after the experiment: i.e. the experiment is not graduated or the backend provides an myLikes endpoint that makes this function unnecessary
-Function getArrayOfLikedIds()
-  likeIds = getFieldFromGlobal("likeIds")
-  constants = getConstantsFromGlobal()
-
-  aLikedIDs = []
-  if constants <> invalid AND likeIds <> invalid
-    for i = 0 to likeIds.getChildCount() - 1
-      child = likeIds.getChild(i)
-      if child.state = constants.ui.likeDislikeStates.liked AND child.id <> ""
-        aLikedIDs.push(child.id)
-      end if
-    end for
-  end if
-
-  return aLikedIDs
-End Function
-
-
 ' getLinearLike finds the like/dislike node based on linear contentId provided
 '
 ' @contentId: string, the id of any content

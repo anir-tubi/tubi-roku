@@ -1382,7 +1382,6 @@ Function onLikeChangedSuccess(requestBody)
 
     '//Tell Detail Screen how to react to user interacting with the like/dislike button
     if detailScreen <> invalid AND detailScreen.content <> invalid
-      handleLikesChange()
       if detailScreen.content.id <> invalid AND returnedContentId <> invalid AND returnedContentId = detailScreen.content.id
         '//if the returned server call is associated with the the current video title, then proceed
         '//Proceed to take the proper action based on the action requested
