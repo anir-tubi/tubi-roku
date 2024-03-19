@@ -174,22 +174,6 @@
           id="closedCaptioningGroup"
           opacity="0">
           <RowList
-            id="closedCaptioningButtonListBackground"
-            translation="[960,882]"
-            numRows="1"
-            showRowLabel="[false]"
-            itemSize="[1835,72]"
-            showRowCounter="[false]"
-            rowItemSize="[[225,72]]"
-            rowItemSpacing="[[18,0]]"
-            fadeFocusFeedbackWhenAutoScrolling="true"
-            drawFocusFeedbackOnTop="true"
-            focusBitmapUri="pkg://images/menu-focus-$$RES$$.9.png"
-            focusFootprintBitmapUri="pkg://images/menu-focus-$$RES$$.9.png"
-            itemComponentName="LinearTVCaptioningMenuItem"
-            rowFocusAnimationStyle="floatingFocus"/>
-          <RowList
-            visible="true"
             id="closedCaptioningButtonList"
             translation="[960,882]"
             numRows="1"
@@ -198,7 +182,10 @@
             showRowCounter="[false]"
             rowItemSize="[[225,72]]"
             rowItemSpacing="[[18,0]]"
-            drawFocusFeedback="false"
+            drawFocusFeedbackOnTop="false"
+            focusBitmapUri="pkg://images/menu-focus-$$RES$$.9.png"
+            focusFootprintBitmapUri="pkg://images/menu-focus-$$RES$$.9.png"
+            loadingBitmapUri="pkg://images/menu-focus-$$RES$$.9.png"
             itemComponentName="LinearTVCaptioningMenuItem"
             rowFocusAnimationStyle="floatingFocus"/>
         </Group>

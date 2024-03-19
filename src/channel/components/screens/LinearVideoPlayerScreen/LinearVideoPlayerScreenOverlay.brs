@@ -30,17 +30,16 @@ Function init()
   '//Closed Captioning Nodes
   m.closedCaptioningGroup = m.top.findNode("closedCaptioningGroup")
   m.closedCaptioningButtonList = m.top.findNode("closedCaptioningButtonList")
-  m.closedCaptioningButtonListBackground = m.top.findNode("closedCaptioningButtonListBackground")
-  m.closedCaptioningButtonListBackground.observeFieldScoped("rowItemSelected", "onCCContentSelected")
-  m.closedCaptioningButtonListBackground.observeFieldScoped("rowItemFocused", "onCCContentFocused")
+  m.closedCaptioningButtonList.observeFieldScoped("rowItemSelected", "onCCContentSelected")
+  m.closedCaptioningButtonList.observeFieldScoped("rowItemFocused", "onCCContentFocused")
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.EPGError, typographyConstants.ids.bodyLargeStrong)
 
   theme = getThemeFromGlobal()
   if theme <> invalid
-    m.closedCaptioningButtonListBackground.focusBitmapBlendColor = theme.focusedColor
-    m.closedCaptioningButtonListBackground.focusFootprintBlendColor = theme.neutralColor
+    m.closedCaptioningButtonList.focusBitmapBlendColor = theme.focusedColor
+    m.closedCaptioningButtonList.focusFootprintBlendColor = theme.neutralColor2
   end if
 
   '//It is best not to check the visible state of a UI element as it may be in a transitionary state. So m.bEPGVisible is used to know what is the intention of the EPG visible state.
@@ -179,14 +178,6 @@ Function onClosedCaptionListUpdated()
     m.sideNav.visible = true
 
     m.closedCaptioningButtonList.content = root
-    '//clone the Closed captioning so any changes made for the m.closedCaptioningButtonListBackground is not reflected in the original cc content
-    backgroundCaptionsContent = root.clone(true)
-    for i=0 to backgroundCaptionsContent.getChild(0).getChildCount()-1
-      clonedCaptionNode = backgroundCaptionsContent.getChild(0).getChild(i)
-      clonedCaptionNode.isForeground = false
-    end for
-
-    m.closedCaptioningButtonListBackground.content = backgroundCaptionsContent
     centerClosedCaptioning()
 
   else
@@ -205,7 +196,6 @@ Function centerClosedCaptioning()
 
   nCenterPointX = (1920-nListWidth)/2
   m.closedCaptioningButtonList.translation = [nCenterPointX, m.closedCaptioningButtonList.translation[1]]
-  m.closedCaptioningButtonListBackground.translation = [nCenterPointX, m.closedCaptioningButtonList.translation[1]]
 End Function
 
 
@@ -354,9 +344,9 @@ End Function
 
 
 Function displayClosedCaptioningMenu()
-  m.closedCaptioningButtonListBackground.setFocus(true)
-  m.closedCaptioningButtonListBackground.setFocus(false) ' workaround for roku focus indicator bug
-  m.closedCaptioningButtonListBackground.setFocus(true)  ' workaround for roku focus indicator bug
+  m.closedCaptioningButtonList.setFocus(true)
+  m.closedCaptioningButtonList.setFocus(false) ' workaround for roku focus indicator bug
+  m.closedCaptioningButtonList.setFocus(true)  ' workaround for roku focus indicator bug
   m.sideNav.setOpenState = "openedAndNotInFocus"
 
   if m.bEPGVisible = true
@@ -364,15 +354,15 @@ Function displayClosedCaptioningMenu()
 
     ' preselect the caption option that the user currently has enabled
     nJumpTo = 0
-    if m.closedCaptioningButtonListBackground.content <> invalid AND m.closedCaptioningButtonListBackground.content.getChildCount() > 0
-      captions = m.closedCaptioningButtonListBackground.content.getChild(0)
+    if m.closedCaptioningButtonList.content <> invalid AND m.closedCaptioningButtonList.content.getChildCount() > 0
+      captions = m.closedCaptioningButtonList.content.getChild(0)
       for i = 0 to captions.getChildCount()-1
         caption = captions.getChild(i)
         if caption.enabled = true
           nJumpTo = i
         end if
       end for
-      m.closedCaptioningButtonListBackground.jumpToRowItem = [0, nJumpTo]
+      m.closedCaptioningButtonList.jumpToRowItem = [0, nJumpTo]
     end if
 
     slideFade(m.EPG, "below", "out", m.top.animationDuration)

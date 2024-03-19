@@ -1,11 +1,15 @@
 Function init()
-  m.top.observeField("itemContent", "onItemContentChange")
-  m.EnabledIcon = m.top.findNode("EnabledIcon")
-  m.MenuText = m.top.findNode("MenuText")
-  m.Bground = m.top.findNode("Bground")
+  m.top.observeFieldScoped("itemContent", "onItemContentChange")
+  m.top.observeFieldScoped("focusPercent", "onFocusPercentChange")
+  m.enabledIcon = m.top.findNode("EnabledIcon")
+  m.unfocusedEnabledIcon = m.top.findNode("unfocusedEnabledIcon")
+  m.menuText = m.top.findNode("MenuText")
+  m.unFocusedMenuText = m.top.findNode("unFocusedMenuText")
+  m.bground = m.top.findNode("Bground")
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.MenuText, typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(m.unFocusedMenuText, typographyConstants.ids.bodySmallStrong)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -22,27 +26,42 @@ Function onThemeChange(msg = invalid)
   end if
 
   if theme <> invalid
-    m.Bground.blendColor = theme.secondaryTextColor
-    m.MenuText.color = theme.focusedTextColor
-    m.EnabledIcon.blendColor = theme.focusedTextColor
+    m.bground.blendColor = theme.neutralColor2
+    m.menuText.color = theme.focusedTextColor
+    m.unFocusedMenuText.color = theme.unFocusedColor
+    m.enabledIcon.blendColor = theme.focusedTextColor
+    m.unfocusedEnabledIcon.blendColor = theme.unFocusedColor
   end if
 End Function
 
 
-Function onItemContentChange()
+Function onItemContentChange(msg)
   tubiLog("LinearTVCaptioningMenuItem.onItemContentChange")
-  if m.top.itemContent <> invalid then
-    if m.top.itemContent.isForeground = true
-      if m.top.itemContent.title <> invalid
-        m.MenuText.text = m.top.itemContent.language_label
-      end if
-      if m.top.itemContent.enabled <> invalid
-        m.EnabledIcon.visible = m.top.itemContent.enabled
-      end if
-    else
-      m.Bground.visible = true
-      m.MenuText.visible = false
-      m.EnabledIcon.visible = false
+  item = msg.getData()
+  if item <> invalid then
+
+    if item.language_label <> invalid
+      m.menuText.text = item.language_label
+      m.unFocusedMenuText.text = item.language_label
+    end if
+
+    if item.enabled <> invalid
+      m.enabledIcon.visible = item.enabled
+      m.unfocusedEnabledIcon.visible = item.enabled
     end if
   end if
+
+End Function
+
+
+Function onFocusPercentChange(msg)
+  ' change the text colors and bg as soon as focus changes for smooth transitions.
+  focusPercent = msg.getData()
+
+  'show the background with off white color for unfocused item.
+  'For focused item, hide the background to avoid focused color mixing with background color.
+  m.bground.opacity = 1 - focusPercent
+  m.menuText.opacity = focusPercent
+  m.enabledIcon.opacity = focusPercent
+  m.unfocusedEnabledIcon.opacity = 1 - focusPercent
 End Function

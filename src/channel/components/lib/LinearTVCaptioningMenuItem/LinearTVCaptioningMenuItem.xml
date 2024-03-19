@@ -16,33 +16,50 @@
      -->
     <field id="itemContent" type="node" />
     <field id="active" type="boolean" />
-    <field id="itemHasFocus" type="boolean" />
+    <field id="focusPercent" type="float" />
 
   </interface>
 
   <children>
     <Poster
-     id="Bground"
-     uri="pkg://images/menu-focus-$$RES$$.9.png"
-     width="225"
-     height="72"
-     visible="false"
-     loadSync="true"/>
+      id="Bground"
+      uri="pkg://images/menu-focus-$$RES$$.9.png"
+      width="225"
+      height="72"
+      loadSync="true"/>
 
     <Label
-     id="MenuText"
-     translation="[36,0]"
-     vertAlign="center"
-     horizAlign="left"
-     ellipsizeOnBoundary="true"
-     width="135"
-     height="72">
+      id="unFocusedMenuText"
+      translation="[36,0]"
+      vertAlign="center"
+      ellipsizeOnBoundary="true"
+      width="135"
+      height="72">
       <Font
-       role="font"/>
+        role="font"/>
+    </Label>
+
+    <Label
+      id="MenuText"
+      translation="[36,0]"
+      vertAlign="center"
+      horizAlign="left"
+      ellipsizeOnBoundary="true"
+      opacity="0.0"
+      width="135"
+      height="72">
+      <Font
+        role="font"/>
     </Label>
 
     <Poster
       id="EnabledIcon"
+      width="36"
+      height="33"
+      translation="[174,21]"
+      uri="pkg:/images/icon-checkmark.png"/>
+    <Poster
+      id="unfocusedEnabledIcon"
       width="36"
       height="33"
       translation="[174,21]"
