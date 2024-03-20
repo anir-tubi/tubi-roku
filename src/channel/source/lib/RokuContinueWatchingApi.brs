@@ -5,7 +5,7 @@ Function RokuContinueWatchingApi(constants)
     constants: constants
     rokuReservedHeaders: {
       "x-roku-reserved-jwt": ""
-      "x-roku-reserved-channel-id": m.constants.productionApplicationId
+      "x-roku-reserved-channel-id": constants.productionApplicationId
       "x-roku-reserved-channel-store-code": ""
       "x-roku-reserved-virtual-user-id": ""
       "x-roku-reserved-device-id": ""

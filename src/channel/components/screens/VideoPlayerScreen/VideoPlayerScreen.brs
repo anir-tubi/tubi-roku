@@ -611,9 +611,6 @@ Function playContent()
 
       m.Video.control = "play"
 
-      ' fire exposure event for video playback
-      getExperimentResource("roku_remove_playready", "roku_remove_playready_v1", true)
-
       ' Calling the set initial audio track in the start of video playback.
       ' The reason we are calling it here is to cover a use case where if we play the same video or the next video as the same value.
       ' For ex: Between different video with audio tracks the available tracks value is exactly the same value.
@@ -1165,9 +1162,6 @@ Function onAdStateChange(msg)
       updateLastPingTime(m.playerPosition) ' updating lastPingtime for extra safety
 
       m.Video.control = "play"
-
-      ' fire exposure event for video playback
-      getExperimentResource("roku_remove_playready", "roku_remove_playready_v1", true)
 
       ' sometimes position callback not getting triggered for longtime after playing Ads.
       ' so unobserving and observing it, it may trigger the position callback properly.

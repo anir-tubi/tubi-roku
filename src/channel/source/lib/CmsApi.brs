@@ -33,7 +33,6 @@ Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
     setTupianLandscapeParam: cmsApi_setTupianLandscapeParam
     getWindowInfo: cmsApi_getWindowInfo
     getFullCategoryId: cmsApi_getFullCategoryId
-    getVideoResources: cmsApi_getVideoResources
   }
 
   cmsApi = {}
@@ -53,7 +52,7 @@ Function cmsApi_createRelatedContentReqInfo(contentId, bKidsMode = false)
   url = m.constants.urls.cms.relatedContent + "/" + contentId + "/related"
   options = m.getCommonOptions()
   options.params["isKidsMode"] = bKidsMode
-  options.params["video_resources"] = m.getVideoResources()
+  options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
   options.params = m.setTupianPosterParam(options.params)
 
   return {
@@ -69,7 +68,7 @@ Function cmsApi_createUpNextContentReqInfo(passedOptions)
   options = m.getCommonOptions()
   params = options.params
   headers = options.headers
-  params["video_resources"] = m.getVideoResources()
+  params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
   params["limit_resolutions"] = m.constants.player.limitResolutions
 
   if passedOptions <> invalid
@@ -103,7 +102,7 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels=false, bKi
   options.params["content_id"] = contentId
   options.params["isKidsMode"] = bKidsMode
   options.params["includeChannels"] = includeChannels
-  options.params["video_resources"] = m.getVideoResources()
+  options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
   options.params = m.setTupianLandscapeParam(options.params)
   capability = formatJson({"content_types" :["se"]})
@@ -130,7 +129,7 @@ Function cmsApi_createMultipleContentReqInfo(aContentIds, includeChannels=false,
     options.params["content_ids"] = contentIds
     options.params["isKidsMode"] = bKidsMode
     options.params["includeChannels"] = includeChannels
-    options.params["video_resources"] = m.getVideoResources()
+    options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
 
     if imageParamTypes = invalid
       options.params = m.setTupianLandscapeParam(options.params)
@@ -623,17 +622,6 @@ Function cmsApi_createHomeScreenBatchRequestInfoForContainers(containerIds, cont
 
   return requests
 
-End Function
-
-
-' cmsApi_getVideoResources returns video resources order based on experiment response
-Function cmsApi_getVideoResources()
-  if getExperimentResource("roku_remove_playready", "roku_remove_playready_v1", false).enabled = true 'bs:disable-line 1001 LINT1001
-    videoResources = m.constants.player.drmOrderWidevineHlsv6
-  else
-    videoResources = m.constants.player.drmOrderHlsv6
-  end if
-  return videoResources
 End Function
 
 

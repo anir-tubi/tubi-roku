@@ -832,13 +832,6 @@ Function getConstants()
       constants.player.drmTypes.hlsv3 = "hlsv3"
 
       ' Supported schemes, in order of preference
-      constants.player.drmOrderHlsv6 = [
-        constants.player.drmTypes.dashWidevine
-        constants.player.drmTypes.dashPlayready
-        constants.player.drmTypes.hlsv6
-      ]
-
-      ' Supported schemes, in order of preference
       constants.player.drmOrderWidevineHlsv6 = [
         constants.player.drmTypes.dashWidevine
         constants.player.drmTypes.hlsv6
