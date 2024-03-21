@@ -732,3 +732,14 @@ Function userDeviceApi_createGetDsarQrCodeReqInfo_test()
   m.assertEqual(m.constants.urls.account.getDsarQrCode, req.url)
   m.assertEqual(m.constants.reqNames.getDsarQrCode, req.requestType)
 End Function
+
+
+'@Test createPostLogoutReqInfo unit tests
+Function userDeviceApi_createPostLogoutReqInfo_test()
+  req = m.userDeviceApi.createPostLogoutReqInfo()
+
+  m.assertNotInvalid(req)
+  m.assertEqual(req.options.method, "POST")
+  ' Since the request only requires token and no other parameters there is no options to verify.
+  m.assertEqual(m.constants.urls.userDevice.logout, req.url)
+End Function

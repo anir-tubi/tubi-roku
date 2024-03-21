@@ -39,6 +39,9 @@ Function UserDeviceApi(constants, apiUtils)
 
     ' Privacy Center QR Code related methods.
     createGetDsarQrCodeReqInfo: userDeviceApi_createGetDsarQrCodeReqInfo
+
+    ' user logout related method.
+    createPostLogoutReqInfo: userDeviceApi_createPostLogoutReqInfo
   }
 
   userDeviceApi = {}
@@ -529,5 +532,16 @@ Function userDeviceApi_createGetDsarQrCodeReqInfo()
   return {
     url: m.constants.urls.account.getDsarQrCode
     requestType: m.constants.reqNames.getDsarQrCode
+  }
+End Function
+
+
+Function userDeviceApi_createPostLogoutReqInfo()
+  url = m.constants.urls.userDevice.logout
+  options = m.getCommonOptions()
+  options["method"] = m.constants.reqTypes.post
+  return {
+    url: url
+    options: options
   }
 End Function

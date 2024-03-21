@@ -358,7 +358,7 @@ Function processSuccessResponse(result, callbackTypes, job)
   else
     parserCallback = callbackTypes.parseSuccess
 
-    ' some requests may not require handling of the response and and therefore may not
+    ' some requests may not require handling of the response and therefore may not
     ' have a parseSuccess callback.
     if parserCallback <> invalid
       output = parserCallback(result.response, job.reqInfo)

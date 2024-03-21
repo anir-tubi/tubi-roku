@@ -119,6 +119,13 @@ End Function
 ' Log the user out
 Function onSignOutModalSelected()
   tubiLog("SettingsScreenHelpers.onSignOutModalSelected")
+  requestInfo = m.userDeviceApi.createPostLogoutReqInfo()
+  m.makeRequest({
+    url: requestInfo.url
+    options: requestInfo.options
+    requestType: m.constants.reqNames.postLogout
+    silenceCallbackWarnings: true
+  })
   setSettingsScreenSignInInfo()
   m.authInfoReceived = false
   if m.authTask <> invalid

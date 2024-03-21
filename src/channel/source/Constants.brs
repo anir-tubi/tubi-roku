@@ -296,6 +296,7 @@ Function getConstants()
     constants.reqNames.getUserSettings = "getUserSettings"
     constants.reqNames.postAnalytics = "postAnalytics"
     constants.reqNames.postBrazeMergeUsers = "postBrazeMergeUsers"
+    constants.reqNames.postLogout = "postLogout"
 
     ' a list of reqnames that the general task will inject auth headers and should expect to handle 403 errors for
     constants.reqNames.acceptsTubiAuth = {}
@@ -337,6 +338,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.patchConsent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getDsarQrCode] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getUserSettings] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.postLogout] = true
 
 
   constants.anonymous = {}
@@ -518,6 +520,7 @@ Function getConstants()
       constants.urls.userDevice.refreshToken = constants.urls.userDevice.urlBase + "/login/refresh"
       constants.urls.userDevice.transferToken = constants.urls.userDevice.urlBase + "/login/transfer"
       constants.urls.userDevice.resetPassword = constants.urls.userDevice.urlBase + "/password/reset"
+      constants.urls.userDevice.logout = constants.urls.userDevice.urlBase + "/logout"
 
     'remote Config hub url
     constants.urls.configHub = {}
