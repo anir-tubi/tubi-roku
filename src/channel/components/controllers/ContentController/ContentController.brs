@@ -754,11 +754,8 @@ Function handleQueueChange()
     ' make request to get bookmarks/queue ids
     getQueueIds(onQueueRefresh)
 
-    ' update My List containers on various home screens
+    ' update My List containers on various screens
     setDirtyUserCategories(m.constants.ui.categoryIds.queue)
-
-    '//when queue changes, then indicate that the myStuff screen should reload
-    setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
   end if
 End Function
 
@@ -768,12 +765,9 @@ Function handleHistoryChange()
   if isLoggedInUser() = true
     ' make request to get history/continue watching ids
     getHistoryIds(onHistoryRefresh)
-
-    ' update Continue Watching containers on various home screens
+    
+    ' update Continue Watching containers on various screens
     setDirtyUserCategories(m.constants.ui.categoryIds.history)
-
-    '//when history changes, then indicate that the myStuff screen should reload
-    setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
   end if
 End Function
 
@@ -817,10 +811,11 @@ Function setDirtyUserCategories(categoryId)
     movieScreen = getFromScreenCache(m.constants.ui.screenIds.movieScreen)
     tvScreen = getFromScreenCache(m.constants.ui.screenIds.tvScreen)
     espanolScreen = getFromScreenCache(m.constants.ui.screenIds.espanolScreen)
+    myStuffScreen = getFromScreenCache(m.constants.ui.screenIds.myStuffScreen)
 
     isKidsMode = shouldKidsModeBeSentToServer()
     reqName = m.constants.reqNames.getCategory
-
+    
     options = {}
     params = {}
     ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
@@ -841,7 +836,7 @@ Function setDirtyUserCategories(categoryId)
       uiMode: m.uiMode
     })
 
-    '//Apply the movie, TV, and Espanol filters if those screens exist
+    '//Apply the movie, TV, myStuff, and Espanol filters if those screens exist
     if movieScreen <> invalid
       optionMovie = {}
       movieParams = {}
@@ -906,6 +901,28 @@ Function setDirtyUserCategories(categoryId)
         isSignedInUser: isLoggedInUser()
         screenId: m.constants.ui.screenIds.espanolScreen
         uiMode: m.uiMode
+      })
+    end if
+
+
+    if myStuffScreen <> invalid
+      optionMyStuff = {
+        params: {}
+      }
+      myStuffImageParamTypes = [
+        "poster"
+        "hero"
+      ]
+      categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, isKidsMode, optionMyStuff, myStuffImageParamTypes)
+      reqName = m.constants.reqNames.getMyStuffContainers
+      m.makeRequest({
+        url: categoryReqInfo.url
+        requestType: reqName
+        options: categoryReqInfo.options
+        successCallback: onReloadUserCategoriesResponseInMyStuffScreen
+        errorCallback: onErrorReloadUserCategoriesInMyStuffScreen
+        responseType: "node"
+        isSignedInUser: isLoggedInUser()
       })
     end if
 

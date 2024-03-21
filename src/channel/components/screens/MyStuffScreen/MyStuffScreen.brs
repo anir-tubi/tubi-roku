@@ -209,12 +209,16 @@ Function onContentUpdateChange(msg) As Void
         m.AllEmptyUI.visible = false
         m.RowList.visible = true
         m.InfoPanel.visible = true
-        m.RowList.setFocus(true)
+        if m.top.isInFocusChain() = true
+          m.RowList.setFocus(true)
+        end if
       else
         m.AllEmptyUI.visible = true
         m.RowList.visible = false
         m.InfoPanel.visible = false
-        m.AllEmptyUIMenu.setFocus(true)
+        if m.top.isInFocusChain() = true
+          m.AllEmptyUIMenu.setFocus(true)
+        end if
         m.top.backgroundUriList = [m.defaultBackgroundUri]
       end if
     end if

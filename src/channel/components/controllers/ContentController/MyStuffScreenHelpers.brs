@@ -133,6 +133,112 @@ Function onMyStuffBatchResponse(response)
 End Function
 
 
+' @response: roSGNode, a ContentNode representing a container/category, may have no children
+Function onReloadUserCategoriesResponseInMyStuffScreen(response)
+  tubiLog("MyStuffScreenHelpers.onReloadUserCategoriesResponseInMyStuffScreen")
+  screen = getFromScreenCache(m.constants.ui.screenIds.myStuffScreen)
+
+  if screen <> invalid
+    content = screen.content
+    if content <> invalid
+      newCategory = invalid
+      oldCategory = invalid
+      nOldCategoryIndex = -1
+
+      if type(response) = "roSGNode"
+
+        if response.getChildCount() > 0
+          newCategory = response
+        end if
+        
+        if content.getChildCount() > 0
+          for i = 0 to content.getChildCount() - 1
+            container = content.getChild(i)
+            if container.id = response.id
+              oldCategory = container
+              nOldCategoryIndex = i
+              exit for
+            end if
+          end for
+        end if
+
+      end if
+
+      if newCategory <> invalid AND oldCategory <> invalid
+        screen.isLoading = true   '//In order to properly refresh the screen content, we need to mark the screen has loading, which will reset the content
+
+        'replace the old category with the new category
+        content.replaceChild(newCategory, nOldCategoryIndex)
+
+        '//Update the validUntil property based on the updated content
+        nValidUntil = determineValidUntilDurationBasedOnChildren(content)
+        content.validUntil = nValidUntil
+
+        screen.content = content
+        screen.isLoading = false
+        screen.contentUpdated = true
+        jumpToPreviousFocusedItem(screen)
+      end if
+
+    end if
+  end if
+End Function
+
+
+Function onErrorReloadUserCategoriesInMyStuffScreen(response)
+  tubiLog("MyStuffScreenHelpers.onErrorReloadUserCategoriesInMyStuffScreen")
+
+  screenID = m.constants.ui.screenIds.myStuffScreen
+  screen = getFromScreenCache(screenID)
+  if screen <> invalid AND response <> invalid
+
+    ' if we were loading in the background, don't show an error modal
+    if screen.isInFocusChain() = true
+      '//use the same error analytics logic as the homscreen
+      errorMessage = getTranslation("screenHome_error_fetchCategories_description")
+      errorCode = getUserFacingErrorCode(m.constants.errors.context.myStuffScreen, m.constants.errors.subtypes.fetchError, response.code)
+      dialogEvent = {
+        type: "dialog"
+        values: {
+          dialog_type: "PLAYER_ERROR"
+          pageOneof: m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, screen.trackingPageInfo.pageValues)
+          dialog_action: "SHOW"
+          dialog_sub_type: errorCode
+        }
+      }
+
+      modalInfo = {
+        message: getErrorMessage(errorMessage, errorCode)
+        openTrackEvent: dialogEvent
+        trackingTask: m.trackingLoggingTask
+      }
+
+      showErrorModal(modalInfo, onUserMyStuffCategoriesFailed, invalid, setContentToRefresh, screenID, [getTranslation("dialog_button_continue")])
+    else
+      '//As a last resort, if there was a problem getting a specific category when refreshing, 
+      '//and the screen is not in focus, then set the entire page to refresh. This way there is a chance
+      '//that the user will see the correct content on this screen
+      setContentToRefresh(m.constants.ui.screenIds.myStuffScreen) 
+    end if
+  end if
+End Function
+
+
+' Callback function after error modal is dismissed when myStuff category fails to refresh. The entire page will refresh
+Function onUserMyStuffCategoriesFailed()
+  tubiLog("MyStuffScreenHelpers.onUserMyStuffCategoriesFailed")
+  screenID = m.constants.ui.screenIds.myStuffScreen
+  screen = getFromScreenCache(screenID)
+
+  if screen <> invalid AND screen.isInFocusChain() = true
+    '//refresh the myStuff screen content after the screen had experienced an error
+    setContentToRefresh(screenID) 
+    showMyStuffScreen()
+  end if
+
+End Function
+
+
 Function jumpToPreviousFocusedItem(screen)
   tubiLog("MyStuffScreenHelpers.jumpToPreviousFocusedItem")
   if screen <> invalid

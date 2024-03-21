@@ -920,6 +920,7 @@ Function getConstants()
   constants.errors.context.emailVerificationScreen = "13"
   constants.errors.context.tournament = "14"
   constants.errors.context.forgotPasswordProcessingScreen = "15"
+  constants.errors.context.myStuffScreen = "16"
 
   '//What is the actual error?
   constants.errors.subtypes = {}
