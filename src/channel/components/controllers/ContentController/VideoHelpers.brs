@@ -1137,7 +1137,7 @@ Function fetchUpNextContent(videoPlayer)
     options = {
       params: {
         "content_id": videoPlayer.content.id
-        "isKidsMode": shouldKidsModeBeSentToServer()
+        "is_kids_mode": shouldKidsModeBeSentToServer()
         "container_id": m.autoplayContext
         "mode": "nap"
       }
