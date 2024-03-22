@@ -426,7 +426,8 @@ Function onAgeNotVerifiedAtSignup(error)
       
       ' If the user is in GDPR countries then user is not allowed to use the application if they are not 18+.
       if isGDPR(m.constants) = true
-        showGDPRAgeGateErrorDialog()
+        resetAuthStateOnAgeGateError()
+        showGDPRAgeGateErrorScreen()
       else
         handle_422_451_error(restartChannelAfterAgeVerification) ' happens when user enters age less than 13
       end if
@@ -917,12 +918,30 @@ Function isAgeVerificationScreen(screen)
 End Function
 
 
-Function showGDPRAgeGateErrorDialog()
-  heading = getTranslation("gdpr_age_gate_error_dialog_heading")
-  message = getTranslation("gdpr_age_gate_error_dialog_sub_heading")
-  buttons = [getTranslation("gdpr_age_gate_error_dialog_exit_tubi"), getTranslation("linearVideoPlayer_buttonBack")]
+Function resetAuthStateOnAgeGateError()
+  Request = TubiRequest(m.constants.settings)
+  Auth = TubiAuth(m.constants, Request)
+  m.guestUserHasAgeInfo = Auth.setGuestUserHasAgeInfo(false)
+  Auth.logout()
+  m.global.authInfo = invalid
+End Function
 
-  ' TODO: Analytics requirement still not available.
-  simpleModalInfo = getSimpleModalInfo(heading, message, buttons, invalid, m.trackingLoggingTask, setExitApp)
-  showModal(simpleModalInfo.modalInfo, simpleModalInfo.buttonInfo)
+
+Function showGDPRAgeGateErrorScreen()
+  showContentGroupAndHideSpinner()
+  displayDefaultBackground()
+  screen = CreateObject("roSGNode", "ConsentAgeGateErrorScreen")
+  pushScreen(screen, true, true)
+  screen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
+  screen.observeFieldScoped("exitButtonSelected", "onAgeGateErrorScreenExitButtonSelected")
+  screen.observeFieldScoped("backButtonPressed", "setExitApp")
+End Function
+
+
+Function onAgeGateErrorScreenExitButtonSelected(_)
+  ' Adding a timer so that we allow the component interaction event from selecting the exit button on the age gate screen error modal to fire and have it completed before the app exits.
+  m.exitAppDelayTimer = m.top.createChild("Timer")
+  m.exitAppDelayTimer.duration = 1
+  m.exitAppDelayTimer.observeFieldScoped("fire", "setExitApp")
+  m.exitAppDelayTimer.control = "start"
 End Function

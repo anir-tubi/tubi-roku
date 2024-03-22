@@ -579,7 +579,28 @@ Function startUserExperience()
   else if m.getServerPersistentDataComplete <> true
     getServerPersistentData(startUserExperience)
   else if m.isConsentCheckComplete <> true
-    getConsent(onInitialGetConsentRequestComplete)
+    ' Below logic handles the use case where in the previous session if the user entered a age less than 18.
+    ' and the user is in gdpr country. During the start up flow we are checking if the user is in gdpr country.
+    ' then we are checking the if user hasage is false which means the age entered is not adult and he recieved a age gate error in previous session.
+    ' since we have 24 hour lock here we are checking if the user is re-entering the app within the 24 hr lock expires.
+    ' If he is within 24 hour lock window we will present the age gate error screen.
+    ' If it has been past 24 hour lock window then we will continue as if a new guest user is launching the application.
+    ' since backend clears the consent when user recieves age gate error user will be presented with consent screen after 24 hours.
+    if isGDPR(m.constants) = true
+      if m.guestUserHasAgeInfo = invalid then
+        m.guestUserHasAgeInfo = TubiAuth(m.constants, m.Request).getGuestUserHasAgeInfo()
+      end if
+  
+      ' Have to make sure we check expired as well as default state will always have hasAge = false
+      if m.guestUserHasAgeInfo.hasAge = false AND m.guestUserHasAgeInfo.expired = false then
+        showGDPRAgeGateErrorScreen()
+      else
+        ' Makes an api request to get latest consent.
+        getConsent(onInitialGetConsentRequestComplete)
+      end if
+    else
+      getConsent(onInitialGetConsentRequestComplete)
+    end if
   else if shouldShowAgeGate() = true AND m.ageVerificationComplete <> true
     ' check if we have age information for the user
     if isLoggedInUser() = true
@@ -624,25 +645,27 @@ Function startUserExperience()
 
     sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
     sendDeviceLog()
-
-    setUiModeFromState()
-
-    if m.enteredFromDeepLink = true
-      tubiLog("ContentController detected deep link request")
-      ' we were asked to deep link into a content item. Go to it
-      ' whether we were logged in or not.
-      handleDeeplink()
-    else
-      startChannelFromAppLoad()
-    end if
-
-    if getConsentOptOutStatusByKey(m.constants.consentKeys.marketing) = false
-      configureBrazeAndInitializeTask()
-    end if
+    
+    setUiModeAndLoadContent()
   end if
 End Function
 
 
+Function setUiModeAndLoadContent()
+  setUiModeFromState()
+  if m.enteredFromDeepLink = true
+    tubiLog("ContentController detected deep link request")
+    ' we were asked to deep link into a content item. Go to it
+    ' whether we were logged in or not.
+    handleDeeplink()
+  else
+    startChannelFromAppLoad()
+  end if
+
+  if getConsentOptOutStatusByKey(m.constants.consentKeys.marketing) = false
+    configureBrazeAndInitializeTask()
+  end if
+End Function
 
 ' sendDeviceLog will check deviceInfo and send device-info to logging API
 Function sendDeviceLog()

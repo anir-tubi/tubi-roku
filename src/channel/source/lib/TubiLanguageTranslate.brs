@@ -1821,15 +1821,15 @@ Function getTranslation_en_US()
     },
     "gdpr_age_gate_error_dialog_heading": {
       "description": "GDPR age gate error dialog heading.",
-      "message": "Sorry!"
+      "message": "You aren't old enough to access Tubi"
     },
     "gdpr_age_gate_error_dialog_sub_heading": {
       "description": "GDPR age gate error dialog sub heading.",
-      "message": "You must be 18 years or older to enter Tubi."
+      "message": "You must be 18 years or older."
     },
     "gdpr_age_gate_error_dialog_exit_tubi": {
       "description": "GDPR age gate error dialog exit tubi button label.",
-      "message": "Continue Without Saving"
+      "message": "Exit Tubi"
     }
   }
 End Function

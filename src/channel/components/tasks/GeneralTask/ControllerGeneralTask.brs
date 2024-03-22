@@ -238,13 +238,19 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
   }
 
-  ' gets the list of user/device level server persistent data.
+  ' gets dsar qr code info.
   m.requestTypes[m.constants.reqNames.getDsarQrCode] = {
     parseSuccess: parseGenericSuccess
   }
 
-  ' Patch Consent.
+  ' posts braze merge users request.
   m.requestTypes[m.constants.reqNames.postBrazeMergeUsers] = {
+    parseSuccess: parseGenericSuccess
+    parseError: parseGenericError
+  }
+
+  ' posts tracking request.
+  m.requestTypes[m.constants.reqNames.postAnalytics] = {
     parseSuccess: parseGenericSuccess
     parseError: parseGenericError
   }

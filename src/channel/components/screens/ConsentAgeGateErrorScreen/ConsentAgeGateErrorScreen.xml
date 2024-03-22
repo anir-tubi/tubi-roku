@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="ConsentAgeGateErrorScreen" extends="BaseScreen">
+  <script type="text/brightscript" uri="ConsentAgeGateErrorScreen.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiTracking.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+
+  <interface>
+    <!-- OUTPUT -->
+    <!-- Holds selected status for the exit button. -->
+    <field id="exitButtonSelected" type="string" alwaysNotify="true" />
+    <!-- event that occurs when a user selects the back button -->
+    <field id="backButtonPressed" type="boolean" alwaysNotify="true"/>
+  </interface>
+
+  <children>
+    <Poster
+      id="background"
+      width="1920"
+      height="1080"
+      translation="[0,0]"/>
+
+     <LayoutGroup
+        translation="[129, 442]"
+        itemSpacings="[12]" >
+        <Label
+          id="heading">
+          <Font
+            role="font"/>
+        </Label>
+        <Label
+          id="subheading">
+          <Font
+            role="font"/>
+        </Label>
+        <SimpleButton
+          id="exitBtn"
+          width="384"
+          fontSize="24"/>
+      </LayoutGroup>
+  </children>
+</component>
