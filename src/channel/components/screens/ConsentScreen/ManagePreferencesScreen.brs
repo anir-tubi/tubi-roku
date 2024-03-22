@@ -80,7 +80,7 @@ Function onThemeChange(msg = invalid)
 End Function
 
 
-Function onSaveAndContinueBtnSelected(msg)
+Function onSaveAndContinueBtnSelected()
   m.top.selectedConsents = m.selectedConsents
 End Function
 

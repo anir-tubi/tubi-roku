@@ -127,7 +127,7 @@ Function onThemeChange(msg = invalid)
 End Function
 
 
-Function onDecreaseChannel(msg)
+Function onDecreaseChannel()
   jumpChannelUiToCurrentPlayingVideo()
   decreaseChannel()
 End Function
@@ -145,7 +145,7 @@ Function decreaseChannel()
 End Function
 
 
-Function onIncreaseChannel(msg)
+Function onIncreaseChannel()
   jumpChannelUiToCurrentPlayingVideo()
   increaseChannel()
 End Function
@@ -165,7 +165,7 @@ Function increaseChannel()
 End Function
 
 
-Function onShowOverlay(msg)
+Function onShowOverlay()
   if m.OverlayParent.opacity < 1
     jumpChannelUiToCurrentPlayingVideo()
     changeChannelUiByIndex(m.channelIndexFocused)
@@ -177,7 +177,7 @@ Function onShowOverlay(msg)
 End Function
 
 
-Function onUpdateAndShowComingUpInfo(msg)
+Function onUpdateAndShowComingUpInfo()
   jumpChannelUiToCurrentPlayingVideo()
   channelInfo = getChannelInfo(m.channelIndexFocused)
 
@@ -188,7 +188,7 @@ Function onUpdateAndShowComingUpInfo(msg)
 End Function
 
 
-Function onHideOverlay(msg)
+Function onHideOverlay()
   if m.OverlayParent.opacity > 0
     hideOverlay()
   end if
@@ -237,7 +237,7 @@ Function hideOverlay()
 End Function
 
 
-Function onButtonFocused(msg)
+Function onButtonFocused()
   m.top.reactedToKeyPresss = true
 End Function
 

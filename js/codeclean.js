@@ -21,7 +21,7 @@ function listUnusedImages(done) {
     imageSet.forEach(image => {
         if (!searchforStringInFiles(image, files)){
             // We now have to look for references to images that have size replacement in them as well like pkg:/images/$$RES$$/menu-button.9.png
-            const imageSizePath = image.replace(/([\/\-_])(fhd|hd)/, '$1$$RES$$');
+            const imageSizePath = image.replace(/([\/\-_])(fhd|hd)/, '$1$$$RES$$$');
             if (!searchforStringInFiles(imageSizePath, files)){
                 log(image);
             }

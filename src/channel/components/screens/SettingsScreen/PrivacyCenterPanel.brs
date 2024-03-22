@@ -137,7 +137,7 @@ Function onQrCodeSelected(msg)
 End Function
 
 
-Function onFocusedIndexChange(msg)
+Function onFocusedIndexChange()
   if m.qrCodeSections.componentGainingFocus <> invalid
     ' Getting the translation of the item that gained focus within the layout group.
     translation = m.qrCodeSections.componentGainingFocus.translation

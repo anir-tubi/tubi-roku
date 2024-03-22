@@ -33,7 +33,7 @@ Function onThemeChange(msg = invalid)
   end if
 End Function
 
-Function onShow(msg)
+Function onShow(_msg)
   tubilog("TubiToast.onShow")
   imageWidth = 0
   imageHeight = 0

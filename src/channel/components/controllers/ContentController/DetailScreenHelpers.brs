@@ -952,12 +952,6 @@ Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
     else if detailScreen.isWaitingForServerResponse <> true
       detailScreen.stringQueueButton = getTranslation("screenDetails_button_queueNow")
 
-      authInfo = getFieldFromGlobal("authInfo")
-      userId = 0
-      if authInfo <> invalid AND authInfo.userId <> invalid
-        userId = authInfo.userId.toInt()
-      end if
-
       contentType = ""
       typeOfQueue = m.constants.userQueueType.watchLater
       content = detailScreen.content
@@ -974,7 +968,7 @@ Function onAddToQueue(detailScreen, callBackAfterSignIn = invalid)
         contentType = content.type
       end if
 
-      addToQueueReq = m.userDeviceApi.addToQueueReqInfo(userId, detailScreen.content.id, contentType, typeOfQueue)
+      addToQueueReq = m.userDeviceApi.addToQueueReqInfo(detailScreen.content.id, contentType, typeOfQueue)
 
       callBackSuccessFunction = callBackAfterSignIn
       if callBackSuccessFunction = invalid
@@ -1681,7 +1675,7 @@ Function onEpisodeList(msg)
 End Function
 
 
-Function onSignUpButtonSelected(msg)
+Function onSignUpButtonSelected()
   tubiLog("DetailScreenHelper.onSignUpButtonSelected")
   startSignIn(onRegistrationProcessCompletedOnDetailsScreen)
 End function

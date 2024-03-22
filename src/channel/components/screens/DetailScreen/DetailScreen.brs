@@ -790,7 +790,7 @@ Function onMenuItemFocused()
 End Function
 
 
-Function onMenuFocusChange(msg)
+Function onMenuFocusChange()
   focusedItem = invalid
   componentInteractionValue = ""
 

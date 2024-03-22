@@ -386,11 +386,10 @@ End Function
 
 '@Test addToQueueReqMovie unit tests
 Function userDeviceApi_addToQueueReqMovie_test()
-  userId = 1234
   contentId = "321221"
   contentType = "movie"
   typeOfQueue = "watch_later"
-  movieAddToQueueReq = m.userDeviceApi.addToQueueReqInfo(userId, contentId, contentType, typeOfQueue)
+  movieAddToQueueReq = m.userDeviceApi.addToQueueReqInfo(contentId, contentType, typeOfQueue)
 
   m.assertNotInvalid(movieAddToQueueReq)
 
@@ -413,11 +412,10 @@ End Function
 
 '@Test addToQueueReqSeries unit tests
 Function userDeviceApi_addToQueueReqSeries_test()
-  userId = 1234
   contentId = "01079"
   contentType = "series"
   typeOfQueue = "watch_later"
-  seriesAddToQueueReqInfo = m.userDeviceApi.addToQueueReqInfo(userId, contentId, contentType, typeOfQueue)
+  seriesAddToQueueReqInfo = m.userDeviceApi.addToQueueReqInfo(contentId, contentType, typeOfQueue)
 
   m.assertNotInvalid(seriesAddToQueueReqInfo)
 

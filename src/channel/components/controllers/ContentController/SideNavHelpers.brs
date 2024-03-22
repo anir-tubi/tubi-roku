@@ -234,7 +234,7 @@ Function onSideNavItemSelected()
         displayMenuItemDisabled(m.constants.ui.sideNavIds.channels)
       else
         setUiMode(m.constants.ui.modes.standard)
-        showChannelListScreen(m.constants, m.constants.ui.terms.menu)
+        showChannelListScreen(m.constants)
         bNewScreenCalledSuccess = true
       end if
     else if itemSelectedId = m.constants.ui.sideNavIds.categories
@@ -242,7 +242,7 @@ Function onSideNavItemSelected()
         setUiMode(m.constants.ui.modes.standard)
       end if
 
-      showCategoryListScreen(m.constants, m.constants.ui.terms.menu)
+      showCategoryListScreen(m.constants)
       bNewScreenCalledSuccess = true
     else if itemSelectedId = m.constants.ui.sideNavIds.espanol
       if isKidsUIOn() = true

@@ -824,7 +824,7 @@ End Function
 
 
 ' A new channel is selected from the channel guide. Start playing that new channel
-Function onLinearChannelSelectedFromGuide(msg)
+Function onLinearChannelSelectedFromGuide()
   tubiLog("LinearVideoPlayerScreenHelpers.onLinearChannelSelectedFromGuide")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
   channel = videoPlayer.channelSelected

@@ -225,7 +225,7 @@ Function onGetScreensaverHomeScreenContainerIdsRequestSuccessResponse(response)
 End Function
 
 
-Function onScreensaverRequestErrorResponse(response)
+Function onScreensaverRequestErrorResponse(_response)
   tubiLog("Failed to load screensaver feed")
   closeScreensaverScreen()
 End Function

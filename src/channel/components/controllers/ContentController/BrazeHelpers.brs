@@ -97,7 +97,7 @@ Function processInAppMessage(message)
     extras = message.extras
     ' Checking to make sure we have a template config key before proceeding.
     if extras <> invalid AND extras.template <> invalid
-      
+
       data = getBrazeModalData(message)
       if extras.template = "toast"
         showToastStyleModal(data.modalInfo, data.buttonList)
@@ -173,7 +173,7 @@ Function onBrazeInAppMessageButtonSelected(parameters)
       uriParameters = {}
       for each queryPair in queryKeyValuePairs
         keyValues = queryPair.split("=")
-        
+
         ' Making sure the we have a validate syntax. ex: "action=navigate".
         if isNonEmptyArray(keyValues) = true AND keyValues.count() = 2
           uriParameters[keyValues[0]] = keyValues[1]
@@ -226,10 +226,10 @@ Function processNavigateAction(uriParameters)
     else if page = "liveTv"
       showDefaultEPGScreen()
     else if page = "categories"
-      showCategoryListScreen(m.constants, m.constants.ui.terms.menu)
+      showCategoryListScreen(m.constants)
       focusSideNavOption(m.constants.ui.sideNavIds.categories)
     else if page = "channels"
-      showChannelListScreen(m.constants, m.constants.ui.terms.menu)
+      showChannelListScreen(m.constants)
       focusSideNavOption(m.constants.ui.sideNavIds.channels)
     else if page = "signin" OR page = "signup"
       isUserSigedIn = isLoggedInUser()
@@ -254,7 +254,7 @@ Function processNavigateAction(uriParameters)
       setUiMode(m.constants.ui.modes.latino)
     else
       setUiMode(m.constants.ui.modes.standard)
-    end if 
+    end if
   end if
 End Function
 
@@ -272,7 +272,7 @@ Function processPlayAndDetailsScreenAction(uriParameters)
   if contentId <> invalid
     if mediaType = "series"
       contentType = "series"
-      
+
       ' Appending zero to series id if one is not appended when configured.
       if contentId.startsWith("0") = false
         contentId = "0" + contentId

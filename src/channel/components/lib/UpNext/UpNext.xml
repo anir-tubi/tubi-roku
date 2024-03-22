@@ -131,8 +131,6 @@
             numRows="1"/>
           <Group
             id="metadataSeries"
-            layoutDirection="vert"
-            itemSpacings="[12]"
             translation="[597,0]">
             <Label
               id="CountdownLabelSeries"

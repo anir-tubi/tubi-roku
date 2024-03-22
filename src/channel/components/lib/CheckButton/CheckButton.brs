@@ -40,8 +40,8 @@ End Function
 Function updateTheme(theme)
   if theme <> invalid
     m.focusedThemeColor = theme.focusedTextColor
-    m.unfocusedThemeColor = theme.primaryTextColor   
-    m.background.blendColor = theme.neutralSolidColor2   
+    m.unfocusedThemeColor = theme.primaryTextColor
+    m.background.blendColor = theme.neutralSolidColor2
   end if
   applyStyling()
 End Function
@@ -103,7 +103,7 @@ End Function
 
 Function onFocusPercentChange(msg)
   hasFocus = listHasFocus()
-  
+
   if hasFocus = true
     focusPercent = msg.getData()
     m.background.opacity = 1 - focusPercent
@@ -116,7 +116,7 @@ Function onFocusPercentChange(msg)
 End Function
 
 
-Function onListHasFocusChange(msg)
+Function onListHasFocusChange(_msg)
   if m.top.itemHasFocus = true
     m.background.opacity = 0
   else
@@ -124,7 +124,7 @@ Function onListHasFocusChange(msg)
   end if
 
   hasFocus = listHasFocus()
-  
+
   if hasFocus = true AND m.top.itemHasFocus = true
     m.labelFocused.opacity = 1
     m.checkIconFocused.opacity = 1

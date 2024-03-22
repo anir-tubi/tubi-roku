@@ -51,7 +51,7 @@ Function showMyStuffScreen()
 
   ' make queue API request only if bLoadData is set to true
   if bLoadData = true
-    fetchMyStuffCategoryDetails(screen)
+    fetchMyStuffCategoryDetails()
   else if bLoggedInUser = true
     jumpToPreviousFocusedItem(screen)
     showHideSpinner(false)
@@ -70,9 +70,8 @@ Function showMyStuffScreen()
 End Function
 
 
-' Get the content for the MyStuff Screen: continue watching and queue containers
-' @param screen, roSGNode - the MyStuff Screen
-Function fetchMyStuffCategoryDetails(screen)
+' Get the content for the MyStuff Screen: continue watching and queue container
+Function fetchMyStuffCategoryDetails()
   tubiLog("MyStuffScreenHelpers.fetchMyStuffCategoryDetails")
 
   isKidsMode = shouldKidsModeBeSentToServer()
@@ -114,7 +113,7 @@ Function onMyStuffBatchResponse(response)
       response.addField("validUntil", "integer", false)
       response.validUntil = nValidUntil
     end if
-    
+
     screen.isLoading = false
     screen.content = response
     screen.contentUpdated = true
@@ -303,13 +302,13 @@ Function determineValidUntilDurationBasedOnChildren(content)
 End function
 
 
-Function onSignUpButtonSelectedOnMyStuffScreen(msg)
+Function onSignUpButtonSelectedOnMyStuffScreen()
   tubiLog("MyStuffScreenHelpers.onSignUpButtonSelectedOnMyStuffScreen")
   startSignIn(onRegistrationProcessCompletedOnMyStuffScreen)
 End function
 
 
-Function onHomeButtonSelectedOnMyStuffScreen(msg)
+Function onHomeButtonSelectedOnMyStuffScreen()
   tubiLog("MyStuffScreenHelpers.onHomeButtonSelectedOnMyStuffScreen")
   '//Take user to the homescreen
   homeSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.homeScreen]
@@ -337,7 +336,7 @@ Function refreshContentSignalForMyStuffScreen(screen)
   screen.content = invalid
   screen.contentUpdated = true
   stopVideoPreview()  '//In case a video preview is playing, stop it until the new content has loaded.
-  fetchMyStuffCategoryDetails(screen)
+  fetchMyStuffCategoryDetails()
 End Function
 
 

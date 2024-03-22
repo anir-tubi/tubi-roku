@@ -297,26 +297,6 @@ Function getTranslation_en_US()
       "description": "Menu option on the app's top nav for pillshaped, (length of text should not be too long). Allows the user to display the home screen.",
       "message": "For You"
     },
-    "menu_recommended": {
-      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
-      "message": "Recommended"
-    },
-    "menu_epg_all":{
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the all EPG screen.",
-      "message": "All"
-    },
-    "menu_epg_sports":{
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Sports EPG screen.",
-      "message": "Sports"
-    },
-    "menu_epg_news":{
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the News EPG screen.",
-      "message": "News"
-    },
-    "menu_epg_entertainment":{
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Entertainment EPG screen.",
-      "message": "Entertainment"
-    },
     "component_library_failed":{
       "description": "Latest Version of Tubi app failed to load due to some error",
       "message": "{errCode}\nThe Tubi channel failed to load fully. Some functionality may be missing."
@@ -372,14 +352,6 @@ Function getTranslation_en_US()
     "menu_livetv": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the live TV screen.",
       "message": "Live TV"
-    },
-    "menu_movies_and_tv": {
-      "description": "Menu option on the app's navigation, (length of text should not be too long). Allows the user to display the home screen.",
-      "message": "Movies & TV"
-    },
-    "menu_mylist": {
-      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the mylist/queue screen.",
-      "message": "My List"
     },
     "menu_mystuff": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the my stuff screen.",
@@ -656,10 +628,6 @@ Function getTranslation_en_US()
     "error_check_birthdate_description": {
       "description": "message letting the user know that they were not able to be signed in",
       "message": "There was an issue when trying to sign you in. Please enter the channel and sign in again."
-    },
-    "screenSearch_defaultSearch": {
-      "description": "Directions on the search page",
-      "message": "Search for movies, TV shows, and people"
     },
     "screenSearch_defaultLinearSearch": {
       "description": "Directions on the search page",
@@ -1385,10 +1353,6 @@ Function getTranslation_en_US()
       "description": "Label of a Button to view the channel guide",
       "message": "Full TV Guide"
     },
-    "linearVideoPlayer_channelGuideTitle": {
-      "description": "The title displayed above a list of live TV channels",
-      "message": "Channel Guide"
-    },
     "linearVideoPlayer_buttonTvGuide": {
       "description": "Label of a Button to view the TV channel guide",
       "message": "TV Guide"
@@ -1408,30 +1372,6 @@ Function getTranslation_en_US()
     "linearVideoPlayer_timeLeft": {
       "description": "Label to display time left in linear video player info panel",
       "message": "{time} left"
-    },
-    "goBack_categories": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESS BACK FOR CATEGORIES"
-    },
-    "goBack_channels": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESS BACK FOR CHANNELS"
-    },
-    "goBack_default": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESS BACK TO GO BACK"
-    },
-    "goBack_videoPlayer_upNext": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "DISMISS"
-    },
-    "goBack_menu": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESS BACK FOR MENU"
-    },
-    "goBack_home": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESS BACK FOR HOME"
     },
     "channel_name": {
       "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
@@ -1546,10 +1486,6 @@ Function getTranslation_en_US()
     "screen_refresh_after_email_verification": {
       "description": "Message shown on the email verification to let the user know screen will refresh after the email verification",
       "message": "This screen will refresh once you have verified your email."
-    },
-    "goBack_signIn": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESS BACK FOR SIGNIN"
     },
     "rated_Label": {
       "description": "Label shown on video player when tv rating/descriptor is shown",
@@ -1702,10 +1638,6 @@ Function getTranslation_en_US()
     "onBoarding_landingScreen_addListLabel": {
       "description": "Label displayed on onBoarding Landing screen informing add to your list",
       "message": "Add to Your List"
-    },
-    "onBoarding_landingScreen_addListBody": {
-      "description": "Body displayed on onBoarding Landing screen informing save now and watch later",
-      "message": "Save Now, Watch Later"
     },
     "onBoarding_landingScreen_saveProgressLabel": {
       "description": "Label displayed on onBoarding Landing screen informing save your progress",
@@ -1935,26 +1867,6 @@ Function getTranslation_es_MX()
       "description": "Menu option on the app's top nav for pillshaped, (length of text should not be too long). Allows the user to display the home screen.",
       "message": "Para ti"
     },
-    "menu_recommended": {
-      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
-      "message": "Recomendado"
-    },
-    "menu_epg_all": {
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the all EPG screen.",
-      "message": "Todo"
-    },
-    "menu_epg_sports": {
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Sports EPG screen.",
-      "message": "Deportes"
-    },
-    "menu_epg_news": {
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the News EPG screen.",
-      "message": "Noticias"
-    },
-    "menu_epg_entertainment": {
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Entertainment EPG screen.",
-      "message": "Entretenimiento"
-    },
     "component_library_failed": {
       "description": "Latest Version of Tubi app failed to load due to some error",
       "message": "{errCode}\nEl canal de Tubi no se cargó completamente. Es posible que falte alguna funcionalidad."
@@ -2010,14 +1922,6 @@ Function getTranslation_es_MX()
     "menu_livetv": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the live TV screen.",
       "message": "TV En Vivo"
-    },
-    "menu_movies_and_tv": {
-      "description": "Menu option on the app's navigation, (length of text should not be too long). Allows the user to display the home screen.",
-      "message": "Películas & Series"
-    },
-    "menu_mylist": {
-      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the mylist/queue screen.",
-      "message": "Mi Lista"
     },
     "menu_mystuff": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the my stuff screen.",
@@ -2294,10 +2198,6 @@ Function getTranslation_es_MX()
     "error_check_birthdate_description": {
       "description": "message letting the user know that they were not able to be signed in",
       "message": "Hubo un error al inciar la sesión. Por favor, ingresa al canal y inicia la sesión de nuevo."
-    },
-    "screenSearch_defaultSearch": {
-      "description": "Directions on the search page",
-      "message": "Busca películas, series y personas"
     },
     "screenSearch_defaultLinearSearch": {
       "description": "Directions on the search page",
@@ -3007,10 +2907,6 @@ Function getTranslation_es_MX()
       "description": "Label of a Button to view the channel guide",
       "message": "Guía Completa de TV"
     },
-    "linearVideoPlayer_channelGuideTitle": {
-      "description": "The title displayed above a list of live TV channels",
-      "message": "Guía de Canales"
-    },
     "linearVideoPlayer_buttonTvGuide": {
       "description": "Label of a Button to view the TV channel guide",
       "message": "Guía TV"
@@ -3031,33 +2927,9 @@ Function getTranslation_es_MX()
       "description": "Label to display time left in linear video player info panel",
       "message": "{time} quedan"
     },
-    "goBack_categories": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA ATRÁS PARA VOLVER A LAS CATEGORÍAS"
-    },
-    "goBack_channels": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA ATRÁS PARA VOLVER A LOS CANALES"
-    },
-    "goBack_default": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA ATRÁS PARA REGRESAR"
-    },
-    "goBack_videoPlayer_upNext": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "DESCARTAR"
-    },
     "goBack_videoPlayer_controls": {
       "description": "Navigational instructions to users on what the back button does on the current page",
       "message": "PRESIONA ATRÁS PARA ESCONDER"
-    },
-    "goBack_menu": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA ATRÁS PARA VOLVER AL MENÚ"
-    },
-    "goBack_home": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA ATRÁS PARA VOLVER A INICIO"
     },
     "channel_name": {
       "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
@@ -3172,10 +3044,6 @@ Function getTranslation_es_MX()
     "screen_refresh_after_email_verification": {
       "description": "Message shown on the email verification to let the user know screen will refresh after the email verification",
       "message": "Esta pantalla se actualizará una vez que hayas verificado tu correo electrónico."
-    },
-    "goBack_signIn": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA ATRÁS PARA VOLVER A INICIAR SESIÓN"
     },
     "rated_Label": {
       "description": "Label shown on video player when tv rating/descriptor is shown",
@@ -3325,37 +3193,9 @@ Function getTranslation_es_MX()
       "description": "Button text displayed on onBoarding screens takes to Initial Content Type Selector Screen or Home Screen",
       "message": "Continuar como invitado"
     },
-    "onBoarding_freeForeverScreen_heading": {
-      "description": "Label displayed on onBoarding Free Forever screen",
-      "message": "Gratis Siempre con Menos\nAnuncios que el Cable"
-    },
-    "onBoarding_freeForeverScreen_description": {
-      "description": "Description displayed on onBoarding Free Forever screen",
-      "message": "3 veces más contenido y 3 veces menos anuncios. Sin costos. $0/mes.\nSin muros de pago, sin paquetes."
-    },
-    "onBoarding_availableDeviceScreen_heading": {
-      "description": "Label displayed on onBoarding Available Device screen",
-      "message": "Disponible en todos\ntus dispositivos"
-    },
-    "onBoarding_availableDeviceScreen_description": {
-      "description": "Description displayed on onBoarding Available Device screen",
-      "message": "Ver en tu teléfono, televisión, tableta\no computadora."
-    },
-    "onBoarding_landingScreen_heading": {
-      "description": "Label displayed on onBoarding Landing screen",
-      "message": "Tubi es mejor cuando\nte inscribes"
-    },
-    "onBoarding_landingScreen_description": {
-      "description": "Description displayed on onBoarding Landing screen",
-      "message": "Tarjeta de Crédito No Requerida • Gratis Siempre"
-    },
     "onBoarding_landingScreen_addListLabel": {
       "description": "Label displayed on onBoarding Landing screen informing add to your list",
       "message": "Agregar a Mi Lista"
-    },
-    "onBoarding_landingScreen_addListBody": {
-      "description": "Body displayed on onBoarding Landing screen informing save now and watch later",
-      "message": "Guardar Ahora, Ver Más Tarde"
     },
     "onBoarding_landingScreen_saveProgressLabel": {
       "description": "Label displayed on onBoarding Landing screen informing save your progress",
@@ -3555,26 +3395,6 @@ Function getTranslation_fr_CA()
       "description": "Menu option on the app's top nav for pillshaped, (length of text should not be too long). Allows the user to display the home screen.",
       "message": "Pour vous"
     },
-    "menu_recommended": {
-      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
-      "message": "Recommandés"
-    },
-    "menu_epg_all": {
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the all EPG screen.",
-      "message": "Tout"
-    },
-    "menu_epg_sports": {
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Sports EPG screen.",
-      "message": "Sports"
-    },
-    "menu_epg_news": {
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the News EPG screen.",
-      "message": "Informations"
-    },
-    "menu_epg_entertainment": {
-      "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Entertainment EPG screen.",
-      "message": "Divertissements"
-    },
     "component_library_failed": {
       "description": "Latest Version of Tubi app failed to load due to some error",
       "message": "{errCode}\nCanal du tubi n'a pas réussi à se charger complètement. Certaines fonctionnalités peuvent être manquantes."
@@ -3630,14 +3450,6 @@ Function getTranslation_fr_CA()
     "menu_livetv": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the live TV screen.",
       "message": "TV en direct"
-    },
-    "menu_movies_and_tv": {
-      "description": "Menu option on the app's navigation, (length of text should not be too long). Allows the user to display the home screen.",
-      "message": "Films et TV"
-    },
-    "menu_mylist": {
-      "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the mylist/queue screen.",
-      "message": "Ma liste"
     },
     "menu_mystuff": {
       "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the my stuff screen.",
@@ -3914,10 +3726,6 @@ Function getTranslation_fr_CA()
     "error_check_birthdate_description": {
       "description": "message letting the user know that they were not able to be signed in",
       "message": "Un problème est survenu lors de la tentative de connexion. Veuillez entrer dans la chaîne et vous connecter à nouveau."
-    },
-    "screenSearch_defaultSearch": {
-      "description": "Directions on the search page",
-      "message": "Rechercher des films, des programmes TV et des personnes"
     },
     "screenSearch_defaultLinearSearch": {
       "description": "Directions on the search page",
@@ -4627,10 +4435,6 @@ Function getTranslation_fr_CA()
       "description": "Label of a Button to view the channel guide",
       "message": "Guide TV complet"
     },
-    "linearVideoPlayer_channelGuideTitle": {
-      "description": "The title displayed above a list of live TV channels",
-      "message": "Guide des chaînes"
-    },
     "linearVideoPlayer_buttonTvGuide": {
       "description": "Label of a Button to view the TV channel guide",
       "message": "Guide TV"
@@ -4651,33 +4455,9 @@ Function getTranslation_fr_CA()
       "description": "Label to display time left in linear video player info panel",
       "message": "{time} restantes"
     },
-    "goBack_categories": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "APPUYER SUR RETOUR POUR LES CATÉGORIES"
-    },
-    "goBack_channels": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "APPUYER SUR RETOUR POUR LES CHAÎNES"
-    },
-    "goBack_default": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "APPUYER SUR RETOUR POUR REVENIR EN ARRIÈRE"
-    },
-    "goBack_videoPlayer_upNext": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "REJETER"
-    },
     "goBack_videoPlayer_controls": {
       "description": "Navigational instructions to users on what the back button does on the current page",
       "message": "APPUYER SUR RETOUR POUR CACHER"
-    },
-    "goBack_menu": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "APPUYER SUR RETOUR POUR ALLER AU MENU"
-    },
-    "goBack_home": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "APPUYER SUR RETOUR POUR ALLER À ACCUEIL"
     },
     "channel_name": {
       "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
@@ -4792,10 +4572,6 @@ Function getTranslation_fr_CA()
     "screen_refresh_after_email_verification": {
       "description": "Message shown on the email verification to let the user know screen will refresh after the email verification",
       "message": "Cet écran s'actualisera une fois que vous aurez vérifié votre e-mail."
-    },
-    "goBack_signIn": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "APPUYER SUR RETOUR POUR VOUS CONNECTER"
     },
     "rated_Label": {
       "description": "Label shown on video player when tv rating/descriptor is shown",
@@ -4945,37 +4721,9 @@ Function getTranslation_fr_CA()
       "description": "Button text displayed on onBoarding screens takes to Initial Content Type Selector Screen or Home Screen",
       "message": "Continuer en tant qu'invité"
     },
-    "onBoarding_freeForeverScreen_heading": {
-      "description": "Label displayed on onBoarding Free Forever screen",
-      "message": "GRATUIT pour toujours avec moins\nde publicités que sur le câble"
-    },
-    "onBoarding_freeForeverScreen_description": {
-      "description": "Description displayed on onBoarding Free Forever screen",
-      "message": "3 fois plus de contenu et 3 fois moins de pubs. Aucun frais. 0 EUR/mois.\nPas de verrou d'accès payant, pas de forfait."
-    },
-    "onBoarding_availableDeviceScreen_heading": {
-      "description": "Label displayed on onBoarding Available Device screen",
-      "message": "Disponible sur tous\nvos appareils"
-    },
-    "onBoarding_availableDeviceScreen_description": {
-      "description": "Description displayed on onBoarding Available Device screen",
-      "message": "Regardez sur votre téléphone, votre TV, votre tablette\nou votre ordinateur."
-    },
-    "onBoarding_landingScreen_heading": {
-      "description": "Label displayed on onBoarding Landing screen",
-      "message": "Tubi est plus performant\nsi vous vous inscrivez"
-    },
-    "onBoarding_landingScreen_description": {
-      "description": "Description displayed on onBoarding Landing screen",
-      "message": "Aucune carte de crédit requise • Gratuit pour toujours"
-    },
     "onBoarding_landingScreen_addListLabel": {
       "description": "Label displayed on onBoarding Landing screen informing add to your list",
       "message": "Ajouter à votre Liste"
-    },
-    "onBoarding_landingScreen_addListBody": {
-      "description": "Body displayed on onBoarding Landing screen informing save now and watch later",
-      "message": "Sauvegardez maintenant, regardez plus tard"
     },
     "onBoarding_landingScreen_saveProgressLabel": {
       "description": "Label displayed on onBoarding Landing screen informing save your progress",

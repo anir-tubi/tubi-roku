@@ -1,7 +1,6 @@
 '@sFocusID : string, the item which will be opened in settings screen
 '@screenLevel : integer, this helps for screen hierarchy when pushing the screen in stack
-'@sPageSource : string, this helps from where settings screen page is called
-Function showSettingsScreen(sFocusID = "", screenLevel = 0, sPageSource = "")
+Function showSettingsScreen(sFocusID = "", screenLevel = 0)
   tubiLog("SettingsScreenHelpers.showSettingsScreen")
   m.settingsScreen = CreateObject("roSGNode", "SettingsScreen")
   m.settingsScreen.id = m.constants.ui.screenIds.settingsScreen

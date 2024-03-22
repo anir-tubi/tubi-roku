@@ -76,9 +76,9 @@ Function handleTopNavItemSelected(topNavItem, screen, isFocusRetainedOnTopNav = 
       else if topNavItem.id = m.constants.ui.sideNavIds.espanol
         showEspanolScreen(componentToFocus)
       else if topNavItem.id = m.constants.ui.sideNavIds.channels
-        showChannelListScreen(m.constants, m.constants.ui.terms.menu)
+        showChannelListScreen(m.constants)
       else if topNavItem.id = m.constants.ui.sideNavIds.Categories
-        showCategoryListScreen(m.constants, m.constants.ui.terms.menu)
+        showCategoryListScreen(m.constants)
       else if topNavItem.id = m.constants.ui.sideNavIds.search
         showSearchScreen()
       else if topNavItem.id = m.constants.ui.homeScreenTopNavIds.linearEPG

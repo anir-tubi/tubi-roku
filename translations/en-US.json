@@ -27,26 +27,6 @@
     "description": "Menu option on the app's top nav for pillshaped, (length of text should not be too long). Allows the user to display the home screen.",
     "message": "For You"
   },
-  "menu_recommended": {
-    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the home screen.",
-    "message": "Recommended"
-  },
-  "menu_epg_all":{
-    "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the all EPG screen.",
-    "message": "All"
-  },
-  "menu_epg_sports":{
-    "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Sports EPG screen.",
-    "message": "Sports"
-  },
-  "menu_epg_news":{
-    "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the News EPG screen.",
-    "message": "News"
-  },
-  "menu_epg_entertainment":{
-    "description": "Menu option on the app's top nav, (length of text should not be too long). Allows the user to display the Entertainment EPG screen.",
-    "message": "Entertainment"
-  },
   "component_library_failed":{
     "description": "Latest Version of Tubi app failed to load due to some error",
     "message": "{errCode}\nThe Tubi channel failed to load fully. Some functionality may be missing."
@@ -102,14 +82,6 @@
   "menu_livetv": {
     "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the live TV screen.",
     "message": "Live TV"
-  },
-  "menu_movies_and_tv": {
-    "description": "Menu option on the app's navigation, (length of text should not be too long). Allows the user to display the home screen.",
-    "message": "Movies & TV"
-  },
-  "menu_mylist": {
-    "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the mylist/queue screen.",
-    "message": "My List"
   },
   "menu_mystuff": {
     "description": "Menu option on the app's side nav, (length of text should not be too long). Allows the user to display the my stuff screen.",
@@ -387,10 +359,6 @@
   "error_check_birthdate_description": {
     "description": "message letting the user know that they were not able to be signed in",
     "message": "There was an issue when trying to sign you in. Please enter the channel and sign in again."
-  },
-  "screenSearch_defaultSearch": {
-    "description": "Directions on the search page",
-    "message": "Search for movies, TV shows, and people"
   },
   "screenSearch_defaultLinearSearch": {
     "description": "Directions on the search page",
@@ -1116,10 +1084,6 @@
     "description": "Label of a Button to view the channel guide",
     "message": "Full TV Guide"
   },
-  "linearVideoPlayer_channelGuideTitle": {
-    "description": "The title displayed above a list of live TV channels",
-    "message": "Channel Guide"
-  },
   "linearVideoPlayer_buttonTvGuide": {
     "description": "Label of a Button to view the TV channel guide",
     "message": "TV Guide"
@@ -1139,30 +1103,6 @@
   "linearVideoPlayer_timeLeft": {
     "description": "Label to display time left in linear video player info panel",
     "message": "{time} left"
-  },
-  "goBack_categories": {
-    "description": "Navigational instructions to users on what the back button does on the current page",
-    "message": "PRESS BACK FOR CATEGORIES"
-  },
-  "goBack_channels": {
-    "description": "Navigational instructions to users on what the back button does on the current page",
-    "message": "PRESS BACK FOR CHANNELS"
-  },
-  "goBack_default": {
-    "description": "Navigational instructions to users on what the back button does on the current page",
-    "message": "PRESS BACK TO GO BACK"
-  },
-  "goBack_videoPlayer_upNext": {
-    "description": "Navigational instructions to users on what the back button does on the current page",
-    "message": "DISMISS"
-  },
-  "goBack_menu": {
-    "description": "Navigational instructions to users on what the back button does on the current page",
-    "message": "PRESS BACK FOR MENU"
-  },
-  "goBack_home": {
-    "description": "Navigational instructions to users on what the back button does on the current page",
-    "message": "PRESS BACK FOR HOME"
   },
   "channel_name": {
     "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
@@ -1277,10 +1217,6 @@
   "screen_refresh_after_email_verification": {
     "description": "Message shown on the email verification to let the user know screen will refresh after the email verification",
     "message": "This screen will refresh once you have verified your email."
-  },
-  "goBack_signIn": {
-    "description": "Navigational instructions to users on what the back button does on the current page",
-    "message": "PRESS BACK FOR SIGNIN"
   },
   "rated_Label": {
     "description": "Label shown on video player when tv rating/descriptor is shown",
@@ -1433,10 +1369,6 @@
   "onBoarding_landingScreen_addListLabel": {
     "description": "Label displayed on onBoarding Landing screen informing add to your list",
     "message": "Add to Your List"
-  },
-  "onBoarding_landingScreen_addListBody": {
-    "description": "Body displayed on onBoarding Landing screen informing save now and watch later",
-    "message": "Save Now, Watch Later"
   },
   "onBoarding_landingScreen_saveProgressLabel": {
     "description": "Label displayed on onBoarding Landing screen informing save your progress",

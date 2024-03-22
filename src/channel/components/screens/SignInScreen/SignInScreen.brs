@@ -175,7 +175,7 @@ Function onContinueButtonSelected(evt)
 End Function
 
 
-Function onForgotPasswordButtonSelected(evt)
+Function onForgotPasswordButtonSelected()
   tubiLog("SignInScreen.onForgotPasswordButtonSelected")
   m.top.forgotPasswordSelected = true
 End Function

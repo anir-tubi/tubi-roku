@@ -1050,7 +1050,7 @@ End Function
 ' @isSignedInUser: boolean, value based on user logged In or not
 '
 ' @returns: roSGNode, a CategoryContentNode with children TubiContentNodes for each content in the container/category
-Function tubiMetadataTranslate_translateCategoryDetails(contentToTranslate, fullJson, isSignedInUser)
+Function tubiMetadataTranslate_translateCategoryDetails(contentToTranslate, isSignedInUser)
   tubiLog("TubiMetadataTranslate.translateCategoryDetails")
   translated = CreateObject("roSGNode", "CategoryContentNode")
   container = contentToTranslate.container
@@ -1086,7 +1086,7 @@ End Function
 ' returns an associative array that can be passed to ContentNode.update() to populate the ContentNode and it's children
 Function tubiMetadataTranslate_buildCategoryAA(container, contents, contentsJson = "", sOrientation = "", bFullData = false, contentMode = "homeScreen", screenId="", isSignedInUser = false)
 
-  categoryParent = m.buildCategoryParentInfo(container, contentMode, sOrientation)
+  categoryParent = m.buildCategoryParentInfo(container, sOrientation)
 
   gridItemType = m.getGridItemType(container, sOrientation, m.constants)
   categoryChildrenInfo = m.buildCategoryChildrenInfo(container, contents, contentsJson, gridItemType, bFullData, isSignedInUser)
@@ -1179,11 +1179,10 @@ End Function
 
 ' @container: assocArray, the container/category metadata as returned by the API, not including metadata
 '                         for each child of the container/category
-' @contentMode: string, one of the contentModes found at m.constants.ui.contentMode
 ' @sOrientation: string, should the thumbnail be a "portrait" or "landscape" (match against m.constants.ui.gridItemTypes values)
 '
 ' @returns: assocArray, an AA that can be used with node.update() to create a TubiCategoryNode
-Function tubiMetadataTranslate_buildCategoryParentInfo(container, contentMode = "homeScreen", sOrientation = "")
+Function tubiMetadataTranslate_buildCategoryParentInfo(container, sOrientation = "")
   updateMetadata = {}
 
   if type(container) = "roAssociativeArray"

@@ -168,7 +168,7 @@ Function hideInfoPanel()
 End Function
 
 
-Function onShowRelated(msg)
+Function onShowRelated()
   if m.YmalGroup.opacity < 1.0
     m.YmalGroupShowAnimation = slideFade(m.YmalGroup, "below", "in", 0.6)
   end if
@@ -190,7 +190,7 @@ Function onHideRelated(msg)
 End Function
 
 
-Function onOpenRelated(msg)
+Function onOpenRelated()
   if m.YmalRow.opacity < 1.0
     fade(m.YmalRow, "in", 0.2, 0, 1.0)
   end if
@@ -200,7 +200,7 @@ Function onOpenRelated(msg)
 End Function
 
 
-Function onCloseRelated(msg)
+Function onCloseRelated()
   if m.YmalRow.opacity = 1.0
     fade(m.YmalRow, "out", 0.2, 0, 0.2)
   end if
@@ -210,7 +210,7 @@ Function onCloseRelated(msg)
 End Function
 
 
-Function onShowRelatedInFullScreen(msg)
+Function onShowRelatedInFullScreen()
   m.YmalGroup.translation = m.ymalXYPositionWhenOpen
   fade(m.YmalGroup, "in", 0.6)
   fade(m.YmalRow, "in", 0.2, 0, 1.0)

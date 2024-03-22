@@ -299,7 +299,7 @@ Function userDeviceApi_updateParentalRatingReqInfo(parentalRating, password)
 End Function
 
 
-Function userDeviceApi_addToQueueReqInfo(userId, contentId, contentType, typeOfQueue)
+Function userDeviceApi_addToQueueReqInfo(contentId, contentType, typeOfQueue)
   url = m.constants.urls.userQueues.queues
 
   options = {}

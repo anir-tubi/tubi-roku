@@ -743,7 +743,7 @@ End Function
 
 
 'TODO: temporary solution; Delete this function after exp roku_progress_bar_on_infopanel
-Function onCWEpisodeError(response)
+Function onCWEpisodeError(_response)
   'Future use. For the this experiment Do not do anything right now.
 End Function
 

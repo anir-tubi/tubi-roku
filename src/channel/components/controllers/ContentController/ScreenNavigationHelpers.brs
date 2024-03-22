@@ -1,5 +1,5 @@
 Function navigateToCategoryDetailsScreen(categoryId)
-  showCategoryListScreen(m.constants, m.constants.ui.terms.menu, false)
+  showCategoryListScreen(m.constants, false)
   contentNode = CreateObject("roSGNode", "CategoryContentNode")
   contentNode.id = categoryId
   showCategoryDetailsScreen(contentNode, false)
@@ -11,7 +11,7 @@ End Function
 
 
 Function navigateToNetworkDetailsScreen(networkId)
-  showChannelListScreen(m.constants, m.constants.ui.terms.menu, false)
+  showChannelListScreen(m.constants, false)
   contentNode = CreateObject("roSGNode", "CategoryContentNode")
   contentNode.id = networkId
   showCategoryDetailsScreen(contentNode, false)

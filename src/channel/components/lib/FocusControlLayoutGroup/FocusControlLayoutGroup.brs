@@ -6,7 +6,7 @@ Function init()
 End Function
 
 
-Function onFocusedChildChange(msg)
+Function onFocusedChildChange(_msg)
   ' We only care if the component itself has focus
   if m.top.hasFocus() = true then
     index = m.top.focusedIndex

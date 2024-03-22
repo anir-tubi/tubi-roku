@@ -596,7 +596,7 @@ Function onAppRestartRequested(msg)
 End Function
 
 
-Function onDidUserSelectSaveAndRestart(msg)
+Function onDidUserSelectSaveAndRestart()
   ' since privacy center is dyanmically created we cannot use alias.
   m.top.didUserSelectSaveAndRestart = true
 End Function

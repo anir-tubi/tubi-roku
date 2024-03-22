@@ -182,7 +182,7 @@ Function onLoadingChange(msg)
 End Function
 
 
-Function onContentUpdateChange(msg) As Void
+Function onContentUpdateChange() As Void
   tubiLog("MyStuffScreen.onContentUpdateChange")
   content = m.top.content
   if content <> invalid
@@ -421,13 +421,13 @@ Function onRowItemSelected(msg)
 End Function
 
 
-Function onGuestMenuItemSelected(msg)
+Function onGuestMenuItemSelected()
   tubiLog("MyStuffScreen.onGuestMenuItemSelected")
   setSignUpButtonSelectedIndicator()
 End Function
 
 
-Function onAllEmptyMenuItemSelected(msg)
+Function onAllEmptyMenuItemSelected()
   tubiLog("MyStuffScreen.onAllEmptyMenuItemSelected")
   setAllEmptyMenuItemSelectedIndicator()
 End Function

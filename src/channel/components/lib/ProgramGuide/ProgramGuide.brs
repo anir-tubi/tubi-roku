@@ -207,7 +207,7 @@ Function onTimeGridFocusChange()
 End Function
 
 
-Function onProgramGridRowFocused(msg)
+Function onProgramGridRowFocused(_msg)
   newFocus = m.programGrid.rowScrollFocused
 
   if m.channelsGrid.preItemFocused <> newFocus
@@ -221,7 +221,7 @@ Function onProgramGridRowFocused(msg)
 End Function
 
 
-Function onChannelsGridRowFocused(msg)
+Function onChannelsGridRowFocused(_msg)
 
   newFocus = m.channelsGrid.rowScrollFocused
 

@@ -1732,7 +1732,7 @@ Function hideTopOverlay()
 End Function
 
 
-Function onShowYMALInFullScreen(msg)
+Function onShowYMALInFullScreen()
   fade(m.VideoYMALOverlay, "in", 0.4)
   m.HUD.translation = [0, -621]
   fade(m.HUD, "in", 0.6)

@@ -770,7 +770,7 @@ Function onChannelLikeChangedSuccess(requestBody)
 End Function
 
 
-Function onChannelLIkeChangedError(msg)
+Function onChannelLIkeChangedError()
   tubiLog("LinearChannel Like/disLike updates to server failed", "warn")
 End Function
 

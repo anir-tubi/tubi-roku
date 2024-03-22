@@ -166,7 +166,7 @@ Function onSelectedPreferenceInfoChange(msg)
       consentKey = keys[0]
       ' As a safety check if we have a mapping value for the consent key if not falling back to backend key.
       buttonValue = m.Tracking.getConsentAnalyticValue(consentKey)
-            
+
       componentValues = {
         button_type: "TOGGLE"
         button_value: buttonValue
@@ -174,7 +174,7 @@ Function onSelectedPreferenceInfoChange(msg)
       pageValues = screen.trackingPageInfo.pageValues
       pageOneof = m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pageType, pageValues)
       componentOneof = m.Tracking.getAnalyticsComponent("button_component", componentValues)
-    
+
       componentInteractionEvent =  {
         pageOneof: pageOneof
         componentOneof: componentOneof
@@ -215,7 +215,7 @@ Function onManagePreferenceSaveAndContinueSelected(msg)
 End Function
 
 
-Function onSetConsentSuccess(response)
+Function onSetConsentSuccess(_response)
   if m.onSetConsentCompletionCallback <> invalid
     setConsentCompletionCallback = m.onSetConsentCompletionCallback
     m.onSetConsentCompletionCallback = invalid
@@ -272,7 +272,7 @@ End Function
 
 
 Function isUserAllowedToManageConsent()
-  ' Since we have country specific Kids age. For ex: In GDPR countries less than 18 is kids. 
+  ' Since we have country specific Kids age. For ex: In GDPR countries less than 18 is kids.
   ' Since outside of GDPR countries it is less than 13 is considered as kids mode. We will not create seperate mapping.
   isUserAllowedToManageConsent = (isUserInAdultsMode() = true OR isParentalControlsTeensLevel() = true)
 

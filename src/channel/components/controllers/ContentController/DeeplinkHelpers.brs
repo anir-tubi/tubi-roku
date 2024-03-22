@@ -546,7 +546,7 @@ Function handleCategoryDeeplinkContent()
     if m.enteredFromDeepLink = true
       sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.category, m.Tracking, m.trackingLoggingTask, m.constants)
     end if
-    showCategoryListScreen(m.constants, m.constants.ui.terms.menu, true)
+    showCategoryListScreen(m.constants, true)
   end if
   sCatSideNavID = m.constants.ui.sideNavIds.categories
 
@@ -577,7 +577,7 @@ Function handleNetworkDeeplinkContent()
       if m.enteredFromDeepLink = true
         sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.channel, m.Tracking, m.trackingLoggingTask, m.constants)
       end if
-      showChannelListScreen(m.constants, m.constants.ui.terms.menu, true)
+      showChannelListScreen(m.constants, true)
     end if
     setUiMode(m.constants.ui.modes.standard)
   end if

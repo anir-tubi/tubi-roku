@@ -140,7 +140,7 @@ Function onIsLoading()
 End Function
 
 
-Function onItemFocused(msg)
+Function onItemFocused(_msg)
   tubiLog("CategoryDetailsScreen.onItemFocused")
   if m.top.content <> invalid
     item = m.VideoGrid.itemFocused

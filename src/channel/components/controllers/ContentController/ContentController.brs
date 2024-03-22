@@ -1942,7 +1942,7 @@ End Function
 
 
 ' This is the fail safe startChannel function to be called if the previously played linear video could not be played
-Function startChannelFromAppLoad(response = invalid)
+Function startChannelFromAppLoad()
   startChannel()
 
   if m.top.isComponentLibFailedToLoad = true
@@ -1954,7 +1954,7 @@ End Function
 
 
 ' This is the fail safe startChannel function to be called if the previously played linear video could not be played
-Function startChannelFromInstantResume(response = invalid)
+Function startChannelFromInstantResume()
   sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
   startChannel()
 End Function

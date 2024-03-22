@@ -131,14 +131,14 @@ Function onSideNavSelectChange()
 End Function
 
 
-Function onShowOverlay(msg)
+Function onShowOverlay()
   if m.top.isDisplaying = false
     displayOverlay(m.top.displayWithDelay)
   end if
 End Function
 
 
-Function onHideOverlay(msg)
+Function onHideOverlay()
   if m.firstTimeEPGLaunched = true
     'EPG is still loading, so keep the overlay with spinning  wheel
   else if m.top.isDisplaying = true
