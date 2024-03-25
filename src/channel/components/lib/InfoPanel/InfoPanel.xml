@@ -300,7 +300,8 @@
           <Poster
             id="SignInLock"
             width="20"
-            height="25"
+            height="24"
+            translation="[0,9]"
             uri="pkg:/images/icon-lock.webp"
             loadDisplayMode="scaleToFit" />
           <Label
