@@ -390,49 +390,47 @@ End Function
 
 
 Function changeLikeDislikeButtonText()
-  if m.top.selectedContentType <> m.constants.ui.contentTypes.sportsEvent
-    sButtonText = ""
-    sIconUrl = ""
-    if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked OR m.top.likeDislikeState = m.constants.ui.likeDislikeStates.disliked
-      if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked
-        '//The Like State is "liked", so display liked state
-        sButtonText = getTranslation("screenDetails_button_liked")
-        m.LikeDislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.likeRemoveRatingMenuItem]
-        sIconUrl = "pkg:/images/icon-liked.webp"
-      else
-        '//The Like State is "disliked", so display disliked state
-        sButtonText = getTranslation("screenDetails_button_disliked")
-
-        m.LikeDislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.dislikeRemoveRatingMenuItem]
-        sIconUrl = "pkg:/images/icon-disliked.webp"
-      end if
-
-      if m.Menu.content <> invalid AND m.Menu.itemFocused >= 0
-
-        focusedMenuItem = m.Menu.content.getChild(m.Menu.itemFocused)
-        if m.Menu.isInFocusChain() = true AND focusedMenuItem <> invalid AND focusedMenuItem.id = m.constants.ui.detailScreenMenuItemIds.likeDislikeMenuItem
-          sButtonText = sButtonText + getTranslation("screenDetails_button_like_instructions")
-        end if
-
-      end if
-
-    else if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.changing
-      sButtonText = getTranslation("screenDetails_button_changingRating")
-      sIconUrl = m.LikeDislikeMenuItem.iconUrl '//Keep the icon as it is while the like state is set to changing
+  sButtonText = ""
+  sIconUrl = ""
+  if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked OR m.top.likeDislikeState = m.constants.ui.likeDislikeStates.disliked
+    if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.liked
+      '//The Like State is "liked", so display liked state
+      sButtonText = getTranslation("screenDetails_button_liked")
+      m.LikeDislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.likeRemoveRatingMenuItem]
+      sIconUrl = "pkg:/images/icon-liked.webp"
     else
-      '//The Like State is nothing so display default state
-      sButtonText = ""
+      '//The Like State is "disliked", so display disliked state
+      sButtonText = getTranslation("screenDetails_button_disliked")
 
-      sButtonText = getTranslation("screenDetails_button_likeDislike")
-
-      m.LikeDislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.LikeDislikeMenuItem.id]
-      sIconUrl = "pkg:/images/icon-like.webp"
+      m.LikeDislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.constants.ui.detailScreenMenuItemIds.dislikeRemoveRatingMenuItem]
+      sIconUrl = "pkg:/images/icon-disliked.webp"
     end if
 
-    changeButtonText("stringLikeDislikeButton", sButtonText)
-    m.LikeDislikeMenuItem.iconUrl = sIconUrl
-    setVisibilityOfSecondaryMenu()
+    if m.Menu.content <> invalid AND m.Menu.itemFocused >= 0
+
+      focusedMenuItem = m.Menu.content.getChild(m.Menu.itemFocused)
+      if m.Menu.isInFocusChain() = true AND focusedMenuItem <> invalid AND focusedMenuItem.id = m.constants.ui.detailScreenMenuItemIds.likeDislikeMenuItem
+        sButtonText = sButtonText + getTranslation("screenDetails_button_like_instructions")
+      end if
+
+    end if
+
+  else if m.top.likeDislikeState = m.constants.ui.likeDislikeStates.changing
+    sButtonText = getTranslation("screenDetails_button_changingRating")
+    sIconUrl = m.LikeDislikeMenuItem.iconUrl '//Keep the icon as it is while the like state is set to changing
+  else
+    '//The Like State is nothing so display default state
+    sButtonText = ""
+
+    sButtonText = getTranslation("screenDetails_button_likeDislike")
+
+    m.LikeDislikeMenuItem.analyticsButtonValue = m.Tracking.detailScreenMenuItemMap[m.LikeDislikeMenuItem.id]
+    sIconUrl = "pkg:/images/icon-like.webp"
   end if
+
+  changeButtonText("stringLikeDislikeButton", sButtonText)
+  m.LikeDislikeMenuItem.iconUrl = sIconUrl
+  setVisibilityOfSecondaryMenu()
 End Function
 
 
