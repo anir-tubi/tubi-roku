@@ -68,7 +68,7 @@ Function init()
   m.Video.observeField("streamingSegment", "onStreamingSegmentChange")
   m.video.observeFieldScoped("availableSubtitleTracks", "setCCAudioTransportBarVisibility")
   m.video.observeFieldScoped("availableAudioTracks", "onAvailableAudioTracksChange")
-  if getExperimentResource("roku_async_stop", "roku_async_stop_v3", false).enabled = true then
+  if getExperimentResource("roku_async_stop", "roku_async_stop_v4", false).enabled = true then
     m.video.asyncStopSemantics = true
   end if
 
@@ -1388,7 +1388,7 @@ Function showAdBreak()
   else
     ' In order to try and change the behavior as little as possible we only want the async stop to rely on the onVideoStateChange callback and just trigger the callback right away here if in the control
     immediatelyTriggerCallback = true
-    if getExperimentResource("roku_async_stop", "roku_async_stop_v3", true).enabled = true then
+    if getExperimentResource("roku_async_stop", "roku_async_stop_v4", true).enabled = true then
       ' the ad break will be shown by showAdBreakStoppedCallback() which will be triggered by
       ' onVideoStateChange() when the video node's state is updated to "stopped".
       ' m.isShowAdBreakPendingStop keeps state to let us know if an break is waiting for the
@@ -1530,7 +1530,7 @@ Function stopVideo()
   ' then state will switch to stopping and never switches to stopped.
   ' After much effort I am still unable to reproduce this behavior in a simple test app but it happens in our app for some reason
   if videoState <> "stop" AND m.Video.state <> "stopped" then
-    getExperimentResource("roku_async_stop", "roku_async_stop_v3", true)
+    getExperimentResource("roku_async_stop", "roku_async_stop_v4", true)
     m.Video.control = "stop"
   end if
 End Function

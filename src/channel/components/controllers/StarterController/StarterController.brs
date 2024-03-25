@@ -77,7 +77,7 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
           end if
         end if
 
-        if experiments.getExperimentResource("roku_async_stop", "roku_async_stop_v3").enabled = true then
+        if experiments.getExperimentResource("roku_async_stop", "roku_async_stop_v4").enabled = true then
           m.animationLogo.asyncStopSemantics = true
         end if
       end if

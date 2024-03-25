@@ -21,7 +21,7 @@ Function TubiExperiments(constants) as Object
     ' For more info on on the experiment backend, see: https://github.com/adRise/popper-config
 
     defaultResources: {
-    
+
       '//Experiment to fix the bug that allows users to skip ads when they seek thru the video
       roku_adfix: {
         roku_adfix_v1 : {"enabled": false}
@@ -57,7 +57,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_async_stop: {
-        roku_async_stop_v3: {"enabled": false}
+        roku_async_stop_v4: {"enabled": false}
       }
 
       roku_cw_consent: {

@@ -723,7 +723,7 @@ Function stopLinearVideoContent()
     videoPlayer.unobserveFieldScoped("sendVideoTrackingStart")
     videoTrackingStop() 'stops youbora tracking
 
-    if getExperimentResource("roku_async_stop", "roku_async_stop_v3", false).enabled = true then
+    if getExperimentResource("roku_async_stop", "roku_async_stop_v4", false).enabled = true then
       waitForVideoPlayerStoppedState(videoPlayer)
     end if
 
