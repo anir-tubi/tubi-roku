@@ -651,10 +651,10 @@ If you need to make a change or addition to the American English text
 
   This will modify the TubiLanguageTranslate.brs to include the new English text
 
-- Once your branch has been merged into master, then run the following command line within the project's root folder to upload your approved changes to the Crowdin server. "KEY" is the key used for our Crowdin account.
+- Once your branch has been merged into master, then run the following command line within the project's root folder to upload your approved changes to the Crowdin server. "TOKEN" is the personal access token that you need to create within your Crowdin account.
 
   ```shell
-  gulp upload_translations --crowdinKey "KEY"
+  gulp upload_translations --crowdinToken "TOKEN"
   ```
 
   This upload command will do two things:
@@ -662,15 +662,15 @@ If you need to make a change or addition to the American English text
 
   - Upload the new change to the Crowdin server so the change can be recorded and our translators can work on obtaining translations for the new change.
 
-If you need to make a change to text that is not the default English, then log into [Crowdin](https://crowdin.com/project/tubiapps) and adjust the translation. Then you will need to follow the directions on how to update the app with the latest translations. Better yet, create a ticket for the translation team to update the translaton. More details can be found at https://www.notion.so/tubi/Localization-d5007e6666d1436bac4391acef5c73bf
+If you need to make a change to text that is not the default English, then log into [Crowdin](https://crowdin.com/project/tubiapps) and adjust the translation. Then you will need to follow the directions on how to update the app with the latest translations. Better yet, create a ticket for the translation team to update the translation. More details can be found at https://www.notion.so/tubi/Localization-d5007e6666d1436bac4391acef5c73bf
 
-If you need to get the latest translations from the Crowdin servers, then create a new GIT branch and run the below command line within the project's root folder, where "KEY" is the key used for our Crowdin account. This will modify the TubiLanguageTranslate.brs to contain all the translations available within Crowdin. You later need to create a PR to start the process of getting the new translations merged to the master branch.
+If you need to get the latest translations from the Crowdin servers, then create a new GIT branch and run the below command line within the project's root folder, where "TOKEN" is the personal access token you need to create within your Crowdin account. This will modify the TubiLanguageTranslate.brs to contain all the translations available within Crowdin. You later need to create a PR to start the process of getting the new translations merged to the master branch.
 
   ```shell
-  gulp download_translations --crowdinKey "KEY"
+  gulp download_translations --crowdinToken "TOKEN"
   ```
 
-NOTE: Instead of passing the crowdin key, you can set the crowdin key as system environment variable labeled as"ROKU_CROWDIN_KEY". This is actually the preferred way of doing things. Check your system on how to create an environment variable. Also note, that the Crowdin key can be gotten either from the company's LastPass Account or through the [Crowdin website](https://crowdin.com/project/tubiapps/settings#api).
+NOTE: Instead of passing the crowdin token, you can set the crowdin token as a system environment variable labeled as "ROKU_CROWDIN_TOKEN". This is actually the preferred way. Check your system on how to create an environment variable. Also note, that the Crowdin personal access token is created under your [Crowdin profile](https://crowdin.com/settings#api-key).
 
 After some time of features being added/removed, some translations may no longer be needed. The following command line script should be used to check for any unnecessary translations. A PR should then be created to remove these no longer-needed translations. Please note that the script also displays other potentially unnecessary things in the codebase: i.e. images.
 

@@ -2,21 +2,24 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const log = require('fancy-log');
-/* Allow the crowdinKey to be driven from an environment variable or thru command line param.
+const {NoStackError} = require('./utilities');
+
+/* Allow the crowdinK token to be driven from an environment variable or thru command line param.
    Environment variables are set on options, along with any parameters passed in
    to the gulp command line call.
 */
 const crowdinConfig = {
-  "crowdinKey": (process.env.ROKU_CROWDIN_KEY || ''),
-  "crowdinBasePath": "/api/project/tubiapps",
-  "crowdinApiBasePath": "api.crowdin.com",
-  "crowdinBaseDirectory": "roku"
+  "crowdinToken": (process.env.ROKU_CROWDIN_TOKEN || ''),
+  "crowdinBaseDirectory": "roku",
+  "projectId": 393299,
+  "fileId": 46,
+  "fileName": "en-US.json"
 }
 
 const _sLocalTranslationFilename = "translations/en-US.json";
 const _sLocalTranslationFilePath = `${process.cwd()}/${_sLocalTranslationFilename}`
 
-// fetch command line arguments and replace params in crowdinConfig. Right now it just replaces the "crowdinKey"
+// fetch command line arguments and replace params in crowdinConfig. Right now it just replaces the "crowdinToken"
 // @Source: https://www.sitepoint.com/pass-parameters-gulp-tasks/
 const arg = (argList => {
 
@@ -38,36 +41,19 @@ const arg = (argList => {
     }
   }
 
-  if(arg["crowdinKey"] !== undefined){
-    crowdinConfig["crowdinKey"] = arg["crowdinKey"]
+  if(arg["crowdinToken"] !== undefined){
+    crowdinConfig["crowdinToken"] = arg["crowdinToken"]
   }
 })(process.argv);
 
-const crowdin_addFilePath = `${crowdinConfig.crowdinBasePath}/add-file?json=1&key=${crowdinConfig.crowdinKey}`;
-const crowdin_updateFilePath = `${crowdinConfig.crowdinBasePath}/update-file?update_option=update_as_unapproved&json=1&key=${crowdinConfig.crowdinKey}`;
-
-
-//Tell Crowdin to zip the translation files. getTranslationsZipFile() will be called to download this zip file.
-async function triggerCrowdinBuild() {
-  const options = {
-    hostname: crowdinConfig.crowdinApiBasePath,
-    method: 'GET',
-    path: `${crowdinConfig.crowdinBasePath}/export?key=${crowdinConfig.crowdinKey}&json=1`,
-  };
-  const response = await makeGetRequest(options);
-  const parsedResponse = JSON.parse(response);
-  return parsedResponse;
-}
-
+const crowdin = require('@crowdin/crowdin-api-client');
+const { translationsApi, uploadStorageApi, sourceFilesApi } = new crowdin.default({
+  token: crowdinConfig.crowdinToken
+});
 
 //Get the already created zip file of the locale translation files from crowdin server
-async function getTranslationsZipFile() {
-  const options = {
-    hostname: crowdinConfig.crowdinApiBasePath,
-    method: 'GET',
-    path: `${crowdinConfig.crowdinBasePath}/download/all.zip?key=${crowdinConfig.crowdinKey}&json=1'`
-  };
-  return await makeGetRequest(options);
+async function getTranslationsZipFile(url) {
+  return await makeGetRequest(url);
 }
 
 
@@ -193,48 +179,14 @@ function writeLocaleDataToBRS_sync(sLocale, localeData) {
 }
 
 
-
 //helper function to upload file to crowdin
-async function updateFilesRequest(filePath, transformedPath) {
-  const filePathKey = `files[${transformedPath}]`;
-  const exportPatternsKey = `export_patterns[${transformedPath}]`;
-
-  const FormData = require('form-data');
-  const formDataObj = new FormData();
-  formDataObj.append(filePathKey, fs.createReadStream(filePath));
-  formDataObj.append(exportPatternsKey, '%locale%.json');
-
-  const options = {
-    hostname: crowdinConfig.crowdinApiBasePath,
-    method: 'POST',
-    path: crowdin_updateFilePath,
-    headers: formDataObj.getHeaders(),
+async function updateFilesRequest(filePath) {
+  const fileContent = fs.readFileSync(filePath);
+  const storageResponse = await uploadStorageApi.addStorage(crowdinConfig.fileName, fileContent);
+  const requestParam = {
+    storageId: storageResponse.data.id,
   };
-
-  const response = await makePostRequest(options, formDataObj);
-  return response;
-}
-
-
-
-//helper function to make a request to crowdin server
-function makePostRequest(options, formData) {
-  return new Promise((resolve, reject) => {
-    const req = https.request(options, (resp) => {
-      let data = '';
-      resp.on('data', (chunk) => {
-        data += chunk;
-      });
-
-      resp.on('end', () => {
-        resolve(JSON.parse(data));
-      });
-    }).on('error', (err) => {
-      reject(err);
-    });
-
-    formData.pipe(req);
-  });
+  return await sourceFilesApi.updateOrRestoreFile(crowdinConfig.projectId, crowdinConfig.fileId, requestParam); 
 }
 
 
@@ -267,8 +219,9 @@ function makeGetRequest(options) {
   });
 }
 
+
 //update the English strings within the translation BRS file with the latest version of the US English locale file
-exports.updateLocalTranslations = function(done) {
+function updateLocalTranslations(done) {
   //update the BRS file with the American English file before uploading to Crowdin
   log("Updating the BRS file with the latest version found in: ", _sLocalTranslationFilePath)
   const localeData = fs.readFileSync(_sLocalTranslationFilePath, 'utf-8');
@@ -280,38 +233,73 @@ exports.updateLocalTranslations = function(done) {
   done();  //inform gulp that the task has completed.
 }
 
+
 //upload the latest version of the US English locale file to crowdin
-exports.uploadTranslations = async function() {
-  if(crowdinConfig.crowdinKey !== undefined && crowdinConfig.crowdinKey !== ""){
-    const crowdinPath = `${crowdinConfig.crowdinBaseDirectory}/${_sLocalTranslationFilename}`;
-    const updateFileResponse = await updateFilesRequest(_sLocalTranslationFilePath, crowdinPath);
-    if (updateFileResponse.success) {
+async function uploadTranslations(done) {
+  if(crowdinConfig.crowdinToken !== undefined && crowdinConfig.crowdinToken !== ""){
+    try {
+      const updateFileResponse = await updateFilesRequest(_sLocalTranslationFilePath);
       log('SUCCESS! FINISHED UPLOADING THE TRANSLATION FILE TO CROWDIN');
-    } else {
-      log('ERROR UPLOADING THE TRANSLATION FILE TO CROWDIN \n', updateFileResponse.error)
+      done();
+    } catch(error) {
+      done(new NoStackError(`ERROR UPLOADING THE TRANSLATION FILE TO CROWDIN: "${error}"`));
     }
   } else {
-    log('MISSING CROWDIN KEY EITHER IN ENVIRONMENT VARIABLE (ROKU_CROWDIN_KEY) OR COMMAND LINE PARAMETER');
+    log('MISSING CROWDIN TOKEN EITHER IN ENVIRONMENT VARIABLE (ROKU_CROWDIN_TOKEN) OR COMMAND LINE PARAMETER');
+    done();
+  }
+}
+
+async function downloadTranslations(done) {
+
+  if(crowdinConfig.crowdinToken!== undefined && crowdinConfig.crowdinToken !== ""){
+    try{
+      const nMaxRetries = 5;
+      const nRetryTiming = 2000; //The number of milliseconds to try to check the build status
+      let nRetryCount = 0
+      const result = await translationsApi.buildProject(crowdinConfig.projectId, {skipUntranslatedStrings: true});
+      const buildId = result.data.id;
+
+      while (nRetryCount < nMaxRetries){
+        const resultResult = await translationsApi.checkBuildStatus(crowdinConfig.projectId, buildId)
+
+        let sStatus = resultResult.data.status.toLowerCase();
+        if (sStatus === 'finished'){
+          log('Starting to download the translations.');
+          const translations = await translationsApi.downloadTranslations(crowdinConfig.projectId, result.data.id);
+
+          const translationsFileBuffer = await getTranslationsZipFile(translations.data.url);
+          const unzipper = require('unzipper');
+          const unzippedDirectory = await unzipper.Open.buffer(translationsFileBuffer);
+          await processTranslationFiles(unzippedDirectory);
+          log('DONE DOWNLOADING TRANSLATIONS.');
+          done();
+          return;
+        } else if(sStatus === 'canceled' || sStatus === 'failed') {
+          done(new NoStackError(`FAILED TO BUILD TRANSLATIONS. STATUS = ${sStatus}`));
+          return;
+        } else {
+          nRetryCount++;
+          log(`Crowdin is currently building the project. Status = ${resultResult.data.status}`);
+          log(`Will attempt to get the translations again in ${nRetryTiming} ms. ${nRetryCount} out of ${nMaxRetries} times.`);
+          await new Promise(resolve => setTimeout(resolve, nRetryTiming));
+        }
+      }
+
+      done(new NoStackError("FAILED TO BUILD TRANSLATIONS. Crowdin is busy creating a build. Please try again later."));
+
+    } catch(error) {
+      done(new NoStackError(`FAILED TO BUILD TRANSLATIONS: "${error}"`));
+    }
+  } else {
+    log('COULD NOT DOWNLOAD TRANSLATIONS. MISSING CROWDIN TOKEN EITHER IN ENVIRONMENT VARIABLE (ROKU_CROWDIN_KEY) OR COMMAND LINE PARAMETER');
+    done();
   }
 }
 
 
-//Main function that initiates the download of any locale translation files from crowdlin
-exports.downloadTranslations = async function() {
-  if(crowdinConfig.crowdinKey !== undefined && crowdinConfig.crowdinKey !== ""){
-    log('START DOWNLOADING TRANSLATIONS FROM CROWDIN');
-    const buildResponse = await triggerCrowdinBuild();
-    if (buildResponse.success) {
-      const translationsFileBuffer = await getTranslationsZipFile();
-
-      const unzipper = require('unzipper');
-      const unzippedDirectory = await unzipper.Open.buffer(translationsFileBuffer);
-      await processTranslationFiles(unzippedDirectory);
-    } else {
-      log('Failed to build translations', buildResponse.error);
-    }
-    log('FINISHED DOWNLOAD TRANSLATIONS FROM CROWDIN');
-  } else {
-    log('COULD NOT DOWNLOAD TRANSLATIONS. MISSING CROWDIN KEY EITHER IN ENVIRONMENT VARIABLE (ROKU_CROWDIN_KEY) OR COMMAND LINE PARAMETER');
-  }
+module.exports = {
+  updateLocalTranslations,
+  uploadTranslations,
+  downloadTranslations
 }
