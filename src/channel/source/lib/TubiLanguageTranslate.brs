@@ -1711,13 +1711,13 @@ Function getTranslation_en_US()
       "description": "Manage preferences button label.",
       "message": "Manage Preferences"
     },
-    "accept_button_label": {
+    "accept_all_button_label": {
       "description": "Accept button label.",
-      "message": "Accept"
+      "message": "Accept All"
     },
-    "reject_button_label": {
+    "reject_all_button_label": {
       "description": "Reject button label.",
-      "message": "Reject"
+      "message": "Reject All"
     },
     "privacy_preferences_label": {
       "description": "privacy preferences screen title.",

@@ -22,11 +22,11 @@ Function init()
   buttons = [
     {
       id: m.constants.ui.consentActionButtonIds.accept
-      title: getTranslation("accept_button_label")
+      title: getTranslation("accept_all_button_label")
     },
     {
       id: m.constants.ui.consentActionButtonIds.reject
-      title: getTranslation("reject_button_label")
+      title: getTranslation("reject_all_button_label")
     },
     {
       id: m.constants.ui.consentActionButtonIds.manage
