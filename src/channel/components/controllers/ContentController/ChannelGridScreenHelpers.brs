@@ -11,7 +11,7 @@ Function showChannelListScreen(constants, sendNavigationLoadEvents = true)
       pushScreen(channelListScreen, true, true)
     end if
   else
-    showChannelGridScreen(constants, true, m.constants.ui.screenLevels.channelCategoryGridScreen , sendNavigationLoadEvents)
+    showChannelGridScreen(constants, true, m.constants.ui.screenLevels.channelListScreen, sendNavigationLoadEvents)
   end if
 End Function
 
@@ -28,7 +28,7 @@ Function showCategoryListScreen(constants, sendNavigationLoadEvents = true)
       pushScreen(categoryListScreen, true, true)
     end if
   else
-    showChannelGridScreen(constants, false, m.constants.ui.screenLevels.channelCategoryGridScreen, sendNavigationLoadEvents)
+    showChannelGridScreen(constants, false, m.constants.ui.screenLevels.categoryListScreen, sendNavigationLoadEvents)
   end if
 End Function
 
@@ -85,7 +85,7 @@ Function onGridContentSelected(msg)
 
   'If the user selects networks from CategoryList Screen we are showing the ChannelListScreen with list of channels.
   if selectedItem.id = "networks"
-    showChannelListScreen(m.constants, m.constants.ui.terms.menu)
+    showChannelListScreen(m.constants)
   else
     showCategoryDetailsScreen(gridScreen.contentSelected)
   end if
