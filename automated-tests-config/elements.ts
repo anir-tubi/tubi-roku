@@ -962,8 +962,8 @@ const elements = typeCheckElements({
   },
 
   liveNewsSubtitlesPanel: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen.#VideoOverlay.#overlayParent.#closedCaptioningGroup.#closedCaptioningButtonListBackground'
-  },
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen.#VideoOverlay.#overlayParent.#closedCaptioningGroup.#closedCaptioningButtonList'
+  },   
 
   /**  Invalid deep link dialog */
   invalidDeepLinkDialog: {
