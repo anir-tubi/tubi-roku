@@ -127,10 +127,9 @@ describe('Settings', function () {
 
     // Is the About Page Open and does the help link exist?
     const settingsScreenHeader = await testUtils.getNodeForElement('settingsScreenHeader');
-    const helpPageText = await testUtils.getNodeForElement('helpPageText');
     expect(settingsScreenHeader.text).to.equal('About Tubi');
-    const helpLink = await testUtils.getNodeForElement('helpLink');
-    expect(helpLink.text).to.equal('Visit http://help.tubitv.com');
+    const helpLinkText = await testUtils.getNodeForElement('helpLinkText');
+    expect(helpLinkText.text).to.equal('Visit http://help.tubitv.com');
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/32372

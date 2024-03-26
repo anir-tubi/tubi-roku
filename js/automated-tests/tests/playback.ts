@@ -138,13 +138,10 @@ describe('Playback', function () {
 
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
-    const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
-    expect(videoPlayerActual.visible).to.equal(true);
     await testUtils.expectPlayerStateToEventuallyEqual('play');
     await ecp.sendKeypress(ecp.Key.Play);
     const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
     expect(playPauseButton.visible).to.equal(true);
-    //await testUtils.expectPlayerStateToEventuallyEqual('pause');
     await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
 
     // FF button highlighted
@@ -169,8 +166,6 @@ describe('Playback', function () {
 
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
-    const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
-    expect(videoPlayerActual.visible).to.equal(true);
     await testUtils.expectPlayerStateToEventuallyEqual('play');
     await ecp.sendKeypress(ecp.Key.Play);
     const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
@@ -200,13 +195,9 @@ describe('Playback', function () {
 
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
-    const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
-    expect(videoPlayerActual.visible).to.equal(true);
-    await testUtils.expectPlayerStateToEventuallyEqual('play');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
-    const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
-    expect(playPauseButton.visible).to.equal(true);
-    //await testUtils.expectPlayerStateToEventuallyEqual('pause');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
     await ecp.sendKeypress(ecp.Key.Right, { count: 2 });
 
     // FF button highlighted
@@ -217,7 +208,7 @@ describe('Playback', function () {
     await ecp.sendKeypress(ecp.Key.Ok, { count: 4 });
 
     // Verify FF button state is FF 4 (back to 1x)
-    expect(fastForwardButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-ffw.png');
+    expect(fastForwardButton.uri).to.equal('pkg:/images/transport/sgplayer/icon-ffw.webp');
 
 
   });

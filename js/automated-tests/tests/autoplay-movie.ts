@@ -5,44 +5,42 @@ import { shared } from '../shared';
 import { waitForDebugger } from 'inspector';
 
 describe('Autoplay Movies', function () {
+    
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/105693
     it('105693 - Autoplay - Movie - When movie reaches the credit cue point then autoplay triggers @autoplay', async () => {
+          
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+          
+        // Are we on the Movies page?
+        await testUtils.waitForCurrentScreenToEqual('movieScreen');
+
+        //Play title, seek to trigger cuepoint
+        await ecp.sendKeypress(ecp.Key.Play);
+        await seekToTriggerCuePoint();
+
+        // Autoplay triggered?
+        await checkForAutoPlayTrigger();    
 
     });
 
-    // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/105693
-    it('105693 - Autoplay - Movie - When movie reaches the credit cue point then autoplay triggers @autoplay', async () => {
-          // Are we on the Movies page?
-          await testUtils.waitForCurrentScreenToEqual('movieScreen');
-  
-          //Play title, seek to trigger cuepoint
-          await ecp.sendKeypress(ecp.Key.Play);
-          await seekToTriggerCuePoint();
-
-          // Autoplay triggered?
-          await checkForAutoPlayTrigger();
-
-    });
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/70395
     it('C70395 - Autoplay - Movie - Timer resets as users navigates within the titles in autoplay UI @autoplay', async () => {
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
-          // Are we on the Movies page?
-          await testUtils.waitForCurrentScreenToEqual('movieScreen');
+        // Are we on the Movies page?
+        await testUtils.waitForCurrentScreenToEqual('movieScreen');
   
-          //Play title, pause to open player, move right to FF button and press, verify state
-          await ecp.sendKeypress(ecp.Key.Play);
-          await seekToTriggerCuePoint();
+        //Play title, pause to open player, move right to FF button and press, verify state
+        await ecp.sendKeypress(ecp.Key.Play);
+        await seekToTriggerCuePoint();
 
         // Autoplay triggered?
         await checkForAutoPlayTrigger();
-
+        
         // Scroll to next selection
         await ecp.sendKeypress(ecp.Key.Right);
 
         // Timer restarts?
-       // await utils.sleep(1000);
         await testUtils.waitForElementToFullyShowOnScreen('countDownMovieAutoPlay');
         const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay');
         expect(countDownMovieAutoPlay.text).does.not.contain('1');
@@ -53,17 +51,16 @@ describe('Autoplay Movies', function () {
     it('C25123 - Autoplay - Movie - When user chooses last title on the list then movie plays @autoplay', async () => {
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
-         // Are we on the Movies page?
-         await testUtils.waitForCurrentScreenToEqual('movieScreen');
-        
- 
-         //Play title, pause to open player, move right to FF button and press, verify state
-         await ecp.sendKeypress(ecp.Key.Play);
-         await seekToTriggerCuePoint();
+        // Are we on the Movies page?
+        await testUtils.waitForCurrentScreenToEqual('movieScreen');
+    
+        //Play title, pause to open player, move right to FF button and press, verify state
+        await ecp.sendKeypress(ecp.Key.Play);
+        await seekToTriggerCuePoint();
 
         // Autoplay triggered?
         await checkForAutoPlayTrigger();
-
+     
         // Scroll to last selection
         await utils.sleep(1000);
         await ecp.sendKeypress(ecp.Key.Right, { count: 10 });
@@ -80,14 +77,11 @@ describe('Autoplay Movies', function () {
 
         // Are we on the Movies page?
         await testUtils.waitForCurrentScreenToEqual('movieScreen');
-        
-        // Move Right one title
-        await ecp.sendKeypress(ecp.Key.Right);
 
-        //Play title, trigger autoplayx
+        //Play title, trigger autoplays
         await ecp.sendKeypress(ecp.Key.Play);
         await seekToTriggerCuePoint();
-
+       
         // Autoplay triggered?
         await ecp.sendKeypress(ecp.Key.Play);
         await checkForAutoPlayTrigger();
@@ -105,7 +99,7 @@ describe('Autoplay Movies', function () {
 
         // Are we on the Movies page?
         await testUtils.waitForCurrentScreenToEqual('movieScreen');
-
+        
         //Play title, pause to open player, move right to FF button and press, verify state
         await ecp.sendKeypress(ecp.Key.Play);
         await seekToTriggerCuePoint();
@@ -135,7 +129,7 @@ describe('Autoplay Movies', function () {
         //Play title, trigger autoplay
         await ecp.sendKeypress(ecp.Key.Play);
         await seekToTriggerCuePoint();
-
+     
         // Autoplay triggered?
         await checkForAutoPlayTrigger();
 
@@ -152,6 +146,6 @@ async function seekToTriggerCuePoint() {
 
 async function checkForAutoPlayTrigger() {
     await testUtils.waitForElementToFullyShowOnScreen('countDownMovieAutoPlay');
-    const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay')
+    const countDownMovieAutoPlay = await testUtils.getNodeForElement('countDownMovieAutoPlay');
     expect(countDownMovieAutoPlay.text).to.contain('Starting');
 }

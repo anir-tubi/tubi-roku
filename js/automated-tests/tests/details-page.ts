@@ -117,13 +117,8 @@ describe('Details Page', function () {
       await createHistory();
 
       // Back out of the video player to land on Details page
+      await ecp.sendKeypress(ecp.Key.Back);
       await testUtils.waitForCurrentScreenToEqual('detailScreen');
-      await ecp.sendKeypress(ecp.Key.Ok);
-      await utils.sleep(2000);
-      await ecp.sendKeypress(ecp.Key.Back);
-      await utils.sleep(2000);
-      await ecp.sendKeypress(ecp.Key.Back);
-
 
       // Check that movie has history)
       await testUtils.retryWithTimeOut(async () => {

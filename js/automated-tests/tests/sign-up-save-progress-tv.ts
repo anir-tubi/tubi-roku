@@ -142,8 +142,10 @@ describe('Sign up Save Progress TV', function () {
         await ecp.sendKeypress(ecp.Key.Right);
         await ecp.sendKeypress(ecp.Key.Down, {count:4});
         await utils.sleep(550);
-        await ecp.sendKeypress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Ok);  
         await utils.sleep(1000);
+        await ecp.sendKeypress(ecp.Key.Down);
+        await ecp.sendKeypress(ecp.Key.Ok);
         
 
         // Are we on details page with Play button at top position?

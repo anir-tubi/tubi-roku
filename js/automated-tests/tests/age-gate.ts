@@ -261,11 +261,14 @@ describe('Age Gate', function () {
 });
 
   async function openKidsMode() {
-    await testUtils.selectMenuItem('kidsLeftNavOption', 'Kids');
+    await ecp.sendKeypress(ecp.Key.Left);
+    await testUtils.waitForSideNavMenuToBeExpanded();
+    await testUtils.selectMenuItem('sideNavMenu', 'Kids');  
   }
 
   async function exitKidsMode() {
-    await testUtils.selectMenuItem('exitKidsOption', 'Exit Kids');
+    await testUtils.waitForSideNavMenuToBeExpanded();
+    await testUtils.selectMenuItem('sideNavMenu', 'Exit Kids');
   }
 
   async function selectSignInFromHomeScreen() {

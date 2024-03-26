@@ -128,7 +128,7 @@ async function triggerSeriesAutoplay() {
 
 async function checkForAutoPlayTrigger() {
     await testUtils.waitForElementToFullyShowOnScreen('countDownSeriesAutoPlay');
-    const countDownSeriesAutoPlay = await testUtils.getNodeForElement('countDownSeriesAutoPlay')
+    const countDownSeriesAutoPlay = await testUtils.getNodeForElement('countDownSeriesAutoPlay');
     expect(countDownSeriesAutoPlay.text).to.contain('Starting');
 }
 

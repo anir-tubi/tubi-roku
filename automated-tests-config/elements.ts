@@ -196,7 +196,7 @@ const elements = typeCheckElements({
 
   /** Play Button icon focused */
   playButtonIconFocused: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.0.#IconParent.#IconFocused'
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.0.#IconParent.#IconFocused'
   },
 
   /** On Movies Page Button */
@@ -240,8 +240,7 @@ const elements = typeCheckElements({
   },
 
   tubiKidsLogo: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#GradientGroup.#LinearGradient1.#BackgroundGradient',
-    xpath: '/TubiScene/ContentController/Group/Group/BackgroundGroup/Group[2]/BackgroundGradientGroup[2]/Poster',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#logoGroup.#tubiKidsLogo',  
   },
 
   exitKidsOption: {
@@ -760,6 +759,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#liveBadgeHeader.#BadgeBackground',
   },
 
+  liveBadgeText: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#liveBadgeHeader.#BadgeInfoLayout.#BadgeText'
+  },
+
   /** Preview off button */
   autoplayPreviewOff: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#AutoplayPreviewMenu.1.#BtnLayout',
@@ -889,6 +892,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#TextTwo',
   },
 
+  /** Help link */
+  helpLinkText: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#TextTwoGroup.0'
+  },
+
   /** Policy Page Header */
   privacyPolicyHeader: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#panelContentSection.#heading',
@@ -999,6 +1007,11 @@ const elements = typeCheckElements({
   searchGrid: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#searchGroup.#SearchKeyboard.0',
   },
+
+ /** Result Grid */
+ searchResultGrid: {
+  keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#ResultArea.#gridContainer.#resultsContainer.#ResultGrid'
+ },
 
   /** No results message */
   noResultsMessage: {

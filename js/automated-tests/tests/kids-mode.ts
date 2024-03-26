@@ -142,14 +142,14 @@ describe('Kids Mode', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Navigate to Left Nav
-    await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
+    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
 
     // Is the Exit Kids button grayed out?
     await checkForKidsModeGrayed();
-
+ 
     // Is the Tubi Kid's logo present?
     const tubiKidsLogo = await testUtils.getNodeForElement('tubiKidsLogo');
-    expect(tubiKidsLogo.visible).to.be.true;
+    expect(tubiKidsLogo.uri).to.equal('pkg:/images/logo-kids-large.webp');
 
 
   });
@@ -357,8 +357,8 @@ describe('Kids Mode', function () {
     await ecp.sendKeypress(ecp.Key.Right);
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
-    const liveIcon = await testUtils.getNodeForElement('liveIcon');
-    expect(liveIcon.uri).to.equal('pkg:/images/live-icon-filled.webp');
+    const liveBadgeText = await testUtils.getNodeForElement('liveBadgeText');
+    expect(liveBadgeText.text).to.equal('LIVE');
 
   });
 

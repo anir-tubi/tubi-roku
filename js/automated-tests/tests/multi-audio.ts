@@ -84,6 +84,7 @@ describe('Multiple Audio', function () {
     await ecp.sendText('fifth plane');
 
     // Call function to navigate right to search results grid
+    await testUtils.waitForElementToFullyShowOnScreen('searchResultGrid');
     await navigateRightToGrid();
 
     await testUtils.retryWithTimeOut(async () => {
@@ -122,12 +123,13 @@ describe('Multiple Audio', function () {
 
     // Start app with new user
     await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+    await testUtils.waitForElementToFullyShowOnScreen('searchKeyPad');
 
     // Nav to AD container and playback any title
     await ecp.sendText('cosmo');
 
     // Call function to navigate right to search results grid
+    await testUtils.waitForElementToShowOnScreen('searchResultGrid', 'Result Grid did not appear', 10000);
     await navigateRightToGrid();
     await testUtils.retryWithTimeOut(async () => {
       const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
@@ -165,9 +167,11 @@ describe('Multiple Audio', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/426763
   it('C426763 - Video Player: Ensure that user is able view and toggle available audio and subtitle language options for each title @multiple_audio', async () => {
     await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
+    await testUtils.waitForElementToFullyShowOnScreen('searchKeyPad');
     await ecp.sendText('fifth plane');
 
     // Call function to navigate right to search results grid
+    await testUtils.waitForElementToFullyShowOnScreen('searchResultGrid');
     await navigateRightToGrid();
 
     await testUtils.retryWithTimeOut(async () => {

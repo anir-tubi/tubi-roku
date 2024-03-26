@@ -546,7 +546,6 @@ describe('Parental Controls', function () {
       const user = await testUtils.createRegisteredUser();
       await createHistory(user);
 
-
       await testUtils.startApplicationAtPage('home', { user: user });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 

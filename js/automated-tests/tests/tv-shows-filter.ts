@@ -69,7 +69,7 @@ describe('Homescreen Navigation - TV Shows Filter', function () {
 
   });
   // https://tubi.testrail.io/index.php?/cases/view/538329
-  it('538329 - TV Shows Filter - When title is selected then corresponding details page displayed, @homescreen, @tvshows', async () => {
+  it('C538329 - TV Shows Filter - When title is selected then corresponding details page displayed, @homescreen, @tvshows', async () => {
 
     await testUtils.waitForAppLaunchBeaconToFire();
 
