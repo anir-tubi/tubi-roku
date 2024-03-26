@@ -150,7 +150,9 @@ Function conditionallyConfirmBirthYear(ageVerificationScreen, verifyAgeCallback,
 
   birthYear = birthdate.tokenize("-")[0]
   currentYear = createObject("roDateTime").getYear()
-  if currentYear - birthYear.toInt() > 12 then
+  userEnteredAge = currentYear - birthYear.toInt()
+  ' show a confirmation pop up if the inputted age is <5 or >99
+  if userEnteredAge >= 5 AND userEnteredAge <= 99 then
     onAgeSubmitted(verifyAgeCallback)
   else
     'Show confirmation
