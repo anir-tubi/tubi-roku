@@ -51,9 +51,32 @@ const { translationsApi, uploadStorageApi, sourceFilesApi } = new crowdin.defaul
   token: crowdinConfig.crowdinToken
 });
 
+
 //Get the already created zip file of the locale translation files from crowdin server
 async function getTranslationsZipFile(url) {
   return await makeGetRequest(url);
+}
+
+
+/**
+ * removeEmptyTranslations
+ *
+ * This function removes translations with empty message strings from a JSON object.
+ *
+ * @param {string} localeData - A JSON string containing translations with the "message" property
+ * @returns {string} - A JSON string with the filtered translations
+ */
+function removeEmptyTranslations(localeData) {
+  const jsonTranslationFile = JSON.parse(localeData);
+
+  for (const key in jsonTranslationFile) {
+    if (jsonTranslationFile[key].message === "") {
+      delete jsonTranslationFile[key];
+    }
+  }
+
+  const jsonString = JSON.stringify(jsonTranslationFile, null, 2);
+  return jsonString;
 }
 
 
@@ -85,9 +108,12 @@ async function processTranslationFiles(directory) {
           // read contents of temporarily written json file
           var localeData = fs.readFileSync(destinationPath, 'utf-8');
 
+          //remove any translation that are empty strings
+          const jsonString = removeEmptyTranslations(localeData)
+          
           // write the contents of the translation json to the appropriate function
           // in the TubiLanguageTranslate.brs file
-          writeLocaleDataToBRS_sync(sLocale, localeData);
+          writeLocaleDataToBRS_sync(sLocale, jsonString);
 
           sLocale = sLocale.toLowerCase();
           if (sLocale !== 'en-us' && sLocale !== 'en_us'){
