@@ -31,6 +31,7 @@ Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
     setImageParams: cmsApi_setImageParams
     setTupianPosterParam: cmsApi_setTupianPosterParam
     setTupianLandscapeParam: cmsApi_setTupianLandscapeParam
+    setTupianBackgroundParam: cmsApi_setTupianBackgroundParam
     getWindowInfo: cmsApi_getWindowInfo
     getFullCategoryId: cmsApi_getFullCategoryId
   }
@@ -105,6 +106,11 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels=false, bKi
   options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
   options.params = m.setTupianLandscapeParam(options.params)
+  
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_tupian_background_images", "roku_tupian_background_images_v1").enabled = true
+    options.params = m.setTupianBackgroundParam(options.params)
+  end if
+
   capability = formatJson({"content_types" :["se"]})
   options.headers.append({"x-capability": capability})
 
@@ -218,6 +224,8 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
     imageParamTypes = [
       "poster"
       "landscape"
+      "hero"
+      "background"
     ]
     params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.homeScreen)
   end if
@@ -276,6 +284,8 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
     imageParamTypes = [
       "poster"
       "landscape"
+      "hero"
+      "background"
     ]
   end if
 
@@ -317,6 +327,8 @@ Function cmsApi_createSearchRequestInfo(searchText, bKidsMode = false)
   options.params["is_kids_mode"] = bKidsMode
   imageParamTypes = [
     "poster"
+    "hero"
+    "background"
   ]
   options.params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.searchScreen)
 
@@ -345,6 +357,7 @@ End Function
 Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "")
   posterSize = m.constants.ui.imageSizes.poster
   landscapeSize = m.constants.ui.imageSizes.landscape
+  background = m.constants.ui.imageSizes.background
 
   '//For now, ensure the large posters do not show up on the search screen
   isNonLargePostersScreen = (isNonEmptyString(screenId) = true AND screenId = m.constants.ui.screenIds.searchScreen)
@@ -362,6 +375,8 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "")
       existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_landscape"
     else if imageType = "hero"
       existingParams["images[hero_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_hero"
+    else if imageType = "background" AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_tupian_background_images", "roku_tupian_background_images_v1").enabled = true
+      existingParams["images[background_tb]"] = "w" + background[0].ToStr() + "h" + background[1].ToStr() + "_background"
     end if
   end for
 
@@ -380,6 +395,13 @@ End Function
 ' @existingParams: assocArray, any parameters that have already been defined that need to be added to
 Function cmsApi_setTupianLandscapeParam(existingParams = {})
   return m.setImageParams(["landscape"], existingParams)
+End Function
+
+
+' Wrapper around setImageParams for the specific case of only adding a Tupian background image param
+' @existingParams: assocArray, any parameters that have already been defined that need to be added to
+Function cmsApi_setTupianBackgroundParam(existingParams = {})
+  return m.setImageParams(["background"], existingParams)
 End Function
 
 
@@ -501,6 +523,7 @@ Function cmsApi_createMyStuffScreenBatchReqInfo(content, bKidsMode = false, isSi
           imageParamTypes = [
             "poster"
             "hero"
+            "background"
           ]
 
           categoryReqInfo = m.createCategoryReqInfo(categoryId, bKidsMode, options, imageParamTypes)

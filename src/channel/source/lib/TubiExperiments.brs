@@ -89,6 +89,10 @@ Function TubiExperiments(constants) as Object
         roku_large_linear_tiles_v1 : {"enabled": false}
       }
 
+      roku_tupian_background_images: {
+        roku_tupian_background_images_v1 : {"enabled": false}
+      }
+
     }
 
     'public methods

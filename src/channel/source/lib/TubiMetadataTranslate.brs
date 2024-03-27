@@ -40,6 +40,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     getThumbnailImage: tubiMetadataTranslate_getThumbnailImage
     composeVideoResources: tubiMetadataTranslate_composeVideoResources
     getRoundedCornersURL: tubiMetadataTranslate_getRoundedCornersURL
+    getBackgroundImages: tubiMetadataTranslate_getBackgroundImages
   }
 End Function
 
@@ -107,6 +108,31 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
   sThumbnailURL = m.getRoundedCornersURL(sThumbnailURL)
 
   return sThumbnailURL
+End Function
+
+
+'''''''''''''''''''''
+' getBackgroundImages
+'
+' @contentFromServer: assocArray, AA representation of content metadata JSON as returned from server
+Function tubiMetadataTranslate_getBackgroundImages(contentFromServer)
+  imagesList = contentFromServer.images
+  backgrounds = []
+  if imagesList <> invalid AND imagesList.background_tb <> invalid AND type(imagesList.background_tb) = "roArray" AND imagesList.background_tb.count() > 0
+    backgrounds = imagesList.background_tb
+    ' If we do not have enough background images than back filling it with hero images.
+    if backgrounds.count() < 2 AND imagesList.hero_tb <> invalid AND type(imagesList.hero_tb) = "roArray" AND imagesList.hero_tb.count() > 0
+      backgrounds.push(imagesList.hero_tb[0])
+    end if
+  else if contentFromServer.backgrounds <> invalid AND type(contentFromServer.backgrounds) = "roArray" AND contentFromServer.backgrounds.count() > 0
+    backgrounds = contentFromServer.backgrounds
+  end if
+
+  if backgrounds.count() > 0
+    backgrounds = m.dedupeBackgrounds(backgrounds)
+  end if
+
+  return backgrounds
 End Function
 
 
@@ -399,8 +425,9 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
     translatedContent.HDGRIDPOSTERURL = sHDGridPosterURL
   end if
 
-  if contentFromServer.backgrounds <> invalid AND type(contentFromServer.backgrounds) = "roArray" AND contentFromServer.backgrounds.count() > 0
-    translatedContent.backgrounds = m.dedupeBackgrounds(contentFromServer.backgrounds)
+  backgrounds = m.getBackgroundImages(contentFromServer)
+  if backgrounds.count() > 0
+    translatedContent.backgrounds = backgrounds
   end if
 
   if contentFromServer.ratings <> invalid AND contentFromServer.ratings[0] <> invalid AND contentFromServer.ratings[0].value <> invalid

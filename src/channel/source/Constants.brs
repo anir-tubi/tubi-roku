@@ -1240,6 +1240,15 @@ Function getConstants()
       'Sizes of the linear background and minimized linear video player
       constants.ui.imageSizes.epgLinearVideoPlayerOnEPGScreen_minimizedDimension = [1120,630]
 
+      ' Size for the background image.
+      if limitedUi = true
+        constants.ui.imageSizes.background = [399, 225]
+      else if lowVram = true
+        constants.ui.imageSizes.background = [798, 450]
+      else
+        constants.ui.imageSizes.background = [1197, 675]
+      end if
+
     constants.ui.imageTranslations = {}
       'Location of the linear background and minimized linear video player
       constants.ui.imageTranslations.epgLinearVideoPlayerOnEPGScreen_minimizedTranslation = [800,0]
