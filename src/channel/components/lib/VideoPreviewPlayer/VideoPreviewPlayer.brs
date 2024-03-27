@@ -40,7 +40,7 @@ Function onPageInfoUpdatedForAnalytics(msg)
     m.currentPageInfo = pageInfo
 
     if m.previousPageInfo.pagetype <> m.currentPageInfo.pagetype
-      previewProgressEvent = getPreviewProgressEvent(m.previousPageInfo)
+      previewProgressEvent = getPreviewProgressEvent(m.previousPageInfo, "onPageInfoUpdatedForAnalytics")
       if previewProgressEvent <> invalid
         trackEvent(previewProgressEvent)
         m.lastPingTime = m.playerPosition
@@ -56,7 +56,9 @@ Function playContent()
   m.videoState = "play"
   m.top.state = "playing" ' The player takes a little while to start playing. If we don't update the state here then setVideoPreviewAfterFocus will try to stop the video and then play it again even though it is the same content
   m.Video.control = "play"
+
   m.lastPingTime = 0
+  m.playerPosition = 0
 
   if m.Video.content.id <> invalid
 
@@ -102,6 +104,13 @@ End Function
 'Occurs when m.Video.state changes (not when m.top.state changes)
 Function onVideoStateChange(msg)
   state = msg.GetData()
+  'Adding below block to consider 'm.videoState' as single source of truth for the video state instead of directly accessing 'state' interface
+  if state = "buffering"
+    m.videoState = state
+  else if state = "playing"
+    m.videoState = "play"
+  end if
+
   if state = "finished"
     finishPreviewEvent = getFinishPreviewEvent(true)
     trackEvent(finishPreviewEvent)
@@ -137,12 +146,11 @@ End Function
 ' onVideoPositionChange
 '
 Function onVideoPositionChange(msg)
-
   m.playerPosition = msg.GetData()
 
   ' Analytics
   if m.playerPosition >= m.lastPingTime + m.analyticsInterval
-    previewProgressEvent = getPreviewProgressEvent(m.currentPageInfo)
+    previewProgressEvent = getPreviewProgressEvent(m.currentPageInfo, "onVideoPositionChange")
     if previewProgressEvent <> invalid
       trackEvent(previewProgressEvent)
       m.lastPingTime = m.playerPosition
@@ -169,15 +177,18 @@ Function resumeContent()
 End Function
 
 
-' pauses the video
+'pauseContent triggers when focus moves to sidenav or top nav,
 Function pauseContent()
-  if m.videoState = "play"
-    m.videoState = "pause"
-    m.Video.control = "pause"
-  else if m.videoState <> "stop" ' added this check to avoid playing content once the buffering is completed when focus is on sidenav/topnav
+  'when video preview is buffering, the video preview getting played even though we set control as pause(assuming it is firmware issue).
+  'so forcing the video preview to stop when it is buffering. Also added alwaysNotify to the video node control field.
+  'added this check to avoid playing content once the buffering is completed when focus is on sidenav/topnav
+  if m.videoState = "buffering"
     m.videoState = "stop"
     getExperimentResource("roku_async_stop", "roku_async_stop_v4", true)
     m.Video.control = "stop"
+  else if m.videoState = "play"
+    m.videoState = "pause"
+    m.Video.control = "pause"
   end if
 End Function
 
@@ -209,11 +220,11 @@ End Function
 
 
 ' @pageInfo: assocarray, value can be { pagetype: "home_page", pagevalues: {}}
-Function getPreviewProgressEvent(pageInfo)
-
+' @callSource: string, temporary param used for debugging large playProgressEvents, should be removed after issue is fixed.
+Function getPreviewProgressEvent(pageInfo, callSource)
   previewProgressEvent = invalid
-  if m.playerPosition > m.lastPingTime AND m.videoState = "play"
 
+  if m.playerPosition > m.lastPingTime AND m.videoState = "play"
     viewTime = Int((m.playerPosition - m.lastPingTime) * 1000) 'ms
 
     previewProgressEvent = {
@@ -227,6 +238,20 @@ Function getPreviewProgressEvent(pageInfo)
       }
     }
 
+
+    '//TODO:: Below block is added for debugging large viewtime issue. It can be removed when there are no (or very less) large viewtime(>=15000) in preview play_progress event by verifying the datadog logs.
+    'Note: This is client bug and we made a possible fix.
+    if viewTime >= 15000
+      videoInfo = {}
+      videoInfo.playerState = m.Video.state
+      videoInfo.videoId = m.Video.content.id.toInt()
+      videoInfo.viewTime = viewTime
+      videoInfo.playerPosition = m.playerPosition
+      videoInfo.lastPingTime = m.lastPingTime
+      videoInfo.callSource = callSource
+      tubiLog(FormatJSON(videoInfo), "info", "videoInfo", "preview-view-time-exceeds")
+    end if
+
   end if
 
   return previewProgressEvent
@@ -236,6 +261,7 @@ End Function
 
 'set hasCompleted to true when user watches the entire video preview, otherwise set it to false.
 Function getFinishPreviewEvent(hasCompleted = false)
+
   if m.Video.content = invalid OR m.Video.content.id = invalid then
     ' TODO remove after roku_async_stop_v4 experiment concludes
     errorInfo = {}
@@ -338,7 +364,7 @@ Function jumpToPosition(position)
     position = 0
   end if
 
-  previewProgressEvent = getPreviewProgressEvent(m.currentPageInfo)
+  previewProgressEvent = getPreviewProgressEvent(m.currentPageInfo, "jumpToPosition")
   if previewProgressEvent <> invalid
     trackEvent(previewProgressEvent)
   end if
