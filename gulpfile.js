@@ -721,6 +721,7 @@ function setAutomatedTestsConfig(done) {
         hideStartupModals: true,
         noAds: true,
         printReqAndResInfo: false,
+        disableHdmiStatusChecks: true,
         bs_const: {
           consoleLoggingEnabled: false,
           useQaAnalyticsProxy: useQaAnalyticsProxy
@@ -731,14 +732,6 @@ function setAutomatedTestsConfig(done) {
   } else {
     done(new Error('setAutomatedTestsConfig: options not found.'));
   }
-}
-
-
-function setRerunAutomatedTestsEnvironment(done) {
-  env.set({
-    isAlreadyDeployed: 'true'
-  });
-  done();
 }
 
 
@@ -967,8 +960,7 @@ function runAutomatedTestsSmoke(done) {
 
 
 exports.buildAutomatedTests = series(setAutomatedTestsConfig, clean, buildInstalled);
-exports.runAutomatedTests = series(exports.buildAutomatedTests, runAutomatedTests);
-exports.rerunAutomatedTests = series(setRerunAutomatedTestsEnvironment, runAutomatedTests);
+exports.runAutomatedTests = series(setAutomatedTestsConfig, runAutomatedTests);
 exports.runAutomatedTestsCli = runAutomatedTestsCli;
 exports.outputAvailableAutomatedTestTags = outputAvailableAutomatedTestTags;
 exports.autotest = runAutomatedTestsCli;

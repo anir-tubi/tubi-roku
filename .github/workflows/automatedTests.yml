@@ -130,6 +130,13 @@ jobs:
           name: HTML Report
           path: out/ui-tests-output/html
 
+      - name: Upload Failed Test Screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: Failed Test Screenshots
+          path: out/ui-tests-output/screenshots
+
       - name: Send Slack Notification
         if: success() || failure()
         run: |

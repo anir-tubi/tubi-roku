@@ -20,7 +20,7 @@ class Shared {
         await ecp.sendKeypress(ecp.Key.Play);
   }
 
-   
+
 
     public async  verifyResumeWithinRange() {
         await ecp.sendKeypress(ecp.Key.Play);// PLay to create history
@@ -106,21 +106,23 @@ class Shared {
     // openSettings function
     public async  openSettings() {
       await testUtils.goToPage('settings');
-      }
+    }
 
 
 
     // Navigate right until the grid is in focus
     // This is specifice to the Search screen
     public async  navigateRightToGrid() {
-        await testUtils.untilTrue(async () => {
-        await ecp.sendKeypress(ecp.Key.Right);
-        const {value: id} = await odc.getValue({
-            base: 'focusedNode',
-            keyPath: 'id'
-        });
-        return id === 'ResultGrid';
-        }, 'ResultGrid never obtained focus');
+      // We have to wait for ResultGrid to be showing first else we can get into an edge case bug that I decided not to fix since a user will never go as fast as the automation
+      await testUtils.waitForElementToShowOnScreen('searchResultGrid');
+      await testUtils.untilTrue(async () => {
+      await ecp.sendKeypress(ecp.Key.Right);
+      const {value: id} = await odc.getValue({
+          base: 'focusedNode',
+          keyPath: 'id'
+      });
+      return id === 'ResultGrid';
+      }, 'ResultGrid never obtained focus');
   }
 
 

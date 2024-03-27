@@ -263,7 +263,7 @@ describe('Age Gate', function () {
   async function openKidsMode() {
     await ecp.sendKeypress(ecp.Key.Left);
     await testUtils.waitForSideNavMenuToBeExpanded();
-    await testUtils.selectMenuItem('sideNavMenu', 'Kids');  
+    await testUtils.selectMenuItem('sideNavMenu', 'Kids');
   }
 
   async function exitKidsMode() {

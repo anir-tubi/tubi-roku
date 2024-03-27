@@ -30,20 +30,20 @@ describe('Sign up Save Progress TV', function () {
         await ecp.sendKeypress(ecp.Key.Ok);
 
         // Wait for Let's create your account screen
-        await utils.sleep(2000);
-        
+        await utils.sleep(3000);
+
         // Click OK
         await ecp.sendKeypress(ecp.Key.Ok);
 
-        // Are we on the sign in/sign up page? 
+        // Are we on the sign in/sign up page?
         const signInScreenPageHeader = await testUtils.getNodeForElement('signInScreenPageHeader');
         expect(signInScreenPageHeader.text).to.equal('Sign In to Your Account');
-      
+
     });
 
     // https://tubi.testrail.io/index.php?/cases/view/260844
     it('C260844 - Guest - When user completes registration after Sign Up to Save Progress, the user is returned to Series Details page with Play button replacing the sign up prompt,@signupsaveprogress', async () => {
-      
+
         // Select a title
         await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -58,16 +58,16 @@ describe('Sign up Save Progress TV', function () {
 
         // Wait for Let's create your account screen
         await utils.sleep(2000);
-        
+
          // Click Down, Ok to Cancel
          await ecp.sendKeypress(ecp.Key.Down);
          await ecp.sendKeypress(ecp.Key.Ok);
- 
+
          // Create user
          const user = await testUtils.createRegisteredUser();
          const userInfo = user['userInfo'];
- 
-         // Are we on the Enter Email Address page? 
+
+         // Are we on the Enter Email Address page?
          const  emailInputScreenHeader = await testUtils.getNodeForElement('emailInputScreenHeader');
          expect(emailInputScreenHeader.text).to.equal('Enter Email Address');
 
@@ -86,7 +86,7 @@ describe('Sign up Save Progress TV', function () {
         await utils.sleep(550);
         await ecp.sendKeypress(ecp.Key.Ok);
         await utils.sleep(1000);
-        
+
 
         // Are we on details page with Play button at top position?
         // Verify we are on the details page
@@ -98,7 +98,7 @@ describe('Sign up Save Progress TV', function () {
         const playButtonIconFocused = await testUtils.getNodeForElement('playButtonIconFocused');
         expect(playButtonIconFocused.uri).to.equal('pkg:/images/icon-play.webp');
 
-      
+
     });
     it('C260845 - Guest - When user  presses Play on the Series Details page after choosing to Sign Up to Save Progress, the  title plays,@signupsaveprogress', async () => {
 
@@ -116,16 +116,16 @@ describe('Sign up Save Progress TV', function () {
 
         // Wait for Let's create your account modal (Roku modal, no elements)
         await utils.sleep(2000);
-        
+
          // Click Down, Ok to Cancel
          await ecp.sendKeypress(ecp.Key.Down);
          await ecp.sendKeypress(ecp.Key.Ok);
- 
+
          // Create user
          const user = await testUtils.createRegisteredUser();
          const userInfo = user['userInfo'];
- 
-         // Are we on the Enter Email Address page? 
+
+         // Are we on the Enter Email Address page?
          const  emailInputScreenHeader = await testUtils.getNodeForElement('emailInputScreenHeader');
          expect(emailInputScreenHeader.text).to.equal('Enter Email Address');
 
@@ -142,11 +142,11 @@ describe('Sign up Save Progress TV', function () {
         await ecp.sendKeypress(ecp.Key.Right);
         await ecp.sendKeypress(ecp.Key.Down, {count:4});
         await utils.sleep(550);
-        await ecp.sendKeypress(ecp.Key.Ok);  
+        await ecp.sendKeypress(ecp.Key.Ok);
         await utils.sleep(1000);
         await ecp.sendKeypress(ecp.Key.Down);
         await ecp.sendKeypress(ecp.Key.Ok);
-        
+
 
         // Are we on details page with Play button at top position?
         // Verify we are on the details page
@@ -163,5 +163,5 @@ describe('Sign up Save Progress TV', function () {
 
         // Is video playing?
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 10000);
-    });  
+    });
 });

@@ -16,8 +16,7 @@ const {execShellCommand, spawnShellCommand} = require('./utilities');
 
 const { testUtils, auth, ContentTypes, ContentRatings } = require('./automated-tests/test-utils');
 
-const testsOutputFolder = `out/ui-tests-output`;
-const jsonReportOutputPath = `${testsOutputFolder}/report.json`;
+const jsonReportOutputPath = `${testUtils.testsOutputFolder}/report.json`;
 
 async function runAutomatedTestsCli(done, analytics=false) {
   let availableTags;
@@ -225,10 +224,22 @@ function runAutomatedTestsSmoke(done) {
 
 
 async function runAutomatedTests(done, branch = '', tags = [], analytics = false) {
+  // Load env file to allow overrides while developing tests
+  const envPath = '.vscode/.env';
+  if (fs.existsSync(envPath)) {
+    env({
+      file: envPath,
+      type: '.ini',
+    });
+  }
+
+  // Clear out any existing output. Should be ok to do asynchronous since we have several long steps before we start writing to output folder
+  fs.rm(testUtils.testsOutputFolder, { recursive: true, force: true }, (e) => {});
+
   const mochaOptions = [
     '--reporter js/automated-tests/mocha-reporter.ts', // Tell mocha to use our custom reporter
     `--reporter-option output=${jsonReportOutputPath}`, // output path for json reporter
-    `--reporter-option reportDir=${testsOutputFolder}/html`, // folder for mochawesome
+    `--reporter-option reportDir=${testUtils.testsOutputFolder}/html`, // folder for mochawesome
     `--reporter-option reportFilename=report`, // filename for mochawesome
     `--reporter-option json=false` // turn off json output for mochawesome
   ];
@@ -247,8 +258,8 @@ async function runAutomatedTests(done, branch = '', tags = [], analytics = false
     mochaOptions.push(`--grep "${tags.join('|')}"`);
   }
 
-  // Used to allow specifying whether we should bail when run from the Github UI for the Automated UI Tests Github runner
-  if (process.env.bail === 'true') {
+  // Used to allow specifying whether we should bail when run from the Github UI for the Automated UI Tests Github runner or while developing tests
+  if (process.env.bail === 'true' || process.env.ENABLE_MOCHA_BAIL === 'true') {
     mochaOptions.push('--bail');
   }
 
@@ -267,19 +278,36 @@ async function runAutomatedTests(done, branch = '', tags = [], analytics = false
 
   execShellCommand(done, `gulp --cwd ${applicationFolder} buildAutomatedTests`);
 
-  const config = utils.getConfigFromConfigFile();
+  const buildFolder = `${applicationFolder}/build/local`;
   env.set({
-    buildFolder: `${applicationFolder}/build/local`,
-    rtaConfig: JSON.stringify(config)
+    buildFolder: buildFolder
   });
+
+  const config = utils.getConfigFromConfigFile();
+  // Enable parallel testing if multiple devices are included and we haven't disabled running in parallel
+  if (config.RokuDevice.devices.length > 1 && process.env.DISABLE_MOCHA_PARALLEL !== 'true') {
+    mochaOptions.push(`--parallel --jobs ${config.RokuDevice.devices.length}`);
+  }
+
+  // Adding retries. May eventually want to allow turning on or off
+  mochaOptions.push('--retries 3');
 
   // Even if our tests fail we still want to append the extra data to the json report
   let testsPath;
-  if(analytics){
+  if (analytics){
     testsPath = 'js/automated-tests/analytics/tests/*.ts';
   } else {
     testsPath = 'js/automated-tests/tests/*.ts';
   }
+
+  // We need to make our package here or else when we run in parallel they will all attempt to make the package at the same time
+  await device.createPackage({
+    rootDir: buildFolder,
+    files: [
+      '**/*'
+    ]
+  });
+
   const code = await spawnShellCommand(done, `npx mocha ${mochaOptions.join(' ')} ${testsPath}`, true);
   await appendDataToJsonReport(branch);
   if (code !== 0) {
@@ -369,7 +397,7 @@ async function appendDataToJsonReport(branch) {
     branch: branch
   };
 
-  fs.writeFileSync(jsonReportOutputPath, JSON.stringify(report));
+  fs.writeFileSync(jsonReportOutputPath, JSON.stringify(report, undefined, 2));
 }
 
 

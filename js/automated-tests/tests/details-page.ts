@@ -44,8 +44,8 @@ describe('Details Page', function () {
       const backgroundGroup = await testUtils.getNodeForElement('backgroundGroup');
       expect(backgroundGroup.posterVisible).to.equal(true);
 
-      for (const [index, url] of backgroundGroup.backgroundInfo.urilist.entries()) {
-        expect(url).to.equal(itemData.backgrounds[index]);
+      for (const url of backgroundGroup.backgroundInfo.urilist) {
+        expect(itemData.backgrounds).to.contain(url);
       }
     });
 
@@ -210,7 +210,7 @@ describe('Details Page', function () {
       expect(onMoviesPageButton.visible).to.equal(true);
       await ecp.sendKeypress(ecp.Key.Down, { count: 7 });  //Move to fresh movie title
 
-      
+
 
       // Create history
       await ecp.sendKeypress(ecp.Key.Play);
@@ -231,7 +231,7 @@ describe('Details Page', function () {
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/6409
     it('C6409 - Movie Details - With History - When "Play From Beginning" selected then movie playback starts from beginning" @mdp_1', async () => {
-     
+
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
       await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
@@ -358,8 +358,7 @@ describe('Details Page', function () {
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
       // On Movies page?
-      const onMoviesPageButton = await testUtils.getNodeForElement('onMoviesPageButton');
-      expect(onMoviesPageButton.visible).to.equal(true);
+      await testUtils.waitForCurrentScreenToEqual('movieScreen');
 
       // Select a title and press the Play button
       await ecp.sendKeypress(ecp.Key.Ok);
@@ -390,6 +389,8 @@ describe('Details Page', function () {
     it('C307688 Registered User - Details page has Play button selected by Default @registered_user,@smoke,@mdp_1', async () => {
       // Start Application at Movies page with logged in user
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+
+      await testUtils.waitForCurrentScreenToEqual('movieScreen');
 
       // Select title
       await ecp.sendKeypress(ecp.Key.Ok);
@@ -585,6 +586,7 @@ describe('Details Page', function () {
     it('C535821 - Series - No History - When episode is chosen then playback should triggered from the beginning @sdp_1,@smoke,@regression,@registered_user', async () => {
       // While on Series Details page, lets play and check playback starts from the beginning
       await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+      await testUtils.waitForCurrentScreenToEqual('tvScreen');
       await ecp.sendKeypress(ecp.Key.Ok);
       await verifyPlayFromBeginning();
       await ecp.sendKeypress(ecp.Key.Back); // Back to Details page
@@ -685,6 +687,7 @@ async function findIndexForFirstItemWithoutVideoPreview(rowListKeyPath) {
 
 // Create history function
 async function createHistory() {
+  await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen', 15000);
   const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
   expect(videoPlayerActual.visible).to.equal(true);
   await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);

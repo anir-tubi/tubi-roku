@@ -12,7 +12,7 @@ describe('Multiple Audio', function () {
     await ecp.sendText('fifth plane');
 
     // Call function to navigate right to search results grid
-    await navigateRightToGrid();
+    await shared.navigateRightToGrid();
 
     await testUtils.retryWithTimeOut(async () => {
       const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
@@ -38,7 +38,7 @@ describe('Multiple Audio', function () {
     await ecp.sendText('fifth plane');
 
     // Call function to navigate right to search results grid
-    await navigateRightToGrid();
+    await shared.navigateRightToGrid();
 
     await testUtils.retryWithTimeOut(async () => {
       const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
@@ -67,12 +67,12 @@ describe('Multiple Audio', function () {
     // CC Section Header present?
     const closedCaptionSectionHeaderLabel = await testUtils.getNodeForElement('closedCaptionSectionHeaderLabel');
     expect (closedCaptionSectionHeaderLabel.text).to.equal('Subtitles');
-   
+
 
     // Audio Section header present?
     const audioTracksSectionHeaderLabel = await testUtils.getNodeForElement('audioTracksSectionHeaderLabel');
     expect(audioTracksSectionHeaderLabel.text).to.equal('Audio');
-    
+
     // Reset AD controls to default
     await resetAudioOptions();
 
@@ -85,7 +85,7 @@ describe('Multiple Audio', function () {
 
     // Call function to navigate right to search results grid
     await testUtils.waitForElementToFullyShowOnScreen('searchResultGrid');
-    await navigateRightToGrid();
+    await shared.navigateRightToGrid();
 
     await testUtils.retryWithTimeOut(async () => {
       const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
@@ -111,7 +111,7 @@ describe('Multiple Audio', function () {
     // CC Section Header present?
     const closedCaptionSectionHeaderLabel = await testUtils.getNodeForElement('closedCaptionSectionHeaderLabel');
     expect (closedCaptionSectionHeaderLabel.text).to.equal('Subtitles');
-   
+
 
     // Audio Section header present?
     const audioTracksSectionHeaderLabel = await testUtils.getNodeForElement('audioTracksSectionHeaderLabel');
@@ -130,7 +130,7 @@ describe('Multiple Audio', function () {
 
     // Call function to navigate right to search results grid
     await testUtils.waitForElementToShowOnScreen('searchResultGrid', 'Result Grid did not appear', 10000);
-    await navigateRightToGrid();
+    await shared.navigateRightToGrid();
     await testUtils.retryWithTimeOut(async () => {
       const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
       expect(searchResultsText.text).to.contain('Cosmos');
@@ -172,7 +172,7 @@ describe('Multiple Audio', function () {
 
     // Call function to navigate right to search results grid
     await testUtils.waitForElementToFullyShowOnScreen('searchResultGrid');
-    await navigateRightToGrid();
+    await shared.navigateRightToGrid();
 
     await testUtils.retryWithTimeOut(async () => {
       const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
@@ -226,7 +226,7 @@ describe('Multiple Audio', function () {
 
     // Reset AD controls to default
     await resetAudioOptions();
-    
+
   });
 });
 
@@ -236,18 +236,3 @@ async function resetAudioOptions() {
   await ecp.sendKeypress(ecp.Key.Down, {count: 2});
   await ecp.sendKeypress(ecp.Key.Ok);
 }
-
-
-// Navigate right until the grid is in focus
-async function navigateRightToGrid() {
-  await testUtils.untilTrue(async () => {
-    await ecp.sendKeypress(ecp.Key.Right);
-    const { value: id } = await odc.getValue({
-      base: 'focusedNode',
-      keyPath: 'id'
-    });
-    return id === 'ResultGrid';
-  }, 'ResultGrid never obtained focus');
-}
-
-

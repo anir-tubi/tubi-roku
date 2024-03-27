@@ -87,6 +87,7 @@ const abbreviatedContentTypeConversion = {
 class TestUtils {
   private userAgent = 'Roku/DVP-11.5 (11.5.0.4312-46)';
 
+  public testsOutputFolder = 'out/ui-tests-output';
 
   /**
    * You can use this to get an element for the key the provided. Can also take an element to allow easier usage
@@ -341,9 +342,10 @@ class TestUtils {
 
   public async createRegisteredUser() {
     const user = new RegisteredUser();
+    const email = `build_roku_${Math.floor(Date.now() / 1000)}_${Math.floor(Math.random() * 1000)}@tubi.tv`;
     const credentials = {
       birthday: '2000-01-01',
-      email: `build_roku_${Math.floor(Date.now() / 1000)}@tubi.tv`,
+      email: email,
       email_type: 'manual',
       first_name: 'Automation',
       gender: '',
@@ -415,10 +417,10 @@ class TestUtils {
    * @param expectedState - The state we are waiting for
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
-  public async waitForPlayerStateToEqual(videoPlayerElementId: VideoPlayerElementId, expectedState: VideoPlayerStates, timeout = 5000) {
+  public async waitForPlayerStateToEqual(videoPlayerElementId: VideoPlayerElementId, expectedState: VideoPlayerStates, timeout = 15000) {
     const element = this.getElementKeyPath(videoPlayerElementId);
     return await testUtils.retryWithTimeOut(async () => {
-      const state = await this.getElementField(videoPlayerElementId, 'state');
+      const state = await this.getElementField(videoPlayerElementId, 'state', timeout);
       expect(state).to.equal(expectedState);
     }, timeout);
   }
@@ -431,7 +433,7 @@ class TestUtils {
    * @param precision - How close in milliseconds the current player position has to be to `position` in order to be considered valid
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
-  public async waitForPlayerPositionToEqual(videoPlayerElementId: VideoPlayerElementId, position: number, precision = 10000, timeout = 5000) {
+  public async waitForPlayerPositionToEqual(videoPlayerElementId: VideoPlayerElementId, position: number, precision = 10000, timeout = 15000) {
     return await testUtils.retryWithTimeOut(async () => {
       const actualPlayerPosition = await testUtils.getPlayerPosition(videoPlayerElementId);
       expect(actualPlayerPosition).to.be.greaterThanOrEqual(position - precision).and.lessThanOrEqual(position + precision);
@@ -757,6 +759,23 @@ class TestUtils {
 
 
   /**
+   * Used to help wait until content loads on a grid before trying to interact with it
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async waitForGridContentToLoad(elementOrElementId: ElementOrElementId, timeout = 15000) {
+    const element = this.getElementKeyPath(elementOrElementId);
+    element.keyPath += '.content';
+
+    // TODO update when we either get multiple observer callback support or more advanced types
+    await this.untilTrue(async () => {
+      const {value} = await odc.getValue(element, {timeout: timeout});
+      return !!value;
+    });
+  }
+
+
+  /**
    * Used to retrieve grid item content for the item specified by the index
    * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
    * @param index - array or number of which item we are getting the content for. For RowLists this should a 2 item array and for Grids a single item array or number
@@ -844,36 +863,38 @@ class TestUtils {
     args['match'] = false;
     await odc.onFieldChangeOnce(args);
 
-    const elementId = 'detailScreenMenu';
+
+    const element = elements.detailScreenMenu;
+    await this.waitForElementToHaveFocus(element);
     switch (item) {
       case 'play':
-        await this.selectMenuItem(elementId, 'Play', timeout);
+        await this.selectMenuItem(element, 'Play', timeout);
         await this.waitForElementToNotBeInFocusChain('detailScreen');
         break;
       case 'playFromBeginning':
-        await this.selectMenuItem(elementId, 'Play from Beginning', timeout);
+        await this.selectMenuItem(element, 'Play from Beginning', timeout);
         await this.waitForElementToNotBeInFocusChain('detailScreen');
         break;
       case 'resume':
-        await this.selectMenuItem(elementId, 'Resume Playing', timeout);
+        await this.selectMenuItem(element, 'Resume Playing', timeout);
         await this.waitForElementToNotBeInFocusChain('detailScreen');
         break;
       case 'addToMyList':
-        await this.selectMenuItem(elementId, 'Add to My List', timeout);
+        await this.selectMenuItem(element, 'Add to My List', timeout);
         // We know we're good once the remove item shows up
-        await this.findRowIndexWithTitle(elementId, 'Remove from My List', timeout);
+        await this.findRowIndexWithTitle(element, 'Remove from My List', timeout);
         break;
       case 'removeFromMyList':
-        await this.selectMenuItem(elementId, 'Remove from My List', timeout);
+        await this.selectMenuItem(element, 'Remove from My List', timeout);
         // We know we're good once the add item shows up
-        await this.findRowIndexWithTitle(elementId, 'Add to My List', timeout);
+        await this.findRowIndexWithTitle(element, 'Add to My List', timeout);
         break;
       case 'removeFromHistory':
-        await this.selectMenuItem(elementId, 'Remove from history', timeout);
+        await this.selectMenuItem(element, 'Remove from history', timeout);
         // We know we're good once the Resume item goes away
         await this.untilTrue(async () => {
           try {
-            await this.findRowIndexWithTitle(elementId, 'Remove from history', 0);
+            await this.findRowIndexWithTitle(element, 'Remove from history', 0);
             return false;
           } catch(e) {
             return true;
@@ -881,7 +902,7 @@ class TestUtils {
         }, 'Could not verify that Remove from history was removed');
         break;
       case 'episodesList':
-        await this.selectMenuItem(elementId, 'Episodes list', timeout);
+        await this.selectMenuItem(element, 'Episodes list', timeout);
         await this.waitForElementToBeInFocusChain('episodesScreen');
         break;
       case 'signUp':
@@ -895,7 +916,7 @@ class TestUtils {
           }
         });
 
-        await this.selectMenuItem(elementId, 'Sign Up to Save Progress', timeout);
+        await this.selectMenuItem(element, 'Sign Up to Save Progress', timeout);
 
         // Currently no way to verify the RFI prompt actually opens up since Roku doesn't expose that ability so the closest we can do is verify that the analytics call was made
         const {value} = await observerPromise;
@@ -1003,6 +1024,9 @@ class TestUtils {
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
   public async waitForElementToHaveFocus(elementOrElementId: ElementOrElementId, errorMessage?: string, timeout = 10000) {
+    if (errorMessage === undefined) {
+      errorMessage = `${elementOrElementId} failed to have focus in ${timeout}ms`;
+    }
     await this.untilTrue(async () => {
       try {
         return await this.elementHasFocus(elementOrElementId);
@@ -1020,6 +1044,9 @@ class TestUtils {
   * @param timeout - How long we will wait for this operation before considering it to have failed
   */
   public async waitForElementToNotHaveFocus(elementOrElementId: ElementOrElementId, errorMessage?: string, timeout = 10000) {
+    if (errorMessage === undefined) {
+      errorMessage = `${elementOrElementId} failed to not have focus in ${timeout}ms`;
+    }
     await this.untilTrue(async () => {
       try {
         const result = await this.elementHasFocus(elementOrElementId);
@@ -1038,6 +1065,9 @@ class TestUtils {
   * @param timeout - How long we will wait for this operation before considering it to have failed
   */
   public async waitForElementToBeInFocusChain(elementOrElementId: ElementOrElementId, errorMessage?: string, timeout = 10000) {
+    if (errorMessage === undefined) {
+      errorMessage = `${elementOrElementId} failed to be in focus chain in ${timeout}ms`;
+    }
     await this.untilTrue(async () => {
       try {
         return await this.elementIsInFocusChain(elementOrElementId);
@@ -1055,6 +1085,9 @@ class TestUtils {
   * @param timeout - How long we will wait for this operation before considering it to have failed
   */
   public async waitForElementToNotBeInFocusChain(elementOrElementId: ElementOrElementId, errorMessage?: string, timeout = 10000) {
+    if (errorMessage === undefined) {
+      errorMessage = `${elementOrElementId} failed to not be in focus chain in ${timeout}ms`;
+    }
     await this.untilTrue(async () => {
       try {
         const result = await this.elementIsInFocusChain(elementOrElementId);

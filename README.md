@@ -539,6 +539,15 @@ Then run:
 
 In addition to Suitest tests we are now adding our own internal tests as well. Getting started with these is covered in this [wiki](https://tubitv.atlassian.net/wiki/spaces/QA/pages/2827419649/Roku+RTA+tests+environment+setup+and+getting+started+writing+tests)
 
+There are some overrides that are helpful while writing tests these are:  
+`DISABLE_MOCHA_PARALLEL` - Will prevent running tests in parallel. You can not use `.only` when run in parallel so need to disable it in order to run only a single test. Parallel testing is only used if multiple devices are included in rta-config.json.
+
+`ENABLE_MOCHA_BAIL` - Will cause mocha to stop running tests as soon as first test fails.
+
+`RERUN_AUTOMATED_TESTS` - Will reuse existing deployment of application instead of redeploying to speed up rerunning tests. Care should be taken as this could cause an older version of the application to run but is useful while writing new tests to speed up deployment
+
+In order to use these environment variables, they must be added to the env file located at `.vscode/.env`.
+
 # Experiments
 
 We may want to see how a new feature will affect the app's metrics from a small group of our users before rolling out the feature to everyone on a given  platform. To do this, we will need to use the popper experiment system to let the app know when an experimental feature should be seen. Below are the details of this process.

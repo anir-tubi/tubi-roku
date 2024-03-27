@@ -102,8 +102,10 @@ describe('Playback', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
-    const homeScreenRowList = await testUtils.getNodeForElement('homeScreenRowList');
-    expect(homeScreenRowList.visible).to.equal(true);
+    await testUtils.waitForCurrentScreenToEqual('homeScreen');
+
+    // Wait for homescreen content to load
+    await testUtils.waitForGridContentToLoad('homeScreenRowList');
 
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);

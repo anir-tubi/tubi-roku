@@ -65,20 +65,18 @@
     "@crowdin/crowdin-api-client": "^1.30.0",
     "gulp-mocha": "^8.0.0",
     "needle": "^3.2.0",
-    "roku-test-automation": "2.0.1"
+    "roku-test-automation": "^2.0.3-0"
   },
   "mocha": {
     "timeout": 120000,
     "require": [
-      "ts-node/register"
+      "ts-node/register",
+      "./js/automated-tests/include.ts"
     ],
     "bail": false,
     "fullTrace": true,
     "watchExtensions": [
       "ts"
-    ],
-    "file": [
-      "./js/automated-tests/include.ts"
     ]
   }
 }
