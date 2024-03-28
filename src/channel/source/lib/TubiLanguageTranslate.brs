@@ -3159,7 +3159,7 @@ Function getTranslation_es_MX()
     },
     "registration_signIn_to_play_R_rated": {
       "description": "hint text next to the Sign In to Play button when a non registered user focuses on details screen for sportsEvent",
-      "message": "Este título requiere iniciar sesión para proteger la audiencia mas joven. No se requiere tarjeta de crédito."
+      "message": "Este título requiere iniciar sesión para proteger la audiencia joven. Es Gratis!"
     },
     "text_new": {
       "description": "simple text to use anywhere to indicate item is new",
