@@ -195,7 +195,7 @@ End Function
 
 ' stops the video
 Function stopContent()
-  if m.videoState <> "stop"
+  if m.videoState <> "stop" AND m.Video.state <> "stopped" then
     if m.Video.content.id <> invalid AND m.playerPosition > 0
       finishPreviewEvent = getFinishPreviewEvent()
       trackEvent(finishPreviewEvent)
@@ -203,8 +203,8 @@ Function stopContent()
 
     getExperimentResource("roku_async_stop", "roku_async_stop_v4", true)
     m.Video.control = "stop"
-    m.videoState = "stop"
   end if
+  m.videoState = "stop"
   m.top.content = invalid
 End Function
 
