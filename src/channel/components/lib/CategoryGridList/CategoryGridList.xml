@@ -87,6 +87,9 @@
       <!-- set to true if the user is signed in and we want to change the experience based on that -->
       <field id="signedIn" type="boolean" value="false" />
 
+      <!-- This field is used to force remove focus from the rowlist. -->
+      <field id="removeFocusFromRowList" type="boolean" />
+
 
     <!-- OUTPUT -->
       <field id="itemSelected" type="node"/>

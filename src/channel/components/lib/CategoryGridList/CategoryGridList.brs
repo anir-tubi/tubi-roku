@@ -9,6 +9,7 @@ Function init()
   m.top.observeField("contentUpdated", "onContentChange")
   m.top.observeField("repopulateContent", "onRepopulateContent")
   m.top.observeField("animateToCategory", "onAnimateToCategory")
+  m.top.observeFieldScoped("removeFocusFromRowList", "onRemoveFocusFromRowList")
   m.RowList = m.top.findNode("RowList")
   m.RowList.observeField("rowItemFocused", "onRowItemFocused")
   m.RowList.observeField("rowItemSelected", "onRowItemSelected")
@@ -61,6 +62,11 @@ Function onThemeChange(msg = invalid)
   if theme <> invalid
     m.RowList.focusBitmapBlendColor = theme.focusedColor
   end if
+End Function
+
+
+Function onRemoveFocusFromRowList()
+  m.RowList.setFocus(false)
 End Function
 
 

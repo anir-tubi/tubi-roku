@@ -102,6 +102,9 @@
       <!-- This field will inform the homescreen to update the infopanel after we fetch episode content
            Delete this field after exp roku_progress_bar_on_infopanel -->
       <field id="refreshInfoPanelWithEpisode" type="node"/>
+      
+      <!-- This field is used to force remove focus from the rowlist. -->
+      <field id="removeFocusFromRowList" type="boolean" alias="CategoryGridList.removeFocusFromRowList" />
 
     <!-- OUTPUTS -->
       <!-- Trigger the content to be loaded.  This field is used to delay
