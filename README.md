@@ -334,7 +334,16 @@ TBD
 - If you still need to setup Infra, then in terminal, navigate to your adrise_infrastructure repo and run the setup instructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure#setup)
 
 - Deploy to the Roku CDN and CDN by running the Infra Script which is detailed in the [RCDN README file](https://github.com/adRise/rcdn#readme).
-  After deployment make sure you can download the components you just uploaded to the CDN using the urls associated with `starterComponentsUrl`, `remoteComponentsUrl` and `rcdnStarterComponentsUrl`, `rcdnRemoteComponentsUrl` in default.yml
+
+- If you encounter an SSH error (`SSH agent does not have your private key loaded`) while running the infra script, run the following command:
+
+  `ssh-add ~/.ssh/id_ed25519`
+
+  See: [Add the key to your SSH agent](https://tubitv.atlassian.net/wiki/spaces/SEC/pages/917963346/SSH+Config#Add-the-key-to-your-SSH-agent)
+
+- After deployment make sure you can download the components you just uploaded to the CDN using the URLs associated with `starterComponentsUrl`, `remoteComponentsUrl`, `rcdnStarterComponentsUrl`, and `rcdnRemoteComponentsUrl` in default.yml.
+
+  Note: The URLs will require you to replace a part of the URL with version strings. For instance: "{{versionMinorUnderscored}}" = "3_2", "{{versionUnderscored}}" = "3_2_34_0".
 
 
 
@@ -473,7 +482,16 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 - If you still need to setup Infra, then in terminal, navigate to your adrise_infrastructure repo and run the setup instructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure#setup)
 
 - Deploy to the Roku CDN and CDN by running the Infra Script which is detailed in the [RCDN README file](https://github.com/adRise/rcdn#readme).
-  After deployment make sure you can download the components you just uploaded to CDN using the urls associated with `starterComponentsUrl`, `remoteComponentsUrl` and `rcdnStarterComponentsUrl`, `rcdnRemoteComponentsUrl` in default.yml
+
+- If you encounter an SSH error (`SSH agent does not have your private key loaded`) while running the infra script, run the following command:
+
+  `ssh-add ~/.ssh/id_ed25519`
+
+  See: [Add the key to your SSH agent](https://tubitv.atlassian.net/wiki/spaces/SEC/pages/917963346/SSH+Config#Add-the-key-to-your-SSH-agent)
+
+- After deployment make sure you can download the components you just uploaded to the CDN using the URLs associated with `starterComponentsUrl`, `remoteComponentsUrl`, `rcdnStarterComponentsUrl`, and `rcdnRemoteComponentsUrl` in default.yml.
+
+  Note: The URLs will require you to replace a part of the URL with version strings. For instance: "{{versionMinorUnderscored}}" = "3_2", "{{versionUnderscored}}" = "3_2_34_0".
 
 15\. Verify the release
 
