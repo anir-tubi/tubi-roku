@@ -306,11 +306,13 @@ Function populateDetailScreen(detailScreen, content, shouldResetButtonIndex = fa
       detailScreen.isSeries = true
     else if content.type = m.constants.ui.contentTypes.sportsEvent
       detailScreen.mode = m.constants.ui.infoPanelModes.sportsEvent
+      detailScreen.isSeries = false
       lineOneData.badgeText = badgeText
       lineOneData.hoursOfAiring = matchTime
       lineTwoData.roundGroupInfo = content.roundGroupInfo
     else
       detailScreen.mode = m.constants.ui.infoPanelModes.movie
+      detailScreen.isSeries = false
       lineTwoData.genres = content.genres
     end if
 
