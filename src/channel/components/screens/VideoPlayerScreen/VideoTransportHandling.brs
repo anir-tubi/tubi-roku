@@ -1201,7 +1201,7 @@ Function animateTransport(direction)
   tubiLog("VideoTransportHandling.AnimateTransport, direction = " + direction)
   handleSkipCuepointsButtonOnAnimateTransport(direction)
 
-  if direction = "in" AND m.VideoState <> "skip" AND m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_v1").enabled = true
+  if direction = "in" AND m.VideoState <> "skip" AND m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_player_controls_v2").enabled = true
     m.Thumbnail.visible = false
     showSignUpSaveProgressButton()
   end if
@@ -1703,7 +1703,7 @@ Function hideYMAL(showSignUpButton = true)
 
     if m.skipCuepointsButtonTimer <> invalid
       showSkipCuepointsButton()
-    else if m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND showSignUpButton = true AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_v1").enabled = true
+    else if m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND showSignUpButton = true AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_player_controls_v2").enabled = true
       showSignUpSaveProgressButton()
     end if
   end if

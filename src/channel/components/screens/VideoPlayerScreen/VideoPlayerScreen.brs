@@ -322,7 +322,7 @@ Function init()
   m.signUpSaveProgressButton.itemContent = signUpSaveProgressContentNode
   m.signUpSaveProgressButton.translation = [87, m.signUpSaveProgressButtonYTranslation]
   m.signUpSaveProgressButton.observeFieldScoped("buttonSelected", "onSignUpSaveProgressButtonSelected")
-  m.isSignUpSaveProgressInPlayerEnabled = getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_v1", false).enabled
+  m.isSignUpSaveProgressInPlayerEnabled = getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_player_controls_v2", false).enabled
 
   setFocusToComponent(m.PlayPauseButton)
 
@@ -457,7 +457,7 @@ Function autoHideSkipCuepointsButton()
   if m.HUD.opacity < 1
     hideSkipCuepointsButton(m.top)
 
-    if m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_v1").enabled = true
+    if m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_player_controls_v2").enabled = true
       showSignUpSaveProgressButton()
     end if
   end if
@@ -1365,7 +1365,7 @@ Function backButtonExit()
   content = m.top.content
 
   'Guest user who is watching series and it's player position greater than or equal to 5 minutes then display prompt only once per session
-  if content <> invalid AND content.parentType = m.constants.ui.contentTypes.series AND m.top.appMode <> "KIDS_MODE" AND isLoggedInUser() = false AND m.playerPosition >= 300 AND m.wasSignUpToSaveProgressModalAlreadyShown = false AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_v1", true).enabled
+  if content <> invalid AND content.parentType = m.constants.ui.contentTypes.series AND m.top.appMode <> "KIDS_MODE" AND isLoggedInUser() = false AND m.playerPosition >= 300 AND m.wasSignUpToSaveProgressModalAlreadyShown = false AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_exit_prompt_v2", true).enabled
     m.wasSignUpToSaveProgressModalAlreadyShown = true
     pauseVideo(false, false)
     m.top.showSignUpModal = true

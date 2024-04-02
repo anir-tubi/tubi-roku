@@ -107,7 +107,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     initVideoTracking(videoPlayer) 'initializeYoubora
     setInScreenCache(videoPlayer)
 
-    if getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_v1", false).enabled = true
+    if getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_player_controls_v2", false).enabled = true
       videoPlayer.observeFieldScoped("signUpSaveProgressButtonSelected", "onSignUpSaveProgressButtonSelected")
     end if
 
