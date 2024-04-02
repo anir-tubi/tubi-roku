@@ -317,6 +317,8 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getThumbnails] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getLiveManifest] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.emailExists] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.magicLink] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.queryStatusOfMagicLink] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postUserHistory] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.signup] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.signIn] = true
