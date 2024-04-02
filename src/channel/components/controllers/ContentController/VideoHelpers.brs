@@ -125,7 +125,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
   videoPlayer.isUserLoggedIn = isLoggedInUser()
   videoPlayer.relatedContent = invalid
 
-  stopVideoPreviewIfPlaying() 'stop videopreview just in case it is playing
+  stopVideoPreview()
 
   ' m.upNextRequest can be checked to determine if a request to fetch up next / autoplay content has
   ' already been made for the currently playing content. This is important in the case where a user

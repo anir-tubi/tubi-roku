@@ -50,21 +50,6 @@ Function stopVideoPreview(node = invalid)
 End Function
 
 
-' stopVideoPreviewIfPlaying stops the video preview only if videopreview is playing or buffering.
-' @node : roSGNode, a VideoPreviewPlayer node
-Function stopVideoPreviewIfPlaying(node = invalid)
-  tubiLog("VideoPreviewHelpers.stopVideoPreviewIfPlaying")
-  if node = invalid
-    node = m.videoPreviewPlayer
-  end if
-
-  if node <> invalid AND node.subType() = "VideoPreviewPlayer" AND (node.state = "buffering" OR node.state = "playing") 'this means video preview not stopped/finished for previous content, so we need to stop it
-    sendVideoPlayerCommand(node, "stop")
-    node.visible = false
-  end if
-End Function
-
-
 Function onPauseVideoPreview()
   tubiLog("VideoPreviewHelpers.onPauseVideoPreview")
   pauseVideoPreview()
@@ -90,10 +75,7 @@ Function onVideoPreviewStateChanged(msg)
     if videoPreview <> invalid
       videoPreview.visible = true
     end if
-    if currentScreen <> invalid
-      ' updating backgroundUriList in order to change the backgroundType/gradient to EPG when video preview is playing/paused
-      currentScreen.backgroundUriList = currentScreen.backgroundUriList
-    end if
+
     m.backgroundGroup.posterVisible = false
   else if videoPreviewState = "error"
     ' unobserve the state if we have any error while playing mp4 video previews to avoid autostarting the focused content on autostart variant of experiment.

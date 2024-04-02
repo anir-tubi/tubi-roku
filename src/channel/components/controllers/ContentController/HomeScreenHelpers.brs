@@ -851,7 +851,7 @@ Function selectLinearContent(content)
   '//stop timer and tell player to go fullscreen
   stopCountdownTimer()
   if content <> invalid AND content.type = m.constants.ui.contentTypes.linear
-    stopVideoPreviewIfPlaying() 'stop the videopreview if it is still playing.
+    stopVideoPreview()
 
     linearContent = getCurrentLinearContent()
     if linearContent <> invalid AND linearContent.id <> invalid AND content.id = linearContent.id

@@ -590,7 +590,7 @@ Function startUserExperience()
       if m.guestUserHasAgeInfo = invalid then
         m.guestUserHasAgeInfo = TubiAuth(m.constants, m.Request).getGuestUserHasAgeInfo()
       end if
-  
+
       ' Have to make sure we check expired as well as default state will always have hasAge = false
       if m.guestUserHasAgeInfo.hasAge = false AND m.guestUserHasAgeInfo.expired = false then
         showGDPRAgeGateErrorScreen()
@@ -645,7 +645,7 @@ Function startUserExperience()
 
     sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
     sendDeviceLog()
-    
+
     setUiModeAndLoadContent()
   end if
 End Function
@@ -793,7 +793,7 @@ Function handleHistoryChange()
   if isLoggedInUser() = true
     ' make request to get history/continue watching ids
     getHistoryIds(onHistoryRefresh)
-    
+
     ' update Continue Watching containers on various screens
     setDirtyUserCategories(m.constants.ui.categoryIds.history)
   end if
@@ -843,7 +843,7 @@ Function setDirtyUserCategories(categoryId)
 
     isKidsMode = shouldKidsModeBeSentToServer()
     reqName = m.constants.reqNames.getCategory
-    
+
     options = {}
     params = {}
     ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
@@ -1538,8 +1538,13 @@ Function setVideoContentScreenBackground(screen)
       contentType = screen.contentFocused.type
     end if
     videoPreviewState = getVideoPreviewState()
-    if videoPreviewState = "playing" OR videoPreviewState = "paused"
 
+    isVideoPreviewPlayQueued = false
+    if m.videoPreviewPlayer <> invalid AND m.queuedVideoPlayerCommand <> invalid AND m.videoPreviewPlayer.isSameNode(m.queuedVideoPlayerCommand.videoPlayerNode) = TRUE AND m.queuedVideoPlayerCommand.command = "play" then
+      isVideoPreviewPlayQueued = true
+    end if
+
+    if videoPreviewState = "playing" OR videoPreviewState = "paused" OR videoPreviewState = "buffering" OR isVideoPreviewPlayQueued = TRUE then
       m.backgroundGroup.backgroundInfo = {
         type: m.constants.ui.backgroundTypes.epg
         uriList: [] ' setting uriList as empty, because don't need to rotate the background poster when video preview is playing. We can't use shouldRotateBackgrounds because we still need the gradients from backgroundGroup
