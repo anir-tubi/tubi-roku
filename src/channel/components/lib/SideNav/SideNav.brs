@@ -136,6 +136,9 @@ Function onCreateMenuItems()
     if (UCase(m.constants.deviceInfo.countryCode) = "US" OR UCase(m.constants.deviceInfo.countryCode) = "CA")
       menuItems.push(m.constants.ui.homeScreenTopNavIds.movies)
       menuItems.push(m.constants.ui.homeScreenTopNavIds.tv)
+    end if
+
+    if m.constants.externalConfig.info.livetv = true
       menuItems.push(m.constants.ui.homeScreenTopNavIds.linearEPG)
     end if
 

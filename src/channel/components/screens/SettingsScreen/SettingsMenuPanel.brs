@@ -100,8 +100,8 @@ Function setSettingsSidePanelMenuItems()
     }
   }
   
-  ' removing the parental controls if in one of the GDPR countries or ui mode is kids age gate.
-  if isGDPR(m.constants) = true OR m.top.uiMode = m.constants.ui.modes.kidsAgeGate
+  ' removing the parental controls if the config returns false.
+  if m.constants.externalConfig.info.enable_parental_control = false
     availablePanelItems.delete("parentalControls")
   end if
 

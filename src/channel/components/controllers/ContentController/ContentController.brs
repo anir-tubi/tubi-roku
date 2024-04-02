@@ -100,7 +100,10 @@ Function init()
 
   ' initialize states needed for various parts of kids mode
   m.kidsModeFeatureOn = false 'Should the kids Mode feature be made available for the user to interact with
-  if m.constants.deviceInfo.countryCode <> invalid AND isKidsModeAvailableByCountry() = true
+  enableKidsMode = m.constants.externalConfig.info.enable_kidsmode
+
+  ' enable kids mode if the config returns true.
+  if enableKidsMode = true
     m.kidsModeFeatureOn = true
   end if
 
@@ -1049,21 +1052,21 @@ Function setUiMode(mode)
 
   else if mode = m.constants.ui.modes.kids
     'kids
-    if m.kidsModeFeatureOn
+    if m.kidsModeFeatureOn = true
       m.uiMode = mode
       setCommonKidsModeElements()
       m.sideNav.uiMode = mode
     end if
   else if mode = m.constants.ui.modes.kidsAgeGate
     'kids mode due to age gating
-    if m.kidsModeFeatureOn
+    if m.kidsModeFeatureOn = true
       m.uiMode = mode
       setCommonKidsModeElements()
       m.sideNav.uiMode = mode
     end if
   else if mode = m.constants.ui.modes.kidsParental
     ' kids mode due to parental controls
-    if m.kidsModeFeatureOn
+    if m.kidsModeFeatureOn = true
       m.uiMode = mode
       setCommonKidsModeElements()
       m.sideNav.uiMode = mode
@@ -1147,7 +1150,7 @@ End Function
 ' a helper function to update the UI to a "kids mode" and which should only be
 ' called from within setUiMode()
 Function setCommonKidsModeElements()
-  if m.kidsModeFeatureOn
+  if m.kidsModeFeatureOn = true
     if m.global.theme = invalid OR m.global.theme.id <> m.constants.ui.themeIDs.kidsMode
       m.global.theme = m.constants.ui.themes.kidsMode
     end if
@@ -1761,17 +1764,6 @@ End Function
 
 Function isDeviceInUSorCA()
   return (UCase(m.constants.deviceInfo.countryCode) = "US" OR UCase(m.constants.deviceInfo.countryCode) = "CA")
-End Function
-
-
-Function isKidsModeAvailableByCountry()
-  countryCode = UCase(m.constants.deviceInfo.countryCode)
-  availableCountries = {
-    "US": true
-    "CA": true
-    "NZ": true
-  }
-  return (availableCountries.doesExist(countryCode) = true)
 End Function
 
 
