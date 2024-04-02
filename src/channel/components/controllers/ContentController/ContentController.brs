@@ -659,7 +659,12 @@ Function setUiModeAndLoadContent()
     ' whether we were logged in or not.
     handleDeeplink()
   else
-    startChannelFromAppLoad()
+    relaunchSeriesPlaybackInfo = m.pub_serverPersistentData.relaunchSeriesPlaybackInfo
+    if relaunchSeriesPlaybackInfo <> invalid AND relaunchSeriesPlaybackInfo.seriesId <> invalid
+      processSeriesRelaunch()
+    else
+      startChannelFromAppLoad()
+    end if
   end if
 
   if getConsentOptOutStatusByKey(m.constants.consentKeys.marketing) = false
@@ -1801,6 +1806,26 @@ Function onCustomSuspend(msg)
     currentScreen = getCurrentScreen()
     ' if the current screen is videoplayer, return to detail screen so that it will update historyPosition AND remove video screen from stack AND show previous screen from stack
     if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
+      content = currentScreen.content
+      historyPosition = round(currentScreen.position)
+      ' Checking the content is a series and if the user is logged in.
+      ' Checking if user watched more than 1 min.
+      if content.parentId <> invalid AND isLoggedInUser() = true AND historyPosition > m.constants.player.historyFrequency1Min AND getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v1", false).enabled = true
+        nowDate = CreateObject("roDateTime")
+        secondsFromEpoch = nowDate.AsSeconds()
+
+        ' We are saving episode id and resume at and lastViewedOn time for future use when we will enable series relaunch for non logged in users where we need to expire the save data after 24 hours.
+        relaunchSeriesPlaybackInfo = {
+          seriesId: content.parentId
+          episodeId: content.id
+          lastViewedOn: secondsFromEpoch
+          resumeAt: historyPosition
+        }
+        
+        saveServerPersistentData({
+          "relaunchSeriesPlaybackInfo": relaunchSeriesPlaybackInfo
+        }, "device")
+      end if
       currentScreen.sendPendingPauseAdPixel = true
       ' don't send analytics event when user presses "home" button during playback, so sending param as false.
       returnToDetailScreenFromVideo(false, false)
@@ -1865,6 +1890,7 @@ Function onCustomResume(msg)
   customResumeLaunchParams = invalid
   bRestartApp = false
   bStartChannel = false
+  shouldResumeChannel = false
 
   if args <> invalid
     customResumeLaunchParams = args.launchParams
@@ -1928,7 +1954,7 @@ Function onCustomResume(msg)
             bStartChannel = true
           else
             sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
-            resumeApp()
+            shouldResumeChannel = true
           end if
         else
           'Unknown state, backup solution to restart app.
@@ -1946,14 +1972,25 @@ Function onCustomResume(msg)
   end if
 
 
-  '// If the resume app action is to restart the app or start the channel, then 1st see if the previously played linear video can be played (if one exists)
-  if bRestartApp = true
-    restartApp()
-  else if bStartChannel = true
-    startChannelFromInstantResume()
+  relaunchSeriesPlaybackInfo = m.pub_serverPersistentData.relaunchSeriesPlaybackInfo
+  if relaunchSeriesPlaybackInfo <> invalid AND relaunchSeriesPlaybackInfo.seriesId <> invalid
+    processSeriesRelaunch()
   else
-    if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.episodeScreen
-      currentScreen.updateContent = true
+    '// If the resume app action is to restart the app or start the channel, then 1st see if the previously played linear video can be played (if one exists)
+    if bRestartApp = true
+      restartApp()
+    else if bStartChannel = true
+      startChannelFromInstantResume()
+    else
+      if shouldResumeChannel = true
+        resumeApp()
+      end if
+
+      ' We are force updating the content on resume since doing it during suspend was resulting in roku not showing images.
+      if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.episodeScreen
+        currentScreen.updateContent = true
+      end if
+
     end if
   end if
 
@@ -2710,4 +2747,36 @@ Function checkIfAllUserInfoReceived()
   end if
 
   return true
+End Function
+
+
+Function processSeriesRelaunch()
+  relaunchSeriesPlaybackInfo = m.pub_serverPersistentData.relaunchSeriesPlaybackInfo
+  if relaunchSeriesPlaybackInfo <> invalid
+    ' Firing the exposure event When users have watched an episode for at least 1 minute and relaunched Tubi.
+    getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v1", true)
+
+    content = CreateObject("roSGNode", "ContentNode")
+    content.update({
+      "id": relaunchSeriesPlaybackInfo.seriesId
+      "type": "series"
+    }, true)
+    startRelaunchSeriesPlayback(content)
+    saveServerPersistentData({
+      "relaunchSeriesPlaybackInfo": {}
+    }, "device")
+  end if
+End Function
+
+
+'@content : Content Node, Contains information about the series.
+Function startRelaunchSeriesPlayback(content)
+  currentScreen = getCurrentScreen()
+  ' Removing the top screen if it is details screen so that we force refresh the details screen always.
+  ' Because we do have logic around if the content expired we load home or if the user completely watched the episode we play next episode
+  ' So we are force removing the details screen and adding a new details screen if required.
+  if currentScreen <> invalid AND currentScreen.id = "detailScreen"
+    removeTopScreen()
+  end if
+  showDetailScreen(content, false, skipDetailScreen, startChannel, {})
 End Function

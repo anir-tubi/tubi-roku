@@ -2017,7 +2017,7 @@ Function skipDetailScreen(refreshedContent)
       else
         history = getHistory(refreshedContent.id)
         if history <> invalid
-          if refreshedContent.type = m.constants.ui.contentTypes.series AND refreshedContent.currentEpisodeId = ""
+          if refreshedContent.type = m.constants.ui.contentTypes.series
             refreshedContent.currentEpisodeId = history.currentEpisodeId
           end if
           nowPos = history.nowPos

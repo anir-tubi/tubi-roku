@@ -93,6 +93,10 @@ Function TubiExperiments(constants) as Object
         roku_tupian_background_images_v1 : {"enabled": false}
       }
 
+      roku_relaunch_series: {
+        roku_relaunch_series_v1: {"enabled": false}
+      }
+
     }
 
     'public methods
