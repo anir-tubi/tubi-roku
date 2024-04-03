@@ -1751,7 +1751,6 @@ Function setDrmOnContent(contentNode, resource, videoResourceIndex)
     ' set general fields related to DRM
     contentNode.httpHeaders = resource.drmHeaders
     contentNode.url = resource.url
-    contentNode.titanVersionOrExperimentVersion = resource.titanVersionOrExperimentVersion
     contentNode.length = resource.length
     contentNode.streamFormat = resource.streamFormat
     contentNode.drmType = resource.type
@@ -1759,6 +1758,13 @@ Function setDrmOnContent(contentNode, resource, videoResourceIndex)
     contentNode.resolution = resource.resolution
     contentNode.currentVideoResourceIndex = videoResourceIndex
     contentNode.hdcpVersion = resource.hdcpVersion
+
+    '//set youbora field
+    youboraTracking = {}
+    trackingKeys = m.constants.thirdParty.youbora.trackingKeys
+    youboraTracking[trackingKeys.titanVersionOrExperimentVersion] = resource.titanVersionOrExperimentVersion
+    youboraTracking[trackingKeys.generatorVersion] = resource.generatorVersion
+    contentNode.youboraTracking = youboraTracking
 
     ' set DRM scheme specific fields
     if resource.type = m.constants.player.drmTypes.dashWidevine

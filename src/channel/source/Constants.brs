@@ -368,6 +368,15 @@ Function getConstants()
 
         constants.thirdParty.youbora.config.expectAds = true
 
+        constants.thirdParty.youbora.trackingKeys = {}
+          ' If the content is coming from a titan endpoint, then a generator_version will be set to this field.
+          constants.thirdParty.youbora.trackingKeys.generatorVersion = "generatorVersion"
+          ' If the content is coming from a titan endpoint, then a titan_version will be set to this field.
+          ' Or if any experiment is running on client side related to video stream formats, then experiment and treatment names will be set to this field
+          constants.thirdParty.youbora.trackingKeys.titanVersionOrExperimentVersion = "titanVersionOrExperimentVersion"
+          ' which ssai is used
+          constants.thirdParty.youbora.trackingKeys.ssaiVersion = "ssaiVersion"
+
     constants.thirdParty.sentry = {}
       constants.thirdParty.sentry.dsn = "https://f8edcfe8baf140b4b91b46dfb8af9a19:acdf43f7c38a47f1ab85583035ff1798@sentry.io/1377102"
 

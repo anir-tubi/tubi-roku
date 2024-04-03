@@ -1833,6 +1833,10 @@ Function tubiMetadataTranslate_composeVideoResources(contentNode, contentFromSer
             resource.titanVersionOrExperimentVersion = titanVersionOrExperimentVersion
           end if
 
+          if video.generator_version <> invalid AND video.generator_version <> ""
+            resource.generatorVersion = video.generator_version
+          end if
+
           ' the following logic groups all the video resources by their codec into a 2 dimensional array of arrays.
           if codecToVideoResourcesIndexMap[codec] = invalid
             videoResourcesIndex = videoResources.count()

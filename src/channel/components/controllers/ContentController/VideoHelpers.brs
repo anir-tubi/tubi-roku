@@ -1077,16 +1077,23 @@ Function onVideoTrackingStart(msg)
     if isLoggedInUser() = true
       youboraConfig.username = m.global.authInfo.userId
     end if
-
     if content.type = m.constants.ui.contentTypes.linear
       youboraConfig["content.isLive"] = true
-      youboraConfig["content.customDimension.3"] = content.ssaiVersion
+      if content.youboraTracking <> invalid AND isNonEmptyString(content.youboraTracking[m.constants.thirdParty.youbora.trackingKeys.ssaiVersion]) = true
+        youboraConfig["content.customDimension.3"] = content.youboraTracking[m.constants.thirdParty.youbora.trackingKeys.ssaiVersion]
+      end if
     else
       youboraConfig["content.isLive"] = false
     end if
-    if isNonEmptyString(content.titanVersionOrExperimentVersion) = true
-      youboraConfig["content.customDimension.2"] = content.titanVersionOrExperimentVersion
+
+    if content.youboraTracking <> invalid AND isNonEmptyString(content.youboraTracking[m.constants.thirdParty.youbora.trackingKeys.titanVersionOrExperimentVersion]) = true
+      youboraConfig["content.customDimension.2"] = content.youboraTracking[m.constants.thirdParty.youbora.trackingKeys.titanVersionOrExperimentVersion]
     end if
+
+    if content.youboraTracking <> invalid AND isNonEmptyString(content.youboraTracking[m.constants.thirdParty.youbora.trackingKeys.generatorVersion]) = true
+      youboraConfig["content.customDimension.10"] = content.youboraTracking[m.constants.thirdParty.youbora.trackingKeys.generatorVersion]
+    end if
+
     youboraConfig["content.resource"] = content.URL
     youboraConfig["device.model"] = m.constants.deviceInfo.model
     youboraConfig["device.id"] = m.constants.deviceInfo.deviceId

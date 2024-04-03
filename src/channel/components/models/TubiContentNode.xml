@@ -38,11 +38,8 @@
     <field id="needsLogin" type="boolean"  value="false"/>
     <field id="hasVideoResources" type="boolean" />
 
-    <!-- If the content is coming from a titan endpoint, then a titan_version will be set to this field.
-    Or if any experiment is running on client side related to video stream formats, then experiment and treatment names will be set to this field
-    (eg. exp=<experimentName>.<treatmentName>)
-    This will be used by Youbora -->
-    <field id="titanVersionOrExperimentVersion" type="string" />
+    <!-- tracking info to be used specifically by youbora. The names of the keys of this AA will be under: constants.thirdParty.youbora.trackingKeys -->
+    <field id="youboraTracking" type="assocarray" value="{}"/>
 
     <!-- true if the content is child directed content (CDC) -->
     <field id="isCdc" type="boolean" />
@@ -85,9 +82,6 @@
 
     <!-- the current codec, it will be inserted in client logs when playback fails -->
     <field id="codec" type="string"/>
-
-    <!-- which ssai is used apollo or yospace at backend-->
-    <field id="ssaiVersion" type="string"/>
 
     <!-- the current resolution, it will be inserted in client logs when playback fails -->
     <field id="resolution" type="string"/>
