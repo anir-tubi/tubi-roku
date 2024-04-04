@@ -29,28 +29,29 @@ export const tabs = {
 	home: {
 		row: 4,
 	},
-	myStuff: {
-		row: 5,
-		page: ({ isAuth }) => MyStuff({ isAuth }),
-	},
 	categories: {
-		row: 6,
+		row: 5,
 		page: () => Categories(),
 	},
-	channels: {
-		row: 7,
-		page: () => ChannelsPage(),
+	myStuff: {
+		row: 6,
+		page: ({ isAuth }) => MyStuff({ isAuth }),
 	},
-	espanol: {
+	movies: {
+		row: 7,
+		page: () => Home(),
+	},
+	tvShows: {
 		row: 8,
 		page: () => Home(),
 	},
-	settings: {
-		row: 9,
-		page: () => Settings(),
-	},
-	exit: {
+	espanol: {
 		row: 10,
+		page: () => Home(),
+	},
+	settings: {
+		row: 11,
+		page: () => Settings(),
 	},
 };
 

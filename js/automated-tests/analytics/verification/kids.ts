@@ -45,7 +45,7 @@ export async function verifyKidsRating(ratingText) {
 }
 
 export async function verifyChannelsDisabledText(text) {
-	expect(text).equal('Channels Disabled');
+	expect(text).equal('Please exit Tubi Kids to use this feature.');
 }
 
 export async function verifyC22571() {

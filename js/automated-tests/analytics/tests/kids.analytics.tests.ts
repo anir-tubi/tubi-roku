@@ -53,7 +53,7 @@ describe('Kids Events', function () {
 		await ecp.sendKeypress(ecp.Key.Right);
 		await kidsHome.selectSideNavTab(tabs.categories, 4);
 		await utils.sleep(1000);
-		await kidsHome.selectSideNavTabNoPageReturn(tabs.channels, 6);
+		await kidsHome.selectSideNavTabNoPageReturn(tabs.movies, 5);
 		const message = await kidsHome.getPopupMessage();
 		await verifyChannelsDisabledText(message);
 	});

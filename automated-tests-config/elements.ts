@@ -155,8 +155,8 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen',
   },
 
-  channelsDisabledMessage: {
-    keyPath: '#ContentController.#444e064.#DialogBox.#ContentArea.#Title',
+  exitToUseThisFeatureMesage: {
+    keyPath: '#ContentController.#9f2a0ff.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
   /** Content title on the detail screen */

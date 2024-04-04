@@ -3,7 +3,6 @@ import { testUtils } from '../../test-utils';
 import HomePage from '../pages/homePage';
 import { expect } from 'chai';
 import SideNav, { tabs } from '../components/sideNav';
-import { sections } from '../components/topNav';
 import {
 	verifyC21261,
 	verifyC76112andC76048,
@@ -44,7 +43,7 @@ describe('Navigate To Page', function () {
 	});
 	it('NavigateToPage - HomePage to SeriesDetailPage by CategoryComponent C21262 and UI:C63513 @analytics,@analyticsNavigateToPage', async () => {
 		const homePage = HomePage();
-		await homePage.selectTopNavTab(sections.tvShows);
+		await homePage.selectSideNavTab(tabs.tvShows);
 		const titleId = await homePage.getTVShowTitleId();
 		const serialTag = await homePage.getSerialTag();
 		await homePage.selectFocusedTitleTVShow();
@@ -54,7 +53,7 @@ describe('Navigate To Page', function () {
 	});
 	it('HomePage to VideoPage by CategoryComponent C21263 and C112680 @analytics,@analyticsNavigateToPage', async () => {
 		const homePage = HomePage();
-		await homePage.selectTopNavTab(sections.movies);
+		await homePage.selectSideNavTab(tabs.movies);
 		const titleId = await homePage.getMovieTitleId();
 		const titleDetailsPage = await homePage.selectFocusedTitleMovie();
 		const video = await titleDetailsPage.clickOnPlay();

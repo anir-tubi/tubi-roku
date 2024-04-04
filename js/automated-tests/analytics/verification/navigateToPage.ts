@@ -726,7 +726,7 @@ export async function verifyC112680() {
 			\n`
 	);
 	expect(
-		navigateToPage.navigate_to_page.top_nav_component.top_nav_section
+		navigateToPage.navigate_to_page.left_side_nav_component.left_nav_section
 	).equal(
 		'MOVIES',
 		`navigateToPage.navigate_to_page.top_nav_component, Event: \n ${JSON.stringify(
@@ -793,7 +793,7 @@ export async function verifyC112681() {
 			\n`
 	);
 	expect(
-		navigateToPage.navigate_to_page.top_nav_component.top_nav_section
+		navigateToPage.navigate_to_page.left_side_nav_component.left_nav_section
 	).equal(
 		'SERIES',
 		`navigateToPage.navigate_to_page.top_nav_component===SERIES, Event: \n ${JSON.stringify(

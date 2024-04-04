@@ -6,7 +6,6 @@ import TitleDetailsPage from './titleDetailsPage';
 import LiveNews from '../pages/liveNews';
 import { NODES, PLAYER_NODES } from '../utils/constants';
 import SideNav, { tabs } from '../components/sideNav';
-import TopNavMenu from '../components/topNav';
 const HomePage = ({ isMovies, isTvShows } = {}) => {
 	const elements = {
 		movieScreenRowList: async () =>
@@ -21,8 +20,8 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 			await testUtils.getNodeForElement('homeScreenPoster'),
 		homeScreenKidsLogo: async () =>
 			await testUtils.getNodeForElement('kidsLogoHomeScreen'),
-		channelsDisabledMessage: async () =>
-			await testUtils.getNodeForElement('channelsDisabledMessage'),
+		exitToUseFeatureMessage: async () =>
+			await testUtils.getNodeForElement('exitToUseThisFeatureMesage'),
 		tvShowsSeriesLabel: async () =>
 			await testUtils.getNodeForElement('tvShowsSeriesLabel'),
 		moviesLabel: async () => await testUtils.getNodeForElement('moviesLabel'),
@@ -164,7 +163,7 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 	async function getPopupMessage() {
 		let channelsDisabledMessage;
 		await testUtils.retryWithTimeOut(async () => {
-			channelsDisabledMessage = await elements.channelsDisabledMessage();
+			channelsDisabledMessage = await elements.exitToUseFeatureMessage();
 			expect(channelsDisabledMessage.text).to.not.be.empty;
 		});
 		return channelsDisabledMessage.text;
@@ -391,7 +390,6 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		waitForPlayBackToStartForMovie,
 		selectFocusedTitleMovieWithSubtitles,
 		...SideNav(),
-		...TopNavMenu(),
 	};
 };
 

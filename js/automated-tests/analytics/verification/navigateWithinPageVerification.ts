@@ -31,7 +31,7 @@ export async function verifyC268957WithinPage() {
 				event.navigate_within_page.left_side_nav_component &&
 				event.navigate_within_page.left_side_nav_component.left_nav_section &&
 				event.navigate_within_page.left_side_nav_component.left_nav_section ===
-					'CHANNEL'
+					'LINEAR'
 		);
 		i++;
 	}
@@ -41,8 +41,8 @@ export async function verifyC268957WithinPage() {
 	expect(
 		navigateWithinPage.navigate_within_page.left_side_nav_component
 			.left_nav_section
-	).equal('CHANNEL');
-	expect(navigateWithinPage.navigate_within_page.vertical_location).equal(8);
+	).equal('LINEAR');
+	expect(navigateWithinPage.navigate_within_page.vertical_location).equal(10);
 	expect(navigateWithinPage.navigate_within_page.horizontal_location).equal(1);
 }
 
