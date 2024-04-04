@@ -40,7 +40,7 @@
         id="Subtitle"
         wrap="true"
         ellipsizeOnBoundary="true"
-        width="1059"
+        width="1092"
         numLines="1"
         vertAlign="center"
         horizAlign="center">

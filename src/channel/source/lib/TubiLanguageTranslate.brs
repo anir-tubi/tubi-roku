@@ -1207,7 +1207,7 @@ Function getTranslation_en_US()
     },
     "metadata_myStuff_empty_myList_description": {
       "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
-      "message": "Use the bookmark button to save favorites series and movies. They’ll show up here."
+      "message": "Use the bookmark button to save favorite series and movies. They’ll show up here."
     },
     "metadata_myStuff_empty_continueWatching_title": {
       "description": "For an empty continueWatching container, this is the title that is display in the empty container",
