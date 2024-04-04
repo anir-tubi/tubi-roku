@@ -161,21 +161,24 @@ End Function
 
 Function onGridHasFocus(msg)
   gridHasFocus = msg.getData()
+  if m.top.itemContent <> invalid
+    '//do not change the menu item's focus UI until the itemContent has been set. this ensures that the look of the 1st item is set properly as the focus to the 1st item can be gained and lost even before the itemContent has been set
 
-  if gridHasFocus = true AND m.top.itemHasFocus = true
-    m.DetailsMenuTextFocused.opacity = 1.0
-    m.DetailsMenuText.opacity = 0
-    m.IconFocused.opacity = 1.0
-    m.Icon.opacity = 0
-    m.badgeLabelFocused.opacity = 1.0
-    m.badgeLabel.opacity = 0
-  else
-    m.DetailsMenuTextFocused.opacity = 0
-    m.DetailsMenuText.opacity = 1.0
-    m.IconFocused.opacity = 0
-    m.Icon.opacity = 1.0
-    m.badgeLabelFocused.opacity = 0
-    m.badgeLabel.opacity = 1.0
+    if gridHasFocus = true AND m.top.itemHasFocus = true
+      m.DetailsMenuTextFocused.opacity = 1.0
+      m.DetailsMenuText.opacity = 0
+      m.IconFocused.opacity = 1.0
+      m.Icon.opacity = 0
+      m.badgeLabelFocused.opacity = 1.0
+      m.badgeLabel.opacity = 0
+    else
+      m.DetailsMenuTextFocused.opacity = 0
+      m.DetailsMenuText.opacity = 1.0
+      m.IconFocused.opacity = 0
+      m.Icon.opacity = 1.0
+      m.badgeLabelFocused.opacity = 0
+      m.badgeLabel.opacity = 1.0
+    end if
   end if
 End Function
 
