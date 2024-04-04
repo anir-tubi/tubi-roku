@@ -558,8 +558,10 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
       return
     end if
 
-    populateDetailScreen(detailScreen, refreshedContent, false, -1)
+  end if
 
+  if detailScreen <> invalid
+    populateDetailScreen(detailScreen, refreshedContent, false, -1)
     sendDetailScreenPageLoadEvent(detailScreen, refreshedContent, sendTracking)
 
     afterFn = invalid
@@ -571,7 +573,6 @@ Function handleSingleContentResponse(refreshedContent, sendTracking = true) As V
     if afterFn <> invalid
       handleDetailScreenAfterFn(detailScreen, afterFn)
     end if
-
   end if
 
 End Function
@@ -901,6 +902,7 @@ Function getTopDetailScreenFromStack()
   screenStackDepth = 0
   while detailScreen = invalid
     hiddenScreen = getHiddenScreen(screenStackDepth)
+
     if hiddenScreen = invalid
       ' we are outside of the screen stack depth so there are no more hidden screens
       exit while

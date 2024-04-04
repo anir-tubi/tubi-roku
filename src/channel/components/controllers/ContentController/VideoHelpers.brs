@@ -691,6 +691,9 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
   tubiLog("VideoHelpers.returnToDetailScreenFromVideo")
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
 
+  'local variable helps to remove the episode list screen in between player and detail screen
+  removeEpisodeScreen = false
+
   ' Local variable which will hold true/false if we need to present the continue watching consent.
   ' will be true if the user has partially watched the movie and backed out before credits.
   shouldShowContinueWatchingConsentDialog = false
@@ -732,6 +735,9 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
         ' Case 5
         ' Autoplayed into a new series, so fetch new series,
         ' repopulate the existing detail screen when the new series metadata is returned
+
+        removeEpisodeScreen = true
+        detailScreen.isLoading = true
         emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
         emptySeriesNode.type = m.constants.ui.contentTypes.series
         emptySeriesNode.id = videoContent.parentId
@@ -791,7 +797,7 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
       ' Video player was playing a movie
       if videoContent.id <> detailContent.id
         ' Case 2
-        ' Movie autoplayed into another movie.
+        ' Movie/Series autoplayed into another Movie.
         ' The above id check is not expected to pass, as we populate the detail screen with the autoplayed
         ' content when autoplay playback occurs (up next ui or go to next button pressed).
         ' In the case that something went wrong with the fetch repopulate the detail screen with the
@@ -800,7 +806,9 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
         ' related content. So, populate the detail screen for an immediate re-render, and then re-fetch
         ' the new content (including the related content). Detail screen will be updated a 2nd time when
         ' fetched content is returned
-        populateDetailScreen(detailScreen, videoContent, false, -1)
+
+        removeEpisodeScreen = true
+        populateDetailScreen(detailScreen, videoContent, true, -1)
         emptyMovieNode = CreateObject("roSGNode", "TubiContentNode")
         emptyMovieNode.type = m.constants.ui.contentTypes.video
         emptyMovieNode.id = videoContent.id
@@ -837,6 +845,14 @@ Function returnToDetailScreenFromVideo(sendAnalyticsEvent = true, shouldUpdateEp
     if sendAnalyticsEvent = true
       popScreen(true, true)
     else
+      popScreen(false, false)
+    end if
+  end if
+
+  'remove the episode list screen to reveal the details screen, if another movie/series is played from player
+  if removeEpisodeScreen = true
+    currentScreen = getCurrentScreen()
+    if currentScreen <> invalid AND currentScreen.id = m.constants.ui.screenIds.episodeScreen
       popScreen(false, false)
     end if
   end if
