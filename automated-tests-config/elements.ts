@@ -206,12 +206,21 @@ const elements = typeCheckElements({
 
   /** Remove from history button */
   removeFromHistoryButton: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.5',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.5',
+  },
+
+  myStuffContinueWatchingRow: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList.1.title.#CategoryName'
   },
 
   /** Progress bar on resumed button */
   resumedProgressBar: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.0.#ResumeProgressBar',
+  },
+
+  /** My Stuff button selected */
+  myStuffSelected: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.5'
   },
 
   /** Movie Run Time */
@@ -606,7 +615,7 @@ const elements = typeCheckElements({
 
   /** My List Row element on My Stuff page */
   myStuffGrid: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#ContentArea.#RowList',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList',
   },
 
   /** My List Screen title element on My Stuff page */
@@ -621,7 +630,7 @@ const elements = typeCheckElements({
 
   /** Left Nav Home Button */
   leftNavHomeButton: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#LabelParent.0.#Label',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#IconParent.#focusedIcon',
   },
 
   /** left home button label */
@@ -659,6 +668,14 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#ChannelsVideoGrid'
 
   },
+  channelsListScreenPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#PageGroup.#ChannelCategoryGrid.0.#PosterRect'
+
+  },
+   categoriesDetailsScreenPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#PageGroup.#ChannelCategoryGrid.0.#PosterRect'
+   },
+
 
   /** Linear Search Results Description */
   searchResultsDesc: {
@@ -724,6 +741,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#2694d4e.#DialogBox.#ContentArea.#Title',
   },
 
+  /** kids exit prompt */
+  kidsExitPrompt: {
+    keyPath: '#ContentController.#cf0de03.#DialogBox.#ContentArea.#Title',
+  },
+
   /** Player controls element */
   playerControls: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons',
@@ -751,7 +773,7 @@ const elements = typeCheckElements({
 
   /** Adult control in PC is selected */
   adultControlSelected: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#ParentalControlsMenu.3',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#ParentalControlsMenu.3.#container',
   },
 
   /** Live Icon */
@@ -1211,8 +1233,9 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2',
   },
 
+
   leftNavSearchItem: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.2'
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.2.#LabelParent.0.#Label'
   },
 
   /** parental controls button */
@@ -1241,7 +1264,7 @@ const elements = typeCheckElements({
 
   /** categories left nav */
   categoriesLeftNavButton: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.5',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.4.#LabelParent.0.#focusedLabel',
   },
 
   /** categories label highlighted */
@@ -1250,8 +1273,8 @@ const elements = typeCheckElements({
   },
 
   /** categories  screen */
-  categoriesListScreen: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid',
+  categoryPagePoster: {
+   keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#PageGroup.#ChannelCategoryGrid.0.#PosterRect',
   },
 
   /** channels left nav button highlighted */
@@ -1267,8 +1290,8 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#SignedOutUI.#GuestMenu.0.#DetailsMenuTextParent.#DetailsMenuText',
   },
 
-  goHomeMyStuffButton: {
-    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#AllEmptyUI.#AllEmptyUIMenu.0.#DetailsMenuTextParent.#DetailsMenuText'
+  emptyMyStuffButton: {
+    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#AllEmptyUI.#AllEmptyUIMenu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused'
   },
 
   /** channels list screen */
@@ -1277,8 +1300,8 @@ const elements = typeCheckElements({
   },
 
   /** settings left nav button highlighted */
-  settingsLeftNavButton: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.8',
+  settingsLeftNavButtonSelected: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.10.#LabelParent.0.#focusedLabel',
   },
 
   /** categories video grid */

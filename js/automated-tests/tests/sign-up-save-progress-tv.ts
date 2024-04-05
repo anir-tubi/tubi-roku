@@ -115,19 +115,19 @@ describe('Sign up Save Progress TV', function () {
         await ecp.sendKeypress(ecp.Key.Ok);
 
         // Wait for Let's create your account modal (Roku modal, no elements)
-        await utils.sleep(2000);
-
+        await utils.sleep(5000);
+        
          // Click Down, Ok to Cancel
-         await ecp.sendKeypress(ecp.Key.Down);
-         await ecp.sendKeypress(ecp.Key.Ok);
+        await ecp.sendKeypress(ecp.Key.Down);
+        await ecp.sendKeypress(ecp.Key.Ok);
 
-         // Create user
-         const user = await testUtils.createRegisteredUser();
-         const userInfo = user['userInfo'];
+        // Create user
+        const user = await testUtils.createRegisteredUser();
+        const userInfo = user['userInfo'];
 
          // Are we on the Enter Email Address page?
-         const  emailInputScreenHeader = await testUtils.getNodeForElement('emailInputScreenHeader');
-         expect(emailInputScreenHeader.text).to.equal('Enter Email Address');
+        const  emailInputScreenHeader = await testUtils.getNodeForElement('emailInputScreenHeader');
+        expect(emailInputScreenHeader.text).to.equal('Enter Email Address');
 
         // Enter user info email
         await ecp.sendText(userInfo.email);

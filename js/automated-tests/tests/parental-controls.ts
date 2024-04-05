@@ -21,6 +21,7 @@ describe('Parental Controls', function () {
         await enterPasswordSettingsChange();
 
         // Verify Little Kids PC Settings Change dialog
+        await testUtils.waitForElementToShowOnScreen('parentalControlsSettingsLittleKids');
         const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids');
         expect(parentalControlsSettingsLittleKids.text).to.equal('Parental controls setting has changed to Little Kids. Parental controls will be password protected after 5 minutes.');
         await ecp.sendKeypress(ecp.Key.Ok);
@@ -144,7 +145,7 @@ describe('Parental Controls', function () {
         await testUtils.elementHasFocus('leftNavHomeButton');
 
         // Select Categories
-        await ecp.sendKeypress(ecp.Key.Down, {count:2});
+        await ecp.sendKeypress(ecp.Key.Down, {count:1});
         await utils.sleep(2000); // Improvement
         await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -188,7 +189,7 @@ describe('Parental Controls', function () {
         await testUtils.elementHasFocus('leftNavHomeButton');
 
         // Select Categories
-        await ecp.sendKeypress(ecp.Key.Down, {count:2});
+        await ecp.sendKeypress(ecp.Key.Down, {count:1});
         await utils.sleep(2000); // Improvement
         await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -232,7 +233,7 @@ describe('Parental Controls', function () {
         await testUtils.elementHasFocus('leftNavHomeButton');
 
         // Select Categories
-        await ecp.sendKeypress(ecp.Key.Down, {count:2});
+        await ecp.sendKeypress(ecp.Key.Down, {count:1});
         await utils.sleep(2000); // Improvement
         await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -350,7 +351,6 @@ describe('Parental Controls', function () {
     it('C535867 - Parental Controls - Adults - When user switches Parental Control to Adults then a modal is presented/Exit Kids is not present, @parental_controls', async () => {
 
       await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
-      await testUtils.waitForAppLaunchBeaconToFire();
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       await testUtils.goToPage('settings');
@@ -358,20 +358,10 @@ describe('Parental Controls', function () {
       await enterPasswordSettingsChange();
 
       // Back to home
-      await ecp.sendKeypress(ecp.Key.Back, {count:4});
+      await ecp.sendKeypress(ecp.Key.Back, {count:3});
 
       // Is the left Nav open?
       const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
-      await testUtils.elementHasFocus('leftNavHomeButton');
-
-      await ecp.sendKeypress(ecp.Key.Ok);
-
-
-      // Open left nav
-      await ecp.sendKeypress(ecp.Key.Left);
-
-
-      // Is the left Nav open?
       await testUtils.elementHasFocus('leftNavHomeButton');
 
       // Is Kids menu option present?
@@ -404,9 +394,9 @@ describe('Parental Controls', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Expect dialog instead of Password Screen (Verify that no password is needed to be entered to change parental controls)
+      await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsOlderKids');
       const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
       expect(parentalControlsSettingsOlderKids.text).to.contain('Parental controls setting has changed');
-
 
     });
 
@@ -441,15 +431,16 @@ describe('Parental Controls', function () {
 
       // Select Search
       await ecp.sendKeypress(ecp.Key.Up);
-      await utils.sleep(2000);
+      await testUtils.waitForElementToFullyShowOnScreen('leftNavSearchItem');
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Send adult title text
       const searchGrid = testUtils.getNodeForElement('searchGrid');
       expect((await searchGrid).visible).to.be.true;
-      await ecp.sendText('gone before her time');
-      await utils.sleep(2000); // Improve
+      await ecp.sendText('the stepdaughter');
+      await testUtils.waitForElementToFullyShowOnScreen('noResultsMessage');
 
+      // Verify no result for Older Kids level
       const noResultsMessage = testUtils.getNodeForElement('noResultsMessage');
       expect((await noResultsMessage).text).to.include('Please try again');
 
@@ -647,6 +638,7 @@ describe('Parental Controls', function () {
 
     // On Settings Page?
     const parentalControlsHeader = await testUtils.getNodeForElement('parentalControlsHeader');
+    await testUtils.waitForElementToShowOnScreen('parentalControlsHeader');
     expect(parentalControlsHeader.text).to.equal('Parental Controls');
 
     // Set PC
@@ -654,6 +646,7 @@ describe('Parental Controls', function () {
     await enterPasswordSettingsChange();
 
     // Verify Older Kids PC Settings Change dialog
+    await testUtils.waitForElementToShowOnScreen('parentalControlsSettingsOlderKids');
     const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
     expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -780,7 +773,7 @@ describe('Parental Controls', function () {
 
       async function selectLittleKidsFromParentalSettings() {
         await ecp.sendKeypress(ecp.Key.Right);
-        await utils.sleep(2000);
+        await testUtils.waitForElementToShowOnScreen('adultControlSelected');
         await ecp.sendKeypress(ecp.Key.Up, {count:3});
         await utils.sleep(2000);
         await ecp.sendKeypress(ecp.Key.Ok);

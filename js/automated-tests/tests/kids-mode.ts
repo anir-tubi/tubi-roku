@@ -252,6 +252,7 @@ describe('Kids Mode', function () {
     await kidsOpenSettings();
 
     // Registered select Older kids from PC Settings page
+    await testUtils.waitForElementToFullyShowOnScreen('parentalControlsHeader');
     await selectOlderKidsFromParentalSettings();
 
     // Are we on the Kid's mode password screen?
@@ -304,10 +305,9 @@ describe('Kids Mode', function () {
     await checkForKidsModeNotGrayed();
 
     // Exit app
-    await ecp.sendKeypress(ecp.Key.Down, { count: 6 });
-    await ecp.sendKeypress(ecp.Key.Ok);
-    const exitPrompt = await testUtils.getNodeForElement('exitPrompt');
-    expect(exitPrompt.visible).to.equal(true);
+    await ecp.sendKeypress(ecp.Key.Up, { count: 3 });
+    await ecp.sendKeypress(ecp.Key.Ok, { count:2 });
+    await testUtils.waitForElementToShowOnScreen('kidsExitPrompt');
     await ecp.sendKeypress(ecp.Key.Ok);
 
 
@@ -433,7 +433,7 @@ async function kidsOpenSettings() {
   await ecp.sendKeypress(ecp.Key.Left);
   const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
   expect(leftNavHomeButton.visible).to.be.true;
-  await ecp.sendKeypress(ecp.Key.Down, { count: 5 });
+  await ecp.sendKeypress(ecp.Key.Down, { count: 7 });
   await ecp.sendKeypress(ecp.Key.Ok);
 
 }
@@ -451,6 +451,7 @@ async function enterPasswordSettingsChange() {
 
 async function selectOlderKidsFromParentalSettings() {
   await ecp.sendKeypress(ecp.Key.Right);
+  await testUtils.waitForElementToFullyShowOnScreen('adultControlSelected');
   await ecp.sendKeypress(ecp.Key.Up, { count: 2 });
   await ecp.sendKeypress(ecp.Key.Ok);
 }

@@ -7,7 +7,6 @@ import { shared } from '../shared';
 describe('Application Launch', function () {
   before(async () => {
     await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
-    await testUtils.waitForAppLaunchBeaconToFire();
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
   });
 
@@ -34,7 +33,7 @@ describe('Application Launch', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/70718
   it('C70718 - Sign out after setting Parental Controls @application_launch', async () => {
     // Go to Settings page and select Older Kids
-   // await testUtils.goToPage('settings');
+    // await testUtils.goToPage('settings');
     await testUtils.goToPage('settings');
     await ecp.sendKeypress(ecp.Key.Right);
     await testUtils.waitForElementToShowOnScreen('adultControlSelected');
@@ -121,7 +120,9 @@ describe('Application Launch', function () {
 
     // Launch app
     await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
-    await testUtils.waitForAppLaunchBeaconToFire();
+    
+    // Check for presence of Movies Grid
+    await testUtils.findRowIndexWithTitle('movieScreenRowList', 'Featured');
 
     // Play title
     await ecp.sendKeypress(ecp.Key.Play);
@@ -142,6 +143,9 @@ describe('Application Launch', function () {
   it('C114199 - Registration Prompt in Continue Watching Container - Homescreen - Navigate to Continue Watching Container @guest_user @application_launch', async () => {
     // Launch as guest
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+    
+    // Check for presence of Movies Grid
+    await testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured');
 
     // Jump To Continue Watching Row
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');

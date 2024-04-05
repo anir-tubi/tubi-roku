@@ -101,7 +101,7 @@ describe('Sign up Save Progress Movies', function () {
         await ecp.sendKeypress(ecp.Key.Ok);
 
         // Wait for Let's create your account screen
-        await utils.sleep(2000);
+        await utils.sleep(5000);
         
         // Click Down, Ok to Cancel
         await ecp.sendKeypress(ecp.Key.Down);

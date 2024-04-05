@@ -67,7 +67,7 @@ enum ScreenIds {
   'emailVerificationScreen' = 'emailVerificationScreen',
   'forgotPasswordProcessingScreen' = 'forgotPasswordProcessingScreen',
   'consentScreen' = 'consentScreen',
-  'managePreferencesScreen' = 'managePreferencesScreen',
+  'managePreferencesScreen' = 'managePreferencesScreen'
 }
 
 

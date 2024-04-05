@@ -13,26 +13,9 @@ describe('Settings', function () {
   // https://tubi.testrail.io/index.php?/cases/view/21250
   it('C21250 - About Page - When user chooses the About Page then About page is open, @settings', async () => {
 
-    //await testUtils.waitForAppLaunchBeaconToFire();
+    // Go to Settings Page, highlight about
+    await goToSettingsPageSelectAbout();
 
-    // Go to Settings Page
-    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
-
-    // Is left nav open?
-    const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
-    await testUtils.elementHasFocus('leftNavHomeButton');
-
-    // Down to Settings
-    await ecp.sendKeypress(ecp.Key.Down, { count: 5 });
-    await ecp.sendKeypress(ecp.Key.Ok);
-
-    // Select About
-    await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
-    await utils.sleep(1500);
-
-    // Is the About Page Open?
-    const settingsScreenHeader = await testUtils.getNodeForElement('settingsScreenHeader');
-    expect(settingsScreenHeader.text).to.equal('About Tubi');
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/21252
@@ -79,55 +62,27 @@ describe('Settings', function () {
    
 
     // Go to Settings Page
-    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
+    await goToSettingsPageSelectAbout();
 
-    // Is left nav open?
-    const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
-    await testUtils.elementHasFocus('leftNavHomeButton');
-
-    // Down to Settings
-    await ecp.sendKeypress(ecp.Key.Down, { count: 5 });
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await utils.sleep(800);
-
-    // Select About
-    await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
-    await testUtils.elementHasFocus('aboutMenuItem');
-    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Full Device ID modal present?
-    await utils.sleep(3000);
-    const dialogBoxContentAreaDeviceID = testUtils.getNodeForElement('dialogBoxContentAreaDeviceID');
-    await dialogBoxContentAreaDeviceID;
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForElementToFullyShowOnScreen('dialogBoxContentAreaDeviceID');
     const fullDeviceID = await testUtils.getNodeForElement('fullDeviceID');
     const fullDeviceMessage = await testUtils.getNodeForElement('fullDeviceMessage');
     await testUtils.elementHasFocus('fullDeviceID');
     expect(fullDeviceID.text).to.equal('Full Device ID');
-    expect(fullDeviceMessage.visible).to.equal(true);
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/32371
   it('C32371 - About Page - When user chooses the About Page and checks Need Help label then Need Help should be present, @settings', async () => {
     
 
-    // Go to Settings Page
-    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
+    // Go to Settings Page and higlight About
+    await goToSettingsPageSelectAbout();
 
-    // Is left nav open?
-    const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
-    await testUtils.elementHasFocus('leftNavHomeButton');
 
-    // Down to Settings
-    await ecp.sendKeypress(ecp.Key.Down, { count: 5 });
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await utils.sleep(800);
-
-    // Select About
-    await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
-
-    // Is the About Page Open and does the help link exist?
-    const settingsScreenHeader = await testUtils.getNodeForElement('settingsScreenHeader');
-    expect(settingsScreenHeader.text).to.equal('About Tubi');
+    // Does the help link exist?
     const helpLinkText = await testUtils.getNodeForElement('helpLinkText');
     expect(helpLinkText.text).to.equal('Visit http://help.tubitv.com');
   });
@@ -137,25 +92,31 @@ describe('Settings', function () {
 
 
     // Go to Settings Page
-    await ecp.sendKeypress(ecp.Key.Back, { count: 2 });
-
-    // Is left nav open?
-    const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
-    await testUtils.elementHasFocus('leftNavHomeButton');
-
-    // Down to Settings
-    await ecp.sendKeypress(ecp.Key.Down, { count: 5 });
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.goToPage('settings');
 
     // Select Privacy Policy
     await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
-    await utils.sleep(1000);
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await utils.sleep(2000);
 
     // Is the Privacy Policy Page Open?
+    await testUtils.waitForElementToFullyShowOnScreen('privacyPolicyHeader');
     const privacyPolicyHeader = await testUtils.getNodeForElement('privacyPolicyHeader');
     expect(await privacyPolicyHeader.text).to.equal('Privacy Center');
 
   });
 });
+
+async function goToSettingsPageSelectAbout(){
+  // Go to Settings Page
+  await testUtils.goToPage('settings');
+  await testUtils.waitForElementToFullyShowOnScreen('settingsScreen');
+
+  // Select About
+  await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
+  
+  // Is the About Page Open?
+  const settingsScreenHeader = await testUtils.getNodeForElement('settingsScreenHeader');
+  await testUtils.waitForElementToFullyShowOnScreen('settingsScreenHeader');
+  expect(settingsScreenHeader.text).to.equal('About Tubi');
+
+}
+

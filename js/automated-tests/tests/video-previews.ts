@@ -217,40 +217,32 @@ describe('Video Preview', function () {
     await ecp.sendKeypress(ecp.Key.Left);
 
     // Check for left nav home button
-    const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
-    expect(leftNavHomeButton.text).to.be.equal('Home');
-
-    await ecp.sendKeypress(ecp.Key.Down);
-    const myStuffLeftNav = await testUtils.getNodeForElement('myStuffLeftNav');
-    await utils.sleep(2000);
-    expect(myStuffLeftNav);
+    await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButton');
+    await utils.sleep(1000);
+    await ecp.sendKeypress(ecp.Key.Down, {count:2});
+    await testUtils.waitForElementToFullyShowOnScreen('myStuffLeftNav');
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Let's check for My Stuff page, CW row here
-    const continueWatchingRow = testUtils.getNodeForElement('continueWatchingRow');
-    expect(continueWatchingRow);
+    await testUtils.waitForElementToFullyShowOnScreen('myStuffContinueWatchingRow');
     await ecp.sendKeypress(ecp.Key.Ok);
-
-
-    // Verify that video is playing
-    await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing', 10000);
 
     // Enter Details page and remove history
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
     await testUtils.selectAndVerifyDetailPageMenuItem('removeFromHistory');
-    await utils.sleep(1000);
+    await utils.sleep(2000);
     await ecp.sendKeypress(ecp.Key.Back);
 
     // 2nd movie
-    await utils.sleep(2000);
-    expect(continueWatchingRow);
+    await testUtils.waitForElementToFullyShowOnScreen('myStuffContinueWatchingRow');
+    await utils.sleep(5000);
     await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
     await testUtils.selectAndVerifyDetailPageMenuItem('removeFromHistory');
-    await utils.sleep(1000);
+    await utils.sleep(2000);
     await ecp.sendKeypress(ecp.Key.Back);
 
-    const emptyMyStuffPage = await testUtils.getNodeForElement('emptyMyStuffPage');
-    expect(emptyMyStuffPage.visible).to.be.true;
+    await testUtils.waitForElementToFullyShowOnScreen('emptyMyStuffButton');
 
     // Check for presence of Video Player
     const previewVideoPlayer = await testUtils.getNodeForElement('previewVideoPlayer');

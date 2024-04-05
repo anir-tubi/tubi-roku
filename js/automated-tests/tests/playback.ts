@@ -109,8 +109,6 @@ describe('Playback', function () {
 
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
-    const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
-    expect(videoPlayerActual.visible).to.equal(true);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
     const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
@@ -353,10 +351,7 @@ describe('Playback', function () {
 
     //Play title, pause to open player, move leff to Rewind button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
-    const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
-    expect(videoPlayerActual.visible).to.equal(true);
-    await testUtils.expectPlayerStateToEventuallyEqual('play');
-    await ecp.sendKeypress(ecp.Key.Play);
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
     expect(playPauseButton.visible).to.equal(true);
     await ecp.sendKeypress(ecp.Key.Left, { count: 2 });

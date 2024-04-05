@@ -19,9 +19,6 @@ describe('Closed Captions Checks', function () {
     
 
     // Navigate to the Live News Row from Home screen
-    // Checking the state of the top Nav Recommended to verify that we are on the home screen in proper state
-    await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
-
     // Jump to Recommended Channels row
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
 
@@ -96,12 +93,8 @@ describe('Closed Captions Checks', function () {
     // Navigate to the Live News Row from Home screen
     await testUtils.goToPage('home');
 
-    // Checking the state of the top Nav Recommended to verify that we are on the home screen in proper state
-    await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
-
     // Jump to Recommended Channels row
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
-
 
     // Start a live feed
     await ecp.sendKeypress(ecp.Key.Ok);

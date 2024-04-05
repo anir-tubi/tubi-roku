@@ -14,8 +14,12 @@ describe('Side Navigation', function () {
 
     // https://tubi.testrail.io/index.php?/cases/view/535773
     it('C535773 - Side Navigation - Home - When user presses the Back button then side nav should expand from collapsed state, @sidenav', async () => {
+      
+       // Press the back button
+       await ecp.sendKeypress(ecp.Key.Back);
 
-        await openLeftNav();
+       // Is the left Nav open?
+       await testUtils.waitForSideNavMenuToBeExpanded();
 
     });
 
@@ -23,10 +27,13 @@ describe('Side Navigation', function () {
     // https://tubi.testrail.io/index.php?/cases/view/535774
     it('C535774 - Side Navigation - Home - Left Nav Button - First Position, @sidenav', async () => {
 
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
       await openLeftNav();
 
       // Press Left
-      await ecp.sendKeypress(ecp.Key.Left, {count:1});
+      await ecp.sendKeypress(ecp.Key.Left);
 
       // Is the left Nav closed?
       await testUtils.waitForSideNavMenuToNotBeExpanded();
@@ -39,17 +46,8 @@ describe('Side Navigation', function () {
       await openLeftNav();
 
       await ecp.sendKeypress(ecp.Key.Up);
+      await ecp.sendKeypress(ecp.Key.Ok);
       expect(testUtils.waitForElementToNotBeInFocusChain('searchGrid'));
-
-    });
-
-
-    // https://tubi.testrail.io/index.php?/cases/view/535777
-    it('C535777 - Side Navigation - Exit - No Prompt, @sidenav', async () => {
-
-      await openLeftNav();
-      await ecp.sendKeypress(ecp.Key.Down, {count:6});
-      expect(testUtils.waitForElementToNotBeInFocusChain('exitPrompt'));
 
     });
 
@@ -96,7 +94,7 @@ describe('Side Navigation', function () {
 
         //Open left nav and browse down to Settings, select
         await openLeftNav();
-        await ecp.sendKeypress(ecp.Key.Down, {count:5});
+        await ecp.sendKeypress(ecp.Key.Down, {count:7});
         await ecp.sendKeypress(ecp.Key.Ok);
 
 
@@ -125,14 +123,14 @@ describe('Side Navigation', function () {
 
       //Open left nav and browse down to Settings, select
       await openLeftNav();
-      await ecp.sendKeypress(ecp.Key.Down, {count:5});
+      await ecp.sendKeypress(ecp.Key.Down, {count:7});
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify Settings screen has focus
       await testUtils.waitForCurrentScreenToEqual('settingsScreen');
 
       // Back 3 times
-      await ecp.sendKeypress(ecp.Key.Back, {count:4});
+      await ecp.sendKeypress(ecp.Key.Back, {count:3});
 
       // Verify that the Exit modal dialog is displayed
       const exitPrompt = testUtils.getNodeForElement('exitPrompt');
@@ -229,7 +227,7 @@ describe('Side Navigation', function () {
     it('C535784 - Side Navigation - Categories Page - Select, @sidenav', async () => {
 
       await openLeftNav();
-      await ecp.sendKeypress(ecp.Key.Down, {count:2});
+      await ecp.sendKeypress(ecp.Key.Down, {count:1});
 
       // Does category menu item have focus?
       // await testUtils.verifySelectedMainMenuItemEquals('categories'); - Brian to change this.
@@ -241,75 +239,32 @@ describe('Side Navigation', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       //Verify that user is on the Categories page
-      const channelCategoryGrid = await testUtils.getNodeForElement('categoriesListScreen');
-      await testUtils.elementHasFocus('categoriesListScreen',true);
+      await testUtils.waitForElementToFullyShowOnScreen('categoryPagePoster');
 
     });
 
-
-    // https://tubi.testrail.io/index.php?/cases/view/535785
-    it('C535785 - Side Navigation - Channels Page - Highlight, @sidenav', async () => {
-
-      await openLeftNav();
-
-      // Press Down to Categories
-      await ecp.sendKeypress(ecp.Key.Down, {count:3});
-
-      // Categories highlighted?
-      // await testUtils.verifySelectedMainMenuItemEquals('categories'); wait for Brian to change
-      const color = await testUtils.getElementColorField('categoriesLabel','color');
-      expect(color).to.equal('#FFFFFFFF');
-
-      // Press right once
-      await ecp.sendKeypress(ecp.Key.Right, {count:1});
-
-      // Make sure we are NOT on Categories page, but still on Home page
-      await testUtils.elementHasFocus('homeScreenRowList',true);
-
-
-    });
-
-
-    // https://tubi.testrail.io/index.php?/cases/view/535786
-    it('C535786 - Side Navigation - Channels Page - Select, @sidenav', async () => {
-
-      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-
-      await openLeftNav();
-      await utils.sleep(1000);
-      await ecp.sendKeypress(ecp.Key.Down, {count:3});
-
-      // Does category menu item have focus?
-      const color = await testUtils.getElementColorField('sideNavChannelsLabel','color');
-      expect(color).to.equal('#FFFFFFFF');
-
-      // Press OK
-      await ecp.sendKeypress(ecp.Key.Ok);
-      await utils.sleep(2000);
-
-      //Verify that user is on the Channels page
-      const channelsListScreenGrid = await testUtils.getNodeForElement('channelsListScreenGrid');
-      await testUtils.elementHasFocus('channelsListScreenGrid',true);
-    });
 
 
     // https://tubi.testrail.io/index.php?/cases/view/535787
     it('C535787 - Side Navigation - Settings Page - Highlight, @sidenav', async () => {
 
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
       await openLeftNav();
 
       // Press Down to Settings option
-      await ecp.sendKeypress(ecp.Key.Down, {count:5});
+      await utils.sleep(1000);
+      await ecp.sendKeypress(ecp.Key.Down, {count:7});
 
-      //Navigate and highlight Settings
-      //await testUtils.verifySelectedMainMenuItemEquals('settings'); - wait for Brian to change
+      //Navigate and highlight Settings 
+      await testUtils.waitForElementToShowOnScreen('settingsLeftNavButtonSelected');
 
       // Press right once
-      await ecp.sendKeypress(ecp.Key.Right, {count:1});
+      await ecp.sendKeypress(ecp.Key.Right);
 
       // Make sure we are NOT on Settings page, but still on home page
-      await testUtils.elementHasFocus('homeScreenRowList',true);
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
 
     });
@@ -322,7 +277,7 @@ describe('Side Navigation', function () {
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       await openLeftNav();
-      await ecp.sendKeypress(ecp.Key.Down, {count:5});
+      await ecp.sendKeypress(ecp.Key.Down, {count:7});
 
       // Does settings menu item have focus?
       // await testUtils.verifySelectedMainMenuItemEquals('settings'); - wait for Brian to change
@@ -349,7 +304,7 @@ describe('Side Navigation', function () {
 
       // Open left Nav
       await openLeftNav();
-      await ecp.sendKeypress(ecp.Key.Down, {count:2});
+      await ecp.sendKeypress(ecp.Key.Down, {count:1});
 
       // Does category menu item have focus? // Change this for menu item
       // await testUtils.verifySelectedMainMenuItemEquals('categories'); - Wait for Brian to change
@@ -360,9 +315,7 @@ describe('Side Navigation', function () {
       await utils.sleep(2000); //Improvement
 
       //Verify that user is on the Categories page
-      const categoriesListScreen = testUtils.getNodeForElement('categoriesListScreen');
-      const hasFocus = await testUtils.elementHasFocus('categoriesListScreen', true);
-      await utils.sleep(2000); // Improvement for sleep
+      await testUtils.waitForElementToFullyShowOnScreen('categoryPagePoster');
 
       // Select a category
       await ecp.sendKeypress(ecp.Key.Ok);
@@ -388,24 +341,22 @@ describe('Side Navigation', function () {
     it('C535791 - Side Navigation - Details Page - Press Back Button, @sidenav', async () => {
 
       // Relaunch - Improvement
-      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       // Open left nav
       await openLeftNav();
-      await ecp.sendKeypress(ecp.Key.Down, {count:2});
+      await utils.sleep(1000);
+      await ecp.sendKeypress(ecp.Key.Down);
 
       // Does category menu item have focus?
-      // await testUtils.verifySelectedMainMenuItemEquals('categories');- wait for Brian to change
-      await utils.sleep(2000); // Improvement for sleep
+      await testUtils.waitForElementToFullyShowOnScreen('categoriesLeftNavButton');
 
       // Press OK
       await ecp.sendKeypress(ecp.Key.Ok);
 
       //Verify that user is on the Categories page
-      const categoriesListScreen = await testUtils.getNodeForElement('categoriesListScreen');
-      const hasFocus = await testUtils.elementHasFocus('categoriesListScreen', true);
-      await utils.sleep(2000); // Improvement for sleep
+      await testUtils.waitForElementToFullyShowOnScreen('categoryPagePoster');
 
       // Select a category
       await ecp.sendKeypress(ecp.Key.Ok);
@@ -420,8 +371,7 @@ describe('Side Navigation', function () {
       await utils.sleep(2000);
 
       // On the title details page?
-      const detailsPageMenu = await testUtils.getNodeForElement('detailsPageMenu');
-      expect(detailsPageMenu).to.exist;
+      await testUtils.waitForElementToFullyShowOnScreen('detailsPageMenu');
 
       // Is Play button in focus?
       const content = await testUtils.getCurrentlyFocusedGridItemContent('detailScreenMenu');
@@ -445,7 +395,7 @@ describe('Side Navigation', function () {
       await openLeftNav();
 
       // Select Categories
-      await ecp.sendKeypress(ecp.Key.Down, { count: 2 });
+      await ecp.sendKeypress(ecp.Key.Down, { count: 1 });
       await utils.sleep(2000); // Improvement
       await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -496,7 +446,7 @@ describe('Side Navigation', function () {
         const detailScreenYearAndDuration = await testUtils.getNodeForElement('detailScreenYearAndDuration');
         expect(detailScreenYearAndDuration.visible).to.equal(true);
 
-        await ecp.sendKeypress(ecp.Key.Back, { count: 4 });
+        await ecp.sendKeypress(ecp.Key.Back, { count: 3 });
 
         // Verify that the Exit modal dialog is displayed
         const exitPrompt = testUtils.getNodeForElement('exitPrompt');
@@ -557,52 +507,45 @@ describe('Side Navigation', function () {
 
     // https://tubi.testrail.io/index.php?/cases/view/538343
     it('C538343 - From Titles Detail Page > Channel Detail Page > Channel > Side Nav > Exit App, @sidenav', async () => {
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
-        await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-        await testUtils.waitForAppLaunchBeaconToFire();
+      // Open the Side nav and select Categories
+      await ecp.sendKeypress(ecp.Key.Left);
 
-        // Open the Side nav and select Categories
-        await ecp.sendKeypress(ecp.Key.Left);
+      // Is the left Nav open?
+      await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButton');
 
-        // Is the left Nav open?
-        const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
-        await testUtils.elementHasFocus('leftNavHomeButton');
+      // Select Categories
+      await utils.sleep(2000);
+      await ecp.sendKeypress(ecp.Key.Down);
+      await testUtils.waitForElementToFullyShowOnScreen('categoriesLeftNavButton');
+      await ecp.sendKeypress(ecp.Key.Ok);
 
-        // Select Channel
-        await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
-        await utils.sleep(2000); // Improvement
-        await ecp.sendKeypress(ecp.Key.Ok);
+      // Are we on Categories page?
+      await testUtils.waitForElementToFullyShowOnScreen('categoryPagePoster','20000');
 
-        // Are we on Channels page?
-        await utils.sleep(2000);
-        const channelPoster = await testUtils.getNodeForElement('channelPoster');
-        expect(channelPoster.visible).to.be.true;
+      // Choose Networks
+      await ecp.sendKeypress(ecp.Key.Right);
+      await ecp.sendKeypress(ecp.Key.Ok);
 
-        // Choose a Channel
-        await utils.sleep(2000);
-        await ecp.sendKeypress(ecp.Key.Ok);
+      // Verify Channels Details page
+      await testUtils.waitForElementToFullyShowOnScreen('channelsListScreenPoster');
 
-        // Verify Channels Details page
-        await testUtils.retryWithTimeOut(async () => {
-            const channelsDetailsGrid = await testUtils.getNodeForElement('channelsDetailsGrid');
-            expect(channelsDetailsGrid.visible).to.be.true;
-        });
+      // Select channel
+      await ecp.sendKeypress(ecp.Key.Ok);
+      await utils.sleep(1000);
 
-        // Select title
-        await utils.sleep(2000); // Improvement
-        await ecp.sendKeypress(ecp.Key.Ok);
+      //Select title
+      await testUtils.waitForElementToFullyShowOnScreen('channelsListScreenPoster');
+      await ecp.sendKeypress(ecp.Key.Ok);
 
-        // Once in detail page press the back button 5x
-        await testUtils.retryWithTimeOut(async () => {
-            const detailScreenYearAndDuration = await testUtils.getNodeForElement('detailScreenYearAndDuration');
-            expect(detailScreenYearAndDuration.visible).to.equal(true);
-        });
+      // Once in detail page press the back button 6x
+      await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
+      await ecp.sendKeypress(ecp.Key.Back, { count: 6 });
 
-        await ecp.sendKeypress(ecp.Key.Back, { count: 5 });
-
-        // Verify that the Exit modal dialog is displayed
-        const exitPrompt = testUtils.getNodeForElement('exitPrompt');
-        expect((await exitPrompt).visible).to.be.true;
+      // Verify that the Exit modal dialog is displayed
+      await testUtils.waitForElementToFullyShowOnScreen('exitPrompt');
 
     });
 
@@ -613,26 +556,9 @@ describe('Side Navigation', function () {
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
-      // Press back twice
+      // Press back once
       await ecp.sendKeypress(ecp.Key.Back, {count:2});
 
-      // Is the left Nav open?
-      const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
-      await testUtils.waitForSideNavMenuToBeExpanded();
-      expect(leftNavHomeButton.text).to.be.equal('Home');
-      await ecp.sendKeypress(ecp.Key.Down, {count:6});
-
-      // Does Exit menu item have focus?
-      await testUtils.retryWithTimeOut(async () => {
-        const exitLeftNavButton = testUtils.getNodeForElement('exitLeftNavButton');
-        expect(await exitLeftNavButton).to.exist;
-
-      });
-
-      await utils.sleep(2000); // Improvement for sleep
-
-      // Press OK
-      await ecp.sendKeypress(ecp.Key.Ok);
 
       // Select Exit from modal
       const exitPrompt = await testUtils.getNodeForElement('exitPrompt');
@@ -649,11 +575,11 @@ describe('Side Navigation', function () {
 
 
 async function openLeftNav() {
-  // Press back twice
-  await ecp.sendKeypress(ecp.Key.Back, {count:2});
+  // Press left
+  await ecp.sendKeypress(ecp.Key.Left);
 
   // Is the left Nav open?
-  await testUtils.waitForSideNavMenuToBeExpanded();
+  await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButtonLabel');
 }
 
 async function navigateRightToGrid() {

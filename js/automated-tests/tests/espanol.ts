@@ -21,7 +21,7 @@ describe('Espanol', function () {
           expect(parentalControlsHeader.text).to.equal('Parental Controls');
 
           // Set PC
-          await shared.selectLittleKidsFromParentalSettings();
+          await selectLittleKidsFromParentalSettings();
           await enterPasswordSettingsChange();
 
           // Verify Little Kids PC Settings Change dialog
@@ -36,7 +36,7 @@ describe('Espanol', function () {
           // Select Espanol from Left Nav
           await ecp.sendKeypress(ecp.Key.Left);
           await utils.sleep(2000);
-          await ecp.sendKeypress(ecp.Key.Down, { count: 4});
+          await ecp.sendKeypress(ecp.Key.Down, { count: 6});
           await ecp.sendKeypress(ecp.Key.Ok);
 
           // Verify Espanol Disabled for Little Kids
@@ -58,7 +58,7 @@ describe('Espanol', function () {
           expect(exitKidsOption.visible).to.be.true;
 
           // Select Espanol from Left Nav
-          await ecp.sendKeypress(ecp.Key.Down, { count: 4});
+          await ecp.sendKeypress(ecp.Key.Down, { count: 6});
           await ecp.sendKeypress(ecp.Key.Ok);
 
           // Verify Espanol Disabled for Kids mode
@@ -81,7 +81,7 @@ describe('Espanol', function () {
           await testUtils.elementHasFocus('leftNavHomeButton');
 
           // Select Espanol
-          await ecp.sendKeypress(ecp.Key.Down, { count: 4});
+          await ecp.sendKeypress(ecp.Key.Down, { count: 6});
           await utils.sleep(2000); // Improvement
           await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -123,7 +123,7 @@ describe('Espanol', function () {
           // Select Espanol from Left Nav
           await ecp.sendKeypress(ecp.Key.Left);
           await utils.sleep(2000);
-          await ecp.sendKeypress(ecp.Key.Down, { count: 4});
+          await ecp.sendKeypress(ecp.Key.Down, { count: 6});
           await ecp.sendKeypress(ecp.Key.Ok);
 
           // Verify Espanol Disabled for Older Kids
@@ -145,7 +145,7 @@ describe('Espanol', function () {
           expect(parentalControlsHeader.text).to.equal('Parental Controls');
 
           // Set PC
-          await shared.selectTeensFromParentalSettings();
+          await selectTeensFromParentalSettings();
           await enterPasswordSettingsChange();
 
           // Verify Little Kids PC Settings Change dialog
@@ -160,7 +160,7 @@ describe('Espanol', function () {
           // Select Espanol from Left Nav
           await ecp.sendKeypress(ecp.Key.Left);
           await utils.sleep(2000);
-          await ecp.sendKeypress(ecp.Key.Down, { count: 4});
+          await ecp.sendKeypress(ecp.Key.Down, { count: 6});
           await ecp.sendKeypress(ecp.Key.Ok);
 
           // Verify Espanol Disabled for Teens
@@ -173,8 +173,8 @@ describe('Espanol', function () {
 
       async function enterPasswordSettingsChange() {
         await utils.sleep(1000);
-        await ecp.sendKeypress(ecp.Key.Ok);
         await ecp.sendText('111111');
+        await ecp.sendKeypress(ecp.Key.Right);
         await ecp.sendKeypress(ecp.Key.Down, {count:4});
         await utils.sleep(2000);
         await ecp.sendKeypress(ecp.Key.Ok);
@@ -196,4 +196,20 @@ describe('Espanol', function () {
       expect(espanolDisabledMessageTeens.text).to.equal('Please turn off parental controls to use this feature.');
       const espanolDisabledButtonTeens = await testUtils.getNodeForElement('espanolDisabledButtonTeens');
       expect(espanolDisabledButtonTeens.text).to.equal('OK');
+    }
+
+    async function selectLittleKidsFromParentalSettings() {
+      await ecp.sendKeypress(ecp.Key.Right);
+      await utils.sleep(2000);
+      await ecp.sendKeypress(ecp.Key.Up, {count:3});
+      await utils.sleep(2000);
+      await ecp.sendKeypress(ecp.Key.Ok);
+    }
+
+    async function selectTeensFromParentalSettings() {
+      await ecp.sendKeypress(ecp.Key.Right);
+      await utils.sleep(2000);
+      await ecp.sendKeypress(ecp.Key.Up, {count:1});
+      await utils.sleep(2000);
+      await ecp.sendKeypress(ecp.Key.Ok);
     }

@@ -534,28 +534,24 @@ describe('Details Page', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify we are on the details page
-
-      await utils.sleep(4000); // Improvement - try to work around sleeps
-
+      await testUtils.waitForElementToShowOnScreen('detailScreenTitle');
       const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
       expect(detailScreenTitle.text).to.not.be.empty;
+
 
       // Press Add to My List Button
       await testUtils.selectAndVerifyDetailPageMenuItem('addToMyList');
 
       // Check the My List container exists
-      await ecp.sendKeypress(ecp.Key.Back, { count: 4 });
-      await utils.sleep(3000); // Improvement - try to work around sleeps
-      const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
-      expect(leftNavHomeButton.visible).to.equal(true);
-
-      await ecp.sendKeypress(ecp.Key.Down);
+      await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
+      await testUtils.waitForSideNavMenuToBeExpanded();
+      await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButton');
+      await ecp.sendKeypress(ecp.Key.Down, {count:2});
+      await testUtils.waitForElementToFullyShowOnScreen('myStuffSelected');
       await ecp.sendKeypress(ecp.Key.Ok);
-      await utils.sleep(2500); // Improvement - try to work around sleeps
 
       // Check we are on the My Stuff page
-      const myStuffGrid = await testUtils.getNodeForElement('myStuffGrid');
-      expect(myStuffGrid).to.exist;
+      await testUtils.waitForElementToShowOnScreen('myStuffGrid');
       await ecp.sendKeypress(ecp.Key.Down);
 
       // Jump to the My List row
