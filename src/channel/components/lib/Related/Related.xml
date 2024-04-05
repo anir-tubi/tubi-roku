@@ -18,7 +18,7 @@
       <field id="showInfoPanel" type="boolean" alwaysNotify="true"/>
       <!-- unfocus the focused components -->
       <field id="unfocus" type="boolean" alwaysNotify="true"/>
-      <!-- shows the YMAL patially -->
+      <!-- shows the YMAL partially -->
       <field id="show" type="boolean" alwaysNotify="true"/>
       <!-- hides the YMAL -->
       <field id="hide" type="boolean" alwaysNotify="true"/>
@@ -33,7 +33,13 @@
 
     <!-- OUTPUTS -->
       <field id="isRelatedContentFocused" type="boolean" alwaysNotify="true"/>
-      <field id="selectedRelatedContentItem" type="node" alwaysNotify="true"/>
+
+      <!-- selectedRelatedContentItemUpdated should be observed instead of this field -->
+      <field id="selectedRelatedContentItem" type="node" />
+
+      <!-- set to true when selectedRelatedContentItem is updated-->
+      <field id="selectedRelatedContentItemUpdated" type="boolean" alwaysNotify="true" />
+
       <field id="keyPress" alias="RelatedGrid.keyPress"/>
       <field id="itemFocused" alias="RelatedGrid.itemFocused"/>
       <!-- Holds the information needed to populate a navigate_within_page event. This will

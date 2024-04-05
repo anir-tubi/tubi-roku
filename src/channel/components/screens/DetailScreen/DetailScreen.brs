@@ -1180,6 +1180,7 @@ Function handlePlayInput()
   else if m.RelatedGrid.isInFocusChain() = true
     selectedContent = m.RelatedGrid.content.getChild(m.RelatedGrid.itemFocused)
     m.top.relatedContentToPlay = selectedContent
+    m.top.relatedContentToPlayUpdated = true
   else
     m.top.resumeSelected = true
     m.Menu.jumpToItem = 0 '//reset menu back to the top after a video is requested to play

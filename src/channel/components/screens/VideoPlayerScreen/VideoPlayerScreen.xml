@@ -175,7 +175,10 @@
       <!-- set to the contentNode of the RelatedGrid item which was focused when
            the ok button is pressed
       -->
-      <field id="relatedContentToPlay" type="node" alwaysNotify="true"/>
+      <field id="relatedContentToPlay" type="node" />
+
+      <!-- set to true when the relatedContentToPlay field is updated -->
+      <field id="relatedContentToPlayUpdated" type="boolean" alwaysNotify="true"/>
 
       <!-- streamingSegment will be set when streamingSegment of videoNode value changes -->
       <field id="segInfo" type="assocarray"/>

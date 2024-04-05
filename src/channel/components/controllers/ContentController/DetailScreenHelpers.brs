@@ -42,7 +42,7 @@ Function showDetailScreen(content, sendTrackingOnResponse = true, successCb = in
     detailScreen.observeFieldScoped("refreshContent", "onRefreshContentSignal")
     detailScreen.observeFieldScoped("refreshRelatedContent", "onRefreshRelatedContentSignal")
     detailScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
-    detailScreen.observeFieldScoped("relatedContentToPlay", "onRelatedContentToPlay")
+    detailScreen.observeFieldScoped("relatedContentToPlayUpdated", "onRelatedContentToPlay")
     detailScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     detailScreen.observeFieldScoped("signUpButtonSelected", "onSignUpButtonSelected")
     detailScreen.observeFieldScoped("componentInteractionInfo", "onComponentInteractionInfoChange")
@@ -2346,13 +2346,16 @@ End Function
 
 
 Function onRelatedContentToPlay(msg)
-  content = msg.getData()
-  playbackSource = {
-    "srcForAnalytic": m.constants.player.playbackSource.unknown
-    "srcForAds":m.constants.player.playbackOrigin.ymal
-  }
+  screen = msg.getRoSGNode()
+  if screen <> invalid then
+    content = screen.relatedContentToPlay
+    playbackSource = {
+      "srcForAnalytic": m.constants.player.playbackSource.unknown
+      "srcForAds":m.constants.player.playbackOrigin.ymal
+    }
 
-  showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
+    showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
+  end if
 End Function
 
 

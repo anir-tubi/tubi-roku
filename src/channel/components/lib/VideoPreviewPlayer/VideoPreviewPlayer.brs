@@ -18,7 +18,7 @@ Function init()
   m.Video = m.top.findNode("VideoNode") ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
   m.Video.observeField("state", "onVideoStateChange")
-  if getExperimentResource("roku_async_stop", "roku_async_stop_v4", false).enabled = true then
+  if getExperimentResource("roku_async_stop", "roku_async_stop_v5", false).enabled = true then
     m.Video.asyncStopSemantics = true
   end if
 
@@ -184,7 +184,7 @@ Function pauseContent()
   'added this check to avoid playing content once the buffering is completed when focus is on sidenav/topnav
   if m.videoState = "buffering"
     m.videoState = "stop"
-    getExperimentResource("roku_async_stop", "roku_async_stop_v4", true)
+    getExperimentResource("roku_async_stop", "roku_async_stop_v5", true)
     m.Video.control = "stop"
   else if m.videoState = "play"
     m.videoState = "pause"
@@ -201,7 +201,7 @@ Function stopContent()
       trackEvent(finishPreviewEvent)
     end if
 
-    getExperimentResource("roku_async_stop", "roku_async_stop_v4", true)
+    getExperimentResource("roku_async_stop", "roku_async_stop_v5", true)
     m.Video.control = "stop"
   end if
   m.videoState = "stop"
@@ -263,7 +263,7 @@ End Function
 Function getFinishPreviewEvent(hasCompleted = false)
 
   if m.Video.content = invalid OR m.Video.content.id = invalid then
-    ' TODO remove after roku_async_stop_v4 experiment concludes
+    ' TODO remove after roku_async_stop_v5 experiment concludes
     errorInfo = {}
 
     if m.top.content <> invalid then

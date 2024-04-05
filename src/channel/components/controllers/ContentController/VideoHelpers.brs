@@ -103,7 +103,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     videoPlayer.observeFieldScoped("getPauseAd", "onGetPauseAd")
     videoPlayer.observeFieldScoped("sendPauseAdPixel", "onSendPauseAdPixel")
     videoPlayer.observeFieldScoped("audioTrackSettings", "onAudioTrackSettingsChange")
-    videoPlayer.observeFieldScoped("relatedContentToPlay", "onPlayerRelatedContentToPlay")
+    videoPlayer.observeFieldScoped("relatedContentToPlayUpdated", "onPlayerRelatedContentToPlay")
     initVideoTracking(videoPlayer) 'initializeYoubora
     setInScreenCache(videoPlayer)
 
@@ -905,7 +905,7 @@ Function stopVideoContent(videoPlayer)
     videoPlayer.unobserveFieldScoped("relatedNavigateWithinPageInfo")
     videoPlayer.unobserveFieldScoped("segInfo")
 
-    if getExperimentResource("roku_async_stop", "roku_async_stop_v4", false).enabled = true then
+    if getExperimentResource("roku_async_stop", "roku_async_stop_v5", false).enabled = true then
       waitForVideoPlayerStoppedState(videoPlayer)
     end if
 
@@ -1433,20 +1433,23 @@ End Function
 
 
 Function onPlayerRelatedContentToPlay(msg)
-  content = msg.getData()
+  screen = msg.getRoSGNode()
+  if screen <> invalid then
+    content = screen.relatedContentToPlay
 
-  ' The episode information is not available for the selected series, so refetch required for series content type
-  if content.type = m.constants.ui.contentTypes.series
-    emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
-    emptySeriesNode.type = m.constants.ui.contentTypes.series
-    emptySeriesNode.id = content.id
-    getSingleContentFromServer(emptySeriesNode, handleYMALSeriesContentSuccessResponse, handleYMALSeriesContentErrorResponse)
-  else
-    playbackSource = {
-      "srcForAnalytic": m.constants.player.playbackSource.unknown
-      "srcForAds": m.constants.player.playbackOrigin.ymal
-    }
-    playUpNextContent(content, playbackSource)
+    ' The episode information is not available for the selected series, so refetch required for series content type
+    if content.type = m.constants.ui.contentTypes.series
+      emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
+      emptySeriesNode.type = m.constants.ui.contentTypes.series
+      emptySeriesNode.id = content.id
+      getSingleContentFromServer(emptySeriesNode, handleYMALSeriesContentSuccessResponse, handleYMALSeriesContentErrorResponse)
+    else
+      playbackSource = {
+        "srcForAnalytic": m.constants.player.playbackSource.unknown
+        "srcForAds": m.constants.player.playbackOrigin.ymal
+      }
+      playUpNextContent(content, playbackSource)
+    end if
   end if
 End Function
 

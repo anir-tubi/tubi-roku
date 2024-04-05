@@ -54,7 +54,7 @@ Function init()
   m.Related = m.top.findNode("Related")
   m.Related.associatedPageName = "video_player_page"
   m.Related.observeFieldScoped("isRelatedContentFocused", "onRelatedItemFocused")
-  m.Related.observeFieldScoped("selectedRelatedContentItem", "onRelatedItemSelected")
+  m.Related.observeFieldScoped("selectedRelatedContentItemUpdated", "onRelatedItemSelected")
   m.Related.observeFieldScoped("keyPress", "onKeyPressWhenYMALHasFocus")
   m.UpNext = m.top.findNode("UpNext")
   m.UpNext.observeField("contentSelected", "onUpNextContentSelected")
@@ -68,7 +68,7 @@ Function init()
   m.Video.observeField("streamingSegment", "onStreamingSegmentChange")
   m.video.observeFieldScoped("availableSubtitleTracks", "setCCAudioTransportBarVisibility")
   m.video.observeFieldScoped("availableAudioTracks", "onAvailableAudioTracksChange")
-  if getExperimentResource("roku_async_stop", "roku_async_stop_v4", false).enabled = true then
+  if getExperimentResource("roku_async_stop", "roku_async_stop_v5", false).enabled = true then
     m.video.asyncStopSemantics = true
   end if
 
@@ -1388,7 +1388,7 @@ Function showAdBreak()
   else
     ' In order to try and change the behavior as little as possible we only want the async stop to rely on the onVideoStateChange callback and just trigger the callback right away here if in the control
     immediatelyTriggerCallback = true
-    if getExperimentResource("roku_async_stop", "roku_async_stop_v4", true).enabled = true then
+    if getExperimentResource("roku_async_stop", "roku_async_stop_v5", true).enabled = true then
       ' the ad break will be shown by showAdBreakStoppedCallback() which will be triggered by
       ' onVideoStateChange() when the video node's state is updated to "stopped".
       ' m.isShowAdBreakPendingStop keeps state to let us know if an break is waiting for the
@@ -1530,7 +1530,7 @@ Function stopVideo()
   ' then state will switch to stopping and never switches to stopped.
   ' After much effort I am still unable to reproduce this behavior in a simple test app but it happens in our app for some reason
   if videoState <> "stop" AND m.Video.state <> "stopped" then
-    getExperimentResource("roku_async_stop", "roku_async_stop_v4", true)
+    getExperimentResource("roku_async_stop", "roku_async_stop_v5", true)
     m.Video.control = "stop"
   end if
 End Function
@@ -2186,20 +2186,24 @@ End Function
 
 
 Function onRelatedItemSelected(msg)
-  selectedContent = msg.getData()
+  screen = msg.getRoSGNode()
+  if screen <> invalid then
+    selectedContent = screen.selectedRelatedContentItem
 
-  m.top.trackingComponentInfo = {
-    componentType: "related_component"
-    componentValues: {
-      content_tile: m.Tracking.getAnalyticsTile(selectedContent, m.Related.itemFocused + 1, 1)
+    m.top.trackingComponentInfo = {
+      componentType: "related_component"
+      componentValues: {
+        content_tile: m.Tracking.getAnalyticsTile(selectedContent, m.Related.itemFocused + 1, 1)
+      }
     }
-  }
 
-  animateTransport("out")
-  hideYMAL()
-  setFocusToPlaybackControl()
-  m.top.relatedContentToPlay = selectedContent
-  resetTransportButtons()
+    animateTransport("out")
+    hideYMAL()
+    setFocusToPlaybackControl()
+    m.top.relatedContentToPlay = selectedContent
+    m.top.relatedContentToPlayUpdated = true
+    resetTransportButtons()
+  end if
 End Function
 
 

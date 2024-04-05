@@ -28,7 +28,7 @@ Function init()
   m.Video.observeField("state", "onVideoStateChange")
   m.Video.observeField("bufferingStatus", "onBufferingStatus")
   m.Video.observeField("timedMetaData", "onId3")
-  if getExperimentResource("roku_async_stop", "roku_async_stop_v4", false).enabled = true then
+  if getExperimentResource("roku_async_stop", "roku_async_stop_v5", false).enabled = true then
     m.Video.asyncStopSemantics = true
   end if
 
@@ -743,7 +743,7 @@ Function stopVideo()
   ' if the video is already in a non playing state.
   videoNodeState = m.Video.state
   if videoNodeState <> "stopped" AND videoNodeState <> "finished" AND videoNodeState <> "none"
-    getExperimentResource("roku_async_stop", "roku_async_stop_v4", true)
+    getExperimentResource("roku_async_stop", "roku_async_stop_v5", true)
     m.Video.control = "stop"
   end if
 End Function
@@ -904,7 +904,7 @@ Function setDrmOnContent(contentNode, resource, videoResourceIndex)
     contentNode.resolution = resource.resolution
     contentNode.currentVideoResourceIndex = videoResourceIndex
     contentNode.hdcpVersion = resource.hdcpVersion
-    
+
     '//set youbora field
     youboraTracking = {}
     trackingKeys = m.constants.thirdParty.youbora.trackingKeys

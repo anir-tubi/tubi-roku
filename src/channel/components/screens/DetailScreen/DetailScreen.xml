@@ -189,7 +189,10 @@
       <!-- set to the contentNode of the RelatedGrid item which was focused when
            the "play" input transport deeplink was triggered
       -->
-      <field id="relatedContentToPlay" type="node" alwaysNotify="true"/>
+      <field id="relatedContentToPlay" type="node" />
+
+      <!-- set to true when the relatedContentToPlay field is updated -->
+      <field id="relatedContentToPlayUpdated" type="boolean" alwaysNotify="true"/>
 
       <!-- tells ContentController/DetailScreenHelpers that the content metadata
            or the related content is out of the cache window and should be updated -->

@@ -111,6 +111,7 @@ End Function
 Function onItemSelected(msg)
   itemSelected = msg.getData()
   m.top.selectedRelatedContentItem = m.RelatedGrid.content.getChild(itemSelected)
+  m.top.selectedRelatedContentItemUpdated = true
 End Function
 
 
@@ -215,4 +216,13 @@ Function onShowRelatedInFullScreen()
   fade(m.YmalGroup, "in", 0.6)
   fade(m.YmalRow, "in", 0.2, 0, 1.0)
   showInfoPanel()
+End Function
+
+
+Function onKeyEvent(key as String, press as Boolean) as Boolean
+  ' CustomMarkupGrid does not capture the OK keypress so without this the VideoPlayerScreen catches the OK keypress instead of us consuming it ourselves when an item is selected
+  if key = "OK" then
+    return true
+  end if
+  return false
 End Function
