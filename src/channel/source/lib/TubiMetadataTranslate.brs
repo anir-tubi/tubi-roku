@@ -85,12 +85,12 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
   else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR (gridType = gridItemTypes.linear AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_large_linear_tiles", "roku_large_linear_tiles_v1").enabled = true)
-    if canvasImages <> invalid AND type(canvasImages.hero_tb) = "roArray" AND isNonEmptyString(canvasImages.hero_tb[0])
-      '//A custom hero size was requested, use this image instead of the default image
-      sThumbnailURL = canvasImages.hero_tb[0]
-    else if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
+    if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
       '//A custom landscape size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.landscape_tb[0]
+    else if canvasImages <> invalid AND type(canvasImages.hero_tb) = "roArray" AND isNonEmptyString(canvasImages.hero_tb[0])
+      '//A custom hero size was requested, use this image instead of the default image
+      sThumbnailURL = canvasImages.hero_tb[0]
     else if isNonEmptyArray(contentFromServer.hero_images) = true
       sThumbnailURL = contentFromServer.hero_images[0]
     else if contentFromServer.type = "l" 'linear content in non-linear row
