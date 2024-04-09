@@ -349,9 +349,10 @@ describe('Kids Mode', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Check that we are no longer in Kids mode
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
     await ecp.sendKeypress(ecp.Key.Left);
-    const leftNavHomeButton = await testUtils.getNodeForElement('leftNavHomeButton');
-    expect(leftNavHomeButton.visible).to.be.true;
+    await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButton');
+    
 
     // Check for Live News row
     await ecp.sendKeypress(ecp.Key.Right);

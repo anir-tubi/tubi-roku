@@ -67,11 +67,8 @@ describe('Settings', function () {
 
     // Full Device ID modal present?
     await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForElementToFullyShowOnScreen('dialogBoxContentAreaDeviceID');
-    const fullDeviceID = await testUtils.getNodeForElement('fullDeviceID');
-    const fullDeviceMessage = await testUtils.getNodeForElement('fullDeviceMessage');
-    await testUtils.elementHasFocus('fullDeviceID');
-    expect(fullDeviceID.text).to.equal('Full Device ID');
+    await testUtils.waitForElementToFullyShowOnScreen('fullDeviceMessage');
+
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/32371

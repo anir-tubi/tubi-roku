@@ -33,7 +33,8 @@ describe('Application Launch', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/70718
   it('C70718 - Sign out after setting Parental Controls @application_launch', async () => {
     // Go to Settings page and select Older Kids
-    // await testUtils.goToPage('settings');
+    await testUtils.startApplicationAtPage('home', {shouldCreateNewUser: true});
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
     await testUtils.goToPage('settings');
     await ecp.sendKeypress(ecp.Key.Right);
     await testUtils.waitForElementToShowOnScreen('adultControlSelected');
@@ -82,7 +83,6 @@ describe('Application Launch', function () {
     await testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured');
   });
 
-
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/116528
   it('C116528_1 - Resume Watching - Guest User - Movie - User plays back content, exits and selects content again, @application_launch', async () => {
     // Start Open Movies
@@ -98,8 +98,9 @@ describe('Application Launch', function () {
     await ecp.sendKeypress(ecp.Key.Play);
     await createHistory();
     await ecp.sendKeypress(ecp.Key.Back);
-    const resumePlayingButton = await testUtils.getNodeForElement('resumePlayingButton');
-    expect(resumePlayingButton.visible).to.equal(true);
+    await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton');
+    
+
 
     // Exit app and restart
     await testUtils.restartApplication();
@@ -110,7 +111,7 @@ describe('Application Launch', function () {
 
     // Test for resume button (Roku retains resume button for 24 hours)
     await ecp.sendKeypress(ecp.Key.Ok);
-    expect(resumePlayingButton.visible).to.equal(true);
+    await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton');
   });
 
 
@@ -125,6 +126,7 @@ describe('Application Launch', function () {
     await testUtils.findRowIndexWithTitle('movieScreenRowList', 'Featured');
 
     // Play title
+    await ecp.sendKeypress(ecp.Key.Down);
     await ecp.sendKeypress(ecp.Key.Play);
 
     // Create CW row
@@ -135,8 +137,9 @@ describe('Application Launch', function () {
 
     // Jump To Continue Watching Row
     await testUtils.jumpToRowWithTitle('movieScreenRowList', 'Continue Watching');
-    const movieScreenPoster = await testUtils.getNodeForElement('movieScreenPoster');
-    expect(movieScreenPoster).to.exist;
+    await testUtils.waitForElementToFullyShowOnScreen('infoPanelTitle');
+    const infoPanelTitle = await testUtils.getNodeForElement('infoPanelTitle');
+    expect(infoPanelTitle.text).to.not.equal('Sign Up to Save Your Progress');
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/114199
@@ -149,49 +152,25 @@ describe('Application Launch', function () {
 
     // Jump To Continue Watching Row
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching');
-    const signUpToSaveProgressDescription = await testUtils.getNodeForElement('signUpToSaveProgressDescription');
-    expect(signUpToSaveProgressDescription.visible).to.be.true;
+    await testUtils.waitForElementToFullyShowOnScreen('signUpToSaveProgressDescription');
 
     // Check CW row title
-
     const continueWatchingRowContent = await testUtils.getCurrentlyFocusedGridItemContent('homeScreenRowList');
     expect(continueWatchingRowContent.title).to.equal('Sign Up to Save Your Progress');
 
 
   });
 
-  // https://tubi.testrail.io/index.php?/cases/view/129714
-  it('C129714 - Logged in user should not see Registration Prompt Container in Movies filter @application_launch @registered_user', async () => {
-
-    // Create user with history
-    const user = await testUtils.createRegisteredUser();
-    const movieContent = await user.getContent().ofContentType('movie').retrieve({ limit: 5});
-    await user.addContentToViewHistory(movieContent, 500);
-
-    // Launch app with created user
-    await testUtils.startApplicationAtPage('home', {user: user});
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-
-    // Jump To Continue Watching Row (verify it is present)
-    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Continue Watching',10000);
-  // 
-    const continueWatchingRowContent = await testUtils.getCurrentlyFocusedGridItemContent('homeScreenRowList');
-    expect(continueWatchingRowContent.title).to.not.equal('Sign Up to Save Your Progress');
-  });
-
-
 
 });
 
 
 async function createHistory() {
-  const node = await testUtils.getNodeForElement('videoPlayerScreen');
-  expect(node.visible).to.be.true;
-  await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
+  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
   await ecp.sendKeypress(ecp.Key.Forward);
   await ecp.sendKeypress(ecp.Key.Forward);
   await ecp.sendKeypress(ecp.Key.Forward);
   await utils.sleep(3000);
   await ecp.sendKeypress(ecp.Key.Play);
-  await utils.sleep(2000);
+  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing');
 }

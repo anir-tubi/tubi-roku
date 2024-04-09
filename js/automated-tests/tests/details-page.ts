@@ -138,9 +138,8 @@ describe('Details Page', function () {
       expect(position).to.be.lessThan(5000);
 
       // Clean up
+      await ecp.sendKeypress(ecp.Key.Back, {count:1});
       await testUtils.selectAndVerifyDetailPageMenuItem('removeFromHistory');
-      await ecp.sendKeypress(ecp.Key.Back, {count:2});
-
     });
 
 
@@ -181,7 +180,7 @@ describe('Details Page', function () {
         await testUtils.selectAndVerifyDetailPageMenuItem('resume');
       });
 
-      await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
+      await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
       // Find resume position
       const resumeposition = await testUtils.getPlayerPosition();
@@ -209,8 +208,6 @@ describe('Details Page', function () {
       const onMoviesPageButton = await testUtils.getNodeForElement('onMoviesPageButton');
       expect(onMoviesPageButton.visible).to.equal(true);
       await ecp.sendKeypress(ecp.Key.Down, { count: 7 });  //Move to fresh movie title
-
-
 
       // Create history
       await ecp.sendKeypress(ecp.Key.Play);
@@ -467,7 +464,7 @@ describe('Details Page', function () {
 
       // Check that UI has Resume button
       await utils.sleep(2000);
-      await testUtils.selectAndVerifyDetailPageMenuItem('resume');
+      await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton');
 
       // Verify that UI also has a Play button
       await utils.sleep(2000); // Improvement
@@ -597,9 +594,7 @@ describe('Details Page', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify we are on the details page
-      const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-      await utils.sleep(4000); // Improvement - try to work around sleeps
-      expect(detailScreenTitle.visible).to.be.true;
+      await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
 
       // Verify resume
       await verifyResumeWithinRange();
@@ -675,17 +670,12 @@ async function findIndexForFirstItemWithoutVideoPreview(rowListKeyPath) {
 // An example of this called from a test after landing on a details page and pressing Play
 // After selecting a title from the details page, press the Play button
     await ecp.sendKeypress(ecp.Key.Ok); // selecting the title
-
-    //
     await testUtils.selectAndVerifyDetailPageMenuItem('play');  // verify the play button and press it
     await createHistory(); // create history function is called
 */
 
 // Create history function
 async function createHistory() {
-  await testUtils.waitForCurrentScreenToEqual('videoPlayerScreen', 15000);
-  const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
-  expect(videoPlayerActual.visible).to.equal(true);
   await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
   await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', 120 * 1000, 'current');
   await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
@@ -716,23 +706,15 @@ async function verifyResumeWithinRange() {
   await ecp.sendKeypress(ecp.Key.Back);
 
   // Verify we are on the details page
-  const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-  await utils.sleep(4000); // Improvement - try to work around sleeps
-  await ecp.sendKeypress(ecp.Key.Ok);
-  expect(detailScreenTitle.visible).to.be.true;
-
-
+ await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
 
   // Select Resume and check for playback
-
   await testUtils.selectAndVerifyDetailPageMenuItem('resume');
   await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
 
   // Find resume position
   const resumeposition = await testUtils.getPlayerPosition();
-  // console.log(resumeposition);
   const difference = (resumeposition - currentposition);
-  // console.log(difference);
 
   // Find out if current postion and resume postion are within range
   const min = -5000;

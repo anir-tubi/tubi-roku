@@ -322,7 +322,7 @@ describe('Side Navigation', function () {
       await utils.sleep(2000); //Improvement
 
       // On the Categories Details page?
-      await testUtils.elementHasFocus('categoriesVideoGrid', true);
+      await testUtils.waitForElementToFullyShowOnScreen('categoriesVideoGridPoster');
 
       // Select a title
       await ecp.sendKeypress(ecp.Key.Ok);
@@ -339,7 +339,6 @@ describe('Side Navigation', function () {
 
     // https://tubi.testrail.io/index.php?/cases/view/535791
     it('C535791 - Side Navigation - Details Page - Press Back Button, @sidenav', async () => {
-
       // Relaunch - Improvement
       await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -362,13 +361,10 @@ describe('Side Navigation', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // On the Categories Details page?
-      await utils.sleep(1000);
-      const categoriesVideoGrid = await testUtils.getNodeForElement('categoriesVideoGrid');
-      await testUtils.elementHasFocus('categoriesVideoGrid', true);
+      await testUtils.waitForElementToFullyShowOnScreen('categoriesVideoGridPoster');
 
       // Select a title
       await ecp.sendKeypress(ecp.Key.Ok);
-      await utils.sleep(2000);
 
       // On the title details page?
       await testUtils.waitForElementToFullyShowOnScreen('detailsPageMenu');
@@ -381,7 +377,7 @@ describe('Side Navigation', function () {
       await ecp.sendKeypress(ecp.Key.Back);
 
       // On the Categories Details page?
-      await testUtils.elementHasFocus('categoriesVideoGrid',true);
+      await testUtils.waitForElementToFullyShowOnScreen('categoriesVideoGridPoster');
 
     });
 

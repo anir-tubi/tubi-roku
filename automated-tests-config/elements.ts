@@ -1,3 +1,4 @@
+
 import type { BaseType } from 'roku-test-automation';
 
 type Element = {
@@ -469,6 +470,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#FastForwardButton',
   },
 
+  /** Transport buttons  */
+  transportButtons: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons'
+  },
+
   rewindButton3xPS4b: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons.#RewindButton',
     xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/VideoPlayerScreen/Group[4]/Group/Group/TransportButton[2]',
@@ -699,12 +705,18 @@ const elements = typeCheckElements({
 
   /** The actual Episodes page. Can be used to see if something on the episodes screen has focus */
   episodesScreen: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#episodeScreen',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#episodeScreen.#PageGroup.#RowList.0.items.0.#FeaturePoster.#Background',
   },
 
   /** Marker to determine if we are on the Episodes page */
-  episodesScreenPoster: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#episodeScreen.#RowList.0.items.0.#FeaturePoster.#Background',
+  episodesScreenSeasonHeader: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#episodeScreen.#PageGroup.#RowList.0.title.#CategoryName',
+  },
+
+  /** Episodes list */
+  episodesListButton:{
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.2.#DetailsMenuTextParent.#DetailsMenuText'
+
   },
 
   /** dialog box sign in button */
@@ -866,12 +878,12 @@ const elements = typeCheckElements({
 
   /** resume playing button */
   resumePlayingButton: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.0.#DetailsMenuTextParent.#DetailsMenuText',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused',
   },
 
   /** Play button */
   playFromBeginning: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuText',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuText',
   },
 
   /** Sign up to save Progress description */
@@ -894,9 +906,9 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#Title',
   },
 
-  /** full device ID modal */
+  /** full device ID  */
   fullDeviceID: {
-    keyPath: '#ContentController.#2f12a2f.#DialogBox.#ContentArea.#Title',
+    keyPath: '#ContentController.#188da7a.#DialogBox.#ContentArea.#Title',
   },
 
   /** About menu item */
@@ -906,7 +918,7 @@ const elements = typeCheckElements({
 
   /** Full Device message */
   fullDeviceMessage: {
-    keyPath: '#ContentController.#2f12a2f.#DialogBox.#ContentArea.#MessageGroup.#Message',
+    keyPath: '#ContentController.#188da7a.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
   /** help page text */
@@ -983,6 +995,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#ChannelsInfoPanel.#infoPanelGroup.#Offset.#Title'
   },
 
+  titleDescriptionMovieScreen: {
+    keyPath: 'ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description'
+
+  },
+
   titleDescriptionOnHomeScreen: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description'
   },
@@ -1030,10 +1047,6 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#searchGroup.#SearchKeyboard.0',
   },
 
- /** Result Grid */
- searchResultGrid: {
-  keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#ResultArea.#gridContainer.#resultsContainer.#ResultGrid'
- },
 
   /** No results message */
   noResultsMessage: {
@@ -1144,10 +1157,6 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextMovieGroup',
   },
 
-  /** transport buttons UI */
-  transportButtons: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#HUD.#Transport.#TransportButtons',
-  },
 
   /** Settings menu item */
   settingsMenuItem: {
@@ -1182,6 +1191,12 @@ const elements = typeCheckElements({
   /** description of title in CW row */
   homeScreenContentDescription: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
+  },
+
+  /** info panel title */
+  infoPanelTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#Title'
+
   },
 
   /** age gate number page */
@@ -1305,8 +1320,8 @@ const elements = typeCheckElements({
   },
 
   /** categories video grid */
-  categoriesVideoGrid: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#ChannelsVideoGrid',
+  categoriesVideoGridPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.#poster',
   },
 
   /** settings left nav button highlighted */

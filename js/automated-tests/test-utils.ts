@@ -283,6 +283,7 @@ class TestUtils {
   // Starts the application at the specified page.
   // args: options to modify starting application state such as wether a user is logged in or not
   public async startApplicationAtPage(page: DeeplinkPage | 'search', args: StartApplicationArgs = {}) {
+    await utils.sleep(5000);
     let deeplink;
     if (page !== 'search') {
       deeplink = {
