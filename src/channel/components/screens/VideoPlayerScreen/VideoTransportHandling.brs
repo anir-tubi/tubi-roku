@@ -1455,7 +1455,6 @@ End Function
 Function showPauseAd()
   animateTransport("out")
   hideYMAL()
-  setFocusToPlaybackControl()
   m.pauseAdAnimation = fade(m.pauseAdOverlay, "in", 0.6, 0.4)
   sendPauseAdPixel(m.constants.pauseAd.pixelTypes.startPixel)
   startImpTrackingTimer()
