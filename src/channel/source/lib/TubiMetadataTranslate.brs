@@ -92,7 +92,7 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     else if isNonEmptyArray(contentFromServer.thumbnails) = true
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
-  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR (gridType = gridItemTypes.linear AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_large_linear_tiles", "roku_large_linear_tiles_v1").enabled = true)
+  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR (gridType = gridItemTypes.linear AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v1").enabled = true)
     if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
       '//A custom landscape size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.landscape_tb[0]
