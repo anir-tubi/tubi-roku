@@ -1378,6 +1378,7 @@ Function getConstants()
     constants.consentKeys.personalization = "personalized_advertising"
     constants.consentKeys.marketing = "marketing"
     constants.consentKeys.continueWatching = "data_sharing"
+    constants.consentKeys.functional = "functional"
 
 
 'THEME/COLOR START///////////////////////
@@ -1627,6 +1628,9 @@ Function getConstants()
       constants.tournament.clearRegistryDate = "2023-01-04T20:00:00Z"
 
       ' Creating Backend/Frontend mapping for preference keys.
+      ' ****** IMPORTANT - PLEASE DO NOT FORGOT ********* 
+      ' Whenever we add any new field to either device or user setting we need to make sure to add corresponding consent key mapping below.
+      ' *************************************************
       constants.serverPersistentDataKeys = {}
       constants.serverPersistentDataKeys.isVideoPreviewOn = "enable_video_preview"
       constants.serverPersistentDataKeys.audioTrack = "audio_track"
@@ -1634,6 +1638,16 @@ Function getConstants()
       constants.serverPersistentDataKeys.isDisLikeToastNotificationShown = "enable_dislike_toast_notification"
       constants.serverPersistentDataKeys.lastRokuCwConsentPromptShownAt = "last_roku_cw_consent_prompt_shown_at"
       constants.serverPersistentDataKeys.relaunchSeriesPlaybackInfo = "relaunch_series_playback_info"
+      
+      ' TODO: These are temporary values once finalized will update accordingly.
+      constants.persistentDataKeyConsentKeyMapping = {
+        "enable_video_preview": constants.consentKeys.functional
+        "audio_track": constants.consentKeys.functional
+        "enable_like_toast_notification": constants.consentKeys.functional
+        "enable_dislike_toast_notification": constants.consentKeys.functional
+        "last_roku_cw_consent_prompt_shown_at": constants.consentKeys.functional
+        "relaunch_series_playback_info": constants.consentKeys.functional
+      }
 
   return constants
 end Function

@@ -255,7 +255,7 @@ Function getConsentOptOutStatusByKey(key)
   ' Please do not remove the isUserInAdultsMode check since we are legally bound to not use parental consent when the user is not in adults mode.
   ' Irrespective of whether user as opted in or opted out when we are in non adult mode we should treat has if user opted out.
   isUserAllowedToManageConsent = isUserAllowedToManageConsent()
-  if m.consentSettings <> invalid AND isUserAllowedToManageConsent = true
+  if m.consentSettings <> invalid AND isUserAllowedToManageConsent = true AND m.consentSettings.consents <> invalid
     for each consent in m.consentSettings.consents
       if consent.key = key
         didOptOut = (consent.value = "opted_out")

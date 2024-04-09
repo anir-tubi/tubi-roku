@@ -67,14 +67,20 @@ End Function
 Function saveServerPersistentData(serverPersistentData, saveInto = "")
   ' Creating backend to front end key mapping so that we can use camelcase fields.
   serverPersistentDataKeys = m.constants.serverPersistentDataKeys
+  persistentDataKeyConsentKeyMapping = m.constants.persistentDataKeyConsentKeyMapping
 
   mappedPersistentData = {}
 
   ' Providing flexibility if we need to update multiple keys at once.
   for each key in serverPersistentData
+    persistentDataKey = serverPersistentDataKeys[key]
     ' Making sure we allow only whitelisted keys as per above mapping.
-    if serverPersistentDataKeys[key] <> invalid
-      mappedPersistentData[serverPersistentDataKeys[key]] = serverPersistentData[key]
+    if persistentDataKey <> invalid
+      ' Adding a consent check.
+      consentKey = persistentDataKeyConsentKeyMapping[persistentDataKey]
+      if consentKey <> invalid AND getConsentOptOutStatusByKey(consentKey) = false
+        mappedPersistentData[persistentDataKey] = serverPersistentData[key]
+      end if
     end if
   end for
 
@@ -124,9 +130,23 @@ End Function
   '   }
   ' ]
 Function saveLocalServerPresistantData(newServerPersistantData)
+  ' We are adding checks both during save and using the backend response to cover a use case if
+  ' someone carries the device to GDPR country we do not use their settings from US.
+  serverPersistentDataKeys = m.constants.serverPersistentDataKeys
+  persistentDataKeyConsentKeyMapping = m.constants.persistentDataKeyConsentKeyMapping
 
   for i = 0 to newServerPersistantData.count() - 1
-    m.pub_serverPersistentData.update(newServerPersistantData[i])
+    entries = newServerPersistantData[i]
+    for each key in entries
+      persistentDataKey = serverPersistentDataKeys[key]
+      if persistentDataKey <> invalid
+        ' Adding a consent check.
+        consentKey = persistentDataKeyConsentKeyMapping[persistentDataKey]
+        if consentKey <> invalid AND getConsentOptOutStatusByKey(consentKey) = false
+          m.pub_serverPersistentData[key] = entries[key]
+        end if
+      end if
+    end for
   end for
 
   m.pubSub.publish("pub_serverPersistentData", m.pub_serverPersistentData)

@@ -579,8 +579,6 @@ Function startUserExperience()
       ' which is necessary to proceed past this step if m.authInfoRefreshed was set to false, but the user was already signed in.
       onAuthInfoRefreshed()
     end if
-  else if m.getServerPersistentDataComplete <> true
-    getServerPersistentData(startUserExperience)
   else if m.isConsentCheckComplete <> true
     ' Below logic handles the use case where in the previous session if the user entered a age less than 18.
     ' and the user is in gdpr country. During the start up flow we are checking if the user is in gdpr country.
@@ -604,6 +602,8 @@ Function startUserExperience()
     else
       getConsent(onInitialGetConsentRequestComplete)
     end if
+  else if m.getServerPersistentDataComplete <> true
+    getServerPersistentData(startUserExperience)
   else if shouldShowAgeGate() = true AND m.ageVerificationComplete <> true
     ' check if we have age information for the user
     if isLoggedInUser() = true
