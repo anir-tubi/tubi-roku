@@ -77,10 +77,12 @@ End Function
 
 
 Function setLockIconOpacity()
-  if m.top.itemHasFocus = false
-    if m.lockIcon <> invalid then m.lockIcon.opacity = 0.0
-  else
-    if m.lockIcon <> invalid then m.lockIcon.opacity = 1.0
+  if m.lockIcon <> invalid
+    if m.top.itemHasFocus = false
+      m.lockIcon.opacity = 0.0
+    else
+      m.lockIcon.opacity = 1.0
+    end if
   end if
 End Function
 

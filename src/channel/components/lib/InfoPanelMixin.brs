@@ -170,6 +170,86 @@ End Function
 
 ' Populates the info panel with the fields necessary for the Linear programs in homeScreen(linear content on non-linear category) mode so that it looks
 ' like the info panel on the homescreen
+' Delete this Function if roku_sports_onnow_rows experiment does not graduate
+'
+' @content: TubiContentNode, containing a linear channel with programs as children
+' @infoPanel: InfoPanel node
+'
+' @sideEffects: updates fields on the passed in infoPanel node
+
+Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel)
+  infoPanel.mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
+  currentProgram = getCurrentLiveProgram(content)
+
+  releaseDate = ""
+  timeLeft = ""
+  duration = ""
+  channelName = ""
+  league = ""
+  hasCC = false
+  rating = ""
+  genres = []
+
+  infoPanel.description = content.description
+
+  if currentProgram <> invalid
+    infoPanel.title = currentProgram.title
+    infoPanel.episodeTitle = currentProgram.epgProgramTitle
+    releaseDate = currentProgram.releaseDate
+    infoPanel.description = currentProgram.description
+
+    channelName = content.title
+    league = currentProgram.league
+    hasCC = currentProgram.hasSubtitles
+    rating = currentProgram.rating
+    timeleft = calculateProgramTimeLeft(currentProgram)
+    genres = currentProgram.genres
+
+    if currentProgram.live = false
+      prgLength = currentProgram.endTime - currentProgram.startTime
+      if prgLength > 0
+        duration = formatLengthAsHourAndMins(prgLength)
+      end if
+    else
+      if currentProgram.hoursOfAiring <> invalid AND currentProgram.hoursOfAiring <> ""
+        startTime = currentProgram.hoursOfAiring.tokenize(" - ")[0]
+        duration = getTranslation("epg_started_at") + " " + startTime
+      end if
+    end if
+  else
+    infoPanel.description = content.description
+    infoPanel.episodeTitle = ""
+    infoPanel.title = content.title
+    hasCC = content.hasSubtitles
+    rating = content.rating
+    releaseDate = content.releaseDate
+    genres = content.genres
+  end if
+
+  lineOneData = {}
+  lineOneData.releaseDate = releaseDate
+  lineOneData.programLength = duration
+  lineOneData.hasCC = hasCC
+  lineOneData.programTimeLeft = timeleft
+  lineOneData.rating = rating
+
+
+  lineTwoData = {}
+  if league <> "" then lineTwoData.roundGroupInfo = league
+  if channelName <> "" then lineTwoData.channelName = channelName
+  lineTwoData.genres = genres
+
+  infoPanel.lineOneData = lineOneData
+  infoPanel.lineTwoData = lineTwoData
+
+  infoPanel.needsLogin = (content.needsLogin AND m.top.signedIn <> true)
+  infoPanel.width = 960
+End Function
+
+
+' Populates the info panel with the fields necessary for the Linear programs in homeScreen(linear content on non-linear category) mode so that it looks
+' like the info panel on the homescreen
+' Delete this Function if roku_sports_onnow_rows experiment graduates
 '
 ' @content: TubiContentNode, containing a linear channel with programs as children
 ' @infoPanel: InfoPanel node
@@ -184,7 +264,6 @@ Function populateInfoPanelWithProgramHomescreenMode(content, infoPanel)
   currentProgram = getCurrentLiveProgram(content)
   badgeText = ""
   programTime = ""
-  infoPanel.description = content.description
 
   if currentProgram <> invalid
     infoPanel.title = currentProgram.title
@@ -210,6 +289,7 @@ Function populateInfoPanelWithProgramHomescreenMode(content, infoPanel)
 End Function
 
 
+
 ' //TODO: Delete this Function if experiment roku_progress_bar_on_infopanel does not graduate
 ' helper function which returns the time left in the format 'x hour and y mins left' if timeleft is more than an hour
 ' else it retuns 'y mins left'
@@ -218,7 +298,7 @@ Function getDurationHoursString(seconds As Integer) As String
   if seconds <> invalid
     hourValue = Int(seconds / 3600)
 
-    minValue = StrI(Int(seconds / 60) mod 60)
+    minValue = StrI((Int(seconds / 60) mod 60) + 1) 'increase the min by one so that we dont show 0 min
 
     if hourValue > 0
       retVal =  getTranslation("hour_mins_left", {"hour": StrI(hourValue), "minutes": minValue})
@@ -228,4 +308,19 @@ Function getDurationHoursString(seconds As Integer) As String
   end if
 
   return retVal
+End Function
+
+
+Function calculateProgramTimeLeft(program) as String
+  retVal = ""
+  now = getCurrentLocalTime()
+
+  if isInt(program.endTime) = true AND program.endTime > now
+    timeLeft = program.endTime - now
+
+    retVal = getDurationHoursString(timeLeft)
+
+  end if
+  return retVal
+
 End Function

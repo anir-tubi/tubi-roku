@@ -67,8 +67,16 @@ End Function
 ' getThumbnailImage
 '
 ' Get the thumbnail URL that should be used to set the ContentNode's HDGRIDPOSTERURL property
-Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "")
-  canvasImages = contentFromServer.images
+' @contentFromServer: assocArray, AA representation of content metadata JSON as returned from server
+' @gridType: value from Enum gridItemTypes
+' @useSeriesImages: boolean, Linear programs of type 'Episode' are expected to use Series_images instead of images. Series_images follows the same structure as images.
+Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "", useSeriesImages = false)
+  if useSeriesImages = true
+    canvasImages = contentFromServer.series_images
+  else
+    canvasImages = contentFromServer.images
+  end if
+
   sThumbnailURL = ""
   gridItemTypes = m.constants.ui.gridItemTypes
   if gridType = ""
@@ -318,13 +326,7 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
   roundGroupInfo = ""
   league = contentFromServer.league
   if league <> invalid AND league.round <> invalid
-    roundGroupInfo += league.round
-    if league.round = "Group Stage" ' hack for world cup
-      teams = contentFromServer.teams
-      if isNonEmptyArray(teams) = true AND teams[0].group <> invalid
-        roundGroupInfo += " " + Chr(&hb7) + " " + teams[0].group
-      end if
-    end if
+    roundGroupInfo = league.round
   end if
 
   if contentFromServer.type = "se"
@@ -653,7 +655,9 @@ Function tubiMetadataTranslate_translateRecursive(contentFromServer As Object, t
         programFromServer = programs[i]
 
         if programFromServer <> invalid
-          translatedChild = CreateObject("roAssociativeArray")
+          translatedChild = {
+            "subtype": "EPGContentNode"
+          }
           m.translateProgram(contentFromServer, programFromServer, translatedChild, m.constants.ui.screenIds.homeScreen, isSignedInUser)
           count = count + 1
           translatedContent.children.push(translatedChild)
@@ -1355,10 +1359,35 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
             childAA.airDateTime = fullChild.air_datetime
           end if
 
-          if parentGridItemType <> m.constants.ui.gridItemTypes.linear AND fullChild.type = "l" AND fullChild.programs <> invalid AND fullChild.programs.count() > 0
-            bSingleContentFullData = true
-          else
-            bSingleContentFullData = false
+          bSingleContentFullData = false
+
+          if fullChild.type = "l"
+            ' Add apiVersion only we experiment is in treatement.  That way, control is not affected and only linear will have this dynamic field.
+            ' this field will be removed when roku_sports_onnow_rows concludes.
+            if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v1").enabled = true
+              childAA.append({apiVersion: "V4"})
+            end if
+
+            if fullChild.schedules <> invalid AND fullChild.schedules.count() > 0
+              ' convert available schedules into programs from program contents
+              programs = []
+              for each schedule in fullChild.schedules
+                prgId = schedule.program_id
+                if isNonEmptyString(prgId) = true
+                  program = contents[prgId]
+                  if program <> invalid
+                    program.start_time = schedule.start_time
+                    program.end_time = schedule.end_time
+                    program.live = schedule.live
+                    program.id = prgId
+                    programs.push(program)
+                  end if
+                end if
+              end for
+              fullChild.programs = programs
+              fullChild.schedules = []
+              bSingleContentFullData = true
+            end if
           end if
 
           if bFullData = true OR bSingleContentFullData = true
@@ -2157,11 +2186,33 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
     translatedProgram.id = channelFromServer.content_id
   end if
 
+  if translatedProgram.id = invalid
+    translatedProgram.id = programFromServer.id
+  end if
+
   translatedProgram.title = programFromServer.title
 
   'Add episode title
   if isNonEmptyString(programFromServer.episode_title)
     translatedProgram.epgProgramTitle = programFromServer.episode_title
+  end if
+
+  if isNonEmptyString(programFromServer.series_title) = true ' that means this is series type program.
+    translatedProgram.title = programFromServer.series_title
+    if isNonEmptyString(programFromServer.episode_number) = true AND isNonEmptyString(programFromServer.season_number) = true
+      snnEnn = "S" + programFromServer.season_number + ":" + "E" + programFromServer.episode_number
+
+      if programFromServer.title.InStr(snnEnn) = true
+        epgProgramTitle = programFromServer.title
+      else
+        epgProgramTitle = snnEnn + " - " + programFromServer.title
+      end if
+
+    else
+      epgProgramTitle = programFromServer.title
+    end if
+
+    translatedProgram.epgProgramTitle = epgProgramTitle
   end if
 
   startTime = ""
@@ -2197,19 +2248,24 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
     if isNonEmptyArray(programFromServer.images.poster)
       sFDPosterURL = programFromServer.images.poster[0]
     end if
+  end if
 
-    if isNonEmptyArray(programFromServer.images.landscape)
-      sHDGridPosterURL = programFromServer.images.landscape[0]
-    end if
-
-  else if channelFromServer.images <> invalid 'if program images are not available, consider channel images for substitute.
+  if  sFDPosterURL = "" AND channelFromServer.images <> invalid 'if program images are not available, consider channel images for substitute.
     if isNonEmptyArray(channelFromServer.images.poster)
       sFDPosterURL = channelFromServer.images.poster[0]
     end if
+  end if
 
-    if isNonEmptyArray(channelFromServer.landscape_image)
-      sHDGridPosterURL = channelFromServer.landscape_images[0]
-    end if
+  ' if a program = episode of a series, then series images are preffered
+  if programFromServer.series_id <> invalid AND programFromServer.series_images <> invalid
+    sHDGridPosterURL = m.getThumbnailImage(programFromServer, m.constants.ui.gridItemTypes.linear, true)'first choice for series/episode
+  else
+    sHDGridPosterURL = m.getThumbnailImage(programFromServer, m.constants.ui.gridItemTypes.linear) 'program images for non series/episode
+  end if
+
+
+  if sHDGridPosterURL = ""
+    sHDGridPosterURL =  m.getThumbnailImage(channelFromServer, m.constants.ui.gridItemTypes.linear) 'channel image - default
   end if
 
   sFDPosterURL = m.getRoundedCornersURL(sFDPosterURL)
@@ -2221,8 +2277,15 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
     translatedProgram.hasSubtitles = programFromServer.has_subtitle
   end if
 
-  if programFromServer.year <> invalid
-    translatedProgram.releaseDate = programFromServer.year
+  year = programFromServer.year
+  if year <> invalid
+    if isInt(year) = true
+      if year > 0
+        translatedProgram.releaseDate = year.toStr()
+      end if
+    else
+      translatedProgram.releaseDate = year
+    end if
   end if
 
   if startTime <> "" AND endTime <> ""
@@ -2253,7 +2316,10 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
   end if
 
   if programFromServer.tags <> invalid AND programFromServer.tags.Count() > 0
+    ' in case of epg programs
     translatedProgram.descriptors = programFromServer.tags
+    ' in case of homescreen programs
+    translatedProgram.genres = programFromServer.tags 'array of genres
   end if
 
   now  = CreateObject("roDateTime")
@@ -2293,6 +2359,10 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
 
   if programFromServer.genres <> invalid AND programFromServer.genres.count() > 0
     translatedProgram.Categories = programFromServer.genres
+  end if
+
+  if programFromServer.league <> invalid AND programFromServer.league <> ""
+    translatedProgram.league = programFromServer.league
   end if
 
   selectedAttributeText = getTranslation("epg_starts_at") + " "

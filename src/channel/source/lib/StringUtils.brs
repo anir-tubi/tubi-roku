@@ -16,6 +16,33 @@ Function formatLengthAsTimestamp(length As Dynamic) As String
 End Function
 
 
+''''''''''''''''''''''
+' formatLengthAsHourAndMins
+'
+' take a float or integer length in seconds, transform to 'x hours y min'
+
+Function formatLengthAsHourAndMins(length As Dynamic) As String
+  if type(length) = "roFloat" OR type(length) = "Double" then length = Int(length)
+
+  if (type(length) = "Integer" OR type(length) = "roInteger") AND length > 0 then
+    hours = length \ 3600
+    minutes = (length mod 3600) \ 60
+
+    result = ""
+    if hours > 0
+      result = stri(hours).trim() + " hr "
+    end if
+
+    if minutes > 0
+      result = result + stri(minutes).trim() + " min"
+    end if
+    return result
+  else
+    return ""
+  end if
+End Function
+
+
 '''''''''''''''''''
 ' padString
 '
@@ -141,7 +168,7 @@ End Function
 ' @addIfDoesNotExist: boolean, Set this to true if you wish to not only replace a param, but to add the param if the param does not exist in the URL's query string
 Function replaceURLParameter(url, paramToReplace, replacementValue, addIfDoesNotExist = false)
   sReplacementURL = url
-  if isString(url) = true AND isString(paramToReplace) = true AND isString(replacementValue) = true
+  if isString(url) = true AND url <> "" AND isString(paramToReplace) = true AND isString(replacementValue) = true
     re = CreateObject("roRegex", "[\\?&]" + paramToReplace + "=([^&#]*)", "i")
     aMatches = re.Match(url)
     if aMatches.Count() > 0

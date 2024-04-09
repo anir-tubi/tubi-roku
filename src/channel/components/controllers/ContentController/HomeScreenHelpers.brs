@@ -108,6 +108,10 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     'page_load tracking will happen when content is received and displayed when onHomescreenContentReady() is called.
     pushScreen(homeScreen, true, false)
   end if
+
+  if m.global <> invalid AND getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v1", false).enabled = true
+    m.global.addField("refreshLinearChannels", "boolean", false)
+  end if
 End Function
 
 
@@ -895,6 +899,7 @@ Function startCountdownTimer()
   if screen <> invalid AND (screen.id = m.constants.ui.screenIds.homeScreen OR isAnEpgScreen(screen) = true)
     stopCountdownTimer()
     screen.fullscreenCountdown = m.constants.settings.linearFullscreenTimeout
+
     m.playerFullscreenCountdownTimer.control = "start"
   end if
 End Function

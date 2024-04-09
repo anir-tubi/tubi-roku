@@ -49,6 +49,11 @@
     <!--Change this field to default secondaryTitle once it available in 11.5-->
     <field id="epgProgramTitle" type="string" />
 
+    <!--InfoPanel Line2 data league-->
+    <field id="league" type="string" />
+
+    <field id="genres" type="stringarray" />
+
     <!--NOTE: THE FOLLOWING FIELDS ARE DEFAULT CONTENTNODE FIELDS. CREATED ONLY AFTER INITIALIZATION.
       These needs to be initialized with "=" or SetFields() or setField(). Otherwise, this field will not exist.
       Title

@@ -89,9 +89,8 @@ Function init()
   m.progressBarOnInfoPanelExp = (getExperimentResource("roku_progress_bar_on_infopanel", "roku_progress_bar_on_infopanel_v1", false).enabled = true)
   m.isExpEvtSendForProgressbarExp = false
 
-  'This variable is used to avoid calling getExperimentResource everytime homescreen gets focus on linear content row.
-  ' Remove after roku_large_linear_tiles
-  m.hasSentLargeLinearTileExp = false
+  m.liveProgramEnabled = getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v1", false).enabled = true
+
 End Function
 
 
@@ -401,11 +400,6 @@ Function onCurrFocusRowChange()
   if categoryEnteringFocus <> invalid
     sSponsorBackgroundURL = ""
 
-    if m.hasSentLargeLinearTileExp = false AND categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
-      getExperimentResource("roku_large_linear_tiles", "roku_large_linear_tiles_v1", true)
-      m.hasSentLargeLinearTileExp = true
-    end if
-
     if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
       ' update contentArea translation, only when linear gain focus
       expandContentAreaForLinear(rowPercent)
@@ -487,11 +481,15 @@ Function populateInfoPanelByContent(focusedContent)
   if focusedContent <> invalid
     sType = focusedContent.type
     if sType = m.constants.ui.contentTypes.linear
-      '// TODO: Currently we can not use focusedContent.parentType to differenciate between linear and non-linear rows.
-      if focusedContent.parentId = "featured" 'linearContent in featured row
-        populateInfoPanel(m.constants.ui.infoPanelModes.programHomescreen, focusedContent)
+      if m.liveProgramEnabled = false 'v3 api
+        '// TODO: Currently we can not use focusedContent.parentType to differenciate between linear and non-linear rows.
+        if focusedContent.parentId = "featured" 'linearContent in featured row
+          populateInfoPanel(m.constants.ui.infoPanelModes.programHomescreen, focusedContent)
+        else
+          populateInfoPanel(m.constants.ui.infoPanelModes.linearHomeScreen, focusedContent)
+        end if
       else
-        populateInfoPanel(m.constants.ui.infoPanelModes.linearHomeScreen, focusedContent)
+        populateInfoPanel(m.constants.ui.infoPanelModes.linearProgramHomescreen, focusedContent)
       end if
     else if sType = m.constants.ui.contentTypes.historySignedOutUser
       populateInfoPanel(m.constants.ui.infoPanelModes.continueWatching, focusedContent)
@@ -672,19 +670,24 @@ Function populateInfoPanel(mode, contentNode)
   if contentNode <> invalid
     if mode = m.constants.ui.infoPanelModes.item
       populateInfoPanelWithHomescreenStyleItemMode(contentNode, m.InfoPanel)
-    else if mode = m.constants.ui.infoPanelModes.linearHomeScreen
+    else if mode = m.constants.ui.infoPanelModes.linearHomeScreen 'v3 api
       theme = getThemeFromGlobal()
       m.InfoPanel.mode = mode
+
       m.InfoPanel.liveBadgeHeaderUri = "pkg:/images/live-icon-filled.webp"
       m.InfoPanel.liveBadgeHeaderText = UCase(getTranslation("screenSearch_liveText"))
+
       if theme <> invalid
         m.InfoPanel.liveBadgeHeaderTextColor =  theme.primaryTextColor
         m.InfoPanel.liveBadgeHeaderBackgroundColor = theme.focused2Color
       end if
+
       m.InfoPanel.title = contentNode.title
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.needsLogin = contentNode.needsLogin AND (m.top.signedIn <> true)
       m.InfoPanel.reminderIsSet = false
+    else if mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
+      populateInfoPanelWithLinearProgramHomescreenMode(contentNode, m.InfoPanel) 'V4 api
     else if mode = m.constants.ui.infoPanelModes.continueWatching
       m.InfoPanel.mode = mode
       m.InfoPanel.title = contentNode.title
@@ -693,7 +696,7 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.reminderIsSet = false
     else if mode = m.constants.ui.infoPanelModes.CWSignedInUser AND m.progressBarOnInfoPanelExp = true
       populateInfoPanelWithCWSignedInUserStyleItemMode(contentNode, m.InfoPanel)
-    else if mode = m.constants.ui.infoPanelModes.programHomescreen
+    else if mode = m.constants.ui.infoPanelModes.programHomescreen 'V3 api
       populateInfoPanelWithProgramHomescreenMode(contentNode, m.InfoPanel)
     else if mode = m.constants.ui.infoPanelModes.sportsEvent
       populateInfoPanelWithHomescreenStyleSportsMode(contentNode, m.InfoPanel)

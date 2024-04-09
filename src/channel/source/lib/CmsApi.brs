@@ -106,7 +106,7 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels=false, bKi
   options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
   options.params = m.setTupianLandscapeParam(options.params)
-  
+
   if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_tupian_background_images", "roku_tupian_background_images_v1").enabled = true
     options.params = m.setTupianBackgroundParam(options.params)
   end if
@@ -201,6 +201,9 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   headers = options.headers
   headers["Accept-Version"] = "6.0.0"
   url = m.constants.urls.tensor.cdn.homescreen
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v1").enabled = true
+    url = m.constants.urls.tensor.cdn.homescreenV4
+  end if
   params["include_empty_history"] = true
   params["include_empty_queue"] = true
   params["include_channels"] = true
@@ -267,6 +270,11 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   options = m.getCommonOptions()
   params = options.params
   url = m.constants.urls.tensor.cdn.container + "/" + categoryId
+
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v1").enabled = true
+    url = m.constants.urls.tensor.cdn.containerV4 + "/" + categoryId
+  end if
+
   params["is_kids_mode"] = bKidsMode
   params["include_channels"] = true
   params["cursor"] = 0

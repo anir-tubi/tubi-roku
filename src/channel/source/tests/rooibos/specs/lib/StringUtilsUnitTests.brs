@@ -55,6 +55,23 @@ Function stringUtils_padStringLeft_test()
   m.AssertEqual(padStringLeft("12345", "0", 8), "00012345")
 End Function
 
+'@Only
+'@Test formatLengthAsHourAndMins unit tests
+Function stringUtils_formatLengthAsHourAndMins_test()
+  m.AssertEqual(formatLengthAsHourAndMins(invalid), "")
+  m.AssertEqual(formatLengthAsHourAndMins(50000), "13 hr 53 min")
+  m.AssertEqual(formatLengthAsHourAndMins(9000), "2 hr 30 min")
+  m.AssertEqual(formatLengthAsHourAndMins(3600), "1 hr ")
+  m.AssertEqual(formatLengthAsHourAndMins(2795), "46 min")
+  m.AssertEqual(formatLengthAsHourAndMins(1800), "30 min")
+  m.AssertEqual(formatLengthAsHourAndMins(3497), "58 min")
+  m.AssertEqual(formatLengthAsHourAndMins(""), "")
+  m.AssertEqual(formatLengthAsHourAndMins(180), "3 min")
+  m.AssertEqual(formatLengthAsHourAndMins(0), "")
+  m.AssertEqual(formatLengthAsHourAndMins(20), "")
+  m.AssertEqual(formatLengthAsHourAndMins(59), "")
+  m.AssertEqual(formatLengthAsHourAndMins(61), "1 min")
+End Function
 
 
 '@Test formatLengthAsTimestamp unit tests

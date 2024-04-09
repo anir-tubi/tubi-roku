@@ -3,6 +3,7 @@
 ' @param program: roSGNode, EPG program node
 Function isProgramLive(program)
   now = getCurrentLocalTime()
+
   if program <> invalid AND program.startTime = 0 AND program.endTime = 0 ' No programs and EPG has single element and click will play live
     return true
   else if program <> invalid AND isint(program.startTime) AND isint(program.endTime)
@@ -26,4 +27,25 @@ Function getCurrentLiveProgram(content)
     end for
   end if
   return invalid
+End Function
+
+
+Function getLinearProgramProgress(currentProgram)
+  now = getCurrentLocalTime()
+  if currentProgram <> invalid
+    nowPos = now - currentProgram.startTime
+
+    if nowPos <= 0
+      return 0
+    end if
+
+    duration = currentProgram.endTime - currentProgram.startTime
+
+    if duration <= 0
+      return 0
+    else
+      return (nowPos / duration) * 100
+    end if
+  end if
+  return 0
 End Function

@@ -86,8 +86,9 @@ Function TubiExperiments(constants) as Object
         roku_progress_bar_on_infopanel_v1: {"enabled": false}
       }
 
-      roku_large_linear_tiles: {
-        roku_large_linear_tiles_v1 : {"enabled": false}
+
+      roku_sports_onnow_rows: {
+        roku_sports_onnow_rows_v1: {"enabled": false}
       }
 
       roku_tupian_background_images: {

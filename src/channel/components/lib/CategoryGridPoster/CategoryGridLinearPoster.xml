@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<component name="CategoryGridLinearPoster" extends="Group" >
+  <script type="text/brightscript" uri="CategoryGridLinearPoster.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/StringUtils.brs" />
+  <script type="text/brightscript" uri="../../../source/lib/Log.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TubiLanguageTranslate.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/ContentMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/TimeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/roku/generalUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/GlobalMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/TypographyMixin.brs"/>
+
+  <interface>
+    <field id="itemContent" type="node" />
+    <field id="focusPercent" type="float" />
+    <field id="width" alias="Poster.width" />
+    <field id="height" alias="Poster.height" />
+  </interface>
+
+  <children>
+    <Poster
+      id="Poster"
+      loadingBitmapUri="pkg:/images/placeholder.webp"
+      failedBitmapUri="pkg:/images/placeholder.webp" />
+
+    <TubiProgressBar
+      id="progressBar"
+      width="375"
+      height="9"
+      visible="false"/>
+
+    <LayoutGroup
+      layoutDirection="horiz"
+      id="badgeGroup"
+      itemSpacings="[9]" />
+
+  </children>
+</component>

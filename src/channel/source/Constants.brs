@@ -517,9 +517,12 @@ Function getConstants()
           constants.urls.tensor.cdn.urlBase = "https://tensor-cdn.staging-public.tubi.io/api"
         end if
         constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v3/homescreen"
+        constants.urls.tensor.cdn.homescreenV4 = constants.urls.tensor.cdn.urlBase + "/v4/homescreen"
         constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v3/containers"
+        constants.urls.tensor.cdn.containerV4 = constants.urls.tensor.cdn.urlBase + "/v4/containers"
         constants.urls.tensor.cdn.epgChannelIds = constants.urls.tensor.cdn.urlBase + "/v2/epg"
         constants.urls.tensor.cdn.tournamentscreen = constants.urls.tensor.cdn.urlBase + "/v1/wc_tournament"
+
 
     'user devices url
     constants.urls.userDevice = {}
@@ -1081,6 +1084,7 @@ Function getConstants()
       constants.ui.infoPanelModes.simplifiedLinearPlayer = "simplifiedLinearPlayer"
       constants.ui.infoPanelModes.linearSearch = "linearSearch"
       constants.ui.infoPanelModes.programHomescreen = "programHomescreen"
+      constants.ui.infoPanelModes.linearProgramHomescreen = "linearProgramHomescreen"  'v4 api
       '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
       constants.ui.infoPanelModes.linearTournament = "linearTournament"
       constants.ui.infoPanelModes.sportsEvent = "sportsEvent"
@@ -1406,6 +1410,7 @@ Function getConstants()
     defaultDarkStatusSuccess = "THEME_defaultDarkStatusSuccess_THEME"
     defaultDarkStatusCaution = "THEME_defaultDarkStatusCaution_THEME"
     defaultDarkStatusAlert = "THEME_defaultDarkStatusAlert_THEME"
+    defaultDarkStatusOnNow = "THEME_defaultDarkStatusOnNow_THEME"
 
     '//default light sub theme
     defaultLightPrimaryBackground = "THEME_defaultLightPrimaryBackground_THEME"
@@ -1477,6 +1482,7 @@ Function getConstants()
         tertiaryTextColor: defaultDarkTransparentForeground50
         focusedTextColor: defaultDarkPrimaryBackground
         keyboardFocusedTextColor: defaultDarkPrimaryBackground
+        blueBadgeColor: defaultDarkStatusOnNow
 
       inverseBackgroundColor: defaultLightPrimaryBackground
       inversePrimaryTextColor: defaultLightPrimaryForeground

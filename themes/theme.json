@@ -100,6 +100,10 @@
 							"alert": {
 								"$value": "#E80047",
 								"$description": "text, icons"
+							},
+							"on-now": {
+								"$value": "#2948FF",
+								"$description": "on now badge"
 							}
 						},
 						"gradient": {
@@ -263,6 +267,10 @@
 							"alert": {
 								"$value": "#BF0039",
 								"$description": "text, icons"
+							},
+							"on-now": {
+								"$value": "#2948FF",
+								"$description": "on now badge"
 							}
 						},
 						"gradient": {
@@ -426,8 +434,12 @@
 								"$description": "text, icons"
 							},
 							"alert": {
-								"$value": "#8F7200",
+								"$value": "#E00080",
 								"$description": "text, icons"
+							},
+							"on-now": {
+								"$value": "#2948FF",
+								"$description": "on now badge"
 							}
 						},
 						"gradient": {

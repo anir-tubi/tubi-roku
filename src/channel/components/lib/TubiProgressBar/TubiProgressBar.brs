@@ -32,11 +32,23 @@ Function drawProgressBar()
   '        scaling wackiness, bitmapWidth or bitmapHeight may report half-pixel values.  It's best to not
   '        set a height explicitly.
   if m.top.scaledUI = true then
-    m.background.uri = "pkg:/images/transport/sgplayer/hd/white-progress-foreground.9.png"
-    m.foreground.uri = "pkg:/images/transport/sgplayer/hd/white-progress-foreground.9.png"
+    if m.top.height < 16
+      'used in case of smaller progress bar like on tile
+      m.background.uri = "pkg:/images/transport/sgplayer/hd/progress-tile.9.png"
+      m.foreground.uri = "pkg:/images/transport/sgplayer/hd/progress-tile.9.png"
+    else
+      'used on fullscreens like video player progress bar
+      m.background.uri = "pkg:/images/transport/sgplayer/hd/white-progress-foreground.9.png"
+      m.foreground.uri = "pkg:/images/transport/sgplayer/hd/white-progress-foreground.9.png"
+    end if
   else
-    m.background.uri = "pkg:/images/transport/sgplayer/fhd/white-progress-foreground.9.png"
-    m.foreground.uri = "pkg:/images/transport/sgplayer/fhd/white-progress-foreground.9.png"
+    if m.top.height < 16
+      m.background.uri = "pkg:/images/transport/sgplayer/fhd/progress-tile.9.png"
+      m.foreground.uri = "pkg:/images/transport/sgplayer/fhd/progress-tile.9.png"
+    else
+      m.background.uri = "pkg:/images/transport/sgplayer/fhd/white-progress-foreground.9.png"
+      m.foreground.uri = "pkg:/images/transport/sgplayer/fhd/white-progress-foreground.9.png"
+    end if
   end if
 
   maxWidth = m.top.width

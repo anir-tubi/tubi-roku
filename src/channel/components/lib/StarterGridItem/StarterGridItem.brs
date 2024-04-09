@@ -11,6 +11,7 @@ Function init()
     "width"
     "height"
   ]
+
 End Function
 
 
@@ -26,10 +27,12 @@ Function onItemContentChange(msg)
     childGridItemComponent = "CategoryGridPoster"
   else if gridItemType = "continue_watching_signed_out_user" then
     childGridItemComponent = "CategoryGridPoster"
+  else if gridItemType = "linear" then 'For any linear content use CategoryGridPoster to add badges/progress bar etc
+    childGridItemComponent = "CategoryGridLinearPoster"
   else if itemContent.type = "linear" then
     row = itemContent.getParent()
     if row <> invalid AND row.gridItemType = "landscapeNoTitle" OR row.gridItemType = "landscape" then
-      childGridItemComponent = "CategoryGridPoster"
+      childGridItemComponent = "CategoryGridLinearPoster"
     end if
   else if itemContent.needsLogin = true AND isLoggedInUser() = false
     childGridItemComponent = "CategoryGridPoster"

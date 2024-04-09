@@ -20,6 +20,7 @@
   <script type="text/brightscript" uri="pkg:/source/lib/TimeOffsetUtils.brs" />
   <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
+  <script type="text/brightscript" uri="pkg:/components/lib/EPGMixin.brs" />
 
   <interface>
     <!-- INPUT -->
@@ -148,5 +149,9 @@
     <Timer
       id="AnimateToCategoryDebounce"
       duration="0.5"/>
+    <Timer
+      id="LinearProgramRefreshTimer"
+      repeat="true"
+      duration="180"/>
   </children>
 </component>

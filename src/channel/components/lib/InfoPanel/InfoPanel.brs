@@ -299,229 +299,248 @@ Function onLineOneDataChange(msg)
   tubiLog("InfoPanel.onLineOneDataChange")
   data = msg.getData()
 
-  firstLineGroup = m.firstLineGroup
-  firstLineGroupIsPresent = (firstLineGroup.getParent() <> invalid)
+    firstLineGroup = m.firstLineGroup
+    firstLineGroupIsPresent = (firstLineGroup.getParent() <> invalid)
 
-  if isAA(data) AND data.count() > 0 AND firstLineGroupIsPresent = false
-    m.twoLineInfo.insertChild(firstLineGroup, 0)
-  else if (isAA(data) = false OR data.count() = 0) AND firstLineGroupIsPresent = true
-    m.twoLineInfo.removeChild(firstLineGroup)
-  end if
-
-  if isAA(data)
-    insertIndex = 0
-
-    ' handle availability badge
-    availabilityBadgeIsPresent = (m.firstLineAvailabilityBadge.getParent() <> invalid)
-    if isNonEmptyString(data.badgeText)
-      if availabilityBadgeIsPresent = false
-        firstLineGroup.insertChild(m.firstLineAvailabilityBadge, insertIndex)
-      end if
-
-      formatBadge(data.badgeText, m.firstLineAvailabilityBadge)
-      insertIndex++
-    else
-      if availabilityBadgeIsPresent = true
-        firstLineGroup.removeChild(m.firstLineAvailabilityBadge)
-      end if
+    if isAA(data) AND data.count() > 0 AND firstLineGroupIsPresent = false
+      m.twoLineInfo.insertChild(firstLineGroup, 0)
+    else if (isAA(data) = false OR data.count() = 0) AND firstLineGroupIsPresent = true
+      m.twoLineInfo.removeChild(firstLineGroup)
     end if
 
-    ' handle text
-    text = ""
+    if isAA(data)
+      insertIndex = 0
 
-    if isNonEmptyString(data.timeLeft)
-      text = data.timeLeft + " "
-    end if
-
-    ' expect that data.releaseDate and data.hoursOfAiring are mutually exclusive
-    if isNonEmptyString(data.releaseDate)
-      ' add 'dot' spacer only if we had a timeLeft & releaseDate
-      if text.len() > 0
-        text += Chr(&hb7) + " "
-      end if
-      text += data.releaseDate + " "
-    else if isNonEmptyString(data.hoursOfAiring) = true
-      ' add 'dot' spacer only if we had a timeLeft & hoursOfAiring
-      if text.len() > 0
-        text += Chr(&hb7) + " "
-      end if
-      text += data.hoursOfAiring + " "
-    end if
-
-    if data.length <> invalid AND data.length <> 0
-      ' add 'dot' spacer only if we had a timeLeft/releaseDate/hoursOfAiring
-      if text.len() > 0
-        text += Chr(&hb7) + " "
-      end if
-
-      text += formatLengthSelectedLocale(data.length) + " "
-    end if
-
-    if data.type <> invalid AND data.type = m.constants.ui.contentTypes.series
-      ' add 'dot' spacer
-      text += Chr(&hb7) + " "
-
-      if data.seasons <> invalid AND data.seasons > 0
-        if data.seasons = 1
-          text += getTranslation("metadata_seasons_singular") + " "
-        else
-          text += getTranslation("metadata_seasons_plural", {seasons: data.seasons.toStr()}) + " "
+      ' handle availability badge
+      availabilityBadgeIsPresent = (m.firstLineAvailabilityBadge.getParent() <> invalid)
+      if isNonEmptyString(data.badgeText)
+        if availabilityBadgeIsPresent = false
+          firstLineGroup.insertChild(m.firstLineAvailabilityBadge, insertIndex)
         end if
+
+        formatBadge(data.badgeText, m.firstLineAvailabilityBadge)
+        insertIndex++
       else
-        text += getTranslation("metadata_series") + " "
-      end if
-    end if
-
-    line1IsPresent = (m.line1.getParent() <> invalid)
-    line1BoldIsPresent = (m.line1Bold.getParent() <> invalid)
-    textIsPresent = (line1IsPresent = true OR line1BoldIsPresent = true)
-
-    if isNonEmptyString(text)
-      if textIsPresent = false
-        mode = m.top.mode
-        if mode = m.constants.ui.infoPanelModes.sportsEvent
-          firstLineGroup.insertChild(m.line1Bold, insertIndex)
-        else
-          firstLineGroup.insertChild(m.line1, insertIndex)
+        if availabilityBadgeIsPresent = true
+          firstLineGroup.removeChild(m.firstLineAvailabilityBadge)
         end if
       end if
 
-      m.line1Bold.text = text
-      m.line1.text = text
-      insertIndex++
-    else
-      if textIsPresent = true
-        firstLineGroup.removeChild(m.line1)
-        firstLineGroup.removeChild(m.line1Bold)
-      end if
-    end if
+      ' handle text
+      text = ""
 
-    ' handle resolution poster (4k)
-    resolutionPosterIsPresent = (m.resolutionPoster.getParent() <> invalid)
-    if data.has4k = true
-      if resolutionPosterIsPresent = false
-        firstLineGroup.insertChild(m.resolutionPoster, insertIndex)
+      if isNonEmptyString(data.timeLeft)
+        text = data.timeLeft + " "
       end if
 
-      insertIndex++
-      ' Although this uri does not change, if it is set in the component XML, the icon will appear
-      ' during the initial channel load, so set it dynamically when it should appear
-      m.resolutionPoster.uri = "pkg:/images/icon-4k-ready-badge.webp"
-    else
-      if resolutionPosterIsPresent = true
-        firstLineGroup.removeChild(m.resolutionPoster)
-      end if
-    end if
-
-    ' handle closed captions
-    closedCaptionsIsPresent = (m.closedCaptions.getParent() <> invalid)
-    if data.hasCC = true
-      if closedCaptionsIsPresent = false
-        firstLineGroup.insertChild(m.closedCaptions, insertIndex)
-      end if
-
-      insertIndex++
-      ' Although this uri does not change, if it is set in the component XML, the icon will appear
-      ' during the initial channel load, so set it dynamically when it should appear
-      m.closedCaptions.uri = "pkg:/images/icon-closed-caption.webp"
-    else
-      if closedCaptionsIsPresent = true
-        firstLineGroup.removeChild(m.closedCaptions)
-      end if
-    end if
-
-    ' handle audio description
-    audioDescriptionIsPresent = (m.audioDescriptionPoster.getParent() <> invalid)
-    if data.hasAudioDescription = true
-      if audioDescriptionIsPresent = false
-        firstLineGroup.insertChild(m.audioDescriptionPoster, insertIndex)
-      end if
-
-      insertIndex++
-    else
-      if audioDescriptionIsPresent = true
-        firstLineGroup.removeChild(m.audioDescriptionPoster)
-      end if
-    end if
-
-    ' handle rating
-    ratingIsPresent = (m.rating.getParent() <> invalid)
-    if isNonEmptyString(data.rating) = true AND m.top.mode <> m.constants.ui.infoPanelModes.sportsEvent
-      if ratingIsPresent = false
-        firstLineGroup.insertChild(m.rating, insertIndex)
-      end if
-
-      m.ratingLabel.width = 0
-      m.ratingLabel.text = Ucase(data.rating)
-
-      nRatingBoundingBoxIncrease = m.ratingLabel.boundingRect().width + 24
-      m.ratingBackground.width = nRatingBoundingBoxIncrease
-      m.ratingLabel.width = nRatingBoundingBoxIncrease
-      insertIndex++
-    else
-      if ratingIsPresent = true
-        firstLineGroup.removeChild(m.rating)
-      end if
-    end if
-
-    ' handle descriptor codes
-    descriptorsArePresent = (m.descriptorCode.getParent() <> invalid)
-    if isNonEmptyString(data.descriptorCode)
-      if descriptorsArePresent = false
-        firstLineGroup.insertChild(m.descriptorCode, insertIndex)
-      end if
-
-      m.descriptorCode.text = UCase(data.descriptorCode)
-      insertIndex++
-    else
-      if descriptorsArePresent = true
-        firstLineGroup.removeChild(m.descriptorCode)
-      end if
-    end if
-
-    ' handle expiration warning
-    expirationWarningPresent = (m.expireWarning.getParent() <> invalid)
-    if isNonEmptyString(data.availabilityEnds)
-      datetime = CreateObject("roDateTime")
-      datetime.FromISO8601String(data.availabilityEnds)
-      endSeconds = datetime.AsSeconds()
-      nowSeconds = CreateObject("roDateTime").AsSeconds()
-      daysRemaining = ((endSeconds - nowSeconds) \ 86400) + 1
-      ' BIZ REQ: only titles expiring in the next 2 weeks should display message
-      if daysRemaining > 0 AND daysRemaining <= 14
-        if daysRemaining > 1
-          m.expireWarning.text = getTranslation("metadata_expiresIn_plural", {days: daysRemaining.toStr()})
-        else
-          m.expireWarning.text = getTranslation("metadata_expiresIn_singular")
+      ' expect that data.releaseDate and data.hoursOfAiring are mutually exclusive
+      if isNonEmptyString(data.releaseDate)
+        ' add 'dot' spacer only if we had a timeLeft & releaseDate
+        if text.len() > 0
+          text += Chr(&hb7) + " "
         end if
+        text += data.releaseDate + " "
+      else if isNonEmptyString(data.hoursOfAiring) = true
+        ' add 'dot' spacer only if we had a timeLeft & hoursOfAiring
+        if text.len() > 0
+          text += Chr(&hb7) + " "
+        end if
+        text += data.hoursOfAiring + " "
+      end if
+
+      if data.length <> invalid AND data.length <> 0
+        ' add 'dot' spacer only if we had a timeLeft/releaseDate/hoursOfAiring
+        if text.len() > 0
+          text += Chr(&hb7) + " "
+        end if
+
+        text += formatLengthSelectedLocale(data.length) + " "
+      end if
+
+      if data.programLength <> invalid AND data.programLength <> ""
+        ' add 'dot' spacer only if we had a timeLeft/releaseDate/hoursOfAiring
+        if text.len() > 0
+          text += Chr(&hb7) + " "
+        end if
+
+        text += data.programLength + " "
+
+      end if
+
+      if data.type <> invalid AND data.type = m.constants.ui.contentTypes.series
+        ' add 'dot' spacer
+        text += Chr(&hb7) + " "
+
+        if data.seasons <> invalid AND data.seasons > 0
+          if data.seasons = 1
+            text += getTranslation("metadata_seasons_singular") + " "
+          else
+            text += getTranslation("metadata_seasons_plural", {seasons: data.seasons.toStr()}) + " "
+          end if
+        else
+          text += getTranslation("metadata_series") + " "
+        end if
+      end if
+
+      line1IsPresent = (m.line1.getParent() <> invalid)
+      line1BoldIsPresent = (m.line1Bold.getParent() <> invalid)
+      textIsPresent = (line1IsPresent = true OR line1BoldIsPresent = true)
+
+      if isNonEmptyString(text)
+        if textIsPresent = false
+          mode = m.top.mode
+          if mode = m.constants.ui.infoPanelModes.sportsEvent
+            firstLineGroup.insertChild(m.line1Bold, insertIndex)
+          else
+            firstLineGroup.insertChild(m.line1, insertIndex)
+          end if
+        end if
+
+        m.line1Bold.text = text
+        m.line1.text = text
+        insertIndex++
+      else
+        if textIsPresent = true
+          firstLineGroup.removeChild(m.line1)
+          firstLineGroup.removeChild(m.line1Bold)
+        end if
+      end if
+
+      ' handle resolution poster (4k)
+      resolutionPosterIsPresent = (m.resolutionPoster.getParent() <> invalid)
+      if data.has4k = true
+        if resolutionPosterIsPresent = false
+          firstLineGroup.insertChild(m.resolutionPoster, insertIndex)
+        end if
+
+        insertIndex++
+        ' Although this uri does not change, if it is set in the component XML, the icon will appear
+        ' during the initial channel load, so set it dynamically when it should appear
+        m.resolutionPoster.uri = "pkg:/images/icon-4k-ready-badge.webp"
+      else
+        if resolutionPosterIsPresent = true
+          firstLineGroup.removeChild(m.resolutionPoster)
+        end if
+      end if
+
+      ' handle closed captions
+      closedCaptionsIsPresent = (m.closedCaptions.getParent() <> invalid)
+      if data.hasCC = true
+        if closedCaptionsIsPresent = false
+          firstLineGroup.insertChild(m.closedCaptions, insertIndex)
+        end if
+
+        insertIndex++
+        ' Although this uri does not change, if it is set in the component XML, the icon will appear
+        ' during the initial channel load, so set it dynamically when it should appear
+        m.closedCaptions.uri = "pkg:/images/icon-closed-caption.webp"
+      else
+        if closedCaptionsIsPresent = true
+          firstLineGroup.removeChild(m.closedCaptions)
+        end if
+      end if
+
+      ' handle audio description
+      audioDescriptionIsPresent = (m.audioDescriptionPoster.getParent() <> invalid)
+      if data.hasAudioDescription = true
+        if audioDescriptionIsPresent = false
+          firstLineGroup.insertChild(m.audioDescriptionPoster, insertIndex)
+        end if
+
+        insertIndex++
+      else
+        if audioDescriptionIsPresent = true
+          firstLineGroup.removeChild(m.audioDescriptionPoster)
+        end if
+      end if
+
+      ' handle rating
+      ratingIsPresent = (m.rating.getParent() <> invalid)
+      if isNonEmptyString(data.rating) = true AND m.top.mode <> m.constants.ui.infoPanelModes.sportsEvent
+        if ratingIsPresent = false
+          firstLineGroup.insertChild(m.rating, insertIndex)
+        end if
+
+        m.ratingLabel.width = 0
+        m.ratingLabel.text = Ucase(data.rating)
+
+        nRatingBoundingBoxIncrease = m.ratingLabel.boundingRect().width + 24
+        m.ratingBackground.width = nRatingBoundingBoxIncrease
+        m.ratingLabel.width = nRatingBoundingBoxIncrease
+        insertIndex++
+      else
+        if ratingIsPresent = true
+          firstLineGroup.removeChild(m.rating)
+        end if
+      end if
+
+      ' handle descriptor codes
+      descriptorsArePresent = (m.descriptorCode.getParent() <> invalid)
+      if isNonEmptyString(data.descriptorCode)
+        if descriptorsArePresent = false
+          firstLineGroup.insertChild(m.descriptorCode, insertIndex)
+        end if
+
+        m.descriptorCode.text = UCase(data.descriptorCode)
+        insertIndex++
+      else
+        if descriptorsArePresent = true
+          firstLineGroup.removeChild(m.descriptorCode)
+        end if
+      end if
+
+      ' handle expiration warning
+      expirationWarningPresent = (m.expireWarning.getParent() <> invalid)
+      if isNonEmptyString(data.availabilityEnds)
+        datetime = CreateObject("roDateTime")
+        datetime.FromISO8601String(data.availabilityEnds)
+        endSeconds = datetime.AsSeconds()
+        nowSeconds = CreateObject("roDateTime").AsSeconds()
+        daysRemaining = ((endSeconds - nowSeconds) \ 86400) + 1
+        ' BIZ REQ: only titles expiring in the next 2 weeks should display message
+        if daysRemaining > 0 AND daysRemaining <= 14
+          if daysRemaining > 1
+            m.expireWarning.text = getTranslation("metadata_expiresIn_plural", {days: daysRemaining.toStr()})
+          else
+            m.expireWarning.text = getTranslation("metadata_expiresIn_singular")
+          end if
+
+          if expirationWarningPresent = false
+            firstLineGroup.insertChild(m.expireWarning, insertIndex)
+          end if
+
+          insertIndex++
+        else if expirationWarningPresent = true
+          firstLineGroup.removeChild(m.expireWarning)
+        end if
+      else if isNonEmptyString(data.programTimeLeft) = true
+        m.expireWarning.text = data.programTimeLeft
 
         if expirationWarningPresent = false
           firstLineGroup.insertChild(m.expireWarning, insertIndex)
         end if
 
         insertIndex++
+
       else if expirationWarningPresent = true
         firstLineGroup.removeChild(m.expireWarning)
       end if
-    else if expirationWarningPresent = true
-      firstLineGroup.removeChild(m.expireWarning)
-    end if
 
-    ' handle parter logos
-    partnerLogoIsPresent = (m.partnerLogo.getParent() <> invalid)
-    if isNonEmptyString(data.partnerLogoUri)
-      if partnerLogoIsPresent = false
-        firstLineGroup.insertChild(m.partnerLogo, insertIndex)
-      end if
+      ' handle parter logos
+      partnerLogoIsPresent = (m.partnerLogo.getParent() <> invalid)
+      if isNonEmptyString(data.partnerLogoUri)
+        if partnerLogoIsPresent = false
+          firstLineGroup.insertChild(m.partnerLogo, insertIndex)
+        end if
 
-      m.partnerLogo.uri = data.partnerLogoUri
-      insertIndex++
-    else
-      if partnerLogoIsPresent = true
-        firstLineGroup.removeChild(m.partnerLogo)
+        m.partnerLogo.uri = data.partnerLogoUri
+        insertIndex++
+      else
+        if partnerLogoIsPresent = true
+          firstLineGroup.removeChild(m.partnerLogo)
+        end if
       end if
     end if
-  end if
 End Function
 
 
@@ -935,7 +954,27 @@ Function onModeChange()
     m.secondLineGroup.appendChild(m.line2)
 
     m.offset.itemSpacings = [15]
+  else if m.top.mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
+    ' This infopanel mode is for linear programs in response with V4 api (treament group of roku_sports_onnow_rows_v1)
+    m.infoPanelGroup.appendChild(m.offset)
+    m.offset.appendChild(m.title)
+
+    if isNonEmptyString(m.episode.text)
+      m.offset.appendChild(m.episode)
+    end if
+
+    m.offset.appendChild(m.twoLineInfo)
+
+    m.twoLineInfo.appendChild(m.firstLineGroup)
+    m.firstLineGroup.appendChild(m.line1)
+
+    m.twoLineInfo.appendChild(m.secondLineGroup)
+    m.secondLineGroup.appendChild(m.line2)
+
+    m.offset.appendChild(m.descriptionGroup)
+    m.offset.itemSpacings = [15, 15]
   else if m.top.mode = m.constants.ui.infoPanelModes.programHomescreen
+    ' This infopanel mode is for linear channel/program in response with V3 api (control group of roku_sports_onnow_rows_v1)
     m.infoPanelGroup.appendChild(m.offset)
     m.offset.appendChild(m.topHeaderImage)
     m.topHeaderImage.height = 72
@@ -945,7 +984,6 @@ Function onModeChange()
     if isNonEmptyString(m.episode.text)
       m.offset.appendChild(m.episode)
     end if
-
     m.offset.appendChild(m.twoLineInfo)
 
     m.twoLineInfo.appendChild(m.firstLineGroup)
@@ -974,10 +1012,22 @@ Function getSecondLineText(data)
   end if
 
   ' handle sports event round/group info
-  ' expect that genres and sports event group info don't both exist
   roundGroupInfo = data.roundGroupInfo
   if isNonEmptyString(roundGroupInfo) = true
-    text = roundGroupInfo
+
+    if text.len() > 0
+      text += " " + Chr(&hb7) + " "
+    end if
+
+    text += roundGroupInfo
+  end if
+
+  if isString(data.channelName)
+    if text.len() > 0
+      text += " " + Chr(&hb7) + " "
+    end if
+
+    text +=  data.channelName
   end if
 
   return text

@@ -305,6 +305,10 @@ Function getTranslation_en_US()
       "description": "Program time Title when user selects a future program on EPG.",
       "message": "Starts at"
     },
+    "epg_started_at": {
+      "description": "Program time Title for live program.",
+      "message": "Started at"
+    },
     "epg_favorites_toast_message": {
       "description": "Message to be displayed on Toast-message when user favorites a lienar channel",
       "message": "Find favorites at the top of program guide."
@@ -972,6 +976,10 @@ Function getTranslation_en_US()
     "tomorrow":{
       "description": "Tomorrow",
       "message": "TOMORROW"
+    },
+    "onNow":{
+      "description": "badge text to show program is not live but on now",
+      "message": "ON NOW"
     },
     "day_1":{
       "description": "shortened version Monday, formatted with , and a space",

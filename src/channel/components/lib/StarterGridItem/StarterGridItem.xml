@@ -9,7 +9,6 @@
   <script type="text/brightscript" uri="pkg:/components/lib/UserMixin.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Auth.brs" />
 
-
   <interface>
     <field id="itemContent" type="node" />
     <field id="itemHasFocus" type="boolean" />

@@ -47,6 +47,10 @@
     "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
     "message": "Removed from Favorites"
   },
+  "epg_started_at": {
+    "description": "Program time Title for live program.",
+    "message": "Started at"
+  },
   "detail_screen_like_disLike_toast_header": {
     "description": "header text to be displayed on Toast-message when user like/dislike a title",
     "message": "Thanks for your feedback!"
@@ -703,6 +707,10 @@
   "tomorrow":{
     "description": "Tomorrow",
     "message": "TOMORROW"
+  },
+  "onNow":{
+    "description": "badge text to show program is not live but on now",
+    "message": "ON NOW"
   },
   "day_1":{
     "description": "shortened version Monday, formatted with , and a space",
