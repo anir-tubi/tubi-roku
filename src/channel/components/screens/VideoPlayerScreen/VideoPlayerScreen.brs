@@ -458,7 +458,9 @@ Function autoHideSkipCuepointsButton()
     hideSkipCuepointsButton(m.top)
 
     if m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_player_controls_v2").enabled = true
-      showSignUpSaveProgressButton()
+      if m.skipCuepointsButton.visible = false
+        showSignUpSaveProgressButton()
+      end if
     end if
   end if
 End Function

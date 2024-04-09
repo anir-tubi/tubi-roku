@@ -1203,7 +1203,9 @@ Function animateTransport(direction)
 
   if direction = "in" AND m.VideoState <> "skip" AND m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_player_controls_v2").enabled = true
     m.Thumbnail.visible = false
-    showSignUpSaveProgressButton()
+    if m.skipCuepointsButton.visible = false
+      showSignUpSaveProgressButton()
+    end if
   end if
 
   if direction = "in" AND m.ratingOverlay.opacity = 1.0
@@ -1704,7 +1706,9 @@ Function hideYMAL(showSignUpButton = true)
     if m.skipCuepointsButtonTimer <> invalid
       showSkipCuepointsButton()
     else if m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND showSignUpButton = true AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_player_controls_v2").enabled = true
-      showSignUpSaveProgressButton()
+      if m.skipCuepointsButton.visible = false
+        showSignUpSaveProgressButton()
+      end if
     end if
   end if
 End Function
