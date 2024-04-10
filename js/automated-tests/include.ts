@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { ecp, odc, device, utils } from 'roku-test-automation';
-import { testUtils } from './test-utils';
+import { auth, testUtils } from './test-utils';
 
 exports.mochaHooks = {
   // Useful for debugging what is running on which Roku device
@@ -16,6 +16,10 @@ exports.mochaHooks = {
 
     utils.setupEnvironmentFromConfigFile(undefined, deviceSelector);
     const host = device.getCurrentDeviceConfig().host;
+
+    // Used to let us know if we have already deployed the application to this device or if this the first time running
+    let isFirstRunForDevice = true;
+
     if (process.env.RERUN_AUTOMATED_TESTS === 'true') {
       // Check if the application is currently running
       if (!await ecp.isActiveApp()) {
@@ -25,6 +29,7 @@ exports.mochaHooks = {
       }
     } else {
       if (device.deployed){
+        isFirstRunForDevice = false;
         // If we have already deployed do nothing
       } else if (fs.existsSync(device.getOutputZipFilePath({}))) {
         // Check if our package already exists, if it does then we are running through gulp runAutomatedTests and have already made our package
@@ -52,6 +57,11 @@ exports.mochaHooks = {
     await testUtils.untilTrue(async () => {
       return await testUtils.isApplicationRunning();
     });
+
+    if (isFirstRunForDevice) {
+      const deviceId = await auth.getDeviceId();
+      console.log(`Retrieved Device ID: ${deviceId}`);
+    }
   },
   async afterEach() {
     const test: Mocha.Test = this.currentTest;
