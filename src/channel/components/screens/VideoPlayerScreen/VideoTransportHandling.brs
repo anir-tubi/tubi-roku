@@ -22,11 +22,13 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
       else if key = "fastforward"
         if m.FastForwardButton.enabled then
           handleFastForward()
+          hideSignUpSaveProgressButton()
         end if
 
       else if key = "rewind"
         if m.RewindButton.enabled then
           handleRewind()
+          hideSignUpSaveProgressButton()
         end if
 
       else if key = "replay"
@@ -545,10 +547,6 @@ Function handleFastForward()
   hideSkipCuepointsButton(m.top)
   clearSkipCuepointsTimer()
 
-  if m.top.isUserLoggedIn = false AND m.isSignUpSaveProgressInPlayerEnabled = true
-    hideSignUpSaveProgressButton()
-  end if
-
   'begin fast forwarding, but don't need everything in beginScrub()
   if m.VideoState = "rew"
     updateVideoState("ffw")
@@ -584,10 +582,6 @@ Function handleRewind()
   'if the transport is shown during playback between the intro or other skippable cuepoints'
   hideSkipCuepointsButton(m.top)
   clearSkipCuepointsTimer()
-
-  if m.top.isUserLoggedIn = false AND m.isSignUpSaveProgressInPlayerEnabled = true
-    hideSignUpSaveProgressButton()
-  end if
 
   'begin rewinding, but don't need everything in beginScrub()
   if m.VideoState = "ffw"
