@@ -37,7 +37,8 @@ export async function verifyDialogEvent() {
 		dialogEvent = pulletEvents.find(
 			(event) =>
 				event.dialog.dialog_type &&
-				event.dialog.dialog_type === 'EXIT_KIDS_MODE'
+				event.dialog.dialog_type === 'EXIT_KIDS_MODE' &&
+				event.dialog.dialog_action === 'SHOW'
 		);
 		i++;
 	}
