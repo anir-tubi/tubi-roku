@@ -2199,20 +2199,7 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
 
   if isNonEmptyString(programFromServer.series_title) = true ' that means this is series type program.
     translatedProgram.title = programFromServer.series_title
-    if isNonEmptyString(programFromServer.episode_number) = true AND isNonEmptyString(programFromServer.season_number) = true
-      snnEnn = "S" + programFromServer.season_number + ":" + "E" + programFromServer.episode_number
-
-      if programFromServer.title.InStr(snnEnn) = true
-        epgProgramTitle = programFromServer.title
-      else
-        epgProgramTitle = snnEnn + " - " + programFromServer.title
-      end if
-
-    else
-      epgProgramTitle = programFromServer.title
-    end if
-
-    translatedProgram.epgProgramTitle = epgProgramTitle
+    translatedProgram.epgProgramTitle = programFromServer.title
   end if
 
   startTime = ""
