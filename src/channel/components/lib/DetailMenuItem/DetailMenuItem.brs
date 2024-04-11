@@ -21,6 +21,7 @@ Function init()
   m.badgeLabel.padding = [12, 9]
   m.badgeLabelFocused = m.top.findNode("badgeLabelFocused")
   m.badgeLabelFocused.padding = [12, 9]
+  m.badgeLabelFocused.opacity = 0
 
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.DetailsMenuText, typographyConstants.ids.bodyMediumStrong)
