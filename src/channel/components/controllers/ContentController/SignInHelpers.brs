@@ -1122,7 +1122,7 @@ End Function
 Function onMagicLinkError(errorResponse)
   tubiLog("SignInHelpers.onMagicLinkError")
   contextCode = m.constants.errors.context.forgotPasswordProcessingScreen
-  errorCode = getUserFacingErrorCode(contextCode, m.constants.errors.subtypes.networkError, errorResponse)
+  errorCode = getUserFacingErrorCode(contextCode, m.constants.errors.subtypes.networkError, errorResponse.code)
   errorMessage = getTranslation("dialog_magicLink_error_description")
   dialogEvent = {
     type: "dialog"
@@ -1199,7 +1199,7 @@ Function onQueryStatusOfMagicLinkError(errorResponse)
 
       contextCode = m.constants.errors.context.forgotPasswordProcessingScreen
 
-      errorCode = getUserFacingErrorCode(contextCode, m.constants.errors.subtypes.expireError, errorResponse)
+      errorCode = getUserFacingErrorCode(contextCode, m.constants.errors.subtypes.expireError, errorResponse.code)
       errorMessage = getTranslation("dialog_uidExpiraionError_description")
 
       dialogEvent = {
