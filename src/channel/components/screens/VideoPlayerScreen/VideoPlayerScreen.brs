@@ -2250,7 +2250,7 @@ Function onSignUpSaveProgressButtonSelected()
 
   'When SignUpSaveProgress button is selected and user will be taken to signIn/signUp process, we should hide/stop the pauseAd overlay/timer
   hidePauseAdOverlay()
-  stopPauseAdTimer()
+  resetPauseAdOverlay()
 
   m.stateForSignUpSaveProgress = videoState
   m.top.signUpSaveProgressButtonSelected = true
