@@ -69,6 +69,11 @@ Function onRfiUserData(msg)
   m.billing = invalid ' making m.billing as invalid to avoid using it another places
 
   currentScreen = getCurrentScreen()
+  if currentScreen.id = m.constants.ui.screenIds.videoPlayerScreen
+    '//if we ever get to this point from the video player, then set the current screen to a non video screen, the previous screen (which is most likely the detail screen)
+    '//This will also ensure the BACK button does not take the user back to the video player screen
+    popScreen(false, false)
+  end if
 
   billing = msg.getRoSGNode()
   if billing <> invalid
