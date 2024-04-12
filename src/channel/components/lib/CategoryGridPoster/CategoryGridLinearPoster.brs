@@ -21,8 +21,8 @@ Function init()
   }
 
   m.languages = {
-    spanish: "ESPANOL"
-    french: "FRANCAIS"
+    spanish: "ESPAÑOL"
+    french: "FRANÇAIS"
   }
 
   setThemeColors()

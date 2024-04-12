@@ -2192,6 +2192,8 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
 
   translatedProgram.title = programFromServer.title
 
+  translatedProgram.live = programFromServer.live
+
   'Add episode title
   if isNonEmptyString(programFromServer.episode_title)
     translatedProgram.epgProgramTitle = programFromServer.episode_title
