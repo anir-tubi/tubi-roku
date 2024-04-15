@@ -647,7 +647,7 @@ Function startUserExperience()
     showContentGroupAndHideSpinner()
 
     sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.sessionStart)
-    sendDeviceLog()
+    sendDeviceEnvironmentSettingsLog()
 
     setUiModeAndLoadContent()
   end if
@@ -675,13 +675,22 @@ Function setUiModeAndLoadContent()
   end if
 End Function
 
-' sendDeviceLog will check deviceInfo and send device-info to logging API
-Function sendDeviceLog()
+
+' sendDeviceEnvironmentSettingsLog will check deviceInfo and send device-info to logging API
+Function sendDeviceEnvironmentSettingsLog()
+  ' Holds true or false based on if the setting is turned on or off.
+  autoPlay = true
+  deviceInfo = CreateObject("roDeviceInfo")
+
+  if FindMemberFunction(deviceInfo, "IsAutoplayEnabled") <> invalid AND deviceInfo.IsAutoplayEnabled() = false
+    autoPlay = false
+  end if
 
   deviceInfo = {
     isVideoPreviewOn: (isVideoPreviewOn() = true)
+    autoPlay: autoPlay
   }
-  tubiLog(FormatJSON(deviceInfo), "info", "clientInfo", "device-info", 0.1) 'send info to server
+  tubiLog(FormatJSON(deviceInfo), "info", "clientInfo", "device-info", 0.2) 'send info to server
 
 End Function
 
