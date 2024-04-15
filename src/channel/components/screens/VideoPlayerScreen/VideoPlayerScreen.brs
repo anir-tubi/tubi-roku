@@ -457,7 +457,7 @@ Function autoHideSkipCuepointsButton()
   if m.HUD.opacity < 1
     hideSkipCuepointsButton(m.top)
 
-    if m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_player_controls_v2").enabled = true
+    if m.top.isTrailer = false AND m.top.appMode <> "KIDS_MODE" AND m.top.isUserLoggedIn = false AND getExperimentResource("roku_registration_player_signup_save_progress", "roku_registration_player_signup_save_progress_player_controls_v2").enabled = true
       if m.skipCuepointsButton.visible = false
         showSignUpSaveProgressButton()
       end if
@@ -501,7 +501,7 @@ Function playContent()
 
   if m.Video.content <> invalid
 
-    if m.top.isUserLoggedIn = true OR m.top.appMode = "KIDS_MODE"
+    if m.top.isUserLoggedIn = true OR m.top.appMode = "KIDS_MODE" OR m.top.isTrailer = true
       hideSignUpSaveProgressButton()
     end if
 
