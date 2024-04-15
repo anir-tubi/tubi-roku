@@ -143,7 +143,7 @@ Function setBadge(badgeType = "live", badgeText = "")
     badge = m.badgeGroup.createChild("Badge")
     badge.backgroundColor = m.focused2Color
     badge.textColor = m.primaryTextColor
-    badge.iconUri = "pkg:/images/live-icon.webp"
+    badge.iconUri = "pkg:/images/live-icon-filled.webp"
     badge.text = UCase(getTranslation("screenSearch_liveText"))
   else if badgeType = m.badgeTypes.onNow
     badge = m.badgeGroup.createChild("Badge")
