@@ -1628,8 +1628,14 @@ Function updateVideoPlayerState(content) as Void
     m.TransportButtons.removeChild(m.SkipTrailerButton)
 
   'add the skip trailer button if it's a trailer and it doesn't already exist on the transport
-  else if m.NodeHelpers.getChildIndex(m.TransportButtons, m.SkipTrailerButton) < 0
-    m.TransportButtons.insertChild(m.SkipTrailerButton, 0)
+  else
+
+    if (content.rating = "R" OR content.rating = "TV-MA" OR content.rating = "NC-17") AND m.constants.deviceinfo.countrycode = "US" AND isLoggedInUser() = false AND getExperimentResource("roku_registration_vs_tvt_lock_rated_content", "roku_registration_vs_tvt_lock_rated_content_v2", false).enabled = true
+      m.TransportButtons.removeChild(m.SkipTrailerButton)
+    else if m.NodeHelpers.getChildIndex(m.TransportButtons, m.SkipTrailerButton) < 0
+      m.TransportButtons.insertChild(m.SkipTrailerButton, 0)
+    end if
+
   end if
 End Function
 
