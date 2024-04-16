@@ -784,7 +784,7 @@ Function setHomeScreenAfterFocus(focusedContent, homeScreen)
       '//unless told otherwise later in this function, the default for bStopCountdownTimer is to assume that
       '//we should stop the countdown timer
       bStopCountdownTimer = true
-      if focusedContent.type = m.constants.ui.categoryTypes.linear AND m.SideNav.opened <> true
+      if focusedContent.type = m.constants.ui.categoryTypes.linear AND m.SideNav.opened <> true AND m.tempModal = invalid
         bPlayVideo = true
         if isLinearPlayerPlayingThisContent(focusedContent) = true
           '//No need to play the video. It already is playing the video
