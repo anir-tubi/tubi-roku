@@ -186,7 +186,6 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel)
   duration = ""
   channelName = ""
   league = ""
-  hasCC = false
   rating = ""
   genres = []
 
@@ -200,7 +199,6 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel)
 
     channelName = content.title
     league = currentProgram.league
-    hasCC = currentProgram.hasSubtitles
     rating = currentProgram.rating
     timeleft = calculateProgramTimeLeft(currentProgram)
     genres = currentProgram.genres
@@ -220,7 +218,6 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel)
     infoPanel.description = content.description
     infoPanel.episodeTitle = ""
     infoPanel.title = content.title
-    hasCC = content.hasSubtitles
     rating = content.rating
     releaseDate = content.releaseDate
     genres = content.genres
@@ -229,7 +226,7 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel)
   lineOneData = {}
   lineOneData.releaseDate = releaseDate
   lineOneData.programLength = duration
-  lineOneData.hasCC = hasCC
+  lineOneData.hasCC = content.hasSubtitles
   lineOneData.programTimeLeft = timeleft
   lineOneData.rating = rating
 
