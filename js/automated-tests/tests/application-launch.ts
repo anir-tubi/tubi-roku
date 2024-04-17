@@ -137,9 +137,9 @@ describe('Application Launch', function () {
 
     // Jump To Continue Watching Row
     await testUtils.jumpToRowWithTitle('movieScreenRowList', 'Continue Watching');
-    await testUtils.waitForElementToFullyShowOnScreen('infoPanelTitle');
-    const infoPanelTitle = await testUtils.getNodeForElement('infoPanelTitle');
-    expect(infoPanelTitle.text).to.not.equal('Sign Up to Save Your Progress');
+    await testUtils.waitForElementToFullyShowOnScreen('infoPanelTitleMovies');
+    const infoPanelTitleMovies = await testUtils.getNodeForElement('infoPanelTitleMovies');
+    expect(infoPanelTitleMovies.text).to.not.equal('Sign Up to Save Your Progress');
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/114199

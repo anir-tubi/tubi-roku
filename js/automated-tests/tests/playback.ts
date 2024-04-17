@@ -356,29 +356,24 @@ describe('Playback', function () {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
 
     // Are we on the home page?
-    const homeScreenRowList = await testUtils.getNodeForElement('homeScreenRowList');
-    expect(homeScreenRowList.visible).to.equal(true);
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
     //Play title, pause to open player, move left to rewind button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
-    const videoPlayerActual = await testUtils.getNodeForElement('videoPlayerActual');
-    expect(videoPlayerActual.visible).to.equal(true);
-    await testUtils.expectPlayerStateToEventuallyEqual('play');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
-    const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
-    expect(playPauseButton.visible).to.equal(true);
-    await utils.sleep(4000); // alternative to sleep here? I thought the next line would do it.
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
     await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
 
     // Rewind button highlighted
-    const rewindButton = await testUtils.getNodeForElement('rewindButton');
-    expect(rewindButton.visible).to.equal(true);
-
+    const rewindButton = await testUtils.waitForElementToFullyShowOnScreen('rewindButton');
+   
     // Press Rewind button 4x
     await ecp.sendKeypress(ecp.Key.Ok, { count: 4 });
 
     // Verify Rewind button state is RW 1 again
     const rewindButton1x = await testUtils.getNodeForElement('rewindButton');
+    await testUtils.waitForElementToFullyShowOnScreen('rewindButton');
     expect(rewindButton1x.uri).to.contain('pkg:/images/transport/sgplayer/icon-rew-1');
 
   });

@@ -54,7 +54,7 @@ describe('Kids Mode', function () {
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/537398
-  it('C537398 - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Little Kids Then Kids Mode icon is now grayed out, @kidsmode_guest', async () => {
+  it('C537398b - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Little Kids Then Kids Mode icon is now grayed out, @kidsmode_guest', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
@@ -357,7 +357,7 @@ describe('Kids Mode', function () {
     // Check for Live News row
     await ecp.sendKeypress(ecp.Key.Right);
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
+    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
     const liveBadgeText = await testUtils.getNodeForElement('liveBadgeText');
     expect(liveBadgeText.text).to.equal('LIVE');
 

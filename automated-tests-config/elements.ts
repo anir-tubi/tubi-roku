@@ -682,6 +682,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#PageGroup.#ChannelCategoryGrid.0.#PosterRect'
    },
 
+   channelsVideoGridPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.#poster'
+   },
+
 
   /** Linear Search Results Description */
   searchResultsDesc: {
@@ -1193,10 +1197,14 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#DescriptionGroup.#Description',
   },
 
-  /** info panel title */
+  /** info panel title home screen */
   infoPanelTitle: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#Title'
 
+  },
+  /** info panel title movies screen */
+  infoPanelTitleMovies: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#Title',
   },
 
   /** age gate number page */

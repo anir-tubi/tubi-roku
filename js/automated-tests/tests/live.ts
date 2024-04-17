@@ -16,10 +16,10 @@ describe('Live', function () {
 
         // Navigate to the Live News Row
         const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
-        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
+        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
         // Verify that video preview is playing
-        await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Recommended Channels');
+        await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'On Now');
         await utils.sleep(5000);
         await linearVideoPreviewPlayingTest();
 
@@ -45,8 +45,7 @@ describe('Live', function () {
     it('C207737 - Live Screen: When in full view, pressing back will return the user to preview mode @live', async () => {
 
         // Navigate to the Live News Row
-        const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
-        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
+        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
         // Start a live feed
         await startLiveFeed();
@@ -68,7 +67,7 @@ describe('Live', function () {
 
         // Navigate to the Live News Row
         const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
-        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
+        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
         // Start a live feed
         await startLiveFeed();
@@ -90,7 +89,7 @@ describe('Live', function () {
  
         // Navigate to the Live News Row
         const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
-        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
+        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
         // Verify that linear preview video is playing
 
@@ -117,7 +116,7 @@ describe('Live', function () {
  
         // Navigate to the Live News Row
         const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
-        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
+        await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
         // Verify that preview video is playing
         await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing');

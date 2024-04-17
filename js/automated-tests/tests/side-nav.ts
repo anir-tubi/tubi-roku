@@ -527,13 +527,10 @@ describe('Side Navigation', function () {
 
       // Verify Channels Details page
       await testUtils.waitForElementToFullyShowOnScreen('channelsListScreenPoster');
-
-      // Select channel
       await ecp.sendKeypress(ecp.Key.Ok);
-      await utils.sleep(1000);
 
       //Select title
-      await testUtils.waitForElementToFullyShowOnScreen('channelsListScreenPoster');
+      await testUtils.waitForElementToFullyShowOnScreen('channelsVideoGridPoster');
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Once in detail page press the back button 6x

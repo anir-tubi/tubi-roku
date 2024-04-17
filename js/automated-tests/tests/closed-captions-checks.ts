@@ -20,7 +20,7 @@ describe('Closed Captions Checks', function () {
 
     // Navigate to the Live News Row from Home screen
     // Jump to Recommended Channels row
-    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
+    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
     // Start a live feed
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -94,7 +94,7 @@ describe('Closed Captions Checks', function () {
     await testUtils.goToPage('home');
 
     // Jump to Recommended Channels row
-    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'Recommended Channels');
+    await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
     // Start a live feed
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -155,8 +155,7 @@ describe('Closed Captions Checks', function () {
     await ecp.sendKeypress(ecp.Key.Right, {count:4});
     await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendKeypress(ecp.Key.Down);
-    const closedCaptionOff = await testUtils.getNodeForElement('closedCaptionOff');
-    expect(closedCaptionOff.visible).to.equal(true);
+    await testUtils.waitForElementToFullyShowOnScreen('closedCaptionOff');
 
   }); 
 
