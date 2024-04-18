@@ -106,10 +106,7 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels=false, bKi
   options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
   options.params["limit_resolutions"] = m.constants.player.limitResolutions
   options.params = m.setTupianLandscapeParam(options.params)
-
-  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_tupian_background_images", "roku_tupian_background_images_v1").enabled = true
-    options.params = m.setTupianBackgroundParam(options.params)
-  end if
+  options.params = m.setTupianBackgroundParam(options.params)
 
   capability = formatJson({"content_types" :["se"]})
   options.headers.append({"x-capability": capability})
@@ -383,7 +380,7 @@ Function cmsApi_setImageParams(imageTypes, existingParams = {}, screenId = "")
       existingParams["images[landscape_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_landscape"
     else if imageType = "hero"
       existingParams["images[hero_tb]"] = "w" + landscapeSize[0].ToStr() + "h" + landscapeSize[1].ToStr() + "_hero"
-    else if imageType = "background" AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_tupian_background_images", "roku_tupian_background_images_v1").enabled = true
+    else if imageType = "background"
       existingParams["images[background_tb]"] = "w" + background[0].ToStr() + "h" + background[1].ToStr() + "_background"
     end if
   end for

@@ -186,20 +186,8 @@ Function setPosterValues(posterUri)
     m.oldPoster.width = 1197
     m.oldPoster.height = 675
     m.oldPoster.posterTranslation = [804,0]
-    if getExperimentResource("roku_tupian_background_images", "roku_tupian_background_images_v1", true).enabled = true
-      if m.constants.deviceInfo.limitedUi = true OR m.constants.deviceInfo.lowVram = true
-        m.oldPoster.loadDisplayMode = "scaleToZoom"
-      end if
-    else
-      if m.constants.deviceInfo.limitedUi = true
-        m.oldPoster.loadWidth = "399"
-        m.oldPoster.loadHeight = "225"
-        m.oldPoster.loadDisplayMode = "scaleToZoom"
-      else if m.constants.deviceInfo.lowVram = true
-        m.oldPoster.loadWidth = "798"
-        m.oldPoster.loadHeight = "450"
-        m.oldPoster.loadDisplayMode = "scaleToZoom"
-      end if
+    if m.constants.deviceInfo.limitedUi = true OR m.constants.deviceInfo.lowVram = true
+      m.oldPoster.loadDisplayMode = "scaleToZoom"
     end if
   else
     ' else block handles the case where we display full screen single gradient background.
