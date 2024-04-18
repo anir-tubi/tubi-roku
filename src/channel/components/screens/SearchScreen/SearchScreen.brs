@@ -537,7 +537,7 @@ Function onItemFocused(msg)
         searchComponent = getTrackingComponentInfo(itemFocused, gridNode.numColumns, focusedContent, m.Tracking)
       end if
 
-      if searchComponent <> invalid
+      if searchComponent <> invalid AND m.oldSearchComponent <> invalid then
         navigateWithinPageInfo = {
           pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
           componentOneof: m.Tracking.getAnalyticsComponent(m.oldSearchComponent.componentType, m.oldSearchComponent.componentValues)
