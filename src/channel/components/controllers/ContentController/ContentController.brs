@@ -664,7 +664,7 @@ Function setUiModeAndLoadContent()
   else
     relaunchSeriesPlaybackInfo = m.pub_serverPersistentData.relaunchSeriesPlaybackInfo
     ' Firing the exposure event When users have watched an episode for at least 1 minute and relaunched Tubi.
-    if relaunchSeriesPlaybackInfo <> invalid AND relaunchSeriesPlaybackInfo.seriesId <> invalid AND getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v1", true).enabled = true
+    if relaunchSeriesPlaybackInfo <> invalid AND isNonEmptyString(relaunchSeriesPlaybackInfo.seriesId) = true AND getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v1", true).enabled = true
       processSeriesRelaunch()
     else
       startChannelFromAppLoad()
@@ -1817,8 +1817,8 @@ Function onCustomSuspend(msg)
       historyPosition = round(currentScreen.position)
       ' Checking the content is a series and if the user is logged in.
       ' Checking if user watched more than 1 min.
-      ' TODO: Remove if we do not graduate the experiment.
-      if content.parentId <> invalid AND isLoggedInUser() = true AND historyPosition > m.constants.player.historyFrequency1Min
+      ' TODO: Remove if we do not graduate roku_relaunch_series experiment.
+      if isNonEmptyString(content.parentId) = true AND isLoggedInUser() = true AND historyPosition > m.constants.player.historyFrequency1Min
         nowDate = CreateObject("roDateTime")
         secondsFromEpoch = nowDate.AsSeconds()
 
@@ -1981,7 +1981,7 @@ Function onCustomResume(msg)
 
 
   relaunchSeriesPlaybackInfo = m.pub_serverPersistentData.relaunchSeriesPlaybackInfo
-  if relaunchSeriesPlaybackInfo <> invalid AND relaunchSeriesPlaybackInfo.seriesId <> invalid AND getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v1", true).enabled = true
+  if relaunchSeriesPlaybackInfo <> invalid AND isNonEmptyString(relaunchSeriesPlaybackInfo.seriesId) = true AND getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v1", true).enabled = true
     processSeriesRelaunch()
   else
     '// If the resume app action is to restart the app or start the channel, then 1st see if the previously played linear video can be played (if one exists)
@@ -2783,5 +2783,11 @@ Function startRelaunchSeriesPlayback(content)
   if currentScreen <> invalid AND currentScreen.id = "detailScreen"
     removeTopScreen()
   end if
-  showDetailScreen(content, false, skipDetailScreen, startChannel, {})
+
+  showDetailScreen(content, false, skipDetailScreen, onSeriesRelaunchError, {})
+End Function
+
+
+Function onSeriesRelaunchError(_error)
+  startChannel()
 End Function
