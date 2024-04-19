@@ -1981,7 +1981,13 @@ Function onCustomResume(msg)
 
 
   relaunchSeriesPlaybackInfo = m.pub_serverPersistentData.relaunchSeriesPlaybackInfo
-  if relaunchSeriesPlaybackInfo <> invalid AND isNonEmptyString(relaunchSeriesPlaybackInfo.seriesId) = true AND getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v1", true).enabled = true
+
+  ' Checking if we have either content id or page in the args.
+  ' We currently support content or page deeplinking. If one of the parameter is present in the args.
+  ' that means we recieved a deeplink request in which case we should not land the user in the series he was watching previously.
+  isDeeplinkRequest = (customResumeLaunchParams <> invalid AND (customResumeLaunchParams.contentId <> invalid OR customResumeLaunchParams.page <> invalid))
+  
+  if isDeeplinkRequest = false AND relaunchSeriesPlaybackInfo <> invalid AND isNonEmptyString(relaunchSeriesPlaybackInfo.seriesId) = true AND getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v1", true).enabled = true
     processSeriesRelaunch()
   else
     '// If the resume app action is to restart the app or start the channel, then 1st see if the previously played linear video can be played (if one exists)
