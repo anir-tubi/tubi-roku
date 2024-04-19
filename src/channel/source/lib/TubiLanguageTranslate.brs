@@ -202,7 +202,7 @@ Function getTranslationSetByLocale(locale)
   else if locale = "es_es"
     ' translationSet = getTranslation_es_ES()
   else if locale = "en_gb"
-    ' translationSet = getTranslation_en_GB()
+    translationSet = getTranslation_en_GB()
   else if locale = "fr_ca"
     translationSet = getTranslation_fr_CA()
   else if locale = "fr_fr"
@@ -2629,7 +2629,7 @@ Function getTranslation_es_MX()
     },
     "screenMyStuff_signedOutUISubtitle": {
       "description": "The subtitle of the MyStuff Screen for the guest user.",
-      "message": "Encuentre tus favoritos, continúa donde lo dejaste–todo en un solo lugar."
+      "message": "Encuentra tus favoritos, continúa donde lo dejaste–todo en un solo lugar."
     },
     "screenMyStuff_signedOutUIBlurb": {
       "description": "The blurb of the MyStuff Screen for the guest user.",
@@ -2777,7 +2777,7 @@ Function getTranslation_es_MX()
     },
     "metadata_myStuff_empty_myList_description": {
       "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
-      "message": "Use el botón de marcador para guardar series y películas favoritas. Aparecerán aquí."
+      "message": "Use el marcador para guardar series y películas favoritas. Aparecerán aquí."
     },
     "metadata_myStuff_empty_continueWatching_title": {
       "description": "For an empty continueWatching container, this is the title that is display in the empty container",
@@ -2934,10 +2934,6 @@ Function getTranslation_es_MX()
     "linearVideoPlayer_timeLeft": {
       "description": "Label to display time left in linear video player info panel",
       "message": "{time} quedan"
-    },
-    "goBack_videoPlayer_controls": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "PRESIONA ATRÁS PARA ESCONDER"
     },
     "channel_name": {
       "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
@@ -3213,14 +3209,6 @@ Function getTranslation_es_MX()
       "description": "Body displayed on onBoarding Landing screen informing pickup where you left off",
       "message": "Continúa donde dejaste de ver"
     },
-    "onBoarding_landingScreen_madeForYouLabel": {
-      "description": "Label displayed on onBoarding Landing screen informing made for you",
-      "message": "Hecho para ti"
-    },
-    "onBoarding_landingScreen_madeForYouBody": {
-      "description": "Body displayed on onBoarding Landing screen informing better recommendations",
-      "message": "Desbloquea mejores recomendaciones"
-    },
     "dialog_got_it": {
       "description": "simple text to use anywhere to indicate dismiss action",
       "message": "Lo entiendo"
@@ -3284,14 +3272,6 @@ Function getTranslation_es_MX()
     "manage_preferences_button_label": {
       "description": "Manage preferences button label.",
       "message": "Administra Preferencias"
-    },
-    "accept_button_label": {
-      "description": "Accept button label.",
-      "message": "Aceptar"
-    },
-    "reject_button_label": {
-      "description": "Reject button label.",
-      "message": "Rechazar"
     },
     "privacy_preferences_label": {
       "description": "privacy preferences screen title.",
@@ -4305,7 +4285,7 @@ Function getTranslation_fr_CA()
     },
     "metadata_myStuff_empty_myList_description": {
       "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
-      "message": "Les films et émissions de télévision ajoutés à votre liste apparaissent ici."
+      "message": "Utilisez bouton de signet pour enregistrer vos séries et films préférés. Ils montreront ici."
     },
     "metadata_myStuff_empty_continueWatching_title": {
       "description": "For an empty continueWatching container, this is the title that is display in the empty container",
@@ -4462,10 +4442,6 @@ Function getTranslation_fr_CA()
     "linearVideoPlayer_timeLeft": {
       "description": "Label to display time left in linear video player info panel",
       "message": "{time} restantes"
-    },
-    "goBack_videoPlayer_controls": {
-      "description": "Navigational instructions to users on what the back button does on the current page",
-      "message": "APPUYER SUR RETOUR POUR CACHER"
     },
     "channel_name": {
       "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
@@ -4741,14 +4717,6 @@ Function getTranslation_fr_CA()
       "description": "Body displayed on onBoarding Landing screen informing pickup where you left off",
       "message": "Reprenez là où vous vous êtes arrêté"
     },
-    "onBoarding_landingScreen_madeForYouLabel": {
-      "description": "Label displayed on onBoarding Landing screen informing made for you",
-      "message": "Fait pour vous"
-    },
-    "onBoarding_landingScreen_madeForYouBody": {
-      "description": "Body displayed on onBoarding Landing screen informing better recommendations",
-      "message": "Proposer de meilleures recommandations"
-    },
     "dialog_got_it": {
       "description": "simple text to use anywhere to indicate dismiss action",
       "message": "J'ai compris"
@@ -4812,14 +4780,6 @@ Function getTranslation_fr_CA()
     "manage_preferences_button_label": {
       "description": "Manage preferences button label.",
       "message": "Gérer les Préférences"
-    },
-    "accept_button_label": {
-      "description": "Accept button label.",
-      "message": "Accepter"
-    },
-    "reject_button_label": {
-      "description": "Reject button label.",
-      "message": "Rejeter"
     },
     "privacy_preferences_label": {
       "description": "privacy preferences screen title.",
@@ -4896,6 +4856,146 @@ Function getTranslation_fr_CA()
     "roku_cw_consent_screen_sub_heading": {
       "description": "Roku Continue Watching screen sub heading.",
       "message": "Facilitez-vous la tâche pour revenir à ce que vous regardiez et obtenez de meilleures recommandations sur ce qu'il faut diffuser ensuite.\n\nChoisir " + Chr(34) + "Accepter maintenant" + Chr(34) + " pour autoriser Tubi à partager votre historique de visionnage de vidéos avec Roku.\n\nVous pouvez modifier cela à tout moment dans les paramètres."
+    }
+  }
+End Function
+
+
+Function getTranslation_en_GB()
+  return {
+    "epg_favorites_toast_message": {
+      "description": "Message to be displayed on Toast-message when user favorites a lienar channel",
+      "message": "Find favourites at the top of programme guide."
+    },
+    "epg_favorites_toast_header": {
+      "description": "header text to be displayed on Toast-message when user favorites a linear channel",
+      "message": "Added to Favourites"
+    },
+    "epg_unfavorites_toast_header": {
+      "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
+      "message": "Removed from Favourites"
+    },
+    "dialog_moviesDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav movies menu item but the item has been disabled",
+      "message": "Films disabled"
+    },
+    "screenSearch_defaultLinearSearch": {
+      "description": "Directions on the search page",
+      "message": "Search for films, TV shows, Live TV, and people"
+    },
+    "screenDetails_error_addQueueMovie_description": {
+      "description": "Description of the warning dialog when user is attempting to add a movie to their list but are not signed in",
+      "message": "Sign in or register for a Tubi account to add this film to your list."
+    },
+    "screenDetails_error_queueMovie_description": {
+      "description": "Error message when a movie is not added to the user's list.",
+      "message": "We’re not sure what happened but something went wrong when trying to add this film to your list."
+    },
+    "screenDetails_error_noQueueMovie_description": {
+      "description": "Error message when a movie is not removed from the user's list.",
+      "message": "We’re not sure what happened but something went wrong when trying to remove this film from your list."
+    },
+    "screenSettings_signIn_description": {
+      "description": "Directions for the signin page",
+      "message": "Sign in to your Tubi account on your computer or phone to see your saved TV shows and films on My List, continue watching where you left off and get personal recommendations synced across your phone, television, tablet or computer."
+    },
+    "screenSettings_about_description": {
+      "description": "The description on the about screen",
+      "message": "Tubi is the leading free, premium, video streaming app. We have a large and diverse library of content with many thousands of titles and 3x fewer adverts than other TV services."
+    },
+    "screenSettings_about_description2": {
+      "description": "The 2nd description on the about screen",
+      "message": "Visit {help_url}\n\nEmail our Support team at support@tubi.tv\n\nReach us on Facebook, Instagram, X, and on our website at:\n{support_url}\n\nVersion {version}\nShort Device ID: {id} (press OK to see full Device ID)\n\n© {year} Tubi, Inc. all rights reserved."
+    },
+    "screenSettings_parentalControls_instructions": {
+      "description": "Description of the parental controls screen",
+      "message": "Please select the appropriate viewing age for Tubi TV. Your selection will determine which film and show ratings you can view in the app. If this selection is changed, you will be required to enter your account password."
+    },
+    "screenSettings_menu_PrivacyCenter": {
+      "description": "A menu Item for the Settings screen",
+      "message": "Privacy Centre"
+    },
+    "screenSettings_error_signInAutoplayPreview_description": {
+      "description": "Description of message to let users know that they must be signed in to change the AutoplayPreview choice.",
+      "message": "You must be signed in to change Auto-play Preview preferences."
+    },
+    "screenMovies_error_fetchScreenContent_description": {
+      "description": "Onscreen message to indicate movies content could not be loaded",
+      "message": "Unable to load the Tubi Films screen."
+    },
+    "short_version_date_format_6": {
+      "description": "Shortened version of date format for the month of June",
+      "message": "June {day}, {year}"
+    },
+    "short_version_date_format_7": {
+      "description": "Shortened version of date format for the month of July",
+      "message": "July {day}, {year}"
+    },
+    "short_version_date_format_9": {
+      "description": "Shortened version of date format for the month of September",
+      "message": "Sept {day}, {year}"
+    },
+    "screenMyStuff_signedOutUISubtitle": {
+      "description": "The subtitle of the MyStuff Screen for the guest user.",
+      "message": "Find your favourites fast, pick up where you left off–all in one place."
+    },
+    "screenMyStuff_allEmptyUISubtitle": {
+      "description": "The subtitle of the MyStuff Screen for the guest user.",
+      "message": "Use the bookmark button to save series and films to your My List."
+    },
+    "screenAgeVerification_network_issue": {
+      "description": "An error message shown to users when they submit their birthdate, but there is an unexpected server or network error",
+      "message": "Could not successfully send your date of birth to our servers."
+    },
+    "metadata_myStuff_empty_myList_description": {
+      "description": "For an empty MyList container, this is the description/subtitle that is display in the empty container",
+      "message": "Use the bookmark button to save favourite series and movies. They’ll show up here."
+    },
+    "metadata_myStuff_empty_continueWatching_description": {
+      "description": "For an empty continueWatching container, this is the description/subtitle that is display in the empty container",
+      "message": "Films and series you haven’t finished will show up here."
+    },
+    "metadata_continueWatching_notSignedIn_description": {
+      "description": "tells non registered user what they need to do to see the continue watching container",
+      "message": "Pick up right where you left off next time you play a TV Series or a Film. Available upon sign up."
+    },
+    "registration_signIn_recommended": {
+      "description": "text appended to recommended row label to subtly remind users that they are signed out so that they understand that they need to sign-in to use Tubi at its fullest",
+      "message": "Sign in for a more personalised experience"
+    },
+    "videoPlayer_adLoadingMessage": {
+      "description": "Message to indicate ads will play before playing video content",
+      "message": "Your programme will begin after these messages..."
+    },
+    "videoPlayer_adHeadsUp": {
+      "description": "Warning when the ad break is about to begin. (seconds is abbreviated for brevity and so singular and plural forms are irrelevant)",
+      "message": "Adverts start in {seconds} s"
+    },
+    "channel_name": {
+      "description": "This is the name of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
+      "message": "Tubi - Free Films & TV"
+    },
+    "channel_description": {
+      "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Channel Store",
+      "message": "Enjoy the largest library of popular films and TV shows, all for free!",
+      "note": "This translation is used for channelStore, please double check that it is not needed before deleting"
+    },
+    "channel_webDescription": {
+      "description": "This is the description of the app. This is not located in the app. It is displayed to the user in the Roku Web Channel Store",
+      "message": "Watch thousands of hit films and TV series for free. Tubi is 100% legal unlimited streaming, with no credit cards and no subscription required. Choose what you want to watch, when you want to watch it, with fewer adverts than other TV services. Tubi is the largest free streaming service featuring award-winning films and TV series. There is something for everybody; from comedy to drama, kids to classics, and niche favourites such as Korean dramas, anime, and British series. Download now and start streaming entertainment for free, today!",
+      "note": "This translation is used for channelStore, please double check that it is not needed before deleting"
+    },
+    "dialog_whoops_title": {
+      "description": "A general whoops title for an dialog window",
+      "message": "Oops!"
+    },
+    "why_ask_age_description": {
+      "description": "The main message which explains why Tubi is asking for the users year of birth",
+      "message": "*We use this information to confirm that you meet the age requirements set out in our Terms of Use and to personalise your experience. Read Terms of Use at: www.tubitv.com/terms Questions? Let us know at: support@tubi.tv"
+    },
+    "goBack_videoPlayer_ad": {
+      "description": "Navigational instructions to users when pause Ad is displayed on video screen",
+      "message": "Press any button to close the advert"
     }
   }
 End Function
