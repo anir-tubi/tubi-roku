@@ -2192,7 +2192,7 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
 
   translatedProgram.title = programFromServer.title
 
-  if translatedProgram.live <> invalid
+  if programFromServer.live <> invalid
     translatedProgram.live = programFromServer.live
   end if
 
