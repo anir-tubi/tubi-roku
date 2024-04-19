@@ -198,20 +198,23 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel)
     infoPanel.description = currentProgram.description
 
     channelName = content.title
-    league = currentProgram.league
     rating = currentProgram.rating
     timeleft = calculateProgramTimeLeft(currentProgram)
     genres = currentProgram.genres
 
-    if currentProgram.live = false
+    if currentProgram.live = false OR currentProgram.epgProgramType <> m.constants.ui.contentTypes.sportsEvent 'live news
       prgLength = currentProgram.endTime - currentProgram.startTime
       if prgLength > 0
         duration = formatLengthAsHourAndMins(prgLength)
       end if
     else
-      if currentProgram.hoursOfAiring <> invalid AND currentProgram.hoursOfAiring <> ""
-        startTime = currentProgram.hoursOfAiring.tokenize(" - ")[0]
-        duration = getTranslation("epg_started_at") + " " + startTime
+      if currentProgram.epgProgramType = m.constants.ui.contentTypes.sportsEvent AND currentProgram.live = true
+        if currentProgram.hoursOfAiring <> invalid AND currentProgram.hoursOfAiring <> ""
+          startTime = currentProgram.hoursOfAiring.tokenize(" - ")[0]
+          duration = getTranslation("epg_started_at") + " " + startTime
+        end if
+        'show the league only for sports Events which are live
+        league = currentProgram.league
       end if
     end if
   else
@@ -232,10 +235,14 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel)
 
 
   lineTwoData = {}
-  if league <> "" then lineTwoData.roundGroupInfo = league
-  if channelName <> "" then lineTwoData.channelName = channelName
-  lineTwoData.genres = genres
+  ' if league is available, show it in the second line, else show genres
+  if league <> ""
+    lineTwoData.roundGroupInfo = league
+  else
+    lineTwoData.genres = genres
+  end if
 
+  if channelName <> "" then lineTwoData.channelName = channelName
   infoPanel.lineOneData = lineOneData
   infoPanel.lineTwoData = lineTwoData
 

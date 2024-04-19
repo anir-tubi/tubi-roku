@@ -2192,7 +2192,14 @@ Function tubiMetadataTranslate_translateProgram(channelFromServer, programFromSe
 
   translatedProgram.title = programFromServer.title
 
-  translatedProgram.live = programFromServer.live
+  if translatedProgram.live <> invalid
+    translatedProgram.live = programFromServer.live
+  end if
+
+  'preserve the program type for some infopanel decisions like to show 'started at' instead of duration.
+  if programFromServer.type <> invalid
+    translatedProgram.epgProgramType = m.translateBackendTypeToClientSideType(programFromServer.type)
+  end if
 
   'Add episode title
   if isNonEmptyString(programFromServer.episode_title)
