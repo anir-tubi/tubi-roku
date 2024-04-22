@@ -1,5 +1,10 @@
+' TODO: Remove this component after the ToS update toast is no longer needed
+' This component is the same as TubiToastItem except that it uses a MultiStyleLabel
+' instead of a regular label so that we can have inline styling for the url.
+' The height of the component is also allowed to be larger and the component
+' is shifted to the right a bit so that the "i" of the Tubi logo is not peeking out
+
 Function init()
-  tubilog("TubiToastItem.init")
   m.infoPaneContainer = m.top.findNode("infoPaneContainer")
   m.infoPaneMsgArea = m.top.findNode("infoPaneMsgArea")
   m.infoPaneBg = m.top.findNode("infoPaneBg")
@@ -9,32 +14,45 @@ Function init()
   m.top.observeFieldScoped("show", "onShow")
   m.top.opacity = 0
   m.infoPaneBg.uri = "pkg:/images/tab_short_component_alt_$$RES$$.9.png"
-
-  typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(m.infoPaneText, typographyConstants.ids.bodySmall)
-
   onThemeChange()
 End Function
 
 
-Function onThemeChange(msg = invalid)
-  if msg <> invalid
-    theme = msg.getData()
-  else
-    theme = getThemeFromGlobal()
-  end if
+Function onThemeChange()
+  theme = getThemeFromGlobal()
+  typographyConstants = getTypographyConstants()
+  setTypographyOfLabel(m.infoPaneText, typographyConstants.ids.bodySmall)
+  defaultStyleColor = ""
+  urlStyleColor = ""
 
   if theme <> invalid
     m.infoPaneBg.blendColor = theme.neutralSolidColor2
-    m.infoPaneText.color = theme.secondaryTextColor
+    defaultStyleColor = theme.secondaryTextColor
+    urlStyleColor = theme.highlightedTextColor
   end if
+
+  drawingStyles = {}
+  if defaultStyleColor <> ""
+    defaultStyle = getTypographyOfMultiStyleLabel(typographyConstants.ids.bodySmall, defaultStyleColor)
+  else
+    defaultStyle = getTypographyOfMultiStyleLabel(typographyConstants.ids.bodySmall)      
+  end if
+
+  if urlStyleColor <> ""
+    urlStyle = getTypographyOfMultiStyleLabel(typographyConstants.ids.bodySmall, urlStyleColor)
+  else
+    urlStyle = getTypographyOfMultiStyleLabel(typographyConstants.ids.bodySmall)      
+  end if
+
+  drawingStyles["defaultStyle"] = defaultStyle
+  drawingStyles["urlStyle"] = urlStyle
+
+  m.infoPaneText.drawingStyles = drawingStyles
 End Function
 
 
 Function onShow(_msg)
-  tubilog("TubiToast.onShow")
   imageWidth = 0
-  imageHeight = 0
   headerWidth = 0
   msgWidth = 0
   inputArgs = m.top.toastInfo
@@ -46,7 +64,6 @@ Function onShow(_msg)
   if inputArgs.imageUri <> invalid AND inputArgs.imageUri <> ""
     createLeftImage(inputArgs)
     imageWidth = m.leftImage.width + 24 ' 72 image width + 24 spacing between image and message
-    imageHeight = m.leftImage.height + 72 '36 upper margin + 36 bottom margin
   else if m.leftImage <> invalid
     m.infoPaneContainer.removeChild(m.leftImage)
     m.leftImage.uri = ""
@@ -105,7 +122,7 @@ Function onShow(_msg)
     end if
   end if
 
-  finalHorizTranslation = 642 - m.infoPaneBg.width
+  finalHorizTranslation = 654 - m.infoPaneBg.width
   m.top.finalHorizTranslation = finalHorizTranslation
 
   totalHeight =  m.infoPaneText.boundingRect().height  + 72 'top + bottom margins
@@ -113,15 +130,8 @@ Function onShow(_msg)
     totalHeight = totalHeight + m.header.boundingRect().height + 12 'header height + spacing
   end if
 
-  if  totalHeight > 177 OR imageHeight > 177
-    m.infoPaneBg.height = 177
-  else if totalHeight < 112 AND imageHeight < 112
-    m.infoPaneBg.height = 112
-  else if totalHeight > imageHeight
-    m.infoPaneBg.height = totalHeight
-  else
-    m.infoPaneBg.height = imageHeight
-  end if
+  ' The height calculation of the background is different from TubiToastItem
+  m.infoPaneBg.height = totalHeight
 
   centerY = m.infoPaneBg.height / 2
   m.infoPaneContainer.translation = [48, centerY]

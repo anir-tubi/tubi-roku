@@ -1838,6 +1838,14 @@ Function getTranslation_en_US()
     "gdpr_age_gate_error_dialog_exit_tubi": {
       "description": "GDPR age gate error dialog exit tubi button label.",
       "message": "Exit Tubi"
+    },
+    "updated_terms_toast_message": {
+      "description": "Message on the toast message informing the user of update ToS. Please keep style tags intact when translating.",
+      "message": "<defaultStyle>We have updated our Terms of Use. By continuing to use Tubi, you agree to these updated terms. You can view our terms at </defaultStyle><urlStyle>https://tubitv.com/static/terms</urlStyle>"
+    },
+    "updated_terms_toast_header": {
+      "description": "Header on the toast message informing the user of update ToS",
+      "message": "Important"
     }
   }
 End Function

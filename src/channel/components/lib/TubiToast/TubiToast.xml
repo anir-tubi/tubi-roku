@@ -23,7 +23,7 @@
               imageWidth: interger, width of the image if imageUri is provided.
               imageHeight: interger, height of the image if imageUri is provided.
             } -->
-      <field id="showToastMessage" type="assocarray" />
+      <field id="toastInfo" type="assocarray" />
       <field id="show" type="boolean" alwaysNotify="true" />
 
   </interface>

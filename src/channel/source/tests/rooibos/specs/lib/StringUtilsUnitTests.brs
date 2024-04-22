@@ -55,7 +55,7 @@ Function stringUtils_padStringLeft_test()
   m.AssertEqual(padStringLeft("12345", "0", 8), "00012345")
 End Function
 
-'@Only
+
 '@Test formatLengthAsHourAndMins unit tests
 Function stringUtils_formatLengthAsHourAndMins_test()
   m.AssertEqual(formatLengthAsHourAndMins(invalid), "")

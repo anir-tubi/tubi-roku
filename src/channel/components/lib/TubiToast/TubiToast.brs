@@ -12,13 +12,20 @@ End Function
 
 Function onShowToast()
   tubilog("TubiToast.onShowToast")
-  tubiToast = createObject("roSGNode","TubiToastItem")
+  toastInfo = m.top.toastInfo
+
+  if toastInfo <> invalid AND toastInfo.isStyled = true
+    toastItem = createObject("roSGNode", "StyledToastItem")
+  else
+    toastItem = createObject("roSGNode", "TubiToastItem")
+  end if
+
   deviceInfo = createObject("roDeviceInfo")
   uuid = deviceInfo.getRandomUUID()
-  tubiToast.id = "tubiToast-" + uuid
-  tubiToast.showToastMessage = m.top.showToastMessage
-  tubiToast.show = true
-  m.showQueue.unshift(tubiToast)
+  toastItem.id = "tubiToast-" + uuid
+  toastItem.toastInfo = toastInfo
+  toastItem.show = true
+  m.showQueue.unshift(toastItem)
 
   if m.timer.control <> "start"
     m.timer.control = "start"

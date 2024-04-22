@@ -117,3 +117,79 @@ End Function
 Function timeUtils_getCurrentYear_test()
   m.assertEqual(createObject("roDateTime").getYear(), getCurrentYear())
 End Function
+
+
+'@Test isNowWithinTimePeriod unit tests
+Function timeUtils_isNowWithinTimePeriod_test()
+  startTime = "2009-01-01 01:00:00.000"
+  endTime = "4000-01-01 01:00:00.000"
+  m.assertTrue(isNowWithinTimePeriod(startTime, endTime))
+
+  startTime = "4000-01-01 01:00:00.000"
+  endTime = "4001-01-01 01:00:00.000"
+  m.assertFalse(isNowWithinTimePeriod(startTime, endTime))
+
+  startTime = "2009-01-01 01:00:00.000"
+  endTime = "2010-01-01 01:00:00.000"
+  m.assertFalse(isNowWithinTimePeriod(startTime, endTime))
+
+  startTime = "2009-01-01 01:00:00.000"
+  endTime = "2007-01-01 01:00:00.000"
+  m.assertFalse(isNowWithinTimePeriod(startTime, endTime))
+
+  startTime = "4001-01-01 01:00:00.000"
+  endTime = "4000-01-01 01:00:00.000"
+  m.assertFalse(isNowWithinTimePeriod(startTime, endTime))
+End Function
+
+
+'@Test isIso8601String unit tests
+Function timeUtils_isIso8601String_test()
+  m.assertTrue(isIso8601String("2009-01-01 01:00:00.000"))
+  m.assertTrue(isIso8601String("2009-01-01 01:01:01.001"))
+  m.assertTrue(isIso8601String("2009-01-01 10:10:10.111"))
+  m.assertTrue(isIso8601String("1984-12-14 01:00:00"))
+  m.assertTrue(isIso8601String("2009-01-01T01:00:00.000"))
+  m.assertTrue(isIso8601String("2009-01-01T01:01:01.001"))
+  m.assertTrue(isIso8601String("2009-01-01T10:10:10.111"))
+  m.assertTrue(isIso8601String("1984-12-14T01:00:00"))
+  m.assertFalse(isIso8601String("1984-65-14 01:00:00.000"))
+  m.assertFalse(isIso8601String("1984-12-65 01:00:00.000"))
+  m.assertFalse(isIso8601String("19843-12-14 01:00:00"))
+  m.assertFalse(isIso8601String("YYYY-12-14 01:00:00"))
+  m.assertFalse(isIso8601String("1984-MM-14 01:00:00"))
+  m.assertFalse(isIso8601String("1984-12-DD 01:00:00.000"))
+  m.assertFalse(isIso8601String("YYYY-MM-DD 01:00:00"))
+  m.assertFalse(isIso8601String("2009-01-01THH:00:00.000"))
+  m.assertFalse(isIso8601String("2009-01-01 25:00:00.000"))
+  m.assertFalse(isIso8601String("2009-01-01 08:60:00.000"))
+  m.assertFalse(isIso8601String("2009-01-01 08:12:60.000"))
+  m.assertFalse(isIso8601String("2009-05-14 01:00:00:000"))
+  m.assertFalse(isIso8601String("2009-05-14 01:00:00;000"))
+  m.assertFalse(isIso8601String("2009-01-01 8:06:25.000"))
+  m.assertFalse(isIso8601String("2009-05-14 01:6:00.000"))
+  m.assertFalse(isIso8601String("2009-05-14 01:6:3.000"))
+  m.assertFalse(isIso8601String("2009-05-14 01:6:3.00"))
+  m.assertFalse(isIso8601String("200e-05-14 01:06:39.013"))
+  m.assertFalse(isIso8601String("2009-W5-14 01:06:39.009"))
+  m.assertFalse(isIso8601String("2009-05-1L 01:06:39.006"))
+  m.assertFalse(isIso8601String("2009-05-14 r1:06:32.156"))
+  m.assertFalse(isIso8601String("2009-05-14 01:P6:32.002"))
+  m.assertFalse(isIso8601String("2009-05-14 01:06:3T.002"))
+  m.assertFalse(isIso8601String("2009-05-14 01:06:39.00d"))
+  m.assertFalse(isIso8601String("20094-05-18 01:06:39.006"))
+  m.assertFalse(isIso8601String("2009-056-18 01:06:39.006"))
+  m.assertFalse(isIso8601String("2009-05-183 01:06:39.006"))
+  m.assertFalse(isIso8601String("2009-05-18 114:06:39.006"))
+  m.assertFalse(isIso8601String("2009-05-18 01:064:39.006"))
+  m.assertFalse(isIso8601String("2009-05-18 01:06:395.006"))
+  m.assertFalse(isIso8601String("2009-05-18 01:06:39.1234"))
+  m.assertFalse(isIso8601String("65-14 01:00:00000"))
+  m.assertFalse(isIso8601String("BRIGHTSCRIP"))
+  m.assertFalse(isIso8601String(""))
+  m.assertFalse(isIso8601String(" "))
+  m.assertFalse(isIso8601String("Hi there"))
+  m.assertFalse(isIso8601String(1234567))
+  m.assertFalse(isIso8601String("1234567"))
+  m.assertFalse(isIso8601String(invalid))
+End Function

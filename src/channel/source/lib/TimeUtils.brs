@@ -95,3 +95,153 @@ Function getMonthAndDayWithYear(datetime)
   shortVersionOfDateFormat = getShortVersionOfDateFormat(month, day, year)
   return shortVersionOfDateFormat
 End Function
+
+
+' Determines if the current time is within the passed in startTime and endTime, inclusive.
+' IMPORTANT: The ISO-8601 strings of the params must match the formats documented at
+' https://developer.roku.com/en-gb/docs/references/brightscript/interfaces/ifdatetime.md#fromiso8601stringdatestring-as-string-as-void
+'
+' @startTime: string, an ISO-8601 string representing the earliest time in the period, UTC time
+' @endTime: string, an ISO-8601 string representing the latest time in the period, UTC time
+Function isNowWithinTimePeriod(startTime, endTime)
+  if isIso8601String(startTime) = true AND isIso8601String(endTime) = true
+    dateTime = CreateObject("roDateTime")
+    nowSeconds = dateTime.AsSeconds()
+
+    dateTime.FromISO8601String(startTime)
+    startSeconds = dateTime.AsSeconds()
+
+    dateTime.FromISO8601String(endTime)
+    endSeconds = dateTime.AsSeconds()
+
+    if startSeconds <= nowSeconds AND endSeconds >= nowSeconds
+      return true
+    end if
+  end if
+
+  return false
+End Function
+
+
+' @strToCheck: string, hopefully an ISO-861 formatted string as recognized by Roku
+'                      ie. in the format "2009-01-01 01:00:00.000" or "2009-01-01T01:00:00.000"
+Function isIso8601String(strToCheck)
+  ' check we have a string
+  if isNonEmptyString(strToCheck) = false
+    return false
+  end if
+
+  ' check we have the date and time parts
+  dateTimeParts = strToCheck.split(" ")
+  if dateTimeParts.count() <> 2
+    dateTimeParts = strToCheck.split("T")
+    if dateTimeParts.count() <> 2
+      return false
+    end if
+  end if
+
+  ' check the date part is formatted correctly
+  date = dateTimeParts[0]
+  dateParts = date.split("-")
+  if dateParts.count() <> 3
+    return false
+  end if
+
+  year = dateParts[0]
+  month = dateParts[1]
+  day = dateParts[2]
+
+  if year.len() <> 4 OR month.len() <> 2 OR day.len() <> 2
+    return false
+  end if
+
+  ' check that only digits were used. toInt() returns 0 if the string contains letters
+  yearChars = year.split("")
+  monthChars = month.split("")
+  dayChars = day.split("")
+  allDateChars = []
+  allDateChars.append(yearChars)
+  allDateChars.append(monthChars)
+  allDateChars.append(dayChars)
+  for each char in allDateChars
+    asciiVal = Asc(char)
+    if asciiVal < 48 OR asciiVal > 57
+      return false
+    end if
+  end for
+
+  if month.toInt() < 1 OR month.toInt() > 12
+    return false
+  end if
+
+  if day.toInt() < 1 OR day.toInt() > 31
+    return false
+  end if
+
+  ' check the time part is formatted correctly
+  time = dateTimeParts[1]
+  timeParts = time.split(":")
+  if timeParts.count() <> 3
+    return false
+  end if
+
+  hours = timeParts[0]
+  minutes = timeParts[1]
+  seconds = timeParts[2]
+
+  hoursChars = hours.split("")
+  minutesChars = minutes.split("")
+  allTimeChars = []
+  allTimeChars.append(hoursChars)
+  allTimeChars.append(minutesChars)
+
+  if hours.len() <> 2 OR minutes.len() <> 2
+    return false
+  end if
+
+  if hours.toInt() < 0 OR hours.toInt() > 24
+    return false
+  end if
+
+  if minutes.toInt() < 0 OR minutes.toInt() > 59
+    return false
+  end if
+
+  ' check the seconds and milliseconds are formatted correctly
+  secsAndMillis = seconds.split(".")
+  if secsAndMillis.count() < 1 OR secsAndMillis.count() > 2
+    return false
+  end if
+
+  secs = secsAndMillis[0]
+  if secs.len() <> 2
+    return false
+  end if
+
+  if secs.toInt() < 0 OR secs.toInt() > 59
+    return false
+  end if
+
+  secondsChars = secs.split("")
+  allTimeChars.append(secondsChars)
+
+  if secsAndMillis.count() = 2
+    milliseconds = secsAndMillis[1]
+    if milliseconds.len() <> 3
+      return false
+    end if
+
+    millisecondsChars = milliseconds.split("")
+    allTimeChars.append(millisecondsChars)
+  end if
+
+  ' check that only digits were used. toInt() returns 0 if the string contains letters
+  for each char in allTimeChars
+    asciiVal = Asc(char)
+    if asciiVal < 48 OR asciiVal > 57
+      return false
+    end if
+  end for
+
+  return true
+End Function

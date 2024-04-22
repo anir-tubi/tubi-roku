@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!--
- - tubiToastItem
- -
- -->
-<component name="TubiToastItem" extends="Group" >
-  <script type="text/brightscript" uri="TubiToastItem.brs" />
+<component name="StyledToastItem" extends="Group" >
+  <script type="text/brightscript" uri="StyledToastItem.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
   <script type="text/brightscript" uri="../../lib/GlobalMixin.brs" />
   <script type="text/brightscript" uri="pkg:/components/lib/AnimationMixin.brs" />
@@ -34,7 +30,6 @@
   </interface>
 
   <children>
-
     <Poster
       id="infoPaneBg"
       translation="[0,0]"
@@ -51,13 +46,10 @@
         layoutDirection="vert"
         itemSpacings="[12]"
         vertAlignment="bottom">
-        <Label
+        <MultiStyleLabel
           id="infoPaneText"
-          maxLines="2"
-          wrap="true">
-          <Font
-            role="font"/>
-        </Label>
+          maxLines="8"
+          wrap="true" />
       </LayoutGroup>
     </LayoutGroup>
   </children>

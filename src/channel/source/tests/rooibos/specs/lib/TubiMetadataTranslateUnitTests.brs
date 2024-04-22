@@ -408,8 +408,7 @@ Function tubiMetadataTranslate_translateEPGPrograms_test()
   m.assertTrue(program.Categories.count() = 0)
   m.assertEqual(program.Rating, "")
   'm.assertTrue(program.descriptors.count() = 0) '- commenting this as epgProgram.json tags is empty. If you want to use this assert, add value to tags in epgProgram.json
-  m.assertEqual(program.ReleaseDate, "")
-
+  m.assertEqual(program.ReleaseDate, "2021")
 End Function
 
 

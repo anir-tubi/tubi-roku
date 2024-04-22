@@ -2019,6 +2019,41 @@ End Function
 Function startChannelFromAppLoad()
   startChannel()
 
+  ' this should only exist temporarily.
+  ' TODO: Remove this toast if block after the dates below
+  ' TODO: Additionally remove logic within TubiToast
+  '       that handles the isStyled field, as it only exists for this
+  '       one time toast message to show that the ToS have updated
+  ' TODO: Additionally remove the StyledToastComponent
+
+  toastStartTime = "2024-04-21 18:00:00.000" '11am PT
+  toastEndTime = "2024-05-02 18:00:00.000"
+  if isNewUser() = false AND isNowWithinTimePeriod(toastStartTime, toastEndTime) = true
+    toastInfo = {
+      message: getTranslation("updated_terms_toast_message")
+      headerText: getTranslation("updated_terms_toast_header")
+      selfDestructTimer: 15
+      isStyled: true
+    }
+
+    homepageInfo = {
+      pageType: "home_page"
+      pageValues: {
+        content_mode: "CONTENT_MODE_UNKNOWN"
+      }
+    }
+    dialogEventInfo = {
+      type: "dialog"
+      values: {
+        dialog_type: "TOAST"
+        pageOneof: m.Tracking.getAnalyticsPage(homepageInfo.pageType, homepageInfo.pageValues)
+        dialog_action: "SHOW"
+        dialog_sub_type: "updated_terms"
+      }
+    }
+    showToast(toastInfo, true, dialogEventInfo)
+  end if
+
   if m.top.isComponentLibFailedToLoad = true
     showPackedVersionLoadedModal(m.Tracking, m.trackingLoggingTask)
   end if
@@ -2238,10 +2273,11 @@ Function onIsHdmiStatusOkChange(msg)
 End Function
 
 
-' Screens can request to show a toast by assigning proper values to showToastMessage field.
+' Screens can request to show a toast by assigning proper values to
+' the toastInfo field.
 Function onShowToastMessage(msg)
-  toastMsg = msg.getData()
-  showToast(toastMsg)
+  toastInfo = msg.getData()
+  showToast(toastInfo)
 End Function
 
 
@@ -2252,7 +2288,7 @@ End Function
 '   max height = 176
 '   min height = 112
 '
-'@toastMsg: assocArray, it contains below
+'@toastInfo: assocArray, it contains below
   '{
     ' @message: string,  message to be displayed
     ' @headerText : string, title
@@ -2266,19 +2302,17 @@ End Function
   '}
 ' @shouldSendTracking: boolean, true if we are sending an event for toast message, otherwise false
 ' @dialogEventInfo: assocArray, contains the info necessary to send a dialog analytics event, has keys: "type" and "values"
-Function showToast(toastMsg, shouldSendTracking = false, dialogEventInfo = {})
-    m.tubiToast = m.top.findNode("tubiToast")
-    if isAA(toastMsg) = true
-      m.tubiToast.showToastMessage = toastMsg
-      m.tubiToast.show = true
+Function showToast(toastInfo, shouldSendTracking = false, dialogEventInfo = {})
+  m.tubiToast = m.top.findNode("tubiToast")
+  if isAA(toastInfo) = true
+    m.tubiToast.toastInfo = toastInfo
+    m.tubiToast.show = true
 
-      if shouldSendTracking = true AND dialogEventInfo.count() > 0
-        m.trackingLoggingTask.trackEvent = dialogEventInfo
-      end if
-
+    if shouldSendTracking = true AND dialogEventInfo.count() > 0
+      m.trackingLoggingTask.trackEvent = dialogEventInfo
     end if
-
-End Function'
+  end if
+End Function
 
 
 Function onLowMemoryEventInfoChange(msg)
