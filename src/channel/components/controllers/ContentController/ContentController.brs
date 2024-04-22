@@ -1988,7 +1988,11 @@ Function onCustomResume(msg)
   isDeeplinkRequest = (customResumeLaunchParams <> invalid AND (customResumeLaunchParams.contentId <> invalid OR customResumeLaunchParams.page <> invalid))
   
   if isDeeplinkRequest = false AND relaunchSeriesPlaybackInfo <> invalid AND isNonEmptyString(relaunchSeriesPlaybackInfo.seriesId) = true AND getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v1", true).enabled = true
-    processSeriesRelaunch()
+    ' When trying to instant resume and trying to play the video immediately with cached version of video node causes edge cases with timing and video playback not starting or audio playing in background.
+    ' We are running into lot of edge cases with timing and video playback.
+    ' Taking a similar approach as deeplinking where we are restarting the application.
+    ' There is a similar doc note added of why we are restarting during deeplinking.
+    restartApp()
   else
     '// If the resume app action is to restart the app or start the channel, then 1st see if the previously played linear video can be played (if one exists)
     if bRestartApp = true
