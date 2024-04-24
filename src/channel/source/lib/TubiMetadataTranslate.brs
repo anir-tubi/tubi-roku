@@ -2554,53 +2554,53 @@ Function tubiMetadataTranslate_getAllGenres()
   return [
     {
       id: "drama",
-      landscapeImage: "pkg:/images/drama_landscape.webp",
-      portraitImage: "pkg:/images/drama_portrait.webp"
+      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/drama_landscape.webp",
+      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/drama_portrait.webp"
     },
     {
       id: "comedy",
-      landscapeImage: "pkg:/images/comedy_landscape.webp",
-      portraitImage: "pkg:/images/comedy_portrait.webp"
+      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/comedy_landscape.webp",
+      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/comedy_portrait.webp"
     },
     {
       id: "action",
-      landscapeImage: "pkg:/images/action_landscape.webp",
-      portraitImage: "pkg:/images/action_portrait.webp"
+      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/action_landscape.webp",
+      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/action_portrait.webp"
     },
     {
       id: "crime_tv",
-      landscapeImage: "pkg:/images/crime_landscape.webp",
-      portraitImage: "pkg:/images/crime_portrait.webp"
+      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/crime_landscape.webp",
+      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/crime_portrait.webp"
     },
     {
       id: "horror",
-      landscapeImage: "pkg:/images/horror_landscape.webp",
-      portraitImage: "pkg:/images/horror_portrait.webp"
+      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/horror_landscape.webp",
+      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/horror_portrait.webp"
     },
     {
       id: "reality_tv",
-      landscapeImage: "pkg:/images/reality_tv_landscape.webp",
-      portraitImage: "pkg:/images/reality_tv_portrait.webp"
+      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/reality_tv_landscape.webp",
+      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/reality_tv_portrait.webp"
     },
     {
       id: "black_cinema",
-      landscapeImage: "pkg:/images/black_cinema_landscape.webp",
-      portraitImage: "pkg:/images/black_cinema_portrait.webp"
+      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/black_cinema_landscape.webp",
+      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/black_cinema_portrait.webp"
     },
     {
       id: "thrillers",
-      landscapeImage: "pkg:/images/thrillers_landscape.webp",
-      portraitImage: "pkg:/images/thrillers_portrait.webp"
+      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/thrillers_landscape.webp",
+      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/thrillers_portrait.webp"
     },
     {
       id: "documentary",
-      landscapeImage: "pkg:/images/documentary_landscape.webp",
-      portraitImage: "pkg:/images/documentary_portrait.webp"
+      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/documentary_landscape.webp",
+      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/documentary_portrait.webp"
     },
     {
       id: "family_movies",
-      landscapeImage: "pkg:/images/family_movies_landscape.webp",
-      portraitImage: "pkg:/images/family_movies_portrait.webp"
+      landscapeImage: "https://cdn.adrise.tv/image/roku_support_images/genres/family_movies_landscape.webp",
+      portraitImage: "https://cdn.adrise.tv/image/roku_support_images/genres/family_movies_portrait.webp"
     }
   ]
 End Function
