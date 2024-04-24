@@ -196,7 +196,8 @@ describe('Kids Events', function () {
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
 		const catgories = await kidsHome.selectSideNavTab(tabs.categories, 4);
-		const container = await catgories.selectFocusedCategory();
+		const container = await catgories.selectCategoryByName('anime');
+		await utils.sleep(300);
 		const detailsPage = await container.selectFocusedTitle();
 		await detailsPage.selectPlay();
 	});

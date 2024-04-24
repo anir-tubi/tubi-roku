@@ -58,7 +58,8 @@ describe('Page Load Analytics', function () {
 	});
 	it('When channels page displayed C76715 and C76716 and C76717 and C3859 and UI: C44199 @analytics,@analyticsPageLoad', async () => {
 		const homePage = HomePage();
-		const channels = await homePage.selectSideNavTab(tabs.channels);
+		const categories = await homePage.selectSideNavTab(tabs.categories);
+		const channels = await categories.selectCategoryByName('Networks');
 		const firstSlugCategory = await channels.getNameOfFirstChannel();
 		const container = await channels.selectChannelByName('cj_enm');
 		const slugCategory = await container.getCategoryName();

@@ -7,19 +7,21 @@ const Container = () => {
 	const elements = {
 		grid: async () =>
 			await testUtils.getNodeForElement(CONTAINER_PAGE_NODES.GRID),
+		channelsVideoGrid: async () =>
+			await testUtils.getNodeForElement('channelsVideoGrid'),
 		titleDescription: async () =>
 			await testUtils.getNodeForElement(CONTAINER_PAGE_NODES.TITLE_DESCRIPTION),
 		titleName: async () =>
 			await testUtils.getNodeForElement(
 				CONTAINER_PAGE_NODES.TITLE_NAME_IN_CONTAINER
 			),
-			categoryNameInCategoryDetailsPage: async () =>
+		categoryNameInCategoryDetailsPage: async () =>
 			await testUtils.getNodeForElement('categoryNameInCategoryDetailsPage'),
 	};
 
 	async function pageDidLoad() {
 		await testUtils.retryWithTimeOut(async () => {
-			const grid = await elements.grid();
+			const grid = await elements.channelsVideoGrid();
 			expect(grid.visible).to.equal(true);
 		});
 	}

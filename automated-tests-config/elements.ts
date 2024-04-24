@@ -952,7 +952,7 @@ const elements = typeCheckElements({
 
   /** category on category page */
   channelCategoryGrid: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#PageGroup.#ChannelCategoryGrid',
   },
 
   /** category on category page */
@@ -969,7 +969,7 @@ const elements = typeCheckElements({
   },
 
   firstChannelNameInChannelPage: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#ChannelCategoryGrid.0.#Title'
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#PageGroup.#ChannelCategoryGrid.0.#Titles'
   },
 
   /** recommended tile on Categories page */
@@ -1328,6 +1328,14 @@ const elements = typeCheckElements({
   },
 
   /** categories video grid */
+  categoriesVideoGrid: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#PageGroup.#ChannelCategoryGrid',
+  },
+
+  channelsVideoGrid: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid',
+  },
+  
   categoriesVideoGridPoster: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.#poster',
   },
