@@ -9,15 +9,16 @@ describe('Multiple Audio', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/403409
   it('C403409 - Video Player - New Audio / subtitle icon @multiple_audio', async () => {
     await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-    await ecp.sendText('fifth plane');
+    await ecp.sendText('lego masters');
 
     // Call function to navigate right to search results grid
+    // Call function to navigate right to search results grid
+    await testUtils.waitForElementToFullyShowOnScreen('searchResultsGridPoster');
     await shared.navigateRightToGrid();
-
-    await testUtils.retryWithTimeOut(async () => {
-      const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-      expect(searchResultsText.text).to.contain('Fifth Plane');
-    });
+    await testUtils.waitForElementToFullyShowOnScreen('searchResultsText');
+    const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+    expect(searchResultsText.text).to.contain('LEGO Masters');
+    
 
     // Select item and Play button
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -35,15 +36,14 @@ describe('Multiple Audio', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/403413
   it('C403413 - Video Player - New Audio / subtitle menu selection @multiple_audio, @smoke', async () => {
     await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-    await ecp.sendText('fifth plane');
+    await ecp.sendText('lego masters');
 
     // Call function to navigate right to search results grid
+    await testUtils.waitForElementToFullyShowOnScreen('searchResultsGridPoster');
     await shared.navigateRightToGrid();
-
-    await testUtils.retryWithTimeOut(async () => {
-      const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-      expect(searchResultsText.text).to.contain('Fifth Plane');
-    });
+    await testUtils.waitForElementToFullyShowOnScreen('searchResultsText');
+    const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+    expect(searchResultsText.text).to.contain('LEGO Masters');
 
     // Select item and Play button
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -81,16 +81,15 @@ describe('Multiple Audio', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/424863
   it('C424863 - Registered User: AD selection persists between sessions on same device (logout / login). @multiple_audio', async () => {
     await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-    await ecp.sendText('fifth plane');
+    await ecp.sendText('lego masters');
 
     // Call function to navigate right to search results grid
-    await testUtils.waitForElementToFullyShowOnScreen('searchResultGrid');
+    await testUtils.waitForElementToFullyShowOnScreen('searchResultsGridPoster');
     await shared.navigateRightToGrid();
-
-    await testUtils.retryWithTimeOut(async () => {
-      const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-      expect(searchResultsText.text).to.contain('Fifth Plane');
-    });
+    await testUtils.waitForElementToFullyShowOnScreen('searchResultsText');
+    const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+    expect(searchResultsText.text).to.contain('LEGO Masters');
+  
 
     // Select item and Play button
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -168,16 +167,16 @@ describe('Multiple Audio', function () {
   it('C426763 - Video Player: Ensure that user is able view and toggle available audio and subtitle language options for each title @multiple_audio', async () => {
     await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
     await testUtils.waitForElementToFullyShowOnScreen('searchKeyPad');
-    await ecp.sendText('fifth plane');
+    await ecp.sendText('lego masters');
 
     // Call function to navigate right to search results grid
-    await testUtils.waitForElementToFullyShowOnScreen('searchResultGrid');
+    // Call function to navigate right to search results grid
+    await testUtils.waitForElementToFullyShowOnScreen('searchResultsGridPoster');
     await shared.navigateRightToGrid();
-
-    await testUtils.retryWithTimeOut(async () => {
-      const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-      expect(searchResultsText.text).to.contain('Fifth Plane');
-    });
+    await testUtils.waitForElementToFullyShowOnScreen('searchResultsText');
+    const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
+    expect(searchResultsText.text).to.contain('LEGO Masters');
+    
 
     // Select item and Play button
     await ecp.sendKeypress(ecp.Key.Ok);

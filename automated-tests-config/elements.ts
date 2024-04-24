@@ -1483,6 +1483,11 @@ const elements = typeCheckElements({
   /** The grid containing search results on SearchScreen */
   searchResultGrid: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#ResultArea.#gridContainer.#resultsContainer.#ResultGrid'
+  },
+
+  /** Search Results Grid content, first result */
+  searchResultsGridPoster :{
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#ResultArea.#gridContainer.#resultsContainer.#ResultGrid.0.#poster',
   }
 });
 
