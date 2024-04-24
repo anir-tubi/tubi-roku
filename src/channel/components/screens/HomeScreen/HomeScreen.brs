@@ -91,7 +91,7 @@ Function init()
   m.progressBarOnInfoPanelExp = (getExperimentResource("roku_progress_bar_on_infopanel", "roku_progress_bar_on_infopanel_v1", false).enabled = true)
   m.isExpEvtSendForProgressbarExp = false
 
-  m.liveProgramEnabled = getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v1", false).enabled = true
+  m.liveProgramEnabled = getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2", false).enabled = true
 
 End Function
 

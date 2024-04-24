@@ -955,7 +955,7 @@ Function onModeChange()
 
     m.offset.itemSpacings = [15]
   else if m.top.mode = m.constants.ui.infoPanelModes.linearProgramHomescreen
-    ' This infopanel mode is for linear programs in response with V4 api (treament group of roku_sports_onnow_rows_v1)
+    ' This infopanel mode is for linear programs in response with V4 api (treament group of roku_sports_onnow_rows_v2)
     m.infoPanelGroup.appendChild(m.offset)
     m.offset.appendChild(m.title)
 
@@ -974,7 +974,7 @@ Function onModeChange()
     m.offset.appendChild(m.descriptionGroup)
     m.offset.itemSpacings = [15, 15]
   else if m.top.mode = m.constants.ui.infoPanelModes.programHomescreen
-    ' This infopanel mode is for linear channel/program in response with V3 api (control group of roku_sports_onnow_rows_v1)
+    ' This infopanel mode is for linear channel/program in response with V3 api (control group of roku_sports_onnow_rows_v2)
     m.infoPanelGroup.appendChild(m.offset)
     m.offset.appendChild(m.topHeaderImage)
     m.topHeaderImage.height = 72

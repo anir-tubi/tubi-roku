@@ -87,7 +87,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_sports_onnow_rows: {
-        roku_sports_onnow_rows_v1: {"enabled": false}
+        roku_sports_onnow_rows_v2: {"enabled": false}
       }
 
       roku_relaunch_series: {

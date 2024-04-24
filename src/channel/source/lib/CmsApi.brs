@@ -198,7 +198,7 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   headers = options.headers
   headers["Accept-Version"] = "6.0.0"
   url = m.constants.urls.tensor.cdn.homescreen
-  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v1").enabled = true
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2").enabled = true
     url = m.constants.urls.tensor.cdn.homescreenV4
   end if
   params["include_empty_history"] = true
@@ -268,7 +268,7 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   params = options.params
   url = m.constants.urls.tensor.cdn.container + "/" + categoryId
 
-  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v1").enabled = true
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2").enabled = true
     url = m.constants.urls.tensor.cdn.containerV4 + "/" + categoryId
   end if
 

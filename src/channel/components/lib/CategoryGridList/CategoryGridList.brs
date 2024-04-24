@@ -37,7 +37,7 @@ Function init()
 
   m.RowList.drawFocusFeedbackOnTop = true
 
-  m.liveProgramEnabled = (getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v1", false).enabled = true)
+  m.liveProgramEnabled = (getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2", false).enabled = true)
 
   ' This variable is used to keep track whether exposure event has been sent. This variable will help in avoiding to execute the getExperimentResource function on each item focused.
   m.firstTimeLinearProgramEnabled = false
@@ -288,7 +288,7 @@ Function setRowHeights()
       rowItemSize.push([1693, posterHeight])
       rowHeight = posterHeight
     else if gridItemType = gridItemTypes.portraitGenre
-      ' Setting numrows to 3 if we have portrait genre because of bug in arraygrid whenever any row is of a larger height than the first row it 
+      ' Setting numrows to 3 if we have portrait genre because of bug in arraygrid whenever any row is of a larger height than the first row it
       ' causes issues with peeking. Setting numrows to 3 increase the clipping rect which works as a work around for our bug.
       numRows = 3
       genrePortraitItemSize = m.constants.ui.imageSizes.genrePortrait
@@ -425,7 +425,7 @@ Function onRowItemFocused()
 
   if m.firstTimeLinearProgramEnabled = false
     m.firstTimeLinearProgramEnabled = true
-    getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v1", true)
+    getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2", true)
   end if
 
 End Function
