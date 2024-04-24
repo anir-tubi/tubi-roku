@@ -86,13 +86,16 @@ Function TubiExperiments(constants) as Object
         roku_progress_bar_on_infopanel_v1: {"enabled": false}
       }
 
-
       roku_sports_onnow_rows: {
         roku_sports_onnow_rows_v1: {"enabled": false}
       }
 
       roku_relaunch_series: {
         roku_relaunch_series_v1: {"enabled": false}
+      }
+
+      roku_genres_homegrid: {
+        roku_genres_homegrid_v1 : {"home_grid_type": "none"} 'valid values are : "none", "landscape", "portrait".
       }
 
     }

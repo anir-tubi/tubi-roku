@@ -282,10 +282,23 @@ Function setRowHeights()
     rowHeightAdjustment = 57 '//The height of the row container heading and its vertical spacing
     gridItemType = category.gridItemType
     gridItemTypes = m.constants.ui.gridItemTypes
+
     if gridItemType = gridItemTypes.historySignedOutUser
       posterHeight = posterSize[1]
       rowItemSize.push([1693, posterHeight])
       rowHeight = posterHeight
+    else if gridItemType = gridItemTypes.portraitGenre
+      ' Setting numrows to 3 if we have portrait genre because of bug in arraygrid whenever any row is of a larger height than the first row it 
+      ' causes issues with peeking. Setting numrows to 3 increase the clipping rect which works as a work around for our bug.
+      numRows = 3
+      genrePortraitItemSize = m.constants.ui.imageSizes.genrePortrait
+      rowItemSize.push([genrePortraitItemSize[0], genrePortraitItemSize[1]])
+      rowHeight = genrePortraitItemSize[1]
+    else if gridItemType = gridItemTypes.landscapeGenre
+      numRows = 3
+      genreLandscapeItemSize = m.constants.ui.imageSizes.largeLandscape
+      rowItemSize.push([genreLandscapeItemSize[0], genreLandscapeItemSize[1]])
+      rowHeight = genreLandscapeItemSize[1]
     else if gridItemType = gridItemTypes.portrait
       posterWidth = posterSize[0]
       posterHeight = posterSize[1]

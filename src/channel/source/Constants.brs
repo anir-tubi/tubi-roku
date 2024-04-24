@@ -707,6 +707,8 @@ Function getConstants()
     constants.uapiContentTypes.channel = "channel"
     constants.uapiContentTypes.sportsEvent = "sports_event"
     constants.uapiContentTypes.container = "container"
+    ' TODO: Remove this after roku_genres_homegrid is graduated.
+    constants.uapiContentTypes.genre = "genre"
 
   constants.serverValues = {}
     constants.serverValues.tensorVideoRenditions = {}
@@ -1109,6 +1111,8 @@ Function getConstants()
       constants.ui.contentTypes.historySignedOutUser = "continue_watching_signed_out_user"
       constants.ui.contentTypes.emptyContainer = "emptyContainer"
       constants.ui.contentTypes.epg = "epg"
+      ' TODO: Remove this after roku_genres_homegrid is graduated.
+      constants.ui.contentTypes.genre = "genre"
       '// REMOVE BELOW CODE ONCE FIFA WORLD CUP IS DONE
       constants.ui.contentTypes.sportsEvent = "sports_event"
       constants.ui.contentTypes.navigate = "navigate"
@@ -1230,6 +1234,9 @@ Function getConstants()
 
     constants.ui.imageSizes = {}
 
+      'Sizes of portrait thumbnail that is used in genres row in homescreen.
+      constants.ui.imageSizes.genrePortrait = [374, 736]
+
       'Sizes of poster thumbnails that need to sent to the backend so Tupian, the dynamic image sizer tool, can provide the correct sized images
       constants.ui.imageSizes.poster = [186, 267]
 
@@ -1349,6 +1356,8 @@ Function getConstants()
       constants.ui.gridItemTypes.linear = "linear"
       constants.ui.gridItemTypes.historySignedOutUser = "continue_watching_signed_out_user"
       constants.ui.gridItemTypes.emptyContainer = "emptyContainer"
+      constants.ui.gridItemTypes.portraitGenre = "portrait_genre"
+      constants.ui.gridItemTypes.landscapeGenre = "landscape_genre"
 
     constants.ui.uris = {}
       'info panel images not populated from content backend
@@ -1383,7 +1392,6 @@ Function getConstants()
     constants.consentKeys.marketing = "marketing"
     constants.consentKeys.continueWatching = "data_sharing"
     constants.consentKeys.functional = "functional"
-
 
 'THEME/COLOR START///////////////////////
 '//::TODO::colors - the following constants should be moved to themes. The app should not call these constants

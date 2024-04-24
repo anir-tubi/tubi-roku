@@ -1010,7 +1010,7 @@ Function tubiTracking_getOneOfs()
       content_tile: {} ' ContentTile message - optional
     }
 
-    ' sub_category_component: {   'Does not currently exist in roku UI
+    ' sub_category_component: { 'Does not currently exist in roku UI
     '   category_slug: ""
     '   sub_category_slug: ""
     '   category_row: 1   ' 1 based index

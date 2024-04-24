@@ -75,6 +75,8 @@ Function init()
   m.sponsorMaskOffsetDiff = 119 'the diff in the amount the content area mask is offset in the up direction for sponsored rows. This is the difference of the heights of the sponsored and normal row titles
   m.linearSlideAmt = 0 'the amount the grid slides up to fit the linear content item
   m.linearMaskOffsetDiff = -199 'the diff in the amount the content area mask is offset in the up direction for the linear news container
+  m.genreSlideAmount = 400
+  m.genresMaskOffsetDiff = 119
 
   m.originalContentAreaTranslation = m.ContentArea.translation
   m.linearContentAreaTranslation = [m.ContentArea.translation[0], m.ContentArea.translation[1] - m.linearSlideAmt]
@@ -397,12 +399,15 @@ Function onCurrFocusRowChange()
     categoryLosingFocus = m.CategoryGridList.content.getChild(rowLosingFocus) 'TubiCategoryNode
   end if
 
+  gridItemTypes = m.constants.ui.gridItemTypes
   if categoryEnteringFocus <> invalid
     sSponsorBackgroundURL = ""
 
-    if categoryEnteringFocus.gridItemType = m.constants.ui.gridItemTypes.linear
+    if categoryEnteringFocus.gridItemType = gridItemTypes.linear
       ' update contentArea translation, only when linear gain focus
       expandContentAreaForLinear(rowPercent)
+    else if categoryEnteringFocus.gridItemType = gridItemTypes.landscapeGenre OR categoryEnteringFocus.gridItemType = gridItemTypes.portraitGenre
+      expandContentAreaForGenre(rowPercent)
     else
       ' In the case of fast scrolling many rows of the grid, across the large vitg or linear rows, the category grid list may
       ' not finish it's translation animation as the focus leaves the vitg or linear rows. We correct for that as the focus scrolls
@@ -474,6 +479,14 @@ End Function
 Function expandContentAreaForLinear(rowPercent)
   m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.linearSlideAmt * rowPercent)]
   m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.linearMaskOffsetDiff * rowPercent)]
+End Function
+
+
+' @rowPercent: float, the percentage that the Genres row is focused
+Function expandContentAreaForGenre(rowPercent)
+  m.infoPanel.opacity = 1 - rowPercent
+  m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.genreSlideAmount * rowPercent)]
+  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.genresMaskOffsetDiff * rowPercent)]
 End Function
 
 

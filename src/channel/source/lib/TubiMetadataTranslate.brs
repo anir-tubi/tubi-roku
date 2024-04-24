@@ -34,6 +34,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     buildCategoryChildrenInfo: tubiMetadataTranslate_buildCategoryChildrenInfo
     buildEmptyMyStuffCategoryAA: tubiMetadataTranslate_buildEmptyMyStuffCategoryAA
     buildContinueWatchingSignedOutUserCategoryAA: tubiMetadataTranslate_buildContinueWatchingSignedOutUserCategoryAA
+    buildGenreCategory: tubiMetadataTranslate_buildGenreCategory
     generateChannelPosterUrl: tubiMetadataTranslate_generateChannelPosterUrl
     fetchedAtTimestamp: tubiMetadataTranslate_fetchedAtTimestamp
     getGridItemType: tubiMetadataTranslate_getGridItemType
@@ -41,6 +42,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     composeVideoResources: tubiMetadataTranslate_composeVideoResources
     getRoundedCornersURL: tubiMetadataTranslate_getRoundedCornersURL
     getBackgroundImages: tubiMetadataTranslate_getBackgroundImages
+    getAllGenres: tubiMetadataTranslate_getAllGenres
   }
 End Function
 
@@ -168,6 +170,9 @@ Function tubiMetadataTranslate_translateBackendTypeToClientSideType(sBackendType
     sReturn = m.contentTypes.sportsEvent
   else if sBackendType = "n"
     sReturn = m.contentTypes.navigate
+  ' TODO: Remove this after roku_genres_homegrid is graduated.
+  else if sBackendType = "genre"
+    sReturn = m.contentTypes.genre
   end if
 
   return sReturn
@@ -824,8 +829,10 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
     continueWatchingIndex = 4
     queueIndex = 5
 
+    genreInHomeGridType = m.experiments.getExperimentResource("roku_genres_homegrid", "roku_genres_homegrid_v1").home_grid_type
+    
     'set up AAs for all categories
-    for i=0 to containers.count()-1
+    for i = 0 to containers.count() - 1
       container = containers[i]
       if container.id = m.constants.ui.categoryIds.history
         continueWatchingIndex = i
@@ -844,6 +851,12 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
 
       if categoryAA <> invalid
         homescreenAA.children.push(categoryAA)
+      end if
+
+      'Insert a Genres row at 15th position for roku_genres_homegrid_v1 experiement.
+      if i = 14 AND genreInHomeGridType <> "none"
+        genreRowAA = m.buildGenreCategory(genreInHomeGridType)
+        homescreenAA.children.push(genreRowAA)
       end if
     end for
 
@@ -1549,6 +1562,63 @@ Function tubiMetadataTranslate_translate(contentToTranslate, isSignedInUser = fa
   m.setTotalCount(translated)
   tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
   return translated
+End Function
+
+
+' This function is used to insert a populare genres row in a home screen response. All the posters and titles are hard coded for now.
+' @returns: assocArray, an AA with keys:
+'                       "children", as an array of AAs containing content metadata
+'                       "json", a JSON formatted string of contents belonging to the container/category
+'                       "id", id of the container/category
+'                       "title", title of the Container/Category
+'                       ...
+' @gridType: String, type of genre grid type valid values are : "landscape", "portrait". This value is controlled from the experiment.
+Function tubiMetadataTranslate_buildGenreCategory(gridType)
+  genres = m.getAllGenres()
+
+  useLandscapeImage = false
+  gridItemType = m.constants.ui.gridItemTypes.portraitGenre
+  if gridType = "landscape"
+    gridItemType = m.constants.ui.gridItemTypes.landscapeGenre
+    useLandscapeImage = true
+  end if
+
+  jsonAA = {}
+  contentType = m.constants.uapiContentTypes.genre
+  genreNodes = []
+
+  for each item in genres
+    genre = {
+      id: item.id
+      type: contentType
+      slug: item.id
+      gridItemType: gridItemType
+      subtype: "ContentNode"
+    }
+    
+    if useLandscapeImage = true
+      genre.hdgridposterurl = item.landscapeImage
+    else
+      genre.hdgridposterurl = item.portraitImage
+    end if
+
+    jsonAA[item.id] = genre
+    genreNodes.push(genre)
+  end for
+
+  genreRowMetadata = {
+    id: "genres_for_you"
+    slug: "genres_for_you"
+    title: "Popular Genres" ' TODO: Change it to use translation once we fix the issue with other row titles getting translated.
+    validUntil: -1
+    state: "full"
+    gridItemType: gridItemType
+    children: genreNodes
+    totalCount: genres.count()
+    json: FormatJSON(jsonAA)
+  }
+
+  return genreRowMetadata
 End Function
 
 
@@ -2473,4 +2543,63 @@ Function tubiMetadataTranslate_setDescriptorCodeAndDescription(content, descript
 
   end if
 
+End Function
+
+
+' Returns the list of genres and its metadata.
+' Each genre item has 2 images landscape and portrait.
+' TODO: Remove this after roku_genres_homegrid is graduated.
+Function tubiMetadataTranslate_getAllGenres()
+  return [
+    {
+      id: "drama",
+      landscapeImage: "pkg:/images/drama_landscape.webp",
+      portraitImage: "pkg:/images/drama_portrait.webp"
+    },
+    {
+      id: "comedy",
+      landscapeImage: "pkg:/images/comedy_landscape.webp",
+      portraitImage: "pkg:/images/comedy_portrait.webp"
+    },
+    {
+      id: "action",
+      landscapeImage: "pkg:/images/action_landscape.webp",
+      portraitImage: "pkg:/images/action_portrait.webp"
+    },
+    {
+      id: "crime_tv",
+      landscapeImage: "pkg:/images/crime_landscape.webp",
+      portraitImage: "pkg:/images/crime_portrait.webp"
+    },
+    {
+      id: "horror",
+      landscapeImage: "pkg:/images/horror_landscape.webp",
+      portraitImage: "pkg:/images/horror_portrait.webp"
+    },
+    {
+      id: "reality_tv",
+      landscapeImage: "pkg:/images/reality_tv_landscape.webp",
+      portraitImage: "pkg:/images/reality_tv_portrait.webp"
+    },
+    {
+      id: "black_cinema",
+      landscapeImage: "pkg:/images/black_cinema_landscape.webp",
+      portraitImage: "pkg:/images/black_cinema_portrait.webp"
+    },
+    {
+      id: "thrillers",
+      landscapeImage: "pkg:/images/thrillers_landscape.webp",
+      portraitImage: "pkg:/images/thrillers_portrait.webp"
+    },
+    {
+      id: "documentary",
+      landscapeImage: "pkg:/images/documentary_landscape.webp",
+      portraitImage: "pkg:/images/documentary_portrait.webp"
+    },
+    {
+      id: "family_movies",
+      landscapeImage: "pkg:/images/family_movies_landscape.webp",
+      portraitImage: "pkg:/images/family_movies_portrait.webp"
+    }
+  ]
 End Function
