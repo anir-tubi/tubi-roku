@@ -92,7 +92,8 @@ Function init()
   m.isExpEvtSendForProgressbarExp = false
 
   m.liveProgramEnabled = getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2", false).enabled = true
-
+  ' TODO: Remove after genre grid experiement graduated.
+  m.genreInHomeGridType = getExperimentResource("roku_genres_homegrid", "roku_genres_homegrid_v1", false).home_grid_type
 End Function
 
 
@@ -251,6 +252,9 @@ Function onScreenFocusChange()
 
     m.top.shouldFocusWhenPushed = true
   end if
+
+  ' Firing the exposure event.
+  getExperimentResource("roku_genres_homegrid", "roku_genres_homegrid_v1")
 End Function
 
 
@@ -445,6 +449,11 @@ End Function
 
 ' @rowPercent: float, the percentage that the row is focused
 Function contractContentAreaToOriginal(rowPercent)
+  ' TODO: Remove after roku_genres_homegrid is graduated.
+  if m.genreInHomeGridType = "landscape"
+    m.categoryGridList.expandContentArea = false
+  end if
+
   if m.ContentArea.translation[1] <> m.originalContentAreaTranslation[1]
     'gradually reset back to original position
     if rowPercent < .95
@@ -485,8 +494,16 @@ End Function
 ' @rowPercent: float, the percentage that the Genres row is focused
 Function expandContentAreaForGenre(rowPercent)
   m.infoPanel.opacity = 1 - rowPercent
-  m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.genreSlideAmount * rowPercent)]
-  m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.genresMaskOffsetDiff * rowPercent)]
+  ' When the genre grid type is landscape avoid using scroll list.
+  ' We cannot use same approach for both due to the portrait mode. Roku has a bug where if the row size is more than half of the screen it does not fully show the row we have to scroll the whole
+  ' rowlist upwards.
+  if m.genreInHomeGridType = "portrait"
+    m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] - (m.genreSlideAmount * rowPercent)]
+    m.ContentArea.maskOffset = [m.ContentArea.maskOffset[0], m.originalContentAreaMaskOffset[1] + (m.genresMaskOffsetDiff * rowPercent)]
+  else
+    m.categoryGridList.expandContentArea = true
+    m.ContentArea.translation = [m.originalContentAreaTranslation[0], m.originalContentAreaTranslation[1] + 69]
+  end if
 End Function
 
 

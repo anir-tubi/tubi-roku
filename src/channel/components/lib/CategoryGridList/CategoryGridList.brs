@@ -10,6 +10,7 @@ Function init()
   m.top.observeField("repopulateContent", "onRepopulateContent")
   m.top.observeField("animateToCategory", "onAnimateToCategory")
   m.top.observeFieldScoped("removeFocusFromRowList", "onRemoveFocusFromRowList")
+  m.top.observeFieldScoped("expandContentArea", "onExpandContentArea")
   m.RowList = m.top.findNode("RowList")
   m.RowList.observeField("rowItemFocused", "onRowItemFocused")
   m.RowList.observeField("rowItemSelected", "onRowItemSelected")
@@ -639,4 +640,26 @@ Function onLinearProgramRefreshTimer()
     m.global.refreshLinearChannels = not m.global.refreshLinearChannels
   end if
 
+End Function
+
+
+Function onExpandContentArea(msg)
+  shouldExpandContentArea = msg.getData()
+
+  if shouldExpandContentArea = true
+    ' Setting negative margin so that upper row is visible.
+    ' The genre is placed in 15 row.
+    previousRowHeight = m.RowList.rowHeights[13]
+    translationY = -(previousRowHeight + m.RowList.rowSpacings[0])
+  else
+    ' Resetting the values back to normal.
+    translationY = 0
+  end if
+  
+  m.RowList.itemClippingRect = {
+    height: 1080
+    width: 1920
+    x: -20
+    y: translationY
+  }
 End Function

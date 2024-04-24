@@ -854,7 +854,8 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
       end if
 
       'Insert a Genres row at 15th position for roku_genres_homegrid_v1 experiement.
-      if i = 14 AND genreInHomeGridType <> "none"
+      ' Accounting for index starting from zero.
+      if i = 13 AND genreInHomeGridType <> "none"
         genreRowAA = m.buildGenreCategory(genreInHomeGridType)
         homescreenAA.children.push(genreRowAA)
       end if

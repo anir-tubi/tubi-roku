@@ -91,6 +91,11 @@
       <!-- This field is used to force remove focus from the rowlist. -->
       <field id="removeFocusFromRowList" type="boolean" />
 
+      <!-- This field will hold boolean true or false, will be set to true if we need to expand content area, false otherwise 
+        -  TODO: Remove this field after roku_genres_homegrid is graduated.
+      -->
+      <field id="expandContentArea" type="boolean" />
+
 
     <!-- OUTPUT -->
       <field id="itemSelected" type="node"/>
