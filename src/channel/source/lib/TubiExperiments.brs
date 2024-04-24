@@ -53,7 +53,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_trending_search_below: {
-        roku_trending_search_below_v1: {"enabled": false}
+        roku_trending_search_below_v1: {"enabled": true}
       }
 
       roku_async_stop: {
