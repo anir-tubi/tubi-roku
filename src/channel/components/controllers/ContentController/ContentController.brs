@@ -2031,7 +2031,7 @@ Function startChannelFromAppLoad()
   ' TODO: Additionally remove the StyledToastComponent
 
   toastStartTime = "2024-04-21 18:00:00.000" '11am PT
-  toastEndTime = "2024-05-02 18:00:00.000"
+  toastEndTime = "2024-04-27 06:59:59.000" '11:59pm PT the day before
   if isNewUser() = false AND isNowWithinTimePeriod(toastStartTime, toastEndTime) = true
     toastInfo = {
       message: getTranslation("updated_terms_toast_message")
