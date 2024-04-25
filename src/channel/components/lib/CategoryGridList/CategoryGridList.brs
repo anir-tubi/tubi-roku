@@ -421,6 +421,11 @@ Function onRowItemFocused()
       if category <> invalid then
         category.focusIndex = m.RowList.rowItemFocused[1]
       end if
+      if m.RowList.rowItemFocused[0] = 13
+        ' Firing the exposure event.
+        ' Since we are displaying genre row at 15 and index starts at zero firing the event when 13 row is focused.
+        getExperimentResource("roku_genres_homegrid", "roku_genres_homegrid_v1", true)
+      end if
     end if
   end if
 
@@ -428,7 +433,6 @@ Function onRowItemFocused()
     m.firstTimeLinearProgramEnabled = true
     getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2", true)
   end if
-
 End Function
 
 

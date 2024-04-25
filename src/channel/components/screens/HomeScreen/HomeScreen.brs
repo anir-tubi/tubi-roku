@@ -252,9 +252,6 @@ Function onScreenFocusChange()
 
     m.top.shouldFocusWhenPushed = true
   end if
-
-  ' Firing the exposure event.
-  getExperimentResource("roku_genres_homegrid", "roku_genres_homegrid_v1")
 End Function
 
 
