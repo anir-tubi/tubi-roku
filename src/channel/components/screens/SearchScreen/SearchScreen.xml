@@ -119,7 +119,7 @@
       <!--::NOTE:: Unfortunately this group cannot be located within a layoutGroup because when it is not in focus,
       the resultGrid is slightly too low and too far to the right. It has to do something to do with the custom focusBitmapUri.  -->
       <Group
-        translation="[594, 444]"
+        translation="[594, 474]"
         id="ResultArea">
 
         <Group
