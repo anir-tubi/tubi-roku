@@ -371,7 +371,7 @@ Function onLiveStreamManifestResponse(response)
     videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
 
     content = invalid
-    if videoPlayer.content <> invalid
+    if videoPlayer <> invalid AND videoPlayer.content <> invalid then
       content = videoPlayer.content
     end if
 
@@ -427,7 +427,7 @@ Function onLiveStreamManifestResponse(response)
 
     videoPlayer.content = content
     videoPlayer.updateContent = true
-    ' AA used here because sending these 2 information asynchronosly might create issue of using wrong ssai and not sending any pixels.
+    ' AA used here because sending these 2 information asynchronously might create issue of using wrong ssai and not sending any pixels.
     videoPlayer.pollUrlAA = {
       "pollUrl": pollUrl
       "ssaiUsed": ssaiUsed
