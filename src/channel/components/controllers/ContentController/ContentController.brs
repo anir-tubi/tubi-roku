@@ -664,7 +664,7 @@ Function setUiModeAndLoadContent()
   else
     relaunchSeriesPlaybackInfo = m.pub_serverPersistentData.relaunchSeriesPlaybackInfo
     ' Firing the exposure event When users have watched an episode for at least 1 minute and relaunched Tubi.
-    if relaunchSeriesPlaybackInfo <> invalid AND isNonEmptyString(relaunchSeriesPlaybackInfo.seriesId) = true AND getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v1", true).enabled = true
+    if relaunchSeriesPlaybackInfo <> invalid AND isNonEmptyString(relaunchSeriesPlaybackInfo.seriesId) = true AND getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v2", true).enabled = true
       processSeriesRelaunch()
     else
       startChannelFromAppLoad()
@@ -1987,7 +1987,7 @@ Function onCustomResume(msg)
   ' that means we recieved a deeplink request in which case we should not land the user in the series he was watching previously.
   isDeeplinkRequest = (customResumeLaunchParams <> invalid AND (customResumeLaunchParams.contentId <> invalid OR customResumeLaunchParams.page <> invalid))
   
-  if isDeeplinkRequest = false AND relaunchSeriesPlaybackInfo <> invalid AND isNonEmptyString(relaunchSeriesPlaybackInfo.seriesId) = true AND getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v1", true).enabled = true
+  if isDeeplinkRequest = false AND relaunchSeriesPlaybackInfo <> invalid AND isNonEmptyString(relaunchSeriesPlaybackInfo.seriesId) = true AND getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v2", false).enabled = true
     ' When trying to instant resume and trying to play the video immediately with cached version of video node causes edge cases with timing and video playback not starting or audio playing in background.
     ' We are running into lot of edge cases with timing and video playback.
     ' Taking a similar approach as deeplinking where we are restarting the application.

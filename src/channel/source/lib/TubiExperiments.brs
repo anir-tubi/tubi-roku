@@ -91,7 +91,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_relaunch_series: {
-        roku_relaunch_series_v1: {"enabled": false}
+        roku_relaunch_series_v2: {"enabled": false}
       }
 
       roku_genres_homegrid: {
