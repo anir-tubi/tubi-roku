@@ -1167,13 +1167,17 @@ End Function
 
 Function onQueryStatusOfMagicLinkResponse(response)
   tubiLog("SignInHelpers.onQueryStatusOfMagicLinkResponse")
-  if response <> invalid AND response.status = "PENDING"
-    m.emailVerificationTimer.control = "start"
-  else if response <> invalid AND response.access_token <> invalid
-    onStopAndClearEmailVerificationTimer()
-    Auth = TubiAuth(m.constants, m.Request)
-    Auth.handleRegistration(response)
-    onSignInResponse(invalid)
+  currentScreen = getCurrentScreen()
+  if currentScreen.id = m.constants.ui.screenIds.forgotPasswordProcessingScreen
+    if response <> invalid AND response.status = "PENDING"
+      currentScreen.queryResponseError = 0
+      m.emailVerificationTimer.control = "start"
+    else if response <> invalid AND response.access_token <> invalid
+      onStopAndClearEmailVerificationTimer()
+      Auth = TubiAuth(m.constants, m.Request)
+      Auth.handleRegistration(response)
+      onSignInResponse(invalid)
+    end if
   end if
 
 End Function
@@ -1195,6 +1199,7 @@ Function onQueryStatusOfMagicLinkError(errorResponse)
   if currentScreen.id = m.constants.ui.screenIds.forgotPasswordProcessingScreen
     currentScreen.queryResponseError = currentScreen.queryResponseError + 1
     if currentScreen.queryResponseError > 3
+      '//if an error has been set more than 3 times, then show error modal to user as the error is probably not a temporary network or server issue
       currentScreen.queryResponseError = 0
 
       contextCode = m.constants.errors.context.forgotPasswordProcessingScreen
@@ -1219,6 +1224,8 @@ Function onQueryStatusOfMagicLinkError(errorResponse)
         trackingTask: m.trackingLoggingTask
       }
       showErrorModal(modalInfo, invalid, invalid, onOkButtonClickedOnLinkExpired, invalid, [getTranslation("dialog_button_ok")])
+    else
+      m.emailVerificationTimer.control = "start"
     end if
   end if
 End Function
