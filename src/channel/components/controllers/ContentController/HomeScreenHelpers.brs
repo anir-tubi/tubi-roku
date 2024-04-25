@@ -269,18 +269,49 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
           ' In order to insert a new row while using replaceChildren(), which is the fastest method, we need to replace the existing rows with the new row plus the existing rows minus the last row, and then append the last row.
           ' See https://developer.roku.com/docs/references/brightscript/interfaces/ifsgnodechildren.md#replacechildrenchild_nodes-as-object-index-as-integer-as-boolean for more information
           content.appendChild(contentArray.peek())
+
+          ' This triggered for example when we add a new CW or My List row.
+          ' Since we are inserting a new row and if the index is less than that will cause the genre row to move down.
+          ' So if the user is in experiment we will just swap 15 and 16 row. 16 row is genre row since it has been pushed down.
+          ' TODO: Remove once roku_genres_homegrid is graduated.
+          if insertIndex <= 14 AND getExperimentResource("roku_genres_homegrid", "roku_genres_homegrid_v1", false).home_grid_type <> "none"
+            newRow = content.getChild(15)
+            if newRow.id = "genres_for_you"
+              rowNeedsReplaced = content.getChild(14)
+              ' We are swapping the position of rows. Basically moving current 15 row to 16.
+              ' Note index starts from 0.
+              content.replaceChildren([newRow, rowNeedsReplaced], 14)
+            end if
+          end if
         end if
 
         homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
       else if newCategory = invalid AND oldCategory <> invalid
+        content = homeScreen.content
+        deleteIndex = invalid
         if oldCategory.id = m.constants.ui.categoryIds.history
           homeScreen.rowRemoved = m.constants.ui.categoryIds.history
+          deleteIndex = content.continueWatchingIndex
         else if oldCategory.id = m.constants.ui.categoryIds.queue
           homeScreen.rowRemoved = m.constants.ui.categoryIds.queue
+          deleteIndex = content.queueIndex
         end if
-
+        
         'remove old category
         homeScreen.content.removeChild(oldCategory)
+
+        ' This triggered for example when we remove the CW or My List since user deleted all the contents.
+        ' TODO: Remove once roku_genres_homegrid is graduated.
+        ' Making sure the row that got removed is above genres.
+        if deleteIndex < 14 AND getExperimentResource("roku_genres_homegrid", "roku_genres_homegrid_v1", false).home_grid_type <> "none"
+          ' Note index starts from 0.
+          newRow = homeScreen.content.getChild(13)
+          if newRow.id = "genres_for_you"
+            rowNeedsReplaced = content.getChild(14)
+            ' We are swapping the position of rows. Basically moving current 14 row to 15.
+            content.replaceChildren([rowNeedsReplaced, newRow], 13)
+          end if
+        end if
         homeScreen.repopulateContent = true '//In case the rows are of different heights, tell homescreen to refresh to display rows correctly
       else if newCategory = invalid AND oldCategory = invalid
         'do nothing

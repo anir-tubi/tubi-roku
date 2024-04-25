@@ -854,7 +854,8 @@ Function tubiMetadataTranslate_translateHomescreen(contentToTranslate, contentMo
       end if
 
       'Insert a Genres row at 15th position for roku_genres_homegrid_v1 experiement.
-      if i = 13 AND genreInHomeGridType <> "none" AND contentMode = "" AND uiMode = m.constants.ui.modes.standard AND m.constants.deviceinfo.countrycode = "US"
+      ' Since all rows might not have value solely relying on i is causing a bug when CW is empty.
+      if homescreenAA.children.count() = 14 AND genreInHomeGridType <> "none" AND contentMode = "" AND uiMode = m.constants.ui.modes.standard AND m.constants.deviceinfo.countrycode = "US"
         genreRowAA = m.buildGenreCategory(genreInHomeGridType)
         homescreenAA.children.push(genreRowAA)
       end if
