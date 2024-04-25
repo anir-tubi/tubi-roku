@@ -948,7 +948,15 @@ Function onContentToPlay(msg)
     "playbackContainer": containerId
   }
 
-  showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
+  ' TODO: Remove the or condition for genre after roku_genres_homegrid is graduated.
+  if content.type = m.constants.uapiContentTypes.channel OR content.type = m.constants.uapiContentTypes.genre
+    showCategoryDetailsScreen(content)
+  else if content.type = m.constants.ui.contentTypes.historySignedOutUser
+    '//if a signed out user selects the continue watching row, then navigate him/her to the sign in screen
+    startSignIn(onCWRowAfterSignIn)
+  else
+    showDetailScreen(content, false, skipDetailScreen, invalid, playbackSource)
+  end if
 End Function
 
 
