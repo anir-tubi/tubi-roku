@@ -1,4 +1,4 @@
-'@TestSuite [TubiExternalConfig] TubiExternalConfig.brs 
+'@TestSuite [TubiExternalConfig] TubiExternalConfig.brs
 
 '@Setup
 Function TubiExternalConfigSetup()
@@ -26,7 +26,7 @@ End Function
 Function tubiExternalConfig_config()
   m.constants = getConstants()
   request = TubiRequest()
-  m.config = TubiExternalConfig(request, m.constants)  
+  m.config = TubiExternalConfig(request, m.constants)
 End Function
 
 
@@ -35,9 +35,9 @@ Function tubiExternalConfig_initSuccess_test()
   config = m.config
   constants = m.constants
   config.getConfigs = tubiExternalConfig_mockGetConfigs_testHelper
-  m.assertInvalid(constants.externalConfig.info)
+  m.AssertEmpty(constants.externalConfig.info)
   config.init()
-  m.assertNotInvalid(constants.externalConfig.info)
+  m.assertNotEmpty(constants.externalConfig.info)
   m.assertFalse(constants.externalConfig.info.livetv)
 End Function
 
@@ -47,9 +47,9 @@ Function tubiExternalConfig_initDefaults_test()
   config = m.config
   constants = m.constants
   config.getConfigs = tubiExternalConfig_mockGetConfigs_testHelper
-  m.assertInvalid(constants.externalConfig.info)
+  m.AssertEmpty(constants.externalConfig.info)
   config.init()
-  m.assertNotInvalid(constants.externalConfig.info)
+  m.assertNotEmpty(constants.externalConfig.info)
 End Function
 
 
@@ -62,9 +62,9 @@ Function tubiExternalConfig_initFailed_test()
     }
   config.defaultValues = defaultConfig
   config.getConfigs = tubiExternalConfig_mockGetInvalidConfigs_testHelper
-  m.assertInvalid(constants.externalConfig.info)
+  m.assertEmpty(constants.externalConfig.info)
   config.init()
-  m.assertNotInvalid(constants.externalConfig.info)
+  m.assertNotEmpty(constants.externalConfig.info)
   m.assertEqual(constants.externalConfig.info, defaultConfig)
 End Function
 

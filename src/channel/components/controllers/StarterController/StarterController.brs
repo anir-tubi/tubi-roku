@@ -13,7 +13,7 @@ Function init()
   '//TODO : after the experiment roku_new_cdn set both m.isExperimentConfigReady and m.isExternalConfigReady to false to start with.
 
   m.isExperimentConfigReady = (m.constants <> invalid AND m.constants.experiments <> invalid AND m.constants.experiments.info <> invalid)
-  m.isExternalConfigReady = (m.constants <> invalid AND m.constants.externalConfig <> invalid AND m.constants.externalConfig.info <> invalid)
+  m.isExternalConfigReady = (m.constants <> invalid AND m.constants.externalConfig <> invalid AND m.constants.externalConfig.info <> invalid AND m.constants.externalConfig.info.Count() > 0)
 
   m.top.observeFieldScoped("getUrl", "onUrlRequest")
 

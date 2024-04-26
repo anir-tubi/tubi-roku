@@ -454,7 +454,7 @@ Function getConstants()
 
   'external configuration options will be placed here
   constants.externalConfig = {}
-    constants.externalConfig.info = invalid   'will be replaced in main.brs
+    constants.externalConfig.info = {}   'will be replaced in main.brs
 
   ' Should the user be shown the upgrade alert to help them upgrade to the latest version.
   '   Used within the hotpatch after a point release to nudge users to use the latest app
@@ -1642,7 +1642,7 @@ Function getConstants()
       constants.tournament.clearRegistryDate = "2023-01-04T20:00:00Z"
 
       ' Creating Backend/Frontend mapping for preference keys.
-      ' ****** IMPORTANT - PLEASE DO NOT FORGOT ********* 
+      ' ****** IMPORTANT - PLEASE DO NOT FORGOT *********
       ' Whenever we add any new field to either device or user setting we need to make sure to add corresponding consent key mapping below.
       ' *************************************************
       constants.serverPersistentDataKeys = {}
@@ -1653,7 +1653,7 @@ Function getConstants()
       constants.serverPersistentDataKeys.isDisLikeToastNotificationShown = "enable_dislike_toast_notification"
       constants.serverPersistentDataKeys.lastRokuCwConsentPromptShownAt = "last_roku_cw_consent_prompt_shown_at"
       constants.serverPersistentDataKeys.relaunchSeriesPlaybackInfo = "relaunch_series_playback_info"
-      
+
       ' TODO: These are temporary values once finalized will update accordingly.
       constants.persistentDataKeyConsentKeyMapping = {
         "enable_video_preview": constants.consentKeys.functional

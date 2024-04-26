@@ -1829,7 +1829,7 @@ Function onCustomSuspend(msg)
           lastViewedOn: secondsFromEpoch
           resumeAt: historyPosition
         }
-        
+
         saveServerPersistentData({
           "relaunchSeriesPlaybackInfo": relaunchSeriesPlaybackInfo
         }, "device")
@@ -1986,7 +1986,7 @@ Function onCustomResume(msg)
   ' We currently support content or page deeplinking. If one of the parameter is present in the args.
   ' that means we recieved a deeplink request in which case we should not land the user in the series he was watching previously.
   isDeeplinkRequest = (customResumeLaunchParams <> invalid AND (customResumeLaunchParams.contentId <> invalid OR customResumeLaunchParams.page <> invalid))
-  
+
   if isDeeplinkRequest = false AND relaunchSeriesPlaybackInfo <> invalid AND isNonEmptyString(relaunchSeriesPlaybackInfo.seriesId) = true AND getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v2", false).enabled = true
     ' When trying to instant resume and trying to play the video immediately with cached version of video node causes edge cases with timing and video playback not starting or audio playing in background.
     ' We are running into lot of edge cases with timing and video playback.
