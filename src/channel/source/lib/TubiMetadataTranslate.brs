@@ -1608,8 +1608,8 @@ Function tubiMetadataTranslate_buildGenreCategory(gridType)
   end for
 
   genreRowMetadata = {
-    id: "genres_for_you"
-    slug: "genres_for_you"
+    id: "popular_genres"
+    slug: "popular_genres"
     title: "Popular Genres" ' TODO: Change it to use translation once we fix the issue with other row titles getting translated.
     validUntil: -1
     state: "full"

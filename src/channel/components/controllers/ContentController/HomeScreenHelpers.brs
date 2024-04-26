@@ -276,7 +276,7 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
           ' TODO: Remove once roku_genres_homegrid is graduated.
           if insertIndex <= 14 AND getExperimentResource("roku_genres_homegrid", "roku_genres_homegrid_v1", false).home_grid_type <> "none"
             newRow = content.getChild(15)
-            if newRow.id = "genres_for_you"
+            if newRow.id = "popular_genres"
               rowNeedsReplaced = content.getChild(14)
               ' We are swapping the position of rows. Basically moving current 15 row to 16.
               ' Note index starts from 0.
@@ -306,7 +306,7 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
         if deleteIndex < 14 AND getExperimentResource("roku_genres_homegrid", "roku_genres_homegrid_v1", false).home_grid_type <> "none"
           ' Note index starts from 0.
           newRow = homeScreen.content.getChild(13)
-          if newRow.id = "genres_for_you"
+          if newRow.id = "popular_genres"
             rowNeedsReplaced = content.getChild(14)
             ' We are swapping the position of rows. Basically moving current 14 row to 15.
             content.replaceChildren([rowNeedsReplaced, newRow], 13)

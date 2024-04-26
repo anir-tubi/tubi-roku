@@ -628,6 +628,8 @@ Function tubiTracking_getAnalyticsTile(contentNode, colPos = 1, rowPos = 1)
       tile.series_id = contentId.toInt()
     else if contentNode.type = m.constants.ui.contentTypes.video OR contentNode.type = m.constants.ui.contentTypes.linear
       tile.video_id = contentId.toInt()
+    else if contentNode.type = m.constants.ui.contentTypes.genre
+      tile.id = contentId
     end if
 
     tile.col = colPos
@@ -1008,6 +1010,7 @@ Function tubiTracking_getOneOfs()
       category_row: -1 ' 1 based index
       category_col: -1 ' 1 based index
       content_tile: {} ' ContentTile message - optional
+      utility_tile: {} ' UtilityTile message - optional
     }
 
     ' sub_category_component: { 'Does not currently exist in roku UI
