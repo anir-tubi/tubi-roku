@@ -102,6 +102,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     videoPlayer.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
     videoPlayer.observeFieldScoped("getPauseAd", "onGetPauseAd")
     videoPlayer.observeFieldScoped("sendPauseAdPixel", "onSendPauseAdPixel")
+    videoPlayer.observeFieldScoped("subtitleTrackSettings", "onSubtitleTrackSettingsChange")
     videoPlayer.observeFieldScoped("audioTrackSettings", "onAudioTrackSettingsChange")
     videoPlayer.observeFieldScoped("relatedContentToPlayUpdated", "onPlayerRelatedContentToPlay")
     initVideoTracking(videoPlayer) 'initializeYoubora
@@ -115,6 +116,12 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
       videoPlayer.disableScreensaver = true
     end if
   end if
+
+  ' Passing current user selected subtitle track.
+  if m.pub_serverPersistentData <> invalid
+    videoPlayer.preferredSubtitleTrack = m.pub_serverPersistentData.subtitleTrack
+  end if
+
 
   ' Passing current user selected track.
   ' Moving it out so that we always pass the updated value even when screen is obtained from cache.
@@ -1299,6 +1306,18 @@ Function updateNowPosForEpisode(detailContent, itemFocused, nResumePoint)
     end if
   end if
 
+End Function
+
+
+Function onSubtitleTrackSettingsChange(msg)
+  selectedSubtitleTrack = msg.getData()
+  ' Making sure we only call update when necessary.
+  currentSubtitleTrack = m.pub_serverPersistentData.subtitleTrack
+  if currentSubtitleTrack = invalid OR (currentSubtitleTrack.language <> selectedSubtitleTrack.language)
+    saveServerPersistentData({
+      "subtitleTrack": selectedSubtitleTrack
+    })
+  end if
 End Function
 
 

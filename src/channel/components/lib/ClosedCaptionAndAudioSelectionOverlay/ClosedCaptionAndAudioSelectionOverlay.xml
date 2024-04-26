@@ -50,6 +50,14 @@
     <field id="trackingEventInfo" type="assocarray" alwaysNotify="true" />
 
     <!--
+      - Will be set when the user selects an subtitle track. This will be used to update the device settings to store the selected subtitle track as the preferred subtitle track.
+      - The AA set on the subtitleTrackSettings field contain key: "language" which is a 2 letter lanuguage code
+    -->
+
+    <!-- Sample: {"language": "EN"} -->
+    <field id="subtitleTrackSettings" type="assocarray" value="{}" />
+
+    <!--
       - Will be set when the user selects an audio track. This will be used to update the user or device settings to store the selected audio track as the preferred audio track.
       - The AA set on the audioTrackSettings field contains 2 keys: "language" which is a 2 letter lanuguage code and "role". "role" can have the values "main" or "description".
     -->

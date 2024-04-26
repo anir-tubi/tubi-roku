@@ -38,6 +38,7 @@ Function init()
     pageValues: {}
   }
 
+  m.tubiTrackingInfo = TubiTrackingInfo(m.constants)
   m.top.observeFieldScoped("focusedChild", "onScreenFocusChange")
 
   m.top.handlesTransportVoiceRequests = true
@@ -610,9 +611,8 @@ Function playContent()
       ' Start pre-roll fetch
       m.top.adControl = "preroll"
     else
-
       m.Video.control = "play"
-
+      setInitialSubtitleTrack(m.Video.availableSubtitleTracks)
       ' Calling the set initial audio track in the start of video playback.
       ' The reason we are calling it here is to cover a use case where if we play the same video or the next video as the same value.
       ' For ex: Between different video with audio tracks the available tracks value is exactly the same value.
@@ -1447,6 +1447,7 @@ End Function
 
 Function onCaptionModeChange(msg)
   globalCaptionMode = msg.getData()
+  m.closedCaptionAndAudioSelectionOverlay.globalCaptionMode = globalCaptionMode
   setAudioSubtitleTransportBarIcon(globalCaptionMode)
 End Function
 
@@ -2130,6 +2131,43 @@ Function onAvailableAudioTracksChange(msg)
 End Function
 
 
+Function setInitialSubtitleTrack(availableSubtitleTracks)
+  preferredSubtitleTrack = m.top.preferredSubtitleTrack
+  ' Proceeding only if we have stored device level settings.
+  if availableSubtitleTracks <> invalid AND availableSubtitleTracks.Count() > 0 AND isAA(preferredSubtitleTrack) = true AND isNonEmptyString(preferredSubtitleTrack.language) = true
+    ' Holds the value of the subtitleTrack to be set to the video node.
+    updatedSubtitleTrack = invalid
+
+    for each track in availableSubtitleTracks
+
+      if isNonEmptyString(track.TrackName) then
+        languageCode = m.tubiTrackingInfo.getLanguageCode(track.language)
+        if languageCode = preferredSubtitleTrack.language
+          updatedSubtitleTrack = track
+          exit for
+        end if
+      end if
+    end for
+
+    ' Setting updated subtitle track to the video node.
+    if updatedSubtitleTrack <> invalid
+      m.Video.subtitleTrack = updatedSubtitleTrack.TrackName
+      m.closedCaptionAndAudioSelectionOverlay.closedCaptionTrack = updatedSubtitleTrack.TrackName
+      m.Video.globalCaptionMode = "On"
+    else
+      m.closedCaptionAndAudioSelectionOverlay.closedCaptionTrack = availableSubtitleTracks[0].TrackName
+      m.Video.globalCaptionMode = "Off"
+    end if
+
+  else if availableSubtitleTracks <> invalid AND availableSubtitleTracks.Count() > 0 AND isNonEmptyString(m.video.currentSubtitleTrack) = true
+    ' This else block will handle case where we do not have a preferred subtitle track saved for device.
+    m.closedCaptionAndAudioSelectionOverlay.closedCaptionTrack = m.video.currentSubtitleTrack
+  end if
+
+  setCCAudioTransportBarVisibility()
+End Function
+
+
 Function setInitialAudioTrack(availableAudioTracks)
   preferredAudioTrack = m.top.preferredAudioTrack
 
@@ -2173,7 +2211,6 @@ Function setInitialAudioTrack(availableAudioTracks)
     ' This else block will handle case where we do not have a preferred audio track saved for user.
     m.closedCaptionAndAudioSelectionOverlay.currentAudioTrack = m.video.currentAudioTrack
   end if
-  setCCAudioTransportBarVisibility()
 End Function
 
 

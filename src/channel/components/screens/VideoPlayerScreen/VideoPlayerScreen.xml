@@ -94,7 +94,11 @@
       <!-- isTrailer will be set true for trailers, otherwise false -->
       <field id="isTrailer" type="boolean" value="false"/>
 
-      <!-- preferredAudioTrack will hold user previously selected track obtained from either device/user settings endpoint.  -->
+      <!-- preferredSubtitleTrack will hold user previously selected subtitle track obtained from either device settings endpoint.  -->
+      <!-- Sample: {"language": "EN"} -->
+      <field id="preferredSubtitleTrack" type="assocarray" value="{}" />
+
+      <!-- preferredAudioTrack will hold user previously selected track obtained from either device settings endpoint.  -->
       <!-- Sample: {"language": "en","role": "main"} -->
       <field id="preferredAudioTrack" type="assocarray" value="{}" />
 
@@ -209,6 +213,8 @@
 
       <!-- pixelUrl to fire during pause ad -->
       <field id="sendPauseAdPixel" type="string" alwaysNotify="true"/>
+
+      <field id="subtitleTrackSettings" type="assocarray" value="{}" alias="closedCaptionAndAudioSelectionOverlay.subtitleTrackSettings" />
       <field id="audioTrackSettings" type="assocarray" value="{}" alias="closedCaptionAndAudioSelectionOverlay.audioTrackSettings" />
 
       <!-- set to true when the user selects signUpSaveProgress button in the player -->

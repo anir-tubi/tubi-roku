@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <component name="ServerPersistentData" extends="Node">
   <interface>
+    <!-- Holds the value of user preferred subtitle track. Sample Format: { "language": "EN" } -->
+    <field id="subtitleTrack" type="assocarray" value="{}" />
+
     <!-- Holds the value of user preferred audio track. Sample Format: { "language": "en","role": "description" }. Where role can hold values description,main depending on if the track as audio description. -->
     <field id="audioTrack" type="assocarray" value="{}" />
 

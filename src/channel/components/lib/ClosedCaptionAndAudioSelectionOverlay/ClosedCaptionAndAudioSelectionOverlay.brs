@@ -97,6 +97,7 @@ Function renderAvailableClosedCaptionTracks()
     for each track in availableClosedCaptionTracks
       ' Incrementing the value since off is the first element.
       index = index + 1
+
       ' Checking if the caption is turned on or in instant replay mode and selected track matches the item.
       checked = (globalCaptionMode <> "Off" AND closedCaptionTrack = track.trackName)
       localizedTitle = getLocalizedSubtitleLanguage(track.description)
@@ -267,6 +268,7 @@ End Function
 ' Callback triggered when the user changes the caption selection.
 Function onClosedCaptionSelectorItemSelectedChange(msg)
   itemSelected = msg.getData()
+  languageCode = "Off"
 
   ' If the selected item is index position zero than turning off the captions.
   if itemSelected = 0
@@ -285,17 +287,24 @@ Function onClosedCaptionSelectorItemSelectedChange(msg)
     selectedTrack = m.top.availableClosedCaptionTracks[itemSelected - 1]
 
     if selectedTrack <> invalid
+      languageCode = m.tubiTrackingInfo.getLanguageCode(selectedTrack.language)
+
       m.top.trackingEventInfo = {
         type: "subtitles_toggle"
         values: {
           video_id: m.top.videoId
           toggle_state: "ON"
-          language_code: m.tubiTrackingInfo.getLanguageCode(selectedTrack.language)
+          language_code: languageCode
         }
       }
       m.top.closedCaptionTrack = selectedTrack.TrackName
     end if
   end if
+
+  m.top.subtitleTrackSettings = {
+    language: languageCode
+  }
+
 End Function
 
 
