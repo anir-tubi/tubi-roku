@@ -119,7 +119,7 @@ describe('Playback', function () {
 
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
-    await testUtils.expectPlayerStateToEventuallyEqual('play');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
     const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
     expect(playPauseButton.visible).to.equal(true);
@@ -146,7 +146,7 @@ describe('Playback', function () {
 
     //Play title, pause to open player, move right to FF button and press, verify state
     await ecp.sendKeypress(ecp.Key.Play);
-    await testUtils.expectPlayerStateToEventuallyEqual('play');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
     await ecp.sendKeypress(ecp.Key.Play);
     const playPauseButton = await testUtils.getNodeForElement('playPauseButton');
     expect(playPauseButton.visible).to.equal(true);
@@ -402,7 +402,7 @@ async function seekWithinRange(startposition) {
   // Find out if current postion and resume postion are within range
 
   await ecp.sendKeypress(ecp.Key.Ok, { count: 1 });
-  await testUtils.expectPlayerStateToEventuallyEqual('play', 15000);
+  await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
   const nextposition = await testUtils.getPlayerPosition();
   //console.log('next', nextposition);
   const difference = (nextposition - startposition);
@@ -488,7 +488,7 @@ async function verifyResumeWithinRangeWhenBackToScreenEpisodes() {
 
 }
 
-    // Create history function
+   // Create history function
    async function createHistory() {
       await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 15000);
       await ecp.sendKeypress(ecp.Key.Forward, { count: 3 });

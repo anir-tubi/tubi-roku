@@ -99,14 +99,14 @@ describe('Autoplay TV', function () {
 
         // Search for a Series title
         await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-        await ecp.sendText('lego masters uk');
+        await ecp.sendText('lego masters');
 
         // Call function to navigate right to search results grid
         await shared.navigateRightToGrid();
 
         await testUtils.retryWithTimeOut(async () => {
             const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-            expect(searchResultsText.text).to.equal('Lego Masters UK');
+            expect(searchResultsText.text).to.equal('LEGO Masters');
         });
 
         //Play title, trigger autoplay

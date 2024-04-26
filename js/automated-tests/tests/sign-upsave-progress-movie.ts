@@ -121,16 +121,15 @@ describe('Sign up Save Progress Movies', function () {
         await ecp.sendKeypress(ecp.Key.Ok);
 
         // Enter password
-        await utils.sleep(550);
+        await utils.sleep(1000);
         await ecp.sendKeypress(ecp.Key.Ok);
         await ecp.sendText('111111');
         await utils.sleep(1000);
         await ecp.sendKeypress(ecp.Key.Right);
         await ecp.sendKeypress(ecp.Key.Down, {count:4});
-        await utils.sleep(550);
-        await ecp.sendKeypress(ecp.Key.Ok);
-        await utils.sleep(1000);
-        
+        await testUtils.waitForElementToFullyShowOnScreen('continueButtonSignInPage');
+        await utils.sleep(2000);
+        await ecp.sendKeypress(ecp.Key.Ok);   
 
         // Are we on details page with Play button at top position?
         // Verify we are on the details page

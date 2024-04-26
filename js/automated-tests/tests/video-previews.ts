@@ -179,8 +179,8 @@ describe('Video Preview', function () {
     await shared.openSettings();
 
     // Are we on Settings page?
-    const settingsScreen = testUtils.getNodeForElement('settingsScreen');
-    expect((await settingsScreen).visible).to.equal(true);
+    await testUtils.waitForElementToFullyShowOnScreen('settingsScreen');
+
 
     // Turn off video previews
     await ecp.sendKeypress(ecp.Key.Down);

@@ -20,11 +20,12 @@ describe('Live', function () {
 
         // Verify that video preview is playing
         await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'On Now');
+        await ecp.sendKeypress(ecp.Key.Right, {count:1});
         await utils.sleep(5000);
         await linearVideoPreviewPlayingTest();
 
         // Press left navigation to open the side navigation
-        await ecp.sendKeypress(ecp.Key.Left, {count:1});
+        await ecp.sendKeypress(ecp.Key.Left, {count:2});
 
         // Is the left Nav open?
         const leftNavHomeButton = 

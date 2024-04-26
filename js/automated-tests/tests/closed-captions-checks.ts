@@ -21,6 +21,7 @@ describe('Closed Captions Checks', function () {
     // Navigate to the Live News Row from Home screen
     // Jump to Recommended Channels row
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
+    await ecp.sendKeypress(ecp.Key.Right);
 
     // Start a live feed
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -43,7 +44,7 @@ describe('Closed Captions Checks', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
     
     // Is the left Nav open?
-    await ecp.sendKeypress(ecp.Key.Left);
+    await ecp.sendKeypress(ecp.Key.Left, {count:2});
     await testUtils.waitForSideNavMenuToBeExpanded();
     await testUtils.verifyFocusedSideNavMenuItemEquals('home');
 
@@ -59,14 +60,14 @@ describe('Closed Captions Checks', function () {
     await testUtils.getNodeForElement('searchKeyPad');
 
     // If so, send search terms
-    await ecp.sendText('fifth plane');
+    await ecp.sendText('lego masters');
 
     // Call function to navigate right to search results grid
     await navigateRightToGrid();
 
     await testUtils.retryWithTimeOut(async () => {
       const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-      expect(searchResultsText.text).to.contain('Fifth Plane');
+      expect(searchResultsText.text).to.contain('LEGO Masters');
     });
 
     // Select item and Play button
@@ -97,6 +98,7 @@ describe('Closed Captions Checks', function () {
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
     // Start a live feed
+    await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Ok);
     
     // Verify that video is playing
@@ -118,7 +120,7 @@ describe('Closed Captions Checks', function () {
      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
      
      // Is the left Nav open?
-     await ecp.sendKeypress(ecp.Key.Left);
+     await ecp.sendKeypress(ecp.Key.Left, {count:2});
      await testUtils.waitForSideNavMenuToBeExpanded();
      await testUtils.verifyFocusedSideNavMenuItemEquals('home');
 
@@ -133,14 +135,14 @@ describe('Closed Captions Checks', function () {
     await testUtils.getNodeForElement('searchKeyPad');
 
     // If so, send search terms
-    await ecp.sendText('fifth plane');
+    await ecp.sendText('lego masters');
 
     // Call function to navigate right to search results grid
     await navigateRightToGrid();
 
     await testUtils.retryWithTimeOut(async () => {
     const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-    expect(searchResultsText.text).to.contain('Fifth Plane');
+    expect(searchResultsText.text).to.contain('LEGO Masters');
     });
 
     // Select item and Play button

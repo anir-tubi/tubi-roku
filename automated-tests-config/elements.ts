@@ -93,6 +93,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup',
   },
 
+  /** Background Poster */
+  backgroundPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#topRightContentPosterGroup.#poster1.#BackgroundPoster',
+  },
+
   /** Component contains side nav menu items. Useful for seeing which page is showing or to switch page is showing */
   sideNavMenu: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems',
@@ -185,10 +190,18 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.4.#DetailsMenuText',
   },
 
+   /** Add to My List Button */
+   addToMyListButtonFocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.2.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+  },
+
+
+
   /** Remove From My List Button */
   removeFromMyListButton: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#Menu.3.#DetailsMenuText',
   },
+
 
   /** Play Button */
   playListButton: {
@@ -328,10 +341,31 @@ const elements = typeCheckElements({
     xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup/Label',
   },
 
-  unlockScreen: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#GradientGroup.#LeftBottomGradient.#gradientGroup.#gradient_1.#BackgroundGradient',
-    xpath: '/TubiScene/ContentController/Group/Group/BackgroundGroup/Group[2]/MultipleGradientGroup/Group/BackgroundGradientGroup[2]/Poster',
+  myStuffEmptyScreen: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#SignedOutUI',
+
   },
+
+  myStuffRegUserEmptyScreen: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#AllEmptyUI',
+  },
+
+  goHomeButtonMyStuff: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#AllEmptyUI.#AllEmptyUIMenu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+  },
+
+  myStuffRegScreenTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#AllEmptyUI.#AllEmptyUITitle',
+  },
+
+  myStuffRegScreenSubTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#AllEmptyUI.#AllEmptyUISubtitle',
+  },
+
+  myStuffRegScreenSubTitle2: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#AllEmptyUI.#AllEmptyUISubtitle2',
+  },
+
 
   homeScreenMyListRow: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName',
@@ -345,11 +379,6 @@ const elements = typeCheckElements({
   homeInfoPanel: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset',
     xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/HomeScreen/Group[2]/InfoPanel/LayoutGroup/LayoutGroup',
-  },
-
-  myStuffEmptyScreen: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#BackgroundGroup.#GradientGroup.#LeftBottomGradient.#gradientGroup.#gradient_1.#BackgroundGradient',
-    xpath: '/TubiScene/ContentController/Group/Group/BackgroundGroup/Group[2]/MultipleGradientGroup/Group/BackgroundGradientGroup[2]/Poster',
   },
 
   kidsDetailsPageRating: {
@@ -652,7 +681,22 @@ const elements = typeCheckElements({
 
   /** Continue Watching Row on My Stuff page */
   continueWatchingRow: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#ContentArea.#RowList.1.title.#CategoryName',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList.0.title.#CategoryName',
+  },
+
+  //** CW Row populated (poster) */
+  continueWatchingRowPoster: {
+   keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList.0.items.0.1.#posterLayout.#Poster.#gradientPoster',
+  },
+
+  //** Empty My List Container */
+  emptyMyStuffContainer: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList',
+  },
+
+  // ** Poster content exists in container*/
+  myListPoster:{
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList.1.items.0.0',
   },
 
   queueRowList: {
@@ -1187,6 +1231,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.1.title.#CategoryName',
   },
 
+  /** Featured text is shown */
+  featuredHeader: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName',
+  },
+
   /** Featured row poster */
   featuredRowPoster: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#ContentArea.#CategoryGridList.#RowList.0.items.0.#poster',
@@ -1256,6 +1305,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2',
   },
 
+  /**Left Nav Categories button selected */
+  categoriesLeftNavButtonSelected:{
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.4',
+  },
 
   leftNavSearchItem: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.2.#LabelParent.0.#Label'
@@ -1310,8 +1363,21 @@ const elements = typeCheckElements({
   },
 
   unlockNowForMyStuff: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#SignedOutUI.#GuestMenu.0.#DetailsMenuTextParent.#DetailsMenuText',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#SignedOutUI.#GuestMenu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused',
   },
+
+  myStuffGuestScreenTextTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#SignedOutUI.#SignedOutUITitle',
+  },
+
+  myStuffGuestScreenTextSubTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#SignedOutUI.#SignedOutUISubtitle',
+  },
+
+  myStuffGuestScreenTextBlurb: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#SignedOutUI.#SignedOutUIBlurb',
+  },
+
 
   emptyMyStuffButton: {
     keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#AllEmptyUI.#AllEmptyUIMenu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused'
@@ -1466,6 +1532,11 @@ const elements = typeCheckElements({
   /** Email input Screen Page Heading */
   emailInputScreenHeader: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailInputScreen.#emailLayout.#pageHeading'
+  },
+   
+  /** Email test edit box */
+  emailTextEditBox: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#emailInputScreen.#emailLayout.1.#emailTextEditBox.1'
   },
 
   /** Sign In Screen page header */
