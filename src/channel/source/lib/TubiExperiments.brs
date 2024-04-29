@@ -31,6 +31,11 @@ Function TubiExperiments(constants) as Object
         roku_screensaver_v2 : {"enabled": false}
       }
 
+      '//Experiment to test pausing the player with the OK button
+      roku_ok_pause: {
+        roku_ok_pause_v1 : {"enabled": false}
+      }
+
       roku_see_all_container: {
         roku_view_more_one_hundred_v1 : {"enabled": false}
         roku_view_more_last_v1: {"enabled" : false}
