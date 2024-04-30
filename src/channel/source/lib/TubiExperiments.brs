@@ -57,10 +57,6 @@ Function TubiExperiments(constants) as Object
         roku_registration_vs_tvt_lock_rated_content_v2: {"enabled" : false}
       }
 
-      roku_trending_search_below: {
-        roku_trending_search_below_v1: {"enabled": true}
-      }
-
       roku_async_stop: {
         roku_async_stop_v5: {"enabled": false}
       }

@@ -347,7 +347,7 @@ Function onSearchContentChange()
       ' Setting the visibility of trending searches if we have result.
       if trendingSearchContent <> invalid AND trendingSearchContent.getChildCount() > 0
         m.trendingResultsHint.visible = false
-        if m.top.isUserEligibleForTrendingSearchBelowExperiment = true AND getExperimentResource("roku_trending_search_below", "roku_trending_search_below_v1", false).enabled = true
+        if m.top.isUserEligibleForTrendingSearchContents = true
           m.trendingSearchResultsContainer.visible = true
           m.trendingResultsHint.visible = true
           if content.getChildCount() > 5
@@ -359,11 +359,6 @@ Function onSearchContentChange()
         else
           m.trendingSearchResultsContainer.visible = false
         end if
-
-        if content.getChildCount() <= 5
-          ' send the exposure event because the trending search results become visible in the peek
-          getExperimentResource("roku_trending_search_below", "roku_trending_search_below_v1", true)
-        end if
       else
         m.trendingSearchResultsContainer.visible = false
       end if
@@ -373,7 +368,7 @@ Function onSearchContentChange()
     m.NoResultsMessage.visible = false
   else
     ' If it is not kids mode and the user is in experiment display the trending search instead of no content message.
-    if m.top.isUserEligibleForTrendingSearchBelowExperiment = true AND getExperimentResource("roku_trending_search_below", "roku_trending_search_below_v1", true).enabled = true
+    if m.top.isUserEligibleForTrendingSearchContents = true
       m.ResultGrid.visible = false
       trendingSearchContent = m.trendingSearchResultGrid.content
       if trendingSearchContent <> invalid AND trendingSearchContent.getChildCount() > 0
@@ -574,7 +569,7 @@ Function onResultGridCurrFocusRowChange(msg)
   end if
 
   fraction = totalRows - 1 - currFocusRow
-  if fraction < 1 AND m.top.isUserEligibleForTrendingSearchBelowExperiment = true AND getExperimentResource("roku_trending_search_below", "roku_trending_search_below_v1", true).enabled = true
+  if fraction < 1 AND m.top.isUserEligibleForTrendingSearchContents = true
     translationY = 672 - ((1 - fraction) * 298)
     m.trendingSearchResultsContainer.translation = [0, translationY]
   end if
@@ -622,7 +617,8 @@ Function onKeyEvent(key As string, press As boolean) As boolean
     if key = "right" AND m.Keyboard.isInFocusChain() AND m.isSearchRequestInProgress = false then
       if m.ResultGrid.content <> invalid AND m.ResultGrid.content.getChildCount() > 0 AND m.isTrendingResultsGridInFocus = false
         m.ResultGrid.setFocus(true)
-      else if m.trendingSearchResultGrid.content <> invalid AND m.trendingSearchResultGrid.content.getChildCount() > 0
+      ' Only setting focus to trending search result if the user is eligible.  
+      else if m.trendingSearchResultGrid.content <> invalid AND m.trendingSearchResultGrid.content.getChildCount() > 0 AND m.trendingSearchResultsContainer.visible = true
         m.trendingSearchResultGrid.setFocus(true)
       end if
       m.gridHasFocus = true

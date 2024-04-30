@@ -26,8 +26,8 @@
       <!-- If the screen is not enabled, then user should not be able to select anything -->
       <field id="enabled" type="boolean" alwaysNotify="true"/>
 
-      <!-- If the user is eligible for trending search below experiment checks if the user is in us and parental controls is enabled and user is in the experiment. -->
-      <field id="isUserEligibleForTrendingSearchBelowExperiment" type="boolean" />
+      <!-- If the user is eligible for trending search contents if the user is in usa and parental controls is enabled. -->
+      <field id="isUserEligibleForTrendingSearchContents" type="boolean" />
 
     <!-- OUTPUT -->
       <!-- set to the tubi content id of the item which was clicked on -->
