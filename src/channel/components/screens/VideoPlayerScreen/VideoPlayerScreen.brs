@@ -1170,6 +1170,10 @@ Function onAdStateChange(msg)
       m.Video.unobserveFieldScoped("position")
       m.Video.observeFieldScoped("position", "onVideoPositionChange")
 
+      ' Adding the initial subtitle track here to cover use case where pre-roll ads are requested.
+      ' Refer playContent for the reasoning behind why we are calling setInitialSubtitleTrack.
+      setInitialSubtitleTrack(m.Video.availableSubtitleTracks)
+
       ' Adding the initial audio track here to cover use case where pre-roll ads are requested.
       ' Refer playContent for the reasoning behind why we are calling setInitialAudioTrack.
       setInitialAudioTrack(m.Video.availableAudioTracks)
