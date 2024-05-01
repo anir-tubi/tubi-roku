@@ -94,7 +94,7 @@ describe('Side Navigation', function () {
 
         //Open left nav and browse down to Settings, select
         await openLeftNav();
-        await ecp.sendKeypress(ecp.Key.Down, {count:7});
+        await testUtils.jumpToRowWithTitle('sideNavMenu', 'Settings');
         await ecp.sendKeypress(ecp.Key.Ok);
 
 
@@ -123,7 +123,7 @@ describe('Side Navigation', function () {
 
       //Open left nav and browse down to Settings, select
       await openLeftNav();
-      await ecp.sendKeypress(ecp.Key.Down, {count:7});
+      await testUtils.jumpToRowWithTitle('sideNavMenu', 'Settings');
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify Settings screen has focus
@@ -206,10 +206,9 @@ describe('Side Navigation', function () {
       await openLeftNav();
 
       // Press Down to Categories
-      await ecp.sendKeypress(ecp.Key.Down, {count:2});
+      await testUtils.jumpToRowWithTitle('sideNavMenu', 'Categories');
 
       //Is Categories button highlighted?
-
       const color = await testUtils.getElementColorField('categoriesLabel','color');
       expect(color).to.equal('#FFFFFFFF');
 
@@ -227,7 +226,7 @@ describe('Side Navigation', function () {
     it('C535784 - Side Navigation - Categories Page - Select, @sidenav', async () => {
 
       await openLeftNav();
-      await ecp.sendKeypress(ecp.Key.Down, {count:1});
+      await testUtils.jumpToRowWithTitle('sideNavMenu', 'Categories');
 
       // Does category menu item have focus?
       // await testUtils.verifySelectedMainMenuItemEquals('categories'); - Brian to change this.
@@ -254,8 +253,7 @@ describe('Side Navigation', function () {
       await openLeftNav();
 
       // Press Down to Settings option
-      await utils.sleep(1000);
-      await ecp.sendKeypress(ecp.Key.Down, {count:7});
+      await testUtils.jumpToRowWithTitle('sideNavMenu', 'Settings');
 
       //Navigate and highlight Settings 
       await testUtils.waitForElementToShowOnScreen('settingsLeftNavButtonSelected');
@@ -277,7 +275,7 @@ describe('Side Navigation', function () {
       await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       await openLeftNav();
-      await ecp.sendKeypress(ecp.Key.Down, {count:7});
+      await testUtils.jumpToRowWithTitle('sideNavMenu', 'Settings');
 
       // Does settings menu item have focus?
       // await testUtils.verifySelectedMainMenuItemEquals('settings'); - wait for Brian to change
@@ -304,7 +302,7 @@ describe('Side Navigation', function () {
 
       // Open left Nav
       await openLeftNav();
-      await ecp.sendKeypress(ecp.Key.Down, {count:1});
+      await testUtils.jumpToRowWithTitle('sideNavMenu', 'Categories');
 
       // Does category menu item have focus? // Change this for menu item
       // await testUtils.verifySelectedMainMenuItemEquals('categories'); - Wait for Brian to change
@@ -391,8 +389,7 @@ describe('Side Navigation', function () {
       await openLeftNav();
 
       // Select Categories
-      await ecp.sendKeypress(ecp.Key.Down, { count: 1 });
-      await utils.sleep(2000); // Improvement
+      await testUtils.jumpToRowWithTitle('sideNavMenu', 'Categories');
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Are we on Categories page?
@@ -412,8 +409,6 @@ describe('Side Navigation', function () {
       // Select title
       await utils.sleep(2000); // Improvement
       await ecp.sendKeypress(ecp.Key.Ok);
-
-
 
       const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
       expect(detailScreenTitle.visible).to.be.true;
@@ -445,8 +440,7 @@ describe('Side Navigation', function () {
         await ecp.sendKeypress(ecp.Key.Back, { count: 3 });
 
         // Verify that the Exit modal dialog is displayed
-        const exitPrompt = testUtils.getNodeForElement('exitPrompt');
-        expect((await exitPrompt).visible).to.be.true;
+        await testUtils.waitForElementToFullyShowOnScreen('exitPrompt');
 
     });
 
@@ -495,8 +489,8 @@ describe('Side Navigation', function () {
       await ecp.sendKeypress(ecp.Key.Back, { count: 5 });
 
       // Verify that the Exit modal dialog is displayed
-      const exitPrompt = testUtils.getNodeForElement('exitPrompt');
-      expect((await exitPrompt).visible).to.be.true;
+      await testUtils.waitForElementToFullyShowOnScreen('exitPrompt');
+      
 
     });
 
@@ -542,6 +536,112 @@ describe('Side Navigation', function () {
 
     });
 
+    // https://tubi.testrail.io/index.php?/cases/view/591018
+    it('C591018 - The left side nav includes Movies option, @sidenav', async () => {
+
+      await openLeftNav();
+
+     // Verify that Movies option is present
+      await testUtils.waitForElementToFullyShowOnScreen('leftNavMoviesItem');
+      const leftNavMoviesItem = await testUtils.getNodeForElement('leftNavMoviesItem');
+      const leftNavMoviesIconNotFocused = await testUtils.getNodeForElement('leftNavMoviesIconNotFocused');
+      expect(leftNavMoviesItem.text).to.equal('Movies');
+      expect(leftNavMoviesIconNotFocused.uri).to.equal('pkg:/images/sideNavMovies.webp');
+
+    });
+
+    // https://tubi.testrail.io/index.php?/cases/view/591019 and https://tubi.testrail.io/index.php?/cases/view/591990
+    it('C591019 - The left side nav includes TV Shows option and takes user to TVShows Screen, @sidenav', async () => {
+
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+      await openLeftNav();
+
+      await selectTVShowsVerifyRedirect();
+
+      // Open left nav while on TV Shows Screen
+      await ecp.sendKeypress(ecp.Key.Left);
+      await testUtils.waitForElementToFullyShowOnScreen('selectedTVShowsItem');
+
+      // Navigate to Home item and press OK
+      await testUtils.jumpToRowWithTitle('sideNavMenu', 'Home');
+      await ecp.sendKeypress(ecp.Key.Ok);
+
+      // Verify redirect to Home page
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+
+    });
+
+    // https://tubi.testrail.io/index.php?/cases/view/591020 and https://tubi.testrail.io/index.php?/cases/view/C591988
+    it('C591020 - The left side nav includes Live TV option, @sidenav', async () => {
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+      await openLeftNav();
+
+      // Verify that TV Shows option is present
+
+      const leftNavLiveTVItem = await testUtils.getNodeForElement('leftNavLiveTVItem');
+      const leftNavLiveTVIconNotFocused = await testUtils.getNodeForElement('leftNavLiveTVIconNotFocused');
+      expect(leftNavLiveTVItem.text).to.equal('Live TV');
+
+      // Navigate down to Live TV option and select
+      await testUtils.jumpToRowWithTitle('sideNavMenu', 'Live TV');
+      await testUtils.waitForElementToFullyShowOnScreen('selectedLiveTVItem');
+      await ecp.sendKeypress(ecp.Key.Ok);
+      
+      // Verify we are on the LIVE TV page
+      await testUtils.waitForElementToFullyShowOnScreen('epgProgramGrid');
+
+    });
+
+    // https://tubi.testrail.io/index.php?/cases/view/591023 - includes https://tubi.testrail.io/index.php?/cases/view/591065
+    it('C591023 - Left side nav: Networks moved to the Categories page, @sidenav', async () => {
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+      await openLeftNav();
+      await selectCategoriesItem();
+
+      // Verify Categories card is present
+      await testUtils.waitForElementToFullyShowOnScreen('categoryPageCategory');
+      const categoryNetworksTitle = await testUtils.getNodeForElement('categoryNetworksTitle');
+      expect(categoryNetworksTitle.text).to.equal('Networks'); 
+
+      // Select Networks
+      await ecp.sendKeypress(ecp.Key.Right);
+      await ecp.sendKeypress(ecp.Key.Ok);
+
+      // Verify navigation to Networks page
+      await testUtils.waitForElementToFullyShowOnScreen('networksPageGridPoster');
+
+    });
+
+    // https://tubi.testrail.io/index.php?/cases/view/591024
+    it('C591024 - Left Side Nav: Exit has moved to Settings, @sidenav', async () => {
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+      await testUtils.goToPage('settings');
+
+     // Verify that Exit item is on the Settings page
+      await testUtils.waitForElementToFullyShowOnScreen('exitItem');
+      const exitItem = await testUtils.getNodeForElement('exitItem');
+      expect(exitItem.text).to.equal('Exit');
+
+      // Navigate to Exit item Press OK
+      await testUtils.jumpToRowWithTitle('settingsMenu', 'Exit');
+      await testUtils.waitForElementToFullyShowOnScreen('exitItemSelected');
+      await ecp.sendKeypress(ecp.Key.Ok);
+
+      // Verify Exit prompt
+      const exitPrompt = await testUtils.getNodeForElement('exitPrompt');
+      expect(testUtils.elementHasFocus('exitPrompt'));    
+
+    });
+
 
     // https://tubi.testrail.io/index.php?/cases/view/536528
     it('C536528 - Side Navigation - Exit - Exit App, @sidenav', async () => {
@@ -551,7 +651,6 @@ describe('Side Navigation', function () {
 
       // Press back once
       await ecp.sendKeypress(ecp.Key.Back, {count:2});
-
 
       // Select Exit from modal
       const exitPrompt = await testUtils.getNodeForElement('exitPrompt');
@@ -564,6 +663,64 @@ describe('Side Navigation', function () {
       expect(testUtils.waitForApplicationShutdown());
 
     });
+
+    // https://tubi.testrail.io/index.php?/cases/view/591989 
+    it('C591989 - Selecting Home while on the Live TV screen results in the redirection to Home screen, @sidenav', async () => {
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+      await openLeftNav();
+
+      // Verify that TV Shows option is present
+      const leftNavLiveTVItem = await testUtils.getNodeForElement('leftNavLiveTVItem');
+      const leftNavLiveTVIconNotFocused = await testUtils.getNodeForElement('leftNavLiveTVIconNotFocused');
+      expect(leftNavLiveTVItem.text).to.equal('Live TV');
+
+      // Navigate down to Live TV option and select
+      await testUtils.jumpToRowWithTitle('sideNavMenu', 'Live TV');
+      await testUtils.waitForElementToFullyShowOnScreen('selectedLiveTVItem');
+      await ecp.sendKeypress(ecp.Key.Ok);
+      
+      // Verify we are on the LIVE TV page
+      await testUtils.waitForElementToFullyShowOnScreen('epgProgramGrid');
+
+      // Open left nav while on Live TV Screen
+      await ecp.sendKeypress(ecp.Key.Left);
+      await testUtils.waitForElementToFullyShowOnScreen('selectedLiveTVItem');
+
+      // Navigate to Home item and press OK
+      await testUtils.jumpToRowWithTitle('sideNavMenu', 'Home');
+      await ecp.sendKeypress(ecp.Key.Ok);
+
+      // Verify redirect to Home page
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    });
+
+      // https://tubi.testrail.io/index.php?/cases/view/591992 and https://tubi.testrail.io/index.php?/cases/view/591993
+    it('C591992 - Selecting Movies from left nav takes the user to Movies screen, @sidenav', async () => {
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+      await openLeftNav();
+
+      await selectMoviesVerifyRedirect();
+
+      // Open left nav while on Movies Screen
+      await ecp.sendKeypress(ecp.Key.Left);
+      await testUtils.waitForElementToFullyShowOnScreen('selectedMoviesItem');
+
+      // Navigate to Home item and press OK
+      await testUtils.jumpToRowWithTitle('sideNavMenu', 'Home');
+      await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButton');
+      await ecp.sendKeypress(ecp.Key.Ok);
+
+      // Verify redirect to Home page
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+    });
+
+
   });
 
 
@@ -572,13 +729,61 @@ async function openLeftNav() {
   await ecp.sendKeypress(ecp.Key.Left);
 
   // Is the left Nav open?
-  await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButtonLabel');
+  await testUtils.waitForElementToFullyShowOnScreen('sideNavMenu');
+}
+
+async function selectCategoriesItem() {
+  
+  await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeIconFocused');
+  await ecp.sendKeypress(ecp.Key.Down);
+  await testUtils.waitForElementToFullyShowOnScreen('leftNavCategoriesButtonSelected');
+  const leftNavCategoriesButtonSelected = await testUtils.getNodeForElement('leftNavCategoriesButtonSelected');
+  expect(leftNavCategoriesButtonSelected.text).to.equal('Categories');
+  await ecp.sendKeypress(ecp.Key.Ok);
+
+}
+
+async function selectTVShowsVerifyRedirect() {
+
+  // Verify that TV Shows option is present
+  const leftNavTVShowsItem = await testUtils.getNodeForElement('leftNavTVShowsItem');
+  const leftNavTVShowsIconNotFocused = await testUtils.getNodeForElement('leftNavTVShowsIconNotFocused');
+  expect(leftNavTVShowsItem.text).to.equal('TV Shows');
+  expect(leftNavTVShowsIconNotFocused.uri).to.equal('pkg:/images/sideNavTvShows.webp');
+
+  // Select TV Shows option and verify redirect
+  // Navigate down to TV Shows option and select
+  await testUtils.jumpToRowWithTitle('sideNavMenu', 'TV Shows');
+  await testUtils.waitForElementToFullyShowOnScreen('selectedTVShowsItem');
+
+  await ecp.sendKeypress(ecp.Key.Ok);
+  await testUtils.waitForElementToHaveFocus('tvShowsScreenRowList', 'Timed out waiting for Rowlist to have focus');
+}
+
+async function selectMoviesVerifyRedirect() {
+
+  // Verify that Movies option is present
+  await testUtils.waitForElementToFullyShowOnScreen('leftNavMoviesItem');
+  const leftNavMoviesItem = await testUtils.getNodeForElement('leftNavMoviesItem');
+  const leftNavMoviesIconNotFocused = await testUtils.getNodeForElement('leftNavMoviesIconNotFocused');
+  expect(leftNavMoviesItem.text).to.equal('Movies');
+  expect(leftNavMoviesIconNotFocused.uri).to.equal('pkg:/images/sideNavMovies.webp');
+  
+  // Select Movies option and verify redirect
+  // Navigate down to Movies option and select
+  await testUtils.jumpToRowWithTitle('sideNavMenu', 'Movies');
+  await testUtils.waitForElementToFullyShowOnScreen('selectedMoviesItem');
+
+  await ecp.sendKeypress(ecp.Key.Ok);
+  await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+  
 }
 
 async function navigateRightToGrid() {
   await testUtils.untilTrue(async () => {
-    await ecp.sendKeypress(ecp.Key.Right);
-    const { value: id } = await odc.getValue({
+  await ecp.sendKeypress(ecp.Key.Right);
+  const { value: id } = await odc.getValue({
       base: 'focusedNode',
       keyPath: 'id'
     });

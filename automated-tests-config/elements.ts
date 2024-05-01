@@ -103,6 +103,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems',
   },
 
+  /** Side Nav Menu contents */
+  sideNavMenuContents: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.content',
+  },
+
   /** This is the main menu grid that is used for knowing what is the selected menu item */
   mainMenuSelected: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected',
@@ -125,6 +130,11 @@ const elements = typeCheckElements({
   /** Settings Screen */
   settingsScreen: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen',
+  },
+
+  /** Settings page */
+  settingsPagePanelSet: {
+    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet', 
   },
 
   /** Enter Password Message */
@@ -668,6 +678,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#IconParent.#focusedIcon',
   },
 
+  /** Left Nav Home button unfocused */
+  leftNavHomeButtonUnfocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#IconParent.0',
+  },
+
   /** left home button label */
   leftNavHomeButtonLabel: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.1.#LabelParent.0.#Label'
@@ -677,6 +692,11 @@ const elements = typeCheckElements({
   /** Left Nav home icon highlighted */
   leftNavHomeFocused: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.3.#IconParent.#focusedIcon',
+  },
+
+  /** Left Nav home icon focused */
+  leftNavHomeIconFocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#IconParent.1',
   },
 
   /** Continue Watching Row on My Stuff page */
@@ -692,6 +712,11 @@ const elements = typeCheckElements({
   //** Empty My List Container */
   emptyMyStuffContainer: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#ContentArea.#RowList',
+  },
+
+  //** Left Nav Categories button */
+  leftNavCategoriesButtonSelected: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.4.#LabelParent.0.#Label',
   },
 
   // ** Poster content exists in container*/
@@ -712,6 +737,8 @@ const elements = typeCheckElements({
   categoriesDetailsGrid: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#ChannelsVideoGrid',
   },
+
+
 
   /** Channels page grid */
   channelsDetailsGrid: {
@@ -1153,7 +1180,13 @@ const elements = typeCheckElements({
 
   /** audio description item content */
   audioDescriptionItemContent: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#audioTracksSection.#audioTrackSelector.1.itemContent'
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#audioTracksSection.#audioTrackSelector.1.itemContent',
+  },
+
+  /** Audio Descriptio item checked */
+  audioDescriptionItemChecked: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#closedCaptionAndAudioSelectionOverlayGroup.#closedCaptionAndAudioSelectionOverlay.#overlayBackground.0.#audioTracksSection.#audioTrackSelector.1.#container.0.0',
+  
   },
 
   /** subtitle OFF */
@@ -1203,6 +1236,11 @@ const elements = typeCheckElements({
   /** autoplay UI */
   autoplayUpNextUI: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextMovieGroup',
+  },
+
+  /** Setting Menu Grid */
+  settingsMenu: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu',
   },
 
 
@@ -1281,9 +1319,19 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#topNav-home.#TopNavMenu.3.#unfocusedTopLabel',
   },
 
-  /**  Live TV option is selected */
+  /**  Live TV option is selected in left nav */
   selectedLiveTVItem: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#topNav-home.#TopNavMenu.3.#BottomLabel',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.8.#IconParent.1"',
+  },
+
+  /** TV Shows option is selected in left nav */
+  selectedTVShowsItem:{
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.7.#IconParent.1',
+  },
+
+  /** Selected Movies item */
+  selectedMoviesItem: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.6.#IconParent.1',
   },
 
   /** Program Guide Header text on the Live TV tab */
@@ -1292,7 +1340,11 @@ const elements = typeCheckElements({
   },
 
   programGuide: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#linearVideoPlayerScreen.#VideoOverlay.#overlayParent.#overlayContentArea.#EPGHorizontalSlide.#EPG'
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#PageGroup.#programGuide.0'
+  },
+
+  epgProgramGrid: {
+    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#PageGroup.#programGuide.#channelsGrid.0.#ChannelPoster',
   },
 
   /** text on Search page header */
@@ -1305,13 +1357,66 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItemsSelected.2',
   },
 
+
+  /** Left Nav Movies item - not hovered */
+  leftNavMoviesItem: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.6.#LabelParent.0.#Label',
+  },
+
+  //**Left Nav TV Shows item - not hovered */
+  leftNavTVShowsItem: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.7.#LabelParent.0.#Label',
+  },
+
+  // * Left Nav TV Shows icon - not focued */
+  leftNavTVShowsIconNotFocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.7.#IconParent.0',
+  },
+
+  //* Left Nav Movies icon - not focued */
+  leftNavMoviesIconNotFocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.6.#IconParent.0',
+  },
+
+  // * Left Nav Live TV - not focused */
+  leftNavLiveTVItem: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.8.#LabelParent.0.#Label',
+  }, 
+
+  // * Left Nav Live TV icon - not focused */
+  leftNavLiveTVIconNotFocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.8.#IconParent.0',
+  }, 
+
+
   /**Left Nav Categories button selected */
   categoriesLeftNavButtonSelected:{
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.4',
   },
 
+  /**Left Nav Search button  */
   leftNavSearchItem: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.2.#LabelParent.0.#Label'
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.2.#LabelParent.0.#Label',
+  },
+
+  //** Category Networks title */
+  categoryNetworksTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#PageGroup.#ChannelCategoryGrid.1.#Title',
+  },
+
+  /** Networks page */
+  networksPageGridPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#PageGroup.#ChannelCategoryGrid.0.#PosterRect',
+  },
+
+  /** Exit item */
+  exitItem: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.5.#DetailsMenuTextParent.#DetailsMenuText',
+  },
+
+  /** Exit item selected */
+  exitItemSelected: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.5.#IconParent.#IconFocused',
   },
 
   /** parental controls button */

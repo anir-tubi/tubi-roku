@@ -1,28 +1,14 @@
 import { expect } from 'chai';
 import { odc, ecp, utils } from 'roku-test-automation';
 import type { RegisteredUser } from '../test-utils';
-import { testUtils } from '../test-utils';
+import { User, testUtils } from '../test-utils';
 import { shared } from '../shared';
 import { count, timeEnd } from 'console';
 
 describe('Multiple Audio', function () {
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/403409
   it('C403409 - Video Player - New Audio / subtitle icon @multiple_audio', async () => {
-    await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-    await ecp.sendText('lego masters');
-
-    // Call function to navigate right to search results grid
-    // Call function to navigate right to search results grid
-    await testUtils.waitForElementToFullyShowOnScreen('searchResultsGridPoster');
-    await shared.navigateRightToGrid();
-    await testUtils.waitForElementToFullyShowOnScreen('searchResultsText');
-    const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-    expect(searchResultsText.text).to.contain('LEGO Masters');
-    
-
-    // Select item and Play button
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.selectAndVerifyDetailPageMenuItem('play');
+    await testUtils.startApplicationWithDeeplink({mediaType: 'episode', contentID: '526358', shouldCreateNewUser: true });
 
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
@@ -35,19 +21,8 @@ describe('Multiple Audio', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/403413
   it('C403413 - Video Player - New Audio / subtitle menu selection @multiple_audio, @smoke', async () => {
-    await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-    await ecp.sendText('lego masters');
-
-    // Call function to navigate right to search results grid
-    await testUtils.waitForElementToFullyShowOnScreen('searchResultsGridPoster');
-    await shared.navigateRightToGrid();
-    await testUtils.waitForElementToFullyShowOnScreen('searchResultsText');
-    const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-    expect(searchResultsText.text).to.contain('LEGO Masters');
-
-    // Select item and Play button
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.selectAndVerifyDetailPageMenuItem('play');
+    await testUtils.startApplicationWithDeeplink({mediaType: 'episode', contentID: '526358', shouldCreateNewUser: true });
+    
 
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
@@ -80,25 +55,15 @@ describe('Multiple Audio', function () {
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/424863
   it('C424863 - Registered User: AD selection persists between sessions on same device (logout / login). @multiple_audio', async () => {
-    await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-    await ecp.sendText('lego masters');
-
-    // Call function to navigate right to search results grid
-    await testUtils.waitForElementToFullyShowOnScreen('searchResultsGridPoster');
-    await shared.navigateRightToGrid();
-    await testUtils.waitForElementToFullyShowOnScreen('searchResultsText');
-    const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-    expect(searchResultsText.text).to.contain('LEGO Masters');
-  
-
-    // Select item and Play button
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.selectAndVerifyDetailPageMenuItem('play');
-
+    
+    const user = await testUtils.createRegisteredUser();
+    await testUtils.startApplicationWithDeeplink({mediaType: 'episode', contentID: '526358'}, {user: user});
+    
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
 
     // Closed Caption audio button present?
+    await ecp.sendKeypress(ecp.Key.Ok);
     const closedCaptionAudioButton = await testUtils.getNodeForElement('closedCaptionAudioButton');
     expect(closedCaptionAudioButton.uri).to.contain('pkg:/images/transport/sgplayer/icon-subtitles');
 
@@ -120,27 +85,8 @@ describe('Multiple Audio', function () {
     await ecp.sendKeypress(ecp.Key.Down, { count: 3 });
     await ecp.sendKeypress(ecp.Key.Ok);
 
-    // Start app with new user
-    await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToFullyShowOnScreen('searchKeyPad');
-
-    // Nav to AD container and playback any title
-    await ecp.sendText('cosmo');
-
-    // Call function to navigate right to search results grid
-    await testUtils.waitForElementToShowOnScreen('searchResultGrid', 'Result Grid did not appear', 10000);
-    await shared.navigateRightToGrid();
-    await testUtils.retryWithTimeOut(async () => {
-      const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-      expect(searchResultsText.text).to.contain('Cosmos');
-    });
-
-    // Verify AD is still enabled.
-    // Select item and Play button
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await utils.sleep(2000);
-
-    await testUtils.selectAndVerifyDetailPageMenuItem('play');
+    // Start app user
+    await testUtils.startApplicationWithDeeplink({mediaType: 'episode', contentID: '526358'}, {user: user});
 
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
@@ -153,9 +99,9 @@ describe('Multiple Audio', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify that AD is still enabled
-    await utils.sleep(3000);
-    const audioDescriptionItemContent = await testUtils.getNodeForElement('audioDescriptionItemContent');
-    expect(audioDescriptionItemContent.checked).is.true;
+    await testUtils.waitForElementToFullyShowOnScreen('audioDescriptionItemChecked');
+    const audioDescriptionItemChecked = await testUtils.getNodeForElement('audioDescriptionItemChecked');
+    expect(audioDescriptionItemChecked.id).is.equal('checkIcon');
 
     // Reset AD controls to default
     await resetAudioOptions();
@@ -163,24 +109,10 @@ describe('Multiple Audio', function () {
 
   });
 
+
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/426763
   it('C426763 - Video Player: Ensure that user is able view and toggle available audio and subtitle language options for each title @multiple_audio', async () => {
-    await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-    await testUtils.waitForElementToFullyShowOnScreen('searchKeyPad');
-    await ecp.sendText('lego masters');
-
-    // Call function to navigate right to search results grid
-    // Call function to navigate right to search results grid
-    await testUtils.waitForElementToFullyShowOnScreen('searchResultsGridPoster');
-    await shared.navigateRightToGrid();
-    await testUtils.waitForElementToFullyShowOnScreen('searchResultsText');
-    const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-    expect(searchResultsText.text).to.contain('LEGO Masters');
-    
-
-    // Select item and Play button
-    await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.selectAndVerifyDetailPageMenuItem('play');
+    await testUtils.startApplicationWithDeeplink({mediaType: 'episode', contentID: '526358', shouldCreateNewUser: true });
 
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing');
