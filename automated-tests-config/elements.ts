@@ -1011,6 +1011,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#panelContentSection.#heading',
   },
 
+  goHomeMyStuffButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#myStuffScreen.#PageGroup.#AllEmptyUI.#AllEmptyUIMenu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+  },
+
   /** Privacy Page scroller */
   privacyPageScroller: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PanelSet.3.#Offset.#ContentGroup.#Text.2',
