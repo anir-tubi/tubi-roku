@@ -21,15 +21,22 @@ End Function
 
 Function onItemSelectedChange(msg)
   selectedItemIndex = msg.getData()
-  topRef = m.top
+  content = m.top.content
 
-  if m.currentCheckedItemIndex <> selectedItemIndex
-    unCheckedContentItem = topRef.content.getChild(m.currentCheckedItemIndex)
-    unCheckedContentItem.checked = false
+  if content <> invalid
+    contentCount = content.getChildCount()
 
-    checkedContentItem = topRef.content.getChild(selectedItemIndex)
+    'Removes tick/check mark from all items on list
+    for i = 0 to contentCount-1
+      unCheckedContentItem = content.getChild(i)
+      unCheckedContentItem.checked = false
+    end for
+
+    'Adds tick/check mark for item which user selected
+    checkedContentItem = content.getChild(selectedItemIndex)
     checkedContentItem.checked = true
-    ' Resetting the current checked item index to new item index.
-    m.currentCheckedItemIndex = selectedItemIndex
   end if
+
+  ' Resetting the current checked item index to new item index.
+  m.currentCheckedItemIndex = selectedItemIndex
 End Function
