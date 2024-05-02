@@ -1994,6 +1994,15 @@ Function onCustomResume(msg)
     ' There is a similar doc note added of why we are restarting during deeplinking.
     restartApp()
   else
+    ' Since we are only going to restart application for users in experiment but we still need to fire exposure event for control group.
+    ' And also we need to reset the value.
+    if isDeeplinkRequest = false AND relaunchSeriesPlaybackInfo <> invalid
+      getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v2", true)
+      saveServerPersistentData({
+        "relaunchSeriesPlaybackInfo": {}
+      }, "device")
+    end if
+
     '// If the resume app action is to restart the app or start the channel, then 1st see if the previously played linear video can be played (if one exists)
     if bRestartApp = true
       restartApp()
