@@ -1996,7 +1996,7 @@ Function onCustomResume(msg)
   else
     ' Since we are only going to restart application for users in experiment but we still need to fire exposure event for control group.
     ' And also we need to reset the value.
-    if isDeeplinkRequest = false AND relaunchSeriesPlaybackInfo <> invalid
+    if isDeeplinkRequest = false AND relaunchSeriesPlaybackInfo <> invalid AND isNonEmptyString(relaunchSeriesPlaybackInfo.seriesId) = true AND isLoggedInUser() = true
       getExperimentResource("roku_relaunch_series", "roku_relaunch_series_v2", true)
       saveServerPersistentData({
         "relaunchSeriesPlaybackInfo": {}
