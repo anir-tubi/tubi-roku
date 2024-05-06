@@ -48,6 +48,9 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     _: rodash()
     adContentType: adContentType  ' "hls" or "mp4"
     breakPos: 0
+    googleAppSession: invalid ' Google's GAMUtils appsession or invalid
+    googleContentSession: invalid ' Google's GAMUtils contentSession or invalid
+    shouldSendGoogleBeacons: false ' Let's us know if during a given ad pod we should send beacons to Google or not
 
     ' public
     roAdFramework: roAdFramework
@@ -288,16 +291,57 @@ Function tubiAds_getRainmakerParamsForLinear(content)
 End Function
 
 
-' This function is used to retrieve ads for linear.
+' This function is used to retrieve ads for linear and VOD
 ' @adsUrl: string, The url that is used to retrieve the ads. This url is already decorated with rainmaker params.
-' @ssaiUsed: string, values are "yospace" or "apollo". currently yospace is default. But in future, apollo will replace the yospace.
-Function tubiAds_retrieveAds(adsUrl, ssaiUsed = "yospace")
+' @adInsertionMethod: string, Defines how we will be inserting ads in the stream. Values are "yospace", "apollo" or "csai".
+Function tubiAds_retrieveAds(adsUrl, adInsertionMethod)
   currentAdUnitsList = invalid
 
+  videoHeight = m.constants.deviceInfo.videoMode.toInt()
+  if videoHeight = 2160 then
+    videoWidth = 3840
+  else if videoHeight = 1080 then
+    videoWidth = 1920
+  else if videoHeight = 720 then
+    videoWidth = 1280
+  else if videoHeight = 480 then
+    videoWidth = 720
+  else
+    videoWidth = -1
+    videoHeight = -1
+  end if
+
+
+  requestOptions = {}
+  if adInsertionMethod = "csai" then
+    if m.googleAppSession = invalid then
+      m.googleAppSession = newAppSession()
+    end if
+    m.googleContentSession = m.googleAppSession.newContentSession({
+      "adWillAutoPlay": false
+      "adWillPlayMuted": false
+      "continuousPlayback": true
+      "directedForChildOrUnknownAge": false
+      "iconsSupported": false
+      "publisherProvidedId": "" ' Required as the fallback is a boolean and it will crash otherwise
+      "raf": m.roAdFramework
+      "videoHeight": videoHeight
+      "videoWidth": videoWidth
+      "storageAllowed": (m.constants.deviceInfo.isAdIdTrackingDisabled = false)
+      "supportedApiFrameworks": []
+      "skippablesSupported": false
+    })
+
+    givn = m.googleContentSession.getGIVN()
+    requestOptions.headers = {
+      "x-tubi-paln": givn
+    }
+  end if
 
   ' RAF has a hard 5 second cutoff for download time.
   ' We make the network request to rainmaker ourselves to work around this.
-  tubiReq = m.request.createAsync(adsUrl)
+  tubiReq = m.request.createAsync(adsUrl, "adsRequest", requestOptions)
+
   port = createObject("roMessagePort")
   if tubiReq.start(port) = true then
     timeout = 10000 ' in milliseconds
@@ -305,6 +349,12 @@ Function tubiAds_retrieveAds(adsUrl, ssaiUsed = "yospace")
     if type(msg) = "roUrlEvent" then
       responseCode = msg.getResponseCode()
       if responseCode >= 200 AND responseCode < 400 then
+        ' If our request was successful and it contains the x-tubi-send-google-beacons header then we should send beacons to Google
+        responseHeaders = msg.getResponseHeaders()
+        if responseHeaders["x-tubi-send-google-beacons"] <> invalid then
+          m.shouldSendGoogleBeacons = true
+        end if
+
         ' If we got a valid result write it to tmp and then have RAF read it from there
         rainmakerResponse = msg.getString()
         localRafVastUrl = "tmp:/local_raf_vast.xml"
@@ -326,7 +376,7 @@ Function tubiAds_retrieveAds(adsUrl, ssaiUsed = "yospace")
         deleteFile(localRafVastUrl)
       else
         code = responseCode.tostr()
-        if code = "404" AND ssaiUsed = "apollo"
+        if code = "404" AND adInsertionMethod = "apollo"
           ' apollo pollUrl sends 404 if there are no ads, hence its not an error that we want report.
         else
           errorInfo = {
@@ -394,7 +444,7 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos, isSeekPastCuepoint = false
 
   adFetchTimer = createObject("roTimeSpan")
 
-  currentAdUnitsList = m.retrieveAds(rainmakerVastUrl)
+  currentAdUnitsList = m.retrieveAds(rainmakerVastUrl, "csai")
   timeToFetch = adFetchTimer.totalMilliseconds()
 
   'log ad fetch errors
@@ -783,6 +833,21 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
     else if eventType = "Resume" then
       m.controlNode.timestampOfLastVideoPlayback = -1
     end if
+
+    ' GAMUtils integration
+    if m.shouldSendGoogleBeacons = true AND m.googleContentSession <> invalid then
+      if eventType = "PodStart" then
+        m.googleContentSession.sendStartedBeacon()
+      else if eventType = "Close" OR eventType = "PodComplete" then
+        m.googleContentSession.sendEndedBeacon()
+        ' Google is using RAF to do the actual sending so we are good to clean up straight away
+        m.googleContentSession = invalid
+        m.shouldSendGoogleBeacons = false
+      else if eventType = "Pause" OR eventType = "Resume" then
+        ' Google wants us to send onKeyEvent responses but we never receive those because RAF consumes them but we can at least send play pause
+        m.googleContentSession.sendAdTouchBeacon("play")
+      end if
+    end if
   else
     if ctx <> invalid then
       ' eventType is invalid when an event fires signaling that one second of ad playback has ocurred
@@ -790,6 +855,11 @@ Function tubiAds_adTrackingCallback(eventType, ctx)
         m.adPlaybackPos = ctx.time
       end if
     end if
+  end if
+
+  if m.shouldSendGoogleBeacons = true AND m.googleContentSession <> invalid then
+    ' We want to poll any time we get an event including those without an eventType. GAMUtils will limit sending on its own
+    m.googleContentSession.poll()
   end if
 
   if m.youboraTask <> invalid

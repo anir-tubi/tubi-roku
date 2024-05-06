@@ -81,6 +81,7 @@
   <script type="text/brightscript" uri="ConsentScreenHelpers.brs" />
   <script type="text/brightscript" uri="pkg:/source/lib/ArrayUtils.brs" />
   <script type="text/brightscript" uri="RokuCWConsentScreenHelpers.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/google/gam_utils.brs" />
 
   <interface>
 
