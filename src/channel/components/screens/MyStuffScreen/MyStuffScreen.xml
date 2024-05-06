@@ -87,7 +87,7 @@
       <LayoutGroup id="SignedOutUI"
         layoutDirection="vert"
         horizAlignment="center"
-        itemSpacings="[24]"
+        itemSpacings="[9,0,21]"
         visible="false"
         translation="[768,411]">
         <Label
@@ -139,7 +139,7 @@
       <LayoutGroup id="AllEmptyUI"
         layoutDirection="vert"
         horizAlignment="center"
-        itemSpacings="[30]"
+        itemSpacings="[9,0,21]"
         visible="false"
         translation="[768,343]">
         <Label
