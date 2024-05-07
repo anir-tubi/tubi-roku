@@ -134,6 +134,8 @@
       -->
       <field id="trackingPageContext" type="assocarray" />
 
+      <field id="trackingLoggingEvent" type="assocarray" />
+
       <field id="contentIdToFocusOnLoadComplete" type="string" />
 
       <!-- Timestamp of the last time we finished playing back video with this player. If -1 then we are currently playing back. -->

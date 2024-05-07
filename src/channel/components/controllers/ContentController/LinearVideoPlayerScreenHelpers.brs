@@ -46,6 +46,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
         videoPlayer.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
         videoPlayer.observeFieldScoped("channelLikeDislikeInfo", "onChannelLikeDislikeInfo")
         videoPlayer.observeFieldScoped("linearOverlayLiteComponentInteractionInfo", "onComponentInteractionInfoChange")
+        videoPlayer.observeFieldScoped("trackingLoggingEvent", "ontrackingLoggingEvent")
 
         initVideoTracking(videoPlayer) 'initializeYoubora. Regular and linear video players share tracking functions, which are found in VideoHelpers
         setInScreenCache(videoPlayer)
@@ -903,5 +904,14 @@ Function handleBackToEPGScreen(content, screenId)
   if content <> invalid
     jumpToParentScreenContentByID(content.id, content.parentId, screenId)
     popScreen(true, true)
+  end if
+End Function
+
+
+Function ontrackingLoggingEvent(event)
+  trackEvent = event.getData()
+
+  if event <> invalid
+    m.trackingLoggingTask.trackEvent =  trackEvent
   end if
 End Function

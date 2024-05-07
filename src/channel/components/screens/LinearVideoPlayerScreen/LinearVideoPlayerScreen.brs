@@ -676,7 +676,7 @@ End Function
 
 
 Function trackEvent(event as object)
-  m.global.trackingLoggingTask.trackEvent = event
+  m.top.trackingLoggingEvent = event
 End Function
 
 
