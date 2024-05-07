@@ -37,7 +37,11 @@ Function onPageInfoUpdatedForAnalytics(msg)
   pageInfo = msg.GetData()
   if pageInfo <> invalid
     m.previousPageInfo = m.currentPageInfo
+    'there might not be pageOneInfo stored.
+    m.previousPageInfo.pageOneInfo = m.tubiTrackingInfo.getAnalyticsPage(m.previousPageInfo.pageType, m.previousPageInfo.pageValues)
+
     m.currentPageInfo = pageInfo
+    m.currentPageInfo.pageOneInfo = m.tubiTrackingInfo.getAnalyticsPage(m.currentPageInfo.pageType, m.currentPageInfo.pageValues)
 
     if m.previousPageInfo.pagetype <> m.currentPageInfo.pagetype
       previewProgressEvent = getPreviewProgressEvent(m.previousPageInfo, "onPageInfoUpdatedForAnalytics")
@@ -146,16 +150,20 @@ End Function
 ' onVideoPositionChange
 '
 Function onVideoPositionChange(msg)
-  m.playerPosition = msg.GetData()
-
-  ' Analytics
-  if m.playerPosition >= m.lastPingTime + m.analyticsInterval
-    previewProgressEvent = getPreviewProgressEvent(m.currentPageInfo, "onVideoPositionChange")
-    if previewProgressEvent <> invalid
-      trackEvent(previewProgressEvent)
-      m.lastPingTime = m.playerPosition
+  TRY
+    m.playerPosition = msg.GetData()
+    ' Analytics
+    if m.playerPosition >= m.lastPingTime + m.analyticsInterval
+      previewProgressEvent = getPreviewProgressEvent(m.currentPageInfo, "onVideoPositionChange")
+      if previewProgressEvent <> invalid
+        trackEvent(previewProgressEvent)
+        m.lastPingTime = m.playerPosition
+      end if
     end if
-  end if
+  CATCH e
+    ?  m.constants.deviceInfo.deviceId
+    THROW e
+  END TRY
 
 End Function
 
@@ -226,15 +234,25 @@ Function getPreviewProgressEvent(pageInfo, callSource)
 
   if m.playerPosition > m.lastPingTime AND m.videoState = "play"
     viewTime = Int((m.playerPosition - m.lastPingTime) * 1000) 'ms
+    currentPosition = Int(m.playerPosition * 1000) 'ms
+    videoId = m.Video.content.id.toInt()
+    pgInfo = {}
 
+    if pageInfo <> invalid
+      if pageInfo.pageOneInfo <> invalid
+        pgInfo = pageInfo.pageOneInfo
+      else
+        pgInfo = m.tubiTrackingInfo.getAnalyticsPage(pageInfo.pagetype, pageInfo.pageValues)
+      end if
+    end if
     previewProgressEvent = {
       type: "preview_play_progress"
       values: {
-        video_id: m.Video.content.id.toInt()
-        position: Int(m.playerPosition * 1000) 'ms
+        video_id: videoId
+        position: currentPosition
         view_time: viewTime
         video_player: "BANNER"
-        pageOneof: m.tubiTrackingInfo.getAnalyticsPage(pageInfo.pageType, pageInfo.pageValues)
+        pageOneof: pgInfo
       }
     }
 
@@ -244,7 +262,7 @@ Function getPreviewProgressEvent(pageInfo, callSource)
     if viewTime >= 15000
       videoInfo = {}
       videoInfo.playerState = m.Video.state
-      videoInfo.videoId = m.Video.content.id.toInt()
+      videoInfo.videoId = videoId
       videoInfo.viewTime = viewTime
       videoInfo.playerPosition = m.playerPosition
       videoInfo.lastPingTime = m.lastPingTime
