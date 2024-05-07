@@ -238,6 +238,17 @@ Function tubiMetadataTranslate_translateHomescreen_test()
 End Function
 
 
+'@Test translateMiniHomescreen unit tests
+Function tubiMetadataTranslate_translateMiniHomescreen_test()
+  homeJson = ReadAsciiFile("pkg:/source/tests/rooibos/units/homescreen.json")
+  translated = m.translate.translateMiniHomescreen(ParseJson(homeJson))
+  m.assertNotInvalid(translated)
+  m.assertEqual(translated.getChildCount(), 8)
+  m.assertEqual(translated.getChild(0).id, "featured")
+  m.assertEqual(translated.getChild(0).getChildCount(), 8)
+End Function
+
+
 '@Test translate unit tests
 Function tubiMetadataTranslate_translate_test()
   matches = ReadAsciiFile("pkg:/source/tests/rooibos/units/search.json")

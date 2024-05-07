@@ -659,7 +659,7 @@ Function onExpandContentArea(msg)
     ' Resetting the values back to normal.
     translationY = 0
   end if
-  
+
   m.RowList.itemClippingRect = {
     height: 1080
     width: 1920

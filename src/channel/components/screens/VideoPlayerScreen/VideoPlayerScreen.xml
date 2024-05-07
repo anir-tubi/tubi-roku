@@ -116,10 +116,16 @@
       <field id="didUserOptOutOfPersonalizedAdvertising" type="boolean" value="false" />
 
       <!-- YMAL content to be displayed on YMAL Row inside player -->
-      <field id="relatedContent" type="node" alias="Related.content" />
+      <field id="relatedContent" type="node" />
 
       <!-- boolean field which tells the YMAL content is updated -->
-      <field id="updateRelatedContent" alias="Related.updateContent"/>
+      <field id="updateRelatedContent" type="boolean" alwaysNotify="true"/>
+
+      <!-- browseContent content to be displayed on YMAL Row inside player -->
+      <field id="browseContent" type="node" />
+
+      <!-- boolean field which tells the browseContent is updated -->
+      <field id="updateBrowseContent" type="boolean" alwaysNotify="true"/>
 
       <!-- Used to allow seeking the video player while still maintaining proper state tracking. Sets video player seek field to appropriate value and updates necessary state. `seek` field is time/double based and value specified should be in seconds -->
       <field id="seekTo" type="time" />
@@ -167,7 +173,7 @@
       <field id="upNextNavigateWithinPageInfo" alias="UpNext.navigateWithinPageInfo" />
 
       <!-- Pass through Related component events to video helper -->
-      <field id="relatedNavigateWithinPageInfo" alias="Related.navigateWithinPageInfo" />
+      <field id="relatedNavigateWithinPageInfo" type="assocarray"/>
 
       <!-- Used to set the autoplay_deliberate and autoplay_automatic analytics values
            for PlayProgressEvents and StartVideoEvents. Allowed values are "automatic", "deliberate" and "unknown"
@@ -184,6 +190,14 @@
 
       <!-- set to true when the relatedContentToPlay field is updated -->
       <field id="relatedContentToPlayUpdated" type="boolean" alwaysNotify="true"/>
+
+      <!-- set to the contentNode of the homescreen item which was focused when
+           the ok button is pressed
+      -->
+      <field id="homescreenContentToPlay" type="node"/>
+
+      <!-- set to true when the homescreenContentToPlay field is updated -->
+      <field id="homescreenContentToPlayUpdated" type="boolean" alwaysNotify="true"/>
 
       <!-- streamingSegment will be set when streamingSegment of videoNode value changes -->
       <field id="segInfo" type="assocarray"/>
@@ -547,9 +561,8 @@
       id="UpNext"
       opacity="0.0" />
 
-    <Related
-      id="Related"
-      translation="[84, 550]"/>
+    <Group
+      id="YmalRow"/>
 
     <Rectangle
       id="closedCaptionAndAudioSelectionOverlayGroup"

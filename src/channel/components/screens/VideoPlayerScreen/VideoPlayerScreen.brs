@@ -52,11 +52,6 @@ Function init()
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
   m.LoadingMessage = m.top.findNode("LoadingMessage")
   m.Transport = m.top.findNode("Transport")
-  m.Related = m.top.findNode("Related")
-  m.Related.associatedPageName = "video_player_page"
-  m.Related.observeFieldScoped("isRelatedContentFocused", "onRelatedItemFocused")
-  m.Related.observeFieldScoped("selectedRelatedContentItemUpdated", "onRelatedItemSelected")
-  m.Related.observeFieldScoped("keyPress", "onKeyPressWhenYMALHasFocus")
   m.UpNext = m.top.findNode("UpNext")
   m.UpNext.observeField("contentSelected", "onUpNextContentSelected")
   m.UpNext.observeField("opacity", "onUpNextOpacityChange")
@@ -72,6 +67,26 @@ Function init()
   if getExperimentResource("roku_async_stop", "roku_async_stop_v5", false).enabled = true then
     m.video.asyncStopSemantics = true
   end if
+
+  YmalRow = m.top.findNode("YmalRow")
+
+  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true then
+    m.Related = YmalRow.createChild("BrowseContentOnPlayer")
+    m.Related.observeFieldScoped("selectedRelatedContentItemUpdated", "onBrowseContentSelected")
+  else
+    m.Related = YmalRow.createChild("Related")
+    m.Related.observeFieldScoped("selectedRelatedContentItemUpdated", "onRelatedItemSelected")
+  end if
+
+  m.Related.translation = "[171, 550]"
+  m.Related.associatedPageName = "video_player_page"
+  m.Related.observeFieldScoped("trackingComponentInfo", "onTrackingComponentInfo")
+  m.Related.observeFieldScoped("isRelatedContentFocused", "onRelatedItemFocused")
+  m.Related.observeFieldScoped("keyPress", "onKeyPressWhenYMALHasFocus")
+  m.Related.observeFieldScoped("navigateWithinPageInfo", "onNavigateWithinPageInfoChange")
+
+  m.top.observeFieldScoped("updateRelatedContent", "onRelatedContentUpdated")
+  m.top.observeFieldScoped("updateBrowseContent", "onBrowseContentUpdated")
 
   m.top.observeField("updateContent", "onContentChange")
   m.top.observeField("sprites", "onSpritesReceived")
@@ -2236,21 +2251,30 @@ End Function
 
 Function onRelatedItemSelected(msg)
   screen = msg.getRoSGNode()
+
   if screen <> invalid then
     selectedContent = screen.selectedRelatedContentItem
-
-    m.top.trackingComponentInfo = {
-      componentType: "related_component"
-      componentValues: {
-        content_tile: m.Tracking.getAnalyticsTile(selectedContent, m.Related.itemFocused + 1, 1)
-      }
-    }
-
     animateTransport("out")
     hideYMAL()
     setFocusToPlaybackControl()
     m.top.relatedContentToPlay = selectedContent
     m.top.relatedContentToPlayUpdated = true
+    resetTransportButtons()
+  end if
+
+End Function
+
+
+Function onBrowseContentSelected(msg)
+  screen = msg.getRoSGNode()
+
+  if screen <> invalid then
+    selectedContent = screen.selectedRelatedContentItem
+    animateTransport("out")
+    hideYMAL()
+    setFocusToPlaybackControl()
+    m.top.homescreenContentToPlay = selectedContent
+    m.top.homescreenContentToPlayUpdated = true
     resetTransportButtons()
   end if
 End Function
@@ -2301,4 +2325,31 @@ Function onSignUpSaveProgressButtonSelected()
 
   m.stateForSignUpSaveProgress = videoState
   m.top.signUpSaveProgressButtonSelected = true
+End Function
+
+
+Function onRelatedContentUpdated(msg)
+  m.Related.content = m.top.relatedContent
+  m.Related.updateContent = true
+End Function
+
+
+Function onBrowseContentUpdated(msg)
+  m.Related.content = m.top.browseContent
+  m.Related.isLoading = false
+  m.Related.updateContent = true
+End Function
+
+
+Function onNavigateWithinPageInfoChange(msg)
+  navigateWithinPageInfo = msg.getData()
+  m.top.relatedNavigateWithinPageInfo = navigateWithinPageInfo
+End Function
+
+
+Function onTrackingComponentInfo(msg)
+  componentInfo = msg.getData()
+  if componentInfo <> invalid
+    m.top.trackingComponentInfo = componentInfo
+  end if
 End Function

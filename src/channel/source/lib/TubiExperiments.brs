@@ -91,6 +91,10 @@ Function TubiExperiments(constants) as Object
         roku_sports_onnow_rows_v2: {"enabled": false}
       }
 
+      roku_browse_while_watching_ymal: {
+        roku_browse_while_watching_ymal_v4 : {"enabled": false}
+      }
+
       roku_relaunch_series: {
         roku_relaunch_series_v2: {"enabled": false}
       }

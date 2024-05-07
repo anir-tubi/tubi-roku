@@ -234,6 +234,7 @@ End Function
 ' this function calls appropriate functions to handle the deeplinks based on deeplink type
 Function handleDeeplinkContentByType()
   tubilog("deeplinkHelpers.handleDeeplinkContentByType")
+
   if m.deepLinkContent <> invalid
     if m.deepLinkContent.deeplinkType = "linear" OR m.deepLinkContent.deeplinkType = "liveTV"
       'if fadeInContentController is still playing, then linear content can not play.

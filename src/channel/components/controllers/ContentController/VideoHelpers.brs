@@ -34,7 +34,6 @@ Function playVideoContent(content, playbackSource = {"srcForAnalytic": "unknown"
         pushScreen(videoPlayer, true, true)
       end if
     end if
-
     '//send a copy of the videoSponsorExposureId to the videoPlayer
     videoPlayer.videoSponsorExposureId = m.videoSponsorExposureId
     sendVideoPlayerCommand(videoPlayer, "play")
@@ -104,6 +103,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     videoPlayer.observeFieldScoped("sendPauseAdPixel", "onSendPauseAdPixel")
     videoPlayer.observeFieldScoped("subtitleTrackSettings", "onSubtitleTrackSettingsChange")
     videoPlayer.observeFieldScoped("audioTrackSettings", "onAudioTrackSettingsChange")
+    videoPlayer.observeFieldScoped("homescreenContentToPlayUpdated", "onPlayerHomeScreenContentToPlay")
     videoPlayer.observeFieldScoped("relatedContentToPlayUpdated", "onPlayerRelatedContentToPlay")
     initVideoTracking(videoPlayer) 'initializeYoubora
     setInScreenCache(videoPlayer)
@@ -215,7 +215,17 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
       end if
 
       sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.streamStart, content)
-      getRelatedContent(content, handleRelatedResponseInVideoPlayer)
+
+      if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
+        browseContent = videoPlayer.browseContent
+
+        if browseContent = invalid OR browseContent.getChildCount() <= 0 AND m.isBrowseContentOnPlayerFetchInProgress = false
+          fetchBrowseContentForPlayer()
+        end if
+      else
+        getRelatedContent(content, handleRelatedResponseInVideoPlayer)
+      end if
+
     end if
 
     ' by default setting sprites to invalid
@@ -260,6 +270,65 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
   end if
 
   return videoPlayer
+End Function
+
+
+Function fetchBrowseContentForPlayer()
+  m.isBrowseContentOnPlayerFetchInProgress = true
+
+  reqName = m.constants.reqNames.getMiniHomescreen
+  options = {}
+  headers = {}
+  params = {}
+
+  limitParamName = "contents_limit"
+  contentModeParamName = "content_mode"
+  ' For tensor API, we need to pass as empty string for homescreen content
+  params[contentModeParamName] = ""
+  isKidsMode = shouldKidsModeBeSentToServer()
+
+  'Requesting 5 more containers on api request, as we remove linear rows from it.
+  params["group_size"] = m.constants.player.browseContent.numContainers + 5
+  params[limitParamName] = m.constants.player.browseContent.numContents
+
+  options.params = params
+  options.headers = headers
+
+  homeScreenReqInfo = m.CmsApi.createMiniHomeScreenOnPlayerReqInfo(isKidsMode, options)
+  m.makeRequest({
+    url: homeScreenReqInfo.url
+    requestType: reqName
+    options: homeScreenReqInfo.options
+    successCallback: onMiniHomeScreenContentSuccessResponse
+    errorCallback: onMiniHomeScreenContentErrorResponse
+    responseType: "node"
+    isSignedInUser: isLoggedInUser()
+  })
+
+End Function
+
+
+Function onMiniHomeScreenContentSuccessResponse(response)
+  m.isBrowseContentOnPlayerFetchInProgress = false
+  screenID = m.constants.ui.screenIds.videoPlayerScreen
+  videoPlayerScreen = getFromScreenCache(screenID)
+
+  if videoPlayerScreen <> invalid
+    videoPlayerScreen.browseContent = response
+    videoPlayerScreen.updateBrowseContent = true
+  end if
+End Function
+
+
+Function onMiniHomeScreenContentErrorResponse(response)
+  m.isBrowseContentOnPlayerFetchInProgress = false
+  screenID = m.constants.ui.screenIds.videoPlayerScreen
+  videoPlayerScreen = getFromScreenCache(screenID)
+
+  if videoPlayerScreen <> invalid
+    videoPlayerScreen.browseContent = invalid
+    videoPlayerScreen.updateBrowseContent = true
+  end if
 End Function
 
 
@@ -1451,6 +1520,27 @@ Function deleteFromRokuContinueWatching(content)
 End Function
 
 
+Function onPlayerHomeScreenContentToPlay(msg)
+  screen = msg.getRoSGNode()
+
+  if screen <> invalid then
+    content = screen.homescreenContentToPlay
+
+    if content.type = m.constants.ui.contentTypes.series
+      emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
+      emptySeriesNode.type = m.constants.ui.contentTypes.series
+      emptySeriesNode.id = content.id
+      getSingleContentFromServer(emptySeriesNode, handleYMALContentSuccessResponse, handleYMALContentErrorResponse)
+    else
+      emptyMovieNode = CreateObject("roSGNode", "TubiContentNode")
+      emptyMovieNode.type = m.constants.ui.contentTypes.video
+      emptyMovieNode.id = content.id
+      getSingleContentFromServer(emptyMovieNode, handleYMALContentSuccessResponse, handleYMALContentErrorResponse)
+    end if
+  end if
+End Function
+
+
 Function onPlayerRelatedContentToPlay(msg)
   screen = msg.getRoSGNode()
   if screen <> invalid then
@@ -1461,7 +1551,7 @@ Function onPlayerRelatedContentToPlay(msg)
       emptySeriesNode = CreateObject("roSGNode", "TubiContentNode")
       emptySeriesNode.type = m.constants.ui.contentTypes.series
       emptySeriesNode.id = content.id
-      getSingleContentFromServer(emptySeriesNode, handleYMALSeriesContentSuccessResponse, handleYMALSeriesContentErrorResponse)
+      getSingleContentFromServer(emptySeriesNode, handleYMALContentSuccessResponse, handleYMALContentErrorResponse)
     else
       playbackSource = {
         "srcForAnalytic": m.constants.player.playbackSource.unknown
@@ -1473,7 +1563,7 @@ Function onPlayerRelatedContentToPlay(msg)
 End Function
 
 
-Function handleYMALSeriesContentSuccessResponse(content)
+Function handleYMALContentSuccessResponse(content)
   playbackSource = {
     "srcForAnalytic": m.constants.player.playbackSource.unknown
     "srcForAds": m.constants.player.playbackOrigin.ymal
@@ -1482,7 +1572,7 @@ Function handleYMALSeriesContentSuccessResponse(content)
 End Function
 
 
-Function handleYMALSeriesContentErrorResponse(error)
+Function handleYMALContentErrorResponse(error)
   videoPlayer = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
   content = invalid
 

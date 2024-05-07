@@ -163,6 +163,12 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
   }
 
+  ' minihomescreen
+  m.requestTypes[m.constants.reqNames.getMiniHomescreen] = {
+    parseSuccess: parseMiniHomeScreenContentSuccess
+    parseError: parseGenericError
+  }
+
   ' category
   m.requestTypes[m.constants.reqNames.getCategory] = {
     parseSuccess: parseCategoryContentSuccess

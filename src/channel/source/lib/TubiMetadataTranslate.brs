@@ -10,6 +10,7 @@ Function TubiMetadataTranslate(constants, experiments = invalid)
     translateContainer: tubiMetadataTranslate_translateContainer
     translateCategoryDetails: tubiMetadataTranslate_translateCategoryDetails
     translateHomescreen: tubiMetadataTranslate_translateHomescreen
+    translateMiniHomescreen: tubiMetadataTranslate_translateMiniHomescreen
     translateCategoriesListScreen: tubiMetadataTranslate_translateCategoriesListScreen
     translateEPGChannelIds: tubiMetadataTranslate_translateEPGChannelIds
     translateEPGPrograms: tubiMetadataTranslate_translateEPGPrograms
@@ -2586,6 +2587,72 @@ Function tubiMetadataTranslate_setDescriptorCodeAndDescription(content, descript
 
   end if
 
+End Function
+
+
+' @contentToTranslate: AA, json parsed response from the matrix/homescreen endpoint
+' @contentMode: string, the value of the contentMode parameter as sent as part of the matrix/homescreen request
+' @screenId: string, the id of the screen
+' @isSignedInUser: boolean, value based on user logged In or not
+Function tubiMetadataTranslate_translateMiniHomescreen(contentToTranslate, contentMode="homescreen", screenId="", isSignedInUser = false) As Object
+  tubiLog("TubiMetadataTranslate tubiMetadataTranslate_translateMiniHomescreen()")
+
+  translated = CreateObject("roSGNode", "CategoryContentNode")
+  homescreenAA = {
+    id: m.constants.ui.contentIds.homegrid
+    title: ""
+    validUntil: 0
+    children: []    'categories
+  }
+
+  if contentToTranslate <> invalid
+    if contentToTranslate.valid_duration <> invalid
+      homescreenAA.validUntil = Uptime(0) + contentToTranslate.valid_duration
+    else
+      homescreenAA.validUntil = Uptime(0) + m.constants.cacheTimes.homescreen
+    end if
+
+    containers = contentToTranslate.containers
+    contents = contentToTranslate.contents
+    containerCount = containers.count()
+
+    'added this to display only 10 rows on videoplayer
+    numOfContainers = 0
+
+    'set up AAs for all categories
+    for i = 0 to containerCount - 1
+      container = containers[i]
+
+      if container.type <> "linear"
+        children = container.children
+
+        for each child in children
+          content = contents[child]
+
+          'Remove non VOD content to avoid showing on video player screen
+          if content <> invalid AND content.type <> "v" AND content.type <> "s"
+            contents.Delete(child)
+          end if
+        end for
+
+        categoryAA = m.buildCategoryAA(container, contents, "", "", false, contentMode, screenId, isSignedInUser)
+        homescreenAA.children.push(categoryAA)
+        numOfContainers += 1
+
+      end if
+
+      if numOfContainers = 10
+        exit for
+      end if
+
+    end for
+
+    translated.update(homescreenAA, true)
+    node_count = 1 + translated.getChildCount()
+    tubiLog("TranslateMetadata converted " + stri(node_count) + " nodes")
+  end if
+
+  return translated
 End Function
 
 

@@ -230,6 +230,9 @@ Function init()
   ' Used to store the currently queued Video node command. Contents should either be invalid or should be an AA containing both
   ' "videoPlayerNode" which is the node for the video player and "command" which is the string we will pass to the control field of the videoPlayerNode node.
   m.queuedVideoPlayerCommand = invalid
+
+  'used to find whether homescreen browse content fetching is in progress in order to show on player ymal section
+  m.isBrowseContentOnPlayerFetchInProgress = false
 End Function
 
 
@@ -1478,6 +1481,14 @@ Function setContentToRefreshAllPersonalizedScreens(shouldRefetchHomescreen = tru
   if searchScreen <> invalid
     ' calling updateSearchContentNode to removes the Lock icon from search result posters once user sign-in.
     updateSearchContentNode(searchScreen)
+  end if
+
+  videoPlayerScreen = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
+
+  'setting videoplayerscreen's browseContent as invalid, so that when nexttime videoplayer launched new homescreen content will be fetched
+  if videoPlayerScreen <> invalid
+    videoPlayerScreen.browseContent = invalid
+    videoPlayerScreen.updateBrowseContent = true
   end if
 
   timeGridContent = getFromContentCache(m.constants.ui.contentIds.timeGridContent)

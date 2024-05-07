@@ -133,7 +133,12 @@ Function onKeyEvent(key As String, press As Boolean) as Boolean
         else if m.signUpSaveProgressButton.hasFocus() = true
           setFocusToComponent(m.ProgressBar)
         else if isFocusOnPlayerControl() = true AND m.TopOverlay.opacity = 1
-          relatedContent = m.top.relatedContent
+
+          if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
+            relatedContent = m.top.browseContent
+          else
+            relatedContent = m.top.relatedContent
+          end if
 
           if relatedContent <> invalid AND relatedContent.getChildCount() > 0
             setFocusToComponent(m.Related)
@@ -1642,8 +1647,8 @@ Function animateTransportAndYMAL(direction)
     fade(m.TransportButtons, "out", 0.4)
     fade(m.VideoOverlay, "out", 0.4)
     fade(m.VideoYMALOverlay, "in", 0.4)
-    showRatingGradient()
-    slideTo(m.HUD, [0, -621], 0.6)
+    hideRatingOverlay()
+    slideTo(m.HUD, [0, -696], 0.6)
     m.Related.open = true
   else
     if m.skipCuepointsButtonTimer <> invalid
@@ -1658,7 +1663,6 @@ Function animateTransportAndYMAL(direction)
 
     fade(m.VideoYMALOverlay, "out", 0.4)
     fade(m.VideoOverlay, "in", 0.4)
-    hideRatingGradient()
     fade(m.TopOverlay, "in", 0.6, 0.2)
     slideTo(m.HUD, [0, 0], 0.6)
     m.Related.close = true
@@ -1670,11 +1674,22 @@ End Function
 
 ' show YMAL row on bottom of the screen and fire exposure event
 Function showYMAL()
-  relatedContent = m.top.relatedContent
-  'fire exposure event when YMAL row is displayed at bottom area of the screen
-  if relatedContent <> invalid AND relatedContent.getChildCount() > 0
-    m.Related.show = true
+
+  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
+    content = m.top.browseContent
+  else
+    content = m.top.relatedContent
   end if
+
+  'fire exposure event when YMAL row is displayed at bottom area of the screen
+  if content <> invalid AND content.getChildCount() > 0 AND getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4").enabled = true
+    m.Related.jumpToRowItem = [0,0]
+    m.Related.isLoading = false
+  else if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
+    m.Related.isLoading = true
+  end if
+
+  m.Related.show = true
 End Function
 
 
@@ -1734,7 +1749,7 @@ End Function
 
 Function onShowYMALInFullScreen()
   fade(m.VideoYMALOverlay, "in", 0.4)
-  m.HUD.translation = [0, -621]
+  m.HUD.translation = [0, -696]
   fade(m.HUD, "in", 0.6)
   m.Related.showInFullScreen = true
   m.Related.setFocus(true)

@@ -12,7 +12,6 @@ Function init()
   m.top.observeFieldScoped("updateContent", "onContentChange")
   m.top.observeFieldScoped("focusedChild", "onComponentFocus")
   m.top.observeFieldScoped("showInfoPanel", "onShowInfoPanel")
-  m.top.observeFieldScoped("unfocus", "onUnfocus")
   m.top.observeFieldScoped("show", "onShowRelated")
   m.top.observeFieldScoped("hide", "onHideRelated")
   m.top.observeFieldScoped("open", "onOpenRelated")
@@ -110,8 +109,23 @@ End Function
 
 Function onItemSelected(msg)
   itemSelected = msg.getData()
-  m.top.selectedRelatedContentItem = m.RelatedGrid.content.getChild(itemSelected)
-  m.top.selectedRelatedContentItemUpdated = true
+
+  if m.RelatedGrid.content <> invalid
+    selectedContent = m.RelatedGrid.content.getChild(itemSelected)
+
+    if selectedContent <> invalid
+      m.top.trackingComponentInfo = {
+        componentType: "related_component"
+        componentValues: {
+          content_tile: m.Tracking.getAnalyticsTile(selectedContent, m.RelatedGrid.itemFocused + 1, 1)
+        }
+      }
+
+      m.top.selectedRelatedContentItem = selectedContent
+      m.top.selectedRelatedContentItemUpdated = true
+    end if
+  end if
+
 End Function
 
 

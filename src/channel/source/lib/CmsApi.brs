@@ -18,6 +18,7 @@ Function CmsApi(constants, request, auth, apiUtils, experiments=invalid)
     createThumbnailsReqInfo: cmsApi_createThumbnailsReqInfo
     createCategoriesListReqInfo: cmsApi_createCategoriesListReqInfo
     createHomeScreenReqInfo: cmsApi_createHomeScreenReqInfo
+    createMiniHomeScreenOnPlayerReqInfo: cmsApi_createMiniHomeScreenOnPlayerReqInfo
     createCategoryReqInfo: cmsApi_createCategoryReqInfo
     createSearchReqInfo: cmsApi_createSearchRequestInfo
     createHomeScreenBatchReqInfo: cmsApi_createHomeScreenBatchRequestInfo
@@ -222,6 +223,72 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   params["include_empty_queue"] = true
   params["include_channels"] = true
   params["include_sponsorships"] = true
+  params["is_kids_mode"] = bKidsMode
+  ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
+  params["content_mode"] = "" ' default contentMode
+
+  'passing device advertiser id to homescreen request for home screen personalization
+  params["idfa"] = m.constants.deviceInfo.deviceAdId
+
+  if passedOptions.params <> invalid AND passedOptions.params["content_mode"] <> invalid AND passedOptions.params["content_mode"] <> ""
+    ' This will be overwritten by the same value later in this function
+    ' when we append the passedOptions.params to params. We add it here so the default value
+    ' is not used in the following logic, if a value was passed in for "contentMode"
+    params["content_mode"] = passedOptions.params["content_mode"]
+  end if
+
+  if params["content_mode"] <> m.constants.ui.contentMode.linear
+    ' don't send the Tupian image params for homescreen requests that are contentMode = "linear"
+    imageParamTypes = [
+      "poster"
+      "landscape"
+      "hero"
+      "background"
+    ]
+    params = m.setImageParams(imageParamTypes, options.params, m.constants.ui.screenIds.homeScreen)
+  end if
+
+  utmCampaignConfig = m.utmCampaignConfig
+  if isString(utmCampaignConfig) = true then
+    params["utm_campaign_config"] = utmCampaignConfig
+  end if
+
+  if passedOptions <> invalid
+    if passedOptions.params <> invalid
+      params.append(passedOptions.params)
+    end if
+
+    if passedOptions.headers <> invalid
+      headers.append(passedOptions.headers)
+    end if
+
+    options.append(passedOptions)
+  end if
+
+  options.params = params
+  options.headers = headers
+
+  return {
+    url: url
+    options: options
+  }
+End Function
+
+
+'''''''''''''''''''''
+' MiniHomeScreenReqInfo()
+'
+
+' @bKidsMode: boolean Are we in kids mode (and parental controls is not set to kids)?
+' @passedOptions: assocArray, options that are used to create a request (ie, headers, params, method, etc.)
+'                 see request.brs for more info
+Function cmsApi_createMiniHomeScreenOnPlayerReqInfo(bKidsMode = false, passedOptions = {})
+
+  options = m.getCommonOptions()
+  params = options.params
+  headers = options.headers
+  headers["Accept-Version"] = "6.0.0"
+  url = m.constants.urls.tensor.cdn.homescreen
   params["is_kids_mode"] = bKidsMode
   ' content_mode is mandatory param and its value needs to be passed as empty for fetching homescreen content
   params["content_mode"] = "" ' default contentMode

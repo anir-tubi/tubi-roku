@@ -1,4 +1,3 @@
-
 '@TestSuite [CmsApi] CmsApi.brs
 
 '@Setup
@@ -508,6 +507,161 @@ Function cmsApi_createHomeScreenReqInfo_test()
   m.assertEqual(homeInfo.options.headers["x-custom-header"], homeOptions.headers["x-custom-header"])
   m.assertEqual(homeInfo.options.headers["x-client-platform"], homeOptions.headers["x-client-platform"])
   m.assertEqual(homeInfo.options.headers["x-client-version"], homeOptions.headers["x-client-version"])
+End Function
+
+
+'@Test unit tests createMiniHomeScreenReqInfo
+Function cmsApi_createMiniHomeScreenReqInfo_test()
+  infoKeys = [
+    "url"
+    "options"
+  ]
+  params = [
+    "app_id"
+    "platform"
+    "device_id"
+    "is_kids_mode"
+    "images[landscape_tb]"
+    "images[poster_tb]"
+    "customParam"
+    "idfa"
+  ]
+  headers = [
+    "x-custom-header"
+    "x-client-platform"
+    "x-client-version"
+  ]
+
+  homeUrl = m.cmsApi.constants.urls.tensor.cdn.homescreen
+  homeOptions = {
+    params: {
+      "app_id": m.cmsApi.constants.settings.shortAppName
+      "platform": m.cmsApi.constants.platform
+      "device_id": m.cmsApi.constants.deviceInfo.deviceId
+      "is_kids_mode": false
+      "images[poster_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largePoster[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largePoster[1].ToStr() + "_poster"
+      "images[landscape_tb]": "w" + m.cmsApi.constants.ui.imageSizes.largeLandscape[0].ToStr() + "h" + m.cmsApi.constants.ui.imageSizes.largeLandscape[1].ToStr() + "_landscape"
+      "contentMode": m.cmsApi.constants.ui.contentMode.homescreen
+      "customParam": "custom_param_value"
+      "idfa": m.cmsApi.constants.deviceInfo.deviceAdId
+    }
+    headers: {
+      "x-custom-header": "custom_header_value"
+      "x-client-platform": m.cmsApi.constants.headers.commonUapi["x-client-platform"]
+      "x-client-version": m.cmsApi.constants.headers.commonUapi["x-client-version"]
+      "Accept-Version": "6.0.0"
+    }
+  }
+
+  passedOptions = {
+    params: {
+      "contentMode": m.cmsApi.constants.ui.contentMode.homescreen
+      "customParam": "custom_param_value"
+    }
+    headers: {
+      "x-custom-header": "custom_header_value"
+    }
+  }
+
+  ' no kids mode and homescreen contentMode
+  homeInfo = m.cmsApi.createMiniHomeScreenOnPlayerReqInfo(false, passedOptions)
+
+  m.assertEqual(homeInfo.count(), 2)
+  m.assertAAHasKeys(homeInfo, infoKeys)
+  m.assertEqual(homeInfo.url, homeUrl)
+  m.assertAAHasKeys(homeInfo.options.params, params)
+  m.assertAAHasKeys(homeInfo.options.headers, headers)
+  m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
+  m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
+  m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
+  m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
+  m.assertEqual(homeInfo.options.params["images[poster_tb]"], homeOptions.params["images[poster_tb]"])
+  m.assertEqual(homeInfo.options.params["images[landscape_tb]"], homeOptions.params["images[landscape_tb]"])
+  m.assertEqual(homeInfo.options.params["contentMode"], homeOptions.params["contentMode"])
+  m.assertEqual(homeInfo.options.params["idfa"], homeOptions.params["idfa"])
+  m.assertEqual(homeInfo.options.params["customParam"], homeOptions.params["customParam"])
+  m.assertEqual(homeInfo.options.headers["x-custom-header"], homeOptions.headers["x-custom-header"])
+  m.assertEqual(homeInfo.options.headers["x-client-platform"], homeOptions.headers["x-client-platform"])
+  m.assertEqual(homeInfo.options.headers["x-client-version"], homeOptions.headers["x-client-version"])
+  m.assertEqual(homeInfo.options.headers["Accept-Version"], homeOptions.headers["Accept-Version"])
+
+  ' with kids mode and homescreen contentMode
+  homeInfo = m.cmsApi.createHomeScreenReqInfo(true, passedOptions)
+  homeOptions.params["is_kids_mode"] = true
+
+  m.assertEqual(homeInfo.count(), 2)
+  m.assertAAHasKeys(homeInfo, infoKeys)
+  m.assertEqual(homeInfo.url, homeUrl)
+  m.assertAAHasKeys(homeInfo.options.params, params)
+  m.assertAAHasKeys(homeInfo.options.headers, headers)
+  m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
+  m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
+  m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
+  m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
+  m.assertEqual(homeInfo.options.params["images[poster_tb]"], homeOptions.params["images[poster_tb]"])
+  m.assertEqual(homeInfo.options.params["images[landscape_tb]"], homeOptions.params["images[landscape_tb]"])
+  m.assertEqual(homeInfo.options.params["contentMode"], homeOptions.params["contentMode"])
+  m.assertEqual(homeInfo.options.params["customParam"], homeOptions.params["customParam"])
+  m.assertEqual(homeInfo.options.headers["x-custom-header"], homeOptions.headers["x-custom-header"])
+  m.assertEqual(homeInfo.options.headers["x-client-platform"], homeOptions.headers["x-client-platform"])
+  m.assertEqual(homeInfo.options.headers["x-client-version"], homeOptions.headers["x-client-version"])
+  m.assertEqual(homeInfo.options.headers["Accept-Version"], homeOptions.headers["Accept-Version"])
+
+  ' with contentMode = "tv"
+  passedOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.tv
+  homeInfo = m.cmsApi.createHomeScreenReqInfo(false, passedOptions)
+  homeOptions.params["is_kids_mode"] = false
+  homeOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.tv
+
+  m.assertEqual(homeInfo.count(), 2)
+  m.assertAAHasKeys(homeInfo, infoKeys)
+  m.assertEqual(homeInfo.url, homeUrl)
+  m.assertAAHasKeys(homeInfo.options.params, params)
+  m.assertAAHasKeys(homeInfo.options.headers, headers)
+  m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
+  m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
+  m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
+  m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
+  m.assertEqual(homeInfo.options.params["images[poster_tb]"], homeOptions.params["images[poster_tb]"])
+  m.assertEqual(homeInfo.options.params["images[landscape_tb]"], homeOptions.params["images[landscape_tb]"])
+  m.assertEqual(homeInfo.options.params["contentMode"], homeOptions.params["contentMode"])
+  m.assertEqual(homeInfo.options.params["customParam"], homeOptions.params["customParam"])
+  m.assertEqual(homeInfo.options.headers["x-custom-header"], homeOptions.headers["x-custom-header"])
+  m.assertEqual(homeInfo.options.headers["x-client-platform"], homeOptions.headers["x-client-platform"])
+  m.assertEqual(homeInfo.options.headers["x-client-version"], homeOptions.headers["x-client-version"])
+  m.assertEqual(homeInfo.options.headers["Accept-Version"], homeOptions.headers["Accept-Version"])
+
+  ' with contentMode = "linear"
+  passedOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.linear
+  homeInfo = m.cmsApi.createHomeScreenReqInfo(false, passedOptions)
+  homeOptions.params["contentMode"] = m.cmsApi.constants.ui.contentMode.linear
+  homeOptions.params.delete("images[landscape_tb]")
+  homeOptions.params.delete("images[poster_tb]")
+  params = [
+    "app_id"
+    "platform"
+    "device_id"
+    "is_kids_mode"
+  ]
+  headers = [
+    "x-custom-header"
+  ]
+
+  m.assertEqual(homeInfo.count(), 2)
+  m.assertAAHasKeys(homeInfo, infoKeys)
+  m.assertEqual(homeInfo.url, homeUrl)
+  m.assertAAHasKeys(homeInfo.options.params, params)
+  m.assertAAHasKeys(homeInfo.options.headers, headers)
+  m.assertEqual(homeInfo.options.params["app_id"], homeOptions.params["app_id"])
+  m.assertEqual(homeInfo.options.params["platform"], homeOptions.params["platform"])
+  m.assertEqual(homeInfo.options.params["device_id"], homeOptions.params["device_id"])
+  m.assertEqual(homeInfo.options.params["is_kids_mode"], homeOptions.params["is_kids_mode"])
+  m.assertEqual(homeInfo.options.params["contentMode"], homeOptions.params["contentMode"])
+  m.assertEqual(homeInfo.options.params["customParam"], homeOptions.params["customParam"])
+  m.assertEqual(homeInfo.options.headers["x-custom-header"], homeOptions.headers["x-custom-header"])
+  m.assertEqual(homeInfo.options.headers["x-client-platform"], homeOptions.headers["x-client-platform"])
+  m.assertEqual(homeInfo.options.headers["x-client-version"], homeOptions.headers["x-client-version"])
+  m.assertEqual(homeInfo.options.headers["Accept-Version"], homeOptions.headers["Accept-Version"])
 End Function
 
 

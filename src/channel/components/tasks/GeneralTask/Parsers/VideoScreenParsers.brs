@@ -211,3 +211,33 @@ Function parsePauseAdSuccess(fullResponse, _reqInfo)
 
   return content
 End Function
+
+
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseMiniHomeScreenContentSuccess(fullResponse, reqInfo)
+  parsedResponse = fullResponse.data
+  contentMode = invalid
+
+  if reqInfo <> invalid AND reqInfo.options <> invalid
+    options = reqInfo.options
+
+    if options <> invalid AND options.params <> invalid
+      contentMode = options.params.contentMode
+
+      if contentMode = invalid
+        contentMode = options.params.content_mode
+      end if
+    end if
+  end if
+
+  isSignedInUser = false
+  if reqInfo <> invalid
+    isSignedInUser = reqInfo.isSignedInUser
+  end if
+
+  convertedMetadata = m.metadataTranslate.translateMiniHomescreen(parsedResponse, contentMode, "homeScreen", isSignedInUser)
+
+  return convertedMetadata
+End Function

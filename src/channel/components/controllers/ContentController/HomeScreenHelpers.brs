@@ -296,7 +296,7 @@ Function onReloadUserCategoriesInHomeScreen(response, screenID = "")
           homeScreen.rowRemoved = m.constants.ui.categoryIds.queue
           deleteIndex = content.queueIndex
         end if
-        
+
         'remove old category
         homeScreen.content.removeChild(oldCategory)
 

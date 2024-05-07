@@ -245,6 +245,7 @@ Function getConstants()
   constants.reqNames = {}
     constants.reqNames.getSearchScreen = "getSearchScreen"
     constants.reqNames.getHomescreen = "getHomescreen"
+    constants.reqNames.getMiniHomescreen = "getMiniHomescreen"
     constants.reqNames.getCategoriesListScreen = "getCategoriesListScreen"
     constants.reqNames.getCategoryDetailsScreen = "getCategoryDetailsScreen"
     constants.reqNames.getSearchDefault = "getSearchDefault"
@@ -307,6 +308,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.checkBirthdayInfo] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getSearchScreen] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getHomescreen] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getMiniHomescreen] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategoriesListScreen] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getCategoryDetailsScreen] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getSearchDefault] = true
@@ -915,6 +917,10 @@ Function getConstants()
         constants.player.linear.comingUpInsideInfoPanelDuration = 300
         ' duration (in seconds) of coming up panel displayed outside info panel
         constants.player.linear.comingUpOutsideInfoPanelDuration = 15
+
+      constants.player.browseContent = {}
+        constants.player.browseContent.numContainers = 10
+        constants.player.browseContent.numContents = 50
 
   ' constants used for EPG
   constants.EPGChannelPlayMode = {}
