@@ -254,6 +254,7 @@ Function getConstants()
     constants.reqNames.getMultipleContent = "getMultipleContent"
     constants.reqNames.getUpNextContent = "getUpNextContent"
     constants.reqNames.getRelatedContent = "getRelatedContent"
+    constants.reqNames.getAutopilotRelatedContent = "getAutopilotRelatedContent"
     constants.reqNames.getThumbnails = "getThumbnails"
     constants.reqNames.getLiveManifest = "getLiveManifest"
     constants.reqNames.emailExists = "emailExists"
@@ -314,6 +315,7 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getSingleContent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getUpNextContent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getRelatedContent] = true
+      constants.reqNames.acceptsTubiAuth[constants.reqNames.getAutopilotRelatedContent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getThumbnails] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getLiveManifest] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.emailExists] = true
@@ -493,14 +495,16 @@ Function getConstants()
 
       'autopilot url
     constants.urls.autopilot = {}
-      constants.urls.autopilot.urlBase = "https://autopilot.production-public.tubi.io/api/v2"
+      constants.urls.autopilot.urlBase = "https://autopilot.production-public.tubi.io/api"
 
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
-        constants.urls.autopilot.urlBase = "https://autopilot.staging-public.tubi.io/api/v2"
+        constants.urls.autopilot.urlBase = "https://autopilot.staging-public.tubi.io/api"
       end if
 
-      constants.urls.autopilot.upNextContent = constants.urls.autopilot.urlBase + "/autoplay"
+      constants.urls.autopilot.upNextContent = constants.urls.autopilot.urlBase + "/v2/autoplay"
 
+      constants.urls.autopilot.relatedContent = constants.urls.autopilot.urlBase + "/v1/related"
+      constants.urls.autopilot.upNextContentV3 = constants.urls.autopilot.urlBase + "/v3/autoplay"
 
     'search url
     constants.urls.search = "https://search.production-public.tubi.io/api/v1/search"
@@ -664,8 +668,15 @@ Function getConstants()
     ' url for pinging Nielsen
     constants.urls.nielsenPing = "https://audit.imrworldwide.com/cgi-bin/gn"
 
-    'epgProgram url
     constants.urls.content = {}
+
+      constants.urls.content.urlBase = "https://content.production-public.tubi.io/api"
+      if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
+        constants.urls.content.urlBase = "https://content.staging-public.tubi.io/api"
+      end if
+      constants.urls.content.singleContentV2 = constants.urls.content.urlBase + "/v2/content"
+
+      'epgProgram url
       constants.urls.content.epgProgramContentUrlBase = "https://content.production-public.tubi.io"
       if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
         constants.urls.content.epgProgramContentUrlBase = "https://content.staging-public.tubi.io"

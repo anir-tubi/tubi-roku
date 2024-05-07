@@ -50,11 +50,17 @@ End Function
 
 
 Function cmsApi_createRelatedContentReqInfo(contentId, bKidsMode = false)
-  url = m.constants.urls.cms.relatedContent + "/" + contentId + "/related"
   options = m.getCommonOptions()
   options.params["isKidsMode"] = bKidsMode
   options.params["video_resources"] = m.constants.player.drmOrderWidevineHlsv6
   options.params = m.setTupianPosterParam(options.params)
+
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_related_content_v1").enabled = true
+    url = m.constants.urls.autopilot.relatedContent
+    options.params["content_id"] = contentId
+  else
+    url = m.constants.urls.cms.relatedContent + "/" + contentId + "/related"
+  end if
 
   return {
     url: url
@@ -65,7 +71,12 @@ End Function
 
 ' @passedOptions: assocArray, options to be added to the request object as created by Request().createAsync()
 Function cmsApi_createUpNextContentReqInfo(passedOptions)
-  url = m.constants.urls.autopilot.upNextContent
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_autoplay_v1").enabled = true
+    url = m.constants.urls.autopilot.upNextContentV3
+  else
+    url = m.constants.urls.autopilot.upNextContent
+  end if
+
   options = m.getCommonOptions()
   params = options.params
   headers = options.headers
@@ -111,8 +122,14 @@ Function cmsApi_createSingleContentReqInfo(contentId, includeChannels=false, bKi
   capability = formatJson({"content_types" :["se"]})
   options.headers.append({"x-capability": capability})
 
+  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_content_v1").enabled = true
+    url = m.constants.urls.content.singleContentV2
+  else
+    url = m.constants.urls.cms.singleContent
+  end if
+
   return {
-    url: m.constants.urls.cms.singleContent
+    url: url
     options: options
   }
 End Function

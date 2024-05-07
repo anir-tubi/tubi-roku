@@ -38,6 +38,17 @@ Function parseDetailScreenRelatedContentSuccess(fullResponse, reqInfo)
 End Function
 
 
+' @fullResponse: assocArray, as returned by Request.handleEvent, but with
+'                            .data value converted from JSON to AA already
+' @reqInfo: AA, info passed in for request as part of generalTask_makeRequest containing info needed to make the request
+Function parseDetailScreenAutopilotRelatedContentSuccess(fullResponse, reqInfo)
+  parsedResponse = fullResponse.data
+  relatedContent = m.metadataTranslate.translateAutopilotRelatedContent(parsedResponse, reqInfo.issignedinuser)
+  relatedContent.id = reqInfo.contentId
+  return relatedContent
+End Function
+
+
 ' Success making changes to the like/dislike settings
 Function parseContentRateSuccess(_fullResponse, reqInfo)
   returnResponse = {}

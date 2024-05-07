@@ -693,9 +693,16 @@ Function getRelatedContent(content, callback = handleRelatedResponse)
   ' (but not if in any of the kids modes, since it won't be displayed)
   if content <> invalid AND isKidsUIOn() = false
     relatedRequestInfo = m.cmsApi.createRelatedContentReqInfo(content.id, shouldKidsModeBeSentToServer())
+
+    if getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_related_content_v1", false).enabled = true
+      requestType = m.constants.reqNames.getAutopilotRelatedContent
+    else
+      requestType = m.constants.reqNames.getRelatedContent
+    end if
+
     m.makeRequest({
       url: relatedRequestInfo.url
-      requestType: m.constants.reqNames.getRelatedContent
+      requestType: requestType
       options: relatedRequestInfo.options
       successCallback: callback
       responseType: "node"

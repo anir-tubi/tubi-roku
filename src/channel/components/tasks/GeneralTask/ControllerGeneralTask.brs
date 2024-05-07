@@ -106,6 +106,12 @@ Function registerParsingCallbacks()
     parseSuccess: parseDetailScreenRelatedContentSuccess
   }
 
+
+  ' autopilot related content
+  m.requestTypes[m.constants.reqNames.getAutopilotRelatedContent] = {
+    parseSuccess: parseDetailScreenAutopilotRelatedContentSuccess
+  }
+
   'epgChannelIds
   m.requestTypes[m.constants.reqNames.getEPGChannelIds] = {
     parseSuccess: parseEPGChannelIdsSuccess
