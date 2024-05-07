@@ -1252,6 +1252,9 @@ Function fetchUpNextContent(videoPlayer)
 
     upNextReqInfo = m.cmsApi.createUpNextContentReqInfo(options)
 
+    'fire exposure event when fetching upnext content
+    getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_autoplay_v1", true)
+
     return m.makeRequest({
       requestType: m.constants.reqNames.getUpNextContent
       url: upNextReqInfo.url

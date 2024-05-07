@@ -473,6 +473,10 @@ End Function
 Function getSingleContentFromServer(content, successCallback, errorCallback)
   tubiLog("DetailScreenHelpers.getSingleContentFromServer")
   if content <> invalid
+
+    'Fire exposure event when fetching content
+    getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_content_v1")
+
     singleRequestInfo = m.cmsApi.createSingleContentReqInfo(content.id, true, shouldKidsModeBeSentToServer())
     m.makeRequest({
       url: singleRequestInfo.url
@@ -694,7 +698,8 @@ Function getRelatedContent(content, callback = handleRelatedResponse)
   if content <> invalid AND isKidsUIOn() = false
     relatedRequestInfo = m.cmsApi.createRelatedContentReqInfo(content.id, shouldKidsModeBeSentToServer())
 
-    if getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_related_content_v1", false).enabled = true
+    'fire exposure event when fetching related content
+    if getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_related_content_v1", true).enabled = true
       requestType = m.constants.reqNames.getAutopilotRelatedContent
     else
       requestType = m.constants.reqNames.getRelatedContent
