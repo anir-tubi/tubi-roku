@@ -685,6 +685,7 @@ Function sendDeviceEnvironmentSettingsLog()
   ' Holds true or false based on if the setting is turned on or off.
   autoPlay = true
   deviceInfo = CreateObject("roDeviceInfo")
+  drmInfo = deviceInfo.GetDrmInfoEx()
 
   if FindMemberFunction(deviceInfo, "IsAutoplayEnabled") <> invalid AND deviceInfo.IsAutoplayEnabled() = false
     autoPlay = false
@@ -693,6 +694,7 @@ Function sendDeviceEnvironmentSettingsLog()
   deviceInfo = {
     isVideoPreviewOn: (isVideoPreviewOn() = true)
     autoPlay: autoPlay
+    drmInfo: drmInfo
   }
   tubiLog(FormatJSON(deviceInfo), "info", "clientInfo", "device-info", 0.2) 'send info to server
 
