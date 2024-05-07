@@ -953,7 +953,7 @@ Function jumpToPosition(position)
     }
   })
 
-  if m.didSeeAdCountdown = true AND getExperimentResource("roku_adfix", "roku_adfix_v1", true).enabled = true
+  if m.didSeeAdCountdown = true
     '//if the user saw the ad-countdown before seeking, then start playing the ad immediately after the seek is done.
     showAdBreak()
     m.showRatings = true

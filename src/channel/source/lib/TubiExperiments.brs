@@ -22,11 +22,6 @@ Function TubiExperiments(constants) as Object
 
     defaultResources: {
 
-      '//Experiment to fix the bug that allows users to skip ads when they seek thru the video
-      roku_adfix: {
-        roku_adfix_v1 : {"enabled": true}
-      }
-
       roku_screensaver: {
         roku_screensaver_v2 : {"enabled": false}
       }
