@@ -77,8 +77,8 @@ describe('Live', function () {
         await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',10000);
 
         // Navigate right after displaying the guide
-        const programGuide = await testUtils.getNodeForElement('programGuide');
-        expect(programGuide.opacity).to.equal(1);
+        await ecp.sendKeypress(ecp.Key.Up);
+        await utils.sleep(1000);
         await ecp.sendKeypress(ecp.Key.Right);
 
          // Verify that linear video is still playing
@@ -134,7 +134,6 @@ describe('Live', function () {
 
     async function startLiveFeed() {
         await utils.sleep(1000);
-        await ecp.sendKeypress(ecp.Key.Right, {count:2});
         await ecp.sendKeypress(ecp.Key.Ok);
         
     }

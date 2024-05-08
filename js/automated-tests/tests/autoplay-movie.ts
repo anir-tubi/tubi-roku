@@ -1,6 +1,7 @@
 import { expect } from 'chai';
-import { ecp, utils } from 'roku-test-automation';
+import { ecp, odc, utils } from 'roku-test-automation';
 import { testUtils } from '../test-utils';
+
 import { shared } from '../shared';
 import { waitForDebugger } from 'inspector';
 
@@ -116,15 +117,31 @@ describe('Autoplay Movies', function () {
     it('C148692 - Autoplay - Movie - When user searches for a movie and initiates playback, Autoplay should work @autoplay,@smoke', async () => {
         // Search for a Movie title
         await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
-        await ecp.sendText('zapp');
+        await testUtils.waitForElementToFullyShowOnScreen('searchKeyPad');
+        await ecp.sendText('zapped');
+        await testUtils.waitForElementToFullyShowOnScreen('searchResultsText');
 
-        // Call function to navigate right to search results grid
-        await shared.navigateRightToGrid();
+      // Navigate right until the grid is in focus
+      await testUtils.untilTrue(async () => {
+          await ecp.sendKeypress(ecp.Key.Right);
+          const { value: id } = await odc.getValue({
+              base: 'focusedNode',
+              keyPath: 'id'
+          });
+          return id === 'ResultGrid';
+      }, 'ResultGrid never obtained focus');
 
-        await testUtils.retryWithTimeOut(async () => {
-            const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-            expect(searchResultsText.text).to.equal('Zapped');
-        });
+      // Wait until our content is loaded
+      await odc.onFieldChangeOnce({
+          base: 'focusedNode',
+          keyPath: 'content',
+          match: {
+              base: 'focusedNode',
+              keyPath: 'content.0.title',
+              value: 'Zapped'
+          }
+      });
+       
 
         //Play title, trigger autoplay
         await ecp.sendKeypress(ecp.Key.Play);
@@ -134,8 +151,8 @@ describe('Autoplay Movies', function () {
         await checkForAutoPlayTrigger();
 
         // Is the Year displayed on the autoplay option?
-        const autoPlayYearAndDuration = await testUtils.getNodeForElement('autoPlayYearAndDuration');
-        expect(autoPlayYearAndDuration.visible).to.be.true;
+        await testUtils.waitForElementToFullyShowOnScreen('autoPlayYearAndDuration');
+        
     });
 });
 

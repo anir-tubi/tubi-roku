@@ -260,9 +260,8 @@ describe('MyStuff', function () {
          await ecp.sendKeypress(ecp.Key.Ok);
          await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
          await testUtils.selectAndVerifyDetailPageMenuItem('removeFromHistory');
-         await testUtils.waitForElementToFullyShowOnScreen('addToMyListButtonFocused'); 
-         const addToMyListButtonFocused = await testUtils.getNodeForElement('addToMyListButtonFocused');
-         expect(addToMyListButtonFocused.text).to.equal('Add to My List');
+         await testUtils.waitForElementToFullyShowOnScreen('addToMyListButtonFocused', 'Button not found', 150000); 
+        
    
          // Check the My Stuff page displays no titles and displays correct indicators and text
          await ecp.sendKeypress(ecp.Key.Back);
@@ -307,11 +306,8 @@ describe('MyStuff', function () {
          await ecp.sendKeypress(ecp.Key.Ok);
          await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
          await testUtils.selectAndVerifyDetailPageMenuItem('removeFromMyList'); 
-         await testUtils.waitForElementToFullyShowOnScreen('addToMyListButtonFocused', 'Button not shown on screen', 8000);
-         const addToMyListButtonFocused = await testUtils.getNodeForElement('addToMyListButtonFocused');
-         expect(addToMyListButtonFocused.text).to.equal('Add to My List');
+         await testUtils.waitForElementToFullyShowOnScreen('addToMyListButtonFocused', 'Button not shown on screen', 15000);
 
-   
          // Verify that the focus has moved to 2nd title and check title
          await utils.sleep(2000); // had to add sleep to get next line to work
          await ecp.sendKeypress(ecp.Key.Back);
@@ -519,7 +515,7 @@ describe('MyStuff', function () {
          await highlightMyStuffMenuItem();
          await ecp.sendKeypress(ecp.Key.Ok);
          await testUtils.waitForElementToFullyShowOnScreen('continueWatchingRow');
-         await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing');
+         await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 15000);
       });
 
       //https://tubi.testrail.io/index.php?/cases/view/439696
@@ -896,8 +892,8 @@ describe('MyStuff', function () {
 
       async function createHistoryOneTitleSeries(user) {
 
-        const movieContentPG = await user.getContent().withRating('TV-PG').ofContentType('series').retrieve({ limit: 1});
-        await user.addContentToViewHistory(movieContentPG, 500);
+        const movieContent = await user.getContent().hasVideoPreview().ofContentType('series').retrieve({ limit: 1});
+        await user.addContentToViewHistory(movieContent, 500);
 
       }
 

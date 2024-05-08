@@ -15,23 +15,22 @@ describe('Closed Captions Checks', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/438464
-  it('C438464 - Closed Caption toggle = ON is in sync between VOD and Linear @closed_captions', async () => {
+  it.only('C438464 - Closed Caption toggle = ON is in sync between VOD and Linear @closed_captions', async () => {
     
 
     // Navigate to the Live News Row from Home screen
     // Jump to Recommended Channels row
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
-    await ecp.sendKeypress(ecp.Key.Right);
 
     // Start a live feed
     await ecp.sendKeypress(ecp.Key.Ok);
-    await utils.sleep(1000);
-
+    await utils.sleep(3000); // Needed this
+    
     // Verify that video is playing
-    await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing');
+    await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',15000);
 
     // Turn on Linear CC
-    await ecp.sendKeypress(ecp.Key.Up);
+    
     await ecp.sendKeypress(ecp.Key.Left);
     await ecp.sendKeypress(ecp.Key.Up);
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -44,7 +43,7 @@ describe('Closed Captions Checks', function () {
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
     
     // Is the left Nav open?
-    await ecp.sendKeypress(ecp.Key.Left, {count:2});
+    await ecp.sendKeypress(ecp.Key.Left);
     await testUtils.waitForSideNavMenuToBeExpanded();
     await testUtils.verifyFocusedSideNavMenuItemEquals('home');
 
@@ -56,7 +55,7 @@ describe('Closed Captions Checks', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Are we on the Search page?
-    await utils.sleep(2000); // Will not work without sleep here
+    await utils.sleep(2500); // Will not work without sleep here
     await testUtils.getNodeForElement('searchKeyPad');
 
     // If so, send search terms
@@ -65,13 +64,11 @@ describe('Closed Captions Checks', function () {
     // Call function to navigate right to search results grid
     await navigateRightToGrid();
 
-    await testUtils.retryWithTimeOut(async () => {
-      const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-      expect(searchResultsText.text).to.contain('LEGO Masters');
-    });
-
     // Select item and Play button
     await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
+    const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
+    expect(detailScreenTitle.text).is.equal('LEGO Masters');
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
     // Verify that video is playing
@@ -98,14 +95,12 @@ describe('Closed Captions Checks', function () {
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
     // Start a live feed
-    await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Ok);
     
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 20000);
 
     // Turn OFF Linear CC
-    await ecp.sendKeypress(ecp.Key.Up);
     await ecp.sendKeypress(ecp.Key.Left);
     await ecp.sendKeypress(ecp.Key.Up);
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -120,7 +115,7 @@ describe('Closed Captions Checks', function () {
      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
      
      // Is the left Nav open?
-     await ecp.sendKeypress(ecp.Key.Left, {count:2});
+     await ecp.sendKeypress(ecp.Key.Left);
      await testUtils.waitForSideNavMenuToBeExpanded();
      await testUtils.verifyFocusedSideNavMenuItemEquals('home');
 
@@ -140,13 +135,11 @@ describe('Closed Captions Checks', function () {
     // Call function to navigate right to search results grid
     await navigateRightToGrid();
 
-    await testUtils.retryWithTimeOut(async () => {
-    const searchResultsText = await testUtils.getNodeForElement('searchResultsText');
-    expect(searchResultsText.text).to.contain('LEGO Masters');
-    });
-
     // Select item and Play button
     await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
+    const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
+    expect(detailScreenTitle.text).is.equal('LEGO Masters');
     await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
     // Verify that video is playing

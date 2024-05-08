@@ -18,7 +18,7 @@ class Shared {
         await ecp.sendKeypress(ecp.Key.Forward, { count: 3 });
         await utils.sleep(3000);
         await ecp.sendKeypress(ecp.Key.Play);
-  }
+     }
 
 
 
@@ -108,8 +108,6 @@ class Shared {
       await testUtils.goToPage('settings');
     }
 
-
-
     // Navigate right until the grid is in focus
     // This is specifice to the Search screen
     public async  navigateRightToGrid() {
@@ -123,9 +121,57 @@ class Shared {
       });
       return id === 'ResultGrid';
       }, 'ResultGrid never obtained focus');
+
+
+  async function selectOlderKidsFromParentalSettings() {
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Up, {count:2});
+    await ecp.sendKeypress(ecp.Key.Ok);
   }
 
+  async function selectLittleKidsFromParentalSettings() {
+    await ecp.sendKeypress(ecp.Key.Right);
+    await testUtils.waitForElementToShowOnScreen('adultControlSelected');
+    await ecp.sendKeypress(ecp.Key.Up, {count:3});
+    await utils.sleep(2000);
+    await ecp.sendKeypress(ecp.Key.Ok);
+  }
 
+  async function selectTeensFromParentalSettings() {
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Up, {count:1});
+    await ecp.sendKeypress(ecp.Key.Ok);
+  }
+
+  async function selectAdultsFromParentalSettings() {
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Ok);
+  }
+  async function enterPasswordSettingsChange() {
+    // Enter Password for PC Settings Change
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await ecp.sendText('111111');
+    await ecp.sendKeypress(ecp.Key.Down, {count:4});
+    await utils.sleep(4000);
+    await ecp.sendKeypress(ecp.Key.Right);
+    await ecp.sendKeypress(ecp.Key.Left);
+    await ecp.sendKeypress(ecp.Key.Ok);
+    await utils.sleep(800);
+}
+
+// Navigate right until the grid is in focus
+async function navigateRightToGrid() {
+  await testUtils.untilTrue(async () => {
+    await ecp.sendKeypress(ecp.Key.Right);
+    const {value: id} = await odc.getValue({
+      base: 'focusedNode',
+      keyPath: 'id'
+    });
+    return id === 'ResultGrid';
+  }, 'ResultGrid never obtained focus');
+}
+
+}
 }
 
     const shared = new Shared();

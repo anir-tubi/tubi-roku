@@ -885,6 +885,10 @@ class TestUtils {
         // We know we're good once the remove item shows up
         await this.findRowIndexWithTitle(element, 'Remove from My List', timeout);
         break;
+      case 'likeOrDislike' :
+        await this.selectMenuItem(element,'Like or Dislike', timeout );
+        await this.waitForElementToFullyShowOnScreen('secondaryMenu');
+        break;
       case 'removeFromMyList':
         await this.selectMenuItem(element, 'Remove from My List', timeout);
         // We know we're good once the add item shows up
@@ -2060,7 +2064,7 @@ type KeyPathElement = {
 };
 
 
-type DetailPageMenuItemType = 'play' | 'playFromBeginning' | 'resume' | 'addToMyList' | 'removeFromMyList' | 'removeFromHistory' | 'episodesList' | 'signUp';
+type DetailPageMenuItemType = 'play' | 'playFromBeginning' | 'likeOrDislike' | 'resume' | 'addToMyList' | 'removeFromMyList' | 'removeFromHistory' | 'episodesList' | 'signUp';
 
 
 type UserInfoResponse = {

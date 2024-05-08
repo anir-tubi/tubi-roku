@@ -149,7 +149,7 @@ const elements = typeCheckElements({
 
   /** Dialog box text for PC Settings Change for Older Kids */
   parentalControlsSettingsOlderKids: {
-    keyPath: '#ContentController.2.#DialogBox.#ContentArea.#MessageGroup.#Message',
+    keyPath: '#ContentController.#d15a38c.#DialogBox.#ContentArea.#MessageGroup.#Message',
   },
 
   /** Exit Kids Menu item in Kids more is grayed out */
@@ -202,7 +202,7 @@ const elements = typeCheckElements({
 
    /** Add to My List Button */
    addToMyListButtonFocused: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.2.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.3.#DetailsMenuTextParent.#DetailsMenuTextFocused',
   },
 
 
@@ -471,6 +471,16 @@ const elements = typeCheckElements({
     xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/DetailScreen/Group/Group',
   },
 
+  /** Secondary Menu Button - Like */
+  secondaryMenuButtonLike: {
+    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#SecondaryMenu.0.#buttonBG',
+  },
+
+  /** Secondary Menu Button - Dislike  */
+  secondaryMenuButtonDislike: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#SecondaryMenu.1.#buttonBG',
+  },
+
   raitingLabelInDetailsScreen: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#AnimationGroup.#DetailInfoPanel.#infoPanelGroup.#Offset.#TwoLineInfo.#FirstLineGroup.#Rating.#RatingLabel',
   },
@@ -584,6 +594,10 @@ const elements = typeCheckElements({
     xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/InfoPanel/LayoutGroup/LayoutGroup/Label',
   },
 
+  kidsSearchResultsText: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#leftSide.0.#searchMenuText',
+  },
+
   searchResultFoxWeather: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchScreenInfoPanel.#infoPanelGroup.#Offset.#Episode',
     xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/InfoPanel/LayoutGroup/LayoutGroup/Label',
@@ -597,6 +611,14 @@ const elements = typeCheckElements({
   kidsSearchText: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#SearchText',
     xpath: '/TubiScene/ContentController/Group/Group/ScreenStack/SearchScreen/Label',
+  },
+
+  kidsSearchResultsGrid: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#ResultArea.#gridContainer.#trendingSearchResultsContainer.#trendingSearchResultGrid',
+  },
+
+  kidsSearchSelected: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.2.#IconParent',
   },
 
   btnCC_label: {
@@ -1351,6 +1373,10 @@ const elements = typeCheckElements({
     keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#epgScreen.#PageGroup.#programGuide.#channelsGrid.0.#ChannelPoster',
   },
 
+  customSplashPoster: {
+    keyPath: '#customSplashPoster',
+  },
+
   /** text on Search page header */
   searchMenuText: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#leftSide.#searchMenuText',
@@ -1545,6 +1571,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#searchGroup.#SearchKeyboard.0',
   },
 
+  /** Kids Search KeyPad */
+  kidsSearchKeyPad: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#searchGroup.#SearchKeyboard.0',
+  },
+
   /** label child in left nav */
   leftNavHomeLabel: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.3.#LabelParent.0.#Label'
@@ -1673,10 +1704,45 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#ResultArea.#gridContainer.#resultsContainer.#ResultGrid'
   },
 
+  //** Kids Search menu item selected */
+  kidsSearchItemSelected: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.2.#IconParent',
+  },
+
   /** Search Results Grid content, first result */
   searchResultsGridPoster :{
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#ResultArea.#gridContainer.#resultsContainer.#ResultGrid.0.#poster',
-  }
+  },
+  
+  /** Reaction button Liked */
+  reactionButtonLiked: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+  },
+
+  /** Secondary Menu Like highlighted */
+  likeButtonFocused: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#SecondaryMenu.0.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+  },
+
+  /** Secondary Menu Disliked highlighted */
+  DislikedButtonFocused: {
+    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#SecondaryMenu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused'
+  },
+
+  /** Reaction Button Disliked */
+  reactionButtonDisliked: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+  },
+
+   /** Secondary Menu Disliked remove button highlighted */
+   DislikedButtonRemove: {
+    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused'
+  },
+
+  /** Like or Dislike Button */
+  likeOrDislikeButton: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#Menu.1.#DetailsMenuTextParent.#DetailsMenuTextFocused',
+  },
 });
 
 export {
