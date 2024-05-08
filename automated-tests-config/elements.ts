@@ -760,7 +760,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#ChannelsVideoGrid',
   },
 
-
+  /** Item counter */
+  itemCounter: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#pageTitleAndCounter.#CategoryCount.#ItemCount',
+  },
 
   /** Channels page grid */
   channelsDetailsGrid: {
@@ -1052,6 +1055,16 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#PageGroup.#ChannelCategoryGrid',
   },
 
+  /** Category  Action */
+  channelCategoryPosterTitle2: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#PageGroup.#ChannelCategoryGrid.2.#Title',
+  }, 
+
+  /** Category Adult Animation */
+  channelCategoryPosterTitle4: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#PageGroup.#ChannelCategoryGrid.4.#Title',
+  },
+
   /** category on category page */
   categoryPageCategory: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.0.#Logo',
@@ -1059,6 +1072,10 @@ const elements = typeCheckElements({
 
   categoryNameInCategoryDetailsPage: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#pageTitleAndCounter.#CategoryName'
+  },
+
+  categoryPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.#poster',
   },
 
   skipIntro: {

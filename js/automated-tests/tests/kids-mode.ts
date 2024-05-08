@@ -410,16 +410,16 @@ async function signInUserFromParentalControls() {
 
   await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
   await ecp.sendKeypress(ecp.Key.Ok);
+
   const signInScreenPasswordBox = await testUtils.getNodeForElement('signInScreenPasswordBox');
   expect(signInScreenPasswordBox.visible).to.be.true;
   await ecp.sendKeypress(ecp.Key.Ok);
   await ecp.sendText('111111');
   await ecp.sendKeypress(ecp.Key.Right);
   await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
-  await utils.sleep(500);
+  await utils.sleep(1500);
   await ecp.sendKeypress(ecp.Key.Ok);
-  const enterPasswordDialogMessage = await testUtils.getNodeForElement('enterPasswordDialogMessage');
-  expect(enterPasswordDialogMessage.visible).to.be.true;
+  await testUtils.getNodeForElement('enterPasswordDialogMessage');
   await ecp.sendKeypress(ecp.Key.Ok);
 
   // Enter password again

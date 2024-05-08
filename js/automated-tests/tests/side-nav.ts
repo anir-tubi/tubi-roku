@@ -394,8 +394,7 @@ describe('Side Navigation', function () {
 
       // Are we on Categories page?
       await utils.sleep(2000);
-      const categoryPageCategory = await testUtils.getNodeForElement('categoryPageCategory');
-      expect(categoryPageCategory.visible).to.be.true;
+      const categoryPageCategory = await testUtils.waitForElementToFullyShowOnScreen('categoryPageCategory');
 
       // Choose a Category
       await ecp.sendKeypress(ecp.Key.Ok);

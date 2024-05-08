@@ -5,7 +5,7 @@ import { testUtils } from '../test-utils';
 
 describe('Search', function () {
   describe('Linear Search', function () {
-    it('C244256 When a user searches for a channel, the channel is shown in the search results', async () => {
+    it('C244256 When a user searches for a channel, the channel is shown in the search results @linearsearch', async () => {
       await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
       await ecp.sendText('nbc');
 
@@ -18,10 +18,10 @@ describe('Search', function () {
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
-      expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon.webp');
+      expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon-filled.webp');
     });
 
-    it('C244258 When a user clicks on the channel poster, the live channel should start playing', async () => {
+    it('C244258 When a user clicks on the channel poster, the live channel should start playing @linearsearch', async () => {
       await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
       await ecp.sendText('nbc');
 
@@ -34,14 +34,14 @@ describe('Search', function () {
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
-      expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon.webp');
+      expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon-filled.webp');
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify that the linear channel plays
-      await testUtils.expectPlayerStateToEventuallyEqual('play', 10000);
+      await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing');
     });
 
-    it('C244259 When a user presses the back button, the user is sent back to the search result page', async () => {
+    it('C244259 When a user presses the back button, the user is sent back to the search result page @linearsearch', async () => {
       await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
       await ecp.sendText('nbc');
 
@@ -54,11 +54,11 @@ describe('Search', function () {
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
-      expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon.webp');
+      expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon-filled.webp');
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify that the Linear channel plays
-      await testUtils.expectPlayerStateToEventuallyEqual('play', 10000);
+      await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing');
 
       // Press the back button and verify that the user is redirected back to the Search result page
       await ecp.sendKeypress(ecp.Key.Back);
@@ -68,7 +68,7 @@ describe('Search', function () {
       });
     });
 
-    it('C244260 - The user should be able to access the channel guide and other player features from the player page of the selected channe', async () => {
+    it('C244260 - The user should be able to access the channel guide and other player features from the player page of the selected channel @linearsearch', async () => {
       await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
       await ecp.sendText('nbc');
 
@@ -81,7 +81,7 @@ describe('Search', function () {
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
-      expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon.webp');
+      expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon-filled.webp');
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify that the linear channel plays
@@ -101,6 +101,7 @@ describe('Search', function () {
       });
     });
 
+    /* ML driven, removing
     // https://tubi.testrail.io/index.php?/cases/view/244261
     it('C244261  When a user searches for a linear channel, the channel matching to the search term should show up in the search results as primary results', async () => {
       await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
@@ -118,8 +119,9 @@ describe('Search', function () {
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
       expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon.webp');
     });
+    */
 
-    it('C244271  Ensure that when the user hover over a channel search result the channel name and description is displayed on the top left corner', async () => {
+    it('C244271  Ensure that when the user hover over a channel search result the channel name and description is displayed on the top left corner @linearsearch', async () => {
       await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
       await ecp.sendText('nbc');
 
@@ -135,7 +137,7 @@ describe('Search', function () {
 
       await testUtils.retryWithTimeOut(async () => {
         const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
-        expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon.webp');
+        expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon-filled.webp');
       });
 
       await testUtils.retryWithTimeOut(async () => {
@@ -157,7 +159,7 @@ describe('Search', function () {
       });
 
       const searchResultsLiveIcon = await testUtils.getNodeForElement('searchResultsLiveIcon');
-      expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon.webp');
+      expect(searchResultsLiveIcon.uri).to.equal('pkg:/images/live-icon-filled.webp');
       await ecp.sendKeypress(ecp.Key.Play);
 
       // Verify that the Linear channel plays
