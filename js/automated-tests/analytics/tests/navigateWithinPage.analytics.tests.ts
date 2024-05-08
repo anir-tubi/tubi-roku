@@ -135,7 +135,7 @@ describe('Navigate Within Page', function () {
 		const videoId = movieDetailsPage.getTitleId();
 		await movieDetailsPage.selectLikeOrDislike();
 		await ecp.sendKeypress(ecp.Key.Down);
-		await utils.sleep(500);
+		await utils.sleep(1500);
 		await ecp.sendKeypress(ecp.Key.Up);
 		await verifyC425235(videoId);
 		await verifyC425236(videoId);

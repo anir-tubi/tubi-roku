@@ -103,6 +103,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems',
   },
 
+  likeButton: {
+    keyPath: 'ContentController.#uiGroup.#ContentGroup.#ScreenStack.#detailScreen.#PageGroup.#AnimationGroup.#SecondaryMenu.0.#buttonBG',
+  },
+
   /** Side Nav Menu contents */
   sideNavMenuContents: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#SideNav.#itemGroups.0.#mainItems.content',

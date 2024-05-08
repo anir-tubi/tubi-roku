@@ -181,6 +181,7 @@ const TitleDetailsPage = (titleDetails) => {
 	async function selectLike() {
 		await selectLikeOrDislike();
 		await ecp.sendKeypress(ecp.Key.Ok);
+		await testUtils.waitForElementToNotShowOnScreen('likeButton');
 	}
 
 	async function focusButDontSelectDislike() {

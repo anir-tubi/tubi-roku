@@ -232,6 +232,13 @@ const PlayBack = ({ content }) => {
 		return lastFive.every((value, index, array) => value === array[0]);
 	}
 
+	function allNaN(arr: number[]): boolean {
+		if (arr.length < 7000) {
+			return false
+		}
+		return arr.every(num => isNaN(num));
+  }
+
 	async function seekToAutoplay() {
 		await clickOnSkipIntroIfPresent();
 		await fastForwardNoWaitTime({ howFast: 3 });
@@ -240,12 +247,12 @@ const PlayBack = ({ content }) => {
 		await testUtils.untilTrue(
 			async () => {
 				const progress = await getProgressPercent();
-				if (progress > 0.99 || areLastFortyValuesSame(arr)) {
+				if (progress > 0.99 || areLastFortyValuesSame(arr) || allNaN(arr)) {
 					await ecp.sendKeypress(ecp.Key.Play);
 					await waitForAutoplayVisible();
 					return true;
 				}
-				if (latestPorgress === progress) {
+				if (latestPorgress === progress || Number.isNaN(latestPorgress)) {
 					arr.push(latestPorgress);
 				}
 				latestPorgress = progress;
@@ -291,13 +298,14 @@ const PlayBack = ({ content }) => {
 		await testUtils.untilTrue(
 			async () => {
 				let countDownAutoplay;
-				if (content.mode === 'series') {
+				if (content.mode === 'series' || content.type === 's') {
 					countDownAutoplay = await elements.countDownAutoplaySeries();
 				} else {
 					countDownAutoplay = await elements.countDownAutoplay();
 				}
+				const text = countDownAutoplay.text
 				const [start, inn, space, seconds] = countDownAutoplay.text.split(' ');
-				if (content.mode === 'series') {
+				if (content.mode === 'series' || content.type === 's') {
 					if (
 						parseInt(seconds) === 14 ||
 						parseInt(seconds) === 13 ||

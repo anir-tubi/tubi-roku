@@ -2,6 +2,7 @@ import { testUtils } from '../../test-utils';
 import { expect } from 'chai';
 import { ecp, utils } from 'roku-test-automation';
 import PlayBack from './playback';
+import ActivatePage from './activatePage';
 import TitleDetailsPage from './titleDetailsPage';
 import LiveNews from '../pages/liveNews';
 import { NODES, PLAYER_NODES } from '../utils/constants';
@@ -232,6 +233,17 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		}
 	}
 
+	async function navigateToContinueWatchingAndSelectIt() {
+		await testUtils.jumpToRowWithTitle(
+			'homeScreenRowList',
+			'Continue Watching'
+		);
+		await ecp.sendKeypress(ecp.Key.Ok);
+		const activatePage = ActivatePage();
+		await activatePage.pageDidLoad();
+		return activatePage;
+	}
+
 	async function navigateToLiveNewsAndSelect(getNavigateToPage = false) {
 		await navigateToLiveNews(getNavigateToPage);
 		await ecp.sendKeypress(ecp.Key.Ok);
@@ -389,6 +401,7 @@ const HomePage = ({ isMovies, isTvShows } = {}) => {
 		highlightTitleWithVideoPreview,
 		waitForPlayBackToStartForMovie,
 		selectFocusedTitleMovieWithSubtitles,
+		navigateToContinueWatchingAndSelectIt,
 		...SideNav(),
 	};
 };

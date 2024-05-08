@@ -112,7 +112,7 @@ ${JSON.stringify(navigateToPageEvent)} \n`
 	);
 }
 
-export async function verifyC543693NavigateToPage() {
+export async function verifyC148727NavigateToPage() {
 	let navigateToPageEvent;
 	let i = 1;
 	while (navigateToPageEvent === undefined && i < 10) {

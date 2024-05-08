@@ -210,7 +210,7 @@ describe('Like Dislike events', function () {
 		const tvShowId = await homePage.getTVShowTitleId();
 		const movieDetailsPage = await homePage.selectFocusedTitleTVShow();
 		await movieDetailsPage.selectLike();
-		await utils.sleep(1000);
+		await utils.sleep(2000);
 		await ecp.sendKeypress(ecp.Key.Ok);
 		await verifyC374793(tvShowId);
 	});

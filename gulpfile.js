@@ -710,16 +710,21 @@ function setStaging(done) {
 function setAutomatedTestsConfig(done) {
   if(options) {
     let useQaAnalyticsProxy = false;
+    let noAdsConfig = true;
     if (process.env.analyticAutomatedTests === 'true') {
       // This turns on the analytic proxy needed for analytic testing
       useQaAnalyticsProxy = true;
+    }
+    if (process.env.enableAdsForTesting === 'true') {
+      // This turns on ads
+      noAdsConfig = false;
     }
     options.config = 'qa';
     options.overrides = {
       settings: {
         injectRtaOnDeviceComponent: true,
         hideStartupModals: true,
-        noAds: true,
+        noAds: noAdsConfig,
         printReqAndResInfo: false,
         disableHdmiStatusChecks: true,
         bs_const: {
@@ -943,6 +948,9 @@ function runAutomatedAnalyticsTestsCli(done) {
   return automatedTests().runAutomatedAnalyticsTestsCli(done);
 }
 
+function runAutomatedAnalyticsTestsForAdsCli(done) {
+  return automatedTests().runAutomatedAnalyticsTestsForAdsCli(done);
+}
 
 function runAutomatedTestsSmoke(done) {
   return automatedTests().runAutomatedTestsSmoke(done);
@@ -956,6 +964,7 @@ exports.outputAvailableAutomatedTestTags = outputAvailableAutomatedTestTags;
 exports.autotest = runAutomatedTestsCli;
 exports.buildTestAccount = buildTestAccountCli;
 exports.runAutomatedAnalyticsTestsCli = runAutomatedAnalyticsTestsCli;
+exports.runAutomatedAnalyticsTestsForAdsCli = runAutomatedAnalyticsTestsForAdsCli;
 exports.runAutomatedTestsSmoke = runAutomatedTestsSmoke;
 
 exports.runToolingTests = series(setAutomatedTestsConfig, clean, buildInstalled, runToolingTests);

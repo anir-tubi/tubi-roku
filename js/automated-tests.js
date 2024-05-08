@@ -73,6 +73,14 @@ async function runAutomatedAnalyticsTestsCli(done) {
   done();
 }
 
+async function runAutomatedAnalyticsTestsForAdsCli(done) {
+	env.set({
+		enableAdsForTesting: 'true',
+	});
+	await runAutomatedTestsCli(done, true);
+	done();
+}
+
 
 async function buildTestAccountCli(done) {
   // We don't want to have to hit a Roku device for this helper so we just make up a fake device id
@@ -441,6 +449,7 @@ function outputAvailableAutomatedTestTags(done) {
 module.exports = {
   runAutomatedTestsCli,
   runAutomatedAnalyticsTestsCli,
+  runAutomatedAnalyticsTestsForAdsCli,
   buildTestAccountCli,
   runAutomatedTests,
   outputAvailableAutomatedTestTags,
