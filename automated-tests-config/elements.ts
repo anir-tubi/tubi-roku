@@ -1734,6 +1734,31 @@ const elements = typeCheckElements({
   searchResultsGridPoster :{
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#searchScreen.#PageGroup.#ResultArea.#gridContainer.#resultsContainer.#ResultGrid.0.#poster',
   },
+
+  /* Welcome registration modal */
+  welcomeRegModal: {
+    keyPath: '#ContentController.#777c636.#dialogBox.#mask'
+  },
+
+  /* Welcome registration modal header*/
+  welcomeRegModalHeader: {
+    keyPath: '#ContentController.#777c636.#dialogBox.#contentArea.0.#header'
+  },
+
+  /* Welcome registration modal sign in button focused*/
+  welcomeRegModalSignInButtonFocused: {
+    keyPath: '#ContentController.#777c636.#dialogBox.#contentArea.#buttonList.0.#buttonTextParent.#labelFocused'
+  },
+  
+  /* Welcome registration modal sign in button*/
+  welcomeRegModalContinueAsGuestButton: {
+    keyPath: '#ContentController.#777c636.#dialogBox.#contentArea.#buttonList.1.#buttonTextParent.#label'
+  },
+
+  /* Welcome registration modal sign in button focused*/
+  welcomeRegModalContinueAsGuestButtonFocused: {
+    keyPath: '#ContentController.#777c636.#dialogBox.#contentArea.#buttonList.1.#buttonTextParent.#labelFocused'
+  },
   
   /** Reaction button Liked */
   reactionButtonLiked: {
