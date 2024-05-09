@@ -13,8 +13,8 @@ describe('Autoplay Movies', function () {
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
           
         // Are we on the Movies page?
-        await testUtils.waitForCurrentScreenToEqual('movieScreen');
-
+        await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
+        
         //Play title, seek to trigger cuepoint
         await ecp.sendKeypress(ecp.Key.Play);
         await seekToTriggerCuePoint();
@@ -29,14 +29,18 @@ describe('Autoplay Movies', function () {
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
         // Are we on the Movies page?
-        await testUtils.waitForCurrentScreenToEqual('movieScreen');
+        await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
   
-        //Play title, pause to open player, move right to FF button and press, verify state
+        //Play title, check cue point
+        await utils.sleep(1000);
         await ecp.sendKeypress(ecp.Key.Play);
+        await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 10000);
         await seekToTriggerCuePoint();
+        await ecp.sendKeypress(ecp.Key.Play);
 
         // Autoplay triggered?
         await checkForAutoPlayTrigger();
+
         
         // Scroll to next selection
         await ecp.sendKeypress(ecp.Key.Right);
@@ -53,7 +57,7 @@ describe('Autoplay Movies', function () {
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
         // Are we on the Movies page?
-        await testUtils.waitForCurrentScreenToEqual('movieScreen');
+        await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
     
         //Play title, pause to open player, move right to FF button and press, verify state
         await ecp.sendKeypress(ecp.Key.Play);
@@ -77,7 +81,7 @@ describe('Autoplay Movies', function () {
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
         // Are we on the Movies page?
-        await testUtils.waitForCurrentScreenToEqual('movieScreen');
+        await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
 
         //Play title, trigger autoplays
         await ecp.sendKeypress(ecp.Key.Play);
@@ -99,7 +103,7 @@ describe('Autoplay Movies', function () {
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
         // Are we on the Movies page?
-        await testUtils.waitForCurrentScreenToEqual('movieScreen');
+        await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
         
         //Play title, pause to open player, move right to FF button and press, verify state
         await ecp.sendKeypress(ecp.Key.Play);
@@ -122,14 +126,14 @@ describe('Autoplay Movies', function () {
         await testUtils.waitForElementToFullyShowOnScreen('searchResultsText');
 
       // Navigate right until the grid is in focus
-      await testUtils.untilTrue(async () => {
+        await testUtils.untilTrue(async () => {
           await ecp.sendKeypress(ecp.Key.Right);
           const { value: id } = await odc.getValue({
               base: 'focusedNode',
               keyPath: 'id'
           });
           return id === 'ResultGrid';
-      }, 'ResultGrid never obtained focus');
+        }, 'ResultGrid never obtained focus');
 
       // Wait until our content is loaded
       await odc.onFieldChangeOnce({

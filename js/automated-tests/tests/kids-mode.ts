@@ -156,6 +156,7 @@ describe('Kids Mode', function () {
 
   // https://tubi.testrail.io/index.php?/cases/view/535860
   it('C535860 - Registered User - Toggle ON - When user switches to Kids Mode then Home Screen filters out non-kids title, @kidsmode_registered', async () => {
+    
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
     await openKidsMode();
     await ecp.sendKeypress(ecp.Key.Right);

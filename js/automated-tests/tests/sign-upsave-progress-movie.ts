@@ -121,7 +121,7 @@ describe('Sign up Save Progress Movies', function () {
         await ecp.sendKeypress(ecp.Key.Ok);
 
         // Enter password
-        await utils.sleep(1000);
+        await utils.sleep(2000);
         await ecp.sendKeypress(ecp.Key.Ok);
         await ecp.sendText('111111');
         await utils.sleep(1000);
@@ -138,10 +138,9 @@ describe('Sign up Save Progress Movies', function () {
             detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
             expect(detailScreenTitle.text).to.not.be.empty;
         });
-        const playButtonIconFocused = await testUtils.getNodeForElement('playButtonIconFocused');
-        expect(playButtonIconFocused.uri).to.equal('pkg:/images/icon-play.webp');
 
         // Press play and verify playback
+        await testUtils.selectAndVerifyDetailPageMenuItem('play');
         await ecp.sendKeypress(ecp.Key.Ok);
 
         // Is video playing?

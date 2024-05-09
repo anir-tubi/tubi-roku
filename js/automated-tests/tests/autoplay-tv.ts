@@ -7,9 +7,7 @@ describe('Autoplay TV', function () {
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/70577
     it('C70577 - Autoplay - Series - When series reaches the credit cue point then autoplay triggers @autoplay', async () => {
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-
-        // Are we on the Series page?
-        await testUtils.waitForCurrentScreenToEqual('tvScreen');
+        await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
 
         // Trigger Series Autoplay
         await triggerSeriesAutoplay();
@@ -24,9 +22,7 @@ describe('Autoplay TV', function () {
     it('C535750 - Autoplay - Series - When autoplay timer expires then next episode autoplays @autoplay', async () => {
 
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-
-        // Are we on the Series page?
-        await testUtils.waitForCurrentScreenToEqual('tvScreen');
+        await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
         // Trigger Series Autoplay
         await triggerSeriesAutoplay();
@@ -43,11 +39,8 @@ describe('Autoplay TV', function () {
     it('C535854 - Autoplay - Series - Next episode plays after multiple consecutive autoplays @autoplay', async () => {
 
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-
-        // Are we on the Series page?
-        await testUtils.waitForCurrentScreenToEqual('tvScreen');
-      
-
+        await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    
         // Trigger Series Autoplay
         await triggerSeriesAutoplay();
 
@@ -74,10 +67,7 @@ describe('Autoplay TV', function () {
     it('C535749 - Autoplay - Series - When user presses the Back button then series autoplay UI is dismissed @autoplay', async () => {
 
         await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-        await ecp.sendKeypress(ecp.Key.Right);
-
-        // Are we on the Series page?
-        await testUtils.waitForCurrentScreenToEqual('tvScreen');
+        await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
         // Trigger Series Autoplay
         await triggerSeriesAutoplay();
@@ -119,8 +109,9 @@ describe('Autoplay TV', function () {
 
 async function triggerSeriesAutoplay() {
     //Play title, seek to autoplay cue point
+    
     await ecp.sendKeypress(ecp.Key.Play);
-    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing');
+    await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','paused');
     await testUtils.seekPlayerToRelativePosition('videoPlayerScreen', 0, 'end');

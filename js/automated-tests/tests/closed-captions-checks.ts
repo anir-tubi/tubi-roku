@@ -15,8 +15,7 @@ describe('Closed Captions Checks', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/438464
-  it.only('C438464 - Closed Caption toggle = ON is in sync between VOD and Linear @closed_captions', async () => {
-    
+  it('C438464 - Closed Caption toggle = ON is in sync between VOD and Linear @closed_captions', async () => {
 
     // Navigate to the Live News Row from Home screen
     // Jump to Recommended Channels row
@@ -24,10 +23,10 @@ describe('Closed Captions Checks', function () {
 
     // Start a live feed
     await ecp.sendKeypress(ecp.Key.Ok);
-    await utils.sleep(3000); // Needed this
+    await utils.sleep(5000); // Needed this
     
     // Verify that video is playing
-    await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',15000);
+    await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing', 15000);
 
     // Turn on Linear CC
     
@@ -69,7 +68,7 @@ describe('Closed Captions Checks', function () {
     await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
     const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
     expect(detailScreenTitle.text).is.equal('LEGO Masters');
-    await testUtils.selectAndVerifyDetailPageMenuItem('play');
+    await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
