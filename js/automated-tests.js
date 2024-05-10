@@ -5,12 +5,11 @@
 require('ts-node/register');
 
 const prompts = require('prompts');
-const mocha = require('gulp-mocha');
-const {src} = require('gulp');
 const env = require('gulp-env');
 const {device, utils} = require('roku-test-automation');
 const fs = require('fs');
 const log = require('fancy-log');
+const path = require('path');
 
 const {execShellCommand, spawnShellCommand} = require('./utilities');
 
@@ -18,14 +17,9 @@ const { testUtils, auth, ContentTypes, ContentRatings } = require('./automated-t
 
 const jsonReportOutputPath = `${testUtils.testsOutputFolder}/report.json`;
 
-async function runAutomatedTestsCli(done, analytics=false) {
-  let availableTags;
-  if(analytics){
-    availableTags = getAvailableTags('js/automated-tests/analytics/tests');
-  } else {
-    availableTags = getAvailableTags();
-  }
-
+async function runAutomatedTestsCli(done, testsPath = 'js/automated-tests/tests/*.ts') {
+  const testsFolder = path.dirname(testsPath);
+  const availableTags = getAvailableTags(testsFolder);
 
   const choices = [];
 
@@ -64,12 +58,15 @@ async function runAutomatedTestsCli(done, analytics=false) {
     done();
     return;
   }
-  await runAutomatedTests(done, branch, tags, analytics);
+  await runAutomatedTests(done, branch, tags, testsPath);
   done();
 }
 
 async function runAutomatedAnalyticsTestsCli(done) {
-  await runAutomatedTestsCli(done, true);
+  env.set({
+    analyticAutomatedTests: 'true'
+  });
+  await runAutomatedTestsCli(done, 'js/automated-tests/analytics/tests/*.ts');
   done();
 }
 
@@ -231,7 +228,7 @@ function runAutomatedTestsSmoke(done) {
 }
 
 
-async function runAutomatedTests(done, branch = '', tags = [], analytics = false) {
+async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/automated-tests/analytics/tests/*.ts') {
   // Load env file to allow overrides while developing tests
   const envPath = '.vscode/.env';
   if (fs.existsSync(envPath)) {
@@ -278,12 +275,6 @@ async function runAutomatedTests(done, branch = '', tags = [], analytics = false
     execShellCommand(done, `git clone --branch ${branch} --depth 1 git@github.com:adRise/project-total-recall.git ${applicationFolder}`);
   }
 
-  if (analytics) {
-    env.set({
-      analyticAutomatedTests: 'true'
-    });
-  }
-
   execShellCommand(done, `gulp --cwd ${applicationFolder} buildAutomatedTests`);
 
   const buildFolder = `${applicationFolder}/build/local`;
@@ -299,14 +290,6 @@ async function runAutomatedTests(done, branch = '', tags = [], analytics = false
 
   // Adding retries. May eventually want to allow turning on or off
   mochaOptions.push('--retries 3');
-
-  // Even if our tests fail we still want to append the extra data to the json report
-  let testsPath;
-  if (analytics){
-    testsPath = 'js/automated-tests/analytics/tests/*.ts';
-  } else {
-    testsPath = 'js/automated-tests/tests/*.ts';
-  }
 
   // We need to make our package here or else when we run in parallel they will all attempt to make the package at the same time
   await device.createPackage({

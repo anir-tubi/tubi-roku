@@ -1,7 +1,7 @@
 import { createHash, createHmac } from 'crypto';
 import { expect } from 'chai';
-import type { MediaPlayerResponse, NodeRepresentation } from 'roku-test-automation';
-import { ecp, odc, utils, device } from 'roku-test-automation';
+import type { MediaPlayerResponse, NodeRepresentation, ComparableValueTypes } from 'roku-test-automation';
+import { ecp, odc, utils } from 'roku-test-automation';
 import * as needle from 'needle';
 import * as querystring from 'needle/lib/querystring';
 
@@ -91,7 +91,7 @@ class TestUtils {
 
   /**
    * You can use this to get an element for the key the provided. Can also take an element to allow easier usage
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param baseArgs - allows you pass in additional arguments if you are passing it directly to another rta function
    */
   public getElementKeyPath<T>(elementOrElementId: ElementOrElementId, baseArgs?: T) {
@@ -116,7 +116,7 @@ class TestUtils {
 
   /**
    * This gives an easy way to get a node for the given element
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
   public async getNodeForElement(elementOrElementId: ElementOrElementId, timeout = 15000) {
@@ -133,7 +133,7 @@ class TestUtils {
 
   /**
    * This gives an easy way to get a node field for the given element. This is more efficient than getNodeForElement if all we care about is one field. It can also be used to use the element key path as a base that you can add on to as well.
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
   public async getElementField(elementOrElementId: ElementOrElementId, field: string, timeout = 15000) {
@@ -151,11 +151,11 @@ class TestUtils {
 
   /**
    * Use this to wait for an element field to match a known value. If a simple known value isn't available you can use waitForElementFieldChange
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param toEqual - What we are expecting the value to equal
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
-  public async waitForElementFieldToEqual(elementOrElementId: ElementOrElementId, field: string, toEqual: odc.ComparableValueTypes, timeout = 15000) {
+  public async waitForElementFieldToEqual(elementOrElementId: ElementOrElementId, field: string, toEqual: ComparableValueTypes, timeout = 15000) {
     const element = this.getElementKeyPath(elementOrElementId) as Element;
     return await odc.onFieldChangeOnce({
       keyPath: element.keyPath + '.' + field,
@@ -168,7 +168,7 @@ class TestUtils {
 
   /**
    * Use this to wait for an element field to change
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
   public async waitForElementFieldChange(elementOrElementId: ElementOrElementId, field: string, timeout = 15000) {
@@ -283,7 +283,6 @@ class TestUtils {
   // Starts the application at the specified page.
   // args: options to modify starting application state such as wether a user is logged in or not
   public async startApplicationAtPage(page: DeeplinkPage | 'search', args: StartApplicationArgs = {}) {
-    await utils.sleep(5000);
     let deeplink;
     if (page !== 'search') {
       deeplink = {
@@ -556,7 +555,7 @@ class TestUtils {
 
   /**
    * Because we store the json object at the row level, trying to access RowList content the normal way with RTA can result in huge responses (21 MB). This helps work around that
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param title - The title we are searching for
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
@@ -603,7 +602,7 @@ class TestUtils {
 
   /**
    * Used to jump to a row with the title provided
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param title - The title we are searching for
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
@@ -616,7 +615,7 @@ class TestUtils {
 
   /**
    * Used to jump to a row with the rowIndex provided
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param rowIndex - The row index we want to jump to
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
@@ -630,7 +629,7 @@ class TestUtils {
 
   /**
    * Used to jump to a row item of the provided index
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param index - The index we want to jump to consisting of row in index 0 and item in index 1
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
@@ -644,7 +643,7 @@ class TestUtils {
 
   /**
    * Used to retrieve all content in row specified by `rowIndex` from the specified RowList element
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param rowIndex - The row index we want to get the content for
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
@@ -684,7 +683,7 @@ class TestUtils {
 
   /**
    * Used to retrieve all content in the currently focused row from the specified RowList element
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
   public async getCurrentlyFocusedRowListRowItemsContent(elementOrElementId: ElementOrElementId, timeout = 10000) {
@@ -700,10 +699,21 @@ class TestUtils {
 
   /**
    * Used to retrieve all content in the specified RowList element
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
   public async getAllRowListItemsContent(elementOrElementId: ElementOrElementId, timeout = 10000) {
+    const rowsContent = await this.getAllRowListItemsContentGroupedByRow(elementOrElementId, timeout);
+    return rowsContent.flat();
+  }
+
+
+  /**
+   * Used to retrieve all content in the specified RowList element grouped by row. This is useful for when you want to know which row each item came from
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async getAllRowListItemsContentGroupedByRow(elementOrElementId: ElementOrElementId, timeout = 10000) {
     const element = this.getElementKeyPath(elementOrElementId);
     let baseKeyPath = `content`;
     if (element.keyPath) {
@@ -718,22 +728,20 @@ class TestUtils {
         throw new Error(`Can't find row count`);
       }
       return rowCount;
-    });
+    }, timeout);
 
-    const gridItemsContent = [];
+    const rowsContent = [];
     for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
       const rowItemsContent = await this.getRowListRowItemsContent(elementOrElementId, rowIndex, timeout);
-      for (const itemContent of rowItemsContent) {
-        gridItemsContent.push(itemContent);
-      }
+      rowsContent.push(rowItemsContent);
     }
-    return gridItemsContent;
+    return rowsContent;
   }
 
 
   /**
    * Used to retrieve all content in the specified grid element. getAllRowListItemsContent should be used instead if this is a RowList
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param timeout - How long we will wait for this operation before considering it to have failed
    * @returns array of NodeRepresentation with each item representing its respective position in the grid contents
    */
@@ -761,7 +769,7 @@ class TestUtils {
 
   /**
    * Used to help wait until content loads on a grid before trying to interact with it
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
   public async waitForGridContentToLoad(elementOrElementId: ElementOrElementId, timeout = 15000) {
@@ -778,7 +786,7 @@ class TestUtils {
 
   /**
    * Used to retrieve grid item content for the item specified by the index
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param index - array or number of which item we are getting the content for. For RowLists this should a 2 item array and for Grids a single item array or number
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
@@ -840,7 +848,7 @@ class TestUtils {
 
   /**
    * Used to get the grid item content for the currently focused grid item
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
   public async getCurrentlyFocusedGridItemContent(elementOrElementId: ElementOrElementId, timeout = 10000) {
@@ -853,6 +861,60 @@ class TestUtils {
     }
 
     return await this.getGridItemContent(elementOrElementId, index, timeout);
+  }
+
+
+  /**
+   * Used to get the index of the grid item that matches the callback function provided
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
+   * @param callbackFn - The function that will be used to determine if the grid item matches the criteria we are looking for
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async getMatchingGridItemIndex(elementOrElementId: ElementOrElementId, callbackFn: (gridItemContent: any) => boolean, timeout = 10000) {
+    const element = this.getElementKeyPath(elementOrElementId);
+
+    // First figure out if it is a grid or RowList
+    const isRowList = await odc.isSubtype({
+      ...element,
+      subtype: 'RowList'
+    });
+
+    if (isRowList) {
+      const content = await this.getAllRowListItemsContentGroupedByRow(element, timeout);
+      for (const [rowIndex, rowContent] of content.entries()) {
+        for (const [itemIndex, gridItemContent] of rowContent.entries()) {
+          if (callbackFn(gridItemContent)) {
+            return [rowIndex, itemIndex] as number[];
+          }
+        }
+      }
+    } else {
+      const content = await this.getAllGridItemsContent(element, timeout);
+      for (const [itemIndex, gridItemContent] of content.entries()) {
+        if (callbackFn(gridItemContent)) {
+          return [itemIndex];
+        }
+      }
+    }
+
+    throw new Error('Could not find matching grid item');
+  }
+
+
+/**
+   * Used to navigate to the grid item that matches the callback function provided
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
+   * @param callbackFn - The function that will be used to determine if the grid item matches the criteria we are looking for
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   */
+  public async navigateToGridItem(elementOrElementId: ElementOrElementId, callbackFn: (gridItemContent: any) => boolean, timeout = 10000) {
+    const index = await this.getMatchingGridItemIndex(elementOrElementId, callbackFn, timeout);
+    if (index.length === 1) {
+      await this.jumpToRowIndex(elementOrElementId, index[0], timeout);
+    } else {
+      await this.jumpToRowItem(elementOrElementId, index, timeout);
+    }
+    return index;
   }
 
 
@@ -935,7 +997,7 @@ class TestUtils {
 
   /**
    * Used to select the item in the provided elementOrElementId that matches title provided.
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param title - Title of the menu item we want to select
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
@@ -986,7 +1048,7 @@ class TestUtils {
 
   /**
    * Checks if element isInFocusChain
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param failIfNot - If not undefined then the result of this function will be checked and fail if not equal to the value specified
    * @param timeout - How long we will wait for this operation before considering it to have failed
    * @returns true if this element or one of its children has focus or false otherwise
@@ -1005,7 +1067,7 @@ class TestUtils {
 
   /**
    * Checks if element has focus
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param failIfNot - If not undefined then the result of this function will be checked and fail if not equal to the value specified
    * @param timeout - How long we will wait for this operation before considering it to have failed
    * @returns true if this element has focus or false otherwise
@@ -1024,7 +1086,7 @@ class TestUtils {
 
   /**
    * Waits for element to have focus within timeout period
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param failIfNot - If not undefined then the result of this function will be checked and fail if not equal to the value specified
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
@@ -1044,7 +1106,7 @@ class TestUtils {
 
   /**
   * Waits for element to not have focus within timeout period
-  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
   * @param errorMessage - A custom string to use for the error message
   * @param timeout - How long we will wait for this operation before considering it to have failed
   */
@@ -1065,7 +1127,7 @@ class TestUtils {
 
   /**
   * Waits for element to be in the focus chain within timeout period
-  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
   * @param errorMessage - A custom string to use for the error message
   * @param timeout - How long we will wait for this operation before considering it to have failed
   */
@@ -1085,7 +1147,7 @@ class TestUtils {
 
   /**
   * Waits for element to not be in the focus chain within timeout period
-  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
   * @param errorMessage - A custom string to use for the error message
   * @param timeout - How long we will wait for this operation before considering it to have failed
   */
@@ -1106,7 +1168,7 @@ class TestUtils {
 
   /**
    * Allows knowing if an element is showing on screen (viewable by a user) as well as whether it is fully showing
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
   public async isElementShowingOnScreen(elementOrElementId: ElementOrElementId, timeout = 10000) {
@@ -1124,7 +1186,7 @@ class TestUtils {
 
   /**
   * Waits for element to be at least partially showing on the screen (viewable by a user)
-  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
   * @param errorMessage - A custom string to use for the error message
   * @param timeout - How long we will wait for this operation before considering it to have failed
   */
@@ -1138,7 +1200,7 @@ class TestUtils {
 
   /**
   * Waits for element to be fully showing on the screen (viewable by a user)
-  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
   * @param errorMessage - A custom string to use for the error message
   * @param timeout - How long we will wait for this operation before considering it to have failed
   */
@@ -1152,7 +1214,7 @@ class TestUtils {
 
   /**
   * Waits for element to not be showing on the screen (viewable by a user)
-  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+  * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
   * @param errorMessage - A custom string to use for the error message
   * @param timeout - How long we will wait for this operation before considering it to have failed
   */
@@ -1166,7 +1228,7 @@ class TestUtils {
 
   /**
    * Allows getting the dimensions of a regular node. Use getGridElementSize for grid children items
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
   public async getElementSize(elementOrElementId: ElementOrElementId, timeout = 10000) {
@@ -1190,7 +1252,7 @@ class TestUtils {
 
     /**
    * Allows getting the dimensions of a grid item node
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file. This should be for the grid or RowList not the grid element itself
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file. This should be for the grid or RowList not the grid element itself
    * @param index - array or number of which item we are getting the size of. For RowLists this should a 2 item array and for Grids a single item array or number
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
@@ -1255,7 +1317,7 @@ class TestUtils {
 
   /**
    * Roku stores colors as integers which are difficult to work with. This helper returns a more usable hex version
-   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the element-keypaths file
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param colorFieldName - The field on the node that we are interested in converting from an integer to a hex representation
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */

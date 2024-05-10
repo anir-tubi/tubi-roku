@@ -759,17 +759,13 @@ function setPerformanceTestsConfig(done) {
   }
 }
 
-function runPerformanceTests() {
-  const mocha = require('gulp-mocha');
-  return src(['js/automated-tests/performance-tests/*.ts'], { read: false })
-    .pipe(mocha({}));
+function runPerformanceTests(done) {
+    automatedTests().runAutomatedTests(done, '', [], 'js/automated-tests/performance-tests/*.ts');
 }
 
 
-function runToolingTests() {
-  const mocha = require('gulp-mocha');
-  return src(['js/automated-tests/tooling-tests.ts'], { read: false })
-    .pipe(mocha({}));
+function runToolingTests(done) {
+  automatedTests().runAutomatedTests(done, '', [], 'js/automated-tests/tooling-tests.ts');
 }
 
 

@@ -349,6 +349,50 @@ describe('test-utils', function () {
         expect(color).to.equal('#232323FF');
       });
     });
+
+
+    describe('getMatchingGridItemIndex', function () {
+      it('should return the correct index for a grid item', async () => {
+        // First we get the content for a known position
+        const knownIndex = [0, 6];
+        const knownContent = await testUtils.getGridItemContent('homeRowList', knownIndex);
+        const actualIndex = await testUtils.getMatchingGridItemIndex('homeRowList', (gridItemContent) => {
+          return gridItemContent.id === knownContent.id;
+        });
+
+        expect(actualIndex[0]).to.equal(knownIndex[0]);
+        expect(actualIndex[1]).to.equal(knownIndex[1]);
+      });
+
+
+      it('should throw an error if no gridItemContent matches the callback', async () => {
+        try {
+          await testUtils.getMatchingGridItemIndex('homeRowList', (_) => {
+            return false;
+          });
+        } catch (e) {
+          // Failed as expected
+          return;
+        }
+        throw new Error('Did not throw an error when it should have');
+      });
+    });
+
+
+    describe('navigateToGridItem', function () {
+      it('should be able to navigate to a valid grid item', async () => {
+        // First we get the content for a known position
+        const knownIndex = [0, 6];
+        const knownContent = await testUtils.getGridItemContent('homeRowList', knownIndex);
+        await testUtils.navigateToGridItem('homeRowList', (gridItemContent) => {
+          return gridItemContent.id === knownContent.id;
+        });
+
+        // Verify that the item is now focused
+        const focusedContent = await testUtils.getCurrentlyFocusedGridItemContent('homeRowList');
+        expect(focusedContent.id).to.equal(knownContent.id);
+      });
+    });
   });
 
 
