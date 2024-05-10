@@ -131,6 +131,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
 
   videoPlayer.isUserLoggedIn = isLoggedInUser()
   videoPlayer.relatedContent = invalid
+  videoPlayer.updateRelatedContent = true
 
   stopVideoPreview()
 
@@ -216,14 +217,21 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
 
       sendNielsenPing(m.constants.thirdParty.nielsen.pingTypes.streamStart, content)
 
-      if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
-        browseContent = videoPlayer.browseContent
+      if isKidsUIOn() = false
+        if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
+          browseContent = videoPlayer.browseContent
 
-        if browseContent = invalid OR browseContent.getChildCount() <= 0 AND m.isBrowseContentOnPlayerFetchInProgress = false
-          fetchBrowseContentForPlayer()
+          if browseContent = invalid OR m.isBrowseContentOnPlayerFetchInProgress = false
+            fetchBrowseContentForPlayer()
+          end if
+        else
+          getRelatedContent(content, handleRelatedResponseInVideoPlayer)
         end if
       else
-        getRelatedContent(content, handleRelatedResponseInVideoPlayer)
+        videoPlayer.browseContent = invalid
+        videoPlayer.updateBrowseContent = true
+        videoPlayer.relatedContent = invalid
+        videoPlayer.updateRelatedContent = true
       end if
 
     end if

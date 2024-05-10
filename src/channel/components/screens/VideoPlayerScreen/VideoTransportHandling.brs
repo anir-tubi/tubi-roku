@@ -1674,22 +1674,25 @@ End Function
 
 ' show YMAL row on bottom of the screen and fire exposure event
 Function showYMAL()
+  if m.top.appMode <> "KIDS_MODE"
 
-  if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
-    content = m.top.browseContent
-  else
-    content = m.top.relatedContent
+    if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
+      content = m.top.browseContent
+    else
+      content = m.top.relatedContent
+    end if
+
+    'fire exposure event when YMAL row is displayed at bottom area of the screen
+    if content <> invalid AND content.getChildCount() > 0 AND getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4").enabled = true
+      m.Related.jumpToRowItem = [0,0]
+      m.Related.isLoading = false
+    else if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
+      m.Related.isLoading = true
+    end if
+
+    m.Related.show = true
+
   end if
-
-  'fire exposure event when YMAL row is displayed at bottom area of the screen
-  if content <> invalid AND content.getChildCount() > 0 AND getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4").enabled = true
-    m.Related.jumpToRowItem = [0,0]
-    m.Related.isLoading = false
-  else if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
-    m.Related.isLoading = true
-  end if
-
-  m.Related.show = true
 End Function
 
 
