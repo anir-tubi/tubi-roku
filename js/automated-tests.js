@@ -74,7 +74,7 @@ async function runAutomatedAnalyticsTestsForAdsCli(done) {
 	env.set({
 		enableAdsForTesting: 'true',
 	});
-	await runAutomatedTestsCli(done, true);
+	await runAutomatedTestsCli(done, 'js/automated-tests/analytics/tests/*.ts');
 	done();
 }
 
@@ -228,7 +228,7 @@ function runAutomatedTestsSmoke(done) {
 }
 
 
-async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/automated-tests/analytics/tests/*.ts') {
+async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/automated-tests/tests/*.ts') {
   // Load env file to allow overrides while developing tests
   const envPath = '.vscode/.env';
   if (fs.existsSync(envPath)) {

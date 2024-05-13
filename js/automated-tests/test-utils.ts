@@ -315,6 +315,8 @@ class TestUtils {
       deeplink['setRegistry'] = JSON.stringify(user.getRegistryAuthValues());
     }
 
+    let constantsUpdates;
+
     if (args.language) {
       let locale: string;
       switch (args.language) {
@@ -326,10 +328,30 @@ class TestUtils {
           break;
       }
       const language = locale.slice(0, 2);
-      deeplink['constantsUpdates'] = JSON.stringify({
+      deeplink['constantsUpdates'] = {
         'deviceInfo.locale': locale,
         'deviceInfo.language': language
-      });
+      };
+    }
+
+    if (args.hideStartupModals !== undefined) {
+      if (!constantsUpdates) {
+        constantsUpdates = {};
+      }
+
+      constantsUpdates['settings.hideStartupModals'] = args.hideStartupModals;
+    }
+
+    if (args.noAds !== undefined) {
+      if (!constantsUpdates) {
+        constantsUpdates = {};
+      }
+
+      constantsUpdates['settings.noAds'] = args.noAds;
+    }
+
+    if (constantsUpdates) {
+      deeplink['constantsUpdates'] = JSON.stringify(constantsUpdates);
     }
 
     await this.restartApplication({
@@ -2191,6 +2213,12 @@ type StartApplicationArgs = {
   clearRegistry?: boolean;
 
   language?: 'english' | 'spanish'
+
+  /** No startup modals are shown unless false */
+  hideStartupModals?: boolean;
+
+  /** No ads are shown unless set to false */
+  noAds?: boolean;
 }
 
 
