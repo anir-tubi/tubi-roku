@@ -271,6 +271,7 @@ Function onSideNavItemSelected()
         bNewScreenCalledSuccess = false
         displayMenuItemDisabled(m.constants.ui.homeScreenTopNavIds.movies, "teens")
       else
+        setUiMode(m.constants.ui.modes.standard)
         showMoviesScreen()
         bNewScreenCalledSuccess = true
       end if
@@ -282,6 +283,7 @@ Function onSideNavItemSelected()
         bNewScreenCalledSuccess = false
         displayMenuItemDisabled(m.constants.ui.homeScreenTopNavIds.tv, "teens")
       else
+        setUiMode(m.constants.ui.modes.standard)
         showTVScreen()
         bNewScreenCalledSuccess = true
       end if

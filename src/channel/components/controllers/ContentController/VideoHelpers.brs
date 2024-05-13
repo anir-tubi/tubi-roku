@@ -221,8 +221,8 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
         if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
           browseContent = videoPlayer.browseContent
 
-          if browseContent = invalid OR m.isBrowseContentOnPlayerFetchInProgress = false
-            fetchBrowseContentForPlayer()
+          if browseContent = invalid
+            fetchBrowseContentForPlayer(videoPlayer.appMode)
           end if
         else
           getRelatedContent(content, handleRelatedResponseInVideoPlayer)
@@ -281,23 +281,28 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
 End Function
 
 
-Function fetchBrowseContentForPlayer()
-  m.isBrowseContentOnPlayerFetchInProgress = true
-
+'Fetch BrowseContent(similar to homescreen/espanol) for player screen BrowseWhileWatching section
+'
+' @appMode: String, current app mode. Possible values are "DEFAULT_MODE", "KIDS_MODE", "LATINO_MODE"
+'
+Function fetchBrowseContentForPlayer(appMode = "DEFAULT_MODE")
   reqName = m.constants.reqNames.getMiniHomescreen
   options = {}
   headers = {}
   params = {}
 
-  limitParamName = "contents_limit"
-  contentModeParamName = "content_mode"
-  ' For tensor API, we need to pass as empty string for homescreen content
-  params[contentModeParamName] = ""
+  if appMode = "LATINO_MODE"
+    contentModeParamValue = m.constants.ui.contentMode.latino
+  else ' For tensor API, we need to pass as empty string for homescreen
+    contentModeParamValue = ""
+  end if
+
+  params["content_mode"] = contentModeParamValue
   isKidsMode = shouldKidsModeBeSentToServer()
 
   'Requesting 5 more containers on api request, as we remove linear rows from it.
   params["group_size"] = m.constants.player.browseContent.numContainers + 5
-  params[limitParamName] = m.constants.player.browseContent.numContents
+  params["contents_limit"] = m.constants.player.browseContent.numContents
 
   options.params = params
   options.headers = headers
@@ -317,7 +322,6 @@ End Function
 
 
 Function onMiniHomeScreenContentSuccessResponse(response)
-  m.isBrowseContentOnPlayerFetchInProgress = false
   screenID = m.constants.ui.screenIds.videoPlayerScreen
   videoPlayerScreen = getFromScreenCache(screenID)
 
@@ -329,7 +333,6 @@ End Function
 
 
 Function onMiniHomeScreenContentErrorResponse(response)
-  m.isBrowseContentOnPlayerFetchInProgress = false
   screenID = m.constants.ui.screenIds.videoPlayerScreen
   videoPlayerScreen = getFromScreenCache(screenID)
 
