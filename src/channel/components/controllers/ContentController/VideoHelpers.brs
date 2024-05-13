@@ -567,7 +567,8 @@ Function playUpNextContent(nextContent, playbackSource = {"srcForAnalytic": "unk
 
       returnToDetailScreenFromVideo()
     else
-      playVideoContent(content, playbackSource)
+      nowPos = processResume(content)
+      playVideoContent(content, playbackSource, nowPos)
     end if
 
   end if
