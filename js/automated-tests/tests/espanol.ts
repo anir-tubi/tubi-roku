@@ -166,7 +166,50 @@ describe('Espanol', function () {
           // Verify Espanol Disabled for Teens
           await verifyEspanolDisabledTeens();
 
+      });
+
+    // https://tubi.testrail.io/index.php?/cases/view/116526
+     it('C116526 - My List and Continue Watching container names are translated, @espanol', async () => {
+
+        // Create user with watch list and history
+         const user = await testUtils.createRegisteredUser();
+         await createEspanolWatchListEvergreenTitle(user);
+         await createHistoryEspanolEvergreenTitle(user);
+
+          // Launch at Espanol page with user above that has watch list and history
+
+          await testUtils.startApplicationAtPage('espanol', { user: user });
+          await testUtils.waitForElementToHaveFocus('espanolHomeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+          // Scroll to CW and verify translation
+          await testUtils.jumpToRowWithTitle('categoryGridRowList', 'Seguir Viendo', 10000);
+
+          // Scroll to My List and verify tranlation
+          await testUtils.jumpToRowWithTitle('categoryGridRowList', 'Mi Lista', 10000);
+
     });
+
+    async function createHistoryEspanolEvergreenTitle(user) {
+
+      // Create history with one Evergreen title movie
+
+      const contentId = await user.getContentById(300006083);
+      await user.addContentToViewHistory(contentId, 500);
+
+   }
+
+   async function createEspanolWatchListEvergreenTitle(user) {
+
+    // Create a user with one title series
+
+    await user.addContentToWatchList({
+          id: '0300006083',
+          type: 'series'
+        });
+      
+   
+
+ }
 
 
   });

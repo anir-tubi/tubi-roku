@@ -73,6 +73,17 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#movieScreen.#ContentArea.#CategoryGridList.#RowList.0.title.#CategoryName',
   },
 
+  /** Espanol Row List */
+  espanolHomeScreenRowList: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#espanolScreen.#PageGroup.#ContentArea.#CategoryGridList.0',
+  },
+
+  /** category name */
+  categoryGridRowList: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#espanolScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList',
+  },
+
+  
   /** TV Shows screen row list */
   tvShowsScreenRowList: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#tvScreen.#ContentArea.#CategoryGridList.#RowList',
