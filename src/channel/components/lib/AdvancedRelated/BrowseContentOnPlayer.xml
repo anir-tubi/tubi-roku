@@ -42,6 +42,8 @@
       <!-- set to true when selectedRelatedContentItem is updated-->
       <field id="selectedRelatedContentItemUpdated" type="boolean" alwaysNotify="true" />
 
+      <field id="currCategoryId" alias="CategoryGridList.currCategoryId" />
+
       <field id="itemFocused" alias="CategoryGridList.itemFocused"/>
       <!-- Holds the information needed to populate a navigate_within_page event. This will
            be observed by the contentController via videoHelpers
