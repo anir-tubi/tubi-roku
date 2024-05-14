@@ -66,7 +66,6 @@ Function showHomeScreen(constants, authInfo, screenID = "", componentToFocus = "
     homeScreen.observeFieldScoped("stopVideoPreview", "onStopVideoPreview")
     homeScreen.observeFieldScoped("pauseVideoPreview", "onPauseVideoPreview")
     homeScreen.observeFieldScoped("loadCategoryForIds", "onLoadCategoryForIds")
-    homeScreen.observeFieldScoped("CWFetchEpisodeContent", "onCWFetchEpisodeContent")
 
     m.playerFullscreenCountdownTimer.unobserveFieldScoped("fire") '//Stop listening to timer before listing to it in case a previous screen started the timer
     m.playerFullscreenCountdownTimer.observeFieldScoped("fire", "onFullscreenCountdown")
@@ -748,38 +747,6 @@ Function onHomeScreenContentFocused(msg)
   focusedContent = msg.getData()
   homeScreen = msg.getRoSGNode()
   setHomeScreenAfterFocus(focusedContent, homeScreen)
-End Function
-
-
-'TODO: temporary solution; Delete this function after exp roku_progress_bar_on_infopanel
-Function onCWFetchEpisodeContent(msg)
-  content = msg.getData()
-  episode = getFromContentCache(content.id)
-
-  if episode = invalid
-    getSingleContentFromServer(content, onCWEpisodeSuccess, onCWEpisodeError)
-  else
-    onCWEpisodeSuccess(episode, false)
-  end if
-End Function
-
-
-'TODO: temporary solution; Delete this function after exp roku_progress_bar_on_infopanel
-Function onCWEpisodeSuccess(content, storeInCache = true)
-  if content <> invalid AND storeInCache = true
-    setInContentCache(content, m.constants.ui.screenIds.homeScreen)
-  end if
-
-  homeScreen = getFromScreenCache(m.constants.ui.screenIds.homeScreen)
-  if homeScreen <> invalid
-    homeScreen.refreshInfoPanelWithEpisode = content
-  end if
-End Function
-
-
-'TODO: temporary solution; Delete this function after exp roku_progress_bar_on_infopanel
-Function onCWEpisodeError(_response)
-  'Future use. For the this experiment Do not do anything right now.
 End Function
 
 

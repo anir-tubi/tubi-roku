@@ -260,11 +260,6 @@
               <Font
                 role="font"/>
             </Label>
-            <TubiProgressBar
-              id="ResumeProgressBar"
-              width="375"
-              height="8"/>
-
           </LayoutGroup>
         </LayoutGroup>
 

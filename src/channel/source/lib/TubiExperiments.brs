@@ -78,10 +78,6 @@ Function TubiExperiments(constants) as Object
         roku_remove_top_nav_v1: {"enabled": true}
       }
 
-      roku_progress_bar_on_infopanel: {
-        roku_progress_bar_on_infopanel_v1: {"enabled": false}
-      }
-
       roku_sports_onnow_rows: {
         roku_sports_onnow_rows_v2: {"enabled": false}
       }

@@ -33,7 +33,6 @@ Function init()
   m.TopNav.observeField("selected", "onTopNavSelection")
   m.TopNav.observeField("backItemSelected", "onTopNavBackItemSelected")
   m.TopNav.observeField("navigateWithinPageInfo", "onTopNavNavigateWithinPageInfoChange")
-  m.top.observeFieldScoped("refreshInfoPanelWithEpisode", "onRefreshInfoPanelWithEpisode")
 
   m.CategoryRefreshTimer = m.top.findNode("CategoryRefreshTimer")
   m.CategoryRefreshTimer.duration = m.constants.timers.categoryContentRefreshTimeout
@@ -87,9 +86,6 @@ Function init()
   if authInfo <> invalid AND authInfo.parentalrating <> invalid
     m.top.parentalRating = authInfo.parentalrating
   end if
-
-  m.progressBarOnInfoPanelExp = (getExperimentResource("roku_progress_bar_on_infopanel", "roku_progress_bar_on_infopanel_v1", false).enabled = true)
-  m.isExpEvtSendForProgressbarExp = false
 
   m.liveProgramEnabled = getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2", false).enabled = true
   ' TODO: Remove after genre grid experiement graduated.
@@ -522,8 +518,6 @@ Function populateInfoPanelByContent(focusedContent)
       populateInfoPanel(m.constants.ui.infoPanelModes.continueWatching, focusedContent)
     else if sType = m.constants.ui.contentTypes.sportsEvent
       populateInfoPanel(m.constants.ui.infoPanelModes.sportsEvent, focusedContent)
-    else if focusedContent.parentId = "continue_watching" AND m.progressBarOnInfoPanelExp = true 'signIn user with continue watching contents
-      populateInfoPanel(m.constants.ui.infoPanelModes.CWSignedInUser, focusedContent)
     else
       populateInfoPanel(m.constants.ui.infoPanelModes.item, focusedContent)
     end if
@@ -561,23 +555,6 @@ Function onGridFocusChange() as void
       if focusedContent.type <> m.constants.ui.gridItemTypes.linear AND oldFocusedContent <> invalid AND oldFocusedContent.type = m.constants.ui.gridItemTypes.linear
         m.top.stopLinearVideoPlayer = true
       end if
-      '//TODO ; Temporary solution; Delete this if after exp roku_progress_bar_on_infopanel
-      if focusedContent.parentId = "continue_watching"
-        history = getHistory(focusedContent.id)
-        if history <> invalid 'signed in User so send the exposure event
-          if m.isExpEvtSendForProgressbarExp = false
-            getExperimentResource("roku_progress_bar_on_infopanel", "roku_progress_bar_on_infopanel_v1", true)
-            m.isExpEvtSendForProgressbarExp = true
-          end if
-
-          if focusedContent.type = m.constants.ui.contentTypes.series AND history.currentEpisodeId <> invalid AND history.currentEpisodeId <> ""
-            episode = createObject("roSGNode", "contentNode")
-            episode.id = history.currentEpisodeId
-
-            m.top.CWFetchEpisodeContent = episode
-          end if
-        end if
-      end if
 
       m.top.trackingComponentInfo = getTrackingComponentInfoOfCategoryGridList(focusedContent, m.CategoryGridList.focusedPosition)
       m.top.contentFocused = focusedContent
@@ -609,7 +586,7 @@ Function onGridFocusChange() as void
       else
         categoryComponentInfo["content_tile"] = tile
       end if
-      
+
 
       m.top.navigateWithinPageInfo = {
         pageOneof: m.Tracking.getAnalyticsPage(m.top.trackingPageInfo.pageType, m.top.trackingPageInfo.pageValues)
@@ -736,8 +713,6 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.needsLogin = contentNode.needsLogin AND (m.top.signedIn <> true)
       m.InfoPanel.reminderIsSet = false
-    else if mode = m.constants.ui.infoPanelModes.CWSignedInUser AND m.progressBarOnInfoPanelExp = true
-      populateInfoPanelWithCWSignedInUserStyleItemMode(contentNode, m.InfoPanel)
     else if mode = m.constants.ui.infoPanelModes.programHomescreen 'V3 api
       populateInfoPanelWithProgramHomescreenMode(contentNode, m.InfoPanel)
     else if mode = m.constants.ui.infoPanelModes.sportsEvent
@@ -987,14 +962,5 @@ Function refreshHomeScreenContainers()
   end for
   if loadCategoryForIds.count() > 0
     m.top.loadCategoryForIds = loadCategoryForIds
-  end if
-End Function
-
-
-Function onRefreshInfoPanelWithEpisode(msg)
-  episode = msg.getData()
-  contentFocused = m.top.contentFocused
-  if episode <> invalid AND contentFocused <> invalid AND episode.seriesId = contentFocused.id
-    populateInfoPanelByContent(contentFocused)
   end if
 End Function

@@ -29,7 +29,6 @@ Function init()
 
   m.secondLineGroup = m.top.findNode("SecondLineGroup")
   m.secondLineAvailabilityBadge = m.secondLineGroup.findNode("SecondLineAvailabilityBadge")
-  m.resumeProgressBar = m.secondLineGroup.findNode("ResumeProgressBar")
   m.line2 = m.secondLineGroup.findNode("Line2")
 
   m.descriptionGroup = m.top.findNode("DescriptionGroup")
@@ -142,9 +141,6 @@ Function onThemeChange(msg = invalid)
     m.Description.color = theme.primaryTextColor
     m.Director.color = theme.primaryTextColor
     m.Starring.color = theme.primaryTextColor
-    m.resumeProgressBar.focusColor = theme.focusedColor
-    m.resumeProgressBar.trackColor = theme.neutralColor
-    m.resumeProgressBar.unfocusColor = theme.focusedColor
   end if
 End Function
 
@@ -592,23 +588,6 @@ Function onLineTwoDataChange(msg)
       end if
     end if
 
-    progressBarIsPresent = m.resumeProgressBar.getParent() <> invalid
-
-    if data.displayProgressBar = true
-
-      if progressBarIsPresent = false
-        secondLineGroup.insertChild(m.resumeProgressBar, insertIndex)
-      end if
-
-      m.resumeProgressBar.progress = data.progressPercent
-    else
-
-      if progressBarIsPresent = true
-        m.resumeProgressBar.progress = 0
-        secondLineGroup.removeChild(m.resumeProgressBar)
-      end if
-
-    end if
   end if
 End Function
 
@@ -871,16 +850,6 @@ Function onModeChange()
     m.offset.appendChild(m.title)
     m.offset.appendChild(m.descriptionGroup)
     m.offset.itemSpacings = [15]
-
-  else if m.top.mode = m.constants.ui.infoPanelModes.CWSignedInUser
-    m.infoPanelGroup.appendChild(m.offset)
-    m.offset.appendChild(m.title)
-    m.offset.appendChild(m.twoLineInfo)
-    m.twoLineInfo.appendChild(m.firstLineGroup)
-    m.firstLineGroup.appendChild(m.line1)
-    m.twoLineInfo.appendChild(m.secondLineGroup)
-    m.secondLineGroup.appendChild(m.resumeProgressBar)
-    m.offset.appendChild(m.descriptionGroup)
   else if m.top.mode = m.constants.ui.infoPanelModes.linearHomeScreen
     '//For when the linear player is on the home screen
     m.infoPanelGroup.appendChild(m.offset)

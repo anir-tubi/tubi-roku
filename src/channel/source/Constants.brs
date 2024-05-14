@@ -1093,7 +1093,6 @@ Function getConstants()
       'these map to different InfoPanel modes/types
       constants.ui.infoPanelModes.item = "item"
       constants.ui.infoPanelModes.continueWatching = "continueWatching"
-      constants.ui.infoPanelModes.CWSignedInUser = "CWSignedInUser"
       constants.ui.infoPanelModes.movie = "movie"
       constants.ui.infoPanelModes.series = "series"
       constants.ui.infoPanelModes.season = "season"
