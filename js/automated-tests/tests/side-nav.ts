@@ -719,6 +719,125 @@ describe('Side Navigation', function () {
 
     });
 
+    // https://tubi.testrail.io/index.php?/cases/view/575863
+    it('C575863 - Side Navigation - Return to Home when pressing back from multiple side nav selections - Search, @sidenav_test', async () => {
+
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 60000);
+
+      // Open left nav
+      await openLeftNav();
+
+      // Go to Search
+      await openPageFromLeftNav('Search')
+      await testUtils.waitForElementToFullyShowOnScreen('searchGrid')
+
+      // Open left nav
+      await openLeftNav();
+
+      // Go to My Stuff
+      await openPageFromLeftNav('My Stuff');
+      await testUtils.waitForElementToFullyShowOnScreen('unlockNowForMyStuff')
+
+      // Open left nav
+      await openLeftNav();
+
+      // Verify press back should go to Home
+      await ecp.sleep(1000);
+      await ecp.sendKeypress(ecp.Key.Back);
+      await testUtils.verifyFocusedSideNavMenuItemEquals('home')
+
+    });
+
+    // https://tubi.testrail.io/index.php?/cases/view/610650
+    it('C610650 - Side Navigation - Return to Home when pressing back from multiple side nav selections - Categories, @sidenav_test', async () => {
+
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 60000);
+
+      // Open left nav
+      await openLeftNav();
+
+      // Go to Categories
+      await openPageFromLeftNav('Categories')
+      await testUtils.waitForElementToFullyShowOnScreen('recommendedCategoryPage')
+
+      // Open left nav
+      await openLeftNav();
+
+      // Go to My Stuff
+      await await openPageFromLeftNav('My Stuff')
+      await testUtils.waitForElementToFullyShowOnScreen('unlockNowForMyStuff')
+      
+      // Open left nav
+      await openLeftNav();
+
+      // Verify press back should go to Home
+      await ecp.sleep(1000);
+      await ecp.sendKeypress(ecp.Key.Back);
+      await testUtils.verifyFocusedSideNavMenuItemEquals('home')
+
+    });
+
+    // https://tubi.testrail.io/index.php?/cases/view/610651
+    it('C610651 - Side Navigation - Return to Home when pressing back from multiple side nav selections - Channels, @sidenav_test', async () => {
+
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 60000);
+
+      // Open left nav
+      await openLeftNav();
+
+      // Go to Live Channels
+      await openPageFromLeftNav('Live TV')
+      await testUtils.waitForElementToFullyShowOnScreen('epgProgramGrid')
+
+      // Open left nav
+      await openLeftNav();
+
+      // Go to My Stuff
+      await await openPageFromLeftNav('My Stuff')
+      await testUtils.waitForElementToFullyShowOnScreen('unlockNowForMyStuff')
+      
+      // Open left nav
+      await openLeftNav();
+
+      // Verify press back should go to Home
+      await ecp.sleep(1000);
+      await ecp.sendKeypress(ecp.Key.Back);
+      await testUtils.verifyFocusedSideNavMenuItemEquals('home')
+
+    });
+
+    // https://tubi.testrail.io/index.php?/cases/view/610652
+    it('C610652 - Side Navigation - Return to Home when pressing back from multiple side nav selections - Espanol, @sidenav_test', async () => {
+
+      await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
+      await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 60000);
+
+      // Open left nav
+      await openLeftNav();
+
+      // Go to Espanol
+      await openPageFromLeftNav('Español')
+      await testUtils.waitForElementToFullyShowOnScreen('espanolLogo')
+
+      // Open left nav
+      await openLeftNav();
+
+      // Go to My Stuff from Espanol
+      await await openPageFromLeftNav('My Stuff')
+      await testUtils.waitForElementToFullyShowOnScreen('unlockNowForMyStuff')
+
+      // Open left nav
+      await openLeftNav();
+
+      // Verify press back should go to Home
+      await ecp.sleep(1000);
+      await ecp.sendKeypress(ecp.Key.Back);
+      await testUtils.verifyFocusedSideNavMenuItemEquals('home')
+
+    });
 
   });
 
@@ -788,4 +907,11 @@ async function navigateRightToGrid() {
     });
     return id === 'ResultGrid';
   }, 'ResultGrid never obtained focus');
+}
+
+
+async function openPageFromLeftNav(title: string) {
+  await testUtils.jumpToRowWithTitle('sideNavMenu', title)
+  await ecp.sleep(1000)
+  await ecp.sendKeypress(ecp.Key.Ok)
 }

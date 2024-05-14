@@ -40,6 +40,7 @@ enum SideNavMenuItems {
   'myList' = 'myList',
   'categories' = 'categories',
   'channels' = 'channels',
+  'linearEPG' = 'linearEPG',
   'espanol' = 'espanol',
   'settings' = 'settings',
   'exit' = 'exit'
