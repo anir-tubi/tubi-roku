@@ -195,9 +195,8 @@ End Function
 ' ----------------------------------------------
 ' @episode: node, TubiContentNode for a video (movie or episode)
 ' @breakPos: integer, the preroll or midroll playback position at which the break occurs
-' @isSeekPastCuepoint: boolean, true if this ad request is due to seeking past a cuepoint
-Function tubiAds_populateUrlRainmaker(episode, breakPos = 0, isSeekPastCuepoint = false) As String
-  params = m.getRainmakerParams(episode, breakPos, isSeekPastCuepoint)
+Function tubiAds_populateUrlRainmaker(episode, breakPos = 0) As String
+  params = m.getRainmakerParams(episode, breakPos)
   baseUrl = m.constants.urls.adsBaseUrlRainmaker + m.constants.analyticsPlatform
   paramAddedUrl = m.request.addParamsToUrl(baseUrl, params)
   return paramAddedUrl
@@ -207,8 +206,7 @@ End Function
 ' returns an assocArray of all parameters that should be sent to rainmaker
 ' @content: node, TubiContentNode for a video (movie or episode)
 ' @breakPos: integer, the preroll or midroll playback position at which the break occurs
-' @isSeekPastCuepoint: boolean, true if this ad request is due to seeking past a cuepoint
-Function tubiAds_getRainmakerParams(content, breakPos = 0, isSeekPastCuepoint = false)
+Function tubiAds_getRainmakerParams(content, breakPos = 0)
   params = {
     content_id: content.id
     pub_id: content.pubId
@@ -245,9 +243,7 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0, isSeekPastCuepoint = 
     params["opt_out"] = "false"
   end if
 
-  if isSeekPastCuepoint = true
-    params["resume_from"] = "ffwd"
-  else if content.adParam <> invalid AND isNonEmptyString(content.adParam.resumeFrom) = true
+ if content.adParam <> invalid AND isNonEmptyString(content.adParam.resumeFrom) = true
     params["resume_from"] = content.adParam.resumeFrom
   end if
 
@@ -407,8 +403,7 @@ End Function
 ' ----------------------------------------------
 ' @episode: node, TubiContentNode for a video (movie or episode)
 ' @breakPos: integer, the preroll or midroll playback position at which the break occurs
-' @isSeekPastCuepoint: boolean, true if this ad request is due to seeking past a cuepoint
-Function tubiAds_getAdsListViaRoku(episode, breakPos, isSeekPastCuepoint = false)
+Function tubiAds_getAdsListViaRoku(episode, breakPos)
   m.allAdUnitsList = []
 
   nielsenGenres = "" 'nielsenGenres may be set as an array of strings later
@@ -440,7 +435,7 @@ Function tubiAds_getAdsListViaRoku(episode, breakPos, isSeekPastCuepoint = false
   m.roAdFramework.setNielsenProgramId(nielsenProgramId)
 
   'get the url for making the ad call
-  rainmakerVastUrl = m.populateUrlRainmaker(episode, breakPos, isSeekPastCuepoint)
+  rainmakerVastUrl = m.populateUrlRainmaker(episode, breakPos)
 
   adFetchTimer = createObject("roTimeSpan")
 
@@ -632,10 +627,10 @@ End Function
 ' SIDE EFFECT: updates the resumePlayAdsList property on the player object that is passed in
 ' (expect that the player object will be the main video player for the channel)
 ' ----------------------------------------------
-Function tubiAds_getResumingPlayAds(episode, position, isSeekPastCuepoint = false)
+Function tubiAds_getResumingPlayAds(episode, position)
   ' resets m.notUsedAdPodPixels after sending current pixels
   m.sendNotUsedAdPodPixels("ffwd")
-  m.getAdsListViaRoku(episode, position, isSeekPastCuepoint)
+  m.getAdsListViaRoku(episode, position)
   return m.hasAds(m.allAdUnitsList)
 End Function
 
