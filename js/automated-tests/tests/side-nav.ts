@@ -729,15 +729,15 @@ describe('Side Navigation', function () {
       await openLeftNav();
 
       // Go to Search
-      await openPageFromLeftNav('Search')
-      await testUtils.waitForElementToFullyShowOnScreen('searchGrid')
+      await openPageFromLeftNav('Search');
+      await testUtils.waitForElementToFullyShowOnScreen('searchGrid');
 
       // Open left nav
       await openLeftNav();
 
       // Go to My Stuff
       await openPageFromLeftNav('My Stuff');
-      await testUtils.waitForElementToFullyShowOnScreen('unlockNowForMyStuff')
+      await testUtils.waitForElementToFullyShowOnScreen('unlockNowForMyStuff');
 
       // Open left nav
       await openLeftNav();
@@ -745,7 +745,7 @@ describe('Side Navigation', function () {
       // Verify press back should go to Home
       await ecp.sleep(1000);
       await ecp.sendKeypress(ecp.Key.Back);
-      await testUtils.verifyFocusedSideNavMenuItemEquals('home')
+      await testUtils.verifyFocusedSideNavMenuItemEquals('home');
 
     });
 
@@ -759,15 +759,15 @@ describe('Side Navigation', function () {
       await openLeftNav();
 
       // Go to Categories
-      await openPageFromLeftNav('Categories')
-      await testUtils.waitForElementToFullyShowOnScreen('recommendedCategoryPage')
+      await openPageFromLeftNav('Categories');
+      await testUtils.waitForElementToFullyShowOnScreen('recommendedCategoryPage');
 
       // Open left nav
       await openLeftNav();
 
       // Go to My Stuff
-      await await openPageFromLeftNav('My Stuff')
-      await testUtils.waitForElementToFullyShowOnScreen('unlockNowForMyStuff')
+      await openPageFromLeftNav('My Stuff');
+      await testUtils.waitForElementToFullyShowOnScreen('unlockNowForMyStuff');
       
       // Open left nav
       await openLeftNav();
@@ -775,7 +775,7 @@ describe('Side Navigation', function () {
       // Verify press back should go to Home
       await ecp.sleep(1000);
       await ecp.sendKeypress(ecp.Key.Back);
-      await testUtils.verifyFocusedSideNavMenuItemEquals('home')
+      await testUtils.verifyFocusedSideNavMenuItemEquals('home');
 
     });
 
@@ -789,15 +789,15 @@ describe('Side Navigation', function () {
       await openLeftNav();
 
       // Go to Live Channels
-      await openPageFromLeftNav('Live TV')
-      await testUtils.waitForElementToFullyShowOnScreen('epgProgramGrid')
+      await openPageFromLeftNav('Live TV');
+      await testUtils.waitForElementToFullyShowOnScreen('epgProgramGrid');
 
       // Open left nav
       await openLeftNav();
 
       // Go to My Stuff
-      await await openPageFromLeftNav('My Stuff')
-      await testUtils.waitForElementToFullyShowOnScreen('unlockNowForMyStuff')
+      await openPageFromLeftNav('My Stuff');
+      await testUtils.waitForElementToFullyShowOnScreen('unlockNowForMyStuff');
       
       // Open left nav
       await openLeftNav();
@@ -805,7 +805,7 @@ describe('Side Navigation', function () {
       // Verify press back should go to Home
       await ecp.sleep(1000);
       await ecp.sendKeypress(ecp.Key.Back);
-      await testUtils.verifyFocusedSideNavMenuItemEquals('home')
+      await testUtils.verifyFocusedSideNavMenuItemEquals('home');
 
     });
 
@@ -819,15 +819,15 @@ describe('Side Navigation', function () {
       await openLeftNav();
 
       // Go to Espanol
-      await openPageFromLeftNav('Español')
-      await testUtils.waitForElementToFullyShowOnScreen('espanolLogo')
+      await openPageFromLeftNav('Español');
+      await testUtils.waitForElementToFullyShowOnScreen('espanolLogo');
 
       // Open left nav
       await openLeftNav();
 
       // Go to My Stuff from Espanol
-      await await openPageFromLeftNav('My Stuff')
-      await testUtils.waitForElementToFullyShowOnScreen('unlockNowForMyStuff')
+      await openPageFromLeftNav('My Stuff');
+      await testUtils.waitForElementToFullyShowOnScreen('unlockNowForMyStuff');
 
       // Open left nav
       await openLeftNav();
@@ -835,7 +835,7 @@ describe('Side Navigation', function () {
       // Verify press back should go to Home
       await ecp.sleep(1000);
       await ecp.sendKeypress(ecp.Key.Back);
-      await testUtils.verifyFocusedSideNavMenuItemEquals('home')
+      await testUtils.verifyFocusedSideNavMenuItemEquals('home');
 
     });
 
@@ -911,7 +911,7 @@ async function navigateRightToGrid() {
 
 
 async function openPageFromLeftNav(title: string) {
-  await testUtils.jumpToRowWithTitle('sideNavMenu', title)
-  await ecp.sleep(1000)
-  await ecp.sendKeypress(ecp.Key.Ok)
+  await testUtils.jumpToRowWithTitle('sideNavMenu', title);
+  await ecp.sleep(1000);
+  await ecp.sendKeypress(ecp.Key.Ok);
 }
