@@ -13,7 +13,7 @@ Function init()
   m.programGrid = m.top.findNode("programGrid")
   m.leftIcon = m.top.findNode("leftIcon")
   m.playOnFocusMode = true
-  ' focusedComponent will keep track of which component (programGrid or channels Grid) had last focus. This will help in handling focus back from topnav/sidenav/lienarvideoplayer.
+  ' focusedComponent will keep track of which component (programGrid or channels Grid) had last focus. This will help in handling focus back from sidenav/lienarvideoplayer.
   m.focusedComponent = "programGrid"
 
   ' canChannelBeFocused will indicate whether linearChannelFocused should get refreshed.
@@ -336,7 +336,7 @@ End Function
 'Currently this function is taking the request from outside(EPGScreen) and setting the focused item as  'LinearchannelToPlay'
 'this functionality is required to handle situations where EPG is asked to behave differently in 'PlayOnSelect' Mode.
 'for example when EPG starts, without user selecting a channel, EPGScreen needs to play first channel in minimized window.
-'other example would be, when user lands on EPG from sideNav/topNav.
+'other example would be, when user lands on EPG from sideNav.
 'EPGScreen/ePGScreenHelper can not set 'linearchannelToPlay' directly which will cause refetching the currently focused channel which might be different than linearchannelToPlay
 
 Function onSetFocusedToPlay()

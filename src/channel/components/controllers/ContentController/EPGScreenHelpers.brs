@@ -1,8 +1,7 @@
 ' Show the epg Screen
 ' @constants: assocArray, constants as set in Constants.brs
 ' @screenID: string, What kind of epgScreen do you wish to make: regular, movies, or TV
-' @componentToFocus: string, one of the values in constants.ui.epgscreen.focusItems
-Function showEPGScreen(constants, screenID = "", componentToFocus = "")
+Function showEPGScreen(constants, screenID = "")
   tubiLog("EPGScreenHelpers.showEPGScreen")
   if isNonEmptyString(screenID) <> true
     screenID = constants.ui.screenIds.epgScreen
@@ -16,13 +15,6 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     changeEPGScreenBackground(epgScreen) ' ensure background of the epg screen is used immediately instead of previous screen's background
     epgScreen.signedIn = isLoggedInUser()
 
-    ' set which component to focus on once the screen gains focus
-    if componentToFocus = m.constants.ui.epgScreen.focusItems.topNav
-      epgScreen.componentToFocus = m.constants.ui.epgScreen.focusItems.topNav
-    else
-      epgScreen.componentToFocus = m.constants.ui.epgScreen.focusItems.epgTimeGrid
-    end if
-
   else
     displayDefaultBackground()  ' clear background from previous screens until epgscreen loads
     showHideSpinner(true)
@@ -33,11 +25,8 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
     epgScreen.observeFieldScoped("programGuideNavigateWithinPageInfo", "onNavigateWithinPageInfoChange")
     epgScreen.observeFieldScoped("programGuidecomponentInteractionInfo", "onComponentInteractionInfoChange")
     epgScreen.observeFieldScoped("transportVoiceResponse", "onTransportVoiceResponse")
-    epgScreen.observeFieldScoped("topNavItemSelected", "onTopNavItemSelected")
-    epgScreen.observeFieldScoped("topNavBackItemSelected", "onTopNavBackItemSelected")
     epgScreen.observeFieldScoped("loadAllChannels", "onLoadAllEPGChannels")
     epgScreen.observeFieldScoped("scrollingStatus", "onEPGScrollingStatusChange")
-    epgScreen.observeFieldScoped("topNavToggled", "onScreenTopNavToggled")
     epgScreen.observeFieldScoped("refreshEPGScreenVideoPlay", "onRefreshEPGScreenVideoPlay")
     epgScreen.observeFieldScoped("epgScreenOkPressed", "onEPGScreenOKPressed")
     epgScreen.observeFieldScoped("channelLikeDislikeInfo", "onChannelLikeDislikeInfo")
@@ -51,25 +40,9 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
 
     epgScreen.id = screenID
 
-    if epgScreen <> invalid AND getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled = true
-      epgScreen.isTopNavVisible = false
-    end if
-
-    'Refreshing the topNav only when TopNav is enabled.
-    if  epgScreen.isTopNavVisible = true
-      epgScreen.refreshTopNav = true
-    end if
-
     refreshEPGScreen(epgScreen)
 
     setInScreenCache(epgScreen)
-
-    ' set which component to focus on once the screen gains focus
-    if componentToFocus = m.constants.ui.epgScreen.focusItems.topNav
-      epgScreen.componentToFocus = m.constants.ui.epgScreen.focusItems.topNav
-    else
-      epgScreen.componentToFocus = m.constants.ui.epgScreen.focusItems.epgTimeGrid
-    end if
 
   end if
 
@@ -84,10 +57,6 @@ Function showEPGScreen(constants, screenID = "", componentToFocus = "")
 
   pushScreen(epgScreen, true, shouldSendPageLoadEvent)
 
-  if screenID = m.constants.ui.screenIds.epgScreen
-    epgScreen.topNavSelectedId = m.constants.ui.homeScreenTopNavIds.linearEPG
-  end if
-
 End Function
 
 
@@ -95,7 +64,6 @@ End Function
 Function refreshEPGScreen(epgScreen)
   tubiLog("EPGScreenHelpers.refreshEPGscreen")
   mode = m.constants.ui.contentMode.epgScreen
-  epgScreen.topNavSelectedId = m.constants.ui.homeScreenTopNavIds.linearEPG
   epgScreen.signedIn = isLoggedInUser()
   epgChannelList  = getFromContentCache(m.constants.ui.contentIds.timeGridContent)
 
@@ -521,10 +489,10 @@ End Function
 
 
 'This function will handle the minimized video player on EPG Screen
-' refreshVideoPlay = true  - Close the Video player since EPGScreen/EPG component lost focus (sideNav or topNav)
+' refreshVideoPlay = true  - Close the Video player since EPGScreen/EPG component lost focus (sideNav)
 ' refreshVideoPlay = false, there are two possibilities
 '   1) epgScreen returning back from full video screen. Keep the video as it is, and make sure the video screen and focused channel are the same.
-'   2) epgScreen:EPG component is gaining focus from side/topNav. In this case restart the video.
+'   2) epgScreen:EPG component is gaining focus from sidenav. In this case restart the video.
 '@epgScreen = node, Screen node
 Function refreshEPGScreenVideoPlay(refreshVideoPlay, epgScreen)
   currentScreen = getCurrentScreen()
@@ -581,11 +549,9 @@ Function refreshEPGScreenVideoPlay(refreshVideoPlay, epgScreen)
 End Function
 
 
-
-' @componentToFocus: string, one of the values in constants.ui.epgScreen.focusItems
-Function showDefaultEPGScreen(componentToFocus = "")
+Function showDefaultEPGScreen()
   tubiLog("EPGScreenHelpers.showDefaultEPGScreen")
-  showEPGScreen(m.constants, m.constants.ui.screenIds.epgScreen, componentToFocus)
+  showEPGScreen(m.constants, m.constants.ui.screenIds.epgScreen)
 End Function
 
 

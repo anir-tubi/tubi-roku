@@ -189,7 +189,7 @@ End Function
 Function pauseContent()
   'when video preview is buffering, the video preview getting played even though we set control as pause(assuming it is firmware issue).
   'so forcing the video preview to stop when it is buffering. Also added alwaysNotify to the video node control field.
-  'added this check to avoid playing content once the buffering is completed when focus is on sidenav/topnav
+  'added this check to avoid playing content once the buffering is completed when focus is on sidenav
   if m.videoState = "buffering"
     m.videoState = "stop"
     getExperimentResource("roku_async_stop", "roku_async_stop_v5", true)

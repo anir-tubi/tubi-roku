@@ -40,9 +40,6 @@ Function TubiTracking(constants, request, auth, userConsentsOptOutStatus = {})
     ' an AA map of tab ids to their corresponding enum values for the Linear LeftSideNavComponent Section
     linearSideNavPageMap: tubiTracking_getLinearSideNavPageMap(constants)
 
-    ' an AA map of page ids to their corresponding enum values for the TopNavComponent Section
-    topNavPageMap: tubiTracking_getTopNavPageMap(constants)
-
     ' an AA map of Menu items in the details screen to their corresponding enum values for the LeftSideNavComponent Section
     detailScreenMenuItemMap: tubiTracking_getDetailScreenMenuPageMap(constants)
 
@@ -889,10 +886,6 @@ Function tubiTracking_getOneOfs()
     left_nav_section: "" ' Section enum
   }
 
-  section_topNav = {
-    top_nav_section: "" ' Section enum
-  }
-
   section_middleNav = {
     middle_nav_section: "" ' Section enum
   }
@@ -983,8 +976,6 @@ Function tubiTracking_getOneOfs()
   dest_componentOneof = {
     dest_left_side_nav_component: section_leftNav
 
-    dest_top_nav_component: section_topNav
-
     dest_middle_nav_component: section_middleNav
   }
 
@@ -1000,8 +991,6 @@ Function tubiTracking_getOneOfs()
     }
 
     left_side_nav_component: section_leftNav
-
-    top_nav_component: section_topNav
 
     middle_nav_component: section_middleNav
 
@@ -1099,15 +1088,7 @@ Function tubiTracking_getSideNavPageMap(constants)
     if sideNavIds.exit <> invalid then map[sideNavIds.exit] = "EXIT"
     if sideNavIds.kidsMode <> invalid then map[sideNavIds.kidsMode] = "KIDS"
     if sideNavIds.profile <> invalid then map[sideNavIds.profile] = "ACCOUNT"
-  end if
-
-  'TODO:remove them if the roku_remove_top_nav_v1 experiment is not graduated. If the roku_remove_top_nav_v1 is graduated,
-  'we will remove tubiTracking_getTopNavPageMap() function and move those items to the sideNav items in constants.
-  if constants <> invalid AND constants.ui <> invalid AND constants.ui.homeScreenTopNavIds <> invalid
-    homeScreenTopNavIds = constants.ui.homeScreenTopNavIds
-    if homeScreenTopNavIds.movies <> invalid then map[homeScreenTopNavIds.movies] = "MOVIES"
-    if homeScreenTopNavIds.tv <> invalid then map[homeScreenTopNavIds.tv] = "SERIES"
-    if homeScreenTopNavIds.linearEPG <> invalid then map[homeScreenTopNavIds.linearEPG] = "LINEAR"
+    if sideNavIds.linearEPG <> invalid then map[sideNavIds.linearEPG] = "LINEAR"
   end if
 
   return map
@@ -1120,19 +1101,6 @@ Function tubiTracking_getLinearSideNavPageMap(constants)
     sideNavIds = constants.ui.linearSideNavIds
     if sideNavIds.subtitles <> invalid then map[sideNavIds.subtitles] = "SUBTITLES"
     if sideNavIds.epg <> invalid then map[sideNavIds.epg] = "BACK"
-  end if
-  return map
-End Function
-
-
-Function tubiTracking_getTopNavPageMap(constants)
-  map = {}
-  if constants <> invalid AND constants.ui <> invalid AND constants.ui.homeScreenTopNavIds <> invalid
-    homeScreenTopNavIds = constants.ui.homeScreenTopNavIds
-    if homeScreenTopNavIds.home <> invalid then map[homeScreenTopNavIds.home] = "HOME"
-    if homeScreenTopNavIds.movies <> invalid then map[homeScreenTopNavIds.movies] = "MOVIES"
-    if homeScreenTopNavIds.tv <> invalid then map[homeScreenTopNavIds.tv] = "SERIES"
-    if homeScreenTopNavIds.linearEPG <> invalid then map[homeScreenTopNavIds.linearEPG] = "LINEAR"
   end if
   return map
 End Function

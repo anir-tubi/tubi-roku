@@ -277,7 +277,7 @@ Function onRowItemFocused(msg) as Boolean
     tubiLog("MyStuffScreen.onRowItemFocused")
     newCursorPosition = msg.getData()
 
-    '//if the screen is loading or if the grid is not in focus or the topnav is not in focus, then exit out of this function
+    '//if the screen is loading or if the grid is not in focus then exit out of this function
     if m.RowList.isInFocusChain() <> true OR m.top.isLoading = true
       return true
     end if

@@ -230,18 +230,9 @@ End Function
 
 Function onScreenChange()
   currentScreen = getCurrentScreen()
+
   if currentScreen <> invalid AND currentScreen.id <> invalid
-    isNetworksInCategoryList = getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled
-
-    'If the user is in roku_remove_top_nav_v1 experiement we are adding networks in catogeryList screen and when are selecting networks
-    'then we are showing channelListscreen. In this scenario we making the sidenav visible false as we are not opened from sidenav.
-    if isNetworksInCategoryList = true AND currentScreen.id = m.constants.ui.screenIds.channelListScreen
-      bSideNavVisible = false
-    else
-      bSideNavVisible = (m.constants.ui.sideNavOpenIds[currentScreen.id] = true)
-    end if
-
-    m.sideNav.visible = bSideNavVisible
+    m.sideNav.visible =  (m.constants.ui.sideNavOpenIds[currentScreen.id] = true)
   end if
   ' Processing any queued braze messaging if they are queued due to being in non whitelisted screens.
   processQueuedInAppMessage()

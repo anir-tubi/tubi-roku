@@ -39,19 +39,14 @@ End Function
 
 
 Function refreshHomeScreenSideNav()
-  isTopNavRemovalExperiementEnabled = getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled
 
   ' Refresh side nav items so their side navs are properly being displayed
   if isParentalControlsAdultLevel() <> true OR isKidsUIOn() = true
     m.SideNav.espanolItemTurnedOn = false
-    if isTopNavRemovalExperiementEnabled = true
-      m.SideNav.linearEPGItemTurnedOn = false
-    end if
+    m.SideNav.linearEPGItemTurnedOn = false
   else
     m.SideNav.espanolItemTurnedOn = true
-    if isTopNavRemovalExperiementEnabled = true
-      m.SideNav.linearEPGItemTurnedOn = true
-    end if
+    m.SideNav.linearEPGItemTurnedOn = true
   end if
 End Function
 
@@ -263,37 +258,37 @@ Function onSideNavItemSelected()
 
       showMyStuffScreen()
       bNewScreenCalledSuccess = true
-    else if itemSelectedId = m.constants.ui.homeScreenTopNavIds.movies
+    else if itemSelectedId = m.constants.ui.sideNavIds.movies
       if isKidsUIOn() = true
         bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.homeScreenTopNavIds.movies)
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.movies)
       else if isParentalControlsAdultLevel() = false
         bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.homeScreenTopNavIds.movies, "teens")
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.movies, "teens")
       else
         setUiMode(m.constants.ui.modes.standard)
         showMoviesScreen()
         bNewScreenCalledSuccess = true
       end if
-    else if itemSelectedId = m.constants.ui.homeScreenTopNavIds.tv
+    else if itemSelectedId = m.constants.ui.sideNavIds.tv
       if isKidsUIOn() = true
         bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.homeScreenTopNavIds.tv)
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.tv)
       else if isParentalControlsAdultLevel() = false
         bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.homeScreenTopNavIds.tv, "teens")
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.tv, "teens")
       else
         setUiMode(m.constants.ui.modes.standard)
         showTVScreen()
         bNewScreenCalledSuccess = true
       end if
-    else if itemSelectedId = m.constants.ui.homeScreenTopNavIds.linearEPG
+    else if itemSelectedId = m.constants.ui.sideNavIds.linearEPG
       if isKidsUIOn() = true
         bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.homeScreenTopNavIds.linearEPG)
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.linearEPG)
       else if isParentalControlsAdultLevel() = false
         bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.homeScreenTopNavIds.linearEPG, "teens")
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.linearEPG, "teens")
       else
         showDefaultEPGScreen()
         bNewScreenCalledSuccess = true
@@ -342,11 +337,12 @@ Function displayMenuItemDisabled(sMenuItemID, parental = "")
   if sMenuItemID = m.constants.ui.sideNavIds.channels
     sTitle = getTranslation("dialog_channelsDisabled_title")
     sDialogSubTypeValue = "kids-mode-channels"
-    '//::TODO:: Because movies, tv shows, espanol, and live TV are displayed in the top nav, then no need to have code to show a dialog window for these options
-    '//         Get rid of this code and any supporting code in this file once it has been determined that top nav is here to stay. Once it has been decided to have the topNav on FireTV
   else if sMenuItemID = m.constants.ui.sideNavIds.espanol
     sTitle = getTranslation("dialog_espanolDisabled_title")
     sDialogSubTypeValue = "kids-mode-espanol"
+  else if sMenuItemID = m.constants.ui.sideNavIds.linearEPG
+    sTitle = getTranslation("dialog_linearEPGDisabled_title")
+    sDialogSubTypeValue = "kids-mode-linearEPG"
   end if
 
   dialogEvent = {
@@ -521,26 +517,12 @@ Function getSideNavIdAssociatedWithScreen(screen)
   sideNavId = ""
 
   idsAssociatedWithHome = {}
-  isTopNavRemoveExperiementEnabled = getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled
-
-  if isTopNavRemoveExperiementEnabled = false
-    idsAssociatedWithHome[m.constants.ui.screenIds.homeScreen] = true
-    idsAssociatedWithHome[m.constants.ui.screenIds.movieScreen] = true
-    idsAssociatedWithHome[m.constants.ui.screenIds.tvScreen] = true
-
-    '//if the new EPG live TV option is in the homescreen top nav, not side nav
-    idsAssociatedWithHome[m.constants.ui.screenIds.epgScreen] = true
-  end if
 
   if screen.id <> invalid
     if idsAssociatedWithHome[screen.id] <> invalid
       sideNavId = m.constants.ui.sideNavIds.home
     else if m.constants.ui.screenIdToSideNavId[screen.id] <> invalid
       sideNavId = m.constants.ui.screenIdToSideNavId[screen.id]
-    else if isTopNavRemoveExperiementEnabled = true AND m.constants.ui.screenIdToTopNavId[screen.id] <> invalid
-      'We moved topNav items to the side nav as part of the roku_remove_top_nav_v1 experiement.
-      'So we are checking any topnav id's associated with the screen to make sure to load the correct screen.
-      sideNavId = m.constants.ui.screenIdToTopNavId[screen.id]
     end if
   end if
 

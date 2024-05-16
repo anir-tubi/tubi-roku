@@ -12,18 +12,8 @@ Function init()
   m.infoPanelParent = m.top.findNode("InfoPanelParent")
   m.infoPanel = m.top.findNode("InfoPanel")
 
-  m.isTopNavRemoveExperimentEnabled = getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled = true
-
   'clock
   m.clock = m.top.findNode("clock")
-
-  'topNav
-  m.topNav = m.top.FindNode("topNav")
-  m.topNav.selectedId = m.constants.ui.homeScreenTopNavIds.linearEPG
-  m.topNav.observeField("selected", "onTopNavSelection")
-  m.topNav.observeField("backItemSelected", "onTopNavBackItemSelected")
-  m.topNav.observeField("navigateWithinPageInfo", "onTopNavNavigateWithinPageInfoChange")
-  m.topnav.doesSelectionNavigate = true
 
   'epgTimeGrid
   m.epgTimeGrid = m.top.findNode("programGuide")
@@ -45,11 +35,9 @@ Function init()
   m.top.observeField("focusedChild", "onScreenFocusChange")
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
   m.top.observeField("id", "onIDChange")
-  m.top.observeField("refreshTopNav", "onRefreshTopNav")
   m.top.observeField("visible", "onVisibleChange")
   m.top.backgroundUriList = []
   m.top.handlesTransportVoiceRequests = true
-  m.top.observeFieldScoped("signedIn", "onSignedInChange")
   m.top.trackingPageInfo = {
     pageType : "linear_browse_page"
     pageValues : {}
@@ -75,27 +63,18 @@ Function onScreenFocusChange()
   tubiLog("EPGHomeScreen.onScreenFocusChange")
   if m.top.hasFocus() = true
     ' since epg main content node does not have valid Until, just findout the validUntil from first child
-    ' This check might be necessary if user stay on topnav/sidenav for very long time.
+    ' This check might be necessary if user stay onsidenav for very long time.
     if m.epgTimeGrid.content <> invalid AND shouldRefresh(m.epgTimeGrid.content.getChild(0)) = true
       m.top.loadAllchannels = true
     end if
 
-    if m.isTopNavRemoveExperimentEnabled = false AND m.top.componentToFocus = m.constants.ui.epgScreen.focusItems.topNav
-      setFocusOntoTopNav(false)
-      'set previously playing channel's background
-      if m.top.linearChannelToPlay <> invalid
-        m.top.backgroundUriList = determineBackgroundImage(m.top.linearChannelToPlay)
-      end if
-    else
-      setFocusOnEpgTimeGrid()
-    end if
+    setFocusOnEpgTimeGrid()
 
-    m.top.componentToFocus = m.constants.ui.epgScreen.focusItems.epgTimeGrid
     m.top.shouldFocusWhenPushed = true
 
-   else if m.top.isInFocusChain() = false
-     m.top.refreshEPGScreenVideoPlay = true
-     fadeInContentArea()
+  else if m.top.isInFocusChain() = false
+    m.top.refreshEPGScreenVideoPlay = true
+    fadeInContentArea()
   end if
 
 End Function
@@ -249,51 +228,6 @@ End Function
 Function onKeyEvent(key As string, press As boolean) As boolean
   tubiLog("EPGHomeScreen.onKeyEvent")
   if press
-    if m.top.enableTopNav = true
-      if key = "back"
-        if m.isTopNavRemoveExperimentEnabled = false AND m.TopNav.isInFocusChain() = false
-        setFocusOntoTopNav(true)
-        return true
-      else
-        if m.TopNav.selectedIndex = 0
-          ' first item in top nav has focus, prepare for the side nav to gain focus
-          m.top.topNavToggled = false
-          m.top.navigatedAwayFromTopNav = true
-
-          m.topNav.isFocused = false
-          fadeInContentArea()
-
-          ' return false so contentController screen stack can use the back button press
-          ' to focus on the side nav
-          return false
-        else
-          m.top.topNavItemSelected = m.TopNav.content.getChild(0)
-
-          ' return false so contentController can use the back button press to trigger
-          ' screen stack functionality
-          return false
-          end if
-        end if
-      else if key = "up" AND m.isTopNavRemoveExperimentEnabled = false AND m.TopNav.isInFocusChain()
-        setFocusOntoTopNav(true)
-        return true
-      else if key = "down" AND m.TopNav.isInFocusChain() = true
-        setFocusOnEpgTimeGrid()
-        return true
-      else if key = "left"
-        ' navigating to the side nav
-        if m.TopNav.isInFocusChain() = true
-          ' navigating to the side nav from the top nav specifically
-          m.top.topNavToggled = false
-          m.top.navigatedAwayFromTopNav = true
-
-          m.topNav.isFocused = false
-          fadeInContentArea()
-
-          return false
-        end if
-      end if
-    end if
     if key = "play" AND m.epgTimeGrid.isInFocusChain() = true
       handlePlayInput()
       return true
@@ -303,98 +237,14 @@ Function onKeyEvent(key As string, press As boolean) As boolean
 End Function
 
 
-
-Function setFocusOntoTopNav(isToggle)
-  tubiLog("EPGHomeScreen.setFocusOntoTopNav")
-  if isToggle = true
-    m.top.topNavToggled = true
-  else
-    m.TopNav.handlingFocusFromOtherTopNavBackButton = true
-  end if
-
-  m.top.refreshEPGScreenVideoPlay = true
-  m.topNav.isFocused = true
-  m.topNav.setFocus(true)
-  fadeOutContentArea()
-End Function
-
-
 Function setFocusOnEpgTimeGrid()
   tubiLog("EPGHomeScreen.setFocusOnEpgTimeGrid ")
   'setting this field to false will trigger the focused channel to play in minimized window
-  if m.topNav.isInFocusChain()
-    ' only send top nav toggle event if the top nav is losing focus
-    m.top.topNavToggled = false
-  end if
-
-  ' is necessary to set the isFocused before the focus, so the topNav itemContents
-  ' can have the appropriate color values set once they react to the focus change
-  m.topNav.isFocused = false
   m.epgTimeGrid.setFocusedToPlay = true
 
   fadeInContentArea()
   m.epgTimeGrid.setFocus(true)
   m.top.refreshEPGScreenVideoPlay = false
-End Function
-
-
-' The top nav has changed selection, so change the contentSelected so the helper can change things accordingly
-Function onTopNavSelection()
-  tubiLog("EPGHomeScreen.onTopNavSelection")
-  m.top.trackingComponentInfo = m.TopNav.trackingComponentInfo
-  m.top.topNavItemSelected = m.TopNav.selected
-End Function
-
-
-
-Function onRefreshTopNav()
-  tubiLog("EPGHomeScreen.onRefreshTopNav")
-  m.topNav.content = generateTopNavContentItems()
-  m.topNav.contentUpdated = true
-  m.TopNav.isFocused = false
-End Function
-
-
-' The top nav has changed selection, so change the contentSelected so the helper can change things accordingly
-Function onTopNavBackItemSelected()
-  tubiLog("EPGHomeScreen.onTopNavBackItemSelected")
-
-  '//Set trackingComponentInfo before setting contentSelected so the proper selected analytics is tracked within the screenStack
-  if m.TopNav.backItemSelected <> invalid
-    m.top.trackingComponentInfo = m.TopNav.trackingComponentInfo
-  end if
-
-  ' so that any adjustments to the menu item don't trigger callbacks. We want m.top.topNavbackItemSelected
-  ' to also be set to invalid for the same reason.
-  m.top.topNavbackItemSelected = m.TopNav.backItemSelected
-End Function
-
-
-Function generateTopNavContentItems()
-  menuItemIds = [
-    m.constants.ui.homeScreenTopNavIds.home
-    m.constants.ui.homeScreenTopNavIds.movies
-    m.constants.ui.homeScreenTopNavIds.tv
-    m.constants.ui.homeScreenTopNavIds.linearEPG
-    ]
-
-  parent = CreateObject("roSGNode", "ContentNode")
-  for each id in menuItemIds
-    item = parent.createChild("TopNavContentNode")
-    item.id = id
-
-    if id = m.constants.ui.homeScreenTopNavIds.home
-      item.title = getTranslation("menu_foryou")
-    else if id = m.constants.ui.homeScreenTopNavIds.movies
-      item.title = getTranslation("menu_movies")
-    else if id = m.constants.ui.homeScreenTopNavIds.tv
-      item.title = getTranslation("menu_tv")
-    else if id = m.constants.ui.homeScreenTopNavIds.linearEPG
-      item.title = getTranslation("menu_livetv")
-    end if
-  end for
-
-  return parent
 End Function
 
 
@@ -412,25 +262,6 @@ Function onIDChange()
   newTrackingPageInfo.pageValues = {content_mode: analyticsContentMode}
 
   m.top.trackingPageInfo = newTrackingPageInfo
-  m.topNav.trackingPageInfo = newTrackingPageInfo
-End Function
-
-
-' The top nav will dispatch a navigateWithinPageInfo event which needs to be re-dispatched to the epgscreenHelpers
-Function onTopNavNavigateWithinPageInfoChange()
-  navigateWithinPageInfo = m.topNav.navigateWithinPageInfo
-  if navigateWithinPageInfo <> invalid AND navigateWithinPageInfo.means_of_navigation = "BUTTON"
-    '//The navigateWithinPageInfo is caused by the user going from the EPG to the Top Nav.
-    '//Before navigateWithinPageInfo is communicated to the outside helper, add info about the EPG
-    epgComponentInfo = getTrackingComponentInfoOfEPGGridList(m.epgTimeGrid.itemFocused, m.epgTimeGrid.rowItemfocused)
-
-    if epgComponentInfo <> invalid AND epgComponentInfo.componentValues <> invalid
-      navigateWithinPageInfo.componentOneof = m.Tracking.getAnalyticsComponent("category_component", epgComponentInfo.componentValues)
-    end if
-  end if
-  ' this field is inherited by basescreen
-  m.top.navigateWithinPageInfo = navigateWithinPageInfo
-
 End Function
 
 
@@ -476,14 +307,5 @@ Function fadeInContentArea()
   stopAnimation(m.infoPanelFade)
   if m.InfoPanelParent.opacity < 1
     m.infoPanelFade = fade(m.InfoPanelParent, "in", .4, 0.0, 1)
-  end if
-End Function
-
-
-Function onSignedInChange()
-  tubiLog("EPGScreen.onSignedInChange")
-  'We are not refreshing the TopNav if the users are in roku_remove_top_nav_v1 experiment.
-  if m.isTopNavRemoveExperimentEnabled = false
-    onRefreshTopNav()
   end if
 End Function

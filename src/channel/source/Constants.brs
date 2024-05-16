@@ -1293,7 +1293,6 @@ Function getConstants()
 
     constants.ui.sideNavOpenIds = {}
       constants.ui.sideNavOpenIds[constants.ui.screenIds.homeScreen] = true
-      constants.ui.sideNavOpenIds[constants.ui.screenIds.channelListScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.categoryListScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.espanolScreen] = true
       constants.ui.sideNavOpenIds[constants.ui.screenIds.epgScreen] = true
@@ -1314,13 +1313,10 @@ Function getConstants()
       constants.ui.sideNavIds.profile = "profile"
       constants.ui.sideNavIds.kidsMode = "kidsMode"
       constants.ui.sideNavIds.myList = "myList"
-
-    constants.ui.homeScreenTopNavIds = {}
-      constants.ui.homeScreenTopNavIds.home = "home"
-      constants.ui.homeScreenTopNavIds.movies = "movies"
-      constants.ui.homeScreenTopNavIds.tv = "tv"
-      constants.ui.homeScreenTopNavIds.linearEPG = "linearEPG"
-      constants.ui.homeScreenTopNavIds.tournament = "tournament"
+      constants.ui.sideNavIds.movies = "movies"
+      constants.ui.sideNavIds.tv = "tv"
+      constants.ui.sideNavIds.linearEPG = "linearEPG"
+      constants.ui.sideNavIds.tournament = "tournament"
 
     constants.ui.linearSideNavIds = {}
       constants.ui.linearSideNavIds.epg = "epg"
@@ -1335,14 +1331,10 @@ Function getConstants()
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.espanolScreen] = constants.ui.sideNavIds.espanol
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.myStuffScreen] = constants.ui.sideNavIds.myList
       constants.ui.screenIdToSideNavId[constants.ui.screenIds.settingsScreen] = constants.ui.sideNavIds.settings
-
-    'a map of screenIds to corresponding topNavIds
-    constants.ui.screenIdToTopNavId = {}
-      constants.ui.screenIdToTopNavId[constants.ui.screenIds.homeScreen] = constants.ui.homeScreenTopNavIds.home
-      constants.ui.screenIdToTopNavId[constants.ui.screenIds.tvScreen] = constants.ui.homeScreenTopNavIds.tv
-      constants.ui.screenIdToTopNavId[constants.ui.screenIds.movieScreen] = constants.ui.homeScreenTopNavIds.movies
-      constants.ui.screenIdToTopNavId[constants.ui.screenIds.epgscreen] = constants.ui.homeScreenTopNavIds.linearEPG
-      constants.ui.screenIdToTopNavId[constants.ui.screenIds.tournamentScreen] = constants.ui.homeScreenTopNavIds.tournament
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.tvScreen] = constants.ui.sideNavIds.tv
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.movieScreen] = constants.ui.sideNavIds.movies
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.epgscreen] = constants.ui.sideNavIds.linearEPG
+      constants.ui.screenIdToSideNavId[constants.ui.screenIds.tournamentScreen] = constants.ui.sideNavIds.tournament
 
     constants.ui.detailScreenMenuItemIds = {}
       constants.ui.detailScreenMenuItemIds.playMenuItem = "PlayMenuItem"
@@ -1561,23 +1553,6 @@ Function getConstants()
 
 
 'THEME/COLOR END///////////////////////
-
-    constants.ui.homescreen = {}
-      constants.ui.homescreen.focusItems = {}
-        constants.ui.homescreen.focusItems.topNav = "topNav"
-        constants.ui.homescreen.focusItems.contentGrid = "contentGrid"
-
-    constants.ui.epgscreen = {}
-      constants.ui.epgscreen.focusItems = {}
-        constants.ui.epgscreen.focusItems.topNav = "topNav"
-        constants.ui.epgscreen.focusItems.epgTimeGrid = "epgTimeGrid"
-
-    constants.ui.tournamentscreen = {}
-      constants.ui.tournamentscreen.focusItems = {}
-        constants.ui.tournamentscreen.focusItems.topNav = "topNav"
-        constants.ui.tournamentScreen.focusItems.epgTimeGrid = "epgTimeGrid"
-        constants.ui.tournamentScreen.focusItems.categoryGridList = "categoryGridList"
-
 
     ' Set some performance parameters based on device profile
     constants.performance = {}

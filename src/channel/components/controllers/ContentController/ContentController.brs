@@ -403,7 +403,7 @@ Function onKeyEvent(key as String, press as Boolean) as Boolean
               setUiMode(m.constants.ui.modes.latino)
             end if
 
-            sideNavId = m.constants.ui.screenIdToTopNavId[newTopScreen.id]
+            sideNavId = m.constants.ui.screenIdToSideNavId[newTopScreen.id]
             if sideNavId <> invalid
               focusSideNavOption(sideNavId)
             end if
@@ -1185,13 +1185,6 @@ Function setCommonKidsModeElements()
     m.trackingLoggingTask.analyticsAppMode = "KIDS_MODE"
     tellScreensIfKidsModeBeSentToServer()
 
-    ' turn off top nav for any homescreen screens (like Espanol screen, or Movies, etc.)
-    for i = 0 to m.screenStack.getChildCount() - 1
-      screen = m.ScreenStack.getChild(i)
-      if screen.isSubType("HomeScreen") OR screen.isSubtype("EPGHomeScreen")
-        screen.enableTopNav = false
-      end if
-    end for
   end if
 End Function
 

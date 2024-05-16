@@ -42,11 +42,8 @@ End Function
 
 
 Function setSettingsSidePanelMenuItems()
-  isTopNavRemoveExperimentEnabled = getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled
-  testAidDisplayOrder = 6
-  if isTopNavRemoveExperimentEnabled = true
-    testAidDisplayOrder = 7
-  end if
+
+  testAidDisplayOrder = 7
 
   ' Adding a display order field since roku does not maintain order in a associative array.
   availablePanelItems = {
@@ -99,7 +96,7 @@ Function setSettingsSidePanelMenuItems()
       displayOrder: testAidDisplayOrder
     }
   }
-  
+
   ' removing the parental controls if the config returns false.
   if m.constants.externalConfig.info.enable_parental_control = false
     availablePanelItems.delete("parentalControls")
@@ -117,11 +114,6 @@ Function setSettingsSidePanelMenuItems()
   ' Deleting the test aid if non qa or dev mode.
   if m.constants.settings.mode <> "qa" AND  m.constants.settings.mode <> "dev" 'this is for extra protection not to restart the app
     availablePanelItems.delete("testAid")
-  end if
-
-  'Deleting the Exit if the users are not in the roku_remove_top_nav_v1 experiment.
-  if isTopNavRemoveExperimentEnabled = false
-    availablePanelItems.delete("exit")
   end if
 
   menuItems = []

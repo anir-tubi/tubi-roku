@@ -63,15 +63,15 @@ Function createMainContent(item)
     contentNode.title = getTranslation("menu_categories")
     contentNode.iconUrl = "pkg:/images/sideNavCategories.webp"
     contentNode.filledIconUrl = "pkg:/images/sideNavCategoriesFilled.webp"
-  else if item = m.constants.ui.homeScreenTopNavIds.movies
+  else if item = m.constants.ui.sideNavIds.movies
     contentNode.title = getTranslation("menu_movies")
     contentNode.iconUrl = "pkg:/images/sideNavMovies.webp"
     contentNode.filledIconUrl = "pkg:/images/sideNavMoviesFilled.webp"
-  else if item = m.constants.ui.homeScreenTopNavIds.tv
+  else if item = m.constants.ui.sideNavIds.tv
     contentNode.title = getTranslation("menu_tv")
     contentNode.iconUrl = "pkg:/images/sideNavTvShows.webp"
     contentNode.filledIconUrl = "pkg:/images/sideNavTvShowsFilled.webp"
-  else if item = m.constants.ui.homeScreenTopNavIds.linearEPG
+  else if item = m.constants.ui.sideNavIds.linearEPG
     contentNode.title = getTranslation("menu_livetv")
     contentNode.iconUrl = "pkg:/images/live-icon.webp"
     contentNode.filledIconUrl = "pkg:/images/live-icon-filled.webp"
@@ -104,11 +104,6 @@ Function createMainContent(item)
     contentNode.title = getTranslation("menu_settings")
     contentNode.iconUrl = "pkg:/images/sideNavSettings.webp"
     contentNode.filledIconUrl = "pkg:/images/sideNavSettingsFilled.webp"
-  'Remove this if roku_remove_top_nav_v1 graduates
-  else if item = m.constants.ui.sideNavIds.exit
-    contentNode.title = getTranslation("menu_exit")
-    contentNode.iconUrl = "pkg:/images/sideNavExit.webp"
-    contentNode.filledIconUrl = "pkg:/images/sideNavExit.webp"
   end if
 
   m[item + "Content"] = contentNode
@@ -129,30 +124,21 @@ Function onCreateMenuItems()
     m.constants.ui.sideNavIds.home
   ]
 
-  if getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled = true
-    menuItems.push(m.constants.ui.sideNavIds.categories)
-    menuItems.push(m.constants.ui.sideNavIds.myList)
 
-    if (UCase(m.constants.deviceInfo.countryCode) = "US" OR UCase(m.constants.deviceInfo.countryCode) = "CA")
-      menuItems.push(m.constants.ui.homeScreenTopNavIds.movies)
-      menuItems.push(m.constants.ui.homeScreenTopNavIds.tv)
-    end if
+  menuItems.push(m.constants.ui.sideNavIds.categories)
+  menuItems.push(m.constants.ui.sideNavIds.myList)
 
-    if m.constants.externalConfig.info.livetv = true
-      menuItems.push(m.constants.ui.homeScreenTopNavIds.linearEPG)
-    end if
-
-    menuItems.push(m.constants.ui.sideNavIds.espanol)
-    menuItems.push(m.constants.ui.sideNavIds.settings)
-  else
-    'Remove this if roku_remove_top_nav_v1 graduates
-    menuItems.push(m.constants.ui.sideNavIds.myList)
-    menuItems.push(m.constants.ui.sideNavIds.categories)
-    menuItems.push(m.constants.ui.sideNavIds.channels)
-    menuItems.push(m.constants.ui.sideNavIds.espanol)
-    menuItems.push(m.constants.ui.sideNavIds.settings)
-    menuItems.push(m.constants.ui.sideNavIds.exit)
+  if (UCase(m.constants.deviceInfo.countryCode) = "US" OR UCase(m.constants.deviceInfo.countryCode) = "CA")
+    menuItems.push(m.constants.ui.sideNavIds.movies)
+    menuItems.push(m.constants.ui.sideNavIds.tv)
   end if
+
+  if m.constants.externalConfig.info.livetv = true
+    menuItems.push(m.constants.ui.sideNavIds.linearEPG)
+  end if
+
+  menuItems.push(m.constants.ui.sideNavIds.espanol)
+  menuItems.push(m.constants.ui.sideNavIds.settings)
 
   ' Creates roSGNode dynamically
   m.MenuItemIDs = menuItems
@@ -173,9 +159,7 @@ Function onCreateMenuItems()
   m.mainItems.wrapDividerBitmapUri = ""
   m.mainItems.wrapDividerHeight = 0
 
-  if getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1", false).enabled = true
-    verticallyCenterSideNav()
-  end if
+  verticallyCenterSideNav()
 
   initList(m.mainItems)
 

@@ -36,9 +36,6 @@
       <!-- removes any existing content on the CategoryGridList! -->
       <field id="isLoading" type="boolean" />
 
-      <!-- should the top nav be displayed? -->
-      <field id="enableTopNav" type="boolean" />
-
       <!-- tells the rowList to re-populate the content because rows have been added/removed and that may affect the look of some rows that have different heights compared to other rows  -->
       <field id="repopulateContent" type="boolean" alias="CategoryGridList.repopulateContent" />
 
@@ -57,17 +54,8 @@
       <!-- show/hide the category menu -->
       <field id="categoryMenuVisible" type="boolean"/>
 
-      <!-- should the topNav refresh? -->
-      <field id="refreshTopNav" type="boolean" alwaysNotify="true" />
-
-      <!-- the id that top nav should treat as selected from a UI perspective -->
-      <field id="topNavSelectedId" type="string" alias="topNav.selectedId" />
-
       <!-- Indicates if that when the server is contacted, it should indicate that the app is in kidsMode. -->
       <field id="shouldKidsModeBeSentToServer" type="boolean" alias="CategoryGridList.shouldKidsModeBeSentToServer"/>
-
-      <!--LinearTV is allowed in topNav if parental control is set to adult.-->
-      <field id="isLinearTVAllowedInTopNav" type="boolean"/>
 
       <field id="animateToCategory" alias="CategoryGridList.animateToCategory" />
       <field id="jumpToRowItemByID" alias="CategoryGridList.jumpToRowItemByID" />
@@ -90,10 +78,6 @@
 
       <!-- kidsModeFeatureOn will be set based device countryCode -->
       <field id="kidsModeFeatureOn" type="boolean" />
-
-      <!-- Used to control which component gains focus when the focusedChild callback runs.
-           Accepted values are in constants.ui.homescreen.focusItems -->
-      <field id="componentToFocus" type="string" />
 
       <!-- incoming metadata from GeneralTask
            type is node, so that it takes less time to send data from one file to another file when comparing to assocarray
@@ -119,12 +103,6 @@
            the "play" input transport deeplink was triggered
       -->
       <field id="contentToPlay" type="node"/>
-
-      <!-- set to the content node of the topNav item which was clicked on -->
-      <field id="topNavItemSelected" type="node" alwaysNotify="true"/>
-
-      <!-- set to the content node of the first item in the top nav since the back button was pressed -->
-      <field id="topNavBackItemSelected" type="node" alwaysNotify="true"/>
 
       <!-- set to the tubi content of the item which was focused on -->
       <field id="contentFocused" type="node"/>
@@ -162,14 +140,6 @@
       -->
       <field id="trackingLoadStartTime" type="integer" />
 
-      <!-- Indicates that a ComponentInteractionEvent should be fired because the TopNav
-      has been toggled on or off -->
-      <field id="topNavToggled" type="boolean" value="false" alwaysNotify="true"/>
-
-      <!-- Indicates that the user is pressing back or left from the top nav (with the assumed
-      intention to navigate to the side nav, but homescreen doesn't know about side nav) -->
-      <field id="navigatedAwayFromTopNav" type="boolean" alwaysNotify="true" />
-
       <!-- Communicates to the parent that the linear video player should be stopped -->
       <field id="stopLinearVideoPlayer" type="boolean" alwaysNotify="true" />
 
@@ -186,11 +156,6 @@
 
   <children>
     <Group id="PageGroup">
-      <TopNav
-        id="topNav"
-        visible="false"
-        translation="[0,48]"/>
-
       <Group
         id="InfoPanelParent">
         <InfoPanel

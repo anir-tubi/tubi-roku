@@ -338,7 +338,7 @@ Function onSingleChannelFetchForDeeplinkSuccess(successResponse, storeInCache = 
         playLinearVideoContent(linearContent, false, m.constants.ui.screenIds.epgScreen, false, playbackSource)
       end if
 
-      sEPGSideNavID = m.constants.ui.screenIdToTopNavId[m.constants.ui.screenIds.epgScreen]
+      sEPGSideNavID = m.constants.ui.screenIdToSideNavId[m.constants.ui.screenIds.epgScreen]
       focusSideNavOption(sEPGSideNavID)
     end if
   else
@@ -506,7 +506,7 @@ Function handleLinearDeeplinkContent()
         sendDeeplinkAnalytics(m.deepLinkContent, m.deepLinkContent, m.constants.deeplinks.entryPoints.epg, m.Tracking, m.trackingLoggingTask, m.constants)
       end if
       showDefaultEPGScreen()
-      'EPG screen is part of homescreen in topnav.
+      'EPG screen is part of homescreen in sideNav.
       sCatSideNavID = m.constants.ui.sideNavIds.home
 
     end if

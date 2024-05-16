@@ -1012,7 +1012,7 @@ Function tubiMetadataTranslate_translateCategoriesListScreen(contentToTranslate,
 
   'Removed Channels from SideNav and adding it to the categories.
   catNetworkChannels = invalid
-  if bDisplayChannels = false AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_remove_top_nav", "roku_remove_top_nav_v1").enabled = true
+  if bDisplayChannels = false
     catNetworkChannels = {
       id: "networks"
       isSpecial: true

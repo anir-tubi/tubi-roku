@@ -334,8 +334,6 @@ Function refreshScreenAfterParentalChanges()
   setContentToRefresh(m.constants.ui.screenIds.epgScreen)
   setContentToRefresh(m.constants.ui.screenIds.myStuffScreen)
 
-  refreshAllHomeScreenTopNav()
-
   refreshHomeScreenSideNav()
 
   videoPlayerScreen = getFromScreenCache(m.constants.ui.screenIds.videoPlayerScreen)
