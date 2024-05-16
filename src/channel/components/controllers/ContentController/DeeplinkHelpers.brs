@@ -507,7 +507,7 @@ Function handleLinearDeeplinkContent()
       end if
       showDefaultEPGScreen()
       'EPG screen is part of homescreen in sideNav.
-      sCatSideNavID = m.constants.ui.sideNavIds.home
+      sCatSideNavID = m.constants.ui.sideNavIds.linearEPG
 
     end if
     focusSideNavOption(sCatSideNavID)
@@ -631,7 +631,7 @@ Function handleMoviesPageDeeplinkContent()
     end if
     'teens get TV screen and movie screen
     showMoviesScreen()
-    focusSideNavOption(m.constants.ui.sideNavIds.home)
+    focusSideNavOption(m.constants.ui.sideNavIds.movies)
   else if isParentalControlsAdultLevel() = false OR m.uiMode = m.constants.ui.modes.kidsAgeGate
       ' Display error message indicating to turn off the parental controls
       message = getTranslation("dialog_sideNavItemDisabled_Parental_description")
@@ -643,7 +643,7 @@ Function handleMoviesPageDeeplinkContent()
     end if
     setUiMode(m.constants.ui.modes.standard)
     showMoviesScreen()
-    focusSideNavOption(m.constants.ui.sideNavIds.home)
+    focusSideNavOption(m.constants.ui.sideNavIds.movies)
   end if
   resetDeeplinkValues()
 
@@ -659,7 +659,7 @@ Function handleTVPageDeeplinkContent()
     end if
     'teens get TV screen and movie screen
     showTVScreen()
-    focusSideNavOption(m.constants.ui.sideNavIds.home)
+    focusSideNavOption(m.constants.ui.sideNavIds.tv)
   else if isParentalControlsAdultLevel() = false OR m.uiMode = m.constants.ui.modes.kidsAgeGate
     ' Display error message indicating to turn off the parental controls
     message = getTranslation("dialog_sideNavItemDisabled_Parental_description")
@@ -671,7 +671,7 @@ Function handleTVPageDeeplinkContent()
     end if
     setUiMode(m.constants.ui.modes.standard)
     showTVScreen()
-    focusSideNavOption(m.constants.ui.sideNavIds.home)
+    focusSideNavOption(m.constants.ui.sideNavIds.tv)
   end if
   resetDeeplinkValues()
 End Function
