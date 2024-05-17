@@ -475,7 +475,7 @@ Function getSingleContentFromServer(content, successCallback, errorCallback)
   if content <> invalid
 
     'Fire exposure event when fetching content
-    getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_content_v1")
+    getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_content_v2")
 
     singleRequestInfo = m.cmsApi.createSingleContentReqInfo(content.id, true, shouldKidsModeBeSentToServer())
     m.makeRequest({
@@ -699,7 +699,7 @@ Function getRelatedContent(content, callback = handleRelatedResponse)
     relatedRequestInfo = m.cmsApi.createRelatedContentReqInfo(content.id, shouldKidsModeBeSentToServer())
 
     'fire exposure event when fetching related content
-    if getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_related_content_v1", true).enabled = true
+    if getExperimentResource("roku_cuepoint_accuracy", "roku_cuepoint_accuracy_related_content_v2", true).enabled = true
       requestType = m.constants.reqNames.getAutopilotRelatedContent
     else
       requestType = m.constants.reqNames.getRelatedContent

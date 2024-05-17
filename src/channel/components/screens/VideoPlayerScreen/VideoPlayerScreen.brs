@@ -1561,7 +1561,7 @@ End Function
 ' wrapper around setting a value on m.Video.seek to protect against trying to seek to negative
 ' values. Seeking to negative values will lead m.Video.seek field to equal 1.844674407371e+16 which
 ' may or may not cause weird behavior
-' @position: integer, the playback position to seek to
+' @position: integer/float, the playback position to seek to
 Function seekToPosition(position)
   if position < 0
     position = 0

@@ -29,8 +29,10 @@ End Function
 '
 ' Attach to the scene graph VideoPlayer node and listen for events
 ' This is a blocking call
-Function tubiSGAdShim_run(videoPlayerNode As Object) As boolean
+'@videoPlayerNode: node, VideoPlayerScreen node
+Function tubiSGAdShim_run(videoPlayerNode) As boolean
   tubiLog("TubSGAdShim.Run")
+
   m.videoPlayerNode = videoPlayerNode
 
   if type(m.videoPlayerNode) <> "roSGNode" or m.videoPlayerNode.subtype() <> "VideoPlayerScreen"
@@ -84,7 +86,11 @@ End Function
 '''''''''''''''''''''''''''
 ' handleControlMessage
 '
-Function tubiSGAdShim_handleControlMessage(state As String, control As String, episode As Object, position As Integer)
+'@state: string, state of the Ad, possible values are init, fetching, noAds, adsPending, adsPlaying, adsClosed
+'@control: string, possible values are preroll, midroll, seek, play, stop
+'@episode: roAssociativeArray, episode/movie details
+'@position: float, ad cuepoint sent from video player
+Function tubiSGAdShim_handleControlMessage(state, control, episode, position)
 
   stateMachine = {
     "init": {
@@ -157,8 +163,9 @@ End Function
 ''''''''''''''''''
 ' preroll
 '
-'
-Function tubiSGAdShim_preroll(episode As Object, cuepoint As Integer)
+'@episode: roAssociativeArray, episode/movie details
+'@cuepoint: float, ad cuepoint sent from video player
+Function tubiSGAdShim_preroll(episode, cuepoint)
   m.videoPlayerNode.adState = "fetching"
   m.ads.reset()
 
@@ -179,7 +186,9 @@ End Function
 '      a) resume ads set on m.resumePlayAdsList
 '      b) cached ads for non-RAF midrolls in m.videoAdsList
 '      c) cached ads in RAF which it stored internally
-Function tubiSGAdShim_playAds(_episode As Object, _cuepoint As Integer)
+'@episode: roAssociativeArray, episode/movie details
+'@cuepoint: float, cuepoint sent from video player
+Function tubiSGAdShim_playAds(_episode, _cuepoint)
   m.videoPlayerNode.adState = "adsPlaying"
 
   adContainer = m.videoPlayerNode.findNode("RAFAdContainer")
@@ -194,7 +203,9 @@ End Function
 
 ''''''''''''''''''
 ' reset
-Function tubiSGAdShim_reset(_episode As Object, _cuepoint As Integer)
+'@episode: roAssociativeArray, episode/movie details
+'@cuepoint: float, cuepoint sent from video player
+Function tubiSGAdShim_reset(_episode, _cuepoint)
   m.ads.reset()
   m.videoPlayerNode.adState = "init"
 End Function
@@ -202,7 +213,10 @@ End Function
 
 ''''''''''''''''''
 ' midroll
-Function tubiSGAdShim_midroll(episode As Object, cuepoint As Integer)
+'
+'@episode: roAssociativeArray, episode/movie details
+'@cuepoint: float, cuepoint sent from video player
+Function tubiSGAdShim_midroll(episode, cuepoint)
   m.videoPlayerNode.adState = "fetching"
   m.ads.cacheAdsList(episode, cuepoint)
   if m.ads.getCachedAdsList(episode, cuepoint) <> invalid then
@@ -215,7 +229,10 @@ End Function
 
 '''''''''''''''''
 ' resume
-Function tubiSGAdShim_resume(episode As Object, cuepoint As Integer)
+'
+'@episode: roAssociativeArray, episode/movie details
+'@cuepoint: float, cuepoint sent from video player
+Function tubiSGAdShim_resume(episode, cuepoint)
   m.videoPlayerNode.adState = "fetching"
   'NOTE: TubiAds sets resumePlayAdsList on 'm' here
   if m.ads.getResumingPlayAds(episode, cuepoint) = true then

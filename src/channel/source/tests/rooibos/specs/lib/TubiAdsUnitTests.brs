@@ -106,7 +106,7 @@ End Function
 
 '@Test tubiAds_getRainmakerParams unit tests
 Function tubiAds_getRainmakerParams_test()
-  params = m.ads.getRainmakerParams(m.stubContent, 126)
+  params = m.ads.getRainmakerParams(m.stubContent, 126.4)
 
   m.assertEqual(type(params), "roAssociativeArray")
   m.assertEqual(params.content_id, "12345")
@@ -138,12 +138,12 @@ Function tubiAds_getRainmakerParams_test()
 
   m.stubContent.videoSponsorExposureId = "toyoda"
 
-  params = m.ads.getRainmakerParams(m.stubContent, 126)
+  params = m.ads.getRainmakerParams(m.stubContent, 126.7)
 
   m.assertEqual(type(params), "roAssociativeArray")
   m.assertEqual(params.content_id, "12345")
   m.assertEqual(params.pub_id, "publisher_id")
-  m.assertEqual(params.now_pos, "126")
+  m.assertEqual(params.now_pos, "127")
   m.assertEqual(params.content_type, "mp4")
   m.assertEqual(params.device_id, m.constants.deviceInfo.deviceId)
   m.assertEqual(params.model, m.constants.deviceInfo.model)

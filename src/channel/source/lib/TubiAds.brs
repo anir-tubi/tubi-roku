@@ -205,12 +205,15 @@ End Function
 
 ' returns an assocArray of all parameters that should be sent to rainmaker
 ' @content: node, TubiContentNode for a video (movie or episode)
-' @breakPos: integer, the preroll or midroll playback position at which the break occurs
+' @breakPos: float, the preroll or midroll playback position at which the break occurs
 Function tubiAds_getRainmakerParams(content, breakPos = 0)
+  'rounding the float to integer as rainmaker will accept only integer format
+  roundedBreakPos = round(breakPos)
+
   params = {
     content_id: content.id
     pub_id: content.pubId
-    now_pos: breakPos.ToStr()
+    now_pos: roundedBreakPos.ToStr()
     content_type: m.adContentType
     device_id: m.constants.deviceInfo.deviceId
     model: m.constants.deviceInfo.model

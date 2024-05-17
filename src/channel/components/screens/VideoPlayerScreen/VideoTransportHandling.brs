@@ -877,7 +877,7 @@ Function updateScrubTime()
     else if m.playerPosition - scrubTime > nMaxScrub
       m.playerPosition = nMaxScrub
     else
-      m.playerPosition = Int(m.playerPosition - scrubTime)
+      m.playerPosition = m.playerPosition - scrubTime
     end if
 
   else if m.VideoState = "ffw"
@@ -886,7 +886,7 @@ Function updateScrubTime()
     else if m.playerPosition + scrubTime > nMaxScrub
       m.playerPosition = nMaxScrub
     else
-      m.playerPosition = Int(m.playerPosition + scrubTime)
+      m.playerPosition = m.playerPosition + scrubTime
     end if
   end if
 
@@ -897,7 +897,7 @@ End Function
 
 
 'handles replay key press or HopBack button selection
-'@position: integer, should be m.playerPosition in most cases
+'@position: float, should be m.playerPosition in most cases
 '
 'function calling jumpToPosition should reset m.positionAtJumpStart to -1 after calling jumpToPosition
 Function jumpToPosition(position)

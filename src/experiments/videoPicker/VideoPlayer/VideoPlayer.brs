@@ -125,7 +125,7 @@ Function init()
   '//::TODO:: use translations for the following Ad text & m.AdHeadsUpText
   m.AdHeadsUpAdBreak1.text = "AD"
   m.AdHeadsUpAdBreak2.text = "   break"
-  
+
   ' checking m.recentCuepointFetch and m.recentCuepoint prevents multiple ad calls and multiple tracking events
   ' for a single cuepoint if the position callback happens at 10.2 and 10.7 for instance
   m.recentCuepointFetch = 0
@@ -185,7 +185,7 @@ Function onThemeChange(msg = invalid)
   else
     theme = getThemeFromGlobal()
   end if
-  
+
   if theme <> invalid
     m.focusedColor = theme.focusedColor
     m.ProgressBar.focusColor = m.focusedColor

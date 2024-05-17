@@ -156,7 +156,7 @@
       <field id="historyPosition" type="integer" value="0" />
 
       <!-- field for communicating playback position to the ad shim -->
-      <field id="adPosition" type="int" />
+      <field id="adPosition" type="float" />
 
       <field id="adProgress" type="integer" value="0" />
 
