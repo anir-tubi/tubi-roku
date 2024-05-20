@@ -12,8 +12,15 @@ Function init()
 
   ' The analytics event needs to be tracked during transition between home screen & detail screen,
   ' so maintaining pageTypes for previous screen & current screen
-  m.previousPageInfo = { pagetype: "home_page" }
-  m.currentPageInfo = { pagetype: "home_page" }
+  m.previousPageInfo = {
+    pagetype: "home_page"
+    pageValues: {}
+  }
+
+  m.currentPageInfo = {
+    pagetype: "home_page"
+    pageValues: {}
+  }
 
   m.Video = m.top.findNode("VideoNode") ' reference in case we change from extending Video to extending Group
   m.Video.observeField("position", "onVideoPositionChange")
