@@ -18,7 +18,8 @@ exports.keypress = function(key, address, password) {
   return new Promise((res, rej) => {
     const url =`http://${address}:8060/keypress/${key}`;
     const data = {};
-    request().post({url: url, formData: data}, (err, response, body) => {
+    const options = getRequestOptions({url: url, formData: data});
+    request().post(options, (err, response, body) => {
       if (err) {
         rej(err);
       }
@@ -30,10 +31,10 @@ exports.keypress = function(key, address, password) {
 exports.deeplink = function(rokuAppId, address) {
   return new Promise((res, rej) => {
     const url = `http://${address}:8060/launch/${rokuAppId}`;
-    const options = {
+    const options = getRequestOptions({
       url,
       data: {}
-    };
+    });
     request().post(options, (err, response, body) => {
       if (err) {
         rej(err);
@@ -41,7 +42,7 @@ exports.deeplink = function(rokuAppId, address) {
       res(body);
     });
   });
-}
+};
 
 /**
  * upload roku zip to target roku box
@@ -61,15 +62,14 @@ exports.uploadPkg = function(zipPath, deviceIp, password) {
       mysubmit: 'Install',
       archive: fs.createReadStream(zipPath)
     };
-    const options = {
+    const options = getRequestOptions({
       url,
       auth,
-      formData,
-      agentOptions: { 'keepAlive': false }
-    };
+      formData
+    });
 
     request().post(options, (err, response, body) => {
-      const success = !!body ? body.match(/<font color="red">.*Install Success.<\/font>/) : null
+      const success = body ? body.match(/<font color="red">.*Install Success.<\/font>/) : null;
 
       if (err) {
         rej(err);
@@ -81,10 +81,10 @@ exports.uploadPkg = function(zipPath, deviceIp, password) {
         let errorMessages = body.match(/<font color="red">([^<]*)/);
         if (errorMessages !== null) {
           var rejMessage = '';
-          errorMessages.shift()
+          errorMessages.shift();
           errorMessages.forEach((message) => {
             log(`Device install error: ${message}`);
-            rejMessage = message
+            rejMessage = message;
           });
         }
         else {
@@ -117,16 +117,15 @@ exports.installWithSquashfs = function(zipPath, deviceIp, password) {
       mysubmit: 'Install with squashfs',
       archive: fs.createReadStream(zipPath)
     };
-    const options = {
+    const options = getRequestOptions({
       url,
       auth,
-      formData,
-      agentOptions: { 'keepAlive': false }
-    };
+      formData
+    });
 
     request().post(options, (err, response, body) => {
       let success = null;
-      if (!!body) {
+      if (body) {
         success = body.match(/<font color="red">.*Install Success.<\/font>/);
         if (success === null) {
           success = body.match(/<font color="red">Uninstall Success.<\/font>/);
@@ -143,10 +142,10 @@ exports.installWithSquashfs = function(zipPath, deviceIp, password) {
         let errorMessages = body.match(/<font color="red">([^<]*)/);
         if (errorMessages !== null) {
           var rejMessage = '';
-          errorMessages.shift()
+          errorMessages.shift();
           errorMessages.forEach((message) => {
             log(`Squashfs conversion error: ${message}`);
-            rejMessage = message
+            rejMessage = message;
           });
         }
         else {
@@ -159,7 +158,7 @@ exports.installWithSquashfs = function(zipPath, deviceIp, password) {
       }
     });
   });
-}
+};
 
 
 /**
@@ -184,8 +183,9 @@ exports.signPkg = function(address, devPassword, signPassword, appName, pkgPath)
       passwd: signPassword,
       pkg_time: '',
     };
-    request().post({url: url, auth: auth, formData: data}, (err, response, body) => {
-      var packages = body ? body.match(/pkgs\/\/([^\"]*)/) : '';
+    const options = getRequestOptions({url: url, auth: auth, formData: data});
+    request().post(options, (err, response, body) => {
+      var packages = body ? body.match(/pkgs\/\/([^"]*)/) : '';
       if (err)
         rej(err);
       else if (response.statusCode !== 200)
@@ -194,7 +194,7 @@ exports.signPkg = function(address, devPassword, signPassword, appName, pkgPath)
         rej('No downloadable packages found!');
       }
       else {
-        log("Got " + body.length + " bytes response");
+        log('Got ' + body.length + ' bytes response');
         const url = `http://${address}/pkgs/${packages[1]}`;
         const auth = {
           user: 'rokudev',
@@ -202,7 +202,8 @@ exports.signPkg = function(address, devPassword, signPassword, appName, pkgPath)
           sendImmediately: false
         };
         var writePath = `${pkgPath}/${appName}.pkg`;
-        request().get({url: url, auth: auth}, (err, response, body) => {
+        const options = getRequestOptions({url: url, auth: auth});
+        request().get(options, (err, response, body) => {
           if (err) {
             rej(err);
           }
@@ -257,8 +258,18 @@ async function fetchJSON(url, headers) {
   } catch (error) {
     log(`Error: An error occurred while reading the JSON file from the URL: ${url}`);
     throw(error);
-    return null;
   }
+}
+
+
+// Used to provide a common spot to add any required base options to the request options. Currently just using to avoid node bug on node 19 and newer
+function getRequestOptions(options) {
+  options = {
+    ...options,
+    agentOptions: { 'keepAlive': false }
+  };
+
+  return options;
 }
 
 
