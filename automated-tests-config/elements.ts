@@ -83,6 +83,10 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#espanolScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList',
   },
 
+  categoryGridTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#PageGroup.#ChannelCategoryGrid.1.#Title',
+  },
+
   
   /** TV Shows screen row list */
   tvShowsScreenRowList: {
@@ -783,6 +787,18 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#ChannelsVideoGrid',
   },
 
+  /** Categories video grid */
+  categoriesDetailsVideoGridPoster: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.#poster',
+  },
+
+  /** Categories 6th poster */
+  categoriesVideoGridPoster6: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.5.#poster',
+  },
+
+
+
   /** Item counter */
   itemCounter: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#pageTitleAndCounter.#CategoryCount.#ItemCount',
@@ -803,6 +819,14 @@ const elements = typeCheckElements({
 
    channelsVideoGridPoster: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.#poster'
+   },
+
+   channelsVideoGrid: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid',
+   },
+
+   categoryContent: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#PageGroup.0.content',
    },
 
 
@@ -1479,6 +1503,11 @@ const elements = typeCheckElements({
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#PageGroup.#ChannelCategoryGrid.0.#PosterRect',
   },
 
+ /** Networks Video Grid poster */
+ networksVideoGridPoster: {
+  keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid.0.#poster',
+ },
+
   /** Exit item */
   exitItem: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.2.#SettingsMenuGroup.#SettingsMenu.5.#DetailsMenuTextParent.#DetailsMenuText',
@@ -1571,10 +1600,6 @@ const elements = typeCheckElements({
   /** categories video grid */
   categoriesVideoGrid: {
     keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#channelListScreen.#PageGroup.#ChannelCategoryGrid',
-  },
-
-  channelsVideoGrid: {
-    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryDetailsScreen.#PageGroup.#ChannelsVideoGrid',
   },
   
   categoriesVideoGridPoster: {
