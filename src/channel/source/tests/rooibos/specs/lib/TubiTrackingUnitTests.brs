@@ -42,12 +42,18 @@ End Function
 
 '@Test getAnalyticsTimestamp unit tests
 Function tubiTracking_getAnalyticsTimestamp_test()
-  dateTime = CreateObject("roDateTime")
-  Tracking = m.Tracking
-  trackingTimestamp = Tracking.getAnalyticsTimestamp()
-  testTimestamp = dateTime.ToISOString("milliseconds")
+  ' We use a loop here since it's possible that the two times are generated at different milliseconds
+  for i = 0 to 100
+    Tracking = m.Tracking
+    trackingTimestamp = Tracking.getAnalyticsTimestamp()
+    dateTime = CreateObject("roDateTime")
+    testTimestamp = dateTime.ToISOString("milliseconds")
 
-  m.assertEqual(trackingTimestamp, testTimestamp)
+    if trackingTimestamp = testTimestamp OR i = 100 then
+      m.assertEqual(trackingTimestamp, testTimestamp)
+      exit for
+    end if
+  end for
 End Function
 
 
