@@ -60,7 +60,7 @@ describe('My List events', function () {
 		});
 	});
 
-	it('Add To My List(Movie) - when show the login required from Details Page C163671 and C116493 and UI:C32373 @analytics,@analyticsMyList', async () => {
+	it('Add To My List(Movie) - when show the login required from Details Page C163671 and C116493 and UI:C32373 @analyticsASet2,@analyticsMyList', async () => {
 		const homePage = HomePage();
 		const titleId = await homePage.getMovieTitleId();
 		const movieDetailsPage = await homePage.selectFocusedTitleMovie();
@@ -71,7 +71,7 @@ describe('My List events', function () {
 		expect(message).equal('Account needed', `text should be Account needed`);
 	});
 
-	it('Add To My List(Series) - when show the login required from Details Page C150664 @analytics,@analyticsMyList', async () => {
+	it('Add To My List(Series) - when show the login required from Details Page C150664 @analyticsASet2,@analyticsMyList', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: false,
 		});
@@ -82,9 +82,9 @@ describe('My List events', function () {
 		await verifyC150664(episodeId);
 	});
 
-	it('when toggle left side nav on My List page C150666 and C150672 and C150665 and C439643 and C439644 and C439645 @analytics,@analyticsMyList', async () => {
+	it('when toggle left side nav on My List page C150666 and C150672 and C150665 and C439643 and C439644 and C439645 @analyticsASet2,@analyticsMyList', async () => {
 		const homePage = HomePage();
-		const myStuff = await homePage.selectSideNavTab(tabs.myStuff);
+		const myStuff = await homePage.selectSideNavTab(tabs.myStuff,7);
 		const activate = await myStuff.selectUnlockNow();
 		await activate.clickOnLetsCreateYourAccount();
 		await verifyC150666andC150672andC150665();
@@ -94,17 +94,17 @@ describe('My List events', function () {
 		await verifyC439645();
 	});
 
-	it('Analytics: Guest User - How many users click “Cancel” on “Lets create your Tubi account” modal? C439646 @analytics,@analyticsMyList', async () => {
+	it('Analytics: Guest User - How many users click “Cancel” on “Lets create your Tubi account” modal? C439646 @analyticsASet2,@analyticsMyList', async () => {
 		const homePage = HomePage();
-		const myStuff = await homePage.selectSideNavTab(tabs.myStuff);
+		const myStuff = await homePage.selectSideNavTab(tabs.myStuff,7);
 		const activate = await myStuff.selectUnlockNow();
 		await activate.clickCancelForCreateAccount();
 		await verifyC439646();
 	});
 
-	it('Analytics: Guest User - Dialog event when selecting the my stuff menu item and registering C348169 and C348170 and C150665 and C3840 C151880 @analytics,@analyticsMyList', async () => {
+	it('Analytics: Guest User - Dialog event when selecting the my stuff menu item and registering C348169 and C348170 and C150665 and C3840 C151880 @analyticsASet2,@analyticsMyList', async () => {
 		const homePage = HomePage();
-		const myStuff = await homePage.selectSideNavTab(tabs.myStuff);
+		const myStuff = await homePage.selectSideNavTab(tabs.myStuff,7);
 		const activate = await myStuff.selectUnlockNow();
 		await verifyC348168();
 		await verifyC3840();
@@ -112,7 +112,7 @@ describe('My List events', function () {
 		await verifyC348168PageLoad();
 	});
 
-	it('When removing movie from the queue then "videoId" matches selected movie title C543642 and C5225 @analytics,@analyticsMyList', async () => {
+	it('When removing movie from the queue then "videoId" matches selected movie title C543642 and C5225 @analyticsASet2,@analyticsMyList', async () => {
 		const user = await testUtils.createRegisteredUser();
 		await testUtils.startApplicationAtPage('movies', { user: user });
 		const homePage = HomePage();
@@ -127,7 +127,7 @@ describe('My List events', function () {
 		await verifyC543642AddToQueue(titleId);
 	});
 
-	it('When series is added to the queue then "seriesId" matches selected series title C5220 and C70582 @analytics,@analyticsMyList', async () => {
+	it('When series is added to the queue then "seriesId" matches selected series title C5220 and C70582 @analyticsASet2,@analyticsMyList', async () => {
 		const user = await testUtils.createRegisteredUser();
 		await testUtils.startApplicationAtPage('tv', { user: user });
 		const homePage = HomePage();
@@ -142,7 +142,7 @@ describe('My List events', function () {
 		await verifyC70582(titleId);
 	});
 
-	it('When removing series from history then seriesId is correct C5226 @analytics,@analyticsMyList', async () => {
+	it('When removing series from history then seriesId is correct C5226 @analyticsASet2,@analyticsMyList', async () => {
 		const user = await testUtils.createRegisteredUser();
 		await addTheFreakBrothersTVShowToHistory(user);
 		await testUtils.startApplicationAtPage('home', { user: user });
@@ -153,7 +153,7 @@ describe('My List events', function () {
 		await verifyC5226(300007896);
 	});
 
-	it('Analytics: Registered User - How many users select one Movie title within Continue Watching and land on details page of the title? C439649 @analytics,@analyticsMyList', async () => {
+	it('Analytics: Registered User - How many users select one Movie title within Continue Watching and land on details page of the title? C439649 @analyticsASet2,@analyticsMyList', async () => {
 		const user = await testUtils.createRegisteredUser();
 		await addZappedTitleToHistory(user);
 		await testUtils.startApplicationAtPage('home', { user: user });
@@ -165,7 +165,7 @@ describe('My List events', function () {
 		await verifyC439649(342067);
 	});
 
-  it('Analytics: Registered User - How many users select one TV Show title within My List and land on the titleâ€™s details page? C439651 @analytics,@analyticsMyList', async () => {
+  it('Analytics: Registered User - How many users select one TV Show title within My List and land on the titleâ€™s details page? C439651 @analyticsASet2,@analyticsMyList', async () => {
 		const user = await testUtils.createRegisteredUser();
 		await addTheFreakBrothersTVShowToMyList(user);
 		await testUtils.startApplicationAtPage('home', { user: user });
@@ -177,7 +177,7 @@ describe('My List events', function () {
 		await verifyC439651(300007896);
 	});
 
-	it('Analytics: Registered User - How many users select one Movie title within My List and land on the titleâ€™s details page? C439651 @analytics,@analyticsMyList', async () => {
+	it('Analytics: Registered User - How many users select one Movie title within My List and land on the titleâ€™s details page? C439651 @analyticsASet2,@analyticsMyList', async () => {
 		const user = await testUtils.createRegisteredUser();
 		await addZappedTitleToMyList(user);
 		await testUtils.startApplicationAtPage('home', { user: user });
@@ -189,7 +189,7 @@ describe('My List events', function () {
 		await verifyC439651Movie(342067);
 	});
 
-	it('Analytics: Registered User - How many registered users landed on My Stuff page from Left Side Nav? C439647 @analytics,@analyticsMyList', async () => {
+	it('Analytics: Registered User - How many registered users landed on My Stuff page from Left Side Nav? C439647 @analyticsASet2,@analyticsMyList', async () => {
 		await testUtils.startApplicationAtPage('home', {
 			shouldCreateNewUser: true,
 		});
@@ -203,7 +203,7 @@ describe('My List events', function () {
 		await verifyC439647PageLoad();
 	});
 
-	it('When movie is added to the queue then "videoId" matches selected movie title C5219 and C5223 and C5229 @analytics,@analyticsMyList', async () => {
+	it('When movie is added to the queue then "videoId" matches selected movie title C5219 and C5223 and C5229 @analyticsASet2,@analyticsMyList', async () => {
 		await testUtils.startApplicationAtPage('movies', {
 			shouldCreateNewUser: true,
 		});

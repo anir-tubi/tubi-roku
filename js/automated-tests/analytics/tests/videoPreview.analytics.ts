@@ -18,7 +18,7 @@ describe('Video preview', function () {
 		});
 	});
 
-	it('C285595 and C285596 When a video starts automatically after the video preview has concluded, update the StartVideoEvent @analytics,@analyticsVideoPreview', async () => {
+	it('C285595 and C285596 When a video starts automatically after the video preview has concluded, update the StartVideoEvent @analyticsASet3,@analyticsVideoPreview', async () => {
 		const homePage = HomePage();
 		const titleId = await homePage.highlightTitleWithVideoPreview();
 		const video = await homePage.waitForPlayBackToStartForMovie();
@@ -26,7 +26,7 @@ describe('Video preview', function () {
 		await verifyC285595(titleId);
 		await verifyC285596(titleId);
 	});
-	it('C285597,C285598 When a user starts video playback from any UI that is not the autoplay UI or automatically from video previews (from pressing play on the details screen for instance), update the StartVideoEvent @analytics,@analyticsVideoPreview', async () => {
+	it('C285597,C285598 When a user starts video playback from any UI that is not the autoplay UI or automatically from video previews (from pressing play on the details screen for instance), update the StartVideoEvent @analyticsASet3,@analyticsVideoPreview', async () => {
 		const homePage = HomePage();
 		const titleId = await homePage.highlightTitleWithVideoPreview();
 		await utils.sleep(10000);

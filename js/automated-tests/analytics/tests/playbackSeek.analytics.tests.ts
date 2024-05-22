@@ -20,7 +20,7 @@ describe('Seek Events', function () {
 		});
 	});
 
-	it('videoId is correct for episode title C21365 and UI:C6522  @analytics,@analyticsPlayback', async () => {
+	it('videoId is correct for episode title C21365 and UI:C6522  @analyticsASet3,@analyticsPlayback', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: false,
 		});
@@ -33,7 +33,7 @@ describe('Seek Events', function () {
 		await verifyC21365(episodeId);
 	});
 
-	it('fromPosition and toPosition reflect start and end position C21366 and C21367 @analytics,@analyticsPlayback', async () => {
+	it('fromPosition and toPosition reflect start and end position C21366 and C21367 @analyticsASet3,@analyticsPlayback', async () => {
 		const homePage = HomePage();
 		const playback = await homePage.playMovieTitle();
 		const timeFromPlaybackBeforeSeek =
@@ -46,7 +46,7 @@ describe('Seek Events', function () {
 		await verifyC21366(timeFromPlaybackBeforeSeek, timeFromPlaybackAfterSeek);
 	});
 
-	it('event fires on 30 skip forward C21368 and C21369 @analytics,@analyticsPlayback', async () => {
+	it('event fires on 30 skip forward C21368 and C21369 @analyticsASet3,@analyticsPlayback', async () => {
 		const homePage = HomePage();
 		const playback = await homePage.playMovieTitle();
 		await playback.allowPlaybackToPlayForSeconds(5000);
@@ -58,7 +58,7 @@ describe('Seek Events', function () {
 		await verifyC21368andC21368();
 	});
 
-	it('event fires on fast forward and rewind C21370 @analytics,@analyticsPlayback', async () => {
+	it('event fires on fast forward and rewind C21370 @analyticsASet3,@analyticsPlayback', async () => {
 		const homePage = HomePage();
 		const titleId = await homePage.getMovieTitleId();
 		const playback = await homePage.playMovieTitle();

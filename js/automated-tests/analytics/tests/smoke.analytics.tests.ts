@@ -13,7 +13,7 @@ describe('SmokeTests', function () {
 		await createNewTestInProxy();
 	});
 
-	it('Autoplay - Action show "videoId" is correct for movie title C21392 and C21398 and C130131 and C130133 and C130135 and UI: C5768 @analytics,@analyticsSmoke', async () => {
+	it('Autoplay - Action show "videoId" is correct for movie title C21392 and C21398 and C130131 and C130133 and C130135 and UI: C5768 @analyticsASet3,@analyticsSmoke', async () => {
 		await testUtils.startApplicationAtPage('movies', {
 			shouldCreateNewUser: false,
 		});
@@ -32,7 +32,7 @@ describe('SmokeTests', function () {
 		await verifyC21398andC130133(idFromAutoplay);
 	});
 
-	it('videoId is correct for episode title C21386 and C21388 and C21379 @analytics,@analyticsSmoke', async () => {
+	it('videoId is correct for episode title C21386 and C21388 and C21379 @analyticsASet3,@analyticsSmoke', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: false,
 		});

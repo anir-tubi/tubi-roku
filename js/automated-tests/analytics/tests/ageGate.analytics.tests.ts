@@ -25,7 +25,7 @@ describe('Age gate', function () {
 		});
 	});
 
-	it('RequesttForInfoEvent when DOB is submitted C152086, C166029, C165481, C165480 @analytics,@analyticsAgeGate', async () => {
+	it('RequesttForInfoEvent when DOB is submitted C152086, C166029, C165481, C165480 @analyticsASet1,@analyticsAgeGate', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
@@ -39,7 +39,7 @@ describe('Age gate', function () {
 		await verifyRequestForInfo();
 	});
 
-	it('Wrong data @analytics,@analyticsAgeGate', async () => {
+	it('Wrong data @analyticsASet1,@analyticsAgeGate', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);

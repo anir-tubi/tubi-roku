@@ -28,7 +28,7 @@ describe('Autoplay Analytics', function () {
 	});
 
 	it('Start video - From autoplay field when autoplay is automatic C130134 \
-      and Play progress - From autoplay field when autoplay is automatic C130136 @analytics,@analyticsAutoplay', async () => {
+      and Play progress - From autoplay field when autoplay is automatic C130136 @analyticsASet1,@analyticsAutoplay', async () => {
 		const homePage = HomePage();
 		const titleId = await homePage.getMovieTitleId();
 		const playback = await homePage.playMovieTitle();
@@ -49,7 +49,7 @@ describe('Autoplay Analytics', function () {
 	it('Autoplay - Action show "videoId" is correct for tv show C515573 and Page load - When next episode playback starts C130132 \
       and  Autoplay - Series - When episode reaches the end of playback then Autoplay \
       and Player remain in view C4184 \
-      and Autoplay - Series - Next episode plays after multiple consecutive autoplays C6030 @analytics,@analyticsAutoplay', async () => {
+      and Autoplay - Series - Next episode plays after multiple consecutive autoplays C6030 @analyticsASet1,@analyticsAutoplay', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: false,
 		});
@@ -67,7 +67,7 @@ describe('Autoplay Analytics', function () {
 		await verifyC130132(idOfNextEpisode);
 		await verifyC130132NavigateToPage(idOfNextEpisode, episodeId);
 	});
-	it('UI: C21201 Autoplay - When user presses the Back button then series autoplay UI is dismissed @analytics,@analyticsAutoplay', async () => {
+	it('UI: C21201 Autoplay - When user presses the Back button then series autoplay UI is dismissed @analyticsASet1,@analyticsAutoplay', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: false,
 		});
@@ -78,7 +78,7 @@ describe('Autoplay Analytics', function () {
 		await ecp.sendKeypress(ecp.Key.Back);
 		await playback.pausePlayback();
 	});
-	it('UI: C21205 - When autoplay timer expires then next episode autoplays @analytics,@analyticsAutoplay', async () => {
+	it('UI: C21205 - When autoplay timer expires then next episode autoplays @analyticsASet1,@analyticsAutoplay', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: false,
 		});
@@ -90,7 +90,7 @@ describe('Autoplay Analytics', function () {
 		await playback.pausePlayback();
 	});
 	it('Autoplay - Action show is fired when autoplay dismissed and viewed again C515574 and \
-      Autoplay - Action dismiss when autoplay is dismissed C515575 @analytics,@analyticsAutoplay', async () => {
+      Autoplay - Action dismiss when autoplay is dismissed C515575 @analyticsASet1,@analyticsAutoplay', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: false,
 		});
@@ -102,7 +102,7 @@ describe('Autoplay Analytics', function () {
 		await verifyC21397(episodeId);
 		await verifyC21396(episodeId);
 	});
-	it('UI: C25123,C105693 - Autoplay - When user chooses last title on the list then movie plays @analytics,@analyticsAutoplay', async () => {
+	it('UI: C25123,C105693 - Autoplay - When user chooses last title on the list then movie plays @analyticsASet1,@analyticsAutoplay', async () => {
 		const homePage = HomePage();
 		const titleId = await homePage.getMovieTitleId();
 		const playback = await homePage.playMovieTitle();

@@ -23,7 +23,7 @@ describe('Play progress', function () {
 	});
 
 	it('Play Progress - Fires every 10 seconds C21349 and Play Progress - ""videoId"" is correct for movie title C543679 \
-      and C543680 Play Progress - ""position"" and ""view_time"" is accurate on playback start @analytics,@analyticsPlayProgress', async () => {
+      and C543680 Play Progress - ""position"" and ""view_time"" is accurate on playback start @analyticsASet3,@analyticsPlayProgress', async () => {
 		const homePage = HomePage();
 		const titleId = await homePage.getMovieTitleId();
 		const playback = await homePage.playMovieTitle();
@@ -32,7 +32,7 @@ describe('Play progress', function () {
 		await verifyC66349andC543679andC543680(titleId);
 	});
 
-	it('C543681 Play Progress - ""videoId"" is correct for episode title @analytics,@analyticsPlayProgress', async () => {
+	it('C543681 Play Progress - ""videoId"" is correct for episode title @analyticsASet3,@analyticsPlayProgress', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: false,
 		});
@@ -45,7 +45,7 @@ describe('Play progress', function () {
 		await verifyC543681(episodeId);
 	});
 
-	it('Play Progress - ""position"" and ""view_time"" is accurate on seek C543682 and C543683 Seek - ""videoId"" is correct for movie title and UI: C536531 @analytics,@analyticsPlayProgress', async () => {
+	it('Play Progress - ""position"" and ""view_time"" is accurate on seek C543682 and C543683 Seek - ""videoId"" is correct for movie title and UI: C536531 @analyticsASet3,@analyticsPlayProgress', async () => {
 		const homePage = HomePage();
 		const titleId = await homePage.getMovieTitleId();
 		const playback = await homePage.playMovieTitle();
@@ -55,7 +55,7 @@ describe('Play progress', function () {
 		await verifyC543682andC543683(timeFromPlayback, titleId);
 	});
 
-	it('Play Progress - ""fromAutoplayAutomatic"" true when autoplay title auto played C543684 @analytics,@analyticsPlayProgress', async () => {
+	it('Play Progress - ""fromAutoplayAutomatic"" true when autoplay title auto played C543684 @analyticsASet3,@analyticsPlayProgress', async () => {
 		const homePage = HomePage();
 		const playback = await homePage.playMovieTitle();
 		await playback.seekToAutoplay();
@@ -65,7 +65,7 @@ describe('Play progress', function () {
 		await verifyC543684();
 	});
 
-	it('Play Progress view_time value when user seeks forward C66349 @analytics,@analyticsPlayProgress', async () => {
+	it('Play Progress view_time value when user seeks forward C66349 @analyticsASet3,@analyticsPlayProgress', async () => {
 		const homePage = HomePage();
 		const playback = await homePage.playMovieTitle();
 		await playback.allowPlaybackToPlayForSeconds(10000);
@@ -75,7 +75,7 @@ describe('Play progress', function () {
 		await verifyC66349();
 	});
 
-	it('Play Progess view_time value when user seeks backward C66355 @analytics,@analyticsPlayProgress', async () => {
+	it('Play Progess view_time value when user seeks backward C66355 @analyticsASet3,@analyticsPlayProgress', async () => {
 		const homePage = HomePage();
 		const playback = await homePage.playMovieTitle();
 		await playback.allowPlaybackToPlayForSeconds(10000);
@@ -85,7 +85,7 @@ describe('Play progress', function () {
 		await verifyC66349();
 	});
 
-	it('Play Progress view_time value when user jumps ahead 10s C66356 @analytics,@analyticsPlayProgress', async () => {
+	it('Play Progress view_time value when user jumps ahead 10s C66356 @analyticsASet3,@analyticsPlayProgress', async () => {
 		const homePage = HomePage();
 		const playback = await homePage.playMovieTitle();
 		await playback.allowPlaybackToPlayForSeconds(10000);
@@ -96,7 +96,7 @@ describe('Play progress', function () {
 		await verifyC66356();
 	});
 
-	it('Play Progress view_time value when user jumps back 10s C66357 @analytics,@analyticsPlayProgress', async () => {
+	it('Play Progress view_time value when user jumps back 10s C66357 @analyticsASet3,@analyticsPlayProgress', async () => {
 		const homePage = HomePage();
 		const playback = await homePage.playMovieTitle();
 		await playback.allowPlaybackToPlayForSeconds(10000);
@@ -106,7 +106,7 @@ describe('Play progress', function () {
 		await verifyC66349();
 	});
 
-	it('Play Progress view_time value when user chooses to go back to beginning from player controls C66358 @analytics,@analyticsPlayProgress', async () => {
+	it('Play Progress view_time value when user chooses to go back to beginning from player controls C66358 @analyticsASet3,@analyticsPlayProgress', async () => {
 		const homePage = HomePage();
 		const playback = await homePage.playMovieTitle();
 		await playback.allowPlaybackToPlayForSeconds(10000);
@@ -117,7 +117,7 @@ describe('Play progress', function () {
 		await verifyC66356();
 	});
 
-	it('Play Progress view_time value when user choose to go to next from player controls C66359 @analytics,@analyticsPlayProgress', async () => {
+	it('Play Progress view_time value when user choose to go to next from player controls C66359 @analyticsASet3,@analyticsPlayProgress', async () => {
 		const homePage = HomePage();
 		const playback = await homePage.playMovieTitle();
 		await playback.allowPlaybackToPlayForSeconds(10000);
@@ -129,7 +129,7 @@ describe('Play progress', function () {
 	});
 
 	it('Play Progress when user exits the player C66351 and UI: Movie Details - When Movie Details page is opened then genre is displayed C5832 \
-      and Movie Details - When Movie Details page is opened then runtime is displayed C76705 @analytics,@analyticsPlayProgress', async () => {
+      and Movie Details - When Movie Details page is opened then runtime is displayed C76705 @analyticsASet3,@analyticsPlayProgress', async () => {
 		const homePage = HomePage();
 		let details = await homePage.selectFocusedTitleMovie();
 		const playback = await details.clickOnPlay();
@@ -140,7 +140,7 @@ describe('Play progress', function () {
 		await verifyC66349();
 	});
 
-	it('Play Progress when seek back 30s when < 30s has played in video, view time should be 10000 to 11000 C66352 @analytics,@analyticsPlayProgress', async () => {
+	it('Play Progress when seek back 30s when < 30s has played in video, view time should be 10000 to 11000 C66352 @analyticsASet3,@analyticsPlayProgress', async () => {
 		const homePage = HomePage();
 		const playback = await homePage.playMovieTitle();
 		await playback.allowPlaybackToPlayForSeconds(10000);
@@ -149,7 +149,7 @@ describe('Play progress', function () {
 		await verifyC66349();
 	});
 
-	it('Play Progress event is not fired when pressing "Home" during seek C424695 @analytics,@analyticsPlayProgress', async () => {
+	it('Play Progress event is not fired when pressing "Home" during seek C424695 @analyticsASet3,@analyticsPlayProgress', async () => {
 		const homePage = HomePage();
 		const playback = await homePage.playMovieTitle();
 		await playback.allowPlaybackToPlayForSeconds(10000);

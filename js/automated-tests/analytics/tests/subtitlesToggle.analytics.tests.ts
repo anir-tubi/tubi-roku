@@ -20,7 +20,7 @@ describe('Subtitles events', function () {
 	it('videoId is correct for movie title C543685 and C21387 and Subtitle Toggle - ""videoId"" is correct for movie title C543687 \
       and Subtitle Toggle - ""toggleState"" is OFF when subtitles are disabled C543667 \
       and Users clicked the "Subtitles/Audio" icon on the player and landed on "Subtitles/Audio" selection dialog C434294 \
-      and UI: C535839 @analytics,@analyticsSubtitles', async () => {
+      and UI: C535839 @analyticsASet3,@analyticsSubtitles', async () => {
 		const homePage = HomePage();
 		const titleId = await homePage.getMovieTitleId();
 		const detailsPage = await homePage.selectFocusedTitleMovie();
@@ -30,7 +30,7 @@ describe('Subtitles events', function () {
 		await verifyC66349(titleId);
 		await verifyC434294();
 	});
-	it('Subtitle Toggle - "language" is set on both enable and disable subtitle C543688 and UI: Movie Details - When Movie Details page is opened then ratings icon is seen C536526 @analytics,@analyticsSubtitles', async () => {
+	it('Subtitle Toggle - "language" is set on both enable and disable subtitle C543688 and UI: Movie Details - When Movie Details page is opened then ratings icon is seen C536526 @analyticsASet3,@analyticsSubtitles', async () => {
 		const homePage = HomePage();
 		const detailsPage = await homePage.selectFocusedTitleMovieWithSubtitles();
 		const titleId = await homePage.getMovieTitleId();

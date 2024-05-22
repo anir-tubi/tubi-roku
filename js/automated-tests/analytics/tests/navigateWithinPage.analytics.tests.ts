@@ -35,13 +35,13 @@ describe('Navigate Within Page', function () {
 	});
 
 	it('When HomePage vertical navigation C543668 and NavigateWithinPage - CategoryPage navigation C543669\
-	    and User Action - Scroll within sublists, such as categories or channel C3843 @analytics,@analyticsNavigateWithinPage', async () => {
+	    and User Action - Scroll within sublists, such as categories or channel C3843 @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		const homePage = HomePage();
 		const titleId = await homePage.getMovieTitleId();
 		await homePage.navigateDown(1);
 		await verifyC543668andC543669(titleId);
 	});
-	it('NavigateWithinPage - HomePage CategoryComponent horizontal navigation - every 3 seconds C543671 @analytics,@analyticsNavigateWithinPage', async () => {
+	it('NavigateWithinPage - HomePage CategoryComponent horizontal navigation - every 3 seconds C543671 @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		const homePage = HomePage();
 		const details = await homePage.getMovieTitleIdAndCategory();
 		await homePage.navigateDown(1);
@@ -51,7 +51,7 @@ describe('Navigate Within Page', function () {
 		await homePage.navigateRight(1);
 		await verifyC543671(details);
 	});
-	it('NavigateWithinPage - autoplay navigation C543672 @analytics,@analyticsNavigateWithinPage', async () => {
+	it('NavigateWithinPage - autoplay navigation C543672 @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		const homePage = HomePage();
 		const titleId = await homePage.getMovieTitleId();
 		const playback = await homePage.playMovieTitle();
@@ -61,7 +61,7 @@ describe('Navigate Within Page', function () {
 		await playback.pausePlayback();
 		await verifyC543672(titleId);
 	});
-	it('When user navigates between menu options - EPISODES_LIST C425239 @analytics,@analyticsNavigateWithinPage', async () => {
+	it('When user navigates between menu options - EPISODES_LIST C425239 @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: false,
 		});
@@ -73,7 +73,7 @@ describe('Navigate Within Page', function () {
 		await verifyC425239(titleId);
 	});
 
-	it('When user makes a selection from details page menu - EPISODES_LIST C425249 @analytics,@analyticsNavigateWithinPage', async () => {
+	it('When user makes a selection from details page menu - EPISODES_LIST C425249 @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: false,
 		});
@@ -89,7 +89,7 @@ describe('Navigate Within Page', function () {
 		await verifyC425250(titleId); // check how to get sign up to save progress
 	});
 
-	it('When user navigates between menu options - SIGNUP_TO_SAVE_PROGRESS C425240 @analytics,@analyticsNavigateWithinPage', async () => {
+	it('When user navigates between menu options - SIGNUP_TO_SAVE_PROGRESS C425240 @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: false,
 		});
@@ -101,7 +101,7 @@ describe('Navigate Within Page', function () {
 		await verifyC425240(titleId);
 	});
 
-	it('When user navigates between menu options - ADD_TO_MY_LIST C425241 @analytics,@analyticsNavigateWithinPage', async () => {
+	it('When user navigates between menu options - ADD_TO_MY_LIST C425241 @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		const homePage = HomePage();
 		const movieDetailsPage = await homePage.selectMovieTitleWithNoTrailer();
 		const videoId = movieDetailsPage.getTitleId();
@@ -111,7 +111,7 @@ describe('Navigate Within Page', function () {
 		await verifyC425241(videoId);
 	});
 	it('When user navigates between menu options - GO_TO_NETWORK C42524 \
-	    and C425251 When user makes a selection from details page menu - GO_TO_NETWORK @analytics,@analyticsNavigateWithinPage', async () => {
+	    and C425251 When user makes a selection from details page menu - GO_TO_NETWORK @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		await testUtils.startApplicationAtPage('home', {
 			shouldCreateNewUser: false,
 		});
@@ -129,7 +129,7 @@ describe('Navigate Within Page', function () {
 		await verifyC425251(videoId);
 	});
 	it('When user navigates between menu options - LIKE C425235 \
-	    and C425236 When user navigates between menu options - DISLIKE @analytics,@analyticsNavigateWithinPage', async () => {
+	    and C425236 When user navigates between menu options - DISLIKE @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		const homePage = HomePage();
 		const movieDetailsPage = await homePage.selectMovieTitleWithNoTrailer();
 		const videoId = movieDetailsPage.getTitleId();
@@ -140,7 +140,7 @@ describe('Navigate Within Page', function () {
 		await verifyC425235(videoId);
 		await verifyC425236(videoId);
 	});
-	it('When user navigates between menu options - WATCH_TRAILER C425233 @analytics,@analyticsNavigateWithinPage', async () => {
+	it('When user navigates between menu options - WATCH_TRAILER C425233 @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		const homePage = HomePage();
 		let movieDetailsPage = await homePage.selectMovieTitleWithTrailer();
 		const videoId = movieDetailsPage.getTitleId();
@@ -152,7 +152,7 @@ describe('Navigate Within Page', function () {
 		await verifyC425233(videoId);
 	});
 
-	it('When the user selects Espanol from Left Side Nav when they were on For You - Home Page: C268956 and C268957 and C268958 and C268959 @analytics,@analyticsNavigateWithinPage', async () => {
+	it('When the user selects Espanol from Left Side Nav when they were on For You - Home Page: C268956 and C268957 and C268958 and C268959 @analyticsASet2,@analyticsNavigateWithinPage', async () => {
 		await testUtils.startApplicationAtPage('home', {
 			shouldCreateNewUser: false,
 		});

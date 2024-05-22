@@ -34,7 +34,7 @@ describe('Page Load Analytics', function () {
 		});
 	});
 
-	it('When navigation within the application then navigate to page event is fired C21253 and C21254 and UI: C5836 and C5837 @analytics,@analyticsPageLoad', async () => {
+	it('When navigation within the application then navigate to page event is fired C21253 and C21254 and UI: C5836 and C5837 @analyticsASet3,@analyticsPageLoad', async () => {
 		const homePage = HomePage();
 		const titleId = await homePage.getMovieTitleId();
 		const movieDetailsPage = await homePage.selectFocusedTitleMovie();
@@ -44,9 +44,9 @@ describe('Page Load Analytics', function () {
 		await verifyC21254PlayerLoad(titleId);
 	});
 
-	it('When browse is loaded then first key is ""categoryListPage"" in the logs C543703 and Page Load - When category container is loaded then first key is ""categoryPage"" with categorySlug C543704 and HomePage to CategoryPage by CategoryComponent C543705 and C21260 and C76712 and C76713 and C76714 and C3857 and C3858 and C3860 @analytics,@analyticsPageLoad', async () => {
+	it('When browse is loaded then first key is ""categoryListPage"" in the logs C543703 and Page Load - When category container is loaded then first key is ""categoryPage"" with categorySlug C543704 and HomePage to CategoryPage by CategoryComponent C543705 and C21260 and C76712 and C76713 and C76714 and C3857 and C3858 and C3860 @analyticsASet3,@analyticsPageLoad,@debug', async () => {
 		const homePage = HomePage();
-		const categories = await homePage.selectSideNavTab(tabs.categories);
+		const categories = await homePage.selectSideNavTab(tabs.categories,7);
 		const container = await categories.selectCategoryByName('action');
 		const slugCategory = await container.getCategoryName();
 		await container.selectFocusedTitle();
@@ -56,7 +56,7 @@ describe('Page Load Analytics', function () {
 		await verifyC543705(slugCategory);
 		await verifyC76713(slugCategory);
 	});
-	it('When channels page displayed C76715 and C76716 and C76717 and C3859 and UI: C44199 @analytics,@analyticsPageLoad', async () => {
+	it('When channels page displayed C76715 and C76716 and C76717 and C3859 and UI: C44199 @analyticsASet3,@analyticsPageLoad', async () => {
 		const homePage = HomePage();
 		const categories = await homePage.selectSideNavTab(tabs.categories);
 		const channels = await categories.selectCategoryByName('Networks');

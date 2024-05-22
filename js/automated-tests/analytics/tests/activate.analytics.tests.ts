@@ -19,7 +19,7 @@ describe('Activate events', function () {
 		});
 	});
 
-	it('Account - Activate Account  C543693 and Account - Account Activated C543694 and C5314 and C5313 and C148718  @analytics,@analyticsActivate', async () => {
+	it('Account - Activate Account  C543693 and Account - Account Activated C543694 and C5314 and C5313 and C148718  @analyticsASet1,@analyticsActivate', async () => {
 		const homePage = HomePage();
 		const activation = await homePage.selectSideNavTab(tabs.signIn);
 		await activation.clickOnLetsCreateYourAccount();
@@ -34,7 +34,7 @@ describe('Activate events', function () {
 		await verifyC148718();
 	});
 
-	it('Home Page - Guest Roku user with Tubi account selects Register/Sign In from CW row -Create account page C148861  @analytics,@analyticsActivate', async () => {
+	it('Home Page - Guest Roku user with Tubi account selects Register/Sign In from CW row -Create account page C148861  @analyticsASet1,@analyticsActivate', async () => {
 		const homePage = HomePage();
 		const activation = await homePage.navigateToContinueWatchingAndSelectIt();
 		await activation.clickOnLetsCreateYourAccount();

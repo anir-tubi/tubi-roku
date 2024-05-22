@@ -5,6 +5,7 @@ import ChannelsPage from '../pages/channelsPage';
 import MyStuff from '../pages/myStuff';
 import SearchPage from '../pages/searchPage';
 import ActivatePage from '../pages/activatePage';
+import LiveNews from '../pages/liveNews';
 import { moveToRow } from '../utils/helpers';
 import { ecp, utils } from 'roku-test-automation';
 import { testUtils } from '../../test-utils';
@@ -44,6 +45,10 @@ export const tabs = {
 	tvShows: {
 		row: 8,
 		page: () => Home(),
+	},
+	liveTV: {
+		row: 8,
+		page: () => LiveNews(),
 	},
 	espanol: {
 		row: 10,

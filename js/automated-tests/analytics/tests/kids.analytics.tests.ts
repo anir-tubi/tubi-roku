@@ -24,7 +24,7 @@ describe('Kids Events', function () {
 		});
 	});
 
-	it('entering Kids Mode C22571 and C22572 Exiting Kids Mode - Analytics Event and entering Kids Mode C22573 and C130118 App mode contains kids when home page load event occurs @analytics,@analyticsKids', async () => {
+	it('entering Kids Mode C22571 and C22572 Exiting Kids Mode - Analytics Event and entering Kids Mode C22573 and C130118 App mode contains kids when home page load event occurs @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
@@ -34,7 +34,7 @@ describe('Kids Events', function () {
 		await verifyC130118();
 	});
 
-	it('app mode contains kids after selecting kids mode C130120 and C130121 and C130125 and C130127 and C130126 and UI:C21175,C21176,C21180 @analytics,@analyticsKids', async () => {
+	it('app mode contains kids after selecting kids mode C130120 and C130121 and C130125 and C130127 and C130126 and UI:C21175,C21176,C21180 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
@@ -47,7 +47,7 @@ describe('Kids Events', function () {
 		await verifyKidsRating(ratingText);
 	});
 
-	it('UI Categories Page - Kids Mode ON - When user goes to Categories page then page is displayed:C6478 and C6479 and C44199 @analytics,@analyticsKids', async () => {
+	it('UI Categories Page - Kids Mode ON - When user goes to Categories page then page is displayed:C6478 and C6479 and C44199 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
@@ -58,7 +58,7 @@ describe('Kids Events', function () {
 		await verifyChannelsDisabledText(message);
 	});
 
-	it('UI Kids Mode ON - When user opens Search Page then Search page should be displayed: C6509 @analytics,@analyticsKids', async () => {
+	it('UI Kids Mode ON - When user opens Search Page then Search page should be displayed: C6509 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
@@ -66,7 +66,7 @@ describe('Kids Events', function () {
 		await searchScreen.checkIfKidsLogoPresent();
 	});
 
-	it('UI Settings Page - Kids Mode ON - When user tries to access Settings page then settings page should be displayed: C43797 @analytics,@analyticsKids', async () => {
+	it('UI Settings Page - Kids Mode ON - When user tries to access Settings page then settings page should be displayed: C43797 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
@@ -74,7 +74,7 @@ describe('Kids Events', function () {
 		await settingsScreen.checkIfKidsLogoPresent();
 	});
 
-	it('UI Playback - When user presses Forward 30 seconds then playback advances 30 seconds forward: C4164 @analytics,@analyticsKids', async () => {
+	it('UI Playback - When user presses Forward 30 seconds then playback advances 30 seconds forward: C4164 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
@@ -88,7 +88,7 @@ describe('Kids Events', function () {
 		);
 	});
 
-	it('UI Playback - When user presses Rewind 30 seconds then playback rewinds 30 seconds back: C4165 @analytics,@analyticsKids', async () => {
+	it('UI Playback - When user presses Rewind 30 seconds then playback rewinds 30 seconds back: C4165 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
@@ -102,7 +102,7 @@ describe('Kids Events', function () {
 		);
 	});
 
-	it('UI Playback - When user presses forward 1x then the video advances at 1x speed: C4166 @analytics,@analyticsKids', async () => {
+	it('UI Playback - When user presses forward 1x then the video advances at 1x speed: C4166 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
@@ -117,7 +117,7 @@ describe('Kids Events', function () {
 		);
 	});
 
-	it('UI Playback - When user presses forward 2x then the video advances at 2x speed: C4167 @analytics,@analyticsKids', async () => {
+	it('UI Playback - When user presses forward 2x then the video advances at 2x speed: C4167 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
@@ -131,7 +131,7 @@ describe('Kids Events', function () {
 			`Playback should be more then 30 sec `
 		);
 	});
-	it('UI Playback - When user presses forward 3x then the video advances at 3x speed: C4168 @analytics,@analyticsKids', async () => {
+	it('UI Playback - When user presses forward 3x then the video advances at 3x speed: C4168 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
@@ -146,7 +146,7 @@ describe('Kids Events', function () {
 		);
 	});
 
-	it('UI Test Title Playback Controls - Rewind Button 1x: C25125 @analytics,@analyticsKids', async () => {
+	it('UI Test Title Playback Controls - Rewind Button 1x: C25125 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
@@ -161,7 +161,7 @@ describe('Kids Events', function () {
 		);
 	});
 
-	it('UI Test Title Playback Controls - Rewind Button 2x: C25126 @analytics,@analyticsKids', async () => {
+	it('UI Test Title Playback Controls - Rewind Button 2x: C25126 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
@@ -176,7 +176,7 @@ describe('Kids Events', function () {
 		);
 	});
 
-	it('UI Test Title Playback Controls - Rewind Button 3x: C25127 @analytics,@analyticsKids', async () => {
+	it('UI Test Title Playback Controls - Rewind Button 3x: C25127 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
@@ -191,7 +191,7 @@ describe('Kids Events', function () {
 		);
 	});
 
-	it('UI Categories - When User chooses a title from Categories Page then playback should be initiated: C44198 @analytics,@analyticsKids', async () => {
+	it('UI Categories - When User chooses a title from Categories Page then playback should be initiated: C44198 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);
@@ -201,7 +201,7 @@ describe('Kids Events', function () {
 		const detailsPage = await container.selectFocusedTitle();
 		await detailsPage.selectPlay();
 	});
-	it('app mode contains kids for search C130122 and C130124 and C130123 @analytics,@analyticsKids', async () => {
+	it('app mode contains kids for search C130122 and C130124 and C130123 @analyticsASet1,@analyticsKids', async () => {
 		const homePage = HomePage();
 		const kidsHome = await homePage.selectSideNavTab(tabs.kids);
 		await ecp.sendKeypress(ecp.Key.Right);

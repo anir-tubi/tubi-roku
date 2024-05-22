@@ -44,7 +44,7 @@ describe('Like Dislike events', function () {
 		await createNewTestInProxy();
 	});
 
-	it('Navigate to the “Like or Dislike” button on the Movie detail page and see the secondary menu with two buttons: “Like” / “Dislike” C374770 and C374772 and C374775 and C374776 @analytics,@analyticsLikeDislike', async () => {
+	it('Navigate to the “Like or Dislike” button on the Movie detail page and see the secondary menu with two buttons: “Like” / “Dislike” C374770 and C374772 and C374775 and C374776 @analyticsASet1,@analyticsLikeDislike', async () => {
 		await testUtils.startApplicationAtPage('movies', {
 			shouldCreateNewUser: true,
 		});
@@ -59,7 +59,7 @@ describe('Like Dislike events', function () {
 		await verifyC374775(titleId);
 	});
 
-	it('Registered User - Analytics -Navigate to the “Like or Dislike” button on a Series detail page and see the secondary menu with two buttons: “Like” / “Dislike” C374771 and C374773 and C374774 and C374777 @analytics,@analyticsLikeDislike', async () => {
+	it('Registered User - Analytics -Navigate to the “Like or Dislike” button on a Series detail page and see the secondary menu with two buttons: “Like” / “Dislike” C374771 and C374773 and C374774 and C374777 @analyticsASet1,@analyticsLikeDislike', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: true,
 		});
@@ -74,7 +74,7 @@ describe('Like Dislike events', function () {
 		await verifyC374774(tvShowId);
 	});
 
-	it('Registered User - Analytics - Select Like on Movie detail page C374784 @analytics,@analyticsLikeDislike', async () => {
+	it('Registered User - Analytics - Select Like on Movie detail page C374784 @analyticsASet1,@analyticsLikeDislike', async () => {
 		await testUtils.startApplicationAtPage('movies', {
 			shouldCreateNewUser: true,
 		});
@@ -88,7 +88,7 @@ describe('Like Dislike events', function () {
 		await verifyC374784ExplicitFeedback(titleId);
 	});
 
-	it('Registered User - Analytics - De-select Like from Movie detail page C374778 @analytics,@analyticsLikeDislike', async () => {
+	it('Registered User - Analytics - De-select Like from Movie detail page C374778 @analyticsASet1,@analyticsLikeDislike', async () => {
 		await testUtils.startApplicationAtPage('movies', {
 			shouldCreateNewUser: true,
 		});
@@ -99,7 +99,7 @@ describe('Like Dislike events', function () {
 		await ecp.sendKeypress(ecp.Key.Left);
 		await verifyC374778(titleId);
 	});
-	it('Registered User - Analytics - De-select Like from Movie detail page C425242 @analytics,@analyticsLikeDislike', async () => {
+	it('Registered User - Analytics - De-select Like from Movie detail page C425242 @analyticsASet1,@analyticsLikeDislike', async () => {
 		await testUtils.startApplicationAtPage('movies', {
 			shouldCreateNewUser: true,
 		});
@@ -112,7 +112,7 @@ describe('Like Dislike events', function () {
 		await verifyC425242(titleId);
 	});
 
-	it('When user navigates between menu options - REMOVE_FROM_HISTORY C425243 @analytics,@analyticsLikeDislike', async () => {
+	it('When user navigates between menu options - REMOVE_FROM_HISTORY C425243 @analyticsASet1,@analyticsLikeDislike', async () => {
 		const user = await testUtils.createRegisteredUser();
 		await addMrPostmanTitleToHistory(user);
 		await testUtils.startApplicationAtPage('search', { user: user });
@@ -124,7 +124,7 @@ describe('Like Dislike events', function () {
 		await ecp.sendKeypress(ecp.Key.Down, { wait: 900, count: 5 });
 		await verifyC425243(videoId);
 	});
-	it('Registered User - Analytics - Select Like on Series detail page C374785 @analytics,@analyticsLikeDislike', async () => {
+	it('Registered User - Analytics - Select Like on Series detail page C374785 @analyticsASet1,@analyticsLikeDislike', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: true,
 		});
@@ -137,7 +137,7 @@ describe('Like Dislike events', function () {
 		await verifyC374785ExplicitFeedback(tvShowId);
 	});
 
-	it('Registered User - Analytics - De-select Like from Series detail page C374779 @analytics,@analyticsLikeDislike', async () => {
+	it('Registered User - Analytics - De-select Like from Series detail page C374779 @analyticsASet1,@analyticsLikeDislike', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: true,
 		});
@@ -149,7 +149,7 @@ describe('Like Dislike events', function () {
 		await verifyC374779(tvShowId);
 	});
 
-	it('Registered User - Analytics - Select Dislike from Movie detail page C374780 and Registered User - Analytics - Select Dislike on Movie detail page C374787 @analytics,@analyticsLikeDislike', async () => {
+	it('Registered User - Analytics - Select Dislike from Movie detail page C374780 and Registered User - Analytics - Select Dislike on Movie detail page C374787 @analyticsASet1,@analyticsLikeDislike', async () => {
 		await testUtils.startApplicationAtPage('movies', {
 			shouldCreateNewUser: true,
 		});
@@ -161,7 +161,7 @@ describe('Like Dislike events', function () {
 		await verifyC374787ExplicitFeedback(titleId);
 		await verifyC374787(titleId);
 	});
-	it('Registered User - Analytics - Navigate away from Dislike on Movie detail page C374783 @analytics,@analyticsLikeDislike', async () => {
+	it('Registered User - Analytics - Navigate away from Dislike on Movie detail page C374783 @analyticsASet1,@analyticsLikeDislike', async () => {
 		await testUtils.startApplicationAtPage('movies', {
 			shouldCreateNewUser: true,
 		});
@@ -175,7 +175,7 @@ describe('Like Dislike events', function () {
 		await verifyC374783(titleId);
 	});
 
-	it('Registered User - Analytics - Select Dislike from Series detail page C374781 and Registered User - Analytics - Select Dislike on Series detail page C374790 @analytics,@analyticsLikeDislike', async () => {
+	it('Registered User - Analytics - Select Dislike from Series detail page C374781 and Registered User - Analytics - Select Dislike on Series detail page C374790 @analyticsASet1,@analyticsLikeDislike', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: true,
 		});
@@ -188,7 +188,7 @@ describe('Like Dislike events', function () {
 		await verifyC374790ExplicitFeedback(tvShowId);
 	});
 
-	it('Registered User - Analytics - Navigate away from Dislike on Series detail page C374782 @analytics,@analyticsLikeDislike', async () => {
+	it('Registered User - Analytics - Navigate away from Dislike on Series detail page C374782 @analyticsASet1,@analyticsLikeDislike', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: true,
 		});
@@ -202,7 +202,7 @@ describe('Like Dislike events', function () {
 		await verifyC374782(tvShowId);
 	});
 
-	it('Registered User - Analytics - Undo Like on Series detail page C374793 @analytics,@analyticsLikeDislike', async () => {
+	it('Registered User - Analytics - Undo Like on Series detail page C374793 @analyticsASet1,@analyticsLikeDislike', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: true,
 		});
@@ -215,7 +215,7 @@ describe('Like Dislike events', function () {
 		await verifyC374793(tvShowId);
 	});
 
-	it('Registered User - Analytics - Undo Dislike on Movie detail page C374794 @analytics,@analyticsLikeDislike', async () => {
+	it('Registered User - Analytics - Undo Dislike on Movie detail page C374794 @analyticsASet1,@analyticsLikeDislike', async () => {
 		await testUtils.startApplicationAtPage('movies', {
 			shouldCreateNewUser: true,
 		});
@@ -227,7 +227,7 @@ describe('Like Dislike events', function () {
 		await ecp.sendKeypress(ecp.Key.Ok);
 		await verifyC374794(titleId);
 	});
-	it('Registered User - Analytics - Undo Dislike on Series detail page C374795 @analytics,@analyticsLikeDislike', async () => {
+	it('Registered User - Analytics - Undo Dislike on Series detail page C374795 @analyticsASet1,@analyticsLikeDislike', async () => {
 		await testUtils.startApplicationAtPage('tv', {
 			shouldCreateNewUser: true,
 		});

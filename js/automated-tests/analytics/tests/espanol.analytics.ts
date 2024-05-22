@@ -21,7 +21,7 @@ describe('Espanol Events', function () {
 		});
 	});
 
-	it('“app_mode”:“LATINO_MODE” in analytics calls C115421 and C116491 and C115414 @analytics', async () => {
+	it('“app_mode”:“LATINO_MODE” in analytics calls C115421 and C116491 and C115414 @analyticsASet1', async () => {
 		const homePage = HomePage();
 		const playback = await homePage.playEspanolTitle();
 		await playback.seekToAutoplay();
@@ -32,7 +32,7 @@ describe('Espanol Events', function () {
 		await verifyC115421();
 	});
 
-	it('“YMAL Movie title playback: send “app_mode”:“LATINO_MODE” to Rainmaker when a user begins playback from Tubi en Español through YMAL C116492 and UI:C115400 @analytics', async () => {
+	it('“YMAL Movie title playback: send “app_mode”:“LATINO_MODE” to Rainmaker when a user begins playback from Tubi en Español through YMAL C116492 and UI:C115400 @analyticsASet1', async () => {
 		const homePage = HomePage();
 		const detials = await homePage.selectFocusedTitleEspanol();
 		await detials.selectTitleFromYouMayAlsoLike(1);
@@ -41,7 +41,7 @@ describe('Espanol Events', function () {
 		await verifyC116492();
 	});
 
-	it('YMAL Series title playback: send app mode = latino to Rainmaker when a user begins playback from Tubi en Español through YMAL C116525 @analytics', async () => {
+	it('YMAL Series title playback: send app mode = latino to Rainmaker when a user begins playback from Tubi en Español through YMAL C116525 @analyticsASet1', async () => {
 		const espanolHome = HomePage();
 		const detailsPage = await espanolHome.selectFocusedTvShowTitleEspanol();
 		await detailsPage.selectTitleFromYouMayAlsoLike(0);

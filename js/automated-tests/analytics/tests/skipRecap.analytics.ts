@@ -13,7 +13,7 @@ describe('Skip Recap', function () {
 		});
 	});
 
-	it('Skip Recap: When user selects Skip Recap button when playback starts for TV episodes with cue points C215937 @analytics,@analyticsSkipRecap', async () => {
+	it('Skip Recap: When user selects Skip Recap button when playback starts for TV episodes with cue points C215937 @analyticsASet3,@analyticsSkipRecap', async () => {
 		const homePage = HomePage();
 		const searchPage = await homePage.selectSideNavTab(tabs.search);
 		await searchPage.enterSearch('the freak brothers');

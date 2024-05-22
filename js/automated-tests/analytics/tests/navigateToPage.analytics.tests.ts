@@ -29,7 +29,7 @@ describe('Navigate To Page', function () {
 		});
 	});
 
-	it('HomePage to VideoPage by CategoryComponent C21261 and C76112 and C76048 @analytics,@analyticsNavigateToPage', async () => {
+	it('HomePage to VideoPage by CategoryComponent C21261 and C76112 and C76048 @analyticsASet2,@analyticsNavigateToPage', async () => {
 		await testUtils.startApplicationAtPage('movies', {
 			shouldCreateNewUser: false,
 		});
@@ -41,7 +41,7 @@ describe('Navigate To Page', function () {
 		await verifyC21261(titleId);
 		await verifyC76112andC76048(titleId);
 	});
-	it('NavigateToPage - HomePage to SeriesDetailPage by CategoryComponent C21262 and UI:C63513 @analytics,@analyticsNavigateToPage', async () => {
+	it('NavigateToPage - HomePage to SeriesDetailPage by CategoryComponent C21262 and UI:C63513 @analyticsASet2,@analyticsNavigateToPage', async () => {
 		const homePage = HomePage();
 		await homePage.selectSideNavTab(tabs.tvShows);
 		const titleId = await homePage.getTVShowTitleId();
@@ -51,7 +51,7 @@ describe('Navigate To Page', function () {
 		await verifyC63513(serialTag);
 		await verifyC112681();
 	});
-	it('HomePage to VideoPage by CategoryComponent C21263 and C112680 @analytics,@analyticsNavigateToPage', async () => {
+	it('HomePage to VideoPage by CategoryComponent C21263 and C112680 @analyticsASet2,@analyticsNavigateToPage', async () => {
 		const homePage = HomePage();
 		await homePage.selectSideNavTab(tabs.movies);
 		const titleId = await homePage.getMovieTitleId();
@@ -61,7 +61,7 @@ describe('Navigate To Page', function () {
 		await verifyC21263(titleId);
 		await verifyC112680();
 	});
-	it('NavigateToPage - SearchPage to VideoPage by Search Result Component C21267 and C116493 and C3854 and C3856 @analytics,@analyticsNavigateToPage', async () => {
+	it('NavigateToPage - SearchPage to VideoPage by Search Result Component C21267 and C116493 and C3854 and C3856 @analyticsASet2,@analyticsNavigateToPage', async () => {
 		const homePage = HomePage();
 		const search = await homePage.selectSideNavTab(tabs.search);
 		await search.enterSearch('hey mr postman');
@@ -75,7 +75,7 @@ describe('Navigate To Page', function () {
 		await verifyC3854();
 		await verifyC3856();
 	});
-	it('Guest User selects My List from left Nav and is prompted to Sign In or Register, selects Ok C145000 @analytics,@analyticsNavigateToPage', async () => {
+	it('Guest User selects My List from left Nav and is prompted to Sign In or Register, selects Ok C145000 @analyticsASet2,@analyticsNavigateToPage', async () => {
 		const homePage = HomePage();
 		await homePage.selectSideNavTab(tabs.myStuff);
 		await ecp.sendKeypress(ecp.Key.Ok);

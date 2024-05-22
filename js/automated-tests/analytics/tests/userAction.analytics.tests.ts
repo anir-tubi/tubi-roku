@@ -13,7 +13,7 @@ describe('User action', function () {
 		});
 	});
 
-	it('User Action - Click on settings C112684 @analytics,@analyticsUserActions', async () => {
+	it('User Action - Click on settings C112684 @analyticsASet3,@analyticsUserActions', async () => {
 		const homePage = HomePage();
 		await homePage.selectSideNavTabNoPageReturn(tabs.settings);
 		await verifyC112684();
