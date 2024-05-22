@@ -144,7 +144,11 @@ Function getMultiStyleModal(modalInfo)
   subHeader = modalInfo.subHeader
   modal.id = getUniqueModalId(header, subHeader)
   modal.multiStyleMessage = modalInfo.multiStyleMessage
-  modal.imageDimensions = modalInfo.imageDimensions
+
+  if modalInfo.imageDimensions <> invalid then
+    modal.imageDimensions = modalInfo.imageDimensions
+  end if
+
   modal.imageUrls = modalInfo.imageUrls
   modal.header = header
   modal.subHeader = subHeader
