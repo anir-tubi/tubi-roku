@@ -198,13 +198,10 @@ describe('Details Page', function () {
     // https://tubi.testrail.io/index.php?/cases/view/535870
     it('C535870 - Movie Details - Given movie has history, when "Remove From History" is selected then buttons change to reflect a movie with no history @mdp_1', async () => {
 
-      // Back to Movies Screen
-      await ecp.sendKeypress(ecp.Key.Back, { count: 1 });
 
-      // On Movies page?
-      const onMoviesPageButton = await testUtils.getNodeForElement('onMoviesPageButton');
-      expect(onMoviesPageButton.visible).to.equal(true);
-      await ecp.sendKeypress(ecp.Key.Down, { count: 7 });  //Move to fresh movie title
+      // Launch app on Movies page
+      await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       // Create history
       await ecp.sendKeypress(ecp.Key.Play);
@@ -272,8 +269,8 @@ describe('Details Page', function () {
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
       // On Movies page?
-      const onMoviesPageButton = await testUtils.getNodeForElement('onMoviesPageButton');
-      expect(onMoviesPageButton.visible).to.equal(true);
+      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
 
       //Select title
       await ecp.sendKeypress(ecp.Key.Right);
@@ -307,8 +304,7 @@ describe('Details Page', function () {
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
       // On Movies page?
-      const onMoviesPageButton = await testUtils.getNodeForElement('onMoviesPageButton');
-      expect(onMoviesPageButton.visible).to.equal(true);
+      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       //Select title
       await ecp.sendKeypress(ecp.Key.Right);
@@ -331,8 +327,7 @@ describe('Details Page', function () {
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
 
       // On Movies page?
-      const onMoviesPageButton = await testUtils.getNodeForElement('onMoviesPageButton');
-      expect(onMoviesPageButton.visible).to.equal(true);
+      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       //Select title
       await ecp.sendKeypress(ecp.Key.Ok);
@@ -342,8 +337,8 @@ describe('Details Page', function () {
 
 
       // Verify that the title is listed on the Movies Details screen
-      const movieRunTime = await testUtils.getNodeForElement('movieRunTime');
-      expect(movieRunTime.visible).to.equal(true);
+      const movieRunTime = await testUtils.waitForElementToFullyShowOnScreen('movieRunTime');
+      
     });
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/141195
@@ -450,8 +445,8 @@ describe('Details Page', function () {
     it('C521094 - Registered User - Check Resume and Play icon and text from Details screen @mdp_1', async () => {
 
       // On Movies page?
-      const onMoviesPageButton = await testUtils.getNodeForElement('onMoviesPageButton');
-      expect(onMoviesPageButton.visible).to.equal(true);
+      await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       // Create history
       await ecp.sendKeypress(ecp.Key.Play);
@@ -525,24 +520,25 @@ describe('Details Page', function () {
     it('C537454 - Series - No History - When "Add to My List" selected then series is added to queue,@registered_user,@sdp_1', async () => {
 
       await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+      await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       // Select a title
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify we are on the details page
-      await testUtils.waitForElementToShowOnScreen('detailScreenTitle');
+      await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle', 'Screen title not found', 10000);
+      await testUtils.waitForElementToFullyShowOnScreen('titleDescriptionNew');
       const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-      expect(detailScreenTitle.text).to.not.be.empty;
-
-
+     
+  
       // Press Add to My List Button
       await testUtils.selectAndVerifyDetailPageMenuItem('addToMyList');
 
       // Check the My List container exists
       await ecp.sendKeypress(ecp.Key.Left, { count: 2 });
       await testUtils.waitForSideNavMenuToBeExpanded();
-      await testUtils.waitForElementToFullyShowOnScreen('leftNavHomeButton');
-      await ecp.sendKeypress(ecp.Key.Down, {count:2});
+      await testUtils.waitForElementToFullyShowOnScreen('leftNavMoviesIconNotFocused');
+      await ecp.sendKeypress(ecp.Key.Up, {count:2});
       await testUtils.waitForElementToFullyShowOnScreen('myStuffSelected');
       await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -563,13 +559,16 @@ describe('Details Page', function () {
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/535820
     it('C535820 Series - No History - When title is removed from queue then Remove From Queue changed to Add To Queue @sdp_1,@regression,@registered_user', async () => {
       await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+      await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+
+      // Select a Title
       await ecp.sendKeypress(ecp.Key.Ok);
-      const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-      expect(detailScreenTitle.visible).to.equal(true);
+      await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
 
       // Select the Remove from my list button and verify that it changes to Add to My List
       await testUtils.selectAndVerifyDetailPageMenuItem('addToMyList');
       await testUtils.selectAndVerifyDetailPageMenuItem('removeFromMyList');
+      await testUtils.waitForElementToFullyShowOnScreen('addToMyListButtonFocused');
 
     });
 
@@ -578,10 +577,13 @@ describe('Details Page', function () {
     it('C535821 - Series - No History - When episode is chosen then playback should triggered from the beginning @sdp_1,@smoke,@regression,@registered_user', async () => {
       // While on Series Details page, lets play and check playback starts from the beginning
       await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
-      await testUtils.waitForCurrentScreenToEqual('tvScreen');
+      await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+      
+      // Select a Title
       await ecp.sendKeypress(ecp.Key.Ok);
+
+      // Verify Playback from beginning
       await verifyPlayFromBeginning();
-      await ecp.sendKeypress(ecp.Key.Back); // Back to Details page
     });
 
 

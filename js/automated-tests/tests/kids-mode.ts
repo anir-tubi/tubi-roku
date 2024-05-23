@@ -8,7 +8,7 @@ describe('Kids Mode', function () {
   it('C537398 - Guest User - Toggle ON - Home Screen - When User Switches Parental Control to Older Kids Then Exit Kids is still present, @kidsmode_guest, @smoke', async () => {
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
     await openKidsMode();
-
+ 
     // Open Settings
     await shared.openSettings();
 

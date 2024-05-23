@@ -24,9 +24,9 @@ describe('Closed Captions Checks', function () {
     // Start a live feed
     await ecp.sendKeypress(ecp.Key.Ok);
     await utils.sleep(5000); // Needed this
-    
+   
     // Verify that video is playing
-    await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing', 15000);
+    await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 15000);
 
     // Turn on Linear CC
     

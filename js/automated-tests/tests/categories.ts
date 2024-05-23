@@ -57,6 +57,7 @@ describe('Categories', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
       await testUtils.waitForElementToFullyShowOnScreen('networksPageGridPoster');
       await ecp.sendKeypress(ecp.Key.Ok);
+      await testUtils.waitForElementToFullyShowOnScreen('titleDescriptionInChannelGrid');
       await testUtils.waitForElementToFullyShowOnScreen('channelsListScreenPoster');
 
       // Verify 6 rows only, navigate horizontally to last poster + 1
@@ -87,6 +88,7 @@ describe('Categories', function () {
     async function verifySixColumns() {
 
        // Verify 6 rows only, navigate horizontally to last poster + 1
+       await utils.sleep(1000);
        await ecp.sendKeypress(ecp.Key.Right, {count:6});
        await utils.sleep(1000);
 

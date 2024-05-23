@@ -79,7 +79,6 @@ describe('Application Launch', function () {
     const signOutVerificationModalMessage = await testUtils.getNodeForElement('signOutVerificationModalMessage');
     expect(signOutVerificationModalMessage.text).to.equal('You are about to sign out of your Tubi account.');
     await ecp.sendKeypress(ecp.Key.Ok);
-    const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
     await testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured');
   });
 

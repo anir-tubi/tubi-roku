@@ -289,7 +289,7 @@ async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/a
   }
 
   // Adding retries. May eventually want to allow turning on or off
-  mochaOptions.push('--retries 3');
+  mochaOptions.push('--retries 1');
 
   // We need to make our package here or else when we run in parallel they will all attempt to make the package at the same time
   await device.createPackage({
