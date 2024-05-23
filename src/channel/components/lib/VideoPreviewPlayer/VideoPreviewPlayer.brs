@@ -114,6 +114,8 @@ End Function
 
 'Occurs when m.Video.state changes (not when m.top.state changes)
 Function onVideoStateChange(msg)
+  ' deviceID is only temporary local variable to see the logs in crashlog as local variable snapshot.
+  deviceId = m.constants.deviceInfo.deviceId 'bs:disable-line 1001 LINT1005
   state = msg.GetData()
   'Adding below block to consider 'm.videoState' as single source of truth for the video state instead of directly accessing 'state' interface
   if state = "buffering"
@@ -159,6 +161,7 @@ End Function
 Function onVideoPositionChange(msg)
   TRY
     m.playerPosition = msg.GetData()
+    deviceId = m.constants.deviceInfo.deviceId
     ' Analytics
     if m.playerPosition >= m.lastPingTime + m.analyticsInterval
       previewProgressEvent = getPreviewProgressEvent(m.currentPageInfo, "onVideoPositionChange")
@@ -168,8 +171,7 @@ Function onVideoPositionChange(msg)
       end if
     end if
   CATCH e
-    ?  m.constants.deviceInfo.deviceId
-    THROW e
+    ?  deviceId
   END TRY
 
 End Function
