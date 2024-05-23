@@ -561,15 +561,20 @@ End Function
 
 
 Function getIndexByID(list, sID)
-  content = list.content
+
   index = -1
-  for i = 0 to content.getChildCount() - 1
-    item = content.getChild(i)
-    if item.id = sID
-      index = i
-      exit for
+  if list <> invalid AND isString(sID) = true
+    content = list.content
+    if content <> invalid
+      for i = 0 to content.getChildCount() - 1
+        item = content.getChild(i)
+        if item.id = sID
+          index = i
+          exit for
+        end if
+      end for
     end if
-  end for
+  end if
   return index
 End Function
 

@@ -231,8 +231,14 @@ Function onParentalSettingSelected()
         }
 
         msg1 = getTranslation("screenSettings_parentalPassword_setup_new_password") + ":" + chr(10)
-        msg2 = getTranslation("screenSettings_parentalPassword_visit_webBrowser") +chr(10)
-        msg3 = getTranslation("screenSettings_parentalPassword_email") +  m.settingsScreen.signInInfo.email + chr(10)
+        msg2 = getTranslation("screenSettings_parentalPassword_visit_webBrowser") + chr(10)
+
+        emailInfo = ""
+        if m.settingsScreen.signInInfo.email <> invalid
+          emailInfo = m.settingsScreen.signInInfo.email
+        end if
+
+        msg3 = getTranslation("screenSettings_parentalPassword_email") + emailInfo + chr(10)
         msg4 = getTranslation("screenSettings_parentalPassword_set_new_Password")
 
         message = msg1 + msg2 + msg3 + msg4

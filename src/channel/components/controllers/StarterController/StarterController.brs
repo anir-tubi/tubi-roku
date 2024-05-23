@@ -263,7 +263,9 @@ Function playAnimationLogo()
   if m.bufferingCompleted = true AND m.customSplashTimerCount >= m.splashScreenMin
     m.top.fadeOutCustomSplash = true
     m.videoPlayed = true
-    m.animationLogo.control = "play"
+    if m.animationLogo <> invalid
+      m.animationLogo.control = "play"
+    end if
   end if
 
 End Function

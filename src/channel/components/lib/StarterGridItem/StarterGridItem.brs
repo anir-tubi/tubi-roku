@@ -18,60 +18,63 @@ End Function
 Function onItemContentChange(msg)
   itemContent = msg.getData()
 
-  gridItemType = itemContent.gridItemType
+  if itemContent <> invalid
 
-  childGridItemComponent = invalid
-  if gridItemType = "emptyContainer" then
-    childGridItemComponent = "CategoryGridPoster"
-  else if gridItemType = "landscapeInnerMetadata" then
-    childGridItemComponent = "CategoryGridPoster"
-  else if gridItemType = "continue_watching_signed_out_user" then
-    childGridItemComponent = "CategoryGridPoster"
-  else if gridItemType = "linear" then 'For any linear content use CategoryGridPoster to add badges/progress bar etc
-    childGridItemComponent = "CategoryGridLinearPoster"
-  else if itemContent.type = "linear" then
-    row = itemContent.getParent()
-    if row <> invalid AND row.gridItemType = "landscapeNoTitle" OR row.gridItemType = "landscape" then
-      childGridItemComponent = "CategoryGridLinearPoster"
-    end if
-  else if itemContent.needsLogin = true AND isLoggedInUser() = false
-    childGridItemComponent = "CategoryGridPoster"
-  else
-    row = itemContent.getParent()
-    if row.id = "continue_watching" then
+    gridItemType = itemContent.gridItemType
+
+    childGridItemComponent = invalid
+    if gridItemType = "emptyContainer" then
       childGridItemComponent = "CategoryGridPoster"
-    end if
-  end if
-
-  if childGridItemComponent = invalid then
-    ' If we're only using the starter component then we want to unobserve all of the conditionally observed fields
-    if m.childGridItem <> invalid then
-      removeConditionalFieldObservers()
-      m.top.removeChild(m.childGridItem)
-      m.delete("childGridItem")
-    end if
-
-    sPosterURL = itemContent.HDGRIDPOSTERURL
-    m.poster.uri = sPosterURL
-    m.poster.visible = true
-  else
-    m.poster.visible = false
-    if m.childGridItem = invalid then
-      ' Create the child grid item component and setup observers to pass along data to it
-      m.childGridItem = m.top.createChild(childGridItemComponent)
-      removeConditionalFieldObservers()
-      addConditionalFieldObservers(m.childGridItem)
-    else if m.childGridItem.subtype() <> childGridItemComponent then
-      ' If our childGridItemComponent doesn't match then we need to throw it out and build the new component
-      m.top.removeChild(m.childGridItem)
-      m.childGridItem = m.top.createChild(childGridItemComponent)
-      removeConditionalFieldObservers()
-      addConditionalFieldObservers(m.childGridItem)
+    else if gridItemType = "landscapeInnerMetadata" then
+      childGridItemComponent = "CategoryGridPoster"
+    else if gridItemType = "continue_watching_signed_out_user" then
+      childGridItemComponent = "CategoryGridPoster"
+    else if gridItemType = "linear" then 'For any linear content use CategoryGridPoster to add badges/progress bar etc
+      childGridItemComponent = "CategoryGridLinearPoster"
+    else if itemContent.type = "linear" then
+      row = itemContent.getParent()
+      if row <> invalid AND row.gridItemType = "landscapeNoTitle" OR row.gridItemType = "landscape" then
+        childGridItemComponent = "CategoryGridLinearPoster"
+      end if
+    else if itemContent.needsLogin = true AND isLoggedInUser() = false
+      childGridItemComponent = "CategoryGridPoster"
+    else
+      row = itemContent.getParent()
+      if row <> invalid AND row.id = "continue_watching" then
+        childGridItemComponent = "CategoryGridPoster"
+      end if
     end if
 
-    if m.childGridItem <> invalid then
-      ' Pass along the itemContent to the child
-      m.childGridItem.itemContent = itemContent
+    if childGridItemComponent = invalid then
+      ' If we're only using the starter component then we want to unobserve all of the conditionally observed fields
+      if m.childGridItem <> invalid then
+        removeConditionalFieldObservers()
+        m.top.removeChild(m.childGridItem)
+        m.delete("childGridItem")
+      end if
+
+      sPosterURL = itemContent.HDGRIDPOSTERURL
+      m.poster.uri = sPosterURL
+      m.poster.visible = true
+    else
+      m.poster.visible = false
+      if m.childGridItem = invalid then
+        ' Create the child grid item component and setup observers to pass along data to it
+        m.childGridItem = m.top.createChild(childGridItemComponent)
+        removeConditionalFieldObservers()
+        addConditionalFieldObservers(m.childGridItem)
+      else if m.childGridItem.subtype() <> childGridItemComponent then
+        ' If our childGridItemComponent doesn't match then we need to throw it out and build the new component
+        m.top.removeChild(m.childGridItem)
+        m.childGridItem = m.top.createChild(childGridItemComponent)
+        removeConditionalFieldObservers()
+        addConditionalFieldObservers(m.childGridItem)
+      end if
+
+      if m.childGridItem <> invalid then
+        ' Pass along the itemContent to the child
+        m.childGridItem.itemContent = itemContent
+      end if
     end if
   end if
 End Function

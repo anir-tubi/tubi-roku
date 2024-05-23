@@ -257,6 +257,8 @@ End Function
 ' Used to remove all children from the provided node
 ' @node: node, the node that we want to remove all the children from
 Function tubiNodeHelpers_removeAllChildren(node)
-  childCount = node.getChildCount()
-  node.removeChildrenIndex(childCount, 0)
+  if node <> invalid
+    childCount = node.getChildCount()
+    node.removeChildrenIndex(childCount, 0)
+  end if
 End Function
