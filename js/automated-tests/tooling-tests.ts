@@ -565,6 +565,16 @@ describe('test-utils', function () {
         expect(userSettings.parental_rating).to.equal(ParentalRating.olderKids);
       });
     });
+
+
+    describe('enableVideoPreview', function () {
+      it('should properly change video preview setting', async () => {
+        const user = await testUtils.createRegisteredUser();
+        await user.enableVideoPreview(false);
+        const userSettings = await user.getUserSettings();
+        expect(userSettings.enable_video_preview).to.be.false;
+      });
+    });
   });
 
 

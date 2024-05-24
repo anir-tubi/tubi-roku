@@ -329,11 +329,7 @@ class TestUtils {
           break;
       }
       const language = locale.slice(0, 2);
-<<<<<<< add_getUserSettings_and_setParentalRating
       constantsUpdates = {
-=======
-      deeplink['constantsUpdates'] = {
->>>>>>> master
         'deviceInfo.locale': locale,
         'deviceInfo.language': language
       };
@@ -1784,6 +1780,17 @@ class RegisteredUser extends User {
       body: {
         parental_rating: parentalRating,
         password: this.userInfo.password
+      }
+    });
+  }
+
+
+  public async enableVideoPreview(enabled: boolean) {
+    await this.sendTubiAuthNetworkRequest({
+      method: 'patch',
+      url: auth.baseAccountUrl + '/user/settings',
+      body: {
+        enable_video_preview: enabled
       }
     });
   }
