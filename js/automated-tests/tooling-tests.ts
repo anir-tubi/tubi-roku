@@ -3,7 +3,7 @@
 import { expect } from 'chai';
 import { ecp, odc, utils } from 'roku-test-automation';
 import type { RegisteredUser } from './test-utils';
-import { auth, testUtils } from './test-utils';
+import { ParentalRating, auth, testUtils } from './test-utils';
 import { elements } from '../../automated-tests-config/elements';
 
 describe('test-utils', function () {
@@ -553,6 +553,16 @@ describe('test-utils', function () {
           expect(Array.isArray(result)).to.be.true;
           expect(result.length).to.be.equal(0);
         });
+      });
+    });
+
+
+    describe('changeParentalRating', function () {
+      it('should properly change parental rating', async () => {
+        const user = await testUtils.createRegisteredUser();
+        await user.changeParentalRating(ParentalRating.olderKids);
+        const userSettings = await user.getUserSettings();
+        expect(userSettings.parental_rating).to.equal(ParentalRating.olderKids);
       });
     });
   });

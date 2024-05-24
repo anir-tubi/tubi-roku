@@ -329,7 +329,11 @@ class TestUtils {
           break;
       }
       const language = locale.slice(0, 2);
+<<<<<<< add_getUserSettings_and_setParentalRating
+      constantsUpdates = {
+=======
       deeplink['constantsUpdates'] = {
+>>>>>>> master
         'deviceInfo.locale': locale,
         'deviceInfo.language': language
       };
@@ -1428,7 +1432,7 @@ class TestUtils {
 
 
 class Auth {
-  private baseAccountUrl = 'https://account.production-public.tubi.io';
+  public baseAccountUrl = 'https://account.production-public.tubi.io';
   private deviceId: string;
   private anonymousTokenInfo: {
     access_token: string;
@@ -1770,6 +1774,26 @@ class RegisteredUser extends User {
     this.userInfo = await auth.userSignup(credentials);
     this.userInfo.password = credentials.password;
     this.accessToken = this.userInfo.access_token;
+  }
+
+
+  public async changeParentalRating(parentalRating: ParentalRating) {
+    await this.sendTubiAuthNetworkRequest({
+      method: 'put',
+      url: auth.baseAccountUrl + '/user/settings/parental_rating',
+      body: {
+        parental_rating: parentalRating,
+        password: this.userInfo.password
+      }
+    });
+  }
+
+
+  public async getUserSettings() {
+    return await this.sendTubiAuthNetworkRequest({
+      method: 'get',
+      url: auth.baseAccountUrl + '/user/settings',
+    }) as UserInfoResponse;
   }
 
 
@@ -2202,6 +2226,13 @@ enum ContentRatings {
   'NR' = 'NR'
 }
 
+enum ParentalRating {
+  'adults' = 3,
+  'teens' = 2,
+  'olderKids' = 1,
+  'littleKids' = 0
+}
+
 
 type StartApplicationArgs = {
   /** If true then we will create a new user account and start the application signed in as that user. */
@@ -2234,5 +2265,6 @@ export {
   RegisteredUser,
   AnonymousUser,
   ContentTypes,
-  ContentRatings
+  ContentRatings,
+  ParentalRating
 };
