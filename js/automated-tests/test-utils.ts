@@ -283,9 +283,10 @@ class TestUtils {
 
   // Starts the application at the specified page.
   // args: options to modify starting application state such as wether a user is logged in or not
-  public async startApplicationAtPage(page: DeeplinkPage | 'search', args: StartApplicationArgs = {}) {
+  public async startApplicationAtPage(page: DeeplinkPage | 'search' | 'settings' | 'myStuff', args: StartApplicationArgs = {}) {
     let deeplink;
-    if (page !== 'search') {
+    const isNonDeeplinkPage = ['search', 'settings', 'myStuff'].includes(page);
+    if (!isNonDeeplinkPage) {
       deeplink = {
         page: page
       };
@@ -293,8 +294,8 @@ class TestUtils {
 
     await this.startApplicationWithDeeplink(deeplink, args);
 
-    if (page === 'search') {
-      await this.goToPage('search');
+    if (isNonDeeplinkPage) {
+      await this.goToPage(page);
     }
   }
 
@@ -402,13 +403,16 @@ class TestUtils {
 
 
   // Helper for going to a different page in the application
-  public async goToPage(page: DeeplinkPage | 'search' | 'settings') {
+  public async goToPage(page: DeeplinkPage | 'search' | 'settings' | 'myStuff') {
     if (page === 'search') {
       // We don't have a deeplink for these so we access it on the side nav menu instead
       await this.selectMenuItem('sideNavMenu', 'Search', undefined);
     } else if (page === 'settings') {
       // We don't have a deeplink for these so we access it on the side nav menu instead
       await this.selectMenuItem('sideNavMenu', 'Settings', undefined);
+    } else if (page === 'myStuff') {
+      // We don't have a deeplink for these so we access it on the side nav menu instead
+      await this.selectMenuItem('sideNavMenu', 'My Stuff', undefined);
     } else {
       await ecp.sendInput({
         params: {

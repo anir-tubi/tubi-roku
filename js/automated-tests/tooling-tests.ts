@@ -13,6 +13,13 @@ describe('test-utils', function () {
   });
 
   describe('TestUtils', function () {
+    describe('startApplicationAtPage', function () {
+      it('should be able to start the application at on the my stuff screen', async () => {
+        await testUtils.startApplicationAtPage('myStuff');
+        await testUtils.waitForCurrentScreenToEqual('myStuffScreen');
+      });
+    });
+
     describe('startApplicationWithDeeplink', function () {
       it('should be able to override current device language', async () => {
         await testUtils.startApplicationWithDeeplink(undefined, {
