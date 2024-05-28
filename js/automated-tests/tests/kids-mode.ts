@@ -412,8 +412,7 @@ async function signInUserFromParentalControls() {
   await ecp.sendKeypress(ecp.Key.Down, { count: 4 });
   await ecp.sendKeypress(ecp.Key.Ok);
 
-  const signInScreenPasswordBox = await testUtils.getNodeForElement('signInScreenPasswordBox');
-  expect(signInScreenPasswordBox.visible).to.be.true;
+  await testUtils.waitForElementToFullyShowOnScreen('signInScreenPasswordBox', 'Password box not found', 10000);
   await ecp.sendKeypress(ecp.Key.Ok);
   await ecp.sendText('111111');
   await ecp.sendKeypress(ecp.Key.Right);
