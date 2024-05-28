@@ -1,6 +1,8 @@
 'use strict';
 // This file provides some functions for running our own automated tests.
 
+const branchTestingFolder = './out/automated_tests_branch';
+
 // We're using TypeScript code here so have to include this
 require('ts-node/register');
 
@@ -47,18 +49,37 @@ async function runAutomatedTestsCli(done, testsPath = 'js/automated-tests/tests/
     return;
   }
 
-  const {branch} = await prompts({
-    type: 'text',
-    name: 'branch',
-    message: 'Enter the branch name you would like to run against. If you would like to use the current checked out version then just hit enter'
-  });
+  let shouldUseExistingBranch = false;
 
-  if (branch === undefined) {
-    // User hit control-c to exit so don't continue
-    done();
-    return;
+  if (fs.existsSync(branchTestingFolder)) {
+    // If we have a branch folder then ask them if they want to use that instead of inputting a new one
+    const existingBranchName = execShellCommand(done, `git -C ${branchTestingFolder} branch --show-current`).trim();
+    const result = await prompts({
+      type: 'confirm',
+      name: 'shouldUseExistingBranch',
+      message: `An existing branch '${existingBranchName}' was found. Would you like to reuse it and pull down the latest changes?`
+    });
+    shouldUseExistingBranch = result.shouldUseExistingBranch;
   }
-  await runAutomatedTests(done, branch, tags, testsPath);
+
+  let branch = '';
+  if (!shouldUseExistingBranch) {
+    const {branchInput} = await prompts({
+      type: 'text',
+      name: 'branchInput',
+      message: 'Enter the branch name you would like to run against. If you would like to use the current checked out version then just hit enter'
+    });
+
+    if (branchInput === undefined) {
+      // User hit control-c to exit so don't continue
+      done();
+      return;
+    } else {
+      branch = branchInput;
+    }
+  }
+
+  await runAutomatedTests(done, branch, tags, testsPath, shouldUseExistingBranch);
   done();
 }
 
@@ -228,7 +249,7 @@ function runAutomatedTestsSmoke(done) {
 }
 
 
-async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/automated-tests/tests/*.ts') {
+async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/automated-tests/tests/*.ts', shouldUseExistingBranch = false) {
   // Load env file to allow overrides while developing tests
   const envPath = '.vscode/.env';
   if (fs.existsSync(envPath)) {
@@ -269,8 +290,11 @@ async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/a
   }
 
   let applicationFolder = './';
-  if (branch) {
-    applicationFolder = './out/automated_tests_branch';
+  if (shouldUseExistingBranch) {
+    applicationFolder = branchTestingFolder;
+    execShellCommand(done, `git -C ${applicationFolder} pull`);
+  } else if (branch) {
+    applicationFolder = branchTestingFolder;
     execShellCommand(done, `rm -rf ${applicationFolder}`);
     execShellCommand(done, `git clone --branch ${branch} --depth 1 git@github.com:adRise/project-total-recall.git ${applicationFolder}`);
   }

@@ -19,7 +19,7 @@ describe('Playback', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/vie/537905
-  it('C537905 - Forward Playback 30 seconds @playback_1,@guest_user', async () => {
+  it('C537905 - Forward Playback 30 seconds @playback_1', async () => {
 
     // Start at home page to select another title, different from previous test
     await testUtils.startApplicationAtPage('home');
@@ -48,10 +48,10 @@ describe('Playback', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/537378
-  it('C537378 - Rewind Payback 30 seconds @playback_1,@guest_user', async () => {
+  it('C537378 - Rewind Payback 30 seconds @playback_1', async () => {
 
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: true });
-   
+
     // Are we on the home page?
     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
@@ -73,7 +73,7 @@ describe('Playback', function () {
     //Get player position
     const currentposition = await testUtils.getPlayerPosition();
     const startposition = currentposition;
-    
+
 
     // Hover on the rewind 30 second button, get start position
     await ecp.sendKeypress(ecp.Key.Left);
@@ -208,7 +208,7 @@ describe('Playback', function () {
 
     // FF button highlighted
     await testUtils.waitForElementToFullyShowOnScreen('fastForwardButton');
-    
+
     // Press FF button three time
     await ecp.sendKeypress(ecp.Key.Ok, { count: 3 });
 
@@ -264,7 +264,7 @@ describe('Playback', function () {
     await ecp.sendKeypress(ecp.Key.Play);
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'paused');
 
-    
+
 
     // verify resume when user goes back to series screen and selects/plays title again
     await verifyResumeWithinRangeWhenBackToScreen();
@@ -367,7 +367,7 @@ describe('Playback', function () {
 
     // Rewind button highlighted
     const rewindButton = await testUtils.waitForElementToFullyShowOnScreen('rewindButton');
-   
+
     // Press Rewind button 4x
     await ecp.sendKeypress(ecp.Key.Ok, { count: 4 });
 

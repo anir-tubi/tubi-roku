@@ -98,7 +98,7 @@ describe('Application Launch', function () {
     await createHistory();
     await ecp.sendKeypress(ecp.Key.Back);
     await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton');
-    
+
 
 
     // Exit app and restart
@@ -120,7 +120,7 @@ describe('Application Launch', function () {
 
     // Launch app
     await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
-    
+
     // Check for presence of Movies Grid
     await testUtils.findRowIndexWithTitle('movieScreenRowList', 'Featured');
 
@@ -142,10 +142,10 @@ describe('Application Launch', function () {
   });
 
   // https://tubi.testrail.io/index.php?/cases/view/114199
-  it('C114199 - Registration Prompt in Continue Watching Container - Homescreen - Navigate to Continue Watching Container @guest_user @application_launch', async () => {
+  it('C114199 - Registration Prompt in Continue Watching Container - Homescreen - Navigate to Continue Watching Container @application_launch', async () => {
     // Launch as guest
     await testUtils.startApplicationAtPage('home', { shouldCreateNewUser: false });
-    
+
     // Check for presence of Movies Grid
     await testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured');
 

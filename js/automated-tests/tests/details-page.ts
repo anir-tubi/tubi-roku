@@ -338,7 +338,7 @@ describe('Details Page', function () {
 
       // Verify that the title is listed on the Movies Details screen
       const movieRunTime = await testUtils.waitForElementToFullyShowOnScreen('movieRunTime');
-      
+
     });
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/141195
@@ -390,7 +390,7 @@ describe('Details Page', function () {
     });
 
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/https://tubi.testrail.io/index.php?/cases/view/537368
-    it('C537368 - Movie Details - No History present - Guest - Resume Playback from beginning @guest_user,@smoke,@mdp_1', async () => {
+    it('C537368 - Movie Details - No History present - Guest - Resume Playback from beginning @smoke,@mdp_1', async () => {
       // Start Application at Movies page with Guest user
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: false });
 
@@ -529,8 +529,8 @@ describe('Details Page', function () {
       await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle', 'Screen title not found', 10000);
       await testUtils.waitForElementToFullyShowOnScreen('titleDescriptionNew');
       const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-     
-  
+
+
       // Press Add to My List Button
       await testUtils.selectAndVerifyDetailPageMenuItem('addToMyList');
 
@@ -578,7 +578,7 @@ describe('Details Page', function () {
       // While on Series Details page, lets play and check playback starts from the beginning
       await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
       await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
-      
+
       // Select a Title
       await ecp.sendKeypress(ecp.Key.Ok);
 

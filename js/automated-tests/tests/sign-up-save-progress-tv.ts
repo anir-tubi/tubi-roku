@@ -15,7 +15,7 @@ describe('Sign up Save Progress TV', function () {
 
 
 // https://tubi.testrail.io/index.php?/cases/view/260843
-    it('C260843 - Guest - When (Tubi) user clicks the "Sign Up to Save Progress" button on the Details page, the user is redirected to  the Registration/Sign In modal, @guest_user,@signupsaveprogress,@smoke', async () => {
+    it('C260843 - Guest - When (Tubi) user clicks the "Sign Up to Save Progress" button on the Details page, the user is redirected to the Registration/Sign In modal @signupsaveprogress,@smoke', async () => {
 
         // Select a title
         await ecp.sendKeypress(ecp.Key.Ok);
@@ -116,7 +116,7 @@ describe('Sign up Save Progress TV', function () {
 
         // Wait for Let's create your account modal (Roku modal, no elements)
         await utils.sleep(5000);
-        
+
          // Click Down, Ok to Cancel
         await ecp.sendKeypress(ecp.Key.Down);
         await ecp.sendKeypress(ecp.Key.Ok);
