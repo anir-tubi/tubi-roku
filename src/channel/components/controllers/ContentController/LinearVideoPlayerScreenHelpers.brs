@@ -372,68 +372,68 @@ Function onLiveStreamManifestResponse(response)
     videoPlayer = getFromScreenCache(m.constants.ui.screenIds.linearVideoPlayerScreen)
 
     content = invalid
-    if videoPlayer <> invalid AND videoPlayer.content <> invalid then
+    if videoPlayer <> invalid then
       content = videoPlayer.content
-    end if
 
-    ' piece together the modified playback url
-    ' The url that will be used for the video stream must be built from the original url returned by the API
-    ' and from the "analytics url"/ad polling url. For more info, please see:
-    ' https://docs.google.com/document/d/14Ovs4KzV0iwloKtILjSZhQxT2NcGdGCm80MIMvB9EfE
-    originalUrl = invalid
+      ' piece together the modified playback url
+      ' The url that will be used for the video stream must be built from the original url returned by the API
+      ' and from the "analytics url"/ad polling url. For more info, please see:
+      ' https://docs.google.com/document/d/14Ovs4KzV0iwloKtILjSZhQxT2NcGdGCm80MIMvB9EfE
+      originalUrl = invalid
 
-    modifiedUrl = ""
-    if content <> invalid AND content.videoResources <> invalid
-      videoResources = content.videoResources
+      modifiedUrl = ""
+      if content <> invalid AND content.videoResources <> invalid
+        videoResources = content.videoResources
 
-      ' Eventhough LIVE has only hlsv3 contents, we are keeping newVideoResources as 2 dimensional array of arrays like VOD to make it consistent.
-      ' Also in future, we may have HEVC/4k/DRM support for LIVE as well. At that time, we need minor updates to 2 dimensional array with CODEC grouping.
-      newVideoResources = []
+        ' Eventhough LIVE has only hlsv3 contents, we are keeping newVideoResources as 2 dimensional array of arrays like VOD to make it consistent.
+        ' Also in future, we may have HEVC/4k/DRM support for LIVE as well. At that time, we need minor updates to 2 dimensional array with CODEC grouping.
+        newVideoResources = []
 
-      for each resources in videoResources
-        for each resource in resources
-          newResources = []
-          newResource = resource
-          if resource.type = m.constants.player.drmTypes.hlsv3
-            if resource.url <> invalid
-              ' For linear content that is serving ads via YoSpace, the video resource that is used to fetch
-              ' the manifest actually redirects through a Tubi "manifest server" and to a YoSpace server
-              ' to get the manifest response. When reconstructing the YoSpace manifest url to include the
-              ' session id, we need to use the original YoSpace stream url and not the video resource url
-              ' provided by UAPI. We get the original YoSpace stream url from the "location" header since
-              ' it is a redirect.
-              if response.headers <> invalid AND response.headers.location <> invalid
-                originalUrl = m.request.removeCharlesProxy(response.headers.location) ' Remove Charles proxy appended by Charles rule for clean redirect.
-              else
-                originalUrl = resource.url
+        for each resources in videoResources
+          for each resource in resources
+            newResources = []
+            newResource = resource
+            if resource.type = m.constants.player.drmTypes.hlsv3
+              if resource.url <> invalid
+                ' For linear content that is serving ads via YoSpace, the video resource that is used to fetch
+                ' the manifest actually redirects through a Tubi "manifest server" and to a YoSpace server
+                ' to get the manifest response. When reconstructing the YoSpace manifest url to include the
+                ' session id, we need to use the original YoSpace stream url and not the video resource url
+                ' provided by UAPI. We get the original YoSpace stream url from the "location" header since
+                ' it is a redirect.
+                if response.headers <> invalid AND response.headers.location <> invalid
+                  originalUrl = m.request.removeCharlesProxy(response.headers.location) ' Remove Charles proxy appended by Charles rule for clean redirect.
+                else
+                  originalUrl = resource.url
+                end if
+
+                if ssaiUsed = "apollo"
+                  modifiedUrl = originalUrl
+                else
+                  modifiedUrl = constructModifiedLinearVideoUrl(originalUrl, pollUrl)
+                end if
+
+                newResource.url = m.request.passThroughCharlesProxy(modifiedUrl)
               end if
-
-              if ssaiUsed = "apollo"
-                modifiedUrl = originalUrl
-              else
-                modifiedUrl = constructModifiedLinearVideoUrl(originalUrl, pollUrl)
-              end if
-
-              newResource.url = m.request.passThroughCharlesProxy(modifiedUrl)
             end if
-          end if
 
-          newResources.push(newResource)
-          newVideoResources.push(newResources)
+            newResources.push(newResource)
+            newVideoResources.push(newResources)
+          end for
         end for
-      end for
 
-      content.videoResources = newVideoResources
+        content.videoResources = newVideoResources
+      end if
+
+      videoPlayer.content = content
+      videoPlayer.updateContent = true
+      ' AA used here because sending these 2 information asynchronously might create issue of using wrong ssai and not sending any pixels.
+      videoPlayer.pollUrlAA = {
+        "pollUrl": pollUrl
+        "ssaiUsed": ssaiUsed
+      }
+      sendVideoPlayerCommand(videoPlayer, "play")
     end if
-
-    videoPlayer.content = content
-    videoPlayer.updateContent = true
-    ' AA used here because sending these 2 information asynchronously might create issue of using wrong ssai and not sending any pixels.
-    videoPlayer.pollUrlAA = {
-      "pollUrl": pollUrl
-      "ssaiUsed": ssaiUsed
-    }
-    sendVideoPlayerCommand(videoPlayer, "play")
   end if
 End Function
 
