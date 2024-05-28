@@ -99,6 +99,7 @@ Function processInAppMessage(message)
     if extras <> invalid AND extras.template <> invalid
 
       data = getBrazeModalData(message)
+
       if extras.template = "toast"
         showToastStyleModal(data.modalInfo, data.buttonList)
       else

@@ -30,7 +30,7 @@
 Function showModal(modalInfo, buttonInfo)
   ' Don't create the modal if a modal already exists, or there is not enough info to create it
   if m.tempModal = invalid AND modalInfo <> invalid AND buttonInfo <> invalid
-
+    removeFocusFromRowlist()
     modal = getSimpleModal(modalInfo)
 
     m.tempModal = {
@@ -98,7 +98,7 @@ Function showMultiStyleModal(modalInfo, buttonInfo)
 
   ' Don't create the modal if a modal already exists, or there is not enough info to create it
   if m.tempModal = invalid AND modalInfo <> invalid AND buttonInfo <> invalid
-
+    removeFocusFromRowlist()
     modal = getMultiStyleModal(modalInfo)
     addButtonsToModal(modal, buttonInfo)
 
@@ -598,6 +598,7 @@ End Function
 Function showToastStyleModal(modalInfo, buttonInfo)
   ' Don't create the modal if a modal already exists, or there is not enough info to create it
   if m.tempModal = invalid AND modalInfo <> invalid AND buttonInfo <> invalid
+    removeFocusFromRowlist()
     modal = CreateObject("roSgNode", "ToastStyleDialogScreen")
     modal.update({
       header: modalInfo.header
@@ -626,4 +627,16 @@ Function showToastStyleModal(modalInfo, buttonInfo)
   end if
 
   return invalid
+End Function
+
+
+Function removeFocusFromRowlist()
+  if type(getCurrentScreen) = "Function" 'bs:disable-line 1001 LINT1001
+    screen = getCurrentScreen() 'bs:disable-line 1001 LINT1001
+    ' Due to a bug in roku when we set focus to rowlist and immediately set focus to modal.
+    ' Modal does not seem to be receive focus properly. So we are force removing focus away from rowlist before displaying the modal.
+    if screen.hasField("removeFocusFromRowList") = true
+      screen.removeFocusFromRowList = true
+    end if
+  end if
 End Function

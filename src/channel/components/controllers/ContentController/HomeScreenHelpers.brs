@@ -895,9 +895,6 @@ Function onHomescreenContentReady(msg)
       'show registration welcome Screen only to new user over homescreen.
       'we need to check if user already signed up in detail Screen if they have entered through deeplink.
       if hasRegModalBeenShown() = false
-        ' Due to a bug in roku when we set focus to rowlist and immediately set focus to modal.
-        ' Modal does not seem to be receive focus properly. So we are force removing focus away from modal before displaying the modal.
-        homeScreen.removeFocusFromRowList = true
         showRegistrationWelcomeModal()
       end if
 
