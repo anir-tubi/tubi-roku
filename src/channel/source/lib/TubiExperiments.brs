@@ -79,7 +79,7 @@ Function TubiExperiments(constants) as Object
       }
 
       roku_browse_while_watching_ymal: {
-        roku_browse_while_watching_ymal_v4 : {"enabled": false}
+        roku_browse_while_watching_ymal_v4 : {"enabled": true}
       }
 
       roku_relaunch_series: {
