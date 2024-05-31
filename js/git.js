@@ -210,7 +210,7 @@ async function createCdnPrUrl(done, cdn = 'cdn') {
   const moveStarterComponentsResult = shell.cp(localStarterComponentsPath, cdnStarterComponentsPath);
   if (moveStarterComponentsResult.stderr) {
     const errorMsg = `There was an error moving the starter components. You will need to manually copy the starter components and remote components and manually make a PR.
-           Error Message: ${moveStarterComponentsResult.stderr}`;
+          Error Message: ${moveStarterComponentsResult.stderr}`;
     done(new NoStackError(errorMsg));
   }
 
@@ -219,8 +219,25 @@ async function createCdnPrUrl(done, cdn = 'cdn') {
   const moveRemoteComponentsRes = shell.cp(localRemoteComponentsPath, cdnRemoteComponentsPath);
   if (moveRemoteComponentsRes.stderr) {
     const errorMsg = `There was an error moving the remote components. You will need to manually copy the remote components and manually make a PR.
-           Error Message: ${moveRemoteComponentsRes.stderr}`;
+          Error Message: ${moveRemoteComponentsRes.stderr}`;
     done(new NoStackError(errorMsg));
+  }
+
+  // copy the rollback starter components from the /build directory to the CDN repo rollbackStarterComponents directory for backup
+  if (cdn === 'rcdn') {
+    // create the directory if it doesn't exist
+    const makeVersionAsDir = shell.mkdir('-p', `${cdnPath}/rollbackStarterComponents/${fullBuildTag}`);
+    if (!makeVersionAsDir.stderr) {
+      let rollbackStarterComponentsPath = `${cdnPath}/rollbackStarterComponents/${fullBuildTag}/${starterComponentsFileName}`;
+
+      log(`...Copying the rollback starter components to the rollbackStarterComponents directory`);
+      const copyRollbackStarterComponentsRes = shell.cp(localStarterComponentsPath, rollbackStarterComponentsPath);
+
+      if (copyRollbackStarterComponentsRes.stderr) {
+        //just print the error message and continue.
+        log(`There was an error moving the starter component to rollback directory. You will need to manually copy the starter component to rollbackStarterComponents/fullVersion/ and create a PR.`);
+      }
+    }
   }
 
   // add the updates so they are staged for commit
