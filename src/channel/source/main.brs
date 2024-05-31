@@ -522,13 +522,41 @@ Function logCrashesOnStartup(args, log, constants)
 
   reason = args.lastExitOrTerminationReason
   if reason <> invalid AND reasonBlacklist[reason] <> true
-    messageInfo = {
-      message: constants.errors.type.crashOnPreviousRun
-      model: constants.deviceInfo.model
-      name: reason
-      type: constants.errors.type.crashOnPreviousRun
-    }
-    log.exception(messageInfo, "warn", m.queue, 1)
+    appManager = createObject("roAppManager")
+
+    ' Check if we can use the new method available in 13+ firmware
+    if findMemberFunction(appManager, "getLastExitInfo") <> invalid then
+      baseMessageContents = appManager.getLastExitInfo()
+      baseMessageContents["connectionType"] = createObject("roDeviceInfo").getConnectionType()
+
+      clientLogsMessageContents = {}
+      clientLogsMessageContents.append(baseMessageContents)
+
+      ' Check if we are too big to send the full console_logs to client logs
+      clientLogsMessage = formatJson(clientLogsMessageContents)
+      if clientLogsMessage.len() > 1700 then
+        ' If so then trim it
+        clientLogsMessageContents.console_log = "..." + right(clientLogsMessageContents.console_log, 1500)
+        clientLogsMessage = formatJson(clientLogsMessageContents)
+      end if
+
+      log.info(clientLogsMessage, "clientInfo", "last-exit-info", m.queue, 1)
+
+      sentryMessageContents = baseMessageContents
+      sentryMessageContents.append({
+        "name": reason
+        "type": constants.errors.type.crashOnPreviousRun
+      })
+      log.exception(sentryMessageContents, "warn", m.queue, 1)
+    else
+      messageInfo = {
+        message: constants.errors.type.crashOnPreviousRun
+        model: constants.deviceInfo.model
+        name: reason
+        type: constants.errors.type.crashOnPreviousRun
+      }
+      log.exception(messageInfo, "warn", m.queue, 1)
+    end if
   end if
 End Function
 
