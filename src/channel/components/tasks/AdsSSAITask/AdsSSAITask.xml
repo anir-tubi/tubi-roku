@@ -11,6 +11,7 @@
     <script type="text/brightscript" uri="../../../source/lib/RequestQueue.brs" />
     <script type="text/brightscript" uri="../../../source/lib/Auth.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiTracking.brs" />
+    <script type="text/brightscript" uri="pkg:/components/lib/DeviceMixin.brs" />
     <script type="text/brightscript" uri="../../../source/lib/TubiAds.brs" />
     <script type="text/brightscript" uri="../../../source/lib/YoSpaceId3s.brs" />
     <script type="text/brightscript" uri="pkg:/source/lib/apolloId3s.brs" />
@@ -56,8 +57,8 @@
         <!-- Holds the consent opt out status for all individual preferences like marketing,analytics etc. -->
         <field id="userConsentsOptOutStatus" type="assocarray" value="{}" />
 
-        <!-- indicates whether user opted out of Personalized Advertising either through initial consent or settings screen. -->
-        <field id="didUserOptOutOfPersonalizedAdvertising" type="boolean" value="false"/>
+        <!-- Holds the tcf string value. -->
+        <field id="tcfString" type="string" />
 
       <!-- OUTPUT -->
         <!-- updated video resources with urls that include ad params needed by yospace/apollo to fetch ads from

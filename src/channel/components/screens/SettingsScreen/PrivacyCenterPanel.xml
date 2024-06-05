@@ -18,12 +18,9 @@
     <field id="consentSettings" type="assocarray"/>
     <field id="title" type="string" alias="heading.text"/>
     <field id="offset" alias="Offset.translation"/>
-
-    <!-- Holds the value of qr code temp uri path.  -->
-    <field id="dsarQrCodeUri" type="string" alwaysNotify="true" />
     
     <!-- Holds the true/false based on if the user is in adults mode and not in kids mode, and not in teens parental controls.  -->
-    <field id="isAllowedToManageConsent" type="boolean" value="false" />
+    <field id="isAllowedToManageConsent" type="boolean" />
 
     <!-- OUTPUTS -->
     <field id="newConsentPreferences" type="assocarray" alias="managePreferences.selectedConsent" />
@@ -31,6 +28,9 @@
 
     <!-- Holds the true/false based on if the user tried to navigate away from privacy center manage preferences.  -->
     <field id="didUserSelectSaveAndRestart" alias="saveAndContinueButton.selected" alwaysNotify="true" />
+
+    <!-- Holds the true/false based on if the user selected manage privacy settings button.  -->
+    <field id="didUserSelectManagePrivacySettingsButton" alias="managePrivacySettingsButton.selected" alwaysNotify="true" />
   </interface>
 
   <children>
@@ -43,14 +43,29 @@
           <Font
             role="font"/>
         </Label>
+        <Label
+          id="viewPrivacySettingsHint"
+          width="1176"
+          visible="false"
+          wrap="true"
+          translation="[0, 75]">
+          <Font
+            role="font"/>
+        </Label>
+        <SimpleButton
+          visible="false"
+          translation="[0, 153]"
+          id="managePrivacySettingsButton"
+          width="369" />
         <ManagePreferences
+          visible="false"
           id="managePreferences"
           bottomGradientUri="pkg:/images/list_overflow_bottom_gradient-settings.webp"
           translation="[0, 72]" />
         <SimpleButton
           id="saveAndContinueButton"
           visible="false"
-          width="369" />  
+          width="369" />
         <Label
           id="nonEditableModeWarningMessage"
           width="1176"

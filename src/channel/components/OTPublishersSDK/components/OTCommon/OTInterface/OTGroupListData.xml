@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+ 
+<component name="OTGroupListData" extends="ContentNode">
+ 
+<interface> 
+  <field id="name" type="string" />
+  <field id="description" type="string" />
+  <field id="descriptionLegal" type="string" />
+  <field id="status" type="string" />
+  <field id="CustomGroupId" type="string" />
+  <field id="OptanonGroupId" type="string" />
+  <field id="purposeId" type="string" />
+  <field id="buttonColor" type="string" />
+  <field id="buttonTextColor" type="string" />
+  <field id="focusButtonColor" type="string" />
+  <field id="focusButtonTextColor" type="string" />
+  <field id="activeTextColor" type="string" />
+  <field id="activeColor" type="string" />
+  <field id="alwaysActiveText" type="string" />
+  <field id="BConsentText" type="string" />
+  <field id="BLegitInterestText" type="string" />
+  <field id="activeText" type="string" />
+  <field id="inactiveText" type="string" />
+  <field id="groupData" type="assocarray" />
+  <field id="isToggleOption" type="boolean" value="true"/>
+  <field id="showDescription" type="boolean" value="true"/>
+  <field id="groupRecId" type="string" />
+  <field id="isunFocused" type="boolean" value="false"/>
+  <field id="isBorder" type="boolean" value="true" />
+  <field id="id" type="string" value=""/>
+  <field id="additionalText" type="string"/>
+</interface>
+
+</component>

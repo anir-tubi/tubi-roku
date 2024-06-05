@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--********** Copyright 2020 One trust.  All Rights
+Reserved. **********-->
+
+
+<component name="OTPreferenceCenter" extends="Group">
+    <interface>
+        <field id="updatedGroups" type="assocarray" />
+        <field id="onHidePreferenceCenter" type="boolean" />
+        <field id="onShowPreferenceCenter" type="boolean" />
+        <field id="onPreferenceCenterAcceptAll" type="boolean" />
+        <field id="onPreferenceCenterRejectAll" type="boolean" />
+        <field id="onPreferenceCenterConfirmChoices" type="boolean" />
+        <field id="onPreferenceCenterPurposeLegitimateInterestChanged" type="boolean" />
+        <field id="onPreferenceCenterPurposeConsentChanged" type="boolean" />
+        <field id="pcData" type="assocarray" onchange="onPreferenceData" />
+        <function name="setViewFocus" />
+    </interface>
+
+    <script type="text/brightscript" uri="../OTPreferenceCenter/OTPreferenceCenter.brs" />
+    <script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/consentLI.brs"></script>
+    <script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/vendor.helper.brs"></script>
+    <script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/style.brs"></script>
+    <script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/utils.brs"></script>
+
+    <children>
+        <Rectangle id="groupRect" width="1920" height="1080" translation="[0,0]">
+        </Rectangle>
+        <Rectangle id="headersection" translation="[0,0]" height="120">
+            <Rectangle id="headerRect" translation="[100,50]">
+                <Poster id="logo" translation="[0,0]" loadHeight="60" height="60" loadSync="true"
+                    loadDisplayMode="scaleToFit" visible="false" />
+                <Label id="close" font="font:LargeSystemFont" text="X" translation="[300,50]"
+                    visible="false" color="0xEEEEEE" />
+                <MarkupGrid
+                    id="closetextList"
+                    itemComponentName="OTButtonListView"
+                    itemSize="[370, 60]"
+                    itemSpacing="[0, 20]"
+                    translation="[940,50]"
+                    numRows="1" vertFocusAnimationStyle="floatingFocus" drawFocusFeedback="false"
+                    visible="false"
+                />
+            </Rectangle>
+        </Rectangle>
+        <Label id="btnSizetext" font="font:MediumSystemFont" translation="[0,0]" visible="false"
+            color="0xEEEEEE" wrap="true" />
+        <Label id="fontSizeText" font="font:MediumSystemFont" translation="[0,0]" visible="false"
+            color="0xEEEEEE" wrap="true" />
+        <Rectangle id="overlayXRect" width="1920" height="1080" color="0x000000" />
+        <Rectangle id="overlayYRect" width="1920" height="1080" color="0x000000" />
+        <Poster id="poweredLogo" width="136" height="16"
+            uri="pkg:/components/OTPublishersSDK/images/poweredBy_ot_logo.png"
+            translation="[1000,500]" />
+    </children>
+</component>

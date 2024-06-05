@@ -29,7 +29,6 @@ Function init()
   m.top.observeFieldScoped("uiMode", "onUiModeChange")
 
   m.top.observeField("autoPreviewItemUpdated", "onSignInInfoChange")
-  m.top.observeFieldScoped("dsarQrCodeUri", "onDsarQrCodeUriChange")
 
   if m.constants.settings.mode <> "production"
     m.top.addField("appRestartRequested", "boolean", true)
@@ -342,34 +341,33 @@ Function createPrivacyCenterPanel(title)
   privacyCenterPanel = CreateObject("roSGNode", "PrivacyCenterPanel")
   privacyCenterPanel.id = "privacyCenterPanel"
   privacyCenterPanel.title = title
-  consentSettings = m.top.consentSettings
-
-  focusable = false
-  privacyCenterSettings = consentSettings.privacyCenterSettings
   privacyCenterPanel.isAllowedToManageConsent = m.top.isAllowedToManageConsent
-  privacyCenterPanel.consentSettings = consentSettings
-  if privacyCenterSettings.showConsentPreferences = true AND consentSettings.consents.Count() > 0
-    for i = 0 to consentSettings.consents.Count()-1
-      if consentSettings.consents[i].value <> "required"
-        focusable = true
-        exit for
-      end if
-    end for
-  end if
+  
+  if isGDPR() = true
+    privacyCenterPanel.observeFieldScoped("didUserSelectManagePrivacySettingsButton", "onDidUserSelectManagePrivacySettingsButton")
+  else
+    consentSettings = m.top.consentSettings
+    focusable = false
+    privacyCenterSettings = consentSettings.privacyCenterSettings
+    privacyCenterPanel.consentSettings = consentSettings
+    if privacyCenterSettings.showConsentPreferences = true AND consentSettings.consents.Count() > 0
+      for i = 0 to consentSettings.consents.Count()-1
+        if consentSettings.consents[i].value <> "required"
+          focusable = true
+          exit for
+        end if
+      end for
+    end if
 
-  if privacyCenterSettings.showTermsOfUse = true OR privacyCenterSettings.showPrivacyPolicy = true OR privacyCenterSettings.showDsar = true
-    focusable = true
-  end if
+    if privacyCenterSettings.showTermsOfUse = true OR privacyCenterSettings.showPrivacyPolicy = true
+      focusable = true
+    end if
 
-  privacyCenterPanel.focusable = focusable
-  privacyCenterPanel.offset = [m.rightPanelOffset[0],-141]
-  privacyCenterPanel.observeFieldScoped("newConsentPreferences", "onNewConsentPreferences")
-  privacyCenterPanel.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
-  privacyCenterPanel.observeFieldScoped("didUserSelectSaveAndRestart", "onDidUserSelectSaveAndRestart")
-
-  ' Since dsar qr codes are dyanmically generated we need to make a network request to get the qr code.
-  if privacyCenterSettings <> invalid AND privacyCenterSettings.showDsar = true
-    m.top.shouldRequestDsarQrCode = true
+    privacyCenterPanel.focusable = focusable
+    privacyCenterPanel.offset = [m.rightPanelOffset[0],-141]
+    privacyCenterPanel.observeFieldScoped("newConsentPreferences", "onNewConsentPreferences")
+    privacyCenterPanel.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
+    privacyCenterPanel.observeFieldScoped("didUserSelectSaveAndRestart", "onDidUserSelectSaveAndRestart")
   end if
 
 
@@ -615,10 +613,7 @@ Function getPanelBySubtype(panelSubtype)
 End Function
 
 
-Function onDsarQrCodeUriChange(msg)
-  dsarQrCodeUri = msg.getData()
-  nextPanel = m.SettingsMenuPanel.nextPanel
-  if nextPanel <> invalid AND nextPanel.id = "privacyCenterPanel" AND isNonEmptyString(dsarQrCodeUri) = true
-    nextPanel.dsarQrCodeUri = dsarQrCodeUri
-  end if
+Function onDidUserSelectManagePrivacySettingsButton()
+  ' since privacy center is dyanmically created we cannot use alias.
+  m.top.didUserSelectManagePrivacySettingsButton = true
 End Function

@@ -99,7 +99,7 @@ End Function
 ' @requestQueue: assocArray, a request queue as returned by TubiRequestQueue().create()
 Function tubiTracking_trackUserEvent(eventType = "", eventValues = invalid, requestQueue = invalid)
   if eventType <> ""
-    blockedAnalyticsEvents = m.constants.externalConfig.info.blocked_analytics_events
+    blockedAnalyticsEvents = m.constants.externalConfig.info.blocked_analytics_events_mapping
     userConsentsOptOutStatus = {}
     if isAA(m.userConsentsOptOutStatus) = true
       userConsentsOptOutStatus = m.userConsentsOptOutStatus

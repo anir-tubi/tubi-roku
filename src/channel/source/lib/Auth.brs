@@ -1065,6 +1065,7 @@ End Function
 '                     name: name(String)
 '                     authType: analyticsAuthType(String)
 '                     has_age: true indicates Tubi has an age on record and the age is >= 13 (Boolean)
+'                     userUuid: 32 bit hex string.
 '                   }
 Function tubiAuth_formatAuthInfoFromServer(serverAuthInfo)
   clock = CreateObject("roDateTime")
@@ -1077,6 +1078,7 @@ Function tubiAuth_formatAuthInfoFromServer(serverAuthInfo)
   if serverAuthInfo.user_id <> invalid then authInfo.userId = serverAuthInfo.user_id.toStr()
   if serverAuthInfo.authType <> invalid then authInfo.authType = serverAuthInfo.authType
   if serverAuthInfo.has_age <> invalid then authInfo.hasAge = serverAuthInfo.has_age.toStr()
+  if serverAuthInfo.user_uuid <> invalid then authInfo.userUuid = serverAuthInfo.user_uuid
 
   authInfo.firstName = ""
   if serverAuthInfo.first_name <> invalid

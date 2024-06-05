@@ -42,8 +42,8 @@ Function tubiSGAdShim_run(videoPlayerNode) As boolean
   port = CreateObject("roMessagePort")
   m.videoPlayerNode.observeField("adControl", port)
   m.videoPlayerNode.observeFieldScoped("userConsentsOptOutStatus", port)
-  m.videoPlayerNode.observeFieldScoped("didUserOptOutOfPersonalizedAdvertising", port)
-  m.ads.setLimitAdTracking(m.videoPlayerNode.didUserOptOutOfPersonalizedAdvertising)
+  m.videoPlayerNode.observeFieldScoped("tcfString", port)
+  userConsentsOptOutStatus = videoPlayerNode.userConsentsOptOutStatus
 
   ' Let SceneGraph know that ad shim is ready
   m.videoPlayerNode.adState = "ready"
@@ -73,9 +73,11 @@ Function tubiSGAdShim_run(videoPlayerNode) As boolean
           m.videoPlayerNode.adState = "noAds"  ' if video player content was changed before we got here, return no ads
         end if
       else if msg.GetField() = "userConsentsOptOutStatus"
-        m.ads.tracking.userConsentsOptOutStatus = msg.getData()
-      else if msg.GetField() = "didUserOptOutOfPersonalizedAdvertising"
-        m.ads.setLimitAdTracking(msg.getData())
+        userConsentsOptOutStatus = msg.getData()
+        m.ads.tracking.userConsentsOptOutStatus = userConsentsOptOutStatus
+        m.ads.setLimitAdTracking(userConsentsOptOutStatus[m.constants_.consentKeys.personalization])
+      else if msg.GetField() = "tcfString"
+        m.ads.tracking.tcfString = msg.getData()
       end if
     end if
   end while

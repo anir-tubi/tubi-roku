@@ -230,6 +230,14 @@ Function init()
   ' Used to store the currently queued Video node command. Contents should either be invalid or should be an AA containing both
   ' "videoPlayerNode" which is the node for the video player and "command" which is the string we will pass to the control field of the videoPlayerNode node.
   m.queuedVideoPlayerCommand = invalid
+
+  ' Holds the callback method value which will be called once the initial get consent request is completed.
+  m.onGetConsentCompletionCallback = invalid
+
+  ' Holds the instance of one trust sdk. Creating m scope variable so that we do not have to access the instance from global.
+  ' Since One trust sdk access m.global.OTsdk within it's codebase we need to update the m.global.OTsdk to have the sdk instance.
+  ' The reason why we are also storing it's reference in m scope for better performance since we access the sdk instance a lot of items during the app session.
+  m.oneTrust = invalid
 End Function
 
 
@@ -2188,7 +2196,10 @@ End Function
 ' @errorCallback: roFunction, a callback to run after getting an error network response
 Function sendNielsenPing(pingType, content = invalid, successCallback = invalid, errorCallback = invalid)
   Auth = TubiAuth(m.constants, m.Request)
-  adLib = TubiAdsLimited(m.constants, Auth)
+  tcfString = getTCFString()
+  consentOptOutStatus = getConsentsOptOutStatus()
+  gdpr = isGDPR()
+  adLib = TubiAdsLimited(m.constants, Auth, tcfString, consentOptOutStatus, gdpr)
   nielsenReqInfo = adLib.getNielsenPingRequestInfo(m.constants, pingType, content)
 
   m.makeRequest({

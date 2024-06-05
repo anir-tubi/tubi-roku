@@ -47,7 +47,9 @@ Function init()
   Request = TubiRequest(m.constants.settings)
   Auth = TubiAuth(m.constants, Request)
   m.Tracking = TubiTracking(m.constants, Request, Auth)
-  m.adsLimited = TubiAdsLimited(m.constants, Auth)
+  m.adsLimited = TubiAdsLimited(m.constants, Auth, m.top.tcfString, m.top.userConsentsOptOutStatus, isGDPR())
+  m.top.observeFieldScoped("tcfString", "onTCFStringChange")
+  m.top.observeField("userConsentsOptOutStatus", "onUserConsentsOptOutStatusChange")
   m.Loading = m.top.findNode("Loading")
   m.LoadingProgressBar = m.top.findNode("LoadingProgressBar")
   m.LoadingMessage = m.top.findNode("LoadingMessage")
@@ -2351,4 +2353,14 @@ Function onTrackingComponentInfo(msg)
   if componentInfo <> invalid
     m.top.trackingComponentInfo = componentInfo
   end if
+End Function
+
+
+Function onTCFStringChange(msg)
+  m.adsLimited.tcfString = msg.getData()
+End Function
+
+
+Function onUserConsentsOptOutStatusChange(msg)
+  m.adsLimited.userConsentsOptOutStatus = msg.getData()
 End Function

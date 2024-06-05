@@ -8,7 +8,7 @@ Function parseGetExternalConfigSuccess(fullResponse, _reqInfo)
     config = data
     externalConfig = TubiExternalConfig(m.request, m.constants)
 
-    config.blocked_analytics_events = externalConfig.parseBlockedAnaylticsEvents(config.blocked_analytics_events)
+    config.blocked_analytics_events_mapping = externalConfig.parseBlockedAnalyticsEvents(config.blocked_analytics_events_mapping)
   end if
 
   return config

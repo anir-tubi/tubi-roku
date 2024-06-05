@@ -8,7 +8,8 @@
     "images/**/*.*",
     "locale/**/*.*",
     "fonts/**/*.*",
-    "!components/controllers/TubiScene/TrackerTask.xml"
+    "!components/controllers/TubiScene/TrackerTask.xml",
+    "!components/OTPublishersSDK/**/*.*"
   ],
   "diagnosticFilters": [{
     "codes": [1104, 1090]

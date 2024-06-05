@@ -42,9 +42,6 @@
       <!-- Holds the true/false based on if the user is in adults mode and not in kids mode, and not in teens parental controls.  -->
       <field id="isAllowedToManageConsent" type="boolean" value="false" />
 
-      <!-- Holds the value of qr code temp uri path.  -->
-      <field id="dsarQrCodeUri" type="string" value="" />
-
     <!-- OUTPUTS -->
       <!-- triggers for upstream controller -->
       <field id="showDeviceModal" type="boolean" alwaysNotify="true" />
@@ -67,8 +64,8 @@
       <field id="selectedConsent" type="assocarray" alwaysNotify="true"/>
       <field id="didUserSelectSaveAndRestart" type="boolean" value="false" alwaysNotify="true" />
 
-      <!-- Holds true or false value based on if we need to make a network request to fetch dsar qr code.  -->
-      <field id="shouldRequestDsarQrCode" type="boolean" value="false" alwaysNotify="true" />
+      <!-- Holds the true/false based on if the user selected manage privacy settings button.  -->
+      <field id="didUserSelectManagePrivacySettingsButton" type="boolean" alwaysNotify="true" />
   </interface>
 
   <children>

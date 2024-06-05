@@ -71,7 +71,7 @@ Function playLinearVideoContent(content, bMinimized = true, sAssociatedScreenID 
       end if
 
       videoPlayer.userConsentsOptOutStatus = getConsentsOptOutStatus()
-      videoPlayer.didUserOptOutOfPersonalizedAdvertising = getConsentOptOutStatusByKey(m.constants.consentKeys.personalization)
+      videoPlayer.tcfString = getTCFString()
 
       ' it's necessary to push the screen after the content has been set on the videoPlayer component,
       ' so NavigateToPage and PageLoad events contain the necessary content id information
@@ -165,7 +165,10 @@ End Function
 
 Function getUpdatedLinearVideoResources(content)
   auth = TubiAuth(m.constants, m.Request)
-  adLib = TubiAdsLimited(m.constants, auth)
+  tcfString = getTCFString()
+  consentOptOutStatus = getConsentsOptOutStatus()
+  gdpr = isGDPR()
+  adLib = TubiAdsLimited(m.constants, auth, tcfString, consentOptOutStatus, gdpr)
 
   ' add the ad parameters for the content. Back end will forward these parameters to YoSpace/Apollo
   ' so that YoSpace/Apollo can have them when YoSpace/Apollo makes ad requests for SSAI

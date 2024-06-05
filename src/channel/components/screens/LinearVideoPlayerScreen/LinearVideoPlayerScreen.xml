@@ -83,8 +83,8 @@
       <!-- Holds the consent opt out status for all individual preferences like marketing,analytics etc. -->
       <field id="userConsentsOptOutStatus" type="assocarray" value="{}" alias="PlayerAdsSSAITask.userConsentsOptOutStatus" />
 
-      <!-- indicates whether user opted out of Personalized Advertising either through initial consent or settings screen. -->
-      <field id="didUserOptOutOfPersonalizedAdvertising" type="boolean" value="false" alias="PlayerAdsSSAITask.didUserOptOutOfPersonalizedAdvertising" />
+      <!-- Holds the tcf string value. -->
+      <field id="tcfString" type="string" alias="PlayerAdsSSAITask.tcfString" />
 
     <!-- OUTPUT -->
       <!-- Set to true if the back button was pressed while the video player has focus -->

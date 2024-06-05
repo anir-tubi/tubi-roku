@@ -291,7 +291,6 @@ Function getConstants()
     constants.reqNames.postPauseAdPixel = "postPauseAdPixel"
     constants.reqNames.getConsent = "getConsent"
     constants.reqNames.patchConsent = "patchConsent"
-    constants.reqNames.getDsarQrCode = "getDsarQrCode"
     constants.reqNames.postRokuContinueWatching = "postRokuContinueWatching"
     constants.reqNames.deleteRokuContinueWatching = "deleteRokuContinueWatching"
     constants.reqNames.clearRokuContinueWatching = "clearRokuContinueWatching"
@@ -342,7 +341,6 @@ Function getConstants()
       constants.reqNames.acceptsTubiAuth[constants.reqNames.patchServerPersistentData] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getConsent] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.patchConsent] = true
-      constants.reqNames.acceptsTubiAuth[constants.reqNames.getDsarQrCode] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.getUserSettings] = true
       constants.reqNames.acceptsTubiAuth[constants.reqNames.postLogout] = true
 
@@ -409,6 +407,15 @@ Function getConstants()
         constants.thirdParty.suiteTest.app_id =  "214cab71-b41b-468d-bcbb-f42732b157c4"
 
       end if
+    constants.thirdParty.oneTrust = {}
+      constants.thirdParty.oneTrust.applicationId = "018fc642-7625-7794-9589-c36d2f0bb32c"
+      ' All non production environments will use staging api key.
+      ' There is no cache when we use test mode, meaning changes can be viewed immediately.
+      if constants.settings.mode <> "production"
+        constants.thirdParty.oneTrust.applicationId = "018fc642-7625-7794-9589-c36d2f0bb32c-test"
+      end if
+      constants.thirdParty.oneTrust.location = "cdn.cookielaw.org"
+      constants.thirdParty.oneTrust.version = "202405.1.0"
 
   'platform is used when communitcating with CMS API
   constants.platform = "roku"
@@ -579,7 +586,6 @@ Function getConstants()
       constants.urls.account.signup = constants.urls.account.urlBase + "/user/signup"
       constants.urls.account.deviceSettings = constants.urls.account.urlBase + "/device/settings"
       constants.urls.account.consent = constants.urls.account.urlBase + "/consent"
-      constants.urls.account.getDsarQrCode = constants.urls.account.urlBase + "/dsar/qr_code"
 
       constants.urls.account.anonymous = {}
       constants.urls.account.anonymous.signingKey = constants.urls.account.urlBase + "/device/anonymous/signing_key"
@@ -1414,11 +1420,13 @@ Function getConstants()
       constants.ui.rokuCWConsentActionButtonIds.reject = "reject"
 
   constants.consentKeys = {}
-    constants.consentKeys.analytics = "analytics"
-    constants.consentKeys.personalization = "personalized_advertising"
-    constants.consentKeys.marketing = "marketing"
+    constants.consentKeys.essential = "C0001"
+    constants.consentKeys.analytics = "C0002"
+    constants.consentKeys.personalization = "C0004"
+    constants.consentKeys.marketing = "C0005"
     constants.consentKeys.continueWatching = "data_sharing"
-    constants.consentKeys.functional = "functional"
+    constants.consentKeys.functional = "C0003"
+
 
 'THEME/COLOR START///////////////////////
 '//::TODO::colors - the following constants should be moved to themes. The app should not call these constants
@@ -1683,12 +1691,12 @@ Function getConstants()
 
       ' TODO: These are temporary values once finalized will update accordingly.
       constants.persistentDataKeyConsentKeyMapping = {
-        "enable_video_preview": constants.consentKeys.functional
-        "audio_track": constants.consentKeys.functional
-        "enable_like_toast_notification": constants.consentKeys.functional
-        "enable_dislike_toast_notification": constants.consentKeys.functional
-        "last_roku_cw_consent_prompt_shown_at": constants.consentKeys.functional
-        "relaunch_series_playback_info": constants.consentKeys.functional
+        "enable_video_preview": constants.consentKeys.essential
+        "audio_track": constants.consentKeys.essential
+        "subtitleTrack": constants.consentKeys.essential
+        "enable_like_toast_notification": constants.consentKeys.essential
+        "enable_dislike_toast_notification": constants.consentKeys.essential
+        "last_roku_cw_consent_prompt_shown_at": constants.consentKeys.essential
       }
 
   return constants

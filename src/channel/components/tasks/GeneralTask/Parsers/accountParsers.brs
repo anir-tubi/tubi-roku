@@ -74,6 +74,10 @@ Function parseGetUserSettingsSuccess(fullResponse, reqInfo)
     result["hasAge"] = parsed.has_age
   end if
 
+  if parsed.user_uuid <> invalid
+    result["userUuid"] = parsed.user_uuid
+  end if
+
   return result
 End Function
 

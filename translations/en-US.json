@@ -1474,14 +1474,6 @@
     "description": "Privacy section subheading.",
     "message": "To view Tubi's Privacy Policy, scan the QR code below with your mobile device or visit "
   },
-  "privacy_preferences_dsar_section_heading": {
-    "description": "DSAR section heading.",
-    "message": "Data Subject Rights"
-  },
-  "privacy_preferences_dsar_section_subheading": {
-    "description": "DSAR section subheading.",
-    "message": "To view your Data Rights and complete a request, scan the QR code below with your mobile device or visit "
-  },
   "privacy_preferences_tos_section_heading": {
     "description": "Terms of service section heading.",
     "message": "Terms of Use"
@@ -1560,11 +1552,11 @@
   },
   "gdpr_age_gate_error_dialog_heading": {
     "description": "GDPR age gate error dialog heading.",
-    "message": "You aren't old enough to access Tubi"
+    "message": "We're sorry"
   },
   "gdpr_age_gate_error_dialog_sub_heading": {
     "description": "GDPR age gate error dialog sub heading.",
-    "message": "You must be 18 years or older."
+    "message": "You are not eligible to continue."
   },
   "gdpr_age_gate_error_dialog_exit_tubi": {
     "description": "GDPR age gate error dialog exit tubi button label.",
@@ -1577,5 +1569,29 @@
   "updated_terms_toast_header": {
     "description": "Header on the toast message informing the user of update ToS",
     "message": "Important"
+  },
+  "privacy_center_restart_channel": {
+    "description": "Settings screen privacy center restart channel button label.",
+    "message": "Restart"
+  },
+  "save_consent_dialog_heading": {
+    "description": "Settings screen save consent dialog heading.",
+    "message": "Privacy Preferences Updated"
+  },
+  "save_consent_dialog_sub_heading": {
+    "description": "Settings screen save consent dialog sub heading.",
+    "message": "You must restart Tubi for changes to take effect."
+  },
+  "privacy_center_view_privacy_settings_hint": {
+    "description": "Settings screen privacy center view privacy settings hint.",
+    "message": "You must save privacy setting changes and restart Tubi for changes to take effect."
+  },
+  "privacy_center_view_privacy_settings": {
+    "description": "Settings screen privacy center launch preferences center button label.",
+    "message": "View Privacy Settings"
+  },
+  "privacy_disclaimer": {
+    "description": "Privacy disclaimer text displayed in Sign in and registration flow.",
+    "message": "By registering or signing in, you agree that you have read and understood Tubi's Privacy Policy and agree to Tubi's Terms of Use. Learn more at {privacy_policy_url} and {terms_of_use_url}"
   }
 }

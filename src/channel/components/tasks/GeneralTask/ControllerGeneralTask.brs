@@ -250,11 +250,6 @@ Function registerParsingCallbacks()
     parseError: parseGenericError
   }
 
-  ' gets dsar qr code info.
-  m.requestTypes[m.constants.reqNames.getDsarQrCode] = {
-    parseSuccess: parseGenericSuccess
-  }
-
   ' posts braze merge users request.
   m.requestTypes[m.constants.reqNames.postBrazeMergeUsers] = {
     parseSuccess: parseGenericSuccess
@@ -266,6 +261,7 @@ Function registerParsingCallbacks()
     parseSuccess: parseGenericSuccess
     parseError: parseGenericError
   }
+
 End Function
 
 

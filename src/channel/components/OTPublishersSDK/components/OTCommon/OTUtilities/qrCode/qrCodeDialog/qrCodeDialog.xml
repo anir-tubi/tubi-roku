@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<component name="qrCodeDialog" extends="StandardDialog">
+    <interface>
+        <field id="show" type="boolean" value="false" />
+        <field id="qrCodeLightColor" type="string" value="0xffffff" />
+        <field id="qrCodeDarkColor" type="string" value="0x000000" />
+        <field id="headerText" type="string" value="" />
+        <field id="headerColor" type="string" value="0x000000" />
+        <field id="uri" type="string" alwaysNotify="true" onchange="onQrCodeData" />
+    </interface>
+    <script type="text/brightscript" uri="./qrCodeDialog.brs" />
+
+    <children>
+        <qrCodeLayout id="qrCodeLayout" />
+    </children>
+</component>
+
+    

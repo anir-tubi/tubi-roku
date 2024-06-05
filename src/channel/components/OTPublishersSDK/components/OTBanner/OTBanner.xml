@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--********** Copyright 2020 One trust.  All Rights Reserved. **********-->
+
+
+<component name="OTBanner" extends="Group" >
+<interface>
+    <field id="onHideBanner" type="boolean" />
+    <field id="onShowBanner" type="boolean" />
+    <field id="onBannerClickedAcceptAll" type="boolean" />
+    <field id="onBannerClickedRejectAll" type="boolean" />
+    <field id="onBannerClickedSettings" type="boolean" alwaysNotify="true"/>
+    <field id="onBannerClickedVendorList" type="boolean" alwaysNotify="true"/>
+    <field id="bannerData" type="assocarray" onchange="onBannerData" />
+    <field id="hideInteractionType" type="string" />
+    <function name="setViewFocus" />
+</interface>
+
+<script type="text/brightscript" uri="../../components/OTCommon/OTConstants/application.constants.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/vendor.helper.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/utils.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/style.brs"></script>
+<script type="text/brightscript" uri="../OTBanner/OTBanner.brs" />
+
+<children>
+    <Rectangle id="privacyRect" width="1300" height="1080" translation="[0,0]">
+
+        <Rectangle id="descriptionRec" height="700" translation="[100,165]">
+            <LayoutGroup id="descriptionScrollRec" layoutDirection="vert" vertAlignment="top" translation="[0,0]" itemSpacings="[40]">
+                <LayoutGroup id="bannerHeading" layoutDirection="vert" vertAlignment="top">
+                   	<Label id="title" font="font:LargeBoldSystemFont" text="" wrap="true" visible="false" scale="[0,0]"/>
+                    <Label id="AfterTitle" font="font:SmallSystemFont" text="" wrap="true" visible="false" scale="[0,0]"/>
+                    <Label id="AfterDescription" font="font:SmallSystemFont" text="" wrap="true" visible="false" scale="[0,0]"/>
+                </LayoutGroup>
+                <LayoutGroup id="dpdheading" layoutDirection="vert" vertAlignment="top" itemSpacings="[10]">
+                   	<Label id="dpdTitle" font="font:LargeBoldSystemFont" text="" wrap="true" visible="false" scale="[0,0]"/>
+                  	<Label id="dpdDescription" font="font:SmallSystemFont" text="" wrap="true" visible="false" scale="[0,0]"/>
+                    <Label id="AfterDPD" font="font:SmallSystemFont" text="" wrap="true" visible="false" scale="[0,0]"/>
+                </LayoutGroup>
+                <LayoutGroup id="policyLinkRec" layoutDirection="vert" vertAlignment="top">
+                   	<Label id="policyLinkText" font="font:SmallSystemFont" text="" wrap="true" visible="false"/>
+                    <Poster id="qrCodeImg" width="0" height="0" uri="" loadSync = "true" loadDisplayMode = "scaleToFit" visible="false"/>
+                </LayoutGroup>
+            </LayoutGroup>
+            <Rectangle id="scrollThumb" width="10" height="150" color="0xffffff" translation="[0,0]" opacity="0.3" visible="false"/>
+        </Rectangle>
+
+        <Rectangle id="headersection" translation="[0,0]" height="130">
+            <Rectangle id="headerRect" translation="[100,50]">
+                <Poster id="logo" translation="[0,0]" loadHeight="60" height="60" loadSync = "true" loadDisplayMode = "scaleToFit" uri="" visible="false"/>
+                <Label id="close" font="font:LargeSystemFont" text="X" translation="[300,50]" visible="false" color="0xEEEEEE"/>
+                  <MarkupGrid
+                    id="closetextList"
+                    itemComponentName="OTButtonListView"
+                    itemSize="[340, 60]"
+                    itemSpacing="[0, 20]"
+                    translation="[940,50]"
+                    numRows="1" vertFocusAnimationStyle="floatingFocus" drawFocusFeedback="false" visible="false"
+                />
+            </Rectangle>
+            </Rectangle>
+            <Rectangle id="paddingBRect"/>
+        </Rectangle>
+
+        <Rectangle id="actionRect" translation="[100,165]">
+            <MarkupGrid
+                id="buttonList"
+                itemComponentName="OTButtonListView"
+                itemSize="[336, 60]"
+                itemSpacing="[0, 20]"
+                translation="[60,250]"
+                numRows="4" vertFocusAnimationStyle="floatingFocus" drawFocusFeedback="false" 
+            />
+        </Rectangle>
+    <Label id="fontSizeText" font="font:MediumSystemFont" translation="[0,0]" visible="false" color="0xEEEEEE" wrap="true"/>
+     <Poster id="poweredLogo"  width="136" height="16" uri="pkg:/components/OTPublishersSDK/images/poweredBy_ot_logo.png" translation="[1000,500]"/>
+</children>
+</component>

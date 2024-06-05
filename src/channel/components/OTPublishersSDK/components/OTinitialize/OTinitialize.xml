@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--********** Copyright 2020 OneTrust.  All Rights Reserved. **********-->
+
+
+<component name="OTinitialize" extends="Group" >
+<interface>
+    <field id="onHideBanner" type="boolean" alwaysNotify="true" />
+    <field id="onShowBanner" type="boolean" alwaysNotify="true" />
+    <field id="AcceptAll" type="boolean" alwaysNotify="true" />
+    <field id="RejectAll" type="boolean" alwaysNotify="true" />
+    <field id="close" type="boolean" alwaysNotify="true" />
+    <field id="ConfirmMyChoice" type="boolean" alwaysNotify="true" />
+    <field id="onHidePreferencecenter" type="boolean" alwaysNotify="true" />
+    <field id="consentResponse" type="assocarray" alwaysNotify="true" />
+    <field id="onSdkBroadCast" type="boolean" alwaysNotify="true" />
+    <field id="onHideFailure" type="boolean" alwaysNotify="true" />
+    <field id="onDeleteProfileCallback" type="boolean" alwaysNotify="true" />
+    <field id="onSwitchUserProfileCallback" type="boolean" alwaysNotify="true" />
+    <field id="eventlistener" type="string" alwaysNotify="true" />
+    <function name="OTSdkParams" />
+    <function name="initOTSDKData" />
+    <function name="setupUI" />
+    <function name="showBannerUI" />
+    <function name="showPreferenceCenterUI" />
+    <function name="showVendorListUI" />
+    <function name="getBannerData" />
+    <function name="getPreferenceCenterData" />
+    <function name="onHideBanner" />
+    <function name="onShowBanner" />
+    <function name="onBannerClickedAcceptAll" />
+    <function name="onBannerClickedRejectAll" />
+    <function name="onHidePreferenceCenter" />
+    <function name="onPreferenceCenterRejectAll" />
+    <function name="onPreferenceCenterAcceptAll" />
+    <function name="onPreferenceCenterConfirmChoices" />
+    <function name="setDataSubjectIdentifier" />
+    <function name="isBannerShown" />
+    <function name="setBannerLogoSize" />
+    <function name="setPreferenceCenterLogoSize" />
+    <function name="getConsentStatusForGroupID" />
+    <function name="clearOTSDK" />
+    <function name="optIntoSaleOfData" />
+    <function name="optOutOfSaleOfData" />
+    <function name="getConsentStatusForSDKId" />
+    <function name="shouldShowBanner" />
+    <function name="updatePurposeConsent" />
+    <function name="updateVendorPurposeConsent" />
+    <function name="saveConsent" />
+    <function name="getVendorStatus" />
+    <function name="updateSdkListConsentData" />
+    <function name="setsaveGroupqueue" />
+    <function name="switchUserProfile" /> 
+    <function name="deleteProfile" /> 
+    <function name="getVendorCount"/>
+</interface>
+<script type="text/brightscript" uri="../OTinitialize/OTinitialize.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTConstants/application.constants.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/logs.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/utils.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/registry.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/ccpa.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/consentLI.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/iab.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/vendor.helper.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/network.helper.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/showBanner.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/multiProfile.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTPublicMethods/OTConsentPM.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/gpp.brs"></script>
+<script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/gppSections.brs"></script>
+</component>

@@ -56,11 +56,20 @@ Function init()
   m.top.screenLevel = m.constants.ui.screenLevels.signInScreen
   m.backgroundUriList = []
 
+  m.privacyDisclaimer = m.top.findNode("privacyDisclaimer")
+  externalConfig = m.constants.externalConfig.info
+  params = {
+    "privacy_policy_url": externalConfig.privacy_policy_url,
+    "terms_of_use_url": externalConfig.terms_of_use_url
+  }
+  m.privacyDisclaimer.text = getTranslation("privacy_disclaimer", params)
+
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerLarge)
   setTypographyOfLabel(m.pageSubHeading, typographyConstants.ids.bodyLarge)
   setTypographyOfLabel(m.passwordValidationMsg, typographyConstants.ids.bodySmallStrong)
   setTypographyOfLabel(m.newPasswordLink, typographyConstants.ids.bodySmall)
+  setTypographyOfLabel(m.privacyDisclaimer, typographyConstants.ids.bodySmall)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
@@ -82,6 +91,7 @@ Function onThemeChange(msg = invalid)
     m.passwordValidationMsg.color = theme.cautionColor
     m.continueBtn.color = theme.backgroundColorLight2
     m.forgotPasswordBtn.color = theme.backgroundColorLight2
+    m.privacyDisclaimer.color = theme.secondaryTextColor
   end if
 End Function
 

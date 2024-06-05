@@ -12,8 +12,8 @@ Function execAdsTask()
   requestQueue = TubiRequestQueue()
   auth = TubiAuth(constants, request)
   tracking = TubiTracking(constants, request, auth, videoPlayerNode.userConsentsOptOutStatus)
-
-  m.tubiAds = TubiAds(constants, request, requestQueue, auth, tracking, m.top.adContentType)
+  gdpr = isGDPR(constants)
+  m.tubiAds = TubiAds(constants, request, requestQueue, auth, tracking, m.top.adContentType, videoPlayerNode.tcfString, videoPlayerNode.userConsentsOptOutStatus, gdpr)
   adShim = TubiSGAdShim(constants, m.tubiAds)
   adShim.run(videoPlayerNode)
 End Function

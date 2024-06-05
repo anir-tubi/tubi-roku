@@ -25,9 +25,9 @@ Function showSettingsScreen(sFocusID = "", screenLevel = 0)
   m.settingsScreen.observeFieldScoped("backButtonPressed", "onSettingsBackPressed")
   m.settingsScreen.observeFieldScoped("autoPreviewSettingSelected", "onAutoPreviewSettingSelected")
   m.settingsScreen.observeFieldScoped("didUserSelectSaveAndRestart", "saveUpdatedConsentPreferences")
+  m.settingsScreen.observeFieldScoped("didUserSelectManagePrivacySettingsButton", "onDidUserSelectManagePrivacySettingsButton")
   m.settingsScreen.observeFieldScoped("selectedConsent", "onSelectedConsentChange")
   m.settingsScreen.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
-  m.settingsScreen.observeFieldScoped("shouldRequestDsarQrCode", "requestDsarQrCode")
   if m.constants.settings.mode = "qa" OR  m.constants.settings.mode = "dev" 'this is for extra protection not to restart the app
     m.settingsScreen.observeFieldScoped("appRestartRequested", "onAppRestartRequested")
   end if
@@ -431,7 +431,7 @@ End Function
 
 Function onConsentRefreshAfterParentalControlsChange()
   ' If user has already provided consent then skipping the show consent screen and updating the settings screen.
-  if m.consentSettings <> invalid AND m.consentSettings.consentRequired = true
+  if isUserConsentRequired() = true
     showConsentScreen(refreshScreenAfterConsentAndParentalChange)
   else
     refreshScreenAfterParentalChanges()
@@ -631,26 +631,51 @@ Function onSettingsScreenGetUserSettingsError(error)
 End Function
 
 
-Function requestDsarQrCode()
-  m.settingsScreen.dsarQrCodeUri = ""
-  requestInfo = m.userDeviceApi.createGetDsarQrCodeReqInfo()
-  m.makeRequest({
-    url: requestInfo.url
-    requestType: requestInfo.requestType
-    successCallback: onGetDsarQrCodeRequestSuccess
-    responseType: "assocarray"
-    silenceCallbackWarnings: true
-  })
+Function onDidUserSelectManagePrivacySettingsButton()
+  m.oneTrust.callFunc("showPreferenceCenterUI")
+  m.oneTrust.unobserveFieldScoped("onHidePreferenceCenter")
+  m.oneTrust.observeFieldScoped("onHidePreferenceCenter", "onPreferenceCenterClosed")
+  m.oneTrust.observeFieldScoped("onSdkBroadCast", "onPreferencesUpdated")
 End Function
 
 
-Function onGetDsarQrCodeRequestSuccess(response)
-  if response <> invalid AND response.image_in_base64 <> invalid
-    imageData = response.image_in_base64
-    uri = "tmp:/dsarQrCode.png"
-    ba = CreateObject("roByteArray")
-    ba.fromBase64String(imageData)
-    ba.writeFile(uri)
-    m.settingsScreen.dsarQrCodeUri = uri
-  end if
+Function onPreferenceCenterClosed()
+  screen = getCurrentScreen()
+  screen.setFocus(true)
+End Function
+
+
+Function onPreferencesUpdated()
+  showRestartChannelAfterConsentUpdatedDialog()
+End Function
+
+
+Function showRestartChannelAfterConsentUpdatedDialog()
+  buttonInfo = [
+    {
+      text: getTranslation("privacy_center_restart_channel")
+      callback: restartApp
+      shouldFocusParentBeforeCallback: false
+    }
+  ]
+  currentScreen = getCurrentScreen()
+  dialogEvent = {
+    type: "dialog"
+    values: {
+      dialog_type: "INFORMATION"
+      pageOneof: m.Tracking.getAnalyticsPage(currentScreen.trackingPageInfo.pageType, currentScreen.trackingPageInfo.pageValues)
+      dialog_action: "SHOW"
+      dialog_sub_type: "restart_on_consent"
+    }
+  }
+
+  modalInfo = {
+    title: getTranslation("save_consent_dialog_heading")
+    message: getTranslation("save_consent_dialog_sub_heading")
+    backButtonCallback: restartApp
+    openTrackEvent: dialogEvent
+    trackingTask: m.trackingLoggingTask
+  }
+
+  showModal(modalInfo, buttonInfo)
 End Function

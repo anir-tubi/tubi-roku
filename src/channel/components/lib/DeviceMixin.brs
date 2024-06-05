@@ -1,7 +1,6 @@
 Function isGDPR(constants = invalid)
   gdprCountries = {
     "gb": true
-    "nz": true
   }
 
   if constants = invalid

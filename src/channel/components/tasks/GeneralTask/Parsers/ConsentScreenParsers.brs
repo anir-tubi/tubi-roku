@@ -19,9 +19,6 @@ Function parseGetConsent(fullResponse, _reqInfo)
       ' whether we need to show privacy policy QR code component.
       showPrivacyPolicy: true
 
-      ' whether we need to show DSAR QR code component.
-      showDsar: false
-
       ' QRCode url for the privacy policy is used for displaying in privacy center.
       privacyPolicyQrCodeUrl: ""
 
@@ -36,9 +33,6 @@ Function parseGetConsent(fullResponse, _reqInfo)
 
       ' privacy policy web link used for displaying in privacy center.
       privacyPolicyUrl: ""
-
-      ' DSAR web link used for displaying in privacy center.
-      dsarUrl: ""
     },
 
     ' Holds the list of preferences which will be used for displaying in manage preferences screen.
@@ -65,12 +59,10 @@ Function parseGetConsent(fullResponse, _reqInfo)
       consentSettings.privacyCenterSettings = {
         showConsentPreferences: privacyCenterSettings.consent_preferences
         showPrivacyPolicy: privacyCenterSettings.privacy_policy
-        showDsar: privacyCenterSettings.dsar
         privacyPolicyQrCodeUrl: privacyCenterSettings.privacy_policy_qr_code_url
         showTermsOfUse: privacyCenterSettings.terms_of_use
         termsOfUseQrCodeUrl: privacyCenterSettings.terms_of_use_qr_code_url
         termsOfUseUrl: privacyCenterSettings.terms_of_use_url
-        dsarUrl: privacyCenterSettings.dsar_url
         privacyPolicyUrl: privacyCenterSettings.privacy_policy_url
       }
     end if

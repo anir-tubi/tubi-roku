@@ -1,0 +1,11 @@
+{
+  "acquisition": {
+    "server": "mobile-data.onetrust.io"
+  },
+  "ssl": true,
+  "initialization": {
+    "apiEp": "bannersdk/v2/applicationdata"
+  },
+  "encodeAPI": "https://mobile.onetrust.io/iabtcf/v1/tcmodel/encode",
+  "version": "202405.1.0"
+}

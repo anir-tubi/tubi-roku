@@ -42,11 +42,11 @@
       height="72"/>
     <LayoutGroup
       id="emailLayout"
-      translation="[0, 290]"
+      translation="[0, 168]"
       layoutDirection="vert"
       vertAlignment="custom"
       horizAlignment="custom"
-      itemSpacings="[30, 40, 10]">
+      itemSpacings="[30, 10]">
       <Label
         id="pageHeading"
         horizAlign="center"
@@ -65,7 +65,7 @@
 
       <Label
         id="emailValidationMsg"
-        translation="[670,-5]"
+        translation="[645, 0]"
         opacity="0.0"
         width="600">
         <Font
@@ -74,39 +74,38 @@
 
     </LayoutGroup>
 
-    <Group
-      id="keyboardGrp"
-      translation="[0,470]">
+    <LayoutGroup
+      layoutDirection="vert"
+      horizAlignment="custom"
+      vertAlignment="custom"
+      translation="[250, 375]"
+      itemSpacings="[20]">
 
-      <LayoutGroup
-        layoutDirection="vert"
-        horizAlignment="custom"
-        vertAlignment="custom"
-        translation="[250, 20]"
-        itemSpacings="[20]">
+      <DynamicKeyboard
+        id="Keyboard"/>
 
-        <DynamicKeyboard
-          id="Keyboard"/>
+      <ButtonGroup
+        id="buttonGroup"
+        layoutDirection="horiz"
+        itemSpacings="[39]"
+        translation="[2,0]">
 
-            <ButtonGroup
-              id="buttonGroup"
-              layoutDirection="horiz"
-              itemSpacings="[39]"
-              translation="[2,0]">
+        <SimpleButton
+          id="back"
+          width="177"/>
 
-              <SimpleButton
-                id="back"
-                width="177"/>
+        <SimpleButton
+          id="continue"
+          width="1149"/>
 
-              <SimpleButton
-                id="continue"
-                width="1149"/>
-
-            </ButtonGroup>
-
-      </LayoutGroup>
-
-    </Group>
-
+      </ButtonGroup>
+    </LayoutGroup>
+    <Label
+      translation="[225, 963]"
+      id="privacyDisclaimer"
+      horizAlign="center"
+      wrap="true"
+      width="1470">
+    </Label>
   </children>
 </component>

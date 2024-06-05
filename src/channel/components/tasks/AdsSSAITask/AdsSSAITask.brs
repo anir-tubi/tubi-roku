@@ -25,11 +25,11 @@ Function execAdsSSAITask()
   m.requestQueue = requestQueueLib.create(m.ssaiPort)
 
   auth = TubiAuth(m.constants, m.request)
-  m.tracking = TubiTracking(m.constants, m.request, auth, m.top.userConsentsOptOutStatus)
-
-  m.adLib = TubiAds(m.constants, m.request, requestQueueLib, auth, m.tracking, "mp4")
+  userConsentsOptOutStatus = m.top.userConsentsOptOutStatus
+  m.tracking = TubiTracking(m.constants, m.request, auth, userConsentsOptOutStatus)
+  gdpr = isGDPR(m.constants)
+  m.adLib = TubiAds(m.constants, m.request, requestQueueLib, auth, m.tracking, "mp4", m.top.tcfString, userConsentsOptOutStatus, gdpr)
   m.raf = m.adLib.roAdFramework
-  m.adLib.setLimitAdTracking(m.top.didUserOptOutOfPersonalizedAdvertising)
 
   ' used to determine when to poll for ads
   m.timeSpan = CreateObject("roTimespan")
@@ -87,7 +87,6 @@ Function runSSAILoop(ssaiPort)
   m.top.observeField("contentUpdated", ssaiPort)
   m.top.observeField("playbackStopped", ssaiPort)
   m.top.observeFieldScoped("userConsentsOptOutStatus", ssaiPort)
-  m.top.observeFieldScoped("didUserOptOutOfPersonalizedAdvertising", ssaiPort)
   m.top.observeField("exit", ssaiPort)
 
   while true
@@ -104,9 +103,12 @@ Function runSSAILoop(ssaiPort)
       else if messageField = "videoIsFullscreen"
         m.videoIsFullscreen = msg.getData()
       else if messageField = "userConsentsOptOutStatus"
-        m.tracking.userConsentsOptOutStatus = msg.getData()
-      else if messageField = "didUserOptOutOfPersonalizedAdvertising"
-        m.adLib.setLimitAdTracking(msg.getData())
+        userConsentsOptOutStatus = msg.getData()
+        m.tracking.userConsentsOptOutStatus = userConsentsOptOutStatus
+        m.adLib.userConsentsOptOutStatus = userConsentsOptOutStatus
+        m.adLib.setLimitAdTracking(userConsentsOptOutStatus[m.constants.consentKeys.personalization])
+      else if messageField = "tcfString"
+        m.adLib.tcfString = msg.getData()
       else if messageField = "playbackStopped"
         if isArray(m.adPod.ads) = true then
           notUsedAction = "exit_mid_pod"

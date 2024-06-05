@@ -1,47 +1,80 @@
 Function showConsentScreen(callback = startUserExperience)
   m.callbackAfterConsent = callback
   showContentGroupAndHideSpinner()
-  displayDefaultBackground()
-  screen = CreateObject("roSGNode", "ConsentScreen")
-  screen.description = m.consentSettings.privacyDescription
-  pushScreen(screen, true, true)
-  screen.observeFieldScoped("buttonSelected", "onConsentActionButtonSelected")
-  screen.setFocus(true)
+  bannerScreenTrackingInfo = {
+    pageType: "your_privacy_page"
+    pageValues: {}
+  }
+  m.oneTrust.callFunc("showBannerUI", true)
+  m.oneTrust.observeFieldScoped("AcceptAll", "onAcceptAll")
+  m.oneTrust.observeFieldScoped("RejectAll", "onRejectAll")
+  m.oneTrust.observeFieldScoped("onHideBanner", "proceedAfterConsentUpdated")
+  m.oneTrust.observeFieldScoped("onHideFailure", "proceedAfterConsentUpdated")
+  m.top.observeFieldScoped("focusedChild", "onConsentScreenFocusChange")
+  
+  ' Since OT handles the displaying of screen. firing a page load after calling show banner ui method.
+  screenTrackingLoad(bannerScreenTrackingInfo)
 End Function
 
 
-Function onConsentActionButtonSelected(msg)
-  buttonSelected = msg.getData()
+Function onConsentScreenFocusChange(msg)
+  node = msg.getData()
+  if node.isSubType("OTBanner") = true
+    ' The focused child change event gets triggered every time the focus changes on the show consent screen.
+    ' Since we only want to know when OneTrust banner component loads for the first and receives focus.
+    ' Once it is loaded and focused for the first time we unobserve the field for which we have attached observer inside showConsentScreen above.
+    m.top.unObserveFieldScoped("focusedChild")
+    node.observeFieldScoped("onBannerClickedSettings", "onManagePreferencesSelected")
+    node.observeFieldScoped("onBannerClickedVendorList", "onManageVendorsSelected")
+  end if
+End Function
 
-  if buttonSelected <> m.constants.ui.consentActionButtonIds.manage
-    consents = m.consentSettings.consents
 
-    optValue = "opted_in"
+Function onAcceptAll(_msg)
+  onConsentActionButtonSelected(m.constants.ui.consentActionButtonIds.accept)
+End Function
+
+
+Function onRejectAll(_msg)
+  onConsentActionButtonSelected(m.constants.ui.consentActionButtonIds.reject)
+End Function
+
+
+Function onManagePreferencesSelected()
+  oldScreenTrackingInfo = {
+    pageType: "your_privacy_page"
+    pageValues: {}
+  }
+  currentScreenTrackingInfo = {
+    pageType: "privacy_preferences_page"
+    pageValues: {}
+  }
+  ' Since we do not control the manage preferences screen firing the events when the buttons are clicked.
+  screenTrackingNavigate(oldScreenTrackingInfo, currentScreenTrackingInfo)
+  screenTrackingLoad(currentScreenTrackingInfo)
+End Function
+
+
+' @buttonSelected: string, contains the id value of the button that was selected, accepted values are in m.constants.ui.consentActionButtonIds.
+Function onConsentActionButtonSelected(buttonSelected)
+  buttonValue = ""
+  if buttonSelected = m.constants.ui.consentActionButtonIds.reject
+    buttonValue = "REJECT_ALL_CONSENTS"
+  else if buttonSelected = m.constants.ui.consentActionButtonIds.accept
     buttonValue = "ACCEPT_ALL_CONSENTS"
-    if buttonSelected = m.constants.ui.consentActionButtonIds.reject
-      optValue = "opted_out"
-      buttonValue = "REJECT_ALL_CONSENTS"
-    end if
+  end if
 
-    if isNonEmptyArray(consents)
-      body = {}
-      ' Looping through the consents array and updating all non required preferences key to the user selected optValue.
-      ' Sample data. [{"key": "behavioral_advertising","subtitle": "Tubi may use your information to make inferences and predict your potential areas of interest.","title": "Targeted Advertising","value": "required", "isRequired": true}]
-      for each consent in consents
-        if consent.isRequired = false AND consent.key <> invalid
-          body[consent.key] = optValue
-        end if
-      end for
+  if isNonEmptyString(buttonValue) = true
+    trackingPageInfo = {
+      pageType: "your_privacy_page"
+      pageValues: {}
+    }
 
-      setConsent(body)
-    end if
-
-    screen = msg.getRoSGNode()
     componentValues = {
       button_type: "TEXT"
       button_value: buttonValue
     }
-    pageOneof = m.Tracking.getAnalyticsPage(screen.trackingPageInfo.pagetype, screen.trackingPageInfo.pageValues)
+    pageOneof = m.Tracking.getAnalyticsPage(trackingPageInfo.pagetype, trackingPageInfo.pageValues)
     componentOneof = m.Tracking.getAnalyticsComponent("button_component", componentValues)
 
     componentInteractionEvent =  {
@@ -53,25 +86,84 @@ Function onConsentActionButtonSelected(msg)
       type: "component_interaction"
       values: componentInteractionEvent
     }
-
-    proceedAfterConsentUpdated()
-  else
-    showManagePreferenceScreen(m.consentSettings.consents)
   end if
 End Function
 
 
-Function getConsent(onGetConsentCompletionCallback = invalid)
+Function getConsent(onGetConsentCompletionCallback)
   m.onGetConsentCompletionCallback = onGetConsentCompletionCallback
-  requestInfo = m.userDeviceApi.createGetConsentReqInfo()
-  m.makeRequest({
-    url: requestInfo.url
-    options: requestInfo.options
-    requestType: m.constants.reqNames.getConsent
-    successCallback: onGetConsentSuccess
-    responseType: "assocarray"
-    silenceCallbackWarnings: true
-  })
+  ' We are using One trust sdk only in GDPR countries.
+  ' If the user is in gdpr country then we will fetch the partner token and proceed with One trust sdk initialization.
+  if isGDPR(m.constants) = true
+    initialiazeOneTrustSDK()
+  else
+    ' If the user is not in GDPR country we will call account service get consent api.
+    ' Response from get consent will contain privacy center information and consent status for Roku's continue watching feature.
+    requestInfo = m.userDeviceApi.createGetConsentReqInfo()
+    m.makeRequest({
+      url: requestInfo.url
+      options: requestInfo.options
+      requestType: m.constants.reqNames.getConsent
+      successCallback: onGetConsentSuccess
+      responseType: "assocarray"
+      silenceCallbackWarnings: true
+    })
+  end if
+End Function
+
+
+Function initialiazeOneTrustSDK()
+  if m.oneTrust = invalid
+    m.oneTrust = CreateObject("roSGNode", "OTinitialize") 'bs:disable-line 1128
+    m.global.Addfield("OTsdk", "node", false)
+    ' Since One trust sdk access m.global.OTsdk within it's codebase we need to update the m.global.OTsdk to have the sdk instance.
+    ' The reason why we are also storing it's reference in m scope for better performance since we access the sdk instance a lot of items during the app session.
+    m.global.OTsdk = m.oneTrust
+  else
+    m.global.unobserveFieldScoped("_OT_initialize_data")
+  end if
+
+  sdkParams = m.oneTrust.callFunc("OTSdkParams")
+  oneTrustConfig = m.constants.thirdParty.oneTrust
+  sdkParams.applicationId = oneTrustConfig.applicationId
+  sdkParams.version = oneTrustConfig.version
+  sdkParams.location = oneTrustConfig.location
+  sdkParams.language = m.constants.deviceInfo.language
+  sdkParams.countryCode = m.constants.deviceInfo.countryCode
+
+  identifier = "roku:" + m.constants.deviceInfo.deviceId
+  sdkParams.shouldCreateProfile = true
+
+  sdkParams.identifier = identifier
+  sdkParams.identifierType = "DeviceID"
+  m.oneTrust.callFunc("setDataSubjectIdentifier",{"subjectIdentifier": identifier})
+
+  m.oneTrust.callFunc("initOTSDKData", sdkParams)
+  m.oneTrust.callFunc("setupUI", { "view": m.top })
+  tcfString = getTCFString()
+  
+  ' For performance reasons so that we can quickly show the homescreen.
+  ' Since for guest user consent if we have locally stored consent we do not have to wait until one trust syncs the data from backend
+  ' because we need to refresh registry consent with server data only for logged in user because there is a possibility of data been updated from other devices.
+  if isNonEmptyString(tcfString)
+    onOneTrustSDKInitializeComplete()
+  else
+    m.global.observeFieldScoped("_OT_initialize_data", "onOneTrustSDKInitializeComplete")
+    ' Attaching a error callback so that for any reason OT SDK failed to initialize we still continue with app load with assumption that user did not grant access.
+    m.oneTrust.observeFieldScoped("onHideFailure", "onOneTrustSDKInitializeComplete")
+  end if
+End Function
+
+
+Function onOneTrustSDKInitializeComplete()
+  m.trackingLoggingTask.userConsentsOptOutStatus = getConsentsOptOutStatus()
+  if m.onGetConsentCompletionCallback <> invalid
+    getConsentCompletionCallback = m.onGetConsentCompletionCallback
+    m.onGetConsentCompletionCallback = invalid
+    getConsentCompletionCallback()
+  end if
+  m.global.unobserveFieldScoped("_OT_initialize_data")
+  m.oneTrust.unobserveFieldScoped("onHideFailure")
 End Function
 
 
@@ -225,9 +317,15 @@ End Function
 
 
 Function onInitialGetConsentRequestComplete()
-  ' Calling getConsents api so that we have the data ready whenever we are ready to calling startUserExperience or showConsentScreen method.
-  if m.consentSettings <> invalid AND m.consentSettings.consentRequired = true AND isUserInAdultsMode() = true AND isKidsUIOn() = false
-    showConsentScreen()
+  if isGDPR(m.constants) = true
+    consentRequired = isUserConsentRequired()
+    ' Calling getConsents api so that we have the data ready whenever we are ready to calling startUserExperience or showConsentScreen method.
+    if consentRequired = true AND isUserInAdultsMode() = true AND isKidsUIOn() = false
+      showConsentScreen()
+    else
+      m.isConsentCheckComplete = true
+      startUserExperience()
+    end if
   else
     m.isConsentCheckComplete = true
     startUserExperience()
@@ -236,6 +334,10 @@ End Function
 
 
 Function proceedAfterConsentUpdated()
+  m.oneTrust.unObserveFieldScoped("AcceptAll")
+  m.oneTrust.unObserveFieldScoped("RejectAll")
+  m.oneTrust.unObserveFieldScoped("onHideBanner")
+  m.oneTrust.unObserveFieldScoped("onHideFailure")
   m.isConsentCheckComplete = true
   if m.callbackAfterConsent <> invalid
     callbackAfterConsent = m.callbackAfterConsent
@@ -252,19 +354,22 @@ End Function
 Function getConsentOptOutStatusByKey(key)
   didOptOut = false
 
-  ' Please do not remove the isUserInAdultsMode check since we are legally bound to not use parental consent when the user is not in adults mode.
-  ' Irrespective of whether user as opted in or opted out when we are in non adult mode we should treat has if user opted out.
-  isUserAllowedToManageConsent = isUserAllowedToManageConsent()
-  if m.consentSettings <> invalid AND isUserAllowedToManageConsent = true AND m.consentSettings.consents <> invalid
-    for each consent in m.consentSettings.consents
-      if consent.key = key
-        didOptOut = (consent.value = "opted_out")
-        exit for
-      end if
-    end for
+  if isGDPR(m.constants) = true
+    didOptOut = (m.oneTrust.callFunc("getConsentStatusForGroupID", key) <> 1)
   else
-    ' If m.consentSettings is invalid that means the request to get consent failed so we are treating it has opted_out for the session.
-    didOptOut = true
+    ' Irrespective of whether user as opted in or opted out when we are in non adult mode we should treat has if user opted out.
+    isUserAllowedToManageConsent = isUserAllowedToManageConsent()
+    if m.consentSettings <> invalid AND isUserAllowedToManageConsent = true AND m.consentSettings.consents <> invalid
+      for each consent in m.consentSettings.consents
+        if consent.key = key
+          didOptOut = (consent.value = "opted_out")
+          exit for
+        end if
+      end for
+    else
+      ' If m.consentSettings is invalid that means the request to get consent failed so we are treating it has opted_out for the session.
+      didOptOut = true
+    end if
   end if
 
   return didOptOut
@@ -294,11 +399,34 @@ Function getConsentsOptOutStatus()
   consentsStatus = {}
 
   isUserAllowedToManageConsent = isUserAllowedToManageConsent()
-  if m.consentSettings <> invalid AND isUserAllowedToManageConsent = true
-    for each consent in m.consentSettings.consents
-      consentsStatus[consent.key] = (consent.value = "opted_out")
+  if isUserAllowedToManageConsent = true
+    consentKeys = m.constants.consentKeys
+    for each key in consentKeys
+      consentsStatus[consentKeys[key]] = getConsentOptOutStatusByKey(consentKeys[key])
     end for
   end if
-
+  
   return consentsStatus
+End Function
+
+
+' Returns true or false based on which we will decide if we need to show the consent screen or not.
+' It will return false if user has already provided consent(either accepted or rejected).
+Function isUserConsentRequired()
+  consentRequired = false
+  if isGDPR(m.constants) = true
+    consentRequired = m.oneTrust.callFunc("shouldShowBanner")
+  else
+    if m.consentSettings <> invalid AND m.consentSettings.consentRequired = true
+      consentRequired = true
+    end if
+  end if
+
+  return consentRequired
+End Function
+
+
+' Creating a wrapper so that it is easier to switch to not use global and use some other method easily.
+Function getTCFString()
+  return m.global.IABTCF_TCString
 End Function

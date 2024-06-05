@@ -268,7 +268,7 @@ Function setupVideoPlayer(content, playbackSource = {"srcForAnalytic": "unknown"
     end if
 
     videoPlayer.userConsentsOptOutStatus = getConsentsOptOutStatus()
-    videoPlayer.didUserOptOutOfPersonalizedAdvertising = getConsentOptOutStatusByKey(m.constants.consentKeys.personalization)
+    videoPlayer.tcfString = getTCFString()
     videoPlayer.content = content
     videoPlayer.updateContent = true
 

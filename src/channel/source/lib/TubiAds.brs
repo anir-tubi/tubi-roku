@@ -1,4 +1,4 @@
-Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType)
+Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType, tcfString = invalid, userConsentsOptOutStatus = invalid, isGDPR = false)
   'Add Support for Roku Advertising Framework
   roAdFramework = Roku_Ads()
 
@@ -16,17 +16,24 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
 
   'turn on debug output for RAF
   roAdFramework.setDebugOutput(false)
-#if consoleLoggingEnabled
-  if constants.settings.mode = "qa" or constants.settings.mode = "staging"
-    roAdFramework.setDebugOutput(true)
-  end if
-#end if
+  #if consoleLoggingEnabled
+    if constants.settings.mode = "qa" or constants.settings.mode = "staging"
+      roAdFramework.setDebugOutput(true)
+    end if
+  #end if
 
   'a port used for sending logging requests
   adLoggingPort = CreateObject("roMessagePort")
 
   if adContentType <> "hls" AND adContentType <> "mp4"
     adContentType = "mp4"  ' safety fallback
+  end if
+
+  if isFunction(roAdFramework.setLimitAdTracking) = true AND userConsentsOptOutStatus <> invalid then
+    userPersonalAdOptOutStatus = userConsentsOptOutStatus[constants.consentKeys.personalization]
+    if userPersonalAdOptOutStatus <> invalid
+      roAdFramework.setLimitAdTracking(userPersonalAdOptOutStatus)
+    end if
   end if
 
   return {
@@ -75,12 +82,15 @@ Function TubiAds(constants, request, requestQueue, auth, tracking, adContentType
     setLimitAdTracking: tubiAds_setLimitAdTracking
     appMode: "DEFAULT_MODE"
     notUsedAdPodPixels: {} ' List of pixels for the current ad pod that should be sent if playback is stopped before we get an impression for that ad
+    tcfString: tcfString ' IAB TC String, currently stored in m.global.IABTCF_TCString from one trust sdk.
+    userConsentsOptOutStatus: userConsentsOptOutStatus ' assoc array of consent to purpose key mapping. ex: {"functional": true, "analytics": true}
+    isGDPR: isGDPR
   }
 End Function
 
 
 ' returns a set of ad helper functions that can be used outside of TubiAds without invoking RAF
-Function TubiAdsLimited(constants, auth)
+Function TubiAdsLimited(constants, auth, tcfString = invalid, userConsentsOptOutStatus = invalid, isGDPR = false)
 
   return {
     constants: constants
@@ -95,6 +105,9 @@ Function TubiAdsLimited(constants, auth)
     getNielsenStreamId: tubiAds_getNielsenStreamId
     getMd5Hash: tubiAds_getMd5Hash
     replaceMacro: tubiAds_replaceMacro
+    tcfString: tcfString ' IAB TC String, currently stored in m.global.IABTCF_TCString from one trust sdk.
+    userConsentsOptOutStatus: userConsentsOptOutStatus ' assoc array of consent to purpose key mapping. ex: {"functional": true, "analytics": true}
+    isGDPR: isGDPR
   }
 End Function
 
@@ -209,6 +222,11 @@ End Function
 Function tubiAds_getRainmakerParams(content, breakPos = 0)
   'rounding the float to integer as rainmaker will accept only integer format
   roundedBreakPos = round(breakPos)
+  ' Converting it to integer since we need to pass numeric boolean.
+  gdpr = 0
+  if m.isGDPR = true 'bs:disable-line 1001 LINT1001
+    gdpr = 1
+  end if
 
   params = {
     content_id: content.id
@@ -228,6 +246,7 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
     ' limit_to_lineitem_id: 0   'only allow ads with that particular line item id through the pre-qual filters
     ' limit_to_creative_id: 0   'only allow ads with that particular campaign id through the pre-qual filters
     ' debug: 0    'set to 1 in order to use the "limit" parameters above
+    gdpr: gdpr
   }
 
   '//send sponsored exposure value if the user call this video from a sponsored container.
@@ -276,6 +295,25 @@ Function tubiAds_getRainmakerParams(content, breakPos = 0)
   end if
 
   params["origin"] = origin
+
+  if gdpr = 1
+    consentKeys = m.constants.consentKeys
+
+    ' 1 when the user has not opted-out of the analytics tubi purpose.
+    analyticsConsentStatus = 1    
+    if m.userConsentsOptOutStatus[consentKeys.analytics] = true
+      analyticsConsentStatus = 0
+    end if
+
+    ' 1 when the user has not opted-out of the personalized advertising tubi purpose.
+    personalizedAdsConsentStatus = 1
+    if m.userConsentsOptOutStatus[consentKeys.personalization] = true
+      personalizedAdsConsentStatus = 0
+    end if
+    
+    params["gdpr_analytics"] = analyticsConsentStatus
+    params["gdpr_personalized_ads"] = personalizedAdsConsentStatus
+  end if
 
   return params
 End Function
@@ -335,6 +373,10 @@ Function tubiAds_retrieveAds(adsUrl, adInsertionMethod)
     requestOptions.headers = {
       "x-tubi-paln": givn
     }
+  end if
+
+  if m.isGDPR = true 'bs:disable-line 1001 LINT1001
+    requestOptions.headers["X-Tubi-TCF-String"] = m.tcfString
   end if
 
   ' RAF has a hard 5 second cutoff for download time.

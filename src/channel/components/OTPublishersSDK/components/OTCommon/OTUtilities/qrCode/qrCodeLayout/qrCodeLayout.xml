@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--********** Copyright 2020 One trust.  All
+Rights Reserved. **********-->
+
+<component name="qrCodeLayout" extends="Group">
+    <interface>
+        <field id="show" type="boolean" value="false" />
+        <field id="qrCodeLightColor" type="string" value="0xffffff" />
+        <field id="qrCodeDarkColor" type="string" value="0x000000" />
+        <field id="headerText" type="string" value="" />
+        <field id="headerColor" type="string" value="0x000000" />
+        <field id="uri" type="string" alwaysNotify="true" onchange="onQrCodeData" />
+    </interface>
+    <script type="text/brightscript" uri="./qrCodeLayout.brs" />
+    <children>
+        <LayoutGroup id="qrCodeLayoutGroup" layoutDirection="vert" vertAlignment="top"
+            itemSpacings="[0]" visible="false">
+            <Label id="qrCodeHeader" font="font:SmallSystemFont" text="" vertAlign="top"
+                horizAlign="center" wrap="true" color="0xEEEEEE" />
+            <qrCode id="qrCode" text="" />
+        </LayoutGroup>
+    </children>
+</component>
+    

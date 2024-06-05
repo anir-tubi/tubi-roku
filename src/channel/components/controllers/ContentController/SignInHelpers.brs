@@ -663,19 +663,14 @@ Function onActivationSuccess()
 End Function
 
 
-Function handleUpdatedAuthAndGetServerPersistentData(callback)
-  handleUpdatedAuth()
-  getServerPersistentData(callback)
-End Function
-
-
 Function refreshConsent()
+  handleUpdatedAuth()
   getConsent(showConsentScreenOrRefreshServerPersistentData)
 End Function
 
 
 Function showConsentScreenOrRefreshServerPersistentData()
-  if m.consentSettings <> invalid AND m.consentSettings.consentRequired = true
+  if isUserConsentRequired() = true
     showConsentScreen(refreshServerPersistentDataAfterSignIn)
   else
     refreshServerPersistentDataAfterSignIn()
@@ -684,7 +679,7 @@ end function
 
 
 Function refreshServerPersistentDataAfterSignIn()
-  handleUpdatedAuthAndGetServerPersistentData(onPostSignInAuthInfoUpdated)
+  getServerPersistentData(onPostSignInAuthInfoUpdated)
 End Function
 
 
@@ -799,17 +794,18 @@ Function onSignOutCompleted()
     }
   }
 
-  handleUpdatedAuthAndGetServerPersistentData(getConsentAfterSignOut)
+  getConsentAfterSignOut()
 End Function
 
 
 Function getConsentAfterSignOut()
+  handleUpdatedAuth()
   getConsent(showConsentScreenOrRefreshServerPersistentDataAfterSignOut)
 End Function
 
 
 Function showConsentScreenOrRefreshServerPersistentDataAfterSignOut()
-  if m.consentSettings <> invalid AND m.consentSettings.consentRequired = true
+  if isUserConsentRequired() = true
     showConsentScreen(onPostSignOutServerPersistentDataRefresh)
   else
     onPostSignOutServerPersistentDataRefresh()

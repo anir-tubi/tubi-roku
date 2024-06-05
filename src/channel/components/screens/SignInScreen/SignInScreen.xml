@@ -88,35 +88,22 @@
         layoutDirection="vert"
         vertAlignment="custom"
         horizAlignment="center"
-        itemSpacings="[90, 130]">
+        itemSpacings="[153, 46]">
 
         <SimpleButton
           id="continueBtn"
-          width="408"/>
+          width="303"/>
 
         <SimpleButton
           id="forgotPasswordBtn"/>
 
-        <ButtonGroup
-          id="staticPageLinkGroup"
-          layoutDirection="horiz"
-          horizAlignment="center"
-          vertAlignment="custom"
-          itemSpacings="[96]">
-
-          <SimpleButton
-            id="termsBtn"
-            unfocusedBackgroundOpacity="0"/>
-
-          <SimpleButton
-            id="ppBtn"
-            unfocusedBackgroundOpacity="0"/>
-
-          <SimpleButton
-            id="YourPrivacyChoicesButton"
-            unfocusedBackgroundOpacity="0"/>
-
-        </ButtonGroup>
+        <Label
+          translation="[225, 963]"
+          id="privacyDisclaimer"
+          horizAlign="center"
+          wrap="true"
+          width="1470">
+        </Label>
 
       </LayoutGroup>
 

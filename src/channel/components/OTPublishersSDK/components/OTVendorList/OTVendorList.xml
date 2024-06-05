@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--********** Copyright 2020 One trust.  All Rights
+Reserved. **********-->
+
+
+<component name="OTVendorList" extends="Group">
+    <interface>
+        <field id="updatedGroups" type="assocarray" />
+        <field id="onHidePreferenceCenter" type="boolean" />
+        <field id="onShowVendorList" type="boolean" />
+        <field id="onPreferenceCenterAcceptAll" type="boolean" />
+        <field id="onPreferenceCenterRejectAll" type="boolean" />
+        <field id="onPreferenceCenterConfirmChoices" type="boolean" />
+        <field id="onPreferenceCenterPurposeLegitimateInterestChanged" type="boolean" />
+        <field id="onPreferenceCenterPurposeConsentChanged" type="boolean" />
+        <field id="pcData" type="assocarray" onchange="onPreferenceData" />
+        <field id="view" type="node" />
+        <field id="filterType" type="assocarray" />
+    </interface>
+
+    <script type="text/brightscript" uri="../OTVendorList/OTVendorList.brs" />
+    <script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/consentLI.brs"></script>
+    <script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/vendor.helper.brs"></script>
+    <script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/style.brs"></script>
+    <script type="text/brightscript" uri="../../components/OTCommon/OTUtilities/utils.brs"></script>
+
+    <children>
+        <Rectangle id="groupRect" width="1920" height="1080" translation="[0,0]">
+        </Rectangle>
+        <Rectangle id="groupHeadRect" width="1920" height="120" translation="[0,0]">
+            <LayoutGroup translation="[50,50]" itemSpacings="[0]" horizAlignment="left"
+                layoutDirection="horiz">
+                <Poster id="logo" translation="[0,0]" loadHeight="60" height="60" loadSync="true"
+                    loadDisplayMode="scaleToFit" visible="false" />
+                <Label id="divider" font="font:LargeSystemFont" width="60" height="60"
+                    horizAlign="center" vertAlign="center" text="|" visible="false" scale="[0,0]" />
+                <Label id="vendorHeader" font="font:LargeBoldSystemFont" width="500" height="60"
+                    text="" vertAlign="center" translation="[0,0]" visible="false" color="0xEEEEEE" />
+            </LayoutGroup>
+        </Rectangle>
+        <Rectangle id="menuSection" translation="[0,0]">
+            <Rectangle id="menuInnerSection" translation="[0,0]">
+                <MarkupGrid
+                    id="menuListView"
+                    itemComponentName="OTButtonListView"
+                    itemSize="[560, 60]"
+                    itemSpacing="[15, 0]"
+                    numRows="1"
+                    numColumns="2"
+                    vertFocusAnimationStyle="floatingFocus"
+                    drawFocusFeedback="false"
+                    translation="[0,0]"
+                    visible="false"
+                    scale="[0,0]"
+                />
+                <MarkupGrid
+                    id="filterListView"
+                    itemComponentName="OTButtonListView"
+                    itemSize="[560, 60]"
+                    itemSpacing="[15, 0]"
+                    numRows="1"
+                    numColumns="6"
+                    vertFocusAnimationStyle="floatingFocus"
+                    drawFocusFeedback="false"
+                    translation="[0,0]"
+                />
+            </Rectangle>
+        </Rectangle>
+        <Label id="btnSizetext" font="font:MediumSystemFont" translation="[0,0]" visible="false"
+            color="0xEEEEEE" wrap="true" />
+        <Rectangle id="overlayXRect" width="1920" height="1080" color="0x000000" />
+        <Rectangle id="overlayYRect" width="1920" height="1080" color="0x000000" />
+        <Poster id="poweredLogo" width="136" height="16"
+            uri="pkg:/components/OTPublishersSDK/images/poweredBy_ot_logo.png"
+            translation="[1000,500]" />
+    </children>
+</component>

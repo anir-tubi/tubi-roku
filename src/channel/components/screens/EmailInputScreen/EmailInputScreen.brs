@@ -36,6 +36,14 @@ Function init()
   m.continue.text = getTranslation("dialog_button_continue")
   m.continue.observeFieldScoped("selected", "onContinueButtonSelected")
 
+  m.privacyDisclaimer = m.top.findNode("privacyDisclaimer")
+  externalConfig = m.constants.externalConfig.info
+  params = {
+    "privacy_policy_url": externalConfig.privacy_policy_url,
+    "terms_of_use_url": externalConfig.terms_of_use_url
+  }
+  m.privacyDisclaimer.text = getTranslation("privacy_disclaimer", params)
+
   m.keyboard.textEditBox.observeFieldScoped("focusedChild", "onKeyboardTextEditBoxFocusedChildChange")
 
   m.keyboard.textEditBox.observeFieldScoped("cursorPosition", "onKeyboardTextEditBoxCursorPositionChange")
@@ -58,26 +66,34 @@ Function init()
   typographyConstants = getTypographyConstants()
   setTypographyOfLabel(m.pageHeading, typographyConstants.ids.headerLarge)
   setTypographyOfLabel(m.emailValidationMsg, typographyConstants.ids.bodySmallStrong)
+  setTypographyOfLabel(m.privacyDisclaimer, typographyConstants.ids.bodySmall)
 
   if m.global <> invalid
     m.global.observeFieldScoped("theme", "onThemeChange")
   end if
+  onThemeChange()
 End Function
 
 
 Function onThemeChange(msg = invalid)
-  theme = msg.getData()
+  if msg <> invalid
+    theme = msg.getData()
+  else
+    theme = getThemeFromGlobal()
+  end if
 
   if theme <> invalid
     m.back.color = theme.backgroundColorLight
     m.continue.color = theme.backgroundColorLight
-    m.emailValidationMsg.color = theme.focused2Color
+    m.emailValidationMsg.color = theme.cautionColor
     m.pageHeading.color = theme.primaryTextColor
 
     paletteColors = m.keyboard.palette.colors
     paletteColors.FocusItemColor = theme.focusedTextColor
     paletteColors.FocusColor = theme.focusedColor
     m.keyboard.palette.colors = paletteColors
+
+    m.privacyDisclaimer.color = theme.secondaryTextColor
   end if
 End Function
 
