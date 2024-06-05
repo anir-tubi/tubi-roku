@@ -2152,6 +2152,7 @@ End Function
 
 Function setInitialSubtitleTrack(availableSubtitleTracks)
   preferredSubtitleTrack = m.top.preferredSubtitleTrack
+
   ' Proceeding only if we have stored device level settings.
   if availableSubtitleTracks <> invalid AND availableSubtitleTracks.Count() > 0 AND isAA(preferredSubtitleTrack) = true AND isNonEmptyString(preferredSubtitleTrack.language) = true
     ' Holds the value of the subtitleTrack to be set to the video node.
@@ -2172,10 +2173,8 @@ Function setInitialSubtitleTrack(availableSubtitleTracks)
     if updatedSubtitleTrack <> invalid
       m.Video.subtitleTrack = updatedSubtitleTrack.TrackName
       m.closedCaptionAndAudioSelectionOverlay.closedCaptionTrack = updatedSubtitleTrack.TrackName
-      m.Video.globalCaptionMode = "On"
     else
       m.closedCaptionAndAudioSelectionOverlay.closedCaptionTrack = availableSubtitleTracks[0].TrackName
-      m.Video.globalCaptionMode = "Off"
     end if
 
   else if availableSubtitleTracks <> invalid AND availableSubtitleTracks.Count() > 0 AND isNonEmptyString(m.video.currentSubtitleTrack) = true
