@@ -341,7 +341,7 @@ TBD
 
   See: [Add the key to your SSH agent](https://tubitv.atlassian.net/wiki/spaces/SEC/pages/917963346/SSH+Config#Add-the-key-to-your-SSH-agent)
 
-- After deployment make sure you can download the components you just uploaded to the CDN using the URLs associated with `starterComponentsUrl`, `remoteComponentsUrl`, `rcdnStarterComponentsUrl`, and `rcdnRemoteComponentsUrl` in default.yml.
+- After deployment make sure you can download the components you just uploaded to the CDN using the URLs associated with `starterComponentsUrl` and `remoteComponentsUrl` in default.yml.
 
   Note: The URLs will require you to replace a part of the URL with version strings. For instance: "{{versionMinorUnderscored}}" = "3_2", "{{versionUnderscored}}" = "3_2_34_0".
 
@@ -470,7 +470,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
   See: [Add the key to your SSH agent](https://tubitv.atlassian.net/wiki/spaces/SEC/pages/917963346/SSH+Config#Add-the-key-to-your-SSH-agent)
 
-- After deployment make sure you can download the components you just uploaded to the CDN using the URLs associated with `starterComponentsUrl`, `remoteComponentsUrl`, `rcdnStarterComponentsUrl`, and `rcdnRemoteComponentsUrl` in default.yml.
+- After deployment make sure you can download the components you just uploaded to the CDN using the URLs associated with `starterComponentsUrl` and `remoteComponentsUrl` in default.yml.
 
   Note: The URLs will require you to replace a part of the URL with version strings. For instance: "{{versionMinorUnderscored}}" = "3_2", "{{versionUnderscored}}" = "3_2_34_0".
 
@@ -538,7 +538,7 @@ Then run:
 
 In addition to Suitest tests we are now adding our own internal tests as well. Getting started with these is covered in this [wiki](https://tubitv.atlassian.net/wiki/spaces/QA/pages/2827419649/Roku+RTA+tests+environment+setup+and+getting+started+writing+tests)
 
-There are some overrides that are helpful while writing tests these are:  
+There are some overrides that are helpful while writing tests these are:
 `DISABLE_MOCHA_PARALLEL` - Will prevent running tests in parallel. You can not use `.only` when run in parallel so need to disable it in order to run only a single test. Parallel testing is only used if multiple devices are included in rta-config.json.
 
 `ENABLE_MOCHA_BAIL` - Will cause mocha to stop running tests as soon as first test fails.

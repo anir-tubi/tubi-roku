@@ -10,21 +10,15 @@ Function init()
     processAnimationLogo()
   end if
 
-  '//TODO : after the experiment roku_new_cdn set both m.isExperimentConfigReady and m.isExternalConfigReady to false to start with.
-
-  m.isExperimentConfigReady = (m.constants <> invalid AND m.constants.experiments <> invalid AND m.constants.experiments.info <> invalid)
-  m.isExternalConfigReady = (m.constants <> invalid AND m.constants.externalConfig <> invalid AND m.constants.externalConfig.info <> invalid AND m.constants.externalConfig.info.Count() > 0)
+  m.isExperimentConfigReady = false
+  m.isExternalConfigReady = false
 
   m.top.observeFieldScoped("getUrl", "onUrlRequest")
 
   starterTask = createObject("roSGNode", "StarterGeneralTask") ' initiate StarterTask
   GeneralTaskModule(m, starterTask)
 
-  if m.isExperimentConfigReady = true AND m.isExternalConfigReady = true
-    checkIfExperimentAndRemoteConfigReadyAndProceed()
-  else
-    sendRequestForExperimentsAndConfig()
-  end if
+  sendRequestForExperimentsAndConfig()
 
 End Function
 
@@ -50,6 +44,7 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
     if m.constants.settings.useRemoteComponents = false
       m.top.useRemoteComponents = m.constants.settings.useRemoteComponents
     else
+      remoteComponentsUrl = m.constants.settings.remoteComponentsUrl
 
       ' if an experiment or remote config needs to update the remoteComponentsUrl, do it here.
       ' (experiment tracking should not happen here. It should happen when the user encounters the experiment!)
@@ -68,21 +63,7 @@ Function checkIfExperimentAndRemoteConfigReadyAndProceed()
       ' REMOTE/EXTERNAL CONFIG EXAMPLE:
       ' remoteComponentsUrl = m.constants.externalConfig.sideNavRemoteComponentsUrl
       '-------------------------------------------------------------------------------------'
-      experiments = TubiExperiments(m.constants)
-      remoteComponentsUrl = m.constants.settings.remoteComponentsUrl
-      if experiments <> invalid then
-        if m.constants.settings.mode <> "dev"
-          if experiments.getExperimentResource("roku_new_cdn", "roku_new_cdn_v1").enabled = true
-            remoteComponentsUrl = m.constants.settings.rcdnRemoteComponentsUrl
-          end if
-        end if
 
-        if experiments.getExperimentResource("roku_async_stop", "roku_async_stop_v5").enabled = true then
-          m.animationLogo.asyncStopSemantics = true
-        end if
-      end if
-      '-------------------------------------------------------------------------------------'
-      '-------------------------------------------------------------------------------------'
 
       ' This needs to be set before m.top.remoteComponentsUrl as we are getting m.top.remoteComponentLibProvided as part of that observer's additional fields
       m.top.remoteComponentLibProvided = m.constants.settings.remoteComponentLibProvided

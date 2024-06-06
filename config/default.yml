@@ -6,11 +6,8 @@ settings:
   contentType: "hls"
   shortAppName: "tubitv"
   platformName: "roku"
-  # if experiment roku_new_cdn graduates, change startercomponenturl to rcdnStarterComponentURl and remoteComponentsUrl to rcdnRemoteComponentsUrl and
-  starterComponentsUrl: "https://cdn.adrise.tv/hotpatches/roku/starter-components/tubi_starter_components_{{versionMinorUnderscored}}.pkg"
-  remoteComponentsUrl: "https://cdn.adrise.tv/hotpatches/roku/components/tubi_remote_components_{{versionUnderscored}}.pkg"
-  rcdnStarterComponentsUrl: "https://rcdn-production.tubitv.com/appFiles/starter-components/tubi_starter_components_{{versionMinorUnderscored}}.pkg"
-  rcdnRemoteComponentsUrl:  "https://rcdn-production.tubitv.com/appFiles/components/tubi_remote_components_{{versionUnderscored}}.pkg"
+  starterComponentsUrl: "https://rcdn-production.tubitv.com/appFiles/starter-components/tubi_starter_components_{{versionMinorUnderscored}}.pkg"
+  remoteComponentsUrl:  "https://rcdn-production.tubitv.com/appFiles/components/tubi_remote_components_{{versionUnderscored}}.pkg"
   remoteComponentsExtension: "pkg"
   remoteComponentLibProvided: "{{remoteComponentLibProvided}}"
   suitest: false

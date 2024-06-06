@@ -44,10 +44,6 @@ Function TubiExperiments(constants) as Object
         roku_linear_favorites_v1: {"enabled": false}
       }
 
-      roku_new_cdn: {
-        roku_new_cdn_v1: {"enabled": false}
-      }
-
       roku_registration_vs_tvt_lock_rated_content: {
         roku_registration_vs_tvt_lock_rated_content_v2: {"enabled" : false}
       }

@@ -3,8 +3,5 @@ settings:
   # Settings are added to constants.settings via getSettings
   # Any constants that need to be templatized should be added via settings
   mode: "staging"
-  # Delete starterComponentsUrl and remoteComponentsUrl after rcdn experiment graduates. Untill then keep both control and treatment pointing to rcdn staging since we have removed adrise-bryan-playground bucket
   starterComponentsUrl: "https://rcdn-staging.tubitv.com/appFiles/starter-components/tubi_starter_components_{{versionMinorUnderscored}}.pkg"
   remoteComponentsUrl: "https://rcdn-staging.tubitv.com/appFiles/components/tubi_remote_components_{{versionUnderscored}}.pkg"
-  rcdnStarterComponentsUrl: "https://rcdn-staging.tubitv.com/appFiles/starter-components/tubi_starter_components_{{versionMinorUnderscored}}.pkg"
-  rcdnRemoteComponentsUrl: "https://rcdn-staging.tubitv.com/appFiles/components/tubi_remote_components_{{versionUnderscored}}.pkg"
