@@ -366,9 +366,11 @@ Function createPrivacyCenterPanel(title)
     privacyCenterPanel.focusable = focusable
     privacyCenterPanel.offset = [m.rightPanelOffset[0],-141]
     privacyCenterPanel.observeFieldScoped("newConsentPreferences", "onNewConsentPreferences")
-    privacyCenterPanel.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
     privacyCenterPanel.observeFieldScoped("didUserSelectSaveAndRestart", "onDidUserSelectSaveAndRestart")
   end if
+
+  ' Since we have QR Code for all geos moving it outside of the else.
+  privacyCenterPanel.observeFieldScoped("selectedQrCodeSectionInfo", "onSelectedQrCodeSectionInfoChanged")
 
 
   pageValues = {
