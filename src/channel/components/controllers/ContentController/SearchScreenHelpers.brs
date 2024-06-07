@@ -10,6 +10,11 @@ Function showSearchScreen()
   searchScreen.observeFieldScoped("contentToPlay", "onSearchContentToPlay")
 
   searchScreen.isUserEligibleForTrendingSearchContents = (isUserInAdultsMode() = true AND isDeviceInUS() = true AND isKidsUIOn() = false)
+
+  if isGDPR() = false
+    searchScreen.isKidsModeAvailable = true
+  end if
+  
   searchScreen.id = m.constants.ui.screenIds.searchScreen
   searchScreen.searchText = "" '//Set searchText to "" to initiate the search screen and load the default "search results"
 

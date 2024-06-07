@@ -83,6 +83,7 @@ Function init()
   m.top.observeField("signedIn", "onSignedInChange")
   m.top.observeField("contentUpdated", "onSearchContentChange")
   m.top.observeField("transportVoiceRequest", "onTransportVoiceRequest")
+  m.top.observeFieldScoped("isKidsModeAvailable", "onIsKidsModeAvailableChange")
 
   'set initial tracking values
   m.top.trackingPageInfo = {
@@ -192,7 +193,11 @@ End Function
 Function setSearchStrings()
   m.sDefaultSearchText = getTranslation("screenSearch_trendingSearch")
   m.searchTitleText = getTranslation("menu_search")
-  m.searchHintToSearch = getTranslation("screenSearch_defaultLinearSearch")
+  if m.constants.externalConfig.info.livetv = true
+    m.searchHintToSearch = getTranslation("screenSearch_defaultLinearSearch")
+  else
+    m.searchHintToSearch = getTranslation("screenSearch_defaultSearch")
+  end if
   setDefaultText()
   m.searchText.text = ""
   m.trendingSearchHeading.text = m.sDefaultSearchText
@@ -753,4 +758,11 @@ Function handleInfoPanelVisibilityForLeftPress()
   if m.microphone <> invalid
     m.microphone.visible = true
   end if
+End Function
+
+
+Function onIsKidsModeAvailableChange(msg)
+  isKidsModeAvailable = msg.getData()
+  kidsModeGroup = m.top.findNode("kidsModeGroup")
+  kidsModeGroup.visible = isKidsModeAvailable
 End Function

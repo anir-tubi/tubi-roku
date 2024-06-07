@@ -637,6 +637,10 @@ Function getTranslation_en_US()
       "description": "Directions on the search page",
       "message": "Search for movies, TV shows, Live TV, and people"
     },
+    "screenSearch_defaultSearch": {
+      "description": "Directions on the search page",
+      "message": "Search for movies, TV shows, and people"
+    },
     "screenSearch_trendingSearch": {
       "description": "A header message that shows on top of default search results in search screen",
       "message": "Trending Searches"
