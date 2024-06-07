@@ -1259,7 +1259,7 @@ Function getTranslation_en_US()
     },
     "metadata_continueWatching_notSignedIn_container_description": {
       "description": "tells non registered user what they need to do to see the continue watching container",
-      "message": "No Subscription  •  No Credit Card  •  Free Forever"
+      "message": "No Subscription  •  No Credit Card  •  Totally Free"
     },
     "metadata_continueWatching_notSignedIn_container_button": {
       "description": "button text for when a non registered user focuses on the continue watching container",
@@ -1669,7 +1669,7 @@ Function getTranslation_en_US()
     },
     "reg_intro_sub_header":{
       "description": "sub header displayed on registraton welcome modal",
-      "message": "No credit card. Free forever."
+      "message": "No credit card. Totally Free."
     },
     "reg_first_line_sub_item": {
       "description": "first sub item to be displayed under reg_first_line_item to explain user about benifit of registration",

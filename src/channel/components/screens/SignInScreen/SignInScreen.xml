@@ -88,13 +88,14 @@
         layoutDirection="vert"
         vertAlignment="custom"
         horizAlignment="center"
-        itemSpacings="[153, 46]">
+        itemSpacings="[12, 204]">
 
         <SimpleButton
           id="continueBtn"
           width="303"/>
 
         <SimpleButton
+          width="303"
           id="forgotPasswordBtn"/>
 
         <Label
