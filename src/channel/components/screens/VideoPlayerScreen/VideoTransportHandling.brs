@@ -498,9 +498,6 @@ Function handleOk()
   if m.HUD.opacity = 0 AND m.skipCuepointsButton.hasFocus() = false
     showTransport()
     showYMAL()
-    if m.VideoState = "play" AND getExperimentResource("roku_ok_pause", "roku_ok_pause_v1", true).enabled = true then
-      pauseVideo(true, true)
-    end if
   else
     'do action based on the current focused button
     focusButtonId = m.TransportButtons.getChild(m.focusedButtonIndex).id
