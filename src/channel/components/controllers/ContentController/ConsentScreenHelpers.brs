@@ -354,24 +354,27 @@ End Function
 Function getConsentOptOutStatusByKey(key)
   didOptOut = false
 
-  if isGDPR(m.constants) = true
-    didOptOut = (m.oneTrust.callFunc("getConsentStatusForGroupID", key) <> 1)
-  else
-    ' Irrespective of whether user as opted in or opted out when we are in non adult mode we should treat has if user opted out.
-    isUserAllowedToManageConsent = isUserAllowedToManageConsent()
-    if m.consentSettings <> invalid AND isUserAllowedToManageConsent = true AND m.consentSettings.consents <> invalid
-      for each consent in m.consentSettings.consents
-        if consent.key = key
-          didOptOut = (consent.value = "opted_out")
-          exit for
-        end if
-      end for
+  ' Proceeding with consent check only if key is not essential. Since if it is essential we are allowed to proceed in kids etc.
+  if key <> m.constants.consentKeys.essential
+    if isGDPR(m.constants) = true
+      didOptOut = (m.oneTrust.callFunc("getConsentStatusForGroupID", key) <> 1)
     else
-      ' If m.consentSettings is invalid that means the request to get consent failed so we are treating it has opted_out for the session.
-      didOptOut = true
+      ' Irrespective of whether user as opted in or opted out when we are in non adult mode we should treat has if user opted out.
+      isUserAllowedToManageConsent = isUserAllowedToManageConsent()
+      if m.consentSettings <> invalid AND isUserAllowedToManageConsent = true AND m.consentSettings.consents <> invalid
+        for each consent in m.consentSettings.consents
+          if consent.key = key
+            didOptOut = (consent.value = "opted_out")
+            exit for
+          end if
+        end for
+      else
+        ' If m.consentSettings is invalid that means the request to get consent failed so we are treating it has opted_out for the session.
+        didOptOut = true
+      end if
     end if
   end if
-
+  
   return didOptOut
 End Function
 
