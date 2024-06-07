@@ -851,7 +851,7 @@ Function onLinearChannelSelectedFromGuide()
           "srcForAds": m.constants.player.playbackOrigin.epg
           "playbackContainer": channel.parentId
         }
-        playLinearVideoContent(channel, false, videoPlayer.associatedScreenID, videoPlayer.allowTransportToAppear, playbackSource)
+        playLinearVideoContent(channel, false, videoPlayer.associatedScreenID, false, playbackSource)
         newTrackingPageInfo = videoPlayer.trackingPageInfo
         screenTrackingNavigate(oldTrackingPageInfo, newTrackingPageInfo, trackingComponentInfo)
         videoPlayer.trackingComponentInfo = invalid
