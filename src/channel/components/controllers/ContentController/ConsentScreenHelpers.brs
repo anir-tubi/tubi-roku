@@ -1,6 +1,5 @@
 Function showConsentScreen(callback = startUserExperience)
   m.callbackAfterConsent = callback
-  showContentGroupAndHideSpinner()
   bannerScreenTrackingInfo = {
     pageType: "your_privacy_page"
     pageValues: {}
