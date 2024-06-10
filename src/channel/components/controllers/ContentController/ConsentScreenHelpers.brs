@@ -10,8 +10,10 @@ Function showConsentScreen(callback = startUserExperience)
   m.oneTrust.observeFieldScoped("RejectAll", "onRejectAll")
   m.oneTrust.observeFieldScoped("onHideBanner", "proceedAfterConsentUpdated")
   m.oneTrust.observeFieldScoped("onHideFailure", "proceedAfterConsentUpdated")
-  m.top.observeFieldScoped("focusedChild", "onConsentScreenFocusChange")
-  
+  oneTrustViews = m.top.findNode("OneTrustViews")
+  if oneTrustViews <> invalid
+    oneTrustViews.observeFieldScoped("focusedChild", "onConsentScreenFocusChange")
+  end if
   ' Since OT handles the displaying of screen. firing a page load after calling show banner ui method.
   screenTrackingLoad(bannerScreenTrackingInfo)
 End Function
@@ -23,7 +25,10 @@ Function onConsentScreenFocusChange(msg)
     ' The focused child change event gets triggered every time the focus changes on the show consent screen.
     ' Since we only want to know when OneTrust banner component loads for the first and receives focus.
     ' Once it is loaded and focused for the first time we unobserve the field for which we have attached observer inside showConsentScreen above.
-    m.top.unObserveFieldScoped("focusedChild")
+    oneTrustViews = m.top.findNode("OneTrustViews")
+    if oneTrustViews <> invalid
+      oneTrustViews.unObserveFieldScoped("focusedChild")
+    end if
     node.observeFieldScoped("onBannerClickedSettings", "onManagePreferencesSelected")
     node.observeFieldScoped("onBannerClickedVendorList", "onManageVendorsSelected")
   end if
@@ -95,6 +100,8 @@ Function getConsent(onGetConsentCompletionCallback)
   ' We are using One trust sdk only in GDPR countries.
   ' If the user is in gdpr country then we will fetch the partner token and proceed with One trust sdk initialization.
   if isGDPR(m.constants) = true
+    oneTrustViews = m.top.createChild("Group")
+    oneTrustViews.id = "oneTrustViews"
     initialiazeOneTrustSDK()
   else
     ' If the user is not in GDPR country we will call account service get consent api.
@@ -139,7 +146,10 @@ Function initialiazeOneTrustSDK()
   m.oneTrust.callFunc("setDataSubjectIdentifier",{"subjectIdentifier": identifier})
 
   m.oneTrust.callFunc("initOTSDKData", sdkParams)
-  m.oneTrust.callFunc("setupUI", { "view": m.top })
+  oneTrustViewsGroup = m.top.findNode("OneTrustViews")
+  if oneTrustViewsGroup <> invalid
+    m.oneTrust.callFunc("setupUI", { "view":  oneTrustViewsGroup})
+  end if
   tcfString = getTCFString()
   
   ' For performance reasons so that we can quickly show the homescreen.
