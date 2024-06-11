@@ -11,7 +11,9 @@
 ' WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ' See the License for the specific language governing permissions and
 ' limitations under the License.
-
+'
+' GAM Utils v2.0.0b2
+'
 ' GAM Utils is a small BrightScript library that helps enable programmatic
 ' monetization on Google Ad Manager for Roku apps. It serves as a lightweight
 ' alternative to the IMA SDK
@@ -25,6 +27,7 @@ Function newAppSession() As Object
     _appInfo: createObject("roAppInfo"),
     _appManager: createObject("roAppManager"),
     _deviceInfo: deviceInfo,
+    _hdmiStatus: createObject("roHdmiStatus"),
     _osVersion: deviceInfo.getOSVersion(),
     _sessionId: deviceInfo.getRandomUUID(),
     _urlTransfer: createObject("roUrlTransfer")
@@ -74,12 +77,12 @@ Function newAppSession() As Object
       "ppid": args.publisherProvidedId,
       "sid": args.sessionId,
       "sdk_apis": m._urlTransfer.escape(args.supportedApiFrameworks.join(",")),
-      "aselc": "1",
+      "aselc": "3",
       "asscs_correlator": args.asscsCorrelator,
       "msid": m._appInfo.getId(),
       "ctv": "1",
       "is_lat": m._booleanAsString(m._deviceInfo.isRidaDisabled(), "1", "0"),
-      "guv": "r.2.0.0b0",
+      "guv": "r.2.0.0b2",
       "imav": "r.3.2.2",
       "ua": m._getUserAgent()
     }
@@ -178,7 +181,7 @@ Function newAppSession() As Object
         "et": eventType,
         "id": "asscs",
         "iet": key,
-        "hdmic": m._instance._booleanAsString(m._instance._deviceInfo.isHdmiConnected(), "1", "0"),
+        "hdmic": m._instance._booleanAsString(m._instance._hdmiStatus.isConnected(), "1", "0"),
         "aut": m._instance._appManager.getUpTime().totalMilliseconds().toStr(),
         "lkp": (m._instance._deviceInfo.timeSinceLastKeyPress() * 1000).toStr(),
         "sut": (upTime(0) * 1000).toStr()
