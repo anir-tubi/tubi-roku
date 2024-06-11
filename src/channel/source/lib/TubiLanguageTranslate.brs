@@ -2239,6 +2239,10 @@ Function getTranslation_es_MX()
       "description": "Directions on the search page",
       "message": "Busca películas, series, TV en vivo, y personas"
     },
+    "screenSearch_defaultSearch": {
+      "description": "Directions on the search page",
+      "message": "Busca películas, series y personas"
+    },
     "screenSearch_trendingSearch": {
       "description": "A header message that shows on top of default search results in search screen",
       "message": "Búsquedas populares"
@@ -2845,7 +2849,7 @@ Function getTranslation_es_MX()
     },
     "metadata_continueWatching_notSignedIn_container_description": {
       "description": "tells non registered user what they need to do to see the continue watching container",
-      "message": "Sin suscripción • Sin tarjeta de crédito • Gratis siempre"
+      "message": "Sin Suscripción • Sin Tarjeta de Crédito • Totalmente Gratis"
     },
     "metadata_continueWatching_notSignedIn_container_button": {
       "description": "button text for when a non registered user focuses on the continue watching container",
@@ -3247,7 +3251,7 @@ Function getTranslation_es_MX()
     },
     "reg_intro_sub_header": {
       "description": "sub header displayed on registraton welcome modal",
-      "message": "No se requiere tarjeta de crédito • Gratis siempre."
+      "message": "Sin tarjeta de crédito. Totalmente Gratis."
     },
     "reg_first_line_sub_item": {
       "description": "first sub item to be displayed under reg_first_line_item to explain user about benifit of registration",
@@ -3368,6 +3372,42 @@ Function getTranslation_es_MX()
     "roku_cw_consent_screen_sub_heading": {
       "description": "Roku Continue Watching screen sub heading.",
       "message": "Facilite volver a lo que estabas viendo y obtén mejores recomendaciones para stream a continuación.\n\nElige " + Chr(34) + "Aceptar ahora" + Chr(34) + " para dar permiso a Tubi para compartir tu historial de visualización de videos con Roku.\n\nPuedes cambiar esto en cualquier momento en Configuración."
+    },
+    "gdpr_age_gate_error_dialog_heading": {
+      "description": "GDPR age gate error dialog heading.",
+      "message": "Lo Sentimos"
+    },
+    "gdpr_age_gate_error_dialog_sub_heading": {
+      "description": "GDPR age gate error dialog sub heading.",
+      "message": "No es elegible para continuar."
+    },
+    "gdpr_age_gate_error_dialog_exit_tubi": {
+      "description": "GDPR age gate error dialog exit tubi button label.",
+      "message": "Salir de Tubi"
+    },
+    "privacy_center_restart_channel": {
+      "description": "Settings screen privacy center restart channel button label.",
+      "message": "Reiniciar"
+    },
+    "save_consent_dialog_heading": {
+      "description": "Settings screen save consent dialog heading.",
+      "message": "Configuración de Privacidad Actualizada"
+    },
+    "save_consent_dialog_sub_heading": {
+      "description": "Settings screen save consent dialog sub heading.",
+      "message": "Debes reiniciar Tubi para que los cambios surtan efecto."
+    },
+    "privacy_center_view_privacy_settings_hint": {
+      "description": "Settings screen privacy center view privacy settings hint.",
+      "message": "Debes guardar los cambios en configuración de privacidad y reiniciar Tubi para que los cambios surtan efecto."
+    },
+    "privacy_center_view_privacy_settings": {
+      "description": "Settings screen privacy center launch preferences center button label.",
+      "message": "Ver Configuración de Privacidad"
+    },
+    "privacy_disclaimer": {
+      "description": "Privacy disclaimer text displayed in Sign in and registration flow.",
+      "message": "Al regístrarte o inicia sesión, acceptas que has leido y entendido la Politica de Privacidade de Tubi y aceptas los Términos de Uso de Tubi. Obtenga más información en {privacy_policy_url} y {terms_of_use_url}"
     }
   }
 End Function
@@ -3738,6 +3778,10 @@ Function getTranslation_fr_CA()
     "screenSearch_defaultLinearSearch": {
       "description": "Directions on the search page",
       "message": "Rechercher des films, TV, des programmes TV, du direct et des personnes"
+    },
+    "screenSearch_defaultSearch": {
+      "description": "Directions on the search page",
+      "message": "Rechercher des films, programmes TV et personnes"
     },
     "screenSearch_trendingSearch": {
       "description": "A header message that shows on top of default search results in search screen",
@@ -4345,7 +4389,7 @@ Function getTranslation_fr_CA()
     },
     "metadata_continueWatching_notSignedIn_container_description": {
       "description": "tells non registered user what they need to do to see the continue watching container",
-      "message": "Pas d'abonnement  •  Pas de carte de crédit  •  Gratuit pour toujours"
+      "message": "Pas d'abonnement  •  Pas de carte de crédit  •  Totalement Gratuit"
     },
     "metadata_continueWatching_notSignedIn_container_button": {
       "description": "button text for when a non registered user focuses on the continue watching container",
@@ -4747,7 +4791,7 @@ Function getTranslation_fr_CA()
     },
     "reg_intro_sub_header": {
       "description": "sub header displayed on registraton welcome modal",
-      "message": "Pas de carte de crédit. Gratuit pour toujours."
+      "message": "Pas de carte de crédit. Totalement Gratuit."
     },
     "reg_first_line_sub_item": {
       "description": "first sub item to be displayed under reg_first_line_item to explain user about benifit of registration",
@@ -4868,6 +4912,42 @@ Function getTranslation_fr_CA()
     "roku_cw_consent_screen_sub_heading": {
       "description": "Roku Continue Watching screen sub heading.",
       "message": "Facilitez-vous la tâche pour revenir à ce que vous regardiez et obtenez de meilleures recommandations sur ce qu'il faut diffuser ensuite.\n\nChoisir " + Chr(34) + "Accepter maintenant" + Chr(34) + " pour autoriser Tubi à partager votre historique de visionnage de vidéos avec Roku.\n\nVous pouvez modifier cela à tout moment dans les paramètres."
+    },
+    "gdpr_age_gate_error_dialog_heading": {
+      "description": "GDPR age gate error dialog heading.",
+      "message": "Nous sommes désolés"
+    },
+    "gdpr_age_gate_error_dialog_sub_heading": {
+      "description": "GDPR age gate error dialog sub heading.",
+      "message": "Désolé, vous n'êtes pas éligible pour continuer."
+    },
+    "gdpr_age_gate_error_dialog_exit_tubi": {
+      "description": "GDPR age gate error dialog exit tubi button label.",
+      "message": "Sortie Tubi"
+    },
+    "privacy_center_restart_channel": {
+      "description": "Settings screen privacy center restart channel button label.",
+      "message": "Redémarrer"
+    },
+    "save_consent_dialog_heading": {
+      "description": "Settings screen save consent dialog heading.",
+      "message": "Paramètres De Confidentialité Mis à Jour"
+    },
+    "save_consent_dialog_sub_heading": {
+      "description": "Settings screen save consent dialog sub heading.",
+      "message": "Vous devez redémarrer Tubi pour que les modifications prennent effet."
+    },
+    "privacy_center_view_privacy_settings_hint": {
+      "description": "Settings screen privacy center view privacy settings hint.",
+      "message": "Vous devez enregistrer les modifications de confidentialité et redémarrer Tubi pour que les modifications prennent effet."
+    },
+    "privacy_center_view_privacy_settings": {
+      "description": "Settings screen privacy center launch preferences center button label.",
+      "message": "Afficher Paramètres de Confidentialité"
+    },
+    "privacy_disclaimer": {
+      "description": "Privacy disclaimer text displayed in Sign in and registration flow.",
+      "message": "En vous inscrivant ou en vous connectant, vous reconnaissez avoir lu et compris la Politique de confidentialité de Tubi et acceptez les Conditions d'utilisation de Tubi. En savoir plus sur {privacy_policy_url} et {terms_of_use_url}"
     }
   }
 End Function
