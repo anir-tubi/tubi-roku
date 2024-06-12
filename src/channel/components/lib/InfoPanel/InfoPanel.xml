@@ -169,20 +169,18 @@
             id="FirstLineGroup"
             layoutDirection="horiz"
             itemSpacings="[10]"
-            vertAlignment="custom"
+            vertAlignment="bottom"
             addItemSpacingAfterChild="true">
             <Badge
               id="FirstLineAvailabilityBadge"/>
             <Label
               id="Line1"
-              translation="[0,6]"
               opacity="0.5">
               <Font
                 role="font" />
             </Label>
             <Label
               id="Line1Bold"
-              translation="[0,9]"
               opacity="0.5">
               <Font
                 role="font"/>
@@ -202,7 +200,6 @@
               loadSync="true"/>
             <Poster
               id="ResolutionPoster"
-              translation="[0,6]"
               loadDisplayMode="scaleToFit"
               loadSync="true"/>
             <Group
@@ -220,7 +217,6 @@
                 opacity="0.8"
                 numLines="1"
                 wrap="false"
-                translation="[0,1]"
                 horizAlign="center"
                 vertAlign="center">
                 <Font
@@ -228,14 +224,12 @@
               </Label>
             </Group>
             <Label
-              id="DescriptorCode"
-              translation="[0, 9]">
+              id="DescriptorCode">
               <Font
               role="font"/>
             </Label>
             <Label
-              id="ExpireWarning"
-              translation="[0, 6]">
+              id="ExpireWarning">
               <Font
                 role="font"/>
             </Label>
