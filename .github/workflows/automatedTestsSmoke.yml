@@ -33,6 +33,8 @@ jobs:
         run: npm install
 
       - name: gulp runAutomatedTestsSmoke
+        env:
+          retries: 1
         run: |
           cp ~/rta-config.json ./rta-config.json
           npx gulp runAutomatedTestsSmoke

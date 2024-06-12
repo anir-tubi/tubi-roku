@@ -312,8 +312,10 @@ async function runAutomatedTests(done, branch = '', tags = [], testsPath = 'js/a
     mochaOptions.push(`--parallel --jobs ${config.RokuDevice.devices.length}`);
   }
 
-  // Adding retries. May eventually want to allow turning on or off
-  mochaOptions.push('--retries 1');
+  // Only used when running test through Github. Locally we don't retry tests
+  if (+process.env.retries > 0) {
+    mochaOptions.push(`--retries ${process.env.retries}`);
+  }
 
   // We need to make our package here or else when we run in parallel they will all attempt to make the package at the same time
   await device.createPackage({

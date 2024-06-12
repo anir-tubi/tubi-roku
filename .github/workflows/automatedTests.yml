@@ -116,6 +116,7 @@ jobs:
           tag: ${{ inputs.tag }}
           customString: ${{ inputs.customString }}
           bail: ${{ inputs.bail }}
+          retries: 1
         run: |
           cp ~/rta-config.json ./rta-config.json
           npx gulp runAutomatedTests

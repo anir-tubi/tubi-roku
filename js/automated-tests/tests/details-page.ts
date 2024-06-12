@@ -349,6 +349,9 @@ describe('Details Page', function () {
       // On Movies page?
       await testUtils.waitForCurrentScreenToEqual('movieScreen');
 
+      // Used to wait until the rowlist content is loaded
+      await testUtils.getCurrentlyFocusedGridItemIndex('movieScreenRowList');
+
       // Select a title and press the Play button
       await ecp.sendKeypress(ecp.Key.Ok);
       await testUtils.selectAndVerifyDetailPageMenuItem('play');
@@ -381,6 +384,9 @@ describe('Details Page', function () {
 
       await testUtils.waitForCurrentScreenToEqual('movieScreen');
 
+      // Used to wait until the rowlist content is loaded
+      await testUtils.getCurrentlyFocusedGridItemIndex('movieScreenRowList');
+
       // Select title
       await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -395,6 +401,9 @@ describe('Details Page', function () {
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: false });
 
       await testUtils.waitForCurrentScreenToEqual('movieScreen');
+
+      // Used to wait until the rowlist content is loaded
+      await testUtils.getCurrentlyFocusedGridItemIndex('movieScreenRowList');
 
       // Select a title
       await ecp.sendKeypress(ecp.Key.Ok);

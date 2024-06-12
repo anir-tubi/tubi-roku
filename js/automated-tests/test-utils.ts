@@ -874,19 +874,32 @@ class TestUtils {
 
 
   /**
+   * Used to get the index for the currently focused item in the grid
+   * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
+   * @param timeout - How long we will wait for this operation before considering it to have failed
+   * @returns index of the currently focused grid item. For RowLists this will be a 2 item array and for Grids a number
+   */
+  public async getCurrentlyFocusedGridItemIndex(elementOrElementId: ElementOrElementId, timeout = 10000) {
+    return await this.retryWithTimeOut(async () => {
+      const grid = await this.getNodeForElement(elementOrElementId, timeout);
+      if (grid.rowItemFocused?.length === 2) {
+        return grid.rowItemFocused  as number[];
+      } else if (grid.itemFocused !== -1) {
+        return grid.itemFocused as number;
+      } else {
+        throw new Error('Could not find focused grid item index');
+      }
+    }, timeout);
+  }
+
+
+  /**
    * Used to get the grid item content for the currently focused grid item
    * @param elementOrElementId - The element or element id that we want to use for this function that is stored in the elements.ts file
    * @param timeout - How long we will wait for this operation before considering it to have failed
    */
   public async getCurrentlyFocusedGridItemContent(elementOrElementId: ElementOrElementId, timeout = 10000) {
-    const grid = await this.getNodeForElement(elementOrElementId, timeout);
-    let index;
-    if (grid.rowItemFocused) {
-      index = grid.rowItemFocused;
-    } else {
-      index = grid.itemFocused;
-    }
-
+    const index = await this.getCurrentlyFocusedGridItemIndex(elementOrElementId, timeout);
     return await this.getGridItemContent(elementOrElementId, index, timeout);
   }
 
@@ -1557,15 +1570,30 @@ class Auth {
       authorization: `Bearer ${anonymousToken.access_token}`
     });
 
-    const user = await testUtils.sendNetworkRequest({
-      method: 'post',
-      url: this.baseAccountUrl + '/user/signup',
-      headers: headers,
-      body: body
-    });
-    user.signingKey = anonymousToken.signingKey;
 
-    return user as UserInfoResponse;
+
+    let retriesLeft = 3;
+    while (retriesLeft > 0) {
+      try {
+        const user = await testUtils.sendNetworkRequest({
+          method: 'post',
+          url: this.baseAccountUrl + '/user/signup',
+          headers: headers,
+          body: body
+        });
+
+        user.signingKey = anonymousToken.signingKey;
+        return user as UserInfoResponse;
+      } catch(e) {
+        retriesLeft--;
+        if (retriesLeft > 0 && e.message.includes('429')) {
+          console.log('Failed to sign up user Due to 429 error. Retrying after 60 second delay');
+          await utils.sleep(60000);
+        } else {
+          throw e;
+        }
+      }
+    }
   }
 
 
