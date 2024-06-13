@@ -643,7 +643,6 @@ End Function
 
 Function onItemFocused(msg)
   list = msg.getRoSGNode()
-  index = list.itemSelected
 
   itemFocused = list.itemFocused
   item = list.content.getChild(itemFocused)
@@ -668,7 +667,7 @@ Function onItemFocused(msg)
   }
   m.listItemSelected = {
     list: list.id
-    index: index
+    index: itemFocused
   }
   m.top.focusedPosition = itemFocused
 End Function
