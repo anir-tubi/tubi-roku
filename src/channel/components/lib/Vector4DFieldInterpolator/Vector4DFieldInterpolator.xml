@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Roku does not have a built in interpolator for setting a 4 item array value so we are making our own that uses FloatFieldInterpolator under the hood -->
+<component name="Vector4DFieldInterpolator" extends="FloatFieldInterpolator">
+  <script type="text/brightscript" uri="Vector4DFieldInterpolator.brs" />
+  <script type="text/brightscript" uri="pkg:/source/3rdparty/rta/typeUtils.brs" />
+  <script type="text/brightscript" uri="pkg:/source/lib/Log.brs" />
+
+  <interface>
+    <!-- INPUT -->
+    <!-- We have to extend an existing interpolator or else Animation appears to ignore it and not update the fraction field. Because of this we also need to add vector4DKeyValue as a new field as trying to override the existing keyValue field does not work. Each item in the array should be an array with four values like [x, y, width, height] -->
+    <field id="vector4DKeyValue" type="array" />
+  </interface>
+</component>

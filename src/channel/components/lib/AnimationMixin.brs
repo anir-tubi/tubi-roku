@@ -151,18 +151,18 @@ End Function
 
 
 '''''''''''''
-' animateItemSize
+' animateClippingRect
 '
-' animate the itemSize property of the target
+' animate the clippingRect property of the target
 ' @param target: Object, the target element that is being animated
-' @param itemSize: vector2d array, the itemSize property of the target that will be animated
+' @param clippingRect: array, the clippingRect property of the target that will be animated. Should be a 4-element array [x, y, width, height]
 ' @param duration: float, the duration of the animation
 ' @param delay: float, the delay (if any) of the animation
-Function animateItemSize(target As Object, itemSize As Object, duration As Float, delay=0.0 As Float)
+Function animateClippingRect(target As Object, clippingRect As Object, duration As Float, delay = 0.0 As Float)
   animationOptions = {
     duration: duration
     delay: delay
-    itemSize: itemSize
+    clippingRect: clippingRect
   }
   return animate(target, animationOptions)
 End Function
@@ -298,16 +298,16 @@ Function animate(target As Object, options as Object) As Object
       animation.removeChild(slideInterpolator)
     end if
 
-    itemSizeInterpolator = animation.findNode("ItemSizeInterpolator-" + target.id)
-    targetItemSize = target.itemSize
-    if itemSizeInterpolator = invalid AND options.itemSize <> invalid AND targetItemSize <> invalid
-      if targetItemSize[0] <> options.itemSize[0] OR targetItemSize[1] <> options.itemSize[1]
-        itemSizeInterpolator = animation.createChild("Vector2DFieldInterpolator")
-        itemSizeInterpolator.id = "ItemSizeInterpolator-" + target.id
-        itemSizeInterpolator.fieldToInterp = target.id + ".itemSize"
+    clippingRectInterpolator = animation.findNode("ClippingRectInterpolator-" + target.id)
+    targetClippingRect = target.clippingRect
+    if clippingRectInterpolator = invalid AND options.clippingRect <> invalid AND targetClippingRect <> invalid then
+      if targetClippingRect.x <> options.clippingRect[0] OR targetClippingRect.y <> options.clippingRect[1] OR targetClippingRect.width <> options.clippingRect[3] OR targetClippingRect.height <> options.clippingRect[4] then
+        clippingRectInterpolator = animation.createChild("Vector4DFieldInterpolator")
+        clippingRectInterpolator.id = "ClippingRectInterpolator-" + target.id
+        clippingRectInterpolator.fieldToInterp = target.id + ".clippingRect"
       end if
-    else if itemSizeInterpolator <> invalid AND options.itemSize = invalid
-      animation.removeChild(itemSizeInterpolator)
+    else if clippingRectInterpolator <> invalid AND options.clippingRect = invalid then
+      animation.removeChild(clippingRectInterpolator)
     end if
 
     scaleInterpolator = animation.findNode("ScaleInterpolator-" + target.id)
@@ -377,14 +377,18 @@ Function animate(target As Object, options as Object) As Object
       end if
     end if
 
-    if itemSizeInterpolator <> invalid
-      itemSizeInterpolator.key = [0.0, delayTime, 1.0]
-      if options.itemSize <> invalid
+    if clippingRectInterpolator <> invalid
+      clippingRectInterpolator.key = [0.0, delayTime, 1.0]
+      if options.clippingRect <> invalid
         'see above comment about slideInterpolator keyValue format
-        itemSizeInterpolator.keyValue = [[target.itemSize[0], target.itemSize[1]], [target.itemSize[0], target.itemSize[1]], [options.itemSize[0], options.itemSize[1]]]
+        ' clipingRect is one of those weird fields that is written in as an array but is read as an associative array so we need to convert back over first
+        targetClippingRect = target.clippingRect
+        startingClippingRect = [targetClippingRect.x, targetClippingRect.y, targetClippingRect.width, targetClippingRect.height]
+
+        clippingRectInterpolator.vector4DKeyValue = [startingClippingRect, startingClippingRect, options.clippingRect]
 
         if bAnimate = false
-          target.itemSize = [options.itemSize[0], options.itemSize[1]]
+          target.clippingRect = options.clippingRect
         end if
       end if
     end if

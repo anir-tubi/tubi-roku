@@ -500,11 +500,11 @@ Function onOpenedChanged()
     end if
 
     setContentActive(m.MainContent)
-    animateItemSize(m.mainItems, m.mainItemsOriginalItemSize, 0.2)
+    animateClippingRect(m.mainItems, [0, 0, m.mainItemsOriginalItemSize[0], 1080], 0.2)
     resize(m.background, m.mainItemsOriginalItemSize[0], m.mainItemsOriginalItemSize[1], 0.2)
   else
     setContentActive(m.MainContent, false)
-    animateItemSize(m.mainItems, [108, m.mainItems.itemSize[1]], 0.2)
+    animateClippingRect(m.mainItems, [0, 0, 108, 1080], 0.2)
     resize(m.background, 100, m.mainItems.itemSize[1], 0.2)
     m.listItemSelected = invalid
     m.oldSideNavFocusedButton = invalid
