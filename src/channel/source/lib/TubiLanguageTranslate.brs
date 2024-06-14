@@ -2849,7 +2849,7 @@ Function getTranslation_es_MX()
     },
     "metadata_continueWatching_notSignedIn_container_description": {
       "description": "tells non registered user what they need to do to see the continue watching container",
-      "message": "Sin Suscripción • Sin Tarjeta de Crédito • Totalmente Gratis"
+      "message": "Sin Suscripción  •  Sin Tarjeta de Crédito  •  Gratis Siempre"
     },
     "metadata_continueWatching_notSignedIn_container_button": {
       "description": "button text for when a non registered user focuses on the continue watching container",
@@ -3251,7 +3251,7 @@ Function getTranslation_es_MX()
     },
     "reg_intro_sub_header": {
       "description": "sub header displayed on registraton welcome modal",
-      "message": "Sin tarjeta de crédito. Totalmente Gratis."
+      "message": "Sin Tarjeta de Crédito. Gratis Siempre."
     },
     "reg_first_line_sub_item": {
       "description": "first sub item to be displayed under reg_first_line_item to explain user about benifit of registration",
@@ -4389,7 +4389,7 @@ Function getTranslation_fr_CA()
     },
     "metadata_continueWatching_notSignedIn_container_description": {
       "description": "tells non registered user what they need to do to see the continue watching container",
-      "message": "Pas d'abonnement  •  Pas de carte de crédit  •  Totalement Gratuit"
+      "message": "Pas d'abonnement  •  Pas de carte de crédit  •  Gratuit pour toujours"
     },
     "metadata_continueWatching_notSignedIn_container_button": {
       "description": "button text for when a non registered user focuses on the continue watching container",
@@ -4791,7 +4791,7 @@ Function getTranslation_fr_CA()
     },
     "reg_intro_sub_header": {
       "description": "sub header displayed on registraton welcome modal",
-      "message": "Pas de carte de crédit. Totalement Gratuit."
+      "message": "Pas de carte de crédit. Gratuit pour toujours."
     },
     "reg_first_line_sub_item": {
       "description": "first sub item to be displayed under reg_first_line_item to explain user about benifit of registration",
