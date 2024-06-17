@@ -80,6 +80,11 @@ Function userDeviceApi_signUpReqInfo_test()
       birthday: ""
     }
   }
+
+  options.params = {
+    "idfa": m.constants.deviceInfo.deviceAdId
+  }
+
   requestInfo = m.userDeviceApi.signUpReqInfo(options)
   m.assertNotInvalid(requestInfo)
   m.assertNotInvalid(requestInfo.url)
@@ -120,6 +125,9 @@ Function userDeviceApi_signUpReqInfo_test()
   m.assertNotInvalid(body.credentials.birthday)
   m.assertEqual(body.credentials.birthday, "")
 
+  m.assertNotInvalid(requestInfo.options.params["idfa"])
+  m.assertEqual(requestInfo.options.params["idfa"], options.params["idfa"])
+
 End Function
 
 
@@ -138,6 +146,11 @@ Function userDeviceApi_signInReqInfo_test()
       password: m.testPassword
     }
   }
+
+  options.params = {
+    "idfa": m.constants.deviceInfo.deviceAdId
+  }
+
   requestInfo = m.userDeviceApi.signInReqInfo(options)
   m.assertNotInvalid(requestInfo)
   m.assertNotInvalid(requestInfo.url)
@@ -168,6 +181,9 @@ Function userDeviceApi_signInReqInfo_test()
 
   m.assertNotInvalid(body.credentials.password)
   m.assertEqual(body.credentials.password, m.testPassword)
+
+  m.assertNotInvalid(requestInfo.options.params["idfa"])
+  m.assertEqual(requestInfo.options.params["idfa"], options.params["idfa"])
 
 End Function
 
@@ -308,6 +324,7 @@ Function userDeviceApi_queryStatusOfMagicLink_test()
   options.params = {
     device_id: m.device_id
     platform: m.platform
+    idfa: m.constants.deviceInfo.deviceAdId
   }
   queryUrlForMagicLink = m.constants.urls.account.magicLink + "/" + uid
   requestInfo = m.userDeviceApi.queryStatusOfMagicLink(uid)
@@ -325,6 +342,9 @@ Function userDeviceApi_queryStatusOfMagicLink_test()
 
   m.assertNotInvalid(params.platform)
   m.assertEqual(params.platform, m.platform)
+
+  m.assertNotInvalid(params.idfa)
+  m.assertEqual(params.idfa, requestInfo.options.params.idfa)
 End Function
 
 

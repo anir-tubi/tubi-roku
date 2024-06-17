@@ -90,11 +90,15 @@ Function userDeviceApi_signUpReqInfo(passedOptions = {})
   url = m.constants.urls.account.signup
   options = {}
   headers = {}
+  params = {}
   headers.append(m.getCommonOptions().headers)
+  'passing device advertiser id to signup request.
+  params["idfa"] = m.constants.deviceInfo.deviceAdId
   body = FormatJSON(passedOptions.body)
   options["method"] = m.constants.reqTypes.post
   options["body"] = body
   options["headers"] = headers
+  options["params"] = params
   return {
     url: url
     options: options
@@ -108,12 +112,16 @@ End Function
 Function userDeviceApi_signInReqInfo(passedOptions = {})
   url = m.constants.urls.account.login
   options = {}
+  params = {}
   body = FormatJSON(passedOptions.body)
   headers = {}
   headers.append(m.getCommonOptions().headers)
+  'passing device advertiser id to signin request.
+  params["idfa"] = m.constants.deviceInfo.deviceAdId
   options["method"] = m.constants.reqTypes.post
   options["body"] = body
   options["headers"] = headers
+  options["params"] = params
   return {
     url: url
     options: options
@@ -216,6 +224,7 @@ Function userDeviceApi_queryStatusOfMagicLink(uid)
   url = m.constants.urls.account.magicLink + "/" + uid
   options = m.getCommonOptions()
   options["method"] = m.constants.reqTypes.get
+  options.params["idfa"] = m.constants.deviceInfo.deviceAdId
   return {
     url: url
     options: options
