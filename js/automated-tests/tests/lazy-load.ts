@@ -47,9 +47,12 @@ describe('LazyLoad', function () {
    await selectCategories();
    
    // Navigate to a category with < 200 titles and validate < 200
-   await ecp.sendKeypress(ecp.Key.Right, {count:2});
-   await testUtils.waitForElementToFullyShowOnScreen('channelCategoryPosterTitle2');
+   await testUtils.navigateToGridItem('categoryPageGrid', (gridItemContent) => {
+    return gridItemContent.id === 'action';
 
+   });
+
+   await testUtils.waitForElementToFullyShowOnScreen('channelCategoryPosterTitle2');
    await ecp.sendKeypress(ecp.Key.Ok);
    await testUtils.waitForElementToFullyShowOnScreen('categoryPoster');
 
@@ -59,6 +62,7 @@ describe('LazyLoad', function () {
 
    await testUtils.waitForElementToFullyShowOnScreen('itemCounter');
    const itemCounter = await testUtils.getNodeForElement('itemCounter');
+   await testUtils.waitForElementToFullyShowOnScreen('itemCounter');
    expect(itemCounter.text).contains('400+');
 
  });
@@ -78,7 +82,10 @@ describe('LazyLoad', function () {
    await selectCategories();
    
    // Navigate to a category with 1000
-   await ecp.sendKeypress(ecp.Key.Right, {count:2});
+   await testUtils.navigateToGridItem('categoryPageGrid', (gridItemContent) => {
+    return gridItemContent.id === 'action';
+
+   });
    await testUtils.waitForElementToFullyShowOnScreen('channelCategoryPosterTitle2');
 
    await ecp.sendKeypress(ecp.Key.Ok);
@@ -128,7 +135,7 @@ describe('LazyLoad', function () {
         await utils.sleep(1000);
         await testUtils.waitForElementToFullyShowOnScreen('categoriesLeftNavButtonSelected');
         await ecp.sendKeypress(ecp.Key.Ok);
-  
+
         // Are we on Categories page?
         await testUtils.waitForElementToFullyShowOnScreen('categoryPageCategory'); 
       }

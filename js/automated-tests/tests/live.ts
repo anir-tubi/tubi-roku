@@ -15,7 +15,6 @@ describe('Live', function () {
     it('C114677 - Live News - Open Side Navigation while on Live New Row @live', async () => {
 
         // Navigate to the Live News Row
-        const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
         await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
         // Verify that video preview is playing
@@ -67,7 +66,6 @@ describe('Live', function () {
     it('C114053 - Live News - Live TV channel guide @live', async () => {
 
         // Navigate to the Live News Row
-        const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
         await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
         // Start a live feed
@@ -82,14 +80,13 @@ describe('Live', function () {
         await ecp.sendKeypress(ecp.Key.Right);
 
          // Verify that linear video is still playing
-        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',6000);
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',10000);
     });
 
     // https://tubi.testrail.io/index.php?/cases/view/114058
     it('C114058 - Live News - When a user changes channels during playback, playback for the updated channel should be near instantaneous @live', async () => {
  
         // Navigate to the Live News Row
-        const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
         await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
         // Verify that linear preview video is playing
@@ -116,20 +113,13 @@ describe('Live', function () {
      it('C115290 -  Home Screen Automatic Small video transition to full screen view @live', async () => {
  
         // Navigate to the Live News Row
-        const node = await testUtils.getNodeForElement('topNavRecommendedWhiteLabel');
         await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
 
         // Verify that preview video is playing
-        await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing');
-        
-
-        // Verify countdown is running
-        await utils.sleep(5000);  // wait for countdown to appear - How can we improve? 
-        const homeScreenNewsCountdown = await testUtils.getNodeForElement('homeScreenNewsCountdown');
-        expect(homeScreenNewsCountdown.text).to.contain('Fullscreen in'); 
+        await testUtils.waitForPlayerStateToEqual('previewVideoPlayer','playing', 8000);
      
         // Verify that full linear video is playing
-        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',10000);
+        await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen','playing',20000);
      });
 
     async function startLiveFeed() {

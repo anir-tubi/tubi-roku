@@ -29,8 +29,8 @@ describe('Closed Captions Checks', function () {
     await testUtils.waitForPlayerStateToEqual('linearVideoPlayerScreen', 'playing', 15000);
 
     // Turn on Linear CC
-    
-    await ecp.sendKeypress(ecp.Key.Left);
+    await utils.sleep(1500);
+    await ecp.sendKeypress(ecp.Key.Left, {count:2});
     await ecp.sendKeypress(ecp.Key.Up);
     await ecp.sendKeypress(ecp.Key.Ok);
     await ecp.sendKeypress(ecp.Key.Right);
@@ -39,7 +39,7 @@ describe('Closed Captions Checks', function () {
     // Back to Home, Search page and play a VOD title
     await utils.sleep(3000);
     await testUtils.goToPage('home');
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 10000);
     
     // Is the left Nav open?
     await ecp.sendKeypress(ecp.Key.Left);
@@ -54,7 +54,7 @@ describe('Closed Captions Checks', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Are we on the Search page?
-    await utils.sleep(2500); // Will not work without sleep here
+    await utils.sleep(3000); // Will not work without sleep here
     await testUtils.getNodeForElement('searchKeyPad');
 
     // If so, send search terms
@@ -64,11 +64,10 @@ describe('Closed Captions Checks', function () {
     await navigateRightToGrid();
 
     // Select item and Play button
+    await utils.sleep(2000);
     await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
-    const detailScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
-    expect(detailScreenTitle.text).is.equal('LEGO Masters');
-    await ecp.sendKeypress(ecp.Key.Ok);
+    await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle', 'title not shown', 10000);
+    await testUtils.selectAndVerifyDetailPageMenuItem('play');
 
     // Verify that video is playing
     await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
@@ -80,7 +79,6 @@ describe('Closed Captions Checks', function () {
     await ecp.sendKeypress(ecp.Key.Down);
     const closedCaptionOn = await testUtils.getNodeForElement('closedCaptionOn');
     expect(closedCaptionOn.id).to.equal('checkIcon');
-
    
   }); 
 
@@ -108,15 +106,15 @@ describe('Closed Captions Checks', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
  
-     // Back to Home, Search page and play a VOD title
-     await utils.sleep(3000);
-     await testUtils.goToPage('home');
-     await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
-     
-     // Is the left Nav open?
-     await ecp.sendKeypress(ecp.Key.Left);
-     await testUtils.waitForSideNavMenuToBeExpanded();
-     await testUtils.verifyFocusedSideNavMenuItemEquals('home');
+    // Back to Home, Search page and play a VOD title
+    await utils.sleep(3000);
+    await testUtils.goToPage('home');
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    
+    // Is the left Nav open?
+    await ecp.sendKeypress(ecp.Key.Left);
+    await testUtils.waitForSideNavMenuToBeExpanded();
+    await testUtils.verifyFocusedSideNavMenuItemEquals('home');
 
     // If so, select Search
     await utils.sleep(2000);

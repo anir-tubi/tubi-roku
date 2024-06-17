@@ -387,9 +387,10 @@ describe('Parental Controls', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Select another PC Setting
-      const parentalControlsMenuTextFocused = testUtils.getNodeForElement('parentalControlsMenuTextFocused');
-      await parentalControlsMenuTextFocused;
+      await testUtils.waitForElementToFullyShowOnScreen('parentalControlsMenuTextFocused');
+      await utils.sleep(1000); // will improve these later
       await ecp.sendKeypress(ecp.Key.Right);
+      await utils.sleep(1000); // will improve these later
       await ecp.sendKeypress(ecp.Key.Up);
       await ecp.sendKeypress(ecp.Key.Ok);
 
@@ -435,8 +436,7 @@ describe('Parental Controls', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Send adult title text
-      const searchGrid = testUtils.getNodeForElement('searchGrid');
-      expect((await searchGrid).visible).to.be.true;
+      await testUtils.waitForElementToFullyShowOnScreen('searchGrid');
       await ecp.sendText('the stepdaughter');
       await testUtils.waitForElementToFullyShowOnScreen('noResultsMessage');
 

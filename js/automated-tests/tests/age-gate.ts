@@ -53,7 +53,7 @@ describe('Age Gate', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Verify Age Gate Screen
-    await testUtils.waitForElementToShowOnScreen('ageVerificationPad');
+    await testUtils.waitForElementToFullyShowOnScreen('ageVerificationPad', 'age verification keypad not found', 10000);
     await yearsVerificationEntry();
 
     // Enter invalid Age >  125

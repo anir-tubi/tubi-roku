@@ -92,6 +92,7 @@ describe('Autoplay Movies', function () {
         await checkForAutoPlayTrigger();
 
         // Press OK for 1st movie title, does movie start?
+        await testUtils.waitForElementToFullyShowOnScreen('autoPlayTitle');
         await ecp.sendKeypress(ecp.Key.Ok);
         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 16000);
 

@@ -226,6 +226,7 @@ describe('User Reactions', function () {
       await shared.enterPasswordSettingsChange();
 
       // Verify Older Kids PC Settings Change dialog
+      await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsOlderKids');
       const parentalControlsSettingsOlderKids = await testUtils.getNodeForElement('parentalControlsSettingsOlderKids');
       expect(parentalControlsSettingsOlderKids.text).to.equal('Parental controls setting has changed to Older Kids. Parental controls will be password protected after 5 minutes.');
       await ecp.sendKeypress(ecp.Key.Ok);

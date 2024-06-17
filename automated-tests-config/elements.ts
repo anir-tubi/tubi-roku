@@ -40,7 +40,15 @@ const elements = typeCheckElements({
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#topNav-home.#TopNavMenu.0.#focusedBottomLabel',
   },
 
-  // We're currently replacing the contents in this section from the existing json file. If you want to add additional elements put them outside this section of the file. Keeping for a little longer in case any lingering keypaths need to be moved over with the script
+  previewOff: {
+    keyPath:'#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#settingsScreen.#PageGroup.#PanelSet.3.#Offset.#ContentGroup.#AutoplayPreviewMenu.1.#container',
+  },
+
+  episodesList: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#episodeScreen.#PageGroup.#RowList.0.title.#CategoryName',
+  },
+
+  // We're currently replacing the contents in this section from the existing json file. If you want to y additional elements put them outside this section of the file. Keeping for a little longer in case any lingering keypaths need to be moved over with the script
   // START ELEMENTS INJECT
   // END ELEMENTS INJECT
 
@@ -1161,7 +1169,7 @@ const elements = typeCheckElements({
 
   liveBadgeText: {
     keyPath:
-      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#InfoPanelParent.#InfoPanel.#infoPanelGroup.#Offset.#liveBadgeHeader.#BadgeInfoLayout.#BadgeText',
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#homeScreen.#PageGroup.#ContentArea.#CategoryGridList.#RowList.2.items.0.1.#badgeGroup.0.#BadgeInfoLayout.#BadgeText',
   },
 
   /** Preview off button */
@@ -1367,6 +1375,12 @@ const elements = typeCheckElements({
   categoryPageCategory: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid.0.#Logo',
+  },
+
+   /** category on category page */
+   categoryPageGrid: {
+    keyPath:
+      '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#categoryListScreen.#ChannelCategoryGrid',
   },
 
   categoryNameInCategoryDetailsPage: {
@@ -1689,6 +1703,11 @@ const elements = typeCheckElements({
   ageVerificationPad: {
     keyPath:
       '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.3.#AgeVerificationNumberPadGroup.#AgeVerificationNumberPad.#keyboard.0',
+  },
+
+  /** Autoplay Title */
+  autoPlayTitle: {
+    keyPath: '#ContentController.#uiGroup.#ContentGroup.#ScreenStack.#videoPlayerScreen.#UpNext.#UpNextUI.#UpNextParent.#UpNextMovieGroup.#movieTiles.#FocusBox',
   },
 
   /** top nav For You */

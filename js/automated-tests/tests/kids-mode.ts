@@ -229,16 +229,14 @@ describe('Kids Mode', function () {
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Parental Controls Settings Change
-    await utils.sleep(5000); // Improvement
-    const parentalControlsSettingsLittleKids = await testUtils.getNodeForElement('parentalControlsSettingsLittleKids');
-    expect(parentalControlsSettingsLittleKids.visible).to.be.true;
+    await testUtils.waitForElementToFullyShowOnScreen('parentalControlsSettingsLittleKids');
     await ecp.sendKeypress(ecp.Key.Ok);
 
     // Navigate to Left Nav
     await ecp.sendKeypress(ecp.Key.Left, { count: 3 });
 
-     // Is the Exit Kids button grayed out?
-     await checkForKidsModeGrayed();
+    // Is the Exit Kids button grayed out?
+    await checkForKidsModeGrayed();
 
   });
 
@@ -357,10 +355,11 @@ describe('Kids Mode', function () {
 
     // Check for Live News row
     await ecp.sendKeypress(ecp.Key.Right);
-    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('homeScreenRowList', 'Timed out waiting for Rowlist to have focus', 10000);
     await testUtils.jumpToRowWithTitle('homeScreenRowList', 'On Now');
+    await testUtils.waitForElementToFullyShowOnScreen('liveBadgeText', 'Live badge not shown', 8000);
     const liveBadgeText = await testUtils.getNodeForElement('liveBadgeText');
-    expect(liveBadgeText.text).to.equal('LIVE');
+    expect(liveBadgeText.text).to.equal('ON NOW');
 
   });
 

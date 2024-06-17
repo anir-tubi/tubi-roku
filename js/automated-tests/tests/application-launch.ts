@@ -99,18 +99,17 @@ describe('Application Launch', function () {
     await ecp.sendKeypress(ecp.Key.Back);
     await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton');
 
-
-
     // Exit app and restart
     await testUtils.restartApplication();
     await testUtils.waitForApplicationStartup();
+    await testUtils.goToPage('movies');
+    await testUtils.findRowIndexWithTitle('movieScreenRowList', 'Featured');
     await ecp.sendKeypress(ecp.Key.Right);
     await ecp.sendKeypress(ecp.Key.Ok);
-    expect(testUtils.findRowIndexWithTitle('homeScreenRowList', 'Featured'));
-
+    
     // Test for resume button (Roku retains resume button for 24 hours)
     await ecp.sendKeypress(ecp.Key.Ok);
-    await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton');
+    await testUtils.waitForElementToFullyShowOnScreen('resumePlayingButton', 'Resume Playing button not found', 8000);
   });
 
 

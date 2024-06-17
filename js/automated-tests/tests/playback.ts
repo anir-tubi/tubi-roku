@@ -247,11 +247,12 @@ describe('Playback', function () {
   });
 
   // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/536522
-  it('536522 -  Resume from series details page episode play @playback_1,@registered_user,@regression', async () => {
-    await testUtils.goToPage('tv');
-
+  it('C536522 -  Resume from series details page episode play @playback_1,@registered_user,@regression', async () => {
+    
+    await testUtils.goToPage('tv'); await testUtils.startApplicationAtPage('tv', { shouldCreateNewUser: true });
+    
     // Are we on the series page?
-    await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus');
+    await testUtils.waitForElementToHaveFocus('tvScreenRowList', 'Timed out waiting for Rowlist to have focus', 10000);
 
     // Enter Details page to get to Episodes list
     await ecp.sendKeypress(ecp.Key.Ok);
@@ -267,7 +268,7 @@ describe('Playback', function () {
 
 
     // verify resume when user goes back to series screen and selects/plays title again
-    await verifyResumeWithinRangeWhenBackToScreen();
+    await verifyResumeWithinRangeWhenBackToScreenEpisodes();
 
     // Remove from History
     await ecp.sendKeypress(ecp.Key.Back);
@@ -432,7 +433,7 @@ async function verifyResumeWithinRangeWhenBackToScreen() {
   await utils.sleep(2000);
 
   // Select Resume and check for playback
-  await testUtils.selectAndVerifyDetailPageMenuItem('resume');
+  await testUtils.selectAndVerifyDetailPageMenuItem('resume', 5000);
   await testUtils.waitForPlayerStateToEqual('videoPlayerScreen','playing', 15000);
 
   // Find resume position
@@ -458,7 +459,7 @@ async function verifyResumeWithinRangeWhenBackToScreenEpisodes() {
   await ecp.sendKeypress(ecp.Key.Back);
 
   // Are we on Episodes page?
-  await testUtils.selectAndVerifyDetailPageMenuItem('episodesList'); // selectAndVerifyDetailPageMenuItem needs to be updated
+  await testUtils.waitForElementToFullyShowOnScreen('episodesList'); // selectAndVerifyDetailPageMenuItem needs to be updated
   await ecp.sendKeypress(ecp.Key.Back);
 
   // Are we on the details page?
@@ -468,7 +469,9 @@ async function verifyResumeWithinRangeWhenBackToScreenEpisodes() {
   await ecp.sendKeypress(ecp.Key.Back);
 
   // Back to title
+
   await ecp.sendKeypress(ecp.Key.Ok);
+  await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
 
   // Select Resume and check for playback
   await testUtils.selectAndVerifyDetailPageMenuItem('resume');

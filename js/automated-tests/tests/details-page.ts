@@ -212,7 +212,7 @@ describe('Details Page', function () {
       await ecp.sendKeypress(ecp.Key.Back);
 
       // Check that movie has history by clicking the Remove from History Button
-      await utils.sleep(2000);
+      await utils.sleep(2500);
       await testUtils.selectAndVerifyDetailPageMenuItem('removeFromHistory');
 
       // Verify that Remove from History changes to Add to My List
@@ -353,8 +353,9 @@ describe('Details Page', function () {
       await testUtils.getCurrentlyFocusedGridItemIndex('movieScreenRowList');
 
       // Select a title and press the Play button
+      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
       await ecp.sendKeypress(ecp.Key.Ok);
-      await testUtils.selectAndVerifyDetailPageMenuItem('play');
+      await testUtils.selectAndVerifyDetailPageMenuItem('play', 8000);
 
       // Create history, then back to details page-
       await createHistory();
@@ -381,8 +382,9 @@ describe('Details Page', function () {
     it('C307688 Registered User - Details page has Play button selected by Default @registered_user,@smoke,@mdp_1', async () => {
       // Start Application at Movies page with logged in user
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
+       // On Movies page?
+      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
-      await testUtils.waitForCurrentScreenToEqual('movieScreen');
 
       // Used to wait until the rowlist content is loaded
       await testUtils.getCurrentlyFocusedGridItemIndex('movieScreenRowList');
@@ -391,6 +393,7 @@ describe('Details Page', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Make sure Play button is selected on opening Details page
+      await testUtils.getNodeForElement('detailScreenMenu', 10000);
       const content = await testUtils.getCurrentlyFocusedGridItemContent('detailScreenMenu');
       expect(content.id).to.equal('PlayMenuItem');
     });
@@ -400,7 +403,8 @@ describe('Details Page', function () {
       // Start Application at Movies page with Guest user
       await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: false });
 
-      await testUtils.waitForCurrentScreenToEqual('movieScreen');
+      // On Movies page?
+      await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus');
 
       // Used to wait until the rowlist content is loaded
       await testUtils.getCurrentlyFocusedGridItemIndex('movieScreenRowList');
@@ -442,6 +446,7 @@ describe('Details Page', function () {
       await ecp.sendKeypress(ecp.Key.Ok);
 
       // Verify that we got the same item otherwise we aren't actually confirming if resume went away
+      await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle', 'Title not shown', 8000);
       const secondScreenTitle = await testUtils.getNodeForElement('detailScreenTitle');
       expect(firstScreenTitle.text).to.equal(secondScreenTitle.text);
 

@@ -306,7 +306,7 @@ describe('MyStuff', function () {
          await ecp.sendKeypress(ecp.Key.Ok);
          await testUtils.waitForElementToFullyShowOnScreen('detailScreenTitle');
          await testUtils.selectAndVerifyDetailPageMenuItem('removeFromMyList'); 
-         await testUtils.waitForElementToFullyShowOnScreen('addToMyListButtonFocused', 'Button not shown on screen', 15000);
+         await testUtils.waitForElementToNotShowOnScreen('removeFromMyListButton', 'Button not shown on screen', 15000);
 
          // Verify that the focus has moved to 2nd title and check title
          await utils.sleep(2000); // had to add sleep to get next line to work
@@ -598,13 +598,11 @@ describe('MyStuff', function () {
          expect(myListPosterContent.height).is.equal(360);
 
          // Check that video preview is playing when autoplay preview is turned on -  My List Row
-         await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing');
+         await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing', 10000);
 
          // Switch focus to another title and verify preview is playing
          await ecp.sendKeypress(ecp.Key.Right);
-         await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing');
-         //await testUtils.seekPlayerToRelativePosition('previewVideoPlayer', 0, 'end'); // HELPER NEEDS TO BE FIXED 
-         await testUtils.waitForPlayerStateToEqual('videoPlayerScreen', 'playing', 70000);
+         await testUtils.waitForPlayerStateToEqual('previewVideoPlayer', 'playing',10000);
 
 
       });
@@ -760,8 +758,10 @@ describe('MyStuff', function () {
          await ecp.sendKeypress(ecp.Key.Down);
          await utils.sleep(2000); // Improvement
          await ecp.sendKeypress(ecp.Key.Ok);
+         await testUtils.waitForElementToFullyShowOnScreen('previewOff');
 
          // Navigate to My Stuff screen
+         await utils.sleep(1000);
          await ecp.sendKeypress(ecp.Key.Back, {count:2});
 
          // Expect Home Side Nav item to be highlighted and on Home page

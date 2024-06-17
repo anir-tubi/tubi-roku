@@ -13,6 +13,7 @@ describe('Video Preview', function () {
       type: 'movie'
     });
     await testUtils.startApplicationAtPage('home', { user: user });
+    
 
     // Now find where the My List Row is and jump to it
     const myListIndex = await testUtils.jumpToRowWithTitle('homeScreenRowList', 'My List');
@@ -26,12 +27,13 @@ describe('Video Preview', function () {
     const { value: row } = await odc.getValue(args);
     const json = JSON.parse(row.json);
     const videoPreviewUrl = json[row.children[0].id].video_preview_url;
-
+  
     await testUtils.retryWithTimeOut(async () => {
       const args = testUtils.getElementKeyPath('previewVideoPlayer');
       args.keyPath += `.content`;
       const { value: content } = await odc.getValue(args);
-      expect(content?.URL).to.equal(videoPreviewUrl);
+
+      expect(content?.url).to.equal(videoPreviewUrl);
     });
 
     // Verify that video is playing
