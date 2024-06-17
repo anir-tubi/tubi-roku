@@ -26,11 +26,6 @@ Function TubiExperiments(constants) as Object
         roku_screensaver_v2 : {"enabled": false}
       }
 
-      roku_see_all_container: {
-        roku_view_more_one_hundred_v1 : {"enabled": false}
-        roku_view_more_last_v1: {"enabled" : false}
-      }
-
       roku_large_play_progress: {
         roku_large_play_progress_v1 : {"enabled": true}
       }
