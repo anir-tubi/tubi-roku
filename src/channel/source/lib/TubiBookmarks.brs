@@ -28,7 +28,7 @@ Function tubiBookmarks_addHistoryLocally(content as Object, position as Integer,
       '//if this TV content
       if content.parentId <> invalid
 
-        historyNode = getHistory(content.parentId) 'bs:disable-line 1001 LINT1001
+        historyNode = getHistory(content.parentId) 'bs:disable-line 1140 LINT1001
 
         if historyNode = invalid
           historyNode = global.historyIds.createChild("HistoryContentNode")
@@ -55,7 +55,7 @@ Function tubiBookmarks_addHistoryLocally(content as Object, position as Integer,
     else
       '//else if this movie content
 
-      historyNode = getHistory(content.id) 'bs:disable-line 1001 LINT1001
+      historyNode = getHistory(content.id) 'bs:disable-line 1140 LINT1001
       if historyNode = invalid
         historyNode = global.historyIds.createChild("HistoryContentNode")
       end if
@@ -77,7 +77,7 @@ End Function
 ' @param sRatingAction, String: The Action enum to alter the like state of the provided content ID. The possible values are all under m.constants.ui.likeDislikeActions
 Function tubiBookmarks_updateLikesLocally(contentId as String, sRatingAction as String, global = invalid)
   if contentId <> invalid AND global <> invalid AND global.likeIds <> invalid
-    likeNode = getLike(contentId) 'bs:disable-line 1001 LINT1001
+    likeNode = getLike(contentId) 'bs:disable-line 1140 LINT1001
 
     sState = ""
     if sRatingAction = m.constants.ui.likeDislikeActions.like
@@ -109,7 +109,7 @@ Function tubiBookmarks_addLinearLikeLocally(contentId as string, global = invali
 
   if contentId <> invalid AND global <> invalid AND global.linearLikeIds <> invalid
 
-    linearLikeNode = getLinearLike(contentId) 'bs:disable-line 1001 LINT1001
+    linearLikeNode = getLinearLike(contentId) 'bs:disable-line 1140 LINT1001
 
     '// save the linearChannel been liked
     if linearLikeNode = invalid
@@ -129,7 +129,7 @@ End Function
 Function tubiBookmarks_removeLinearLikeLocally(contentId as string, global = invalid)
   if contentId <> invalid AND global <> invalid AND global.linearLikeIds <> invalid
 
-    linearLikeNode = getLinearLike(contentId) 'bs:disable-line 1001 LINT1001
+    linearLikeNode = getLinearLike(contentId) 'bs:disable-line 1140 LINT1001
 
     '//remove if linearChannel been disliked
     if linearLikeNode <> invalid

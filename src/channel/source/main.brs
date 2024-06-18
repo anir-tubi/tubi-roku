@@ -86,7 +86,7 @@ Function runChannel(constants, log, request)
   'run SceneGraph tests if in test mode
   if constants.settings.mode = "test"
     sgGlobal.setField("theme", constants.ui.themes.default) 'set theme for testing purposes
-    if (type(Rooibos__Init) = "Function") then Rooibos__Init() 'bs:disable-line 1001 LINT1001
+    if (type(Rooibos__Init) = "Function") then Rooibos__Init() 'bs:disable-line 1001 1140 LINT1001
 
     localHostUri = constants.settings.localHostUri
     url = localHostUri + "/unit_tests_completed"

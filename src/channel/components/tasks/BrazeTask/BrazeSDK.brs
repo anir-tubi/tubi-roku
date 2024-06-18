@@ -420,7 +420,7 @@ function BrazeInit(config as object, messagePort as object)
           if m.cachedconfig.feature_flags_enabled = false
             storage.brazeDeleteData(BrazeConstants().BRAZE_STORAGE.FEATURE_FLAG_DATA_KEY, BrazeConstants().BRAZE_STORAGE.CONFIG_SECTION)
             getBrazeTask().BrazeFeatureFlags = {}
-          end if   
+          end if
         end if
         if config_response <> invalid and config_response.triggers <> invalid
           m.cachedConfig.triggers = config_response.triggers
@@ -428,7 +428,7 @@ function BrazeInit(config as object, messagePort as object)
       end if
       return m.cachedConfig
     end function
-    
+
     syncForNewUser: function()
       config = m.ConfigProvider()
       if config <> invalid then
@@ -467,8 +467,8 @@ function BrazeInit(config as object, messagePort as object)
             feature_flags_enabled = config_response.config.feature_flags.enabled
             feature_flags_rate_limit = config_response.config.feature_flags.refresh_rate_limit
           else
-            feature_flags_enabled = false 'bs:disable-line 1001 LINT1005
-            feature_flags_rate_limit = 0 'bs:disable-line 1001 LINT1005
+            feature_flags_enabled = false
+            feature_flags_rate_limit = 0
           end if
         end if
         if config_response <> invalid and config_response.triggers <> invalid
@@ -802,7 +802,7 @@ function BrazeInit(config as object, messagePort as object)
         return
       end if
 
-      last_update = cached_config.feature_flags_last_update 
+      last_update = cached_config.feature_flags_last_update
       rate_limit = cached_config.feature_flags_rate_limit
       now = Braze()._privateApi.timeUtils.getCurrentTimeSeconds()
 
@@ -823,7 +823,7 @@ function BrazeInit(config as object, messagePort as object)
           else
             brazelogger.debug("feature flag response could not be parsed", raw_response)
           end if
-        else 
+        else
           brazelogger.debug("feature flag response was invalid", "")
         end if
       else
@@ -891,7 +891,7 @@ function BrazeInit(config as object, messagePort as object)
     end function,
 
     toColor: function(s as object) as dynamic
-      if s = invalid 
+      if s = invalid
         return invalid
       end if
       hex = stri(s, 16)
@@ -1047,7 +1047,6 @@ function BrazeInit(config as object, messagePort as object)
       required_fields = Braze()._privateApi.networkUtil.generateRequiredRequestFields()
       json.Append(required_fields)
       endpoint = Braze()._privateApi.config[BrazeConstants().BRAZE_CONFIG_FIELDS.ENDPOINT] + "api/v3/data"
-      'bs:disable-next-line LINT1005
       server_response = Braze()._privateApi.networkUtil.postToUrl(endpoint, json)
     end function,
 
@@ -1058,7 +1057,6 @@ function BrazeInit(config as object, messagePort as object)
       required_fields = Braze()._privateApi.networkUtil.generateRequiredRequestFields()
       json.Append(required_fields)
       endpoint = Braze()._privateApi.config[BrazeConstants().BRAZE_CONFIG_FIELDS.ENDPOINT] + "api/v3/data"
-      'bs:disable-next-line LINT1005
       server_response = Braze()._privateApi.networkUtil.postToUrl(endpoint, json)
     end function,
 
@@ -1131,7 +1129,6 @@ function BrazeInit(config as object, messagePort as object)
         while (true)
           msg = wait(0, port)
           if (type(msg) = "roUrlEvent")
-            'bs:disable-next-line LINT1005
             code = msg.GetResponseCode()
             return msg.getString()
           end if
@@ -1374,15 +1371,15 @@ function BrazeInit(config as object, messagePort as object)
 
       if fts <> invalid
         if m._privateapi.dataprovider.cachedconfig.feature_flags_sent_ffi[fts] <> invalid
-          brazeLogger.debug("Not logging a feature flag impression. Was already logged once this session.", FormatJson(args)) 'bs:disable-line 1001 LINT1004
+          brazeLogger.debug("Not logging a feature flag impression. Was already logged once this session.", FormatJson(args))
         else
           m._privateapi.dataprovider.cachedconfig.feature_flags_sent_ffi[fts] = 1
           event_object = m._privateApi.eventHandler.createFeatureFlagImpressionEvent(ffId, fts)
-          brazeLogger.debug("Logging a feature flag impression. ", FormatJson(args)) 'bs:disable-line 1001 LINT1004
-          m._privateApi.eventHandler.logEvent(event_object)  
+          brazeLogger.debug("Logging a feature flag impression. ", FormatJson(args))
+          m._privateApi.eventHandler.logEvent(event_object)
         end if
-      else 
-        brazeLogger.debug("Not logging a feature flag impression. The feature flag was not part of any matching campaign", FormatJson(args)) 'bs:disable-line 1001 LINT1004
+      else
+        brazeLogger.debug("Not logging a feature flag impression. The feature flag was not part of any matching campaign", FormatJson(args))
       end if
     end function,
 
@@ -1461,7 +1458,7 @@ function BrazeInit(config as object, messagePort as object)
         m.sessionStart({})
       else
         m._privateApi.brazeLogger.debug("userid not changed", "")
-      end if  
+      end if
     end function
   }
 
@@ -1471,9 +1468,8 @@ function BrazeInit(config as object, messagePort as object)
     dataProvider: DataProvider
     timeUtils: TimeUtils
     networkUtil: NetworkUtil
-    'bs:disable-next-line LINT1004
     brazeLogger: BrazeLogger
-    eventHandler: eventHandler 'bs:disable-line 1001 LINT1004
+    eventHandler: eventHandler
     brazeUtils: BrazeUtils
   }
 
@@ -1668,7 +1664,7 @@ function getBrazeInstance(task as object) as object
 
     getFeatureFlag: function(id as string) as object
       feature_flags = getBrazeTask().BrazeFeatureFlags
-      for each ff in feature_flags 
+      for each ff in feature_flags
         if ff.id = id
           return _createFeatureFlag(ff)
         end if
@@ -1676,7 +1672,7 @@ function getBrazeInstance(task as object) as object
       emptyFF = { "id": id, "enabled": false, properties: {} }
       return _createFeatureFlag(emptyFF)
     end function,
-    
+
     logFeatureFlagImpression: function(featureFlagId as string) as void
       m.callInstanceMethod("logFeatureFlagImpression", { ffId: featureFlagId })
     end function,

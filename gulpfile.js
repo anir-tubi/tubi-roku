@@ -152,6 +152,8 @@ function buildInstalled() {
       '!src/channel/components/controllers/StarterController/**',
       '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.xml',
       '!src/channel/components/tasks/GeneralTask/StarterGeneralTask.brs',
+      '!src/channel/components/tasks/GeneralTask/Parsers/ExternalConfigParsers.brs',
+      '!src/channel/components/tasks/GeneralTask/Parsers/TubiExperimentParsers.brs',
     ];
 
     let testSources = [

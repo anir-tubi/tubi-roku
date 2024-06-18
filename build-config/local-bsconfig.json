@@ -7,6 +7,7 @@
       "codes": [1013],
       "src": "components/lib/DevGridOverlay.brs"
     },
+    "components/tasks/BrazeTask/BrazeSDK.brs",
     "source/3rdparty/rodash/rodash.cat.brs",
     "source/3rdparty/roku/generalUtils.brs"
   ]
