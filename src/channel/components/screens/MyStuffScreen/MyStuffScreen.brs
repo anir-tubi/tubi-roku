@@ -403,8 +403,6 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.reminderIsSet = false
       m.InfoPanel.width = 960
-    else if mode = m.constants.ui.infoPanelModes.programHomescreen
-      populateInfoPanelWithProgramHomescreenMode(contentNode, m.InfoPanel)
     else if mode = m.constants.ui.infoPanelModes.sportsEvent
       populateInfoPanelWithHomescreenStyleSportsMode(contentNode, m.InfoPanel)
     end if

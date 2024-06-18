@@ -96,7 +96,7 @@ Function tubiMetadataTranslate_getThumbnailImage(contentFromServer, gridType = "
     else if isNonEmptyArray(contentFromServer.thumbnails) = true
       sThumbnailURL = contentFromServer.thumbnails[0]
     end if
-  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR (gridType = gridItemTypes.linear AND m.experiments <> invalid AND m.experiments.getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2").enabled = true)
+  else if gridType = gridItemTypes.landscape OR gridType = gridItemTypes.landscapeNoTitle OR gridType = gridItemTypes.landscapeInnerMetadata OR gridType = gridItemTypes.linear
     if canvasImages <> invalid AND type(canvasImages.landscape_tb) = "roArray" AND isNonEmptyString(canvasImages.landscape_tb[0])
       '//A custom landscape size was requested, use this image instead of the default image
       sThumbnailURL = canvasImages.landscape_tb[0]
@@ -1419,12 +1419,6 @@ Function tubiMetadataTranslate_buildCategoryChildrenInfo(container, contents, co
           bSingleContentFullData = false
 
           if fullChild.type = "l"
-            ' Add apiVersion only we experiment is in treatement.  That way, control is not affected and only linear will have this dynamic field.
-            ' this field will be removed when roku_sports_onnow_rows concludes.
-            if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2").enabled = true
-              childAA.append({apiVersion: "V4"})
-            end if
-
             if fullChild.schedules <> invalid AND fullChild.schedules.count() > 0
               ' convert available schedules into programs from program contents
               programs = []

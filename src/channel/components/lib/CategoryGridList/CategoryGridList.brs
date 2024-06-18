@@ -38,11 +38,6 @@ Function init()
 
   m.RowList.drawFocusFeedbackOnTop = true
 
-  m.liveProgramEnabled = (getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2", false).enabled = true)
-
-  ' This variable is used to keep track whether exposure event has been sent. This variable will help in avoiding to execute the getExperimentResource function on each item focused.
-  m.firstTimeLinearProgramEnabled = false
-
   ' suppress debounce if we have just gained focus
   m.justGainedFocus = false
 
@@ -54,11 +49,8 @@ Function init()
   end if
   onThemeChange()
 
-
-  if m.liveProgramEnabled = true
-    m.LinearProgramRefreshTimer = m.top.findNode("LinearProgramRefreshTimer")
-    m.LinearProgramRefreshTimer.observeFieldScoped("fire", "onLinearProgramRefreshTimer")
-  end if
+  m.LinearProgramRefreshTimer = m.top.findNode("LinearProgramRefreshTimer")
+  m.LinearProgramRefreshTimer.observeFieldScoped("fire", "onLinearProgramRefreshTimer")
 
 End Function
 
@@ -142,16 +134,11 @@ Function onComponentFocusChange()
       m.RowList.setFocus(true)
     end if
 
-    if  m.liveProgramEnabled = true
-      m.LinearProgramRefreshTimer.control = "start"
-      ' When Grid get focus refresh all visible channels
-      onLinearProgramRefreshTimer()
-    end if
+    m.LinearProgramRefreshTimer.control = "start"
+    ' When Grid get focus refresh all visible channels
+    onLinearProgramRefreshTimer()
   else if m.top.isInFocusChain() = false
-    if m.liveProgramEnabled = true
-      m.LinearProgramRefreshTimer.control = "stop"
-    end if
-
+    m.LinearProgramRefreshTimer.control = "stop"
   end if
 
   ' We used to only jump to if m.top had focus. In some cases we would not jump back to the correct item after we modified the RowList content which triggers a jump to the first position usually. Now if we have a m.itemToJumpTo we will always jump to it when we receive a focus change event
@@ -305,10 +292,7 @@ Function setRowHeights()
       posterHeight = posterSize[1]
       rowItemSize.push([posterWidth, posterHeight])
       rowHeight = posterHeight
-    else if gridItemType = gridItemTypes.linear AND m.liveProgramEnabled = false
-      rowItemSize.push(m.constants.ui.imageSizes.linear)
-      rowHeight = m.constants.ui.imageSizes.linear[1]
-    else if gridItemType = gridItemTypes.landscape OR gridItemType = gridItemTypes.landscapeNoTitle OR (gridItemType = gridItemTypes.linear AND m.liveProgramEnabled = true)
+    else if gridItemType = gridItemTypes.landscape OR gridItemType = gridItemTypes.landscapeNoTitle OR gridItemType = gridItemTypes.linear
       posterWidth = landscapeSize[0]
       posterHeight = landscapeSize[1]
       if gridItemType = gridItemTypes.landscape then
@@ -427,11 +411,6 @@ Function onRowItemFocused()
         getExperimentResource("roku_genres_homegrid", "roku_genres_homegrid_v1", true)
       end if
     end if
-  end if
-
-  if m.firstTimeLinearProgramEnabled = false
-    m.firstTimeLinearProgramEnabled = true
-    getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2", true)
   end if
 End Function
 

@@ -525,10 +525,8 @@ Function getConstants()
         if constants.settings.mode <> "production" AND constants.settings.stagingApis = true
           constants.urls.tensor.cdn.urlBase = "https://tensor-cdn.staging-public.tubi.io/api"
         end if
-        constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v3/homescreen"
-        constants.urls.tensor.cdn.homescreenV4 = constants.urls.tensor.cdn.urlBase + "/v4/homescreen"
-        constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v3/containers"
-        constants.urls.tensor.cdn.containerV4 = constants.urls.tensor.cdn.urlBase + "/v4/containers"
+        constants.urls.tensor.cdn.homescreen = constants.urls.tensor.cdn.urlBase + "/v4/homescreen"
+        constants.urls.tensor.cdn.container = constants.urls.tensor.cdn.urlBase + "/v4/containers"
         constants.urls.tensor.cdn.epgChannelIds = constants.urls.tensor.cdn.urlBase + "/v2/epg"
 
 
@@ -1094,7 +1092,6 @@ Function getConstants()
       constants.ui.infoPanelModes.epg = "epg"
       constants.ui.infoPanelModes.simplifiedLinearPlayer = "simplifiedLinearPlayer"
       constants.ui.infoPanelModes.linearSearch = "linearSearch"
-      constants.ui.infoPanelModes.programHomescreen = "programHomescreen"
       constants.ui.infoPanelModes.linearProgramHomescreen = "linearProgramHomescreen"  'v4 api
       constants.ui.infoPanelModes.sportsEvent = "sportsEvent"
 

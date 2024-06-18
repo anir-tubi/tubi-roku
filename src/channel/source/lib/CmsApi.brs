@@ -215,10 +215,9 @@ Function cmsApi_createHomeScreenReqInfo(bKidsMode = false, passedOptions = {})
   params = options.params
   headers = options.headers
   headers["Accept-Version"] = "6.0.0"
+
   url = m.constants.urls.tensor.cdn.homescreen
-  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2").enabled = true
-    url = m.constants.urls.tensor.cdn.homescreenV4
-  end if
+
   params["include_empty_history"] = true
   params["include_empty_queue"] = true
   params["include_channels"] = true
@@ -351,10 +350,6 @@ Function cmsApi_createCategoryReqInfo(categoryId, bKidsMode = false, passedOptio
   options = m.getCommonOptions()
   params = options.params
   url = m.constants.urls.tensor.cdn.container + "/" + categoryId
-
-  if m.experiments <> invalid AND m.experiments.getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2").enabled = true
-    url = m.constants.urls.tensor.cdn.containerV4 + "/" + categoryId
-  end if
 
   params["is_kids_mode"] = bKidsMode
   params["include_channels"] = true

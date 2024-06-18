@@ -60,10 +60,6 @@ Function TubiExperiments(constants) as Object
         roku_registration_player_signup_save_progress_exit_prompt_v2: {"enabled": true}
       }
 
-      roku_sports_onnow_rows: {
-        roku_sports_onnow_rows_v2: {"enabled": true}
-      }
-
       roku_browse_while_watching_ymal: {
         roku_browse_while_watching_ymal_v4 : {"enabled": true}
       }

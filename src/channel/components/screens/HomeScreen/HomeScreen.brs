@@ -78,7 +78,6 @@ Function init()
     m.top.parentalRating = authInfo.parentalrating
   end if
 
-  m.liveProgramEnabled = getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2", false).enabled = true
   ' TODO: Remove after genre grid experiement graduated.
   m.genreInHomeGridType = getExperimentResource("roku_genres_homegrid", "roku_genres_homegrid_v1", false).home_grid_type
 End Function
@@ -399,16 +398,7 @@ Function populateInfoPanelByContent(focusedContent)
   if focusedContent <> invalid
     sType = focusedContent.type
     if sType = m.constants.ui.contentTypes.linear
-      if m.liveProgramEnabled = false 'v3 api
-        '// TODO: Currently we can not use focusedContent.parentType to differenciate between linear and non-linear rows.
-        if focusedContent.parentId = "featured" 'linearContent in featured row
-          populateInfoPanel(m.constants.ui.infoPanelModes.programHomescreen, focusedContent)
-        else
-          populateInfoPanel(m.constants.ui.infoPanelModes.linearHomeScreen, focusedContent)
-        end if
-      else
-        populateInfoPanel(m.constants.ui.infoPanelModes.linearProgramHomescreen, focusedContent)
-      end if
+      populateInfoPanel(m.constants.ui.infoPanelModes.linearProgramHomescreen, focusedContent)
     else if sType = m.constants.ui.contentTypes.historySignedOutUser
       populateInfoPanel(m.constants.ui.infoPanelModes.continueWatching, focusedContent)
     else if sType = m.constants.ui.contentTypes.sportsEvent
@@ -590,8 +580,6 @@ Function populateInfoPanel(mode, contentNode)
       m.InfoPanel.description = contentNode.description
       m.InfoPanel.needsLogin = contentNode.needsLogin AND (m.top.signedIn <> true)
       m.InfoPanel.reminderIsSet = false
-    else if mode = m.constants.ui.infoPanelModes.programHomescreen 'V3 api
-      populateInfoPanelWithProgramHomescreenMode(contentNode, m.InfoPanel)
     else if mode = m.constants.ui.infoPanelModes.sportsEvent
       populateInfoPanelWithHomescreenStyleSportsMode(contentNode, m.InfoPanel)
     end if

@@ -83,7 +83,7 @@ Function showHomeScreen(constants, authInfo, screenID = "")
     pushScreen(homeScreen, true, false)
   end if
 
-  if m.global <> invalid AND getExperimentResource("roku_sports_onnow_rows", "roku_sports_onnow_rows_v2", false).enabled = true
+  if m.global <> invalid
     m.global.addField("refreshLinearChannels", "boolean", false)
   end if
 End Function

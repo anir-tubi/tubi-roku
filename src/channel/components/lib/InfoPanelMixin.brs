@@ -97,7 +97,6 @@ End Function
 
 ' Populates the info panel with the fields necessary for the Linear programs in homeScreen(linear content on non-linear category) mode so that it looks
 ' like the info panel on the homescreen
-' Delete this Function if roku_sports_onnow_rows experiment does not graduate
 '
 ' @content: TubiContentNode, containing a linear channel with programs as children
 ' @infoPanel: InfoPanel node
@@ -172,48 +171,6 @@ Function populateInfoPanelWithLinearProgramHomescreenMode(content, infoPanel)
   if channelName <> "" then lineTwoData.channelName = channelName
   infoPanel.lineOneData = lineOneData
   infoPanel.lineTwoData = lineTwoData
-
-  infoPanel.needsLogin = (content.needsLogin AND m.top.signedIn <> true)
-  infoPanel.width = 960
-End Function
-
-
-' Populates the info panel with the fields necessary for the Linear programs in homeScreen(linear content on non-linear category) mode so that it looks
-' like the info panel on the homescreen
-' Delete this Function if roku_sports_onnow_rows experiment graduates
-'
-' @content: TubiContentNode, containing a linear channel with programs as children
-' @infoPanel: InfoPanel node
-'
-' @sideEffects: updates fields on the passed in infoPanel node
-
-Function populateInfoPanelWithProgramHomescreenMode(content, infoPanel)
-  infoPanel.mode = m.constants.ui.infoPanelModes.programHomescreen
-  '//TODO - Check if we use thumbnail URIs here or inlineLogoUri ??
-  infoPanel.topHeaderImageUri = content.inlineLogoUri
-
-  currentProgram = getCurrentLiveProgram(content)
-  badgeText = ""
-  programTime = ""
-
-  if currentProgram <> invalid
-    infoPanel.title = currentProgram.title
-    infoPanel.episodeTitle = currentProgram.epgProgramTitle
-    badgeText = UCase(getTranslation("screenSearch_liveText"))
-    programTime = currentProgram.hoursOfAiring
-    infoPanel.description = currentProgram.description
-  else
-    infoPanel.description = content.description
-    infoPanel.title = content.title
-  end if
-
-  lineOneData = {}
-  lineOneData.badgeText = badgeText
-  lineOneData.hasCC = content.hasSubtitles
-  lineOneData.hasAudioDescription = content.hasAudioDescription
-  lineOneData.hoursOfAiring = programTime
-
-  infoPanel.lineOneData = lineOneData
 
   infoPanel.needsLogin = (content.needsLogin AND m.top.signedIn <> true)
   infoPanel.width = 960

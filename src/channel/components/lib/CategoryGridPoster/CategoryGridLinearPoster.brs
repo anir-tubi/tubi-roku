@@ -101,11 +101,7 @@ Function updateItemContent(itemContent)
       setProgressBar(progress)
     else 'showing channel info
       m.progressBar.visible = false
-      ' Show onNow badge on channel too if apiVersio is V4
-      ' this check will be removed when roku_sports_onnow_rows concludes.
-      if itemContent.apiVersion <> invalid AND itemContent.apiVersion = "V4"
-        setBadge(m.badgeTypes.onNow)
-      end if
+      setBadge(m.badgeTypes.onNow)
     end if
   end if
 
