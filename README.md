@@ -320,7 +320,7 @@ TBD
 
 11\. Merge the new PR in the adrise_cdn repo and rcdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
 
-12\. check if you need to tun multifactor authentication for AWS. Typically this means running `$ vauth`. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
+12\. check if you need to run multifactor authentication for AWS. Typically this means running `$ valet`. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the valet command.
 
 - __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THE PR FOR THE adRise_cdn REPO, rcdn REPO AND THE PR FOR THE project-total-recall REPO ARE APPROVED AND MERGED.__
 
@@ -332,6 +332,8 @@ TBD
   `$ pyenv`
 
 - If you still need to setup Infra, then in terminal, navigate to your adrise_infrastructure repo and run the setup instructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure#setup)
+
+- Connect to the company VPN (Tailscale) or else you will not be able to run the following Infra Script successfully.
 
 - Deploy to the Roku CDN and CDN by running the Infra Script which is detailed in the [RCDN README file](https://github.com/adRise/rcdn#readme).
 
@@ -449,7 +451,7 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
 
 11\. Merge the new PRs in the adrise_cdn repo and rcdn repo. Also merge the release_x_y_z PR into the x_y_branch branch. Once merged, delete both of these branches.
 
-12\. check if you need to tun multifactor authentication for AWS. Typically this means running `$ vauth`. You ran this in a previous step, but some time may has passed and you may have to run it again. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the vauth command.
+12\. check if you need to run multifactor authentication for AWS. Typically this means running `$ valet`. You ran this in a previous step, but some time may has passed and you may have to run it again. Refer to the [valet repo](https://github.com/adRise/valet#installation) on how to install the valet command.
 
 - __DO NOT PROCEED TO THE FOLLOWING INFRA SCRIPT STEP UNTIL THIS PR AND THE PREVIOUS PRs ARE APPROVED__
 
@@ -461,6 +463,8 @@ Ensure the cherry pick commit names include the name of PR number. This usually 
   `$ pyenv`
 
 - If you still need to setup Infra, then in terminal, navigate to your adrise_infrastructure repo and run the setup instructions that are found on the infrastructure repo's [README file](https://github.com/adRise/adrise_infrastructure#setup)
+
+- Connect to the company VPN (Tailscale) or else you will not be able to run the following Infra Script successfully.
 
 - Deploy to the Roku CDN and CDN by running the Infra Script which is detailed in the [RCDN README file](https://github.com/adRise/rcdn#readme).
 
@@ -639,8 +643,8 @@ The source of these values are two JSON files stored locally within the app's co
 To perform these updates, simply run the following two gulp commands:
 
 ```shell
-gulp update_json_color
-gulp update_json_typography
+gulp updateJsonColor
+gulp updateJsonTypography
 ```
 
 ## Updating the static text (translations) in app
@@ -654,7 +658,7 @@ If you need to make a change or addition to the American English text
 - Then run the following command line within the project's root folder:
 
   ```shell
-  gulp update_local_translations
+  gulp updateLocalTranslations
   ```
 
   This will modify the TubiLanguageTranslate.brs to include the new English text
@@ -662,7 +666,7 @@ If you need to make a change or addition to the American English text
 - Once your branch has been merged into master, then run the following command line within the project's root folder to upload your approved changes to the Crowdin server. "TOKEN" is the personal access token that you need to create within your Crowdin account.
 
   ```shell
-  gulp upload_translations --crowdinToken "TOKEN"
+  gulp uploadTranslations --crowdinToken "TOKEN"
   ```
 
   This upload command will do two things:
@@ -675,7 +679,7 @@ If you need to make a change to text that is not the default English, then log i
 If you need to get the latest translations from the Crowdin servers, then create a new GIT branch and run the below command line within the project's root folder, where "TOKEN" is the personal access token you need to create within your Crowdin account. This will modify the TubiLanguageTranslate.brs to contain all the translations available within Crowdin. You later need to create a PR to start the process of getting the new translations merged to the master branch.
 
   ```shell
-  gulp download_translations --crowdinToken "TOKEN"
+  gulp downloadTranslations --crowdinToken "TOKEN"
   ```
 
 NOTE: Instead of passing the crowdin token, you can set the crowdin token as a system environment variable labeled as "ROKU_CROWDIN_TOKEN". This is actually the preferred way. Check your system on how to create an environment variable. Also note, that the Crowdin personal access token is created under your [Crowdin profile](https://crowdin.com/settings#api-key).

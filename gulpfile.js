@@ -977,9 +977,9 @@ exports.startAutomatedTestsRunner = startAutomatedTestsGithubActionRunner;
 exports.removeAutomatedTestsRunner = removeAutomatedTestsGithubActionRunner;
 
 //command lines related to the crowdin language translations
-exports.update_local_translations = updateLocalTranslations;
-exports.upload_translations = series(updateLocalTranslations, uploadTranslations);
-exports.download_translations = downloadTranslations;
+exports.updateLocalTranslations = updateLocalTranslations;
+exports.uploadTranslations = series(updateLocalTranslations, uploadTranslations);
+exports.downloadTranslations = downloadTranslations;
 
-exports.update_json_typography = updateTypographyJSON;
-exports.update_json_color = updateColorJSON;
+exports.updateJsonTypography = updateTypographyJSON;
+exports.updateJsonColor = updateColorJSON;
