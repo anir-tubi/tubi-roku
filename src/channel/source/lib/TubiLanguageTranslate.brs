@@ -305,10 +305,6 @@ Function getTranslation_en_US()
       "description": "Program time Title when user selects a future program on EPG.",
       "message": "Starts at"
     },
-    "epg_started_at": {
-      "description": "Program time Title for live program.",
-      "message": "Started at"
-    },
     "epg_favorites_toast_message": {
       "description": "Message to be displayed on Toast-message when user favorites a lienar channel",
       "message": "Find favorites at the top of program guide."
@@ -320,6 +316,10 @@ Function getTranslation_en_US()
     "epg_unfavorites_toast_header": {
       "description": "header text to be displayed on Toast-message when user unfavorites a linear channel",
       "message": "Removed from Favorites"
+    },
+    "epg_started_at": {
+      "description": "Program time Title for live program.",
+      "message": "Started at"
     },
     "detail_screen_like_disLike_toast_header": {
       "description": "header text to be displayed on Toast-message when user like/dislike a title",
@@ -1094,8 +1094,12 @@ Function getTranslation_en_US()
       "message": "Watch Trailer"
     },
     "screenDetails_button_episodes": {
-      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title",
+      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
       "message": "Episodes list"
+    },
+    "screenDetails_button_episodes_experiment": {
+      "description": "Label of button to allow users to display the list of episodes/seasons of the current video title. Should be title case.",
+      "message": "All Episodes"
     },
     "screenDetails_relatedTitles": {
       "description": "Label of button to allow users to view other video titles related to the current video title",
@@ -1843,10 +1847,6 @@ Function getTranslation_en_US()
       "description": "Header on the toast message informing the user of update ToS",
       "message": "Important"
     },
-    "privacy_center_view_privacy_settings": {
-      "description": "Settings screen privacy center launch preferences center button label.",
-      "message": "View Privacy Settings"
-    },
     "privacy_center_restart_channel": {
       "description": "Settings screen privacy center restart channel button label.",
       "message": "Restart"
@@ -1862,6 +1862,10 @@ Function getTranslation_en_US()
     "privacy_center_view_privacy_settings_hint": {
       "description": "Settings screen privacy center view privacy settings hint.",
       "message": "You must save privacy setting changes and restart Tubi for changes to take effect."
+    },
+    "privacy_center_view_privacy_settings": {
+      "description": "Settings screen privacy center launch preferences center button label.",
+      "message": "View Privacy Settings"
     },
     "privacy_disclaimer": {
       "description": "Privacy disclaimer text displayed in Sign in and registration flow.",

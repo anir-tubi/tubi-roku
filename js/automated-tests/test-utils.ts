@@ -1009,6 +1009,7 @@ class TestUtils {
         }, 'Could not verify that Remove from history was removed');
         break;
       case 'episodesList':
+        // TODO:: roku_all_episiodes_v1 - if experiment is graduated, then change Episode List to All Episodes
         await this.selectMenuItem(element, 'Episodes list', timeout);
         await this.waitForElementToBeInFocusChain('episodesScreen');
         break;

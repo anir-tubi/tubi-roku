@@ -29,6 +29,10 @@ Function TubiExperiments(constants) as Object
       roku_large_play_progress: {
         roku_large_play_progress_v1 : {"enabled": true}
       }
+      
+      roku_all_episiodes: {
+        roku_all_episiodes_v1 : {"enabled": false}
+      }
 
       roku_linear_favorites: {
         roku_linear_favorites_v1: {"enabled": false}
