@@ -682,6 +682,12 @@ If you need to get the latest translations from the Crowdin servers, then create
   gulp downloadTranslations --crowdinToken "TOKEN"
   ```
 
+During the `gulp stage` and `gulp release` commands, there will be a few comparison checks to ensure all English strings have been uploaded to Crowdin and all translations have been downloaded from Crowdin. These checks can be done directly using the following command:
+
+  ```shell
+  gulp compareTranslations --crowdinToken "TOKEN"
+  ```
+
 NOTE: Instead of passing the crowdin token, you can set the crowdin token as a system environment variable labeled as "ROKU_CROWDIN_TOKEN". This is actually the preferred way. Check your system on how to create an environment variable. Also note, that the Crowdin personal access token is created under your [Crowdin profile](https://crowdin.com/settings#api-key).
 
 After some time of features being added/removed, some translations may no longer be needed. The following command line script should be used to check for any unnecessary translations. A PR should then be created to remove these no longer-needed translations. Please note that the script also displays other potentially unnecessary things in the codebase: i.e. images.

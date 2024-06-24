@@ -20,7 +20,7 @@ const {createManifest, createSettings} = require('./js/build');
 const {keypress, deeplink, uploadPkg, signPkg, installWithSquashfs} = require('./js/network');
 
 //Functions to upload and download static string translations
-const {downloadTranslations, updateLocalTranslations, uploadTranslations} = require('./js/translate');
+const {compareTranslations, downloadAndProcessTranslations, updateLocalTranslations, uploadTranslations} = require('./js/translate');
 const {listUnusedImages,listUnusedTranslations} = require('./js/codeclean.js');
 const {replaceColorConstants, updateColorJSON} = require('./js/colorreplace.js');
 const {replaceTypographyConstants, updateTypographyJSON} = require('./js/typography.js');
@@ -903,9 +903,9 @@ exports.bumpQa = exports.bumpQA; //Create bumpQA command alias
 exports.install = series(exports.build, conditionalPackage, sideLoad);
 exports.test = series(setTest, clean, preprocessTests, buildInstalled, sideLoad);
 exports.buildQaBranch = buildQaBranch;
-exports.stage = series(setStaging, bumpRevision, exports.build, packageAll, pushStaging, pushBranch);
+exports.stage = series(compareTranslations, setStaging, bumpRevision, exports.build, packageAll, pushStaging, pushBranch);
 exports.releaseOnGithub = series(tagBuild, pushTag, createGithubRelease);
-exports.release = series(confirmRelease, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub);
+exports.release = series(confirmRelease, compareTranslations, setProduction, bumpBuild, exports.build, packageAll, makeReleasePrs, exports.releaseOnGithub);
 exports.compareProd = findCommitsNotOnProductionBranch;
 exports.compareCheckedOut = findCommitsNotOnCurrentBranch;
 exports.addMissingImages = addMissingImagesToRemoteLibrary;
@@ -979,7 +979,8 @@ exports.removeAutomatedTestsRunner = removeAutomatedTestsGithubActionRunner;
 //command lines related to the crowdin language translations
 exports.updateLocalTranslations = updateLocalTranslations;
 exports.uploadTranslations = series(updateLocalTranslations, uploadTranslations);
-exports.downloadTranslations = downloadTranslations;
+exports.downloadTranslations = downloadAndProcessTranslations;
+exports.compareTranslations = compareTranslations;
 
 exports.updateJsonTypography = updateTypographyJSON;
 exports.updateJsonColor = updateColorJSON;
