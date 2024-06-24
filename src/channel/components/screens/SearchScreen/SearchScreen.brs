@@ -199,7 +199,6 @@ Function setSearchStrings()
     m.searchHintToSearch = getTranslation("screenSearch_defaultSearch")
   end if
   setDefaultText()
-  m.searchText.text = ""
   m.trendingSearchHeading.text = m.sDefaultSearchText
   m.sDefaultKidsWarning = getTranslation("screenSearch_kidsWarning")
   m.KidsModeMessage.text = m.sDefaultKidsWarning
@@ -309,7 +308,6 @@ End Function
 ' When the server returns with search content, this function will be called.
 Function onSearchContentChange()
   displayLoading(false)
-  m.ResultGrid.content = invalid '//reset content everytime so in case the new results = previous results, then the contemt can refresh. Without refreshing content, then the content may appear blank
   content = m.top.content
 
   if content <> invalid AND content.getChildCount() > 0
@@ -321,27 +319,24 @@ Function onSearchContentChange()
     end if
   end if
 
-
   if content <> invalid AND content.getChildCount() > 0 then
-    ' Resetting the values to default on every new search term to clear out previous navigation/scroll history.
-    m.noMatchingResultsMessage.visible = false
-    m.trendingResultsHint.visible = false
-    m.trendingSearchResultsContainer.translation = [0, 0]
-    m.ResultGrid.jumpToItem = 0
-    m.trendingSearchResultGrid.jumpToItem = 0
-    m.gridContainer.translation = [0, 0]
-    m.gridContainer.visible = true
-    m.isTrendingResultsGridInFocus = false
-
     if content.isDefaultSearchResults = true
-      '//display special text when the default search is displaying
-      setDefaultText()
-      if m.microphone <> invalid
-        m.microphone.visible = true
-      end if
-      m.searchText.text = ""
       m.trendingSearchResultsContainer.visible = true
-      m.ResultGrid.visible = false
+      resultsContent = m.ResultGrid.content
+      ' Checking if the resultsGrid is empty, if yes than hiding the resultsGrid and moving the trendingSearchResultsContainer upwards.
+      if resultsContent = invalid OR resultsContent.getChildCount() = 0
+        '// display special text when the default search is displaying
+        setDefaultText()
+        m.ResultGrid.visible = false
+        m.trendingSearchResultsContainer.translation = [0, 0]
+      else
+        if resultsContent.getChildCount() > 5
+          m.trendingSearchResultsContainer.translation = [0, 672]
+        else
+          ' If the result count is less than or equal to 5. We will show the trending searches.
+          m.trendingSearchResultsContainer.translation = [0, 372]
+        end if
+      end if
     else
       matchingText = getTranslation("screenSearch_matchingTitles")
       m.searchHintText.text = m.ResultGrid.content.getChildCount().toStr() + " " + matchingText + " " + Chr(34) + m.searchMenuText.text + Chr(34)
@@ -354,10 +349,10 @@ Function onSearchContentChange()
         m.trendingResultsHint.visible = false
         if m.top.isUserEligibleForTrendingSearchContents = true
           m.trendingSearchResultsContainer.visible = true
-          m.trendingResultsHint.visible = true
           if content.getChildCount() > 5
             m.trendingSearchResultsContainer.translation = [0, 672]
           else
+            m.trendingResultsHint.visible = true
             ' If the result count is less than or equal to 5. We will show the trending searches.
             m.trendingSearchResultsContainer.translation = [0, 372]
           end if
@@ -424,13 +419,29 @@ Function onKeyboardTextChanged()
   '//display spinner
   displayLoading()
   '//hide previous content
+  m.ResultGrid.content = invalid
+  m.noMatchingResultsMessage.visible = false
+  m.trendingResultsHint.visible = false
+  m.trendingSearchResultsContainer.visible = false
+  m.trendingSearchResultsContainer.translation = [0, 0]
+  m.ResultGrid.jumpToItem = 0
+  m.trendingSearchResultGrid.jumpToItem = 0
+  m.gridContainer.translation = [0, 0]
+  m.gridContainer.visible = true
+  m.isTrendingResultsGridInFocus = false
+
   m.ResultGrid.visible = false
   m.NoResultsMessage.visible = false
 
   m.SearchText.text = ""
   m.searchHintText.text = ""
   m.KidsModeMessage.text = ""
-  m.searchMenuText.text = LCase(m.Keyboard.text)
+
+  if m.Keyboard.text <> invalid AND m.Keyboard.text.len() > 0
+    m.searchMenuText.text = LCase(m.Keyboard.text)
+  else
+    m.searchMenuText.text = m.searchTitleText
+  end if
 
   ' making backend request only after 0.5s
   m.searchDebounce.control = "start"
@@ -577,6 +588,9 @@ Function onResultGridCurrFocusRowChange(msg)
   if fraction < 1 AND m.top.isUserEligibleForTrendingSearchContents = true
     translationY = 672 - ((1 - fraction) * 298)
     m.trendingSearchResultsContainer.translation = [0, translationY]
+    m.trendingResultsHint.visible = true
+  else
+    m.trendingResultsHint.visible = false
   end if
 End Function
 
@@ -731,9 +745,12 @@ End Function
 
 
 Function setDefaultText()
-  m.searchMenuText.text = m.searchTitleText
-  m.searchHintText.text = m.searchHintToSearch
-  m.KidsModeMessage.text = m.sDefaultKidsWarning
+  if m.Keyboard.text = ""
+    m.searchMenuText.text = m.searchTitleText
+    m.KidsModeMessage.text = m.sDefaultKidsWarning
+    m.searchHintText.text = m.searchHintToSearch
+    m.searchText.text = ""
+  end if
 End Function
 
 

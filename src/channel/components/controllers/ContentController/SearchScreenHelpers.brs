@@ -112,7 +112,7 @@ Function onSearchTextChanged(msg)
     end if
 
     categoryReqInfo = m.CmsApi.createCategoryReqInfo(categoryId, kidsMode, requestOptions)
-    m.currentSearchScreenRequestInfo = m.makeRequest({
+    m.makeRequest({
       url: categoryReqInfo.url
       requestType: m.constants.reqNames.getSearchDefault
       options: categoryReqInfo.options
