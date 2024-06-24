@@ -344,13 +344,13 @@ Function init()
 
   setFocusToComponent(m.PlayPauseButton)
 
-  title = m.TopOverlay.findNode("VideoOverlayTitle")
-  episodeTitle = m.TopOverlay.findNode("VideoOverlayEpisodeTitle")
+  m.title = m.TopOverlay.findNode("VideoOverlayTitle")
+  m.episodeTitle = m.TopOverlay.findNode("VideoOverlayEpisodeTitle")
   SkipTrailerButtonLabel = m.TopOverlay.findNode("SkipTrailerButtonLabel")
 
   typographyConstants = getTypographyConstants()
-  setTypographyOfLabel(title, typographyConstants.ids.headerSmall)
-  setTypographyOfLabel(episodeTitle, typographyConstants.ids.bodyLarge)
+  setTypographyOfLabel(m.title, typographyConstants.ids.headerSmall)
+  setTypographyOfLabel(m.episodeTitle, typographyConstants.ids.bodyLarge)
   setTypographyOfLabel(m.AdHeadsUpText, typographyConstants.ids.subheaderMedium)
   setTypographyOfLabel(m.ratedLabel, typographyConstants.ids.bodyMediumStrong)
   setTypographyOfLabel(m.ratingLabel, typographyConstants.ids.bodySmallStrong)
@@ -1613,18 +1613,14 @@ Function updateVideoPlayerState(content) as Void
   end if
   m.descriptorDesc.text = sDescriptorDescText
 
-  ' add the title and episode title to the overlay
-  title = m.TopOverlay.findNode("VideoOverlayTitle")
-  'This field is also used to display the gameInfo for Replay sports
-  episodeTitle = m.TopOverlay.findNode("VideoOverlayEpisodeTitle")
-  episodeTitle.text = ""
+  m.episodeTitle.text = ""
 
   if content.parentType = "series"
-    title.text = content.parentTitle
-    episodeTitle.text = content.title
+    m.title.text = content.parentTitle
+    m.episodeTitle.text = content.title
   'TODO: check once the API data is ready and remove the hardcoded values
   else if content.parentType = m.constants.uapiContentTypes.sportsEvent
-    title.text = content.title
+    m.title.text = content.title
     episodeTitleText = ""
     if content.length <> invalid and content.length <> 0
       ' add 'dot' spacer only if we had a release date
@@ -1633,14 +1629,14 @@ Function updateVideoPlayerState(content) as Void
       end if
       episodeTitleText = episodeTitleText + formatLengthSelectedLocale(content.length) + " "
     end if
-    episodeTitle.text = "" '.matchTime + " . " + episodeTitleText
+    m.episodeTitle.text = "" '.matchTime + " . " + episodeTitleText
   else
-    title.text = content.title
-    episodeTitle.text = ""
+    m.title.text = content.title
+    m.episodeTitle.text = ""
   end if
 
   m.ratingOverlayAnimatedPositionY = 90
-  if episodeTitle.text <> ""
+  if m.episodeTitle.text <> ""
     '//if the episode title has text, then move the rating y position down to fit the episode title.
     m.ratingOverlayAnimatedPositionY = 144
   end if
