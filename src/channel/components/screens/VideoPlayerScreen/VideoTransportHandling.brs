@@ -1684,7 +1684,10 @@ Function showYMAL()
       m.Related.jumpToRowItem = [0,0]
       m.Related.isLoading = false
     else if getExperimentResource("roku_browse_while_watching_ymal", "roku_browse_while_watching_ymal_v4", false).enabled = true
-      m.Related.isLoading = true
+      ' Since we do not show YMAL for trailers avoiding showing the spinner when user is viewing trailer.
+      if m.top.isTrailer = false
+        m.Related.isLoading = true
+      end if
     end if
 
     m.Related.show = true
