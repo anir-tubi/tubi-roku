@@ -75,7 +75,10 @@ Function tubiSGAdShim_run(videoPlayerNode) As boolean
       else if msg.GetField() = "userConsentsOptOutStatus"
         userConsentsOptOutStatus = msg.getData()
         m.ads.tracking.userConsentsOptOutStatus = userConsentsOptOutStatus
-        m.ads.setLimitAdTracking(userConsentsOptOutStatus[m.constants_.consentKeys.personalization])
+        userPersonalAdOptOutStatus = userConsentsOptOutStatus[m.constants_.consentKeys.personalization]
+        if userPersonalAdOptOutStatus <> invalid
+          m.ads.setLimitAdTracking(userPersonalAdOptOutStatus)
+        end if
       else if msg.GetField() = "tcfString"
         m.ads.tracking.tcfString = msg.getData()
       end if

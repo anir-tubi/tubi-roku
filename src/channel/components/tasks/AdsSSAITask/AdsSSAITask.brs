@@ -106,7 +106,12 @@ Function runSSAILoop(ssaiPort)
         userConsentsOptOutStatus = msg.getData()
         m.tracking.userConsentsOptOutStatus = userConsentsOptOutStatus
         m.adLib.userConsentsOptOutStatus = userConsentsOptOutStatus
-        m.adLib.setLimitAdTracking(userConsentsOptOutStatus[m.constants.consentKeys.personalization])
+        
+        userPersonalAdOptOutStatus = userConsentsOptOutStatus[m.constants.consentKeys.personalization]
+        if userPersonalAdOptOutStatus <> invalid
+          m.adLib.setLimitAdTracking(userPersonalAdOptOutStatus)
+        end if
+
       else if messageField = "tcfString"
         m.adLib.tcfString = msg.getData()
       else if messageField = "playbackStopped"
