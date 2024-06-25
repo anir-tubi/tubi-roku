@@ -495,7 +495,11 @@ Function getTranslation_en_US()
     },
     "dialog_tvDisabled_title": {
       "description": "Title of a Dialog Window that is shown when the user clicked the sidenav TV menu item but the item has been disabled",
-      "message": "TV Disabled"
+      "message": "TV Shows Disabled"
+    },
+    "dialog_linearEPGDisabled_title": {
+      "description": "Title of a Dialog Window that is shown when the user clicked the sidenav Live TV menu item but the item has been disabled",
+      "message": "Live TV Disabled"
     },
     "dialog_sideNavItemDisabled_description": {
       "description": "Message of a Dialog Window that is shown when the user clicked on a sidenav menu item but the item has been disabled",

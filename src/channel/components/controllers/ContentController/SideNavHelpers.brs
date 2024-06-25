@@ -262,9 +262,9 @@ Function onSideNavItemSelected()
       if isKidsUIOn() = true
         bNewScreenCalledSuccess = false
         displayMenuItemDisabled(m.constants.ui.sideNavIds.movies)
-      else if isParentalControlsAdultLevel() = false
+      else if isKidsModeEnabledByParentalControls() = true
         bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.sideNavIds.movies, "teens")
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.movies)
       else
         setUiMode(m.constants.ui.modes.standard)
         showMoviesScreen()
@@ -274,9 +274,9 @@ Function onSideNavItemSelected()
       if isKidsUIOn() = true
         bNewScreenCalledSuccess = false
         displayMenuItemDisabled(m.constants.ui.sideNavIds.tv)
-      else if isParentalControlsAdultLevel() = false
+      else if isKidsModeEnabledByParentalControls() = true
         bNewScreenCalledSuccess = false
-        displayMenuItemDisabled(m.constants.ui.sideNavIds.tv, "teens")
+        displayMenuItemDisabled(m.constants.ui.sideNavIds.tv)
       else
         setUiMode(m.constants.ui.modes.standard)
         showTVScreen()
@@ -343,6 +343,12 @@ Function displayMenuItemDisabled(sMenuItemID, parental = "")
   else if sMenuItemID = m.constants.ui.sideNavIds.linearEPG
     sTitle = getTranslation("dialog_linearEPGDisabled_title")
     sDialogSubTypeValue = "kids-mode-linearEPG"
+  else if sMenuItemID = m.constants.ui.sideNavIds.movies
+    sTitle = getTranslation("dialog_moviesDisabled_title")
+    sDialogSubTypeValue = "kids-mode-movies"
+  else if sMenuItemID = m.constants.ui.sideNavIds.tv
+    sTitle = getTranslation("dialog_tvDisabled_title")
+    sDialogSubTypeValue = "kids-mode-tvshows"
   end if
 
   dialogEvent = {
