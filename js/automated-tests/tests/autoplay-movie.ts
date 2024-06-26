@@ -6,21 +6,21 @@ import { shared } from '../shared';
 import { waitForDebugger } from 'inspector';
 
 describe('Autoplay Movies', function () {
-    
+
     // Test Rail Link: https://tubi.testrail.io/index.php?/cases/view/105693
     it('105693 - Autoplay - Movie - When movie reaches the credit cue point then autoplay triggers @autoplay', async () => {
-          
+
         await testUtils.startApplicationAtPage('movies', { shouldCreateNewUser: true });
-          
+
         // Are we on the Movies page?
         await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-        
+
         //Play title, seek to trigger cuepoint
         await ecp.sendKeypress(ecp.Key.Play);
         await seekToTriggerCuePoint();
 
         // Autoplay triggered?
-        await checkForAutoPlayTrigger();    
+        await checkForAutoPlayTrigger();
 
     });
 
@@ -30,7 +30,7 @@ describe('Autoplay Movies', function () {
 
         // Are we on the Movies page?
         await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-  
+
         //Play title, check cue point
         await utils.sleep(1000);
         await ecp.sendKeypress(ecp.Key.Play);
@@ -41,7 +41,7 @@ describe('Autoplay Movies', function () {
         // Autoplay triggered?
         await checkForAutoPlayTrigger();
 
-        
+
         // Scroll to next selection
         await ecp.sendKeypress(ecp.Key.Right);
 
@@ -58,14 +58,14 @@ describe('Autoplay Movies', function () {
 
         // Are we on the Movies page?
         await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-    
+
         //Play title, pause to open player, move right to FF button and press, verify state
         await ecp.sendKeypress(ecp.Key.Play);
         await seekToTriggerCuePoint();
 
         // Autoplay triggered?
         await checkForAutoPlayTrigger();
-     
+
         // Scroll to last selection
         await utils.sleep(1000);
         await ecp.sendKeypress(ecp.Key.Right, { count: 10 });
@@ -86,7 +86,7 @@ describe('Autoplay Movies', function () {
         //Play title, trigger autoplays
         await ecp.sendKeypress(ecp.Key.Play);
         await seekToTriggerCuePoint();
-       
+
         // Autoplay triggered?
         await ecp.sendKeypress(ecp.Key.Play);
         await checkForAutoPlayTrigger();
@@ -105,7 +105,7 @@ describe('Autoplay Movies', function () {
 
         // Are we on the Movies page?
         await testUtils.waitForElementToHaveFocus('movieScreenRowList', 'Timed out waiting for Rowlist to have focus', 15000);
-        
+
         //Play title, pause to open player, move right to FF button and press, verify state
         await ecp.sendKeypress(ecp.Key.Play);
         await seekToTriggerCuePoint();
@@ -124,9 +124,9 @@ describe('Autoplay Movies', function () {
         await testUtils.startApplicationAtPage('search', { shouldCreateNewUser: true });
         await testUtils.waitForElementToFullyShowOnScreen('searchKeyPad');
         await ecp.sendText('zapped');
-        await testUtils.waitForElementToFullyShowOnScreen('searchResultsText');
+        await testUtils.waitForElementToShowOnScreen('searchResultGrid');
 
-      // Navigate right until the grid is in focus
+        // Navigate right until the grid is in focus
         await testUtils.untilTrue(async () => {
           await ecp.sendKeypress(ecp.Key.Right);
           const { value: id } = await odc.getValue({
@@ -146,18 +146,18 @@ describe('Autoplay Movies', function () {
               value: 'Zapped'
           }
       });
-       
+
 
         //Play title, trigger autoplay
         await ecp.sendKeypress(ecp.Key.Play);
         await seekToTriggerCuePoint();
-     
+
         // Autoplay triggered?
         await checkForAutoPlayTrigger();
 
         // Is the Year displayed on the autoplay option?
         await testUtils.waitForElementToFullyShowOnScreen('autoPlayYearAndDuration');
-        
+
     });
 });
 
